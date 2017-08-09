@@ -1,0 +1,10 @@
+[ignore]
+.*/node_modules/styled-components/.*
+
+[options]
+
+# Provides a way to suppress flow errors in the following line.
+# Example: // $FlowFixMe: This following line is borked because of reasons.
+# Example: // $ExpectError: This following line is correctly ignored by flow.
+suppress_comment= \\(.\\|\n\\)*\\$FlowFixMe
+suppress_comment= \\(.\\|\n\\)*\\$ExpectError
