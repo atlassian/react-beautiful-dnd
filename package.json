@@ -1,6 +1,6 @@
 {
   "name": "react-natural-drag",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Natural drag and drop for lists with React",
   "author": "Alex Reardon <areardon@atlassian.com>",
   "keywords": [
