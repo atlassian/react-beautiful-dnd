@@ -1,7 +1,7 @@
 {
-  "name": "react-natural-drag",
+  "name": "react-beautiful-dnd",
   "version": "1.0.1",
-  "description": "Natural drag and drop for lists with React",
+  "description": "A beautiful, accessible drag and drop library for lists with React.js",
   "author": "Alex Reardon <areardon@atlassian.com>",
   "keywords": [
     "drag and drop",
@@ -10,7 +10,7 @@
     "beautiful"
   ],
   "bugs": {
-    "url": "https://github.com/atlassian/react-natural-drag/issues"
+    "url": "https://github.com/atlassian/react-beautiful-dnd/issues"
   },
   "main": "lib/index.js",
   "scripts": {
@@ -70,6 +70,6 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/atlassian/react-natural-drag.git"
+    "url": "https://github.com/atlassian/react-beautiful-dnd.git"
   }
 }

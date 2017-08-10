@@ -1,14 +1,14 @@
-# react-natural-drag
+# react-beautiful-dnd
 
-Natural drag and drop for lists with [React](https://facebook.github.io/react/)
+A beautiful, accessible drag and drop library for lists with [React.js](https://facebook.github.io/react/)
 
-[![Build Status](https://travis-ci.org/atlassian/react-natural-drag.svg?branch=master)](https://travis-ci.org/atlassian/react-natural-drag) [![dependencies](https://david-dm.org/atlassian/react-natural-drag.svg)](https://david-dm.org/atlassian/react-natural-drag) [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
+[![Build Status](https://travis-ci.org/atlassian/react-beautiful-dnd.svg?branch=master)](https://travis-ci.org/atlassian/react-beautiful-dnd) [![dependencies](https://david-dm.org/atlassian/react-beautiful-dnd.svg)](https://david-dm.org/atlassian/react-beautiful-dnd) [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
 
 ![example](https://raw.githubusercontent.com/alexreardon/files/master/resources/dnd-overview.gif)
 
 ## Examples 🎉
 
-See how beautiful it is for yourself - [have a play with the examples!](https://react-natural-drag.netlify.com)
+See how beautiful it is for yourself - [have a play with the examples!](https://react-beautiful-drag.netlify.com)
 
 ## Core characteristics:
 
@@ -21,7 +21,7 @@ See how beautiful it is for yourself - [have a play with the examples!](https://
 
 ## Why not [react-dnd](https://github.com/react-dnd/react-dnd)?
 
-There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing **react-dnd**. It does an incredible job at providing a consistent react based interface on the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **react-natural-drag is a higher level abstraction specifically built for vertical and horizontal lists.**. Within that subset of functionality react-natural-drag offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by **react-dnd**. So this library might not be for you depending on what your use case is.
+There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing **react-dnd**. It does an incredible job at providing a consistent react based interface on the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **react-beautiful-dnd is a higher level abstraction specifically built for vertical and horizontal lists.**. Within that subset of functionality react-beautiful-dnd offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by **react-dnd**. So this library might not be for you depending on what your use case is.
 
 ## Still young!
 
@@ -56,10 +56,10 @@ This library is still fairly new and so there is a relatively small feature set.
 
 ```bash
 # yarn
-yarn add react-natural-drag
+yarn add react-beautiful-dnd
 
 # npm
-npm install react-natural-drag --save
+npm install react-beautiful-dnd --save
 ```
 
 ## Basic usage example
@@ -71,7 +71,7 @@ This is a simple little reorderable list. [You can play with it on webpackbin](h
 ```js
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { DragDropContext, Droppable, Draggable } from 'react-natural-drag';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 // fake data generator
 const getItems = (count) => Array.from({length: count}, (v, k) => k).map(k => ({
@@ -203,7 +203,7 @@ type Props = Hooks & {|
 ### Basic usage
 
 ```js
-import { DragDropContext } from 'react-natural-drag';
+import { DragDropContext } from 'react-beautiful-dnd';
 
 class App extends React.Component {
   onDragStart = () => {...}
@@ -339,7 +339,7 @@ Your *hook* functions will only be captured *once at start up*. Please do not ch
 `Droppable` components can be **dropped on by a `Draggable`**. They also **contain** `Draggable`s. A `Draggable` must be contained within a `Droppable`.
 
 ```js
-import { Droppable } from 'react-natural-drag';
+import { Droppable } from 'react-beautiful-dnd';
 
 <Droppable
   droppableId="droppable-1"
@@ -452,7 +452,7 @@ Getting keyboard dragging to work with scroll containers is quite difficult. Cur
 > Note: moving between `Droppable`s is currently not supported in the initial version.
 
 ```js
-import { Draggable } from 'react-natural-drag';
+import { Draggable } from 'react-beautiful-dnd';
 
 <Draggable
   draggableId="draggable-1"
@@ -765,7 +765,7 @@ When a user presses the mouse down on an element, we cannot determine if the use
 
 ### Focus management
 
-react-natural-drag does not create any wrapper elements. This means that it will not impact the usage tab flow of a document. For example, if you are wrapping an *anchor* tag then the user will tab to the anchor directly and not an element surrounding the *anchor*. Whatever element you wrap will be given a `tab-index` to ensure that users can tab to the element to perform keyboard dragging.
+react-beautiful-dnd does not create any wrapper elements. This means that it will not impact the usage tab flow of a document. For example, if you are wrapping an *anchor* tag then the user will tab to the anchor directly and not an element surrounding the *anchor*. Whatever element you wrap will be given a `tab-index` to ensure that users can tab to the element to perform keyboard dragging.
 
 ### Keyboard dragging 🎹
 
