@@ -11,6 +11,9 @@ node_modules/
 # generated files
 lib/
 
+# generated site
+site/
+
 # logs
 yarn-error.log
 npm-debug.log

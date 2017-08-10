@@ -20,6 +20,7 @@
     "typecheck": "flow check",
     "build": "babel src -d lib",
     "storybook": "start-storybook -p 9002",
+    "build-storybook": "build-storybook -c .storybook -o site",
     "prepublish": "yarn run build"
   },
   "dependencies": {
