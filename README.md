@@ -17,7 +17,7 @@ Natural drag and drop for lists with [React](https://facebook.github.io/react/)
 
 ## Why not [react-dnd](https://github.com/react-dnd/react-dnd)?
 
-There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing **react-dnd**. It does an incredible job at providing a consistent react based interface on the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **This library is a higher level abstraction specifically built for vertical and horizontal lists.**. Within that subset of functionality this library offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by **react-dnd**. So this library might not be for you depending on what your use case is.
+There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing **react-dnd**. It does an incredible job at providing a consistent react based interface on the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **react-natural-drag is a higher level abstraction specifically built for vertical and horizontal lists.**. Within that subset of functionality react-natural-drag offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by **react-dnd**. So this library might not be for you depending on what your use case is.
 
 ## Still young!
 
@@ -644,7 +644,25 @@ When a user presses the mouse down on an element, we cannot determine if the use
 
 ### Focus management
 
-This library does not create any wrapper elements. This means that it will not impact the usage tab flow of a document. For example, if you are wrapping an *anchor* tag then the user will tab to the anchor directly and not an element surrounding the *anchor*. Whatever element you wrap will be given a `tab-index` to ensure that users can tab to the element to perform keyboard dragging.
+react-natural-drag does not create any wrapper elements. This means that it will not impact the usage tab flow of a document. For example, if you are wrapping an *anchor* tag then the user will tab to the anchor directly and not an element surrounding the *anchor*. Whatever element you wrap will be given a `tab-index` to ensure that users can tab to the element to perform keyboard dragging.
+
+### Keyboard dragging 🎹
+
+Traditionally drag and drop interactions have been exclusively a mouse or touch interaction. This library supports drag and drop interactions using only a keyboard. This enables power users to drive more of our interfaces with a keyboard. It also opens drag and drop interactions to those who previously would be unable to use them due to an impediment.
+
+#### Shortcuts
+
+Currently the keyboard handling is hard coded. This could be changed in the future to become customisable. Here is the existing keyboard mapping:
+
+- **tab `↹`** - standard browser tabbing will navigate through the `Droppable`'s. The library does not do anything fancy with `tab` while users are selecting. Once a drag has started, `tab` is blocked for the duration of the drag.
+- **spacebar ` `** - lift a focused `Draggable`. Also, drop a dragging `Draggable` where the drag was started with a `spacebar`.
+- **Up arrow `↑`** - move a `Draggable` that is dragging up on a vertical list
+- **Down arrow `↓`** - move a `Draggable` that is dragging down on a vertical list
+- **Escape `esc`** - cancel an existing drag - regardless of whether the user is dragging with the keyboard or mouse.
+
+#### Limitations of keyboard dragging
+
+There is a currently limitation of keyboard dragging: **the drag will cancel if the user scrolls the window**. This could be worked around but for now it is the simpliest initial approach.
 
 ## Engineering health
 
@@ -673,22 +691,6 @@ This codebase is designed to be extremely performant - it is part of its DNA. It
 |------------------------|-----------------------|
 |![minimal-browser-paints](https://github.com/alexreardon/files/blob/master/resources/dnd-browser-paint.gif?raw=true)|![minimal-react-updates](https://github.com/alexreardon/files/blob/master/resources/dnd-react-paint.gif?raw=true)|
 
-## Keyboard
-
-### Shortcuts
-
-Currently the keyboard handling is hard coded. This could be changed in the future to become customisable. Here is the existing keyboard mapping:
-
-- **tab `↹`** - standard browser tabbing will navigate through the `Droppable`'s. The library does not do anything fancy with `tab` while users are selecting. Once a drag has started, `tab` is blocked for the duration of the drag.
-- **spacebar ` `** - lift a focused `Draggable`. Also, drop a dragging `Draggable` where the drag was started with a `spacebar`.
-- **Up arrow `↑`** - move a `Draggable` that is dragging up on a vertical list
-- **Down arrow `↓`** - move a `Draggable` that is dragging down on a vertical list
-- **Escape `esc`** - cancel an existing drag - regardless of whether the user is dragging with the keyboard or mouse.
-
-### Limitations of keyboard dragging
-
-There is a currently limitation of keyboard dragging: **the drag will cancel if the user scrolls the window**. This could be worked around but for now it is the simpliest initial approach.
-
 ## Author / maintainer
 
-Alex Reardon - areardon@atlassian.com
+Alex Reardon - [@alexandereardon](https://twitter.com/alexandereardon) - areardon@atlassian.com
