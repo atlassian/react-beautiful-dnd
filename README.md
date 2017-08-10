@@ -6,6 +6,10 @@ Natural drag and drop for lists with [React](https://facebook.github.io/react/)
 
 ![example](https://raw.githubusercontent.com/alexreardon/files/master/resources/dnd-overview.gif)
 
+## Examples 🎉
+
+See how beautiful it is for yourself - [have a play with the examples!](https://react-natural-drag.netlify.com)
+
 ## Core characteristics:
 
 - beautiful, natural movement of items
