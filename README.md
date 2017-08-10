@@ -669,13 +669,9 @@ This codebase is designed to be extremely performant - it is part of its DNA. It
 - memoization is used all over the place - thanks [memoize-one](https://github.com/alexreardon/memoize-one)
 - conditionally disabling [`pointer-events`](https://developer.mozilla.org/en/docs/Web/CSS/pointer-events) on `Draggable`s while dragging to prevent the browser needing to do redundant work
 
-*Minimal amount of browser paints*
-
-![minimal-browser-paints](https://github.com/alexreardon/files/blob/master/resources/dnd-browser-paint.gif?raw=true)
-
-*Minimal amount of react updates*
-
-![minimal-react-updates](https://github.com/alexreardon/files/blob/master/resources/dnd-react-paint.gif?raw=true)
+| Minimal browser paints | Minimal React updates |
+|------------------------|-----------------------|
+|![minimal-browser-paints](https://github.com/alexreardon/files/blob/master/resources/dnd-browser-paint.gif?raw=true)|![minimal-react-updates](https://github.com/alexreardon/files/blob/master/resources/dnd-react-paint.gif?raw=true)|
 
 ## Keyboard
 
