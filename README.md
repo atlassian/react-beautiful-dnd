@@ -812,6 +812,20 @@ This codebase is designed to be extremely performant - it is part of its DNA. It
 |------------------------|-----------------------|
 |![minimal-browser-paints](https://github.com/alexreardon/files/blob/master/resources/dnd-browser-paint.gif?raw=true)|![minimal-react-updates](https://github.com/alexreardon/files/blob/master/resources/dnd-react-paint.gif?raw=true)|
 
+## Supported browsers
+
+This library supports the standard [Atlassian supported browsers](https://confluence.atlassian.com/cloud/supported-browsers-744721663.html) for desktop:
+
+| Desktop                             | Version                                              |
+|-------------------------------------|------------------------------------------------------|
+| Microsoft Internet Explorer(Windows)| Version 11                                           |
+| Microsoft Edge                      | Latest stable version supported                      |
+| Mozilla Firefox (all platforms)     | Latest stable version supported                      |
+| Google Chrome (Windows and Mac)     | Latest stable version supported                      |
+| Safari (Mac)                        | Latest stable version on latest OS release supported |
+
+Currently mobile is not supported. However, there are plans to add touch support in the future
+
 ## Author / maintainer
 
 Alex Reardon - [@alexandereardon](https://twitter.com/alexandereardon) - areardon@atlassian.com
