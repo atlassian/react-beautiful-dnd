@@ -54,64 +54,9 @@ This library is still fairly new and so there is a relatively small feature set.
 - A mechanism to programatically perform dragging without user input
 - And lots more!
 
-### Core design principle 🎓
-
-Drag and drop with react-beautiful-dnd is supposed to feel physical and natural - similar to that of moving physical objects around. As much as possible things should never 'snap' anywhere. Rather, everything should move naturally at all times.
-
-#### Application 1: knowing when to move
-
-`Draggables` will move into their new position based on their center of gravity. Regardless of where a user grabs an item from - the movement of other things is **based on its center position**. This is similar to a set of scales ⚖️. Here are some rules that are followed to allow for a natural drag experience even with items of flexible height:
-
-- A `Droppable` is dragged over when the center position of a dragging item goes over one of the boundaries of the `Droppable`
-- A resting `Draggable` will move out of the way of a dragging `Draggable` when the center position of the dragging `Draggable` goes over the edge of the resting `Draggable`. Put another way: once the center position of a `Draggable` (A) goes over the edge of another `Draggable` (B), B moves out of the way.
-
-#### Application 2: no drop shadows
-
-Drop shadows are useful in an environment where items and their destinations snap around. However, with react-beautiful-dnd it should be obvious where things will be dropping based on the movement of items. This might be changed in the future - but the experiment is to see how far we can get without any of these affordances.
-
-### Sloppy clicks and click blocking 🐱🎁
-
-A drag will not start until a user has dragged their mouse past a small threshold. If this threshold is not exceeded then the library will not impact the mouse click and will release the event to the browser.
-
-When a user presses the mouse down on an element, we cannot determine if the user was clicking or dragging. If the sloppy click threshold was not exceeded then the event will be treated as if it where a click and the click event will bubble up unmodified. If the user has started dragging by moving the mouse beyond the sloppy click threshold then the click event will be prevented. This behavior allows you to wrap an element that has click behavior such as an anchor and have it work just like a standard anchor while also allowing it to be dragged.
-
-(🐱🎁 is a [schrodinger's cat](https://www.youtube.com/watch?v=IOYyCHGWJq4) joke)
-
-### Focus management 📖
-
-react-beautiful-dnd does not create any wrapper elements. This means that it will not impact the usage tab flow of a document. For example, if you are wrapping an *anchor* tag then the user will tab to the anchor directly and not an element surrounding the *anchor*. Whatever element you wrap will be given a `tab-index` to ensure that users can tab to the element to perform keyboard dragging.
-
-### Keyboard dragging 🎹
-
-Traditionally drag and drop interactions have been exclusively a mouse or touch interaction. This library supports drag and drop interactions using only a keyboard. This enables power users to drive more of our interfaces with a keyboard. It also opens drag and drop interactions to those who previously would be unable to use them due to an impediment.
-
-#### Shortcuts
-
-Currently the keyboard handling is hard coded. This could be changed in the future to become customisable. Here is the existing keyboard mapping:
-
-- **tab `↹`** - standard browser tabbing will navigate through the `Droppable`'s. The library does not do anything fancy with `tab` while users are selecting. Once a drag has started, `tab` is blocked for the duration of the drag.
-- **spacebar ` `** - lift a focused `Draggable`. Also, drop a dragging `Draggable` where the drag was started with a `spacebar`.
-- **Up arrow `↑`** - move a `Draggable` that is dragging up on a vertical list
-- **Down arrow `↓`** - move a `Draggable` that is dragging down on a vertical list
-- **Escape `esc`** - cancel an existing drag - regardless of whether the user is dragging with the keyboard or mouse.
-
-#### Limitations of keyboard dragging
-
-There is a currently limitation of keyboard dragging: **the drag will cancel if the user scrolls the window**. This could be worked around but for now it is the simpliest initial approach.
-
-## Installation
-
-```bash
-# yarn
-yarn add react-beautiful-dnd
-
-# npm
-npm install react-beautiful-dnd --save
-```
-
 ## Basic usage example
 
-This is a simple little reorderable list. [You can play with it on webpackbin](https://www.webpackbin.com/bins/-Kr9aE9jnUeWlphY8wsw)
+This is a simple reorderable list. [You can play with it on webpackbin](https://www.webpackbin.com/bins/-Kr9aE9jnUeWlphY8wsw)
 
 ![basic example](https://github.com/alexreardon/files/blob/master/resources/dnd-basic-example-small.gif?raw=true)
 
@@ -224,6 +169,61 @@ class App extends Component {
 
 // Put the thing into the DOM!
 ReactDOM.render(<App />, document.getElementById('app'));
+```
+
+### Core design principle 🎓
+
+Drag and drop with react-beautiful-dnd is supposed to feel physical and natural - similar to that of moving physical objects around. Things should never 'snap' anywhere. Rather, everything should move naturally as much as possible.
+
+#### Application 1: knowing when to move
+
+`Draggables` will move into their new position based on their center of gravity. Regardless of where a user grabs an item from - the movement of other things is **based on its center position**. This is similar to a set of scales ⚖️. Here are some rules that are followed to allow for a natural drag experience even with items of flexible height:
+
+- A `Droppable` is dragged over when the center position of a dragging item goes over one of the boundaries of the `Droppable`
+- A resting `Draggable` will move out of the way of a dragging `Draggable` when the center position of the dragging `Draggable` goes over the edge of the resting `Draggable`. Put another way: once the center position of a `Draggable` (A) goes over the edge of another `Draggable` (B), B moves out of the way.
+
+#### Application 2: no drop shadows
+
+Drop shadows are useful in an environment where items and their destinations snap around. However, with react-beautiful-dnd it should be obvious where things will be dropping based on the movement of items. This might be changed in the future - but the experiment is to see how far we can get without any of these affordances.
+
+### Sloppy clicks and click blocking 🐱🎁
+
+A drag will not start until a user has dragged their mouse past a small threshold. If this threshold is not exceeded then the library will not impact the mouse click and will release the event to the browser.
+
+When a user presses the mouse down on an element, we cannot determine if the user was clicking or dragging. If the sloppy click threshold was not exceeded then the event will be treated as if it where a click and the click event will bubble up unmodified. If the user has started dragging by moving the mouse beyond the sloppy click threshold then the click event will be prevented. This behavior allows you to wrap an element that has click behavior such as an anchor and have it work just like a standard anchor while also allowing it to be dragged.
+
+(🐱🎁 is a [schrodinger's cat](https://www.youtube.com/watch?v=IOYyCHGWJq4) joke)
+
+### Focus management 📖
+
+react-beautiful-dnd does not create any wrapper elements. This means that it will not impact the usage tab flow of a document. For example, if you are wrapping an *anchor* tag then the user will tab to the anchor directly and not an element surrounding the *anchor*. Whatever element you wrap will be given a `tab-index` to ensure that users can tab to the element to perform keyboard dragging.
+
+### Keyboard dragging 🎹
+
+Traditionally drag and drop interactions have been exclusively a mouse or touch interaction. This library supports drag and drop interactions using only a keyboard. This enables power users to drive more of our interfaces with a keyboard. It also opens drag and drop interactions to those who previously would be unable to use them due to an impediment.
+
+#### Shortcuts
+
+Currently the keyboard handling is hard coded. This could be changed in the future to become customisable. Here is the existing keyboard mapping:
+
+- **tab `↹`** - standard browser tabbing will navigate through the `Droppable`'s. The library does not do anything fancy with `tab` while users are selecting. Once a drag has started, `tab` is blocked for the duration of the drag.
+- **spacebar ` `** - lift a focused `Draggable`. Also, drop a dragging `Draggable` where the drag was started with a `spacebar`.
+- **Up arrow `↑`** - move a `Draggable` that is dragging up on a vertical list
+- **Down arrow `↓`** - move a `Draggable` that is dragging down on a vertical list
+- **Escape `esc`** - cancel an existing drag - regardless of whether the user is dragging with the keyboard or mouse.
+
+#### Limitations of keyboard dragging
+
+There is a currently limitation of keyboard dragging: **the drag will cancel if the user scrolls the window**. This could be worked around but for now it is the simpliest initial approach.
+
+## Installation
+
+```bash
+# yarn
+yarn add react-beautiful-dnd
+
+# npm
+npm install react-beautiful-dnd --save
 ```
 
 ## API
