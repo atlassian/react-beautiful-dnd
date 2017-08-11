@@ -24,8 +24,6 @@
     "prepublish": "yarn run build"
   },
   "dependencies": {
-    "@atlaskit/css-reset": "1.1.5",
-    "@storybook/react": "3.2.3",
     "babel-runtime": "6.25.0",
     "invariant": "2.2.2",
     "memoize-one": "3.0.1",
@@ -39,6 +37,8 @@
     "reselect": "3.0.1"
   },
   "devDependencies": {
+    "@atlaskit/css-reset": "1.1.5",
+    "@storybook/react": "3.2.3",
     "babel-cli": "6.24.1",
     "babel-eslint": "7.2.3",
     "babel-plugin-react-flow-props-to-prop-types": "0.15.0",
