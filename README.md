@@ -30,7 +30,10 @@ This library is still fairly new and so there is a relatively small feature set.
 ### Currently supported feature set
 
 - dragging an item within a single vertical list
+- multiple independent lists on the one page
 - mouse 🐭 and **keyboard 🎹** dragging
+- flexible height items (the draggable items can have different heights)
+- custom drag handle (you can drag a whole item by just a part of it)
 - the vertical list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 
 ### Short term backlog
@@ -42,14 +45,13 @@ This library is still fairly new and so there is a relatively small feature set.
 
 - Moving items between horizontal lists
 - Moving a `Draggable` from a vertical list to a horizontal list
-- Touch support
+- Dragging multiple items at once
 
 ### Long term backlog
 
-- Nesting
+- Touch support
 - Automatically disabling animations when the frame rate drops below a threshold.
 - A mechanism to programatically perform dragging without user input
-- Dragging multiple items at a time
 - And lots more!
 
 ## Installation
@@ -757,13 +759,30 @@ The `children` function is also provided with a small about of state relating to
 </Draggable>
 ```
 
-### Sloppy clicks and click blocking
+### Core design principle 🎓
+
+Drag and drop with react-beautiful-dnd is supposed to feel physical and natural - similar to that of moving physical objects around. As much as possible things should never 'snap' anywhere. Rather, everything should move naturally at all times.
+
+#### Application 1: knowing when to move
+
+`Draggables` will move into their new position based on their center of gravity. Regardless of where a user grabs an item from - the movement of other things is **based on its center position**. This is similar to a set of scales ⚖️. Here are some rules that are followed to allow for a natural drag experience even with items of flexible height:
+
+- A `Droppable` is dragged over when the center position of a dragging item goes over one of the boundaries of the `Droppable`
+- A resting `Draggable` will move out of the way of a dragging `Draggable` when the center position of the dragging `Draggable` goes over the edge of the resting `Draggable`. Put another way: once the center position of a `Draggable` (A) goes over the edge of another `Draggable` (B), B moves out of the way.
+
+#### Application 2: no drop shadows
+
+Drop shadows are useful in an environment where items and their destinations snap around. However, with react-beautiful-dnd it should be obvious where things will be dropping based on the movement of items. This might be changed in the future - but the experiment is to see how far we can get without any of these affordances.
+
+### Sloppy clicks and click blocking 🐱🎁
 
 A drag will not start until a user has dragged their mouse past a small threshold. If this threshold is not exceeded then the library will not impact the mouse click and will release the event to the browser.
 
 When a user presses the mouse down on an element, we cannot determine if the user was clicking or dragging. If the sloppy click threshold was not exceeded then the event will be treated as if it where a click and the click event will bubble up unmodified. If the user has started dragging by moving the mouse beyond the sloppy click threshold then the click event will be prevented. This behavior allows you to wrap an element that has click behavior such as an anchor and have it work just like a standard anchor while also allowing it to be dragged.
 
-### Focus management
+(🐱🎁 is a [schrodinger's cat](https://www.youtube.com/watch?v=IOYyCHGWJq4) joke)
+
+### Focus management 📖
 
 react-beautiful-dnd does not create any wrapper elements. This means that it will not impact the usage tab flow of a document. For example, if you are wrapping an *anchor* tag then the user will tab to the anchor directly and not an element surrounding the *anchor*. Whatever element you wrap will be given a `tab-index` to ensure that users can tab to the element to perform keyboard dragging.
 
