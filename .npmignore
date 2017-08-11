@@ -1,1 +1,27 @@
-# Ignoring nothing. Publishing both src and lib to npm
+# editors
+.idea
+.vscode
+
+# library
+node_modules/
+
+# MacOS
+.DS_Store
+
+# generated site & stories
+site/
+.storybook/
+
+# coverage reports
+coverage/
+
+# yarn
+yarn.lock
+
+# CI
+.travis.yml
+
+# logs
+yarn-error.log
+npm-debug.log
+npm-debug.log.*
