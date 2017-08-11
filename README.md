@@ -21,7 +21,7 @@ See how beautiful it is for yourself - [have a play with the examples!](https://
 
 ## Why not [react-dnd](https://github.com/react-dnd/react-dnd)?
 
-There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing **react-dnd**. It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **react-beautiful-dnd is a higher level abstraction specifically built for vertical and horizontal lists.**. Within that subset of functionality react-beautiful-dnd offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by **react-dnd**. So this library might not be for you depending on what your use case is.
+There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing **react-dnd**. It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **react-beautiful-dnd is a higher level abstraction specifically built for vertical and horizontal lists**. Within that subset of functionality react-beautiful-dnd offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by **react-dnd**. So this library might not be for you depending on what your use case is.
 
 ## Still young!
 
