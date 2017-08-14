@@ -7,7 +7,7 @@ const isScrollable = (...values: string[]): boolean =>
 
 const isElementScrollable = (el: HTMLElement) => {
   const style = window.getComputedStyle(el);
-  return isScrollable(style.overflow, style.overflowY);
+  return isScrollable(style.overflow, style.overflowY, style.overflowX);
 };
 
 const getClosestScrollable = (el: ?HTMLElement): ?HTMLElement => {

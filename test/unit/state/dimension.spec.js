@@ -3,6 +3,7 @@ import {
   getDraggableDimension,
   getDroppableDimension,
 } from '../../../src/state/dimension';
+import { vertical, horizontal } from '../../../src/state/axis';
 // eslint-disable-next-line no-duplicate-imports
 import type { Margin, ClientRect } from '../../../src/state/dimension';
 import type {
@@ -142,6 +143,39 @@ describe('dimension', () => {
         initial: scroll,
         current: scroll,
       });
+    });
+
+    it('should apply the correct axis', () => {
+      const withDefault: DroppableDimension = getDroppableDimension({
+        id: droppableId,
+        clientRect,
+        margin,
+        windowScroll,
+        scroll,
+      });
+      const withVertical: DroppableDimension = getDroppableDimension({
+        id: droppableId,
+        clientRect,
+        margin,
+        windowScroll,
+        scroll,
+        direction: 'vertical',
+      });
+      const withHorizontal: DroppableDimension = getDroppableDimension({
+        id: droppableId,
+        clientRect,
+        margin,
+        windowScroll,
+        scroll,
+        direction: 'horizontal',
+      });
+
+      // default uses vertical
+      expect(withDefault.axis).toBe(vertical);
+      // explicit vertical
+      expect(withVertical.axis).toBe(vertical);
+      // explicit horizontal
+      expect(withHorizontal.axis).toBe(horizontal);
     });
 
     it('should return a portion that does not consider margins', () => {

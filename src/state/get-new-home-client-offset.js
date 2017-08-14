@@ -5,8 +5,9 @@ import type {
   DraggableDimension,
   DraggableDimensionMap,
   DraggableId,
+  Axis,
 } from '../types';
-import { add, subtract } from './position';
+import { add, subtract, patch } from './position';
 
 type NewHomeArgs = {|
   movement: DragMovement,
@@ -15,6 +16,8 @@ type NewHomeArgs = {|
   droppableScrollDiff: Position,
   windowScrollDiff: Position,
   draggables: DraggableDimensionMap,
+  // axis of the destination droppable
+  axis: ?Axis,
 |}
 
 type ClientOffset = Position;
@@ -28,9 +31,15 @@ export default ({
   droppableScrollDiff,
   windowScrollDiff,
   draggables,
+  axis,
 }: NewHomeArgs): ClientOffset => {
   // Just animate back to where it started
   if (!movement.draggables.length) {
+    return add(droppableScrollDiff, windowScrollDiff);
+  }
+
+  if (!axis) {
+    console.error('should not have any movement if there is no axis');
     return add(droppableScrollDiff, windowScrollDiff);
   }
 
@@ -38,23 +47,21 @@ export default ({
   const distance: number = movement.draggables.reduce(
     (previous: number, draggableId: DraggableId): number => {
       const dimension: DraggableDimension = draggables[draggableId];
-      return previous + dimension.page.withMargin.height;
+      // $ExpectError - for some reason flow is not liking axis.size
+      return previous + dimension.page.withMargin[axis.size];
     }, 0);
 
-  const amount: number = movement.isMovingForward ? distance : -distance;
+  const signed: number = movement.isMovingForward ? distance : -distance;
 
   // How much distance the item needs to travel to be in its new home
   // from where it started
-  const verticalChange: Position = {
-    x: 0,
-    y: amount,
-  };
+  const amount = patch(axis.line, signed);
 
   // How far away it is on the page from where it needs to be
-  const verticalDiff: Position = subtract(verticalChange, pageOffset);
+  const diff: Position = subtract(amount, pageOffset);
 
   // The final client offset
-  const client: Position = add(verticalDiff, clientOffset);
+  const client: Position = add(diff, clientOffset);
 
   // Accounting for container scroll
   const withScroll: Position = add(client, droppableScrollDiff);

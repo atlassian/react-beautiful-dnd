@@ -9,7 +9,10 @@ import type { DraggableId,
   DragImpact,
   DimensionFragment,
   WithinDroppable,
-  Position } from '../types';
+  Axis,
+  Position,
+} from '../types';
+import { patch } from './position';
 import getDroppableOver from './get-droppable-over';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
 import noImpact from './no-impact';
@@ -52,9 +55,11 @@ export default ({
     draggables,
   );
 
+  const axis: Axis = droppableDimension.axis;
+
   // not considering margin so that items move based on visible edges
   const draggableCenter: Position = draggingDimension.page.withoutMargin.center;
-  const isMovingForward: boolean = newCenter.y - draggableCenter.y > 0;
+  const isMovingForward: boolean = newCenter[axis.line] - draggableCenter[axis.line] > 0;
 
   const moved: DraggableId[] = insideDroppable
     .filter((dimension: DraggableDimension): boolean => {
@@ -68,20 +73,20 @@ export default ({
       if (isMovingForward) {
         // 1. item needs to start ahead of the moving item
         // 2. the dragging item has moved over it
-        if (fragment.center.y < draggableCenter.y) {
+        if (fragment.center[axis.line] < draggableCenter[axis.line]) {
           return false;
         }
 
-        return newCenter.y > fragment.top;
+        return newCenter[axis.line] > fragment[axis.start];
       }
       // moving backwards
       // 1. item needs to start behind the moving item
       // 2. the dragging item has moved over it
-      if (draggableCenter.y < fragment.center.y) {
+      if (draggableCenter[axis.line] < fragment.center[axis.line]) {
         return false;
       }
 
-      return newCenter.y < fragment.bottom;
+      return newCenter[axis.line] < fragment[axis.end];
     })
     .map((dimension: DraggableDimension): DroppableId => dimension.id);
 
@@ -98,10 +103,12 @@ export default ({
     return startIndex - moved.length;
   })();
 
-  const amount = index !== startIndex ?
+  const distance = index !== startIndex ?
     // need to ensure that the whole item is moved
-    draggingDimension.page.withMargin.height :
+    draggingDimension.page.withMargin[axis.size] :
     0;
+
+  const amount: Position = patch(axis.line, distance);
 
   const movement: DragMovement = {
     amount,
@@ -111,6 +118,7 @@ export default ({
 
   const impact: DragImpact = {
     movement,
+    direction: axis.direction,
     destination: {
       droppableId,
       index,

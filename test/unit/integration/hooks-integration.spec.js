@@ -10,6 +10,7 @@ import type {
   DraggableLocation,
   DraggableId,
   DroppableId,
+  DragStart,
   DropResult,
   Position,
 } from '../../../src/types';
@@ -166,34 +167,42 @@ describe('hooks integration', () => {
   })();
 
   const expected = (() => {
-    const start: DraggableLocation = {
+    const source: DraggableLocation = {
       droppableId,
       index: 0,
     };
 
-      // Unless we do some more hardcore stubbing
-      // both completed and cancelled look the same.
-      // Ideally we would move one item below another
+    const start: DragStart = {
+      draggableId,
+      type: 'DEFAULT',
+      source,
+    };
+
+    // Unless we do some more hardcore stubbing
+    // both completed and cancelled look the same.
+    // Ideally we would move one item below another
     const completed: DropResult = {
       draggableId,
-      source: start,
+      type: 'DEFAULT',
+      source,
       destination: null,
     };
 
     const cancelled: DropResult = {
       draggableId,
-      source: start,
+      type: 'DEFAULT',
+      source,
       destination: null,
     };
 
-    return { completed, cancelled };
+    return { start, completed, cancelled };
   })();
 
   const wasDragStarted = (amountOfDrags?: number = 1) => {
     expect(hooks.onDragStart).toHaveBeenCalledTimes(amountOfDrags);
     // $ExpectError - type of hook function
-    expect(hooks.onDragStart.mock.calls[amountOfDrags - 1])
-      .toEqual([draggableId, expected.completed.source]);
+    expect(hooks.onDragStart.mock.calls[amountOfDrags - 1][0])
+      .toEqual(expected.start);
   };
 
   const wasDragCompleted = (amountOfDrags?: number = 1) => {

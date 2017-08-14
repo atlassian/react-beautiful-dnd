@@ -19,6 +19,7 @@ import type {
   DroppableDimension,
   DimensionState,
   DraggableLocation,
+  DragStart,
 } from '../../../src/types';
 
 const execute = (hooks: Hooks, current: State, previous: State) => {
@@ -143,6 +144,7 @@ const state = (() => {
   const result: DropResult = {
     draggableId,
     source,
+    type: typeId,
     destination: null,
   };
 
@@ -151,7 +153,7 @@ const state = (() => {
     drag: null,
     drop: {
       pending: {
-        type: 'DROP',
+        trigger: 'DROP',
         newHomeOffset: { x: 100, y: 100 },
         impact: noImpact,
         result,
@@ -166,7 +168,7 @@ const state = (() => {
     drag: null,
     drop: {
       pending: {
-        type: 'CANCEL',
+        trigger: 'CANCEL',
         newHomeOffset: { x: 100, y: 100 },
         impact: noImpact,
         result,
@@ -207,11 +209,16 @@ describe('Hook middleware', () => {
   describe('drag start', () => {
     it('should call the onDragStart hook when a drag starts', () => {
       execute(hooks, state.dragging, state.collecting);
+      const expected: DragStart = {
+        draggableId,
+        type: typeId,
+        source: {
+          droppableId,
+          index: 0,
+        },
+      };
 
-      expect(hooks.onDragStart).toHaveBeenCalledWith(draggableId, {
-        droppableId,
-        index: 0,
-      });
+      expect(hooks.onDragStart).toHaveBeenCalledWith(expected);
     });
 
     it('should do nothing if no onDragStart is not provided', () => {
@@ -256,11 +263,7 @@ describe('Hook middleware', () => {
 
         const result: DropResult = state.complete.drop.result;
 
-        expect(hooks.onDragEnd).toHaveBeenCalledWith({
-          draggableId,
-          source: result.source,
-          destination: result.destination,
-        });
+        expect(hooks.onDragEnd).toHaveBeenCalledWith(result);
       });
 
       it('should log an error and not call the callback if there is no drop result', () => {
@@ -280,6 +283,7 @@ describe('Hook middleware', () => {
       it('should call onDragEnd with null as the destination if there is no destination', () => {
         const result: DropResult = {
           draggableId,
+          type: typeId,
           source: {
             droppableId,
             index: 0,
@@ -298,11 +302,7 @@ describe('Hook middleware', () => {
 
         execute(hooks, custom, previous);
 
-        expect(hooks.onDragEnd).toHaveBeenCalledWith({
-          draggableId,
-          source: result.source,
-          destination: null,
-        });
+        expect(hooks.onDragEnd).toHaveBeenCalledWith(result);
       });
 
       it('should call onDragEnd with null if the item did not move', () => {
@@ -312,6 +312,7 @@ describe('Hook middleware', () => {
         };
         const result: DropResult = {
           draggableId,
+          type: typeId,
           source: location,
           destination: location,
         };
@@ -324,14 +325,17 @@ describe('Hook middleware', () => {
           drag: null,
           dimension: noDimensions,
         };
+        const expected : DropResult = {
+          draggableId: result.draggableId,
+          type: result.type,
+          source: result.source,
+          // destination has been cleared
+          destination: null,
+        };
 
         execute(hooks, custom, previous);
 
-        expect(hooks.onDragEnd).toHaveBeenCalledWith({
-          draggableId,
-          source: result.source,
-          destination: null,
-        });
+        expect(hooks.onDragEnd).toHaveBeenCalledWith(expected);
       });
     });
   });
@@ -339,14 +343,17 @@ describe('Hook middleware', () => {
   describe('drag cleared', () => {
     describe('cleared while dragging', () => {
       it('should return a result with a null destination', () => {
-        execute(hooks, state.idle, state.dragging);
-
-        expect(hooks.onDragEnd).toHaveBeenCalledWith({
+        const expected: DropResult = {
           draggableId,
+          type: typeId,
           // $ExpectError - not checking for null
           source: state.dragging.drag.initial.source,
           destination: null,
-        });
+        };
+
+        execute(hooks, state.idle, state.dragging);
+
+        expect(hooks.onDragEnd).toHaveBeenCalledWith(expected);
       });
 
       it('should log an error and do nothing if it cannot find a previous drag to publish', () => {
@@ -367,14 +374,17 @@ describe('Hook middleware', () => {
     // this should never really happen - but just being safe
     describe('cleared while drop animating', () => {
       it('should return a result with a null destination', () => {
-        execute(hooks, state.idle, state.dropAnimating);
-
-        expect(hooks.onDragEnd).toHaveBeenCalledWith({
+        const expected: DropResult = {
           draggableId,
-          // $ExpectError
+          type: typeId,
+          // $ExpectError - not checking for null
           source: state.dropAnimating.drop.pending.result.source,
           destination: null,
-        });
+        };
+
+        execute(hooks, state.idle, state.dropAnimating);
+
+        expect(hooks.onDragEnd).toHaveBeenCalledWith(expected);
       });
 
       it('should log an error and do nothing if it cannot find a previous drag to publish', () => {

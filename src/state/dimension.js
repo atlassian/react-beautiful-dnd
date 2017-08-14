@@ -1,10 +1,12 @@
 // @flow
+import { vertical, horizontal } from './axis';
 import type {
   DroppableId,
   DraggableId,
   Position,
   DraggableDimension,
   DroppableDimension,
+  Direction,
   DimensionFragment,
 } from '../types';
 
@@ -112,6 +114,7 @@ export const getDraggableDimension = ({
 type GetDroppableArgs = {|
   id: DroppableId,
   clientRect: ClientRect,
+  direction?: Direction,
   margin?: Margin,
   windowScroll?: Position,
   scroll?: Position,
@@ -120,6 +123,7 @@ type GetDroppableArgs = {|
 export const getDroppableDimension = ({
   id,
   clientRect,
+  direction = 'vertical',
   margin = noMargin,
   windowScroll = origin,
   scroll = origin,
@@ -129,6 +133,7 @@ export const getDroppableDimension = ({
 
   const dimension: DroppableDimension = {
     id,
+    axis: direction === 'vertical' ? vertical : horizontal,
     scroll: {
       initial: scroll,
       // when we start the current scroll is the initial scroll

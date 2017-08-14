@@ -3,7 +3,13 @@
 // $ExpectError - not added to project deps
 import type { HasDefaultProp } from 'babel-plugin-react-flow-props-to-prop-types';
 /* eslint-enable */
-import type { DroppableId, TypeId, ReactElement, HTMLElement } from '../../types';
+import type {
+  DroppableId,
+  TypeId,
+  ReactElement,
+  HTMLElement,
+  Direction,
+} from '../../types';
 
 export type Provided = {|
   innerRef: (HTMLElement) => void,
@@ -19,6 +25,7 @@ export type MapProps = {|
 
 export type OwnProps = {|
   droppableId: DroppableId,
+  direction: HasDefaultProp<Direction>,
   isDropDisabled: HasDefaultProp<boolean>,
   type: HasDefaultProp<TypeId>,
   children: (Provided, StateSnapshot) => ?ReactElement

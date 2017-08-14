@@ -1,15 +1,19 @@
 // @flow
 import React, { Component } from 'react';
 import styled, { injectGlobal } from 'styled-components';
-import { DragDropContext } from '../../src/';
-import QuoteItem from './quote-item';
+import { action } from '@storybook/addon-actions';
+import { DragDropContext } from '../../../src/';
 import QuoteList from './quote-list';
-import { colors, grid } from './constants';
-import type { Quote } from './types';
-import type { DropResult, DraggableLocation } from '../../src/types';
+import { colors, grid } from '../constants';
+import reorder from '../reorder';
+import type { Quote } from '../types';
+import type { DropResult, DragStart } from '../../../src/types';
+
+const publishOnDragStart = action('onDragStart');
+const publishOnDragEnd = action('onDragEnd');
 
 const Root = styled.div`
-  background-color: ${colors.blue};
+  background-color: ${colors.blue.deep};
   box-sizing: border-box;
   padding: ${grid * 2}px;
   min-height: 100vh;
@@ -43,44 +47,27 @@ export default class QuoteApp extends Component {
   };
   /* eslint-enable */
 
-  onDragStart = () => {
+  onDragStart = (initial: DragStart) => {
+    publishOnDragStart(initial);
     // $ExpectError - body could be null?
     document.body.classList.add(isDraggingClassName);
   }
 
   onDragEnd = (result: DropResult) => {
-    // remove drag styles
+    publishOnDragEnd(result);
     // $ExpectError - body could be null?
     document.body.classList.remove(isDraggingClassName);
 
-    const source: DraggableLocation = result.source;
-    const destination: ?DraggableLocation = result.destination;
-
-    // nothing to do here!
-    if (destination == null) {
+    // dropped outside the list
+    if (!result.destination) {
       return;
     }
 
-    if (source.droppableId !== destination.droppableId) {
-      console.error('unsupported use case');
-      return;
-    }
-
-    const quotes: Quote[] = [...this.state.quotes];
-    const target: ?Quote = quotes.find(
-      (quote: Quote): boolean => quote.id === result.draggableId
+    const quotes = reorder(
+      this.state.quotes,
+      result.source.index,
+      result.destination.index
     );
-
-    if (!target) {
-      console.error('cannot find quote in list');
-      return;
-    }
-
-    // remove target from the array
-    quotes.splice(source.index, 1);
-
-    // put into correct spot
-    quotes.splice(destination.index, 0, target);
 
     this.setState({
       quotes,
@@ -106,14 +93,11 @@ export default class QuoteApp extends Component {
         onDragEnd={this.onDragEnd}
       >
         <Root>
-          <QuoteList listId="list" style={this.props.listStyle}>
-            {quotes.map((quote: Quote) => (
-              <QuoteItem
-                quote={quote}
-                key={quote.id}
-              />
-          ))}
-          </QuoteList>
+          <QuoteList
+            listId="list"
+            style={this.props.listStyle}
+            quotes={quotes}
+          />
         </Root>
       </DragDropContext>
     );

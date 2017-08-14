@@ -25,6 +25,7 @@ export default class Droppable extends Component {
   static defaultProps: DefaultProps = {
     type: 'DEFAULT',
     isDropDisabled: false,
+    direction: 'vertical',
   }
 
   // Need to declare childContextTypes without flow
@@ -70,6 +71,7 @@ export default class Droppable extends Component {
     return (
       <DroppableDimensionPublisher
         droppableId={this.props.droppableId}
+        direction={this.props.direction}
         type={this.props.type}
         targetRef={this.state.ref}
       >

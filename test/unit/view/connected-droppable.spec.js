@@ -118,9 +118,13 @@ const perform = (() => {
   const dragOverImpact: DragImpact = {
     movement: {
       draggables: [draggableId],
-      amount: dimension.page.withMargin.height,
+      amount: {
+        y: dimension.page.withMargin.height,
+        x: 0,
+      },
       isMovingForward: true,
     },
+    direction: 'vertical',
     destination: {
       index: initial.source.index + 1,
       droppableId,
@@ -145,6 +149,7 @@ const perform = (() => {
 
     const result: DropResult = {
       draggableId,
+      type: 'TYPE',
       source: initial.source,
       destination: {
         index: initial.source.index + 1,
@@ -153,7 +158,7 @@ const perform = (() => {
     };
 
     const pending: PendingDrop = {
-      type: 'DROP',
+      trigger: 'DROP',
       newHomeOffset,
       impact: isDraggingOver ? dragOverImpact : noImpact,
       result,
