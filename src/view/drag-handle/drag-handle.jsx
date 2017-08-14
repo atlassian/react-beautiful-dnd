@@ -81,6 +81,11 @@ export default class DragHandle extends Component {
     this.props.callbacks.onCancel();
   }
 
+  // TODO: there is a scenario where events will not be unbound:
+  // - listeners are bound
+  // - drag is cancelled during the COLLECTING_DIMENSION phase
+  // FIX: need to know when a drag is cancelled / cleaned during the
+  // COLLECTING_DIMENSIONS phase.
   componentWillReceiveProps(nextProps: Props) {
     // if the application cancels a drag we need to unbind the handlers
     const isDragStopping: boolean = (this.props.isDragging && !nextProps.isDragging);
@@ -206,6 +211,10 @@ export default class DragHandle extends Component {
       return;
     }
 
+    if (!this.props.canLift) {
+      return;
+    }
+
     const { button, clientX, clientY } = event;
 
     if (button !== primaryButton) {
@@ -287,7 +296,10 @@ export default class DragHandle extends Component {
 
   // the on element keydown is only for lifting - otherwise using the window keydown
   onKeyDown = (event: KeyboardEvent): void => {
-    if (!this.props.isEnabled || this.state.pending || this.state.draggingWith) {
+    if (!this.props.isEnabled ||
+      this.state.pending ||
+      this.state.draggingWith ||
+      !this.props.canLift) {
       return;
     }
 

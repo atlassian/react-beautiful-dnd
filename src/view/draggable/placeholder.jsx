@@ -11,6 +11,7 @@ export default class Placeholder extends PureComponent {
     const style = {
       width: this.props.width,
       height: this.props.height,
+      pointerEvents: 'none',
     };
     return (
       <div style={style} />

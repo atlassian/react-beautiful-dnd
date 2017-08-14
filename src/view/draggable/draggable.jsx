@@ -175,13 +175,13 @@ export default class Draggable extends Component {
 
   onDrop = () => {
     this.throwIfCannotDrag();
-    this.props.drop(this.props.draggableId);
+    this.props.drop();
   }
 
   onCancel = () => {
     // Not checking if drag is enabled.
     // Cancel is an escape mechanism
-    this.props.cancel(this.props.draggableId);
+    this.props.cancel();
   }
 
   // React calls ref callback twice for every render
@@ -240,12 +240,12 @@ export default class Draggable extends Component {
     (
       canAnimate: boolean,
       movementStyle: MovementStyle,
-      isAnotherDragging: boolean,
+      canLift: boolean,
     ): NotDraggingStyle => {
       const style: NotDraggingStyle = {
         transition: canAnimate ? css.outOfTheWay : null,
         transform: movementStyle.transform,
-        pointerEvents: isAnotherDragging ? 'none' : 'auto',
+        pointerEvents: canLift ? 'auto' : 'none',
       };
       return style;
     }
@@ -255,7 +255,7 @@ export default class Draggable extends Component {
     (
       isDragging: boolean,
       isDropAnimating: boolean,
-      isAnotherDragging: boolean,
+      canLift: boolean,
       canAnimate: boolean,
       dimension: ?DraggableDimension,
       dragHandleProps: ?DragHandleProvided,
@@ -268,7 +268,7 @@ export default class Draggable extends Component {
           return this.getNotDraggingStyle(
             canAnimate,
             movementStyle,
-            isAnotherDragging,
+            canLift,
           );
         }
         invariant(dimension, 'draggable dimension required for dragging');
@@ -318,7 +318,7 @@ export default class Draggable extends Component {
       offset,
       isDragging,
       isDropAnimating,
-      isAnotherDragging,
+      canLift,
       canAnimate,
       isDragDisabled,
       dimension,
@@ -343,6 +343,7 @@ export default class Draggable extends Component {
             <DragHandle
               isDragging={isDragging}
               isEnabled={!isDragDisabled}
+              canLift={canLift}
               callbacks={this.callbacks}
               draggableRef={this.state.ref}
             >
@@ -351,7 +352,7 @@ export default class Draggable extends Component {
                   this.getProvided(
                     isDragging,
                     isDropAnimating,
-                    isAnotherDragging,
+                    canLift,
                     canAnimate,
                     dimension,
                     dragHandleProps,

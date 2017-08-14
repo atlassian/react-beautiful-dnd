@@ -81,7 +81,7 @@ export type DispatchProps = {
 export type MapProps = {|
   isDragging: boolean,
   isDropAnimating: boolean,
-  isAnotherDragging: boolean,
+  canLift: boolean,
   canAnimate: boolean,
   offset: Position,
   dimension: ?DraggableDimension,

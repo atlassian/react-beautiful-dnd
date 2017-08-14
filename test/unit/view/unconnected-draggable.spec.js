@@ -99,7 +99,7 @@ const disabledOwnProps: OwnProps = {
 const defaultMapProps: MapProps = {
   isDropAnimating: false,
   isDragging: false,
-  isAnotherDragging: false,
+  canLift: true,
   canAnimate: true,
   offset: origin,
   dimension: null,
@@ -108,7 +108,7 @@ const defaultMapProps: MapProps = {
 const somethingElseDraggingMapProps: MapProps = {
   isDropAnimating: false,
   isDragging: false,
-  isAnotherDragging: true,
+  canLift: false,
   canAnimate: true,
   offset: origin,
   dimension: null,
@@ -117,7 +117,7 @@ const somethingElseDraggingMapProps: MapProps = {
 const draggingMapProps: MapProps = {
   isDropAnimating: false,
   isDragging: true,
-  isAnotherDragging: false,
+  canLift: false,
   canAnimate: false,
   dimension,
   offset: { x: 75, y: 75 },
@@ -127,14 +127,15 @@ const dropAnimatingMapProps: MapProps = {
   isDragging: false,
   isDropAnimating: true,
   canAnimate: true,
-  isAnotherDragging: false,
+  // cannot lift while dropping
+  canLift: false,
   dimension,
   offset: { x: 75, y: 75 },
 };
 
 const dropCompleteMapProps: MapProps = {
   offset: origin,
-  isAnotherDragging: false,
+  canLift: true,
   isDropAnimating: false,
   isDragging: false,
   canAnimate: false,
@@ -555,7 +556,7 @@ describe('Draggable - unconnected', () => {
 
           wrapper.find(DragHandle).props().callbacks.onDrop();
 
-          expect(dispatchProps.drop).toBeCalledWith(draggableId);
+          expect(dispatchProps.drop).toBeCalled();
         });
       });
 
@@ -713,9 +714,9 @@ describe('Draggable - unconnected', () => {
             dispatchProps,
           });
 
-          wrapper.find(DragHandle).props().callbacks.onCancel(draggableId);
+          wrapper.find(DragHandle).props().callbacks.onCancel();
 
-          expect(dispatchProps.cancel).toBeCalledWith(draggableId);
+          expect(dispatchProps.cancel).toBeCalled();
         });
 
         it('should allow the action even if dragging is disabled', () => {
@@ -726,9 +727,9 @@ describe('Draggable - unconnected', () => {
             dispatchProps,
           });
 
-          wrapper.find(DragHandle).props().callbacks.onCancel(draggableId);
+          wrapper.find(DragHandle).props().callbacks.onCancel();
 
-          expect(dispatchProps.cancel).toBeCalledWith(draggableId);
+          expect(dispatchProps.cancel).toBeCalled();
         });
 
         it('should allow the action even when not attached to the dom', () => {
@@ -738,9 +739,9 @@ describe('Draggable - unconnected', () => {
             dispatchProps,
           });
 
-          wrapper.find(DragHandle).props().callbacks.onCancel(draggableId);
+          wrapper.find(DragHandle).props().callbacks.onCancel();
 
-          expect(dispatchProps.cancel).toBeCalledWith(draggableId);
+          expect(dispatchProps.cancel).toBeCalled();
         });
       });
 

@@ -153,9 +153,10 @@ const perform = (() => {
     };
 
     const pending: PendingDrop = {
+      type: 'DROP',
       newHomeOffset,
+      impact: isDraggingOver ? dragOverImpact : noImpact,
       result,
-      last: drag({ isDraggingOver }),
     };
 
     return pending;

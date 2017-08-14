@@ -186,6 +186,15 @@ Drag and drop with react-beautiful-dnd is supposed to feel physical and natural 
 
 Drop shadows are useful in an environment where items and their destinations snap around. However, with react-beautiful-dnd it should be obvious where things will be dropping based on the movement of items. This might be changed in the future - but the experiment is to see how far we can get without any of these affordances.
 
+#### Application 3: no dead zones
+
+react-beautiful-dnd works really hard to avoid any periods of time where the user cannot fully engage with the application (no 'dead zones'). However, there is a balance that needs to be done between correctness and power in order to make everybody's lives more sane. Here are the only situations where some things are not interactive:
+
+1. From when a user cancels a drag to when the drop animation completes. On cancel there are lots of things moving back to where they should be. If you grab an item in a location that is not its true home then the following drag will be incorrect.
+2. Starting a drag on an item that is animating its own drop. For simplicity this is the case - it is actually quite hard to grab something while it is animating home. It could be coded around - but it seems like an edge case that would add a lot of complexity.
+
+Keep in mind that these dead zones may not always exist.
+
 ### Sloppy clicks and click blocking 🐱🎁
 
 A drag will not start until a user has dragged their mouse past a small threshold. If this threshold is not exceeded then the library will not impact the mouse click and will release the event to the browser.

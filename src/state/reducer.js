@@ -434,7 +434,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
   }
 
   if (action.type === 'DROP_ANIMATE') {
-    const { newHomeOffset, result } = action.payload;
+    const { type, newHomeOffset, impact, result } = action.payload;
 
     if (state.phase !== 'DRAGGING') {
       console.error('cannot animate drop while not dragging', action);
@@ -447,9 +447,10 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     }
 
     const pending: PendingDrop = {
+      type,
       newHomeOffset,
       result,
-      last: state.drag,
+      impact,
     };
 
     return {
@@ -477,7 +478,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     };
   }
 
-  if (action.type === 'CANCEL') {
+  if (action.type === 'CLEAN') {
     return clean();
   }
 

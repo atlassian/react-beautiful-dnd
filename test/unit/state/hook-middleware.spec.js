@@ -1,7 +1,7 @@
 // @flow
 import middleware from '../../../src/state/hook-middleware';
 import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
-import { cancel } from '../../../src/state/action-creators';
+import { clean } from '../../../src/state/action-creators';
 import getClientRect from '../../utils/get-client-rect';
 import noImpact from '../../../src/state/no-impact';
 import type {
@@ -29,8 +29,8 @@ const execute = (hooks: Hooks, current: State, previous: State) => {
     getState: stateMock,
   };
   const next = x => x;
-  // does not matter what this is - but using cancel to get correct typing
-  const action = cancel('some-fake-id');
+  // does not matter what this is - but using clean to get correct typing
+  const action = clean();
 
   middleware(hooks)(store)(next)(action);
 };
@@ -151,8 +151,24 @@ const state = (() => {
     drag: null,
     drop: {
       pending: {
+        type: 'DROP',
         newHomeOffset: { x: 100, y: 100 },
-        last: drag,
+        impact: noImpact,
+        result,
+      },
+      result: null,
+    },
+    dimension: noDimensions,
+  };
+
+  const cancelAnimating: State = {
+    phase: 'DROP_ANIMATING',
+    drag: null,
+    drop: {
+      pending: {
+        type: 'CANCEL',
+        newHomeOffset: { x: 100, y: 100 },
+        impact: noImpact,
         result,
       },
       result: null,
@@ -170,7 +186,7 @@ const state = (() => {
     dimension: noDimensions,
   };
 
-  return { idle, collecting, dragging, dropAnimating, complete };
+  return { idle, collecting, dragging, dropAnimating, cancelAnimating, complete };
 })();
 
 describe('Hook middleware', () => {
@@ -227,8 +243,8 @@ describe('Hook middleware', () => {
   });
 
   describe('drag end', () => {
-    // it is possible to complete a drag from a DROP_ANIMATING phase or a DRAGGING_PHASE
-    const preEndStates: State[] = [state.dragging, state.dropAnimating];
+    // it is possible to complete a drag from a DRAGGING or DROP_ANIMATING (drop or cancel)
+    const preEndStates: State[] = [state.dragging, state.dropAnimating, state.cancelAnimating];
 
     preEndStates.forEach((previous: State): void => {
       it('should call onDragEnd with the drop result', () => {
@@ -320,14 +336,14 @@ describe('Hook middleware', () => {
     });
   });
 
-  describe('drag cancelled', () => {
-    describe('cancelled while dragging', () => {
+  describe('drag cleared', () => {
+    describe('cleared while dragging', () => {
       it('should return a result with a null destination', () => {
         execute(hooks, state.idle, state.dragging);
 
         expect(hooks.onDragEnd).toHaveBeenCalledWith({
           draggableId,
-          // $ExpectError
+          // $ExpectError - not checking for null
           source: state.dragging.drag.initial.source,
           destination: null,
         });
@@ -349,7 +365,7 @@ describe('Hook middleware', () => {
     });
 
     // this should never really happen - but just being safe
-    describe('cancelled while drop animating', () => {
+    describe('cleared while drop animating', () => {
       it('should return a result with a null destination', () => {
         execute(hooks, state.idle, state.dropAnimating);
 
