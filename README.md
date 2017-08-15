@@ -106,10 +106,10 @@ class App extends Component {
     this.state = {
       items: getItems(10)
     }
-    this.onDragEnd = this.onDragEnd.bind(this);
+    this.handleDragEnd = this.handleDragEnd.bind(this);
   }
 
-  onDragEnd (result) {
+  handleDragEnd (result) {
     // dropped outside the list
     if(!result.destination) {
       return;
@@ -130,7 +130,7 @@ class App extends Component {
   // But in this example everything is just done in one place for simplicity
   render() {
     return (
-      <DragDropContext onDragEnd={this.onDragEnd}>
+      <DragDropContext onDragEnd={this.handleDragEnd}>
         <Droppable droppableId="droppable">
           {(provided, snapshot) => (
             <div
@@ -533,7 +533,7 @@ import { Draggable } from 'react-beautiful-dnd';
 
 - `draggableId`: A *required* `DraggableId(string)` that uniquely identifies the `Draggable` for the application. Please do not change this prop - especially during a drag.
 - `type`: An *optional* type (`TypeId(string)`) of the `Draggable`. This is used to control what `Droppable`s the `Draggable` is permitted to drop on. `Draggable`s can only drop on `Droppable`s that share the same `type`. If no `type` is provided, it will be set to `'DEFAULT'`. Currently the `type` of a `Draggable` **must be** the same as its container `Droppable`. This restriction might be loosened in the future if there is a valid use case.
-- `isDragDisabled`: An *optional* flag to control whether or not dropping is currently allowed on the `Droppable`. You can use this to implement your own conditional dropping logic. It will default to `false`.
+- `isDragDisabled`: An *optional* flag to control whether or not dragging is currently allowed on the `Draggable`. You can use this to implement your own conditional dragging logic. It will default to `false`.
 
 ### Children function
 
