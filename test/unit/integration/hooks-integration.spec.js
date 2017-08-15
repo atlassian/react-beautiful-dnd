@@ -138,9 +138,7 @@ describe('hooks integration', () => {
       requestAnimationFrame.step();
     };
 
-    const stop = () => {
-      windowMouseUp();
-
+    const waitForReturnToHome = () => {
       // flush the return to home animation
       requestAnimationFrame.flush();
 
@@ -148,8 +146,14 @@ describe('hooks integration', () => {
       jest.runOnlyPendingTimers();
     };
 
+    const stop = () => {
+      windowMouseUp();
+      waitForReturnToHome();
+    };
+
     const cancel = () => {
       cancelWithKeyboard();
+      waitForReturnToHome();
     };
 
     const perform = () => {

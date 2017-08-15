@@ -57,25 +57,30 @@ const draggables: DraggableDimensionMap = {
 };
 
 describe('get new home client offset', () => {
-  it('should return to the scrollDiff if nothing has moved', () => {
+  it('should return to the total scroll diff if nothing has moved', () => {
     const offset: Position = {
       x: 100,
       y: 200,
     };
-    const scrollDiff: Position = {
+    const droppableScrollDiff: Position = {
       x: 20,
       y: 10,
+    };
+    const windowScrollDiff: Position = {
+      x: 30,
+      y: 20,
     };
 
     const result: Position = getNewHomeClientOffset({
       movement: noImpact.movement,
       clientOffset: offset,
       pageOffset: offset,
-      scrollDiff,
+      droppableScrollDiff,
+      windowScrollDiff,
       draggables,
     });
 
-    expect(result).toEqual(scrollDiff);
+    expect(result).toEqual(add(droppableScrollDiff, windowScrollDiff));
   });
 
   describe('moving forward', () => {
@@ -116,7 +121,8 @@ describe('get new home client offset', () => {
         movement,
         clientOffset,
         pageOffset,
-        scrollDiff: origin,
+        droppableScrollDiff: origin,
+        windowScrollDiff: origin,
         draggables,
       });
 
@@ -127,7 +133,10 @@ describe('get new home client offset', () => {
     it('should account for any changes in the droppables scroll container', () => {
       const clientOffset: Position = origin;
       const pageOffset: Position = origin;
-      const scrollDiff: Position = subtract(selection, draggable1.page.withoutMargin.center);
+      const droppableScrollDiff: Position = subtract(
+        selection,
+        draggable1.page.withoutMargin.center
+      );
       const movement: DragMovement = {
         draggables: [draggable2.id, draggable3.id],
         amount: draggable1.page.withMargin.height,
@@ -141,13 +150,50 @@ describe('get new home client offset', () => {
       // this is how far away it is from where it needs to end up
       const diff: Position = subtract(verticalChange, pageOffset);
       // this is the final client offset
-      const expected = add(diff, scrollDiff);
+      const expected = add(diff, droppableScrollDiff);
 
       const newHomeOffset = getNewHomeClientOffset({
         movement,
         clientOffset,
         pageOffset,
-        scrollDiff,
+        droppableScrollDiff,
+        windowScrollDiff: origin,
+        draggables,
+      });
+
+      expect(newHomeOffset).toEqual(expected);
+    });
+
+    // moving the first item down past the third using only window scroll
+    it('should account for any changes in the window scroll', () => {
+      const clientOffset: Position = origin;
+      const pageOffset: Position = {
+        x: 10,
+        y: 200,
+      };
+      const droppableScrollDiff = origin;
+      const windowScrollDiff = pageOffset;
+      const movement: DragMovement = {
+        draggables: [draggable2.id, draggable3.id],
+        amount: draggable1.page.withMargin.height,
+        isMovingForward: true,
+      };
+      // this is where it needs to end up
+      const verticalChange = {
+        x: 0,
+        y: draggable2.page.withMargin.height + draggable3.page.withMargin.height,
+      };
+      // this is how far away it is from where it needs to end up
+      const diff: Position = subtract(verticalChange, pageOffset);
+      // this is the final client offset
+      const expected = add(diff, droppableScrollDiff);
+
+      const newHomeOffset = getNewHomeClientOffset({
+        movement,
+        clientOffset,
+        pageOffset,
+        droppableScrollDiff: origin,
+        windowScrollDiff,
         draggables,
       });
 
@@ -193,7 +239,8 @@ describe('get new home client offset', () => {
         movement,
         clientOffset,
         pageOffset,
-        scrollDiff: origin,
+        droppableScrollDiff: origin,
+        windowScrollDiff: origin,
         draggables,
       });
 
@@ -226,7 +273,8 @@ describe('get new home client offset', () => {
         movement,
         clientOffset,
         pageOffset,
-        scrollDiff: origin,
+        droppableScrollDiff: origin,
+        windowScrollDiff: origin,
         draggables,
       });
 
@@ -237,7 +285,10 @@ describe('get new home client offset', () => {
     it('should account for any changes in the droppables scroll container', () => {
       const clientOffset: Position = origin;
       const pageOffset: Position = origin;
-      const scrollDiff: Position = subtract(selection, draggable3.page.withoutMargin.center);
+      const droppableScrollDiff: Position = subtract(
+        selection,
+        draggable3.page.withoutMargin.center
+      );
       const movement: DragMovement = {
         draggables: [draggable1.id, draggable2.id],
         amount: draggable3.page.withMargin.height,
@@ -251,13 +302,14 @@ describe('get new home client offset', () => {
       // this is how far away it is from where it needs to end up
       const diff: Position = subtract(verticalChange, pageOffset);
       // this is the final client offset
-      const expected = add(diff, scrollDiff);
+      const expected = add(diff, droppableScrollDiff);
 
       const newHomeOffset = getNewHomeClientOffset({
         movement,
         clientOffset,
         pageOffset,
-        scrollDiff,
+        droppableScrollDiff,
+        windowScrollDiff: origin,
         draggables,
       });
 

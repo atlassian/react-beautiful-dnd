@@ -4,15 +4,47 @@ import type {
   DroppableId,
   DropResult,
   TypeId,
+  DragImpact,
   DraggableDimension,
   DroppableDimension,
   InitialDragLocation,
   Position,
   Dispatch,
   State,
+  DropType,
+  CurrentDrag,
+  InitialDrag,
 } from '../types';
+import noImpact from './no-impact';
 import getNewHomeClientOffset from './get-new-home-client-offset';
-import { subtract, isEqual } from './position';
+import { add, subtract, isEqual } from './position';
+
+const origin: Position = { x: 0, y: 0 };
+
+type ScrollDiffResult = {|
+  droppable: Position,
+  window: Position,
+|}
+
+const getScrollDiff = (
+  initial: InitialDrag,
+  current: CurrentDrag,
+  droppable: DroppableDimension
+): ScrollDiffResult => {
+  const windowScrollDiff: Position = subtract(
+    initial.windowScroll,
+    current.windowScroll
+  );
+  const droppableScrollDiff: Position = subtract(
+    droppable.scroll.initial,
+    droppable.scroll.current
+  );
+
+  return {
+    window: windowScrollDiff,
+    droppable: droppableScrollDiff,
+  };
+};
 
 export type RequestDimensionsAction = {|
   type: 'REQUEST_DIMENSIONS',
@@ -158,28 +190,44 @@ export const moveForward = (id: DraggableId): MoveForwardAction => ({
   payload: id,
 });
 
-export type CancelAction = {
-  type: 'CANCEL',
-  payload: DraggableId
+type CleanAction = {
+  type: 'CLEAN',
+  payload: null,
 }
 
-export const cancel = (id: DraggableId): CancelAction => ({
-  type: 'CANCEL',
-  payload: id,
+export const clean = (): CleanAction => ({
+  type: 'CLEAN',
+  payload: null,
 });
 
 export type DropAnimateAction = {
   type: 'DROP_ANIMATE',
   payload: {|
+    type: DropType,
     newHomeOffset: Position,
+    impact: DragImpact,
     result: DropResult,
   |}
 }
 
-const animateDrop = (newHomeOffset: Position, result: DropResult): DropAnimateAction => ({
+type AnimateDropArgs = {|
+  type: DropType,
+  newHomeOffset: Position,
+  impact: DragImpact,
+  result: DropResult
+|}
+
+const animateDrop = ({
+  type,
+  newHomeOffset,
+  impact,
+  result,
+}: AnimateDropArgs): DropAnimateAction => ({
   type: 'DROP_ANIMATE',
   payload: {
+    type,
     newHomeOffset,
+    impact,
     result,
   },
 });
@@ -194,7 +242,7 @@ export const completeDrop = (result: DropResult): DropCompleteAction => ({
   payload: result,
 });
 
-export const drop = (id: DraggableId) =>
+export const drop = () =>
   (dispatch: Dispatch, getState: () => State): void => {
     const state: State = getState();
 
@@ -204,19 +252,19 @@ export const drop = (id: DraggableId) =>
     // for a DRAGGING phase before firing a onDragStart
     if (state.phase === 'COLLECTING_DIMENSIONS') {
       console.error('canceling drag while collecting');
-      dispatch(cancel(id));
+      dispatch(clean());
       return;
     }
 
     if (state.phase !== 'DRAGGING') {
       console.error('cannot drop if not dragging', state);
-      dispatch(cancel(id));
+      dispatch(clean());
       return;
     }
 
     if (!state.drag) {
       console.error('invalid drag state', state);
-      dispatch(cancel(id));
+      dispatch(clean());
       return;
     }
 
@@ -229,13 +277,14 @@ export const drop = (id: DraggableId) =>
       destination: impact.destination,
     };
 
-    const scrollDiff: Position = subtract(droppable.scroll.initial, droppable.scroll.current);
+    const scrollDiff = getScrollDiff(initial, current, droppable);
 
     const newHomeOffset: Position = getNewHomeClientOffset({
       movement: impact.movement,
       clientOffset: current.client.offset,
       pageOffset: current.page.offset,
-      scrollDiff,
+      droppableScrollDiff: scrollDiff.droppable,
+      windowScrollDiff: scrollDiff.window,
       draggables: state.dimension.draggable,
     });
 
@@ -247,26 +296,75 @@ export const drop = (id: DraggableId) =>
       newHomeOffset,
     );
 
-    if (isAnimationRequired) {
-      dispatch(animateDrop(newHomeOffset, result));
+    if (!isAnimationRequired) {
+      dispatch(completeDrop(result));
       return;
     }
-    dispatch(completeDrop(result));
+
+    dispatch(animateDrop({
+      type: 'DROP',
+      newHomeOffset,
+      impact,
+      result,
+    }));
   };
 
-export const dropAnimationFinished = (id: DraggableId) =>
+export const cancel = () =>
+  (dispatch: Dispatch, getState: () => State): void => {
+    const state: State = getState();
+
+    // only allowing cancelling in the DRAGGING phase
+    if (state.phase !== 'DRAGGING') {
+      dispatch(clean());
+      return;
+    }
+
+    if (!state.drag) {
+      console.error('invalid drag state', state);
+      dispatch(clean());
+      return;
+    }
+
+    const { initial, current } = state.drag;
+    const droppable: DroppableDimension = state.dimension.droppable[initial.source.droppableId];
+
+    const result: DropResult = {
+      draggableId: current.id,
+      source: initial.source,
+      // no destination when cancelling
+      destination: null,
+    };
+
+    const isAnimationRequired = !isEqual(current.client.offset, origin);
+
+    if (!isAnimationRequired) {
+      dispatch(completeDrop(result));
+      return;
+    }
+
+    const scrollDiff = getScrollDiff(initial, current, droppable);
+
+    dispatch(animateDrop({
+      type: 'CANCEL',
+      newHomeOffset: add(scrollDiff.droppable, scrollDiff.window),
+      impact: noImpact,
+      result,
+    }));
+  };
+
+export const dropAnimationFinished = () =>
   (dispatch: Dispatch, getState: () => State): void => {
     const state: State = getState();
 
     if (state.phase !== 'DROP_ANIMATING') {
       console.error('cannot end drop that is no longer animating', state);
-      dispatch(cancel(id));
+      dispatch(clean());
       return;
     }
 
     if (!state.drop || !state.drop.pending) {
       console.error('cannot end drop that has no pending state', state);
-      dispatch(cancel(id));
+      dispatch(clean());
       return;
     }
 
@@ -297,7 +395,7 @@ export const lift = (id: DraggableId,
     if (state.phase === 'DROP_ANIMATING') {
       if (!state.drop || !state.drop.pending) {
         console.error('cannot flush drop animation if there is no pending');
-        dispatch(cancel('super cool id'));
+        dispatch(clean());
         return;
       }
       dispatch(completeDrop(state.drop.pending.result));
@@ -310,8 +408,7 @@ export const lift = (id: DraggableId,
     const state: State = getState();
 
     if (state.phase !== 'IDLE' || state.phase !== 'DRAG_COMPLETE') {
-      // TODO: cancel does not need an id
-      dispatch(cancel('some-fake-id'));
+      dispatch(clean());
     }
 
     dispatch(beginLift());
@@ -343,4 +440,4 @@ export type Action = BeginLiftAction |
   MoveForwardAction |
   DropAnimateAction |
   DropCompleteAction |
-  CancelAction;
+  CleanAction;

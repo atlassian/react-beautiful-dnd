@@ -40,7 +40,7 @@ const origin: Position = { x: 0, y: 0 };
 const defaultMapProps: MapProps = {
   isDropAnimating: false,
   isDragging: false,
-  isAnotherDragging: false,
+  canLift: true,
   // By default the item will not animate unless instructed to.
   // If animation is enabled then there may be some animation
   // at unexpected points: such as on a DROP_COMPLETE
@@ -59,11 +59,11 @@ export const makeSelector = () => {
   );
 
   const getWithMovement = memoizeOne(
-    (offset: Position, isAnotherDragging: boolean): MapProps => ({
+    (offset: Position, canLift: boolean): MapProps => ({
       isDropAnimating: false,
       isDragging: false,
       canAnimate: true,
-      isAnotherDragging,
+      canLift,
       offset,
       dimension: null,
     }),
@@ -72,12 +72,15 @@ export const makeSelector = () => {
   const getNotDraggingProps = memoizeOne(
     (draggableId: DraggableId,
       movement: DragMovement,
-      isAnotherDragging: boolean,
+      canLift: boolean,
     ): MapProps => {
       const needsToMove = movement.draggables.indexOf(draggableId) !== -1;
 
       if (!needsToMove) {
-        return getWithMovement(origin, isAnotherDragging);
+        return getWithMovement(
+          origin,
+          canLift
+        );
       }
 
       const amount = movement.isMovingForward ? -movement.amount : movement.amount;
@@ -85,7 +88,7 @@ export const makeSelector = () => {
       return getWithMovement(
         // currently not handling horizontal movement
         memoizedOffset(0, amount),
-        isAnotherDragging,
+        canLift,
       );
     },
   );
@@ -130,8 +133,8 @@ export const makeSelector = () => {
           return getNotDraggingProps(
             id,
             impact.movement,
-            // blocking pointer events while something else is dragging
-            true,
+            // disallowing lifting while dragging something else
+            false,
           );
         }
 
@@ -142,7 +145,7 @@ export const makeSelector = () => {
         // not memoizing result as it should not move without an update
         return {
           isDragging: true,
-          isAnotherDragging: false,
+          canLift: false,
           isDropAnimating: false,
           canAnimate,
           offset,
@@ -156,22 +159,33 @@ export const makeSelector = () => {
           return defaultMapProps;
         }
 
-        if (pending.last.current.id !== id) {
+        if (pending.result.draggableId !== id) {
+          // This flag is a matter of degree.
+          // When dropping chances are Draggables have already mostly moved to where
+          // they need to be. When cancelling, Draggables still have to travel
+          // to their original position. If the user clicks on one while returning
+          // home then the original scroll position will be off
+
+          // We want to enable dragging as quickly as possible
+
+          // Ideally the drag-handle would be intelligent enough to remove any
+          // temporary animating offset from its initial position
+          const canLift = pending.type === 'DROP';
+
           return getNotDraggingProps(
             id,
-            pending.last.impact.movement,
-            // We are indicating that nothing else is dragging while a drop is
-            // occurring
-            false,
+            pending.impact.movement,
+            canLift,
           );
         }
 
         return {
           isDragging: false,
           isDropAnimating: true,
-          isAnotherDragging: false,
           canAnimate: true,
           offset: pending.newHomeOffset,
+          // cannot lift something that is dropping
+          canLift: false,
           // still need to provide the dimension for the placeholder
           dimension,
         };
@@ -203,7 +217,9 @@ const mapDispatchToProps: DispatchProps = {
 // that `connect` provides.
 // It avoids needing to do it own within `Draggable`
 export default connect(
-  makeMapStateToProps(),
+  // returning a function to ensure each
+  // Draggable gets its own selector
+  makeMapStateToProps,
   mapDispatchToProps,
   null,
   { storeKey },

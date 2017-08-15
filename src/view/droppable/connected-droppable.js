@@ -70,7 +70,7 @@ export const makeSelector = () => {
           return getMapProps(false);
         }
 
-        const isDraggingOver = getIsDraggingOver(id, pending.last.impact.destination);
+        const isDraggingOver = getIsDraggingOver(id, pending.impact.destination);
         return getMapProps(isDraggingOver);
       }
 
@@ -88,7 +88,9 @@ const makeMapStateToProps = () => {
 // that `connect` provides.
 // It avoids needing to do it own within `Droppable`
 export default connect(
-  makeMapStateToProps(),
+  // returning a function to ensure each
+  // Droppable gets its own selector
+  makeMapStateToProps,
   null,
   null,
   { storeKey },

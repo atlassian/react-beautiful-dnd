@@ -98,8 +98,9 @@ describe('drag handle', () => {
     wrapper = mount(
       <DragHandle
         callbacks={callbacks}
-        isEnabled
         isDragging={false}
+        isEnabled
+        canLift
       >
         {(dragHandleProps: Provided) => (
           <Child dragHandleProps={dragHandleProps} />
@@ -131,8 +132,9 @@ describe('drag handle', () => {
           const customWrapper = mount(
             <DragHandle
               callbacks={customCallbacks}
-              isEnabled
               isDragging={false}
+              isEnabled
+              canLift
             >
               {(dragHandleProps: Provided) => (
                 <Child dragHandleProps={dragHandleProps} />
@@ -166,6 +168,20 @@ describe('drag handle', () => {
 
       it('should not start a drag if not using the primary mouse button', () => {
         mouseDown(wrapper, 0, 0, auxiliaryButton);
+        windowMouseMove(0, sloppyClickThreshold);
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 0,
+        })).toBe(true);
+      });
+
+      it('should not start a drag if cannot lift', () => {
+        wrapper.setProps({
+          canLift: false,
+        });
+
+        // lift
+        mouseDown(wrapper);
         windowMouseMove(0, sloppyClickThreshold);
 
         expect(callbacksCalled(callbacks)({
@@ -823,6 +839,18 @@ describe('drag handle', () => {
 
         expect(preventDefault).toHaveBeenCalled();
         expect(stopPropagation).toHaveBeenCalled();
+      });
+
+      it('should not lift if told it cannot lift', () => {
+        wrapper.setProps({
+          canLift: false,
+        });
+
+        pressSpacebar(wrapper);
+
+        expect(callbacksCalled(callbacks)({
+          onKeyLift: 0,
+        })).toBe(true);
       });
     });
 

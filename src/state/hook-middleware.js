@@ -33,12 +33,13 @@ const getFireHooks = (hooks: Hooks) => memoizeOne((current: State, previous: Sta
 
     const { source, destination, draggableId } = current.drop.result;
 
+    // Could be a cancel or a drop nowhere
     if (!destination) {
       onDragEnd(current.drop.result);
       return;
     }
 
-    // Do not publish a result where nothing moved
+    // Do not publish a result.destination where nothing moved
     const didMove: boolean = source.droppableId !== destination.droppableId ||
                               source.index !== destination.index;
 
@@ -56,7 +57,7 @@ const getFireHooks = (hooks: Hooks) => memoizeOne((current: State, previous: Sta
     onDragEnd(muted);
   }
 
-  // Drag cancelled while dragging
+  // Drag ended while dragging
   if (currentPhase === 'IDLE' && previousPhase === 'DRAGGING') {
     if (!previous.drag) {
       console.error('cannot fire onDragEnd for cancel because cannot find previous drag');
@@ -70,7 +71,7 @@ const getFireHooks = (hooks: Hooks) => memoizeOne((current: State, previous: Sta
     onDragEnd(result);
   }
 
-  // Drag cancelled during a drop animation. Not super sure how this can even happen.
+  // Drag ended during a drop animation. Not super sure how this can even happen.
   // This is being really safe
   if (currentPhase === 'IDLE' && previousPhase === 'DROP_ANIMATING') {
     if (!previous.drop || !previous.drop.pending) {

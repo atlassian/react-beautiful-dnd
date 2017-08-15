@@ -90,8 +90,11 @@ export type InitialDrag = {|
 |}
 
 export type CurrentDragLocation = {|
+  // where the user initially selected
   selection: Position,
+  // the current center of the item
   center: Position,
+  // how far the item has moved from its original position
   offset: Position,
 |}
 
@@ -123,9 +126,12 @@ export type DragState = {|
   impact: DragImpact,
 |}
 
+export type DropType = 'DROP' | 'CANCEL';
+
 export type PendingDrop = {|
+  type: DropType,
   newHomeOffset: Position,
-  last: DragState,
+  impact: DragImpact,
   result: DropResult,
 |}
 
@@ -149,6 +155,8 @@ export type State = {
   dimension: DimensionState,
   // null if not dragging
   drag: ?DragState,
+
+  // available when dropping or cancelling
   drop: ?DropState,
 };
 

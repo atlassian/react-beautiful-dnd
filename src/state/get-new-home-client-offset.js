@@ -12,7 +12,8 @@ type NewHomeArgs = {|
   movement: DragMovement,
   clientOffset: Position,
   pageOffset: Position,
-  scrollDiff: Position,
+  droppableScrollDiff: Position,
+  windowScrollDiff: Position,
   draggables: DraggableDimensionMap,
 |}
 
@@ -24,12 +25,13 @@ export default ({
   movement,
   clientOffset,
   pageOffset,
-  scrollDiff,
+  droppableScrollDiff,
+  windowScrollDiff,
   draggables,
 }: NewHomeArgs): ClientOffset => {
   // Just animate back to where it started
   if (!movement.draggables.length) {
-    return scrollDiff;
+    return add(droppableScrollDiff, windowScrollDiff);
   }
 
   // Currently not considering horizontal movement
@@ -55,7 +57,7 @@ export default ({
   const client: Position = add(verticalDiff, clientOffset);
 
   // Accounting for container scroll
-  const withScroll: Position = add(client, scrollDiff);
+  const withScroll: Position = add(client, droppableScrollDiff);
 
   return withScroll;
 };
