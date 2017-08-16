@@ -19,9 +19,9 @@ See how beautiful it is for yourself - [have a play with the examples!](https://
 - plays well with existing interactive nodes such as anchors
 - state driven dragging - which allows for dragging from many input types, including programatic dragging. Currently only mouse and keyboard dragging are supported
 
-## Why not [react-dnd](https://github.com/react-dnd/react-dnd)?
+## Not for everyone
 
-There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing **react-dnd**. It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **react-beautiful-dnd is a higher level abstraction specifically built for vertical and horizontal lists**. Within that subset of functionality react-beautiful-dnd offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by **react-dnd**. So this library might not be for you depending on what your use case is.
+There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing [react-dnd](https://github.com/react-dnd/react-dnd). It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **react-beautiful-dnd is a higher level abstraction specifically built for vertical and horizontal lists**. Within that subset of functionality react-beautiful-dnd offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by react-dnd. So this library might not be for you depending on what your use case is.
 
 ## Still young!
 
@@ -171,24 +171,30 @@ class App extends Component {
 ReactDOM.render(<App />, document.getElementById('app'));
 ```
 
-### Core design principle 🎓
+### Physicality
 
-Drag and drop with react-beautiful-dnd is supposed to feel physical and natural - similar to that of moving physical objects around. Things should never 'snap' anywhere. Rather, everything should move naturally as much as possible.
+The core design idea of react-beautiful-dnd is physicality: we want users to feel like they are moving physical objects around
 
-#### Application 1: knowing when to move
+#### Application 1: no instant movement
 
-`Draggables` will move into their new position based on their center of gravity. Regardless of where a user grabs an item from - the movement of other things is **based on its center position**. This is similar to a set of scales ⚖️. Here are some rules that are followed to allow for a natural drag experience even with items of flexible height:
+It is a fairly standard drag and drop pattern for things to disappear and reappear in response to the users drag. For a more natural drag we animate the movement of items as they need to move out of the way while dragging to more clearly show a drags effect. We also animate the drop of an item so that it animates into its new home position. At no point is an item instantly moved anywhere — regardless of whether it is dragging or not.
 
-- A `Droppable` is dragged over when the center position of a dragging item goes over one of the boundaries of the `Droppable`
-- A resting `Draggable` will move out of the way of a dragging `Draggable` when the center position of the dragging `Draggable` goes over the edge of the resting `Draggable`. Put another way: once the center position of a `Draggable` (A) goes over the edge of another `Draggable` (B), B moves out of the way.
+#### Application 2: knowing when to move
 
-#### Application 2: no drop shadows
+It is quite common for drag and drop interactions to be based on the position that user started the drag from.
+
+In react-beautiful-dnd a dragging items impact is based on its centre of gravity — regardless of where a user grabs an item from. A dragging items impact follows similar rules to a set of scales ⚖️. Here are some rules that are followed to allow for a natural drag experience even with items of flexible height:
+
+- A list is *dragged over* when the centre position of a dragging item goes over one of the boundaries of the list
+- A resting drag item will move out of the way of a dragging item when the centre position of the dragging item goes over the edge of the resting item. Put another way: once the centre position of an item (A) goes over the edge of another item (B), B moves out of the way.
+
+#### Application 3: no drop shadows
 
 Drop shadows are useful in an environment where items and their destinations snap around. However, with react-beautiful-dnd it should be obvious where things will be dropping based on the movement of items. This might be changed in the future - but the experiment is to see how far we can get without any of these affordances.
 
-#### Application 3: no dead zones
+#### Application 4: maximise interactivity
 
-react-beautiful-dnd works really hard to avoid any periods of time where the user cannot fully engage with the application (no 'dead zones'). However, there is a balance that needs to be done between correctness and power in order to make everybody's lives more sane. Here are the only situations where some things are not interactive:
+react-beautiful-dnd works really hard to avoid as many periods of non-interactivity as possible. The user should feel like they are in control of the interface and not waiting for an animation to finish before they can continue to interact with the interface. However, there is a balance that needs to be made between correctness and power in order to make everybody's lives more sane. Here are the only situations where some things are not interactive:
 
 1. From when a user cancels a drag to when the drop animation completes. On cancel there are lots of things moving back to where they should be. If you grab an item in a location that is not its true home then the following drag will be incorrect.
 2. Starting a drag on an item that is animating its own drop. For simplicity this is the case - it is actually quite hard to grab something while it is animating home. It could be coded around - but it seems like an edge case that would add a lot of complexity.
@@ -197,23 +203,25 @@ Keep in mind that these dead zones may not always exist.
 
 ### Sloppy clicks and click blocking 🐱🎁
 
-A drag will not start until a user has dragged their mouse past a small threshold. If this threshold is not exceeded then the library will not impact the mouse click and will release the event to the browser.
+When a user presses the mouse down on an element, we cannot determine if the user was clicking or dragging. Also, sometimes when a user clicks they can move the cursor slightly — a sloppy click. So we only start a drag once the user has moved beyond a certain distance with the mouse down (the drag threshold) — more than they would if they where just making a sloppy click. If the drag threshold is not exceeded then the user interaction behaves just like a regular click. If the drag threshold is exceeded then the interaction will be classified as a drag and the standard click action will not occur. 
 
-When a user presses the mouse down on an element, we cannot determine if the user was clicking or dragging. If the sloppy click threshold was not exceeded then the event will be treated as if it where a click and the click event will bubble up unmodified. If the user has started dragging by moving the mouse beyond the sloppy click threshold then the click event will be prevented. This behavior allows you to wrap an element that has click behavior such as an anchor and have it work just like a standard anchor while also allowing it to be dragged.
+This allows consumers to wrap interactive elements such as an anchor and have it be both a standard anchor as well as a draggable item in a natural way.
 
 (🐱🎁 is a [schrodinger's cat](https://www.youtube.com/watch?v=IOYyCHGWJq4) joke)
 
-### Focus management 📖
+### Focus management
 
-react-beautiful-dnd does not create any wrapper elements. This means that it will not impact the usage tab flow of a document. For example, if you are wrapping an *anchor* tag then the user will tab to the anchor directly and not an element surrounding the *anchor*. Whatever element you wrap will be given a `tab-index` to ensure that users can tab to the element to perform keyboard dragging.
+react-beautiful-dnd does not create any wrapper elements. This means that it will not impact the usual tab flow of a document. For example, if you are wrapping an *anchor* tag then the user will tab to the anchor directly and not an element surrounding the *anchor*. Whatever element you wrap will be given a `tab-index` to ensure that users can tab to the element to perform keyboard dragging.
 
-### Keyboard dragging 🎹
+### Accessibility
 
-Traditionally drag and drop interactions have been exclusively a mouse or touch interaction. This library supports drag and drop interactions using only a keyboard. This enables power users to drive more of our interfaces with a keyboard. It also opens drag and drop interactions to those who previously would be unable to use them due to an impediment.
+Traditionally drag and drop interactions have been exclusively a mouse or touch interaction. This library ships with support for drag and drop interactions **using only a keyboard**. This enables power users to drive their experience entirely from the keyboard. As well as opening up these experiences to users who would have been excluded previously.
+
+In addition to supporting keyboard, we have also audited how the keyboard shortcuts interact with standard browser keyboard interactions. When the user is not dragging they can use their keyboard as they normally would. While dragging we override and disable certain browser shortcuts (such as `tab`) to ensure a fluid experience for the user.
 
 #### Shortcuts
 
-Currently the keyboard handling is hard coded. This could be changed in the future to become customisable. Here is the existing keyboard mapping:
+Currently the keyboard handling is hard coded. This might be changed in the future to become customisable. Here is the existing keyboard mapping:
 
 - **tab `↹`** - standard browser tabbing will navigate through the `Droppable`'s. The library does not do anything fancy with `tab` while users are selecting. Once a drag has started, `tab` is blocked for the duration of the drag.
 - **spacebar ` `** - lift a focused `Draggable`. Also, drop a dragging `Draggable` where the drag was started with a `spacebar`.
@@ -223,7 +231,28 @@ Currently the keyboard handling is hard coded. This could be changed in the futu
 
 #### Limitations of keyboard dragging
 
-There is a currently limitation of keyboard dragging: **the drag will cancel if the user scrolls the window**. This could be worked around but for now it is the simpliest initial approach.
+There is current limitation of keyboard dragging: **the drag will cancel if the user scrolls the window**. This could be worked around but for now it is the simpliest initial approach.
+
+## Carefully designed animations
+
+With things moving a lot it would be easy for the user to become distracted by the animations or for them to get in the way. We have tweaked the various animations to ensure the right balance of guidance, performance and interactivity.
+
+#### Dropping
+
+When you drop a dragging item its movement is based on physics (thanks react-motion). This results in the drop feeling more weighted and physical.
+
+#### Moving out of the way
+
+Items that are moving out of the way of a dragging item do so with a CSS transition rather than physics. This is to maximise performance by allowing the GPU to handle the movement. The CSS animation curve has been designed to communicate getting out of the way.
+
+How it is composed:
+
+1. A warm up period to mimic a natural response time
+2. A small phase to quickly move out of the way
+3. A long tail so that people can read any text that is being animated in the second half of the animation
+
+![animation curve](https://raw.githubusercontent.com/alexreardon/files/master/resources/dnd-ease-in-out-small.png?raw=true)
+> animation curve used when moving out of the way
 
 ## Installation
 
@@ -832,7 +861,8 @@ This codebase is designed to be extremely performant - it is part of its DNA. It
 - using connected-components with memoization to ensure the only components that render are the ones that need to - thanks [react-redux](https://github.com/reactjs/react-redux), [reselect](https://github.com/reactjs/reselect) and [memoize-one](https://github.com/alexreardon/memoize-one)
 - all movements are throttled with a [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame) - thanks [raf-schd](https://github.com/alexreardon/raf-schd)
 - memoization is used all over the place - thanks [memoize-one](https://github.com/alexreardon/memoize-one)
-- conditionally disabling [`pointer-events`](https://developer.mozilla.org/en/docs/Web/CSS/pointer-events) on `Draggable`s while dragging to prevent the browser needing to do redundant work
+- conditionally disabling [`pointer-events`](https://developer.mozilla.org/en/docs/Web/CSS/pointer-events) on `Draggable`s while dragging to prevent the browser needing to do redundant work - you can read more about the technique [here](https://www.thecssninja.com/css/pointer-events-60fps)
+- Non primary animations are done on the GPU
 
 | Minimal browser paints | Minimal React updates |
 |------------------------|-----------------------|
