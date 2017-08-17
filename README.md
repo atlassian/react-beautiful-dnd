@@ -1,6 +1,6 @@
 # react-beautiful-dnd
 
-Beautiful, accessible drag and drop for lists with [React.js](https://facebook.github.io/react/)
+Beautiful, accessible drag and drop for lists with [`React.js`](https://facebook.github.io/react/)
 
 [![Build Status](https://travis-ci.org/atlassian/react-beautiful-dnd.svg?branch=master)](https://travis-ci.org/atlassian/react-beautiful-dnd) [![dependencies](https://david-dm.org/atlassian/react-beautiful-dnd.svg)](https://david-dm.org/atlassian/react-beautiful-dnd) [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
 
@@ -21,7 +21,7 @@ See how beautiful it is for yourself - [have a play with the examples!](https://
 
 ## Not for everyone
 
-There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing [react-dnd](https://github.com/react-dnd/react-dnd). It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **react-beautiful-dnd is a higher level abstraction specifically built for vertical and horizontal lists**. Within that subset of functionality react-beautiful-dnd offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by react-dnd. So this library might not be for you depending on what your use case is.
+There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing [`react-dnd`](https://github.com/react-dnd/react-dnd). It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **`react-beautiful-dnd` is a higher level abstraction specifically built for vertical and horizontal lists**. Within that subset of functionality `react-beautiful-dnd` offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by react-dnd. So this library might not be for you depending on what your use case is.
 
 ## Still young!
 
@@ -173,7 +173,7 @@ ReactDOM.render(<App />, document.getElementById('app'));
 
 ### Physicality
 
-The core design idea of react-beautiful-dnd is physicality: we want users to feel like they are moving physical objects around
+The core design idea of `react-beautiful-dnd` is physicality: we want users to feel like they are moving physical objects around
 
 #### Application 1: no instant movement
 
@@ -183,23 +183,27 @@ It is a fairly standard drag and drop pattern for things to disappear and reappe
 
 It is quite common for drag and drop interactions to be based on the position that user started the drag from.
 
-In react-beautiful-dnd a dragging items impact is based on its centre of gravity — regardless of where a user grabs an item from. A dragging items impact follows similar rules to a set of scales ⚖️. Here are some rules that are followed to allow for a natural drag experience even with items of flexible height:
+In `react-beautiful-dnd` a dragging items impact is based on its centre of gravity — regardless of where a user grabs an item from. A dragging items impact follows similar rules to a set of scales ⚖️. Here are some rules that are followed to allow for a natural drag experience even with items of flexible height:
 
 - A list is *dragged over* when the centre position of a dragging item goes over one of the boundaries of the list
 - A resting drag item will move out of the way of a dragging item when the centre position of the dragging item goes over the edge of the resting item. Put another way: once the centre position of an item (A) goes over the edge of another item (B), B moves out of the way.
 
 #### Application 3: no drop shadows
 
-Drop shadows are useful in an environment where items and their destinations snap around. However, with react-beautiful-dnd it should be obvious where things will be dropping based on the movement of items. This might be changed in the future - but the experiment is to see how far we can get without any of these affordances.
+Drop shadows are useful in an environment where items and their destinations snap around. However, with `react-beautiful-dnd` it should be obvious where things will be dropping based on the movement of items. This might be changed in the future - but the experiment is to see how far we can get without any of these affordances.
 
 #### Application 4: maximise interactivity
 
-react-beautiful-dnd works really hard to avoid as many periods of non-interactivity as possible. The user should feel like they are in control of the interface and not waiting for an animation to finish before they can continue to interact with the interface. However, there is a balance that needs to be made between correctness and power in order to make everybody's lives more sane. Here are the only situations where some things are not interactive:
+`react-beautiful-dnd` works really hard to avoid as many periods of non-interactivity as possible. The user should feel like they are in control of the interface and not waiting for an animation to finish before they can continue to interact with the interface. However, there is a balance that needs to be made between correctness and power in order to make everybody's lives more sane. Here are the only situations where some things are not interactive:
 
 1. From when a user cancels a drag to when the drop animation completes. On cancel there are lots of things moving back to where they should be. If you grab an item in a location that is not its true home then the following drag will be incorrect.
 2. Starting a drag on an item that is animating its own drop. For simplicity this is the case - it is actually quite hard to grab something while it is animating home. It could be coded around - but it seems like an edge case that would add a lot of complexity.
 
-Keep in mind that these dead zones may not always exist.
+Keep in mind that these periods of inactivity may not always exist.
+
+#### Application 5: no drag axis locking
+
+For now, the library does not support drag axis locking (aka drag rails). This is where the user is restricted to only dragging along one axis. The current thinking is this breaks the physical metaphore we are going for and sends a message to the user that they are interacting with a piece of software rather than moving physical objects around. It is possible to ensure that a user can only drop in a single list by using props `type` and `isDropEnabled`. You can also do some visual treatment to the list `onDragStart` to show the user that this is the only place they can interact with.
 
 ### Sloppy clicks and click blocking 🐱🎁
 
@@ -211,7 +215,7 @@ This allows consumers to wrap interactive elements such as an anchor and have it
 
 ### Focus management
 
-react-beautiful-dnd does not create any wrapper elements. This means that it will not impact the usual tab flow of a document. For example, if you are wrapping an *anchor* tag then the user will tab to the anchor directly and not an element surrounding the *anchor*. Whatever element you wrap will be given a `tab-index` to ensure that users can tab to the element to perform keyboard dragging.
+`react-beautiful-dnd` does not create any wrapper elements. This means that it will not impact the usual tab flow of a document. For example, if you are wrapping an *anchor* tag then the user will tab to the anchor directly and not an element surrounding the *anchor*. Whatever element you wrap will be given a `tab-index` to ensure that users can tab to the element to perform keyboard dragging.
 
 ### Accessibility
 
@@ -239,7 +243,7 @@ With things moving a lot it would be easy for the user to become distracted by t
 
 #### Dropping
 
-When you drop a dragging item its movement is based on physics (thanks react-motion). This results in the drop feeling more weighted and physical.
+When you drop a dragging item its movement is based on physics (thanks [`react-motion`](https://github.com/chenglou/react-motion)). This results in the drop feeling more weighted and physical.
 
 #### Moving out of the way
 
@@ -270,7 +274,7 @@ So how do you use the library?
 
 ## `DragDropContext`
 
-In order to use drag and drop, you need to have the part of your react tree that you want to be able to use drag and drop in wrapped in a `DragDropContext`. It is advised to just wrap your entire application in a `DragDropContext`. Having nested `DragDropContext`'s is *not* supported. You will be able to achieve your desired conditional dragging and dropping using the props of `Droppable` and `Draggable`. You can think of `DragDropContext` as having a similar purpose to the [react-redux Provider component](https://github.com/reactjs/react-redux/blob/master/docs/api.md#provider-store)
+In order to use drag and drop, you need to have the part of your `React` tree that you want to be able to use drag and drop in wrapped in a `DragDropContext`. It is advised to just wrap your entire application in a `DragDropContext`. Having nested `DragDropContext`'s is *not* supported. You will be able to achieve your desired conditional dragging and dropping using the props of `Droppable` and `Draggable`. You can think of `DragDropContext` as having a similar purpose to the [react-redux Provider component](https://github.com/reactjs/react-redux/blob/master/docs/api.md#provider-store)
 
 ### Prop type information
 
@@ -447,7 +451,7 @@ import { Droppable } from 'react-beautiful-dnd';
 
 ### Children function
 
-The React children of a `Droppable` must be a function that returns a `ReactElement`.
+The `React` children of a `Droppable` must be a function that returns a `ReactElement`.
 
 ```js
 <Droppable droppableId="droppable-1">
@@ -562,11 +566,11 @@ import { Draggable } from 'react-beautiful-dnd';
 
 - `draggableId`: A *required* `DraggableId(string)` that uniquely identifies the `Draggable` for the application. Please do not change this prop - especially during a drag.
 - `type`: An *optional* type (`TypeId(string)`) of the `Draggable`. This is used to control what `Droppable`s the `Draggable` is permitted to drop on. `Draggable`s can only drop on `Droppable`s that share the same `type`. If no `type` is provided, it will be set to `'DEFAULT'`. Currently the `type` of a `Draggable` **must be** the same as its container `Droppable`. This restriction might be loosened in the future if there is a valid use case.
-- `isDragDisabled`: An *optional* flag to control whether or not dropping is currently allowed on the `Droppable`. You can use this to implement your own conditional dropping logic. It will default to `false`.
+- `isDragDisabled`: An *optional* flag to control whether or not the `Draggable` is permitted to drag. You can use this to implement your own conditional drag logic. It will default to `false`.
 
 ### Children function
 
-The React children of a `Draggable` must be a function that returns a `ReactElement`.
+The `React` children of a `Draggable` must be a function that returns a `ReactElement`.
 
 ```js
 <Draggable draggableId="draggable-1">
@@ -688,7 +692,7 @@ type NotDraggingStyle = {|
 |}
 ```
 
-- `provided.placeholder (?ReactElement)` The `Draggable` element has `position: fixed` applied to it while it is dragging. The role of the `placeholder` is to sit in the place that the `Draggable` was during a drag. It is needed to stop the `Droppable` list from collapsing when you drag. It is advised to render it as a sibling to the `Draggable` node. When the library moves to React 16 the `placeholder` will be removed from api.
+- `provided.placeholder (?ReactElement)` The `Draggable` element has `position: fixed` applied to it while it is dragging. The role of the `placeholder` is to sit in the place that the `Draggable` was during a drag. It is needed to stop the `Droppable` list from collapsing when you drag. It is advised to render it as a sibling to the `Draggable` node. When the library moves to `React` 16 the `placeholder` will be removed from api.
 
 ```js
 <Draggable draggableId="draggable-1">
@@ -854,13 +858,13 @@ While code coverage is [not a guarantee of code health](https://stackoverflow.co
 
 ### Performance
 
-This codebase is designed to be extremely performant - it is part of its DNA. It builds on prior investigations into React performance that you can read about [here](https://medium.com/@alexandereardon/performance-optimisations-for-react-applications-b453c597b191) and [here](https://medium.com/@alexandereardon/performance-optimisations-for-react-applications-round-2-2042e5c9af97). It is designed to perform the minimum number of renders required for each task.
+This codebase is designed to be extremely performant - it is part of its DNA. It builds on prior investigations into `React` performance that you can read about [here](https://medium.com/@alexandereardon/performance-optimisations-for-react-applications-b453c597b191) and [here](https://medium.com/@alexandereardon/performance-optimisations-for-react-applications-round-2-2042e5c9af97). It is designed to perform the minimum number of renders required for each task.
 
 **Highlights**
 
-- using connected-components with memoization to ensure the only components that render are the ones that need to - thanks [react-redux](https://github.com/reactjs/react-redux), [reselect](https://github.com/reactjs/reselect) and [memoize-one](https://github.com/alexreardon/memoize-one)
-- all movements are throttled with a [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame) - thanks [raf-schd](https://github.com/alexreardon/raf-schd)
-- memoization is used all over the place - thanks [memoize-one](https://github.com/alexreardon/memoize-one)
+- using connected-components with memoization to ensure the only components that render are the ones that need to - thanks [`react-redux`](https://github.com/reactjs/react-redux), [`reselect`](https://github.com/reactjs/reselect) and [`memoize-one`](https://github.com/alexreardon/memoize-one)
+- all movements are throttled with a [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame) - thanks [`raf-schd`](https://github.com/alexreardon/raf-schd)
+- memoization is used all over the place - thanks [`memoize-one`](https://github.com/alexreardon/memoize-one)
 - conditionally disabling [`pointer-events`](https://developer.mozilla.org/en/docs/Web/CSS/pointer-events) on `Draggable`s while dragging to prevent the browser needing to do redundant work - you can read more about the technique [here](https://www.thecssninja.com/css/pointer-events-60fps)
 - Non primary animations are done on the GPU
 
