@@ -487,7 +487,7 @@ type StateSnapshot = {|
 |}
 ```
 
-The `children` function is also provided with a small about of state relating to the current drag state. This can be optionally used to enhance your component. A common use case is changing the appearance of a `Droppable` while it is being dragged over.
+The `children` function is also provided with a small amount of state relating to the current drag state. This can be optionally used to enhance your component. A common use case is changing the appearance of a `Droppable` while it is being dragged over.
 
 ```js
 <Droppable droppableId="droppable-1">
@@ -544,9 +544,9 @@ import { Draggable } from 'react-beautiful-dnd';
   {(provided, snapshot) => (
     <div>
       <div
-        ref={draggableProvided.innerRef}
-        style={draggableProvided.draggableStyle}
-        {...draggableProvided.dragHandleProps}
+        ref={provided.innerRef}
+        style={provided.draggableStyle}
+        {...provided.dragHandleProps}
       >
         <h4>My draggable</h4>
       </div>
@@ -618,11 +618,11 @@ Everything within the *provided* object must be applied for the `Draggable` to f
 innerRef: (HTMLElement) => void
 ```
 
-- `provided.draggableStyle (?DraggableStyle)`: This is an `Object` or `null` that contains an a number of styles that needs to be applied to the `Draggable`. This needs to be applied to the same node that you apply `provided.innerRef` to. The controls the movement of the draggable when it is dragging and not dragging. You are welcome to add your own styles to this object - but please do not remove or replace any of the properties.
+- `provided.draggableStyle (?DraggableStyle)`: This is an `Object` or `null` that contains an a number of styles that needs to be applied to the `Draggable`. This needs to be applied to the same node that you apply `provided.innerRef` to. This controls the movement of the draggable when it is dragging and not dragging. You are welcome to add your own styles to this object – but please do not remove or replace any of the properties.
 
 **Ownership**
 
-It is a contract of this library that it own the positioning logic of the dragging element. This includes properties such as `top`, `right`, `bottom`, `left` and `transform`. The library may change how it positions things and what properties it uses without performing a major version bump. It is also recommended that you do not apply your own `transition` property to the dragging element.
+It is a contract of this library that it owns the positioning logic of the dragging element. This includes properties such as `top`, `right`, `bottom`, `left` and `transform`. The library may change how it positions things and what properties it uses without performing a major version bump. It is also recommended that you do not apply your own `transition` property to the dragging element.
 
 ```js
 <Draggable draggableId="draggable-1">
@@ -688,7 +688,7 @@ type NotDraggingStyle = {|
 |}
 ```
 
-- `provided.placeholder (?ReactElement)` The `Draggable` element has `position:fixed` applied to it while it is dragging. The role of the `placeholder` is to sit in the place that the `Draggable` was during a drag. It is needed to stop the `Droppable` list from collapsing when you drag. It is advised to render it as a sibling to the `Draggable` node. When the library moves to React 16 the `placeholder` will be removed from api.
+- `provided.placeholder (?ReactElement)` The `Draggable` element has `position: fixed` applied to it while it is dragging. The role of the `placeholder` is to sit in the place that the `Draggable` was during a drag. It is needed to stop the `Droppable` list from collapsing when you drag. It is advised to render it as a sibling to the `Draggable` node. When the library moves to React 16 the `placeholder` will be removed from api.
 
 ```js
 <Draggable draggableId="draggable-1">
@@ -707,7 +707,7 @@ type NotDraggingStyle = {|
 </Draggable>
 ```
 
-- `provided.dragHandleProps (?DragHandleProps)` every `Draggable` has a *drag handle*. This is what is used to drag the whole `Draggable`. Often this will be the same as the node as the `Draggable`, but sometimes it can be a child of the `Draggable`. `DragHandleProps` need to be applied to the node that you want to be the drag handle. This is a number of props that need to be applied to the `Draggable` node. The simpliest approach is to spread the props onto the draggable node (`{...provided.dragHandleProps}`). However, you are also welcome to [monkey patch](https://davidwalsh.name/monkey-patching) these props if you also need to respond to them. DragHandleProps will be `null` when `isDragDisabled` is set to `true`.
+- `provided.dragHandleProps (?DragHandleProps)` every `Draggable` has a *drag handle*. This is what is used to drag the whole `Draggable`. Often this will be the same node as the `Draggable`, but sometimes it can be a child of the `Draggable`. `DragHandleProps` need to be applied to the node that you want to be the drag handle. This is a number of props that need to be applied to the `Draggable` node. The simpliest approach is to spread the props onto the draggable node (`{...provided.dragHandleProps}`). However, you are also welcome to [monkey patch](https://davidwalsh.name/monkey-patching) these props if you also need to respond to them. DragHandleProps will be `null` when `isDragDisabled` is set to `true`.
 
 **Type information**
 
@@ -814,7 +814,7 @@ type StateSnapshot = {|
 |}
 ```
 
-The `children` function is also provided with a small about of state relating to the current drag state. This can be optionally used to enhance your component. A common use case is changing the appearance of a `Draggable` while it is being dragged. Note: if you want to change the cursor to something like `grab` you will need to add the style to the body. (See `DragDropContext` > **style** above)
+The `children` function is also provided with a small amount of state relating to the current drag state. This can be optionally used to enhance your component. A common use case is changing the appearance of a `Draggable` while it is being dragged. Note: if you want to change the cursor to something like `grab` you will need to add the style to the body. (See `DragDropContext` > **style** above)
 
 ```js
 <Draggable draggableId="draggable-1">
