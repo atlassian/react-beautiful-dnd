@@ -138,7 +138,7 @@ class App extends Component {
               ref={provided.innerRef}
               style={getListStyle(snapshot.isDraggingOver)}
             >
-              {this.state.items.map(item =>
+              {this.state.items.map(item => (
                 <Draggable key={item.id} draggableId={item.id}>
                   {(provided, snapshot) => (
                     <div>
@@ -156,7 +156,7 @@ class App extends Component {
                     </div>
                   )}
                 </Draggable>
-              )}
+              ))}
             </div>
           )}
         </Droppable>
