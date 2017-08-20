@@ -133,14 +133,14 @@ class App extends Component {
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
         <Droppable droppableId="droppable">
-          {(provided, snapshot) =>
+          {(provided, snapshot) => (
             <div
               ref={provided.innerRef}
               style={getListStyle(snapshot.isDraggingOver)}
             >
               {this.state.items.map(item =>
                 <Draggable key={item.id} draggableId={item.id}>
-                  {(provided, snapshot) =>
+                  {(provided, snapshot) => (
                     <div>
                       <div
                         ref={provided.innerRef}
@@ -153,10 +153,12 @@ class App extends Component {
                         {item.content}
                       </div>
                       {provided.placeholder}
-                    </div>}
+                    </div>
+                  )}
                 </Draggable>
               )}
-            </div>}
+            </div>
+          )}
         </Droppable>
       </DragDropContext>
     );
@@ -429,13 +431,14 @@ Your *hook* functions will only be captured *once at start up*. Please do not ch
 import { Droppable } from 'react-beautiful-dnd';
 
 <Droppable droppableId="droppable-1" type="PERSON">
-  {(provided, snapshot) =>
+  {(provided, snapshot) => (
     <div
       ref={provided.innerRef}
       style={{ backgroundColor: snapshot.isDraggingOver ? 'blue' : 'grey' }}
     >
       I am a droppable!
-    </div>}
+    </div>
+  )}
 </Droppable>;
 ```
 
@@ -487,13 +490,14 @@ The `children` function is also provided with a small amount of state relating t
 
 ```js
 <Droppable droppableId="droppable-1">
-  {(provided, snapshot) =>
+  {(provided, snapshot) => (
     <div
       ref={provided.innerRef}
       style={{ backgroundColor: snapshot.isDraggingOver ? 'blue' : 'grey' }}
     >
       I am a droppable!
-    </div>}
+    </div>
+  )}
 </Droppable>;
 ```
 
@@ -533,7 +537,7 @@ Getting keyboard dragging to work with scroll containers is quite difficult. Cur
 import { Draggable } from 'react-beautiful-dnd';
 
 <Draggable draggableId="draggable-1" type="PERSON">
-  {(provided, snapshot) =>
+  {(provided, snapshot) => (
     <div>
       <div
         ref={provided.innerRef}
@@ -543,7 +547,8 @@ import { Draggable } from 'react-beautiful-dnd';
         <h4>My draggable</h4>
       </div>
       {provided.placeholder}
-    </div>}
+    </div>
+  )}
 </Draggable>;
 ```
 
@@ -561,7 +566,7 @@ The `React` children of a `Draggable` must be a function that returns a `ReactEl
 
 ```js
 <Draggable draggableId="draggable-1">
-  {(provided, snapshot) =>
+  {(provided, snapshot) => (
     <div>
       <div
         ref={provided.innerRef}
@@ -571,7 +576,8 @@ The `React` children of a `Draggable` must be a function that returns a `ReactEl
         Drag me!
       </div>
       {provided.placeholder}
-    </div>}
+    </div>
+  )}
 </Draggable>;
 ```
 
@@ -612,12 +618,13 @@ It is a contract of this library that it owns the positioning logic of the dragg
 
 ```js
 <Draggable draggableId="draggable-1">
-  {(provided, snapshot) =>
+  {(provided, snapshot) => (
     <div>
       <div ref={provided.innerRef} style={provided.draggableStyle}>
         Drag me!
       </div>
-    </div>}
+    </div>
+  )}
 </Draggable>;
 ```
 
@@ -671,14 +678,15 @@ type NotDraggingStyle = {|
 
 ```js
 <Draggable draggableId="draggable-1">
-  {(provided, snapshot) =>
+  {(provided, snapshot) => (
     <div>
       <div ref={provided.innerRef} style={provided.draggableStyle}>
         Drag me!
       </div>
       {/* Always render me - I will be null if not required */}
       {provided.placeholder}
-    </div>}
+    </div>
+  )}
 </Draggable>;
 ```
 
@@ -703,7 +711,7 @@ type DragHandleProps = {|
 
 ```js
 <Draggable draggableId="draggable-1">
-  {(provided, snapshot) =>
+  {(provided, snapshot) => (
     <div>
       <div
         ref={provided.innerRef}
@@ -713,7 +721,8 @@ type DragHandleProps = {|
         Drag me!
       </div>
       {provided.placeholder}
-    </div>}
+    </div>
+  )}
 </Draggable>;
 ```
 
@@ -721,14 +730,15 @@ type DragHandleProps = {|
 
 ```js
 <Draggable draggableId="draggable-1">
-  {(provided, snapshot) =>
+  {(provided, snapshot) => (
     <div>
       <div ref={provided.innerRef} style={provided.draggableStyle}>
         <h2>Hello there</h2>
         <div {...provided.dragHandleProps}>Drag handle</div>
       </div>
       {provided.placeholder}
-    </div>}
+    </div>
+  )}
 </Draggable>;
 ```
 
