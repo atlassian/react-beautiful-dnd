@@ -28,16 +28,40 @@ import type {
 } from '../drag-handle/drag-handle-types';
 
 export type DraggingStyle = {|
-  position: 'fixed',
-  boxSizing: 'border-box',
-  // allow scrolling of the element behind the dragging element
+  // Allow scrolling of the element behind the dragging element
   pointerEvents: 'none',
-  zIndex: ZIndex,
+
+  // `position: fixed` is used to ensure that the element is always positioned
+  // in the correct position and ignores the surrounding position:relative parents
+  position: 'fixed',
+
+  // When we do `position: fixed` the element looses its normal dimensions,
+  // especially if using flexbox. We set the width and height manually to
+  // ensure the element has the same dimensions as before it started dragging
   width: number,
   height: number,
+
+  // When we set the width and height they include the padding on the element.
+  // We use box-sizing: border-box to ensure that the width and height are inclusive of the padding
+  boxSizing: 'border-box',
+
+  // We initially position the element in the same visual spot as when it started.
+  // To do this we give the element the top / left position with the margins considered
   top: number,
   left: number,
+
+  // We clear any top or left margins on the element to ensure it does not push
+  // the element positioned with the top/left position.
+  // We also clear the margin right / bottom. This has no positioning impact,
+  // but it is cleanest to just remove all the margins rather than only the top and left.
+  margin: 0,
+
+  // Move the element in response to a user dragging
   transform: ?string,
+
+  // When dragging or dropping we control the z-index to ensure that
+  // the layering is correct
+  zIndex: ZIndex,
 |}
 
 export type NotDraggingStyle = {|

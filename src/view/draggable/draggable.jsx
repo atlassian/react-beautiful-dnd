@@ -221,6 +221,7 @@ export default class Draggable extends Component {
       left: number,
       isDropAnimating: boolean,
       movementStyle: MovementStyle): DraggingStyle => {
+      // For an explanation of properties see `draggable-types`.
       const style: DraggingStyle = {
         position: 'fixed',
         boxSizing: 'border-box',
@@ -230,6 +231,7 @@ export default class Draggable extends Component {
         height,
         top,
         left,
+        margin: 0,
         transform: movementStyle.transform ? `${movementStyle.transform}` : null,
       };
       return style;
@@ -273,7 +275,9 @@ export default class Draggable extends Component {
         }
         invariant(dimension, 'draggable dimension required for dragging');
 
+        // Margins are accounted for. See `draggable-types` for explanation
         const { width, height, top, left } = dimension.client.withoutMargin;
+
         return this.getDraggingStyle(width, height, top, left, isDropAnimating, movementStyle);
       })();
 
