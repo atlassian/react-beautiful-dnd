@@ -655,17 +655,17 @@ It is a contract of this library that it owns the positioning logic of the dragg
 type DraggableStyle = DraggingStyle | NotDraggingStyle;
 
 type DraggingStyle = {|
-  position: 'fixed',
-  boxSizing: 'border-box',
-  // allow scrolling of the element behind the dragging element
   pointerEvents: 'none',
-  zIndex: ZIndex,
+  position: 'fixed',
   width: number,
   height: number,
+  boxSizing: 'border-box',
   top: number,
   left: number,
+  margin: 0,
   transform: ?string,
-|};
+  zIndex: ZIndex,
+|}
 
 type NotDraggingStyle = {|
   transition: ?string,

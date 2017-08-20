@@ -887,6 +887,7 @@ describe('Draggable - unconnected', () => {
         height: dimension.page.withMargin.height,
         top: dimension.page.withMargin.top,
         left: dimension.page.withMargin.left,
+        margin: 0,
         transform: null,
         pointerEvents: 'none',
       };
@@ -919,6 +920,7 @@ describe('Draggable - unconnected', () => {
         height: dimension.page.withMargin.height,
         top: dimension.page.withMargin.top,
         left: dimension.page.withMargin.left,
+        margin: 0,
         transform: `translate(${offset.x}px, ${offset.y}px)`,
         pointerEvents: 'none',
       };
@@ -955,6 +957,7 @@ describe('Draggable - unconnected', () => {
         height: dimension.page.withMargin.height,
         top: dimension.page.withMargin.top,
         left: dimension.page.withMargin.left,
+        margin: 0,
       };
 
       mountDraggable({
@@ -1083,6 +1086,7 @@ describe('Draggable - unconnected', () => {
         height: dimension.page.withMargin.height,
         top: dimension.page.withMargin.top,
         left: dimension.page.withMargin.left,
+        margin: 0,
         transform: `translate(${offset.x}px, ${offset.y}px)`,
         pointerEvents: 'none',
       };
