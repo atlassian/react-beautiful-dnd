@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import type { Props, Provided, StateSnapshot, DefaultProps } from './droppable-types';
 import type { DroppableId, HTMLElement } from '../../types';
 import DroppableDimensionPublisher from '../droppable-dimension-publisher/';
