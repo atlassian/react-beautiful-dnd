@@ -66,13 +66,14 @@ import ReactDOM from 'react-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 // fake data generator
-const getItems = (count) => Array.from({length: count}, (v, k) => k).map(k => ({
-  id: `item-${k}`,
-  content: `item ${k}`
-}));
+const getItems = count =>
+  Array.from({ length: count }, (v, k) => k).map(k => ({
+    id: `item-${k}`,
+    content: `item ${k}`,
+  }));
 
 // a little function to help us with reordering the result
-const reorder =  (list, startIndex, endIndex) => {
+const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
   const [removed] = result.splice(startIndex, 1);
   result.splice(endIndex, 0, removed);
@@ -92,26 +93,26 @@ const getItemStyle = (draggableStyle, isDragging) => ({
   background: isDragging ? 'lightgreen' : 'grey',
 
   // styles we need to apply on draggables
-  ...draggableStyle
+  ...draggableStyle,
 });
-const getListStyle = (isDraggingOver) => ({
+const getListStyle = isDraggingOver => ({
   background: isDraggingOver ? 'lightblue' : 'lightgrey',
   padding: grid,
-  width: 250
+  width: 250,
 });
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      items: getItems(10)
-    }
+      items: getItems(10),
+    };
     this.onDragEnd = this.onDragEnd.bind(this);
   }
 
-  onDragEnd (result) {
+  onDragEnd(result) {
     // dropped outside the list
-    if(!result.destination) {
+    if (!result.destination) {
       return;
     }
 
@@ -122,7 +123,7 @@ class App extends Component {
     );
 
     this.setState({
-      items
+      items,
     });
   }
 
@@ -138,10 +139,7 @@ class App extends Component {
               style={getListStyle(snapshot.isDraggingOver)}
             >
               {this.state.items.map(item => (
-                <Draggable
-                  key={item.id}
-                  draggableId={item.id}
-                >
+                <Draggable key={item.id} draggableId={item.id}>
                   {(provided, snapshot) => (
                     <div>
                       <div
@@ -295,8 +293,12 @@ type Props = Hooks & {|
 import { DragDropContext } from 'react-beautiful-dnd';
 
 class App extends React.Component {
-  onDragStart = () => {...}
-  onDragEnd = () => {...}
+  onDragStart = () => {
+    /*...*/
+  };
+  onDragEnd = () => {
+    /*...*/
+  };
 
   render() {
     return (
@@ -306,7 +308,7 @@ class App extends React.Component {
       >
         <div>Hello world</div>
       </DragDropContext>
-    )
+    );
   }
 }
 ```
@@ -428,19 +430,16 @@ Your *hook* functions will only be captured *once at start up*. Please do not ch
 ```js
 import { Droppable } from 'react-beautiful-dnd';
 
-<Droppable
-  droppableId="droppable-1"
-  type="PERSON"
->
+<Droppable droppableId="droppable-1" type="PERSON">
   {(provided, snapshot) => (
     <div
       ref={provided.innerRef}
-      style={{backgroundColor: snapshot.isDraggingOver ? 'blue' : 'grey'}}
+      style={{ backgroundColor: snapshot.isDraggingOver ? 'blue' : 'grey' }}
     >
       I am a droppable!
     </div>
   )}
-</Droppable>
+</Droppable>;
 ```
 
 ### Props
@@ -455,10 +454,10 @@ The `React` children of a `Droppable` must be a function that returns a `ReactEl
 
 ```js
 <Droppable droppableId="droppable-1">
-  {(provided, snapshot) => (
-    // ...
-  )}
-</Droppable>
+  {(provided, snapshot) => ({
+    /*...*/
+  })}
+</Droppable>;
 ```
 
 The function is provided with two arguments:
@@ -475,12 +474,8 @@ In order for the droppable to function correctly, **you must** bind the `provide
 
 ```js
 <Droppable droppableId="droppable-1">
-  {(provided, snapshot) => (
-    <div ref={provided.innerRef}>
-      Good to go
-    </div>
-  )}
-</Droppable>
+  {(provided, snapshot) => <div ref={provided.innerRef}>Good to go</div>}
+</Droppable>;
 ```
 
 **2. snapshot: (StateSnapshot)**
@@ -488,7 +483,7 @@ In order for the droppable to function correctly, **you must** bind the `provide
 ```js
 type StateSnapshot = {|
   isDraggingOver: boolean,
-|}
+|};
 ```
 
 The `children` function is also provided with a small amount of state relating to the current drag state. This can be optionally used to enhance your component. A common use case is changing the appearance of a `Droppable` while it is being dragged over.
@@ -498,12 +493,12 @@ The `children` function is also provided with a small amount of state relating t
   {(provided, snapshot) => (
     <div
       ref={provided.innerRef}
-      style={{backgroundColor: snapshot.isDraggingOver ? 'blue' : 'grey'}}
+      style={{ backgroundColor: snapshot.isDraggingOver ? 'blue' : 'grey' }}
     >
       I am a droppable!
     </div>
   )}
-</Droppable>
+</Droppable>;
 ```
 
 ### Conditionally dropping
@@ -541,10 +536,7 @@ Getting keyboard dragging to work with scroll containers is quite difficult. Cur
 ```js
 import { Draggable } from 'react-beautiful-dnd';
 
-<Draggable
-  draggableId="draggable-1"
-  type="PERSON"
->
+<Draggable draggableId="draggable-1" type="PERSON">
   {(provided, snapshot) => (
     <div>
       <div
@@ -557,7 +549,7 @@ import { Draggable } from 'react-beautiful-dnd';
       {provided.placeholder}
     </div>
   )}
-</Draggable>
+</Draggable>;
 ```
 
 > Note: when the library moves to React 16 this will be cleaned up a little bit as we will be able to return the placeholder as a sibling to your child function without you needing to create a wrapping element
@@ -586,7 +578,7 @@ The `React` children of a `Draggable` must be a function that returns a `ReactEl
       {provided.placeholder}
     </div>
   )}
-</Draggable>
+</Draggable>;
 ```
 
 The function is provided with two arguments:
@@ -608,12 +600,8 @@ Everything within the *provided* object must be applied for the `Draggable` to f
 
 ```js
 <Draggable draggableId="draggable-1">
-  {(provided, snapshot) => (
-    <div ref={provided.innerRef}>
-      Drag me!
-    </div>
-  )}
-</Draggable>
+  {(provided, snapshot) => <div ref={provided.innerRef}>Drag me!</div>}
+</Draggable>;
 ```
 
 **Type information**
@@ -632,15 +620,12 @@ It is a contract of this library that it owns the positioning logic of the dragg
 <Draggable draggableId="draggable-1">
   {(provided, snapshot) => (
     <div>
-      <div
-        ref={provided.innerRef}
-        style={provided.draggableStyle}
-      >
+      <div ref={provided.innerRef} style={provided.draggableStyle}>
         Drag me!
       </div>
     </div>
   )}
-</Draggable>
+</Draggable>;
 ```
 
 **Extending with your own styles**
@@ -650,21 +635,18 @@ It is a contract of this library that it owns the positioning logic of the dragg
   {(provided, snapshot) => {
     const style = {
       ...provided.draggableStyle,
-      backgroundColor: snapshot.isDragging : 'blue' : 'white',
+      backgroundColor: snapshot.isDragging ? 'blue' : 'white',
       fontSize: 18,
-    }
+    };
     return (
       <div>
-        <div
-          ref={provided.innerRef}
-          style={style}
-        >
+        <div ref={provided.innerRef} style={style}>
           Drag me!
         </div>
       </div>
     );
   }}
-</Draggable>
+</Draggable>;
 ```
 
 **Type information**
@@ -683,13 +665,13 @@ type DraggingStyle = {|
   top: number,
   left: number,
   transform: ?string,
-|}
+|};
 
 type NotDraggingStyle = {|
   transition: ?string,
   transform: ?string,
   pointerEvents: 'none' | 'auto',
-|}
+|};
 ```
 
 - `provided.placeholder (?ReactElement)` The `Draggable` element has `position: fixed` applied to it while it is dragging. The role of the `placeholder` is to sit in the place that the `Draggable` was during a drag. It is needed to stop the `Droppable` list from collapsing when you drag. It is advised to render it as a sibling to the `Draggable` node. When the library moves to `React` 16 the `placeholder` will be removed from api.
@@ -698,17 +680,14 @@ type NotDraggingStyle = {|
 <Draggable draggableId="draggable-1">
   {(provided, snapshot) => (
     <div>
-      <div
-        ref={provided.innerRef}
-        style={provided.draggableStyle}
-      >
+      <div ref={provided.innerRef} style={provided.draggableStyle}>
         Drag me!
       </div>
       {/* Always render me - I will be null if not required */}
       {provided.placeholder}
     </div>
   )}
-</Draggable>
+</Draggable>;
 ```
 
 - `provided.dragHandleProps (?DragHandleProps)` every `Draggable` has a *drag handle*. This is what is used to drag the whole `Draggable`. Often this will be the same node as the `Draggable`, but sometimes it can be a child of the `Draggable`. `DragHandleProps` need to be applied to the node that you want to be the drag handle. This is a number of props that need to be applied to the `Draggable` node. The simpliest approach is to spread the props onto the draggable node (`{...provided.dragHandleProps}`). However, you are also welcome to [monkey patch](https://davidwalsh.name/monkey-patching) these props if you also need to respond to them. DragHandleProps will be `null` when `isDragDisabled` is set to `true`.
@@ -724,8 +703,8 @@ type DragHandleProps = {|
   'aria-grabbed': boolean,
   draggable: boolean,
   onDragStart: () => void,
-  onDrop: () => void
-|}
+  onDrop: () => void,
+|};
 ```
 
 **Standard example**
@@ -744,7 +723,7 @@ type DragHandleProps = {|
       {provided.placeholder}
     </div>
   )}
-</Draggable>
+</Draggable>;
 ```
 
 **Custom drag handle**
@@ -753,19 +732,14 @@ type DragHandleProps = {|
 <Draggable draggableId="draggable-1">
   {(provided, snapshot) => (
     <div>
-      <div
-        ref={provided.innerRef}
-        style={provided.draggableStyle}
-      >
+      <div ref={provided.innerRef} style={provided.draggableStyle}>
         <h2>Hello there</h2>
-        <div {...provided.dragHandleProps}>
-          Drag handle
-        </div>
+        <div {...provided.dragHandleProps}>Drag handle</div>
       </div>
       {provided.placeholder}
     </div>
   )}
-</Draggable>
+</Draggable>;
 ```
 
 **Monkey patching**
@@ -773,24 +747,24 @@ type DragHandleProps = {|
 > If you want to also use one of the props in `DragHandleProps`
 
 ```js
-const myOnClick = (event) => console.log('clicked on', event.target);
+const myOnClick = event => console.log('clicked on', event.target);
 
 <Draggable draggableId="draggable-1">
   {(provided, snapshot) => {
     const onClick = (() => {
       // dragHandleProps might be null
-      if(!provided.dragHandleProps) {
+      if (!provided.dragHandleProps) {
         return myOnClick;
       }
 
       // creating a new onClick function that calls my onClick
       // event as well as the provided one.
-      return (event) => {
+      return event => {
         provided.dragHandleProps.onClick(event);
         // You may want to check if event.defaultPrevented
         // is true and optionally fire your handler
         myOnClick(event);
-      }
+      };
     })();
 
     return (
@@ -807,7 +781,7 @@ const myOnClick = (event) => console.log('clicked on', event.target);
       </div>
     );
   }}
-</Draggable>
+</Draggable>;
 ```
 
 **2. snapshot: (StateSnapshot)**
@@ -815,7 +789,7 @@ const myOnClick = (event) => console.log('clicked on', event.target);
 ```js
 type StateSnapshot = {|
   isDragging: boolean,
-|}
+|};
 ```
 
 The `children` function is also provided with a small amount of state relating to the current drag state. This can be optionally used to enhance your component. A common use case is changing the appearance of a `Draggable` while it is being dragged. Note: if you want to change the cursor to something like `grab` you will need to add the style to the body. (See `DragDropContext` > **style** above)
@@ -841,7 +815,7 @@ The `children` function is also provided with a small amount of state relating t
       </div>
     );
   }}
-</Draggable>
+</Draggable>;
 ```
 
 ## Engineering health
