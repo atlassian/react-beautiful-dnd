@@ -866,6 +866,10 @@ This library supports the standard [Atlassian supported browsers](https://conflu
 
 Currently mobile is not supported. However, there are plans to add touch support in the future
 
+## Translation
+This library is also available in other languages:
+- ![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **Korean**: [leehyunggeun/react-beautiful-dnd](https://github.com/LeeHyungGeun/react-beautiful-dnd-kr)
+
 ## Author / maintainer
 
 Alex Reardon - [@alexandereardon](https://twitter.com/alexandereardon) - areardon@atlassian.com
