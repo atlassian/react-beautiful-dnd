@@ -466,7 +466,7 @@ The function is provided with two arguments:
 
 ```js
 type Provided = {|
-  innerRef: (HTMLElement) => mixed,
+  innerRef: (HTMLElement) => void,
 |}
 ```
 
@@ -615,6 +615,12 @@ innerRef: (HTMLElement) => void
 **Ownership**
 
 It is a contract of this library that it owns the positioning logic of the dragging element. This includes properties such as `top`, `right`, `bottom`, `left` and `transform`. The library may change how it positions things and what properties it uses without performing a major version bump. It is also recommended that you do not apply your own `transition` property to the dragging element.
+
+**Warning: `position: fixed`**
+
+`react-beautiful-dnd` uses `position: fixed` to position the dragging element. This is quite robust and allows for you to have `position: relative | absolute | fixed` parents. However, unfortunately `position:fixed` is [impacted by `transform`](http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/) (such as `transform: rotate(10deg);`). This means that if you have a `transform: *` on one of the parents of a `Draggable` then the positioning logic will be incorrect while dragging. Lame! For most consumers this will not be an issue. We may look into creating a portal solution where we attach the dragging element to the body rather than leave it in place. However, leaving it in place is a really nice experience for everyone. For now we will leave it as is, but feel free to raise an issue if you this is important to you.
+
+**Usage of `draggableStyle`**
 
 ```js
 <Draggable draggableId="draggable-1">
