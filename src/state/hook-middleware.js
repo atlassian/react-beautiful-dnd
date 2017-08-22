@@ -1,6 +1,6 @@
 // @flow
 import memoizeOne from 'memoize-one';
-import type { Action, Store, State, Hooks, DropResult } from '../types';
+import type { Action, Store, State, Hooks, DragStart, DropResult } from '../types';
 
 const getFireHooks = (hooks: Hooks) => memoizeOne((current: State, previous: State): void => {
   const { onDragStart, onDragEnd } = hooks;
@@ -20,7 +20,13 @@ const getFireHooks = (hooks: Hooks) => memoizeOne((current: State, previous: Sta
       return;
     }
 
-    onDragStart(current.drag.current.id, current.drag.initial.source);
+    const start: DragStart = {
+      draggableId: current.drag.current.id,
+      type: current.drag.current.type,
+      source: current.drag.initial.source,
+    };
+
+    onDragStart(start);
     return;
   }
 
@@ -31,7 +37,12 @@ const getFireHooks = (hooks: Hooks) => memoizeOne((current: State, previous: Sta
       return;
     }
 
-    const { source, destination, draggableId } = current.drop.result;
+    const {
+      source,
+      destination,
+      draggableId,
+      type,
+    } = current.drop.result;
 
     // Could be a cancel or a drop nowhere
     if (!destination) {
@@ -50,6 +61,7 @@ const getFireHooks = (hooks: Hooks) => memoizeOne((current: State, previous: Sta
 
     const muted: DropResult = {
       draggableId,
+      type,
       source,
       destination: null,
     };
@@ -65,6 +77,7 @@ const getFireHooks = (hooks: Hooks) => memoizeOne((current: State, previous: Sta
     }
     const result: DropResult = {
       draggableId: previous.drag.current.id,
+      type: previous.drag.current.type,
       source: previous.drag.initial.source,
       destination: null,
     };
@@ -81,6 +94,7 @@ const getFireHooks = (hooks: Hooks) => memoizeOne((current: State, previous: Sta
 
     const result: DropResult = {
       draggableId: previous.drop.pending.result.draggableId,
+      type: previous.drop.pending.result.type,
       source: previous.drop.pending.result.source,
       destination: null,
     };

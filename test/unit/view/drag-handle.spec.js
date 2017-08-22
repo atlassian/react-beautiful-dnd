@@ -57,6 +57,14 @@ const callbacksCalled = (callbacks: Callbacks) => ({
 const whereAnyCallbacksCalled = (callbacks: Callbacks) =>
   !callbacksCalled(callbacks)();
 
+// useful debug function
+// eslint-disable-next-line no-unused-vars
+const getCallbackCalls = (callbacks: Callbacks) =>
+  Object.keys(callbacks).reduce((previous: Object, key: string) => ({
+    ...previous,
+    [key]: callbacks[key].mock.calls.length,
+  }), {});
+
 class Child extends Component {
   props: {
     dragHandleProps?: Provided,
@@ -79,11 +87,10 @@ const windowSpacebar = dispatchWindowKeyDownEvent.bind(null, keyCodes.space);
 const windowEscape = dispatchWindowKeyDownEvent.bind(null, keyCodes.escape);
 const windowArrowUp = dispatchWindowKeyDownEvent.bind(null, keyCodes.arrowUp);
 const windowArrowDown = dispatchWindowKeyDownEvent.bind(null, keyCodes.arrowDown);
+const windowArrowLeft = dispatchWindowKeyDownEvent.bind(null, keyCodes.arrowLeft);
+const windowArrowRight = dispatchWindowKeyDownEvent.bind(null, keyCodes.arrowRight);
 const windowTab = dispatchWindowKeyDownEvent.bind(null, keyCodes.tab);
 const windowEnter = dispatchWindowKeyDownEvent.bind(null, keyCodes.enter);
-
-// lame
-const { beforeAll, afterAll } = global;
 
 describe('drag handle', () => {
   let callbacks: Callbacks;
@@ -94,10 +101,12 @@ describe('drag handle', () => {
   });
 
   beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => { });
     callbacks = getStubCallbacks();
     wrapper = mount(
       <DragHandle
         callbacks={callbacks}
+        direction="vertical"
         isDragging={false}
         isEnabled
         canLift
@@ -111,6 +120,7 @@ describe('drag handle', () => {
 
   afterEach(() => {
     wrapper.unmount();
+    console.error.mockRestore();
   });
 
   afterAll(() => {
@@ -855,30 +865,6 @@ describe('drag handle', () => {
     });
 
     describe('progress', () => {
-      it('should move backward when the user presses ArrowUp', () => {
-        pressSpacebar(wrapper);
-        // move backward
-        windowArrowUp();
-        requestAnimationFrame.step();
-
-        expect(callbacksCalled(callbacks)({
-          onKeyLift: 1,
-          onMoveBackward: 1,
-        })).toBe(true);
-      });
-
-      it('should move forward when the user presses ArrowDown', () => {
-        pressSpacebar(wrapper);
-        // move forward
-        windowArrowDown();
-        requestAnimationFrame.step();
-
-        expect(callbacksCalled(callbacks)({
-          onKeyLift: 1,
-          onMoveForward: 1,
-        })).toBe(true);
-      });
-
       it('should prevent tabbing away from the element while dragging', () => {
         pressSpacebar(wrapper);
 
@@ -905,6 +891,177 @@ describe('drag handle', () => {
           onMoveForward: 0,
           onMoveBackward: 0,
         })).toBe(true);
+      });
+
+      it('should be able to lift without a direction provided', () => {
+        const customCallbacks = getStubCallbacks();
+        const customWrapper = mount(
+          <DragHandle
+            callbacks={customCallbacks}
+            isDragging={false}
+            isEnabled
+            canLift
+          >
+            {(dragHandleProps: Provided) => (
+              <Child dragHandleProps={dragHandleProps} />
+            )}
+          </DragHandle>,
+        );
+
+        pressSpacebar(customWrapper);
+
+        expect(callbacksCalled(customCallbacks)({
+          onKeyLift: 1,
+        })).toBe(true);
+      });
+
+      it('should stop dragging if the keyboard is used after a lift and a direction is not provided', () => {
+        const customCallbacks = getStubCallbacks();
+        const customWrapper = mount(
+          <DragHandle
+            callbacks={customCallbacks}
+            isDragging={false}
+            isEnabled
+            canLift
+          >
+            {(dragHandleProps: Provided) => (
+              <Child dragHandleProps={dragHandleProps} />
+            )}
+          </DragHandle>,
+        );
+
+        // lift - all good
+        pressSpacebar(customWrapper);
+
+        // boom.
+        windowArrowDown();
+
+        expect(console.error).toHaveBeenCalled();
+        expect(callbacksCalled(customCallbacks)({
+          onKeyLift: 1,
+          onCancel: 1,
+          onMoveForward: 0,
+        })).toBe(true);
+      });
+
+      describe('dragging in a vertical list', () => {
+        it('should move backward when the user presses ArrowUp', () => {
+          pressSpacebar(wrapper);
+          // move backward
+          windowArrowUp();
+          requestAnimationFrame.step();
+
+          expect(callbacksCalled(callbacks)({
+            onKeyLift: 1,
+            onMoveBackward: 1,
+          })).toBe(true);
+        });
+
+        it('should move forward when the user presses ArrowDown', () => {
+          pressSpacebar(wrapper);
+          // move forward
+          windowArrowDown();
+          requestAnimationFrame.step();
+
+          expect(callbacksCalled(callbacks)({
+            onKeyLift: 1,
+            onMoveForward: 1,
+          })).toBe(true);
+        });
+
+        it('should not move backward when the user presses LeftArrow', () => {
+          pressSpacebar(wrapper);
+          windowArrowLeft();
+          requestAnimationFrame.step();
+
+          expect(callbacksCalled(callbacks)({
+            onKeyLift: 1,
+            onMoveBackward: 0,
+          })).toBe(true);
+        });
+
+        it('should not move forward when the user presses RightArrow', () => {
+          pressSpacebar(wrapper);
+          windowArrowRight();
+          requestAnimationFrame.step();
+
+          expect(callbacksCalled(callbacks)({
+            onKeyLift: 1,
+            onMoveForward: 0,
+          })).toBe(true);
+        });
+      });
+
+      describe('dragging in a horizontal list', () => {
+        let customWrapper: ReactWrapper;
+        let customCallbacks: Callbacks;
+
+        beforeEach(() => {
+          customCallbacks = getStubCallbacks();
+          customWrapper = mount(
+            <DragHandle
+              callbacks={customCallbacks}
+              direction="horizontal"
+              isDragging={false}
+              isEnabled
+              canLift
+            >
+              {(dragHandleProps: Provided) => (
+                <Child dragHandleProps={dragHandleProps} />
+            )}
+            </DragHandle>,
+          );
+        });
+
+        afterEach(() => {
+          customWrapper.unmount();
+        });
+
+        it('should not move backward when the user presses ArrowUp', () => {
+          pressSpacebar(customWrapper);
+          // try move backward
+          windowArrowUp();
+          requestAnimationFrame.step();
+
+          expect(callbacksCalled(customCallbacks)({
+            onKeyLift: 1,
+            onMoveBackward: 0,
+          })).toBe(true);
+        });
+
+        it('should not move forward when the user presses ArrowDown', () => {
+          pressSpacebar(customWrapper);
+          // try move forward
+          windowArrowDown();
+          requestAnimationFrame.step();
+
+          expect(callbacksCalled(customCallbacks)({
+            onKeyLift: 1,
+            onMoveForward: 0,
+          })).toBe(true);
+        });
+
+        it('should move backward when the user presses LeftArrow', () => {
+          pressSpacebar(customWrapper);
+          windowArrowLeft();
+          requestAnimationFrame.step();
+
+          expect(callbacksCalled(customCallbacks)({
+            onKeyLift: 1,
+            onMoveBackward: 1,
+          })).toBe(true);
+        });
+
+        it('should move forward when the user presses RightArrow', () => {
+          pressSpacebar(customWrapper);
+          windowArrowRight();
+          requestAnimationFrame.step();
+
+          expect(callbacksCalled(customCallbacks)({
+            onKeyLift: 1,
+            onMoveForward: 1,
+          })).toBe(true);
+        });
       });
 
       describe('event collapsing', () => {

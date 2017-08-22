@@ -29,9 +29,11 @@ This library is still fairly new and so there is a relatively small feature set.
 
 ### Currently supported feature set
 
-- dragging an item within a single vertical list
+- vertical lists ↕
+- horizontal lists ↔
 - multiple independent lists on the one page
 - mouse 🐭 and **keyboard 🎹** dragging
+- independent nested lists (list can be a child of another list, but you cannot drag items from the parent list into a child list)
 - flexible height items (the draggable items can have different heights)
 - custom drag handle (you can drag a whole item by just a part of it)
 - the vertical list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
@@ -227,8 +229,10 @@ Currently the keyboard handling is hard coded. This might be changed in the futu
 
 - **tab** <kbd>tab ↹</kbd> - standard browser tabbing will navigate through the `Droppable`'s. The library does not do anything fancy with `tab` while users are selecting. Once a drag has started, `tab` is blocked for the duration of the drag.
 - **spacebar** <kbd>space</kbd> - lift a focused `Draggable`. Also, drop a dragging `Draggable` where the drag was started with a `spacebar`.
-- **Up arrow** <kbd>↑</kbd> - move a `Draggable` that is dragging up on a vertical list
-- **Down arrow** <kbd>↓</kbd> - move a `Draggable` that is dragging down on a vertical list
+- **Up arrow** <kbd>↑</kbd> - move a `Draggable` that is dragging backward in a vertical list
+- **Down arrow** <kbd>↓</kbd> - move a `Draggable` that is dragging forward in a vertical list
+- **Left arrow** <kbd>←</kbd> - move a `Draggable` that is dragging backward in a horizontal list
+- **Right arrow** <kbd>→</kbd> - move a `Draggable` that is dragging forward in a horizontal list
 - **Escape** <kbd>esc</kbd> - cancel an existing drag - regardless of whether the user is dragging with the keyboard or mouse.
 
 #### Limitations of keyboard dragging
@@ -278,7 +282,7 @@ In order to use drag and drop, you need to have the part of your `React` tree th
 
 ```js
 type Hooks = {|
-  onDragStart?: (id: DraggableId, location: DraggableLocation) => void,
+  onDragStart?: (initial: DragStart) => void,
   onDragEnd: (result: DropResult) => void,
 |}
 
@@ -322,25 +326,35 @@ These are top level application events that you can use to perform your own stat
 
 This function will get notified when a drag starts. You are provided with the following details:
 
-- `id`: the id of the `Draggable` that is now dragging
-- `location`: the location (`droppableId` and `index`) of where the dragging item has started within a `Droppable`.
+### `initial: DragStart`
+
+- `initial.draggableId`: the id of the `Draggable` that is now dragging
+- `initial.type`: the `type` of the `Draggable` that is now dragging
+- `initial.source`: the location (`droppableId` and `index`) of where the dragging item has started within a `Droppable`.
 
 This function is *optional* and therefore does not need to be provided. It is **highly recommended** that you use this function to block updates to all `Draggable` and `Droppable` components during a drag. (See *Best `hooks` practices*)
 
 **Type information**
 
 ```js
-onDragStart?: (id: DraggableId, location: DraggableLocation) => void
+onDragStart?: (initial: DragStart) => void
 
 // supporting types
-type Id = string;
-type DroppableId: Id;
-type DraggableId: Id;
+type DragStart = {|
+  draggableId: DraggableId,
+  type: TypeId,
+  source: DraggableLocation,
+|}
+
 type DraggableLocation = {|
   droppableId: DroppableId,
   // the position of the draggable within a droppable
   index: number
 |};
+type Id = string;
+type DraggableId = Id;
+type DroppableId = Id;
+type TypeId = Id;
 ```
 
 ### `onDragEnd` (required)
@@ -349,9 +363,10 @@ This function is *extremely* important and has an critical role to play in the a
 
 It is provided with all the information about a drag:
 
-### `result: DragResult`
+### `result: DropResult`
 
-- `result.draggableId`: the id of the `Draggable` was dragging.
+- `result.draggableId`: the id of the `Draggable` that was dragging.
+- `result.type`: the `type` of the `Draggable` that was dragging.
 - `result.source`: the location that the `Draggable` started in.
 - `result.destination`: the location that the `Draggable` finished in. The `destination` will be `null` if the user dropped into no position (such as outside any list) *or* if they dropped the `Draggable` back into the same position that it started in.
 
@@ -372,14 +387,16 @@ onDragEnd: (result: DropResult) => void
 // supporting types
 type DropResult = {|
   draggableId: DraggableId,
+  type: TypeId,
   source: DraggableLocation,
   // may not have any destination (drag to nowhere)
   destination: ?DraggableLocation
 |}
 
 type Id = string;
-type DroppableId: Id;
-type DraggableId: Id;
+type DroppableId = Id;
+type DraggableId = Id;
+type TypeId = Id;
 type DraggableLocation = {|
   droppableId: DroppableId,
   // the position of the droppable within a droppable
@@ -866,9 +883,12 @@ This library supports the standard [Atlassian supported browsers](https://conflu
 
 Currently mobile is not supported. However, there are plans to add touch support in the future
 
-## Community documentation translations
+## Translations
+
 The documentation for this library is also available in other languages:
 - ![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **Korean**: [leehyunggeun/react-beautiful-dnd](https://github.com/LeeHyungGeun/react-beautiful-dnd-kr)
+
+These translations are maintained by the community and are not reviewed or maintained by the maintainers of this library. Please raise issues on the respective translations if you would like to have them updated.
 
 ## Author / maintainer
 

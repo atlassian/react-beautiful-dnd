@@ -328,6 +328,7 @@ export default class Draggable extends Component {
       isDragDisabled,
       dimension,
       children,
+      direction,
     } = this.props;
 
     const speed = this.getSpeed(isDragging, isDropAnimating, canAnimate);
@@ -347,6 +348,7 @@ export default class Draggable extends Component {
           {(movementStyle: MovementStyle) => (
             <DragHandle
               isDragging={isDragging}
+              direction={direction}
               isEnabled={!isDragDisabled}
               canLift={canLift}
               callbacks={this.callbacks}

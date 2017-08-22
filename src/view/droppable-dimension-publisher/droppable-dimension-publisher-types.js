@@ -7,6 +7,7 @@ import type {
   ReactElement,
   HTMLElement,
   Position,
+  Direction,
 } from '../../types';
 
 export type MapProps = {|
@@ -20,6 +21,7 @@ export type DispatchProps = {|
 
 export type OwnProps = {|
   droppableId: DroppableId,
+  direction: Direction,
   type: TypeId,
   targetRef: ?HTMLElement,
   children?: ReactElement,

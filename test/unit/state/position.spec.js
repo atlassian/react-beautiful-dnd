@@ -1,5 +1,5 @@
 // @flow
-import { add, subtract, isEqual, negate } from '../../../src/state/position';
+import { add, subtract, isEqual, negate, patch } from '../../../src/state/position';
 import type { Position } from '../../../src/types';
 
 const point1: Position = {
@@ -47,6 +47,21 @@ describe('position', () => {
     it('should return the inverse of the provided point', () => {
       const expected: Position = { x: -point1.x, y: -point1.y };
       expect(negate(point1)).toEqual(expected);
+    });
+
+    it('should not negate 0 to -0', () => {
+      const original: Position = { x: 0, y: 0 };
+      expect(negate(original)).toEqual(original);
+    });
+  });
+
+  describe('patch', () => {
+    it('should patch position with a y value', () => {
+      expect(patch('x', 5)).toEqual({ x: 5, y: 0 });
+    });
+
+    it('should patch a position with a x value', () => {
+      expect(patch('y', 5)).toEqual({ x: 0, y: 5 });
     });
   });
 });

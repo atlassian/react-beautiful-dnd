@@ -34,7 +34,7 @@ export default class DroppableDimensionPublisher extends Component {
   }
 
   getDimension = (): DroppableDimension => {
-    const { droppableId, targetRef } = this.props;
+    const { droppableId, direction, targetRef } = this.props;
     invariant(targetRef, 'DimensionPublisher cannot calculate a dimension when not attached to the DOM');
 
     const style = window.getComputedStyle(targetRef);
@@ -48,6 +48,7 @@ export default class DroppableDimensionPublisher extends Component {
 
     const dimension: DroppableDimension = getDroppableDimension({
       id: droppableId,
+      direction,
       clientRect: targetRef.getBoundingClientRect(),
       margin,
       windowScroll: getWindowScrollPosition(),

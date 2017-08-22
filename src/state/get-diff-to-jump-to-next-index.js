@@ -1,6 +1,7 @@
 // @flow
 import memoizeOne from 'memoize-one';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
+import { patch } from './position';
 import type {
   DraggableLocation,
   DraggableDimension,
@@ -9,12 +10,13 @@ import type {
   DroppableDimensionMap,
   Position,
   DraggableId,
+  Axis,
 } from '../types';
 
 const getIndex = memoizeOne(
   (draggables: DraggableDimension[],
-    target: DraggableDimension,
-  ): number => draggables.indexOf(target),
+    target: DraggableDimension
+  ): number => draggables.indexOf(target)
 );
 
 type GetDiffArgs = {|
@@ -35,6 +37,7 @@ export default ({
   const droppable: DroppableDimension = droppables[location.droppableId];
   const draggable: DraggableDimension = draggables[draggableId];
   const currentIndex: number = location.index;
+  const axis: Axis = droppable.axis;
 
   const insideDroppable: DraggableDimension[] = getDraggablesInsideDroppable(
     droppable,
@@ -66,14 +69,12 @@ export default ({
     (!isMovingForward && nextIndex >= startIndex);
 
   const amount: number = isMovingTowardStart ?
-    atCurrentIndex.page.withMargin.height :
-    atNextIndex.page.withMargin.height;
+    atCurrentIndex.page.withMargin[axis.size] :
+    atNextIndex.page.withMargin[axis.size];
 
-  const diff: Position = {
-    // not worrying about horizontal for now
-    x: 0,
-    y: isMovingForward ? amount : -amount,
-  };
+  const signed: number = isMovingForward ? amount : -amount;
+
+  const diff: Position = patch(axis.line, signed);
 
   return diff;
 };

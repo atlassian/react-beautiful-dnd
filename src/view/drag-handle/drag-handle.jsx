@@ -248,6 +248,7 @@ export default class DragHandle extends Component {
     if (!this.state.draggingWith) {
       console.error('should not be listening to window mouse up if nothing is dragging');
       this.stopDragging(() => this.props.callbacks.onCancel());
+      return;
     }
 
     // Dragging with either a keyboard or mouse
@@ -255,16 +256,19 @@ export default class DragHandle extends Component {
     // Blocking standard submission action
     if (event.keyCode === keyCodes.enter) {
       event.preventDefault();
+      return;
     }
 
     // Preventing tabbing or submitting
     if (event.keyCode === keyCodes.tab) {
       event.preventDefault();
+      return;
     }
 
     if (event.keyCode === keyCodes.escape) {
       event.preventDefault();
       this.stopDragging(() => this.props.callbacks.onCancel());
+      return;
     }
 
     if (this.state.draggingWith === 'MOUSE') {
@@ -276,19 +280,41 @@ export default class DragHandle extends Component {
     }
 
     // Only keyboard dragging
+    if (!this.props.direction) {
+      console.error('cannot handle keyboard event if direction is not provided');
+      this.stopDragging(() => this.props.callbacks.onCancel());
+      return;
+    }
 
+    // at this point we do not know what the direction is
     if (event.keyCode === keyCodes.space) {
       event.preventDefault();
       this.stopDragging(() => this.props.callbacks.onDrop());
+      return;
     }
 
-    // keyboard dragging only
-    if (event.keyCode === keyCodes.arrowDown) {
+    if (this.props.direction === 'vertical') {
+      if (event.keyCode === keyCodes.arrowDown) {
+        event.preventDefault();
+        this.scheduleMoveForward();
+      }
+
+      if (event.keyCode === keyCodes.arrowUp) {
+        event.preventDefault();
+        this.scheduleMoveBackward();
+      }
+
+      return;
+    }
+
+    // horizontal dragging
+    if (event.keyCode === keyCodes.arrowRight) {
       event.preventDefault();
       this.scheduleMoveForward();
+      return;
     }
 
-    if (event.keyCode === keyCodes.arrowUp) {
+    if (event.keyCode === keyCodes.arrowLeft) {
       event.preventDefault();
       this.scheduleMoveBackward();
     }
@@ -303,6 +329,7 @@ export default class DragHandle extends Component {
       return;
     }
 
+    // At this point we will not have a direction provided
     if (event.keyCode === keyCodes.space) {
       event.preventDefault();
       // stopping the event from bubbling up to the window event handler

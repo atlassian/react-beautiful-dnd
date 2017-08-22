@@ -9,6 +9,7 @@ import type {
   DraggableDimension,
   Position,
   TypeId,
+  Direction,
   ZIndex,
   HTMLElement,
   ReactElement,
@@ -104,6 +105,9 @@ export type DispatchProps = {
 
 export type MapProps = {|
   isDragging: boolean,
+  // only provided when dragging
+  // can be null if not over a droppable
+  direction: ?Direction,
   isDropAnimating: boolean,
   canLift: boolean,
   canAnimate: boolean,

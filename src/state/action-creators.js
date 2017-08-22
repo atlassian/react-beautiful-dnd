@@ -11,7 +11,7 @@ import type {
   Position,
   Dispatch,
   State,
-  DropType,
+  DropTrigger,
   CurrentDrag,
   InitialDrag,
 } from '../types';
@@ -203,7 +203,7 @@ export const clean = (): CleanAction => ({
 export type DropAnimateAction = {
   type: 'DROP_ANIMATE',
   payload: {|
-    type: DropType,
+    trigger: DropTrigger,
     newHomeOffset: Position,
     impact: DragImpact,
     result: DropResult,
@@ -211,21 +211,21 @@ export type DropAnimateAction = {
 }
 
 type AnimateDropArgs = {|
-  type: DropType,
+  trigger: DropTrigger,
   newHomeOffset: Position,
   impact: DragImpact,
   result: DropResult
 |}
 
 const animateDrop = ({
-  type,
+  trigger,
   newHomeOffset,
   impact,
   result,
 }: AnimateDropArgs): DropAnimateAction => ({
   type: 'DROP_ANIMATE',
   payload: {
-    type,
+    trigger,
     newHomeOffset,
     impact,
     result,
@@ -269,15 +269,24 @@ export const drop = () =>
     }
 
     const { impact, initial, current } = state.drag;
-    const droppable: DroppableDimension = state.dimension.droppable[initial.source.droppableId];
+    const sourceDroppable: DroppableDimension =
+      state.dimension.droppable[initial.source.droppableId];
+    const destinationDroppable: ?DroppableDimension = impact.destination ?
+      state.dimension.droppable[impact.destination.droppableId] :
+      null;
 
     const result: DropResult = {
       draggableId: current.id,
+      type: current.type,
       source: initial.source,
       destination: impact.destination,
     };
 
-    const scrollDiff = getScrollDiff(initial, current, droppable);
+    const scrollDiff = getScrollDiff(
+        initial,
+        current,
+        sourceDroppable,
+    );
 
     const newHomeOffset: Position = getNewHomeClientOffset({
       movement: impact.movement,
@@ -286,6 +295,7 @@ export const drop = () =>
       droppableScrollDiff: scrollDiff.droppable,
       windowScrollDiff: scrollDiff.window,
       draggables: state.dimension.draggable,
+      axis: destinationDroppable ? destinationDroppable.axis : null,
     });
 
     // Do not animate if you do not need to.
@@ -302,7 +312,7 @@ export const drop = () =>
     }
 
     dispatch(animateDrop({
-      type: 'DROP',
+      trigger: 'DROP',
       newHomeOffset,
       impact,
       result,
@@ -330,6 +340,7 @@ export const cancel = () =>
 
     const result: DropResult = {
       draggableId: current.id,
+      type: current.type,
       source: initial.source,
       // no destination when cancelling
       destination: null,
@@ -345,7 +356,7 @@ export const cancel = () =>
     const scrollDiff = getScrollDiff(initial, current, droppable);
 
     dispatch(animateDrop({
-      type: 'CANCEL',
+      trigger: 'CANCEL',
       newHomeOffset: add(scrollDiff.droppable, scrollDiff.window),
       impact: noImpact,
       result,
@@ -414,7 +425,7 @@ export const lift = (id: DraggableId,
     dispatch(beginLift());
     dispatch(requestDimensions(type));
 
-    // Dimensions will be requested synronously
+    // Dimensions will be requested synchronously
     // after they are done - lift.
     // Could improve this by explicitly waiting until all dimensions are published.
     // Could also allow a lift to occur before all the dimensions are published

@@ -9,6 +9,7 @@ import {
 } from '../../state/selectors';
 import Draggable from './draggable';
 import { storeKey } from '../context-keys';
+import { negate } from '../../state/position';
 import {
   lift as liftAction,
   move as moveAction,
@@ -26,6 +27,7 @@ import type {
   DragState,
   PendingDrop,
   Phase,
+  TypeId,
   DragMovement,
   DraggableDimension,
 } from '../../types';
@@ -46,11 +48,15 @@ const defaultMapProps: MapProps = {
   // at unexpected points: such as on a DROP_COMPLETE
   canAnimate: false,
   offset: origin,
+
+  // these properties are only populated when the item is dragging
   dimension: null,
+  direction: null,
 };
 
 export const makeSelector = () => {
-  const idSelector = (state: State, ownProps: OwnProps) => ownProps.draggableId;
+  const idSelector = (state: State, ownProps: OwnProps): DraggableId => ownProps.draggableId;
+  const typeSelector = (state: State, ownProps: OwnProps): TypeId => ownProps.type || 'DEFAULT';
 
   const memoizedOffset = memoizeOne(
     (x: number, y: number): Position => ({
@@ -66,6 +72,7 @@ export const makeSelector = () => {
       canLift,
       offset,
       dimension: null,
+      direction: null,
     }),
   );
 
@@ -83,11 +90,11 @@ export const makeSelector = () => {
         );
       }
 
-      const amount = movement.isMovingForward ? -movement.amount : movement.amount;
+      const amount: Position = movement.isMovingForward ? negate(movement.amount) : movement.amount;
 
       return getWithMovement(
         // currently not handling horizontal movement
-        memoizedOffset(0, amount),
+        memoizedOffset(amount.x, amount.y),
         canLift,
       );
     },
@@ -110,12 +117,14 @@ export const makeSelector = () => {
   return createSelector(
     [
       idSelector,
+      typeSelector,
       phaseSelector,
       dragSelector,
       pendingDropSelector,
       draggableSelector,
     ],
     (id: DraggableId,
+      type: TypeId,
       phase: Phase,
       drag: ?DragState,
       pending: ?PendingDrop,
@@ -128,6 +137,10 @@ export const makeSelector = () => {
         }
 
         const { current, impact } = drag;
+
+        if (current.type !== type) {
+          return defaultMapProps;
+        }
 
         if (current.id !== id) {
           return getNotDraggingProps(
@@ -150,12 +163,17 @@ export const makeSelector = () => {
           canAnimate,
           offset,
           dimension,
+          direction: impact.direction,
         };
       }
 
       if (phase === 'DROP_ANIMATING') {
         if (!pending) {
           console.error('cannot animate drop without a pending drop');
+          return defaultMapProps;
+        }
+
+        if (type !== pending.result.type) {
           return defaultMapProps;
         }
 
@@ -170,7 +188,7 @@ export const makeSelector = () => {
 
           // Ideally the drag-handle would be intelligent enough to remove any
           // temporary animating offset from its initial position
-          const canLift = pending.type === 'DROP';
+          const canLift = pending.trigger === 'DROP';
 
           return getNotDraggingProps(
             id,
@@ -188,6 +206,8 @@ export const makeSelector = () => {
           canLift: false,
           // still need to provide the dimension for the placeholder
           dimension,
+          // direction no longer needed as drag handle is unbound
+          direction: null,
         };
       }
 

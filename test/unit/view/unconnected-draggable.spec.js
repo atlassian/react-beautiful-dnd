@@ -103,6 +103,7 @@ const defaultMapProps: MapProps = {
   canAnimate: true,
   offset: origin,
   dimension: null,
+  direction: null,
 };
 
 const somethingElseDraggingMapProps: MapProps = {
@@ -112,6 +113,7 @@ const somethingElseDraggingMapProps: MapProps = {
   canAnimate: true,
   offset: origin,
   dimension: null,
+  direction: null,
 };
 
 const draggingMapProps: MapProps = {
@@ -121,6 +123,8 @@ const draggingMapProps: MapProps = {
   canAnimate: false,
   dimension,
   offset: { x: 75, y: 75 },
+  // this may or may not be set during a drag
+  direction: null,
 };
 
 const dropAnimatingMapProps: MapProps = {
@@ -131,6 +135,7 @@ const dropAnimatingMapProps: MapProps = {
   canLift: false,
   dimension,
   offset: { x: 75, y: 75 },
+  direction: null,
 };
 
 const dropCompleteMapProps: MapProps = {
@@ -140,6 +145,7 @@ const dropCompleteMapProps: MapProps = {
   isDragging: false,
   canAnimate: false,
   dimension: null,
+  direction: null,
 };
 
 type MountConnected = {|

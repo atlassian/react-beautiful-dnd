@@ -13,6 +13,26 @@ export type Position = {|
   y: number,
 |};
 
+export type Direction = 'horizontal' | 'vertical';
+
+export type VerticalAxis = {|
+  direction: 'vertical',
+  line: 'y',
+  start: 'top',
+  end: 'bottom',
+  size: 'height',
+|}
+
+export type HorizontalAxis = {|
+  direction: 'horizontal',
+  line: 'x',
+  start: 'left',
+  end: 'right',
+  size: 'width',
+|}
+
+export type Axis = VerticalAxis | HorizontalAxis
+
 export type DimensionFragment = {|
   top: number,
   left: number,
@@ -38,6 +58,7 @@ export type DraggableDimension = {|
 
 export type DroppableDimension = {|
   id: DroppableId,
+  axis: Axis,
   scroll: {|
     initial: Position,
     current: Position,
@@ -57,12 +78,13 @@ export type DroppableDimensionMap = { [key: DroppableId]: DroppableDimension };
 
 export type DragMovement = {|
   draggables: DraggableId[],
-  amount: number,
+  amount: Position,
   isMovingForward: boolean,
 |}
 
 export type DragImpact = {|
   movement: DragMovement,
+  direction: ?Direction,
   destination: ?DraggableLocation
 |}
 
@@ -113,8 +135,17 @@ export type CurrentDrag = {|
   shouldAnimate: boolean,
 |}
 
+// published when a drag starts
+export type DragStart = {|
+  draggableId: DraggableId,
+  type: TypeId,
+  source: DraggableLocation,
+|}
+
+// published when a drag finishes
 export type DropResult = {|
   draggableId: DraggableId,
+  type: TypeId,
   source: DraggableLocation,
   // may not have any destination (drag to nowhere)
   destination: ?DraggableLocation
@@ -126,16 +157,14 @@ export type DragState = {|
   impact: DragImpact,
 |}
 
-export type DropType = 'DROP' | 'CANCEL';
+export type DropTrigger = 'DROP' | 'CANCEL';
 
 export type PendingDrop = {|
-  type: DropType,
+  trigger: DropTrigger,
   newHomeOffset: Position,
   impact: DragImpact,
   result: DropResult,
 |}
-
-export type Direction = 'vertical'; // | horiztonal - currently not supported
 
 export type Phase = 'IDLE' | 'COLLECTING_DIMENSIONS' | 'DRAGGING' | 'DROP_ANIMATING' | 'DROP_COMPLETE';
 
@@ -165,7 +194,7 @@ export type Store = ReduxStore<State, Action>;
 export type Dispatch = ReduxDispatch<Action>;
 
 export type Hooks = {|
-  onDragStart?: (id: DraggableId, location: DraggableLocation) => void,
+  onDragStart?: (start: DragStart) => void,
   onDragEnd: (result: DropResult) => void,
 |}
 
