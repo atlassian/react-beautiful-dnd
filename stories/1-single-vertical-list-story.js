@@ -25,7 +25,7 @@ const Title = styled.h4`
   margin-bottom: ${grid}px;
 `;
 
-storiesOf('vertical list reordering', module)
+storiesOf('single vertical list', module)
   .add('simple example', () => (
     <QuoteApp initial={quotes} />
   ))

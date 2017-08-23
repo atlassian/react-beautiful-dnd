@@ -12,7 +12,7 @@ const WideWindow = styled.div`
   width: 120vw;
 `;
 
-storiesOf('horizontal list reordering', module)
+storiesOf('single horizontal list', module)
   .add('simple example', () => (
     <AuthorApp initial={authors} />
   ))
