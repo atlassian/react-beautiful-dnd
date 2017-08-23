@@ -1,6 +1,7 @@
 // @flow
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
+import type { Selector } from 'reselect';
 import memoizeOne from 'memoize-one';
 import { storeKey } from '../context-keys';
 import { dragSelector, pendingDropSelector, phaseSelector } from '../../state/selectors';
@@ -18,7 +19,7 @@ import type {
   MapProps,
 } from './droppable-types';
 
-export const makeSelector = () => {
+export const makeSelector = (): Selector<State, OwnProps, MapProps> => {
   const idSelector = (state: State, ownProps: OwnProps) =>
     ownProps.droppableId;
   const isDropDisabledSelector = (state: State, ownProps: OwnProps) =>

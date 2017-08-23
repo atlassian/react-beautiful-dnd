@@ -1,6 +1,7 @@
 // @flow
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
+import type { Selector } from 'reselect';
 import memoizeOne from 'memoize-one';
 import type { State, TypeId } from '../../types';
 import type { DispatchProps, MapProps, OwnProps } from './droppable-dimension-publisher-types';
@@ -16,7 +17,7 @@ const requestDimensionSelector =
 
 const getOwnType = (state: State, props: OwnProps): TypeId => props.type;
 
-export const makeSelector = () => {
+export const makeSelector = (): Selector<State, OwnProps, MapProps> => {
   const getMapProps = memoizeOne(
     (shouldPublish: boolean): MapProps => ({
       shouldPublish,
@@ -27,7 +28,6 @@ export const makeSelector = () => {
     [getOwnType, requestDimensionSelector],
     (ownType: TypeId, requested: ?TypeId): MapProps =>
       getMapProps(ownType === requested)
-
   );
 };
 

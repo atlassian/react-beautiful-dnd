@@ -1,7 +1,8 @@
 // @flow
 import { connect } from 'react-redux';
-import { createSelector } from 'reselect';
 import memoizeOne from 'memoize-one';
+import { createSelector } from 'reselect';
+import type { Selector } from 'reselect';
 import type {
   State,
   TypeId,
@@ -16,7 +17,7 @@ const requestDimensionSelector =
 
 const getOwnType = (state: State, props: OwnProps): TypeId => props.type;
 
-export const makeSelector = () => {
+export const makeSelector = (): Selector<State, OwnProps, MapProps> => {
   const getMapProps = memoizeOne(
     (shouldPublish: boolean): MapProps => ({
       shouldPublish,
