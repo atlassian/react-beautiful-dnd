@@ -38,24 +38,6 @@ This library is still fairly new and so there is a relatively small feature set.
 - custom drag handle (you can drag a whole item by just a part of it)
 - the vertical list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 
-### Short term backlog
-
-- Dragging within a horizontal list
-- Moving items between vertical lists (until this lands conditional dropping will not be available)
-
-### Medium term backlog
-
-- Moving items between horizontal lists
-- Moving a `Draggable` from a vertical list to a horizontal list
-- Dragging multiple items at once
-
-### Long term backlog
-
-- Touch support
-- Automatically disabling animations when the frame rate drops below a threshold.
-- A mechanism to programatically perform dragging without user input
-- And lots more!
-
 ## Basic usage example
 
 This is a simple reorderable list. [You can play with it on webpackbin](https://www.webpackbin.com/bins/-Kr9aE9jnUeWlphY8wsw)
