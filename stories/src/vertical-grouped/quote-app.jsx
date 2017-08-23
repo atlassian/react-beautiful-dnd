@@ -3,36 +3,48 @@ import React, { Component } from 'react';
 import styled, { injectGlobal } from 'styled-components';
 import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src/';
-import QuoteList from './quote-list';
+import QuoteList from '../vertical/quote-list';
 import { colors, grid } from '../constants';
-import reorder from '../reorder';
-import type { Quote } from '../types';
+import { reorderGroup } from '../reorder';
+import type { AuthorWithQuotes } from '../types';
 import type { DropResult, DragStart } from '../../../src/types';
 
 const publishOnDragStart = action('onDragStart');
 const publishOnDragEnd = action('onDragEnd');
 
 const Root = styled.div`
-  background-color: ${colors.blue.deep};
-  box-sizing: border-box;
-  padding: ${grid * 2}px;
-  min-height: 100vh;
+  background: ${colors.blue.deep};
+  display: flex;
+`;
+
+const Column = styled.div`
+  background-color: ${colors.blue.light};
+
+  /* make the column a scroll container */
+  height: 100vh;
+  overflow: auto;
 
   /* flexbox */
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+`;
+
+const Group = styled.div`
+  margin-top: ${grid * 2}px;
+`;
+
+const Title = styled.h4`
+  margin: ${grid}px;
 `;
 
 const isDraggingClassName = 'is-dragging';
 
 type Props = {|
-  initial: Quote[],
-  listStyle?: Object,
+  initial: AuthorWithQuotes[],
 |}
 
 type State = {|
-  quotes: Quote[],
+  groups: AuthorWithQuotes[],
 |}
 
 export default class QuoteApp extends Component {
@@ -41,7 +53,7 @@ export default class QuoteApp extends Component {
   state: State
 
   state: State = {
-    quotes: this.props.initial,
+    groups: this.props.initial,
   };
   /* eslint-enable react/sort-comp */
 
@@ -56,19 +68,16 @@ export default class QuoteApp extends Component {
     // $ExpectError - body could be null?
     document.body.classList.remove(isDraggingClassName);
 
-    // dropped outside the list
-    if (!result.destination) {
+    const groups: ?AuthorWithQuotes[] = reorderGroup(
+      this.state.groups, result
+    );
+
+    if (!groups) {
       return;
     }
 
-    const quotes = reorder(
-      this.state.quotes,
-      result.source.index,
-      result.destination.index
-    );
-
     this.setState({
-      quotes,
+      groups,
     });
   }
 
@@ -83,7 +92,7 @@ export default class QuoteApp extends Component {
   }
 
   render() {
-    const { quotes } = this.state;
+    const { groups } = this.state;
 
     return (
       <DragDropContext
@@ -91,11 +100,18 @@ export default class QuoteApp extends Component {
         onDragEnd={this.onDragEnd}
       >
         <Root>
-          <QuoteList
-            listId="list"
-            style={this.props.listStyle}
-            quotes={quotes}
-          />
+          <Column>
+            {groups.map((group: AuthorWithQuotes) => (
+              <Group>
+                <Title>{group.author.name}</Title>
+                <QuoteList
+                  quotes={group.quotes}
+                  listId={group.author.id}
+                  listType={group.author.id}
+                />
+              </Group>
+            ))}
+          </Column>
         </Root>
       </DragDropContext>
     );

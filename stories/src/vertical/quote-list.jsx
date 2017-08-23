@@ -16,7 +16,6 @@ import type {
 
 const Container = styled.div`
   background-color: ${({ isDraggingOver }) => (isDraggingOver ? colors.blue.lighter : colors.blue.light)};
-  /*border-radius: ${borderRadius}px;*/
   display: flex;
   flex-direction: column;
   padding: ${grid}px;

@@ -5,7 +5,7 @@ import { action } from '@storybook/addon-actions';
 import Column from './column';
 import { DragDropContext, Droppable } from '../../../src/';
 import { colors } from '../constants';
-import reorder from '../reorder';
+import reorder, { reorderGroup } from '../reorder';
 import type { AuthorWithQuotes } from '../types';
 import type { Provided } from '../../../src/view/droppable/droppable-types';
 import type { DropResult, DragStart, DraggableLocation } from '../../../src/types';
@@ -86,29 +86,13 @@ export default class Board extends Component {
       return;
     }
 
-    // reordering a quote
-    const column: ?AuthorWithQuotes = this.state.columns.filter(
-      (item: AuthorWithQuotes) => item.author.id === result.type
-    )[0];
-
-    if (!column) {
-      console.error('could not find column', result.type, this.state.columns);
-      return;
-    }
-
-    const quotes = reorder(
-      column.quotes,
-      source.index,
-      destination.index
+    const columns: ?AuthorWithQuotes[] = reorderGroup(
+      this.state.columns, result
     );
 
-    const updated: AuthorWithQuotes = {
-      author: column.author,
-      quotes,
-    };
-
-    const columns = Array.from(this.state.columns);
-    columns[this.state.columns.indexOf(column)] = updated;
+    if (!columns) {
+      return;
+    }
 
     this.setState({
       columns,
