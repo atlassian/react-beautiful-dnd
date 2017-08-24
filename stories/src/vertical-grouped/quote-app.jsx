@@ -102,7 +102,7 @@ export default class QuoteApp extends Component {
         <Root>
           <Column>
             {groups.map((group: AuthorWithQuotes) => (
-              <Group>
+              <Group key={group.author.id}>
                 <Title>{group.author.name}</Title>
                 <QuoteList
                   quotes={group.quotes}
