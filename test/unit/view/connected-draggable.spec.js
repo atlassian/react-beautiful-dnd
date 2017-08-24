@@ -281,7 +281,7 @@ describe('Draggable - connected', () => {
                 y: dragging.dimension.page.withMargin.height,
                 x: 0,
               },
-              isMovingForward: true,
+              isBeyondStartPosition: true,
             },
             direction: 'vertical',
             destination: {
@@ -323,7 +323,7 @@ describe('Draggable - connected', () => {
                 y: 0,
                 x: dragging.dimension.page.withMargin.width,
               },
-              isMovingForward: true,
+              isBeyondStartPosition: true,
             },
             direction: 'horizontal',
             destination: {
@@ -393,7 +393,7 @@ describe('Draggable - connected', () => {
                   x: 0,
                   y: dragging.dimension.page.withMargin.height,
                 },
-                isMovingForward: true,
+                isBeyondStartPosition: true,
               },
               direction: 'vertical',
               destination: {
@@ -476,7 +476,7 @@ describe('Draggable - connected', () => {
                 x: 0,
                 y: dragging.dimension.page.withMargin.height,
               },
-              isMovingForward: true,
+              isBeyondStartPosition: true,
             },
             direction: 'vertical',
             destination: {
@@ -512,7 +512,7 @@ describe('Draggable - connected', () => {
                 x: 0,
                 y: dragging.dimension.page.withMargin.height,
               },
-              isMovingForward: true,
+              isBeyondStartPosition: true,
             },
             direction: 'vertical',
             destination: {
@@ -691,7 +691,7 @@ describe('Draggable - connected', () => {
                   x: 0,
                   y: dragging.dimension.page.withMargin.height,
                 },
-                isMovingForward: true,
+                isBeyondStartPosition: true,
               },
               direction: 'vertical',
               destination: {
@@ -742,7 +742,7 @@ describe('Draggable - connected', () => {
                 x: 0,
                 y: dragging.dimension.page.withMargin.height,
               },
-              isMovingForward: true,
+              isBeyondStartPosition: true,
             },
             direction: 'vertical',
             destination: {
@@ -778,7 +778,7 @@ describe('Draggable - connected', () => {
                 x: 0,
                 y: dragging.dimension.page.withMargin.height,
               },
-              isMovingForward: true,
+              isBeyondStartPosition: true,
             },
             direction: 'vertical',
             destination: {
@@ -988,7 +988,7 @@ describe('Draggable - connected', () => {
                 x: 0,
                 y: dragging.dimension.page.withMargin.height,
               },
-              isMovingForward: true,
+              isBeyondStartPosition: true,
             },
             direction: 'vertical',
             destination: {
@@ -1168,7 +1168,7 @@ describe('Draggable - connected', () => {
             x: 0,
             y: a.dimension.page.withMargin.height,
           },
-          isMovingForward: true,
+          isBeyondStartPosition: true,
         },
         direction: 'vertical',
         destination: {

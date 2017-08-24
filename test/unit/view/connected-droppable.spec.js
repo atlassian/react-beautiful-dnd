@@ -122,7 +122,7 @@ const perform = (() => {
         y: dimension.page.withMargin.height,
         x: 0,
       },
-      isMovingForward: true,
+      isBeyondStartPosition: true,
     },
     direction: 'vertical',
     destination: {

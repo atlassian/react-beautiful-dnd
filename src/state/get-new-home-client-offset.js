@@ -51,7 +51,7 @@ export default ({
       return previous + dimension.page.withMargin[axis.size];
     }, 0);
 
-  const signed: number = movement.isMovingForward ? distance : -distance;
+  const signed: number = movement.isBeyondStartPosition ? distance : -distance;
 
   // How much distance the item needs to travel to be in its new home
   // from where it started

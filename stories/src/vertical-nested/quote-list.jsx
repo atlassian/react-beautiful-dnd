@@ -37,6 +37,10 @@ const NestedContainer = Container.extend`
   }
 `;
 
+const Title = styled.h4`
+  margin-bottom: ${grid}px;
+`;
+
 export default class QuoteList extends Component {
   props: {|
     list: NestedQuoteList
@@ -72,7 +76,7 @@ export default class QuoteList extends Component {
           innerRef={dropProvided.innerRef}
           isDraggingOver={dropSnapshot.isDraggingOver}
         >
-          <h4>{list.title}</h4>
+          <Title>{list.title}</Title>
           {list.children.map((item: Quote | NestedQuoteList) => (
             !item.children ?
               this.renderQuote((item: any), list.id) :

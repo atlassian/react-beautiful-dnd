@@ -115,7 +115,7 @@ describe('get new home client offset', () => {
           x: 0,
           y: draggable1.page.withMargin.height,
         },
-        isMovingForward: true,
+        isBeyondStartPosition: true,
       };
 
       const result: Position = getNewHomeClientOffset({
@@ -156,7 +156,7 @@ describe('get new home client offset', () => {
             x: 0,
             y: draggable1.page.withMargin.height,
           },
-          isMovingForward: true,
+          isBeyondStartPosition: true,
         };
 
         // How much distance the item needs to travel to be in its new home
@@ -197,7 +197,7 @@ describe('get new home client offset', () => {
             x: 0,
             y: draggable1.page.withMargin.height,
           },
-          isMovingForward: true,
+          isBeyondStartPosition: true,
         };
         // this is where it needs to end up
         const verticalChange = {
@@ -237,7 +237,7 @@ describe('get new home client offset', () => {
             x: 0,
             y: draggable1.page.withMargin.height,
           },
-          isMovingForward: true,
+          isBeyondStartPosition: true,
         };
         // this is where it needs to end up
         const verticalChange = {
@@ -286,7 +286,7 @@ describe('get new home client offset', () => {
             x: 0,
             y: draggable3.page.withMargin.height,
           },
-          isMovingForward: false,
+          isBeyondStartPosition: false,
         };
 
         // How much distance the item needs to travel to be in its new home
@@ -325,7 +325,7 @@ describe('get new home client offset', () => {
             x: 0,
             y: draggable3.page.withMargin.height,
           },
-          isMovingForward: false,
+          isBeyondStartPosition: false,
         };
         // How much distance the item needs to travel to be in its new home
         // from where it started
@@ -365,7 +365,7 @@ describe('get new home client offset', () => {
             x: 0,
             y: draggable3.page.withMargin.height,
           },
-          isMovingForward: false,
+          isBeyondStartPosition: false,
         };
         // this is where it needs to end up
         const verticalChange = {
@@ -482,7 +482,7 @@ describe('get new home client offset', () => {
           x: draggable1.page.withMargin.width,
           y: 0,
         },
-        isMovingForward: true,
+        isBeyondStartPosition: true,
       };
 
       const result: Position = getNewHomeClientOffset({
@@ -523,7 +523,7 @@ describe('get new home client offset', () => {
             x: draggable1.page.withMargin.width,
             y: 0,
           },
-          isMovingForward: true,
+          isBeyondStartPosition: true,
         };
 
         // How much distance the item needs to travel to be in its new home
@@ -564,7 +564,7 @@ describe('get new home client offset', () => {
             x: draggable1.page.withMargin.width,
             y: 0,
           },
-          isMovingForward: true,
+          isBeyondStartPosition: true,
         };
         // this is where it needs to end up
         const horizontalChange = {
@@ -604,7 +604,7 @@ describe('get new home client offset', () => {
             x: draggable1.page.withMargin.width,
             y: 0,
           },
-          isMovingForward: true,
+          isBeyondStartPosition: true,
         };
         // this is where it needs to end up
         const horizontalChange = {
@@ -653,7 +653,7 @@ describe('get new home client offset', () => {
             x: draggable3.page.withMargin.width,
             y: 0,
           },
-          isMovingForward: false,
+          isBeyondStartPosition: false,
         };
 
         // How much distance the item needs to travel to be in its new home
@@ -692,7 +692,7 @@ describe('get new home client offset', () => {
             x: draggable3.page.withMargin.width,
             y: 0,
           },
-          isMovingForward: false,
+          isBeyondStartPosition: false,
         };
         // How much distance the item needs to travel to be in its new home
         // from where it started
@@ -732,7 +732,7 @@ describe('get new home client offset', () => {
             x: draggable3.page.withMargin.width,
             y: 0,
           },
-          isMovingForward: false,
+          isBeyondStartPosition: false,
         };
         // this is where it needs to end up
         const horizontalChange = {

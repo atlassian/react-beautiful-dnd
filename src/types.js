@@ -79,11 +79,13 @@ export type DroppableDimensionMap = { [key: DroppableId]: DroppableDimension };
 export type DragMovement = {|
   draggables: DraggableId[],
   amount: Position,
-  isMovingForward: boolean,
+  // is moving forward relative to the starting position
+  isBeyondStartPosition: boolean,
 |}
 
 export type DragImpact = {|
   movement: DragMovement,
+  // the direction of the Droppable you are over
   direction: ?Direction,
   destination: ?DraggableLocation
 |}
