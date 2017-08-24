@@ -22,6 +22,7 @@ import type { TypeId,
 import { add, subtract, negate } from './position';
 import getDragImpact from './get-drag-impact';
 import getDiffToJumpToNextIndex from './get-diff-to-jump-to-next-index';
+import type { GetDiffResult } from './get-diff-to-jump-to-next-index';
 import getDroppableOver from './get-droppable-over';
 
 const noDimensions: DimensionState = {
@@ -49,7 +50,9 @@ type MoveArgs = {|
   clientSelection: Position,
   pageSelection: Position,
   shouldAnimate?: boolean,
-  windowScroll?: Position
+  windowScroll ?: Position,
+  // force a custom drag impact
+  impact?: DragImpact,
 |}
 
 const move = ({
@@ -58,6 +61,7 @@ const move = ({
   pageSelection,
   shouldAnimate = false,
   windowScroll,
+  impact,
 }: MoveArgs): State => {
   if (state.phase !== 'DRAGGING') {
     console.error('cannot move while not dragging');
@@ -115,17 +119,17 @@ const move = ({
     windowScroll: currentWindowScroll,
   };
 
-  const impact: DragImpact = getDragImpact({
+  const newImpact: DragImpact = (impact || getDragImpact({
     page: page.selection,
     withinDroppable,
     draggableId: current.id,
     draggables: state.dimension.draggable,
     droppables: state.dimension.droppable,
-  });
+  }));
 
   const drag: DragState = {
     initial,
-    impact,
+    impact: newImpact,
     current,
   };
 
@@ -390,26 +394,23 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     }
 
     const existing: DragState = state.drag;
-
-    if (!existing.impact.destination) {
-      console.warn('cannot move forward when there is not previous location');
-      return state;
-    }
-
     const isMovingForward: boolean = action.type === 'MOVE_FORWARD';
 
-    const diff: ?Position = getDiffToJumpToNextIndex({
+    const result: ?GetDiffResult = getDiffToJumpToNextIndex({
       isMovingForward,
       draggableId: existing.current.id,
-      location: existing.impact.destination,
+      impact: existing.impact,
       draggables: state.dimension.draggable,
       droppables: state.dimension.droppable,
     });
 
     // cannot move anyway (at the beginning or end of a list)
-    if (!diff) {
+    if (!result) {
       return state;
     }
+
+    const diff: Position = result.diff;
+    const impact: DragImpact = result.impact;
 
     const page: Position = add(existing.current.page.selection, diff);
     const client: Position = add(existing.current.client.selection, diff);
@@ -427,6 +428,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
     return move({
       state,
+      impact,
       clientSelection: client,
       pageSelection: page,
       shouldAnimate: true,

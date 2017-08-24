@@ -90,7 +90,9 @@ export const makeSelector = () => {
         );
       }
 
-      const amount: Position = movement.isMovingForward ? negate(movement.amount) : movement.amount;
+      const amount: Position = movement.isBeyondStartPosition ?
+        negate(movement.amount) :
+        movement.amount;
 
       return getWithMovement(
         // currently not handling horizontal movement

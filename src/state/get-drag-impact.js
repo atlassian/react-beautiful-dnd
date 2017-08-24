@@ -59,7 +59,7 @@ export default ({
 
   // not considering margin so that items move based on visible edges
   const draggableCenter: Position = draggingDimension.page.withoutMargin.center;
-  const isMovingForward: boolean = newCenter[axis.line] - draggableCenter[axis.line] > 0;
+  const isBeyondStartPosition: boolean = newCenter[axis.line] - draggableCenter[axis.line] > 0;
 
   const moved: DraggableId[] = insideDroppable
     .filter((dimension: DraggableDimension): boolean => {
@@ -70,7 +70,7 @@ export default ({
 
       const fragment: DimensionFragment = dimension.page.withoutMargin;
 
-      if (isMovingForward) {
+      if (isBeyondStartPosition) {
         // 1. item needs to start ahead of the moving item
         // 2. the dragging item has moved over it
         if (fragment.center[axis.line] < draggableCenter[axis.line]) {
@@ -96,7 +96,7 @@ export default ({
       return startIndex;
     }
 
-    if (isMovingForward) {
+    if (isBeyondStartPosition) {
       return startIndex + moved.length;
     }
     // is moving backwards
@@ -113,7 +113,7 @@ export default ({
   const movement: DragMovement = {
     amount,
     draggables: moved,
-    isMovingForward,
+    isBeyondStartPosition,
   };
 
   const impact: DragImpact = {

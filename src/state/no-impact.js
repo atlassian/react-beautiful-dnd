@@ -6,7 +6,7 @@ const origin: Position = { x: 0, y: 0 };
 const noMovement: DragMovement = {
   draggables: [],
   amount: origin,
-  isMovingForward: false,
+  isBeyondStartPosition: false,
 };
 
 const noImpact: DragImpact = {

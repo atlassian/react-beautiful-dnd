@@ -11,6 +11,8 @@ import type {
   Position,
   DraggableId,
   Axis,
+  DragImpact,
+  DragMovement,
 } from '../types';
 
 const getIndex = memoizeOne(
@@ -22,18 +24,29 @@ const getIndex = memoizeOne(
 type GetDiffArgs = {|
   isMovingForward: boolean,
   draggableId: DraggableId,
-  location: DraggableLocation,
+  impact: DragImpact,
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
+|}
+
+export type GetDiffResult = {|
+  diff: Position,
+  impact: DragImpact,
 |}
 
 export default ({
   isMovingForward,
   draggableId,
-  location,
+  impact,
   draggables,
   droppables,
-}: GetDiffArgs): ?Position => {
+}: GetDiffArgs): ?GetDiffResult => {
+  if (!impact.destination) {
+    console.error('cannot move forward when there is not previous destination');
+    return null;
+  }
+
+  const location: DraggableLocation = impact.destination;
   const droppable: DroppableDimension = droppables[location.droppableId];
   const draggable: DraggableDimension = draggables[draggableId];
   const currentIndex: number = location.index;
@@ -68,14 +81,44 @@ export default ({
   const isMovingTowardStart = (isMovingForward && nextIndex <= startIndex) ||
     (!isMovingForward && nextIndex >= startIndex);
 
-  const amount: number = isMovingTowardStart ?
+  const distance: number = isMovingTowardStart ?
     atCurrentIndex.page.withMargin[axis.size] :
     atNextIndex.page.withMargin[axis.size];
 
-  const signed: number = isMovingForward ? amount : -amount;
+  const signed: number = isMovingForward ? distance : -distance;
 
   const diff: Position = patch(axis.line, signed);
 
-  return diff;
+  // Calculate DragImpact
+
+  // 1. If moving back towards where we started
+  // we need to remove the latest addition
+  // 2. If we are moving away from where we started,
+  // we need to add the next draggable to the impact
+  const moved: DraggableId[] = isMovingTowardStart ?
+    impact.movement.draggables.slice(0, impact.movement.draggables.length - 1) :
+    [...impact.movement.draggables, atNextIndex.id];
+
+  const movement: DragMovement = {
+    draggables: moved,
+    // The amount of movement will always be the size of the dragging item
+    amount: patch(axis.line, draggable.page.withMargin[axis.size]),
+    isBeyondStartPosition: nextIndex > startIndex,
+  };
+
+  const newImpact: DragImpact = {
+    movement,
+    destination: {
+      droppableId: droppable.id,
+      index: nextIndex,
+    },
+    direction: droppable.axis.direction,
+  };
+
+  const result: GetDiffResult = {
+    diff, impact: newImpact,
+  };
+
+  return result;
 };
 
