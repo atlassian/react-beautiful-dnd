@@ -21,7 +21,7 @@ const getIndex = memoizeOne(
   ): number => draggables.indexOf(target)
 );
 
-type GetDiffArgs = {|
+type JumpToNextArgs = {|
   isMovingForward: boolean,
   draggableId: DraggableId,
   impact: DragImpact,
@@ -29,7 +29,7 @@ type GetDiffArgs = {|
   droppables: DroppableDimensionMap,
 |}
 
-export type GetDiffResult = {|
+export type JumpToNextResult = {|
   diff: Position,
   impact: DragImpact,
 |}
@@ -40,7 +40,7 @@ export default ({
   impact,
   draggables,
   droppables,
-}: GetDiffArgs): ?GetDiffResult => {
+}: JumpToNextArgs): ?JumpToNextResult => {
   if (!impact.destination) {
     console.error('cannot move forward when there is not previous destination');
     return null;
@@ -99,15 +99,13 @@ export default ({
     impact.movement.draggables.slice(0, impact.movement.draggables.length - 1) :
     [...impact.movement.draggables, atNextIndex.id];
 
-  const movement: DragMovement = {
-    draggables: moved,
-    // The amount of movement will always be the size of the dragging item
-    amount: patch(axis.line, draggable.page.withMargin[axis.size]),
-    isBeyondStartPosition: nextIndex > startIndex,
-  };
-
   const newImpact: DragImpact = {
-    movement,
+    movement: {
+      draggables: moved,
+      // The amount of movement will always be the size of the dragging item
+      amount: patch(axis.line, draggable.page.withMargin[axis.size]),
+      isBeyondStartPosition: nextIndex > startIndex,
+    },
     destination: {
       droppableId: droppable.id,
       index: nextIndex,
@@ -115,7 +113,7 @@ export default ({
     direction: droppable.axis.direction,
   };
 
-  const result: GetDiffResult = {
+  const result: JumpToNextResult = {
     diff, impact: newImpact,
   };
 

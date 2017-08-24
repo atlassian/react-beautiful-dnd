@@ -21,8 +21,8 @@ import type { TypeId,
 } from '../types';
 import { add, subtract, negate } from './position';
 import getDragImpact from './get-drag-impact';
-import getDiffToJumpToNextIndex from './get-diff-to-jump-to-next-index';
-import type { GetDiffResult } from './get-diff-to-jump-to-next-index';
+import jumpToNextIndex from './jump-to-next-index';
+import type { JumpToNextResult } from './jump-to-next-index';
 import getDroppableOver from './get-droppable-over';
 
 const noDimensions: DimensionState = {
@@ -396,7 +396,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const existing: DragState = state.drag;
     const isMovingForward: boolean = action.type === 'MOVE_FORWARD';
 
-    const result: ?GetDiffResult = getDiffToJumpToNextIndex({
+    const result: ?JumpToNextResult = jumpToNextIndex({
       isMovingForward,
       draggableId: existing.current.id,
       impact: existing.impact,
