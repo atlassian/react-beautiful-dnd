@@ -12,7 +12,6 @@ import type {
   DraggableId,
   Axis,
   DragImpact,
-  DragMovement,
 } from '../types';
 
 const getIndex = memoizeOne(

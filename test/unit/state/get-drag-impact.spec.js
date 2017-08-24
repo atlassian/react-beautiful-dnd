@@ -119,7 +119,7 @@ describe('get drag impact', () => {
             movement: {
               amount: origin,
               draggables: [],
-              isMovingForward: true,
+              isBeyondStartPosition: true,
             },
             direction: 'vertical',
             destination: {
@@ -173,7 +173,7 @@ describe('get drag impact', () => {
         });
 
         it('should indicate that the item being move forward', () => {
-          expect(impact.movement.isMovingForward).toBe(true);
+          expect(impact.movement.isBeyondStartPosition).toBe(true);
         });
 
         it('should indicate that the item being moved should move the height of the item being dragged', () => {
@@ -222,7 +222,7 @@ describe('get drag impact', () => {
         });
 
         it('should indicate that the item being move forward', () => {
-          expect(impact.movement.isMovingForward).toBe(true);
+          expect(impact.movement.isBeyondStartPosition).toBe(true);
         });
 
         it('should indicate that the item being moved should move the height of the item being dragged', () => {
@@ -271,7 +271,7 @@ describe('get drag impact', () => {
         });
 
         it('should indicate that the item being move forward', () => {
-          expect(impact.movement.isMovingForward).toBe(true);
+          expect(impact.movement.isBeyondStartPosition).toBe(true);
         });
 
         it('should indicate that the item being moved should move the height of the item being dragged', () => {
@@ -321,7 +321,7 @@ describe('get drag impact', () => {
         });
 
         it('should indicate that the item being move forward', () => {
-          expect(impact.movement.isMovingForward).toBe(true);
+          expect(impact.movement.isBeyondStartPosition).toBe(true);
         });
 
         it('should indicate that the item being moved should move the height of the item being dragged', () => {
@@ -354,7 +354,7 @@ describe('get drag impact', () => {
             movement: {
               amount: origin,
               draggables: [],
-              isMovingForward: false,
+              isBeyondStartPosition: false,
             },
             direction: 'vertical',
             destination: {
@@ -408,7 +408,7 @@ describe('get drag impact', () => {
         });
 
         it('should indicate that the item being moved backward', () => {
-          expect(impact.movement.isMovingForward).toBe(false);
+          expect(impact.movement.isBeyondStartPosition).toBe(false);
         });
 
         it('should indicate that the item being moved should move the height of the item being dragged', () => {
@@ -457,7 +457,7 @@ describe('get drag impact', () => {
         });
 
         it('should indicate that the item being moved backward', () => {
-          expect(impact.movement.isMovingForward).toBe(false);
+          expect(impact.movement.isBeyondStartPosition).toBe(false);
         });
 
         it('should indicate that the items being moved should move the height of the item being dragged', () => {
@@ -507,7 +507,7 @@ describe('get drag impact', () => {
         });
 
         it('should indicate that the item being moved backward', () => {
-          expect(impact.movement.isMovingForward).toBe(false);
+          expect(impact.movement.isBeyondStartPosition).toBe(false);
         });
 
         it('should indicate that the items being moved should move the height of the item being dragged', () => {
@@ -558,7 +558,7 @@ describe('get drag impact', () => {
         });
 
         it('should indicate that the item being moved backward', () => {
-          expect(impact.movement.isMovingForward).toBe(false);
+          expect(impact.movement.isBeyondStartPosition).toBe(false);
         });
 
         it('should indicate that the item being moved should move the height of the item being dragged', () => {
@@ -675,7 +675,7 @@ describe('get drag impact', () => {
             movement: {
               amount: origin,
               draggables: [],
-              isMovingForward: true,
+              isBeyondStartPosition: true,
             },
             direction: 'horizontal',
             destination: {
@@ -729,7 +729,7 @@ describe('get drag impact', () => {
         });
 
         it('should indicate that the item being move forward', () => {
-          expect(impact.movement.isMovingForward).toBe(true);
+          expect(impact.movement.isBeyondStartPosition).toBe(true);
         });
 
         it('should indicate that the item being moved should move the width of the item being dragged', () => {
@@ -778,7 +778,7 @@ describe('get drag impact', () => {
         });
 
         it('should indicate that the item being move forward', () => {
-          expect(impact.movement.isMovingForward).toBe(true);
+          expect(impact.movement.isBeyondStartPosition).toBe(true);
         });
 
         it('should indicate that the item being moved should move the width of the item being dragged', () => {
@@ -827,7 +827,7 @@ describe('get drag impact', () => {
         });
 
         it('should indicate that the item being move forward', () => {
-          expect(impact.movement.isMovingForward).toBe(true);
+          expect(impact.movement.isBeyondStartPosition).toBe(true);
         });
 
         it('should indicate that the item being moved should move the width of the item being dragged', () => {
@@ -877,7 +877,7 @@ describe('get drag impact', () => {
         });
 
         it('should indicate that the item being move forward', () => {
-          expect(impact.movement.isMovingForward).toBe(true);
+          expect(impact.movement.isBeyondStartPosition).toBe(true);
         });
 
         it('should indicate that the item being moved should move the width of the item being dragged', () => {
@@ -910,7 +910,7 @@ describe('get drag impact', () => {
             movement: {
               amount: origin,
               draggables: [],
-              isMovingForward: false,
+              isBeyondStartPosition: false,
             },
             direction: 'horizontal',
             destination: {
@@ -964,7 +964,7 @@ describe('get drag impact', () => {
         });
 
         it('should indicate that the item being moved backward', () => {
-          expect(impact.movement.isMovingForward).toBe(false);
+          expect(impact.movement.isBeyondStartPosition).toBe(false);
         });
 
         it('should indicate that the item being moved should move the width of the item being dragged', () => {
@@ -1013,7 +1013,7 @@ describe('get drag impact', () => {
         });
 
         it('should indicate that the item being moved backward', () => {
-          expect(impact.movement.isMovingForward).toBe(false);
+          expect(impact.movement.isBeyondStartPosition).toBe(false);
         });
 
         it('should indicate that the items being moved should move the width of the item being dragged', () => {
@@ -1063,7 +1063,7 @@ describe('get drag impact', () => {
         });
 
         it('should indicate that the item being moved backward', () => {
-          expect(impact.movement.isMovingForward).toBe(false);
+          expect(impact.movement.isBeyondStartPosition).toBe(false);
         });
 
         it('should indicate that the items being moved should move the width of the item being dragged', () => {
@@ -1114,7 +1114,7 @@ describe('get drag impact', () => {
         });
 
         it('should indicate that the item being moved backward', () => {
-          expect(impact.movement.isMovingForward).toBe(false);
+          expect(impact.movement.isBeyondStartPosition).toBe(false);
         });
 
         it('should indicate that the item being moved should move the width of the item being dragged', () => {

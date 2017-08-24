@@ -19,7 +19,6 @@ import type {
 } from '../../../src/types';
 
 const droppableId: DroppableId = 'drop-1';
-const origin: Position = { x: 0, y: 0 };
 
 describe('jump to next index', () => {
   [vertical, horizontal].forEach((axis: Axis) => {
@@ -248,7 +247,7 @@ describe('jump to next index', () => {
               throw new Error('invalid result');
             }
 
-            it('should return the height of the second dimension as the diff', () => {
+            it('should return the size of the second dimension as the diff', () => {
               const expected: Position = patch(axis.line, draggable2.page.withMargin[axis.size]);
 
               expect(result.diff).toEqual(expected);
