@@ -32,3 +32,7 @@ export const distance = (point1: Position, point2: Position): number =>
     Math.pow((point2.x - point1.x), 2) +
     Math.pow((point2.y - point1.y), 2)
   );
+
+// When given a list of points, it finds the smallest distance to any point
+export const closest = (target: Position, points: Position[]): number =>
+  Math.min(...points.map((point: Position) => distance(target, point)));

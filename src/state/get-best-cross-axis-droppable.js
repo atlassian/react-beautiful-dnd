@@ -1,31 +1,18 @@
 // @flow
 import memoizeOne from 'memoize-one';
-import { distance } from './position';
+import { closest } from './position';
 import type {
   Axis,
   Position,
   DimensionFragment,
-  DraggableId,
   DroppableId,
-  DraggableDimension,
   DroppableDimension,
-  DraggableDimensionMap,
   DroppableDimensionMap,
 } from '../types';
 
-type DroppableCornerMap = {|
-  [id: DroppableId]: Position[],
-|}
-
-type GetBestDroppableArgs = {|
-  draggableId: DraggableId,
-  center: Position,
-  isMovingForward: boolean,
-  plane: 'main-axis' | 'cross-axis',
-  // the droppable the draggable is currently in
-  droppableId: DroppableId,
-  droppables: DroppableDimensionMap,
-  draggables: DraggableDimensionMap,
+type DistanceToDroppable = {|
+  id: DroppableId,
+  distance: number,
 |}
 
 const sortOnCrossAxis = memoizeOne(
@@ -38,23 +25,35 @@ const sortOnCrossAxis = memoizeOne(
   )
 );
 
-type IsWithResultFn = (number) => boolean;
-
-const isWithin = (lowerBound: number, upperBound: number): IsWithResultFn =>
+const isWithin = (lowerBound: number, upperBound: number): ((number) => boolean) =>
   (value: number): boolean => value <= upperBound && value >= lowerBound;
+
+const getCorners = (droppable: DroppableDimension): Position[] => {
+  const fragment: DimensionFragment = droppable.page.withMargin;
+
+  return [
+    { x: fragment.left, y: fragment.top },
+    { x: fragment.right, y: fragment.top },
+    { x: fragment.left, y: fragment.bottom },
+    { x: fragment.right, y: fragment.bottom },
+  ];
+};
+
+type GetBestDroppableArgs = {|
+  isMovingForward: boolean,
+  center: Position,
+  droppableId: DroppableId,
+  droppables: DroppableDimensionMap,
+|}
 
 export default ({
   isMovingForward,
-  draggableId,
   center,
   droppableId,
   droppables,
-  draggables,
 }: GetBestDroppableArgs): ?DroppableId => {
-  const draggable: DraggableDimension = draggables[draggableId];
   const source: DroppableDimension = droppables[droppableId];
   const axis: Axis = source.axis;
-
   const sorted: DroppableDimension[] = sortOnCrossAxis(droppables, axis);
 
   const candidates: DroppableDimension[] =
@@ -80,15 +79,15 @@ export default ({
         sourceFragment[axis.start],
         sourceFragment[axis.end]
       );
-      const isBetweenDestBounds = isWithin(
+      const isBetweenDestinationBounds = isWithin(
         destinationFragment[axis.start],
         destinationFragment[axis.end]
       );
 
       return isBetweenSourceBounds(destinationFragment[axis.start]) ||
         isBetweenSourceBounds(destinationFragment[axis.end]) ||
-        isBetweenDestBounds(sourceFragment[axis.start]) ||
-        isBetweenDestBounds(sourceFragment[axis.end]);
+        isBetweenDestinationBounds(sourceFragment[axis.start]) ||
+        isBetweenDestinationBounds(sourceFragment[axis.end]);
     })
     // 4. Find the droppables that have the same cross axis value as the first item
     .filter((droppable: DroppableDimension, index: number, array: DroppableDimension[]): boolean =>
@@ -113,19 +112,17 @@ export default ({
   // 1. Get the distance to all of the corner points
   // 2. Find the closest corner to current center
   // 3. in the event of a tie: choose the corner that is closest to {x: 0, y: 0}
-  const items: DroppableDimension[] =
-    candidates.map((droppable: DroppableDimension): DroppableCornerMap => {
-      const fragment: DimensionFragment = droppable.page.withMargin;
-      const first: Position = {
-        x: fragment[axis.crossAxisStart],
-        y: fragment[axis.start],
-      };
-      const second: Position = {
-        x: 2,
-        y: 3,
-      };
-      return {
-        [droppable.id]: [first, second],
-      };
-    });
+  const bestId: DroppableId =
+    candidates.map((droppable: DroppableDimension): DistanceToDroppable => ({
+      id: droppableId,
+      // two of the corners will be redundant, but it is *way* easier
+      // to pass every corner than to conditionally grab the right ones
+      distance: closest(center, getCorners(droppable)),
+    }))
+    // the item with the shortest distance will be first
+    .sort((a: DistanceToDroppable, b: DistanceToDroppable) => a.distance - b.distance)
+    // TODO: what if there is a tie?
+    .map(a => a.id)[0];
+
+  return bestId;
 };
