@@ -87,6 +87,13 @@
     // All blocks must be wrapped in curly braces {}
     // Preventing if(condition) return;
     // https://eslint.org/docs/rules/curly
-    "curly": ["error", "all"]
+    "curly": ["error", "all"],
+
+    // Allowing Math.pow rather than forcing `**`
+    // https://eslint.org/docs/rules/no-restricted-properties
+    "no-restricted-properties": ["off", {
+      "object": "Math",
+      "property": "pow"
+    }]
   }
 }
