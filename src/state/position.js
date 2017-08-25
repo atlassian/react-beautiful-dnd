@@ -25,3 +25,10 @@ export const patch = (line: 'x' | 'y', value: number): Position => ({
   y: line === 'y' ? value : 0,
 });
 
+// Returns the distance between two points
+// https://www.mathsisfun.com/algebra/distance-2-points.html
+export const distance = (point1: Position, point2: Position): number =>
+  Math.sqrt(
+    Math.pow((point2.x - point1.x), 2) +
+    Math.pow((point2.y - point1.y), 2)
+  );

@@ -7,6 +7,9 @@ export const vertical: VerticalAxis = {
   start: 'top',
   end: 'bottom',
   size: 'height',
+  crossAxisStart: 'left',
+  crossAxisEnd: 'right',
+  crossAxisSize: 'width',
 };
 
 export const horizontal: HorizontalAxis = {
@@ -15,4 +18,7 @@ export const horizontal: HorizontalAxis = {
   start: 'left',
   end: 'right',
   size: 'width',
+  crossAxisStart: 'top',
+  crossAxisEnd: 'bottom',
+  crossAxisSize: 'height',
 };
