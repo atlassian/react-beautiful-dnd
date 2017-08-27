@@ -190,6 +190,26 @@ export const moveForward = (id: DraggableId): MoveForwardAction => ({
   payload: id,
 });
 
+export type CrossAxisMoveForwardAction = {|
+  type: 'CROSS_AXIS_MOVE_FORWARD',
+  payload: DraggableId
+|}
+
+export const crossAxisMoveForward = (id: DraggableId): MoveForwardAction => ({
+  type: 'CROSS_AXIS_MOVE_FORWARD',
+  payload: id,
+});
+
+export type CrossAxisMoveBackwardAction = {|
+  type: 'CROSS_AXIS_MOVE_BACKWARD',
+  payload: DraggableId
+|}
+
+export const crossAxisMoveBackward = (id: DraggableId): MoveForwardAction => ({
+  type: 'CROSS_AXIS_MOVE_BACKWARD',
+  payload: id,
+});
+
 type CleanAction = {
   type: 'CLEAN',
   payload: null,
@@ -449,6 +469,8 @@ export type Action = BeginLiftAction |
   MoveAction |
   MoveBackwardAction |
   MoveForwardAction |
+  CrossAxisMoveForwardAction |
+  CrossAxisMoveBackwardAction |
   DropAnimateAction |
   DropCompleteAction |
   CleanAction;

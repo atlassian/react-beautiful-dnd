@@ -15,19 +15,10 @@ type DistanceToDroppable = {|
   distance: number,
 |}
 
-const sortOnCrossAxis = memoizeOne(
-  (droppables: DroppableDimensionMap, axis: Axis): DroppableDimension[] =>
-    Object.keys(droppables)
-      .map((key: DroppableId): DroppableDimension => droppables[key])
-      .sort((a: DroppableDimension, b: DroppableDimension) => (
-        a.page.withMargin[axis.crossAxisStart] - b.page.withMargin[axis.crossAxisStart]
-      )
-  )
-);
-
 const isWithin = (lowerBound: number, upperBound: number): ((number) => boolean) =>
   (value: number): boolean => value <= upperBound && value >= lowerBound;
 
+// TODO: could this be done once and not redone each time?
 const getCorners = (droppable: DroppableDimension): Position[] => {
   const fragment: DimensionFragment = droppable.page.withMargin;
 
@@ -42,23 +33,21 @@ const getCorners = (droppable: DroppableDimension): Position[] => {
 type GetBestDroppableArgs = {|
   isMovingForward: boolean,
   center: Position,
-  droppableId: DroppableId,
-  droppables: DroppableDimensionMap,
+  source: DroppableDimension,
+  droppables: DroppableDimension[],
 |}
 
 export default ({
   isMovingForward,
   center,
-  droppableId,
+  source,
   droppables,
 }: GetBestDroppableArgs): ?DroppableId => {
-  const source: DroppableDimension = droppables[droppableId];
   const axis: Axis = source.axis;
-  const sorted: DroppableDimension[] = sortOnCrossAxis(droppables, axis);
 
   const candidates: DroppableDimension[] =
     // 1. Remove the source droppable from the list
-    sorted.filter((droppable: DroppableDimension): boolean => droppable !== source)
+    droppables.filter((droppable: DroppableDimension): boolean => droppable !== source)
     // 2. Get only droppables that are on the desired side
     .filter((droppable: DroppableDimension): boolean => {
       if (isMovingForward) {
@@ -89,7 +78,11 @@ export default ({
         isBetweenDestinationBounds(sourceFragment[axis.start]) ||
         isBetweenDestinationBounds(sourceFragment[axis.end]);
     })
-    // 4. Find the droppables that have the same cross axis value as the first item
+    // 4. Sort on the cross axis
+    .sort((a: DroppableDimension, b: DroppableDimension) => (
+      a.page.withMargin[axis.crossAxisStart] - b.page.withMargin[axis.crossAxisStart]
+    ))
+    // 5. Find the droppables that have the same cross axis value as the first item
     .filter((droppable: DroppableDimension, index: number, array: DroppableDimension[]): boolean =>
       droppable.page.withMargin[axis.crossAxisStart] ===
       array[0].page.withMargin[axis.crossAxisStart]
@@ -119,9 +112,13 @@ export default ({
       // to pass every corner than to conditionally grab the right ones
       distance: closest(center, getCorners(droppable)),
     }))
+    // 4. Sort on the cross main axis
+    .sort((a: DroppableDimension, b: DroppableDimension) => (
+      a.page.withMargin[axis.start] - b.page.withMargin[axis.end]
+    ))
     // the item with the shortest distance will be first
     .sort((a: DistanceToDroppable, b: DistanceToDroppable) => a.distance - b.distance)
-    // TODO: what if there is a tie?
+    // if there is a tie we return the first - they are already sorted on main axis
     .map(a => a.id)[0];
 
   return bestId;

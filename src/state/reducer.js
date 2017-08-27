@@ -233,6 +233,8 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       center: page.center,
     };
 
+    console.log('state', state);
+
     const impact: DragImpact = getDragImpact({
       page: page.selection,
       withinDroppable,
@@ -433,6 +435,27 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       pageSelection: page,
       shouldAnimate: true,
     });
+  }
+
+  if (action.type === 'CROSS_AXIS_MOVE_FORWARD' || action.type === 'CROSS_AXIS_MOVE_BACKWARD') {
+    if (state.phase !== 'DRAGGING') {
+      console.error('cannot move cross axis when not dragging');
+      return clean();
+    }
+
+    if (!state.drag) {
+      console.error('cannot move cross axis if there is no drag information');
+      return clean();
+    }
+
+    if (!state.drag.impact.destination) {
+      console.error('cannot move cross axis if not in a droppable');
+      return clean();
+    }
+
+    if (!result) {
+      return state;
+    }
   }
 
   if (action.type === 'DROP_ANIMATE') {
