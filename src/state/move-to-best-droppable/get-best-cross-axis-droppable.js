@@ -1,6 +1,6 @@
 // @flow
-import memoizeOne from 'memoize-one';
-import { closest } from './position';
+import { closest } from '../position';
+import { droppableMapToList } from '../dimension-map-to-list';
 import type {
   Axis,
   Position,
@@ -8,7 +8,7 @@ import type {
   DroppableId,
   DroppableDimension,
   DroppableDimensionMap,
-} from '../types';
+} from '../../types';
 
 type DistanceToDroppable = {|
   id: DroppableId,
@@ -32,9 +32,12 @@ const getCorners = (droppable: DroppableDimension): Position[] => {
 
 type GetBestDroppableArgs = {|
   isMovingForward: boolean,
+  // the current position of the dragging item
   center: Position,
+  // the home of the draggable
   source: DroppableDimension,
-  droppables: DroppableDimension[],
+  // all the droppables in the system
+  droppables: DroppableDimensionMap,
 |}
 
 export default ({
@@ -45,9 +48,9 @@ export default ({
 }: GetBestDroppableArgs): ?DroppableId => {
   const axis: Axis = source.axis;
 
-  const candidates: DroppableDimension[] =
+  const candidates: DroppableDimension[] = droppableMapToList(droppables)
     // 1. Remove the source droppable from the list
-    droppables.filter((droppable: DroppableDimension): boolean => droppable !== source)
+    .filter((droppable: DroppableDimension): boolean => droppable !== source)
     // 2. Get only droppables that are on the desired side
     .filter((droppable: DroppableDimension): boolean => {
       if (isMovingForward) {
@@ -107,13 +110,13 @@ export default ({
   // 3. in the event of a tie: choose the corner that is closest to {x: 0, y: 0}
   const bestId: DroppableId =
     candidates.map((droppable: DroppableDimension): DistanceToDroppable => ({
-      id: droppableId,
+      id: droppable.id,
       // two of the corners will be redundant, but it is *way* easier
       // to pass every corner than to conditionally grab the right ones
       distance: closest(center, getCorners(droppable)),
     }))
-    // 4. Sort on the cross main axis
-    .sort((a: DroppableDimension, b: DroppableDimension) => (
+    // 4. Sort on the main axis
+    .sort((a: DistanceToDroppable, b: DistanceToDroppable) => (
       a.page.withMargin[axis.start] - b.page.withMargin[axis.end]
     ))
     // the item with the shortest distance will be first

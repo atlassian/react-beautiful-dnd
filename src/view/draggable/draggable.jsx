@@ -69,7 +69,7 @@ export default class Draggable extends Component {
   constructor(props: Props, context: mixed) {
     super(props, context);
 
-    this.callbacks = {
+    const callbacks: DragHandleCallbacks = {
       onLift: this.onLift,
       onMove: this.onMove,
       onDrop: this.onDrop,
@@ -77,8 +77,12 @@ export default class Draggable extends Component {
       onKeyLift: this.onKeyLift,
       onMoveBackward: this.onMoveBackward,
       onMoveForward: this.onMoveForward,
+      onCrossAxisMoveForward: this.onCrossAxisMoveForward,
+      onCrossAxisMoveBackward: this.onCrossAxisMoveBackward,
       onWindowScroll: this.onWindowScroll,
     };
+
+    this.callbacks = callbacks;
   }
 
   // This should already be handled gracefully in DragHandle.
@@ -166,6 +170,16 @@ export default class Draggable extends Component {
   onMoveBackward = () => {
     this.throwIfCannotDrag();
     this.props.moveBackward(this.props.draggableId);
+  }
+
+  onCrossAxisMoveForward = () => {
+    this.throwIfCannotDrag();
+    this.props.crossAxisMoveForward(this.props.draggableId);
+  }
+
+  onCrossAxisMoveBackward = () => {
+    this.throwIfCannotDrag();
+    this.props.crossAxisMoveBackward(this.props.draggableId);
   }
 
   onWindowScroll = () => {

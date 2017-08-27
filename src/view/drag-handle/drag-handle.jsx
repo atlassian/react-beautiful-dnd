@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import invariant from 'invariant';
 import memoizeOne from 'memoize-one';
-import rafScheduler from 'raf-schd';
+import rafSchedule from 'raf-schd';
 // Using keyCode's for consistent event pattern matching between
 // React synthetic events as well as raw browser events.
 import * as keyCodes from '../key-codes';
@@ -23,6 +23,11 @@ type State = {
   draggingWith: ?DragTypes,
   pending: ?Position,
 };
+
+type ExecuteBasedOnDirection = {|
+  vertical: Function,
+  horizontal: Function,
+|}
 
 export default class DragHandle extends Component {
   /* eslint-disable react/sort-comp */
@@ -55,19 +60,27 @@ export default class DragHandle extends Component {
   });
 
   // scheduled functions
-  scheduleMove = rafScheduler((point: Position) => {
+  scheduleMove = rafSchedule((point: Position) => {
     this.ifDragging(() => this.memoizedMove(point.x, point.y));
   });
 
-  scheduleMoveForward = rafScheduler(() => {
+  scheduleMoveForward = rafSchedule(() => {
     this.ifDragging(this.props.callbacks.onMoveForward);
   })
 
-  scheduleMoveBackward = rafScheduler(() => {
+  scheduleMoveBackward = rafSchedule(() => {
     this.ifDragging(this.props.callbacks.onMoveBackward);
   });
 
-  scheduleWindowScrollMove = rafScheduler(() => {
+  scheduleCrossAxisMoveForward = rafSchedule(() => {
+    this.ifDragging(this.props.callbacks.onCrossAxisMoveForward);
+  })
+
+  scheduleCrossAxisMoveBackward = rafSchedule(() => {
+    this.ifDragging(this.props.callbacks.onCrossAxisMoveBackward);
+  });
+
+  scheduleWindowScrollMove = rafSchedule(() => {
     this.ifDragging(this.props.callbacks.onWindowScroll);
   });
   /* eslint-enable react/sort-comp */
@@ -232,6 +245,17 @@ export default class DragHandle extends Component {
     this.startPendingMouseDrag(point);
   };
 
+  executeBasedOnDirection = ({ vertical, horizontal }: Object) => {
+    if (!this.props.direction) {
+      console.error('cannot move based on direction when none is provided');
+      this.stopDragging(() => this.props.callbacks.onCancel());
+      return;
+    }
+
+    // eslint-disable-next-line no-unused-expressions
+    this.props.direction === 'vertical' ? vertical() : horizontal();
+  }
+
   // window keyboard events are bound during a keyboard drag
   // or after the user presses the mouse down
   onWindowKeydown = (event: KeyboardEvent): void => {
@@ -293,30 +317,39 @@ export default class DragHandle extends Component {
       return;
     }
 
-    if (this.props.direction === 'vertical') {
-      if (event.keyCode === keyCodes.arrowDown) {
-        event.preventDefault();
-        this.scheduleMoveForward();
-      }
-
-      if (event.keyCode === keyCodes.arrowUp) {
-        event.preventDefault();
-        this.scheduleMoveBackward();
-      }
-
+    if (event.keyCode === keyCodes.arrowDown) {
+      event.preventDefault();
+      this.executeBasedOnDirection({
+        vertical: this.scheduleMoveForward,
+        horizontal: this.scheduleCrossAxisMoveForward,
+      });
       return;
     }
 
-    // horizontal dragging
+    if (event.keyCode === keyCodes.arrowUp) {
+      event.preventDefault();
+      this.executeBasedOnDirection({
+        vertical: this.scheduleMoveBackward,
+        horizontal: this.scheduleCrossAxisMoveBackward,
+      });
+      return;
+    }
+
     if (event.keyCode === keyCodes.arrowRight) {
       event.preventDefault();
-      this.scheduleMoveForward();
+      this.executeBasedOnDirection({
+        vertical: this.scheduleCrossAxisMoveForward,
+        horizontal: this.scheduleMoveForward,
+      });
       return;
     }
 
     if (event.keyCode === keyCodes.arrowLeft) {
       event.preventDefault();
-      this.scheduleMoveBackward();
+      this.executeBasedOnDirection({
+        vertical: this.scheduleCrossAxisMoveBackward,
+        horizontal: this.scheduleMoveBackward,
+      });
     }
   }
 

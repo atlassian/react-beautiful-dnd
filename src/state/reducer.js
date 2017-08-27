@@ -6,6 +6,7 @@ import type { TypeId,
   DraggableDimension,
   DroppableDimension,
   DroppableId,
+  DraggableId,
   DimensionState,
   DragImpact,
   DragState,
@@ -24,6 +25,7 @@ import getDragImpact from './get-drag-impact';
 import jumpToNextIndex from './jump-to-next-index';
 import type { JumpToNextResult } from './jump-to-next-index';
 import getDroppableOver from './get-droppable-over';
+import moveToBestDroppable from './move-to-best-droppable/';
 
 const noDimensions: DimensionState = {
   request: null,
@@ -233,8 +235,6 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       center: page.center,
     };
 
-    console.log('state', state);
-
     const impact: DragImpact = getDragImpact({
       page: page.selection,
       withinDroppable,
@@ -438,6 +438,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
   }
 
   if (action.type === 'CROSS_AXIS_MOVE_FORWARD' || action.type === 'CROSS_AXIS_MOVE_BACKWARD') {
+    console.log('trying to moving on cross axis', action.type);
     if (state.phase !== 'DRAGGING') {
       console.error('cannot move cross axis when not dragging');
       return clean();
@@ -453,9 +454,22 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
-    if (!result) {
-      return state;
-    }
+    const draggableId: DraggableId = state.drag.current.id;
+    const center: Position = state.drag.current.page.center;
+    const droppableId: DroppableId = state.drag.impact.destination.droppableId;
+
+    const result = moveToBestDroppable({
+      isMovingForward: action.type === 'CROSS_AXIS_MOVE_FORWARD',
+      center,
+      draggableId,
+      droppableId,
+      draggables: state.dimension.draggable,
+      droppables: state.dimension.droppable,
+    });
+
+    console.log('result', result);
+
+    return state;
   }
 
   if (action.type === 'DROP_ANIMATE') {
