@@ -24,12 +24,17 @@ const Root = styled.div`
   align-items: flex-start;
 `;
 
+const Column = styled.div`
+
+`;
+
 const isDraggingClassName = 'is-dragging';
 
 type GroupedQuotes = {
   alpha: Quote[],
   beta: Quote[],
   gamma: Quote[],
+  delta: Quote[],
 }
 
 type Props = {|
@@ -124,24 +129,36 @@ export default class QuoteApp extends Component {
         onDragEnd={this.onDragEnd}
       >
         <Root>
-          <QuoteList
-            listId="alpha"
-            listType="card"
-            style={style}
-            quotes={quotes.alpha}
-          />
-          <QuoteList
-            listId="beta"
-            listType="card"
-            style={style}
-            quotes={quotes.beta}
-          />
-          <QuoteList
-            listId="gamma"
-            listType="card"
-            style={style}
-            quotes={quotes.gamma}
-          />
+          <Column>
+            <QuoteList
+              listId="alpha"
+              listType="card"
+              style={style}
+              quotes={quotes.alpha}
+            />
+          </Column>
+          <Column>
+            <QuoteList
+              listId="beta"
+              listType="card"
+              style={style}
+              quotes={quotes.beta}
+            />
+            <QuoteList
+              listId="gamma"
+              listType="card"
+              style={style}
+              quotes={quotes.gamma}
+            />
+          </Column>
+          <Column>
+            <QuoteList
+              listId="delta"
+              listType="card"
+              style={style}
+              quotes={quotes.delta}
+            />
+          </Column>
         </Root>
       </DragDropContext>
     );

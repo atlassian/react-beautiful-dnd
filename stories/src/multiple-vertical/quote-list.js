@@ -25,6 +25,10 @@ const Container = styled.div`
   width: 250px;
 `;
 
+const Title = styled.h4`
+  margin-bottom: ${grid}px;
+`;
+
 export default class QuoteList extends Component {
   props: {|
     listId: string,
@@ -43,6 +47,7 @@ export default class QuoteList extends Component {
             innerRef={dropProvided.innerRef}
             style={style}
           >
+            <Title>{listId}</Title>
             {quotes.map((quote: Quote) => (
               <Draggable key={quote.id} draggableId={quote.id} type={listType}>
                 {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (

@@ -15,6 +15,7 @@ const initialQuotes = {
   alpha: namespaceQuoteIds(getQuotes(10), 'alpha'),
   beta: namespaceQuoteIds(getQuotes(3), 'beta'),
   gamma: namespaceQuoteIds(getQuotes(10), 'gamma'),
+  delta: namespaceQuoteIds(getQuotes(5), 'delta'),
 };
 
 storiesOf('multiple vertical lists', module)
