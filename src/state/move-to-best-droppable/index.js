@@ -39,7 +39,6 @@ export default ({
   draggables,
   droppables,
   }: Args): ?Result => {
-  const draggable: DraggableDimension = draggables[draggableId];
   const source: DroppableDimension = droppables[droppableId];
 
   const destination: ?DroppableDimension = getBestCrossAxisDroppable({
@@ -49,8 +48,11 @@ export default ({
     droppables,
   });
 
+  console.log('desintation', destination);
+
   // nothing available to move to
   if (!destination) {
+    console.log('no destination found');
     return null;
   }
 
@@ -58,6 +60,8 @@ export default ({
     destination,
     draggables,
   );
+
+  console.log('new siblings', newSiblings);
 
   if (!newSiblings.length) {
     // need to move to the start of the list
@@ -68,20 +72,21 @@ export default ({
   // Assumption: list must have same width
   // All good if smaller - but if bigger then it will be a bit messy - up to consumer
 
-  const closestSibling: DroppableDimension = getClosestDraggable({
+  const closestSibling: DraggableDimension = getClosestDraggable({
     axis: destination.axis,
     center,
     scrollOffset: destination.scroll.current,
     draggables: newSiblings,
   });
 
+  console.log('closest', closestSibling);
+
   // TODO: what if going from a vertical to horizontal list
 
   // needs to go before the closest if it is before / equal on the main axis
-  const isGoingBefore: boolean = center <= closestSibling.page.withMargin.center[source.axis.line];
-
-  // isGoingBefore -> bottom edge of current draggable needs go against top edge of closest
-  // !isGoingBefore -> top of of current draggable needs to go again bottom edge of closest
+  // Keep in mind that an item 'before' another will have a smaller value on the viewport
+  const isGoingBefore: boolean = center[source.axis.line] < closestSibling.page.withMargin.center[source.axis.line];
 
   // also need to force the other draggables to move to needed
+  console.log('is going before?', isGoingBefore);
 };

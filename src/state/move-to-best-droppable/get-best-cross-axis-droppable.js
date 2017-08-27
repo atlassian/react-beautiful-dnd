@@ -11,7 +11,7 @@ import type {
 } from '../../types';
 
 type DistanceToDroppable = {|
-  id: DroppableId,
+  droppable: DroppableDimension,
   distance: number,
 |}
 
@@ -45,7 +45,7 @@ export default ({
   center,
   source,
   droppables,
-}: GetBestDroppableArgs): ?DroppableId => {
+}: GetBestDroppableArgs): ?DroppableDimension => {
   const axis: Axis = source.axis;
 
   const candidates: DroppableDimension[] = droppableMapToList(droppables)
@@ -98,7 +98,7 @@ export default ({
 
   // only one result - all done!
   if (candidates.length === 1) {
-    return candidates[0].id;
+    return candidates[0];
   }
 
   // At this point we have a number of candidates that
@@ -108,21 +108,27 @@ export default ({
   // 1. Get the distance to all of the corner points
   // 2. Find the closest corner to current center
   // 3. in the event of a tie: choose the corner that is closest to {x: 0, y: 0}
-  const bestId: DroppableId =
+  const best: DroppableDimension =
     candidates.map((droppable: DroppableDimension): DistanceToDroppable => ({
-      id: droppable.id,
+      droppable,
       // two of the corners will be redundant, but it is *way* easier
       // to pass every corner than to conditionally grab the right ones
       distance: closest(center, getCorners(droppable)),
     }))
-    // 4. Sort on the main axis
-    .sort((a: DistanceToDroppable, b: DistanceToDroppable) => (
-      a.page.withMargin[axis.start] - b.page.withMargin[axis.end]
-    ))
-    // the item with the shortest distance will be first
-    .sort((a: DistanceToDroppable, b: DistanceToDroppable) => a.distance - b.distance)
-    // if there is a tie we return the first - they are already sorted on main axis
-    .map(a => a.id)[0];
+    .sort((a: DistanceToDroppable, b: DistanceToDroppable): number => {
+      // 'a' is closer - make 'a' first
+      if (a.distance < b.distance) {
+        return -1;
+      }
 
-  return bestId;
+      // 'b' is closer - make 'b' first
+      if (b.distance > a.distance) {
+        return 1;
+      }
+
+      // they have equal distances - sort based on which appears first on the main axis
+      return a.droppable.page.withMargin[axis.start] - b.droppable.page.withMargin[axis.start];
+    })[0].droppable;
+
+  return best;
 };

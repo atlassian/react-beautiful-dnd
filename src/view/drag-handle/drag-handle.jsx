@@ -25,8 +25,8 @@ type State = {
 };
 
 type ExecuteBasedOnDirection = {|
-  vertical: Function,
-  horizontal: Function,
+  vertical: () => void,
+  horizontal: () => void,
 |}
 
 export default class DragHandle extends Component {

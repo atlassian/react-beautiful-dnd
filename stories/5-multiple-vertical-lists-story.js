@@ -2,7 +2,7 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 import QuoteApp from './src/multiple-vertical/quote-app';
-import { quotes } from './src/data';
+import { getQuotes } from './src/data';
 
 const namespaceQuoteIds = (quoteList, namespace) => quoteList.map(
   quote => ({
@@ -11,13 +11,10 @@ const namespaceQuoteIds = (quoteList, namespace) => quoteList.map(
   })
 );
 
-// I don't want these to be random
-const alphaQuotes = quotes.slice(0, 2);
-const betaQuotes = quotes.slice(6, 8);
-
 const initialQuotes = {
-  alpha: namespaceQuoteIds(alphaQuotes, 'alpha'),
-  beta: namespaceQuoteIds(betaQuotes, 'beta'),
+  alpha: namespaceQuoteIds(getQuotes(10), 'alpha'),
+  beta: namespaceQuoteIds(getQuotes(3), 'beta'),
+  gamma: namespaceQuoteIds(getQuotes(10), 'gamma'),
 };
 
 storiesOf('multiple vertical lists', module)

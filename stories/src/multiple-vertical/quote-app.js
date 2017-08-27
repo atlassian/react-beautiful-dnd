@@ -7,7 +7,7 @@ import QuoteList from './quote-list';
 import { colors, grid } from '../constants';
 import reorder from '../reorder';
 import type { Quote } from '../types';
-import type { DropResult, DragStart } from '../../../src/types';
+import type { DropResult, DragStart, DraggableLocation } from '../../../src/types';
 
 const publishOnDragStart = action('onDragStart');
 const publishOnDragEnd = action('onDragEnd');
@@ -26,22 +26,23 @@ const Root = styled.div`
 
 const isDraggingClassName = 'is-dragging';
 
-type Quotes = {
+type GroupedQuotes = {
   alpha: Quote[],
   beta: Quote[],
+  gamma: Quote[],
 }
 
 type Props = {|
-  initial: Quotes,
+  initial: GroupedQuotes,
   listStyle?: Object,
 |}
 
 type State = {|
-  quotes: Quotes,
+  quotes: GroupedQuotes,
 |}
 
-const resolveDrop = (quotes: Quotes, { source, destination }): Quotes => {
-  const newQuotes: Quotes = { ...quotes };
+const resolveDrop = (quotes: GroupedQuotes, source: DraggableLocation, destination: DraggableLocation): GroupedQuotes => {
+  const newQuotes: GroupedQuotes = { ...quotes };
 
   const movedQuote = quotes[source.droppableId][source.index];
 
@@ -95,7 +96,7 @@ export default class QuoteApp extends Component {
       return;
     }
 
-    const quotes = resolveDrop(this.state.quotes, result);
+    const quotes = resolveDrop(this.state.quotes, result.source, result.destination);
 
     this.setState({ quotes });
   }
@@ -134,6 +135,12 @@ export default class QuoteApp extends Component {
             listType="card"
             style={style}
             quotes={quotes.beta}
+          />
+          <QuoteList
+            listId="gamma"
+            listType="card"
+            style={style}
+            quotes={quotes.gamma}
           />
         </Root>
       </DragDropContext>

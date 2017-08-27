@@ -20,11 +20,21 @@ export default ({
   scrollOffset,
   draggables,
 }: Args): DraggableDimension =>
-  draggables.sort((a: DraggableDimension, b: DraggableDimension) => (
-    distance(center, add(a.page.withMargin.center, scrollOffset)) -
-    distance(center, add(b.page.withMargin.center, scrollOffset))
-  ))
-  // If there is a tie, we want to go into the first slot on the main axis
-  .sort((a: DraggableDimension, b: DraggableDimension) => (
-    a.page.withMargin[axis.start] - b.page.withMargin[axis.start]
-  ))[0];
+  draggables.sort((a: DraggableDimension, b: DraggableDimension): number => {
+    const distanceToA = distance(center, add(a.page.withMargin.center, scrollOffset));
+    const distanceToB = distance(center, add(b.page.withMargin.center, scrollOffset));
+
+    // if a is closer - return a
+    if (distanceToA > distanceToB) {
+      return -1;
+    }
+
+    // if b is closer - return b
+    if (distanceToB < distanceToA) {
+      return 1;
+    }
+
+    // if the distance to a and b are the same:
+    // return the one that appears first on the main axis
+    return a.page.withMargin[axis.start] - b.page.withMargin[axis.start];
+  })[0];
