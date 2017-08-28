@@ -48,13 +48,13 @@ export default ({
   }
 
   // The dimension of the item being dragged
-  const draggedDimension: DimensionFragment = draggables[draggableId].client.withoutMargin;
+  const draggedDimension: DimensionFragment = draggables[draggableId].client.withMargin;
   // The index of the last item being displaced
   const displacedIndex: number = isBeyondStartPosition ? movedDraggables.length - 1 : 0;
   // The dimension of the last item being displaced
   const displacedDimension: DimensionFragment = draggables[
     movedDraggables[displacedIndex]
-  ].client.withoutMargin;
+  ].client.withMargin;
 
   // Find the difference between the center of the dragging item
   // and the center of the last item being displaced
