@@ -32,6 +32,11 @@ const PushDown = styled.div`
   height: 200px;
 `;
 
+const ScrollContainer = styled.div`
+  overflow: auto;
+  height: 400px;
+`;
+
 const isDraggingClassName = 'is-dragging';
 
 type GroupedQuotes = {
@@ -149,20 +154,24 @@ export default class QuoteApp extends Component {
               style={style}
               quotes={quotes.beta}
             />
-            <QuoteList
-              listId="gamma"
-              listType="card"
-              style={style}
-              quotes={quotes.gamma}
-            />
+            <ScrollContainer>
+              <QuoteList
+                listId="gamma"
+                listType="card"
+                style={style}
+                quotes={quotes.gamma}
+              />
+            </ScrollContainer>
           </Column>
           <Column>
-            <QuoteList
-              listId="delta"
-              listType="card"
-              style={style}
-              quotes={quotes.delta}
-            />
+            <ScrollContainer>
+              <QuoteList
+                listId="delta"
+                listType="card"
+                style={style}
+                quotes={quotes.delta}
+              />
+            </ScrollContainer>
           </Column>
         </Root>
       </DragDropContext>
