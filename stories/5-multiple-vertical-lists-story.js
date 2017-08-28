@@ -12,8 +12,8 @@ const namespaceQuoteIds = (quoteList, namespace) => quoteList.map(
 );
 
 // I don't want these to be random
-const alphaQuotes = quotes.slice(0, 2);
-const betaQuotes = quotes.slice(6, 8);
+const alphaQuotes = quotes.slice(0, 4);
+const betaQuotes = quotes.slice(5, 9);
 
 const initialQuotes = {
   alpha: namespaceQuoteIds(alphaQuotes, 'alpha'),

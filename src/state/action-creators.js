@@ -17,7 +17,7 @@ import type {
 } from '../types';
 import noImpact from './no-impact';
 import getNewHomeClientOffset from './get-new-home-client-offset';
-import { add, subtract, isEqual } from './position';
+import { add, subtract, isEqual, patch } from './position';
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -296,6 +296,7 @@ export const drop = () =>
       windowScrollDiff: scrollDiff.window,
       draggables: state.dimension.draggable,
       axis: destinationDroppable ? destinationDroppable.axis : null,
+      draggableId: current.id,
     });
 
     // Do not animate if you do not need to.

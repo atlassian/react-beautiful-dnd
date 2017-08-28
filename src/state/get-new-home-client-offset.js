@@ -2,7 +2,7 @@
 import type {
   DragMovement,
   Position,
-  DraggableDimension,
+  DimensionFragment,
   DraggableDimensionMap,
   DraggableId,
   Axis,
@@ -13,6 +13,7 @@ type NewHomeArgs = {|
   movement: DragMovement,
   clientOffset: Position,
   pageOffset: Position,
+  draggableId: DraggableId,
   droppableScrollDiff: Position,
   windowScrollDiff: Position,
   draggables: DraggableDimensionMap,
@@ -28,13 +29,16 @@ export default ({
   movement,
   clientOffset,
   pageOffset,
+  draggableId,
   droppableScrollDiff,
   windowScrollDiff,
   draggables,
   axis,
 }: NewHomeArgs): ClientOffset => {
+  const { draggables: movedDraggables, isBeyondStartPosition } = movement;
+
   // Just animate back to where it started
-  if (!movement.draggables.length) {
+  if (!movedDraggables.length) {
     return add(droppableScrollDiff, windowScrollDiff);
   }
 
@@ -43,19 +47,33 @@ export default ({
     return add(droppableScrollDiff, windowScrollDiff);
   }
 
-  // Currently not considering horizontal movement
-  const distance: number = movement.draggables.reduce(
-    (previous: number, draggableId: DraggableId): number => {
-      const dimension: DraggableDimension = draggables[draggableId];
-      // $ExpectError - for some reason flow is not liking axis.size
-      return previous + dimension.page.withMargin[axis.size];
-    }, 0);
+  // The dimension of the item being dragged
+  const draggedDimension: DimensionFragment = draggables[draggableId].client.withoutMargin;
+  // The index of the last item being displaced
+  const displacedIndex: number = isBeyondStartPosition ? movedDraggables.length - 1 : 0;
+  // The dimension of the last item being displaced
+  const displacedDimension: DimensionFragment = draggables[
+    movedDraggables[displacedIndex]
+  ].client.withoutMargin;
 
-  const signed: number = movement.isBeyondStartPosition ? distance : -distance;
+  // Find the difference between the center of the dragging item
+  // and the center of the last item being displaced
+  const distanceToDisplacedCenter: Position = subtract(
+    displacedDimension.center,
+    draggedDimension.center
+  );
 
-  // How much distance the item needs to travel to be in its new home
-  // from where it started
-  const amount = patch(axis.line, signed);
+  // To account for items of different sizes we need to adjust the offset
+  // between their center points by half their size difference
+  const mainAxisSizeDifference: number = (
+    ((draggedDimension[axis.size] - displacedDimension[axis.size])
+    / 2)
+    * (isBeyondStartPosition ? -1 : 1)
+  );
+  const mainAxisSizeOffset: Position = patch(axis.line, mainAxisSizeDifference);
+
+  // Finally, this is how far the dragged item has to travel to be in its new home
+  const amount: Position = add(distanceToDisplacedCenter, mainAxisSizeOffset);
 
   // How far away it is on the page from where it needs to be
   const diff: Position = subtract(amount, pageOffset);
