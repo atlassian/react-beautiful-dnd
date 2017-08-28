@@ -41,6 +41,10 @@ export const makeSelector = () => {
     },
   );
 
+  const memoizedPlaceholder = memoizeOne((width: number, height: number): Placeholder => ({
+    width, height,
+  }));
+
   const getPlaceholder = memoizeOne(
     (id: DroppableId,
       source: DraggableLocation,
@@ -64,10 +68,10 @@ export const makeSelector = () => {
         return null;
       }
 
-      const placeholder: Placeholder = {
-        width: draggable.page.withMargin.width,
-        height: draggable.page.withMargin.height,
-      };
+      const placeholder: Placeholder = memoizedPlaceholder(
+        draggable.page.withMargin.width,
+        draggable.page.withMargin.height,
+      );
 
       return placeholder;
     }

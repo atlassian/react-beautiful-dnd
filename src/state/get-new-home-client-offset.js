@@ -66,8 +66,7 @@ export default ({
   // To account for items of different sizes we need to adjust the offset
   // between their center points by half their size difference
   const mainAxisSizeDifference: number = (
-    ((draggedDimension[axis.size] - displacedDimension[axis.size])
-    / 2)
+    ((draggedDimension[axis.size] - displacedDimension[axis.size]) / 2)
     * (isBeyondStartPosition ? -1 : 1)
   );
   const mainAxisSizeOffset: Position = patch(axis.line, mainAxisSizeDifference);
