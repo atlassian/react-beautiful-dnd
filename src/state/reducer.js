@@ -402,6 +402,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       isMovingForward,
       draggableId: existing.current.id,
       impact: existing.impact,
+      center: existing.current.page.center,
       draggables: state.dimension.draggable,
       droppables: state.dimension.droppable,
     });
@@ -454,11 +455,13 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
-    const draggableId: DraggableId = state.drag.current.id;
-    const center: Position = state.drag.current.page.center;
+    const current: CurrentDrag = state.drag.current;
+
+    const draggableId: DraggableId = current.id;
+    const center: Position = current.page.center;
     const droppableId: DroppableId = state.drag.impact.destination.droppableId;
 
-    const result = moveToBestDroppable({
+    const offset: ?Position = moveToBestDroppable({
       isMovingForward: action.type === 'CROSS_AXIS_MOVE_FORWARD',
       center,
       draggableId,
@@ -467,9 +470,18 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       droppables: state.dimension.droppable,
     });
 
-    console.log('result', result);
+    if (!offset) {
+      return state;
+    }
 
-    return state;
+    const client: Position = add(current.client.selection, offset);
+    const page: Position = add(current.page.selection, offset);
+
+    return move({
+      state,
+      clientSelection: client,
+      pageSelection: page,
+    });
   }
 
   if (action.type === 'DROP_ANIMATE') {

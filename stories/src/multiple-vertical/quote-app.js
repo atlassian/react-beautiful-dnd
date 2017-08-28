@@ -29,7 +29,7 @@ const Column = styled.div`
 `;
 
 const PushDown = styled.div`
-  height: 400px;
+  height: 200px;
 `;
 
 const isDraggingClassName = 'is-dragging';

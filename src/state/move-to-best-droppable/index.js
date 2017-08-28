@@ -2,6 +2,7 @@
 import getBestCrossAxisDroppable from './get-best-cross-axis-droppable';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import getClosestDraggable from './get-closest-draggable';
+import { subtract } from '../position';
 import type {
   DraggableId,
   DroppableId,
@@ -26,11 +27,6 @@ type Args = {|
   droppables: DroppableDimensionMap,
 |}
 
-type Result = {|
-  offset: Position,
-  impact: DragImpact,
-|}
-
 export default ({
   isMovingForward,
   center,
@@ -38,7 +34,8 @@ export default ({
   droppableId,
   draggables,
   droppables,
-  }: Args): ?Result => {
+  }: Args): ?Position => {
+  const draggable: DraggableDimension = draggables[draggableId];
   const source: DroppableDimension = droppables[droppableId];
 
   const destination: ?DroppableDimension = getBestCrossAxisDroppable({
@@ -89,4 +86,15 @@ export default ({
 
   // also need to force the other draggables to move to needed
   console.log('is going before?', isGoingBefore);
+
+  // need to line up the top/bottom edge
+  // need to align to the center position
+  const newHome: Position = {
+    x: closestSibling.page.withMargin.center.x,
+    y: (closestSibling.page.withMargin[isGoingBefore ? 'top' : 'bottom']) + (draggable.page.withMargin.height / 2),
+  };
+
+  const offset: Position = subtract(newHome, center);
+
+  return offset;
 };
