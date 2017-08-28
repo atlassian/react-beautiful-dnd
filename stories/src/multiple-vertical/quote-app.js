@@ -28,6 +28,10 @@ const Column = styled.div`
 
 `;
 
+const PushDown = styled.div`
+  height: 400px;
+`;
+
 const isDraggingClassName = 'is-dragging';
 
 type GroupedQuotes = {
@@ -138,6 +142,7 @@ export default class QuoteApp extends Component {
             />
           </Column>
           <Column>
+            <PushDown />
             <QuoteList
               listId="beta"
               listType="card"

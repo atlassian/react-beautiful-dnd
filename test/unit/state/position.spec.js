@@ -6,6 +6,7 @@ import {
   negate,
   patch,
   distance,
+  closest,
 } from '../../../src/state/position';
 import type { Position } from '../../../src/types';
 
@@ -101,6 +102,22 @@ describe('position', () => {
         const target = { x: 3, y: 4 };
         expect(distance(origin, target)).toEqual(5);
       });
+
+      it('should account for a negative shift in plane', () => {
+        // a reverse '3, 4, 5' triangle shifted down to (-1, -1)
+        const customOrigin = { x: -1, y: -1 };
+        const target = { x: -4, y: -5 };
+        expect(distance(customOrigin, target)).toEqual(5);
+      });
+    });
+  });
+
+  describe('closest', () => {
+    it('should return the closest distance from a series of options', () => {
+      const option1 = { x: 1, y: 1 };
+      const option2 = { x: 2, y: 2 };
+
+      expect(closest(origin, [option1, option2])).toEqual(distance(origin, option1));
     });
   });
 });

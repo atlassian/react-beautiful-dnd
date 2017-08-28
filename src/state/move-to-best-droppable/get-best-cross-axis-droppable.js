@@ -5,20 +5,13 @@ import type {
   Axis,
   Position,
   DimensionFragment,
-  DroppableId,
   DroppableDimension,
   DroppableDimensionMap,
 } from '../../types';
 
-type DistanceToDroppable = {|
-  droppable: DroppableDimension,
-  distance: number,
-|}
-
 const isWithin = (lowerBound: number, upperBound: number): ((number) => boolean) =>
   (value: number): boolean => value <= upperBound && value >= lowerBound;
 
-// TODO: could this be done once and not redone each time?
 const getCorners = (droppable: DroppableDimension): Position[] => {
   const fragment: DimensionFragment = droppable.page.withMargin;
 
@@ -82,9 +75,15 @@ export default ({
         isBetweenDestinationBounds(sourceFragment[axis.end]);
     })
     // 4. Sort on the cross axis
-    .sort((a: DroppableDimension, b: DroppableDimension) => (
-      a.page.withMargin[axis.crossAxisStart] - b.page.withMargin[axis.crossAxisStart]
-    ))
+    .sort((a: DroppableDimension, b: DroppableDimension) => {
+      const first: number = a.page.withMargin[axis.crossAxisStart];
+      const second: number = b.page.withMargin[axis.crossAxisStart];
+
+      if (isMovingForward) {
+        return first - second;
+      }
+      return second - first;
+    })
     // 5. Find the droppables that have the same cross axis value as the first item
     .filter((droppable: DroppableDimension, index: number, array: DroppableDimension[]): boolean =>
       droppable.page.withMargin[axis.crossAxisStart] ===
@@ -103,32 +102,45 @@ export default ({
 
   // At this point we have a number of candidates that
   // all have the same axis.crossAxisStart value.
-  // Now need to consider the main axis as a tiebreaker
 
-  // 1. Get the distance to all of the corner points
-  // 2. Find the closest corner to current center
-  // 3. in the event of a tie: choose the corner that is closest to {x: 0, y: 0}
-  const best: DroppableDimension =
-    candidates.map((droppable: DroppableDimension): DistanceToDroppable => ({
-      droppable,
-      // two of the corners will be redundant, but it is *way* easier
-      // to pass every corner than to conditionally grab the right ones
-      distance: closest(center, getCorners(droppable)),
-    }))
-    .sort((a: DistanceToDroppable, b: DistanceToDroppable): number => {
-      // 'a' is closer - make 'a' first
-      if (a.distance < b.distance) {
-        return -1;
-      }
+  // 1. Check to see if the center position is within the size of a Droppable on the main axis
 
-      // 'b' is closer - make 'b' first
-      if (b.distance > a.distance) {
-        return 1;
-      }
+  const contains: DroppableDimension[] = candidates
+    .filter((droppable: DroppableDimension) => {
+      const isWithinDroppable = isWithin(
+        droppable.page.withMargin[axis.start],
+        droppable.page.withMargin[axis.end]
+      );
+      return isWithinDroppable(center[axis.line]);
+    });
 
-      // they have equal distances - sort based on which appears first on the main axis
-      return a.droppable.page.withMargin[axis.start] - b.droppable.page.withMargin[axis.start];
-    })[0].droppable;
+  if (contains.length === 1) {
+    return contains[0];
+  }
 
-  return best;
+  // the center point of the draggable falls on the boundary between to droppables
+  if (contains.length > 1) {
+    // sort on the main axis and choose the first
+    return contains.sort((a: DroppableDimension, b: DroppableDimension) => (
+      a.page.withMargin[axis.start] - b.page.withMargin[axis.start]
+    ))[0];
+  }
+
+  // 2. The center is not contained within any droppable
+
+  // 1. Find the candidate that has the closest corner
+  // 2. If there is a tie - choose the one that is first on the main axis
+  return candidates.sort((a: DroppableDimension, b: DroppableDimension) => {
+    const first = closest(center, getCorners(a));
+    const second = closest(center, getCorners(b));
+
+    // if the distances are not equal - choose the shortest
+    if (first !== second) {
+      return first - second;
+    }
+
+    // they both have the same distance -
+    // choose the one that is first on the main axis
+    return a.page.withMargin[axis.start] - b.page.withMargin[axis.start];
+  })[0];
 };
