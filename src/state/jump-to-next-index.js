@@ -23,6 +23,8 @@ const getIndex = memoizeOne(
 type JumpToNextArgs = {|
   isMovingForward: boolean,
   draggableId: DraggableId,
+  // the current center position
+  center: Position,
   impact: DragImpact,
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
@@ -37,6 +39,7 @@ export default ({
   isMovingForward,
   draggableId,
   impact,
+  center,
   draggables,
   droppables,
 }: JumpToNextArgs): ?JumpToNextResult => {
@@ -54,6 +57,9 @@ export default ({
   const insideDroppable: DraggableDimension[] = getDraggablesInsideDroppable(
     droppable,
     draggables,
+    { draggableId,
+      center,
+    }
   );
 
   const startIndex: number = getIndex(insideDroppable, draggable);

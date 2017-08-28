@@ -25,7 +25,9 @@ type ImpactArgs = {|
   page: Position,
   // used for comparison with other dimensions
   withinDroppable: WithinDroppable,
+  // item being dragged
   draggableId: DraggableId,
+  // all dimensions in system
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap
 |}
@@ -48,14 +50,14 @@ export default ({
 
   const newCenter = withinDroppable.center;
   const draggingDimension: DraggableDimension = draggables[draggableId];
-  const droppableDimension: DroppableDimension = droppables[droppableId];
+  const droppable: DroppableDimension = droppables[droppableId];
 
   const insideDroppable: DraggableDimension[] = getDraggablesInsideDroppable(
-    droppableDimension,
+    droppable,
     draggables,
   );
 
-  const axis: Axis = droppableDimension.axis;
+  const axis: Axis = droppable.axis;
 
   // not considering margin so that items move based on visible edges
   const draggableCenter: Position = draggingDimension.page.withoutMargin.center;
