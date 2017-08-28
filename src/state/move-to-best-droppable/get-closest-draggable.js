@@ -25,7 +25,7 @@ export default ({
     const distanceToB = distance(center, add(b.page.withMargin.center, scrollOffset));
 
     // if a is closer - return a
-    if (distanceToA > distanceToB) {
+    if (distanceToA < distanceToB) {
       return -1;
     }
 
