@@ -20,7 +20,7 @@ import type {
   Provided as DragHandleProvided,
 } from '../drag-handle/drag-handle-types';
 import getCenterPosition from '../get-center-position';
-import Placeholder from './placeholder';
+import Placeholder from '../placeholder';
 import { droppableIdKey } from '../context-keys';
 import { add } from '../../state/position';
 import type {

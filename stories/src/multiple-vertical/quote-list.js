@@ -14,7 +14,8 @@ import type {
   StateSnapshot as DraggableStateSnapshot,
 } from '../../../src/view/draggable/draggable-types';
 
-const Container = styled.div`
+const Wrapper = styled.div`
+  width: 250px;
   background-color: ${({ isDraggingOver }) => (isDraggingOver ? colors.blue.lighter : colors.blue.light)};
   display: flex;
   flex-direction: column;
@@ -22,7 +23,11 @@ const Container = styled.div`
   padding-bottom: 0;
   user-select: none;
   transition: background-color 0.1s ease;
-  width: 250px;
+`;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
 const Title = styled.h4`
@@ -42,28 +47,31 @@ export default class QuoteList extends Component {
     return (
       <Droppable droppableId={listId} type={listType}>
         {(dropProvided: DroppableProvided, dropSnapshot: DroppableStateSnapshot) => (
-          <Container
-            isDraggingOver={dropSnapshot.isDraggingOver}
-            innerRef={dropProvided.innerRef}
-            style={style}
-          >
-            <Title>{listId}</Title>
-            {quotes.map((quote: Quote) => (
-              <Draggable key={quote.id} draggableId={quote.id} type={listType}>
-                {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
-                  <div>
-                    <QuoteItem
-                      key={quote.id}
-                      quote={quote}
-                      isDragging={dragSnapshot.isDragging}
-                      provided={dragProvided}
-                    />
-                    {dragProvided.placeholder}
-                  </div>
+          <Wrapper>
+            <Container
+              isDraggingOver={dropSnapshot.isDraggingOver}
+              innerRef={dropProvided.innerRef}
+              style={style}
+            >
+              <Title>{listId}</Title>
+              {quotes.map((quote: Quote) => (
+                <Draggable key={quote.id} draggableId={quote.id} type={listType}>
+                  {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
+                    <div>
+                      <QuoteItem
+                        key={quote.id}
+                        quote={quote}
+                        isDragging={dragSnapshot.isDragging}
+                        provided={dragProvided}
+                      />
+                      {dragProvided.placeholder}
+                    </div>
                 )}
-              </Draggable>
+                </Draggable>
             ))}
-          </Container>
+            </Container>
+            {dropProvided.placeholder}
+          </Wrapper>
         )}
       </Droppable>
     );
