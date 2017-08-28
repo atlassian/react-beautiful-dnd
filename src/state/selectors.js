@@ -52,7 +52,7 @@ export const draggingDraggableSelector = createSelector([
       return null;
     }
 
-    const draggable: DraggableDimension = draggables[pending.result.destination.id];
+    const draggable: DraggableDimension = draggables[pending.result.draggableId];
     return draggable;
   }
 

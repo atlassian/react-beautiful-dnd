@@ -23,9 +23,16 @@ const Wrapper = styled.div`
   padding-bottom: 0;
   user-select: none;
   transition: background-color 0.1s ease;
+
+  /* stop the list collapsing when empty */
+  min-height: 150px;
 `;
 
 const Container = styled.div`
+  /* flex child */
+  flex-grow: 1;
+
+  /* flex parent */
   display: flex;
   flex-direction: column;
 `;
@@ -47,11 +54,12 @@ export default class QuoteList extends Component {
     return (
       <Droppable droppableId={listId} type={listType}>
         {(dropProvided: DroppableProvided, dropSnapshot: DroppableStateSnapshot) => (
-          <Wrapper>
+          <Wrapper
+            style={style}
+            isDraggingOver={dropSnapshot.isDraggingOver}
+          >
             <Container
-              isDraggingOver={dropSnapshot.isDraggingOver}
               innerRef={dropProvided.innerRef}
-              style={style}
             >
               <Title>{listId}</Title>
               {quotes.map((quote: Quote) => (

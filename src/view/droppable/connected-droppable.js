@@ -66,7 +66,7 @@ export const makeSelector = () => {
 
       const placeholder: Placeholder = {
         width: draggable.page.withMargin.width,
-        height: draggable.page.withoutMargin.height,
+        height: draggable.page.withMargin.height,
       };
 
       return placeholder;
