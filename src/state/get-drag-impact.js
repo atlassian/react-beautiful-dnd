@@ -130,8 +130,6 @@ export default ({
     isBeyondStartPosition: shouldDisplaceItemsForward,
   };
 
-  console.log('destination', { droppableId, index });
-
   const impact: DragImpact = {
     movement,
     direction: axis.direction,

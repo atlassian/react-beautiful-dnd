@@ -25,16 +25,11 @@ const Root = styled.div`
 `;
 
 const Column = styled.div`
-
+  margin: 0 ${grid * 2}px;
 `;
 
 const PushDown = styled.div`
   height: 200px;
-`;
-
-const ScrollContainer = styled.div`
-  overflow: auto;
-  height: 400px;
 `;
 
 const isDraggingClassName = 'is-dragging';
@@ -48,7 +43,6 @@ type GroupedQuotes = {
 
 type Props = {|
   initial: GroupedQuotes,
-  listStyle?: Object,
 |}
 
 type State = {|
@@ -127,10 +121,6 @@ export default class QuoteApp extends Component {
 
   render() {
     const { quotes } = this.state;
-    const style = {
-      ...this.props.listStyle,
-      margin: '0 20px',
-    };
 
     return (
       <DragDropContext
@@ -142,7 +132,6 @@ export default class QuoteApp extends Component {
             <QuoteList
               listId="alpha"
               listType="card"
-              style={style}
               quotes={quotes.alpha}
             />
           </Column>
@@ -151,27 +140,28 @@ export default class QuoteApp extends Component {
             <QuoteList
               listId="beta"
               listType="card"
-              style={style}
               quotes={quotes.beta}
             />
-            <ScrollContainer>
-              <QuoteList
-                listId="gamma"
-                listType="card"
-                style={style}
-                quotes={quotes.gamma}
-              />
-            </ScrollContainer>
+            <QuoteList
+              listId="gamma"
+              listType="card"
+              style={{
+                overflow: 'auto',
+                height: 400,
+              }}
+              quotes={quotes.gamma}
+            />
           </Column>
           <Column>
-            <ScrollContainer>
-              <QuoteList
-                listId="delta"
-                listType="card"
-                style={style}
-                quotes={quotes.delta}
-              />
-            </ScrollContainer>
+            <QuoteList
+              listId="delta"
+              listType="card"
+              style={{
+                overflow: 'auto',
+                height: 400,
+              }}
+              quotes={quotes.delta}
+            />
           </Column>
         </Root>
       </DragDropContext>
