@@ -60,6 +60,8 @@ export default ({
   // not considering margin so that items move based on visible edges
   const draggableCenter: Position = draggingDimension.page.withoutMargin.center;
   const isBeyondStartPosition: boolean = newCenter[axis.line] - draggableCenter[axis.line] > 0;
+  const isWithinHomeDroppable = draggingDimension.droppableId === droppableId;
+  const shouldDisplaceItemsForward = isWithinHomeDroppable ? isBeyondStartPosition : false;
 
   const moved: DraggableId[] = insideDroppable
     .filter((dimension: DraggableDimension): boolean => {
@@ -69,6 +71,12 @@ export default ({
       }
 
       const fragment: DimensionFragment = dimension.page.withoutMargin;
+
+      // If we're over a new droppable items will be displaced
+      // if they sit ahead of the dragging item
+      if (!isWithinHomeDroppable) {
+        return newCenter[axis.line] < fragment[axis.end];
+      }
 
       if (isBeyondStartPosition) {
         // 1. item needs to start ahead of the moving item
@@ -92,6 +100,10 @@ export default ({
 
   const startIndex = insideDroppable.indexOf(draggingDimension);
   const index: number = (() => {
+    if (!isWithinHomeDroppable) {
+      return insideDroppable.length - moved.length;
+    }
+
     if (!moved.length) {
       return startIndex;
     }
@@ -113,7 +125,7 @@ export default ({
   const movement: DragMovement = {
     amount,
     draggables: moved,
-    isBeyondStartPosition,
+    isBeyondStartPosition: shouldDisplaceItemsForward,
   };
 
   const impact: DragImpact = {

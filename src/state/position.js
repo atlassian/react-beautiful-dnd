@@ -20,9 +20,13 @@ export const negate = (point: Position): Position => ({
   y: point.y !== 0 ? -point.y : 0,
 });
 
-export const patch = (line: 'x' | 'y', value: number): Position => ({
-  x: line === 'x' ? value : 0,
-  y: line === 'y' ? value : 0,
+export const patch = (
+  line: 'x' | 'y',
+  value: number,
+  otherValue?: number = 0
+): Position => ({
+  [line]: value,
+  [line === 'x' ? 'y' : 'x']: otherValue,
 });
 
 // Returns the distance between two points
