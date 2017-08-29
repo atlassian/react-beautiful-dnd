@@ -15,5 +15,4 @@ export const droppableMapToList = memoizeOne(
 export const draggableMapToList = memoizeOne(
   (draggables: DraggableDimensionMap) =>
     Object.keys(draggables).map((id: DraggableId) => draggables[id])
-)
-;
+);
