@@ -2,7 +2,6 @@
 import memoizeOne from 'memoize-one';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import type { Selector } from 'reselect';
 import {
   dragSelector,
   pendingDropSelector,
@@ -36,6 +35,7 @@ import type {
   MapProps,
   OwnProps,
   DispatchProps,
+  Selector,
 } from './draggable-types';
 
 const origin: Position = { x: 0, y: 0 };
@@ -55,7 +55,7 @@ const defaultMapProps: MapProps = {
   direction: null,
 };
 
-export const makeSelector = (): Selector<State, OwnProps, MapProps> => {
+export const makeSelector = (): Selector => {
   const idSelector = (state: State, ownProps: OwnProps): DraggableId => ownProps.draggableId;
   const typeSelector = (state: State, ownProps: OwnProps): TypeId => ownProps.type || 'DEFAULT';
 
@@ -221,7 +221,7 @@ export const makeSelector = (): Selector<State, OwnProps, MapProps> => {
 };
 
 const makeMapStateToProps = () => {
-  const selector = makeSelector();
+  const selector: Selector = makeSelector();
   return (state: State, props: OwnProps) => selector(state, props);
 };
 

@@ -24,7 +24,7 @@ import type {
   InitialDragLocation,
   CurrentDragLocation,
 } from '../../../src/types';
-import type { MapProps, Provided } from '../../../src/view/draggable/draggable-types';
+import type { MapProps, Provided, Selector } from '../../../src/view/draggable/draggable-types';
 
 const droppableId: DroppableId = 'drop-1';
 const origin: Position = { x: 0, y: 0 };
@@ -44,7 +44,7 @@ const make = (() => {
     const type: TypeId = params.type;
     callCount++;
     const id: DraggableId = `drag-id-${callCount}`;
-    const selector = makeSelector();
+    const selector: Selector = makeSelector();
     const dimension: DraggableDimension = getDraggableDimension({
       id,
       droppableId,
@@ -163,7 +163,7 @@ const defaultMapProps: MapProps = {
   direction: null,
 };
 
-type SelectorArgs = {|
+type ExecuteArgs = {|
   id: DraggableId,
   phase: Phase,
   type: TypeId,
@@ -172,8 +172,8 @@ type SelectorArgs = {|
   dimension: ?DraggableDimension,
 |}
 
-const execute = (selector: Function) =>
-  ({ phase, drag, pending, id, dimension, type }: SelectorArgs): MapProps =>
+const execute = (selector: Selector) =>
+  ({ phase, drag, pending, id, dimension, type }: ExecuteArgs): MapProps =>
     selector.resultFunc(
       id,
       type,
