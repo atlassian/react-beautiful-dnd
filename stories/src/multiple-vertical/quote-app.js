@@ -145,10 +145,7 @@ export default class QuoteApp extends Component {
             <QuoteList
               listId="gamma"
               listType="card"
-              style={{
-                overflow: 'auto',
-                height: 400,
-              }}
+              internalScroll
               quotes={quotes.gamma}
             />
           </Column>
@@ -156,10 +153,7 @@ export default class QuoteApp extends Component {
             <QuoteList
               listId="delta"
               listType="card"
-              style={{
-                overflow: 'auto',
-                height: 400,
-              }}
+              internalScroll
               quotes={quotes.delta}
             />
           </Column>

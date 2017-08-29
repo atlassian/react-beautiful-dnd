@@ -1,7 +1,7 @@
 // @flow
 import getNewHomeClientOffset from '../../../src/state/get-new-home-client-offset';
 import noImpact from '../../../src/state/no-impact';
-import { getDraggableDimension } from '../../../src/state/dimension';
+import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
 import { add, negate, subtract } from '../../../src/state/position';
 import getClientRect from '../../utils/get-client-rect';
 import { vertical, horizontal } from '../../../src/state/axis';
@@ -11,6 +11,7 @@ import type {
   Position,
   DraggableDimension,
   DraggableDimensionMap,
+  DroppableDimension,
 } from '../../../src/types';
 
 const origin: Position = { x: 0, y: 0 };
@@ -20,6 +21,7 @@ let draggable2: DraggableDimension;
 let draggable3: DraggableDimension;
 let draggables: DraggableDimensionMap;
 let draggableId;
+let destinationDroppable: DroppableDimension;
 
 const getDistanceOverDraggables = dimension => arr => ({
   [dimension === 'height' ? 'y' : 'x']: arr.reduce(
@@ -76,6 +78,16 @@ describe('get new home client offset', () => {
     };
 
     draggableId = Object.keys(draggables)[0];
+
+    destinationDroppable = getDroppableDimension({
+      id: droppableId,
+      clientRect: getClientRect({
+        top: 0,
+        left: 0,
+        bottom: 600,
+        right: 100,
+      }),
+    });
   });
 
   afterEach(() => {
@@ -105,13 +117,13 @@ describe('get new home client offset', () => {
         windowScrollDiff,
         draggables,
         draggableId,
-        axis: vertical,
+        destinationDroppable,
       });
 
       expect(result).toEqual(add(droppableScrollDiff, windowScrollDiff));
     });
 
-    it('should return the total scroll diff if no axis is provided', () => {
+    it('should return the total scroll diff if no destination is provided', () => {
       const offset: Position = {
         x: 100,
         y: 200,
@@ -143,12 +155,10 @@ describe('get new home client offset', () => {
         windowScrollDiff,
         draggables,
         draggableId,
-        axis: null,
+        destinationDroppable: null,
       });
 
       expect(result).toEqual(add(droppableScrollDiff, windowScrollDiff));
-      // this is an error situation
-      expect(console.error).toHaveBeenCalled();
     });
 
     describe('moving forward', () => {
@@ -197,7 +207,7 @@ describe('get new home client offset', () => {
           windowScrollDiff: origin,
           draggables,
           draggableId,
-          axis: vertical,
+          destinationDroppable,
         });
 
         expect(newHomeOffset).toEqual(expected);
@@ -234,7 +244,7 @@ describe('get new home client offset', () => {
           windowScrollDiff: origin,
           draggables,
           draggableId,
-          axis: vertical,
+          destinationDroppable,
         });
 
         expect(newHomeOffset).toEqual(expected);
@@ -272,7 +282,7 @@ describe('get new home client offset', () => {
           windowScrollDiff,
           draggables,
           draggableId,
-          axis: vertical,
+          destinationDroppable,
         });
 
         expect(newHomeOffset).toEqual(expected);
@@ -327,7 +337,7 @@ describe('get new home client offset', () => {
           windowScrollDiff: origin,
           draggables,
           draggableId,
-          axis: vertical,
+          destinationDroppable,
         });
 
         expect(newHomeOffset).toEqual(expected);
@@ -365,7 +375,7 @@ describe('get new home client offset', () => {
           windowScrollDiff: origin,
           draggables,
           draggableId,
-          axis: vertical,
+          destinationDroppable,
         });
 
         expect(newHomeOffset).toEqual(expected);
@@ -404,7 +414,7 @@ describe('get new home client offset', () => {
           windowScrollDiff: origin,
           draggables,
           draggableId,
-          axis: vertical,
+          destinationDroppable,
         });
 
         expect(newHomeOffset).toEqual(expected);
@@ -457,6 +467,17 @@ describe('get new home client offset', () => {
       };
 
       draggableId = Object.keys(draggables)[0];
+
+      destinationDroppable = getDroppableDimension({
+        id: droppableId,
+        direction: 'horizontal',
+        clientRect: getClientRect({
+          top: 0,
+          left: 0,
+          bottom: 100,
+          right: 500,
+        }),
+      });
     });
 
     it('should return to the total scroll diff if nothing has moved', () => {
@@ -481,13 +502,13 @@ describe('get new home client offset', () => {
         windowScrollDiff,
         draggables,
         draggableId,
-        axis: horizontal,
+        destinationDroppable,
       });
 
       expect(result).toEqual(add(droppableScrollDiff, windowScrollDiff));
     });
 
-    it('should return the total scroll diff is no axis is provided', () => {
+    it('should return the total scroll diff is no destination is provided', () => {
       const offset: Position = {
         x: 100,
         y: 200,
@@ -519,12 +540,10 @@ describe('get new home client offset', () => {
         windowScrollDiff,
         draggables,
         draggableId,
-        axis: null,
+        destinationDroppable: null,
       });
 
       expect(result).toEqual(add(droppableScrollDiff, windowScrollDiff));
-      // this is an error situation
-      expect(console.error).toHaveBeenCalled();
     });
 
     describe('moving forward', () => {
@@ -573,7 +592,7 @@ describe('get new home client offset', () => {
           windowScrollDiff: origin,
           draggables,
           draggableId,
-          axis: horizontal,
+          destinationDroppable,
         });
 
         expect(newHomeOffset).toEqual(expected);
@@ -610,7 +629,7 @@ describe('get new home client offset', () => {
           windowScrollDiff: origin,
           draggables,
           draggableId,
-          axis: horizontal,
+          destinationDroppable,
         });
 
         expect(newHomeOffset).toEqual(expected);
@@ -648,7 +667,7 @@ describe('get new home client offset', () => {
           windowScrollDiff,
           draggables,
           draggableId,
-          axis: horizontal,
+          destinationDroppable,
         });
 
         expect(newHomeOffset).toEqual(expected);
@@ -705,7 +724,7 @@ describe('get new home client offset', () => {
           windowScrollDiff: origin,
           draggables,
           draggableId,
-          axis: horizontal,
+          destinationDroppable,
         });
 
         expect(newHomeOffset).toEqual(expected);
@@ -743,7 +762,7 @@ describe('get new home client offset', () => {
           windowScrollDiff: origin,
           draggables,
           draggableId,
-          axis: horizontal,
+          destinationDroppable,
         });
 
         expect(newHomeOffset).toEqual(expected);
@@ -782,7 +801,7 @@ describe('get new home client offset', () => {
           windowScrollDiff: origin,
           draggables,
           draggableId,
-          axis: horizontal,
+          destinationDroppable,
         });
 
         expect(newHomeOffset).toEqual(expected);

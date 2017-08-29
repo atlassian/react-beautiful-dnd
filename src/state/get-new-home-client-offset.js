@@ -4,8 +4,8 @@ import type {
   Position,
   DimensionFragment,
   DraggableDimensionMap,
+  DroppableDimension,
   DraggableId,
-  Axis,
 } from '../types';
 import { add, subtract, patch } from './position';
 
@@ -17,8 +17,7 @@ type NewHomeArgs = {|
   droppableScrollDiff: Position,
   windowScrollDiff: Position,
   draggables: DraggableDimensionMap,
-  // axis of the destination droppable
-  axis: ?Axis,
+  destinationDroppable: ?DroppableDimension,
 |}
 
 type ClientOffset = Position;
@@ -32,47 +31,88 @@ export default ({
   draggableId,
   droppableScrollDiff,
   windowScrollDiff,
+  destinationDroppable,
   draggables,
-  axis,
 }: NewHomeArgs): ClientOffset => {
   const { draggables: movedDraggables, isBeyondStartPosition } = movement;
+  const draggedItem = draggables[draggableId];
+  const isWithinHomeDroppable = destinationDroppable &&
+    destinationDroppable.id === draggedItem.droppableId;
 
-  // Just animate back to where it started
-  if (!movedDraggables.length) {
+  // If there's no destination or if no movement has occurred, return the starting position.
+  if (
+    !destinationDroppable ||
+    (isWithinHomeDroppable && !movedDraggables.length)
+  ) {
     return add(droppableScrollDiff, windowScrollDiff);
   }
 
-  if (!axis) {
-    console.error('should not have any movement if there is no axis');
-    return add(droppableScrollDiff, windowScrollDiff);
-  }
+  const {
+    axis,
+    id: destinationDroppableId,
+    page: destinationDroppablePage,
+  } = destinationDroppable;
+
+  // All the draggables in the destination (even the ones that haven't moved)
+  const draggablesInDestination = Object.keys(draggables).filter(
+    thisDraggableId => draggables[thisDraggableId].droppableId === destinationDroppableId
+  );
 
   // The dimension of the item being dragged
-  const draggedDimension: DimensionFragment = draggables[draggableId].client.withMargin;
-  // The index of the last item being displaced
-  const displacedIndex: number = isBeyondStartPosition ? movedDraggables.length - 1 : 0;
-  // The dimension of the last item being displaced
-  const displacedDimension: DimensionFragment = draggables[
-    movedDraggables[displacedIndex]
-  ].client.withMargin;
+  const draggedDimension: DimensionFragment = draggedItem.client.withMargin;
 
-  // Find the difference between the center of the dragging item
-  // and the center of the last item being displaced
-  const distanceToDisplacedCenter: Position = subtract(
-    displacedDimension.center,
-    draggedDimension.center
-  );
+  // Find the dimension we need to compare the dragged item with
+  const destinationDimension: DimensionFragment = (() => {
+    // If we're not dragging into an empty list
+    if (movedDraggables.length) {
+      // The index of the last item being displaced
+      const displacedIndex: number = isBeyondStartPosition ? movedDraggables.length - 1 : 0;
+      // Return the dimension of the last item being displaced
+      return draggables[
+        movedDraggables[displacedIndex]
+      ].client.withMargin;
+    }
 
-  // To account for items of different sizes we need to adjust the offset
-  // between their center points by half their size difference
-  const mainAxisSizeDifference: number = (
-    ((draggedDimension[axis.size] - displacedDimension[axis.size]) / 2)
-    * (isBeyondStartPosition ? -1 : 1)
-  );
-  const mainAxisSizeOffset: Position = patch(axis.line, mainAxisSizeDifference);
+    // If we're dragging to the last place in a new droppable
+    // which has items in it (but which haven't moved)
+    if (draggablesInDestination.length) {
+      return draggables[
+        draggablesInDestination[draggablesInDestination.length - 1]
+      ].client.withMargin;
+    }
+
+    // Otherwise, return the dimension of the empty droppable
+    return destinationDroppablePage.withMargin;
+  })();
+
+  // The main axis edge to compare
+  const mainAxisDistance: number = (() => {
+    // If we're moving in after the last draggable in a new droppable
+    // we match our start edge to its end edge
+    if (
+      !isWithinHomeDroppable &&
+      !movedDraggables.length &&
+      draggablesInDestination.length
+    ) {
+      return destinationDimension[axis.end] - draggedDimension[axis.start];
+    }
+
+    // If we're moving forwards in our own list we match end edges
+    if (isBeyondStartPosition) {
+      return destinationDimension[axis.end] - draggedDimension[axis.end];
+    }
+
+    // If we're moving backwards in our own list or into a new list
+    // we match start edges
+    return destinationDimension[axis.start] - draggedDimension[axis.start];
+  })();
+
+  // The difference along the cross axis
+  const crossAxisDistance: number = destinationDimension[axis.crossAxisStart] -
+    draggedDimension[axis.crossAxisStart];
 
   // Finally, this is how far the dragged item has to travel to be in its new home
-  const amount: Position = add(distanceToDisplacedCenter, mainAxisSizeOffset);
+  const amount: Position = patch(axis.line, mainAxisDistance, crossAxisDistance);
 
   // How far away it is on the page from where it needs to be
   const diff: Position = subtract(amount, pageOffset);

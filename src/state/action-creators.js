@@ -17,7 +17,7 @@ import type {
 } from '../types';
 import noImpact from './no-impact';
 import getNewHomeClientOffset from './get-new-home-client-offset';
-import { add, subtract, isEqual, patch } from './position';
+import { add, subtract, isEqual } from './position';
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -303,9 +303,9 @@ export const drop = () =>
     };
 
     const scrollDiff = getScrollDiff(
-        initial,
-        current,
-        sourceDroppable,
+      initial,
+      current,
+      sourceDroppable,
     );
 
     const newHomeOffset: Position = getNewHomeClientOffset({
@@ -315,7 +315,7 @@ export const drop = () =>
       droppableScrollDiff: scrollDiff.droppable,
       windowScrollDiff: scrollDiff.window,
       draggables: state.dimension.draggable,
-      axis: destinationDroppable ? destinationDroppable.axis : null,
+      destinationDroppable,
       draggableId: current.id,
     });
 
