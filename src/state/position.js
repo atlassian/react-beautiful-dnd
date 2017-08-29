@@ -20,10 +20,15 @@ export const negate = (point: Position): Position => ({
   y: point.y !== 0 ? -point.y : 0,
 });
 
+export const absolute = (point: Position): Position => ({
+  x: Math.abs(point.x),
+  y: Math.abs(point.y),
+});
+
 // Allows you to build a position from values.
 // Really useful when working with the Axis type
 // patch('x', 5)    = { x: 5, y: 0 }
-// patch('x', 5, 1) = { x: 5, y: 1 }
+// patch('y', 5, 1) = { x: 1, y: 5 }
 export const patch = (
   line: 'x' | 'y',
   value: number,

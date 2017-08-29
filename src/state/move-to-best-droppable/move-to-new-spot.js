@@ -1,5 +1,6 @@
 // @flow
 import { subtract, patch } from '../position';
+import moveToEdge from '../move-to-edge';
 import type {
   Axis,
   Position,
@@ -10,7 +11,7 @@ import type {
 } from '../../types';
 
 type Args = {|
-  // the center position of the current draggable
+  // the current center position of the draggable
   center: Position,
   // the draggable that is dragging and needs to move
   draggable: DraggableDimension,
@@ -25,9 +26,9 @@ type Args = {|
   draggables: DraggableDimensionMap,
 |}
 
-type Result = {|
+export type Result = {|
   // how far the draggable needs to move to be in its new home
-  diff: Position,
+  center: Position,
   // The impact of the movement
   impact: DragImpact,
 |}
@@ -50,11 +51,13 @@ export default ({
 
     // start edge of draggable needs to line up
     // with start edge of destination
-    const newHome: Position = {
-
-    };
-
-    const diff: Position = subtract(center, newHome);
+    const newCenter: Position = moveToEdge({
+      source: draggable,
+      sourceEdge: 'start',
+      destination: destination.page.withMargin,
+      destinationEdge: 'start',
+      destinationAxis,
+    });
 
     const impact: DragImpact = {
       movement: {
@@ -71,7 +74,8 @@ export default ({
     };
 
     return {
-      diff, impact,
+      center: newCenter,
+      impact,
     };
   }
 
@@ -81,8 +85,39 @@ export default ({
   // Then need to move the target and everything after it forward
   // 2. If is going after: need to move draggable start edge to the end of the target
   // Then need to move everything after the target forward
-  const isGoingBefore: boolean = center[sourceAxis.line] <
+  const isGoingBeforeTarget: boolean = center[sourceAxis.line] <
     target.page.withMargin.center[sourceAxis.line];
 
-  const newHome =
+  console.log(`moving ${draggable.id}`);
+  console.log('source edge:', isGoingBeforeTarget ? 'end' : 'start');
+  console.log('destination edge:', isGoingBeforeTarget ? 'start' : 'end');
+
+  const newCenter: Position = moveToEdge({
+    source: draggable,
+    // TODO: source edge will always be start - unless moving to home column?
+    sourceEdge: 'start',
+    destination: target.page.withMargin,
+    destinationEdge: isGoingBeforeTarget ? 'start' : 'end',
+    destinationAxis,
+  });
+
+  // TODO
+  const impact: DragImpact = {
+    movement: {
+      draggables: [],
+      amount: { x: 0, y: 0 },
+      // TODO: not sure what this should be
+      isBeyondStartPosition: false,
+    },
+    direction: destinationAxis.direction,
+    destination: {
+      droppableId: destination.id,
+      index: 0,
+    },
+  };
+
+  return {
+    center: newCenter,
+    impact,
+  };
 };

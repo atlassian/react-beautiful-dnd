@@ -24,6 +24,7 @@ import { add, subtract, negate } from './position';
 import getDragImpact from './get-drag-impact';
 import jumpToNextIndex from './jump-to-next-index';
 import type { JumpToNextResult } from './jump-to-next-index';
+import type { Result as MoveToNewSpotResult } from './move-to-best-droppable/move-to-new-spot';
 import getDroppableOver from './get-droppable-over';
 import moveToBestDroppable from './move-to-best-droppable/';
 
@@ -461,7 +462,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const center: Position = current.page.center;
     const droppableId: DroppableId = state.drag.impact.destination.droppableId;
 
-    const result: ?mixed = moveToBestDroppable({
+    const result: ?MoveToNewSpotResult = moveToBestDroppable({
       isMovingForward: action.type === 'CROSS_AXIS_MOVE_FORWARD',
       center,
       draggableId,
