@@ -64,7 +64,7 @@ export default class Column extends Component {
               </Header>
               <CardList
                 listId={column.author.id}
-                listType={column.author.id}
+                listType="QUOTE"
                 quotes={column.quotes}
               />
             </Container>

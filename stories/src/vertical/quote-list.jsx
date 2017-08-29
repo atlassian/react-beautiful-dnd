@@ -25,6 +25,16 @@ const Container = styled.div`
   width: 250px;
 `;
 
+const AddCard = styled.button`
+  margin-bottom: ${grid}px;
+  margin-top: ${grid}px;
+  outline: none;
+  border: none;
+  font-size: 14px;
+  text-align: left;
+  padding: ${grid * 1.5}px ${grid}px;
+`;
+
 export default class QuoteList extends Component {
   props: {|
     listId: string,
@@ -58,6 +68,10 @@ export default class QuoteList extends Component {
                 )}
               </Draggable>
             ))}
+            {dropProvided.placeholder}
+            <AddCard>
+              Add a card...
+            </AddCard>
           </Container>
         )}
       </Droppable>
