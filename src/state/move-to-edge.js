@@ -52,7 +52,8 @@ export default ({
 
   const signed: Position = patch(
     destinationAxis.line,
-    (sourceEdge === 'start' ? 1 : -1) * centerDiff[destinationAxis.line],
+    // if moving to the sourceEdge then we need to pull backwards on the main axis
+    (sourceEdge === 'end' ? -1 : 1) * centerDiff[destinationAxis.line],
     centerDiff[destinationAxis.crossLine],
   );
 

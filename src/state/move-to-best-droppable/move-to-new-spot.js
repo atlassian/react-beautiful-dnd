@@ -97,7 +97,7 @@ export default ({
   console.log('destination edge:', isGoingBeforeTarget ? 'start' : 'end');
 
   const newCenter: Position = moveToEdge({
-    source: draggable.page.withMargin,
+    source: draggable.page.withoutMargin,
     // TODO: source edge will always be start - unless moving to home column?
     sourceEdge: 'start',
     destination: target.page.withMargin,
