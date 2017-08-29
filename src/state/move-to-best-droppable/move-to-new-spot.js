@@ -43,6 +43,10 @@ export default ({
 }: Args): Result => {
   const destinationAxis: Axis = destination.axis;
   const sourceAxis: Axis = source.axis;
+  const amount: Position = patch(
+    destinationAxis.line,
+    draggable.page.withMargin[destinationAxis.size]
+  );
   // 1. Moving to an empty droppable
 
   if (!target) {
@@ -52,7 +56,7 @@ export default ({
     // start edge of draggable needs to line up
     // with start edge of destination
     const newCenter: Position = moveToEdge({
-      source: draggable,
+      source: draggable.page.withMargin,
       sourceEdge: 'start',
       destination: destination.page.withMargin,
       destinationEdge: 'start',
@@ -62,7 +66,7 @@ export default ({
     const impact: DragImpact = {
       movement: {
         draggables: [],
-        amount: patch(destinationAxis.line, draggable.page.withMargin[destinationAxis.size]),
+        amount,
         // TODO: not sure what this should be
         isBeyondStartPosition: false,
       },
@@ -93,7 +97,7 @@ export default ({
   console.log('destination edge:', isGoingBeforeTarget ? 'start' : 'end');
 
   const newCenter: Position = moveToEdge({
-    source: draggable,
+    source: draggable.page.withMargin,
     // TODO: source edge will always be start - unless moving to home column?
     sourceEdge: 'start',
     destination: target.page.withMargin,
@@ -105,7 +109,7 @@ export default ({
   const impact: DragImpact = {
     movement: {
       draggables: [],
-      amount: { x: 0, y: 0 },
+      amount,
       // TODO: not sure what this should be
       isBeyondStartPosition: false,
     },
