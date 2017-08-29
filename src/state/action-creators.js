@@ -195,7 +195,7 @@ export type CrossAxisMoveForwardAction = {|
   payload: DraggableId
 |}
 
-export const crossAxisMoveForward = (id: DraggableId): MoveForwardAction => ({
+export const crossAxisMoveForward = (id: DraggableId): CrossAxisMoveForwardAction => ({
   type: 'CROSS_AXIS_MOVE_FORWARD',
   payload: id,
 });
@@ -205,7 +205,7 @@ export type CrossAxisMoveBackwardAction = {|
   payload: DraggableId
 |}
 
-export const crossAxisMoveBackward = (id: DraggableId): MoveForwardAction => ({
+export const crossAxisMoveBackward = (id: DraggableId): CrossAxisMoveBackwardAction => ({
   type: 'CROSS_AXIS_MOVE_BACKWARD',
   payload: id,
 });
