@@ -50,18 +50,18 @@ export default ({
     return null;
   }
 
-  const newSiblings: DraggableDimension[] = getDraggablesInsideDroppable(
+  // const newSiblings: DraggableDimension[] = getDraggablesInsideDroppable(
+  //   destination,
+  //   draggables,
+  // );
+
+  const target: ?DraggableDimension = getClosestDraggable({
+    axis: destination.axis,
+    center,
+    scrollOffset: destination.scroll.current,
     destination,
     draggables,
-  );
-
-  const target: ?DraggableDimension = newSiblings.length ?
-    getClosestDraggable({
-      axis: destination.axis,
-      center,
-      scrollOffset: destination.scroll.current,
-      draggables: newSiblings,
-    }) : null;
+  });
 
   return moveToNewSpot({
     center,

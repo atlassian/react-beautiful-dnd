@@ -92,10 +92,6 @@ export default ({
   const isGoingBeforeTarget: boolean = center[sourceAxis.line] <
     target.page.withMargin.center[sourceAxis.line];
 
-  console.log(`moving ${draggable.id}`);
-  console.log('source edge:', isGoingBeforeTarget ? 'end' : 'start');
-  console.log('destination edge:', isGoingBeforeTarget ? 'start' : 'end');
-
   const newCenter: Position = moveToEdge({
     source: draggable.page.withoutMargin,
     // TODO: source edge will always be start - unless moving to home column?
@@ -104,6 +100,10 @@ export default ({
     destinationEdge: isGoingBeforeTarget ? 'start' : 'end',
     destinationAxis,
   });
+
+  // const targetIndex: number = getDraggablesInDroppable(
+  //   target, dragg
+  // );
 
   // TODO
   const impact: DragImpact = {

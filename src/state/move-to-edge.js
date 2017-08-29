@@ -41,7 +41,6 @@ export default ({
 
   // 1. Find the intersection corner point
   // 2. add the difference between that point and the center of the dimension
-
   const corner: Position = getCorner(destination);
 
   // the difference between the center of the draggable and its corner
