@@ -305,7 +305,7 @@ export const drop = () =>
     const scrollDiff = getScrollDiff(
       initial,
       current,
-      sourceDroppable,
+      destinationDroppable || sourceDroppable,
     );
 
     const newHomeOffset: Position = getNewHomeClientOffset({

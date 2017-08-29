@@ -17,6 +17,24 @@ import getDroppableOver from './get-droppable-over';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
 import noImpact from './no-impact';
 
+// Calculates the net scroll diff along the main axis
+// between two droppables with internal scrolling
+const getDroppablesScrollDiff = ({
+  sourceDroppable,
+  destinationDroppable,
+  line,
+}: {
+  sourceDroppable: DroppableDimension,
+  destinationDroppable: DroppableDimension,
+  line: 'x' | 'y',
+}): number => {
+  const sourceScrollDiff = sourceDroppable.scroll.initial[line] -
+    sourceDroppable.scroll.current[line];
+  const destinationScrollDiff = destinationDroppable.scroll.initial[line] -
+    destinationDroppable.scroll.current[line];
+  return destinationScrollDiff - sourceScrollDiff;
+};
+
 // It is the responsibility of this function
 // to return the impact of a drag
 
@@ -77,7 +95,12 @@ export default ({
       // If we're over a new droppable items will be displaced
       // if they sit ahead of the dragging item
       if (!isWithinHomeDroppable) {
-        return newCenter[axis.line] < fragment[axis.end];
+        const scrollDiff = getDroppablesScrollDiff({
+          sourceDroppable: droppables[draggingDimension.droppableId],
+          destinationDroppable: droppable,
+          line: axis.line,
+        });
+        return (newCenter[axis.line] - scrollDiff) < fragment[axis.end];
       }
 
       if (isBeyondStartPosition) {

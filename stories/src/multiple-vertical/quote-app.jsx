@@ -132,6 +132,7 @@ export default class QuoteApp extends Component {
             <QuoteList
               listId="alpha"
               listType="card"
+              internalScroll
               quotes={quotes.alpha}
             />
           </Column>
