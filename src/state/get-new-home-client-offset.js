@@ -7,7 +7,7 @@ import type {
   DroppableDimension,
   DraggableId,
 } from '../types';
-import { add, subtract, patch } from './position';
+import { add, patch, subtract } from './position';
 
 type NewHomeArgs = {|
   movement: DragMovement,

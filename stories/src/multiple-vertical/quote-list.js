@@ -31,7 +31,8 @@ const DropZone = styled.div`
 `;
 
 const ScrollContainer = styled.div`
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   max-height: 400px;
 `;
 
@@ -57,7 +58,7 @@ export default class QuoteList extends Component {
     internalScroll?: boolean,
   |}
 
-  renderBoard = (dropProvided) => {
+  renderBoard = (dropProvided: DroppableProvided) => {
     const { listId, listType, quotes } = this.props;
 
     return (
