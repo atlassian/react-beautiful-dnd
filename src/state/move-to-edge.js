@@ -1,16 +1,15 @@
 // @flow
-import { absolute, add, patch, negate, subtract } from './position';
+import { absolute, add, patch, subtract } from './position';
 import type {
   Axis,
   Position,
-  DraggableDimension,
   DimensionFragment,
 } from '../types';
 
 type Edge = 'start' | 'end';
 
 type Args = {|
-  source: DraggableDimension,
+  source: DimensionFragment,
   sourceEdge: Edge,
   destination: DimensionFragment,
   destinationEdge: Edge,
@@ -47,13 +46,14 @@ export default ({
 
   // the difference between the center of the draggable and its corner
   const centerDiff = absolute(subtract(
-    source.page.withoutMargin.center,
-    getCorner(source.page.withoutMargin)
+    source.center,
+    getCorner(source)
   ));
 
   const signed: Position = patch(
     destinationAxis.line,
-    (sourceEdge === 'start' ? 1 : -1) * centerDiff[destinationAxis.line],
+    // if moving to the sourceEdge then we need to pull backwards on the main axis
+    (sourceEdge === 'end' ? -1 : 1) * centerDiff[destinationAxis.line],
     centerDiff[destinationAxis.crossLine],
   );
 
