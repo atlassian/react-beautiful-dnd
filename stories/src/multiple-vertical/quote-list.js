@@ -54,10 +54,40 @@ export default class QuoteList extends Component {
     quotes: Quote[],
     listType?: string,
     style?: Object,
+    internalScroll?: boolean,
   |}
 
+  renderBoard = (dropProvided) => {
+    const { listId, listType, quotes } = this.props;
+
+    return (
+      <Container>
+        <Title>{listId}</Title>
+        <DropZone innerRef={dropProvided.innerRef}>
+          {quotes.map((quote: Quote) => (
+            <Draggable key={quote.id} draggableId={quote.id} type={listType}>
+              {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
+                <div>
+                  <QuoteItem
+                    key={quote.id}
+                    quote={quote}
+                    isDragging={dragSnapshot.isDragging}
+                    provided={dragProvided}
+                  />
+                  {dragProvided.placeholder}
+                </div>
+            )}
+            </Draggable>
+          ))}
+          {dropProvided.placeholder}
+        </DropZone>
+      </Container>
+    );
+  }
+
   render() {
-    const { listId, listType, style, quotes } = this.props;
+    const { listId, listType, internalScroll, style } = this.props;
+
     return (
       <Droppable droppableId={listId} type={listType}>
         {(dropProvided: DroppableProvided, dropSnapshot: DroppableStateSnapshot) => (
@@ -65,29 +95,13 @@ export default class QuoteList extends Component {
             style={style}
             isDraggingOver={dropSnapshot.isDraggingOver}
           >
-            <ScrollContainer>
-              <Container>
-                <Title>{listId}</Title>
-                <DropZone innerRef={dropProvided.innerRef}>
-                  {quotes.map((quote: Quote) => (
-                    <Draggable key={quote.id} draggableId={quote.id} type={listType}>
-                      {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
-                        <div>
-                          <QuoteItem
-                            key={quote.id}
-                            quote={quote}
-                            isDragging={dragSnapshot.isDragging}
-                            provided={dragProvided}
-                          />
-                          {dragProvided.placeholder}
-                        </div>
-                    )}
-                    </Draggable>
-                  ))}
-                  {dropProvided.placeholder}
-                </DropZone>
-              </Container>
-            </ScrollContainer>
+            {internalScroll ? (
+              <ScrollContainer>
+                {this.renderBoard(dropProvided)}
+              </ScrollContainer>
+            ) : (
+              this.renderBoard(dropProvided)
+            )}
           </Wrapper>
         )}
       </Droppable>

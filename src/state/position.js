@@ -20,12 +20,18 @@ export const negate = (point: Position): Position => ({
   y: point.y !== 0 ? -point.y : 0,
 });
 
+// Allows you to build a position from values.
+// Really useful when working with the Axis type
+// patch('x', 5)    = { x: 5, y: 0 }
+// patch('x', 5, 1) = { x: 5, y: 1 }
 export const patch = (
   line: 'x' | 'y',
   value: number,
   otherValue?: number = 0
 ): Position => ({
+  // set the value of 'x', or 'y'
   [line]: value,
+  // set the value of the other line
   [line === 'x' ? 'y' : 'x']: otherValue,
 });
 

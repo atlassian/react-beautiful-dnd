@@ -42,7 +42,7 @@ export default ({
   center,
   draggables,
   droppables,
-}: JumpToNextArgs): ?JumpToNextResult => {
+  }: JumpToNextArgs): ?JumpToNextResult => {
   if (!impact.destination) {
     console.error('cannot move forward when there is not previous destination');
     return null;

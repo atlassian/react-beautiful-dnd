@@ -72,6 +72,11 @@ describe('position', () => {
     it('should patch a position with a x value', () => {
       expect(patch('y', 5)).toEqual({ x: 0, y: 5 });
     });
+
+    it('should allow patching of the non primary line', () => {
+      expect(patch('x', 5, 1)).toEqual({ x: 5, y: 1 });
+      expect(patch('y', 5, 1)).toEqual({ x: 1, y: 5 });
+    });
   });
 
   describe('distance', () => {

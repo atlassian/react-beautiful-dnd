@@ -461,7 +461,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const center: Position = current.page.center;
     const droppableId: DroppableId = state.drag.impact.destination.droppableId;
 
-    const offset: ?Position = moveToBestDroppable({
+    const result: ?mixed = moveToBestDroppable({
       isMovingForward: action.type === 'CROSS_AXIS_MOVE_FORWARD',
       center,
       draggableId,
@@ -470,17 +470,16 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       droppables: state.dimension.droppable,
     });
 
-    if (!offset) {
+    if (!result) {
       return state;
     }
 
-    const client: Position = add(current.client.selection, offset);
-    const page: Position = add(current.page.selection, offset);
-
     return move({
       state,
-      clientSelection: client,
-      pageSelection: page,
+      clientSelection: result.center,
+      pageSelection: result.center,
+      impact: result.impact,
+      shouldAnimate: true,
     });
   }
 
