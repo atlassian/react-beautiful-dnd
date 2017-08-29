@@ -3,12 +3,11 @@ import getBestCrossAxisDroppable from './get-best-cross-axis-droppable';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import getClosestDraggable from './get-closest-draggable';
 import moveToNewSpot from './move-to-new-spot';
-import { subtract } from '../position';
+import type { Result } from './move-to-new-spot';
 import type {
   DraggableId,
   DroppableId,
   Position,
-  DragImpact,
   DroppableDimension,
   DraggableDimension,
   DraggableDimensionMap,
@@ -26,11 +25,6 @@ type Args = {|
   // all the dimensions in the system
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
-|}
-
-type Result = {|
-  offset: Position,
-  impact: DragImpact,
 |}
 
 export default ({
