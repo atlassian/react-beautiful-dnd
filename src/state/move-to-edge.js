@@ -35,6 +35,8 @@ export default ({
 }: Args): CenterPosition => {
   const getCorner = (fragment: DimensionFragment): Position => patch(
     destinationAxis.line,
+    // it does not really matter what edge we use here
+    // as the difference to the center from edges will be the same
     fragment[destinationAxis[destinationEdge]],
     fragment[destinationAxis.crossAxisStart]
   );
@@ -51,7 +53,7 @@ export default ({
 
   const signed: Position = patch(
     destinationAxis.line,
-    // if moving to the sourceEdge then we need to pull backwards on the main axis
+    // if moving to the end edge - we need to pull the source backwards
     (sourceEdge === 'end' ? -1 : 1) * centerDiff[destinationAxis.line],
     centerDiff[destinationAxis.crossLine],
   );

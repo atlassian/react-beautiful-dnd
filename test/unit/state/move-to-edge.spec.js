@@ -1,19 +1,37 @@
 // @flow
-import type {
-  Position,
-  DimensionFragment,
-} from '../../../src/types';
+import {
+  add,
+  absolute,
+  isEqual,
+  patch,
+  subtract,
+} from '../../../src/state/position';
 import getFragment from '../../utils/get-fragment';
 import getClientRect from '../../utils/get-client-rect';
 import moveToEdge from '../../../src/state/move-to-edge';
 import { vertical, horizontal } from '../../../src/state/axis';
+import type {
+  Axis,
+  Position,
+  DimensionFragment,
+} from '../../../src/types';
 
+// behind the destination
 // width: 40, height: 20
-const source: DimensionFragment = getFragment(getClientRect({
+const behind: DimensionFragment = getFragment(getClientRect({
   top: 0,
   left: 0,
   right: 40,
   bottom: 20,
+}));
+
+// in front of the destination
+// width: 50, height: 10
+const infront: DimensionFragment = getFragment(getClientRect({
+  top: 120,
+  left: 150,
+  right: 200,
+  bottom: 130,
 }));
 
 // width: 50, height: 60
@@ -26,166 +44,227 @@ const destination: DimensionFragment = getFragment(getClientRect({
 
 // All results are aligned on the crossAxisStart
 
+const pullBackwardsOnMainAxis = (axis: Axis) => (point: Position) => patch(
+  axis.line,
+  -point[axis.line],
+  point[axis.crossLine]
+);
+
+// returns the absolute difference of the center position
+// to one of the corners on the axis.end. Choosing axis.end is arbitrary
+const getCenterDiff = (axis: Axis) => (source: DimensionFragment): Position => {
+  const corner = patch(
+    axis.line, source[axis.end], source[axis.crossAxisStart]
+  );
+
+  const diff = absolute(subtract(source.center, corner));
+
+  (() => {
+    // a little check to ensure that our assumption that the distance between the edges
+    // and the axis.end is the same
+    const otherCorner = patch(
+      axis.line, source[axis.end], source[axis.crossAxisEnd]
+    );
+    const otherDiff = absolute(subtract(source.center, otherCorner));
+
+    if (!isEqual(diff, otherDiff)) {
+      throw new Error('invalidation position assumption');
+    }
+  })();
+
+  return diff;
+};
+
 describe('move to edge', () => {
-  describe('moving to vertical list', () => {
-    describe('destination start edge', () => {
-      describe('to source end edge', () => {
-        it('should move to the correct position', () => {
-          const center: Position = {
-            x: 70,
-            y: 50,
+  [behind, infront].forEach((source: DimensionFragment) => {
+    describe(`source is ${source === behind ? 'behind' : 'infront of'} destination`, () => {
+      describe('moving to a vertical list', () => {
+        const pullUpwards = pullBackwardsOnMainAxis(vertical);
+        const centerDiff = getCenterDiff(vertical)(source);
+
+        describe('destination start edge', () => {
+          const destinationTopCorner: Position = {
+            x: destination.left,
+            y: destination.top,
           };
 
-          const result: Position = moveToEdge({
-            source,
-            sourceEdge: 'end',
-            destination,
-            destinationEdge: 'start',
-            destinationAxis: vertical,
+          describe('to source end edge', () => {
+            it('should move the source above the destination', () => {
+              const newCenter: Position = add(
+              pullUpwards(centerDiff),
+              destinationTopCorner
+            );
+
+              const result: Position = moveToEdge({
+                source,
+                sourceEdge: 'end',
+                destination,
+                destinationEdge: 'start',
+                destinationAxis: vertical,
+              });
+
+              expect(result).toEqual(newCenter);
+            });
           });
 
-          expect(result).toEqual(center);
+          describe('to source start edge', () => {
+            it('should move below the top of the destination', () => {
+              const newCenter: Position = add(
+              centerDiff,
+              destinationTopCorner,
+            );
+
+              const result: Position = moveToEdge({
+                source,
+                sourceEdge: 'start',
+                destination,
+                destinationEdge: 'start',
+                destinationAxis: vertical,
+              });
+
+              expect(result).toEqual(newCenter);
+            });
+          });
+        });
+
+        describe('destination end edge', () => {
+          const destinationBottomCorner: Position = {
+            x: destination.left,
+            y: destination.bottom,
+          };
+
+          describe('to source end edge', () => {
+            it('should move above the bottom of the destination', () => {
+              const newCenter: Position = add(
+              pullUpwards(centerDiff),
+              destinationBottomCorner,
+            );
+
+              const result: Position = moveToEdge({
+                source,
+                sourceEdge: 'end',
+                destination,
+                destinationEdge: 'end',
+                destinationAxis: vertical,
+              });
+
+              expect(result).toEqual(newCenter);
+            });
+          });
+
+          describe('to source start edge', () => {
+            it('should move below the destination', () => {
+              const newCenter: Position = add(
+              centerDiff,
+              destinationBottomCorner,
+            );
+
+              const result: Position = moveToEdge({
+                source,
+                sourceEdge: 'start',
+                destination,
+                destinationEdge: 'end',
+                destinationAxis: vertical,
+              });
+
+              expect(result).toEqual(newCenter);
+            });
+          });
         });
       });
 
-      describe('to source start edge', () => {
-        it('should move to the correct position', () => {
-          const center: Position = {
-            x: 70,
-            y: 70,
+      describe('moving to a horizontal list', () => {
+        const pullLeft = pullBackwardsOnMainAxis(horizontal);
+        const centerDiff = getCenterDiff(horizontal)(source);
+
+        describe('destination start edge', () => {
+          const destinationTopCorner: Position = {
+            x: destination.left, // axis.start
+            y: destination.top, // axis.crossAxisStart
           };
 
-          const result: Position = moveToEdge({
-            source,
-            sourceEdge: 'start',
-            destination,
-            destinationEdge: 'start',
-            destinationAxis: vertical,
+          describe('to source end edge', () => {
+            it('should move the source to the left of destination start edge', () => {
+              const newCenter: Position = add(
+                pullLeft(centerDiff),
+                destinationTopCorner
+              );
+
+              const result: Position = moveToEdge({
+                source,
+                sourceEdge: 'end',
+                destination,
+                destinationEdge: 'start',
+                destinationAxis: horizontal,
+              });
+
+              expect(result).toEqual(newCenter);
+            });
           });
 
-          expect(result).toEqual(center);
+          describe('to source start edge', () => {
+            it('should move to the right of the destination start edge', () => {
+              const newCenter: Position = add(
+                centerDiff,
+                destinationTopCorner,
+              );
+
+              const result: Position = moveToEdge({
+                source,
+                sourceEdge: 'start',
+                destination,
+                destinationEdge: 'start',
+                destinationAxis: horizontal,
+              });
+
+              expect(result).toEqual(newCenter);
+            });
+          });
         });
-      });
-    });
 
-    describe('destination end edge', () => {
-      describe('to source end edge', () => {
-        it('should move to the correct position', () => {
-          const center: Position = {
-            x: 70,
-            y: 90,
+        describe('destination end edge', () => {
+          const destinationTopRightCorner: Position = {
+            x: destination.right, // axis.end
+            y: destination.top, // axis.crossAxisStart
           };
 
-          const result: Position = moveToEdge({
-            source,
-            sourceEdge: 'end',
-            destination,
-            destinationEdge: 'end',
-            destinationAxis: vertical,
+          describe('to source end edge', () => {
+            it('should move to the left of right side of the destination', () => {
+              const newCenter: Position = add(
+                pullLeft(centerDiff),
+                destinationTopRightCorner,
+              );
+
+              const result: Position = moveToEdge({
+                source,
+                sourceEdge: 'end',
+                destination,
+                destinationEdge: 'end',
+                destinationAxis: horizontal,
+              });
+
+              expect(result).toEqual(newCenter);
+            });
           });
 
-          expect(result).toEqual(center);
-        });
-      });
+          describe('to source start edge', () => {
+            it('should move to the right of the destination', () => {
+              const newCenter: Position = add(
+                centerDiff,
+                destinationTopRightCorner,
+              );
 
-      describe('to source start edge', () => {
-        it('should move to the correct position', () => {
-          const center: Position = {
-            x: 70,
-            y: 110,
-          };
+              const result: Position = moveToEdge({
+                source,
+                sourceEdge: 'start',
+                destination,
+                destinationEdge: 'end',
+                destinationAxis: horizontal,
+              });
 
-          const result: Position = moveToEdge({
-            source,
-            sourceEdge: 'start',
-            destination,
-            destinationEdge: 'end',
-            destinationAxis: vertical,
+              expect(result).toEqual(newCenter);
+            });
           });
-
-          expect(result).toEqual(center);
-        });
-      });
-    });
-  });
-
-  describe.skip('moving to horizontal list', () => {
-    describe('destination start edge', () => {
-      describe('to source end edge', () => {
-        it('should move to the correct position', () => {
-          const center: Position = {
-            x: 50,
-            y: 70,
-          };
-
-          const result: Position = moveToEdge({
-            source,
-            sourceEdge: 'end',
-            destination,
-            destinationEdge: 'start',
-            destinationAxis: horizontal,
-          });
-
-          expect(result).toEqual(center);
-        });
-      });
-
-      describe('to source start edge', () => {
-        it('should move to the correct position', () => {
-          const center: Position = {
-            x: 70,
-            y: 70,
-          };
-
-          const result: Position = moveToEdge({
-            source,
-            sourceEdge: 'start',
-            destination,
-            destinationEdge: 'start',
-            destinationAxis: horizontal,
-          });
-
-          expect(result).toEqual(center);
-        });
-      });
-    });
-
-    describe('destination end edge', () => {
-      describe('to source end edge', () => {
-        it('should move to the correct position', () => {
-          const center: Position = {
-            x: 70,
-            y: 90,
-          };
-
-          const result: Position = moveToEdge({
-            source,
-            sourceEdge: 'end',
-            destination,
-            destinationEdge: 'end',
-            destinationAxis: vertical,
-          });
-
-          expect(result).toEqual(center);
-        });
-      });
-
-      describe('to source start edge', () => {
-        it('should move to the correct position', () => {
-          const center: Position = {
-            x: 70,
-            y: 110,
-          };
-
-          const result: Position = moveToEdge({
-            source,
-            sourceEdge: 'start',
-            destination,
-            destinationEdge: 'end',
-            destinationAxis: vertical,
-          });
-
-          expect(result).toEqual(center);
         });
       });
     });
