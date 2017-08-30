@@ -47,3 +47,7 @@ export type DefaultProps = {|
 |}
 
 export type Props = OwnProps & MapProps;
+
+// Having issues getting the correct reselect type
+// export type Selector = OutputSelector<State, OwnProps, MapProps>;
+export type Selector = Function;

@@ -22,10 +22,11 @@ import type {
 import type {
   OwnProps,
   MapProps,
+  Selector,
   Placeholder,
 } from './droppable-types';
 
-export const makeSelector = () => {
+export const makeSelector = (): Selector => {
   const i = 0;
   const idSelector = (state: State, ownProps: OwnProps) =>
     ownProps.droppableId;
