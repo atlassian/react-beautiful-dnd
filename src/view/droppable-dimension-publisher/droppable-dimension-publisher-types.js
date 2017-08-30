@@ -1,5 +1,4 @@
 // @flow
-import { Select as ReselectSelector } from 'reselect';
 import type {
   DroppableDimension,
   DroppableId,
@@ -8,7 +7,6 @@ import type {
   HTMLElement,
   Position,
   Direction,
-  State,
 } from '../../types';
 
 export type MapProps = {|
@@ -30,4 +28,6 @@ export type OwnProps = {|
 
 export type Props = MapProps & DispatchProps & OwnProps;
 
-export type Selector = ReselectSelector<State, OwnProps, MapProps>;
+// Having issues getting the correct reselect type
+// export type Selector = OutputSelector<State, OwnProps, MapProps>;
+export type Selector = Function;

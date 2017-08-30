@@ -20,15 +20,17 @@ import type {
   DimensionState,
   DraggableLocation,
   DragStart,
+  Store,
 } from '../../../src/types';
 
 const execute = (hooks: Hooks, current: State, previous: State) => {
   const stateMock = jest.fn();
   stateMock.mockReturnValueOnce(previous)
     .mockReturnValueOnce(current);
-  const store = {
+  // force casting to Store type
+  const store: Store = ({
     getState: stateMock,
-  };
+  }: any);
   const next = x => x;
   // does not matter what this is - but using clean to get correct typing
   const action = clean();

@@ -3,12 +3,10 @@
 // $ExpectError - not added to project deps
 import type { PropType } from 'babel-plugin-react-flow-props-to-prop-types';
 /* eslint-enable */
-import type { Selector as ReselectSelector } from 'reselect';
 import {
   publishDraggableDimension,
 } from '../../state/action-creators';
 import type {
-  State,
   DraggableId,
   DroppableId,
   TypeId,
@@ -32,6 +30,8 @@ export type OwnProps = {|
   children?: ReactElement,
 |}
 
-export type Selector = ReselectSelector<State, OwnProps, MapProps>;
-
 export type Props = MapProps & DispatchProps & OwnProps;
+
+// Having issues getting the correct reselect type
+// export type Selector = OutputSelector<State, OwnProps, MapProps>;
+export type Selector = Function;

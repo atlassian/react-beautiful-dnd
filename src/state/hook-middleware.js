@@ -1,9 +1,10 @@
 // @flow
+// temp
 import memoizeOne from 'memoize-one';
+import type { MiddlewareAPI } from 'redux';
 import type {
   Action,
   Dispatch,
-  Store,
   State,
   Hooks,
   DragStart,
@@ -112,15 +113,17 @@ const getFireHooks = (hooks: Hooks) => memoizeOne((current: State, previous: Sta
 
 export default (hooks: Hooks) => {
   const fireHooks = getFireHooks(hooks);
-  return (store: Store) => (next: Dispatch) => (action: Action): Action => {
-    const previous: State = store.getState();
+  return (store: MiddlewareAPI<State, Action, Dispatch>) =>
+    (next: Dispatch) =>
+      (action: Action): Action => {
+        const previous: State = store.getState();
 
-    const result: Action = next(action);
+        const result: Action = next(action);
 
-    const current: State = store.getState();
+        const current: State = store.getState();
 
-    fireHooks(current, previous);
+        fireHooks(current, previous);
 
-    return result;
-  };
+        return result;
+      };
 };
