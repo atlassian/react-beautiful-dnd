@@ -200,8 +200,8 @@ export type State = {
 };
 
 export type Action = ActionCreators;
-export type Store = ReduxStore<State, Action>;
 export type Dispatch = ReduxDispatch<Action>;
+export type Store = ReduxStore<State, Action, Dispatch>;
 
 export type Hooks = {|
   onDragStart?: (start: DragStart) => void,

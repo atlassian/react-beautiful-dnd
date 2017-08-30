@@ -22,9 +22,9 @@ import type {
   InitialDragLocation,
   CurrentDragLocation,
 } from '../../../src/types';
-import type { MapProps, Provided } from '../../../src/view/droppable/droppable-types';
+import type { MapProps, Provided, Selector } from '../../../src/view/droppable/droppable-types';
 
-type SelectorArgs = {|
+type ExecuteArgs = {|
   id: DroppableId,
   phase: Phase,
   drag: ?DragState,
@@ -32,8 +32,8 @@ type SelectorArgs = {|
   isDropDisabled?: boolean
 |}
 
-const execute = (selector: Function) =>
-  ({ phase, drag, pending, id, isDropDisabled = false }: SelectorArgs) =>
+const execute = (selector: Selector) =>
+  ({ phase, drag, pending, id, isDropDisabled = false }: ExecuteArgs) =>
     selector.resultFunc(
       phase, drag, pending, id, isDropDisabled,
     );

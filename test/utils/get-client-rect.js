@@ -1,3 +1,4 @@
+// @flow
 import type { ClientRect } from '../../src/state/dimension';
 
 type GetClientRect = {|

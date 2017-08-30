@@ -1,6 +1,6 @@
 // @flow
 import { makeSelector } from '../../../src/view/draggable-dimension-publisher/connected-draggable-dimension-publisher';
-import type { MapProps } from '../../../src/view/draggable-dimension-publisher/draggable-dimension-publisher-types';
+import type { Selector, MapProps } from '../../../src/view/draggable-dimension-publisher/draggable-dimension-publisher-types';
 
 const defaultMapProps: MapProps = {
   shouldPublish: false,
@@ -12,7 +12,7 @@ const shouldPublishMapProps: MapProps = {
 
 describe('Dimension publisher - connected', () => {
   it('should return the default props when not requested to publish dimensions', () => {
-    const selector = makeSelector();
+    const selector: Selector = makeSelector();
 
     const result: MapProps = selector.resultFunc(
       'DEFAULT',
