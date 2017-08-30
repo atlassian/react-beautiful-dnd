@@ -16,9 +16,10 @@ import type {
 import type {
   OwnProps,
   MapProps,
+  Selector,
 } from './droppable-types';
 
-export const makeSelector = () => {
+export const makeSelector = (): Selector => {
   const idSelector = (state: State, ownProps: OwnProps) =>
     ownProps.droppableId;
   const isDropDisabledSelector = (state: State, ownProps: OwnProps) =>

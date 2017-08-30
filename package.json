@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@atlaskit/css-reset": "1.1.5",
-    "@storybook/react": "3.2.5",
+    "@storybook/react": "3.2.8",
     "babel-cli": "6.26.0",
     "babel-eslint": "7.2.3",
     "babel-plugin-react-flow-props-to-prop-types": "0.15.0",

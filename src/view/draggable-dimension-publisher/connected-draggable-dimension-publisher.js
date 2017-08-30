@@ -1,12 +1,17 @@
 // @flow
 import { connect } from 'react-redux';
-import { createSelector } from 'reselect';
 import memoizeOne from 'memoize-one';
+import { createSelector } from 'reselect';
 import type {
   State,
   TypeId,
 } from '../../types';
-import type { DispatchProps, MapProps, OwnProps } from './draggable-dimension-publisher-types';
+import type {
+  Selector,
+  DispatchProps,
+  MapProps,
+  OwnProps,
+} from './draggable-dimension-publisher-types';
 import { storeKey } from '../context-keys';
 import { publishDraggableDimension } from '../../state/action-creators';
 import DraggableDimensionPublisher from './draggable-dimension-publisher';
@@ -16,7 +21,7 @@ const requestDimensionSelector =
 
 const getOwnType = (state: State, props: OwnProps): TypeId => props.type;
 
-export const makeSelector = () => {
+export const makeSelector = (): Selector => {
   const getMapProps = memoizeOne(
     (shouldPublish: boolean): MapProps => ({
       shouldPublish,

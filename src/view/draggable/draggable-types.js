@@ -3,7 +3,6 @@
 // $ExpectError - not added to project deps
 import type { PropType, HasDefaultProp } from 'babel-plugin-react-flow-props-to-prop-types';
 /* eslint-enable */
-
 import type {
   DraggableId,
   DraggableDimension,
@@ -128,3 +127,7 @@ export type DefaultProps = {|
 |}
 
 export type Props = MapProps & DispatchProps & OwnProps;
+
+// Having issues getting the correct reselect type
+// export type Selector = OutputSelector<State, OwnProps, MapProps>;
+export type Selector = Function;
