@@ -7,6 +7,7 @@ export const dispatchWindowMouseEvent = (
   clientX?: number = 0,
   clientY?: number = 0,
   button?: number = primaryButton,
+  options?: Object = {},
 ): MouseEvent => {
   const event = new window.MouseEvent(eventName, {
     bubbles: true,
@@ -16,6 +17,10 @@ export const dispatchWindowMouseEvent = (
     clientY,
     button,
   });
+
+  // override properties on the event itself
+  Object.assign(event, options);
+
   window.dispatchEvent(event);
   return event;
 };

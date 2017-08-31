@@ -434,7 +434,7 @@ export default class DragHandle extends Component {
   // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
   mouseForceChanged = (event: MouseForceChangedEvent) => {
     if (event.webkitForce == null || MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null) {
-      console.warn('handling a mouse force changed event when it is not supported');
+      console.error('handling a mouse force changed event when it is not supported');
       return;
     }
 
@@ -453,6 +453,8 @@ export default class DragHandle extends Component {
       return;
     }
 
+    // This case should not happen as it looks like force press is not
+    // possible while moving the mouse. However, this is being super defensive.
     if (this.state.draggingWith) {
       this.stopDragging(() => this.props.callbacks.onCancel());
     }
