@@ -7,7 +7,12 @@ import rafScheduler from 'raf-schd';
 // React synthetic events as well as raw browser events.
 import * as keyCodes from '../key-codes';
 import type { Position } from '../../types';
-import type { Props, DragTypes, Provided } from './drag-handle-types';
+import type {
+  Props,
+  DragTypes,
+  Provided,
+  MouseForceChangedEvent,
+} from './drag-handle-types';
 
 const noop = (): void => { };
 const getFalse: () => boolean = () => false;
@@ -424,6 +429,37 @@ export default class DragHandle extends Component {
     this.setState(state, done);
   }
 
+  // Need to opt out of dragging if the user is a force press
+  // Only for safari which has decided to introduce its own custom way of doing things
+  // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
+  mouseForceChanged = (event: MouseForceChangedEvent) => {
+    if (event.webkitForce == null || MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null) {
+      console.error('handling a mouse force changed event when it is not supported');
+      return;
+    }
+
+    const forcePressThreshold: number = (MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN : any);
+
+    // not a force press
+    if (event.webkitForce < forcePressThreshold) {
+      return;
+    }
+
+    // is a force press
+    // if we are dragging - kill the drag
+
+    if (this.state.pending) {
+      this.stopPendingMouseDrag();
+      return;
+    }
+
+    // This case should not happen as it looks like force press is not
+    // possible while moving the mouse. However, this is being super defensive.
+    if (this.state.draggingWith) {
+      this.stopDragging(() => this.props.callbacks.onCancel());
+    }
+  }
+
   unbindWindowEvents = () => {
     window.removeEventListener('mousemove', this.onWindowMouseMove);
     window.removeEventListener('mouseup', this.onWindowMouseUp);
@@ -431,6 +467,7 @@ export default class DragHandle extends Component {
     window.removeEventListener('keydown', this.onWindowKeydown);
     window.removeEventListener('resize', this.onWindowResize);
     window.removeEventListener('scroll', this.onWindowScroll);
+    window.removeEventListener('webkitmouseforcechanged', this.mouseForceChanged);
   }
 
   bindWindowEvents = () => {
@@ -440,6 +477,7 @@ export default class DragHandle extends Component {
     window.addEventListener('keydown', this.onWindowKeydown);
     window.addEventListener('resize', this.onWindowResize);
     window.addEventListener('scroll', this.onWindowScroll, { passive: true });
+    window.addEventListener('webkitmouseforcechanged', this.mouseForceChanged);
   }
 
   getProvided = memoizeOne((isEnabled: boolean, isDragging: boolean): ?Provided => {
