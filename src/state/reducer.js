@@ -403,7 +403,6 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       isMovingForward,
       draggableId: existing.current.id,
       impact: existing.impact,
-      center: existing.current.page.center,
       draggables: state.dimension.draggable,
       droppables: state.dimension.droppable,
     });
@@ -413,15 +412,14 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
-    const diff: Position = result.diff;
     const impact: DragImpact = result.impact;
 
-    const page: Position = add(existing.current.page.selection, diff);
-    const client: Position = add(existing.current.client.selection, diff);
+    // const page: Position = add(existing.current.page.selection, diff);
+    // const client: Position = add(existing.current.client.selection, diff);
 
     // current limitation: cannot go beyond visible border of list
     const droppableId: ?DroppableId = getDroppableOver(
-      page, state.dimension.droppable,
+      result.center, state.dimension.droppable,
     );
 
     if (!droppableId) {
@@ -433,8 +431,8 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     return move({
       state,
       impact,
-      clientSelection: client,
-      pageSelection: page,
+      clientSelection: result.center,
+      pageSelection: result.center,
       shouldAnimate: true,
     });
   }
