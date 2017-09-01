@@ -43,3 +43,8 @@ export type Props = {|
   callbacks: Callbacks,
   children: (?Provided) => void,
 |}
+
+// Custom event format for force press inputs
+export type MouseForceChangedEvent = MouseEvent & {
+  webkitForce?: number,
+}
