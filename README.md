@@ -828,7 +828,7 @@ The `children` function is also provided with a small amount of state relating t
 
 `react-beautiful-dnd` is typed using [`flowtype`](flowtype.org). This greatly improves internal consistency within the codebase. We also expose a number of public types which will allow you to type your javascript if you would like to. If you are not using `flowtype` this will not inhibit you from using the library. It is just extra safety for those who want it.
 
-### Public types
+### Public flow types
 
 ```js
 // id's
@@ -894,7 +894,7 @@ type DragHandleProvided = {|
 |}
 ```
 
-### Using the types
+### Using the flow types
 
 The types are exported as part of the module so using them is as simple as:
 
@@ -902,7 +902,7 @@ The types are exported as part of the module so using them is as simple as:
 import type { DroppableProvided } from 'react-beautiful-dnd';
 ```
 
-### Version
+### Flow version
 
 `react-beautiful-dnd` currently uses flow `0.52` which is not the [latest version](https://github.com/facebook/flow/releases). However, we are not able to upgrade until [eslint-plugin-react](https://github.com/yannickcr/eslint-plugin-react) [supports it](https://github.com/yannickcr/eslint-plugin-react/issues/1376) - [more details](https://github.com/atlassian/react-beautiful-dnd/issues/37)
 
