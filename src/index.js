@@ -9,9 +9,10 @@ export { default as Draggable } from './view/draggable/';
 // Public flow types
 
 export type {
+  Id,
+  TypeId,
   DraggableId,
   DroppableId,
-  TypeId,
 
   // Hooks
   DragStart,
@@ -22,14 +23,16 @@ export type {
 // Droppable
 export type {
   Provided as DroppableProvided,
-  StateSnapshot as DroppableSnapshot,
+  StateSnapshot as DroppableStateSnapshot,
 } from './view/droppable/droppable-types';
 
 // Draggable
 export type {
   Provided as DraggableProvided,
-  StateSnapshot as DraggableSnapshot,
+  StateSnapshot as DraggableStateSnapshot,
   DraggableStyle,
+  DraggingStyle,
+  NotDraggingStyle,
 } from './view/draggable/draggable-types';
 
 // DragHandle

@@ -12,7 +12,7 @@ import type {
 } from '../../types';
 
 export type Provided = {|
-  innerRef: (HTMLElement) => void,
+  innerRef: (?HTMLElement) => void,
 |}
 
 export type StateSnapshot = {|
