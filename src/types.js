@@ -54,14 +54,16 @@ export type DimensionFragment = {|
 export type DraggableDimension = {|
   id: DraggableId,
   droppableId: DroppableId,
+  // relative to the current viewport
+  client: {|
+    withMargin: DimensionFragment,
+    withoutMargin: DimensionFragment,
+  |},
+  // relative to the whole page
   page: {|
     withMargin: DimensionFragment,
     withoutMargin: DimensionFragment,
   |},
-  client: {|
-    withMargin: DimensionFragment,
-    withoutMargin: DimensionFragment,
-  |}
 |}
 
 export type DroppableDimension = {|
@@ -71,10 +73,16 @@ export type DroppableDimension = {|
     initial: Position,
     current: Position,
   |},
+  // relative to the current viewport
+  client: {|
+    withMargin: DimensionFragment,
+    withoutMargin: DimensionFragment,
+  |},
+  // relative to the whole page
   page: {|
     withMargin: DimensionFragment,
     withoutMargin: DimensionFragment,
-  |}
+  |},
 |}
 export type DraggableLocation = {|
   droppableId: DroppableId,

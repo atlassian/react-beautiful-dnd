@@ -43,17 +43,15 @@ export default ({
   );
 
   // If there's no destination or if no movement has occurred, return the starting position.
-  if (
-    !destinationDroppable ||
-    (isWithinHomeDroppable && !movedDraggables.length)
-  ) {
+  if (!destinationDroppable ||
+    (isWithinHomeDroppable && !movedDraggables.length)) {
     return add(droppableScrollDiff, windowScrollDiff);
   }
 
   const {
     axis,
     id: destinationDroppableId,
-    page: destinationDroppablePage,
+    client: destinationDroppableClient,
   } = destinationDroppable;
 
   // All the draggables in the destination (even the ones that haven't moved)
@@ -85,7 +83,7 @@ export default ({
     }
 
     // Otherwise, return the dimension of the empty droppable
-    return destinationDroppablePage.withMargin;
+    return destinationDroppableClient.withMargin;
   })();
 
   const { sourceEdge, destinationEdge } = (() => {

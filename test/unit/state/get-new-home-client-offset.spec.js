@@ -87,12 +87,8 @@ const getVerticalDistanceOverDraggables = getDistanceOverDraggables('height');
 const getHorizontalDistanceOverDraggables = getDistanceOverDraggables('width');
 
 describe('get new home client offset', () => {
-  let droppable;
-
-  beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => { });
-
-    droppable = createDroppable({
+  describe('vertical', () => {
+    const droppable = createDroppable({
       droppableId: 'drop-1',
       droppableRect: { top: 0, left: 0, bottom: 600, right: 100 },
       draggableRects: [
@@ -101,13 +97,7 @@ describe('get new home client offset', () => {
         { top: 301, left: 0, bottom: 600, right: 100 },
       ],
     });
-  });
 
-  afterEach(() => {
-    console.error.mockRestore();
-  });
-
-  describe('vertical', () => {
     it('should return the total scroll diff if nothing has moved', () => {
       const offset: Position = {
         x: 100,
@@ -200,10 +190,7 @@ describe('get new home client offset', () => {
 
         const movement: DragMovement = {
           draggables: droppable.draggableIds.slice(1),
-          amount: {
-            x: 0,
-            y: droppable.draggableDimensions[0].page.withMargin.height,
-          },
+          amount: origin,
           isBeyondStartPosition: true,
         };
 
@@ -241,10 +228,7 @@ describe('get new home client offset', () => {
         );
         const movement: DragMovement = {
           draggables: droppable.draggableIds.slice(1),
-          amount: {
-            x: 0,
-            y: droppable.draggableDimensions[0].page.withMargin.height,
-          },
+          amount: origin,
           isBeyondStartPosition: true,
         };
         // this is where it needs to end up
@@ -281,10 +265,7 @@ describe('get new home client offset', () => {
         const windowScrollDiff = pageOffset;
         const movement: DragMovement = {
           draggables: droppable.draggableIds.slice(1),
-          amount: {
-            x: 0,
-            y: droppable.draggableDimensions[0].page.withMargin.height,
-          },
+          amount: origin,
           isBeyondStartPosition: true,
         };
         // this is where it needs to end up
@@ -336,10 +317,7 @@ describe('get new home client offset', () => {
 
         const movement: DragMovement = {
           draggables: droppable.draggableIds.slice(0, 2),
-          amount: {
-            x: 0,
-            y: droppable.draggableDimensions[2].page.withMargin.height,
-          },
+          amount: origin,
           isBeyondStartPosition: false,
         };
 
@@ -378,10 +356,7 @@ describe('get new home client offset', () => {
         );
         const movement: DragMovement = {
           draggables: droppable.draggableIds.slice(0, 2),
-          amount: {
-            x: 0,
-            y: droppable.draggableDimensions[2].page.withMargin.height,
-          },
+          amount: origin,
           isBeyondStartPosition: false,
         };
         // How much distance the item needs to travel to be in its new home
@@ -418,10 +393,7 @@ describe('get new home client offset', () => {
         );
         const movement: DragMovement = {
           draggables: droppable.draggableIds.slice(0, 2),
-          amount: {
-            x: 0,
-            y: droppable.draggableDimensions[2].page.withMargin.height,
-          },
+          amount: origin,
           isBeyondStartPosition: false,
         };
         // this is where it needs to end up
@@ -450,73 +422,15 @@ describe('get new home client offset', () => {
   });
 
   describe('horizontal', () => {
-    beforeEach(() => {
-      jest.spyOn(console, 'error').mockImplementation(() => { });
-
-      droppable = createDroppable({
-        direction: 'horizontal',
-        droppableId: 'drop-1',
-        droppableRect: { top: 0, left: 0, bottom: 100, right: 500 },
-        draggableRects: [
-          { top: 0, left: 0, bottom: 100, right: 100 },
-          { top: 0, left: 101, bottom: 100, right: 300 },
-          { top: 0, left: 301, bottom: 100, right: 500 },
-        ],
-      });
-
-      // draggable1 = getDraggableDimension({
-      //   id: 'drag-1',
-      //   droppableId,
-      //   clientRect: getClientRect({
-      //     top: 0,
-      //     left: 0,
-      //     bottom: 100,
-      //     right: 100,
-      //   }),
-      // });
-
-      // // huge height: 199
-      // draggable2 = getDraggableDimension({
-      //   id: 'drag-2',
-      //   droppableId,
-      //   clientRect: getClientRect({
-      //     top: 0,
-      //     left: 101,
-      //     bottom: 100,
-      //     right: 300,
-      //   }),
-      // });
-
-      // // height: 299
-      // draggable3 = getDraggableDimension({
-      //   id: 'drag-3',
-      //   droppableId,
-      //   clientRect: getClientRect({
-      //     top: 0,
-      //     left: 301,
-      //     bottom: 100,
-      //     right: 500,
-      //   }),
-      // });
-
-      // draggables = {
-      //   [draggable1.id]: draggable1,
-      //   [draggable2.id]: draggable2,
-      //   [draggable3.id]: draggable3,
-      // };
-
-      // draggableId = Object.keys(draggables)[0];
-
-      // destinationDroppable = getDroppableDimension({
-      //   id: droppableId,
-      //   direction: 'horizontal',
-      //   clientRect: getClientRect({
-      //     top: 0,
-      //     left: 0,
-      //     bottom: 100,
-      //     right: 500,
-      //   }),
-      // });
+    const droppable = createDroppable({
+      direction: 'horizontal',
+      droppableId: 'drop-1',
+      droppableRect: { top: 0, left: 0, bottom: 100, right: 500 },
+      draggableRects: [
+        { top: 0, left: 0, bottom: 100, right: 100 },
+        { top: 0, left: 101, bottom: 100, right: 300 },
+        { top: 0, left: 301, bottom: 100, right: 500 },
+      ],
     });
 
     it('should return to the total scroll diff if nothing has moved', () => {
@@ -611,10 +525,7 @@ describe('get new home client offset', () => {
 
         const movement: DragMovement = {
           draggables: droppable.draggableIds.slice(1),
-          amount: {
-            x: droppable.draggableDimensions[0].page.withMargin.width,
-            y: 0,
-          },
+          amount: origin,
           isBeyondStartPosition: true,
         };
 
@@ -652,10 +563,7 @@ describe('get new home client offset', () => {
         );
         const movement: DragMovement = {
           draggables: droppable.draggableIds.slice(1),
-          amount: {
-            x: droppable.draggableDimensions[0].page.withMargin.width,
-            y: 0,
-          },
+          amount: origin,
           isBeyondStartPosition: true,
         };
         // this is where it needs to end up
@@ -692,10 +600,7 @@ describe('get new home client offset', () => {
         const windowScrollDiff = pageOffset;
         const movement: DragMovement = {
           draggables: droppable.draggableIds.slice(1),
-          amount: {
-            x: droppable.draggableDimensions[0].page.withMargin.width,
-            y: 0,
-          },
+          amount: origin,
           isBeyondStartPosition: true,
         };
         // this is where it needs to end up
@@ -748,10 +653,7 @@ describe('get new home client offset', () => {
 
         const movement: DragMovement = {
           draggables: droppable.draggableIds.slice(0, 2),
-          amount: {
-            x: droppable.draggableDimensions[2].page.withMargin.width,
-            y: 0,
-          },
+          amount: origin,
           isBeyondStartPosition: false,
         };
 
@@ -790,10 +692,7 @@ describe('get new home client offset', () => {
         );
         const movement: DragMovement = {
           draggables: droppable.draggableIds.slice(0, 2),
-          amount: {
-            x: droppable.draggableDimensions[2].page.withMargin.width,
-            y: 0,
-          },
+          amount: origin,
           isBeyondStartPosition: false,
         };
         // How much distance the item needs to travel to be in its new home
@@ -830,10 +729,7 @@ describe('get new home client offset', () => {
         );
         const movement: DragMovement = {
           draggables: droppable.draggableIds.slice(0, 2),
-          amount: {
-            x: droppable.draggableDimensions[2].page.withMargin.width,
-            y: 0,
-          },
+          amount: origin,
           isBeyondStartPosition: false,
         };
         // this is where it needs to end up
@@ -858,6 +754,235 @@ describe('get new home client offset', () => {
 
         expect(newHomeOffset).toEqual(expected);
       });
+    });
+  });
+
+  describe('multiple lists - vertical', () => {
+    const homeDroppable = createDroppable({
+      droppableId: 'drop-home',
+      droppableRect: { top: 0, left: 0, bottom: 600, right: 100 },
+      draggableRects: [
+        { top: 0, left: 0, bottom: 100, right: 100 },
+        { top: 101, left: 0, bottom: 300, right: 100 },
+        { top: 301, left: 0, bottom: 600, right: 100 },
+      ],
+    });
+
+    const destinationDroppable = createDroppable({
+      droppableId: 'drop-destination',
+      droppableRect: { top: 100, left: 110, bottom: 700, right: 210 },
+      draggableRects: [
+        { top: 100, left: 110, bottom: 400, right: 210 },
+        { top: 401, left: 110, bottom: 600, right: 210 },
+        { top: 601, left: 110, bottom: 700, right: 210 },
+      ],
+    });
+
+    const emptyDroppable = createDroppable({
+      droppableId: 'drop-empty',
+      droppableRect: { top: 200, left: 220, bottom: 800, right: 320 },
+      draggableRects: [],
+    });
+
+    const draggable = homeDroppable.draggableDimensions[0];
+
+    const allDraggables = { ...homeDroppable.draggables, ...destinationDroppable.draggables };
+
+    const selection = {
+      x: emptyDroppable.droppable.client.withMargin.left + 1,
+      y: emptyDroppable.droppable.client.withMargin.bottom + 1,
+    };
+
+    const clientOffset = subtract(selection, draggable.client.withMargin.center);
+
+    const pageOffset = clientOffset;
+
+    it('should move to the top of the droppable when landing in an empty droppable', () => {
+      const movement: DragMovement = {
+        draggables: emptyDroppable.draggableIds,
+        amount: origin,
+        isBeyondStartPosition: false,
+      };
+
+      // Align top-left of incoming draggable with top-left of droppable
+      const expected = {
+        x: (
+          emptyDroppable.droppable.client.withMargin.left -
+          draggable.client.withMargin.left
+        ),
+        y: (
+          emptyDroppable.droppable.client.withMargin.top -
+          draggable.client.withMargin.top
+        ),
+      };
+
+      const newHomeOffset = getNewHomeClientOffset({
+        movement,
+        clientOffset,
+        pageOffset,
+        droppableScrollDiff: origin,
+        windowScrollDiff: origin,
+        draggables: allDraggables,
+        draggableId: draggable.id,
+        destinationDroppable: emptyDroppable.droppable,
+      });
+
+      expect(newHomeOffset).toEqual(expected);
+    });
+
+    it('should move into the top of the first-most displaced draggable when landing in a new droppable which already contains draggables', () => {
+      const movement: DragMovement = {
+        draggables: destinationDroppable.draggableIds.slice(2),
+        amount: origin,
+        isBeyondStartPosition: false,
+      };
+
+      const displacedDraggable = destinationDroppable.draggableDimensions[2];
+
+      // Align top-left of incoming draggable with top-left of displaced draggable
+      const expected = {
+        x: (
+          displacedDraggable.client.withMargin.left -
+          draggable.client.withMargin.left
+        ),
+        y: (
+          displacedDraggable.client.withMargin.top -
+          draggable.client.withMargin.top
+        ),
+      };
+
+      const newHomeOffset = getNewHomeClientOffset({
+        movement,
+        clientOffset,
+        pageOffset,
+        droppableScrollDiff: origin,
+        windowScrollDiff: origin,
+        draggables: allDraggables,
+        draggableId: draggable.id,
+        destinationDroppable: destinationDroppable.droppable,
+      });
+
+      expect(newHomeOffset).toEqual(expected);
+    });
+
+    it('should move in after the last draggable when landing on the end of a new droppable which already contains draggables', () => {
+      const movement: DragMovement = {
+        draggables: [],
+        amount: origin,
+        isBeyondStartPosition: false,
+      };
+
+      const lastDraggable = destinationDroppable.draggableDimensions[2];
+
+      // Align top-left of incoming draggable with bottom-left of last draggable
+      const expected = {
+        x: (
+          lastDraggable.client.withMargin.left -
+          draggable.client.withMargin.left
+        ),
+        y: (
+          lastDraggable.client.withMargin.bottom -
+          draggable.client.withMargin.top
+        ),
+      };
+
+      const newHomeOffset = getNewHomeClientOffset({
+        movement,
+        clientOffset,
+        pageOffset,
+        droppableScrollDiff: origin,
+        windowScrollDiff: origin,
+        draggables: allDraggables,
+        draggableId: draggable.id,
+        destinationDroppable: destinationDroppable.droppable,
+      });
+
+      expect(newHomeOffset).toEqual(expected);
+    });
+
+    it('should account for internal scrolling in the destination droppable', () => {
+      const movement: DragMovement = {
+        draggables: destinationDroppable.draggableIds.slice(2),
+        amount: origin,
+        isBeyondStartPosition: false,
+      };
+
+      const displacedDraggable = destinationDroppable.draggableDimensions[2];
+
+      const horizontalScrollAmount = 50;
+      const verticalScrollAmount = 100;
+
+      const droppableScrollDiff = {
+        x: -horizontalScrollAmount,
+        y: -verticalScrollAmount,
+      };
+
+      // Offset alignment by scroll amount
+      const expected = {
+        x: (
+          displacedDraggable.client.withMargin.left -
+          draggable.client.withMargin.left -
+          horizontalScrollAmount
+        ),
+        y: (
+          displacedDraggable.client.withMargin.top -
+          draggable.client.withMargin.top -
+          verticalScrollAmount
+        ),
+      };
+
+      const newHomeOffset = getNewHomeClientOffset({
+        movement,
+        clientOffset,
+        pageOffset,
+        droppableScrollDiff,
+        windowScrollDiff: origin,
+        draggables: allDraggables,
+        draggableId: draggable.id,
+        destinationDroppable: destinationDroppable.droppable,
+      });
+
+      expect(newHomeOffset).toEqual(expected);
+    });
+
+    it('should account for full page scrolling during the drag', () => {
+      const movement: DragMovement = {
+        draggables: destinationDroppable.draggableIds.slice(2),
+        amount: origin,
+        isBeyondStartPosition: false,
+      };
+
+      const displacedDraggable = destinationDroppable.draggableDimensions[2];
+
+      const windowScrollDiff = {
+        x: -100,
+        y: -200,
+      };
+
+      // Since the whole page scrolled there should be no net difference in alignment
+      const expected = {
+        x: (
+          displacedDraggable.client.withMargin.left -
+          draggable.client.withMargin.left
+        ),
+        y: (
+          displacedDraggable.client.withMargin.top -
+          draggable.client.withMargin.top
+        ),
+      };
+
+      const newHomeOffset = getNewHomeClientOffset({
+        movement,
+        clientOffset,
+        pageOffset,
+        droppableScrollDiff: origin,
+        windowScrollDiff,
+        draggables: allDraggables,
+        draggableId: draggable.id,
+        destinationDroppable: destinationDroppable.droppable,
+      });
+
+      expect(newHomeOffset).toEqual(expected);
     });
   });
 });
