@@ -1,15 +1,17 @@
 // @flow
 
-// Ideally would do
-// export DragDropContext from '...'
-// But there is a flow bug that prevents it: https://github.com/facebook/flow/issues/940
-import { DragDropContext as a } from './view/drag-drop-context/';
-import { Droppable as b } from './view/droppable/';
-import { Draggable as c } from './view/draggable/';
+// Components
 
-export const DragDropContext = a;
-export const Droppable = b;
-export const Draggable = c;
+// Ideally would do `export DragDropContext from '...'`
+// But there is a flow bug that prevents it: https://github.com/facebook/flow/issues/940
+
+import DragDropContext from './view/drag-drop-context/';
+import Droppable from './view/droppable/';
+import Draggable from './view/draggable/';
+
+export { DragDropContext };
+export { Droppable };
+export { Draggable };
 
 // Public flow types
 
