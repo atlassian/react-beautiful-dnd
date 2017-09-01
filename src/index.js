@@ -2,16 +2,9 @@
 
 // Components
 
-// Ideally would do `export DragDropContext from '...'`
-// But there is a flow bug that prevents it: https://github.com/facebook/flow/issues/940
-
-import DragDropContext from './view/drag-drop-context/';
-import Droppable from './view/droppable/';
-import Draggable from './view/draggable/';
-
-export { DragDropContext };
-export { Droppable };
-export { Draggable };
+export { default as DragDropContext } from './view/drag-drop-context/';
+export { default as Droppable } from './view/droppable/';
+export { default as Draggable } from './view/draggable/';
 
 // Public flow types
 
