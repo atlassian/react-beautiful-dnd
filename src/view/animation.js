@@ -23,6 +23,11 @@ export const physics = (() => {
   return { standard, fast };
 })();
 
+const transitionCurve = 'cubic-bezier(0.2, 0, 0, 1)';
+const transitionTime = '0.2s';
+
 export const css = {
-  outOfTheWay: 'transform 0.2s cubic-bezier(0.2, 0, 0, 1)',
+  outOfTheWay: `transform ${transitionTime} ${transitionCurve}`,
+  transitionCurve,
+  transitionTime,
 };

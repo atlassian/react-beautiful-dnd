@@ -14,6 +14,8 @@ type Context = {|
   [droppableIdKey]: DroppableId
 |}
 
+const defaultPlaceholderDimensions = { height: 0, width: 0 };
+
 export default class Droppable extends Component {
   /* eslint-disable react/sort-comp */
   props: Props
@@ -62,14 +64,14 @@ export default class Droppable extends Component {
   }
 
   getPlaceholder() {
-    if (!this.props.placeholder) {
-      return null;
-    }
+    const isVisible = Boolean(this.props.placeholder);
+    const { height, width } = this.props.placeholder || defaultPlaceholderDimensions;
 
     return (
       <Placeholder
-        height={this.props.placeholder.height}
-        width={this.props.placeholder.width}
+        isVisible={isVisible}
+        height={height}
+        width={width}
       />
     );
   }
