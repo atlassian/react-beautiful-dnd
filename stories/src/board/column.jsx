@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { grid, colors, borderRadius } from '../constants';
 import { Draggable } from '../../../src/';
+import type { DraggableProvided, DraggableStateSnapshot } from '../../../src/';
 import CardList from '../vertical/quote-list';
 import type { AuthorWithQuotes } from '../types';
-import type { Provided, StateSnapshot } from '../../../src/view/draggable/draggable-types';
 
 const Wrapper = styled.div`
   display: flex;
@@ -48,7 +48,7 @@ export default class Column extends Component {
     const column: AuthorWithQuotes = this.props.column;
     return (
       <Draggable draggableId={column.author.id} type="AUTHOR">
-        {(provided: Provided, snapshot: StateSnapshot) => (
+        {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
           <Wrapper>
             <Container
               innerRef={provided.innerRef}

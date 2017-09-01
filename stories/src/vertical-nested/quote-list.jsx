@@ -7,13 +7,11 @@ import { grid, colors } from '../constants';
 import type { Quote } from '../types';
 import type { NestedQuoteList } from './types';
 import type {
-  Provided as DroppableProvided,
-  StateSnapshot as DroppableSnapshot,
-} from '../../../src/view/droppable/droppable-types';
-import type {
-  Provided as DraggableProvided,
-  StateSnapshot as DraggableStateSnapshot,
-} from '../../../src/view/draggable/draggable-types';
+  DroppableProvided,
+  DroppableStateSnapshot,
+  DraggableProvided,
+  DraggableStateSnapshot,
+} from '../../../src/';
 
 const Root = styled.div`
   width: 250px;
@@ -71,7 +69,7 @@ export default class QuoteList extends Component {
       type={list.id}
       key={list.id}
     >
-      {(dropProvided: DroppableProvided, dropSnapshot: DroppableSnapshot) => (
+      {(dropProvided: DroppableProvided, dropSnapshot: DroppableStateSnapshot) => (
         <Container
           innerRef={dropProvided.innerRef}
           isDraggingOver={dropSnapshot.isDraggingOver}

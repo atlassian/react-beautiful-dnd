@@ -6,9 +6,9 @@ import createStore from '../../state/create-store';
 import type { Store, Hooks, ReactElement } from '../../types';
 import { storeKey } from '../context-keys';
 
-type Props = Hooks & {|
-  children?: ReactElement,
-|}
+type Props = Hooks & {
+  children: ?ReactElement,
+}
 
 type Context = {
   [string]: Store

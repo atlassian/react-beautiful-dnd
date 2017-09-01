@@ -17,7 +17,7 @@ export type Placeholder = {|
 |}
 
 export type Provided = {|
-  innerRef: (HTMLElement) => void,
+  innerRef: (?HTMLElement) => void,
   placeholder: ?ReactElement,
 |}
 

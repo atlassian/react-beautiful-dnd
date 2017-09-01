@@ -3,8 +3,7 @@ import React from 'react';
 import { mount } from 'enzyme';
 import Moveable from '../../../src/view/moveable/';
 import type { Position } from '../../../src/types';
-// eslint-disable-next-line no-duplicate-imports
-import type { Speed, Style } from '../../../src/view/moveable/';
+import type { Speed, Style } from '../../../src/view/moveable/moveable-types';
 
 describe('Moveable', () => {
   let wrapper;

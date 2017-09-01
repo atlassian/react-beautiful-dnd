@@ -1,18 +1,16 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Droppable, Draggable } from '../../../src';
 import QuoteItem from '../primatives/quote-item';
-import { borderRadius, grid, colors } from '../constants';
+import { grid, colors } from '../constants';
+import { Droppable, Draggable } from '../../../src';
+import type {
+  DraggableProvided,
+  DraggableStateSnapshot,
+  DroppableProvided,
+  DroppableStateSnapshot,
+} from '../../../src/';
 import type { Quote } from '../types';
-import type {
-  Provided as DroppableProvided,
-  StateSnapshot as DroppableStateSnapshot,
-} from '../../../src/view/droppable/droppable-types';
-import type {
-  Provided as DraggableProvided,
-  StateSnapshot as DraggableStateSnapshot,
-} from '../../../src/view/draggable/draggable-types';
 
 const Container = styled.div`
   background-color: ${({ isDraggingOver }) => (isDraggingOver ? colors.blue.lighter : colors.blue.light)};

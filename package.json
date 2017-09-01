@@ -1,6 +1,6 @@
 {
   "name": "react-beautiful-dnd",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Beautiful, accessible drag and drop for lists with React.js",
   "author": "Alex Reardon <areardon@atlassian.com>",
   "keywords": [
@@ -20,7 +20,9 @@
     "validate": "yarn run lint && yarn run typecheck",
     "lint": "eslint src test stories",
     "typecheck": "flow check",
-    "build": "babel src -d lib",
+    "build": "yarn run build:lib && yarn run build:flow",
+    "build:lib": "babel src -d lib",
+    "build:flow": "flow-copy-source --verbose src lib",
     "storybook": "start-storybook -p 9002",
     "build-storybook": "build-storybook -c .storybook -o site",
     "prepublish": "yarn run build"
@@ -59,6 +61,7 @@
     "eslint-plugin-jsx-a11y": "5",
     "eslint-plugin-react": "7.1.0",
     "flow-bin": "0.52.0",
+    "flow-copy-source": "1.2.1",
     "jest": "20.0.4",
     "raf-stub": "2.0.1",
     "react": "15.6.1",

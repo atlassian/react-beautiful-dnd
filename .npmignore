@@ -1,18 +1,22 @@
-# editors
+# Editors
 .idea
 .vscode
 
-# library
+# Dependencies
 node_modules/
 
-# MacOS
-.DS_Store
+# Tests
+test/
+jest.config.js
 
-# generated site & stories
+# Stories
+stories/
+
+# Generated site & stories
 site/
 .storybook/
 
-# coverage reports
+# Coverage reports
 coverage/
 
 # yarn
@@ -25,3 +29,6 @@ yarn.lock
 yarn-error.log
 npm-debug.log
 npm-debug.log.*
+
+# MacOS
+.DS_Store

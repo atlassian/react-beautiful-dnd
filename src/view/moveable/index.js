@@ -1,1 +1,2 @@
-export default from './moveable';
+// @flow
+export { default } from './moveable';
