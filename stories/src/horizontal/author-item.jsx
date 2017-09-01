@@ -1,10 +1,10 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Draggable } from '../../../src/';
 import { colors, grid } from '../constants';
+import { Draggable } from '../../../src/';
+import type { DraggableProvided, DraggableStateSnapshot } from '../../../src/';
 import type { Author } from '../types';
-import type { Provided, StateSnapshot } from '../../../src/view/draggable/draggable-types';
 
 const Avatar = styled.img`
   width: 60px;
@@ -35,7 +35,7 @@ export default class AuthorItem extends Component {
     const author: Author = this.props.author;
     return (
       <Draggable draggableId={author.id}>
-        {(provided: Provided, snapshot: StateSnapshot) => (
+        {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
           <div>
             <Avatar
               innerRef={ref => provided.innerRef(ref)}

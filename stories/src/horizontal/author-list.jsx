@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Droppable } from '../../../src/';
-import type { Provided, StateSnapshot } from '../../../src/view/droppable/droppable-types';
+import type { DroppableProvided, DroppableStateSnapshot } from '../../../src/';
 import type { Overflow } from './types';
 
 const Container = styled.div`
@@ -27,7 +27,7 @@ export default class AuthorList extends Component {
         droppableId={this.props.listId}
         direction="horizontal"
       >
-        {(provided: Provided, snapshot: StateSnapshot) => (
+        {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
           <Container
             isDraggingOver={snapshot.isDraggingOver}
             overflow={this.props.overflow}

@@ -3,12 +3,12 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { borderRadius, colors, grid } from '../constants';
 import type { Quote } from '../types';
-import type { Provided } from '../../../src/view/draggable/draggable-types';
+import type { DraggableProvided } from '../../../src/';
 
 type Props = {
   quote: Quote,
   isDragging: boolean,
-  provided: Provided,
+  provided: DraggableProvided,
 }
 
 const Container = styled.a`

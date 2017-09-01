@@ -6,9 +6,13 @@ import Column from './column';
 import { colors } from '../constants';
 import reorder, { reorderGroup } from '../reorder';
 import { DragDropContext, Droppable } from '../../../src/';
-import type { DropResult, DragStart, DraggableLocation } from '../../../src/';
+import type {
+  DropResult,
+  DragStart,
+  DraggableLocation,
+  DroppableProvided,
+} from '../../../src/';
 import type { AuthorWithQuotes } from '../types';
-import type { Provided } from '../../../src/view/droppable/droppable-types';
 
 const isDraggingClassName = 'is-dragging';
 
@@ -110,7 +114,7 @@ export default class Board extends Component {
           type="AUTHOR"
           direction="horizontal"
         >
-          {(provided: Provided) => (
+          {(provided: DroppableProvided) => (
             <Container innerRef={provided.innerRef}>
               {this.state.columns.map((column: AuthorWithQuotes) => (
                 <Column key={column.author.id} column={column} />
