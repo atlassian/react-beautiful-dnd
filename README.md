@@ -902,6 +902,10 @@ The types are exported as part of the module so using them is as simple as:
 import type { DroppableProvided } from 'react-beautiful-dnd';
 ```
 
+### Version
+
+`react-beautiful-dnd` currently uses flow `0.52` which is not the [latest version](https://github.com/facebook/flow/releases). However, we are not able to upgrade until [eslint-plugin-react](https://github.com/yannickcr/eslint-plugin-react) [supports it](https://github.com/yannickcr/eslint-plugin-react/issues/1376) - [more details](https://github.com/atlassian/react-beautiful-dnd/issues/37)
+
 ## Engineering health
 
 ### Typed
