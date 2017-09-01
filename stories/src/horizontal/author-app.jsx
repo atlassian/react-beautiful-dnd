@@ -3,12 +3,12 @@ import React, { Component } from 'react';
 import styled, { injectGlobal } from 'styled-components';
 import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src/';
+import type { DropResult, DragStart } from '../../../src';
 import AuthorList from './author-list';
 import AuthorItem from './author-item';
 import reorder from '../reorder';
 import { colors, grid } from '../constants';
 import type { Author } from '../types';
-import type { DropResult, DragStart } from '../../../src/types';
 import type { Overflow } from './types';
 
 const isDraggingClassName = 'is-dragging';

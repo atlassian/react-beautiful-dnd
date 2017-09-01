@@ -1,1 +1,2 @@
-export default from './drag-handle';
+// @flow
+export { default } from './drag-handle';

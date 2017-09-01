@@ -462,11 +462,11 @@ The `React` children of a `Droppable` must be a function that returns a `ReactEl
 
 The function is provided with two arguments:
 
-**1. provided: (Provided)**
+**1. provided: (DroppableProvided)**
 
 ```js
-type Provided = {|
-  innerRef: (HTMLElement) => void,
+type DroppableProvided = {|
+  innerRef: (?HTMLElement) => void,
 |}
 ```
 
@@ -478,10 +478,10 @@ In order for the droppable to function correctly, **you must** bind the `provide
 </Droppable>;
 ```
 
-**2. snapshot: (StateSnapshot)**
+**2. snapshot: (DroppableStateSnapshot)**
 
 ```js
-type StateSnapshot = {|
+type DroppableStateSnapshot = {|
   isDraggingOver: boolean,
 |};
 ```
@@ -517,7 +517,7 @@ This library supports dragging within scroll containers (DOM elements that have 
 1. The `Droppable` can itself be a scroll container with **no scrollable parents**
 2. The `Droppable` has **one scrollable parent**
 
-**Auto scrolling is not provided**
+**Auto scrolling is not provided (yet!)**
 
 Currently auto scrolling of scroll containers is not part of this library. Auto scrolling is where the container automatically scrolls to make room for the dragging item as you drag near the edge of a scroll container. You are welcome to build your own auto scrolling list, or if you would you really like it as part of this library we could provide a auto scrolling `Droppable`.
 
@@ -583,10 +583,10 @@ The `React` children of a `Draggable` must be a function that returns a `ReactEl
 
 The function is provided with two arguments:
 
-**1. provided: (Provided)**
+**1. provided: (DraggableProvided)**
 
 ```js
-type Provided = {|
+type DraggableProvided = {|
   innerRef: (HTMLElement) => void,
   draggableStyle: ?DraggableStyle,
   dragHandleProps: ?DragHandleProvided,
@@ -790,10 +790,10 @@ const myOnClick = event => console.log('clicked on', event.target);
 </Draggable>;
 ```
 
-**2. snapshot: (StateSnapshot)**
+**2. snapshot: (DraggableStateSnapshot)**
 
 ```js
-type StateSnapshot = {|
+type DraggableStateSnapshot = {|
   isDragging: boolean,
 |};
 ```
@@ -823,6 +823,88 @@ The `children` function is also provided with a small amount of state relating t
   }}
 </Draggable>;
 ```
+
+## Flow usage
+
+`react-beautiful-dnd` is typed using [`flowtype`](flowtype.org). This greatly improves internal consistency within the codebase. We also expose a number of public types which will allow you to type your javascript if you would like to. If you are not using `flowtype` this will not inhibit you from using the library. It is just extra safety for those who want it.
+
+### Public flow types
+
+```js
+// id's
+type Id = string;
+type TypeId = Id;
+type DroppableId = Id;
+type DraggableId = Id;
+
+// hooks
+type DropResult = {|
+  draggableId: DraggableId,
+  type: TypeId,
+  source: DraggableLocation,
+  // may not have any destination (drag to nowhere)
+  destination: ?DraggableLocation
+|}
+
+type DraggableLocation = {|
+  droppableId: DroppableId,
+  // the position of the droppable within a droppable
+  index: number
+|};
+
+// Droppable
+type DroppableProvided = {|
+  innerRef: (?HTMLElement) => void,
+|}
+
+// Draggable
+type DraggableProvided = {|
+  innerRef: (?HTMLElement) => void,
+  draggableStyle: ?DraggableStyle,
+  dragHandleProps: ?DragHandleProvided,
+  placeholder: ?ReactElement,
+|}
+type DraggableStyle = DraggingStyle | NotDraggingStyle
+type DraggingStyle = {|
+  pointerEvents: 'none',
+  position: 'fixed',
+  width: number,
+  height: number,
+  boxSizing: 'border-box',
+  top: number,
+  left: number,
+  margin: 0,
+  transform: ?string,
+  zIndex: ZIndex,
+|}
+type NotDraggingStyle = {|
+  transition: ?string,
+  transform: ?string,
+  pointerEvents: 'none' | 'auto',
+|}
+type DragHandleProvided = {|
+  onMouseDown: (event: MouseEvent) => void,
+  onKeyDown: (event: KeyboardEvent) => void,
+  onClick: (event: MouseEvent) => void,
+  tabIndex: number,
+  'aria-grabbed': boolean,
+  draggable: boolean,
+  onDragStart: () => void,
+  onDrop: () => void
+|}
+```
+
+### Using the flow types
+
+The types are exported as part of the module so using them is as simple as:
+
+```js
+import type { DroppableProvided } from 'react-beautiful-dnd';
+```
+
+### Flow version
+
+`react-beautiful-dnd` currently uses flow `0.52` which is not the [latest version](https://github.com/facebook/flow/releases). However, we are not able to upgrade until [eslint-plugin-react](https://github.com/yannickcr/eslint-plugin-react) [supports it](https://github.com/yannickcr/eslint-plugin-react/issues/1376) - [more details](https://github.com/atlassian/react-beautiful-dnd/issues/37)
 
 ## Engineering health
 

@@ -78,7 +78,7 @@ export type ZIndexOptions = {|
 |}
 
 export type Provided = {|
-  innerRef: (HTMLElement) => void,
+  innerRef: (?HTMLElement) => void,
   draggableStyle: ?DraggableStyle,
   dragHandleProps: ?DragHandleProvided,
   placeholder: ?ReactElement,

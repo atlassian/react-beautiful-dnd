@@ -1,1 +1,2 @@
-export default from './connected-draggable-dimension-publisher';
+// @flow
+export { default } from './connected-draggable-dimension-publisher';

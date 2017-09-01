@@ -1,1 +1,2 @@
-export default from './drag-drop-context';
+// @flow
+export { default } from './drag-drop-context';

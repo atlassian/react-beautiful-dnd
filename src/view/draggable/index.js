@@ -1,1 +1,2 @@
-export default from './connected-draggable';
+// @flow
+export { default } from './connected-draggable';
