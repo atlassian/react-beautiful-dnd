@@ -5,6 +5,7 @@ import {
   add,
   patch,
   subtract,
+  absolute,
 } from './position';
 import moveToEdge from './move-to-edge';
 import type {
@@ -58,6 +59,7 @@ const shift = (adjust: (original: Position, modification: Position) => Position)
 export default ({
   isMovingForward,
   draggableId,
+  center,
   impact,
   draggables,
   droppables,
@@ -102,47 +104,35 @@ export default ({
   // if moving forward: move start edge of source to end edge of destination
   // if moving backward: move end edge of source to start edge of destination
 
-  const center = moveToEdge({
-    source: draggable.page.withoutMargin,
-    sourceEdge: isMovingForward ? 'start' : 'end',
-    destination: destination.page.withMargin,
-    destinationEdge: isMovingForward ? 'start' : 'end',
-    destinationAxis: droppable.axis,
-  });
-
   const isMovingTowardStart = (isMovingForward && proposedIndex <= startIndex) ||
     (!isMovingForward && proposedIndex >= startIndex);
 
-  const sizeDiff: Position = patch(
-    axis.line,
-    destination.page.withMargin[axis.size] - draggable.page.withMargin[axis.size]
-  );
+  const newCenter: Position = (() => {
+    // If moving toward start, just add / remove the size of the dragging item
+    // Things have moved out of the way by the size of the dragging item - we are
+    // just undoing the movement
+    if (isMovingTowardStart) {
+      const size = patch(axis.line, destination.page.withMargin[axis.size]);
 
-  const shifted = add(center, sizeDiff);
+      return isMovingForward ? add(center, size) : subtract(center, size);
+    }
 
-  // const shifted = (() => {
-  //   const fragment: DimensionFragment = isMovingTowardStart ?
-  //     atCurrentIndex.page.withMargin :
-  //     draggable.page.withMargin;
+    // if moving away from the start - move to the start edge of the next draggable
+    const goal: Position = moveToEdge({
+      source: draggable.page.withoutMargin,
+      sourceEdge: 'start',
+      destination: destination.page.withMargin,
+      destinationEdge: 'start',
+      destinationAxis: droppable.axis,
+    });
 
-  //   const amount: Position = patch(
-  //     axis.line,
-  //     fragment[axis.size],
-  //   );
+    const sizeDiff: Position = patch(
+      axis.line,
+      draggable.page.withMargin[axis.size] - destination.page.withMargin[axis.size]
+    );
 
-  //   if (isMovingForward) {
-  //     return subtract(center, amount);
-  //   }
-  //   return add(center, amount);
-  // })();
-
-  // const distance: number = isMovingTowardStart ?
-  //   atCurrentIndex.page.withMargin[axis.size] :
-  //   destination.page.withMargin[axis.size];
-
-  // const signed: number = isMovingForward ? distance : -distance;
-
-  // const diff: Position = patch(axis.line, signed);
+    return isMovingForward ? subtract(goal, sizeDiff) : goal;
+  })();
 
   // Calculate DragImpact
 
@@ -169,7 +159,7 @@ export default ({
   };
 
   const result: JumpToNextResult = {
-    center: shifted,
+    center: newCenter,
     impact: newImpact,
   };
 
