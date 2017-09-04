@@ -30,8 +30,6 @@ const getIndex = memoizeOne(
 type JumpToNextArgs = {|
   isMovingForward: boolean,
   draggableId: DraggableId,
-  // the current center position
-  center: Position,
   impact: DragImpact,
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
@@ -41,16 +39,6 @@ export type JumpToNextResult = {|
   center: Position,
   impact: DragImpact,
 |}
-
-type ShiftPosition = (point: Position, size: number, axis: Axis) => Position;
-
-const shift = (adjust: (original: Position, modification: Position) => Position): ShiftPosition =>
-  (point: Position, size: number, axis: Axis): Position => {
-    const amount: Position = patch(axis.line, size);
-
-    return adjust(point, amount);
-  };
-
 // const pull =
 
 // const pull: ShiftPosition = shift(subtract, size: number);
@@ -59,7 +47,6 @@ const shift = (adjust: (original: Position, modification: Position) => Position)
 export default ({
   isMovingForward,
   draggableId,
-  center,
   impact,
   draggables,
   droppables,
@@ -99,40 +86,23 @@ export default ({
   }
 
   const destination: DraggableDimension = insideDroppable[proposedIndex];
-  const atCurrentIndex: DraggableDimension = insideDroppable[currentIndex];
-
-  // if moving forward: move start edge of source to end edge of destination
-  // if moving backward: move end edge of source to start edge of destination
-
   const isMovingTowardStart = (isMovingForward && proposedIndex <= startIndex) ||
     (!isMovingForward && proposedIndex >= startIndex);
 
-  const newCenter: Position = (() => {
-    // If moving toward start, just add / remove the size of the dragging item
-    // Things have moved out of the way by the size of the dragging item - we are
-    // just undoing the movement
-    if (isMovingTowardStart) {
-      const size = patch(axis.line, destination.page.withMargin[axis.size]);
-
-      return isMovingForward ? add(center, size) : subtract(center, size);
+  const edge = (() => {
+    if (!isMovingTowardStart) {
+      return isMovingForward ? 'end' : 'start';
     }
-
-    // if moving away from the start - move to the start edge of the next draggable
-    const goal: Position = moveToEdge({
-      source: draggable.page.withoutMargin,
-      sourceEdge: 'start',
-      destination: destination.page.withMargin,
-      destinationEdge: 'start',
-      destinationAxis: droppable.axis,
-    });
-
-    const sizeDiff: Position = patch(
-      axis.line,
-      draggable.page.withMargin[axis.size] - destination.page.withMargin[axis.size]
-    );
-
-    return isMovingForward ? subtract(goal, sizeDiff) : goal;
+    return isMovingForward ? 'start' : 'end';
   })();
+
+  const newCenter = moveToEdge({
+    source: draggable.page.withoutMargin,
+    sourceEdge: edge,
+    destination: destination.page.withoutMargin,
+    destinationEdge: edge,
+    destinationAxis: droppable.axis,
+  });
 
   // Calculate DragImpact
 

@@ -403,7 +403,6 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       isMovingForward,
       draggableId: existing.current.id,
       impact: existing.impact,
-      center: existing.current.page.center,
       draggables: state.dimension.draggable,
       droppables: state.dimension.droppable,
     });
