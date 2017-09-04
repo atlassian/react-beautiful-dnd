@@ -3,6 +3,7 @@ import jumpToNextIndex from '../../../src/state/jump-to-next-index';
 import type { JumpToNextResult } from '../../../src/state/jump-to-next-index';
 import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
 import getClientRect from '../../utils/get-client-rect';
+import moveToEdge from '../../../src/state/move-to-edge';
 import { patch } from '../../../src/state/position';
 import { vertical, horizontal } from '../../../src/state/axis';
 import type {
@@ -105,6 +106,185 @@ describe('jump to next index', () => {
           expect(result).toBe(null);
         });
 
+        describe('is moving away from start position', () => {
+          describe('dragging first item forward one position', () => {
+            // dragging the first item forward into the second position
+            const movement: DragMovement = {
+              draggables: [],
+              amount: patch(axis.line, draggable1.page.withMargin[axis.size]),
+              isBeyondStartPosition: false,
+            };
+            const destination: DraggableLocation = {
+              index: 0,
+              droppableId: droppable.id,
+            };
+            const impact: DragImpact = {
+              movement,
+              direction: axis.direction,
+              destination,
+            };
+            const result: ?JumpToNextResult = jumpToNextIndex({
+              isMovingForward: true,
+              draggableId: draggable1.id,
+              impact,
+              draggables,
+              droppables,
+            });
+
+            if (!result) {
+              throw new Error('invalid result');
+            }
+
+            it('should move the end of the dragging item to the end of the next item', () => {
+              const expected: Position = moveToEdge({
+                source: draggable1.page.withoutMargin,
+                sourceEdge: 'end',
+                destination: draggable2.page.withoutMargin,
+                destinationEdge: 'end',
+                destinationAxis: axis,
+              });
+
+              expect(result.center).toEqual(expected);
+            });
+
+            it('should move the item into the second spot and move the second item out of the way', () => {
+              const expected: DragImpact = {
+                movement: {
+                  draggables: [draggable2.id],
+                  amount: patch(axis.line, draggable1.page.withMargin[axis.size]),
+                  isBeyondStartPosition: true,
+                },
+                direction: axis.direction,
+                // is now in the second position
+                destination: {
+                  droppableId: droppable.id,
+                  index: 1,
+                },
+              };
+
+              expect(result.impact).toEqual(expected);
+            });
+          });
+
+          describe('dragging second item forward one position', () => {
+            const movement: DragMovement = {
+              draggables: [],
+              amount: patch(axis.line, draggable2.page.withMargin[axis.size]),
+              isBeyondStartPosition: false,
+            };
+            const destination: DraggableLocation = {
+              index: 1,
+              droppableId: droppable.id,
+            };
+            const impact: DragImpact = {
+              movement,
+              direction: axis.direction,
+              destination,
+            };
+            const result: ?JumpToNextResult = jumpToNextIndex({
+              isMovingForward: true,
+              draggableId: draggable2.id,
+              impact,
+              draggables,
+              droppables,
+            });
+
+            if (!result) {
+              throw new Error('invalid result');
+            }
+
+            it('should move the end of the dragging item to the end of the next item', () => {
+              const expected: Position = moveToEdge({
+                source: draggable2.page.withoutMargin,
+                sourceEdge: 'end',
+                destination: draggable3.page.withoutMargin,
+                destinationEdge: 'end',
+                destinationAxis: axis,
+              });
+
+              expect(result.center).toEqual(expected);
+            });
+
+            it('should move the dragging item into the third spot and move the third item out of the way', () => {
+              const expected: DragImpact = {
+                movement: {
+                  draggables: [draggable3.id],
+                  amount: patch(axis.line, draggable2.page.withMargin[axis.size]),
+                  isBeyondStartPosition: true,
+                },
+                direction: axis.direction,
+                // is now in the second position
+                destination: {
+                  droppableId: droppable.id,
+                  index: 2,
+                },
+              };
+
+              expect(result.impact).toEqual(expected);
+            });
+          });
+
+          describe('dragging first item forward one position after already moving it forward once', () => {
+            const impact: DragImpact = {
+              movement: {
+                // second item has already moved
+                draggables: [draggable2.id],
+                amount: patch(axis.line, draggable1.page.withMargin[axis.size]),
+                isBeyondStartPosition: true,
+              },
+              direction: axis.direction,
+              // draggable1 is now in the second position
+              destination: {
+                droppableId: droppable.id,
+                index: 1,
+              },
+            };
+            const result: ?JumpToNextResult = jumpToNextIndex({
+              isMovingForward: true,
+              draggableId: draggable1.id,
+              impact,
+              draggables,
+              droppables,
+            });
+
+            if (!result) {
+              throw new Error('invalid result');
+            }
+
+            it('should move the end of the dragging item to the end of the next item', () => {
+              // next dimension from the current index is draggable3
+              const expected: Position = moveToEdge({
+                source: draggable1.page.withoutMargin,
+                sourceEdge: 'end',
+                destination: draggable3.page.withoutMargin,
+                destinationEdge: 'end',
+                destinationAxis: axis,
+              });
+
+              expect(result.center).toEqual(expected);
+            });
+
+            it('should move the third item out of the way', () => {
+              const expected: DragImpact = {
+                movement: {
+                  // adding draggable3 to the list
+                  draggables: [draggable2.id, draggable3.id],
+                  amount: patch(axis.line, draggable1.page.withMargin[axis.size]),
+                  isBeyondStartPosition: true,
+                },
+                direction: axis.direction,
+                // is now in the second position
+                destination: {
+                  droppableId: droppable.id,
+                  index: 2,
+                },
+              };
+
+              expect(result.impact).toEqual(expected);
+            });
+          });
+        });
+
         describe('is moving toward start position', () => {
           describe('dragging item forward to starting position', () => {
             // dragging the second item (draggable2), which has previously
@@ -133,13 +313,16 @@ describe('jump to next index', () => {
               throw new Error('invalid result of jumpToNextIndex');
             }
 
-            it('should return the size of the dimension in the current index as the diff', () => {
-              const size: Position = patch(
-                axis.line,
-                draggable1.page.withMargin[axis.size]
-              );
+            it('should move the start of the dragging item to the end of the previous item (which is itself)', () => {
+              const expected: Position = moveToEdge({
+                source: draggable2.page.withoutMargin,
+                sourceEdge: 'start',
+                destination: draggable2.page.withoutMargin,
+                destinationEdge: 'start',
+                destinationAxis: axis,
+              });
 
-              expect(result.diff).toEqual(size);
+              expect(result.center).toEqual(expected);
             });
 
             it('should return an empty impact', () => {
@@ -189,12 +372,16 @@ describe('jump to next index', () => {
               throw new Error('invalid result');
             }
 
-            it('should return the size of the moving dimension (draggable1)', () => {
-              const expected: Position = patch(
-                axis.line,
-                draggable1.page.withMargin[axis.size],
-              );
-              expect(result.diff).toEqual(expected);
+            it('should move to the start of the draggable item to the start position of the destination draggable', () => {
+              const expected: Position = moveToEdge({
+                source: draggable3.page.withoutMargin,
+                sourceEdge: 'start',
+                destination: draggable2.page.withoutMargin,
+                destinationEdge: 'start',
+                destinationAxis: axis,
+              });
+
+              expect(result.center).toEqual(expected);
             });
 
             it('should remove the first dimension from the impact', () => {
@@ -210,172 +397,6 @@ describe('jump to next index', () => {
                 destination: {
                   droppableId: droppable.id,
                   index: 1,
-                },
-              };
-
-              expect(result.impact).toEqual(expected);
-            });
-          });
-        });
-
-        describe('is moving away from start position', () => {
-          describe('dragging first item forward one position', () => {
-          // dragging the first item forward into the second position
-            const movement: DragMovement = {
-              draggables: [],
-              amount: patch(axis.line, draggable1.page.withMargin[axis.size]),
-              isBeyondStartPosition: false,
-            };
-            const destination: DraggableLocation = {
-              index: 0,
-              droppableId: droppable.id,
-            };
-            const impact: DragImpact = {
-              movement,
-              direction: axis.direction,
-              destination,
-            };
-            const result: ?JumpToNextResult = jumpToNextIndex({
-              isMovingForward: true,
-              draggableId: draggable1.id,
-              impact,
-              draggables,
-              droppables,
-            });
-
-            if (!result) {
-              throw new Error('invalid result');
-            }
-
-            it('should return the size of the second dimension as the diff', () => {
-              const expected: Position = patch(axis.line, draggable2.page.withMargin[axis.size]);
-
-              expect(result.diff).toEqual(expected);
-            });
-
-            it('should move the item into the second spot and move the second item out of the way', () => {
-              const expected: DragImpact = {
-                movement: {
-                  draggables: [draggable2.id],
-                  amount: patch(axis.line, draggable1.page.withMargin[axis.size]),
-                  isBeyondStartPosition: true,
-                },
-                direction: axis.direction,
-                // is now in the second position
-                destination: {
-                  droppableId: droppable.id,
-                  index: 1,
-                },
-              };
-
-              expect(result.impact).toEqual(expected);
-            });
-          });
-
-          describe('dragging second item forward one position', () => {
-            const movement: DragMovement = {
-              draggables: [],
-              amount: patch(axis.line, draggable2.page.withMargin[axis.size]),
-              isBeyondStartPosition: false,
-            };
-            const destination: DraggableLocation = {
-              index: 1,
-              droppableId: droppable.id,
-            };
-            const impact: DragImpact = {
-              movement,
-              direction: axis.direction,
-              destination,
-            };
-            const result: ?JumpToNextResult = jumpToNextIndex({
-              isMovingForward: true,
-              draggableId: draggable2.id,
-              impact,
-              draggables,
-              droppables,
-            });
-
-            if (!result) {
-              throw new Error('invalid result');
-            }
-
-            it('should return the size of the third dimension as the diff', () => {
-              const expected: Position = patch(
-                axis.line,
-                draggable3.page.withMargin[axis.size],
-              );
-              expect(result.diff).toEqual(expected);
-            });
-
-            it('should move the dragging item into the third spot and move the third item out of the way', () => {
-              const expected: DragImpact = {
-                movement: {
-                  draggables: [draggable3.id],
-                  amount: patch(axis.line, draggable2.page.withMargin[axis.size]),
-                  isBeyondStartPosition: true,
-                },
-                direction: axis.direction,
-                // is now in the second position
-                destination: {
-                  droppableId: droppable.id,
-                  index: 2,
-                },
-              };
-
-              expect(result.impact).toEqual(expected);
-            });
-          });
-
-          describe('dragging first item forward one position after already moving it forward once', () => {
-            const impact: DragImpact = {
-              movement: {
-                // second item has already moved
-                draggables: [draggable2.id],
-                amount: patch(axis.line, draggable1.page.withMargin[axis.size]),
-                isBeyondStartPosition: true,
-              },
-              direction: axis.direction,
-              // draggable1 is now in the second position
-              destination: {
-                droppableId: droppable.id,
-                index: 1,
-              },
-            };
-            const result: ?JumpToNextResult = jumpToNextIndex({
-              isMovingForward: true,
-              draggableId: draggable1.id,
-              impact,
-              draggables,
-              droppables,
-            });
-
-            if (!result) {
-              throw new Error('invalid result');
-            }
-
-            it('should return the size of the third dimension', () => {
-              // next dimension from the current index is draggable3
-              const expected: Position = patch(
-                axis.line,
-                draggable3.page.withMargin[axis.size],
-              );
-
-              expect(result.diff).toEqual(expected);
-            });
-
-            it('should move the third item out of the way', () => {
-              const expected: DragImpact = {
-                movement: {
-                  // adding draggable3 to the list
-                  draggables: [draggable2.id, draggable3.id],
-                  amount: patch(axis.line, draggable1.page.withMargin[axis.size]),
-                  isBeyondStartPosition: true,
-                },
-                direction: axis.direction,
-                // is now in the second position
-                destination: {
-                  droppableId: droppable.id,
-                  index: 2,
                 },
               };
 

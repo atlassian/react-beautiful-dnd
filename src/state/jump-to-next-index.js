@@ -1,13 +1,9 @@
 // @flow
 import memoizeOne from 'memoize-one';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
-import {
-  add,
-  patch,
-  subtract,
-  absolute,
-} from './position';
+import { patch } from './position';
 import moveToEdge from './move-to-edge';
+import type { Edge } from './move-to-edge';
 import type {
   DraggableLocation,
   DraggableDimension,
@@ -89,14 +85,14 @@ export default ({
   const isMovingTowardStart = (isMovingForward && proposedIndex <= startIndex) ||
     (!isMovingForward && proposedIndex >= startIndex);
 
-  const edge = (() => {
+  const edge: Edge = (() => {
     if (!isMovingTowardStart) {
       return isMovingForward ? 'end' : 'start';
     }
     return isMovingForward ? 'start' : 'end';
   })();
 
-  const newCenter = moveToEdge({
+  const newCenter: Position = moveToEdge({
     source: draggable.page.withoutMargin,
     sourceEdge: edge,
     destination: destination.page.withoutMargin,
