@@ -86,9 +86,11 @@ export default ({
     (!isMovingForward && proposedIndex >= startIndex);
 
   const edge: Edge = (() => {
+    // is moving away from the start
     if (!isMovingTowardStart) {
       return isMovingForward ? 'end' : 'start';
     }
+    // is moving back towards the start
     return isMovingForward ? 'start' : 'end';
   })();
 
