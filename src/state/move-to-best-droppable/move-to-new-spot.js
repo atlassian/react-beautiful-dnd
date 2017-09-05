@@ -153,25 +153,6 @@ export default ({
     console.log('result moving back home', result);
 
     return result;
-
-    // const newCenter: Position = moveToEdge({
-    //   source: draggable.page.withoutMargin,
-    //   sourceEdge: 'start',
-    //   destination: target.page.withMargin,
-    //   destinationEdge: 'start',
-    //   destinationAxis,
-    // });
-
-    // const impact: DragImpact = {
-    //   draggables: [],
-    //   amount,
-    //   isBeyondStartPosition: proposedIndex >
-    // };
-
-    // return {
-    //   center: newCenter,
-    //   impact: noImpact,
-    // };
   }
 
   // 1. If isGoingBefore: need to move draggable start edge to start edge of target

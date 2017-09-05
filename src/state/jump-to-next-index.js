@@ -80,14 +80,14 @@ export default ({
       return null;
     }
 
-  // cannot move before the first item
+    // cannot move before the first item
     if (proposedIndex < 0) {
       return null;
     }
 
     console.log('foreignDestinationStartIndex', startIndex);
 
-    const destinationIndex = proposedIndex >= startIndex ? proposedIndex - 1 : proposedIndex;
+    const destinationIndex = proposedIndex >= startIndex ? proposedIndex - 1 : proposedIndex - 1;
 
     console.log('destinationIndex', destinationIndex);
 
@@ -95,7 +95,7 @@ export default ({
     // 'inserted' at start position
     const destination: DimensionFragment = (() => {
       if (proposedIndex === 0) {
-        console.log('using droppable as target');
+        console.log('destination id', insideDroppable[0].id);
         return insideDroppable[0].page.withMargin;
       }
 
@@ -125,7 +125,7 @@ export default ({
 
       // is moving away from the start
       if (!isMovingTowardStart) {
-        return isMovingForward ? 'start' : 'end';
+        return isMovingForward ? 'start' : 'start';
       }
       // is moving back towards the start
       return isMovingForward ? 'start' : 'start';
@@ -139,7 +139,7 @@ export default ({
 
       // is moving away from the start
       if (!isMovingTowardStart) {
-        return isMovingForward ? 'end' : 'start';
+        return isMovingForward ? 'end' : 'end';
       }
       // is moving back towards the start
       return isMovingForward ? 'end' : 'end';
