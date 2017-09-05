@@ -141,6 +141,7 @@ export default ({
 
     // TODO: need to give an appropriate impact!
     // TODO: broken if moving back to list when current list is impacted
+    console.info('returning to original list - but not in original position');
 
     const result = jumpToNextIndex({
       isMovingForward: isGoingBeforeTarget,

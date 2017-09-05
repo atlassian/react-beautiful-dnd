@@ -216,6 +216,8 @@ export default ({
   // If not in home list - need to insert draggable into correct position in list
   // const tempIndex: number = impact.destination.index;
 
+  console.log('moving when in home list')
+
   const startIndex: number = getIndex(insideDroppable, draggable);
   const currentIndex: number = location.index;
   const proposedIndex = isMovingForward ? currentIndex + 1 : currentIndex - 1;
