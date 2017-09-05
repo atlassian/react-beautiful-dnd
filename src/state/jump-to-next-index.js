@@ -27,8 +27,8 @@ type JumpToNextArgs = {|
   isMovingForward: boolean,
   draggableId: DraggableId,
   impact: DragImpact,
+  droppable: DroppableDimension,
   draggables: DraggableDimensionMap,
-  droppables: DroppableDimensionMap,
 |}
 
 export type JumpToNextResult = {|
@@ -44,8 +44,8 @@ export default ({
   isMovingForward,
   draggableId,
   impact,
+  droppable,
   draggables,
-  droppables,
   }: JumpToNextArgs): ?JumpToNextResult => {
   if (!impact.destination) {
     console.error('cannot move forward when there is not previous destination');
@@ -53,7 +53,6 @@ export default ({
   }
 
   const location: DraggableLocation = impact.destination;
-  const droppable: DroppableDimension = droppables[location.droppableId];
   const draggable: DraggableDimension = draggables[draggableId];
   const axis: Axis = droppable.axis;
 
@@ -61,6 +60,121 @@ export default ({
     droppable,
     draggables,
   );
+
+  // has the dragging item moved into a new list?
+  const isInHomeList: boolean = draggable.droppableId === droppable.id;
+
+  if (!isInHomeList) {
+    console.log('not in home list!');
+    // if draggable is not in home list
+    const currentIndex: number = location.index;
+    const proposedIndex = isMovingForward ? currentIndex + 1 : currentIndex - 1;
+    const startIndex: number = impact.foreignDestinationStartIndex;
+
+    // cannot move forward beyond the last item
+    if (proposedIndex > insideDroppable.length) {
+      return null;
+    }
+
+  // cannot move before the first item
+    if (proposedIndex < 0) {
+      return null;
+    }
+
+    const isMovingToEnd = proposedIndex === insideDroppable.length;
+
+    console.log('isMovingToEnd', isMovingToEnd);
+    console.log('foreignDestinationStartIndex', startIndex);
+
+    const destination: DraggableDimension =
+      insideDroppable[isMovingToEnd ? proposedIndex - 1 : proposedIndex];
+
+    // const sourceEdge = isMovingForward ? 'start' : 'end';
+
+    // const destinationEdge = (() => {
+    //   if (isMovingToEnd) {
+    //     return 'end';
+    //   }
+
+    //   return isMovingForward ? 'start' : 'end';
+    // })();
+
+    const isMovingTowardStart = (isMovingForward && proposedIndex <= startIndex) ||
+      (!isMovingForward && proposedIndex >= startIndex);
+
+    const sourceEdge = (() => {
+      if (isMovingToEnd) {
+        return 'start';
+      }
+
+      if (!isMovingTowardStart) {
+        return isMovingForward ? 'start' : 'end';
+      }
+    // is moving back towards the start
+      return isMovingForward ? 'start' : 'end';
+    })();
+
+    const destinationEdge = (() => {
+      if (isMovingToEnd) {
+        return 'end';
+      }
+
+      if (!isMovingTowardStart) {
+        return isMovingForward ? 'start' : 'end';
+      }
+    // is moving back towards the start
+      return isMovingForward ? 'start' : 'end';
+    })();
+    // console.log('edge', edge);
+    // console.log('is moving forward', isMovingForward);
+    // console.log('isMovingTowardStart', isMovingTowardStart);
+
+    const newCenter: Position = moveToEdge({
+      source: draggable.page.withoutMargin,
+      sourceEdge,
+      destination: isMovingToEnd ? destination.page.withMargin : destination.page.withoutMargin,
+      destinationEdge,
+      destinationAxis: droppable.axis,
+    });
+
+    const moved: DraggableId[] = (() => {
+      if (isMovingTowardStart) {
+        return [...impact.movement.draggables, destination.id];
+      }
+
+      // strip first item off the list
+      return impact.movement.draggables.slice(1, impact.movement.draggables.length);
+    })();
+
+    console.log('moved', moved);
+
+    const newImpact: DragImpact = {
+      movement: {
+        draggables: moved,
+          // The amount of movement will always be the size of the dragging item
+        amount: patch(axis.line, draggable.page.withMargin[axis.size]),
+        isBeyondStartPosition: false,
+      },
+      destination: {
+        droppableId: droppable.id,
+        index: proposedIndex,
+      },
+      direction: droppable.axis.direction,
+      foreignDestinationStartIndex: impact.foreignDestinationStartIndex,
+    };
+
+    // console.log('returning result', { newCenter, newImpact });
+
+    return {
+      center: newCenter,
+      impact: newImpact,
+    };
+  }
+
+  // even if not in home list -
+
+  // If not in home list - need to insert draggable into correct position in list
+  // const tempIndex: number = impact.destination.index;
 
   const startIndex: number = getIndex(insideDroppable, draggable);
   const currentIndex: number = location.index;

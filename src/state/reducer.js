@@ -403,8 +403,8 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       isMovingForward,
       draggableId: existing.current.id,
       impact: existing.impact,
+      droppable: state.dimension.droppable[existing.impact.destination.droppableId],
       draggables: state.dimension.draggable,
-      droppables: state.dimension.droppable,
     });
 
     // cannot move anyway (at the beginning or end of a list)
@@ -459,12 +459,15 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const draggableId: DraggableId = current.id;
     const center: Position = current.page.center;
     const droppableId: DroppableId = state.drag.impact.destination.droppableId;
+    const home: DraggableLocation = state.drag.initial.source;
 
     const result: ?MoveToNewSpotResult = moveToBestDroppable({
       isMovingForward: action.type === 'CROSS_AXIS_MOVE_FORWARD',
       center,
       draggableId,
       droppableId,
+      home,
+      impact: state.drag.impact,
       draggables: state.dimension.draggable,
       droppables: state.dimension.droppable,
     });

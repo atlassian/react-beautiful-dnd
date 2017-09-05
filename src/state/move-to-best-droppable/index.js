@@ -12,6 +12,7 @@ import type {
   DraggableDimension,
   DraggableDimensionMap,
   DroppableDimensionMap,
+  DraggableLocation,
 } from '../../types';
 
 type Args = {|
@@ -22,6 +23,10 @@ type Args = {|
   draggableId: DraggableId,
   // the droppable the dragging item is in
   droppableId: DroppableId,
+  // the original location of the draggable
+  home: DraggableLocation,
+  // the current drag impact
+  impact: DragImpact,
   // all the dimensions in the system
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
@@ -32,7 +37,9 @@ export default ({
   center,
   draggableId,
   droppableId,
+  home,
   draggables,
+  impact,
   droppables,
   }: Args): ?Result => {
   const draggable: DraggableDimension = draggables[draggableId];
@@ -65,10 +72,12 @@ export default ({
 
   return moveToNewSpot({
     center,
-    source,
-    destination,
     draggable,
     target,
+    source,
+    destination,
+    home,
+    impact,
     draggables,
   });
 };

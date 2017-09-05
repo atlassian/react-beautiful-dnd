@@ -103,7 +103,11 @@ export type DragImpact = {|
   movement: DragMovement,
   // the direction of the Droppable you are over
   direction: ?Direction,
-  destination: ?DraggableLocation
+  destination: ?DraggableLocation,
+  // The starting index within a droppable
+  // This might be the original start index
+  // or it could be the first index received once jumped into a list
+  foreignDestinationStartIndex?: number,
 |}
 
 export type InitialDragLocation = {|
@@ -150,7 +154,11 @@ export type CurrentDrag = {|
   windowScroll: Position,
   // viewport + scroll + droppable scroll
   withinDroppable: WithinDroppable,
+  // whether or not movements should be animated
   shouldAnimate: boolean,
+  droppable: DraggableLocation & {|
+    startIndex: number,
+  |}
 |}
 
 // published when a drag starts
