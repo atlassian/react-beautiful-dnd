@@ -119,6 +119,7 @@ export default ({
 
     const sourceEdge = (() => {
       if (proposedIndex === 0) {
+        console.log('returning custom edge');
         return 'start';
       }
 
@@ -132,6 +133,7 @@ export default ({
 
     const destinationEdge = (() => {
       if (proposedIndex === 0) {
+        console.log('returning custom edge');
         return 'start';
       }
 
@@ -140,7 +142,7 @@ export default ({
         return isMovingForward ? 'end' : 'start';
       }
       // is moving back towards the start
-      return isMovingForward ? 'start' : 'end';
+      return isMovingForward ? 'end' : 'end';
     })();
 
     console.log('sourceEdge:', sourceEdge);
@@ -167,13 +169,13 @@ export default ({
           // need to trim the existing movement
           return [atProposedIndex.id, ...impact.movement.draggables];
         }
-        return impact.movement.draggables.slice(0, impact.movement.draggables.length - 1);
+        return impact.movement.draggables.slice(1, impact.movement.draggables.length);
       }
 
       // if moving away from start and moving backwards
       if (!isMovingForward) {
         // need to add the destination to the impacted
-        return [...impact.movement.draggables, atProposedIndex.id];
+        return [atProposedIndex.id, ...impact.movement.draggables];
       }
 
       // is moving away from the start and moving forward
