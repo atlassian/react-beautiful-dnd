@@ -44,6 +44,8 @@ export const zIndexOptions: ZIndexOptions = {
   dropAnimating: 4500,
 };
 
+const defaultPlaceholderDimensions = { height: 0, width: 0 };
+
 export default class Draggable extends Component {
   /* eslint-disable react/sort-comp */
   props: Props
@@ -219,12 +221,15 @@ export default class Draggable extends Component {
 
   getPlaceholder() {
     const dimension: ?DraggableDimension = this.props.dimension;
-    invariant(dimension, 'cannot get a drag placeholder when not dragging');
+
+    const isVisible = Boolean(dimension) && !this.props.isDropAnimating;
+    const { height, width } = dimension ? dimension.page.withMargin : defaultPlaceholderDimensions;
 
     return (
       <Placeholder
-        height={dimension.page.withMargin.height}
-        width={dimension.page.withMargin.width}
+        height={height}
+        isVisible={isVisible}
+        width={width}
       />
     );
   }
