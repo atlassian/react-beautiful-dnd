@@ -2,8 +2,8 @@
 import getBestCrossAxisDroppable from './get-best-cross-axis-droppable';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import getClosestDraggable from './get-closest-draggable';
-import moveToNewSpot from './move-to-new-spot';
-import type { Result } from './move-to-new-spot';
+import moveToNewDroppable from './move-to-new-droppable';
+import type { Result } from './move-to-new-droppable';
 import type {
   DraggableId,
   DroppableId,
@@ -70,7 +70,7 @@ export default ({
     draggables,
   });
 
-  return moveToNewSpot({
+  return moveToNewDroppable({
     center,
     draggable,
     target,

@@ -22,10 +22,9 @@ import type { TypeId,
 } from '../types';
 import { add, subtract, negate } from './position';
 import getDragImpact from './get-drag-impact';
-import jumpToNextIndex from './jump-to-next-index';
-import type { JumpToNextResult } from './jump-to-next-index';
-import type { Result as MoveToNewSpotResult } from './move-to-best-droppable/move-to-new-spot';
-import getDroppableOver from './get-droppable-over';
+import jumpToNextIndex from './jump-to-next-index/';
+import type { Result as JumpToNextResult } from './jump-to-next-index/jump-to-next-index-types';
+import type { Result as MoveToNewDroppable } from './move-to-best-droppable/move-to-new-droppable';
 import moveToBestDroppable from './move-to-best-droppable/';
 
 const noDimensions: DimensionState = {
@@ -461,7 +460,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const droppableId: DroppableId = state.drag.impact.destination.droppableId;
     const home: DraggableLocation = state.drag.initial.source;
 
-    const result: ?MoveToNewSpotResult = moveToBestDroppable({
+    const result: ?MoveToNewDroppable = moveToBestDroppable({
       isMovingForward: action.type === 'CROSS_AXIS_MOVE_FORWARD',
       center,
       draggableId,

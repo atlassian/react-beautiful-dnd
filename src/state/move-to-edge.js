@@ -6,7 +6,7 @@ import type {
   DimensionFragment,
 } from '../types';
 
-type Edge = 'start' | 'end';
+export type Edge = 'start' | 'end';
 
 type Args = {|
   source: DimensionFragment,

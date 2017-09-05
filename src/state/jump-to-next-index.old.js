@@ -65,15 +65,9 @@ export default ({
   const isInHomeList: boolean = draggable.droppableId === droppable.id;
 
   if (!isInHomeList) {
-    console.group('not in home list');
-    console.log('not in home list!');
-    // if draggable is not in home list
     const currentIndex: number = location.index;
     const proposedIndex = isMovingForward ? currentIndex + 1 : currentIndex - 1;
     const startIndex: number = impact.foreignDestinationStartIndex;
-    console.log('proposed index', proposedIndex);
-    console.log('currentIndex', currentIndex);
-    console.log('start index', startIndex);
 
     // cannot move forward beyond the last item
     if (proposedIndex > insideDroppable.length) {
@@ -159,28 +153,11 @@ export default ({
       destinationAxis: droppable.axis,
     });
 
-    console.log('is moving towards start', isMovingTowardStart);
-    console.log('is moving forward', isMovingForward);
-
     const moved: DraggableId[] = (() => {
-      if (isMovingTowardStart) {
-        // if moving backwards towards the start
-        if (!isMovingForward) {
-          // need to trim the existing movement
-          return [atProposedIndex.id, ...impact.movement.draggables];
-        }
-        return impact.movement.draggables.slice(1, impact.movement.draggables.length);
-      }
-
-      // if moving away from start and moving backwards
       if (!isMovingForward) {
-        // need to add the destination to the impacted
+          // need to trim the existing movement
         return [atProposedIndex.id, ...impact.movement.draggables];
       }
-
-      // is moving away from the start and moving forward
-      // need to add the destination to the impacted
-      // when moving away we need to trim the impacted as it has already moved down to make room
       return impact.movement.draggables.slice(1, impact.movement.draggables.length);
     })();
 
@@ -189,8 +166,9 @@ export default ({
     const newImpact: DragImpact = {
       movement: {
         draggables: moved,
-          // The amount of movement will always be the size of the dragging item
+        // The amount of movement will always be the size of the dragging item
         amount: patch(axis.line, draggable.page.withMargin[axis.size]),
+        // when in another list we are never past the start position
         isBeyondStartPosition: false,
       },
       destination: {
@@ -203,8 +181,6 @@ export default ({
 
     // console.log('returning result', { newCenter, newImpact });
 
-    console.groupEnd();
-
     return {
       center: newCenter,
       impact: newImpact,
@@ -216,7 +192,7 @@ export default ({
   // If not in home list - need to insert draggable into correct position in list
   // const tempIndex: number = impact.destination.index;
 
-  console.log('moving when in home list')
+  console.log('moving when in home list');
 
   const startIndex: number = getIndex(insideDroppable, draggable);
   const currentIndex: number = location.index;
