@@ -197,6 +197,8 @@ export default ({
     .slice(proposedIndex, insideDestination.length)
     .map((dimension: DraggableDimension): DraggableId => dimension.id);
 
+  console.log('cross axis movement', needsToMove);
+
   const newImpact: DragImpact = {
     movement: {
       draggables: needsToMove,
