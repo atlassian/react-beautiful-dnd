@@ -18,7 +18,7 @@
   "scripts": {
     "test": "jest --config ./jest.config.js",
     "validate": "yarn run lint && yarn run typecheck",
-    "lint": "eslint src test stories",
+    "lint": "eslint .",
     "typecheck": "flow check",
     "build": "yarn run build:lib && yarn run build:flow",
     "build:lib": "babel src -d lib",
