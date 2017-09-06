@@ -48,7 +48,6 @@ export default ({
   draggable,
   target,
   home,
-  impact,
   draggables,
 }: Args): ?Result => {
   const destinationAxis: Axis = destination.axis;

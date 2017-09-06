@@ -1,8 +1,7 @@
 // @flow
 import getBestCrossAxisDroppable from './get-best-cross-axis-droppable';
-import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import getClosestDraggable from './get-closest-draggable';
-import moveToNewDroppable from './move-to-new-droppable';
+import moveToNewDroppable from './move-to-new-droppable/';
 import type { Result } from './move-to-new-droppable';
 import type {
   DraggableId,
@@ -13,6 +12,7 @@ import type {
   DraggableDimensionMap,
   DroppableDimensionMap,
   DraggableLocation,
+  DragImpact,
 } from '../../types';
 
 type Args = {|

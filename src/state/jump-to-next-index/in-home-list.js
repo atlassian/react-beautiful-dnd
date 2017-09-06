@@ -12,7 +12,7 @@ import type {
   DraggableId,
   Axis,
   DragImpact,
-} from '../types';
+} from '../../types';
 
 const getIndex = memoizeOne(
   (draggables: DraggableDimension[],
@@ -45,9 +45,6 @@ export default ({
   const startIndex: number = getIndex(insideDroppable, draggable);
   const currentIndex: number = location.index;
   const proposedIndex = isMovingForward ? currentIndex + 1 : currentIndex - 1;
-
-  console.log('proposed index', proposedIndex);
-  console.log('current index', currentIndex);
 
   if (startIndex === -1) {
     console.error('could not find draggable inside current droppable');
