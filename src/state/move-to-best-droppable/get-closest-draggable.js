@@ -38,6 +38,7 @@ export default ({
     siblings
       .filter((draggable: DraggableDimension) => isVisible(draggable, destination))
       .sort((a: DraggableDimension, b: DraggableDimension): number => {
+        // TODO: not considering scroll offset
         const distanceToA = distance(center, add(a.page.withMargin.center, scrollOffset));
         const distanceToB = distance(center, add(b.page.withMargin.center, scrollOffset));
 

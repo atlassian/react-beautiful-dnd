@@ -2,11 +2,15 @@
 import React, { Component } from 'react';
 import styled, { injectGlobal } from 'styled-components';
 import { action } from '@storybook/addon-actions';
-import { DragDropContext } from '../../../src/';
-import type { DropResult, DragStart } from '../../../src';
+import { Draggable, DragDropContext } from '../../../src/';
+import type {
+  DropResult,
+  DragStart,
+  DraggableProvided,
+  DraggableStateSnapshot,
+} from '../../../src';
 import AuthorList from './author-list';
 import AuthorItem from '../primatives/author-item';
-import { Draggable } from '../../../src/';
 import reorder from '../reorder';
 import { colors, grid } from '../constants';
 import type { Author } from '../types';
@@ -89,9 +93,8 @@ export default class AuthorApp extends Component {
               <Draggable
                 key={author.id}
                 draggableId={author.id}
-                type="list"
               >
-                {(provided, snapshot) => (
+                {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
                   <div>
                     <AuthorItem
                       author={author}
