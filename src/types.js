@@ -106,10 +106,6 @@ export type DragImpact = {|
   // the direction of the Droppable you are over
   direction: ?Direction,
   destination: ?DraggableLocation,
-  // The starting index within a droppable
-  // This might be the original start index
-  // or it could be the first index received once jumped into a list
-  foreignDestinationStartIndex?: number,
 |}
 
 export type InitialDragLocation = {|

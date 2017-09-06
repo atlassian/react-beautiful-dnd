@@ -35,24 +35,27 @@ export default ({
     draggables,
   );
 
-  // const startIndex: ?number = impact.foreignDestinationStartIndex;
   const currentIndex: number = location.index;
+  // Where the draggable will end up
   const proposedIndex = isMovingForward ? currentIndex + 1 : currentIndex - 1;
 
-  // TODO
+  // draggable is allowed to exceed the foreign droppables count by 1
   if (proposedIndex > insideForeignDroppable.length) {
     return null;
   }
 
-  // cannot move before the first item
+  // Cannot move before the first item
   if (proposedIndex < 0) {
     return null;
   }
 
   const atProposedIndex: DraggableDimension = insideForeignDroppable[proposedIndex];
-  const destinationIndex = Math.max(0, proposedIndex - 1);
-  const destination: DraggableDimension = insideForeignDroppable[destinationIndex];
-  console.log('destination', destination.id);
+  // The draggable that we are going to move relative to
+  const movingRelativeTo: DraggableDimension = insideForeignDroppable[
+    // We want to move relative to the previous draggable
+    // or to the first if there is no previous
+    Math.max(0, proposedIndex - 1)
+  ];
 
   const sourceEdge: Edge = 'start';
   const destinationEdge: Edge = proposedIndex === 0 ? 'start' : 'end';
@@ -60,13 +63,17 @@ export default ({
   const newCenter: Position = moveToEdge({
     source: draggable.page.withoutMargin,
     sourceEdge,
-    destination: destination.page.withMargin,
+    destination: movingRelativeTo.page.withMargin,
     destinationEdge,
     destinationAxis: droppable.axis,
   });
 
+  // When we are in foreign list we are only displacing items forward
+  // This list is always sorted by the closest impacted draggable
   const moved: DraggableId[] = isMovingForward ?
+      // Stop displacing the closest draggable forward
       impact.movement.draggables.slice(1, impact.movement.draggables.length) :
+      // Add the draggable that we are moving into the place of
       [atProposedIndex.id, ...impact.movement.draggables];
 
   const newImpact: DragImpact = {
@@ -74,7 +81,7 @@ export default ({
       draggables: moved,
       // The amount of movement will always be the size of the dragging item
       amount: patch(axis.line, draggable.page.withMargin[axis.size]),
-      // when in another list we are never past the start position
+      // When we are in foreign list we are only displacing items forward
       isBeyondStartPosition: false,
     },
     destination: {

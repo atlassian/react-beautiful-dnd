@@ -193,7 +193,6 @@ export default ({
       droppableId: destination.id,
       index: proposedIndex,
     },
-    foreignDestinationStartIndex: proposedIndex,
   };
 
   return {
