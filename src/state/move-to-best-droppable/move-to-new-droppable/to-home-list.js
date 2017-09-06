@@ -22,7 +22,6 @@ type Args = {|
 |}
 
 export default ({
-  isGoingBeforeTarget,
   originalIndex,
   target,
   amount,
@@ -84,7 +83,12 @@ export default ({
       return insideDroppable.slice(originalIndex + 1, targetIndex + 1);
     }
     return insideDroppable.slice(targetIndex, originalIndex);
-  })().map((d: DraggableDimension): DraggableId => d.id);
+  })()
+    .map((d: DraggableDimension): DraggableId => d.id)
+    // need to ensure that the list is sorted with the closest item being first
+    .reverse();
+
+  console.log('to home list moved', needsToMove);
 
   const newImpact: DragImpact = {
     movement: {

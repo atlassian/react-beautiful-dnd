@@ -89,6 +89,8 @@ export default ({
     .slice(proposedIndex, insideDroppable.length)
     .map((dimension: DraggableDimension): DraggableId => dimension.id);
 
+  console.log('moved', needsToMove);
+
   const newImpact: DragImpact = {
     movement: {
       draggables: needsToMove,

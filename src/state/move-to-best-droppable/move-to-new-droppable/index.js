@@ -54,7 +54,6 @@ export default ({
   if (destination.id === draggable.droppableId) {
     return toHomeList({
       amount,
-      isGoingBeforeTarget,
       originalIndex: home.index,
       target,
       insideDroppable: insideDestination,

@@ -84,13 +84,11 @@ export default ({
 
   // Calculate DragImpact
 
-  // 1. If moving back towards where we started
-  // we need to remove the latest addition
-  // 2. If we are moving away from where we started,
-  // we need to add the next draggable to the impact
   const moved: DraggableId[] = isMovingTowardStart ?
-    impact.movement.draggables.slice(0, impact.movement.draggables.length - 1) :
-    [...impact.movement.draggables, destination.id];
+    impact.movement.draggables.slice(1, impact.movement.draggables.length) :
+    [destination.id, ...impact.movement.draggables];
+
+  console.log('in home list moved', moved);
 
   const newImpact: DragImpact = {
     movement: {
