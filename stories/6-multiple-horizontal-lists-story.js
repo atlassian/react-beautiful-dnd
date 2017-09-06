@@ -12,9 +12,9 @@ const namespaceQuoteIds = (quoteList, namespace) => quoteList.map(
 );
 
 const initialQuotes = {
-  alpha: namespaceQuoteIds(getQuotes(10), 'alpha'),
-  beta: namespaceQuoteIds(getQuotes(8), 'beta'),
-  gamma: namespaceQuoteIds(getQuotes(12), 'gamma'),
+  alpha: namespaceQuoteIds(getQuotes(20), 'alpha'),
+  beta: namespaceQuoteIds(getQuotes(18), 'beta'),
+  gamma: namespaceQuoteIds(getQuotes(22), 'gamma'),
 };
 
 storiesOf('multiple horizontal lists', module)

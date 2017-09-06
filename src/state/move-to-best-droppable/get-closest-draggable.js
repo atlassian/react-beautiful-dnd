@@ -39,8 +39,9 @@ export default ({
       .filter((draggable: DraggableDimension) => isVisible(draggable, destination))
       .sort((a: DraggableDimension, b: DraggableDimension): number => {
         // TODO: not considering scroll offset
-        const distanceToA = distance(center, add(a.page.withMargin.center, scrollOffset));
-        const distanceToB = distance(center, add(b.page.withMargin.center, scrollOffset));
+        console.log('scroll offset', scrollOffset);
+        const distanceToA = distance(center, a.page.withMargin.center);
+        const distanceToB = distance(center, b.page.withMargin.center);
 
         // if a is closer - return a
         if (distanceToA < distanceToB) {
