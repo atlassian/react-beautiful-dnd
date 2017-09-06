@@ -12,7 +12,7 @@ const namespaceQuoteIds = (quoteList, namespace) => quoteList.map(
 );
 
 const initialQuotes = {
-  alpha: namespaceQuoteIds(getQuotes(10), 'alpha'),
+  alpha: namespaceQuoteIds(getQuotes(20), 'alpha'),
   beta: namespaceQuoteIds(getQuotes(3), 'beta'),
   gamma: namespaceQuoteIds(getQuotes(10), 'gamma'),
   delta: namespaceQuoteIds(getQuotes(0), 'delta'),
