@@ -1,5 +1,6 @@
 // @flow
 import moveToEdge from '../../move-to-edge';
+import type { Edge } from '../../move-to-edge';
 import type { Result } from './move-to-new-droppable-types';
 import type {
   Axis,
@@ -68,35 +69,22 @@ export default ({
 
   const isMovingBeyondHome = targetIndex > originalIndex;
 
-  const sourceEdge = (() => {
-    if (isMovingBeyondHome) {
-      return isGoingBeforeTarget ? 'end' : 'end';
-    }
-    return 'start';
-  })();
-
-  const destinationEdge = (() => {
-    if (isMovingBeyondHome) {
-      return isGoingBeforeTarget ? 'end' : 'end';
-    }
-    return 'start';
-  })();
+  const edge: Edge = isMovingBeyondHome ? 'end' : 'start';
 
   const newCenter: Position = moveToEdge({
     source: draggable.page.withoutMargin,
-    sourceEdge,
-    destination: target.page.withMargin,
-    destinationEdge,
+    sourceEdge: edge,
+    destination: isMovingBeyondHome ? target.page.withoutMargin : target.page.withMargin,
+    destinationEdge: edge,
     destinationAxis: axis,
   });
 
   const needsToMove: DraggableId[] = (() => {
     if (isMovingBeyondHome) {
-      const result = [...insideDroppable];
-      return result.slice(originalIndex + 1, targetIndex + 1);
+      return insideDroppable.slice(originalIndex + 1, targetIndex + 1);
     }
     return insideDroppable.slice(targetIndex, originalIndex);
-  })().map(d => d.id);
+  })().map((d: DraggableDimension): DraggableId => d.id);
 
   const newImpact: DragImpact = {
     movement: {
