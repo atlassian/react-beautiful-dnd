@@ -427,11 +427,14 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     //   return state;
     // }
 
+    const page: Position = result.pageCenter;
+    const client: Position = subtract(page, existing.current.windowScroll);
+
     return move({
       state,
       impact,
-      clientSelection: result.center,
-      pageSelection: result.center,
+      clientSelection: client,
+      pageSelection: page,
       shouldAnimate: true,
     });
   }
@@ -462,7 +465,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
     const result: ?MoveToNewDroppable = moveToBestDroppable({
       isMovingForward: action.type === 'CROSS_AXIS_MOVE_FORWARD',
-      center,
+      pageCenter: center,
       draggableId,
       droppableId,
       home,
@@ -475,10 +478,13 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
+    const page: Position = result.pageCenter;
+    const client: Position = subtract(page, current.windowScroll);
+
     return move({
       state,
-      clientSelection: result.center,
-      pageSelection: result.center,
+      clientSelection: client,
+      pageSelection: page,
       impact: result.impact,
       shouldAnimate: true,
     });

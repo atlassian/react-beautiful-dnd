@@ -105,7 +105,7 @@ export default ({
   };
 
   const result: Result = {
-    center: newCenter,
+    pageCenter: newCenter,
     impact: newImpact,
   };
 

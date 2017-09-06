@@ -16,6 +16,8 @@ export type Args = {|
 |}
 
 export type Result = {|
-  center: Position,
+  // the new page center position of the element
+  pageCenter: Position,
+  // the impact of the movement
   impact: DragImpact,
 |}

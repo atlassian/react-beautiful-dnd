@@ -15,7 +15,7 @@ import type {
 
 type Args = {|
   // the current center position of the draggable
-  center: Position,
+  pageCenter: Position,
   // the draggable that is dragging and needs to move
   draggable: DraggableDimension,
   // what the draggable is moving towards
@@ -32,7 +32,7 @@ type Args = {|
 |}
 
 export default ({
-  center,
+  pageCenter,
   destination,
   draggable,
   target,
@@ -48,7 +48,7 @@ export default ({
   );
 
   const isGoingBeforeTarget: boolean = Boolean(target &&
-    center[destination.axis.line] < target.page.withMargin.center[destination.axis.line]);
+    pageCenter[destination.axis.line] < target.page.withMargin.center[destination.axis.line]);
 
   // moving back to the home list
   if (destination.id === draggable.droppableId) {

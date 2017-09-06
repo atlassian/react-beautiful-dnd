@@ -17,8 +17,8 @@ import type {
 
 type Args = {|
   isMovingForward: boolean,
-  // the current center of the dragging item
-  center: Position,
+  // the current page center of the dragging item
+  pageCenter: Position,
   // the dragging item
   draggableId: DraggableId,
   // the droppable the dragging item is in
@@ -34,7 +34,7 @@ type Args = {|
 
 export default ({
   isMovingForward,
-  center,
+  pageCenter,
   draggableId,
   droppableId,
   home,
@@ -47,7 +47,7 @@ export default ({
 
   const destination: ?DroppableDimension = getBestCrossAxisDroppable({
     isMovingForward,
-    center,
+    pageCenter,
     source,
     droppables,
   });
@@ -64,14 +64,14 @@ export default ({
 
   const target: ?DraggableDimension = getClosestDraggable({
     axis: destination.axis,
-    center,
+    pageCenter,
     scrollOffset: destination.scroll.current,
     destination,
     draggables,
   });
 
   return moveToNewDroppable({
-    center,
+    pageCenter,
     draggable,
     target,
     source,

@@ -54,7 +54,7 @@ export type DimensionFragment = {|
 export type DraggableDimension = {|
   id: DraggableId,
   droppableId: DroppableId,
-  // relative to the current viewport
+  // relative to the viewport when the drag started
   client: {|
     withMargin: DimensionFragment,
     withoutMargin: DimensionFragment,
@@ -119,9 +119,9 @@ export type WithinDroppable = {|
 
 export type InitialDrag = {|
   source: DraggableLocation,
-  // viewport
+  // relative to the viewport when the drag started
   client: InitialDragLocation,
-  // viewport + window scroll
+  // viewport + window scroll (position relative to 0, 0)
   page: InitialDragLocation,
   // Storing scroll directly to support movement during a window scroll.
   // Value required for comparison with current scroll

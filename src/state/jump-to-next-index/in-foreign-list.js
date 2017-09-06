@@ -92,7 +92,7 @@ export default ({
   };
 
   return {
-    center: newCenter,
+    pageCenter: newCenter,
     impact: newImpact,
   };
 };
