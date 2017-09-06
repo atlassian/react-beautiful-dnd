@@ -2,7 +2,7 @@
 import { subtract, patch } from '../position';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import moveToEdge from '../move-to-edge';
-import jumpToNextIndex from '../jump-to-next-index';
+import noImpact from '../no-impact';
 import type {
   Axis,
   Position,
@@ -113,7 +113,8 @@ export default ({
   const isReturningToHomeList = destination.id === draggable.droppableId;
 
   if (isReturningToHomeList) {
-    console.log('returning to home list');
+    console.group('returning to home list');
+    console.log('target index', targetIndex);
     console.log('proposed index', proposedIndex);
     // returning to original position
     if (targetIndex === home.index) {
@@ -132,6 +133,7 @@ export default ({
           index: 0,
         },
       };
+      console.groupEnd();
 
       return {
         center: newCenter,
@@ -139,21 +141,77 @@ export default ({
       };
     }
 
-    // TODO: need to give an appropriate impact!
-    // TODO: broken if moving back to list when current list is impacted
     console.info('returning to original list - but not in original position');
+    console.log('is going before target', isGoingBeforeTarget);
 
-    const result = jumpToNextIndex({
-      isMovingForward: isGoingBeforeTarget,
-      draggableId: draggable.id,
-      impact,
-      draggables,
-      droppable: destination,
+    // need to put into the correct position and have the correct impact
+
+    const isMovingBeyondHome = targetIndex > home.index;
+    console.log('is moving beyond home', isMovingBeyondHome);
+
+    const isMovingRelativeToSelf = target.id === draggable.id;
+    console.log('target id', target.id);
+
+    console.log('is moving relative to self', isMovingRelativeToSelf);
+
+    const sourceEdge = (() => {
+      if (isMovingBeyondHome) {
+        return 'start';
+      }
+      return 'start';
+    })();
+
+    const destinationEdge = (() => {
+      if (isMovingBeyondHome) {
+        return 'end';
+      }
+      return 'start';
+    })();
+
+    const newCenter: Position = moveToEdge({
+      source: draggable.page.withoutMargin,
+      sourceEdge,
+      destination: target.page.withMargin,
+      destinationEdge,
+      destinationAxis,
     });
 
-    console.log('result moving back home', result);
+    const needsToMove: DraggableId[] = (() => {
+      if (isMovingBeyondHome) {
+        console.group('movingBeyondHome');
+        console.log('original', insideDestination);
+        const result = [...insideDestination];
+        result.splice(home.index, 1);
+        console.log('stripped', result);
+        return result.slice(0, proposedIndex);
+        console.groupEnd();
+      }
+      return insideDestination.slice(proposedIndex, home.index);
+    })().map(d => d.id);
 
-    return result;
+    console.log('moved', needsToMove);
+
+    const newImpact: DragImpact = {
+      movement: {
+        draggables: needsToMove,
+        amount,
+        // TODO: not sure what this should be
+        isBeyondStartPosition: isMovingBeyondHome,
+      },
+      direction: destinationAxis.direction,
+      destination: {
+        droppableId: destination.id,
+        index: proposedIndex,
+      },
+    };
+
+    console.log('impact', newImpact);
+    console.groupEnd();
+
+    return {
+      center: newCenter,
+      impact: newImpact,
+    };
   }
 
   // 1. If isGoingBefore: need to move draggable start edge to start edge of target
