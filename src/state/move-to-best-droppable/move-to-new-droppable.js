@@ -113,6 +113,8 @@ export default ({
   const isReturningToHomeList = destination.id === draggable.droppableId;
 
   if (isReturningToHomeList) {
+    const proposedIndex: number = targetIndex;
+
     console.group('returning to home list');
     console.log('target index', targetIndex);
     console.log('proposed index', proposedIndex);
@@ -130,7 +132,7 @@ export default ({
         direction: destinationAxis.direction,
         destination: {
           droppableId: destination.id,
-          index: 0,
+          index: home.index,
         },
       };
       console.groupEnd();
@@ -156,17 +158,20 @@ export default ({
 
     const sourceEdge = (() => {
       if (isMovingBeyondHome) {
-        return 'start';
+        return isGoingBeforeTarget ? 'end' : 'end';
       }
       return 'start';
     })();
 
     const destinationEdge = (() => {
       if (isMovingBeyondHome) {
-        return 'end';
+        return isGoingBeforeTarget ? 'end' : 'end';
       }
       return 'start';
     })();
+
+    console.log('source edge', sourceEdge);
+    console.log('destination edge', destinationEdge);
 
     const newCenter: Position = moveToEdge({
       source: draggable.page.withoutMargin,
@@ -181,9 +186,9 @@ export default ({
         console.group('movingBeyondHome');
         console.log('original', insideDestination);
         const result = [...insideDestination];
-        result.splice(home.index, 1);
+        // result.splice(home.index, 1);
         console.log('stripped', result);
-        return result.slice(0, proposedIndex);
+        return result.slice(home.index + 1, proposedIndex + 1);
         console.groupEnd();
       }
       return insideDestination.slice(proposedIndex, home.index);

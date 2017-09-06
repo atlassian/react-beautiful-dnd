@@ -46,6 +46,9 @@ export default ({
   const currentIndex: number = location.index;
   const proposedIndex = isMovingForward ? currentIndex + 1 : currentIndex - 1;
 
+  console.log('proposed index', proposedIndex);
+  console.log('current index', currentIndex);
+
   if (startIndex === -1) {
     console.error('could not find draggable inside current droppable');
     return null;

@@ -79,6 +79,21 @@ export const quotes: Quote[] = [
     content: 'Don\'t you always call sweatpants \'give up on life pants,\' Jake?',
     author: finn,
   },
+  {
+    id: '10',
+    content: 'I should not have drunk that much tea!',
+    author: princess,
+  },
+  {
+    id: '11',
+    content: 'Please! I need the real you!',
+    author: princess,
+  },
+  {
+    id: '12',
+    content: 'Haven\'t slept for a solid 83 hours, but, yeah, I\'m good.',
+    author: princess,
+  },
 ];
 
 export const getQuotes = (count: number): Quote[] =>
