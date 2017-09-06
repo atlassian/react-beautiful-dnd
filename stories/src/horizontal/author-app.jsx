@@ -5,7 +5,8 @@ import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src/';
 import type { DropResult, DragStart } from '../../../src';
 import AuthorList from './author-list';
-import AuthorItem from './author-item';
+import AuthorItem from '../primatives/author-item';
+import { Draggable } from '../../../src/';
 import reorder from '../reorder';
 import { colors, grid } from '../constants';
 import type { Author } from '../types';
@@ -85,10 +86,23 @@ export default class AuthorApp extends Component {
         <Root>
           <AuthorList listId="list" overflow={this.props.overflow}>
             {this.state.authors.map((author: Author) => (
-              <AuthorItem
+              <Draggable
                 key={author.id}
-                author={author}
-              />
+                draggableId={author.id}
+                type="list"
+              >
+                {(provided, snapshot) => (
+                  <div>
+                    <AuthorItem
+                      author={author}
+                      provided={provided}
+                      snapshot={snapshot}
+                    />
+                    {provided.placeholder}
+                  </div>
+                )}
+
+              </Draggable>
             ))}
           </AuthorList>
         </Root>

@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Droppable, Draggable } from '../../../src';
-import QuoteItem from '../primatives/quote-item';
+import Author from '../primatives/author-item';
 import { grid, colors } from '../constants';
 import type { Quote } from '../types';
 import type {
@@ -13,24 +13,25 @@ import type {
 } from '../../../src/';
 
 const Wrapper = styled.div`
-  width: 250px;
   background-color: ${({ isDraggingOver }) => (isDraggingOver ? colors.blue.lighter : colors.blue.light)};
   display: flex;
   flex-direction: column;
   padding: ${grid}px;
-  padding-bottom: 0;
   user-select: none;
   transition: background-color 0.1s ease;
+  margin: ${grid}px 0;
+
+  overflow: auto;
 `;
 
 const DropZone = styled.div`
   /* stop the list collapsing when empty */
-  min-height: 250px;
+  min-width: 600px;
+  display: flex;
 `;
 
 const ScrollContainer = styled.div`
   overflow: auto;
-  max-height: 400px;
 `;
 
 const Container = styled.div`
@@ -66,11 +67,10 @@ export default class QuoteList extends Component {
             <Draggable key={quote.id} draggableId={quote.id} type={listType}>
               {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
                 <div>
-                  <QuoteItem
-                    key={quote.id}
-                    quote={quote}
-                    isDragging={dragSnapshot.isDragging}
+                  <Author
+                    author={quote.author}
                     provided={dragProvided}
+                    snapshot={dragSnapshot}
                   />
                   {dragProvided.placeholder}
                 </div>
@@ -87,7 +87,7 @@ export default class QuoteList extends Component {
     const { listId, listType, internalScroll, style } = this.props;
 
     return (
-      <Droppable droppableId={listId} type={listType}>
+      <Droppable droppableId={listId} type={listType} direction="horizontal">
         {(dropProvided: DroppableProvided, dropSnapshot: DroppableStateSnapshot) => (
           <Wrapper
             style={style}

@@ -19,12 +19,11 @@ const Root = styled.div`
 
   /* flexbox */
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
 `;
 
-const Column = styled.div`
-  margin: 0 ${grid * 2}px;
+const Row = styled.div`
+  margin: ${grid * 2}px ${grid * 2}px;
 `;
 
 const PushDown = styled.div`
@@ -37,7 +36,6 @@ type GroupedQuotes = {
   alpha: Quote[],
   beta: Quote[],
   gamma: Quote[],
-  delta: Quote[],
 }
 
 type Props = {|
@@ -130,35 +128,22 @@ export default class QuoteApp extends Component {
         onDragEnd={this.onDragEnd}
       >
         <Root>
-          <Column>
-            <QuoteList
-              listId="alpha"
-              listType="card"
-              quotes={quotes.alpha}
-            />
-          </Column>
-          <Column>
-            <PushDown />
-            <QuoteList
-              listId="beta"
-              listType="card"
-              quotes={quotes.beta}
-            />
-            <QuoteList
-              listId="gamma"
-              listType="card"
-              internalScroll
-              quotes={quotes.gamma}
-            />
-          </Column>
-          <Column>
-            <QuoteList
-              listId="delta"
-              listType="card"
-              internalScroll
-              quotes={quotes.delta}
-            />
-          </Column>
+          <QuoteList
+            listId="alpha"
+            listType="card"
+            quotes={quotes.alpha}
+          />
+          <QuoteList
+            listId="beta"
+            listType="card"
+            quotes={quotes.beta}
+          />
+          <QuoteList
+            listId="gamma"
+            listType="card"
+            internalScroll
+            quotes={quotes.gamma}
+          />
         </Root>
       </DragDropContext>
     );

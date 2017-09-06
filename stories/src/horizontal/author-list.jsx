@@ -34,6 +34,7 @@ export default class AuthorList extends Component {
             innerRef={provided.innerRef}
           >
             {this.props.children}
+            {provided.placeholder}
           </Container>
         )}
       </Droppable>
