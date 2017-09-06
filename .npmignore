@@ -30,5 +30,8 @@ yarn-error.log
 npm-debug.log
 npm-debug.log.*
 
+# babel
+.babelrc
+
 # MacOS
 .DS_Store
