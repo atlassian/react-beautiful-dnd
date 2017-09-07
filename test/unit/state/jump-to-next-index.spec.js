@@ -1,6 +1,6 @@
 // @flow
 import jumpToNextIndex from '../../../src/state/jump-to-next-index';
-import type { JumpToNextResult } from '../../../src/state/jump-to-next-index';
+import type { Result } from '../../../src/state/jump-to-next-index/jump-to-next-index-types';
 import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
 import getClientRect from '../../utils/get-client-rect';
 import moveToEdge from '../../../src/state/move-to-edge';
@@ -20,6 +20,16 @@ import type {
 } from '../../../src/types';
 
 const droppableId: DroppableId = 'drop-1';
+
+describe('jump to next index', () => {
+  describe('in home list', () => {
+
+  });
+
+  describe('in foreign list', () => {
+
+  });
+});
 
 describe('jump to next index', () => {
   [vertical, horizontal].forEach((axis: Axis) => {

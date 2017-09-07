@@ -124,7 +124,12 @@ export default ({
     .map((dimension: DraggableDimension): DroppableId => dimension.id);
 
   // Need to ensure that we always order by the closest impacted item
-  const ordered: DraggableId[] = isBeyondStartPosition ? moved.reverse() : moved;
+  const ordered: DraggableId[] = (() => {
+    if (!isWithinHomeDroppable) {
+      return moved;
+    }
+    return isBeyondStartPosition ? moved.reverse() : moved;
+  })();
 
   const startIndex = insideDroppable.indexOf(draggingDimension);
   const index: number = (() => {
@@ -156,7 +161,7 @@ export default ({
     isBeyondStartPosition: shouldDisplaceItemsForward,
   };
 
-  console.log('mouse moved', moved);
+  console.log('mouse moved', ordered);
 
   const impact: DragImpact = {
     movement,
