@@ -161,8 +161,6 @@ export default ({
     isBeyondStartPosition: shouldDisplaceItemsForward,
   };
 
-  console.log('mouse moved', ordered);
-
   const impact: DragImpact = {
     movement,
     direction: axis.direction,

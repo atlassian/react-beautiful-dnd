@@ -168,7 +168,7 @@ describe('jump to next index', () => {
       });
 
       describe('in home list', () => {
-        describe('jump forward', () => {
+        describe('moving forwards', () => {
           it('should return null if cannot move forward', () => {
             const impact: DragImpact = {
               movement: {
@@ -498,7 +498,7 @@ describe('jump to next index', () => {
           });
         });
 
-        describe('jump backward', () => {
+        describe('moving backwards', () => {
           it('should return null if cannot move backward', () => {
             const impact: DragImpact = {
               movement: {

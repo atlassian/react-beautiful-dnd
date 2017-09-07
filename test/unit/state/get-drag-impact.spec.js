@@ -22,6 +22,8 @@ const droppableId: DroppableId = 'drop-1';
 const origin: Position = { x: 0, y: 0 };
 
 describe('get drag impact', () => {
+  // TODO: add tests for when not in home list
+
   describe('vertical', () => {
     const droppable: DroppableDimension = getDroppableDimension({
       id: droppableId,
@@ -233,8 +235,8 @@ describe('get drag impact', () => {
           expect(impact.movement.amount).toEqual(expected);
         });
 
-        it('should return the items that need to be moved', () => {
-          expect(impact.movement.draggables).toEqual([draggable2.id, draggable3.id]);
+        it('should return the items that need to be moved (sorted by the closest to the draggables current location)', () => {
+          expect(impact.movement.draggables).toEqual([draggable3.id, draggable2.id]);
         });
       });
 
@@ -789,8 +791,8 @@ describe('get drag impact', () => {
           expect(impact.movement.amount).toEqual(expected);
         });
 
-        it('should return the items that need to be moved', () => {
-          expect(impact.movement.draggables).toEqual([draggable2.id, draggable3.id]);
+        it('should return the items that need to be moved (sorted by closest impacted)', () => {
+          expect(impact.movement.draggables).toEqual([draggable3.id, draggable2.id]);
         });
       });
 
@@ -1024,7 +1026,7 @@ describe('get drag impact', () => {
           expect(impact.movement.amount).toEqual(expected);
         });
 
-        it('should return the items that need to be moved', () => {
+        it('should return the items that need to be moved (sorted by closest to the draggables current position)', () => {
           expect(impact.movement.draggables).toEqual([draggable1.id, draggable2.id]);
         });
       });
