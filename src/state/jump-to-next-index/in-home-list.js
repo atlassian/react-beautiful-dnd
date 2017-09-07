@@ -27,7 +27,6 @@ export default ({
   droppable,
   draggables,
 }: Args): ?Result => {
-  console.log('in-home-list.js');
   if (!impact.destination) {
     console.error('cannot jump to next index when there is not previous destination');
     return null;
@@ -84,11 +83,12 @@ export default ({
 
   // Calculate DragImpact
 
+  // List is sorted where the items closest to where the draggable is currently go first
   const moved: DraggableId[] = isMovingTowardStart ?
+    // remove the most recently impacted
     impact.movement.draggables.slice(1, impact.movement.draggables.length) :
+    // add the destination as the most recently impacted
     [destination.id, ...impact.movement.draggables];
-
-  console.log('in home list moved', moved);
 
   const newImpact: DragImpact = {
     movement: {
