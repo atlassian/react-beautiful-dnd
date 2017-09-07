@@ -80,15 +80,12 @@ export default ({
 
   const needsToMove: DraggableId[] = (() => {
     if (isMovingBeyondHome) {
-      return insideDroppable.slice(originalIndex + 1, targetIndex + 1);
+      // need to ensure that the list is sorted with the closest item being first
+      return insideDroppable.slice(originalIndex + 1, targetIndex + 1).reverse();
     }
     return insideDroppable.slice(targetIndex, originalIndex);
   })()
-    .map((d: DraggableDimension): DraggableId => d.id)
-    // need to ensure that the list is sorted with the closest item being first
-    .reverse();
-
-  console.log('to home list moved', needsToMove);
+  .map((d: DraggableDimension): DraggableId => d.id);
 
   const newImpact: DragImpact = {
     movement: {
