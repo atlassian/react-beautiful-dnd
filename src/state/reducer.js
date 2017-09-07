@@ -398,6 +398,11 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const existing: DragState = state.drag;
     const isMovingForward: boolean = action.type === 'MOVE_FORWARD';
 
+    if (!existing.impact.destination) {
+      console.error('cannot move if there is no previous destination');
+      return clean();
+    }
+
     const result: ?MoveToNextResult = moveToNextIndex({
       isMovingForward,
       draggableId: existing.current.id,
@@ -440,7 +445,6 @@ export default (state: State = clean('IDLE'), action: Action): State => {
   }
 
   if (action.type === 'CROSS_AXIS_MOVE_FORWARD' || action.type === 'CROSS_AXIS_MOVE_BACKWARD') {
-    console.log('trying to moving on cross axis', action.type);
     if (state.phase !== 'DRAGGING') {
       console.error('cannot move cross axis when not dragging');
       return clean();
@@ -457,7 +461,6 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     }
 
     const current: CurrentDrag = state.drag.current;
-
     const draggableId: DraggableId = current.id;
     const center: Position = current.page.center;
     const droppableId: DroppableId = state.drag.impact.destination.droppableId;

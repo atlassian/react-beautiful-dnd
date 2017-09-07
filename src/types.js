@@ -155,9 +155,6 @@ export type CurrentDrag = {|
   withinDroppable: WithinDroppable,
   // whether or not movements should be animated
   shouldAnimate: boolean,
-  droppable: DraggableLocation & {|
-    startIndex: number,
-  |}
 |}
 
 // published when a drag starts
