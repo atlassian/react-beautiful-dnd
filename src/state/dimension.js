@@ -117,7 +117,10 @@ type GetDroppableArgs = {|
   direction?: Direction,
   margin?: Margin,
   windowScroll?: Position,
-  scroll?: Position,
+  scroll ?: Position,
+  // Whether or not the droppable is currently enabled (can change at during a drag)
+  // defaults to true
+  isEnabled?: boolean,
 |}
 
 export const getDroppableDimension = ({
@@ -127,12 +130,14 @@ export const getDroppableDimension = ({
   margin = noMargin,
   windowScroll = origin,
   scroll = origin,
+  isEnabled = true,
 }: GetDroppableArgs): DroppableDimension => {
   const withWindowScroll = getWithPosition(clientRect, windowScroll);
   const withWindowScrollAndMargin = getWithMargin(withWindowScroll, margin);
 
   const dimension: DroppableDimension = {
     id,
+    isEnabled,
     axis: direction === 'vertical' ? vertical : horizontal,
     scroll: {
       initial: scroll,

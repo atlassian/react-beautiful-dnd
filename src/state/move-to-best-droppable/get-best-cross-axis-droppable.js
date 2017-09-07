@@ -42,9 +42,11 @@ export default ({
   const axis: Axis = source.axis;
 
   const candidates: DroppableDimension[] = droppableMapToList(droppables)
-    // 1. Remove the source droppable from the list
+    // Remove the source droppable from the list
     .filter((droppable: DroppableDimension): boolean => droppable !== source)
-    // 2. Get only droppables that are on the desired side
+    // Remove any options that are not enabled
+    .filter((droppable: DroppableDimension): boolean => droppable.isEnabled)
+    // Get only droppables that are on the desired side
     .filter((droppable: DroppableDimension): boolean => {
       if (isMovingForward) {
         // is the droppable in front of the source on the cross axis?
@@ -55,7 +57,7 @@ export default ({
       return droppable.page.withMargin[axis.crossAxisEnd] <=
         source.page.withMargin[axis.crossAxisStart];
     })
-    // 3. is there any overlap on the main axis?
+    // Must have some overlap on the main axis
     .filter((droppable: DroppableDimension): boolean => {
       const sourceFragment: DimensionFragment = source.page.withMargin;
       const destinationFragment: DimensionFragment = droppable.page.withMargin;
@@ -74,7 +76,7 @@ export default ({
         isBetweenDestinationBounds(sourceFragment[axis.start]) ||
         isBetweenDestinationBounds(sourceFragment[axis.end]);
     })
-    // 4. Sort on the cross axis
+    // Sort on the cross axis
     .sort((a: DroppableDimension, b: DroppableDimension) => {
       const first: number = a.page.withMargin[axis.crossAxisStart];
       const second: number = b.page.withMargin[axis.crossAxisStart];
@@ -84,7 +86,7 @@ export default ({
       }
       return second - first;
     })
-    // 5. Find the droppables that have the same cross axis value as the first item
+    // Find the droppables that have the same cross axis value as the first item
     .filter((droppable: DroppableDimension, index: number, array: DroppableDimension[]): boolean =>
       droppable.page.withMargin[axis.crossAxisStart] ===
       array[0].page.withMargin[axis.crossAxisStart]
