@@ -35,8 +35,8 @@ export default ({
   );
 
   const currentIndex: number = location.index;
-  // Where the draggable will end up
-  const proposedIndex = isMovingForward ? currentIndex + 1 : currentIndex - 1;
+  const proposedIndex: number = isMovingForward ? currentIndex + 1 : currentIndex - 1;
+  const lastIndex: number = insideForeignDroppable.length - 1;
 
   // draggable is allowed to exceed the foreign droppables count by 1
   if (proposedIndex > insideForeignDroppable.length) {
@@ -48,16 +48,24 @@ export default ({
     return null;
   }
 
-  const atProposedIndex: DraggableDimension = insideForeignDroppable[proposedIndex];
-  // The draggable that we are going to move relative to
+  // Always moving relative to the draggable at the current index
   const movingRelativeTo: DraggableDimension = insideForeignDroppable[
-    // We want to move relative to the previous draggable
-    // or to the first if there is no previous
-    Math.max(0, proposedIndex - 1)
+    // We want to move relative to the proposed index
+    // or if we are going beyond to the end of the list - use that index
+    Math.min(proposedIndex, lastIndex)
   ];
 
   const sourceEdge: Edge = 'start';
-  const destinationEdge: Edge = proposedIndex === 0 ? 'start' : 'end';
+  const destinationEdge: Edge = (() => {
+    // moving past the last item
+    // in this case we are moving relative to the last item
+    // as there is nothing at the proposed index.
+    if (proposedIndex > lastIndex) {
+      return 'end';
+    }
+
+    return 'start';
+  })();
 
   const newCenter: Position = moveToEdge({
     source: draggable.page.withoutMargin,
@@ -73,7 +81,7 @@ export default ({
       // Stop displacing the closest draggable forward
       impact.movement.draggables.slice(1, impact.movement.draggables.length) :
       // Add the draggable that we are moving into the place of
-      [atProposedIndex.id, ...impact.movement.draggables];
+      [movingRelativeTo.id, ...impact.movement.draggables];
 
   const newImpact: DragImpact = {
     movement: {
