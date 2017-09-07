@@ -14,6 +14,8 @@ type Context = {|
   [droppableIdKey]: DroppableId
 |}
 
+const defaultPlaceholderDimensions = { height: 0, width: 0 };
+
 export default class Droppable extends Component {
   /* eslint-disable react/sort-comp */
   props: Props
@@ -62,14 +64,16 @@ export default class Droppable extends Component {
   }
 
   getPlaceholder() {
-    if (!this.props.placeholder) {
-      return null;
-    }
+    const { phase } = this.props;
+    const isDraggedOver = Boolean(this.props.placeholder);
+    const { height, width } = this.props.placeholder || defaultPlaceholderDimensions;
 
     return (
       <Placeholder
-        height={this.props.placeholder.height}
-        width={this.props.placeholder.width}
+        phase={phase}
+        isDraggedOver={isDraggedOver}
+        height={height}
+        width={width}
       />
     );
   }

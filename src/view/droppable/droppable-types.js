@@ -31,6 +31,8 @@ export type MapProps = {|
   // not the user is dragging over a list that
   // is not the source list
   placeholder: ?Placeholder,
+  // whether the entire application is currently in the dragging state
+  phase: ?string,
 |}
 
 export type OwnProps = {|
