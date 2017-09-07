@@ -55,9 +55,8 @@ export default ({
   } = destinationDroppable;
 
   // All the draggables in the destination (even the ones that haven't moved)
-  const draggablesInDestination: DraggableDimension[] = draggableMapToList(draggables).filter(
-    draggable => draggable.droppableId === destinationDroppableId
-  );
+  const draggablesInDestination: DraggableDimension[] = draggableMapToList(draggables)
+    .filter(draggable => draggable.droppableId === destinationDroppableId);
 
   // The dimension of the item being dragged
   const draggedDimensionFragment: DimensionFragment = draggedItem.client.withMargin;
@@ -66,12 +65,10 @@ export default ({
   const destinationDimensionFragment: DimensionFragment = (() => {
     // If we're not dragging into an empty list
     if (movedDraggables.length) {
-      // The index of the last item being displaced
-      const displacedIndex: number = isBeyondStartPosition ? movedDraggables.length - 1 : 0;
-      // Return the dimension of the last item being displaced
-      return draggables[
-        movedDraggables[displacedIndex]
-      ].client.withMargin;
+      // Return the dimension of the closest item being displaced
+      // The moved list is ordered by the closest to the furthest
+      // so we can just grab the first moved item.
+      return draggables[movedDraggables[0]].client.withMargin;
     }
 
     // If we're dragging to the last place in a new droppable
