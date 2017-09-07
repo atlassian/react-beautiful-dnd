@@ -20,7 +20,6 @@ export default ({
   droppable,
   draggables,
 }: Args): ?Result => {
-  console.log('in-foreign-list.js');
   if (!impact.destination) {
     console.error('cannot jump to next index when there is not previous destination');
     return null;
