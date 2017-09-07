@@ -79,9 +79,10 @@ export const makeSelector = (): Selector => {
   );
 
   const getMapProps = memoizeOne(
-    (isDraggingOver: boolean, placeholder: ?Placeholder): MapProps => ({
+    (isDraggingOver: boolean, placeholder: ?Placeholder, phase: ?string): MapProps => ({
       isDraggingOver,
       placeholder,
+      phase,
     })
   );
 
@@ -107,7 +108,7 @@ export const makeSelector = (): Selector => {
       if (phase === 'DRAGGING') {
         if (!drag) {
           console.error('cannot determine dragging over as there is not drag');
-          return getMapProps(false, null);
+          return getMapProps(false, null, phase);
         }
 
         const isDraggingOver = getIsDraggingOver(id, drag.impact.destination);
@@ -117,13 +118,13 @@ export const makeSelector = (): Selector => {
           drag.impact.destination,
           draggable
         );
-        return getMapProps(isDraggingOver, placeholder);
+        return getMapProps(isDraggingOver, placeholder, phase);
       }
 
       if (phase === 'DROP_ANIMATING') {
         if (!pending) {
           console.error('cannot determine dragging over as there is no pending result');
-          return getMapProps(false, null);
+          return getMapProps(false, null, phase);
         }
 
         const isDraggingOver = getIsDraggingOver(id, pending.impact.destination);
@@ -133,10 +134,10 @@ export const makeSelector = (): Selector => {
           pending.result.destination,
           draggable
         );
-        return getMapProps(isDraggingOver, placeholder);
+        return getMapProps(isDraggingOver, placeholder, phase);
       }
 
-      return getMapProps(false, null);
+      return getMapProps(false, null, phase);
     },
   );
 };

@@ -1,1 +1,2 @@
-export default from './placeholder';
+export default from './Placeholder';
+export { default as StaticPlaceholder } from './StaticPlaceholder';
