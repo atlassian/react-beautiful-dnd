@@ -69,6 +69,7 @@ export type DraggableDimension = {|
 export type DroppableDimension = {|
   id: DroppableId,
   axis: Axis,
+  isEnabled: boolean,
   scroll: {|
     initial: Position,
     current: Position,
@@ -94,7 +95,7 @@ export type DroppableDimensionMap = { [key: DroppableId]: DroppableDimension };
 
 export type DragMovement = {|
   // The draggables that need to move in response to a drag.
-  // Ordered by the closest to the start of the droppable
+  // Ordered by closest draggable to the *current* location of the dragging item
   draggables: DraggableId[],
   amount: Position,
   // is moving forward relative to the starting position

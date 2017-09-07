@@ -74,7 +74,6 @@ export default ({
     pageCenter,
     draggable,
     target,
-    source,
     destination,
     home,
     impact,

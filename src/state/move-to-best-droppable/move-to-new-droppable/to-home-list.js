@@ -79,6 +79,7 @@ export default ({
   });
 
   const needsToMove: DraggableId[] = (() => {
+    // TODO: explain the index trickery
     if (isMovingBeyondHome) {
       // need to ensure that the list is sorted with the closest item being first
       return insideDroppable.slice(originalIndex + 1, targetIndex + 1).reverse();
