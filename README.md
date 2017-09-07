@@ -13,12 +13,12 @@ See how beautiful it is for yourself - [have a play with the examples!](https://
 
 ## Core characteristics:
 
-- beautiful, natural movement of items
-- clean and powerful api which is simple to get started with
-- unopinionated styling
-- no creation of additional wrapper dom nodes - flexbox and focus management friendly!
-- plays well with existing interactive nodes such as anchors
-- state driven dragging - which allows for dragging from many input types, including programatic dragging. Currently only mouse and keyboard dragging are supported
+- Beautiful, natural movement of items
+- Clean and powerful api which is simple to get started with
+- Unopinionated styling
+- No creation of additional wrapper dom nodes - flexbox and focus management friendly!
+- Plays well with existing interactive nodes such as anchors
+- State driven dragging - which allows for dragging from many input types, including programatic dragging. Currently only mouse and keyboard dragging are supported
 
 ## Not for everyone
 
@@ -37,7 +37,7 @@ This library is still fairly new and so there is a relatively small feature set.
 - Independent nested lists (list can be a child of another list, but you cannot drag items from the parent list into a child list)
 - Flexible height items (the draggable items can have different heights)
 - Custom drag handle (you can drag a whole item by just a part of it)
-- the vertical list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
+- The vertical list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Server side rendering compatible
 
 ## Basic usage example

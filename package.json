@@ -1,6 +1,6 @@
 {
   "name": "react-beautiful-dnd",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Beautiful, accessible drag and drop for lists with React.js",
   "author": "Alex Reardon <areardon@atlassian.com>",
   "keywords": [
@@ -18,7 +18,7 @@
   "scripts": {
     "test": "jest --config ./jest.config.js",
     "validate": "yarn run lint && yarn run typecheck",
-    "lint": "eslint src test stories",
+    "lint": "eslint .",
     "typecheck": "flow check",
     "build": "yarn run build:lib && yarn run build:flow",
     "build:lib": "babel src -d lib",
