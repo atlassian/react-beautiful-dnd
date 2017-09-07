@@ -22,8 +22,8 @@ import type { TypeId,
 } from '../types';
 import { add, subtract, negate } from './position';
 import getDragImpact from './get-drag-impact';
-import jumpToNextIndex from './jump-to-next-index/';
-import type { Result as JumpToNextResult } from './jump-to-next-index/jump-to-next-index-types';
+import moveToNextIndex from './move-to-next-index/';
+import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
 import type { Result as MoveToNewDroppable } from './move-to-best-droppable/move-to-new-droppable';
 import moveToBestDroppable from './move-to-best-droppable/';
 
@@ -398,7 +398,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const existing: DragState = state.drag;
     const isMovingForward: boolean = action.type === 'MOVE_FORWARD';
 
-    const result: ?JumpToNextResult = jumpToNextIndex({
+    const result: ?MoveToNextResult = moveToNextIndex({
       isMovingForward,
       draggableId: existing.current.id,
       impact: existing.impact,

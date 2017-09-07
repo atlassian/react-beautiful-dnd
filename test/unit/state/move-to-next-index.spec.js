@@ -1,6 +1,6 @@
 // @flow
-import jumpToNextIndex from '../../../src/state/jump-to-next-index/';
-import type { Result } from '../../../src/state/jump-to-next-index/jump-to-next-index-types';
+import moveToNextIndex from '../../../src/state/move-to-next-index/';
+import type { Result } from '../../../src/state/move-to-next-index/move-to-next-index-types';
 import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
 import getClientRect from '../../utils/get-client-rect';
 import moveToEdge from '../../../src/state/move-to-edge';
@@ -17,7 +17,7 @@ import type {
   Position,
 } from '../../../src/types';
 
-describe('jump to next index', () => {
+describe('move to next index', () => {
   beforeEach(() => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });
@@ -132,6 +132,42 @@ describe('jump to next index', () => {
         [foreign3.id]: foreign3,
       };
 
+      it('should return null if the droppable is disabled', () => {
+        const disabled: DroppableDimension = getDroppableDimension({
+          id: 'disabled',
+          isEnabled: false,
+          direction: axis.direction,
+          clientRect: getClientRect({
+            top: 2001,
+            left: 2001,
+            bottom: 3000,
+            right: 3000,
+          }),
+        });
+        const impact: DragImpact = {
+          movement: {
+            draggables: [],
+            amount: patch(axis.line, home1.page.withMargin[axis.size]),
+            isBeyondStartPosition: false,
+          },
+          direction: axis.direction,
+          destination: {
+            droppableId: disabled.id,
+            index: 0,
+          },
+        };
+
+        const result: ?Result = moveToNextIndex({
+          isMovingForward: true,
+          draggableId: home1.id,
+          impact,
+          droppable: disabled,
+          draggables,
+        });
+
+        expect(result).toEqual(null);
+      });
+
       it('should return null if there was no previous destination', () => {
         const impact: DragImpact = {
           movement: {
@@ -144,7 +180,7 @@ describe('jump to next index', () => {
           destination: null,
         };
 
-        const result1: ?Result = jumpToNextIndex({
+        const result1: ?Result = moveToNextIndex({
           isMovingForward: true,
           draggableId: home1.id,
           impact,
@@ -155,7 +191,7 @@ describe('jump to next index', () => {
         expect(result1).toEqual(null);
         expect(console.error).toHaveBeenCalledTimes(1);
 
-        const result2: ?Result = jumpToNextIndex({
+        const result2: ?Result = moveToNextIndex({
           isMovingForward: true,
           draggableId: home1.id,
           impact,
@@ -183,7 +219,7 @@ describe('jump to next index', () => {
               },
             };
 
-            const result: ?Result = jumpToNextIndex({
+            const result: ?Result = moveToNextIndex({
               isMovingForward: true,
               draggableId: home3.id,
               impact,
@@ -211,7 +247,7 @@ describe('jump to next index', () => {
                 direction: axis.direction,
                 destination,
               };
-              const result: ?Result = jumpToNextIndex({
+              const result: ?Result = moveToNextIndex({
                 isMovingForward: true,
                 draggableId: home1.id,
                 impact,
@@ -269,7 +305,7 @@ describe('jump to next index', () => {
                 direction: axis.direction,
                 destination,
               };
-              const result: ?Result = jumpToNextIndex({
+              const result: ?Result = moveToNextIndex({
                 isMovingForward: true,
                 draggableId: home2.id,
                 impact,
@@ -327,7 +363,7 @@ describe('jump to next index', () => {
                   index: 1,
                 },
               };
-              const result: ?Result = jumpToNextIndex({
+              const result: ?Result = moveToNextIndex({
                 isMovingForward: true,
                 draggableId: home1.id,
                 impact,
@@ -390,7 +426,7 @@ describe('jump to next index', () => {
                   droppableId: home.id,
                 },
               };
-              const result: ?Result = jumpToNextIndex({
+              const result: ?Result = moveToNextIndex({
                 isMovingForward: true,
                 draggableId: home2.id,
                 impact,
@@ -399,7 +435,7 @@ describe('jump to next index', () => {
               });
 
               if (!result) {
-                throw new Error('invalid result of jumpToNextIndex');
+                throw new Error('invalid result of moveToNextIndex');
               }
 
               it('should move the start of the dragging item to the end of the previous item (which its original position)', () => {
@@ -452,7 +488,7 @@ describe('jump to next index', () => {
                 },
               };
               // moving draggable3 forward one position
-              const result: ?Result = jumpToNextIndex({
+              const result: ?Result = moveToNextIndex({
                 isMovingForward: true,
                 draggableId: home3.id,
                 impact,
@@ -513,7 +549,7 @@ describe('jump to next index', () => {
               },
             };
 
-            const result: ?Result = jumpToNextIndex({
+            const result: ?Result = moveToNextIndex({
               isMovingForward: false,
               draggableId: home1.id,
               impact,
@@ -539,7 +575,7 @@ describe('jump to next index', () => {
                 },
                 direction: axis.direction,
               };
-              const result: ?Result = jumpToNextIndex({
+              const result: ?Result = moveToNextIndex({
                 isMovingForward: false,
                 draggableId: home2.id,
                 impact,
@@ -595,7 +631,7 @@ describe('jump to next index', () => {
                 },
                 direction: axis.direction,
               };
-              const result: ?Result = jumpToNextIndex({
+              const result: ?Result = moveToNextIndex({
                 isMovingForward: false,
                 draggableId: home3.id,
                 impact,
@@ -655,7 +691,7 @@ describe('jump to next index', () => {
                   droppableId: home.id,
                 },
               };
-              const result: ?Result = jumpToNextIndex({
+              const result: ?Result = moveToNextIndex({
                 isMovingForward: false,
                 draggableId: home2.id,
                 impact,
@@ -717,7 +753,7 @@ describe('jump to next index', () => {
                   droppableId: home.id,
                 },
               };
-              const result: ?Result = jumpToNextIndex({
+              const result: ?Result = moveToNextIndex({
                 isMovingForward: false,
                 draggableId: home1.id,
                 impact,
@@ -784,7 +820,7 @@ describe('jump to next index', () => {
               },
             };
 
-            const result: ?Result = jumpToNextIndex({
+            const result: ?Result = moveToNextIndex({
               isMovingForward: true,
               draggableId: home1.id,
               impact,
@@ -844,7 +880,7 @@ describe('jump to next index', () => {
               },
             };
 
-            const result: ?Result = jumpToNextIndex({
+            const result: ?Result = moveToNextIndex({
               isMovingForward: true,
               draggableId: home1.id,
               impact,
@@ -903,7 +939,7 @@ describe('jump to next index', () => {
               },
             };
 
-            const result: ?Result = jumpToNextIndex({
+            const result: ?Result = moveToNextIndex({
               isMovingForward: true,
               draggableId: home1.id,
               impact,
@@ -935,7 +971,7 @@ describe('jump to next index', () => {
               },
             };
 
-            const result: ?Result = jumpToNextIndex({
+            const result: ?Result = moveToNextIndex({
               isMovingForward: false,
               draggableId: home1.id,
               impact,
@@ -962,7 +998,7 @@ describe('jump to next index', () => {
               },
             };
 
-            const result: ?Result = jumpToNextIndex({
+            const result: ?Result = moveToNextIndex({
               isMovingForward: false,
               draggableId: home1.id,
               impact,
@@ -1022,7 +1058,7 @@ describe('jump to next index', () => {
               },
             };
 
-            const result: ?Result = jumpToNextIndex({
+            const result: ?Result = moveToNextIndex({
               isMovingForward: false,
               draggableId: home1.id,
               impact,
