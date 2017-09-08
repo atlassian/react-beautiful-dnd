@@ -25,8 +25,8 @@ import getDragImpact from './get-drag-impact';
 import moveToNextIndex from './move-to-next-index/';
 import isWithinVisibleBoundsOfDroppable from './is-within-visible-bounds-of-droppable';
 import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
-import type { Result as MoveToNewDroppable } from './move-to-best-droppable/move-to-new-droppable/move-to-new-droppable-types';
-import moveToBestDroppable from './move-to-best-droppable/';
+import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-to-new-droppable/move-to-new-droppable-types';
+import moveCrossAxis from './move-cross-axis/';
 
 const noDimensions: DimensionState = {
   request: null,
@@ -469,6 +469,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const client: Position = subtract(page, existing.current.windowScroll);
 
     // current limitation: cannot go beyond visible border of list
+    // TODO: need to allow movement into the placeholder space
     const isVisible: boolean = isWithinVisibleBoundsOfDroppable(
       page, droppable,
     );
@@ -510,7 +511,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const droppableId: DroppableId = state.drag.impact.destination.droppableId;
     const home: DraggableLocation = state.drag.initial.source;
 
-    const result: ?MoveToNewDroppable = moveToBestDroppable({
+    const result: ?MoveCrossAxisResult = moveCrossAxis({
       isMovingForward: action.type === 'CROSS_AXIS_MOVE_FORWARD',
       pageCenter: center,
       draggableId,
