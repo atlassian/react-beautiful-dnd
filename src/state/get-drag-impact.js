@@ -15,7 +15,7 @@ import type { DraggableId,
 import { patch } from './position';
 import getDroppableOver from './get-droppable-over';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
-import noImpact from './no-impact';
+import noImpact, { noMovement } from './no-impact';
 
 // Calculates the net scroll diff along the main axis
 // between two droppables with internal scrolling
@@ -76,6 +76,22 @@ export default ({
   );
 
   const axis: Axis = droppable.axis;
+
+  if (!droppable.isEnabled) {
+    const homeDroppableId = draggingDimension.droppableId;
+    const homeIndex = getDraggablesInsideDroppable(
+      droppables[homeDroppableId],
+      draggables,
+    ).indexOf(draggingDimension);
+    return {
+      movement: noMovement,
+      direction: null,
+      destination: {
+        droppableId: homeDroppableId,
+        index: homeIndex,
+      },
+    };
+  }
 
   // not considering margin so that items move based on visible edges
   const draggableCenter: Position = draggingDimension.page.withoutMargin.center;

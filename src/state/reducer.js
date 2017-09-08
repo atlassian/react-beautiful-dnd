@@ -339,6 +339,23 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     });
   }
 
+  if (action.type === 'UPDATE_DROPPABLE_IS_ENABLED') {
+    const { id, isEnabled } = action.payload;
+    return {
+      ...state,
+      dimension: {
+        ...state.dimension,
+        droppable: {
+          ...state.dimension.droppable,
+          [id]: {
+            ...state.dimension.droppable[id],
+            isEnabled,
+          },
+        },
+      },
+    };
+  }
+
   if (action.type === 'MOVE') {
     const { client, page, windowScroll } = action.payload;
     return move({

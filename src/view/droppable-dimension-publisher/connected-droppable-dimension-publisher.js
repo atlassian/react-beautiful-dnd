@@ -13,6 +13,7 @@ import { storeKey } from '../context-keys';
 import DroppableDimensionPublisher from './droppable-dimension-publisher';
 import {
   publishDroppableDimension,
+  updateDroppableIsEnabled,
   updateDroppableDimensionScroll,
 } from '../../state/action-creators';
 
@@ -43,6 +44,7 @@ const makeMapStateToProps = () => {
 const mapDispatchToProps: DispatchProps = {
   publish: publishDroppableDimension,
   updateScroll: updateDroppableDimensionScroll,
+  updateIsEnabled: updateDroppableIsEnabled,
 };
 
 export default connect(
