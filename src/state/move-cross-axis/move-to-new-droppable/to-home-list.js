@@ -13,7 +13,6 @@ import type {
 
 type Args = {|
   amount: Position,
-  isGoingBeforeTarget: boolean,
   originalIndex: number,
   target: ?DraggableDimension,
   insideDroppable: DraggableDimension[],
@@ -22,14 +21,13 @@ type Args = {|
 |}
 
 export default ({
+  amount,
   originalIndex,
   target,
-  amount,
   insideDroppable,
   draggable,
   droppable,
 }: Args): ?Result => {
-  console.log('to-home-list.js');
   if (!target) {
     console.error('there will always be a target in the original list');
     return null;

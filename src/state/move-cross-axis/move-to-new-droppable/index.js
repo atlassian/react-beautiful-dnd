@@ -42,9 +42,6 @@ export default ({
     draggable.page.withMargin[destination.axis.size]
   );
 
-  const isGoingBeforeTarget: boolean = Boolean(target &&
-    pageCenter[destination.axis.line] < target.page.withMargin.center[destination.axis.line]);
-
   // moving back to the home list
   if (destination.id === draggable.droppableId) {
     return toHomeList({
@@ -60,7 +57,7 @@ export default ({
   // moving to a foreign list
   return toForeignList({
     amount,
-    isGoingBeforeTarget,
+    pageCenter,
     target,
     insideDroppable: insideDestination,
     draggable,

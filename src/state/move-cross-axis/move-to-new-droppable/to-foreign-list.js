@@ -12,7 +12,7 @@ import type {
 
 type Args = {|
   amount: Position,
-  isGoingBeforeTarget: boolean,
+  pageCenter: Position,
   target: ?DraggableDimension,
   insideDroppable: DraggableDimension[],
   draggable: DraggableDimension,
@@ -21,13 +21,15 @@ type Args = {|
 
 export default ({
   amount,
-  isGoingBeforeTarget,
+  pageCenter,
   target,
   insideDroppable,
   draggable,
   droppable,
 }: Args): ?Result => {
   const axis: Axis = droppable.axis;
+  const isGoingBeforeTarget: boolean = Boolean(target &&
+    pageCenter[droppable.axis.line] < target.page.withMargin.center[droppable.axis.line]);
 
   // Moving to an empty list
 
@@ -87,8 +89,6 @@ export default ({
   const needsToMove: DraggableId[] = insideDroppable
     .slice(proposedIndex, insideDroppable.length)
     .map((dimension: DraggableDimension): DraggableId => dimension.id);
-
-  console.log('moved', needsToMove);
 
   const newImpact: DragImpact = {
     movement: {
