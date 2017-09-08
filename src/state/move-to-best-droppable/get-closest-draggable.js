@@ -33,9 +33,11 @@ export default ({
     return null;
   }
 
+  const containerScroll: Position = destination.scroll.current;
+
   const isWithinMainAxis = isWithin(
-    destination.page.withMargin[axis.start],
-    destination.page.withMargin[axis.end]
+    destination.page.withMargin[axis.start] + containerScroll[axis.line],
+    destination.page.withMargin[axis.end] + containerScroll[axis.line]
   );
 
   const result: DraggableDimension[] = options

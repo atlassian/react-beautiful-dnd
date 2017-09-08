@@ -12,6 +12,19 @@ import type {
   DraggableDimensionMap,
 } from '../../../../src/types';
 
+const withScroll = (droppable: DroppableDimension, scroll: Position): DroppableDimension => {
+  // $ExpectError - using spread
+  const updated: DroppableDimension = {
+    ...droppable,
+    scroll: {
+      initial: droppable.scroll.initial,
+      current: scroll,
+    },
+  };
+
+  return updated;
+};
+
 describe('get closest draggable', () => {
   [vertical, horizontal].forEach((axis: Axis) => {
     const start: number = 0;
@@ -31,7 +44,7 @@ describe('get closest draggable', () => {
 
     // first item bleeds backwards past the start of the droppable
     const partialHiddenBackwards: DraggableDimension = getDraggableDimension({
-      id: 'bleedsOverStart',
+      id: 'partialHiddenBackwards',
       droppableId: droppable.id,
       clientRect: getClientRect({
         [axis.crossAxisStart]: crossAxisStart,
@@ -65,7 +78,7 @@ describe('get closest draggable', () => {
 
     // bleeds over the end of the visible boundary
     const partiallyHiddenForwards: DraggableDimension = getDraggableDimension({
-      id: 'bleedsOverEnd',
+      id: 'partiallyHiddenForwards',
       droppableId: droppable.id,
       clientRect: getClientRect({
         [axis.crossAxisStart]: crossAxisStart,
@@ -139,7 +152,7 @@ describe('get closest draggable', () => {
     });
 
     describe('removal of draggables that are not entirely within the current visible bounds of a droppable', () => {
-      it('should remove draggables that have backwards partial visiblility', () => {
+      it('should ignore draggables that have backwards partial visiblility', () => {
         // point would usually be closest to visible1 -
         // but it is outside of the visible bounds of the droppable
         const center: Position = patch(
@@ -156,7 +169,7 @@ describe('get closest draggable', () => {
         expect(result).toBe(visible1);
       });
 
-      it('should remove draggables that have forward partial visiblility', () => {
+      it('should ignore draggables that have forward partial visiblility', () => {
         const center: Position = patch(
           axis.line, partiallyHiddenForwards.page.withoutMargin.center[axis.line], 100
         );
@@ -171,7 +184,7 @@ describe('get closest draggable', () => {
         expect(result).toBe(visible2);
       });
 
-      it('should remove draggables that have no visiblity', () => {
+      it('should ignore draggables that have no visiblity', () => {
         const center: Position = patch(
           axis.line, hidden.page.withoutMargin.center[axis.line], 100
         );
@@ -205,6 +218,48 @@ describe('get closest draggable', () => {
         });
 
         expect(result).toBe(null);
+      });
+
+      describe('taking into account droppable scroll', () => {
+        it('should include forward items that otherwise would be excluded', () => {
+          const center: Position = patch(
+            axis.line, partiallyHiddenForwards.page.withoutMargin.center[axis.line], 100
+          );
+          // need to scroll so that partiallyHiddenForwards is now visible
+          const diffToEnd: number =
+            partiallyHiddenForwards.page.withoutMargin[axis.end] -
+            droppable.page.withoutMargin[axis.end];
+
+          const scroll: Position = patch(axis.line, diffToEnd);
+
+          const result: ?DraggableDimension = getClosestDraggable({
+            axis,
+            pageCenter: center,
+            destination: withScroll(droppable, scroll),
+            draggables,
+          });
+
+          expect(result).toBe(partiallyHiddenForwards);
+        });
+
+        it.only('should include backward items that otherwise would be excluded', () => {
+          const center: Position = patch(
+            axis.line, partialHiddenBackwards.page.withoutMargin.center[axis.line], 100
+          );
+          // need to scroll so that partialHiddenBackwards is now visible
+          const diffToEnd: number = partialHiddenBackwards.page.withoutMargin[axis.start] -
+            droppable.page.withoutMargin[axis.start];
+          const scroll: Position = patch(axis.line, diffToEnd);
+
+          const result: ?DraggableDimension = getClosestDraggable({
+            axis,
+            pageCenter: center,
+            destination: withScroll(droppable, scroll),
+            draggables,
+          });
+
+          expect(result).toBe(partialHiddenBackwards);
+        });
       });
     });
 
