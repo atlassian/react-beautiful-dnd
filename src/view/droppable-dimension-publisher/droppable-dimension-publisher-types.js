@@ -15,12 +15,14 @@ export type MapProps = {|
 
 export type DispatchProps = {|
   publish: (dimension: DroppableDimension) => mixed,
+  updateIsEnabled: (id: DroppableId, isEnabled: boolean) => mixed,
   updateScroll: (id: DroppableId, offset: Position) => mixed,
 |}
 
 export type OwnProps = {|
   droppableId: DroppableId,
   direction: Direction,
+  isDropDisabled: boolean,
   type: TypeId,
   targetRef: ?HTMLElement,
   children?: ReactElement,

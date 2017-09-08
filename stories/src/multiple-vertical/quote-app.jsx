@@ -45,6 +45,7 @@ type Props = {|
 |}
 
 type State = {|
+  disabledDroppable: ?string,
   quotes: GroupedQuotes,
 |}
 
@@ -86,12 +87,16 @@ export default class QuoteApp extends Component {
   state: State
 
   state: State = {
+    disabledDroppable: null,
     quotes: this.props.initial,
   };
   /* eslint-enable react/sort-comp */
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
+    this.setState({
+      disabledDroppable: this.getDisabledDroppable(initial.source.droppableId),
+    });
     // $ExpectError - body could be null?
     document.body.classList.add(isDraggingClassName);
   }
@@ -101,14 +106,16 @@ export default class QuoteApp extends Component {
     // $ExpectError - body could be null?
     document.body.classList.remove(isDraggingClassName);
 
-    // // dropped outside the list
-    if (!result.destination) {
-      return;
-    }
+    const quotes = result.destination ? (
+      resolveDrop(this.state.quotes, result.source, result.destination)
+    ) : (
+      this.state.quotes
+    );
 
-    const quotes = resolveDrop(this.state.quotes, result.source, result.destination);
-
-    this.setState({ quotes });
+    this.setState({
+      disabledDroppable: null,
+      quotes,
+    });
   }
 
   componentDidMount() {
@@ -121,8 +128,19 @@ export default class QuoteApp extends Component {
     `;
   }
 
+  getDisabledDroppable = (sourceDroppable: ?string) => {
+    if (!sourceDroppable) {
+      return null;
+    }
+    const droppables: string[] = ['alpha', 'beta', 'gamma', 'delta'];
+    const sourceIndex = droppables.indexOf(sourceDroppable);
+    const disabledDroppableIndex = (sourceIndex + 1) % droppables.length;
+
+    return droppables[disabledDroppableIndex];
+  }
+
   render() {
-    const { quotes } = this.state;
+    const { quotes, disabledDroppable } = this.state;
 
     return (
       <DragDropContext
@@ -134,6 +152,7 @@ export default class QuoteApp extends Component {
             <QuoteList
               listId="alpha"
               listType="card"
+              isDropDisabled={disabledDroppable === 'alpha'}
               quotes={quotes.alpha}
             />
           </Column>
@@ -142,12 +161,14 @@ export default class QuoteApp extends Component {
             <QuoteList
               listId="beta"
               listType="card"
+              isDropDisabled={disabledDroppable === 'beta'}
               quotes={quotes.beta}
             />
             <QuoteList
               listId="gamma"
               listType="card"
               internalScroll
+              isDropDisabled={disabledDroppable === 'gamma'}
               quotes={quotes.gamma}
             />
           </Column>
@@ -156,6 +177,7 @@ export default class QuoteApp extends Component {
               listId="delta"
               listType="card"
               internalScroll
+              isDropDisabled={disabledDroppable === 'delta'}
               quotes={quotes.delta}
             />
           </Column>
