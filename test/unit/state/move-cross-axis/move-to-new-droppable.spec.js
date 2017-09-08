@@ -12,7 +12,13 @@ describe('move to new droppable', () => {
     });
 
     describe('moving back into original index', () => {
+      it('should return the original center', () => {
 
+      });
+
+      it('should return an empty impact with the original location', () => {
+
+      });
     });
 
     describe('moving before the original index', () => {

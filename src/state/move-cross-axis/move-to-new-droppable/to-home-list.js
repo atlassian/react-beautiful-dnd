@@ -64,21 +64,21 @@ export default ({
     };
   }
 
-  const isMovingBeyondHome = targetIndex > originalIndex;
+  const isMovingBeyondOriginalIndex = targetIndex > originalIndex;
 
-  const edge: Edge = isMovingBeyondHome ? 'end' : 'start';
+  const edge: Edge = isMovingBeyondOriginalIndex ? 'end' : 'start';
 
   const newCenter: Position = moveToEdge({
     source: draggable.page.withoutMargin,
     sourceEdge: edge,
-    destination: isMovingBeyondHome ? target.page.withoutMargin : target.page.withMargin,
+    destination: isMovingBeyondOriginalIndex ? target.page.withoutMargin : target.page.withMargin,
     destinationEdge: edge,
     destinationAxis: axis,
   });
 
   const needsToMove: DraggableId[] = (() => {
     // TODO: explain the index trickery
-    if (isMovingBeyondHome) {
+    if (isMovingBeyondOriginalIndex) {
       // need to ensure that the list is sorted with the closest item being first
       return insideDroppable.slice(originalIndex + 1, targetIndex + 1).reverse();
     }
@@ -91,7 +91,7 @@ export default ({
       draggables: needsToMove,
       amount,
           // TODO: not sure what this should be
-      isBeyondStartPosition: isMovingBeyondHome,
+      isBeyondStartPosition: isMovingBeyondOriginalIndex,
     },
     direction: axis.direction,
     destination: {
