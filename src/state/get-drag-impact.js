@@ -69,13 +69,12 @@ export default ({
   const newCenter = withinDroppable.center;
   const draggingDimension: DraggableDimension = draggables[draggableId];
   const droppable: DroppableDimension = droppables[droppableId];
+  const axis: Axis = droppable.axis;
 
   const insideDroppable: DraggableDimension[] = getDraggablesInsideDroppable(
     droppable,
     draggables,
   );
-
-  const axis: Axis = droppable.axis;
 
   // not considering margin so that items move based on visible edges
   const draggableCenter: Position = draggingDimension.page.withoutMargin.center;

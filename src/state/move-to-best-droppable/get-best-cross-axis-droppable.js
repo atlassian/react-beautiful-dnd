@@ -105,8 +105,7 @@ export default ({
   // At this point we have a number of candidates that
   // all have the same axis.crossAxisStart value.
 
-  // 1. Check to see if the center position is within the size of a Droppable on the main axis
-
+  // Check to see if the center position is within the size of a Droppable on the main axis
   const contains: DroppableDimension[] = candidates
     .filter((droppable: DroppableDimension) => {
       const isWithinDroppable = isWithin(
@@ -120,7 +119,7 @@ export default ({
     return contains[0];
   }
 
-  // the center point of the draggable falls on the boundary between to droppables
+  // The center point of the draggable falls on the boundary between two droppables
   if (contains.length > 1) {
     // sort on the main axis and choose the first
     return contains.sort((a: DroppableDimension, b: DroppableDimension) => (
@@ -128,8 +127,7 @@ export default ({
     ))[0];
   }
 
-  // 2. The center is not contained within any droppable
-
+  // The center is not contained within any droppable
   // 1. Find the candidate that has the closest corner
   // 2. If there is a tie - choose the one that is first on the main axis
   return candidates.sort((a: DroppableDimension, b: DroppableDimension) => {
@@ -141,7 +139,7 @@ export default ({
       return first - second;
     }
 
-    // they both have the same distance -
+    // They both have the same distance -
     // choose the one that is first on the main axis
     return a.page.withMargin[axis.start] - b.page.withMargin[axis.start];
   })[0];
