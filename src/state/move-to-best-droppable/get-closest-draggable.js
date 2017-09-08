@@ -1,5 +1,6 @@
 // @flow
 import { add, distance } from '../position';
+import isWithin from '../is-within';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import type {
   Axis,
@@ -12,34 +13,40 @@ import type {
 type Args = {|
   axis: Axis,
   pageCenter: Position,
-  // how far the destination Droppable is scrolled
-  scrollOffset: Position,
   // the droppable that is being moved to
   destination: DroppableDimension,
   draggables: DraggableDimensionMap,
 |}
 
-// TODO
-const isVisible = (draggable: DraggableDimension, droppable: DroppableDimension) => true;
-
 export default ({
   axis,
   pageCenter,
-  scrollOffset,
   destination,
   draggables,
 }: Args): ?DraggableDimension => {
-  const siblings: DraggableDimension[] = getDraggablesInsideDroppable(
+  const options: DraggableDimension[] = getDraggablesInsideDroppable(
     destination, draggables
   );
 
-  const result: DraggableDimension[] =
-    // remove any options that are hidden by overflow
-    siblings
-      .filter((draggable: DraggableDimension) => isVisible(draggable, destination))
+  // Empty list - bail out
+  if (!options.length) {
+    return null;
+  }
+
+  const isWithinMainAxis = isWithin(
+    destination.page.withMargin[axis.start],
+    destination.page.withMargin[axis.end]
+  );
+
+  const result: DraggableDimension[] = options
+      // Remove any options that are hidden by overflow
+      // Whole draggable must be visible to move to it
+      .filter((draggable: DraggableDimension) =>
+        isWithinMainAxis(draggable.page.withMargin[axis.start]) &&
+        isWithinMainAxis(draggable.page.withMargin[axis.end])
+      )
       .sort((a: DraggableDimension, b: DraggableDimension): number => {
         // TODO: not considering scroll offset
-        console.log('scroll offset', scrollOffset);
         const distanceToA = distance(pageCenter, a.page.withMargin.center);
         const distanceToB = distance(pageCenter, b.page.withMargin.center);
 

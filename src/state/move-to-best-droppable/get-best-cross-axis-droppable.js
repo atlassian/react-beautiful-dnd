@@ -1,6 +1,7 @@
 // @flow
 import { closest } from '../position';
 import { droppableMapToList } from '../dimension-map-to-list';
+import isWithin from '../is-within';
 import type {
   Axis,
   Position,
@@ -8,9 +9,6 @@ import type {
   DroppableDimension,
   DroppableDimensionMap,
 } from '../../types';
-
-const isWithin = (lowerBound: number, upperBound: number): ((number) => boolean) =>
-  (value: number): boolean => value <= upperBound && value >= lowerBound;
 
 const getCorners = (droppable: DroppableDimension): Position[] => {
   const fragment: DimensionFragment = droppable.page.withMargin;
