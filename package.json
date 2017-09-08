@@ -64,13 +64,13 @@
     "flow-copy-source": "1.2.1",
     "jest": "20.0.4",
     "raf-stub": "2.0.1",
-    "react": "15.6.1",
+    "react": "15.4.0",
     "react-dom": "15.6.1",
     "react-test-renderer": "15.6.1",
     "styled-components": "2.1.2"
   },
   "peerDependencies": {
-    "react": "15.6.1"
+    "react": ">=15.4.0"
   },
   "license": "Apache-2.0",
   "repository": {
