@@ -75,22 +75,31 @@ export default class Droppable extends Component {
   }
 
   render() {
+    const {
+      children,
+      direction,
+      droppableId,
+      isDraggingOver,
+      isDropDisabled,
+      type,
+    } = this.props;
     const provided: Provided = {
       innerRef: this.setRef,
       placeholder: this.getPlaceholder(),
     };
     const snapshot: StateSnapshot = {
-      isDraggingOver: this.props.isDraggingOver,
+      isDraggingOver,
     };
 
     return (
       <DroppableDimensionPublisher
-        droppableId={this.props.droppableId}
-        direction={this.props.direction}
-        type={this.props.type}
+        droppableId={droppableId}
+        direction={direction}
+        isDropDisabled={isDropDisabled}
+        type={type}
         targetRef={this.state.ref}
       >
-        {this.props.children(provided, snapshot)}
+        {children(provided, snapshot)}
       </DroppableDimensionPublisher>
     );
   }

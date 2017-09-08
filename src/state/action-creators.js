@@ -130,6 +130,23 @@ export const updateDroppableDimensionScroll =
     },
   });
 
+export type UpdateDroppableIsEnabledAction = {|
+  type: 'UPDATE_DROPPABLE_IS_ENABLED',
+  payload: {
+    id: DroppableId,
+    isEnabled: boolean,
+  }
+|}
+
+export const updateDroppableIsEnabled =
+  (id: DroppableId, isEnabled: boolean): UpdateDroppableIsEnabledAction => ({
+    type: 'UPDATE_DROPPABLE_IS_ENABLED',
+    payload: {
+      id,
+      isEnabled,
+    },
+  });
+
 export type MoveAction = {|
   type: 'MOVE',
   payload: {|

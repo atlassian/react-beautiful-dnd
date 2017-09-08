@@ -3,7 +3,7 @@ import type { DragMovement, DragImpact, Position } from '../types';
 
 const origin: Position = { x: 0, y: 0 };
 
-const noMovement: DragMovement = {
+export const noMovement: DragMovement = {
   draggables: [],
   amount: origin,
   isBeyondStartPosition: false,
