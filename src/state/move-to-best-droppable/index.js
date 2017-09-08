@@ -2,6 +2,7 @@
 import getBestCrossAxisDroppable from './get-best-cross-axis-droppable';
 import getClosestDraggable from './get-closest-draggable';
 import moveToNewDroppable from './move-to-new-droppable/';
+import { add, subtract } from '../position';
 import type { Result } from './move-to-new-droppable';
 import type {
   DraggableId,
@@ -45,6 +46,8 @@ export default ({
   const draggable: DraggableDimension = draggables[draggableId];
   const source: DroppableDimension = droppables[droppableId];
 
+  // not considering the container scroll changes as container scrolling cancels a keyboard drag
+
   const destination: ?DroppableDimension = getBestCrossAxisDroppable({
     isMovingForward,
     pageCenter,
@@ -57,15 +60,9 @@ export default ({
     return null;
   }
 
-  // const newSiblings: DraggableDimension[] = getDraggablesInsideDroppable(
-  //   destination,
-  //   draggables,
-  // );
-
   const target: ?DraggableDimension = getClosestDraggable({
     axis: destination.axis,
     pageCenter,
-    scrollOffset: destination.scroll.current,
     destination,
     draggables,
   });

@@ -1,5 +1,5 @@
 // @flow
-import { add, distance } from '../position';
+import { add, distance, patch, subtract } from '../position';
 import isWithin from '../is-within';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import type {
@@ -33,11 +33,9 @@ export default ({
     return null;
   }
 
-  const containerScroll: Position = destination.scroll.current;
-
   const isWithinMainAxis = isWithin(
-    destination.page.withMargin[axis.start] + containerScroll[axis.line],
-    destination.page.withMargin[axis.end] + containerScroll[axis.line]
+    destination.page.withMargin[axis.start],
+    destination.page.withMargin[axis.end]
   );
 
   const result: DraggableDimension[] = options

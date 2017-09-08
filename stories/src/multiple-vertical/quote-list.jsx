@@ -31,7 +31,7 @@ const DropZone = styled.div`
 
 const ScrollContainer = styled.div`
   overflow: auto;
-  max-height: 400px;
+  max-height: 800px;
 `;
 
 const Container = styled.div`

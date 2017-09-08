@@ -23,8 +23,9 @@ import type { TypeId,
 import { add, subtract, negate } from './position';
 import getDragImpact from './get-drag-impact';
 import moveToNextIndex from './move-to-next-index/';
+import isWithinVisibleBoundsOfDroppable from './is-within-visible-bounds-of-droppable';
 import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
-import type { Result as MoveToNewDroppable } from './move-to-best-droppable/move-to-new-droppable';
+import type { Result as MoveToNewDroppable } from './move-to-best-droppable/move-to-new-droppable/move-to-new-droppable-types';
 import moveToBestDroppable from './move-to-best-droppable/';
 
 const noDimensions: DimensionState = {
@@ -298,6 +299,14 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
+    // Currently not supporting container scrolling while dragging with a keyboard
+    // We do not store whether we are dragging with a keyboard in the state but this flag
+    // does this trick. Ideally this check would not exist.
+    // Kill the drag instantly
+    if (state.drag.current.shouldAnimate) {
+      return clean();
+    }
+
     const { id, offset } = action.payload;
 
     const target: ?DroppableDimension = state.dimension.droppable[id];
@@ -438,11 +447,13 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
+    const droppable: DroppableDimension = state.dimension.droppable[existing.impact.destination.droppableId];
+
     const result: ?MoveToNextResult = moveToNextIndex({
       isMovingForward,
       draggableId: existing.current.id,
       impact: existing.impact,
-      droppable: state.dimension.droppable[existing.impact.destination.droppableId],
+      droppable,
       draggables: state.dimension.draggable,
     });
 
@@ -452,23 +463,19 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     }
 
     const impact: DragImpact = result.impact;
-
-    // const page: Position = add(existing.current.page.selection, diff);
-    // const client: Position = add(existing.current.client.selection, diff);
-
-    // current limitation: cannot go beyond visible border of list
-    // const droppableId: ?DroppableId = getDroppableOver(
-    //   result.center, state.dimension.droppable,
-    // );
-
-    // if (!droppableId) {
-    //   // eslint-disable-next-line no-console
-    //   console.info('currently not supporting moving a draggable outside the visibility bounds of a droppable');
-    //   return state;
-    // }
-
     const page: Position = result.pageCenter;
     const client: Position = subtract(page, existing.current.windowScroll);
+
+    // current limitation: cannot go beyond visible border of list
+    const isVisible: boolean = isWithinVisibleBoundsOfDroppable(
+      page, droppable,
+    );
+
+    if (!isVisible) {
+      // eslint-disable-next-line no-console
+      console.info('currently not supporting moving a draggable outside the visibility bounds of a droppable');
+      return state;
+    }
 
     return move({
       state,

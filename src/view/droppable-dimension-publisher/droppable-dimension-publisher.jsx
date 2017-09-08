@@ -7,7 +7,7 @@ import getWindowScrollPosition from '../get-window-scroll-position';
 import { getDroppableDimension } from '../../state/dimension';
 import getClosestScrollable from '../get-closest-scrollable';
 // eslint-disable-next-line no-duplicate-imports
-import type { Margin } from '../../state/dimension';
+import type { Margin, ClientRect } from '../../state/dimension';
 import type { DroppableDimension, Position, HTMLElement } from '../../types';
 import type { Props } from './droppable-dimension-publisher-types';
 
@@ -46,10 +46,41 @@ export default class DroppableDimensionPublisher extends Component {
       left: parseInt(style.marginLeft, 10),
     };
 
+    const clientRect: ClientRect = (() => {
+      const current: ClientRect = targetRef.getBoundingClientRect();
+
+      if (!this.closestScrollable) {
+        return current;
+      }
+
+      if (this.closestScrollable === targetRef) {
+        return current;
+      }
+
+      // need to trim dimensions
+      const parent: ClientRect = this.closestScrollable.getBoundingClientRect();
+
+      const top = Math.max(current.top, parent.top);
+      const left = Math.max(current.left, parent.left);
+      const right = Math.min(current.right, parent.right);
+      const bottom = Math.min(current.bottom, parent.bottom);
+
+      const result: ClientRect = {
+        top,
+        right,
+        bottom,
+        left,
+        width: (right - left),
+        height: (bottom - top),
+      };
+
+      return result;
+    })();
+
     const dimension: DroppableDimension = getDroppableDimension({
       id: droppableId,
       direction,
-      clientRect: targetRef.getBoundingClientRect(),
+      clientRect,
       margin,
       windowScroll: getWindowScrollPosition(),
       scroll: this.getScrollOffset(),

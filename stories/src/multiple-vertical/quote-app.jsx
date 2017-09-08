@@ -151,6 +151,7 @@ export default class QuoteApp extends Component {
           <Column>
             <QuoteList
               listId="alpha"
+              internalScroll
               listType="card"
               isDropDisabled={disabledDroppable === 'alpha'}
               quotes={quotes.alpha}
