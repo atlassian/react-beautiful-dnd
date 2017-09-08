@@ -1,12 +1,10 @@
 // @flow
-import { add, distance, patch, subtract } from '../position';
+import { distance } from '../position';
 import isWithin from '../is-within';
-import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import type {
   Axis,
   Position,
   DraggableDimension,
-  DraggableDimensionMap,
   DroppableDimension,
 } from '../../types';
 
@@ -15,21 +13,18 @@ type Args = {|
   pageCenter: Position,
   // the droppable that is being moved to
   destination: DroppableDimension,
-  draggables: DraggableDimensionMap,
+  // the droppables inside the destination
+  insideDestination: DraggableDimension[],
 |}
 
 export default ({
   axis,
   pageCenter,
   destination,
-  draggables,
+  insideDestination,
 }: Args): ?DraggableDimension => {
-  const options: DraggableDimension[] = getDraggablesInsideDroppable(
-    destination, draggables
-  );
-
   // Empty list - bail out
-  if (!options.length) {
+  if (!insideDestination.length) {
     return null;
   }
 
@@ -38,7 +33,7 @@ export default ({
     destination.page.withMargin[axis.end]
   );
 
-  const result: DraggableDimension[] = options
+  const result: DraggableDimension[] = insideDestination
       // Remove any options that are hidden by overflow
       // Whole draggable must be visible to move to it
       .filter((draggable: DraggableDimension) =>

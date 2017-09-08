@@ -2,8 +2,8 @@
 import getBestCrossAxisDroppable from './get-best-cross-axis-droppable';
 import getClosestDraggable from './get-closest-draggable';
 import moveToNewDroppable from './move-to-new-droppable/';
-import { add, subtract } from '../position';
-import type { Result } from './move-to-new-droppable';
+import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
+import type { Result } from './move-to-new-droppable/move-to-new-droppable-types';
 import type {
   DraggableId,
   DroppableId,
@@ -60,20 +60,30 @@ export default ({
     return null;
   }
 
+  const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
+    destination, draggables
+  );
+
   const target: ?DraggableDimension = getClosestDraggable({
     axis: destination.axis,
     pageCenter,
     destination,
-    draggables,
+    insideDestination,
   });
+
+  // Draggables available, but none are candidates for movement (eg none are visible)
+  // Cannot move into the list
+  if (insideDestination.length && !target) {
+    return null;
+  }
 
   return moveToNewDroppable({
     pageCenter,
     draggable,
     target,
     destination,
+    insideDestination,
     home,
     impact,
-    draggables,
   });
 };

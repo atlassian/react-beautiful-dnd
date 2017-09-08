@@ -447,7 +447,9 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
-    const droppable: DroppableDimension = state.dimension.droppable[existing.impact.destination.droppableId];
+    const droppable: DroppableDimension = state.dimension.droppable[
+      existing.impact.destination.droppableId
+    ];
 
     const result: ?MoveToNextResult = moveToNextIndex({
       isMovingForward,

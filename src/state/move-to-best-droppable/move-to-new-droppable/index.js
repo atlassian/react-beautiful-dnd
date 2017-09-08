@@ -2,7 +2,6 @@
 import toHomeList from './to-home-list';
 import toForeignList from './to-foreign-list';
 import { patch } from '../../position';
-import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
 import type { Result } from './move-to-new-droppable-types';
 import type {
   Position,
@@ -10,7 +9,6 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DraggableLocation,
-  DraggableDimensionMap,
 } from '../../../types';
 
 type Args = {|
@@ -23,12 +21,12 @@ type Args = {|
   target: ?DraggableDimension,
   // the droppable the draggable is moving to
   destination: DroppableDimension,
+  // all the draggables inside the destination
+  insideDestination: DraggableDimension[],
   // the source location of the draggable
   home: DraggableLocation,
   // the current drag impact
   impact: DragImpact,
-  // all the draggables in the system
-  draggables: DraggableDimensionMap,
 |}
 
 export default ({
@@ -37,11 +35,8 @@ export default ({
   draggable,
   target,
   home,
-  draggables,
+  insideDestination,
 }: Args): ?Result => {
-  const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
-    destination, draggables
-  );
   const amount: Position = patch(
     destination.axis.line,
     draggable.page.withMargin[destination.axis.size]

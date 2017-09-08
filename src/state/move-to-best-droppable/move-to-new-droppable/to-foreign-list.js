@@ -27,7 +27,6 @@ export default ({
   draggable,
   droppable,
 }: Args): ?Result => {
-  console.log('to-foreign-list.js');
   const axis: Axis = droppable.axis;
 
   // Moving to an empty list
