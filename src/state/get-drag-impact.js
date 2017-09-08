@@ -94,6 +94,24 @@ export default ({
     };
   }
 
+  // If the droppable is disabled we still need to return an impact with a destination, otherwise
+  // we'll get errors when trying to lift from a disabled droppable (which is allowed)
+  if (!droppable.isEnabled) {
+    const homeDroppableId = draggingDimension.droppableId;
+    const homeIndex = getDraggablesInsideDroppable(
+      droppables[homeDroppableId],
+      draggables,
+    ).indexOf(draggingDimension);
+    return {
+      movement: noMovement,
+      direction: null,
+      destination: {
+        droppableId: homeDroppableId,
+        index: homeIndex,
+      },
+    };
+  }
+
   // not considering margin so that items move based on visible edges
   const draggableCenter: Position = draggingDimension.page.withoutMargin.center;
   const isBeyondStartPosition: boolean = newCenter[axis.line] - draggableCenter[axis.line] > 0;
