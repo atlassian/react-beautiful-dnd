@@ -76,6 +76,8 @@ export default ({
     draggables,
   );
 
+  // If the droppable is disabled we still need to return an impact with a destination, otherwise
+  // we'll get errors when trying to lift from a disabled droppable (which is allowed)
   if (!droppable.isEnabled) {
     const homeDroppableId = draggingDimension.droppableId;
     const homeIndex = getDraggablesInsideDroppable(
