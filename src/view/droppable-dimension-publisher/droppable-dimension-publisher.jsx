@@ -34,7 +34,7 @@ export default class DroppableDimensionPublisher extends Component {
   }
 
   getDimension = (): DroppableDimension => {
-    const { droppableId, direction, targetRef } = this.props;
+    const { droppableId, direction, isDropDisabled, targetRef } = this.props;
     invariant(targetRef, 'DimensionPublisher cannot calculate a dimension when not attached to the DOM');
 
     const style = window.getComputedStyle(targetRef);
@@ -53,6 +53,7 @@ export default class DroppableDimensionPublisher extends Component {
       margin,
       windowScroll: getWindowScrollPosition(),
       scroll: this.getScrollOffset(),
+      isEnabled: !isDropDisabled,
     });
 
     return dimension;
@@ -112,6 +113,10 @@ export default class DroppableDimensionPublisher extends Component {
         console.warn('changing targetRef while watching scroll!');
         this.unwatchScroll();
       }
+    }
+
+    if (nextProps.isDropDisabled !== this.props.isDropDisabled) {
+      this.props.updateIsEnabled(this.props.droppableId, !nextProps.isDropDisabled);
     }
 
     // Because the dimension publisher wraps children - it might render even when its props do

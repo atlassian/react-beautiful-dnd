@@ -13,14 +13,15 @@ import type {
 } from '../../../src/';
 
 const Wrapper = styled.div`
-  width: 250px;
   background-color: ${({ isDraggingOver }) => (isDraggingOver ? colors.blue.lighter : colors.blue.light)};
   display: flex;
   flex-direction: column;
+  opacity: ${({ isDropDisabled }) => (isDropDisabled ? 0.5 : 1)};
   padding: ${grid}px;
   padding-bottom: 0;
+  transition: background-color 0.1s ease, opacity 0.1s ease;
   user-select: none;
-  transition: background-color 0.1s ease;
+  width: 250px;
 `;
 
 const DropZone = styled.div`
@@ -49,10 +50,11 @@ const Title = styled.h4`
 export default class QuoteList extends Component {
   props: {|
     listId: string,
-    quotes: Quote[],
     listType?: string,
+    internalScroll?: boolean,
+    isDropDisabled?: boolean,
+    quotes: Quote[],
     style?: Object,
-    internalScroll ?: boolean,
   |}
 
   renderBoard = (dropProvided: DroppableProvided) => {
@@ -84,14 +86,15 @@ export default class QuoteList extends Component {
   }
 
   render() {
-    const { listId, listType, internalScroll, style } = this.props;
+    const { listId, listType, internalScroll, isDropDisabled, style } = this.props;
 
     return (
-      <Droppable droppableId={listId} type={listType}>
+      <Droppable droppableId={listId} isDropDisabled={isDropDisabled} type={listType}>
         {(dropProvided: DroppableProvided, dropSnapshot: DroppableStateSnapshot) => (
           <Wrapper
             style={style}
             isDraggingOver={dropSnapshot.isDraggingOver}
+            isDropDisabled={isDropDisabled}
           >
             {internalScroll ? (
               <ScrollContainer>

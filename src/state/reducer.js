@@ -339,6 +339,41 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     });
   }
 
+  if (action.type === 'UPDATE_DROPPABLE_IS_ENABLED') {
+    if (!Object.keys(state.dimension.droppable).length) {
+      return state;
+    }
+
+    const { id, isEnabled } = action.payload;
+    const target = state.dimension.droppable[id];
+
+    if (!target) {
+      console.error('cannot update enabled flag on droppable that does not have a dimension');
+      return clean();
+    }
+
+    if (target.isEnabled === isEnabled) {
+      console.warn(`trying to set droppable isEnabled to ${isEnabled} but it is already ${isEnabled}`);
+      return state;
+    }
+
+    const updatedDroppableDimension = {
+      ...target,
+      isEnabled,
+    };
+
+    return {
+      ...state,
+      dimension: {
+        ...state.dimension,
+        droppable: {
+          ...state.dimension.droppable,
+          [id]: updatedDroppableDimension,
+        },
+      },
+    };
+  }
+
   if (action.type === 'MOVE') {
     const { client, page, windowScroll } = action.payload;
     return move({
