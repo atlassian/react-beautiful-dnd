@@ -29,19 +29,18 @@ export default ({
   }
 
   const isWithinMainAxis = isWithin(
-    destination.page.withMargin[axis.start],
-    destination.page.withMargin[axis.end]
+    destination.page.withoutMargin[axis.start],
+    destination.page.withoutMargin[axis.end]
   );
 
   const result: DraggableDimension[] = insideDestination
       // Remove any options that are hidden by overflow
       // Whole draggable must be visible to move to it
-      .filter((draggable: DraggableDimension) =>
-        isWithinMainAxis(draggable.page.withMargin[axis.start]) &&
-        isWithinMainAxis(draggable.page.withMargin[axis.end])
-      )
+      .filter((draggable: DraggableDimension) => (
+        isWithinMainAxis(draggable.page.withoutMargin[axis.start]) &&
+        isWithinMainAxis(draggable.page.withoutMargin[axis.end])
+      ))
       .sort((a: DraggableDimension, b: DraggableDimension): number => {
-        // TODO: not considering scroll offset
         const distanceToA = distance(pageCenter, a.page.withMargin.center);
         const distanceToB = distance(pageCenter, b.page.withMargin.center);
 
