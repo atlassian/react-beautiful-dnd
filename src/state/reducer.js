@@ -23,7 +23,6 @@ import type { TypeId,
 import { add, subtract, negate } from './position';
 import getDragImpact from './get-drag-impact';
 import moveToNextIndex from './move-to-next-index/';
-import isWithinVisibleBoundsOfDroppable from './is-within-visible-bounds-of-droppable';
 import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
 import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-to-new-droppable/move-to-new-droppable-types';
 import moveCrossAxis from './move-cross-axis/';
@@ -467,18 +466,6 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const impact: DragImpact = result.impact;
     const page: Position = result.pageCenter;
     const client: Position = subtract(page, existing.current.windowScroll);
-
-    // current limitation: cannot go beyond visible border of list
-    // TODO: need to allow movement into the placeholder space
-    const isVisible: boolean = isWithinVisibleBoundsOfDroppable(
-      page, droppable,
-    );
-
-    if (!isVisible) {
-      // eslint-disable-next-line no-console
-      console.info('currently not supporting moving a draggable outside the visibility bounds of a droppable');
-      return state;
-    }
 
     return move({
       state,

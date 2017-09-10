@@ -65,7 +65,6 @@ export default ({
   }
 
   const isMovingBeyondOriginalIndex = targetIndex > originalIndex;
-
   const edge: Edge = isMovingBeyondOriginalIndex ? 'end' : 'start';
 
   const newCenter: Position = moveToEdge({
@@ -90,7 +89,7 @@ export default ({
     movement: {
       draggables: needsToMove,
       amount,
-          // TODO: not sure what this should be
+      // TODO: not sure what this should be
       isBeyondStartPosition: isMovingBeyondOriginalIndex,
     },
     direction: axis.direction,

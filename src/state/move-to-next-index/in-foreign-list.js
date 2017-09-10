@@ -1,5 +1,6 @@
 // @flow
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
+import isWithinVisibleBoundsOfDroppable from '../is-within-visible-bounds-of-droppable';
 import { patch } from '../position';
 import moveToEdge from '../move-to-edge';
 import type { Edge } from '../move-to-edge';
@@ -55,12 +56,13 @@ export default ({
     Math.min(proposedIndex, lastIndex)
   ];
 
+  const isMovingPastLastIndex: boolean = proposedIndex > lastIndex;
   const sourceEdge: Edge = 'start';
   const destinationEdge: Edge = (() => {
     // moving past the last item
     // in this case we are moving relative to the last item
     // as there is nothing at the proposed index.
-    if (proposedIndex > lastIndex) {
+    if (isMovingPastLastIndex) {
       return 'end';
     }
 
@@ -74,6 +76,22 @@ export default ({
     destinationEdge,
     destinationAxis: droppable.axis,
   });
+
+  const isVisible: boolean = (() => {
+    // Moving into placeholder position
+    // Usually this would be outside of the visible bounds
+    if (isMovingPastLastIndex) {
+      return true;
+    }
+
+    return isWithinVisibleBoundsOfDroppable(
+      newCenter, droppable,
+    );
+  })();
+
+  if (!isVisible) {
+    return null;
+  }
 
   // When we are in foreign list we are only displacing items forward
   // This list is always sorted by the closest impacted draggable

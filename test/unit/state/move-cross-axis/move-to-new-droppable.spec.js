@@ -22,11 +22,21 @@ describe('move to new droppable', () => {
     });
 
     describe('moving before the original index', () => {
+      describe('center', () => {
 
+      });
+      describe('impact', () => {
+
+      });
     });
 
     describe('moving after the original index', () => {
+      describe('center', () => {
 
+      });
+      describe('impact', () => {
+
+      });
     });
   });
 
