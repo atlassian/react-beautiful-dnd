@@ -2,7 +2,7 @@
 import getNewHomeClientOffset from '../../../src/state/get-new-home-client-offset';
 import noImpact from '../../../src/state/no-impact';
 import { add, negate, subtract } from '../../../src/state/position';
-import createDroppable from '../../utils/create-droppable';
+import getDroppableWithDraggables from '../../utils/get-droppable-with-draggables';
 import type {
   DragMovement,
   Position,
@@ -22,7 +22,7 @@ const getHorizontalDistanceOverDraggables = getDistanceOverDraggables('width');
 
 describe('get new home client offset', () => {
   describe('vertical', () => {
-    const droppable = createDroppable({
+    const droppable = getDroppableWithDraggables({
       droppableId: 'drop-1',
       droppableRect: { top: 0, left: 0, bottom: 600, right: 100 },
       draggableRects: [
@@ -356,7 +356,7 @@ describe('get new home client offset', () => {
   });
 
   describe('horizontal', () => {
-    const droppable = createDroppable({
+    const droppable = getDroppableWithDraggables({
       direction: 'horizontal',
       droppableId: 'drop-1',
       droppableRect: { top: 0, left: 0, bottom: 100, right: 500 },
@@ -692,7 +692,7 @@ describe('get new home client offset', () => {
   });
 
   describe('multiple lists - vertical', () => {
-    const homeDroppable = createDroppable({
+    const homeDroppable = getDroppableWithDraggables({
       droppableId: 'drop-home',
       droppableRect: { top: 0, left: 0, bottom: 600, right: 100 },
       draggableRects: [
@@ -702,7 +702,7 @@ describe('get new home client offset', () => {
       ],
     });
 
-    const destinationDroppable = createDroppable({
+    const destinationDroppable = getDroppableWithDraggables({
       droppableId: 'drop-destination',
       droppableRect: { top: 100, left: 110, bottom: 700, right: 210 },
       draggableRects: [
@@ -712,7 +712,7 @@ describe('get new home client offset', () => {
       ],
     });
 
-    const emptyDroppable = createDroppable({
+    const emptyDroppable = getDroppableWithDraggables({
       droppableId: 'drop-empty',
       droppableRect: { top: 200, left: 220, bottom: 800, right: 320 },
       draggableRects: [],

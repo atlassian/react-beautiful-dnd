@@ -4,6 +4,7 @@ import type {
   DraggableDimension,
   DraggableDimensionMap,
   DroppableDimension,
+  Direction,
 } from '../../src/types';
 import getClientRect from './get-client-rect';
 
@@ -14,14 +15,14 @@ type Rect = {|
   right: number,
 |};
 
-type CreateDroppableArgs = {|
-  direction?: 'vertical' | 'horizontal',
+type Args = {|
+  direction?: Direction,
   droppableId: DroppableId,
   droppableRect: Rect,
   draggableRects: Rect[],
 |};
 
-type TestDroppable = {
+type Result = {
   droppableId: string,
   droppable: DroppableDimension,
   draggables: DraggableDimensionMap,
@@ -34,14 +35,14 @@ export default ({
   droppableId,
   droppableRect,
   draggableRects,
-}: CreateDroppableArgs): TestDroppable => {
-  const droppable = getDroppableDimension({
+}: Args): Result => {
+  const droppable: DroppableDimension = getDroppableDimension({
     id: droppableId,
     direction,
     clientRect: getClientRect(droppableRect),
   });
 
-  const draggableDimensions = draggableRects.map(
+  const draggableDimensions: DraggableDimension[] = draggableRects.map(
     (draggableRect, index) => getDraggableDimension({
       id: `${droppableId}::drag-${index}`,
       droppableId,
@@ -49,13 +50,11 @@ export default ({
     })
   );
 
-  const draggables = draggableDimensions.reduce(
+  const draggables: DraggableDimensionMap = draggableDimensions.reduce(
     (currentDraggables, draggable) => ({
       ...currentDraggables,
       [draggable.id]: draggable,
-    }),
-    {}
-  );
+    }), {});
 
   const draggableIds = Object.keys(draggables);
 

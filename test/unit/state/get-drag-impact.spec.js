@@ -7,7 +7,7 @@ import {
 import getDragImpact from '../../../src/state/get-drag-impact';
 import noImpact from '../../../src/state/no-impact';
 import getClientRect from '../../utils/get-client-rect';
-import createDroppable from '../../utils/create-droppable';
+import getDroppableWithDraggables from '../../utils/get-droppable-with-draggables';
 import { add, patch } from '../../../src/state/position';
 import type {
   WithinDroppable,
@@ -1137,7 +1137,7 @@ describe('get drag impact', () => {
   });
 
   describe('moving between lists', () => {
-    const homeDroppable = createDroppable({
+    const homeDroppable = getDroppableWithDraggables({
       direction: 'vertical',
       droppableId: 'drop-home',
       droppableRect: { top: 0, left: 0, bottom: 600, right: 100 },
@@ -1148,7 +1148,7 @@ describe('get drag impact', () => {
       ],
     });
 
-    const destinationDroppable = createDroppable({
+    const destinationDroppable = getDroppableWithDraggables({
       droppableId: 'drop-destination',
       droppableRect: { top: 100, left: 110, bottom: 800, right: 210 },
       draggableRects: [

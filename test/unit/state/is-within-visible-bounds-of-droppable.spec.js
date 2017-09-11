@@ -1,8 +1,9 @@
 // @flow
-import { isPointWithin } from '../../../src/state/is-within-visible-bounds-of-droppable';
+import { isPointWithin, isDraggableWithin } from '../../../src/state/is-within-visible-bounds-of-droppable';
 import { getDroppableDimension } from '../../../src/state/dimension';
 import { add, subtract } from '../../../src/state/position';
 import getClientRect from '../../utils/get-client-rect';
+import getDroppableWithDraggables from '../../utils/get-droppable-with-draggables';
 import type {
   Position,
 } from '../../../src/types';
@@ -80,9 +81,16 @@ describe('is within visible bounds of a droppable', () => {
 
   describe('is draggable within', () => {
     it('should return true if the draggable is within the droppable', () => {
-      const draggable = getDraggableDimension({
-
+      const result = getDroppableWithDraggables({
+        direction: 'vertical',
+        droppableRect: { top: 0, left: 0, bottom: 100, right: 100 },
+        draggableRects: [
+          { top: 0, left: 0, bottom: 20, right: 100 },
+        ],
       });
+      const isWithinDroppable = isDraggableWithin(result.droppable);
+
+      expect(isWithinDroppable(result.draggables[0])).toBe(true);
     });
 
     it('should return false if there is overlap on any side', () => {
