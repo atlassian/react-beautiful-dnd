@@ -1,4 +1,5 @@
 import { getDraggableDimension, getDroppableDimension } from '../../src/state/dimension';
+import type { ClientRect } from '../../src/state/dimension';
 import type {
   DroppableId,
   DraggableDimension,
@@ -8,18 +9,11 @@ import type {
 } from '../../src/types';
 import getClientRect from './get-client-rect';
 
-type Rect = {|
-  top: number,
-  left: number,
-  bottom: number,
-  right: number,
-|};
-
 type Args = {|
   direction?: Direction,
   droppableId: DroppableId,
-  droppableRect: Rect,
-  draggableRects: Rect[],
+  droppableRect: ClientRect,
+  draggableRects: ClientRect[],
 |};
 
 type Result = {
