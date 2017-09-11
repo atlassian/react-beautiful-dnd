@@ -94,6 +94,4 @@ describe('get draggables inside a droppable', () => {
 
     expect(result).toEqual([inside1, inside2, inside3]);
   });
-
-  // other edge cases tested in get-inside-dimension
 });
