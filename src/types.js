@@ -144,6 +144,8 @@ export type CurrentDragLocation = {|
 export type CurrentDrag = {|
   id: DraggableId,
   type: TypeId,
+  // whether scrolling is allowed - otherwise a scroll will cancel the drag
+  allowScroll: boolean,
   // viewport
   client: CurrentDragLocation,
   // viewport + scroll

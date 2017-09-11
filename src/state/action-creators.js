@@ -72,6 +72,7 @@ export type CompleteLiftAction = {|
     client: InitialDragLocation,
     page: InitialDragLocation,
     windowScroll: Position,
+    allowScroll: boolean,
   |}
 |}
 
@@ -80,6 +81,7 @@ const completeLift = (id: DraggableId,
   client: InitialDragLocation,
   page: InitialDragLocation,
   windowScroll: Position,
+  allowScroll: boolean,
 ): CompleteLiftAction => ({
   type: 'COMPLETE_LIFT',
   payload: {
@@ -88,6 +90,7 @@ const completeLift = (id: DraggableId,
     client,
     page,
     windowScroll,
+    allowScroll,
   },
 });
 
@@ -428,6 +431,7 @@ export type LiftAction = {|
     client: InitialDragLocation,
     page: InitialDragLocation,
     windowScroll: Position,
+    allowScroll: boolean,
   |}
 |}
 
@@ -437,6 +441,7 @@ export const lift = (id: DraggableId,
   client: InitialDragLocation,
   page: InitialDragLocation,
   windowScroll: Position,
+  allowScroll: boolean,
 ) => (dispatch: Dispatch, getState: Function) => {
   (() => {
     const state: State = getState();
@@ -474,7 +479,7 @@ export const lift = (id: DraggableId,
       if (newState.phase !== 'COLLECTING_DIMENSIONS') {
         return;
       }
-      dispatch(completeLift(id, type, client, page, windowScroll));
+      dispatch(completeLift(id, type, client, page, windowScroll, allowScroll));
     });
   });
 };

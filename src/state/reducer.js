@@ -302,7 +302,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     // We do not store whether we are dragging with a keyboard in the state but this flag
     // does this trick. Ideally this check would not exist.
     // Kill the drag instantly
-    if (state.drag.current.shouldAnimate) {
+    if (!state.drag.current.allowScroll) {
       return clean();
     }
 
