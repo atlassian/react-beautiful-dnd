@@ -122,9 +122,9 @@ export default class Draggable extends Component {
     };
 
     // Allowing scrolling with a mouse when lifting with a mouse
-    const allowScroll = true;
+    const isScrollAllowed = true;
 
-    lift(draggableId, type, client, page, windowScroll, allowScroll);
+    lift(draggableId, type, client, page, windowScroll, isScrollAllowed);
   }
 
   onKeyLift = () => {
@@ -146,9 +146,9 @@ export default class Draggable extends Component {
       center: add(center, windowScroll),
     };
     // not allowing scrolling with a mouse when lifting with a keyboard
-    const allowScroll = false;
+    const isScrollAllowed = false;
 
-    lift(draggableId, type, client, page, windowScroll, allowScroll);
+    lift(draggableId, type, client, page, windowScroll, isScrollAllowed);
   }
 
   onMove = (client: Position) => {
