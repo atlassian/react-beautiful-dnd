@@ -1,5 +1,5 @@
 // @flow
-import getClosestDraggable from '../../../../src/state/move-to-best-droppable/get-closest-draggable';
+import getClosestDraggable from '../../../../src/state/move-cross-axis/get-closest-draggable';
 import { getDroppableDimension, getDraggableDimension } from '../../../../src/state/dimension';
 import { add, distance, patch } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
@@ -224,7 +224,7 @@ describe('get closest draggable', () => {
 
       expect(result).toBe(visible1);
 
-    // validating test assumptions
+      // validating test assumptions
 
       // 1. that they have equal distances
       expect(distance(center, visible1.page.withoutMargin.center))

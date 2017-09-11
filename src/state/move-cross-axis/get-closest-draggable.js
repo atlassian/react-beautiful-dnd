@@ -1,6 +1,6 @@
 // @flow
 import { distance } from '../position';
-import isWithin from '../is-within';
+import { isDraggableWithin } from '../is-within-visible-bounds-of-droppable';
 import type {
   Axis,
   Position,
@@ -28,36 +28,30 @@ export default ({
     return null;
   }
 
-  const isWithinMainAxis = isWithin(
-    destination.page.withoutMargin[axis.start],
-    destination.page.withoutMargin[axis.end]
-  );
+  const isWithinDestination = isDraggableWithin(destination);
 
   const result: DraggableDimension[] = insideDestination
-      // Remove any options that are hidden by overflow
-      // Whole draggable must be visible to move to it
-      .filter((draggable: DraggableDimension) => (
-        isWithinMainAxis(draggable.page.withoutMargin[axis.start]) &&
-        isWithinMainAxis(draggable.page.withoutMargin[axis.end])
-      ))
-      .sort((a: DraggableDimension, b: DraggableDimension): number => {
-        const distanceToA = distance(pageCenter, a.page.withMargin.center);
-        const distanceToB = distance(pageCenter, b.page.withMargin.center);
+    // Remove any options that are hidden by overflow
+    // Whole draggable must be visible to move to it
+    .filter(isWithinDestination)
+    .sort((a: DraggableDimension, b: DraggableDimension): number => {
+      const distanceToA = distance(pageCenter, a.page.withMargin.center);
+      const distanceToB = distance(pageCenter, b.page.withMargin.center);
 
         // if a is closer - return a
-        if (distanceToA < distanceToB) {
-          return -1;
-        }
+      if (distanceToA < distanceToB) {
+        return -1;
+      }
 
         // if b is closer - return b
-        if (distanceToB < distanceToA) {
-          return 1;
-        }
+      if (distanceToB < distanceToA) {
+        return 1;
+      }
 
         // if the distance to a and b are the same:
         // return the one that appears first on the main axis
-        return a.page.withMargin[axis.start] - b.page.withMargin[axis.start];
-      });
+      return a.page.withMargin[axis.start] - b.page.withMargin[axis.start];
+    });
 
   return result.length ? result[0] : null;
 };

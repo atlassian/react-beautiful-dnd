@@ -1,6 +1,6 @@
 // @flow
 import { droppableMapToList } from './dimension-map-to-list';
-import isWithinVisibleBoundsOfDroppable from './is-within-visible-bounds-of-droppable';
+import { isPointWithin } from './is-within-visible-bounds-of-droppable';
 import type {
   DroppableId,
   Position,
@@ -14,7 +14,7 @@ export default (
 ): ?DroppableId => {
   const maybe: ?DroppableDimension = droppableMapToList(droppables)
     .find((droppable: DroppableDimension): boolean => (
-      isWithinVisibleBoundsOfDroppable(target, droppable)
+      isPointWithin(droppable)(target)
     ));
 
   return maybe ? maybe.id : null;
