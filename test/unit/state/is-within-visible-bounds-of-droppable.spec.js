@@ -4,8 +4,10 @@ import { getDroppableDimension } from '../../../src/state/dimension';
 import { add, subtract } from '../../../src/state/position';
 import getClientRect from '../../utils/get-client-rect';
 import getDroppableWithDraggables from '../../utils/get-droppable-with-draggables';
+import type { Result } from '../../utils/get-droppable-with-draggables';
 import type {
   Position,
+  DraggableDimension,
 } from '../../../src/types';
 
 describe('is within visible bounds of a droppable', () => {
@@ -81,24 +83,50 @@ describe('is within visible bounds of a droppable', () => {
 
   describe('is draggable within', () => {
     it('should return true if the draggable is within the droppable', () => {
-      const result = getDroppableWithDraggables({
-        direction: 'vertical',
+      const result: Result = getDroppableWithDraggables({
         droppableRect: { top: 0, left: 0, bottom: 100, right: 100 },
         draggableRects: [
-          { top: 0, left: 0, bottom: 20, right: 100 },
+          // on the boundaries
+          { top: 0, left: 0, bottom: 100, right: 100 },
         ],
       });
       const isWithinDroppable = isDraggableWithin(result.droppable);
 
-      expect(isWithinDroppable(result.draggables[0])).toBe(true);
+      expect(isWithinDroppable(result.draggableDimensions[0])).toBe(true);
     });
 
     it('should return false if there is overlap on any side', () => {
+      const result: Result = getDroppableWithDraggables({
+        droppableRect: { top: 0, left: 0, bottom: 100, right: 100 },
+        draggableRects: [
+          { top: -10, left: 0, bottom: 20, right: 100 },  // too far top
+          { top: 0, left: -10, bottom: 20, right: 100 },  // too far left
+          { top: 0, left: 0, bottom: 20, right: 110 },    // too far right
+          { top: 0, left: 0, bottom: 120, right: 100 },   // too far bottom
+        ],
+      });
+      const isWithinDroppable = isDraggableWithin(result.droppable);
 
+      result.draggableDimensions.forEach((draggable: DraggableDimension) => {
+        expect(isWithinDroppable(draggable)).toBe(false);
+      });
     });
 
     it('should allow a small affordance to compensate for margin capturing inaccuracy', () => {
+      const result: Result = getDroppableWithDraggables({
+        droppableRect: { top: 0, left: 0, bottom: 100, right: 100 },
+        draggableRects: [
+          { top: -1, left: 0, bottom: 20, right: 100 },   // not too far top
+          { top: 0, left: -1, bottom: 20, right: 100 },   // not too far left
+          { top: 0, left: 0, bottom: 20, right: 101 },    // not too far right
+          { top: 0, left: 0, bottom: 101, right: 100 },   // not too far bottom
+        ],
+      });
+      const isWithinDroppable = isDraggableWithin(result.droppable);
 
+      result.draggableDimensions.forEach((draggable: DraggableDimension) => {
+        expect(isWithinDroppable(draggable)).toBe(true);
+      });
     });
   });
 });

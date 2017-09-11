@@ -9,14 +9,21 @@ import type {
 } from '../../src/types';
 import getClientRect from './get-client-rect';
 
+type ClientRectSubset = {
+  top: number,
+  left: number,
+  right: number,
+  bottom: number,
+}
+
 type Args = {|
   direction?: Direction,
   droppableId: DroppableId,
   droppableRect: ClientRect,
-  draggableRects: ClientRect[],
+  draggableRects: ClientRectSubset[],
 |};
 
-type Result = {
+export type Result = {
   droppableId: string,
   droppable: DroppableDimension,
   draggables: DraggableDimensionMap,
