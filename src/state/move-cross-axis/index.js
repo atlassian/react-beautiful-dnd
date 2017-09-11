@@ -3,7 +3,7 @@ import getBestCrossAxisDroppable from './get-best-cross-axis-droppable';
 import getClosestDraggable from './get-closest-draggable';
 import moveToNewDroppable from './move-to-new-droppable/';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import type { Result } from './move-to-new-droppable/move-to-new-droppable-types';
+import type { Result } from './move-cross-axis-types';
 import type {
   DraggableId,
   DroppableId,

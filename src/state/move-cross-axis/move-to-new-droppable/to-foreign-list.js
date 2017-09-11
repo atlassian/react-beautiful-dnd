@@ -1,6 +1,6 @@
 // @flow
 import moveToEdge from '../../move-to-edge';
-import type { Result } from './move-to-new-droppable-types';
+import type { Result } from '../move-cross-axis-types';
 import type {
   Axis,
   Position,
@@ -73,10 +73,6 @@ export default ({
     console.error('could not find target inside destination');
     return null;
   }
-  if (droppable.id === draggable.droppableId) {
-    console.error('to-foreign-list handles movement to foreign lists and not home lists');
-    return null;
-  }
 
   const newCenter: Position = moveToEdge({
     source: draggable.page.withoutMargin,
@@ -85,6 +81,10 @@ export default ({
     destinationEdge: isGoingBeforeTarget ? 'start' : 'end',
     destinationAxis: axis,
   });
+
+  // Can only displace forward when moving into a foreign list
+  // if going before: move everything down including the target
+  // if going after: move everything down excluding the target
 
   const needsToMove: DraggableId[] = insideDroppable
     .slice(proposedIndex, insideDroppable.length)

@@ -2,7 +2,7 @@
 import toHomeList from './to-home-list';
 import toForeignList from './to-foreign-list';
 import { patch } from '../../position';
-import type { Result } from './move-to-new-droppable-types';
+import type { Result } from '../move-cross-axis-types';
 import type {
   Position,
   DragImpact,
@@ -25,8 +25,6 @@ type Args = {|
   insideDestination: DraggableDimension[],
   // the source location of the draggable
   home: DraggableLocation,
-  // the current drag impact
-  impact: DragImpact,
 |}
 
 export default ({

@@ -1,7 +1,7 @@
 // @flow
 import moveToEdge from '../../move-to-edge';
 import type { Edge } from '../../move-to-edge';
-import type { Result } from './move-to-new-droppable-types';
+import type { Result } from '../move-cross-axis-types';
 import type {
   Axis,
   Position,
@@ -64,33 +64,48 @@ export default ({
     };
   }
 
-  const isMovingBeyondOriginalIndex = targetIndex > originalIndex;
-  const edge: Edge = isMovingBeyondOriginalIndex ? 'end' : 'start';
+  // When moving *before* where the item started:
+  // We align the dragging item top of the target
+  // and move everything from the target to the original position forwards
+
+  // When moving *after* where the item started:
+  // We align the dragging item to the end of the target
+  // and move everything from the target to the original position backwards
+
+  const isMovingPastOriginalIndex = targetIndex > originalIndex;
+  const edge: Edge = isMovingPastOriginalIndex ? 'end' : 'start';
 
   const newCenter: Position = moveToEdge({
     source: draggable.page.withoutMargin,
     sourceEdge: edge,
-    destination: isMovingBeyondOriginalIndex ? target.page.withoutMargin : target.page.withMargin,
+    destination: isMovingPastOriginalIndex ? target.page.withoutMargin : target.page.withMargin,
     destinationEdge: edge,
     destinationAxis: axis,
   });
 
   const needsToMove: DraggableId[] = (() => {
-    // TODO: explain the index trickery
-    if (isMovingBeyondOriginalIndex) {
-      // need to ensure that the list is sorted with the closest item being first
-      return insideDroppable.slice(originalIndex + 1, targetIndex + 1).reverse();
+    if (!isMovingPastOriginalIndex) {
+      return insideDroppable.slice(targetIndex, originalIndex);
     }
-    return insideDroppable.slice(targetIndex, originalIndex);
-  })()
-  .map((d: DraggableDimension): DraggableId => d.id);
+
+    // We are aligning to the bottom of the target and moving everything
+    // back to the original index backwards
+
+    // We want everything after the original index to move
+    const from: number = originalIndex + 1;
+    // We need the target to move backwards
+    const to: number = targetIndex + 1;
+
+    // Need to ensure that the list is sorted with the closest item being first
+    return insideDroppable.slice(from, to).reverse();
+  })().map((d: DraggableDimension): DraggableId => d.id);
 
   const newImpact: DragImpact = {
     movement: {
       draggables: needsToMove,
       amount,
       // TODO: not sure what this should be
-      isBeyondStartPosition: isMovingBeyondOriginalIndex,
+      isBeyondStartPosition: isMovingPastOriginalIndex,
     },
     direction: axis.direction,
     destination: {
