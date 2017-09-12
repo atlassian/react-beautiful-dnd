@@ -31,18 +31,19 @@ import type {
 } from '../../../src/view/droppable/droppable-types';
 
 type ExecuteArgs = {|
-  id: DroppableId,
+  droppableId: DroppableId,
   phase: Phase,
   drag: ?DragState,
   pending: ?PendingDrop,
   draggable: ?DraggableDimension,
-  isDropDisabled: ?boolean,
+  // being simple and defaulting to false (droppable is enabled)
+  isDropDisabled?: boolean,
 |}
 
 const execute = (selector: Selector) =>
-  ({ phase, drag, draggable, pending, id, isDropDisabled = false }: ExecuteArgs) =>
+  ({ phase, drag, draggable, pending, droppableId, isDropDisabled = false }: ExecuteArgs) =>
     selector.resultFunc(
-      phase, drag, draggable, pending, id, isDropDisabled,
+      phase, drag, draggable, pending, droppableId, isDropDisabled,
     );
 
 const defaultMapProps: MapProps = {
@@ -50,7 +51,7 @@ const defaultMapProps: MapProps = {
   placeholder: null,
 };
 
-const droppableId: DroppableId = 'drop-1';
+const homeDroppableId: DroppableId = 'home-id';
 const foreignDroppableId: DroppableId = 'foreign-droppable';
 const draggableId: DraggableId = 'drag-1';
 const origin: Position = { x: 0, y: 0 };
@@ -61,7 +62,7 @@ type DragArgs = {|
 
 const draggable: DraggableDimension = getDraggableDimension({
   id: draggableId,
-  droppableId,
+  droppableId: homeDroppableId,
   clientRect: getClientRect({
     top: 100,
     left: 0,
@@ -90,7 +91,7 @@ const perform = (() => {
     const value: InitialDrag = {
       source: {
         index: 0,
-        droppableId,
+        droppableId: homeDroppableId,
       },
       client,
       page,
@@ -99,6 +100,7 @@ const perform = (() => {
         center: page.center,
       },
     };
+
     return value;
   })();
 
@@ -132,7 +134,7 @@ const perform = (() => {
 
   const homeDestination: DraggableLocation = {
     index: initial.source.index + 1,
-    droppableId,
+    droppableId: homeDroppableId,
   };
   const foreignDestination: DraggableLocation = {
     index: 0,
@@ -242,7 +244,7 @@ describe('Droppable - connected', () => {
             drag: null,
             pending: null,
             draggable: null,
-            id: droppableId,
+            droppableId: homeDroppableId,
             isDropDisabled: true,
           });
 
@@ -259,7 +261,7 @@ describe('Droppable - connected', () => {
             drag: null,
             pending: null,
             draggable: null,
-            id: droppableId,
+            droppableId: homeDroppableId,
             isDropDisabled: true,
           });
           const second: MapProps = execute(selector)({
@@ -267,7 +269,7 @@ describe('Droppable - connected', () => {
             drag: null,
             pending: null,
             draggable: null,
-            id: droppableId,
+            droppableId: homeDroppableId,
             isDropDisabled: true,
           });
 
@@ -286,7 +288,7 @@ describe('Droppable - connected', () => {
             drag: null,
             pending: null,
             draggable: null,
-            id: droppableId,
+            droppableId: homeDroppableId,
             isDropDisabled: true,
           });
 
@@ -310,7 +312,7 @@ describe('Droppable - connected', () => {
           drag: null,
           draggable: null,
           pending: null,
-          id: droppableId,
+          droppableId: homeDroppableId,
         });
 
         expect(props).toEqual(defaultMapProps);
@@ -329,7 +331,7 @@ describe('Droppable - connected', () => {
             drag: perform.drag({ isDraggingOver: 'home' }),
             draggable,
             pending: null,
-            id: droppableId,
+            droppableId: homeDroppableId,
           });
 
           expect(props).toEqual(expected);
@@ -347,14 +349,14 @@ describe('Droppable - connected', () => {
             drag: perform.drag({ isDraggingOver: 'home' }),
             pending: null,
             draggable,
-            id: droppableId,
+            droppableId: homeDroppableId,
           });
           const props2: MapProps = execute(selector)({
             phase: 'DRAGGING',
             drag: perform.drag({ isDraggingOver: 'home' }),
             pending: null,
             draggable,
-            id: droppableId,
+            droppableId: homeDroppableId,
           });
 
           // checking object equality
@@ -376,7 +378,7 @@ describe('Droppable - connected', () => {
             drag: perform.drag({ isDraggingOver: 'foreign' }),
             draggable,
             pending: null,
-            id: foreignDroppableId,
+            droppableId: foreignDroppableId,
           });
 
           expect(props).toEqual(expected);
@@ -394,14 +396,14 @@ describe('Droppable - connected', () => {
             drag: perform.drag({ isDraggingOver: 'foreign' }),
             pending: null,
             draggable,
-            id: foreignDroppableId,
+            droppableId: foreignDroppableId,
           });
           const props2: MapProps = execute(selector)({
             phase: 'DRAGGING',
             drag: perform.drag({ isDraggingOver: 'foreign' }),
             pending: null,
             draggable,
-            id: foreignDroppableId,
+            droppableId: foreignDroppableId,
           });
 
           // checking object equality
@@ -423,7 +425,8 @@ describe('Droppable - connected', () => {
             phase: 'DRAGGING',
             drag: perform.drag({ isDraggingOver: false }),
             pending: null,
-            id: droppableId,
+            draggable,
+            droppableId: homeDroppableId,
           });
 
           expect(props).toEqual(expected);
@@ -440,13 +443,15 @@ describe('Droppable - connected', () => {
             phase: 'DRAGGING',
             drag: perform.drag({ isDraggingOver: false }),
             pending: null,
-            id: droppableId,
+            draggable,
+            droppableId: homeDroppableId,
           });
           const props2: MapProps = execute(selector)({
             phase: 'DRAGGING',
             drag: perform.drag({ isDraggingOver: false }),
             pending: null,
-            id: droppableId,
+            draggable,
+            droppableId: homeDroppableId,
           });
 
           // checking object equality
@@ -463,7 +468,8 @@ describe('Droppable - connected', () => {
           phase: 'DROP_ANIMATING',
           drag: null,
           pending: null,
-          id: droppableId,
+          draggable,
+          droppableId: homeDroppableId,
         });
 
         expect(props).toEqual(defaultMapProps);
@@ -480,8 +486,9 @@ describe('Droppable - connected', () => {
           const props: MapProps = execute(makeSelector())({
             phase: 'DROP_ANIMATING',
             drag: null,
+            draggable,
             pending: perform.drop({ isDraggingOver: 'home' }),
-            id: droppableId,
+            droppableId: homeDroppableId,
           });
 
           expect(props).toEqual(expected);
@@ -498,13 +505,15 @@ describe('Droppable - connected', () => {
             phase: 'DRAGGING',
             drag: perform.drag({ isDraggingOver: 'home' }),
             pending: null,
-            id: droppableId,
+            draggable,
+            droppableId: homeDroppableId,
           });
           const dropAnimating: MapProps = execute(selector)({
             phase: 'DROP_ANIMATING',
             drag: null,
             pending: perform.drop({ isDraggingOver: 'home' }),
-            id: droppableId,
+            draggable,
+            droppableId: homeDroppableId,
           });
 
           expect(dragging).toEqual(expected);
@@ -526,7 +535,7 @@ describe('Droppable - connected', () => {
             drag: null,
             pending: perform.drop({ isDraggingOver: 'foreign' }),
             draggable,
-            id: foreignDroppableId,
+            droppableId: foreignDroppableId,
           });
 
           expect(props).toEqual(expected);
@@ -544,14 +553,14 @@ describe('Droppable - connected', () => {
             drag: perform.drag({ isDraggingOver: 'foreign' }),
             pending: null,
             draggable,
-            id: foreignDroppableId,
+            droppableId: foreignDroppableId,
           });
           const dropAnimating: MapProps = execute(selector)({
             phase: 'DROP_ANIMATING',
             drag: null,
             pending: perform.drop({ isDraggingOver: 'foreign' }),
             draggable,
-            id: foreignDroppableId,
+            droppableId: foreignDroppableId,
           });
 
           expect(dragging).toEqual(expected);
@@ -573,7 +582,7 @@ describe('Droppable - connected', () => {
             drag: null,
             draggable,
             pending: perform.drop({ isDraggingOver: false }),
-            id: droppableId,
+            droppableId: homeDroppableId,
           });
 
           expect(props).toEqual(expected);
@@ -591,13 +600,14 @@ describe('Droppable - connected', () => {
             drag: perform.drag({ isDraggingOver: false }),
             pending: null,
             draggable,
-            id: droppableId,
+            droppableId: homeDroppableId,
           });
           const dropAnimating: MapProps = execute(selector)({
             phase: 'DROP_ANIMATING',
             drag: null,
             pending: perform.drop({ isDraggingOver: false }),
-            id: droppableId,
+            draggable,
+            droppableId: homeDroppableId,
           });
 
           expect(dragging).toEqual(expected);
@@ -609,17 +619,18 @@ describe('Droppable - connected', () => {
     });
 
     describe('other phases', () => {
-      const other: Phase[] = ['IDLE', 'COLLECTING_DIMENSIONS', 'DROP_COMPLETE'];
+      const others: Phase[] = ['IDLE', 'COLLECTING_DIMENSIONS', 'DROP_COMPLETE'];
 
       it('should return the default props', () => {
         const selector = makeSelector();
 
-        other.forEach((phase: Phase): void => {
+        others.forEach((phase: Phase): void => {
           const props: MapProps = execute(selector)({
             phase,
             drag: null,
             pending: null,
-            id: droppableId,
+            draggable: null,
+            droppableId: homeDroppableId,
           });
 
           expect(props).toEqual(defaultMapProps);
@@ -629,18 +640,20 @@ describe('Droppable - connected', () => {
       it('should not break memoization on multiple calls', () => {
         const selector = makeSelector();
 
-        other.forEach((phase: Phase): void => {
+        others.forEach((phase: Phase): void => {
           const first: MapProps = execute(selector)({
             phase,
             drag: null,
             pending: null,
-            id: droppableId,
+            draggable: null,
+            droppableId: homeDroppableId,
           });
           const second: MapProps = execute(selector)({
             phase,
             drag: null,
             pending: null,
-            id: droppableId,
+            draggable: null,
+            droppableId: homeDroppableId,
           });
 
           expect(first).toEqual(defaultMapProps);
