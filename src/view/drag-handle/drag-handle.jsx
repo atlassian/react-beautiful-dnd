@@ -250,7 +250,7 @@ export default class DragHandle extends Component {
     this.startPendingMouseDrag(point);
   };
 
-  executeBasedOnDirection = ({ vertical, horizontal }: Object) => {
+  executeBasedOnDirection = (fns: ExecuteBasedOnDirection) => {
     if (!this.props.direction) {
       console.error('cannot move based on direction when none is provided');
       this.stopDragging(() => this.props.callbacks.onCancel());
@@ -258,7 +258,7 @@ export default class DragHandle extends Component {
     }
 
     // eslint-disable-next-line no-unused-expressions
-    this.props.direction === 'vertical' ? vertical() : horizontal();
+    this.props.direction === 'vertical' ? fns.vertical() : fns.horizontal();
   }
 
   // window keyboard events are bound during a keyboard drag

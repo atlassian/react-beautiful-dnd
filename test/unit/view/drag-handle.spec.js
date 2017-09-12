@@ -21,6 +21,8 @@ const getStubCallbacks = (): Callbacks => ({
   onMove: jest.fn(),
   onMoveForward: jest.fn(),
   onMoveBackward: jest.fn(),
+  onCrossAxisMoveForward: jest.fn(),
+  onCrossAxisMoveBackward: jest.fn(),
   onDrop: jest.fn(),
   onCancel: jest.fn(),
   onWindowScroll: jest.fn(),
@@ -32,6 +34,8 @@ type CallBacksCalledFn = {|
   onMove?: number,
   onMoveForward?: number,
   onMoveBackward?: number,
+  onCrossAxisMoveForward ?: number,
+  onCrossAxisMoveBackward?: number,
   onDrop?: number,
   onCancel ?: number,
   onWindowScroll ?: number,
@@ -43,6 +47,8 @@ const callbacksCalled = (callbacks: Callbacks) => ({
   onMove = 0,
   onMoveForward = 0,
   onMoveBackward = 0,
+  onCrossAxisMoveForward = 0,
+  onCrossAxisMoveBackward = 0,
   onDrop = 0,
   onCancel = 0,
 }: CallBacksCalledFn = {}) =>
@@ -52,7 +58,9 @@ const callbacksCalled = (callbacks: Callbacks) => ({
   callbacks.onMoveForward.mock.calls.length === onMoveForward &&
   callbacks.onMoveBackward.mock.calls.length === onMoveBackward &&
   callbacks.onDrop.mock.calls.length === onDrop &&
-  callbacks.onCancel.mock.calls.length === onCancel;
+  callbacks.onCancel.mock.calls.length === onCancel &&
+  callbacks.onCrossAxisMoveForward.mock.calls.length === onCrossAxisMoveForward &&
+  callbacks.onCrossAxisMoveBackward.mock.calls.length === onCrossAxisMoveBackward;
 
 const whereAnyCallbacksCalled = (callbacks: Callbacks) =>
   !callbacksCalled(callbacks)();
@@ -1104,25 +1112,25 @@ describe('drag handle', () => {
           })).toBe(true);
         });
 
-        it('should not move backward when the user presses LeftArrow', () => {
+        it('should request to move to a droppable on the left when the user presses LeftArrow', () => {
           pressSpacebar(wrapper);
           windowArrowLeft();
           requestAnimationFrame.step();
 
           expect(callbacksCalled(callbacks)({
             onKeyLift: 1,
-            onMoveBackward: 0,
+            onCrossAxisMoveBackward: 1,
           })).toBe(true);
         });
 
-        it('should not move forward when the user presses RightArrow', () => {
+        it('should request to move to a droppable on the right when the user presses RightArrow', () => {
           pressSpacebar(wrapper);
           windowArrowRight();
           requestAnimationFrame.step();
 
           expect(callbacksCalled(callbacks)({
             onKeyLift: 1,
-            onMoveForward: 0,
+            onCrossAxisMoveForward: 1,
           })).toBe(true);
         });
       });
@@ -1152,30 +1160,6 @@ describe('drag handle', () => {
           customWrapper.unmount();
         });
 
-        it('should not move backward when the user presses ArrowUp', () => {
-          pressSpacebar(customWrapper);
-          // try move backward
-          windowArrowUp();
-          requestAnimationFrame.step();
-
-          expect(callbacksCalled(customCallbacks)({
-            onKeyLift: 1,
-            onMoveBackward: 0,
-          })).toBe(true);
-        });
-
-        it('should not move forward when the user presses ArrowDown', () => {
-          pressSpacebar(customWrapper);
-          // try move forward
-          windowArrowDown();
-          requestAnimationFrame.step();
-
-          expect(callbacksCalled(customCallbacks)({
-            onKeyLift: 1,
-            onMoveForward: 0,
-          })).toBe(true);
-        });
-
         it('should move backward when the user presses LeftArrow', () => {
           pressSpacebar(customWrapper);
           windowArrowLeft();
@@ -1195,6 +1179,28 @@ describe('drag handle', () => {
           expect(callbacksCalled(customCallbacks)({
             onKeyLift: 1,
             onMoveForward: 1,
+          })).toBe(true);
+        });
+
+        it('should request a backward cross axis move when the user presses ArrowUp', () => {
+          pressSpacebar(customWrapper);
+          windowArrowUp();
+          requestAnimationFrame.step();
+
+          expect(callbacksCalled(customCallbacks)({
+            onKeyLift: 1,
+            onCrossAxisMoveBackward: 1,
+          })).toBe(true);
+        });
+
+        it('should request a forward cross axis move when the user presses ArrowDown', () => {
+          pressSpacebar(customWrapper);
+          windowArrowDown();
+          requestAnimationFrame.step();
+
+          expect(callbacksCalled(customCallbacks)({
+            onKeyLift: 1,
+            onCrossAxisMoveForward: 1,
           })).toBe(true);
         });
       });
