@@ -406,7 +406,13 @@ describe('DraggableDimensionPublisher', () => {
         });
         const expected = getDroppableDimension({
           id: droppableId,
-          clientRect: scrollParentRect,
+          clientRect: getClientRect({
+            top: 0,
+            bottom: 100,
+            left: 0,
+            // using max value...
+            right: 110,
+          }),
         });
         (() => {
           let count = 0;

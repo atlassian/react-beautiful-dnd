@@ -11,6 +11,9 @@ import type { Margin, ClientRect } from '../../state/dimension';
 import type { DroppableDimension, Position, HTMLElement } from '../../types';
 import type { Props } from './droppable-dimension-publisher-types';
 
+// TEMP - move to source if needed
+import getClientRect from '../../../test/utils/get-client-rect';
+
 const origin: Position = { x: 0, y: 0 };
 
 export default class DroppableDimensionPublisher extends Component {
@@ -37,6 +40,7 @@ export default class DroppableDimensionPublisher extends Component {
     const { droppableId, direction, isDropDisabled, targetRef } = this.props;
     invariant(targetRef, 'DimensionPublisher cannot calculate a dimension when not attached to the DOM');
 
+    const scroll: Position = this.getScrollOffset();
     const style = window.getComputedStyle(targetRef);
 
     const margin: Margin = {
@@ -57,28 +61,23 @@ export default class DroppableDimensionPublisher extends Component {
         return current;
       }
 
-      // Clipping the droppables dimensions by its scroll parent.
-      // If the scroll parent is smaller in size than the droppable we need to trim the
-      // dimensions of the droppable so that it is has the correct visible coordinates
-      // Still using the margin of the droppable. We can revisit the margin selection decision
+      // We need to trim the dimension by the visible area of the scroll container
+
+      // Adjust the current dimension with the parents scroll
+      const top = current.top + scroll.y;
+      const bottom = current.bottom + scroll.y;
+      const left = current.left + scroll.x;
+      const right = current.right + scroll.x;
+
+      // Trim the dimension by the size of the parent
 
       const parent: ClientRect = this.closestScrollable.getBoundingClientRect();
-
-      const top = Math.max(current.top, parent.top);
-      const left = Math.max(current.left, parent.left);
-      const right = Math.min(current.right, parent.right);
-      const bottom = Math.min(current.bottom, parent.bottom);
-
-      const result: ClientRect = {
-        top,
-        right,
-        bottom,
-        left,
-        width: (right - left),
-        height: (bottom - top),
-      };
-
-      return result;
+      return getClientRect({
+        top: Math.max(top, parent.top),
+        left: Math.max(left, parent.left),
+        right: Math.min(right, parent.right),
+        bottom: Math.min(bottom, parent.bottom),
+      });
     })();
 
     const dimension: DroppableDimension = getDroppableDimension({

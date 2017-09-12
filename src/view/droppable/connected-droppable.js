@@ -34,7 +34,6 @@ export const makeSelector = (): Selector => {
 
   const getIsDraggingOver = memoizeOne(
     (id: DroppableId, destination: ?DraggableLocation): boolean => {
-      console.log('destination', destination);
       if (!destination) {
         return false;
       }
