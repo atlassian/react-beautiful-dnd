@@ -27,7 +27,6 @@ import type {
 } from './droppable-types';
 
 export const makeSelector = (): Selector => {
-  const i = 0;
   const idSelector = (state: State, ownProps: OwnProps) =>
     ownProps.droppableId;
   const isDropDisabledSelector = (state: State, ownProps: OwnProps) =>
@@ -101,7 +100,7 @@ export const makeSelector = (): Selector => {
       isDropDisabled: boolean,
     ): MapProps => {
       if (isDropDisabled) {
-        return getMapProps(false);
+        return getMapProps(false, null);
       }
 
       if (phase === 'DRAGGING') {
@@ -127,7 +126,7 @@ export const makeSelector = (): Selector => {
         }
 
         const isDraggingOver = getIsDraggingOver(id, pending.impact.destination);
-        const placeholder = getPlaceholder(
+        const placeholder: ?Placeholder = getPlaceholder(
           id,
           pending.result.source,
           pending.result.destination,
