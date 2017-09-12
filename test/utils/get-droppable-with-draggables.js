@@ -1,6 +1,5 @@
 // @flow
 import { getDraggableDimension, getDroppableDimension } from '../../src/state/dimension';
-import type { ClientRect } from '../../src/state/dimension';
 import type {
   DroppableId,
   DraggableDimension,
@@ -19,7 +18,7 @@ type ClientRectSubset = {|
 
 type Args = {|
   direction?: Direction,
-  droppableId: DroppableId,
+  droppableId?: DroppableId,
   droppableRect: ClientRectSubset,
   draggableRects: ClientRectSubset[],
 |};
@@ -32,9 +31,11 @@ export type Result = {
   draggableDimensions: DraggableDimension[],
 };
 
+let idCount = 0;
+
 export default ({
   direction = 'vertical',
-  droppableId,
+  droppableId = `droppable-generated-id-${idCount++}`,
   droppableRect,
   draggableRects,
 }: Args): Result => {

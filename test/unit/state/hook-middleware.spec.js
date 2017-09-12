@@ -124,6 +124,7 @@ const state = (() => {
         center: currentClient.center,
       },
       shouldAnimate: true,
+      isScrollAllowed: true,
     },
     impact: noImpact,
   };

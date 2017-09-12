@@ -1,11 +1,15 @@
 // @flow
+import type { PropType } from 'babel-plugin-react-flow-props-to-prop-types';
+import {
+  publishDroppableDimension,
+  updateDroppableDimensionIsEnabled,
+  updateDroppableDimensionScroll,
+} from '../../state/action-creators';
 import type {
-  DroppableDimension,
   DroppableId,
   TypeId,
   ReactElement,
   HTMLElement,
-  Position,
   Direction,
 } from '../../types';
 
@@ -14,9 +18,9 @@ export type MapProps = {|
 |}
 
 export type DispatchProps = {|
-  publish: (dimension: DroppableDimension) => void,
-  updateIsEnabled: (id: DroppableId, isEnabled: boolean) => void,
-  updateScroll: (id: DroppableId, offset: Position) => void,
+  publish: PropType<typeof publishDroppableDimension, Function>,
+  updateIsEnabled: PropType<typeof updateDroppableDimensionIsEnabled, Function>,
+  updateScroll: PropType<typeof updateDroppableDimensionScroll, Function>,
 |}
 
 export type OwnProps = {|

@@ -1136,7 +1136,6 @@ describe('get drag impact', () => {
 
   describe('moving between lists', () => {
     const homeDroppable = getDroppableWithDraggables({
-      direction: 'vertical',
       droppableId: 'drop-home',
       droppableRect: { top: 0, left: 0, bottom: 600, right: 100 },
       draggableRects: [

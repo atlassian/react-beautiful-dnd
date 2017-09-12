@@ -24,7 +24,7 @@ import { add, subtract, negate } from './position';
 import getDragImpact from './get-drag-impact';
 import moveToNextIndex from './move-to-next-index/';
 import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
-import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-to-new-droppable/move-to-new-droppable-types';
+import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';
 import moveCrossAxis from './move-cross-axis/';
 
 const noDimensions: DimensionState = {
@@ -349,7 +349,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     });
   }
 
-  if (action.type === 'UPDATE_DROPPABLE_IS_ENABLED') {
+  if (action.type === 'UPDATE_DROPPABLE_DIMENSION_IS_ENABLED') {
     if (!Object.keys(state.dimension.droppable).length) {
       return state;
     }

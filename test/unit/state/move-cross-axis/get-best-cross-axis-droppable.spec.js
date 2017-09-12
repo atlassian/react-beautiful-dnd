@@ -1,5 +1,5 @@
 // @flow
-import getBestCrossAxisDroppable from '../../../../src/state/move-to-best-droppable/get-best-cross-axis-droppable';
+import getBestCrossAxisDroppable from '../../../../src/state/move-cross-axis/get-best-cross-axis-droppable';
 import { getDroppableDimension } from '../../../../src/state/dimension';
 import getClientRect from '../../../utils/get-client-rect';
 import { add } from '../../../../src/state/position';

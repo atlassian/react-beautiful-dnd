@@ -133,17 +133,17 @@ export const updateDroppableDimensionScroll =
     },
   });
 
-export type UpdateDroppableIsEnabledAction = {|
-  type: 'UPDATE_DROPPABLE_IS_ENABLED',
+export type UpdateDroppableDimensionIsEnabledAction = {|
+  type: 'UPDATE_DROPPABLE_DIMENSION_IS_ENABLED',
   payload: {
     id: DroppableId,
     isEnabled: boolean,
   }
 |}
 
-export const updateDroppableIsEnabled =
-  (id: DroppableId, isEnabled: boolean): UpdateDroppableIsEnabledAction => ({
-    type: 'UPDATE_DROPPABLE_IS_ENABLED',
+export const updateDroppableDimensionIsEnabled =
+  (id: DroppableId, isEnabled: boolean): UpdateDroppableDimensionIsEnabledAction => ({
+    type: 'UPDATE_DROPPABLE_DIMENSION_IS_ENABLED',
     payload: {
       id,
       isEnabled,
