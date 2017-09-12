@@ -132,9 +132,12 @@ export default class QuoteApp extends Component {
     if (!sourceDroppable) {
       return null;
     }
+    return null;
+
     const droppables: string[] = ['alpha', 'beta', 'gamma', 'delta'];
     const sourceIndex = droppables.indexOf(sourceDroppable);
-    const disabledDroppableIndex = (sourceIndex + 1) % droppables.length;
+    // const disabledDroppableIndex = (sourceIndex + 1) % droppables.length;
+    const disabledDroppableIndex = sourceIndex;
 
     return droppables[disabledDroppableIndex];
   }

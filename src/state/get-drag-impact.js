@@ -66,56 +66,29 @@ export default ({
     return noImpact;
   }
 
-  const newCenter = withinDroppable.center;
-  const draggingDimension: DraggableDimension = draggables[draggableId];
   const droppable: DroppableDimension = droppables[droppableId];
   const axis: Axis = droppable.axis;
+
+  if (!droppable.isEnabled) {
+    return {
+      movement: noMovement,
+      direction: axis.direction,
+      destination: null,
+    };
+  }
 
   const insideDroppable: DraggableDimension[] = getDraggablesInsideDroppable(
     droppable,
     draggables,
   );
 
-  // If the droppable is disabled we still need to return an impact with a destination, otherwise
-  // we'll get errors when trying to lift from a disabled droppable (which is allowed)
-  if (!droppable.isEnabled) {
-    const homeDroppableId = draggingDimension.droppableId;
-    const homeIndex = getDraggablesInsideDroppable(
-      droppables[homeDroppableId],
-      draggables,
-    ).indexOf(draggingDimension);
-    return {
-      movement: noMovement,
-      direction: null,
-      destination: {
-        droppableId: homeDroppableId,
-        index: homeIndex,
-      },
-    };
-  }
-
-  // If the droppable is disabled we still need to return an impact with a destination, otherwise
-  // we'll get errors when trying to lift from a disabled droppable (which is allowed)
-  if (!droppable.isEnabled) {
-    const homeDroppableId = draggingDimension.droppableId;
-    const homeIndex = getDraggablesInsideDroppable(
-      droppables[homeDroppableId],
-      draggables,
-    ).indexOf(draggingDimension);
-    return {
-      movement: noMovement,
-      direction: null,
-      destination: {
-        droppableId: homeDroppableId,
-        index: homeIndex,
-      },
-    };
-  }
+  const newCenter: Position = withinDroppable.center;
+  const draggingDimension: DraggableDimension = draggables[draggableId];
+  const isWithinHomeDroppable = draggingDimension.droppableId === droppableId;
 
   // not considering margin so that items move based on visible edges
   const draggableCenter: Position = draggingDimension.page.withoutMargin.center;
   const isBeyondStartPosition: boolean = newCenter[axis.line] - draggableCenter[axis.line] > 0;
-  const isWithinHomeDroppable = draggingDimension.droppableId === droppableId;
   const shouldDisplaceItemsForward = isWithinHomeDroppable ? isBeyondStartPosition : false;
 
   const moved: DraggableId[] = insideDroppable

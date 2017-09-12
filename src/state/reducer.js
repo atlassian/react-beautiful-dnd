@@ -5,6 +5,7 @@ import type { TypeId,
   State,
   DraggableDimension,
   DroppableDimension,
+  DraggableDimensionMap,
   DroppableId,
   DraggableId,
   DimensionState,
@@ -20,6 +21,7 @@ import type { TypeId,
   Position,
   WithinDroppable,
 } from '../types';
+import getInitialImpact from './get-initial-impact';
 import { add, subtract, negate } from './position';
 import getDragImpact from './get-drag-impact';
 import moveToNextIndex from './move-to-next-index/';
@@ -230,26 +232,26 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     }
 
     const { id, type, client, page, windowScroll, isScrollAllowed } = action.payload;
+    const draggables: DraggableDimensionMap = state.dimension.draggable;
+    const draggable: DraggableDimension = state.dimension.draggable[id];
+    const droppable: DroppableDimension = state.dimension.droppable[draggable.droppableId];
 
-    // no scroll diff yet so withinDroppable is just the center position
+    const impact: ?DragImpact = getInitialImpact({
+      draggable,
+      droppable,
+      draggables,
+    });
+
+    if (!impact || !impact.destination) {
+      console.error('invalid lift state');
+      return clean();
+    }
+
+    const source: DraggableLocation = impact.destination;
+
     const withinDroppable: WithinDroppable = {
       center: page.center,
     };
-
-    const impact: DragImpact = getDragImpact({
-      page: page.selection,
-      withinDroppable,
-      draggableId: id,
-      draggables: state.dimension.draggable,
-      droppables: state.dimension.droppable,
-    });
-
-    const source: ?DraggableLocation = impact.destination;
-
-    if (!source) {
-      console.error('lifting a draggable that is not inside a droppable');
-      return clean();
-    }
 
     const initial: InitialDrag = {
       source,
