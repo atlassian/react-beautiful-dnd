@@ -2,7 +2,7 @@
 import moveToNewDroppable from '../../../../src/state/move-cross-axis/move-to-new-droppable/';
 import type { Result } from '../../../../src/state/move-cross-axis/move-cross-axis-types';
 import { getDraggableDimension, getDroppableDimension } from '../../../../src/state/dimension';
-import getClientRect from '../../../utils/get-client-rect';
+import getClientRect from '../../../../src/state/get-client-rect';
 import moveToEdge from '../../../../src/state/move-to-edge';
 import { patch } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';

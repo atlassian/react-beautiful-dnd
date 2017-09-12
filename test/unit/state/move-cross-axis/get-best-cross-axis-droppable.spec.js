@@ -1,7 +1,7 @@
 // @flow
 import getBestCrossAxisDroppable from '../../../../src/state/move-cross-axis/get-best-cross-axis-droppable';
 import { getDroppableDimension } from '../../../../src/state/dimension';
-import getClientRect from '../../../utils/get-client-rect';
+import getClientRect from '../../../../src/state/get-client-rect';
 import { add } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
 import type {

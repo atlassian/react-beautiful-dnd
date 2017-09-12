@@ -28,7 +28,7 @@ import type {
   InitialDragLocation,
 } from '../../../src/types';
 import { getDraggableDimension } from '../../../src/state/dimension';
-import getClientRect from '../../utils/get-client-rect';
+import getClientRect from '../../../src/state/get-client-rect';
 import { combine, withStore, withDroppableId } from '../../utils/get-context-options';
 import { dispatchWindowMouseEvent, mouseEvent } from '../../utils/user-input-util';
 import setWindowScroll from '../../utils/set-window-scroll';

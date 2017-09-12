@@ -6,7 +6,7 @@ import Droppable, { makeSelector } from '../../../src/view/droppable/connected-d
 import noImpact from '../../../src/state/no-impact';
 import { getDraggableDimension } from '../../../src/state/dimension';
 import { withStore } from '../../utils/get-context-options';
-import getClientRect from '../../utils/get-client-rect';
+import getClientRect from '../../../src/state/get-client-rect';
 import type {
   Phase,
   DragState,

@@ -5,7 +5,7 @@ import DraggableDimensionPublisher from '../../../src/view/draggable-dimension-p
 import { getDraggableDimension } from '../../../src/state/dimension';
 // eslint-disable-next-line no-duplicate-imports
 import type { ClientRect, Margin } from '../../../src/state/dimension';
-import getClientRect from '../../utils/get-client-rect';
+import getClientRect from '../../../src/state/get-client-rect';
 import setWindowScroll from '../../utils/set-window-scroll';
 import type {
   Position,

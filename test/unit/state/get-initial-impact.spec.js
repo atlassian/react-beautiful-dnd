@@ -2,7 +2,7 @@
 import getInitialImpact from '../../../src/state/get-initial-impact';
 import getDroppableWithDraggables from '../../utils/get-droppable-with-draggables';
 import { getDraggableDimension } from '../../../src/state/dimension';
-import getClientRect from '../../utils/get-client-rect';
+import getClientRect from '../../../src/state/get-client-rect';
 import { noMovement } from '../../../src/state/no-impact';
 import type { Result as Data } from '../../utils/get-droppable-with-draggables';
 import type {

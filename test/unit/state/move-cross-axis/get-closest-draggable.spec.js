@@ -3,7 +3,7 @@ import getClosestDraggable from '../../../../src/state/move-cross-axis/get-close
 import { getDroppableDimension, getDraggableDimension } from '../../../../src/state/dimension';
 import { add, distance, patch } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
-import getClientRect from '../../../utils/get-client-rect';
+import getClientRect from '../../../../src/state/get-client-rect';
 import type {
   Axis,
   Position,

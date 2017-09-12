@@ -4,15 +4,13 @@ import invariant from 'invariant';
 import rafScheduler from 'raf-schd';
 import memoizeOne from 'memoize-one';
 import getWindowScrollPosition from '../get-window-scroll-position';
+import getClientRect from '../../state/get-client-rect';
 import { getDroppableDimension } from '../../state/dimension';
 import getClosestScrollable from '../get-closest-scrollable';
 // eslint-disable-next-line no-duplicate-imports
 import type { Margin, ClientRect } from '../../state/dimension';
 import type { DroppableDimension, Position, HTMLElement } from '../../types';
 import type { Props } from './droppable-dimension-publisher-types';
-
-// TEMP - move to source if needed
-import getClientRect from '../../../test/utils/get-client-rect';
 
 const origin: Position = { x: 0, y: 0 };
 

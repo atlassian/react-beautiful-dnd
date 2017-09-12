@@ -2,7 +2,7 @@
 import moveToNextIndex from '../../../src/state/move-to-next-index/';
 import type { Result } from '../../../src/state/move-to-next-index/move-to-next-index-types';
 import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
-import getClientRect from '../../utils/get-client-rect';
+import getClientRect from '../../../src/state/get-client-rect';
 import moveToEdge from '../../../src/state/move-to-edge';
 import { patch } from '../../../src/state/position';
 import { vertical, horizontal } from '../../../src/state/axis';

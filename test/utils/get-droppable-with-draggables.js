@@ -7,7 +7,7 @@ import type {
   DroppableDimension,
   Direction,
 } from '../../src/types';
-import getClientRect from './get-client-rect';
+import getClientRect from '../../src/state/get-client-rect';
 
 type ClientRectSubset = {|
   top: number,

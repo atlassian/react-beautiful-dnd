@@ -6,7 +6,7 @@ import DroppableDimensionPublisher from '../../../src/view/droppable-dimension-p
 import { getDroppableDimension } from '../../../src/state/dimension';
 // eslint-disable-next-line no-duplicate-imports
 import type { Margin, ClientRect } from '../../../src/state/dimension';
-import getClientRect from '../../utils/get-client-rect';
+import getClientRect from '../../../src/state/get-client-rect';
 import setWindowScroll from '../../utils/set-window-scroll';
 import type {
   DroppableId,

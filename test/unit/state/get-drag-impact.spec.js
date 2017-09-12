@@ -6,7 +6,7 @@ import {
 // eslint-disable-next-line no-duplicate-imports
 import getDragImpact from '../../../src/state/get-drag-impact';
 import noImpact from '../../../src/state/no-impact';
-import getClientRect from '../../utils/get-client-rect';
+import getClientRect from '../../../src/state/get-client-rect';
 import getDroppableWithDraggables from '../../utils/get-droppable-with-draggables';
 import { add, patch } from '../../../src/state/position';
 import { noMovement } from '../../../src/state/no-impact';
@@ -588,11 +588,12 @@ describe('get drag impact', () => {
         const withinDroppable: WithinDroppable = {
           center: page,
         };
-        const disabled = {
+        // $ExpectError - using spread
+        const disabled: DroppableDimension = {
           ...droppable,
           isEnabled: false,
         };
-        const custom: DraggableDimensionMap = {
+        const custom: DroppableDimensionMap = {
           [disabled.id]: disabled,
         };
         const expected: DragImpact = {
@@ -1179,11 +1180,12 @@ describe('get drag impact', () => {
         const withinDroppable: WithinDroppable = {
           center: page,
         };
-        const disabled = {
+        // $ExpectError - using flow
+        const disabled: DroppableDimension = {
           ...droppable,
           isEnabled: false,
         };
-        const custom: DraggableDimensionMap = {
+        const custom: DroppableDimensionMap = {
           [disabled.id]: disabled,
         };
         const expected: DragImpact = {

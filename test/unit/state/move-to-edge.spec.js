@@ -7,7 +7,7 @@ import {
   subtract,
 } from '../../../src/state/position';
 import getFragment from '../../utils/get-fragment';
-import getClientRect from '../../utils/get-client-rect';
+import getClientRect from '../../../src/state/get-client-rect';
 import moveToEdge from '../../../src/state/move-to-edge';
 import { vertical, horizontal } from '../../../src/state/axis';
 import type {

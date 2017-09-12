@@ -2,7 +2,7 @@
 import { isPointWithin, isDraggableWithin } from '../../../src/state/is-within-visible-bounds-of-droppable';
 import { getDroppableDimension } from '../../../src/state/dimension';
 import { add, subtract } from '../../../src/state/position';
-import getClientRect from '../../utils/get-client-rect';
+import getClientRect from '../../../src/state/get-client-rect';
 import getDroppableWithDraggables from '../../utils/get-droppable-with-draggables';
 import type { Result } from '../../utils/get-droppable-with-draggables';
 import type {

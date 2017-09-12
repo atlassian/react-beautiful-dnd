@@ -6,7 +6,7 @@ import Draggable, { makeSelector } from '../../../src/view/draggable/connected-d
 import { getDraggableDimension } from '../../../src/state/dimension';
 import noImpact from '../../../src/state/no-impact';
 import { combine, withStore, withDroppableId } from '../../utils/get-context-options';
-import getClientRect from '../../utils/get-client-rect';
+import getClientRect from '../../../src/state/get-client-rect';
 import { add } from '../../../src/state/position';
 import type {
   CurrentDrag,
