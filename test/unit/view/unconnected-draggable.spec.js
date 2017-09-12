@@ -7,7 +7,7 @@ import type { ReactWrapper } from 'enzyme';
 import Draggable, { zIndexOptions } from '../../../src/view/draggable/draggable';
 import DragHandle, { sloppyClickThreshold } from '../../../src/view/drag-handle/drag-handle';
 import Moveable from '../../../src/view/moveable/';
-import Placeholder from '../../../src/view/draggable/placeholder';
+import Placeholder from '../../../src/view/placeholder';
 import { css } from '../../../src/view/animation';
 import { add, subtract } from '../../../src/state/position';
 import type {
@@ -77,6 +77,8 @@ const getDispatchPropsStub = (): DispatchProps => ({
   moveByWindowScroll: jest.fn(),
   moveForward: jest.fn(),
   moveBackward: jest.fn(),
+  crossAxisMoveForward: jest.fn(),
+  crossAxisMoveBackward: jest.fn(),
   drop: jest.fn(),
   cancel: jest.fn(),
   dropAnimationFinished: jest.fn(),
@@ -709,6 +711,84 @@ describe('Draggable - unconnected', () => {
           wrapper.find(DragHandle).props().callbacks.onMoveForward(draggableId);
 
           expect(dispatchProps.moveForward).toBeCalledWith(draggableId);
+        });
+      });
+
+      describe('onCrossAxisMoveForward', () => {
+        it('should throw if dragging is disabled', () => {
+          const wrapper = mountDraggable({
+            ownProps: disabledOwnProps,
+            mapProps: draggingMapProps,
+          });
+
+          const tryMove = () =>
+            wrapper.find(DragHandle).props().callbacks.onCrossAxisMoveForward(draggableId);
+
+          expect(tryMove).toThrow();
+        });
+
+        it('should throw if not attached to the DOM', () => {
+          const wrapper = mountDraggable({
+            mapProps: draggingMapProps,
+          });
+
+          wrapper.unmount();
+
+          const tryMove = () =>
+            wrapper.find(DragHandle).props().callbacks.onCrossAxisMoveForward(draggableId);
+
+          expect(tryMove).toThrow();
+        });
+
+        it('should call the cross axis move forward action', () => {
+          const dispatchProps = getDispatchPropsStub();
+          const wrapper = mountDraggable({
+            mapProps: draggingMapProps,
+            dispatchProps,
+          });
+
+          wrapper.find(DragHandle).props().callbacks.onCrossAxisMoveForward(draggableId);
+
+          expect(dispatchProps.crossAxisMoveForward).toBeCalledWith(draggableId);
+        });
+      });
+
+      describe('onCrossAxisMoveBackward', () => {
+        it('should throw if dragging is disabled', () => {
+          const wrapper = mountDraggable({
+            ownProps: disabledOwnProps,
+            mapProps: draggingMapProps,
+          });
+
+          const tryMove = () =>
+            wrapper.find(DragHandle).props().callbacks.onCrossAxisMoveBackward(draggableId);
+
+          expect(tryMove).toThrow();
+        });
+
+        it('should throw if not attached to the DOM', () => {
+          const wrapper = mountDraggable({
+            mapProps: draggingMapProps,
+          });
+
+          wrapper.unmount();
+
+          const tryMove = () =>
+            wrapper.find(DragHandle).props().callbacks.onCrossAxisMoveBackward(draggableId);
+
+          expect(tryMove).toThrow();
+        });
+
+        it('should call the move cross axis backwards action', () => {
+          const dispatchProps = getDispatchPropsStub();
+          const wrapper = mountDraggable({
+            mapProps: draggingMapProps,
+            dispatchProps,
+          });
+
+          wrapper.find(DragHandle).props().callbacks.onCrossAxisMoveBackward(draggableId);
+
+          expect(dispatchProps.crossAxisMoveBackward).toBeCalledWith(draggableId);
         });
       });
 
