@@ -1,4 +1,5 @@
 // @flow
+/* eslint-disable react/no-multi-comp */
 import React, { Component } from 'react';
 import { mount } from 'enzyme';
 import DroppableDimensionPublisher from '../../../src/view/droppable-dimension-publisher/droppable-dimension-publisher';
@@ -12,6 +13,7 @@ import type {
   DroppableDimension,
   HTMLElement,
   Position,
+  ReactElement,
 } from '../../../src/types';
 
 const droppableId: DroppableId = 'drop-1';
@@ -332,10 +334,16 @@ describe('DraggableDimensionPublisher', () => {
     });
 
     describe('dimension clipping', () => {
+      type ItemProps = {
+        publish: (dimension: DroppableDimension) => void,
+        updateScroll: (id: DroppableId, offset: Position) => void,
+        shouldPublish?: boolean,
+      };
+
       class ScrollParent extends Component {
-        props: {|
-          children: ?any
-        |}
+        props: {
+          children: ?ReactElement
+        }
 
         render() {
           return (
@@ -345,12 +353,6 @@ describe('DraggableDimensionPublisher', () => {
           );
         }
       }
-
-      type ItemProps = {
-        publish: (dimension: DroppableDimension) => void,
-        updateScroll: (id: DroppableId, offset: Position) => void,
-        shouldPublish?: boolean,
-      };
 
       class Item extends Component {
         /* eslint-disable react/sort-comp */
@@ -394,10 +396,15 @@ describe('DraggableDimensionPublisher', () => {
 
       class App extends Component {
         props: ItemProps
+
         render() {
           return (
             <ScrollParent>
-              <Item {...this.props} />
+              <Item
+                publish={this.props.publish}
+                updateScroll={this.props.updateScroll}
+                shouldPublish={this.props.shouldPublish}
+              />
             </ScrollParent>
           );
         }
