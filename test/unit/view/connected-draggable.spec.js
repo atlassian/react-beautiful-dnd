@@ -99,6 +99,7 @@ const make = (() => {
           center: page.center,
         },
         shouldAnimate: true,
+        isScrollAllowed: true,
       };
 
       const state: DragState = {

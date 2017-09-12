@@ -14,9 +14,9 @@ export type MapProps = {|
 |}
 
 export type DispatchProps = {|
-  publish: (dimension: DroppableDimension) => mixed,
-  updateIsEnabled: (id: DroppableId, isEnabled: boolean) => mixed,
-  updateScroll: (id: DroppableId, offset: Position) => mixed,
+  publish: (dimension: DroppableDimension) => void,
+  updateIsEnabled: (id: DroppableId, isEnabled: boolean) => void,
+  updateScroll: (id: DroppableId, offset: Position) => void,
 |}
 
 export type OwnProps = {|
@@ -28,7 +28,11 @@ export type OwnProps = {|
   children?: ReactElement,
 |}
 
-export type Props = MapProps & DispatchProps & OwnProps;
+export type Props = {
+  ...MapProps,
+  ...DispatchProps,
+  ...OwnProps
+}
 
 // Having issues getting the correct reselect type
 // export type Selector = OutputSelector<State, OwnProps, MapProps>;

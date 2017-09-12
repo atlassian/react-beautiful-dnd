@@ -141,32 +141,43 @@ export default class DroppableDimensionPublisher extends Component {
     this.closestScrollable.removeEventListener('scroll', this.onClosestScroll);
   }
 
-  // TODO: componentDidUpdate?
   componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.targetRef !== this.props.targetRef) {
-      if (this.isWatchingScroll) {
-        console.warn('changing targetRef while watching scroll!');
-        this.unwatchScroll();
-      }
-    }
-
-    if (nextProps.isDropDisabled !== this.props.isDropDisabled) {
-      this.props.updateIsEnabled(this.props.droppableId, !nextProps.isDropDisabled);
-    }
-
     // Because the dimension publisher wraps children - it might render even when its props do
     // not change. We need to ensure that it does not publish when it should not.
-    const shouldPublish = !this.props.shouldPublish && nextProps.shouldPublish;
+
+    const shouldStartPublishing = !this.props.shouldPublish && nextProps.shouldPublish;
+    const alreadyPublishing = this.props.shouldPublish && nextProps.shouldPublish;
+    const stopPublishing = this.props.shouldPublish && !nextProps.shouldPublish;
 
     // should no longer watch for scrolling
-    if (!nextProps.shouldPublish) {
+    if (stopPublishing) {
       this.unwatchScroll();
       return;
     }
 
-    if (!shouldPublish) {
+    if (alreadyPublishing) {
+      // if ref changes and watching scroll - unwatch the scroll
+      if (nextProps.targetRef !== this.props.targetRef) {
+        if (this.isWatchingScroll) {
+          console.warn('changing targetRef while watching scroll!');
+          this.unwatchScroll();
+        }
+      }
+
+      // publish any changes to the disabled flag
+      if (nextProps.isDropDisabled !== this.props.isDropDisabled) {
+        this.props.updateIsEnabled(this.props.droppableId, !nextProps.isDropDisabled);
+      }
+
       return;
     }
+
+    // This will be the default when nothing is happening
+    if (!shouldStartPublishing) {
+      return;
+    }
+
+    // Need to start publishing
 
     // discovering the closest scrollable for a drag
     this.closestScrollable = getClosestScrollable(this.props.targetRef);
