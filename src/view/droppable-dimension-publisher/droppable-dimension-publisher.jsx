@@ -57,7 +57,10 @@ export default class DroppableDimensionPublisher extends Component {
         return current;
       }
 
-      // Clipping the droppables dimensions by its scroll parent
+      // Clipping the droppables dimensions by its scroll parent.
+      // If the scroll parent is smaller in size than the droppable we need to trim the
+      // dimensions of the droppable so that it is has the correct visible coordinates
+      // Still using the margin of the droppable. We can revisit the margin selection decision
 
       const parent: ClientRect = this.closestScrollable.getBoundingClientRect();
 

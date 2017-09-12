@@ -13,7 +13,6 @@ import type {
   DraggableDimensionMap,
   DroppableDimensionMap,
   DraggableLocation,
-  DragImpact,
 } from '../../types';
 
 type Args = {|
@@ -26,8 +25,6 @@ type Args = {|
   droppableId: DroppableId,
   // the original location of the draggable
   home: DraggableLocation,
-  // the current drag impact
-  impact: DragImpact,
   // all the dimensions in the system
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
@@ -40,7 +37,6 @@ export default ({
   droppableId,
   home,
   draggables,
-  impact,
   droppables,
   }: Args): ?Result => {
   const draggable: DraggableDimension = draggables[draggableId];
@@ -79,11 +75,10 @@ export default ({
 
   return moveToNewDroppable({
     pageCenter,
+    destination,
     draggable,
     target,
-    destination,
     insideDestination,
     home,
-    impact,
   });
 };

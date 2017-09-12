@@ -1,3 +1,4 @@
+// @flow
 import { getDraggableDimension, getDroppableDimension } from '../../src/state/dimension';
 import type { ClientRect } from '../../src/state/dimension';
 import type {
@@ -9,17 +10,17 @@ import type {
 } from '../../src/types';
 import getClientRect from './get-client-rect';
 
-type ClientRectSubset = {
+type ClientRectSubset = {|
   top: number,
   left: number,
   right: number,
   bottom: number,
-}
+|}
 
 type Args = {|
   direction?: Direction,
   droppableId: DroppableId,
-  droppableRect: ClientRect,
+  droppableRect: ClientRectSubset,
   draggableRects: ClientRectSubset[],
 |};
 

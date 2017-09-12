@@ -114,6 +114,7 @@ const move = ({
   const current: CurrentDrag = {
     id: previous.id,
     type: previous.type,
+    isScrollAllowed: previous.isScrollAllowed,
     client,
     page,
     withinDroppable,
@@ -228,7 +229,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
-    const { id, type, client, page, windowScroll } = action.payload;
+    const { id, type, client, page, windowScroll, isScrollAllowed } = action.payload;
 
     // no scroll diff yet so withinDroppable is just the center position
     const withinDroppable: WithinDroppable = {
@@ -273,6 +274,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       },
       withinDroppable,
       windowScroll,
+      isScrollAllowed,
       shouldAnimate: false,
     };
 
@@ -504,7 +506,6 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       draggableId,
       droppableId,
       home,
-      impact: state.drag.impact,
       draggables: state.dimension.draggable,
       droppables: state.dimension.droppable,
     });
