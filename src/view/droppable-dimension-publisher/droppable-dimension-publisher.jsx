@@ -57,7 +57,8 @@ export default class DroppableDimensionPublisher extends Component {
         return current;
       }
 
-      // need to trim dimensions
+      // Clipping the droppables dimensions by its scroll parent
+
       const parent: ClientRect = this.closestScrollable.getBoundingClientRect();
 
       const top = Math.max(current.top, parent.top);

@@ -24,8 +24,6 @@ const droppableId: DroppableId = 'drop-1';
 const origin: Position = { x: 0, y: 0 };
 
 describe('get drag impact', () => {
-  // TODO: add tests for when not in home list
-
   describe('vertical', () => {
     const droppable: DroppableDimension = getDroppableDimension({
       id: droppableId,

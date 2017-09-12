@@ -15,7 +15,7 @@ import type {
 } from '../../../src/types';
 
 const droppableId: DroppableId = 'drop-1';
-const dimension: DroppableDimension = getDroppableDimension({
+const droppable: DroppableDimension = getDroppableDimension({
   id: droppableId,
   clientRect: getClientRect({
     top: 0,
@@ -113,12 +113,12 @@ describe('DraggableDimensionPublisher', () => {
       const publish = jest.fn();
       const updateScroll = jest.fn();
       jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => ({
-        top: dimension.page.withoutMargin.top,
-        bottom: dimension.page.withoutMargin.bottom,
-        left: dimension.page.withoutMargin.left,
-        right: dimension.page.withoutMargin.right,
-        height: dimension.page.withoutMargin.height,
-        width: dimension.page.withoutMargin.width,
+        top: droppable.page.withoutMargin.top,
+        bottom: droppable.page.withoutMargin.bottom,
+        left: droppable.page.withoutMargin.left,
+        right: droppable.page.withoutMargin.right,
+        height: droppable.page.withoutMargin.height,
+        width: droppable.page.withoutMargin.width,
       }));
       jest.spyOn(window, 'getComputedStyle').mockImplementation(() => ({
         marginTop: '0',
@@ -137,7 +137,7 @@ describe('DraggableDimensionPublisher', () => {
         shouldPublish: true,
       });
 
-      expect(publish).toBeCalledWith(dimension);
+      expect(publish).toBeCalledWith(droppable);
       expect(publish).toHaveBeenCalledTimes(1);
 
       wrapper.unmount();
@@ -163,12 +163,12 @@ describe('DraggableDimensionPublisher', () => {
         margin,
       });
       jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => ({
-        top: dimension.page.withoutMargin.top,
-        bottom: dimension.page.withoutMargin.bottom,
-        left: dimension.page.withoutMargin.left,
-        right: dimension.page.withoutMargin.right,
-        height: dimension.page.withoutMargin.height,
-        width: dimension.page.withoutMargin.width,
+        top: droppable.page.withoutMargin.top,
+        bottom: droppable.page.withoutMargin.bottom,
+        left: droppable.page.withoutMargin.left,
+        right: droppable.page.withoutMargin.right,
+        height: droppable.page.withoutMargin.height,
+        width: droppable.page.withoutMargin.width,
       }));
       jest.spyOn(window, 'getComputedStyle').mockImplementation(() => ({
         marginTop: `${margin.top}`,
@@ -290,12 +290,12 @@ describe('DraggableDimensionPublisher', () => {
       const publish = jest.fn();
       const updateScroll = jest.fn();
       jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => ({
-        top: dimension.page.withMargin.top,
-        bottom: dimension.page.withMargin.bottom,
-        left: dimension.page.withMargin.left,
-        right: dimension.page.withMargin.right,
-        height: dimension.page.withMargin.height,
-        width: dimension.page.withMargin.width,
+        top: droppable.page.withMargin.top,
+        bottom: droppable.page.withMargin.bottom,
+        left: droppable.page.withMargin.left,
+        right: droppable.page.withMargin.right,
+        height: droppable.page.withMargin.height,
+        width: droppable.page.withMargin.width,
       }));
 
       // initial publish
@@ -329,6 +329,148 @@ describe('DraggableDimensionPublisher', () => {
       expect(updateScroll).not.toHaveBeenCalled();
 
       wrapper.unmount();
+    });
+
+    describe('dimension clipping', () => {
+      class ScrollParent extends Component {
+        props: {|
+          children: ?any
+        |}
+
+        render() {
+          return (
+            <div className="scroll-parent" >
+              { this.props.children }
+            </div>
+          );
+        }
+      }
+
+      type ItemProps = {
+        publish: (dimension: DroppableDimension) => void,
+        updateScroll: (id: DroppableId, offset: Position) => void,
+        shouldPublish?: boolean,
+      };
+
+      class Item extends Component {
+        /* eslint-disable react/sort-comp */
+        props: ItemProps
+
+        state: {|
+        ref: ?HTMLElement
+        |}
+
+        state = {
+          ref: null,
+        }
+
+        setRef = (ref: ?HTMLElement) => {
+          this.setState({
+            ref,
+          });
+        }
+
+        render() {
+          return (
+            <div
+              ref={this.setRef}
+              className="item"
+            >
+              {/* $ExpectError */ }
+              <DroppableDimensionPublisher
+                droppableId={droppableId}
+                type="TYPE"
+                targetRef={this.state.ref}
+                shouldPublish={Boolean(this.props.shouldPublish)}
+                publish={this.props.publish}
+                updateScroll={this.props.updateScroll}
+              >
+                <div>hello world</div>
+              </DroppableDimensionPublisher>
+            </div>
+          );
+        }
+      }
+
+      class App extends Component {
+        props: ItemProps
+        render() {
+          return (
+            <ScrollParent>
+              <Item {...this.props} />
+            </ScrollParent>
+          );
+        }
+      }
+
+      it('should clip a dimension by the size of its scroll parent', () => {
+        const publish = jest.fn();
+        const updateScroll = jest.fn();
+        const scrollParentRect: ClientRect = getClientRect({
+          top: 0,
+          bottom: 100,
+          left: 0,
+          right: 100,
+        });
+        const expected = getDroppableDimension({
+          id: droppableId,
+          clientRect: scrollParentRect,
+        });
+        (() => {
+          let count = 0;
+          jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => {
+            // first call is item
+            if (count === 0) {
+              count++;
+              // 10px bigger in every direction from the scroll parent
+              return getClientRect({
+                top: -10,
+                bottom: 110,
+                left: -10,
+                right: 110,
+              });
+            }
+
+            // second call is to the scroll parent
+            return scrollParentRect;
+          });
+        })();
+
+        jest.spyOn(window, 'getComputedStyle').mockImplementation((el) => {
+          const noMargin = {
+            marginTop: '0',
+            marginRight: '0',
+            marginBottom: '0',
+            marginLeft: '0',
+          };
+
+          if (el.className === 'item') {
+            return noMargin;
+          }
+
+          if (el.className === 'scroll-parent') {
+            return {
+              ...noMargin,
+              overflow: 'auto',
+            };
+          }
+
+          throw new Error('unknown el');
+        });
+
+        const wrapper = mount(
+          <App
+            publish={publish}
+            updateScroll={updateScroll}
+          />
+        );
+        wrapper.setProps({
+          shouldPublish: true,
+        });
+
+        expect(publish).toBeCalledWith(expected);
+        expect(publish).toHaveBeenCalledTimes(1);
+      });
     });
   });
 
