@@ -9,6 +9,7 @@ import noImpact from '../../../src/state/no-impact';
 import getClientRect from '../../utils/get-client-rect';
 import getDroppableWithDraggables from '../../utils/get-droppable-with-draggables';
 import { add, patch } from '../../../src/state/position';
+import { noMovement } from '../../../src/state/no-impact';
 import type {
   WithinDroppable,
   DroppableId,
@@ -85,7 +86,7 @@ describe('get drag impact', () => {
     };
 
     it('should return no movement when not dragging over anything', () => {
-    // dragging up above the list
+      // dragging up above the list
       const page: Position = {
         x: droppable.page.withMargin.left,
         y: droppable.page.withMargin.top - 100,
@@ -109,7 +110,7 @@ describe('get drag impact', () => {
     describe('moving forward', () => {
       describe('not moved far enough', () => {
         it('should return the starting position', () => {
-        // moving forward - but not enough
+          // moving forward - but not enough
           const page: Position = {
             x: draggable2.page.withoutMargin.center.x,
             y: draggable2.page.withoutMargin.center.y + 1,
@@ -143,7 +144,7 @@ describe('get drag impact', () => {
       });
 
       describe('moving past one item', () => {
-      // moving forward past the top of the next item
+        // moving forward past the top of the next item
         const page: Position = {
           x: draggable1.page.withoutMargin.center.x,
           y: draggable2.page.withoutMargin.top + 1,
@@ -192,7 +193,7 @@ describe('get drag impact', () => {
       });
 
       describe('moving past two items', () => {
-      // moving forward past the top of the third item
+        // moving forward past the top of the third item
         const page: Position = {
           x: draggable1.page.withoutMargin.center.x,
           y: draggable3.page.withoutMargin.top + 1,
@@ -241,7 +242,7 @@ describe('get drag impact', () => {
       });
 
       describe('moving past one item when the dragging item is not the first in the list', () => {
-      // moving the second item forward past the top of the third item
+        // moving the second item forward past the top of the third item
         const page: Position = {
           x: draggable2.page.withoutMargin.center.x,
           y: draggable3.page.withMargin.top + 1,
@@ -290,7 +291,7 @@ describe('get drag impact', () => {
       });
 
       describe('moving past an item due to change in droppable scroll', () => {
-      // using the center position of the draggable as the selection point
+        // using the center position of the draggable as the selection point
         const page: Position = draggable1.page.withMargin.center;
         const withinDroppable: WithinDroppable = {
         // just over the top of the second item
@@ -574,6 +575,41 @@ describe('get drag impact', () => {
         it('should return the items that need to be moved', () => {
           expect(impact.movement.draggables).toEqual([draggable1.id]);
         });
+      });
+    });
+
+    describe('moving over disabled list', () => {
+      it('should return an empty impact', () => {
+        // moving forward past the top of the next item
+        const page: Position = {
+          x: draggable1.page.withoutMargin.center.x,
+          y: draggable2.page.withoutMargin.top + 1,
+        };
+        const withinDroppable: WithinDroppable = {
+          center: page,
+        };
+        const disabled = {
+          ...droppable,
+          isEnabled: false,
+        };
+        const custom: DraggableDimensionMap = {
+          [disabled.id]: disabled,
+        };
+        const expected: DragImpact = {
+          movement: noMovement,
+          direction: droppable.axis.direction,
+          destination: null,
+        };
+
+        const impact: DragImpact = getDragImpact({
+          page,
+          withinDroppable,
+          draggableId: draggable1.id,
+          draggables,
+          droppables: custom,
+        });
+
+        expect(impact).toEqual(expected);
       });
     });
   });
@@ -1130,6 +1166,41 @@ describe('get drag impact', () => {
         it('should return the items that need to be moved', () => {
           expect(impact.movement.draggables).toEqual([draggable1.id]);
         });
+      });
+    });
+
+    describe('moving over disabled list', () => {
+      it('should return an empty impact', () => {
+        // moving forward past the right of the next item
+        const page: Position = {
+          x: draggable2.page.withoutMargin.left + 1,
+          y: draggable1.page.withoutMargin.center.y,
+        };
+        const withinDroppable: WithinDroppable = {
+          center: page,
+        };
+        const disabled = {
+          ...droppable,
+          isEnabled: false,
+        };
+        const custom: DraggableDimensionMap = {
+          [disabled.id]: disabled,
+        };
+        const expected: DragImpact = {
+          movement: noMovement,
+          direction: droppable.axis.direction,
+          destination: null,
+        };
+
+        const impact: DragImpact = getDragImpact({
+          page,
+          withinDroppable,
+          draggableId: draggable1.id,
+          draggables,
+          droppables: custom,
+        });
+
+        expect(impact).toEqual(expected);
       });
     });
   });
