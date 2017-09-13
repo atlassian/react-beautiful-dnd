@@ -26,6 +26,7 @@ const droppable: DroppableDimension = getDroppableDimension({
     left: 0,
   }),
 });
+const origin: Position = { x: 0, y: 0 };
 
 class ScrollableItem extends Component {
   /* eslint-disable react/sort-comp */
@@ -332,7 +333,7 @@ describe('DraggableDimensionPublisher', () => {
         render() {
           return (
             <div className="scroll-parent" >
-              { this.props.children }
+              {this.props.children}
             </div>
           );
         }
@@ -397,56 +398,52 @@ describe('DraggableDimensionPublisher', () => {
         }
       }
 
-      it('should clip a dimension by the size of its scroll parent', () => {
-        const scrollParentRect: ClientRect = getClientRect({
-          top: 0,
-          bottom: 100,
-          left: 0,
-          right: 100,
-        });
-        const expected = getDroppableDimension({
-          id: droppableId,
-          clientRect: getClientRect({
-            top: 0,
-            bottom: 100,
-            left: 0,
-            // using max value...
-            right: 110,
-          }),
-        });
-        (() => {
-          let count = 0;
-          jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => {
-            // first call is item
-            if (count === 0) {
-              count++;
-              // 10px bigger in every direction from the scroll parent
-              return getClientRect({
-                top: -10,
-                bottom: 110,
-                left: -10,
-                right: 110,
-              });
-            }
+      const noMargin = {
+        marginTop: '0',
+        marginRight: '0',
+        marginBottom: '0',
+        marginLeft: '0',
+      };
 
-            // second call is to the scroll parent
-            return scrollParentRect;
-          });
-        })();
+      type ExecuteArgs = {|
+        droppableRect: ClientRect,
+        scrollParentRect: ClientRect,
+        scrollParentScroll?: Position,
+      |}
+
+      const execute = ({
+        droppableRect,
+        scrollParentRect,
+        scrollParentScroll = origin,
+      }: ExecuteArgs) => {
+        wrapper = mount(
+          <App
+            publish={publish}
+            updateScroll={updateScroll}
+            updateIsEnabled={updateIsEnabled}
+          />
+        );
+
+        const scrollParentNode: HTMLElement = wrapper.getDOMNode();
+
+        if (!scrollParentNode.classList.contains('scroll-parent')) {
+          throw new Error('scroll parent node not obtained correctly');
+        }
+
+        const droppableNode: HTMLElement = scrollParentNode.querySelector('.item');
+
+        scrollParentNode.scrollLeft = scrollParentScroll.x;
+        scrollParentNode.scrollTop = scrollParentScroll.y;
+
+        jest.spyOn(scrollParentNode, 'getBoundingClientRect').mockImplementationOnce(() => scrollParentRect);
+        jest.spyOn(droppableNode, 'getBoundingClientRect').mockImplementationOnce(() => droppableRect);
 
         jest.spyOn(window, 'getComputedStyle').mockImplementation((el) => {
-          const noMargin = {
-            marginTop: '0',
-            marginRight: '0',
-            marginBottom: '0',
-            marginLeft: '0',
-          };
-
-          if (el.className === 'item') {
+          if (el === droppableNode) {
             return noMargin;
           }
 
-          if (el.className === 'scroll-parent') {
+          if (el === scrollParentNode) {
             return {
               ...noMargin,
               overflow: 'auto',
@@ -456,16 +453,219 @@ describe('DraggableDimensionPublisher', () => {
           throw new Error('unknown el');
         });
 
-        wrapper = mount(
-          <App
-            publish={publish}
-            updateScroll={updateScroll}
-            updateIsEnabled={updateIsEnabled}
-          />
-        );
         wrapper.setProps({
           shouldPublish: true,
         });
+      };
+
+      it('should clip the dimension by the size of the scroll parent', () => {
+        const droppableRect: ClientRect = getClientRect({
+          top: 0,
+          bottom: 100,
+          left: 0,
+          right: 100,
+        });
+        // smaller by 10px in every direction
+        const scrollParentRect: ClientRect = getClientRect({
+          top: 10,
+          bottom: 90,
+          left: 10,
+          right: 90,
+        });
+        const expected = getDroppableDimension({
+          id: droppableId,
+          // because it is smaller in every direction
+          // the result will be the scroll parent rect
+          clientRect: scrollParentRect,
+        });
+
+        execute({ droppableRect, scrollParentRect });
+
+        // the trimmed rect
+        expect(publish).toBeCalledWith(expected);
+        expect(publish).toHaveBeenCalledTimes(1);
+      });
+
+      describe('dimension clipping by edge', () => {
+        const base = {
+          top: 0,
+          bottom: 100,
+          left: 0,
+          right: 100,
+        };
+        const droppableRect: ClientRect = getClientRect(base);
+
+        describe('cut off by scroll container', () => {
+          it('should choose the biggest top value', () => {
+            const scrollParentRect: ClientRect = getClientRect({
+              ...base,
+              top: 10,
+            });
+            execute({ droppableRect, scrollParentRect });
+            const expected = getDroppableDimension({
+              id: droppableId,
+              clientRect: getClientRect({
+                ...base,
+                top: 10,
+              }),
+            });
+
+            // the trimmed rect
+            expect(publish).toBeCalledWith(expected);
+            expect(publish).toHaveBeenCalledTimes(1);
+          });
+
+          it('should choose the biggest left value', () => {
+            const scrollParentRect: ClientRect = getClientRect({
+              ...base,
+              left: 10,
+            });
+            execute({ droppableRect, scrollParentRect });
+            const expected = getDroppableDimension({
+              id: droppableId,
+              clientRect: getClientRect({
+                ...base,
+                left: 10,
+              }),
+            });
+
+            // the trimmed rect
+            expect(publish).toBeCalledWith(expected);
+            expect(publish).toHaveBeenCalledTimes(1);
+          });
+
+          it('should choose the smallest right value', () => {
+            const scrollParentRect: ClientRect = getClientRect({
+              ...base,
+              right: 90,
+            });
+            execute({ droppableRect, scrollParentRect });
+            const expected = getDroppableDimension({
+              id: droppableId,
+              clientRect: getClientRect({
+                ...base,
+                right: 90,
+              }),
+            });
+
+            // the trimmed rect
+            expect(publish).toBeCalledWith(expected);
+            expect(publish).toHaveBeenCalledTimes(1);
+          });
+
+          it('should choose the smallest bottom value', () => {
+            const scrollParentRect: ClientRect = getClientRect({
+              ...base,
+              bottom: 90,
+            });
+            execute({ droppableRect, scrollParentRect });
+            const expected = getDroppableDimension({
+              id: droppableId,
+              clientRect: getClientRect({
+                ...base,
+                bottom: 90,
+              }),
+            });
+
+            // the trimmed rect
+            expect(publish).toBeCalledWith(expected);
+            expect(publish).toHaveBeenCalledTimes(1);
+          });
+        });
+
+        describe('cut off by droppable rect', () => {
+          it('should choose the biggest top value', () => {
+            const scrollParentRect: ClientRect = getClientRect({
+              ...base,
+              top: -10,
+            });
+            execute({ droppableRect, scrollParentRect });
+            const expected = getDroppableDimension({
+              id: droppableId,
+              clientRect: getClientRect(base),
+            });
+
+            // the trimmed rect
+            expect(publish).toBeCalledWith(expected);
+            expect(publish).toHaveBeenCalledTimes(1);
+          });
+
+          it('should choose the biggest left value', () => {
+            const scrollParentRect: ClientRect = getClientRect({
+              ...base,
+              left: -10,
+            });
+            execute({ droppableRect, scrollParentRect });
+            const expected = getDroppableDimension({
+              id: droppableId,
+              clientRect: getClientRect(base),
+            });
+
+            // the trimmed rect
+            expect(publish).toBeCalledWith(expected);
+            expect(publish).toHaveBeenCalledTimes(1);
+          });
+
+          it('should choose the smallest right value', () => {
+            const scrollParentRect: ClientRect = getClientRect({
+              ...base,
+              right: 110,
+            });
+            execute({ droppableRect, scrollParentRect });
+            const expected = getDroppableDimension({
+              id: droppableId,
+              clientRect: getClientRect(base),
+            });
+
+            // the trimmed rect
+            expect(publish).toBeCalledWith(expected);
+            expect(publish).toHaveBeenCalledTimes(1);
+          });
+
+          it('should choose the smallest bottom value', () => {
+            const scrollParentRect: ClientRect = getClientRect({
+              ...base,
+              bottom: 110,
+            });
+            execute({ droppableRect, scrollParentRect });
+            const expected = getDroppableDimension({
+              id: droppableId,
+              clientRect: getClientRect(base),
+            });
+
+            // the trimmed rect
+            expect(publish).toBeCalledWith(expected);
+            expect(publish).toHaveBeenCalledTimes(1);
+          });
+        });
+      });
+
+      it('should take into account the parents scroll when clipping', () => {
+        const base = {
+          top: 0,
+          bottom: 100,
+          left: 0,
+          right: 100,
+        };
+        const scrollParentScroll: Position = {
+          x: 100,
+          y: 100,
+        };
+        // rect will have the scroll subtracted when measurements are taken
+        const droppableRect: ClientRect = getClientRect({
+          top: base.top - scrollParentScroll.y,
+          bottom: base.bottom - scrollParentScroll.y,
+          left: base.left - scrollParentScroll.x,
+          right: base.right - scrollParentScroll.x,
+        });
+        const scrollParentRect: ClientRect = getClientRect(base);
+        const expected: DroppableDimension = getDroppableDimension({
+          id: droppableId,
+          scroll: scrollParentScroll,
+          clientRect: getClientRect(base),
+        });
+
+        execute({ droppableRect, scrollParentRect, scrollParentScroll });
 
         expect(publish).toBeCalledWith(expected);
         expect(publish).toHaveBeenCalledTimes(1);

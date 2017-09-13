@@ -41,6 +41,8 @@ export default class DroppableDimensionPublisher extends Component {
     const scroll: Position = this.getScrollOffset();
     const style = window.getComputedStyle(targetRef);
 
+    // keeping it simple and always using the margin of the droppable
+
     const margin: Margin = {
       top: parseInt(style.marginTop, 10),
       right: parseInt(style.marginRight, 10),
@@ -84,7 +86,7 @@ export default class DroppableDimensionPublisher extends Component {
       clientRect,
       margin,
       windowScroll: getWindowScrollPosition(),
-      scroll: this.getScrollOffset(),
+      scroll,
       isEnabled: !isDropDisabled,
     });
 
