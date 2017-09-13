@@ -30,7 +30,7 @@ export default ({
   const homeCenter: Position = draggable.client.withMargin.center;
 
   // not dropping anywhere
-  if (!destination) {
+  if (destination == null) {
     return homeCenter;
   }
 
@@ -70,6 +70,7 @@ export default ({
     }
 
     // Otherwise, return the dimension of the empty foreign droppable
+    // $ExpectError - flow does not correctly type this as non optional
     return destination.client.withMargin;
   })();
 

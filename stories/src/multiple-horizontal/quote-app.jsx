@@ -23,16 +23,9 @@ const Root = styled.div`
   flex-direction: column;
 `;
 
-const Row = styled.div`
-  margin: ${grid * 2}px ${grid * 2}px;
-`;
-
-const PushDown = styled.div`
-  height: 200px;
-`;
-
 const isDraggingClassName = 'is-dragging';
 
+/* eslint-disable react/no-unused-prop-types */
 type GroupedQuotes = {
   alpha: Quote[],
   beta: Quote[],
@@ -71,23 +64,6 @@ const resolveDrop = (quotes: GroupedQuotes,
         ...previous.slice(destination.index),
       ];
     })();
-
-    // let list: Quote[] = [...newQuotes[listId]];
-
-    // if (listId === source.droppableId) {
-    //   list = [
-    //     ...list.slice(0, source.index),
-    //     ...list.slice(source.index + 1),
-    //   ];
-    // }
-
-    // if (listId === destination.droppableId) {
-    //   list = [
-    //     ...list.slice(0, destination.index),
-    //     movedQuote,
-    //     ...list.slice(destination.index),
-    //   ];
-    // }
 
     newQuotes[listId] = list;
   });
