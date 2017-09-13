@@ -501,7 +501,6 @@ describe('DraggableDimensionPublisher', () => {
               ...base,
               top: 10,
             });
-            execute({ droppableRect, scrollParentRect });
             const expected = getDroppableDimension({
               id: droppableId,
               clientRect: getClientRect({
@@ -509,6 +508,8 @@ describe('DraggableDimensionPublisher', () => {
                 top: 10,
               }),
             });
+
+            execute({ droppableRect, scrollParentRect });
 
             // the trimmed rect
             expect(publish).toBeCalledWith(expected);
@@ -520,7 +521,6 @@ describe('DraggableDimensionPublisher', () => {
               ...base,
               left: 10,
             });
-            execute({ droppableRect, scrollParentRect });
             const expected = getDroppableDimension({
               id: droppableId,
               clientRect: getClientRect({
@@ -528,6 +528,8 @@ describe('DraggableDimensionPublisher', () => {
                 left: 10,
               }),
             });
+
+            execute({ droppableRect, scrollParentRect });
 
             // the trimmed rect
             expect(publish).toBeCalledWith(expected);
@@ -539,7 +541,6 @@ describe('DraggableDimensionPublisher', () => {
               ...base,
               right: 90,
             });
-            execute({ droppableRect, scrollParentRect });
             const expected = getDroppableDimension({
               id: droppableId,
               clientRect: getClientRect({
@@ -547,6 +548,8 @@ describe('DraggableDimensionPublisher', () => {
                 right: 90,
               }),
             });
+
+            execute({ droppableRect, scrollParentRect });
 
             // the trimmed rect
             expect(publish).toBeCalledWith(expected);
@@ -558,7 +561,6 @@ describe('DraggableDimensionPublisher', () => {
               ...base,
               bottom: 90,
             });
-            execute({ droppableRect, scrollParentRect });
             const expected = getDroppableDimension({
               id: droppableId,
               clientRect: getClientRect({
@@ -566,6 +568,8 @@ describe('DraggableDimensionPublisher', () => {
                 bottom: 90,
               }),
             });
+
+            execute({ droppableRect, scrollParentRect });
 
             // the trimmed rect
             expect(publish).toBeCalledWith(expected);
@@ -579,11 +583,12 @@ describe('DraggableDimensionPublisher', () => {
               ...base,
               top: -10,
             });
-            execute({ droppableRect, scrollParentRect });
             const expected = getDroppableDimension({
               id: droppableId,
               clientRect: getClientRect(base),
             });
+
+            execute({ droppableRect, scrollParentRect });
 
             // the trimmed rect
             expect(publish).toBeCalledWith(expected);
@@ -595,11 +600,12 @@ describe('DraggableDimensionPublisher', () => {
               ...base,
               left: -10,
             });
-            execute({ droppableRect, scrollParentRect });
             const expected = getDroppableDimension({
               id: droppableId,
               clientRect: getClientRect(base),
             });
+
+            execute({ droppableRect, scrollParentRect });
 
             // the trimmed rect
             expect(publish).toBeCalledWith(expected);
@@ -611,11 +617,12 @@ describe('DraggableDimensionPublisher', () => {
               ...base,
               right: 110,
             });
-            execute({ droppableRect, scrollParentRect });
             const expected = getDroppableDimension({
               id: droppableId,
               clientRect: getClientRect(base),
             });
+
+            execute({ droppableRect, scrollParentRect });
 
             // the trimmed rect
             expect(publish).toBeCalledWith(expected);
@@ -627,11 +634,12 @@ describe('DraggableDimensionPublisher', () => {
               ...base,
               bottom: 110,
             });
-            execute({ droppableRect, scrollParentRect });
             const expected = getDroppableDimension({
               id: droppableId,
               clientRect: getClientRect(base),
             });
+
+            execute({ droppableRect, scrollParentRect });
 
             // the trimmed rect
             expect(publish).toBeCalledWith(expected);
