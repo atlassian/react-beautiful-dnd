@@ -16,7 +16,7 @@ const Wrapper = styled.div`
   background-color: ${({ isDraggingOver }) => (isDraggingOver ? colors.blue.lighter : colors.blue.light)};
   display: flex;
   flex-direction: column;
-  opacity: ${({ isDropDisabled }) => (isDropDisabled ? 0.5 : 1)};
+  opacity: ${({ isDropDisabled }) => (isDropDisabled ? 0.5 : 'inherit')};
   padding: ${grid}px;
   padding-bottom: 0;
   transition: background-color 0.1s ease, opacity 0.1s ease;
@@ -24,7 +24,7 @@ const Wrapper = styled.div`
   width: 250px;
 `;
 
-const DropZone = styled.div`
+const Container = styled.div`
   /* stop the list collapsing when empty */
   min-height: 250px;
 `;
@@ -32,19 +32,6 @@ const DropZone = styled.div`
 const ScrollContainer = styled.div`
   overflow: auto;
   max-height: 800px;
-`;
-
-const Container = styled.div`
-  /* flex child */
-  flex-grow: 1;
-
-  /* flex parent */
-  display: flex;
-  flex-direction: column;
-`;
-
-const Title = styled.h4`
-  margin-bottom: ${grid}px;
 `;
 
 export default class QuoteList extends Component {
@@ -57,30 +44,27 @@ export default class QuoteList extends Component {
     style?: Object,
   |}
 
-  renderBoard = (dropProvided: DroppableProvided) => {
-    const { listId, listType, quotes } = this.props;
+  renderQuotes = (dropProvided: DroppableProvided) => {
+    const { listType, quotes } = this.props;
 
     return (
-      <Container>
-        <Title>{listId}</Title>
-        <DropZone innerRef={dropProvided.innerRef}>
-          {quotes.map((quote: Quote) => (
-            <Draggable key={quote.id} draggableId={quote.id} type={listType}>
-              {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
-                <div>
-                  <QuoteItem
-                    key={quote.id}
-                    quote={quote}
-                    isDragging={dragSnapshot.isDragging}
-                    provided={dragProvided}
-                  />
-                  {dragProvided.placeholder}
-                </div>
+      <Container innerRef={dropProvided.innerRef}>
+        {quotes.map((quote: Quote) => (
+          <Draggable key={quote.id} draggableId={quote.id} type={listType}>
+            {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
+              <div>
+                <QuoteItem
+                  key={quote.id}
+                  quote={quote}
+                  isDragging={dragSnapshot.isDragging}
+                  provided={dragProvided}
+                />
+                {dragProvided.placeholder}
+              </div>
             )}
-            </Draggable>
+          </Draggable>
           ))}
-          {dropProvided.placeholder}
-        </DropZone>
+        {dropProvided.placeholder}
       </Container>
     );
   }
@@ -98,10 +82,10 @@ export default class QuoteList extends Component {
           >
             {internalScroll ? (
               <ScrollContainer>
-                {this.renderBoard(dropProvided)}
+                {this.renderQuotes(dropProvided)}
               </ScrollContainer>
             ) : (
-              this.renderBoard(dropProvided)
+              this.renderQuotes(dropProvided)
             )}
           </Wrapper>
         )}

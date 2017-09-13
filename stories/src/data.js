@@ -96,12 +96,14 @@ export const quotes: Quote[] = [
   },
 ];
 
+let idCount: number = 0;
+
 export const getQuotes = (count: number): Quote[] =>
-  Array.from({ length: count }, (v, k) => k).map((val: number) => {
+  Array.from({ length: count }, (v, k) => k).map(() => {
     const random: Quote = quotes[Math.floor(Math.random() * quotes.length)];
 
     const custom: Quote = {
-      id: `${val}`,
+      id: `quote-${idCount++}`,
       content: random.content,
       author: random.author,
     };
@@ -110,11 +112,11 @@ export const getQuotes = (count: number): Quote[] =>
   });
 
 export const getAuthors = (count: number): Author[] =>
-  Array.from({ length: count }, (v, k) => k).map((val: number) => {
+  Array.from({ length: count }, (v, k) => k).map(() => {
     const random: Author = authors[Math.floor(Math.random() * authors.length)];
 
     const custom: Author = {
-      id: `${val}`,
+      id: `author-${idCount++}`,
       name: random.name,
       avatarUrl: random.avatarUrl,
       url: random.url,

@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import styled, { injectGlobal } from 'styled-components';
 import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src/';
-import QuoteList from './quote-list';
+import AuthorList from '../primatives/author-list';
 import { colors, grid } from '../constants';
 import reorder from '../reorder';
 import type { Quote } from '../types';
@@ -121,18 +121,15 @@ export default class QuoteApp extends Component {
         onDragEnd={this.onDragEnd}
       >
         <Root>
-          <QuoteList
-            listId="alpha"
+          <AuthorList
             listType="card"
             quotes={quotes.alpha}
           />
-          <QuoteList
-            listId="beta"
+          <AuthorList
             listType="card"
             quotes={quotes.beta}
           />
-          <QuoteList
-            listId="gamma"
+          <AuthorList
             listType="card"
             internalScroll
             quotes={quotes.gamma}

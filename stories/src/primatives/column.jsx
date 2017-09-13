@@ -4,8 +4,8 @@ import styled from 'styled-components';
 import { grid, colors, borderRadius } from '../constants';
 import { Draggable } from '../../../src/';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../src/';
-import CardList from '../vertical/quote-list';
-import type { AuthorWithQuotes } from '../types';
+import QuoteList from './quote-list';
+import type { Quote } from '../types';
 
 const Wrapper = styled.div`
   display: flex;
@@ -42,12 +42,15 @@ const Title = styled.h4`
 
 export default class Column extends Component {
   props: {|
-    column: AuthorWithQuotes
+    title: string,
+    quotes: Quote[]
   |}
+
   render() {
-    const column: AuthorWithQuotes = this.props.column;
+    const title: string = this.props.title;
+    const quotes: Quote[] = this.props.quotes;
     return (
-      <Draggable draggableId={column.author.id} type="AUTHOR">
+      <Draggable draggableId={title} type="COLUMN">
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
           <Wrapper>
             <Container
@@ -59,13 +62,13 @@ export default class Column extends Component {
                   isDragging={snapshot.isDragging}
                   {...provided.dragHandleProps}
                 >
-                  {column.author.name}
+                  {title}
                 </Title>
               </Header>
-              <CardList
-                listId={column.author.id}
+              <QuoteList
+                listId={title}
                 listType="QUOTE"
-                quotes={column.quotes}
+                quotes={quotes}
               />
             </Container>
             {provided.placeholder}

@@ -43,25 +43,19 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
-const Title = styled.h4`
-  margin-bottom: ${grid}px;
-`;
-
-export default class QuoteList extends Component {
+export default class AuthorList extends Component {
   props: {|
-    listId: string,
     quotes: Quote[],
     listType?: string,
     style?: Object,
-    internalScroll ?: boolean,
+    internalScroll?: boolean,
   |}
 
   renderBoard = (dropProvided: DroppableProvided) => {
-    const { listId, listType, quotes } = this.props;
+    const { listType, quotes } = this.props;
 
     return (
       <Container>
-        <Title>{listId}</Title>
         <DropZone innerRef={dropProvided.innerRef}>
           {quotes.map((quote: Quote) => (
             <Draggable key={quote.id} draggableId={quote.id} type={listType}>

@@ -2,9 +2,9 @@
 import React, { Component } from 'react';
 import styled, { injectGlobal } from 'styled-components';
 import { action } from '@storybook/addon-actions';
-import Column from './column';
+import Column from '../primatives/column';
 import { colors } from '../constants';
-import reorder, { reorderGroup } from '../reorder';
+import reorder from '../reorder';
 import { DragDropContext, Droppable } from '../../../src/';
 import type {
   DropResult,
@@ -12,7 +12,7 @@ import type {
   DraggableLocation,
   DroppableProvided,
 } from '../../../src/';
-import type { AuthorWithQuotes } from '../types';
+import type { Quote, QuoteMap } from '../types';
 
 const isDraggingClassName = 'is-dragging';
 
@@ -29,11 +29,12 @@ const Container = styled.div`
 `;
 
 type Props = {|
-  initial: AuthorWithQuotes[],
+  initial: QuoteMap,
 |}
 
 type State = {|
-  columns: AuthorWithQuotes[],
+  columns: QuoteMap,
+  ordered: string[],
 |}
 
 export default class Board extends Component {
@@ -43,6 +44,7 @@ export default class Board extends Component {
 
   state: State = {
     columns: this.props.initial,
+    ordered: Object.keys(this.props.initial),
   }
   /* eslint-enable react/sort-comp */
 
@@ -76,27 +78,53 @@ export default class Board extends Component {
     const destination: DraggableLocation = result.destination;
 
     // reordering column
-    if (result.type === 'AUTHOR') {
-      const columns: AuthorWithQuotes[] = reorder(
-        this.state.columns,
+    if (result.type === 'COLUMN') {
+      const ordered: string[] = reorder(
+        this.state.ordered,
         source.index,
         destination.index
       );
 
       this.setState({
-        columns,
+        ordered,
       });
 
       return;
     }
 
-    const columns: ?AuthorWithQuotes[] = reorderGroup(
-      this.state.columns, result
-    );
+    const current: Quote[] = [...this.state.columns[source.droppableId]];
+    console.log('current', current);
 
-    if (!columns) {
+    // reordering within the same column
+    if (source.droppableId === destination.droppableId) {
+      const reordered: Quote[] = reorder(
+        current,
+        source.index,
+        destination.index,
+      );
+      const columns: QuoteMap = {
+        ...this.state.columns,
+        [source.droppableId]: reordered,
+      };
+      this.setState({
+        columns,
+      });
       return;
     }
+
+    const target: Quote = current[source.index];
+    const next: Quote[] = [...this.state.columns[destination.droppableId]];
+
+    // remove from original
+    current.splice(source.index, 1);
+    // insert into next
+    next.splice(destination.index, 0, target);
+
+    const columns: QuoteMap = {
+      ...this.state.columns,
+      [source.droppableId]: current,
+      [destination.droppableId]: next,
+    };
 
     this.setState({
       columns,
@@ -104,6 +132,9 @@ export default class Board extends Component {
   }
 
   render() {
+    const columns: QuoteMap = this.state.columns;
+    const ordered: string[] = this.state.ordered;
+
     return (
       <DragDropContext
         onDragStart={this.onDragStart}
@@ -111,13 +142,17 @@ export default class Board extends Component {
       >
         <Droppable
           droppableId="board"
-          type="AUTHOR"
+          type="COLUMN"
           direction="horizontal"
         >
           {(provided: DroppableProvided) => (
             <Container innerRef={provided.innerRef}>
-              {this.state.columns.map((column: AuthorWithQuotes) => (
-                <Column key={column.author.id} column={column} />
+              {ordered.map((key: string) => (
+                <Column
+                  key={key}
+                  title={key}
+                  quotes={columns[key]}
+                />
               ))}
             </Container>
           )}

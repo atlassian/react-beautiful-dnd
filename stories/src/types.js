@@ -23,3 +23,7 @@ export type AuthorWithQuotes = {|
   author: Author,
   quotes: Quote[],
 |}
+
+export type QuoteMap = {
+  [key: string]: Quote[]
+}

@@ -21,16 +21,7 @@ const Container = styled.div`
   user-select: none;
   transition: background-color 0.1s ease;
   width: 250px;
-`;
-
-const AddCard = styled.button`
-  margin-bottom: ${grid}px;
-  margin-top: ${grid}px;
-  outline: none;
-  border: none;
-  font-size: 14px;
-  text-align: left;
-  padding: ${grid * 1.5}px ${grid}px;
+  min-height: 250px;
 `;
 
 export default class QuoteList extends Component {
@@ -67,9 +58,6 @@ export default class QuoteList extends Component {
               </Draggable>
             ))}
             {dropProvided.placeholder}
-            <AddCard>
-              Add a card...
-            </AddCard>
           </Container>
         )}
       </Droppable>
