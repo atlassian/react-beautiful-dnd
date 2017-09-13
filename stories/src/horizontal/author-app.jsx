@@ -85,6 +85,7 @@ export default class AuthorApp extends Component {
       >
         <Root>
           <AuthorList
+            listId="AUTHOR"
             internalScroll={this.props.internalScroll}
             quotes={this.state.quotes}
           />

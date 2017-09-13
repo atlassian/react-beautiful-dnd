@@ -46,8 +46,8 @@ const Container = styled.div`
 export default class AuthorList extends Component {
   props: {|
     quotes: Quote[],
+    listId: string,
     listType?: string,
-    style?: Object,
     internalScroll?: boolean,
   |}
 
@@ -78,15 +78,12 @@ export default class AuthorList extends Component {
   }
 
   render() {
-    const { listId, listType, internalScroll, style } = this.props;
+    const { listId, listType, internalScroll } = this.props;
 
     return (
       <Droppable droppableId={listId} type={listType} direction="horizontal">
         {(dropProvided: DroppableProvided, dropSnapshot: DroppableStateSnapshot) => (
-          <Wrapper
-            style={style}
-            isDraggingOver={dropSnapshot.isDraggingOver}
-          >
+          <Wrapper isDraggingOver={dropSnapshot.isDraggingOver}>
             {internalScroll ? (
               <ScrollContainer>
                 {this.renderBoard(dropProvided)}

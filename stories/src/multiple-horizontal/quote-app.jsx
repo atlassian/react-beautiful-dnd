@@ -122,15 +122,18 @@ export default class QuoteApp extends Component {
       >
         <Root>
           <AuthorList
-            listType="card"
+            listId="alpha"
+            listType="CARD"
             quotes={quotes.alpha}
           />
           <AuthorList
-            listType="card"
+            listId="beta"
+            listType="CARD"
             quotes={quotes.beta}
           />
           <AuthorList
-            listType="card"
+            listId="gamma"
+            listType="CARD"
             internalScroll
             quotes={quotes.gamma}
           />
