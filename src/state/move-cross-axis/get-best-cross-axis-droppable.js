@@ -1,10 +1,10 @@
 // @flow
 import { closest } from '../position';
-import { droppableMapToList } from '../dimension-map-to-list';
 import isWithin from '../is-within';
 import type {
   Axis,
   Position,
+  DroppableId,
   DimensionFragment,
   DroppableDimension,
   DroppableDimensionMap,
@@ -39,7 +39,8 @@ export default ({
 }: GetBestDroppableArgs): ?DroppableDimension => {
   const axis: Axis = source.axis;
 
-  const candidates: DroppableDimension[] = droppableMapToList(droppables)
+  const candidates: DroppableDimension[] = Object.keys(droppables)
+    .map((id: DroppableId) => droppables[id])
     // Remove the source droppable from the list
     .filter((droppable: DroppableDimension): boolean => droppable !== source)
     // Remove any options that are not enabled

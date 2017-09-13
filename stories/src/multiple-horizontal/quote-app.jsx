@@ -5,6 +5,7 @@ import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src/';
 import QuoteList from './quote-list';
 import { colors, grid } from '../constants';
+import reorder from '../reorder';
 import type { Quote } from '../types';
 import type { DropResult, DragStart, DraggableLocation } from '../../../src/types';
 
@@ -54,25 +55,41 @@ const resolveDrop = (quotes: GroupedQuotes,
 
   const movedQuote = quotes[source.droppableId][source.index];
 
-  Object.entries(newQuotes).forEach(([listId, listQuotes]: [string, Quote[]]) => {
-    let newListQuotes = [...listQuotes];
+  Object.keys(newQuotes).forEach((listId: string) => {
+    const list: Quote[] = (() => {
+      const previous: Quote[] = newQuotes[listId];
 
-    if (listId === source.droppableId) {
-      newListQuotes = [
-        ...newListQuotes.slice(0, source.index),
-        ...newListQuotes.slice(source.index + 1),
-      ];
-    }
+      // moving within the same list
+      if (listId === source.droppableId) {
+        return reorder(previous, source.index, destination.index);
+      }
 
-    if (listId === destination.droppableId) {
-      newListQuotes = [
-        ...newListQuotes.slice(0, destination.index),
+      // moving to new list
+      return [
+        ...previous.slice(0, destination.index),
         movedQuote,
-        ...newListQuotes.slice(destination.index),
+        ...previous.slice(destination.index),
       ];
-    }
+    })();
 
-    newQuotes[listId] = newListQuotes;
+    // let list: Quote[] = [...newQuotes[listId]];
+
+    // if (listId === source.droppableId) {
+    //   list = [
+    //     ...list.slice(0, source.index),
+    //     ...list.slice(source.index + 1),
+    //   ];
+    // }
+
+    // if (listId === destination.droppableId) {
+    //   list = [
+    //     ...list.slice(0, destination.index),
+    //     movedQuote,
+    //     ...list.slice(destination.index),
+    //   ];
+    // }
+
+    newQuotes[listId] = list;
   });
 
   return newQuotes;

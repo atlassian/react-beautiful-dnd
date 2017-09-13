@@ -5,11 +5,10 @@ import {
 } from '../../../src/state/dimension';
 // eslint-disable-next-line no-duplicate-imports
 import getDragImpact from '../../../src/state/get-drag-impact';
-import noImpact from '../../../src/state/no-impact';
+import noImpact, { noMovement } from '../../../src/state/no-impact';
 import getClientRect from '../../../src/state/get-client-rect';
 import getDroppableWithDraggables from '../../utils/get-droppable-with-draggables';
 import { add, patch } from '../../../src/state/position';
-import { noMovement } from '../../../src/state/no-impact';
 import type {
   WithinDroppable,
   DroppableId,

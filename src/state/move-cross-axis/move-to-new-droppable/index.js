@@ -5,7 +5,6 @@ import { patch } from '../../position';
 import type { Result } from '../move-cross-axis-types';
 import type {
   Position,
-  DragImpact,
   DraggableDimension,
   DroppableDimension,
   DraggableLocation,

@@ -16,34 +16,33 @@ import type {
   InitialDrag,
 } from '../types';
 import noImpact from './no-impact';
-import getNewHomeClientOffset from './get-new-home-client-offset';
+import getNewHomeClientCenter from './get-new-home-client-center';
 import { add, subtract, isEqual } from './position';
 
 const origin: Position = { x: 0, y: 0 };
 
-type ScrollDiffResult = {|
-  droppable: Position,
-  window: Position,
-|}
-
-const getScrollDiff = (
+type ScrollDiffArgs = {|
   initial: InitialDrag,
   current: CurrentDrag,
-  droppable: DroppableDimension
-): ScrollDiffResult => {
+  droppable: ?DroppableDimension
+|}
+
+const getScrollDiff = ({
+  initial,
+  current,
+  droppable,
+}: ScrollDiffArgs): Position => {
   const windowScrollDiff: Position = subtract(
     initial.windowScroll,
     current.windowScroll
   );
-  const droppableScrollDiff: Position = subtract(
+
+  const droppableScrollDiff: Position = droppable ? subtract(
     droppable.scroll.initial,
     droppable.scroll.current
-  );
+  ) : origin;
 
-  return {
-    window: windowScrollDiff,
-    droppable: droppableScrollDiff,
-  };
+  return add(windowScrollDiff, droppableScrollDiff);
 };
 
 export type RequestDimensionsAction = {|
@@ -309,11 +308,10 @@ export const drop = () =>
     }
 
     const { impact, initial, current } = state.drag;
-    const sourceDroppable: DroppableDimension =
-      state.dimension.droppable[initial.source.droppableId];
-    const destinationDroppable: ?DroppableDimension = impact.destination ?
+    const droppable: ?DroppableDimension = impact.destination ?
       state.dimension.droppable[impact.destination.droppableId] :
       null;
+    const draggable: DraggableDimension = state.dimension.draggable[current.id];
 
     const result: DropResult = {
       draggableId: current.id,
@@ -322,22 +320,16 @@ export const drop = () =>
       destination: impact.destination,
     };
 
-    const scrollDiff = getScrollDiff(
-      initial,
-      current,
-      destinationDroppable || sourceDroppable,
-    );
-
-    const newHomeOffset: Position = getNewHomeClientOffset({
+    const newCenter: Position = getNewHomeClientCenter({
       movement: impact.movement,
-      clientOffset: current.client.offset,
-      pageOffset: current.page.offset,
-      droppableScrollDiff: scrollDiff.droppable,
-      windowScrollDiff: scrollDiff.window,
+      draggable,
       draggables: state.dimension.draggable,
-      destinationDroppable,
-      draggableId: current.id,
+      destination: droppable,
     });
+
+    const clientOffset: Position = subtract(newCenter, draggable.client.withMargin.center);
+    const scrollDiff: Position = getScrollDiff({ initial, current, droppable });
+    const newHomeOffset: Position = add(clientOffset, scrollDiff);
 
     // Do not animate if you do not need to.
     // This will be the case if either you are dragging with a
@@ -394,11 +386,11 @@ export const cancel = () =>
       return;
     }
 
-    const scrollDiff = getScrollDiff(initial, current, droppable);
+    const scrollDiff: Position = getScrollDiff({ initial, current, droppable });
 
     dispatch(animateDrop({
       trigger: 'CANCEL',
-      newHomeOffset: add(scrollDiff.droppable, scrollDiff.window),
+      newHomeOffset: scrollDiff,
       impact: noImpact,
       result,
     }));
