@@ -32,6 +32,7 @@ This library is still fairly new and so there is a relatively small feature set.
 
 - Vertical lists ↕
 - Horizontal lists ↔
+- Movement between lists (▤ ↔ ▤)
 - Multiple independent lists on the one page
 - Mouse 🐭 and **keyboard 🎹** dragging
 - Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
@@ -214,11 +215,23 @@ Currently the keyboard handling is hard coded. This might be changed in the futu
 
 - **tab** <kbd>tab ↹</kbd> - standard browser tabbing will navigate through the `Droppable`'s. The library does not do anything fancy with `tab` while users are selecting. Once a drag has started, `tab` is blocked for the duration of the drag.
 - **spacebar** <kbd>space</kbd> - lift a focused `Draggable`. Also, drop a dragging `Draggable` where the drag was started with a `spacebar`.
-- **Up arrow** <kbd>↑</kbd> - move a `Draggable` that is dragging backward in a vertical list
-- **Down arrow** <kbd>↓</kbd> - move a `Draggable` that is dragging forward in a vertical list
-- **Left arrow** <kbd>←</kbd> - move a `Draggable` that is dragging backward in a horizontal list
-- **Right arrow** <kbd>→</kbd> - move a `Draggable` that is dragging forward in a horizontal list
 - **Escape** <kbd>esc</kbd> - cancel an existing drag - regardless of whether the user is dragging with the keyboard or mouse.
+
+##### Keyboard dragging movement
+
+**Currently within a vertical list**
+
+- **Up arrow** <kbd>↑</kbd> - move a `Draggable` upwards in a `Droppable`
+- **Down arrow** <kbd>↓</kbd> - move a `Draggable` downwards in a `Droppable`
+- **Right arrow** <kbd>→</kbd> - move a `Draggable` to a `Droppable` to the *right* of the current `Droppable` (move to new list)
+- **Left arrow** <kbd>←</kbd> - move a `Draggable` to a `Droppable` to the *left* of the current `Droppable` (move to new list)
+
+**Currently within a horizontal list**
+
+- **Up arrow** <kbd>↑</kbd> - move a `Draggable` to a `Droppable` to *above* the current `Droppable` (move to new list)
+- **Down arrow** <kbd>↓</kbd> - move a `Draggable` to a `Droppable` to *below* the current `Droppable` (move to new list)
+- **Right arrow** <kbd>→</kbd> - move a `Draggable` to the *right* in the current `Droppable`
+- **Left arrow** <kbd>←</kbd> - move a `Draggable` to the *left* in the current `Droppable`
 
 #### Limitations of keyboard dragging
 
@@ -549,7 +562,7 @@ Users will be able to scroll a scroll container while dragging by using their tr
 
 **Keyboard dragging limitation**
 
-Getting keyboard dragging to work with scroll containers is quite difficult. Currently there is a limitation: you cannot drag with a keyboard beyond the visible edge of a scroll container. This limitation could be removed if we introduced auto scrolling.
+Getting keyboard dragging to work with scroll containers is quite difficult. Currently there is a limitation: you cannot drag with a keyboard beyond the visible edge of a scroll container. This limitation could be removed if we introduced auto scrolling. Scrolling a container with a mouse during a keyboard drag will cancel the drag.
 
 ## `Draggable`
 
