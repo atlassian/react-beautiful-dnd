@@ -34,10 +34,10 @@ This library is still fairly new and so there is a relatively small feature set.
 - Horizontal lists ↔
 - Multiple independent lists on the one page
 - Mouse 🐭 and **keyboard 🎹** dragging
-- Independent nested lists (list can be a child of another list, but you cannot drag items from the parent list into a child list)
-- Flexible height items (the draggable items can have different heights)
-- Custom drag handle (you can drag a whole item by just a part of it)
-- The vertical list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
+- Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
+- Flexible item sizes - the draggable items can have different heights (vertical) or widths (horizontal))
+- Custom drag handle - you can drag a whole item by just a part of it
+- A droppable list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Server side rendering compatible
 
 ## Basic usage example
