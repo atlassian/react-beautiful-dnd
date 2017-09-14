@@ -35,6 +35,7 @@ type Props = {|
 type State = {|
   columns: QuoteMap,
   ordered: string[],
+  lastMovedQuoteId: ?string,
 |}
 
 export default class Board extends Component {
@@ -45,6 +46,7 @@ export default class Board extends Component {
   state: State = {
     columns: this.props.initial,
     ordered: Object.keys(this.props.initial),
+    lastMovedQuoteId: null,
   }
   /* eslint-enable react/sort-comp */
 
@@ -62,6 +64,10 @@ export default class Board extends Component {
     publishOnDragStart(initial);
     // $ExpectError - body wont be null
     document.body.classList.add(isDraggingClassName);
+
+    this.setState({
+      lastMovedQuoteId: null,
+    });
   }
 
   onDragEnd = (result: DropResult) => {
@@ -93,7 +99,6 @@ export default class Board extends Component {
     }
 
     const current: Quote[] = [...this.state.columns[source.droppableId]];
-    console.log('current', current);
 
     // reordering within the same column
     if (source.droppableId === destination.droppableId) {
@@ -128,6 +133,7 @@ export default class Board extends Component {
 
     this.setState({
       columns,
+      lastMovedQuoteId: source.droppableId,
     });
   }
 
@@ -152,6 +158,7 @@ export default class Board extends Component {
                   key={key}
                   title={key}
                   quotes={columns[key]}
+                  autoFocusQuoteId={this.state.lastMovedQuoteId}
                 />
               ))}
             </Container>

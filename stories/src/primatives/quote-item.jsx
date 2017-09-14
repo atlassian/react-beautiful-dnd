@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { borderRadius, colors, grid } from '../constants';
 import type { Quote } from '../types';
@@ -9,7 +10,10 @@ type Props = {
   quote: Quote,
   isDragging: boolean,
   provided: DraggableProvided,
+  autoFocus?: boolean,
 }
+
+type HTMLElement = any;
 
 const Container = styled.a`
 border-radius: ${borderRadius}px;
@@ -89,6 +93,16 @@ flex-grow: 1;
 
 export default class QuoteItem extends Component {
   props: Props
+
+  componentDidMount() {
+    if (!this.props.autoFocus) {
+      return;
+    }
+
+    // eslint-disable-next-line react/no-find-dom-node
+    const node: HTMLElement = ReactDOM.findDOMNode(this);
+    node.focus();
+  }
 
   render() {
     const { quote, isDragging, provided } = this.props;

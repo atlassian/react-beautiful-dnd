@@ -172,7 +172,7 @@ export type DropResult = {|
   type: TypeId,
   source: DraggableLocation,
   // may not have any destination (drag to nowhere)
-  destination: ?DraggableLocation
+  destination: ?DraggableLocation,
 |}
 
 export type DragState = {|

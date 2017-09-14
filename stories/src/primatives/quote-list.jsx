@@ -41,7 +41,8 @@ export default class QuoteList extends Component {
     internalScroll?: boolean,
     isDropDisabled?: boolean,
     quotes: Quote[],
-    style?: Object,
+    // may not be provided - and might be null
+    autoFocusQuoteId?: ?string,
   |}
 
   renderQuotes = (dropProvided: DroppableProvided) => {
@@ -58,6 +59,7 @@ export default class QuoteList extends Component {
                   quote={quote}
                   isDragging={dragSnapshot.isDragging}
                   provided={dragProvided}
+                  autoFocus={Boolean(this.props.autoFocusQuoteId)}
                 />
                 {dragProvided.placeholder}
               </div>

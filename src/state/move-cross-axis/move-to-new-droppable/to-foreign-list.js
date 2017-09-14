@@ -38,7 +38,7 @@ export default ({
     // based on the axis of the destination
 
     const newCenter: Position = moveToEdge({
-      source: draggable.page.withMargin,
+      source: draggable.page.withoutMargin,
       sourceEdge: 'start',
       destination: droppable.page.withMargin,
       destinationEdge: 'start',
@@ -75,6 +75,7 @@ export default ({
   }
 
   const newCenter: Position = moveToEdge({
+    // Aligning to visible top of draggable
     source: draggable.page.withoutMargin,
     sourceEdge: 'start',
     destination: target.page.withMargin,

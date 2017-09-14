@@ -43,7 +43,8 @@ const Title = styled.h4`
 export default class Column extends Component {
   props: {|
     title: string,
-    quotes: Quote[]
+    quotes: Quote[],
+    autoFocusQuoteId: ?string,
   |}
 
   render() {
@@ -69,6 +70,7 @@ export default class Column extends Component {
                 listId={title}
                 listType="QUOTE"
                 quotes={quotes}
+                autoFocusQuoteId={this.props.autoFocusQuoteId}
               />
             </Container>
             {provided.placeholder}

@@ -400,7 +400,7 @@ describe('move to new droppable', () => {
 
           it('should move to the start edge of the droppable', () => {
             const expected: Position = moveToEdge({
-              source: inHome1.page.withMargin,
+              source: inHome1.page.withoutMargin,
               sourceEdge: 'start',
               destination: foreign.page.withMargin,
               destinationEdge: 'start',

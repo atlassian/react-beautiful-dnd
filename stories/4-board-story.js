@@ -10,9 +10,9 @@ const inProgress: string = 'In progress';
 const done: string = 'Done';
 
 const columns: QuoteMap = {
-  [todo]: getQuotes(0),
+  [todo]: getQuotes(7),
   [inProgress]: getQuotes(3),
-  [done]: getQuotes(4),
+  [done]: getQuotes(0),
 };
 
 storiesOf('board', module)
