@@ -25,6 +25,7 @@ describe('move to new droppable', () => {
   });
 
   const noMargin: Spacing = { top: 0, left: 0, bottom: 0, right: 0 };
+  const padding: Spacing = { top: 2, left: 3, bottom: 4, right: 5 };
 
   [vertical, horizontal].forEach((axis: Axis) => {
     describe(`on ${axis.direction} axis`, () => {
@@ -39,6 +40,7 @@ describe('move to new droppable', () => {
       const home: DroppableDimension = getDroppableDimension({
         id: 'home',
         direction: axis.direction,
+        padding,
         clientRect: getClientRect({
           [axis.start]: 0,
           [axis.crossAxisStart]: crossAxisStart,
@@ -301,6 +303,7 @@ describe('move to new droppable', () => {
 
         const foreign: DroppableDimension = getDroppableDimension({
           id: 'foreign',
+          padding,
           direction: axis.direction,
           clientRect: getClientRect({
             [axis.start]: 0,
@@ -398,11 +401,11 @@ describe('move to new droppable', () => {
             throw new Error('invalid test setup');
           }
 
-          it('should move to the start edge of the droppable', () => {
+          it('should move to the start edge of the droppable (including its padding)', () => {
             const expected: Position = moveToEdge({
               source: inHome1.page.withoutMargin,
               sourceEdge: 'start',
-              destination: foreign.page.withMargin,
+              destination: foreign.page.withMarginAndPadding,
               destinationEdge: 'start',
               destinationAxis: foreign.axis,
             });

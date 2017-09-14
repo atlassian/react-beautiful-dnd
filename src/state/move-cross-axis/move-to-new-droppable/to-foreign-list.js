@@ -40,7 +40,7 @@ export default ({
     const newCenter: Position = moveToEdge({
       source: draggable.page.withoutMargin,
       sourceEdge: 'start',
-      destination: droppable.page.withMargin,
+      destination: droppable.page.withMarginAndPadding,
       destinationEdge: 'start',
       destinationAxis: axis,
     });
