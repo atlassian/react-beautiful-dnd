@@ -1,1 +1,2 @@
-export default from './placeholder';
+// @flow
+export { default } from './placeholder';
