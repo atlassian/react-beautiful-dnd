@@ -69,8 +69,8 @@ export const makeSelector = (): Selector => {
       }
 
       const placeholder: Placeholder = memoizedPlaceholder(
-        draggable.page.withMargin.width,
-        draggable.page.withMargin.height,
+        draggable.client.withoutMargin.width,
+        draggable.client.withoutMargin.height,
       );
 
       return placeholder;
