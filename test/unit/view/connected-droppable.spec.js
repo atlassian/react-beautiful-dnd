@@ -22,6 +22,7 @@ import type {
   DraggableLocation,
   InitialDragLocation,
   CurrentDragLocation,
+  Spacing,
 } from '../../../src/types';
 import type {
   MapProps,
@@ -60,9 +61,14 @@ type DragArgs = {|
   isDraggingOver: false | 'home' | 'foreign'
 |}
 
+const margin: Spacing = {
+  top: 1, left: 2, bottom: 3, right: 4,
+};
+
 const draggable: DraggableDimension = getDraggableDimension({
   id: draggableId,
   droppableId: homeDroppableId,
+  margin,
   clientRect: getClientRect({
     top: 100,
     left: 0,
