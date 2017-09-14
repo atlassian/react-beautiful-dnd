@@ -3,11 +3,11 @@ import React, { Component } from 'react';
 import { mount } from 'enzyme';
 import DraggableDimensionPublisher from '../../../src/view/draggable-dimension-publisher/draggable-dimension-publisher';
 import { getDraggableDimension } from '../../../src/state/dimension';
-// eslint-disable-next-line no-duplicate-imports
-import type { ClientRect, Margin } from '../../../src/state/dimension';
 import getClientRect from '../../../src/state/get-client-rect';
 import setWindowScroll from '../../utils/set-window-scroll';
 import type {
+  Spacing,
+  ClientRect,
   Position,
   DraggableId,
   DroppableId,
@@ -117,7 +117,7 @@ describe('DraggableDimensionPublisher', () => {
   });
 
   it('should consider any margins when calculating dimensions', () => {
-    const margin: Margin = {
+    const margin: Spacing = {
       top: 10,
       right: 30,
       bottom: 40,

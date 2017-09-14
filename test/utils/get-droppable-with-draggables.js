@@ -6,21 +6,15 @@ import type {
   DraggableDimensionMap,
   DroppableDimension,
   Direction,
+  Spacing,
 } from '../../src/types';
 import getClientRect from '../../src/state/get-client-rect';
-
-type ClientRectSubset = {|
-  top: number,
-  left: number,
-  right: number,
-  bottom: number,
-|}
 
 type Args = {|
   direction?: Direction,
   droppableId?: DroppableId,
-  droppableRect: ClientRectSubset,
-  draggableRects: ClientRectSubset[],
+  droppableRect: Spacing,
+  draggableRects: Spacing[],
 |};
 
 export type Result = {

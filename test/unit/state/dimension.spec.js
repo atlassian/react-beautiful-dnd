@@ -4,9 +4,9 @@ import {
   getDroppableDimension,
 } from '../../../src/state/dimension';
 import { vertical, horizontal } from '../../../src/state/axis';
-// eslint-disable-next-line no-duplicate-imports
-import type { Margin, ClientRect } from '../../../src/state/dimension';
 import type {
+  ClientRect,
+  Spacing,
   DraggableId,
   DroppableId,
   Position,
@@ -26,7 +26,7 @@ const clientRect: ClientRect = {
   width: 90,
   height: 80,
 };
-const margin: Margin = {
+const margin: Spacing = {
   top: 1, right: 2, bottom: 3, left: 4,
 };
 const windowScroll: Position = {

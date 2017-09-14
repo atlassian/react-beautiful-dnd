@@ -13,6 +13,22 @@ export type Position = {|
   y: number,
 |};
 
+export type Spacing = {|
+  top: number,
+  right: number,
+  bottom: number,
+  left: number,
+|}
+
+export type ClientRect = {|
+  top: number,
+  right: number,
+  bottom: number,
+  left: number,
+  width: number,
+  height: number,
+|}
+
 export type Direction = 'horizontal' | 'vertical';
 
 export type VerticalAxis = {|
@@ -42,12 +58,7 @@ export type HorizontalAxis = {|
 export type Axis = VerticalAxis | HorizontalAxis
 
 export type DimensionFragment = {|
-  top: number,
-  left: number,
-  bottom: number,
-  right: number,
-  width: number,
-  height: number,
+  ...ClientRect,
   center: Position,
 |}
 
@@ -78,11 +89,15 @@ export type DroppableDimension = {|
   client: {|
     withMargin: DimensionFragment,
     withoutMargin: DimensionFragment,
+    // the area in which content presses up against
+    withMarginAndPadding: DimensionFragment,
   |},
   // relative to the whole page
   page: {|
     withMargin: DimensionFragment,
     withoutMargin: DimensionFragment,
+    // the area in which content presses up against
+    withMarginAndPadding: DimensionFragment,
   |},
 |}
 export type DraggableLocation = {|

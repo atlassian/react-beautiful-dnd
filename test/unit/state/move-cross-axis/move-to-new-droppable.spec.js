@@ -6,9 +6,9 @@ import getClientRect from '../../../../src/state/get-client-rect';
 import moveToEdge from '../../../../src/state/move-to-edge';
 import { patch } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
-import type { Margin } from '../../../../src/state/dimension';
 import type {
   Axis,
+  Spacing,
   DragImpact,
   DraggableDimension,
   DroppableDimension,
@@ -24,7 +24,7 @@ describe('move to new droppable', () => {
     console.error.mockRestore();
   });
 
-  const noMargin: Margin = { top: 0, left: 0, bottom: 0, right: 0 };
+  const noMargin: Spacing = { top: 0, left: 0, bottom: 0, right: 0 };
 
   [vertical, horizontal].forEach((axis: Axis) => {
     describe(`on ${axis.direction} axis`, () => {

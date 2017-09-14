@@ -8,8 +8,13 @@ import getClientRect from '../../state/get-client-rect';
 import { getDroppableDimension } from '../../state/dimension';
 import getClosestScrollable from '../get-closest-scrollable';
 // eslint-disable-next-line no-duplicate-imports
-import type { Margin, ClientRect } from '../../state/dimension';
-import type { DroppableDimension, Position, HTMLElement } from '../../types';
+import type {
+  DroppableDimension,
+  Position,
+  HTMLElement,
+  ClientRect,
+  Spacing,
+} from '../../types';
 import type { Props } from './droppable-dimension-publisher-types';
 
 const origin: Position = { x: 0, y: 0 };
@@ -43,11 +48,17 @@ export default class DroppableDimensionPublisher extends Component {
 
     // keeping it simple and always using the margin of the droppable
 
-    const margin: Margin = {
+    const margin: Spacing = {
       top: parseInt(style.marginTop, 10),
       right: parseInt(style.marginRight, 10),
       bottom: parseInt(style.marginBottom, 10),
       left: parseInt(style.marginLeft, 10),
+    };
+    const padding: Spacing = {
+      top: parseInt(style.paddingTop, 10),
+      right: parseInt(style.paddingRight, 10),
+      bottom: parseInt(style.paddingBottom, 10),
+      left: parseInt(style.paddingLeft, 10),
     };
 
     const clientRect: ClientRect = (() => {
@@ -85,6 +96,7 @@ export default class DroppableDimensionPublisher extends Component {
       direction,
       clientRect,
       margin,
+      padding,
       windowScroll: getWindowScrollPosition(),
       scroll,
       isEnabled: !isDropDisabled,
