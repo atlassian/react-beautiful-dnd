@@ -2,9 +2,9 @@
 import React, { Component } from 'react';
 import styled, { injectGlobal } from 'styled-components';
 import { action } from '@storybook/addon-actions';
-import Column from '../primatives/column';
+import Column from './column';
 import { colors } from '../constants';
-import reorder from '../reorder';
+import reorder, { reorderQuoteMap } from '../reorder';
 import { DragDropContext, Droppable } from '../../../src/';
 import type {
   DropResult,
@@ -12,7 +12,7 @@ import type {
   DraggableLocation,
   DroppableProvided,
 } from '../../../src/';
-import type { Quote, QuoteMap } from '../types';
+import type { QuoteMap } from '../types';
 
 const isDraggingClassName = 'is-dragging';
 
@@ -35,7 +35,7 @@ type Props = {|
 type State = {|
   columns: QuoteMap,
   ordered: string[],
-  lastMovedQuoteId: ?string,
+  autoFocusQuoteId: ?string,
 |}
 
 export default class Board extends Component {
@@ -46,7 +46,7 @@ export default class Board extends Component {
   state: State = {
     columns: this.props.initial,
     ordered: Object.keys(this.props.initial),
-    lastMovedQuoteId: null,
+    autoFocusQuoteId: null,
   }
   /* eslint-enable react/sort-comp */
 
@@ -66,7 +66,7 @@ export default class Board extends Component {
     document.body.classList.add(isDraggingClassName);
 
     this.setState({
-      lastMovedQuoteId: null,
+      autoFocusQuoteId: null,
     });
   }
 
@@ -98,42 +98,15 @@ export default class Board extends Component {
       return;
     }
 
-    const current: Quote[] = [...this.state.columns[source.droppableId]];
-
-    // reordering within the same column
-    if (source.droppableId === destination.droppableId) {
-      const reordered: Quote[] = reorder(
-        current,
-        source.index,
-        destination.index,
-      );
-      const columns: QuoteMap = {
-        ...this.state.columns,
-        [source.droppableId]: reordered,
-      };
-      this.setState({
-        columns,
-      });
-      return;
-    }
-
-    const target: Quote = current[source.index];
-    const next: Quote[] = [...this.state.columns[destination.droppableId]];
-
-    // remove from original
-    current.splice(source.index, 1);
-    // insert into next
-    next.splice(destination.index, 0, target);
-
-    const columns: QuoteMap = {
-      ...this.state.columns,
-      [source.droppableId]: current,
-      [destination.droppableId]: next,
-    };
+    const data = reorderQuoteMap({
+      quoteMap: this.state.columns,
+      source,
+      destination,
+    });
 
     this.setState({
-      columns,
-      lastMovedQuoteId: source.droppableId,
+      columns: data.quoteMap,
+      autoFocusQuoteId: data.autoFocusQuoteId,
     });
   }
 
@@ -158,7 +131,7 @@ export default class Board extends Component {
                   key={key}
                   title={key}
                   quotes={columns[key]}
-                  autoFocusQuoteId={this.state.lastMovedQuoteId}
+                  autoFocusQuoteId={this.state.autoFocusQuoteId}
                 />
               ))}
             </Container>

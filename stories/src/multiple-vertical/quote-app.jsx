@@ -5,8 +5,9 @@ import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src/';
 import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
-import reorder from '../reorder';
-import type { Quote } from '../types';
+import { reorderQuoteMap } from '../reorder';
+import type { ReorderQuoteMapResult } from '../reorder';
+import type { QuoteMap } from '../types';
 import type { DropResult, DragStart, DraggableLocation } from '../../../src/types';
 
 const publishOnDragStart = action('onDragStart');
@@ -34,53 +35,11 @@ const PushDown = styled.div`
 
 const isDraggingClassName = 'is-dragging';
 
-/* eslint-disable react/no-unused-prop-types */
-type GroupedQuotes = {
-  alpha: Quote[],
-  beta: Quote[],
-  gamma: Quote[],
-  delta: Quote[],
-}
-
 type Props = {|
-  initial: GroupedQuotes,
+  initial: QuoteMap,
 |}
 
-type State = {|
-  disabledDroppable: ?string,
-  quotes: GroupedQuotes,
-|}
-
-const resolveDrop = (quotes: GroupedQuotes,
-  source: DraggableLocation,
-  destination: DraggableLocation
-): GroupedQuotes => {
-  const newQuotes: GroupedQuotes = { ...quotes };
-
-  const movedQuote = quotes[source.droppableId][source.index];
-
-  Object.keys(newQuotes).forEach((listId: string) => {
-    const list: Quote[] = (() => {
-      const previous: Quote[] = newQuotes[listId];
-
-      // moving within the same list
-      if (listId === source.droppableId) {
-        return reorder(previous, source.index, destination.index);
-      }
-
-      // moving to new list
-      return [
-        ...previous.slice(0, destination.index),
-        movedQuote,
-        ...previous.slice(destination.index),
-      ];
-    })();
-
-    newQuotes[listId] = list;
-  });
-
-  return newQuotes;
-};
+type State = ReorderQuoteMapResult
 
 export default class QuoteApp extends Component {
   /* eslint-disable react/sort-comp */
@@ -88,16 +47,16 @@ export default class QuoteApp extends Component {
   state: State
 
   state: State = {
-    disabledDroppable: null,
-    quotes: this.props.initial,
+    quoteMap: this.props.initial,
+    autoFocusQuoteId: null,
   };
   /* eslint-enable react/sort-comp */
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
-    this.setState({
-      disabledDroppable: this.getDisabledDroppable(initial.source.droppableId),
-    });
+    // this.setState({
+    //   disabledDroppable: this.getDisabledDroppable(initial.source.droppableId),
+    // });
     // $ExpectError - body could be null?
     document.body.classList.add(isDraggingClassName);
   }
@@ -107,16 +66,19 @@ export default class QuoteApp extends Component {
     // $ExpectError - body could be null?
     document.body.classList.remove(isDraggingClassName);
 
-    const quotes = result.destination ? (
-      resolveDrop(this.state.quotes, result.source, result.destination)
-    ) : (
-      this.state.quotes
-    );
+    // dropped nowhere
+    if (!result.destination) {
+      return;
+    }
 
-    this.setState({
-      disabledDroppable: null,
-      quotes,
-    });
+    const source: DraggableLocation = result.source;
+    const destination: DraggableLocation = result.destination;
+
+    this.setState(reorderQuoteMap({
+      quoteMap: this.state.quoteMap,
+      source,
+      destination,
+    }));
   }
 
   componentDidMount() {
@@ -129,6 +91,7 @@ export default class QuoteApp extends Component {
     `;
   }
 
+  // TODO
   getDisabledDroppable = (sourceDroppable: ?string) => {
     if (!sourceDroppable) {
       return null;
@@ -142,7 +105,8 @@ export default class QuoteApp extends Component {
   }
 
   render() {
-    const { quotes, disabledDroppable } = this.state;
+    const { quoteMap, autoFocusQuoteId } = this.state;
+    const disabledDroppable = 'TODO';
 
     return (
       <DragDropContext
@@ -152,36 +116,44 @@ export default class QuoteApp extends Component {
         <Root>
           <Column>
             <QuoteList
+              title="alpha"
               listId="alpha"
               internalScroll
               listType="card"
               isDropDisabled={disabledDroppable === 'alpha'}
-              quotes={quotes.alpha}
+              quotes={quoteMap.alpha}
+              autoFocusQuoteId={autoFocusQuoteId}
             />
           </Column>
           <Column>
             <PushDown />
             <QuoteList
+              title="beta"
               listId="beta"
               listType="card"
               isDropDisabled={disabledDroppable === 'beta'}
-              quotes={quotes.beta}
+              quotes={quoteMap.beta}
+              autoFocusQuoteId={autoFocusQuoteId}
             />
             <QuoteList
+              title="gamma"
               listId="gamma"
               listType="card"
               internalScroll
               isDropDisabled={disabledDroppable === 'gamma'}
-              quotes={quotes.gamma}
+              quotes={quoteMap.gamma}
+              autoFocusQuoteId={autoFocusQuoteId}
             />
           </Column>
           <Column>
             <QuoteList
+              title="delta"
               listId="delta"
               listType="card"
               internalScroll
               isDropDisabled={disabledDroppable === 'delta'}
-              quotes={quotes.delta}
+              quotes={quoteMap.delta}
+              autoFocusQuoteId={autoFocusQuoteId}
             />
           </Column>
         </Root>

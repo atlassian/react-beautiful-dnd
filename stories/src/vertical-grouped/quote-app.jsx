@@ -3,10 +3,10 @@ import React, { Component } from 'react';
 import styled, { injectGlobal } from 'styled-components';
 import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src/';
-import QuoteList from '../vertical/quote-list';
+import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
-import { reorderGroup } from '../reorder';
-import type { AuthorWithQuotes } from '../types';
+import { reorderQuoteMap } from '../reorder';
+import type { QuoteMap } from '../types';
 import type { DropResult, DragStart } from '../../../src/types';
 
 const publishOnDragStart = action('onDragStart');
@@ -40,11 +40,11 @@ const Title = styled.h4`
 const isDraggingClassName = 'is-dragging';
 
 type Props = {|
-  initial: AuthorWithQuotes[],
+  initial: QuoteMap,
 |}
 
 type State = {|
-  groups: AuthorWithQuotes[],
+  quoteMap: QuoteMap,
 |}
 
 export default class QuoteApp extends Component {
@@ -53,7 +53,7 @@ export default class QuoteApp extends Component {
   state: State
 
   state: State = {
-    groups: this.props.initial,
+    quoteMap: this.props.initial,
   };
   /* eslint-enable react/sort-comp */
 
@@ -68,17 +68,17 @@ export default class QuoteApp extends Component {
     // $ExpectError - body could be null?
     document.body.classList.remove(isDraggingClassName);
 
-    const groups: ?AuthorWithQuotes[] = reorderGroup(
-      this.state.groups, result
-    );
-
-    if (!groups) {
+    if (!result.destination) {
       return;
     }
 
-    this.setState({
-      groups,
+    const { quoteMap } = reorderQuoteMap({
+      quoteMap: this.state.quoteMap,
+      source: result.source,
+      destination: result.destination,
     });
+
+    this.setState({ quoteMap });
   }
 
   componentDidMount() {
@@ -92,7 +92,7 @@ export default class QuoteApp extends Component {
   }
 
   render() {
-    const { groups } = this.state;
+    const { quoteMap } = this.state;
 
     return (
       <DragDropContext
@@ -101,13 +101,13 @@ export default class QuoteApp extends Component {
       >
         <Root>
           <Column>
-            {groups.map((group: AuthorWithQuotes) => (
-              <Group key={group.author.id}>
-                <Title>{group.author.name}</Title>
+            {Object.keys(quoteMap).map((key: string) => (
+              <Group key={key}>
+                <Title>{key}</Title>
                 <QuoteList
-                  quotes={group.quotes}
-                  listId={group.author.id}
-                  listType={group.author.id}
+                  quotes={quoteMap[key]}
+                  listId={key}
+                  listType={key}
                 />
               </Group>
             ))}

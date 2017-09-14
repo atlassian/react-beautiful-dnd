@@ -49,6 +49,7 @@ export default class AuthorList extends Component {
     listId: string,
     listType?: string,
     internalScroll?: boolean,
+    autoFocusQuoteId?: ?string,
   |}
 
   renderBoard = (dropProvided: DroppableProvided) => {
@@ -65,6 +66,7 @@ export default class AuthorList extends Component {
                     author={quote.author}
                     provided={dragProvided}
                     snapshot={dragSnapshot}
+                    autoFocus={this.props.autoFocusQuoteId === quote.id}
                   />
                   {dragProvided.placeholder}
                 </div>

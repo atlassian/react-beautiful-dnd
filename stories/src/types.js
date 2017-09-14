@@ -19,11 +19,6 @@ export type Dragging = {|
   location: DraggableLocation,
 |}
 
-export type AuthorWithQuotes = {|
-  author: Author,
-  quotes: Quote[],
-|}
-
 export type QuoteMap = {
   [key: string]: Quote[]
 }

@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { Droppable, Draggable } from '../../../src';
 import QuoteItem from '../primatives/quote-item';
 import { grid, colors } from '../constants';
+import Title from '../primatives/title';
 import type { Quote } from '../types';
 import type {
   DroppableProvided,
@@ -24,7 +25,7 @@ const Wrapper = styled.div`
   width: 250px;
 `;
 
-const Container = styled.div`
+const DropZone = styled.div`
   /* stop the list collapsing when empty */
   min-height: 250px;
 `;
@@ -34,39 +35,49 @@ const ScrollContainer = styled.div`
   max-height: 800px;
 `;
 
+const Container = styled.div``;
+
 export default class QuoteList extends Component {
   props: {|
     listId: string,
+    quotes: Quote[],
+    title?: string,
     listType?: string,
     internalScroll?: boolean,
-    isDropDisabled?: boolean,
-    quotes: Quote[],
+    isDropDisabled ?: boolean,
+    style?: Object,
     // may not be provided - and might be null
     autoFocusQuoteId?: ?string,
   |}
 
   renderQuotes = (dropProvided: DroppableProvided) => {
     const { listType, quotes } = this.props;
+    const title = this.props.title ? (
+      <Title>{this.props.title}</Title>
+    ) : null;
 
     return (
-      <Container innerRef={dropProvided.innerRef}>
-        {quotes.map((quote: Quote) => (
-          <Draggable key={quote.id} draggableId={quote.id} type={listType}>
-            {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
-              <div>
-                <QuoteItem
-                  key={quote.id}
-                  quote={quote}
-                  isDragging={dragSnapshot.isDragging}
-                  provided={dragProvided}
-                  autoFocus={Boolean(this.props.autoFocusQuoteId)}
-                />
-                {dragProvided.placeholder}
-              </div>
+      <Container>
+        {title}
+        <DropZone innerRef={dropProvided.innerRef}>
+          {quotes.map((quote: Quote) => (
+            <Draggable key={quote.id} draggableId={quote.id} type={listType}>
+              {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
+                <div>
+                  <QuoteItem
+                    key={quote.id}
+                    quote={quote}
+                    isDragging={dragSnapshot.isDragging}
+                    provided={dragProvided}
+                    autoFocus={this.props.autoFocusQuoteId === quote.id}
+                  />
+                  {dragProvided.placeholder}
+                </div>
             )}
-          </Draggable>
+            </Draggable>
           ))}
-        {dropProvided.placeholder}
+          {dropProvided.placeholder}
+        </DropZone>
       </Container>
     );
   }

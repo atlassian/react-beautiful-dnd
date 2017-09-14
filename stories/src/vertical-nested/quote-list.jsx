@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Droppable, Draggable } from '../../../src';
 import QuoteItem from '../primatives/quote-item';
+import Title from '../primatives/title';
 import { grid, colors } from '../constants';
 import type { Quote } from '../types';
 import type { NestedQuoteList } from './types';
@@ -33,10 +34,6 @@ const NestedContainer = Container.extend`
   &:hover {
     cursor: grab;
   }
-`;
-
-const Title = styled.h4`
-  margin-bottom: ${grid}px;
 `;
 
 export default class QuoteList extends Component {

@@ -1,5 +1,5 @@
 // @flow
-import type { Author, Quote, AuthorWithQuotes } from './types';
+import type { Author, Quote, QuoteMap } from './types';
 
 const jake: Author = {
   id: '1',
@@ -128,8 +128,8 @@ export const getAuthors = (count: number): Author[] =>
 const getByAuthor = (author: Author, items: Quote[]): Quote[] =>
   items.filter((quote: Quote) => quote.author === author);
 
-export const authorWithQuotes: AuthorWithQuotes[] =
-  authors.map((author: Author): AuthorWithQuotes => ({
-    author,
-    quotes: getByAuthor(author, quotes),
-  }));
+export const authorQuoteMap: QuoteMap =
+  authors.reduce((previous: QuoteMap, author: Author) => ({
+    ...previous,
+    [author.name]: getByAuthor(author, quotes),
+  }), {});

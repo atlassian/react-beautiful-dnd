@@ -1,9 +1,12 @@
 // @flow
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { colors, grid } from '../constants';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../src/';
 import type { Author } from '../types';
+
+type HTMLElement = any;
 
 const Avatar = styled.img`
   width: 60px;
@@ -30,7 +33,18 @@ export default class AuthorItem extends Component {
     author: Author,
     provided: DraggableProvided,
     snapshot: DraggableStateSnapshot,
+    autoFocus?: boolean,
   |}
+
+  componentDidMount() {
+    if (!this.props.autoFocus) {
+      return;
+    }
+
+    // eslint-disable-next-line react/no-find-dom-node
+    const node: HTMLElement = ReactDOM.findDOMNode(this);
+    node.focus();
+  }
 
   render() {
     const author: Author = this.props.author;

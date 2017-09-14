@@ -5,9 +5,10 @@ import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src/';
 import AuthorList from '../primatives/author-list';
 import { colors, grid } from '../constants';
-import reorder from '../reorder';
-import type { Quote } from '../types';
-import type { DropResult, DragStart, DraggableLocation } from '../../../src/types';
+import { reorderQuoteMap } from '../reorder';
+import type { ReorderQuoteMapResult } from '../reorder';
+import type { QuoteMap } from '../types';
+import type { DropResult, DragStart } from '../../../src/types';
 
 const publishOnDragStart = action('onDragStart');
 const publishOnDragEnd = action('onDragEnd');
@@ -25,51 +26,11 @@ const Root = styled.div`
 
 const isDraggingClassName = 'is-dragging';
 
-/* eslint-disable react/no-unused-prop-types */
-type GroupedQuotes = {
-  alpha: Quote[],
-  beta: Quote[],
-  gamma: Quote[],
-}
-
 type Props = {|
-  initial: GroupedQuotes,
+  initial: QuoteMap,
 |}
 
-type State = {|
-  quotes: GroupedQuotes,
-|}
-
-const resolveDrop = (quotes: GroupedQuotes,
-  source: DraggableLocation,
-  destination: DraggableLocation
-): GroupedQuotes => {
-  const newQuotes: GroupedQuotes = { ...quotes };
-
-  const movedQuote = quotes[source.droppableId][source.index];
-
-  Object.keys(newQuotes).forEach((listId: string) => {
-    const list: Quote[] = (() => {
-      const previous: Quote[] = newQuotes[listId];
-
-      // moving within the same list
-      if (listId === source.droppableId) {
-        return reorder(previous, source.index, destination.index);
-      }
-
-      // moving to new list
-      return [
-        ...previous.slice(0, destination.index),
-        movedQuote,
-        ...previous.slice(destination.index),
-      ];
-    })();
-
-    newQuotes[listId] = list;
-  });
-
-  return newQuotes;
-};
+type State = ReorderQuoteMapResult;
 
 export default class QuoteApp extends Component {
   /* eslint-disable react/sort-comp */
@@ -77,7 +38,8 @@ export default class QuoteApp extends Component {
   state: State
 
   state: State = {
-    quotes: this.props.initial,
+    quoteMap: this.props.initial,
+    autoFocusQuoteId: null,
   };
   /* eslint-enable react/sort-comp */
 
@@ -97,9 +59,11 @@ export default class QuoteApp extends Component {
       return;
     }
 
-    const quotes = resolveDrop(this.state.quotes, result.source, result.destination);
-
-    this.setState({ quotes });
+    this.setState(reorderQuoteMap({
+      quoteMap: this.state.quoteMap,
+      source: result.source,
+      destination: result.destination,
+    }));
   }
 
   componentDidMount() {
@@ -113,7 +77,7 @@ export default class QuoteApp extends Component {
   }
 
   render() {
-    const { quotes } = this.state;
+    const { quoteMap, autoFocusQuoteId } = this.state;
 
     return (
       <DragDropContext
@@ -121,22 +85,15 @@ export default class QuoteApp extends Component {
         onDragEnd={this.onDragEnd}
       >
         <Root>
-          <AuthorList
-            listId="alpha"
-            listType="CARD"
-            quotes={quotes.alpha}
-          />
-          <AuthorList
-            listId="beta"
-            listType="CARD"
-            quotes={quotes.beta}
-          />
-          <AuthorList
-            listId="gamma"
-            listType="CARD"
-            internalScroll
-            quotes={quotes.gamma}
-          />
+          {Object.keys(quoteMap).map((key: string) => (
+            <AuthorList
+              key={key}
+              listId={key}
+              listType="CARD"
+              quotes={quoteMap[key]}
+              autoFocusQuoteId={autoFocusQuoteId}
+            />
+          ))}
         </Root>
       </DragDropContext>
     );

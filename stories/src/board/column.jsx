@@ -4,7 +4,8 @@ import styled from 'styled-components';
 import { grid, colors, borderRadius } from '../constants';
 import { Draggable } from '../../../src/';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../src/';
-import QuoteList from './quote-list';
+import QuoteList from '../primatives/quote-list';
+import Title from '../primatives/title';
 import type { Quote } from '../types';
 
 const Wrapper = styled.div`
@@ -30,14 +31,6 @@ const Header = styled.div`
   &:hover {
     background-color: ${colors.blue.lighter};
   }
-`;
-
-const Title = styled.h4`
-  padding: ${grid}px;
-  cursor: grab;
-  transition: background-color ease 0.2s;
-  flex-grow: 1;
-  user-select: none;
 `;
 
 export default class Column extends Component {
