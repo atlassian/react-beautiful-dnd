@@ -433,7 +433,7 @@ We try very hard to ensure that each `onDragStart` event is paired with a single
 
 **Dynamic hooks**
 
-Your *hook* functions will only be captured *once at start up*. Please do not change the function after that. This will be changed soon.
+Your *hook* functions will only be captured *once at start up*. Please do not change the function after that. This behaviour will be changed soon to allow dynamic hooks.
 
 ## `Droppable`
 
