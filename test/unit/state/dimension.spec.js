@@ -72,10 +72,10 @@ describe('dimension', () => {
 
       it('should return a portion that considers margins', () => {
         const rect: ClientRect = getClientRect({
-          top: clientRect.top + margin.top,
+          top: clientRect.top - margin.top,
           right: clientRect.right + margin.right,
           bottom: clientRect.bottom + margin.bottom,
-          left: clientRect.left + margin.left,
+          left: clientRect.left - margin.left,
         });
 
         const fragment: DimensionFragment = {
@@ -115,10 +115,10 @@ describe('dimension', () => {
 
       it('should return a portion that considers margins', () => {
         const rect: ClientRect = getClientRect({
-          top: clientRect.top + margin.top + windowScroll.y,
+          top: (clientRect.top - margin.top) + windowScroll.y,
           right: clientRect.right + margin.right + windowScroll.x,
           bottom: clientRect.bottom + margin.bottom + windowScroll.y,
-          left: clientRect.left + margin.left + windowScroll.x,
+          left: (clientRect.left - margin.left) + windowScroll.x,
         });
 
         const fragment: DimensionFragment = {
@@ -208,8 +208,8 @@ describe('dimension', () => {
 
       it('should return a portion that does consider margins', () => {
         const rect: ClientRect = getClientRect({
-          top: clientRect.top + margin.top,
-          left: clientRect.left + margin.left,
+          top: clientRect.top - margin.top,
+          left: clientRect.left - margin.left,
           bottom: clientRect.bottom + margin.bottom,
           right: clientRect.right + margin.right,
         });
@@ -229,8 +229,8 @@ describe('dimension', () => {
 
       it('should return a portion that considers margins and padding', () => {
         const rect: ClientRect = getClientRect({
-          top: clientRect.top + margin.top + padding.top,
-          left: clientRect.left + margin.left + padding.left,
+          top: clientRect.top - margin.top - padding.top,
+          left: clientRect.left - margin.left - padding.left,
           bottom: clientRect.bottom + margin.bottom + padding.bottom,
           right: clientRect.right + margin.right + padding.right,
         });
@@ -273,8 +273,8 @@ describe('dimension', () => {
 
       it('should return a portion that does consider margins', () => {
         const rect: ClientRect = getClientRect({
-          top: clientRect.top + windowScroll.y + margin.top,
-          left: clientRect.left + windowScroll.x + margin.left,
+          top: (clientRect.top + windowScroll.y) - margin.top,
+          left: (clientRect.left + windowScroll.x) - margin.left,
           bottom: clientRect.bottom + windowScroll.y + margin.bottom,
           right: clientRect.right + windowScroll.x + margin.right,
         });
@@ -294,8 +294,8 @@ describe('dimension', () => {
 
       it('should return a portion that considers margins and padding', () => {
         const rect: ClientRect = getClientRect({
-          top: clientRect.top + windowScroll.y + margin.top + padding.top,
-          left: clientRect.left + windowScroll.x + margin.left + padding.left,
+          top: (clientRect.top + windowScroll.y) - margin.top - padding.top,
+          left: (clientRect.left + windowScroll.x) - margin.left - padding.left,
           bottom: clientRect.bottom + windowScroll.y + margin.bottom + padding.bottom,
           right: clientRect.right + windowScroll.x + margin.right + padding.right,
         });
