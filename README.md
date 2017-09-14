@@ -1002,6 +1002,10 @@ The documentation for this library is also available in other languages:
 
 These translations are maintained by the community and are not reviewed or maintained by the maintainers of this library. Please raise issues on the respective translations if you would like to have them updated.
 
-## Author / maintainer
+## Author
 
 Alex Reardon - [@alexandereardon](https://twitter.com/alexandereardon) - areardon@atlassian.com
+
+## Other maintainers
+
+Jared Crowe - jcrowe@atlassian.com
