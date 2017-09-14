@@ -9,6 +9,8 @@ export type Callbacks = {|
   onWindowScroll: (diff: Position) => void,
   onMoveForward: () => void,
   onMoveBackward: () => void,
+  onCrossAxisMoveForward: () => void,
+  onCrossAxisMoveBackward: () => void,
   onDrop: () => void,
   onCancel: () => void,
 |}

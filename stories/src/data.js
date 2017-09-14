@@ -1,5 +1,5 @@
 // @flow
-import type { Author, Quote, AuthorWithQuotes } from './types';
+import type { Author, Quote, QuoteMap } from './types';
 
 const jake: Author = {
   id: '1',
@@ -79,14 +79,31 @@ export const quotes: Quote[] = [
     content: 'Don\'t you always call sweatpants \'give up on life pants,\' Jake?',
     author: finn,
   },
+  {
+    id: '10',
+    content: 'I should not have drunk that much tea!',
+    author: princess,
+  },
+  {
+    id: '11',
+    content: 'Please! I need the real you!',
+    author: princess,
+  },
+  {
+    id: '12',
+    content: 'Haven\'t slept for a solid 83 hours, but, yeah, I\'m good.',
+    author: princess,
+  },
 ];
 
+let idCount: number = 0;
+
 export const getQuotes = (count: number): Quote[] =>
-  Array.from({ length: count }, (v, k) => k).map((val: number) => {
+  Array.from({ length: count }, (v, k) => k).map(() => {
     const random: Quote = quotes[Math.floor(Math.random() * quotes.length)];
 
     const custom: Quote = {
-      id: `${val}`,
+      id: `quote-${idCount++}`,
       content: random.content,
       author: random.author,
     };
@@ -95,11 +112,11 @@ export const getQuotes = (count: number): Quote[] =>
   });
 
 export const getAuthors = (count: number): Author[] =>
-  Array.from({ length: count }, (v, k) => k).map((val: number) => {
+  Array.from({ length: count }, (v, k) => k).map(() => {
     const random: Author = authors[Math.floor(Math.random() * authors.length)];
 
     const custom: Author = {
-      id: `${val}`,
+      id: `author-${idCount++}`,
       name: random.name,
       avatarUrl: random.avatarUrl,
       url: random.url,
@@ -111,8 +128,8 @@ export const getAuthors = (count: number): Author[] =>
 const getByAuthor = (author: Author, items: Quote[]): Quote[] =>
   items.filter((quote: Quote) => quote.author === author);
 
-export const authorWithQuotes: AuthorWithQuotes[] =
-  authors.map((author: Author): AuthorWithQuotes => ({
-    author,
-    quotes: getByAuthor(author, quotes),
-  }));
+export const authorQuoteMap: QuoteMap =
+  authors.reduce((previous: QuoteMap, author: Author) => ({
+    ...previous,
+    [author.name]: getByAuthor(author, quotes),
+  }), {});

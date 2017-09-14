@@ -4,11 +4,17 @@ import invariant from 'invariant';
 import rafScheduler from 'raf-schd';
 import memoizeOne from 'memoize-one';
 import getWindowScrollPosition from '../get-window-scroll-position';
+import getClientRect from '../../state/get-client-rect';
 import { getDroppableDimension } from '../../state/dimension';
 import getClosestScrollable from '../get-closest-scrollable';
 // eslint-disable-next-line no-duplicate-imports
-import type { Margin } from '../../state/dimension';
-import type { DroppableDimension, Position, HTMLElement } from '../../types';
+import type {
+  DroppableDimension,
+  Position,
+  HTMLElement,
+  ClientRect,
+  Spacing,
+} from '../../types';
 import type { Props } from './droppable-dimension-publisher-types';
 
 const origin: Position = { x: 0, y: 0 };
@@ -34,25 +40,66 @@ export default class DroppableDimensionPublisher extends Component {
   }
 
   getDimension = (): DroppableDimension => {
-    const { droppableId, direction, targetRef } = this.props;
+    const { droppableId, direction, isDropDisabled, targetRef } = this.props;
     invariant(targetRef, 'DimensionPublisher cannot calculate a dimension when not attached to the DOM');
 
+    const scroll: Position = this.getScrollOffset();
     const style = window.getComputedStyle(targetRef);
 
-    const margin: Margin = {
+    // keeping it simple and always using the margin of the droppable
+
+    const margin: Spacing = {
       top: parseInt(style.marginTop, 10),
       right: parseInt(style.marginRight, 10),
       bottom: parseInt(style.marginBottom, 10),
       left: parseInt(style.marginLeft, 10),
     };
+    const padding: Spacing = {
+      top: parseInt(style.paddingTop, 10),
+      right: parseInt(style.paddingRight, 10),
+      bottom: parseInt(style.paddingBottom, 10),
+      left: parseInt(style.paddingLeft, 10),
+    };
+
+    const clientRect: ClientRect = (() => {
+      const current: ClientRect = targetRef.getBoundingClientRect();
+
+      if (!this.closestScrollable) {
+        return current;
+      }
+
+      if (this.closestScrollable === targetRef) {
+        return current;
+      }
+
+      // We need to trim the dimension by the visible area of the scroll container
+
+      // Adjust the current dimension with the parents scroll
+      const top = current.top + scroll.y;
+      const bottom = current.bottom + scroll.y;
+      const left = current.left + scroll.x;
+      const right = current.right + scroll.x;
+
+      // Trim the dimension by the size of the parent
+
+      const parent: ClientRect = this.closestScrollable.getBoundingClientRect();
+      return getClientRect({
+        top: Math.max(top, parent.top),
+        left: Math.max(left, parent.left),
+        right: Math.min(right, parent.right),
+        bottom: Math.min(bottom, parent.bottom),
+      });
+    })();
 
     const dimension: DroppableDimension = getDroppableDimension({
       id: droppableId,
       direction,
-      clientRect: targetRef.getBoundingClientRect(),
+      clientRect,
       margin,
+      padding,
       windowScroll: getWindowScrollPosition(),
-      scroll: this.getScrollOffset(),
+      scroll,
+      isEnabled: !isDropDisabled,
     });
 
     return dimension;
@@ -105,28 +152,43 @@ export default class DroppableDimensionPublisher extends Component {
     this.closestScrollable.removeEventListener('scroll', this.onClosestScroll);
   }
 
-  // TODO: componentDidUpdate?
   componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.targetRef !== this.props.targetRef) {
-      if (this.isWatchingScroll) {
-        console.warn('changing targetRef while watching scroll!');
-        this.unwatchScroll();
-      }
-    }
-
     // Because the dimension publisher wraps children - it might render even when its props do
     // not change. We need to ensure that it does not publish when it should not.
-    const shouldPublish = !this.props.shouldPublish && nextProps.shouldPublish;
+
+    const shouldStartPublishing = !this.props.shouldPublish && nextProps.shouldPublish;
+    const alreadyPublishing = this.props.shouldPublish && nextProps.shouldPublish;
+    const stopPublishing = this.props.shouldPublish && !nextProps.shouldPublish;
 
     // should no longer watch for scrolling
-    if (!nextProps.shouldPublish) {
+    if (stopPublishing) {
       this.unwatchScroll();
       return;
     }
 
-    if (!shouldPublish) {
+    if (alreadyPublishing) {
+      // if ref changes and watching scroll - unwatch the scroll
+      if (nextProps.targetRef !== this.props.targetRef) {
+        if (this.isWatchingScroll) {
+          console.warn('changing targetRef while watching scroll!');
+          this.unwatchScroll();
+        }
+      }
+
+      // publish any changes to the disabled flag
+      if (nextProps.isDropDisabled !== this.props.isDropDisabled) {
+        this.props.updateIsEnabled(this.props.droppableId, !nextProps.isDropDisabled);
+      }
+
       return;
     }
+
+    // This will be the default when nothing is happening
+    if (!shouldStartPublishing) {
+      return;
+    }
+
+    // Need to start publishing
 
     // discovering the closest scrollable for a drag
     this.closestScrollable = getClosestScrollable(this.props.targetRef);

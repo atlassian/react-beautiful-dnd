@@ -1,7 +1,7 @@
 // @flow
 import getDraggablesInsideDroppable from '../../../src/state/get-draggables-inside-droppable';
 import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
-import getClientRect from '../../utils/get-client-rect';
+import getClientRect from '../../../src/state/get-client-rect';
 import type {
   DroppableId,
   DraggableDimension,
@@ -94,6 +94,4 @@ describe('get draggables inside a droppable', () => {
 
     expect(result).toEqual([inside1, inside2, inside3]);
   });
-
-  // other edge cases tested in get-inside-dimension
 });

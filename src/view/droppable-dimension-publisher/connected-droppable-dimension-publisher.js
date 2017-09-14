@@ -14,6 +14,7 @@ import DroppableDimensionPublisher from './droppable-dimension-publisher';
 import {
   publishDroppableDimension,
   updateDroppableDimensionScroll,
+  updateDroppableDimensionIsEnabled,
 } from '../../state/action-creators';
 
 const requestDimensionSelector =
@@ -43,6 +44,7 @@ const makeMapStateToProps = () => {
 const mapDispatchToProps: DispatchProps = {
   publish: publishDroppableDimension,
   updateScroll: updateDroppableDimensionScroll,
+  updateIsEnabled: updateDroppableDimensionIsEnabled,
 };
 
 export default connect(

@@ -20,7 +20,7 @@ import type {
   Provided as DragHandleProvided,
 } from '../drag-handle/drag-handle-types';
 import getCenterPosition from '../get-center-position';
-import Placeholder from './placeholder';
+import Placeholder from '../placeholder';
 import { droppableIdKey } from '../context-keys';
 import { add } from '../../state/position';
 import type {
@@ -69,7 +69,7 @@ export default class Draggable extends Component {
   constructor(props: Props, context: mixed) {
     super(props, context);
 
-    this.callbacks = {
+    const callbacks: DragHandleCallbacks = {
       onLift: this.onLift,
       onMove: this.onMove,
       onDrop: this.onDrop,
@@ -77,8 +77,12 @@ export default class Draggable extends Component {
       onKeyLift: this.onKeyLift,
       onMoveBackward: this.onMoveBackward,
       onMoveForward: this.onMoveForward,
+      onCrossAxisMoveForward: this.onCrossAxisMoveForward,
+      onCrossAxisMoveBackward: this.onCrossAxisMoveBackward,
       onWindowScroll: this.onWindowScroll,
     };
+
+    this.callbacks = callbacks;
   }
 
   // This should already be handled gracefully in DragHandle.
@@ -117,7 +121,10 @@ export default class Draggable extends Component {
       center: add(client.center, windowScroll),
     };
 
-    lift(draggableId, type, client, page, windowScroll);
+    // Allowing scrolling with a mouse when lifting with a mouse
+    const isScrollAllowed = true;
+
+    lift(draggableId, type, client, page, windowScroll, isScrollAllowed);
   }
 
   onKeyLift = () => {
@@ -138,8 +145,10 @@ export default class Draggable extends Component {
       selection: add(center, windowScroll),
       center: add(center, windowScroll),
     };
+    // not allowing scrolling with a mouse when lifting with a keyboard
+    const isScrollAllowed = false;
 
-    lift(draggableId, type, client, page, windowScroll);
+    lift(draggableId, type, client, page, windowScroll, isScrollAllowed);
   }
 
   onMove = (client: Position) => {
@@ -166,6 +175,16 @@ export default class Draggable extends Component {
   onMoveBackward = () => {
     this.throwIfCannotDrag();
     this.props.moveBackward(this.props.draggableId);
+  }
+
+  onCrossAxisMoveForward = () => {
+    this.throwIfCannotDrag();
+    this.props.crossAxisMoveForward(this.props.draggableId);
+  }
+
+  onCrossAxisMoveBackward = () => {
+    this.throwIfCannotDrag();
+    this.props.crossAxisMoveBackward(this.props.draggableId);
   }
 
   onWindowScroll = () => {

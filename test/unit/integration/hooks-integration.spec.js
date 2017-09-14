@@ -4,7 +4,7 @@ import { mount } from 'enzyme';
 import { DragDropContext, Draggable, Droppable } from '../../../src/';
 import { sloppyClickThreshold } from '../../../src/view/drag-handle/drag-handle';
 import { dispatchWindowMouseEvent, dispatchWindowKeyDownEvent, mouseEvent } from '../../utils/user-input-util';
-import getClientRect from '../../utils/get-client-rect';
+import getClientRect from '../../../src/state/get-client-rect';
 import type {
   Hooks,
   DraggableLocation,
@@ -48,6 +48,10 @@ describe('hooks integration', () => {
       marginRight: '0',
       marginBottom: '0',
       marginLeft: '0',
+      paddingTop: '0',
+      paddingRight: '0',
+      paddingBottom: '0',
+      paddingLeft: '0',
     }));
 
     return mount(
@@ -61,13 +65,16 @@ describe('hooks integration', () => {
               <h2>Droppable</h2>
               <Draggable draggableId={draggableId}>
                 {(draggableProvided: DraggableProvided) => (
-                  <div
-                    className="drag-handle"
-                    ref={draggableProvided.innerRef}
-                    style={draggableProvided.draggableStyle}
-                    {...draggableProvided.dragHandleProps}
-                  >
-                    <h4>Draggable</h4>
+                  <div>
+                    <div
+                      className="drag-handle"
+                      ref={draggableProvided.innerRef}
+                      style={draggableProvided.draggableStyle}
+                      {...draggableProvided.dragHandleProps}
+                    >
+                      <h4>Draggable</h4>
+                    </div>
+                    {draggableProvided.placeholder}
                   </div>
                 )}
               </Draggable>

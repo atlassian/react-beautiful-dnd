@@ -5,7 +5,9 @@ import type { TypeId,
   State,
   DraggableDimension,
   DroppableDimension,
+  DraggableDimensionMap,
   DroppableId,
+  DraggableId,
   DimensionState,
   DragImpact,
   DragState,
@@ -19,11 +21,13 @@ import type { TypeId,
   Position,
   WithinDroppable,
 } from '../types';
+import getInitialImpact from './get-initial-impact';
 import { add, subtract, negate } from './position';
 import getDragImpact from './get-drag-impact';
-import jumpToNextIndex from './jump-to-next-index';
-import type { JumpToNextResult } from './jump-to-next-index';
-import getDroppableOver from './get-droppable-over';
+import moveToNextIndex from './move-to-next-index/';
+import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
+import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';
+import moveCrossAxis from './move-cross-axis/';
 
 const noDimensions: DimensionState = {
   request: null,
@@ -112,6 +116,7 @@ const move = ({
   const current: CurrentDrag = {
     id: previous.id,
     type: previous.type,
+    isScrollAllowed: previous.isScrollAllowed,
     client,
     page,
     withinDroppable,
@@ -226,27 +231,27 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
-    const { id, type, client, page, windowScroll } = action.payload;
+    const { id, type, client, page, windowScroll, isScrollAllowed } = action.payload;
+    const draggables: DraggableDimensionMap = state.dimension.draggable;
+    const draggable: DraggableDimension = state.dimension.draggable[id];
+    const droppable: DroppableDimension = state.dimension.droppable[draggable.droppableId];
 
-    // no scroll diff yet so withinDroppable is just the center position
+    const impact: ?DragImpact = getInitialImpact({
+      draggable,
+      droppable,
+      draggables,
+    });
+
+    if (!impact || !impact.destination) {
+      console.error('invalid lift state');
+      return clean();
+    }
+
+    const source: DraggableLocation = impact.destination;
+
     const withinDroppable: WithinDroppable = {
       center: page.center,
     };
-
-    const impact: DragImpact = getDragImpact({
-      page: page.selection,
-      withinDroppable,
-      draggableId: id,
-      draggables: state.dimension.draggable,
-      droppables: state.dimension.droppable,
-    });
-
-    const source: ?DraggableLocation = impact.destination;
-
-    if (!source) {
-      console.error('lifting a draggable that is not inside a droppable');
-      return clean();
-    }
 
     const initial: InitialDrag = {
       source,
@@ -271,6 +276,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       },
       withinDroppable,
       windowScroll,
+      isScrollAllowed,
       shouldAnimate: false,
     };
 
@@ -293,6 +299,14 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
     if (state.drag == null) {
       console.error('invalid store state');
+      return clean();
+    }
+
+    // Currently not supporting container scrolling while dragging with a keyboard
+    // We do not store whether we are dragging with a keyboard in the state but this flag
+    // does this trick. Ideally this check would not exist.
+    // Kill the drag instantly
+    if (!state.drag.current.isScrollAllowed) {
       return clean();
     }
 
@@ -335,6 +349,41 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       clientSelection: client.selection,
       pageSelection: page.selection,
     });
+  }
+
+  if (action.type === 'UPDATE_DROPPABLE_DIMENSION_IS_ENABLED') {
+    if (!Object.keys(state.dimension.droppable).length) {
+      return state;
+    }
+
+    const { id, isEnabled } = action.payload;
+    const target = state.dimension.droppable[id];
+
+    if (!target) {
+      console.error('cannot update enabled flag on droppable that does not have a dimension');
+      return clean();
+    }
+
+    if (target.isEnabled === isEnabled) {
+      console.warn(`trying to set droppable isEnabled to ${isEnabled} but it is already ${isEnabled}`);
+      return state;
+    }
+
+    const updatedDroppableDimension = {
+      ...target,
+      isEnabled,
+    };
+
+    return {
+      ...state,
+      dimension: {
+        ...state.dimension,
+        droppable: {
+          ...state.dimension.droppable,
+          [id]: updatedDroppableDimension,
+        },
+      },
+    };
   }
 
   if (action.type === 'MOVE') {
@@ -396,12 +445,21 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const existing: DragState = state.drag;
     const isMovingForward: boolean = action.type === 'MOVE_FORWARD';
 
-    const result: ?JumpToNextResult = jumpToNextIndex({
+    if (!existing.impact.destination) {
+      console.error('cannot move if there is no previous destination');
+      return clean();
+    }
+
+    const droppable: DroppableDimension = state.dimension.droppable[
+      existing.impact.destination.droppableId
+    ];
+
+    const result: ?MoveToNextResult = moveToNextIndex({
       isMovingForward,
       draggableId: existing.current.id,
       impact: existing.impact,
+      droppable,
       draggables: state.dimension.draggable,
-      droppables: state.dimension.droppable,
     });
 
     // cannot move anyway (at the beginning or end of a list)
@@ -409,28 +467,63 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
-    const diff: Position = result.diff;
     const impact: DragImpact = result.impact;
-
-    const page: Position = add(existing.current.page.selection, diff);
-    const client: Position = add(existing.current.client.selection, diff);
-
-    // current limitation: cannot go beyond visible border of list
-    const droppableId: ?DroppableId = getDroppableOver(
-      page, state.dimension.droppable,
-    );
-
-    if (!droppableId) {
-      // eslint-disable-next-line no-console
-      console.info('currently not supporting moving a draggable outside the visibility bounds of a droppable');
-      return state;
-    }
+    const page: Position = result.pageCenter;
+    const client: Position = subtract(page, existing.current.windowScroll);
 
     return move({
       state,
       impact,
       clientSelection: client,
       pageSelection: page,
+      shouldAnimate: true,
+    });
+  }
+
+  if (action.type === 'CROSS_AXIS_MOVE_FORWARD' || action.type === 'CROSS_AXIS_MOVE_BACKWARD') {
+    if (state.phase !== 'DRAGGING') {
+      console.error('cannot move cross axis when not dragging');
+      return clean();
+    }
+
+    if (!state.drag) {
+      console.error('cannot move cross axis if there is no drag information');
+      return clean();
+    }
+
+    if (!state.drag.impact.destination) {
+      console.error('cannot move cross axis if not in a droppable');
+      return clean();
+    }
+
+    const current: CurrentDrag = state.drag.current;
+    const draggableId: DraggableId = current.id;
+    const center: Position = current.page.center;
+    const droppableId: DroppableId = state.drag.impact.destination.droppableId;
+    const home: DraggableLocation = state.drag.initial.source;
+
+    const result: ?MoveCrossAxisResult = moveCrossAxis({
+      isMovingForward: action.type === 'CROSS_AXIS_MOVE_FORWARD',
+      pageCenter: center,
+      draggableId,
+      droppableId,
+      home,
+      draggables: state.dimension.draggable,
+      droppables: state.dimension.droppable,
+    });
+
+    if (!result) {
+      return state;
+    }
+
+    const page: Position = result.pageCenter;
+    const client: Position = subtract(page, current.windowScroll);
+
+    return move({
+      state,
+      clientSelection: client,
+      pageSelection: page,
+      impact: result.impact,
       shouldAnimate: true,
     });
   }

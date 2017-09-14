@@ -16,34 +16,33 @@ import type {
   InitialDrag,
 } from '../types';
 import noImpact from './no-impact';
-import getNewHomeClientOffset from './get-new-home-client-offset';
+import getNewHomeClientCenter from './get-new-home-client-center';
 import { add, subtract, isEqual } from './position';
 
 const origin: Position = { x: 0, y: 0 };
 
-type ScrollDiffResult = {|
-  droppable: Position,
-  window: Position,
-|}
-
-const getScrollDiff = (
+type ScrollDiffArgs = {|
   initial: InitialDrag,
   current: CurrentDrag,
-  droppable: DroppableDimension
-): ScrollDiffResult => {
+  droppable: ?DroppableDimension
+|}
+
+const getScrollDiff = ({
+  initial,
+  current,
+  droppable,
+}: ScrollDiffArgs): Position => {
   const windowScrollDiff: Position = subtract(
     initial.windowScroll,
     current.windowScroll
   );
-  const droppableScrollDiff: Position = subtract(
+
+  const droppableScrollDiff: Position = droppable ? subtract(
     droppable.scroll.initial,
     droppable.scroll.current
-  );
+  ) : origin;
 
-  return {
-    window: windowScrollDiff,
-    droppable: droppableScrollDiff,
-  };
+  return add(windowScrollDiff, droppableScrollDiff);
 };
 
 export type RequestDimensionsAction = {|
@@ -72,6 +71,7 @@ export type CompleteLiftAction = {|
     client: InitialDragLocation,
     page: InitialDragLocation,
     windowScroll: Position,
+    isScrollAllowed: boolean,
   |}
 |}
 
@@ -80,6 +80,7 @@ const completeLift = (id: DraggableId,
   client: InitialDragLocation,
   page: InitialDragLocation,
   windowScroll: Position,
+  isScrollAllowed: boolean,
 ): CompleteLiftAction => ({
   type: 'COMPLETE_LIFT',
   payload: {
@@ -88,6 +89,7 @@ const completeLift = (id: DraggableId,
     client,
     page,
     windowScroll,
+    isScrollAllowed,
   },
 });
 
@@ -127,6 +129,23 @@ export const updateDroppableDimensionScroll =
     payload: {
       id,
       offset,
+    },
+  });
+
+export type UpdateDroppableDimensionIsEnabledAction = {|
+  type: 'UPDATE_DROPPABLE_DIMENSION_IS_ENABLED',
+  payload: {
+    id: DroppableId,
+    isEnabled: boolean,
+  }
+|}
+
+export const updateDroppableDimensionIsEnabled =
+  (id: DroppableId, isEnabled: boolean): UpdateDroppableDimensionIsEnabledAction => ({
+    type: 'UPDATE_DROPPABLE_DIMENSION_IS_ENABLED',
+    payload: {
+      id,
+      isEnabled,
     },
   });
 
@@ -187,6 +206,26 @@ export type MoveForwardAction = {|
 
 export const moveForward = (id: DraggableId): MoveForwardAction => ({
   type: 'MOVE_FORWARD',
+  payload: id,
+});
+
+export type CrossAxisMoveForwardAction = {|
+  type: 'CROSS_AXIS_MOVE_FORWARD',
+  payload: DraggableId
+|}
+
+export const crossAxisMoveForward = (id: DraggableId): CrossAxisMoveForwardAction => ({
+  type: 'CROSS_AXIS_MOVE_FORWARD',
+  payload: id,
+});
+
+export type CrossAxisMoveBackwardAction = {|
+  type: 'CROSS_AXIS_MOVE_BACKWARD',
+  payload: DraggableId
+|}
+
+export const crossAxisMoveBackward = (id: DraggableId): CrossAxisMoveBackwardAction => ({
+  type: 'CROSS_AXIS_MOVE_BACKWARD',
   payload: id,
 });
 
@@ -269,11 +308,10 @@ export const drop = () =>
     }
 
     const { impact, initial, current } = state.drag;
-    const sourceDroppable: DroppableDimension =
-      state.dimension.droppable[initial.source.droppableId];
-    const destinationDroppable: ?DroppableDimension = impact.destination ?
+    const droppable: ?DroppableDimension = impact.destination ?
       state.dimension.droppable[impact.destination.droppableId] :
       null;
+    const draggable: DraggableDimension = state.dimension.draggable[current.id];
 
     const result: DropResult = {
       draggableId: current.id,
@@ -282,21 +320,16 @@ export const drop = () =>
       destination: impact.destination,
     };
 
-    const scrollDiff = getScrollDiff(
-        initial,
-        current,
-        sourceDroppable,
-    );
-
-    const newHomeOffset: Position = getNewHomeClientOffset({
+    const newCenter: Position = getNewHomeClientCenter({
       movement: impact.movement,
-      clientOffset: current.client.offset,
-      pageOffset: current.page.offset,
-      droppableScrollDiff: scrollDiff.droppable,
-      windowScrollDiff: scrollDiff.window,
+      draggable,
       draggables: state.dimension.draggable,
-      axis: destinationDroppable ? destinationDroppable.axis : null,
+      destination: droppable,
     });
+
+    const clientOffset: Position = subtract(newCenter, draggable.client.withMargin.center);
+    const scrollDiff: Position = getScrollDiff({ initial, current, droppable });
+    const newHomeOffset: Position = add(clientOffset, scrollDiff);
 
     // Do not animate if you do not need to.
     // This will be the case if either you are dragging with a
@@ -353,11 +386,11 @@ export const cancel = () =>
       return;
     }
 
-    const scrollDiff = getScrollDiff(initial, current, droppable);
+    const scrollDiff: Position = getScrollDiff({ initial, current, droppable });
 
     dispatch(animateDrop({
       trigger: 'CANCEL',
-      newHomeOffset: add(scrollDiff.droppable, scrollDiff.window),
+      newHomeOffset: scrollDiff,
       impact: noImpact,
       result,
     }));
@@ -390,6 +423,7 @@ export type LiftAction = {|
     client: InitialDragLocation,
     page: InitialDragLocation,
     windowScroll: Position,
+    isScrollAllowed: boolean,
   |}
 |}
 
@@ -399,6 +433,7 @@ export const lift = (id: DraggableId,
   client: InitialDragLocation,
   page: InitialDragLocation,
   windowScroll: Position,
+  isScrollAllowed: boolean,
 ) => (dispatch: Dispatch, getState: Function) => {
   (() => {
     const state: State = getState();
@@ -436,7 +471,7 @@ export const lift = (id: DraggableId,
       if (newState.phase !== 'COLLECTING_DIMENSIONS') {
         return;
       }
-      dispatch(completeLift(id, type, client, page, windowScroll));
+      dispatch(completeLift(id, type, client, page, windowScroll, isScrollAllowed));
     });
   });
 };
@@ -449,6 +484,8 @@ export type Action = BeginLiftAction |
   MoveAction |
   MoveBackwardAction |
   MoveForwardAction |
+  CrossAxisMoveForwardAction |
+  CrossAxisMoveBackwardAction |
   DropAnimateAction |
   DropCompleteAction |
   CleanAction;

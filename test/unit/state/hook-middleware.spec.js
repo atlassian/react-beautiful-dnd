@@ -2,7 +2,7 @@
 import middleware from '../../../src/state/hook-middleware';
 import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
 import { clean } from '../../../src/state/action-creators';
-import getClientRect from '../../utils/get-client-rect';
+import getClientRect from '../../../src/state/get-client-rect';
 import noImpact from '../../../src/state/no-impact';
 import type {
   DraggableId,
@@ -124,6 +124,7 @@ const state = (() => {
         center: currentClient.center,
       },
       shouldAnimate: true,
+      isScrollAllowed: true,
     },
     impact: noImpact,
   };

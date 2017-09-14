@@ -1,25 +1,25 @@
 // @flow
 import memoizeOne from 'memoize-one';
 import type {
+  DraggableId,
   DraggableDimension,
   DroppableDimension,
   DraggableDimensionMap,
-  DraggableId,
 } from '../types';
 
 export default memoizeOne(
-  (droppableDimension: DroppableDimension,
-    draggableDimensions: DraggableDimensionMap,
+  (droppable: DroppableDimension,
+    draggables: DraggableDimensionMap,
   ): DraggableDimension[] =>
-    Object.keys(draggableDimensions)
-      .map((key: DraggableId): DraggableDimension => draggableDimensions[key])
-      .filter((dimension: DraggableDimension): boolean =>
-        dimension.droppableId === droppableDimension.id
-      )
+    Object.keys(draggables)
+      .map((id: DraggableId): DraggableDimension => draggables[id])
+      .filter((draggable: DraggableDimension): boolean => (
+        droppable.id === draggable.droppableId
+      ))
       // Dimensions are not guarenteed to be ordered in the same order as keys
       // So we need to sort them so they are in the correct order
-      .sort((a: DraggableDimension, b: DraggableDimension): number =>
-        a.page.withoutMargin.center[droppableDimension.axis.line] -
-        b.page.withoutMargin.center[droppableDimension.axis.line]
-      )
-  );
+      .sort((a: DraggableDimension, b: DraggableDimension): number => (
+        a.page.withoutMargin.center[droppable.axis.line] -
+        b.page.withoutMargin.center[droppable.axis.line]
+      ))
+);

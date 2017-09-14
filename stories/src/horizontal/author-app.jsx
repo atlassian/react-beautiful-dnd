@@ -3,25 +3,26 @@ import React, { Component } from 'react';
 import styled, { injectGlobal } from 'styled-components';
 import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src/';
-import type { DropResult, DragStart } from '../../../src';
-import AuthorList from './author-list';
-import AuthorItem from './author-item';
+import type {
+  DropResult,
+  DragStart,
+} from '../../../src';
+import type { Quote } from '../types';
+import AuthorList from '../primatives/author-list';
 import reorder from '../reorder';
 import { colors, grid } from '../constants';
-import type { Author } from '../types';
-import type { Overflow } from './types';
 
 const isDraggingClassName = 'is-dragging';
 const publishOnDragStart = action('onDragStart');
 const publishOnDragEnd = action('onDragEnd');
 
 type Props = {|
-  initial: Author[],
-  overflow?: Overflow,
+  initial: Quote[],
+  internalScroll?: boolean,
 |}
 
 type State = {|
-  authors: Author[],
+  quotes: Quote[],
 |}
 
 const Root = styled.div`
@@ -35,7 +36,7 @@ export default class AuthorApp extends Component {
   state: State
 
   state: State = {
-    authors: this.props.initial,
+    quotes: this.props.initial,
   }
   /* eslint-enable react/sort-comp */
 
@@ -65,14 +66,14 @@ export default class AuthorApp extends Component {
       return;
     }
 
-    const authors = reorder(
-      this.state.authors,
+    const quotes = reorder(
+      this.state.quotes,
       result.source.index,
       result.destination.index
     );
 
     this.setState({
-      authors,
+      quotes,
     });
   }
 
@@ -83,14 +84,11 @@ export default class AuthorApp extends Component {
         onDragEnd={this.onDragEnd}
       >
         <Root>
-          <AuthorList listId="list" overflow={this.props.overflow}>
-            {this.state.authors.map((author: Author) => (
-              <AuthorItem
-                key={author.id}
-                author={author}
-              />
-            ))}
-          </AuthorList>
+          <AuthorList
+            listId="AUTHOR"
+            internalScroll={this.props.internalScroll}
+            quotes={this.state.quotes}
+          />
         </Root>
       </DragDropContext>
     );

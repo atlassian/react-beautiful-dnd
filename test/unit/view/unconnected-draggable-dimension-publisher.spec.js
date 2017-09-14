@@ -3,11 +3,11 @@ import React, { Component } from 'react';
 import { mount } from 'enzyme';
 import DraggableDimensionPublisher from '../../../src/view/draggable-dimension-publisher/draggable-dimension-publisher';
 import { getDraggableDimension } from '../../../src/state/dimension';
-// eslint-disable-next-line no-duplicate-imports
-import type { ClientRect, Margin } from '../../../src/state/dimension';
-import getClientRect from '../../utils/get-client-rect';
+import getClientRect from '../../../src/state/get-client-rect';
 import setWindowScroll from '../../utils/set-window-scroll';
 import type {
+  Spacing,
+  ClientRect,
   Position,
   DraggableId,
   DroppableId,
@@ -28,11 +28,15 @@ const dimension: DraggableDimension = getDraggableDimension({
   }),
 });
 
-const noComputedMargin = {
+const noSpacing = {
   marginTop: '0',
   marginRight: '0',
   marginBottom: '0',
   marginLeft: '0',
+  paddingTop: '0',
+  paddingRight: '0',
+  paddingBottom: '0',
+  paddingLeft: '0',
 };
 
 class Item extends Component {
@@ -105,7 +109,7 @@ describe('DraggableDimensionPublisher', () => {
       height: dimension.page.withoutMargin.height,
       width: dimension.page.withoutMargin.width,
     }));
-    jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noComputedMargin);
+    jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noSpacing);
 
     const wrapper = mount(<Item publish={publish} />);
     wrapper.setProps({
@@ -117,7 +121,7 @@ describe('DraggableDimensionPublisher', () => {
   });
 
   it('should consider any margins when calculating dimensions', () => {
-    const margin: Margin = {
+    const margin: Spacing = {
       top: 10,
       right: 30,
       bottom: 40,
@@ -181,7 +185,7 @@ describe('DraggableDimensionPublisher', () => {
       windowScroll,
     });
     jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => clientRect);
-    jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noComputedMargin);
+    jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noSpacing);
     setWindowScroll(windowScroll);
 
     const wrapper = mount(<Item publish={publish} />);

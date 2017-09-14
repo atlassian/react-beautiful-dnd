@@ -3,10 +3,10 @@ import React from 'react';
 import { storiesOf } from '@storybook/react';
 import styled from 'styled-components';
 import AuthorApp from './src/horizontal/author-app';
-import { authors, getAuthors } from './src/data';
-import type { Author } from './src/types';
+import { quotes, getQuotes } from './src/data';
+import type { Quote } from './src/types';
 
-const bigData: Author[] = getAuthors(30);
+const bigData: Quote[] = getQuotes(30);
 
 const WideWindow = styled.div`
   width: 120vw;
@@ -14,13 +14,13 @@ const WideWindow = styled.div`
 
 storiesOf('single horizontal list', module)
   .add('simple example', () => (
-    <AuthorApp initial={authors} />
+    <AuthorApp initial={quotes} />
   ))
   .add('with overflow scroll', () => (
-    <AuthorApp initial={bigData} overflow="auto" />
+    <AuthorApp initial={bigData} internalScroll />
   ))
   .add('with window scroll and overflow scroll', () => (
     <WideWindow>
-      <AuthorApp initial={bigData} overflow="auto" />
+      <AuthorApp initial={bigData} internalScroll />
     </WideWindow>
   ));

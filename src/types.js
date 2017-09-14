@@ -13,60 +13,92 @@ export type Position = {|
   y: number,
 |};
 
+export type Spacing = {|
+  top: number,
+  right: number,
+  bottom: number,
+  left: number,
+|}
+
+export type ClientRect = {|
+  top: number,
+  right: number,
+  bottom: number,
+  left: number,
+  width: number,
+  height: number,
+|}
+
 export type Direction = 'horizontal' | 'vertical';
 
 export type VerticalAxis = {|
   direction: 'vertical',
   line: 'y',
+  crossLine: 'x',
   start: 'top',
   end: 'bottom',
   size: 'height',
+  crossAxisStart: 'left',
+  crossAxisEnd: 'right',
+  crossAxisSize: 'width',
 |}
 
 export type HorizontalAxis = {|
   direction: 'horizontal',
   line: 'x',
+  crossLine: 'y',
   start: 'left',
   end: 'right',
   size: 'width',
+  crossAxisStart: 'top',
+  crossAxisEnd: 'bottom',
+  crossAxisSize: 'height',
 |}
 
 export type Axis = VerticalAxis | HorizontalAxis
 
 export type DimensionFragment = {|
-  top: number,
-  left: number,
-  bottom: number,
-  right: number,
-  width: number,
-  height: number,
+  ...ClientRect,
   center: Position,
 |}
 
 export type DraggableDimension = {|
   id: DraggableId,
   droppableId: DroppableId,
+  // relative to the viewport when the drag started
+  client: {|
+    withMargin: DimensionFragment,
+    withoutMargin: DimensionFragment,
+  |},
+  // relative to the whole page
   page: {|
     withMargin: DimensionFragment,
     withoutMargin: DimensionFragment,
   |},
-  client: {|
-    withMargin: DimensionFragment,
-    withoutMargin: DimensionFragment,
-  |}
 |}
 
 export type DroppableDimension = {|
   id: DroppableId,
   axis: Axis,
+  isEnabled: boolean,
   scroll: {|
     initial: Position,
     current: Position,
   |},
+  // relative to the current viewport
+  client: {|
+    withMargin: DimensionFragment,
+    withoutMargin: DimensionFragment,
+    // the area in which content presses up against
+    withMarginAndPadding: DimensionFragment,
+  |},
+  // relative to the whole page
   page: {|
     withMargin: DimensionFragment,
     withoutMargin: DimensionFragment,
-  |}
+    // the area in which content presses up against
+    withMarginAndPadding: DimensionFragment,
+  |},
 |}
 export type DraggableLocation = {|
   droppableId: DroppableId,
@@ -77,6 +109,8 @@ export type DraggableDimensionMap = { [key: DraggableId]: DraggableDimension };
 export type DroppableDimensionMap = { [key: DroppableId]: DroppableDimension };
 
 export type DragMovement = {|
+  // The draggables that need to move in response to a drag.
+  // Ordered by closest draggable to the *current* location of the dragging item
   draggables: DraggableId[],
   amount: Position,
   // is moving forward relative to the starting position
@@ -87,7 +121,7 @@ export type DragImpact = {|
   movement: DragMovement,
   // the direction of the Droppable you are over
   direction: ?Direction,
-  destination: ?DraggableLocation
+  destination: ?DraggableLocation,
 |}
 
 export type InitialDragLocation = {|
@@ -101,9 +135,9 @@ export type WithinDroppable = {|
 
 export type InitialDrag = {|
   source: DraggableLocation,
-  // viewport
+  // relative to the viewport when the drag started
   client: InitialDragLocation,
-  // viewport + window scroll
+  // viewport + window scroll (position relative to 0, 0)
   page: InitialDragLocation,
   // Storing scroll directly to support movement during a window scroll.
   // Value required for comparison with current scroll
@@ -125,6 +159,8 @@ export type CurrentDragLocation = {|
 export type CurrentDrag = {|
   id: DraggableId,
   type: TypeId,
+  // whether scrolling is allowed - otherwise a scroll will cancel the drag
+  isScrollAllowed: boolean,
   // viewport
   client: CurrentDragLocation,
   // viewport + scroll
@@ -134,6 +170,7 @@ export type CurrentDrag = {|
   windowScroll: Position,
   // viewport + scroll + droppable scroll
   withinDroppable: WithinDroppable,
+  // whether or not movements should be animated
   shouldAnimate: boolean,
 |}
 
@@ -150,7 +187,7 @@ export type DropResult = {|
   type: TypeId,
   source: DraggableLocation,
   // may not have any destination (drag to nowhere)
-  destination: ?DraggableLocation
+  destination: ?DraggableLocation,
 |}
 
 export type DragState = {|

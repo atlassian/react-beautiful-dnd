@@ -10,7 +10,7 @@ const shouldPublishMapProps: MapProps = {
   shouldPublish: true,
 };
 
-describe('Dimension publisher - connected', () => {
+describe('Connected droppable dimension publisher', () => {
   it('should return the default props when not requested to publish dimensions', () => {
     const selector = makeSelector();
 

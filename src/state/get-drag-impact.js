@@ -15,7 +15,25 @@ import type { DraggableId,
 import { patch } from './position';
 import getDroppableOver from './get-droppable-over';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
-import noImpact from './no-impact';
+import noImpact, { noMovement } from './no-impact';
+
+// Calculates the net scroll diff along the main axis
+// between two droppables with internal scrolling
+const getDroppablesScrollDiff = ({
+  sourceDroppable,
+  destinationDroppable,
+  line,
+}: {
+  sourceDroppable: DroppableDimension,
+  destinationDroppable: DroppableDimension,
+  line: 'x' | 'y',
+}): number => {
+  const sourceScrollDiff = sourceDroppable.scroll.initial[line] -
+    sourceDroppable.scroll.current[line];
+  const destinationScrollDiff = destinationDroppable.scroll.initial[line] -
+    destinationDroppable.scroll.current[line];
+  return destinationScrollDiff - sourceScrollDiff;
+};
 
 // It is the responsibility of this function
 // to return the impact of a drag
@@ -25,7 +43,9 @@ type ImpactArgs = {|
   page: Position,
   // used for comparison with other dimensions
   withinDroppable: WithinDroppable,
+  // item being dragged
   draggableId: DraggableId,
+  // all dimensions in system
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap
 |}
@@ -46,20 +66,30 @@ export default ({
     return noImpact;
   }
 
-  const newCenter = withinDroppable.center;
-  const draggingDimension: DraggableDimension = draggables[draggableId];
-  const droppableDimension: DroppableDimension = droppables[droppableId];
+  const droppable: DroppableDimension = droppables[droppableId];
+  const axis: Axis = droppable.axis;
+
+  if (!droppable.isEnabled) {
+    return {
+      movement: noMovement,
+      direction: axis.direction,
+      destination: null,
+    };
+  }
 
   const insideDroppable: DraggableDimension[] = getDraggablesInsideDroppable(
-    droppableDimension,
+    droppable,
     draggables,
   );
 
-  const axis: Axis = droppableDimension.axis;
+  const newCenter: Position = withinDroppable.center;
+  const draggingDimension: DraggableDimension = draggables[draggableId];
+  const isWithinHomeDroppable = draggingDimension.droppableId === droppableId;
 
   // not considering margin so that items move based on visible edges
   const draggableCenter: Position = draggingDimension.page.withoutMargin.center;
   const isBeyondStartPosition: boolean = newCenter[axis.line] - draggableCenter[axis.line] > 0;
+  const shouldDisplaceItemsForward = isWithinHomeDroppable ? isBeyondStartPosition : false;
 
   const moved: DraggableId[] = insideDroppable
     .filter((dimension: DraggableDimension): boolean => {
@@ -69,6 +99,17 @@ export default ({
       }
 
       const fragment: DimensionFragment = dimension.page.withoutMargin;
+
+      // If we're over a new droppable items will be displaced
+      // if they sit ahead of the dragging item
+      if (!isWithinHomeDroppable) {
+        const scrollDiff = getDroppablesScrollDiff({
+          sourceDroppable: droppables[draggingDimension.droppableId],
+          destinationDroppable: droppable,
+          line: axis.line,
+        });
+        return (newCenter[axis.line] - scrollDiff) < fragment[axis.end];
+      }
 
       if (isBeyondStartPosition) {
         // 1. item needs to start ahead of the moving item
@@ -90,8 +131,20 @@ export default ({
     })
     .map((dimension: DraggableDimension): DroppableId => dimension.id);
 
+  // Need to ensure that we always order by the closest impacted item
+  const ordered: DraggableId[] = (() => {
+    if (!isWithinHomeDroppable) {
+      return moved;
+    }
+    return isBeyondStartPosition ? moved.reverse() : moved;
+  })();
+
   const startIndex = insideDroppable.indexOf(draggingDimension);
   const index: number = (() => {
+    if (!isWithinHomeDroppable) {
+      return insideDroppable.length - moved.length;
+    }
+
     if (!moved.length) {
       return startIndex;
     }
@@ -112,8 +165,8 @@ export default ({
 
   const movement: DragMovement = {
     amount,
-    draggables: moved,
-    isBeyondStartPosition,
+    draggables: ordered,
+    isBeyondStartPosition: shouldDisplaceItemsForward,
   };
 
   const impact: DragImpact = {

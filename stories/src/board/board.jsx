@@ -4,7 +4,7 @@ import styled, { injectGlobal } from 'styled-components';
 import { action } from '@storybook/addon-actions';
 import Column from './column';
 import { colors } from '../constants';
-import reorder, { reorderGroup } from '../reorder';
+import reorder, { reorderQuoteMap } from '../reorder';
 import { DragDropContext, Droppable } from '../../../src/';
 import type {
   DropResult,
@@ -12,7 +12,7 @@ import type {
   DraggableLocation,
   DroppableProvided,
 } from '../../../src/';
-import type { AuthorWithQuotes } from '../types';
+import type { QuoteMap } from '../types';
 
 const isDraggingClassName = 'is-dragging';
 
@@ -29,11 +29,13 @@ const Container = styled.div`
 `;
 
 type Props = {|
-  initial: AuthorWithQuotes[],
+  initial: QuoteMap,
 |}
 
 type State = {|
-  columns: AuthorWithQuotes[],
+  columns: QuoteMap,
+  ordered: string[],
+  autoFocusQuoteId: ?string,
 |}
 
 export default class Board extends Component {
@@ -43,6 +45,8 @@ export default class Board extends Component {
 
   state: State = {
     columns: this.props.initial,
+    ordered: Object.keys(this.props.initial),
+    autoFocusQuoteId: null,
   }
   /* eslint-enable react/sort-comp */
 
@@ -60,6 +64,10 @@ export default class Board extends Component {
     publishOnDragStart(initial);
     // $ExpectError - body wont be null
     document.body.classList.add(isDraggingClassName);
+
+    this.setState({
+      autoFocusQuoteId: null,
+    });
   }
 
   onDragEnd = (result: DropResult) => {
@@ -76,34 +84,36 @@ export default class Board extends Component {
     const destination: DraggableLocation = result.destination;
 
     // reordering column
-    if (result.type === 'AUTHOR') {
-      const columns: AuthorWithQuotes[] = reorder(
-        this.state.columns,
+    if (result.type === 'COLUMN') {
+      const ordered: string[] = reorder(
+        this.state.ordered,
         source.index,
         destination.index
       );
 
       this.setState({
-        columns,
+        ordered,
       });
 
       return;
     }
 
-    const columns: ?AuthorWithQuotes[] = reorderGroup(
-      this.state.columns, result
-    );
-
-    if (!columns) {
-      return;
-    }
+    const data = reorderQuoteMap({
+      quoteMap: this.state.columns,
+      source,
+      destination,
+    });
 
     this.setState({
-      columns,
+      columns: data.quoteMap,
+      autoFocusQuoteId: data.autoFocusQuoteId,
     });
   }
 
   render() {
+    const columns: QuoteMap = this.state.columns;
+    const ordered: string[] = this.state.ordered;
+
     return (
       <DragDropContext
         onDragStart={this.onDragStart}
@@ -111,13 +121,18 @@ export default class Board extends Component {
       >
         <Droppable
           droppableId="board"
-          type="AUTHOR"
+          type="COLUMN"
           direction="horizontal"
         >
           {(provided: DroppableProvided) => (
             <Container innerRef={provided.innerRef}>
-              {this.state.columns.map((column: AuthorWithQuotes) => (
-                <Column key={column.author.id} column={column} />
+              {ordered.map((key: string) => (
+                <Column
+                  key={key}
+                  title={key}
+                  quotes={columns[key]}
+                  autoFocusQuoteId={this.state.autoFocusQuoteId}
+                />
               ))}
             </Container>
           )}

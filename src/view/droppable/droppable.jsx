@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import type { Props, Provided, StateSnapshot, DefaultProps } from './droppable-types';
 import type { DroppableId, HTMLElement } from '../../types';
 import DroppableDimensionPublisher from '../droppable-dimension-publisher/';
+import Placeholder from '../placeholder/';
 import { droppableIdKey } from '../context-keys';
 
 type State = {|
@@ -60,22 +61,45 @@ export default class Droppable extends Component {
     });
   }
 
+  getPlaceholder() {
+    if (!this.props.placeholder) {
+      return null;
+    }
+
+    return (
+      <Placeholder
+        height={this.props.placeholder.height}
+        width={this.props.placeholder.width}
+      />
+    );
+  }
+
   render() {
+    const {
+      children,
+      direction,
+      droppableId,
+      isDraggingOver,
+      isDropDisabled,
+      type,
+    } = this.props;
     const provided: Provided = {
       innerRef: this.setRef,
+      placeholder: this.getPlaceholder(),
     };
     const snapshot: StateSnapshot = {
-      isDraggingOver: this.props.isDraggingOver,
+      isDraggingOver,
     };
 
     return (
       <DroppableDimensionPublisher
-        droppableId={this.props.droppableId}
-        direction={this.props.direction}
-        type={this.props.type}
+        droppableId={droppableId}
+        direction={direction}
+        isDropDisabled={isDropDisabled}
+        type={type}
         targetRef={this.state.ref}
       >
-        {this.props.children(provided, snapshot)}
+        {children(provided, snapshot)}
       </DroppableDimensionPublisher>
     );
   }

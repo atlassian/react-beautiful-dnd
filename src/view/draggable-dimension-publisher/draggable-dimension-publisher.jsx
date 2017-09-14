@@ -3,9 +3,7 @@ import { Component } from 'react';
 import invariant from 'invariant';
 import getWindowScrollPosition from '../get-window-scroll-position';
 import { getDraggableDimension } from '../../state/dimension';
-// eslint-disable-next-line no-duplicate-imports
-import type { Margin } from '../../state/dimension';
-import type { DraggableDimension } from '../../types';
+import type { DraggableDimension, Spacing } from '../../types';
 import type { Props } from './draggable-dimension-publisher-types';
 
 export default class DraggableDimensionPublisher extends Component {
@@ -23,7 +21,7 @@ export default class DraggableDimensionPublisher extends Component {
 
     const style = window.getComputedStyle(targetRef);
 
-    const margin: Margin = {
+    const margin: Spacing = {
       top: parseInt(style.marginTop, 10),
       right: parseInt(style.marginRight, 10),
       bottom: parseInt(style.marginBottom, 10),

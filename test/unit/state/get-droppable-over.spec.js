@@ -1,7 +1,7 @@
 // @flow
 import getDroppableOver from '../../../src/state/get-droppable-over';
 import { getDroppableDimension } from '../../../src/state/dimension';
-import getClientRect from '../../utils/get-client-rect';
+import getClientRect from '../../../src/state/get-client-rect';
 import type {
   DroppableDimension,
   DroppableDimensionMap,

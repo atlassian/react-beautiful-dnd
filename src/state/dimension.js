@@ -1,5 +1,6 @@
 // @flow
 import { vertical, horizontal } from './axis';
+import getClientRect from './get-client-rect';
 import type {
   DroppableId,
   DraggableId,
@@ -8,27 +9,13 @@ import type {
   DroppableDimension,
   Direction,
   DimensionFragment,
+  Spacing,
+  ClientRect,
 } from '../types';
-
-export type ClientRect = {|
-  top: number,
-  right: number,
-  bottom: number,
-  left: number,
-  width: number,
-  height: number,
-|}
-
-export type Margin = {|
-  top: number,
-  right: number,
-  bottom: number,
-  left: number,
-|}
 
 const origin: Position = { x: 0, y: 0 };
 
-export const noMargin: Margin = {
+export const noSpacing: Spacing = {
   top: 0,
   right: 0,
   bottom: 0,
@@ -36,50 +23,55 @@ export const noMargin: Margin = {
 };
 
 const getWithPosition = (clientRect: ClientRect, point: Position): ClientRect => {
-  const { top, right, bottom, left, width, height } = clientRect;
-  return {
+  const { top, right, bottom, left } = clientRect;
+  return getClientRect({
     top: top + point.y,
     left: left + point.x,
     bottom: bottom + point.y,
     right: right + point.x,
-    height,
-    width,
-  };
+  });
 };
 
-const getWithMargin = (clientRect: ClientRect, margin: Margin): ClientRect => {
-  const { top, right, bottom, left, height, width } = clientRect;
-  return {
-    top: top + margin.top,
-    left: left + margin.left,
-    bottom: bottom + margin.bottom,
-    right: right + margin.right,
-    height: height + margin.top + margin.bottom,
-    width: width + margin.left + margin.right,
-  };
+const getWithSpacing = (clientRect: ClientRect, spacing: Spacing): ClientRect => {
+  const { top, right, bottom, left } = clientRect;
+  return getClientRect({
+    top: top + spacing.top,
+    left: left + spacing.left,
+    bottom: bottom + spacing.bottom,
+    right: right + spacing.right,
+  });
 };
 
 const getFragment = (
   initial: ClientRect | DimensionFragment,
   point?: Position = origin,
-): DimensionFragment => ({
-  top: initial.top + point.y,
-  left: initial.left + point.x,
-  bottom: initial.bottom + point.y,
-  right: initial.right + point.x,
-  width: initial.width,
-  height: initial.height,
-  center: {
-    x: ((initial.right + point.x) + (initial.left + point.x)) / 2,
-    y: ((initial.bottom + point.y) + (initial.top + point.y)) / 2,
-  },
-});
+): DimensionFragment => {
+  const rect: ClientRect = getClientRect({
+    top: initial.top + point.y,
+    left: initial.left + point.x,
+    bottom: initial.bottom + point.y,
+    right: initial.right + point.x,
+  });
+
+  return {
+    top: rect.top,
+    right: rect.right,
+    bottom: rect.bottom,
+    left: rect.left,
+    width: rect.width,
+    height: rect.height,
+    center: {
+      x: (rect.right + rect.left) / 2,
+      y: (rect.bottom + rect.top) / 2,
+    },
+  };
+};
 
 type GetDraggableArgs = {|
   id: DraggableId,
   droppableId: DroppableId,
   clientRect: ClientRect,
-  margin?: Margin,
+  margin?: Spacing,
   windowScroll?: Position,
 |};
 
@@ -87,11 +79,10 @@ export const getDraggableDimension = ({
   id,
   droppableId,
   clientRect,
-  margin = noMargin,
+  margin = noSpacing,
   windowScroll = origin,
 }: GetDraggableArgs): DraggableDimension => {
   const withScroll = getWithPosition(clientRect, windowScroll);
-  const withScrollAndMargin = getWithMargin(withScroll, margin);
 
   const dimension: DraggableDimension = {
     id,
@@ -99,12 +90,12 @@ export const getDraggableDimension = ({
     // on the viewport
     client: {
       withoutMargin: getFragment(clientRect),
-      withMargin: getFragment(getWithMargin(clientRect, margin)),
+      withMargin: getFragment(getWithSpacing(clientRect, margin)),
     },
     // with scroll
     page: {
       withoutMargin: getFragment(withScroll),
-      withMargin: getFragment(withScrollAndMargin),
+      withMargin: getFragment(getWithSpacing(withScroll, margin)),
     },
   };
 
@@ -115,33 +106,53 @@ type GetDroppableArgs = {|
   id: DroppableId,
   clientRect: ClientRect,
   direction?: Direction,
-  margin?: Margin,
+  margin?: Spacing,
+  padding?: Spacing,
   windowScroll?: Position,
-  scroll?: Position,
+  scroll ?: Position,
+  // Whether or not the droppable is currently enabled (can change at during a drag)
+  // defaults to true
+  isEnabled?: boolean,
 |}
+
+const add = (spacing1: Spacing, spacing2: Spacing): Spacing => ({
+  top: spacing1.top + spacing2.top,
+  left: spacing1.left + spacing2.left,
+  right: spacing1.right + spacing2.right,
+  bottom: spacing1.bottom + spacing2.bottom,
+});
 
 export const getDroppableDimension = ({
   id,
   clientRect,
   direction = 'vertical',
-  margin = noMargin,
+  margin = noSpacing,
+  padding = noSpacing,
   windowScroll = origin,
   scroll = origin,
+  isEnabled = true,
 }: GetDroppableArgs): DroppableDimension => {
+  const withMargin = getWithSpacing(clientRect, margin);
   const withWindowScroll = getWithPosition(clientRect, windowScroll);
-  const withWindowScrollAndMargin = getWithMargin(withWindowScroll, margin);
 
   const dimension: DroppableDimension = {
     id,
+    isEnabled,
     axis: direction === 'vertical' ? vertical : horizontal,
     scroll: {
       initial: scroll,
       // when we start the current scroll is the initial scroll
       current: scroll,
     },
+    client: {
+      withoutMargin: getFragment(clientRect),
+      withMargin: getFragment(withMargin),
+      withMarginAndPadding: getFragment(getWithSpacing(withMargin, padding)),
+    },
     page: {
       withoutMargin: getFragment(withWindowScroll),
-      withMargin: getFragment(withWindowScrollAndMargin),
+      withMargin: getFragment(getWithSpacing(withWindowScroll, margin)),
+      withMarginAndPadding: getFragment(getWithSpacing(withWindowScroll, add(margin, padding))),
     },
   };
 

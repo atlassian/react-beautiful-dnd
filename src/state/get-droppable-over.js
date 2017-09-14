@@ -1,13 +1,22 @@
 // @flow
-import type { DroppableId, Position, DroppableDimensionMap } from '../types';
-import isInsideDroppable from './is-inside-droppable';
+import { isPointWithin } from './is-within-visible-bounds-of-droppable';
+import type {
+  DroppableId,
+  Position,
+  DroppableDimensionMap,
+  DroppableDimension,
+} from '../types';
 
 export default (
   target: Position,
   droppables: DroppableDimensionMap,
 ): ?DroppableId => {
-  const maybeId: ?DroppableId = Object.keys(droppables)
-    .find(key => isInsideDroppable(target, droppables[key]));
+  const maybe: ?DroppableDimension =
+    Object.keys(droppables)
+      .map((id: DroppableId): DroppableDimension => droppables[id])
+      .find((droppable: DroppableDimension): boolean => (
+        isPointWithin(droppable)(target)
+      ));
 
-  return maybeId || null;
+  return maybe ? maybe.id : null;
 };
