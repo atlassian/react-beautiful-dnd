@@ -45,18 +45,27 @@ const getWithSpacing = (clientRect: ClientRect, spacing: Spacing): ClientRect =>
 const getFragment = (
   initial: ClientRect | DimensionFragment,
   point?: Position = origin,
-): DimensionFragment => ({
-  top: initial.top + point.y,
-  left: initial.left + point.x,
-  bottom: initial.bottom + point.y,
-  right: initial.right + point.x,
-  width: initial.width,
-  height: initial.height,
-  center: {
-    x: ((initial.right + point.x) + (initial.left + point.x)) / 2,
-    y: ((initial.bottom + point.y) + (initial.top + point.y)) / 2,
-  },
-});
+): DimensionFragment => {
+  const rect: ClientRect = getClientRect({
+    top: initial.top + point.y,
+    left: initial.left + point.x,
+    bottom: initial.bottom + point.y,
+    right: initial.right + point.x,
+  });
+
+  return {
+    top: rect.top,
+    right: rect.right,
+    bottom: rect.bottom,
+    left: rect.left,
+    width: rect.width,
+    height: rect.height,
+    center: {
+      x: (rect.right + rect.left) / 2,
+      y: (rect.bottom + rect.top) / 2,
+    },
+  };
+};
 
 type GetDraggableArgs = {|
   id: DraggableId,
@@ -74,7 +83,6 @@ export const getDraggableDimension = ({
   windowScroll = origin,
 }: GetDraggableArgs): DraggableDimension => {
   const withScroll = getWithPosition(clientRect, windowScroll);
-  const withScrollAndMargin = getWithSpacing(withScroll, margin);
 
   const dimension: DraggableDimension = {
     id,
@@ -87,7 +95,7 @@ export const getDraggableDimension = ({
     // with scroll
     page: {
       withoutMargin: getFragment(withScroll),
-      withMargin: getFragment(withScrollAndMargin),
+      withMargin: getFragment(getWithSpacing(withScroll, margin)),
     },
   };
 

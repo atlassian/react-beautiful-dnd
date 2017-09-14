@@ -28,11 +28,15 @@ const dimension: DraggableDimension = getDraggableDimension({
   }),
 });
 
-const noComputedMargin = {
+const noSpacing = {
   marginTop: '0',
   marginRight: '0',
   marginBottom: '0',
   marginLeft: '0',
+  paddingTop: '0',
+  paddingRight: '0',
+  paddingBottom: '0',
+  paddingLeft: '0',
 };
 
 class Item extends Component {
@@ -105,7 +109,7 @@ describe('DraggableDimensionPublisher', () => {
       height: dimension.page.withoutMargin.height,
       width: dimension.page.withoutMargin.width,
     }));
-    jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noComputedMargin);
+    jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noSpacing);
 
     const wrapper = mount(<Item publish={publish} />);
     wrapper.setProps({
@@ -181,7 +185,7 @@ describe('DraggableDimensionPublisher', () => {
       windowScroll,
     });
     jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => clientRect);
-    jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noComputedMargin);
+    jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noSpacing);
     setWindowScroll(windowScroll);
 
     const wrapper = mount(<Item publish={publish} />);

@@ -28,6 +28,24 @@ const droppable: DroppableDimension = getDroppableDimension({
 });
 const origin: Position = { x: 0, y: 0 };
 
+const noMargin = {
+  marginTop: '0',
+  marginRight: '0',
+  marginBottom: '0',
+  marginLeft: '0',
+};
+const noPadding = {
+  paddingTop: '0',
+  paddingRight: '0',
+  paddingBottom: '0',
+  paddingLeft: '0',
+};
+
+const noSpacing = {
+  ...noMargin,
+  ...noPadding,
+};
+
 class ScrollableItem extends Component {
   /* eslint-disable react/sort-comp */
   props: {
@@ -139,12 +157,7 @@ describe('DraggableDimensionPublisher', () => {
         height: droppable.page.withoutMargin.height,
         width: droppable.page.withoutMargin.width,
       }));
-      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => ({
-        marginTop: '0',
-        marginRight: '0',
-        marginBottom: '0',
-        marginLeft: '0',
-      }));
+      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noSpacing);
 
       wrapper = mount(
         <ScrollableItem {...dispatchProps} />,
@@ -187,6 +200,7 @@ describe('DraggableDimensionPublisher', () => {
         marginRight: `${margin.right}`,
         marginBottom: `${margin.bottom}`,
         marginLeft: `${margin.left}`,
+        ...noPadding,
       }));
 
       wrapper = mount(
@@ -217,12 +231,7 @@ describe('DraggableDimensionPublisher', () => {
         windowScroll,
       });
       jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => clientRect);
-      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => ({
-        marginTop: '0',
-        marginRight: '0',
-        marginBottom: '0',
-        marginLeft: '0',
-      }));
+      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noSpacing);
       wrapper = mount(
         <ScrollableItem {...dispatchProps} />,
       );
@@ -259,10 +268,7 @@ describe('DraggableDimensionPublisher', () => {
       }));
       jest.spyOn(window, 'getComputedStyle').mockImplementation(() => ({
         overflowY: 'scroll',
-        marginTop: '0',
-        marginRight: '0',
-        marginBottom: '0',
-        marginLeft: '0',
+        ...noSpacing,
       }));
       wrapper = mount(
         <ScrollableItem {...dispatchProps} />,
@@ -398,13 +404,6 @@ describe('DraggableDimensionPublisher', () => {
         }
       }
 
-      const noMargin = {
-        marginTop: '0',
-        marginRight: '0',
-        marginBottom: '0',
-        marginLeft: '0',
-      };
-
       type ExecuteArgs = {|
         droppableRect: ClientRect,
         scrollParentRect: ClientRect,
@@ -440,12 +439,12 @@ describe('DraggableDimensionPublisher', () => {
 
         jest.spyOn(window, 'getComputedStyle').mockImplementation((el) => {
           if (el === droppableNode) {
-            return noMargin;
+            return noSpacing;
           }
 
           if (el === scrollParentNode) {
             return {
-              ...noMargin,
+              ...noSpacing,
               overflow: 'auto',
             };
           }
@@ -893,12 +892,7 @@ describe('DraggableDimensionPublisher', () => {
         height: droppable.page.withoutMargin.height,
         width: droppable.page.withoutMargin.width,
       }));
-      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => ({
-        marginTop: '0',
-        marginRight: '0',
-        marginBottom: '0',
-        marginLeft: '0',
-      }));
+      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noSpacing);
     });
 
     it('should publish whether the droppable is enabled when requested to publish', () => {

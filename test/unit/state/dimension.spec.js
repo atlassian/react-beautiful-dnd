@@ -4,6 +4,7 @@ import {
   getDroppableDimension,
 } from '../../../src/state/dimension';
 import { vertical, horizontal } from '../../../src/state/axis';
+import getClientRect from '../../../src/state/get-client-rect';
 import type {
   ClientRect,
   Spacing,
@@ -29,10 +30,18 @@ const clientRect: ClientRect = {
 const margin: Spacing = {
   top: 1, right: 2, bottom: 3, left: 4,
 };
+const padding: Spacing = {
+  top: 5, right: 6, bottom: 7, left: 8,
+};
 const windowScroll: Position = {
   x: 50,
   y: 80,
 };
+
+const getCenter = (rect: ClientRect): Position => ({
+  x: (rect.left + rect.right) / 2,
+  y: (rect.top + rect.bottom) / 2,
+});
 
 describe('dimension', () => {
   describe('draggable dimension', () => {
@@ -44,7 +53,7 @@ describe('dimension', () => {
       windowScroll,
     });
 
-    describe('client coordinates', () => {
+    describe('without scroll (client)', () => {
       it('should return a portion that does not account for margins', () => {
         const fragment: DimensionFragment = {
           top: clientRect.top,
@@ -62,23 +71,27 @@ describe('dimension', () => {
       });
 
       it('should return a portion that considers margins', () => {
-        const fragment: DimensionFragment = {
+        const rect: ClientRect = getClientRect({
           top: clientRect.top + margin.top,
           right: clientRect.right + margin.right,
           bottom: clientRect.bottom + margin.bottom,
           left: clientRect.left + margin.left,
-          width: clientRect.width + margin.left + margin.right,
-          height: clientRect.height + margin.top + margin.bottom,
-          center: {
-            x: (clientRect.left + margin.left + clientRect.right + margin.right) / 2,
-            y: (clientRect.top + margin.top + clientRect.bottom + margin.bottom) / 2,
-          },
+        });
+
+        const fragment: DimensionFragment = {
+          top: rect.top,
+          right: rect.right,
+          bottom: rect.bottom,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+          center: getCenter(rect),
         };
         expect(dimension.client.withMargin).toEqual(fragment);
       });
     });
 
-    describe('page coordination', () => {
+    describe('with scroll (page)', () => {
       it('should return a portion that does not account for margins', () => {
         const top: number = clientRect.top + windowScroll.y;
         const right: number = clientRect.right + windowScroll.x;
@@ -101,22 +114,21 @@ describe('dimension', () => {
       });
 
       it('should return a portion that considers margins', () => {
-        const top: number = clientRect.top + margin.top + windowScroll.y;
-        const right: number = clientRect.right + margin.right + windowScroll.x;
-        const bottom: number = clientRect.bottom + margin.bottom + windowScroll.y;
-        const left: number = clientRect.left + margin.left + windowScroll.x;
+        const rect: ClientRect = getClientRect({
+          top: clientRect.top + margin.top + windowScroll.y,
+          right: clientRect.right + margin.right + windowScroll.x,
+          bottom: clientRect.bottom + margin.bottom + windowScroll.y,
+          left: clientRect.left + margin.left + windowScroll.x,
+        });
 
         const fragment: DimensionFragment = {
-          top,
-          right,
-          bottom,
-          left,
-          width: clientRect.width + margin.left + margin.right,
-          height: clientRect.height + margin.top + margin.bottom,
-          center: {
-            x: (left + right) / 2,
-            y: (top + bottom) / 2,
-          },
+          top: rect.top,
+          right: rect.right,
+          bottom: rect.bottom,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+          center: getCenter(rect),
         };
 
         expect(dimension.page.withMargin).toEqual(fragment);
@@ -134,6 +146,7 @@ describe('dimension', () => {
       id: droppableId,
       clientRect,
       margin,
+      padding,
       windowScroll,
       scroll,
     });
@@ -178,48 +191,127 @@ describe('dimension', () => {
       expect(withHorizontal.axis).toBe(horizontal);
     });
 
-    it('should return a portion that does not consider margins', () => {
-      const top: number = clientRect.top + windowScroll.y;
-      const left: number = clientRect.left + windowScroll.x;
-      const bottom: number = clientRect.bottom + windowScroll.y;
-      const right: number = clientRect.right + windowScroll.x;
+    describe('without scroll (client)', () => {
+      it('should return a portion that does not consider margins', () => {
+        const fragment: DimensionFragment = {
+          top: clientRect.top,
+          right: clientRect.right,
+          bottom: clientRect.bottom,
+          left: clientRect.left,
+          width: clientRect.width,
+          height: clientRect.height,
+          center: getCenter(clientRect),
+        };
 
-      const fragment: DimensionFragment = {
-        top,
-        right,
-        bottom,
-        left,
-        width: clientRect.width,
-        height: clientRect.height,
-        center: {
-          x: (left + right) / 2,
-          y: (top + bottom) / 2,
-        },
-      };
+        expect(dimension.client.withoutMargin).toEqual(fragment);
+      });
 
-      expect(dimension.page.withoutMargin).toEqual(fragment);
+      it('should return a portion that does consider margins', () => {
+        const rect: ClientRect = getClientRect({
+          top: clientRect.top + margin.top,
+          left: clientRect.left + margin.left,
+          bottom: clientRect.bottom + margin.bottom,
+          right: clientRect.right + margin.right,
+        });
+
+        const fragment: DimensionFragment = {
+          top: rect.top,
+          right: rect.right,
+          bottom: rect.bottom,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+          center: getCenter(rect),
+        };
+
+        expect(dimension.client.withMargin).toEqual(fragment);
+      });
+
+      it('should return a portion that considers margins and padding', () => {
+        const rect: ClientRect = getClientRect({
+          top: clientRect.top + margin.top + padding.top,
+          left: clientRect.left + margin.left + padding.left,
+          bottom: clientRect.bottom + margin.bottom + padding.bottom,
+          right: clientRect.right + margin.right + padding.right,
+        });
+
+        const fragment: DimensionFragment = {
+          top: rect.top,
+          right: rect.right,
+          bottom: rect.bottom,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+          center: getCenter(rect),
+        };
+
+        expect(dimension.client.withMarginAndPadding).toEqual(fragment);
+      });
     });
 
-    it('should return a portion that does consider margins', () => {
-      const top: number = clientRect.top + windowScroll.y + margin.top;
-      const left: number = clientRect.left + windowScroll.x + margin.left;
-      const bottom: number = clientRect.bottom + windowScroll.y + margin.bottom;
-      const right: number = clientRect.right + windowScroll.x + margin.right;
+    describe('with scroll (page)', () => {
+      it('should return a portion that does not consider margins', () => {
+        const rect: ClientRect = getClientRect({
+          top: clientRect.top + windowScroll.y,
+          left: clientRect.left + windowScroll.x,
+          bottom: clientRect.bottom + windowScroll.y,
+          right: clientRect.right + windowScroll.x,
+        });
 
-      const fragment: DimensionFragment = {
-        top,
-        right,
-        bottom,
-        left,
-        width: clientRect.width + margin.left + margin.right,
-        height: clientRect.height + margin.top + margin.bottom,
-        center: {
-          x: (left + right) / 2,
-          y: (top + bottom) / 2,
-        },
-      };
+        const fragment: DimensionFragment = {
+          top: rect.top,
+          right: rect.right,
+          bottom: rect.bottom,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+          center: getCenter(rect),
+        };
 
-      expect(dimension.page.withMargin).toEqual(fragment);
+        expect(dimension.page.withoutMargin).toEqual(fragment);
+      });
+
+      it('should return a portion that does consider margins', () => {
+        const rect: ClientRect = getClientRect({
+          top: clientRect.top + windowScroll.y + margin.top,
+          left: clientRect.left + windowScroll.x + margin.left,
+          bottom: clientRect.bottom + windowScroll.y + margin.bottom,
+          right: clientRect.right + windowScroll.x + margin.right,
+        });
+
+        const fragment: DimensionFragment = {
+          top: rect.top,
+          right: rect.right,
+          bottom: rect.bottom,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+          center: getCenter(rect),
+        };
+
+        expect(dimension.page.withMargin).toEqual(fragment);
+      });
+
+      it('should return a portion that considers margins and padding', () => {
+        const rect: ClientRect = getClientRect({
+          top: clientRect.top + windowScroll.y + margin.top + padding.top,
+          left: clientRect.left + windowScroll.x + margin.left + padding.left,
+          bottom: clientRect.bottom + windowScroll.y + margin.bottom + padding.bottom,
+          right: clientRect.right + windowScroll.x + margin.right + padding.right,
+        });
+
+        const fragment: DimensionFragment = {
+          top: rect.top,
+          right: rect.right,
+          bottom: rect.bottom,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+          center: getCenter(rect),
+        };
+
+        expect(dimension.page.withMarginAndPadding).toEqual(fragment);
+      });
     });
   });
 });
