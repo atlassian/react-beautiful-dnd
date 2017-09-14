@@ -143,6 +143,7 @@ class App extends Component {
                   )}
                 </Draggable>
               ))}
+              {provided.placeholder}
             </div>
           )}
         </Droppable>
@@ -390,7 +391,7 @@ type DraggableLocation = {|
 
 ### Best practices for `hooks`
 
-**Block updates during a drag**
+#### Block updates during a drag
 
 It is **highly** recommended that while a user is dragging that you block any state updates that might impact the amount of `Draggable`s and `Droppable`s, or their dimensions. Please listen to `onDragStart` and block updates to the `Draggable`s and `Droppable`s until you receive at `onDragEnd`.
 
@@ -404,12 +405,7 @@ Here are a few poor user experiences that can occur if you change things *during
 - If you remove the node that the user is dragging the drag will instantly end
 - If you change the dimension of the dragging node then other things will not move out of the way at the correct time.
 
-
-**`onDragStart` and `onDragEnd` pairing**
-
-We try very hard to ensure that each `onDragStart` event is paired with a single `onDragEnd` event. However, there maybe a rouge situation where this is not the case. If that occurs - it is a bug. Currently there is no mechanism to tell the library to cancel a current drag externally.
-
-**Style**
+#### Add a cursor style and block selection
 
 During a drag it is recommended that you add two styles to the body:
 
@@ -420,9 +416,24 @@ During a drag it is recommended that you add two styles to the body:
 
 `cursor: [your desired cursor];` is needed because we apply `pointer-events: none;` to the dragging item. This prevents you setting your own cursor style on the Draggable directly based on `snapshot.isDragging` (see `Draggable`).
 
+#### Force focus after a transition between lists
+
+When an item is moved from one list to a different list it looses browser focus if it had it. This is because `React` creates a new node in this situation. It will not loose focus if transitioned within the same list. The dragging item will always have had browser focus if it is dragging with a keyboard. It is highly recommended that you give the item (which is now in a different list) focus again. You can see an example of how to do this in our stories. Here is an example of how you could do it:
+
+- `onDragEnd`: move the item into the new list and record the id fo the item that has moved
+- When rendering the reordered list pass down a prop which will tell the newly moved item to obtain focus
+- In the `componentDidMount` lifecycle call back check if the item needs to gain focus based on its props (such as an `autoFocus` prop)
+- If focus is required - call `.focus` on the node. You can obtain the node by using `ReactDOM.findDOMNode` or monkey patching the `provided.innerRef` callback.
+
+### Other `hooks` information
+
+**`onDragStart` and `onDragEnd` pairing**
+
+We try very hard to ensure that each `onDragStart` event is paired with a single `onDragEnd` event. However, there maybe a rouge situation where this is not the case. If that occurs - it is a bug. Currently there is no mechanism to tell the library to cancel a current drag externally.
+
 **Dynamic hooks**
 
-Your *hook* functions will only be captured *once at start up*. Please do not change the function after that. If there is a valid use case for this then dynamic hooks could be supported. However, at this time it is not.
+Your *hook* functions will only be captured *once at start up*. Please do not change the function after that. This will be changed soon.
 
 ## `Droppable`
 
@@ -437,7 +448,8 @@ import { Droppable } from 'react-beautiful-dnd';
       ref={provided.innerRef}
       style={{ backgroundColor: snapshot.isDraggingOver ? 'blue' : 'grey' }}
     >
-      I am a droppable!
+      <h2>I am a droppable!</h2>
+      {provided.placeholder}
     </div>
   )}
 </Droppable>;
@@ -468,14 +480,23 @@ The function is provided with two arguments:
 ```js
 type DroppableProvided = {|
   innerRef: (?HTMLElement) => void,
+  placeholder: ?ReactElement,
 |}
 ```
 
-In order for the droppable to function correctly, **you must** bind the `provided.innerRef` to the highest possible DOM node in the `ReactElement`. We do this in order to avoid needing to use `ReactDOM` to look up your DOM node.
+- `provided.innerRef`: In order for the droppable to function correctly, **you must** bind the `provided.innerRef` to the highest possible DOM node in the `ReactElement`. We do this in order to avoid needing to use `ReactDOM` to look up your DOM node.
+
+- `provided.placeholder`: This is used to create space in the `Droppable` as needed during a drag. This space is needed when a user is dragging over a list that is not the home list. Please be sure to put the placeholder inside of the component that you have provided the ref for. We need to increase the side of the `Droppable` itself. This is different from `Draggable` where the `placeholder` needs to be a *silbing* to the draggable node.
 
 ```js
 <Droppable droppableId="droppable-1">
-  {(provided, snapshot) => <div ref={provided.innerRef}>Good to go</div>}
+  {(provided, snapshot) => (
+    <div ref={provided.innerRef}>
+      Good to go
+
+      {provided.placeholder}
+    </div>
+  )}
 </Droppable>;
 ```
 
@@ -497,6 +518,8 @@ The `children` function is also provided with a small amount of state relating t
       style={{ backgroundColor: snapshot.isDraggingOver ? 'blue' : 'grey' }}
     >
       I am a droppable!
+
+      {provided.placeholder}
     </div>
   )}
 </Droppable>;
@@ -681,7 +704,7 @@ type NotDraggingStyle = {|
 |};
 ```
 
-- `provided.placeholder (?ReactElement)` The `Draggable` element has `position: fixed` applied to it while it is dragging. The role of the `placeholder` is to sit in the place that the `Draggable` was during a drag. It is needed to stop the `Droppable` list from collapsing when you drag. It is advised to render it as a sibling to the `Draggable` node. When the library moves to `React` 16 the `placeholder` will be removed from api.
+- `provided.placeholder (?ReactElement)` The `Draggable` element has `position: fixed` applied to it while it is dragging. The role of the `placeholder` is to sit in the place that the `Draggable` was during a drag. It is needed to stop the `Droppable` list from collapsing when you drag. It is advised to render it as a sibling to the `Draggable` node. This is unlike `Droppable` where the `placeholder` needs to be *within* the `Droppable` node. When the library moves to `React` 16 the `placeholder` will be removed from api.
 
 ```js
 <Draggable draggableId="draggable-1">
@@ -856,6 +879,11 @@ type DraggableLocation = {|
 // Droppable
 type DroppableProvided = {|
   innerRef: (?HTMLElement) => void,
+  placeholder: ?ReactElement,
+|}
+
+type DraggableStateSnapshot = {|
+  isDraggingOver: boolean,
 |}
 
 // Draggable
@@ -865,6 +893,11 @@ type DraggableProvided = {|
   dragHandleProps: ?DragHandleProvided,
   placeholder: ?ReactElement,
 |}
+
+type DraggableStateSnapshot = {|
+  isDragging: boolean,
+|}
+
 type DraggableStyle = DraggingStyle | NotDraggingStyle
 type DraggingStyle = {|
   pointerEvents: 'none',
