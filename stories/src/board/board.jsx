@@ -21,11 +21,11 @@ const publishOnDragEnd = action('onDragEnd');
 
 const Container = styled.div`
   background: ${colors.blue.deep};
-  display: flex;
   min-height: 100vh;
 
-  /* add a scroll bar if the list is too wide */
-  overflow-x: auto;
+  /* like display:flex but will allow bleeding over the window width */
+  min-width: 100vw;
+  display: inline-flex;
 `;
 
 type Props = {|
