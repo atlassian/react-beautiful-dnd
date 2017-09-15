@@ -188,7 +188,11 @@ describe('get drag impact', () => {
           expect(impact).toEqual(expected);
         });
 
-        describe('moving in list due to change in droppable scroll', () => {
+        describe('home droppable is scrolled', () => {
+
+        });
+
+        describe('home droppable scroll has changed during a drag', () => {
 
         });
       });
