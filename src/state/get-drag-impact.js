@@ -65,11 +65,7 @@ export default ({
   const axis: Axis = destination.axis;
 
   if (!destination.isEnabled) {
-    return {
-      movement: noMovement,
-      direction: axis.direction,
-      destination: null,
-    };
+    return noImpact;
   }
 
   const source: DroppableDimension = droppables[draggable.droppableId];
@@ -136,12 +132,14 @@ export default ({
     return isBeyondStartPosition ? moved.reverse() : moved;
   })();
 
-  const startIndex = insideDestination.indexOf(draggable);
   const index: number = (() => {
+    // is over foreign list
     if (!isWithinHomeDroppable) {
       return insideDestination.length - moved.length;
     }
 
+    // is over home list
+    const startIndex = insideDestination.indexOf(draggable);
     if (!moved.length) {
       return startIndex;
     }
