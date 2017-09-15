@@ -129,10 +129,6 @@ export type InitialDragLocation = {|
   center: Position,
 |}
 
-export type WithinDroppable = {|
-  center: Position,
-|}
-
 export type InitialDrag = {|
   source: DraggableLocation,
   // relative to the viewport when the drag started
@@ -142,9 +138,6 @@ export type InitialDrag = {|
   // Storing scroll directly to support movement during a window scroll.
   // Value required for comparison with current scroll
   windowScroll: Position,
-  // viewport + window scroll + droppable scroll diff
-  // (this will be the same as page initially)
-  withinDroppable: WithinDroppable,
 |}
 
 export type CurrentDragLocation = {|
@@ -168,8 +161,6 @@ export type CurrentDrag = {|
   // Storing scroll directly to support movement during a window scroll.
   // Value required for comparison with current scroll
   windowScroll: Position,
-  // viewport + scroll + droppable scroll
-  withinDroppable: WithinDroppable,
   // whether or not movements should be animated
   shouldAnimate: boolean,
 |}

@@ -8,11 +8,10 @@ import type { DraggableId,
   DroppableDimensionMap,
   DragImpact,
   DimensionFragment,
-  WithinDroppable,
   Axis,
   Position,
 } from '../types';
-import { patch } from './position';
+import { add, subtract, patch } from './position';
 import getDroppableOver from './get-droppable-over';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
 import noImpact, { noMovement } from './no-impact';
@@ -38,38 +37,34 @@ const getDroppablesScrollDiff = ({
 // It is the responsibility of this function
 // to return the impact of a drag
 
-type ImpactArgs = {|
-  // used to lookup which droppable you are over
-  page: Position,
-  // used for comparison with other dimensions
-  withinDroppable: WithinDroppable,
-  // item being dragged
-  draggableId: DraggableId,
+type Args = {|
+  pageCenter: Position,
+  draggable: DraggableDimension,
+  homeDroppable: DroppableDimension,
   // all dimensions in system
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap
 |}
 
 export default ({
-  page,
-  withinDroppable,
-  draggableId,
+  pageCenter,
+  draggable,
   draggables,
   droppables,
-}: ImpactArgs): DragImpact => {
-  const droppableId: ?DroppableId = getDroppableOver(
-    page, droppables,
+}: Args): DragImpact => {
+  const destinationId: ?DroppableId = getDroppableOver(
+    pageCenter, droppables,
   );
 
   // not dragging over anything
-  if (!droppableId) {
+  if (!destinationId) {
     return noImpact;
   }
 
-  const droppable: DroppableDimension = droppables[droppableId];
-  const axis: Axis = droppable.axis;
+  const destination: DroppableDimension = droppables[destinationId];
+  const axis: Axis = destination.axis;
 
-  if (!droppable.isEnabled) {
+  if (!destination.isEnabled) {
     return {
       movement: noMovement,
       direction: axis.direction,
@@ -77,24 +72,26 @@ export default ({
     };
   }
 
-  const insideDroppable: DraggableDimension[] = getDraggablesInsideDroppable(
-    droppable,
+  const source: DroppableDimension = droppables[draggable.droppableId];
+  const sourceScrollDiff: Position = subtract(source.scroll.current, source.scroll.initial);
+  const originalCenter: Position = draggable.page.withoutMargin.center;
+  // where the element actually is now
+  const currentCenter: Position = add(pageCenter, sourceScrollDiff);
+  const isWithinHomeDroppable = draggable.droppableId === destinationId;
+
+  const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
+    destination,
     draggables,
   );
 
-  const newCenter: Position = withinDroppable.center;
-  const draggingDimension: DraggableDimension = draggables[draggableId];
-  const isWithinHomeDroppable = draggingDimension.droppableId === droppableId;
-
   // not considering margin so that items move based on visible edges
-  const draggableCenter: Position = draggingDimension.page.withoutMargin.center;
-  const isBeyondStartPosition: boolean = newCenter[axis.line] - draggableCenter[axis.line] > 0;
+  const isBeyondStartPosition: boolean = currentCenter[axis.line] - originalCenter[axis.line] > 0;
   const shouldDisplaceItemsForward = isWithinHomeDroppable ? isBeyondStartPosition : false;
 
-  const moved: DraggableId[] = insideDroppable
+  const moved: DraggableId[] = insideDestination
     .filter((dimension: DraggableDimension): boolean => {
       // do not want to move the item that is dragging
-      if (dimension === draggingDimension) {
+      if (dimension === draggable) {
         return false;
       }
 
@@ -104,30 +101,30 @@ export default ({
       // if they sit ahead of the dragging item
       if (!isWithinHomeDroppable) {
         const scrollDiff = getDroppablesScrollDiff({
-          sourceDroppable: droppables[draggingDimension.droppableId],
-          destinationDroppable: droppable,
+          sourceDroppable: droppables[draggable.droppableId],
+          destinationDroppable: destination,
           line: axis.line,
         });
-        return (newCenter[axis.line] - scrollDiff) < fragment[axis.end];
+        return (currentCenter[axis.line] - scrollDiff) < fragment[axis.end];
       }
 
       if (isBeyondStartPosition) {
         // 1. item needs to start ahead of the moving item
         // 2. the dragging item has moved over it
-        if (fragment.center[axis.line] < draggableCenter[axis.line]) {
+        if (fragment.center[axis.line] < originalCenter[axis.line]) {
           return false;
         }
 
-        return newCenter[axis.line] > fragment[axis.start];
+        return currentCenter[axis.line] > fragment[axis.start];
       }
       // moving backwards
       // 1. item needs to start behind the moving item
       // 2. the dragging item has moved over it
-      if (draggableCenter[axis.line] < fragment.center[axis.line]) {
+      if (originalCenter[axis.line] < fragment.center[axis.line]) {
         return false;
       }
 
-      return newCenter[axis.line] < fragment[axis.end];
+      return currentCenter[axis.line] < fragment[axis.end];
     })
     .map((dimension: DraggableDimension): DroppableId => dimension.id);
 
@@ -139,10 +136,10 @@ export default ({
     return isBeyondStartPosition ? moved.reverse() : moved;
   })();
 
-  const startIndex = insideDroppable.indexOf(draggingDimension);
+  const startIndex = insideDestination.indexOf(draggable);
   const index: number = (() => {
     if (!isWithinHomeDroppable) {
-      return insideDroppable.length - moved.length;
+      return insideDestination.length - moved.length;
     }
 
     if (!moved.length) {
@@ -156,15 +153,8 @@ export default ({
     return startIndex - moved.length;
   })();
 
-  const distance = index !== startIndex ?
-    // need to ensure that the whole item is moved
-    draggingDimension.page.withMargin[axis.size] :
-    0;
-
-  const amount: Position = patch(axis.line, distance);
-
   const movement: DragMovement = {
-    amount,
+    amount: patch(axis.line, draggable.page.withMargin[axis.size]),
     draggables: ordered,
     isBeyondStartPosition: shouldDisplaceItemsForward,
   };
@@ -173,7 +163,7 @@ export default ({
     movement,
     direction: axis.direction,
     destination: {
-      droppableId,
+      droppableId: destinationId,
       index,
     },
   };

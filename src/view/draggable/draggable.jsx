@@ -22,7 +22,6 @@ import type {
 import getCenterPosition from '../get-center-position';
 import Placeholder from '../placeholder';
 import { droppableIdKey } from '../context-keys';
-import { add } from '../../state/position';
 import type {
   Props,
   Provided,
@@ -116,15 +115,10 @@ export default class Draggable extends Component {
       center: getCenterPosition(ref),
     };
 
-    const page: InitialDragLocation = {
-      selection: add(client.selection, windowScroll),
-      center: add(client.center, windowScroll),
-    };
-
     // Allowing scrolling with a mouse when lifting with a mouse
     const isScrollAllowed = true;
 
-    lift(draggableId, type, client, page, windowScroll, isScrollAllowed);
+    lift(draggableId, type, client, windowScroll, isScrollAllowed);
   }
 
   onKeyLift = () => {
@@ -141,14 +135,10 @@ export default class Draggable extends Component {
     };
 
     const windowScroll: Position = getWindowScrollPosition();
-    const page: InitialDragLocation = {
-      selection: add(center, windowScroll),
-      center: add(center, windowScroll),
-    };
     // not allowing scrolling with a mouse when lifting with a keyboard
     const isScrollAllowed = false;
 
-    lift(draggableId, type, client, page, windowScroll, isScrollAllowed);
+    lift(draggableId, type, client, windowScroll, isScrollAllowed);
   }
 
   onMove = (client: Position) => {
@@ -162,9 +152,8 @@ export default class Draggable extends Component {
     }
 
     const windowScroll: Position = getWindowScrollPosition();
-    const page: Position = add(client, windowScroll);
 
-    move(draggableId, client, page, windowScroll);
+    move(draggableId, client, windowScroll);
   }
 
   onMoveForward = () => {
