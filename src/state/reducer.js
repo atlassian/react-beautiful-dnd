@@ -58,6 +58,7 @@ type MoveArgs = {|
   impact?: DragImpact,
 |}
 
+// TODO: move into own file and write tests
 const move = ({
   state,
   clientSelection,

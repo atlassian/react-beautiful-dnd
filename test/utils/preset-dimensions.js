@@ -12,8 +12,8 @@ import type {
 } from '../../src/types';
 
 export default (axis: Axis) => {
-  const margin: Spacing = { top: 1, left: 2, bottom: 3, right: 4 };
-  const padding: Spacing = { top: 5, left: 6, bottom: 7, right: 8 };
+  const margin: Spacing = { top: 10, left: 10, bottom: 10, right: 10 };
+  const padding: Spacing = { top: 2, left: 2, bottom: 2, right: 2 };
   const windowScroll: Position = { x: 50, y: 100 };
   const crossAxisStart: number = 0;
   const crossAxisEnd: number = 100;
@@ -24,9 +24,11 @@ export default (axis: Axis) => {
     id: 'home',
     direction: axis.direction,
     padding,
+    margin,
     windowScroll,
     clientRect: getClientRect({
-      [axis.start]: 0,
+      // would be 0 but pushed forward by margin
+      [axis.start]: 10,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
       [axis.end]: 200,
@@ -39,10 +41,10 @@ export default (axis: Axis) => {
     margin,
     windowScroll,
     clientRect: getClientRect({
-      [axis.start]: 0,
+      [axis.start]: 10,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
-      [axis.end]: 10,
+      [axis.end]: 20,
     }),
   });
   // size: 20
@@ -53,7 +55,7 @@ export default (axis: Axis) => {
     margin,
     windowScroll,
     clientRect: getClientRect({
-      [axis.start]: 20,
+      [axis.start]: 30,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
       [axis.end]: 50,
@@ -91,9 +93,11 @@ export default (axis: Axis) => {
   const foreign: DroppableDimension = getDroppableDimension({
     id: 'foreign',
     padding,
+    margin,
     direction: axis.direction,
     clientRect: getClientRect({
-      [axis.start]: 0,
+      // would be 0 but pushed forward by margin
+      [axis.start]: 10,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
       [axis.end]: 200,
@@ -106,10 +110,10 @@ export default (axis: Axis) => {
     margin,
     windowScroll,
     clientRect: getClientRect({
-      [axis.start]: 0,
+      [axis.start]: 10,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
-      [axis.end]: 10,
+      [axis.end]: 20,
     }),
   });
   // size: 20
@@ -120,7 +124,7 @@ export default (axis: Axis) => {
     margin,
     windowScroll,
     clientRect: getClientRect({
-      [axis.start]: 20,
+      [axis.start]: 30,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
       [axis.end]: 50,
@@ -177,6 +181,7 @@ export default (axis: Axis) => {
     inHome2,
     inHome3,
     inHome4,
+    foreign,
     inForeign1,
     inForeign2,
     inForeign3,

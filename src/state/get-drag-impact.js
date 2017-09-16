@@ -14,7 +14,7 @@ import type { DraggableId,
 import { add, subtract, patch } from './position';
 import getDroppableOver from './get-droppable-over';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
-import noImpact, { noMovement } from './no-impact';
+import noImpact from './no-impact';
 
 // Calculates the net scroll diff along the main axis
 // between two droppables with internal scrolling
@@ -85,13 +85,13 @@ export default ({
   const shouldDisplaceItemsForward = isWithinHomeDroppable ? isBeyondStartPosition : false;
 
   const moved: DraggableId[] = insideDestination
-    .filter((dimension: DraggableDimension): boolean => {
+    .filter((child: DraggableDimension): boolean => {
       // do not want to move the item that is dragging
-      if (dimension === draggable) {
+      if (child === draggable) {
         return false;
       }
 
-      const fragment: DimensionFragment = dimension.page.withoutMargin;
+      const fragment: DimensionFragment = child.page.withoutMargin;
 
       // If we're over a new droppable items will be displaced
       // if they sit ahead of the dragging item
