@@ -41,6 +41,7 @@ export default (axis: Axis) => {
     margin,
     windowScroll,
     clientRect: getClientRect({
+      // starting at start of home
       [axis.start]: 10,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,

@@ -155,7 +155,7 @@ describe('get drag impact', () => {
         });
 
         // moving inHome3 back past inHome1
-        describe.only('moving back past start position', () => {
+        describe('moving back past start position', () => {
           it('should move into the correct position', () => {
             const pageCenter: Position = patch(
               axis.line,
@@ -166,7 +166,7 @@ describe('get drag impact', () => {
 
             const expected: DragImpact = {
               movement: {
-                amount: patch(axis.line, inHome2.page.withMargin[axis.size]),
+                amount: patch(axis.line, inHome3.page.withMargin[axis.size]),
                 // ordered by closest to current location
                 draggables: [inHome1.id, inHome2.id],
                 isBeyondStartPosition: false,
@@ -218,47 +218,49 @@ describe('get drag impact', () => {
 
           // moving inHome1 past inHome2 by scrolling the dimension
           describe('moving beyond start position with own scroll', () => {
-            // the middle of the target edge
-            const startOfInHome2: Position = patch(
-              axis.line,
-              inHome2.page.withoutMargin[axis.start],
-              inHome2.page.withoutMargin.center[axis.crossLine],
-            );
-            const distanceNeeded: Position = add(
-              subtract(startOfInHome2, inHome1.page.withoutMargin.center),
-              // need to move over the edge
-              patch(axis.line, 1),
-            );
-            const homeWithScroll: DroppableDimension = updateCurrentScroll(home, distanceNeeded);
-            const updatedDroppables: DroppableDimensionMap = {
-              ...droppables,
-              [home.id]: homeWithScroll,
-            };
-            // no changes in current page center from original
-            const pageCenter: Position = inHome1.page.withoutMargin.center;
-            const expected: DragImpact = {
-              movement: {
-                amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
-                // ordered by closest to current location
-                draggables: [inHome2.id],
-                isBeyondStartPosition: true,
-              },
-              direction: axis.direction,
-              destination: {
-                droppableId: home.id,
-                // is now after inHome2
-                index: 1,
-              },
-            };
+            it('should move past other draggables', () => {
+              // the middle of the target edge
+              const startOfInHome2: Position = patch(
+                axis.line,
+                inHome2.page.withoutMargin[axis.start],
+                inHome2.page.withoutMargin.center[axis.crossLine],
+              );
+              const distanceNeeded: Position = add(
+                subtract(startOfInHome2, inHome1.page.withoutMargin.center),
+                // need to move over the edge
+                patch(axis.line, 1),
+              );
+              const homeWithScroll: DroppableDimension = updateCurrentScroll(home, distanceNeeded);
+              const updatedDroppables: DroppableDimensionMap = {
+                ...droppables,
+                [home.id]: homeWithScroll,
+              };
+              // no changes in current page center from original
+              const pageCenter: Position = inHome1.page.withoutMargin.center;
+              const expected: DragImpact = {
+                movement: {
+                  amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
+                  // ordered by closest to current location
+                  draggables: [inHome2.id],
+                  isBeyondStartPosition: true,
+                },
+                direction: axis.direction,
+                destination: {
+                  droppableId: home.id,
+                  // is now after inHome2
+                  index: 1,
+                },
+              };
 
-            const impact: DragImpact = getDragImpact({
-              pageCenter,
-              draggable: inHome1,
-              draggables,
-              droppables: updatedDroppables,
+              const impact: DragImpact = getDragImpact({
+                pageCenter,
+                draggable: inHome1,
+                draggables,
+                droppables: updatedDroppables,
+              });
+
+              expect(impact).toEqual(expected);
             });
-
-            expect(impact).toEqual(expected);
           });
 
           // moving inHome4 back past inHome2
