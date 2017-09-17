@@ -1,12 +1,13 @@
 // @flow
 // eslint-disable-next-line no-duplicate-imports
 import getDragImpact from '../../../src/state/get-drag-impact';
-import noImpact, { noMovement } from '../../../src/state/no-impact';
-import getClientRect from '../../../src/state/get-client-rect';
-import getDroppableWithDraggables from '../../utils/get-droppable-with-draggables';
+import noImpact from '../../../src/state/no-impact';
 import { add, patch, subtract } from '../../../src/state/position';
 import { vertical, horizontal } from '../../../src/state/axis';
-import getPresetDimensions from '../../utils/preset-dimensions';
+import {
+  getPreset,
+  updateDroppableScroll,
+} from '../../utils/dimension';
 import type {
   Axis,
   DroppableId,
@@ -35,7 +36,7 @@ describe('get drag impact', () => {
         inForeign4,
         droppables,
         draggables,
-      } = getPresetDimensions(axis);
+      } = getPreset(axis);
 
       it('should return no impact when not dragging over anything', () => {
         // dragging up above the list
@@ -195,27 +196,6 @@ describe('get drag impact', () => {
         });
 
         describe('home droppable scroll has changed during a drag', () => {
-          const updateCurrentScroll = (
-            droppable: DroppableDimension,
-            addition: Position
-          ): DroppableDimension => {
-            const newScroll = add(droppable.scroll.initial, addition);
-
-            const result: DroppableDimension = {
-              id: droppable.id,
-              axis: droppable.axis,
-              isEnabled: droppable.isEnabled,
-              scroll: {
-                initial: droppable.scroll.initial,
-                current: newScroll,
-              },
-              client: droppable.client,
-              page: droppable.page,
-            };
-
-            return result;
-          };
-
           // moving inHome1 past inHome2 by scrolling the dimension
           describe('moving beyond start position with own scroll', () => {
             it('should move past other draggables', () => {
@@ -230,7 +210,9 @@ describe('get drag impact', () => {
                 // need to move over the edge
                 patch(axis.line, 1),
               );
-              const homeWithScroll: DroppableDimension = updateCurrentScroll(home, distanceNeeded);
+              const homeWithScroll: DroppableDimension = updateDroppableScroll(
+                home, distanceNeeded
+              );
               const updatedDroppables: DroppableDimensionMap = {
                 ...droppables,
                 [home.id]: homeWithScroll,
@@ -277,7 +259,9 @@ describe('get drag impact', () => {
                 // need to move over the edge
                 patch(axis.line, -1),
               );
-              const homeWithScroll: DroppableDimension = updateCurrentScroll(home, distanceNeeded);
+              const homeWithScroll: DroppableDimension = updateDroppableScroll(
+                home, distanceNeeded
+              );
               const updatedDroppables: DroppableDimensionMap = {
                 ...droppables,
                 [home.id]: homeWithScroll,

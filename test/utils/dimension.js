@@ -1,6 +1,7 @@
 // @flow
 import getClientRect from '../../src/state/get-client-rect';
 import { getDroppableDimension, getDraggableDimension } from '../../src/state/dimension';
+import { add } from '../../src/state/position';
 import type {
   Axis,
   Position,
@@ -11,7 +12,7 @@ import type {
   DroppableDimensionMap,
 } from '../../src/types';
 
-export default (axis: Axis) => {
+export const getPreset = (axis: Axis) => {
   const margin: Spacing = { top: 10, left: 10, bottom: 10, right: 10 };
   const padding: Spacing = { top: 2, left: 2, bottom: 2, right: 2 };
   const windowScroll: Position = { x: 50, y: 100 };
@@ -34,6 +35,7 @@ export default (axis: Axis) => {
       [axis.end]: 200,
     }),
   });
+
   // size: 10
   const inHome1: DraggableDimension = getDraggableDimension({
     id: 'inhome1',
@@ -95,6 +97,7 @@ export default (axis: Axis) => {
     id: 'foreign',
     padding,
     margin,
+    windowScroll,
     direction: axis.direction,
     clientRect: getClientRect({
       // would be 0 but pushed forward by margin
@@ -191,3 +194,33 @@ export default (axis: Axis) => {
     draggables,
   };
 };
+
+export const updateDroppableScroll = (
+  droppable: DroppableDimension,
+  addition: Position
+): DroppableDimension => {
+  const newScroll = add(droppable.scroll.initial, addition);
+
+  const result: DroppableDimension = {
+    id: droppable.id,
+    axis: droppable.axis,
+    isEnabled: droppable.isEnabled,
+    scroll: {
+      initial: droppable.scroll.initial,
+      current: newScroll,
+    },
+    client: droppable.client,
+    page: droppable.page,
+  };
+
+  return result;
+};
+
+export const disableDroppable = (droppable: DroppableDimension): DroppableDimension => ({
+  id: droppable.id,
+  axis: droppable.axis,
+  isEnabled: false,
+  scroll: droppable.scroll,
+  client: droppable.client,
+  page: droppable.page,
+});
