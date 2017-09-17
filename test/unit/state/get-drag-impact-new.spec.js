@@ -7,6 +7,7 @@ import { vertical, horizontal } from '../../../src/state/axis';
 import {
   getPreset,
   updateDroppableScroll,
+  disableDroppable,
 } from '../../utils/dimension';
 import type {
   Axis,
@@ -55,11 +56,26 @@ describe('get drag impact', () => {
         expect(impact).toEqual(noImpact);
       });
 
-      it('should return no impact when moving over a disabled list', () => {
-
-      });
-
       describe('moving over home list', () => {
+        it('should return no impact when home is disabled', () => {
+          const disabled: DroppableDimension = disableDroppable(home);
+          const withDisabled: DroppableDimensionMap = {
+            ...droppables,
+            [disabled.id]: disabled,
+          };
+          // choosing the center of inHome2 which should have an impact
+          const pageCenter: Position = inHome2.page.withoutMargin.center;
+
+          const impact: DragImpact = getDragImpact({
+            pageCenter,
+            draggable: inHome1,
+            draggables,
+            droppables: withDisabled,
+          });
+
+          expect(impact).toEqual(noImpact);
+        });
+
         // moving inHome1 no where
         describe('moving over original position', () => {
           it('should return no impact', () => {
@@ -297,6 +313,25 @@ describe('get drag impact', () => {
       });
 
       describe('moving into foreign list', () => {
+        it('should return no impact when list is disabled', () => {
+          const disabled: DroppableDimension = disableDroppable(foreign);
+          const withDisabled: DroppableDimensionMap = {
+            ...droppables,
+            [foreign.id]: disabled,
+          };
+          // choosing the center of inForeign1 which should have an impact
+          const pageCenter: Position = inForeign1.page.withoutMargin.center;
+
+          const impact: DragImpact = getDragImpact({
+            pageCenter,
+            draggable: inHome1,
+            draggables,
+            droppables: withDisabled,
+          });
+
+          expect(impact).toEqual(noImpact);
+        });
+
         // moving inHome1 above inForeign1
         describe('moving into the start of a populated droppable', () => {
           it('should move everything in the foreign list forward', () => {
