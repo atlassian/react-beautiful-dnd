@@ -18,20 +18,26 @@ import noImpact from './no-impact';
 
 // Calculates the net scroll diff along the main axis
 // between two droppables with internal scrolling
+type GetDroppableScrollDiff = {|
+  home: DroppableDimension,
+  foreign: DroppableDimension,
+  axis: Axis
+|}
+
 const getDroppablesScrollDiff = ({
-  sourceDroppable,
-  destinationDroppable,
-  line,
-}: {
-  sourceDroppable: DroppableDimension,
-  destinationDroppable: DroppableDimension,
-  line: 'x' | 'y',
+  home,
+  foreign,
+  axis,
 }): number => {
-  const sourceScrollDiff = sourceDroppable.scroll.initial[line] -
-    sourceDroppable.scroll.current[line];
-  const destinationScrollDiff = destinationDroppable.scroll.initial[line] -
-    destinationDroppable.scroll.current[line];
-  return destinationScrollDiff - sourceScrollDiff;
+  const homeScrollDiff: number =
+    home.scroll.initial[axis.line] -
+    home.scroll.current[axis.line];
+
+  const foreignScrollDiff =
+    foreign.scroll.initial[axis.line] -
+    foreign.scroll.current[axis.line];
+
+  return foreignScrollDiff - homeScrollDiff;
 };
 
 // It is the responsibility of this function
@@ -68,12 +74,16 @@ export default ({
     return noImpact;
   }
 
-  const source: DroppableDimension = droppables[draggable.droppableId];
-  const sourceScrollDiff: Position = subtract(source.scroll.current, source.scroll.initial);
+  const home: DroppableDimension = droppables[draggable.droppableId];
+  const homeScrollDiff: Position = subtract(home.scroll.current, home.scroll.initial);
   const originalCenter: Position = draggable.page.withoutMargin.center;
-  // where the element actually is now
-  const currentCenter: Position = add(pageCenter, sourceScrollDiff);
+  // Where the element actually is now
+  const currentCenter: Position = add(pageCenter, homeScrollDiff);
   const isWithinHomeDroppable = draggable.droppableId === destinationId;
+
+  const foreignScrollDiff: Position = isWithinHomeDroppable ?
+    subtract(home.scroll.current, home.scroll.initial) :
+    origin;
 
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
     destination,
@@ -97,9 +107,9 @@ export default ({
       // if they sit ahead of the dragging item
       if (!isWithinHomeDroppable) {
         const scrollDiff = getDroppablesScrollDiff({
-          sourceDroppable: droppables[draggable.droppableId],
-          destinationDroppable: destination,
-          line: axis.line,
+          home: droppables[draggable.droppableId],
+          foreign: destination,
+          axis,
         });
         return (currentCenter[axis.line] - scrollDiff) < fragment[axis.end];
       }

@@ -20,6 +20,8 @@ export const getPreset = (axis: Axis) => {
   const crossAxisEnd: number = 100;
   const foreignCrossAxisStart: number = 100;
   const foreignCrossAxisEnd: number = 200;
+  const emptyForeignCrossAxisStart: number = 200;
+  const emptyForeignCrossAxisEnd: number = 300;
 
   const home: DroppableDimension = getDroppableDimension({
     id: 'home',
@@ -32,6 +34,36 @@ export const getPreset = (axis: Axis) => {
       [axis.start]: 10,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
+      [axis.end]: 200,
+    }),
+  });
+
+  const foreign: DroppableDimension = getDroppableDimension({
+    id: 'foreign',
+    padding,
+    margin,
+    windowScroll,
+    direction: axis.direction,
+    clientRect: getClientRect({
+      // would be 0 but pushed forward by margin
+      [axis.start]: 10,
+      [axis.crossAxisStart]: foreignCrossAxisStart,
+      [axis.crossAxisEnd]: foreignCrossAxisEnd,
+      [axis.end]: 200,
+    }),
+  });
+
+  const emptyForeign: DroppableDimension = getDroppableDimension({
+    id: 'empty-foreign',
+    padding,
+    margin,
+    windowScroll,
+    direction: axis.direction,
+    clientRect: getClientRect({
+      // would be 0 but pushed forward by margin
+      [axis.start]: 10,
+      [axis.crossAxisStart]: emptyForeignCrossAxisStart,
+      [axis.crossAxisEnd]: emptyForeignCrossAxisEnd,
       [axis.end]: 200,
     }),
   });
@@ -93,20 +125,6 @@ export const getPreset = (axis: Axis) => {
     }),
   });
 
-  const foreign: DroppableDimension = getDroppableDimension({
-    id: 'foreign',
-    padding,
-    margin,
-    windowScroll,
-    direction: axis.direction,
-    clientRect: getClientRect({
-      // would be 0 but pushed forward by margin
-      [axis.start]: 10,
-      [axis.crossAxisStart]: foreignCrossAxisStart,
-      [axis.crossAxisEnd]: foreignCrossAxisEnd,
-      [axis.end]: 200,
-    }),
-  });
   // size: 10
   const inForeign1: DraggableDimension = getDraggableDimension({
     id: 'inForeign1',
@@ -166,6 +184,7 @@ export const getPreset = (axis: Axis) => {
   const droppables: DroppableDimensionMap = {
     [home.id]: home,
     [foreign.id]: foreign,
+    [emptyForeign.id]: emptyForeign,
   };
 
   const draggables: DraggableDimensionMap = {
@@ -190,6 +209,7 @@ export const getPreset = (axis: Axis) => {
     inForeign2,
     inForeign3,
     inForeign4,
+    emptyForeign,
     droppables,
     draggables,
   };
