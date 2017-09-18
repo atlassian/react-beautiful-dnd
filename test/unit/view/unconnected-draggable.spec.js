@@ -217,13 +217,20 @@ const executeOnKeyLift = (wrapper: ReactWrapper) => ({
 };
 
 const getFromLift = (dispatchProps: DispatchProps) => {
-  const [draggableIdArg, typeArg, clientArg, pageArg] = dispatchProps.lift.mock.calls[0];
+  const [
+    draggableIdArg,
+    typeArg,
+    clientArg,
+    windowScrollArg,
+    isScrollAllowedArg,
+  ] = dispatchProps.lift.mock.calls[0];
 
   return {
     draggableId: draggableIdArg,
     type: typeArg,
     client: clientArg,
-    page: pageArg,
+    windowScroll: windowScrollArg,
+    isScrollAllowed: isScrollAllowedArg,
   };
 };
 
@@ -418,29 +425,21 @@ describe('Draggable - unconnected', () => {
           expect(getFromLift(dispatchProps).client).toEqual(client);
         });
 
-        it('should lift with the page location', () => {
-          const selection: Position = {
-            x: 100,
-            y: 200,
-          };
-          // made up
-          const center: Position = {
-            x: 50,
-            y: 60,
-          };
+        it('should lift with the window scroll', () => {
           const windowScroll = {
             x: 20,
             y: 30,
           };
 
-          const page: InitialDragLocation = {
-            selection: add(selection, windowScroll),
-            center: add(center, windowScroll),
-          };
+          executeOnLift(wrapper)({ windowScroll });
 
-          executeOnLift(wrapper)({ selection, center, windowScroll });
+          expect(getFromLift(dispatchProps).windowScroll).toEqual(windowScroll);
+        });
 
-          expect(getFromLift(dispatchProps).page).toEqual(page);
+        it('should publish that container scrolling is allowed', () => {
+          executeOnLift(wrapper)();
+
+          expect(getFromLift(dispatchProps).isScrollAllowed).toEqual(true);
         });
       });
 
@@ -504,21 +503,12 @@ describe('Draggable - unconnected', () => {
           expect(client).toEqual(expected);
         });
 
-        it('should consider the mouse movement and window scroll for the page coordinates', () => {
-          const original: Position = {
-            x: 10, y: 20,
-          };
-          const mouse: Position = {
-            x: 10,
-            y: 50,
-          };
+        it('should publish the window scroll', () => {
           const windowScroll: Position = {
             x: 10,
             y: 20,
           };
           setWindowScroll(windowScroll);
-          const mouseDiff: Position = subtract(mouse, original);
-          const expected: Position = add(add(original, mouseDiff), windowScroll);
 
           const dispatchProps = getDispatchPropsStub();
           const wrapper = mountDraggable({
@@ -526,10 +516,10 @@ describe('Draggable - unconnected', () => {
             dispatchProps,
           });
 
-          wrapper.find(DragHandle).props().callbacks.onMove(mouse);
-          const [, , page] = getLastCall(dispatchProps.move);
+          wrapper.find(DragHandle).props().callbacks.onMove(origin);
+          const [, , windowScrollResult] = getLastCall(dispatchProps.move);
 
-          expect(page).toEqual(expected);
+          expect(windowScrollResult).toEqual(windowScroll);
         });
       });
 
@@ -618,23 +608,21 @@ describe('Draggable - unconnected', () => {
           expect(getFromLift(dispatchProps).client).toEqual(expected);
         });
 
-        it('should lift with a page component that considers window scroll', () => {
-          const center: Position = {
-            x: 100,
-            y: 200,
-          };
+        it('should publish the window scroll', () => {
           const windowScroll: Position = {
             x: 10,
             y: 20,
           };
-          const expected: InitialDragLocation = {
-            center: add(center, windowScroll),
-            selection: add(center, windowScroll),
-          };
 
-          executeOnKeyLift(standardWrapper)({ center, windowScroll });
+          executeOnKeyLift(standardWrapper)({ windowScroll });
 
-          expect(getFromLift(dispatchProps).page).toEqual(expected);
+          expect(getFromLift(dispatchProps).windowScroll).toEqual(windowScroll);
+        });
+
+        it('should publish that container scrolling is not alllowed', () => {
+          executeOnKeyLift(standardWrapper)();
+
+          expect(getFromLift(dispatchProps).isScrollAllowed).toEqual(false);
         });
       });
 

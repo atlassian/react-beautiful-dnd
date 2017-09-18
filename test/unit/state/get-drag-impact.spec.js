@@ -1,1415 +1,591 @@
 // @flow
-import {
-  getDraggableDimension,
-  getDroppableDimension,
-} from '../../../src/state/dimension';
 // eslint-disable-next-line no-duplicate-imports
-import getDragImpact from '../../../src/state/get-drag-impact';
-import noImpact, { noMovement } from '../../../src/state/no-impact';
-import getClientRect from '../../../src/state/get-client-rect';
-import getDroppableWithDraggables from '../../utils/get-droppable-with-draggables';
-import { add, patch } from '../../../src/state/position';
+import getDragImpact from '../../../src/state/get-drag-impact/';
+import noImpact from '../../../src/state/no-impact';
+import { add, patch, subtract } from '../../../src/state/position';
+import { vertical, horizontal } from '../../../src/state/axis';
+import {
+  getPreset,
+  updateDroppableScroll,
+  disableDroppable,
+} from '../../utils/dimension';
 import type {
-  WithinDroppable,
-  DroppableId,
-  DraggableDimension,
+  Axis,
   DroppableDimension,
-  DraggableDimensionMap,
   DroppableDimensionMap,
   DragImpact,
   Position,
 } from '../../../src/types';
 
-const droppableId: DroppableId = 'drop-1';
-const origin: Position = { x: 0, y: 0 };
-
 describe('get drag impact', () => {
-  describe('vertical', () => {
-    const droppable: DroppableDimension = getDroppableDimension({
-      id: droppableId,
-      clientRect: getClientRect({
-        top: 0,
-        left: 0,
-        right: 100,
-        bottom: 100,
-      }),
-    });
-
-    // Making sure the draggables have different heights
-    // so that we do not get false positives in the tests
-
-    // height of 9
-    const draggable1: DraggableDimension = getDraggableDimension({
-      id: 'drag-1',
-      droppableId,
-      clientRect: getClientRect({
-        top: 1,
-        left: 10,
-        right: 90,
-        bottom: 11,
-      }),
-    });
-
-    // height of 19
-    const draggable2: DraggableDimension = getDraggableDimension({
-      id: 'drag-2',
-      droppableId,
-      clientRect: getClientRect({
-        top: 11,
-        left: 10,
-        right: 90,
-        bottom: 30,
-      }),
-    });
-
-    // height of 29
-    const draggable3: DraggableDimension = getDraggableDimension({
-      id: 'drag-3',
-      droppableId,
-      clientRect: getClientRect({
-        top: 31,
-        left: 10,
-        right: 90,
-        bottom: 60,
-      }),
-    });
-
-    const droppables: DroppableDimensionMap = {
-      [droppable.id]: droppable,
-    };
-
-    const draggables: DraggableDimensionMap = {
-      [draggable1.id]: draggable1,
-      [draggable2.id]: draggable2,
-      [draggable3.id]: draggable3,
-    };
-
-    it('should return no movement when not dragging over anything', () => {
-      // dragging up above the list
-      const page: Position = {
-        x: droppable.page.withMargin.left,
-        y: droppable.page.withMargin.top - 100,
-      };
-
-      const withinDroppable: WithinDroppable = {
-        center: page,
-      };
-
-      const impact: DragImpact = getDragImpact({
-        page,
-        withinDroppable,
-        draggableId: draggable1.id,
-        draggables,
+  [vertical, horizontal].forEach((axis: Axis) => {
+    describe(`on ${axis.direction} axis`, () => {
+      const {
+        home,
+        inHome1,
+        inHome2,
+        inHome3,
+        inHome4,
+        foreign,
+        inForeign1,
+        inForeign2,
+        inForeign3,
+        inForeign4,
+        emptyForeign,
         droppables,
+        draggables,
+      } = getPreset(axis);
+
+      it('should return no impact when not dragging over anything', () => {
+        // dragging up above the list
+        const farAway: Position = {
+          x: 1000,
+          y: 1000,
+        };
+
+        const impact: DragImpact = getDragImpact({
+          pageCenter: farAway,
+          draggable: inHome1,
+          draggables,
+          droppables,
+        });
+
+        expect(impact).toEqual(noImpact);
       });
 
-      expect(impact).toEqual(noImpact);
-    });
+      describe('moving over home list', () => {
+        it('should return no impact when home is disabled', () => {
+          const disabled: DroppableDimension = disableDroppable(home);
+          const withDisabled: DroppableDimensionMap = {
+            ...droppables,
+            [disabled.id]: disabled,
+          };
+          // choosing the center of inHome2 which should have an impact
+          const pageCenter: Position = inHome2.page.withoutMargin.center;
 
-    describe('moving forward', () => {
-      describe('not moved far enough', () => {
-        it('should return the starting position', () => {
-          // moving forward - but not enough
-          const page: Position = {
-            x: draggable2.page.withoutMargin.center.x,
-            y: draggable2.page.withoutMargin.center.y + 1,
-          };
-          const withinDroppable: WithinDroppable = {
-            center: page,
-          };
+          const impact: DragImpact = getDragImpact({
+            pageCenter,
+            draggable: inHome1,
+            draggables,
+            droppables: withDisabled,
+          });
+
+          expect(impact).toEqual(noImpact);
+        });
+
+        // moving inHome1 no where
+        describe('moving over original position', () => {
+          it('should return no impact', () => {
+            const pageCenter: Position = inHome1.page.withoutMargin.center;
+            const expected: DragImpact = {
+              movement: {
+                amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
+                draggables: [],
+                isBeyondStartPosition: false,
+              },
+              direction: axis.direction,
+              destination: {
+                droppableId: home.id,
+                index: 0,
+              },
+            };
+
+            const impact: DragImpact = getDragImpact({
+              pageCenter,
+              draggable: inHome1,
+              draggables,
+              droppables,
+            });
+
+            expect(impact).toEqual(expected);
+          });
+        });
+
+        // moving inHome1 forward towards but not past inHome2
+        describe('have not moved enough to impact others', () => {
+          it('should return no impact', () => {
+            const pageCenter: Position = patch(
+              axis.line,
+              // up to the line but not over it
+              inHome2.page.withoutMargin[axis.start],
+              // no movement on cross axis
+              inHome1.page.withoutMargin.center[axis.crossLine],
+            );
+            const expected: DragImpact = {
+              movement: {
+                amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
+                draggables: [],
+                isBeyondStartPosition: true,
+              },
+              direction: axis.direction,
+              destination: {
+                droppableId: home.id,
+                index: 0,
+              },
+            };
+
+            const impact: DragImpact = getDragImpact({
+              pageCenter,
+              draggable: inHome1,
+              draggables,
+              droppables,
+            });
+
+            expect(impact).toEqual(expected);
+          });
+        });
+
+        // moving inHome2 forwards past inHome4
+        describe('moving beyond start position', () => {
+          const pageCenter: Position = patch(
+            axis.line,
+            inHome4.page.withoutMargin[axis.start] + 1,
+            // no change
+            inHome2.page.withoutMargin.center[axis.crossLine],
+          );
           const expected: DragImpact = {
             movement: {
-              amount: origin,
-              draggables: [],
+              amount: patch(axis.line, inHome2.page.withMargin[axis.size]),
+              // ordered by closest to current location
+              draggables: [inHome4.id, inHome3.id],
               isBeyondStartPosition: true,
             },
-            direction: 'vertical',
+            direction: axis.direction,
             destination: {
-              droppableId: droppable.id,
-              index: 1,
+              droppableId: home.id,
+              // is now after inHome4
+              index: 3,
             },
           };
 
           const impact: DragImpact = getDragImpact({
-            page,
-            withinDroppable,
-            draggableId: draggable2.id,
+            pageCenter,
+            draggable: inHome2,
             draggables,
             droppables,
           });
 
           expect(impact).toEqual(expected);
         });
-      });
 
-      describe('moving past one item', () => {
-        // moving forward past the top of the next item
-        const page: Position = {
-          x: draggable1.page.withoutMargin.center.x,
-          y: draggable2.page.withoutMargin.top + 1,
-        };
-        const withinDroppable: WithinDroppable = {
-          center: page,
-        };
+        // moving inHome3 back past inHome1
+        describe('moving back past start position', () => {
+          it('should move into the correct position', () => {
+            const pageCenter: Position = patch(
+              axis.line,
+              inHome1.page.withoutMargin[axis.end] - 1,
+              // no change
+              inHome3.page.withoutMargin.center[axis.crossLine],
+            );
 
-        const impact: DragImpact = getDragImpact({
-          page,
-          withinDroppable,
-          draggableId: draggable1.id,
-          draggables,
-          droppables,
+            const expected: DragImpact = {
+              movement: {
+                amount: patch(axis.line, inHome3.page.withMargin[axis.size]),
+                // ordered by closest to current location
+                draggables: [inHome1.id, inHome2.id],
+                isBeyondStartPosition: false,
+              },
+              direction: axis.direction,
+              destination: {
+                droppableId: home.id,
+                // is now before inHome1
+                index: 0,
+              },
+            };
+
+            const impact: DragImpact = getDragImpact({
+              pageCenter,
+              draggable: inHome3,
+              draggables,
+              droppables,
+            });
+
+            expect(impact).toEqual(expected);
+          });
         });
 
-        it('should return the droppable the item is in', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.droppableId).toBe(droppable.id);
-        });
+        describe('home droppable scroll has changed during a drag', () => {
+          // moving inHome1 past inHome2 by scrolling the dimension
+          describe('moving beyond start position with own scroll', () => {
+            it('should move past other draggables', () => {
+              // the middle of the target edge
+              const startOfInHome2: Position = patch(
+                axis.line,
+                inHome2.page.withoutMargin[axis.start],
+                inHome2.page.withoutMargin.center[axis.crossLine],
+              );
+              const distanceNeeded: Position = add(
+                subtract(startOfInHome2, inHome1.page.withoutMargin.center),
+                // need to move over the edge
+                patch(axis.line, 1),
+              );
+              const homeWithScroll: DroppableDimension = updateDroppableScroll(
+                home, distanceNeeded
+              );
+              const updatedDroppables: DroppableDimensionMap = {
+                ...droppables,
+                [home.id]: homeWithScroll,
+              };
+              // no changes in current page center from original
+              const pageCenter: Position = inHome1.page.withoutMargin.center;
+              const expected: DragImpact = {
+                movement: {
+                  amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
+                  // ordered by closest to current location
+                  draggables: [inHome2.id],
+                  isBeyondStartPosition: true,
+                },
+                direction: axis.direction,
+                destination: {
+                  droppableId: home.id,
+                  // is now after inHome2
+                  index: 1,
+                },
+              };
 
-        it('should return the new index of the item', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.index).toBe(1);
-        });
+              const impact: DragImpact = getDragImpact({
+                pageCenter,
+                draggable: inHome1,
+                draggables,
+                droppables: updatedDroppables,
+              });
 
-        it('should indicate that the item being move forward', () => {
-          expect(impact.movement.isBeyondStartPosition).toBe(true);
-        });
-
-        it('should indicate that the item being moved should move the height of the item being dragged', () => {
-          const expected: Position = {
-            x: 0,
-            y: draggable1.page.withMargin.height,
-          };
-          expect(impact.movement.amount).toEqual(expected);
-        });
-
-        it('should return the items that need to be moved', () => {
-          expect(impact.movement.draggables).toEqual([draggable2.id]);
-        });
-      });
-
-      describe('moving past two items', () => {
-        // moving forward past the top of the third item
-        const page: Position = {
-          x: draggable1.page.withoutMargin.center.x,
-          y: draggable3.page.withoutMargin.top + 1,
-        };
-        const withinDroppable: WithinDroppable = {
-          center: page,
-        };
-
-        const impact: DragImpact = getDragImpact({
-          page,
-          withinDroppable,
-          draggableId: draggable1.id,
-          draggables,
-          droppables,
-        });
-
-        it('should return the droppable the item is in', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.droppableId).toBe(droppable.id);
-        });
-
-        it('should return the new index of the item', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.index).toBe(2);
-        });
-
-        it('should indicate that the item being move forward', () => {
-          expect(impact.movement.isBeyondStartPosition).toBe(true);
-        });
-
-        it('should indicate that the item being moved should move the height of the item being dragged', () => {
-          const expected: Position = {
-            x: 0,
-            y: draggable1.page.withMargin.height,
-          };
-          expect(impact.movement.amount).toEqual(expected);
-        });
-
-        it('should return the items that need to be moved (sorted by the closest to the draggables current location)', () => {
-          expect(impact.movement.draggables).toEqual([draggable3.id, draggable2.id]);
-        });
-      });
-
-      describe('moving past one item when the dragging item is not the first in the list', () => {
-        // moving the second item forward past the top of the third item
-        const page: Position = {
-          x: draggable2.page.withoutMargin.center.x,
-          y: draggable3.page.withMargin.top + 1,
-        };
-        const withinDroppable: WithinDroppable = {
-          center: page,
-        };
-
-        const impact: DragImpact = getDragImpact({
-          page,
-          withinDroppable,
-          draggableId: draggable2.id,
-          draggables,
-          droppables,
-        });
-
-        it('should return the droppable the item is in', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.droppableId).toBe(droppable.id);
-        });
-
-        it('should return the new index of the item', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.index).toBe(2);
-        });
-
-        it('should indicate that the item being move forward', () => {
-          expect(impact.movement.isBeyondStartPosition).toBe(true);
-        });
-
-        it('should indicate that the item being moved should move the height of the item being dragged', () => {
-          const expected: Position = {
-            x: 0,
-            y: draggable2.page.withMargin.height,
-          };
-          expect(impact.movement.amount).toEqual(expected);
-        });
-
-        it('should return the items that need to be moved', () => {
-          expect(impact.movement.draggables).toEqual([draggable3.id]);
-        });
-      });
-
-      describe('moving past an item due to change in droppable scroll', () => {
-        // using the center position of the draggable as the selection point
-        const page: Position = draggable1.page.withMargin.center;
-        const withinDroppable: WithinDroppable = {
-        // just over the top of the second item
-          center: {
-            x: draggable1.page.withoutMargin.center.x,
-            y: draggable2.page.withoutMargin.top + 1,
-          },
-        };
-
-        const impact: DragImpact = getDragImpact({
-          page,
-          withinDroppable,
-          draggableId: draggable1.id,
-          draggables,
-          droppables,
-        });
-
-        it('should return the droppable the item is in', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.droppableId).toBe(droppable.id);
-        });
-
-        it('should return the new index of the item', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.index).toBe(1);
-        });
-
-        it('should indicate that the item being move forward', () => {
-          expect(impact.movement.isBeyondStartPosition).toBe(true);
-        });
-
-        it('should indicate that the item being moved should move the height of the item being dragged', () => {
-          const expected: Position = {
-            x: 0,
-            y: draggable1.page.withMargin.height,
-          };
-          expect(impact.movement.amount).toEqual(expected);
-        });
-
-        it('should return the items that need to be moved', () => {
-          expect(impact.movement.draggables).toEqual([draggable2.id]);
-        });
-      });
-    });
-
-    // same tests as moving forward
-    describe('moving backward', () => {
-      describe('not moved far enough', () => {
-        it('should return the initial location', () => {
-        // moving the last item backward - but not enough
-          const page: Position = {
-            x: draggable3.page.withoutMargin.center.x,
-            y: draggable3.page.withoutMargin.center.y - 1,
-          };
-          const withinDroppable: WithinDroppable = {
-            center: page,
-          };
-          const expected: DragImpact = {
-            movement: {
-              amount: origin,
-              draggables: [],
-              isBeyondStartPosition: false,
-            },
-            direction: 'vertical',
-            destination: {
-              droppableId: droppable.id,
-              index: 2,
-            },
-          };
-
-          const impact: DragImpact = getDragImpact({
-            page,
-            withinDroppable,
-            draggableId: draggable3.id,
-            draggables,
-            droppables,
+              expect(impact).toEqual(expected);
+            });
           });
 
-          expect(impact).toEqual(expected);
+          // moving inHome4 back past inHome2
+          describe('moving back past start position with own scroll', () => {
+            it('should move back past inHome2', () => {
+              // the middle of the target edge
+              const endOfInHome2: Position = patch(
+                axis.line,
+                inHome2.page.withoutMargin[axis.end],
+                inHome2.page.withoutMargin.center[axis.crossLine],
+              );
+              const distanceNeeded: Position = add(
+                subtract(endOfInHome2, inHome4.page.withoutMargin.center),
+                // need to move over the edge
+                patch(axis.line, -1),
+              );
+              const homeWithScroll: DroppableDimension = updateDroppableScroll(
+                home, distanceNeeded
+              );
+              const updatedDroppables: DroppableDimensionMap = {
+                ...droppables,
+                [home.id]: homeWithScroll,
+              };
+              // no changes in current page center from original
+              const pageCenter: Position = inHome4.page.withoutMargin.center;
+              const expected: DragImpact = {
+                movement: {
+                  amount: patch(axis.line, inHome4.page.withMargin[axis.size]),
+                // ordered by closest to current location
+                  draggables: [inHome2.id, inHome3.id],
+                  isBeyondStartPosition: false,
+                },
+                direction: axis.direction,
+                destination: {
+                  droppableId: home.id,
+                // is now before inHome2
+                  index: 1,
+                },
+              };
+
+              const impact: DragImpact = getDragImpact({
+                pageCenter,
+                draggable: inHome4,
+                draggables,
+                droppables: updatedDroppables,
+              });
+
+              expect(impact).toEqual(expected);
+            });
+          });
         });
       });
 
-      describe('moving past one item', () => {
-      // moving backward past the bottom of the previous item
-        const page: Position = {
-          x: draggable3.page.withoutMargin.center.x,
-          y: draggable2.page.withoutMargin.bottom - 1,
-        };
-        const withinDroppable: WithinDroppable = {
-          center: page,
-        };
-
-        const impact: DragImpact = getDragImpact({
-          page,
-          withinDroppable,
-          draggableId: draggable3.id,
-          draggables,
-          droppables,
-        });
-
-        it('should return the droppable the item is in', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.droppableId).toBe(droppable.id);
-        });
-
-        it('should return the new index of the item', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.index).toBe(1);
-        });
-
-        it('should indicate that the item being moved backward', () => {
-          expect(impact.movement.isBeyondStartPosition).toBe(false);
-        });
-
-        it('should indicate that the item being moved should move the height of the item being dragged', () => {
-          const expected: Position = {
-            x: 0,
-            y: draggable3.page.withMargin.height,
+      describe('moving into foreign list', () => {
+        it('should return no impact when list is disabled', () => {
+          const disabled: DroppableDimension = disableDroppable(foreign);
+          const withDisabled: DroppableDimensionMap = {
+            ...droppables,
+            [foreign.id]: disabled,
           };
-          expect(impact.movement.amount).toEqual(expected);
-        });
-
-        it('should return the items that need to be moved', () => {
-          expect(impact.movement.draggables).toEqual([draggable2.id]);
-        });
-      });
-
-      describe('moving past two items', () => {
-      // moving the last item backward past the bottom of the first item
-        const page: Position = {
-          x: draggable3.page.withoutMargin.center.x,
-          y: draggable1.page.withoutMargin.bottom - 1,
-        };
-        const withinDroppable: WithinDroppable = {
-          center: page,
-        };
-
-        const impact: DragImpact = getDragImpact({
-          page,
-          withinDroppable,
-          draggableId: draggable3.id,
-          draggables,
-          droppables,
-        });
-
-        it('should return the droppable the item is in', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.droppableId).toBe(droppable.id);
-        });
-
-        it('should return the new index of the item', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.index).toBe(0);
-        });
-
-        it('should indicate that the item being moved backward', () => {
-          expect(impact.movement.isBeyondStartPosition).toBe(false);
-        });
-
-        it('should indicate that the items being moved should move the height of the item being dragged', () => {
-          const expected: Position = {
-            x: 0,
-            y: draggable3.page.withMargin.height,
-          };
-          expect(impact.movement.amount).toEqual(expected);
-        });
-
-        it('should return the items that need to be moved', () => {
-          expect(impact.movement.draggables).toEqual([draggable1.id, draggable2.id]);
-        });
-      });
-
-      describe('moving past one item when the dragging item is not the last in the list', () => {
-      // moving the second item backward past the bottom of the first item
-        const page: Position = {
-          x: draggable2.page.withoutMargin.center.x,
-          y: draggable1.page.withoutMargin.bottom - 1,
-        };
-
-        const withinDroppable: WithinDroppable = {
-          center: page,
-        };
-
-        const impact: DragImpact = getDragImpact({
-          page,
-          withinDroppable,
-          draggableId: draggable2.id,
-          draggables,
-          droppables,
-        });
-
-        it('should return the droppable the item is in', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.droppableId).toBe(droppable.id);
-        });
-
-        it('should return the new index of the item', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.index).toBe(0);
-        });
-
-        it('should indicate that the item being moved backward', () => {
-          expect(impact.movement.isBeyondStartPosition).toBe(false);
-        });
-
-        it('should indicate that the items being moved should move the height of the item being dragged', () => {
-          const expected: Position = {
-            x: 0,
-            y: draggable2.page.withMargin.height,
-          };
-          expect(impact.movement.amount).toEqual(expected);
-        });
-
-        it('should return the items that need to be moved', () => {
-          expect(impact.movement.draggables).toEqual([draggable1.id]);
-        });
-      });
-
-      describe('moving past an item due to change in droppable scroll', () => {
-      // using the center position of the draggable as the selection point
-        const page: Position = draggable2.page.withMargin.center;
-        const withinDroppable: WithinDroppable = {
-        // just back past the bottom of the first draggable
-          center: {
-            x: draggable2.page.withoutMargin.center.x,
-            y: draggable1.page.withoutMargin.bottom - 1,
-          },
-        };
-
-        const impact: DragImpact = getDragImpact({
-          page,
-          withinDroppable,
-          draggableId: draggable2.id,
-          draggables,
-          droppables,
-        });
-
-        it('should return the droppable the item is in', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.droppableId).toBe(droppable.id);
-        });
-
-        it('should return the new index of the item', () => {
-        // Moving from second position to first position
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.index).toBe(0);
-        });
-
-        it('should indicate that the item being moved backward', () => {
-          expect(impact.movement.isBeyondStartPosition).toBe(false);
-        });
-
-        it('should indicate that the item being moved should move the height of the item being dragged', () => {
-          const expected: Position = {
-            x: 0,
-            y: draggable2.page.withMargin.height,
-          };
-          expect(impact.movement.amount).toEqual(expected);
-        });
-
-        it('should return the items that need to be moved', () => {
-          expect(impact.movement.draggables).toEqual([draggable1.id]);
-        });
-      });
-    });
-
-    describe('moving over disabled list', () => {
-      it('should return an empty impact', () => {
-        // moving forward past the top of the next item
-        const page: Position = {
-          x: draggable1.page.withoutMargin.center.x,
-          y: draggable2.page.withoutMargin.top + 1,
-        };
-        const withinDroppable: WithinDroppable = {
-          center: page,
-        };
-        // $ExpectError - using spread
-        const disabled: DroppableDimension = {
-          ...droppable,
-          isEnabled: false,
-        };
-        const custom: DroppableDimensionMap = {
-          [disabled.id]: disabled,
-        };
-        const expected: DragImpact = {
-          movement: noMovement,
-          direction: droppable.axis.direction,
-          destination: null,
-        };
-
-        const impact: DragImpact = getDragImpact({
-          page,
-          withinDroppable,
-          draggableId: draggable1.id,
-          draggables,
-          droppables: custom,
-        });
-
-        expect(impact).toEqual(expected);
-      });
-    });
-  });
-
-  // same tests as vertical - but moving on the horizontal plane
-  describe('horizontal', () => {
-    const droppable: DroppableDimension = getDroppableDimension({
-      id: droppableId,
-      direction: 'horizontal',
-      clientRect: getClientRect({
-        top: 0,
-        left: 0,
-        right: 100,
-        bottom: 100,
-      }),
-    });
-
-    // Making sure the draggables have different heights
-    // so that we do not get false positives in the tests
-
-    // width of 9
-    const draggable1: DraggableDimension = getDraggableDimension({
-      id: 'drag-1',
-      droppableId,
-      clientRect: getClientRect({
-        top: 0,
-        left: 1,
-        right: 10,
-        bottom: 100,
-      }),
-    });
-
-    // width of 19
-    const draggable2: DraggableDimension = getDraggableDimension({
-      id: 'drag-2',
-      droppableId,
-      clientRect: getClientRect({
-        top: 0,
-        left: 11,
-        right: 30,
-        bottom: 100,
-      }),
-    });
-
-    // width of 29
-    const draggable3: DraggableDimension = getDraggableDimension({
-      id: 'drag-3',
-      droppableId,
-      clientRect: getClientRect({
-        top: 0,
-        left: 31,
-        right: 60,
-        bottom: 100,
-      }),
-    });
-
-    const droppables: DroppableDimensionMap = {
-      [droppable.id]: droppable,
-    };
-
-    const draggables: DraggableDimensionMap = {
-      [draggable1.id]: draggable1,
-      [draggable2.id]: draggable2,
-      [draggable3.id]: draggable3,
-    };
-
-    it('should return no movement when not dragging over anything', () => {
-      // dragging up above the list
-      const page: Position = {
-        x: droppable.page.withMargin.left,
-        y: droppable.page.withMargin.top - 100,
-      };
-
-      const withinDroppable: WithinDroppable = {
-        center: page,
-      };
-
-      const impact: DragImpact = getDragImpact({
-        page,
-        withinDroppable,
-        draggableId: draggable1.id,
-        draggables,
-        droppables,
-      });
-
-      expect(impact).toEqual(noImpact);
-    });
-
-    describe('moving forward', () => {
-      describe('not moved far enough', () => {
-        it('should return the starting position', () => {
-          // moving forward - but not enough
-          const page: Position = {
-            x: draggable2.page.withoutMargin.center.x + 1,
-            y: draggable2.page.withoutMargin.center.y,
-          };
-          const withinDroppable: WithinDroppable = {
-            center: page,
-          };
-          const expected: DragImpact = {
-            movement: {
-              amount: origin,
-              draggables: [],
-              isBeyondStartPosition: true,
-            },
-            direction: 'horizontal',
-            destination: {
-              droppableId: droppable.id,
-              index: 1,
-            },
-          };
+          // choosing the center of inForeign1 which should have an impact
+          const pageCenter: Position = inForeign1.page.withoutMargin.center;
 
           const impact: DragImpact = getDragImpact({
-            page,
-            withinDroppable,
-            draggableId: draggable2.id,
+            pageCenter,
+            draggable: inHome1,
             draggables,
-            droppables,
+            droppables: withDisabled,
           });
 
-          expect(impact).toEqual(expected);
-        });
-      });
-
-      describe('moving past one item', () => {
-        // moving forward past the right of the next item
-        const page: Position = {
-          x: draggable2.page.withoutMargin.left + 1,
-          y: draggable1.page.withoutMargin.center.y,
-        };
-        const withinDroppable: WithinDroppable = {
-          center: page,
-        };
-
-        const impact: DragImpact = getDragImpact({
-          page,
-          withinDroppable,
-          draggableId: draggable1.id,
-          draggables,
-          droppables,
+          expect(impact).toEqual(noImpact);
         });
 
-        it('should return the droppable the item is in', () => {
-          if (!impact.destination) {
-            throw new Error('invalid data');
-          }
-          expect(impact.destination.droppableId).toBe(droppable.id);
+        // moving inHome1 above inForeign1
+        describe('moving into the start of a populated droppable', () => {
+          it('should move everything in the foreign list forward', () => {
+            const pageCenter: Position = patch(
+              axis.line,
+              // just before the end of the dimension which is the cut off
+              inForeign1.page.withoutMargin[axis.end] - 1,
+              inForeign1.page.withoutMargin.center[axis.crossLine],
+            );
+            const expected: DragImpact = {
+              movement: {
+                amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
+                // ordered by closest to current location
+                draggables: [inForeign1.id, inForeign2.id, inForeign3.id, inForeign4.id],
+                isBeyondStartPosition: false,
+              },
+              direction: axis.direction,
+              destination: {
+                // now in a different droppable
+                droppableId: foreign.id,
+                // is now before inForeign1
+                index: 0,
+              },
+            };
+
+            const impact: DragImpact = getDragImpact({
+              pageCenter,
+              draggable: inHome1,
+              draggables,
+              droppables,
+            });
+
+            expect(impact).toEqual(expected);
+          });
         });
 
-        it('should return the new index of the item', () => {
-          if (!impact.destination) {
-            throw new Error('invalid data');
-          }
-          expect(impact.destination.index).toBe(1);
+        // moving inHome1 just after the start of inForeign2
+        describe('moving into the middle of a populated droppable', () => {
+          it('should move everything after inHome2 forward', () => {
+            const pageCenter: Position = patch(
+              axis.line,
+              inForeign2.page.withoutMargin[axis.end] - 1,
+              inForeign2.page.withoutMargin.center[axis.crossLine],
+            );
+            const expected: DragImpact = {
+              movement: {
+                amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
+                // ordered by closest to current location
+                draggables: [inForeign2.id, inForeign3.id, inForeign4.id],
+                isBeyondStartPosition: false,
+              },
+              direction: axis.direction,
+              destination: {
+                // now in a different droppable
+                droppableId: foreign.id,
+                // is now after inForeign1
+                index: 1,
+              },
+            };
+
+            const impact: DragImpact = getDragImpact({
+              pageCenter,
+              draggable: inHome1,
+              draggables,
+              droppables,
+            });
+
+            expect(impact).toEqual(expected);
+          });
         });
 
-        it('should indicate that the item being move forward', () => {
-          expect(impact.movement.isBeyondStartPosition).toBe(true);
+        // moving inHome1 after inForeign4
+        describe('moving into the end of a populated dropppable', () => {
+          it('should not displace anything', () => {
+            const pageCenter: Position = patch(
+              axis.line,
+              inForeign4.page.withoutMargin[axis.end],
+              inForeign4.page.withoutMargin.center[axis.crossLine],
+            );
+            const expected: DragImpact = {
+              movement: {
+                amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
+                // nothing is moved - moving to the end of the list
+                draggables: [],
+                isBeyondStartPosition: false,
+              },
+              direction: axis.direction,
+              destination: {
+                // now in a different droppable
+                droppableId: foreign.id,
+                // is now after inForeign1
+                index: 4,
+              },
+            };
+
+            const impact: DragImpact = getDragImpact({
+              pageCenter,
+              draggable: inHome1,
+              draggables,
+              droppables,
+            });
+
+            expect(impact).toEqual(expected);
+          });
         });
 
-        it('should indicate that the item being moved should move the width of the item being dragged', () => {
-          const expected: Position = {
-            x: draggable1.page.withMargin.width,
-            y: 0,
-          };
-          expect(impact.movement.amount).toEqual(expected);
+        describe('moving to an empty droppable', () => {
+          it('should not displace anything an move into the first position', () => {
+            // over the center of the empty droppable
+            const pageCenter: Position = emptyForeign.page.withoutMargin.center;
+            const expected: DragImpact = {
+              movement: {
+                amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
+                draggables: [],
+                isBeyondStartPosition: false,
+              },
+              direction: axis.direction,
+              destination: {
+                // now in a different droppable
+                droppableId: emptyForeign.id,
+                // first item in the empty list
+                index: 0,
+              },
+            };
+
+            const impact: DragImpact = getDragImpact({
+              pageCenter,
+              draggable: inHome1,
+              draggables,
+              droppables,
+            });
+
+            expect(impact).toEqual(expected);
+          });
         });
 
-        it('should return the items that need to be moved', () => {
-          expect(impact.movement.draggables).toEqual([draggable2.id]);
-        });
-      });
+        describe('home droppable is updated during a drag', () => {
+          const pageCenter: Position = patch(
+            axis.line,
+            inForeign2.page.withoutMargin[axis.end] - 1,
+            inForeign2.page.withoutMargin.center[axis.crossLine],
+          );
 
-      describe('moving past two items', () => {
-        // moving forward past the left of the third item
-        const page: Position = {
-          x: draggable3.page.withoutMargin.left + 1,
-          y: draggable1.page.withoutMargin.center.y,
-        };
-        const withinDroppable: WithinDroppable = {
-          center: page,
-        };
+          it('should have no impact impact the destination (actual)', () => {
+            // will go over the threshold of inForeign2 so that it will not be displaced forward
+            const scroll: Position = patch(axis.line, 1000);
+            const map: DroppableDimensionMap = {
+              ...droppables,
+              [home.id]: updateDroppableScroll(home, scroll),
+            };
 
-        const impact: DragImpact = getDragImpact({
-          page,
-          withinDroppable,
-          draggableId: draggable1.id,
-          draggables,
-          droppables,
-        });
+            const expected: DragImpact = {
+              movement: {
+                amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
+                draggables: [inForeign2.id, inForeign3.id, inForeign4.id],
+                isBeyondStartPosition: false,
+              },
+              direction: axis.direction,
+              destination: {
+                droppableId: foreign.id,
+                index: 1,
+              },
+            };
 
-        it('should return the droppable the item is in', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.droppableId).toBe(droppable.id);
-        });
+            const impact: DragImpact = getDragImpact({
+              pageCenter,
+              draggable: inHome1,
+              draggables,
+              droppables: map,
+            });
 
-        it('should return the new index of the item', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.index).toBe(2);
-        });
+            expect(impact).toEqual(expected);
+          });
+          it('should impact the destination (control)', () => {
+            const expected: DragImpact = {
+              movement: {
+                amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
+                draggables: [inForeign2.id, inForeign3.id, inForeign4.id],
+                isBeyondStartPosition: false,
+              },
+              direction: axis.direction,
+              destination: {
+                droppableId: foreign.id,
+                index: 1,
+              },
+            };
 
-        it('should indicate that the item being move forward', () => {
-          expect(impact.movement.isBeyondStartPosition).toBe(true);
-        });
+            const impact: DragImpact = getDragImpact({
+              pageCenter,
+              draggable: inHome1,
+              draggables,
+              droppables,
+            });
 
-        it('should indicate that the item being moved should move the width of the item being dragged', () => {
-          const expected: Position = {
-            x: draggable1.page.withMargin.width,
-            y: 0,
-          };
-          expect(impact.movement.amount).toEqual(expected);
-        });
-
-        it('should return the items that need to be moved (sorted by closest impacted)', () => {
-          expect(impact.movement.draggables).toEqual([draggable3.id, draggable2.id]);
-        });
-      });
-
-      describe('moving past one item when the dragging item is not the first in the list', () => {
-        // moving the second item forward past the left of the third item
-        const page: Position = {
-          x: draggable3.page.withoutMargin.left + 1,
-          y: draggable2.page.withMargin.center.y,
-        };
-        const withinDroppable: WithinDroppable = {
-          center: page,
-        };
-
-        const impact: DragImpact = getDragImpact({
-          page,
-          withinDroppable,
-          draggableId: draggable2.id,
-          draggables,
-          droppables,
+            expect(impact).toEqual(expected);
+          });
         });
 
-        it('should return the droppable the item is in', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.droppableId).toBe(droppable.id);
-        });
+        describe('destination droppable scroll is updated during a drag', () => {
+          const pageCenter: Position = patch(
+            axis.line,
+            inForeign2.page.withoutMargin[axis.end] - 1,
+            inForeign2.page.withoutMargin.center[axis.crossLine],
+          );
 
-        it('should return the new index of the item', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.index).toBe(2);
-        });
+          it('should impact the destination (actual)', () => {
+            // will go over the threshold of inForeign2 so that it will not
+            // be displaced forward
+            const scroll: Position = patch(axis.line, 1);
+            const map: DroppableDimensionMap = {
+              ...droppables,
+              [foreign.id]: updateDroppableScroll(foreign, scroll),
+            };
 
-        it('should indicate that the item being move forward', () => {
-          expect(impact.movement.isBeyondStartPosition).toBe(true);
-        });
+            const expected: DragImpact = {
+              movement: {
+                amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
+                draggables: [inForeign3.id, inForeign4.id],
+                isBeyondStartPosition: false,
+              },
+              direction: axis.direction,
+              destination: {
+                droppableId: foreign.id,
+                index: 2,
+              },
+            };
 
-        it('should indicate that the item being moved should move the width of the item being dragged', () => {
-          const expected: Position = {
-            x: draggable2.page.withMargin.width,
-            y: 0,
-          };
-          expect(impact.movement.amount).toEqual(expected);
-        });
+            const impact: DragImpact = getDragImpact({
+              pageCenter,
+              draggable: inHome1,
+              draggables,
+              droppables: map,
+            });
 
-        it('should return the items that need to be moved', () => {
-          expect(impact.movement.draggables).toEqual([draggable3.id]);
-        });
-      });
-
-      describe('moving past an item due to change in droppable scroll', () => {
-        // using the center position of the draggable as the selection point
-        const page: Position = draggable1.page.withMargin.center;
-        const withinDroppable: WithinDroppable = {
-          // just over the top of the right item
-          center: {
-            x: draggable2.page.withoutMargin.right + 1,
-            y: draggable1.page.withoutMargin.center.y,
-          },
-        };
-
-        const impact: DragImpact = getDragImpact({
-          page,
-          withinDroppable,
-          draggableId: draggable1.id,
-          draggables,
-          droppables,
-        });
-
-        it('should return the droppable the item is in', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.droppableId).toBe(droppable.id);
-        });
-
-        it('should return the new index of the item', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.index).toBe(1);
-        });
-
-        it('should indicate that the item being move forward', () => {
-          expect(impact.movement.isBeyondStartPosition).toBe(true);
-        });
-
-        it('should indicate that the item being moved should move the width of the item being dragged', () => {
-          const expected: Position = {
-            x: draggable1.page.withMargin.width,
-            y: 0,
-          };
-          expect(impact.movement.amount).toEqual(expected);
-        });
-
-        it('should return the items that need to be moved', () => {
-          expect(impact.movement.draggables).toEqual([draggable2.id]);
-        });
-      });
-    });
-
-    // same tests as moving forward
-    describe('moving backward', () => {
-      describe('not moved far enough', () => {
-        it('should return the initial location', () => {
-          // moving the last item backward - but not enough
-          const page: Position = {
-            x: draggable3.page.withoutMargin.center.x - 1,
-            y: draggable3.page.withoutMargin.center.y,
-          };
-          const withinDroppable: WithinDroppable = {
-            center: page,
-          };
-          const expected: DragImpact = {
-            movement: {
-              amount: origin,
-              draggables: [],
-              isBeyondStartPosition: false,
-            },
-            direction: 'horizontal',
-            destination: {
-              droppableId: droppable.id,
-              index: 2,
-            },
-          };
-
-          const impact: DragImpact = getDragImpact({
-            page,
-            withinDroppable,
-            draggableId: draggable3.id,
-            draggables,
-            droppables,
+            expect(impact).toEqual(expected);
           });
 
-          expect(impact).toEqual(expected);
+          it('should impact the destination (control)', () => {
+            const expected: DragImpact = {
+              movement: {
+                amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
+                draggables: [inForeign2.id, inForeign3.id, inForeign4.id],
+                isBeyondStartPosition: false,
+              },
+              direction: axis.direction,
+              destination: {
+                droppableId: foreign.id,
+                index: 1,
+              },
+            };
+
+            const impact: DragImpact = getDragImpact({
+              pageCenter,
+              draggable: inHome1,
+              draggables,
+              droppables,
+            });
+
+            expect(impact).toEqual(expected);
+          });
         });
-      });
-
-      describe('moving past one item', () => {
-        // moving backward past the bottom of the previous item
-        const page: Position = {
-          x: draggable2.page.withoutMargin.right - 1,
-          y: draggable2.page.withoutMargin.center.y,
-        };
-        const withinDroppable: WithinDroppable = {
-          center: page,
-        };
-
-        const impact: DragImpact = getDragImpact({
-          page,
-          withinDroppable,
-          draggableId: draggable3.id,
-          draggables,
-          droppables,
-        });
-
-        it('should return the droppable the item is in', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.droppableId).toBe(droppable.id);
-        });
-
-        it('should return the new index of the item', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.index).toBe(1);
-        });
-
-        it('should indicate that the item being moved backward', () => {
-          expect(impact.movement.isBeyondStartPosition).toBe(false);
-        });
-
-        it('should indicate that the item being moved should move the width of the item being dragged', () => {
-          const expected: Position = {
-            x: draggable3.page.withMargin.width,
-            y: 0,
-          };
-          expect(impact.movement.amount).toEqual(expected);
-        });
-
-        it('should return the items that need to be moved', () => {
-          expect(impact.movement.draggables).toEqual([draggable2.id]);
-        });
-      });
-
-      describe('moving past two items', () => {
-        // moving the last item backward past the bottom of the first item
-        const page: Position = {
-          x: draggable1.page.withoutMargin.right - 1,
-          y: draggable1.page.withoutMargin.center.y,
-        };
-        const withinDroppable: WithinDroppable = {
-          center: page,
-        };
-
-        const impact: DragImpact = getDragImpact({
-          page,
-          withinDroppable,
-          draggableId: draggable3.id,
-          draggables,
-          droppables,
-        });
-
-        it('should return the droppable the item is in', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.droppableId).toBe(droppable.id);
-        });
-
-        it('should return the new index of the item', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.index).toBe(0);
-        });
-
-        it('should indicate that the item being moved backward', () => {
-          expect(impact.movement.isBeyondStartPosition).toBe(false);
-        });
-
-        it('should indicate that the items being moved should move the width of the item being dragged', () => {
-          const expected: Position = {
-            x: draggable3.page.withMargin.width,
-            y: 0,
-          };
-          expect(impact.movement.amount).toEqual(expected);
-        });
-
-        it('should return the items that need to be moved (sorted by closest to the draggables current position)', () => {
-          expect(impact.movement.draggables).toEqual([draggable1.id, draggable2.id]);
-        });
-      });
-
-      describe('moving past one item when the dragging item is not the last in the list', () => {
-        // moving the second item backward past the right of the first item
-        const page: Position = {
-          x: draggable1.page.withoutMargin.right - 1,
-          y: draggable1.page.withoutMargin.center.y,
-        };
-
-        const withinDroppable: WithinDroppable = {
-          center: page,
-        };
-
-        const impact: DragImpact = getDragImpact({
-          page,
-          withinDroppable,
-          draggableId: draggable2.id,
-          draggables,
-          droppables,
-        });
-
-        it('should return the droppable the item is in', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.droppableId).toBe(droppable.id);
-        });
-
-        it('should return the new index of the item', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.index).toBe(0);
-        });
-
-        it('should indicate that the item being moved backward', () => {
-          expect(impact.movement.isBeyondStartPosition).toBe(false);
-        });
-
-        it('should indicate that the items being moved should move the width of the item being dragged', () => {
-          const expected: Position = {
-            x: draggable2.page.withMargin.width,
-            y: 0,
-          };
-          expect(impact.movement.amount).toEqual(expected);
-        });
-
-        it('should return the items that need to be moved', () => {
-          expect(impact.movement.draggables).toEqual([draggable1.id]);
-        });
-      });
-
-      describe('moving past an item due to change in droppable scroll', () => {
-        // using the center position of the draggable as the selection point
-        const page: Position = draggable2.page.withMargin.center;
-        const withinDroppable: WithinDroppable = {
-          // just back past the bottom of the first draggable
-          center: {
-            x: draggable1.page.withoutMargin.right - 1,
-            y: draggable2.page.withoutMargin.center.y,
-          },
-        };
-
-        const impact: DragImpact = getDragImpact({
-          page,
-          withinDroppable,
-          draggableId: draggable2.id,
-          draggables,
-          droppables,
-        });
-
-        it('should return the droppable the item is in', () => {
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.droppableId).toBe(droppable.id);
-        });
-
-        it('should return the new index of the item', () => {
-          // Moving from second position to first position
-          if (!impact.destination) {
-            throw new Error('invalid result');
-          }
-          expect(impact.destination.index).toBe(0);
-        });
-
-        it('should indicate that the item being moved backward', () => {
-          expect(impact.movement.isBeyondStartPosition).toBe(false);
-        });
-
-        it('should indicate that the item being moved should move the width of the item being dragged', () => {
-          const expected: Position = {
-            x: draggable2.page.withMargin.width,
-            y: 0,
-          };
-          expect(impact.movement.amount).toEqual(expected);
-        });
-
-        it('should return the items that need to be moved', () => {
-          expect(impact.movement.draggables).toEqual([draggable1.id]);
-        });
-      });
-    });
-
-    describe('moving over disabled list', () => {
-      it('should return an empty impact', () => {
-        // moving forward past the right of the next item
-        const page: Position = {
-          x: draggable2.page.withoutMargin.left + 1,
-          y: draggable1.page.withoutMargin.center.y,
-        };
-        const withinDroppable: WithinDroppable = {
-          center: page,
-        };
-        // $ExpectError - using flow
-        const disabled: DroppableDimension = {
-          ...droppable,
-          isEnabled: false,
-        };
-        const custom: DroppableDimensionMap = {
-          [disabled.id]: disabled,
-        };
-        const expected: DragImpact = {
-          movement: noMovement,
-          direction: droppable.axis.direction,
-          destination: null,
-        };
-
-        const impact: DragImpact = getDragImpact({
-          page,
-          withinDroppable,
-          draggableId: draggable1.id,
-          draggables,
-          droppables: custom,
-        });
-
-        expect(impact).toEqual(expected);
-      });
-    });
-  });
-
-  describe('moving between lists', () => {
-    const homeDroppable = getDroppableWithDraggables({
-      droppableId: 'drop-home',
-      droppableRect: { top: 0, left: 0, bottom: 600, right: 100 },
-      draggableRects: [
-        { top: 0, left: 0, bottom: 100, right: 100 },
-        { top: 101, left: 0, bottom: 300, right: 100 },
-        { top: 301, left: 0, bottom: 600, right: 100 },
-      ],
-    });
-
-    const destinationDroppable = getDroppableWithDraggables({
-      droppableId: 'drop-destination',
-      droppableRect: { top: 100, left: 110, bottom: 800, right: 210 },
-      draggableRects: [
-        { top: 100, left: 110, bottom: 400, right: 210 },
-        { top: 401, left: 110, bottom: 600, right: 210 },
-        { top: 601, left: 110, bottom: 700, right: 210 },
-      ],
-    });
-
-    const droppables = {
-      [homeDroppable.droppableId]: homeDroppable.droppable,
-      [destinationDroppable.droppableId]: destinationDroppable.droppable,
-    };
-
-    const draggables = {
-      ...homeDroppable.draggables,
-      ...destinationDroppable.draggables,
-    };
-
-    const draggableId = homeDroppable.draggableIds[0];
-    const draggedItem = homeDroppable.draggables[draggableId];
-
-    describe('moving outside a droppable', () => {
-      const page = {
-        x: homeDroppable.droppable.page.withMargin.center.x,
-        y: homeDroppable.droppable.page.withMargin.height + 1,
-      };
-      const withinDroppable = { center: page };
-      const impact = getDragImpact({
-        page,
-        withinDroppable,
-        draggableId,
-        draggables,
-        droppables,
-      });
-
-      it('should not return a destination', () => {
-        expect(impact.destination).toBe(null);
-      });
-      it('should not return a movement amount', () => {
-        expect(impact.movement.amount).toEqual(origin);
-      });
-      it('should not displace any items', () => {
-        expect(impact.movement.draggables.length).toBe(0);
-      });
-    });
-
-    describe('moving to the start of a foreign droppable', () => {
-      const page = {
-        x: destinationDroppable.droppable.page.withMargin.center.x,
-        y: destinationDroppable.droppable.page.withMargin.top + 1,
-      };
-      const withinDroppable = { center: page };
-      const impact = getDragImpact({
-        page,
-        withinDroppable,
-        draggableId,
-        draggables,
-        droppables,
-      });
-
-      it('should return the destination droppable', () => {
-        expect(impact.destination && impact.destination.droppableId)
-          .toBe(destinationDroppable.droppableId);
-      });
-      it('should return an index of 0 (first position)', () => {
-        expect(impact.destination && impact.destination.index).toEqual(0);
-      });
-      it('should indicate that items must be displaced forwards', () => {
-        expect(impact.movement.isBeyondStartPosition).toBe(false);
-      });
-      it('should indicate that items need to be displaced by the height of the dragged item', () => {
-        const expected = patch('y', draggedItem.page.withMargin.height);
-        expect(impact.movement.amount).toEqual(expected);
-      });
-      it('should displace all items in the destination droppable', () => {
-        expect(impact.movement.draggables).toEqual(destinationDroppable.draggableIds);
-      });
-    });
-
-    describe('moving to the second position of a foreign droppable', () => {
-      const page = {
-        x: destinationDroppable.droppable.page.withMargin.center.x,
-        y: destinationDroppable.draggables[
-          destinationDroppable.draggableIds[1]
-        ].page.withMargin.top + 1,
-      };
-      const withinDroppable = { center: page };
-      const impact = getDragImpact({
-        page,
-        withinDroppable,
-        draggableId,
-        draggables,
-        droppables,
-      });
-
-      it('should return the destination droppable', () => {
-        expect(impact.destination && impact.destination.droppableId)
-          .toBe(destinationDroppable.droppableId);
-      });
-      it('should return an index of 1 (second position)', () => {
-        expect(impact.destination && impact.destination.index).toEqual(1);
-      });
-      it('should indicate that items must be displaced forwards', () => {
-        expect(impact.movement.isBeyondStartPosition).toBe(false);
-      });
-      it('should indicate that items need to be displaced by the height of the dragged item', () => {
-        const expected = patch('y', draggedItem.page.withMargin.height);
-        expect(impact.movement.amount).toEqual(expected);
-      });
-      it('should displace all items in the destination droppable except the first', () => {
-        expect(impact.movement.draggables).toEqual(
-          destinationDroppable.draggableIds.slice(1 - destinationDroppable.draggableIds.length)
-        );
-      });
-    });
-
-    describe('moving to the end of a foreign droppable', () => {
-      const page = {
-        x: destinationDroppable.droppable.page.withMargin.center.x,
-        y: destinationDroppable.droppable.page.withMargin.bottom - 1,
-      };
-      const withinDroppable = { center: page };
-      const impact = getDragImpact({
-        page,
-        withinDroppable,
-        draggableId,
-        draggables,
-        droppables,
-      });
-
-      it('should return the destination droppable', () => {
-        expect(impact.destination && impact.destination.droppableId)
-          .toBe(destinationDroppable.droppableId);
-      });
-      it('should return an index equal to the number of draggables in the destination droppable', () => {
-        expect(impact.destination && impact.destination.index)
-          .toEqual(destinationDroppable.draggableIds.length);
-      });
-      it('should indicate that items must be displaced forwards', () => {
-        expect(impact.movement.isBeyondStartPosition).toBe(false);
-      });
-      it('should indicate that items need to be displaced by the height of the dragged item', () => {
-        const expected = patch('y', draggedItem.page.withMargin.height);
-        expect(impact.movement.amount).toEqual(expected);
-      });
-      it('should not displace any items', () => {
-        expect(impact.movement.draggables.length).toBe(0);
-      });
-    });
-
-    describe('when the foreign droppable is scrolled', () => {
-      // top of the first item
-      const page = {
-        x: destinationDroppable.droppable.page.withMargin.center.x,
-        y: destinationDroppable.droppable.page.withMargin.top + 1,
-      };
-
-      // scroll past the first item
-      const center = add(page, {
-        x: 0,
-        y: destinationDroppable.draggables[
-          destinationDroppable.draggableIds[0]
-        ].page.withMargin.height,
-      });
-      const withinDroppable = { center };
-      const impact = getDragImpact({
-        page,
-        withinDroppable,
-        draggableId,
-        draggables,
-        droppables,
-      });
-
-      it('should return the destination droppable', () => {
-        expect(impact.destination && impact.destination.droppableId)
-          .toBe(destinationDroppable.droppableId);
-      });
-      it('should account for scrolling when calculating the index', () => {
-        expect(impact.destination && impact.destination.index).toEqual(1);
-      });
-      it('should indicate that items must be displaced forwards', () => {
-        expect(impact.movement.isBeyondStartPosition).toBe(false);
-      });
-      it('should indicate that items need to be displaced by the height of the dragged item', () => {
-        const expected = patch('y', draggedItem.page.withMargin.height);
-        expect(impact.movement.amount).toEqual(expected);
-      });
-      it('should account for scrolling when determining which items are being displaced', () => {
-        expect(impact.movement.draggables).toEqual(
-          destinationDroppable.draggableIds.slice(1 - destinationDroppable.draggableIds.length)
-        );
       });
     });
   });
