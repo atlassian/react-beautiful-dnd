@@ -29,9 +29,10 @@ export default ({
 }: Args): DragImpact => {
   const axis: Axis = home.axis;
   const homeScrollDiff: Position = subtract(home.scroll.current, home.scroll.initial);
-  const originalCenter: Position = draggable.page.withoutMargin.center;
   // Where the element actually is now
   const currentCenter: Position = add(pageCenter, homeScrollDiff);
+  // The starting center position
+  const originalCenter: Position = draggable.page.withoutMargin.center;
 
   // not considering margin so that items move based on visible edges
   const isBeyondStartPosition: boolean = currentCenter[axis.line] - originalCenter[axis.line] > 0;
