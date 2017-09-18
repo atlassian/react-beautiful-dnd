@@ -73,9 +73,6 @@ const make = (() => {
         client,
         page,
         windowScroll: origin,
-        withinDroppable: {
-          center: page.center,
-        },
       };
       return value;
     })();
@@ -95,9 +92,6 @@ const make = (() => {
         client,
         page,
         windowScroll: origin,
-        withinDroppable: {
-          center: page.center,
-        },
         shouldAnimate: true,
         isScrollAllowed: true,
       };

@@ -102,9 +102,6 @@ const perform = (() => {
       client,
       page,
       windowScroll: origin,
-      withinDroppable: {
-        center: page.center,
-      },
     };
 
     return value;
@@ -129,9 +126,6 @@ const perform = (() => {
       client,
       page,
       windowScroll: origin,
-      withinDroppable: {
-        center: page.center,
-      },
       shouldAnimate: true,
       isScrollAllowed: true,
     };
