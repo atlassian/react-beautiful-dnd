@@ -62,7 +62,6 @@ export default ({
   return inForeignList({
     pageCenter,
     draggable,
-    home,
     destination,
     insideDestination,
   });

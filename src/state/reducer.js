@@ -23,7 +23,7 @@ import type { TypeId,
 } from '../types';
 import getInitialImpact from './get-initial-impact';
 import { add, subtract } from './position';
-import getDragImpact from './get-drag-impact';
+import getDragImpact from './get-drag-impact/';
 import moveToNextIndex from './move-to-next-index/';
 import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
 import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';

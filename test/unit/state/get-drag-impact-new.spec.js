@@ -332,7 +332,8 @@ describe('get drag impact', () => {
           it('should move everything in the foreign list forward', () => {
             const pageCenter: Position = patch(
               axis.line,
-              inForeign1.page.withoutMargin[axis.start] + 1,
+              // just before the end of the dimension which is the cut off
+              inForeign1.page.withoutMargin[axis.end] - 1,
               inForeign1.page.withoutMargin.center[axis.crossLine],
             );
             const expected: DragImpact = {
@@ -367,7 +368,7 @@ describe('get drag impact', () => {
           it('should move everything after inHome2 forward', () => {
             const pageCenter: Position = patch(
               axis.line,
-              inForeign2.page.withoutMargin[axis.start] + 1,
+              inForeign2.page.withoutMargin[axis.end] - 1,
               inForeign2.page.withoutMargin.center[axis.crossLine],
             );
             const expected: DragImpact = {
@@ -463,30 +464,83 @@ describe('get drag impact', () => {
         });
 
         describe('home droppable is updated during a drag', () => {
-          it('should impact the drag impact', () => {
-            // Moving inHome1 just above inForeign2
-            // Usually this would move inForeign2 and the ones after it forward.
-            // However, the home has scrolled so that now it will go before inForeign3
+          const pageCenter: Position = patch(
+            axis.line,
+            inForeign2.page.withoutMargin[axis.end] - 1,
+            inForeign2.page.withoutMargin.center[axis.crossLine],
+          );
 
-            // Distance needed for impact to change
-            const distanceNeeded: number = inForeign3.page.withoutMargin[axis.start] -
-                inForeign2.page.withoutMargin[axis.start];
-            const scroll: Position = patch(
-              axis.line,
-              distanceNeeded,
-            );
-            const withUpdatedScroll: DroppableDimension = updateDroppableScroll(foreign, scroll);
-            const withUpdatedDimension: DroppableDimensionMap = {
+          it('should have no impact impact the destination (actual)', () => {
+            // will go over the threshold of inForeign2 so that it will not be displaced forward
+            const scroll: Position = patch(axis.line, 1000);
+            const map: DroppableDimensionMap = {
               ...droppables,
-              [foreign.id]: withUpdatedScroll,
+              [home.id]: updateDroppableScroll(home, scroll),
             };
-            // usually would be going before inForeign2
-            const pageCenter: Position = patch(
-              axis.line,
-              inForeign2.page.withoutMargin[axis.start],
-              inForeign2.page.withoutMargin.center[axis.crossLine],
-            );
-            // due to scroll expecting to be pulled up before inForeign1
+
+            const expected: DragImpact = {
+              movement: {
+                amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
+                draggables: [inForeign2.id, inForeign3.id, inForeign4.id],
+                isBeyondStartPosition: false,
+              },
+              direction: axis.direction,
+              destination: {
+                droppableId: foreign.id,
+                index: 1,
+              },
+            };
+
+            const impact: DragImpact = getDragImpact({
+              pageCenter,
+              draggable: inHome1,
+              draggables,
+              droppables: map,
+            });
+
+            expect(impact).toEqual(expected);
+          });
+          it('should impact the destination (control)', () => {
+            const expected: DragImpact = {
+              movement: {
+                amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
+                draggables: [inForeign2.id, inForeign3.id, inForeign4.id],
+                isBeyondStartPosition: false,
+              },
+              direction: axis.direction,
+              destination: {
+                droppableId: foreign.id,
+                index: 1,
+              },
+            };
+
+            const impact: DragImpact = getDragImpact({
+              pageCenter,
+              draggable: inHome1,
+              draggables,
+              droppables,
+            });
+
+            expect(impact).toEqual(expected);
+          });
+        });
+
+        describe('destination droppable scroll is updated during a drag', () => {
+          const pageCenter: Position = patch(
+            axis.line,
+            inForeign2.page.withoutMargin[axis.end] - 1,
+            inForeign2.page.withoutMargin.center[axis.crossLine],
+          );
+
+          it('should impact the destination (actual)', () => {
+            // will go over the threshold of inForeign2 so that it will not
+            // be displaced forward
+            const scroll: Position = patch(axis.line, 1);
+            const map: DroppableDimensionMap = {
+              ...droppables,
+              [foreign.id]: updateDroppableScroll(foreign, scroll),
+            };
+
             const expected: DragImpact = {
               movement: {
                 amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
@@ -500,20 +554,18 @@ describe('get drag impact', () => {
               },
             };
 
-            console.log('executing');
             const impact: DragImpact = getDragImpact({
               pageCenter,
               draggable: inHome1,
               draggables,
-              droppables: withUpdatedDimension,
+              droppables: map,
             });
 
             expect(impact).toEqual(expected);
+          });
 
-            // Validation
-            // without the scroll would have been in a different position
-
-            const withoutScrollExpectation: DragImpact = {
+          it('should impact the destination (control)', () => {
+            const expected: DragImpact = {
               movement: {
                 amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
                 draggables: [inForeign2.id, inForeign3.id, inForeign4.id],
@@ -522,27 +574,19 @@ describe('get drag impact', () => {
               direction: axis.direction,
               destination: {
                 droppableId: foreign.id,
-                // first item in the empty list
                 index: 1,
               },
             };
 
-            const withoutScrollImpact: DragImpact = getDragImpact({
+            const impact: DragImpact = getDragImpact({
               pageCenter,
               draggable: inHome1,
               draggables,
               droppables,
             });
 
-            expect(withoutScrollImpact).toEqual(withoutScrollExpectation);
+            expect(impact).toEqual(expected);
           });
-        });
-
-        describe('destination droppable scroll is updated during a drag', () => {
-          // moving inHome1 into the inForeign3
-          // except for the foreign droppable scroll it would have gone into inForeign2
-
-          // validating that without the scroll the drag would have had a different impact
         });
       });
     });
