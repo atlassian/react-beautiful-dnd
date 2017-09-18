@@ -302,10 +302,11 @@ export const drop = () =>
     }
 
     const { impact, initial, current } = state.drag;
-    const droppable: ?DroppableDimension = impact.destination ?
+    const draggable: DraggableDimension = state.dimension.draggable[current.id];
+    const home: DroppableDimension = state.dimension.droppable[draggable.droppableId];
+    const destination: ?DroppableDimension = impact.destination ?
       state.dimension.droppable[impact.destination.droppableId] :
       null;
-    const draggable: DraggableDimension = state.dimension.draggable[current.id];
 
     const result: DropResult = {
       draggableId: current.id,
@@ -318,11 +319,15 @@ export const drop = () =>
       movement: impact.movement,
       draggable,
       draggables: state.dimension.draggable,
-      destination: droppable,
+      destination,
     });
 
     const clientOffset: Position = subtract(newCenter, draggable.client.withMargin.center);
-    const scrollDiff: Position = getScrollDiff({ initial, current, droppable });
+    const scrollDiff: Position = getScrollDiff({
+      initial,
+      current,
+      droppable: destination || home,
+    });
     const newHomeOffset: Position = add(clientOffset, scrollDiff);
 
     // Do not animate if you do not need to.
