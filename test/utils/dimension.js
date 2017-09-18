@@ -13,7 +13,7 @@ import type {
 } from '../../src/types';
 
 export const getPreset = (axis: Axis) => {
-  const margin: Spacing = { top: 10, left: 10, bottom: 10, right: 10 };
+  const margin: Spacing = { top: 10, left: 10, bottom: 5, right: 5 };
   const padding: Spacing = { top: 2, left: 2, bottom: 2, right: 2 };
   const windowScroll: Position = { x: 50, y: 100 };
   const crossAxisStart: number = 0;

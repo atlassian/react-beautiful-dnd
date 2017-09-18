@@ -109,6 +109,7 @@ describe('move to new droppable', () => {
 
           it('should return the original center without margin', () => {
             expect(result.pageCenter).toBe(inHome2.page.withoutMargin.center);
+            expect(result.pageCenter).not.toEqual(inHome2.page.withMargin.center);
           });
 
           it('should return an empty impact with the original location', () => {
