@@ -69,7 +69,6 @@ export type CompleteLiftAction = {|
     id: DraggableId,
     type: TypeId,
     client: InitialDragLocation,
-    page: InitialDragLocation,
     windowScroll: Position,
     isScrollAllowed: boolean,
   |}
@@ -78,7 +77,6 @@ export type CompleteLiftAction = {|
 const completeLift = (id: DraggableId,
   type: TypeId,
   client: InitialDragLocation,
-  page: InitialDragLocation,
   windowScroll: Position,
   isScrollAllowed: boolean,
 ): CompleteLiftAction => ({
@@ -87,7 +85,6 @@ const completeLift = (id: DraggableId,
     id,
     type,
     client,
-    page,
     windowScroll,
     isScrollAllowed,
   },
@@ -154,20 +151,17 @@ export type MoveAction = {|
   payload: {|
     id: DraggableId,
     client: Position,
-    page: Position,
     windowScroll: Position,
   |}
 |}
 
 export const move = (id: DraggableId,
   client: Position,
-  page: Position,
   windowScroll: Position): MoveAction => ({
     type: 'MOVE',
     payload: {
       id,
       client,
-      page,
       windowScroll,
     },
   });
@@ -421,7 +415,6 @@ export type LiftAction = {|
     id: DraggableId,
     type: TypeId,
     client: InitialDragLocation,
-    page: InitialDragLocation,
     windowScroll: Position,
     isScrollAllowed: boolean,
   |}
@@ -431,7 +424,6 @@ export type LiftAction = {|
 export const lift = (id: DraggableId,
   type: TypeId,
   client: InitialDragLocation,
-  page: InitialDragLocation,
   windowScroll: Position,
   isScrollAllowed: boolean,
 ) => (dispatch: Dispatch, getState: Function) => {
@@ -471,7 +463,7 @@ export const lift = (id: DraggableId,
       if (newState.phase !== 'COLLECTING_DIMENSIONS') {
         return;
       }
-      dispatch(completeLift(id, type, client, page, windowScroll, isScrollAllowed));
+      dispatch(completeLift(id, type, client, windowScroll, isScrollAllowed));
     });
   });
 };

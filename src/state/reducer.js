@@ -19,11 +19,11 @@ import type { TypeId,
   DraggableLocation,
   CurrentDragLocation,
   Position,
-  WithinDroppable,
+  InitialDragLocation,
 } from '../types';
 import getInitialImpact from './get-initial-impact';
-import { add, subtract, negate } from './position';
-import getDragImpact from './get-drag-impact';
+import { add, subtract } from './position';
+import getDragImpact from './get-drag-impact/';
 import moveToNextIndex from './move-to-next-index/';
 import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
 import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';
@@ -52,17 +52,16 @@ const clean = memoizeOne((phase: ?Phase): State => {
 type MoveArgs = {|
   state: State,
   clientSelection: Position,
-  pageSelection: Position,
   shouldAnimate?: boolean,
   windowScroll ?: Position,
   // force a custom drag impact
   impact?: DragImpact,
 |}
 
+// TODO: move into own file and write tests
 const move = ({
   state,
   clientSelection,
-  pageSelection,
   shouldAnimate = false,
   windowScroll,
   impact,
@@ -79,39 +78,24 @@ const move = ({
 
   const previous: CurrentDrag = state.drag.current;
   const initial: InitialDrag = state.drag.initial;
-  const droppable: DroppableDimension = state.dimension.droppable[initial.source.droppableId];
+  const currentWindowScroll: Position = windowScroll || previous.windowScroll;
 
   const client: CurrentDragLocation = (() => {
     const offset: Position = subtract(clientSelection, initial.client.selection);
-    const center: Position = add(offset, initial.client.center);
 
     const result: CurrentDragLocation = {
+      offset,
       selection: clientSelection,
-      offset,
-      center,
+      center: add(offset, initial.client.center),
     };
     return result;
   })();
 
-  const page: CurrentDragLocation = (() => {
-    const offset: Position = subtract(pageSelection, initial.page.selection);
-    const center: Position = add(offset, initial.page.center);
-
-    const result: CurrentDragLocation = {
-      selection: pageSelection,
-      offset,
-      center,
-    };
-    return result;
-  })();
-
-  const scrollDiff: Position = subtract(droppable.scroll.initial, droppable.scroll.current);
-
-  const withinDroppable: WithinDroppable = {
-    center: add(page.center, negate(scrollDiff)),
+  const page: CurrentDragLocation = {
+    selection: add(client.selection, currentWindowScroll),
+    offset: add(client.offset, currentWindowScroll),
+    center: add(client.center, currentWindowScroll),
   };
-
-  const currentWindowScroll: Position = windowScroll || previous.windowScroll;
 
   const current: CurrentDrag = {
     id: previous.id,
@@ -119,15 +103,13 @@ const move = ({
     isScrollAllowed: previous.isScrollAllowed,
     client,
     page,
-    withinDroppable,
     shouldAnimate,
     windowScroll: currentWindowScroll,
   };
 
   const newImpact: DragImpact = (impact || getDragImpact({
-    page: page.center,
-    withinDroppable,
-    draggableId: current.id,
+    pageCenter: page.center,
+    draggable: state.dimension.draggable[current.id],
     draggables: state.dimension.draggable,
     droppables: state.dimension.droppable,
   }));
@@ -231,10 +213,14 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
-    const { id, type, client, page, windowScroll, isScrollAllowed } = action.payload;
+    const { id, type, client, windowScroll, isScrollAllowed } = action.payload;
     const draggables: DraggableDimensionMap = state.dimension.draggable;
     const draggable: DraggableDimension = state.dimension.draggable[id];
     const droppable: DroppableDimension = state.dimension.droppable[draggable.droppableId];
+    const page: InitialDragLocation = {
+      selection: add(client.selection, windowScroll),
+      center: add(client.center, windowScroll),
+    };
 
     const impact: ?DragImpact = getInitialImpact({
       draggable,
@@ -249,16 +235,11 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
     const source: DraggableLocation = impact.destination;
 
-    const withinDroppable: WithinDroppable = {
-      center: page.center,
-    };
-
     const initial: InitialDrag = {
       source,
       client,
       page,
       windowScroll,
-      withinDroppable,
     };
 
     const current: CurrentDrag = {
@@ -274,7 +255,6 @@ export default (state: State = clean('IDLE'), action: Action): State => {
         center: page.center,
         offset: origin,
       },
-      withinDroppable,
       windowScroll,
       isScrollAllowed,
       shouldAnimate: false,
@@ -342,12 +322,9 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       },
     };
 
-    const { client, page } = state.drag.current;
-
     return move({
       state: withUpdatedDimension,
-      clientSelection: client.selection,
-      pageSelection: page.selection,
+      clientSelection: state.drag.current.client.selection,
     });
   }
 
@@ -387,11 +364,10 @@ export default (state: State = clean('IDLE'), action: Action): State => {
   }
 
   if (action.type === 'MOVE') {
-    const { client, page, windowScroll } = action.payload;
+    const { client, windowScroll } = action.payload;
     return move({
       state,
       clientSelection: client,
-      pageSelection: page,
       windowScroll,
     });
   }
@@ -404,29 +380,9 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
-    const initial: InitialDrag = state.drag.initial;
-    const current: CurrentDrag = state.drag.current;
-    const client: Position = current.client.selection;
-
-    // diff between the previous scroll position and the initial
-    const previousDiff: Position = subtract(
-      current.windowScroll,
-      initial.windowScroll,
-    );
-    // diff between the current scroll position and the initial
-    const currentDiff: Position = subtract(
-      windowScroll,
-      initial.windowScroll,
-    );
-    // diff required to move from previous diff to new diff
-    const diff: Position = subtract(currentDiff, previousDiff);
-    // move the page coordinate by that amount
-    const page: Position = add(current.page.selection, diff);
-
     return move({
       state,
-      clientSelection: client,
-      pageSelection: page,
+      clientSelection: state.drag.current.client.selection,
       windowScroll,
     });
   }
@@ -475,7 +431,6 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       state,
       impact,
       clientSelection: client,
-      pageSelection: page,
       shouldAnimate: true,
     });
   }
@@ -522,7 +477,6 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     return move({
       state,
       clientSelection: client,
-      pageSelection: page,
       impact: result.impact,
       shouldAnimate: true,
     });

@@ -1,17 +1,16 @@
 // @flow
 import moveToNewDroppable from '../../../../src/state/move-cross-axis/move-to-new-droppable/';
 import type { Result } from '../../../../src/state/move-cross-axis/move-cross-axis-types';
-import { getDraggableDimension, getDroppableDimension } from '../../../../src/state/dimension';
+import { getDraggableDimension } from '../../../../src/state/dimension';
 import getClientRect from '../../../../src/state/get-client-rect';
 import moveToEdge from '../../../../src/state/move-to-edge';
 import { patch } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
+import { getPreset } from '../../../utils/dimension';
 import type {
   Axis,
-  Spacing,
   DragImpact,
   DraggableDimension,
-  DroppableDimension,
   Position,
 } from '../../../../src/types';
 
@@ -24,83 +23,21 @@ describe('move to new droppable', () => {
     console.error.mockRestore();
   });
 
-  const noMargin: Spacing = { top: 0, left: 0, bottom: 0, right: 0 };
-  const padding: Spacing = { top: 2, left: 3, bottom: 4, right: 5 };
-
   [vertical, horizontal].forEach((axis: Axis) => {
     describe(`on ${axis.direction} axis`, () => {
-      const margin = {
-        ...noMargin,
-        [axis.end]: 10,
-      };
+      const {
+        home,
+        foreign,
+        inHome1,
+        inHome2,
+        inHome3,
+        inHome4,
+        inForeign1,
+        inForeign2,
+        inForeign3,
+        inForeign4,
+      } = getPreset(axis);
 
-      const crossAxisStart: number = 0;
-      const crossAxisEnd: number = 100;
-
-      const home: DroppableDimension = getDroppableDimension({
-        id: 'home',
-        direction: axis.direction,
-        padding,
-        clientRect: getClientRect({
-          [axis.start]: 0,
-          [axis.crossAxisStart]: crossAxisStart,
-          [axis.crossAxisEnd]: crossAxisEnd,
-          [axis.end]: 200,
-        }),
-      });
-      // size: 10
-      const inHome1: DraggableDimension = getDraggableDimension({
-        id: 'inhome1',
-        droppableId: home.id,
-        margin,
-        clientRect: getClientRect({
-          [axis.start]: 0,
-          [axis.crossAxisStart]: crossAxisStart,
-          [axis.crossAxisEnd]: crossAxisEnd,
-          [axis.end]: 10,
-        }),
-      });
-      // size: 20
-      const inHome2: DraggableDimension = getDraggableDimension({
-        id: 'inhome2',
-        droppableId: home.id,
-        // pushed forward by margin of inHome1
-        margin,
-        clientRect: getClientRect({
-          [axis.start]: 20,
-          [axis.crossAxisStart]: crossAxisStart,
-          [axis.crossAxisEnd]: crossAxisEnd,
-          [axis.end]: 50,
-        }),
-      });
-      // size: 30
-      const inHome3: DraggableDimension = getDraggableDimension({
-        id: 'inhome3',
-        droppableId: home.id,
-        margin,
-        // pushed forward by margin of inHome2
-        clientRect: getClientRect({
-          [axis.start]: 60,
-          [axis.crossAxisStart]: crossAxisStart,
-          [axis.crossAxisEnd]: crossAxisEnd,
-          [axis.end]: 90,
-        }),
-      });
-      // size: 40
-      const inHome4: DraggableDimension = getDraggableDimension({
-        id: 'inhome4',
-        droppableId: home.id,
-        // pushed forward by margin of inHome3
-        margin,
-        clientRect: getClientRect({
-          [axis.start]: 100,
-          [axis.crossAxisStart]: crossAxisStart,
-          [axis.crossAxisEnd]: crossAxisEnd,
-          [axis.end]: 140,
-        }),
-      });
-
-      // TODO: get working with horizonital axis
       describe('to home list', () => {
         const dontCare: Position = { x: 0, y: 0 };
         const draggables: DraggableDimension[] = [
@@ -298,72 +235,6 @@ describe('move to new droppable', () => {
       });
 
       describe('to foreign list', () => {
-        const foreignCrossAxisStart: number = 100;
-        const foreignCrossAxisEnd: number = 200;
-
-        const foreign: DroppableDimension = getDroppableDimension({
-          id: 'foreign',
-          padding,
-          direction: axis.direction,
-          clientRect: getClientRect({
-            [axis.start]: 0,
-            [axis.crossAxisStart]: foreignCrossAxisStart,
-            [axis.crossAxisEnd]: foreignCrossAxisEnd,
-            [axis.end]: 200,
-          }),
-        });
-        // size: 10
-        const inForeign1: DraggableDimension = getDraggableDimension({
-          id: 'inForeign1',
-          droppableId: foreign.id,
-          margin,
-          clientRect: getClientRect({
-            [axis.start]: 0,
-            [axis.crossAxisStart]: foreignCrossAxisStart,
-            [axis.crossAxisEnd]: foreignCrossAxisEnd,
-            [axis.end]: 10,
-          }),
-        });
-        // size: 20
-        const inForeign2: DraggableDimension = getDraggableDimension({
-          id: 'inForeign2',
-          droppableId: foreign.id,
-          // pushed forward by margin of inForeign1
-          margin,
-          clientRect: getClientRect({
-            [axis.start]: 20,
-            [axis.crossAxisStart]: foreignCrossAxisStart,
-            [axis.crossAxisEnd]: foreignCrossAxisEnd,
-            [axis.end]: 50,
-          }),
-        });
-        // size: 30
-        const inForeign3: DraggableDimension = getDraggableDimension({
-          id: 'inForeign3',
-          droppableId: foreign.id,
-          margin,
-          // pushed forward by margin of inForeign2
-          clientRect: getClientRect({
-            [axis.start]: 60,
-            [axis.crossAxisStart]: foreignCrossAxisStart,
-            [axis.crossAxisEnd]: foreignCrossAxisEnd,
-            [axis.end]: 90,
-          }),
-        });
-        // size: 40
-        const inForeign4: DraggableDimension = getDraggableDimension({
-          id: 'inForeign4',
-          droppableId: foreign.id,
-          margin,
-          // pushed forward by margin of inForeign3
-          clientRect: getClientRect({
-            [axis.start]: 100,
-            [axis.crossAxisStart]: foreignCrossAxisStart,
-            [axis.crossAxisEnd]: foreignCrossAxisEnd,
-            [axis.end]: 140,
-          }),
-        });
-
         const draggables: DraggableDimension[] = [
           inForeign1, inForeign2, inForeign3, inForeign4,
         ];

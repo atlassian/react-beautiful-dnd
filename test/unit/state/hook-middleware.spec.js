@@ -110,9 +110,6 @@ const state = (() => {
       client: initialClient,
       page: initialClient,
       windowScroll: origin,
-      withinDroppable: {
-        center: initialClient.center,
-      },
     },
     current: {
       id: draggableId,
@@ -120,9 +117,6 @@ const state = (() => {
       client: currentClient,
       page: currentClient,
       windowScroll: origin,
-      withinDroppable: {
-        center: currentClient.center,
-      },
       shouldAnimate: true,
       isScrollAllowed: true,
     },
