@@ -104,7 +104,6 @@ export default ({
     movement: {
       draggables: needsToMove,
       amount,
-      // TODO: not sure what this should be
       isBeyondStartPosition: isMovingPastOriginalIndex,
     },
     direction: axis.direction,
