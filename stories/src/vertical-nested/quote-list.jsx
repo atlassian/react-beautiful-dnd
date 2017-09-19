@@ -26,6 +26,10 @@ const Container = styled.div`
   padding-bottom: 0;
   user-select: none;
   transition: background-color 0.1s ease;
+  &:focus {
+    outline: 2px solid rebeccapurple;
+    outline-offset: 2px;
+  }
 `;
 
 const NestedContainer = Container.extend`
