@@ -17,6 +17,12 @@ import type {
 const noop = (): void => { };
 const getFalse: () => boolean = () => false;
 
+// If we are controlling an event
+const stop = (event: Event) => {
+  event.preventDefault();
+  event.stopPropagation();
+};
+
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 const primaryButton = 0;
 
@@ -239,8 +245,7 @@ export default class DragHandle extends Component {
       return;
     }
 
-    event.stopPropagation();
-    event.preventDefault();
+    stop(event);
 
     const point: Position = {
       x: clientX,
@@ -263,12 +268,12 @@ export default class DragHandle extends Component {
 
   // window keyboard events are bound during a keyboard drag
   // or after the user presses the mouse down
-  onWindowKeydown = (event: KeyboardEvent): void => {
+  onWindowKeyDown = (event: KeyboardEvent): void => {
     const isMouseDragPending: boolean = Boolean(this.state.pending);
 
     if (isMouseDragPending) {
       if (event.keyCode === keyCodes.escape) {
-        event.preventDefault();
+        stop(event);
         this.stopPendingMouseDrag();
       }
       return;
@@ -300,30 +305,67 @@ export default class DragHandle extends Component {
       return;
     }
 
-    if (this.state.draggingWith === 'MOUSE') {
+    // Handled through the keydown handler as the element has focus
+    // while dragging with a keyboard
+    if (this.state.draggingWith === 'KEYBOARD') {
+      return;
+    }
+
       // Want to block scrolling the page with the space bar
+    if (event.keyCode === keyCodes.space) {
+      event.preventDefault();
+    }
+
+    // at this point we know what the direction is
+  }
+
+  // When dragging with a mouse - the element may not have focus
+  // When dragging with a keyboard - the element will have focus
+  onKeyDown = (event: KeyboardEvent): void => {
+    if (!this.props.isEnabled) {
+      return;
+    }
+
+    // Handled in the window key down function as it may not have focus
+    if (this.state.pending || this.state.draggingWith === 'MOUSE') {
+      return;
+    }
+
+    const canStartKeyboardDrag: boolean = this.props.canLift && !this.state.draggingWith;
+    const isKeyboardDragging: boolean = this.state.draggingWith === 'KEYBOARD';
+
+    if (!canStartKeyboardDrag && !isKeyboardDragging) {
+      return;
+    }
+
+    if (canStartKeyboardDrag) {
+      // Lifting with a keyboard
       if (event.keyCode === keyCodes.space) {
-        event.preventDefault();
+        stop(event);
+        this.startDragging('KEYBOARD', () => this.props.callbacks.onKeyLift());
       }
       return;
     }
 
-    // Only keyboard dragging
     if (!this.props.direction) {
       console.error('cannot handle keyboard event if direction is not provided');
+      stop(event);
       this.stopDragging(() => this.props.callbacks.onCancel());
       return;
     }
 
-    // at this point we do not know what the direction is
+    // Dropping
+
     if (event.keyCode === keyCodes.space) {
-      event.preventDefault();
+      // need to stop parent Draggable's thinking this is a lift
+      stop(event);
       this.stopDragging(() => this.props.callbacks.onDrop());
-      return;
     }
 
+    // Movement
+
     if (event.keyCode === keyCodes.arrowDown) {
-      event.preventDefault();
+      stop(event);
       this.executeBasedOnDirection({
         vertical: this.scheduleMoveForward,
         horizontal: this.scheduleCrossAxisMoveForward,
@@ -332,7 +374,7 @@ export default class DragHandle extends Component {
     }
 
     if (event.keyCode === keyCodes.arrowUp) {
-      event.preventDefault();
+      stop(event);
       this.executeBasedOnDirection({
         vertical: this.scheduleMoveBackward,
         horizontal: this.scheduleCrossAxisMoveBackward,
@@ -341,7 +383,7 @@ export default class DragHandle extends Component {
     }
 
     if (event.keyCode === keyCodes.arrowRight) {
-      event.preventDefault();
+      stop(event);
       this.executeBasedOnDirection({
         vertical: this.scheduleCrossAxisMoveForward,
         horizontal: this.scheduleMoveForward,
@@ -350,29 +392,11 @@ export default class DragHandle extends Component {
     }
 
     if (event.keyCode === keyCodes.arrowLeft) {
-      event.preventDefault();
+      stop(event);
       this.executeBasedOnDirection({
         vertical: this.scheduleCrossAxisMoveBackward,
         horizontal: this.scheduleMoveBackward,
       });
-    }
-  }
-
-  // the on element keydown is only for lifting - otherwise using the window keydown
-  onKeyDown = (event: KeyboardEvent): void => {
-    if (!this.props.isEnabled ||
-      this.state.pending ||
-      this.state.draggingWith ||
-      !this.props.canLift) {
-      return;
-    }
-
-    // At this point we will not have a direction provided
-    if (event.keyCode === keyCodes.space) {
-      event.preventDefault();
-      // stopping the event from bubbling up to the window event handler
-      event.stopPropagation();
-      this.startDragging('KEYBOARD', () => this.props.callbacks.onKeyLift());
     }
   }
 
@@ -497,7 +521,7 @@ export default class DragHandle extends Component {
     window.removeEventListener('mousemove', this.onWindowMouseMove);
     window.removeEventListener('mouseup', this.onWindowMouseUp);
     window.removeEventListener('mousedown', this.onWindowMouseDown);
-    window.removeEventListener('keydown', this.onWindowKeydown);
+    window.removeEventListener('keydown', this.onWindowKeyDown);
     window.removeEventListener('resize', this.onWindowResize);
     window.removeEventListener('scroll', this.onWindowScroll);
     window.removeEventListener('webkitmouseforcechanged', this.mouseForceChanged);
@@ -507,7 +531,7 @@ export default class DragHandle extends Component {
     window.addEventListener('mousemove', this.onWindowMouseMove);
     window.addEventListener('mouseup', this.onWindowMouseUp);
     window.addEventListener('mousedown', this.onWindowMouseDown);
-    window.addEventListener('keydown', this.onWindowKeydown);
+    window.addEventListener('keydown', this.onWindowKeyDown);
     window.addEventListener('resize', this.onWindowResize);
     window.addEventListener('scroll', this.onWindowScroll, { passive: true });
     window.addEventListener('webkitmouseforcechanged', this.mouseForceChanged);
