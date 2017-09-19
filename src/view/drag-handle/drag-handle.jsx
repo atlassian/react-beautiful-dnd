@@ -17,7 +17,9 @@ import type {
 const noop = (): void => { };
 const getFalse: () => boolean = () => false;
 
-// If we are controlling an event
+// If we are making an action based on an event often we want to
+// prevent the default browser action and stop any other elements
+// from receiving the event.
 const stop = (event: Event) => {
   event.preventDefault();
   event.stopPropagation();
