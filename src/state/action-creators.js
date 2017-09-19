@@ -278,7 +278,6 @@ export const completeDrop = (result: DropResult): DropCompleteAction => ({
 export const drop = () =>
   (dispatch: Dispatch, getState: () => State): void => {
     const state: State = getState();
-
     // This can occur if the user ends a drag before
     // the collecting phase is finished.
     // This will not trigger a hook as the hook waits

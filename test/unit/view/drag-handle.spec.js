@@ -92,11 +92,11 @@ const mouseDown = mouseEvent.bind(null, 'mousedown');
 const click = mouseEvent.bind(null, 'click');
 const pressSpacebar = withKeyboard(keyCodes.space);
 const windowSpacebar = dispatchWindowKeyDownEvent.bind(null, keyCodes.space);
+const pressArrowDown = withKeyboard(keyCodes.arrowDown);
+const pressArrowUp = withKeyboard(keyCodes.arrowUp);
+const pressArrowRight = withKeyboard(keyCodes.arrowRight);
+const pressArrowLeft = withKeyboard(keyCodes.arrowLeft);
 const windowEscape = dispatchWindowKeyDownEvent.bind(null, keyCodes.escape);
-const windowArrowUp = dispatchWindowKeyDownEvent.bind(null, keyCodes.arrowUp);
-const windowArrowDown = dispatchWindowKeyDownEvent.bind(null, keyCodes.arrowDown);
-const windowArrowLeft = dispatchWindowKeyDownEvent.bind(null, keyCodes.arrowLeft);
-const windowArrowRight = dispatchWindowKeyDownEvent.bind(null, keyCodes.arrowRight);
 const windowTab = dispatchWindowKeyDownEvent.bind(null, keyCodes.tab);
 const windowEnter = dispatchWindowKeyDownEvent.bind(null, keyCodes.enter);
 
@@ -313,7 +313,7 @@ describe('drag handle', () => {
         mouseDown(wrapper);
         windowMouseMove(0, sloppyClickThreshold);
 
-        windowSpacebar(wrapper);
+        pressSpacebar(wrapper);
 
         expect(callbacksCalled(callbacks)({
           onLift: 1,
@@ -334,8 +334,8 @@ describe('drag handle', () => {
         mouseDown(wrapper);
         windowMouseMove(0, sloppyClickThreshold);
 
-        windowArrowDown();
-        windowArrowUp();
+        pressArrowDown(wrapper);
+        pressArrowUp(wrapper);
 
         expect(callbacksCalled(callbacks)({
           onLift: 1,
@@ -1005,6 +1005,18 @@ describe('drag handle', () => {
           onKeyLift: 0,
         })).toBe(true);
       });
+
+      it('should not lift if disabled', () => {
+        wrapper.setProps({
+          isEnabled: false,
+        });
+
+        pressSpacebar(wrapper);
+
+        expect(callbacksCalled(callbacks)({
+          onKeyLift: 0,
+        })).toBe(true);
+      });
     });
 
     describe('progress', () => {
@@ -1076,8 +1088,8 @@ describe('drag handle', () => {
         // lift - all good
         pressSpacebar(customWrapper);
 
-        // boom.
-        windowArrowDown();
+        // boom
+        pressArrowDown(customWrapper);
 
         expect(console.error).toHaveBeenCalled();
         expect(callbacksCalled(customCallbacks)({
@@ -1091,7 +1103,7 @@ describe('drag handle', () => {
         it('should move backward when the user presses ArrowUp', () => {
           pressSpacebar(wrapper);
           // move backward
-          windowArrowUp();
+          pressArrowUp(wrapper);
           requestAnimationFrame.step();
 
           expect(callbacksCalled(callbacks)({
@@ -1103,7 +1115,7 @@ describe('drag handle', () => {
         it('should move forward when the user presses ArrowDown', () => {
           pressSpacebar(wrapper);
           // move forward
-          windowArrowDown();
+          pressArrowDown(wrapper);
           requestAnimationFrame.step();
 
           expect(callbacksCalled(callbacks)({
@@ -1114,7 +1126,7 @@ describe('drag handle', () => {
 
         it('should request to move to a droppable on the left when the user presses LeftArrow', () => {
           pressSpacebar(wrapper);
-          windowArrowLeft();
+          pressArrowLeft(wrapper);
           requestAnimationFrame.step();
 
           expect(callbacksCalled(callbacks)({
@@ -1125,7 +1137,7 @@ describe('drag handle', () => {
 
         it('should request to move to a droppable on the right when the user presses RightArrow', () => {
           pressSpacebar(wrapper);
-          windowArrowRight();
+          pressArrowRight(wrapper);
           requestAnimationFrame.step();
 
           expect(callbacksCalled(callbacks)({
@@ -1162,7 +1174,7 @@ describe('drag handle', () => {
 
         it('should move backward when the user presses LeftArrow', () => {
           pressSpacebar(customWrapper);
-          windowArrowLeft();
+          pressArrowLeft(customWrapper);
           requestAnimationFrame.step();
 
           expect(callbacksCalled(customCallbacks)({
@@ -1173,7 +1185,7 @@ describe('drag handle', () => {
 
         it('should move forward when the user presses RightArrow', () => {
           pressSpacebar(customWrapper);
-          windowArrowRight();
+          pressArrowRight(customWrapper);
           requestAnimationFrame.step();
 
           expect(callbacksCalled(customCallbacks)({
@@ -1184,7 +1196,7 @@ describe('drag handle', () => {
 
         it('should request a backward cross axis move when the user presses ArrowUp', () => {
           pressSpacebar(customWrapper);
-          windowArrowUp();
+          pressArrowUp(customWrapper);
           requestAnimationFrame.step();
 
           expect(callbacksCalled(customCallbacks)({
@@ -1195,7 +1207,7 @@ describe('drag handle', () => {
 
         it('should request a forward cross axis move when the user presses ArrowDown', () => {
           pressSpacebar(customWrapper);
-          windowArrowDown();
+          pressArrowDown(customWrapper);
           requestAnimationFrame.step();
 
           expect(callbacksCalled(customCallbacks)({
@@ -1209,9 +1221,9 @@ describe('drag handle', () => {
         it('should collapse multiple forward movements into a single animation frame', () => {
           pressSpacebar(wrapper);
 
-          windowArrowDown();
-          windowArrowDown();
-          windowArrowDown();
+          pressArrowDown(wrapper);
+          pressArrowDown(wrapper);
+          pressArrowDown(wrapper);
           requestAnimationFrame.step();
 
           expect(callbacksCalled(callbacks)({
@@ -1235,9 +1247,9 @@ describe('drag handle', () => {
         it('should collapse multiple backward movements into a single animation frame', () => {
           pressSpacebar(wrapper);
 
-          windowArrowUp();
-          windowArrowUp();
-          windowArrowUp();
+          pressArrowUp(wrapper);
+          pressArrowUp(wrapper);
+          pressArrowUp(wrapper);
           requestAnimationFrame.step();
 
           expect(callbacksCalled(callbacks)({
@@ -1260,9 +1272,9 @@ describe('drag handle', () => {
 
         it('should not fire a scheduled forward movement if no longer dragging', () => {
           pressSpacebar(wrapper);
-          windowArrowDown();
+          pressArrowDown(wrapper);
           // finishing drag before animation frame
-          windowSpacebar();
+          pressSpacebar(wrapper);
 
           // flushing any animation frames
           requestAnimationFrame.flush();
@@ -1276,9 +1288,9 @@ describe('drag handle', () => {
 
         it('should not fire a scheduled backward movement if no longer dragging', () => {
           pressSpacebar(wrapper);
-          windowArrowUp();
+          pressArrowUp(wrapper);
           // finishing drag before animation frame
-          windowSpacebar();
+          pressSpacebar(wrapper);
 
           // flushing any animation frames
           requestAnimationFrame.flush();
@@ -1295,12 +1307,23 @@ describe('drag handle', () => {
     describe('finish', () => {
       it('should drop when the user presses spacebar', () => {
         pressSpacebar(wrapper);
-        windowSpacebar();
+        pressSpacebar(wrapper);
 
         expect(callbacksCalled(callbacks)({
           onKeyLift: 1,
           onDrop: 1,
         })).toBe(true);
+      });
+
+      it('should stop the event before it can be listened to', () => {
+        const preventDefault = jest.fn();
+        const stopPropagation = jest.fn();
+
+        pressSpacebar(wrapper);
+        pressSpacebar(wrapper, { preventDefault, stopPropagation });
+
+        expect(preventDefault).toHaveBeenCalled();
+        expect(stopPropagation).toHaveBeenCalled();
       });
     });
 
@@ -1322,7 +1345,7 @@ describe('drag handle', () => {
           pressSpacebar(wrapper);
           mouseDown(wrapper, 0, 0, button);
           // should now do nothing
-          windowArrowUp(wrapper);
+          pressArrowUp(wrapper);
 
           expect(callbacksCalled(callbacks)({
             onKeyLift: index + 1,
@@ -1365,8 +1388,8 @@ describe('drag handle', () => {
       it('should not prevent any clicks after a drag', () => {
         const mock = jest.fn();
         pressSpacebar(wrapper);
-        windowArrowDown(wrapper);
-        windowSpacebar();
+        pressArrowDown(wrapper);
+        pressSpacebar(wrapper);
 
         click(wrapper, 0, 0, primaryButton, { preventDefault: mock });
 
@@ -1408,9 +1431,9 @@ describe('drag handle', () => {
         })).toBe(true);
 
         // should have no impact
-        windowArrowDown();
+        pressArrowDown(wrapper);
         requestAnimationFrame.step();
-        windowArrowUp();
+        pressArrowUp(wrapper);
         requestAnimationFrame.step();
         windowEscape();
         requestAnimationFrame.step();
@@ -1445,10 +1468,10 @@ describe('drag handle', () => {
           // lift
           pressSpacebar(wrapper);
           // move forward
-          windowArrowDown(wrapper);
+          pressArrowDown(wrapper);
           requestAnimationFrame.step();
           // drop
-          windowSpacebar();
+          pressSpacebar(wrapper);
 
           expect(callbacksCalled(callbacks)({
             onKeyLift: val + 1,
@@ -1470,7 +1493,7 @@ describe('drag handle', () => {
 
         // lift and drop
         pressSpacebar(wrapper);
-        windowSpacebar(wrapper);
+        pressSpacebar(wrapper);
 
         expect(callbacksCalled(callbacks)({
           onCancel: 1,
