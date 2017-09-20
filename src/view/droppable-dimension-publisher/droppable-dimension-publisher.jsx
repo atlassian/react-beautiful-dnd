@@ -61,33 +61,27 @@ export default class DroppableDimensionPublisher extends Component {
       left: parseInt(style.paddingLeft, 10),
     };
 
-    const clientRect: ClientRect = (() => {
-      const current: ClientRect = targetRef.getBoundingClientRect();
+    const clientRect: ClientRect = targetRef.getBoundingClientRect();
 
+    const containerRect: ClientRect = (() => {
       if (!this.closestScrollable) {
-        return current;
+        return clientRect;
       }
 
       if (this.closestScrollable === targetRef) {
-        return current;
+        return clientRect;
       }
 
-      const { top, right, bottom, left } = current;
-
-      // We need to trim the dimension by the visible area of the scroll container
-      const parent: ClientRect = this.closestScrollable.getBoundingClientRect();
-      return getClientRect({
-        top: Math.max(top, parent.top),
-        left: Math.max(left, parent.left),
-        right: Math.min(right, parent.right),
-        bottom: Math.min(bottom, parent.bottom),
-      });
+      return getClientRect(
+        this.closestScrollable.getBoundingClientRect()
+      );
     })();
 
     const dimension: DroppableDimension = getDroppableDimension({
       id: droppableId,
       direction,
       clientRect,
+      containerRect,
       margin,
       padding,
       windowScroll: getWindowScrollPosition(),

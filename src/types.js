@@ -81,10 +81,6 @@ export type DroppableDimension = {|
   id: DroppableId,
   axis: Axis,
   isEnabled: boolean,
-  scroll: {|
-    initial: Position,
-    current: Position,
-  |},
   // relative to the current viewport
   client: {|
     withMargin: DimensionFragment,
@@ -98,6 +94,13 @@ export type DroppableDimension = {|
     withoutMargin: DimensionFragment,
     // the area in which content presses up against
     withMarginAndPadding: DimensionFragment,
+  |},
+  container: {|
+    scroll: {|
+      initial: Position,
+      current: Position,
+    |},
+    page: DimensionFragment,
   |},
 |}
 export type DraggableLocation = {|

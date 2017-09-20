@@ -75,6 +75,12 @@ export default ({
         isBetweenDestinationBounds(sourceFragment[axis.start]) ||
         isBetweenDestinationBounds(sourceFragment[axis.end]);
     })
+    .filter(droppable => (
+      (droppable.page.withMargin[axis.crossAxisStart] >=
+        droppable.container.page[axis.crossAxisStart]) &&
+      (droppable.page.withMargin[axis.crossAxisEnd] <=
+        droppable.container.page[axis.crossAxisEnd])
+    ))
     // Sort on the cross axis
     .sort((a: DroppableDimension, b: DroppableDimension) => {
       const first: number = a.page.withMargin[axis.crossAxisStart];
