@@ -1,7 +1,7 @@
 language: node_js
 cache: yarn
 node_js:
-- '6.9'
+- '8.4'
 script:
 - yarn run validate
 - yarn run test
