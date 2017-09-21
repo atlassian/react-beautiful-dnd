@@ -42,7 +42,7 @@ const getWithSpacing = (clientRect: ClientRect, spacing: Spacing): ClientRect =>
   });
 };
 
-const getFragment = (
+export const getFragment = (
   initial: ClientRect | DimensionFragment,
   point?: Position = origin,
 ): DimensionFragment => {

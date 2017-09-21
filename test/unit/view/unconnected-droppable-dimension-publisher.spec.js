@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import { mount } from 'enzyme';
 import DroppableDimensionPublisher from '../../../src/view/droppable-dimension-publisher/droppable-dimension-publisher';
-import { getDroppableDimension } from '../../../src/state/dimension';
+import { getDroppableDimension, getFragment } from '../../../src/state/dimension';
 import getClientRect from '../../../src/state/get-client-rect';
 import setWindowScroll from '../../utils/set-window-scroll';
 import type {
@@ -13,7 +13,6 @@ import type {
   DroppableDimension,
   HTMLElement,
   Position,
-  ReactElement,
 } from '../../../src/types';
 
 const droppableId: DroppableId = 'drop-1';
@@ -26,7 +25,6 @@ const droppable: DroppableDimension = getDroppableDimension({
     left: 0,
   }),
 });
-const origin: Position = { x: 0, y: 0 };
 
 const noMargin = {
   marginTop: '0',
@@ -323,359 +321,133 @@ describe('DraggableDimensionPublisher', () => {
       expect(updateScroll).not.toHaveBeenCalled();
     });
 
-    describe('dimension clipping', () => {
-      type ItemProps = {
-        publish: (dimension: DroppableDimension) => void,
-        updateScroll: (id: DroppableId, offset: Position) => void,
-        updateIsEnabled: (id: DroppableId, isEnabled: boolean) => void,
-        shouldPublish?: boolean,
-      };
-
-      class ScrollParent extends Component {
-        props: {
-          children: ?ReactElement
-        }
-
-        render() {
-          return (
-            <div className="scroll-parent" >
-              {this.props.children}
-            </div>
-          );
-        }
-      }
-
-      class Item extends Component {
-        /* eslint-disable react/sort-comp */
-        props: ItemProps
-
-        state: {|
-        ref: ?HTMLElement
-        |}
-
-        state = {
-          ref: null,
-        }
-
-        setRef = (ref: ?HTMLElement) => {
-          this.setState({
-            ref,
-          });
-        }
-
-        render() {
-          return (
-            <div
-              ref={this.setRef}
-              className="item"
-            >
-              <DroppableDimensionPublisher
-                droppableId={droppableId}
-                direction="vertical"
-                isDropDisabled={false}
-                type="TYPE"
-                targetRef={this.state.ref}
-                shouldPublish={Boolean(this.props.shouldPublish)}
-                publish={this.props.publish}
-                updateScroll={this.props.updateScroll}
-                updateIsEnabled={this.props.updateIsEnabled}
-              >
-                <div>hello world</div>
-              </DroppableDimensionPublisher>
-            </div>
-          );
-        }
-      }
+    describe('calculating the container dimension', () => {
+      const parentRect = getFragment(getClientRect({
+        top: 0,
+        left: 0,
+        right: 150,
+        bottom: 150,
+      }));
+      const droppableRect = getFragment(getClientRect({
+        top: 0,
+        left: 0,
+        right: 120,
+        bottom: 120,
+      }));
 
       class App extends Component {
-        props: ItemProps
+        props: {
+          droppableIsScrollable?: boolean,
+          onPublish: () => void,
+          parentIsScrollable?: boolean,
+          shouldPublish?: boolean,
+        }
 
+        static defaultProps = {
+          onPublish: () => {},
+        }
+
+        state = { ref: null }
+        setRef = ref => this.setState({ ref })
         render() {
+          const {
+            droppableIsScrollable,
+            parentIsScrollable,
+            onPublish,
+            shouldPublish,
+          } = this.props;
           return (
-            <ScrollParent>
-              <Item
-                publish={this.props.publish}
-                updateScroll={this.props.updateScroll}
-                shouldPublish={this.props.shouldPublish}
-                updateIsEnabled={this.props.updateIsEnabled}
-              />
-            </ScrollParent>
+            <div
+              className="scroll-parent"
+              style={{
+                height: parentRect.height,
+                width: parentRect.width,
+                padding: 0,
+                margin: 0,
+                overflow: parentIsScrollable ? 'scroll' : 'visible',
+              }}
+            >
+              <div>
+                <div
+                  ref={this.setRef}
+                  className="droppable"
+                  style={{
+                    height: droppableRect.height,
+                    width: droppableRect.width,
+                    padding: 0,
+                    margin: 0,
+                    overflow: droppableIsScrollable ? 'scroll' : 'visible',
+                  }}
+                >
+                  <DroppableDimensionPublisher
+                    droppableId={droppableId}
+                    direction="vertical"
+                    isDropDisabled={false}
+                    type="TYPE"
+                    targetRef={this.state.ref}
+                    shouldPublish={Boolean(shouldPublish)}
+                    publish={onPublish}
+                    updateIsEnabled={updateIsEnabled}
+                    updateScroll={updateScroll}
+                  >
+                    <div>hello world</div>
+                  </DroppableDimensionPublisher>
+                </div>
+              </div>
+            </div>
           );
         }
       }
 
-      type ExecuteArgs = {|
-        droppableRect: ClientRect,
-        scrollParentRect: ClientRect,
-        scrollParentScroll?: Position,
-      |}
-
-      const execute = ({
-        droppableRect,
-        scrollParentRect,
-        scrollParentScroll = origin,
-      }: ExecuteArgs) => {
-        wrapper = mount(
-          <App
-            publish={publish}
-            updateScroll={updateScroll}
-            updateIsEnabled={updateIsEnabled}
-          />
-        );
-
-        const scrollParentNode: HTMLElement = wrapper.getDOMNode();
-
-        if (!scrollParentNode.classList.contains('scroll-parent')) {
-          throw new Error('scroll parent node not obtained correctly');
-        }
-
-        const droppableNode: HTMLElement = scrollParentNode.querySelector('.item');
-
-        scrollParentNode.scrollLeft = scrollParentScroll.x;
-        scrollParentNode.scrollTop = scrollParentScroll.y;
-
-        jest.spyOn(scrollParentNode, 'getBoundingClientRect').mockImplementationOnce(() => scrollParentRect);
-        jest.spyOn(droppableNode, 'getBoundingClientRect').mockImplementationOnce(() => droppableRect);
-
-        jest.spyOn(window, 'getComputedStyle').mockImplementation((el) => {
-          if (el === droppableNode) {
-            return noSpacing;
-          }
-
-          if (el === scrollParentNode) {
-            return {
-              ...noSpacing,
-              overflow: 'auto',
-            };
-          }
-
-          throw new Error('unknown el');
-        });
-
-        wrapper.setProps({
-          shouldPublish: true,
-        });
-      };
-
-      it('should clip the dimension by the size of the scroll parent', () => {
-        const droppableRect: ClientRect = getClientRect({
-          top: 0,
-          bottom: 100,
-          left: 0,
-          right: 100,
-        });
-        // smaller by 10px in every direction
-        const scrollParentRect: ClientRect = getClientRect({
-          top: 10,
-          bottom: 90,
-          left: 10,
-          right: 90,
-        });
-        const expected = getDroppableDimension({
-          id: droppableId,
-          // because it is smaller in every direction
-          // the result will be the scroll parent rect
-          clientRect: scrollParentRect,
-        });
-
-        execute({ droppableRect, scrollParentRect });
-
-        // the trimmed rect
-        expect(publish).toBeCalledWith(expected);
-        expect(publish).toHaveBeenCalledTimes(1);
+      it('should detect scrolling on the droppable', () => {
+        wrapper = mount(<App
+          droppableIsScrollable
+          parentIsScrollable
+          onPublish={(dimension) => {
+            expect(dimension).toBeTruthy();
+            if (dimension) {
+              expect(dimension.container.page).toEqual(droppableRect);
+            }
+          }}
+        />);
+        const parentNode = wrapper.getDOMNode();
+        const droppableNode = wrapper.state().ref;
+        jest.spyOn(parentNode, 'getBoundingClientRect').mockImplementation(() => parentRect);
+        jest.spyOn(droppableNode, 'getBoundingClientRect').mockImplementation(() => droppableRect);
+        wrapper.setProps({ shouldPublish: true });
       });
 
-      describe('dimension clipping by edge', () => {
-        const base = {
-          top: 0,
-          bottom: 100,
-          left: 0,
-          right: 100,
-        };
-        const droppableRect: ClientRect = getClientRect(base);
-
-        describe('cut off by scroll container', () => {
-          it('should choose the biggest top value', () => {
-            const scrollParentRect: ClientRect = getClientRect({
-              ...base,
-              top: 10,
-            });
-            const expected = getDroppableDimension({
-              id: droppableId,
-              clientRect: getClientRect({
-                ...base,
-                top: 10,
-              }),
-            });
-
-            execute({ droppableRect, scrollParentRect });
-
-            // the trimmed rect
-            expect(publish).toBeCalledWith(expected);
-            expect(publish).toHaveBeenCalledTimes(1);
-          });
-
-          it('should choose the biggest left value', () => {
-            const scrollParentRect: ClientRect = getClientRect({
-              ...base,
-              left: 10,
-            });
-            const expected = getDroppableDimension({
-              id: droppableId,
-              clientRect: getClientRect({
-                ...base,
-                left: 10,
-              }),
-            });
-
-            execute({ droppableRect, scrollParentRect });
-
-            // the trimmed rect
-            expect(publish).toBeCalledWith(expected);
-            expect(publish).toHaveBeenCalledTimes(1);
-          });
-
-          it('should choose the smallest right value', () => {
-            const scrollParentRect: ClientRect = getClientRect({
-              ...base,
-              right: 90,
-            });
-            const expected = getDroppableDimension({
-              id: droppableId,
-              clientRect: getClientRect({
-                ...base,
-                right: 90,
-              }),
-            });
-
-            execute({ droppableRect, scrollParentRect });
-
-            // the trimmed rect
-            expect(publish).toBeCalledWith(expected);
-            expect(publish).toHaveBeenCalledTimes(1);
-          });
-
-          it('should choose the smallest bottom value', () => {
-            const scrollParentRect: ClientRect = getClientRect({
-              ...base,
-              bottom: 90,
-            });
-            const expected = getDroppableDimension({
-              id: droppableId,
-              clientRect: getClientRect({
-                ...base,
-                bottom: 90,
-              }),
-            });
-
-            execute({ droppableRect, scrollParentRect });
-
-            // the trimmed rect
-            expect(publish).toBeCalledWith(expected);
-            expect(publish).toHaveBeenCalledTimes(1);
-          });
-        });
-
-        describe('cut off by droppable rect', () => {
-          it('should choose the biggest top value', () => {
-            const scrollParentRect: ClientRect = getClientRect({
-              ...base,
-              top: -10,
-            });
-            const expected = getDroppableDimension({
-              id: droppableId,
-              clientRect: getClientRect(base),
-            });
-
-            execute({ droppableRect, scrollParentRect });
-
-            // the trimmed rect
-            expect(publish).toBeCalledWith(expected);
-            expect(publish).toHaveBeenCalledTimes(1);
-          });
-
-          it('should choose the biggest left value', () => {
-            const scrollParentRect: ClientRect = getClientRect({
-              ...base,
-              left: -10,
-            });
-            const expected = getDroppableDimension({
-              id: droppableId,
-              clientRect: getClientRect(base),
-            });
-
-            execute({ droppableRect, scrollParentRect });
-
-            // the trimmed rect
-            expect(publish).toBeCalledWith(expected);
-            expect(publish).toHaveBeenCalledTimes(1);
-          });
-
-          it('should choose the smallest right value', () => {
-            const scrollParentRect: ClientRect = getClientRect({
-              ...base,
-              right: 110,
-            });
-            const expected = getDroppableDimension({
-              id: droppableId,
-              clientRect: getClientRect(base),
-            });
-
-            execute({ droppableRect, scrollParentRect });
-
-            // the trimmed rect
-            expect(publish).toBeCalledWith(expected);
-            expect(publish).toHaveBeenCalledTimes(1);
-          });
-
-          it('should choose the smallest bottom value', () => {
-            const scrollParentRect: ClientRect = getClientRect({
-              ...base,
-              bottom: 110,
-            });
-            const expected = getDroppableDimension({
-              id: droppableId,
-              clientRect: getClientRect(base),
-            });
-
-            execute({ droppableRect, scrollParentRect });
-
-            // the trimmed rect
-            expect(publish).toBeCalledWith(expected);
-            expect(publish).toHaveBeenCalledTimes(1);
-          });
-        });
+      it('should detect a scrollable parent', () => {
+        wrapper = mount(<App
+          parentIsScrollable
+          onPublish={(dimension) => {
+            expect(dimension).toBeTruthy();
+            if (dimension) {
+              expect(dimension.container.page).toEqual(parentRect);
+            }
+          }}
+        />);
+        const parentNode = wrapper.getDOMNode();
+        const droppableNode = wrapper.state().ref;
+        jest.spyOn(parentNode, 'getBoundingClientRect').mockImplementation(() => parentRect);
+        jest.spyOn(droppableNode, 'getBoundingClientRect').mockImplementation(() => droppableRect);
+        wrapper.setProps({ shouldPublish: true });
       });
 
-      it('should take into account the parents scroll when clipping', () => {
-        const base = {
-          top: 0,
-          bottom: 100,
-          left: 0,
-          right: 100,
-        };
-        const scrollParentScroll: Position = {
-          x: 100,
-          y: 100,
-        };
-        // rect will have the scroll subtracted when measurements are taken
-        const droppableRect: ClientRect = getClientRect({
-          top: base.top - scrollParentScroll.y,
-          bottom: base.bottom - scrollParentScroll.y,
-          left: base.left - scrollParentScroll.x,
-          right: base.right - scrollParentScroll.x,
-        });
-        const scrollParentRect: ClientRect = getClientRect(base);
-        const expected: DroppableDimension = getDroppableDimension({
-          id: droppableId,
-          scroll: scrollParentScroll,
-          clientRect: getClientRect(base),
-        });
-
-        execute({ droppableRect, scrollParentRect, scrollParentScroll });
-
-        expect(publish).toBeCalledWith(expected);
-        expect(publish).toHaveBeenCalledTimes(1);
+      it('should default to the dimension of the droppable if there are no scroll containers detected', () => {
+        wrapper = mount(<App
+          onPublish={(dimension) => {
+            expect(dimension).toBeTruthy();
+            if (dimension) {
+              expect(dimension.container.page).toEqual(droppableRect);
+            }
+          }}
+        />);
+        const parentNode = wrapper.getDOMNode();
+        const droppableNode = wrapper.state().ref;
+        jest.spyOn(parentNode, 'getBoundingClientRect').mockImplementation(() => parentRect);
+        jest.spyOn(droppableNode, 'getBoundingClientRect').mockImplementation(() => droppableRect);
+        wrapper.setProps({ shouldPublish: true });
       });
     });
   });
