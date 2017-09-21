@@ -1,6 +1,6 @@
 // @flow
 import isWithin from './is-within';
-import { subtract } from './position';
+import { subtract, offsetSpacing } from './position';
 import type {
   Position,
   DraggableDimension,
@@ -9,28 +9,22 @@ import type {
 } from '../types';
 
 export const isPointWithin = (droppable: DroppableDimension) => {
-  const droppableRect = droppable.page.withMarginAndPadding;
-  const { container } = droppable;
-
   // Calculate the mid-drag scroll ∆ of the scroll container
-  const containerScrollDiff = subtract(container.scroll.current, container.scroll.initial);
+  const scroll = droppable.container.scroll;
+  const containerScrollDiff = subtract(scroll.initial, scroll.current);
 
   // Calculate the droppable's bounds, accounting for the container's scroll
-  const droppableBounds = {
-    top: droppableRect.top - containerScrollDiff.y,
-    right: droppableRect.right - containerScrollDiff.x,
-    bottom: droppableRect.bottom - containerScrollDiff.y,
-    left: droppableRect.left - containerScrollDiff.x,
-  };
+  const droppableBounds = offsetSpacing(droppable.page.withMargin, containerScrollDiff);
 
   // Clip the droppable's bounds by the scroll container's bounds
   // This gives us the droppable's true visible area
   // Note: if the droppable doesn't have a scroll parent droppableBounds === container.page
+  const containerBounds = droppable.container.page.withoutMargin;
   const clippedBounds = {
-    top: Math.max(droppableBounds.top, container.page.top),
-    right: Math.min(droppableBounds.right, container.page.right),
-    bottom: Math.min(droppableBounds.bottom, container.page.bottom),
-    left: Math.max(droppableBounds.left, container.page.left),
+    top: Math.max(droppableBounds.top, containerBounds.top),
+    right: Math.min(droppableBounds.right, containerBounds.right),
+    bottom: Math.min(droppableBounds.bottom, containerBounds.bottom),
+    left: Math.max(droppableBounds.left, containerBounds.left),
   };
 
   const isWithinHorizontal = isWithin(clippedBounds.left, clippedBounds.right);
@@ -43,7 +37,7 @@ export const isPointWithin = (droppable: DroppableDimension) => {
 };
 
 export const isDraggableWithin = (droppable: DroppableDimension) => {
-  const { top, right, bottom, left } = droppable.container.page;
+  const { top, right, bottom, left } = droppable.container.page.withoutMargin;
 
   // There are some extremely minor inaccuracy in the calculations of margins (~0.001)
   // To allow for this inaccuracy we make the dimension slightly bigger for this calculation

@@ -13,12 +13,12 @@ export type Position = {|
   y: number,
 |};
 
-export type Spacing = {|
+export type Spacing = {
   top: number,
   right: number,
   bottom: number,
   left: number,
-|}
+}
 
 export type ClientRect = {|
   top: number,
@@ -100,7 +100,9 @@ export type DroppableDimension = {|
       initial: Position,
       current: Position,
     |},
-    page: DimensionFragment,
+    page: {|
+      withoutMargin: DimensionFragment,
+    |},
   |},
 |}
 export type DraggableLocation = {|

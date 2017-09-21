@@ -159,7 +159,9 @@ export const getDroppableDimension = ({
         // when we start the current scroll is the initial scroll
         current: scroll,
       },
-      page: getFragment(containerRectWithWindowScroll),
+      page: {
+        withoutMargin: getFragment(containerRectWithWindowScroll),
+      },
     },
   };
 

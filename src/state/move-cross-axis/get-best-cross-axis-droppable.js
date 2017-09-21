@@ -76,10 +76,10 @@ export default ({
         isBetweenDestinationBounds(sourceFragment[axis.end]);
     })
     .filter(droppable => (
-      (droppable.page.withMargin[axis.crossAxisStart] >=
-        droppable.container.page[axis.crossAxisStart]) &&
-      (droppable.page.withMargin[axis.crossAxisEnd] <=
-        droppable.container.page[axis.crossAxisEnd])
+      (droppable.page.withoutMargin[axis.crossAxisStart] >=
+        droppable.container.page.withoutMargin[axis.crossAxisStart]) &&
+      (droppable.page.withoutMargin[axis.crossAxisEnd] <=
+        droppable.container.page.withoutMargin[axis.crossAxisEnd])
     ))
     // Sort on the cross axis
     .sort((a: DroppableDimension, b: DroppableDimension) => {
