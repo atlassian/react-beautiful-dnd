@@ -19,11 +19,6 @@ const isDraggingClassName = 'is-dragging';
 const publishOnDragStart = action('onDragStart');
 const publishOnDragEnd = action('onDragEnd');
 
-const Content = styled.div`
-  max-width: 500px;
-  overflow: auto;
-`;
-
 const Container = styled.div`
   background: ${colors.blue.deep};
   min-height: 100vh;
@@ -124,26 +119,24 @@ export default class Board extends Component {
         onDragStart={this.onDragStart}
         onDragEnd={this.onDragEnd}
       >
-        <Content>
-          <Droppable
-            droppableId="board"
-            type="COLUMN"
-            direction="horizontal"
-          >
-            {(provided: DroppableProvided) => (
-              <Container innerRef={provided.innerRef}>
-                {ordered.map((key: string) => (
-                  <Column
-                    key={key}
-                    title={key}
-                    quotes={columns[key]}
-                    autoFocusQuoteId={this.state.autoFocusQuoteId}
-                  />
-                ))}
-              </Container>
-            )}
-          </Droppable>
-        </Content>
+        <Droppable
+          droppableId="board"
+          type="COLUMN"
+          direction="horizontal"
+        >
+          {(provided: DroppableProvided) => (
+            <Container innerRef={provided.innerRef}>
+              {ordered.map((key: string) => (
+                <Column
+                  key={key}
+                  title={key}
+                  quotes={columns[key]}
+                  autoFocusQuoteId={this.state.autoFocusQuoteId}
+                />
+              ))}
+            </Container>
+          )}
+        </Droppable>
       </DragDropContext>
     );
   }
