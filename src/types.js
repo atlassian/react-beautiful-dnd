@@ -95,6 +95,10 @@ export type DroppableDimension = {|
     // the area in which content presses up against
     withMarginAndPadding: DimensionFragment,
   |},
+  // Some droppables will have a scroll container - either themselves or a parent element.
+  // We need to take into account the dimensions and scroll of this container when calculating
+  // the true visible area of the droppable. If the droppable doesn't have scrolling then
+  // the dimension of the container will be the same as the dimensions of the droppable itself.
   container: {|
     scroll: {|
       initial: Position,
