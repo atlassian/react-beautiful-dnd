@@ -406,7 +406,7 @@ describe('DraggableDimensionPublisher', () => {
           onPublish={(dimension) => {
             expect(dimension).toBeTruthy();
             if (dimension) {
-              expect(dimension.container.page).toEqual(droppableRect);
+              expect(dimension.container.page.withoutMargin).toEqual(droppableRect);
             }
           }}
         />);
@@ -423,7 +423,7 @@ describe('DraggableDimensionPublisher', () => {
           onPublish={(dimension) => {
             expect(dimension).toBeTruthy();
             if (dimension) {
-              expect(dimension.container.page).toEqual(parentRect);
+              expect(dimension.container.page.withoutMargin).toEqual(parentRect);
             }
           }}
         />);
@@ -439,7 +439,7 @@ describe('DraggableDimensionPublisher', () => {
           onPublish={(dimension) => {
             expect(dimension).toBeTruthy();
             if (dimension) {
-              expect(dimension.container.page).toEqual(droppableRect);
+              expect(dimension.container.page.withoutMargin).toEqual(droppableRect);
             }
           }}
         />);
