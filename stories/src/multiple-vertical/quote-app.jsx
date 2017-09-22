@@ -29,6 +29,27 @@ const Column = styled.div`
   margin: 0 ${grid * 2}px;
 `;
 
+const HorizontalScrollContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  background: rgba(0, 0, 0, 0.1);
+  padding: ${grid}px;
+  max-width: 400px;
+  overflow: auto;
+`;
+
+const VerticalScrollContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  background: rgba(0, 0, 0, 0.1);
+  padding: ${grid}px;
+  max-height: 800px;
+  overflow: auto;
+`;
+
 const PushDown = styled.div`
   height: 200px;
 `;
@@ -114,45 +135,108 @@ export default class QuoteApp extends Component {
         onDragEnd={this.onDragEnd}
       >
         <Root>
-          <Column>
-            <QuoteList
-              title="alpha"
-              listId="alpha"
-              internalScroll
-              listType="card"
-              isDropDisabled={disabledDroppable === 'alpha'}
-              quotes={quoteMap.alpha}
-              autoFocusQuoteId={autoFocusQuoteId}
-            />
-          </Column>
+          <HorizontalScrollContainer>
+            <Column>
+              <QuoteList
+                title="alpha"
+                listId="alpha"
+                listType="card"
+                isDropDisabled={disabledDroppable === 'alpha'}
+                quotes={quoteMap.alpha}
+                autoFocusQuoteId={autoFocusQuoteId}
+              />
+            </Column>
+            <Column>
+              <QuoteList
+                title="beta"
+                listId="beta"
+                listType="card"
+                isDropDisabled={disabledDroppable === 'beta'}
+                quotes={quoteMap.beta}
+                autoFocusQuoteId={autoFocusQuoteId}
+              />
+            </Column>
+            <Column>
+              <QuoteList
+                title="gamma"
+                listId="gamma"
+                listType="card"
+                isDropDisabled={disabledDroppable === 'gamma'}
+                quotes={quoteMap.gamma}
+                autoFocusQuoteId={autoFocusQuoteId}
+              />
+            </Column>
+          </HorizontalScrollContainer>
           <Column>
             <PushDown />
-            <QuoteList
-              title="beta"
-              listId="beta"
-              listType="card"
-              isDropDisabled={disabledDroppable === 'beta'}
-              quotes={quoteMap.beta}
-              autoFocusQuoteId={autoFocusQuoteId}
-            />
-            <QuoteList
-              title="gamma"
-              listId="gamma"
-              listType="card"
-              internalScroll
-              isDropDisabled={disabledDroppable === 'gamma'}
-              quotes={quoteMap.gamma}
-              autoFocusQuoteId={autoFocusQuoteId}
-            />
-          </Column>
-          <Column>
             <QuoteList
               title="delta"
               listId="delta"
               listType="card"
-              internalScroll
               isDropDisabled={disabledDroppable === 'delta'}
               quotes={quoteMap.delta}
+              autoFocusQuoteId={autoFocusQuoteId}
+            />
+            <QuoteList
+              title="epsilon"
+              listId="epsilon"
+              listType="card"
+              internalScroll
+              isDropDisabled={disabledDroppable === 'epsilon'}
+              quotes={quoteMap.epsilon}
+              autoFocusQuoteId={autoFocusQuoteId}
+            />
+          </Column>
+          <VerticalScrollContainer>
+            <Column>
+              <QuoteList
+                title="zeta"
+                listId="zeta"
+                listType="card"
+                isDropDisabled={disabledDroppable === 'zeta'}
+                quotes={quoteMap.zeta}
+                autoFocusQuoteId={autoFocusQuoteId}
+              />
+            </Column>
+            <Column>
+              <QuoteList
+                title="eta"
+                listId="eta"
+                listType="card"
+                isDropDisabled={disabledDroppable === 'eta'}
+                quotes={quoteMap.eta}
+                autoFocusQuoteId={autoFocusQuoteId}
+              />
+            </Column>
+            <Column>
+              <QuoteList
+                title="theta"
+                listId="theta"
+                listType="card"
+                isDropDisabled={disabledDroppable === 'theta'}
+                quotes={quoteMap.theta}
+                autoFocusQuoteId={autoFocusQuoteId}
+              />
+            </Column>
+          </VerticalScrollContainer>
+          <Column>
+            <QuoteList
+              title="iota"
+              listId="iota"
+              listType="card"
+              isDropDisabled={disabledDroppable === 'iota'}
+              quotes={quoteMap.iota}
+              autoFocusQuoteId={autoFocusQuoteId}
+            />
+          </Column>
+          <Column>
+            <QuoteList
+              title="kappa"
+              listId="kappa"
+              listType="card"
+              internalScroll
+              isDropDisabled={disabledDroppable === 'kappa'}
+              quotes={quoteMap.kappa}
               autoFocusQuoteId={autoFocusQuoteId}
             />
           </Column>

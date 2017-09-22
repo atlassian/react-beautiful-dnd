@@ -304,9 +304,12 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     // $ExpectError - flow does not like spread
     const dimension: DroppableDimension = {
       ...target,
-      scroll: {
-        initial: target.scroll.initial,
-        current: offset,
+      container: {
+        ...target.container,
+        scroll: {
+          ...target.container.scroll,
+          current: offset,
+        },
       },
     };
 
