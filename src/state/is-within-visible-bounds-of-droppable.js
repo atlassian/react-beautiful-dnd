@@ -6,21 +6,22 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DimensionFragment,
+  Spacing,
 } from '../types';
 
 export const isPointWithin = (droppable: DroppableDimension) => {
   // Calculate the mid-drag scroll ∆ of the scroll container
   const scroll = droppable.container.scroll;
-  const containerScrollDiff = subtract(scroll.initial, scroll.current);
+  const containerScrollDiff: Position = subtract(scroll.initial, scroll.current);
 
   // Calculate the droppable's bounds, accounting for the container's scroll
-  const droppableBounds = offsetSpacing(droppable.page.withMargin, containerScrollDiff);
+  const droppableBounds: Spacing = offsetSpacing(droppable.page.withMargin, containerScrollDiff);
 
   // Clip the droppable's bounds by the scroll container's bounds
   // This gives us the droppable's true visible area
   // Note: if the droppable doesn't have a scroll parent droppableBounds === container.page
   const containerBounds = droppable.container.page.withoutMargin;
-  const clippedBounds = {
+  const clippedBounds: Spacing = {
     top: Math.max(droppableBounds.top, containerBounds.top),
     right: Math.min(droppableBounds.right, containerBounds.right),
     bottom: Math.min(droppableBounds.bottom, containerBounds.bottom),

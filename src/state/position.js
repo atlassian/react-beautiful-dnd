@@ -52,7 +52,7 @@ export const distance = (point1: Position, point2: Position): number =>
 export const closest = (target: Position, points: Position[]): number =>
   Math.min(...points.map((point: Position) => distance(target, point)));
 
-export const offsetSpacing = (spacing: Spacing, position: Position) => ({
+export const offsetSpacing = (spacing: Spacing, position: Position): Spacing => ({
   top: spacing.top + position.y,
   right: spacing.right + position.x,
   bottom: spacing.bottom + position.y,
