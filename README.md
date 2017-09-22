@@ -191,6 +191,12 @@ Keep in mind that these periods of inactivity may not always exist.
 
 For now, the library does not support drag axis locking (aka drag rails). This is where the user is restricted to only dragging along one axis. The current thinking is this breaks the physical metaphore we are going for and sends a message to the user that they are interacting with a piece of software rather than moving physical objects around. It is possible to ensure that a user can only drop in a single list by using props `type` and `isDropEnabled`. You can also do some visual treatment to the list `onDragStart` to show the user that this is the only place they can interact with.
 
+#### Application 6: natural cross list movement
+
+Rather than using an index based approach for keyboard movement between lists, `react-beautiful-dnd` performs cross list movement based on **inertia, gravity and collisions**. You can find out more about how this works by reading the blog ["Natural keyboard movement between lists"](https://medium.com/@alexandereardon/friction-gravity-and-collisions-3adac3a94e19).
+
+![example](https://raw.githubusercontent.com/alexreardon/files/master/resources/collision.gif?raw=true)
+
 ### Sloppy clicks and click blocking 🐱🎁
 
 When a user presses the mouse down on an element, we cannot determine if the user was clicking or dragging. Also, sometimes when a user clicks they can move the cursor slightly — a sloppy click. So we only start a drag once the user has moved beyond a certain distance with the mouse down (the drag threshold) — more than they would if they where just making a sloppy click. If the drag threshold is not exceeded then the user interaction behaves just like a regular click. If the drag threshold is exceeded then the interaction will be classified as a drag and the standard click action will not occur. 
@@ -214,7 +220,7 @@ In addition to supporting keyboard, we have also audited how the keyboard shortc
 Currently the keyboard handling is hard coded. This might be changed in the future to become customisable. Here is the existing keyboard mapping:
 
 - **tab** <kbd>tab ↹</kbd> - standard browser tabbing will navigate through the `Droppable`'s. The library does not do anything fancy with `tab` while users are selecting. Once a drag has started, `tab` is blocked for the duration of the drag.
-- **spacebar** <kbd>space</kbd> - lift a focused `Draggable`. Also, drop a dragging `Draggable` where the drag was started with a `spacebar`.
+- **spacebar** <kbd>space</kbd> - lift a focused `Draggable`. Also, drop a dragging `Draggable` where the drag was started with a `spacebar`. Users dragging with a mouse can still use <kbd>space</kbd> to scroll the window during a drag (super cool)
 - **Escape** <kbd>esc</kbd> - cancel an existing drag - regardless of whether the user is dragging with the keyboard or mouse.
 
 ##### Keyboard dragging movement
@@ -539,8 +545,6 @@ The `children` function is also provided with a small amount of state relating t
 ```
 
 ### Conditionally dropping
-
-> Keep in mind that this is not supported at this time. In this current initial version we only support reordering within a single list.
 
 - `Droppable`s can only be dropped on by `Draggable`s who share the same `type`. This is a simple way of allowing conditional dropping. If you do not provide a `type` for the `Droppable` then it will only accept `Draggable`s which also have the default type. `Draggable`s and `Droppable`s both will have their `types` set to `'DEFAULT'` when none is provided. There is currently no way to set multiple `types`, or a `type` wildcard that will accept `Draggable`s of multiple any types. This could be added if there is a valid use case.
 - Using the `isDropDisabled` prop you can conditionally allow dropping. This allows you to do arbitrarily complex conditional transitions. This will only be considered if the `type` of the `Droppable` matches the `type` of the currently dragging `Draggable`.
@@ -1008,4 +1012,4 @@ Alex Reardon - [@alexandereardon](https://twitter.com/alexandereardon) - areardo
 
 ## Other maintainers
 
-Jared Crowe - jcrowe@atlassian.com
+Jared Crowe - [@jaredjcrowe](https://twitter.com/jaredjcrowe) - jcrowe@atlassian.com

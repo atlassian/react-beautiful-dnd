@@ -1,7 +1,16 @@
 language: node_js
 cache: yarn
 node_js:
-  - "6.9"
+- '8.4'
 script:
-  - "yarn run validate"
-  - "yarn run test"
+- yarn run validate
+- yarn run test
+deploy:
+  provider: npm
+  email: alexreardon@gmail.com
+  api_key:
+    secure: qqKc08HEhgqauJI6tGP/DIxSRIttPsQCuXjhSp/1VoU6H9Ye0IvJo9h3IQcrxdMF1+d8YSqT9tLzGQTjyOgUTjKe1Mgstyd4ShMBPBWWsF0PyT0Hnhn+NL4e+sWycu6RQdevWy4GFQ1gTYrTXIW9Gv+joUVua9RE7fZJPX0pAShiDTn3U/SOviWegBba9VrIN1e3GX3pZ+aHKq8Ns9EhlT/yfpipAnIQt4FOw11s+4+MZ9VyhL8B3pJ2QzeZ5DpIIsQJ/JPiLM/UZGwGltU+Fdz95Znf7MtH/2kwXv7vnwwdBDVKV92fyJUDmuU5UjBXGOPf7OYSBE/rfSMd80xYzrkTkWCBuCQ1l4WFDfGaOKhOJzZW1w0evZFLmlUnYz07Qg8/UbfIvfd5DUud7HsC74cUEBkshTyrE9kbi6ZBe2Qi1Yp9z+zvafnEfPyJbkNgsmf5bQ+VsKdUGpy3XLKwxIly7BLkj5LtCBtGNjIaPPCJ4w/kCGfjWntOyPc4gkHfrOG0N6w8wqqCyL01NOhbz0eH3mGQjdGSvn27EbjodChfQRWWysGxoCWZAS69zvQvs5qglK3yjMIaaW1oKEtRah8D4j1DZCty8H+2fQLH0U1AwfGm+4uYuMXPPz+wSuajmJOlG995wLJeVnIzmai2kE22N6oEvbVbVsATOIdurjY=
+  on:
+    branch: master
+    tags: true
+    repo: atlassian/react-beautiful-dnd
