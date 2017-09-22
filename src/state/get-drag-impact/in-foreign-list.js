@@ -27,7 +27,7 @@ export default ({
   const axis: Axis = destination.axis;
 
   const destinationScrollDiff: Position = subtract(
-    destination.scroll.current, destination.scroll.initial
+    destination.container.scroll.current, destination.container.scroll.initial
   );
 
   const currentCenter: Position = add(pageCenter, destinationScrollDiff);

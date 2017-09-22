@@ -28,7 +28,9 @@ export default ({
   insideHome,
 }: Args): DragImpact => {
   const axis: Axis = home.axis;
-  const homeScrollDiff: Position = subtract(home.scroll.current, home.scroll.initial);
+  const homeScrollDiff: Position = subtract(
+    home.container.scroll.current, home.container.scroll.initial
+  );
   // Where the element actually is now
   const currentCenter: Position = add(pageCenter, homeScrollDiff);
   // The starting center position
