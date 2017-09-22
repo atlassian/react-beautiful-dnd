@@ -11,7 +11,7 @@ import type {
 } from '../../../src/types';
 
 describe('is within visible bounds of a droppable', () => {
-  const droppable = getDroppableDimension({
+  const getDroppableDimensionArgs = {
     id: 'droppable',
     clientRect: getClientRect({
       top: 0,
@@ -19,7 +19,8 @@ describe('is within visible bounds of a droppable', () => {
       right: 100,
       bottom: 100,
     }),
-  });
+  };
+  const droppable = getDroppableDimension(getDroppableDimensionArgs);
 
   describe('is point within', () => {
     const isWithinDroppable = isPointWithin(droppable);
@@ -78,6 +79,170 @@ describe('is within visible bounds of a droppable', () => {
       // checking with the center position of the dimension itself
       expect(isWithinCustom(custom.client.withMargin.center)).toBe(false);
       expect(isWithinCustom(custom.page.withMargin.center)).toBe(true);
+    });
+
+    describe('dimension clipping', () => {
+      const points = {
+        'top-left': { x: left, y: top },
+        'top-right': { x: right, y: top },
+        'bottom-left': { x: left, y: bottom },
+        'bottom-right': { x: right, y: bottom },
+        top: { x: right / 2, y: top },
+        right: { x: right, y: bottom / 2 },
+        bottom: { x: right / 2, y: bottom },
+        left: { x: left, y: bottom / 2 },
+        center: { x: right / 2, y: bottom / 2 },
+        outside: { x: right + 5, y: top },
+      };
+
+      it('should not be clipped if the droppable is fully contained by its scroll container', () => {
+        const fullyContainedDroppable = getDroppableDimension({
+          ...getDroppableDimensionArgs,
+          containerRect: getClientRect({
+            top: -10,
+            right: 110,
+            bottom: 110,
+            left: -10,
+          }),
+        });
+        const isPointWithinDroppable = isPointWithin(fullyContainedDroppable);
+        Object.keys(points).forEach(
+          (point) => {
+            const expected = point !== 'outside';
+            expect(isPointWithinDroppable(points[point])).toBe(expected);
+          }
+        );
+      });
+
+      it('should be completely clipped if the droppable is outside the scroll container\'s bounds', () => {
+        const fullyClippedDroppable = getDroppableDimension({
+          ...getDroppableDimensionArgs,
+          containerRect: getClientRect({
+            top,
+            right: 210,
+            bottom,
+            left: 110,
+          }),
+        });
+        const isPointWithinDroppable = isPointWithin(fullyClippedDroppable);
+        Object.keys(points).forEach(
+          point => expect(isPointWithinDroppable(points[point])).toBe(false)
+        );
+      });
+
+      it('should be clipped on the top edge', () => {
+        const partiallyClippedDroppable = getDroppableDimension({
+          ...getDroppableDimensionArgs,
+          containerRect: getClientRect({
+            top: 10,
+            right,
+            bottom,
+            left,
+          }),
+        });
+        const isPointWithinDroppable = isPointWithin(partiallyClippedDroppable);
+        Object.keys(points).forEach(
+          (point) => {
+            const expected = !['top-left', 'top', 'top-right', 'outside'].includes(point);
+            expect(isPointWithinDroppable(points[point])).toBe(expected);
+          }
+        );
+      });
+
+      it('should be clipped on the right edge', () => {
+        const partiallyClippedDroppable = getDroppableDimension({
+          ...getDroppableDimensionArgs,
+          containerRect: getClientRect({
+            top,
+            right: right - 10,
+            bottom,
+            left,
+          }),
+        });
+        const isPointWithinDroppable = isPointWithin(partiallyClippedDroppable);
+        Object.keys(points).forEach(
+          (point) => {
+            const expected = !['top-right', 'right', 'bottom-right', 'outside'].includes(point);
+            expect(isPointWithinDroppable(points[point])).toBe(expected);
+          }
+        );
+      });
+
+      it('should be clipped on the bottom edge', () => {
+        const partiallyClippedDroppable = getDroppableDimension({
+          ...getDroppableDimensionArgs,
+          containerRect: getClientRect({
+            top,
+            right,
+            bottom: bottom - 10,
+            left,
+          }),
+        });
+        const isPointWithinDroppable = isPointWithin(partiallyClippedDroppable);
+        Object.keys(points).forEach(
+          (point) => {
+            const expected = !['bottom-left', 'bottom', 'bottom-right', 'outside'].includes(point);
+            expect(isPointWithinDroppable(points[point])).toBe(expected);
+          }
+        );
+      });
+
+      it('should be clipped on the left edge', () => {
+        const partiallyClippedDroppable = getDroppableDimension({
+          ...getDroppableDimensionArgs,
+          containerRect: getClientRect({
+            top,
+            right,
+            bottom,
+            left: 10,
+          }),
+        });
+        const isPointWithinDroppable = isPointWithin(partiallyClippedDroppable);
+        Object.keys(points).forEach(
+          (point) => {
+            const expected = !['top-left', 'left', 'bottom-left', 'outside'].includes(point);
+            expect(isPointWithinDroppable(points[point])).toBe(expected);
+          }
+        );
+      });
+
+      it('should account for container scroll', () => {
+        const partiallyClippedDroppable = getDroppableDimension({
+          ...getDroppableDimensionArgs,
+          clientRect: getClientRect({
+            top: top + 200,
+            right,
+            bottom: bottom + 200,
+            left,
+          }),
+          containerRect: getClientRect({ top, right, bottom, left }),
+        });
+        const isPointWithinDroppable = isPointWithin(partiallyClippedDroppable);
+        // Before we scroll the droppable should be fully clipped
+        Object.keys(points).forEach(
+          point => expect(isPointWithinDroppable(points[point])).toBe(false)
+        );
+
+        // Simulating a scroll...
+        const scrolledDroppable = {
+          ...partiallyClippedDroppable,
+          container: {
+            ...partiallyClippedDroppable.container,
+            scroll: {
+              ...partiallyClippedDroppable.container.scroll,
+              current: { x: 0, y: 200 },
+            },
+          },
+        };
+        const isPointWithinScrolledDroppable = isPointWithin(scrolledDroppable);
+        // Now the droppable should catch all the points
+        Object.keys(points).forEach(
+          (point) => {
+            const expected = point !== 'outside';
+            expect(isPointWithinScrolledDroppable(points[point])).toBe(expected);
+          }
+        );
+      });
     });
   });
 

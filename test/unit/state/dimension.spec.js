@@ -152,7 +152,7 @@ describe('dimension', () => {
     });
 
     it('should return the initial scroll as the initial and current scroll', () => {
-      expect(dimension.scroll).toEqual({
+      expect(dimension.container.scroll).toEqual({
         initial: scroll,
         current: scroll,
       });
