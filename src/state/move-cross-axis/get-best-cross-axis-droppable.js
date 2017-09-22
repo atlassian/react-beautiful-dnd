@@ -75,7 +75,7 @@ export default ({
         isBetweenDestinationBounds(sourceFragment[axis.start]) ||
         isBetweenDestinationBounds(sourceFragment[axis.end]);
     })
-    .filter(droppable => (
+    .filter((droppable: DroppableDimension) => (
       (droppable.page.withoutMargin[axis.crossAxisStart] >=
         droppable.container.page.withoutMargin[axis.crossAxisStart]) &&
       (droppable.page.withoutMargin[axis.crossAxisEnd] <=
