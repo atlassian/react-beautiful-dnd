@@ -11,6 +11,7 @@ import type {
   Spacing,
   DroppableId,
   DroppableDimension,
+  DimensionFragment,
   HTMLElement,
   Position,
 } from '../../../src/types';
@@ -322,18 +323,36 @@ describe('DraggableDimensionPublisher', () => {
     });
 
     describe('calculating the container dimension', () => {
-      const parentRect = getFragment(getClientRect({
+      const parentRect: ClientRect = getClientRect({
         top: 0,
         left: 0,
         right: 150,
         bottom: 150,
-      }));
-      const droppableRect = getFragment(getClientRect({
+      });
+      const parentFragment: DimensionFragment = getFragment(parentRect);
+      const droppableRect: ClientRect = getClientRect({
         top: 0,
         left: 0,
         right: 120,
         bottom: 120,
-      }));
+      });
+      const droppableFragment: DimensionFragment = getFragment(droppableRect);
+
+      const dimensionWithNoScrolling: DroppableDimension = getDroppableDimension({
+        id: droppableId,
+        clientRect: droppableRect,
+        containerRect: droppableRect,
+      });
+      const dimensionWithInternalScrolling: DroppableDimension = getDroppableDimension({
+        id: droppableId,
+        clientRect: droppableRect,
+        containerRect: droppableRect,
+      });
+      const dimensionWithScrollParent: DroppableDimension = getDroppableDimension({
+        id: droppableId,
+        clientRect: droppableRect,
+        containerRect: parentRect,
+      });
 
       class App extends Component {
         props: {
@@ -360,8 +379,8 @@ describe('DraggableDimensionPublisher', () => {
             <div
               className="scroll-parent"
               style={{
-                height: parentRect.height,
-                width: parentRect.width,
+                height: parentFragment.height,
+                width: parentFragment.width,
                 padding: 0,
                 margin: 0,
                 overflow: parentIsScrollable ? 'scroll' : 'visible',
@@ -372,8 +391,8 @@ describe('DraggableDimensionPublisher', () => {
                   ref={this.setRef}
                   className="droppable"
                   style={{
-                    height: droppableRect.height,
-                    width: droppableRect.width,
+                    height: droppableFragment.height,
+                    width: droppableFragment.width,
                     padding: 0,
                     margin: 0,
                     overflow: droppableIsScrollable ? 'scroll' : 'visible',
@@ -403,51 +422,37 @@ describe('DraggableDimensionPublisher', () => {
         wrapper = mount(<App
           droppableIsScrollable
           parentIsScrollable
-          onPublish={(dimension) => {
-            expect(dimension).toBeTruthy();
-            if (dimension) {
-              expect(dimension.container.page.withoutMargin).toEqual(droppableRect);
-            }
-          }}
+          onPublish={publish}
         />);
         const parentNode = wrapper.getDOMNode();
         const droppableNode = wrapper.state().ref;
-        jest.spyOn(parentNode, 'getBoundingClientRect').mockImplementation(() => parentRect);
-        jest.spyOn(droppableNode, 'getBoundingClientRect').mockImplementation(() => droppableRect);
+        jest.spyOn(parentNode, 'getBoundingClientRect').mockImplementation(() => parentFragment);
+        jest.spyOn(droppableNode, 'getBoundingClientRect').mockImplementation(() => droppableFragment);
         wrapper.setProps({ shouldPublish: true });
+        expect(publish).toHaveBeenCalledWith(dimensionWithInternalScrolling);
       });
 
       it('should detect a scrollable parent', () => {
         wrapper = mount(<App
           parentIsScrollable
-          onPublish={(dimension) => {
-            expect(dimension).toBeTruthy();
-            if (dimension) {
-              expect(dimension.container.page.withoutMargin).toEqual(parentRect);
-            }
-          }}
+          onPublish={publish}
         />);
         const parentNode = wrapper.getDOMNode();
         const droppableNode = wrapper.state().ref;
-        jest.spyOn(parentNode, 'getBoundingClientRect').mockImplementation(() => parentRect);
-        jest.spyOn(droppableNode, 'getBoundingClientRect').mockImplementation(() => droppableRect);
+        jest.spyOn(parentNode, 'getBoundingClientRect').mockImplementation(() => parentFragment);
+        jest.spyOn(droppableNode, 'getBoundingClientRect').mockImplementation(() => droppableFragment);
         wrapper.setProps({ shouldPublish: true });
+        expect(publish).toHaveBeenCalledWith(dimensionWithScrollParent);
       });
 
       it('should default to the dimension of the droppable if there are no scroll containers detected', () => {
-        wrapper = mount(<App
-          onPublish={(dimension) => {
-            expect(dimension).toBeTruthy();
-            if (dimension) {
-              expect(dimension.container.page.withoutMargin).toEqual(droppableRect);
-            }
-          }}
-        />);
+        wrapper = mount(<App onPublish={publish} />);
         const parentNode = wrapper.getDOMNode();
         const droppableNode = wrapper.state().ref;
-        jest.spyOn(parentNode, 'getBoundingClientRect').mockImplementation(() => parentRect);
-        jest.spyOn(droppableNode, 'getBoundingClientRect').mockImplementation(() => droppableRect);
+        jest.spyOn(parentNode, 'getBoundingClientRect').mockImplementation(() => parentFragment);
+        jest.spyOn(droppableNode, 'getBoundingClientRect').mockImplementation(() => droppableFragment);
         wrapper.setProps({ shouldPublish: true });
+        expect(publish).toHaveBeenCalledWith(dimensionWithNoScrolling);
       });
     });
   });
