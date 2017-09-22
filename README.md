@@ -494,7 +494,7 @@ The `React` children of a `Droppable` must be a function that returns a `ReactEl
 
 The function is provided with two arguments:
 
-**1. provided: (DroppableProvided)**
+#### 1. provided: (DroppableProvided)**
 
 ```js
 type DroppableProvided = {|
@@ -519,7 +519,7 @@ type DroppableProvided = {|
 </Droppable>;
 ```
 
-**2. snapshot: (DroppableStateSnapshot)**
+#### 2. snapshot: (DroppableStateSnapshot)**
 
 ```js
 type DroppableStateSnapshot = {|
@@ -624,7 +624,7 @@ The `React` children of a `Draggable` must be a function that returns a `ReactEl
 
 The function is provided with two arguments:
 
-**1. provided: (DraggableProvided)**
+#### 1. provided: (DraggableProvided)**
 
 ```js
 type DraggableProvided = {|
@@ -831,7 +831,7 @@ const myOnClick = event => console.log('clicked on', event.target);
 </Draggable>;
 ```
 
-**2. snapshot: (DraggableStateSnapshot)**
+#### 2. snapshot: (DraggableStateSnapshot)**
 
 ```js
 type DraggableStateSnapshot = {|
@@ -863,6 +863,78 @@ The `children` function is also provided with a small amount of state relating t
     );
   }}
 </Draggable>;
+```
+
+### Interactive child elements within a `Draggable`
+
+It is possible for your `Draggable` to be an interactive element such as a `<button>` or an `<a>`. However, there may be a situation where you want your `Draggable` element be the parent of an interactive element such as a `<button>` or an `<input>`. By default the child interactive element **will not be interactive**. Interacting with these nested interactive elements will be used as part of the calculation to start a drag. This is because we call `event.preventDefault()` on the `mousedown` event for the `Draggable`. Calling `preventDefault` will prevent the nested interactive element from performing its standard actions and interactions. What you will need to do is *opt out* of our standard calling of `event.preventDefault()`. By doing this the nested interactive element will not be able to be used to start a drag - but will allow the user to interact with it directly. Keep in mind - that by doing this the user will not be able to drag the `Draggable` by dragging on the interactive child element - which is probably what you want anyway. There are a few ways you can get around the standard `preventDefault` behaviour. Here are some suggestions:
+
+**1. Call `event.stopPropagation()` on the interactive element `mousedown`**
+*This is the simpler solution*
+
+On the child element, call `event.stopPropagation()` for the `onMouseDown` function. This will stop the event bubbling up to the `Draggable` and having `event.preventDefault()` called on it. The `Draggable` will not be aware that a `mousedown` has even occurred.
+
+```js
+<input
+  // stop event from bubbling up to Draggable where it will be prevented
+  onMouseDown={e => e.stopPropagation()}
+/>
+```
+
+**2. Patch the `onMouseDown` event in `provided`**
+*This is the more complex solution*
+
+If you cannot use the first solution, then you can consider patching the `provided` > `onMouseDown` function. The main idea of this approach is to add additional behaviour to the existing `onMouseDown` function - only calling it when it should be called.
+
+```js
+class DraggableWithSelect extends Component {
+
+  renderSelect = (provided) => {
+    // Patched onMouseDown handler
+    const onMouseDown = (event) => {
+      // If mouse down is on a select, then do not
+      // let react-beautiful-dnd do anything with it
+      if(event.target.nodeName === 'SELECT') {
+        return;
+      }
+      provided.dragHandleProps.onMouseDown(event);
+    }
+
+    // patching drag handle props
+    const patched = {
+      ...provided.dragHandleProps,
+      onMouseDown,
+    }
+
+    return (
+      <div>
+        <div
+          ref={provided.innerRef}
+          style={getItemStyle(
+            provided.draggableStyle,
+            snapshot.isDragging
+          )}
+          {...patched}
+        >
+          <select>
+            <option>One</option>
+            <option>Two</option>
+            <option>Three</option>
+          </select>
+        </div>
+        {provided.placeholder}
+      </div>
+    );
+  }
+
+  render() {
+    return (
+      <Draggable draggableId="draggable-1">
+        {this.renderSelect}
+      </Draggable>
+    );
+  }
+}
 ```
 
 ## Flow usage
