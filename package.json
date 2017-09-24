@@ -20,7 +20,8 @@
     "validate": "yarn run lint && yarn run typecheck",
     "lint": "eslint .",
     "typecheck": "flow check",
-    "build": "yarn run build:lib && yarn run build:flow",
+    "build": "yarn run build:clean && yarn run build:lib && yarn run build:flow",
+    "build:clean": "rimraf lib",
     "build:lib": "babel src -d lib",
     "build:flow": "flow-copy-source --verbose src lib",
     "storybook": "start-storybook -p 9002",
@@ -28,6 +29,7 @@
     "prepublish": "yarn run build"
   },
   "dependencies": {
+    "babel-plugin-react-flow-props-to-prop-types": "^0.15.0",
     "babel-runtime": "6.26.0",
     "invariant": "2.2.2",
     "memoize-one": "3.0.1",
@@ -36,7 +38,7 @@
     "raf-schd": "2.0.1",
     "react-motion": "0.5.0",
     "react-redux": "5.0.6",
-    "redux": "^3.6.0",
+    "redux": "3.7.2",
     "redux-thunk": "2.2.0",
     "reselect": "3.0.1"
   },
@@ -45,7 +47,6 @@
     "@storybook/react": "3.2.8",
     "babel-cli": "6.26.0",
     "babel-eslint": "7.2.3",
-    "babel-plugin-react-flow-props-to-prop-types": "0.15.0",
     "babel-plugin-transform-class-properties": "6.24.1",
     "babel-plugin-transform-export-extensions": "6.22.0",
     "babel-plugin-transform-object-rest-spread": "6.26.0",
@@ -67,6 +68,7 @@
     "react": "15.6.1",
     "react-dom": "15.6.1",
     "react-test-renderer": "15.6.1",
+    "rimraf": "2.6.2",
     "styled-components": "2.1.2"
   },
   "peerDependencies": {
