@@ -91,9 +91,9 @@ describe('move to edge', () => {
           describe('to source end edge', () => {
             it('should move the source above the destination', () => {
               const newCenter: Position = add(
-              pullUpwards(centerDiff),
-              destinationTopCorner
-            );
+                pullUpwards(centerDiff),
+                destinationTopCorner
+              );
 
               const result: Position = moveToEdge({
                 source,
@@ -110,9 +110,9 @@ describe('move to edge', () => {
           describe('to source start edge', () => {
             it('should move below the top of the destination', () => {
               const newCenter: Position = add(
-              centerDiff,
-              destinationTopCorner,
-            );
+                centerDiff,
+                destinationTopCorner,
+              );
 
               const result: Position = moveToEdge({
                 source,
@@ -136,9 +136,9 @@ describe('move to edge', () => {
           describe('to source end edge', () => {
             it('should move above the bottom of the destination', () => {
               const newCenter: Position = add(
-              pullUpwards(centerDiff),
-              destinationBottomCorner,
-            );
+                pullUpwards(centerDiff),
+                destinationBottomCorner,
+              );
 
               const result: Position = moveToEdge({
                 source,
@@ -155,9 +155,9 @@ describe('move to edge', () => {
           describe('to source start edge', () => {
             it('should move below the destination', () => {
               const newCenter: Position = add(
-              centerDiff,
-              destinationBottomCorner,
-            );
+                centerDiff,
+                destinationBottomCorner,
+              );
 
               const result: Position = moveToEdge({
                 source,

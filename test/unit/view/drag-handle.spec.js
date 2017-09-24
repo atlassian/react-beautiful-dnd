@@ -1163,7 +1163,7 @@ describe('drag handle', () => {
             >
               {(dragHandleProps: Provided) => (
                 <Child dragHandleProps={dragHandleProps} />
-            )}
+              )}
             </DragHandle>,
           );
         });

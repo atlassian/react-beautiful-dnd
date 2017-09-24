@@ -94,10 +94,10 @@ export default ({
   // When we are in foreign list we are only displacing items forward
   // This list is always sorted by the closest impacted draggable
   const moved: DraggableId[] = isMovingForward ?
-      // Stop displacing the closest draggable forward
-      impact.movement.draggables.slice(1, impact.movement.draggables.length) :
-      // Add the draggable that we are moving into the place of
-      [movingRelativeTo.id, ...impact.movement.draggables];
+    // Stop displacing the closest draggable forward
+    impact.movement.draggables.slice(1, impact.movement.draggables.length) :
+    // Add the draggable that we are moving into the place of
+    [movingRelativeTo.id, ...impact.movement.draggables];
 
   const newImpact: DragImpact = {
     movement: {
