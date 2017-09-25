@@ -29,7 +29,7 @@
     "prepublish": "yarn run build"
   },
   "dependencies": {
-    "babel-plugin-react-flow-props-to-prop-types": "^0.15.0",
+    "babel-plugin-react-flow-props-to-prop-types": "0.15.0",
     "babel-runtime": "6.26.0",
     "invariant": "2.2.2",
     "memoize-one": "3.0.1",

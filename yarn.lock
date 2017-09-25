@@ -915,7 +915,7 @@ babel-plugin-react-docgen@^1.6.0:
     lodash "4.x.x"
     react-docgen "^2.15.0"
 
-babel-plugin-react-flow-props-to-prop-types@^0.15.0:
+babel-plugin-react-flow-props-to-prop-types@0.15.0:
   version "0.15.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-react-flow-props-to-prop-types/-/babel-plugin-react-flow-props-to-prop-types-0.15.0.tgz#0008ecf31bb68f43c11dec57e366f58b73a8acbd"
   dependencies:
