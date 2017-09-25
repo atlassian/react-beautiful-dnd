@@ -45,10 +45,10 @@ describe('is within visible bounds of a droppable', () => {
 
     it('should return false if the point is not within the droppable on any side', () => {
       const outside = [
-        subtract({ x: left, y: top }, { x: 0, y: 10 }),    // too far top
+        subtract({ x: left, y: top }, { x: 0, y: 10 }), // too far top
         subtract({ x: left, y: bottom }, { x: 10, y: 0 }), // too far left
-        add({ x: right, y: top }, { x: 10, y: 0 }),        // too far right
-        add({ x: right, y: bottom }, { x: 0, y: 10 }),     // too far bottom
+        add({ x: right, y: top }, { x: 10, y: 0 }), // too far right
+        add({ x: right, y: bottom }, { x: 0, y: 10 }), // too far bottom
       ];
 
       outside.forEach((point: Position) => {
@@ -264,10 +264,10 @@ describe('is within visible bounds of a droppable', () => {
       const result: Result = getDroppableWithDraggables({
         droppableRect: { top: 0, left: 0, bottom: 100, right: 100 },
         draggableRects: [
-          { top: -10, left: 0, bottom: 20, right: 100 },  // too far top
-          { top: 0, left: -10, bottom: 20, right: 100 },  // too far left
-          { top: 0, left: 0, bottom: 20, right: 110 },    // too far right
-          { top: 0, left: 0, bottom: 120, right: 100 },   // too far bottom
+          { top: -10, left: 0, bottom: 20, right: 100 }, // too far top
+          { top: 0, left: -10, bottom: 20, right: 100 }, // too far left
+          { top: 0, left: 0, bottom: 20, right: 110 }, // too far right
+          { top: 0, left: 0, bottom: 120, right: 100 }, // too far bottom
         ],
       });
       const isWithinDroppable = isDraggableWithin(result.droppable);
@@ -281,10 +281,10 @@ describe('is within visible bounds of a droppable', () => {
       const result: Result = getDroppableWithDraggables({
         droppableRect: { top: 0, left: 0, bottom: 100, right: 100 },
         draggableRects: [
-          { top: -1, left: 0, bottom: 20, right: 100 },   // not too far top
-          { top: 0, left: -1, bottom: 20, right: 100 },   // not too far left
-          { top: 0, left: 0, bottom: 20, right: 101 },    // not too far right
-          { top: 0, left: 0, bottom: 101, right: 100 },   // not too far bottom
+          { top: -1, left: 0, bottom: 20, right: 100 }, // not too far top
+          { top: 0, left: -1, bottom: 20, right: 100 }, // not too far left
+          { top: 0, left: 0, bottom: 20, right: 101 }, // not too far right
+          { top: 0, left: 0, bottom: 101, right: 100 }, // not too far bottom
         ],
       });
       const isWithinDroppable = isDraggableWithin(result.droppable);

@@ -31,7 +31,7 @@ export const draggingDraggableSelector = createSelector([
   drag: ?DragState,
   pending: ?PendingDrop,
   draggables: DraggableDimensionMap
-  ): ?DraggableDimension => {
+): ?DraggableDimension => {
   if (phase === 'DRAGGING') {
     if (!drag) {
       console.error('cannot get placeholder dimensions as there is an invalid drag state');
