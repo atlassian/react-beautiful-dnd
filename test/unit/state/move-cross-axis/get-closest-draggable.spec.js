@@ -228,7 +228,7 @@ describe('get closest draggable', () => {
 
       // 1. that they have equal distances
       expect(distance(center, visible1.page.withoutMargin.center))
-      .toEqual(distance(center, visible2.page.withoutMargin.center));
+        .toEqual(distance(center, visible2.page.withoutMargin.center));
 
       // 2. if we move beyond the edge visible2 will be selected
       const result2: ?DraggableDimension = getClosestDraggable({
