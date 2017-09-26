@@ -37,7 +37,7 @@ color: ${colors.black};
   text-decoration: none;
 }
 &:focus {
-  outline: 2px solid rebeccapurple;
+  outline: 2px solid ${colors.purple};
 }
 
 /* flexbox */

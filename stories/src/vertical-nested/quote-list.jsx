@@ -27,7 +27,7 @@ const Container = styled.div`
   user-select: none;
   transition: background-color 0.1s ease;
   &:focus {
-    outline: 2px solid rebeccapurple;
+    outline: 2px solid ${colors.purple};
     outline-offset: 2px;
   }
 `;
