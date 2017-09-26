@@ -1,7 +1,5 @@
 // @flow
-/* eslint-disable import/no-extraneous-dependencies */
 import type { PropType, HasDefaultProp } from 'babel-plugin-react-flow-props-to-prop-types';
-/* eslint-enable */
 import type {
   DraggableId,
   DraggableDimension,

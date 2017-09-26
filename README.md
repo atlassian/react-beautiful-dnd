@@ -33,6 +33,7 @@ This library is still fairly new and so there is a relatively small feature set.
 - Vertical lists ↕
 - Horizontal lists ↔
 - Movement between lists (▤ ↔ ▤)
+- Conditional [dragging](https://github.com/atlassian/react-beautiful-dnd#props-1) and [dropping](https://github.com/atlassian/react-beautiful-dnd#conditionally-dropping)
 - Multiple independent lists on the one page
 - Mouse 🐭 and **keyboard 🎹** dragging
 - Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list

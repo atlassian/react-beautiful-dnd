@@ -1,7 +1,5 @@
 // @flow
-/* eslint-disable import/no-extraneous-dependencies */
 import type { PropType } from 'babel-plugin-react-flow-props-to-prop-types';
-/* eslint-enable */
 import {
   publishDraggableDimension,
 } from '../../state/action-creators';
