@@ -2,6 +2,7 @@
 // flow-typed version: a165222d28/redux_v3.x.x/flow_>=v0.33.x
 
 declare module 'redux' {
+
   /*
 
     S = State
@@ -104,4 +105,5 @@ declare module 'redux' {
     bc: (b: B) => C,
     ab: (a: A) => B
   ): (a: A) => I
+
 }

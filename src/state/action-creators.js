@@ -38,8 +38,8 @@ const getScrollDiff = ({
   );
 
   const droppableScrollDiff: Position = droppable ? subtract(
-    droppable.scroll.initial,
-    droppable.scroll.current
+    droppable.container.scroll.initial,
+    droppable.container.scroll.current
   ) : origin;
 
   return add(windowScrollDiff, droppableScrollDiff);
@@ -158,13 +158,13 @@ export type MoveAction = {|
 export const move = (id: DraggableId,
   client: Position,
   windowScroll: Position): MoveAction => ({
-    type: 'MOVE',
-    payload: {
-      id,
-      client,
-      windowScroll,
-    },
-  });
+  type: 'MOVE',
+  payload: {
+    id,
+    client,
+    windowScroll,
+  },
+});
 
 export type MoveByWindowScrollAction = {|
   type: 'MOVE_BY_WINDOW_SCROLL',

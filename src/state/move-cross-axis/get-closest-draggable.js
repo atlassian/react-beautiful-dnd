@@ -38,18 +38,18 @@ export default ({
       const distanceToA = distance(pageCenter, a.page.withMargin.center);
       const distanceToB = distance(pageCenter, b.page.withMargin.center);
 
-        // if a is closer - return a
+      // if a is closer - return a
       if (distanceToA < distanceToB) {
         return -1;
       }
 
-        // if b is closer - return b
+      // if b is closer - return b
       if (distanceToB < distanceToA) {
         return 1;
       }
 
-        // if the distance to a and b are the same:
-        // return the one that appears first on the main axis
+      // if the distance to a and b are the same:
+      // return the one that appears first on the main axis
       return a.page.withMargin[axis.start] - b.page.withMargin[axis.start];
     });
 

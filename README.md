@@ -33,6 +33,7 @@ This library is still fairly new and so there is a relatively small feature set.
 - Vertical lists ↕
 - Horizontal lists ↔
 - Movement between lists (▤ ↔ ▤)
+- Conditional [dragging](https://github.com/atlassian/react-beautiful-dnd#props-1) and [dropping](https://github.com/atlassian/react-beautiful-dnd#conditionally-dropping)
 - Multiple independent lists on the one page
 - Mouse 🐭 and **keyboard 🎹** dragging
 - Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
@@ -191,6 +192,12 @@ Keep in mind that these periods of inactivity may not always exist.
 
 For now, the library does not support drag axis locking (aka drag rails). This is where the user is restricted to only dragging along one axis. The current thinking is this breaks the physical metaphore we are going for and sends a message to the user that they are interacting with a piece of software rather than moving physical objects around. It is possible to ensure that a user can only drop in a single list by using props `type` and `isDropEnabled`. You can also do some visual treatment to the list `onDragStart` to show the user that this is the only place they can interact with.
 
+#### Application 6: natural cross list movement
+
+Rather than using an index based approach for keyboard movement between lists, `react-beautiful-dnd` performs cross list movement based on **inertia, gravity and collisions**. You can find out more about how this works by reading the blog ["Natural keyboard movement between lists"](https://medium.com/@alexandereardon/friction-gravity-and-collisions-3adac3a94e19).
+
+![example](https://raw.githubusercontent.com/alexreardon/files/master/resources/collision.gif?raw=true)
+
 ### Sloppy clicks and click blocking 🐱🎁
 
 When a user presses the mouse down on an element, we cannot determine if the user was clicking or dragging. Also, sometimes when a user clicks they can move the cursor slightly — a sloppy click. So we only start a drag once the user has moved beyond a certain distance with the mouse down (the drag threshold) — more than they would if they where just making a sloppy click. If the drag threshold is not exceeded then the user interaction behaves just like a regular click. If the drag threshold is exceeded then the interaction will be classified as a drag and the standard click action will not occur. 
@@ -214,7 +221,7 @@ In addition to supporting keyboard, we have also audited how the keyboard shortc
 Currently the keyboard handling is hard coded. This might be changed in the future to become customisable. Here is the existing keyboard mapping:
 
 - **tab** <kbd>tab ↹</kbd> - standard browser tabbing will navigate through the `Droppable`'s. The library does not do anything fancy with `tab` while users are selecting. Once a drag has started, `tab` is blocked for the duration of the drag.
-- **spacebar** <kbd>space</kbd> - lift a focused `Draggable`. Also, drop a dragging `Draggable` where the drag was started with a `spacebar`.
+- **spacebar** <kbd>space</kbd> - lift a focused `Draggable`. Also, drop a dragging `Draggable` where the drag was started with a `spacebar`. Users dragging with a mouse can still use <kbd>space</kbd> to scroll the window during a drag (super cool)
 - **Escape** <kbd>esc</kbd> - cancel an existing drag - regardless of whether the user is dragging with the keyboard or mouse.
 
 ##### Keyboard dragging movement
@@ -330,7 +337,7 @@ This function will get notified when a drag starts. You are provided with the fo
 - `initial.type`: the `type` of the `Draggable` that is now dragging
 - `initial.source`: the location (`droppableId` and `index`) of where the dragging item has started within a `Droppable`.
 
-This function is *optional* and therefore does not need to be provided. It is **highly recommended** that you use this function to block updates to all `Draggable` and `Droppable` components during a drag. (See *Best `hooks` practices*)
+This function is *optional* and therefore does not need to be provided. It is **highly recommended** that you use this function to block updates to all `Draggable` and `Droppable` components during a drag. (See [*Best practices for `hooks` *](https://github.com/atlassian/react-beautiful-dnd#best-practices-for-hooks))
 
 **Type information**
 
@@ -365,8 +372,8 @@ It is provided with all the information about a drag:
 
 - `result.draggableId`: the id of the `Draggable` that was dragging.
 - `result.type`: the `type` of the `Draggable` that was dragging.
-- `result.source`: the location that the `Draggable` started in.
-- `result.destination`: the location that the `Draggable` finished in. The `destination` will be `null` if the user dropped into no position (such as outside any list) *or* if they dropped the `Draggable` back into the same position that it started in.
+- `result.source`: the location where the `Draggable` started.
+- `result.destination`: the location where the `Draggable` finished. The `destination` will be `null` if the user dropped into no position (such as outside any list) *or* if they dropped the `Draggable` back into the same position in which it started.
 
 ### Synchronous reordering
 
@@ -375,7 +382,7 @@ Because this library does not control your state, it is up to you to *synchronou
 *Here is what you need to do:*
 - if the `destination` is `null`: all done!
 - if `source.droppableId` equals `destination.droppableId` you need to remove the item from your list and insert it at the correct position.
-- if `source.droppableId` does not equal `destination.droppable` you need to the `Draggable` from the `source.droppableId` list and add it into the correct position of the `destination.droppableId` list.
+- if `source.droppableId` does not equal `destination.droppable`, then you need to remove the `Draggable` from the `source.droppableId` list and add it into the correct position of the `destination.droppableId` list.
 
 ### Type information
 
@@ -412,11 +419,11 @@ When the user starts dragging we take a snapshot of all of the dimensions of the
 
 Here are a few poor user experiences that can occur if you change things *during a drag*:
 
-- If you increase the amount of nodes the library will not know about them and they will not be moved when the user would expect them to be.
-- If you decrease the amount of nodes then there might be gaps and unexpected movements in your lists.
-- If you change the dimensions of any node, it can cause the changed node as well as others to move at incorrect times.
-- If you remove the node that the user is dragging the drag will instantly end
-- If you change the dimension of the dragging node then other things will not move out of the way at the correct time.
+- If you increase the amount of nodes, then the library will not know about them and they will not be moved when the user would expect them to be.
+- If you decrease the amount of nodes, then there might be gaps and unexpected movements in your lists.
+- If you change the dimensions of any node, then it can cause the changed node as well as others to move at incorrect times.
+- If you remove the node that the user is dragging, then the drag will instantly end
+- If you change the dimension of the dragging node, then other things will not move out of the way at the correct time.
 
 #### Add a cursor style and block selection
 
@@ -427,14 +434,14 @@ During a drag it is recommended that you add two styles to the body:
 
 `user-select: none;` prevents the user drag from selecting text on the page as they drag.
 
-`cursor: [your desired cursor];` is needed because we apply `pointer-events: none;` to the dragging item. This prevents you setting your own cursor style on the Draggable directly based on `snapshot.isDragging` (see `Draggable`).
+`cursor: [your desired cursor];` is needed because we apply `pointer-events: none;` to the dragging item. This prevents you setting your own cursor style on the Draggable directly based on `snapshot.isDragging` (see [`Draggable`](https://github.com/atlassian/react-beautiful-dnd#draggable)).
 
 #### Force focus after a transition between lists
 
-When an item is moved from one list to a different list it looses browser focus if it had it. This is because `React` creates a new node in this situation. It will not loose focus if transitioned within the same list. The dragging item will always have had browser focus if it is dragging with a keyboard. It is highly recommended that you give the item (which is now in a different list) focus again. You can see an example of how to do this in our stories. Here is an example of how you could do it:
+When an item is moved from one list to a different list, it loses browser focus if it had it. This is because `React` creates a new node in this situation. It will not lose focus if transitioned within the same list. The dragging item will always have had browser focus if it is dragging with a keyboard. It is highly recommended that you give the item (which is now in a different list) focus again. You can see an example of how to do this in our stories. Here is an example of how you could do it:
 
-- `onDragEnd`: move the item into the new list and record the id fo the item that has moved
-- When rendering the reordered list pass down a prop which will tell the newly moved item to obtain focus
+- `onDragEnd`: move the item into the new list and record the id of the item that has moved
+- When rendering the reordered list, pass down a prop which will tell the newly moved item to obtain focus
 - In the `componentDidMount` lifecycle call back check if the item needs to gain focus based on its props (such as an `autoFocus` prop)
 - If focus is required - call `.focus` on the node. You can obtain the node by using `ReactDOM.findDOMNode` or monkey patching the `provided.innerRef` callback.
 
@@ -442,7 +449,7 @@ When an item is moved from one list to a different list it looses browser focus 
 
 **`onDragStart` and `onDragEnd` pairing**
 
-We try very hard to ensure that each `onDragStart` event is paired with a single `onDragEnd` event. However, there maybe a rouge situation where this is not the case. If that occurs - it is a bug. Currently there is no mechanism to tell the library to cancel a current drag externally.
+We try very hard to ensure that each `onDragStart` event is paired with a single `onDragEnd` event. However, there maybe a rogue situation where this is not the case. If that occurs - it is a bug. Currently there is no mechanism to tell the library to cancel a current drag externally.
 
 **Dynamic hooks**
 
@@ -488,7 +495,7 @@ The `React` children of a `Droppable` must be a function that returns a `ReactEl
 
 The function is provided with two arguments:
 
-**1. provided: (DroppableProvided)**
+#### 1. provided: (DroppableProvided)**
 
 ```js
 type DroppableProvided = {|
@@ -499,7 +506,7 @@ type DroppableProvided = {|
 
 - `provided.innerRef`: In order for the droppable to function correctly, **you must** bind the `provided.innerRef` to the highest possible DOM node in the `ReactElement`. We do this in order to avoid needing to use `ReactDOM` to look up your DOM node.
 
-- `provided.placeholder`: This is used to create space in the `Droppable` as needed during a drag. This space is needed when a user is dragging over a list that is not the home list. Please be sure to put the placeholder inside of the component that you have provided the ref for. We need to increase the side of the `Droppable` itself. This is different from `Draggable` where the `placeholder` needs to be a *silbing* to the draggable node.
+- `provided.placeholder`: This is used to create space in the `Droppable` as needed during a drag. This space is needed when a user is dragging over a list that is not the home list. Please be sure to put the placeholder inside of the component for which you have provided the ref. We need to increase the side of the `Droppable` itself. This is different from `Draggable` where the `placeholder` needs to be a *sibling* to the draggable node.
 
 ```js
 <Droppable droppableId="droppable-1">
@@ -513,7 +520,7 @@ type DroppableProvided = {|
 </Droppable>;
 ```
 
-**2. snapshot: (DroppableStateSnapshot)**
+#### 2. snapshot: (DroppableStateSnapshot)**
 
 ```js
 type DroppableStateSnapshot = {|
@@ -540,9 +547,7 @@ The `children` function is also provided with a small amount of state relating t
 
 ### Conditionally dropping
 
-> Keep in mind that this is not supported at this time. In this current initial version we only support reordering within a single list.
-
-- `Droppable`s can only be dropped on by `Draggable`s who share the same `type`. This is a simple way of allowing conditional dropping. If you do not provide a `type` for the `Droppable` then it will only accept `Draggable`s which also have the default type. `Draggable`s and `Droppable`s both will have their `types` set to `'DEFAULT'` when none is provided. There is currently no way to set multiple `types`, or a `type` wildcard that will accept `Draggable`s of multiple any types. This could be added if there is a valid use case.
+- `Droppable`s can only be dropped on by `Draggable`s who share the same `type`. This is a simple way of allowing conditional dropping. If you do not provide a `type` for the `Droppable`, then it will only accept `Draggable`s which also have the default type. `Draggable`s and `Droppable`s both will have their `types` set to `'DEFAULT'` when none is provided. There is currently no way to set multiple `types`, or a `type` wildcard that will accept `Draggable`s of multiple any types. This could be added if there is a valid use case.
 - Using the `isDropDisabled` prop you can conditionally allow dropping. This allows you to do arbitrarily complex conditional transitions. This will only be considered if the `type` of the `Droppable` matches the `type` of the currently dragging `Draggable`.
 - You can disable dropping on a `Droppable` altogether by always setting `isDropDisabled` to false. You can do this to create a list that is never able to be dropped on, but contains `Draggable`s.
 - Technically you do not need to use `type` and do all of your conditional drop logic with the `isDropDisabled` function. The `type` parameter is a convenient shortcut for a common use case.
@@ -594,7 +599,7 @@ import { Draggable } from 'react-beautiful-dnd';
 ### Props
 
 - `draggableId`: A *required* `DraggableId(string)` that uniquely identifies the `Draggable` for the application. Please do not change this prop - especially during a drag.
-- `type`: An *optional* type (`TypeId(string)`) of the `Draggable`. This is used to control what `Droppable`s the `Draggable` is permitted to drop on. `Draggable`s can only drop on `Droppable`s that share the same `type`. If no `type` is provided, it will be set to `'DEFAULT'`. Currently the `type` of a `Draggable` **must be** the same as its container `Droppable`. This restriction might be loosened in the future if there is a valid use case.
+- `type`: An *optional* type (`TypeId(string)`) of the `Draggable`. This is used to control what `Droppable`s the `Draggable` is permitted to drop on. `Draggable`s can only drop on `Droppable`s that share the same `type`. If no `type` is provided, then it will be set to `'DEFAULT'`. Currently the `type` of a `Draggable` **must be** the same as its container `Droppable`. This restriction might be loosened in the future if there is a valid use case.
 - `isDragDisabled`: An *optional* flag to control whether or not the `Draggable` is permitted to drag. You can use this to implement your own conditional drag logic. It will default to `false`.
 
 ### Children function
@@ -620,7 +625,7 @@ The `React` children of a `Draggable` must be a function that returns a `ReactEl
 
 The function is provided with two arguments:
 
-**1. provided: (DraggableProvided)**
+#### 1. provided: (DraggableProvided)**
 
 ```js
 type DraggableProvided = {|
@@ -651,7 +656,7 @@ innerRef: (HTMLElement) => void
 
 **Ownership**
 
-It is a contract of this library that it owns the positioning logic of the dragging element. This includes properties such as `top`, `right`, `bottom`, `left` and `transform`. The library may change how it positions things and what properties it uses without performing a major version bump. It is also recommended that you do not apply your own `transition` property to the dragging element.
+It is a contract of this library that it owns the positioning logic of the dragging element. This includes properties such as `top`, `right`, `bottom`, `left` and `transform`. The library may change how it positions things and which properties it uses without performing a major version bump. It is also recommended that you do not apply your own `transition` property to the dragging element.
 
 **Warning: `position: fixed`**
 
@@ -733,7 +738,7 @@ type NotDraggingStyle = {|
 </Draggable>;
 ```
 
-- `provided.dragHandleProps (?DragHandleProps)` every `Draggable` has a *drag handle*. This is what is used to drag the whole `Draggable`. Often this will be the same node as the `Draggable`, but sometimes it can be a child of the `Draggable`. `DragHandleProps` need to be applied to the node that you want to be the drag handle. This is a number of props that need to be applied to the `Draggable` node. The simpliest approach is to spread the props onto the draggable node (`{...provided.dragHandleProps}`). However, you are also welcome to [monkey patch](https://davidwalsh.name/monkey-patching) these props if you also need to respond to them. DragHandleProps will be `null` when `isDragDisabled` is set to `true`.
+- `provided.dragHandleProps (?DragHandleProps)` every `Draggable` has a *drag handle*. This is what is used to drag the whole `Draggable`. Often this will be the same node as the `Draggable`, but sometimes it can be a child of the `Draggable`. `DragHandleProps` need to be applied to the node that you want to be the drag handle. This is a number of props that need to be applied to the `Draggable` node. The simplest approach is to spread the props onto the draggable node (`{...provided.dragHandleProps}`). However, you are also welcome to [monkey patch](https://davidwalsh.name/monkey-patching) these props if you also need to respond to them. DragHandleProps will be `null` when `isDragDisabled` is set to `true`.
 
 **Type information**
 
@@ -827,7 +832,7 @@ const myOnClick = event => console.log('clicked on', event.target);
 </Draggable>;
 ```
 
-**2. snapshot: (DraggableStateSnapshot)**
+#### 2. snapshot: (DraggableStateSnapshot)**
 
 ```js
 type DraggableStateSnapshot = {|
@@ -859,6 +864,78 @@ The `children` function is also provided with a small amount of state relating t
     );
   }}
 </Draggable>;
+```
+
+### Interactive child elements within a `Draggable`
+
+It is possible for your `Draggable` to be an interactive element such as a `<button>` or an `<a>`. However, there may be a situation where you want your `Draggable` element be the parent of an interactive element such as a `<button>` or an `<input>`. By default the child interactive element **will not be interactive**. Interacting with these nested interactive elements will be used as part of the calculation to start a drag. This is because we call `event.preventDefault()` on the `mousedown` event for the `Draggable`. Calling `preventDefault` will prevent the nested interactive element from performing its standard actions and interactions. What you will need to do is *opt out* of our standard calling of `event.preventDefault()`. By doing this the nested interactive element will not be able to be used to start a drag - but will allow the user to interact with it directly. Keep in mind - that by doing this the user will not be able to drag the `Draggable` by dragging on the interactive child element - which is probably what you want anyway. There are a few ways you can get around the standard `preventDefault` behaviour. Here are some suggestions:
+
+**1. Call `event.stopPropagation()` on the interactive element `mousedown`**
+*This is the simpler solution*
+
+On the child element, call `event.stopPropagation()` for the `onMouseDown` function. This will stop the event bubbling up to the `Draggable` and having `event.preventDefault()` called on it. The `Draggable` will not be aware that a `mousedown` has even occurred.
+
+```js
+<input
+  // stop event from bubbling up to Draggable where it will be prevented
+  onMouseDown={e => e.stopPropagation()}
+/>
+```
+
+**2. Patch the `onMouseDown` event in `provided`**
+*This is the more complex solution*
+
+If you cannot use the first solution, then you can consider patching the `provided` > `onMouseDown` function. The main idea of this approach is to add additional behaviour to the existing `onMouseDown` function - only calling it when it should be called.
+
+```js
+class DraggableWithSelect extends Component {
+
+  renderSelect = (provided) => {
+    // Patched onMouseDown handler
+    const onMouseDown = (event) => {
+      // If mouse down is on a select, then do not
+      // let react-beautiful-dnd do anything with it
+      if(event.target.nodeName === 'SELECT') {
+        return;
+      }
+      provided.dragHandleProps.onMouseDown(event);
+    }
+
+    // patching drag handle props
+    const patched = {
+      ...provided.dragHandleProps,
+      onMouseDown,
+    }
+
+    return (
+      <div>
+        <div
+          ref={provided.innerRef}
+          style={getItemStyle(
+            provided.draggableStyle,
+            snapshot.isDragging
+          )}
+          {...patched}
+        >
+          <select>
+            <option>One</option>
+            <option>Two</option>
+            <option>Three</option>
+          </select>
+        </div>
+        {provided.placeholder}
+      </div>
+    );
+  }
+
+  render() {
+    return (
+      <Draggable draggableId="draggable-1">
+        {this.renderSelect}
+      </Draggable>
+    );
+  }
+}
 ```
 
 ## Flow usage
@@ -949,6 +1026,10 @@ The types are exported as part of the module so using them is as simple as:
 import type { DroppableProvided } from 'react-beautiful-dnd';
 ```
 
+### Sample application
+
+We have created a [sample application](https://github.com/alexreardon/react-beautiful-dnd-flow-example) which exercises the flowtypes. It is a super simple `React` project based on [`react-create-app`](https://github.com/facebookincubator/create-react-app). You can use this as a reference to see how to set things up correctly.
+
 ### Flow version
 
 `react-beautiful-dnd` currently uses flow `0.52` which is not the [latest version](https://github.com/facebook/flow/releases). However, we are not able to upgrade until [eslint-plugin-react](https://github.com/yannickcr/eslint-plugin-react) [supports it](https://github.com/yannickcr/eslint-plugin-react/issues/1376) - [more details](https://github.com/atlassian/react-beautiful-dnd/issues/37)
@@ -1008,4 +1089,4 @@ Alex Reardon - [@alexandereardon](https://twitter.com/alexandereardon) - areardo
 
 ## Other maintainers
 
-Jared Crowe - jcrowe@atlassian.com
+Jared Crowe - [@jaredjcrowe](https://twitter.com/jaredjcrowe) - jcrowe@atlassian.com

@@ -38,7 +38,7 @@ export default ({
   home,
   draggables,
   droppables,
-  }: Args): ?Result => {
+}: Args): ?Result => {
   const draggable: DraggableDimension = draggables[draggableId];
   const source: DroppableDimension = droppables[droppableId];
 

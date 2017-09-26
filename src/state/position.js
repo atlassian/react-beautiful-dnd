@@ -1,5 +1,5 @@
 // @flow
-import type { Position } from '../types';
+import type { Position, Spacing } from '../types';
 
 export const add = (point1: Position, point2: Position): Position => ({
   x: point1.x + point2.x,
@@ -51,3 +51,10 @@ export const distance = (point1: Position, point2: Position): number =>
 // When given a list of points, it finds the smallest distance to any point
 export const closest = (target: Position, points: Position[]): number =>
   Math.min(...points.map((point: Position) => distance(target, point)));
+
+export const offsetSpacing = (spacing: Spacing, position: Position): Spacing => ({
+  top: spacing.top + position.y,
+  right: spacing.right + position.x,
+  bottom: spacing.bottom + position.y,
+  left: spacing.left + position.x,
+});

@@ -610,14 +610,14 @@ describe('Draggable - connected', () => {
           const expected: MapProps = {
             isDragging: false,
             isDropAnimating: false,
-          // can lift while the other item is dropping
+            // can lift while the other item is dropping
             canLift: true,
-          // has not moved so still at the origin
+            // has not moved so still at the origin
             offset: origin,
             dimension: null,
             direction: null,
-          // is the same as the default props except for
-          // animation being permitted
+            // is the same as the default props except for
+            // animation being permitted
             canAnimate: true,
           };
 
@@ -645,7 +645,7 @@ describe('Draggable - connected', () => {
               isDropAnimating: false,
               canLift: false,
               canAnimate: true,
-            // at the origin by default
+              // at the origin by default
               offset: origin,
               dimension: null,
               direction: null,
@@ -668,7 +668,7 @@ describe('Draggable - connected', () => {
               dimension: null,
             });
 
-          // checking value
+            // checking value
             expect(duringDrag).toEqual(duringDragMapProps);
             expect(duringDrop).toEqual(expected);
           });
@@ -697,15 +697,15 @@ describe('Draggable - connected', () => {
             const expected: MapProps = {
               isDropAnimating: false,
               isDragging: false,
-            // can lift while other item is dropping
+              // can lift while other item is dropping
               canLift: true,
-            // Because the item is moving forward, this will
-            // be moving backwards to get out of the way.
+              // Because the item is moving forward, this will
+              // be moving backwards to get out of the way.
               offset: {
                 x: 0,
                 y: -dragging.dimension.page.withMargin.height,
               },
-            // allowing item to move out of the way
+              // allowing item to move out of the way
               canAnimate: true,
               dimension: null,
               direction: null,
