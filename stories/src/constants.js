@@ -10,6 +10,7 @@ export const colors = {
   grey: '#E2E4E6',
   green: 'rgb(185, 244, 188)',
   white: 'white',
+  purple: 'rebeccapurple',
 };
 
 export const grid = 8;
