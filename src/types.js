@@ -106,6 +106,7 @@ export type DroppableDimension = {|
     |},
     page: {|
       withoutMargin: DimensionFragment,
+      withMargin: DimensionFragment,
     |},
   |},
 |}

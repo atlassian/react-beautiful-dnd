@@ -161,6 +161,7 @@ export const getDroppableDimension = ({
       },
       page: {
         withoutMargin: getFragment(containerRectWithWindowScroll),
+        withMargin: getFragment(getWithSpacing(containerRectWithWindowScroll, margin)),
       },
     },
   };

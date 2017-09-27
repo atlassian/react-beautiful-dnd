@@ -6,18 +6,25 @@ import getClientRect from '../../../src/state/get-client-rect';
 import getDroppableWithDraggables from '../../utils/get-droppable-with-draggables';
 import type { Result } from '../../utils/get-droppable-with-draggables';
 import type {
+  Spacing,
   Position,
   DraggableDimension,
 } from '../../../src/types';
 
+const margin: Spacing = {
+  top: 10, left: 10, right: 10, bottom: 10,
+};
+
 describe('is within visible bounds of a droppable', () => {
   const getDroppableDimensionArgs = {
     id: 'droppable',
+    margin,
+    // 100 x 100 box with margin's
     clientRect: getClientRect({
-      top: 0,
-      left: 0,
-      right: 100,
-      bottom: 100,
+      top: 10,
+      left: 10,
+      right: 90,
+      bottom: 90,
     }),
   };
   const droppable = getDroppableDimension(getDroppableDimensionArgs);
@@ -99,10 +106,10 @@ describe('is within visible bounds of a droppable', () => {
         const fullyContainedDroppable = getDroppableDimension({
           ...getDroppableDimensionArgs,
           containerRect: getClientRect({
-            top: -10,
-            right: 110,
-            bottom: 110,
-            left: -10,
+            top: 0,
+            right: 100,
+            bottom: 100,
+            left: 0,
           }),
         });
         const isPointWithinDroppable = isPointWithin(fullyContainedDroppable);
