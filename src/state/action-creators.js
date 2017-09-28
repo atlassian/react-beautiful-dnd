@@ -158,13 +158,13 @@ export type MoveAction = {|
 export const move = (id: DraggableId,
   client: Position,
   windowScroll: Position): MoveAction => ({
-    type: 'MOVE',
-    payload: {
-      id,
-      client,
-      windowScroll,
-    },
-  });
+  type: 'MOVE',
+  payload: {
+    id,
+    client,
+    windowScroll,
+  },
+});
 
 export type MoveByWindowScrollAction = {|
   type: 'MOVE_BY_WINDOW_SCROLL',
