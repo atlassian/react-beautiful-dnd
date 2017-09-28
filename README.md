@@ -1026,6 +1026,10 @@ The types are exported as part of the module so using them is as simple as:
 import type { DroppableProvided } from 'react-beautiful-dnd';
 ```
 
+## Typescript
+
+If you are using [TypeScript](https://www.typescriptlang.org/) you can use the community maintained [DefinitelyTyped type definitions](https://www.npmjs.com/package/@types/react-beautiful-dnd). [Installation instructions](http://definitelytyped.org/).
+
 ### Sample application
 
 We have created a [sample application](https://github.com/alexreardon/react-beautiful-dnd-flow-example) which exercises the flowtypes. It is a super simple `React` project based on [`react-create-app`](https://github.com/facebookincubator/create-react-app). You can use this as a reference to see how to set things up correctly.
