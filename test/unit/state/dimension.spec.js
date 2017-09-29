@@ -38,7 +38,7 @@ const windowScroll: Position = {
   y: 80,
 };
 
-const getCenter = (rect: ClientRect): Position => ({
+const getCenter = (rect: ClientRect | Spacing): Position => ({
   x: (rect.left + rect.right) / 2,
   y: (rect.top + rect.bottom) / 2,
 });
