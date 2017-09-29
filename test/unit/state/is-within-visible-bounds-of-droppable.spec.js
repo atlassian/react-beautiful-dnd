@@ -15,80 +15,92 @@ const margin: Spacing = {
   top: 10, left: 10, right: 10, bottom: 10,
 };
 
+const noSpacing: Spacing = {
+  top: 0, left: 0, right: 0, bottom: 0,
+};
+
 describe('is within visible bounds of a droppable', () => {
+  const clientSpacing = {
+    top: 10,
+    left: 10,
+    right: 90,
+    bottom: 90,
+  };
   const getDroppableDimensionArgs = {
     id: 'droppable',
     margin,
     // 100 x 100 box with margin's
-    clientRect: getClientRect({
-      top: 10,
-      left: 10,
-      right: 90,
-      bottom: 90,
-    }),
+    clientRect: getClientRect(clientSpacing),
   };
   const droppable = getDroppableDimension(getDroppableDimensionArgs);
 
   describe('is point within', () => {
-    const isWithinDroppable = isPointWithin(droppable);
-    const { top, left, right, bottom } = droppable.page.withMargin;
+    describe('basic behaviour', () => {
+      const isWithinDroppable = isPointWithin(droppable);
+      const { top, left, right, bottom } = droppable.page.withMargin;
 
-    it('should return true if a point is within a droppable', () => {
-      expect(isWithinDroppable(droppable.page.withMargin.center)).toBe(true);
-    });
-
-    it('should return true if a point is on any of the droppable boundaries', () => {
-      const corners = [
-        { x: left, y: top },
-        { x: left, y: bottom },
-        { x: right, y: top },
-        { x: right, y: bottom },
-      ];
-
-      corners.forEach((corner: Position) => {
-        expect(isWithinDroppable(corner)).toBe(true);
+      it('should return true if a point is within a droppable', () => {
+        expect(isWithinDroppable(droppable.page.withMargin.center)).toBe(true);
       });
-    });
 
-    it('should return false if the point is not within the droppable on any side', () => {
-      const outside = [
-        subtract({ x: left, y: top }, { x: 0, y: 10 }), // too far top
-        subtract({ x: left, y: bottom }, { x: 10, y: 0 }), // too far left
-        add({ x: right, y: top }, { x: 10, y: 0 }), // too far right
-        add({ x: right, y: bottom }, { x: 0, y: 10 }), // too far bottom
-      ];
+      it('should return true if a point is on any of the droppable boundaries', () => {
+        const corners = [
+          { x: left, y: top },
+          { x: left, y: bottom },
+          { x: right, y: top },
+          { x: right, y: bottom },
+        ];
 
-      outside.forEach((point: Position) => {
-        expect(isWithinDroppable(point)).toBe(false);
+        corners.forEach((corner: Position) => {
+          expect(isWithinDroppable(corner)).toBe(true);
+        });
       });
-    });
 
-    it('should be based on the page coordinates of the droppable', () => {
-      const windowScroll: Position = {
-        x: 200, y: 200,
-      };
-      const custom = getDroppableDimension({
-        id: 'with-scroll',
-        windowScroll,
-        clientRect: getClientRect({
-          top: 0,
-          left: 0,
-          right: 100,
-          bottom: 100,
-        }),
+      it('should return false if the point is not within the droppable on any side', () => {
+        const outside = [
+          subtract({ x: left, y: top }, { x: 0, y: 10 }), // too far top
+          subtract({ x: left, y: bottom }, { x: 10, y: 0 }), // too far left
+          add({ x: right, y: top }, { x: 10, y: 0 }), // too far right
+          add({ x: right, y: bottom }, { x: 0, y: 10 }), // too far bottom
+        ];
+
+        outside.forEach((point: Position) => {
+          expect(isWithinDroppable(point)).toBe(false);
+        });
       });
-      const isWithinCustom = isPointWithin(custom);
 
-      // custom points
-      expect(isWithinCustom({ x: 10, y: 10 })).toBe(false);
-      expect(isWithinCustom({ x: 210, y: 210 })).toBe(true);
+      it('should be based on the page coordinates of the droppable', () => {
+        const windowScroll: Position = {
+          x: 200, y: 200,
+        };
+        const custom = getDroppableDimension({
+          id: 'with-scroll',
+          windowScroll,
+          clientRect: getClientRect({
+            top: 0,
+            left: 0,
+            right: 100,
+            bottom: 100,
+          }),
+        });
+        const isWithinCustom = isPointWithin(custom);
 
-      // checking with the center position of the dimension itself
-      expect(isWithinCustom(custom.client.withMargin.center)).toBe(false);
-      expect(isWithinCustom(custom.page.withMargin.center)).toBe(true);
+        // custom points
+        expect(isWithinCustom({ x: 10, y: 10 })).toBe(false);
+        expect(isWithinCustom({ x: 210, y: 210 })).toBe(true);
+
+        // checking with the center position of the dimension itself
+        expect(isWithinCustom(custom.client.withMargin.center)).toBe(false);
+        expect(isWithinCustom(custom.page.withMargin.center)).toBe(true);
+      });
     });
 
     describe('dimension clipping', () => {
+      const clientSpacingNoMargin = {
+        top: 0, right: 100, bottom: 100, left: 0,
+      };
+      const clientRect = getClientRect(clientSpacingNoMargin);
+      const { top, right, bottom, left } = clientSpacingNoMargin;
       const points = {
         'top-left': { x: left, y: top },
         'top-right': { x: right, y: top },
@@ -104,7 +116,9 @@ describe('is within visible bounds of a droppable', () => {
 
       it('should not be clipped if the droppable is fully contained by its scroll container', () => {
         const fullyContainedDroppable = getDroppableDimension({
-          ...getDroppableDimensionArgs,
+          id: 'droppable',
+          margin: noSpacing,
+          clientRect,
           containerRect: getClientRect({
             top: 0,
             right: 100,
@@ -123,7 +137,9 @@ describe('is within visible bounds of a droppable', () => {
 
       it('should be completely clipped if the droppable is outside the scroll container\'s bounds', () => {
         const fullyClippedDroppable = getDroppableDimension({
-          ...getDroppableDimensionArgs,
+          id: 'droppable',
+          margin: noSpacing,
+          clientRect,
           containerRect: getClientRect({
             top,
             right: 210,
@@ -139,7 +155,9 @@ describe('is within visible bounds of a droppable', () => {
 
       it('should be clipped on the top edge', () => {
         const partiallyClippedDroppable = getDroppableDimension({
-          ...getDroppableDimensionArgs,
+          id: 'droppable',
+          margin: noSpacing,
+          clientRect,
           containerRect: getClientRect({
             top: 10,
             right,
@@ -158,7 +176,9 @@ describe('is within visible bounds of a droppable', () => {
 
       it('should be clipped on the right edge', () => {
         const partiallyClippedDroppable = getDroppableDimension({
-          ...getDroppableDimensionArgs,
+          id: 'droppable',
+          margin: noSpacing,
+          clientRect,
           containerRect: getClientRect({
             top,
             right: right - 10,
@@ -177,7 +197,9 @@ describe('is within visible bounds of a droppable', () => {
 
       it('should be clipped on the bottom edge', () => {
         const partiallyClippedDroppable = getDroppableDimension({
-          ...getDroppableDimensionArgs,
+          id: 'droppable',
+          margin: noSpacing,
+          clientRect,
           containerRect: getClientRect({
             top,
             right,
@@ -196,7 +218,9 @@ describe('is within visible bounds of a droppable', () => {
 
       it('should be clipped on the left edge', () => {
         const partiallyClippedDroppable = getDroppableDimension({
-          ...getDroppableDimensionArgs,
+          id: 'droppable',
+          margin: noSpacing,
+          clientRect,
           containerRect: getClientRect({
             top,
             right,
@@ -215,7 +239,8 @@ describe('is within visible bounds of a droppable', () => {
 
       it('should account for container scroll', () => {
         const partiallyClippedDroppable = getDroppableDimension({
-          ...getDroppableDimensionArgs,
+          id: 'droppable',
+          margin: noSpacing,
           clientRect: getClientRect({
             top: top + 200,
             right,

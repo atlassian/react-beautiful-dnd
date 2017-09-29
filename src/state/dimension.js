@@ -123,6 +123,13 @@ const add = (spacing1: Spacing, spacing2: Spacing): Spacing => ({
   bottom: spacing1.bottom + spacing2.bottom,
 });
 
+const equal = (spacing1: Spacing, spacing2: Spacing): boolean => (
+  spacing1.top === spacing2.top &&
+  spacing1.right === spacing2.right &&
+  spacing1.bottom === spacing2.bottom &&
+  spacing1.left === spacing2.left
+);
+
 export const getDroppableDimension = ({
   id,
   clientRect,
@@ -136,8 +143,12 @@ export const getDroppableDimension = ({
 }: GetDroppableArgs): DroppableDimension => {
   const withMargin = getWithSpacing(clientRect, margin);
   const withWindowScroll = getWithPosition(clientRect, windowScroll);
-  // If no containerRect is provided, the clientRect is the container
-  const containerRectWithWindowScroll = getWithPosition(containerRect || clientRect, windowScroll);
+  // If no containerRect is provided, or if the clientRect matches the containerRect, this
+  // droppable is its own container. In that case we include margin in the container dimension.
+  const droppableIsContainer = !containerRect || equal(containerRect, clientRect);
+  const containerRectWithWindowScroll = droppableIsContainer
+    ? getWithPosition(withMargin, windowScroll)
+    : getWithPosition(containerRect || withMargin, windowScroll);
 
   const dimension: DroppableDimension = {
     id,
@@ -161,7 +172,6 @@ export const getDroppableDimension = ({
       },
       page: {
         withoutMargin: getFragment(containerRectWithWindowScroll),
-        withMargin: getFragment(getWithSpacing(containerRectWithWindowScroll, margin)),
       },
     },
   };

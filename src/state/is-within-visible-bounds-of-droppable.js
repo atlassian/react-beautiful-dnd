@@ -20,7 +20,7 @@ export const isPointWithin = (droppable: DroppableDimension) => {
   // Clip the droppable's bounds by the scroll container's bounds
   // This gives us the droppable's true visible area
   // Note: if the droppable doesn't have a scroll parent droppableBounds === container.page
-  const containerBounds = droppable.container.page.withMargin;
+  const containerBounds = droppable.container.page.withoutMargin;
   const clippedBounds: Spacing = {
     top: Math.max(droppableBounds.top, containerBounds.top),
     right: Math.min(droppableBounds.right, containerBounds.right),

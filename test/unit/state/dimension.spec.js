@@ -313,5 +313,82 @@ describe('dimension', () => {
         expect(dimension.page.withMarginAndPadding).toEqual(fragment);
       });
     });
+
+    describe('calculating container dimension', () => {
+      const id = 'droppable';
+      const droppableRect = getClientRect({
+        top: 0,
+        right: 90,
+        bottom: 90,
+        left: 10,
+      });
+      const droppableMargin = { top: 10, right: 10, bottom: 10, left: 10 };
+      const noMargin = { top: 0, right: 0, bottom: 0, left: 0 };
+
+      it('should default to the droppable\'s dimension if none is provided', () => {
+        const droppableDimension = getDroppableDimension({
+          id,
+          clientRect: droppableRect,
+          margin: noMargin,
+        });
+
+        expect(droppableDimension.container.page.withoutMargin)
+          .toEqual(droppableDimension.page.withoutMargin);
+      });
+
+      it('should not include margins if the container is different from the droppable\'s spacing', () => {
+        const container = getClientRect({
+          top: 0,
+          right: 10,
+          bottom: 10,
+          left: 0,
+        });
+        const droppableDimension = getDroppableDimension({
+          id,
+          clientRect: droppableRect,
+          containerRect: container,
+          margin: noMargin,
+        });
+        const expected = {
+          ...container,
+          center: getCenter(container),
+        };
+
+        expect(droppableDimension.container.page.withoutMargin)
+          .toEqual(expected);
+      });
+
+      it('should include margins if the container is the same as the droppable\'s spacing', () => {
+        const container = droppableRect;
+        const droppableDimension = getDroppableDimension({
+          id,
+          clientRect: droppableRect,
+          containerRect: container,
+          margin: droppableMargin,
+        });
+        const droppableDimensionNoContainerProvided = getDroppableDimension({
+          id,
+          clientRect: droppableRect,
+          margin: droppableMargin,
+        });
+        const expectedSpacing = {
+          top: container.top - droppableMargin.top,
+          right: container.right + droppableMargin.right,
+          bottom: container.bottom + droppableMargin.bottom,
+          left: container.left - droppableMargin.left,
+        };
+        const expected = {
+          ...expectedSpacing,
+          center: getCenter(expectedSpacing),
+          height: expectedSpacing.bottom - expectedSpacing.top,
+          width: expectedSpacing.right - expectedSpacing.left,
+        };
+
+        expect(droppableDimension.container.page.withoutMargin)
+          .toEqual(expected);
+        expect(droppableDimensionNoContainerProvided.container.page.withoutMargin)
+          .toEqual(expected);
+      });
+    });
   });
 });
