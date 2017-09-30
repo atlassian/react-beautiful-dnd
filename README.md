@@ -451,10 +451,6 @@ When an item is moved from one list to a different list, it loses browser focus 
 
 We try very hard to ensure that each `onDragStart` event is paired with a single `onDragEnd` event. However, there maybe a rogue situation where this is not the case. If that occurs - it is a bug. Currently there is no mechanism to tell the library to cancel a current drag externally.
 
-**Dynamic hooks**
-
-Your *hook* functions will only be captured *once at start up*. Please do not change the function after that. This behaviour will be changed soon to allow dynamic hooks.
-
 ## `Droppable`
 
 `Droppable` components can be **dropped on by a `Draggable`**. They also **contain** `Draggable`s. A `Draggable` must be contained within a `Droppable`.
