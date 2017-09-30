@@ -171,7 +171,7 @@ const state = (() => {
   return { idle, collecting, dragging, dropAnimating, cancelAnimating, complete };
 })();
 
-describe('Hook middleware', () => {
+describe('fire hooks', () => {
   let hooks: Hooks;
 
   beforeEach(() => {
@@ -383,22 +383,9 @@ describe('Hook middleware', () => {
     });
   });
 
-  describe('dynamic hooks', () => {
-    it('should allow you to change hook functions before a drag starts', () => {
-
+  describe('memoization', () => {
+    it('should not do anything if the previous and next state are the same', () => {
+      expect(fireHooks(hooks, state.dragging, state.dragging)).toBe(undefined);
     });
-
-    // Changing onDragEnd after onDragStart has already happened
-    it('should allow you to change hook functions within a drag', () => {
-
-    });
-
-    it('should allow you to change hook functions after a completed drag', () => {
-
-    });
-  });
-
-  describe('subsequent drags', () => {
-
   });
 });
