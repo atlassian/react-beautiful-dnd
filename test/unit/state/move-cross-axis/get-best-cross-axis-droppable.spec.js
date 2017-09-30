@@ -302,7 +302,7 @@ describe('get best cross axis droppable', () => {
 
           expect(result).toBe(sibling1);
 
-        // checking that center position was selected correctly
+          // checking that center position was selected correctly
           const center2: Position = add(center, { x: 0, y: 1 });
           const result2: ?DroppableDimension = getBestCrossAxisDroppable({
             isMovingForward: true,

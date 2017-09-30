@@ -87,6 +87,7 @@ export default class QuoteApp extends Component {
         <Root>
           {Object.keys(quoteMap).map((key: string) => (
             <AuthorList
+              internalScroll
               key={key}
               listId={key}
               listType="CARD"

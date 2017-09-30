@@ -158,13 +158,13 @@ export type MoveAction = {|
 export const move = (id: DraggableId,
   client: Position,
   windowScroll: Position): MoveAction => ({
-    type: 'MOVE',
-    payload: {
-      id,
-      client,
-      windowScroll,
-    },
-  });
+  type: 'MOVE',
+  payload: {
+    id,
+    client,
+    windowScroll,
+  },
+});
 
 export type MoveByWindowScrollAction = {|
   type: 'MOVE_BY_WINDOW_SCROLL',
@@ -291,7 +291,9 @@ export const drop = () =>
 
     if (state.phase !== 'DRAGGING') {
       console.error('cannot drop if not dragging', state);
-      dispatch(clean());
+      // We need to wrap this in a setTimeout to avoid a race
+      // condition with `lift`, which includes timeouts
+      setTimeout(() => dispatch(clean()));
       return;
     }
 
@@ -450,7 +452,7 @@ export const lift = (id: DraggableId,
   setTimeout(() => {
     const state: State = getState();
 
-    if (state.phase !== 'IDLE' || state.phase !== 'DRAG_COMPLETE') {
+    if (state.phase !== 'IDLE' && state.phase !== 'DRAG_COMPLETE') {
       dispatch(clean());
     }
 

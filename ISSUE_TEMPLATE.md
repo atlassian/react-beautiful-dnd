@@ -21,10 +21,17 @@ If you raise a bug that is not in a supported version we will not be fixing it
 
 ### Demo
 <!--
-Please either provide a code example or a video / gif of the issue
+Please provide a webpack bin to show the issue. Here is a boilerplate to help you get started:
+https://www.webpackbin.com/bins/-Kr9aE9jnUeWlphY8wsw
 
-Here is a boilerplate to help you get started:
-https://www.webpackbin.com/bins/-KrEPVjWSAWwHhI-dGUe
+If you paste a big block of code it can be difficult to debug it.
+
+If it is a visual bug, a video or a gif would be helpful also.
 
 Issues without demo's may not be investigated
 -->
+
+<!-- 
+Note: stale issues will be removed
+When a maintainer asks a question about an issue and it is not responded to within a reasonable timeframe then the issue will be closed. We don't want this to happen - but we also do not want to accumulate stale issues
+--->

@@ -1,7 +1,5 @@
 // @flow
-/* eslint-disable import/no-extraneous-dependencies */
 import type { HasDefaultProp } from 'babel-plugin-react-flow-props-to-prop-types';
-/* eslint-enable */
 import type {
   DroppableId,
   TypeId,

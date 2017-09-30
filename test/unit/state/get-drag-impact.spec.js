@@ -280,14 +280,14 @@ describe('get drag impact', () => {
               const expected: DragImpact = {
                 movement: {
                   amount: patch(axis.line, inHome4.page.withMargin[axis.size]),
-                // ordered by closest to current location
+                  // ordered by closest to current location
                   draggables: [inHome2.id, inHome3.id],
                   isBeyondStartPosition: false,
                 },
                 direction: axis.direction,
                 destination: {
                   droppableId: home.id,
-                // is now before inHome2
+                  // is now before inHome2
                   index: 1,
                 },
               };

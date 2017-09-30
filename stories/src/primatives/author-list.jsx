@@ -20,8 +20,6 @@ const Wrapper = styled.div`
   user-select: none;
   transition: background-color 0.1s ease;
   margin: ${grid}px 0;
-
-  overflow: auto;
 `;
 
 const DropZone = styled.div`
@@ -39,7 +37,7 @@ const Container = styled.div`
   flex-grow: 1;
 
   /* flex parent */
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
 `;
 

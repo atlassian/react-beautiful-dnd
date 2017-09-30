@@ -672,7 +672,7 @@ describe('DraggableDimensionPublisher', () => {
       jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noSpacing);
     });
 
-    it('should publish whether the droppable is enabled when requested to publish', () => {
+    describe('disabled dimensions should not publish', () => {
       describe('enabled on mount', () => {
         it('should publish that the dimension is enabled', () => {
           wrapper = mount(
