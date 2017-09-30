@@ -7,14 +7,14 @@ import type {
 } from '../types';
 
 export default (hooks: Hooks, current: State, previous: State): void => {
-  if (current === previous) {
-    return;
-  }
-
   const { onDragStart, onDragEnd } = hooks;
-
   const currentPhase = current.phase;
   const previousPhase = previous.phase;
+
+  // Exit early if phase in unchanged
+  if (currentPhase === previousPhase) {
+    return;
+  }
 
   // Drag start
   if (currentPhase === 'DRAGGING' && previousPhase !== 'DRAGGING') {

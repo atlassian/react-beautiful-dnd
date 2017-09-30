@@ -50,6 +50,7 @@ export default class DragDropContext extends Component {
     this.unsubscribe = this.store.subscribe(() => {
       const current = this.store.getState();
 
+      // Allowing dynamic hooks by re-capturing the hook functions
       const hooks: Hooks = {
         onDragStart: this.props.onDragStart,
         onDragEnd: this.props.onDragEnd,

@@ -383,9 +383,12 @@ describe('fire hooks', () => {
     });
   });
 
-  describe('memoization', () => {
-    it('should not do anything if the previous and next state are the same', () => {
-      expect(fireHooks(hooks, state.dragging, state.dragging)).toBe(undefined);
+  describe('phase unchanged', () => {
+    it('should not do anything if the previous and next phase are the same', () => {
+      Object.keys(state).forEach((key: string) => {
+        const current: State = state[key];
+        expect(fireHooks(hooks, current, current)).toBe(undefined);
+      });
     });
   });
 });
