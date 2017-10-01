@@ -387,7 +387,11 @@ describe('fire hooks', () => {
     it('should not do anything if the previous and next phase are the same', () => {
       Object.keys(state).forEach((key: string) => {
         const current: State = state[key];
-        expect(fireHooks(hooks, current, current)).toBe(undefined);
+
+        fireHooks(hooks, current, current);
+
+        expect(hooks.onDragStart).not.toHaveBeenCalled();
+        expect(hooks.onDragEnd).not.toHaveBeenCalled();
       });
     });
   });
