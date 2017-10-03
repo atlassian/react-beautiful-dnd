@@ -332,7 +332,7 @@ describe('dimension', () => {
           margin: noMargin,
         });
 
-        expect(droppableDimension.container.page.withoutMargin)
+        expect(droppableDimension.container.bounds)
           .toEqual(droppableDimension.page.withoutMargin);
       });
 
@@ -354,7 +354,7 @@ describe('dimension', () => {
           center: getCenter(container),
         };
 
-        expect(droppableDimension.container.page.withoutMargin)
+        expect(droppableDimension.container.bounds)
           .toEqual(expected);
       });
 
@@ -384,9 +384,9 @@ describe('dimension', () => {
           width: expectedSpacing.right - expectedSpacing.left,
         };
 
-        expect(droppableDimension.container.page.withoutMargin)
+        expect(droppableDimension.container.bounds)
           .toEqual(expected);
-        expect(droppableDimensionNoContainerProvided.container.page.withoutMargin)
+        expect(droppableDimensionNoContainerProvided.container.bounds)
           .toEqual(expected);
       });
     });

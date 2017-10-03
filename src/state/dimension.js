@@ -1,6 +1,7 @@
 // @flow
 import { vertical, horizontal } from './axis';
 import getClientRect from './get-client-rect';
+import { add, isEqual } from './spacing';
 import type {
   DroppableId,
   DraggableId,
@@ -116,20 +117,6 @@ type GetDroppableArgs = {|
   isEnabled?: boolean,
 |}
 
-const add = (spacing1: Spacing, spacing2: Spacing): Spacing => ({
-  top: spacing1.top + spacing2.top,
-  left: spacing1.left + spacing2.left,
-  right: spacing1.right + spacing2.right,
-  bottom: spacing1.bottom + spacing2.bottom,
-});
-
-const equal = (spacing1: Spacing, spacing2: Spacing): boolean => (
-  spacing1.top === spacing2.top &&
-  spacing1.right === spacing2.right &&
-  spacing1.bottom === spacing2.bottom &&
-  spacing1.left === spacing2.left
-);
-
 export const getDroppableDimension = ({
   id,
   clientRect,
@@ -144,11 +131,12 @@ export const getDroppableDimension = ({
   const withMargin = getWithSpacing(clientRect, margin);
   const withWindowScroll = getWithPosition(clientRect, windowScroll);
   // If no containerRect is provided, or if the clientRect matches the containerRect, this
-  // droppable is its own container. In that case we include margin in the container dimension.
-  const droppableIsContainer = !containerRect || equal(containerRect, clientRect);
-  const containerRectWithWindowScroll = droppableIsContainer
+  // droppable is its own container. In this case we include its margin in the container bounds.
+  // Otherwise, the container is a scrollable parent. In this case we don't care about margins
+  // in the container bounds.
+  const containerRectWithWindowScroll = !containerRect || isEqual(containerRect, clientRect)
     ? getWithPosition(withMargin, windowScroll)
-    : getWithPosition(containerRect || withMargin, windowScroll);
+    : getWithPosition(containerRect, windowScroll);
 
   const dimension: DroppableDimension = {
     id,
@@ -170,9 +158,7 @@ export const getDroppableDimension = ({
         // when we start the current scroll is the initial scroll
         current: scroll,
       },
-      page: {
-        withoutMargin: getFragment(containerRectWithWindowScroll),
-      },
+      bounds: getFragment(containerRectWithWindowScroll),
     },
   };
 

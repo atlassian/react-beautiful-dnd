@@ -104,9 +104,7 @@ export type DroppableDimension = {|
       initial: Position,
       current: Position,
     |},
-    page: {|
-      withoutMargin: DimensionFragment,
-    |},
+    bounds: DimensionFragment,
   |},
 |}
 export type DraggableLocation = {|
