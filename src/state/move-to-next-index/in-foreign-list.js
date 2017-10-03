@@ -1,6 +1,6 @@
 // @flow
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { isPointWithin } from '../is-within-visible-bounds-of-droppable';
+import { isPointWithinDroppable } from '../is-within-visible-bounds-of-droppable';
 import { patch } from '../position';
 import moveToEdge from '../move-to-edge';
 import type { Edge } from '../move-to-edge';
@@ -84,7 +84,7 @@ export default ({
       return true;
     }
 
-    return isPointWithin(droppable)(newCenter);
+    return isPointWithinDroppable(droppable)(newCenter);
   })();
 
   if (!isVisible) {

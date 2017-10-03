@@ -107,17 +107,25 @@ const move = ({
     windowScroll: currentWindowScroll,
   };
 
+  const previousDroppableOver = state.drag && state.drag.impact.destination
+    ? state.drag.impact.destination.droppableId
+    : null;
+
   const newImpact: DragImpact = (impact || getDragImpact({
     pageCenter: page.center,
     draggable: state.dimension.draggable[current.id],
     draggables: state.dimension.draggable,
     droppables: state.dimension.droppable,
+    previousDroppableOver,
   }));
 
   const drag: DragState = {
     initial,
     impact: newImpact,
     current,
+    previous: {
+      droppableOver: previousDroppableOver,
+    },
   };
 
   return {

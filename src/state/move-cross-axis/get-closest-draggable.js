@@ -28,7 +28,7 @@ export default ({
     return null;
   }
 
-  const isWithinDestination = isDraggableWithin(destination);
+  const isWithinDestination = isDraggableWithin(destination.container.bounds);
 
   const result: DraggableDimension[] = insideDestination
     // Remove any options that are hidden by overflow

@@ -1,7 +1,7 @@
 // @flow
 import isWithin from './is-within';
 import { subtract } from './position';
-import { offset } from './spacing';
+import { addPosition, offset } from './spacing';
 import type {
   Position,
   DraggableDimension,
@@ -10,9 +10,13 @@ import type {
   Spacing,
 } from '../types';
 
-export const isPointWithin = (droppable: DroppableDimension) => {
-  const { scroll, bounds: containerBounds } = droppable.container;
+const noPadding: Position = { x: 0, y: 0 };
 
+const getVisibleBounds = (
+  droppable: DroppableDimension,
+  padding: Position = noPadding
+): Spacing => {
+  const { scroll, bounds: containerBounds } = droppable.container;
   // Calculate the mid-drag scroll ∆ of the scroll container
   const containerScrollDiff: Position = subtract(scroll.initial, scroll.current);
 
@@ -29,8 +33,15 @@ export const isPointWithin = (droppable: DroppableDimension) => {
     left: Math.max(droppableBounds.left, containerBounds.left),
   };
 
-  const isWithinHorizontal = isWithin(clippedBounds.left, clippedBounds.right);
-  const isWithinVertical = isWithin(clippedBounds.top, clippedBounds.bottom);
+  const includingPadding = addPosition(clippedBounds, padding);
+
+  return includingPadding;
+};
+
+const isPointWithin = (bounds: Spacing) => {
+  // console.log(bounds);
+  const isWithinHorizontal = isWithin(bounds.left, bounds.right);
+  const isWithinVertical = isWithin(bounds.top, bounds.bottom);
 
   return (point: Position): boolean => (
     isWithinHorizontal(point.x) &&
@@ -38,8 +49,15 @@ export const isPointWithin = (droppable: DroppableDimension) => {
   );
 };
 
-export const isDraggableWithin = (droppable: DroppableDimension) => {
-  const { top, right, bottom, left } = droppable.container.bounds;
+export const isPointWithinDroppable = (
+  droppable: DroppableDimension,
+  padding: Position = noPadding
+) => (
+  isPointWithin(getVisibleBounds(droppable, padding))
+);
+
+export const isDraggableWithin = (bounds: Spacing) => {
+  const { top, right, bottom, left } = bounds;
 
   // There are some extremely minor inaccuracy in the calculations of margins (~0.001)
   // To allow for this inaccuracy we make the dimension slightly bigger for this calculation
