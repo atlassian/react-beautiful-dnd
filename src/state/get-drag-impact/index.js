@@ -33,6 +33,7 @@ export default ({
   const destinationId: ?DroppableId = getDroppableOver({
     target: pageCenter,
     draggable,
+    draggables,
     droppables,
     previousDroppableOver,
   });
