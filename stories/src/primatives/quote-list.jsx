@@ -76,7 +76,7 @@ export default class QuoteList extends Component {
                   />
                   {dragProvided.placeholder}
                 </div>
-            )}
+              )}
             </Draggable>
           ))}
           {dropProvided.placeholder}
