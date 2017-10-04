@@ -7,7 +7,6 @@ import {
   patch,
   distance,
   closest,
-  offsetSpacing,
 } from '../../../src/state/position';
 import type { Position } from '../../../src/types';
 
@@ -48,7 +47,7 @@ describe('position', () => {
       expect(isEqual(point1, copy)).toBe(true);
     });
 
-    it('should return value when two objects have different values', () => {
+    it('should return false when two objects have different values', () => {
       expect(isEqual(point1, point2)).toBe(false);
     });
   });
@@ -124,24 +123,6 @@ describe('position', () => {
       const option2 = { x: 2, y: 2 };
 
       expect(closest(origin, [option1, option2])).toEqual(distance(origin, option1));
-    });
-  });
-
-  describe('offsetSpacing', () => {
-    it('should add x/y values to top/right/bottom/left dimensions', () => {
-      const spacing = {
-        top: 8,
-        right: 16,
-        bottom: 23,
-        left: 5,
-      };
-      const expected = {
-        top: 13,
-        right: 26,
-        bottom: 28,
-        left: 15,
-      };
-      expect(offsetSpacing(spacing, point1)).toEqual(expected);
     });
   });
 });

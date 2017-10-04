@@ -77,9 +77,9 @@ export default ({
     })
     .filter((droppable: DroppableDimension) => (
       (droppable.page.withoutMargin[axis.crossAxisStart] >=
-        droppable.container.page.withoutMargin[axis.crossAxisStart]) &&
+        droppable.container.bounds[axis.crossAxisStart]) &&
       (droppable.page.withoutMargin[axis.crossAxisEnd] <=
-        droppable.container.page.withoutMargin[axis.crossAxisEnd])
+        droppable.container.bounds[axis.crossAxisEnd])
     ))
     // Sort on the cross axis
     .sort((a: DroppableDimension, b: DroppableDimension) => {

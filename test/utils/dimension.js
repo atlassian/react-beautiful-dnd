@@ -232,7 +232,7 @@ export const updateDroppableScroll = (
         initial: droppable.container.scroll.initial,
         current: newScroll,
       },
-      page: droppable.container.page,
+      bounds: droppable.container.bounds,
     },
   };
 
