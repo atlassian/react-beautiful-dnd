@@ -1,7 +1,6 @@
 // @flow
-import middleware from '../../../src/state/hook-middleware';
+import fireHooks from '../../../src/state/fire-hooks';
 import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
-import { clean } from '../../../src/state/action-creators';
 import getClientRect from '../../../src/state/get-client-rect';
 import noImpact from '../../../src/state/no-impact';
 import type {
@@ -20,23 +19,7 @@ import type {
   DimensionState,
   DraggableLocation,
   DragStart,
-  Store,
 } from '../../../src/types';
-
-const execute = (hooks: Hooks, current: State, previous: State) => {
-  const stateMock = jest.fn();
-  stateMock.mockReturnValueOnce(previous)
-    .mockReturnValueOnce(current);
-  // force casting to Store type
-  const store: Store = ({
-    getState: stateMock,
-  }: any);
-  const next = x => x;
-  // does not matter what this is - but using clean to get correct typing
-  const action = clean();
-
-  middleware(hooks)(store)(next)(action);
-};
 
 const origin: Position = { x: 0, y: 0 };
 const draggableId: DraggableId = 'drag-1';
@@ -188,7 +171,7 @@ const state = (() => {
   return { idle, collecting, dragging, dropAnimating, cancelAnimating, complete };
 })();
 
-describe('Hook middleware', () => {
+describe('fire hooks', () => {
   let hooks: Hooks;
 
   beforeEach(() => {
@@ -205,7 +188,7 @@ describe('Hook middleware', () => {
 
   describe('drag start', () => {
     it('should call the onDragStart hook when a drag starts', () => {
-      execute(hooks, state.dragging, state.collecting);
+      fireHooks(hooks, state.dragging, state.collecting);
       const expected: DragStart = {
         draggableId,
         type: typeId,
@@ -223,7 +206,7 @@ describe('Hook middleware', () => {
         onDragEnd: jest.fn(),
       };
 
-      execute(customHooks, state.dragging, state.collecting);
+      fireHooks(customHooks, state.dragging, state.collecting);
 
       expect(console.error).not.toHaveBeenCalled();
     });
@@ -234,13 +217,13 @@ describe('Hook middleware', () => {
         drag: null,
       };
 
-      execute(hooks, invalid, state.collecting);
+      fireHooks(hooks, invalid, state.collecting);
 
       expect(console.error).toHaveBeenCalled();
     });
 
     it('should not call if only collecting dimensions (not dragging yet)', () => {
-      execute(hooks, state.idle, state.collecting);
+      fireHooks(hooks, state.idle, state.collecting);
 
       expect(hooks.onDragStart).not.toHaveBeenCalled();
     });
@@ -252,7 +235,7 @@ describe('Hook middleware', () => {
 
     preEndStates.forEach((previous: State): void => {
       it('should call onDragEnd with the drop result', () => {
-        execute(hooks, state.complete, previous);
+        fireHooks(hooks, state.complete, previous);
 
         if (!state.complete.drop || !state.complete.drop.result) {
           throw new Error('invalid state');
@@ -271,7 +254,7 @@ describe('Hook middleware', () => {
           dimension: noDimensions,
         };
 
-        execute(hooks, invalid, previous);
+        fireHooks(hooks, invalid, previous);
 
         expect(hooks.onDragEnd).not.toHaveBeenCalled();
         expect(console.error).toHaveBeenCalled();
@@ -297,7 +280,7 @@ describe('Hook middleware', () => {
           dimension: noDimensions,
         };
 
-        execute(hooks, custom, previous);
+        fireHooks(hooks, custom, previous);
 
         expect(hooks.onDragEnd).toHaveBeenCalledWith(result);
       });
@@ -330,7 +313,7 @@ describe('Hook middleware', () => {
           destination: null,
         };
 
-        execute(hooks, custom, previous);
+        fireHooks(hooks, custom, previous);
 
         expect(hooks.onDragEnd).toHaveBeenCalledWith(expected);
       });
@@ -348,7 +331,7 @@ describe('Hook middleware', () => {
           destination: null,
         };
 
-        execute(hooks, state.idle, state.dragging);
+        fireHooks(hooks, state.idle, state.dragging);
 
         expect(hooks.onDragEnd).toHaveBeenCalledWith(expected);
       });
@@ -361,7 +344,7 @@ describe('Hook middleware', () => {
           dimension: noDimensions,
         };
 
-        execute(hooks, state.idle, invalid);
+        fireHooks(hooks, state.idle, invalid);
 
         expect(hooks.onDragEnd).not.toHaveBeenCalled();
         expect(console.error).toHaveBeenCalled();
@@ -379,7 +362,7 @@ describe('Hook middleware', () => {
           destination: null,
         };
 
-        execute(hooks, state.idle, state.dropAnimating);
+        fireHooks(hooks, state.idle, state.dropAnimating);
 
         expect(hooks.onDragEnd).toHaveBeenCalledWith(expected);
       });
@@ -392,10 +375,23 @@ describe('Hook middleware', () => {
           dimension: noDimensions,
         };
 
-        execute(hooks, state.idle, invalid);
+        fireHooks(hooks, state.idle, invalid);
 
         expect(hooks.onDragEnd).not.toHaveBeenCalled();
         expect(console.error).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('phase unchanged', () => {
+    it('should not do anything if the previous and next phase are the same', () => {
+      Object.keys(state).forEach((key: string) => {
+        const current: State = state[key];
+
+        fireHooks(hooks, current, current);
+
+        expect(hooks.onDragStart).not.toHaveBeenCalled();
+        expect(hooks.onDragEnd).not.toHaveBeenCalled();
       });
     });
   });

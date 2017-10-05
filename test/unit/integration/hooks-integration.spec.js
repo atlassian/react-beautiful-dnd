@@ -205,16 +205,19 @@ describe('hooks integration', () => {
     return { start, completed, cancelled };
   })();
 
-  const wasDragStarted = (amountOfDrags?: number = 1) => {
-    expect(hooks.onDragStart).toHaveBeenCalledTimes(amountOfDrags);
-    // $ExpectError - type of hook function
-    expect(hooks.onDragStart.mock.calls[amountOfDrags - 1][0])
+  const wasDragStarted = (amountOfDrags?: number = 1, provided?: Hooks = hooks) => {
+    expect(provided.onDragStart).toHaveBeenCalledTimes(amountOfDrags);
+    if (!hooks.onDragStart) {
+      throw new Error('cannot validate if drag was started without onDragStart hook');
+    }
+    // $ExpectError - mock property
+    expect(provided.onDragStart.mock.calls[amountOfDrags - 1][0])
       .toEqual(expected.start);
   };
 
-  const wasDragCompleted = (amountOfDrags?: number = 1) => {
-    expect(hooks.onDragEnd).toHaveBeenCalledTimes(amountOfDrags);
-    expect(hooks.onDragEnd.mock.calls[amountOfDrags - 1][0])
+  const wasDragCompleted = (amountOfDrags?: number = 1, provided?: Hooks = hooks) => {
+    expect(provided.onDragEnd).toHaveBeenCalledTimes(amountOfDrags);
+    expect(provided.onDragEnd.mock.calls[amountOfDrags - 1][0])
       .toEqual(expected.completed);
   };
 
@@ -294,6 +297,72 @@ describe('hooks integration', () => {
       drag.perform();
       wasDragStarted(2);
       wasDragCompleted(2);
+    });
+  });
+
+  describe('dynamic hooks', () => {
+    const setHooks = (provided: Hooks) => {
+      wrapper.setProps({
+        onDragStart: provided.onDragStart,
+        onDragEnd: provided.onDragEnd,
+      });
+    };
+
+    it('should allow you to change hooks before a drag started', () => {
+      const newHooks: Hooks = {
+        onDragStart: jest.fn(),
+        onDragEnd: jest.fn(),
+      };
+      setHooks(newHooks);
+
+      drag.perform();
+
+      // new hooks called
+      wasDragStarted(1, newHooks);
+      wasDragCompleted(1, newHooks);
+      // original hooks not called
+      expect(hooks.onDragStart).not.toHaveBeenCalled();
+      expect(hooks.onDragEnd).not.toHaveBeenCalled();
+    });
+
+    it('should allow you to change onDragEnd during a drag', () => {
+      const newHooks: Hooks = {
+        onDragEnd: jest.fn(),
+      };
+
+      drag.start();
+      // changing the onDragEnd hook during a drag
+      setHooks(newHooks);
+      drag.stop();
+
+      wasDragStarted(1, hooks);
+      // called the new hook that was changed during a drag
+      wasDragCompleted(1, newHooks);
+      // not calling original hook
+      expect(hooks.onDragEnd).not.toHaveBeenCalled();
+    });
+
+    it('should allow you to change hooks between drags', () => {
+      const newHooks: Hooks = {
+        onDragStart: jest.fn(),
+        onDragEnd: jest.fn(),
+      };
+
+      // first drag
+      drag.perform();
+      wasDragStarted(1, hooks);
+      wasDragCompleted(1, hooks);
+
+      // second drag
+      setHooks(newHooks);
+      drag.perform();
+
+      // new hooks called for second drag
+      wasDragStarted(1, newHooks);
+      wasDragCompleted(1, newHooks);
+      // original hooks should not have been called again
+      wasDragStarted(1, hooks);
+      wasDragCompleted(1, hooks);
     });
   });
 });

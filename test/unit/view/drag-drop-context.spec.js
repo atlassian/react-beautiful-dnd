@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import TestUtils from 'react-dom/test-utils';
+import { mount } from 'enzyme';
 import { DragDropContext } from '../../../src/';
 import { storeKey } from '../../../src/view/context-keys';
 
@@ -40,5 +41,17 @@ describe('DragDropContext', () => {
     expect(app.context[storeKey].getState).toBeInstanceOf(Function);
     expect(app.context[storeKey]).toHaveProperty('subscribe');
     expect(app.context[storeKey].subscribe).toBeInstanceOf(Function);
+  });
+
+  it('should not throw when unmounting', () => {
+    const wrapper = mount(
+      <DragDropContext
+        onDragEnd={() => { }}
+      >
+        <App />
+      </DragDropContext>,
+    );
+
+    expect(() => wrapper.unmount()).not.toThrow();
   });
 });

@@ -1,21 +1,20 @@
 // @flow
-// temp
-import memoizeOne from 'memoize-one';
-import type { MiddlewareAPI } from 'redux';
 import type {
-  Action,
-  Dispatch,
   State,
   Hooks,
   DragStart,
   DropResult,
 } from '../types';
 
-const getFireHooks = (hooks: Hooks) => memoizeOne((current: State, previous: State): void => {
+export default (hooks: Hooks, current: State, previous: State): void => {
   const { onDragStart, onDragEnd } = hooks;
-
   const currentPhase = current.phase;
   const previousPhase = previous.phase;
+
+  // Exit early if phase in unchanged
+  if (currentPhase === previousPhase) {
+    return;
+  }
 
   // Drag start
   if (currentPhase === 'DRAGGING' && previousPhase !== 'DRAGGING') {
@@ -109,21 +108,4 @@ const getFireHooks = (hooks: Hooks) => memoizeOne((current: State, previous: Sta
     };
     onDragEnd(result);
   }
-});
-
-export default (hooks: Hooks) => {
-  const fireHooks = getFireHooks(hooks);
-  return (store: MiddlewareAPI<State, Action, Dispatch>) =>
-    (next: Dispatch) =>
-      (action: Action): Action => {
-        const previous: State = store.getState();
-
-        const result: Action = next(action);
-
-        const current: State = store.getState();
-
-        fireHooks(current, previous);
-
-        return result;
-      };
 };

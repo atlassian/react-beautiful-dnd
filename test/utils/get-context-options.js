@@ -9,7 +9,7 @@ import type { DroppableId } from '../../src/types';
 export const withStore = () => ({
   context: {
     // Each consumer will get their own store
-    [storeKey]: createStore({ onDragEnd: () => { } }),
+    [storeKey]: createStore(),
   },
   childContextTypes: {
     [storeKey]: PropTypes.shape({
