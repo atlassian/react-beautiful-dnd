@@ -105,7 +105,7 @@ describe('get droppable over', () => {
       draggable: draggable1,
       draggables: draggableMap,
       droppables: droppableMap,
-      previousDroppableOver: null,
+      previousDroppableOverId: null,
     });
 
     expect(result).toBe(null);
@@ -122,7 +122,7 @@ describe('get droppable over', () => {
       draggable: draggable1,
       draggables: draggableMap,
       droppables: droppableMap,
-      previousDroppableOver: null,
+      previousDroppableOverId: null,
     });
 
     expect(result).toBe(droppable1.id);
@@ -135,14 +135,14 @@ describe('get droppable over', () => {
         draggable: draggable1,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOver: droppable1.id,
+        previousDroppableOverId: droppable1.id,
       });
       const draggingForeignDraggable: ?DroppableId = getDroppableOver({
         target: { x: 10, y: 110 },
         draggable: draggable2,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOver: droppable1.id,
+        previousDroppableOverId: droppable1.id,
       });
       expect(draggingHomeDraggable).toBe(droppable2.id);
       expect(draggingForeignDraggable).toBe(droppable1.id);
@@ -154,14 +154,14 @@ describe('get droppable over', () => {
         draggable: draggable1,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOver: droppable2.id,
+        previousDroppableOverId: droppable2.id,
       });
       const wasNotPreviouslyHovered: ?DroppableId = getDroppableOver({
         target: { x: 10, y: 210 },
         draggable: draggable1,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOver: null,
+        previousDroppableOverId: null,
       });
       expect(wasPreviouslyHovered).toBe(droppable2.id);
       expect(wasNotPreviouslyHovered).toBe(null);
@@ -173,14 +173,14 @@ describe('get droppable over', () => {
         draggable: draggable1,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOver: droppable2.id,
+        previousDroppableOverId: droppable2.id,
       });
       const inPlaceholderAreaOnTheCrossAxis: ?DroppableId = getDroppableOver({
         target: { x: 110, y: 150 },
         draggable: draggable1,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOver: droppable2.id,
+        previousDroppableOverId: droppable2.id,
       });
       expect(inPlaceholderAreaOnTheMainAxis).toBe(droppable2.id);
       expect(inPlaceholderAreaOnTheCrossAxis).toBe(null);
@@ -196,7 +196,7 @@ describe('get droppable over', () => {
         draggable: draggable1,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOver: droppable2.id,
+        previousDroppableOverId: droppable2.id,
       });
       const justOutsidePlaceholderArea: ?DroppableId = getDroppableOver({
         target: {
@@ -206,7 +206,7 @@ describe('get droppable over', () => {
         draggable: draggable1,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOver: droppable2.id,
+        previousDroppableOverId: droppable2.id,
       });
 
       expect(justInsidePlaceholderArea).toBe(droppable2.id);
@@ -224,7 +224,7 @@ describe('get droppable over', () => {
         draggable: draggable1,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOver: droppable3.id,
+        previousDroppableOverId: droppable3.id,
       });
       const justOutsidePlaceholderArea: ?DroppableId = getDroppableOver({
         target: {
@@ -234,7 +234,7 @@ describe('get droppable over', () => {
         draggable: draggable1,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOver: droppable3.id,
+        previousDroppableOverId: droppable3.id,
       });
 
       expect(justInsidePlaceholderArea).toBe(droppable3.id);

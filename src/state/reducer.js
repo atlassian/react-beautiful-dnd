@@ -107,7 +107,7 @@ const move = ({
     windowScroll: currentWindowScroll,
   };
 
-  const previousDroppableOver = state.drag && state.drag.impact.destination
+  const previousDroppableOverId: ?DroppableId = state.drag && state.drag.impact.destination
     ? state.drag.impact.destination.droppableId
     : null;
 
@@ -116,7 +116,7 @@ const move = ({
     draggable: state.dimension.draggable[current.id],
     draggables: state.dimension.draggable,
     droppables: state.dimension.droppable,
-    previousDroppableOver,
+    previousDroppableOverId,
   }));
 
   const drag: DragState = {
@@ -124,7 +124,7 @@ const move = ({
     impact: newImpact,
     current,
     previous: {
-      droppableOver: previousDroppableOver,
+      droppableOverId: previousDroppableOverId,
     },
   };
 

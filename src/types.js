@@ -173,7 +173,7 @@ export type CurrentDrag = {|
 |}
 
 type PreviousDrag = {
-  droppableOver: ?DroppableId,
+  droppableOverId: ?DroppableId,
 };
 
 // published when a drag starts

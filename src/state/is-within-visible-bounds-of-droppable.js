@@ -1,7 +1,7 @@
 // @flow
 import isWithin from './is-within';
 import { subtract } from './position';
-import { addPosition, offset } from './spacing';
+import { offset } from './spacing';
 import type {
   Position,
   DraggableDimension,
@@ -10,13 +10,9 @@ import type {
   Spacing,
 } from '../types';
 
-const noPadding: Position = { x: 0, y: 0 };
-
-const getVisibleBounds = (
-  droppable: DroppableDimension,
-  padding: Position = noPadding
-): Spacing => {
+const getVisibleBounds = (droppable: DroppableDimension): Spacing => {
   const { scroll, bounds: containerBounds } = droppable.container;
+
   // Calculate the mid-drag scroll ∆ of the scroll container
   const containerScrollDiff: Position = subtract(scroll.initial, scroll.current);
 
@@ -33,13 +29,10 @@ const getVisibleBounds = (
     left: Math.max(droppableBounds.left, containerBounds.left),
   };
 
-  const includingPadding = addPosition(clippedBounds, padding);
-
-  return includingPadding;
+  return clippedBounds;
 };
 
 const isPointWithin = (bounds: Spacing) => {
-  // console.log(bounds);
   const isWithinHorizontal = isWithin(bounds.left, bounds.right);
   const isWithinVertical = isWithin(bounds.top, bounds.bottom);
 
@@ -49,11 +42,8 @@ const isPointWithin = (bounds: Spacing) => {
   );
 };
 
-export const isPointWithinDroppable = (
-  droppable: DroppableDimension,
-  padding: Position = noPadding
-) => (
-  isPointWithin(getVisibleBounds(droppable, padding))
+export const isPointWithinDroppable = (droppable: DroppableDimension) => (
+  isPointWithin(getVisibleBounds(droppable))
 );
 
 export const isDraggableWithin = (bounds: Spacing) => {
