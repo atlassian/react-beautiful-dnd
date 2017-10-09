@@ -128,8 +128,8 @@ describe('get droppable over', () => {
     expect(result).toBe(droppable1.id);
   });
 
-  describe('adding padding to the droppable area', () => {
-    it('should never add padding to the home droppable', () => {
+  describe('adding a buffer to the droppable area', () => {
+    it('should never add buffer to the home droppable', () => {
       const draggingHomeDraggable: ?DroppableId = getDroppableOver({
         target: { x: 10, y: 110 },
         draggable: draggable1,
@@ -148,7 +148,7 @@ describe('get droppable over', () => {
       expect(draggingForeignDraggable).toBe(droppable1.id);
     });
 
-    it('should only add padding if this droppable was hovered over on the previous tick', () => {
+    it('should only add buffer if this droppable was hovered over on the previous tick', () => {
       const wasPreviouslyHovered: ?DroppableId = getDroppableOver({
         target: { x: 10, y: 210 },
         draggable: draggable1,
@@ -167,7 +167,7 @@ describe('get droppable over', () => {
       expect(wasNotPreviouslyHovered).toBe(null);
     });
 
-    it('padding should only be added along the main axis of the droppable', () => {
+    it('buffer should only be added along the main axis of the droppable', () => {
       const inPlaceholderAreaOnTheMainAxis: ?DroppableId = getDroppableOver({
         target: { x: 10, y: 210 },
         draggable: draggable1,
@@ -186,7 +186,7 @@ describe('get droppable over', () => {
       expect(inPlaceholderAreaOnTheCrossAxis).toBe(null);
     });
 
-    it('padding should be the size of the draggable, including margin', () => {
+    it('buffer should be the size of the draggable, including margin', () => {
       const target = {
         x: 10,
         y: droppable2.page.withMargin.bottom + draggable1.page.withMargin.height,
@@ -213,7 +213,7 @@ describe('get droppable over', () => {
       expect(justOutsidePlaceholderArea).toBe(null);
     });
 
-    it('if a droppable is longer than its list of items only as much padding as is necessary should be added', () => {
+    it('if a droppable is longer than its list of items only as much buffer as is necessary should be added', () => {
       const target = {
         x: 150,
         y: draggable3.page.withMargin.bottom + draggable1.page.withMargin.height,
