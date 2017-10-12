@@ -21,7 +21,7 @@ const quoteMap: QuoteMap = {
   [beta]: getQuotes(3),
   [gamma]: getQuotes(7),
   [delta]: getQuotes(2),
-  [epsilon]: getQuotes(5),
+  [epsilon]: getQuotes(10),
   [zeta]: getQuotes(5),
   [eta]: getQuotes(5),
   [theta]: getQuotes(5),
