@@ -26,3 +26,10 @@ export const offset = (spacing: Spacing, position: Position): Spacing => ({
   bottom: spacing.bottom + position.y,
   left: spacing.left + position.x,
 });
+
+export const getCorners = (spacing: Spacing): Position[] => [
+  { x: spacing.left, y: spacing.top },
+  { x: spacing.right, y: spacing.top },
+  { x: spacing.left, y: spacing.bottom },
+  { x: spacing.right, y: spacing.bottom },
+];

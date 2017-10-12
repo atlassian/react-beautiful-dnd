@@ -1,6 +1,7 @@
 // @flow
 import { closest } from '../position';
 import isWithin from '../is-within';
+import { getCorners } from '../spacing';
 import { getVisibleBounds } from '../is-within-visible-bounds-of-droppable';
 import type {
   Axis,
@@ -10,13 +11,6 @@ import type {
   Position,
   Spacing,
 } from '../../types';
-
-const getCorners = (bounds: Spacing): Position[] => [
-  { x: bounds.left, y: bounds.top },
-  { x: bounds.right, y: bounds.top },
-  { x: bounds.left, y: bounds.bottom },
-  { x: bounds.right, y: bounds.bottom },
-];
 
 type GetBestDroppableArgs = {|
   isMovingForward: boolean,
@@ -28,10 +22,12 @@ type GetBestDroppableArgs = {|
   droppables: DroppableDimensionMap,
 |}
 
-type Candidate = {
+// This is the shape of an object which we use in this module for
+// passing a droppable's clipped bounds along with its dimension
+type Candidate = {|
   bounds: Spacing,
   droppable: DroppableDimension,
-};
+|};
 
 export default ({
   isMovingForward,
@@ -50,7 +46,7 @@ export default ({
     .filter((droppable: DroppableDimension): boolean => droppable.isEnabled)
     // Get the true visible bounds of the droppables.
     // We calculate it once here and pass it on in an
-    // object along with the original droppable.
+    // object along with the original dimension.
     .map((droppable: DroppableDimension): Candidate => ({
       bounds: getVisibleBounds(droppable),
       droppable,
