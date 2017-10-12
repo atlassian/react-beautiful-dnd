@@ -172,6 +172,10 @@ export type CurrentDrag = {|
   shouldAnimate: boolean,
 |}
 
+type PreviousDrag = {
+  droppableOverId: ?DroppableId,
+};
+
 // published when a drag starts
 export type DragStart = {|
   draggableId: DraggableId,
@@ -192,6 +196,7 @@ export type DragState = {|
   initial: InitialDrag,
   current: CurrentDrag,
   impact: DragImpact,
+  previous?: PreviousDrag,
 |}
 
 export type DropTrigger = 'DROP' | 'CANCEL';

@@ -10,7 +10,7 @@ import type {
   Spacing,
 } from '../types';
 
-export const isPointWithin = (droppable: DroppableDimension) => {
+const getVisibleBounds = (droppable: DroppableDimension): Spacing => {
   const { scroll, bounds: containerBounds } = droppable.container;
 
   // Calculate the mid-drag scroll ∆ of the scroll container
@@ -29,8 +29,12 @@ export const isPointWithin = (droppable: DroppableDimension) => {
     left: Math.max(droppableBounds.left, containerBounds.left),
   };
 
-  const isWithinHorizontal = isWithin(clippedBounds.left, clippedBounds.right);
-  const isWithinVertical = isWithin(clippedBounds.top, clippedBounds.bottom);
+  return clippedBounds;
+};
+
+const isPointWithin = (bounds: Spacing) => {
+  const isWithinHorizontal = isWithin(bounds.left, bounds.right);
+  const isWithinVertical = isWithin(bounds.top, bounds.bottom);
 
   return (point: Position): boolean => (
     isWithinHorizontal(point.x) &&
@@ -38,8 +42,12 @@ export const isPointWithin = (droppable: DroppableDimension) => {
   );
 };
 
-export const isDraggableWithin = (droppable: DroppableDimension) => {
-  const { top, right, bottom, left } = droppable.container.bounds;
+export const isPointWithinDroppable = (droppable: DroppableDimension) => (
+  isPointWithin(getVisibleBounds(droppable))
+);
+
+export const isDraggableWithin = (bounds: Spacing) => {
+  const { top, right, bottom, left } = bounds;
 
   // There are some extremely minor inaccuracy in the calculations of margins (~0.001)
   // To allow for this inaccuracy we make the dimension slightly bigger for this calculation

@@ -48,6 +48,7 @@ describe('get drag impact', () => {
           draggable: inHome1,
           draggables,
           droppables,
+          previousDroppableOverId: null,
         });
 
         expect(impact).toEqual(noImpact);
@@ -68,6 +69,7 @@ describe('get drag impact', () => {
             draggable: inHome1,
             draggables,
             droppables: withDisabled,
+            previousDroppableOverId: null,
           });
 
           expect(impact).toEqual(noImpact);
@@ -95,6 +97,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables,
+              previousDroppableOverId: null,
             });
 
             expect(impact).toEqual(expected);
@@ -129,6 +132,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables,
+              previousDroppableOverId: null,
             });
 
             expect(impact).toEqual(expected);
@@ -163,6 +167,7 @@ describe('get drag impact', () => {
             draggable: inHome2,
             draggables,
             droppables,
+            previousDroppableOverId: null,
           });
 
           expect(impact).toEqual(expected);
@@ -198,6 +203,7 @@ describe('get drag impact', () => {
               draggable: inHome3,
               draggables,
               droppables,
+              previousDroppableOverId: null,
             });
 
             expect(impact).toEqual(expected);
@@ -248,6 +254,7 @@ describe('get drag impact', () => {
                 draggable: inHome1,
                 draggables,
                 droppables: updatedDroppables,
+                previousDroppableOverId: null,
               });
 
               expect(impact).toEqual(expected);
@@ -297,6 +304,7 @@ describe('get drag impact', () => {
                 draggable: inHome4,
                 draggables,
                 droppables: updatedDroppables,
+                previousDroppableOverId: null,
               });
 
               expect(impact).toEqual(expected);
@@ -320,6 +328,7 @@ describe('get drag impact', () => {
             draggable: inHome1,
             draggables,
             droppables: withDisabled,
+            previousDroppableOverId: null,
           });
 
           expect(impact).toEqual(noImpact);
@@ -355,6 +364,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables,
+              previousDroppableOverId: null,
             });
 
             expect(impact).toEqual(expected);
@@ -390,6 +400,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables,
+              previousDroppableOverId: null,
             });
 
             expect(impact).toEqual(expected);
@@ -425,6 +436,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables,
+              previousDroppableOverId: null,
             });
 
             expect(impact).toEqual(expected);
@@ -455,6 +467,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables,
+              previousDroppableOverId: null,
             });
 
             expect(impact).toEqual(expected);
@@ -494,6 +507,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables: map,
+              previousDroppableOverId: null,
             });
 
             expect(impact).toEqual(expected);
@@ -517,6 +531,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables,
+              previousDroppableOverId: null,
             });
 
             expect(impact).toEqual(expected);
@@ -557,6 +572,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables: map,
+              previousDroppableOverId: null,
             });
 
             expect(impact).toEqual(expected);
@@ -581,6 +597,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables,
+              previousDroppableOverId: null,
             });
 
             expect(impact).toEqual(expected);

@@ -1,5 +1,5 @@
 // @flow
-import { isPointWithin, isDraggableWithin } from '../../../src/state/is-within-visible-bounds-of-droppable';
+import { isPointWithinDroppable, isDraggableWithin } from '../../../src/state/is-within-visible-bounds-of-droppable';
 import { getDroppableDimension } from '../../../src/state/dimension';
 import { add, subtract } from '../../../src/state/position';
 import getClientRect from '../../../src/state/get-client-rect';
@@ -36,11 +36,11 @@ describe('is within visible bounds of a droppable', () => {
 
   describe('is point within', () => {
     describe('basic behaviour', () => {
-      const isWithinDroppable = isPointWithin(droppable);
+      const isWithinThisDroppable = isPointWithinDroppable(droppable);
       const { top, left, right, bottom } = droppable.page.withMargin;
 
       it('should return true if a point is within a droppable', () => {
-        expect(isWithinDroppable(droppable.page.withMargin.center)).toBe(true);
+        expect(isWithinThisDroppable(droppable.page.withMargin.center)).toBe(true);
       });
 
       it('should return true if a point is on any of the droppable boundaries', () => {
@@ -52,7 +52,7 @@ describe('is within visible bounds of a droppable', () => {
         ];
 
         corners.forEach((corner: Position) => {
-          expect(isWithinDroppable(corner)).toBe(true);
+          expect(isWithinThisDroppable(corner)).toBe(true);
         });
       });
 
@@ -65,7 +65,7 @@ describe('is within visible bounds of a droppable', () => {
         ];
 
         outside.forEach((point: Position) => {
-          expect(isWithinDroppable(point)).toBe(false);
+          expect(isWithinThisDroppable(point)).toBe(false);
         });
       });
 
@@ -83,7 +83,7 @@ describe('is within visible bounds of a droppable', () => {
             bottom: 100,
           }),
         });
-        const isWithinCustom = isPointWithin(custom);
+        const isWithinCustom = isPointWithinDroppable(custom);
 
         // custom points
         expect(isWithinCustom({ x: 10, y: 10 })).toBe(false);
@@ -126,11 +126,11 @@ describe('is within visible bounds of a droppable', () => {
             left: 0,
           }),
         });
-        const isPointWithinDroppable = isPointWithin(fullyContainedDroppable);
+        const isWithinClippedDroppable = isPointWithinDroppable(fullyContainedDroppable);
         Object.keys(points).forEach(
           (point) => {
             const expected = point !== 'outside';
-            expect(isPointWithinDroppable(points[point])).toBe(expected);
+            expect(isWithinClippedDroppable(points[point])).toBe(expected);
           }
         );
       });
@@ -147,9 +147,9 @@ describe('is within visible bounds of a droppable', () => {
             left: 110,
           }),
         });
-        const isPointWithinDroppable = isPointWithin(fullyClippedDroppable);
+        const isWithinClippedDroppable = isPointWithinDroppable(fullyClippedDroppable);
         Object.keys(points).forEach(
-          point => expect(isPointWithinDroppable(points[point])).toBe(false)
+          point => expect(isWithinClippedDroppable(points[point])).toBe(false)
         );
       });
 
@@ -165,11 +165,11 @@ describe('is within visible bounds of a droppable', () => {
             left,
           }),
         });
-        const isPointWithinDroppable = isPointWithin(partiallyClippedDroppable);
+        const isWithinClippedDroppable = isPointWithinDroppable(partiallyClippedDroppable);
         Object.keys(points).forEach(
           (point) => {
             const expected = !['top-left', 'top', 'top-right', 'outside'].includes(point);
-            expect(isPointWithinDroppable(points[point])).toBe(expected);
+            expect(isWithinClippedDroppable(points[point])).toBe(expected);
           }
         );
       });
@@ -186,11 +186,11 @@ describe('is within visible bounds of a droppable', () => {
             left,
           }),
         });
-        const isPointWithinDroppable = isPointWithin(partiallyClippedDroppable);
+        const isWithinClippedDroppable = isPointWithinDroppable(partiallyClippedDroppable);
         Object.keys(points).forEach(
           (point) => {
             const expected = !['top-right', 'right', 'bottom-right', 'outside'].includes(point);
-            expect(isPointWithinDroppable(points[point])).toBe(expected);
+            expect(isWithinClippedDroppable(points[point])).toBe(expected);
           }
         );
       });
@@ -207,11 +207,11 @@ describe('is within visible bounds of a droppable', () => {
             left,
           }),
         });
-        const isPointWithinDroppable = isPointWithin(partiallyClippedDroppable);
+        const isWithinClippedDroppable = isPointWithinDroppable(partiallyClippedDroppable);
         Object.keys(points).forEach(
           (point) => {
             const expected = !['bottom-left', 'bottom', 'bottom-right', 'outside'].includes(point);
-            expect(isPointWithinDroppable(points[point])).toBe(expected);
+            expect(isWithinClippedDroppable(points[point])).toBe(expected);
           }
         );
       });
@@ -228,11 +228,11 @@ describe('is within visible bounds of a droppable', () => {
             left: 10,
           }),
         });
-        const isPointWithinDroppable = isPointWithin(partiallyClippedDroppable);
+        const isWithinClippedDroppable = isPointWithinDroppable(partiallyClippedDroppable);
         Object.keys(points).forEach(
           (point) => {
             const expected = !['top-left', 'left', 'bottom-left', 'outside'].includes(point);
-            expect(isPointWithinDroppable(points[point])).toBe(expected);
+            expect(isWithinClippedDroppable(points[point])).toBe(expected);
           }
         );
       });
@@ -249,10 +249,10 @@ describe('is within visible bounds of a droppable', () => {
           }),
           containerRect: getClientRect({ top, right, bottom, left }),
         });
-        const isPointWithinDroppable = isPointWithin(partiallyClippedDroppable);
+        const isWithinClippedDroppable = isPointWithinDroppable(partiallyClippedDroppable);
         // Before we scroll the droppable should be fully clipped
         Object.keys(points).forEach(
-          point => expect(isPointWithinDroppable(points[point])).toBe(false)
+          point => expect(isWithinClippedDroppable(points[point])).toBe(false)
         );
 
         // Simulating a scroll...
@@ -266,7 +266,7 @@ describe('is within visible bounds of a droppable', () => {
             },
           },
         };
-        const isPointWithinScrolledDroppable = isPointWithin(scrolledDroppable);
+        const isPointWithinScrolledDroppable = isPointWithinDroppable(scrolledDroppable);
         // Now the droppable should catch all the points
         Object.keys(points).forEach(
           (point) => {
@@ -287,9 +287,10 @@ describe('is within visible bounds of a droppable', () => {
           { top: 0, left: 0, bottom: 100, right: 100 },
         ],
       });
-      const isWithinDroppable = isDraggableWithin(result.droppable);
+      const isWithinThisDroppable =
+        isDraggableWithin(result.droppable.container.bounds);
 
-      expect(isWithinDroppable(result.draggableDimensions[0])).toBe(true);
+      expect(isWithinThisDroppable(result.draggableDimensions[0])).toBe(true);
     });
 
     it('should return false if there is overlap on any side', () => {
@@ -302,10 +303,11 @@ describe('is within visible bounds of a droppable', () => {
           { top: 0, left: 0, bottom: 120, right: 100 }, // too far bottom
         ],
       });
-      const isWithinDroppable = isDraggableWithin(result.droppable);
+      const isWithinThisDroppable =
+        isDraggableWithin(result.droppable.container.bounds);
 
       result.draggableDimensions.forEach((draggable: DraggableDimension) => {
-        expect(isWithinDroppable(draggable)).toBe(false);
+        expect(isWithinThisDroppable(draggable)).toBe(false);
       });
     });
 
@@ -319,10 +321,11 @@ describe('is within visible bounds of a droppable', () => {
           { top: 0, left: 0, bottom: 101, right: 100 }, // not too far bottom
         ],
       });
-      const isWithinDroppable = isDraggableWithin(result.droppable);
+      const isWithinThisDroppable =
+        isDraggableWithin(result.droppable.container.bounds);
 
       result.draggableDimensions.forEach((draggable: DraggableDimension) => {
-        expect(isWithinDroppable(draggable)).toBe(true);
+        expect(isWithinThisDroppable(draggable)).toBe(true);
       });
     });
   });

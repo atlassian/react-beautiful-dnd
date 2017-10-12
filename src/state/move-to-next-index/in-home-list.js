@@ -1,7 +1,7 @@
 // @flow
 import memoizeOne from 'memoize-one';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { isPointWithin } from '../is-within-visible-bounds-of-droppable';
+import { isPointWithinDroppable } from '../is-within-visible-bounds-of-droppable';
 import { patch } from '../position';
 import moveToEdge from '../move-to-edge';
 import type { Edge } from '../move-to-edge';
@@ -83,8 +83,7 @@ export default ({
   });
 
   // Currently not supporting moving a draggable outside the visibility bounds of a droppable
-
-  const isVisible: boolean = isPointWithin(droppable)(newCenter);
+  const isVisible: boolean = isPointWithinDroppable(droppable)(newCenter);
 
   if (!isVisible) {
     return null;
