@@ -506,7 +506,9 @@ export default class DragHandle extends Component {
   }
 
  unbindWindowEvents = () => {
-    const win = this.props.draggableRef.ownerDocument.defaultView;
+    // this.props.draggableRef is not defined when testing. If testing, default to global window object.
+    const win = this.props.draggableRef ? this.props.draggableRef.ownerDocument.defaultView : window;
+   
     win.removeEventListener('mousemove', this.onWindowMouseMove);
     win.removeEventListener('mouseup', this.onWindowMouseUp);
     win.removeEventListener('mousedown', this.onWindowMouseDown);
@@ -517,7 +519,9 @@ export default class DragHandle extends Component {
   }
 
   bindWindowEvents = () => {
-    const win = this.props.draggableRef.ownerDocument.defaultView;
+    // this.props.draggableRef is not defined when testing. If testing, default to global window object.
+    const win = this.props.draggableRef ? this.props.draggableRef.ownerDocument.defaultView : window;
+    
     win.addEventListener('mousemove', this.onWindowMouseMove);
     win.addEventListener('mouseup', this.onWindowMouseUp);
     win.addEventListener('mousedown', this.onWindowMouseDown);
