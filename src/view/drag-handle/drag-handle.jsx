@@ -505,24 +505,30 @@ export default class DragHandle extends Component {
     }
   }
 
-  unbindWindowEvents = () => {
-    window.removeEventListener('mousemove', this.onWindowMouseMove);
-    window.removeEventListener('mouseup', this.onWindowMouseUp);
-    window.removeEventListener('mousedown', this.onWindowMouseDown);
-    window.removeEventListener('keydown', this.onWindowKeyDown);
-    window.removeEventListener('resize', this.onWindowResize);
-    window.removeEventListener('scroll', this.onWindowScroll);
-    window.removeEventListener('webkitmouseforcechanged', this.mouseForceChanged);
+ unbindWindowEvents = () => {
+    // this.props.draggableRef is not defined when testing. If testing, default to global window object.
+    const win = this.props.draggableRef ? this.props.draggableRef.ownerDocument.defaultView : window;
+   
+    win.removeEventListener('mousemove', this.onWindowMouseMove);
+    win.removeEventListener('mouseup', this.onWindowMouseUp);
+    win.removeEventListener('mousedown', this.onWindowMouseDown);
+    win.removeEventListener('keydown', this.onWindowKeyDown);
+    win.removeEventListener('resize', this.onWindowResize);
+    win.removeEventListener('scroll', this.onWindowScroll);
+    win.removeEventListener('webkitmouseforcechanged', this.mouseForceChanged);
   }
 
   bindWindowEvents = () => {
-    window.addEventListener('mousemove', this.onWindowMouseMove);
-    window.addEventListener('mouseup', this.onWindowMouseUp);
-    window.addEventListener('mousedown', this.onWindowMouseDown);
-    window.addEventListener('keydown', this.onWindowKeyDown);
-    window.addEventListener('resize', this.onWindowResize);
-    window.addEventListener('scroll', this.onWindowScroll, { passive: true });
-    window.addEventListener('webkitmouseforcechanged', this.mouseForceChanged);
+    // this.props.draggableRef is not defined when testing. If testing, default to global window object.
+    const win = this.props.draggableRef ? this.props.draggableRef.ownerDocument.defaultView : window;
+    
+    win.addEventListener('mousemove', this.onWindowMouseMove);
+    win.addEventListener('mouseup', this.onWindowMouseUp);
+    win.addEventListener('mousedown', this.onWindowMouseDown);
+    win.addEventListener('keydown', this.onWindowKeyDown);
+    win.addEventListener('resize', this.onWindowResize);
+    win.addEventListener('scroll', this.onWindowScroll, { passive: true });
+    win.addEventListener('webkitmouseforcechanged', this.mouseForceChanged);
   }
 
   getProvided = memoizeOne((isEnabled: boolean, isDragging: boolean): ?Provided => {
