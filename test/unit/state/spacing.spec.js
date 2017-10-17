@@ -1,8 +1,10 @@
 // @flow
 import {
   add,
+  addPosition,
   isEqual,
   offset,
+  getCorners,
 } from '../../../src/state/spacing';
 import type { Position, Spacing } from '../../../src/types';
 
@@ -30,6 +32,28 @@ describe('spacing', () => {
         left: 14,
       };
       expect(add(spacing1, spacing2)).toEqual(expected);
+    });
+  });
+
+  describe('addPosition', () => {
+    it('should add a position to the right and bottom bounds of a spacing box', () => {
+      const spacing = {
+        top: 0,
+        right: 10,
+        bottom: 10,
+        left: 0,
+      };
+      const position = {
+        x: 5,
+        y: 5,
+      };
+      const expected = {
+        top: 0,
+        right: 15,
+        bottom: 15,
+        left: 0,
+      };
+      expect(addPosition(spacing, position)).toEqual(expected);
     });
   });
 
@@ -61,6 +85,24 @@ describe('spacing', () => {
         left: 15,
       };
       expect(offset(spacing1, offsetPosition)).toEqual(expected);
+    });
+  });
+
+  describe('getCorners', () => {
+    it('should return the corners of a spacing box in the order TL, TR, BL, BR', () => {
+      const spacing: Spacing = {
+        top: 1,
+        right: 2,
+        bottom: 3,
+        left: 4,
+      };
+      const expected = [
+        { x: 4, y: 1 },
+        { x: 2, y: 1 },
+        { x: 4, y: 3 },
+        { x: 2, y: 3 },
+      ];
+      expect(getCorners(spacing)).toEqual(expected);
     });
   });
 });

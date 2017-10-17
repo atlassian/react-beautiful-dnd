@@ -1,25 +1,16 @@
 // @flow
 import { closest } from '../position';
 import isWithin from '../is-within';
+import { getCorners } from '../spacing';
+import { getVisibleBounds } from '../is-within-visible-bounds-of-droppable';
 import type {
   Axis,
-  Position,
-  DroppableId,
-  DimensionFragment,
   DroppableDimension,
   DroppableDimensionMap,
+  DroppableId,
+  Position,
+  Spacing,
 } from '../../types';
-
-const getCorners = (droppable: DroppableDimension): Position[] => {
-  const fragment: DimensionFragment = droppable.page.withMargin;
-
-  return [
-    { x: fragment.left, y: fragment.top },
-    { x: fragment.right, y: fragment.top },
-    { x: fragment.left, y: fragment.bottom },
-    { x: fragment.right, y: fragment.bottom },
-  ];
-};
 
 type GetBestDroppableArgs = {|
   isMovingForward: boolean,
@@ -31,6 +22,13 @@ type GetBestDroppableArgs = {|
   droppables: DroppableDimensionMap,
 |}
 
+// This is the shape of an object which we use in this module for
+// passing a droppable's clipped bounds along with its dimension
+type Candidate = {|
+  bounds: Spacing,
+  droppable: DroppableDimension,
+|};
+
 export default ({
   isMovingForward,
   pageCenter,
@@ -38,53 +36,59 @@ export default ({
   droppables,
 }: GetBestDroppableArgs): ?DroppableDimension => {
   const axis: Axis = source.axis;
+  const sourceBounds: Spacing = getVisibleBounds(source);
 
-  const candidates: DroppableDimension[] = Object.keys(droppables)
-    .map((id: DroppableId) => droppables[id])
+  const candidates: Candidate[] = Object.keys(droppables)
+    .map((id: DroppableId): DroppableDimension => droppables[id])
     // Remove the source droppable from the list
     .filter((droppable: DroppableDimension): boolean => droppable !== source)
     // Remove any options that are not enabled
     .filter((droppable: DroppableDimension): boolean => droppable.isEnabled)
+    // Get the true visible bounds of the droppables.
+    // We calculate it once here and pass it on in an
+    // object along with the original dimension.
+    .map((droppable: DroppableDimension): Candidate => ({
+      bounds: getVisibleBounds(droppable),
+      droppable,
+    }))
     // Get only droppables that are on the desired side
-    .filter((droppable: DroppableDimension): boolean => {
+    .filter(({ bounds }: Candidate): boolean => {
       if (isMovingForward) {
         // is the droppable in front of the source on the cross axis?
-        return source.page.withMargin[axis.crossAxisEnd] <=
-          droppable.page.withMargin[axis.crossAxisStart];
+        return sourceBounds[axis.crossAxisEnd] <=
+          bounds[axis.crossAxisStart];
       }
       // is the droppable behind the source on the cross axis?
-      return droppable.page.withMargin[axis.crossAxisEnd] <=
-        source.page.withMargin[axis.crossAxisStart];
+      return bounds[axis.crossAxisEnd] <=
+        sourceBounds[axis.crossAxisStart];
     })
     // Must have some overlap on the main axis
-    .filter((droppable: DroppableDimension): boolean => {
-      const sourceFragment: DimensionFragment = source.page.withMargin;
-      const destinationFragment: DimensionFragment = droppable.page.withMargin;
-
+    .filter(({ bounds }: Candidate): boolean => {
       const isBetweenSourceBounds = isWithin(
-        sourceFragment[axis.start],
-        sourceFragment[axis.end]
+        sourceBounds[axis.start],
+        sourceBounds[axis.end]
       );
       const isBetweenDestinationBounds = isWithin(
-        destinationFragment[axis.start],
-        destinationFragment[axis.end]
+        bounds[axis.start],
+        bounds[axis.end]
       );
 
-      return isBetweenSourceBounds(destinationFragment[axis.start]) ||
-        isBetweenSourceBounds(destinationFragment[axis.end]) ||
-        isBetweenDestinationBounds(sourceFragment[axis.start]) ||
-        isBetweenDestinationBounds(sourceFragment[axis.end]);
+      return isBetweenSourceBounds(bounds[axis.start]) ||
+        isBetweenSourceBounds(bounds[axis.end]) ||
+        isBetweenDestinationBounds(sourceBounds[axis.start]) ||
+        isBetweenDestinationBounds(sourceBounds[axis.end]);
     })
-    .filter((droppable: DroppableDimension) => (
+    // Filter any droppables which are obscured by their container
+    .filter(({ droppable }: Candidate) => (
       (droppable.page.withoutMargin[axis.crossAxisStart] >=
         droppable.container.bounds[axis.crossAxisStart]) &&
       (droppable.page.withoutMargin[axis.crossAxisEnd] <=
         droppable.container.bounds[axis.crossAxisEnd])
     ))
     // Sort on the cross axis
-    .sort((a: DroppableDimension, b: DroppableDimension) => {
-      const first: number = a.page.withMargin[axis.crossAxisStart];
-      const second: number = b.page.withMargin[axis.crossAxisStart];
+    .sort(({ bounds: a }: Candidate, { bounds: b }: Candidate) => {
+      const first: number = a[axis.crossAxisStart];
+      const second: number = b[axis.crossAxisStart];
 
       if (isMovingForward) {
         return first - second;
@@ -92,9 +96,9 @@ export default ({
       return second - first;
     })
     // Find the droppables that have the same cross axis value as the first item
-    .filter((droppable: DroppableDimension, index: number, array: DroppableDimension[]): boolean =>
-      droppable.page.withMargin[axis.crossAxisStart] ===
-      array[0].page.withMargin[axis.crossAxisStart]
+    .filter(({ bounds }: Candidate, index: number, array: Candidate[]): boolean =>
+      bounds[axis.crossAxisStart] ===
+      array[0].bounds[axis.crossAxisStart]
     );
 
   // no possible candidates
@@ -104,38 +108,38 @@ export default ({
 
   // only one result - all done!
   if (candidates.length === 1) {
-    return candidates[0];
+    return candidates[0].droppable;
   }
 
   // At this point we have a number of candidates that
   // all have the same axis.crossAxisStart value.
 
   // Check to see if the center position is within the size of a Droppable on the main axis
-  const contains: DroppableDimension[] = candidates
-    .filter((droppable: DroppableDimension) => {
+  const contains: Candidate[] = candidates
+    .filter(({ bounds }: Candidate) => {
       const isWithinDroppable = isWithin(
-        droppable.page.withMargin[axis.start],
-        droppable.page.withMargin[axis.end]
+        bounds[axis.start],
+        bounds[axis.end]
       );
       return isWithinDroppable(pageCenter[axis.line]);
     });
 
   if (contains.length === 1) {
-    return contains[0];
+    return contains[0].droppable;
   }
 
   // The center point of the draggable falls on the boundary between two droppables
   if (contains.length > 1) {
     // sort on the main axis and choose the first
-    return contains.sort((a: DroppableDimension, b: DroppableDimension) => (
-      a.page.withMargin[axis.start] - b.page.withMargin[axis.start]
-    ))[0];
+    return contains.sort(({ bounds: a }: Candidate, { bounds: b }: Candidate) => (
+      a[axis.start] - b[axis.start]
+    ))[0].droppable;
   }
 
   // The center is not contained within any droppable
   // 1. Find the candidate that has the closest corner
   // 2. If there is a tie - choose the one that is first on the main axis
-  return candidates.sort((a: DroppableDimension, b: DroppableDimension) => {
+  return candidates.sort(({ bounds: a }: Candidate, { bounds: b }: Candidate) => {
     const first = closest(pageCenter, getCorners(a));
     const second = closest(pageCenter, getCorners(b));
 
@@ -146,6 +150,6 @@ export default ({
 
     // They both have the same distance -
     // choose the one that is first on the main axis
-    return a.page.withMargin[axis.start] - b.page.withMargin[axis.start];
-  })[0];
+    return a[axis.start] - b[axis.start];
+  })[0].droppable;
 };

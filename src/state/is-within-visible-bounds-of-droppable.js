@@ -10,7 +10,7 @@ import type {
   Spacing,
 } from '../types';
 
-const getVisibleBounds = (droppable: DroppableDimension): Spacing => {
+export const getVisibleBounds = (droppable: DroppableDimension): Spacing => {
   const { scroll, bounds: containerBounds } = droppable.container;
 
   // Calculate the mid-drag scroll ∆ of the scroll container

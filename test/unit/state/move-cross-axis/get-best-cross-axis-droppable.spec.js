@@ -223,6 +223,13 @@ describe('get best cross axis droppable', () => {
         id: 'sibling1',
         direction: axis.direction,
         clientRect: getClientRect({
+          top: 20,
+          left: 20,
+          right: 40,
+          // long droppable inside a shorter container - this should be clipped
+          bottom: 80,
+        }),
+        containerRect: getClientRect({
           // not the same top value as source
           top: 20,
           // shares the left edge with the source
@@ -256,6 +263,25 @@ describe('get best cross axis droppable', () => {
           x: 10,
         };
 
+        const result: ?DroppableDimension = getBestCrossAxisDroppable({
+          isMovingForward: true,
+          pageCenter: center,
+          source,
+          droppables,
+        });
+
+        expect(result).toBe(sibling2);
+      });
+
+      it('should account for container clipping', () => {
+        // inside sibling1's droppable bounds, but outside its clipped bounds
+        const center: Position = {
+          y: 50,
+          x: 10,
+        };
+
+        // if we're clipping dimensions correctly we should land in sibling2
+        // if not, we'll land in sibling1
         const result: ?DroppableDimension = getBestCrossAxisDroppable({
           isMovingForward: true,
           pageCenter: center,
