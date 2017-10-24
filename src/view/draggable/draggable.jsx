@@ -377,7 +377,7 @@ export default class Draggable extends Component {
                 )
               }
             </DragHandle>
-        )}
+          )}
         </Moveable>
       </DraggableDimensionPublisher>
     );

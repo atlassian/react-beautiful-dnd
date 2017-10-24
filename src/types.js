@@ -208,7 +208,13 @@ export type PendingDrop = {|
   result: DropResult,
 |}
 
-export type Phase = 'IDLE' | 'COLLECTING_DIMENSIONS' | 'DRAGGING' | 'DROP_ANIMATING' | 'DROP_COMPLETE';
+export type Phase = 'IDLE'
+  | 'BEGIN_LIFT'
+  | 'COLLECTING_DIMENSIONS'
+  | 'COMPLETE_LIFT'
+  | 'DRAGGING'
+  | 'DROP_ANIMATING'
+  | 'DROP_COMPLETE';
 
 export type DimensionState = {|
   request: ?TypeId,
@@ -236,6 +242,8 @@ export type Dispatch = ReduxDispatch<Action>;
 export type Store = ReduxStore<State, Action, Dispatch>;
 
 export type Hooks = {
+  onLiftStart?: () => void,
+  onLiftEnd?: () => void,
   onDragStart?: (start: DragStart) => void,
   onDragEnd: (result: DropResult) => void,
 }

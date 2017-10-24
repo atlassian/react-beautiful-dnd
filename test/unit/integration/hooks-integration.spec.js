@@ -26,6 +26,14 @@ const cancelWithKeyboard = dispatchWindowKeyDownEvent.bind(null, keyCodes.escape
 describe('hooks integration', () => {
   let hooks: Hooks;
   let wrapper;
+  // let callLog = [];
+
+  // const recordCall = (key, mock) => (args) => {
+  //   callLog = [...callLog, key];
+  //   if (mock) {
+  //     mock(args);
+  //   }
+  // };
 
   const draggableId: DraggableId = 'drag-1';
   const droppableId: DroppableId = 'drop-1';
@@ -56,6 +64,8 @@ describe('hooks integration', () => {
 
     return mount(
       <DragDropContext
+        onLiftStart={hooks.onLiftStart}
+        onLiftEnd={hooks.onLiftEnd}
         onDragStart={hooks.onDragStart}
         onDragEnd={hooks.onDragEnd}
       >
@@ -89,10 +99,13 @@ describe('hooks integration', () => {
     requestAnimationFrame.reset();
     jest.useFakeTimers();
     hooks = {
+      onLiftStart: jest.fn(),
+      onLiftEnd: jest.fn(),
       onDragStart: jest.fn(),
       onDragEnd: jest.fn(),
     };
     wrapper = getMountedApp();
+    // callLog = [];
   });
 
   afterEach(() => {
@@ -226,6 +239,41 @@ describe('hooks integration', () => {
     expect(hooks.onDragEnd.mock.calls[amountOfDrags - 1][0])
       .toEqual(expected.cancelled);
   };
+
+  describe('lift start', () => {
+    it('should call the onLiftStart hook when a drag starts', () => {
+      drag.start();
+      expect(hooks.onLiftStart).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call the onLiftStart hook before the onDragStart hook fires', () => {
+      const callLog = [];
+      wrapper.setProps({
+        onLiftStart: () => callLog.push('onLiftStart'),
+        onDragStart: () => callLog.push('onDragStart'),
+      });
+      drag.start();
+      expect(callLog).toEqual(['onLiftStart', 'onDragStart']);
+    });
+  });
+
+  describe('lift end', () => {
+    it('should call the onLiftEnd hook when a drag starts', () => {
+      drag.start();
+      expect(hooks.onLiftStart).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call the onLiftEnd hook after the onLiftStart hook fires and before the onDragStart hook fires', () => {
+      const callLog = [];
+      wrapper.setProps({
+        onLiftStart: () => callLog.push('onLiftStart'),
+        onLiftEnd: () => callLog.push('onLiftEnd'),
+        onDragStart: () => callLog.push('onDragStart'),
+      });
+      drag.start();
+      expect(callLog).toEqual(['onLiftStart', 'onLiftEnd', 'onDragStart']);
+    });
+  });
 
   describe('drag start', () => {
     it('should call the onDragStart hook when a drag starts', () => {

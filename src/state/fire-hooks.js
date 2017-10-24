@@ -7,12 +7,34 @@ import type {
 } from '../types';
 
 export default (hooks: Hooks, current: State, previous: State): void => {
-  const { onDragStart, onDragEnd } = hooks;
+  const { onLiftStart, onLiftEnd, onDragStart, onDragEnd } = hooks;
   const currentPhase = current.phase;
   const previousPhase = previous.phase;
 
   // Exit early if phase in unchanged
   if (currentPhase === previousPhase) {
+    return;
+  }
+
+  // Lift start
+  if (currentPhase === 'BEGIN_LIFT' && previousPhase !== 'BEGIN_LIFT') {
+    // onLiftStart is optional
+    if (!onLiftStart) {
+      return;
+    }
+
+    onLiftStart();
+    return;
+  }
+
+  // Lift end
+  if (currentPhase === 'COMPLETE_LIFT' && previousPhase !== 'COMPLETE_LIFT') {
+    // onLiftEnd is optional
+    if (!onLiftEnd) {
+      return;
+    }
+
+    onLiftEnd();
     return;
   }
 

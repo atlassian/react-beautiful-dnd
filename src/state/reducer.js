@@ -22,7 +22,7 @@ import type { TypeId,
   InitialDragLocation,
 } from '../types';
 import getInitialImpact from './get-initial-impact';
-import { add, subtract } from './position';
+import { add, subtract, patch } from './position';
 import getDragImpact from './get-drag-impact/';
 import moveToNextIndex from './move-to-next-index/';
 import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
@@ -140,11 +140,11 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       console.error('trying to start a lift while another is occurring');
       return state;
     }
-    return clean('COLLECTING_DIMENSIONS');
+    return clean('BEGIN_LIFT');
   }
 
   if (action.type === 'REQUEST_DIMENSIONS') {
-    if (state.phase !== 'COLLECTING_DIMENSIONS') {
+    if (state.phase !== 'BEGIN_LIFT') {
       console.error('trying to collect dimensions at the wrong time');
       return state;
     }
@@ -218,6 +218,18 @@ export default (state: State = clean('IDLE'), action: Action): State => {
   if (action.type === 'COMPLETE_LIFT') {
     if (state.phase !== 'COLLECTING_DIMENSIONS') {
       console.error('trying complete lift without collecting dimensions');
+      return state;
+    }
+
+    return {
+      ...state,
+      phase: 'COMPLETE_LIFT',
+    };
+  }
+
+  if (action.type === 'START_DRAG') {
+    if (state.phase !== 'COMPLETE_LIFT') {
+      console.error('trying to start drag without completing lift');
       return state;
     }
 
@@ -435,7 +447,13 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     }
 
     const impact: DragImpact = result.impact;
-    const page: Position = result.pageCenter;
+    const currentMainAxisPosition: number =
+      existing.current.client.selection[droppable.axis.crossLine];
+    const page: Position = patch(
+      droppable.axis.line,
+      result.pageCenter[droppable.axis.line],
+      currentMainAxisPosition
+    );
     const client: Position = subtract(page, existing.current.windowScroll);
 
     return move({
