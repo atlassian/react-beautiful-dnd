@@ -382,7 +382,7 @@ Because this library does not control your state, it is up to you to *synchronou
 *Here is what you need to do:*
 - if the `destination` is `null`: all done!
 - if `source.droppableId` equals `destination.droppableId` you need to remove the item from your list and insert it at the correct position.
-- if `source.droppableId` does not equal `destination.droppable`, then you need to remove the `Draggable` from the `source.droppableId` list and add it into the correct position of the `destination.droppableId` list.
+- if `source.droppableId` does not equal `destination.droppableId`, then you need to remove the `Draggable` from the `source.droppableId` list and add it into the correct position of the `destination.droppableId` list.
 
 ### Type information
 
