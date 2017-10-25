@@ -23,6 +23,10 @@ export default class DroppableDimensionPublisher extends Component {
   /* eslint-disable react/sort-comp */
   props: Props;
 
+  static defaultProps = {
+    ignoreContainerClipping: false,
+  }
+
   isWatchingScroll: boolean = false;
   closestScrollable: HTMLElement = null;
 
@@ -40,7 +44,13 @@ export default class DroppableDimensionPublisher extends Component {
   }
 
   getDimension = (): DroppableDimension => {
-    const { droppableId, direction, isDropDisabled, targetRef } = this.props;
+    const {
+      droppableId,
+      direction,
+      ignoreContainerClipping,
+      isDropDisabled,
+      targetRef,
+    } = this.props;
     invariant(targetRef, 'DimensionPublisher cannot calculate a dimension when not attached to the DOM');
 
     const scroll: Position = this.getScrollOffset();
@@ -64,11 +74,9 @@ export default class DroppableDimensionPublisher extends Component {
     const clientRect: ClientRect = targetRef.getBoundingClientRect();
 
     const containerRect: ClientRect = (() => {
-      if (!this.closestScrollable) {
-        return clientRect;
-      }
-
-      if (this.closestScrollable === targetRef) {
+      if (ignoreContainerClipping ||
+        !this.closestScrollable ||
+        this.closestScrollable === targetRef) {
         return clientRect;
       }
 

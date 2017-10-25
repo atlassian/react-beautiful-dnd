@@ -31,11 +31,12 @@ export type MapProps = {|
 |}
 
 export type OwnProps = {|
-  droppableId: DroppableId,
+  children: (Provided, StateSnapshot) => ?ReactElement,
   direction: HasDefaultProp<Direction>,
+  droppableId: DroppableId,
+  ignoreContainerClipping: boolean,
   isDropDisabled: HasDefaultProp<boolean>,
   type: HasDefaultProp<TypeId>,
-  children: (Provided, StateSnapshot) => ?ReactElement
 |};
 
 export type DefaultProps = {|

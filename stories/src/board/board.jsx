@@ -19,9 +19,15 @@ const isDraggingClassName = 'is-dragging';
 const publishOnDragStart = action('onDragStart');
 const publishOnDragEnd = action('onDragEnd');
 
+const ParentContainer = styled.div`
+  height: ${({ height }) => height};
+  overflow-x: hidden;
+  overflow-y: auto;
+`;
+
 const Container = styled.div`
   background: ${colors.blue.deep};
-  min-height: 100vh;
+  height: ${({ height }) => height};
 
   /* like display:flex but will allow bleeding over the window width */
   min-width: 100vw;
@@ -30,6 +36,7 @@ const Container = styled.div`
 
 type Props = {|
   initial: QuoteMap,
+  containerHeight?: string,
 |}
 
 type State = {|
@@ -49,6 +56,8 @@ export default class Board extends Component {
     autoFocusQuoteId: null,
   }
   /* eslint-enable react/sort-comp */
+
+  boardRef: ?HTMLElement
 
   componentDidMount() {
     // eslint-disable-next-line no-unused-expressions
@@ -113,30 +122,40 @@ export default class Board extends Component {
   render() {
     const columns: QuoteMap = this.state.columns;
     const ordered: string[] = this.state.ordered;
+    const { containerHeight } = this.props;
+
+    const board = (
+      <Droppable
+        droppableId="board"
+        type="COLUMN"
+        direction="horizontal"
+        ignoreContainerClipping={!!containerHeight}
+      >
+        {(provided: DroppableProvided) => (
+          <Container innerRef={provided.innerRef}>
+            {ordered.map((key: string) => (
+              <Column
+                key={key}
+                title={key}
+                quotes={columns[key]}
+                autoFocusQuoteId={this.state.autoFocusQuoteId}
+              />
+            ))}
+          </Container>
+        )}
+      </Droppable>
+    );
 
     return (
       <DragDropContext
         onDragStart={this.onDragStart}
         onDragEnd={this.onDragEnd}
       >
-        <Droppable
-          droppableId="board"
-          type="COLUMN"
-          direction="horizontal"
-        >
-          {(provided: DroppableProvided) => (
-            <Container innerRef={provided.innerRef}>
-              {ordered.map((key: string) => (
-                <Column
-                  key={key}
-                  title={key}
-                  quotes={columns[key]}
-                  autoFocusQuoteId={this.state.autoFocusQuoteId}
-                />
-              ))}
-            </Container>
-          )}
-        </Droppable>
+        {this.props.containerHeight ? (
+          <ParentContainer height={containerHeight}>{board}</ParentContainer>
+        ) : (
+          board
+        )}
       </DragDropContext>
     );
   }

@@ -52,6 +52,7 @@ export default class QuoteList extends Component {
     style?: Object,
     // may not be provided - and might be null
     autoFocusQuoteId?: ?string,
+    ignoreContainerClipping?: boolean,
   |}
 
   renderQuotes = (dropProvided: DroppableProvided) => {
@@ -87,10 +88,22 @@ export default class QuoteList extends Component {
   }
 
   render() {
-    const { listId, listType, internalScroll, isDropDisabled, style } = this.props;
+    const {
+      ignoreContainerClipping,
+      internalScroll,
+      isDropDisabled,
+      listId,
+      listType,
+      style,
+    } = this.props;
 
     return (
-      <Droppable droppableId={listId} isDropDisabled={isDropDisabled} type={listType}>
+      <Droppable
+        droppableId={listId}
+        ignoreContainerClipping={ignoreContainerClipping}
+        isDropDisabled={isDropDisabled}
+        type={listType}
+      >
         {(dropProvided: DroppableProvided, dropSnapshot: DroppableStateSnapshot) => (
           <Wrapper
             style={style}
