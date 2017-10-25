@@ -52,6 +52,8 @@ export default class DragDropContext extends Component {
 
       // Allowing dynamic hooks by re-capturing the hook functions
       const hooks: Hooks = {
+        onLiftStart: this.props.onLiftStart,
+        onLiftEnd: this.props.onLiftEnd,
         onDragStart: this.props.onDragStart,
         onDragEnd: this.props.onDragEnd,
       };

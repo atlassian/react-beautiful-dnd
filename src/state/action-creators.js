@@ -65,6 +65,14 @@ const beginLift = (): BeginLiftAction => ({
 
 export type CompleteLiftAction = {|
   type: 'COMPLETE_LIFT',
+|}
+
+const completeLift = (): CompleteLiftAction => ({
+  type: 'COMPLETE_LIFT',
+});
+
+export type StartDragAction = {|
+  type: 'START_DRAG',
   payload: {|
     id: DraggableId,
     type: TypeId,
@@ -74,13 +82,13 @@ export type CompleteLiftAction = {|
   |}
 |}
 
-const completeLift = (id: DraggableId,
+const startDrag = (id: DraggableId,
   type: TypeId,
   client: InitialDragLocation,
   windowScroll: Position,
   isScrollAllowed: boolean,
-): CompleteLiftAction => ({
-  type: 'COMPLETE_LIFT',
+): StartDragAction => ({
+  type: 'START_DRAG',
   payload: {
     id,
     type,
@@ -457,26 +465,41 @@ export const lift = (id: DraggableId,
     }
 
     dispatch(beginLift());
-    dispatch(requestDimensions(type));
 
-    // Dimensions will be requested synchronously
-    // after they are done - lift.
-    // Could improve this by explicitly waiting until all dimensions are published.
-    // Could also allow a lift to occur before all the dimensions are published
+    // Wait a tick to allow a re-render
     setTimeout(() => {
-      const newState: State = getState();
+      dispatch(requestDimensions(type));
 
-      // drag was already cancelled before dimensions all collected
-      if (newState.phase !== 'COLLECTING_DIMENSIONS') {
-        return;
-      }
-      dispatch(completeLift(id, type, client, windowScroll, isScrollAllowed));
+      // Dimensions will be requested synchronously
+      // after they are done - lift.
+      // Could improve this by explicitly waiting until all dimensions are published.
+      // Could also allow a lift to occur before all the dimensions are published
+      setTimeout(() => {
+        const newState: State = getState();
+
+        // drag was already cancelled before dimensions all collected
+        if (newState.phase !== 'COLLECTING_DIMENSIONS') {
+          return;
+        }
+        const realClient = {
+          center: newState.dimension.draggable[id].client.withMargin.center,
+          selection: client.selection,
+        };
+
+        dispatch(completeLift());
+
+        // Wait for a re-render again
+        setTimeout(() => {
+          dispatch(startDrag(id, type, realClient, windowScroll, isScrollAllowed));
+        });
+      });
     });
   });
 };
 
 export type Action = BeginLiftAction |
   CompleteLiftAction |
+  StartDragAction |
   RequestDimensionsAction |
   PublishDraggableDimensionAction |
   PublishDroppableDimensionAction |

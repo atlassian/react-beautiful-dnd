@@ -15,12 +15,30 @@ const Wrapper = styled.div`
 
 const Container = styled.div`
   margin: ${grid}px;
+  // max-height: ${({ height, isDragging }) => (height && !isDragging ? height : 'auto')};
   display: flex;
   flex-direction: column;
+  overflow-y: hidden;
+
+  ${({ isDragging }) => (
+    isDragging && false ? (
+      `&:after {
+        content: '';
+        display: block;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 20px;
+        background-color: #000;
+      }`
+    ) : null
+  )}
 `;
 
 const Header = styled.div`
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
   border-top-left-radius: ${borderRadius}px;
@@ -34,10 +52,12 @@ const Header = styled.div`
 `;
 
 export default class Column extends Component {
+  // eslint-disable-next-line react/sort-comp
   props: {|
     title: string,
     quotes: Quote[],
     autoFocusQuoteId: ?string,
+    listHeight?: string,
   |}
 
   render() {
@@ -48,8 +68,14 @@ export default class Column extends Component {
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
           <Wrapper>
             <Container
+              height={this.props.listHeight}
+              isDragging={!!provided.placeholder}
               innerRef={provided.innerRef}
-              style={provided.draggableStyle}
+              style={{
+                ...provided.draggableStyle,
+                height: 'auto',
+                maxHeight: this.props.listHeight,
+              }}
             >
               <Header isDragging={snapshot.isDragging}>
                 <Title
