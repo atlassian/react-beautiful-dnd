@@ -84,6 +84,7 @@ class ScrollableItem extends Component {
         updateIsEnabled={this.props.updateIsEnabled}
         shouldPublish={Boolean(this.props.shouldPublish)}
         updateScroll={this.props.updateScroll}
+        ignoreContainerClipping={false}
       >
         <div
           className="scroll-container"

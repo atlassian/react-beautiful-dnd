@@ -34,7 +34,7 @@ export type OwnProps = {|
   children: (Provided, StateSnapshot) => ?ReactElement,
   direction: HasDefaultProp<Direction>,
   droppableId: DroppableId,
-  ignoreContainerClipping: boolean,
+  ignoreContainerClipping: HasDefaultProp<boolean>,
   isDropDisabled: HasDefaultProp<boolean>,
   type: HasDefaultProp<TypeId>,
 |};
