@@ -200,7 +200,7 @@ Rather than using an index based approach for keyboard movement between lists, `
 
 ### Sloppy clicks and click blocking 🐱🎁
 
-When a user presses the mouse down on an element, we cannot determine if the user was clicking or dragging. Also, sometimes when a user clicks they can move the cursor slightly — a sloppy click. So we only start a drag once the user has moved beyond a certain distance with the mouse down (the drag threshold) — more than they would if they where just making a sloppy click. If the drag threshold is not exceeded then the user interaction behaves just like a regular click. If the drag threshold is exceeded then the interaction will be classified as a drag and the standard click action will not occur. 
+When a user presses the mouse down on an element, we cannot determine if the user was clicking or dragging. Also, sometimes when a user clicks they can move the cursor slightly — a sloppy click. So we only start a drag once the user has moved beyond a certain distance with the mouse down (the drag threshold) — more than they would if they where just making a sloppy click. If the drag threshold is not exceeded then the user interaction behaves just like a regular click. If the drag threshold is exceeded then the interaction will be classified as a drag and the standard click action will not occur.
 
 This allows consumers to wrap interactive elements such as an anchor and have it be both a standard anchor as well as a draggable item in a natural way.
 
@@ -929,6 +929,62 @@ class DraggableWithSelect extends Component {
     return (
       <Draggable draggableId="draggable-1">
         {this.renderSelect}
+      </Draggable>
+    );
+  }
+}
+```
+
+**3. Patch the `onKeyDown` event in `provided`**
+
+Similar to #2, this patch should be used on inputs inside a `Draggable`
+
+```js
+class DraggableWithInput extends Component {
+  renderInput = provided => {
+    // Patched onMouseDown, make inputs selectable
+    const onMouseDown = event => {
+      if (event.target.nodeName === 'INPUT') {
+        return;
+      }
+      provided.dragHandleProps.onMouseDown(event);
+    };
+    // Patched onKeyDown handler, make typing in inputs
+    // work as expected. For example, spacebar can be used
+    // as normal characters instead of a shortcut.
+    const onKeyDown = event => {
+      if (event.target.nodeName === 'INPUT') {
+        return;
+      }
+      provided.dragHandleProps.onKeyDown(event);
+    };
+    // patching drag handle props
+    const patched = {
+      ...provided.dragHandleProps,
+      onMouseDown,
+      onKeyDown,
+    };
+    return (
+      <div>
+        <div
+          ref={provided.innerRef}
+          style={getItemStyle(
+            provided.draggableStyle,
+            snapshot.isDragging
+          )}
+          {...patched}
+        >
+          <input type="text" />
+        </div>
+        {provided.placeholder}
+      </div>
+    );
+  }
+
+  render() {
+    return (
+      <Draggable draggableId="draggable-1">
+        {this.renderInput}
       </Draggable>
     );
   }
