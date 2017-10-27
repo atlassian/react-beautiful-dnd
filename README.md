@@ -200,7 +200,7 @@ Rather than using an index based approach for keyboard movement between lists, `
 
 ### Sloppy clicks and click blocking 🐱🎁
 
-When a user presses the mouse down on an element, we cannot determine if the user was clicking or dragging. Also, sometimes when a user clicks they can move the cursor slightly — a sloppy click. So we only start a drag once the user has moved beyond a certain distance with the mouse down (the drag threshold) — more than they would if they where just making a sloppy click. If the drag threshold is not exceeded then the user interaction behaves just like a regular click. If the drag threshold is exceeded then the interaction will be classified as a drag and the standard click action will not occur. 
+When a user presses the mouse down on an element, we cannot determine if the user was clicking or dragging. Also, sometimes when a user clicks they can move the cursor slightly — a sloppy click. So we only start a drag once the user has moved beyond a certain distance with the mouse down (the drag threshold) — more than they would if they where just making a sloppy click. If the drag threshold is not exceeded then the user interaction behaves just like a regular click. If the drag threshold is exceeded then the interaction will be classified as a drag and the standard click action will not occur.
 
 This allows consumers to wrap interactive elements such as an anchor and have it be both a standard anchor as well as a draggable item in a natural way.
 
@@ -382,7 +382,7 @@ Because this library does not control your state, it is up to you to *synchronou
 *Here is what you need to do:*
 - if the `destination` is `null`: all done!
 - if `source.droppableId` equals `destination.droppableId` you need to remove the item from your list and insert it at the correct position.
-- if `source.droppableId` does not equal `destination.droppable`, then you need to remove the `Draggable` from the `source.droppableId` list and add it into the correct position of the `destination.droppableId` list.
+- if `source.droppableId` does not equal `destination.droppableId`, then you need to remove the `Draggable` from the `source.droppableId` list and add it into the correct position of the `destination.droppableId` list.
 
 ### Type information
 
@@ -476,6 +476,7 @@ import { Droppable } from 'react-beautiful-dnd';
 - `droppableId`: A *required* `DroppableId(string)` that uniquely identifies the droppable for the application. Please do not change this prop - especially during a drag.
 - `type`: An *optional* `TypeId(string)` that can be used to simply accept a class of `Draggable`. For example, if you use the type `PERSON` then it will only allow `Draggable`s of type `PERSON` to be dropped on itself. `Draggable`s of type `TASK` would not be able to be dropped on a `Droppable` with type `PERSON`. If no `type` is provided, it will be set to `'DEFAULT'`. Currently the `type` of the `Draggable`s within a `Droppable` **must be** the same. This restriction might be loosened in the future if there is a valid use case.
 - `isDropDisabled`: An *optional* flag to control whether or not dropping is currently allowed on the `Droppable`. You can use this to implement your own conditional dropping logic. It will default to `false`.
+- `direction`: The direction in which items flow in this droppable. Options are `vertical` (default) and `horizontal`.
 
 ### Children function
 
@@ -928,6 +929,62 @@ class DraggableWithSelect extends Component {
     return (
       <Draggable draggableId="draggable-1">
         {this.renderSelect}
+      </Draggable>
+    );
+  }
+}
+```
+
+**3. Patch the `onKeyDown` event in `provided`**
+
+Similar to #2, this patch should be used on inputs inside a `Draggable`
+
+```js
+class DraggableWithInput extends Component {
+  renderInput = provided => {
+    // Patched onMouseDown, make inputs selectable
+    const onMouseDown = event => {
+      if (event.target.nodeName === 'INPUT') {
+        return;
+      }
+      provided.dragHandleProps.onMouseDown(event);
+    };
+    // Patched onKeyDown handler, make typing in inputs
+    // work as expected. For example, spacebar can be used
+    // as normal characters instead of a shortcut.
+    const onKeyDown = event => {
+      if (event.target.nodeName === 'INPUT') {
+        return;
+      }
+      provided.dragHandleProps.onKeyDown(event);
+    };
+    // patching drag handle props
+    const patched = {
+      ...provided.dragHandleProps,
+      onMouseDown,
+      onKeyDown,
+    };
+    return (
+      <div>
+        <div
+          ref={provided.innerRef}
+          style={getItemStyle(
+            provided.draggableStyle,
+            snapshot.isDragging
+          )}
+          {...patched}
+        >
+          <input type="text" />
+        </div>
+        {provided.placeholder}
+      </div>
+    );
+  }
+
+  render() {
+    return (
+      <Draggable draggableId="draggable-1">
+        {this.renderInput}
       </Draggable>
     );
   }
