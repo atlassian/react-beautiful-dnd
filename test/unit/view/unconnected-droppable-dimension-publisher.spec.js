@@ -84,6 +84,7 @@ class ScrollableItem extends Component {
         updateIsEnabled={this.props.updateIsEnabled}
         shouldPublish={Boolean(this.props.shouldPublish)}
         updateScroll={this.props.updateScroll}
+        ignoreContainerClipping={false}
       >
         <div
           className="scroll-container"
@@ -360,10 +361,12 @@ describe('DraggableDimensionPublisher', () => {
           onPublish: () => void,
           parentIsScrollable?: boolean,
           shouldPublish?: boolean,
+          ignoreContainerClipping?: boolean,
         }
 
         static defaultProps = {
           onPublish: () => {},
+          ignoreContainerClipping: false,
         }
 
         state = { ref: null }
@@ -374,6 +377,7 @@ describe('DraggableDimensionPublisher', () => {
             parentIsScrollable,
             onPublish,
             shouldPublish,
+            ignoreContainerClipping,
           } = this.props;
           return (
             <div
@@ -408,6 +412,7 @@ describe('DraggableDimensionPublisher', () => {
                     publish={onPublish}
                     updateIsEnabled={updateIsEnabled}
                     updateScroll={updateScroll}
+                    ignoreContainerClipping={ignoreContainerClipping}
                   >
                     <div>hello world</div>
                   </DroppableDimensionPublisher>
@@ -447,6 +452,20 @@ describe('DraggableDimensionPublisher', () => {
 
       it('should default to the dimension of the droppable if there are no scroll containers detected', () => {
         wrapper = mount(<App onPublish={publish} />);
+        const parentNode = wrapper.getDOMNode();
+        const droppableNode = wrapper.state().ref;
+        jest.spyOn(parentNode, 'getBoundingClientRect').mockImplementation(() => parentFragment);
+        jest.spyOn(droppableNode, 'getBoundingClientRect').mockImplementation(() => droppableFragment);
+        wrapper.setProps({ shouldPublish: true });
+        expect(publish).toHaveBeenCalledWith(dimensionWithNoScrolling);
+      });
+
+      it('should return the dimension of the droppable if the ignoreContainerClipping prop is set', () => {
+        wrapper = mount(<App
+          parentIsScrollable
+          onPublish={publish}
+          ignoreContainerClipping
+        />);
         const parentNode = wrapper.getDOMNode();
         const droppableNode = wrapper.state().ref;
         jest.spyOn(parentNode, 'getBoundingClientRect').mockImplementation(() => parentFragment);

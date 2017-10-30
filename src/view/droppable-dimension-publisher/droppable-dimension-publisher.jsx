@@ -40,7 +40,13 @@ export default class DroppableDimensionPublisher extends Component {
   }
 
   getDimension = (): DroppableDimension => {
-    const { droppableId, direction, isDropDisabled, targetRef } = this.props;
+    const {
+      droppableId,
+      direction,
+      ignoreContainerClipping,
+      isDropDisabled,
+      targetRef,
+    } = this.props;
     invariant(targetRef, 'DimensionPublisher cannot calculate a dimension when not attached to the DOM');
 
     const scroll: Position = this.getScrollOffset();
@@ -63,19 +69,16 @@ export default class DroppableDimensionPublisher extends Component {
 
     const clientRect: ClientRect = targetRef.getBoundingClientRect();
 
-    const containerRect: ClientRect = (() => {
-      if (!this.closestScrollable) {
-        return clientRect;
-      }
-
-      if (this.closestScrollable === targetRef) {
-        return clientRect;
-      }
-
-      return getClientRect(
-        this.closestScrollable.getBoundingClientRect()
-      );
-    })();
+    // The droppable's own bounds should be treated as the
+    // container bounds in the following situations:
+    // 1. The consumer has opted in to ignoring container clipping
+    // 2. There is no scroll container
+    // 3. The droppable has internal scrolling
+    const containerRect: ClientRect = ignoreContainerClipping ||
+      !this.closestScrollable ||
+      this.closestScrollable === targetRef
+      ? clientRect
+      : getClientRect(this.closestScrollable.getBoundingClientRect());
 
     const dimension: DroppableDimension = getDroppableDimension({
       id: droppableId,
