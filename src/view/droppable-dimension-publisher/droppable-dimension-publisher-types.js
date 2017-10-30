@@ -24,12 +24,13 @@ export type DispatchProps = {|
 |}
 
 export type OwnProps = {|
+  children?: ReactElement,
   droppableId: DroppableId,
   direction: Direction,
+  ignoreContainerClipping: boolean,
   isDropDisabled: boolean,
-  type: TypeId,
   targetRef: ?HTMLElement,
-  children?: ReactElement,
+  type: TypeId,
 |}
 
 export type Props = {

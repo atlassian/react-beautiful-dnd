@@ -25,6 +25,7 @@ export default class Droppable extends Component {
 
   static defaultProps: DefaultProps = {
     type: 'DEFAULT',
+    ignoreContainerClipping: false,
     isDropDisabled: false,
     direction: 'vertical',
   }
@@ -79,6 +80,7 @@ export default class Droppable extends Component {
       children,
       direction,
       droppableId,
+      ignoreContainerClipping,
       isDraggingOver,
       isDropDisabled,
       type,
@@ -95,6 +97,7 @@ export default class Droppable extends Component {
       <DroppableDimensionPublisher
         droppableId={droppableId}
         direction={direction}
+        ignoreContainerClipping={ignoreContainerClipping}
         isDropDisabled={isDropDisabled}
         type={type}
         targetRef={this.state.ref}
