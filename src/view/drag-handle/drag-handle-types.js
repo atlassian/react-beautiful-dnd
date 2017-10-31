@@ -1,4 +1,4 @@
-import type { Position, Direction } from '../../types';
+import type { Position, Direction, HTMLElement } from '../../types';
 
 export type DragTypes = 'KEYBOARD' | 'MOUSE';
 
@@ -43,6 +43,8 @@ export type Props = {|
   // the direction of the current droppable
   direction: ?Direction,
   callbacks: Callbacks,
+  // the ref of the draggable
+  draggableRef: ?HTMLElement,
   children: (?Provided) => void,
 |}
 

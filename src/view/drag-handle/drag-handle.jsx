@@ -6,7 +6,8 @@ import rafSchedule from 'raf-schd';
 // Using keyCode's for consistent event pattern matching between
 // React synthetic events as well as raw browser events.
 import * as keyCodes from '../key-codes';
-import type { Position } from '../../types';
+import getWindowFromRef from '../get-window-from-ref';
+import type { Position, HTMLElement } from '../../types';
 import type {
   Props,
   DragTypes,
@@ -505,10 +506,9 @@ export default class DragHandle extends Component {
     }
   }
 
- unbindWindowEvents = () => {
-    // this.props.draggableRef is not defined when testing. If testing, default to global window object.
-    const win = this.props.draggableRef ? this.props.draggableRef.ownerDocument.defaultView : window;
-   
+  unbindWindowEvents = () => {
+    const win: HTMLElement = getWindowFromRef(this.props.draggableRef);
+
     win.removeEventListener('mousemove', this.onWindowMouseMove);
     win.removeEventListener('mouseup', this.onWindowMouseUp);
     win.removeEventListener('mousedown', this.onWindowMouseDown);
@@ -519,9 +519,8 @@ export default class DragHandle extends Component {
   }
 
   bindWindowEvents = () => {
-    // this.props.draggableRef is not defined when testing. If testing, default to global window object.
-    const win = this.props.draggableRef ? this.props.draggableRef.ownerDocument.defaultView : window;
-    
+    const win: HTMLElement = getWindowFromRef(this.props.draggableRef);
+
     win.addEventListener('mousemove', this.onWindowMouseMove);
     win.addEventListener('mouseup', this.onWindowMouseUp);
     win.addEventListener('mousedown', this.onWindowMouseDown);
