@@ -43,6 +43,10 @@ type ExecuteBasedOnDirection = {|
   horizontal: () => void,
 |}
 
+const isSloppyClickThresholdExceeded = (original: Position, current: Position): boolean =>
+  Math.abs(current.x - original.x) >= sloppyClickThreshold ||
+  Math.abs(current.y - original.y) >= sloppyClickThreshold;
+
 export default class DragHandle extends Component {
   /* eslint-disable react/sort-comp */
 
@@ -55,6 +59,7 @@ export default class DragHandle extends Component {
   };
 
   preventClick: boolean
+  touchDragStartTimerId: ?number = null;
 
   ifDragging = (fn: Function) => {
     if (this.state.draggingWith) {
@@ -129,7 +134,7 @@ export default class DragHandle extends Component {
 
     // if a drag is pending - clear it
     if (this.state.pending) {
-      this.stopPendingMouseDrag();
+      this.stopPendingDrag();
       return;
     }
 
@@ -141,7 +146,7 @@ export default class DragHandle extends Component {
 
   onWindowResize = () => {
     if (this.state.pending) {
-      this.stopPendingMouseDrag();
+      this.stopPendingDrag();
       return;
     }
 
@@ -153,9 +158,15 @@ export default class DragHandle extends Component {
   }
 
   onWindowScroll = () => {
-    const { draggingWith } = this.state;
+    const { pending, draggingWith } = this.state;
 
     if (!draggingWith) {
+      return;
+    }
+
+    if (pending) {
+      // TODO: need to do different things if mouse orgit st
+      this.stopPendingTouchDrag();
       return;
     }
 
@@ -171,6 +182,7 @@ export default class DragHandle extends Component {
   }
 
   onWindowMouseMove = (event: MouseEvent) => {
+    console.log('on window mouse move');
     const { draggingWith, pending } = this.state;
     if (draggingWith === 'KEYBOARD') {
       return;
@@ -194,10 +206,10 @@ export default class DragHandle extends Component {
     }
 
     // not yet dragging
-    const shouldStartDrag = Math.abs(pending.x - point.x) >= sloppyClickThreshold ||
-                            Math.abs(pending.y - point.y) >= sloppyClickThreshold;
+    const shouldStartDrag: boolean = isSloppyClickThresholdExceeded(pending, point);
 
     if (shouldStartDrag) {
+      console.log('starting mouse drag???');
       this.startDragging('MOUSE', () => this.props.callbacks.onLift(point));
     }
   };
@@ -206,7 +218,7 @@ export default class DragHandle extends Component {
     // Did not move far enough for it to actually be a drag
     if (this.state.pending) {
       // not blocking the default event - letting it pass through
-      this.stopPendingMouseDrag();
+      this.stopPendingDrag();
       return;
     }
 
@@ -226,12 +238,14 @@ export default class DragHandle extends Component {
   };
 
   onWindowMouseDown = () => {
+    console.log('on window mouse down');
     // this can happen during a drag when the user clicks a button
     // other than the primary mouse button
     this.stopDragging(() => this.props.callbacks.onCancel());
   }
 
   onMouseDown = (event: MouseEvent) => {
+    console.warn('on mouse down fired');
     if (this.state.draggingWith === 'KEYBOARD') {
       // allowing any type of mouse down to cancel
       this.stopDragging(() => this.props.callbacks.onCancel());
@@ -255,7 +269,7 @@ export default class DragHandle extends Component {
       y: clientY,
     };
 
-    this.startPendingMouseDrag(point);
+    this.startPendingDrag(point, 'MOUSE');
   };
 
   executeBasedOnDirection = (fns: ExecuteBasedOnDirection) => {
@@ -277,7 +291,7 @@ export default class DragHandle extends Component {
     if (isMouseDragPending) {
       if (event.keyCode === keyCodes.escape) {
         stop(event);
-        this.stopPendingMouseDrag();
+        this.stopPendingDrag();
       }
       return;
     }
@@ -397,7 +411,7 @@ export default class DragHandle extends Component {
     event.preventDefault();
   }
 
-  startPendingMouseDrag = (point: Position) => {
+  startPendingDrag = (point: Position, type: DragTypes) => {
     if (this.state.draggingWith) {
       console.error('cannot start a pending mouse drag when already dragging');
       return;
@@ -409,7 +423,7 @@ export default class DragHandle extends Component {
     }
 
     // need to bind the window events
-    this.bindWindowEvents();
+    this.bindWindowEvents(type);
 
     const state: State = {
       draggingWith: null,
@@ -420,6 +434,7 @@ export default class DragHandle extends Component {
   }
 
   startDragging = (type: DragTypes, done?: () => void = noop) => {
+    console.info('staring drag:', type);
     if (this.state.draggingWith) {
       console.error('cannot start dragging when already dragging');
       return;
@@ -430,9 +445,14 @@ export default class DragHandle extends Component {
       return;
     }
 
+    if (type === 'TOUCH' && !this.state.pending) {
+      console.error('cannot start touch drag when there is not a pending position');
+      return;
+    }
+
     // keyboard events already bound for mouse dragging
     if (type === 'KEYBOARD') {
-      this.bindWindowEvents();
+      this.bindWindowEvents(type);
     }
 
     const state: State = {
@@ -442,7 +462,7 @@ export default class DragHandle extends Component {
     this.setState(state, done);
   }
 
-  stopPendingMouseDrag = (done?: () => void = noop) => {
+  stopPendingDrag = (done?: () => void = noop) => {
     invariant(this.state.pending, 'cannot stop pending drag when there is none');
 
     // we need to allow the click event to get through
@@ -475,6 +495,115 @@ export default class DragHandle extends Component {
     this.setState(state, done);
   }
 
+  // touch support
+  startPendingTouchDrag = (point: Position) => {
+    console.log('starting pending touch drag');
+    console.log('setting timeout');
+    this.touchDragStartTimerId = setTimeout(
+      () => {
+        console.log('STARTING TOUCH DRAG AFTER TIMEOUT');
+        this.startDragging('TOUCH', () => this.props.callbacks.onLift(point));
+      },
+      200
+    );
+    this.startPendingDrag(point, 'TOUCH');
+  }
+
+  stopPendingTouchDrag = (done?: Function) => {
+    console.log('stop pending touch drag');
+    clearTimeout(this.touchDragStartTimerId);
+    this.touchDragStartTimerId = null;
+    this.stopPendingDrag(done);
+  }
+
+  onTouchStart = (event: TouchEvent) => {
+    // TODO: only if one finger?
+    console.log('on touch start', event);
+    const { clientX, clientY } = event.touches[0];
+    const point: Position = {
+      x: clientX,
+      y: clientY,
+    };
+    this.startPendingTouchDrag(point);
+  }
+
+  onWindowTouchMove = (event: TouchEvent) => {
+    console.log('on window touch move');
+    const { pending, draggingWith } = this.state;
+    const { clientX, clientY } = event.touches[0];
+
+    const point: Position = {
+      x: clientX,
+      y: clientY,
+    };
+
+    if (!pending && !draggingWith) {
+      console.error('should not be listening to window touch move event');
+      this.stopDragging(() => this.props.callbacks.onCancel());
+      return;
+    }
+
+    // drag is currently pending and has not yet started
+    if (pending) {
+      if (isSloppyClickThresholdExceeded(pending, point)) {
+        console.log('cancelling pending touch drag', { pending, point });
+        this.stopPendingTouchDrag();
+        return;
+      }
+      // still waiting to see if drag will start
+      console.log('stopping window drag handle');
+      stop(event);
+      return;
+    }
+
+    if (draggingWith !== 'TOUCH') {
+      console.error('window touch move intercepted when not dragging with touch', draggingWith);
+      return;
+    }
+
+    console.log('scheduling move', point, event);
+
+    this.scheduleMove(point);
+    stop(event);
+  }
+
+  onWindowTouchEnd = () => {
+    console.log('on window touch end');
+    if (this.state.pending) {
+      this.stopPendingTouchDrag();
+      return;
+    }
+
+    if (this.state.draggingWith !== 'TOUCH') {
+      console.error('window touch end intercepted when not dragging with touch');
+      this.stopDragging(() => this.props.callbacks.onCancel());
+      return;
+    }
+
+    this.stopDragging(() => this.props.callbacks.onDrop());
+  }
+
+  onWindowTouchCancel = () => {
+    console.log('on window touch cancel');
+    if (this.state.pending) {
+      this.stopPendingTouchDrag();
+      return;
+    }
+
+    if (this.state.draggingWith !== 'TOUCH') {
+      console.error('window touch cancel intercepted when not dragging with touch');
+    }
+
+    this.stopDragging(() => this.props.callbacks.onCancel());
+  }
+
+  onWindowContextMenu = (event: Event) => {
+    console.log('on window context menu');
+    if (this.state.pending || this.state.draggingWith) {
+      stop(event);
+    }
+  }
+
   // Need to opt out of dragging if the user is a force press
   // Only for safari which has decided to introduce its own custom way of doing things
   // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
@@ -495,7 +624,7 @@ export default class DragHandle extends Component {
     // if we are dragging - kill the drag
 
     if (this.state.pending) {
-      this.stopPendingMouseDrag();
+      this.stopPendingDrag();
       return;
     }
 
@@ -513,18 +642,33 @@ export default class DragHandle extends Component {
     win.removeEventListener('mouseup', this.onWindowMouseUp);
     win.removeEventListener('mousedown', this.onWindowMouseDown);
     win.removeEventListener('keydown', this.onWindowKeyDown);
+    win.removeEventListener('touchmove', this.onWindowTouchMove);
+    win.removeEventListener('touchend', this.onWindowTouchEnd);
+    win.removeEventListener('touchcancel', this.onWindowTouchCancel);
     win.removeEventListener('resize', this.onWindowResize);
     win.removeEventListener('scroll', this.onWindowScroll);
+    win.removeEventListener('contextmenu', this.onWindowContextMenu);
     win.removeEventListener('webkitmouseforcechanged', this.mouseForceChanged);
   }
 
-  bindWindowEvents = () => {
+  bindWindowEvents = (type: DragTypes) => {
     const win: HTMLElement = getWindowFromRef(this.props.draggableRef);
 
-    win.addEventListener('mousemove', this.onWindowMouseMove);
-    win.addEventListener('mouseup', this.onWindowMouseUp);
-    win.addEventListener('mousedown', this.onWindowMouseDown);
-    win.addEventListener('keydown', this.onWindowKeyDown);
+    if (type === 'MOUSE' || type === 'KEYBOARD') {
+      win.addEventListener('mousemove', this.onWindowMouseMove);
+      win.addEventListener('mouseup', this.onWindowMouseUp);
+      win.addEventListener('mousedown', this.onWindowMouseDown);
+      win.addEventListener('keydown', this.onWindowKeyDown);
+    }
+
+    if (type === 'TOUCH') {
+      // opting out of passive (default) so as to prevent scrolling while moving
+      win.addEventListener('touchmove', this.onWindowTouchMove, { passive: false });
+      win.addEventListener('touchend', this.onWindowTouchEnd);
+      win.addEventListener('touchcancel', this.onWindowTouchCancel);
+      win.addEventListener('contextmenu', this.onWindowContextMenu);
+    }
+
     win.addEventListener('resize', this.onWindowResize);
     win.addEventListener('scroll', this.onWindowScroll, { passive: true });
     win.addEventListener('webkitmouseforcechanged', this.mouseForceChanged);
@@ -538,6 +682,7 @@ export default class DragHandle extends Component {
     const provided: Provided = {
       onMouseDown: this.onMouseDown,
       onKeyDown: this.onKeyDown,
+      onTouchStart: this.onTouchStart,
       onClick: this.onClick,
       tabIndex: 0,
       'aria-grabbed': isDragging,

@@ -1,6 +1,6 @@
 import type { Position, Direction, HTMLElement } from '../../types';
 
-export type DragTypes = 'KEYBOARD' | 'MOUSE';
+export type DragTypes = 'KEYBOARD' | 'MOUSE' | 'TOUCH';
 
 export type Callbacks = {|
   onLift: (point: Position) => void,
@@ -18,6 +18,7 @@ export type Callbacks = {|
 export type Provided = {|
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
+  onTouchStart: (event: TouchEvent) => void,
 
   // Conditionally block clicks
   onClick: (event: MouseEvent) => void,

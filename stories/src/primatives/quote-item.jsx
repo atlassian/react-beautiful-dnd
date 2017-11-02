@@ -38,7 +38,12 @@ color: ${colors.black};
 }
 &:focus {
   outline: 2px solid ${colors.purple};
+  box-shadow: none;
 }
+
+/* stop any color overlay when tapping anchor */
+/* https://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/ */
+-webkit-tap-highlight-color: rgba(0,0,0,0);
 
 /* flexbox */
 display: flex;
