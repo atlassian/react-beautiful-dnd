@@ -571,8 +571,6 @@ Getting keyboard dragging to work with scroll containers is quite difficult. Cur
 
 `Draggable` components can be dragged around and dropped onto `Droppable`s. A `Draggable` must always be contained within a `Droppable`. It is **possible** to reorder a `Draggable` within its home `Droppable` or move to another `Droppable`. It is **possible** because a `Droppable` is free to control what it allows to be dropped on it.
 
-> Note: moving between `Droppable`s is currently not supported in the initial version.
-
 ```js
 import { Draggable } from 'react-beautiful-dnd';
 
