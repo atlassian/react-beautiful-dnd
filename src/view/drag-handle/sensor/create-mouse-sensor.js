@@ -14,11 +14,11 @@ import type {
   Props,
 } from '../drag-handle-types';
 
-type State = {|
+type State = {
   isDragging: boolean,
   preventClick: boolean,
   pending: ?Position,
-|}
+}
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 const primaryButton = 0;
@@ -35,7 +35,6 @@ export default (callbacks: Callbacks): MouseSensor => {
       ...state,
       ...partial,
     };
-    console.log('state', state);
   };
   const isDragging = (): boolean => state.isDragging;
   const isCapturing = (): boolean => Boolean(state.pending || state.isDragging);
@@ -151,7 +150,6 @@ export default (callbacks: Callbacks): MouseSensor => {
         return;
       }
 
-      console.log('binding window event', eventKey);
       window.addEventListener(eventKey, windowBindings[eventKey]);
     });
   };
@@ -195,6 +193,8 @@ export default (callbacks: Callbacks): MouseSensor => {
     }
 
     // preventing click
+
+    // only want to prevent the first click
     setState({
       preventClick: false,
     });
