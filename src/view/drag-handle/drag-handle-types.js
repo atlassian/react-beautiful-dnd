@@ -53,3 +53,15 @@ export type Props = {|
 export type MouseForceChangedEvent = MouseEvent & {
   webkitForce?: number,
 }
+
+export type Sensor = {|
+  // start a drag
+  start: (event: mixed) => void,
+  // force stop
+  stop: () => void,
+  // Is the sensor currently recording a drag
+  isDragging: () => boolean,
+  // Is the sensor listening for events.
+  // This can happen before a drag starts
+  isCapturing: () => boolean,
+|}
