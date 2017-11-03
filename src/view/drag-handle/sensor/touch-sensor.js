@@ -13,9 +13,31 @@ import type {
   Props,
 } from '../drag-handle-types';
 
+type State = {
+  isDragging: boolean,
+  pending: ?Position,
+}
+
 export default (callbacks: Callbacks): TouchSensor => {
   const state: State = {
     isDragging: false,
     pending: null,
+  };
+  const setState = (newState: State): void => {
+    state = newState;
+  };
+  const isDragging = (): boolean => state.isDragging;
+  const isCapturing = (): boolean => Boolean(state.pending || state.isDragging);
+  const schedule = createScheduler(callbacks, isDragging);
+
+  const onTouchStart = (event: TouchEvent) => {
+    // TODO
+  };
+
+  const sensor: TouchSensor = {
+    onTouchStart,
+    end: () => console.warn('end not yet implemented'),
+    isCapturing,
+    isDragging,
   };
 };

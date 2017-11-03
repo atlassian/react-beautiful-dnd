@@ -42,6 +42,7 @@ export default (callbacks: Callbacks): KeyboardSensor => {
     });
     fn();
   };
+  const kill = () => stopDragging();
   const cancel = () => {
     stopDragging(callbacks.onCancel);
   };
@@ -159,9 +160,9 @@ export default (callbacks: Callbacks): KeyboardSensor => {
 
   const sensor: KeyboardSensor = {
     onKeyDown,
-    end: () => console.warn('end not yet implemented'),
+    kill,
     isDragging,
-    // a drag starts instantly
+    // a drag starts instantly so capturing is the same as dragging
     isCapturing: isDragging,
   };
 

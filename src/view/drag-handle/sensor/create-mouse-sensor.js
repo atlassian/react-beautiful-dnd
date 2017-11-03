@@ -30,6 +30,7 @@ export default (callbacks: Callbacks): MouseSensor => {
     pending: null,
     preventClick: false,
   };
+  // TODO: flow
   const setState = (partial: $Shape<State>): void => {
     state = {
       ...state,
@@ -38,7 +39,6 @@ export default (callbacks: Callbacks): MouseSensor => {
   };
   const isDragging = (): boolean => state.isDragging;
   const isCapturing = (): boolean => Boolean(state.pending || state.isDragging);
-
   const schedule = createScheduler(callbacks, isDragging);
 
   const startDragging = (fn?: Function = noop) => {
@@ -68,12 +68,16 @@ export default (callbacks: Callbacks): MouseSensor => {
     stopDragging();
   };
 
-  const cancel = () => {
+  const kill = (fn?: Function = noop) => {
     if (state.pending) {
       stopPendingDrag();
       return;
     }
-    stopDragging(callbacks.onCancel);
+    stopDragging(fn);
+  };
+
+  const cancel = () => {
+    kill(callbacks.onCancel);
   };
 
   const windowBindings = {
@@ -204,7 +208,7 @@ export default (callbacks: Callbacks): MouseSensor => {
   const sensor: MouseSensor = {
     onMouseDown,
     onClick,
-    end: () => console.warn('end not yet implemented'),
+    kill,
     isCapturing,
     isDragging,
   };

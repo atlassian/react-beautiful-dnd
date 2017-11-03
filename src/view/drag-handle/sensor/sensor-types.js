@@ -2,8 +2,8 @@
 import type { Props } from '../drag-handle-types';
 
 type Sensor = {|
-  // force stop
-  stop: () => void,
+  // force stop and do not fire any events
+  kill: () => void,
   // Is the sensor currently recording a drag
   isDragging: () => boolean,
   // Is the sensor listening for events.

@@ -11,6 +11,7 @@ import type { Position, HTMLElement } from '../../types';
 import type {
   Props,
   Provided,
+  Sensor,
   MouseSensor,
   KeyboardSensor,
 } from './drag-handle-types';
@@ -28,40 +29,59 @@ type SensorMap = {|
 export default class DragHandle extends Component {
   /* eslint-disable react/sort-comp */
   props: Props
-  sensors: SensorMap = {
-    mouse: createMouseSensor(this.props.callbacks),
-    keyboard: createKeyboardSensor(this.props.callbacks),
-    // touch: createTouchSensor(this.props.callbacks),
-  }
+  mouseSensor: MouseSensor = createMouseSensor(this.props.callbacks);
+  keyboardSensor: KeyboardSensor = createKeyboardSensor(this.props.callbacks);
+  sensors: Sensor[] = [this.mouseSensor, this.keyboardSensor];
 
   componentWillUnmount() {
-    // TODO
+    this.sensors.forEach((sensor: Sensor) => {
+      // kill the current drag and fire a cancel event if
+      const wasCapturing = sensor.isCapturing();
+      const wasDragging = sensor.isDragging();
+
+      // stop capturing
+      if (wasCapturing) {
+        sensor.kill();
+      }
+      // cancel if drag was occuring
+      if (wasDragging) {
+        this.props.callbacks.onCancel();
+      }
+    });
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    // TODO
+    // if the application cancels a drag we need to unbind the handlers
+    const isDragStopping: boolean = (this.props.isDragging && !nextProps.isDragging);
+
+    if (!isDragStopping) {
+      return;
+    }
+
+    this.sensors.forEach((sensor: Sensor) => {
+      if (sensor.isCapturing()) {
+        sensor.kill();
+        // not firing any cancel event as the drag is already over
+      }
+    });
   }
 
   onKeyDown = (event: MouseEvent) => {
-    const { mouse, keyboard } = this.sensors;
-
     // let the mouse sensor deal with it
-    if (mouse.isCapturing()) {
+    if (this.mouseSensor.isCapturing()) {
       return;
     }
 
-    keyboard.onKeyDown(event, this.props);
+    this.keyboardSensor.onKeyDown(event, this.props);
   }
 
   onMouseDown = (event: MouseEvent) => {
-    const { mouse, keyboard } = this.sensors;
-
     // let the keyboard sensor deal with it
-    if (keyboard.isCapturing()) {
+    if (this.keyboardSensor.isCapturing()) {
       return;
     }
 
-    mouse.onMouseDown(event, this.props);
+    this.mouseSensor.onMouseDown(event, this.props);
   }
 
   onTouchStart = (event: TouchEvent) => {
@@ -69,20 +89,17 @@ export default class DragHandle extends Component {
       return;
     }
 
-    const { mouse, keyboard, touch } = this.sensors;
-
     // let the keyboard sensor deal with it
-    if (mouse.isCapturing() || keyboard.isCapturing()) {
+    if (this.mouseSensor.isCapturing() || this.keyboardSensor.isCapturing()) {
       console.error('mouse or keyboard already listening when attempting to touch drag');
       return;
     }
 
-    touch.start(event);
+    this.touchSensor.start(event);
   }
 
   isSensorDragging = () =>
-    Object.keys(this.sensors)
-      .some((key: string) => this.sensors[key].isDragging())
+    this.sensors.some((sensor: Sensor) => sensor.isDragging())
 
   getProvided = memoizeOne((isEnabled: boolean, isDragging: boolean): ?Provided => {
     if (!isEnabled) {
@@ -93,7 +110,7 @@ export default class DragHandle extends Component {
       onMouseDown: this.onMouseDown,
       onKeyDown: this.onKeyDown,
       onTouchStart: this.onTouchStart,
-      onClick: this.sensors.mouse.onClick,
+      onClick: this.mouseSensor.onClick,
       tabIndex: 0,
       'aria-grabbed': isDragging,
       draggable: false,
