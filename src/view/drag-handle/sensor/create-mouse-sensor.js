@@ -4,30 +4,38 @@ import stopEvent from '../stop-event';
 import createScheduler from '../create-scheduler';
 import isSloppyClickThresholdExceeded from '../is-sloppy-click-threshold-exceeded';
 import * as keyCodes from '../../key-codes';
+import blockStandardKeyEvents from '../util/block-standard-key-events';
 import type {
   Position,
 } from '../../../types';
 import type {
   Callbacks,
-  Sensor,
+  MouseSensor,
+  Props,
 } from '../drag-handle-types';
 
-type State = {
+type State = {|
   isDragging: boolean,
-  pending: ?Position
-}
+  preventClick: boolean,
+  pending: ?Position,
+|}
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 const primaryButton = 0;
 const noop = () => { };
 
-export default (callbacks: Callbacks): Sensor => {
+export default (callbacks: Callbacks): MouseSensor => {
   let state: State = {
     isDragging: false,
     pending: null,
+    preventClick: false,
   };
-  const setState = (newState: State): void => {
-    state = newState;
+  const setState = (partial: $Shape<State>): void => {
+    state = {
+      ...state,
+      ...partial,
+    };
+    console.log('state', state);
   };
   const isDragging = (): boolean => state.isDragging;
   const isCapturing = (): boolean => Boolean(state.pending || state.isDragging);
@@ -38,6 +46,7 @@ export default (callbacks: Callbacks): Sensor => {
     setState({
       pending: null,
       isDragging: true,
+      preventClick: true,
     });
     fn();
   };
@@ -54,6 +63,9 @@ export default (callbacks: Callbacks): Sensor => {
     bindWindowEvents();
   };
   const stopPendingDrag = () => {
+    setState({
+      preventClick: false,
+    });
     stopDragging();
   };
 
@@ -117,16 +129,7 @@ export default (callbacks: Callbacks): Sensor => {
         return;
       }
 
-      // blocking standard browser behavior
-      const shouldBlock: boolean =
-        // submission
-        event.keyCode === keyCodes.enter ||
-        // tabbing
-        event.keyCode === keyCodes.tab;
-
-      if (shouldBlock) {
-        stopEvent(event);
-      }
+      blockStandardKeyEvents(event);
     },
     resize: cancel,
     scroll: () => {
@@ -148,6 +151,7 @@ export default (callbacks: Callbacks): Sensor => {
         return;
       }
 
+      console.log('binding window event', eventKey);
       window.addEventListener(eventKey, windowBindings[eventKey]);
     });
   };
@@ -158,8 +162,12 @@ export default (callbacks: Callbacks): Sensor => {
     );
   };
 
-  const onMouseDown = (event: MouseEvent): void => {
-    if (state.isDragging || state.pending) {
+  const onMouseDown = (event: MouseEvent, props: Props): void => {
+    if (!props.canLift) {
+      return;
+    }
+
+    if (isCapturing()) {
       console.error('should not be able to perform a mouse down while a drag or pending drag is occurring');
       stopDragging(callbacks.onCancel);
       return;
@@ -167,12 +175,12 @@ export default (callbacks: Callbacks): Sensor => {
 
     const { button, clientX, clientY } = event;
 
+    // only starting a drag if dragging with the primary mouse button
     if (button !== primaryButton) {
       return;
     }
 
     stopEvent(event);
-
     const point: Position = {
       x: clientX,
       y: clientY,
@@ -181,10 +189,23 @@ export default (callbacks: Callbacks): Sensor => {
     startPendingDrag(point);
   };
 
-  const sensor: Sensor = {
-    start: onMouseDown,
+  const onClick = (event: MouseEvent): void => {
+    if (!state.preventClick) {
+      return;
+    }
+
+    // preventing click
+    setState({
+      preventClick: false,
+    });
+    stopEvent(event);
+  };
+
+  const sensor: MouseSensor = {
+    onMouseDown,
+    onClick,
     end: () => console.warn('end not yet implemented'),
-    isCapturing: () => Boolean(state.pending || state.isDragging),
+    isCapturing,
     isDragging,
   };
 

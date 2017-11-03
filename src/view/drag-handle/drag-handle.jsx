@@ -10,19 +10,19 @@ import getWindowFromRef from '../get-window-from-ref';
 import type { Position, HTMLElement } from '../../types';
 import type {
   Props,
-  DragTypes,
   Provided,
-  MouseForceChangedEvent,
-  Sensor,
+  MouseSensor,
+  KeyboardSensor,
 } from './drag-handle-types';
 import createMouseSensor from './sensor/create-mouse-sensor';
+import createKeyboardSensor from './sensor/create-keyboard-sensor';
 
 const getFalse: () => boolean = () => false;
 
 type SensorMap = {|
-  mouse: Sensor,
-  keyboard: Sensor,
-  touch: Sensor,
+  mouse: MouseSensor,
+  keyboard: KeyboardSensor,
+  // touch: TouchSensor,
 |}
 
 export default class DragHandle extends Component {
@@ -30,7 +30,7 @@ export default class DragHandle extends Component {
   props: Props
   sensors: SensorMap = {
     mouse: createMouseSensor(this.props.callbacks),
-    // keyboard: createKeyboardSensor(this.props.callbacks),
+    keyboard: createKeyboardSensor(this.props.callbacks),
     // touch: createTouchSensor(this.props.callbacks),
   }
 
@@ -43,10 +43,6 @@ export default class DragHandle extends Component {
   }
 
   onKeyDown = (event: MouseEvent) => {
-    if (!this.props.canLift) {
-      return;
-    }
-
     const { mouse, keyboard } = this.sensors;
 
     // let the mouse sensor deal with it
@@ -54,22 +50,18 @@ export default class DragHandle extends Component {
       return;
     }
 
-    keyboard.start(event);
+    keyboard.onKeyDown(event, this.props);
   }
 
   onMouseDown = (event: MouseEvent) => {
-    if (!this.props.canLift) {
-      return;
-    }
-
     const { mouse, keyboard } = this.sensors;
 
     // let the keyboard sensor deal with it
-    // if (keyboard.isCapturing()) {
-    //   return;
-    // }
+    if (keyboard.isCapturing()) {
+      return;
+    }
 
-    mouse.start(event);
+    mouse.onMouseDown(event, this.props);
   }
 
   onTouchStart = (event: TouchEvent) => {
@@ -101,7 +93,7 @@ export default class DragHandle extends Component {
       onMouseDown: this.onMouseDown,
       onKeyDown: this.onKeyDown,
       onTouchStart: this.onTouchStart,
-      // onClick: this.onClick,
+      onClick: this.sensors.mouse.onClick,
       tabIndex: 0,
       'aria-grabbed': isDragging,
       draggable: false,
