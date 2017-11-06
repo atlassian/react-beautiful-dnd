@@ -171,7 +171,7 @@ export default (callbacks: Callbacks): MouseSensor => {
 
     if (isCapturing()) {
       console.error('should not be able to perform a mouse down while a drag or pending drag is occurring');
-      stopDragging(callbacks.onCancel);
+      cancel();
       return;
     }
 

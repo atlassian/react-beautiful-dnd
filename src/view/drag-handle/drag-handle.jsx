@@ -1,37 +1,33 @@
 // @flow
 import { Component } from 'react';
-import invariant from 'invariant';
 import memoizeOne from 'memoize-one';
-import rafSchedule from 'raf-schd';
 // Using keyCode's for consistent event pattern matching between
 // React synthetic events as well as raw browser events.
-import * as keyCodes from '../key-codes';
-import getWindowFromRef from '../get-window-from-ref';
-import type { Position, HTMLElement } from '../../types';
 import type {
   Props,
   Provided,
   Sensor,
   MouseSensor,
   KeyboardSensor,
+  TouchSensor,
 } from './drag-handle-types';
 import createMouseSensor from './sensor/create-mouse-sensor';
 import createKeyboardSensor from './sensor/create-keyboard-sensor';
+import createTouchSensor from './sensor/create-touch-sensor';
 
 const getFalse: () => boolean = () => false;
-
-type SensorMap = {|
-  mouse: MouseSensor,
-  keyboard: KeyboardSensor,
-  // touch: TouchSensor,
-|}
 
 export default class DragHandle extends Component {
   /* eslint-disable react/sort-comp */
   props: Props
   mouseSensor: MouseSensor = createMouseSensor(this.props.callbacks);
   keyboardSensor: KeyboardSensor = createKeyboardSensor(this.props.callbacks);
-  sensors: Sensor[] = [this.mouseSensor, this.keyboardSensor];
+  touchSensor: TouchSensor = createTouchSensor(this.props.callbacks);
+  sensors: Sensor[] = [
+    this.mouseSensor,
+    this.keyboardSensor,
+    this.touchSensor,
+  ];
 
   componentWillUnmount() {
     this.sensors.forEach((sensor: Sensor) => {
@@ -43,7 +39,7 @@ export default class DragHandle extends Component {
       if (wasCapturing) {
         sensor.kill();
       }
-      // cancel if drag was occuring
+      // cancel if drag was occurring
       if (wasDragging) {
         this.props.callbacks.onCancel();
       }
@@ -95,7 +91,7 @@ export default class DragHandle extends Component {
       return;
     }
 
-    this.touchSensor.start(event);
+    this.touchSensor.onTouchStart(event, this.props);
   }
 
   isSensorDragging = () =>

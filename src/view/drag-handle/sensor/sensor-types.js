@@ -21,3 +21,8 @@ export type KeyboardSensor = {
   ...Sensor,
   onKeyDown: (event: MouseEvent, props: Props) => void,
 }
+
+export type TouchSensor = {
+  ...Sensor,
+  onTouchStart: (event: MouseEvent, props: Props) => void,
+}
