@@ -1,6 +1,6 @@
 // @flow
 import * as keyCodes from '../../key-codes';
-import stopEvent from '../stop-event';
+import stopEvent from './stop-event';
 
 const blocked: number[] = [
   // submission

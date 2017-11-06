@@ -1,7 +1,7 @@
 // @flow
 /* eslint-disable no-use-before-define */
-import stopEvent from '../stop-event';
-import createScheduler from '../create-scheduler';
+import stopEvent from '../util/stop-event';
+import createScheduler from '../util/create-scheduler';
 import blockStandardKeyEvents from '../util/block-standard-key-events';
 import * as keyCodes from '../../key-codes';
 import type {

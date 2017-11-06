@@ -1,8 +1,8 @@
 // @flow
 /* eslint-disable no-use-before-define */
-import stopEvent from '../stop-event';
-import createScheduler from '../create-scheduler';
-import isSloppyClickThresholdExceeded from '../is-sloppy-click-threshold-exceeded';
+import stopEvent from '../util/stop-event';
+import createScheduler from '../util/create-scheduler';
+import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
 import isForcePress from '../util/is-force-press';
 import * as keyCodes from '../../key-codes';
 import blockStandardKeyEvents from '../util/block-standard-key-events';
@@ -32,12 +32,12 @@ export default (callbacks: Callbacks): MouseSensor => {
     pending: null,
     preventClick: false,
   };
-  // TODO: flow
-  const setState = (partial: $Shape<State>): void => {
-    state = {
-      ...state,
+  const setState = (partial: Object): void => {
+    const newState: State = {
       ...partial,
+      ...state,
     };
+    state = newState;
   };
   const isDragging = (): boolean => state.isDragging;
   const isCapturing = (): boolean => Boolean(state.pending || state.isDragging);

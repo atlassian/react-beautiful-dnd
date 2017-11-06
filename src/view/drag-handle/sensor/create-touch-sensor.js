@@ -1,8 +1,8 @@
 // @flow
 /* eslint-disable no-use-before-define */
-import stopEvent from '../stop-event';
-import createScheduler from '../create-scheduler';
-import isSloppyClickThresholdExceeded from '../is-sloppy-click-threshold-exceeded';
+import stopEvent from '../util/stop-event';
+import createScheduler from '../util/create-scheduler';
+import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
 import isForcePress from '../util/is-force-press';
 import type {
   Position,
@@ -37,7 +37,6 @@ export default (callbacks: Callbacks): TouchSensor => {
   const schedule = createScheduler(callbacks, isDragging);
 
   const startDragging = (fn?: Function = noop) => {
-    console.log('drag starting');
     setState({
       pending: null,
       isDragging: true,
@@ -56,7 +55,6 @@ export default (callbacks: Callbacks): TouchSensor => {
   };
 
   const startPendingDrag = (point: Position) => {
-    console.log('starting pending drag');
     const startTimerId: number = setTimeout(
       () => startDragging(callbacks.onLift(point)),
       200
@@ -64,18 +62,19 @@ export default (callbacks: Callbacks): TouchSensor => {
     setState({
       startTimerId,
       pending: point,
+      isDragging: false,
     });
     bindWindowEvents();
   };
 
   const stopPendingDrag = () => {
-    console.log('stopping pending drag');
     clearTimeout(state.startTimerId);
     unbindWindowEvents();
 
     setState({
       startTimerId: null,
       pending: null,
+      isDragging: false,
     });
   };
 

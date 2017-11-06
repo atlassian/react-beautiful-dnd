@@ -1,8 +1,8 @@
 // @flow
 import memoizeOne from 'memoize-one';
 import rafSchedule from 'raf-schd';
-import type { Position } from '../../types';
-import type { Callbacks } from './drag-handle-types';
+import type { Position } from '../../../types';
+import type { Callbacks } from '../drag-handle-types';
 
 export default (callbacks: Callbacks, isDraggingFn: () => boolean) => {
   const ifDragging = (fn: Function) => {
