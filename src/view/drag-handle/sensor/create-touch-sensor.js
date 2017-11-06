@@ -3,6 +3,7 @@
 import stopEvent from '../stop-event';
 import createScheduler from '../create-scheduler';
 import isSloppyClickThresholdExceeded from '../is-sloppy-click-threshold-exceeded';
+import isForcePress from '../util/is-force-press';
 import type {
   Position,
 } from '../../../types';
@@ -10,6 +11,7 @@ import type {
   Callbacks,
   TouchSensor,
   Props,
+  MouseForceChangedEvent,
 } from '../drag-handle-types';
 
 type State = {
@@ -130,14 +132,20 @@ export default (callbacks: Callbacks): TouchSensor => {
       }
       cancel();
     },
+    resize: cancel,
     // A window scroll will cancel a pending or current drag
     // This will be looked at when auto scrolling is supported
     scroll: cancel,
     // long press can bring up a context menu
     // need to opt out of this behavior
     contextmenu: stopEvent,
-    webkitmouseforcechanged: (event: Event) => {
-      console.warn('not yet handled');
+    // Need to opt out of dragging if the user is a force press
+    // Only for safari which has decided to introduce its own custom way of doing things
+    // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
+    webkitmouseforcechanged: (event: MouseForceChangedEvent) => {
+      if (isForcePress(event)) {
+        cancel();
+      }
     },
   };
 
@@ -145,19 +153,20 @@ export default (callbacks: Callbacks): TouchSensor => {
 
   const bindWindowEvents = () => {
     eventKeys.forEach((eventKey: string) => {
+      const fn: Function = windowBindings[eventKey];
+
       if (eventKey === 'touchmove') {
         // opting out of passive touchmove (default) so as to prevent scrolling while moving
         // Not worried about performance as effect of move is throttled in requestAnimationFrame
-        window.addEventListener(eventKey, windowBindings.touchmove, { passive: false });
+        window.addEventListener(eventKey, fn, { passive: false });
         return;
       }
 
-      window.addEventListener(eventKey, windowBindings[eventKey]);
+      window.addEventListener(eventKey, fn);
     });
   };
 
   const unbindWindowEvents = () => {
-    console.log('unbinding window events');
     eventKeys.forEach((eventKey: string) =>
       window.removeEventListener(eventKey, windowBindings[eventKey]));
   };
@@ -179,6 +188,10 @@ export default (callbacks: Callbacks): TouchSensor => {
       x: clientX,
       y: clientY,
     };
+
+    // Need to call preventDefault() in order to prevent
+    // A scroll from occurring
+    stopEvent(event);
 
     startPendingDrag(point);
   };

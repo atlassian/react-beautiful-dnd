@@ -45,6 +45,9 @@ color: ${colors.black};
 /* https://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/ */
 -webkit-tap-highlight-color: rgba(0,0,0,0);
 
+/* stop the 'open in new tab' dialog */
+-webkit-touch-callout: none;
+
 /* flexbox */
 display: flex;
 align-items: center;

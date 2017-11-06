@@ -3,6 +3,7 @@
 import stopEvent from '../stop-event';
 import createScheduler from '../create-scheduler';
 import isSloppyClickThresholdExceeded from '../is-sloppy-click-threshold-exceeded';
+import isForcePress from '../util/is-force-press';
 import * as keyCodes from '../../key-codes';
 import blockStandardKeyEvents from '../util/block-standard-key-events';
 import type {
@@ -12,6 +13,7 @@ import type {
   Callbacks,
   MouseSensor,
   Props,
+  MouseForceChangedEvent,
 } from '../drag-handle-types';
 
 type State = {
@@ -142,6 +144,14 @@ export default (callbacks: Callbacks): MouseSensor => {
         return;
       }
       schedule.windowScrollMove();
+    },
+    // Need to opt out of dragging if the user is a force press
+    // Only for safari which has decided to introduce its own custom way of doing things
+    // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
+    webkitmouseforcechanged: (event: MouseForceChangedEvent) => {
+      if (isForcePress(event)) {
+        cancel();
+      }
     },
   };
 
