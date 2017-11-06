@@ -101,8 +101,9 @@ export default (callbacks: Callbacks): TouchSensor => {
 
       if (state.pending) {
         if (isSloppyClickThresholdExceeded(state.pending, point)) {
+          // Moved too far before the timer finished.
+          // Letting the event go through without stopping it.
           stopPendingDrag();
-          // not stopping event - releasing it as we are no longer interested
           return;
         }
         // threshold not yet exceed and timeout not finished
@@ -117,6 +118,15 @@ export default (callbacks: Callbacks): TouchSensor => {
     touchend: (event: TouchEvent) => {
       if (state.pending) {
         stopPendingDrag();
+        // Because we called event.preventDefault in touchstart all mouse events
+        // including 'click' are stopped. At this point we know that the user as actually intending
+        // to click (tap) so we need to manually fire a click
+
+        // Appeasing flow with check
+        if (event.target instanceof HTMLElement) {
+          event.target.click();
+        }
+
         return;
       }
 
@@ -188,8 +198,9 @@ export default (callbacks: Callbacks): TouchSensor => {
       y: clientY,
     };
 
-    // Need to call preventDefault() in order to prevent
-    // A scroll from occurring
+    // Need to call preventDefault() in order to prevent native scrolling from occurring
+    // However, this will also swallow the click event. So if a pending drag is determined to be a
+    // tap then we need to manually trigger the click event.
     stopEvent(event);
 
     startPendingDrag(point);

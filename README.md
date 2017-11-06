@@ -249,7 +249,7 @@ When a drag **is occurring** with a *mouse* the user is able to execute the foll
 
 - **escape** <kbd>esc</kbd> - cancel the drag
 
-During a drag the following standard keyboard events are blocked to prevent a bad experience:
+During a mouse drag the following standard keyboard events are blocked to prevent a bad experience:
 
 - **tab** <kbd>tab ↹</kbd> - blocking tabbing
 - **enter** <kbd>⏎</kbd> - blocking submission
@@ -258,27 +258,27 @@ Other than these explicitly blocked keyboard events all standard keyboard events
 
 ## Keyboard dragging
 
-`react-beautiful-dnd` supports dragging with only a keyboard.
+`react-beautiful-dnd` supports dragging with only a keyboard
 
 ### Keyboard shortcuts: keyboard dragging
 
-When a drag is not occurring, key the user will be able to navigation through the `Draggable`'s on a page using the standard **tab** <kbd>tab ↹</kbd> key. We achieve this by adding a `tab-index` to the `Draggable`. When a `Draggable` has focus the **spacebar** <kbd>space</kbd> key will **lift** a `Draggable`. This will start the drag.
+When a drag is not occurring, key the user will be able to navigation through the `Draggable`'s on a page using the standard **tab** <kbd>tab ↹</kbd> key to move forward through the tabbable elements and (**shift** + **tab**) (<kbd>shift</kbd> + )<kbd>tab ↹</kbd>) to move backwards. We achieve this by adding a `tab-index` to the `Draggable`. When a `Draggable` has focus the **spacebar** <kbd>space</kbd> will **lift** a `Draggable`. This will start the drag.
 
 Once a drag is started the following keyboard shortcuts can be used:
 
-- **spacebar** <kbd>space</kbd> - drop the dragging `Draggable`
+- **spacebar** <kbd>space</kbd> - drop the `Draggable`
 - **escape** <kbd>esc</kbd> - cancel the drag
 
-The following commands are also available but depend on the `type` of `Droppable` that the `Draggable` is currently in:
+The following commands are also available but they depend on the `type` of `Droppable` that the `Draggable` is *currently* in:
 
-**Currently within a vertical list**
+#### Within a vertical list**
 
 - **Up arrow** <kbd>↑</kbd> - move a `Draggable` upwards in a `Droppable`
 - **Down arrow** <kbd>↓</kbd> - move a `Draggable` downwards in a `Droppable`
 - **Right arrow** <kbd>→</kbd> - move a `Draggable` to a `Droppable` to the *right* of the current `Droppable` (move to new list)
 - **Left arrow** <kbd>←</kbd> - move a `Draggable` to a `Droppable` to the *left* of the current `Droppable` (move to new list)
 
-**Currently within a horizontal list**
+#### Within a horizontal list
 
 - **Up arrow** <kbd>↑</kbd> - move a `Draggable` to a `Droppable` to *above* the current `Droppable` (move to new list)
 - **Down arrow** <kbd>↓</kbd> - move a `Draggable` to a `Droppable` to *below* the current `Droppable` (move to new list)
@@ -300,14 +300,29 @@ There is current limitation of keyboard dragging: **the drag will cancel if the 
 
 ### Sloppy taps, navigation blocking and scrolling
 
-(Similar to the logic for starting a mouse drag but a little more complex)
+> Similar to the logic for starting a mouse drag but a little more complex
 
-When a user presses their finger on an element, we cannot determine if the user was tapping, force pressing (safari), scrolling or dragging. Also, sometimes when a user taps they may move their finger slightly - a sloppy tap.
-
-TODO
+When a user presses their finger on an element, we cannot determine if the user was tapping, force pressing (safari), scrolling or dragging. Also, sometimes when a user taps they may move their finger (or some other touch input) slightly but still be intending to tap - a sloppy tap. We start a drag if a user presses on an element and holds for a small period of time without moving beyond a small threshold (press and hold). If the user lifts their finger before this small period of time has elapsed then the interaction will be treated as a tap (click). If the user moves beyond the distance threshold within the initial time period then a drag will not start.
 
 ### Recommendations
 
+In order for users to have a good experience using touch dragging we suggest that you implement the following recommendations:
+
+#### `Draggable` Anchors
+
+If the element you are dragging is an anchor `<a>` we recommend that you add the following styles:
+
+- Disable tap highlight colors. By default webkit based browsers will add a grey overlay to anchors when they are active [more information](https://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/).
+
+```css
+-webkit-tap-highlight-color: rgba(0,0,0,0);
+```
+
+- Disable the 'open in new tab' dialog. This prevents a dialog popping when a user long presses an anchor
+
+```css
+-webkit-touch-callout: none;
+```
 
 ## Installation
 
