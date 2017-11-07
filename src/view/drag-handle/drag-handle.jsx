@@ -47,19 +47,41 @@ export default class DragHandle extends Component {
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    // if the application cancels a drag we need to unbind the handlers
-    const isDragStopping: boolean = (this.props.isDragging && !nextProps.isDragging);
+    const isCapturing: boolean = this.isAnySensorCapturing();
 
-    if (!isDragStopping) {
+    if (!isCapturing) {
       return;
     }
 
-    this.sensors.forEach((sensor: Sensor) => {
-      if (sensor.isCapturing()) {
-        sensor.kill();
-        // not firing any cancel event as the drag is already over
-      }
-    });
+    const isDragStopping: boolean = (this.props.isDragging && !nextProps.isDragging);
+
+    // if the application cancels a drag we need to unbind the handlers
+    if (isDragStopping) {
+      this.sensors.forEach((sensor: Sensor) => {
+        if (sensor.isCapturing()) {
+          sensor.kill();
+          // not firing any cancel event as the drag is already over
+        }
+      });
+      return;
+    }
+
+    // dragging disabled mid drag
+    if (!nextProps.isEnabled) {
+      this.sensors.forEach((sensor: Sensor) => {
+        if (sensor.isCapturing()) {
+          const wasDragging: boolean = sensor.isDragging();
+
+          // stop listening
+          sensor.kill();
+
+          // we need to cancel the drag if it was dragging
+          if (wasDragging) {
+            this.props.callbacks.onCancel();
+          }
+        }
+      });
+    }
   }
 
   onKeyDown = (event: MouseEvent) => {
@@ -72,8 +94,9 @@ export default class DragHandle extends Component {
   }
 
   onMouseDown = (event: MouseEvent) => {
-    // let the keyboard sensor deal with it
+    // let the keyboard sensor deal with it if it is capturing
     if (this.keyboardSensor.isCapturing()) {
+      console.log('keyboard is capturing')
       return;
     }
 
@@ -94,8 +117,11 @@ export default class DragHandle extends Component {
     this.touchSensor.onTouchMove(event);
   }
 
-  isSensorDragging = () =>
+  isAnySensorDragging = () =>
     this.sensors.some((sensor: Sensor) => sensor.isDragging())
+
+  isAnySensorCapturing = () =>
+    this.sensors.some((sensor: Sensor) => sensor.isCapturing())
 
   getProvided = memoizeOne((isEnabled: boolean, isDragging: boolean): ?Provided => {
     if (!isEnabled) {
@@ -121,6 +147,6 @@ export default class DragHandle extends Component {
   render() {
     const { children, isEnabled } = this.props;
 
-    return children(this.getProvided(isEnabled, this.isSensorDragging()));
+    return children(this.getProvided(isEnabled, this.isAnySensorDragging()));
   }
 }

@@ -3,7 +3,6 @@
 import stopEvent from '../util/stop-event';
 import createScheduler from '../util/create-scheduler';
 import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
-import isForcePress from '../util/is-force-press';
 import * as keyCodes from '../../key-codes';
 import blockStandardKeyEvents from '../util/block-standard-key-events';
 import type {
@@ -13,8 +12,12 @@ import type {
   Callbacks,
   MouseSensor,
   Props,
-  MouseForceChangedEvent,
 } from '../drag-handle-types';
+
+// Custom event format for force press inputs
+type MouseForceChangedEvent = MouseEvent & {
+  webkitForce?: number,
+}
 
 type State = {
   isDragging: boolean,
@@ -149,7 +152,15 @@ export default (callbacks: Callbacks): MouseSensor => {
     // Only for safari which has decided to introduce its own custom way of doing things
     // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
     webkitmouseforcechanged: (event: MouseForceChangedEvent) => {
-      if (isForcePress(event)) {
+      if (event.webkitForce == null || MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null) {
+        console.error('handling a mouse force changed event when it is not supported');
+        return false;
+      }
+
+      const forcePressThreshold: number = (MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN : any);
+      const isForcePressing: boolean = event.webkitForce >= forcePressThreshold;
+
+      if (isForcePressing) {
         cancel();
       }
     },

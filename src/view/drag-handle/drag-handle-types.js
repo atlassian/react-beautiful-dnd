@@ -48,8 +48,3 @@ export type Props = {|
   draggableRef: ?HTMLElement,
   children: (?Provided) => void,
 |}
-
-// Custom event format for force press inputs
-export type MouseForceChangedEvent = MouseEvent & {
-  webkitForce?: number,
-}

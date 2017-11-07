@@ -3,8 +3,6 @@
 import stopEvent from '../util/stop-event';
 import createScheduler from '../util/create-scheduler';
 import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
-import isForcePress from '../util/is-force-press';
-import { isEqual } from '../../../state/position';
 import type {
   Position,
 } from '../../../types';
@@ -12,7 +10,6 @@ import type {
   Callbacks,
   TouchSensor,
   Props,
-  MouseForceChangedEvent,
 } from '../drag-handle-types';
 
 type State = {

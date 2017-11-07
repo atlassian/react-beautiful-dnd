@@ -139,6 +139,8 @@ export default (callbacks: Callbacks): KeyboardSensor => {
   };
 
   const windowBindings = {
+    // any mouse down kills a drag
+    mousedown: cancel,
     resize: cancel,
     // currently not supporting window scrolling with a keyboard
     scroll: cancel,

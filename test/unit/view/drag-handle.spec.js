@@ -3,7 +3,8 @@ import React, { Component } from 'react';
 import { mount } from 'enzyme';
 // eslint-disable-next-line no-duplicate-imports
 import type { ReactWrapper } from 'enzyme';
-import DragHandle, { sloppyClickThreshold } from '../../../src/view/drag-handle/drag-handle';
+import DragHandle from '../../../src/view/drag-handle/drag-handle';
+import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
 // eslint-disable-next-line no-duplicate-imports
 import type { Callbacks, Provided } from '../../../src/view/drag-handle/drag-handle-types';
 import { dispatchWindowMouseEvent, dispatchWindowKeyDownEvent, mouseEvent, withKeyboard } from '../../utils/user-input-util';
@@ -87,6 +88,7 @@ class Child extends Component {
 }
 
 const windowMouseUp = dispatchWindowMouseEvent.bind(null, 'mouseup');
+const windowMouseDown = dispatchWindowMouseEvent.bind(null, 'mousedown');
 const windowMouseMove = dispatchWindowMouseEvent.bind(null, 'mousemove');
 const mouseDown = mouseEvent.bind(null, 'mousedown');
 const click = mouseEvent.bind(null, 'click');
@@ -96,9 +98,28 @@ const pressArrowDown = withKeyboard(keyCodes.arrowDown);
 const pressArrowUp = withKeyboard(keyCodes.arrowUp);
 const pressArrowRight = withKeyboard(keyCodes.arrowRight);
 const pressArrowLeft = withKeyboard(keyCodes.arrowLeft);
+const pressEscape = withKeyboard(keyCodes.escape);
 const windowEscape = dispatchWindowKeyDownEvent.bind(null, keyCodes.escape);
+const pressTab = withKeyboard(keyCodes.tab);
 const windowTab = dispatchWindowKeyDownEvent.bind(null, keyCodes.tab);
+const pressEnter = withKeyboard(keyCodes.enter);
 const windowEnter = dispatchWindowKeyDownEvent.bind(null, keyCodes.enter);
+
+type MockEvent = {|
+  preventDefault: Function,
+  stopPropagation: Function,
+|}
+
+const getMockEvent = (): MockEvent => ({
+  preventDefault: jest.fn(),
+  stopPropagation: jest.fn(),
+});
+
+const wasEventStopped = (mockEvent: MockEvent): boolean =>
+  Boolean(
+    mockEvent.preventDefault.mock.calls.length &&
+    mockEvent.stopPropagation.mock.calls.length
+  );
 
 describe('drag handle', () => {
   let callbacks: Callbacks;
@@ -167,6 +188,14 @@ describe('drag handle', () => {
 
           customWrapper.unmount();
         });
+      });
+
+      it('should stop the initial mousedown event', () => {
+        const mockEvent: MockEvent = getMockEvent();
+
+        mouseDown(wrapper, 0, 0, primaryButton, mockEvent);
+
+        expect(wasEventStopped(mockEvent)).toBe(true);
       });
 
       it('should not start a drag if there was no mouse movement while mouse was pressed', () => {
@@ -551,6 +580,19 @@ describe('drag handle', () => {
         })).toBe(true);
       });
 
+      it('should prevent the default Escape action', () => {
+        mouseDown(wrapper);
+        windowMouseMove(0, sloppyClickThreshold);
+
+        const event = windowEscape();
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onCancel: 1,
+        })).toBe(true);
+        expect(event.defaultPrevented).toEqual(true);
+      });
+
       it('should stop listening to mouse events after a cancel', () => {
         // lift
         mouseDown(wrapper);
@@ -666,6 +708,10 @@ describe('drag handle', () => {
     });
 
     describe('disabled mid drag', () => {
+      it('should cancel a pending drag', () => {
+
+      });
+
       it('should cancel an existing drag', () => {
         // lift
         mouseDown(wrapper);
@@ -985,13 +1031,11 @@ describe('drag handle', () => {
       });
 
       it('should stop the event before it can be listened to', () => {
-        const preventDefault = jest.fn();
-        const stopPropagation = jest.fn();
+        const mockEvent: MockEvent = getMockEvent();
 
-        pressSpacebar(wrapper, { preventDefault, stopPropagation });
+        pressSpacebar(wrapper, mockEvent);
 
-        expect(preventDefault).toHaveBeenCalled();
-        expect(stopPropagation).toHaveBeenCalled();
+        expect(wasEventStopped(mockEvent)).toBe(true);
       });
 
       it('should not lift if told it cannot lift', () => {
@@ -1021,18 +1065,23 @@ describe('drag handle', () => {
 
     describe('progress', () => {
       it('should prevent tabbing away from the element while dragging', () => {
+        const mockEvent: MockEvent = getMockEvent();
+
         pressSpacebar(wrapper);
+        // pressing tab on the element itself as it must have focus to drag
+        pressTab(wrapper, mockEvent);
 
-        const event: KeyboardEvent = windowTab();
-
-        expect(event.defaultPrevented).toBe(true);
+        expect(wasEventStopped(mockEvent)).toBe(true);
       });
 
       it('should prevent submitting the dragging item', () => {
-        pressSpacebar(wrapper);
-        const event: KeyboardEvent = windowEnter();
+        const mockEvent: MockEvent = getMockEvent();
 
-        expect(event.defaultPrevented).toBe(true);
+        pressSpacebar(wrapper);
+        // pressing enter on the element itself as it must have focus to drag
+        pressEnter(wrapper, mockEvent);
+
+        expect(wasEventStopped(mockEvent)).toBe(true);
       });
 
       it('should not take into account any mouse movements', () => {
@@ -1328,14 +1377,17 @@ describe('drag handle', () => {
     });
 
     describe('cancel', () => {
-      it('should cancel the drag when the user presses escape', () => {
+      it('should cancel the drag when the user presses escape and stop the event', () => {
+        const mockEvent: MockEvent = getMockEvent();
+
         pressSpacebar(wrapper);
-        windowEscape();
+        pressEscape(wrapper, mockEvent);
 
         expect(callbacksCalled(callbacks)({
           onKeyLift: 1,
           onCancel: 1,
         })).toBe(true);
+        expect(wasEventStopped(mockEvent)).toBe(true);
       });
 
       it('should cancel when the user pushes any mouse button', () => {
@@ -1343,7 +1395,7 @@ describe('drag handle', () => {
 
         mouseButtons.forEach((button: number, index: number): void => {
           pressSpacebar(wrapper);
-          mouseDown(wrapper, 0, 0, button);
+          windowMouseDown(button);
           // should now do nothing
           pressArrowUp(wrapper);
 
@@ -1484,7 +1536,7 @@ describe('drag handle', () => {
       it('should allow drags after a cancel', () => {
         // cancelled drag
         pressSpacebar(wrapper);
-        windowEscape();
+        pressEscape(wrapper);
 
         expect(callbacksCalled(callbacks)({
           onKeyLift: 1,
@@ -1502,6 +1554,10 @@ describe('drag handle', () => {
         })).toBe(true);
       });
     });
+  });
+
+  describe('touch dragging', () => {
+
   });
 
   describe('drag disabled', () => {
