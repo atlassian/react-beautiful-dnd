@@ -9,7 +9,12 @@ Beautiful, accessible drag and drop for lists with [`React.js`](https://facebook
 
 ## Examples 🎉
 
-See how beautiful it is for yourself - [have a play with the examples!](https://react-beautiful-dnd.netlify.com)
+See how beautiful it is for yourself!
+
+- [Viewing on a desktop](https://react-beautiful-dnd.netlify.com)
+- [Viewing on a mobile or tablet](https://react-beautiful-dnd.netlify.com/iframe.html)
+
+> We provide different links as currently [storybook](https://github.com/storybooks/storybook) does not have a good menu experience for mobile [more information](https://github.com/storybooks/storybook/issues/124)
 
 ## Core characteristics:
 
@@ -18,15 +23,15 @@ See how beautiful it is for yourself - [have a play with the examples!](https://
 - Unopinionated styling
 - No creation of additional wrapper dom nodes - flexbox and focus management friendly!
 - Plays well with existing interactive nodes such as anchors
-- State driven dragging - which allows for dragging from many input types, including programatic dragging.
+- State driven dragging - which allows for dragging from many input types
 
 ## Not for everyone
 
 There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing [`react-dnd`](https://github.com/react-dnd/react-dnd). It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **`react-beautiful-dnd` is a higher level abstraction specifically built for vertical and horizontal lists**. Within that subset of functionality `react-beautiful-dnd` offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by react-dnd. So this library might not be for you depending on what your use case is.
 
-## Still young!
+## Still young
 
-This library is still fairly new and so there is a relatively small feature set. Be patient! Things will be moving rather quickly!
+This library is still fairly new and so there is a relatively small feature set. Be patient - things will be moving rather quickly.
 
 ### Currently supported feature set
 
@@ -298,31 +303,50 @@ There is current limitation of keyboard dragging: **the drag will cancel if the 
 
 `react-beautiful-dnd` supports dragging on touch devices such as mobiles and tablets.
 
-### Sloppy taps, navigation blocking and scrolling
+### Understanding intention: tap, force press, scroll and drag
 
-> Similar to the logic for starting a mouse drag but a little more complex
+When a user presses their finger (or other input) on a `Draggable` we are not sure if they where intending to *tap*, *force press*, *scroll the container* or *drag*. As much as possible `react-beautiful-dnd` aims to ensure that a users default interaction experience remains unaffected.
 
-When a user presses their finger on an element, we cannot determine if the user was tapping, force pressing (safari), scrolling or dragging. Also, sometimes when a user taps they may move their finger (or some other touch input) slightly but still be intending to tap - a sloppy tap. We start a drag if a user presses on an element and holds for a small period of time without moving beyond a small threshold (press and hold). If the user lifts their finger before this small period of time has elapsed then the interaction will be treated as a tap (click). If the user moves beyond the distance threshold within the initial time period then a drag will not start.
+- A user starts a drag by holding their finger 👇 on an element for a small period of time 🕑 (long press)
+- If the user lifts their finger before the timer is finished then we release the event to the browser for it to determine whether to perform the standard tap / click action. This allows you to have a `Draggable` that is both clickable such as a anchor as well as draggable.
+- If the user moves beyond a small threshold before the drag start timer finishes then it is determined that the user was intending to scroll rather than drag and a drag will not start. Unfortunately by the time we know this we need to opt out of native scrolling. This means that a user will not be able to scroll a container / the view port if they start the drag on a `Draggable`. This is unfortunate but opting out of native scrolling can only be done before we know if it was a scroll or not. This is standard in drag and drop libraries but we wanted to call it out
+- *Safari only*: if the user force presses on the element before they have moved the element (even if a drag has already started) then the drag is cancelled and the standard force press action occurs. For an anchor this is a website preview.
 
-### Recommendations
+### `Draggable` anchors
 
-In order for users to have a good experience using touch dragging we suggest that you implement the following recommendations:
+If the element you are dragging is an anchor `<a>` there are a few additional steps we recommend that you take.
 
-#### `Draggable` Anchors
+A long press on anchors usually pops a content menu that has options for the link such as 'Open in new tab'. Because long press is used to start a drag you will need to opt out of this behavior using this css:
 
-If the element you are dragging is an anchor `<a>` we recommend that you add the following styles:
+```css
+-webkit-touch-callout: none;
+```
 
-- Disable tap highlight colors. By default webkit based browsers will add a grey overlay to anchors when they are active [more information](https://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/).
+Webkit based browsers add a grey overlay to anchors when they are active. We recommend that you remove this tap overlay as it is confusing for users. [more information](https://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/).
 
 ```css
 -webkit-tap-highlight-color: rgba(0,0,0,0);
 ```
 
-- Disable the 'open in new tab' dialog. This prevents a dialog popping when a user long presses an anchor
+### Vibration
 
-```css
--webkit-touch-callout: none;
+If you like you could also trigger a [vibration event](https://developer.mozilla.org/en-US/docs/Web/API/Vibration_API) when the user picks up a `Draggable`. This can provide tactile feedback that the user is doing something. It currently is only supported in Chrome on Android.
+
+```js
+class App extends React.Component {
+  onDragStart = () => {
+    // good times
+    if (window.navigator.vibrate) {
+      window.navigator.vibrate(200);
+    }
+  };
+  /*...*/
+}
 ```
+
+### Auto scrolling currently not supported
+
+Currently auto scrolling is not supported. This means that when a user moves a `Draggable` to the edge of a container or the screen it will not scroll. We are looking at [adding support for this soon](https://github.com/atlassian/react-beautiful-dnd/issues/27).
 
 ## Installation
 
@@ -442,6 +466,10 @@ Because this library does not control your state, it is up to you to *synchronou
 - if the `destination` is `null`: all done!
 - if `source.droppableId` equals `destination.droppableId` you need to remove the item from your list and insert it at the correct position.
 - if `source.droppableId` does not equal `destination.droppableId`, then you need to remove the `Draggable` from the `source.droppableId` list and add it into the correct position of the `destination.droppableId` list.
+
+### Persisting a reorder
+
+If you need to persist a reorder to a remote data store - update the list synchronously on the client and fire off a request in the background to persist the change. If the remote save fails it is up to you how to communicate that to the user and update, or not update, the list.
 
 ### Type information
 

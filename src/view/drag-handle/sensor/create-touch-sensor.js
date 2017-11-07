@@ -4,6 +4,7 @@ import stopEvent from '../util/stop-event';
 import createScheduler from '../util/create-scheduler';
 import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
 import isForcePress from '../util/is-force-press';
+import { isEqual } from '../../../state/position';
 import type {
   Position,
 } from '../../../types';
@@ -16,20 +17,32 @@ import type {
 
 type State = {
   isDragging: boolean,
+  hasMoved: boolean,
   startTimerId: ?number,
   pending: ?Position,
 }
 
+type TouchWithForce = Touch & {
+  force: number
+}
+
 const noop = (): void => { };
 
+const initial: State = {
+  isDragging: false,
+  pending: null,
+  hasMoved: false,
+  startTimerId: null,
+};
+
 export default (callbacks: Callbacks): TouchSensor => {
-  let state: State = {
-    isDragging: false,
-    pending: null,
-    startTimerId: null,
-  };
-  const setState = (newState: State): void => {
-    state = newState;
+  let state: State = initial;
+
+  const setState = (partial: Object): void => {
+    state = {
+      ...state,
+      ...partial,
+    };
   };
   const isDragging = (): boolean => state.isDragging;
   const isCapturing = (): boolean =>
@@ -38,23 +51,30 @@ export default (callbacks: Callbacks): TouchSensor => {
 
   const startDragging = (fn?: Function = noop) => {
     setState({
-      pending: null,
       isDragging: true,
+      // has not moved from original position yet
+      hasMoved: false,
+      // no longer relevant
+      pending: null,
       startTimerId: null,
     });
     fn();
   };
   const stopDragging = (fn?: Function = noop) => {
     unbindWindowEvents();
-    setState({
-      isDragging: false,
-      pending: null,
-      startTimerId: null,
-    });
+    setState(initial);
     fn();
   };
 
-  const startPendingDrag = (point: Position) => {
+  const startPendingDrag = (event: TouchEvent) => {
+    const touch: Touch = event.touches[0];
+    const { clientX, clientY } = touch;
+    const point: Position = {
+      x: clientX,
+      y: clientY,
+    };
+
+    console.log('start pending drag');
     const startTimerId: number = setTimeout(
       () => startDragging(callbacks.onLift(point)),
       200
@@ -63,6 +83,7 @@ export default (callbacks: Callbacks): TouchSensor => {
       startTimerId,
       pending: point,
       isDragging: false,
+      hasMoved: false,
     });
     bindWindowEvents();
   };
@@ -71,11 +92,7 @@ export default (callbacks: Callbacks): TouchSensor => {
     clearTimeout(state.startTimerId);
     unbindWindowEvents();
 
-    setState({
-      startTimerId: null,
-      pending: null,
-      isDragging: false,
-    });
+    setState(initial);
   };
 
   const kill = (fn?: Function = noop) => {
@@ -99,6 +116,12 @@ export default (callbacks: Callbacks): TouchSensor => {
         y: clientY,
       };
 
+      // event already stopped in onTouchMove but being caucious
+      stopEvent(event);
+      setState({
+        hasMoved: true,
+      });
+
       if (state.pending) {
         if (isSloppyClickThresholdExceeded(state.pending, point)) {
           // Moved too far before the timer finished.
@@ -107,26 +130,22 @@ export default (callbacks: Callbacks): TouchSensor => {
           return;
         }
         // threshold not yet exceed and timeout not finished
-        stopEvent(event);
         return;
       }
 
       // already dragging
       schedule.move(point);
-      stopEvent(event);
+
+      if (!state.hasMoved) {
+        setState({
+          hasMoved: true,
+        });
+      }
     },
     touchend: (event: TouchEvent) => {
       if (state.pending) {
         stopPendingDrag();
-        // Because we called event.preventDefault in touchstart all mouse events
-        // including 'click' are stopped. At this point we know that the user as actually intending
-        // to click (tap) so we need to manually fire a click
-
-        // Appeasing flow with check
-        if (event.target instanceof HTMLElement) {
-          event.target.click();
-        }
-
+        // not stopping the event as this can be registered as a tap
         return;
       }
 
@@ -141,9 +160,14 @@ export default (callbacks: Callbacks): TouchSensor => {
       }
       cancel();
     },
+    // if the orientation of the device changes - kill the drag
+    // https://davidwalsh.name/orientation-change
+    orientationchange: cancel,
+    // some devices fire resize if the orientation changes
     resize: cancel,
-    // A window scroll will cancel a pending or current drag
-    // This will be looked at when auto scrolling is supported
+    // A window scroll will cancel a pending or current drag.
+    // This should not happen as we are calling preventDefault in touchmove,
+    // but just being extra safe
     scroll: cancel,
     // long press can bring up a context menu
     // need to opt out of this behavior
@@ -151,8 +175,15 @@ export default (callbacks: Callbacks): TouchSensor => {
     // Need to opt out of dragging if the user is a force press
     // Only for safari which has decided to introduce its own custom way of doing things
     // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
-    webkitmouseforcechanged: (event: MouseForceChangedEvent) => {
-      if (isForcePress(event)) {
+    touchforcechange: (event: TouchEvent) => {
+      // force push action will no longer fire after a touchmove
+      if (state.hasMoved) {
+        return;
+      }
+
+      const touch: TouchWithForce = (event.touches[0] : any);
+
+      if (touch.force >= 0.15) {
         cancel();
       }
     },
@@ -192,22 +223,28 @@ export default (callbacks: Callbacks): TouchSensor => {
       return;
     }
 
-    const { clientX, clientY } = event.touches[0];
-    const point: Position = {
-      x: clientX,
-      y: clientY,
-    };
+    // Not stopping the event as we want to allow force press and other events to occur
+    // Scrolling is stopped by onTouchMove
 
-    // Need to call preventDefault() in order to prevent native scrolling from occurring
-    // However, this will also swallow the click event. So if a pending drag is determined to be a
-    // tap then we need to manually trigger the click event.
-    stopEvent(event);
+    startPendingDrag(event);
+  };
 
-    startPendingDrag(point);
+  const onTouchMove = (event: TouchEvent) => {
+    // Need to call preventDefault() on the *first* touchmove
+    // in order to prevent native scrolling from occurring.
+    // Adding the global event handler for touchmove misses the first event
+    // https://twitter.com/alexandereardon/status/927671336435990528
+
+    if (isCapturing()) {
+      event.preventDefault();
+    }
+
+    // Not calling stopPropigation as we want the events to bubble to the global event handler
   };
 
   const sensor: TouchSensor = {
     onTouchStart,
+    onTouchMove,
     kill,
     isCapturing,
     isDragging,

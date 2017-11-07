@@ -34,8 +34,8 @@ export default (callbacks: Callbacks): MouseSensor => {
   };
   const setState = (partial: Object): void => {
     const newState: State = {
-      ...partial,
       ...state,
+      ...partial,
     };
     state = newState;
   };
