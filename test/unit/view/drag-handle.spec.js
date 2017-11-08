@@ -19,13 +19,13 @@ import type { Position } from '../../../src/types';
 import * as keyCodes from '../../../src/view/key-codes';
 import getWindowScrollPosition from '../../../src/view/get-window-scroll-position';
 import setWindowScroll from '../../utils/set-window-scroll';
+import getClientRect from '../../../src/state/get-client-rect';
 
 const primaryButton: number = 0;
 const auxiliaryButton: number = 1;
 
 const getStubCallbacks = (): Callbacks => ({
   onLift: jest.fn(),
-  onKeyLift: jest.fn(),
   onMove: jest.fn(),
   onMoveForward: jest.fn(),
   onMoveBackward: jest.fn(),
@@ -38,7 +38,6 @@ const getStubCallbacks = (): Callbacks => ({
 
 type CallBacksCalledFn = {|
   onLift?: number,
-  onKeyLift?: number,
   onMove?: number,
   onMoveForward?: number,
   onMoveBackward?: number,
@@ -51,7 +50,6 @@ type CallBacksCalledFn = {|
 
 const callbacksCalled = (callbacks: Callbacks) => ({
   onLift = 0,
-  onKeyLift = 0,
   onMove = 0,
   onMoveForward = 0,
   onMoveBackward = 0,
@@ -61,7 +59,6 @@ const callbacksCalled = (callbacks: Callbacks) => ({
   onCancel = 0,
 }: CallBacksCalledFn = {}) =>
   callbacks.onLift.mock.calls.length === onLift &&
-  callbacks.onKeyLift.mock.calls.length === onKeyLift &&
   callbacks.onMove.mock.calls.length === onMove &&
   callbacks.onMoveForward.mock.calls.length === onMoveForward &&
   callbacks.onMoveBackward.mock.calls.length === onMoveBackward &&
@@ -140,8 +137,20 @@ describe('drag handle', () => {
   let callbacks: Callbacks;
   let wrapper: ReactWrapper;
 
+  const fakeDraggableRef: HTMLElement = document.createElement('div');
+  const fakeCenter: Position = {
+    x: 50,
+    y: 80,
+  };
+
   beforeAll(() => {
     requestAnimationFrame.reset();
+    jest.spyOn(fakeDraggableRef, 'getBoundingClientRect').mockImplementation(() => getClientRect({
+      left: 0,
+      top: 0,
+      right: fakeCenter.x * 2,
+      bottom: fakeCenter.y * 2,
+    }));
   });
 
   beforeEach(() => {
@@ -154,6 +163,7 @@ describe('drag handle', () => {
         isDragging={false}
         isEnabled
         canLift
+        getDraggableRef={() => fakeDraggableRef}
       >
         {(dragHandleProps: Provided) => (
           <Child dragHandleProps={dragHandleProps} />
@@ -169,6 +179,7 @@ describe('drag handle', () => {
 
   afterAll(() => {
     requestAnimationFrame.reset();
+    fakeDraggableRef.getBoundingClientRect.mockRestore();
   });
 
   describe('mouse dragging', () => {
@@ -189,6 +200,7 @@ describe('drag handle', () => {
               isDragging={false}
               isEnabled
               canLift
+              getDraggableRef={() => fakeDraggableRef}
             >
               {(dragHandleProps: Provided) => (
                 <Child dragHandleProps={dragHandleProps} />
@@ -199,7 +211,8 @@ describe('drag handle', () => {
           mouseDown(customWrapper, 0, 0);
           windowMouseMove(point.x, point.y);
 
-          expect(customCallbacks.onLift).toHaveBeenCalledWith(point);
+          expect(customCallbacks.onLift)
+            .toHaveBeenCalledWith({ client: point, isScrollAllowed: true });
 
           customWrapper.unmount();
         });
@@ -1037,12 +1050,13 @@ describe('drag handle', () => {
 
   describe('keyboard dragging', () => {
     describe('initiation', () => {
-      it('should lift when a user presses the space bar', () => {
+      it('should lift when a user presses the space bar and use the center as the selection point', () => {
         pressSpacebar(wrapper);
 
-        expect(callbacksCalled(callbacks)({
-          onKeyLift: 1,
-        })).toBe(true);
+        expect(callbacks.onLift).toHaveBeenCalledWith({
+          client: fakeCenter,
+          isScrollAllowed: false,
+        });
       });
 
       it('should stop the event before it can be listened to', () => {
@@ -1061,7 +1075,7 @@ describe('drag handle', () => {
         pressSpacebar(wrapper);
 
         expect(callbacksCalled(callbacks)({
-          onKeyLift: 0,
+          onLift: 0,
         })).toBe(true);
       });
 
@@ -1073,7 +1087,7 @@ describe('drag handle', () => {
         pressSpacebar(wrapper);
 
         expect(callbacksCalled(callbacks)({
-          onKeyLift: 0,
+          onLift: 0,
         })).toBe(true);
       });
     });
@@ -1105,7 +1119,7 @@ describe('drag handle', () => {
         windowMouseMove();
 
         expect(callbacksCalled(callbacks)({
-          onKeyLift: 1,
+          onLift: 1,
           onMove: 0,
           onMoveForward: 0,
           onMoveBackward: 0,
@@ -1120,6 +1134,7 @@ describe('drag handle', () => {
             isDragging={false}
             isEnabled
             canLift
+            getDraggableRef={() => fakeDraggableRef}
           >
             {(dragHandleProps: Provided) => (
               <Child dragHandleProps={dragHandleProps} />
@@ -1130,7 +1145,7 @@ describe('drag handle', () => {
         pressSpacebar(customWrapper);
 
         expect(callbacksCalled(customCallbacks)({
-          onKeyLift: 1,
+          onLift: 1,
         })).toBe(true);
       });
 
@@ -1142,6 +1157,7 @@ describe('drag handle', () => {
             isDragging={false}
             isEnabled
             canLift
+            getDraggableRef={() => fakeDraggableRef}
           >
             {(dragHandleProps: Provided) => (
               <Child dragHandleProps={dragHandleProps} />
@@ -1157,7 +1173,7 @@ describe('drag handle', () => {
 
         expect(console.error).toHaveBeenCalled();
         expect(callbacksCalled(customCallbacks)({
-          onKeyLift: 1,
+          onLift: 1,
           onCancel: 1,
           onMoveForward: 0,
         })).toBe(true);
@@ -1171,7 +1187,7 @@ describe('drag handle', () => {
           requestAnimationFrame.step();
 
           expect(callbacksCalled(callbacks)({
-            onKeyLift: 1,
+            onLift: 1,
             onMoveBackward: 1,
           })).toBe(true);
         });
@@ -1183,7 +1199,7 @@ describe('drag handle', () => {
           requestAnimationFrame.step();
 
           expect(callbacksCalled(callbacks)({
-            onKeyLift: 1,
+            onLift: 1,
             onMoveForward: 1,
           })).toBe(true);
         });
@@ -1194,7 +1210,7 @@ describe('drag handle', () => {
           requestAnimationFrame.step();
 
           expect(callbacksCalled(callbacks)({
-            onKeyLift: 1,
+            onLift: 1,
             onCrossAxisMoveBackward: 1,
           })).toBe(true);
         });
@@ -1205,7 +1221,7 @@ describe('drag handle', () => {
           requestAnimationFrame.step();
 
           expect(callbacksCalled(callbacks)({
-            onKeyLift: 1,
+            onLift: 1,
             onCrossAxisMoveForward: 1,
           })).toBe(true);
         });
@@ -1224,6 +1240,7 @@ describe('drag handle', () => {
               isDragging={false}
               isEnabled
               canLift
+              getDraggableRef={() => fakeDraggableRef}
             >
               {(dragHandleProps: Provided) => (
                 <Child dragHandleProps={dragHandleProps} />
@@ -1242,7 +1259,7 @@ describe('drag handle', () => {
           requestAnimationFrame.step();
 
           expect(callbacksCalled(customCallbacks)({
-            onKeyLift: 1,
+            onLift: 1,
             onMoveBackward: 1,
           })).toBe(true);
         });
@@ -1253,7 +1270,7 @@ describe('drag handle', () => {
           requestAnimationFrame.step();
 
           expect(callbacksCalled(customCallbacks)({
-            onKeyLift: 1,
+            onLift: 1,
             onMoveForward: 1,
           })).toBe(true);
         });
@@ -1264,7 +1281,7 @@ describe('drag handle', () => {
           requestAnimationFrame.step();
 
           expect(callbacksCalled(customCallbacks)({
-            onKeyLift: 1,
+            onLift: 1,
             onCrossAxisMoveBackward: 1,
           })).toBe(true);
         });
@@ -1275,7 +1292,7 @@ describe('drag handle', () => {
           requestAnimationFrame.step();
 
           expect(callbacksCalled(customCallbacks)({
-            onKeyLift: 1,
+            onLift: 1,
             onCrossAxisMoveForward: 1,
           })).toBe(true);
         });
@@ -1291,7 +1308,7 @@ describe('drag handle', () => {
           requestAnimationFrame.step();
 
           expect(callbacksCalled(callbacks)({
-            onKeyLift: 1,
+            onLift: 1,
             onMove: 0,
             onMoveForward: 1,
             onMoveBackward: 0,
@@ -1301,7 +1318,7 @@ describe('drag handle', () => {
           requestAnimationFrame.flush();
 
           expect(callbacksCalled(callbacks)({
-            onKeyLift: 1,
+            onLift: 1,
             onMove: 0,
             onMoveForward: 1,
             onMoveBackward: 0,
@@ -1317,7 +1334,7 @@ describe('drag handle', () => {
           requestAnimationFrame.step();
 
           expect(callbacksCalled(callbacks)({
-            onKeyLift: 1,
+            onLift: 1,
             onMove: 0,
             onMoveForward: 0,
             onMoveBackward: 1,
@@ -1327,7 +1344,7 @@ describe('drag handle', () => {
           requestAnimationFrame.flush();
 
           expect(callbacksCalled(callbacks)({
-            onKeyLift: 1,
+            onLift: 1,
             onMove: 0,
             onMoveForward: 0,
             onMoveBackward: 1,
@@ -1345,7 +1362,7 @@ describe('drag handle', () => {
 
           expect(callbacksCalled(callbacks)({
             onMoveForward: 0,
-            onKeyLift: 1,
+            onLift: 1,
             onDrop: 1,
           })).toBe(true);
         });
@@ -1361,7 +1378,7 @@ describe('drag handle', () => {
 
           expect(callbacksCalled(callbacks)({
             onMoveBackward: 0,
-            onKeyLift: 1,
+            onLift: 1,
             onDrop: 1,
           })).toBe(true);
         });
@@ -1374,7 +1391,7 @@ describe('drag handle', () => {
         pressSpacebar(wrapper);
 
         expect(callbacksCalled(callbacks)({
-          onKeyLift: 1,
+          onLift: 1,
           onDrop: 1,
         })).toBe(true);
       });
@@ -1399,7 +1416,7 @@ describe('drag handle', () => {
         pressEscape(wrapper, mockEvent);
 
         expect(callbacksCalled(callbacks)({
-          onKeyLift: 1,
+          onLift: 1,
           onCancel: 1,
         })).toBe(true);
         expect(wasEventStopped(mockEvent)).toBe(true);
@@ -1415,7 +1432,7 @@ describe('drag handle', () => {
           pressArrowUp(wrapper);
 
           expect(callbacksCalled(callbacks)({
-            onKeyLift: index + 1,
+            onLift: index + 1,
             onCancel: index + 1,
           })).toBe(true);
         });
@@ -1428,7 +1445,7 @@ describe('drag handle', () => {
         window.dispatchEvent(new Event('resize'));
 
         expect(callbacksCalled(callbacks)({
-          onKeyLift: 1,
+          onLift: 1,
           onCancel: 1,
         })).toBe(true);
       });
@@ -1440,7 +1457,7 @@ describe('drag handle', () => {
         window.dispatchEvent(new Event('scroll'));
 
         expect(callbacksCalled(callbacks)({
-          onKeyLift: 1,
+          onLift: 1,
           onCancel: 1,
         })).toBe(true);
       });
@@ -1473,7 +1490,7 @@ describe('drag handle', () => {
         });
 
         expect(callbacksCalled(callbacks)({
-          onKeyLift: 1,
+          onLift: 1,
           onCancel: 1,
         })).toBe(true);
       });
@@ -1493,7 +1510,7 @@ describe('drag handle', () => {
         });
 
         expect(callbacksCalled(callbacks)({
-          onKeyLift: 1,
+          onLift: 1,
           onCancel: 0,
         })).toBe(true);
 
@@ -1509,7 +1526,7 @@ describe('drag handle', () => {
         requestAnimationFrame.flush();
 
         expect(callbacksCalled(callbacks)({
-          onKeyLift: 1,
+          onLift: 1,
           onCancel: 0,
         })).toBe(true);
       });
@@ -1523,7 +1540,7 @@ describe('drag handle', () => {
 
       it('should call the onCancel prop', () => {
         expect(callbacksCalled(callbacks)({
-          onKeyLift: 1,
+          onLift: 1,
           onCancel: 1,
         })).toBe(true);
       });
@@ -1541,7 +1558,7 @@ describe('drag handle', () => {
           pressSpacebar(wrapper);
 
           expect(callbacksCalled(callbacks)({
-            onKeyLift: val + 1,
+            onLift: val + 1,
             onMoveForward: val + 1,
             onDrop: val + 1,
           })).toBe(true);
@@ -1554,7 +1571,7 @@ describe('drag handle', () => {
         pressEscape(wrapper);
 
         expect(callbacksCalled(callbacks)({
-          onKeyLift: 1,
+          onLift: 1,
           onCancel: 1,
         })).toBe(true);
 
@@ -1564,7 +1581,7 @@ describe('drag handle', () => {
 
         expect(callbacksCalled(callbacks)({
           onCancel: 1,
-          onKeyLift: 2,
+          onLift: 2,
           onDrop: 1,
         })).toBe(true);
       });

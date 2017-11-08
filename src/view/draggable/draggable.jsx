@@ -73,7 +73,6 @@ export default class Draggable extends Component {
       onMove: this.onMove,
       onDrop: this.onDrop,
       onCancel: this.onCancel,
-      onKeyLift: this.onKeyLift,
       onMoveBackward: this.onMoveBackward,
       onMoveForward: this.onMoveForward,
       onCrossAxisMoveForward: this.onCrossAxisMoveForward,
