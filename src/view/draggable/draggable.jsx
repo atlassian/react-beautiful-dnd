@@ -103,42 +103,20 @@ export default class Draggable extends Component {
     this.props.dropAnimationFinished(this.props.draggableId);
   }
 
-  onLift = (point: Position) => {
+  onLift = (options: {client: Position, isScrollAllowed: boolean}) => {
     this.throwIfCannotDrag();
+    const { client, isScrollAllowed } = options;
     const { lift, draggableId, type } = this.props;
     const { ref } = this.state;
 
-    const windowScroll: Position = getWindowScrollPosition();
-
-    const client: InitialDragLocation = {
-      selection: point,
+    const initial: InitialDragLocation = {
+      selection: client,
       center: getCenterPosition(ref),
     };
 
-    // Allowing scrolling with a mouse when lifting with a mouse
-    const isScrollAllowed = true;
-
-    lift(draggableId, type, client, windowScroll, isScrollAllowed);
-  }
-
-  onKeyLift = () => {
-    this.throwIfCannotDrag();
-    const { lift, draggableId, type } = this.props;
-    const { ref } = this.state;
-
-    // using center position as selection
-    const center: Position = getCenterPosition(ref);
-
-    const client: InitialDragLocation = {
-      selection: center,
-      center,
-    };
-
     const windowScroll: Position = getWindowScrollPosition();
-    // not allowing scrolling with a mouse when lifting with a keyboard
-    const isScrollAllowed = false;
 
-    lift(draggableId, type, client, windowScroll, isScrollAllowed);
+    lift(draggableId, type, initial, windowScroll, isScrollAllowed);
   }
 
   onMove = (client: Position) => {
@@ -210,6 +188,8 @@ export default class Draggable extends Component {
       ref,
     });
   })
+
+  getDraggableRef = (): ?HTMLElement => this.state.ref;
 
   getPlaceholder() {
     const dimension: ?DraggableDimension = this.props.dimension;
@@ -360,7 +340,7 @@ export default class Draggable extends Component {
               isEnabled={!isDragDisabled}
               canLift={canLift}
               callbacks={this.callbacks}
-              draggableRef={this.state.ref}
+              getDraggableRef={this.getDraggableRef}
             >
               {(dragHandleProps: ?DragHandleProvided) =>
                 children(
@@ -377,7 +357,7 @@ export default class Draggable extends Component {
                 )
               }
             </DragHandle>
-        )}
+          )}
         </Moveable>
       </DraggableDimensionPublisher>
     );

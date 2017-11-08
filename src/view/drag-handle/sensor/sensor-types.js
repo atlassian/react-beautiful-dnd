@@ -1,7 +1,8 @@
 // @flow
-import type { Props } from '../drag-handle-types';
+import type { HTMLElement } from '../../../types';
+import type { Props, Callbacks } from '../drag-handle-types';
 
-type Sensor = {|
+export type Sensor = {
   // force stop and do not fire any events
   kill: () => void,
   // Is the sensor currently recording a drag
@@ -9,21 +10,25 @@ type Sensor = {|
   // Is the sensor listening for events.
   // This can happen before a drag starts
   isCapturing: () => boolean,
+}
+
+export type CreateSensorArgs = {|
+  callbacks: Callbacks,
+  getDraggableRef: () => ?HTMLElement
 |}
 
-export type MouseSensor = {
-  ...Sensor,
+export type MouseSensor = Sensor & {
   onMouseDown: (event: MouseEvent, props: Props) => void,
   onClick: (event: MouseEvent) => void,
 }
 
-export type KeyboardSensor = {
-  ...Sensor,
+export type KeyboardSensor = Sensor & {
   onKeyDown: (event: MouseEvent, props: Props) => void,
 }
 
-export type TouchSensor = {
-  ...Sensor,
-  onTouchStart: (event: MouseEvent, props: Props) => void,
-  onTouchMove: (event: MouseEvent) => void,
+export type TouchSensor = Sensor & {
+  onTouchStart: (event: TouchEvent, props: Props) => void,
+  onTouchMove: (event: TouchEvent) => void,
 }
+
+// export type CreateSensor = (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement) => Sensor

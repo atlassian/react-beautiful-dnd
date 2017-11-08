@@ -3,10 +3,12 @@
 import stopEvent from '../util/stop-event';
 import createScheduler from '../util/create-scheduler';
 import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
+import getWindowFromRef from '../../get-window-from-ref';
 import * as keyCodes from '../../key-codes';
 import blockStandardKeyEvents from '../util/block-standard-key-events';
 import type {
   Position,
+  HTMLElement,
 } from '../../../types';
 import type {
   Callbacks,
@@ -29,7 +31,7 @@ type State = {
 const primaryButton = 0;
 const noop = () => { };
 
-export default (callbacks: Callbacks): MouseSensor => {
+export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): MouseSensor => {
   let state: State = {
     isDragging: false,
     pending: null,
@@ -114,7 +116,7 @@ export default (callbacks: Callbacks): MouseSensor => {
         return;
       }
 
-      startDragging(() => callbacks.onLift(point));
+      startDragging(() => callbacks.onLift({ client: point, isScrollAllowed: true }));
     },
     mouseup: () => {
       if (state.pending) {
@@ -154,7 +156,7 @@ export default (callbacks: Callbacks): MouseSensor => {
     webkitmouseforcechanged: (event: MouseForceChangedEvent) => {
       if (event.webkitForce == null || MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null) {
         console.error('handling a mouse force changed event when it is not supported');
-        return false;
+        return;
       }
 
       const forcePressThreshold: number = (MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN : any);
@@ -169,19 +171,23 @@ export default (callbacks: Callbacks): MouseSensor => {
   const eventKeys = Object.keys(windowBindings);
 
   const bindWindowEvents = () => {
+    const win: HTMLElement = getWindowFromRef(getDraggableRef());
+
     eventKeys.forEach((eventKey: string) => {
       if (eventKey === 'scroll') {
-        window.addEventListener(eventKey, windowBindings.scroll, { passive: true });
+        win.addEventListener(eventKey, windowBindings.scroll, { passive: true });
         return;
       }
 
-      window.addEventListener(eventKey, windowBindings[eventKey]);
+      win.addEventListener(eventKey, windowBindings[eventKey]);
     });
   };
 
   const unbindWindowEvents = () => {
+    const win: HTMLElement = getWindowFromRef(getDraggableRef());
+
     eventKeys.forEach((eventKey: string) =>
-      window.removeEventListener(eventKey, windowBindings[eventKey])
+      win.removeEventListener(eventKey, windowBindings[eventKey])
     );
   };
 

@@ -3,14 +3,16 @@
 import stopEvent from '../util/stop-event';
 import createScheduler from '../util/create-scheduler';
 import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
+import getWindowFromRef from '../../get-window-from-ref';
 import type {
   Position,
+  HTMLElement,
 } from '../../../types';
 import type {
   Callbacks,
-  TouchSensor,
   Props,
 } from '../drag-handle-types';
+import type { TouchSensor } from './sensor-types';
 
 type State = {
   isDragging: boolean,
@@ -32,7 +34,11 @@ const initial: State = {
   startTimerId: null,
 };
 
-export default (callbacks: Callbacks): TouchSensor => {
+// export const createTouchSensor: CreateSensor = (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): TouchSensor => {
+//   console.log('hi there');
+// };
+
+export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): TouchSensor => {
   let state: State = initial;
 
   const setState = (partial: Object): void => {
@@ -72,7 +78,11 @@ export default (callbacks: Callbacks): TouchSensor => {
     };
 
     const startTimerId: number = setTimeout(
-      () => startDragging(callbacks.onLift(point)),
+      () => startDragging(callbacks.onLift({
+        client: point,
+        // not allowing container scrolling for touch movements at this stage
+        isScrollAllowed: false,
+      })),
       200
     );
     setState({
@@ -188,23 +198,27 @@ export default (callbacks: Callbacks): TouchSensor => {
   const eventKeys = Object.keys(windowBindings);
 
   const bindWindowEvents = () => {
+    const win: HTMLElement = getWindowFromRef(getDraggableRef());
+
     eventKeys.forEach((eventKey: string) => {
       const fn: Function = windowBindings[eventKey];
 
       if (eventKey === 'touchmove') {
         // opting out of passive touchmove (default) so as to prevent scrolling while moving
         // Not worried about performance as effect of move is throttled in requestAnimationFrame
-        window.addEventListener(eventKey, fn, { passive: false });
+        win.addEventListener(eventKey, fn, { passive: false });
         return;
       }
 
-      window.addEventListener(eventKey, fn);
+      win.addEventListener(eventKey, fn);
     });
   };
 
   const unbindWindowEvents = () => {
+    const win: HTMLElement = getWindowFromRef(getDraggableRef());
+
     eventKeys.forEach((eventKey: string) =>
-      window.removeEventListener(eventKey, windowBindings[eventKey]));
+      win.removeEventListener(eventKey, windowBindings[eventKey]));
   };
 
   // entry point

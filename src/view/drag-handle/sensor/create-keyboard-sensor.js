@@ -4,6 +4,9 @@ import stopEvent from '../util/stop-event';
 import createScheduler from '../util/create-scheduler';
 import blockStandardKeyEvents from '../util/block-standard-key-events';
 import * as keyCodes from '../../key-codes';
+import getWindowFromRef from '../../get-window-from-ref';
+import getCenterPosition from '../../get-center-position';
+import type { Position, HTMLElement } from '../../../types';
 import type {
   Callbacks,
   KeyboardSensor,
@@ -21,7 +24,7 @@ type ExecuteBasedOnDirection = {|
 
 const noop = () => { };
 
-export default (callbacks: Callbacks): KeyboardSensor => {
+export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): KeyboardSensor => {
   let state: State = {
     isDragging: false,
   };
@@ -63,7 +66,19 @@ export default (callbacks: Callbacks): KeyboardSensor => {
         return;
       }
       stopEvent(event);
-      startDragging(callbacks.onKeyLift);
+
+      const ref: ?HTMLElement = getDraggableRef();
+
+      if (!ref) {
+        console.error('cannot start a keyboard drag without a draggable ref');
+        return;
+      }
+
+      // using center position as selection
+      const center: Position = getCenterPosition(ref);
+
+      // not allowing scrolling with a mouse when lifting with a keyboard
+      startDragging(() => callbacks.onLift({ client: center, isScrollAllowed: false }));
       return;
     }
 
@@ -149,14 +164,18 @@ export default (callbacks: Callbacks): KeyboardSensor => {
   const eventKeys: string[] = Object.keys(windowBindings);
 
   const bindWindowEvents = () => {
+    const win: HTMLElement = getWindowFromRef(getDraggableRef());
+
     eventKeys.forEach((eventKey: string) => {
-      window.addEventListener(eventKey, windowBindings[eventKey]);
+      win.addEventListener(eventKey, windowBindings[eventKey]);
     });
   };
 
   const unbindWindowEvents = () => {
+    const win: HTMLElement = getWindowFromRef(getDraggableRef());
+
     eventKeys.forEach((eventKey: string) => {
-      window.removeEventListener(eventKey, windowBindings[eventKey]);
+      win.removeEventListener(eventKey, windowBindings[eventKey]);
     });
   };
 

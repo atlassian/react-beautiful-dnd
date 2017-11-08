@@ -13,7 +13,7 @@ import {
   dispatchWindowTouchEvent,
   mouseEvent,
   touchEvent,
-  withKeyboard
+  withKeyboard,
 } from '../../utils/user-input-util';
 import type { Position } from '../../../src/types';
 import * as keyCodes from '../../../src/view/key-codes';
@@ -1572,33 +1572,63 @@ describe('drag handle', () => {
   });
 
   describe('touch dragging', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+
+    });
+
     describe('initiation', () => {
       it('should start a drag on long press', () => {
+        const client: Position = {
+          x: 50,
+          y: 100,
+        };
 
+        touchStart(wrapper, client);
+        jest.runTimersToTime(sloppyClickThreshold);
+
+        expect(callbacks.onLift).toHaveBeenCalledWith(client);
+      });
+
+      it('should not start a drag until the drag start timer has completed', () => {
+        const client: Position = {
+          x: 50,
+          y: 100,
+        };
+
+        touchStart(wrapper, client);
+        jest.runTimersToTime(sloppyClickThreshold - 1);
+
+        expect(callbacksCalled({
+          onLift: 0,
+        })).toBe(true);
       });
 
       it('should opt out of native scrolling', () => {
 
       });
 
-      describe('not starting a drag', () => {
-        it('should allow standard tap interactions', () => {
+      it.skip('should allow standard tap interactions', () => {
+
+      });
+
+      describe('drag start timer not yet completed', () => {
+        it('should not start a drag if a touchcancel is fired', () => {
 
         });
 
-        it('should not start a drag after a touchcancel', () => {
+        it('should not start a drag if a touchcancel is fired', () => {
 
         });
 
-        it('should not start a drag after a touchend', () => {
+        it('should not start a drag if the user releases', () => {
 
         });
 
-        it('should not start a drag if the user releases before the timeout', () => {
-
-        });
-
-        it('should not start a drag if user moves too far before timeout', () => {
+        it('should not start a drag if user moves too far', () => {
 
         });
 
@@ -1614,12 +1644,16 @@ describe('drag handle', () => {
 
         });
       });
+
+      describe('not starting a drag', () => {
+
+      });
     });
 
     describe('progress', () => {
       it('should schedule a move to the new position', () => {
 
-      })
+      });
 
       it('should prevent any context menu from popping', () => {
 

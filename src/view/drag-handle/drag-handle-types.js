@@ -3,8 +3,7 @@ import type { Position, Direction, HTMLElement } from '../../types';
 export type DragTypes = 'KEYBOARD' | 'MOUSE' | 'TOUCH';
 
 export type Callbacks = {|
-  onLift: (point: Position) => void,
-  onKeyLift: () => void,
+  onLift: ({ client: Position, isScrollAllowed: boolean }) => void,
   onMove: (point: Position) => void,
   onWindowScroll: (diff: Position) => void,
   onMoveForward: () => void,
@@ -44,7 +43,7 @@ export type Props = {|
   // the direction of the current droppable
   direction: ?Direction,
   callbacks: Callbacks,
-  // the ref of the draggable
-  draggableRef: ?HTMLElement,
+  // get the ref of the draggable
+  getDraggableRef: () => ?HTMLElement,
   children: (?Provided) => void,
 |}

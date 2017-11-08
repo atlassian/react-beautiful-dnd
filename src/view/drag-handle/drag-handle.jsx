@@ -1,16 +1,16 @@
 // @flow
 import { Component } from 'react';
 import memoizeOne from 'memoize-one';
-// Using keyCode's for consistent event pattern matching between
-// React synthetic events as well as raw browser events.
 import type {
   Props,
   Provided,
+} from './drag-handle-types';
+import type {
   Sensor,
   MouseSensor,
   KeyboardSensor,
   TouchSensor,
-} from './drag-handle-types';
+} from './sensor/sensor-types';
 import createMouseSensor from './sensor/create-mouse-sensor';
 import createKeyboardSensor from './sensor/create-keyboard-sensor';
 import createTouchSensor from './sensor/create-touch-sensor';
@@ -20,9 +20,18 @@ const getFalse: () => boolean = () => false;
 export default class DragHandle extends Component {
   /* eslint-disable react/sort-comp */
   props: Props
-  mouseSensor: MouseSensor = createMouseSensor(this.props.callbacks);
-  keyboardSensor: KeyboardSensor = createKeyboardSensor(this.props.callbacks);
-  touchSensor: TouchSensor = createTouchSensor(this.props.callbacks);
+  mouseSensor: MouseSensor = createMouseSensor(
+    this.props.callbacks,
+    this.props.getDraggableRef
+  );
+  keyboardSensor: KeyboardSensor = createKeyboardSensor(
+    this.props.callbacks,
+    this.props.getDraggableRef
+  );
+  touchSensor: TouchSensor = createTouchSensor(
+    this.props.callbacks,
+    this.props.getDraggableRef
+  );
   sensors: Sensor[] = [
     this.mouseSensor,
     this.keyboardSensor,
