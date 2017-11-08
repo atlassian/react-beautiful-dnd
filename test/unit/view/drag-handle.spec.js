@@ -20,6 +20,7 @@ import * as keyCodes from '../../../src/view/key-codes';
 import getWindowScrollPosition from '../../../src/view/get-window-scroll-position';
 import setWindowScroll from '../../utils/set-window-scroll';
 import getClientRect from '../../../src/state/get-client-rect';
+import { timeForLongPress } from '../../../src/view/drag-handle/sensor/create-touch-sensor';
 
 const primaryButton: number = 0;
 const auxiliaryButton: number = 1;
@@ -1597,7 +1598,7 @@ describe('drag handle', () => {
 
     });
 
-    describe('initiation', () => {
+    describe.only('initiation', () => {
       it('should start a drag on long press', () => {
         const client: Position = {
           x: 50,
@@ -1605,27 +1606,31 @@ describe('drag handle', () => {
         };
 
         touchStart(wrapper, client);
-        jest.runTimersToTime(sloppyClickThreshold);
+        jest.runTimersToTime(timeForLongPress);
 
-        expect(callbacks.onLift).toHaveBeenCalledWith(client);
+        expect(callbacks.onLift).toHaveBeenCalledWith({ client, isScrollAllowed: false });
       });
 
-      it('should not start a drag until the drag start timer has completed', () => {
-        const client: Position = {
-          x: 50,
-          y: 100,
-        };
+      it('should opt out of native scrolling (touchmove first on element)', () => {
+        const mockEvent: MockEvent = getMockEvent();
 
-        touchStart(wrapper, client);
-        jest.runTimersToTime(sloppyClickThreshold - 1);
+        // start a drag
+        touchStart(wrapper);
+        jest.runTimersToTime(timeForLongPress);
+        // move on the element
+        touchMove(wrapper, { x: 0, y: 0 }, 0, mockEvent);
 
-        expect(callbacksCalled({
-          onLift: 0,
-        })).toBe(true);
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
       });
 
-      it('should opt out of native scrolling', () => {
+      it('should opt out of native scrolling (touchmove first on window)', () => {
+        // start a drag
+        touchStart(wrapper);
+        jest.runTimersToTime(timeForLongPress);
+        // move on the window
+        const event: TouchEvent = windowTouchMove();
 
+        expect(event.defaultPrevented).toBe(true);
       });
 
       it.skip('should allow standard tap interactions', () => {
@@ -1633,17 +1638,30 @@ describe('drag handle', () => {
       });
 
       describe('drag start timer not yet completed', () => {
-        it('should not start a drag if a touchcancel is fired', () => {
+        it('should not start a drag if the user releases before a long press', () => {
+          const client: Position = {
+            x: 50,
+            y: 100,
+          };
 
+          touchStart(wrapper, client);
+          // have not waited long enough
+          jest.runTimersToTime(timeForLongPress - 1);
+
+          expect(callbacksCalled(callbacks)({
+            onLift: 0,
+          })).toBe(true);
         });
 
         it('should not start a drag if a touchcancel is fired', () => {
 
         });
 
-        it('should not start a drag if the user releases', () => {
+        it('should not start a drag if a touchcancel is fired', () => {
 
         });
+
+
 
         it('should not start a drag if user moves too far', () => {
 

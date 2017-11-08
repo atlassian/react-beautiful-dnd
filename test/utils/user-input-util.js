@@ -3,6 +3,23 @@ import { Position } from '../../src/types';
 
 const primaryButton: number = 0;
 
+const getTouch = (client: Position, force: number): Touch => {
+  const touch: Touch = new window.Touch({
+    // const touch: Touch = {
+    identifier: Date.now(),
+    // being super generic here
+    target: window,
+    clientX: client.x,
+    clientY: client.y,
+    radiusX: 2.5,
+    radiusY: 2.5,
+    rotationAngle: 0,
+    force,
+  });
+
+  return touch;
+};
+
 export const dispatchWindowMouseEvent = (
   eventName: string,
   clientX?: number = 0,
@@ -44,15 +61,14 @@ export const dispatchWindowTouchEvent = (
   force?: number = 0,
   options?: Object = {},
 ): TouchEvent => {
-  const event = new window.TouchEvent(eventName, {
+  const touch: Touch = getTouch(client, force);
+  const event: TouchEvent = new window.TouchEvent(eventName, {
     bubbles: true,
     cancelable: true,
-    view: window,
-    touches: [{
-      clientX: client.x,
-      clientY: client.y,
-      force,
-    }],
+    touches: [touch],
+    targetTouches: [],
+    changedTouches: [touch],
+    shiftKey: false,
   });
 
   // override properties on the event itself
@@ -91,11 +107,9 @@ export const touchEvent = (
   force?: number = 0,
   options?: Object = {},
 ): void => {
-  const touches: Touch[] = [{
-    clientX: client.x,
-    clientY: client.y,
-    force,
-  }];
+  const touches: Touch[] = [
+    getTouch(client, force),
+  ];
 
   wrapper.simulate(eventName, { touches, ...options });
 };

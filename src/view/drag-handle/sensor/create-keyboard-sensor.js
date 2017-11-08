@@ -24,7 +24,7 @@ type ExecuteBasedOnDirection = {|
 
 const noop = () => { };
 
-export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): KeyboardSensor => {
+export default (callbacks: Callbacks, getDraggableRef: () =>?HTMLElement): KeyboardSensor => {
   let state: State = {
     isDragging: false,
   };
@@ -188,5 +188,5 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Keyb
   };
 
   return sensor;
-}
-;
+};
+

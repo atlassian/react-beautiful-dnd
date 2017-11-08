@@ -25,6 +25,8 @@ type TouchWithForce = Touch & {
   force: number
 }
 
+export const timeForLongPress: number = 200;
+
 const noop = (): void => { };
 
 const initial: State = {
@@ -33,10 +35,6 @@ const initial: State = {
   hasMoved: false,
   startTimerId: null,
 };
-
-// export const createTouchSensor: CreateSensor = (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): TouchSensor => {
-//   console.log('hi there');
-// };
 
 export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): TouchSensor => {
   let state: State = initial;
@@ -83,7 +81,7 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
         // not allowing container scrolling for touch movements at this stage
         isScrollAllowed: false,
       })),
-      200
+      timeForLongPress
     );
     setState({
       startTimerId,
@@ -121,6 +119,8 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
         x: clientX,
         y: clientY,
       };
+
+      console.log('window touch move')
 
       // event already stopped in onTouchMove but being caucious
       stopEvent(event);
