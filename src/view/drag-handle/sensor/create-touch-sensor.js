@@ -71,7 +71,6 @@ export default (callbacks: Callbacks): TouchSensor => {
       y: clientY,
     };
 
-    console.log('start pending drag');
     const startTimerId: number = setTimeout(
       () => startDragging(callbacks.onLift(point)),
       200

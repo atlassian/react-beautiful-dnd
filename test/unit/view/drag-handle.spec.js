@@ -7,7 +7,14 @@ import DragHandle from '../../../src/view/drag-handle/drag-handle';
 import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
 // eslint-disable-next-line no-duplicate-imports
 import type { Callbacks, Provided } from '../../../src/view/drag-handle/drag-handle-types';
-import { dispatchWindowMouseEvent, dispatchWindowKeyDownEvent, mouseEvent, withKeyboard } from '../../utils/user-input-util';
+import {
+  dispatchWindowMouseEvent,
+  dispatchWindowKeyDownEvent,
+  dispatchWindowTouchEvent,
+  mouseEvent,
+  touchEvent,
+  withKeyboard
+} from '../../utils/user-input-util';
 import type { Position } from '../../../src/types';
 import * as keyCodes from '../../../src/view/key-codes';
 import getWindowScrollPosition from '../../../src/view/get-window-scroll-position';
@@ -87,11 +94,13 @@ class Child extends Component {
   }
 }
 
+// mouse events
 const windowMouseUp = dispatchWindowMouseEvent.bind(null, 'mouseup');
 const windowMouseDown = dispatchWindowMouseEvent.bind(null, 'mousedown');
 const windowMouseMove = dispatchWindowMouseEvent.bind(null, 'mousemove');
 const mouseDown = mouseEvent.bind(null, 'mousedown');
 const click = mouseEvent.bind(null, 'click');
+// keyboard events
 const pressSpacebar = withKeyboard(keyCodes.space);
 const windowSpacebar = dispatchWindowKeyDownEvent.bind(null, keyCodes.space);
 const pressArrowDown = withKeyboard(keyCodes.arrowDown);
@@ -104,6 +113,12 @@ const pressTab = withKeyboard(keyCodes.tab);
 const windowTab = dispatchWindowKeyDownEvent.bind(null, keyCodes.tab);
 const pressEnter = withKeyboard(keyCodes.enter);
 const windowEnter = dispatchWindowKeyDownEvent.bind(null, keyCodes.enter);
+// touch events
+const touchStart = touchEvent.bind(null, 'touchstart');
+const touchMove = touchEvent.bind(null, 'touchmove');
+const windowTouchMove = dispatchWindowTouchEvent.bind(null, 'touchmove');
+const windowTouchEnd = dispatchWindowTouchEvent.bind(null, 'touchend');
+const windowTouchCancel = dispatchWindowTouchEvent.bind(null, 'touchcancel');
 
 type MockEvent = {|
   preventDefault: Function,
@@ -1557,7 +1572,72 @@ describe('drag handle', () => {
   });
 
   describe('touch dragging', () => {
+    describe('initiation', () => {
+      it('should start a drag on long press', () => {
 
+      });
+
+      it('should opt out of native scrolling', () => {
+
+      });
+
+      describe('not starting a drag', () => {
+        it('should allow standard tap interactions', () => {
+
+        });
+
+        it('should not start a drag after a touchcancel', () => {
+
+        });
+
+        it('should not start a drag after a touchend', () => {
+
+        });
+
+        it('should not start a drag if the user releases before the timeout', () => {
+
+        });
+
+        it('should not start a drag if user moves too far before timeout', () => {
+
+        });
+
+        it('should not start a drag after a resize', () => {
+
+        });
+
+        it('should not start a drag after a orientation change', () => {
+
+        });
+
+        it('should not start a drag after a window scroll', () => {
+
+        });
+      });
+    });
+
+    describe('progress', () => {
+      it('should schedule a move to the new position', () => {
+
+      })
+
+      it('should prevent any context menu from popping', () => {
+
+      });
+    });
+
+    describe('cancelling a drag that has started', () => {
+    });
+
+    describe('dropping', () => {
+      it('should drop a drag on touchend', () => {
+
+      });
+    });
+
+    describe('force press', () => {
+
+    });
   });
 
   describe('drag disabled', () => {

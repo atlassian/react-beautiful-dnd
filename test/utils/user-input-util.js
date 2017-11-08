@@ -1,4 +1,5 @@
 import { ReactWrapper } from 'enzyme';
+import { Position } from '../../src/types';
 
 const primaryButton: number = 0;
 
@@ -37,6 +38,30 @@ export const dispatchWindowKeyDownEvent = (
   return event;
 };
 
+export const dispatchWindowTouchEvent = (
+  eventName: string,
+  client?: Position = { x: 0, y: 0 },
+  force?: number = 0,
+  options?: Object = {},
+): TouchEvent => {
+  const event = new window.TouchEvent(eventName, {
+    bubbles: true,
+    cancelable: true,
+    view: window,
+    touches: [{
+      clientX: client.x,
+      clientY: client.y,
+      force,
+    }],
+  });
+
+  // override properties on the event itself
+  Object.assign(event, options);
+
+  window.dispatchEvent(event);
+  return event;
+};
+
 export const mouseEvent = (
   eventName: string,
   wrapper: ReactWrapper<any>,
@@ -58,3 +83,20 @@ export const liftWithMouse = (
 export const withKeyboard = (keyCode: number): Function =>
   (wrapper: ReactWrapper<any>, options?: Object = {}) =>
     wrapper.simulate('keydown', { keyCode, ...options });
+
+export const touchEvent = (
+  eventName: string,
+  wrapper: ReactWrapper<any>,
+  client?: Position = { x: 0, y: 0 },
+  force?: number = 0,
+  options?: Object = {},
+): void => {
+  const touches: Touch[] = [{
+    clientX: client.x,
+    clientY: client.y,
+    force,
+  }];
+
+  wrapper.simulate(eventName, { touches, ...options });
+};
+
