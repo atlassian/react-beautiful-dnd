@@ -120,8 +120,6 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
         y: clientY,
       };
 
-      console.log('window touch move')
-
       // event already stopped in onTouchMove but being caucious
       stopEvent(event);
       setState({
@@ -133,7 +131,6 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
           // Moved too far before the timer finished.
           // Letting the event go through without stopping it.
           stopPendingDrag();
-          return;
         }
         // threshold not yet exceed and timeout not finished
         return;

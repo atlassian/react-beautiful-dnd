@@ -1628,7 +1628,7 @@ describe('drag handle', () => {
         touchStart(wrapper);
         jest.runTimersToTime(timeForLongPress);
         // move on the window
-        const event: TouchEvent = windowTouchMove();
+        const event: Event = windowTouchMove();
 
         expect(event.defaultPrevented).toBe(true);
       });
@@ -1660,8 +1660,6 @@ describe('drag handle', () => {
         it('should not start a drag if a touchcancel is fired', () => {
 
         });
-
-
 
         it('should not start a drag if user moves too far', () => {
 

@@ -3,8 +3,11 @@ import { Position } from '../../src/types';
 
 const primaryButton: number = 0;
 
-const getTouch = (client: Position, force: number): Touch => {
-  const touch: Touch = new window.Touch({
+const getTouch = (client: Position, force: number): Object => {
+  // window.Touch not supported in jest yet so just returning an object
+
+  // const touch: Touch = new window.Touch({
+  const touch = {
     // const touch: Touch = {
     identifier: Date.now(),
     // being super generic here
@@ -15,7 +18,7 @@ const getTouch = (client: Position, force: number): Touch => {
     radiusY: 2.5,
     rotationAngle: 0,
     force,
-  });
+  };
 
   return touch;
 };
@@ -60,21 +63,25 @@ export const dispatchWindowTouchEvent = (
   client?: Position = { x: 0, y: 0 },
   force?: number = 0,
   options?: Object = {},
-): TouchEvent => {
-  const touch: Touch = getTouch(client, force);
-  const event: TouchEvent = new window.TouchEvent(eventName, {
-    bubbles: true,
-    cancelable: true,
+): Event => {
+  const touch = getTouch(client, force);
+  // window.TouchEvent constructor not supported in current version of Jest
+  // So using the old school document.createEvent \o/
+  const event: Event = document.createEvent('Event');
+  event.initEvent(eventName, true, true);
+
+  const touchOptions = {
     touches: [touch],
     targetTouches: [],
     changedTouches: [touch],
     shiftKey: false,
-  });
+  };
 
   // override properties on the event itself
-  Object.assign(event, options);
+  Object.assign(event, touchOptions, options);
 
   window.dispatchEvent(event);
+
   return event;
 };
 
@@ -107,7 +114,7 @@ export const touchEvent = (
   force?: number = 0,
   options?: Object = {},
 ): void => {
-  const touches: Touch[] = [
+  const touches: Object[] = [
     getTouch(client, force),
   ];
 
