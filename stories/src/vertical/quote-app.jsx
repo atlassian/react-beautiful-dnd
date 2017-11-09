@@ -53,7 +53,7 @@ export default class QuoteApp extends Component {
     // Add a little vibration if the browser supports it.
     // Add's a nice little physical feedback
     if (window.navigator.vibrate) {
-      window.navigator.vibrate(200);
+      window.navigator.vibrate(100);
     }
   }
 

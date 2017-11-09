@@ -50,7 +50,18 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
     Boolean(state.pending || state.isDragging || state.startTimerId);
   const schedule = createScheduler(callbacks, isDragging);
 
-  const startDragging = (fn?: Function = noop) => {
+  const startDragging = () => {
+    // Drag can start from either a timeout or user movement
+    // so we need to clear the timeout
+    clearTimeout(state.startTimerId);
+    const pending: ?Position = state.pending;
+
+    if (!state.pending) {
+      console.error('cannot start a touch drag without a pending position');
+      kill();
+      return;
+    }
+
     setState({
       isDragging: true,
       // has not moved from original position yet
@@ -59,7 +70,12 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
       pending: null,
       startTimerId: null,
     });
-    fn();
+
+    callbacks.onLift({
+      client: pending,
+      // not allowing container scrolling for touch movements at this stage
+      isScrollAllowed: false,
+    });
   };
   const stopDragging = (fn?: Function = noop) => {
     unbindWindowEvents();
@@ -127,23 +143,21 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
       });
 
       if (state.pending) {
-        if (isSloppyClickThresholdExceeded(state.pending, point)) {
-          // Moved too far before the timer finished.
-          // Letting the event go through without stopping it.
-          stopPendingDrag();
+        if (!isSloppyClickThresholdExceeded(state.pending, point)) {
+          return;
         }
-        // threshold not yet exceed and timeout not finished
+
+        // User is probably attempting to scroll. However, because we have opted
+        // out of native scrolling the best option is to start a drag rather than
+        // end the pending drag and do nothing.
+        // More information: https://github.com/atlassian/react-beautiful-dnd/issues/11#issuecomment-343288990
+
+        startDragging();
         return;
       }
 
       // already dragging
       schedule.move(point);
-
-      if (!state.hasMoved) {
-        setState({
-          hasMoved: true,
-        });
-      }
     },
     touchend: (event: TouchEvent) => {
       if (state.pending) {
