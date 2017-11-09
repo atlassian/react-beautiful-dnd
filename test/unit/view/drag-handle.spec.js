@@ -1633,18 +1633,24 @@ describe('drag handle', () => {
         expect(event.defaultPrevented).toBe(true);
       });
 
-      it.skip('should allow standard tap interactions', () => {
+      it('should allow standard tap interactions', () => {
+        const mockEvent: MockEvent = getMockEvent();
 
+        touchStart(wrapper, { x: 0, y: 0 }, 0, mockEvent);
+        const endEvent: Event = windowTouchEnd();
+
+        // flush any timers
+        jest.runAllTimers();
+
+        // initial touch start not blocked
+        expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+        // end of lift not blocked
+        expect(endEvent.defaultPrevented).toBe(false);
       });
 
       describe('drag start timer not yet completed', () => {
         it('should not start a drag if the user releases before a long press', () => {
-          const client: Position = {
-            x: 50,
-            y: 100,
-          };
-
-          touchStart(wrapper, client);
+          touchStart(wrapper);
           // have not waited long enough
           jest.runTimersToTime(timeForLongPress - 1);
 
@@ -1653,16 +1659,39 @@ describe('drag handle', () => {
           })).toBe(true);
         });
 
-        it('should not start a drag if a touchcancel is fired', () => {
+        it('should not start a drag if a touchend is fired', () => {
+          touchStart(wrapper);
+          // ended before timer finished
+          windowTouchEnd();
+          // flush all timers
+          jest.runAllTimers();
 
+          expect(callbacksCalled(callbacks)({
+            onLift: 0,
+          })).toBe(true);
         });
 
         it('should not start a drag if a touchcancel is fired', () => {
+          touchStart(wrapper);
+          // cancelled before timer finished
+          windowTouchCancel();
+          // flush all timers
+          jest.runAllTimers();
 
+          expect(callbacksCalled(callbacks)({
+            onLift: 0,
+          })).toBe(true);
         });
 
         it('should not start a drag if user moves too far', () => {
+          const start: Position = { x: 0, y: 0 };
+          const tooFar: Position[] = [
+            { x: 0, y: sloppyClickThreshold + 1 },
+            { x: 0, y: -(sloppyClickThreshold + 1) },
+            { x: sloppyClickThreshold + 1, y: 0 },
+          ];
 
+          touchStart(wrapper);
         });
 
         it('should not start a drag after a resize', () => {
