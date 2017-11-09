@@ -48,7 +48,7 @@ color: ${colors.black};
 /* stop the 'open in new tab' dialog */
 -webkit-touch-callout: none;
 
-/* stop pull down to refresh and anchor pre-select in andriod */
+/* stop pull down to refresh and anchor pre-select in Android */
 touch-action: none;
 
 /* flexbox */

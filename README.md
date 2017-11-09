@@ -312,7 +312,17 @@ When a user presses their finger (or other input) on a `Draggable` we are not su
 - If the user moves beyond a small threshold before the drag start timer finishes then it is determined that the user was intending to scroll rather than drag and a drag will not start. Unfortunately by the time we know this we need to opt out of native scrolling. This means that a user will not be able to scroll a container / the view port if they start the drag on a `Draggable`. This is unfortunate but opting out of native scrolling can only be done before we know if it was a scroll or not. This is standard in drag and drop libraries but we wanted to call it out
 - *Safari only*: if the user force presses on the element before they have moved the element (even if a drag has already started) then the drag is cancelled and the standard force press action occurs. For an anchor this is a website preview.
 
-### `Draggable` anchors
+### Style recommendations
+
+#### Pull to refresh
+
+In order to void the *pull to refresh action* and *anchor focus* on Android Chrome - you will want to add the following style to your `Draggable`:
+
+```css
+touch-action: none;
+```
+
+#### `Draggable` anchors
 
 If the element you are dragging is an anchor `<a>` there are a few additional steps we recommend that you take.
 
