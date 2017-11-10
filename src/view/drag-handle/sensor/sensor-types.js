@@ -29,6 +29,7 @@ export type KeyboardSensor = Sensor & {
 export type TouchSensor = Sensor & {
   onTouchStart: (event: TouchEvent, props: Props) => void,
   onTouchMove: (event: TouchEvent) => void,
+  onClick: (event: MouseEvent) => void,
 }
 
 // export type CreateSensor = (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement) => Sensor

@@ -125,6 +125,12 @@ export default class DragHandle extends Component {
     this.touchSensor.onTouchMove(event);
   }
 
+  onClick = (event: MouseEvent) => {
+    // The mouse or touch sensor may want to block the click
+    this.mouseSensor.onClick(event);
+    this.touchSensor.onClick(event);
+  }
+
   isAnySensorDragging = () =>
     this.sensors.some((sensor: Sensor) => sensor.isDragging())
 
@@ -141,7 +147,7 @@ export default class DragHandle extends Component {
       onKeyDown: this.onKeyDown,
       onTouchStart: this.onTouchStart,
       onTouchMove: this.onTouchMove,
-      onClick: this.mouseSensor.onClick,
+      onClick: this.onClick,
       tabIndex: 0,
       'aria-grabbed': isDragging,
       draggable: false,

@@ -17,6 +17,7 @@ import type { TouchSensor } from './sensor-types';
 type State = {
   isDragging: boolean,
   hasMoved: boolean,
+  preventClick: boolean,
   startTimerId: ?number,
   pending: ?Position,
 }
@@ -33,6 +34,7 @@ const initial: State = {
   isDragging: false,
   pending: null,
   hasMoved: false,
+  preventClick: false,
   startTimerId: null,
 };
 
@@ -53,7 +55,10 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
   const startDragging = () => {
     // Drag can start from either a timeout or user movement
     // so we need to clear the timeout
-    clearTimeout(state.startTimerId);
+    if (state.startTimerId) {
+      clearTimeout(state.startTimerId);
+    }
+
     const pending: ?Position = state.pending;
 
     if (!state.pending) {
@@ -79,7 +84,10 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
   };
   const stopDragging = (fn?: Function = noop) => {
     unbindWindowEvents();
-    setState(initial);
+    setState({
+      ...initial,
+      preventClick: true,
+    });
     fn();
   };
 
@@ -91,14 +99,8 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
       y: clientY,
     };
 
-    const startTimerId: number = setTimeout(
-      () => startDragging(callbacks.onLift({
-        client: point,
-        // not allowing container scrolling for touch movements at this stage
-        isScrollAllowed: false,
-      })),
-      timeForLongPress
-    );
+    const startTimerId: number = setTimeout(startDragging, timeForLongPress);
+
     setState({
       startTimerId,
       pending: point,
@@ -263,9 +265,19 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
     // Not calling stopPropigation as we want the events to bubble to the global event handler
   };
 
+  const onClick = (event: MouseEvent) => {
+    if (!state.preventClick) {
+      return;
+    }
+
+    stopEvent(event);
+    setState(initial);
+  };
+
   const sensor: TouchSensor = {
     onTouchStart,
     onTouchMove,
+    onClick,
     kill,
     isCapturing,
     isDragging,
