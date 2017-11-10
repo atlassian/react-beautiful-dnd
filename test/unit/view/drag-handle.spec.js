@@ -480,7 +480,6 @@ describe('drag handle', () => {
 
     describe('window scroll during drag', () => {
       const originalScroll: Position = getWindowScrollPosition();
-      const origin: Position = { x: 0, y: 0 };
 
       beforeEach(() => {
         setWindowScroll(origin, { shouldPublish: false });
