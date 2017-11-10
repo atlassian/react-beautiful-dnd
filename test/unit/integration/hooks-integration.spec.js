@@ -2,7 +2,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import { DragDropContext, Draggable, Droppable } from '../../../src/';
-import { sloppyClickThreshold } from '../../../src/view/drag-handle/drag-handle';
+import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
 import { dispatchWindowMouseEvent, dispatchWindowKeyDownEvent, mouseEvent } from '../../utils/user-input-util';
 import getClientRect from '../../../src/state/get-client-rect';
 import type {

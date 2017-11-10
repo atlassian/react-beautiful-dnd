@@ -917,7 +917,7 @@ describe('drag handle', () => {
     });
 
     describe('webkit force press', () => {
-      const forcePressThreshold = 2;
+      const mouseForcePressThreshold = 2;
       const standardForce = 1;
 
       // $ExpectError - non-standard MouseEvent property
@@ -943,7 +943,7 @@ describe('drag handle', () => {
       });
 
       it('should log a warning if a mouse force changed event is fired when there is no force value', () => {
-        setForceDownThreshold(forcePressThreshold);
+        setForceDownThreshold(mouseForcePressThreshold);
 
         mouseDown(wrapper);
         // not providing any force value
@@ -964,7 +964,7 @@ describe('drag handle', () => {
 
       describe('non error scenarios', () => {
         beforeEach(() => {
-          setForceDownThreshold(forcePressThreshold);
+          setForceDownThreshold(mouseForcePressThreshold);
           jest.useFakeTimers();
         });
 
@@ -977,7 +977,7 @@ describe('drag handle', () => {
           mouseDown(wrapper);
 
           // not a force push
-          windowMouseForceChange(forcePressThreshold - 0.1);
+          windowMouseForceChange(mouseForcePressThreshold - 0.1);
 
           // should start a drag
           windowMouseMove(0, sloppyClickThreshold);
@@ -992,7 +992,7 @@ describe('drag handle', () => {
           mouseDown(wrapper);
 
           // is a force push
-          windowMouseForceChange(forcePressThreshold);
+          windowMouseForceChange(mouseForcePressThreshold);
 
           // would normally start a drag
           windowMouseMove(0, sloppyClickThreshold);
@@ -1013,7 +1013,7 @@ describe('drag handle', () => {
           })).toBe(true);
 
           // should not do anything
-          windowMouseForceChange(forcePressThreshold - 0.1);
+          windowMouseForceChange(mouseForcePressThreshold - 0.1);
 
           // a move event
           windowMouseMove(0, sloppyClickThreshold + 1);
@@ -1031,7 +1031,7 @@ describe('drag handle', () => {
           windowMouseMove(0, sloppyClickThreshold);
 
           // will cancel the drag
-          windowMouseForceChange(forcePressThreshold);
+          windowMouseForceChange(mouseForcePressThreshold);
 
           expect(callbacksCalled(callbacks)({
             onLift: 1,

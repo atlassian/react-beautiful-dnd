@@ -10,8 +10,7 @@ const blocked: number[] = [
 ];
 
 export default (event: KeyboardEvent) => {
-  // TODO: ie11?
-  if (blocked.includes(event.keyCode)) {
+  if (blocked.indexOf(event.keyCode) >= 0) {
     stopEvent(event);
   }
 };

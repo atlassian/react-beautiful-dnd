@@ -31,5 +31,3 @@ export type TouchSensor = Sensor & {
   onTouchMove: (event: TouchEvent) => void,
   onClick: (event: MouseEvent) => void,
 }
-
-// export type CreateSensor = (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement) => Sensor
