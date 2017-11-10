@@ -1592,7 +1592,7 @@ describe('drag handle', () => {
     });
   });
 
-  describe.only('touch dragging', () => {
+  describe('touch dragging', () => {
     beforeEach(() => {
       jest.useFakeTimers();
     });
