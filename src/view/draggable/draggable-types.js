@@ -30,7 +30,7 @@ import type {
 // better touch device drag and drop experience.
 // Users can opt out of these styles or change them if
 // they really need too for their specific use case.
-type BaseStyle = {
+export type BaseStyle = {
   // A long press on anchors usually pops a content menu that has options for
   // the link such as 'Open in new tab'. Because long press is used to start
   // a drag we need to opt out of this behavior

@@ -5,7 +5,8 @@ import { mount } from 'enzyme';
 // eslint-disable-next-line no-duplicate-imports
 import type { ReactWrapper } from 'enzyme';
 import Draggable, { zIndexOptions } from '../../../src/view/draggable/draggable';
-import DragHandle, { sloppyClickThreshold } from '../../../src/view/drag-handle/drag-handle';
+import DragHandle from '../../../src/view/drag-handle/drag-handle';
+import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
 import Moveable from '../../../src/view/moveable/';
 import Placeholder from '../../../src/view/placeholder';
 import { css } from '../../../src/view/animation';
@@ -18,6 +19,7 @@ import type {
   DispatchProps,
   Provided,
   StateSnapshot,
+  BaseStyle,
 } from '../../../src/view/draggable/draggable-types';
 import type {
   Position,
@@ -59,6 +61,11 @@ const draggableId: DraggableId = 'draggable1';
 const droppableId: DroppableId = 'droppable1';
 const type: TypeId = 'ITEM';
 const origin: Position = { x: 0, y: 0 };
+const baseStyle: BaseStyle = {
+  WebkitTouchCallout: 'none',
+  WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+  touchAction: 'none',
+};
 
 const dimension: DraggableDimension = getDraggableDimension({
   id: draggableId,
@@ -184,6 +191,7 @@ type StartDrag = {|
   selection?: Position,
   center ?: Position,
   windowScroll?: Position,
+  isScrollAllowed?: boolean,
 |}
 
 const stubClientRect = (center?: Position = origin): void =>
@@ -199,21 +207,12 @@ const executeOnLift = (wrapper: ReactWrapper) => ({
   selection = origin,
   center = origin,
   windowScroll = origin,
+  isScrollAllowed = false,
 }: StartDrag = {}) => {
   setWindowScroll(windowScroll);
   stubClientRect(center);
 
-  wrapper.find(DragHandle).props().callbacks.onLift(selection);
-};
-
-const executeOnKeyLift = (wrapper: ReactWrapper) => ({
-  center = origin,
-  windowScroll = origin,
-}: StartDrag = {}) => {
-  setWindowScroll(windowScroll);
-  stubClientRect(center);
-
-  wrapper.find(DragHandle).props().callbacks.onKeyLift();
+  wrapper.find(DragHandle).props().callbacks.onLift({ client: selection, isScrollAllowed });
 };
 
 const getFromLift = (dispatchProps: DispatchProps) => {
@@ -437,9 +436,20 @@ describe('Draggable - unconnected', () => {
         });
 
         it('should publish that container scrolling is allowed', () => {
-          executeOnLift(wrapper)();
+          const dispatchProps1: DispatchProps = getDispatchPropsStub();
+          const wrapper1: ReactWrapper = mountDraggable({
+            dispatchProps: dispatchProps1,
+          });
+          const dispatchProps2: DispatchProps = getDispatchPropsStub();
+          const wrapper2: ReactWrapper = mountDraggable({
+            dispatchProps: dispatchProps2,
+          });
 
-          expect(getFromLift(dispatchProps).isScrollAllowed).toEqual(true);
+          executeOnLift(wrapper1)({ isScrollAllowed: true });
+          executeOnLift(wrapper2)({ isScrollAllowed: false });
+
+          expect(getFromLift(dispatchProps1).isScrollAllowed).toEqual(true);
+          expect(getFromLift(dispatchProps2).isScrollAllowed).toEqual(false);
         });
       });
 
@@ -555,74 +565,6 @@ describe('Draggable - unconnected', () => {
           wrapper.find(DragHandle).props().callbacks.onDrop();
 
           expect(dispatchProps.drop).toBeCalled();
-        });
-      });
-
-      describe('onKeyLift', () => {
-        let standardWrapper;
-        let dispatchProps;
-
-        beforeEach(() => {
-          dispatchProps = getDispatchPropsStub();
-          standardWrapper = mountDraggable({
-            dispatchProps,
-          });
-        });
-
-        it('should throw if dragging is disabled', () => {
-          const wrapper = mountDraggable({
-            ownProps: disabledOwnProps,
-          });
-
-          const onKeyLift = () => executeOnKeyLift(wrapper)();
-
-          expect(onKeyLift).toThrow();
-        });
-
-        it('should throw if not attached to the DOM', () => {
-          const onKeyLift = () => executeOnKeyLift(standardWrapper)();
-
-          standardWrapper.unmount();
-
-          expect(onKeyLift).toThrow();
-        });
-
-        it('should lift with the draggableId', () => {
-          executeOnKeyLift(standardWrapper)();
-
-          expect(getFromLift(dispatchProps).draggableId).toBe(draggableId);
-        });
-
-        it('should lift with the selection as the center position', () => {
-          const center: Position = {
-            x: 50,
-            y: 80,
-          };
-          const expected: InitialDragLocation = {
-            center,
-            selection: center,
-          };
-
-          executeOnKeyLift(standardWrapper)({ center });
-
-          expect(getFromLift(dispatchProps).client).toEqual(expected);
-        });
-
-        it('should publish the window scroll', () => {
-          const windowScroll: Position = {
-            x: 10,
-            y: 20,
-          };
-
-          executeOnKeyLift(standardWrapper)({ windowScroll });
-
-          expect(getFromLift(dispatchProps).windowScroll).toEqual(windowScroll);
-        });
-
-        it('should publish that container scrolling is not alllowed', () => {
-          executeOnKeyLift(standardWrapper)();
-
-          expect(getFromLift(dispatchProps).isScrollAllowed).toEqual(false);
         });
       });
 
@@ -921,6 +863,7 @@ describe('Draggable - unconnected', () => {
         transform: null,
         transition: css.outOfTheWay,
         pointerEvents: 'none',
+        ...baseStyle,
       };
 
       expect(draggingStyle.zIndex).toBe(zIndexOptions.dragging);
@@ -964,6 +907,7 @@ describe('Draggable - unconnected', () => {
         margin: 0,
         transform: null,
         pointerEvents: 'none',
+        ...baseStyle,
       };
 
       const provided: Provided = getLastCall(myMock)[0].provided;
@@ -997,6 +941,7 @@ describe('Draggable - unconnected', () => {
         margin: 0,
         transform: `translate(${offset.x}px, ${offset.y}px)`,
         pointerEvents: 'none',
+        ...baseStyle,
       };
 
       const provided: Provided = getLastCall(myMock)[0].provided;
@@ -1032,6 +977,7 @@ describe('Draggable - unconnected', () => {
         top: dimension.page.withMargin.top,
         left: dimension.page.withMargin.left,
         margin: 0,
+        ...baseStyle,
       };
 
       mountDraggable({
@@ -1143,6 +1089,7 @@ describe('Draggable - unconnected', () => {
         transition: css.outOfTheWay,
         transform: null,
         pointerEvents: 'none',
+        ...baseStyle,
       };
 
       expect(droppingStyle.zIndex).toBe(zIndexOptions.dropAnimating);
@@ -1163,6 +1110,7 @@ describe('Draggable - unconnected', () => {
         margin: 0,
         transform: `translate(${offset.x}px, ${offset.y}px)`,
         pointerEvents: 'none',
+        ...baseStyle,
       };
 
       mountDraggable({
@@ -1207,6 +1155,7 @@ describe('Draggable - unconnected', () => {
         transform: null,
         transition: null,
         pointerEvents: 'auto',
+        ...baseStyle,
       };
 
       expect(provided.draggableStyle).toEqual(style);
@@ -1241,6 +1190,7 @@ describe('Draggable - unconnected', () => {
           transform: null,
           transition: css.outOfTheWay,
           pointerEvents: 'auto',
+          ...baseStyle,
         };
 
         expect(provided.draggableStyle).toEqual(expected);
@@ -1276,6 +1226,7 @@ describe('Draggable - unconnected', () => {
             transition: css.outOfTheWay,
             pointerEvents: 'none',
             transform: null,
+            ...baseStyle,
           };
           expect(provided.draggableStyle).toEqual(expected);
         });
@@ -1296,6 +1247,7 @@ describe('Draggable - unconnected', () => {
             transition: null,
             transform: null,
             pointerEvents: 'none',
+            ...baseStyle,
           };
 
           const customWrapper = mountDraggable({
@@ -1350,6 +1302,7 @@ describe('Draggable - unconnected', () => {
             pointerEvents: 'none',
             transition: css.outOfTheWay,
             transform: `translate(${offset.x}px, ${offset.y}px)`,
+            ...baseStyle,
           };
 
           expect(provided.draggableStyle).toEqual(expected);
@@ -1371,6 +1324,7 @@ describe('Draggable - unconnected', () => {
             pointerEvents: 'none',
             transition: null,
             transform: `translate(${offset.x}px, ${offset.y}px)`,
+            ...baseStyle,
           };
 
           const customWrapper = mountDraggable({
