@@ -41,16 +41,6 @@ color: ${colors.black};
   box-shadow: none;
 }
 
-/* stop any color overlay when tapping anchor */
-/* https://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/ */
--webkit-tap-highlight-color: rgba(0,0,0,0);
-
-/* stop the 'open in new tab' dialog */
--webkit-touch-callout: none;
-
-/* stop pull down to refresh and anchor pre-select in Android */
-touch-action: none;
-
 /* flexbox */
 display: flex;
 align-items: center;

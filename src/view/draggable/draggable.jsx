@@ -221,6 +221,10 @@ export default class Draggable extends Component {
         left,
         margin: 0,
         transform: movementStyle.transform ? `${movementStyle.transform}` : null,
+        // base style
+        '-webkit-touch-callout': 'none',
+        '-webkit-tap-highlight-color': 'rgba(0,0,0,0)',
+        touchAction: 'none',
       };
       return style;
     }
@@ -236,6 +240,10 @@ export default class Draggable extends Component {
         transition: canAnimate ? css.outOfTheWay : null,
         transform: movementStyle.transform,
         pointerEvents: canLift ? 'auto' : 'none',
+        // base style
+        '-webkit-touch-callout': 'none',
+        '-webkit-tap-highlight-color': 'rgba(0,0,0,0)',
+        touchAction: 'none',
       };
       return style;
     }

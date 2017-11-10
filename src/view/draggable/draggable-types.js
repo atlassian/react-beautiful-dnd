@@ -26,7 +26,13 @@ import type {
   Provided as DragHandleProvided,
 } from '../drag-handle/drag-handle-types';
 
-export type DraggingStyle = {|
+type BaseStyle = {
+  '-webkit-touch-callout': 'none',
+  '-webkit-tap-highlight-color': 'rgba(0,0,0,0)',
+  touchAction: 'none',
+}
+
+export type DraggingStyle = BaseStyle & {
   // Allow scrolling of the element behind the dragging element
   pointerEvents: 'none',
 
@@ -61,13 +67,13 @@ export type DraggingStyle = {|
   // When dragging or dropping we control the z-index to ensure that
   // the layering is correct
   zIndex: ZIndex,
-|}
+}
 
-export type NotDraggingStyle = {|
+export type NotDraggingStyle = BaseStyle & {
   transition: ?string,
   transform: ?string,
   pointerEvents: 'none' | 'auto',
-|}
+}
 
 export type DraggableStyle = DraggingStyle | NotDraggingStyle;
 
