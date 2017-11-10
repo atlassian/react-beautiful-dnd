@@ -58,6 +58,18 @@ export const dispatchWindowKeyDownEvent = (
   return event;
 };
 
+export const dispatchWindowEvent = (eventName: string, options?: Object = {}): Event => {
+  const event: Event = document.createEvent('Event');
+  event.initEvent(eventName, true, true);
+
+  // override properties on the event itself
+  Object.assign(event, options);
+
+  window.dispatchEvent(event);
+
+  return event;
+};
+
 export const dispatchWindowTouchEvent = (
   eventName: string,
   client?: Position = { x: 0, y: 0 },
@@ -67,8 +79,6 @@ export const dispatchWindowTouchEvent = (
   const touch = getTouch(client, force);
   // window.TouchEvent constructor not supported in current version of Jest
   // So using the old school document.createEvent \o/
-  const event: Event = document.createEvent('Event');
-  event.initEvent(eventName, true, true);
 
   const touchOptions = {
     touches: [touch],
@@ -77,12 +87,10 @@ export const dispatchWindowTouchEvent = (
     shiftKey: false,
   };
 
-  // override properties on the event itself
-  Object.assign(event, touchOptions, options);
-
-  window.dispatchEvent(event);
-
-  return event;
+  return dispatchWindowEvent(eventName, {
+    ...touchOptions,
+    ...options,
+  });
 };
 
 export const mouseEvent = (

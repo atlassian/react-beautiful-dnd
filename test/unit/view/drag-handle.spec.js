@@ -14,13 +14,14 @@ import {
   mouseEvent,
   touchEvent,
   withKeyboard,
+  dispatchWindowEvent,
 } from '../../utils/user-input-util';
 import type { Position } from '../../../src/types';
 import * as keyCodes from '../../../src/view/key-codes';
 import getWindowScrollPosition from '../../../src/view/get-window-scroll-position';
 import setWindowScroll from '../../utils/set-window-scroll';
 import getClientRect from '../../../src/state/get-client-rect';
-import { timeForLongPress } from '../../../src/view/drag-handle/sensor/create-touch-sensor';
+import { timeForLongPress, forcePressThreshold } from '../../../src/view/drag-handle/sensor/create-touch-sensor';
 
 const primaryButton: number = 0;
 const auxiliaryButton: number = 1;
@@ -118,12 +119,14 @@ const windowTouchMove = dispatchWindowTouchEvent.bind(null, 'touchmove');
 const windowTouchEnd = dispatchWindowTouchEvent.bind(null, 'touchend');
 const windowTouchCancel = dispatchWindowTouchEvent.bind(null, 'touchcancel');
 
+const origin: Position = { x: 0, y: 0 };
+
 type MockEvent = {|
   preventDefault: Function,
   stopPropagation: Function,
 |}
 
-const getMockEvent = (): MockEvent => ({
+const createMockEvent = (): MockEvent => ({
   preventDefault: jest.fn(),
   stopPropagation: jest.fn(),
 });
@@ -220,7 +223,7 @@ describe('drag handle', () => {
       });
 
       it('should stop the initial mousedown event', () => {
-        const mockEvent: MockEvent = getMockEvent();
+        const mockEvent: MockEvent = createMockEvent();
 
         mouseDown(wrapper, 0, 0, primaryButton, mockEvent);
 
@@ -1061,7 +1064,7 @@ describe('drag handle', () => {
       });
 
       it('should stop the event before it can be listened to', () => {
-        const mockEvent: MockEvent = getMockEvent();
+        const mockEvent: MockEvent = createMockEvent();
 
         pressSpacebar(wrapper, mockEvent);
 
@@ -1095,7 +1098,7 @@ describe('drag handle', () => {
 
     describe('progress', () => {
       it('should prevent tabbing away from the element while dragging', () => {
-        const mockEvent: MockEvent = getMockEvent();
+        const mockEvent: MockEvent = createMockEvent();
 
         pressSpacebar(wrapper);
         // pressing tab on the element itself as it must have focus to drag
@@ -1105,7 +1108,7 @@ describe('drag handle', () => {
       });
 
       it('should prevent submitting the dragging item', () => {
-        const mockEvent: MockEvent = getMockEvent();
+        const mockEvent: MockEvent = createMockEvent();
 
         pressSpacebar(wrapper);
         // pressing enter on the element itself as it must have focus to drag
@@ -1411,7 +1414,7 @@ describe('drag handle', () => {
 
     describe('cancel', () => {
       it('should cancel the drag when the user presses escape and stop the event', () => {
-        const mockEvent: MockEvent = getMockEvent();
+        const mockEvent: MockEvent = createMockEvent();
 
         pressSpacebar(wrapper);
         pressEscape(wrapper, mockEvent);
@@ -1471,14 +1474,14 @@ describe('drag handle', () => {
 
     describe('post drag click', () => {
       it('should not prevent any clicks after a drag', () => {
-        const mock = jest.fn();
+        const mockEvent: MockEvent = createMockEvent();
         pressSpacebar(wrapper);
         pressArrowDown(wrapper);
         pressSpacebar(wrapper);
 
-        click(wrapper, 0, 0, primaryButton, { preventDefault: mock });
+        click(wrapper, 0, 0, primaryButton, mockEvent);
 
-        expect(mock).not.toHaveBeenCalled();
+        expect(mockEvent.preventDefault).not.toHaveBeenCalled();
       });
     });
 
@@ -1589,30 +1592,147 @@ describe('drag handle', () => {
     });
   });
 
-  describe('touch dragging', () => {
+  describe.only('touch dragging', () => {
     beforeEach(() => {
       jest.useFakeTimers();
     });
 
     afterEach(() => {
-
+      jest.clearAllTimers();
+      jest.useRealTimers();
     });
 
-    describe.only('initiation', () => {
-      it('should start a drag on long press', () => {
-        const client: Position = {
-          x: 50,
-          y: 100,
-        };
+    const start = () => {
+      touchStart(wrapper, origin);
+      jest.runTimersToTime(timeForLongPress);
+    };
+    const end = () => windowTouchEnd();
+    const move = (point?: Position = { x: 5, y: 20 }) => {
+      windowTouchMove(point);
+      requestAnimationFrame.step();
+    };
 
-        touchStart(wrapper, client);
-        jest.runTimersToTime(timeForLongPress);
+    describe('initiation', () => {
+      describe('starting with long press', () => {
+        it('should start a drag on long press', () => {
+          const client: Position = {
+            x: 50,
+            y: 100,
+          };
 
-        expect(callbacks.onLift).toHaveBeenCalledWith({ client, isScrollAllowed: false });
+          touchStart(wrapper, client);
+          jest.runTimersToTime(timeForLongPress);
+
+          expect(callbacks.onLift).toHaveBeenCalledWith({ client, isScrollAllowed: false });
+        });
+
+        it('should not fire a second lift after movement that would have otherwise have started a drag', () => {
+          touchStart(wrapper, origin);
+          jest.runTimersToTime(timeForLongPress);
+
+          expect(callbacksCalled(callbacks)({
+            onLift: 1,
+          })).toBe(true);
+
+          // movement that would normally start a lift, but now will not
+          windowTouchMove({ x: 0, y: sloppyClickThreshold });
+
+          // should not have lifted again
+          expect(callbacksCalled(callbacks)({
+            onLift: 1,
+          })).toBe(true);
+        });
+      });
+
+      describe('starting with movement', () => {
+        it('should start a drag if the user moves more than a threshold', () => {
+          const valid: Position[] = [
+            { x: 0, y: sloppyClickThreshold },
+            { x: 0, y: -sloppyClickThreshold },
+            { x: sloppyClickThreshold, y: 0 },
+            { x: -sloppyClickThreshold, y: 0 },
+          ];
+
+          valid.forEach((point: Position): void => {
+            const customCallbacks = getStubCallbacks();
+            const customWrapper = mount(
+              <DragHandle
+                callbacks={customCallbacks}
+                isDragging={false}
+                isEnabled
+                canLift
+                getDraggableRef={() => fakeDraggableRef}
+              >
+                {(dragHandleProps: Provided) => (
+                  <Child dragHandleProps={dragHandleProps} />
+                )}
+              </DragHandle>,
+            );
+
+            touchStart(customWrapper, { x: 0, y: 0 });
+            windowTouchMove(point);
+
+            expect(customCallbacks.onLift)
+              .toHaveBeenCalledWith({ client: origin, isScrollAllowed: false });
+
+            customWrapper.unmount();
+          });
+        });
+
+        it('should not start a drag if the user does not move more than a threshold', () => {
+          const invalid: Position[] = [
+            { x: 0, y: sloppyClickThreshold - 1 },
+            { x: 0, y: -sloppyClickThreshold + 1 },
+            { x: sloppyClickThreshold - 1, y: 0 },
+            { x: -sloppyClickThreshold + 1, y: 0 },
+          ];
+
+          invalid.forEach((point: Position): void => {
+            const customCallbacks = getStubCallbacks();
+            const customWrapper = mount(
+              <DragHandle
+                callbacks={customCallbacks}
+                isDragging={false}
+                isEnabled
+                canLift
+                getDraggableRef={() => fakeDraggableRef}
+              >
+                {(dragHandleProps: Provided) => (
+                  <Child dragHandleProps={dragHandleProps} />
+                )}
+              </DragHandle>,
+            );
+
+            touchStart(customWrapper, { x: 0, y: 0 });
+            windowTouchMove(point);
+
+            expect(customCallbacks.onLift).not.toHaveBeenCalled();
+
+            customWrapper.unmount();
+          });
+        });
+
+        it('should not fire a second lift after the long press timer completes', () => {
+          // starting a drag with a long press
+          touchStart(wrapper, origin);
+          windowTouchMove({ x: 0, y: sloppyClickThreshold });
+
+          expect(callbacksCalled(callbacks)({
+            onLift: 1,
+          })).toBe(true);
+
+          // long press timer now expires
+          jest.runTimersToTime(timeForLongPress);
+
+          // it should not trigger another lift
+          expect(callbacksCalled(callbacks)({
+            onLift: 1,
+          })).toBe(true);
+        });
       });
 
       it('should opt out of native scrolling (touchmove first on element)', () => {
-        const mockEvent: MockEvent = getMockEvent();
+        const mockEvent: MockEvent = createMockEvent();
 
         // start a drag
         touchStart(wrapper);
@@ -1632,107 +1752,383 @@ describe('drag handle', () => {
 
         expect(event.defaultPrevented).toBe(true);
       });
+    });
 
-      it('should allow standard tap interactions', () => {
-        const mockEvent: MockEvent = getMockEvent();
+    describe('drag ending before it started', () => {
+      it('should not start a drag if the user releases before a long press and there is not enough movement', () => {
+        touchStart(wrapper);
+        // have not waited long enough
+        jest.runTimersToTime(timeForLongPress - 1);
 
-        touchStart(wrapper, { x: 0, y: 0 }, 0, mockEvent);
-        const endEvent: Event = windowTouchEnd();
+        expect(callbacksCalled(callbacks)({
+          onLift: 0,
+        })).toBe(true);
+      });
 
-        // flush any timers
+      it('should not start a drag if a touchend is fired', () => {
+        touchStart(wrapper);
+        // ended before timer finished
+        windowTouchEnd();
+        // flush all timers
         jest.runAllTimers();
 
-        // initial touch start not blocked
-        expect(mockEvent.preventDefault).not.toHaveBeenCalled();
-        // end of lift not blocked
-        expect(endEvent.defaultPrevented).toBe(false);
+        expect(callbacksCalled(callbacks)({
+          onLift: 0,
+        })).toBe(true);
       });
 
-      describe('drag start timer not yet completed', () => {
-        it('should not start a drag if the user releases before a long press', () => {
-          touchStart(wrapper);
-          // have not waited long enough
-          jest.runTimersToTime(timeForLongPress - 1);
+      it('should not start a drag if a touchcancel is fired', () => {
+        touchStart(wrapper);
+        // cancelled before timer finished
+        windowTouchCancel();
+        // flush all timers
+        jest.runAllTimers();
 
-          expect(callbacksCalled(callbacks)({
-            onLift: 0,
-          })).toBe(true);
-        });
-
-        it('should not start a drag if a touchend is fired', () => {
-          touchStart(wrapper);
-          // ended before timer finished
-          windowTouchEnd();
-          // flush all timers
-          jest.runAllTimers();
-
-          expect(callbacksCalled(callbacks)({
-            onLift: 0,
-          })).toBe(true);
-        });
-
-        it('should not start a drag if a touchcancel is fired', () => {
-          touchStart(wrapper);
-          // cancelled before timer finished
-          windowTouchCancel();
-          // flush all timers
-          jest.runAllTimers();
-
-          expect(callbacksCalled(callbacks)({
-            onLift: 0,
-          })).toBe(true);
-        });
-
-        it('should not start a drag if user moves too far', () => {
-          const start: Position = { x: 0, y: 0 };
-          const tooFar: Position[] = [
-            { x: 0, y: sloppyClickThreshold + 1 },
-            { x: 0, y: -(sloppyClickThreshold + 1) },
-            { x: sloppyClickThreshold + 1, y: 0 },
-          ];
-
-          touchStart(wrapper);
-        });
-
-        it('should not start a drag after a resize', () => {
-
-        });
-
-        it('should not start a drag after a orientation change', () => {
-
-        });
-
-        it('should not start a drag after a window scroll', () => {
-
-        });
+        expect(callbacksCalled(callbacks)({
+          onLift: 0,
+        })).toBe(true);
       });
 
-      describe('not starting a drag', () => {
+      it('should not start a drag after a resize', () => {
+        touchStart(wrapper);
+        // resize before timer finished
+        dispatchWindowEvent('resize');
+        // flush all timers
+        jest.runAllTimers();
 
+        expect(callbacksCalled(callbacks)({
+          onLift: 0,
+        })).toBe(true);
+      });
+
+      it('should not start a drag after a orientation change', () => {
+        touchStart(wrapper);
+        dispatchWindowEvent('orientationchange');
+        // flush all timers
+        jest.runAllTimers();
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 0,
+        })).toBe(true);
+      });
+
+      it('should not start a drag after a window scroll', () => {
+        touchStart(wrapper);
+        dispatchWindowEvent('scroll');
+        // flush all timers
+        jest.runAllTimers();
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 0,
+        })).toBe(true);
+      });
+
+      it('should not start a drag if unmounted', () => {
+        touchStart(wrapper);
+        wrapper.unmount();
+
+        // flush all timers
+        jest.runAllTimers();
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 0,
+        })).toBe(true);
       });
     });
 
     describe('progress', () => {
       it('should schedule a move to the new position', () => {
+        const target: Position = { x: 100, y: 50 };
 
+        start();
+        windowTouchMove(target);
+
+        // scheduled move has not yet occurred
+        expect(callbacks.onMove).not.toHaveBeenCalled();
+
+        // releasing the movement
+        requestAnimationFrame.step();
+        expect(callbacks.onMove).toHaveBeenCalledWith(target);
       });
 
       it('should prevent any context menu from popping', () => {
+        start();
 
+        const event: Event = dispatchWindowEvent('contextmenu');
+
+        expect(event.defaultPrevented).toBe(true);
       });
-    });
-
-    describe('cancelling a drag that has started', () => {
     });
 
     describe('dropping', () => {
       it('should drop a drag on touchend', () => {
+        touchStart(wrapper);
+        jest.runTimersToTime(timeForLongPress);
+        windowTouchEnd();
 
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onDrop: 1,
+        })).toBe(true);
+      });
+    });
+
+    describe('cancelling a drag that has started', () => {
+      beforeEach(start);
+
+      it('should cancel a drag if it is disabled mid drag', () => {
+        wrapper.setProps({
+          isEnabled: false,
+        });
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onCancel: 1,
+        })).toBe(true);
+      });
+
+      it('should cancel a drag if unmounted', () => {
+        wrapper.unmount();
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onCancel: 1,
+        })).toBe(true);
+      });
+
+      describe('cancelled elsewhere in the app', () => {
+        it('should end the drag without firing the onCancel callback', () => {
+          wrapper.setProps({
+            isDragging: true,
+          });
+
+          // cancelled mid drag
+          wrapper.setProps({
+            isDragging: false,
+          });
+
+          expect(callbacksCalled(callbacks)({
+            onLift: 1,
+            onCancel: 0,
+          })).toBe(true);
+
+          // should have no impact
+          windowTouchMove({ x: 100, y: 200 });
+          requestAnimationFrame.step();
+
+          expect(callbacksCalled(callbacks)({
+            onLift: 1,
+            onCancel: 0,
+          })).toBe(true);
+        });
+      });
+
+      it('should cancel the drag if a touchcancel is fired', () => {
+        windowTouchCancel();
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onCancel: 1,
+        })).toBe(true);
+      });
+
+      it('should cancel the drag after a resize', () => {
+        dispatchWindowEvent('resize');
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onCancel: 1,
+        })).toBe(true);
+      });
+
+      it('should cancel the drag after a orientation change', () => {
+        dispatchWindowEvent('orientationchange');
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onCancel: 1,
+        })).toBe(true);
+      });
+
+      it('should cancel the drag after a window scroll', () => {
+        dispatchWindowEvent('scroll');
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onCancel: 1,
+        })).toBe(true);
       });
     });
 
     describe('force press', () => {
+      const forcePress = (force?: number = forcePressThreshold): void => {
+        dispatchWindowEvent('touchforcechange', {
+          touches: [{
+            force,
+          }],
+        });
+      };
 
+      describe('drag not yet started', () => {
+        it('should not start a drag if a force press occurs', () => {
+          touchStart(wrapper);
+          forcePress(forcePressThreshold);
+          // would normally start a drag
+          jest.runAllTimers();
+
+          expect(callbacksCalled(callbacks)({
+            onLift: 0,
+          })).toBe(true);
+        });
+
+        it('should not block lifting if the force press is not strong enough', () => {
+          touchStart(wrapper);
+          forcePress(forcePressThreshold - 0.1);
+          // would normally start a drag
+          jest.runAllTimers();
+
+          expect(callbacksCalled(callbacks)({
+            onLift: 1,
+          })).toBe(true);
+        });
+
+        it('should not block lifting if the force press occurs after a window touchmove (and before a drag starts)', () => {
+          touchStart(wrapper, origin);
+          // firing a touch move - but not enough to start a drag
+          windowTouchMove({ x: 0, y: sloppyClickThreshold - 1 });
+          expect(callbacks.onLift).not.toHaveBeenCalled();
+
+          // force press should no longer prevent the drag from starting
+          forcePress();
+          // start the drag with a long press
+          jest.runAllTimers();
+
+          expect(callbacksCalled(callbacks)({
+            onLift: 1,
+          })).toBe(true);
+        });
+      });
+
+      describe('drag started', () => {
+        it('should cancel the drag if no movement has occurred yet', () => {
+          start();
+          forcePress();
+
+          expect(callbacksCalled(callbacks)({
+            onLift: 1,
+            onCancel: 1,
+          })).toBe(true);
+        });
+
+        it('should not cancel the drag if movement has occurred before the force press', () => {
+          start();
+          windowTouchMove({ x: 10, y: 20 });
+          forcePress();
+
+          expect(callbacksCalled(callbacks)({
+            onLift: 1,
+            onCancel: 0,
+          })).toBe(true);
+        });
+      });
+    });
+
+    it('should allow standard tap interactions', () => {
+      const mockEvent: MockEvent = createMockEvent();
+
+      touchStart(wrapper, { x: 0, y: 0 }, 0, mockEvent);
+      const endEvent: Event = windowTouchEnd();
+
+      // flush any timers
+      jest.runAllTimers();
+
+      // initial touch start not blocked
+      expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+      // end of lift not blocked
+      expect(endEvent.defaultPrevented).toBe(false);
+    });
+
+    describe('click prevention', () => {
+      it('should prevent a click if a drag has occurred', () => {
+        const mockEvent: MockEvent = createMockEvent();
+
+        start();
+        end();
+        click(wrapper, 0, 0, primaryButton, mockEvent);
+
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
+      });
+
+      it('should not prevent a click if no drag has occurred', () => {
+        const mockEvent: MockEvent = createMockEvent();
+
+        touchStart(wrapper);
+        // drag has not started yet
+        expect(callbacks.onLift).not.toHaveBeenCalled();
+        // drag ended
+        end();
+        // then a click
+        click(wrapper, 0, 0, primaryButton, mockEvent);
+
+        expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+      });
+
+      it('should only prevent a single click', () => {
+        const mockEvent: MockEvent = createMockEvent();
+
+        start();
+        end();
+
+        // first click blocked
+        click(wrapper, 0, 0, primaryButton, mockEvent);
+        expect(mockEvent.preventDefault).toHaveBeenCalledTimes(1);
+
+        // second click not blocked
+        click(wrapper, 0, 0, primaryButton, mockEvent);
+        expect(mockEvent.preventDefault).toHaveBeenCalledTimes(1);
+      });
+
+      it('should not prevent clicks on subsequent unsuccessful drags', () => {
+        const mockEvent: MockEvent = createMockEvent();
+
+        // first drag
+        start();
+        end();
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onDrop: 1,
+        })).toBe(true);
+
+        // second drag start unsuccessful
+        touchStart(wrapper);
+        end();
+        // no lift or drop occurred
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onDrop: 1,
+        })).toBe(true);
+
+        // click after unsuccessful drag is not blocked
+        click(wrapper, 0, 0, primaryButton, mockEvent);
+        expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('subsequent drags', () => {
+      it('should be possible to do another drag after one finishes', () => {
+        Array.from({ length: 10 }, (v, k) => k).forEach((val: number) => {
+          start();
+          // moves are memoized
+          move({ x: 0, y: val });
+          end();
+
+          expect(callbacksCalled(callbacks)({
+            onLift: val + 1,
+            onMove: val + 1,
+            onDrop: val + 1,
+          })).toBe(true);
+        });
+      });
     });
   });
 

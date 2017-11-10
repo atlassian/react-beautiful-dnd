@@ -18,7 +18,7 @@ type State = {
   isDragging: boolean,
   hasMoved: boolean,
   preventClick: boolean,
-  startTimerId: ?number,
+  longPressTimerId: ?number,
   pending: ?Position,
 }
 
@@ -27,6 +27,7 @@ type TouchWithForce = Touch & {
 }
 
 export const timeForLongPress: number = 200;
+export const forcePressThreshold: number = 0.15;
 
 const noop = (): void => { };
 
@@ -35,7 +36,7 @@ const initial: State = {
   pending: null,
   hasMoved: false,
   preventClick: false,
-  startTimerId: null,
+  longPressTimerId: null,
 };
 
 export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): TouchSensor => {
@@ -49,14 +50,14 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
   };
   const isDragging = (): boolean => state.isDragging;
   const isCapturing = (): boolean =>
-    Boolean(state.pending || state.isDragging || state.startTimerId);
+    Boolean(state.pending || state.isDragging || state.longPressTimerId);
   const schedule = createScheduler(callbacks, isDragging);
 
   const startDragging = () => {
     // Drag can start from either a timeout or user movement
     // so we need to clear the timeout
-    if (state.startTimerId) {
-      clearTimeout(state.startTimerId);
+    if (state.longPressTimerId) {
+      clearTimeout(state.longPressTimerId);
     }
 
     const pending: ?Position = state.pending;
@@ -73,7 +74,7 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
       hasMoved: false,
       // no longer relevant
       pending: null,
-      startTimerId: null,
+      longPressTimerId: null,
     });
 
     callbacks.onLift({
@@ -99,10 +100,10 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
       y: clientY,
     };
 
-    const startTimerId: number = setTimeout(startDragging, timeForLongPress);
+    const longPressTimerId: number = setTimeout(startDragging, timeForLongPress);
 
     setState({
-      startTimerId,
+      longPressTimerId,
       pending: point,
       isDragging: false,
       hasMoved: false,
@@ -111,7 +112,7 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
   };
 
   const stopPendingDrag = () => {
-    clearTimeout(state.startTimerId);
+    clearTimeout(state.longPressTimerId);
     unbindWindowEvents();
 
     setState(initial);
@@ -138,11 +139,15 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
         y: clientY,
       };
 
-      // event already stopped in onTouchMove but being caucious
+      // event already stopped in onTouchMove but being cautious
       stopEvent(event);
-      setState({
-        hasMoved: true,
-      });
+
+      // record that a movement has occurred
+      if (!state.hasMoved) {
+        setState({
+          hasMoved: true,
+        });
+      }
 
       if (state.pending) {
         if (!isSloppyClickThresholdExceeded(state.pending, point)) {
@@ -202,7 +207,7 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
 
       const touch: TouchWithForce = (event.touches[0] : any);
 
-      if (touch.force >= 0.15) {
+      if (touch.force >= forcePressThreshold) {
         cancel();
       }
     },
