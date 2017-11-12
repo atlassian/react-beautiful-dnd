@@ -1,7 +1,5 @@
 import type { Position, Direction, HTMLElement } from '../../types';
 
-export type DragTypes = 'KEYBOARD' | 'MOUSE' | 'TOUCH';
-
 export type Callbacks = {|
   onLift: ({ client: Position, isScrollAllowed: boolean }) => void,
   onMove: (point: Position) => void,
