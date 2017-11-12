@@ -1833,6 +1833,23 @@ describe('drag handle', () => {
           onLift: 0,
         })).toBe(true);
       });
+
+      it('should not start if any keypress is made', () => {
+        Object.keys(keyCodes).forEach((key: string) => {
+          // start a pending drag
+          touchStart(wrapper);
+
+          // should cancel the pending drag
+          dispatchWindowKeyDownEvent(key);
+
+          // would normally start a drag
+          jest.runAllTimers();
+
+          expect(callbacksCalled(callbacks)({
+            onLift: 0,
+          })).toBe(true);
+        });
+      });
     });
 
     describe('progress', () => {
@@ -1956,6 +1973,17 @@ describe('drag handle', () => {
           onLift: 1,
           onCancel: 1,
         })).toBe(true);
+      });
+
+      it('should cancel a drag if any keypress is made', () => {
+        Object.keys(keyCodes).forEach((key: string) => {
+          dispatchWindowKeyDownEvent(key);
+
+          expect(callbacksCalled(callbacks)({
+            onLift: 1,
+            onCancel: 1,
+          })).toBe(true);
+        });
       });
     });
 

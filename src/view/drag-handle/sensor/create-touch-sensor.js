@@ -184,7 +184,7 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
       }
       cancel();
     },
-    // if the orientation of the device changes - kill the drag
+    // If the orientation of the device changes - kill the drag
     // https://davidwalsh.name/orientation-change
     orientationchange: cancel,
     // some devices fire resize if the orientation changes
@@ -193,9 +193,12 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
     // This should not happen as we are calling preventDefault in touchmove,
     // but just being extra safe
     scroll: cancel,
-    // long press can bring up a context menu
+    // Long press can bring up a context menu
     // need to opt out of this behavior
     contextmenu: stopEvent,
+    // On some devices it is possible to have a touch interface with a keyboard.
+    // On any keyboard event we cancel a touch drag
+    keydown: cancel,
     // Need to opt out of dragging if the user is a force press
     // Only for safari which has decided to introduce its own custom way of doing things
     // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
