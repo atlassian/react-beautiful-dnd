@@ -24,11 +24,7 @@ See how beautiful it is for yourself!
 - Unopinionated styling
 - No creation of additional wrapper dom nodes - flexbox and focus management friendly!
 
-## Not for everyone
-
-There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing [`react-dnd`](https://github.com/react-dnd/react-dnd). It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **`react-beautiful-dnd` is a higher level abstraction specifically built for vertical and horizontal lists**. Within that subset of functionality `react-beautiful-dnd` offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by react-dnd. So this library might not be for you depending on what your use case is.
-
-### Currently supported feature set
+## Currently supported feature set
 
 - Vertical lists ↕
 - Horizontal lists ↔
@@ -45,6 +41,10 @@ There are a lot of libraries out there that allow for drag and drop interactions
 ### Lots more coming soon
 
 You can check out all the features that will be landing soon [on our issue page](https://github.com/atlassian/react-beautiful-dnd/issues).
+
+## Not for everyone
+
+There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing [`react-dnd`](https://github.com/react-dnd/react-dnd). It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **`react-beautiful-dnd` is a higher level abstraction specifically built for vertical and horizontal lists**. Within that subset of functionality `react-beautiful-dnd` offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by react-dnd. So this library might not be for you depending on what your use case is.
 
 ## Basic usage example
 
