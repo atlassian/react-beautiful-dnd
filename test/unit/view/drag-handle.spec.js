@@ -2151,4 +2151,112 @@ describe('drag handle', () => {
       expect(mock).toHaveBeenCalledWith(null);
     });
   });
+
+  describe('generic', () => {
+    type Control = {|
+      name: string,
+      preLift: Function,
+      lift: Function,
+      end: Function,
+    |}
+
+    const touch: Control = {
+      name: 'touch',
+      preLift: () => touchStart(wrapper),
+      lift: () => jest.runTimersToTime(timeForLongPress),
+      end: () => windowTouchEnd(),
+    };
+
+    const keyboard: Control = {
+      name: 'keyboard',
+      // no pre lift required
+      preLift: () => {},
+      lift: () => pressSpacebar(wrapper),
+      end: () => pressSpacebar(wrapper),
+    };
+
+    const mouse: Control = {
+      name: 'mouse',
+      preLift: () => mouseDown(wrapper),
+      lift: () => windowMouseMove(0, sloppyClickThreshold),
+      end: () => windowMouseUp(),
+    };
+
+    const controls: Control[] = [mouse, keyboard, touch];
+
+    const getAria = (): boolean => Boolean(wrapper.find(Child).props().dragHandleProps['aria-grabbed']);
+
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    controls.forEach((control: Control) => {
+      describe(`control: ${control.name}`, () => {
+        describe('aria', () => {
+          it('should not set the aria attribute of dragging if not dragging', () => {
+            expect(getAria()).toBe(false);
+          });
+
+          it('should not set the aria attribute of dragging if a drag is pending', () => {
+            control.preLift();
+            wrapper.update();
+
+            expect(getAria()).toBe(false);
+          });
+
+          it('should set the aria attribute of dragging if a drag is occurring', () => {
+            control.preLift();
+            control.lift();
+            wrapper.update();
+
+            expect(getAria()).toBe(true);
+          });
+
+          it('should set the aria attribute if drag is finished', () => {
+            control.preLift();
+            control.lift();
+            wrapper.update();
+            control.end();
+            wrapper.update();
+
+            expect(getAria()).toBe(false);
+          });
+        });
+
+        describe('window bindings', () => {
+          it('should unbind all window listeners when drag ends', () => {
+            jest.spyOn(window, 'addEventListener');
+            jest.spyOn(window, 'removeEventListener');
+
+            control.preLift();
+            control.lift();
+
+            // window events bound
+            expect(window.addEventListener).toHaveBeenCalled();
+
+            // nothing unabound yet
+            expect(window.removeEventListener).not.toHaveBeenCalled();
+
+            // ending the drag
+            control.end();
+
+            expect(window.addEventListener.mock.calls.length)
+              .toBe(window.removeEventListener.mock.calls.length);
+
+            // validation
+            expect(window.addEventListener.mock.calls.length).toBeGreaterThan(1);
+            expect(window.removeEventListener.mock.calls.length).toBeGreaterThan(1);
+
+            // cleanup
+            window.addEventListener.mockRestore();
+            window.removeEventListener.mockRestore();
+          });
+        });
+      });
+    });
+  });
 });
