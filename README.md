@@ -319,7 +319,19 @@ If the user lifts their finger before the timer is finished then we release the 
 
 #### Opting out of native scrolling
 
-When the user first puts their finger down we are not sure if they were attempting to scroll. However, when they first put their finger down we have a one time opportunity to opt out of native scrolling. You cannot opt back into native scrolling or out of native scrolling from this point. The primary reason we need to opt out of native scrolling as the direction that a user moves an element to reorder it is often in a different direction to the movement of reordering. Scrolling while dragging will be supported when we add the [auto scrolling feature](https://github.com/atlassian/react-beautiful-dnd/issues/27)
+When the user first puts their finger down we are not sure if they were attempting to scroll. However, when they first put their finger down we have a one time opportunity to opt out of native scrolling. You cannot opt back into native scrolling or out of native scrolling from this point. The primary reason we need to opt out of native scrolling is that the scroll of the page would cancel out the impact of a users reorder action. Scrolling while dragging will be supported when we add the [auto scrolling feature](https://github.com/atlassian/react-beautiful-dnd/issues/27)
+
+| Native scrolling                | Reordering                      |
+|---------------------------------|---------------------------------|
+| Moving up moves the **page** up | Moving up moves the **item** up |
+|![native scrolling](https://github.com/alexreardon/files/blob/master/resources/native-scroll.gif?raw=true)|![reordering](https://github.com/alexreardon/files/blob/master/resources/no-scroll-reorder.gif?raw=true)|
+
+When a user moves an item up we need the item to move up in the list and not for the viewport or container to scroll up also. If we did not disable native scrolling the user would not be able to reorder items.
+
+The library needs to opt out of native scrolling for reordering, however we recommend that you allow some ability for the user to scroll without reordering. This can be done through a variety of means including:
+
+- Not making `Draggable`s the full width of the viewport so they can scroll on the side of it
+- Use a *drag handle* so that only part of the `Draggable` is reserved for dragging
 
 #### Force press support
 
@@ -583,7 +595,7 @@ import { Droppable } from 'react-beautiful-dnd';
 - `type`: An *optional* `TypeId(string)` that can be used to simply accept a class of `Draggable`. For example, if you use the type `PERSON` then it will only allow `Draggable`s of type `PERSON` to be dropped on itself. `Draggable`s of type `TASK` would not be able to be dropped on a `Droppable` with type `PERSON`. If no `type` is provided, it will be set to `'DEFAULT'`. Currently the `type` of the `Draggable`s within a `Droppable` **must be** the same. This restriction might be loosened in the future if there is a valid use case.
 - `isDropDisabled`: An *optional* flag to control whether or not dropping is currently allowed on the `Droppable`. You can use this to implement your own conditional dropping logic. It will default to `false`.
 - `direction`: The direction in which items flow in this droppable. Options are `vertical` (default) and `horizontal`.
-- `ignoreContainerClipping`: When a `Droppable` is inside a scrollable container its area is constrained so that you can only drop on the part of the `Droppable` that you can see. Setting this prop opts out of this behaviour, allowing you to drop anywhere on a `Droppable` even if it's visually hidden by a scrollable parent. The default behaviour is suitable for most cases so odds are you'll never need to use this prop, but it can be useful if you've got very long `Draggable`s inside a short scroll container. Keep in mind that it might cause some unexpected behaviour if you have multiple `Droppable`s inside scroll containers on the same page.
+- `ignoreContainerClipping`: When a `Droppable` is inside a scrollable container its area is constrained so that you can only drop on the part of the `Droppable` that you can see. Setting this prop opts out of this behavior, allowing you to drop anywhere on a `Droppable` even if it's visually hidden by a scrollable parent. The default behavior is suitable for most cases so odds are you'll never need to use this prop, but it can be useful if you've got very long `Draggable`s inside a short scroll container. Keep in mind that it might cause some unexpected behavior if you have multiple `Droppable`s inside scroll containers on the same page.
 
 ### Children function
 
@@ -987,7 +999,7 @@ The `children` function is also provided with a small amount of state relating t
 
 ### Interactive child elements within a `Draggable`
 
-It is possible for your `Draggable` to be an interactive element such as a `<button>` or an `<a>`. However, there may be a situation where you want your `Draggable` element be the parent of an interactive element such as a `<button>` or an `<input>`. By default the child interactive element **will not be interactive**. Interacting with these nested interactive elements will be used as part of the calculation to start a drag. This is because we call `event.preventDefault()` on the `mousedown` event for the `Draggable`. Calling `preventDefault` will prevent the nested interactive element from performing its standard actions and interactions. What you will need to do is *opt out* of our standard calling of `event.preventDefault()`. By doing this the nested interactive element will not be able to be used to start a drag - but will allow the user to interact with it directly. Keep in mind - that by doing this the user will not be able to drag the `Draggable` by dragging on the interactive child element - which is probably what you want anyway. There are a few ways you can get around the standard `preventDefault` behaviour. Here are some suggestions:
+It is possible for your `Draggable` to be an interactive element such as a `<button>` or an `<a>`. However, there may be a situation where you want your `Draggable` element be the parent of an interactive element such as a `<button>` or an `<input>`. By default the child interactive element **will not be interactive**. Interacting with these nested interactive elements will be used as part of the calculation to start a drag. This is because we call `event.preventDefault()` on the `mousedown` event for the `Draggable`. Calling `preventDefault` will prevent the nested interactive element from performing its standard actions and interactions. What you will need to do is *opt out* of our standard calling of `event.preventDefault()`. By doing this the nested interactive element will not be able to be used to start a drag - but will allow the user to interact with it directly. Keep in mind - that by doing this the user will not be able to drag the `Draggable` by dragging on the interactive child element - which is probably what you want anyway. There are a few ways you can get around the standard `preventDefault` behavior. Here are some suggestions:
 
 **1. Call `event.stopPropagation()` on the interactive element `mousedown`**
 *This is the simpler solution*
@@ -1004,7 +1016,7 @@ On the child element, call `event.stopPropagation()` for the `onMouseDown` funct
 **2. Patch the `onMouseDown` event in `provided`**
 *This is the more complex solution*
 
-If you cannot use the first solution, then you can consider patching the `provided` > `onMouseDown` function. The main idea of this approach is to add additional behaviour to the existing `onMouseDown` function - only calling it when it should be called.
+If you cannot use the first solution, then you can consider patching the `provided` > `onMouseDown` function. The main idea of this approach is to add additional behavior to the existing `onMouseDown` function - only calling it when it should be called.
 
 ```js
 class DraggableWithSelect extends Component {
