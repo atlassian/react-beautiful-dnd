@@ -184,6 +184,8 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
       }
       cancel();
     },
+    // This should never happen - but just being super safe
+    touchstart: cancel,
     // If the orientation of the device changes - kill the drag
     // https://davidwalsh.name/orientation-change
     orientationchange: cancel,

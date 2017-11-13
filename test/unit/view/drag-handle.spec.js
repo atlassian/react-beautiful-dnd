@@ -1850,6 +1850,18 @@ describe('drag handle', () => {
           })).toBe(true);
         });
       });
+
+      it('should not start if a touchstart event is fired', () => {
+        touchStart(wrapper);
+        // rogue touchstart before timer finished
+        dispatchWindowTouchEvent('touchstart');
+        // flush all timers
+        jest.runAllTimers();
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 0,
+        })).toBe(true);
+      });
     });
 
     describe('progress', () => {
@@ -1976,14 +1988,38 @@ describe('drag handle', () => {
       });
 
       it('should cancel a drag if any keypress is made', () => {
-        Object.keys(keyCodes).forEach((key: string) => {
+        // end initial drag
+        end();
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onDrop: 1,
+        })).toBe(true);
+
+        Object.keys(keyCodes).forEach((key: string, index: number) => {
+          // start drag
+          start();
+
+          // should kill the drag
           dispatchWindowKeyDownEvent(key);
 
           expect(callbacksCalled(callbacks)({
-            onLift: 1,
-            onCancel: 1,
+            // initial lift + index + 1
+            onLift: index + 2,
+            // index + 1
+            onCancel: index + 1,
+            // initial drop
+            onDrop: 1,
           })).toBe(true);
         });
+      });
+
+      it('should if a touchstart event is fired', () => {
+        dispatchWindowTouchEvent('touchstart');
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onCancel: 1,
+        })).toBe(true);
       });
     });
 
