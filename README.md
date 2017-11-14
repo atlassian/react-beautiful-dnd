@@ -18,7 +18,7 @@ See how beautiful it is for yourself!
 ### Viewing on a mobile or tablet
 
 - [Simple list](https://react-beautiful-dnd.netlify.com/iframe.html)
-- [Board](https://react-beautiful-dnd.netlify.com/iframe.html?selectedKind=board&selectedStory=task%20board&full=0&down=1&left=1&panelRight=0&downPanel=storybook%2Factions%2Factions-panel)
+- [Board](https://react-beautiful-dnd.netlify.com/iframe.html?selectedKind=board&selectedStory=task%20board&full=0&down=1&left=1&panelRight=0&downPanel=storybook%2Factions%2Factions-panel) - best viewed in landscape
 
 > We provide different links for touch devices as currently [storybook](https://github.com/storybooks/storybook) does not have a good menu mobile experience [more information](https://github.com/storybooks/storybook/issues/124)
 
