@@ -1851,15 +1851,15 @@ describe('drag handle', () => {
         });
       });
 
-      it('should not start if a touchstart event is fired', () => {
+      it('should start if a touchstart event is fired', () => {
         touchStart(wrapper);
-        // rogue touchstart before timer finished
+        // this can be the touchstart initial event
         dispatchWindowTouchEvent('touchstart');
         // flush all timers
         jest.runAllTimers();
 
         expect(callbacksCalled(callbacks)({
-          onLift: 0,
+          onLift: 1,
         })).toBe(true);
       });
     });
