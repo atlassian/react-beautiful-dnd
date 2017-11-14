@@ -85,7 +85,7 @@ const getItemStyle = (draggableStyle, isDragging) => ({
   // some basic styles to make the items look a bit nicer
   userSelect: 'none',
   padding: grid * 2,
-  marginBottom: grid,
+  margin: `0 0 ${grid}px 0`,
 
   // change background colour if dragging
   background: isDragging ? 'lightgreen' : 'grey',
@@ -694,8 +694,6 @@ Getting keyboard dragging to work with scroll containers is quite difficult. Cur
 ## `Draggable`
 
 `Draggable` components can be dragged around and dropped onto `Droppable`s. A `Draggable` must always be contained within a `Droppable`. It is **possible** to reorder a `Draggable` within its home `Droppable` or move to another `Droppable`. It is **possible** because a `Droppable` is free to control what it allows to be dropped on it.
-
-> Note: moving between `Droppable`s is currently not supported in the initial version.
 
 ```js
 import { Draggable } from 'react-beautiful-dnd';
