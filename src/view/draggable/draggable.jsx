@@ -73,7 +73,6 @@ export default class Draggable extends Component {
       onMove: this.onMove,
       onDrop: this.onDrop,
       onCancel: this.onCancel,
-      onKeyLift: this.onKeyLift,
       onMoveBackward: this.onMoveBackward,
       onMoveForward: this.onMoveForward,
       onCrossAxisMoveForward: this.onCrossAxisMoveForward,
@@ -103,42 +102,20 @@ export default class Draggable extends Component {
     this.props.dropAnimationFinished(this.props.draggableId);
   }
 
-  onLift = (point: Position) => {
+  onLift = (options: {client: Position, isScrollAllowed: boolean}) => {
     this.throwIfCannotDrag();
+    const { client, isScrollAllowed } = options;
     const { lift, draggableId, type } = this.props;
     const { ref } = this.state;
 
-    const windowScroll: Position = getWindowScrollPosition();
-
-    const client: InitialDragLocation = {
-      selection: point,
+    const initial: InitialDragLocation = {
+      selection: client,
       center: getCenterPosition(ref),
     };
 
-    // Allowing scrolling with a mouse when lifting with a mouse
-    const isScrollAllowed = true;
-
-    lift(draggableId, type, client, windowScroll, isScrollAllowed);
-  }
-
-  onKeyLift = () => {
-    this.throwIfCannotDrag();
-    const { lift, draggableId, type } = this.props;
-    const { ref } = this.state;
-
-    // using center position as selection
-    const center: Position = getCenterPosition(ref);
-
-    const client: InitialDragLocation = {
-      selection: center,
-      center,
-    };
-
     const windowScroll: Position = getWindowScrollPosition();
-    // not allowing scrolling with a mouse when lifting with a keyboard
-    const isScrollAllowed = false;
 
-    lift(draggableId, type, client, windowScroll, isScrollAllowed);
+    lift(draggableId, type, initial, windowScroll, isScrollAllowed);
   }
 
   onMove = (client: Position) => {
@@ -211,6 +188,8 @@ export default class Draggable extends Component {
     });
   })
 
+  getDraggableRef = (): ?HTMLElement => this.state.ref;
+
   getPlaceholder() {
     const dimension: ?DraggableDimension = this.props.dimension;
     invariant(dimension, 'cannot get a drag placeholder when not dragging');
@@ -242,6 +221,10 @@ export default class Draggable extends Component {
         left,
         margin: 0,
         transform: movementStyle.transform ? `${movementStyle.transform}` : null,
+        // base style
+        WebkitTouchCallout: 'none',
+        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        touchAction: 'none',
       };
       return style;
     }
@@ -257,6 +240,10 @@ export default class Draggable extends Component {
         transition: canAnimate ? css.outOfTheWay : null,
         transform: movementStyle.transform,
         pointerEvents: canLift ? 'auto' : 'none',
+        // base style
+        WebkitTouchCallout: 'none',
+        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        touchAction: 'none',
       };
       return style;
     }
@@ -360,7 +347,7 @@ export default class Draggable extends Component {
               isEnabled={!isDragDisabled}
               canLift={canLift}
               callbacks={this.callbacks}
-              draggableRef={this.state.ref}
+              getDraggableRef={this.getDraggableRef}
             >
               {(dragHandleProps: ?DragHandleProvided) =>
                 children(
@@ -377,7 +364,7 @@ export default class Draggable extends Component {
                 )
               }
             </DragHandle>
-        )}
+          )}
         </Moveable>
       </DraggableDimensionPublisher>
     );

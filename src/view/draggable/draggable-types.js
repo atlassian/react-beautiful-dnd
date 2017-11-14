@@ -26,7 +26,26 @@ import type {
   Provided as DragHandleProvided,
 } from '../drag-handle/drag-handle-types';
 
-export type DraggingStyle = {|
+// These styles are applied by default to allow for a
+// better touch device drag and drop experience.
+// Users can opt out of these styles or change them if
+// they really need too for their specific use case.
+export type BaseStyle = {
+  // A long press on anchors usually pops a content menu that has options for
+  // the link such as 'Open in new tab'. Because long press is used to start
+  // a drag we need to opt out of this behavior
+  WebkitTouchCallout: 'none',
+
+  // Webkit based browsers add a grey overlay to anchors when they are active.
+  // We remove this tap overlay as it is confusing for users
+  // https://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/
+  WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+
+  // Added to avoid the *pull to refresh action* and *anchor focus* on Android Chrome
+  touchAction: 'none',
+}
+
+export type DraggingStyle = BaseStyle & {
   // Allow scrolling of the element behind the dragging element
   pointerEvents: 'none',
 
@@ -61,13 +80,13 @@ export type DraggingStyle = {|
   // When dragging or dropping we control the z-index to ensure that
   // the layering is correct
   zIndex: ZIndex,
-|}
+}
 
-export type NotDraggingStyle = {|
+export type NotDraggingStyle = BaseStyle & {
   transition: ?string,
   transform: ?string,
   pointerEvents: 'none' | 'auto',
-|}
+}
 
 export type DraggableStyle = DraggingStyle | NotDraggingStyle;
 

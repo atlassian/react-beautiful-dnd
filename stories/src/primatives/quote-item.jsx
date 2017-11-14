@@ -38,6 +38,7 @@ color: ${colors.black};
 }
 &:focus {
   outline: 2px solid ${colors.purple};
+  box-shadow: none;
 }
 
 /* flexbox */
@@ -95,6 +96,7 @@ flex-grow: 1;
 `;
 
 export default class QuoteItem extends Component {
+  // eslint-disable-next-line react/sort-comp
   props: Props
 
   componentDidMount() {
