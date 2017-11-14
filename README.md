@@ -9,38 +9,48 @@ Beautiful, accessible drag and drop for lists with [`React.js`](https://facebook
 
 ## Examples 🎉
 
-See how beautiful it is for yourself - [have a play with the examples!](https://react-beautiful-dnd.netlify.com)
+See how beautiful it is for yourself!
 
-## Core characteristics:
+### Viewing on a desktop
+
+[All the examples!](https://react-beautiful-dnd.netlify.com)
+
+### Viewing on a mobile or tablet
+
+- [Simple list](https://react-beautiful-dnd.netlify.com/iframe.html)
+- [Board](https://react-beautiful-dnd.netlify.com/iframe.html?selectedKind=board&selectedStory=task%20board&full=0&down=1&left=1&panelRight=0&downPanel=storybook%2Factions%2Factions-panel)
+
+> We provide different links for touch devices as currently [storybook](https://github.com/storybooks/storybook) does not have a good menu mobile experience [more information](https://github.com/storybooks/storybook/issues/124)
+
+## Core characteristics
 
 - Beautiful, natural movement of items
 - Clean and powerful api which is simple to get started with
+- Plays extremely well with standard browser interactions
 - Unopinionated styling
 - No creation of additional wrapper dom nodes - flexbox and focus management friendly!
-- Plays well with existing interactive nodes such as anchors
-- State driven dragging - which allows for dragging from many input types, including programatic dragging. Currently only mouse and keyboard dragging are supported
 
-## Not for everyone
-
-There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing [`react-dnd`](https://github.com/react-dnd/react-dnd). It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **`react-beautiful-dnd` is a higher level abstraction specifically built for vertical and horizontal lists**. Within that subset of functionality `react-beautiful-dnd` offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by react-dnd. So this library might not be for you depending on what your use case is.
-
-## Still young!
-
-This library is still fairly new and so there is a relatively small feature set. Be patient! Things will be moving rather quickly!
-
-### Currently supported feature set
+## Currently supported feature set
 
 - Vertical lists ↕
 - Horizontal lists ↔
 - Movement between lists (▤ ↔ ▤)
+- Mouse 🐭, keyboard 🎹 and touch 👉📱 (mobile, tablet and so on) support
 - Conditional [dragging](https://github.com/atlassian/react-beautiful-dnd#props-1) and [dropping](https://github.com/atlassian/react-beautiful-dnd#conditionally-dropping)
 - Multiple independent lists on the one page
-- Mouse 🐭 and **keyboard 🎹** dragging
 - Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
 - Flexible item sizes - the draggable items can have different heights (vertical) or widths (horizontal))
 - Custom drag handle - you can drag a whole item by just a part of it
 - A droppable list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Server side rendering compatible
+
+### Lots more coming soon
+
+You can check out all the features that will be landing soon [on our issue page](https://github.com/atlassian/react-beautiful-dnd/issues).
+
+## Not for everyone
+
+There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing [`react-dnd`](https://github.com/react-dnd/react-dnd). It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **`react-beautiful-dnd` is a higher level abstraction specifically built for vertical and horizontal lists**. Within that subset of functionality `react-beautiful-dnd` offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by react-dnd. So this library might not be for you depending on what your use case is.
 
 ## Basic usage example
 
@@ -158,15 +168,15 @@ class App extends Component {
 ReactDOM.render(<App />, document.getElementById('app'));
 ```
 
-### Physicality
+## Driving philosophy: physicality
 
 The core design idea of `react-beautiful-dnd` is physicality: we want users to feel like they are moving physical objects around
 
-#### Application 1: no instant movement
+### Application 1: no instant movement
 
 It is a fairly standard drag and drop pattern for things to disappear and reappear in response to the users drag. For a more natural drag we animate the movement of items as they need to move out of the way while dragging to more clearly show a drags effect. We also animate the drop of an item so that it animates into its new home position. At no point is an item instantly moved anywhere — regardless of whether it is dragging or not.
 
-#### Application 2: knowing when to move
+### Application 2: knowing when to move
 
 It is quite common for drag and drop interactions to be based on the position that user started the drag from.
 
@@ -175,11 +185,11 @@ In `react-beautiful-dnd` a dragging items impact is based on its centre of gravi
 - A list is *dragged over* when the centre position of a dragging item goes over one of the boundaries of the list
 - A resting drag item will move out of the way of a dragging item when the centre position of the dragging item goes over the edge of the resting item. Put another way: once the centre position of an item (A) goes over the edge of another item (B), B moves out of the way.
 
-#### Application 3: no drop shadows
+### Application 3: no drop shadows
 
 Drop shadows are useful in an environment where items and their destinations snap around. However, with `react-beautiful-dnd` it should be obvious where things will be dropping based on the movement of items. This might be changed in the future - but the experiment is to see how far we can get without any of these affordances.
 
-#### Application 4: maximise interactivity
+### Application 4: maximise interactivity
 
 `react-beautiful-dnd` works really hard to avoid as many periods of non-interactivity as possible. The user should feel like they are in control of the interface and not waiting for an animation to finish before they can continue to interact with the interface. However, there is a balance that needs to be made between correctness and power in order to make everybody's lives more sane. Here are the only situations where some things are not interactive:
 
@@ -188,71 +198,25 @@ Drop shadows are useful in an environment where items and their destinations sna
 
 Keep in mind that these periods of inactivity may not always exist.
 
-#### Application 5: no drag axis locking
+### Application 5: no drag axis locking
 
 For now, the library does not support drag axis locking (aka drag rails). This is where the user is restricted to only dragging along one axis. The current thinking is this breaks the physical metaphore we are going for and sends a message to the user that they are interacting with a piece of software rather than moving physical objects around. It is possible to ensure that a user can only drop in a single list by using props `type` and `isDropEnabled`. You can also do some visual treatment to the list `onDragStart` to show the user that this is the only place they can interact with.
 
-#### Application 6: natural cross list movement
+### Application 6: natural cross list movement
 
 Rather than using an index based approach for keyboard movement between lists, `react-beautiful-dnd` performs cross list movement based on **inertia, gravity and collisions**. You can find out more about how this works by reading the blog ["Natural keyboard movement between lists"](https://medium.com/@alexandereardon/friction-gravity-and-collisions-3adac3a94e19).
 
 ![example](https://raw.githubusercontent.com/alexreardon/files/master/resources/collision.gif?raw=true)
 
-### Sloppy clicks and click blocking 🐱🎁
-
-When a user presses the mouse down on an element, we cannot determine if the user was clicking or dragging. Also, sometimes when a user clicks they can move the cursor slightly — a sloppy click. So we only start a drag once the user has moved beyond a certain distance with the mouse down (the drag threshold) — more than they would if they where just making a sloppy click. If the drag threshold is not exceeded then the user interaction behaves just like a regular click. If the drag threshold is exceeded then the interaction will be classified as a drag and the standard click action will not occur.
-
-This allows consumers to wrap interactive elements such as an anchor and have it be both a standard anchor as well as a draggable item in a natural way.
-
-(🐱🎁 is a [schrodinger's cat](https://www.youtube.com/watch?v=IOYyCHGWJq4) joke)
-
-### Focus management
-
-`react-beautiful-dnd` does not create any wrapper elements. This means that it will not impact the usual tab flow of a document. For example, if you are wrapping an *anchor* tag then the user will tab to the anchor directly and not an element surrounding the *anchor*. Whatever element you wrap will be given a `tab-index` to ensure that users can tab to the element to perform keyboard dragging.
-
-### Accessibility
-
-Traditionally drag and drop interactions have been exclusively a mouse or touch interaction. This library ships with support for drag and drop interactions **using only a keyboard**. This enables power users to drive their experience entirely from the keyboard. As well as opening up these experiences to users who would have been excluded previously.
-
-In addition to supporting keyboard, we have also audited how the keyboard shortcuts interact with standard browser keyboard interactions. When the user is not dragging they can use their keyboard as they normally would. While dragging we override and disable certain browser shortcuts (such as `tab`) to ensure a fluid experience for the user.
-
-#### Shortcuts
-
-Currently the keyboard handling is hard coded. This might be changed in the future to become customisable. Here is the existing keyboard mapping:
-
-- **tab** <kbd>tab ↹</kbd> - standard browser tabbing will navigate through the `Droppable`'s. The library does not do anything fancy with `tab` while users are selecting. Once a drag has started, `tab` is blocked for the duration of the drag.
-- **spacebar** <kbd>space</kbd> - lift a focused `Draggable`. Also, drop a dragging `Draggable` where the drag was started with a `spacebar`. Users dragging with a mouse can still use <kbd>space</kbd> to scroll the window during a drag (super cool)
-- **Escape** <kbd>esc</kbd> - cancel an existing drag - regardless of whether the user is dragging with the keyboard or mouse.
-
-##### Keyboard dragging movement
-
-**Currently within a vertical list**
-
-- **Up arrow** <kbd>↑</kbd> - move a `Draggable` upwards in a `Droppable`
-- **Down arrow** <kbd>↓</kbd> - move a `Draggable` downwards in a `Droppable`
-- **Right arrow** <kbd>→</kbd> - move a `Draggable` to a `Droppable` to the *right* of the current `Droppable` (move to new list)
-- **Left arrow** <kbd>←</kbd> - move a `Draggable` to a `Droppable` to the *left* of the current `Droppable` (move to new list)
-
-**Currently within a horizontal list**
-
-- **Up arrow** <kbd>↑</kbd> - move a `Draggable` to a `Droppable` to *above* the current `Droppable` (move to new list)
-- **Down arrow** <kbd>↓</kbd> - move a `Draggable` to a `Droppable` to *below* the current `Droppable` (move to new list)
-- **Right arrow** <kbd>→</kbd> - move a `Draggable` to the *right* in the current `Droppable`
-- **Left arrow** <kbd>←</kbd> - move a `Draggable` to the *left* in the current `Droppable`
-
-#### Limitations of keyboard dragging
-
-There is current limitation of keyboard dragging: **the drag will cancel if the user scrolls the window**. This could be worked around but for now it is the simpliest initial approach.
-
 ## Carefully designed animations
 
 With things moving a lot it would be easy for the user to become distracted by the animations or for them to get in the way. We have tweaked the various animations to ensure the right balance of guidance, performance and interactivity.
 
-#### Dropping
+### Dropping
 
 When you drop a dragging item its movement is based on physics (thanks [`react-motion`](https://github.com/chenglou/react-motion)). This results in the drop feeling more weighted and physical.
 
-#### Moving out of the way
+### Moving out of the way
 
 Items that are moving out of the way of a dragging item do so with a CSS transition rather than physics. This is to maximise performance by allowing the GPU to handle the movement. The CSS animation curve has been designed to communicate getting out of the way.
 
@@ -264,6 +228,162 @@ How it is composed:
 
 ![animation curve](https://raw.githubusercontent.com/alexreardon/files/master/resources/dnd-ease-in-out-small.png?raw=true)
 > animation curve used when moving out of the way
+
+## Caring about the interaction details
+
+### Focus management
+
+`react-beautiful-dnd` does not create any wrapper elements. This means that it will not impact the usual tab flow of a document. For example, if you are wrapping an *anchor* tag then the user will tab to the anchor directly and not an element surrounding the *anchor*. Whatever element you wrap will be given a `tab-index` to ensure that users can tab to the element to perform keyboard dragging.
+
+### Accessibility
+
+Traditionally drag and drop interactions have been exclusively a mouse or touch interaction. This library ships with support for drag and drop interactions **using only a keyboard**. This enables power users to drive their experience entirely from the keyboard. As well as opening up these experiences to users who would have been excluded previously.
+
+In addition to supporting keyboard, we have also audited how the keyboard shortcuts interact with standard browser keyboard interactions. When the user is not dragging they can use their keyboard as they normally would. While dragging we override and disable certain browser shortcuts (such as `tab`) to ensure a fluid experience for the user.
+
+## Mouse dragging
+
+### Sloppy clicks and click blocking 🐱🎁
+
+When a user presses the mouse down on an element, we cannot determine if the user was clicking or dragging. Also, sometimes when a user clicks they can move the cursor slightly — a sloppy click. So we only start a drag once the user has moved beyond a certain distance with the mouse down (the drag threshold) — more than they would if they where just making a sloppy click. If the drag threshold is not exceeded then the user interaction behaves just like a regular click. If the drag threshold is exceeded then the interaction will be classified as a drag and the standard click action will not occur.
+
+This allows consumers to wrap interactive elements such as an anchor and have it be both a standard anchor as well as a draggable item in a natural way.
+
+(🐱🎁 is a [schrodinger's cat](https://www.youtube.com/watch?v=IOYyCHGWJq4) joke)
+
+### Keyboard shortcuts: mouse dragging
+
+When a drag **is not occurring** `react-beautiful-dnd` does not impact any of the standard keyboard interactions (it has no listeners bound).
+
+When a drag **is occurring** with a *mouse* the user is able to execute the following keyboard shortcuts:
+
+- **escape** <kbd>esc</kbd> - cancel the drag
+
+During a mouse drag the following standard keyboard events are blocked to prevent a bad experience:
+
+- **tab** <kbd>tab ↹</kbd> - blocking tabbing
+- **enter** <kbd>⏎</kbd> - blocking submission
+
+Other than these explicitly blocked keyboard events all standard keyboard events should work as expected.
+
+## Keyboard dragging
+
+`react-beautiful-dnd` supports dragging with only a keyboard
+
+### Keyboard shortcuts: keyboard dragging
+
+When a drag is not occurring, key the user will be able to navigation through the `Draggable`'s on a page using the standard **tab** <kbd>tab ↹</kbd> key to move forward through the tabbable elements and (**shift** + **tab**) (<kbd>shift</kbd> + )<kbd>tab ↹</kbd>) to move backwards. We achieve this by adding a `tab-index` to the `Draggable`. When a `Draggable` has focus the **spacebar** <kbd>space</kbd> will **lift** a `Draggable`. This will start the drag.
+
+Once a drag is started the following keyboard shortcuts can be used:
+
+- **spacebar** <kbd>space</kbd> - drop the `Draggable`
+- **escape** <kbd>esc</kbd> - cancel the drag
+
+The following commands are also available but they depend on the `type` of `Droppable` that the `Draggable` is *currently* in:
+
+#### Within a vertical list
+
+- **Up arrow** <kbd>↑</kbd> - move a `Draggable` upwards in a `Droppable`
+- **Down arrow** <kbd>↓</kbd> - move a `Draggable` downwards in a `Droppable`
+- **Right arrow** <kbd>→</kbd> - move a `Draggable` to a `Droppable` to the *right* of the current `Droppable` (move to new list)
+- **Left arrow** <kbd>←</kbd> - move a `Draggable` to a `Droppable` to the *left* of the current `Droppable` (move to new list)
+
+#### Within a horizontal list
+
+- **Up arrow** <kbd>↑</kbd> - move a `Draggable` to a `Droppable` to *above* the current `Droppable` (move to new list)
+- **Down arrow** <kbd>↓</kbd> - move a `Draggable` to a `Droppable` to *below* the current `Droppable` (move to new list)
+- **Right arrow** <kbd>→</kbd> - move a `Draggable` to the *right* in the current `Droppable`
+- **Left arrow** <kbd>←</kbd> - move a `Draggable` to the *left* in the current `Droppable`
+
+During a drag the following standard keyboard events are blocked to prevent a bad experience:
+
+- **tab** <kbd>tab ↹</kbd> - blocking tabbing
+- **enter** <kbd>⏎</kbd> - blocking submission
+
+### Limitations of keyboard dragging
+
+There is current limitation of keyboard dragging: **the drag will cancel if the user scrolls the window**. This could be worked around but for now it is the simpliest initial approach.
+
+## Touch dragging
+
+`react-beautiful-dnd` supports dragging on touch devices such as mobiles and tablets.
+
+### Starting a drag
+
+A user can start a drag by:
+
+1. Holding their finger 👇 on an element for a small period of time 🕑 (long press); OR
+2. Moving an element beyond a small distance threshold
+
+### Understanding intention: tap, force press, scroll and drag
+
+When a user presses their finger (or other input) on a `Draggable` we are not sure if they where intending to *tap*, *force press*, *scroll the container* or *drag*. **As much as possible `react-beautiful-dnd` aims to ensure that a users default interaction experience remains unaffected**.
+
+#### Tap support
+
+If the user lifts their finger before the timer is finished then we release the event to the browser for it to determine whether to perform the standard tap / click action. This allows you to have a `Draggable` that is both clickable such as a anchor as well as draggable.
+
+#### Opting out of native scrolling
+
+When the user first puts their finger down we are not sure if they were attempting to scroll. However, when they first put their finger down we have a one time opportunity to opt out of native scrolling. You cannot opt back into native scrolling or out of native scrolling from this point. The primary reason we need to opt out of native scrolling is that the scroll of the page would cancel out the impact of a users reorder action. Scrolling while dragging will be supported when we add the [auto scrolling feature](https://github.com/atlassian/react-beautiful-dnd/issues/27)
+
+| Native scrolling                | Reordering                      |
+|---------------------------------|---------------------------------|
+| Moving up moves the **page** up | Moving up moves the **item** up |
+|![native scrolling](https://github.com/alexreardon/files/blob/master/resources/native-scroll.gif?raw=true)|![reordering](https://github.com/alexreardon/files/blob/master/resources/no-scroll-reorder.gif?raw=true)|
+
+When a user moves an item up we need the item to move up in the list and not for the viewport or container to scroll up also. If we did not disable native scrolling the user would not be able to reorder items.
+
+The library needs to opt out of native scrolling for reordering, however we recommend that you allow some ability for the user to scroll without reordering. This can be done through a variety of means including:
+
+- Not making `Draggable`s the full width of the viewport so they can scroll on the side of it
+- Use a *drag handle* so that only part of the `Draggable` is reserved for dragging
+
+#### Force press support
+
+> Safari only
+
+If the user force presses on the element before they have moved the element (even if a drag has already started) then the drag is cancelled and the standard force press action occurs. For an anchor this is a website preview.
+
+### Preset styles
+
+We add the following styles to `Draggable`s by default to provide a more consistent touch dragging experience across various browsers out of the box. They have no visual impact. You are welcome to change these values or disable them for your specific use cases if you need to.
+
+Avoid the *pull to refresh action* and *anchor focus* on Android Chrome
+
+```css
+touch-action: none;
+```
+
+A long press on anchors usually pops a content menu that has options for the link such as 'Open in new tab'. Because long press is used to start a drag we need to opt out of this behavior
+
+```css
+-webkit-touch-callout: none;
+```
+
+Webkit based browsers add a grey overlay to anchors when they are active. We remove this tap overlay as it is confusing for users. [more information](https://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/).
+
+```css
+-webkit-tap-highlight-color: rgba(0,0,0,0);
+```
+
+### Vibration
+
+> This is merely a suggestion - it is up to you to add this if you want this behavior.
+
+If you like you could also trigger a [vibration event](https://developer.mozilla.org/en-US/docs/Web/API/Vibration_API) when the user picks up a `Draggable`. This can provide tactile feedback that the user is doing something. It currently is only supported in Chrome on Android.
+
+```js
+class App extends React.Component {
+  onDragStart = () => {
+    // good times
+    if (window.navigator.vibrate) {
+      window.navigator.vibrate(100);
+    }
+  };
+  /*...*/
+}
+```
 
 ## Installation
 
@@ -384,6 +504,10 @@ Because this library does not control your state, it is up to you to *synchronou
 - if `source.droppableId` equals `destination.droppableId` you need to remove the item from your list and insert it at the correct position.
 - if `source.droppableId` does not equal `destination.droppableId`, then you need to remove the `Draggable` from the `source.droppableId` list and add it into the correct position of the `destination.droppableId` list.
 
+### Persisting a reorder
+
+If you need to persist a reorder to a remote data store - update the list synchronously on the client and fire off a request in the background to persist the change. If the remote save fails it is up to you how to communicate that to the user and update, or not update, the list.
+
 ### Type information
 
 ```js
@@ -477,7 +601,7 @@ import { Droppable } from 'react-beautiful-dnd';
 - `type`: An *optional* `TypeId(string)` that can be used to simply accept a class of `Draggable`. For example, if you use the type `PERSON` then it will only allow `Draggable`s of type `PERSON` to be dropped on itself. `Draggable`s of type `TASK` would not be able to be dropped on a `Droppable` with type `PERSON`. If no `type` is provided, it will be set to `'DEFAULT'`. Currently the `type` of the `Draggable`s within a `Droppable` **must be** the same. This restriction might be loosened in the future if there is a valid use case.
 - `isDropDisabled`: An *optional* flag to control whether or not dropping is currently allowed on the `Droppable`. You can use this to implement your own conditional dropping logic. It will default to `false`.
 - `direction`: The direction in which items flow in this droppable. Options are `vertical` (default) and `horizontal`.
-- `ignoreContainerClipping`: When a `Droppable` is inside a scrollable container its area is constrained so that you can only drop on the part of the `Droppable` that you can see. Setting this prop opts out of this behaviour, allowing you to drop anywhere on a `Droppable` even if it's visually hidden by a scrollable parent. The default behaviour is suitable for most cases so odds are you'll never need to use this prop, but it can be useful if you've got very long `Draggable`s inside a short scroll container. Keep in mind that it might cause some unexpected behaviour if you have multiple `Droppable`s inside scroll containers on the same page.
+- `ignoreContainerClipping`: When a `Droppable` is inside a scrollable container its area is constrained so that you can only drop on the part of the `Droppable` that you can see. Setting this prop opts out of this behavior, allowing you to drop anywhere on a `Droppable` even if it's visually hidden by a scrollable parent. The default behavior is suitable for most cases so odds are you'll never need to use this prop, but it can be useful if you've got very long `Draggable`s inside a short scroll container. Keep in mind that it might cause some unexpected behavior if you have multiple `Droppable`s inside scroll containers on the same page.
 
 ### Children function
 
@@ -698,7 +822,22 @@ It is a contract of this library that it owns the positioning logic of the dragg
 ```js
 type DraggableStyle = DraggingStyle | NotDraggingStyle;
 
-type DraggingStyle = {|
+// These styles are applied by default to allow for a
+// better touch device drag and drop experience.
+// Users can opt out of these styles or change them if
+// they really need too for their specific use case.
+type BaseStyle = {
+  // Disable standard long press action
+  WebkitTouchCallout: 'none',
+
+  // Disable grey overlay on active anchors
+  WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+
+  // Avoid pull to refresh action and anchor focus on Android Chrome
+  touchAction: 'none',
+}
+
+type DraggingStyle = BaseStyle & {
   pointerEvents: 'none',
   position: 'fixed',
   width: number,
@@ -709,13 +848,13 @@ type DraggingStyle = {|
   margin: 0,
   transform: ?string,
   zIndex: ZIndex,
-|}
+}
 
-type NotDraggingStyle = {|
+type NotDraggingStyle = BaseStyle & {
   transition: ?string,
   transform: ?string,
   pointerEvents: 'none' | 'auto',
-|};
+};
 ```
 
 - `provided.placeholder (?ReactElement)` The `Draggable` element has `position: fixed` applied to it while it is dragging. The role of the `placeholder` is to sit in the place that the `Draggable` was during a drag. It is needed to stop the `Droppable` list from collapsing when you drag. It is advised to render it as a sibling to the `Draggable` node. This is unlike `Droppable` where the `placeholder` needs to be *within* the `Droppable` node. When the library moves to `React` 16 the `placeholder` will be removed from api.
@@ -864,7 +1003,7 @@ The `children` function is also provided with a small amount of state relating t
 
 ### Interactive child elements within a `Draggable`
 
-It is possible for your `Draggable` to be an interactive element such as a `<button>` or an `<a>`. However, there may be a situation where you want your `Draggable` element be the parent of an interactive element such as a `<button>` or an `<input>`. By default the child interactive element **will not be interactive**. Interacting with these nested interactive elements will be used as part of the calculation to start a drag. This is because we call `event.preventDefault()` on the `mousedown` event for the `Draggable`. Calling `preventDefault` will prevent the nested interactive element from performing its standard actions and interactions. What you will need to do is *opt out* of our standard calling of `event.preventDefault()`. By doing this the nested interactive element will not be able to be used to start a drag - but will allow the user to interact with it directly. Keep in mind - that by doing this the user will not be able to drag the `Draggable` by dragging on the interactive child element - which is probably what you want anyway. There are a few ways you can get around the standard `preventDefault` behaviour. Here are some suggestions:
+It is possible for your `Draggable` to be an interactive element such as a `<button>` or an `<a>`. However, there may be a situation where you want your `Draggable` element be the parent of an interactive element such as a `<button>` or an `<input>`. By default the child interactive element **will not be interactive**. Interacting with these nested interactive elements will be used as part of the calculation to start a drag. This is because we call `event.preventDefault()` on the `mousedown` event for the `Draggable`. Calling `preventDefault` will prevent the nested interactive element from performing its standard actions and interactions. What you will need to do is *opt out* of our standard calling of `event.preventDefault()`. By doing this the nested interactive element will not be able to be used to start a drag - but will allow the user to interact with it directly. Keep in mind - that by doing this the user will not be able to drag the `Draggable` by dragging on the interactive child element - which is probably what you want anyway. There are a few ways you can get around the standard `preventDefault` behavior. Here are some suggestions:
 
 **1. Call `event.stopPropagation()` on the interactive element `mousedown`**
 *This is the simpler solution*
@@ -881,7 +1020,7 @@ On the child element, call `event.stopPropagation()` for the `onMouseDown` funct
 **2. Patch the `onMouseDown` event in `provided`**
 *This is the more complex solution*
 
-If you cannot use the first solution, then you can consider patching the `provided` > `onMouseDown` function. The main idea of this approach is to add additional behaviour to the existing `onMouseDown` function - only calling it when it should be called.
+If you cannot use the first solution, then you can consider patching the `provided` > `onMouseDown` function. The main idea of this approach is to add additional behavior to the existing `onMouseDown` function - only calling it when it should be called.
 
 ```js
 class DraggableWithSelect extends Component {
@@ -1041,7 +1180,13 @@ type DraggableStateSnapshot = {|
 |}
 
 type DraggableStyle = DraggingStyle | NotDraggingStyle
-type DraggingStyle = {|
+
+type BaseStyle = {
+  WebkitTouchCallout: 'none',
+  WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+  touchAction: 'none',
+}
+type DraggingStyle = BaseStyle & {
   pointerEvents: 'none',
   position: 'fixed',
   width: number,
@@ -1052,8 +1197,8 @@ type DraggingStyle = {|
   margin: 0,
   transform: ?string,
   zIndex: ZIndex,
-|}
-type NotDraggingStyle = {|
+}
+type NotDraggingStyle = BaseStyle & {
   transition: ?string,
   transform: ?string,
   pointerEvents: 'none' | 'auto',
@@ -1062,6 +1207,8 @@ type DragHandleProvided = {|
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
   onClick: (event: MouseEvent) => void,
+  onTouchStart: (event: TouchEvent) => void,
+  onTouchMove: (event: TouchEvent) => void,
   tabIndex: number,
   'aria-grabbed': boolean,
   draggable: boolean,
@@ -1130,7 +1277,11 @@ This library supports the standard [Atlassian supported browsers](https://conflu
 | Google Chrome (Windows and Mac)     | Latest stable version supported                      |
 | Safari (Mac)                        | Latest stable version on latest OS release supported |
 
-Currently mobile is not supported. However, there are plans to add touch support in the future
+| Mobile                              | Version                                              |
+|-------------------------------------|------------------------------------------------------|
+| Chrome (Android and iOS)            | Latest stable version supported                      |
+| Mobile Safari (iOS)                 | Latest stable version supported                      |
+| Android (Android)                   | The default browser on Android 4.0.3 (Ice Cream Sandwich) |
 
 ## Translations
 

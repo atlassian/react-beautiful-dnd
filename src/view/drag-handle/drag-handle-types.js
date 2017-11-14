@@ -1,10 +1,7 @@
-import type { Position, Direction } from '../../types';
-
-export type DragTypes = 'KEYBOARD' | 'MOUSE';
+import type { Position, Direction, HTMLElement } from '../../types';
 
 export type Callbacks = {|
-  onLift: (point: Position) => void,
-  onKeyLift: () => void,
+  onLift: ({ client: Position, isScrollAllowed: boolean }) => void,
   onMove: (point: Position) => void,
   onWindowScroll: (diff: Position) => void,
   onMoveForward: () => void,
@@ -18,6 +15,8 @@ export type Callbacks = {|
 export type Provided = {|
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
+  onTouchStart: (event: TouchEvent) => void,
+  onTouchMove: (event: TouchEvent) => void,
 
   // Conditionally block clicks
   onClick: (event: MouseEvent) => void,
@@ -43,10 +42,7 @@ export type Props = {|
   // the direction of the current droppable
   direction: ?Direction,
   callbacks: Callbacks,
+  // get the ref of the draggable
+  getDraggableRef: () => ?HTMLElement,
   children: (?Provided) => void,
 |}
-
-// Custom event format for force press inputs
-export type MouseForceChangedEvent = MouseEvent & {
-  webkitForce?: number,
-}

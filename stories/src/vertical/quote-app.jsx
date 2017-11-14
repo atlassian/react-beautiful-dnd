@@ -49,6 +49,12 @@ export default class QuoteApp extends Component {
     publishOnDragStart(initial);
     // $ExpectError - body could be null?
     document.body.classList.add(isDraggingClassName);
+
+    // Add a little vibration if the browser supports it.
+    // Add's a nice little physical feedback
+    if (window.navigator.vibrate) {
+      window.navigator.vibrate(100);
+    }
   }
 
   onDragEnd = (result: DropResult) => {
