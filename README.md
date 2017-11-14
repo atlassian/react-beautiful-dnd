@@ -308,6 +308,10 @@ There is current limitation of keyboard dragging: **the drag will cancel if the 
 
 `react-beautiful-dnd` supports dragging on touch devices such as mobiles and tablets.
 
+![Mobile landscape](https://github.com/alexreardon/files/blob/master/resources/iphone-landscape.gif?raw=true)
+
+> Recorded on iPhone 6s
+
 ### Starting a drag
 
 A user can start a drag by:
