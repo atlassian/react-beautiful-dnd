@@ -184,8 +184,15 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
       }
       cancel();
     },
-    // This should never happen - but just being super safe
-    touchstart: cancel,
+    touchstart: () => {
+      // this will also intercept the initial touchstart
+
+      // This should never happen - but just being super safe
+      if (isDragging()) {
+        console.error('touch start fired while already dragging');
+        cancel();
+      }
+    },
     // If the orientation of the device changes - kill the drag
     // https://davidwalsh.name/orientation-change
     orientationchange: cancel,
