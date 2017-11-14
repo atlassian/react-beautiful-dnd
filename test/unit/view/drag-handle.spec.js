@@ -20,6 +20,7 @@ import type { Position } from '../../../src/types';
 import * as keyCodes from '../../../src/view/key-codes';
 import getWindowScrollPosition from '../../../src/view/get-window-scroll-position';
 import setWindowScroll from '../../utils/set-window-scroll';
+import forceUpdate from '../../utils/force-update';
 import getClientRect from '../../../src/state/get-client-rect';
 import { timeForLongPress, forcePressThreshold } from '../../../src/view/drag-handle/sensor/create-touch-sensor';
 
@@ -2267,7 +2268,7 @@ describe('drag handle', () => {
 
           it('should not set the aria attribute of dragging if a drag is pending', () => {
             control.preLift();
-            wrapper.update();
+            forceUpdate(wrapper);
 
             expect(getAria()).toBe(false);
           });
@@ -2275,7 +2276,7 @@ describe('drag handle', () => {
           it('should set the aria attribute of dragging if a drag is occurring', () => {
             control.preLift();
             control.lift();
-            wrapper.update();
+            forceUpdate(wrapper);
 
             expect(getAria()).toBe(true);
           });
@@ -2283,9 +2284,9 @@ describe('drag handle', () => {
           it('should set the aria attribute if drag is finished', () => {
             control.preLift();
             control.lift();
-            wrapper.update();
+            forceUpdate(wrapper);
             control.end();
-            wrapper.update();
+            forceUpdate(wrapper);
 
             expect(getAria()).toBe(false);
           });
