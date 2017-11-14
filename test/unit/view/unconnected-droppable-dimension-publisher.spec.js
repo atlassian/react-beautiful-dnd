@@ -6,6 +6,7 @@ import DroppableDimensionPublisher from '../../../src/view/droppable-dimension-p
 import { getDroppableDimension, getFragment } from '../../../src/state/dimension';
 import getClientRect from '../../../src/state/get-client-rect';
 import setWindowScroll from '../../utils/set-window-scroll';
+import forceUpdate from '../../utils/force-update';
 import type {
   ClientRect,
   Spacing,
@@ -305,7 +306,7 @@ describe('DraggableDimensionPublisher', () => {
       expect(publish).toHaveBeenCalledTimes(1);
 
       // should not publish if the props have not changed
-      wrapper.update();
+      forceUpdate(wrapper);
       expect(publish).toHaveBeenCalledTimes(1);
 
       // should publish when freshly required to do so

@@ -7,6 +7,7 @@ import noImpact from '../../../src/state/no-impact';
 import { getDraggableDimension } from '../../../src/state/dimension';
 import { withStore } from '../../utils/get-context-options';
 import getClientRect from '../../../src/state/get-client-rect';
+import forceUpdate from '../../utils/force-update';
 import type {
   Phase,
   DragState,
@@ -720,7 +721,7 @@ describe('Droppable - connected', () => {
     it('should render the child function when the parent re-renders', () => {
       const wrapper = mount(<App currentUser="Jake" />, withStore());
 
-      wrapper.update();
+      forceUpdate(wrapper);
 
       // initial render causes two renders due to setting child ref
       expect(Person.prototype.render).toHaveBeenCalledTimes(3);
