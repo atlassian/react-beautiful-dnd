@@ -11,12 +11,18 @@ Beautiful, accessible drag and drop for lists with [`React.js`](https://facebook
 
 See how beautiful it is for yourself!
 
-- [Viewing on a desktop](https://react-beautiful-dnd.netlify.com)
-- [Viewing on a mobile or tablet](https://react-beautiful-dnd.netlify.com/iframe.html)
+### Viewing on a desktop
 
-> We provide a different link for mobile as currently [storybook](https://github.com/storybooks/storybook) does not have a good menu mobile experience [more information](https://github.com/storybooks/storybook/issues/124)
+[All the examples!](https://react-beautiful-dnd.netlify.com)
 
-## Core characteristics:
+### Viewing on a mobile or tablet
+
+- [Simple list](https://react-beautiful-dnd.netlify.com/iframe.html)
+- [Board](https://react-beautiful-dnd.netlify.com/iframe.html?selectedKind=board&selectedStory=task%20board&full=0&down=1&left=1&panelRight=0&downPanel=storybook%2Factions%2Factions-panel)
+
+> We provide different links for touch devices as currently [storybook](https://github.com/storybooks/storybook) does not have a good menu mobile experience [more information](https://github.com/storybooks/storybook/issues/124)
+
+## Core characteristics
 
 - Beautiful, natural movement of items
 - Clean and powerful api which is simple to get started with
@@ -1203,6 +1209,8 @@ type DragHandleProvided = {|
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
   onClick: (event: MouseEvent) => void,
+  onTouchStart: (event: TouchEvent) => void,
+  onTouchMove: (event: TouchEvent) => void,
   tabIndex: number,
   'aria-grabbed': boolean,
   draggable: boolean,

@@ -16,6 +16,7 @@ export type Provided = {|
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
   onTouchStart: (event: TouchEvent) => void,
+  onTouchMove: (event: TouchEvent) => void,
 
   // Conditionally block clicks
   onClick: (event: MouseEvent) => void,
