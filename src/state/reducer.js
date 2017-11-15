@@ -37,17 +37,12 @@ const noDimensions: DimensionState = {
 
 const origin: Position = { x: 0, y: 0 };
 
-const clean = memoizeOne((phase?: Phase = 'IDLE'): State => {
-  const state: State = {
-    // flow was not good with having a default arg on an optional type
-    phase,
-    drag: null,
-    drop: null,
-    dimension: noDimensions,
-  };
-
-  return state;
-});
+const clean = memoizeOne((phase?: Phase = 'IDLE'): State => ({
+  phase,
+  drag: null,
+  drop: null,
+  dimension: noDimensions,
+}));
 
 type MoveArgs = {|
   state: State,
