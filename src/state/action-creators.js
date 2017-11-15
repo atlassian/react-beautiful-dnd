@@ -233,6 +233,16 @@ export const clean = (): CleanAction => ({
   payload: null,
 });
 
+type PrepareAction = {
+  type: 'PREPARE',
+  payload: null,
+}
+
+export const prepare = (): PrepareAction => ({
+  type: 'PREPARE',
+  payload: null,
+});
+
 export type DropAnimateAction = {
   type: 'DROP_ANIMATE',
   payload: {|
@@ -279,26 +289,21 @@ export const drop = () =>
   (dispatch: Dispatch, getState: () => State): void => {
     const state: State = getState();
 
-    // This can occur if the user ends a drag before
-    // the collecting phase is finished.
-    // This will not trigger a hook as the hook waits
-    // for a DRAGGING phase before firing a onDragStart
+    // dropped before a drag officially started - this is fine
     if (state.phase === 'COLLECTING_DIMENSIONS') {
-      console.error('canceling drag while collecting');
       dispatch(clean());
       return;
     }
 
+    // dropped in another phase except for dragging - this is an error
     if (state.phase !== 'DRAGGING') {
-      console.error('cannot drop if not dragging', state);
-      // We need to wrap this in a setTimeout to avoid a race
-      // condition with `lift`, which includes timeouts
-      setTimeout(() => dispatch(clean()));
+      console.error(`not able to drop in phase: '${state.phase}'`);
+      dispatch(clean());
       return;
     }
 
     if (!state.drag) {
-      console.error('invalid drag state', state);
+      console.error('not able to drop when there is invalid drag state', state);
       dispatch(clean());
       return;
     }
@@ -434,26 +439,28 @@ export const lift = (id: DraggableId,
   windowScroll: Position,
   isScrollAllowed: boolean,
 ) => (dispatch: Dispatch, getState: Function) => {
-  (() => {
-    const state: State = getState();
-    // quickly finish any current animations
-    if (state.phase === 'DROP_ANIMATING') {
-      if (!state.drop || !state.drop.pending) {
-        console.error('cannot flush drop animation if there is no pending');
-        dispatch(clean());
-        return;
-      }
-      dispatch(completeDrop(state.drop.pending.result));
+  // Quickly finish any current drop animations
+  const initial: State = getState();
+
+  if (initial.phase === 'DROP_ANIMATING') {
+    if (!initial.drop || !initial.drop.pending) {
+      console.error('cannot flush drop animation if there is no pending');
+      dispatch(clean());
+    } else {
+      dispatch(completeDrop(initial.drop.pending.result));
     }
-  })();
+  }
 
   // https://github.com/chenglou/react-motion/issues/437
   // need to allow a flush of react-motion
+  dispatch(prepare());
+
   setTimeout(() => {
     const state: State = getState();
 
-    if (state.phase !== 'IDLE' && state.phase !== 'DRAG_COMPLETE') {
-      dispatch(clean());
+    // drag cancelled before timeout finished
+    if (state.phase !== 'PREPARING') {
+      return;
     }
 
     dispatch(beginLift());
@@ -470,6 +477,7 @@ export const lift = (id: DraggableId,
       if (newState.phase !== 'COLLECTING_DIMENSIONS') {
         return;
       }
+
       dispatch(completeLift(id, type, client, windowScroll, isScrollAllowed));
     });
   });
@@ -487,4 +495,5 @@ export type Action = BeginLiftAction |
   CrossAxisMoveBackwardAction |
   DropAnimateAction |
   DropCompleteAction |
+  PrepareAction |
   CleanAction;

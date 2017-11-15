@@ -208,7 +208,7 @@ export type PendingDrop = {|
   result: DropResult,
 |}
 
-export type Phase = 'IDLE' | 'COLLECTING_DIMENSIONS' | 'DRAGGING' | 'DROP_ANIMATING' | 'DROP_COMPLETE';
+export type Phase = 'IDLE' | 'PREPARING' | 'COLLECTING_DIMENSIONS' | 'DRAGGING' | 'DROP_ANIMATING' | 'DROP_COMPLETE';
 
 export type DimensionState = {|
   request: ?TypeId,
