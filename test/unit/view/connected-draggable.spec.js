@@ -1073,12 +1073,18 @@ describe('Draggable - connected', () => {
       });
     });
 
-    describe('other phases', () => {
-      it('should return the default props', () => {
-        const phases: Phase[] = ['IDLE', 'COLLECTING_DIMENSIONS'];
+    describe('pre lift', () => {
+      // $ExpectError - using spread
+      const preLiftMapProps: MapProps = {
+        ...defaultMapProps,
+        canLift: false,
+      };
+
+      it('should prevent other draggables from lifting', () => {
+        const preLiftPhases: Phase[] = ['PREPARING', 'COLLECTING_DIMENSIONS'];
         const { id, type, selector } = make();
 
-        phases.forEach((phase: Phase): void => {
+        preLiftPhases.forEach((phase: Phase): void => {
           const props: MapProps = execute(selector)({
             id,
             type,
@@ -1088,8 +1094,25 @@ describe('Draggable - connected', () => {
             dimension: null,
           });
 
-          expect(props).toEqual(defaultMapProps);
+          expect(props).toEqual(preLiftMapProps);
         });
+      });
+    });
+
+    describe('idle', () => {
+      it('should return the default map props', () => {
+        const { id, type, selector } = make();
+
+        const props: MapProps = execute(selector)({
+          id,
+          type,
+          phase: 'IDLE',
+          drag: null,
+          pending: null,
+          dimension: null,
+        });
+
+        expect(props).toEqual(defaultMapProps);
       });
     });
   });

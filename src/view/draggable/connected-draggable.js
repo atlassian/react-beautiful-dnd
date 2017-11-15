@@ -57,6 +57,12 @@ const defaultMapProps: MapProps = {
   direction: null,
 };
 
+// $ExpectError - using spread
+const preLiftMapProps: MapProps = {
+  ...defaultMapProps,
+  canLift: false,
+};
+
 export const makeSelector = (): Selector => {
   const idSelector = (state: State, ownProps: OwnProps): DraggableId => ownProps.draggableId;
   const typeSelector = (state: State, ownProps: OwnProps): TypeId => ownProps.type || 'DEFAULT';
@@ -214,6 +220,11 @@ export const makeSelector = (): Selector => {
           // direction no longer needed as drag handle is unbound
           direction: null,
         };
+      }
+
+      // a lift is in progress - do not let anything start a lift
+      if (phase === 'PREPARING' || phase === 'COLLECTING_DIMENSIONS') {
+        return preLiftMapProps;
       }
 
       // All unhandled phases

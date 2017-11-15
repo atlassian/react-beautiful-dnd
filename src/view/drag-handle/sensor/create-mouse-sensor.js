@@ -209,6 +209,7 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Mous
       return;
     }
 
+    // stopping the event from publishing to parents
     stopEvent(event);
     const point: Position = {
       x: clientX,
