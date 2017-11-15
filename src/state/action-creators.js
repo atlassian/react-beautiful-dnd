@@ -430,7 +430,7 @@ export const lift = (id: DraggableId,
   windowScroll: Position,
   isScrollAllowed: boolean,
 ) => (dispatch: Dispatch, getState: Function) => {
-  // Quickly finish any current drop animations
+  // Phase 1: Quickly finish any current drop animations
   const initial: State = getState();
 
   if (initial.phase === 'DROP_ANIMATING') {
@@ -447,6 +447,7 @@ export const lift = (id: DraggableId,
   dispatch(prepare());
 
   setTimeout(() => {
+    // Phase 2: collect all dimensions
     const state: State = getState();
 
     // drag cancelled before timeout finished
@@ -456,11 +457,9 @@ export const lift = (id: DraggableId,
 
     dispatch(requestDimensions(type));
 
-    // Dimensions will be requested synchronously
-    // after they are done - lift.
-    // Could improve this by explicitly waiting until all dimensions are published.
-    // Could also allow a lift to occur before all the dimensions are published
+    // Need to allow an opportunity for the dimensions to be requested.
     setTimeout(() => {
+      // Phase 3: dimensions are collected: start a lift
       const newState: State = getState();
 
       // drag was already cancelled before dimensions all collected

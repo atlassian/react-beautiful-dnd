@@ -6,9 +6,13 @@ import {
   completeDrop,
   prepare,
   completeLift,
+  requestDimensions,
+  publishDraggableDimension,
+  publishDroppableDimension,
 } from '../../../src/state/action-creators';
 import createStore from '../../../src/state/create-store';
 import noImpact from '../../../src/state/no-impact';
+import { getPreset } from '../../utils/dimension';
 import type {
   State,
   Position,
@@ -19,6 +23,8 @@ import type {
   PendingDrop,
   DimensionState,
 } from '../../../src/types';
+
+const { home, inHome1 } = getPreset();
 
 const origin: Position = { x: 0, y: 0 };
 const noWhere: InitialDragLocation = {
@@ -38,7 +44,7 @@ type LiftFnArgs = {
   isScrollAllowed: boolean,
 }
 
-const draggableId: DraggableId = 'drag-1';
+const draggableId: DraggableId = inHome1.id;
 const defaultType: TypeId = 'type';
 
 const liftDefaults: LiftFnArgs = {
@@ -66,6 +72,43 @@ describe('action creators', () => {
     afterEach(() => {
       jest.useRealTimers();
       console.error.mockRestore();
+    });
+
+    // This test is more a baseline for the others
+    // to ensure that the happy path works correctly
+    it('should perform a multi phased lift', () => {
+      const store: Store = createStore();
+      jest.spyOn(store, 'dispatch');
+
+      liftWithDefaults()(store.dispatch, store.getState);
+
+      // Phase 1: flush any existing animations
+      expect(store.dispatch).toHaveBeenCalledWith(prepare());
+      expect(store.dispatch).toHaveBeenCalledTimes(1);
+
+      // Phase 2: request dimensions after flushing animations
+      jest.runOnlyPendingTimers();
+
+      expect(store.dispatch).toHaveBeenCalledWith(requestDimensions(defaultType));
+      expect(store.dispatch).toHaveBeenCalledTimes(2);
+
+      // publishing some fake dimensions
+      store.dispatch(publishDroppableDimension(home));
+      store.dispatch(publishDraggableDimension(inHome1));
+      // now called four times
+      expect(store.dispatch).toHaveBeenCalledTimes(4);
+
+      // Phase 3: after dimensions are collected complete the lift
+      jest.runOnlyPendingTimers();
+
+      expect(store.dispatch).toHaveBeenCalledWith(completeLift(
+        liftDefaults.id,
+        liftDefaults.type,
+        liftDefaults.client,
+        liftDefaults.windowScroll,
+        liftDefaults.isScrollAllowed
+      ));
+      expect(store.dispatch).toHaveBeenCalledTimes(5);
     });
 
     describe('flushing previous drop animations', () => {
@@ -162,7 +205,44 @@ describe('action creators', () => {
 
     describe('dimensions collected and drag not started', () => {
       it('should not continue to lift if cancelled', () => {
+        const store: Store = createStore();
+        jest.spyOn(store, 'dispatch');
 
+        liftWithDefaults()(store.dispatch, store.getState);
+
+        // Phase 1: flush any existing animations
+        expect(store.dispatch).toHaveBeenCalledWith(prepare());
+        expect(store.dispatch).toHaveBeenCalledTimes(1);
+
+        // Phase 2: request dimensions after flushing animations
+        jest.runOnlyPendingTimers();
+
+        expect(store.dispatch).toHaveBeenCalledWith(requestDimensions(defaultType));
+        expect(store.dispatch).toHaveBeenCalledTimes(2);
+
+        // drag is now cancelled before all dimensions are published
+        cancel()(store.dispatch, store.getState);
+        expect(store.dispatch).toHaveBeenCalledTimes(3);
+
+        // This would usually start phase three: lift
+        jest.runOnlyPendingTimers();
+
+        // no increase in the amount of times called
+        expect(store.dispatch).toHaveBeenCalledTimes(3);
+        expect(store.dispatch).not.toHaveBeenCalledWith(completeLift(
+          liftDefaults.id,
+          liftDefaults.type,
+          liftDefaults.client,
+          liftDefaults.windowScroll,
+          liftDefaults.isScrollAllowed
+        ));
+
+        // being super careful
+        jest.runAllTimers();
+        expect(store.dispatch).toHaveBeenCalledTimes(3);
+
+        // should be in the idle state
+        expect(store.getState()).toEqual(initialState);
       });
     });
   });
