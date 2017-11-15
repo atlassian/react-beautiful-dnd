@@ -145,6 +145,7 @@ describe('action creators', () => {
 
         liftWithDefaults()(dispatch, getState);
 
+        // $ExpectError - not checking for null in state shape
         expect(dispatch).toHaveBeenCalledWith(completeDrop(dropAnimatingState.drop.pending.result));
         expect(dispatch).toHaveBeenCalledWith(prepare());
         expect(console.error).not.toHaveBeenCalled();
