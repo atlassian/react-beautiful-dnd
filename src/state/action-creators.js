@@ -55,14 +55,6 @@ export const requestDimensions = (type: TypeId): RequestDimensionsAction => ({
   payload: type,
 });
 
-export type BeginLiftAction = {|
-  type: 'BEGIN_LIFT'
-|}
-
-const beginLift = (): BeginLiftAction => ({
-  type: 'BEGIN_LIFT',
-});
-
 export type CompleteLiftAction = {|
   type: 'COMPLETE_LIFT',
   payload: {|
@@ -74,7 +66,7 @@ export type CompleteLiftAction = {|
   |}
 |}
 
-const completeLift = (id: DraggableId,
+export const completeLift = (id: DraggableId,
   type: TypeId,
   client: InitialDragLocation,
   windowScroll: Position,
@@ -432,7 +424,6 @@ export type LiftAction = {|
   |}
 |}
 
-// using redux-thunk
 export const lift = (id: DraggableId,
   type: TypeId,
   client: InitialDragLocation,
@@ -463,7 +454,6 @@ export const lift = (id: DraggableId,
       return;
     }
 
-    dispatch(beginLift());
     dispatch(requestDimensions(type));
 
     // Dimensions will be requested synchronously
@@ -483,7 +473,7 @@ export const lift = (id: DraggableId,
   });
 };
 
-export type Action = BeginLiftAction |
+export type Action =
   CompleteLiftAction |
   RequestDimensionsAction |
   PublishDraggableDimensionAction |

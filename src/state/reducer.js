@@ -143,18 +143,10 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     return clean('PREPARING');
   }
 
-  if (action.type === 'BEGIN_LIFT') {
+  if (action.type === 'REQUEST_DIMENSIONS') {
     if (state.phase !== 'PREPARING') {
       console.error('trying to start a lift while not preparing for a lift');
-      return state;
-    }
-    return clean('COLLECTING_DIMENSIONS');
-  }
-
-  if (action.type === 'REQUEST_DIMENSIONS') {
-    if (state.phase !== 'COLLECTING_DIMENSIONS') {
-      console.error('trying to collect dimensions at the wrong time');
-      return state;
+      return clean();
     }
 
     const typeId: TypeId = action.payload;
