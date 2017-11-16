@@ -35,7 +35,7 @@
     "memoize-one": "3.0.1",
     "prop-types": "15.5.10",
     "prop-types-extra": "1.0.1",
-    "raf-schd": "2.0.1",
+    "raf-schd": "2.0.2",
     "react-motion": "0.5.0",
     "react-redux": "5.0.6",
     "redux": "3.7.2",
