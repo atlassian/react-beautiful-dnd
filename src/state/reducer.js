@@ -37,17 +37,12 @@ const noDimensions: DimensionState = {
 
 const origin: Position = { x: 0, y: 0 };
 
-const clean = memoizeOne((phase: ?Phase): State => {
-  const state: State = {
-    // flow was not good with having a default arg on an optional type
-    phase: phase || 'IDLE',
-    drag: null,
-    drop: null,
-    dimension: noDimensions,
-  };
-
-  return state;
-});
+const clean = memoizeOne((phase?: Phase = 'IDLE'): State => ({
+  phase,
+  drag: null,
+  drop: null,
+  dimension: noDimensions,
+}));
 
 type MoveArgs = {|
   state: State,
@@ -135,18 +130,18 @@ const move = ({
 };
 
 export default (state: State = clean('IDLE'), action: Action): State => {
-  if (action.type === 'BEGIN_LIFT') {
-    if (state.phase !== 'IDLE') {
-      console.error('trying to start a lift while another is occurring');
-      return state;
-    }
-    return clean('COLLECTING_DIMENSIONS');
+  if (action.type === 'CLEAN') {
+    return clean();
+  }
+
+  if (action.type === 'PREPARE') {
+    return clean('PREPARING');
   }
 
   if (action.type === 'REQUEST_DIMENSIONS') {
-    if (state.phase !== 'COLLECTING_DIMENSIONS') {
-      console.error('trying to collect dimensions at the wrong time');
-      return state;
+    if (state.phase !== 'PREPARING') {
+      console.error('trying to start a lift while not preparing for a lift');
+      return clean();
     }
 
     const typeId: TypeId = action.payload;
@@ -536,10 +531,6 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       },
       dimension: noDimensions,
     };
-  }
-
-  if (action.type === 'CLEAN') {
-    return clean();
   }
 
   return state;
