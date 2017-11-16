@@ -2,6 +2,7 @@
 import getClientRect from '../../src/state/get-client-rect';
 import { getDroppableDimension, getDraggableDimension } from '../../src/state/dimension';
 import { add } from '../../src/state/position';
+import { vertical } from '../../src/state/axis';
 import type {
   Axis,
   Position,
@@ -12,7 +13,7 @@ import type {
   DroppableDimensionMap,
 } from '../../src/types';
 
-export const getPreset = (axis: Axis) => {
+export const getPreset = (axis?: Axis = vertical) => {
   const margin: Spacing = { top: 10, left: 10, bottom: 5, right: 5 };
   const padding: Spacing = { top: 2, left: 2, bottom: 2, right: 2 };
   const windowScroll: Position = { x: 50, y: 100 };
