@@ -71,5 +71,5 @@ export const reorderQuoteMap = ({
     quoteMap: result,
     autoFocusQuoteId: target.id,
   };
-}
-;
+};
+
