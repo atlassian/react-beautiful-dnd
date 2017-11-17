@@ -1642,6 +1642,22 @@ describe('drag handle', () => {
             onLift: 1,
           })).toBe(true);
         });
+
+        it('should not call preventDefault on the initial touchstart', () => {
+          const mockEvent: MockEvent = createMockEvent();
+
+          touchStart(wrapper, origin, 0, mockEvent);
+
+          expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+        });
+
+        it('should call stopPropagation on the initial touchstart to prevent parents from starting', () => {
+          const mockEvent: MockEvent = createMockEvent();
+
+          touchStart(wrapper, origin, 0, mockEvent);
+
+          expect(mockEvent.stopPropagation).toHaveBeenCalled();
+        });
       });
 
       describe('starting with movement', () => {

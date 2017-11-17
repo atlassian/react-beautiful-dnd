@@ -208,7 +208,30 @@ export type PendingDrop = {|
   result: DropResult,
 |}
 
-export type Phase = 'IDLE' | 'COLLECTING_DIMENSIONS' | 'DRAGGING' | 'DROP_ANIMATING' | 'DROP_COMPLETE';
+export type Phase =
+  // The application rest state
+  'IDLE' |
+
+  // When a drag starts we need to flush any existing animations
+  // that might be occurring. While this flush is occurring we
+  // are in this phase
+  'PREPARING' |
+
+  // After the animations have been flushed we need to collect the
+  // dimensions of all of the Draggable and Droppable components.
+  // At this point a drag has not started yet and the onDragStart
+  // hook has not fired.
+  'COLLECTING_DIMENSIONS' |
+
+  // A drag is active. The onDragStart hook has been fired
+  'DRAGGING' |
+
+  // An optional phase for animating the drop / cancel if it is needed
+  'DROP_ANIMATING' |
+
+  // The final state of a drop / cancel.
+  // This will result in the onDragEnd hook being fired
+  'DROP_COMPLETE';
 
 export type DimensionState = {|
   request: ?TypeId,
