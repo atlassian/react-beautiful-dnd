@@ -1235,11 +1235,7 @@ describe('Draggable - connected', () => {
       }
     }
 
-    class App extends Component {
-      props: {
-        currentUser: string,
-      }
-
+    class App extends Component<{ currentUser: string }> {
       render() {
         return (
           <Draggable draggableId="drag-1">

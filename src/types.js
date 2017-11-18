@@ -266,7 +266,5 @@ export type Hooks = {
 // These types are 'fake'. They really just resolve to 'any'.
 // But it is useful for readability and intention
 export type ReactClass = any;
-export type ReactElement = any;
-export type HTMLElement = any;
 
 export type HOC = (Component: ReactClass) => ReactClass;

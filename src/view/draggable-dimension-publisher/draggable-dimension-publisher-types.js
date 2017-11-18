@@ -7,7 +7,6 @@ import type {
   DraggableId,
   DroppableId,
   TypeId,
-  HTMLElement,
 } from '../../types';
 
 export type MapProps = {|
@@ -23,10 +22,14 @@ export type OwnProps = {|
   droppableId: DroppableId,
   type: TypeId,
   targetRef: ?HTMLElement,
-  children?: React.Node,
+  children: React.Node,
 |}
 
-export type Props = MapProps & DispatchProps & OwnProps;
+export type Props = {
+  ...MapProps,
+  ...DispatchProps,
+  ...OwnProps
+}
 
 // Having issues getting the correct reselect type
 // export type Selector = OutputSelector<State, OwnProps, MapProps>;

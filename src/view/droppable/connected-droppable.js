@@ -149,6 +149,7 @@ const makeMapStateToProps = () => {
 // Leaning heavily on the default shallow equality checking
 // that `connect` provides.
 // It avoids needing to do it own within `Droppable`
+// $ExpectError - no idea how to type this correctly
 export default connect(
   // returning a function to ensure each
   // Droppable gets its own selector

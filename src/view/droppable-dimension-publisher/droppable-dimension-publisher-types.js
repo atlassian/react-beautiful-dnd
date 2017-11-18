@@ -1,4 +1,5 @@
 // @flow
+import * as React from 'react';
 import {
   publishDroppableDimension,
   updateDroppableDimensionIsEnabled,
@@ -7,8 +8,6 @@ import {
 import type {
   DroppableId,
   TypeId,
-  ReactElement,
-  HTMLElement,
   Direction,
 } from '../../types';
 
@@ -23,12 +22,12 @@ export type DispatchProps = {|
 |}
 
 export type OwnProps = {|
-  children?: ReactElement,
   droppableId: DroppableId,
   direction: Direction,
   ignoreContainerClipping: boolean,
   isDropDisabled: boolean,
   targetRef: ?HTMLElement,
+  children: React.Node,
   type: TypeId,
 |}
 

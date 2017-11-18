@@ -1,5 +1,4 @@
 // @flow
-import type { HTMLElement } from '../../../types';
 import type { Props, Callbacks } from '../drag-handle-types';
 
 export type Sensor = {

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import type { Props, Provided, StateSnapshot, DefaultProps } from './droppable-types';
-import type { DroppableId, HTMLElement } from '../../types';
+import type { DroppableId } from '../../types';
 import DroppableDimensionPublisher from '../droppable-dimension-publisher/';
 import Placeholder from '../placeholder/';
 import { droppableIdKey } from '../context-keys';

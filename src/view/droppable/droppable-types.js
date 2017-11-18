@@ -1,9 +1,8 @@
 // @flow
+import * as React from 'react';
 import type {
   DroppableId,
   TypeId,
-  ReactElement,
-  HTMLElement,
   Direction,
 } from '../../types';
 
@@ -14,7 +13,7 @@ export type Placeholder = {|
 
 export type Provided = {|
   innerRef: (?HTMLElement) => void,
-  placeholder: ?ReactElement,
+  placeholder: ?React.Node,
 |}
 
 export type StateSnapshot = {|
@@ -30,7 +29,7 @@ export type MapProps = {|
 |}
 
 export type OwnProps = {|
-  children: (Provided, StateSnapshot) => ?ReactElement,
+  children: (Provided, StateSnapshot) => ?React.Node,
   droppableId: DroppableId,
   type: TypeId,
   isDropDisabled: boolean,

@@ -13,7 +13,6 @@ import type {
   DroppableId,
   DroppableDimension,
   DimensionFragment,
-  HTMLElement,
   Position,
 } from '../../../src/types';
 
@@ -46,22 +45,23 @@ const noSpacing = {
   ...noPadding,
 };
 
-class ScrollableItem extends Component {
-  /* eslint-disable react/sort-comp */
-  props: {
-    // dispatch props
-    publish: (dimension: DroppableDimension) => void,
-    updateScroll: (id: DroppableId, offset: Position) => void,
-    updateIsEnabled: (id: DroppableId, isEnabled: boolean) => void,
-    // map props (default: false)
-    shouldPublish?: boolean,
-    // scrollable item prop (default: false)
-    isDropDisabled?: boolean,
-  }
+type ScrollableItemProps = {
+  // dispatch props
+  publish: (dimension: DroppableDimension) => void,
+  updateScroll: (id: DroppableId, offset: Position) => void,
+  updateIsEnabled: (id: DroppableId, isEnabled: boolean) => void,
+  // map props (default: false)
+  shouldPublish?: boolean,
+  // scrollable item prop (default: false)
+  isDropDisabled?: boolean,
+}
 
-  state: {|
-    ref: ?HTMLElement
-  |}
+type ScrollableItemState = {|
+  ref: ?HTMLElement
+|}
+
+class ScrollableItem extends Component<ScrollableItemProps, ScrollableItemState> {
+  /* eslint-disable react/sort-comp */
 
   state = {
     ref: null,

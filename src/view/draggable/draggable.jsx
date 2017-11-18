@@ -5,7 +5,6 @@ import memoizeOne from 'memoize-one';
 import invariant from 'invariant';
 import type {
   Position,
-  HTMLElement,
   DraggableDimension,
   InitialDragLocation,
 } from '../../types';
@@ -105,6 +104,10 @@ export default class Draggable extends Component<Props, State> {
     const { client, isScrollAllowed } = options;
     const { lift, draggableId, type } = this.props;
     const { ref } = this.state;
+
+    if (!ref) {
+      throw new Error('cannot lift at this time');
+    }
 
     const initial: InitialDragLocation = {
       selection: client,

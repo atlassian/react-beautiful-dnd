@@ -13,7 +13,6 @@ import type {
   DraggableId,
   DroppableId,
   DraggableDimension,
-  HTMLElement,
 } from '../../../src/types';
 
 const draggableId: DraggableId = 'drag-1';

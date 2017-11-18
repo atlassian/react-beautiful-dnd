@@ -667,12 +667,7 @@ describe('Droppable - connected', () => {
   });
 
   describe('child render behavior', () => {
-    class Person extends Component {
-      props: {
-        name: string,
-        provided: Provided
-      }
-
+    class Person extends Component<{ name: string, provided: Provided }> {
       render() {
         const { provided, name } = this.props;
         return (
@@ -683,11 +678,7 @@ describe('Droppable - connected', () => {
       }
     }
 
-    class App extends Component {
-      props: {
-        currentUser: string,
-      }
-
+    class App extends Component<{ currentUser: string }> {
       render() {
         return (
           <Droppable droppableId="drop-1">

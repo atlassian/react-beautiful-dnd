@@ -218,6 +218,7 @@ const getFromLift = (dispatchProps: DispatchProps) => {
     clientArg,
     windowScrollArg,
     isScrollAllowedArg,
+    // $ExpectError - mock property
   ] = dispatchProps.lift.mock.calls[0];
 
   return {
@@ -229,14 +230,11 @@ const getFromLift = (dispatchProps: DispatchProps) => {
   };
 };
 
+// $ExpectError - not checking type of mock
 const getLastCall = myMock => myMock.mock.calls[myMock.mock.calls.length - 1];
 
 const getStubber = stub =>
-  class Stubber extends Component {
-    props: {|
-      provided: Provided,
-      snapshot: StateSnapshot,
-    |}
+  class Stubber extends Component<{provided: Provided, snapshot: StateSnapshot}> {
     render() {
       const provided: Provided = this.props.provided;
       const snapshot: StateSnapshot = this.props.snapshot;
@@ -297,10 +295,7 @@ describe('Draggable - unconnected', () => {
     });
 
     describe('non standard drag handle', () => {
-      class WithNestedHandle extends Component {
-        props: {|
-          provided: Provided,
-        |}
+      class WithNestedHandle extends Component<{ provided: Provided }> {
         render() {
           const provided: Provided = this.props.provided;
           return (

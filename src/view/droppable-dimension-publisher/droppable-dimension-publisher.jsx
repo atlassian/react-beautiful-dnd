@@ -11,7 +11,6 @@ import getClosestScrollable from '../get-closest-scrollable';
 import type {
   DroppableDimension,
   Position,
-  HTMLElement,
   ClientRect,
   Spacing,
 } from '../../types';
@@ -23,7 +22,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
 
   isWatchingScroll: boolean = false;
-  closestScrollable: HTMLElement = null;
+  closestScrollable: ?Element = null;
 
   getScrollOffset = (): Position => {
     if (!this.closestScrollable) {
@@ -46,10 +45,12 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       isDropDisabled,
       targetRef,
     } = this.props;
-    invariant(targetRef, 'DimensionPublisher cannot calculate a dimension when not attached to the DOM');
+    if (!targetRef) {
+      throw new Error('DimensionPublisher cannot calculate a dimension when not attached to the DOM');
+    }
 
     const scroll: Position = this.getScrollOffset();
-    const style = window.getComputedStyle(targetRef);
+    const style: Object = window.getComputedStyle(targetRef);
 
     // keeping it simple and always using the margin of the droppable
 
@@ -66,7 +67,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       left: parseInt(style.paddingLeft, 10),
     };
 
-    const clientRect: ClientRect = targetRef.getBoundingClientRect();
+    const clientRect: ClientRect = (targetRef.getBoundingClientRect(): any);
 
     // The droppable's own bounds should be treated as the
     // container bounds in the following situations:
@@ -138,6 +139,12 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     }
 
     this.isWatchingScroll = false;
+
+    if (!this.closestScrollable) {
+      console.error('cannot unbind event listener if element is null');
+      return;
+    }
+
     this.closestScrollable.removeEventListener('scroll', this.onClosestScroll);
   }
 

@@ -1,5 +1,5 @@
 // @flow
-import { Component } from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
 import fireHooks from '../../state/fire-hooks';
@@ -7,19 +7,18 @@ import type {
   Store,
   State,
   Hooks,
-  ReactElement,
 } from '../../types';
 import { storeKey } from '../context-keys';
 
 type Props = Hooks & {
-  children: ?ReactElement,
+  children: ?React.Node,
 }
 
 type Context = {
   [string]: Store
 }
 
-export default class DragDropContext extends Component<Props> {
+export default class DragDropContext extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
   store: Store
   unsubscribe: Function
