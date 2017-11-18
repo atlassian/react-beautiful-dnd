@@ -32,16 +32,13 @@ type Props = {|
 
 type State = ReorderQuoteMapResult;
 
-export default class QuoteApp extends Component {
+export default class QuoteApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
-  props: Props
-  state: State
 
   state: State = {
     quoteMap: this.props.initial,
     autoFocusQuoteId: null,
   };
-  /* eslint-enable react/sort-comp */
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);

@@ -40,11 +40,7 @@ const NestedContainer = Container.extend`
   }
 `;
 
-export default class QuoteList extends Component {
-  props: {|
-    list: NestedQuoteList
-  |}
-
+export default class QuoteList extends Component<{ list: NestedQuoteList }> {
   renderQuote = (quote: Quote, type: string) => (
     <Draggable
       key={quote.id}

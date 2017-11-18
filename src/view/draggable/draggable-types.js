@@ -1,5 +1,4 @@
 // @flow
-import type { PropType, HasDefaultProp } from 'babel-plugin-react-flow-props-to-prop-types';
 import type {
   DraggableId,
   DraggableDimension,
@@ -110,16 +109,16 @@ export type StateSnapshot = {|
 // for React PropTypes
 // https://github.com/thejameskyle/babel-plugin-react-flow-props-to-prop-types#override-type-used-in-proptypes
 export type DispatchProps = {
-  lift: PropType<typeof lift, Function>,
-  move: PropType<typeof move, Function>,
-  moveByWindowScroll: PropType<typeof moveByWindowScroll, Function>,
-  moveForward: PropType<typeof moveForward, Function>,
-  moveBackward: PropType<typeof moveBackward, Function>,
-  crossAxisMoveForward: PropType<typeof crossAxisMoveForward, Function>,
-  crossAxisMoveBackward: PropType<typeof crossAxisMoveBackward, Function>,
-  drop: PropType<typeof drop, Function>,
-  cancel: PropType<typeof cancel, Function>,
-  dropAnimationFinished: PropType<typeof dropAnimationFinished, Function>,
+  lift: typeof lift,
+  move: typeof move,
+  moveByWindowScroll: typeof moveByWindowScroll,
+  moveForward: typeof moveForward,
+  moveBackward: typeof moveBackward,
+  crossAxisMoveForward: typeof crossAxisMoveForward,
+  crossAxisMoveBackward: typeof crossAxisMoveBackward,
+  drop: typeof drop,
+  cancel: typeof cancel,
+  dropAnimationFinished: typeof dropAnimationFinished,
 }
 
 export type MapProps = {|
@@ -137,8 +136,8 @@ export type MapProps = {|
 export type OwnProps = {|
   draggableId: DraggableId,
   children: (Provided, StateSnapshot) => ?ReactElement,
-  type: HasDefaultProp<TypeId>,
-  isDragDisabled: HasDefaultProp<boolean>,
+  type: TypeId,
+  isDragDisabled: boolean,
 |}
 
 export type DefaultProps = {|
@@ -149,5 +148,4 @@ export type DefaultProps = {|
 export type Props = MapProps & DispatchProps & OwnProps;
 
 // Having issues getting the correct reselect type
-// export type Selector = OutputSelector<State, OwnProps, MapProps>;
 export type Selector = Function;

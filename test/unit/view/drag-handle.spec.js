@@ -81,10 +81,7 @@ const getCallbackCalls = (callbacks: Callbacks) =>
     [key]: callbacks[key].mock.calls.length,
   }), {});
 
-class Child extends Component {
-  props: {
-    dragHandleProps?: Provided,
-  }
+class Child extends Component<{ dragHandleProps?: Provided}> {
   render() {
     return (
       <div {...this.props.dragHandleProps}>

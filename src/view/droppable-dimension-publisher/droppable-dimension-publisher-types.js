@@ -1,5 +1,4 @@
 // @flow
-import type { PropType } from 'babel-plugin-react-flow-props-to-prop-types';
 import {
   publishDroppableDimension,
   updateDroppableDimensionIsEnabled,
@@ -18,9 +17,9 @@ export type MapProps = {|
 |}
 
 export type DispatchProps = {|
-  publish: PropType<typeof publishDroppableDimension, Function>,
-  updateIsEnabled: PropType<typeof updateDroppableDimensionIsEnabled, Function>,
-  updateScroll: PropType<typeof updateDroppableDimensionScroll, Function>,
+  publish: typeof publishDroppableDimension,
+  updateIsEnabled: typeof updateDroppableDimensionIsEnabled,
+  updateScroll: typeof updateDroppableDimensionScroll,
 |}
 
 export type OwnProps = {|

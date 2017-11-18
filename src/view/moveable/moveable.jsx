@@ -38,9 +38,8 @@ const getStyle = (isNotMoving: boolean, x: number, y: number): Style => {
   return style;
 };
 
-export default class Movable extends Component {
+export default class Movable extends Component<Props> {
   /* eslint-disable react/sort-comp */
-  props: Props
 
   static defaultProps: DefaultProps = {
     destination: origin,

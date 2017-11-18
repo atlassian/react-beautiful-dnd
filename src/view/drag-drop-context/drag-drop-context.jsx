@@ -19,9 +19,8 @@ type Context = {
   [string]: Store
 }
 
-export default class DragDropContext extends Component {
+export default class DragDropContext extends Component<Props> {
   /* eslint-disable react/sort-comp */
-  props: Props
   store: Store
   unsubscribe: Function
 

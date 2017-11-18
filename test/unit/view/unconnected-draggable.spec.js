@@ -36,11 +36,7 @@ import { dispatchWindowMouseEvent, mouseEvent } from '../../utils/user-input-uti
 import setWindowScroll from '../../utils/set-window-scroll';
 import getWindowScrollPosition from '../../../src/view/get-window-scroll-position';
 
-class Item extends Component {
-  props: {
-    provided: Provided
-  }
-
+class Item extends Component<{ provided: Provided }> {
   render() {
     const provided: Provided = this.props.provided;
 

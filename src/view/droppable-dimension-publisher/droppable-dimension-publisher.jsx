@@ -19,9 +19,8 @@ import type { Props } from './droppable-dimension-publisher-types';
 
 const origin: Position = { x: 0, y: 0 };
 
-export default class DroppableDimensionPublisher extends Component {
+export default class DroppableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
-  props: Props;
 
   isWatchingScroll: boolean = false;
   closestScrollable: HTMLElement = null;

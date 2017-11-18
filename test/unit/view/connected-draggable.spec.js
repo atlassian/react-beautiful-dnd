@@ -1220,12 +1220,7 @@ describe('Draggable - connected', () => {
   });
 
   describe('child render behavior', () => {
-    class Person extends Component {
-      props: {
-        name: string,
-        provided: Provided
-      }
-
+    class Person extends Component<{ name: string, provided: Provided}> {
       render() {
         const { provided, name } = this.props;
         return (

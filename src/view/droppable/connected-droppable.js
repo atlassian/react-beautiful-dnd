@@ -157,3 +157,4 @@ export default connect(
   null,
   { storeKey },
 )(Droppable);
+

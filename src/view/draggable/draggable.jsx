@@ -43,10 +43,8 @@ export const zIndexOptions: ZIndexOptions = {
   dropAnimating: 4500,
 };
 
-export default class Draggable extends Component {
+export default class Draggable extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
-  props: Props
-  state: State
   callbacks: DragHandleCallbacks
 
   state: State = {
@@ -99,7 +97,7 @@ export default class Draggable extends Component {
       return;
     }
 
-    this.props.dropAnimationFinished(this.props.draggableId);
+    this.props.dropAnimationFinished();
   }
 
   onLift = (options: {client: Position, isScrollAllowed: boolean}) => {

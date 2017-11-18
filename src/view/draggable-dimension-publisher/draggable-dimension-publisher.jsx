@@ -6,10 +6,8 @@ import { getDraggableDimension } from '../../state/dimension';
 import type { DraggableDimension, Spacing } from '../../types';
 import type { Props } from './draggable-dimension-publisher-types';
 
-export default class DraggableDimensionPublisher extends Component {
+export default class DraggableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
-  props: Props;
-
   getDimension = (): DraggableDimension => {
     const {
       draggableId,
@@ -56,3 +54,4 @@ export default class DraggableDimensionPublisher extends Component {
     return this.props.children;
   }
 }
+
