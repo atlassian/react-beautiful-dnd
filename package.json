@@ -15,6 +15,9 @@
     "url": "https://github.com/atlassian/react-beautiful-dnd/issues"
   },
   "main": "lib/index.js",
+  "files": [
+    "/lib"
+  ],
   "scripts": {
     "test": "jest --config ./jest.config.js",
     "validate": "yarn run lint && yarn run typecheck",
