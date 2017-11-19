@@ -24,18 +24,14 @@ export type DispatchProps = {|
 export type OwnProps = {|
   droppableId: DroppableId,
   direction: Direction,
-  ignoreContainerClipping: boolean,
   isDropDisabled: boolean,
-  targetRef: ?HTMLElement,
-  children: React.Node,
   type: TypeId,
+  targetRef: ?HTMLElement,
+  ignoreContainerClipping: boolean,
+  children: React.Node,
 |}
 
-export type Props = {
-  ...MapProps,
-  ...DispatchProps,
-  ...OwnProps
-}
+export type Props = MapProps & DispatchProps & OwnProps;
 
 // Having issues getting the correct reselect type
 // export type Selector = OutputSelector<State, OwnProps, MapProps>;

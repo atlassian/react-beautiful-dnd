@@ -75,17 +75,18 @@ class ScrollableItem extends Component<ScrollableItemProps, ScrollableItemState>
 
   render() {
     return (
+      // $ExpectError - invalid action creators
       <DroppableDimensionPublisher
         droppableId={droppableId}
         direction="vertical"
         isDropDisabled={this.props.isDropDisabled === true}
         type="TYPE"
         targetRef={this.state.ref}
+        ignoreContainerClipping={false}
         publish={this.props.publish}
         updateIsEnabled={this.props.updateIsEnabled}
         shouldPublish={Boolean(this.props.shouldPublish)}
         updateScroll={this.props.updateScroll}
-        ignoreContainerClipping={false}
       >
         <div
           className="scroll-container"
@@ -356,15 +357,18 @@ describe('DraggableDimensionPublisher', () => {
         containerRect: parentRect,
       });
 
-      class App extends Component {
-        props: {
-          droppableIsScrollable?: boolean,
-          onPublish: () => void,
-          parentIsScrollable?: boolean,
-          shouldPublish?: boolean,
-          ignoreContainerClipping?: boolean,
-        }
+      type AppProps = {
+        droppableIsScrollable?: boolean,
+        onPublish: () => void,
+        parentIsScrollable?: boolean,
+        shouldPublish?: boolean,
+        ignoreContainerClipping: boolean,
+      };
+      type AppState = {
+        ref: ?HTMLElement,
+      }
 
+      class App extends Component<AppProps, AppState> {
         static defaultProps = {
           onPublish: () => {},
           ignoreContainerClipping: false,
@@ -403,17 +407,18 @@ describe('DraggableDimensionPublisher', () => {
                     overflow: droppableIsScrollable ? 'scroll' : 'visible',
                   }}
                 >
+                  {/* $ExpectError - invalid action creators */}
                   <DroppableDimensionPublisher
                     droppableId={droppableId}
                     direction="vertical"
                     isDropDisabled={false}
                     type="TYPE"
                     targetRef={this.state.ref}
+                    ignoreContainerClipping={ignoreContainerClipping}
                     shouldPublish={Boolean(shouldPublish)}
                     publish={onPublish}
                     updateIsEnabled={updateIsEnabled}
                     updateScroll={updateScroll}
-                    ignoreContainerClipping={ignoreContainerClipping}
                   >
                     <div>hello world</div>
                   </DroppableDimensionPublisher>
