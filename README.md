@@ -406,7 +406,7 @@ So how do you use the library?
 
 In order to use drag and drop, you need to have the part of your `React` tree that you want to be able to use drag and drop in wrapped in a `DragDropContext`. It is advised to just wrap your entire application in a `DragDropContext`. Having nested `DragDropContext`'s is *not* supported. You will be able to achieve your desired conditional dragging and dropping using the props of `Droppable` and `Draggable`. You can think of `DragDropContext` as having a similar purpose to the [react-redux Provider component](https://github.com/reactjs/react-redux/blob/master/docs/api.md#provider-store)
 
-### Prop type information
+### Props
 
 ```js
 type Hooks = {|
@@ -449,7 +449,6 @@ class App extends React.Component {
 
 These are top level application events that you can use to perform your own state updates.
 
-
 ### `onDragStart` (optional)
 
 This function will get notified when a drag starts. You are provided with the following details:
@@ -462,7 +461,7 @@ This function will get notified when a drag starts. You are provided with the fo
 
 This function is *optional* and therefore does not need to be provided. It is **highly recommended** that you use this function to block updates to all `Draggable` and `Droppable` components during a drag. (See [*Best practices for `hooks` *](https://github.com/atlassian/react-beautiful-dnd#best-practices-for-hooks))
 
-**Type information**
+### `onDragStart` type information
 
 ```js
 onDragStart?: (initial: DragStart) => void
@@ -511,7 +510,7 @@ Because this library does not control your state, it is up to you to *synchronou
 
 If you need to persist a reorder to a remote data store - update the list synchronously on the client and fire off a request in the background to persist the change. If the remote save fails it is up to you how to communicate that to the user and update, or not update, the list.
 
-### Type information
+### `onDragEnd` type information
 
 ```js
 onDragEnd: (result: DropResult) => void
@@ -572,9 +571,7 @@ When an item is moved from one list to a different list, it loses browser focus 
 - In the `componentDidMount` lifecycle call back check if the item needs to gain focus based on its props (such as an `autoFocus` prop)
 - If focus is required - call `.focus` on the node. You can obtain the node by using `ReactDOM.findDOMNode` or monkey patching the `provided.innerRef` callback.
 
-### Other `hooks` information
-
-**`onDragStart` and `onDragEnd` pairing**
+### `onDragStart` and `onDragEnd` pairing
 
 We try very hard to ensure that each `onDragStart` event is paired with a single `onDragEnd` event. However, there maybe a rogue situation where this is not the case. If that occurs - it is a bug. Currently there is no mechanism to tell the library to cancel a current drag externally.
 
@@ -608,7 +605,7 @@ import { Droppable } from 'react-beautiful-dnd';
 
 ### Children function
 
-The `React` children of a `Droppable` must be a function that returns a `ReactElement`.
+The `React` children of a `Droppable` must be a function that returns a [`ReactElement`](https://tylermcginnis.com/react-elements-vs-react-components/).
 
 ```js
 <Droppable droppableId="droppable-1">
@@ -684,13 +681,17 @@ This library supports dragging within scroll containers (DOM elements that have 
 1. The `Droppable` can itself be a scroll container with **no scrollable parents**
 2. The `Droppable` has **one scrollable parent**
 
-**Auto scrolling is not provided (yet!)**
+### Empty `Droppable`s
+
+It is recommended that you put a `min-height` on a vertical `Droppable` or a `min-width` on a horizontal `Droppable`. Otherwise when the `Droppable` is empty there may not be enough of a target for `Draggable` being dragged with touch or mouse inputs to be *over* to `Droppable`.
+
+### Auto scrolling is not provided (yet!)
 
 Currently auto scrolling of scroll containers is not part of this library. Auto scrolling is where the container automatically scrolls to make room for the dragging item as you drag near the edge of a scroll container. You are welcome to build your own auto scrolling list, or if you would you really like it as part of this library we could provide a auto scrolling `Droppable`.
 
 Users will be able to scroll a scroll container while dragging by using their trackpad or mouse wheel.
 
-**Keyboard dragging limitation**
+### Keyboard dragging limitation
 
 Getting keyboard dragging to work with scroll containers is quite difficult. Currently there is a limitation: you cannot drag with a keyboard beyond the visible edge of a scroll container. This limitation could be removed if we introduced auto scrolling. Scrolling a container with a mouse during a keyboard drag will cancel the drag.
 
@@ -769,23 +770,13 @@ Everything within the *provided* object must be applied for the `Draggable` to f
 </Draggable>;
 ```
 
-**Type information**
+### Type information
 
 ```js
 innerRef: (HTMLElement) => void
 ```
 
 - `provided.draggableStyle (?DraggableStyle)`: This is an `Object` or `null` that contains an a number of styles that needs to be applied to the `Draggable`. This needs to be applied to the same node that you apply `provided.innerRef` to. This controls the movement of the draggable when it is dragging and not dragging. You are welcome to add your own styles to this object – but please do not remove or replace any of the properties.
-
-**Ownership**
-
-It is a contract of this library that it owns the positioning logic of the dragging element. This includes properties such as `top`, `right`, `bottom`, `left` and `transform`. The library may change how it positions things and which properties it uses without performing a major version bump. It is also recommended that you do not apply your own `transition` property to the dragging element.
-
-**Warning: `position: fixed`**
-
-`react-beautiful-dnd` uses `position: fixed` to position the dragging element. This is quite robust and allows for you to have `position: relative | absolute | fixed` parents. However, unfortunately `position:fixed` is [impacted by `transform`](http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/) (such as `transform: rotate(10deg);`). This means that if you have a `transform: *` on one of the parents of a `Draggable` then the positioning logic will be incorrect while dragging. Lame! For most consumers this will not be an issue. We may look into creating a portal solution where we attach the dragging element to the body rather than leave it in place. However, leaving it in place is a really nice experience for everyone. For now we will leave it as is, but feel free to raise an issue if you this is important to you.
-
-**Usage of `draggableStyle`**
 
 ```js
 <Draggable draggableId="draggable-1">
@@ -799,11 +790,22 @@ It is a contract of this library that it owns the positioning logic of the dragg
 </Draggable>;
 ```
 
-**Extending with your own styles**
+### Positioning ownership
+
+It is a contract of this library that it owns the positioning logic of the dragging element. This includes properties such as `top`, `right`, `bottom`, `left` and `transform`. The library may change how it positions things and which properties it uses without performing a major version bump. It is also recommended that you do not apply your own `transition` property to the dragging element.
+
+### Warning: `position: fixed`
+
+`react-beautiful-dnd` uses `position: fixed` to position the dragging element. This is quite robust and allows for you to have `position: relative | absolute | fixed` parents. However, unfortunately `position:fixed` is [impacted by `transform`](http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/) (such as `transform: rotate(10deg);`). This means that if you have a `transform: *` on one of the parents of a `Draggable` then the positioning logic will be incorrect while dragging. Lame! For most consumers this will not be an issue. We may look into creating a portal solution where we attach the dragging element to the body rather than leave it in place. However, leaving it in place is a really nice experience for everyone. For now we will leave it as is, but feel free to raise an issue if you this is important to you.
+
+### Extending `draggableStyle`
+
+If you are using inline styles you are welcome to extend the `draggableStyle` object. You are also welcome to apply the `draggableStyle` object using inline styles and use your own styling solution for the component itself - such as [styled-components](https://github.com/styled-components/styled-components).
 
 ```js
 <Draggable draggable="draggable-1">
   {(provided, snapshot) => {
+    // extending the draggableStyle with our own inline styles
     const style = {
       ...provided.draggableStyle,
       backgroundColor: snapshot.isDragging ? 'blue' : 'white',
@@ -820,7 +822,7 @@ It is a contract of this library that it owns the positioning logic of the dragg
 </Draggable>;
 ```
 
-**Type information**
+### Type information
 
 ```js
 type DraggableStyle = DraggingStyle | NotDraggingStyle;
@@ -880,7 +882,7 @@ type NotDraggingStyle = {|
 
 - `provided.dragHandleProps (?DragHandleProps)` every `Draggable` has a *drag handle*. This is what is used to drag the whole `Draggable`. Often this will be the same node as the `Draggable`, but sometimes it can be a child of the `Draggable`. `DragHandleProps` need to be applied to the node that you want to be the drag handle. This is a number of props that need to be applied to the `Draggable` node. The simplest approach is to spread the props onto the draggable node (`{...provided.dragHandleProps}`). However, you are also welcome to [monkey patch](https://davidwalsh.name/monkey-patching) these props if you also need to respond to them. DragHandleProps will be `null` when `isDragDisabled` is set to `true`.
 
-**Type information**
+### Type information
 
 ```js
 type DragHandleProps = {|
@@ -895,7 +897,7 @@ type DragHandleProps = {|
 |};
 ```
 
-**Standard example**
+### Example: standard
 
 ```js
 <Draggable draggableId="draggable-1">
@@ -914,7 +916,9 @@ type DragHandleProps = {|
 </Draggable>;
 ```
 
-**Custom drag handle**
+### Example: custom drag handle
+
+Controlling a whole draggable by just a part of it
 
 ```js
 <Draggable draggableId="draggable-1">
@@ -930,9 +934,9 @@ type DragHandleProps = {|
 </Draggable>;
 ```
 
-**Monkey patching**
+### Monkey patching
 
-> If you want to also use one of the props in `DragHandleProps`
+You can override some of the `dragHandleProvided` props with your own behavior if you need to.
 
 ```js
 const myOnClick = event => console.log('clicked on', event.target);
@@ -1010,7 +1014,8 @@ The `children` function is also provided with a small amount of state relating t
 
 It is possible for your `Draggable` to be an interactive element such as a `<button>` or an `<a>`. However, there may be a situation where you want your `Draggable` element be the parent of an interactive element such as a `<button>` or an `<input>`. By default the child interactive element **will not be interactive**. Interacting with these nested interactive elements will be used as part of the calculation to start a drag. This is because we call `event.preventDefault()` on the `mousedown` event for the `Draggable`. Calling `preventDefault` will prevent the nested interactive element from performing its standard actions and interactions. What you will need to do is *opt out* of our standard calling of `event.preventDefault()`. By doing this the nested interactive element will not be able to be used to start a drag - but will allow the user to interact with it directly. Keep in mind - that by doing this the user will not be able to drag the `Draggable` by dragging on the interactive child element - which is probably what you want anyway. There are a few ways you can get around the standard `preventDefault` behavior. Here are some suggestions:
 
-**1. Call `event.stopPropagation()` on the interactive element `mousedown`**
+#### 1. Call `event.stopPropagation()` on the interactive element `mousedown`
+
 *This is the simpler solution*
 
 On the child element, call `event.stopPropagation()` for the `onMouseDown` function. This will stop the event bubbling up to the `Draggable` and having `event.preventDefault()` called on it. The `Draggable` will not be aware that a `mousedown` has even occurred.
@@ -1022,7 +1027,8 @@ On the child element, call `event.stopPropagation()` for the `onMouseDown` funct
 />
 ```
 
-**2. Patch the `onMouseDown` event in `provided`**
+#### 2. Patch the `onMouseDown` event in `provided`
+
 *This is the more complex solution*
 
 If you cannot use the first solution, then you can consider patching the `provided` > `onMouseDown` function. The main idea of this approach is to add additional behavior to the existing `onMouseDown` function - only calling it when it should be called.
@@ -1078,7 +1084,7 @@ class DraggableWithSelect extends Component {
 }
 ```
 
-**3. Patch the `onKeyDown` event in `provided`**
+#### 3. Patch the `onKeyDown` event in `provided`
 
 Similar to #2, this patch should be used on inputs inside a `Draggable`
 
@@ -1256,7 +1262,7 @@ While code coverage is [not a guarantee of code health](https://stackoverflow.co
 
 This codebase is designed to be extremely performant - it is part of its DNA. It builds on prior investigations into `React` performance that you can read about [here](https://medium.com/@alexandereardon/performance-optimisations-for-react-applications-b453c597b191) and [here](https://medium.com/@alexandereardon/performance-optimisations-for-react-applications-round-2-2042e5c9af97). It is designed to perform the minimum number of renders required for each task.
 
-**Highlights**
+#### Highlights
 
 - using connected-components with memoization to ensure the only components that render are the ones that need to - thanks [`react-redux`](https://github.com/reactjs/react-redux), [`reselect`](https://github.com/reactjs/reselect) and [`memoize-one`](https://github.com/alexreardon/memoize-one)
 - all movements are throttled with a [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame) - thanks [`raf-schd`](https://github.com/alexreardon/raf-schd)
@@ -1289,6 +1295,7 @@ This library supports the standard [Atlassian supported browsers](https://conflu
 ## Translations
 
 The documentation for this library is also available in other languages:
+
 - ![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **Korean**: [leehyunggeun/react-beautiful-dnd](https://github.com/LeeHyungGeun/react-beautiful-dnd-kr)
 
 These translations are maintained by the community and are not reviewed or maintained by the maintainers of this library. Please raise issues on the respective translations if you would like to have them updated.
