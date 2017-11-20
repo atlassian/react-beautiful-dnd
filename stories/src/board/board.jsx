@@ -45,17 +45,14 @@ type State = {|
   autoFocusQuoteId: ?string,
 |}
 
-export default class Board extends Component {
+export default class Board extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
-  props: Props
-  state: State
 
   state: State = {
     columns: this.props.initial,
     ordered: Object.keys(this.props.initial),
     autoFocusQuoteId: null,
   }
-  /* eslint-enable react/sort-comp */
 
   boardRef: ?HTMLElement
 

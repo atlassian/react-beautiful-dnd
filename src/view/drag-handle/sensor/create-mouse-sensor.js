@@ -8,7 +8,6 @@ import * as keyCodes from '../../key-codes';
 import blockStandardKeyEvents from '../util/block-standard-key-events';
 import type {
   Position,
-  HTMLElement,
 } from '../../../types';
 import type {
   Callbacks,

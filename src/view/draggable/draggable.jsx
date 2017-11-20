@@ -5,7 +5,6 @@ import memoizeOne from 'memoize-one';
 import invariant from 'invariant';
 import type {
   Position,
-  HTMLElement,
   DraggableDimension,
   InitialDragLocation,
 } from '../../types';
@@ -43,10 +42,8 @@ export const zIndexOptions: ZIndexOptions = {
   dropAnimating: 4500,
 };
 
-export default class Draggable extends Component {
+export default class Draggable extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
-  props: Props
-  state: State
   callbacks: DragHandleCallbacks
 
   state: State = {
@@ -99,7 +96,7 @@ export default class Draggable extends Component {
       return;
     }
 
-    this.props.dropAnimationFinished(this.props.draggableId);
+    this.props.dropAnimationFinished();
   }
 
   onLift = (options: {client: Position, isScrollAllowed: boolean}) => {
@@ -107,6 +104,10 @@ export default class Draggable extends Component {
     const { client, isScrollAllowed } = options;
     const { lift, draggableId, type } = this.props;
     const { ref } = this.state;
+
+    if (!ref) {
+      throw new Error('cannot lift at this time');
+    }
 
     const initial: InitialDragLocation = {
       selection: client,

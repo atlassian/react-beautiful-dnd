@@ -235,6 +235,7 @@ export const makeSelector = (): Selector => {
 
 const makeMapStateToProps = () => {
   const selector: Selector = makeSelector();
+  // $FlowFixMe - no idea how to type this correctly
   return (state: State, props: OwnProps) => selector(state, props);
 };
 

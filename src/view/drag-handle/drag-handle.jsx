@@ -17,9 +17,8 @@ import createTouchSensor from './sensor/create-touch-sensor';
 
 const getFalse: () => boolean = () => false;
 
-export default class DragHandle extends Component {
+export default class DragHandle extends Component<Props> {
   /* eslint-disable react/sort-comp */
-  props: Props
   mouseSensor: MouseSensor = createMouseSensor(
     this.props.callbacks,
     this.props.getDraggableRef

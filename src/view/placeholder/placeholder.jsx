@@ -1,12 +1,12 @@
 // @flow
 import React, { PureComponent } from 'react';
 
-export default class Placeholder extends PureComponent {
-  props: {|
-    height: number,
-    width: number,
-  |}
+type Props = {|
+  height: number,
+  width: number,
+|}
 
+export default class Placeholder extends PureComponent<Props> {
   render() {
     const style = {
       width: this.props.width,

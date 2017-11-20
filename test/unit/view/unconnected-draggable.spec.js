@@ -19,7 +19,6 @@ import type {
   DispatchProps,
   Provided,
   StateSnapshot,
-  BaseStyle,
 } from '../../../src/view/draggable/draggable-types';
 import type {
   Position,
@@ -36,11 +35,7 @@ import { dispatchWindowMouseEvent, mouseEvent } from '../../utils/user-input-uti
 import setWindowScroll from '../../utils/set-window-scroll';
 import getWindowScrollPosition from '../../../src/view/get-window-scroll-position';
 
-class Item extends Component {
-  props: {
-    provided: Provided
-  }
-
+class Item extends Component<{ provided: Provided }> {
   render() {
     const provided: Provided = this.props.provided;
 
@@ -61,11 +56,6 @@ const draggableId: DraggableId = 'draggable1';
 const droppableId: DroppableId = 'droppable1';
 const type: TypeId = 'ITEM';
 const origin: Position = { x: 0, y: 0 };
-const baseStyle: BaseStyle = {
-  WebkitTouchCallout: 'none',
-  WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-  touchAction: 'none',
-};
 
 const dimension: DraggableDimension = getDraggableDimension({
   id: draggableId,
@@ -222,6 +212,7 @@ const getFromLift = (dispatchProps: DispatchProps) => {
     clientArg,
     windowScrollArg,
     isScrollAllowedArg,
+    // $ExpectError - mock property
   ] = dispatchProps.lift.mock.calls[0];
 
   return {
@@ -233,14 +224,11 @@ const getFromLift = (dispatchProps: DispatchProps) => {
   };
 };
 
+// $ExpectError - not checking type of mock
 const getLastCall = myMock => myMock.mock.calls[myMock.mock.calls.length - 1];
 
 const getStubber = stub =>
-  class Stubber extends Component {
-    props: {|
-      provided: Provided,
-      snapshot: StateSnapshot,
-    |}
+  class Stubber extends Component<{provided: Provided, snapshot: StateSnapshot}> {
     render() {
       const provided: Provided = this.props.provided;
       const snapshot: StateSnapshot = this.props.snapshot;
@@ -301,10 +289,7 @@ describe('Draggable - unconnected', () => {
     });
 
     describe('non standard drag handle', () => {
-      class WithNestedHandle extends Component {
-        props: {|
-          provided: Provided,
-        |}
+      class WithNestedHandle extends Component<{ provided: Provided }> {
         render() {
           const provided: Provided = this.props.provided;
           return (
@@ -863,7 +848,10 @@ describe('Draggable - unconnected', () => {
         transform: null,
         transition: css.outOfTheWay,
         pointerEvents: 'none',
-        ...baseStyle,
+        // BaseStyle
+        WebkitTouchCallout: 'none',
+        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        touchAction: 'none',
       };
 
       expect(draggingStyle.zIndex).toBe(zIndexOptions.dragging);
@@ -907,7 +895,10 @@ describe('Draggable - unconnected', () => {
         margin: 0,
         transform: null,
         pointerEvents: 'none',
-        ...baseStyle,
+        // BaseStyle
+        WebkitTouchCallout: 'none',
+        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        touchAction: 'none',
       };
 
       const provided: Provided = getLastCall(myMock)[0].provided;
@@ -941,7 +932,10 @@ describe('Draggable - unconnected', () => {
         margin: 0,
         transform: `translate(${offset.x}px, ${offset.y}px)`,
         pointerEvents: 'none',
-        ...baseStyle,
+        // BaseStyle
+        WebkitTouchCallout: 'none',
+        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        touchAction: 'none',
       };
 
       const provided: Provided = getLastCall(myMock)[0].provided;
@@ -977,7 +971,10 @@ describe('Draggable - unconnected', () => {
         top: dimension.page.withMargin.top,
         left: dimension.page.withMargin.left,
         margin: 0,
-        ...baseStyle,
+        // BaseStyle
+        WebkitTouchCallout: 'none',
+        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        touchAction: 'none',
       };
 
       mountDraggable({
@@ -1089,7 +1086,10 @@ describe('Draggable - unconnected', () => {
         transition: css.outOfTheWay,
         transform: null,
         pointerEvents: 'none',
-        ...baseStyle,
+        // BaseStyle
+        WebkitTouchCallout: 'none',
+        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        touchAction: 'none',
       };
 
       expect(droppingStyle.zIndex).toBe(zIndexOptions.dropAnimating);
@@ -1110,7 +1110,10 @@ describe('Draggable - unconnected', () => {
         margin: 0,
         transform: `translate(${offset.x}px, ${offset.y}px)`,
         pointerEvents: 'none',
-        ...baseStyle,
+        // BaseStyle
+        WebkitTouchCallout: 'none',
+        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        touchAction: 'none',
       };
 
       mountDraggable({
@@ -1155,7 +1158,10 @@ describe('Draggable - unconnected', () => {
         transform: null,
         transition: null,
         pointerEvents: 'auto',
-        ...baseStyle,
+        // BaseStyle
+        WebkitTouchCallout: 'none',
+        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        touchAction: 'none',
       };
 
       expect(provided.draggableStyle).toEqual(style);
@@ -1190,7 +1196,10 @@ describe('Draggable - unconnected', () => {
           transform: null,
           transition: css.outOfTheWay,
           pointerEvents: 'auto',
-          ...baseStyle,
+          // BaseStyle
+          WebkitTouchCallout: 'none',
+          WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+          touchAction: 'none',
         };
 
         expect(provided.draggableStyle).toEqual(expected);
@@ -1226,7 +1235,10 @@ describe('Draggable - unconnected', () => {
             transition: css.outOfTheWay,
             pointerEvents: 'none',
             transform: null,
-            ...baseStyle,
+            // BaseStyle
+            WebkitTouchCallout: 'none',
+            WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+            touchAction: 'none',
           };
           expect(provided.draggableStyle).toEqual(expected);
         });
@@ -1247,7 +1259,10 @@ describe('Draggable - unconnected', () => {
             transition: null,
             transform: null,
             pointerEvents: 'none',
-            ...baseStyle,
+            // BaseStyle
+            WebkitTouchCallout: 'none',
+            WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+            touchAction: 'none',
           };
 
           const customWrapper = mountDraggable({
@@ -1302,7 +1317,10 @@ describe('Draggable - unconnected', () => {
             pointerEvents: 'none',
             transition: css.outOfTheWay,
             transform: `translate(${offset.x}px, ${offset.y}px)`,
-            ...baseStyle,
+            // BaseStyle
+            WebkitTouchCallout: 'none',
+            WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+            touchAction: 'none',
           };
 
           expect(provided.draggableStyle).toEqual(expected);
@@ -1324,7 +1342,10 @@ describe('Draggable - unconnected', () => {
             pointerEvents: 'none',
             transition: null,
             transform: `translate(${offset.x}px, ${offset.y}px)`,
-            ...baseStyle,
+            // BaseStyle
+            WebkitTouchCallout: 'none',
+            WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+            touchAction: 'none',
           };
 
           const customWrapper = mountDraggable({

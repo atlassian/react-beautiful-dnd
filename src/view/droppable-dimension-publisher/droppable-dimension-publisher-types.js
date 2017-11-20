@@ -1,5 +1,5 @@
 // @flow
-import type { PropType } from 'babel-plugin-react-flow-props-to-prop-types';
+import * as React from 'react';
 import {
   publishDroppableDimension,
   updateDroppableDimensionIsEnabled,
@@ -8,8 +8,6 @@ import {
 import type {
   DroppableId,
   TypeId,
-  ReactElement,
-  HTMLElement,
   Direction,
 } from '../../types';
 
@@ -18,26 +16,26 @@ export type MapProps = {|
 |}
 
 export type DispatchProps = {|
-  publish: PropType<typeof publishDroppableDimension, Function>,
-  updateIsEnabled: PropType<typeof updateDroppableDimensionIsEnabled, Function>,
-  updateScroll: PropType<typeof updateDroppableDimensionScroll, Function>,
+  publish: typeof publishDroppableDimension,
+  updateIsEnabled: typeof updateDroppableDimensionIsEnabled,
+  updateScroll: typeof updateDroppableDimensionScroll,
 |}
 
 export type OwnProps = {|
-  children?: ReactElement,
   droppableId: DroppableId,
   direction: Direction,
-  ignoreContainerClipping: boolean,
   isDropDisabled: boolean,
-  targetRef: ?HTMLElement,
   type: TypeId,
+  targetRef: ?HTMLElement,
+  ignoreContainerClipping: boolean,
+  children: React.Node,
 |}
 
-export type Props = {
+export type Props = {|
   ...MapProps,
   ...DispatchProps,
   ...OwnProps
-}
+|}
 
 // Having issues getting the correct reselect type
 // export type Selector = OutputSelector<State, OwnProps, MapProps>;

@@ -41,15 +41,15 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
-export default class AuthorList extends Component {
-  props: {|
-    quotes: Quote[],
-    listId: string,
-    listType?: string,
-    internalScroll?: boolean,
-    autoFocusQuoteId?: ?string,
-  |}
+type Props = {|
+  quotes: Quote[],
+  listId: string,
+  listType?: string,
+  internalScroll?: boolean,
+  autoFocusQuoteId?: ?string,
+|}
 
+export default class AuthorList extends Component<Props> {
   renderBoard = (dropProvided: DroppableProvided) => {
     const { listType, quotes } = this.props;
 

@@ -41,20 +41,20 @@ const ScrollContainer = styled.div`
 
 const Container = styled.div``;
 
-export default class QuoteList extends Component {
-  props: {|
-    listId: string,
-    quotes: Quote[],
-    title?: string,
-    listType?: string,
-    internalScroll?: boolean,
-    isDropDisabled ?: boolean,
-    style?: Object,
-    // may not be provided - and might be null
-    autoFocusQuoteId?: ?string,
-    ignoreContainerClipping?: boolean,
-  |}
+type Props = {|
+  listId: string,
+  quotes: Quote[],
+  title?: string,
+  listType?: string,
+  internalScroll?: boolean,
+  isDropDisabled ?: boolean,
+  style?: Object,
+  // may not be provided - and might be null
+  autoFocusQuoteId?: ?string,
+  ignoreContainerClipping?: boolean,
+|}
 
+export default class QuoteList extends Component<Props> {
   renderQuotes = (dropProvided: DroppableProvided) => {
     const { listType, quotes } = this.props;
     const title = this.props.title ? (

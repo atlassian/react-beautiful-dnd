@@ -3,13 +3,11 @@ import { Component } from 'react';
 import invariant from 'invariant';
 import getWindowScrollPosition from '../get-window-scroll-position';
 import { getDraggableDimension } from '../../state/dimension';
-import type { DraggableDimension, Spacing } from '../../types';
+import type { DraggableDimension, Spacing, ClientRect } from '../../types';
 import type { Props } from './draggable-dimension-publisher-types';
 
-export default class DraggableDimensionPublisher extends Component {
+export default class DraggableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
-  props: Props;
-
   getDimension = (): DraggableDimension => {
     const {
       draggableId,
@@ -28,10 +26,12 @@ export default class DraggableDimensionPublisher extends Component {
       left: parseInt(style.marginLeft, 10),
     };
 
+    const clientRect: ClientRect = (targetRef.getBoundingClientRect() : any);
+
     const dimension: DraggableDimension = getDraggableDimension({
       id: draggableId,
       droppableId,
-      clientRect: targetRef.getBoundingClientRect(),
+      clientRect,
       margin,
       windowScroll: getWindowScrollPosition(),
     });
@@ -56,3 +56,4 @@ export default class DraggableDimensionPublisher extends Component {
     return this.props.children;
   }
 }
+

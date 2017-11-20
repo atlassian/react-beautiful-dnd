@@ -48,10 +48,8 @@ type State = {|
   list: NestedQuoteList,
 |}
 
-export default class QuoteApp extends Component {
+export default class QuoteApp extends Component<*, State> {
   /* eslint-disable react/sort-comp */
-  state: State
-
   state: State = {
     list: initialList,
   };

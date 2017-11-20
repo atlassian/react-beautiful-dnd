@@ -832,7 +832,7 @@ type DraggableStyle = DraggingStyle | NotDraggingStyle;
 // better touch device drag and drop experience.
 // Users can opt out of these styles or change them if
 // they really need too for their specific use case.
-type BaseStyle = {
+type BaseStyle = {|
   // Disable standard long press action
   WebkitTouchCallout: 'none',
 
@@ -841,9 +841,10 @@ type BaseStyle = {
 
   // Avoid pull to refresh action and anchor focus on Android Chrome
   touchAction: 'none',
-}
+|}
 
-type DraggingStyle = BaseStyle & {
+type DraggingStyle = {|
+  ...BaseStyle,
   pointerEvents: 'none',
   position: 'fixed',
   width: number,
@@ -854,13 +855,14 @@ type DraggingStyle = BaseStyle & {
   margin: 0,
   transform: ?string,
   zIndex: ZIndex,
-}
+|}
 
-type NotDraggingStyle = BaseStyle & {
+type NotDraggingStyle = {|
+  ...BaseStyle,
   transition: ?string,
   transform: ?string,
   pointerEvents: 'none' | 'auto',
-};
+|};
 ```
 
 - `provided.placeholder (?ReactElement)` The `Draggable` element has `position: fixed` applied to it while it is dragging. The role of the `placeholder` is to sit in the place that the `Draggable` was during a drag. It is needed to stop the `Droppable` list from collapsing when you drag. It is advised to render it as a sibling to the `Draggable` node. This is unlike `Droppable` where the `placeholder` needs to be *within* the `Droppable` node. When the library moves to `React` 16 the `placeholder` will be removed from api.
@@ -1187,12 +1189,13 @@ type DraggableStateSnapshot = {|
 
 type DraggableStyle = DraggingStyle | NotDraggingStyle
 
-type BaseStyle = {
+type BaseStyle = {|
   WebkitTouchCallout: 'none',
   WebkitTapHighlightColor: 'rgba(0,0,0,0)',
   touchAction: 'none',
-}
-type DraggingStyle = BaseStyle & {
+|}
+type DraggingStyle = {|
+  ...BaseStyle,
   pointerEvents: 'none',
   position: 'fixed',
   width: number,
@@ -1203,8 +1206,9 @@ type DraggingStyle = BaseStyle & {
   margin: 0,
   transform: ?string,
   zIndex: ZIndex,
-}
-type NotDraggingStyle = BaseStyle & {
+|}
+type NotDraggingStyle = {|
+  ...BaseStyle,
   transition: ?string,
   transform: ?string,
   pointerEvents: 'none' | 'auto',
