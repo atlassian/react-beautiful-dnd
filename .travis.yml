@@ -14,3 +14,12 @@ deploy:
     branch: master
     tags: true
     repo: atlassian/react-beautiful-dnd
+# Used for updating lock file
+env:
+  global:
+    secure: CfvbcPdIVezyCyihoDFMernw44IKIqrjMsuJ0GbOSqeOTbKnsjLW/aNBj3r+jlnokS4OLRPEyFfCYyjEj8683Qqi3ElAAMDAHNS7YB9oK1nWd3w4FclHaATtBsE5CWquf6oli0jz58/0WxEyfcojEUYb2/4UQK+1w3W6oyQG9vO6wdPOh5gsotvJGEH7sMGeSVoVSdBgeYxlu1oGEoYObagOkaJfxhCON2BmhlMez8r+wcvtNYT930tfSXfmr9uToNzxkv45ltphbnLeIx/DrmaMEUOllzjQvvyN3ycJjtZKVP/dneCEpfziA98XpbRLPWGcFlPH8rZ53fAhAmUoHKZ9D7owrMx+h+BDU9YQso2cJOBruu3emPfy/clEWJeSr3cDLukcH/EaPw85KsVYhBvf4lsj3tZDfZ7RdkEyWtPcKMDc1PikabOHgETvXyBy+QMTe4rffRnlJypaBMzWiefiJ8MoyhJeKQcv0L5RCzXsTkHf3vtR4NyajM0mdJN5KwcjqLIoFDnv1+MhMnHpAweEUJh4nHLtNVJ3Irzq+A9cNMrsGWoDKYXUh53HFoDqexRf9dOhustp7pGazIgrhUDUyBlvpWnegvcSd57VavEswGpevii6D6o/3CNS+Qceo74J/e+7sbeG70Gnvuz1Y6BaG+SsxtUGU/FmGDjKSbQ=
+# Required for lock file generation
+# https://github.com/greenkeeperio/greenkeeper-lockfile
+before_install: yarn global add greenkeeper-lockfile@1
+before_script: greenkeeper-lockfile-update
+after_script: greenkeeper-lockfile-upload
