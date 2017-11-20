@@ -683,7 +683,7 @@ This library supports dragging within scroll containers (DOM elements that have 
 
 ### Empty `Droppable`s
 
-It is recommended that you put a `min-height` on a vertical `Droppable` or a `min-width` on a horizontal `Droppable`. Otherwise when the `Droppable` is empty there may not be enough of a target for `Draggable` being dragged with touch or mouse inputs to be *over* to `Droppable`.
+It is recommended that you put a `min-height` on a vertical `Droppable` or a `min-width` on a horizontal `Droppable`. Otherwise when the `Droppable` is empty there may not be enough of a target for `Draggable` being dragged with touch or mouse inputs to be *over* the `Droppable`.
 
 ### Auto scrolling is not provided (yet!)
 
