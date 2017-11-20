@@ -1,5 +1,5 @@
 // @flow
-import * as React from 'react';
+import type { Node } from 'react';
 import type {
   DraggableId,
   DraggableDimension,
@@ -99,7 +99,7 @@ export type Provided = {|
   innerRef: (?HTMLElement) => void,
   draggableStyle: ?DraggableStyle,
   dragHandleProps: ?DragHandleProvided,
-  placeholder: ?React.Node,
+  placeholder: ?Node,
 |}
 
 export type StateSnapshot = {|
@@ -133,7 +133,7 @@ export type MapProps = {|
 
 export type OwnProps = {|
   draggableId: DraggableId,
-  children: (Provided, StateSnapshot) => ?React.Node,
+  children: (Provided, StateSnapshot) => ?Node,
   type: TypeId,
   isDragDisabled: boolean,
 |}
