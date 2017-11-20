@@ -106,9 +106,6 @@ export type StateSnapshot = {|
   isDragging: boolean,
 |}
 
-// Using PropType<*,*> to allow strict typing within code and looser typing
-// for React PropTypes
-// https://github.com/thejameskyle/babel-plugin-react-flow-props-to-prop-types#override-type-used-in-proptypes
 export type DispatchProps = {|
   lift: typeof lift,
   move: typeof move,
