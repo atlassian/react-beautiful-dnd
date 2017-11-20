@@ -44,7 +44,10 @@ export type DefaultProps = {|
   ignoreContainerClipping: boolean,
 |}
 
-export type Props = OwnProps & MapProps;
+export type Props = {|
+  ...OwnProps,
+  ...MapProps,
+|}
 
 // Having issues getting the correct reselect type
 // export type Selector = OutputSelector<State, OwnProps, MapProps>;

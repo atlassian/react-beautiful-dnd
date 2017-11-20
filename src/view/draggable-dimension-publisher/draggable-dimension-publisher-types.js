@@ -25,11 +25,11 @@ export type OwnProps = {|
   children: React.Node,
 |}
 
-export type Props = {
+export type Props = {|
   ...MapProps,
   ...DispatchProps,
   ...OwnProps
-}
+|}
 
 // Having issues getting the correct reselect type
 // export type Selector = OutputSelector<State, OwnProps, MapProps>;

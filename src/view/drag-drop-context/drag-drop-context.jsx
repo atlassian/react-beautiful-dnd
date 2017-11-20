@@ -10,9 +10,10 @@ import type {
 } from '../../types';
 import { storeKey } from '../context-keys';
 
-type Props = Hooks & {
+type Props = {|
+  ...Hooks,
   children: ?React.Node,
-}
+|}
 
 type Context = {
   [string]: Store

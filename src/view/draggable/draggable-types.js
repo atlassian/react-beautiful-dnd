@@ -109,7 +109,7 @@ export type StateSnapshot = {|
 // Using PropType<*,*> to allow strict typing within code and looser typing
 // for React PropTypes
 // https://github.com/thejameskyle/babel-plugin-react-flow-props-to-prop-types#override-type-used-in-proptypes
-export type DispatchProps = {
+export type DispatchProps = {|
   lift: typeof lift,
   move: typeof move,
   moveByWindowScroll: typeof moveByWindowScroll,
@@ -120,7 +120,7 @@ export type DispatchProps = {
   drop: typeof drop,
   cancel: typeof cancel,
   dropAnimationFinished: typeof dropAnimationFinished,
-}
+|}
 
 export type MapProps = {|
   isDragging: boolean,
@@ -146,7 +146,11 @@ export type DefaultProps = {|
   isDragDisabled: boolean,
 |}
 
-export type Props = MapProps & DispatchProps & OwnProps;
+export type Props = {|
+  ...MapProps,
+  ...DispatchProps,
+  ...OwnProps
+|}
 
 // Having issues getting the correct reselect type
 export type Selector = Function;
