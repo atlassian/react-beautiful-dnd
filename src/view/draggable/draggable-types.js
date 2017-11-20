@@ -28,7 +28,7 @@ import type {
 // better touch device drag and drop experience.
 // Users can opt out of these styles or change them if
 // they really need too for their specific use case.
-export type BaseStyle = {
+export type BaseStyle = {|
   // A long press on anchors usually pops a content menu that has options for
   // the link such as 'Open in new tab'. Because long press is used to start
   // a drag we need to opt out of this behavior
@@ -41,9 +41,10 @@ export type BaseStyle = {
 
   // Added to avoid the *pull to refresh action* and *anchor focus* on Android Chrome
   touchAction: 'none',
-}
+|}
 
-export type DraggingStyle = BaseStyle & {
+export type DraggingStyle = {|
+  ...BaseStyle,
   // Allow scrolling of the element behind the dragging element
   pointerEvents: 'none',
 
@@ -78,13 +79,14 @@ export type DraggingStyle = BaseStyle & {
   // When dragging or dropping we control the z-index to ensure that
   // the layering is correct
   zIndex: ZIndex,
-}
+|}
 
-export type NotDraggingStyle = BaseStyle & {
+export type NotDraggingStyle = {|
+  ...BaseStyle,
   transition: ?string,
   transform: ?string,
   pointerEvents: 'none' | 'auto',
-}
+|}
 
 export type DraggableStyle = DraggingStyle | NotDraggingStyle;
 
