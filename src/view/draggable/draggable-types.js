@@ -1,5 +1,5 @@
 // @flow
-import type { PropType, HasDefaultProp } from 'babel-plugin-react-flow-props-to-prop-types';
+import * as React from 'react';
 import type {
   DraggableId,
   DraggableDimension,
@@ -7,8 +7,6 @@ import type {
   TypeId,
   Direction,
   ZIndex,
-  HTMLElement,
-  ReactElement,
 } from '../../types';
 import {
   lift,
@@ -30,7 +28,7 @@ import type {
 // better touch device drag and drop experience.
 // Users can opt out of these styles or change them if
 // they really need too for their specific use case.
-export type BaseStyle = {
+export type BaseStyle = {|
   // A long press on anchors usually pops a content menu that has options for
   // the link such as 'Open in new tab'. Because long press is used to start
   // a drag we need to opt out of this behavior
@@ -43,9 +41,10 @@ export type BaseStyle = {
 
   // Added to avoid the *pull to refresh action* and *anchor focus* on Android Chrome
   touchAction: 'none',
-}
+|}
 
-export type DraggingStyle = BaseStyle & {
+export type DraggingStyle = {|
+  ...BaseStyle,
   // Allow scrolling of the element behind the dragging element
   pointerEvents: 'none',
 
@@ -80,13 +79,14 @@ export type DraggingStyle = BaseStyle & {
   // When dragging or dropping we control the z-index to ensure that
   // the layering is correct
   zIndex: ZIndex,
-}
+|}
 
-export type NotDraggingStyle = BaseStyle & {
+export type NotDraggingStyle = {|
+  ...BaseStyle,
   transition: ?string,
   transform: ?string,
   pointerEvents: 'none' | 'auto',
-}
+|}
 
 export type DraggableStyle = DraggingStyle | NotDraggingStyle;
 
@@ -99,28 +99,25 @@ export type Provided = {|
   innerRef: (?HTMLElement) => void,
   draggableStyle: ?DraggableStyle,
   dragHandleProps: ?DragHandleProvided,
-  placeholder: ?ReactElement,
+  placeholder: ?React.Node,
 |}
 
 export type StateSnapshot = {|
   isDragging: boolean,
 |}
 
-// Using PropType<*,*> to allow strict typing within code and looser typing
-// for React PropTypes
-// https://github.com/thejameskyle/babel-plugin-react-flow-props-to-prop-types#override-type-used-in-proptypes
-export type DispatchProps = {
-  lift: PropType<typeof lift, Function>,
-  move: PropType<typeof move, Function>,
-  moveByWindowScroll: PropType<typeof moveByWindowScroll, Function>,
-  moveForward: PropType<typeof moveForward, Function>,
-  moveBackward: PropType<typeof moveBackward, Function>,
-  crossAxisMoveForward: PropType<typeof crossAxisMoveForward, Function>,
-  crossAxisMoveBackward: PropType<typeof crossAxisMoveBackward, Function>,
-  drop: PropType<typeof drop, Function>,
-  cancel: PropType<typeof cancel, Function>,
-  dropAnimationFinished: PropType<typeof dropAnimationFinished, Function>,
-}
+export type DispatchProps = {|
+  lift: typeof lift,
+  move: typeof move,
+  moveByWindowScroll: typeof moveByWindowScroll,
+  moveForward: typeof moveForward,
+  moveBackward: typeof moveBackward,
+  crossAxisMoveForward: typeof crossAxisMoveForward,
+  crossAxisMoveBackward: typeof crossAxisMoveBackward,
+  drop: typeof drop,
+  cancel: typeof cancel,
+  dropAnimationFinished: typeof dropAnimationFinished,
+|}
 
 export type MapProps = {|
   isDragging: boolean,
@@ -136,9 +133,9 @@ export type MapProps = {|
 
 export type OwnProps = {|
   draggableId: DraggableId,
-  children: (Provided, StateSnapshot) => ?ReactElement,
-  type: HasDefaultProp<TypeId>,
-  isDragDisabled: HasDefaultProp<boolean>,
+  children: (Provided, StateSnapshot) => ?React.Node,
+  type: TypeId,
+  isDragDisabled: boolean,
 |}
 
 export type DefaultProps = {|
@@ -146,8 +143,11 @@ export type DefaultProps = {|
   isDragDisabled: boolean,
 |}
 
-export type Props = MapProps & DispatchProps & OwnProps;
+export type Props = {|
+  ...MapProps,
+  ...DispatchProps,
+  ...OwnProps
+|}
 
 // Having issues getting the correct reselect type
-// export type Selector = OutputSelector<State, OwnProps, MapProps>;
 export type Selector = Function;

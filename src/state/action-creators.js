@@ -477,6 +477,9 @@ export type Action =
   RequestDimensionsAction |
   PublishDraggableDimensionAction |
   PublishDroppableDimensionAction |
+  UpdateDroppableDimensionScrollAction |
+  UpdateDroppableDimensionIsEnabledAction |
+  MoveByWindowScrollAction |
   MoveAction |
   MoveBackwardAction |
   MoveForwardAction |

@@ -348,7 +348,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     }
 
     if (target.isEnabled === isEnabled) {
-      console.warn(`trying to set droppable isEnabled to ${isEnabled} but it is already ${isEnabled}`);
+      console.warn(`trying to set droppable isEnabled to ${String(isEnabled)} but it is already ${String(isEnabled)}`);
       return state;
     }
 

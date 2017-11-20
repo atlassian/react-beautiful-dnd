@@ -1,16 +1,14 @@
 // @flow
-import type { HTMLElement } from '../../src/types';
-
 const isScrollable = (...values: string[]): boolean =>
   values.some((value: string): boolean =>
     (value === 'auto' || value === 'scroll'));
 
-const isElementScrollable = (el: HTMLElement) => {
+const isElementScrollable = (el: Element) => {
   const style = window.getComputedStyle(el);
   return isScrollable(style.overflow, style.overflowY, style.overflowX);
 };
 
-const getClosestScrollable = (el: ?HTMLElement): ?HTMLElement => {
+const getClosestScrollable = (el: ?Element): ?Element => {
   // cannot do anything else!
   if (el == null) {
     return null;

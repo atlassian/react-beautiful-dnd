@@ -6,7 +6,7 @@ import { mount } from 'enzyme';
 import { DragDropContext } from '../../../src/';
 import { storeKey } from '../../../src/view/context-keys';
 
-class App extends Component {
+class App extends Component<*> {
   // Part of reacts api is to use flow types for this.
   // Sadly cannot use flow
   static contextTypes = {

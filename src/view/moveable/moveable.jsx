@@ -38,9 +38,8 @@ const getStyle = (isNotMoving: boolean, x: number, y: number): Style => {
   return style;
 };
 
-export default class Movable extends Component {
+export default class Movable extends Component<Props> {
   /* eslint-disable react/sort-comp */
-  props: Props
 
   static defaultProps: DefaultProps = {
     destination: origin,
@@ -87,6 +86,10 @@ export default class Movable extends Component {
     const isNotMoving: boolean = isAtOrigin(final);
 
     return (
+      // Expecting a flow error
+      // React Motion type: children: (interpolatedStyle: PlainStyle) => ReactElement
+      // Our type: children: (Position) => (Style) => React.Node
+      // $ExpectError
       <Motion defaultStyle={origin} style={final} onRest={this.onRest}>
         {(current: Position) =>
           this.props.children(

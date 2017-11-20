@@ -30,10 +30,8 @@ const Root = styled.div`
   background: ${colors.blue.light};
 `;
 
-export default class AuthorApp extends Component {
+export default class AuthorApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
-  props: Props
-  state: State
 
   state: State = {
     quotes: this.props.initial,

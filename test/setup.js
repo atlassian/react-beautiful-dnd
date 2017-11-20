@@ -6,3 +6,10 @@
 if (typeof window !== 'undefined') {
   require('raf-stub').replaceRaf([global, window]);
 }
+
+// setting up global enzyme
+const Enzyme = require('enzyme');
+
+const Adapter = require('enzyme-adapter-react-15');
+
+Enzyme.configure({ adapter: new Adapter() });

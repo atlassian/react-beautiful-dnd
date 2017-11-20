@@ -1,4 +1,4 @@
-import type { Position, Direction, HTMLElement } from '../../types';
+import type { Position, Direction } from '../../types';
 
 export type Callbacks = {|
   onLift: ({ client: Position, isScrollAllowed: boolean }) => void,

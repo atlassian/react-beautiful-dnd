@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import type { Props, Provided, StateSnapshot, DefaultProps } from './droppable-types';
-import type { DroppableId, HTMLElement } from '../../types';
+import type { DroppableId } from '../../types';
 import DroppableDimensionPublisher from '../droppable-dimension-publisher/';
 import Placeholder from '../placeholder/';
 import { droppableIdKey } from '../context-keys';
@@ -14,20 +14,17 @@ type Context = {|
   [droppableIdKey]: DroppableId
 |}
 
-export default class Droppable extends Component {
+export default class Droppable extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
-  props: Props
-  state: State
-
   state: State = {
     ref: null,
   }
 
   static defaultProps: DefaultProps = {
     type: 'DEFAULT',
-    ignoreContainerClipping: false,
     isDropDisabled: false,
     direction: 'vertical',
+    ignoreContainerClipping: false,
   }
 
   // Need to declare childContextTypes without flow

@@ -19,6 +19,7 @@ describe('Moveable', () => {
     wrapper = mount(
       <Moveable
         speed="STANDARD"
+        onMoveEnd={() => { }}
       >
         {childFn}
       </Moveable>,
