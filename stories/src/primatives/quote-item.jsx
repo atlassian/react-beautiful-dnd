@@ -95,10 +95,7 @@ text-align: right;
 flex-grow: 1;
 `;
 
-export default class QuoteItem extends Component {
-  // eslint-disable-next-line react/sort-comp
-  props: Props
-
+export default class QuoteItem extends Component<Props> {
   componentDidMount() {
     if (!this.props.autoFocus) {
       return;

@@ -1,10 +1,8 @@
 // @flow
-import type { HasDefaultProp } from 'babel-plugin-react-flow-props-to-prop-types';
+import * as React from 'react';
 import type {
   DroppableId,
   TypeId,
-  ReactElement,
-  HTMLElement,
   Direction,
 } from '../../types';
 
@@ -15,7 +13,7 @@ export type Placeholder = {|
 
 export type Provided = {|
   innerRef: (?HTMLElement) => void,
-  placeholder: ?ReactElement,
+  placeholder: ?React.Node,
 |}
 
 export type StateSnapshot = {|
@@ -31,20 +29,25 @@ export type MapProps = {|
 |}
 
 export type OwnProps = {|
-  children: (Provided, StateSnapshot) => ?ReactElement,
-  direction: HasDefaultProp<Direction>,
+  children: (Provided, StateSnapshot) => ?React.Node,
   droppableId: DroppableId,
-  ignoreContainerClipping: HasDefaultProp<boolean>,
-  isDropDisabled: HasDefaultProp<boolean>,
-  type: HasDefaultProp<TypeId>,
+  type: TypeId,
+  isDropDisabled: boolean,
+  direction: Direction,
+  ignoreContainerClipping: boolean,
 |};
 
 export type DefaultProps = {|
+  type: string,
   isDropDisabled: boolean,
-  type: TypeId
+  direction: Direction,
+  ignoreContainerClipping: boolean,
 |}
 
-export type Props = OwnProps & MapProps;
+export type Props = {|
+  ...OwnProps,
+  ...MapProps,
+|}
 
 // Having issues getting the correct reselect type
 // export type Selector = OutputSelector<State, OwnProps, MapProps>;

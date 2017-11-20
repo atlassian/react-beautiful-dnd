@@ -10,11 +10,7 @@ import type { DroppableId } from '../../../src/types';
 import type { MapProps, OwnProps, Provided, StateSnapshot } from '../../../src/view/droppable/droppable-types';
 
 const getStubber = (mock: Function) =>
-  class Stubber extends Component {
-    props: {|
-      provided: Provided,
-      snapshot: StateSnapshot,
-    |}
+  class Stubber extends Component<{provided: Provided, snapshot: StateSnapshot}> {
     render() {
       mock({
         provided: this.props.provided,

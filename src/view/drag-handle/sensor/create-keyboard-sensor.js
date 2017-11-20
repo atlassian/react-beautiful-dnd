@@ -6,7 +6,7 @@ import blockStandardKeyEvents from '../util/block-standard-key-events';
 import * as keyCodes from '../../key-codes';
 import getWindowFromRef from '../../get-window-from-ref';
 import getCenterPosition from '../../get-center-position';
-import type { Position, HTMLElement } from '../../../types';
+import type { Position } from '../../../types';
 import type {
   Callbacks,
   KeyboardSensor,

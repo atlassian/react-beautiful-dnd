@@ -1,5 +1,5 @@
 // @flow
-import type { Position, HTMLElement } from '../types';
+import type { Position } from '../types';
 
 export default (el: HTMLElement): Position => {
   const { top, right, bottom, left } = el.getBoundingClientRect();

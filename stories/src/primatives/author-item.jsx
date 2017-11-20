@@ -28,14 +28,14 @@ const Avatar = styled.img`
   }
 `;
 
-export default class AuthorItem extends Component {
-  props: {|
-    author: Author,
-    provided: DraggableProvided,
-    snapshot: DraggableStateSnapshot,
-    autoFocus?: boolean,
-  |}
+type Props = {|
+  author: Author,
+  provided: DraggableProvided,
+  snapshot: DraggableStateSnapshot,
+  autoFocus?: boolean,
+|}
 
+export default class AuthorItem extends Component<Props> {
   componentDidMount() {
     if (!this.props.autoFocus) {
       return;

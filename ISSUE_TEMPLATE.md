@@ -6,6 +6,15 @@ If raising a feature request please be sure to have a search
 through other open and closed issues tagged with 'new feature'
 
 https://github.com/atlassian/react-beautiful-dnd/issues?utf8=%E2%9C%93&q=is%3Aopen%20is%3Aclosed%20is%3Aissue%20
+
+Before raising a new feature please take a look at the core design
+principles of the library:
+
+https://github.com/atlassian/react-beautiful-dnd#driving-philosophy-physicality
+
+This is not a general purpose drag and drop library and is attempting
+to create an experience that is more physical than standard drag and drop
+interactions on the web.
 -->
 
 <!-- If raising a bug -->

@@ -5,6 +5,7 @@ import DraggableDimensionPublisher from '../../../src/view/draggable-dimension-p
 import { getDraggableDimension } from '../../../src/state/dimension';
 import getClientRect from '../../../src/state/get-client-rect';
 import setWindowScroll from '../../utils/set-window-scroll';
+import forceUpdate from '../../utils/force-update';
 import type {
   Spacing,
   ClientRect,
@@ -12,7 +13,6 @@ import type {
   DraggableId,
   DroppableId,
   DraggableDimension,
-  HTMLElement,
 } from '../../../src/types';
 
 const draggableId: DraggableId = 'drag-1';
@@ -39,16 +39,17 @@ const noSpacing = {
   paddingLeft: '0',
 };
 
-class Item extends Component {
-  /* eslint-disable react/sort-comp */
-  props: {
-    publish: (dimension: DraggableDimension) => void,
-    shouldPublish?: boolean,
-  }
+type Props = {
+  publish: (dimension: DraggableDimension) => void,
+  shouldPublish?: boolean,
+}
 
-  state: {|
-    ref: ?HTMLElement
-  |}
+type State = {
+  ref: ?HTMLElement
+}
+
+class Item extends Component<Props, State> {
+  /* eslint-disable react/sort-comp */
 
   state = {
     ref: null,
@@ -217,7 +218,7 @@ describe('DraggableDimensionPublisher', () => {
     expect(publish).toHaveBeenCalledTimes(1);
 
     // should not publish if the props have not changed
-    wrapper.update();
+    forceUpdate(wrapper);
     expect(publish).toHaveBeenCalledTimes(1);
 
     // should publish when freshly required to do so

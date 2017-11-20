@@ -6,7 +6,6 @@ import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-ex
 import getWindowFromRef from '../../get-window-from-ref';
 import type {
   Position,
-  HTMLElement,
 } from '../../../types';
 import type {
   Callbacks,

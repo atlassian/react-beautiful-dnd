@@ -35,15 +35,12 @@ type State = {|
   quotes: Quote[],
 |}
 
-export default class QuoteApp extends Component {
+export default class QuoteApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
-  props: Props
-  state: State
 
   state: State = {
     quotes: this.props.initial,
   };
-  /* eslint-enable react/sort-comp */
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);

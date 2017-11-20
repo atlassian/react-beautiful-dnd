@@ -33,13 +33,13 @@ const Header = styled.div`
   }
 `;
 
-export default class Column extends Component {
-  props: {|
-    title: string,
-    quotes: Quote[],
-    autoFocusQuoteId: ?string,
-  |}
+type Props = {|
+  title: string,
+  quotes: Quote[],
+  autoFocusQuoteId: ?string,
+|}
 
+export default class Column extends Component<Props> {
   render() {
     const title: string = this.props.title;
     const quotes: Quote[] = this.props.quotes;

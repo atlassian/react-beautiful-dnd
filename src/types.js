@@ -258,15 +258,13 @@ export type Action = ActionCreators;
 export type Dispatch = ReduxDispatch<Action>;
 export type Store = ReduxStore<State, Action, Dispatch>;
 
-export type Hooks = {
+export type Hooks = {|
   onDragStart?: (start: DragStart) => void,
   onDragEnd: (result: DropResult) => void,
-}
+|}
 
 // These types are 'fake'. They really just resolve to 'any'.
 // But it is useful for readability and intention
 export type ReactClass = any;
-export type ReactElement = any;
-export type HTMLElement = any;
 
 export type HOC = (Component: ReactClass) => ReactClass;
