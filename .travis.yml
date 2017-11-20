@@ -5,9 +5,6 @@ node_js:
 script:
 - yarn run validate
 - yarn run test
-# yarn run build:clean was failiing as it could not find rimraf - so strange
-before_deploy:
-  yarn global add rimraf
 deploy:
   provider: npm
   email: alexreardon@gmail.com
