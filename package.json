@@ -35,6 +35,7 @@
     "babel-runtime": "^6.26.0",
     "invariant": "^2.2.2",
     "memoize-one": "^3.0.1",
+    "prop-types": "^15.6.0",
     "raf-schd": "^2.0.2",
     "react-motion": "^0.5.2",
     "react-redux": "^5.0.6",
