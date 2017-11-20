@@ -1,5 +1,5 @@
 // @flow
-import * as React from 'react';
+import React, { type Node } from 'react';
 import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
 import fireHooks from '../../state/fire-hooks';
@@ -12,7 +12,7 @@ import { storeKey } from '../context-keys';
 
 type Props = {|
   ...Hooks,
-  children: ?React.Node,
+  children: ?Node,
 |}
 
 type Context = {

@@ -1,5 +1,5 @@
 // @flow
-import * as React from 'react';
+import type { Node } from 'react';
 import {
   publishDroppableDimension,
   updateDroppableDimensionIsEnabled,
@@ -28,7 +28,7 @@ export type OwnProps = {|
   type: TypeId,
   targetRef: ?HTMLElement,
   ignoreContainerClipping: boolean,
-  children: React.Node,
+  children: Node,
 |}
 
 export type Props = {|
