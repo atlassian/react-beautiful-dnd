@@ -199,7 +199,7 @@ Keep in mind that these periods of inactivity may not always exist.
 
 ### Application 5: no drag axis locking
 
-For now, the library does not support drag axis locking (aka drag rails). This is where the user is restricted to only dragging along one axis. The current thinking is this breaks the physical metaphore we are going for and sends a message to the user that they are interacting with a piece of software rather than moving physical objects around. It is possible to ensure that a user can only drop in a single list by using props `type` and `isDropEnabled`. You can also do some visual treatment to the list `onDragStart` to show the user that this is the only place they can interact with.
+For now, the library does not support drag axis locking (aka drag rails). This is where the user is restricted to only dragging along one axis. The current thinking is this breaks the physical metaphore we are going for and sends a message to the user that they are interacting with a piece of software rather than moving physical objects around. It is possible to ensure that a user can only drop in a single list by using props `type` and `isDropDisabled`. You can also do some visual treatment to the list `onDragStart` to show the user that this is the only place they can interact with.
 
 ### Application 6: natural cross list movement
 
@@ -1239,10 +1239,6 @@ If you are using [TypeScript](https://www.typescriptlang.org/) you can use the c
 ### Sample application
 
 We have created a [sample application](https://github.com/alexreardon/react-beautiful-dnd-flow-example) which exercises the flowtypes. It is a super simple `React` project based on [`react-create-app`](https://github.com/facebookincubator/create-react-app). You can use this as a reference to see how to set things up correctly.
-
-### Flow version
-
-`react-beautiful-dnd` currently uses flow `0.52` which is not the [latest version](https://github.com/facebook/flow/releases). However, we are not able to upgrade until [eslint-plugin-react](https://github.com/yannickcr/eslint-plugin-react) [supports it](https://github.com/yannickcr/eslint-plugin-react/issues/1376) - [more details](https://github.com/atlassian/react-beautiful-dnd/issues/37)
 
 ## Engineering health
 
