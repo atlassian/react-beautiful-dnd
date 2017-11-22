@@ -1672,25 +1672,31 @@ describe('drag handle', () => {
       });
 
       it('should not start a drag if the user moves their finger before a long press (movement captured on element)', () => {
+        const mockEvent: MockEvent = createMockEvent();
+
         touchStart(wrapper);
-        touchMove(wrapper);
+        touchMove(wrapper, origin, 0, mockEvent);
         // would normally start a drag
         jest.runTimersToTime(timeForLongPress);
 
         expect(callbacksCalled(callbacks)({
           onLift: 0,
         })).toBe(true);
+        // letting the movement event flow through - this enables native scrolling
+        expect(wasEventStopped(mockEvent)).toBe(false);
       });
 
       it('should not start a drag if the user moves their finger before a long press (movement captured on window)', () => {
         touchStart(wrapper);
-        windowTouchMove(origin);
+        const event = windowTouchMove(origin);
         // would normally start a drag
         jest.runTimersToTime(timeForLongPress);
 
         expect(callbacksCalled(callbacks)({
           onLift: 0,
         })).toBe(true);
+        // letting the movement event flow through - this enables native scrolling
+        expect(event.defaultPrevented).toBe(false);
       });
 
       it('should not start a drag if a touchend is fired', () => {
