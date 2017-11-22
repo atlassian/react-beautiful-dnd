@@ -851,6 +851,7 @@ describe('Draggable - unconnected', () => {
         // BaseStyle
         WebkitTouchCallout: 'none',
         WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        touchAction: 'manipulation',
       };
 
       expect(draggingStyle.zIndex).toBe(zIndexOptions.dragging);
@@ -897,6 +898,7 @@ describe('Draggable - unconnected', () => {
         // BaseStyle
         WebkitTouchCallout: 'none',
         WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        touchAction: 'manipulation',
       };
 
       const provided: Provided = getLastCall(myMock)[0].provided;
@@ -933,6 +935,7 @@ describe('Draggable - unconnected', () => {
         // BaseStyle
         WebkitTouchCallout: 'none',
         WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        touchAction: 'manipulation',
       };
 
       const provided: Provided = getLastCall(myMock)[0].provided;
@@ -971,6 +974,7 @@ describe('Draggable - unconnected', () => {
         // BaseStyle
         WebkitTouchCallout: 'none',
         WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        touchAction: 'manipulation',
       };
 
       mountDraggable({
@@ -1085,6 +1089,7 @@ describe('Draggable - unconnected', () => {
         // BaseStyle
         WebkitTouchCallout: 'none',
         WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        touchAction: 'manipulation',
       };
 
       expect(droppingStyle.zIndex).toBe(zIndexOptions.dropAnimating);
@@ -1108,6 +1113,7 @@ describe('Draggable - unconnected', () => {
         // BaseStyle
         WebkitTouchCallout: 'none',
         WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        touchAction: 'manipulation',
       };
 
       mountDraggable({
@@ -1155,6 +1161,7 @@ describe('Draggable - unconnected', () => {
         // BaseStyle
         WebkitTouchCallout: 'none',
         WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        touchAction: 'manipulation',
       };
 
       expect(provided.draggableStyle).toEqual(style);
@@ -1192,6 +1199,7 @@ describe('Draggable - unconnected', () => {
           // BaseStyle
           WebkitTouchCallout: 'none',
           WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+          touchAction: 'manipulation',
         };
 
         expect(provided.draggableStyle).toEqual(expected);
@@ -1230,6 +1238,7 @@ describe('Draggable - unconnected', () => {
             // BaseStyle
             WebkitTouchCallout: 'none',
             WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+            touchAction: 'manipulation',
           };
           expect(provided.draggableStyle).toEqual(expected);
         });
@@ -1253,6 +1262,7 @@ describe('Draggable - unconnected', () => {
             // BaseStyle
             WebkitTouchCallout: 'none',
             WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+            touchAction: 'manipulation',
           };
 
           const customWrapper = mountDraggable({
@@ -1310,6 +1320,7 @@ describe('Draggable - unconnected', () => {
             // BaseStyle
             WebkitTouchCallout: 'none',
             WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+            touchAction: 'manipulation',
           };
 
           expect(provided.draggableStyle).toEqual(expected);
@@ -1334,6 +1345,7 @@ describe('Draggable - unconnected', () => {
             // BaseStyle
             WebkitTouchCallout: 'none',
             WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+            touchAction: 'manipulation',
           };
 
           const customWrapper = mountDraggable({
