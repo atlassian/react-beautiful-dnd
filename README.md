@@ -1210,8 +1210,8 @@ type DragHandleProvided = {|
   tabIndex: number,
   'aria-grabbed': boolean,
   draggable: boolean,
-  onDragStart: () => void,
-  onDrop: () => void
+  onDragStart: () => boolean,
+  onDrop: () => boolean
 |}
 ```
 
