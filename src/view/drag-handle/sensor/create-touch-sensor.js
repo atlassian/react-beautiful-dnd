@@ -24,7 +24,7 @@ type TouchWithForce = Touch & {
   force: number
 }
 
-export const timeForLongPress: number = 200;
+export const timeForLongPress: number = 120;
 export const forcePressThreshold: number = 0.15;
 
 const noop = (): void => { };
