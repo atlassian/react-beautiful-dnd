@@ -102,8 +102,8 @@ export default class DragHandle extends Component<Props> {
   }
 
   onMouseDown = (event: MouseEvent) => {
-    // let the keyboard sensor deal with it if it is capturing
-    if (this.keyboardSensor.isCapturing()) {
+    // let the other sensors deal with it
+    if (this.keyboardSensor.isCapturing() || this.mouseSensor.isCapturing()) {
       return;
     }
 

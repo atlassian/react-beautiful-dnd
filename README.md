@@ -337,12 +337,6 @@ If the user force presses on the element before they have moved the element (eve
 
 We add the following styles to `Draggable`s by default to provide a more consistent touch dragging experience across various browsers out of the box. They have no visual impact. You are welcome to change these values or disable them for your specific use cases if you need to.
 
-Avoid the *pull to refresh action* and *anchor focus* on Android Chrome
-
-```css
-touch-action: none;
-```
-
 A long press on anchors usually pops a content menu that has options for the link such as 'Open in new tab'. Because long press is used to start a drag we need to opt out of this behavior
 
 ```css

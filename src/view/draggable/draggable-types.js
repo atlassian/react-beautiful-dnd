@@ -38,9 +38,6 @@ export type BaseStyle = {|
   // We remove this tap overlay as it is confusing for users
   // https://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/
   WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-
-  // Added to avoid the *pull to refresh action* and *anchor focus* on Android Chrome
-  touchAction: 'none',
 |}
 
 export type DraggingStyle = {|
