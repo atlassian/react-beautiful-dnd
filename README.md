@@ -311,7 +311,7 @@ There is current limitation of keyboard dragging: **the drag will cancel if the 
 
 > Recorded on iPhone 6s
 
-### Starting a drag
+### Starting a drag: long press
 
 A user can start a drag by holding their finger 👇 on an element for a small period of time 🕑 (long press)
 
@@ -325,7 +325,7 @@ If the user lifts their finger before the timer is finished then we release the 
 
 #### Native scrolling support
 
-If we detect a `touchmove` before the long press timer expires we cancel the pending drag and allow the user to scroll the list normally.
+If we detect a `touchmove` before the long press timer expires we cancel the pending drag and allow the user to scroll normally.
 
 #### Force press support
 
