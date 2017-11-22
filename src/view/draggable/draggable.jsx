@@ -225,6 +225,7 @@ export default class Draggable extends Component<Props, State> {
         // base style
         WebkitTouchCallout: 'none',
         WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        touchAction: 'manipulation',
       };
       return style;
     }
@@ -243,6 +244,7 @@ export default class Draggable extends Component<Props, State> {
         // base style
         WebkitTouchCallout: 'none',
         WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        touchAction: 'manipulation',
       };
       return style;
     }
