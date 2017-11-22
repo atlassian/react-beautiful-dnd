@@ -54,7 +54,7 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
   const startDragging = () => {
     const pending: ?Position = state.pending;
 
-    if (!state.pending) {
+    if (!pending) {
       console.error('cannot start a touch drag without a pending position');
       kill();
       return;
@@ -251,17 +251,11 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
     startPendingDrag(event);
   };
 
+  // a touch move can happen very quickly - before the window handlers are bound
+  // so we need to also add some logic here to ensure that a pending drag is cancelled if needed
   const onTouchMove = () => {
-    // if we are waiting for a long press -
-    // we need to cancel as the user is trying to scroll
     if (state.pending) {
       stopPendingDrag();
-    }
-
-    if (state.isDragging) {
-      setState({
-        hasMoved: true,
-      });
     }
   };
 

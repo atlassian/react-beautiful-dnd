@@ -76,12 +76,13 @@ const whereAnyCallbacksCalled = (callbacks: Callbacks) =>
 // useful debug function
 // eslint-disable-next-line no-unused-vars
 const getCallbackCalls = (callbacks: Callbacks) =>
+  // $ExpectError - hacking things big time
   Object.keys(callbacks).reduce((previous: Object, key: string) => ({
     ...previous,
     [key]: callbacks[key].mock.calls.length,
   }), {});
 
-class Child extends Component<{ dragHandleProps?: Provided}> {
+class Child extends Component<{ dragHandleProps: ?Provided}> {
   render() {
     return (
       <div {...this.props.dragHandleProps}>
@@ -167,7 +168,7 @@ describe('drag handle', () => {
         canLift
         getDraggableRef={() => fakeDraggableRef}
       >
-        {(dragHandleProps: Provided) => (
+        {(dragHandleProps: ?Provided) => (
           <Child dragHandleProps={dragHandleProps} />
         )}
       </DragHandle>,
@@ -202,9 +203,10 @@ describe('drag handle', () => {
               isDragging={false}
               isEnabled
               canLift
+              direction={null}
               getDraggableRef={() => fakeDraggableRef}
             >
-              {(dragHandleProps: Provided) => (
+              {(dragHandleProps: ?Provided) => (
                 <Child dragHandleProps={dragHandleProps} />
               )}
             </DragHandle>,
@@ -1135,9 +1137,10 @@ describe('drag handle', () => {
             isDragging={false}
             isEnabled
             canLift
+            direction="vertical"
             getDraggableRef={() => fakeDraggableRef}
           >
-            {(dragHandleProps: Provided) => (
+            {(dragHandleProps: ?Provided) => (
               <Child dragHandleProps={dragHandleProps} />
             )}
           </DragHandle>,
@@ -1158,9 +1161,10 @@ describe('drag handle', () => {
             isDragging={false}
             isEnabled
             canLift
+            direction={null}
             getDraggableRef={() => fakeDraggableRef}
           >
-            {(dragHandleProps: Provided) => (
+            {(dragHandleProps: ?Provided) => (
               <Child dragHandleProps={dragHandleProps} />
             )}
           </DragHandle>,
@@ -1243,7 +1247,7 @@ describe('drag handle', () => {
               canLift
               getDraggableRef={() => fakeDraggableRef}
             >
-              {(dragHandleProps: Provided) => (
+              {(dragHandleProps: ?Provided) => (
                 <Child dragHandleProps={dragHandleProps} />
               )}
             </DragHandle>,
@@ -1610,168 +1614,79 @@ describe('drag handle', () => {
     };
 
     describe('initiation', () => {
-      describe('starting with long press', () => {
-        it('should start a drag on long press', () => {
-          const client: Position = {
-            x: 50,
-            y: 100,
-          };
+      it('should start a drag on long press', () => {
+        const client: Position = {
+          x: 50,
+          y: 100,
+        };
 
-          touchStart(wrapper, client);
-          jest.runTimersToTime(timeForLongPress);
+        touchStart(wrapper, client);
+        jest.runTimersToTime(timeForLongPress);
 
-          expect(callbacks.onLift).toHaveBeenCalledWith({ client, isScrollAllowed: false });
-        });
-
-        it('should not fire a second lift after movement that would have otherwise have started a drag', () => {
-          touchStart(wrapper, origin);
-          jest.runTimersToTime(timeForLongPress);
-
-          expect(callbacksCalled(callbacks)({
-            onLift: 1,
-          })).toBe(true);
-
-          // movement that would normally start a lift, but now will not
-          windowTouchMove({ x: 0, y: sloppyClickThreshold });
-
-          // should not have lifted again
-          expect(callbacksCalled(callbacks)({
-            onLift: 1,
-          })).toBe(true);
-        });
-
-        it('should not call preventDefault on the initial touchstart', () => {
-          const mockEvent: MockEvent = createMockEvent();
-
-          touchStart(wrapper, origin, 0, mockEvent);
-
-          expect(mockEvent.preventDefault).not.toHaveBeenCalled();
-        });
-
-        it('should call stopPropagation on the initial touchstart to prevent parents from starting', () => {
-          const mockEvent: MockEvent = createMockEvent();
-
-          touchStart(wrapper, origin, 0, mockEvent);
-
-          expect(mockEvent.stopPropagation).toHaveBeenCalled();
-        });
+        expect(callbacks.onLift).toHaveBeenCalledWith({ client, isScrollAllowed: false });
       });
 
-      describe('starting with movement', () => {
-        it('should start a drag if the user moves more than a threshold', () => {
-          const valid: Position[] = [
-            { x: 0, y: sloppyClickThreshold },
-            { x: 0, y: -sloppyClickThreshold },
-            { x: sloppyClickThreshold, y: 0 },
-            { x: -sloppyClickThreshold, y: 0 },
-          ];
+      it('should not fire a second lift after movement that would have otherwise have started a drag', () => {
+        touchStart(wrapper, origin);
+        jest.runTimersToTime(timeForLongPress);
 
-          valid.forEach((point: Position): void => {
-            const customCallbacks = getStubCallbacks();
-            const customWrapper = mount(
-              <DragHandle
-                callbacks={customCallbacks}
-                isDragging={false}
-                isEnabled
-                canLift
-                getDraggableRef={() => fakeDraggableRef}
-              >
-                {(dragHandleProps: Provided) => (
-                  <Child dragHandleProps={dragHandleProps} />
-                )}
-              </DragHandle>,
-            );
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+        })).toBe(true);
 
-            touchStart(customWrapper, { x: 0, y: 0 });
-            windowTouchMove(point);
+        // movement that would normally start a lift, but now will not
+        windowTouchMove({ x: 0, y: sloppyClickThreshold });
 
-            expect(customCallbacks.onLift)
-              .toHaveBeenCalledWith({ client: origin, isScrollAllowed: false });
-
-            customWrapper.unmount();
-          });
-        });
-
-        it('should not start a drag if the user does not move more than a threshold', () => {
-          const invalid: Position[] = [
-            { x: 0, y: sloppyClickThreshold - 1 },
-            { x: 0, y: -sloppyClickThreshold + 1 },
-            { x: sloppyClickThreshold - 1, y: 0 },
-            { x: -sloppyClickThreshold + 1, y: 0 },
-          ];
-
-          invalid.forEach((point: Position): void => {
-            const customCallbacks = getStubCallbacks();
-            const customWrapper = mount(
-              <DragHandle
-                callbacks={customCallbacks}
-                isDragging={false}
-                isEnabled
-                canLift
-                getDraggableRef={() => fakeDraggableRef}
-              >
-                {(dragHandleProps: Provided) => (
-                  <Child dragHandleProps={dragHandleProps} />
-                )}
-              </DragHandle>,
-            );
-
-            touchStart(customWrapper, { x: 0, y: 0 });
-            windowTouchMove(point);
-
-            expect(customCallbacks.onLift).not.toHaveBeenCalled();
-
-            customWrapper.unmount();
-          });
-        });
-
-        it('should not fire a second lift after the long press timer completes', () => {
-          // starting a drag with a long press
-          touchStart(wrapper, origin);
-          windowTouchMove({ x: 0, y: sloppyClickThreshold });
-
-          expect(callbacksCalled(callbacks)({
-            onLift: 1,
-          })).toBe(true);
-
-          // long press timer now expires
-          jest.runTimersToTime(timeForLongPress);
-
-          // it should not trigger another lift
-          expect(callbacksCalled(callbacks)({
-            onLift: 1,
-          })).toBe(true);
-        });
+        // should not have lifted again
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+        })).toBe(true);
       });
 
-      it('should opt out of native scrolling (touchmove first on element)', () => {
+      it('should not call preventDefault on the initial touchstart', () => {
         const mockEvent: MockEvent = createMockEvent();
 
-        // start a drag
-        touchStart(wrapper);
-        jest.runTimersToTime(timeForLongPress);
-        // move on the element
-        touchMove(wrapper, { x: 0, y: 0 }, 0, mockEvent);
+        touchStart(wrapper, origin, 0, mockEvent);
 
-        expect(mockEvent.preventDefault).toHaveBeenCalled();
+        expect(mockEvent.preventDefault).not.toHaveBeenCalled();
       });
 
-      it('should opt out of native scrolling (touchmove first on window)', () => {
-        // start a drag
-        touchStart(wrapper);
-        jest.runTimersToTime(timeForLongPress);
-        // move on the window
-        const event: Event = windowTouchMove();
+      it('should call stopPropagation on the initial touchstart to prevent parents from starting', () => {
+        const mockEvent: MockEvent = createMockEvent();
 
-        expect(event.defaultPrevented).toBe(true);
+        touchStart(wrapper, origin, 0, mockEvent);
+
+        expect(mockEvent.stopPropagation).toHaveBeenCalled();
       });
     });
 
     describe('drag ending before it started', () => {
-      it('should not start a drag if the user releases before a long press and there is not enough movement', () => {
+      it('should not start a drag if the user releases before a long press', () => {
         touchStart(wrapper);
         // have not waited long enough
         jest.runTimersToTime(timeForLongPress - 1);
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 0,
+        })).toBe(true);
+      });
+
+      it('should not start a drag if the user moves their finger before a long press (movement captured on element)', () => {
+        touchStart(wrapper);
+        touchMove(wrapper);
+        // would normally start a drag
+        jest.runTimersToTime(timeForLongPress);
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 0,
+        })).toBe(true);
+      });
+
+      it('should not start a drag if the user moves their finger before a long press (movement captured on window)', () => {
+        touchStart(wrapper);
+        windowTouchMove(origin);
+        // would normally start a drag
+        jest.runTimersToTime(timeForLongPress);
 
         expect(callbacksCalled(callbacks)({
           onLift: 0,
@@ -2068,22 +1983,6 @@ describe('drag handle', () => {
             onLift: 1,
           })).toBe(true);
         });
-
-        it('should not block lifting if the force press occurs after a window touchmove (and before a drag starts)', () => {
-          touchStart(wrapper, origin);
-          // firing a touch move - but not enough to start a drag
-          windowTouchMove({ x: 0, y: sloppyClickThreshold - 1 });
-          expect(callbacks.onLift).not.toHaveBeenCalled();
-
-          // force press should no longer prevent the drag from starting
-          forcePress();
-          // start the drag with a long press
-          jest.runAllTimers();
-
-          expect(callbacksCalled(callbacks)({
-            onLift: 1,
-          })).toBe(true);
-        });
       });
 
       describe('drag started', () => {
@@ -2219,6 +2118,9 @@ describe('drag handle', () => {
           callbacks={callbacks}
           isEnabled={false}
           isDragging={false}
+          canLift
+          direction={null}
+          getDraggableRef={() => fakeDraggableRef}
         >
           {(dragHandleProps: ?Provided) => (
             mock(dragHandleProps)

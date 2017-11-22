@@ -22,7 +22,7 @@ export type MouseSensor = Sensor & {
 }
 
 export type KeyboardSensor = Sensor & {
-  onKeyDown: (event: MouseEvent, props: Props) => void,
+  onKeyDown: (event: KeyboardEvent, props: Props) => void,
 }
 
 export type TouchSensor = Sensor & {

@@ -313,10 +313,7 @@ There is current limitation of keyboard dragging: **the drag will cancel if the 
 
 ### Starting a drag
 
-A user can start a drag by:
-
-1. Holding their finger 👇 on an element for a small period of time 🕑 (long press); OR
-2. Moving an element beyond a small distance threshold
+A user can start a drag by holding their finger 👇 on an element for a small period of time 🕑 (long press)
 
 ### Understanding intention: tap, force press, scroll and drag
 
@@ -326,21 +323,9 @@ When a user presses their finger (or other input) on a `Draggable` we are not su
 
 If the user lifts their finger before the timer is finished then we release the event to the browser for it to determine whether to perform the standard tap / click action. This allows you to have a `Draggable` that is both clickable such as a anchor as well as draggable.
 
-#### Opting out of native scrolling
+#### Native scrolling support
 
-When the user first puts their finger down we are not sure if they were attempting to scroll. However, when they first put their finger down we have a one time opportunity to opt out of native scrolling. You cannot opt back into native scrolling or out of native scrolling from this point. The primary reason we need to opt out of native scrolling is that the scroll of the page would cancel out the impact of a users reorder action. Scrolling while dragging will be supported when we add the [auto scrolling feature](https://github.com/atlassian/react-beautiful-dnd/issues/27)
-
-| Native scrolling                | Reordering                      |
-|---------------------------------|---------------------------------|
-| Moving up moves the **page** up | Moving up moves the **item** up |
-|![native scrolling](https://github.com/alexreardon/files/blob/master/resources/native-scroll.gif?raw=true)|![reordering](https://github.com/alexreardon/files/blob/master/resources/no-scroll-reorder.gif?raw=true)|
-
-When a user moves an item up we need the item to move up in the list and not for the viewport or container to scroll up also. If we did not disable native scrolling the user would not be able to reorder items.
-
-The library needs to opt out of native scrolling for reordering, however we recommend that you allow some ability for the user to scroll without reordering. This can be done through a variety of means including:
-
-- Not making `Draggable`s the full width of the viewport so they can scroll on the side of it
-- Use a *drag handle* so that only part of the `Draggable` is reserved for dragging
+If we detect a `touchmove` before the long press timer expires we cancel the pending drag and allow the user to scroll the list normally.
 
 #### Force press support
 
