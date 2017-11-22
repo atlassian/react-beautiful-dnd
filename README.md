@@ -311,17 +311,17 @@ There is current limitation of keyboard dragging: **the drag will cancel if the 
 
 > Recorded on iPhone 6s
 
-### Starting a drag: long press
-
-A user can start a drag by holding their finger 👇 on an element for a small period of time 🕑 (long press)
-
 ### Understanding intention: tap, force press, scroll and drag
 
 When a user presses their finger (or other input) on a `Draggable` we are not sure if they where intending to *tap*, *force press*, *scroll the container* or *drag*. **As much as possible `react-beautiful-dnd` aims to ensure that a users default interaction experience remains unaffected**.
 
+### Starting a drag: long press
+
+A user can start a drag by holding their finger 👇 on an element for a small period of time 🕑 (long press)
+
 #### Tap support
 
-If the user lifts their finger before the timer is finished then we release the event to the browser for it to determine whether to perform the standard tap / click action. This allows you to have a `Draggable` that is both clickable such as a anchor as well as draggable.
+If the user lifts their finger before the timer is finished then we release the event to the browser for it to determine whether to perform the standard tap / click action. This allows you to have a `Draggable` that is both clickable such as a anchor as well as draggable. If the item was dragged then we block the tap action from occurring.
 
 #### Native scrolling support
 
@@ -347,6 +347,12 @@ Webkit based browsers add a grey overlay to anchors when they are active. We rem
 
 ```css
 -webkit-tap-highlight-color: rgba(0,0,0,0);
+```
+
+Avoid the *pull to refresh action* and *delayed anchor focus* on Android Chrome
+
+```css
+touch-action: manipulation;
 ```
 
 ### Vibration
@@ -393,7 +399,8 @@ type Hooks = {|
   onDragEnd: (result: DropResult) => void,
 |}
 
-type Props = Hooks & {|
+type Props = {|
+  ...Hooks,
   children?: ReactElement,
 |}
 ```
@@ -818,7 +825,7 @@ type BaseStyle = {|
   WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 
   // Avoid pull to refresh action and anchor focus on Android Chrome
-  touchAction: 'none',
+  touchAction: 'manipulation',
 |}
 
 type DraggingStyle = {|
