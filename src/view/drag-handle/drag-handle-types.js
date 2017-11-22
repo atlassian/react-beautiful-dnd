@@ -47,5 +47,7 @@ export type Props = {|
   direction: ?Direction,
   // get the ref of the draggable
   getDraggableRef: () => ?HTMLElement,
+  // whether interactive elements should be permitted to start a drag
+  canDragInteractiveElements: boolean,
   children: (?Provided) => Node,
 |}

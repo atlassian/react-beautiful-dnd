@@ -6,9 +6,11 @@ import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-ex
 import getWindowFromRef from '../../get-window-from-ref';
 import * as keyCodes from '../../key-codes';
 import blockStandardKeyEvents from '../util/block-standard-key-events';
+import shouldAllowDraggingWithTarget from '../util/should-allow-dragging-with-target';
 import type {
   Position,
 } from '../../../types';
+import type { MouseSensor } from './sensor-types';
 import type {
   Callbacks,
   Props,
@@ -198,6 +200,10 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Mous
     if (isCapturing()) {
       console.error('should not be able to perform a mouse down while a drag or pending drag is occurring');
       cancel();
+      return;
+    }
+
+    if (!shouldAllowDraggingWithTarget(event, props)) {
       return;
     }
 
