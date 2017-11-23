@@ -23,6 +23,7 @@ import setWindowScroll from '../../utils/set-window-scroll';
 import forceUpdate from '../../utils/force-update';
 import getClientRect from '../../../src/state/get-client-rect';
 import { timeForLongPress, forcePressThreshold } from '../../../src/view/drag-handle/sensor/create-touch-sensor';
+import { interactiveTagNames } from '../../../src/view/drag-handle/util/should-allow-dragging-with-target';
 
 const primaryButton: number = 0;
 const auxiliaryButton: number = 1;
@@ -2141,14 +2142,14 @@ describe('drag handle', () => {
   describe('generic', () => {
     type Control = {|
       name: string,
-      preLift: Function,
-      lift: Function,
+      preLift: (options?: Object) => void,
+      lift: (options?: Object) => void,
       end: Function,
     |}
 
     const touch: Control = {
       name: 'touch',
-      preLift: () => touchStart(wrapper),
+      preLift: (options?: Object = {}) => touchStart(wrapper, origin, 0, options),
       lift: () => jest.runTimersToTime(timeForLongPress),
       end: () => windowTouchEnd(),
     };
@@ -2157,13 +2158,13 @@ describe('drag handle', () => {
       name: 'keyboard',
       // no pre lift required
       preLift: () => {},
-      lift: () => pressSpacebar(wrapper),
+      lift: (options?: Object = {}) => pressSpacebar(wrapper, options),
       end: () => pressSpacebar(wrapper),
     };
 
     const mouse: Control = {
       name: 'mouse',
-      preLift: () => mouseDown(wrapper),
+      preLift: (options?: Object = {}) => mouseDown(wrapper, 0, 0, primaryButton, options),
       lift: () => windowMouseMove(0, sloppyClickThreshold),
       end: () => windowMouseUp(),
     };
@@ -2240,6 +2241,51 @@ describe('drag handle', () => {
             // cleanup
             window.addEventListener.mockRestore();
             window.removeEventListener.mockRestore();
+          });
+        });
+
+        describe('interactive element interactions', () => {
+          const mixedCase = (items: string[]): string[] => [
+            ...items.map((i: string): string => i.toLowerCase()),
+            ...items.map((i: string): string => i.toUpperCase()),
+          ];
+
+          it('should not start a drag if the target is an interactive element', () => {
+            mixedCase(interactiveTagNames).forEach((tagName: string) => {
+              const element: HTMLElement = document.createElement(tagName);
+              const options = {
+                target: element,
+              };
+
+              control.preLift(options);
+              control.lift(options);
+
+              expect(callbacksCalled(callbacks)({
+                onLift: 0,
+              })).toBe(true);
+            });
+          });
+
+          it('should start a drag if the target is not an interactive element', () => {
+            const nonInteractiveTags: string[] = [
+              'a', 'div', 'span', 'header',
+            ];
+
+            mixedCase(nonInteractiveTags).forEach((tagName: string, index: number) => {
+              const element: HTMLElement = document.createElement(tagName);
+              const options = {
+                target: element,
+              };
+
+              control.preLift(options);
+              control.lift(options);
+              control.end();
+
+              expect(callbacksCalled(callbacks)({
+                onLift: index + 1,
+                onDrop: index + 1,
+              })).toBe(true);
+            });
           });
         });
       });

@@ -13,7 +13,6 @@ import type {
   Callbacks,
   Props,
 } from '../drag-handle-types';
-import type { KeyboardSensor } from './sensor-types';
 
 type State = {|
   isDragging: boolean,

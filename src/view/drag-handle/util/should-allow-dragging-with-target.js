@@ -1,7 +1,7 @@
 // @flow
 import type { Props } from '../drag-handle-types';
 
-const interactive: string[] = [
+export const interactiveTagNames: string[] = [
   'input',
   'textarea',
   'select',
@@ -21,6 +21,6 @@ export default (event: Event, props: Props): boolean => {
   // If tagname is not found in the interactive array then a drag is permitted
 
   // $ExpectError - .tagName is not a property of EventTarget apparently...
-  return interactive.indexOf(event.target.tagName.toLowerCase()) === -1;
+  return interactiveTagNames.indexOf(event.target.tagName.toLowerCase()) === -1;
 };
 

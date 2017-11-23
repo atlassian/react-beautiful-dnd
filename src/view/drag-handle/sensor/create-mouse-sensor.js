@@ -15,7 +15,6 @@ import type {
   Callbacks,
   Props,
 } from '../drag-handle-types';
-import type { MouseSensor } from './sensor-types';
 
 // Custom event format for force press inputs
 type MouseForceChangedEvent = MouseEvent & {
