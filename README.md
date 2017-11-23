@@ -325,7 +325,10 @@ If the user lifts their finger before the timer is finished then we release the 
 
 #### Native scrolling support
 
-If we detect a `touchmove` before the long press timer expires we cancel the pending drag and allow the user to scroll normally.
+If we detect a `touchmove` before the long press timer expires we cancel the pending drag and allow the user to scroll normally. This means that the user needs to be fairly intentional and precise with their grabbing. Once the first `touchmove` occurs we have to either opt in our out of native scrolling.
+
+- If the long press timer **has not** expired: *allow native scrolling and prevent dragging*
+- If the long press timer **has** expired: *a drag has started and we prevent native scrolling*
 
 #### Force press support
 
@@ -1181,7 +1184,7 @@ type DraggableStyle = DraggingStyle | NotDraggingStyle
 type BaseStyle = {|
   WebkitTouchCallout: 'none',
   WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-  touchAction: 'none',
+  touchAction: 'manipulation',
 |}
 type DraggingStyle = {|
   ...BaseStyle,
