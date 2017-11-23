@@ -352,7 +352,8 @@ export default class Draggable extends Component<Props, State> {
               canLift={canLift}
               callbacks={this.callbacks}
               getDraggableRef={this.getDraggableRef}
-              canDragInteractiveElements={!disableInteractiveElementBlocking}
+              // by default we do not allow dragging on interactive elements
+              canDragInteractiveElements={disableInteractiveElementBlocking}
             >
               {(dragHandleProps: ?DragHandleProvided) =>
                 children(
