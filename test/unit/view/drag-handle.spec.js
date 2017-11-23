@@ -168,6 +168,7 @@ describe('drag handle', () => {
         isEnabled
         canLift
         getDraggableRef={() => fakeDraggableRef}
+        canDragInteractiveElements={false}
       >
         {(dragHandleProps: ?Provided) => (
           <Child dragHandleProps={dragHandleProps} />
@@ -206,6 +207,7 @@ describe('drag handle', () => {
               canLift
               direction={null}
               getDraggableRef={() => fakeDraggableRef}
+              canDragInteractiveElements={false}
             >
               {(dragHandleProps: ?Provided) => (
                 <Child dragHandleProps={dragHandleProps} />
@@ -1140,6 +1142,7 @@ describe('drag handle', () => {
             canLift
             direction="vertical"
             getDraggableRef={() => fakeDraggableRef}
+            canDragInteractiveElements={false}
           >
             {(dragHandleProps: ?Provided) => (
               <Child dragHandleProps={dragHandleProps} />
@@ -1164,6 +1167,7 @@ describe('drag handle', () => {
             canLift
             direction={null}
             getDraggableRef={() => fakeDraggableRef}
+            canDragInteractiveElements={false}
           >
             {(dragHandleProps: ?Provided) => (
               <Child dragHandleProps={dragHandleProps} />
@@ -1247,6 +1251,7 @@ describe('drag handle', () => {
               isEnabled
               canLift
               getDraggableRef={() => fakeDraggableRef}
+              canDragInteractiveElements={false}
             >
               {(dragHandleProps: ?Provided) => (
                 <Child dragHandleProps={dragHandleProps} />
@@ -2128,6 +2133,7 @@ describe('drag handle', () => {
           canLift
           direction={null}
           getDraggableRef={() => fakeDraggableRef}
+          canDragInteractiveElements={false}
         >
           {(dragHandleProps: ?Provided) => (
             mock(dragHandleProps)
@@ -2266,29 +2272,8 @@ describe('drag handle', () => {
             });
           });
 
-          it('should start a drag if the target is not an interactive element', () => {
-            const nonInteractiveTagNames: string[] = [
-              'a', 'div', 'span', 'header',
-            ];
-
-            mixedCase(nonInteractiveTagNames).forEach((tagName: string, index: number) => {
-              const element: HTMLElement = document.createElement(tagName);
-              const options = {
-                target: element,
-              };
-
-              control.preLift(options);
-              control.lift(options);
-              control.end();
-
-              expect(callbacksCalled(callbacks)({
-                onLift: index + 1,
-                onDrop: index + 1,
-              })).toBe(true);
-            });
-          });
-
           it('should start a drag on an interactive element if asked to by user', () => {
+            // allowing dragging from interactive elements
             wrapper.setProps({ canDragInteractiveElements: true });
 
             mixedCase(interactiveTagNames).forEach((tagName: string, index: number) => {
@@ -2305,6 +2290,37 @@ describe('drag handle', () => {
                 onLift: index + 1,
                 onDrop: index + 1,
               })).toBe(true);
+            });
+          });
+
+          it('should start a drag if the target is not an interactive element', () => {
+            const nonInteractiveTagNames: string[] = [
+              'a', 'div', 'span', 'header',
+            ];
+
+            // counting call count between loops
+            let count: number = 0;
+
+            [true, false].forEach((bool: boolean) => {
+              // doesn't matter if this is set or not
+              wrapper.setProps({ canDragInteractiveElements: bool });
+
+              mixedCase(nonInteractiveTagNames).forEach((tagName: string) => {
+                count++;
+                const element: HTMLElement = document.createElement(tagName);
+                const options = {
+                  target: element,
+                };
+
+                control.preLift(options);
+                control.lift(options);
+                control.end();
+
+                expect(callbacksCalled(callbacks)({
+                  onLift: count,
+                  onDrop: count,
+                })).toBe(true);
+              });
             });
           });
         });
