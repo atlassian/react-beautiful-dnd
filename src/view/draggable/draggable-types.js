@@ -136,13 +136,13 @@ export type OwnProps = {|
   children: (Provided, StateSnapshot) => ?Node,
   type: TypeId,
   isDragDisabled: boolean,
-  cannotDragInteractiveElements: boolean,
+  disableInteractiveElementBlocking: boolean,
 |}
 
 export type DefaultProps = {|
   type: TypeId,
   isDragDisabled: boolean,
-  cannotDragInteractiveElements: boolean
+  disableInteractiveElementBlocking: boolean
 |}
 
 export type Props = {|

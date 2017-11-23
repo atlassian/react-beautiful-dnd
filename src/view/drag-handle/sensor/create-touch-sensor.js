@@ -3,7 +3,7 @@
 import stopEvent from '../util/stop-event';
 import createScheduler from '../util/create-scheduler';
 import getWindowFromRef from '../../get-window-from-ref';
-import shouldAllowDraggingWithTarget from '../util/should-allow-dragging-with-target';
+import shouldAllowDraggingFromTarget from '../util/should-allow-dragging-from-target';
 import type {
   Position,
 } from '../../../types';
@@ -242,7 +242,7 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
       return;
     }
 
-    if (!shouldAllowDraggingWithTarget(event, props)) {
+    if (!shouldAllowDraggingFromTarget(event, props)) {
       return;
     }
 

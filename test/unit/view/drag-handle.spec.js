@@ -23,7 +23,7 @@ import setWindowScroll from '../../utils/set-window-scroll';
 import forceUpdate from '../../utils/force-update';
 import getClientRect from '../../../src/state/get-client-rect';
 import { timeForLongPress, forcePressThreshold } from '../../../src/view/drag-handle/sensor/create-touch-sensor';
-import { interactiveTagNames } from '../../../src/view/drag-handle/util/should-allow-dragging-with-target';
+import { interactiveTagNames } from '../../../src/view/drag-handle/util/should-allow-dragging-from-target';
 
 const primaryButton: number = 0;
 const auxiliaryButton: number = 1;
@@ -2267,11 +2267,31 @@ describe('drag handle', () => {
           });
 
           it('should start a drag if the target is not an interactive element', () => {
-            const nonInteractiveTags: string[] = [
+            const nonInteractiveTagNames: string[] = [
               'a', 'div', 'span', 'header',
             ];
 
-            mixedCase(nonInteractiveTags).forEach((tagName: string, index: number) => {
+            mixedCase(nonInteractiveTagNames).forEach((tagName: string, index: number) => {
+              const element: HTMLElement = document.createElement(tagName);
+              const options = {
+                target: element,
+              };
+
+              control.preLift(options);
+              control.lift(options);
+              control.end();
+
+              expect(callbacksCalled(callbacks)({
+                onLift: index + 1,
+                onDrop: index + 1,
+              })).toBe(true);
+            });
+          });
+
+          it('should start a drag on an interactive element if asked to by user', () => {
+            wrapper.setProps({ canDragInteractiveElements: true });
+
+            mixedCase(interactiveTagNames).forEach((tagName: string, index: number) => {
               const element: HTMLElement = document.createElement(tagName);
               const options = {
                 target: element,

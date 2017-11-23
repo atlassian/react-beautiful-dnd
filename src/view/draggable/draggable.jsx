@@ -54,7 +54,7 @@ export default class Draggable extends Component<Props, State> {
     isDragDisabled: false,
     type: 'DEFAULT',
     // cannot drag interactive elements by default
-    cannotDragInteractiveElements: true,
+    disableInteractiveElementBlocking: false,
   }
 
   // Need to declare contextTypes without flow
@@ -327,7 +327,7 @@ export default class Draggable extends Component<Props, State> {
       dimension,
       children,
       direction,
-      cannotDragInteractiveElements,
+      disableInteractiveElementBlocking,
     } = this.props;
 
     const speed = this.getSpeed(isDragging, isDropAnimating, canAnimate);
@@ -352,7 +352,7 @@ export default class Draggable extends Component<Props, State> {
               canLift={canLift}
               callbacks={this.callbacks}
               getDraggableRef={this.getDraggableRef}
-              canDragInteractiveElements={!cannotDragInteractiveElements}
+              canDragInteractiveElements={!disableInteractiveElementBlocking}
             >
               {(dragHandleProps: ?DragHandleProvided) =>
                 children(

@@ -6,7 +6,7 @@ import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-ex
 import getWindowFromRef from '../../get-window-from-ref';
 import * as keyCodes from '../../key-codes';
 import blockStandardKeyEvents from '../util/block-standard-key-events';
-import shouldAllowDraggingWithTarget from '../util/should-allow-dragging-with-target';
+import shouldAllowDraggingFromTarget from '../util/should-allow-dragging-from-target';
 import type {
   Position,
 } from '../../../types';
@@ -202,7 +202,7 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Mous
       return;
     }
 
-    if (!shouldAllowDraggingWithTarget(event, props)) {
+    if (!shouldAllowDraggingFromTarget(event, props)) {
       return;
     }
 
