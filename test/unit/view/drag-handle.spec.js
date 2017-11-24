@@ -2148,15 +2148,29 @@ describe('drag handle', () => {
   describe('generic', () => {
     type Control = {|
       name: string,
-      preLift: (options?: Object) => void,
-      lift: (options?: Object) => void,
-      end: Function,
+      preLift: (wrap?: ReactWrapper, options?: Object) => void,
+      lift: (wrap?: ReactWrapper, options?: Object) => void,
+      end: (wrap?: ReactWrapper) => void,
     |}
+
+    const trySetIsDragging = (wrap: ReactWrapper) => {
+      // lift was not successful
+      if (!wrap.props().callbacks.onLift.mock.calls.length) {
+        return;
+      }
+      // would be set during a drag
+      wrap.setProps({ direction: 'vertical' });
+      wrap.setProps({ isDragging: true });
+    };
 
     const touch: Control = {
       name: 'touch',
-      preLift: (options?: Object = {}) => touchStart(wrapper, origin, 0, options),
-      lift: () => jest.runTimersToTime(timeForLongPress),
+      preLift: (wrap:? ReactWrapper = wrapper, options?: Object = {}) =>
+        touchStart(wrap, origin, 0, options),
+      lift: (wrap:? ReactWrapper = wrapper) => {
+        jest.runTimersToTime(timeForLongPress);
+        trySetIsDragging(wrap);
+      },
       end: () => windowTouchEnd(),
     };
 
@@ -2164,20 +2178,33 @@ describe('drag handle', () => {
       name: 'keyboard',
       // no pre lift required
       preLift: () => {},
-      lift: (options?: Object = {}) => pressSpacebar(wrapper, options),
-      end: () => pressSpacebar(wrapper),
+      lift: (wrap: ?ReactWrapper = wrapper, options?: Object = {}) => {
+        pressSpacebar(wrap, options);
+        trySetIsDragging(wrap);
+      },
+      end: (wrap?: ReactWrapper = wrapper) => {
+        // only want to fire the event if dragging - otherwise it might start a drag
+        if (wrap.props().isDragging) {
+          pressSpacebar(wrap);
+        }
+      },
     };
 
     const mouse: Control = {
       name: 'mouse',
-      preLift: (options?: Object = {}) => mouseDown(wrapper, 0, 0, primaryButton, options),
-      lift: () => windowMouseMove(0, sloppyClickThreshold),
+      preLift: (wrap:? ReactWrapper = wrapper, options?: Object = {}) =>
+        mouseDown(wrap, 0, 0, primaryButton, options),
+      lift: (wrap:? ReactWrapper = wrapper) => {
+        windowMouseMove(0, sloppyClickThreshold);
+        trySetIsDragging(wrap);
+      },
       end: () => windowMouseUp(),
     };
 
     const controls: Control[] = [mouse, keyboard, touch];
 
-    const getAria = (): boolean => Boolean(wrapper.find(Child).props().dragHandleProps['aria-grabbed']);
+    const getAria = (wrap:? ReactWrapper = wrapper): boolean =>
+      Boolean(wrap.find(Child).props().dragHandleProps['aria-grabbed']);
 
     beforeEach(() => {
       jest.useFakeTimers();
@@ -2263,8 +2290,8 @@ describe('drag handle', () => {
                 target: element,
               };
 
-              control.preLift(options);
-              control.lift(options);
+              control.preLift(wrapper, options);
+              control.lift(wrapper, options);
 
               expect(callbacksCalled(callbacks)({
                 onLift: 0,
@@ -2282,9 +2309,9 @@ describe('drag handle', () => {
                 target: element,
               };
 
-              control.preLift(options);
-              control.lift(options);
-              control.end();
+              control.preLift(wrapper, options);
+              control.lift(wrapper, options);
+              control.end(wrapper);
 
               expect(callbacksCalled(callbacks)({
                 onLift: index + 1,
@@ -2312,15 +2339,219 @@ describe('drag handle', () => {
                   target: element,
                 };
 
-                control.preLift(options);
-                control.lift(options);
-                control.end();
+                control.preLift(wrapper, options);
+                control.lift(wrapper, options);
+                control.end(wrapper);
 
                 expect(callbacksCalled(callbacks)({
                   onLift: count,
                   onDrop: count,
                 })).toBe(true);
               });
+            });
+          });
+        });
+
+        describe('contenteditable interactions', () => {
+          describe('interactive interactions are blocked', () => {
+            it('should block the drag if the drag handle is itself contenteditable', () => {
+              const customCallbacks = getStubCallbacks();
+              const customWrapper = mount(
+                <DragHandle
+                  callbacks={customCallbacks}
+                  isDragging={false}
+                  isEnabled
+                  canLift
+                  direction={null}
+                  getDraggableRef={() => fakeDraggableRef}
+                  canDragInteractiveElements={false}
+                >
+                  {(dragHandleProps: ?Provided) => (
+                    <div
+                      {...dragHandleProps}
+                      contentEditable
+                    />
+                  )}
+                </DragHandle>,
+              );
+              const target = customWrapper.getDOMNode();
+              const options = {
+                target,
+              };
+
+              control.preLift(customWrapper, options);
+              control.lift(customWrapper, options);
+              control.end(customWrapper);
+
+              expect(callbacksCalled(customCallbacks)({
+                onLift: 0,
+              })).toBe(true);
+            });
+
+            it('should block the drag if originated from a child contenteditable', () => {
+              const customCallbacks = getStubCallbacks();
+              const customWrapper = mount(
+                <DragHandle
+                  callbacks={customCallbacks}
+                  isDragging={false}
+                  isEnabled
+                  canLift
+                  direction={null}
+                  getDraggableRef={() => fakeDraggableRef}
+                  canDragInteractiveElements={false}
+                >
+                  {(dragHandleProps: ?Provided) => (
+                    <div {...dragHandleProps}>
+                      <div
+                        className="editable"
+                        contentEditable
+                      />
+                    </div>
+                  )}
+                </DragHandle>,
+              );
+              const target = customWrapper.getDOMNode().querySelector('.editable');
+              if (!target) {
+                throw new Error('could not find editable element');
+              }
+              const options = {
+                target,
+              };
+
+              control.preLift(customWrapper, options);
+              control.lift(customWrapper, options);
+              control.end(customWrapper);
+
+              expect(whereAnyCallbacksCalled(customCallbacks)).toBe(false);
+            });
+
+            it('should block the drag if originated from a child of a child contenteditable', () => {
+              const customCallbacks = getStubCallbacks();
+              const customWrapper = mount(
+                <DragHandle
+                  callbacks={customCallbacks}
+                  isDragging={false}
+                  isEnabled
+                  canLift
+                  direction={null}
+                  getDraggableRef={() => fakeDraggableRef}
+                  canDragInteractiveElements={false}
+                >
+                  {(dragHandleProps: ?Provided) => (
+                    <div {...dragHandleProps}>
+                      <div
+                        className="editable"
+                        contentEditable
+                      >
+                        <p>hello there</p>
+                        <span className="target">Edit me!</span>
+                      </div>
+                    </div>
+                  )}
+                </DragHandle>,
+              );
+              const target = customWrapper.getDOMNode().querySelector('.target');
+              if (!target) {
+                throw new Error('could not find the target');
+              }
+              const options = {
+                target,
+              };
+
+              control.preLift(customWrapper, options);
+              control.lift(customWrapper, options);
+              control.end(customWrapper);
+
+              expect(callbacksCalled(customCallbacks)({
+                onLift: 0,
+              })).toBe(true);
+            });
+          });
+
+          describe('interactive interactions are not blocked', () => {
+            it('should not block the drag if the drag handle is contenteditable', () => {
+              const customCallbacks = getStubCallbacks();
+              const customWrapper = mount(
+                <DragHandle
+                  callbacks={customCallbacks}
+                  isDragging={false}
+                  isEnabled
+                  canLift
+                  direction={null}
+                  getDraggableRef={() => fakeDraggableRef}
+                  // stating that we can drag
+                  canDragInteractiveElements
+                >
+                  {(dragHandleProps: ?Provided) => (
+                    <div {...dragHandleProps}>
+                      <div
+                        className="editable"
+                        contentEditable
+                      />
+                    </div>
+                  )}
+                </DragHandle>,
+              );
+              const target = customWrapper.getDOMNode().querySelector('.editable');
+              if (!target) {
+                throw new Error('could not find editable element');
+              }
+              const options = {
+                target,
+              };
+
+              control.preLift(customWrapper, options);
+              control.lift(customWrapper, options);
+              control.end(customWrapper);
+
+              expect(callbacksCalled(customCallbacks)({
+                onLift: 1,
+                onDrop: 1,
+              })).toBe(true);
+            });
+
+            it('should not block the drag if originated from a child contenteditable', () => {
+              const customCallbacks = getStubCallbacks();
+              const customWrapper = mount(
+                <DragHandle
+                  callbacks={customCallbacks}
+                  isDragging={false}
+                  isEnabled
+                  canLift
+                  direction={null}
+                  getDraggableRef={() => fakeDraggableRef}
+                  // stating that we can drag
+                  canDragInteractiveElements
+                >
+                  {(dragHandleProps: ?Provided) => (
+                    <div {...dragHandleProps}>
+                      <div
+                        className="editable"
+                        contentEditable
+                      >
+                        <p>hello there</p>
+                        <span className="target">Edit me!</span>
+                      </div>
+                    </div>
+                  )}
+                </DragHandle>,
+              );
+              const target = customWrapper.getDOMNode().querySelector('.target');
+              if (!target) {
+                throw new Error('could not find the target');
+              }
+              const options = {
+                target,
+              };
+
+              control.preLift(customWrapper, options);
+              control.lift(customWrapper, options);
+              control.end(customWrapper);
+
+              expect(callbacksCalled(customCallbacks)({
+                onLift: 1,
+                onDrop: 1,
+              })).toBe(true);
             });
           });
         });

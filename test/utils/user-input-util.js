@@ -1,3 +1,4 @@
+// @flow
 import { ReactWrapper } from 'enzyme';
 import { Position } from '../../src/types';
 
