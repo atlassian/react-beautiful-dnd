@@ -3,6 +3,7 @@
 import stopEvent from '../util/stop-event';
 import createScheduler from '../util/create-scheduler';
 import getWindowFromRef from '../../get-window-from-ref';
+import shouldAllowDraggingFromTarget from '../util/should-allow-dragging-from-target';
 import type {
   Position,
 } from '../../../types';
@@ -238,6 +239,10 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
     if (isCapturing()) {
       console.error('should not be able to perform a touch start while a drag or pending drag is occurring');
       cancel();
+      return;
+    }
+
+    if (!shouldAllowDraggingFromTarget(event, props)) {
       return;
     }
 

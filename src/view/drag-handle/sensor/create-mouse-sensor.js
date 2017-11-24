@@ -6,14 +6,15 @@ import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-ex
 import getWindowFromRef from '../../get-window-from-ref';
 import * as keyCodes from '../../key-codes';
 import blockStandardKeyEvents from '../util/block-standard-key-events';
+import shouldAllowDraggingFromTarget from '../util/should-allow-dragging-from-target';
 import type {
   Position,
 } from '../../../types';
+import type { MouseSensor } from './sensor-types';
 import type {
   Callbacks,
   Props,
 } from '../drag-handle-types';
-import type { MouseSensor } from './sensor-types';
 
 // Custom event format for force press inputs
 type MouseForceChangedEvent = MouseEvent & {
@@ -198,6 +199,10 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Mous
     if (isCapturing()) {
       console.error('should not be able to perform a mouse down while a drag or pending drag is occurring');
       cancel();
+      return;
+    }
+
+    if (!shouldAllowDraggingFromTarget(event, props)) {
       return;
     }
 
