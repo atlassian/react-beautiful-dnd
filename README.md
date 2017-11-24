@@ -714,6 +714,7 @@ import { Draggable } from 'react-beautiful-dnd';
 - `draggableId`: A *required* `DraggableId(string)` that uniquely identifies the `Draggable` for the application. Please do not change this prop - especially during a drag.
 - `type`: An *optional* type (`TypeId(string)`) of the `Draggable`. This is used to control what `Droppable`s the `Draggable` is permitted to drop on. `Draggable`s can only drop on `Droppable`s that share the same `type`. If no `type` is provided, then it will be set to `'DEFAULT'`. Currently the `type` of a `Draggable` **must be** the same as its container `Droppable`. This restriction might be loosened in the future if there is a valid use case.
 - `isDragDisabled`: An *optional* flag to control whether or not the `Draggable` is permitted to drag. You can use this to implement your own conditional drag logic. It will default to `false`.
+- `disableInteractiveElementBlocking`: An *optional* flag to opt out of blocking a drag from interactive elements. For more information refer to the section *Interactive child elements within a `Draggable`*
 
 ### Children function
 
@@ -1001,133 +1002,19 @@ The `children` function is also provided with a small amount of state relating t
 
 ### Interactive child elements within a `Draggable`
 
-It is possible for your `Draggable` to be an interactive element such as a `<button>` or an `<a>`. However, there may be a situation where you want your `Draggable` element be the parent of an interactive element such as a `<button>` or an `<input>`. By default the child interactive element **will not be interactive**. Interacting with these nested interactive elements will be used as part of the calculation to start a drag. This is because we call `event.preventDefault()` on the `mousedown` event for the `Draggable`. Calling `preventDefault` will prevent the nested interactive element from performing its standard actions and interactions. What you will need to do is *opt out* of our standard calling of `event.preventDefault()`. By doing this the nested interactive element will not be able to be used to start a drag - but will allow the user to interact with it directly. Keep in mind - that by doing this the user will not be able to drag the `Draggable` by dragging on the interactive child element - which is probably what you want anyway. There are a few ways you can get around the standard `preventDefault` behavior. Here are some suggestions:
+It is possible for your `Draggable` to contain interactive elements. By default we block dragging on these elements. By doing this we allow those elements to function in the usual way. Here is the list of interactive elements that block dragging from by default:
 
-#### 1. Call `event.stopPropagation()` on the interactive element `mousedown`
+- `input`
+- `button`
+- `textarea`
+- `select`
+- `option`
+- `optgroup`
+- `video`
+- `audio`
+- [`contenteditable`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/contenteditable) (any elements that are `contenteditable` or are within a `contenteditable` container)
 
-*This is the simpler solution*
-
-On the child element, call `event.stopPropagation()` for the `onMouseDown` function. This will stop the event bubbling up to the `Draggable` and having `event.preventDefault()` called on it. The `Draggable` will not be aware that a `mousedown` has even occurred.
-
-```js
-<input
-  // stop event from bubbling up to Draggable where it will be prevented
-  onMouseDown={e => e.stopPropagation()}
-/>
-```
-
-#### 2. Patch the `onMouseDown` event in `provided`
-
-*This is the more complex solution*
-
-If you cannot use the first solution, then you can consider patching the `provided` > `onMouseDown` function. The main idea of this approach is to add additional behavior to the existing `onMouseDown` function - only calling it when it should be called.
-
-```js
-class DraggableWithSelect extends Component {
-
-  renderSelect = (provided) => {
-    // Patched onMouseDown handler
-    const onMouseDown = (event) => {
-      // If mouse down is on a select, then do not
-      // let react-beautiful-dnd do anything with it
-      if(event.target.nodeName === 'SELECT') {
-        return;
-      }
-      provided.dragHandleProps.onMouseDown(event);
-    }
-
-    // patching drag handle props
-    const patched = {
-      ...provided.dragHandleProps,
-      onMouseDown,
-    }
-
-    return (
-      <div>
-        <div
-          ref={provided.innerRef}
-          style={getItemStyle(
-            provided.draggableStyle,
-            snapshot.isDragging
-          )}
-          {...patched}
-        >
-          <select>
-            <option>One</option>
-            <option>Two</option>
-            <option>Three</option>
-          </select>
-        </div>
-        {provided.placeholder}
-      </div>
-    );
-  }
-
-  render() {
-    return (
-      <Draggable draggableId="draggable-1">
-        {this.renderSelect}
-      </Draggable>
-    );
-  }
-}
-```
-
-#### 3. Patch the `onKeyDown` event in `provided`
-
-Similar to #2, this patch should be used on inputs inside a `Draggable`
-
-```js
-class DraggableWithInput extends Component {
-  renderInput = provided => {
-    // Patched onMouseDown, make inputs selectable
-    const onMouseDown = event => {
-      if (event.target.nodeName === 'INPUT') {
-        return;
-      }
-      provided.dragHandleProps.onMouseDown(event);
-    };
-    // Patched onKeyDown handler, make typing in inputs
-    // work as expected. For example, spacebar can be used
-    // as normal characters instead of a shortcut.
-    const onKeyDown = event => {
-      if (event.target.nodeName === 'INPUT') {
-        return;
-      }
-      provided.dragHandleProps.onKeyDown(event);
-    };
-    // patching drag handle props
-    const patched = {
-      ...provided.dragHandleProps,
-      onMouseDown,
-      onKeyDown,
-    };
-    return (
-      <div>
-        <div
-          ref={provided.innerRef}
-          style={getItemStyle(
-            provided.draggableStyle,
-            snapshot.isDragging
-          )}
-          {...patched}
-        >
-          <input type="text" />
-        </div>
-        {provided.placeholder}
-      </div>
-    );
-  }
-
-  render() {
-    return (
-      <Draggable draggableId="draggable-1">
-        {this.renderInput}
-      </Draggable>
-    );
-  }
-}
-```
+You can opt out of this behavior by adding the `disableInteractiveElementBlocking` prop to a `Draggable`. However, it is questionable as to whether you should be doing so because it will render the interactive element unusable. If you need to *conditionally* block dragging from interactive elements you can add the `disableInteractiveElementBlocking` prop to opt out of the default blocking and monkey patch the `dragHandleProps (DragHandleProvided)` event handlers to disable dragging as required.
 
 ## Flow usage
 
