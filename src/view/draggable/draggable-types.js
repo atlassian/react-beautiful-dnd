@@ -39,8 +39,8 @@ export type BaseStyle = {|
   // https://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/
   WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 
-  // Added to avoid the *pull to refresh action* and *anchor focus* on Android Chrome
-  touchAction: 'none',
+  // Avoid the *pull to refresh action* and *delayed anchor focus* on Android Chrome
+  touchAction: 'manipulation',
 |}
 
 export type DraggingStyle = {|
