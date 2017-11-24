@@ -128,12 +128,11 @@ describe('hooks integration', () => {
     const start = () => {
       mouseDown(
         wrapper.find('.drag-handle'),
-        initial.x,
-        initial.y,
+        initial,
       );
 
       // Drag does not start until mouse has moved past a certain threshold
-      windowMouseMove(dragStart.x, dragStart.y);
+      windowMouseMove(dragStart);
 
       // Need to wait for the nested async lift action to complete
       // this takes two async actions.
@@ -141,7 +140,7 @@ describe('hooks integration', () => {
     };
 
     const move = () => {
-      windowMouseMove(dragMove.x, dragMove.y + sloppyClickThreshold + 1);
+      windowMouseMove({ x: dragMove.x, y: dragMove.y + sloppyClickThreshold + 1 });
       // movements are scheduled with requestAnimationFrame
       requestAnimationFrame.step();
     };
