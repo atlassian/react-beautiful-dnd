@@ -2466,6 +2466,49 @@ describe('drag handle', () => {
                 onLift: 0,
               })).toBe(true);
             });
+
+            it('should not block if contenteditable is set to false', () => {
+              const customCallbacks = getStubCallbacks();
+              const customWrapper = mount(
+                <DragHandle
+                  callbacks={customCallbacks}
+                  isDragging={false}
+                  isEnabled
+                  canLift
+                  direction={null}
+                  getDraggableRef={() => fakeDraggableRef}
+                  canDragInteractiveElements={false}
+                >
+                  {(dragHandleProps: ?Provided) => (
+                    <div {...dragHandleProps}>
+                      <div
+                        className="editable"
+                        contentEditable={false}
+                      >
+                        <p>hello there</p>
+                        <span className="target">Edit me!</span>
+                      </div>
+                    </div>
+                  )}
+                </DragHandle>,
+              );
+              const target = customWrapper.getDOMNode().querySelector('.target');
+              if (!target) {
+                throw new Error('could not find the target');
+              }
+              const options = {
+                target,
+              };
+
+              control.preLift(customWrapper, options);
+              control.lift(customWrapper, options);
+              control.end(customWrapper);
+
+              expect(callbacksCalled(customCallbacks)({
+                onLift: 1,
+                onDrop: 1,
+              })).toBe(true);
+            });
           });
 
           describe('interactive interactions are not blocked', () => {

@@ -1005,11 +1005,14 @@ The `children` function is also provided with a small amount of state relating t
 It is possible for your `Draggable` to contain interactive elements. By default we block dragging on these elements. By doing this we allow those elements to function in the usual way. Here is the list of interactive elements that block dragging from by default:
 
 - `input`
+- `button`
 - `textarea`
 - `select`
 - `option`
-- `button`
-- `contenteditable`
+- `optgroup`
+- `video`
+- `audio`
+- [`contenteditable`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/contenteditable) (any elements that are `contenteditable` or are within a `contenteditable` container)
 
 You can opt out of this behavior by adding the `disableInteractiveElementBlocking` prop to a `Draggable`. However, it is questionable as to whether you should be doing so because it will render the interactive element unusable. If you need to *conditionally* block dragging from interactive elements you can add the `disableInteractiveElementBlocking` prop to opt out of the default blocking and monkey patch the `dragHandleProps (DragHandleProvided)` event handlers to disable dragging as required.
 

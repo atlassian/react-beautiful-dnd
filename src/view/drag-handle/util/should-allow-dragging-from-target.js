@@ -3,10 +3,13 @@ import type { Props } from '../drag-handle-types';
 
 export const interactiveTagNames: string[] = [
   'input',
+  'button',
   'textarea',
   'select',
   'option',
-  'button',
+  'optgroup',
+  'video',
+  'audio',
 ];
 
 const isContentEditable = (parent: HTMLElement, current: ?HTMLElement): boolean => {
@@ -14,7 +17,12 @@ const isContentEditable = (parent: HTMLElement, current: ?HTMLElement): boolean 
     return false;
   }
 
-  if (current.getAttribute('contenteditable') === 'true') {
+  // contenteditable="true" or contenteditable="" are valid ways
+  // of creating a contenteditable container
+  // https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/contenteditable
+
+  const attribute: ?string = current.getAttribute('contenteditable');
+  if (attribute === 'true' || attribute === '') {
     return true;
   }
 
