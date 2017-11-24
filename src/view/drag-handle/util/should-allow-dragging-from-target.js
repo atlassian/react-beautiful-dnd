@@ -12,7 +12,7 @@ export const interactiveTagNames: string[] = [
   'audio',
 ];
 
-const isContentEditable = (parent: HTMLElement, current: ?HTMLElement): boolean => {
+const isContentEditable = (parent: Element, current: ?Element): boolean => {
   if (current == null) {
     return false;
   }
@@ -41,8 +41,15 @@ export default (event: Event, props: Props): boolean => {
     return true;
   }
 
+  const { target, currentTarget } = event;
+
+  // Technically target and currentTarget are EventTarget's and do not have to be elements
+  if (!(target instanceof HTMLElement) || !(currentTarget instanceof HTMLElement)) {
+    return true;
+  }
+
   const isTargetInteractive: boolean =
-    interactiveTagNames.indexOf(event.target.tagName.toLowerCase()) !== -1;
+    interactiveTagNames.indexOf(target.tagName.toLowerCase()) !== -1;
 
   if (isTargetInteractive) {
     return false;
@@ -53,6 +60,6 @@ export default (event: Event, props: Props): boolean => {
   // - event.currentTarget = the drag handle
   // - event.target = the node that was interacted with (can be a child of the drag handle)
 
-  return !isContentEditable(event.currentTarget, event.target);
+  return !isContentEditable(currentTarget, target);
 };
 

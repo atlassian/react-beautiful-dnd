@@ -1,6 +1,6 @@
 // @flow
-import { ReactWrapper } from 'enzyme';
-import { Position } from '../../src/types';
+import type { ReactWrapper } from 'enzyme';
+import type { Position } from '../../src/types';
 
 const primaryButton: number = 0;
 
@@ -96,29 +96,33 @@ export const dispatchWindowTouchEvent = (
 
 export const mouseEvent = (
   eventName: string,
-  wrapper: ReactWrapper<any>,
+  wrapper: ReactWrapper,
   clientX?: number = 0,
   clientY?: number = 0,
   button?: number = primaryButton,
   options?: Object = {},
-): void => wrapper.simulate(eventName, { button, clientX, clientY, ...options });
+): void => {
+  wrapper.simulate(eventName, { button, clientX, clientY, ...options });
+};
 
 export const liftWithMouse = (
-  wrapper: ReactWrapper<any>,
+  wrapper: ReactWrapper,
   clientX?: number = 0,
   clientY?: number = 0,
   button?: number = primaryButton,
   options?: Object = {},
-): void =>
+): void => {
   wrapper.simulate('mousedown', { button, clientX, clientY, ...options });
+};
 
 export const withKeyboard = (keyCode: number): Function =>
-  (wrapper: ReactWrapper<any>, options?: Object = {}) =>
+  (wrapper: ReactWrapper, options?: Object = {}): void => {
     wrapper.simulate('keydown', { keyCode, ...options });
+  };
 
 export const touchEvent = (
   eventName: string,
-  wrapper: ReactWrapper<any>,
+  wrapper: ReactWrapper,
   client?: Position = { x: 0, y: 0 },
   force?: number = 0,
   options?: Object = {},

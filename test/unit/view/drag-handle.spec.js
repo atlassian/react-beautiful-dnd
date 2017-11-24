@@ -908,7 +908,7 @@ describe('drag handle', () => {
 
         mouseDown(wrapper);
         windowMouseMove(0, sloppyClickThreshold);
-        windowMouseUp(wrapper, 0, sloppyClickThreshold);
+        windowMouseUp(0, sloppyClickThreshold);
 
         expect(callbacksCalled(callbacks)({
           onCancel: 1,
@@ -1781,7 +1781,7 @@ describe('drag handle', () => {
           touchStart(wrapper);
 
           // should cancel the pending drag
-          dispatchWindowKeyDownEvent(key);
+          dispatchWindowKeyDownEvent(keyCodes[key]);
 
           // would normally start a drag
           jest.runAllTimers();
@@ -1941,7 +1941,7 @@ describe('drag handle', () => {
           start();
 
           // should kill the drag
-          dispatchWindowKeyDownEvent(key);
+          dispatchWindowKeyDownEvent(keyCodes[key]);
 
           expect(callbacksCalled(callbacks)({
             // initial lift + index + 1
@@ -2165,20 +2165,22 @@ describe('drag handle', () => {
 
     const touch: Control = {
       name: 'touch',
-      preLift: (wrap:? ReactWrapper = wrapper, options?: Object = {}) =>
+      preLift: (wrap?: ReactWrapper = wrapper, options?: Object = {}) =>
         touchStart(wrap, origin, 0, options),
-      lift: (wrap:? ReactWrapper = wrapper) => {
+      lift: (wrap?: ReactWrapper = wrapper) => {
         jest.runTimersToTime(timeForLongPress);
         trySetIsDragging(wrap);
       },
-      end: () => windowTouchEnd(),
+      end: () => {
+        windowTouchEnd();
+      },
     };
 
     const keyboard: Control = {
       name: 'keyboard',
       // no pre lift required
       preLift: () => {},
-      lift: (wrap: ?ReactWrapper = wrapper, options?: Object = {}) => {
+      lift: (wrap?: ReactWrapper = wrapper, options?: Object = {}) => {
         pressSpacebar(wrap, options);
         trySetIsDragging(wrap);
       },
@@ -2192,18 +2194,20 @@ describe('drag handle', () => {
 
     const mouse: Control = {
       name: 'mouse',
-      preLift: (wrap:? ReactWrapper = wrapper, options?: Object = {}) =>
+      preLift: (wrap?: ReactWrapper = wrapper, options?: Object = {}) =>
         mouseDown(wrap, 0, 0, primaryButton, options),
-      lift: (wrap:? ReactWrapper = wrapper) => {
+      lift: (wrap?: ReactWrapper = wrapper) => {
         windowMouseMove(0, sloppyClickThreshold);
         trySetIsDragging(wrap);
       },
-      end: () => windowMouseUp(),
+      end: () => {
+        windowMouseUp();
+      },
     };
 
     const controls: Control[] = [mouse, keyboard, touch];
 
-    const getAria = (wrap:? ReactWrapper = wrapper): boolean =>
+    const getAria = (wrap?: ReactWrapper = wrapper): boolean =>
       Boolean(wrap.find(Child).props().dragHandleProps['aria-grabbed']);
 
     beforeEach(() => {

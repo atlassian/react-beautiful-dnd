@@ -11,7 +11,7 @@ import type {
 } from '../../../src';
 
 type ItemType = {|
-  name: string,
+  id: string,
   component: Node,
 |}
 
@@ -77,6 +77,19 @@ const Item = styled.div`
   margin-bottom: ${grid}px;
 `;
 
+const Container = styled.div`
+  display: flex;
+`;
+
+const Controls = styled.div`
+  padding: ${grid * 2}px;
+  width: 250px;
+`;
+
+const Status = styled.strong`
+  color: ${({ isEnabled }) => (isEnabled ? colors.blue.deep : colors.purple)};
+`;
+
 type State = {|
   canDragInteractiveElements: boolean,
   items: ItemType[],
@@ -104,35 +117,58 @@ export default class InteractiveElementsApp extends React.Component<*, State> {
     });
   }
 
+  toggleBlocking = () => {
+    this.setState({
+      canDragInteractiveElements: !this.state.canDragInteractiveElements,
+    });
+  }
+
   render() {
+    const { canDragInteractiveElements } = this.state;
+
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
-        <Droppable droppableId="droppable">
-          {(droppableProvided: DroppableProvided) => (
-            <List
-              innerRef={droppableProvided.innerRef}
-            >
-              {this.state.items.map((item: ItemType) => (
-                <Draggable key={item.id} draggableId={item.id}>
-                  {(draggableProvided: DraggableProvided) => (
-                    <div>
-                      <Item
-                        innerRef={draggableProvided.innerRef}
-                        style={draggableProvided.draggableStyle}
-                        {...draggableProvided.dragHandleProps}
-                      >
-                        {item.component}
-                      </Item>
-                      {draggableProvided.placeholder}
-                    </div>
+        <Container>
+          <Droppable droppableId="droppable">
+            {(droppableProvided: DroppableProvided) => (
+              <List
+                innerRef={droppableProvided.innerRef}
+              >
+                {this.state.items.map((item: ItemType) => (
+                  <Draggable
+                    key={item.id}
+                    draggableId={item.id}
+                    disableInteractiveElementBlocking={canDragInteractiveElements}
+                  >
+                    {(draggableProvided: DraggableProvided) => (
+                      <div>
+                        <Item
+                          innerRef={draggableProvided.innerRef}
+                          style={draggableProvided.draggableStyle}
+                          {...draggableProvided.dragHandleProps}
+                        >
+                          {item.component}
+                        </Item>
+                        {draggableProvided.placeholder}
+                      </div>
                   )}
-                </Draggable>
+                  </Draggable>
               ))}
-              {droppableProvided.placeholder}
-            </List>
+                {droppableProvided.placeholder}
+              </List>
           )}
-        </Droppable>
+          </Droppable>
+          <Controls>
+            <p>
+              Dragging from interactive elements is {' '}
+              <Status isEnabled={canDragInteractiveElements}>
+                {canDragInteractiveElements ? 'enabled' : 'disabled'}
+              </Status>
+            </p>
+            <button onClick={this.toggleBlocking}>toggle</button>
+          </Controls>
+        </Container>
       </DragDropContext>
-    )
+    );
   }
-};
+}
