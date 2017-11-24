@@ -311,36 +311,24 @@ There is current limitation of keyboard dragging: **the drag will cancel if the 
 
 > Recorded on iPhone 6s
 
-### Starting a drag
-
-A user can start a drag by:
-
-1. Holding their finger 👇 on an element for a small period of time 🕑 (long press); OR
-2. Moving an element beyond a small distance threshold
-
 ### Understanding intention: tap, force press, scroll and drag
 
 When a user presses their finger (or other input) on a `Draggable` we are not sure if they where intending to *tap*, *force press*, *scroll the container* or *drag*. **As much as possible `react-beautiful-dnd` aims to ensure that a users default interaction experience remains unaffected**.
 
+### Starting a drag: long press
+
+A user can start a drag by holding their finger 👇 on an element for a small period of time 🕑 (long press)
+
 #### Tap support
 
-If the user lifts their finger before the timer is finished then we release the event to the browser for it to determine whether to perform the standard tap / click action. This allows you to have a `Draggable` that is both clickable such as a anchor as well as draggable.
+If the user lifts their finger before the timer is finished then we release the event to the browser for it to determine whether to perform the standard tap / click action. This allows you to have a `Draggable` that is both clickable such as a anchor as well as draggable. If the item was dragged then we block the tap action from occurring.
 
-#### Opting out of native scrolling
+#### Native scrolling support
 
-When the user first puts their finger down we are not sure if they were attempting to scroll. However, when they first put their finger down we have a one time opportunity to opt out of native scrolling. You cannot opt back into native scrolling or out of native scrolling from this point. The primary reason we need to opt out of native scrolling is that the scroll of the page would cancel out the impact of a users reorder action. Scrolling while dragging will be supported when we add the [auto scrolling feature](https://github.com/atlassian/react-beautiful-dnd/issues/27)
+If we detect a `touchmove` before the long press timer expires we cancel the pending drag and allow the user to scroll normally. This means that the user needs to be fairly intentional and precise with their grabbing. Once the first `touchmove` occurs we have to either opt in our out of native scrolling.
 
-| Native scrolling                | Reordering                      |
-|---------------------------------|---------------------------------|
-| Moving up moves the **page** up | Moving up moves the **item** up |
-|![native scrolling](https://github.com/alexreardon/files/blob/master/resources/native-scroll.gif?raw=true)|![reordering](https://github.com/alexreardon/files/blob/master/resources/no-scroll-reorder.gif?raw=true)|
-
-When a user moves an item up we need the item to move up in the list and not for the viewport or container to scroll up also. If we did not disable native scrolling the user would not be able to reorder items.
-
-The library needs to opt out of native scrolling for reordering, however we recommend that you allow some ability for the user to scroll without reordering. This can be done through a variety of means including:
-
-- Not making `Draggable`s the full width of the viewport so they can scroll on the side of it
-- Use a *drag handle* so that only part of the `Draggable` is reserved for dragging
+- If the long press timer **has not** expired: *allow native scrolling and prevent dragging*
+- If the long press timer **has** expired: *a drag has started and we prevent native scrolling*
 
 #### Force press support
 
@@ -352,12 +340,6 @@ If the user force presses on the element before they have moved the element (eve
 
 We add the following styles to `Draggable`s by default to provide a more consistent touch dragging experience across various browsers out of the box. They have no visual impact. You are welcome to change these values or disable them for your specific use cases if you need to.
 
-Avoid the *pull to refresh action* and *anchor focus* on Android Chrome
-
-```css
-touch-action: none;
-```
-
 A long press on anchors usually pops a content menu that has options for the link such as 'Open in new tab'. Because long press is used to start a drag we need to opt out of this behavior
 
 ```css
@@ -368,6 +350,12 @@ Webkit based browsers add a grey overlay to anchors when they are active. We rem
 
 ```css
 -webkit-tap-highlight-color: rgba(0,0,0,0);
+```
+
+Avoid the *pull to refresh action* and *delayed anchor focus* on Android Chrome
+
+```css
+touch-action: manipulation;
 ```
 
 ### Vibration
@@ -414,7 +402,8 @@ type Hooks = {|
   onDragEnd: (result: DropResult) => void,
 |}
 
-type Props = Hooks & {|
+type Props = {|
+  ...Hooks,
   children?: ReactElement,
 |}
 ```
@@ -839,7 +828,7 @@ type BaseStyle = {|
   WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 
   // Avoid pull to refresh action and anchor focus on Android Chrome
-  touchAction: 'none',
+  touchAction: 'manipulation',
 |}
 
 type DraggingStyle = {|
@@ -1195,7 +1184,7 @@ type DraggableStyle = DraggingStyle | NotDraggingStyle
 type BaseStyle = {|
   WebkitTouchCallout: 'none',
   WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-  touchAction: 'none',
+  touchAction: 'manipulation',
 |}
 type DraggingStyle = {|
   ...BaseStyle,
@@ -1225,8 +1214,8 @@ type DragHandleProvided = {|
   tabIndex: number,
   'aria-grabbed': boolean,
   draggable: boolean,
-  onDragStart: () => void,
-  onDrop: () => void
+  onDragStart: () => boolean,
+  onDrop: () => boolean
 |}
 ```
 

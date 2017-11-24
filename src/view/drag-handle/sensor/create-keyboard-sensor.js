@@ -7,9 +7,9 @@ import * as keyCodes from '../../key-codes';
 import getWindowFromRef from '../../get-window-from-ref';
 import getCenterPosition from '../../get-center-position';
 import type { Position } from '../../../types';
+import type { KeyboardSensor } from './sensor-types';
 import type {
   Callbacks,
-  KeyboardSensor,
   Props,
 } from '../drag-handle-types';
 

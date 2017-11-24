@@ -2,7 +2,6 @@
 /* eslint-disable no-use-before-define */
 import stopEvent from '../util/stop-event';
 import createScheduler from '../util/create-scheduler';
-import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
 import getWindowFromRef from '../../get-window-from-ref';
 import type {
   Position,
@@ -25,7 +24,7 @@ type TouchWithForce = Touch & {
   force: number
 }
 
-export const timeForLongPress: number = 200;
+export const timeForLongPress: number = 150;
 export const forcePressThreshold: number = 0.15;
 
 const noop = (): void => { };
@@ -53,15 +52,9 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
   const schedule = createScheduler(callbacks, isDragging);
 
   const startDragging = () => {
-    // Drag can start from either a timeout or user movement
-    // so we need to clear the timeout
-    if (state.longPressTimerId) {
-      clearTimeout(state.longPressTimerId);
-    }
-
     const pending: ?Position = state.pending;
 
-    if (!state.pending) {
+    if (!pending) {
       console.error('cannot start a touch drag without a pending position');
       kill();
       return;
@@ -131,36 +124,28 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
 
   const windowBindings = {
     touchmove: (event: TouchEvent) => {
-      const { clientX, clientY } = event.touches[0];
+      // Drag has not yet started and we are waiting for a long press.
+      if (state.pending) {
+        stopPendingDrag();
+        return;
+      }
 
-      const point: Position = {
-        x: clientX,
-        y: clientY,
-      };
+      // At this point we are dragging
 
-      // event already stopped in onTouchMove but being cautious
-      stopEvent(event);
-
-      // record that a movement has occurred
       if (!state.hasMoved) {
         setState({
           hasMoved: true,
         });
       }
 
-      if (state.pending) {
-        if (!isSloppyClickThresholdExceeded(state.pending, point)) {
-          return;
-        }
+      stopEvent(event);
 
-        // User is probably attempting to scroll. However, because we have opted
-        // out of native scrolling the best option is to start a drag rather than
-        // end the pending drag and do nothing.
-        // More information: https://github.com/atlassian/react-beautiful-dnd/issues/11#issuecomment-343288990
+      const { clientX, clientY } = event.touches[0];
 
-        startDragging();
-        return;
-      }
+      const point: Position = {
+        x: clientX,
+        y: clientY,
+      };
 
       // already dragging
       schedule.move(point);
@@ -176,13 +161,7 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
       stopDragging(callbacks.onDrop);
       stopEvent(event);
     },
-    touchcancel: () => {
-      if (state.pending) {
-        stopPendingDrag();
-        return;
-      }
-      cancel();
-    },
+    touchcancel: cancel,
     touchstart: () => {
       // this will also intercept the initial touchstart
 
@@ -272,17 +251,12 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
     startPendingDrag(event);
   };
 
-  const onTouchMove = (event: TouchEvent) => {
-    // Need to call preventDefault() on the *first* touchmove
-    // in order to prevent native scrolling from occurring.
-    // Adding the global event handler for touchmove misses the first event
-    // https://twitter.com/alexandereardon/status/927671336435990528
-
-    if (isCapturing()) {
-      event.preventDefault();
+  // a touch move can happen very quickly - before the window handlers are bound
+  // so we need to also add some logic here to ensure that a pending drag is cancelled if needed
+  const onTouchMove = () => {
+    if (state.pending) {
+      stopPendingDrag();
     }
-
-    // Not calling stopPropigation as we want the events to bubble to the global event handler
   };
 
   const onClick = (event: MouseEvent) => {
