@@ -62,9 +62,20 @@ export type DimensionFragment = {|
   center: Position,
 |}
 
+export type Placeholder = {|
+  withoutMargin: {|
+    height: number,
+    width: number,
+  |},
+  // we apply the margin seperately to avoid margin collapsing
+  margin: Spacing,
+|}
+
 export type DraggableDimension = {|
   id: DraggableId,
   droppableId: DroppableId,
+  // the placeholder for the draggable
+  placeholder: Placeholder,
   // relative to the viewport when the drag started
   client: {|
     withMargin: DimensionFragment,

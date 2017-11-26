@@ -88,6 +88,13 @@ export const getDraggableDimension = ({
   const dimension: DraggableDimension = {
     id,
     droppableId,
+    placeholder: {
+      margin,
+      withoutMargin: {
+        width: clientRect.width,
+        height: clientRect.height,
+      },
+    },
     // on the viewport
     client: {
       withoutMargin: getFragment(clientRect),

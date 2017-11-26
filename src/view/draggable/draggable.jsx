@@ -198,10 +198,7 @@ export default class Draggable extends Component<Props, State> {
     invariant(dimension, 'cannot get a drag placeholder when not dragging');
 
     return (
-      <Placeholder
-        height={dimension.page.withMargin.height}
-        width={dimension.page.withMargin.width}
-      />
+      <Placeholder placeholder={dimension.placeholder} />
     );
   }
 
@@ -272,6 +269,7 @@ export default class Draggable extends Component<Props, State> {
             canLift,
           );
         }
+
         invariant(dimension, 'draggable dimension required for dragging');
 
         // Margins are accounted for. See `draggable-types` for explanation
