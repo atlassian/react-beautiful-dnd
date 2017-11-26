@@ -262,9 +262,3 @@ export type Hooks = {|
   onDragStart?: (start: DragStart) => void,
   onDragEnd: (result: DropResult) => void,
 |}
-
-// These types are 'fake'. They really just resolve to 'any'.
-// But it is useful for readability and intention
-export type ReactClass = any;
-
-export type HOC = (Component: ReactClass) => ReactClass;
