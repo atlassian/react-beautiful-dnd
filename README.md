@@ -42,6 +42,7 @@ See how beautiful it is for yourself!
 - Custom drag handle - you can drag a whole item by just a part of it
 - A droppable list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Server side rendering compatible
+- Plays well with [nested interactive elements](https://github.com/atlassian/react-beautiful-dnd#interactive-child-elements-within-a-draggable) by default
 
 ### Lots more coming soon
 
@@ -1179,6 +1180,10 @@ This codebase is designed to be extremely performant - it is part of its DNA. It
 | Minimal browser paints | Minimal React updates |
 |------------------------|-----------------------|
 |![minimal-browser-paints](https://github.com/alexreardon/files/blob/master/resources/dnd-browser-paint.gif?raw=true)|![minimal-react-updates](https://github.com/alexreardon/files/blob/master/resources/dnd-react-paint.gif?raw=true)|
+
+## Size
+
+Great care has been taken to keep the library as light as possible. It is currently **~34kb (gzip)** in size. There could be a smaller net cost if you where already using one of the underlying dependencies.
 
 ## Supported browsers
 
