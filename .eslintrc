@@ -3,7 +3,8 @@
   "parser": "babel-eslint",
   "plugins": [
     "react",
-    "jest"
+    "jest",
+    "flowtype"
   ],
   "env": {
     "es6": true,
@@ -103,6 +104,9 @@
     "object-curly-newline": "off",
 
     // Opting out of specific paren styles for now
-    "function-paren-newline": "off"
+    "function-paren-newline": "off",
+
+    // Require // @flow at the top of files
+    "flowtype/require-valid-file-annotation": ["error", "always", { "annotationStyle": "line" }]
   }
 }

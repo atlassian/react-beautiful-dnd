@@ -1,13 +1,14 @@
 /**
 * @jest-environment node
 */
+// @flow
 import React, { Component } from 'react';
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import { DragDropContext, Droppable, Draggable } from '../../../src/';
 import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';
 import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';
 
-class App extends Component {
+class App extends Component<*, *> {
   onDragStart = () => {
     // drag is starting!
   }
