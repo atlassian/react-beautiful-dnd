@@ -389,9 +389,14 @@ yarn add react-beautiful-dnd
 npm install react-beautiful-dnd --save
 ```
 
-### UMD
+### UMD bundle
 
-You can use the UMD to run `react-beautiful-dnd` directly in the browser
+A [universal module definition](https://github.com/umdjs/umd) bundle is published on `npm` under the `/dist` folder. We publish the following files:
+
+- `dist/react-beautiful-dnd.js`
+- `dist/react-beautiful-dnd.min.js` (minified)
+
+You can use the UMD to run `react-beautiful-dnd` directly in the browser.
 
 ```html
 <!-- peer dependency -->
