@@ -6,10 +6,11 @@ import blockStandardKeyEvents from '../util/block-standard-key-events';
 import * as keyCodes from '../../key-codes';
 import getWindowFromRef from '../../get-window-from-ref';
 import getCenterPosition from '../../get-center-position';
+import shouldAllowDraggingFromTarget from '../util/should-allow-dragging-from-target';
 import type { Position } from '../../../types';
+import type { KeyboardSensor } from './sensor-types';
 import type {
   Callbacks,
-  KeyboardSensor,
   Props,
 } from '../drag-handle-types';
 
@@ -65,6 +66,11 @@ export default (callbacks: Callbacks, getDraggableRef: () =>?HTMLElement): Keybo
       if (event.keyCode !== keyCodes.space) {
         return;
       }
+
+      if (!shouldAllowDraggingFromTarget(event, props)) {
+        return;
+      }
+
       stopEvent(event);
 
       const ref: ?HTMLElement = getDraggableRef();

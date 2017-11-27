@@ -37,5 +37,5 @@ export type {
 
 // DragHandle
 export type {
-  DragHandleProvided,
+  Provided as DragHandleProvided,
 } from './view/drag-handle/drag-handle-types';

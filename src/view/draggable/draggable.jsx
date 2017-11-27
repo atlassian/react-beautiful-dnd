@@ -53,6 +53,8 @@ export default class Draggable extends Component<Props, State> {
   static defaultProps: DefaultProps = {
     isDragDisabled: false,
     type: 'DEFAULT',
+    // cannot drag interactive elements by default
+    disableInteractiveElementBlocking: false,
   }
 
   // Need to declare contextTypes without flow
@@ -225,7 +227,7 @@ export default class Draggable extends Component<Props, State> {
         // base style
         WebkitTouchCallout: 'none',
         WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-        touchAction: 'none',
+        touchAction: 'manipulation',
       };
       return style;
     }
@@ -244,7 +246,7 @@ export default class Draggable extends Component<Props, State> {
         // base style
         WebkitTouchCallout: 'none',
         WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-        touchAction: 'none',
+        touchAction: 'manipulation',
       };
       return style;
     }
@@ -325,6 +327,7 @@ export default class Draggable extends Component<Props, State> {
       dimension,
       children,
       direction,
+      disableInteractiveElementBlocking,
     } = this.props;
 
     const speed = this.getSpeed(isDragging, isDropAnimating, canAnimate);
@@ -349,6 +352,8 @@ export default class Draggable extends Component<Props, State> {
               canLift={canLift}
               callbacks={this.callbacks}
               getDraggableRef={this.getDraggableRef}
+              // by default we do not allow dragging on interactive elements
+              canDragInteractiveElements={disableInteractiveElementBlocking}
             >
               {(dragHandleProps: ?DragHandleProvided) =>
                 children(

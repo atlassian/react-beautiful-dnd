@@ -1,5 +1,5 @@
 // @flow
-import * as React from 'react';
+import type { Node } from 'react';
 import {
   publishDraggableDimension,
 } from '../../state/action-creators';
@@ -22,7 +22,7 @@ export type OwnProps = {|
   droppableId: DroppableId,
   type: TypeId,
   targetRef: ?HTMLElement,
-  children: React.Node,
+  children: Node,
 |}
 
 export type Props = {|

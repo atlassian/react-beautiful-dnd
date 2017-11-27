@@ -1,3 +1,5 @@
+// @flow
+import type { Node } from 'react';
 import type { Position, Direction } from '../../types';
 
 export type Callbacks = {|
@@ -29,11 +31,13 @@ export type Provided = {|
 
   // Stop html5 drag and drop
   draggable: boolean,
-  onDragStart: () => void,
-  onDrop: () => void
+  onDragStart: () => boolean,
+  onDrop: () => boolean
 |}
 
 export type Props = {|
+  // callbacks provided by the draggable
+  callbacks: Callbacks,
   isEnabled: boolean,
   // whether the application thinks a drag is occurring
   isDragging: boolean,
@@ -41,8 +45,9 @@ export type Props = {|
   canLift: boolean,
   // the direction of the current droppable
   direction: ?Direction,
-  callbacks: Callbacks,
   // get the ref of the draggable
   getDraggableRef: () => ?HTMLElement,
-  children: (?Provided) => void,
+  // whether interactive elements should be permitted to start a drag
+  canDragInteractiveElements: boolean,
+  children: (?Provided) => Node,
 |}

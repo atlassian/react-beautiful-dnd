@@ -1,5 +1,5 @@
 // @flow
-import * as React from 'react';
+import type { Node } from 'react';
 import type {
   DraggableId,
   DraggableDimension,
@@ -39,8 +39,8 @@ export type BaseStyle = {|
   // https://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/
   WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 
-  // Added to avoid the *pull to refresh action* and *anchor focus* on Android Chrome
-  touchAction: 'none',
+  // Avoid the *pull to refresh action* and *delayed anchor focus* on Android Chrome
+  touchAction: 'manipulation',
 |}
 
 export type DraggingStyle = {|
@@ -99,7 +99,7 @@ export type Provided = {|
   innerRef: (?HTMLElement) => void,
   draggableStyle: ?DraggableStyle,
   dragHandleProps: ?DragHandleProvided,
-  placeholder: ?React.Node,
+  placeholder: ?Node,
 |}
 
 export type StateSnapshot = {|
@@ -133,14 +133,16 @@ export type MapProps = {|
 
 export type OwnProps = {|
   draggableId: DraggableId,
-  children: (Provided, StateSnapshot) => ?React.Node,
+  children: (Provided, StateSnapshot) => ?Node,
   type: TypeId,
   isDragDisabled: boolean,
+  disableInteractiveElementBlocking: boolean,
 |}
 
 export type DefaultProps = {|
   type: TypeId,
   isDragDisabled: boolean,
+  disableInteractiveElementBlocking: boolean
 |}
 
 export type Props = {|
