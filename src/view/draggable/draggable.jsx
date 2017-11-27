@@ -7,7 +7,6 @@ import type {
   Position,
   DraggableDimension,
   InitialDragLocation,
-  Spacing,
 } from '../../types';
 import DraggableDimensionPublisher from '../draggable-dimension-publisher/';
 import Moveable from '../moveable/';
@@ -22,7 +21,6 @@ import type {
 import getCenterPosition from '../get-center-position';
 import Placeholder from '../placeholder';
 import { droppableIdKey } from '../context-keys';
-import { toInline } from '../spacing';
 import type {
   Props,
   Provided,

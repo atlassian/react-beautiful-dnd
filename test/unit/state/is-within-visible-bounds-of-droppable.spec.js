@@ -10,7 +10,6 @@ import type {
   Position,
   DraggableDimension,
   DroppableDimension,
-  ClientRect,
 } from '../../../src/types';
 
 const margin: Spacing = {
@@ -305,7 +304,7 @@ describe('is within visible bounds of a droppable', () => {
         id: 'draggable',
         droppableId: myDroppable.id,
         // would normally not be within the droppable clientRect, but is within the margin
-        clientRect: getClientRect({ top: 0, left: 0, right: 100, bottom: 100`` }),
+        clientRect: getClientRect({ top: 0, left: 0, right: 100, bottom: 100 }),
       });
       const isWithinDroppable = isDraggableWithin(myDroppable.container.bounds);
 
