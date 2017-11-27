@@ -25,7 +25,7 @@
     "lint": "eslint .",
     "typecheck": "flow check",
     "build": "yarn run build:clean && yarn run build:lib && yarn run build:flow && yarn run build:dist",
-    "build:clean": "rimraf lib",
+    "build:clean": "rimraf lib && rimraf dist",
     "build:dist": "rollup -c && rollup -c --min",
     "build:lib": "babel src -d lib",
     "build:flow": "flow-copy-source --verbose src lib",

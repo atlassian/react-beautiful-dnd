@@ -10,7 +10,7 @@ const args = yargs.argv;
 export default {
   input: './lib/index.js',
   output: {
-    file: `dist/index${args.min ? '.min' : ''}.js`,
+    file: `dist/react-beautiful-dnd${args.min ? '.min' : ''}.js`,
     format: 'umd',
   },
   name: 'ReactBeautifulDnd',
