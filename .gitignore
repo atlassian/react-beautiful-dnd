@@ -10,6 +10,7 @@ node_modules/
 
 # generated files
 lib/
+dist/
 
 # generated site
 site/
