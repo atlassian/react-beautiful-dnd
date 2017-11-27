@@ -1,4 +1,5 @@
 /* eslint-disable global-require */
+/* eslint-disable flowtype/require-valid-file-annotation */
 
 // Replacing requestAnimationFrame
 // Adding window check because some tests do not

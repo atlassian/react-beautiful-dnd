@@ -16,15 +16,17 @@
   },
   "main": "lib/index.js",
   "files": [
-    "/lib"
+    "/lib",
+    "/dist"
   ],
   "scripts": {
     "test": "jest --config ./jest.config.js",
     "validate": "yarn run lint && yarn run typecheck",
     "lint": "eslint .",
     "typecheck": "flow check",
-    "build": "yarn run build:clean && yarn run build:lib && yarn run build:flow",
-    "build:clean": "rimraf lib",
+    "build": "yarn run build:clean && yarn run build:lib && yarn run build:flow && yarn run build:dist",
+    "build:clean": "rimraf lib && rimraf dist",
+    "build:dist": "rollup -c && rollup -c --min",
     "build:lib": "babel src -d lib",
     "build:flow": "flow-copy-source --verbose src lib",
     "storybook": "start-storybook -p 9002",
@@ -59,6 +61,7 @@
     "enzyme-adapter-react-15": "^1.0.5",
     "eslint": "^4.11.0",
     "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-flowtype": "^2.39.1",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-jest": "^21.3.2",
     "eslint-plugin-jsx-a11y": "^6.0.2",
@@ -71,6 +74,12 @@
     "react-dom": "^15.6.1",
     "react-test-renderer": "^15.6.1",
     "rimraf": "^2.6.2",
+    "rollup": "^0.51.8",
+    "rollup-plugin-babel": "^3.0.2",
+    "rollup-plugin-commonjs": "^8.2.6",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-replace": "^2.0.0",
+    "rollup-plugin-uglify": "^2.0.1",
     "styled-components": "^2.2.3"
   },
   "license": "Apache-2.0",

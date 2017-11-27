@@ -42,6 +42,7 @@ See how beautiful it is for yourself!
 - Custom drag handle - you can drag a whole item by just a part of it
 - A droppable list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Server side rendering compatible
+- Plays well with [nested interactive elements](https://github.com/atlassian/react-beautiful-dnd#interactive-child-elements-within-a-draggable) by default
 
 ### Lots more coming soon
 
@@ -378,6 +379,8 @@ class App extends React.Component {
 
 ## Installation
 
+### Package manager
+
 ```bash
 # yarn
 yarn add react-beautiful-dnd
@@ -385,6 +388,41 @@ yarn add react-beautiful-dnd
 # npm
 npm install react-beautiful-dnd --save
 ```
+
+### Distribution bundle
+
+A [universal module definition](https://github.com/umdjs/umd) bundle is published on `npm` under the `/dist` folder for consumption . We publish the following files:
+
+- `dist/react-beautiful-dnd.js`
+- `dist/react-beautiful-dnd.min.js` (minified bundle)
+
+These bundles list `react` as an external which needs to be provided. This is done to reduce the size of the bundle and prevent consumers from loading `react` multiple times. You can provide `react` through your module system or simply by having `react` on the `window`.
+
+You can use the UMD to run `react-beautiful-dnd` directly in the browser.
+
+```html
+<!-- peer dependency -->
+<script src="https://unpkg.com/react@15.6.0/dist/react.js"></script>
+<!-- lib (change x.x.x for the version you would like) -->
+<script src="https://unpkg.com/react-dom@x.x.x/dist/react-beautiful-dnd.js"></script>
+<!-- needed to mount your react app -->
+<script src="https://unpkg.com/react-dom@15.6.0/dist/react-dom.js"></script>
+
+<script>
+  const React = window.React;
+  const ReactDOM = window.ReactDOM;
+  const { DragDropContext, Draggable, Droppable } = window.ReactBeautifulDnd;
+
+  class App extends React.Component {
+    //...
+  }
+
+  // You can use JSX if your environment supports it
+  ReactDOM.render(React.createElement(App), document.getElementById('app'));
+</script>
+```
+
+There is also an [example codepen](https://codepen.io/alexreardon/project/editor/ZyNMPo) you can use to play with this technique.
 
 ## API
 
@@ -1157,6 +1195,10 @@ This codebase is designed to be extremely performant - it is part of its DNA. It
 | Minimal browser paints | Minimal React updates |
 |------------------------|-----------------------|
 |![minimal-browser-paints](https://github.com/alexreardon/files/blob/master/resources/dnd-browser-paint.gif?raw=true)|![minimal-react-updates](https://github.com/alexreardon/files/blob/master/resources/dnd-react-paint.gif?raw=true)|
+
+## Size
+
+Great care has been taken to keep the library as light as possible. It is currently **~34kb (gzip)** in size. There could be a smaller net cost if you where already using one of the underlying dependencies.
 
 ## Supported browsers
 
