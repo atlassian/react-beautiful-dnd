@@ -378,6 +378,8 @@ class App extends React.Component {
 
 ## Installation
 
+### Package manager
+
 ```bash
 # yarn
 yarn add react-beautiful-dnd
@@ -385,6 +387,34 @@ yarn add react-beautiful-dnd
 # npm
 npm install react-beautiful-dnd --save
 ```
+
+### UMD
+
+You can use the UMD to run `react-beautiful-dnd` directly in the browser
+
+```html
+<!-- peer dependency -->
+<script src="https://unpkg.com/react@15.6.0/dist/react.js"></script>
+<!-- lib (change x.x.x for the version you would like) -->
+<script src="https://unpkg.com/react-dom@x.x.x/dist/react-beautiful-dnd.js"></script>
+<!-- needed to mount your react app -->
+<script src="https://unpkg.com/react-dom@15.6.0/dist/react-dom.js"></script>
+
+<script>
+  const React = window.React;
+  const ReactDOM = window.ReactDOM;
+  const { DragDropContext, Draggable, Droppable } = window.ReactBeautifulDnd;
+
+  class App extends React.Component {
+    //...
+  }
+
+  // You can use JSX if your environment supports it
+  ReactDOM.render(React.createElement(App), document.getElementById('app'));
+</script>
+```
+
+There is also an [example codepen](https://codepen.io/alexreardon/project/editor/ZyNMPo) you can use to play with this technique.
 
 ## API
 
