@@ -816,6 +816,10 @@ If you are using inline styles you are welcome to extend the `draggableStyle` ob
 
 TODO
 
+### `Draggable`s should be visible siblings
+
+TODO (no elements that take up visible space between draggables)
+
 ### Type information
 
 ```js
