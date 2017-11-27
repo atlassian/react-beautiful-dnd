@@ -215,8 +215,8 @@ describe('drag handle', () => {
             </DragHandle>,
           );
 
-          mouseDown(customWrapper, 0, 0);
-          windowMouseMove(point.x, point.y);
+          mouseDown(customWrapper, origin);
+          windowMouseMove(point);
 
           expect(customCallbacks.onLift)
             .toHaveBeenCalledWith({ client: point, isScrollAllowed: true });
@@ -228,7 +228,7 @@ describe('drag handle', () => {
       it('should stop the initial mousedown event', () => {
         const mockEvent: MockEvent = createMockEvent();
 
-        mouseDown(wrapper, 0, 0, primaryButton, mockEvent);
+        mouseDown(wrapper, origin, primaryButton, mockEvent);
 
         expect(wasEventStopped(mockEvent)).toBe(true);
       });
@@ -241,16 +241,16 @@ describe('drag handle', () => {
       });
 
       it('should not start a drag if there was too little mouse movement while mouse was pressed', () => {
-        mouseDown(wrapper, 0, 0);
-        windowMouseMove(0, sloppyClickThreshold - 1);
-        windowMouseUp(0, sloppyClickThreshold - 1);
+        mouseDown(wrapper, origin);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold - 1 });
+        windowMouseUp({ x: 0, y: sloppyClickThreshold - 1 });
 
         expect(whereAnyCallbacksCalled(callbacks)).toBe(false);
       });
 
       it('should not start a drag if not using the primary mouse button', () => {
-        mouseDown(wrapper, 0, 0, auxiliaryButton);
-        windowMouseMove(0, sloppyClickThreshold);
+        mouseDown(wrapper, origin, auxiliaryButton);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
         expect(callbacksCalled(callbacks)({
           onLift: 0,
@@ -264,7 +264,7 @@ describe('drag handle', () => {
 
         // lift
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
         expect(callbacksCalled(callbacks)({
           onLift: 0,
@@ -274,13 +274,13 @@ describe('drag handle', () => {
       describe('cancelled before moved enough', () => {
         describe('cancelled with escape', () => {
           beforeEach(() => {
-            mouseDown(wrapper, 0, 0, auxiliaryButton);
+            mouseDown(wrapper, origin, auxiliaryButton);
             // not moved enough yet
-            windowMouseMove(0, sloppyClickThreshold - 1);
+            windowMouseMove({ x: 0, y: sloppyClickThreshold - 1 });
             windowEscape();
 
             // should normally start a drag
-            windowMouseMove(0, sloppyClickThreshold);
+            windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
             // should normally end a drag
             windowMouseUp();
@@ -297,7 +297,7 @@ describe('drag handle', () => {
           it('should not prevent subsequent click actions if a pending drag is cancelled', () => {
             const mock = jest.fn();
 
-            click(wrapper, 0, 0, primaryButton, { preventDefault: mock });
+            click(wrapper, origin, primaryButton, { preventDefault: mock });
 
             expect(mock).not.toHaveBeenCalled();
           });
@@ -305,15 +305,15 @@ describe('drag handle', () => {
 
         describe('cancelled with a window resize', () => {
           beforeEach(() => {
-            mouseDown(wrapper, 0, 0);
+            mouseDown(wrapper, origin);
             // not moved enough yet
-            windowMouseMove(0, sloppyClickThreshold - 1);
+            windowMouseMove({ x: 0, y: sloppyClickThreshold - 1 });
 
             // trigger resize
             window.dispatchEvent(new Event('resize'));
 
             // should normally start a drag
-            windowMouseMove(0, sloppyClickThreshold);
+            windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
             // should normally end a drag
             windowMouseUp();
@@ -330,7 +330,7 @@ describe('drag handle', () => {
           it('should not prevent subsequent click actions if a pending drag is cancelled', () => {
             const mock = jest.fn();
 
-            click(wrapper, 0, 0, primaryButton, { preventDefault: mock });
+            click(wrapper, origin, primaryButton, { preventDefault: mock });
 
             expect(mock).not.toHaveBeenCalled();
           });
@@ -347,9 +347,9 @@ describe('drag handle', () => {
 
         mouseDown(wrapper);
         // will start the drag
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
         // will fire the first move
-        windowMouseMove(expected.x, expected.y);
+        windowMouseMove(expected);
         requestAnimationFrame.step();
 
         expect(callbacks.onMove).toBeCalledWith(expected);
@@ -357,7 +357,7 @@ describe('drag handle', () => {
 
       it('should prevent keyboard submission', () => {
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
         const event: KeyboardEvent = windowEnter();
 
@@ -366,7 +366,7 @@ describe('drag handle', () => {
 
       it('should prevent tabbing', () => {
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
         const event: KeyboardEvent = windowTab();
 
@@ -375,7 +375,7 @@ describe('drag handle', () => {
 
       it('should not drop on spacebar', () => {
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
         pressSpacebar(wrapper);
 
@@ -387,7 +387,7 @@ describe('drag handle', () => {
 
       it('should not prevent scrolling on spacebar', () => {
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
         const event: KeyboardEvent = windowSpacebar();
 
@@ -396,7 +396,7 @@ describe('drag handle', () => {
 
       it('should not attempt to move forward or backward with arrow keys', () => {
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
         pressArrowDown(wrapper);
         pressArrowUp(wrapper);
@@ -411,18 +411,18 @@ describe('drag handle', () => {
       it('should not fire a mouse movement if the mouse position has not changed since the last frame', () => {
         mouseDown(wrapper);
         // will start the drag
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
         // will fire the first move
-        windowMouseMove(10, 20);
+        windowMouseMove({ x: 10, y: 20 });
         requestAnimationFrame.step();
         expect(callbacks.onMove).toBeCalledWith({ x: 10, y: 20 });
 
         // second move event
-        windowMouseMove(11, 21);
+        windowMouseMove({ x: 11, y: 21 });
         // no frame to release event
         // third move event
-        windowMouseMove(10, 20);
+        windowMouseMove({ x: 10, y: 20 });
         // releasing frame
         requestAnimationFrame.step();
 
@@ -437,13 +437,13 @@ describe('drag handle', () => {
       it('should collapse multiple mouse movements into a single animation frame', () => {
         // lift
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
         // movements - all in a single frame
-        windowMouseMove(0, sloppyClickThreshold + 1);
-        windowMouseMove(0, sloppyClickThreshold + 2);
-        windowMouseMove(0, sloppyClickThreshold + 3);
-        windowMouseMove(0, sloppyClickThreshold + 4);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 2 });
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 3 });
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 4 });
 
         // release the frame
         requestAnimationFrame.step();
@@ -459,10 +459,10 @@ describe('drag handle', () => {
       it('should not fire a move if no longer dragging when the scheduled animation frame is fired', () => {
         // lift
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
         // One movement
-        windowMouseMove(0, sloppyClickThreshold + 1);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
 
         // No frame released
 
@@ -495,7 +495,7 @@ describe('drag handle', () => {
       it('should not trigger onWindowScroll before an animation frame', () => {
         // lift
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
         // first scroll
         setWindowScroll({
@@ -518,7 +518,7 @@ describe('drag handle', () => {
       it('should only trigger onWindowScroll if still dragging when the animation frame fires', () => {
         // lift
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
         // first scroll to get initial scroll
         setWindowScroll({
@@ -549,7 +549,7 @@ describe('drag handle', () => {
       it('should fire an onDrop when the drag finishes', () => {
         // lift
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
         // drop
         windowMouseUp();
 
@@ -559,9 +559,9 @@ describe('drag handle', () => {
       it('should stop listening to window mouse events after a drop', () => {
         // lift
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
         // move
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
         requestAnimationFrame.step();
 
         // drop
@@ -574,11 +574,11 @@ describe('drag handle', () => {
         })).toBe(true);
 
         // this should have no impact
-        windowMouseMove(0, sloppyClickThreshold);
-        windowMouseMove(0, sloppyClickThreshold + 1);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
         windowMouseUp();
         windowMouseUp();
-        windowMouseMove(0, sloppyClickThreshold + 2);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 2 });
         requestAnimationFrame.flush();
 
         expect(callbacksCalled(callbacks)({
@@ -590,8 +590,8 @@ describe('drag handle', () => {
 
       it('should fire an onDrop even when not dropping with the primary mouse button', () => {
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
-        windowMouseUp(0, 0, auxiliaryButton);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
+        windowMouseUp(origin, auxiliaryButton);
 
         expect(callbacks.onDrop).toHaveBeenCalled();
       });
@@ -601,7 +601,7 @@ describe('drag handle', () => {
       it('should cancel an existing drag by pressing Escape', () => {
         // start dragging
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
         expect(callbacksCalled(callbacks)({
           onLift: 1,
           onCancel: 0,
@@ -616,7 +616,7 @@ describe('drag handle', () => {
 
       it('should prevent the default Escape action', () => {
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
         const event = windowEscape();
 
@@ -630,9 +630,9 @@ describe('drag handle', () => {
       it('should stop listening to mouse events after a cancel', () => {
         // lift
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
         // move
-        windowMouseMove(0, sloppyClickThreshold + 1);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
         requestAnimationFrame.step();
         // cancel
         windowEscape();
@@ -644,7 +644,7 @@ describe('drag handle', () => {
         })).toBe(true);
 
         // these should not do anything
-        windowMouseMove(0, sloppyClickThreshold + 1);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
         windowEscape();
         expect(callbacksCalled(callbacks)({
           onLift: 1,
@@ -656,7 +656,7 @@ describe('drag handle', () => {
       it('should cancel when the window is resized', () => {
         // lift
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
         // resize event
         window.dispatchEvent(new Event('resize'));
 
@@ -678,14 +678,14 @@ describe('drag handle', () => {
         const mock = jest.fn();
 
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
-        windowMouseUp(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
+        windowMouseUp({ x: 0, y: sloppyClickThreshold });
         expect(callbacksCalled(callbacks)({
           onLift: 1,
           onDrop: 1,
         })).toBe(true);
 
-        click(wrapper, 0, 0, primaryButton, { preventDefault: mock });
+        click(wrapper, origin, primaryButton, { preventDefault: mock });
         expect(mock).toHaveBeenCalled();
       });
 
@@ -693,14 +693,14 @@ describe('drag handle', () => {
         const mock = jest.fn();
 
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
         windowEscape();
         expect(callbacksCalled(callbacks)({
           onLift: 1,
           onCancel: 1,
         })).toBe(true);
 
-        click(wrapper, 0, 0, primaryButton, { preventDefault: mock });
+        click(wrapper, origin, primaryButton, { preventDefault: mock });
         expect(mock).toHaveBeenCalled();
       });
 
@@ -708,34 +708,34 @@ describe('drag handle', () => {
         const mock = jest.fn();
 
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold - 1);
-        windowMouseUp(0, sloppyClickThreshold - 1);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold - 1 });
+        windowMouseUp({ x: 0, y: sloppyClickThreshold - 1 });
         expect(callbacksCalled(callbacks)({
           onLift: 0,
           onCancel: 0,
           onDrop: 0,
         })).toBe(true);
 
-        click(wrapper, 0, 0, primaryButton, { preventDefault: mock });
+        click(wrapper, origin, primaryButton, { preventDefault: mock });
         expect(mock).not.toHaveBeenCalled();
       });
 
       describe('subsequent interactions', () => {
         it('should allow subsequent clicks through after blocking one after a drag', () => {
           mouseDown(wrapper);
-          windowMouseMove(0, sloppyClickThreshold);
-          windowMouseUp(0, sloppyClickThreshold);
+          windowMouseMove({ x: 0, y: sloppyClickThreshold });
+          windowMouseUp({ x: 0, y: sloppyClickThreshold });
           expect(callbacksCalled(callbacks)({
             onLift: 1,
             onDrop: 1,
           })).toBe(true);
 
           const mock1 = jest.fn();
-          click(wrapper, 0, 0, primaryButton, { preventDefault: mock1 });
+          click(wrapper, origin, primaryButton, { preventDefault: mock1 });
           expect(mock1).toHaveBeenCalled();
 
           const mock2 = jest.fn();
-          click(wrapper, 0, 0, primaryButton, { preventDefault: mock2 });
+          click(wrapper, origin, primaryButton, { preventDefault: mock2 });
           expect(mock2).not.toHaveBeenCalled();
         });
       });
@@ -749,9 +749,9 @@ describe('drag handle', () => {
       it('should cancel an existing drag', () => {
         // lift
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
         // move
-        windowMouseMove(0, sloppyClickThreshold + 1);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
         requestAnimationFrame.step();
 
         expect(callbacksCalled(callbacks)({
@@ -771,9 +771,9 @@ describe('drag handle', () => {
       it('should stop listening to mouse events', () => {
         // lift
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold + 1);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
         // move
-        windowMouseMove(0, sloppyClickThreshold + 1);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
         requestAnimationFrame.step();
 
         wrapper.setProps({ isEnabled: false });
@@ -784,12 +784,12 @@ describe('drag handle', () => {
         })).toBe(true);
 
         // should have no impact
-        windowMouseMove(0, sloppyClickThreshold + 1);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
         requestAnimationFrame.step();
-        windowMouseMove(0, sloppyClickThreshold + 2);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 2 });
         requestAnimationFrame.step();
         windowMouseUp();
-        windowMouseMove(0, sloppyClickThreshold + 2);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 2 });
         requestAnimationFrame.step();
 
         // being super safe
@@ -807,7 +807,7 @@ describe('drag handle', () => {
       it('should end a current drag without firing the onCancel callback', () => {
         // lift
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
         wrapper.setProps({
           isDragging: true,
         });
@@ -824,12 +824,12 @@ describe('drag handle', () => {
         })).toBe(true);
 
         // should have no impact
-        windowMouseMove(0, sloppyClickThreshold + 1);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
         requestAnimationFrame.step();
-        windowMouseMove(0, sloppyClickThreshold + 2);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 2 });
         requestAnimationFrame.step();
         windowMouseUp();
-        windowMouseMove(0, sloppyClickThreshold + 2);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 2 });
         requestAnimationFrame.step();
 
         // being super safe
@@ -846,7 +846,7 @@ describe('drag handle', () => {
     describe('unmounted mid drag', () => {
       beforeEach(() => {
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
         wrapper.unmount();
       });
 
@@ -858,7 +858,7 @@ describe('drag handle', () => {
       });
 
       it('should unbind any window events', () => {
-        windowMouseMove(0, sloppyClickThreshold + 1);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
 
         expect(callbacksCalled(callbacks)({
           onLift: 1,
@@ -877,12 +877,12 @@ describe('drag handle', () => {
 
           // lift
           mouseDown(wrapper);
-          windowMouseMove(0, originalY);
+          windowMouseMove({ x: 0, y: originalY });
           // move
-          windowMouseMove(0, originalY + 1);
+          windowMouseMove({ x: 0, y: originalY + 1 });
           requestAnimationFrame.step();
           // drop
-          windowMouseUp(0, originalY + 1);
+          windowMouseUp({ x: 0, y: originalY + 1 });
 
           // expect(callbacks.onLift).toHaveBeenCalledTimes(val + 1);
           expect(callbacks.onMove).toHaveBeenCalledTimes(val + 1);
@@ -898,7 +898,7 @@ describe('drag handle', () => {
 
       it('should allow drags after a cancel', () => {
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
         windowEscape();
 
         expect(callbacksCalled(callbacks)({
@@ -907,8 +907,8 @@ describe('drag handle', () => {
         })).toBe(true);
 
         mouseDown(wrapper);
-        windowMouseMove(0, sloppyClickThreshold);
-        windowMouseUp(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
+        windowMouseUp({ x: 0, y: sloppyClickThreshold });
 
         expect(callbacksCalled(callbacks)({
           onCancel: 1,
@@ -931,7 +931,7 @@ describe('drag handle', () => {
       };
 
       const windowMouseForceChange = (value?: number) => {
-        dispatchWindowMouseEvent('webkitmouseforcechanged', 0, 0, primaryButton, {
+        dispatchWindowMouseEvent('webkitmouseforcechanged', origin, primaryButton, {
           webkitForce: value,
         });
       };
@@ -982,7 +982,7 @@ describe('drag handle', () => {
           windowMouseForceChange(mouseForcePressThreshold - 0.1);
 
           // should start a drag
-          windowMouseMove(0, sloppyClickThreshold);
+          windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
           expect(callbacksCalled(callbacks)({
             onLift: 1,
@@ -997,7 +997,7 @@ describe('drag handle', () => {
           windowMouseForceChange(mouseForcePressThreshold);
 
           // would normally start a drag
-          windowMouseMove(0, sloppyClickThreshold);
+          windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
           expect(callbacksCalled(callbacks)({
             onLift: 0,
@@ -1007,7 +1007,7 @@ describe('drag handle', () => {
         it('should not cancel a drag if the press is not a force press', () => {
           // start the drag
           mouseDown(wrapper);
-          windowMouseMove(0, sloppyClickThreshold);
+          windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
           expect(callbacksCalled(callbacks)({
             onLift: 1,
@@ -1018,7 +1018,7 @@ describe('drag handle', () => {
           windowMouseForceChange(mouseForcePressThreshold - 0.1);
 
           // a move event
-          windowMouseMove(0, sloppyClickThreshold + 1);
+          windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
           requestAnimationFrame.step();
 
           expect(callbacksCalled(callbacks)({
@@ -1030,7 +1030,7 @@ describe('drag handle', () => {
         it('should cancel a drag if a force press is registered', () => {
           // start the drag
           mouseDown(wrapper);
-          windowMouseMove(0, sloppyClickThreshold);
+          windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
           // will cancel the drag
           windowMouseForceChange(mouseForcePressThreshold);
@@ -1042,7 +1042,7 @@ describe('drag handle', () => {
 
           // movements should not do anything
 
-          windowMouseMove(0, sloppyClickThreshold + 1);
+          windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
           requestAnimationFrame.step();
 
           expect(callbacksCalled(callbacks)({
@@ -1438,7 +1438,7 @@ describe('drag handle', () => {
 
         mouseButtons.forEach((button: number, index: number): void => {
           pressSpacebar(wrapper);
-          windowMouseDown(button);
+          windowMouseDown(origin, button);
           // should now do nothing
           pressArrowUp(wrapper);
 
@@ -1486,7 +1486,7 @@ describe('drag handle', () => {
         pressArrowDown(wrapper);
         pressSpacebar(wrapper);
 
-        click(wrapper, 0, 0, primaryButton, mockEvent);
+        click(wrapper, origin, primaryButton, mockEvent);
 
         expect(mockEvent.preventDefault).not.toHaveBeenCalled();
       });
@@ -2042,7 +2042,7 @@ describe('drag handle', () => {
 
         start();
         end();
-        click(wrapper, 0, 0, primaryButton, mockEvent);
+        click(wrapper, origin, primaryButton, mockEvent);
 
         expect(mockEvent.preventDefault).toHaveBeenCalled();
       });
@@ -2056,7 +2056,7 @@ describe('drag handle', () => {
         // drag ended
         end();
         // then a click
-        click(wrapper, 0, 0, primaryButton, mockEvent);
+        click(wrapper, origin, primaryButton, mockEvent);
 
         expect(mockEvent.preventDefault).not.toHaveBeenCalled();
       });
@@ -2068,11 +2068,11 @@ describe('drag handle', () => {
         end();
 
         // first click blocked
-        click(wrapper, 0, 0, primaryButton, mockEvent);
+        click(wrapper, origin, primaryButton, mockEvent);
         expect(mockEvent.preventDefault).toHaveBeenCalledTimes(1);
 
         // second click not blocked
-        click(wrapper, 0, 0, primaryButton, mockEvent);
+        click(wrapper, origin, primaryButton, mockEvent);
         expect(mockEvent.preventDefault).toHaveBeenCalledTimes(1);
       });
 
@@ -2097,7 +2097,7 @@ describe('drag handle', () => {
         })).toBe(true);
 
         // click after unsuccessful drag is not blocked
-        click(wrapper, 0, 0, primaryButton, mockEvent);
+        click(wrapper, origin, primaryButton, mockEvent);
         expect(mockEvent.preventDefault).not.toHaveBeenCalled();
       });
     });
@@ -2195,9 +2195,9 @@ describe('drag handle', () => {
     const mouse: Control = {
       name: 'mouse',
       preLift: (wrap?: ReactWrapper = wrapper, options?: Object = {}) =>
-        mouseDown(wrap, 0, 0, primaryButton, options),
+        mouseDown(wrap, origin, primaryButton, options),
       lift: (wrap?: ReactWrapper = wrapper) => {
-        windowMouseMove(0, sloppyClickThreshold);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
         trySetIsDragging(wrap);
       },
       end: () => {
