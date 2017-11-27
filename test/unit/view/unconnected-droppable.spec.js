@@ -6,7 +6,7 @@ import type { ReactWrapper } from 'enzyme';
 import Droppable from '../../../src/view/droppable/droppable';
 import Placeholder from '../../../src/view/placeholder/';
 import { withStore } from '../../utils/get-context-options';
-import getPreset from '../../utils/dimension';
+import { getPreset } from '../../utils/dimension';
 import type { DroppableId, DraggableDimension } from '../../../src/types';
 import type { MapProps, OwnProps, Provided, StateSnapshot } from '../../../src/view/droppable/droppable-types';
 
@@ -100,7 +100,8 @@ describe('Droppable - unconnected', () => {
       // $ExpectError - type property of placeholder
       expect(provided.placeholder.type).toBe(Placeholder);
       // $ExpectError - props property of placeholder
-      expect(provided.placeholder.props).toEqual(isDraggingOverForeignMapProps.placeholder);
+      expect(provided.placeholder.props.placeholder)
+        .toEqual(isDraggingOverForeignMapProps.placeholder);
     });
 
     describe('not dragging over droppable', () => {

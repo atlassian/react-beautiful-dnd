@@ -821,9 +821,7 @@ describe('Draggable - unconnected', () => {
 
       const provided: Provided = getLastCall(myMock)[0].provided;
       // $ExpectError - because we do not have the correct React type for placeholder
-      expect(provided.placeholder.props.height).toBe(dimension.page.withMargin.height);
-      // $ExpectError
-      expect(provided.placeholder.props.width).toBe(dimension.page.withMargin.width);
+      expect(provided.placeholder.props.placeholder).toBe(dimension.placeholder);
     });
 
     it('should be above Draggables that are not dragging', () => {

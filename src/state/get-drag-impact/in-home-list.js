@@ -85,7 +85,7 @@ export default ({
   })();
 
   const movement: DragMovement = {
-    amount: patch(axis.line, draggable.page.withMargin[axis.size]),
+    amount: patch(axis.line, draggable.client.withMargin[axis.size]),
     draggables: ordered,
     isBeyondStartPosition,
   };

@@ -63,11 +63,12 @@ export type DimensionFragment = {|
 |}
 
 export type Placeholder = {|
+  // We apply the margin separately to maintain margin collapsing
+  // behavior of the original element
   withoutMargin: {|
     height: number,
     width: number,
   |},
-  // we apply the margin seperately to avoid margin collapsing
   margin: Spacing,
 |}
 

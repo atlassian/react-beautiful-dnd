@@ -7,6 +7,7 @@ import type {
   Position,
   DraggableDimension,
   InitialDragLocation,
+  Spacing,
 } from '../../types';
 import DraggableDimensionPublisher from '../draggable-dimension-publisher/';
 import Moveable from '../moveable/';
@@ -21,6 +22,7 @@ import type {
 import getCenterPosition from '../get-center-position';
 import Placeholder from '../placeholder';
 import { droppableIdKey } from '../context-keys';
+import { toInline } from '../spacing';
 import type {
   Props,
   Provided,
@@ -203,12 +205,10 @@ export default class Draggable extends Component<Props, State> {
   }
 
   getDraggingStyle = memoizeOne(
-    (width: number,
-      height: number,
-      top: number,
-      left: number,
+    (dimension: DraggableDimension,
       isDropAnimating: boolean,
       movementStyle: MovementStyle): DraggingStyle => {
+      const { width, height, top, left } = dimension.client.withoutMargin;
       // For an explanation of properties see `draggable-types`.
       const style: DraggingStyle = {
         position: 'fixed',
@@ -272,10 +272,9 @@ export default class Draggable extends Component<Props, State> {
 
         invariant(dimension, 'draggable dimension required for dragging');
 
-        // Margins are accounted for. See `draggable-types` for explanation
-        const { width, height, top, left } = dimension.client.withoutMargin;
-
-        return this.getDraggingStyle(width, height, top, left, isDropAnimating, movementStyle);
+        // Need to position element in original visual position. To do this
+        // we position it without
+        return this.getDraggingStyle(dimension, isDropAnimating, movementStyle);
       })();
 
       const provided: Provided = {

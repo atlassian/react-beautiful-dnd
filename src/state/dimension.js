@@ -36,8 +36,10 @@ const getWithPosition = (clientRect: ClientRect, point: Position): ClientRect =>
 const getWithSpacing = (clientRect: ClientRect, spacing: Spacing): ClientRect => {
   const { top, right, bottom, left } = clientRect;
   return getClientRect({
+    // pulling back to increase size
     top: top - spacing.top,
     left: left - spacing.left,
+    // pushing forward to increase size
     bottom: bottom + spacing.bottom,
     right: right + spacing.right,
   });
