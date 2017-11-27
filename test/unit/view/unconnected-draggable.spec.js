@@ -272,8 +272,8 @@ describe('Draggable - unconnected', () => {
       // fake some position to get the center we want
       stubClientRect(center);
 
-      mouseDown(wrapper, selection.x, selection.y - sloppyClickThreshold);
-      windowMouseMove(selection.x, selection.y);
+      mouseDown(wrapper, subtract(selection, { x: 0, y: sloppyClickThreshold }));
+      windowMouseMove(selection);
     };
 
     it('should allow you to attach a drag handle', () => {

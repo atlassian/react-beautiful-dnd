@@ -3,6 +3,7 @@ import type { ReactWrapper } from 'enzyme';
 import type { Position } from '../../src/types';
 
 const primaryButton: number = 0;
+const origin: Position = { x: 0, y: 0 };
 
 const getTouch = (client: Position, force: number): Object => {
   // window.Touch not supported in jest yet so just returning an object
@@ -26,8 +27,7 @@ const getTouch = (client: Position, force: number): Object => {
 
 export const dispatchWindowMouseEvent = (
   eventName: string,
-  clientX?: number = 0,
-  clientY?: number = 0,
+  client?: Position = origin,
   button?: number = primaryButton,
   options?: Object = {},
 ): MouseEvent => {
@@ -35,8 +35,8 @@ export const dispatchWindowMouseEvent = (
     bubbles: true,
     cancelable: true,
     view: window,
-    clientX,
-    clientY,
+    clientX: client.x,
+    clientY: client.y,
     button,
   });
 
@@ -97,22 +97,16 @@ export const dispatchWindowTouchEvent = (
 export const mouseEvent = (
   eventName: string,
   wrapper: ReactWrapper,
-  clientX?: number = 0,
-  clientY?: number = 0,
+  client?: Position = origin,
   button?: number = primaryButton,
   options?: Object = {},
 ): void => {
-  wrapper.simulate(eventName, { button, clientX, clientY, ...options });
-};
-
-export const liftWithMouse = (
-  wrapper: ReactWrapper,
-  clientX?: number = 0,
-  clientY?: number = 0,
-  button?: number = primaryButton,
-  options?: Object = {},
-): void => {
-  wrapper.simulate('mousedown', { button, clientX, clientY, ...options });
+  wrapper.simulate(eventName, {
+    button,
+    clientX: client.x,
+    clientY: client.y,
+    ...options,
+  });
 };
 
 export const withKeyboard = (keyCode: number): Function =>
