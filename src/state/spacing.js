@@ -1,3 +1,4 @@
+// @flow
 import type { Position, Spacing } from '../types';
 
 export const add = (spacing1: Spacing, spacing2: Spacing): Spacing => ({

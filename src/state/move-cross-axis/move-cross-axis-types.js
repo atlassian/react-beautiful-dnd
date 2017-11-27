@@ -1,3 +1,4 @@
+// @flow
 import type { Position, DragImpact } from '../../types';
 
 export type Result = {|
