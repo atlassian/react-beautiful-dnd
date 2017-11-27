@@ -394,7 +394,7 @@ npm install react-beautiful-dnd --save
 A [universal module definition](https://github.com/umdjs/umd) bundle is published on `npm` under the `/dist` folder for consumption . We publish the following files:
 
 - `dist/react-beautiful-dnd.js`
-- `dist/react-beautiful-dnd.min.js` (minified)
+- `dist/react-beautiful-dnd.min.js` (minified bundle)
 
 These bundles list `react` as an external which needs to be provided. This is done to reduce the size of the bundle and prevent consumers from loading `react` multiple times. You can provide `react` through your module system or simply by having `react` on the `window`.
 
