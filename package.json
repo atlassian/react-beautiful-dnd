@@ -3,19 +3,28 @@
   "version": "2.6.4",
   "description": "Beautiful, accessible drag and drop for lists with React.js",
   "author": "Alex Reardon <areardon@atlassian.com>",
-  "keywords": ["drag and drop", "dnd", "react", "react.js", "natural", "beautiful"],
+  "keywords": [
+    "drag and drop",
+    "dnd",
+    "react",
+    "react.js",
+    "natural",
+    "beautiful"
+  ],
   "bugs": {
     "url": "https://github.com/atlassian/react-beautiful-dnd/issues"
   },
   "main": "lib/index.js",
-  "files": ["/lib", "/dist"],
+  "files": [
+    "/lib",
+    "/dist"
+  ],
   "scripts": {
     "test": "jest --config ./jest.config.js",
     "validate": "yarn run lint && yarn run typecheck",
     "lint": "eslint .",
     "typecheck": "flow check",
-    "build":
-      "yarn run build:clean && yarn run build:lib && yarn run build:flow && yarn run build:dist",
+    "build": "yarn run build:clean && yarn run build:lib && yarn run build:flow && yarn run build:dist",
     "build:clean": "rimraf lib",
     "build:dist": "rollup -c && rollup -c --min",
     "build:lib": "babel src -d lib",
@@ -68,6 +77,7 @@
     "rollup-plugin-babel": "^3.0.2",
     "rollup-plugin-commonjs": "^8.2.6",
     "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-uglify": "^2.0.1",
     "styled-components": "^2.2.3"
   },
