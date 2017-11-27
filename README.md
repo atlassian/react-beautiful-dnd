@@ -812,6 +812,10 @@ If you are using inline styles you are welcome to extend the `draggableStyle` ob
 </Draggable>;
 ```
 
+### Avoid margin collapsing between `Draggable`s
+
+TODO
+
 ### Type information
 
 ```js

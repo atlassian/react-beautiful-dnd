@@ -26,6 +26,7 @@ box-shadow: ${({ isDragging }) => (isDragging ? `2px 2px 1px ${colors.shadow}` :
 padding: ${grid}px;
 min-height: 40px;
 margin-bottom: ${grid}px;
+/* TODO: breaks with margin-left (or margin-top?) */
 user-select: none;
 transition: background-color 0.1s ease;
 
