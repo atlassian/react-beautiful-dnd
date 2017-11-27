@@ -24,7 +24,6 @@ export default class Placeholder extends PureComponent<Props> {
       marginRight: right,
       pointerEvents: 'none',
       boxSizing: 'border-box',
-      background: 'green',
     };
     return (
       <div style={style} />
