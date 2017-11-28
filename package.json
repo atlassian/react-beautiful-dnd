@@ -70,7 +70,7 @@
     "flow-copy-source": "^1.2.1",
     "jest": "^21.2.1",
     "raf-stub": "^2.0.1",
-    "react": "^15.6.1",
+    "react": "^16.2.0",
     "react-dom": "^15.6.1",
     "react-test-renderer": "^16.2.0",
     "rimraf": "^2.6.2",
