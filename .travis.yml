@@ -5,6 +5,10 @@ node_js:
 script:
 - yarn run validate
 - yarn run test
+before_deploy:
+- which babel || true
+- pwd
+- echo $PATH
 deploy:
   provider: npm
   email: alexreardon@gmail.com
