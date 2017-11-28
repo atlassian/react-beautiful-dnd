@@ -104,7 +104,6 @@ export const makeSelector = (): Selector => {
         movement.amount;
 
       return getWithMovement(
-        // currently not handling horizontal movement
         memoizedOffset(amount.x, amount.y),
         canLift,
       );

@@ -58,17 +58,20 @@ export type DraggingStyle = {|
   width: number,
   height: number,
 
-  // When we set the width and height they include the padding on the element.
-  // We use box-sizing: border-box to ensure that the width and height are inclusive of the padding
+  // The width and height values take into account whether the original element
+  // used `box-sizing: content-box` or `box-sizing: border-box`
+  // Because we are setting the width and height directly we want to ensure that
+  // these are the actual values applied
   boxSizing: 'border-box',
 
-  // We initially position the element in the same visual spot as when it started.
-  // To do this we give the element the top / left position with the margins considered
+  // We initially position the element in the same *visual spot* as when it started.
+  // This means that these values *exclude* the original margins so that element remains
+  // in the same visual position - even though now it has no margins
   top: number,
   left: number,
 
   // We clear any top or left margins on the element to ensure it does not push
-  // the element positioned with the top/left position.
+  // the element positioned with the top/left position (which is margin aware).
   // We also clear the margin right / bottom. This has no positioning impact,
   // but it is cleanest to just remove all the margins rather than only the top and left.
   margin: 0,

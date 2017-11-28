@@ -850,6 +850,57 @@ If you are using inline styles you are welcome to extend the `draggableStyle` ob
 </Draggable>;
 ```
 
+### Avoid margin collapsing between `Draggable`s
+
+[margin collapsing](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model/Mastering_margin_collapsing) is one of those really hard parts of CSS. For our purposes, if you have one `Draggable` with a `margin-bottom: 10px` and the next `Draggable` has a `margin-top: 12px` these margins will *collapse* and the resulting margin will be the greater of the two: `12px`. When we do our calculations we are currently not accounting for margin collapsing. If you do want to have a margin on the siblings, wrap them both in a `div` and apply the margin to the inner `div` so they are not direct siblings.
+
+### `Draggable`s should be visible siblings
+
+It is an assumption that `Draggable`s and *visible siblings* of one another. There can be other elements in between, but these elements should not take up any additional space. You probably will not do this anyway, but just calling it out to be super clear
+
+```js
+// Direct siblings ✅
+<Draggable draggableId="draggable-1" >
+  {() => {}}
+</Draggable>
+<Draggable draggableId="draggable-2">
+  {() => {}}
+</Draggable>
+
+// Not direct siblings, but are visual siblings ✅
+<div>
+  <Draggable draggableId="draggable-1">
+    {() => {}}
+  </Draggable>
+</div>
+<div>
+  <Draggable draggableId="draggable-2">
+    {() => {}}
+  </Draggable>
+</div>
+
+// Spacer elements ❌
+<Draggable draggableId="draggable-1">
+    {() => {}}
+</Draggable>
+<p>I will break things!</p>
+<Draggable draggableId="draggable-2">
+    {() => {}}
+</Draggable>
+
+// Spacing on non sibling wrappers ❌
+<div style={{padding: 10}}>
+  <Draggable draggableId="draggable-1">
+    {() => {}}
+  </Draggable>
+</div>
+<div style={{padding: 10}}>
+  <Draggable draggableId="draggable-2">
+    {() => {}}
+  </Draggable>
+</div>
+```
+
 ### Type information
 
 ```js

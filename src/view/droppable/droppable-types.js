@@ -4,12 +4,8 @@ import type {
   DroppableId,
   TypeId,
   Direction,
+  Placeholder,
 } from '../../types';
-
-export type Placeholder = {|
-  height: number,
-  width: number,
-|}
 
 export type Provided = {|
   innerRef: (?HTMLElement) => void,

@@ -26,6 +26,8 @@ export default class DraggableDimensionPublisher extends Component<Props> {
       left: parseInt(style.marginLeft, 10),
     };
 
+    // We do not need to worry about 'box-sizing' because getBoundingClientRect already
+    // takes that into account
     const clientRect: ClientRect = (targetRef.getBoundingClientRect() : any);
 
     const dimension: DraggableDimension = getDraggableDimension({

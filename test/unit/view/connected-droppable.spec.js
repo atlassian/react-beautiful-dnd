@@ -24,12 +24,12 @@ import type {
   InitialDragLocation,
   CurrentDragLocation,
   Spacing,
+  Placeholder,
 } from '../../../src/types';
 import type {
   MapProps,
   Provided,
   Selector,
-  Placeholder,
 } from '../../../src/view/droppable/droppable-types';
 
 type ExecuteArgs = {|
@@ -78,10 +78,7 @@ const draggable: DraggableDimension = getDraggableDimension({
   }),
 });
 
-const placeholder: Placeholder = {
-  width: draggable.page.withoutMargin.width,
-  height: draggable.page.withoutMargin.height,
-};
+const placeholder: Placeholder = draggable.placeholder;
 
 const perform = (() => {
   const initial: InitialDrag = (() => {
