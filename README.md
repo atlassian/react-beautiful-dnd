@@ -824,7 +824,9 @@ It is a contract of this library that it owns the positioning logic of the dragg
 
 ### Warning: `position: fixed`
 
-`react-beautiful-dnd` uses `position: fixed` to position the dragging element. This is quite robust and allows for you to have `position: relative | absolute | fixed` parents. However, unfortunately `position:fixed` is [impacted by `transform`](http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/) (such as `transform: rotate(10deg);`). This means that if you have a `transform: *` on one of the parents of a `Draggable` then the positioning logic will be incorrect while dragging. Lame! For most consumers this will not be an issue. We may look into creating a portal solution where we attach the dragging element to the body rather than leave it in place. However, leaving it in place is a really nice experience for everyone. For now we will leave it as is, but feel free to raise an issue if you this is important to you.
+`react-beautiful-dnd` uses `position: fixed` to position the dragging element. This is quite robust and allows for you to have `position: relative | absolute | fixed` parents. However, unfortunately `position:fixed` is [impacted by `transform`](http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/) (such as `transform: rotate(10deg);`). This means that if you have a `transform: *` on one of the parents of a `Draggable` then the positioning logic will be incorrect while dragging. Lame! For most consumers this will not be an issue.
+
+This will be changing soon as we move to a [portal solution](https://github.com/atlassian/react-beautiful-dnd/issues/192) where we will be appending the `Draggable` to the end of the body to avoid any parent transforms. If you really need this feature right now we have [created an example](https://www.webpackbin.com/bins/-L-3aZ_bTMiGPl8bqlRB) where we implement a portal on top of the current api. Please note however, this technique is not officially supported and might break in minor / patch releases.
 
 ### Extending `draggableStyle`
 
