@@ -55,7 +55,8 @@ export const isDraggableWithin = (bounds: Spacing) => {
   const isWithinVertical = isWithin(top - 1, bottom + 1);
 
   return (draggable: DraggableDimension): boolean => {
-    const fragment: DimensionFragment = draggable.page.withMargin;
+    // margin may bleed outside of container size
+    const fragment: DimensionFragment = draggable.page.withoutMargin;
 
     return isWithinHorizontal(fragment.left) &&
       isWithinHorizontal(fragment.right) &&

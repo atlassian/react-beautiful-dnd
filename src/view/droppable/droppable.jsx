@@ -1,3 +1,4 @@
+// @flow
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import type { Props, Provided, StateSnapshot, DefaultProps } from './droppable-types';
@@ -11,7 +12,7 @@ type State = {|
 |}
 
 type Context = {|
-  [droppableIdKey]: DroppableId
+  [typeof droppableIdKey]: DroppableId
 |}
 
 export default class Droppable extends Component<Props, State> {
@@ -65,10 +66,7 @@ export default class Droppable extends Component<Props, State> {
     }
 
     return (
-      <Placeholder
-        height={this.props.placeholder.height}
-        width={this.props.placeholder.width}
-      />
+      <Placeholder placeholder={this.props.placeholder} />
     );
   }
 

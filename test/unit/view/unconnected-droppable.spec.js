@@ -6,7 +6,8 @@ import type { ReactWrapper } from 'enzyme';
 import Droppable from '../../../src/view/droppable/droppable';
 import Placeholder from '../../../src/view/placeholder/';
 import { withStore } from '../../utils/get-context-options';
-import type { DroppableId } from '../../../src/types';
+import { getPreset } from '../../utils/dimension';
+import type { DroppableId, DraggableDimension } from '../../../src/types';
 import type { MapProps, OwnProps, Provided, StateSnapshot } from '../../../src/view/droppable/droppable-types';
 
 const getStubber = (mock: Function) =>
@@ -31,12 +32,12 @@ const isDraggingOverHomeMapProps: MapProps = {
   placeholder: null,
 };
 
+const data = getPreset();
+const inHome1: DraggableDimension = data.inHome1;
+
 const isDraggingOverForeignMapProps: MapProps = {
   isDraggingOver: true,
-  placeholder: {
-    width: 100,
-    height: 50,
-  },
+  placeholder: inHome1.placeholder,
 };
 
 // $ExpectError - not providing children
@@ -56,6 +57,7 @@ const mountDroppable = ({
   ownProps = defaultOwnProps,
   mapProps = notDraggingOverMapProps,
 }: MountArgs = {}): ReactWrapper => mount(
+  // $ExpectError - using spread
   <Droppable
     {...ownProps}
     {...mapProps}
@@ -98,7 +100,8 @@ describe('Droppable - unconnected', () => {
       // $ExpectError - type property of placeholder
       expect(provided.placeholder.type).toBe(Placeholder);
       // $ExpectError - props property of placeholder
-      expect(provided.placeholder.props).toEqual(isDraggingOverForeignMapProps.placeholder);
+      expect(provided.placeholder.props.placeholder)
+        .toEqual(isDraggingOverForeignMapProps.placeholder);
     });
 
     describe('not dragging over droppable', () => {

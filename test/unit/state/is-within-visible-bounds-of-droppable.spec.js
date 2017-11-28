@@ -1,6 +1,6 @@
 // @flow
 import { isPointWithinDroppable, isDraggableWithin } from '../../../src/state/is-within-visible-bounds-of-droppable';
-import { getDroppableDimension } from '../../../src/state/dimension';
+import { getDroppableDimension, getDraggableDimension } from '../../../src/state/dimension';
 import { add, subtract } from '../../../src/state/position';
 import getClientRect from '../../../src/state/get-client-rect';
 import getDroppableWithDraggables from '../../utils/get-droppable-with-draggables';
@@ -9,6 +9,7 @@ import type {
   Spacing,
   Position,
   DraggableDimension,
+  DroppableDimension,
 } from '../../../src/types';
 
 const margin: Spacing = {
@@ -20,7 +21,7 @@ const noSpacing: Spacing = {
 };
 
 describe('is within visible bounds of a droppable', () => {
-  const clientSpacing = {
+  const clientSpacing: Spacing = {
     top: 10,
     left: 10,
     right: 90,
@@ -36,11 +37,11 @@ describe('is within visible bounds of a droppable', () => {
 
   describe('is point within', () => {
     describe('basic behaviour', () => {
-      const isWithinThisDroppable = isPointWithinDroppable(droppable);
+      const isPointWithinTestDroppable = isPointWithinDroppable(droppable);
       const { top, left, right, bottom } = droppable.page.withMargin;
 
       it('should return true if a point is within a droppable', () => {
-        expect(isWithinThisDroppable(droppable.page.withMargin.center)).toBe(true);
+        expect(isPointWithinTestDroppable(droppable.page.withMargin.center)).toBe(true);
       });
 
       it('should return true if a point is on any of the droppable boundaries', () => {
@@ -52,7 +53,7 @@ describe('is within visible bounds of a droppable', () => {
         ];
 
         corners.forEach((corner: Position) => {
-          expect(isWithinThisDroppable(corner)).toBe(true);
+          expect(isPointWithinTestDroppable(corner)).toBe(true);
         });
       });
 
@@ -65,7 +66,7 @@ describe('is within visible bounds of a droppable', () => {
         ];
 
         outside.forEach((point: Position) => {
-          expect(isWithinThisDroppable(point)).toBe(false);
+          expect(isPointWithinTestDroppable(point)).toBe(false);
         });
       });
 
@@ -287,10 +288,44 @@ describe('is within visible bounds of a droppable', () => {
           { top: 0, left: 0, bottom: 100, right: 100 },
         ],
       });
-      const isWithinThisDroppable =
+      const isWithinDroppable =
         isDraggableWithin(result.droppable.container.bounds);
 
-      expect(isWithinThisDroppable(result.draggableDimensions[0])).toBe(true);
+      expect(isWithinDroppable(result.draggableDimensions[0])).toBe(true);
+    });
+
+    it('should return true if the draggable is within the margin of the droppable', () => {
+      const myDroppable: DroppableDimension = getDroppableDimension({
+        id: 'custom',
+        clientRect: getClientRect({ top: 10, left: 10, right: 90, bottom: 90 }),
+        margin: { top: 10, left: 10, right: 10, bottom: 10 },
+      });
+      const draggable: DraggableDimension = getDraggableDimension({
+        id: 'draggable',
+        droppableId: myDroppable.id,
+        // would normally not be within the droppable clientRect, but is within the margin
+        clientRect: getClientRect({ top: 0, left: 0, right: 100, bottom: 100 }),
+      });
+      const isWithinDroppable = isDraggableWithin(myDroppable.container.bounds);
+
+      const result: boolean = isWithinDroppable(draggable);
+
+      expect(result).toBe(true);
+    });
+
+    it('should not consider the margins of the draggable when comparing because the margins may bleed outside the container', () => {
+      const draggable: DraggableDimension = getDraggableDimension({
+        id: 'drag-1',
+        droppableId: droppable.id,
+        clientRect: getClientRect(clientSpacing),
+        // would normally push draggable outside of bounds
+        margin,
+      });
+      const isWithinDroppable = isDraggableWithin(droppable.container.bounds);
+
+      const result: boolean = isWithinDroppable(draggable);
+
+      expect(result).toBe(true);
     });
 
     it('should return false if there is overlap on any side', () => {

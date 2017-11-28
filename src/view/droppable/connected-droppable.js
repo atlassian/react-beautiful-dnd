@@ -18,12 +18,12 @@ import type {
   DroppableId,
   DraggableLocation,
   DraggableDimension,
+  Placeholder,
 } from '../../types';
 import type {
   OwnProps,
   MapProps,
   Selector,
-  Placeholder,
 } from './droppable-types';
 
 export const makeSelector = (): Selector => {
@@ -40,10 +40,6 @@ export const makeSelector = (): Selector => {
       return destination.droppableId === id;
     },
   );
-
-  const memoizedPlaceholder = memoizeOne((width: number, height: number): Placeholder => ({
-    width, height,
-  }));
 
   const getPlaceholder = memoizeOne(
     (id: DroppableId,
@@ -68,12 +64,7 @@ export const makeSelector = (): Selector => {
         return null;
       }
 
-      const placeholder: Placeholder = memoizedPlaceholder(
-        draggable.client.withoutMargin.width,
-        draggable.client.withoutMargin.height,
-      );
-
-      return placeholder;
+      return draggable.placeholder;
     }
   );
 
