@@ -3121,9 +3121,9 @@ flatten@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/flatten/-/flatten-1.0.2.tgz#dae46a9d78fbe25292258cc1e780a41d95c03782"
 
-flow-bin@0.59.0:
-  version "0.59.0"
-  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.59.0.tgz#8c151ee7f09f1deed9bf0b9d1f2e8ab9d470f1bb"
+flow-bin@0.60.0:
+  version "0.60.0"
+  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.60.0.tgz#885d0d92a90f94c29445e0f9a0382f5b5debaaed"
 
 flow-copy-source@^1.2.1:
   version "1.2.1"
@@ -5564,7 +5564,7 @@ react-style-proptype@^3.0.0:
   dependencies:
     prop-types "^15.5.4"
 
-react-test-renderer@16.2.0:
+react-test-renderer@^16.2.0:
   version "16.2.0"
   resolved "https://registry.yarnpkg.com/react-test-renderer/-/react-test-renderer-16.2.0.tgz#bddf259a6b8fcd8555f012afc8eacc238872a211"
   dependencies:
