@@ -4,7 +4,13 @@ import invariant from 'invariant';
 import getWindowScrollPosition from '../get-window-scroll-position';
 import { getDraggableDimension } from '../../state/dimension';
 import type { DraggableDimension, Spacing, ClientRect } from '../../types';
-import type { Props } from './draggable-dimension-publisher-types';
+
+type Props = {|
+  draggableId: DraggableId,
+  droppableId: DroppableId,
+  targetRef: ?HTMLElement,
+  children: Node,
+|}
 
 export default class DraggableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
@@ -16,6 +22,12 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     } = this.props;
 
     invariant(targetRef, 'DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
+
+    const descriptor: DraggableDescriptor = {
+      id: draggableId,
+      droppableId,
+      index,
+    };
 
     const style = window.getComputedStyle(targetRef);
 
@@ -31,8 +43,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     const clientRect: ClientRect = (targetRef.getBoundingClientRect() : any);
 
     const dimension: DraggableDimension = getDraggableDimension({
-      id: draggableId,
-      droppableId,
+      descriptor,
       clientRect,
       margin,
       windowScroll: getWindowScrollPosition(),

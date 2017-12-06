@@ -9,14 +9,6 @@ import type {
   TypeId,
 } from '../../types';
 
-export type MapProps = {|
-  shouldPublish: boolean,
-|}
-
-export type DispatchProps = {|
-  publish: typeof publishDraggableDimension,
-|}
-
 export type OwnProps = {|
   draggableId: DraggableId,
   droppableId: DroppableId,

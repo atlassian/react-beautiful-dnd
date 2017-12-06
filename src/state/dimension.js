@@ -4,8 +4,6 @@ import getClientRect from './get-client-rect';
 import { add, isEqual } from './spacing';
 import type {
   DroppableId,
-  DraggableId,
-  TypeId,
   DraggableDescriptor,
   DroppableDescriptor,
   Position,
@@ -74,8 +72,7 @@ export const getFragment = (
 };
 
 type GetDraggableArgs = {|
-  id: DraggableId,
-  droppableId: DroppableId,
+  descriptor: DraggableDescriptor,
   clientRect: ClientRect,
   index: number,
   margin?: Spacing,
@@ -83,19 +80,12 @@ type GetDraggableArgs = {|
 |};
 
 export const getDraggableDimension = ({
-  id,
-  droppableId,
+  descriptor,
   clientRect,
-  index,
   margin = noSpacing,
   windowScroll = origin,
 }: GetDraggableArgs): DraggableDimension => {
   const withScroll = getWithPosition(clientRect, windowScroll);
-  const descriptor: DraggableDescriptor = {
-    id,
-    droppableId,
-    index,
-  };
 
   const dimension: DraggableDimension = {
     descriptor,
@@ -122,10 +112,8 @@ export const getDraggableDimension = ({
 };
 
 type GetDroppableArgs = {|
-  id: DroppableId,
+  descriptor: DroppableDescriptor,
   clientRect: ClientRect,
-  index: number,
-  type?: TypeId,
   containerRect?: ClientRect,
   direction?: Direction,
   margin?: Spacing,
@@ -138,11 +126,9 @@ type GetDroppableArgs = {|
 |}
 
 export const getDroppableDimension = ({
-  id,
+  descriptor,
   clientRect,
   containerRect,
-  index,
-  type = 'TYPE',
   direction = 'vertical',
   margin = noSpacing,
   padding = noSpacing,
@@ -150,12 +136,6 @@ export const getDroppableDimension = ({
   scroll = origin,
   isEnabled = true,
 }: GetDroppableArgs): DroppableDimension => {
-  const descriptor: DroppableDescriptor = {
-    id,
-    type,
-    index,
-  };
-
   const withMargin = getWithSpacing(clientRect, margin);
   const withWindowScroll = getWithPosition(clientRect, windowScroll);
   // If no containerRect is provided, or if the clientRect matches the containerRect, this
