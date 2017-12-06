@@ -34,7 +34,7 @@ export default ({
 
   const home: DraggableLocation = {
     index: homeIndex,
-    droppableId: droppable.id,
+    droppableId: droppable.descriptor.id,
   };
 
   const impact: DragImpact = {

@@ -166,8 +166,8 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
-    if (state.dimension.draggable[dimension.id]) {
-      console.error(`dimension already exists for ${dimension.id}`);
+    if (state.dimension.draggable[dimension.descriptor.id]) {
+      console.error(`dimension already exists for ${dimension.descriptor.id}`);
       return state;
     }
 
@@ -178,7 +178,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
         droppable: state.dimension.droppable,
         draggable: {
           ...state.dimension.draggable,
-          [dimension.id]: dimension,
+          [dimension.descriptor.id]: dimension,
         },
       },
     };
@@ -192,8 +192,8 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
-    if (state.dimension.droppable[dimension.id]) {
-      console.error(`dimension already exists for ${dimension.id}`);
+    if (state.dimension.droppable[dimension.descriptor.id]) {
+      console.error(`dimension already exists for ${dimension.descriptor.id}`);
       return state;
     }
 
@@ -204,7 +204,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
         draggable: state.dimension.draggable,
         droppable: {
           ...state.dimension.droppable,
-          [dimension.id]: dimension,
+          [dimension.descriptor.id]: dimension,
         },
       },
     };
@@ -219,7 +219,8 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const { id, type, client, windowScroll, isScrollAllowed } = action.payload;
     const draggables: DraggableDimensionMap = state.dimension.draggable;
     const draggable: DraggableDimension = state.dimension.draggable[id];
-    const droppable: DroppableDimension = state.dimension.droppable[draggable.droppableId];
+    const droppable: DroppableDimension =
+      state.dimension.droppable[draggable.descriptor.droppableId];
     const page: InitialDragLocation = {
       selection: add(client.selection, windowScroll),
       center: add(client.center, windowScroll),

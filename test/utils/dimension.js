@@ -223,7 +223,7 @@ export const updateDroppableScroll = (
   const newScroll = add(droppable.container.scroll.initial, addition);
 
   const result: DroppableDimension = {
-    id: droppable.id,
+    id: droppable.descriptor.id,
     axis: droppable.axis,
     isEnabled: droppable.isEnabled,
     client: droppable.client,
@@ -241,7 +241,7 @@ export const updateDroppableScroll = (
 };
 
 export const disableDroppable = (droppable: DroppableDimension): DroppableDimension => ({
-  id: droppable.id,
+  id: droppable.descriptor.id,
   axis: droppable.axis,
   isEnabled: false,
   client: droppable.client,

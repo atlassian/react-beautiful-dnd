@@ -96,7 +96,7 @@ export default ({
     // remove the most recently impacted
     impact.movement.draggables.slice(1, impact.movement.draggables.length) :
     // add the destination as the most recently impacted
-    [destination.id, ...impact.movement.draggables];
+    [destination.descriptor.id, ...impact.movement.draggables];
 
   const newImpact: DragImpact = {
     movement: {
@@ -106,7 +106,7 @@ export default ({
       isBeyondStartPosition: proposedIndex > startIndex,
     },
     destination: {
-      droppableId: droppable.id,
+      droppableId: droppable.descriptor.id,
       index: proposedIndex,
     },
     direction: droppable.axis.direction,

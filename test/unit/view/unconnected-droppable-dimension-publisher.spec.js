@@ -754,14 +754,14 @@ describe('DraggableDimensionPublisher', () => {
         isDropDisabled: true,
       });
       expect(updateIsEnabled).toHaveBeenCalledTimes(1);
-      expect(updateIsEnabled.mock.calls[0]).toEqual([droppable.id, false]);
+      expect(updateIsEnabled.mock.calls[0]).toEqual([droppable.descriptor.id, false]);
 
       // enable
       wrapper.setProps({
         isDropDisabled: false,
       });
       expect(updateIsEnabled).toHaveBeenCalledTimes(2);
-      expect(updateIsEnabled.mock.calls[1]).toEqual([droppable.id, true]);
+      expect(updateIsEnabled.mock.calls[1]).toEqual([droppable.descriptor.id, true]);
     });
 
     it('should not publish changes to the enabled state of the droppable when a drag is not occuring', () => {
@@ -791,9 +791,9 @@ describe('DraggableDimensionPublisher', () => {
       change();
       expect(updateIsEnabled).toHaveBeenCalledTimes(2);
       // disabling
-      expect(updateIsEnabled.mock.calls[0]).toEqual([droppable.id, false]);
+      expect(updateIsEnabled.mock.calls[0]).toEqual([droppable.descriptor.id, false]);
       // enabling
-      expect(updateIsEnabled.mock.calls[1]).toEqual([droppable.id, true]);
+      expect(updateIsEnabled.mock.calls[1]).toEqual([droppable.descriptor.id, true]);
 
       // no longer publishing
       wrapper.setProps({

@@ -60,7 +60,7 @@ describe('get initial impact', () => {
         movement: noMovement,
         direction: droppable.axis.direction,
         destination: {
-          droppableId: droppable.id,
+          droppableId: droppable.descriptor.id,
           index,
         },
       };

@@ -37,8 +37,8 @@ describe('get best cross axis droppable', () => {
         }),
       });
       const droppables: DroppableDimensionMap = {
-        [source.id]: source,
-        [forward.id]: forward,
+        [source.descriptor.id]: source,
+        [forward.descriptor.id]: forward,
       };
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({

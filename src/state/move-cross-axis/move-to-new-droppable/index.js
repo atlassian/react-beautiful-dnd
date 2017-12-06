@@ -40,7 +40,7 @@ export default ({
   );
 
   // moving back to the home list
-  if (destination.id === draggable.droppableId) {
+  if (destination.id === draggable.descriptor.droppableId) {
     return toHomeList({
       amount,
       originalIndex: home.index,

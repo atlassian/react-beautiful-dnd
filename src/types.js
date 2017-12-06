@@ -8,6 +8,18 @@ export type DroppableId = Id;
 export type TypeId = Id;
 export type ZIndex = number | string;
 
+export type DroppableDescriptor = {|
+  id: DroppableId,
+  type: TypeId,
+  index: number,
+|}
+
+export type DraggableDescriptor = {|
+  id: DraggableId,
+  droppableId: DroppableId,
+  index: number,
+|}
+
 export type Position = {|
   x: number,
   y: number,
@@ -73,8 +85,7 @@ export type Placeholder = {|
 |}
 
 export type DraggableDimension = {|
-  id: DraggableId,
-  droppableId: DroppableId,
+  descriptor: DraggableDescriptor,
   // the placeholder for the draggable
   placeholder: Placeholder,
   // relative to the viewport when the drag started
@@ -90,7 +101,7 @@ export type DraggableDimension = {|
 |}
 
 export type DroppableDimension = {|
-  id: DroppableId,
+  descriptor: DroppableDescriptor,
   axis: Axis,
   isEnabled: boolean,
   // relative to the current viewport

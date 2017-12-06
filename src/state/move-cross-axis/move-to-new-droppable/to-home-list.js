@@ -53,7 +53,7 @@ export default ({
       },
       direction: droppable.axis.direction,
       destination: {
-        droppableId: droppable.id,
+        droppableId: droppable.descriptor.id,
         index: originalIndex,
       },
     };
@@ -98,7 +98,7 @@ export default ({
 
     // Need to ensure that the list is sorted with the closest item being first
     return insideDroppable.slice(from, to).reverse();
-  })().map((d: DraggableDimension): DraggableId => d.id);
+  })().map((d: DraggableDimension): DraggableId => d.descriptor.id);
 
   const newImpact: DragImpact = {
     movement: {
@@ -108,7 +108,7 @@ export default ({
     },
     direction: axis.direction,
     destination: {
-      droppableId: droppable.id,
+      droppableId: droppable.descriptor.id,
       index: targetIndex,
     },
   };

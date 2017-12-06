@@ -302,7 +302,7 @@ describe('is within visible bounds of a droppable', () => {
       });
       const draggable: DraggableDimension = getDraggableDimension({
         id: 'draggable',
-        droppableId: myDroppable.id,
+        droppableId: myDroppable.descriptor.id,
         // would normally not be within the droppable clientRect, but is within the margin
         clientRect: getClientRect({ top: 0, left: 0, right: 100, bottom: 100 }),
       });
@@ -316,7 +316,7 @@ describe('is within visible bounds of a droppable', () => {
     it('should not consider the margins of the draggable when comparing because the margins may bleed outside the container', () => {
       const draggable: DraggableDimension = getDraggableDimension({
         id: 'drag-1',
-        droppableId: droppable.id,
+        droppableId: droppable.descriptor.id,
         clientRect: getClientRect(clientSpacing),
         // would normally push draggable outside of bounds
         margin,

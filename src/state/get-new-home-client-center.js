@@ -37,7 +37,8 @@ export default ({
   const { draggables: movedDraggables, isBeyondStartPosition } = movement;
   const axis: Axis = destination.axis;
 
-  const isWithinHomeDroppable: boolean = destination.id === draggable.droppableId;
+  const isWithinHomeDroppable: boolean =
+    destination.descriptor.id === draggable.descriptor.droppableId;
 
   // dropping back into home index
   if (isWithinHomeDroppable && !movedDraggables.length) {

@@ -36,18 +36,18 @@ describe('move cross axis', () => {
       ...foreign.draggables,
     };
     const droppables: DroppableDimensionMap = {
-      [home.droppable.id]: home.droppable,
-      [foreign.droppable.id]: foreign.droppable,
+      [home.droppable.descriptor.id]: home.droppable,
+      [foreign.droppable.descriptor.id]: foreign.droppable,
     };
     const draggable: DraggableDimension = home.draggableDimensions[0];
 
     const result: ?Result = moveCrossAxis({
       isMovingForward: true,
       pageCenter: draggable.page.withMargin.center,
-      draggableId: draggable.id,
-      droppableId: home.droppable.id,
+      draggableId: draggable.descriptor.id,
+      droppableId: home.droppable.descriptor.id,
       home: {
-        droppableId: home.droppable.id,
+        droppableId: home.droppable.descriptor.id,
         index: 0,
       },
       draggables,
@@ -74,8 +74,8 @@ describe('move cross axis', () => {
       ...foreign.draggables,
     };
     const droppables: DroppableDimensionMap = {
-      [home.droppable.id]: home.droppable,
-      [foreign.droppable.id]: foreign.droppable,
+      [home.droppable.descriptor.id]: home.droppable,
+      [foreign.droppable.descriptor.id]: foreign.droppable,
     };
     const draggable: DraggableDimension = home.draggableDimensions[0];
 
@@ -83,9 +83,9 @@ describe('move cross axis', () => {
       isMovingForward: true,
       pageCenter: draggable.page.withMargin.center,
       draggableId: draggable.id,
-      droppableId: home.droppable.id,
+      droppableId: home.droppable.descriptor.id,
       home: {
-        droppableId: home.droppable.id,
+        droppableId: home.droppable.descriptor.id,
         index: 0,
       },
       draggables,

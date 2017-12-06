@@ -31,7 +31,7 @@ describe('get closest draggable', () => {
     // first item bleeds backwards past the start of the droppable
     const partialHiddenBackwards: DraggableDimension = getDraggableDimension({
       id: 'partialHiddenBackwards',
-      droppableId: droppable.id,
+      droppableId: droppable.descriptor.id,
       clientRect: getClientRect({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
@@ -42,7 +42,7 @@ describe('get closest draggable', () => {
 
     const visible1: DraggableDimension = getDraggableDimension({
       id: 'visible1',
-      droppableId: droppable.id,
+      droppableId: droppable.descriptor.id,
       clientRect: getClientRect({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
@@ -53,7 +53,7 @@ describe('get closest draggable', () => {
 
     const visible2: DraggableDimension = getDraggableDimension({
       id: 'visible2',
-      droppableId: droppable.id,
+      droppableId: droppable.descriptor.id,
       clientRect: getClientRect({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
@@ -65,7 +65,7 @@ describe('get closest draggable', () => {
     // bleeds over the end of the visible boundary
     const partiallyHiddenForwards: DraggableDimension = getDraggableDimension({
       id: 'partiallyHiddenForwards',
-      droppableId: droppable.id,
+      droppableId: droppable.descriptor.id,
       clientRect: getClientRect({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
@@ -77,7 +77,7 @@ describe('get closest draggable', () => {
     // totally invisible
     const hidden: DraggableDimension = getDraggableDimension({
       id: 'hidden',
-      droppableId: droppable.id,
+      droppableId: droppable.descriptor.id,
       clientRect: getClientRect({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,

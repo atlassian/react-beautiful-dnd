@@ -53,7 +53,7 @@ export default ({
       },
       direction: axis.direction,
       destination: {
-        droppableId: droppable.id,
+        droppableId: droppable.descriptor.id,
         index: 0,
       },
     };
@@ -89,7 +89,7 @@ export default ({
 
   const needsToMove: DraggableId[] = insideDroppable
     .slice(proposedIndex, insideDroppable.length)
-    .map((dimension: DraggableDimension): DraggableId => dimension.id);
+    .map((dimension: DraggableDimension): DraggableId => dimension.descriptor.id);
 
   const newImpact: DragImpact = {
     movement: {
@@ -99,7 +99,7 @@ export default ({
     },
     direction: axis.direction,
     destination: {
-      droppableId: droppable.id,
+      droppableId: droppable.descriptor.id,
       index: proposedIndex,
     },
   };

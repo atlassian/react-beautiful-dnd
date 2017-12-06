@@ -44,7 +44,7 @@ type LiftFnArgs = {
   isScrollAllowed: boolean,
 }
 
-const draggableId: DraggableId = inHome1.id;
+const draggableId: DraggableId = inHome1.descriptor.id;
 const defaultType: TypeId = 'type';
 
 const liftDefaults: LiftFnArgs = {

@@ -26,7 +26,7 @@ const addBufferToDroppableDimension = memoizeOne((
   buffer: Position,
   droppable: DroppableDimension
 ): DroppableDimension => {
-  const { id, axis, isEnabled, client, container, page } = droppable;
+  const { descriptor, axis, isEnabled, client, container, page } = droppable;
   const withBuffer = bufferDimensionFragment(buffer);
 
   const newClient = {
@@ -50,7 +50,7 @@ const addBufferToDroppableDimension = memoizeOne((
     : { ...container.bounds };
 
   return {
-    id,
+    descriptor,
     axis,
     isEnabled,
     client: newClient,
@@ -104,9 +104,9 @@ const bufferDroppable = ({
   droppable,
   previousDroppableOverId,
 }: GetBufferedDroppableArgs): DroppableDimension => {
-  const isHomeDroppable = draggable.droppableId === droppable.id;
+  const isHomeDroppable = draggable.descriptor.droppableId === droppable.descriptor.id;
   const isCurrentlyHovered = previousDroppableOverId &&
-    previousDroppableOverId === droppable.id;
+    previousDroppableOverId === droppable.descriptor.id;
 
   // We only include the placeholder size if it's a
   // foreign list and is currently being hovered over
@@ -146,5 +146,5 @@ export default ({
         return isPointWithinDroppable(bufferedDroppable)(target);
       });
 
-  return maybe ? maybe.id : null;
+  return maybe ? maybe.descriptor.id : null;
 };

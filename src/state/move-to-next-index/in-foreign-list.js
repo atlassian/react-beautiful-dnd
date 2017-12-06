@@ -97,7 +97,7 @@ export default ({
     // Stop displacing the closest draggable forward
     impact.movement.draggables.slice(1, impact.movement.draggables.length) :
     // Add the draggable that we are moving into the place of
-    [movingRelativeTo.id, ...impact.movement.draggables];
+    [movingRelativeTo.descriptor.id, ...impact.movement.draggables];
 
   const newImpact: DragImpact = {
     movement: {
@@ -108,7 +108,7 @@ export default ({
       isBeyondStartPosition: false,
     },
     destination: {
-      droppableId: droppable.id,
+      droppableId: droppable.descriptor.id,
       index: proposedIndex,
     },
     direction: droppable.axis.direction,

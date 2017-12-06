@@ -5,6 +5,9 @@ import { add, isEqual } from './spacing';
 import type {
   DroppableId,
   DraggableId,
+  TypeId,
+  DraggableDescriptor,
+  DroppableDescriptor,
   Position,
   DraggableDimension,
   DroppableDimension,
@@ -74,6 +77,7 @@ type GetDraggableArgs = {|
   id: DraggableId,
   droppableId: DroppableId,
   clientRect: ClientRect,
+  index: number,
   margin?: Spacing,
   windowScroll?: Position,
 |};
@@ -82,14 +86,19 @@ export const getDraggableDimension = ({
   id,
   droppableId,
   clientRect,
+  index,
   margin = noSpacing,
   windowScroll = origin,
 }: GetDraggableArgs): DraggableDimension => {
   const withScroll = getWithPosition(clientRect, windowScroll);
-
-  const dimension: DraggableDimension = {
+  const descriptor: DraggableDescriptor = {
     id,
     droppableId,
+    index,
+  };
+
+  const dimension: DraggableDimension = {
+    descriptor,
     placeholder: {
       margin,
       withoutMargin: {
@@ -115,6 +124,8 @@ export const getDraggableDimension = ({
 type GetDroppableArgs = {|
   id: DroppableId,
   clientRect: ClientRect,
+  index: number,
+  type?: TypeId,
   containerRect?: ClientRect,
   direction?: Direction,
   margin?: Spacing,
@@ -130,6 +141,8 @@ export const getDroppableDimension = ({
   id,
   clientRect,
   containerRect,
+  index,
+  type = 'TYPE',
   direction = 'vertical',
   margin = noSpacing,
   padding = noSpacing,
@@ -137,6 +150,12 @@ export const getDroppableDimension = ({
   scroll = origin,
   isEnabled = true,
 }: GetDroppableArgs): DroppableDimension => {
+  const descriptor: DroppableDescriptor = {
+    id,
+    type,
+    index,
+  };
+
   const withMargin = getWithSpacing(clientRect, margin);
   const withWindowScroll = getWithPosition(clientRect, windowScroll);
   // If no containerRect is provided, or if the clientRect matches the containerRect, this
@@ -149,7 +168,7 @@ export const getDroppableDimension = ({
       : getWithPosition(containerRect, windowScroll);
 
   const dimension: DroppableDimension = {
-    id,
+    descriptor,
     isEnabled,
     axis: direction === 'vertical' ? vertical : horizontal,
     client: {

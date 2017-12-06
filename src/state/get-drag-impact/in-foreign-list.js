@@ -38,7 +38,7 @@ export default ({
       const threshold: number = child.page.withoutMargin[axis.end];
       return threshold > currentCenter[axis.line];
     })
-    .map((dimension: DraggableDimension): DroppableId => dimension.id);
+    .map((dimension: DraggableDimension): DroppableId => dimension.descriptor.id);
 
   const newIndex: number = insideDestination.length - moved.length;
 
@@ -52,7 +52,7 @@ export default ({
     movement,
     direction: axis.direction,
     destination: {
-      droppableId: destination.id,
+      droppableId: destination.descriptor.id,
       index: newIndex,
     },
   };

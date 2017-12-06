@@ -302,7 +302,7 @@ export const drop = () =>
 
     const { impact, initial, current } = state.drag;
     const draggable: DraggableDimension = state.dimension.draggable[current.id];
-    const home: DroppableDimension = state.dimension.droppable[draggable.droppableId];
+    const home: DroppableDimension = state.dimension.droppable[draggable.descriptor.droppableId];
     const destination: ?DroppableDimension = impact.destination ?
       state.dimension.droppable[impact.destination.droppableId] :
       null;

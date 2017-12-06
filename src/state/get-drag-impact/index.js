@@ -49,8 +49,8 @@ export default ({
     return noImpact;
   }
 
-  const home: DroppableDimension = droppables[draggable.droppableId];
-  const isWithinHomeDroppable: boolean = home.id === destinationId;
+  const home: DroppableDimension = droppables[draggable.descriptor.droppableId];
+  const isWithinHomeDroppable: boolean = home.descriptor.id === destinationId;
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
     destination,
     draggables,

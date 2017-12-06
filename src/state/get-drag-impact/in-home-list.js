@@ -66,7 +66,7 @@ export default ({
 
       return currentCenter[axis.line] < fragment[axis.end];
     })
-    .map((dimension: DraggableDimension): DroppableId => dimension.id);
+    .map((dimension: DraggableDimension): DroppableId => dimension.descriptor.id);
 
   // Need to ensure that we always order by the closest impacted item
   const ordered: DraggableId[] = isBeyondStartPosition ? moved.reverse() : moved;
@@ -94,7 +94,7 @@ export default ({
     movement,
     direction: axis.direction,
     destination: {
-      droppableId: home.id,
+      droppableId: home.descriptor.id,
       index,
     },
   };
