@@ -28,6 +28,7 @@ export type OwnProps = {|
   children: (Provided, StateSnapshot) => ?Node,
   droppableId: DroppableId,
   type: TypeId,
+  index: number,
   isDropDisabled: boolean,
   direction: Direction,
   ignoreContainerClipping: boolean,

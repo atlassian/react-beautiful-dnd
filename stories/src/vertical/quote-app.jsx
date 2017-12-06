@@ -96,6 +96,7 @@ export default class QuoteApp extends Component<Props, State> {
         <Root>
           <QuoteList
             listId="list"
+            listIndex={0}
             style={this.props.listStyle}
             quotes={quotes}
           />

@@ -34,16 +34,20 @@ export default class DraggableDimensionPublisher extends Component<Props, State>
     [dimensionMarshalKey]: PropTypes.object.isRequired,
   };
 
-  state: State = {
-    descriptor: this.getMemoizedDescriptor(
-      this.props.draggableId,
-      this.props.droppableId,
-      this.props.index
-    ),
+  constructor(props: Props, context: mixed) {
+    super(props, context);
+
+    this.state = {
+      descriptor: this.getMemoizedDescriptor(
+        this.props.draggableId,
+        this.props.droppableId,
+        this.props.index
+      ),
+    };
   }
 
   componentDidMount() {
-    const marshal: Marshal = this.context.marshal;
+    const marshal: Marshal = this.context[dimensionMarshalKey];
     const descriptor: DraggableDescriptor = this.state.descriptor;
 
     marshal.registerDraggable(descriptor, this.getDimension);

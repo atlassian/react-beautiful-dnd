@@ -73,6 +73,7 @@ export default class Droppable extends Component<Props, State> {
   render() {
     const {
       children,
+      index,
       direction,
       droppableId,
       ignoreContainerClipping,
@@ -91,10 +92,11 @@ export default class Droppable extends Component<Props, State> {
     return (
       <DroppableDimensionPublisher
         droppableId={droppableId}
+        type={type}
+        index={index}
         direction={direction}
         ignoreContainerClipping={ignoreContainerClipping}
         isDropDisabled={isDropDisabled}
-        type={type}
         targetRef={this.state.ref}
       >
         {children(provided, snapshot)}

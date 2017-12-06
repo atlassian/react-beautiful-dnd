@@ -4,7 +4,6 @@ import type {
   DraggableId,
   DraggableDimension,
   Position,
-  TypeId,
   Direction,
   ZIndex,
 } from '../../types';
@@ -137,13 +136,12 @@ export type MapProps = {|
 export type OwnProps = {|
   draggableId: DraggableId,
   children: (Provided, StateSnapshot) => ?Node,
-  type: TypeId,
+  index: number,
   isDragDisabled: boolean,
   disableInteractiveElementBlocking: boolean,
 |}
 
 export type DefaultProps = {|
-  type: TypeId,
   isDragDisabled: boolean,
   disableInteractiveElementBlocking: boolean
 |}

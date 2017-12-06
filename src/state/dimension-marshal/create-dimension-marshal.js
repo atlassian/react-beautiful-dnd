@@ -2,7 +2,6 @@
 import type{
   DraggableId,
   DroppableId,
-  TypeId,
   DroppableDescriptor,
   DraggableDescriptor,
   DraggableDimension,
@@ -195,10 +194,14 @@ export default (callbacks: MarshalCallbacks) => {
       return;
     }
 
-    state.draggables[id] = {
+    const entry: DraggableEntry = {
       descriptor,
       getDimension,
     };
+
+    console.log('publishing draggable entry', entry);
+
+    state.draggables[id] = entry;
   };
 
   const registerDroppable = (
@@ -212,10 +215,14 @@ export default (callbacks: MarshalCallbacks) => {
       return;
     }
 
-    state.droppables[id] = {
+    const entry: DroppableEntry = {
       descriptor,
       getDimension,
     };
+
+    console.log('publishing droppable entry', entry);
+
+    state.droppables[id] = entry;
   };
 
   const unregisterDraggable = (id: DraggableId) => {

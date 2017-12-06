@@ -312,7 +312,7 @@ export default class Draggable extends Component<Props, State> {
   render() {
     const {
       draggableId,
-      type,
+      index,
       offset,
       isDragging,
       isDropAnimating,
@@ -331,7 +331,7 @@ export default class Draggable extends Component<Props, State> {
       <DraggableDimensionPublisher
         draggableId={draggableId}
         droppableId={this.context[droppableIdKey]}
-        type={type}
+        index={index}
         targetRef={this.state.ref}
       >
         <Moveable

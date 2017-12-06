@@ -57,16 +57,20 @@ export default class DroppableDimensionPublisher extends Component<Props, State>
     [dimensionMarshalKey]: PropTypes.object.isRequired,
   };
 
-  state: State = {
-    descriptor: this.getMemoizedDescriptor(
-      this.props.droppableId,
-      this.props.type,
-      this.props.index
-    ),
+  constructor(props: Props, context: mixed) {
+    super(props, context);
+
+    this.state = {
+      descriptor: this.getMemoizedDescriptor(
+        this.props.droppableId,
+        this.props.type,
+        this.props.index
+      ),
+    };
   }
 
   componentDidMount() {
-    const marshal: Marshal = this.context.marshal;
+    const marshal: Marshal = this.context[dimensionMarshalKey];
     const descriptor: DroppableDescriptor = this.state.descriptor;
 
     marshal.registerDroppable(descriptor, this.getDimension);

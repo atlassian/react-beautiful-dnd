@@ -43,9 +43,10 @@ const Container = styled.div``;
 
 type Props = {|
   listId: string,
+  listIndex: number,
+  listType?: string,
   quotes: Quote[],
   title?: string,
-  listType?: string,
   internalScroll?: boolean,
   isDropDisabled ?: boolean,
   style?: Object,
@@ -56,7 +57,7 @@ type Props = {|
 
 export default class QuoteList extends Component<Props> {
   renderQuotes = (dropProvided: DroppableProvided) => {
-    const { listType, quotes } = this.props;
+    const { quotes } = this.props;
     const title = this.props.title ? (
       <Title>{this.props.title}</Title>
     ) : null;
@@ -65,8 +66,8 @@ export default class QuoteList extends Component<Props> {
       <Container>
         {title}
         <DropZone innerRef={dropProvided.innerRef}>
-          {quotes.map((quote: Quote) => (
-            <Draggable key={quote.id} draggableId={quote.id} type={listType}>
+          {quotes.map((quote: Quote, index: number) => (
+            <Draggable key={quote.id} draggableId={quote.id} index={index}>
               {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
                 <div>
                   <QuoteItem
@@ -93,6 +94,7 @@ export default class QuoteList extends Component<Props> {
       internalScroll,
       isDropDisabled,
       listId,
+      listIndex,
       listType,
       style,
     } = this.props;
@@ -100,9 +102,10 @@ export default class QuoteList extends Component<Props> {
     return (
       <Droppable
         droppableId={listId}
+        index={listIndex}
+        type={listType}
         ignoreContainerClipping={ignoreContainerClipping}
         isDropDisabled={isDropDisabled}
-        type={listType}
       >
         {(dropProvided: DroppableProvided, dropSnapshot: DroppableStateSnapshot) => (
           <Wrapper

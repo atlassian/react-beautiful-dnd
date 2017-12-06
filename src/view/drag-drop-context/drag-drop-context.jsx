@@ -3,12 +3,14 @@ import React, { type Node } from 'react';
 import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
 import fireHooks from '../../state/fire-hooks';
+import createDimensionMarshal from '../../state/dimension-marshal/create-dimension-marshal';
+import type { Marshal } from '../../state/dimension-marshal/dimension-marshal-types';
 import type {
   Store,
   State,
   Hooks,
 } from '../../types';
-import { storeKey } from '../context-keys';
+import { storeKey, dimensionMarshalKey } from '../context-keys';
 
 type Props = {|
   ...Hooks,
@@ -22,6 +24,7 @@ type Context = {
 export default class DragDropContext extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
   store: Store
+  marshal: Marshal
   unsubscribe: Function
 
   // Need to declare childContextTypes without flow
@@ -32,17 +35,25 @@ export default class DragDropContext extends React.Component<Props> {
       subscribe: PropTypes.func.isRequired,
       getState: PropTypes.func.isRequired,
     }).isRequired,
+    [dimensionMarshalKey]: PropTypes.object.isRequired,
   }
   /* eslint-enable */
 
   getChildContext(): Context {
+    console.log('putting marshal on context', this.marshal);
     return {
       [storeKey]: this.store,
+      [dimensionMarshalKey]: this.marshal,
     };
   }
 
   componentWillMount() {
     this.store = createStore();
+    this.marshal = createDimensionMarshal({
+      publishDraggables: (...args) => console.log('publishing draggables', args),
+      publishDroppables: (...args) => console.log('publishing droppables', args),
+      cancel: () => console.warn('cancel from dimension publisher'),
+    });
 
     let previous: State = this.store.getState();
 
