@@ -3,7 +3,6 @@ import { vertical, horizontal } from './axis';
 import getClientRect from './get-client-rect';
 import { add, isEqual } from './spacing';
 import type {
-  DroppableId,
   DraggableDescriptor,
   DroppableDescriptor,
   Position,
@@ -74,7 +73,6 @@ export const getFragment = (
 type GetDraggableArgs = {|
   descriptor: DraggableDescriptor,
   clientRect: ClientRect,
-  index: number,
   margin?: Spacing,
   windowScroll?: Position,
 |};

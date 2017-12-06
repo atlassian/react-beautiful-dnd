@@ -1,23 +1,14 @@
 // @flow
-import type {
+import type{
   DraggableId,
   DroppableId,
   TypeId,
+  DroppableDescriptor,
+  DraggableDescriptor,
   DraggableDimension,
   DroppableDimension,
 } from '../../types';
-
-type DroppableDescriptor = {|
-  id: DroppableId,
-  type: TypeId,
-  index: number,
-|}
-
-type DraggableDescriptor = {|
-  id: DraggableId,
-  droppableId: DroppableId,
-  index: number,
-|}
+import type { Marshal } from './dimension-marshal-types';
 
 type GetDraggableDimensionFn = () => DraggableDimension;
 type GetDroppableDimensionFn = () => DroppableDimension;
@@ -286,7 +277,7 @@ export default (callbacks: MarshalCallbacks) => {
     }
   };
 
-  return {
+  const marshal: Marshal = {
     registerDraggable,
     registerDroppable,
     unregisterDraggable,
@@ -294,4 +285,6 @@ export default (callbacks: MarshalCallbacks) => {
     start,
     stop,
   };
+
+  return marshal;
 };

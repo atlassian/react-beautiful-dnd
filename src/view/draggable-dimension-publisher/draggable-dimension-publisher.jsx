@@ -1,33 +1,49 @@
 // @flow
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 import invariant from 'invariant';
 import getWindowScrollPosition from '../get-window-scroll-position';
 import { getDraggableDimension } from '../../state/dimension';
-import type { DraggableDimension, Spacing, ClientRect } from '../../types';
+import { dimensionMarshalKey } from '../context-keys';
+import type { DraggableDescriptor, DraggableDimension, Spacing, ClientRect } from '../../types';
+import type { Marshal } from '../../state/dimension-marshal/dimension-marshal-types';
 
 type Props = {|
-  draggableId: DraggableId,
-  droppableId: DroppableId,
+  descriptor: DraggableDescriptor,
   targetRef: ?HTMLElement,
   children: Node,
 |}
 
 export default class DraggableDimensionPublisher extends Component<Props> {
-  /* eslint-disable react/sort-comp */
+  static contextTypes = {
+    [dimensionMarshalKey]: PropTypes.object.isRequired,
+  };
+
+  componentDidMount() {
+    const marshal: Marshal = this.context.marshal;
+    const descriptor: DraggableDescriptor = this.props.descriptor;
+
+    marshal.registerDraggable(descriptor, this.getDimension);
+  }
+
+  componentWillUpdate(nextProps: Props) {
+    // TODO: handle updates to an existing draggable
+    if (this.props.descriptor !== nextProps.descriptor) {
+      console.warn('descriptor changing on mounted draggable', nextProps.descriptor.id);
+    }
+  }
+
+  componentWillUnmount() {
+    const marshal: Marshal = this.context.marshal;
+    const descriptor: DraggableDescriptor = this.props.descriptor;
+
+    marshal.unregisterDraggable(descriptor.id);
+  }
+
   getDimension = (): DraggableDimension => {
-    const {
-      draggableId,
-      droppableId,
-      targetRef,
-    } = this.props;
+    const { descriptor, targetRef } = this.props;
 
     invariant(targetRef, 'DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
-
-    const descriptor: DraggableDescriptor = {
-      id: draggableId,
-      droppableId,
-      index,
-    };
 
     const style = window.getComputedStyle(targetRef);
 
@@ -50,19 +66,6 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     });
 
     return dimension;
-  }
-
-  /* eslint-enable react/sort-comp */
-
-  // TODO: componentDidUpdate?
-  componentWillReceiveProps(nextProps: Props) {
-    // Because the dimension publisher wraps children - it might render even when its props do
-    // not change. We need to ensure that it does not publish when it should not.
-    const shouldPublish = !this.props.shouldPublish && nextProps.shouldPublish;
-
-    if (shouldPublish) {
-      this.props.publish(this.getDimension());
-    }
   }
 
   render() {
