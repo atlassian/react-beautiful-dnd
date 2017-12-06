@@ -30,10 +30,10 @@ type DropppableEntryMap = {
   [key: DroppableId]: DroppableEntry,
 }
 
-type UnknownEntryType = DroppableEntry | DraggableEntry;
-type UnknownDimensionType = DraggableDescriptor | DroppableDescriptor;
+type UnknownDescriptorType = DraggableDescriptor | DroppableDescriptor;
+type UnknownDimensionType = DraggableDimension | DroppableDimension;
 
-type OrderedCollectionList = Array<UnknownEntryType>;
+type OrderedCollectionList = Array<UnknownDescriptorType>;
 
 type Collection = {|
   // item that is dragging
@@ -176,10 +176,7 @@ const getCollectionOrder = ({
   const combined: OrderedCollectionList = [...draggablesWithScore, ...droppablesWithScore]
     // descriptors with the lowest score go first
     .sort((a: EntryWithScore, b: EntryWithScore) => a.score - b.score)
-    .map((item: EntryWithScore): UnknownEntryType => ({
-      descriptor: item.descriptor,
-      getDimension: item.getDimension,
-    }));
+    .map((item: EntryWithScore): UnknownDescriptorType => item.descriptor);
 
   return combined;
 };
