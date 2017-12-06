@@ -30,13 +30,19 @@ type DropppableEntryMap = {
   [key: DroppableId]: DroppableEntry,
 }
 
-type OrderedCollectionList = Array<DraggableDescriptor | DroppableDescriptor>;
+type UnknownEntryType = DroppableEntry | DraggableEntry;
+type UnknownDimensionType = DraggableDescriptor | DroppableDescriptor;
+
+type OrderedCollectionList = Array<UnknownEntryType>;
 
 type Collection = {|
   // item that is dragging
   draggable: DraggableDescriptor,
   // ordered list based on distance from starting draggable
-  toBeCollected: OrderedCollectionList
+  toBeCollected: OrderedCollectionList,
+  // Dimensions that have been collected from components
+  // but have not yet been published to the store
+  toBePublishedBuffer: Array<UnknownDimensionType>
 |}
 
 type MarshalCallbacks = {|
@@ -60,7 +66,7 @@ type GetCollectionOrderFn = {|
   draggables: DraggableEntryMap,
 |}
 
-type DescriptorWithScore = {|
+type EntryWithScore = {|
   descriptor: DraggableDescriptor | DroppableDescriptor,
   score: number,
 |}
@@ -79,6 +85,8 @@ const scoreTable = (() => {
     },
   };
 })();
+
+const collectionSize: number = 4;
 
 // It is the responsiblity of this function to create
 // a single dimensional ordered list for dimensions to be collected.
@@ -116,7 +124,7 @@ const getCollectionOrder = ({
   // - Change in index from home droppable = + 2 points per index change
   //     (Eg: droppable[index:1] compared to droppable[index:3] would be 4 points)
 
-  const draggablesWithScore: DescriptorWithScore[] = Object.keys(draggables)
+  const draggablesWithScore: EntryWithScore[] = Object.keys(draggables)
     .map((id: DraggableId): DraggableDescriptor => draggables[id].descriptor)
     // remove the original draggable from the list
     .filter((descriptor: DraggableDescriptor): boolean => descriptor.id !== draggable.id)
@@ -126,7 +134,7 @@ const getCollectionOrder = ({
       return droppable.type === home.type;
     })
     // add score
-    .map((descriptor: DraggableDescriptor): DescriptorWithScore => {
+    .map((descriptor: DraggableDescriptor): EntryWithScore => {
       // 1 point for every index difference
       const indexDiff: number = Math.abs(draggable.index - descriptor.index);
       const indexScore: number = indexDiff * scoreTable.draggable.indexChange;
@@ -144,7 +152,7 @@ const getCollectionOrder = ({
       };
     });
 
-  const droppablesWithScore: DescriptorWithScore[] = Object.keys(droppables)
+  const droppablesWithScore: EntryWithScore[] = Object.keys(droppables)
     .map((id: DroppableId): DroppableDescriptor => droppables[id].descriptor)
     // remove the home droppable from the list
     .filter((descriptor: DroppableDescriptor): boolean => descriptor.id !== home.id)
@@ -167,8 +175,11 @@ const getCollectionOrder = ({
 
   const combined: OrderedCollectionList = [...draggablesWithScore, ...droppablesWithScore]
     // descriptors with the lowest score go first
-    .sort((a: DescriptorWithScore, b: DescriptorWithScore) => a.score - b.score)
-    .map((item: DescriptorWithScore) => item.descriptor);
+    .sort((a: EntryWithScore, b: EntryWithScore) => a.score - b.score)
+    .map((item: EntryWithScore): UnknownEntryType => ({
+      descriptor: item.descriptor,
+      getDimension: item.getDimension,
+    }));
 
   return combined;
 };
@@ -241,6 +252,79 @@ export default (callbacks: MarshalCallbacks) => {
     delete state.droppables[id];
   };
 
+  const collect = () => {
+    // no longer collecting
+    if (!state.isCollecting) {
+      state.collection = null;
+      return;
+    }
+
+    const collection: ?Collection = state.collection;
+
+    if (!collection) {
+      console.error('cannot collect when there is not collection on the state');
+      return;
+    }
+
+    // All finished!
+    if (!collection.toBeCollected.length && !collection.toBePublishedBuffer.length) {
+      state.collection = null;
+      return;
+    }
+
+    // Splitting the act of
+    // - collecting dimensions(expensive) and
+    // - publishing them into the store(expensive)
+    // into two seperate frames
+    requestAnimationFrame(() => {
+      // within the frame duration we where told to no longer collect
+      if (!state.isCollecting) {
+        return;
+      }
+
+      // if there are things in the buffer - publish them
+
+      if (collection.toBePublishedBuffer.length) {
+        type ToBePublished = {|
+          draggables: DraggableDimension[],
+          droppables: DroppableDimension[],
+        |}
+
+        const toBePublished: ToBePublished = collection.toBePublishedBuffer.reduce(
+          (previous: ToBePublished, dimension: UnknownDimensionType): ToBePublished => {
+            if (dimension.placeholder) {
+              previous.draggables.push(dimension);
+            } else {
+              previous.droppables.push(dimension);
+            }
+            return previous;
+          }, { draggables: [], droppables: [] }
+        );
+
+        callbacks.publishDroppables(toBePublished.droppables);
+        callbacks.publishDraggables(toBePublished.draggables);
+
+        // clear the buffer
+        collection.toBePublishedBuffer = [];
+
+        // continue collecting
+        collect();
+      }
+
+      // the buffer is empty: start collecting other dimensions
+      // obtain targets and remove them from the array
+      const targets: OrderedCollectionList = collection.toBeCollected.splice(0, collectionSize);
+
+      const buffer: UnknownDimensionType[] = targets.map(
+        (entry: UnknownEntryType): UnknownDimensionType => entry.getDimension()
+      );
+
+      collection.toBePublishedBuffer = buffer;
+    });
+
+    // Need to put
+  };
+
   const start = (id: DraggableId) => {
     if (state.dragging) {
       console.error('Cannot start capturing dimensions for a drag it is already dragging');
@@ -276,6 +360,23 @@ export default (callbacks: MarshalCallbacks) => {
 
     // Drag will now have started
     // - need to figure out the weighted distance to each dimension
+
+    setTimeout(() => {
+      // no longer collecting
+      if (!state.isCollecting) {
+        return;
+      }
+
+      const collection: Collection = {
+        draggable,
+        toBeCollected: [],
+        toBePublishedBuffer: [],
+      };
+
+      state.collection = collection;
+
+      collect();
+    });
   };
 
   const stop = () => {

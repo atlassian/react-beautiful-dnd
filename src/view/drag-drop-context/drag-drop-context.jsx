@@ -67,6 +67,7 @@ export default class DragDropContext extends React.Component<Props> {
       };
 
       fireHooks(hooks, current, previous);
+
       previous = current;
     });
   }
