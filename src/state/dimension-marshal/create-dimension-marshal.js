@@ -26,7 +26,7 @@ type DraggableEntryMap = {
   [key: DraggableId]: DraggableEntry,
 }
 
-type DropppableEntryMap = {
+type DroppableEntryMap = {
   [key: DroppableId]: DroppableEntry,
 }
 
@@ -51,24 +51,29 @@ type MarshalCallbacks = {|
   cancel: () => void,
 |}
 
-type State = {|
-  droppables: DropppableEntryMap,
+// Not using exact type to allow spread to create a new state object
+type State = {
+  droppables: DroppableEntryMap,
   draggables: DraggableEntryMap,
-  isCollecting: boolean,
   collection: ?Collection,
-|}
+}
 
 // TODO: move into own file
 type GetCollectionOrderFn = {|
   draggable: DraggableDescriptor,
   home: DroppableDescriptor,
-  droppables: DropppableEntryMap,
+  droppables: DroppableEntryMap,
   draggables: DraggableEntryMap,
 |}
 
 type EntryWithScore = {|
   descriptor: DraggableDescriptor | DroppableDescriptor,
   score: number,
+|}
+
+type ToBePublished = {|
+  draggables: DraggableDimension[],
+  droppables: DroppableDimension[],
 |}
 
 const scoreTable = (() => {
@@ -182,14 +187,16 @@ const getCollectionOrder = ({
 };
 
 export default (callbacks: MarshalCallbacks) => {
-  const initial: State = {
+  let state: State = {
     droppables: {},
     draggables: {},
     collection: null,
     isCollecting: false,
   };
 
-  const state: State = initial;
+  const setState = (newState: State) => {
+    state = newState;
+  };
 
   const registerDraggable = (
     descriptor: DraggableDescriptor,
@@ -209,7 +216,15 @@ export default (callbacks: MarshalCallbacks) => {
 
     console.log('publishing draggable entry', entry);
 
-    state.draggables[id] = entry;
+    const draggables: DraggableEntryMap = {
+      ...state.draggables,
+      [id]: entry,
+    };
+
+    setState({
+      ...state,
+      draggables,
+    });
   };
 
   const registerDroppable = (
@@ -230,7 +245,15 @@ export default (callbacks: MarshalCallbacks) => {
 
     console.log('publishing droppable entry', entry);
 
-    state.droppables[id] = entry;
+    const droppables: DroppableEntryMap = {
+      ...state.droppables,
+      [id]: entry,
+    };
+
+    setState({
+      ...state,
+      droppables,
+    });
   };
 
   const unregisterDraggable = (id: DraggableId) => {
@@ -251,21 +274,12 @@ export default (callbacks: MarshalCallbacks) => {
 
   const collect = () => {
     // no longer collecting
-    if (!state.isCollecting) {
-      state.collection = null;
-      return;
-    }
-
-    const collection: ?Collection = state.collection;
-
-    if (!collection) {
-      console.error('cannot collect when there is not collection on the state');
+    if (!state.collection) {
       return;
     }
 
     // All finished!
-    if (!collection.toBeCollected.length && !collection.toBePublishedBuffer.length) {
-      state.collection = null;
+    if (!state.collection.toBeCollected.length && !state.collection.toBePublishedBuffer.length) {
       return;
     }
 
@@ -274,20 +288,19 @@ export default (callbacks: MarshalCallbacks) => {
     // - publishing them into the store(expensive)
     // into two seperate frames
     requestAnimationFrame(() => {
+      const collection: ?Collection = state.collection;
       // within the frame duration we where told to no longer collect
-      if (!state.isCollecting) {
+      if (collection == null) {
         return;
       }
 
-      // if there are things in the buffer - publish them
+      const toBeCollected: OrderedCollectionList = collection.toBeCollected;
+      const toBePublishedBuffer: Array<UnknownDimensionType> = collection.toBePublishedBuffer;
 
-      if (collection.toBePublishedBuffer.length) {
-        type ToBePublished = {|
-          draggables: DraggableDimension[],
-          droppables: DroppableDimension[],
-        |}
+      // if there are dimensions from the previous frame in the buffer - publish them
 
-        const toBePublished: ToBePublished = collection.toBePublishedBuffer.reduce(
+      if (toBePublishedBuffer.length) {
+        const toBePublished: ToBePublished = toBePublishedBuffer.reduce(
           (previous: ToBePublished, dimension: UnknownDimensionType): ToBePublished => {
             if (dimension.placeholder) {
               previous.draggables.push(dimension);
@@ -302,7 +315,17 @@ export default (callbacks: MarshalCallbacks) => {
         callbacks.publishDraggables(toBePublished.draggables);
 
         // clear the buffer
-        collection.toBePublishedBuffer = [];
+        const newCollection: Collection = {
+          draggable: collection.draggable,
+          toBeCollected: collection.toBeCollected,
+          // clear the buffer
+          toBePublishedBuffer: [],
+        };
+
+        setState({
+          ...state,
+          collection: newCollection,
+        });
 
         // continue collecting
         collect();
@@ -310,13 +333,33 @@ export default (callbacks: MarshalCallbacks) => {
 
       // the buffer is empty: start collecting other dimensions
       // obtain targets and remove them from the array
-      const targets: OrderedCollectionList = collection.toBeCollected.splice(0, collectionSize);
+      const newToBeCollected: OrderedCollectionList = toBeCollected.slice(0);
+      const targets: OrderedCollectionList = newToBeCollected.splice(0, collectionSize);
 
-      const buffer: UnknownDimensionType[] = targets.map(
-        (entry: UnknownEntryType): UnknownDimensionType => entry.getDimension()
+      const newToBePublishedBuffer: UnknownDimensionType[] = targets.map(
+        (descriptor: UnknownDescriptorType): UnknownDimensionType => {
+          // is a droppable
+          if (descriptor.type) {
+            return state.droppables[descriptor.id].getDimension();
+          }
+          // is a draggable
+          return state.draggables[descriptor.id].getDimension();
+        }
       );
 
-      collection.toBePublishedBuffer = buffer;
+      const newCollection: Collection = {
+        draggable: collection.draggable,
+        toBeCollected: newToBeCollected,
+        toBePublishedBuffer: newToBePublishedBuffer,
+      };
+
+      setState({
+        ...state,
+        collection: newCollection,
+      });
+
+      // continue collecting
+      collect();
     });
 
     // Need to put
@@ -337,49 +380,77 @@ export default (callbacks: MarshalCallbacks) => {
       return;
     }
 
-    const droppableEntry: ?DroppableEntry = state.droppables[draggableEntry.descriptor.droppableId];
+    const homeEntry: ?DroppableEntry = state.droppables[draggableEntry.descriptor.droppableId];
 
-    if (!droppableEntry) {
+    if (!homeEntry) {
       console.error(`Cannot find home Droppable [id:${draggableEntry.descriptor.droppableId}] for Draggable [id:${id}]`);
       callbacks.cancel();
       return;
     }
 
-    // We are now registering that a drag is occurring
-    state.isCollecting = true;
+    const emptyCollection: Collection = {
+      draggable: draggableEntry.descriptor,
+      toBeCollected: [],
+      toBePublishedBuffer: [],
+    };
+
+    setState({
+      ...state,
+      collection: emptyCollection,
+    });
 
     // Get the minimum dimensions to start a drag
-    const home: DroppableDimension = droppableEntry.getDimension();
-    const draggable: DraggableDimension = draggableEntry.getDimension();
+    const homeDimension: DroppableDimension = homeEntry.getDimension();
+    const draggableDimension: DraggableDimension = draggableEntry.getDimension();
 
-    callbacks.publishDroppables([home]);
-    callbacks.publishDraggables([draggable]);
+    // publishing container first
+    callbacks.publishDroppables([homeDimension]);
+    callbacks.publishDraggables([draggableDimension]);
 
-    // Drag will now have started
-    // - need to figure out the weighted distance to each dimension
-
+    // After this initial publish a drag will start
     setTimeout(() => {
-      // no longer collecting
-      if (!state.isCollecting) {
+      // Drag was cancelled during this timeout
+      if (!state.collection) {
         return;
       }
 
+      // The drag has started and we need to collect all the other dimensions
+
+      const toBeCollected: OrderedCollectionList =
+        getCollectionOrder({
+          draggable: draggableEntry.descriptor,
+          home: homeEntry.descriptor,
+          draggables: state.draggables,
+          droppables: state.droppables,
+        });
+
       const collection: Collection = {
-        draggable,
-        toBeCollected: [],
+        draggable: draggableEntry.descriptor,
+        toBeCollected,
         toBePublishedBuffer: [],
       };
 
-      state.collection = collection;
+      setState({
+        ...state,
+        collection,
+      });
 
       collect();
     });
   };
 
   const stop = () => {
-    if (!state.isCollecting) {
-      console.error('cannot stop capturing dimensions as ');
+    if (!state.collection) {
+      console.warn('not stopping dimension capturing as was not previously capturing');
+      return;
     }
+
+    const newState: State = {
+      ...state,
+      collection: null,
+    };
+
+    setState(newState);
   };
 
   const marshal: Marshal = {
