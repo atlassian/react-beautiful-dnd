@@ -1,47 +1,84 @@
 // @flow
 import { Component } from 'react';
+import type { Node } from 'react';
 import PropTypes from 'prop-types';
 import invariant from 'invariant';
+import memoizeOne from 'memoize-one';
 import getWindowScrollPosition from '../get-window-scroll-position';
 import { getDraggableDimension } from '../../state/dimension';
 import { dimensionMarshalKey } from '../context-keys';
-import type { DraggableDescriptor, DraggableDimension, Spacing, ClientRect } from '../../types';
+import type {
+  DraggableDescriptor,
+  DraggableDimension,
+  Spacing,
+  ClientRect,
+  DraggableId,
+  DroppableId,
+} from '../../types';
 import type { Marshal } from '../../state/dimension-marshal/dimension-marshal-types';
 
 type Props = {|
-  descriptor: DraggableDescriptor,
+  draggableId: DraggableId,
+  droppableId: DroppableId,
+  index: number,
   targetRef: ?HTMLElement,
   children: Node,
 |}
 
-export default class DraggableDimensionPublisher extends Component<Props> {
+type State = {|
+  descriptor: DraggableDescriptor,
+|}
+
+export default class DraggableDimensionPublisher extends Component<Props, State> {
   static contextTypes = {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
   };
 
+  state: State = {
+    descriptor: this.getMemoizedDescriptor(
+      this.props.draggableId,
+      this.props.droppableId,
+      this.props.index
+    ),
+  }
+
   componentDidMount() {
     const marshal: Marshal = this.context.marshal;
-    const descriptor: DraggableDescriptor = this.props.descriptor;
+    const descriptor: DraggableDescriptor = this.state.descriptor;
 
     marshal.registerDraggable(descriptor, this.getDimension);
   }
 
-  componentWillUpdate(nextProps: Props) {
-    // TODO: handle updates to an existing draggable
-    if (this.props.descriptor !== nextProps.descriptor) {
-      console.warn('descriptor changing on mounted draggable', nextProps.descriptor.id);
+  componentWillReceiveProps(nextProps: Props) {
+    const next: DraggableDescriptor = this.getMemoizedDescriptor(
+      nextProps.draggableId,
+      nextProps.droppableId,
+      nextProps.index
+    );
+
+    // TODO
+    if (next !== this.state.descriptor) {
+      console.warn('changing descriptor for Draggable while mounted');
+      console.error('this is current not handled');
     }
   }
 
   componentWillUnmount() {
     const marshal: Marshal = this.context.marshal;
-    const descriptor: DraggableDescriptor = this.props.descriptor;
 
-    marshal.unregisterDraggable(descriptor.id);
+    marshal.unregisterDraggable(this.props.draggableId);
   }
 
+  getMemoizedDescriptor = memoizeOne(
+    (id: DraggableId, droppableId: DroppableId, index: number): DraggableDescriptor => ({
+      id,
+      droppableId,
+      index,
+    }));
+
   getDimension = (): DraggableDimension => {
-    const { descriptor, targetRef } = this.props;
+    const { targetRef } = this.props;
+    const { descriptor } = this.state;
 
     invariant(targetRef, 'DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
 
