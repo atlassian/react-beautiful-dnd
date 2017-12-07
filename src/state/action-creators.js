@@ -81,26 +81,26 @@ export const completeLift = (descriptor: DraggableDescriptor,
   },
 });
 
-export type PublishDraggableDimensionAction = {|
-  type: 'PUBLISH_DRAGGABLE_DIMENSION',
-  payload: DraggableDimension
+export type PublishDraggableDimensionsAction = {|
+  type: 'PUBLISH_DRAGGABLE_DIMENSIONS',
+  payload: DraggableDimension[]
 |}
 
-export const publishDraggableDimension =
-  (dimension: DraggableDimension): PublishDraggableDimensionAction => ({
-    type: 'PUBLISH_DRAGGABLE_DIMENSION',
-    payload: dimension,
+export const publishDraggableDimensions =
+  (dimensions: DraggableDimension[]): PublishDraggableDimensionsAction => ({
+    type: 'PUBLISH_DRAGGABLE_DIMENSIONS',
+    payload: dimensions,
   });
 
-export type PublishDroppableDimensionAction = {|
-  type: 'PUBLISH_DROPPABLE_DIMENSION',
-  payload: DroppableDimension
+export type PublishDroppableDimensionsAction = {|
+  type: 'PUBLISH_DROPPABLE_DIMENSIONS',
+  payload: DroppableDimension[]
 |}
 
-export const publishDroppableDimension =
-  (dimension: DroppableDimension): PublishDroppableDimensionAction => ({
-    type: 'PUBLISH_DROPPABLE_DIMENSION',
-    payload: dimension,
+export const publishDroppableDimensions =
+  (dimensions: DroppableDimension[]): PublishDroppableDimensionsAction => ({
+    type: 'PUBLISH_DROPPABLE_DIMENSIONS',
+    payload: dimensions,
   });
 
 export type UpdateDroppableDimensionScrollAction = {|
@@ -484,8 +484,8 @@ export const lift = (descriptor: DraggableDescriptor,
 export type Action =
   CompleteLiftAction |
   RequestDimensionsAction |
-  PublishDraggableDimensionAction |
-  PublishDroppableDimensionAction |
+  PublishDraggableDimensionsAction |
+  PublishDroppableDimensionsAction |
   UpdateDroppableDimensionScrollAction |
   UpdateDroppableDimensionIsEnabledAction |
   MoveByWindowScrollAction |

@@ -1,16 +1,29 @@
 // @flow
-import type { DraggableId, DroppableId, TypeId } from '../../types';
+import type {
+  DraggableDescriptor,
+  DroppableDescriptor,
+  DraggableDimension,
+  DroppableDimension,
+  DraggableId,
+  State,
+  DroppableId,
+} from '../../types';
+
+export type GetDraggableDimensionFn = () => DraggableDimension;
+export type GetDroppableDimensionFn = () => DroppableDimension;
 
 export type Marshal = {|
-  // TODO: type correctly
-  registerDraggable: Function,
-  registerDroppable: Function,
-  unregisterDraggable: Function,
-  unregisterDroppable: Function,
-  start: Function,
-  stop: Function,
+  registerDraggable: (descriptor: DraggableDescriptor,
+    getDimension: GetDraggableDimensionFn) => void,
+  registerDroppable: (descriptor: DroppableDescriptor,
+    getDimension: GetDroppableDimensionFn) => void,
+  unregisterDraggable: (id: DraggableId) => void,
+  unregisterDroppable: (id: DroppableId) => void,
+  onStateChange: (current: State, previous: State) => void
 |}
 
 export type Callbacks = {|
-
+  cancel: () => void,
+  publishDraggables: (DraggableDimension[]) => void,
+  publishDroppables: (DroppableDimension[]) => void,
 |}

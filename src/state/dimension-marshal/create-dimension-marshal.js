@@ -8,10 +8,12 @@ import type{
   DroppableDimension,
   State as AppState,
 } from '../../types';
-import type { Marshal } from './dimension-marshal-types';
-
-type GetDraggableDimensionFn = () => DraggableDimension;
-type GetDroppableDimensionFn = () => DroppableDimension;
+import type {
+  Marshal,
+  Callbacks,
+  GetDraggableDimensionFn,
+  GetDroppableDimensionFn,
+} from './dimension-marshal-types';
 
 type DroppableEntry = {|
   descriptor: DroppableDescriptor,
@@ -44,12 +46,6 @@ type Collection = {|
   // Dimensions that have been collected from components
   // but have not yet been published to the store
   toBePublishedBuffer: Array<UnknownDimensionType>
-|}
-
-type MarshalCallbacks = {|
-  publishDraggables: (DraggableDimension[]) => void,
-  publishDroppables: (DroppableDimension[]) => void,
-  cancel: () => void,
 |}
 
 // Not using exact type to allow spread to create a new state object
@@ -187,7 +183,7 @@ const getCollectionOrder = ({
   return combined;
 };
 
-export default (callbacks: MarshalCallbacks) => {
+export default (callbacks: Callbacks) => {
   let state: State = {
     droppables: {},
     draggables: {},

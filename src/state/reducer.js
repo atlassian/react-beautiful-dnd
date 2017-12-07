@@ -9,6 +9,8 @@ import type {
   DraggableId,
   DimensionState,
   DraggableDescriptor,
+  DraggableDimensionMap,
+  DroppableDimensionMap,
   DragState,
   DropResult,
   CurrentDrag,
@@ -21,7 +23,6 @@ import type {
   Position,
   InitialDragLocation,
 } from '../types';
-import getInitialImpact from './get-initial-impact';
 import { add, subtract } from './position';
 import noImpact from './no-impact';
 import getDragImpact from './get-drag-impact/';
@@ -53,6 +54,9 @@ type MoveArgs = {|
   // force a custom drag impact
   impact?: DragImpact,
 |}
+
+const canPublishDimension = (phase: Phase): boolean =>
+  ['IDLE', 'DROP_ANIMATING', 'DROP_COMPLETE'].indexOf(phase) === -1;
 
 // TODO: move into own file and write tests
 const move = ({
@@ -129,6 +133,24 @@ const move = ({
   };
 };
 
+const updateStateAfterDimensionAddition = (newState: State): State => {
+  // not dragging yet
+  if (newState.phase === 'COLLECTING_DIMENSIONS') {
+    return newState;
+  }
+
+  // already dragging - need to recalculate impact
+  if (!newState.drag) {
+    console.error('cannot update a draggable dimension in an existing drag as there is invalid drag state');
+    return clean();
+  }
+
+  return move({
+    state: newState,
+    clientSelection: newState.drag.current.client.selection,
+  });
+};
+
 export default (state: State = clean('IDLE'), action: Action): State => {
   if (action.type === 'CLEAN') {
     return clean();
@@ -158,56 +180,60 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     };
   }
 
-  if (action.type === 'PUBLISH_DRAGGABLE_DIMENSION') {
-    const dimension: DraggableDimension = action.payload;
+  if (action.type === 'PUBLISH_DRAGGABLE_DIMENSIONS') {
+    const dimensions: DraggableDimension[] = action.payload;
 
-    if (state.phase !== 'COLLECTING_DIMENSIONS') {
-      console.warn('dimension rejected as no longer requesting dimensions', dimension);
+    if (!canPublishDimension(state.phase)) {
+      console.warn('dimensions rejected as no longer allowing dimension capture in phase', state.phase);
       return state;
     }
 
-    if (state.dimension.draggable[dimension.descriptor.id]) {
-      console.error(`dimension already exists for ${dimension.descriptor.id}`);
-      return state;
-    }
+    const additions: DraggableDimensionMap = dimensions.reduce((previous, current) => {
+      previous[current.descriptor.id] = current;
+      return previous;
+    }, {});
 
-    return {
+    const newState: State = {
       ...state,
       dimension: {
         request: state.dimension.request,
         droppable: state.dimension.droppable,
         draggable: {
           ...state.dimension.draggable,
-          [dimension.descriptor.id]: dimension,
+          ...additions,
         },
       },
     };
+
+    return updateStateAfterDimensionAddition(newState);
   }
 
-  if (action.type === 'PUBLISH_DROPPABLE_DIMENSION') {
-    const dimension: DroppableDimension = action.payload;
+  if (action.type === 'PUBLISH_DROPPABLE_DIMENSIONS') {
+    const dimensions: DroppableDimension[] = action.payload;
 
-    if (state.phase !== 'COLLECTING_DIMENSIONS') {
-      console.warn('dimension rejected as no longer requesting dimensions', dimension);
+    if (!canPublishDimension(state.phase)) {
+      console.warn('dimensions rejected as no longer allowing dimension capture in phase', state.phase);
       return state;
     }
 
-    if (state.dimension.droppable[dimension.descriptor.id]) {
-      console.error(`dimension already exists for ${dimension.descriptor.id}`);
-      return state;
-    }
+    const additions: DroppableDimensionMap = dimensions.reduce((previous, current) => {
+      previous[current.descriptor.id] = current;
+      return previous;
+    }, {});
 
-    return {
+    const newState: State = {
       ...state,
       dimension: {
         request: state.dimension.request,
         draggable: state.dimension.draggable,
         droppable: {
           ...state.dimension.droppable,
-          [dimension.descriptor.id]: dimension,
+          ...additions,
         },
       },
     };
+
+    return updateStateAfterDimensionAddition(newState);
   }
 
   if (action.type === 'COMPLETE_LIFT') {
