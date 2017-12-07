@@ -73,18 +73,21 @@ export default class DragDropContext extends React.Component<Props> {
     let previous: State = this.store.getState();
 
     this.unsubscribe = this.store.subscribe(() => {
+      const previousForThisExecution = previous;
       const current = this.store.getState();
+      // setting previous now incase any of the
+      // functions synchronously trigger more updates
+      previous = current;
 
       // Allowing dynamic hooks by re-capturing the hook functions
       const hooks: Hooks = {
         onDragStart: this.props.onDragStart,
         onDragEnd: this.props.onDragEnd,
       };
-      fireHooks(hooks, current, previous);
+      fireHooks(hooks, current, previousForThisExecution);
 
-      this.marshal.onStateChange(current, previous);
-
-      previous = current;
+      // inform the dimension marshal about updates
+      this.marshal.onStateChange(current, previousForThisExecution);
     });
   }
 

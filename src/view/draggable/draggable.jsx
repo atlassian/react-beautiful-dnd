@@ -8,6 +8,7 @@ import type {
   DraggableDimension,
   InitialDragLocation,
   DraggableDescriptor,
+  DroppableId,
 } from '../../types';
 import DraggableDimensionPublisher from '../draggable-dimension-publisher/';
 import Moveable from '../moveable/';
@@ -105,7 +106,7 @@ export default class Draggable extends Component<Props, State> {
     this.throwIfCannotDrag();
     const { client, isScrollAllowed } = options;
     const { lift, draggableId, index } = this.props;
-    const { droppableId } = this.context;
+    const droppableId: DroppableId = this.context[droppableIdKey];
     const { ref } = this.state;
 
     if (!ref) {
@@ -331,13 +332,14 @@ export default class Draggable extends Component<Props, State> {
       direction,
       disableInteractiveElementBlocking,
     } = this.props;
+    const droppableId: DroppableId = this.context[droppableIdKey];
 
     const speed = this.getSpeed(isDragging, isDropAnimating, canAnimate);
 
     return (
       <DraggableDimensionPublisher
         draggableId={draggableId}
-        droppableId={this.context[droppableIdKey]}
+        droppableId={droppableId}
         index={index}
         targetRef={this.state.ref}
       >

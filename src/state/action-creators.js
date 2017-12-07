@@ -456,7 +456,7 @@ export const lift = (descriptor: DraggableDescriptor,
   dispatch(prepare());
 
   setTimeout(() => {
-    // Phase 2: collect all dimensions
+    // Phase 2: collect initial dimensions
     const state: State = getState();
 
     // drag cancelled before timeout finished
@@ -464,6 +464,7 @@ export const lift = (descriptor: DraggableDescriptor,
       return;
     }
 
+    // will communicate with the marshal to start requesting dimensions
     dispatch(requestDimensions(descriptor));
 
     // Need to allow an opportunity for the dimensions to be requested.

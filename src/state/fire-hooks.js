@@ -32,7 +32,7 @@ export default (hooks: Hooks, current: State, previous: State): void => {
     }
 
     const descriptor: DraggableDescriptor = current.drag.current.descriptor;
-    const home: ?DroppableDimension = current.dimension[descriptor.droppableId];
+    const home: ?DroppableDimension = current.dimension.droppable[descriptor.droppableId];
 
     if (!home) {
       console.error('cannot find dimension for home droppable');
