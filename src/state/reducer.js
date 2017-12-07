@@ -9,7 +9,7 @@ import type {
   DroppableId,
   DraggableId,
   DimensionState,
-  DragImpact,
+  DraggableDescriptor
   DragState,
   DropResult,
   CurrentDrag,
@@ -93,7 +93,7 @@ const move = ({
   };
 
   const current: CurrentDrag = {
-    id: previous.id,
+    descriptor: previous.descriptor,
     isScrollAllowed: previous.isScrollAllowed,
     client,
     page,
@@ -143,14 +143,14 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
-    const draggableId: DraggableId = action.payload;
+    const descriptor: DraggableDescriptor = action.payload;
 
     return {
       phase: 'COLLECTING_DIMENSIONS',
       drag: null,
       drop: null,
       dimension: {
-        request: draggableId,
+        request: descriptor,
         draggable: {},
         droppable: {},
       },
@@ -215,9 +215,9 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
-    const { id, client, windowScroll, isScrollAllowed } = action.payload;
+    const { descriptor, client, windowScroll, isScrollAllowed } = action.payload;
     const draggables: DraggableDimensionMap = state.dimension.draggable;
-    const draggable: DraggableDimension = state.dimension.draggable[id];
+    const draggable: DraggableDimension = state.dimension.draggable[descriptor.id];
     const droppable: DroppableDimension =
       state.dimension.droppable[draggable.descriptor.droppableId];
     const page: InitialDragLocation = {
@@ -246,7 +246,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     };
 
     const current: CurrentDrag = {
-      id,
+      descriptor,
       client: {
         selection: client.selection,
         center: client.center,
@@ -417,7 +417,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
     const result: ?MoveToNextResult = moveToNextIndex({
       isMovingForward,
-      draggableId: existing.current.id,
+      draggableId: existing.current.descriptor.id,
       impact: existing.impact,
       droppable,
       draggables: state.dimension.draggable,
@@ -457,7 +457,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     }
 
     const current: CurrentDrag = state.drag.current;
-    const draggableId: DraggableId = current.id;
+    const draggableId: DraggableId = current.descriptor.id;
     const center: Position = current.page.center;
     const droppableId: DroppableId = state.drag.impact.destination.droppableId;
     const home: DraggableLocation = state.drag.initial.source;

@@ -14,10 +14,12 @@ import type {
   DropTrigger,
   CurrentDrag,
   InitialDrag,
+  DraggableDescriptor,
 } from '../types';
 import noImpact from './no-impact';
 import getNewHomeClientCenter from './get-new-home-client-center';
 import { add, subtract, isEqual } from './position';
+import { DraggableDescriptor } from '../types';
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -47,32 +49,32 @@ const getScrollDiff = ({
 
 export type RequestDimensionsAction = {|
   type: 'REQUEST_DIMENSIONS',
-  payload: DraggableId,
+  payload: DraggableDescriptor,
 |}
 
-export const requestDimensions = (draggableId: DraggableId): RequestDimensionsAction => ({
+export const requestDimensions = (descriptor: DraggableDescriptor): RequestDimensionsAction => ({
   type: 'REQUEST_DIMENSIONS',
-  payload: draggableId,
+  payload: descriptor,
 });
 
 export type CompleteLiftAction = {|
   type: 'COMPLETE_LIFT',
   payload: {|
-    id: DraggableId,
+    descriptor: DraggableDescriptor,
     client: InitialDragLocation,
     windowScroll: Position,
     isScrollAllowed: boolean,
   |}
 |}
 
-export const completeLift = (id: DraggableId,
+export const completeLift = (descriptor: DraggableDescriptor,
   client: InitialDragLocation,
   windowScroll: Position,
   isScrollAllowed: boolean,
 ): CompleteLiftAction => ({
   type: 'COMPLETE_LIFT',
   payload: {
-    id,
+    descriptor,
     client,
     windowScroll,
     isScrollAllowed,
@@ -305,7 +307,7 @@ export const drop = () =>
       null;
 
     const result: DropResult = {
-      draggableId: current.id,
+      draggableId: current.descriptor.id,
       type: home.descriptor.type,
       source: initial.source,
       destination: impact.destination,
@@ -367,7 +369,7 @@ export const cancel = () =>
     const droppable: DroppableDimension = state.dimension.droppable[initial.source.droppableId];
 
     const result: DropResult = {
-      draggableId: current.id,
+      draggableId: current.descriptor.id,
       type: droppable.descriptor.type,
       source: initial.source,
       // no destination when cancelling
@@ -421,7 +423,7 @@ export type LiftAction = {|
   |}
 |}
 
-export const lift = (id: DraggableId,
+export const lift = (descriptor: DraggableDescriptor,
   client: InitialDragLocation,
   windowScroll: Position,
   isScrollAllowed: boolean,
@@ -451,7 +453,7 @@ export const lift = (id: DraggableId,
       return;
     }
 
-    dispatch(requestDimensions(id));
+    dispatch(requestDimensions(descriptor));
 
     // Need to allow an opportunity for the dimensions to be requested.
     setTimeout(() => {
@@ -463,7 +465,7 @@ export const lift = (id: DraggableId,
         return;
       }
 
-      dispatch(completeLift(id, client, windowScroll, isScrollAllowed));
+      dispatch(completeLift(descriptor, client, windowScroll, isScrollAllowed));
     });
   });
 };

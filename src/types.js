@@ -180,7 +180,7 @@ export type CurrentDragLocation = {|
 |}
 
 export type CurrentDrag = {|
-  id: DraggableId,
+  descriptor: DraggableDescriptor,
   // whether scrolling is allowed - otherwise a scroll will cancel the drag
   isScrollAllowed: boolean,
   // viewport
@@ -256,7 +256,7 @@ export type Phase =
   'DROP_COMPLETE';
 
 export type DimensionState = {|
-  request: ?TypeId,
+  request: ?DraggableDescriptor,
   draggable: DraggableDimensionMap,
   droppable: DroppableDimensionMap,
 |};

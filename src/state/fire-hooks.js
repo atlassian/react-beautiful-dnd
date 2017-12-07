@@ -4,6 +4,8 @@ import type {
   Hooks,
   DragStart,
   DropResult,
+  DraggableDescriptor,
+  DroppableDimension,
 } from '../types';
 
 export default (hooks: Hooks, current: State, previous: State): void => {
@@ -28,9 +30,17 @@ export default (hooks: Hooks, current: State, previous: State): void => {
       return;
     }
 
+    const descriptor: DraggableDescriptor = current.drag.current.descriptor;
+    const home: ?DroppableDimension = current.dimension[descriptor.droppableId];
+
+    if (!home) {
+      console.error('cannot find dimension for home droppable');
+      return;
+    }
+
     const start: DragStart = {
-      draggableId: current.drag.current.id,
-      type: current.drag.current.type,
+      draggableId: descriptor.id,
+      type: home.descriptor.type,
       source: current.drag.initial.source,
     };
 
@@ -83,9 +93,18 @@ export default (hooks: Hooks, current: State, previous: State): void => {
       console.error('cannot fire onDragEnd for cancel because cannot find previous drag');
       return;
     }
+
+    const descriptor: DraggableDescriptor = previous.drag.current.descriptor;
+    const home: ?DroppableDimension = previous.dimension[descriptor.droppableId];
+
+    if (!home) {
+      console.error('cannot find dimension for home droppable');
+      return;
+    }
+
     const result: DropResult = {
-      draggableId: previous.drag.current.id,
-      type: previous.drag.current.type,
+      draggableId: descriptor.id,
+      type: home.descriptor.type,
       source: previous.drag.initial.source,
       destination: null,
     };
