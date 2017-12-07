@@ -118,6 +118,8 @@ const move = ({
     previousDroppableOverId,
   }));
 
+  // changing this reference will trigger all Draggables to recompute
+
   const drag: DragState = {
     initial,
     impact: newImpact,

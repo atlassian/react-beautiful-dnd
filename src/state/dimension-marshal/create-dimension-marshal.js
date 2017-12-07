@@ -191,6 +191,7 @@ export default (callbacks: Callbacks) => {
 
         // continue collecting
         collect();
+        return;
       }
 
       // the buffer is empty: start collecting other dimensions
@@ -269,7 +270,7 @@ export default (callbacks: Callbacks) => {
 
     // After this initial publish a drag will start
     setTimeout(() => {
-      // Drag was cleanled during this timeout
+      // Drag was cleaned during this timeout
       if (!state.collection) {
         return;
       }
