@@ -331,12 +331,15 @@ export default (callbacks: Callbacks) => {
         return;
       }
 
+      console.log('starting collection');
       startCollection(descriptor);
     }
 
     // No need to collect any more as the user has finished interacting
     if (currentPhase === 'DROP_ANIMATING' || currentPhase === 'DROP_COMPLETE') {
-      stopCollecting();
+      if (state.collection) {
+        stopCollecting();
+      }
       return;
     }
 

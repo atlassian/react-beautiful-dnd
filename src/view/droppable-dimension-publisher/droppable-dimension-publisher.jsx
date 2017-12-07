@@ -91,7 +91,7 @@ export default class DroppableDimensionPublisher extends Component<Props, State>
   }
 
   componentWillUnmount() {
-    const marshal: Marshal = this.context.marshal;
+    const marshal: Marshal = this.context[dimensionMarshalKey];
     marshal.unregisterDroppable(this.props.droppableId);
   }
 

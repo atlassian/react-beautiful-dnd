@@ -68,7 +68,7 @@ export default class DraggableDimensionPublisher extends Component<Props, State>
   }
 
   componentWillUnmount() {
-    const marshal: Marshal = this.context.marshal;
+    const marshal: Marshal = this.context[dimensionMarshalKey];
 
     marshal.unregisterDraggable(this.props.draggableId);
   }

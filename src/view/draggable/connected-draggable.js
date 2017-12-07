@@ -29,9 +29,10 @@ import type {
   DragState,
   PendingDrop,
   Phase,
-  TypeId,
   DragMovement,
   DraggableDimension,
+  CurrentDrag,
+  DragImpact,
 } from '../../types';
 import type {
   MapProps,
@@ -65,7 +66,6 @@ const preLiftMapProps: MapProps = {
 
 export const makeSelector = (): Selector => {
   const idSelector = (state: State, ownProps: OwnProps): DraggableId => ownProps.draggableId;
-  const typeSelector = (state: State, ownProps: OwnProps): TypeId => ownProps.type || 'DEFAULT';
 
   const memoizedOffset = memoizeOne(
     (x: number, y: number): Position => ({
@@ -110,7 +110,7 @@ export const makeSelector = (): Selector => {
     },
   );
 
-  const draggableSelector = (state: State, ownProps: OwnProps): ?DraggableDimension => {
+  const ownDimensionSelector = (state: State, ownProps: OwnProps): ?DraggableDimension => {
     if (!state.dimension) {
       return null;
     }
@@ -127,32 +127,38 @@ export const makeSelector = (): Selector => {
   return createSelector(
     [
       idSelector,
-      typeSelector,
       phaseSelector,
       dragSelector,
       pendingDropSelector,
-      draggableSelector,
+      ownDimensionSelector,
     ],
     (id: DraggableId,
-      type: TypeId,
       phase: Phase,
       drag: ?DragState,
       pending: ?PendingDrop,
-      dimension: ?DraggableDimension,
+      ownDimension: ?DraggableDimension,
     ): MapProps => {
+      // a lift is in progress - do not let anything start a lift
+      if (phase === 'PREPARING' || phase === 'COLLECTING_DIMENSIONS') {
+        return preLiftMapProps;
+      }
+
+      // may not have the correct type OR has not been collected.
+      // either way this item will not be moving
+      if (!ownDimension) {
+        return defaultMapProps;
+      }
+
       if (phase === 'DRAGGING') {
         if (!drag) {
           console.error('invalid dragging state');
           return defaultMapProps;
         }
 
-        const { current, impact } = drag;
+        const current: CurrentDrag = drag.current;
+        const impact: DragImpact = drag.impact;
 
-        if (current.type !== type) {
-          return defaultMapProps;
-        }
-
-        if (current.id !== id) {
+        if (current.descriptor.id !== id) {
           return getNotDraggingProps(
             id,
             impact.movement,
@@ -172,7 +178,7 @@ export const makeSelector = (): Selector => {
           isDropAnimating: false,
           canAnimate,
           offset,
-          dimension,
+          dimension: ownDimension,
           direction: impact.direction,
         };
       }
@@ -180,10 +186,6 @@ export const makeSelector = (): Selector => {
       if (phase === 'DROP_ANIMATING') {
         if (!pending) {
           console.error('cannot animate drop without a pending drop');
-          return defaultMapProps;
-        }
-
-        if (type !== pending.result.type) {
           return defaultMapProps;
         }
 
@@ -215,15 +217,10 @@ export const makeSelector = (): Selector => {
           // cannot lift something that is dropping
           canLift: false,
           // still need to provide the dimension for the placeholder
-          dimension,
+          dimension: ownDimension,
           // direction no longer needed as drag handle is unbound
           direction: null,
         };
-      }
-
-      // a lift is in progress - do not let anything start a lift
-      if (phase === 'PREPARING' || phase === 'COLLECTING_DIMENSIONS') {
-        return preLiftMapProps;
       }
 
       // All unhandled phases
