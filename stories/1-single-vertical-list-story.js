@@ -27,7 +27,7 @@ const Title = styled.h4`
 
 storiesOf('single vertical list', module)
   .add('simple example', () => (
-    <QuoteApp initial={quotes.slice(0, 3)} />
+    <QuoteApp initial={getQuotes(50)} />
   ))
   .add('with window scrolling', () => (
     <QuoteApp

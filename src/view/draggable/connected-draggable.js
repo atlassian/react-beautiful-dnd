@@ -139,9 +139,11 @@ export const makeSelector = (): Selector => {
       ownDimension: ?DraggableDimension,
     ): MapProps => {
       // a lift is in progress - do not let anything start a lift
-      if (phase === 'PREPARING' || phase === 'COLLECTING_DIMENSIONS') {
-        return preLiftMapProps;
-      }
+
+      // TODO: required?
+      // if (phase === 'PREPARING' || phase === 'COLLECTING_DIMENSIONS') {
+      //   return preLiftMapProps;
+      // }
 
       // may not have the correct type OR has not been collected.
       // either way this item will not be moving
