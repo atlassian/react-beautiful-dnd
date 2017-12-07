@@ -4,13 +4,20 @@ import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
 import fireHooks from '../../state/fire-hooks';
 import createDimensionMarshal from '../../state/dimension-marshal/create-dimension-marshal';
-import type { Marshal } from '../../state/dimension-marshal/dimension-marshal-types';
+import type { Marshal, Callbacks as MarshalCallbacks } from '../../state/dimension-marshal/dimension-marshal-types';
 import type {
   Store,
   State,
   Hooks,
+  DraggableDimension,
+  DroppableDimension,
 } from '../../types';
 import { storeKey, dimensionMarshalKey } from '../context-keys';
+import {
+  clean,
+  publishDraggableDimensions,
+  publishDroppableDimensions,
+} from '../../state/action-creators';
 
 type Props = {|
   ...Hooks,
@@ -40,7 +47,6 @@ export default class DragDropContext extends React.Component<Props> {
   /* eslint-enable */
 
   getChildContext(): Context {
-    console.log('putting marshal on context', this.marshal);
     return {
       [storeKey]: this.store,
       [dimensionMarshalKey]: this.marshal,
@@ -49,7 +55,20 @@ export default class DragDropContext extends React.Component<Props> {
 
   componentWillMount() {
     this.store = createStore();
-    this.marshal = createDimensionMarshal(this.store.dispatch);
+
+    // set up the dimension marshal
+    const callbacks: MarshalCallbacks = {
+      cancel: () => {
+        this.store.dispatch(clean());
+      },
+      publishDraggables: (dimensions: DraggableDimension[]) => {
+        this.store.dispatch(publishDraggableDimensions(dimensions));
+      },
+      publishDroppables: (dimensions: DroppableDimension[]) => {
+        this.store.dispatch(publishDroppableDimensions(dimensions));
+      },
+    };
+    this.marshal = createDimensionMarshal(callbacks);
 
     let previous: State = this.store.getState();
 
