@@ -1,4 +1,5 @@
 // @flow
+/* eslint-disable react/no-multi-comp */
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Droppable, Draggable } from '../../../src';
@@ -55,9 +56,26 @@ type Props = {|
   ignoreContainerClipping?: boolean,
 |}
 
-export default class QuoteList extends Component<Props> {
-  renderQuotes = (dropProvided: DroppableProvided) => {
-    const { quotes } = this.props;
+type InnerListProps = {|
+  dropProvided: DroppableProvided,
+  dropSnapshot: DroppableStateSnapshot,
+  quotes: Quote[],
+  title: ?string,
+  autoFocusQuoteId: ?string,
+|}
+
+class InnerList extends Component<InnerListProps> {
+  shouldComponentUpdate(nextProps: InnerListProps) {
+    // do not render list if the only thing changing is whether the list is being dragged over
+    // this will prevent the entire list from rendering when dragging over
+    if (nextProps.dropSnapshot.isDraggingOver !== this.props.dropSnapshot.isDraggingOver) {
+      return false;
+    }
+    return true;
+  }
+
+  render() {
+    const { quotes, dropProvided } = this.props;
     const title = this.props.title ? (
       <Title>{this.props.title}</Title>
     ) : null;
@@ -87,7 +105,9 @@ export default class QuoteList extends Component<Props> {
       </Container>
     );
   }
+}
 
+export default class QuoteList extends Component<Props> {
   render() {
     const {
       ignoreContainerClipping,
@@ -97,6 +117,9 @@ export default class QuoteList extends Component<Props> {
       listIndex,
       listType,
       style,
+      quotes,
+      autoFocusQuoteId,
+      title,
     } = this.props;
 
     return (
@@ -115,10 +138,22 @@ export default class QuoteList extends Component<Props> {
           >
             {internalScroll ? (
               <ScrollContainer>
-                {this.renderQuotes(dropProvided)}
+                <InnerList
+                  quotes={quotes}
+                  title={title}
+                  dropProvided={dropProvided}
+                  dropSnapshot={dropSnapshot}
+                  autoFocusQuoteId={autoFocusQuoteId}
+                />
               </ScrollContainer>
             ) : (
-              this.renderQuotes(dropProvided)
+              <InnerList
+                quotes={quotes}
+                title={title}
+                dropProvided={dropProvided}
+                dropSnapshot={dropSnapshot}
+                autoFocusQuoteId={autoFocusQuoteId}
+              />
             )}
           </Wrapper>
         )}

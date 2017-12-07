@@ -1,5 +1,6 @@
 // @flow
 import getCollectionOrder from './get-collection-order';
+import Perf from 'react-addons-perf';
 import type{
   DraggableId,
   DroppableId,
@@ -46,7 +47,7 @@ type ToBePublished = {|
   droppables: DroppableDimension[],
 |}
 
-const collectionSize: number = 4;
+const collectionSize: number = 100;
 
 export default (callbacks: Callbacks) => {
   let state: State = {
@@ -162,6 +163,8 @@ export default (callbacks: Callbacks) => {
       // if there are dimensions from the previous frame in the buffer - publish them
 
       if (toBePublishedBuffer.length) {
+        Perf.start();
+        console.time('flushing buffer');
         const toBePublished: ToBePublished = toBePublishedBuffer.reduce(
           (previous: ToBePublished, dimension: UnknownDimensionType): ToBePublished => {
             if (dimension.placeholder) {
@@ -175,6 +178,10 @@ export default (callbacks: Callbacks) => {
 
         callbacks.publishDroppables(toBePublished.droppables);
         callbacks.publishDraggables(toBePublished.draggables);
+        console.timeEnd('flushing buffer');
+        Perf.stop();
+        const measurements = Perf.getLastMeasurements();
+        Perf.printInclusive(measurements);
 
         // clear the buffer
         const newCollection: Collection = {
@@ -199,6 +206,8 @@ export default (callbacks: Callbacks) => {
       const newToBeCollected: OrderedCollectionList = toBeCollected.slice(0);
       const targets: OrderedCollectionList = newToBeCollected.splice(0, collectionSize);
 
+      console.time('requesting dimensions');
+
       const newToBePublishedBuffer: UnknownDimensionType[] = targets.map(
         (descriptor: UnknownDescriptorType): UnknownDimensionType => {
           // is a droppable
@@ -209,6 +218,8 @@ export default (callbacks: Callbacks) => {
           return state.draggables[descriptor.id].getDimension();
         }
       );
+
+      console.timeEnd('requesting dimensions');
 
       const newCollection: Collection = {
         draggable: collection.draggable,

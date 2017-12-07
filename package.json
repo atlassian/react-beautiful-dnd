@@ -71,6 +71,7 @@
     "jest": "^21.2.1",
     "raf-stub": "^2.0.1",
     "react": "^15.6.1",
+    "react-addons-perf": "^15.4.2",
     "react-dom": "^15.6.1",
     "react-test-renderer": "^16.2.0",
     "rimraf": "^2.6.2",

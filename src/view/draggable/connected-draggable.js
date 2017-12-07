@@ -93,10 +93,13 @@ export const makeSelector = (): Selector => {
       const needsToMove = movement.draggables.indexOf(draggableId) !== -1;
 
       if (!needsToMove) {
-        return getWithMovement(
-          origin,
-          canLift
-        );
+        // TEMP
+        // canAnimate?
+        return defaultMapProps;
+        // return getWithMovement(
+        //   origin,
+        //   canLift
+        // );
       }
 
       const amount: Position = movement.isBeyondStartPosition ?
