@@ -5,14 +5,14 @@ import type {
   State,
   DraggableDimension,
   DroppableDimension,
-  DraggableDimensionMap,
   DroppableId,
   DraggableId,
   DimensionState,
-  DraggableDescriptor
+  DraggableDescriptor,
   DragState,
   DropResult,
   CurrentDrag,
+  DragImpact,
   InitialDrag,
   PendingDrop,
   Phase,
@@ -23,6 +23,7 @@ import type {
 } from '../types';
 import getInitialImpact from './get-initial-impact';
 import { add, subtract } from './position';
+import noImpact from './no-impact';
 import getDragImpact from './get-drag-impact/';
 import moveToNextIndex from './move-to-next-index/';
 import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
@@ -107,7 +108,7 @@ const move = ({
 
   const newImpact: DragImpact = (impact || getDragImpact({
     pageCenter: page.center,
-    draggable: state.dimension.draggable[current.id],
+    draggable: state.dimension.draggable[current.descriptor.id],
     draggables: state.dimension.draggable,
     droppables: state.dimension.droppable,
     previousDroppableOverId,
@@ -216,30 +217,12 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     }
 
     const { descriptor, client, windowScroll, isScrollAllowed } = action.payload;
-    const draggables: DraggableDimensionMap = state.dimension.draggable;
-    const draggable: DraggableDimension = state.dimension.draggable[descriptor.id];
-    const droppable: DroppableDimension =
-      state.dimension.droppable[draggable.descriptor.droppableId];
     const page: InitialDragLocation = {
       selection: add(client.selection, windowScroll),
       center: add(client.center, windowScroll),
     };
 
-    const impact: ?DragImpact = getInitialImpact({
-      draggable,
-      droppable,
-      draggables,
-    });
-
-    if (!impact || !impact.destination) {
-      console.error('invalid lift state');
-      return clean();
-    }
-
-    const source: DraggableLocation = impact.destination;
-
     const initial: InitialDrag = {
-      source,
       client,
       page,
       windowScroll,
@@ -268,7 +251,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       drag: {
         initial,
         current,
-        impact,
+        impact: noImpact,
       },
     };
   }
@@ -460,7 +443,10 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const draggableId: DraggableId = current.descriptor.id;
     const center: Position = current.page.center;
     const droppableId: DroppableId = state.drag.impact.destination.droppableId;
-    const home: DraggableLocation = state.drag.initial.source;
+    const home: DraggableLocation = {
+      index: state.drag.current.descriptor.index,
+      droppableId: state.drag.current.descriptor.droppableId,
+    };
 
     const result: ?MoveCrossAxisResult = moveCrossAxis({
       isMovingForward: action.type === 'CROSS_AXIS_MOVE_FORWARD',

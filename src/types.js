@@ -160,7 +160,6 @@ export type InitialDragLocation = {|
 |}
 
 export type InitialDrag = {|
-  source: DraggableLocation,
   // relative to the viewport when the drag started
   client: InitialDragLocation,
   // viewport + window scroll (position relative to 0, 0)

@@ -4,6 +4,7 @@ import type {
   Hooks,
   DragStart,
   DropResult,
+  DraggableLocation,
   DraggableDescriptor,
   DroppableDimension,
 } from '../types';
@@ -38,10 +39,15 @@ export default (hooks: Hooks, current: State, previous: State): void => {
       return;
     }
 
+    const source: DraggableLocation = {
+      index: descriptor.index,
+      droppableId: descriptor.droppableId,
+    };
+
     const start: DragStart = {
       draggableId: descriptor.id,
       type: home.descriptor.type,
-      source: current.drag.initial.source,
+      source,
     };
 
     onDragStart(start);
@@ -102,10 +108,15 @@ export default (hooks: Hooks, current: State, previous: State): void => {
       return;
     }
 
+    const source: DraggableLocation = {
+      index: descriptor.index,
+      droppableId: descriptor.droppableId,
+    };
+
     const result: DropResult = {
       draggableId: descriptor.id,
       type: home.descriptor.type,
-      source: previous.drag.initial.source,
+      source,
       destination: null,
     };
     onDragEnd(result);

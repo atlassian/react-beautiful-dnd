@@ -8,6 +8,7 @@ import type {
   DraggableDimension,
   DroppableDimension,
   InitialDragLocation,
+  DraggableLocation,
   Position,
   Dispatch,
   State,
@@ -19,7 +20,6 @@ import type {
 import noImpact from './no-impact';
 import getNewHomeClientCenter from './get-new-home-client-center';
 import { add, subtract, isEqual } from './position';
-import { DraggableDescriptor } from '../types';
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -300,16 +300,21 @@ export const drop = () =>
     }
 
     const { impact, initial, current } = state.drag;
-    const draggable: DraggableDimension = state.dimension.draggable[current.id];
+    const draggable: DraggableDimension = state.dimension.draggable[current.descriptor.id];
     const home: DroppableDimension = state.dimension.droppable[draggable.descriptor.droppableId];
     const destination: ?DroppableDimension = impact.destination ?
       state.dimension.droppable[impact.destination.droppableId] :
       null;
 
+    const source: DraggableLocation = {
+      droppableId: current.descriptor.droppableId,
+      index: current.descriptor.index,
+    };
+
     const result: DropResult = {
       draggableId: current.descriptor.id,
       type: home.descriptor.type,
-      source: initial.source,
+      source,
       destination: impact.destination,
     };
 
@@ -366,12 +371,18 @@ export const cancel = () =>
     }
 
     const { initial, current } = state.drag;
-    const droppable: DroppableDimension = state.dimension.droppable[initial.source.droppableId];
+    const descriptor = current.descriptor;
+    const home: DroppableDimension = state.dimension.droppable[descriptor.droppableId];
+
+    const source: DraggableLocation = {
+      index: current.descriptor.index,
+      droppableId: current.descriptor.droppableId,
+    };
 
     const result: DropResult = {
       draggableId: current.descriptor.id,
-      type: droppable.descriptor.type,
-      source: initial.source,
+      type: home.descriptor.type,
+      source,
       // no destination when cancelling
       destination: null,
     };
@@ -383,7 +394,7 @@ export const cancel = () =>
       return;
     }
 
-    const scrollDiff: Position = getScrollDiff({ initial, current, droppable });
+    const scrollDiff: Position = getScrollDiff({ initial, current, droppable: home });
 
     dispatch(animateDrop({
       trigger: 'CANCEL',
