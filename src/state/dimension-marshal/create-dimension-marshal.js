@@ -6,6 +6,7 @@ import type{
   DraggableDescriptor,
   DraggableDimension,
   DroppableDimension,
+  State as AppState,
 } from '../../types';
 import type { Marshal } from './dimension-marshal-types';
 
@@ -364,17 +365,17 @@ export default (callbacks: MarshalCallbacks) => {
     });
   };
 
-  const startCollection = (id: DraggableId) => {
+  const startCollection = (descriptor: DraggableDescriptor) => {
     if (state.dragging) {
       console.error('Cannot start capturing dimensions for a drag it is already dragging');
       callbacks.cancel();
       return;
     }
 
-    const draggableEntry: ?DraggableEntry = state.draggables[id];
+    const draggableEntry: ?DraggableEntry = state.draggables[descriptor.id];
 
     if (!draggableEntry) {
-      console.error(`Cannot find Draggable with id ${id} to start collecting dimensions`);
+      console.error(`Cannot find Draggable with id ${descriptor.id} to start collecting dimensions`);
       callbacks.cancel();
       return;
     }
@@ -382,7 +383,7 @@ export default (callbacks: MarshalCallbacks) => {
     const homeEntry: ?DroppableEntry = state.droppables[draggableEntry.descriptor.droppableId];
 
     if (!homeEntry) {
-      console.error(`Cannot find home Droppable [id:${draggableEntry.descriptor.droppableId}] for Draggable [id:${id}]`);
+      console.error(`Cannot find home Droppable [id:${draggableEntry.descriptor.droppableId}] for Draggable [id:${descriptor.id}]`);
       callbacks.cancel();
       return;
     }
@@ -453,8 +454,8 @@ export default (callbacks: MarshalCallbacks) => {
   };
 
   const onStateChange = (current: AppState, previous: AppState) => {
-    const currentPhase = current.phase;
-    const previousPhase = previous.phase;
+    const currentPhase: string = current.phase;
+    const previousPhase: string = previous.phase;
 
     // Exit early if phase in unchanged
     if (currentPhase === previousPhase) {
@@ -462,15 +463,15 @@ export default (callbacks: MarshalCallbacks) => {
     }
 
     if (currentPhase === 'COLLECTING_DIMENSIONS') {
-      const draggableId: ?DraggableId = current.dimension.request;
+      const descriptor: ?DraggableDescriptor = current.dimension.request;
 
-      if (!draggableId) {
+      if (!descriptor) {
         console.error('could not find requested draggable id in state');
         callbacks.cancel();
         return;
       }
 
-      startCollection(draggableId);
+      startCollection(descriptor);
     }
 
     // No need to collect any more as the user has finished interacting

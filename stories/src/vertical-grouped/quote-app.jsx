@@ -98,12 +98,13 @@ export default class QuoteApp extends Component<Props, State> {
       >
         <Root>
           <Column>
-            {Object.keys(quoteMap).map((key: string) => (
+            {Object.keys(quoteMap).map((key: string, index: number) => (
               <Group key={key}>
                 <Title>{key}</Title>
                 <QuoteList
                   quotes={quoteMap[key]}
                   listId={key}
+                  listIndex={index}
                   listType={key}
                 />
               </Group>
