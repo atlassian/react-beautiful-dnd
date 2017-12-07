@@ -49,11 +49,7 @@ export default class DragDropContext extends React.Component<Props> {
 
   componentWillMount() {
     this.store = createStore();
-    this.marshal = createDimensionMarshal({
-      publishDraggables: (...args) => console.log('publishing draggables', args),
-      publishDroppables: (...args) => console.log('publishing droppables', args),
-      cancel: () => console.warn('cancel from dimension publisher'),
-    });
+    this.marshal = createDimensionMarshal(this.store.dispatch);
 
     let previous: State = this.store.getState();
 

@@ -1,4 +1,9 @@
 // @flow
+import {
+  publishDraggableDimensions,
+  publishDroppableDimensions,
+  clean,
+} from '../action-creators';
 import type{
   DraggableId,
   DroppableId,
@@ -7,10 +12,10 @@ import type{
   DraggableDimension,
   DroppableDimension,
   State as AppState,
+  Dispatch,
 } from '../../types';
 import type {
   Marshal,
-  Callbacks,
   GetDraggableDimensionFn,
   GetDroppableDimensionFn,
 } from './dimension-marshal-types';
@@ -183,16 +188,31 @@ const getCollectionOrder = ({
   return combined;
 };
 
-export default (callbacks: Callbacks) => {
+export default (dispatch: Dispatch) => {
   let state: State = {
     droppables: {},
     draggables: {},
     collection: null,
-    isCollecting: false,
   };
 
   const setState = (newState: State) => {
     state = newState;
+  };
+
+  const cancel = () => {
+    setState({
+      ...state,
+      collection: null,
+    });
+    dispatch(clean());
+  };
+
+  const publishDroppables = (dimensions: DroppableDimension[]) => {
+    dispatch(publishDroppableDimensions(dimensions));
+  };
+
+  const publishDraggables = (dimensions: DraggableDimension[]) => {
+    dispatch(publishDraggableDimensions(dimensions));
   };
 
   const registerDraggable = (
@@ -309,8 +329,8 @@ export default (callbacks: Callbacks) => {
           }, { draggables: [], droppables: [] }
         );
 
-        callbacks.publishDroppables(toBePublished.droppables);
-        callbacks.publishDraggables(toBePublished.draggables);
+        publishDroppables(toBePublished.droppables);
+        publishDraggables(toBePublished.draggables);
 
         // clear the buffer
         const newCollection: Collection = {
@@ -364,7 +384,7 @@ export default (callbacks: Callbacks) => {
   const startCollection = (descriptor: DraggableDescriptor) => {
     if (state.dragging) {
       console.error('Cannot start capturing dimensions for a drag it is already dragging');
-      callbacks.cancel();
+      cancel();
       return;
     }
 
@@ -372,7 +392,7 @@ export default (callbacks: Callbacks) => {
 
     if (!draggableEntry) {
       console.error(`Cannot find Draggable with id ${descriptor.id} to start collecting dimensions`);
-      callbacks.cancel();
+      cancel();
       return;
     }
 
@@ -380,7 +400,7 @@ export default (callbacks: Callbacks) => {
 
     if (!homeEntry) {
       console.error(`Cannot find home Droppable [id:${draggableEntry.descriptor.droppableId}] for Draggable [id:${descriptor.id}]`);
-      callbacks.cancel();
+      cancel();
       return;
     }
 
@@ -400,12 +420,12 @@ export default (callbacks: Callbacks) => {
     const draggableDimension: DraggableDimension = draggableEntry.getDimension();
 
     // publishing container first
-    callbacks.publishDroppables([homeDimension]);
-    callbacks.publishDraggables([draggableDimension]);
+    publishDroppables([homeDimension]);
+    publishDraggables([draggableDimension]);
 
     // After this initial publish a drag will start
     setTimeout(() => {
-      // Drag was cancelled during this timeout
+      // Drag was cleanled during this timeout
       if (!state.collection) {
         return;
       }
@@ -463,7 +483,7 @@ export default (callbacks: Callbacks) => {
 
       if (!descriptor) {
         console.error('could not find requested draggable id in state');
-        callbacks.cancel();
+        cancel();
         return;
       }
 
@@ -476,7 +496,7 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    // drag potentially cancelled
+    // drag potentially cleanled
     if (currentPhase === 'IDLE') {
       if (state.collection) {
         stopCollecting();
