@@ -52,7 +52,6 @@ export default class Draggable extends Component<Props, State> {
 
   static defaultProps: DefaultProps = {
     isDragDisabled: false,
-    type: 'DEFAULT',
     // cannot drag interactive elements by default
     disableInteractiveElementBlocking: false,
   }
@@ -104,7 +103,7 @@ export default class Draggable extends Component<Props, State> {
   onLift = (options: {client: Position, isScrollAllowed: boolean}) => {
     this.throwIfCannotDrag();
     const { client, isScrollAllowed } = options;
-    const { lift, draggableId, type } = this.props;
+    const { lift, draggableId } = this.props;
     const { ref } = this.state;
 
     if (!ref) {
@@ -118,7 +117,7 @@ export default class Draggable extends Component<Props, State> {
 
     const windowScroll: Position = getWindowScrollPosition();
 
-    lift(draggableId, type, initial, windowScroll, isScrollAllowed);
+    lift(draggableId, initial, windowScroll, isScrollAllowed);
   }
 
   onMove = (client: Position) => {

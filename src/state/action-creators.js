@@ -47,19 +47,18 @@ const getScrollDiff = ({
 
 export type RequestDimensionsAction = {|
   type: 'REQUEST_DIMENSIONS',
-  payload: TypeId
+  payload: DraggableId,
 |}
 
-export const requestDimensions = (type: TypeId): RequestDimensionsAction => ({
+export const requestDimensions = (draggableId: DraggableId): RequestDimensionsAction => ({
   type: 'REQUEST_DIMENSIONS',
-  payload: type,
+  payload: draggableId,
 });
 
 export type CompleteLiftAction = {|
   type: 'COMPLETE_LIFT',
   payload: {|
     id: DraggableId,
-    type: TypeId,
     client: InitialDragLocation,
     windowScroll: Position,
     isScrollAllowed: boolean,
@@ -67,7 +66,6 @@ export type CompleteLiftAction = {|
 |}
 
 export const completeLift = (id: DraggableId,
-  type: TypeId,
   client: InitialDragLocation,
   windowScroll: Position,
   isScrollAllowed: boolean,
@@ -75,7 +73,6 @@ export const completeLift = (id: DraggableId,
   type: 'COMPLETE_LIFT',
   payload: {
     id,
-    type,
     client,
     windowScroll,
     isScrollAllowed,
@@ -309,7 +306,7 @@ export const drop = () =>
 
     const result: DropResult = {
       draggableId: current.id,
-      type: current.type,
+      type: home.descriptor.type,
       source: initial.source,
       destination: impact.destination,
     };
@@ -371,7 +368,7 @@ export const cancel = () =>
 
     const result: DropResult = {
       draggableId: current.id,
-      type: current.type,
+      type: droppable.descriptor.type,
       source: initial.source,
       // no destination when cancelling
       destination: null,
@@ -425,7 +422,6 @@ export type LiftAction = {|
 |}
 
 export const lift = (id: DraggableId,
-  type: TypeId,
   client: InitialDragLocation,
   windowScroll: Position,
   isScrollAllowed: boolean,
@@ -455,7 +451,7 @@ export const lift = (id: DraggableId,
       return;
     }
 
-    dispatch(requestDimensions(type));
+    dispatch(requestDimensions(id));
 
     // Need to allow an opportunity for the dimensions to be requested.
     setTimeout(() => {
@@ -467,7 +463,7 @@ export const lift = (id: DraggableId,
         return;
       }
 
-      dispatch(completeLift(id, type, client, windowScroll, isScrollAllowed));
+      dispatch(completeLift(id, client, windowScroll, isScrollAllowed));
     });
   });
 };

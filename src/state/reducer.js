@@ -1,6 +1,6 @@
 // @flow
 import memoizeOne from 'memoize-one';
-import type { TypeId,
+import type {
   Action,
   State,
   DraggableDimension,
@@ -94,7 +94,6 @@ const move = ({
 
   const current: CurrentDrag = {
     id: previous.id,
-    type: previous.type,
     isScrollAllowed: previous.isScrollAllowed,
     client,
     page,
@@ -144,14 +143,14 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
-    const typeId: TypeId = action.payload;
+    const draggableId: DraggableId = action.payload;
 
     return {
       phase: 'COLLECTING_DIMENSIONS',
       drag: null,
       drop: null,
       dimension: {
-        request: typeId,
+        request: draggableId,
         draggable: {},
         droppable: {},
       },
@@ -216,7 +215,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
-    const { id, type, client, windowScroll, isScrollAllowed } = action.payload;
+    const { id, client, windowScroll, isScrollAllowed } = action.payload;
     const draggables: DraggableDimensionMap = state.dimension.draggable;
     const draggable: DraggableDimension = state.dimension.draggable[id];
     const droppable: DroppableDimension =
@@ -248,7 +247,6 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
     const current: CurrentDrag = {
       id,
-      type,
       client: {
         selection: client.selection,
         center: client.center,

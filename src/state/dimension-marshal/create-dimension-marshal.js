@@ -286,7 +286,8 @@ export default (callbacks: MarshalCallbacks) => {
     // Splitting the act of
     // - collecting dimensions(expensive) and
     // - publishing them into the store(expensive)
-    // into two seperate frames
+    // into two seperate frames.
+    //
     requestAnimationFrame(() => {
       const collection: ?Collection = state.collection;
       // within the frame duration we where told to no longer collect
@@ -361,11 +362,9 @@ export default (callbacks: MarshalCallbacks) => {
       // continue collecting
       collect();
     });
-
-    // Need to put
   };
 
-  const start = (id: DraggableId) => {
+  const startCollection = (id: DraggableId) => {
     if (state.dragging) {
       console.error('Cannot start capturing dimensions for a drag it is already dragging');
       callbacks.cancel();
@@ -439,7 +438,7 @@ export default (callbacks: MarshalCallbacks) => {
     });
   };
 
-  const stop = () => {
+  const stopCollecting = () => {
     if (!state.collection) {
       console.warn('not stopping dimension capturing as was not previously capturing');
       return;
@@ -453,13 +452,47 @@ export default (callbacks: MarshalCallbacks) => {
     setState(newState);
   };
 
+  const onStateChange = (current: AppState, previous: AppState) => {
+    const currentPhase = current.phase;
+    const previousPhase = previous.phase;
+
+    // Exit early if phase in unchanged
+    if (currentPhase === previousPhase) {
+      return;
+    }
+
+    if (currentPhase === 'COLLECTING_DIMENSIONS') {
+      const draggableId: ?DraggableId = current.dimension.request;
+
+      if (!draggableId) {
+        console.error('could not find requested draggable id in state');
+        callbacks.cancel();
+        return;
+      }
+
+      startCollection(draggableId);
+    }
+
+    // No need to collect any more as the user has finished interacting
+    if (currentPhase === 'DROP_ANIMATING' || currentPhase === 'DROP_COMPLETE') {
+      stopCollecting();
+      return;
+    }
+
+    // drag potentially cancelled
+    if (currentPhase === 'IDLE') {
+      if (state.collection) {
+        stopCollecting();
+      }
+    }
+  };
+
   const marshal: Marshal = {
     registerDraggable,
     registerDroppable,
     unregisterDraggable,
     unregisterDroppable,
-    start,
-    stop,
+    onStateChange,
   };
 
   return marshal;
