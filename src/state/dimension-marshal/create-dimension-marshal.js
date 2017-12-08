@@ -76,8 +76,6 @@ export default (callbacks: Callbacks) => {
       getDimension,
     };
 
-    console.log('publishing draggable entry', entry);
-
     const draggables: DraggableEntryMap = {
       ...state.draggables,
       [id]: entry,
@@ -162,7 +160,7 @@ export default (callbacks: Callbacks) => {
 
       // if there are dimensions from the previous frame in the buffer - publish them
 
-      if (toBePublishedBuffer.length) {
+      if (!toBeCollected.length) {
         Perf.start();
         console.time('flushing buffer');
         const toBePublished: ToBePublished = toBePublishedBuffer.reduce(
@@ -196,8 +194,7 @@ export default (callbacks: Callbacks) => {
           collection: newCollection,
         });
 
-        // continue collecting
-        collect();
+        // all finished
         return;
       }
 
@@ -208,7 +205,7 @@ export default (callbacks: Callbacks) => {
 
       console.time('requesting dimensions');
 
-      const newToBePublishedBuffer: UnknownDimensionType[] = targets.map(
+      const additions: UnknownDimensionType[] = targets.map(
         (descriptor: UnknownDescriptorType): UnknownDimensionType => {
           // is a droppable
           if (descriptor.type) {
@@ -224,7 +221,7 @@ export default (callbacks: Callbacks) => {
       const newCollection: Collection = {
         draggable: collection.draggable,
         toBeCollected: newToBeCollected,
-        toBePublishedBuffer: newToBePublishedBuffer,
+        toBePublishedBuffer: [...toBePublishedBuffer, ...additions],
       };
 
       setState({
@@ -343,7 +340,6 @@ export default (callbacks: Callbacks) => {
         return;
       }
 
-      console.log('starting collection');
       startCollection(descriptor);
     }
 
