@@ -49,7 +49,7 @@ const clean = memoizeOne((phase?: Phase = 'IDLE'): State => ({
 type MoveArgs = {|
   state: State,
   clientSelection: Position,
-  shouldAnimate?: boolean,
+  shouldAnimate: boolean,
   windowScroll ?: Position,
   // force a custom drag impact
   impact?: DragImpact,
@@ -62,7 +62,7 @@ const canPublishDimension = (phase: Phase): boolean =>
 const move = ({
   state,
   clientSelection,
-  shouldAnimate = false,
+  shouldAnimate,
   windowScroll,
   impact,
 }: MoveArgs): State => {
@@ -150,6 +150,7 @@ const updateStateAfterDimensionAddition = (newState: State): State => {
   return move({
     state: newState,
     clientSelection: newState.drag.current.client.selection,
+    shouldAnimate: newState.drag.current.shouldAnimate,
   });
 };
 
@@ -326,7 +327,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       },
     };
 
-    const withUpdatedDimension: State = {
+    const newState: State = {
       ...state,
       dimension: {
         request: state.dimension.request,
@@ -339,8 +340,9 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     };
 
     return move({
-      state: withUpdatedDimension,
+      state: newState,
       clientSelection: state.drag.current.client.selection,
+      shouldAnimate: state.drag.current.shouldAnimate,
     });
   }
 
@@ -385,6 +387,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       state,
       clientSelection: client,
       windowScroll,
+      shouldAnimate: false,
     });
   }
 
@@ -400,6 +403,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       state,
       clientSelection: state.drag.current.client.selection,
       windowScroll,
+      shouldAnimate: false,
     });
   }
 
