@@ -47,7 +47,7 @@ type ToBePublished = {|
   droppables: DroppableDimension[],
 |}
 
-const collectionSize: number = 100;
+const collectionSize: number = 5;
 
 export default (callbacks: Callbacks) => {
   let state: State = {
@@ -102,8 +102,6 @@ export default (callbacks: Callbacks) => {
       descriptor,
       getDimension,
     };
-
-    console.log('publishing droppable entry', entry);
 
     const droppables: DroppableEntryMap = {
       ...state.droppables,
@@ -160,8 +158,8 @@ export default (callbacks: Callbacks) => {
 
       // if there are dimensions from the previous frame in the buffer - publish them
 
-      if (!toBeCollected.length) {
-        Perf.start();
+      if (toBePublishedBuffer.length) {
+        // Perf.start();
         console.time('flushing buffer');
         const toBePublished: ToBePublished = toBePublishedBuffer.reduce(
           (previous: ToBePublished, dimension: UnknownDimensionType): ToBePublished => {
@@ -177,9 +175,9 @@ export default (callbacks: Callbacks) => {
         callbacks.publishDroppables(toBePublished.droppables);
         callbacks.publishDraggables(toBePublished.draggables);
         console.timeEnd('flushing buffer');
-        Perf.stop();
-        const measurements = Perf.getLastMeasurements();
-        Perf.printInclusive(measurements);
+        // Perf.stop();
+        // const measurements = Perf.getLastMeasurements();
+        // Perf.printInclusive(measurements);
 
         // clear the buffer
         const newCollection: Collection = {
@@ -194,7 +192,7 @@ export default (callbacks: Callbacks) => {
           collection: newCollection,
         });
 
-        // all finished
+        collect();
         return;
       }
 
@@ -203,7 +201,7 @@ export default (callbacks: Callbacks) => {
       const newToBeCollected: OrderedCollectionList = toBeCollected.slice(0);
       const targets: OrderedCollectionList = newToBeCollected.splice(0, collectionSize);
 
-      console.time('requesting dimensions');
+      // console.time('requesting dimensions');
 
       const additions: UnknownDimensionType[] = targets.map(
         (descriptor: UnknownDescriptorType): UnknownDimensionType => {
@@ -216,7 +214,7 @@ export default (callbacks: Callbacks) => {
         }
       );
 
-      console.timeEnd('requesting dimensions');
+      // console.timeEnd('requesting dimensions');
 
       const newCollection: Collection = {
         draggable: collection.draggable,
@@ -273,8 +271,10 @@ export default (callbacks: Callbacks) => {
     const draggableDimension: DraggableDimension = draggableEntry.getDimension();
 
     // publishing container first
+    console.time('initial dimension publish');
     callbacks.publishDroppables([homeDimension]);
     callbacks.publishDraggables([draggableDimension]);
+    console.timeEnd('initial dimension publish');
 
     // After this initial publish a drag will start
     setTimeout(() => {

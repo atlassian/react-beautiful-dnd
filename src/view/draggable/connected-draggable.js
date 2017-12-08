@@ -95,11 +95,11 @@ export const makeSelector = (): Selector => {
       if (!needsToMove) {
         // TEMP
         // canAnimate?
-        return defaultMapProps;
-        // return getWithMovement(
-        //   origin,
-        //   canLift
-        // );
+        // return defaultMapProps;
+        return getWithMovement(
+          origin,
+          canLift
+        );
       }
 
       const amount: Position = movement.isBeyondStartPosition ?
