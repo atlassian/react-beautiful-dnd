@@ -32,7 +32,8 @@ type Collection = {|
   toBeCollected: OrderedCollectionList,
   // Dimensions that have been collected from components
   // but have not yet been published to the store
-  toBePublishedBuffer: OrderedDimensionList
+  toBePublishedBuffer: OrderedDimensionList,
+  toBeUnpublishedBuffer: OrderedCollectionList,
 |}
 
 // Not using exact type to allow spread to create a new state object
@@ -85,6 +86,15 @@ export default (callbacks: Callbacks) => {
       ...state,
       draggables,
     });
+
+    if (!state.collection) {
+      return;
+    }
+
+    // currently collecting - publish!
+    console.log('publishing droppable mid collection');
+    const dimension: DraggableDimension = entry.getDimension();
+    callbacks.publishDraggables([dimension]);
   };
 
   const registerDroppable = (
@@ -112,6 +122,15 @@ export default (callbacks: Callbacks) => {
       ...state,
       droppables,
     });
+
+    if (!state.collection) {
+      return;
+    }
+
+    // currently collecting - publish!
+    console.log('publishing droppable mid collection');
+    const dimension: DroppableDimension = entry.getDimension();
+    callbacks.publishDroppables([dimension]);
   };
 
   const unregisterDraggable = (id: DraggableId) => {
@@ -120,6 +139,13 @@ export default (callbacks: Callbacks) => {
       return;
     }
     delete state.draggables[id];
+
+    if (!state.collection) {
+
+    }
+
+    // todo: unpublished buffer
+    // unpublishDraggable();
   };
 
   const unregisterDroppable = (id: DroppableId) => {
@@ -128,6 +154,13 @@ export default (callbacks: Callbacks) => {
       return;
     }
     delete state.droppables[id];
+
+    if (!state.collection) {
+
+    }
+
+    // TODO: unpublished buffer
+    // callbacks.unpublishDroppable(id);
   };
 
   const collect = () => {
@@ -183,6 +216,7 @@ export default (callbacks: Callbacks) => {
         const newCollection: Collection = {
           draggable: collection.draggable,
           toBeCollected: collection.toBeCollected,
+          toBeUnpublishedBuffer: collection.toBeUnpublishedBuffer,
           // clear the buffer
           toBePublishedBuffer: [],
         };
@@ -232,7 +266,7 @@ export default (callbacks: Callbacks) => {
     });
   };
 
-  const startCollection = (descriptor: DraggableDescriptor) => {
+  const startInitialCollection = (descriptor: DraggableDescriptor) => {
     if (state.dragging) {
       console.error('Cannot start capturing dimensions for a drag it is already dragging');
       callbacks.cancel();
@@ -340,7 +374,7 @@ export default (callbacks: Callbacks) => {
         return;
       }
 
-      startCollection(descriptor);
+      startInitialCollection(descriptor);
     }
 
     // No need to collect any more as the user has finished interacting
