@@ -255,13 +255,8 @@ export type Phase =
   // This will result in the onDragEnd hook being fired
   'DROP_COMPLETE';
 
-export type DimensionRequest = {|
-  descriptor: DraggableDescriptor,
-  isScrollAllowed: boolean,
-|}
-
 export type DimensionState = {|
-  request: ?DimensionRequest,
+  request: ?DraggableDescriptor,
   draggable: DraggableDimensionMap,
   droppable: DroppableDimensionMap,
 |};

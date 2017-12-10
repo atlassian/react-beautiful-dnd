@@ -41,19 +41,6 @@ type State = {|
 
 const origin: Position = { x: 0, y: 0 };
 
-const getScrollOffset = (closestScrollable: ?Element): Position => {
-  if (!closestScrollable) {
-    return origin;
-  }
-
-  const offset: Position = {
-    x: closestScrollable.scrollLeft,
-    y: closestScrollable.scrollTop,
-  };
-
-  return offset;
-};
-
 export default class DroppableDimensionPublisher extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
   closestScrollable: ?Element = null;
@@ -62,6 +49,19 @@ export default class DroppableDimensionPublisher extends Component<Props, State>
   static contextTypes = {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
   };
+
+  getScrollOffset = (): Position => {
+    if (!this.closestScrollable) {
+      return origin;
+    }
+
+    const offset: Position = {
+      x: this.closestScrollable.scrollLeft,
+      y: this.closestScrollable.scrollTop,
+    };
+
+    return offset;
+  }
 
   constructor(props: Props, context: mixed) {
     super(props, context);
@@ -92,6 +92,7 @@ export default class DroppableDimensionPublisher extends Component<Props, State>
   }
 
   watchScroll = () => {
+    console.info('requesting to watch scroll');
     if (!this.props.targetRef) {
       console.error('cannot watch droppable scroll if not in the dom');
       return;
@@ -110,14 +111,29 @@ export default class DroppableDimensionPublisher extends Component<Props, State>
     this.closestScrollable.addEventListener('scroll', this.onClosestScroll, { passive: true });
   };
 
+  unwatchScroll = () => {
+    if (!this.isWatchingScroll) {
+      return;
+    }
+
+    this.isWatchingScroll = false;
+
+    if (!this.closestScrollable) {
+      console.error('cannot unbind event listener if element is null');
+      return;
+    }
+
+    this.closestScrollable.removeEventListener('scroll', this.onClosestScroll);
+  }
+
   componentDidMount() {
     const marshal: Marshal = this.context[dimensionMarshalKey];
     const descriptor: DroppableDescriptor = this.state.descriptor;
 
     const callbacks: DroppableCallbacks = {
       getDimension: this.getDimension,
-      startListeningToScroll: this.watchScroll,
-      stopListeningToScroll: this.unwatchScroll,
+      watchScroll: this.watchScroll,
+      unwatchScroll: this.unwatchScroll,
     };
 
     marshal.registerDroppable(descriptor, callbacks);
@@ -161,8 +177,9 @@ export default class DroppableDimensionPublisher extends Component<Props, State>
       throw new Error('DimensionPublisher cannot calculate a dimension when not attached to the DOM');
     }
 
-    const closestScrollable: ?Element = getClosestScrollable(targetRef);
-    const scroll: Position = getScrollOffset(closestScrollable);
+    // side effect
+    this.closestScrollable = getClosestScrollable(targetRef);
+    const scroll: Position = this.getScrollOffset();
     const style: Object = window.getComputedStyle(targetRef);
 
     // keeping it simple and always using the margin of the droppable
@@ -189,9 +206,9 @@ export default class DroppableDimensionPublisher extends Component<Props, State>
     // 3. The droppable has internal scrolling
     const containerRect: ClientRect =
       ignoreContainerClipping ||
-      !closestScrollable ||
-      closestScrollable === targetRef ?
-        clientRect : getClientRect(closestScrollable.getBoundingClientRect());
+      !this.closestScrollable ||
+      this.closestScrollable === targetRef ?
+        clientRect : getClientRect(this.closestScrollable.getBoundingClientRect());
 
     const dimension: DroppableDimension = getDroppableDimension({
       descriptor,

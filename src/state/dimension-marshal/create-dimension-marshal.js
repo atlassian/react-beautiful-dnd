@@ -4,7 +4,6 @@ import Perf from 'react-addons-perf';
 import type{
   DraggableId,
   DroppableId,
-  DimensionRequest,
   DroppableDescriptor,
   DraggableDescriptor,
   DraggableDimension,
@@ -37,8 +36,6 @@ type Collection = {|
   // toBeUnpublishedBuffer: OrderedCollectionList,
   // Dimensions that have already been collected
   collected: OrderedCollectionList,
-  // is droppable scrolling allowed for the current drag
-  isScrollAllowed: boolean,
 |}
 
 // Not using exact type to allow spread to create a new state object
@@ -216,14 +213,12 @@ export default (callbacks: Callbacks) => {
 
         // Need to request droppables to start listening to scrolling
         toBePublished.droppables.forEach((dimension: DroppableDimension) => {
-          state.droppables[dimension.descriptor.id].callbacks.watchScroll({
-            isScrollAllowed,
-          });
+          state.droppables[dimension.descriptor.id].callbacks.watchScroll();
         });
 
         console.timeEnd('flushing buffer');
         // Perf.stop();
-        // const measurements = Perf.getLastMeasurements();
+        // const measurements = Perf.getLastMeasurements();w
         // Perf.printInclusive(measurements);
 
         // clear the buffer
@@ -234,7 +229,6 @@ export default (callbacks: Callbacks) => {
           draggable: collection.draggable,
           toBeCollected: collection.toBeCollected,
           collected: collection.collected,
-          isScrollAllowed: collection.isScrollAllowed,
         };
 
         setState({
@@ -268,7 +262,6 @@ export default (callbacks: Callbacks) => {
 
       const newCollection: Collection = {
         draggable: collection.draggable,
-        isScrollAllowed: collection.isScrollAllowed,
         toBeCollected: newToBeCollected,
         collected: [...collection.collected, ...targets],
         toBePublishedBuffer: [...toBePublishedBuffer, ...additions],
@@ -284,14 +277,12 @@ export default (callbacks: Callbacks) => {
     });
   };
 
-  const startInitialCollection = (request: DimensionRequest) => {
+  const startInitialCollection = (descriptor: DraggableDescriptor) => {
     if (state.dragging) {
       console.error('Cannot start capturing dimensions for a drag it is already dragging');
       callbacks.cancel();
       return;
     }
-    const descriptor: DraggableDescriptor = request.descriptor;
-    const isScrollAllowed: boolean = request.isScrollAllowed;
 
     const draggableEntry: ?DraggableEntry = state.draggables[descriptor.id];
 
@@ -311,7 +302,6 @@ export default (callbacks: Callbacks) => {
 
     const emptyCollection: Collection = {
       draggable: descriptor,
-      isScrollAllowed,
       collected: [],
       toBeCollected: [],
       toBePublishedBuffer: [],
@@ -329,7 +319,10 @@ export default (callbacks: Callbacks) => {
     // publishing container first
     console.time('initial dimension publish');
     callbacks.publishDroppables([homeDimension]);
+    homeEntry.callbacks.watchScroll();
+
     callbacks.publishDraggables([draggableDimension]);
+
     console.timeEnd('initial dimension publish');
 
     // After this initial publish a drag will start
@@ -351,7 +344,6 @@ export default (callbacks: Callbacks) => {
 
       const collection: Collection = {
         draggable: descriptor,
-        isScrollAllowed,
         toBeCollected,
         collected: [],
         toBePublishedBuffer: [],

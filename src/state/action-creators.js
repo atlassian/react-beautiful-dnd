@@ -9,7 +9,6 @@ import type {
   DroppableDimension,
   InitialDragLocation,
   DraggableLocation,
-  DimensionRequest,
   Position,
   Dispatch,
   State,
@@ -50,12 +49,12 @@ const getScrollDiff = ({
 
 export type RequestDimensionsAction = {|
   type: 'REQUEST_DIMENSIONS',
-  payload: DimensionRequest,
+  payload: DraggableDescriptor,
 |}
 
-export const requestDimensions = (request: DimensionRequest): RequestDimensionsAction => ({
+export const requestDimensions = (descriptor: DraggableDescriptor): RequestDimensionsAction => ({
   type: 'REQUEST_DIMENSIONS',
-  payload: request,
+  payload: descriptor,
 });
 
 export type CompleteLiftAction = {|
@@ -464,15 +463,9 @@ export const lift = (descriptor: DraggableDescriptor,
     if (state.phase !== 'PREPARING') {
       return;
     }
-    console.time('lifting');
-
-    const request: DimensionRequest = {
-      descriptor,
-      isScrollAllowed,
-    };
 
     // will communicate with the marshal to start requesting dimensions
-    dispatch(requestDimensions(request));
+    dispatch(requestDimensions(descriptor));
 
     // Need to allow an opportunity for the dimensions to be requested.
     setTimeout(() => {
