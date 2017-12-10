@@ -243,7 +243,7 @@ export type Phase =
   // At this point a drag has not started yet and the onDragStart
   // hook has not fired.
   // TODO: COLLECTING_INITIAL_DIMENSIONS
-  'COLLECTING_DIMENSIONS' |
+  'COLLECTING_INITIAL_DIMENSIONS' |
 
   // A drag is active. The onDragStart hook has been fired
   'DRAGGING' |
@@ -255,8 +255,13 @@ export type Phase =
   // This will result in the onDragEnd hook being fired
   'DROP_COMPLETE';
 
+export type DimensionRequest = {|
+  descriptor: DraggableDescriptor,
+  isScrollAllowed: boolean,
+|}
+
 export type DimensionState = {|
-  request: ?DraggableDescriptor,
+  request: ?DimensionRequest,
   draggable: DraggableDimensionMap,
   droppable: DroppableDimensionMap,
 |};

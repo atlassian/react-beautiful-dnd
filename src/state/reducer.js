@@ -137,7 +137,7 @@ const move = ({
 
 const updateStateAfterDimensionAddition = (newState: State): State => {
   // not dragging yet
-  if (newState.phase === 'COLLECTING_DIMENSIONS') {
+  if (newState.phase === 'COLLECTING_INITIAL_DIMENSIONS') {
     return newState;
   }
 
@@ -172,7 +172,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const descriptor: DraggableDescriptor = action.payload;
 
     return {
-      phase: 'COLLECTING_DIMENSIONS',
+      phase: 'COLLECTING_INITIAL_DIMENSIONS',
       drag: null,
       drop: null,
       dimension: {
@@ -240,7 +240,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
   }
 
   if (action.type === 'COMPLETE_LIFT') {
-    if (state.phase !== 'COLLECTING_DIMENSIONS') {
+    if (state.phase !== 'COLLECTING_INITIAL_DIMENSIONS') {
       console.error('trying complete lift without collecting dimensions');
       return state;
     }
@@ -309,8 +309,9 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const target: ?DroppableDimension = state.dimension.droppable[id];
 
     if (!target) {
-      console.error('cannot update a droppable that is not inside of the state', id);
-      return clean();
+      // eslint-disable-next-line no-console
+      console.log('cannot update scroll for droppable as it has not yet been collected');
+      return state;
     }
 
     // TODO: do not break an existing dimension.

@@ -144,7 +144,7 @@ export const makeSelector = (): Selector => {
       // a lift is in progress - do not let anything start a lift
 
       // TODO: required?
-      // if (phase === 'PREPARING' || phase === 'COLLECTING_DIMENSIONS') {
+      // if (phase === 'PREPARING' || phase === 'COLLECTING_INITIAL_DIMENSIONS') {
       //   return preLiftMapProps;
       // }
 

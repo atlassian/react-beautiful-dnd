@@ -3,12 +3,13 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
+import rafSchedule from 'raf-schd';
 import getWindowScrollPosition from '../get-window-scroll-position';
 import getClientRect from '../../state/get-client-rect';
 import { getDroppableDimension } from '../../state/dimension';
 import getClosestScrollable from '../get-closest-scrollable';
 import { dimensionMarshalKey } from '../context-keys';
-import type { Marshal } from '../../state/dimension-marshal/dimension-marshal-types';
+import type { Marshal, DroppableCallbacks } from '../../state/dimension-marshal/dimension-marshal-types';
 // eslint-disable-next-line no-duplicate-imports
 import type {
   DroppableId,
@@ -29,6 +30,7 @@ type Props = {|
   isDropDisabled: boolean,
   ignoreContainerClipping: boolean,
   isDropDisabled: boolean,
+  updateScroll: (id: DroppableId, scroll: Position) => void,
   targetRef: ?HTMLElement,
   children: Node,
 |}
@@ -53,6 +55,10 @@ const getScrollOffset = (closestScrollable: ?Element): Position => {
 };
 
 export default class DroppableDimensionPublisher extends Component<Props, State> {
+  /* eslint-disable react/sort-comp */
+  closestScrollable: ?Element = null;
+  isWatchingScroll: boolean = false;
+
   static contextTypes = {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
   };
@@ -69,11 +75,52 @@ export default class DroppableDimensionPublisher extends Component<Props, State>
     };
   }
 
+  memoizedUpdateScroll = memoizeOne((x: number, y: number) => {
+    const offset: Position = { x, y };
+    this.props.updateScroll(this.props.droppableId, offset);
+  });
+
+  scheduleScrollUpdate = rafSchedule((offset: Position) => {
+    // might no longer be listening for scroll changes by the time a frame comes back
+    if (this.isWatchingScroll) {
+      this.memoizedUpdateScroll(offset.x, offset.y);
+    }
+  });
+
+  onClosestScroll = () => {
+    this.scheduleScrollUpdate(this.getScrollOffset());
+  }
+
+  watchScroll = () => {
+    if (!this.props.targetRef) {
+      console.error('cannot watch droppable scroll if not in the dom');
+      return;
+    }
+
+    // no closest parent
+    if (this.closestScrollable == null) {
+      return;
+    }
+
+    if (this.isWatchingScroll) {
+      return;
+    }
+
+    this.isWatchingScroll = true;
+    this.closestScrollable.addEventListener('scroll', this.onClosestScroll, { passive: true });
+  };
+
   componentDidMount() {
     const marshal: Marshal = this.context[dimensionMarshalKey];
     const descriptor: DroppableDescriptor = this.state.descriptor;
 
-    marshal.registerDroppable(descriptor, this.getDimension);
+    const callbacks: DroppableCallbacks = {
+      getDimension: this.getDimension,
+      startListeningToScroll: this.watchScroll,
+      stopListeningToScroll: this.unwatchScroll,
+    };
+
+    marshal.registerDroppable(descriptor, callbacks);
   }
 
   componentWillReceiveProps(nextProps: Props) {

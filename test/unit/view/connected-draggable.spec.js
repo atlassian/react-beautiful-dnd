@@ -1082,7 +1082,7 @@ describe('Draggable - connected', () => {
       };
 
       it('should prevent other draggables from lifting', () => {
-        const preLiftPhases: Phase[] = ['PREPARING', 'COLLECTING_DIMENSIONS'];
+        const preLiftPhases: Phase[] = ['PREPARING', 'COLLECTING_INITIAL_DIMENSIONS'];
         const { id, type, selector } = make();
 
         preLiftPhases.forEach((phase: Phase): void => {

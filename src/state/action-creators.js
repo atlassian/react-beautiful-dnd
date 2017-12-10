@@ -9,6 +9,7 @@ import type {
   DroppableDimension,
   InitialDragLocation,
   DraggableLocation,
+  DimensionRequest,
   Position,
   Dispatch,
   State,
@@ -49,12 +50,12 @@ const getScrollDiff = ({
 
 export type RequestDimensionsAction = {|
   type: 'REQUEST_DIMENSIONS',
-  payload: DraggableDescriptor,
+  payload: DimensionRequest,
 |}
 
-export const requestDimensions = (descriptor: DraggableDescriptor): RequestDimensionsAction => ({
+export const requestDimensions = (request: DimensionRequest): RequestDimensionsAction => ({
   type: 'REQUEST_DIMENSIONS',
-  payload: descriptor,
+  payload: request,
 });
 
 export type CompleteLiftAction = {|
@@ -281,7 +282,7 @@ export const drop = () =>
     const state: State = getState();
 
     // dropped before a drag officially started - this is fine
-    if (state.phase === 'COLLECTING_DIMENSIONS') {
+    if (state.phase === 'COLLECTING_INITIAL_DIMENSIONS') {
       dispatch(clean());
       return;
     }
@@ -463,9 +464,15 @@ export const lift = (descriptor: DraggableDescriptor,
     if (state.phase !== 'PREPARING') {
       return;
     }
+    console.time('lifting');
+
+    const request: DimensionRequest = {
+      descriptor,
+      isScrollAllowed,
+    };
 
     // will communicate with the marshal to start requesting dimensions
-    dispatch(requestDimensions(descriptor));
+    dispatch(requestDimensions(request));
 
     // Need to allow an opportunity for the dimensions to be requested.
     setTimeout(() => {
@@ -473,11 +480,12 @@ export const lift = (descriptor: DraggableDescriptor,
       const newState: State = getState();
 
       // drag was already cancelled before dimensions all collected
-      if (newState.phase !== 'COLLECTING_DIMENSIONS') {
+      if (newState.phase !== 'COLLECTING_INITIAL_DIMENSIONS') {
         return;
       }
 
       dispatch(completeLift(descriptor, client, windowScroll, isScrollAllowed));
+      console.timeEnd('lifting');
     });
   });
 };

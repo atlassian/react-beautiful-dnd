@@ -233,7 +233,7 @@ describe('Droppable - connected', () => {
     });
 
     describe('dropping is disabled', () => {
-      const phases: Phase[] = ['IDLE', 'COLLECTING_DIMENSIONS', 'DRAGGING', 'DROP_ANIMATING', 'DROP_COMPLETE'];
+      const phases: Phase[] = ['IDLE', 'COLLECTING_INITIAL_DIMENSIONS', 'DRAGGING', 'DROP_ANIMATING', 'DROP_COMPLETE'];
 
       it('should always return the default props', () => {
         phases.forEach((phase: Phase) => {
@@ -617,7 +617,7 @@ describe('Droppable - connected', () => {
     });
 
     describe('other phases', () => {
-      const others: Phase[] = ['IDLE', 'COLLECTING_DIMENSIONS', 'DROP_COMPLETE'];
+      const others: Phase[] = ['IDLE', 'COLLECTING_INITIAL_DIMENSIONS', 'DROP_COMPLETE'];
 
       it('should return the default props', () => {
         const selector = makeSelector();

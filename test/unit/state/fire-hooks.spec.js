@@ -41,7 +41,7 @@ const state = (() => {
   };
 
   const collecting: State = {
-    phase: 'COLLECTING_DIMENSIONS',
+    phase: 'COLLECTING_INITIAL_DIMENSIONS',
     drag: null,
     drop: null,
     dimension: {
