@@ -5,16 +5,18 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DraggableId,
-  State,
   DroppableId,
+  State,
+  Position,
 } from '../../types';
 
 export type GetDraggableDimensionFn = () => DraggableDimension;
 export type GetDroppableDimensionFn = () => DroppableDimension;
+export type UpdateDroppableScrollFn = (id: DroppableId, offset: Position) => void;
 
 export type DroppableCallbacks = {|
   getDimension: GetDroppableDimensionFn,
-  watchScroll: () => void,
+  watchScroll: (onChange: UpdateDroppableScrollFn) => void,
   unwatchScroll: () => void,
 |}
 
@@ -49,11 +51,12 @@ export type Marshal = {|
     callbacks: DroppableCallbacks) => void,
   unregisterDraggable: (id: DraggableId) => void,
   unregisterDroppable: (id: DroppableId) => void,
-  onStateChange: (current: State, previous: State) => void
+  onStateChange: (current: State, previous: State) => void,
 |}
 
 export type Callbacks = {|
   cancel: () => void,
   publishDraggables: (DraggableDimension[]) => void,
   publishDroppables: (DroppableDimension[]) => void,
+  updateDroppableScroll: (id: DroppableId, offset: Position) => void,
 |}

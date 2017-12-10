@@ -11,12 +11,14 @@ import type {
   Hooks,
   DraggableDimension,
   DroppableDimension,
+  DroppableId,
 } from '../../types';
 import { storeKey, dimensionMarshalKey } from '../context-keys';
 import {
   clean,
   publishDraggableDimensions,
   publishDroppableDimensions,
+  updateDroppableDimensionScroll,
 } from '../../state/action-creators';
 
 type Props = {|
@@ -66,6 +68,9 @@ export default class DragDropContext extends React.Component<Props> {
       },
       publishDroppables: (dimensions: DroppableDimension[]) => {
         this.store.dispatch(publishDroppableDimensions(dimensions));
+      },
+      updateDroppableScroll: (id: DroppableId, offset: Position) => {
+        this.store.dispatch(updateDroppableDimensionScroll(id, offset));
       },
     };
     this.marshal = createDimensionMarshal(callbacks);
