@@ -229,7 +229,7 @@ export default (callbacks: Callbacks) => {
           // keep everything else the same
           draggable: collection.draggable,
           toBeCollected: collection.toBeCollected,
-          published: [...collection.published, ...toBePublishedBuffer],
+          published: [...collection.published, ...toBePublishedBuffer.map(item => item.descriptor)],
         };
 
         setState({
