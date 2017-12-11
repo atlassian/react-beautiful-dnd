@@ -52,7 +52,6 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
   componentWillUnmount() {
     const marshal: Marshal = this.context[dimensionMarshalKey];
-
     marshal.unregisterDraggable(this.props.draggableId);
   }
 
@@ -71,11 +70,13 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
   getDimension = (): DraggableDimension => {
     const { targetRef, draggableId, droppableId, index } = this.props;
+    if (!targetRef) {
+      throw new Error('DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
+    }
+
     const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
       draggableId, droppableId, index
     );
-
-    invariant(targetRef, 'DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
 
     const style = window.getComputedStyle(targetRef);
 

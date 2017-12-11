@@ -37,17 +37,24 @@ type Props = {|
   children: Node,
 |}
 
-type State = {|
-  descriptor: DroppableDescriptor,
-|}
-
 const origin: Position = { x: 0, y: 0 };
 
-export default class DroppableDimensionPublisher extends Component<Props, State> {
+export default class DroppableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
   closestScrollable: ?Element = null;
   isWatchingScroll: boolean = false;
   updateDroppableScroll: ?UpdateDroppableScrollFn;
+  callbacks: DroppableCallbacks;
+
+  constructor(props: Props, context: mixed) {
+    super(props, context);
+    const callbacks: DroppableCallbacks = {
+      getDimension: this.getDimension,
+      watchScroll: this.watchScroll,
+      unwatchScroll: this.unwatchScroll,
+    };
+    this.callbacks = callbacks;
+  }
 
   static contextTypes = {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
@@ -64,18 +71,6 @@ export default class DroppableDimensionPublisher extends Component<Props, State>
     };
 
     return offset;
-  }
-
-  constructor(props: Props, context: mixed) {
-    super(props, context);
-
-    this.state = {
-      descriptor: this.getMemoizedDescriptor(
-        this.props.droppableId,
-        this.props.type,
-        this.props.index
-      ),
-    };
   }
 
   memoizedUpdateScroll = memoizeOne((x: number, y: number) => {
@@ -137,29 +132,21 @@ export default class DroppableDimensionPublisher extends Component<Props, State>
 
   componentDidMount() {
     const marshal: Marshal = this.context[dimensionMarshalKey];
-    const descriptor: DroppableDescriptor = this.state.descriptor;
+    const { droppableId, type, index } = this.props;
+    const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
+      droppableId, type, index
+    );
 
-    const callbacks: DroppableCallbacks = {
-      getDimension: this.getDimension,
-      watchScroll: this.watchScroll,
-      unwatchScroll: this.unwatchScroll,
-    };
-
-    marshal.registerDroppable(descriptor, callbacks);
+    marshal.registerDroppable(descriptor, this.callbacks);
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    const next: DroppableDescriptor = this.getMemoizedDescriptor(
-      nextProps.droppableId,
-      nextProps.type,
-      nextProps.index
+    const { droppableId, type, index } = nextProps;
+    const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
+      droppableId, type, index
     );
 
-    // TODO
-    if (next !== this.state.descriptor) {
-      console.warn('changing descriptor for Droppable while mounted');
-      console.error('this is current not handled');
-    }
+    this.publishDescriptorChange(descriptor);
   }
 
   componentWillUnmount() {
@@ -174,19 +161,35 @@ export default class DroppableDimensionPublisher extends Component<Props, State>
       index,
     }));
 
+  publishDescriptorChange = memoizeOne((descriptor: DroppableDescriptor) => {
+    const marshal: Marshal = this.context[dimensionMarshalKey];
+    marshal.unregisterDroppable(descriptor.id);
+    marshal.registerDroppable(descriptor, this.callbacks);
+  })
+
   getDimension = (): DroppableDimension => {
     const {
       direction,
       ignoreContainerClipping,
       isDropDisabled,
       targetRef,
+      droppableId,
+      type,
+      index,
     } = this.props;
-    const { descriptor } = this.state;
     if (!targetRef) {
       throw new Error('DimensionPublisher cannot calculate a dimension when not attached to the DOM');
     }
 
-    // side effect
+    if (this.isWatchingScroll) {
+      throw new Error('Attempting to recapture Droppable dimension while already watching scroll on previous capture');
+    }
+
+    const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
+      droppableId, type, index
+    );
+
+    // side effect - grabbing it for scroll listening so we know it is the same node
     this.closestScrollable = getClosestScrollable(targetRef);
     const scroll: Position = this.getScrollOffset();
     const style: Object = window.getComputedStyle(targetRef);
