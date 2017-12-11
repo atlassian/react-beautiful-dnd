@@ -135,9 +135,14 @@ const move = ({
   };
 };
 
-const updateStateAfterDimensionAddition = (newState: State): State => {
+const updateStateAfterDimensionChange = (newState: State): State => {
   // not dragging yet
   if (newState.phase === 'COLLECTING_INITIAL_DIMENSIONS') {
+    return newState;
+  }
+
+  // not calculating movement if not in the DRAGGING phase
+  if (newState.phase !== 'DRAGGING') {
     return newState;
   }
 
@@ -149,6 +154,7 @@ const updateStateAfterDimensionAddition = (newState: State): State => {
 
   return move({
     state: newState,
+    // use the existing values
     clientSelection: newState.drag.current.client.selection,
     shouldAnimate: newState.drag.current.shouldAnimate,
   });
@@ -208,7 +214,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       },
     };
 
-    return updateStateAfterDimensionAddition(newState);
+    return updateStateAfterDimensionChange(newState);
   }
 
   if (action.type === 'PUBLISH_DROPPABLE_DIMENSIONS') {
@@ -236,7 +242,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       },
     };
 
-    return updateStateAfterDimensionAddition(newState);
+    return updateStateAfterDimensionChange(newState);
   }
 
   if (action.type === 'COMPLETE_LIFT') {
@@ -340,11 +346,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       },
     };
 
-    return move({
-      state: newState,
-      clientSelection: state.drag.current.client.selection,
-      shouldAnimate: state.drag.current.shouldAnimate,
-    });
+    return updateStateAfterDimensionChange(newState);
   }
 
   if (action.type === 'UPDATE_DROPPABLE_DIMENSION_IS_ENABLED') {

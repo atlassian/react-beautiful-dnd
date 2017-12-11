@@ -305,11 +305,11 @@ export default (callbacks: Callbacks) => {
     const homeDimension: DroppableDimension = homeEntry.callbacks.getDimension();
     const draggableDimension: DraggableDimension = draggableEntry.getDimension();
 
-    // publishing container first
-    console.time('initial dimension publish');
+    // publishing container first - although it is not strictly needed
     callbacks.publishDroppables([homeDimension]);
-    homeEntry.callbacks.watchScroll(callbacks.updateDroppableScroll);
     callbacks.publishDraggables([draggableDimension]);
+    // watching the scroll of the home droppable
+    homeEntry.callbacks.watchScroll(callbacks.updateDroppableScroll);
 
     const initialCollection: Collection = {
       draggable: descriptor,
@@ -334,19 +334,17 @@ export default (callbacks: Callbacks) => {
       }
 
       // The drag has started and we need to collect all the other dimensions
-
-      const toBeCollected: OrderedCollectionList =
-        getCollectionOrder({
-          draggable: descriptor,
-          home: homeEntry.descriptor,
-          draggables: state.draggables,
-          droppables: state.droppables,
-        });
+      const toBeCollected: OrderedCollectionList = getCollectionOrder({
+        draggable: descriptor,
+        home: homeEntry.descriptor,
+        draggables: state.draggables,
+        droppables: state.droppables,
+      });
 
       const newCollection: Collection = {
         draggable: collection.draggable,
         published: collection.published,
-        toBePublishedBuffer: [],
+        toBePublishedBuffer: collection.toBePublishedBuffer,
         toBeCollected,
       };
 
@@ -355,6 +353,7 @@ export default (callbacks: Callbacks) => {
         collection: newCollection,
       });
 
+      // start collection loop
       collect();
     });
   };
