@@ -43,6 +43,10 @@ type State = {
   droppables: DroppableEntryMap,
   draggables: DraggableEntryMap,
   collection: ?Collection,
+  timers: {|
+    liftTimeoutId: ?number,
+    collectionFrameId: ?number,
+  |}
 }
 
 type ToBePublished = {|
@@ -50,13 +54,24 @@ type ToBePublished = {|
   droppables: DroppableDimension[],
 |}
 
+type Timers = {|
+  liftTimeoutId: ?number,
+  collectionFrameId: ?number,
+|}
+
 const collectionSize: number = 2;
+
+const noTimers: Timers = {
+  liftTimeoutId: null,
+  collectionFrameId: null,
+};
 
 export default (callbacks: Callbacks) => {
   let state: State = {
     droppables: {},
     draggables: {},
     collection: null,
+    timers: noTimers,
   };
 
   const setState = (newState: State) => {
@@ -181,7 +196,7 @@ export default (callbacks: Callbacks) => {
     // - publishing them into the store(expensive)
     // into two seperate frames.
     //
-    requestAnimationFrame(() => {
+    const frameId: number = requestAnimationFrame(() => {
       const collection: ?Collection = state.collection;
       // within the frame duration we where told to no longer collect
       if (collection == null) {
@@ -279,6 +294,17 @@ export default (callbacks: Callbacks) => {
       // continue collecting
       collect();
     });
+
+    const timers: Timers = {
+      collectionFrameId: frameId,
+      // should be null - but not worth checking for here
+      liftTimeoutId: state.timers.liftTimeoutId,
+    };
+
+    setState({
+      ...state,
+      timers,
+    });
   };
 
   const startInitialCollection = (descriptor: DraggableDescriptor) => {
@@ -330,7 +356,7 @@ export default (callbacks: Callbacks) => {
     console.timeEnd('initial dimension publish');
 
     // After this initial publish a drag will start
-    setTimeout(() => {
+    const timerId: number = setTimeout(() => {
       const collection: ?Collection = state.collection;
       // Drag was cleaned during this timeout
       if (!collection) {
@@ -361,6 +387,16 @@ export default (callbacks: Callbacks) => {
       // start collection loop
       collect();
     });
+
+    const timers: Timers = {
+      liftTimeoutId: timerId,
+      collectionFrameId: null,
+    };
+
+    setState({
+      ...state,
+      timers,
+    });
   };
 
   const stopCollecting = () => {
@@ -387,10 +423,19 @@ export default (callbacks: Callbacks) => {
       entry.callbacks.unwatchScroll();
     });
 
+    if (state.timers.liftTimeoutId) {
+      clearTimeout(state.timers.liftTimeoutId);
+    }
+
+    if (state.timers.collectionFrameId) {
+      cancelAnimationFrame(state.timers.collectionFrameId);
+    }
+
     // clear the collection
     setState({
       ...state,
       collection: null,
+      timers: noTimers,
     });
   };
 
