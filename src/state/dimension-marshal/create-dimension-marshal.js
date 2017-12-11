@@ -35,8 +35,8 @@ type Collection = {|
   // but have not yet been published to the store
   toBePublishedBuffer: OrderedDimensionList,
   // toBeUnpublishedBuffer: OrderedCollectionList,
-  // Dimensions that have already been published
-  published: OrderedCollectionList,
+  // Dimensions that have already been collected
+  collected: OrderedCollectionList,
 |}
 
 // Not using exact type to allow spread to create a new state object
@@ -214,12 +214,13 @@ export default (callbacks: Callbacks) => {
 
         // Need to request droppables to start listening to scrolling
         toBePublished.droppables.forEach((dimension: DroppableDimension) => {
-          state.droppables[dimension.descriptor.id].callbacks.watchScroll(callbacks.updateDroppableScroll);
+          const entry: DroppableEntry = state.droppables[dimension.descriptor.id];
+          entry.callbacks.watchScroll(callbacks.updateDroppableScroll);
         });
 
         console.timeEnd('flushing buffer');
         // Perf.stop();
-        // const measurements = Perf.getLastMeasurements();w
+        // const measurements = Perf.getLastMeasurements();
         // Perf.printInclusive(measurements);
 
         // clear the buffer
@@ -229,7 +230,7 @@ export default (callbacks: Callbacks) => {
           // keep everything else the same
           draggable: collection.draggable,
           toBeCollected: collection.toBeCollected,
-          published: [...collection.published, ...toBePublishedBuffer.map(item => item.descriptor)],
+          collected: collection.collected,
         };
 
         setState({
@@ -263,8 +264,11 @@ export default (callbacks: Callbacks) => {
 
       const newCollection: Collection = {
         draggable: collection.draggable,
-        published: collection.published,
+        // newly collected items have been added to the collected list
+        collected: [...collection.collected, ...targets],
+        // new list with targets removed
         toBeCollected: newToBeCollected,
+        // collected items added to buffer
         toBePublishedBuffer: [...toBePublishedBuffer, ...additions],
       };
 
@@ -375,12 +379,10 @@ export default (callbacks: Callbacks) => {
     });
 
     // clear the collection
-    const newState: State = {
+    setState({
       ...state,
       collection: null,
-    };
-
-    setState(newState);
+    });
   };
 
   const onStateChange = (current: AppState, previous: AppState) => {
