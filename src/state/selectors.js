@@ -38,7 +38,7 @@ export const draggingDraggableSelector = createSelector([
       return null;
     }
 
-    const draggable: DraggableDimension = draggables[drag.current.descriptor.id];
+    const draggable: DraggableDimension = draggables[drag.initial.descriptor.id];
     return draggable;
   }
 

@@ -300,19 +300,20 @@ export const drop = () =>
     }
 
     const { impact, initial, current } = state.drag;
-    const draggable: DraggableDimension = state.dimension.draggable[current.descriptor.id];
+    const descriptor: DraggableDescriptor = initial.descriptor;
+    const draggable: DraggableDimension = state.dimension.draggable[initial.descriptor.id];
     const home: DroppableDimension = state.dimension.droppable[draggable.descriptor.droppableId];
     const destination: ?DroppableDimension = impact.destination ?
       state.dimension.droppable[impact.destination.droppableId] :
       null;
 
     const source: DraggableLocation = {
-      droppableId: current.descriptor.droppableId,
-      index: current.descriptor.index,
+      droppableId: descriptor.droppableId,
+      index: descriptor.index,
     };
 
     const result: DropResult = {
-      draggableId: current.descriptor.id,
+      draggableId: descriptor.id,
       type: home.descriptor.type,
       source,
       destination: impact.destination,
@@ -371,16 +372,16 @@ export const cancel = () =>
     }
 
     const { initial, current } = state.drag;
-    const descriptor = current.descriptor;
+    const descriptor = initial.descriptor;
     const home: DroppableDimension = state.dimension.droppable[descriptor.droppableId];
 
     const source: DraggableLocation = {
-      index: current.descriptor.index,
-      droppableId: current.descriptor.droppableId,
+      index: descriptor.index,
+      droppableId: descriptor.droppableId,
     };
 
     const result: DropResult = {
-      draggableId: current.descriptor.id,
+      draggableId: descriptor.id,
       type: home.descriptor.type,
       source,
       // no destination when cancelling

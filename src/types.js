@@ -160,6 +160,9 @@ export type InitialDragLocation = {|
 |}
 
 export type InitialDrag = {|
+  descriptor: DraggableDescriptor,
+  // whether scrolling is allowed - otherwise a scroll will cancel the drag
+  isScrollAllowed: boolean,
   // relative to the viewport when the drag started
   client: InitialDragLocation,
   // viewport + window scroll (position relative to 0, 0)
@@ -179,9 +182,6 @@ export type CurrentDragLocation = {|
 |}
 
 export type CurrentDrag = {|
-  descriptor: DraggableDescriptor,
-  // whether scrolling is allowed - otherwise a scroll will cancel the drag
-  isScrollAllowed: boolean,
   // viewport
   client: CurrentDragLocation,
   // viewport + scroll

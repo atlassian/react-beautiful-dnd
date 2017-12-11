@@ -98,8 +98,6 @@ const move = ({
   };
 
   const current: CurrentDrag = {
-    descriptor: previous.descriptor,
-    isScrollAllowed: previous.isScrollAllowed,
     client,
     page,
     shouldAnimate,
@@ -112,7 +110,7 @@ const move = ({
 
   const newImpact: DragImpact = (impact || getDragImpact({
     pageCenter: page.center,
-    draggable: state.dimension.draggable[current.descriptor.id],
+    draggable: state.dimension.draggable[initial.descriptor.id],
     draggables: state.dimension.draggable,
     droppables: state.dimension.droppable,
     previousDroppableOverId,
@@ -258,13 +256,14 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     };
 
     const initial: InitialDrag = {
+      descriptor,
+      isScrollAllowed,
       client,
       page,
       windowScroll,
     };
 
     const current: CurrentDrag = {
-      descriptor,
       client: {
         selection: client.selection,
         center: client.center,
@@ -276,7 +275,6 @@ export default (state: State = clean('IDLE'), action: Action): State => {
         offset: origin,
       },
       windowScroll,
-      isScrollAllowed,
       shouldAnimate: false,
     };
 
@@ -435,7 +433,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
     const result: ?MoveToNextResult = moveToNextIndex({
       isMovingForward,
-      draggableId: existing.current.descriptor.id,
+      draggableId: existing.initial.descriptor.id,
       impact: existing.impact,
       droppable,
       draggables: state.dimension.draggable,
@@ -475,12 +473,13 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     }
 
     const current: CurrentDrag = state.drag.current;
-    const draggableId: DraggableId = current.descriptor.id;
+    const descriptor: DraggableDescriptor = state.drag.initial.descriptor;
+    const draggableId: DraggableId = descriptor.id;
     const center: Position = current.page.center;
     const droppableId: DroppableId = state.drag.impact.destination.droppableId;
     const home: DraggableLocation = {
-      index: state.drag.current.descriptor.index,
-      droppableId: state.drag.current.descriptor.droppableId,
+      index: descriptor.index,
+      droppableId: descriptor.droppableId,
     };
 
     const result: ?MoveCrossAxisResult = moveCrossAxis({

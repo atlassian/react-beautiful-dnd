@@ -31,7 +31,7 @@ export default (hooks: Hooks, current: State, previous: State): void => {
       return;
     }
 
-    const descriptor: DraggableDescriptor = current.drag.current.descriptor;
+    const descriptor: DraggableDescriptor = current.drag.initial.descriptor;
     const home: ?DroppableDimension = current.dimension.droppable[descriptor.droppableId];
 
     if (!home) {
@@ -100,7 +100,7 @@ export default (hooks: Hooks, current: State, previous: State): void => {
       return;
     }
 
-    const descriptor: DraggableDescriptor = previous.drag.current.descriptor;
+    const descriptor: DraggableDescriptor = previous.drag.initial.descriptor;
     const home: ?DroppableDimension = previous.dimension[descriptor.droppableId];
 
     if (!home) {

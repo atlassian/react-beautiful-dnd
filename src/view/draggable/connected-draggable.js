@@ -33,6 +33,7 @@ import type {
   DraggableDimension,
   CurrentDrag,
   DragImpact,
+  DraggableDescriptor,
 } from '../../types';
 import type {
   MapProps,
@@ -56,12 +57,6 @@ const defaultMapProps: MapProps = {
   // these properties are only populated when the item is dragging
   dimension: null,
   direction: null,
-};
-
-// $ExpectError - using spread
-const preLiftMapProps: MapProps = {
-  ...defaultMapProps,
-  canLift: false,
 };
 
 export const makeSelector = (): Selector => {
@@ -161,9 +156,10 @@ export const makeSelector = (): Selector => {
         }
 
         const current: CurrentDrag = drag.current;
+        const descriptor: DraggableDescriptor = drag.initial.descriptor;
         const impact: DragImpact = drag.impact;
 
-        if (current.descriptor.id !== id) {
+        if (descriptor.id !== id) {
           return getNotDraggingProps(
             id,
             impact.movement,
