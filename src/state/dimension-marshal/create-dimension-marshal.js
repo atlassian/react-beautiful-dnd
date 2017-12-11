@@ -58,7 +58,7 @@ type Timers = {|
   collectionFrameId: ?number,
 |}
 
-const collectionSize: number = 2;
+const collectionSize: number = 1;
 
 const noTimers: Timers = {
   liftTimeoutId: null,
