@@ -33,7 +33,6 @@ type Collection = {|
   // Dimensions that have been collected from components
   // but have not yet been published to the store
   toBePublishedBuffer: OrderedDimensionList,
-  // toBeUnpublishedBuffer: OrderedCollectionList,
   // Dimensions that have already been collected
   collected: OrderedCollectionList,
 |}
@@ -158,11 +157,10 @@ export default (callbacks: Callbacks) => {
     delete state.draggables[id];
 
     if (!state.collection) {
-
+      return;
     }
 
-    // todo: unpublished buffer
-    // unpublishDraggable();
+    console.warn('currently not supporting unmounting a Draggable during a drag');
   };
 
   const unregisterDroppable = (id: DroppableId) => {
@@ -173,11 +171,11 @@ export default (callbacks: Callbacks) => {
     delete state.droppables[id];
 
     if (!state.collection) {
-
+      return;
     }
 
-    // TODO: unpublished buffer
-    // callbacks.unpublishDroppable(id);
+    // TODO: actually unpublish
+    console.warn('currently not supporting unmounting a Droppable during a drag');
   };
 
   const collect = () => {

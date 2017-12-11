@@ -25,46 +25,29 @@ type Props = {|
   children: Node,
 |}
 
-type State = {|
-  descriptor: DraggableDescriptor,
-|}
-
-export default class DraggableDimensionPublisher extends Component<Props, State> {
+export default class DraggableDimensionPublisher extends Component<Props> {
+  /* eslint-disable react/sort-comp */
   static contextTypes = {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
   };
 
-  constructor(props: Props, context: mixed) {
-    super(props, context);
-
-    this.state = {
-      descriptor: this.getMemoizedDescriptor(
-        this.props.draggableId,
-        this.props.droppableId,
-        this.props.index
-      ),
-    };
-  }
-
   componentDidMount() {
     const marshal: Marshal = this.context[dimensionMarshalKey];
-    const descriptor: DraggableDescriptor = this.state.descriptor;
+    const { draggableId, droppableId, index } = this.props;
+    const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
+      draggableId, droppableId, index
+    );
 
     marshal.registerDraggable(descriptor, this.getDimension);
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    const next: DraggableDescriptor = this.getMemoizedDescriptor(
-      nextProps.draggableId,
-      nextProps.droppableId,
-      nextProps.index
+    const { draggableId, droppableId, index } = nextProps;
+    const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
+      draggableId, droppableId, index
     );
 
-    // TODO
-    if (next !== this.state.descriptor) {
-      console.warn('changing descriptor for Draggable while mounted');
-      console.error('this is current not handled');
-    }
+    this.publishDescriptorChange(descriptor);
   }
 
   componentWillUnmount() {
@@ -80,9 +63,17 @@ export default class DraggableDimensionPublisher extends Component<Props, State>
       index,
     }));
 
+  publishDescriptorChange = memoizeOne((descriptor: DraggableDescriptor) => {
+    const marshal: Marshal = this.context[dimensionMarshalKey];
+    marshal.unregisterDraggable(descriptor.id);
+    marshal.registerDraggable(descriptor, this.getDimension);
+  })
+
   getDimension = (): DraggableDimension => {
-    const { targetRef } = this.props;
-    const { descriptor } = this.state;
+    const { targetRef, draggableId, droppableId, index } = this.props;
+    const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
+      draggableId, droppableId, index
+    );
 
     invariant(targetRef, 'DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
 
