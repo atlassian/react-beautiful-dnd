@@ -92,7 +92,6 @@ export default (callbacks: Callbacks) => {
       descriptor,
       getDimension,
     };
-
     const draggables: DraggableEntryMap = {
       ...state.draggables,
       [id]: entry,
@@ -154,7 +153,15 @@ export default (callbacks: Callbacks) => {
       console.error(`Cannot unregister Draggable with id ${id} as as it is not registered`);
       return;
     }
-    delete state.draggables[id];
+    const newMap: DraggableEntryMap = {
+      ...state.draggables,
+    };
+    delete newMap[id];
+
+    setState({
+      ...state,
+      draggables: newMap,
+    });
 
     if (!state.collection) {
       return;
@@ -168,7 +175,15 @@ export default (callbacks: Callbacks) => {
       console.error(`Cannot unregister Droppable with id ${id} as as it is not registered`);
       return;
     }
-    delete state.droppables[id];
+    const newMap: DroppableEntryMap = {
+      ...state.droppables,
+    };
+    delete newMap[id];
+
+    setState({
+      ...state,
+      droppables: newMap,
+    });
 
     if (!state.collection) {
       return;

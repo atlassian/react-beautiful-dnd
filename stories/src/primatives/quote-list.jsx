@@ -56,6 +56,44 @@ type Props = {|
   ignoreContainerClipping?: boolean,
 |}
 
+type QuoteListProps = {|
+  quotes: Quote[],
+  autoFocusQuoteId: ?string,
+|}
+
+class InnerQuoteList extends Component<QuoteListProps> {
+  shouldComponentUpdate(nextProps: QuoteListProps) {
+    if (nextProps.quotes !== this.props.quotes) {
+      return true;
+    }
+
+    return false;
+  }
+
+  render() {
+    return (
+      <div>
+        {this.props.quotes.map((quote: Quote, index: number) => (
+          <Draggable key={quote.id} draggableId={quote.id} index={index}>
+            {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
+              <div>
+                <QuoteItem
+                  key={quote.id}
+                  quote={quote}
+                  isDragging={dragSnapshot.isDragging}
+                  provided={dragProvided}
+                  autoFocus={this.props.autoFocusQuoteId === quote.id}
+                />
+                {dragProvided.placeholder}
+              </div>
+          )}
+          </Draggable>
+        ))}
+      </div>
+    );
+  }
+}
+
 type InnerListProps = {|
   dropProvided: DroppableProvided,
   dropSnapshot: DroppableStateSnapshot,
@@ -65,22 +103,8 @@ type InnerListProps = {|
 |}
 
 class InnerList extends Component<InnerListProps> {
-  shouldComponentUpdate(nextProps: InnerListProps) {
-    // do not render list if the only thing changing is whether the list is being dragged over
-    // this will prevent the entire list from rendering when dragging over
-    if (nextProps.dropSnapshot.isDraggingOver === this.props.dropSnapshot.isDraggingOver) {
-      return true;
-    }
-
-    if (nextProps.quotes !== this.props.quotes) {
-      return true;
-    }
-
-    return false;
-  }
-
   render() {
-    const { quotes, dropProvided } = this.props;
+    const { quotes, dropProvided, autoFocusQuoteId } = this.props;
     const title = this.props.title ? (
       <Title>{this.props.title}</Title>
     ) : null;
@@ -89,22 +113,10 @@ class InnerList extends Component<InnerListProps> {
       <Container>
         {title}
         <DropZone innerRef={dropProvided.innerRef}>
-          {quotes.map((quote: Quote, index: number) => (
-            <Draggable key={quote.id} draggableId={quote.id} index={index}>
-              {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
-                <div>
-                  <QuoteItem
-                    key={quote.id}
-                    quote={quote}
-                    isDragging={dragSnapshot.isDragging}
-                    provided={dragProvided}
-                    autoFocus={this.props.autoFocusQuoteId === quote.id}
-                  />
-                  {dragProvided.placeholder}
-                </div>
-              )}
-            </Draggable>
-          ))}
+          <InnerQuoteList
+            quotes={quotes}
+            autoFocusQuoteId={autoFocusQuoteId}
+          />
           {dropProvided.placeholder}
         </DropZone>
       </Container>

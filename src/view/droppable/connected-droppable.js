@@ -46,11 +46,17 @@ export const makeSelector = (): Selector => {
       destination: ?DraggableLocation,
       draggable: ?DraggableDimension
     ): ?Placeholder => {
-      if (!destination || !draggable) {
+      // not dragging anything
+      if (!draggable) {
         return null;
       }
 
-      // no placeholder needed when dragging over the home
+      // not dragging over any droppable
+      if (!destination) {
+        return null;
+      }
+
+      // no placeholder needed when dragging over the home droppable
       if (id === draggable.descriptor.droppableId) {
         return null;
       }

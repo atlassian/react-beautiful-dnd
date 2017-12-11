@@ -88,14 +88,6 @@ export default (callbacks: Callbacks, getDraggableRef: () =>?HTMLElement): Keybo
       return;
     }
 
-    // already dragging
-    if (!direction) {
-      console.error('cannot handle keyboard event if direction is not provided');
-      stopEvent(event);
-      cancel();
-      return;
-    }
-
     // Cancelling
     if (event.keyCode === keyCodes.escape) {
       stopEvent(event);
@@ -112,6 +104,14 @@ export default (callbacks: Callbacks, getDraggableRef: () =>?HTMLElement): Keybo
     }
 
     // Movement
+
+    // already dragging
+    if (!direction) {
+      console.error('cannot handle keyboard movement event if direction is not provided');
+      stopEvent(event);
+      cancel();
+      return;
+    }
 
     const executeBasedOnDirection = (fns: ExecuteBasedOnDirection) => {
       if (direction === 'vertical') {
