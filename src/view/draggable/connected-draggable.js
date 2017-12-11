@@ -88,9 +88,6 @@ export const makeSelector = (): Selector => {
       const needsToMove = movement.draggables.indexOf(draggableId) !== -1;
 
       if (!needsToMove) {
-        // TEMP
-        // canAnimate?
-        // return defaultMapProps;
         return getWithMovement(
           origin,
           canLift
@@ -136,13 +133,6 @@ export const makeSelector = (): Selector => {
       pending: ?PendingDrop,
       ownDimension: ?DraggableDimension,
     ): MapProps => {
-      // a lift is in progress - do not let anything start a lift
-
-      // TODO: required?
-      // if (phase === 'PREPARING' || phase === 'COLLECTING_INITIAL_DIMENSIONS') {
-      //   return preLiftMapProps;
-      // }
-
       // may not have the correct type OR has not been collected.
       // either way this item will not be moving
       if (!ownDimension) {
