@@ -68,10 +68,15 @@ class InnerList extends Component<InnerListProps> {
   shouldComponentUpdate(nextProps: InnerListProps) {
     // do not render list if the only thing changing is whether the list is being dragged over
     // this will prevent the entire list from rendering when dragging over
-    if (nextProps.dropSnapshot.isDraggingOver !== this.props.dropSnapshot.isDraggingOver) {
-      return false;
+    if (nextProps.dropSnapshot.isDraggingOver === this.props.dropSnapshot.isDraggingOver) {
+      return true;
     }
-    return true;
+
+    if (nextProps.quotes !== this.props.quotes) {
+      return true;
+    }
+
+    return false;
   }
 
   render() {
