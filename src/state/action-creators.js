@@ -465,6 +465,7 @@ export const lift = (descriptor: DraggableDescriptor,
     }
 
     // will communicate with the marshal to start requesting dimensions
+    console.time('lifting');
     dispatch(requestDimensions(descriptor));
 
     // Need to allow an opportunity for the dimensions to be requested.

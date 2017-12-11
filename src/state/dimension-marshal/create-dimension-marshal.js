@@ -8,7 +8,6 @@ import type{
   DraggableDescriptor,
   DraggableDimension,
   DroppableDimension,
-  Position,
   State as AppState,
 } from '../../types';
 import type {
@@ -305,19 +304,20 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
+    console.time('initial dimension publish');
+
     // Get the minimum dimensions to start a drag
     const homeDimension: DroppableDimension = homeEntry.callbacks.getDimension();
     const draggableDimension: DraggableDimension = draggableEntry.getDimension();
-
-    // publishing container first - although it is not strictly needed
+    // Publishing dimensions
     callbacks.publishDroppables([homeDimension]);
     callbacks.publishDraggables([draggableDimension]);
-    // watching the scroll of the home droppable
+    // Watching the scroll of the home droppable
     homeEntry.callbacks.watchScroll(callbacks.updateDroppableScroll);
 
     const initialCollection: Collection = {
       draggable: descriptor,
-      published: [descriptor, homeEntry.descriptor],
+      collected: [descriptor, homeEntry.descriptor],
       toBeCollected: [],
       toBePublishedBuffer: [],
     };
@@ -346,10 +346,11 @@ export default (callbacks: Callbacks) => {
       });
 
       const newCollection: Collection = {
-        draggable: collection.draggable,
-        published: collection.published,
-        toBePublishedBuffer: collection.toBePublishedBuffer,
         toBeCollected,
+        // unchanged
+        draggable: collection.draggable,
+        collected: collection.collected,
+        toBePublishedBuffer: collection.toBePublishedBuffer,
       };
 
       setState({
@@ -363,18 +364,26 @@ export default (callbacks: Callbacks) => {
   };
 
   const stopCollecting = () => {
-    if (!state.collection) {
+    const collection: ?Collection = state.collection;
+
+    if (!collection) {
       console.warn('not stopping dimension capturing as was not previously capturing');
       return;
     }
 
     // need to tell published droppables to stop watching the scroll
-    state.collection.published.forEach((descriptor: UnknownDescriptorType) => {
+    collection.collected.forEach((descriptor: UnknownDescriptorType) => {
       // do nothing if it was a draggable
       if (!descriptor.type) {
         return;
       }
-      const entry: DroppableEntry = state.droppables[descriptor.id];
+      const entry: ?DroppableEntry = state.droppables[descriptor.id];
+
+      // might have been removed during a drag
+      if (!entry) {
+        return;
+      }
+
       entry.callbacks.unwatchScroll();
     });
 
