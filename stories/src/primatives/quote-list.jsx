@@ -96,7 +96,6 @@ class InnerQuoteList extends Component<QuoteListProps> {
 
 type InnerListProps = {|
   dropProvided: DroppableProvided,
-  dropSnapshot: DroppableStateSnapshot,
   quotes: Quote[],
   title: ?string,
   autoFocusQuoteId: ?string,
@@ -159,7 +158,6 @@ export default class QuoteList extends Component<Props> {
                   quotes={quotes}
                   title={title}
                   dropProvided={dropProvided}
-                  dropSnapshot={dropSnapshot}
                   autoFocusQuoteId={autoFocusQuoteId}
                 />
               </ScrollContainer>
@@ -168,7 +166,6 @@ export default class QuoteList extends Component<Props> {
                 quotes={quotes}
                 title={title}
                 dropProvided={dropProvided}
-                dropSnapshot={dropSnapshot}
                 autoFocusQuoteId={autoFocusQuoteId}
               />
             )}
