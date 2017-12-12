@@ -10,7 +10,7 @@ import shouldAllowDraggingFromTarget from '../util/should-allow-dragging-from-ta
 import type {
   Position,
 } from '../../../types';
-import type { MouseSensor } from './sensor-types';
+import type { MouseSensor, CreateSensorArgs } from './sensor-types';
 import type {
   Callbacks,
   Props,
@@ -31,7 +31,7 @@ type State = {
 const primaryButton = 0;
 const noop = () => { };
 
-export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): MouseSensor => {
+export default ({ callbacks, getDraggableRef, canLift }: CreateSensorArgs): MouseSensor => {
   let state: State = {
     isDragging: false,
     pending: null,
@@ -191,18 +191,14 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Mous
     );
   };
 
-  const onMouseDown = (event: MouseEvent, props: Props): void => {
-    if (!props.canLift) {
+  const onMouseDown = (event: MouseEvent): void => {
+    if (!canLift(event)) {
       return;
     }
 
     if (isCapturing()) {
       console.error('should not be able to perform a mouse down while a drag or pending drag is occurring');
       cancel();
-      return;
-    }
-
-    if (!shouldAllowDraggingFromTarget(event, props)) {
       return;
     }
 

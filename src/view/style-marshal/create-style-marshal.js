@@ -12,9 +12,14 @@ const baseStyles: string = `
 `;
 
 const whileDraggingStyles: string = `
-  * {
+  body {
     cursor: grabbing;
     cursor: -webkit-grabbing;
+  }
+
+  /* Stop any text selection and mouse events processing */
+  body > * {
+    user-select: none;
   }
 
   ${baseStyles}
@@ -43,7 +48,6 @@ export default () => {
         head.appendChild(el);
       }
 
-      // setting the text content for good browser support
       // https://stackoverflow.com/a/22050778/1374236
       el.innerHTML = rules;
     };

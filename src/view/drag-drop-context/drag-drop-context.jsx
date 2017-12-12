@@ -31,6 +31,18 @@ type Context = {
   [string]: Store
 }
 
+const getIsAnimatingCancel = (state: State) => {
+  if (state.phase !== 'DROP_ANIMATING') {
+    return false;
+  }
+
+  if (!state.drop || !state.drop.pending) {
+    return false;
+  }
+
+  return state.drop.pending.trigger === 'CANCEL';
+};
+
 export default class DragDropContext extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
   store: Store
@@ -80,7 +92,7 @@ export default class DragDropContext extends React.Component<Props> {
     let previous: State = this.store.getState();
 
     this.unsubscribe = this.store.subscribe(() => {
-      const previousForThisExecution = previous;
+      const previousValue = previous;
       const current = this.store.getState();
       // setting previous now incase any of the
       // functions synchronously trigger more updates
@@ -91,21 +103,26 @@ export default class DragDropContext extends React.Component<Props> {
         onDragStart: this.props.onDragStart,
         onDragEnd: this.props.onDragEnd,
       };
-      fireHooks(hooks, current, previousForThisExecution);
+      fireHooks(hooks, current, previousValue);
 
-      // TEMP
-      const isDragStarting: boolean = previousForThisExecution.phase !== 'DRAGGING' && current.phase === 'DRAGGING';
-      const isDragStopping: boolean = previousForThisExecution.phase === 'DRAGGING' && current.phase !== 'DRAGGING';
+      const wasAnimatingCancel: boolean = getIsAnimatingCancel(previousValue);
+      const isAnimatingCancel: boolean = getIsAnimatingCancel(current);
+      const wasDragging: boolean = previousValue.phase === 'DRAGGING' || wasAnimatingCancel;
+      const isDragging: boolean = current.phase === 'DRAGGING';
+      const isDragStarting: boolean = !wasDragging && isDragging;
+      const isDragStopping: boolean = wasDragging && !isDragging && !isAnimatingCancel;
 
       if (isDragStarting) {
+        console.warn('applying harsh styles');
         styleMarshal.dragStarted();
       }
       if (isDragStopping) {
+        console.warn('removing harsh styles');
         styleMarshal.dragStopped();
       }
 
       // inform the dimension marshal about updates
-      this.marshal.onStateChange(current, previousForThisExecution);
+      this.marshal.onStateChange(current, previousValue);
     });
   }
 

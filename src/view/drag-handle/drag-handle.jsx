@@ -10,7 +10,9 @@ import type {
   MouseSensor,
   KeyboardSensor,
   TouchSensor,
+  CreateSensorArgs,
 } from './sensor/sensor-types';
+import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-target';
 import createMouseSensor from './sensor/create-mouse-sensor';
 import createKeyboardSensor from './sensor/create-keyboard-sensor';
 import createTouchSensor from './sensor/create-touch-sensor';
@@ -19,23 +21,29 @@ const getFalse: () => boolean = () => false;
 
 export default class DragHandle extends Component<Props> {
   /* eslint-disable react/sort-comp */
-  mouseSensor: MouseSensor = createMouseSensor(
-    this.props.callbacks,
-    this.props.getDraggableRef
-  );
-  keyboardSensor: KeyboardSensor = createKeyboardSensor(
-    this.props.callbacks,
-    this.props.getDraggableRef
-  );
-  touchSensor: TouchSensor = createTouchSensor(
-    this.props.callbacks,
-    this.props.getDraggableRef
-  );
-  sensors: Sensor[] = [
-    this.mouseSensor,
-    this.keyboardSensor,
-    this.touchSensor,
-  ];
+  mouseSensor: MouseSensor;
+  keyboardSensor: KeyboardSensor;
+  touchSensor: TouchSensor;
+  sensors: Sensor[];
+
+  constructor(props: Props, context: mixed) {
+    super(props, context);
+
+    const args: CreateSensorArgs = {
+      callbacks: this.props.callbacks,
+      getDraggableRef: this.props.getDraggableRef,
+      canLift: this.canLift,
+    };
+
+    this.mouseSensor = createMouseSensor(args);
+    this.keyboardSensor = createKeyboardSensor(args);
+    this.touchSensor = createTouchSensor(args);
+    this.sensors = [
+      this.mouseSensor,
+      this.keyboardSensor,
+      this.touchSensor,
+    ];
+  }
 
   componentWillUnmount() {
     this.sensors.forEach((sensor: Sensor) => {
@@ -107,7 +115,7 @@ export default class DragHandle extends Component<Props> {
       return;
     }
 
-    this.mouseSensor.onMouseDown(event, this.props);
+    this.mouseSensor.onMouseDown(event);
   }
 
   onTouchStart = (event: TouchEvent) => {
@@ -117,7 +125,7 @@ export default class DragHandle extends Component<Props> {
       return;
     }
 
-    this.touchSensor.onTouchStart(event, this.props);
+    this.touchSensor.onTouchStart(event);
   }
 
   onTouchMove = (event: TouchEvent) => {
@@ -130,10 +138,18 @@ export default class DragHandle extends Component<Props> {
     this.touchSensor.onClick(event);
   }
 
-  isAnySensorDragging = () =>
+  canLift = (event: Event) => {
+    if (this.isAnySensorCapturing()) {
+      return false;
+    }
+
+    return shouldAllowDraggingFromTarget(event, this.props);
+  }
+
+  isAnySensorDragging = (): boolean =>
     this.sensors.some((sensor: Sensor) => sensor.isDragging())
 
-  isAnySensorCapturing = () =>
+  isAnySensorCapturing = (): boolean =>
     this.sensors.some((sensor: Sensor) => sensor.isCapturing())
 
   getProvided = memoizeOne((isEnabled: boolean, isDragging: boolean): ?Provided => {

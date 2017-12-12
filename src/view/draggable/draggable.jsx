@@ -14,7 +14,6 @@ import type {
 import DraggableDimensionPublisher from '../draggable-dimension-publisher/';
 import Moveable from '../moveable/';
 import DragHandle from '../drag-handle';
-import { css } from '../animation';
 import getWindowScrollPosition from '../get-window-scroll-position';
 // eslint-disable-next-line no-duplicate-imports
 import type {
@@ -234,25 +233,18 @@ export default class Draggable extends Component<Props, State> {
     }
   )
 
-  getNotDraggingStyle = memoizeOne(
-    (
-      canAnimate: boolean,
-      movementStyle: MovementStyle,
-      canLift: boolean,
-    ): NotDraggingStyle => {
-      const style: NotDraggingStyle = {
-        transform: movementStyle.transform,
-      };
-      return style;
-    }
+  getNotDraggingStyle = memoizeOne((movementStyle: MovementStyle): NotDraggingStyle => {
+    const style: NotDraggingStyle = {
+      transform: movementStyle.transform,
+    };
+    return style;
+  }
   )
 
   getProvided = memoizeOne(
     (
       isDragging: boolean,
       isDropAnimating: boolean,
-      canLift: boolean,
-      canAnimate: boolean,
       dimension: ?DraggableDimension,
       dragHandleProps: ?DragHandleProvided,
       movementStyle: MovementStyle,
@@ -261,11 +253,7 @@ export default class Draggable extends Component<Props, State> {
 
       const draggableStyle: DraggableStyle = (() => {
         if (!useDraggingStyle) {
-          return this.getNotDraggingStyle(
-            canAnimate,
-            movementStyle,
-            canLift,
-          );
+          return this.getNotDraggingStyle(movementStyle);
         }
 
         invariant(dimension, 'draggable dimension required for dragging');
@@ -291,11 +279,7 @@ export default class Draggable extends Component<Props, State> {
   }))
 
   getSpeed = memoizeOne(
-    (isDragging: boolean, isDropAnimating: boolean, canAnimate: boolean): Speed => {
-      if (!canAnimate) {
-        return 'INSTANT';
-      }
-
+    (isDragging: boolean, isDropAnimating: boolean): Speed => {
       if (isDropAnimating) {
         return 'STANDARD';
       }
@@ -317,8 +301,6 @@ export default class Draggable extends Component<Props, State> {
       offset,
       isDragging,
       isDropAnimating,
-      canLift,
-      canAnimate,
       isDragDisabled,
       dimension,
       children,
@@ -327,7 +309,7 @@ export default class Draggable extends Component<Props, State> {
     } = this.props;
     const droppableId: DroppableId = this.context[droppableIdKey];
 
-    const speed = this.getSpeed(isDragging, isDropAnimating, canAnimate);
+    const speed = this.getSpeed(isDragging, isDropAnimating);
 
     return (
       <DraggableDimensionPublisher
@@ -346,7 +328,6 @@ export default class Draggable extends Component<Props, State> {
               isDragging={isDragging}
               direction={direction}
               isEnabled={!isDragDisabled}
-              canLift={canLift}
               callbacks={this.callbacks}
               getDraggableRef={this.getDraggableRef}
               // by default we do not allow dragging on interactive elements
@@ -357,8 +338,6 @@ export default class Draggable extends Component<Props, State> {
                   this.getProvided(
                     isDragging,
                     isDropAnimating,
-                    canLift,
-                    canAnimate,
                     dimension,
                     dragHandleProps,
                     movementStyle,

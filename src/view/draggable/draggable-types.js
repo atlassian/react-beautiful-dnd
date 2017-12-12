@@ -108,8 +108,6 @@ export type MapProps = {|
   // can be null if not over a droppable
   direction: ?Direction,
   isDropAnimating: boolean,
-  canLift: boolean,
-  canAnimate: boolean,
   offset: Position,
   dimension: ?DraggableDimension,
 |}
