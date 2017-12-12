@@ -34,6 +34,7 @@ import type {
   CurrentDrag,
   DragImpact,
   DraggableDescriptor,
+  Direction,
 } from '../../types';
 import type {
   MapProps,
@@ -85,6 +86,8 @@ export const makeSelector = (): Selector => {
       movement: DragMovement,
       canLift: boolean,
     ): MapProps => {
+      // return defaultMapProps;
+
       const needsToMove = movement.draggables.indexOf(draggableId) !== -1;
 
       if (!needsToMove) {
@@ -105,6 +108,23 @@ export const makeSelector = (): Selector => {
     },
   );
 
+  const getDraggingProps = memoizeOne((
+    offset: Position,
+    canAnimate: boolean,
+    dimension: DraggableDimension,
+    // direction of the droppable you are over
+    direction: ?Direction,
+  ): MapProps => ({
+    isDragging: true,
+    canLift: false,
+    isDropAnimating: false,
+    offset,
+    canAnimate,
+    dimension,
+    direction,
+  }));
+
+  // TODO: return null if not dragging?
   const ownDimensionSelector = (state: State, ownProps: OwnProps): ?DraggableDimension => {
     if (!state.dimension) {
       return null;
@@ -162,16 +182,12 @@ export const makeSelector = (): Selector => {
         const offset: Position = current.client.offset;
         const canAnimate: boolean = current.shouldAnimate;
 
-        // not memoizing result as it should not move without an update
-        return {
-          isDragging: true,
-          canLift: false,
-          isDropAnimating: false,
+        return getDraggingProps(
+          memoizedOffset(offset.x, offset.y),
           canAnimate,
-          offset,
-          dimension: ownDimension,
-          direction: impact.direction,
-        };
+          ownDimension,
+          impact.direction,
+        );
       }
 
       if (phase === 'DROP_ANIMATING') {

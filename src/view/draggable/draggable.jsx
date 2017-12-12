@@ -335,6 +335,7 @@ export default class Draggable extends Component<Props, State> {
     const droppableId: DroppableId = this.context[droppableIdKey];
 
     const speed = this.getSpeed(isDragging, isDropAnimating, canAnimate);
+    console.log('rendering draggable', draggableId);
 
     return (
       <DraggableDimensionPublisher
