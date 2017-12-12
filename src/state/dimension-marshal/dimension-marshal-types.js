@@ -16,7 +16,12 @@ export type UpdateDroppableScrollFn = (id: DroppableId, offset: Position) => voi
 
 export type DroppableCallbacks = {|
   getDimension: GetDroppableDimensionFn,
+  // Droppable must listen to scroll events and publish them using the
+  // onChange callback. If the Droppable is not in a scroll container then
+  // it does not need to do anything
   watchScroll: (onChange: UpdateDroppableScrollFn) => void,
+  // If the Droppable is listening for scrol events - it needs to stop!
+  // This may be called even if watchScroll was not previously called
   unwatchScroll: () => void,
 |}
 

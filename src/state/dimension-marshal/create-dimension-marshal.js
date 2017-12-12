@@ -1,7 +1,6 @@
 // @flow
-import getCollectionOrder from './get-collection-order';
 import Perf from 'react-addons-perf';
-import type{
+import type {
   DraggableId,
   DroppableId,
   DroppableDescriptor,
@@ -26,23 +25,11 @@ import type {
   DraggableEntryMap,
 } from './dimension-marshal-types';
 
-type Collection = {|
-  // item that is dragging
-  draggable: DraggableDescriptor,
-  // ordered list based on distance from starting draggable
-  toBeCollected: OrderedCollectionList,
-  // Dimensions that have been collected from components
-  // but have not yet been published to the store
-  toBePublishedBuffer: OrderedDimensionList,
-  // Dimensions that have already been collected
-  collected: OrderedCollectionList,
-|}
-
 // Not using exact type to allow spread to create a new state object
 type State = {
   droppables: DroppableEntryMap,
   draggables: DraggableEntryMap,
-  collection: ?Collection,
+  isCollecting: boolean,
   timers: {|
     liftTimeoutId: ?number,
     collectionFrameId: ?number,
@@ -59,8 +46,6 @@ type Timers = {|
   collectionFrameId: ?number,
 |}
 
-const collectionSize: number = 600;
-
 const noTimers: Timers = {
   liftTimeoutId: null,
   collectionFrameId: null,
@@ -70,7 +55,7 @@ export default (callbacks: Callbacks) => {
   let state: State = {
     droppables: {},
     draggables: {},
-    collection: null,
+    isCollecting: false,
     timers: noTimers,
   };
 
@@ -194,37 +179,37 @@ export default (callbacks: Callbacks) => {
     console.warn('currently not supporting unmounting a Droppable during a drag');
   };
 
-  const collect = () => {
-    // no longer collecting
-    if (!state.collection) {
-      return;
-    }
+  const setFrameId = (frameId: ?number) => {
+    const timers: Timers = {
+      collectionFrameId: frameId,
+      liftTimeoutId: null,
+    };
 
-    // All finished!
-    if (!state.collection.toBeCollected.length && !state.collection.toBePublishedBuffer.length) {
-      return;
-    }
+    setState({
+      ...state,
+      timers,
+    });
+  };
 
-    // Splitting the act of
-    // - collecting dimensions(expensive) and
-    // - publishing them into the store(expensive)
-    // into two seperate frames.
-    //
-    const frameId: number = requestAnimationFrame(() => {
-      const collection: ?Collection = state.collection;
-      // within the frame duration we where told to no longer collect
-      if (collection == null) {
-        return;
-      }
+  const collect = (toBeCollected: UnknownDescriptorType[]) => {
+    // Phase 1: collect dimensions in a single frame
+    const collectFrameId: number = requestAnimationFrame(() => {
+      console.time('collecting raw dimensions');
+      const toBePublishedBuffer: UnknownDimensionType[] = toBeCollected.map(
+        (descriptor: UnknownDescriptorType): UnknownDimensionType => {
+          // is a droppable
+          if (descriptor.type) {
+            return state.droppables[descriptor.id].callbacks.getDimension();
+          }
+          // is a draggable
+          return state.draggables[descriptor.id].getDimension();
+        }
+      );
+      console.timeEnd('collecting raw dimensions');
 
-      const toBeCollected: OrderedCollectionList = collection.toBeCollected;
-      const toBePublishedBuffer: OrderedDimensionList = collection.toBePublishedBuffer;
-
-      // if there are dimensions from the previous frame in the buffer - publish them
-
-      if (toBePublishedBuffer.length) {
-        // Perf.start();
-        console.time('flushing buffer');
+      // Phase 2: publish all dimensions to the store
+      const publishFrameId: number = requestAnimationFrame(() => {
+        console.time('publishing dimensions');
         const toBePublished: ToBePublished = toBePublishedBuffer.reduce(
           (previous: ToBePublished, dimension: UnknownDimensionType): ToBePublished => {
             // is a draggable
@@ -240,85 +225,20 @@ export default (callbacks: Callbacks) => {
         callbacks.publishDroppables(toBePublished.droppables);
         callbacks.publishDraggables(toBePublished.draggables);
 
-        // Need to request droppables to start listening to scrolling
+        // need to watch the scroll on each droppable
         toBePublished.droppables.forEach((dimension: DroppableDimension) => {
           const entry: DroppableEntry = state.droppables[dimension.descriptor.id];
           entry.callbacks.watchScroll(callbacks.updateDroppableScroll);
         });
 
-        console.timeEnd('flushing buffer');
-        // Perf.stop();
-        // const measurements = Perf.getLastMeasurements();
-        // Perf.printInclusive(measurements);
-
-        // clear the buffer
-        const newCollection: Collection = {
-          // clear the buffer
-          toBePublishedBuffer: [],
-          // keep everything else the same
-          draggable: collection.draggable,
-          toBeCollected: collection.toBeCollected,
-          collected: collection.collected,
-        };
-
-        setState({
-          ...state,
-          collection: newCollection,
-        });
-
-        collect();
-        return;
-      }
-
-      // the buffer is empty: start collecting other dimensions
-      // obtain targets and remove them from the array
-      const newToBeCollected: OrderedCollectionList = toBeCollected.slice(0);
-      const targets: OrderedCollectionList = newToBeCollected.splice(0, collectionSize);
-
-      console.time('requesting dimensions');
-
-      const additions: UnknownDimensionType[] = targets.map(
-        (descriptor: UnknownDescriptorType): UnknownDimensionType => {
-          // is a droppable
-          if (descriptor.type) {
-            return state.droppables[descriptor.id].callbacks.getDimension();
-          }
-          // is a draggable
-          return state.draggables[descriptor.id].getDimension();
-        }
-      );
-
-      console.timeEnd('requesting dimensions');
-
-      const newCollection: Collection = {
-        draggable: collection.draggable,
-        // newly collected items have been added to the collected list
-        collected: [...collection.collected, ...targets],
-        // new list with targets removed
-        toBeCollected: newToBeCollected,
-        // collected items added to buffer
-        toBePublishedBuffer: [...toBePublishedBuffer, ...additions],
-      };
-
-      setState({
-        ...state,
-        collection: newCollection,
+        setFrameId(null);
+        console.timeEnd('publishing dimensions');
       });
 
-      // continue collecting
-      collect();
+      setFrameId(publishFrameId);
     });
 
-    const timers: Timers = {
-      collectionFrameId: frameId,
-      // should be null - but not worth checking for here
-      liftTimeoutId: state.timers.liftTimeoutId,
-    };
-
-    setState({
-      ...state,
-      timers,
-    });
+    setFrameId(collectFrameId);
   };
 
   const startInitialCollection = (descriptor: DraggableDescriptor) => {
@@ -328,7 +248,10 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    const draggableEntry: ?DraggableEntry = state.draggables[descriptor.id];
+    const draggables: DraggableEntryMap = state.draggables;
+    const droppables: DroppableEntryMap = state.droppables;
+
+    const draggableEntry: ?DraggableEntry = draggables[descriptor.id];
 
     if (!draggableEntry) {
       console.error(`Cannot find Draggable with id ${descriptor.id} to start collecting dimensions`);
@@ -336,7 +259,7 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    const homeEntry: ?DroppableEntry = state.droppables[draggableEntry.descriptor.droppableId];
+    const homeEntry: ?DroppableEntry = droppables[draggableEntry.descriptor.droppableId];
 
     if (!homeEntry) {
       console.error(`Cannot find home Droppable [id:${draggableEntry.descriptor.droppableId}] for Draggable [id:${descriptor.id}]`);
@@ -347,63 +270,47 @@ export default (callbacks: Callbacks) => {
     console.time('initial dimension publish');
 
     // Get the minimum dimensions to start a drag
-    const homeDimension: DroppableDimension = homeEntry.callbacks.getDimension();
-    const draggableDimension: DraggableDimension = draggableEntry.getDimension();
+    const home: DroppableDimension = homeEntry.callbacks.getDimension();
+    const draggable: DraggableDimension = draggableEntry.getDimension();
     // Publishing dimensions
-    callbacks.publishDroppables([homeDimension]);
-    callbacks.publishDraggables([draggableDimension]);
+    callbacks.publishDroppables([home]);
+    callbacks.publishDraggables([draggable]);
     // Watching the scroll of the home droppable
     homeEntry.callbacks.watchScroll(callbacks.updateDroppableScroll);
 
-    const initialCollection: Collection = {
-      draggable: descriptor,
-      collected: [descriptor, homeEntry.descriptor],
-      toBeCollected: [],
-      toBePublishedBuffer: [],
-    };
+    const draggablesToBeCollected: DraggableDescriptor[] =
+      Object.keys(draggables)
+        .map((id: DraggableId): DraggableDescriptor => draggables[id].descriptor)
+        // remove the original draggable from the list
+        .filter((d: DraggableDescriptor): boolean => d.id !== descriptor.id)
+        // remove draggables that do not have the same droppable type
+        .filter((d: DraggableDescriptor): boolean => {
+          const droppable: DroppableDescriptor = droppables[d.droppableId].descriptor;
+          return droppable.type === home.descriptor.type;
+        });
 
-    setState({
-      ...state,
-      collection: initialCollection,
-    });
+    const droppablesToBeCollected: DroppableDescriptor[] =
+      Object.keys(droppables)
+        // remove the home droppable from the list
+        .filter((d: DroppableDescriptor): boolean => d.id !== home.descriptor.id)
+      // remove droppables with a different type
+        .filter((d: DroppableDescriptor): boolean => {
+          const droppable: DroppableDescriptor = droppables[d.id].descriptor;
+          return droppable.type === home.descriptor.type;
+        });
+
+    const toBeCollected: UnknownDescriptorType[] = [
+      ...droppablesToBeCollected,
+      ...draggablesToBeCollected,
+    ];
 
     console.timeEnd('initial dimension publish');
 
     // After this initial publish a drag will start
-    const timerId: number = setTimeout(() => {
-      const collection: ?Collection = state.collection;
-      // Drag was cleaned during this timeout
-      if (!collection) {
-        return;
-      }
-
-      // The drag has started and we need to collect all the other dimensions
-      const toBeCollected: OrderedCollectionList = getCollectionOrder({
-        draggable: descriptor,
-        home: homeEntry.descriptor,
-        draggables: state.draggables,
-        droppables: state.droppables,
-      });
-
-      const newCollection: Collection = {
-        toBeCollected,
-        // unchanged
-        draggable: collection.draggable,
-        collected: collection.collected,
-        toBePublishedBuffer: collection.toBePublishedBuffer,
-      };
-
-      setState({
-        ...state,
-        collection: newCollection,
-      });
-
-      // start collection loop
-      collect();
-    });
+    const liftTimeoutId: number = setTimeout(() => collect(toBeCollected));
 
     const timers: Timers = {
-      liftTimeoutId: timerId,
+      liftTimeoutId,
       collectionFrameId: null,
     };
 
@@ -414,28 +321,16 @@ export default (callbacks: Callbacks) => {
   };
 
   const stopCollecting = () => {
-    const collection: ?Collection = state.collection;
-
-    if (!collection) {
+    if (!state.isCollecting) {
       console.warn('not stopping dimension capturing as was not previously capturing');
       return;
     }
 
-    // need to tell published droppables to stop watching the scroll
-    collection.collected.forEach((descriptor: UnknownDescriptorType) => {
-      // do nothing if it was a draggable
-      if (!descriptor.type) {
-        return;
-      }
-      const entry: ?DroppableEntry = state.droppables[descriptor.id];
-
-      // might have been removed during a drag
-      if (!entry) {
-        return;
-      }
-
-      entry.callbacks.unwatchScroll();
-    });
+    // Tell all droppables to stop watching scroll
+    // all good if they where not already listening
+    Object.keys(state.droppables)
+      .map((id: DroppableId): DroppableEntry => state.droppables[id])
+      .forEach((entry: DroppableEntry) => entry.callbacks.unwatchScroll());
 
     if (state.timers.liftTimeoutId) {
       clearTimeout(state.timers.liftTimeoutId);
@@ -448,7 +343,7 @@ export default (callbacks: Callbacks) => {
     // clear the collection
     setState({
       ...state,
-      collection: null,
+      isCollecting: false,
       timers: noTimers,
     });
   };
@@ -470,7 +365,7 @@ export default (callbacks: Callbacks) => {
 
     // No need to collect any more as the user has finished interacting
     if (phase === 'DROP_ANIMATING' || phase === 'DROP_COMPLETE') {
-      if (state.collection) {
+      if (state.isCollecting);
         stopCollecting();
       }
       return;
@@ -478,7 +373,7 @@ export default (callbacks: Callbacks) => {
 
     // drag potentially cleanled
     if (phase === 'IDLE') {
-      if (state.collection) {
+      if (state.isCollecting) {
         stopCollecting();
       }
     }
@@ -493,4 +388,4 @@ export default (callbacks: Callbacks) => {
   };
 
   return marshal;
-};
+}

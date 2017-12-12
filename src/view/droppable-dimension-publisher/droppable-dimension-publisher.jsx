@@ -115,6 +115,8 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   };
 
   unwatchScroll = () => {
+    // it is possible for the dimension publisher to tell this component to unwatch scroll
+    // when it was not listening to a scroll
     if (!this.isWatchingScroll) {
       return;
     }
