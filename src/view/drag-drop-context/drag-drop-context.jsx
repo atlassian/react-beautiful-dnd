@@ -41,7 +41,7 @@ const createDraggableClassName = (() => {
 export default class DragDropContext extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
   store: Store
-  marshal: Marshal
+  dimensionMarshal: Marshal
   unsubscribe: Function
   draggableClassName: string
 
@@ -61,7 +61,7 @@ export default class DragDropContext extends React.Component<Props> {
   getChildContext(): Context {
     return {
       [storeKey]: this.store,
-      [dimensionMarshalKey]: this.marshal,
+      [dimensionMarshalKey]: this.dimensionMarshal,
       [draggableClassNameKey]: this.draggableClassName,
     };
   }
@@ -86,7 +86,7 @@ export default class DragDropContext extends React.Component<Props> {
         this.store.dispatch(updateDroppableDimensionScroll(id, offset));
       },
     };
-    this.marshal = createDimensionMarshal(callbacks);
+    this.dimensionMarshal = createDimensionMarshal(callbacks);
 
     let previous: State = this.store.getState();
 
@@ -114,7 +114,7 @@ export default class DragDropContext extends React.Component<Props> {
 
       // inform the dimension marshal about updates
       // this can trigger more actions synchronously so we are placing it last
-      this.marshal.onStateChange(current, previousValue);
+      this.dimensionMarshal.onStateChange(current);
     });
   }
 

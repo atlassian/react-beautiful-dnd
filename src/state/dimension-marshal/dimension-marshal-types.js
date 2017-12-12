@@ -51,7 +51,7 @@ export type Marshal = {|
     callbacks: DroppableCallbacks) => void,
   unregisterDraggable: (id: DraggableId) => void,
   unregisterDroppable: (id: DroppableId) => void,
-  onStateChange: (current: State, previous: State) => void,
+  onStateChange: (current: State) => void,
 |}
 
 export type Callbacks = {|

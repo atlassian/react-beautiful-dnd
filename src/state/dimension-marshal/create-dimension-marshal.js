@@ -9,6 +9,7 @@ import type{
   DraggableDimension,
   DroppableDimension,
   State as AppState,
+  Phase,
 } from '../../types';
 import type {
   Marshal,
@@ -452,16 +453,10 @@ export default (callbacks: Callbacks) => {
     });
   };
 
-  const onStateChange = (current: AppState, previous: AppState) => {
-    const currentPhase: string = current.phase;
-    const previousPhase: string = previous.phase;
+  const onStateChange = (current: AppState) => {
+    const phase: Phase = current.phase;
 
-    // Exit early if phase in unchanged
-    if (currentPhase === previousPhase) {
-      return;
-    }
-
-    if (currentPhase === 'COLLECTING_INITIAL_DIMENSIONS') {
+    if (phase === 'COLLECTING_INITIAL_DIMENSIONS') {
       const descriptor: ?DraggableDescriptor = current.dimension.request;
 
       if (!descriptor) {
@@ -474,7 +469,7 @@ export default (callbacks: Callbacks) => {
     }
 
     // No need to collect any more as the user has finished interacting
-    if (currentPhase === 'DROP_ANIMATING' || currentPhase === 'DROP_COMPLETE') {
+    if (phase === 'DROP_ANIMATING' || phase === 'DROP_COMPLETE') {
       if (state.collection) {
         stopCollecting();
       }
@@ -482,7 +477,7 @@ export default (callbacks: Callbacks) => {
     }
 
     // drag potentially cleanled
-    if (currentPhase === 'IDLE') {
+    if (phase === 'IDLE') {
       if (state.collection) {
         stopCollecting();
       }

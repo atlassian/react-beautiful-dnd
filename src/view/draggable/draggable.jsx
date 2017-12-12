@@ -142,7 +142,9 @@ export default class Draggable extends Component<Props, State> {
 
     const windowScroll: Position = getWindowScrollPosition();
 
+    console.time('movement');
     move(draggableId, client, windowScroll);
+    console.timeEnd('movement');
   }
 
   onMoveForward = () => {

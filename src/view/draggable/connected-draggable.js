@@ -50,16 +50,6 @@ const defaultMapProps: MapProps = {
   direction: null,
 };
 
-// type DraggingResult = {|
-//   dimension: DraggableDimension,
-//   offset: Position,
-//   direction: ?Direction,
-// |}
-
-// type MovingResult = {|
-//   offset: Position,
-// |}
-
 export const makeSelector = (): Selector => {
   const memoizedOffset = memoizeOne(
     (x: number, y: number): Position => ({
