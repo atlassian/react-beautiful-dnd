@@ -101,7 +101,6 @@ export default class DragDropContext extends React.Component<Props> {
         styleMarshal.dragStarted();
       }
       if (isDragStopping) {
-        console.log('removing dragging styles');
         styleMarshal.dragStopped();
       }
 

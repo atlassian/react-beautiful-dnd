@@ -6,7 +6,7 @@ export const draggableClassName = 'react-beautiful-dnd-draggable';
 const baseStyles: string = `
   .${draggableClassName} {
     -webkit-touch-callout: none;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
     touch-action: manipulation;
   }
 `;
@@ -45,7 +45,7 @@ export default () => {
 
       // setting the text content for good browser support
       // https://stackoverflow.com/a/22050778/1374236
-      el.textContent = rules;
+      el.innerHTML = rules;
     };
   })();
 

@@ -26,14 +26,8 @@ import type {
   State,
   Position,
   DraggableId,
-  DragState,
-  PendingDrop,
-  Phase,
   DragMovement,
   DraggableDimension,
-  CurrentDrag,
-  DragImpact,
-  DraggableDescriptor,
   Direction,
 } from '../../types';
 import type {
@@ -77,12 +71,12 @@ export const makeSelector = (): Selector => {
     }),
   );
 
-  const getWithMovement = memoizeOne(
-    (offset: Position, canLift: boolean): MapProps => ({
+  const getNotDraggingProps = memoizeOne(
+    (offset: Position): MapProps => ({
       isDropAnimating: false,
       isDragging: false,
       canAnimate: true,
-      canLift,
+      canLift: true,
       offset,
       dimension: null,
       direction: null,
@@ -105,48 +99,64 @@ export const makeSelector = (): Selector => {
     direction,
   }));
 
-  // TODO: drop animating
   const draggingSelector = (state: State, ownProps: OwnProps): ?MapProps => {
-    if (state.phase !== 'DRAGGING') {
+    if (state.phase !== 'DRAGGING' && state.phase !== 'DROP_ANIMATING') {
       return null;
     }
 
-    if (!state.drag) {
-      console.error('invalid drag state found in selector');
+    if (state.phase === 'DRAGGING') {
+      if (!state.drag) {
+        console.error('invalid drag state found in selector');
+        return null;
+      }
+
+      // not the dragging item
+      if (state.drag.initial.descriptor.id !== ownProps.draggableId) {
+        return null;
+      }
+
+      const offset: Position = state.drag.current.client.offset;
+      const dimension: DraggableDimension = state.dimension.draggable[ownProps.draggableId];
+      const direction: ?Direction = state.drag.impact.direction;
+
+      return getDraggingProps(
+        memoizedOffset(offset.x, offset.y),
+        // TODO
+        true,
+        dimension,
+        direction,
+      );
+    }
+
+    // dropping
+
+    if (!state.drop || !state.drop.pending) {
+      console.error('cannot provide props for dropping item when there is invalid state');
       return null;
     }
 
-    // not the dragging item
-    if (state.drag.initial.descriptor.id !== ownProps.draggableId) {
+    // this was not the dragging item
+    if (state.drop.pending.result.draggableId !== ownProps.draggableId) {
       return null;
     }
 
-    const offset: Position = state.drag.current.client.offset;
-    const dimension: DraggableDimension = state.dimension.draggable[ownProps.draggableId];
-    const direction: ?Direction = state.drag.impact.direction;
-
-    return getDraggingProps(
-      memoizedOffset(offset.x, offset.y),
-      // TODO
-      true,
-      dimension,
-      direction,
-    );
+    // not memoized as it is the only execution
+    return {
+      isDragging: false,
+      isDropAnimating: true,
+      canAnimate: true,
+      offset: state.drop.pending.newHomeOffset,
+      // cannot lift something that is dropping
+      canLift: false,
+      // still need to provide the dimension for the placeholder
+      dimension: state.dimension.draggable[ownProps.draggableId],
+      // direction no longer needed as drag handle is unbound
+      direction: null,
+    };
   };
 
-  const movingOutOfTheWaySelector = (state: State, ownProps: OwnProps): ?MapProps => {
-    if (state.phase !== 'DRAGGING') {
-      return null;
-    }
-
-    if (!state.drag) {
-      console.error('cannot correctly move item out of the way when there is invalid state');
-      return null;
-    }
-
-    const movement: DragMovement = state.drag.impact.movement;
-
-    const needsToMove = movement.draggables.indexOf(ownProps.draggableId) !== -1;
+  const getWithMovement = (id: DraggableId, movement: DragMovement): ?MapProps => {
+    const needsToMove = movement.draggables.indexOf(id) !== -1;
 
     if (!needsToMove) {
       return null;
@@ -156,11 +166,47 @@ export const makeSelector = (): Selector => {
       negate(movement.amount) :
       movement.amount;
 
-    return getWithMovement(
-      memoizedOffset(amount.x, amount.y),
-      // TODO
-      true,
-    );
+    return getNotDraggingProps(memoizedOffset(amount.x, amount.y));
+  };
+
+  const movingOutOfTheWaySelector = (state: State, ownProps: OwnProps): ?MapProps => {
+    if (state.phase !== 'DRAGGING' && state.phase !== 'DROP_ANIMATING') {
+      return null;
+    }
+
+    if (state.phase === 'DRAGGING') {
+      if (!state.drag) {
+        console.error('cannot correctly move item out of the way when there is invalid state');
+        return null;
+      }
+
+      // we do not care about the dragging item
+      if (state.drag.initial.descriptor.id === ownProps.draggableId) {
+        return null;
+      }
+
+      const movement: DragMovement = state.drag.impact.movement;
+      const needsToMove = movement.draggables.indexOf(ownProps.draggableId) !== -1;
+
+      if (!needsToMove) {
+        return null;
+      }
+
+      return getWithMovement(ownProps.draggableId, movement);
+    }
+
+    // state.phase === 'DROP_ANIMATING'
+    if (!state.drop || !state.drop.pending) {
+      console.error('cannot provide props for dropping item when there is invalid state');
+      return null;
+    }
+
+    // do nothing if this was the dragging item
+    if (state.drop.pending.result.draggableId === ownProps.draggableId) {
+      return null;
+    }
+
+    return getWithMovement(ownProps.draggableId, state.drop.pending.impact.movement);
   };
 
   return createSelector(
