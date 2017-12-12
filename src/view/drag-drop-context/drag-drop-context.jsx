@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
 import fireHooks from '../../state/fire-hooks';
 import createDimensionMarshal from '../../state/dimension-marshal/create-dimension-marshal';
+import createStyleMarshal from '../style-marshal/create-style-marshal';
 import type { Marshal, Callbacks as MarshalCallbacks } from '../../state/dimension-marshal/dimension-marshal-types';
 import type {
   Store,
@@ -57,6 +58,7 @@ export default class DragDropContext extends React.Component<Props> {
 
   componentWillMount() {
     this.store = createStore();
+    const styleMarshal = createStyleMarshal();
 
     // set up the dimension marshal
     const callbacks: MarshalCallbacks = {
@@ -90,6 +92,19 @@ export default class DragDropContext extends React.Component<Props> {
         onDragEnd: this.props.onDragEnd,
       };
       fireHooks(hooks, current, previousForThisExecution);
+
+      // TEMP
+      const isDragStarting: boolean = previousForThisExecution.phase !== 'DRAGGING' && current.phase === 'DRAGGING';
+      const isDragStopping: boolean = previousForThisExecution.phase === 'DRAGGING' && current.phase !== 'DRAGGING';
+
+      if (isDragStarting) {
+        console.warn('applying dragging styles');
+        styleMarshal.apply();
+      }
+      if (isDragStopping) {
+        console.log('removing dragging styles');
+        styleMarshal.unapply();
+      }
 
       // inform the dimension marshal about updates
       this.marshal.onStateChange(current, previousForThisExecution);

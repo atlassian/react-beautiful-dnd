@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'invariant';
+import { draggableClassName } from '../style-marshal/create-style-marshal';
 import type {
   Position,
   DraggableDimension,
@@ -226,11 +227,8 @@ export default class Draggable extends Component<Props, State> {
         top,
         left,
         margin: 0,
+        transition: 'none',
         transform: movementStyle.transform ? `${movementStyle.transform}` : null,
-        // base style
-        WebkitTouchCallout: 'none',
-        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-        touchAction: 'manipulation',
       };
       return style;
     }
@@ -243,13 +241,7 @@ export default class Draggable extends Component<Props, State> {
       canLift: boolean,
     ): NotDraggingStyle => {
       const style: NotDraggingStyle = {
-        transition: canAnimate ? css.outOfTheWay : null,
         transform: movementStyle.transform,
-        pointerEvents: canLift ? 'auto' : 'none',
-        // base style
-        WebkitTouchCallout: 'none',
-        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-        touchAction: 'manipulation',
       };
       return style;
     }
@@ -286,6 +278,7 @@ export default class Draggable extends Component<Props, State> {
       const provided: Provided = {
         innerRef: this.setRef,
         placeholder: useDraggingStyle ? this.getPlaceholder() : null,
+        className: draggableClassName,
         dragHandleProps,
         draggableStyle,
       };
@@ -335,7 +328,6 @@ export default class Draggable extends Component<Props, State> {
     const droppableId: DroppableId = this.context[droppableIdKey];
 
     const speed = this.getSpeed(isDragging, isDropAnimating, canAnimate);
-    console.log('rendering draggable', draggableId);
 
     return (
       <DraggableDimensionPublisher

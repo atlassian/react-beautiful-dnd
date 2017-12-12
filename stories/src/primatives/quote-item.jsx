@@ -115,6 +115,7 @@ export default class QuoteItem extends Component<Props> {
         isDragging={isDragging}
         innerRef={provided.innerRef}
         style={provided.draggableStyle}
+        className={provided.className}
         {...provided.dragHandleProps}
       >
         <Avatar src={quote.author.avatarUrl} alt={quote.author.name} />
