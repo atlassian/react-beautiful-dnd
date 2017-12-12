@@ -74,6 +74,7 @@ export default (draggableClassName: string) => {
         head.appendChild(el);
       }
 
+      // This technique works with ie11+ so no need for a nasty fallback as seen here:
       // https://stackoverflow.com/a/22050778/1374236
       el.innerHTML = rules;
     };
