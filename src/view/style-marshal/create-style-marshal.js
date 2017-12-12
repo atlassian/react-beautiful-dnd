@@ -6,14 +6,15 @@ export const draggableClassName = 'react-beautiful-dnd-draggable';
 const baseStyles: string = `
   .${draggableClassName} {
     -webkit-touch-callout: none;
-    -webkit-tap-highlight-color: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     touch-action: manipulation;
   }
 `;
 
 const whileDraggingStyles: string = `
   * {
-    cursor: grab;
+    cursor: grabbing;
+    cursor: -webkit-grabbing;
   }
 
   ${baseStyles}
@@ -25,35 +26,39 @@ const whileDraggingStyles: string = `
 `;
 
 export default () => {
-  const getStyleElement = (() => {
+  const set = (() => {
     let el: ?HTMLStyleElement;
 
-    // lazily create style tag as required
-    return (): HTMLStyleElement => {
-      if (el) {
-        return el;
+    return (rules: string) => {
+      // create the style tag in the head if we have not already
+      if (!el) {
+        el = document.createElement('style');
+        el.type = 'text/css';
+        const head: ?HTMLElement = document.querySelector('head');
+
+        if (!head) {
+          throw new Error('cannot append style to head');
+        }
+
+        head.appendChild(el);
       }
 
-      el = document.createElement('style');
-      el.type = 'text/css';
-      const head: ?HTMLElement = document.querySelector('head');
-
-      if (!head) {
-        throw new Error('cannot append style to head');
-      }
-
-      head.appendChild(el);
-      return el;
+      // setting the text content for good browser support
+      // https://stackoverflow.com/a/22050778/1374236
+      el.textContent = rules;
     };
   })();
 
-  const apply = () => {
-    getStyleElement().innerHTML = whileDraggingStyles;
+  const dragStarted = () => {
+    set(whileDraggingStyles);
   };
 
-  const unapply = () => {
-    getStyleElement().innerHTML = baseStyles;
+  const dragStopped = () => {
+    set(baseStyles);
   };
 
-  return { apply, unapply };
+  // self initialising
+  set(baseStyles);
+
+  return { dragStarted, dragStopped };
 };

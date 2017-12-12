@@ -98,12 +98,11 @@ export default class DragDropContext extends React.Component<Props> {
       const isDragStopping: boolean = previousForThisExecution.phase === 'DRAGGING' && current.phase !== 'DRAGGING';
 
       if (isDragStarting) {
-        console.warn('applying dragging styles');
-        styleMarshal.apply();
+        styleMarshal.dragStarted();
       }
       if (isDragStopping) {
         console.log('removing dragging styles');
-        styleMarshal.unapply();
+        styleMarshal.dragStopped();
       }
 
       // inform the dimension marshal about updates
