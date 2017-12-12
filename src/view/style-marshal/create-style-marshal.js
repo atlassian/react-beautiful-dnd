@@ -4,35 +4,6 @@ import type {
   State as AppState,
 } from '../../types';
 
-export const draggableClassName = 'react-beautiful-dnd-draggable';
-
-const baseStyles: string = `
-  .${draggableClassName} {
-    -webkit-touch-callout: none;
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    touch-action: manipulation;
-  }
-`;
-
-const whileDraggingStyles: string = `
-  body {
-    cursor: grabbing;
-    cursor: -webkit-grabbing;
-  }
-
-  /* Stop any text selection and mouse events processing */
-  body > * {
-    user-select: none;
-  }
-
-  ${baseStyles}
-
-  .${draggableClassName} {
-    pointer-events: none;
-    transition: ${css.outOfTheWay};
-  }
-`;
-
 const getIsAnimatingCancel = (state: AppState) => {
   if (state.phase !== 'DROP_ANIMATING') {
     return false;
@@ -49,7 +20,35 @@ type State = {|
   isDraggingStyleActive: boolean,
 |}
 
-export default () => {
+export default (draggableClassName: string) => {
+  const baseStyles: string = `
+  .${draggableClassName} {
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    touch-action: manipulation;
+  }
+`;
+
+  const whileDraggingStyles: string = `
+  body {
+    cursor: grabbing;
+    cursor: -webkit-grabbing;
+  }
+
+  /* Stop any text selection during a drag */
+  /* Applying to children of body so that the body can still have the nice cursor style */
+  body > * {
+    user-select: none;
+  }
+
+  ${baseStyles}
+
+  .${draggableClassName} {
+    pointer-events: none;
+    transition: ${css.outOfTheWay};
+  }
+`;
+
   let state = {
     isDraggingStyleActive: false,
   };
@@ -107,7 +106,7 @@ export default () => {
   };
 
   // self initiating
-  applyBaseStyles();
+  setStyle(baseStyles);
 
   const onStateChange = (current: AppState, previous: AppState) => {
     const wasAnimatingCancel: boolean = getIsAnimatingCancel(previous);

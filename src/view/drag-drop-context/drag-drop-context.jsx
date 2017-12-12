@@ -14,7 +14,7 @@ import type {
   DroppableDimension,
   DroppableId,
 } from '../../types';
-import { storeKey, dimensionMarshalKey } from '../context-keys';
+import { storeKey, dimensionMarshalKey, draggableClassNameKey } from '../context-keys';
 import {
   clean,
   publishDraggableDimensions,
@@ -31,11 +31,19 @@ type Context = {
   [string]: Store
 }
 
+const createDraggableClassName = (() => {
+  const prefix: string = 'react-beautiful-dnd-draggable';
+  let count: number = 0;
+
+  return () => `${prefix}-${count++}`;
+})();
+
 export default class DragDropContext extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
   store: Store
   marshal: Marshal
   unsubscribe: Function
+  draggableClassName: string
 
   // Need to declare childContextTypes without flow
   // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
@@ -46,6 +54,7 @@ export default class DragDropContext extends React.Component<Props> {
       getState: PropTypes.func.isRequired,
     }).isRequired,
     [dimensionMarshalKey]: PropTypes.object.isRequired,
+    [draggableClassNameKey]: PropTypes.string.isRequired,
   }
   /* eslint-enable */
 
@@ -53,12 +62,14 @@ export default class DragDropContext extends React.Component<Props> {
     return {
       [storeKey]: this.store,
       [dimensionMarshalKey]: this.marshal,
+      [draggableClassNameKey]: this.draggableClassName,
     };
   }
 
   componentWillMount() {
     this.store = createStore();
-    const styleMarshal = createStyleMarshal();
+    this.draggableClassName = createDraggableClassName();
+    const styleMarshal = createStyleMarshal(this.draggableClassName);
 
     // set up the dimension marshal
     const callbacks: MarshalCallbacks = {

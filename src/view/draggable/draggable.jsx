@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'invariant';
-import { draggableClassName } from '../style-marshal/create-style-marshal';
 import type {
   Position,
   DraggableDimension,
@@ -22,7 +21,7 @@ import type {
 } from '../drag-handle/drag-handle-types';
 import getCenterPosition from '../get-center-position';
 import Placeholder from '../placeholder';
-import { droppableIdKey } from '../context-keys';
+import { droppableIdKey, draggableClassNameKey } from '../context-keys';
 import type {
   Props,
   Provided,
@@ -47,6 +46,7 @@ export const zIndexOptions: ZIndexOptions = {
 export default class Draggable extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
   callbacks: DragHandleCallbacks
+  draggableClassName: string
 
   state: State = {
     ref: null,
@@ -62,10 +62,10 @@ export default class Draggable extends Component<Props, State> {
   // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
   static contextTypes = {
     [droppableIdKey]: PropTypes.string.isRequired,
+    [draggableClassNameKey]: PropTypes.string.isRequired,
   }
-  /* eslint-enable */
 
-  constructor(props: Props, context: mixed) {
+  constructor(props: Props, context: Object) {
     super(props, context);
 
     const callbacks: DragHandleCallbacks = {
@@ -81,6 +81,7 @@ export default class Draggable extends Component<Props, State> {
     };
 
     this.callbacks = callbacks;
+    this.draggableClassName = context[draggableClassNameKey];
   }
 
   // This should already be handled gracefully in DragHandle.
@@ -266,7 +267,7 @@ export default class Draggable extends Component<Props, State> {
       const provided: Provided = {
         innerRef: this.setRef,
         placeholder: useDraggingStyle ? this.getPlaceholder() : null,
-        className: draggableClassName,
+        className: this.draggableClassName,
         dragHandleProps,
         draggableStyle,
       };
