@@ -31,18 +31,6 @@ type Context = {
   [string]: Store
 }
 
-const getIsAnimatingCancel = (state: State) => {
-  if (state.phase !== 'DROP_ANIMATING') {
-    return false;
-  }
-
-  if (!state.drop || !state.drop.pending) {
-    return false;
-  }
-
-  return state.drop.pending.trigger === 'CANCEL';
-};
-
 export default class DragDropContext extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
   store: Store
@@ -92,11 +80,16 @@ export default class DragDropContext extends React.Component<Props> {
     let previous: State = this.store.getState();
 
     this.unsubscribe = this.store.subscribe(() => {
-      const previousValue = previous;
+      const previousValue: State = previous;
       const current = this.store.getState();
       // setting previous now incase any of the
       // functions synchronously trigger more updates
       previous = current;
+
+      // no lifecycle changes have occurred if phase has not changed
+      if (current.phase === previousValue.phase) {
+        return;
+      }
 
       // Allowing dynamic hooks by re-capturing the hook functions
       const hooks: Hooks = {
@@ -105,23 +98,11 @@ export default class DragDropContext extends React.Component<Props> {
       };
       fireHooks(hooks, current, previousValue);
 
-      const wasAnimatingCancel: boolean = getIsAnimatingCancel(previousValue);
-      const isAnimatingCancel: boolean = getIsAnimatingCancel(current);
-      const wasDragging: boolean = previousValue.phase === 'DRAGGING' || wasAnimatingCancel;
-      const isDragging: boolean = current.phase === 'DRAGGING';
-      const isDragStarting: boolean = !wasDragging && isDragging;
-      const isDragStopping: boolean = wasDragging && !isDragging && !isAnimatingCancel;
-
-      if (isDragStarting) {
-        console.warn('applying harsh styles');
-        styleMarshal.dragStarted();
-      }
-      if (isDragStopping) {
-        console.warn('removing harsh styles');
-        styleMarshal.dragStopped();
-      }
+      // Update the global styles
+      styleMarshal.onStateChange(current, previousValue);
 
       // inform the dimension marshal about updates
+      // this can trigger more actions synchronously so we are placing it last
       this.marshal.onStateChange(current, previousValue);
     });
   }
