@@ -280,17 +280,16 @@ export default class Draggable extends Component<Props, State> {
   }))
 
   getSpeed = memoizeOne(
-    (isDragging: boolean, isDropAnimating: boolean): Speed => {
+    (isDragging: boolean, shouldAnimateDragMovement: boolean, isDropAnimating: boolean): Speed => {
       if (isDropAnimating) {
         return 'STANDARD';
       }
 
       // if dragging and can animate - then move quickly
-      if (isDragging) {
+      if (isDragging && shouldAnimateDragMovement) {
         return 'FAST';
       }
 
-      // Moving out of the way.
       // Animation taken care of by css
       return 'INSTANT';
     })
@@ -306,11 +305,16 @@ export default class Draggable extends Component<Props, State> {
       dimension,
       children,
       direction,
+      shouldAnimateDragMovement,
       disableInteractiveElementBlocking,
     } = this.props;
     const droppableId: DroppableId = this.context[droppableIdKey];
 
-    const speed = this.getSpeed(isDragging, isDropAnimating);
+    const speed = this.getSpeed(
+      isDragging,
+      shouldAnimateDragMovement,
+      isDropAnimating
+    );
 
     return (
       <DraggableDimensionPublisher

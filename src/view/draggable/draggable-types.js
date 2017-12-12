@@ -81,7 +81,7 @@ export type Provided = {|
   innerRef: (?HTMLElement) => void,
   draggableStyle: ?DraggableStyle,
   dragHandleProps: ?DragHandleProvided,
-  className: 'react-beautiful-dnd-draggable',
+  className: string,
   placeholder: ?Node,
 |}
 
@@ -104,6 +104,9 @@ export type DispatchProps = {|
 
 export type MapProps = {|
   isDragging: boolean,
+  // whether or not a drag movement should be animated
+  // used for dropping and keyboard dragging
+  shouldAnimateDragMovement: boolean,
   // only provided when dragging
   // can be null if not over a droppable
   direction: ?Direction,

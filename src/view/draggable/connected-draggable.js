@@ -42,12 +42,8 @@ const origin: Position = { x: 0, y: 0 };
 const defaultMapProps: MapProps = {
   isDropAnimating: false,
   isDragging: false,
-  canLift: true,
-  // By default the item will not animate unless instructed to.
-  // If animation is enabled then there may be some animation
-  // at unexpected points: such as on a DROP_COMPLETE
-  canAnimate: false,
   offset: origin,
+  shouldAnimateDragMovement: false,
 
   // these properties are only populated when the item is dragging
   dimension: null,
@@ -75,9 +71,9 @@ export const makeSelector = (): Selector => {
     (offset: Position): MapProps => ({
       isDropAnimating: false,
       isDragging: false,
-      canAnimate: true,
-      canLift: true,
       offset,
+      // not relevant
+      shouldAnimateDragMovement: false,
       dimension: null,
       direction: null,
     }),
@@ -85,16 +81,15 @@ export const makeSelector = (): Selector => {
 
   const getDraggingProps = memoizeOne((
     offset: Position,
-    canAnimate: boolean,
+    shouldAnimateDragMovement: boolean,
     dimension: DraggableDimension,
     // direction of the droppable you are over
     direction: ?Direction,
   ): MapProps => ({
     isDragging: true,
-    canLift: false,
     isDropAnimating: false,
     offset,
-    canAnimate,
+    shouldAnimateDragMovement,
     dimension,
     direction,
   }));
@@ -118,11 +113,11 @@ export const makeSelector = (): Selector => {
       const offset: Position = state.drag.current.client.offset;
       const dimension: DraggableDimension = state.dimension.draggable[ownProps.draggableId];
       const direction: ?Direction = state.drag.impact.direction;
+      const shouldAnimateDragMovement: boolean = state.drag.current.shouldAnimate;
 
       return getDraggingProps(
         memoizedOffset(offset.x, offset.y),
-        // TODO
-        true,
+        shouldAnimateDragMovement,
         dimension,
         direction,
       );
@@ -144,14 +139,13 @@ export const makeSelector = (): Selector => {
     return {
       isDragging: false,
       isDropAnimating: true,
-      canAnimate: true,
       offset: state.drop.pending.newHomeOffset,
-      // cannot lift something that is dropping
-      canLift: false,
       // still need to provide the dimension for the placeholder
       dimension: state.dimension.draggable[ownProps.draggableId],
       // direction no longer needed as drag handle is unbound
       direction: null,
+      // animation will be controlled by the isDropAnimating flag
+      shouldAnimateDragMovement: false,
     };
   };
 
