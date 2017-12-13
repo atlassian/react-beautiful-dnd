@@ -17,6 +17,7 @@ import type {
   DragImpact,
   InitialDrag,
   PendingDrop,
+  DragMovement,
   Phase,
   DraggableLocation,
   CurrentDragLocation,
@@ -57,6 +58,36 @@ type MoveArgs = {|
 
 const canPublishDimension = (phase: Phase): boolean =>
   ['IDLE', 'DROP_ANIMATING', 'DROP_COMPLETE'].indexOf(phase) === -1;
+
+const trimImpact = (impact: DragImpact, droppables: DroppableDimensionMap): DragImpact => {
+  // not dragging over anything
+  if (!impact.destination) {
+    return impact;
+  }
+  // nothing has been displaced
+  if (!impact.movement.draggables.length) {
+    return impact;
+  }
+
+  const target: DroppableDimension = droppables[impact.destination.droppableId];
+
+  const trimmed: DragMovement = {
+    // cutting the impacted items
+    draggables: impact.movement.draggables.slice(0, target.descriptor.displacementLimit),
+    // unmodified
+    amount: impact.movement.amount,
+    isBeyondStartPosition: impact.movement.isBeyondStartPosition,
+  };
+
+  const withTrimmed: DragImpact = {
+    movement: trimmed,
+    // unmodified
+    direction: impact.direction,
+    destination: impact.destination,
+  };
+
+  return withTrimmed;
+};
 
 // TODO: move into own file and write tests
 const move = ({
@@ -116,11 +147,13 @@ const move = ({
     previousDroppableOverId,
   }));
 
+  const trimmed: DragImpact = trimImpact(newImpact, state.dimension.droppable);
+
   // changing this reference will trigger all Draggables to recompute
 
   const drag: DragState = {
     initial,
-    impact: newImpact,
+    impact: trimmed,
     current,
     previous: {
       droppableOverId: previousDroppableOverId,

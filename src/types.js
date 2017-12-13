@@ -11,6 +11,9 @@ export type ZIndex = number | string;
 export type DroppableDescriptor = {|
   id: DroppableId,
   type: TypeId,
+  // the maximum amount of items that are permitted to be displaced in the list at one time
+  // a useful performance optimisation for big lists
+  displacementLimit: number,
 |}
 
 export type DraggableDescriptor = {|

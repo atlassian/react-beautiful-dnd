@@ -31,6 +31,7 @@ type Props = {|
   direction: Direction,
   isDropDisabled: boolean,
   ignoreContainerClipping: boolean,
+  displacementLimit: number,
   isDropDisabled: boolean,
   targetRef: ?HTMLElement,
   children: Node,
@@ -133,18 +134,18 @@ export default class DroppableDimensionPublisher extends Component<Props> {
 
   componentDidMount() {
     const marshal: Marshal = this.context[dimensionMarshalKey];
-    const { droppableId, type } = this.props;
+    const { droppableId, type, displacementLimit } = this.props;
     const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
-      droppableId, type
+      droppableId, type, displacementLimit
     );
 
     marshal.registerDroppable(descriptor, this.callbacks);
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    const { droppableId, type } = nextProps;
+    const { droppableId, type, displacementLimit } = nextProps;
     const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
-      droppableId, type,
+      droppableId, type, displacementLimit,
     );
 
     this.publishDescriptorChange(descriptor);
@@ -156,9 +157,10 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   }
 
   getMemoizedDescriptor = memoizeOne(
-    (id: DroppableId, type: TypeId): DroppableDescriptor => ({
+    (id: DroppableId, type: TypeId, displacementLimit: number): DroppableDescriptor => ({
       id,
       type,
+      displacementLimit,
     }));
 
   publishDescriptorChange = memoizeOne((descriptor: DroppableDescriptor) => {
@@ -175,6 +177,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       targetRef,
       droppableId,
       type,
+      displacementLimit,
     } = this.props;
     if (!targetRef) {
       throw new Error('DimensionPublisher cannot calculate a dimension when not attached to the DOM');
@@ -185,7 +188,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     }
 
     const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
-      droppableId, type,
+      droppableId, type, displacementLimit
     );
 
     // side effect - grabbing it for scroll listening so we know it is the same node

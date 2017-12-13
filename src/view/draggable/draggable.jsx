@@ -169,8 +169,10 @@ export default class Draggable extends Component<Props, State> {
 
   onWindowScroll = () => {
     this.throwIfCannotDrag();
+    console.time('window scroll move');
     const windowScroll = getWindowScrollPosition();
     this.props.moveByWindowScroll(this.props.draggableId, windowScroll);
+    console.timeEnd('window scroll move');
   }
 
   onDrop = () => {
