@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled, { injectGlobal } from 'styled-components';
+import styled from 'styled-components';
 import { action } from '@storybook/addon-actions';
 import Column from './column';
 import { colors } from '../constants';
@@ -14,8 +14,6 @@ import type {
 } from '../../../src/';
 import type { QuoteMap } from '../types';
 
-const isDraggingClassName = 'is-dragging';
-
 const publishOnDragStart = action('onDragStart');
 const publishOnDragEnd = action('onDragEnd');
 
@@ -27,7 +25,7 @@ const ParentContainer = styled.div`
 
 const Container = styled.div`
   background: ${colors.blue.deep};
-  height: ${({ height }) => height};
+  min-height: 100vh;
 
   /* like display:flex but will allow bleeding over the window width */
   min-width: 100vw;
@@ -56,20 +54,8 @@ export default class Board extends Component<Props, State> {
 
   boardRef: ?HTMLElement
 
-  componentDidMount() {
-    // eslint-disable-next-line no-unused-expressions
-    injectGlobal`
-      body.${isDraggingClassName} {
-        cursor: grabbing;
-        user-select: none;
-      }
-    `;
-  }
-
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
-    // $ExpectError - body wont be null
-    document.body.classList.add(isDraggingClassName);
 
     this.setState({
       autoFocusQuoteId: null,
@@ -78,8 +64,6 @@ export default class Board extends Component<Props, State> {
 
   onDragEnd = (result: DropResult) => {
     publishOnDragEnd(result);
-    // $ExpectError - body wont be null
-    document.body.classList.remove(isDraggingClassName);
 
     // dropped nowhere
     if (!result.destination) {
