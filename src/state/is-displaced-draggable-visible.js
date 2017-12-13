@@ -20,15 +20,13 @@ export default ({
   droppable,
   viewport,
 }: Args): boolean => {
-  // TODO: check droppable
-
   const isWithinHorizontal = isWithin(viewport.left, viewport.right);
   const isWithinVertical = isWithin(viewport.top, viewport.bottom);
 
   const fragment: DimensionFragment = displaced.page.withMargin;
 
   const isPartiallyVisibleVertically: boolean =
-    isWithinVertical(fragment.bottom) || isWithinVertical(fragment.top);
+    isWithinVertical(fragment.top) || isWithinVertical(fragment.bottom);
   const isPartiallyVisibleHorizontally: boolean =
     isWithinHorizontal(fragment.left) || isWithinHorizontal(fragment.right);
 

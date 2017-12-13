@@ -238,18 +238,22 @@ export default class Draggable extends Component<Props, State> {
     }
   )
 
-  getNotDraggingStyle = memoizeOne((movementStyle: MovementStyle): NotDraggingStyle => {
-    const style: NotDraggingStyle = {
-      transform: movementStyle.transform,
-    };
-    return style;
-  }
+  getNotDraggingStyle = memoizeOne(
+    (movementStyle: MovementStyle, shouldAnimateDisplacement: boolean): NotDraggingStyle => {
+      const style: NotDraggingStyle = {
+        transform: movementStyle.transform,
+        // transition: shouldAnimateDisplacement ? null : 'none',
+        transition: null,
+      };
+      return style;
+    }
   )
 
   getProvided = memoizeOne(
     (
       isDragging: boolean,
       isDropAnimating: boolean,
+      shouldAnimateDisplacement: boolean,
       dimension: ?DraggableDimension,
       dragHandleProps: ?DragHandleProvided,
       movementStyle: MovementStyle,
@@ -258,7 +262,7 @@ export default class Draggable extends Component<Props, State> {
 
       const draggableStyle: DraggableStyle = (() => {
         if (!useDraggingStyle) {
-          return this.getNotDraggingStyle(movementStyle);
+          return this.getNotDraggingStyle(movementStyle, shouldAnimateDisplacement);
         }
 
         invariant(dimension, 'draggable dimension required for dragging');
@@ -310,6 +314,7 @@ export default class Draggable extends Component<Props, State> {
       children,
       direction,
       shouldAnimateDragMovement,
+      shouldAnimateDisplacement,
       disableInteractiveElementBlocking,
     } = this.props;
     const droppableId: DroppableId = this.context[droppableIdKey];
@@ -347,6 +352,7 @@ export default class Draggable extends Component<Props, State> {
                   this.getProvided(
                     isDragging,
                     isDropAnimating,
+                    shouldAnimateDisplacement,
                     dimension,
                     dragHandleProps,
                     movementStyle,

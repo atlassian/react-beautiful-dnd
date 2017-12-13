@@ -1,7 +1,6 @@
 // @flow
 import toHomeList from './to-home-list';
 import toForeignList from './to-foreign-list';
-import trimDragImpact from '../../trim-drag-impact';
 import { patch } from '../../position';
 import type { Result } from '../move-cross-axis-types';
 import type {
@@ -9,7 +8,6 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DraggableLocation,
-  DragImpact,
 } from '../../../types';
 
 type Args = {|

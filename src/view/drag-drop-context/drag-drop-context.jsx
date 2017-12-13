@@ -13,6 +13,7 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DroppableId,
+  Position,
 } from '../../types';
 import { storeKey, dimensionMarshalKey, draggableClassNameKey } from '../context-keys';
 import {

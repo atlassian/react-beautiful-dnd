@@ -68,6 +68,9 @@ export type DraggingStyle = {|
 
 export type NotDraggingStyle = {|
   transform: ?string,
+  // null: use the global animation style
+  // none: skip animation (used in certain displacement situations)
+  transition: null | 'none',
 |}
 
 export type DraggableStyle = DraggingStyle | NotDraggingStyle;
@@ -107,6 +110,9 @@ export type MapProps = {|
   // whether or not a drag movement should be animated
   // used for dropping and keyboard dragging
   shouldAnimateDragMovement: boolean,
+  // when an item is being displaced by a dragging item,
+  // we need to know if that movement should be animated
+  shouldAnimateDisplacement: boolean,
   // only provided when dragging
   // can be null if not over a droppable
   direction: ?Direction,

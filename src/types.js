@@ -137,10 +137,15 @@ export type DraggableLocation = {|
 export type DraggableDimensionMap = { [key: DraggableId]: DraggableDimension };
 export type DroppableDimensionMap = { [key: DroppableId]: DroppableDimension };
 
+export type Displacement = {|
+  draggableId: DraggableId,
+  shouldAnimate: boolean,
+|}
+
 export type DragMovement = {|
   // The draggables that need to move in response to a drag.
   // Ordered by closest draggable to the *current* location of the dragging item
-  draggables: DraggableId[],
+  displaced: Displacement[],
   amount: Position,
   // is moving forward relative to the starting position
   isBeyondStartPosition: boolean,

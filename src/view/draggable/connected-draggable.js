@@ -2,11 +2,6 @@
 import memoizeOne from 'memoize-one';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import {
-  dragSelector,
-  pendingDropSelector,
-  phaseSelector,
-} from '../../state/selectors';
 import Draggable from './draggable';
 import { storeKey } from '../context-keys';
 import { negate } from '../../state/position';
@@ -29,6 +24,7 @@ import type {
   DragMovement,
   DraggableDimension,
   Direction,
+  Displacement,
 } from '../../types';
 import type {
   MapProps,
@@ -44,7 +40,8 @@ const defaultMapProps: MapProps = {
   isDragging: false,
   offset: origin,
   shouldAnimateDragMovement: false,
-
+  // TODO: not sure what the default value should be
+  shouldAnimateDisplacement: false,
   // these properties are only populated when the item is dragging
   dimension: null,
   direction: null,
@@ -58,10 +55,11 @@ export const makeSelector = (): Selector => {
   );
 
   const getNotDraggingProps = memoizeOne(
-    (offset: Position): MapProps => ({
+    (offset: Position, shouldAnimateDisplacement: boolean): MapProps => ({
       isDropAnimating: false,
       isDragging: false,
       offset,
+      shouldAnimateDisplacement,
       // not relevant
       shouldAnimateDragMovement: false,
       dimension: null,
@@ -78,6 +76,7 @@ export const makeSelector = (): Selector => {
   ): MapProps => ({
     isDragging: true,
     isDropAnimating: false,
+    shouldAnimateDisplacement: false,
     offset,
     shouldAnimateDragMovement,
     dimension,
@@ -136,13 +135,17 @@ export const makeSelector = (): Selector => {
       direction: null,
       // animation will be controlled by the isDropAnimating flag
       shouldAnimateDragMovement: false,
+      // not relevant,
+      shouldAnimateDisplacement: false,
     };
   };
 
   const getWithMovement = (id: DraggableId, movement: DragMovement): ?MapProps => {
-    const needsToMove = movement.draggables.indexOf(id) !== -1;
+    const displacement: ?Displacement = movement.displaced
+      .filter((value: Displacement) => value.draggableId === id)[0];
 
-    if (!needsToMove) {
+    // does not need to move
+    if (!displacement) {
       return null;
     }
 
@@ -150,7 +153,10 @@ export const makeSelector = (): Selector => {
       negate(movement.amount) :
       movement.amount;
 
-    return getNotDraggingProps(memoizedOffset(amount.x, amount.y));
+    return getNotDraggingProps(
+      memoizedOffset(amount.x, amount.y),
+      displacement.shouldAnimate
+    );
   };
 
   const movingOutOfTheWaySelector = (state: State, ownProps: OwnProps): ?MapProps => {
@@ -169,14 +175,7 @@ export const makeSelector = (): Selector => {
         return null;
       }
 
-      const movement: DragMovement = state.drag.impact.movement;
-      const needsToMove = movement.draggables.indexOf(ownProps.draggableId) !== -1;
-
-      if (!needsToMove) {
-        return null;
-      }
-
-      return getWithMovement(ownProps.draggableId, movement);
+      return getWithMovement(ownProps.draggableId, state.drag.impact.movement);
     }
 
     // state.phase === 'DROP_ANIMATING'

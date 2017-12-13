@@ -10,7 +10,7 @@ import type {
   Phase,
 } from '../../types';
 import type {
-  Marshal,
+  DimensionMarshal,
   Callbacks,
   GetDraggableDimensionFn,
   DroppableCallbacks,
@@ -365,7 +365,7 @@ export default (callbacks: Callbacks) => {
     }
   };
 
-  const marshal: Marshal = {
+  const marshal: DimensionMarshal = {
     registerDraggable,
     registerDroppable,
     unregisterDraggable,

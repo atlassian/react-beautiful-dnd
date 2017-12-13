@@ -15,7 +15,7 @@ import type {
   DraggableId,
   DroppableId,
 } from '../../types';
-import type { Marshal } from '../../state/dimension-marshal/dimension-marshal-types';
+import type { DimensionMarshal } from '../../state/dimension-marshal/dimension-marshal-types';
 
 type Props = {|
   draggableId: DraggableId,
@@ -32,7 +32,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
   };
 
   componentDidMount() {
-    const marshal: Marshal = this.context[dimensionMarshalKey];
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
     const { draggableId, droppableId, index } = this.props;
     const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
       draggableId, droppableId, index
@@ -51,7 +51,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
   }
 
   componentWillUnmount() {
-    const marshal: Marshal = this.context[dimensionMarshalKey];
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
     marshal.unregisterDraggable(this.props.draggableId);
   }
 
@@ -63,7 +63,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     }));
 
   publishDescriptorChange = memoizeOne((descriptor: DraggableDescriptor) => {
-    const marshal: Marshal = this.context[dimensionMarshalKey];
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
     marshal.unregisterDraggable(descriptor.id);
     marshal.registerDraggable(descriptor, this.getDimension);
   })

@@ -1,6 +1,5 @@
 // @flow
-import type { DraggableId,
-  DroppableId,
+import type {
   DragMovement,
   DraggableDimension,
   DroppableDimension,
@@ -9,6 +8,7 @@ import type { DraggableId,
   Axis,
   Position,
   ClientRect,
+  Displacement,
 } from '../../types';
 import { add, subtract, patch } from '../position';
 import isDisplacedDraggableVisible from '../is-displaced-draggable-visible';
@@ -45,10 +45,7 @@ export default ({
   // not considering margin so that items move based on visible edges
   const isBeyondStartPosition: boolean = currentCenter[axis.line] - originalCenter[axis.line] > 0;
 
-  const displacement: Position = patch(axis.line, draggable.client.withMargin[axis.size]);
-  const shouldDisplaceForward: boolean = isBeyondStartPosition;
-
-  const moved: DraggableId[] = insideHome
+  const moved: Displacement[] = insideHome
     .filter((child: DraggableDimension): boolean => {
       // do not want to move the item that is dragging
       if (child === draggable) {
@@ -82,13 +79,15 @@ export default ({
         droppable: home,
         viewport,
       });
-      // console.log('is visible?', result);
       return result;
     })
-    .map((dimension: DraggableDimension): DroppableId => dimension.descriptor.id);
+    .map((dimension: DraggableDimension): Displacement => ({
+      draggableId: dimension.descriptor.id,
+      shouldAnimate: false,
+    }));
 
   // Need to ensure that we always order by the closest impacted item
-  const ordered: DraggableId[] = isBeyondStartPosition ? moved.reverse() : moved;
+  const ordered: Displacement[] = isBeyondStartPosition ? moved.reverse() : moved;
 
   const index: number = (() => {
     const startIndex = insideHome.indexOf(draggable);
@@ -104,8 +103,8 @@ export default ({
   })();
 
   const movement: DragMovement = {
-    amount: displacement,
-    draggables: ordered,
+    amount: patch(axis.line, draggable.client.withMargin[axis.size]),
+    displaced: ordered,
     isBeyondStartPosition,
   };
 
