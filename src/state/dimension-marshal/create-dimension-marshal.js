@@ -282,20 +282,21 @@ export default (callbacks: Callbacks) => {
       Object.keys(draggables)
         .map((id: DraggableId): DraggableDescriptor => draggables[id].descriptor)
         // remove the original draggable from the list
-        .filter((d: DraggableDescriptor): boolean => d.id !== descriptor.id)
+        .filter((item: DraggableDescriptor): boolean => item.id !== descriptor.id)
         // remove draggables that do not have the same droppable type
-        .filter((d: DraggableDescriptor): boolean => {
-          const droppable: DroppableDescriptor = droppables[d.droppableId].descriptor;
+        .filter((item: DraggableDescriptor): boolean => {
+          const droppable: DroppableDescriptor = droppables[item.droppableId].descriptor;
           return droppable.type === home.descriptor.type;
         });
 
     const droppablesToBeCollected: DroppableDescriptor[] =
       Object.keys(droppables)
+        .map((id: DroppableId): DroppableDescriptor => droppables[id].descriptor)
         // remove the home droppable from the list
-        .filter((d: DroppableDescriptor): boolean => d.id !== home.descriptor.id)
+        .filter((item: DroppableDescriptor): boolean => item.id !== home.descriptor.id)
       // remove droppables with a different type
-        .filter((d: DroppableDescriptor): boolean => {
-          const droppable: DroppableDescriptor = droppables[d.id].descriptor;
+        .filter((item: DroppableDescriptor): boolean => {
+          const droppable: DroppableDescriptor = droppables[item.id].descriptor;
           return droppable.type === home.descriptor.type;
         });
 
@@ -329,8 +330,7 @@ export default (callbacks: Callbacks) => {
     // Tell all droppables to stop watching scroll
     // all good if they where not already listening
     Object.keys(state.droppables)
-      .map((id: DroppableId): DroppableEntry => state.droppables[id])
-      .forEach((entry: DroppableEntry) => entry.callbacks.unwatchScroll());
+      .forEach((id: DroppableId) => state.droppables[id].callbacks.unwatchScroll());
 
     if (state.timers.liftTimeoutId) {
       clearTimeout(state.timers.liftTimeoutId);
@@ -361,17 +361,18 @@ export default (callbacks: Callbacks) => {
       }
 
       startInitialCollection(descriptor);
+      return;
     }
 
     // No need to collect any more as the user has finished interacting
     if (phase === 'DROP_ANIMATING' || phase === 'DROP_COMPLETE') {
-      if (state.isCollecting);
+      if (state.isCollecting) {
         stopCollecting();
       }
       return;
     }
 
-    // drag potentially cleanled
+    // drag potentially cleaned
     if (phase === 'IDLE') {
       if (state.isCollecting) {
         stopCollecting();
@@ -388,4 +389,4 @@ export default (callbacks: Callbacks) => {
   };
 
   return marshal;
-}
+};
