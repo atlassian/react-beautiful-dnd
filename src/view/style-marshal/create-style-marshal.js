@@ -30,24 +30,24 @@ export default (draggableClassName: string) => {
 `;
 
   const whileDraggingStyles: string = `
-  body {
-    cursor: grabbing;
-    cursor: -webkit-grabbing;
-  }
+    body {
+      cursor: grabbing;
+      cursor: -webkit-grabbing;
+    }
 
-  /* Stop any text selection during a drag */
-  /* Applying to children of body so that the body can still have the nice cursor style */
-  body > * {
-    user-select: none;
-  }
+    /* Stop any text selection during a drag */
+    /* Applying to children of body so that the body can still have the nice cursor style */
+    body > * {
+      user-select: none;
+    }
 
-  ${baseStyles}
+    ${baseStyles}
 
-  .${draggableClassName} {
-    pointer-events: none;
-    transition: ${css.outOfTheWay};
-  }
-`;
+    .${draggableClassName} {
+      pointer-events: none;
+      transition: ${css.outOfTheWay};
+    }
+  `;
 
   let state = {
     isDraggingStyleActive: false,
