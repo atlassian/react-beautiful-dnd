@@ -120,7 +120,7 @@ export const getPreset = (axis?: Axis = vertical) => {
   const inHome3: DraggableDimension = getDraggableDimension({
     descriptor: {
       id: 'inhome3',
-      droppableId: home.id,
+      droppableId: home.descriptor.id,
       index: 3,
     },
     margin,
@@ -171,7 +171,7 @@ export const getPreset = (axis?: Axis = vertical) => {
   const inForeign2: DraggableDimension = getDraggableDimension({
     descriptor: {
       id: 'inForeign2',
-      droppableId: foreign.id,
+      droppableId: foreign.descriptor.id,
       index: 2,
     },
     // pushed forward by margin of inForeign1
@@ -188,7 +188,7 @@ export const getPreset = (axis?: Axis = vertical) => {
   const inForeign3: DraggableDimension = getDraggableDimension({
     descriptor: {
       id: 'inForeign3',
-      droppableId: foreign.id,
+      droppableId: foreign.descriptor.id,
       index: 3,
     },
     margin,
@@ -205,7 +205,7 @@ export const getPreset = (axis?: Axis = vertical) => {
   const inForeign4: DraggableDimension = getDraggableDimension({
     descriptor: {
       id: 'inForeign4',
-      droppableId: foreign.id,
+      droppableId: foreign.descriptor.id,
       index: 4,
     },
     margin,
