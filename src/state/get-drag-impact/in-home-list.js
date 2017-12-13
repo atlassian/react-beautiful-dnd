@@ -31,7 +31,7 @@ export default ({
   insideHome,
 }: Args): DragImpact => {
   const viewport: ClientRect = getVisibleViewport();
-  console.log('viewport', viewport);
+  // console.log('viewport', viewport);
 
   const axis: Axis = home.axis;
   const homeScrollDiff: Position = subtract(
@@ -44,6 +44,9 @@ export default ({
 
   // not considering margin so that items move based on visible edges
   const isBeyondStartPosition: boolean = currentCenter[axis.line] - originalCenter[axis.line] > 0;
+
+  const displacement: Position = patch(axis.line, draggable.client.withMargin[axis.size]);
+  const shouldDisplaceForward: boolean = isBeyondStartPosition;
 
   const moved: DraggableId[] = insideHome
     .filter((child: DraggableDimension): boolean => {
@@ -72,12 +75,16 @@ export default ({
 
       return currentCenter[axis.line] < fragment[axis.end];
     })
-    .filter((dimension: DraggableDimension) => isDisplacedDraggableVisible({
-      draggable,
-      displaced: dimension,
-      droppable: home,
-      viewport,
-    }))
+    .filter((dimension: DraggableDimension) => {
+      const result = isDisplacedDraggableVisible({
+        draggable,
+        displaced: dimension,
+        droppable: home,
+        viewport,
+      });
+      // console.log('is visible?', result);
+      return result;
+    })
     .map((dimension: DraggableDimension): DroppableId => dimension.descriptor.id);
 
   // Need to ensure that we always order by the closest impacted item
@@ -97,7 +104,7 @@ export default ({
   })();
 
   const movement: DragMovement = {
-    amount: patch(axis.line, draggable.client.withMargin[axis.size]),
+    amount: displacement,
     draggables: ordered,
     isBeyondStartPosition,
   };
