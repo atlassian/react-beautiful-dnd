@@ -26,7 +26,7 @@ export default class Droppable extends Component<Props, State> {
     isDropDisabled: false,
     direction: 'vertical',
     ignoreContainerClipping: false,
-    displacementLimit: 20,
+    displacementLimit: 30,
   }
 
   // Need to declare childContextTypes without flow

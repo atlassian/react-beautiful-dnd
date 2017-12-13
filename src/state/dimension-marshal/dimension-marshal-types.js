@@ -46,7 +46,7 @@ export type DroppableEntryMap = {
 export type UnknownDescriptorType = DraggableDescriptor | DroppableDescriptor;
 export type UnknownDimensionType = DraggableDimension | DroppableDimension;
 
-export type Marshal = {|
+export type DimensionMarshal = {|
   registerDraggable: (descriptor: DraggableDescriptor,
     getDimension: GetDraggableDimensionFn) => void,
   registerDroppable: (descriptor: DroppableDescriptor,

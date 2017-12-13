@@ -3,9 +3,9 @@ import React, { type Node } from 'react';
 import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
 import fireHooks from '../../state/fire-hooks';
-import createDimensionMarshal from '../../state/dimension-marshal/create-dimension-marshal';
+import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
 import createStyleMarshal from '../style-marshal/create-style-marshal';
-import type { Marshal, Callbacks as MarshalCallbacks } from '../../state/dimension-marshal/dimension-marshal-types';
+import type { DimensionMarshal, Callbacks as MarshalCallbacks } from '../../state/dimension-marshal/dimension-marshal-types';
 import type {
   Store,
   State,
@@ -41,7 +41,7 @@ const createDraggableClassName = (() => {
 export default class DragDropContext extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
   store: Store
-  dimensionMarshal: Marshal
+  dimensionMarshal: DimensionMarshal
   unsubscribe: Function
   draggableClassName: string
 
