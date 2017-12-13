@@ -23,9 +23,14 @@ export const getPreset = (axis?: Axis = vertical) => {
   const foreignCrossAxisEnd: number = 200;
   const emptyForeignCrossAxisStart: number = 200;
   const emptyForeignCrossAxisEnd: number = 300;
+  const displacementLimit: number = 20;
 
   const home: DroppableDimension = getDroppableDimension({
-    id: 'home',
+    descriptor: {
+      id: 'home',
+      type: 'TYPE',
+      displacementLimit,
+    },
     direction: axis.direction,
     padding,
     margin,
@@ -40,7 +45,11 @@ export const getPreset = (axis?: Axis = vertical) => {
   });
 
   const foreign: DroppableDimension = getDroppableDimension({
-    id: 'foreign',
+    descriptor: {
+      id: 'foreign',
+      type: 'TYPE',
+      displacementLimit,
+    },
     padding,
     margin,
     windowScroll,
@@ -55,7 +64,11 @@ export const getPreset = (axis?: Axis = vertical) => {
   });
 
   const emptyForeign: DroppableDimension = getDroppableDimension({
-    id: 'empty-foreign',
+    descriptor: {
+      id: 'empty-foreign',
+      type: 'TYPE',
+      displacementLimit,
+    },
     padding,
     margin,
     windowScroll,
@@ -71,8 +84,11 @@ export const getPreset = (axis?: Axis = vertical) => {
 
   // size: 10
   const inHome1: DraggableDimension = getDraggableDimension({
-    id: 'inhome1',
-    droppableId: home.id,
+    descriptor: {
+      id: 'inhome1',
+      droppableId: home.descriptor.id,
+      index: 1,
+    },
     margin,
     windowScroll,
     clientRect: getClientRect({
@@ -85,8 +101,11 @@ export const getPreset = (axis?: Axis = vertical) => {
   });
   // size: 20
   const inHome2: DraggableDimension = getDraggableDimension({
-    id: 'inhome2',
-    droppableId: home.id,
+    descriptor: {
+      id: 'inhome2',
+      droppableId: home.descriptor.id,
+      index: 2,
+    },
     // pushed forward by margin of inHome1
     margin,
     windowScroll,
@@ -99,8 +118,11 @@ export const getPreset = (axis?: Axis = vertical) => {
   });
   // size: 30
   const inHome3: DraggableDimension = getDraggableDimension({
-    id: 'inhome3',
-    droppableId: home.id,
+    descriptor: {
+      id: 'inhome3',
+      droppableId: home.id,
+      index: 3,
+    },
     margin,
     windowScroll,
     // pushed forward by margin of inHome2
@@ -113,8 +135,11 @@ export const getPreset = (axis?: Axis = vertical) => {
   });
   // size: 40
   const inHome4: DraggableDimension = getDraggableDimension({
-    id: 'inhome4',
-    droppableId: home.id,
+    descriptor: {
+      id: 'inhome4',
+      droppableId: home.descriptor.id,
+      index: 4,
+    },
     // pushed forward by margin of inHome3
     margin,
     windowScroll,
@@ -128,8 +153,11 @@ export const getPreset = (axis?: Axis = vertical) => {
 
   // size: 10
   const inForeign1: DraggableDimension = getDraggableDimension({
-    id: 'inForeign1',
-    droppableId: foreign.id,
+    descriptor: {
+      id: 'inForeign1',
+      droppableId: foreign.descriptor.id,
+      index: 1,
+    },
     margin,
     windowScroll,
     clientRect: getClientRect({
@@ -141,8 +169,11 @@ export const getPreset = (axis?: Axis = vertical) => {
   });
   // size: 20
   const inForeign2: DraggableDimension = getDraggableDimension({
-    id: 'inForeign2',
-    droppableId: foreign.id,
+    descriptor: {
+      id: 'inForeign2',
+      droppableId: foreign.id,
+      index: 2,
+    },
     // pushed forward by margin of inForeign1
     margin,
     windowScroll,
@@ -155,8 +186,11 @@ export const getPreset = (axis?: Axis = vertical) => {
   });
   // size: 30
   const inForeign3: DraggableDimension = getDraggableDimension({
-    id: 'inForeign3',
-    droppableId: foreign.id,
+    descriptor: {
+      id: 'inForeign3',
+      droppableId: foreign.id,
+      index: 3,
+    },
     margin,
     windowScroll,
     // pushed forward by margin of inForeign2
@@ -169,8 +203,11 @@ export const getPreset = (axis?: Axis = vertical) => {
   });
   // size: 40
   const inForeign4: DraggableDimension = getDraggableDimension({
-    id: 'inForeign4',
-    droppableId: foreign.id,
+    descriptor: {
+      id: 'inForeign4',
+      droppableId: foreign.id,
+      index: 4,
+    },
     margin,
     windowScroll,
     // pushed forward by margin of inForeign3
@@ -183,20 +220,20 @@ export const getPreset = (axis?: Axis = vertical) => {
   });
 
   const droppables: DroppableDimensionMap = {
-    [home.id]: home,
-    [foreign.id]: foreign,
-    [emptyForeign.id]: emptyForeign,
+    [home.descriptor.id]: home,
+    [foreign.descriptor.id]: foreign,
+    [emptyForeign.descriptor.id]: emptyForeign,
   };
 
   const draggables: DraggableDimensionMap = {
-    [inHome1.id]: inHome1,
-    [inHome2.id]: inHome2,
-    [inHome3.id]: inHome3,
-    [inHome4.id]: inHome4,
-    [inForeign1.id]: inForeign1,
-    [inForeign2.id]: inForeign2,
-    [inForeign3.id]: inForeign3,
-    [inForeign4.id]: inForeign4,
+    [inHome1.descriptor.id]: inHome1,
+    [inHome2.descriptor.id]: inHome2,
+    [inHome3.descriptor.id]: inHome3,
+    [inHome4.descriptor.id]: inHome4,
+    [inForeign1.descriptor.id]: inForeign1,
+    [inForeign2.descriptor.id]: inForeign2,
+    [inForeign3.descriptor.id]: inForeign3,
+    [inForeign4.descriptor.id]: inForeign4,
   };
 
   return {
@@ -223,7 +260,7 @@ export const updateDroppableScroll = (
   const newScroll = add(droppable.container.scroll.initial, addition);
 
   const result: DroppableDimension = {
-    id: droppable.descriptor.id,
+    descriptor: droppable.descriptor,
     axis: droppable.axis,
     isEnabled: droppable.isEnabled,
     client: droppable.client,
@@ -241,7 +278,7 @@ export const updateDroppableScroll = (
 };
 
 export const disableDroppable = (droppable: DroppableDimension): DroppableDimension => ({
-  id: droppable.descriptor.id,
+  descriptor: droppable.descriptor,
   axis: droppable.axis,
   isEnabled: false,
   client: droppable.client,

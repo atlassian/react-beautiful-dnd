@@ -158,8 +158,14 @@ describe('dimension marshal', () => {
       });
     });
 
-    describe('dimension removed', () => {
+    // This would need to work to support virtualisation
+    describe('dimension removed (not currently supported)', () => {
+      it('should cancel the drag when removing a draggable', () => {
 
+      });
+      it('should cancel the drag when removing a droppable', () => {
+
+      });
     });
   });
 });

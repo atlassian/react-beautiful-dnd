@@ -68,7 +68,7 @@ export default (draggableClassName: string) => {
         const head: ?HTMLElement = document.querySelector('head');
 
         if (!head) {
-          throw new Error('cannot append style to head');
+          throw new Error('Cannot find the head to append a style to');
         }
 
         head.appendChild(el);
