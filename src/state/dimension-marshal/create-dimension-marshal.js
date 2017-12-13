@@ -15,8 +15,6 @@ import type {
   Callbacks,
   GetDraggableDimensionFn,
   DroppableCallbacks,
-  OrderedCollectionList,
-  OrderedDimensionList,
   UnknownDimensionType,
   UnknownDescriptorType,
   DroppableEntry,

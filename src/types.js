@@ -11,7 +11,6 @@ export type ZIndex = number | string;
 export type DroppableDescriptor = {|
   id: DroppableId,
   type: TypeId,
-  index: number,
 |}
 
 export type DraggableDescriptor = {|

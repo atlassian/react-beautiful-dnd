@@ -44,7 +44,6 @@ const Container = styled.div``;
 
 type Props = {|
   listId: string,
-  listIndex: number,
   listType?: string,
   quotes: Quote[],
   title?: string,
@@ -130,7 +129,6 @@ export default class QuoteList extends Component<Props> {
       internalScroll,
       isDropDisabled,
       listId,
-      listIndex,
       listType,
       style,
       quotes,
@@ -141,7 +139,6 @@ export default class QuoteList extends Component<Props> {
     return (
       <Droppable
         droppableId={listId}
-        index={listIndex}
         type={listType}
         ignoreContainerClipping={ignoreContainerClipping}
         isDropDisabled={isDropDisabled}

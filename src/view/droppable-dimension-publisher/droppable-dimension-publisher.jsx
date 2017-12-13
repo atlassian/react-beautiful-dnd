@@ -28,7 +28,6 @@ import type {
 type Props = {|
   droppableId: DroppableId,
   type: TypeId,
-  index: number,
   direction: Direction,
   isDropDisabled: boolean,
   ignoreContainerClipping: boolean,
@@ -134,18 +133,18 @@ export default class DroppableDimensionPublisher extends Component<Props> {
 
   componentDidMount() {
     const marshal: Marshal = this.context[dimensionMarshalKey];
-    const { droppableId, type, index } = this.props;
+    const { droppableId, type } = this.props;
     const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
-      droppableId, type, index
+      droppableId, type
     );
 
     marshal.registerDroppable(descriptor, this.callbacks);
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    const { droppableId, type, index } = nextProps;
+    const { droppableId, type } = nextProps;
     const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
-      droppableId, type, index
+      droppableId, type,
     );
 
     this.publishDescriptorChange(descriptor);
@@ -157,10 +156,9 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   }
 
   getMemoizedDescriptor = memoizeOne(
-    (id: DroppableId, type: TypeId, index: number): DroppableDescriptor => ({
+    (id: DroppableId, type: TypeId): DroppableDescriptor => ({
       id,
       type,
-      index,
     }));
 
   publishDescriptorChange = memoizeOne((descriptor: DroppableDescriptor) => {
@@ -177,7 +175,6 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       targetRef,
       droppableId,
       type,
-      index,
     } = this.props;
     if (!targetRef) {
       throw new Error('DimensionPublisher cannot calculate a dimension when not attached to the DOM');
@@ -188,7 +185,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     }
 
     const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
-      droppableId, type, index
+      droppableId, type,
     );
 
     // side effect - grabbing it for scroll listening so we know it is the same node
