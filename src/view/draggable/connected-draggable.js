@@ -41,7 +41,7 @@ const defaultMapProps: MapProps = {
   offset: origin,
   shouldAnimateDragMovement: false,
   // TODO: not sure what the default value should be
-  shouldAnimateDisplacement: false,
+  shouldAnimateDisplacement: true,
   // these properties are only populated when the item is dragging
   dimension: null,
   direction: null,

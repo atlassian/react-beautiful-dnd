@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'invariant';
+import { css } from '../animation';
 import type {
   Position,
   DraggableDimension,
@@ -242,8 +243,9 @@ export default class Draggable extends Component<Props, State> {
     (movementStyle: MovementStyle, shouldAnimateDisplacement: boolean): NotDraggingStyle => {
       const style: NotDraggingStyle = {
         transform: movementStyle.transform,
-        // transition: shouldAnimateDisplacement ? null : 'none',
-        transition: null,
+        // use the global animation for animation - or opt out of it
+        transition: shouldAnimateDisplacement ? null : 'none',
+        // transition: css.outOfTheWay,
       };
       return style;
     }

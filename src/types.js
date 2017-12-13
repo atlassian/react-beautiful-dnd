@@ -142,6 +142,10 @@ export type Displacement = {|
   shouldAnimate: boolean,
 |}
 
+export type Displaced = {|
+  visible: Displacement[]
+|}
+
 export type DragMovement = {|
   // The draggables that need to move in response to a drag.
   // Ordered by closest draggable to the *current* location of the dragging item

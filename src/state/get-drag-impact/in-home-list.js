@@ -45,6 +45,8 @@ export default ({
   // not considering margin so that items move based on visible edges
   const isBeyondStartPosition: boolean = currentCenter[axis.line] - originalCenter[axis.line] > 0;
 
+  const amount: Position = patch(axis.line, draggable.client.withMargin[axis.size]);
+
   const moved: Displacement[] = insideHome
     .filter((child: DraggableDimension): boolean => {
       // do not want to move the item that is dragging
@@ -74,17 +76,29 @@ export default ({
     })
     .filter((dimension: DraggableDimension) => {
       const result = isDisplacedDraggableVisible({
-        draggable,
+        amount,
         displaced: dimension,
         droppable: home,
         viewport,
       });
+      console.log('is visible', result);
       return result;
     })
-    .map((dimension: DraggableDimension): Displacement => ({
-      draggableId: dimension.descriptor.id,
-      shouldAnimate: false,
-    }));
+    .map((dimension: DraggableDimension): Displacement => {
+      // TODO: need to figure out if should animate
+      // Need to skip animation if moving
+
+      // need to calculate whether this displacement animation should be skipped
+
+      // Scenario: should have been previously displaced but wasn't because of visiblity filter
+
+      const displacement: Displacement = {
+        draggableId: dimension.descriptor.id,
+        shouldAnimate: true,
+      };
+
+      return displacement;
+    });
 
   // Need to ensure that we always order by the closest impacted item
   const ordered: Displacement[] = isBeyondStartPosition ? moved.reverse() : moved;
@@ -103,7 +117,7 @@ export default ({
   })();
 
   const movement: DragMovement = {
-    amount: patch(axis.line, draggable.client.withMargin[axis.size]),
+    amount,
     displaced: ordered,
     isBeyondStartPosition,
   };

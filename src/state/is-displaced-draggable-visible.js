@@ -8,20 +8,18 @@ import type {
 import isWithin from './is-within';
 
 type Args = {|
-  draggable: DraggableDimension,
   displaced: DraggableDimension,
   droppable: DroppableDimension,
   viewport: ClientRect,
 |}
 
 export default ({
-  draggable,
   displaced,
   droppable,
   viewport,
 }: Args): boolean => {
-  const isWithinHorizontal = isWithin(viewport.left, viewport.right);
   const isWithinVertical = isWithin(viewport.top, viewport.bottom);
+  const isWithinHorizontal = isWithin(viewport.left, viewport.right);
 
   const fragment: DimensionFragment = displaced.page.withMargin;
 
