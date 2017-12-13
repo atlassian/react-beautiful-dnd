@@ -8,8 +8,11 @@ import type { DraggableId,
   DimensionFragment,
   Axis,
   Position,
+  ClientRect,
 } from '../../types';
 import { add, subtract, patch } from '../position';
+import isDisplacedDraggableVisible from '../is-displaced-draggable-visible';
+import getVisibleViewport from '../get-visible-viewport';
 
 // It is the responsibility of this function
 // to return the impact of a drag
@@ -27,6 +30,9 @@ export default ({
   home,
   insideHome,
 }: Args): DragImpact => {
+  const viewport: ClientRect = getVisibleViewport();
+  console.log('viewport', viewport);
+
   const axis: Axis = home.axis;
   const homeScrollDiff: Position = subtract(
     home.container.scroll.current, home.container.scroll.initial
@@ -66,6 +72,12 @@ export default ({
 
       return currentCenter[axis.line] < fragment[axis.end];
     })
+    .filter((dimension: DraggableDimension) => isDisplacedDraggableVisible({
+      draggable,
+      displaced: dimension,
+      droppable: home,
+      viewport,
+    }))
     .map((dimension: DraggableDimension): DroppableId => dimension.descriptor.id);
 
   // Need to ensure that we always order by the closest impacted item

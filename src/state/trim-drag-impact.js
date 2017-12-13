@@ -16,7 +16,8 @@ export default (impact: DragImpact, displacementLimit: number): DragImpact => {
 
   const trimmed: DragMovement = {
     // cutting the impacted items
-    draggables: impact.movement.draggables.slice(0, displacementLimit),
+    // TEMP: no trimming
+    draggables: impact.movement.draggables,
     // unmodified
     amount: impact.movement.amount,
     isBeyondStartPosition: impact.movement.isBeyondStartPosition,
