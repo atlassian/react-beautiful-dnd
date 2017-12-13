@@ -1,6 +1,7 @@
 // @flow
 import toHomeList from './to-home-list';
 import toForeignList from './to-foreign-list';
+import trimDragImpact from '../../trim-drag-impact';
 import { patch } from '../../position';
 import type { Result } from '../move-cross-axis-types';
 import type {
@@ -8,6 +9,7 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DraggableLocation,
+  DragImpact,
 } from '../../../types';
 
 type Args = {|
@@ -39,25 +41,43 @@ export default ({
     draggable.client.withMargin[destination.axis.size]
   );
 
-  // moving back to the home list
-  if (destination.id === draggable.descriptor.droppableId) {
-    return toHomeList({
+  const result: ?Result = (() => {
+    // moving back to the home list
+    if (destination.id === draggable.descriptor.droppableId) {
+      return toHomeList({
+        amount,
+        originalIndex: home.index,
+        target,
+        insideDroppable: insideDestination,
+        draggable,
+        droppable: destination,
+      });
+    }
+
+    // moving to a foreign list
+    return toForeignList({
       amount,
-      originalIndex: home.index,
+      pageCenter,
       target,
       insideDroppable: insideDestination,
       draggable,
       droppable: destination,
     });
+  })();
+
+  if (!result) {
+    return result;
   }
 
-  // moving to a foreign list
-  return toForeignList({
-    amount,
-    pageCenter,
-    target,
-    insideDroppable: insideDestination,
-    draggable,
-    droppable: destination,
-  });
+  const trimmed: DragImpact = trimDragImpact(
+    result.impact,
+    destination.descriptor.displacementLimit
+  );
+
+  const withTrimmed: Result = {
+    impact: trimmed,
+    pageCenter: result.pageCenter,
+  };
+
+  return withTrimmed;
 };
