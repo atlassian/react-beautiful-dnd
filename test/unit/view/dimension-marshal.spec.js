@@ -250,7 +250,6 @@ describe('dimension marshal', () => {
             descriptor: {
               id: 'of-another-type',
               type: 'another-type',
-              displacementLimit: 10,
             },
             clientRect: getClientRect({
               top: 0, right: 100, bottom: 100, left: 0

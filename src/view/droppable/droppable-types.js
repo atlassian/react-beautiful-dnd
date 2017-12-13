@@ -31,7 +31,6 @@ export type OwnProps = {|
   isDropDisabled: boolean,
   direction: Direction,
   ignoreContainerClipping: boolean,
-  displacementLimit: number,
 |};
 
 export type DefaultProps = {|
@@ -39,7 +38,6 @@ export type DefaultProps = {|
   isDropDisabled: boolean,
   direction: Direction,
   ignoreContainerClipping: boolean,
-  displacementLimit: number,
 |}
 
 export type Props = {|

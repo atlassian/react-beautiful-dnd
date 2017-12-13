@@ -10,7 +10,7 @@ import { getDroppableDimension } from '../../state/dimension';
 import getClosestScrollable from '../get-closest-scrollable';
 import { dimensionMarshalKey } from '../context-keys';
 import type {
-  Marshal,
+  DimensionMarshal,
   DroppableCallbacks,
   UpdateDroppableScrollFn,
 } from '../../state/dimension-marshal/dimension-marshal-types';
@@ -31,7 +31,6 @@ type Props = {|
   direction: Direction,
   isDropDisabled: boolean,
   ignoreContainerClipping: boolean,
-  displacementLimit: number,
   isDropDisabled: boolean,
   targetRef: ?HTMLElement,
   children: Node,
@@ -133,38 +132,37 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   }
 
   componentDidMount() {
-    const marshal: Marshal = this.context[dimensionMarshalKey];
-    const { droppableId, type, displacementLimit } = this.props;
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
+    const { droppableId, type } = this.props;
     const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
-      droppableId, type, displacementLimit
+      droppableId, type
     );
 
     marshal.registerDroppable(descriptor, this.callbacks);
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    const { droppableId, type, displacementLimit } = nextProps;
+    const { droppableId, type } = nextProps;
     const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
-      droppableId, type, displacementLimit,
+      droppableId, type,
     );
 
     this.publishDescriptorChange(descriptor);
   }
 
   componentWillUnmount() {
-    const marshal: Marshal = this.context[dimensionMarshalKey];
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
     marshal.unregisterDroppable(this.props.droppableId);
   }
 
   getMemoizedDescriptor = memoizeOne(
-    (id: DroppableId, type: TypeId, displacementLimit: number): DroppableDescriptor => ({
+    (id: DroppableId, type: TypeId): DroppableDescriptor => ({
       id,
       type,
-      displacementLimit,
     }));
 
   publishDescriptorChange = memoizeOne((descriptor: DroppableDescriptor) => {
-    const marshal: Marshal = this.context[dimensionMarshalKey];
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
     marshal.unregisterDroppable(descriptor.id);
     marshal.registerDroppable(descriptor, this.callbacks);
   })
@@ -177,7 +175,6 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       targetRef,
       droppableId,
       type,
-      displacementLimit,
     } = this.props;
     if (!targetRef) {
       throw new Error('DimensionPublisher cannot calculate a dimension when not attached to the DOM');
@@ -188,7 +185,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     }
 
     const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
-      droppableId, type, displacementLimit
+      droppableId, type
     );
 
     // side effect - grabbing it for scroll listening so we know it is the same node

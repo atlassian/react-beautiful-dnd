@@ -26,7 +26,6 @@ export default class Droppable extends Component<Props, State> {
     isDropDisabled: false,
     direction: 'vertical',
     ignoreContainerClipping: false,
-    displacementLimit: 30,
   }
 
   // Need to declare childContextTypes without flow
@@ -80,7 +79,6 @@ export default class Droppable extends Component<Props, State> {
       isDraggingOver,
       isDropDisabled,
       type,
-      displacementLimit,
     } = this.props;
     const provided: Provided = {
       innerRef: this.setRef,
@@ -96,7 +94,6 @@ export default class Droppable extends Component<Props, State> {
         type={type}
         direction={direction}
         ignoreContainerClipping={ignoreContainerClipping}
-        displacementLimit={displacementLimit}
         isDropDisabled={isDropDisabled}
         targetRef={this.state.ref}
       >

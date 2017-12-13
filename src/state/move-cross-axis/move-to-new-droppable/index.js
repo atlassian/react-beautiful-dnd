@@ -41,43 +41,25 @@ export default ({
     draggable.client.withMargin[destination.axis.size]
   );
 
-  const result: ?Result = (() => {
     // moving back to the home list
-    if (destination.id === draggable.descriptor.droppableId) {
-      return toHomeList({
-        amount,
-        originalIndex: home.index,
-        target,
-        insideDroppable: insideDestination,
-        draggable,
-        droppable: destination,
-      });
-    }
-
-    // moving to a foreign list
-    return toForeignList({
+  if (destination.id === draggable.descriptor.droppableId) {
+    return toHomeList({
       amount,
-      pageCenter,
+      originalIndex: home.index,
       target,
       insideDroppable: insideDestination,
       draggable,
       droppable: destination,
     });
-  })();
-
-  if (!result) {
-    return result;
   }
 
-  const trimmed: DragImpact = trimDragImpact(
-    result.impact,
-    destination.descriptor.displacementLimit
-  );
-
-  const withTrimmed: Result = {
-    impact: trimmed,
-    pageCenter: result.pageCenter,
-  };
-
-  return withTrimmed;
+  // moving to a foreign list
+  return toForeignList({
+    amount,
+    pageCenter,
+    target,
+    insideDroppable: insideDestination,
+    draggable,
+    droppable: destination,
+  });
 };

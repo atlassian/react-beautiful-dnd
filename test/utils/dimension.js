@@ -23,13 +23,11 @@ export const getPreset = (axis?: Axis = vertical) => {
   const foreignCrossAxisEnd: number = 200;
   const emptyForeignCrossAxisStart: number = 200;
   const emptyForeignCrossAxisEnd: number = 300;
-  const displacementLimit: number = 20;
 
   const home: DroppableDimension = getDroppableDimension({
     descriptor: {
       id: 'home',
       type: 'TYPE',
-      displacementLimit,
     },
     direction: axis.direction,
     padding,
@@ -48,7 +46,6 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'foreign',
       type: 'TYPE',
-      displacementLimit,
     },
     padding,
     margin,
@@ -67,7 +64,6 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'empty-foreign',
       type: 'TYPE',
-      displacementLimit,
     },
     padding,
     margin,

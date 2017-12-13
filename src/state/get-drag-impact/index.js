@@ -11,7 +11,6 @@ import type {
 import getDroppableOver from '../get-droppable-over';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import noImpact from '../no-impact';
-import trimDragImpact from '../trim-drag-impact';
 import inHomeList from './in-home-list';
 import inForeignList from './in-foreign-list';
 
@@ -57,23 +56,19 @@ export default ({
     draggables,
   );
 
-  const impact: DragImpact = (() => {
-    if (isWithinHomeDroppable) {
-      return inHomeList({
-        pageCenter,
-        draggable,
-        home,
-        insideHome: insideDestination,
-      });
-    }
-
-    return inForeignList({
+  if (isWithinHomeDroppable) {
+    return inHomeList({
       pageCenter,
       draggable,
-      destination,
-      insideDestination,
+      home,
+      insideHome: insideDestination,
     });
-  })();
+  }
 
-  return trimDragImpact(impact, home.descriptor.displacementLimit);
+  return inForeignList({
+    pageCenter,
+    draggable,
+    destination,
+    insideDestination,
+  });
 };
