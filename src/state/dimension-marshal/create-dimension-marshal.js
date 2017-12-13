@@ -1,5 +1,4 @@
 // @flow
-import Perf from 'react-addons-perf';
 import type {
   DraggableId,
   DroppableId,
@@ -23,25 +22,21 @@ import type {
   DraggableEntryMap,
 } from './dimension-marshal-types';
 
-// Not using exact type to allow spread to create a new state object
-type State = {
+type Timers = {|
+  liftTimeoutId: ?number,
+  collectionFrameId: ?number,
+|}
+
+type State = {|
   droppables: DroppableEntryMap,
   draggables: DraggableEntryMap,
   isCollecting: boolean,
-  timers: {|
-    liftTimeoutId: ?number,
-    collectionFrameId: ?number,
-  |}
-}
+  timers: Timers,
+|}
 
 type ToBePublished = {|
   draggables: DraggableDimension[],
   droppables: DroppableDimension[],
-|}
-
-type Timers = {|
-  liftTimeoutId: ?number,
-  collectionFrameId: ?number,
 |}
 
 const noTimers: Timers = {
@@ -57,8 +52,17 @@ export default (callbacks: Callbacks) => {
     timers: noTimers,
   };
 
-  const setState = (newState: State) => {
+  const setState = (partial: Object) => {
+    const newState: State = {
+      ...state,
+      ...partial,
+    };
     state = newState;
+  };
+
+  const error = (...args: mixed[]) => {
+    console.error(...args);
+    callbacks.cancel();
   };
 
   const registerDraggable = (
@@ -82,16 +86,15 @@ export default (callbacks: Callbacks) => {
     };
 
     setState({
-      ...state,
       draggables,
     });
 
-    if (!state.collection) {
+    if (!state.isCollecting) {
       return;
     }
 
-    // currently collecting - publish!
-    console.log('publishing droppable mid collection');
+    // if a draggable is published while collecting - publishing it immediately
+
     const dimension: DraggableDimension = entry.getDimension();
     callbacks.publishDraggables([dimension]);
   };
@@ -118,18 +121,17 @@ export default (callbacks: Callbacks) => {
     };
 
     setState({
-      ...state,
       droppables,
     });
 
-    if (!state.collection) {
+    if (!state.isCollecting) {
       return;
     }
 
-    // currently collecting - publish!
-    console.log('publishing droppable mid collection');
+    // if a droppable is published while collecting - publishing it immediately
     const dimension: DroppableDimension = entry.callbacks.getDimension();
     callbacks.publishDroppables([dimension]);
+    entry.callbacks.watchScroll(callbacks.updateDroppableScroll);
   };
 
   const unregisterDraggable = (id: DraggableId) => {
@@ -143,7 +145,6 @@ export default (callbacks: Callbacks) => {
     delete newMap[id];
 
     setState({
-      ...state,
       draggables: newMap,
     });
 
@@ -165,7 +166,6 @@ export default (callbacks: Callbacks) => {
     delete newMap[id];
 
     setState({
-      ...state,
       droppables: newMap,
     });
 
@@ -184,7 +184,6 @@ export default (callbacks: Callbacks) => {
     };
 
     setState({
-      ...state,
       timers,
     });
   };
@@ -192,7 +191,6 @@ export default (callbacks: Callbacks) => {
   const collect = (toBeCollected: UnknownDescriptorType[]) => {
     // Phase 1: collect dimensions in a single frame
     const collectFrameId: number = requestAnimationFrame(() => {
-      console.time('collecting raw dimensions');
       const toBePublishedBuffer: UnknownDimensionType[] = toBeCollected.map(
         (descriptor: UnknownDescriptorType): UnknownDimensionType => {
           // is a droppable
@@ -203,11 +201,9 @@ export default (callbacks: Callbacks) => {
           return state.draggables[descriptor.id].getDimension();
         }
       );
-      console.timeEnd('collecting raw dimensions');
 
       // Phase 2: publish all dimensions to the store
       const publishFrameId: number = requestAnimationFrame(() => {
-        console.time('publishing dimensions');
         const toBePublished: ToBePublished = toBePublishedBuffer.reduce(
           (previous: ToBePublished, dimension: UnknownDimensionType): ToBePublished => {
             // is a draggable
@@ -230,7 +226,6 @@ export default (callbacks: Callbacks) => {
         });
 
         setFrameId(null);
-        console.timeEnd('publishing dimensions');
       });
 
       setFrameId(publishFrameId);
@@ -239,10 +234,9 @@ export default (callbacks: Callbacks) => {
     setFrameId(collectFrameId);
   };
 
-  const startInitialCollection = (descriptor: DraggableDescriptor) => {
-    if (state.dragging) {
-      console.error('Cannot start capturing dimensions for a drag it is already dragging');
-      callbacks.cancel();
+  const startCollecting = (descriptor: DraggableDescriptor) => {
+    if (state.isCollecting) {
+      error('Cannot start capturing dimensions for a drag it is already dragging');
       return;
     }
 
@@ -252,20 +246,16 @@ export default (callbacks: Callbacks) => {
     const draggableEntry: ?DraggableEntry = draggables[descriptor.id];
 
     if (!draggableEntry) {
-      console.error(`Cannot find Draggable with id ${descriptor.id} to start collecting dimensions`);
-      callbacks.cancel();
+      error(`Cannot find Draggable with id ${descriptor.id} to start collecting dimensions`);
       return;
     }
 
     const homeEntry: ?DroppableEntry = droppables[draggableEntry.descriptor.droppableId];
 
     if (!homeEntry) {
-      console.error(`Cannot find home Droppable [id:${draggableEntry.descriptor.droppableId}] for Draggable [id:${descriptor.id}]`);
-      callbacks.cancel();
+      error(`Cannot find home Droppable [id:${draggableEntry.descriptor.droppableId}] for Draggable [id:${descriptor.id}]`);
       return;
     }
-
-    console.time('initial dimension publish');
 
     // Get the minimum dimensions to start a drag
     const home: DroppableDimension = homeEntry.callbacks.getDimension();
@@ -303,8 +293,6 @@ export default (callbacks: Callbacks) => {
       ...draggablesToBeCollected,
     ];
 
-    console.timeEnd('initial dimension publish');
-
     // After this initial publish a drag will start
     const liftTimeoutId: number = setTimeout(() => collect(toBeCollected));
 
@@ -314,8 +302,8 @@ export default (callbacks: Callbacks) => {
     };
 
     setState({
-      ...state,
       timers,
+      isCollecting: true,
     });
   };
 
@@ -340,7 +328,6 @@ export default (callbacks: Callbacks) => {
 
     // clear the collection
     setState({
-      ...state,
       isCollecting: false,
       timers: noTimers,
     });
@@ -358,7 +345,7 @@ export default (callbacks: Callbacks) => {
         return;
       }
 
-      startInitialCollection(descriptor);
+      startCollecting(descriptor);
       return;
     }
 
