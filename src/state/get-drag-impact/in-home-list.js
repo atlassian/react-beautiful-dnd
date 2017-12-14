@@ -1,6 +1,5 @@
 // @flow
 import type {
-  DraggableId,
   DragMovement,
   DraggableDimension,
   DroppableDimension,
@@ -12,7 +11,7 @@ import type {
   Displacement,
 } from '../../types';
 import { add, subtract, patch } from '../position';
-import isDisplacedDraggableVisible from '../is-displaced-draggable-visible';
+import getDisplacement from '../get-displacement';
 import getVisibleViewport from '../get-visible-viewport';
 
 // It is the responsibility of this function
@@ -34,7 +33,6 @@ export default ({
   previousImpact,
 }: Args): DragImpact => {
   const viewport: ClientRect = getVisibleViewport();
-  // console.log('viewport', viewport);
 
   const axis: Axis = home.axis;
   const homeScrollDiff: Position = subtract(
@@ -77,48 +75,14 @@ export default ({
 
       return currentCenter[axis.line] < fragment[axis.end];
     })
-    .map((dimension: DraggableDimension): Displacement => {
-      const id: DraggableId = dimension.descriptor.id;
+    .map((dimension: DraggableDimension): Displacement => getDisplacement({
+      draggable: dimension,
+      destination: home,
+      viewport,
+      previousImpact,
+    }));
 
-      const isVisible: boolean = isDisplacedDraggableVisible({
-        displaced: dimension,
-        droppable: home,
-        viewport,
-      });
-
-      console.log(`is ${id} visible?`, isVisible);
-
-      const shouldAnimate: boolean = (() => {
-        // if should be displaced and not visible
-        if (!isVisible) {
-          return false;
-        }
-
-        // see if we can find a previous value
-        const previous: ?Displacement = previousImpact.movement.displaced.filter(
-          (item: Displacement) => item.draggableId === id
-        )[0];
-
-        // if visible and no previous entries: animate!
-        if (!previous) {
-          return true;
-        }
-
-        // return our previous value
-        // for items that where originally not visible this will be false
-        // otherwise it will be true
-        return previous.shouldAnimate;
-      })();
-
-      const displacement: Displacement = {
-        draggableId: id,
-        isVisible,
-        shouldAnimate,
-      };
-
-      return displacement;
-    });
-  // Need to ensure that we always order by the closest impacted item
+    // Need to ensure that we always order by the closest impacted item
   const ordered: Displacement[] = isBeyondStartPosition ? displaced.reverse() : displaced;
   const index: number = (() => {
     const startIndex = insideHome.indexOf(draggable);

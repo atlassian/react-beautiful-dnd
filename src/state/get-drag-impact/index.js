@@ -76,5 +76,6 @@ export default ({
     draggable,
     destination,
     insideDestination,
+    previousImpact: previousImpact || noImpact,
   });
 };
