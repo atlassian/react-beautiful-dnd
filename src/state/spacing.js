@@ -1,5 +1,10 @@
 // @flow
-import type { Position, Spacing } from '../types';
+import type {
+  Position,
+  Spacing,
+  ClientRect,
+  DimensionFragment,
+} from '../types';
 
 export const add = (spacing1: Spacing, spacing2: Spacing): Spacing => ({
   top: spacing1.top + spacing2.top,
@@ -34,3 +39,10 @@ export const getCorners = (spacing: Spacing): Position[] => [
   { x: spacing.left, y: spacing.bottom },
   { x: spacing.right, y: spacing.bottom },
 ];
+
+export const getSpacingFrom = (target: ClientRect | DimensionFragment): Spacing => ({
+  top: target.top,
+  right: target.right,
+  bottom: target.bottom,
+  left: target.left,
+});

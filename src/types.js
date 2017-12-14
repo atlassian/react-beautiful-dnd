@@ -194,7 +194,7 @@ export type CurrentDrag = {|
   // Storing scroll directly to support movement during a window scroll.
   // Value required for comparison with current scroll
   windowScroll: Position,
-  // whether or not movements should be animated
+  // whether or not draggable movements should be animated
   shouldAnimate: boolean,
 |}
 

@@ -86,6 +86,8 @@ export default ({
         viewport,
       });
 
+      console.log(`is ${id} visible?`, isVisible);
+
       const shouldAnimate: boolean = (() => {
         // if should be displaced and not visible
         if (!isVisible) {
