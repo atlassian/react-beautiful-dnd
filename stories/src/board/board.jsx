@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled, { injectGlobal } from 'styled-components';
 import { action } from '@storybook/addon-actions';
 import Column from './column';
 import { colors } from '../constants';
@@ -24,7 +24,6 @@ const ParentContainer = styled.div`
 `;
 
 const Container = styled.div`
-  background: ${colors.blue.deep};
   min-height: 100vh;
 
   /* like display:flex but will allow bleeding over the window width */
@@ -53,6 +52,14 @@ export default class Board extends Component<Props, State> {
   }
 
   boardRef: ?HTMLElement
+
+  componentDidMount() {
+    injectGlobal`
+      body {
+        background: ${colors.blue.deep};
+      }
+    `;
+  }
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);

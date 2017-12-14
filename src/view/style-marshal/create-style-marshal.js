@@ -94,8 +94,7 @@ export default (draggableClassName: string) => {
 
   const applyBaseStyles = () => {
     if (!state.isDraggingStyleActive) {
-      console.warn('not removing dragging styles as they are not active');
-      return;
+      console.warn('removing dragging styles even though there was no active drag');
     }
 
     console.warn('applying base styles');

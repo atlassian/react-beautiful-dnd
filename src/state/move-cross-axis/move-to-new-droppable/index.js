@@ -43,8 +43,9 @@ export default ({
     draggable.client.withMargin[destination.axis.size]
   );
 
-    // moving back to the home list
-  if (destination.id === draggable.descriptor.droppableId) {
+  // moving back to the home list
+  if (destination.descriptor.id === draggable.descriptor.droppableId) {
+    console.log('moving to home list');
     return toHomeList({
       amount,
       originalIndex: home.index,
@@ -52,8 +53,11 @@ export default ({
       insideDroppable: insideDestination,
       draggable,
       droppable: destination,
+      previousImpact,
     });
   }
+
+  console.log('moving to foreign list');
 
   // moving to a foreign list
   return toForeignList({
