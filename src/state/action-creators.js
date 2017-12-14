@@ -281,7 +281,7 @@ export const drop = () =>
     const state: State = getState();
 
     // dropped before a drag officially started - this is fine
-    if (state.phase === 'COLLECTING_INITIAL_DIMENSIONS') {
+    if (state.phase === 'PREPARING' || state.phase === 'COLLECTING_INITIAL_DIMENSIONS') {
       dispatch(clean());
       return;
     }

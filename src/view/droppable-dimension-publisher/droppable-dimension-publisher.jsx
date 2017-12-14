@@ -131,7 +131,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     this.closestScrollable.removeEventListener('scroll', this.onClosestScroll);
   }
 
-  componentDidMount() {
+  componentWillMount() {
     const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
     const { droppableId, type } = this.props;
     const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
