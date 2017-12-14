@@ -50,6 +50,7 @@ export default class Column extends Component<Props> {
             <Container
               innerRef={provided.innerRef}
               style={provided.draggableStyle}
+              className={provided.className}
             >
               <Header isDragging={snapshot.isDragging}>
                 <Title
