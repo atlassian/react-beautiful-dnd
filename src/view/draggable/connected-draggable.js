@@ -5,6 +5,7 @@ import { createSelector } from 'reselect';
 import Draggable from './draggable';
 import { storeKey } from '../context-keys';
 import { negate } from '../../state/position';
+import getDisplacementMap, { type DisplacementMap } from '../../state/get-displacement-map';
 import {
   lift as liftAction,
   move as moveAction,
@@ -141,8 +142,10 @@ export const makeSelector = (): Selector => {
   };
 
   const getWithMovement = (id: DraggableId, movement: DragMovement): ?MapProps => {
-    const displacement: ?Displacement = movement.displaced
-      .filter((value: Displacement) => value.draggableId === id)[0];
+    // Doing this cuts 50% of the time to move
+    // Otherwise need to loop over every item in every selector (yuck!)
+    const map: DisplacementMap = getDisplacementMap(movement.displaced);
+    const displacement: ?Displacement = map[id];
 
     // does not need to move
     if (!displacement) {

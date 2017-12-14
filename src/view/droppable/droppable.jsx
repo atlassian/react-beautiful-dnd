@@ -88,6 +88,8 @@ export default class Droppable extends Component<Props, State> {
       isDraggingOver,
     };
 
+    console.log('is dragging over', isDraggingOver);
+
     return (
       <DroppableDimensionPublisher
         droppableId={droppableId}

@@ -33,11 +33,6 @@ export default (draggableClassName: string) => {
     body {
       cursor: grabbing;
       cursor: -webkit-grabbing;
-    }
-
-    /* Stop any text selection during a drag */
-    /* Applying to children of body so that the body can still have the nice cursor style */
-    body > * {
       user-select: none;
     }
 
@@ -49,7 +44,7 @@ export default (draggableClassName: string) => {
     }
   `;
 
-  let state = {
+  let state: State = {
     isDraggingStyleActive: false,
   };
 
@@ -95,6 +90,7 @@ export default (draggableClassName: string) => {
   const applyBaseStyles = () => {
     if (!state.isDraggingStyleActive) {
       console.warn('removing dragging styles even though there was no active drag');
+      // not returning - need to provide a way of clearing even in an error scenario
     }
 
     console.warn('applying base styles');

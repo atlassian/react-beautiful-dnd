@@ -1,5 +1,6 @@
 // @flow
 import isDisplacedDraggableVisible from './is-displaced-draggable-visible';
+import getDisplacementMap, { type DisplacementMap } from './get-displacement-map';
 import type {
   DraggableId,
   Displacement,
@@ -23,6 +24,7 @@ export default ({
   previousImpact,
 }: Args): Displacement => {
   const id: DraggableId = draggable.descriptor.id;
+  const map: DisplacementMap = getDisplacementMap(previousImpact.movement.displaced);
 
   const isVisible: boolean = isDisplacedDraggableVisible({
     displaced: draggable,
@@ -37,9 +39,7 @@ export default ({
     }
 
     // see if we can find a previous value
-    const previous: ?Displacement = previousImpact.movement.displaced.filter(
-      (item: Displacement) => item.draggableId === id
-    )[0];
+    const previous: ?Displacement = map[id];
 
     // if visible and no previous entries: animate!
     if (!previous) {

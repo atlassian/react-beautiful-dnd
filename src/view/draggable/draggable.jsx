@@ -177,8 +177,10 @@ export default class Draggable extends Component<Props, State> {
   }
 
   onDrop = () => {
+    console.time('start drop');
     this.throwIfCannotDrag();
     this.props.drop();
+    console.timeEnd('start drop');
   }
 
   onCancel = () => {
