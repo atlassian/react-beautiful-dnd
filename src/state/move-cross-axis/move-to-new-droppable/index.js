@@ -45,7 +45,6 @@ export default ({
 
   // moving back to the home list
   if (destination.descriptor.id === draggable.descriptor.droppableId) {
-    console.log('moving to home list');
     return toHomeList({
       amount,
       originalIndex: home.index,
@@ -56,8 +55,6 @@ export default ({
       previousImpact,
     });
   }
-
-  console.log('moving to foreign list');
 
   // moving to a foreign list
   return toForeignList({
