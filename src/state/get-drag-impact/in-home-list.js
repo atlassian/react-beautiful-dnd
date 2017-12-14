@@ -1,5 +1,6 @@
 // @flow
 import type {
+  DraggableId,
   DragMovement,
   DraggableDimension,
   DroppableDimension,
@@ -22,6 +23,7 @@ type Args = {|
   draggable: DraggableDimension,
   home: DroppableDimension,
   insideHome: DraggableDimension[],
+  previousImpact: DragImpact,
 |}
 
 export default ({
@@ -29,6 +31,7 @@ export default ({
   draggable,
   home,
   insideHome,
+  previousImpact,
 }: Args): DragImpact => {
   const viewport: ClientRect = getVisibleViewport();
   // console.log('viewport', viewport);
@@ -47,7 +50,7 @@ export default ({
 
   const amount: Position = patch(axis.line, draggable.client.withMargin[axis.size]);
 
-  const moved: Displacement[] = insideHome
+  const displaced: Displacement[] = insideHome
     .filter((child: DraggableDimension): boolean => {
       // do not want to move the item that is dragging
       if (child === draggable) {
@@ -74,46 +77,59 @@ export default ({
 
       return currentCenter[axis.line] < fragment[axis.end];
     })
-    .filter((dimension: DraggableDimension) => {
-      const result = isDisplacedDraggableVisible({
-        amount,
+    .map((dimension: DraggableDimension): Displacement => {
+      const id: DraggableId = dimension.descriptor.id;
+
+      const isVisible: boolean = isDisplacedDraggableVisible({
         displaced: dimension,
         droppable: home,
         viewport,
       });
-      console.log('is visible', result);
-      return result;
-    })
-    .map((dimension: DraggableDimension): Displacement => {
-      // TODO: need to figure out if should animate
-      // Need to skip animation if moving
 
-      // need to calculate whether this displacement animation should be skipped
+      const shouldAnimate: boolean = (() => {
+        // if should be displaced and not visible
+        if (!isVisible) {
+          return false;
+        }
 
-      // Scenario: should have been previously displaced but wasn't because of visiblity filter
+        // see if we can find a previous value
+        const previous: ?Displacement = previousImpact.movement.displaced.filter(
+          (item: Displacement) => item.draggableId === id
+        )[0];
+
+        // if visible and no previous entries: animate!
+        if (!previous) {
+          return true;
+        }
+
+        // return our previous value
+        // for items that where originally not visible this will be false
+        // otherwise it will be true
+        return previous.shouldAnimate;
+      })();
 
       const displacement: Displacement = {
-        draggableId: dimension.descriptor.id,
-        shouldAnimate: true,
+        draggableId: id,
+        isVisible,
+        shouldAnimate,
       };
 
       return displacement;
     });
-
   // Need to ensure that we always order by the closest impacted item
-  const ordered: Displacement[] = isBeyondStartPosition ? moved.reverse() : moved;
-
+  const ordered: Displacement[] = isBeyondStartPosition ? displaced.reverse() : displaced;
   const index: number = (() => {
     const startIndex = insideHome.indexOf(draggable);
-    if (!moved.length) {
+    const length: number = ordered.length;
+    if (!length) {
       return startIndex;
     }
 
     if (isBeyondStartPosition) {
-      return startIndex + moved.length;
+      return startIndex + length;
     }
     // is moving backwards
-    return startIndex - moved.length;
+    return startIndex - length;
   })();
 
   const movement: DragMovement = {

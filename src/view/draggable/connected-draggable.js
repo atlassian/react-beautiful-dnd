@@ -149,6 +149,11 @@ export const makeSelector = (): Selector => {
       return null;
     }
 
+    // do not need to do anything
+    if (!displacement.isVisible) {
+      return null;
+    }
+
     const amount: Position = movement.isBeyondStartPosition ?
       negate(movement.amount) :
       movement.amount;

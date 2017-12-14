@@ -139,11 +139,8 @@ export type DroppableDimensionMap = { [key: DroppableId]: DroppableDimension };
 
 export type Displacement = {|
   draggableId: DraggableId,
+  isVisible: boolean,
   shouldAnimate: boolean,
-|}
-
-export type Displaced = {|
-  visible: Displacement[]
 |}
 
 export type DragMovement = {|
@@ -201,9 +198,9 @@ export type CurrentDrag = {|
   shouldAnimate: boolean,
 |}
 
-type PreviousDrag = {
-  droppableOverId: ?DroppableId,
-};
+// type PreviousDrag = {
+//   droppableOverId: ?DroppableId,
+// };
 
 // published when a drag starts
 export type DragStart = {|
@@ -225,7 +222,8 @@ export type DragState = {|
   initial: InitialDrag,
   current: CurrentDrag,
   impact: DragImpact,
-  previous?: PreviousDrag,
+  // TODO: what was using this?
+  // previous?: PreviousDrag,
 |}
 
 export type DropTrigger = 'DROP' | 'CANCEL';

@@ -134,6 +134,14 @@ export const authorQuoteMap: QuoteMap =
     [author.name]: getByAuthor(author, quotes),
   }), {});
 
+export const generateQuoteMap = (number: number): QuoteMap => authors.reduce(
+  (previous: QuoteMap, author: Author) => ({
+    ...previous,
+    [author.name]: getQuotes(number),
+  }),
+  {}
+);
+
 export const randomAuthorQuotes: QuoteMap = authors.reduce(
   (previous: QuoteMap, author: Author) => ({
     ...previous,

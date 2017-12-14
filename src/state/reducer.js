@@ -105,25 +105,25 @@ const move = ({
     windowScroll: currentWindowScroll,
   };
 
-  const previousDroppableOverId: ?DroppableId = state.drag && state.drag.impact.destination
-    ? state.drag.impact.destination.droppableId
-    : null;
+  const previousImpact: ?DragImpact = (() => {
+    if (state.drag && state.drag.impact) {
+      return state.drag.impact;
+    }
+    return null;
+  })();
 
   const newImpact: DragImpact = (impact || getDragImpact({
     pageCenter: page.center,
     draggable: state.dimension.draggable[initial.descriptor.id],
     draggables: state.dimension.draggable,
     droppables: state.dimension.droppable,
-    previousDroppableOverId,
+    previousImpact,
   }));
 
   const drag: DragState = {
     initial,
     impact: newImpact,
     current,
-    previous: {
-      droppableOverId: previousDroppableOverId,
-    },
   };
 
   return {

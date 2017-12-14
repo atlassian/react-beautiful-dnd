@@ -20,7 +20,7 @@ type Args = {|
   // all dimensions in system
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
-  previousDroppableOverId: ?DroppableId,
+  previousImpact: ?DragImpact,
 |}
 
 export default ({
@@ -28,8 +28,13 @@ export default ({
   draggable,
   draggables,
   droppables,
-  previousDroppableOverId,
+  previousImpact,
 }: Args): DragImpact => {
+  const previousDroppableOverId: ?DroppableId =
+    previousImpact &&
+    previousImpact.destination &&
+    previousImpact.destination.droppableId;
+
   const destinationId: ?DroppableId = getDroppableOver({
     target: pageCenter,
     draggable,
@@ -62,6 +67,7 @@ export default ({
       draggable,
       home,
       insideHome: insideDestination,
+      previousImpact: previousImpact || noImpact,
     });
   }
 
