@@ -4,7 +4,7 @@ import { storiesOf } from '@storybook/react';
 import Board from './src/board/board';
 import { authorQuoteMap, randomAuthorQuotes, generateQuoteMap } from './src/data';
 
-const quoteMap = generateQuoteMap(100);
+const quoteMap = generateQuoteMap(125);
 
 storiesOf('board', module)
   .add('task board', () => (

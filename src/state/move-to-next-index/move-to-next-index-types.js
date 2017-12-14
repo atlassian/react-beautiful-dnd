@@ -10,7 +10,7 @@ import type {
 export type Args = {|
   isMovingForward: boolean,
   draggableId: DraggableId,
-  impact: DragImpact,
+  previousImpact: DragImpact,
   droppable: DroppableDimension,
   draggables: DraggableDimensionMap,
 |}

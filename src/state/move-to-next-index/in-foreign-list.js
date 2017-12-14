@@ -17,16 +17,16 @@ import type {
 export default ({
   isMovingForward,
   draggableId,
-  impact,
+  previousImpact,
   droppable,
   draggables,
 }: Args): ?Result => {
-  if (!impact.destination) {
+  if (!previousImpact.destination) {
     console.error('cannot move to next index when there is not previous destination');
     return null;
   }
 
-  const location: DraggableLocation = impact.destination;
+  const location: DraggableLocation = previousImpact.destination;
   const draggable: DraggableDimension = draggables[draggableId];
   const axis: Axis = droppable.axis;
 
@@ -95,9 +95,9 @@ export default ({
   // This list is always sorted by the closest impacted draggable
   const moved: DraggableId[] = isMovingForward ?
     // Stop displacing the closest draggable forward
-    impact.movement.draggables.slice(1, impact.movement.draggables.length) :
+    previousImpact.movement.draggables.slice(1, previousImpact.movement.draggables.length) :
     // Add the draggable that we are moving into the place of
-    [movingRelativeTo.descriptor.id, ...impact.movement.draggables];
+    [movingRelativeTo.descriptor.id, ...previousImpact.movement.draggables];
 
   const newImpact: DragImpact = {
     movement: {
