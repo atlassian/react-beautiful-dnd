@@ -3,6 +3,8 @@ import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import { isPointWithinDroppable } from '../is-within-visible-bounds-of-droppable';
 import { patch } from '../position';
 import moveToEdge from '../move-to-edge';
+import getDisplacement from '../get-displacement';
+import getVisibleViewport from '../get-visible-viewport';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import type {
@@ -11,7 +13,8 @@ import type {
   Position,
   Axis,
   DragImpact,
-  DraggableId,
+  Displacement,
+  ClientRect,
 } from '../../types';
 
 export default ({
@@ -91,17 +94,45 @@ export default ({
     return null;
   }
 
+  // at this point we know that the destination is droppable
+  const movingRelativeToDisplacement: Displacement = {
+    draggableId: movingRelativeTo.descriptor.id,
+    isVisible: true,
+    shouldAnimate: true,
+  };
+
   // When we are in foreign list we are only displacing items forward
   // This list is always sorted by the closest impacted draggable
-  const moved: DraggableId[] = isMovingForward ?
+  const modified: Displacement[] = (isMovingForward ?
     // Stop displacing the closest draggable forward
-    previousImpact.movement.draggables.slice(1, previousImpact.movement.draggables.length) :
+    previousImpact.movement.displaced.slice(1, previousImpact.movement.displaced.length) :
     // Add the draggable that we are moving into the place of
-    [movingRelativeTo.descriptor.id, ...previousImpact.movement.draggables];
+    [movingRelativeToDisplacement, ...previousImpact.movement.displaced]);
+
+  // update displacement to consider viewport and droppable visibility
+  const viewport: ClientRect = getVisibleViewport();
+  const displaced: Displacement[] = modified
+    .map((displacement: Displacement): Displacement => {
+    // already processed
+      if (displacement === movingRelativeToDisplacement) {
+        return displacement;
+      }
+
+      const target: DraggableDimension = draggables[displacement.draggableId];
+
+      const updated: Displacement = getDisplacement({
+        draggable: target,
+        destination: droppable,
+        viewport,
+        previousImpact,
+      });
+
+      return updated;
+    });
 
   const newImpact: DragImpact = {
     movement: {
-      draggables: moved,
+      displaced,
       // The amount of movement will always be the size of the dragging item
       amount: patch(axis.line, draggable.page.withMargin[axis.size]),
       // When we are in foreign list we are only displacing items forward

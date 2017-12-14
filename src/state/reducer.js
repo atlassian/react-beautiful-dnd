@@ -434,9 +434,9 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const result: ?MoveToNextResult = moveToNextIndex({
       isMovingForward,
       draggableId: existing.initial.descriptor.id,
-      impact: existing.impact,
       droppable,
       draggables: state.dimension.draggable,
+      previousImpact: existing.impact,
     });
 
     // cannot move anyway (at the beginning or end of a list)
@@ -490,6 +490,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       home,
       draggables: state.dimension.draggable,
       droppables: state.dimension.droppable,
+      previousImpact: state.drag.impact,
     });
 
     if (!result) {

@@ -1,12 +1,15 @@
 // @flow
 import moveToEdge from '../../move-to-edge';
+import getVisibleViewport from '../../get-visible-viewport';
+import getDisplacement from '../../get-displacement';
 import type { Edge } from '../../move-to-edge';
 import type { Result } from '../move-cross-axis-types';
 import type {
   Axis,
+  ClientRect,
+  Displacement,
   Position,
   DragImpact,
-  DraggableId,
   DraggableDimension,
   DroppableDimension,
 } from '../../../types';
@@ -18,6 +21,7 @@ type Args = {|
   insideDroppable: DraggableDimension[],
   draggable: DraggableDimension,
   droppable: DroppableDimension,
+  previousImpact: DragImpact,
 |}
 
 export default ({
@@ -27,6 +31,7 @@ export default ({
   insideDroppable,
   draggable,
   droppable,
+  previousImpact,
 }: Args): ?Result => {
   if (!target) {
     console.error('there will always be a target in the original list');
@@ -47,7 +52,7 @@ export default ({
     const newCenter: Position = draggable.page.withoutMargin.center;
     const newImpact: DragImpact = {
       movement: {
-        draggables: [],
+        displaced: [],
         amount,
         isBeyondStartPosition: false,
       },
@@ -83,7 +88,7 @@ export default ({
     destinationAxis: axis,
   });
 
-  const needsToMove: DraggableId[] = (() => {
+  const modified: DraggableDimension[] = (() => {
     if (!isMovingPastOriginalIndex) {
       return insideDroppable.slice(targetIndex, originalIndex);
     }
@@ -98,11 +103,20 @@ export default ({
 
     // Need to ensure that the list is sorted with the closest item being first
     return insideDroppable.slice(from, to).reverse();
-  })().map((d: DraggableDimension): DraggableId => d.descriptor.id);
+  })();
+
+  const viewport: ClientRect = getVisibleViewport();
+  const displaced: Displacement[] = modified
+    .map((dimension: DraggableDimension): Displacement => getDisplacement({
+      draggable: dimension,
+      destination: droppable,
+      previousImpact,
+      viewport,
+    }));
 
   const newImpact: DragImpact = {
     movement: {
-      draggables: needsToMove,
+      displaced,
       amount,
       isBeyondStartPosition: isMovingPastOriginalIndex,
     },

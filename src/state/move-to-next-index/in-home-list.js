@@ -38,7 +38,6 @@ export default ({
     return null;
   }
 
-  const viewport: ClientRect = getVisibleViewport();
   const draggable: DraggableDimension = draggables[draggableId];
   const axis: Axis = droppable.axis;
 
@@ -109,12 +108,13 @@ export default ({
     [destinationDisplacement, ...previousImpact.movement.displaced]);
 
   // update impact with visiblity - stops redundant work!
+  const viewport: ClientRect = getVisibleViewport();
   const displaced: Displacement[] = modified
     .map((displacement: Displacement): Displacement => {
       // already processed
-      if (displacement === destinationDisplacement) {
-        return displacement;
-      }
+      // if (displacement === destinationDisplacement) {
+      //   return displacement;
+      // }
 
       const target: DraggableDimension = draggables[displacement.draggableId];
 
