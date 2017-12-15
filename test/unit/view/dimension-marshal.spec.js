@@ -16,7 +16,6 @@ import type {
   DroppableDimensionMap,
   DraggableId,
   DroppableId,
-  State,
   ClientRect,
   Phase,
 } from '../../../src/types';
@@ -100,7 +99,12 @@ const populateMarshal = (
   return watches;
 };
 
-type PhaseMap = { [key: string] : Phase }
+type PhaseMap = {|
+  idle: Phase,
+  requesting: Phase,
+  dropAnimating: Phase,
+  dropComplete: Phase,
+|}
 
 const phase: PhaseMap = {
   idle: 'IDLE',
@@ -466,7 +470,7 @@ describe('dimension marshal', () => {
 
   describe('drag completed after initial collection', () => {
     it('should unwatch all the scroll events on droppables', () => {
-      [phase.idle, phase.dropAnimating, phase.dropComplete].forEach((finish: State) => {
+      [phase.idle, phase.dropAnimating, phase.dropComplete].forEach((finish: Phase) => {
         const marshal = createDimensionMarshal(getCallbackStub());
         const watchers = populateMarshal(marshal);
 
