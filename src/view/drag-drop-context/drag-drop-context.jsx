@@ -32,13 +32,6 @@ type Context = {
   [string]: Store
 }
 
-const createDraggableClassName = (() => {
-  const prefix: string = 'react-beautiful-dnd-draggable';
-  let count: number = 0;
-
-  return () => `${prefix}-${count++}`;
-})();
-
 export default class DragDropContext extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
   store: Store
@@ -69,8 +62,8 @@ export default class DragDropContext extends React.Component<Props> {
 
   componentWillMount() {
     this.store = createStore();
-    this.draggableClassName = createDraggableClassName();
-    const styleMarshal = createStyleMarshal(this.draggableClassName);
+    const styleMarshal = createStyleMarshal();
+    this.draggableClassName = styleMarshal.draggableClassName;
 
     // set up the dimension marshal
     const callbacks: MarshalCallbacks = {

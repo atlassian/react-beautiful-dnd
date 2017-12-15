@@ -1,8 +1,12 @@
 // @flow
 import { css } from '../animation';
+import type { Marshal } from './style-marshal-types';
 import type {
   State as AppState,
 } from '../../types';
+
+let count: number = 0;
+const key: string = 'react-beautiful-dnd';
 
 const getIsAnimatingCancel = (state: AppState) => {
   if (state.phase !== 'DROP_ANIMATING') {
@@ -20,7 +24,11 @@ type State = {|
   isDraggingStyleActive: boolean,
 |}
 
-export default (draggableClassName: string) => {
+export default () => {
+  const context: string = `${count++}`;
+  const draggableClassName: string = `${key}-draggable-${context}`;
+  const tagName: string = `data-${key}-${context}`;
+
   const baseStyles: string = `
   .${draggableClassName} {
     -webkit-touch-callout: none;
@@ -61,7 +69,7 @@ export default (draggableClassName: string) => {
         el = document.createElement('style');
         el.type = 'text/css';
         // for easy identification
-        el.setAttribute('data-react-beautiful-dnd', '');
+        el.setAttribute(tagName, '');
         const head: ?HTMLElement = document.querySelector('head');
 
         if (!head) {
@@ -133,5 +141,11 @@ export default (draggableClassName: string) => {
     }
   };
 
-  return { onStateChange };
+  const marshal: Marshal = {
+    onStateChange,
+    draggableClassName,
+    tagName,
+  };
+
+  return marshal;
 };
