@@ -1,6 +1,6 @@
 // @flow
 import { css } from '../animation';
-import type { Marshal } from './style-marshal-types';
+import type { StyleMarshal } from './style-marshal-types';
 import type {
   State as AppState,
 } from '../../types';
@@ -141,7 +141,7 @@ export default () => {
     }
   };
 
-  const marshal: Marshal = {
+  const marshal: StyleMarshal = {
     onStateChange,
     draggableClassName,
     tagName,

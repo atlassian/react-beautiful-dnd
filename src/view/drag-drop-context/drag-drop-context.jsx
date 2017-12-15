@@ -5,7 +5,11 @@ import createStore from '../../state/create-store';
 import fireHooks from '../../state/fire-hooks';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
 import createStyleMarshal from '../style-marshal/style-marshal';
-import type { DimensionMarshal, Callbacks as MarshalCallbacks } from '../../state/dimension-marshal/dimension-marshal-types';
+import type { StyleMarshal } from '../style-marshal/style-marshal-types';
+import type {
+  DimensionMarshal,
+  Callbacks as DimensionMarshalCallbacks,
+} from '../../state/dimension-marshal/dimension-marshal-types';
 import type {
   Store,
   State,
@@ -62,11 +66,13 @@ export default class DragDropContext extends React.Component<Props> {
 
   componentWillMount() {
     this.store = createStore();
-    const styleMarshal = createStyleMarshal();
+
+    // create the style marshal
+    const styleMarshal: StyleMarshal = createStyleMarshal();
     this.draggableClassName = styleMarshal.draggableClassName;
 
-    // set up the dimension marshal
-    const callbacks: MarshalCallbacks = {
+    // create the dimension marshal
+    const callbacks: DimensionMarshalCallbacks = {
       cancel: () => {
         this.store.dispatch(clean());
       },

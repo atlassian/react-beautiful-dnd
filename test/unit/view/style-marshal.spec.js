@@ -3,7 +3,7 @@
 describe('style marshal', () => {
   describe('not dragging', () => {
     it('should apply the base styles', () => {
-
+      const marshal: StyleMarshal =
     });
 
     it('should not prevent pointer events or add a transition to the draggable', () => {
