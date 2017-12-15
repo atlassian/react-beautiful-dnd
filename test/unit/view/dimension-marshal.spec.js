@@ -467,7 +467,7 @@ describe('dimension marshal', () => {
 
   describe('drag completed after initial collection', () => {
     it('should unwatch all the scroll events on droppables', () => {
-      [phase.idle].forEach((finish: State) => {
+      [phase.idle, phase.dropAnimating, phase.dropComplete].forEach((finish: State) => {
         const marshal = createDimensionMarshal(getCallbackStub());
         const watchers = populateMarshal(marshal);
 
@@ -491,7 +491,93 @@ describe('dimension marshal', () => {
   });
 
   describe('subsequent drags', () => {
+    it('should support subsequent drags after a completed collection', () => {
+      const callbacks = getCallbackStub();
+      const marshal = createDimensionMarshal(callbacks);
+      const watchers = populateMarshal(marshal);
+      const droppableCount: number = Object.keys(preset.droppables).length;
+      const draggableCount: number = Object.keys(preset.draggables).length;
 
+      Array.from({ length: 4 }).forEach(() => {
+        // start the collection
+        marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
+
+        expect(callbacks.publishDroppables).toHaveBeenCalledWith([preset.home]);
+        expect(callbacks.publishDroppables).toHaveBeenCalledTimes(1);
+        expect(callbacks.publishDraggables).toHaveBeenCalledWith([preset.inHome1]);
+        expect(callbacks.publishDraggables).toHaveBeenCalledTimes(1);
+        expect(watchers.droppable.getDimension).toHaveBeenCalledTimes(1);
+        expect(watchers.draggable.getDimension).toHaveBeenCalledTimes(1);
+        expect(watchers.droppable.watchScroll).toHaveBeenCalledWith(preset.home.descriptor.id);
+        expect(watchers.droppable.watchScroll).toHaveBeenCalledTimes(1);
+        expect(watchers.droppable.unwatchScroll).not.toHaveBeenCalled();
+
+        executeCollectionAndPublish();
+
+        expect(callbacks.publishDroppables).toHaveBeenCalledTimes(2);
+        expect(callbacks.publishDraggables).toHaveBeenCalledTimes(2);
+        expect(watchers.droppable.getDimension).toHaveBeenCalledTimes(droppableCount);
+        expect(watchers.droppable.watchScroll).toHaveBeenCalledTimes(droppableCount);
+        expect(watchers.draggable.getDimension).toHaveBeenCalledTimes(draggableCount);
+        expect(watchers.droppable.unwatchScroll).not.toHaveBeenCalled();
+
+        // finish the collection
+        marshal.onStateChange(phase.dropComplete);
+
+        expect(watchers.droppable.unwatchScroll).toHaveBeenCalledTimes(droppableCount);
+
+        // reset
+        callbacks.publishDraggables.mockClear();
+        callbacks.publishDroppables.mockClear();
+        watchers.draggable.getDimension.mockClear();
+        watchers.droppable.getDimension.mockClear();
+        watchers.droppable.watchScroll.mockClear();
+        watchers.droppable.unwatchScroll.mockClear();
+      });
+    });
+
+    it('should support subsequent drags after a cancelled collection', () => {
+      const callbacks = getCallbackStub();
+      const marshal = createDimensionMarshal(callbacks);
+      const watchers = populateMarshal(marshal);
+      const droppableCount: number = Object.keys(preset.droppables).length;
+      const draggableCount: number = Object.keys(preset.draggables).length;
+
+      Array.from({ length: 4 }).forEach(() => {
+        // start the collection
+        marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
+
+        expect(callbacks.publishDroppables).toHaveBeenCalledWith([preset.home]);
+        expect(callbacks.publishDroppables).toHaveBeenCalledTimes(1);
+        expect(callbacks.publishDraggables).toHaveBeenCalledWith([preset.inHome1]);
+        expect(callbacks.publishDraggables).toHaveBeenCalledTimes(1);
+        expect(watchers.droppable.getDimension).toHaveBeenCalledTimes(1);
+        expect(watchers.draggable.getDimension).toHaveBeenCalledTimes(1);
+        expect(watchers.droppable.watchScroll).toHaveBeenCalledWith(preset.home.descriptor.id);
+        expect(watchers.droppable.watchScroll).toHaveBeenCalledTimes(1);
+        expect(watchers.droppable.unwatchScroll).not.toHaveBeenCalled();
+
+        executeCollectionPhase();
+
+        // unchanged - not published yet
+        expect(callbacks.publishDroppables).toHaveBeenCalledTimes(1);
+        expect(callbacks.publishDraggables).toHaveBeenCalledTimes(1);
+        // dimensions collected
+        expect(watchers.droppable.getDimension).toHaveBeenCalledTimes(droppableCount);
+        expect(watchers.draggable.getDimension).toHaveBeenCalledTimes(draggableCount);
+
+        // cancelled
+        marshal.onStateChange(phase.idle);
+
+        // reset
+        callbacks.publishDraggables.mockClear();
+        callbacks.publishDroppables.mockClear();
+        watchers.draggable.getDimension.mockClear();
+        watchers.droppable.getDimension.mockClear();
+        watchers.droppable.watchScroll.mockClear();
+        watchers.droppable.unwatchScroll.mockClear();
+      });
+    });
   });
 
   describe('registration change while not collecting', () => {
