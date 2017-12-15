@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
 import fireHooks from '../../state/fire-hooks';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
-import createStyleMarshal from '../style-marshal/create-style-marshal';
+import createStyleMarshal from '../style-marshal/style-marshal';
 import type { DimensionMarshal, Callbacks as MarshalCallbacks } from '../../state/dimension-marshal/dimension-marshal-types';
 import type {
   Store,

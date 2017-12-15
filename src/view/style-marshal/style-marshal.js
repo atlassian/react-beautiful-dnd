@@ -60,6 +60,8 @@ export default (draggableClassName: string) => {
       if (!el) {
         el = document.createElement('style');
         el.type = 'text/css';
+        // for easy identification
+        el.setAttribute('data-react-beautiful-dnd', '');
         const head: ?HTMLElement = document.querySelector('head');
 
         if (!head) {

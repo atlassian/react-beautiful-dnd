@@ -120,6 +120,26 @@ const state = (() => {
   return { idle, requesting };
 })();
 
+const ofAnotherType: DroppableDimension = getDroppableDimension({
+  descriptor: {
+    id: 'of-another-type',
+    type: 'another-type',
+  },
+  clientRect: getClientRect({
+    top: 0, right: 100, bottom: 100, left: 0,
+  }),
+});
+const childOfAnotherType: DraggableDimension = getDraggableDimension({
+  descriptor: {
+    id: 'addition',
+    droppableId: ofAnotherType.descriptor.id,
+    index: 0,
+  },
+  clientRect: getClientRect({
+    top: 0, right: 100, bottom: 100, left: 0,
+  }),
+});
+
 describe('dimension marshal', () => {
   beforeAll(() => {
     requestAnimationFrame.reset();
@@ -260,32 +280,13 @@ describe('dimension marshal', () => {
         });
 
         it('should only collect dimensions have the same type as the dragging item', () => {
-          const ofAnotherType: DroppableDimension = getDroppableDimension({
-            descriptor: {
-              id: 'of-another-type',
-              type: 'another-type',
-            },
-            clientRect: getClientRect({
-              top: 0, right: 100, bottom: 100, left: 0,
-            }),
-          });
-          const addition: DraggableDimension = getDraggableDimension({
-            descriptor: {
-              id: 'addition',
-              droppableId: ofAnotherType.descriptor.id,
-              index: 0,
-            },
-            clientRect: getClientRect({
-              top: 0, right: 100, bottom: 100, left: 0,
-            }),
-          });
           const droppables: DroppableDimensionMap = {
             ...preset.droppables,
             [ofAnotherType.descriptor.id]: ofAnotherType,
           };
           const draggables: DraggableDimensionMap = {
             ...preset.draggables,
-            [addition.descriptor.id]: addition,
+            [childOfAnotherType.descriptor.id]: childOfAnotherType,
           };
           const callbacks = getCallbackStub();
           const marshal = createDimensionMarshal(callbacks);
@@ -302,7 +303,7 @@ describe('dimension marshal', () => {
           executeFirstFrame();
 
           expect(watchers.draggable.getDimension)
-            .not.toHaveBeenCalledWith(addition.descriptor.id);
+            .not.toHaveBeenCalledWith(childOfAnotherType.descriptor.id);
           expect(watchers.droppable.getDimension)
             .not.toHaveBeenCalledWith(ofAnotherType.descriptor.id);
 
@@ -373,6 +374,33 @@ describe('dimension marshal', () => {
           expect(callbacks.publishDroppables).not.toHaveBeenCalled();
         });
 
+        it('should publish all the collected draggables', () => {
+          const callbacks = getCallbackStub();
+          const marshal = createDimensionMarshal(callbacks);
+          populateMarshal(marshal);
+
+          marshal.onStateChange(state.requesting);
+          // clearing initial calls
+          callbacks.publishDraggables.mockClear();
+
+          executeFirstTwoFrames();
+
+          // calls are batched
+          expect(callbacks.publishDraggables).toHaveBeenCalledTimes(1);
+          const result: DraggableDimension[] = callbacks.publishDraggables.mock.calls[0][0];
+          // not calling for the dragging item
+          expect(result.length).toBe(Object.keys(preset.draggables).length - 1);
+          // super explicit test
+          // - doing it like this because the order of Object.keys is not guarenteed
+          Object.keys(preset.draggables).forEach((id: DraggableId) => {
+            if (id === preset.inHome1.descriptor.id) {
+              expect(result).not.toContain(preset.inHome1);
+              return;
+            }
+            expect(result).toContain(preset.draggables[id]);
+          });
+        });
+
         it('should publish all the collected droppables', () => {
           const callbacks = getCallbackStub();
           const marshal = createDimensionMarshal(callbacks);
@@ -390,6 +418,7 @@ describe('dimension marshal', () => {
           // not calling for the dragging item
           expect(result.length).toBe(Object.keys(preset.droppables).length - 1);
           // super explicit test
+          // - doing it like this because the order of Object.keys is not guarenteed
           Object.keys(preset.droppables).forEach((id: DroppableId) => {
             if (id === preset.home.descriptor.id) {
               expect(result.includes(preset.home)).toBe(false);
@@ -399,16 +428,46 @@ describe('dimension marshal', () => {
           });
         });
 
-        it('should publish all the collected draggable dimensions', () => {
-
-        });
-
         it('should request all the droppables to start listening to scroll events', () => {
+          const callbacks = getCallbackStub();
+          const marshal = createDimensionMarshal(callbacks);
+          const watchers = populateMarshal(marshal);
 
+          marshal.onStateChange(state.requesting);
+          // initial droppable
+          expect(watchers.droppable.watchScroll).toHaveBeenCalledTimes(1);
+          // clearing this initial call
+          watchers.droppable.watchScroll.mockClear();
+
+          executeFirstTwoFrames();
+
+          // excluding the home droppable
+          const expectedLength: number = Object.keys(preset.droppables).length - 1;
+          expect(watchers.droppable.watchScroll).toHaveBeenCalledTimes(expectedLength);
         });
 
         it('should not publish dimensions that where not collected', () => {
+          const droppables: DroppableDimensionMap = {
+            ...preset.droppables,
+            [ofAnotherType.descriptor.id]: ofAnotherType,
+          };
+          const draggables: DraggableDimensionMap = {
+            ...preset.draggables,
+            [childOfAnotherType.descriptor.id]: childOfAnotherType,
+          };
+          const callbacks = getCallbackStub();
+          const marshal = createDimensionMarshal(callbacks);
+          populateMarshal(marshal, {
+            draggables,
+            droppables,
+          });
 
+          marshal.onStateChange(state.requesting);
+
+          executeFirstTwoFrames();
+
+          expect(callbacks.publishDroppables.mock.calls[0][0]).not.toContain(ofAnotherType);
+          expect(callbacks.publishDraggables.mock.calls[0][0]).not.toContain(childOfAnotherType);
         });
       });
     });
