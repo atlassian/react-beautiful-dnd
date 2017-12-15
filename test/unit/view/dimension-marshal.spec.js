@@ -10,7 +10,6 @@ import type {
   GetDraggableDimensionFn,
 } from '../../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
-  DraggableDescriptor,
   DraggableDimension,
   DroppableDimension,
   DraggableDimensionMap,
