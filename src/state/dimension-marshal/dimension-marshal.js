@@ -71,6 +71,12 @@ export default (callbacks: Callbacks) => {
   ) => {
     const id: DraggableId = descriptor.id;
 
+    // Cannot register a draggable if no entry exists for the droppable
+    if (!state.droppables[descriptor.droppableId]) {
+      console.error(`Cannot register Draggable ${id} as there is no entry for the Droppable ${descriptor.droppableId}`);
+      return;
+    }
+
     if (state.draggables[id]) {
       console.error(`Cannot register Draggable with id ${id} as one is already registered`);
       return;
@@ -139,6 +145,7 @@ export default (callbacks: Callbacks) => {
       console.error(`Cannot unregister Draggable with id ${id} as as it is not registered`);
       return;
     }
+
     const newMap: DraggableEntryMap = {
       ...state.draggables,
     };
@@ -160,6 +167,11 @@ export default (callbacks: Callbacks) => {
       console.error(`Cannot unregister Droppable with id ${id} as as it is not registered`);
       return;
     }
+
+    // Not checking if this will leave orphan draggables as react
+    // unmounts parents before it unmounts children:
+    // https://twitter.com/alexandereardon/status/941514612624703488
+
     const newMap: DroppableEntryMap = {
       ...state.droppables,
     };
@@ -169,11 +181,10 @@ export default (callbacks: Callbacks) => {
       droppables: newMap,
     });
 
-    if (!state.collection) {
+    if (!state.isCollecting) {
       return;
     }
 
-    // TODO: actually unpublish
     console.warn('currently not supporting unmounting a Droppable during a drag');
   };
 
@@ -273,8 +284,16 @@ export default (callbacks: Callbacks) => {
         .filter((item: DraggableDescriptor): boolean => item.id !== descriptor.id)
         // remove draggables that do not have the same droppable type
         .filter((item: DraggableDescriptor): boolean => {
-          const droppable: DroppableDescriptor = droppables[item.droppableId].descriptor;
-          return droppable.type === home.descriptor.type;
+          const entry: ?DroppableEntry = droppables[item.droppableId];
+
+          // This should never happen
+          // but it is better to print this information and continue on
+          if (!entry) {
+            console.error(`Orphan Draggable found ${item.id} which says it belongs to unknown Droppable ${item.droppableId}`);
+            return false;
+          }
+
+          return entry.descriptor.type === home.descriptor.type;
         });
 
     const droppablesToBeCollected: DroppableDescriptor[] =
@@ -333,11 +352,9 @@ export default (callbacks: Callbacks) => {
     });
   };
 
-  const onStateChange = (current: AppState) => {
-    const phase: Phase = current.phase;
-
+  const onStateChange = (phase: Phase, request: ?DraggableDescriptor) => {
     if (phase === 'COLLECTING_INITIAL_DIMENSIONS') {
-      const descriptor: ?DraggableDescriptor = current.dimension.request;
+      const descriptor: ?DraggableDescriptor = request;
 
       if (!descriptor) {
         console.error('could not find requested draggable id in state');

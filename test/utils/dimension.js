@@ -232,6 +232,14 @@ export const getPreset = (axis?: Axis = vertical) => {
     [inForeign4.descriptor.id]: inForeign4,
   };
 
+  const inHomeList: DraggableDimension[] = [
+    inHome1, inHome2, inHome3, inHome4,
+  ];
+
+  const inForeignList: DraggableDimension[] = [
+    inForeign1, inForeign2, inForeign3, inForeign4,
+  ];
+
   return {
     home,
     inHome1,
@@ -246,6 +254,8 @@ export const getPreset = (axis?: Axis = vertical) => {
     emptyForeign,
     droppables,
     draggables,
+    inHomeList,
+    inForeignList,
   };
 };
 

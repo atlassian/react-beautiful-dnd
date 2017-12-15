@@ -7,8 +7,10 @@ import type {
   Callbacks,
   DimensionMarshal,
   DroppableCallbacks,
+  GetDraggableDimensionFn,
 } from '../../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
+  DraggableDescriptor,
   DraggableDimension,
   DroppableDimension,
   DraggableDimensionMap,
@@ -16,6 +18,8 @@ import type {
   DraggableId,
   DroppableId,
   State,
+  ClientRect,
+  Phase,
 } from '../../../src/types';
 
 const getCallbackStub = (): Callbacks => {
@@ -51,7 +55,10 @@ type PopulateMarshalWatches = {
   |},
 }
 
-const populateMarshal = (marshal: DimensionMarshal, args?: PopulateMarshalState = defaultArgs): PopulateMarshalWatches => {
+const populateMarshal = (
+  marshal: DimensionMarshal,
+  args?: PopulateMarshalState = defaultArgs
+): PopulateMarshalWatches => {
   const { draggables, droppables } = args;
   const watches: PopulateMarshalWatches = {
     draggable: {
@@ -94,40 +101,25 @@ const populateMarshal = (marshal: DimensionMarshal, args?: PopulateMarshalState 
   return watches;
 };
 
-const state = (() => {
-  const idle: State = {
-    phase: 'IDLE',
-    drag: null,
-    drop: null,
-    dimension: {
-      request: null,
-      draggable: {},
-      droppable: {},
-    },
-  };
+type PhaseMap = { [key: string] : Phase }
 
-  const requesting: State = {
-    phase: 'COLLECTING_INITIAL_DIMENSIONS',
-    drag: null,
-    drop: null,
-    dimension: {
-      request: preset.inHome1.descriptor,
-      draggable: {},
-      droppable: {},
-    },
-  };
+const phase: PhaseMap = {
+  idle: 'IDLE',
+  requesting: 'COLLECTING_INITIAL_DIMENSIONS',
+  dropAnimating: 'DROP_ANIMATING',
+  dropComplete: 'DROP_COMPLETE',
+};
 
-  return { idle, requesting };
-})();
+const fakeClientRect: ClientRect = getClientRect({
+  top: 0, right: 100, bottom: 100, left: 0,
+});
 
 const ofAnotherType: DroppableDimension = getDroppableDimension({
   descriptor: {
     id: 'of-another-type',
     type: 'another-type',
   },
-  clientRect: getClientRect({
-    top: 0, right: 100, bottom: 100, left: 0,
-  }),
+  clientRect: fakeClientRect,
 });
 const childOfAnotherType: DraggableDimension = getDraggableDimension({
   descriptor: {
@@ -135,9 +127,7 @@ const childOfAnotherType: DraggableDimension = getDraggableDimension({
     droppableId: ofAnotherType.descriptor.id,
     index: 0,
   },
-  clientRect: getClientRect({
-    top: 0, right: 100, bottom: 100, left: 0,
-  }),
+  clientRect: fakeClientRect,
 });
 
 describe('dimension marshal', () => {
@@ -147,14 +137,33 @@ describe('dimension marshal', () => {
 
   beforeEach(() => {
     jest.useFakeTimers();
+    jest.spyOn(console, 'error').mockImplementation(() => { });
   });
 
   afterEach(() => {
     requestAnimationFrame.reset();
     jest.useRealTimers();
+    console.error.mockRestore();
   });
 
-  describe('initial collection', () => {
+  const executeCollectionPhase = () => {
+    // lift timeout
+    jest.runOnlyPendingTimers();
+    // execute first frame - this should publish everything
+    requestAnimationFrame.step();
+  };
+
+  const executePublishPhase = () => {
+    // after the first frame, the second frame is just a single frame away
+    requestAnimationFrame.step();
+  };
+
+  const executeCollectionAndPublish = () => {
+    executeCollectionPhase();
+    executePublishPhase();
+  };
+
+  describe('drag starting (including early cancel)', () => {
     describe('invalid start state', () => {
       it('should cancel the collecting if already collecting', () => {
 
@@ -175,7 +184,7 @@ describe('dimension marshal', () => {
         const marshal = createDimensionMarshal(callbacks);
         populateMarshal(marshal);
 
-        marshal.onStateChange(state.requesting);
+        marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
 
         expect(callbacks.publishDraggables).toHaveBeenCalledTimes(1);
         expect(callbacks.publishDraggables).toBeCalledWith([preset.inHome1]);
@@ -188,7 +197,7 @@ describe('dimension marshal', () => {
         const marshal = createDimensionMarshal(callbacks);
         const watches = populateMarshal(marshal);
 
-        marshal.onStateChange(state.requesting);
+        marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
 
         // it should not watch scroll on the other droppables at this stage
         expect(watches.droppable.watchScroll).toHaveBeenCalledTimes(1);
@@ -197,34 +206,17 @@ describe('dimension marshal', () => {
     });
 
     describe('post drag start actions', () => {
-      const executeFirstFrame = () => {
-        // lift timeout
-        jest.runOnlyPendingTimers();
-        // execute first frame - this should publish everything
-        requestAnimationFrame.step();
-      };
-
-      const executeSecondFrame = () => {
-        // after the first frame, the second frame is just a single frame away
-        requestAnimationFrame.step();
-      };
-
-      const executeFirstTwoFrames = () => {
-        executeFirstFrame();
-        executeSecondFrame();
-      };
-
       describe('before the first frame', () => {
         it('should not do anything if the drag was cancelled before the lift timeout finished', () => {
           const callbacks = getCallbackStub();
           const marshal = createDimensionMarshal(callbacks);
           populateMarshal(marshal);
 
-          marshal.onStateChange(state.requesting);
+          marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
           expect(callbacks.publishDroppables).toHaveBeenCalledTimes(1);
           expect(callbacks.publishDraggables).toHaveBeenCalledTimes(1);
           // moving to idle state
-          marshal.onStateChange(state.idle);
+          marshal.onStateChange(phase.idle);
           // something would normally happen
           jest.runAllTimers();
           requestAnimationFrame.flush();
@@ -241,7 +233,7 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           populateMarshal(marshal);
 
-          marshal.onStateChange(state.requesting);
+          marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
           expect(callbacks.publishDroppables).toHaveBeenCalledTimes(1);
           expect(callbacks.publishDraggables).toHaveBeenCalledTimes(1);
           callbacks.publishDroppables.mockClear();
@@ -251,7 +243,7 @@ describe('dimension marshal', () => {
           jest.runOnlyPendingTimers();
           // no animation frame has occurred yet
           // moving to idle state
-          marshal.onStateChange(state.idle);
+          marshal.onStateChange(phase.idle);
           // flushing all frames
           requestAnimationFrame.flush();
 
@@ -263,13 +255,13 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           const watchers = populateMarshal(marshal);
 
-          marshal.onStateChange(state.requesting);
+          marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
           expect(watchers.draggable.getDimension).toHaveBeenCalledTimes(1);
           expect(watchers.droppable.getDimension).toHaveBeenCalledTimes(1);
           watchers.draggable.getDimension.mockClear();
           watchers.droppable.getDimension.mockClear();
 
-          executeFirstFrame();
+          executeCollectionPhase();
 
           // all dimensions have been collected
           // length -1 as the initial dimensions have already been collected
@@ -295,12 +287,12 @@ describe('dimension marshal', () => {
             droppables,
           });
 
-          marshal.onStateChange(state.requesting);
+          marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
           // clearing the initial calls
           watchers.draggable.getDimension.mockClear();
           watchers.droppable.getDimension.mockClear();
 
-          executeFirstFrame();
+          executeCollectionPhase();
 
           expect(watchers.draggable.getDimension)
             .not.toHaveBeenCalledWith(childOfAnotherType.descriptor.id);
@@ -320,7 +312,7 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           const watchers = populateMarshal(marshal);
 
-          marshal.onStateChange(state.requesting);
+          marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
 
           // called straight away
           expect(watchers.draggable.getDimension)
@@ -328,7 +320,7 @@ describe('dimension marshal', () => {
           // clear the watchers state
           watchers.draggable.getDimension.mockClear();
           // will trigger the collection
-          executeFirstFrame();
+          executeCollectionPhase();
 
           expect(watchers.draggable.getDimension)
             .not.toHaveBeenCalledWith(preset.inHome1.descriptor.id);
@@ -339,7 +331,7 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           const watchers = populateMarshal(marshal);
 
-          marshal.onStateChange(state.requesting);
+          marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
 
           // called straight away
           expect(watchers.droppable.getDimension)
@@ -347,7 +339,7 @@ describe('dimension marshal', () => {
           // clear the watchers state
           watchers.droppable.getDimension.mockClear();
           // will trigger the collection
-          executeFirstFrame();
+          executeCollectionPhase();
 
           expect(watchers.droppable.getDimension)
             .not.toHaveBeenCalledWith(preset.home.descriptor.id);
@@ -360,14 +352,14 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           populateMarshal(marshal);
 
-          marshal.onStateChange(state.requesting);
+          marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
           // clearing initial calls
           callbacks.publishDraggables.mockClear();
           callbacks.publishDroppables.mockClear();
-          executeFirstFrame();
+          executeCollectionPhase();
           // cancelled before second frame fired
-          marshal.onStateChange(state.idle);
-          executeSecondFrame();
+          marshal.onStateChange(phase.idle);
+          executePublishPhase();
 
           // nothing additional called
           expect(callbacks.publishDraggables).not.toHaveBeenCalled();
@@ -379,11 +371,11 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           populateMarshal(marshal);
 
-          marshal.onStateChange(state.requesting);
+          marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
           // clearing initial calls
           callbacks.publishDraggables.mockClear();
 
-          executeFirstTwoFrames();
+          executeCollectionAndPublish();
 
           // calls are batched
           expect(callbacks.publishDraggables).toHaveBeenCalledTimes(1);
@@ -406,11 +398,11 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           populateMarshal(marshal);
 
-          marshal.onStateChange(state.requesting);
+          marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
           // clearing initial calls
           callbacks.publishDroppables.mockClear();
 
-          executeFirstTwoFrames();
+          executeCollectionAndPublish();
 
           // calls are batched
           expect(callbacks.publishDroppables).toHaveBeenCalledTimes(1);
@@ -433,13 +425,13 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           const watchers = populateMarshal(marshal);
 
-          marshal.onStateChange(state.requesting);
+          marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
           // initial droppable
           expect(watchers.droppable.watchScroll).toHaveBeenCalledTimes(1);
           // clearing this initial call
           watchers.droppable.watchScroll.mockClear();
 
-          executeFirstTwoFrames();
+          executeCollectionAndPublish();
 
           // excluding the home droppable
           const expectedLength: number = Object.keys(preset.droppables).length - 1;
@@ -462,9 +454,9 @@ describe('dimension marshal', () => {
             droppables,
           });
 
-          marshal.onStateChange(state.requesting);
+          marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
 
-          executeFirstTwoFrames();
+          executeCollectionAndPublish();
 
           expect(callbacks.publishDroppables.mock.calls[0][0]).not.toContain(ofAnotherType);
           expect(callbacks.publishDraggables.mock.calls[0][0]).not.toContain(childOfAnotherType);
@@ -473,25 +465,103 @@ describe('dimension marshal', () => {
     });
   });
 
+  describe('drag completed after initial collection', () => {
+    it('should unwatch all the scroll events on droppables', () => {
+      [phase.idle].forEach((finish: State) => {
+        const marshal = createDimensionMarshal(getCallbackStub());
+        const watchers = populateMarshal(marshal);
+
+        // do initial work
+        marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
+        executeCollectionAndPublish();
+        // currently only watching
+        Object.keys(preset.droppables).forEach((id: DroppableId) => {
+          expect(watchers.droppable.watchScroll).toHaveBeenCalledWith(id);
+          expect(watchers.droppable.unwatchScroll).not.toHaveBeenCalledWith(id);
+        });
+
+        // finishing the drag
+        marshal.onStateChange(finish);
+        // now unwatch has been called
+        Object.keys(preset.droppables).forEach((id: DroppableId) => {
+          expect(watchers.droppable.unwatchScroll).toHaveBeenCalledWith(id);
+        });
+      });
+    });
+  });
+
+  describe('subsequent drags', () => {
+
+  });
+
   describe('registration change while not collecting', () => {
+    const droppableCallbacks: DroppableCallbacks = {
+      getDimension: () => preset.home,
+      watchScroll: () => { },
+      unwatchScroll: () => { },
+    };
+    const getDraggableDimensionFn: GetDraggableDimensionFn = () => preset.inHome1;
+
     describe('dimension added', () => {
       describe('droppable', () => {
         it('should log an error if there is already an entry with the same id', () => {
+          const marshal = createDimensionMarshal(getCallbackStub());
 
+          marshal.registerDroppable(preset.home.descriptor, droppableCallbacks);
+          expect(console.error).not.toHaveBeenCalled();
+
+          marshal.registerDroppable(preset.home.descriptor, droppableCallbacks);
+          expect(console.error).toHaveBeenCalled();
         });
 
         it('should be published in the next collection', () => {
+          const callbacks = getCallbackStub();
+          const marshal = createDimensionMarshal(callbacks);
+          populateMarshal(marshal, {
+            draggables: {}, droppables: {},
+          });
 
+          marshal.registerDroppable(preset.home.descriptor, droppableCallbacks);
+          marshal.registerDraggable(preset.inHome1.descriptor, getDraggableDimensionFn);
+          marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
+
+          expect(callbacks.publishDroppables).toHaveBeenCalledWith([preset.home]);
         });
       });
 
       describe('draggable', () => {
-        it('should log an error if there is already an entry with the same id', () => {
+        it('should log an error if there is no matching droppable', () => {
+          const marshal = createDimensionMarshal(getCallbackStub());
 
+          marshal.registerDraggable(preset.inHome1.descriptor, getDraggableDimensionFn);
+          expect(console.error).toHaveBeenCalled();
+        });
+
+        it('should log an error if there is already an entry with the same id', () => {
+          const marshal = createDimensionMarshal(getCallbackStub());
+
+          // need to register a droppable first
+          marshal.registerDroppable(preset.home.descriptor, droppableCallbacks);
+
+          marshal.registerDraggable(preset.inHome1.descriptor, getDraggableDimensionFn);
+          expect(console.error).not.toHaveBeenCalled();
+
+          marshal.registerDraggable(preset.inHome1.descriptor, getDraggableDimensionFn);
+          expect(console.error).toHaveBeenCalled();
         });
 
         it('should be published in the next collection', () => {
+          const callbacks = getCallbackStub();
+          const marshal = createDimensionMarshal(callbacks);
+          populateMarshal(marshal, {
+            draggables: {}, droppables: {},
+          });
 
+          marshal.registerDroppable(preset.home.descriptor, droppableCallbacks);
+          marshal.registerDraggable(preset.inHome1.descriptor, getDraggableDimensionFn);
+          marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
+
+          expect(callbacks.publishDraggables).toHaveBeenCalledWith([preset.inHome1]);
         });
       });
     });
@@ -499,21 +569,101 @@ describe('dimension marshal', () => {
     describe('dimension removed', () => {
       describe('droppable', () => {
         it('should log an error if there is no entry with a matching id', () => {
+          const marshal = createDimensionMarshal(getCallbackStub());
 
+          marshal.unregisterDroppable(preset.inHome1.descriptor.id);
+
+          expect(console.error).toHaveBeenCalled();
         });
 
-        it('should not collect the entry on the next collection', () => {
+        it('should not error if the droppable still has registered draggables', () => {
+          // Even though this leaves orphans, the in react the parent is unmounted before the child
+          // removing foreign droppable
+          const callbacks = getCallbackStub();
+          const marshal = createDimensionMarshal(callbacks);
+          populateMarshal(marshal);
 
+          // unregistering the foreign droppable without unregistering its children
+          marshal.unregisterDroppable(preset.foreign.descriptor.id);
+          expect(console.error).not.toHaveBeenCalled();
+        });
+
+        it('should remove the dimension if it exists', () => {
+          // removing foreign droppable
+          const callbacks = getCallbackStub();
+          const marshal = createDimensionMarshal(callbacks);
+          const watchers = populateMarshal(marshal);
+
+          // unregistering the foreign droppable
+          marshal.unregisterDroppable(preset.foreign.descriptor.id);
+          // unregistering all children to prevent orphan children log
+          preset.inForeignList.forEach((dimension: DraggableDimension) => {
+            marshal.unregisterDraggable(dimension.descriptor.id);
+          });
+          expect(console.error).not.toHaveBeenCalled();
+
+          // lift, collect and publish
+          marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
+          // clearing state from original publish
+          callbacks.publishDroppables.mockClear();
+          executeCollectionAndPublish();
+
+          expect(watchers.droppable.getDimension)
+            .not.toHaveBeenCalledWith(preset.foreign.descriptor.id);
+          expect(callbacks.publishDroppables.mock.calls[0][0])
+            .not.toContain(preset.foreign);
+
+          // checking we are not causing an orphan child warning
+          expect(console.error).not.toHaveBeenCalled();
+        });
+
+        // This should never happen - this test is just checking that the error logging is occurring
+        it('should exclude orphaned children on the next collection', () => {
+          const callbacks = getCallbackStub();
+          const marshal = createDimensionMarshal(callbacks);
+          const watchers = populateMarshal(marshal);
+
+          // unregistering the foreign droppable
+          marshal.unregisterDroppable(preset.foreign.descriptor.id);
+          expect(console.error).not.toHaveBeenCalled();
+          // not unregistering children (bad)
+
+          // lift, collect and publish
+          marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
+          executeCollectionAndPublish();
+
+          // checking that none of the children in the foreign list where interacted with
+          preset.inForeignList.forEach((dimension: DraggableDimension) => {
+            expect(watchers.draggable.getDimension)
+              .not.toHaveBeenCalledWith(dimension.descriptor.id);
+          });
+
+          // this should cause an orphan child warning
+          expect(console.error).toHaveBeenCalledTimes(preset.inForeignList.length);
         });
       });
 
       describe('draggable', () => {
         it('should log an error if there is no entry with a matching id', () => {
+          const marshal = createDimensionMarshal(getCallbackStub());
 
+          marshal.unregisterDraggable(preset.home.descriptor.id);
+
+          expect(console.error).toHaveBeenCalled();
         });
 
-        it('should not collect the entry on the next collection', () => {
+        it('should remove the dimension if it exists', () => {
+          const marshal = createDimensionMarshal(getCallbackStub());
+          const watchers = populateMarshal(marshal);
 
+          marshal.unregisterDraggable(preset.inForeign1.descriptor.id);
+          expect(console.error).not.toHaveBeenCalled();
+
+          marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
+          executeCollectionAndPublish();
+
+          expect(watchers.draggable.getDimension)
+            .not.toHaveBeenCalledWith(preset.inForeign1.descriptor.id);
         });
       });
     });
@@ -522,37 +672,51 @@ describe('dimension marshal', () => {
   describe('registration change while collecting', () => {
     describe('dimension added', () => {
       describe('draggable', () => {
-        it('should log an error if the dimension already existed', () => {
-
-        });
-
         it('should immediately publish the draggable', () => {
+          const callbacks = getCallbackStub();
+          const marshal = createDimensionMarshal(callbacks);
+          populateMarshal(marshal);
+          const fake: DraggableDimension = getDraggableDimension({
+            descriptor: {
+              id: 'my fake id',
+              droppableId: preset.home.descriptor.id,
+              index: preset.inHomeList.length,
+            },
+            clientRect: fakeClientRect,
+          });
 
+          marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
+
+          marshal.registerDraggable(fake.descriptor, () => fake);
+          expect(callbacks.publishDraggables).toHaveBeenCalledWith([fake]);
         });
       });
 
       describe('droppable', () => {
-        it('should log an error if the dimension already existed', () => {
-
-        });
-
         it('should immediately publish the droppable', () => {
+          const callbacks = getCallbackStub();
+          const marshal = createDimensionMarshal(callbacks);
+          populateMarshal(marshal);
+          const fake: DroppableDimension = getDroppableDimension({
+            descriptor: {
+              id: 'my fake id',
+              type: preset.home.descriptor.type,
+            },
+            clientRect: fakeClientRect,
+          });
+          const droppableCallbacks: DroppableCallbacks = {
+            getDimension: () => fake,
+            watchScroll: jest.fn(),
+            unwatchScroll: () => { },
+          };
 
+          marshal.onStateChange(phase.requesting, preset.inHome1.descriptor);
+
+          marshal.registerDroppable(fake.descriptor, droppableCallbacks);
+          expect(callbacks.publishDroppables).toHaveBeenCalledWith([fake]);
+          // should subscribe to scrolling immediately
+          expect(droppableCallbacks.watchScroll).toHaveBeenCalled();
         });
-
-        it('should request the droppable publish scroll updates', () => {
-
-        });
-      });
-    });
-
-    // This would need to work to support virtualisation
-    describe('dimension removed (not currently supported)', () => {
-      it('should cancel the drag when removing a draggable', () => {
-
-      });
-      it('should cancel the drag when removing a droppable', () => {
-
       });
     });
   });
