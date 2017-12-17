@@ -6,7 +6,7 @@ import type {
   DroppableDimension,
   DraggableId,
   DroppableId,
-  Phase,
+  State,
   Position,
 } from '../../types';
 
@@ -53,7 +53,7 @@ export type DimensionMarshal = {|
     callbacks: DroppableCallbacks) => void,
   unregisterDraggable: (id: DraggableId) => void,
   unregisterDroppable: (id: DroppableId) => void,
-  onStateChange: (phase: Phase, request: ?DraggableDescriptor) => void,
+  onPhaseChange: (current: State) => void,
 |}
 
 export type Callbacks = {|

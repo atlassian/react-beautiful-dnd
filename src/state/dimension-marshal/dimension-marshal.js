@@ -22,16 +22,13 @@ import type {
   DraggableEntryMap,
 } from './dimension-marshal-types';
 
-type Timers = {|
-  liftTimeoutId: ?number,
-  collectionFrameId: ?number,
-|}
-
 type State = {|
+  // long lived
   droppables: DroppableEntryMap,
   draggables: DraggableEntryMap,
   isCollecting: boolean,
-  timers: Timers,
+  request: ?DraggableDescriptor,
+  frameId: ?number,
 |}
 
 type ToBePublished = {|
@@ -39,17 +36,13 @@ type ToBePublished = {|
   droppables: DroppableDimension[],
 |}
 
-const noTimers: Timers = {
-  liftTimeoutId: null,
-  collectionFrameId: null,
-};
-
 export default (callbacks: Callbacks) => {
   let state: State = {
     droppables: {},
     draggables: {},
     isCollecting: false,
-    timers: noTimers,
+    request: null,
+    frameId: null,
   };
 
   const setState = (partial: Object) => {
@@ -60,8 +53,10 @@ export default (callbacks: Callbacks) => {
     state = newState;
   };
 
-  const error = (...args: mixed[]) => {
+  const cancel = (...args: mixed[]) => {
     console.error(...args);
+    // eslint-disable-next-line no-use-before-define
+    stopCollecting();
     callbacks.cancel();
   };
 
@@ -188,18 +183,108 @@ export default (callbacks: Callbacks) => {
     console.warn('currently not supporting unmounting a Droppable during a drag');
   };
 
-  const setFrameId = (frameId: ?number) => {
-    const timers: Timers = {
-      collectionFrameId: frameId,
-      liftTimeoutId: null,
-    };
+  const getToBeCollected = (descriptor: DraggableDescriptor): UnknownDescriptorType[] => {
+    const draggables: DraggableEntryMap = state.draggables;
+    const droppables: DroppableEntryMap = state.droppables;
+    const home: DroppableDescriptor = droppables[descriptor.droppableId].descriptor;
+
+    const draggablesToBeCollected: DraggableDescriptor[] =
+      Object.keys(draggables)
+        .map((id: DraggableId): DraggableDescriptor => draggables[id].descriptor)
+        // remove the original draggable from the list
+        .filter((item: DraggableDescriptor): boolean => item.id !== descriptor.id)
+        // remove draggables that do not have the same droppable type
+        .filter((item: DraggableDescriptor): boolean => {
+          const entry: ?DroppableEntry = droppables[item.droppableId];
+
+          // This should never happen
+          // but it is better to print this information and continue on
+          if (!entry) {
+            console.warn(`Orphan Draggable found ${item.id} which says it belongs to unknown Droppable ${item.droppableId}`);
+            return false;
+          }
+
+          return entry.descriptor.type === home.type;
+        });
+
+    const droppablesToBeCollected: DroppableDescriptor[] =
+      Object.keys(droppables)
+        .map((id: DroppableId): DroppableDescriptor => droppables[id].descriptor)
+        // remove the home droppable from the list
+        .filter((item: DroppableDescriptor): boolean => item.id !== home.id)
+      // remove droppables with a different type
+        .filter((item: DroppableDescriptor): boolean => {
+          const droppable: DroppableDescriptor = droppables[item.id].descriptor;
+          return droppable.type === home.type;
+        });
+
+    const toBeCollected: UnknownDescriptorType[] = [
+      ...droppablesToBeCollected,
+      ...draggablesToBeCollected,
+    ];
+
+    return toBeCollected;
+  };
+
+  const processPrimaryDimensions = (descriptor: DraggableDescriptor) => {
+    if (state.isCollecting) {
+      cancel('Cannot start capturing dimensions for a drag it is already dragging');
+      return;
+    }
 
     setState({
-      timers,
+      isCollecting: true,
+      request: descriptor,
+    });
+
+    const draggables: DraggableEntryMap = state.draggables;
+    const droppables: DroppableEntryMap = state.droppables;
+
+    const draggableEntry: ?DraggableEntry = draggables[descriptor.id];
+
+    if (!draggableEntry) {
+      cancel(`Cannot find Draggable with id ${descriptor.id} to start collecting dimensions`);
+      return;
+    }
+
+    const homeEntry: ?DroppableEntry = droppables[draggableEntry.descriptor.droppableId];
+
+    if (!homeEntry) {
+      cancel(`Cannot find home Droppable [id:${draggableEntry.descriptor.droppableId}] for Draggable [id:${descriptor.id}]`);
+      return;
+    }
+
+    // Get the minimum dimensions to start a drag
+    const home: DroppableDimension = homeEntry.callbacks.getDimension();
+    const draggable: DraggableDimension = draggableEntry.getDimension();
+    // Publishing dimensions
+    callbacks.publishDroppables([home]);
+    callbacks.publishDraggables([draggable]);
+    // Watching the scroll of the home droppable
+    homeEntry.callbacks.watchScroll(callbacks.updateDroppableScroll);
+  };
+
+  const setFrameId = (frameId: ?number) => {
+    setState({
+      frameId,
     });
   };
 
-  const collect = (toBeCollected: UnknownDescriptorType[]) => {
+  const processSecondaryDimensions = (): void => {
+    if (!state.isCollecting) {
+      cancel('Cannot collect secondary dimensions when collection is not occurring');
+      return;
+    }
+
+    if (!state.request) {
+      cancel('Cannot collect secondary dimensions with no request');
+      return;
+    }
+
+    console.time('processing to be collected');
+    const toBeCollected: UnknownDescriptorType[] = getToBeCollected(state.request);
+    console.timeEnd('processing to be collected');
+
     // Phase 1: collect dimensions in a single frame
     const collectFrameId: number = requestAnimationFrame(() => {
       const toBePublishedBuffer: UnknownDimensionType[] = toBeCollected.map(
@@ -245,124 +330,41 @@ export default (callbacks: Callbacks) => {
     setFrameId(collectFrameId);
   };
 
-  const startCollecting = (descriptor: DraggableDescriptor) => {
-    if (state.isCollecting) {
-      error('Cannot start capturing dimensions for a drag it is already dragging');
-      return;
-    }
-
-    const draggables: DraggableEntryMap = state.draggables;
-    const droppables: DroppableEntryMap = state.droppables;
-
-    const draggableEntry: ?DraggableEntry = draggables[descriptor.id];
-
-    if (!draggableEntry) {
-      error(`Cannot find Draggable with id ${descriptor.id} to start collecting dimensions`);
-      return;
-    }
-
-    const homeEntry: ?DroppableEntry = droppables[draggableEntry.descriptor.droppableId];
-
-    if (!homeEntry) {
-      error(`Cannot find home Droppable [id:${draggableEntry.descriptor.droppableId}] for Draggable [id:${descriptor.id}]`);
-      return;
-    }
-
-    // Get the minimum dimensions to start a drag
-    const home: DroppableDimension = homeEntry.callbacks.getDimension();
-    const draggable: DraggableDimension = draggableEntry.getDimension();
-    // Publishing dimensions
-    callbacks.publishDroppables([home]);
-    callbacks.publishDraggables([draggable]);
-    // Watching the scroll of the home droppable
-    homeEntry.callbacks.watchScroll(callbacks.updateDroppableScroll);
-
-    const draggablesToBeCollected: DraggableDescriptor[] =
-      Object.keys(draggables)
-        .map((id: DraggableId): DraggableDescriptor => draggables[id].descriptor)
-        // remove the original draggable from the list
-        .filter((item: DraggableDescriptor): boolean => item.id !== descriptor.id)
-        // remove draggables that do not have the same droppable type
-        .filter((item: DraggableDescriptor): boolean => {
-          const entry: ?DroppableEntry = droppables[item.droppableId];
-
-          // This should never happen
-          // but it is better to print this information and continue on
-          if (!entry) {
-            console.error(`Orphan Draggable found ${item.id} which says it belongs to unknown Droppable ${item.droppableId}`);
-            return false;
-          }
-
-          return entry.descriptor.type === home.descriptor.type;
-        });
-
-    const droppablesToBeCollected: DroppableDescriptor[] =
-      Object.keys(droppables)
-        .map((id: DroppableId): DroppableDescriptor => droppables[id].descriptor)
-        // remove the home droppable from the list
-        .filter((item: DroppableDescriptor): boolean => item.id !== home.descriptor.id)
-      // remove droppables with a different type
-        .filter((item: DroppableDescriptor): boolean => {
-          const droppable: DroppableDescriptor = droppables[item.id].descriptor;
-          return droppable.type === home.descriptor.type;
-        });
-
-    const toBeCollected: UnknownDescriptorType[] = [
-      ...droppablesToBeCollected,
-      ...draggablesToBeCollected,
-    ];
-
-    // After this initial publish a drag will start
-    const liftTimeoutId: number = setTimeout(() => collect(toBeCollected));
-
-    const timers: Timers = {
-      liftTimeoutId,
-      collectionFrameId: null,
-    };
-
-    setState({
-      timers,
-      isCollecting: true,
-    });
-  };
-
   const stopCollecting = () => {
-    if (!state.isCollecting) {
-      console.warn('not stopping dimension capturing as was not previously capturing');
-      return;
-    }
-
     // Tell all droppables to stop watching scroll
     // all good if they where not already listening
     Object.keys(state.droppables)
       .forEach((id: DroppableId) => state.droppables[id].callbacks.unwatchScroll());
 
-    if (state.timers.liftTimeoutId) {
-      clearTimeout(state.timers.liftTimeoutId);
+    if (state.frameId) {
+      cancelAnimationFrame(state.frameId);
     }
 
-    if (state.timers.collectionFrameId) {
-      cancelAnimationFrame(state.timers.collectionFrameId);
-    }
-
-    // clear the collection
+    // reset collections state
     setState({
       isCollecting: false,
-      timers: noTimers,
+      request: null,
+      frameId: null,
     });
   };
 
-  const onStateChange = (phase: Phase, request: ?DraggableDescriptor) => {
+  const onPhaseChange = (current: AppState) => {
+    const phase: Phase = current.phase;
+
     if (phase === 'COLLECTING_INITIAL_DIMENSIONS') {
-      const descriptor: ?DraggableDescriptor = request;
+      const descriptor: ?DraggableDescriptor = current.dimension.request;
 
       if (!descriptor) {
-        console.error('could not find requested draggable id in state');
-        callbacks.cancel();
+        cancel('could not find requested draggable id in state');
         return;
       }
 
-      startCollecting(descriptor);
+      processPrimaryDimensions(descriptor);
+      return;
+    }
+
+    if (phase === 'DRAGGING') {
+      processSecondaryDimensions();
       return;
     }
 
@@ -387,7 +389,7 @@ export default (callbacks: Callbacks) => {
     registerDroppable,
     unregisterDraggable,
     unregisterDroppable,
-    onStateChange,
+    onPhaseChange,
   };
 
   return marshal;

@@ -114,7 +114,7 @@ export default class DragDropContext extends React.Component<Props> {
 
       // inform the dimension marshal about updates
       // this can trigger more actions synchronously so we are placing it last
-      this.dimensionMarshal.onStateChange(current.phase, current.dimension.request);
+      this.dimensionMarshal.onPhaseChange(current);
     });
   }
 
