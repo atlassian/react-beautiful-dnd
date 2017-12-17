@@ -183,9 +183,16 @@ export default (callbacks: Callbacks) => {
     console.warn('currently not supporting unmounting a Droppable during a drag');
   };
 
-  const getToBeCollected = (descriptor: DraggableDescriptor): UnknownDescriptorType[] => {
+  const getToBeCollected = (): UnknownDescriptorType[] => {
     const draggables: DraggableEntryMap = state.draggables;
     const droppables: DroppableEntryMap = state.droppables;
+    const descriptor: ?DraggableDescriptor = state.request;
+
+    if (!descriptor) {
+      console.error('cannot find request in state');
+      return [];
+    }
+
     const home: DroppableDescriptor = droppables[descriptor.droppableId].descriptor;
 
     const draggablesToBeCollected: DraggableDescriptor[] =
@@ -212,7 +219,7 @@ export default (callbacks: Callbacks) => {
         .map((id: DroppableId): DroppableDescriptor => droppables[id].descriptor)
         // remove the home droppable from the list
         .filter((item: DroppableDescriptor): boolean => item.id !== home.id)
-      // remove droppables with a different type
+        // remove droppables with a different type
         .filter((item: DroppableDescriptor): boolean => {
           const droppable: DroppableDescriptor = droppables[item.id].descriptor;
           return droppable.type === home.type;
@@ -276,14 +283,7 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    if (!state.request) {
-      cancel('Cannot collect secondary dimensions with no request');
-      return;
-    }
-
-    console.time('processing to be collected');
-    const toBeCollected: UnknownDescriptorType[] = getToBeCollected(state.request);
-    console.timeEnd('processing to be collected');
+    const toBeCollected: UnknownDescriptorType[] = getToBeCollected();
 
     // Phase 1: collect dimensions in a single frame
     const collectFrameId: number = requestAnimationFrame(() => {
@@ -364,6 +364,11 @@ export default (callbacks: Callbacks) => {
     }
 
     if (phase === 'DRAGGING') {
+      if (current.dimension.request !== state.request) {
+        cancel('Request in local state does not match that of the store');
+        return;
+      }
+
       processSecondaryDimensions();
       return;
     }

@@ -159,8 +159,10 @@ export type DragImpact = {|
   destination: ?DraggableLocation,
 |}
 
-export type InitialDragLocation = {|
+export type InitialDragPositions = {|
+  // where the user initially selected
   selection: Position,
+  // the current center of the item
   center: Position,
 |}
 
@@ -169,28 +171,25 @@ export type InitialDrag = {|
   // whether scrolling is allowed - otherwise a scroll will cancel the drag
   isScrollAllowed: boolean,
   // relative to the viewport when the drag started
-  client: InitialDragLocation,
+  client: InitialDragPositions,
   // viewport + window scroll (position relative to 0, 0)
-  page: InitialDragLocation,
+  page: InitialDragPositions,
   // Storing scroll directly to support movement during a window scroll.
   // Value required for comparison with current scroll
   windowScroll: Position,
 |}
 
-export type CurrentDragLocation = {|
-  // where the user initially selected
-  selection: Position,
-  // the current center of the item
-  center: Position,
+export type CurrentDragPositions = {|
+  ...InitialDragPositions,
   // how far the item has moved from its original position
   offset: Position,
 |}
 
 export type CurrentDrag = {|
   // viewport
-  client: CurrentDragLocation,
+  client: CurrentDragPositions,
   // viewport + scroll
-  page: CurrentDragLocation,
+  page: CurrentDragPositions,
   // Storing scroll directly to support movement during a window scroll.
   // Value required for comparison with current scroll
   windowScroll: Position,
