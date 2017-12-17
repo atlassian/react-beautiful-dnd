@@ -3,11 +3,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'invariant';
-import { css } from '../animation';
 import type {
   Position,
   DraggableDimension,
-  InitialDragLocation,
+  InitialDragPositions,
   DraggableDescriptor,
   DroppableId,
 } from '../../types';
@@ -121,7 +120,7 @@ export default class Draggable extends Component<Props, State> {
       index,
     };
 
-    const initial: InitialDragLocation = {
+    const initial: InitialDragPositions = {
       selection: client,
       center: getCenterPosition(ref),
     };

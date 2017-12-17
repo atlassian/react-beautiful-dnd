@@ -17,12 +17,11 @@ import type {
   DragImpact,
   InitialDrag,
   PendingDrop,
-  DragMovement,
   Phase,
   DraggableLocation,
-  CurrentDragLocation,
+  CurrentDragPositions,
   Position,
-  InitialDragLocation,
+  InitialDragPositions,
 } from '../types';
 import { add, subtract } from './position';
 import noImpact from './no-impact';
@@ -81,10 +80,10 @@ const move = ({
   const initial: InitialDrag = state.drag.initial;
   const currentWindowScroll: Position = windowScroll || previous.windowScroll;
 
-  const client: CurrentDragLocation = (() => {
+  const client: CurrentDragPositions = (() => {
     const offset: Position = subtract(clientSelection, initial.client.selection);
 
-    const result: CurrentDragLocation = {
+    const result: CurrentDragPositions = {
       offset,
       selection: clientSelection,
       center: add(offset, initial.client.center),
@@ -92,7 +91,7 @@ const move = ({
     return result;
   })();
 
-  const page: CurrentDragLocation = {
+  const page: CurrentDragPositions = {
     selection: add(client.selection, currentWindowScroll),
     offset: add(client.offset, currentWindowScroll),
     center: add(client.center, currentWindowScroll),
@@ -249,7 +248,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     }
 
     const { descriptor, client, windowScroll, isScrollAllowed } = action.payload;
-    const page: InitialDragLocation = {
+    const page: InitialDragPositions = {
       selection: add(client.selection, windowScroll),
       center: add(client.center, windowScroll),
     };

@@ -19,7 +19,7 @@ import type {
   DraggableId,
   TypeId,
   Store,
-  InitialDragLocation,
+  InitialDragPositions,
   PendingDrop,
   DimensionState,
 } from '../../../src/types';
@@ -27,7 +27,7 @@ import type {
 const { home, inHome1 } = getPreset();
 
 const origin: Position = { x: 0, y: 0 };
-const noWhere: InitialDragLocation = {
+const noWhere: InitialDragPositions = {
   selection: origin,
   center: origin,
 };
@@ -39,7 +39,7 @@ const noDimensions: DimensionState = {
 type LiftFnArgs = {
   id: DraggableId,
   type: TypeId,
-  client: InitialDragLocation,
+  client: InitialDragPositions,
   windowScroll: Position,
   isScrollAllowed: boolean,
 }

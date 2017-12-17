@@ -7,7 +7,7 @@ import type {
   DragImpact,
   DraggableDimension,
   DroppableDimension,
-  InitialDragLocation,
+  InitialDragPositions,
   DraggableLocation,
   Position,
   Dispatch,
@@ -61,14 +61,14 @@ export type CompleteLiftAction = {|
   type: 'COMPLETE_LIFT',
   payload: {|
     descriptor: DraggableDescriptor,
-    client: InitialDragLocation,
+    client: InitialDragPositions,
     windowScroll: Position,
     isScrollAllowed: boolean,
   |}
 |}
 
 export const completeLift = (descriptor: DraggableDescriptor,
-  client: InitialDragLocation,
+  client: InitialDragPositions,
   windowScroll: Position,
   isScrollAllowed: boolean,
 ): CompleteLiftAction => ({
@@ -429,14 +429,14 @@ export type LiftAction = {|
   payload: {|
     id: DraggableId,
     type: TypeId,
-    client: InitialDragLocation,
+    client: InitialDragPositions,
     windowScroll: Position,
     isScrollAllowed: boolean,
   |}
 |}
 
 export const lift = (descriptor: DraggableDescriptor,
-  client: InitialDragLocation,
+  client: InitialDragPositions,
   windowScroll: Position,
   isScrollAllowed: boolean,
 ) => (dispatch: Dispatch, getState: Function) => {
