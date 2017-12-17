@@ -27,7 +27,7 @@ type State = {|
 export default () => {
   const context: string = `${count++}`;
   const draggableClassName: string = `${key}-draggable-${context}`;
-  const tagName: string = `data-${key}-${context}`;
+  const styleTagDataAttribute: string = `data-${key}-${context}`;
 
   const baseStyles: string = `
   .${draggableClassName} {
@@ -69,7 +69,7 @@ export default () => {
         el = document.createElement('style');
         el.type = 'text/css';
         // for easy identification
-        el.setAttribute(tagName, '');
+        el.setAttribute(styleTagDataAttribute, '');
         const head: ?HTMLElement = document.querySelector('head');
 
         if (!head) {
@@ -144,7 +144,7 @@ export default () => {
   const marshal: StyleMarshal = {
     onStateChange,
     draggableClassName,
-    tagName,
+    styleTagDataAttribute,
   };
 
   return marshal;

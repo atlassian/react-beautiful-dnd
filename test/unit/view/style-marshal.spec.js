@@ -1,13 +1,34 @@
 // @flow
+import createStyleMarshal from '../../../src/view/style-marshal/style-marshal';
+import type { StyleMarshal } from '../../../src/view/style-marshal/style-marshal-types';
+
+const getStyle = (styleTagDataAttribute: string): string => {
+  const el: HTMLStyleElement = (document.querySelector(`style[${styleTagDataAttribute}]`): any);
+  return el.innerHTML;
+};
+
+const getBaseStyle = (draggableClassName: string) => `
+  .${draggableClassName} {
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    touch-action: manipulation;
+  }
+`.trim();
 
 describe('style marshal', () => {
   describe('not dragging', () => {
     it('should apply the base styles', () => {
-      const marshal: StyleMarshal =
+      const marshal: StyleMarshal = createStyleMarshal();
+      const style = getStyle(marshal.styleTagDataAttribute);
+
+      expect(style.includes(getBaseStyle(marshal.draggableClassName))).toBe(true);
     });
 
     it('should not prevent pointer events or add a transition to the draggable', () => {
+      const marshal: StyleMarshal = createStyleMarshal();
+      const style = getStyle(marshal.styleTagDataAttribute);
 
+      expect(style.includes('pointer-events')).toBe(false);
     });
   });
 
