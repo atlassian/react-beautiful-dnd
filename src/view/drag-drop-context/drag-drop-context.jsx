@@ -5,6 +5,7 @@ import createStore from '../../state/create-store';
 import fireHooks from '../../state/fire-hooks';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
 import createStyleMarshal from '../style-marshal/style-marshal';
+import canStartDrag from '../../state/can-start-drag';
 import type { StyleMarshal } from '../style-marshal/style-marshal-types';
 import type {
   DimensionMarshal,
@@ -19,7 +20,12 @@ import type {
   DroppableId,
   Position,
 } from '../../types';
-import { storeKey, dimensionMarshalKey, styleContextKey } from '../context-keys';
+import {
+  storeKey,
+  dimensionMarshalKey,
+  styleContextKey,
+  canLiftContextKey,
+} from '../context-keys';
 import {
   clean,
   publishDraggableDimensions,
@@ -53,6 +59,7 @@ export default class DragDropContext extends React.Component<Props> {
     }).isRequired,
     [dimensionMarshalKey]: PropTypes.object.isRequired,
     [styleContextKey]: PropTypes.string.isRequired,
+    [canLiftContextKey]: PropTypes.func.isRequired,
   }
   /* eslint-enable */
 
@@ -61,6 +68,7 @@ export default class DragDropContext extends React.Component<Props> {
       [storeKey]: this.store,
       [dimensionMarshalKey]: this.dimensionMarshal,
       [styleContextKey]: this.styleMarshal.styleContext,
+      [canLiftContextKey]: this.canLift,
     };
   }
 
@@ -116,6 +124,15 @@ export default class DragDropContext extends React.Component<Props> {
       this.dimensionMarshal.onPhaseChange(current);
     });
   }
+
+  // Providing function on the context for drag handles to use to
+  // let them know if they can start a drag or not. This is done
+  // rather than mapping a prop onto the drag handle so that we
+  // do not need to re-render a connected drag handle in order to
+  // pull this state off. It would cause a re-render of all items
+  // on drag start which is too expensive.
+  // This is useful when the user
+  canLift = () => canStartDrag(this.store.getState());
 
   componentWillUnmount() {
     this.unsubscribe();

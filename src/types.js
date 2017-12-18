@@ -247,7 +247,6 @@ export type Phase =
   // dimensions of all of the Draggable and Droppable components.
   // At this point a drag has not started yet and the onDragStart
   // hook has not fired.
-  // TODO: COLLECTING_INITIAL_DIMENSIONS
   'COLLECTING_INITIAL_DIMENSIONS' |
 
   // A drag is active. The onDragStart hook has been fired

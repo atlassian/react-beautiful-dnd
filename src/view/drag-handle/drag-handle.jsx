@@ -13,7 +13,7 @@ import type {
   TouchSensor,
   CreateSensorArgs,
 } from './sensor/sensor-types';
-import { styleContextKey } from '../context-keys';
+import { styleContextKey, canLiftContextKey } from '../context-keys';
 import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-target';
 import createMouseSensor from './sensor/create-mouse-sensor';
 import createKeyboardSensor from './sensor/create-keyboard-sensor';
@@ -28,11 +28,13 @@ export default class DragHandle extends Component<Props> {
   touchSensor: TouchSensor;
   sensors: Sensor[];
   styleContext: string;
+  canLift: () => boolean;
 
   // Need to declare contextTypes without flow
   // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
   static contextTypes = {
     [styleContextKey]: PropTypes.string.isRequired,
+    [canLiftContextKey]: PropTypes.func.isRequired,
   }
 
   constructor(props: Props, context: Object) {
@@ -53,6 +55,14 @@ export default class DragHandle extends Component<Props> {
       this.touchSensor,
     ];
     this.styleContext = context[styleContextKey];
+
+    // The canLift function is read directly off the context
+    // and will communicate with the store. This is done to avoid
+    // needing to query a property from the store and re-render this component
+    // with that value. By putting it as a function on the context we are able
+    // to avoid re-rendering to pass this information while still allowing
+    // drag-handles to obtain this state if they need it.
+    this.canLift = context[canLiftContextKey];
   }
 
   componentWillUnmount() {
@@ -149,10 +159,17 @@ export default class DragHandle extends Component<Props> {
   }
 
   canStartCapturing = (event: Event) => {
+    // this might be before a drag has started - isolated to this element
     if (this.isAnySensorCapturing()) {
       return false;
     }
 
+    // this will check if anything else in the system is dragging
+    if (!this.canLift()) {
+      return false;
+    }
+
+    // check if we are dragging an interactive element
     return shouldAllowDraggingFromTarget(event, this.props);
   }
 

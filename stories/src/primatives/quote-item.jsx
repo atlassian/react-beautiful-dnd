@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { borderRadius, colors, grid } from '../constants';
@@ -95,7 +95,14 @@ text-align: right;
 flex-grow: 1;
 `;
 
-export default class QuoteItem extends Component<Props> {
+// Previously this extended React.Component
+// That was a good thing, because using React.PureComponent can hide
+// issues with the selectors. However, moving it over does can considerable
+// performance improvements when reordering big lists (400ms => 200ms)
+// Need to be super sure we are not relying on PureComponent here for
+// things we should be doing in the selector as we do not know if consumers
+// will be using PureComponent
+export default class QuoteItem extends React.PureComponent<Props> {
   componentDidMount() {
     if (!this.props.autoFocus) {
       return;

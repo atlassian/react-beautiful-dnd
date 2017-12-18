@@ -24,6 +24,7 @@ import forceUpdate from '../../utils/force-update';
 import getClientRect from '../../../src/state/get-client-rect';
 import { timeForLongPress, forcePressThreshold } from '../../../src/view/drag-handle/sensor/create-touch-sensor';
 import { interactiveTagNames } from '../../../src/view/drag-handle/util/should-allow-dragging-from-target';
+import { styleContextKey, canLiftContextKey } from '../../../src/view/context-keys';
 
 const primaryButton: number = 0;
 const auxiliaryButton: number = 1;
@@ -147,6 +148,11 @@ describe('drag handle', () => {
     y: 80,
   };
 
+  const basicContext = {
+    [styleContextKey]: 'hello',
+    [canLiftContextKey]: () => true,
+  };
+
   beforeAll(() => {
     requestAnimationFrame.reset();
     jest.spyOn(fakeDraggableRef, 'getBoundingClientRect').mockImplementation(() => getClientRect({
@@ -173,6 +179,7 @@ describe('drag handle', () => {
           <Child dragHandleProps={dragHandleProps} />
         )}
       </DragHandle>,
+      { context: basicContext }
     );
   });
 
@@ -211,6 +218,7 @@ describe('drag handle', () => {
                 <Child dragHandleProps={dragHandleProps} />
               )}
             </DragHandle>,
+            { context: basicContext }
           );
 
           mouseDown(customWrapper, origin);
@@ -1144,6 +1152,7 @@ describe('drag handle', () => {
               <Child dragHandleProps={dragHandleProps} />
             )}
           </DragHandle>,
+          { context: basicContext }
         );
 
         pressSpacebar(customWrapper);
@@ -1168,6 +1177,7 @@ describe('drag handle', () => {
               <Child dragHandleProps={dragHandleProps} />
             )}
           </DragHandle>,
+          { context: basicContext }
         );
 
         // lift - all good
@@ -1251,6 +1261,7 @@ describe('drag handle', () => {
                 <Child dragHandleProps={dragHandleProps} />
               )}
             </DragHandle>,
+            { context: basicContext }
           );
         });
 
@@ -2132,6 +2143,7 @@ describe('drag handle', () => {
             mock(dragHandleProps)
           )}
         </DragHandle>,
+        { context: basicContext }
       );
 
       expect(mock).toHaveBeenCalledWith(null);
@@ -2369,6 +2381,7 @@ describe('drag handle', () => {
                     />
                   )}
                 </DragHandle>,
+                { context: basicContext }
               );
               const target = customWrapper.getDOMNode();
               const options = {
@@ -2404,6 +2417,7 @@ describe('drag handle', () => {
                     </div>
                   )}
                 </DragHandle>,
+                { context: basicContext }
               );
               const target = customWrapper.getDOMNode().querySelector('.editable');
               if (!target) {
@@ -2443,6 +2457,7 @@ describe('drag handle', () => {
                     </div>
                   )}
                 </DragHandle>,
+                { context: basicContext }
               );
               const target = customWrapper.getDOMNode().querySelector('.target');
               if (!target) {
@@ -2484,6 +2499,7 @@ describe('drag handle', () => {
                     </div>
                   )}
                 </DragHandle>,
+                { context: basicContext }
               );
               const target = customWrapper.getDOMNode().querySelector('.target');
               if (!target) {
@@ -2526,6 +2542,7 @@ describe('drag handle', () => {
                     </div>
                   )}
                 </DragHandle>,
+                { context: basicContext }
               );
               const target = customWrapper.getDOMNode().querySelector('.editable');
               if (!target) {
@@ -2569,6 +2586,7 @@ describe('drag handle', () => {
                     </div>
                   )}
                 </DragHandle>,
+                { context: basicContext }
               );
               const target = customWrapper.getDOMNode().querySelector('.target');
               if (!target) {
