@@ -18,7 +18,13 @@ export default (state: State): boolean => {
     return false;
   }
 
-  // can lift depending on the type of drop animation
+  // Can lift depending on the type of drop animation
+  // - For a user drop we allow the user to drag other Draggables
+  //   immediately as items are most likely already in their home
+  // - For a cancel items will be moving back to their original position
+  //   as such it is a cleaner experience to block them from dragging until
+  //   the drop animation is complete. Otherwise they will be grabbing
+  //   items not in their original position which can lead to bad visuals
   if (phase === 'DROP_ANIMATING') {
     if (!state.drop || !state.drop.pending) {
       console.error('Invalid state shape for drop animating');

@@ -220,9 +220,17 @@ describe('style marshal', () => {
       const marshal: StyleMarshal = createStyleMarshal();
 
       Array.from({ length: 4 }).forEach(() => {
-        // requesting
-        marshal.onPhaseChange(state.requesting());
+        // idle
+        marshal.onPhaseChange(state.idle);
         expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
+
+        // preparing
+        marshal.onPhaseChange(state.preparing);
+        expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
+
+        // initial dimension request
+        marshal.onPhaseChange(state.requesting());
+        expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
 
         // dragging
         marshal.onPhaseChange(state.dragging());
@@ -243,7 +251,7 @@ describe('style marshal', () => {
 
       Array.from({ length: 4 }).forEach(() => {
         // requesting
-        marshal.onPhaseChange(state.requesting());
+        marshal.onPhaseChange(state.idle);
         expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
 
         // dragging
@@ -264,8 +272,8 @@ describe('style marshal', () => {
       const marshal: StyleMarshal = createStyleMarshal();
 
       Array.from({ length: 4 }).forEach(() => {
-        // requesting
-        marshal.onPhaseChange(state.requesting());
+        // idle
+        marshal.onPhaseChange(state.idle);
         expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
 
         // dragging
