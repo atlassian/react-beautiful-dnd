@@ -166,7 +166,6 @@ describe('drag handle', () => {
         direction="vertical"
         isDragging={false}
         isEnabled
-        canLift
         getDraggableRef={() => fakeDraggableRef}
         canDragInteractiveElements={false}
       >
@@ -204,7 +203,6 @@ describe('drag handle', () => {
               callbacks={customCallbacks}
               isDragging={false}
               isEnabled
-              canLift
               direction={null}
               getDraggableRef={() => fakeDraggableRef}
               canDragInteractiveElements={false}
@@ -257,10 +255,9 @@ describe('drag handle', () => {
         })).toBe(true);
       });
 
-      it('should not start a drag if cannot lift', () => {
-        wrapper.setProps({
-          canLift: false,
-        });
+      it('should not start a drag if another sensor is capturing', () => {
+        // will now be capturing
+        touchStart(wrapper);
 
         // lift
         mouseDown(wrapper);
@@ -1073,11 +1070,11 @@ describe('drag handle', () => {
         expect(wasEventStopped(mockEvent)).toBe(true);
       });
 
-      it('should not lift if told it cannot lift', () => {
-        wrapper.setProps({
-          canLift: false,
-        });
+      it('should not lift if another sensor is capturing', () => {
+        // stealing the capture
+        touchStart(wrapper);
 
+        // would normally start a drag
         pressSpacebar(wrapper);
 
         expect(callbacksCalled(callbacks)({
@@ -1139,7 +1136,6 @@ describe('drag handle', () => {
             callbacks={customCallbacks}
             isDragging={false}
             isEnabled
-            canLift
             direction="vertical"
             getDraggableRef={() => fakeDraggableRef}
             canDragInteractiveElements={false}
@@ -1164,7 +1160,6 @@ describe('drag handle', () => {
             callbacks={customCallbacks}
             isDragging={false}
             isEnabled
-            canLift
             direction={null}
             getDraggableRef={() => fakeDraggableRef}
             canDragInteractiveElements={false}
@@ -1249,7 +1244,6 @@ describe('drag handle', () => {
               direction="horizontal"
               isDragging={false}
               isEnabled
-              canLift
               getDraggableRef={() => fakeDraggableRef}
               canDragInteractiveElements={false}
             >
@@ -2130,7 +2124,6 @@ describe('drag handle', () => {
           callbacks={callbacks}
           isEnabled={false}
           isDragging={false}
-          canLift
           direction={null}
           getDraggableRef={() => fakeDraggableRef}
           canDragInteractiveElements={false}
@@ -2365,7 +2358,6 @@ describe('drag handle', () => {
                   callbacks={customCallbacks}
                   isDragging={false}
                   isEnabled
-                  canLift
                   direction={null}
                   getDraggableRef={() => fakeDraggableRef}
                   canDragInteractiveElements={false}
@@ -2399,7 +2391,6 @@ describe('drag handle', () => {
                   callbacks={customCallbacks}
                   isDragging={false}
                   isEnabled
-                  canLift
                   direction={null}
                   getDraggableRef={() => fakeDraggableRef}
                   canDragInteractiveElements={false}
@@ -2436,7 +2427,6 @@ describe('drag handle', () => {
                   callbacks={customCallbacks}
                   isDragging={false}
                   isEnabled
-                  canLift
                   direction={null}
                   getDraggableRef={() => fakeDraggableRef}
                   canDragInteractiveElements={false}
@@ -2478,7 +2468,6 @@ describe('drag handle', () => {
                   callbacks={customCallbacks}
                   isDragging={false}
                   isEnabled
-                  canLift
                   direction={null}
                   getDraggableRef={() => fakeDraggableRef}
                   canDragInteractiveElements={false}
@@ -2523,7 +2512,6 @@ describe('drag handle', () => {
                   callbacks={customCallbacks}
                   isDragging={false}
                   isEnabled
-                  canLift
                   direction={null}
                   getDraggableRef={() => fakeDraggableRef}
                   // stating that we can drag
@@ -2564,7 +2552,6 @@ describe('drag handle', () => {
                   callbacks={customCallbacks}
                   isDragging={false}
                   isEnabled
-                  canLift
                   direction={null}
                   getDraggableRef={() => fakeDraggableRef}
                   // stating that we can drag
