@@ -4,4 +4,4 @@ const prefix = (key: string): string => `private-react-beautiful-dnd-key-do-not-
 export const storeKey: string = prefix('store');
 export const droppableIdKey: string = prefix('droppable-id');
 export const dimensionMarshalKey: string = prefix('dimension-marshal');
-export const draggableClassNameKey: string = prefix('draggable-class-name');
+export const styleContextKey: string = prefix('style-context');

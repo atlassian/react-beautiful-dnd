@@ -1,5 +1,6 @@
 // @flow
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import type {
   Props,
@@ -12,6 +13,7 @@ import type {
   TouchSensor,
   CreateSensorArgs,
 } from './sensor/sensor-types';
+import { styleContextKey } from '../context-keys';
 import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-target';
 import createMouseSensor from './sensor/create-mouse-sensor';
 import createKeyboardSensor from './sensor/create-keyboard-sensor';
@@ -25,6 +27,13 @@ export default class DragHandle extends Component<Props> {
   keyboardSensor: KeyboardSensor;
   touchSensor: TouchSensor;
   sensors: Sensor[];
+  styleContext: string;
+
+  // Need to declare contextTypes without flow
+  // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
+  static contextTypes = {
+    [styleContextKey]: PropTypes.string.isRequired,
+  }
 
   constructor(props: Props, context: mixed) {
     super(props, context);
@@ -43,6 +52,7 @@ export default class DragHandle extends Component<Props> {
       this.keyboardSensor,
       this.touchSensor,
     ];
+    this.styleContext = context[styleContextKey];
   }
 
   componentWillUnmount() {
@@ -165,6 +175,7 @@ export default class DragHandle extends Component<Props> {
       onClick: this.onClick,
       tabIndex: 0,
       'aria-grabbed': isDragging,
+      'data-react-beautiful-dnd-drag-handle': this.styleContext,
       draggable: false,
       onDragStart: getFalse,
       onDrop: getFalse,

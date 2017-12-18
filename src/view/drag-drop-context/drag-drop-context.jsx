@@ -19,7 +19,7 @@ import type {
   DroppableId,
   Position,
 } from '../../types';
-import { storeKey, dimensionMarshalKey, draggableClassNameKey } from '../context-keys';
+import { storeKey, dimensionMarshalKey, styleContextKey } from '../context-keys';
 import {
   clean,
   publishDraggableDimensions,
@@ -40,8 +40,8 @@ export default class DragDropContext extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
   store: Store
   dimensionMarshal: DimensionMarshal
+  styleMarshal: StyleMarshal
   unsubscribe: Function
-  draggableClassName: string
 
   // Need to declare childContextTypes without flow
   // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
@@ -52,7 +52,7 @@ export default class DragDropContext extends React.Component<Props> {
       getState: PropTypes.func.isRequired,
     }).isRequired,
     [dimensionMarshalKey]: PropTypes.object.isRequired,
-    [draggableClassNameKey]: PropTypes.string.isRequired,
+    [styleContextKey]: PropTypes.string.isRequired,
   }
   /* eslint-enable */
 
@@ -60,7 +60,7 @@ export default class DragDropContext extends React.Component<Props> {
     return {
       [storeKey]: this.store,
       [dimensionMarshalKey]: this.dimensionMarshal,
-      [draggableClassNameKey]: this.draggableClassName,
+      [styleContextKey]: this.styleMarshal.styleContext,
     };
   }
 
@@ -68,8 +68,7 @@ export default class DragDropContext extends React.Component<Props> {
     this.store = createStore();
 
     // create the style marshal
-    const styleMarshal: StyleMarshal = createStyleMarshal();
-    this.draggableClassName = styleMarshal.draggableClassName;
+    this.styleMarshal = createStyleMarshal();
 
     // create the dimension marshal
     const callbacks: DimensionMarshalCallbacks = {
@@ -110,7 +109,7 @@ export default class DragDropContext extends React.Component<Props> {
       fireHooks(hooks, current, previousValue);
 
       // Update the global styles
-      styleMarshal.onStateChange(current, previousValue);
+      this.styleMarshal.onPhaseChange(previousValue, current);
 
       // inform the dimension marshal about updates
       // this can trigger more actions synchronously so we are placing it last
@@ -120,6 +119,7 @@ export default class DragDropContext extends React.Component<Props> {
 
   componentWillUnmount() {
     this.unsubscribe();
+    this.styleMarshal.unmount();
   }
 
   render() {

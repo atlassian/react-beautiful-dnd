@@ -23,6 +23,9 @@ export type Provided = {|
   // Conditionally block clicks
   onClick: (event: MouseEvent) => void,
 
+  // Control styling from style marshal
+  'data-react-beautiful-dnd-drag-handle': string,
+
   // Allow tabbing to this element
   tabIndex: number,
 

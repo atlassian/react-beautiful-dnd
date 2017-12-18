@@ -80,11 +80,15 @@ export type ZIndexOptions = {|
   dropAnimating: number,
 |}
 
+type DraggableProps = {|
+  style: ?DraggableStyle,
+  'data-react-beautiful-dnd-draggable': string,
+|}
+
 export type Provided = {|
-  innerRef: (?HTMLElement) => void,
-  draggableStyle: ?DraggableStyle,
+  innerRef: (? HTMLElement) => void,
+  draggableProps: DraggableProps,
   dragHandleProps: ?DragHandleProvided,
-  className: string,
   placeholder: ?Node,
 |}
 

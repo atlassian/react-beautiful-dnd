@@ -1,81 +1,260 @@
 // @flow
 import createStyleMarshal from '../../../src/view/style-marshal/style-marshal';
 import type { StyleMarshal } from '../../../src/view/style-marshal/style-marshal-types';
+import * as state from '../../utils/simple-state-preset';
+import { css } from '../../../src/view/animation';
 
-const getStyle = (styleTagDataAttribute: string): string => {
-  const el: HTMLStyleElement = (document.querySelector(`style[${styleTagDataAttribute}]`): any);
-  return el.innerHTML;
+const getSelectors = (context: string) => {
+  const prefix: string = 'data-react-beautiful-dnd';
+  const dragHandle: string = `[${prefix}-drag-handle="${context}"]`;
+  const draggable: string = `[${prefix}-draggable="${context}"]`;
+  const styleTag: string = `style[data-react-beautiful-dnd="${context}"]`;
+
+  return {
+    styleTag,
+    dragHandle,
+    draggable,
+  };
 };
 
-const getBaseStyle = (draggableClassName: string) => `
-  .${draggableClassName} {
+// Obtain consistent white spacing
+// 1. replace any whitespace greater than two characters with a single whitespace
+// 2. trim any wrapping whitespace
+const clean = (value: string): string =>
+  value.replace(/\s{2,}/g, ' ').trim();
+
+const getStyle = (context: string): string => {
+  const selector: string = getSelectors(context).styleTag;
+  const el: HTMLStyleElement = (document.querySelector(selector): any);
+  return clean(el.innerHTML);
+};
+
+const getBaseStyles = (context: string) => clean(`
+  ${getSelectors(context).dragHandle} {
     -webkit-touch-callout: none;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     touch-action: manipulation;
+    cursor: -webkit-grab;
+    cursor: grab;
   }
-`.trim();
+`);
+
+const getDraggingStyles = (context: string) => clean(`
+  body {
+    cursor: grabbing;
+    cursor: -webkit-grabbing;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  ${getBaseStyles(context)}
+
+  ${getSelectors(context).dragHandle} {
+    pointer-events: none;
+  }
+
+  ${getSelectors(context).draggable} {
+    transition: ${css.outOfTheWay};
+  }
+`);
 
 describe('style marshal', () => {
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => { });
+  });
+
+  afterEach(() => {
+    console.error.mockRestore();
+  });
+
   describe('not dragging', () => {
-    it('should apply the base styles', () => {
+    it('should apply the base drag handle styles', () => {
       const marshal: StyleMarshal = createStyleMarshal();
-      const style = getStyle(marshal.styleTagDataAttribute);
+      const style: string = getStyle(marshal.styleContext);
 
-      expect(style.includes(getBaseStyle(marshal.draggableClassName))).toBe(true);
-    });
-
-    it('should not prevent pointer events or add a transition to the draggable', () => {
-      const marshal: StyleMarshal = createStyleMarshal();
-      const style = getStyle(marshal.styleTagDataAttribute);
-
-      expect(style.includes('pointer-events')).toBe(false);
+      expect(style).toEqual(getBaseStyles(marshal.styleContext));
     });
   });
 
-  describe('dragging', () => {
-    it('should apply the base styles', () => {
+  describe('drag starting', () => {
+    it('should apply the dragging styles', () => {
+      const marshal: StyleMarshal = createStyleMarshal();
 
+      marshal.onPhaseChange(state.requesting(), state.dragging());
+      const style: string = getStyle(marshal.styleContext);
+
+      expect(style).toEqual(getDraggingStyles(marshal.styleContext));
+    });
+  });
+
+  describe('cancelled by error', () => {
+    it('should revert to the base styles', () => {
+      const marshal: StyleMarshal = createStyleMarshal();
+
+      // initial drag
+      marshal.onPhaseChange(state.requesting(), state.dragging());
+      expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
+
+      // cancelled by error
+      marshal.onPhaseChange(state.dragging(), state.idle);
+      expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
+    });
+  });
+
+  describe('user directed cancel', () => {
+    it('should maintain the dragging styles', () => {
+      const marshal: StyleMarshal = createStyleMarshal();
+
+      // initial drag
+      marshal.onPhaseChange(state.requesting(), state.dragging());
+      expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
+
+      // cancelled
+      marshal.onPhaseChange(state.dragging(), state.userCancel());
+      expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
     });
 
-    it('should block pointer events on the draggables', () => {
+    it('should clear the style once the drop is complete', () => {
+      const marshal: StyleMarshal = createStyleMarshal();
 
+      // initial drag
+      marshal.onPhaseChange(state.requesting(), state.dragging());
+      expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
+
+      // cancelled
+      marshal.onPhaseChange(state.dragging(), state.userCancel());
+      expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
+
+      // drop complete
+      marshal.onPhaseChange(state.userCancel(), state.dropComplete());
+      expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
     });
 
-    it('should transition transforms on the draggables', () => {
+    it('should clear the style if there is an error while cancelling', () => {
+      const marshal: StyleMarshal = createStyleMarshal();
 
-    });
+      // initial drag
+      marshal.onPhaseChange(state.requesting(), state.dragging());
+      expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
 
-    it('should prevent selecting text', () => {
+      // user cancel
+      marshal.onPhaseChange(state.dragging(), state.userCancel());
+      expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
 
-    });
-
-    it('should apply a grabbing cursor to the body', () => {
-
+      // some error causes the drop to be abandoned
+      marshal.onPhaseChange(state.userCancel(), state.idle);
+      expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
     });
   });
 
   describe('dropping', () => {
-    it('should remove the dragging styles if a drag is stopped', () => {
+    it('should revert to the base styles', () => {
+      const marshal: StyleMarshal = createStyleMarshal();
 
+      // initial drag
+      marshal.onPhaseChange(state.requesting(), state.dragging());
+      expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
+
+      // dropping
+      marshal.onPhaseChange(state.dragging(), state.dropAnimating());
+      expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
+    });
+  });
+
+  describe('unmounting', () => {
+    it('should remove the style tag from the head when unmounting', () => {
+      const marshal: StyleMarshal = createStyleMarshal();
+      const selector: string = getSelectors(marshal.styleContext).styleTag;
+
+      // the style tag exists
+      expect(document.querySelector(selector)).toBeTruthy();
+
+      // now unmounted
+      marshal.unmount();
+
+      expect(document.querySelector(selector)).not.toBeTruthy();
     });
 
-    // This will remove pointer-events: none and let the user start dropping other items
-    it('should remove the dragging styles if animating a drop', () => {
+    it('should log an error if attempting to apply styles after unmounted', () => {
+      const marshal: StyleMarshal = createStyleMarshal();
+      const selector: string = getSelectors(marshal.styleContext).styleTag;
+      // grabbing the element before unmount
+      const el: HTMLElement = (document.querySelector(selector): any);
+      // asserting it has the base styles
+      expect(clean(el.innerHTML)).toEqual(getBaseStyles(marshal.styleContext));
 
+      marshal.unmount();
+      marshal.onPhaseChange(state.requesting(), state.dragging());
+
+      // asserting it has the base styles (not updated)
+      expect(clean(el.innerHTML)).toEqual(getBaseStyles(marshal.styleContext));
+      // an error is logged
+      expect(console.error).toHaveBeenCalled();
+    });
+  });
+
+  describe('subseqent updates', () => {
+    it('should allow multiple updates', () => {
+      const marshal: StyleMarshal = createStyleMarshal();
+
+      Array.from({ length: 4 }).forEach(() => {
+        // requesting
+        marshal.onPhaseChange(state.idle, state.requesting());
+        expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
+
+        // dragging
+        marshal.onPhaseChange(state.requesting, state.dragging());
+        expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
+
+        // dropping
+        marshal.onPhaseChange(state.dragging(), state.dropAnimating());
+        expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
+
+        // complete
+        marshal.onPhaseChange(state.dropAnimating(), state.dropComplete());
+        expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
+      });
     });
 
-    describe('animating cancel', () => {
-      // we do not allow dragging of other items while animating a cancel
-      it('should maintain the dragging styles if animating a cancel', () => {
+    it('should allow multiple updates after a cancel', () => {
+      const marshal: StyleMarshal = createStyleMarshal();
 
+      Array.from({ length: 4 }).forEach(() => {
+        // requesting
+        marshal.onPhaseChange(state.idle, state.requesting());
+        expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
+
+        // dragging
+        marshal.onPhaseChange(state.requesting(), state.dragging());
+        expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
+
+        // cancelling
+        marshal.onPhaseChange(state.dragging(), state.userCancel());
+        expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
+
+        // complete
+        marshal.onPhaseChange(state.userCancel(), state.dropComplete());
+        expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
       });
+    });
 
-      it('should clear the dragging style when the animation is finished', () => {
+    it('should allow multiple updates after an error', () => {
+      const marshal: StyleMarshal = createStyleMarshal();
 
-      });
+      Array.from({ length: 4 }).forEach(() => {
+        // requesting
+        marshal.onPhaseChange(state.idle, state.requesting());
+        expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
 
-      it('should clear the dragging style when the cancel is flushed at the start of another drag', () => {
+        // dragging
+        marshal.onPhaseChange(state.requesting(), state.dragging());
+        expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
 
+        // error
+        marshal.onPhaseChange(state.dragging(), state.idle);
+        expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
       });
     });
   });

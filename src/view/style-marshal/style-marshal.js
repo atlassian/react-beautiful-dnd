@@ -6,7 +6,6 @@ import type {
 } from '../../types';
 
 let count: number = 0;
-const key: string = 'react-beautiful-dnd';
 
 const getIsAnimatingCancel = (state: AppState) => {
   if (state.phase !== 'DROP_ANIMATING') {
@@ -20,77 +19,86 @@ const getIsAnimatingCancel = (state: AppState) => {
   return state.drop.pending.trigger === 'CANCEL';
 };
 
-type State = {|
+type State = {
   isDraggingStyleActive: boolean,
-|}
+  isMounted: boolean,
+}
 
+const prefix: string = 'data-react-beautiful-dnd';
 export default () => {
   const context: string = `${count++}`;
-  const draggableClassName: string = `${key}-draggable-${context}`;
-  const styleTagDataAttribute: string = `data-${key}-${context}`;
+  const dragHandleSelector: string = `[${prefix}-drag-handle="${context}"]`;
+  const draggableSelector: string = `[${prefix}-draggable="${context}"]`;
+  const el: HTMLElement = (() => {
+    const result = document.createElement('style');
+    result.type = 'text/css';
+    // for easy identification
+    result.setAttribute(prefix, context);
+    const head: ?HTMLElement = document.querySelector('head');
+
+    if (!head) {
+      throw new Error('Cannot find the head to append a style to');
+    }
+
+    head.appendChild(result);
+    return result;
+  })();
 
   const baseStyles: string = `
-  .${draggableClassName} {
-    -webkit-touch-callout: none;
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    touch-action: manipulation;
-  }
-`;
+    ${dragHandleSelector} {
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
+      touch-action: manipulation;
+      cursor: -webkit-grab;
+      cursor: grab;
+    }
+  `;
 
   const whileDraggingStyles: string = `
     body {
       cursor: grabbing;
       cursor: -webkit-grabbing;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
       user-select: none;
     }
 
     ${baseStyles}
 
-    .${draggableClassName} {
+    ${dragHandleSelector} {
       pointer-events: none;
+    }
+
+    ${draggableSelector} {
       transition: ${css.outOfTheWay};
     }
   `;
 
   let state: State = {
     isDraggingStyleActive: false,
+    isMounted: true,
   };
 
-  const setState = (newState: State) => {
+  const setState = (partial: Object) => {
+    const newState: State = {
+      ...state,
+      ...partial,
+    };
     state = newState;
   };
 
-  const setStyle = (() => {
-    let el: ?HTMLStyleElement;
-
-    return (rules: string) => {
-      // create the style tag in the head if we have not already
-      if (!el) {
-        el = document.createElement('style');
-        el.type = 'text/css';
-        // for easy identification
-        el.setAttribute(styleTagDataAttribute, '');
-        const head: ?HTMLElement = document.querySelector('head');
-
-        if (!head) {
-          throw new Error('Cannot find the head to append a style to');
-        }
-
-        head.appendChild(el);
-      }
-
-      // This technique works with ie11+ so no need for a nasty fallback as seen here:
-      // https://stackoverflow.com/a/22050778/1374236
-      el.innerHTML = rules;
-    };
-  })();
+  const setStyle = (rules: string) => {
+    // This technique works with ie11+ so no need for a nasty fallback as seen here:
+    // https://stackoverflow.com/a/22050778/1374236
+    el.innerHTML = rules;
+  };
 
   const applyDragStyles = () => {
     if (state.isDraggingStyleActive) {
       console.warn('not applying dragging styles as they are already active');
       return;
     }
-    console.warn('applying drag styles');
     setState({
       isDraggingStyleActive: true,
     });
@@ -103,8 +111,6 @@ export default () => {
       // not returning - need to provide a way of clearing even in an error scenario
     }
 
-    console.warn('applying base styles');
-
     setState({
       isDraggingStyleActive: false,
     });
@@ -114,7 +120,12 @@ export default () => {
   // self initiating
   setStyle(baseStyles);
 
-  const onStateChange = (current: AppState, previous: AppState) => {
+  const onPhaseChange = (previous: AppState, current: AppState) => {
+    if (!state.isMounted) {
+      console.error('cannot update styles when not mounted');
+      return;
+    }
+
     const wasAnimatingCancel: boolean = getIsAnimatingCancel(previous);
     const isAnimatingCancel: boolean = getIsAnimatingCancel(current);
     const wasDragging: boolean = previous.phase === 'DRAGGING';
@@ -141,10 +152,28 @@ export default () => {
     }
   };
 
+  const unmount = (): void => {
+    if (!state.isMounted) {
+      console.error('Cannot unmount style marshal as it is already unmounted');
+      return;
+    }
+    setState({
+      isMounted: false,
+    });
+
+    // this should never happen - just appeasing flow
+    if (!el.parentNode) {
+      console.error('Cannot unmount style marshal as cannot find parent');
+      return;
+    }
+
+    el.parentNode.removeChild(el);
+  };
+
   const marshal: StyleMarshal = {
-    onStateChange,
-    draggableClassName,
-    styleTagDataAttribute,
+    onPhaseChange,
+    styleContext: context,
+    unmount,
   };
 
   return marshal;

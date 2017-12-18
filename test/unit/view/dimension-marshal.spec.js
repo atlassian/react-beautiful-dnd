@@ -3,7 +3,7 @@ import { getPreset } from '../../utils/dimension';
 import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
 import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
 import getClientRect from '../../../src/state/get-client-rect';
-import noImpact from '../../../src/state/no-impact';
+import * as state from '../../utils/simple-state-preset';
 import type {
   Callbacks,
   DimensionMarshal,
@@ -12,7 +12,6 @@ import type {
 } from '../../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
   State,
-  DraggableDescriptor,
   DraggableDimension,
   DroppableDimension,
   DraggableDimensionMap,
@@ -20,14 +19,6 @@ import type {
   DraggableId,
   DroppableId,
   ClientRect,
-  DimensionState,
-  DragState,
-  Position,
-  CurrentDragPositions,
-  InitialDragPositions,
-  DroppableDescriptor,
-  PendingDrop,
-  DropResult,
 } from '../../../src/types';
 
 const getCallbackStub = (): Callbacks => {
@@ -108,147 +99,6 @@ const populateMarshal = (
 
   return watches;
 };
-
-const state = (() => {
-  const getDimensionState = (request: DraggableDescriptor): DimensionState => {
-    const draggable: DraggableDimension = preset.draggables[request.id];
-    const home: DroppableDimension = preset.droppables[request.droppableId];
-
-    const result: DimensionState = {
-      request,
-      draggable: { [draggable.descriptor.id]: draggable },
-      droppable: { [home.descriptor.id]: home },
-    };
-    return result;
-  };
-
-  const idle: State = {
-    phase: 'IDLE',
-    drag: null,
-    drop: null,
-    dimension: {
-      request: null,
-      draggable: {},
-      droppable: {},
-    },
-  };
-
-  const requesting = (request: DraggableDescriptor): State => {
-    const result: State = {
-      phase: 'COLLECTING_INITIAL_DIMENSIONS',
-      drag: null,
-      drop: null,
-      dimension: {
-        request,
-        draggable: {},
-        droppable: {},
-      },
-    };
-    return result;
-  };
-
-  const origin: Position = { x: 0, y: 0 };
-
-  const dragging = (descriptor: DraggableDescriptor): State => {
-    // will populate the dimension state with the initial dimensions
-    const draggable: DraggableDimension = preset.draggables[descriptor.id];
-    const client: Position = draggable.client.withMargin.center;
-    const initialPosition: InitialDragPositions = {
-      selection: client,
-      center: client,
-    };
-    const clientPositions: CurrentDragPositions = {
-      selection: client,
-      center: client,
-      offset: origin,
-    };
-
-    const drag: DragState = {
-      initial: {
-        descriptor,
-        isScrollAllowed: true,
-        client: initialPosition,
-        page: initialPosition,
-        windowScroll: origin,
-      },
-      current: {
-        client: clientPositions,
-        page: clientPositions,
-        windowScroll: origin,
-        shouldAnimate: true,
-      },
-      impact: noImpact,
-    };
-
-    const result: State = {
-      phase: 'DRAGGING',
-      drag,
-      drop: null,
-      dimension: getDimensionState(descriptor),
-    };
-
-    return result;
-  };
-
-  const dropAnimating = (descriptor: DraggableDescriptor): State => {
-    const home: DroppableDescriptor = preset.droppables[descriptor.droppableId].descriptor;
-    const pending: PendingDrop = {
-      trigger: 'DROP',
-      newHomeOffset: origin,
-      impact: noImpact,
-      result: {
-        draggableId: descriptor.id,
-        type: home.type,
-        source: {
-          droppableId: home.id,
-          index: descriptor.index,
-        },
-        destination: null,
-      },
-    };
-
-    const result: State = {
-      phase: 'DROP_ANIMATING',
-      drag: null,
-      drop: {
-        pending,
-        result: null,
-      },
-      dimension: getDimensionState(descriptor),
-    };
-    return result;
-  };
-
-  const dropComplete = (descriptor: DraggableDescriptor): State => {
-    const home: DroppableDescriptor = preset.droppables[descriptor.droppableId].descriptor;
-    const result: DropResult = {
-      draggableId: descriptor.id,
-      type: home.type,
-      source: {
-        droppableId: home.id,
-        index: descriptor.index,
-      },
-      destination: null,
-    };
-
-    const value: State = {
-      phase: 'DROP_COMPLETE',
-      drag: null,
-      drop: {
-        pending: null,
-        result,
-      },
-      dimension: {
-        request: null,
-        draggable: {},
-        droppable: {},
-      },
-    };
-    return value;
-  };
-
-  return { idle, requesting, dragging, dropAnimating, dropComplete };
-})();
 
 const fakeClientRect: ClientRect = getClientRect({
   top: 0, right: 100, bottom: 100, left: 0,
