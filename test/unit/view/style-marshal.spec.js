@@ -195,7 +195,7 @@ describe('style marshal', () => {
     });
   });
 
-  describe('subseqent updates', () => {
+  describe('subsequent updates', () => {
     it('should allow multiple updates', () => {
       const marshal: StyleMarshal = createStyleMarshal();
 
