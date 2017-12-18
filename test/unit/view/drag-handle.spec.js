@@ -193,6 +193,30 @@ describe('drag handle', () => {
     fakeDraggableRef.getBoundingClientRect.mockRestore();
   });
 
+  it('should apply the style context to a data-attribute', () => {
+    const myMock = jest.fn();
+    myMock.mockReturnValue(<div>hello world</div>);
+
+    mount(
+      <DragHandle
+        callbacks={callbacks}
+        isEnabled
+        isDragging={false}
+        direction={null}
+        getDraggableRef={() => fakeDraggableRef}
+        canDragInteractiveElements={false}
+      >
+        {(dragHandleProps: ?Provided) => (
+          myMock(dragHandleProps)
+        )}
+      </DragHandle>,
+      { context: basicContext }
+    );
+
+    // $ExpectError - using lots of accessors
+    expect(myMock.mock.calls[0][0]['data-react-beautiful-dnd-drag-handle']).toEqual(basicContext[styleContextKey]);
+  });
+
   describe('mouse dragging', () => {
     describe('initiation', () => {
       it('should start a drag if there was sufficient mouse movement in any direction', () => {
