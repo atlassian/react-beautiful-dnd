@@ -276,10 +276,6 @@ describe('drag handle', () => {
         })).toBe(true);
       });
 
-      it('should not start a drag if the application state does not permit a drag to start', () => {
-        throw new Error('TODO');
-      });
-
       describe('cancelled before moved enough', () => {
         describe('cancelled with escape', () => {
           beforeEach(() => {
@@ -2362,6 +2358,40 @@ describe('drag handle', () => {
                 })).toBe(true);
               });
             });
+          });
+        });
+
+        describe('something else already dragging', () => {
+          it('should not start a drag if something else is already dragging in the system', () => {
+            const customContext = {
+              ...basicContext,
+              // faking a 'false' response
+              [canLiftContextKey]: () => false,
+            };
+            const customCallbacks = getStubCallbacks();
+            const customWrapper = mount(
+              <DragHandle
+                callbacks={customCallbacks}
+                isDragging={false}
+                isEnabled
+                direction={null}
+                getDraggableRef={() => fakeDraggableRef}
+                canDragInteractiveElements={false}
+              >
+                {(dragHandleProps: ?Provided) => (
+                  <Child dragHandleProps={dragHandleProps} />
+                )}
+              </DragHandle>,
+              { context: customContext }
+            );
+
+            control.preLift();
+            control.lift();
+            control.end(customWrapper);
+
+            expect(callbacksCalled(customCallbacks)({
+              onLift: 0,
+            })).toBe(true);
           });
         });
 

@@ -106,8 +106,9 @@ export default ({
 
     // already dragging
     if (!direction) {
-      console.warn('Cannot handle keyboard movement event if direction is not provided');
+      console.error('Cannot handle keyboard movement event if direction is not provided');
       stopEvent(event);
+      cancel();
       return;
     }
 
