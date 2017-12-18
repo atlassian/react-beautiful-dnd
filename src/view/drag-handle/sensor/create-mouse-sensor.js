@@ -31,7 +31,7 @@ type State = {
 const primaryButton = 0;
 const noop = () => { };
 
-export default ({ callbacks, getDraggableRef, canLift }: CreateSensorArgs): MouseSensor => {
+export default ({ callbacks, getDraggableRef, canStartCapturing }: CreateSensorArgs): MouseSensor => {
   let state: State = {
     isDragging: false,
     pending: null,
@@ -192,7 +192,7 @@ export default ({ callbacks, getDraggableRef, canLift }: CreateSensorArgs): Mous
   };
 
   const onMouseDown = (event: MouseEvent): void => {
-    if (!canLift(event)) {
+    if (!canStartCapturing(event)) {
       return;
     }
 

@@ -35,13 +35,13 @@ export default class DragHandle extends Component<Props> {
     [styleContextKey]: PropTypes.string.isRequired,
   }
 
-  constructor(props: Props, context: mixed) {
+  constructor(props: Props, context: Object) {
     super(props, context);
 
     const args: CreateSensorArgs = {
       callbacks: this.props.callbacks,
       getDraggableRef: this.props.getDraggableRef,
-      canLift: this.canLift,
+      canStartCapturing: this.canStartCapturing,
     };
 
     this.mouseSensor = createMouseSensor(args);
@@ -148,7 +148,7 @@ export default class DragHandle extends Component<Props> {
     this.touchSensor.onClick(event);
   }
 
-  canLift = (event: Event) => {
+  canStartCapturing = (event: Event) => {
     if (this.isAnySensorCapturing()) {
       return false;
     }

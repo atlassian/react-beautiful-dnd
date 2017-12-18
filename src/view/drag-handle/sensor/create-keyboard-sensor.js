@@ -24,7 +24,7 @@ type ExecuteBasedOnDirection = {|
 
 const noop = () => { };
 
-export default ({ callbacks, getDraggableRef, canLift }: CreateSensorArgs): KeyboardSensor => {
+export default ({ callbacks, getDraggableRef, canStartCapturing }: CreateSensorArgs): KeyboardSensor => {
   let state: State = {
     isDragging: false,
   };
@@ -58,7 +58,7 @@ export default ({ callbacks, getDraggableRef, canLift }: CreateSensorArgs): Keyb
     // not yet dragging
     if (!isDragging()) {
       // cannot lift at this time
-      if (!canLift(event)) {
+      if (!canStartCapturing(event)) {
         return;
       }
 

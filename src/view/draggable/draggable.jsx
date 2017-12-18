@@ -280,7 +280,7 @@ export default class Draggable extends Component<Props, State> {
         draggableProps: {
           'data-react-beautiful-dnd-draggable': this.styleContext,
           style: draggableStyle,
-        }
+        },
         dragHandleProps,
         placeholder: useDraggingStyle ? this.getPlaceholder() : null,
       };

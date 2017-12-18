@@ -14,7 +14,7 @@ export type Sensor = {
 export type CreateSensorArgs = {|
   callbacks: Callbacks,
   getDraggableRef: () => ?HTMLElement,
-  canLift: (event: Event) => boolean,
+  canStartCapturing: (event: Event) => boolean,
 |}
 
 export type MouseSensor = Sensor & {

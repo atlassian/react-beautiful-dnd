@@ -37,7 +37,7 @@ const initial: State = {
   longPressTimerId: null,
 };
 
-export default ({ callbacks, getDraggableRef, canLift }: CreateSensorArgs): TouchSensor => {
+export default ({ callbacks, getDraggableRef, canStartCapturing }: CreateSensorArgs): TouchSensor => {
   let state: State = initial;
 
   const setState = (partial: Object): void => {
@@ -231,7 +231,7 @@ export default ({ callbacks, getDraggableRef, canLift }: CreateSensorArgs): Touc
 
   // entry point
   const onTouchStart = (event: TouchEvent) => {
-    if (!canLift(event)) {
+    if (!canStartCapturing(event)) {
       return;
     }
 
