@@ -7,12 +7,12 @@ import type {
   DimensionFragment,
   Axis,
   Position,
-  ClientRect,
   Displacement,
+  ClientRect,
 } from '../../types';
 import { add, subtract, patch } from '../position';
 import getDisplacement from '../get-displacement';
-import getVisibleViewport from '../get-visible-viewport';
+import getViewport from '../visibility/get-viewport';
 
 // It is the responsibility of this function
 // to return the impact of a drag
@@ -32,8 +32,7 @@ export default ({
   insideHome,
   previousImpact,
 }: Args): DragImpact => {
-  const viewport: ClientRect = getVisibleViewport();
-
+  const viewport: ClientRect = getViewport();
   const axis: Axis = home.axis;
   const homeScrollDiff: Position = subtract(
     home.container.scroll.current, home.container.scroll.initial
@@ -78,8 +77,8 @@ export default ({
     .map((dimension: DraggableDimension): Displacement => getDisplacement({
       draggable: dimension,
       destination: home,
-      viewport,
       previousImpact,
+      viewport,
     }));
 
     // Need to ensure that we always order by the closest impacted item

@@ -1,8 +1,5 @@
 // @flow
 import type {
-  DraggableId,
-  DroppableId,
-  ClientRect,
   DragMovement,
   DraggableDimension,
   DroppableDimension,
@@ -10,10 +7,11 @@ import type {
   Axis,
   Position,
   Displacement,
+  ClientRect,
 } from '../../types';
 import { add, subtract, patch } from '../position';
-import getVisibleViewport from '../get-visible-viewport';
 import getDisplacement from '../get-displacement';
+import getViewport from '../visibility/get-viewport';
 
 type Args = {|
   pageCenter: Position,
@@ -30,9 +28,8 @@ export default ({
   insideDestination,
   previousImpact,
 }: Args): DragImpact => {
-  const viewport: ClientRect = getVisibleViewport();
   const axis: Axis = destination.axis;
-
+  const viewport: ClientRect = getViewport();
   const destinationScrollDiff: Position = subtract(
     destination.container.scroll.current, destination.container.scroll.initial
   );
@@ -48,8 +45,8 @@ export default ({
     .map((dimension: DraggableDimension): Displacement => getDisplacement({
       draggable: dimension,
       destination,
-      viewport,
       previousImpact,
+      viewport,
     }));
 
   const newIndex: number = insideDestination.length - displaced.length;

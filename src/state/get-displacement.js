@@ -1,33 +1,33 @@
 // @flow
-import isDisplacedDraggableVisible from './is-displaced-draggable-visible';
+import { isDraggablePartiallyVisible } from './visibility/is-partially-visible';
 import getDisplacementMap, { type DisplacementMap } from './get-displacement-map';
 import type {
   DraggableId,
   Displacement,
   DraggableDimension,
   DroppableDimension,
-  ClientRect,
   DragImpact,
+  ClientRect,
 } from '../types';
 
 type Args = {|
   draggable: DraggableDimension,
   destination: DroppableDimension,
-  viewport: ClientRect,
   previousImpact: DragImpact,
+  viewport: ClientRect,
 |}
 
 export default ({
   draggable,
   destination,
-  viewport,
   previousImpact,
+  viewport,
 }: Args): Displacement => {
   const id: DraggableId = draggable.descriptor.id;
   const map: DisplacementMap = getDisplacementMap(previousImpact.movement.displaced);
 
-  const isVisible: boolean = isDisplacedDraggableVisible({
-    displaced: draggable,
+  const isVisible: boolean = isDraggablePartiallyVisible({
+    draggable,
     droppable: destination,
     viewport,
   });

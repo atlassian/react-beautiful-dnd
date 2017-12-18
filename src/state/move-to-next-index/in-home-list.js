@@ -1,13 +1,14 @@
 // @flow
 import memoizeOne from 'memoize-one';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { isPointWithinDroppable } from '../is-within-visible-bounds-of-droppable';
-import { patch } from '../position';
+import { patch, subtract } from '../position';
+import { offset, getSpacingFrom } from '../spacing';
+import getViewport from '../visibility/get-viewport';
 import moveToEdge from '../move-to-edge';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import getDisplacement from '../get-displacement';
-import getVisibleViewport from '../get-visible-viewport';
+import { isSpacingPartiallyVisible } from '../visibility/is-partially-visible';
 import type {
   DraggableLocation,
   DraggableDimension,
@@ -15,6 +16,7 @@ import type {
   Displacement,
   Axis,
   DragImpact,
+  Spacing,
   ClientRect,
 } from '../../types';
 
@@ -87,7 +89,15 @@ export default ({
   });
 
   // Currently not supporting moving a draggable outside the visibility bounds of a droppable
-  const isVisible: boolean = isPointWithinDroppable(droppable)(newCenter);
+  const diff: Position = subtract(newCenter, draggable.page.withoutMargin.center);
+  const target: Spacing = offset(getSpacingFrom(draggable.page.withMargin), diff);
+  const viewport: ClientRect = getViewport();
+
+  const isVisible: boolean = isSpacingPartiallyVisible({
+    spacing: target,
+    droppable,
+    viewport,
+  });
 
   if (!isVisible) {
     return null;
@@ -108,7 +118,6 @@ export default ({
     [destinationDisplacement, ...previousImpact.movement.displaced]);
 
   // update impact with visiblity - stops redundant work!
-  const viewport: ClientRect = getVisibleViewport();
   const displaced: Displacement[] = modified
     .map((displacement: Displacement): Displacement => {
       // already processed
@@ -121,8 +130,8 @@ export default ({
       const updated: Displacement = getDisplacement({
         draggable: target,
         destination: droppable,
-        viewport,
         previousImpact,
+        viewport,
       });
 
       return updated;
