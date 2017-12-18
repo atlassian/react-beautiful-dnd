@@ -9,7 +9,7 @@ import type {
   DroppableDimension,
 } from '../types';
 
-export default (hooks: Hooks, current: State, previous: State): void => {
+export default (hooks: Hooks, previous: State, current: State): void => {
   const { onDragStart, onDragEnd } = hooks;
   const currentPhase = current.phase;
   const previousPhase = previous.phase;

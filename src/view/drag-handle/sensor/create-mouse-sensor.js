@@ -6,7 +6,6 @@ import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-ex
 import getWindowFromRef from '../../get-window-from-ref';
 import * as keyCodes from '../../key-codes';
 import blockStandardKeyEvents from '../util/block-standard-key-events';
-import shouldAllowDraggingFromTarget from '../util/should-allow-dragging-from-target';
 import type {
   Position,
 } from '../../../types';
@@ -31,7 +30,11 @@ type State = {
 const primaryButton = 0;
 const noop = () => { };
 
-export default ({ callbacks, getDraggableRef, canStartCapturing }: CreateSensorArgs): MouseSensor => {
+export default ({
+  callbacks,
+  getDraggableRef,
+  canStartCapturing
+}: CreateSensorArgs): MouseSensor => {
   let state: State = {
     isDragging: false,
     pending: null,

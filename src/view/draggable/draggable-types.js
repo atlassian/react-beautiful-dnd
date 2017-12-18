@@ -55,7 +55,9 @@ export type DraggingStyle = {|
   // but it is cleanest to just remove all the margins rather than only the top and left.
   margin: 0,
 
-  // TEMP
+  // We need to opt out of the shared global style that is being applied to
+  // all draggables. The movement of moving draggables is either not animated
+  // or handled by react-motion.
   transition: 'none',
 
   // Move the element in response to a user dragging
@@ -80,15 +82,19 @@ export type ZIndexOptions = {|
   dropAnimating: number,
 |}
 
+// Props that can be spread onto the element directly
 type DraggableProps = {|
+  // inline style
   style: ?DraggableStyle,
+  // used for shared global styles
   'data-react-beautiful-dnd-draggable': string,
 |}
 
 export type Provided = {|
-  innerRef: (? HTMLElement) => void,
   draggableProps: DraggableProps,
   dragHandleProps: ?DragHandleProvided,
+  // The following props will be removed once we move to react 16
+  innerRef: (?HTMLElement) => void,
   placeholder: ?Node,
 |}
 

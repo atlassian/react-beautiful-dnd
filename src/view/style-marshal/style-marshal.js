@@ -44,6 +44,27 @@ export default () => {
     return result;
   })();
 
+  // ## Base styles
+
+  // ### Drag handle
+
+  // -webkit-touch-callout
+  // A long press on anchors usually pops a content menu that has options for
+  // the link such as 'Open in new tab'. Because long press is used to start
+  // a drag we need to opt out of this behavior
+
+  // -webkit-tap-highlight-color
+  // Webkit based browsers add a grey overlay to anchors when they are active.
+  // We remove this tap overlay as it is confusing for users
+  // https://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/
+
+  // touch-action: manipulation
+  // Avoid the *pull to refresh action* and *delayed anchor focus* on Android Chrome
+
+  // cursor: grab
+  // We apply this by default for an improved user experience. It is such a common default that we
+  // bake it right in. Consumers can opt out of this by adding a selector with higher specificity
+
   const baseStyles: string = `
     ${dragHandleSelector} {
       -webkit-touch-callout: none;
@@ -53,6 +74,25 @@ export default () => {
       cursor: grab;
     }
   `;
+
+  // ## While dragging styles
+
+  // ### Body
+
+  // cursor: grab
+  // We apply this by default for an improved user experience. It is such a common default that we
+  // bake it right in. Consumers can opt out of this by adding a selector with higher specificity
+
+  // user-select: none
+  // This prevents the user from selecting text on the page while dragging
+
+  // ## Drag handle
+
+  // > We apply all of the base styles while dragging
+
+  // pointer-events: none
+  // This style has two purposes
+  // 1. It prevents other
 
   const whileDraggingStyles: string = `
     body {
