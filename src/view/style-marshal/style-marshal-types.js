@@ -4,7 +4,7 @@ import type {
 } from '../../types';
 
 export type StyleMarshal = {|
-  onPhaseChange: (previous: State, current: State) => void,
+  onPhaseChange: (current: State) => void,
   styleContext: string,
   unmount: () => void,
 |}

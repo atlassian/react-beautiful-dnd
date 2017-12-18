@@ -276,6 +276,10 @@ describe('drag handle', () => {
         })).toBe(true);
       });
 
+      it('should not start a drag if the application state does not permit a drag to start', () => {
+        throw new Error('TODO');
+      });
+
       describe('cancelled before moved enough', () => {
         describe('cancelled with escape', () => {
           beforeEach(() => {

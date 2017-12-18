@@ -78,11 +78,31 @@ describe('style marshal', () => {
     });
   });
 
+  describe('drag preparing', () => {
+    it('should apply the dragging styles while flushing the last drag', () => {
+      const marshal: StyleMarshal = createStyleMarshal();
+
+      marshal.onPhaseChange(state.preparing);
+      const style: string = getStyle(marshal.styleContext);
+
+      expect(style).toEqual(getDraggingStyles(marshal.styleContext));
+    });
+
+    it('should apply the dragging styles while requesting initial dimensions', () => {
+      const marshal: StyleMarshal = createStyleMarshal();
+
+      marshal.onPhaseChange(state.requesting());
+      const style: string = getStyle(marshal.styleContext);
+
+      expect(style).toEqual(getDraggingStyles(marshal.styleContext));
+    });
+  });
+
   describe('drag starting', () => {
     it('should apply the dragging styles', () => {
       const marshal: StyleMarshal = createStyleMarshal();
 
-      marshal.onPhaseChange(state.requesting(), state.dragging());
+      marshal.onPhaseChange(state.dragging());
       const style: string = getStyle(marshal.styleContext);
 
       expect(style).toEqual(getDraggingStyles(marshal.styleContext));
@@ -94,11 +114,11 @@ describe('style marshal', () => {
       const marshal: StyleMarshal = createStyleMarshal();
 
       // initial drag
-      marshal.onPhaseChange(state.requesting(), state.dragging());
+      marshal.onPhaseChange(state.dragging());
       expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
 
       // cancelled by error
-      marshal.onPhaseChange(state.dragging(), state.idle);
+      marshal.onPhaseChange(state.idle);
       expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
     });
   });
@@ -108,11 +128,11 @@ describe('style marshal', () => {
       const marshal: StyleMarshal = createStyleMarshal();
 
       // initial drag
-      marshal.onPhaseChange(state.requesting(), state.dragging());
+      marshal.onPhaseChange(state.dragging());
       expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
 
       // cancelled
-      marshal.onPhaseChange(state.dragging(), state.userCancel());
+      marshal.onPhaseChange(state.userCancel());
       expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
     });
 
@@ -120,15 +140,15 @@ describe('style marshal', () => {
       const marshal: StyleMarshal = createStyleMarshal();
 
       // initial drag
-      marshal.onPhaseChange(state.requesting(), state.dragging());
+      marshal.onPhaseChange(state.dragging());
       expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
 
       // cancelled
-      marshal.onPhaseChange(state.dragging(), state.userCancel());
+      marshal.onPhaseChange(state.userCancel());
       expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
 
       // drop complete
-      marshal.onPhaseChange(state.userCancel(), state.dropComplete());
+      marshal.onPhaseChange(state.dropComplete());
       expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
     });
 
@@ -136,15 +156,15 @@ describe('style marshal', () => {
       const marshal: StyleMarshal = createStyleMarshal();
 
       // initial drag
-      marshal.onPhaseChange(state.requesting(), state.dragging());
+      marshal.onPhaseChange(state.dragging());
       expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
 
       // user cancel
-      marshal.onPhaseChange(state.dragging(), state.userCancel());
+      marshal.onPhaseChange(state.userCancel());
       expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
 
       // some error causes the drop to be abandoned
-      marshal.onPhaseChange(state.userCancel(), state.idle);
+      marshal.onPhaseChange(state.idle);
       expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
     });
   });
@@ -154,11 +174,11 @@ describe('style marshal', () => {
       const marshal: StyleMarshal = createStyleMarshal();
 
       // initial drag
-      marshal.onPhaseChange(state.requesting(), state.dragging());
+      marshal.onPhaseChange(state.dragging());
       expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
 
       // dropping
-      marshal.onPhaseChange(state.dragging(), state.dropAnimating());
+      marshal.onPhaseChange(state.dropAnimating());
       expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
     });
   });
@@ -186,7 +206,7 @@ describe('style marshal', () => {
       expect(clean(el.innerHTML)).toEqual(getBaseStyles(marshal.styleContext));
 
       marshal.unmount();
-      marshal.onPhaseChange(state.requesting(), state.dragging());
+      marshal.onPhaseChange(state.dragging());
 
       // asserting it has the base styles (not updated)
       expect(clean(el.innerHTML)).toEqual(getBaseStyles(marshal.styleContext));
@@ -201,19 +221,19 @@ describe('style marshal', () => {
 
       Array.from({ length: 4 }).forEach(() => {
         // requesting
-        marshal.onPhaseChange(state.idle, state.requesting());
+        marshal.onPhaseChange(state.requesting());
         expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
 
         // dragging
-        marshal.onPhaseChange(state.requesting, state.dragging());
+        marshal.onPhaseChange(state.dragging());
         expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
 
         // dropping
-        marshal.onPhaseChange(state.dragging(), state.dropAnimating());
+        marshal.onPhaseChange(state.dropAnimating());
         expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
 
         // complete
-        marshal.onPhaseChange(state.dropAnimating(), state.dropComplete());
+        marshal.onPhaseChange(state.dropComplete());
         expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
       });
     });
@@ -223,19 +243,19 @@ describe('style marshal', () => {
 
       Array.from({ length: 4 }).forEach(() => {
         // requesting
-        marshal.onPhaseChange(state.idle, state.requesting());
+        marshal.onPhaseChange(state.requesting());
         expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
 
         // dragging
-        marshal.onPhaseChange(state.requesting(), state.dragging());
+        marshal.onPhaseChange(state.dragging());
         expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
 
         // cancelling
-        marshal.onPhaseChange(state.dragging(), state.userCancel());
+        marshal.onPhaseChange(state.userCancel());
         expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
 
         // complete
-        marshal.onPhaseChange(state.userCancel(), state.dropComplete());
+        marshal.onPhaseChange(state.dropComplete());
         expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
       });
     });
@@ -245,15 +265,15 @@ describe('style marshal', () => {
 
       Array.from({ length: 4 }).forEach(() => {
         // requesting
-        marshal.onPhaseChange(state.idle, state.requesting());
+        marshal.onPhaseChange(state.requesting());
         expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
 
         // dragging
-        marshal.onPhaseChange(state.requesting(), state.dragging());
+        marshal.onPhaseChange(state.dragging());
         expect(getStyle(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
 
         // error
-        marshal.onPhaseChange(state.dragging(), state.idle);
+        marshal.onPhaseChange(state.idle);
         expect(getStyle(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
       });
     });

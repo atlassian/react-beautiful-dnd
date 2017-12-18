@@ -24,7 +24,7 @@ import type {
   InitialDragPositions,
 } from '../types';
 import { add, subtract } from './position';
-import noImpact from './no-impact';
+import noImpact, { noMovement } from './no-impact';
 import getDragImpact from './get-drag-impact/';
 import moveToNextIndex from './move-to-next-index/';
 import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
@@ -276,19 +276,38 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       shouldAnimate: false,
     };
 
+    // Calculate initial impact
+
+    const home: ?DroppableDimension = state.dimension.droppable[descriptor.droppableId];
+
+    if (!home) {
+      console.error('Cannot find home dimension for initial lift');
+      return clean();
+    }
+
+    const destination: DraggableLocation = {
+      index: descriptor.index,
+      droppableId: descriptor.droppableId,
+    };
+
+    const impact: DragImpact = {
+      movement: noMovement,
+      direction: home.axis.direction,
+      destination,
+    };
+
     return {
       ...state,
       phase: 'DRAGGING',
       drag: {
         initial,
         current,
-        impact: noImpact,
+        impact,
       },
     };
   }
 
   if (action.type === 'UPDATE_DROPPABLE_DIMENSION_SCROLL') {
-    console.log('updating scorll');
     if (state.phase !== 'DRAGGING') {
       console.error('cannot update a droppable dimensions scroll when not dragging');
       return clean();

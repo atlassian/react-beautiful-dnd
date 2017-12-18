@@ -117,7 +117,7 @@ export default class DragDropContext extends React.Component<Props> {
       fireHooks(hooks, previousValue, current);
 
       // Update the global styles
-      this.styleMarshal.onPhaseChange(previousValue, current);
+      this.styleMarshal.onPhaseChange(current);
 
       // inform the dimension marshal about updates
       // this can trigger more actions synchronously so we are placing it last

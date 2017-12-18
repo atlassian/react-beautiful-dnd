@@ -42,6 +42,11 @@ export const idle: State = {
   },
 };
 
+export const preparing: State = {
+  ...idle,
+  phase: 'PREPARING',
+};
+
 export const requesting = (request?: DraggableDescriptor = preset.inHome1.descriptor): State => {
   const result: State = {
     phase: 'COLLECTING_INITIAL_DIMENSIONS',

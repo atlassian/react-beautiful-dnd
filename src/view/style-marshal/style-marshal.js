@@ -1,26 +1,17 @@
 // @flow
 import { css } from '../animation';
 import type { StyleMarshal } from './style-marshal-types';
+import canStartDrag from '../../state/can-start-drag';
 import type {
   State as AppState,
 } from '../../types';
 
 let count: number = 0;
 
-const getIsAnimatingCancel = (state: AppState) => {
-  if (state.phase !== 'DROP_ANIMATING') {
-    return false;
-  }
-
-  if (!state.drop || !state.drop.pending) {
-    return false;
-  }
-
-  return state.drop.pending.trigger === 'CANCEL';
-};
+type Applied = 'DRAG' | 'BASE';
 
 type State = {
-  isDraggingStyleActive: boolean,
+  applied: ?Applied,
   isMounted: boolean,
 }
 
@@ -116,7 +107,7 @@ export default () => {
   `;
 
   let state: State = {
-    isDraggingStyleActive: false,
+    applied: null,
     isMounted: true,
   };
 
@@ -128,68 +119,33 @@ export default () => {
     state = newState;
   };
 
-  const setStyle = (rules: string) => {
-    // This technique works with ie11+ so no need for a nasty fallback as seen here:
-    // https://stackoverflow.com/a/22050778/1374236
-    el.innerHTML = rules;
-  };
-
-  const applyDragStyles = () => {
-    if (state.isDraggingStyleActive) {
-      console.warn('not applying dragging styles as they are already active');
+  const setStyle = (apply: Applied) => {
+    if (state.applied === apply) {
       return;
     }
     setState({
-      isDraggingStyleActive: true,
+      apply,
     });
-    setStyle(whileDraggingStyles);
-  };
 
-  const applyBaseStyles = () => {
-    if (!state.isDraggingStyleActive) {
-      console.warn('removing dragging styles even though there was no active drag');
-      // not returning - need to provide a way of clearing even in an error scenario
-    }
-
-    setState({
-      isDraggingStyleActive: false,
-    });
-    setStyle(baseStyles);
+    // This technique works with ie11+ so no need for a nasty fallback as seen here:
+    // https://stackoverflow.com/a/22050778/1374236
+    el.innerHTML = apply === 'DRAG' ? whileDraggingStyles : baseStyles;
   };
 
   // self initiating
-  setStyle(baseStyles);
+  setStyle('BASE');
 
-  const onPhaseChange = (previous: AppState, current: AppState) => {
+  const onPhaseChange = (current: AppState) => {
     if (!state.isMounted) {
       console.error('cannot update styles when not mounted');
       return;
     }
 
-    const wasAnimatingCancel: boolean = getIsAnimatingCancel(previous);
-    const isAnimatingCancel: boolean = getIsAnimatingCancel(current);
-    const wasDragging: boolean = previous.phase === 'DRAGGING';
-    const isDragging: boolean = current.phase === 'DRAGGING';
-    const isDragStarting: boolean = !wasDragging && isDragging;
-    const isDragStopping: boolean = wasDragging && !isDragging;
-
-    if (isDragStarting) {
-      applyDragStyles();
+    if (canStartDrag(current)) {
+      setStyle('BASE');
       return;
     }
-
-    // not removing styles when animating a cancel as we want to prevent
-    // the user from dragging anything until the animation for this type
-    // of drop is complete.
-    if (isAnimatingCancel) {
-      return;
-    }
-
-    // Reset to the base styles if drag is stopping, or we where previously
-    // holding off applying the base styles because of a cancel
-    if (isDragStopping || wasAnimatingCancel) {
-      applyBaseStyles();
-    }
+    setStyle('DRAG');
   };
 
   const unmount = (): void => {
