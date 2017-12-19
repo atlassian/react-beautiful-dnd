@@ -4162,7 +4162,7 @@ jest-worker@^22.0.1:
   dependencies:
     merge-stream "^1.0.1"
 
-jest@22.0.1:
+jest@^22.0.1:
   version "22.0.1"
   resolved "https://registry.yarnpkg.com/jest/-/jest-22.0.1.tgz#79047f5d133b8e31fa0a4c0afe5a2b5e06bd9e86"
   dependencies:
@@ -6011,9 +6011,9 @@ rollup-pluginutils@^2.0.1:
     estree-walker "^0.3.0"
     micromatch "^2.3.11"
 
-rollup@^0.51.8:
-  version "0.51.8"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.51.8.tgz#58bd0b642885f4770b5f93cc64f14e4233c2236d"
+rollup@0.52.3:
+  version "0.52.3"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.52.3.tgz#020d99fffe9619351e47b3894fd397c26f5e1bf6"
 
 rst-selector-parser@^2.2.3:
   version "2.2.3"
