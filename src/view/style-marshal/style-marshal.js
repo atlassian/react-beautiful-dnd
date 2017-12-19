@@ -1,26 +1,25 @@
 // @flow
-import { css } from '../animation';
+import getStyles, { type Styles } from './get-styles';
 import type { StyleMarshal } from './style-marshal-types';
-import canStartDrag from '../../state/can-start-drag';
 import type {
   State as AppState,
   Phase,
+  DropTrigger,
 } from '../../types';
 
 let count: number = 0;
 
-type Applied = 'DRAG' | 'BASE';
-
 type State = {
-  applied: ?Applied,
+  applied: ?string,
   isMounted: boolean,
 }
 
 const prefix: string = 'data-react-beautiful-dnd';
+
 export default () => {
   const context: string = `${count++}`;
-  const dragHandleSelector: string = `[${prefix}-drag-handle="${context}"]`;
-  const draggableSelector: string = `[${prefix}-draggable="${context}"]`;
+  const styles: Styles = getStyles(context);
+
   const el: HTMLElement = (() => {
     const result = document.createElement('style');
     result.type = 'text/css';
@@ -36,77 +35,6 @@ export default () => {
     return result;
   })();
 
-  // ## Base styles
-
-  // ### Drag handle
-
-  // -webkit-touch-callout
-  // A long press on anchors usually pops a content menu that has options for
-  // the link such as 'Open in new tab'. Because long press is used to start
-  // a drag we need to opt out of this behavior
-
-  // -webkit-tap-highlight-color
-  // Webkit based browsers add a grey overlay to anchors when they are active.
-  // We remove this tap overlay as it is confusing for users
-  // https://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/
-
-  // touch-action: manipulation
-  // Avoid the *pull to refresh action* and *delayed anchor focus* on Android Chrome
-
-  // cursor: grab
-  // We apply this by default for an improved user experience. It is such a common default that we
-  // bake it right in. Consumers can opt out of this by adding a selector with higher specificity
-
-  const baseStyles: string = `
-    ${dragHandleSelector} {
-      -webkit-touch-callout: none;
-      -webkit-tap-highlight-color: rgba(0,0,0,0);
-      touch-action: manipulation;
-      cursor: -webkit-grab;
-      cursor: grab;
-    }
-  `;
-
-  // ## While dragging styles
-
-  // ### Body
-
-  // cursor: grab
-  // We apply this by default for an improved user experience. It is such a common default that we
-  // bake it right in. Consumers can opt out of this by adding a selector with higher specificity
-
-  // user-select: none
-  // This prevents the user from selecting text on the page while dragging
-
-  // ## Drag handle
-
-  // > We apply all of the base styles while dragging
-
-  // pointer-events: none
-  // This style has two purposes
-  // 1. It prevents other
-
-  const whileDraggingStyles: string = `
-    body {
-      cursor: grabbing;
-      cursor: -webkit-grabbing;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-    }
-
-    ${baseStyles}
-
-    ${dragHandleSelector} {
-      pointer-events: none;
-    }
-
-    ${draggableSelector} {
-      transition: ${css.outOfTheWay};
-    }
-  `;
-
   let state: State = {
     applied: null,
     isMounted: true,
@@ -120,26 +48,24 @@ export default () => {
     state = newState;
   };
 
-  const setStyle = (apply: Applied) => {
-    if (state.applied === apply) {
+  const setStyle = (proposed: string) => {
+    if (state.applied === proposed) {
       return;
     }
-    console.warn('setting style:', apply);
+
     setState({
-      applied: apply,
+      applied: proposed,
     });
 
     // This technique works with ie11+ so no need for a nasty fallback as seen here:
     // https://stackoverflow.com/a/22050778/1374236
-    el.innerHTML = apply === 'DRAG' ? whileDraggingStyles : baseStyles;
+    el.innerHTML = proposed;
   };
 
   // self initiating
-  setStyle('BASE');
+  setStyle(styles.resting);
 
   const onPhaseChange = (current: AppState) => {
-    // TODO: better styles for pre drag phases?
-
     if (!state.isMounted) {
       console.error('cannot update styles when not mounted');
       return;
@@ -148,19 +74,28 @@ export default () => {
     const phase: Phase = current.phase;
 
     if (phase === 'DRAGGING') {
-      setStyle('DRAG');
+      setStyle(styles.dragging);
       return;
     }
 
-    // if (phase === 'DROP_ANIMATING') {
-    //   // if (current.drop.pending.trigger === 'CANCEL') {
-    //     // using dragging styles
-    //   setStyle('BASE');
-    //   return;
-    //   // }
-    // }
+    if (phase === 'DROP_ANIMATING') {
+      if (!current.drop || !current.drop.pending) {
+        console.error('Invalid state found in style-marshal');
+        return;
+      }
 
-    setStyle('BASE');
+      const trigger: DropTrigger = current.drop.pending.trigger;
+
+      if (trigger === 'DROP') {
+        setStyle(styles.dropping);
+        return;
+      }
+      console.warn('user cancel styles');
+      setStyle(styles.userCancel);
+      return;
+    }
+
+    setStyle(styles.resting);
   };
 
   const unmount = (): void => {

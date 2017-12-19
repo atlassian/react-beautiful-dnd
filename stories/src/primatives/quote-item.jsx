@@ -20,8 +20,6 @@ border-radius: ${borderRadius}px;
 border: 1px solid grey;
 background-color: ${({ isDragging }) => (isDragging ? colors.green : colors.white)};
 
-/* cursor: grabbing is handled by app */
-cursor: grab;
 box-shadow: ${({ isDragging }) => (isDragging ? `2px 2px 1px ${colors.shadow}` : 'none')};
 padding: ${grid}px;
 min-height: 40px;
