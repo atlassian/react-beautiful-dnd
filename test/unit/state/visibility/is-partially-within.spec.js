@@ -1,8 +1,6 @@
 // @flow
 import isPartiallyWithin from '../../../../src/state/visibility/is-partially-within';
-import type {
-  Spacing
-} from '../../../../src/types';
+import type { Spacing } from '../../../../src/types';
 
 const container: Spacing = {
   top: 0, left: 0, right: 100, bottom: 100,

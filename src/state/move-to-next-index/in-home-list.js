@@ -8,7 +8,7 @@ import moveToEdge from '../move-to-edge';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import getDisplacement from '../get-displacement';
-import { isSpacingPartiallyVisible } from '../visibility/is-partially-visible';
+import { isPartiallyVisible } from '../visibility/is-partially-visible';
 import type {
   DraggableLocation,
   DraggableDimension,
@@ -89,15 +89,17 @@ export default ({
   });
 
   // Currently not supporting moving a draggable outside the visibility bounds of a droppable
-  const diff: Position = subtract(newCenter, draggable.page.withoutMargin.center);
-  const target: Spacing = offset(getSpacingFrom(draggable.page.withMargin), diff);
   const viewport: ClientRect = getViewport();
+  const isVisible: boolean = (() => {
+    const diff: Position = subtract(newCenter, draggable.page.withoutMargin.center);
+    const withDiff: Spacing = offset(getSpacingFrom(draggable.page.withMargin), diff);
 
-  const isVisible: boolean = isSpacingPartiallyVisible({
-    spacing: target,
-    droppable,
-    viewport,
-  });
+    return isPartiallyVisible({
+      target: withDiff,
+      droppable,
+      viewport,
+    });
+  })();
 
   if (!isVisible) {
     return null;

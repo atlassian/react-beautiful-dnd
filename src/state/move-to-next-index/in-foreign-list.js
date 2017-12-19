@@ -87,6 +87,7 @@ export default ({
       return true;
     }
 
+    // TODO: use new visibility logic
     return isPointWithinDroppable(droppable)(newCenter);
   })();
 

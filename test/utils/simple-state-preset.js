@@ -15,13 +15,14 @@ import type {
   DropResult,
   PendingDrop,
   DropTrigger,
+  DraggableId,
 } from '../../src/types';
 
 const preset = getPreset();
 
-const getDimensionState = (request: DraggableDescriptor): DimensionState => {
-  const draggable: DraggableDimension = preset.draggables[request.id];
-  const home: DroppableDimension = preset.droppables[request.droppableId];
+const getDimensionState = (request: DraggableId): DimensionState => {
+  const draggable: DraggableDimension = preset.draggables[request];
+  const home: DroppableDimension = preset.droppables[draggable.descriptor.droppableId];
 
   const result: DimensionState = {
     request,
@@ -47,7 +48,7 @@ export const preparing: State = {
   phase: 'PREPARING',
 };
 
-export const requesting = (request?: DraggableDescriptor = preset.inHome1.descriptor): State => {
+export const requesting = (request?: DraggableId = preset.inHome1.descriptor.id): State => {
   const result: State = {
     phase: 'COLLECTING_INITIAL_DIMENSIONS',
     drag: null,
@@ -64,10 +65,10 @@ export const requesting = (request?: DraggableDescriptor = preset.inHome1.descri
 const origin: Position = { x: 0, y: 0 };
 
 export const dragging = (
-  descriptor?: DraggableDescriptor = preset.inHome1.descriptor
+  id?: DraggableId = preset.inHome1.descriptor.id
 ): State => {
   // will populate the dimension state with the initial dimensions
-  const draggable: DraggableDimension = preset.draggables[descriptor.id];
+  const draggable: DraggableDimension = preset.draggables[id];
   const client: Position = draggable.client.withMargin.center;
   const initialPosition: InitialDragPositions = {
     selection: client,
@@ -81,7 +82,7 @@ export const dragging = (
 
   const drag: DragState = {
     initial: {
-      descriptor,
+      descriptor: draggable.descriptor,
       isScrollAllowed: true,
       client: initialPosition,
       page: initialPosition,
@@ -100,13 +101,14 @@ export const dragging = (
     phase: 'DRAGGING',
     drag,
     drop: null,
-    dimension: getDimensionState(descriptor),
+    dimension: getDimensionState(id),
   };
 
   return result;
 };
 
-const getDropAnimating = (descriptor: DraggableDescriptor, trigger: DropTrigger) => {
+const getDropAnimating = (id: DraggableId, trigger: DropTrigger) => {
+  const descriptor: DraggableDescriptor = preset.draggables[id].descriptor;
   const home: DroppableDescriptor = preset.droppables[descriptor.droppableId].descriptor;
   const pending: PendingDrop = {
     trigger,
@@ -130,22 +132,23 @@ const getDropAnimating = (descriptor: DraggableDescriptor, trigger: DropTrigger)
       pending,
       result: null,
     },
-    dimension: getDimensionState(descriptor),
+    dimension: getDimensionState(descriptor.id),
   };
   return result;
 };
 
 export const dropAnimating = (
-  descriptor?: DraggableDescriptor = preset.inHome1.descriptor
-): State => getDropAnimating(descriptor, 'DROP');
+  id?: DraggableId = preset.inHome1.descriptor.id
+): State => getDropAnimating(id, 'DROP');
 
 export const userCancel = (
-  descriptor?: DraggableDescriptor = preset.inHome1.descriptor
-): State => getDropAnimating(descriptor, 'CANCEL');
+  id?: DraggableId = preset.inHome1.descriptor.id
+): State => getDropAnimating(id, 'CANCEL');
 
 export const dropComplete = (
-  descriptor?: DraggableDescriptor = preset.inHome1.descriptor
+  id?: DraggableId = preset.inHome1.descriptor.id
 ): State => {
+  const descriptor: DraggableDescriptor = preset.draggables[id].descriptor;
   const home: DroppableDescriptor = preset.droppables[descriptor.droppableId].descriptor;
   const result: DropResult = {
     draggableId: descriptor.id,

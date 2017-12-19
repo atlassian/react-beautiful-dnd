@@ -171,14 +171,14 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
-    const descriptor: DraggableDescriptor = action.payload;
+    const id: DraggableId = action.payload;
 
     return {
       phase: 'COLLECTING_INITIAL_DIMENSIONS',
       drag: null,
       drop: null,
       dimension: {
-        request: descriptor,
+        request: id,
         draggable: {},
         droppable: {},
       },
@@ -247,11 +247,14 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
-    const { descriptor, client, windowScroll, isScrollAllowed } = action.payload;
+    const { id, client, windowScroll, isScrollAllowed } = action.payload;
     const page: InitialDragPositions = {
       selection: add(client.selection, windowScroll),
       center: add(client.center, windowScroll),
     };
+
+    // TODO: catch exception?
+    const descriptor: DraggableDescriptor = state.dimension.draggable[id].descriptor;
 
     const initial: InitialDrag = {
       descriptor,

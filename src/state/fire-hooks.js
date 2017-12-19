@@ -91,6 +91,7 @@ export default (hooks: Hooks, previous: State, current: State): void => {
     };
 
     onDragEnd(muted);
+    return;
   }
 
   // Drag ended while dragging

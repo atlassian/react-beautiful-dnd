@@ -106,19 +106,12 @@ export default class Draggable extends Component<Props, State> {
   onLift = (options: {client: Position, isScrollAllowed: boolean}) => {
     this.throwIfCannotDrag();
     const { client, isScrollAllowed } = options;
-    const { lift, draggableId, index } = this.props;
-    const droppableId: DroppableId = this.context[droppableIdKey];
+    const { lift, draggableId } = this.props;
     const { ref } = this.state;
 
     if (!ref) {
       throw new Error('cannot lift at this time');
     }
-
-    const descriptor: DraggableDescriptor = {
-      id: draggableId,
-      droppableId,
-      index,
-    };
 
     const initial: InitialDragPositions = {
       selection: client,
@@ -127,7 +120,7 @@ export default class Draggable extends Component<Props, State> {
 
     const windowScroll: Position = getWindowScrollPosition();
 
-    lift(descriptor, initial, windowScroll, isScrollAllowed);
+    lift(draggableId, initial, windowScroll, isScrollAllowed);
   }
 
   onMove = (client: Position) => {

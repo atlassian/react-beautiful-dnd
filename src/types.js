@@ -260,7 +260,12 @@ export type Phase =
   'DROP_COMPLETE';
 
 export type DimensionState = {|
-  request: ?DraggableDescriptor,
+  // using the draggable id rather than the descriptor as the descriptor
+  // may change as a result of the initial flush. This means that the lift
+  // descriptor may not be the same as the actual descriptor. To avoid
+  // confusion the request is just an id which is looked up
+  // in the dimension-marshal post-flush
+  request: ?DraggableId,
   draggable: DraggableDimensionMap,
   droppable: DroppableDimensionMap,
 |};

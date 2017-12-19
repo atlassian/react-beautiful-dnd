@@ -49,32 +49,33 @@ const getScrollDiff = ({
 
 export type RequestDimensionsAction = {|
   type: 'REQUEST_DIMENSIONS',
-  payload: DraggableDescriptor,
+  payload: DraggableId,
 |}
 
-export const requestDimensions = (descriptor: DraggableDescriptor): RequestDimensionsAction => ({
+export const requestDimensions = (id: DraggableId): RequestDimensionsAction => ({
   type: 'REQUEST_DIMENSIONS',
-  payload: descriptor,
+  payload: id,
 });
 
 export type CompleteLiftAction = {|
   type: 'COMPLETE_LIFT',
   payload: {|
-    descriptor: DraggableDescriptor,
+    id: DraggableId,
     client: InitialDragPositions,
     windowScroll: Position,
     isScrollAllowed: boolean,
   |}
 |}
 
-export const completeLift = (descriptor: DraggableDescriptor,
+export const completeLift = (
+  id: DraggableId,
   client: InitialDragPositions,
   windowScroll: Position,
   isScrollAllowed: boolean,
 ): CompleteLiftAction => ({
   type: 'COMPLETE_LIFT',
   payload: {
-    descriptor,
+    id,
     client,
     windowScroll,
     isScrollAllowed,
@@ -435,7 +436,7 @@ export type LiftAction = {|
   |}
 |}
 
-export const lift = (descriptor: DraggableDescriptor,
+export const lift = (id: DraggableId,
   client: InitialDragPositions,
   windowScroll: Position,
   isScrollAllowed: boolean,
@@ -448,15 +449,21 @@ export const lift = (descriptor: DraggableDescriptor,
       console.error('cannot flush drop animation if there is no pending');
       dispatch(clean());
     } else {
+      console.group('FLUSHING DROP');
       dispatch(completeDrop(initial.drop.pending.result));
+      console.groupEnd();
     }
   }
+
+  // TODO: the original descriptor will actually be incorrect if the flush changes anything
 
   // https://github.com/chenglou/react-motion/issues/437
   // need to allow a flush of react-motion
   dispatch(prepare());
 
+  console.info('waiting for timeout');
   setTimeout(() => {
+    console.info('timeout finishied');
     // Phase 2: collect initial dimensions
     const state: State = getState();
 
@@ -467,7 +474,7 @@ export const lift = (descriptor: DraggableDescriptor,
 
     // will communicate with the marshal to start requesting dimensions
     console.time('lifting');
-    dispatch(requestDimensions(descriptor));
+    dispatch(requestDimensions(id));
 
     // Need to allow an opportunity for the dimensions to be requested.
     setTimeout(() => {
@@ -479,7 +486,7 @@ export const lift = (descriptor: DraggableDescriptor,
         return;
       }
 
-      dispatch(completeLift(descriptor, client, windowScroll, isScrollAllowed));
+      dispatch(completeLift(id, client, windowScroll, isScrollAllowed));
       console.timeEnd('lifting');
     });
   });

@@ -27,7 +27,7 @@ type State = {|
   droppables: DroppableEntryMap,
   draggables: DraggableEntryMap,
   isCollecting: boolean,
-  request: ?DraggableDescriptor,
+  request: ?DraggableId,
   frameId: ?number,
 |}
 
@@ -150,7 +150,7 @@ export default (callbacks: Callbacks) => {
       draggables: newMap,
     });
 
-    if (!state.collection) {
+    if (!state.isCollecting) {
       return;
     }
 
@@ -186,13 +186,14 @@ export default (callbacks: Callbacks) => {
   const getToBeCollected = (): UnknownDescriptorType[] => {
     const draggables: DraggableEntryMap = state.draggables;
     const droppables: DroppableEntryMap = state.droppables;
-    const descriptor: ?DraggableDescriptor = state.request;
+    const request: ?DraggableId = state.request;
 
-    if (!descriptor) {
+    if (!request) {
       console.error('cannot find request in state');
       return [];
     }
 
+    const descriptor: DraggableDescriptor = draggables[request].descriptor;
     const home: DroppableDescriptor = droppables[descriptor.droppableId].descriptor;
 
     const draggablesToBeCollected: DraggableDescriptor[] =
@@ -233,31 +234,35 @@ export default (callbacks: Callbacks) => {
     return toBeCollected;
   };
 
-  const processPrimaryDimensions = (descriptor: DraggableDescriptor) => {
+  const processPrimaryDimensions = (request: ?DraggableId) => {
     if (state.isCollecting) {
       cancel('Cannot start capturing dimensions for a drag it is already dragging');
       return;
     }
 
+    if (!request) {
+      cancel('Cannot start capturing dimensions with an invalid request', request);
+      return;
+    }
+
     setState({
       isCollecting: true,
-      request: descriptor,
+      request,
     });
 
     const draggables: DraggableEntryMap = state.draggables;
     const droppables: DroppableEntryMap = state.droppables;
-
-    const draggableEntry: ?DraggableEntry = draggables[descriptor.id];
+    const draggableEntry: ?DraggableEntry = draggables[request];
 
     if (!draggableEntry) {
-      cancel(`Cannot find Draggable with id ${descriptor.id} to start collecting dimensions`);
+      cancel(`Cannot find Draggable with id ${request} to start collecting dimensions`);
       return;
     }
 
     const homeEntry: ?DroppableEntry = droppables[draggableEntry.descriptor.droppableId];
 
     if (!homeEntry) {
-      cancel(`Cannot find home Droppable [id:${draggableEntry.descriptor.droppableId}] for Draggable [id:${descriptor.id}]`);
+      cancel(`Cannot find home Droppable [id:${draggableEntry.descriptor.droppableId}] for Draggable [id:${request}]`);
       return;
     }
 
@@ -352,14 +357,7 @@ export default (callbacks: Callbacks) => {
     const phase: Phase = current.phase;
 
     if (phase === 'COLLECTING_INITIAL_DIMENSIONS') {
-      const descriptor: ?DraggableDescriptor = current.dimension.request;
-
-      if (!descriptor) {
-        cancel('could not find requested draggable id in state');
-        return;
-      }
-
-      processPrimaryDimensions(descriptor);
+      processPrimaryDimensions(current.dimension.request);
       return;
     }
 

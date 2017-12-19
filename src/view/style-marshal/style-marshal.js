@@ -4,6 +4,7 @@ import type { StyleMarshal } from './style-marshal-types';
 import canStartDrag from '../../state/can-start-drag';
 import type {
   State as AppState,
+  Phase,
 } from '../../types';
 
 let count: number = 0;
@@ -123,8 +124,9 @@ export default () => {
     if (state.applied === apply) {
       return;
     }
+    console.warn('setting style:', apply);
     setState({
-      apply,
+      applied: apply,
     });
 
     // This technique works with ie11+ so no need for a nasty fallback as seen here:
@@ -136,16 +138,29 @@ export default () => {
   setStyle('BASE');
 
   const onPhaseChange = (current: AppState) => {
+    // TODO: better styles for pre drag phases?
+
     if (!state.isMounted) {
       console.error('cannot update styles when not mounted');
       return;
     }
 
-    if (canStartDrag(current)) {
-      setStyle('BASE');
+    const phase: Phase = current.phase;
+
+    if (phase === 'DRAGGING') {
+      setStyle('DRAG');
       return;
     }
-    setStyle('DRAG');
+
+    // if (phase === 'DROP_ANIMATING') {
+    //   // if (current.drop.pending.trigger === 'CANCEL') {
+    //     // using dragging styles
+    //   setStyle('BASE');
+    //   return;
+    //   // }
+    // }
+
+    setStyle('BASE');
   };
 
   const unmount = (): void => {
