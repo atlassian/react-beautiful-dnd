@@ -429,13 +429,14 @@ export type LiftAction = {|
   type: 'LIFT',
   payload: {|
     id: DraggableId,
-    type: TypeId,
     client: InitialDragPositions,
     windowScroll: Position,
     isScrollAllowed: boolean,
   |}
 |}
 
+// lifting with DraggableId rather than descriptor
+// as the descriptor might change after a drop is flushed
 export const lift = (id: DraggableId,
   client: InitialDragPositions,
   windowScroll: Position,
@@ -444,18 +445,16 @@ export const lift = (id: DraggableId,
   // Phase 1: Quickly finish any current drop animations
   const initial: State = getState();
 
+  // flush dropping animation if needed
+  // this can change the descriptor of the dragging item
   if (initial.phase === 'DROP_ANIMATING') {
     if (!initial.drop || !initial.drop.pending) {
       console.error('cannot flush drop animation if there is no pending');
       dispatch(clean());
     } else {
-      console.group('FLUSHING DROP');
       dispatch(completeDrop(initial.drop.pending.result));
-      console.groupEnd();
     }
   }
-
-  // TODO: the original descriptor will actually be incorrect if the flush changes anything
 
   // https://github.com/chenglou/react-motion/issues/437
   // need to allow a flush of react-motion
