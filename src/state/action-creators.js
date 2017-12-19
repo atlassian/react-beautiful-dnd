@@ -3,7 +3,6 @@ import type {
   DraggableId,
   DroppableId,
   DropResult,
-  TypeId,
   DragImpact,
   DraggableDimension,
   DroppableDimension,
@@ -452,6 +451,7 @@ export const lift = (id: DraggableId,
       console.error('cannot flush drop animation if there is no pending');
       dispatch(clean());
     } else {
+      // this can cause descriptor updates in the dimension marshal
       dispatch(completeDrop(initial.drop.pending.result));
     }
   }
@@ -460,9 +460,7 @@ export const lift = (id: DraggableId,
   // need to allow a flush of react-motion
   dispatch(prepare());
 
-  console.info('waiting for timeout');
   setTimeout(() => {
-    console.info('timeout finishied');
     // Phase 2: collect initial dimensions
     const state: State = getState();
 

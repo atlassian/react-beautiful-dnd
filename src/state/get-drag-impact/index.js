@@ -20,7 +20,7 @@ type Args = {|
   // all dimensions in system
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
-  previousImpact: ?DragImpact,
+  previousImpact: DragImpact,
 |}
 
 export default ({
@@ -31,7 +31,6 @@ export default ({
   previousImpact,
 }: Args): DragImpact => {
   const previousDroppableOverId: ?DroppableId =
-    previousImpact &&
     previousImpact.destination &&
     previousImpact.destination.droppableId;
 

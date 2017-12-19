@@ -24,7 +24,7 @@ import type {
   InitialDragPositions,
 } from '../types';
 import { add, subtract } from './position';
-import noImpact, { noMovement } from './no-impact';
+import { noMovement } from './no-impact';
 import getDragImpact from './get-drag-impact/';
 import moveToNextIndex from './move-to-next-index/';
 import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
@@ -71,13 +71,15 @@ const move = ({
     return clean();
   }
 
-  if (state.drag == null) {
+  const last: ?DragState = state.drag;
+
+  if (last == null) {
     console.error('cannot move if there is no drag information');
     return clean();
   }
 
-  const previous: CurrentDrag = state.drag.current;
-  const initial: InitialDrag = state.drag.initial;
+  const previous: CurrentDrag = last.current;
+  const initial: InitialDrag = last.initial;
   const currentWindowScroll: Position = windowScroll || previous.windowScroll;
 
   const client: CurrentDragPositions = (() => {
@@ -104,19 +106,12 @@ const move = ({
     windowScroll: currentWindowScroll,
   };
 
-  const previousImpact: ?DragImpact = (() => {
-    if (state.drag && state.drag.impact) {
-      return state.drag.impact;
-    }
-    return null;
-  })();
-
   const newImpact: DragImpact = (impact || getDragImpact({
     pageCenter: page.center,
     draggable: state.dimension.draggable[initial.descriptor.id],
     draggables: state.dimension.draggable,
     droppables: state.dimension.droppable,
-    previousImpact,
+    previousImpact: last.impact,
   }));
 
   const drag: DragState = {
@@ -253,8 +248,14 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       center: add(client.center, windowScroll),
     };
 
-    // TODO: catch exception?
-    const descriptor: DraggableDescriptor = state.dimension.draggable[id].descriptor;
+    const draggable: ?DraggableDimension = state.dimension.draggable[id];
+
+    if (!draggable) {
+      console.error('could not find draggable in store after lift');
+      return clean();
+    }
+
+    const descriptor: DraggableDescriptor = draggable.descriptor;
 
     const initial: InitialDrag = {
       descriptor,

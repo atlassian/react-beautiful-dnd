@@ -83,7 +83,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inhome1',
       droppableId: home.descriptor.id,
-      index: 1,
+      index: 0,
     },
     margin,
     windowScroll,
@@ -100,7 +100,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inhome2',
       droppableId: home.descriptor.id,
-      index: 2,
+      index: 1,
     },
     // pushed forward by margin of inHome1
     margin,
@@ -117,7 +117,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inhome3',
       droppableId: home.descriptor.id,
-      index: 3,
+      index: 2,
     },
     margin,
     windowScroll,
@@ -134,7 +134,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inhome4',
       droppableId: home.descriptor.id,
-      index: 4,
+      index: 3,
     },
     // pushed forward by margin of inHome3
     margin,
@@ -152,7 +152,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inForeign1',
       droppableId: foreign.descriptor.id,
-      index: 1,
+      index: 0,
     },
     margin,
     windowScroll,
@@ -168,7 +168,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inForeign2',
       droppableId: foreign.descriptor.id,
-      index: 2,
+      index: 1,
     },
     // pushed forward by margin of inForeign1
     margin,
@@ -185,7 +185,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inForeign3',
       droppableId: foreign.descriptor.id,
-      index: 3,
+      index: 2,
     },
     margin,
     windowScroll,
@@ -202,7 +202,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inForeign4',
       droppableId: foreign.descriptor.id,
-      index: 4,
+      index: 3,
     },
     margin,
     windowScroll,
@@ -256,6 +256,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     draggables,
     inHomeList,
     inForeignList,
+    windowScroll,
   };
 };
 

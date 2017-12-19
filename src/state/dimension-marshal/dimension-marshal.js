@@ -317,8 +317,13 @@ export default (callbacks: Callbacks) => {
           }, { draggables: [], droppables: [] }
         );
 
-        callbacks.publishDroppables(toBePublished.droppables);
-        callbacks.publishDraggables(toBePublished.draggables);
+        // TODO: add test for this
+        if (toBePublished.droppables.length) {
+          callbacks.publishDroppables(toBePublished.droppables);
+        }
+        if (toBePublished.draggables.length) {
+          callbacks.publishDraggables(toBePublished.draggables);
+        }
 
         // need to watch the scroll on each droppable
         toBePublished.droppables.forEach((dimension: DroppableDimension) => {
