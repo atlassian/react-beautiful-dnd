@@ -1,7 +1,7 @@
 // @flow
-import isWithin from '../is-within';
+import isPartiallyWithin from './is-partially-within';
 import { subtract } from '../position';
-import { offset, getSpacingFrom } from '../spacing';
+import { offset } from '../spacing';
 import type {
   Spacing,
   Position,
@@ -10,34 +10,35 @@ import type {
   DroppableDimension,
 } from '../../types';
 
-type IsSpacingPartiallyVisibleArgs = {|
-  spacing: Spacing,
+type IsPartiallyVisibleArgs = {|
+  target: Spacing | ClientRect,
   droppable: DroppableDimension,
   viewport: ClientRect,
 |}
 
-export const isSpacingPartiallyVisible = ({
-  spacing,
+export const isPartiallyVisible = ({
+  target,
   droppable,
   viewport,
-}: IsSpacingPartiallyVisibleArgs): boolean => {
-  // Need to account for change in droppable scroll position
+}: IsPartiallyVisibleArgs): boolean => {
   const droppableScrollDiff: Position = subtract(
     droppable.container.scroll.initial,
     droppable.container.scroll.current,
   );
+  const withScroll: Spacing = offset(target, droppableScrollDiff);
 
-  const isWithinVertical = isWithin(viewport.top, viewport.bottom);
-  const isWithinHorizontal = isWithin(viewport.left, viewport.right);
+  const isVisibleWithinDroppable: boolean =
+    isPartiallyWithin(droppable.container.bounds)(withScroll);
 
-  const withDroppableScroll: Spacing = offset(spacing, droppableScrollDiff);
+  // exit early
+  if (!isVisibleWithinDroppable) {
+    return false;
+  }
 
-  const isPartiallyVisibleVertically: boolean =
-    isWithinVertical(withDroppableScroll.top) || isWithinVertical(withDroppableScroll.bottom);
-  const isPartiallyVisibleHorizontally: boolean =
-    isWithinHorizontal(withDroppableScroll.left) || isWithinHorizontal(withDroppableScroll.right);
+  const isVisibleWithinViewport: boolean =
+    isPartiallyWithin(viewport)(withScroll);
 
-  return isPartiallyVisibleVertically && isPartiallyVisibleHorizontally;
+  return isVisibleWithinViewport;
 };
 
 type IsDraggableVisibleArgs = {|
@@ -50,8 +51,8 @@ export const isDraggablePartiallyVisible = ({
   draggable,
   droppable,
   viewport,
-}: IsDraggableVisibleArgs): boolean => isSpacingPartiallyVisible({
-  spacing: getSpacingFrom(draggable.page.withMargin),
+}: IsDraggableVisibleArgs): boolean => isPartiallyVisible({
+  target: draggable.page.withMargin,
   droppable,
   viewport,
 });
