@@ -208,7 +208,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       left: parseInt(style.paddingLeft, 10),
     };
 
-    const client: ClientRect = (targetRef.getBoundingClientRect(): any);
+    const client: ClientRect = getClientRect(targetRef.getBoundingClientRect());
 
     // The droppable's own bounds should be treated as the
     // container bounds in the following situations:

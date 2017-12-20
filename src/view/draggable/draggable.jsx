@@ -7,7 +7,6 @@ import type {
   Position,
   DraggableDimension,
   InitialDragPositions,
-  DraggableDescriptor,
   DroppableId,
 } from '../../types';
 import DraggableDimensionPublisher from '../draggable-dimension-publisher/';

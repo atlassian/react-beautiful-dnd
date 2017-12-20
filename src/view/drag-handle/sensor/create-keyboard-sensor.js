@@ -6,7 +6,6 @@ import blockStandardKeyEvents from '../util/block-standard-key-events';
 import * as keyCodes from '../../key-codes';
 import getWindowFromRef from '../../get-window-from-ref';
 import getCenterPosition from '../../get-center-position';
-import shouldAllowDraggingFromTarget from '../util/should-allow-dragging-from-target';
 import type { Position } from '../../../types';
 import type { KeyboardSensor, CreateSensorArgs } from './sensor-types';
 import type {
