@@ -38,6 +38,7 @@ export type ClientRect = {|
   left: number,
   width: number,
   height: number,
+  center: Position,
 |}
 
 export type Direction = 'horizontal' | 'vertical';
@@ -68,11 +69,6 @@ export type HorizontalAxis = {|
 
 export type Axis = VerticalAxis | HorizontalAxis
 
-export type DimensionFragment = {|
-  ...ClientRect,
-  center: Position,
-|}
-
 export type Placeholder = {|
   // We apply the margin separately to maintain margin collapsing
   // behavior of the original element
@@ -89,13 +85,13 @@ export type DraggableDimension = {|
   placeholder: Placeholder,
   // relative to the viewport when the drag started
   client: {|
-    withMargin: DimensionFragment,
-    withoutMargin: DimensionFragment,
+    withMargin: ClientRect,
+    withoutMargin: ClientRect,
   |},
   // relative to the whole page
   page: {|
-    withMargin: DimensionFragment,
-    withoutMargin: DimensionFragment,
+    withMargin: ClientRect,
+    withoutMargin: ClientRect,
   |},
 |}
 
@@ -110,10 +106,10 @@ export type DroppableDimensionViewport = {|
     diff: Position,
   |},
   // the fragment to be clipped by the frame
-  subject: DimensionFragment,
+  subject: ClientRect,
   // this the dimension of the droppable (page.withMargin) through
   // the viewport of the frame.
-  clipped: DimensionFragment,
+  clipped: ClientRect,
 |}
 
 export type DroppableDimension = {|
@@ -122,17 +118,17 @@ export type DroppableDimension = {|
   isEnabled: boolean,
   // relative to the current viewport
   client: {|
-    withMargin: DimensionFragment,
-    withoutMargin: DimensionFragment,
+    withMargin: ClientRect,
+    withoutMargin: ClientRect,
     // the area in which content presses up against
-    withMarginAndPadding: DimensionFragment,
+    withMarginAndPadding: ClientRect,
   |},
   // relative to the whole page
   page: {|
-    withMargin: DimensionFragment,
-    withoutMargin: DimensionFragment,
+    withMargin: ClientRect,
+    withoutMargin: ClientRect,
     // the area in which content presses up against
-    withMarginAndPadding: DimensionFragment,
+    withMarginAndPadding: ClientRect,
   |},
   // The container of the droppable
   viewport: DroppableDimensionViewport,

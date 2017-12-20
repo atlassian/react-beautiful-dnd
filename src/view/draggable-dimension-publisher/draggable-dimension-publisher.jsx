@@ -2,7 +2,6 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import PropTypes from 'prop-types';
-import invariant from 'invariant';
 import memoizeOne from 'memoize-one';
 import getWindowScrollPosition from '../get-window-scroll-position';
 import { getDraggableDimension } from '../../state/dimension';

@@ -1,13 +1,11 @@
 // @flow
 import memoizeOne from 'memoize-one';
-import { getFragment } from './dimension';
 import getClientRect from './get-client-rect';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
 import { isPositionPartiallyWithin } from './visibility/is-partially-within';
 import { patch } from './position';
 import { addPosition } from './spacing';
 import type {
-  DimensionFragment,
   DraggableDimension,
   DraggableDimensionMap,
   DroppableDimension,
@@ -135,9 +133,8 @@ type GetBufferedDroppableArgs = {
 };
 
 const getWithGrowth = memoizeOne(
-  (fragment: DimensionFragment, growth: Position): DimensionFragment =>
-    getFragment(getClientRect(addPosition(fragment, growth))
-    )
+  (fragment: ClientRect, growth: Position): ClientRect =>
+    getClientRect(addPosition(fragment, growth))
 );
 
 const getClippedAreaWithPlaceholder = ({
@@ -145,16 +142,16 @@ const getClippedAreaWithPlaceholder = ({
   draggables,
   droppable,
   previousDroppableOverId,
-}: GetBufferedDroppableArgs): DimensionFragment => {
+}: GetBufferedDroppableArgs): ClientRect => {
   const isHomeDroppable: boolean = draggable.descriptor.droppableId === droppable.descriptor.id;
   const isOverDroppable: boolean = Boolean(
     previousDroppableOverId &&
     previousDroppableOverId === droppable.descriptor.id
   );
 
-  const subject: DimensionFragment = droppable.viewport.subject;
+  const subject: ClientRect = droppable.viewport.subject;
   const frame: ClientRect = droppable.viewport.frame;
-  const clipped: DimensionFragment = droppable.viewport.clipped;
+  const clipped: ClientRect = droppable.viewport.clipped;
 
   // We only include the placeholder size if it's a
   // foreign list and is currently being hovered over
@@ -204,7 +201,7 @@ export default ({
       .map((id: DroppableId): DroppableDimension => droppables[id])
       .find((droppable: DroppableDimension): boolean => {
         // Add the size of a placeholder to a droppable's dimensions (if necessary)
-        const clipped: DimensionFragment = getClippedAreaWithPlaceholder({
+        const clipped: ClientRect = getClippedAreaWithPlaceholder({
           draggable, draggables, droppable, previousDroppableOverId,
         });
 

@@ -4,7 +4,6 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DragImpact,
-  DimensionFragment,
   Axis,
   Position,
   Displacement,
@@ -52,7 +51,7 @@ export default ({
         return false;
       }
 
-      const fragment: DimensionFragment = child.page.withoutMargin;
+      const fragment: ClientRect = child.page.withoutMargin;
 
       if (isBeyondStartPosition) {
         // 1. item needs to start ahead of the moving item

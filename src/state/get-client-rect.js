@@ -16,6 +16,10 @@ const getClientRect = ({ top, right, bottom, left }: ShouldBeSpacing): ClientRec
   left,
   width: (right - left),
   height: (bottom - top),
+  center: {
+    x: (right + left) / 2,
+    y: (bottom + top) / 2,
+  },
 });
 
 export default getClientRect;

@@ -3,7 +3,6 @@ import type {
   Position,
   Spacing,
   ClientRect,
-  DimensionFragment,
 } from '../types';
 
 export const add = (spacing1: Spacing, spacing2: Spacing): Spacing => ({
@@ -40,7 +39,8 @@ export const getCorners = (spacing: Spacing): Position[] => [
   { x: spacing.right, y: spacing.bottom },
 ];
 
-export const getSpacingFrom = (target: ClientRect | DimensionFragment): Spacing => ({
+// TODO: should not be required as anything that works with spacing should work with a client rect
+export const getSpacingFrom = (target: ClientRect): Spacing => ({
   top: target.top,
   right: target.right,
   bottom: target.bottom,

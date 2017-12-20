@@ -1,5 +1,6 @@
 // @flow
 import type { ClientRect } from '../../types';
+import getClientRect from '../get-client-rect';
 
 export default (): ClientRect => {
   // would use window.scrollY and window.scrollX but it is not supported in ie11
@@ -12,8 +13,7 @@ export default (): ClientRect => {
   const right: number = left + width;
   const bottom: number = top + height;
 
-  const rect: ClientRect = {
-    top, right, bottom, left, width, height,
-  };
-  return rect;
+  return getClientRect({
+    top, left, right, bottom,
+  });
 };

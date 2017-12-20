@@ -1,12 +1,12 @@
 // @flow
 import type {
   Axis,
-  DimensionFragment,
   DraggableDimension,
   DraggableDimensionMap,
   DragMovement,
   DroppableDimension,
   Position,
+  ClientRect,
 } from '../types';
 import moveToEdge from './move-to-edge';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
@@ -51,7 +51,7 @@ export default ({
   );
 
   // Find the dimension we need to compare the dragged item with
-  const destinationFragment: DimensionFragment = (() => {
+  const destinationFragment: ClientRect = (() => {
     if (isWithinHomeDroppable) {
       return draggables[displaced[0].draggableId].client.withMargin;
     }
@@ -98,7 +98,7 @@ export default ({
     return { sourceEdge: 'start', destinationEdge: 'start' };
   })();
 
-  const source: DimensionFragment = draggable.client.withMargin;
+  const source: ClientRect = draggable.client.withMargin;
 
   // This is the draggable's new home
   const targetCenter: Position = moveToEdge({

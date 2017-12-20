@@ -322,7 +322,7 @@ describe('dimension', () => {
       });
     });
 
-    describe.only('viewport', () => {
+    describe('viewport', () => {
       it('should use the client rect as the frame if no frame is provided', () => {
         const droppable: DroppableDimension = getDroppableDimension({
           descriptor: droppableDescriptor,
