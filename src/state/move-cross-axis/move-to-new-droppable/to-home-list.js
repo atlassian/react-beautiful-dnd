@@ -1,6 +1,6 @@
 // @flow
 import moveToEdge from '../../move-to-edge';
-import getVisibleViewport from '../../get-visible-viewport';
+import getViewport from '../../visibility/get-viewport';
 import getDisplacement from '../../get-displacement';
 import type { Edge } from '../../move-to-edge';
 import type { Result } from '../move-cross-axis-types';
@@ -105,7 +105,7 @@ export default ({
     return insideDroppable.slice(from, to).reverse();
   })();
 
-  const viewport: ClientRect = getVisibleViewport();
+  const viewport: ClientRect = getViewport();
   const displaced: Displacement[] = modified
     .map((dimension: DraggableDimension): Displacement => getDisplacement({
       draggable: dimension,

@@ -1,10 +1,10 @@
 // @flow
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { isPointWithinDroppable } from '../is-within-visible-bounds-of-droppable';
+import { isPositionVisible } from '../visibility/is-partially-visible';
 import { patch } from '../position';
 import moveToEdge from '../move-to-edge';
 import getDisplacement from '../get-displacement';
-import getVisibleViewport from '../get-visible-viewport';
+import getViewport from '../visibility/get-viewport';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import type {
@@ -72,6 +72,7 @@ export default ({
     return 'start';
   })();
 
+  const viewport: ClientRect = getViewport();
   const newCenter: Position = moveToEdge({
     source: draggable.page.withoutMargin,
     sourceEdge,
@@ -87,8 +88,11 @@ export default ({
       return true;
     }
 
-    // TODO: use new visibility logic
-    return isPointWithinDroppable(droppable)(newCenter);
+    return isPositionVisible({
+      droppable,
+      point: newCenter,
+      viewport,
+    });
   })();
 
   if (!isVisible) {
@@ -111,7 +115,6 @@ export default ({
     [movingRelativeToDisplacement, ...previousImpact.movement.displaced]);
 
   // update displacement to consider viewport and droppable visibility
-  const viewport: ClientRect = getVisibleViewport();
   const displaced: Displacement[] = modified
     .map((displacement: Displacement): Displacement => {
     // already processed

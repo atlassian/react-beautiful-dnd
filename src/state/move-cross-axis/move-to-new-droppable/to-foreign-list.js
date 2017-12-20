@@ -2,7 +2,7 @@
 import moveToEdge from '../../move-to-edge';
 import type { Result } from '../move-cross-axis-types';
 import getDisplacement from '../../get-displacement';
-import getVisibleViewport from '../../get-visible-viewport';
+import getViewport from '../../visibility/get-viewport';
 import type {
   Axis,
   Position,
@@ -92,7 +92,7 @@ export default ({
   // if going before: move everything down including the target
   // if going after: move everything down excluding the target
 
-  const viewport: ClientRect = getVisibleViewport();
+  const viewport: ClientRect = getViewport();
   const displaced: Displacement[] = insideDroppable
     .slice(proposedIndex, insideDroppable.length)
     .map((dimension: DraggableDimension): Displacement => getDisplacement({
