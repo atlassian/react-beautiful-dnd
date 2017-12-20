@@ -30,10 +30,7 @@ export default ({
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
   const viewport: ClientRect = getViewport();
-  const destinationScrollDiff: Position = subtract(
-    destination.container.scroll.current, destination.container.scroll.initial
-  );
-
+  const destinationScrollDiff: Position = destination.viewport.frameScroll.diff;
   const currentCenter: Position = add(pageCenter, destinationScrollDiff);
 
   const displaced: Displacement[] = insideDestination

@@ -1,38 +1,15 @@
 // @flow
-import isWithin from '../is-within';
+import { isSpacingPartiallyWithin, isPositionPartiallyWithin } from './is-partially-within';
 import type {
-  Position,
   DroppableDimension,
-  DimensionFragment,
   DraggableDimension,
-  Spacing,
 } from '../../types';
 
-export const isPositionVisible = (droppable: DroppableDimension) => {
-  const clipped: DimensionFragment = droppable.viewport.clipped;
+export const isPositionVisible = (droppable: DroppableDimension) =>
+  isPositionPartiallyWithin(droppable.viewport.clipped);
 
-  const isWithinHorizontal = isWithin(clipped.left, clipped.right);
-  const isWithinVertical = isWithin(clipped.top, clipped.bottom);
-
-  return (point: Position): boolean => (
-    isWithinHorizontal(point.x) &&
-    isWithinVertical(point.y)
-  );
-};
-
-export const isSpacingVisible = (droppable: DroppableDimension) => {
-  const clipped: DimensionFragment = droppable.viewport.clipped;
-
-  const isWithinHorizontal = isWithin(clipped.left, clipped.right);
-  const isWithinVertical = isWithin(clipped.top, clipped.bottom);
-
-  return (spacing: Spacing): boolean => (
-    isWithinHorizontal(spacing.left) &&
-    isWithinHorizontal(spacing.right) &&
-    isWithinVertical(spacing.top) &&
-    isWithinVertical(spacing.bottom)
-  );
-};
+export const isSpacingVisible = (droppable: DroppableDimension) =>
+  isSpacingPartiallyWithin(droppable.viewport.clipped);
 
 export const isDraggableVisible = (droppable: DroppableDimension) => {
   const isVisibleInClipped = isSpacingVisible(droppable);

@@ -10,7 +10,7 @@ import type {
   Displacement,
   ClientRect,
 } from '../../types';
-import { add, subtract, patch } from '../position';
+import { add, patch } from '../position';
 import getDisplacement from '../get-displacement';
 import getViewport from '../visibility/get-viewport';
 

@@ -137,16 +137,15 @@ export default ({
   const maybe: ?DroppableDimension =
     Object.keys(droppables)
       .map((id: DroppableId): DroppableDimension => droppables[id])
-      .find((droppable: DroppableDimension): boolean => {
+      .find((droppable: DroppableDimension): boolean =>
         // Add the size of a placeholder to a droppable's dimensions (if necessary)
-        const droppableWithPlaceholder: DroppableDimension = bufferDroppable({
-          draggable, draggables, droppable, previousDroppableOverId,
-        });
+        // const droppableWithPlaceholder: DroppableDimension = bufferDroppable({
+        //   draggable, draggables, droppable, previousDroppableOverId,
+        // });
 
         // TODO: do with placeholder
-
-        return isPositionVisible(droppable)(target);
-      });
+        isPositionVisible(droppable)(target)
+      );
 
   return maybe ? maybe.descriptor.id : null;
 };
