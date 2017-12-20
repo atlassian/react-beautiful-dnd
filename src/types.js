@@ -99,6 +99,23 @@ export type DraggableDimension = {|
   |},
 |}
 
+export type DroppableDimensionViewport = {|
+  // This is the window through which the droppable is observed
+  // It does not change during a drag
+  frame: ClientRect,
+  // keeping track of the scroll
+  frameScroll: {|
+    initial: Position,
+    current: Position,
+    diff: Position,
+  |},
+  // the fragment to be clipped by the frame
+  subject: DimensionFragment,
+  // this the dimension of the droppable (page.withMargin) through
+  // the viewport of the frame.
+  clipped: DimensionFragment,
+|}
+
 export type DroppableDimension = {|
   descriptor: DroppableDescriptor,
   axis: Axis,
@@ -117,17 +134,8 @@ export type DroppableDimension = {|
     // the area in which content presses up against
     withMarginAndPadding: DimensionFragment,
   |},
-  // Some droppables will have a scroll container - either themselves or a parent element.
-  // We need to take into account the dimensions and scroll of this container when calculating
-  // the true visible area of the droppable. If the droppable doesn't have scrolling then
-  // the dimension of the container will be the same as the dimensions of the droppable itself.
-  container: {|
-    scroll: {|
-      initial: Position,
-      current: Position,
-    |},
-    bounds: DimensionFragment,
-  |},
+  // The container of the droppable
+  viewport: DroppableDimensionViewport,
 |}
 export type DraggableLocation = {|
   droppableId: DroppableId,

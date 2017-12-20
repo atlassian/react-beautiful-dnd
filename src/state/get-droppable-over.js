@@ -3,7 +3,7 @@ import memoizeOne from 'memoize-one';
 import { getFragment } from './dimension';
 import getClientRect from './get-client-rect';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
-import { isPointWithinDroppable } from './is-within-visible-bounds-of-droppable';
+import { isPositionVisible } from './visibility/is-within-visible-bounds-of-droppable';
 import { patch } from './position';
 import { addPosition } from './spacing';
 import type {
@@ -139,11 +139,13 @@ export default ({
       .map((id: DroppableId): DroppableDimension => droppables[id])
       .find((droppable: DroppableDimension): boolean => {
         // Add the size of a placeholder to a droppable's dimensions (if necessary)
-        const bufferedDroppable = bufferDroppable({
+        const droppableWithPlaceholder: DroppableDimension = bufferDroppable({
           draggable, draggables, droppable, previousDroppableOverId,
         });
 
-        return isPointWithinDroppable(bufferedDroppable)(target);
+        // TODO: do with placeholder
+
+        return isPositionVisible(droppable)(target);
       });
 
   return maybe ? maybe.descriptor.id : null;

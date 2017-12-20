@@ -34,9 +34,7 @@ export default ({
 }: Args): DragImpact => {
   const viewport: ClientRect = getViewport();
   const axis: Axis = home.axis;
-  const homeScrollDiff: Position = subtract(
-    home.container.scroll.current, home.container.scroll.initial
-  );
+  const homeScrollDiff: Position = home.viewport.frameScroll.diff;
   // Where the element actually is now
   const currentCenter: Position = add(pageCenter, homeScrollDiff);
   // The starting center position

@@ -190,7 +190,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
 
     // side effect - grabbing it for scroll listening so we know it is the same node
     this.closestScrollable = getClosestScrollable(targetRef);
-    const scroll: Position = this.getScrollOffset();
+    const frameScroll: Position = this.getScrollOffset();
     const style: Object = window.getComputedStyle(targetRef);
 
     // keeping it simple and always using the margin of the droppable
@@ -208,28 +208,36 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       left: parseInt(style.paddingLeft, 10),
     };
 
-    const clientRect: ClientRect = (targetRef.getBoundingClientRect(): any);
+    const client: ClientRect = (targetRef.getBoundingClientRect(): any);
 
     // The droppable's own bounds should be treated as the
     // container bounds in the following situations:
     // 1. The consumer has opted in to ignoring container clipping
     // 2. There is no scroll container
     // 3. The droppable has internal scrolling
-    const containerRect: ClientRect =
-      ignoreContainerClipping ||
-      !this.closestScrollable ||
-      this.closestScrollable === targetRef ?
-        clientRect : getClientRect(this.closestScrollable.getBoundingClientRect());
+
+    const frameClient: ClientRect = (() => {
+      if (ignoreContainerClipping) {
+        return client;
+      }
+      if (!this.closestScrollable) {
+        return client;
+      }
+      if (this.closestScrollable === targetRef) {
+        return client;
+      }
+      return getClientRect(this.closestScrollable.getBoundingClientRect());
+    })();
 
     const dimension: DroppableDimension = getDroppableDimension({
       descriptor,
       direction,
-      clientRect,
-      containerRect,
+      client,
+      frameClient,
+      frameScroll,
       margin,
       padding,
       windowScroll: getWindowScrollPosition(),
-      scroll,
       isEnabled: !isDropDisabled,
     });
 

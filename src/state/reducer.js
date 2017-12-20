@@ -30,6 +30,7 @@ import moveToNextIndex from './move-to-next-index/';
 import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
 import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';
 import moveCrossAxis from './move-cross-axis/';
+import { scrollDroppable } from './dimension';
 
 const noDimensions: DimensionState = {
   request: null,
@@ -340,19 +341,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
-    // TODO: do not break an existing dimension.
-    // Rather, have a different structure to store the scroll
-    // $ExpectError - flow does not like spread
-    const dimension: DroppableDimension = {
-      ...target,
-      container: {
-        ...target.container,
-        scroll: {
-          ...target.container.scroll,
-          current: offset,
-        },
-      },
-    };
+    const dimension: DroppableDimension = scrollDroppable(target, offset);
 
     const newState: State = {
       ...state,

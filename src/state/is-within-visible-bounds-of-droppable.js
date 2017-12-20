@@ -1,7 +1,5 @@
 // @flow
 import isWithin from './is-within';
-import { subtract } from './position';
-import { offset } from './spacing';
 import type {
   Position,
   DraggableDimension,
@@ -9,28 +7,6 @@ import type {
   DimensionFragment,
   Spacing,
 } from '../types';
-
-export const getVisibleBounds = (droppable: DroppableDimension): Spacing => {
-  const { scroll, bounds: containerBounds } = droppable.container;
-
-  // Calculate the mid-drag scroll ∆ of the scroll container
-  const containerScrollDiff: Position = subtract(scroll.initial, scroll.current);
-
-  // Calculate the droppable's bounds, accounting for the container's scroll
-  const droppableBounds: Spacing = offset(droppable.page.withMargin, containerScrollDiff);
-
-  // Clip the droppable's bounds by the scroll container's bounds
-  // This gives us the droppable's true visible area
-  // Note: if the droppable doesn't have a scroll parent droppableBounds === container.page
-  const clippedBounds: Spacing = {
-    top: Math.max(droppableBounds.top, containerBounds.top),
-    right: Math.min(droppableBounds.right, containerBounds.right),
-    bottom: Math.min(droppableBounds.bottom, containerBounds.bottom),
-    left: Math.max(droppableBounds.left, containerBounds.left),
-  };
-
-  return clippedBounds;
-};
 
 const isPointWithin = (bounds: Spacing) => {
   const isWithinHorizontal = isWithin(bounds.left, bounds.right);
@@ -43,7 +19,7 @@ const isPointWithin = (bounds: Spacing) => {
 };
 
 export const isPointWithinDroppable = (droppable: DroppableDimension) => (
-  isPointWithin(getVisibleBounds(droppable))
+  isPointWithin(droppable.viewport.clipped)
 );
 
 export const isDraggableWithin = (bounds: Spacing) => {

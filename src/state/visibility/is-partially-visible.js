@@ -1,5 +1,6 @@
 // @flow
 import isPartiallyWithin from './is-partially-within';
+import { isSpacingVisible } from './is-within-visible-bounds-of-droppable';
 import { subtract } from '../position';
 import { offset } from '../spacing';
 import type {
@@ -16,19 +17,22 @@ type IsPartiallyVisibleArgs = {|
   viewport: ClientRect,
 |}
 
+// TODO: own scroll?
 export const isPartiallyVisible = ({
   target,
   droppable,
   viewport,
 }: IsPartiallyVisibleArgs): boolean => {
-  const droppableScrollDiff: Position = subtract(
-    droppable.container.scroll.initial,
-    droppable.container.scroll.current,
-  );
-  const withScroll: Spacing = offset(target, droppableScrollDiff);
+  // const droppableScrollDiff: Position = subtract(
+  //   droppable.container.scroll.initial,
+  //   droppable.container.scroll.current,
+  // );
+  // const withScroll: Spacing = offset(target, droppableScrollDiff);
+
+  // TODO: scroll diff
 
   const isVisibleWithinDroppable: boolean =
-    isPartiallyWithin(droppable.container.bounds)(withScroll);
+    isSpacingVisible(droppable)(target);
 
   // exit early
   if (!isVisibleWithinDroppable) {
@@ -36,7 +40,7 @@ export const isPartiallyVisible = ({
   }
 
   const isVisibleWithinViewport: boolean =
-    isPartiallyWithin(viewport)(withScroll);
+    isPartiallyWithin(viewport)(target);
 
   return isVisibleWithinViewport;
 };

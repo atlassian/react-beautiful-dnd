@@ -2,31 +2,37 @@
 import {
   getDraggableDimension,
   getDroppableDimension,
+  getFragment,
 } from '../../../src/state/dimension';
 import { vertical, horizontal } from '../../../src/state/axis';
-import getClientRect from '../../../src/state/get-client-rect';
+import getClientRect, { getWithPosition, getWithSpacing } from '../../../src/state/get-client-rect';
 import type {
   ClientRect,
   Spacing,
-  DraggableId,
-  DroppableId,
+  DroppableDescriptor,
+  DraggableDescriptor,
   Position,
   DraggableDimension,
   DroppableDimension,
   DimensionFragment,
 } from '../../../src/types';
 
-const draggableId: DraggableId = 'drag-1';
-const droppableId: DroppableId = 'drop-1';
+const droppableDescriptor: DroppableDescriptor = {
+  id: 'drop-1',
+  type: 'TYPE',
+};
+const draggableDescriptor: DraggableDescriptor = {
+  id: 'drag-1',
+  droppableId: droppableDescriptor.id,
+  index: 0,
+};
 
-const clientRect: ClientRect = {
+const client: ClientRect = getClientRect({
   top: 10,
   right: 110,
   bottom: 90,
   left: 20,
-  width: 90,
-  height: 80,
-};
+});
 const margin: Spacing = {
   top: 1, right: 2, bottom: 3, left: 4,
 };
@@ -37,6 +43,7 @@ const windowScroll: Position = {
   x: 50,
   y: 80,
 };
+const origin: Position = { x: 0, y: 0 };
 
 const getCenter = (rect: ClientRect | Spacing): Position => ({
   x: (rect.left + rect.right) / 2,
@@ -48,7 +55,7 @@ describe('dimension', () => {
     const dimension: DraggableDimension = getDraggableDimension({
       id: draggableId,
       droppableId,
-      clientRect,
+      client,
       margin,
       windowScroll,
     });
@@ -56,15 +63,15 @@ describe('dimension', () => {
     describe('without scroll (client)', () => {
       it('should return a portion that does not account for margins', () => {
         const fragment: DimensionFragment = {
-          top: clientRect.top,
-          right: clientRect.right,
-          bottom: clientRect.bottom,
-          left: clientRect.left,
-          width: clientRect.width,
-          height: clientRect.height,
+          top: client.top,
+          right: client.right,
+          bottom: client.bottom,
+          left: client.left,
+          width: client.width,
+          height: client.height,
           center: {
-            x: (clientRect.left + clientRect.right) / 2,
-            y: (clientRect.top + clientRect.bottom) / 2,
+            x: (client.left + client.right) / 2,
+            y: (client.top + client.bottom) / 2,
           },
         };
         expect(dimension.client.withoutMargin).toEqual(fragment);
@@ -72,10 +79,10 @@ describe('dimension', () => {
 
       it('should return a portion that considers margins', () => {
         const rect: ClientRect = getClientRect({
-          top: clientRect.top - margin.top,
-          right: clientRect.right + margin.right,
-          bottom: clientRect.bottom + margin.bottom,
-          left: clientRect.left - margin.left,
+          top: client.top - margin.top,
+          right: client.right + margin.right,
+          bottom: client.bottom + margin.bottom,
+          left: client.left - margin.left,
         });
 
         const fragment: DimensionFragment = {
@@ -93,18 +100,18 @@ describe('dimension', () => {
 
     describe('with scroll (page)', () => {
       it('should return a portion that does not account for margins', () => {
-        const top: number = clientRect.top + windowScroll.y;
-        const right: number = clientRect.right + windowScroll.x;
-        const bottom: number = clientRect.bottom + windowScroll.y;
-        const left: number = clientRect.left + windowScroll.x;
+        const top: number = client.top + windowScroll.y;
+        const right: number = client.right + windowScroll.x;
+        const bottom: number = client.bottom + windowScroll.y;
+        const left: number = client.left + windowScroll.x;
 
         const fragment: DimensionFragment = {
           top,
           right,
           bottom,
           left,
-          width: clientRect.width,
-          height: clientRect.height,
+          width: client.width,
+          height: client.height,
           center: {
             x: (left + right) / 2,
             y: (top + bottom) / 2,
@@ -115,10 +122,10 @@ describe('dimension', () => {
 
       it('should return a portion that considers margins', () => {
         const rect: ClientRect = getClientRect({
-          top: (clientRect.top - margin.top) + windowScroll.y,
-          right: clientRect.right + margin.right + windowScroll.x,
-          bottom: clientRect.bottom + margin.bottom + windowScroll.y,
-          left: (clientRect.left - margin.left) + windowScroll.x,
+          top: (client.top - margin.top) + windowScroll.y,
+          right: client.right + margin.right + windowScroll.x,
+          bottom: client.bottom + margin.bottom + windowScroll.y,
+          left: (client.left - margin.left) + windowScroll.x,
         });
 
         const fragment: DimensionFragment = {
@@ -136,50 +143,51 @@ describe('dimension', () => {
     });
   });
 
-  describe('droppable dimension', () => {
-    const scroll: Position = {
+  describe.only('droppable dimension', () => {
+    const frameScroll: Position = {
       x: 10,
       y: 20,
     };
 
     const dimension: DroppableDimension = getDroppableDimension({
-      id: droppableId,
-      clientRect,
+      descriptor: droppableDescriptor,
+      client,
       margin,
       padding,
       windowScroll,
-      scroll,
+      frameScroll,
     });
 
     it('should return the initial scroll as the initial and current scroll', () => {
-      expect(dimension.container.scroll).toEqual({
-        initial: scroll,
-        current: scroll,
+      expect(dimension.viewport.frameScroll).toEqual({
+        initial: frameScroll,
+        current: frameScroll,
+        diff: origin,
       });
     });
 
     it('should apply the correct axis', () => {
       const withDefault: DroppableDimension = getDroppableDimension({
-        id: droppableId,
-        clientRect,
+        descriptor: droppableDescriptor,
+        client,
         margin,
         windowScroll,
-        scroll,
+        frameScroll,
       });
       const withVertical: DroppableDimension = getDroppableDimension({
-        id: droppableId,
-        clientRect,
+        descriptor: droppableDescriptor,
+        client,
         margin,
         windowScroll,
-        scroll,
+        frameScroll,
         direction: 'vertical',
       });
       const withHorizontal: DroppableDimension = getDroppableDimension({
-        id: droppableId,
-        clientRect,
+        descriptor: droppableDescriptor,
+        client,
         margin,
         windowScroll,
-        scroll,
+        frameScroll,
         direction: 'horizontal',
       });
 
@@ -194,13 +202,13 @@ describe('dimension', () => {
     describe('without scroll (client)', () => {
       it('should return a portion that does not consider margins', () => {
         const fragment: DimensionFragment = {
-          top: clientRect.top,
-          right: clientRect.right,
-          bottom: clientRect.bottom,
-          left: clientRect.left,
-          width: clientRect.width,
-          height: clientRect.height,
-          center: getCenter(clientRect),
+          top: client.top,
+          right: client.right,
+          bottom: client.bottom,
+          left: client.left,
+          width: client.width,
+          height: client.height,
+          center: getCenter(client),
         };
 
         expect(dimension.client.withoutMargin).toEqual(fragment);
@@ -208,10 +216,10 @@ describe('dimension', () => {
 
       it('should return a portion that does consider margins', () => {
         const rect: ClientRect = getClientRect({
-          top: clientRect.top - margin.top,
-          left: clientRect.left - margin.left,
-          bottom: clientRect.bottom + margin.bottom,
-          right: clientRect.right + margin.right,
+          top: client.top - margin.top,
+          left: client.left - margin.left,
+          bottom: client.bottom + margin.bottom,
+          right: client.right + margin.right,
         });
 
         const fragment: DimensionFragment = {
@@ -229,10 +237,10 @@ describe('dimension', () => {
 
       it('should return a portion that considers margins and padding', () => {
         const rect: ClientRect = getClientRect({
-          top: clientRect.top - margin.top - padding.top,
-          left: clientRect.left - margin.left - padding.left,
-          bottom: clientRect.bottom + margin.bottom + padding.bottom,
-          right: clientRect.right + margin.right + padding.right,
+          top: client.top - margin.top - padding.top,
+          left: client.left - margin.left - padding.left,
+          bottom: client.bottom + margin.bottom + padding.bottom,
+          right: client.right + margin.right + padding.right,
         });
 
         const fragment: DimensionFragment = {
@@ -252,10 +260,10 @@ describe('dimension', () => {
     describe('with scroll (page)', () => {
       it('should return a portion that does not consider margins', () => {
         const rect: ClientRect = getClientRect({
-          top: clientRect.top + windowScroll.y,
-          left: clientRect.left + windowScroll.x,
-          bottom: clientRect.bottom + windowScroll.y,
-          right: clientRect.right + windowScroll.x,
+          top: client.top + windowScroll.y,
+          left: client.left + windowScroll.x,
+          bottom: client.bottom + windowScroll.y,
+          right: client.right + windowScroll.x,
         });
 
         const fragment: DimensionFragment = {
@@ -273,10 +281,10 @@ describe('dimension', () => {
 
       it('should return a portion that does consider margins', () => {
         const rect: ClientRect = getClientRect({
-          top: (clientRect.top + windowScroll.y) - margin.top,
-          left: (clientRect.left + windowScroll.x) - margin.left,
-          bottom: clientRect.bottom + windowScroll.y + margin.bottom,
-          right: clientRect.right + windowScroll.x + margin.right,
+          top: (client.top + windowScroll.y) - margin.top,
+          left: (client.left + windowScroll.x) - margin.left,
+          bottom: client.bottom + windowScroll.y + margin.bottom,
+          right: client.right + windowScroll.x + margin.right,
         });
 
         const fragment: DimensionFragment = {
@@ -294,10 +302,10 @@ describe('dimension', () => {
 
       it('should return a portion that considers margins and padding', () => {
         const rect: ClientRect = getClientRect({
-          top: (clientRect.top + windowScroll.y) - margin.top - padding.top,
-          left: (clientRect.left + windowScroll.x) - margin.left - padding.left,
-          bottom: clientRect.bottom + windowScroll.y + margin.bottom + padding.bottom,
-          right: clientRect.right + windowScroll.x + margin.right + padding.right,
+          top: (client.top + windowScroll.y) - margin.top - padding.top,
+          left: (client.left + windowScroll.x) - margin.left - padding.left,
+          bottom: client.bottom + windowScroll.y + margin.bottom + padding.bottom,
+          right: client.right + windowScroll.x + margin.right + padding.right,
         });
 
         const fragment: DimensionFragment = {
@@ -311,6 +319,103 @@ describe('dimension', () => {
         };
 
         expect(dimension.page.withMarginAndPadding).toEqual(fragment);
+      });
+    });
+
+    describe.only('viewport', () => {
+      it('should use the client rect as the frame if no frame is provided', () => {
+        const droppable: DroppableDimension = getDroppableDimension({
+          descriptor: droppableDescriptor,
+          client,
+          margin,
+          windowScroll: origin,
+          frameScroll,
+        });
+
+        expect(droppable.viewport.frame).toEqual(getWithSpacing(client, margin));
+      });
+
+      it('should include the window scroll', () => {
+        const droppable: DroppableDimension = getDroppableDimension({
+          descriptor: droppableDescriptor,
+          client,
+          margin,
+          windowScroll,
+          frameScroll,
+        });
+
+        expect(droppable.viewport.frame).toEqual(
+          getWithPosition(getWithSpacing(client, margin), windowScroll),
+        );
+      });
+
+      it('should use the frame rect as the frame if provided', () => {
+        const frameClient: ClientRect = getClientRect({
+          top: 20,
+          left: 30,
+          right: 40,
+          bottom: 50,
+        });
+
+        const droppable: DroppableDimension = getDroppableDimension({
+          descriptor: droppableDescriptor,
+          client,
+          frameClient,
+        });
+
+        expect(droppable.viewport.frame).toEqual(frameClient);
+      });
+
+      describe('frame clipping', () => {
+        describe('frame is smaller than subject', () => {
+          it('should clip the subject to the size of the frame', () => {
+            const subject = getClientRect({
+              top: 0,
+              right: 100,
+              bottom: 100,
+              left: 0,
+            });
+            const frameClient = getClientRect({
+              top: 10,
+              right: 90,
+              bottom: 90,
+              left: 10,
+            });
+
+            const droppable: DroppableDimension = getDroppableDimension({
+              descriptor: droppableDescriptor,
+              client: subject,
+              frameClient,
+            });
+
+            expect(droppable.viewport.clipped).toEqual(getFragment(frameClient));
+          });
+        });
+
+        describe('frame is larger than subject', () => {
+          it('should return a clipped size that is equal to that of the subject', () => {
+            const frameClient = getClientRect({
+              top: 0,
+              right: 100,
+              bottom: 100,
+              left: 0,
+            });
+            const subject = getClientRect({
+              top: 10,
+              right: 90,
+              bottom: 90,
+              left: 10,
+            });
+
+            const droppable: DroppableDimension = getDroppableDimension({
+              descriptor: droppableDescriptor,
+              client: subject,
+              frameClient,
+            });
+
+            expect(droppable.viewport.clipped).toEqual(getFragment(subject));
+          });
+        });
       });
     });
 
@@ -390,5 +495,9 @@ describe('dimension', () => {
           .toEqual(expected);
       });
     });
+  });
+
+  describe('scroll droppable', () => {
+
   });
 });
