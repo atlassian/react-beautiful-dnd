@@ -103,7 +103,10 @@ type GetDroppableArgs = {|
   isEnabled?: boolean,
 |}
 
-const clip = (frame: ClientRect, subject: DimensionFragment | Spacing | ClientRect): DimensionFragment =>
+export const clip = (
+  frame: ClientRect,
+  subject: DimensionFragment | Spacing | ClientRect
+): DimensionFragment =>
   getFragment(getClientRect({
     top: Math.max(subject.top, frame.top),
     right: Math.min(subject.right, frame.right),

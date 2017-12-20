@@ -3,7 +3,8 @@ import memoizeOne from 'memoize-one';
 import { getFragment } from './dimension';
 import getClientRect from './get-client-rect';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
-import { isPositionVisible } from './visibility/is-within-visible-bounds-of-droppable';
+import { isPositionPartiallyWithin } from './visibility/is-partially-within';
+// import { isPositionVisible } from './visibility/is-within-visible-bounds-of-droppable';
 import { patch } from './position';
 import { addPosition } from './spacing';
 import type {
@@ -14,81 +15,117 @@ import type {
   DroppableDimensionMap,
   DroppableId,
   Position,
+  ClientRect,
 } from '../types';
 
-const noBuffer: Position = { x: 0, y: 0 };
+// const bufferDimensionFragment = (buffer: Position) => (spacing: Spacing) => (
+//   getFragment(getClientRect(addPosition(spacing, buffer)))
+// );
 
-const bufferDimensionFragment = (buffer: Position) => (fragment: DimensionFragment) => (
-  getFragment(getClientRect(addPosition(fragment, buffer)))
-);
+// const getClippedAreaWithBuffer = memoizeOne((
+//   buffer: Position,
+//   droppable: DroppableDimension
+// ): DimensionFragment => {
+//   // We only want to add the buffer to the container dimensions
+//   // if the droppable isn't clipped by a scroll container
 
-const addBufferToDroppableDimension = memoizeOne((
-  buffer: Position,
-  droppable: DroppableDimension
-): DroppableDimension => {
-  const { descriptor, axis, isEnabled, client, container, page } = droppable;
-  const withBuffer = bufferDimensionFragment(buffer);
+//   const subject: DimensionFragment = droppable.viewport.subject;
+//   const frame: ClientRect = droppable.viewport.frame;
+//   const clipped: DimensionFragment = droppable.viewport.clipped;
 
-  const newClient = {
-    withoutMargin: withBuffer(client.withoutMargin),
-    withMargin: withBuffer(client.withMargin),
-    withMarginAndPadding: withBuffer(client.withMarginAndPadding),
-  };
+//   const isClipped: boolean = subject[droppable.axis.size] > frame[droppable.axis.size];
 
-  const newPage = {
-    withoutMargin: withBuffer(page.withoutMargin),
-    withMargin: withBuffer(page.withMargin),
-    withMarginAndPadding: withBuffer(page.withMarginAndPadding),
-  };
+//   if (isClipped) {
+//     return clipped;
+//   }
 
-  // We only want to add the buffer to the container dimensions
-  // if the droppable isn't clipped by a scroll container
-  const shouldBufferContainer = droppable.page.withMargin[droppable.axis.size] <=
-    droppable.container.bounds[droppable.axis.size];
-  const newContainerBounds = shouldBufferContainer
-    ? withBuffer(container.bounds)
-    : { ...container.bounds };
+//   return getFragment(getClientRect(addPosition(clipped, buffer));
 
-  return {
-    descriptor,
-    axis,
-    isEnabled,
-    client: newClient,
-    page: newPage,
-    container: {
-      scroll: container.scroll,
-      bounds: newContainerBounds,
-    },
-  };
-});
+//   const { descriptor, axis, isEnabled, client, page } = droppable;
+//   const withBuffer = bufferDimensionFragment(buffer);
 
-const calculateBufferSize = memoizeOne((
+//   const newClient = {
+//     withoutMargin: withBuffer(client.withoutMargin),
+//     withMargin: withBuffer(client.withMargin),
+//     withMarginAndPadding: withBuffer(client.withMarginAndPadding),
+//   };
+
+//   const newPage = {
+//     withoutMargin: withBuffer(page.withoutMargin),
+//     withMargin: withBuffer(page.withMargin),
+//     withMarginAndPadding: withBuffer(page.withMarginAndPadding),
+//   };
+
+//   // const shouldBufferContainer = droppable.page.withMargin[droppable.axis.size] <=
+//   // droppable.container.bounds[droppable.axis.size];
+//   const newContainerBounds = shouldBuffer
+//     ? withBuffer(container.bounds)
+//     : { ...container.bounds };
+
+//   const clipped: DimensionFragment = (() => {
+//     const frame: ClientRect = droppable.viewport.frame;
+//     const subject: DimensionFragment = droppable.viewport.subject;
+//     // We only want to add the buffer to the container dimensions
+//     // if the droppable isn't clipped by a scroll container
+//     const isClipped: boolean = subject[droppable.axis.size] < frame[droppable.axis.size];
+
+//     if (!isClipped) {
+//       return frame;
+//     }
+
+//     return frame;
+//   })();
+
+//   const viewport: DroppableDimensionViewport = {
+//     frame: clipped,
+//     frameScroll: droppable.viewport.frameScroll,
+//     subject: droppable.viewport.subject,
+//     clipped: clip(clipped, subjectWithBuffer),
+//   };
+
+//   return {
+//     descriptor,
+//     axis,
+//     isEnabled,
+//     client: newClient,
+//     page: newPage,
+//     container: {
+//       scroll: container.scroll,
+//       bounds: newContainerBounds,
+//     },
+//   };
+// });
+
+const getRequiredGrowth = memoizeOne((
   draggable: DraggableDimension,
   draggables: DraggableDimensionMap,
   droppable: DroppableDimension,
-) => {
+): ?Position => {
   // We can't always simply add the placeholder size to the droppable size.
   // If a droppable has a min-height there will be scenarios where it has
   // some items in it, but not enough to completely fill its size.
   // In this case - when the droppable already contains excess space - we
   // don't need to add the full placeholder size.
+  console.warn('breaking cache');
+  const dimensions: DraggableDimension[] = getDraggablesInsideDroppable(droppable, draggables);
 
-  const draggablesInDroppable = getDraggablesInsideDroppable(droppable, draggables);
-
-  if (!draggablesInDroppable.length) {
-    return noBuffer;
+  if (!dimensions.length) {
+    return null;
   }
-  const excessSpace = droppable.page.withMargin[droppable.axis.end] -
-    draggablesInDroppable[draggablesInDroppable.length - 1]
-      .page.withMargin[droppable.axis.end];
-  const bufferSize = Math.max(
-    draggable.page.withMargin[droppable.axis.size] - excessSpace,
-    0
-  );
 
-  const buffer = patch(droppable.axis.line, bufferSize);
+  const endOfDraggables: number =
+    dimensions[dimensions.length - 1].page.withMargin[droppable.axis.end];
+  const endOfDroppable: number = droppable.page.withMargin[droppable.axis.end];
+  const excess: number = endOfDroppable - endOfDraggables;
 
-  return buffer;
+  // Not sure when this can happen
+  if (excess < 0) {
+    return null;
+  }
+
+  const requiredGrowth: Position = patch(droppable.axis.line, excess);
+
+  return requiredGrowth;
 });
 
 type GetBufferedDroppableArgs = {
@@ -98,25 +135,49 @@ type GetBufferedDroppableArgs = {
   previousDroppableOverId: ?DroppableId,
 };
 
-const bufferDroppable = ({
+const getWithGrowth = memoizeOne(
+  (fragment: DimensionFragment, growth: Position): DimensionFragment =>
+    getFragment(getClientRect(addPosition(fragment, growth))
+    )
+);
+
+const getClippedAreaWithPlaceholder = ({
   draggable,
   draggables,
   droppable,
   previousDroppableOverId,
-}: GetBufferedDroppableArgs): DroppableDimension => {
-  const isHomeDroppable = draggable.descriptor.droppableId === droppable.descriptor.id;
-  const isCurrentlyHovered = previousDroppableOverId &&
-    previousDroppableOverId === droppable.descriptor.id;
+}: GetBufferedDroppableArgs): DimensionFragment => {
+  const isHomeDroppable: boolean = draggable.descriptor.droppableId === droppable.descriptor.id;
+  const isOverDroppable: boolean = Boolean(
+    previousDroppableOverId &&
+    previousDroppableOverId === droppable.descriptor.id
+  );
+
+  const subject: DimensionFragment = droppable.viewport.subject;
+  const frame: ClientRect = droppable.viewport.frame;
+  const clipped: DimensionFragment = droppable.viewport.clipped;
 
   // We only include the placeholder size if it's a
   // foreign list and is currently being hovered over
-  if (isHomeDroppable || !isCurrentlyHovered) {
-    return droppable;
+  if (isHomeDroppable || !isOverDroppable) {
+    return clipped;
   }
 
-  const buffer = calculateBufferSize(draggable, draggables, droppable);
+  // We only want to add the buffer to the container dimensions
+  // if the droppable isn't clipped by a scroll container
+  const isClipped: boolean = subject[droppable.axis.size] > frame[droppable.axis.size];
+  if (isClipped) {
+    return clipped;
+  }
 
-  return addBufferToDroppableDimension(buffer, droppable);
+  const requiredGrowth: ?Position = getRequiredGrowth(draggable, draggables, droppable);
+
+  // no required growth
+  if (!requiredGrowth) {
+    return clipped;
+  }
+
+  return getWithGrowth(clipped, requiredGrowth);
 };
 
 type Args = {
@@ -137,15 +198,15 @@ export default ({
   const maybe: ?DroppableDimension =
     Object.keys(droppables)
       .map((id: DroppableId): DroppableDimension => droppables[id])
-      .find((droppable: DroppableDimension): boolean =>
+      .find((droppable: DroppableDimension): boolean => {
         // Add the size of a placeholder to a droppable's dimensions (if necessary)
-        // const droppableWithPlaceholder: DroppableDimension = bufferDroppable({
-        //   draggable, draggables, droppable, previousDroppableOverId,
-        // });
+        const clipped: DimensionFragment = getClippedAreaWithPlaceholder({
+          draggable, draggables, droppable, previousDroppableOverId,
+        });
 
         // TODO: do with placeholder
-        isPositionVisible(droppable)(target)
-      );
+        return isPositionPartiallyWithin(clipped)(target);
+      });
 
   return maybe ? maybe.descriptor.id : null;
 };

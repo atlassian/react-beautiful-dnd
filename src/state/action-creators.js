@@ -38,10 +38,9 @@ const getScrollDiff = ({
     current.windowScroll
   );
 
-  const droppableScrollDiff: Position = droppable ? subtract(
-    droppable.container.scroll.initial,
-    droppable.container.scroll.current
-  ) : origin;
+  const droppableScrollDiff: Position = droppable ?
+    droppable.viewport.frameScroll.diff :
+    origin;
 
   return add(windowScrollDiff, droppableScrollDiff);
 };
