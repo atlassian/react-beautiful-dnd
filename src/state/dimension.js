@@ -92,7 +92,8 @@ export const getDraggableDimension = ({
 type GetDroppableArgs = {|
   descriptor: DroppableDescriptor,
   client: ClientRect,
-  frameClient?: ClientRect,
+  // optionally provided - and can also be null
+  frameClient?: ?ClientRect,
   frameScroll?: Position,
   direction?: Direction,
   margin?: Spacing,
@@ -105,7 +106,7 @@ type GetDroppableArgs = {|
 
 export const clip = (
   frame: ClientRect,
-  subject: DimensionFragment | Spacing | ClientRect
+  subject: Spacing
 ): DimensionFragment =>
   getFragment(getClientRect({
     top: Math.max(subject.top, frame.top),
@@ -114,7 +115,10 @@ export const clip = (
     left: Math.max(subject.left, frame.left),
   }));
 
-export const scrollDroppable = (droppable: DroppableDimension, newScroll: Position): DroppableDimension => {
+export const scrollDroppable = (
+  droppable: DroppableDimension,
+  newScroll: Position
+): DroppableDimension => {
   const existing: DroppableDimensionViewport = droppable.viewport;
 
   const scrollDiff: Position = subtract(existing.frameScroll.initial, newScroll);
@@ -156,23 +160,27 @@ export const getDroppableDimension = ({
   // Otherwise, the container is a scrollable parent. In this case we don't care about margins
   // in the container bounds.
 
-  const subject: DimensionFragment =
-    getFragment(getWithSpacing(withWindowScroll, margin));
+  const subject: ClientRect = getWithSpacing(withWindowScroll, margin);
+  const subjectFragment: DimensionFragment = getFragment(subject);
 
   // use client + margin if frameClient is not provided
-  const frame: ClientRect = frameClient || withMargin;
-  const frameWithWindowScroll = getWithPosition(frame, windowScroll);
+  const frame: ClientRect = (() => {
+    if (!frameClient) {
+      return subject;
+    }
+    return getWithPosition(frameClient, windowScroll);
+  })();
 
   const viewport: DroppableDimensionViewport = {
-    frame: frameWithWindowScroll,
+    frame,
     frameScroll: {
       initial: frameScroll,
       // no scrolling yet, so current = initial
       current: frameScroll,
       diff: origin,
     },
-    subject,
-    clipped: clip(frameWithWindowScroll, subject),
+    subject: subjectFragment,
+    clipped: clip(frame, subject),
   };
 
   const dimension: DroppableDimension = {
@@ -186,7 +194,7 @@ export const getDroppableDimension = ({
     },
     page: {
       withoutMargin: getFragment(withWindowScroll),
-      withMargin: subject,
+      withMargin: subjectFragment,
       withMarginAndPadding: getFragment(getWithSpacing(withWindowScroll, add(margin, padding))),
     },
     viewport,

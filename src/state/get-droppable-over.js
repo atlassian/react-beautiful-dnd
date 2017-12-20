@@ -116,14 +116,14 @@ const getRequiredGrowth = memoizeOne((
   const endOfDraggables: number =
     dimensions[dimensions.length - 1].page.withMargin[droppable.axis.end];
   const endOfDroppable: number = droppable.page.withMargin[droppable.axis.end];
-  const excess: number = endOfDroppable - endOfDraggables;
+  const existingSpace: number = endOfDroppable - endOfDraggables;
+  const requiredSpace: number = draggable.page.withMargin[droppable.axis.size];
 
-  // Not sure when this can happen
-  if (excess < 0) {
+  if (requiredSpace <= existingSpace) {
     return null;
   }
 
-  const requiredGrowth: Position = patch(droppable.axis.line, excess);
+  const requiredGrowth: Position = patch(droppable.axis.line, requiredSpace - existingSpace);
 
   return requiredGrowth;
 });
@@ -166,16 +166,21 @@ const getClippedAreaWithPlaceholder = ({
   // We only want to add the buffer to the container dimensions
   // if the droppable isn't clipped by a scroll container
   const isClipped: boolean = subject[droppable.axis.size] > frame[droppable.axis.size];
+  console.log('is clipped?', isClipped);
   if (isClipped) {
     return clipped;
   }
 
   const requiredGrowth: ?Position = getRequiredGrowth(draggable, draggables, droppable);
+  console.log('required growth', requiredGrowth);
 
   // no required growth
   if (!requiredGrowth) {
     return clipped;
   }
+
+  console.log('clipped', clipped);
+  console.log('with growth', getWithGrowth(clipped, requiredGrowth));
 
   return getWithGrowth(clipped, requiredGrowth);
 };

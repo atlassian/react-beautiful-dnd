@@ -216,15 +216,15 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     // 2. There is no scroll container
     // 3. The droppable has internal scrolling
 
-    const frameClient: ClientRect = (() => {
+    const frameClient: ?ClientRect = (() => {
       if (ignoreContainerClipping) {
-        return client;
+        return null;
       }
       if (!this.closestScrollable) {
-        return client;
+        return null;
       }
       if (this.closestScrollable === targetRef) {
-        return client;
+        return null;
       }
       return getClientRect(this.closestScrollable.getBoundingClientRect());
     })();
