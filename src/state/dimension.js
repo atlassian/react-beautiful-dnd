@@ -1,6 +1,6 @@
 // @flow
 import { vertical, horizontal } from './axis';
-import getArea, { getWithPosition, getWithSpacing } from './get-area';
+import getArea from './get-area';
 import { add, offset } from './spacing';
 import { subtract } from './position';
 import type {
@@ -24,6 +24,28 @@ export const noSpacing: Spacing = {
   left: 0,
 };
 
+const addPosition = (area: Area, point: Position): Area => {
+  const { top, right, bottom, left } = area;
+  return getArea({
+    top: top + point.y,
+    left: left + point.x,
+    bottom: bottom + point.y,
+    right: right + point.x,
+  });
+};
+
+const addSpacing = (area: Area, spacing: Spacing): Area => {
+  const { top, right, bottom, left } = area;
+  return getArea({
+    // pulling back to increase size
+    top: top - spacing.top,
+    left: left - spacing.left,
+    // pushing forward to increase size
+    bottom: bottom + spacing.bottom,
+    right: right + spacing.right,
+  });
+};
+
 type GetDraggableArgs = {|
   descriptor: DraggableDescriptor,
   area: Area,
@@ -37,7 +59,7 @@ export const getDraggableDimension = ({
   margin = noSpacing,
   windowScroll = origin,
 }: GetDraggableArgs): DraggableDimension => {
-  const withScroll = getWithPosition(area, windowScroll);
+  const withScroll = addPosition(area, windowScroll);
 
   const dimension: DraggableDimension = {
     descriptor,
@@ -51,12 +73,12 @@ export const getDraggableDimension = ({
     // on the viewport
     client: {
       withoutMargin: getArea(area),
-      withMargin: getArea(getWithSpacing(area, margin)),
+      withMargin: getArea(addSpacing(area, margin)),
     },
     // with scroll
     page: {
       withoutMargin: getArea(withScroll),
-      withMargin: getArea(getWithSpacing(withScroll, margin)),
+      withMargin: getArea(addSpacing(withScroll, margin)),
     },
   };
 
@@ -127,21 +149,21 @@ export const getDroppableDimension = ({
   windowScroll = origin,
   isEnabled = true,
 }: GetDroppableArgs): DroppableDimension => {
-  const withMargin = getWithSpacing(client, margin);
-  const withWindowScroll = getWithPosition(client, windowScroll);
+  const withMargin = addSpacing(client, margin);
+  const withWindowScroll = addPosition(client, windowScroll);
   // If no frameClient is provided, or if the area matches the frameClient, this
   // droppable is its own container. In this case we include its margin in the container bounds.
   // Otherwise, the container is a scrollable parent. In this case we don't care about margins
   // in the container bounds.
 
-  const subject: Area = getWithSpacing(withWindowScroll, margin);
+  const subject: Area = addSpacing(withWindowScroll, margin);
 
   // use client + margin if frameClient is not provided
   const frame: Area = (() => {
     if (!frameClient) {
       return subject;
     }
-    return getWithPosition(frameClient, windowScroll);
+    return addPosition(frameClient, windowScroll);
   })();
 
   const viewport: DroppableDimensionViewport = {
@@ -163,12 +185,12 @@ export const getDroppableDimension = ({
     client: {
       withoutMargin: getArea(client),
       withMargin: getArea(withMargin),
-      withMarginAndPadding: getArea(getWithSpacing(withMargin, padding)),
+      withMarginAndPadding: getArea(addSpacing(withMargin, padding)),
     },
     page: {
       withoutMargin: getArea(withWindowScroll),
       withMargin: subject,
-      withMarginAndPadding: getArea(getWithSpacing(withWindowScroll, add(margin, padding))),
+      withMarginAndPadding: getArea(addSpacing(withWindowScroll, add(margin, padding))),
     },
     viewport,
   };
