@@ -8,7 +8,7 @@ import type {
   Direction,
   Spacing,
 } from '../../src/types';
-import getClientRect from '../../src/state/get-client-rect';
+import getArea from '../../src/state/get-area';
 
 type Args = {|
   direction?: Direction,
@@ -36,14 +36,14 @@ export default ({
   const droppable: DroppableDimension = getDroppableDimension({
     id: droppableId,
     direction,
-    clientRect: getClientRect(droppableRect),
+    clientRect: getArea(droppableRect),
   });
 
   const draggableDimensions: DraggableDimension[] = draggableRects.map(
     (draggableRect, index) => getDraggableDimension({
       id: `${droppableId}::drag-${index}`,
       droppableId,
-      clientRect: getClientRect(draggableRect),
+      clientRect: getArea(draggableRect),
     })
   );
 

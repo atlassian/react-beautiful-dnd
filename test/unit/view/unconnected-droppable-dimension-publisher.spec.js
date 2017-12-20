@@ -4,11 +4,11 @@ import React, { Component } from 'react';
 import { mount } from 'enzyme';
 import DroppableDimensionPublisher from '../../../src/view/droppable-dimension-publisher/droppable-dimension-publisher';
 import { getDroppableDimension, getFragment } from '../../../src/state/dimension';
-import getClientRect from '../../../src/state/get-client-rect';
+import getArea from '../../../src/state/get-area';
 import setWindowScroll from '../../utils/set-window-scroll';
 import forceUpdate from '../../utils/force-update';
 import type {
-  ClientRect,
+  Area,
   Spacing,
   DroppableId,
   DroppableDimension,
@@ -19,7 +19,7 @@ import type {
 const droppableId: DroppableId = 'drop-1';
 const droppable: DroppableDimension = getDroppableDimension({
   id: droppableId,
-  clientRect: getClientRect({
+  clientRect: getArea({
     top: 0,
     right: 100,
     bottom: 100,
@@ -181,7 +181,7 @@ describe('DraggableDimensionPublisher', () => {
       };
       const expected: DroppableDimension = getDroppableDimension({
         id: droppableId,
-        clientRect: getClientRect({
+        clientRect: getArea({
           top: 0,
           right: 100,
           bottom: 100,
@@ -221,7 +221,7 @@ describe('DraggableDimensionPublisher', () => {
         y: 1000,
       };
       setWindowScroll(windowScroll, { shouldPublish: false });
-      const clientRect: ClientRect = getClientRect({
+      const clientRect: Area = getArea({
         top: 0,
         right: 100,
         bottom: 100,
@@ -252,7 +252,7 @@ describe('DraggableDimensionPublisher', () => {
       };
       const expected: DroppableDimension = getDroppableDimension({
         id: droppableId,
-        clientRect: getClientRect({
+        clientRect: getArea({
           top: 0,
           right: 100,
           bottom: 100,
@@ -326,14 +326,14 @@ describe('DraggableDimensionPublisher', () => {
     });
 
     describe('calculating the container dimension', () => {
-      const parentRect: ClientRect = getClientRect({
+      const parentRect: Area = getArea({
         top: 0,
         left: 0,
         right: 150,
         bottom: 150,
       });
       const parentFragment: DimensionFragment = getFragment(parentRect);
-      const droppableRect: ClientRect = getClientRect({
+      const droppableRect: Area = getArea({
         top: 0,
         left: 0,
         right: 120,

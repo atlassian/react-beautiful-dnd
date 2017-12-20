@@ -4,7 +4,7 @@ import { mount } from 'enzyme';
 import { DragDropContext, Draggable, Droppable } from '../../../src/';
 import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
 import { dispatchWindowMouseEvent, dispatchWindowKeyDownEvent, mouseEvent } from '../../utils/user-input-util';
-import getClientRect from '../../../src/state/get-client-rect';
+import getArea from '../../../src/state/get-area';
 import type {
   Hooks,
   DraggableLocation,
@@ -31,7 +31,7 @@ describe('hooks integration', () => {
   const droppableId: DroppableId = 'drop-1';
 
   // both our list and item have the same dimension for now
-  const clientRect = getClientRect({
+  const clientRect = getArea({
     top: 0,
     right: 100,
     bottom: 100,

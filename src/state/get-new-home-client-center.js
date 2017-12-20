@@ -6,7 +6,7 @@ import type {
   DragMovement,
   DroppableDimension,
   Position,
-  ClientRect,
+  Area,
 } from '../types';
 import moveToEdge from './move-to-edge';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
@@ -51,7 +51,7 @@ export default ({
   );
 
   // Find the dimension we need to compare the dragged item with
-  const destinationFragment: ClientRect = (() => {
+  const destinationFragment: Area = (() => {
     if (isWithinHomeDroppable) {
       return draggables[displaced[0].draggableId].client.withMargin;
     }
@@ -98,7 +98,7 @@ export default ({
     return { sourceEdge: 'start', destinationEdge: 'start' };
   })();
 
-  const source: ClientRect = draggable.client.withMargin;
+  const source: Area = draggable.client.withMargin;
 
   // This is the draggable's new home
   const targetCenter: Position = moveToEdge({

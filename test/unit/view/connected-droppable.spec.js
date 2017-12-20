@@ -6,7 +6,7 @@ import Droppable, { makeSelector } from '../../../src/view/droppable/connected-d
 import noImpact from '../../../src/state/no-impact';
 import { getDraggableDimension } from '../../../src/state/dimension';
 import { withStore } from '../../utils/get-context-options';
-import getClientRect from '../../../src/state/get-client-rect';
+import getArea from '../../../src/state/get-area';
 import forceUpdate from '../../utils/force-update';
 import type {
   Phase,
@@ -70,7 +70,7 @@ const draggable: DraggableDimension = getDraggableDimension({
   id: draggableId,
   droppableId: homeDroppableId,
   margin,
-  clientRect: getClientRect({
+  clientRect: getArea({
     top: 100,
     left: 0,
     right: 100,

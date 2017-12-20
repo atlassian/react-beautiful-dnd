@@ -11,7 +11,7 @@ import type {
   DroppableId,
   Position,
   Spacing,
-  ClientRect,
+  Area,
 } from '../../types';
 
 type GetBestDroppableArgs = {|
@@ -36,7 +36,7 @@ export default ({
     sourceClipped[axis.start],
     sourceClipped[axis.end]
   );
-  const viewport: ClientRect = getViewport();
+  const viewport: Area = getViewport();
 
   // const candidates: Candidate[] = Object.keys(droppables)
   const candidates: DroppableDimension[] = Object.keys(droppables)
@@ -53,7 +53,7 @@ export default ({
     }))
     // Get only droppables that are on the desired side
     .filter((droppable: DroppableDimension): boolean => {
-      const targetClipped: ClientRect = droppable.viewport.clipped;
+      const targetClipped: Area = droppable.viewport.clipped;
 
       if (isMovingForward) {
         // is the droppable in front of the source on the cross axis?
@@ -66,7 +66,7 @@ export default ({
     })
     // Must have some overlap on the main axis
     .filter((droppable: DroppableDimension): boolean => {
-      const targetClipped: ClientRect = droppable.viewport.clipped;
+      const targetClipped: Area = droppable.viewport.clipped;
 
       const isBetweenDestinationClipped = isWithin(
         targetClipped[axis.start],

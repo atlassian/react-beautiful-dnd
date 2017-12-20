@@ -1,6 +1,6 @@
 // @flow
 import memoizeOne from 'memoize-one';
-import getClientRect from './get-client-rect';
+import getArea from './get-area';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
 import { isPositionPartiallyWithin } from './visibility/is-partially-within';
 import { patch } from './position';
@@ -12,11 +12,11 @@ import type {
   DroppableDimensionMap,
   DroppableId,
   Position,
-  ClientRect,
+  Area,
 } from '../types';
 
 // const bufferDimensionFragment = (buffer: Position) => (spacing: Spacing) => (
-//   getFragment(getClientRect(addPosition(spacing, buffer)))
+//   getFragment(getArea(addPosition(spacing, buffer)))
 // );
 
 // const getClippedAreaWithBuffer = memoizeOne((
@@ -27,7 +27,7 @@ import type {
 //   // if the droppable isn't clipped by a scroll container
 
 //   const subject: DimensionFragment = droppable.viewport.subject;
-//   const frame: ClientRect = droppable.viewport.frame;
+//   const frame: Area = droppable.viewport.frame;
 //   const clipped: DimensionFragment = droppable.viewport.clipped;
 
 //   const isClipped: boolean = subject[droppable.axis.size] > frame[droppable.axis.size];
@@ -36,7 +36,7 @@ import type {
 //     return clipped;
 //   }
 
-//   return getFragment(getClientRect(addPosition(clipped, buffer));
+//   return getFragment(getArea(addPosition(clipped, buffer));
 
 //   const { descriptor, axis, isEnabled, client, page } = droppable;
 //   const withBuffer = bufferDimensionFragment(buffer);
@@ -60,7 +60,7 @@ import type {
 //     : { ...container.bounds };
 
 //   const clipped: DimensionFragment = (() => {
-//     const frame: ClientRect = droppable.viewport.frame;
+//     const frame: Area = droppable.viewport.frame;
 //     const subject: DimensionFragment = droppable.viewport.subject;
 //     // We only want to add the buffer to the container dimensions
 //     // if the droppable isn't clipped by a scroll container
@@ -133,8 +133,8 @@ type GetBufferedDroppableArgs = {
 };
 
 const getWithGrowth = memoizeOne(
-  (fragment: ClientRect, growth: Position): ClientRect =>
-    getClientRect(addPosition(fragment, growth))
+  (fragment: Area, growth: Position): Area =>
+    getArea(addPosition(fragment, growth))
 );
 
 const getClippedAreaWithPlaceholder = ({
@@ -142,16 +142,16 @@ const getClippedAreaWithPlaceholder = ({
   draggables,
   droppable,
   previousDroppableOverId,
-}: GetBufferedDroppableArgs): ClientRect => {
+}: GetBufferedDroppableArgs): Area => {
   const isHomeDroppable: boolean = draggable.descriptor.droppableId === droppable.descriptor.id;
   const isOverDroppable: boolean = Boolean(
     previousDroppableOverId &&
     previousDroppableOverId === droppable.descriptor.id
   );
 
-  const subject: ClientRect = droppable.viewport.subject;
-  const frame: ClientRect = droppable.viewport.frame;
-  const clipped: ClientRect = droppable.viewport.clipped;
+  const subject: Area = droppable.viewport.subject;
+  const frame: Area = droppable.viewport.frame;
+  const clipped: Area = droppable.viewport.clipped;
 
   // We only include the placeholder size if it's a
   // foreign list and is currently being hovered over
@@ -201,7 +201,7 @@ export default ({
       .map((id: DroppableId): DroppableDimension => droppables[id])
       .find((droppable: DroppableDimension): boolean => {
         // Add the size of a placeholder to a droppable's dimensions (if necessary)
-        const clipped: ClientRect = getClippedAreaWithPlaceholder({
+        const clipped: Area = getClippedAreaWithPlaceholder({
           draggable, draggables, droppable, previousDroppableOverId,
         });
 

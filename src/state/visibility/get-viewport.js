@@ -1,8 +1,8 @@
 // @flow
-import type { ClientRect } from '../../types';
-import getClientRect from '../get-client-rect';
+import type { Area } from '../../types';
+import getArea from '../get-area';
 
-export default (): ClientRect => {
+export default (): Area => {
   // would use window.scrollY and window.scrollX but it is not supported in ie11
   const top: number = window.pageYOffset;
   const left: number = window.pageXOffset;
@@ -13,7 +13,7 @@ export default (): ClientRect => {
   const right: number = left + width;
   const bottom: number = top + height;
 
-  return getClientRect({
+  return getArea({
     top, left, right, bottom,
   });
 };

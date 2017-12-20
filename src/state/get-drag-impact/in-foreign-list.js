@@ -7,9 +7,9 @@ import type {
   Axis,
   Position,
   Displacement,
-  ClientRect,
+  Area,
 } from '../../types';
-import { add, subtract, patch } from '../position';
+import { add, patch } from '../position';
 import getDisplacement from '../get-displacement';
 import getViewport from '../visibility/get-viewport';
 
@@ -29,7 +29,7 @@ export default ({
   previousImpact,
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
-  const viewport: ClientRect = getViewport();
+  const viewport: Area = getViewport();
   const destinationScrollDiff: Position = destination.viewport.frameScroll.diff;
   const currentCenter: Position = add(pageCenter, destinationScrollDiff);
 

@@ -31,7 +31,7 @@ export type Spacing = {
   left: number,
 }
 
-export type ClientRect = {|
+export type Area = {|
   top: number,
   right: number,
   bottom: number,
@@ -85,20 +85,20 @@ export type DraggableDimension = {|
   placeholder: Placeholder,
   // relative to the viewport when the drag started
   client: {|
-    withMargin: ClientRect,
-    withoutMargin: ClientRect,
+    withMargin: Area,
+    withoutMargin: Area,
   |},
   // relative to the whole page
   page: {|
-    withMargin: ClientRect,
-    withoutMargin: ClientRect,
+    withMargin: Area,
+    withoutMargin: Area,
   |},
 |}
 
 export type DroppableDimensionViewport = {|
   // This is the window through which the droppable is observed
   // It does not change during a drag
-  frame: ClientRect,
+  frame: Area,
   // keeping track of the scroll
   frameScroll: {|
     initial: Position,
@@ -106,10 +106,10 @@ export type DroppableDimensionViewport = {|
     diff: Position,
   |},
   // the fragment to be clipped by the frame
-  subject: ClientRect,
+  subject: Area,
   // this the dimension of the droppable (page.withMargin) through
   // the viewport of the frame.
-  clipped: ClientRect,
+  clipped: Area,
 |}
 
 export type DroppableDimension = {|
@@ -118,17 +118,17 @@ export type DroppableDimension = {|
   isEnabled: boolean,
   // relative to the current viewport
   client: {|
-    withMargin: ClientRect,
-    withoutMargin: ClientRect,
+    withMargin: Area,
+    withoutMargin: Area,
     // the area in which content presses up against
-    withMarginAndPadding: ClientRect,
+    withMarginAndPadding: Area,
   |},
   // relative to the whole page
   page: {|
-    withMargin: ClientRect,
-    withoutMargin: ClientRect,
+    withMargin: Area,
+    withoutMargin: Area,
     // the area in which content presses up against
-    withMarginAndPadding: ClientRect,
+    withMarginAndPadding: Area,
   |},
   // The container of the droppable
   viewport: DroppableDimensionViewport,

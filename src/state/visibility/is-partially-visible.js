@@ -5,7 +5,7 @@ import { offset } from '../spacing';
 import type {
   Spacing,
   Position,
-  ClientRect,
+  Area,
   DraggableDimension,
   DroppableDimension,
 } from '../../types';
@@ -13,7 +13,7 @@ import type {
 type IsPartiallyVisibleArgs = {|
   target: Spacing,
   droppable: DroppableDimension,
-  viewport: ClientRect,
+  viewport: Area,
 |}
 
 export const isPartiallyVisible = ({
@@ -41,7 +41,7 @@ export const isPartiallyVisible = ({
 type IsDraggableVisibleArgs = {|
   draggable: DraggableDimension,
   droppable: DroppableDimension,
-  viewport: ClientRect,
+  viewport: Area,
 |}
 
 export const isDraggablePartiallyVisible = ({
@@ -57,7 +57,7 @@ export const isDraggablePartiallyVisible = ({
 type IsPositionVisibleArgs = {|
   point: Position,
   droppable: DroppableDimension,
-  viewport: ClientRect,
+  viewport: Area,
 |}
 
 export const isPositionVisible = ({

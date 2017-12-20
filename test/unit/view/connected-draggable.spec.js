@@ -6,7 +6,7 @@ import Draggable, { makeSelector } from '../../../src/view/draggable/connected-d
 import { getDraggableDimension } from '../../../src/state/dimension';
 import noImpact from '../../../src/state/no-impact';
 import { combine, withStore, withDroppableId } from '../../utils/get-context-options';
-import getClientRect from '../../../src/state/get-client-rect';
+import getArea from '../../../src/state/get-area';
 import { add } from '../../../src/state/position';
 import forceUpdate from '../../utils/force-update';
 import type {
@@ -49,7 +49,7 @@ const make = (() => {
     const dimension: DraggableDimension = getDraggableDimension({
       id,
       droppableId,
-      clientRect: getClientRect({
+      clientRect: getArea({
         top: 100 * callCount,
         left: 0,
         right: 100,

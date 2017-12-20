@@ -2,7 +2,7 @@
 import { isPointWithinDroppable, isDraggableWithin } from '../../../src/state/is-within-visible-bounds-of-droppable';
 import { getDroppableDimension, getDraggableDimension } from '../../../src/state/dimension';
 import { add, subtract } from '../../../src/state/position';
-import getClientRect from '../../../src/state/get-client-rect';
+import getArea from '../../../src/state/get-area';
 import getDroppableWithDraggables from '../../utils/get-droppable-with-draggables';
 import type { Result } from '../../utils/get-droppable-with-draggables';
 import type {
@@ -31,7 +31,7 @@ describe('is within visible bounds of a droppable', () => {
     id: 'droppable',
     margin,
     // 100 x 100 box with margin's
-    clientRect: getClientRect(clientSpacing),
+    clientRect: getArea(clientSpacing),
   };
   const droppable = getDroppableDimension(getDroppableDimensionArgs);
 
@@ -77,7 +77,7 @@ describe('is within visible bounds of a droppable', () => {
         const custom = getDroppableDimension({
           id: 'with-scroll',
           windowScroll,
-          clientRect: getClientRect({
+          clientRect: getArea({
             top: 0,
             left: 0,
             right: 100,
@@ -100,7 +100,7 @@ describe('is within visible bounds of a droppable', () => {
       const clientSpacingNoMargin = {
         top: 0, right: 100, bottom: 100, left: 0,
       };
-      const clientRect = getClientRect(clientSpacingNoMargin);
+      const clientRect = getArea(clientSpacingNoMargin);
       const { top, right, bottom, left } = clientSpacingNoMargin;
       const points = {
         'top-left': { x: left, y: top },
@@ -120,7 +120,7 @@ describe('is within visible bounds of a droppable', () => {
           id: 'droppable',
           margin: noSpacing,
           clientRect,
-          containerRect: getClientRect({
+          containerRect: getArea({
             top: 0,
             right: 100,
             bottom: 100,
@@ -141,7 +141,7 @@ describe('is within visible bounds of a droppable', () => {
           id: 'droppable',
           margin: noSpacing,
           clientRect,
-          containerRect: getClientRect({
+          containerRect: getArea({
             top,
             right: 210,
             bottom,
@@ -159,7 +159,7 @@ describe('is within visible bounds of a droppable', () => {
           id: 'droppable',
           margin: noSpacing,
           clientRect,
-          containerRect: getClientRect({
+          containerRect: getArea({
             top: 10,
             right,
             bottom,
@@ -180,7 +180,7 @@ describe('is within visible bounds of a droppable', () => {
           id: 'droppable',
           margin: noSpacing,
           clientRect,
-          containerRect: getClientRect({
+          containerRect: getArea({
             top,
             right: right - 10,
             bottom,
@@ -201,7 +201,7 @@ describe('is within visible bounds of a droppable', () => {
           id: 'droppable',
           margin: noSpacing,
           clientRect,
-          containerRect: getClientRect({
+          containerRect: getArea({
             top,
             right,
             bottom: bottom - 10,
@@ -222,7 +222,7 @@ describe('is within visible bounds of a droppable', () => {
           id: 'droppable',
           margin: noSpacing,
           clientRect,
-          containerRect: getClientRect({
+          containerRect: getArea({
             top,
             right,
             bottom,
@@ -242,13 +242,13 @@ describe('is within visible bounds of a droppable', () => {
         const partiallyClippedDroppable = getDroppableDimension({
           id: 'droppable',
           margin: noSpacing,
-          clientRect: getClientRect({
+          clientRect: getArea({
             top: top + 200,
             right,
             bottom: bottom + 200,
             left,
           }),
-          containerRect: getClientRect({ top, right, bottom, left }),
+          containerRect: getArea({ top, right, bottom, left }),
         });
         const isWithinClippedDroppable = isPointWithinDroppable(partiallyClippedDroppable);
         // Before we scroll the droppable should be fully clipped
@@ -297,14 +297,14 @@ describe('is within visible bounds of a droppable', () => {
     it('should return true if the draggable is within the margin of the droppable', () => {
       const myDroppable: DroppableDimension = getDroppableDimension({
         id: 'custom',
-        clientRect: getClientRect({ top: 10, left: 10, right: 90, bottom: 90 }),
+        clientRect: getArea({ top: 10, left: 10, right: 90, bottom: 90 }),
         margin: { top: 10, left: 10, right: 10, bottom: 10 },
       });
       const draggable: DraggableDimension = getDraggableDimension({
         id: 'draggable',
         droppableId: myDroppable.descriptor.id,
         // would normally not be within the droppable clientRect, but is within the margin
-        clientRect: getClientRect({ top: 0, left: 0, right: 100, bottom: 100 }),
+        clientRect: getArea({ top: 0, left: 0, right: 100, bottom: 100 }),
       });
       const isWithinDroppable = isDraggableWithin(myDroppable.container.bounds);
 
@@ -317,7 +317,7 @@ describe('is within visible bounds of a droppable', () => {
       const draggable: DraggableDimension = getDraggableDimension({
         id: 'drag-1',
         droppableId: droppable.descriptor.id,
-        clientRect: getClientRect(clientSpacing),
+        clientRect: getArea(clientSpacing),
         // would normally push draggable outside of bounds
         margin,
       });

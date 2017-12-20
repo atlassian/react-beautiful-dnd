@@ -3,12 +3,12 @@ import React, { Component } from 'react';
 import { mount } from 'enzyme';
 import DraggableDimensionPublisher from '../../../src/view/draggable-dimension-publisher/draggable-dimension-publisher';
 import { getDraggableDimension } from '../../../src/state/dimension';
-import getClientRect from '../../../src/state/get-client-rect';
+import getArea from '../../../src/state/get-area';
 import setWindowScroll from '../../utils/set-window-scroll';
 import forceUpdate from '../../utils/force-update';
 import type {
   Spacing,
-  ClientRect,
+  Area,
   Position,
   DraggableId,
   DroppableId,
@@ -20,7 +20,7 @@ const droppableId: DroppableId = 'drop-1';
 const dimension: DraggableDimension = getDraggableDimension({
   id: draggableId,
   droppableId,
-  clientRect: getClientRect({
+  clientRect: getArea({
     top: 0,
     right: 100,
     bottom: 100,
@@ -132,7 +132,7 @@ describe('DraggableDimensionPublisher', () => {
     const expected: DraggableDimension = getDraggableDimension({
       id: draggableId,
       droppableId,
-      clientRect: getClientRect({
+      clientRect: getArea({
         top: 0,
         right: 100,
         bottom: 100,
@@ -173,7 +173,7 @@ describe('DraggableDimensionPublisher', () => {
       x: 100,
       y: 200,
     };
-    const clientRect: ClientRect = getClientRect({
+    const clientRect: Area = getArea({
       top: 0,
       right: 100,
       bottom: 100,

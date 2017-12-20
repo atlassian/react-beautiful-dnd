@@ -1,7 +1,7 @@
 // @flow
 import getDraggablesInsideDroppable from '../../../src/state/get-draggables-inside-droppable';
 import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
-import getClientRect from '../../../src/state/get-client-rect';
+import getArea from '../../../src/state/get-area';
 import type {
   DroppableId,
   DraggableDimension,
@@ -15,7 +15,7 @@ const otherDroppableId: DroppableId = 'drop-2';
 describe('get draggables inside a droppable', () => {
   const droppable: DroppableDimension = getDroppableDimension({
     id: droppableId,
-    clientRect: getClientRect({
+    clientRect: getArea({
       top: 0,
       left: 0,
       right: 100,
@@ -26,7 +26,7 @@ describe('get draggables inside a droppable', () => {
   const inside1: DraggableDimension = getDraggableDimension({
     id: 'inside-1',
     droppableId,
-    clientRect: getClientRect({
+    clientRect: getArea({
       top: 20,
       left: 20,
       right: 80,
@@ -37,7 +37,7 @@ describe('get draggables inside a droppable', () => {
   const inside2: DraggableDimension = getDraggableDimension({
     id: 'inside-2',
     droppableId,
-    clientRect: getClientRect({
+    clientRect: getArea({
       top: 31,
       left: 30,
       right: 70,
@@ -48,7 +48,7 @@ describe('get draggables inside a droppable', () => {
   const inside3: DraggableDimension = getDraggableDimension({
     id: 'inside-3',
     droppableId,
-    clientRect: getClientRect({
+    clientRect: getArea({
       top: 41,
       left: 30,
       right: 70,
@@ -59,7 +59,7 @@ describe('get draggables inside a droppable', () => {
   const outside: DraggableDimension = getDraggableDimension({
     id: 'outside-1',
     droppableId: otherDroppableId,
-    clientRect: getClientRect({
+    clientRect: getArea({
       top: 200,
       left: 200,
       right: 300,

@@ -1,6 +1,6 @@
 // @flow
-import getClientRect from '../../../src/state/get-client-rect';
-import type { ClientRect, Spacing } from '../../../src/types';
+import getArea from '../../../src/state/get-area';
+import type { Area, Spacing } from '../../../src/types';
 
 describe('get client rect', () => {
   describe('conversion', () => {
@@ -12,7 +12,7 @@ describe('get client rect', () => {
         bottom: 100,
       };
 
-      const rect: ClientRect = getClientRect(spacing);
+      const rect: Area = getArea(spacing);
 
       expect(rect).toEqual({
         ...spacing,

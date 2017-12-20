@@ -7,7 +7,7 @@ import type {
   Axis,
   Position,
   DragImpact,
-  ClientRect,
+  Area,
   DraggableDimension,
   DroppableDimension,
   Displacement,
@@ -92,7 +92,7 @@ export default ({
   // if going before: move everything down including the target
   // if going after: move everything down excluding the target
 
-  const viewport: ClientRect = getViewport();
+  const viewport: Area = getViewport();
   const displaced: Displacement[] = insideDroppable
     .slice(proposedIndex, insideDroppable.length)
     .map((dimension: DraggableDimension): Displacement => getDisplacement({

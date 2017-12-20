@@ -2,7 +2,7 @@
 import moveToNewDroppable from '../../../../src/state/move-cross-axis/move-to-new-droppable/';
 import type { Result } from '../../../../src/state/move-cross-axis/move-cross-axis-types';
 import { getDraggableDimension } from '../../../../src/state/dimension';
-import getClientRect from '../../../../src/state/get-client-rect';
+import getArea from '../../../../src/state/get-area';
 import moveToEdge from '../../../../src/state/move-to-edge';
 import { patch } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
@@ -66,7 +66,7 @@ describe('move to new droppable', () => {
           const invalid: DraggableDimension = getDraggableDimension({
             id: 'invalid',
             droppableId: 'some-other-droppable',
-            clientRect: getClientRect({
+            clientRect: getArea({
               top: 1000,
               left: 1000,
               bottom: 1100,

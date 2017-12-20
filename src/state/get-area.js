@@ -1,7 +1,7 @@
 // @flow
 import type {
   Spacing,
-  ClientRect,
+  Area,
   Position,
 } from '../types';
 
@@ -9,7 +9,7 @@ import type {
 // dynamically creating a Spacing object from an axis
 type ShouldBeSpacing = Object | Spacing
 
-const getClientRect = ({ top, right, bottom, left }: ShouldBeSpacing): ClientRect => ({
+const getArea = ({ top, right, bottom, left }: ShouldBeSpacing): Area => ({
   top,
   right,
   bottom,
@@ -22,11 +22,11 @@ const getClientRect = ({ top, right, bottom, left }: ShouldBeSpacing): ClientRec
   },
 });
 
-export default getClientRect;
+export default getArea;
 
-export const getWithPosition = (clientRect: ClientRect, point: Position): ClientRect => {
+export const getWithPosition = (clientRect: Area, point: Position): Area => {
   const { top, right, bottom, left } = clientRect;
-  return getClientRect({
+  return getArea({
     top: top + point.y,
     left: left + point.x,
     bottom: bottom + point.y,
@@ -34,9 +34,9 @@ export const getWithPosition = (clientRect: ClientRect, point: Position): Client
   });
 };
 
-export const getWithSpacing = (clientRect: ClientRect, spacing: Spacing): ClientRect => {
+export const getWithSpacing = (clientRect: Area, spacing: Spacing): Area => {
   const { top, right, bottom, left } = clientRect;
-  return getClientRect({
+  return getArea({
     // pulling back to increase size
     top: top - spacing.top,
     left: left - spacing.left,

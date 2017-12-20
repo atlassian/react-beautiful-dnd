@@ -29,7 +29,7 @@ import type {
   InitialDragLocation,
 } from '../../../src/types';
 import { getDraggableDimension } from '../../../src/state/dimension';
-import getClientRect from '../../../src/state/get-client-rect';
+import getArea from '../../../src/state/get-area';
 import { combine, withStore, withDroppableId } from '../../utils/get-context-options';
 import { dispatchWindowMouseEvent, mouseEvent } from '../../utils/user-input-util';
 import setWindowScroll from '../../utils/set-window-scroll';
@@ -60,7 +60,7 @@ const origin: Position = { x: 0, y: 0 };
 const dimension: DraggableDimension = getDraggableDimension({
   id: draggableId,
   droppableId,
-  clientRect: getClientRect({
+  clientRect: getArea({
     top: 0,
     right: 100,
     bottom: 100,
@@ -184,9 +184,9 @@ type StartDrag = {|
   isScrollAllowed?: boolean,
 |}
 
-const stubClientRect = (center?: Position = origin): void =>
+const stubArea = (center?: Position = origin): void =>
   // $ExpectError
-  jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => getClientRect({
+  jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => getArea({
     left: 0,
     top: 0,
     right: center.x * 2,
@@ -200,7 +200,7 @@ const executeOnLift = (wrapper: ReactWrapper) => ({
   isScrollAllowed = false,
 }: StartDrag = {}) => {
   setWindowScroll(windowScroll);
-  stubClientRect(center);
+  stubArea(center);
 
   wrapper.find(DragHandle).props().callbacks.onLift({ client: selection, isScrollAllowed });
 };
@@ -270,7 +270,7 @@ describe('Draggable - unconnected', () => {
       center = origin,
     }: StartDrag = {}) => {
       // fake some position to get the center we want
-      stubClientRect(center);
+      stubArea(center);
 
       mouseDown(wrapper, subtract(selection, { x: 0, y: sloppyClickThreshold }));
       windowMouseMove(selection);

@@ -1,6 +1,6 @@
 // @flow
 import { vertical, horizontal } from './axis';
-import getClientRect, { getWithPosition, getWithSpacing } from './get-client-rect';
+import getArea, { getWithPosition, getWithSpacing } from './get-area';
 import { add, offset } from './spacing';
 import { subtract } from './position';
 import type {
@@ -11,7 +11,7 @@ import type {
   DroppableDimension,
   Direction,
   Spacing,
-  ClientRect,
+  Area,
   DroppableDimensionViewport,
 } from '../types';
 
@@ -26,7 +26,7 @@ export const noSpacing: Spacing = {
 
 type GetDraggableArgs = {|
   descriptor: DraggableDescriptor,
-  clientRect: ClientRect,
+  clientRect: Area,
   margin?: Spacing,
   windowScroll?: Position,
 |};
@@ -50,13 +50,13 @@ export const getDraggableDimension = ({
     },
     // on the viewport
     client: {
-      withoutMargin: getClientRect(clientRect),
-      withMargin: getClientRect(getWithSpacing(clientRect, margin)),
+      withoutMargin: getArea(clientRect),
+      withMargin: getArea(getWithSpacing(clientRect, margin)),
     },
     // with scroll
     page: {
-      withoutMargin: getClientRect(withScroll),
-      withMargin: getClientRect(getWithSpacing(withScroll, margin)),
+      withoutMargin: getArea(withScroll),
+      withMargin: getArea(getWithSpacing(withScroll, margin)),
     },
   };
 
@@ -65,9 +65,9 @@ export const getDraggableDimension = ({
 
 type GetDroppableArgs = {|
   descriptor: DroppableDescriptor,
-  client: ClientRect,
+  client: Area,
   // optionally provided - and can also be null
-  frameClient?: ?ClientRect,
+  frameClient?: ?Area,
   frameScroll?: Position,
   direction?: Direction,
   margin?: Spacing,
@@ -79,10 +79,10 @@ type GetDroppableArgs = {|
 |}
 
 export const clip = (
-  frame: ClientRect,
+  frame: Area,
   subject: Spacing
-): ClientRect =>
-  getClientRect(getClientRect({
+): Area =>
+  getArea(getArea({
     top: Math.max(subject.top, frame.top),
     right: Math.min(subject.right, frame.right),
     bottom: Math.min(subject.bottom, frame.bottom),
@@ -134,10 +134,10 @@ export const getDroppableDimension = ({
   // Otherwise, the container is a scrollable parent. In this case we don't care about margins
   // in the container bounds.
 
-  const subject: ClientRect = getWithSpacing(withWindowScroll, margin);
+  const subject: Area = getWithSpacing(withWindowScroll, margin);
 
   // use client + margin if frameClient is not provided
-  const frame: ClientRect = (() => {
+  const frame: Area = (() => {
     if (!frameClient) {
       return subject;
     }
@@ -161,14 +161,14 @@ export const getDroppableDimension = ({
     isEnabled,
     axis: direction === 'vertical' ? vertical : horizontal,
     client: {
-      withoutMargin: getClientRect(client),
-      withMargin: getClientRect(withMargin),
-      withMarginAndPadding: getClientRect(getWithSpacing(withMargin, padding)),
+      withoutMargin: getArea(client),
+      withMargin: getArea(withMargin),
+      withMarginAndPadding: getArea(getWithSpacing(withMargin, padding)),
     },
     page: {
-      withoutMargin: getClientRect(withWindowScroll),
+      withoutMargin: getArea(withWindowScroll),
       withMargin: subject,
-      withMarginAndPadding: getClientRect(getWithSpacing(withWindowScroll, add(margin, padding))),
+      withMarginAndPadding: getArea(getWithSpacing(withWindowScroll, add(margin, padding))),
     },
     viewport,
   };

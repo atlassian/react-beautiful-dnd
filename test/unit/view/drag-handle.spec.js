@@ -21,7 +21,7 @@ import * as keyCodes from '../../../src/view/key-codes';
 import getWindowScrollPosition from '../../../src/view/get-window-scroll-position';
 import setWindowScroll from '../../utils/set-window-scroll';
 import forceUpdate from '../../utils/force-update';
-import getClientRect from '../../../src/state/get-client-rect';
+import getArea from '../../../src/state/get-area';
 import { timeForLongPress, forcePressThreshold } from '../../../src/view/drag-handle/sensor/create-touch-sensor';
 import { interactiveTagNames } from '../../../src/view/drag-handle/util/should-allow-dragging-from-target';
 import { styleContextKey, canLiftContextKey } from '../../../src/view/context-keys';
@@ -155,7 +155,7 @@ describe('drag handle', () => {
 
   beforeAll(() => {
     requestAnimationFrame.reset();
-    jest.spyOn(fakeDraggableRef, 'getBoundingClientRect').mockImplementation(() => getClientRect({
+    jest.spyOn(fakeDraggableRef, 'getBoundingClientRect').mockImplementation(() => getArea({
       left: 0,
       top: 0,
       right: fakeCenter.x * 2,

@@ -3,15 +3,15 @@ import { absolute, add, patch, subtract } from './position';
 import type {
   Axis,
   Position,
-  ClientRect,
+  Area,
 } from '../types';
 
 export type Edge = 'start' | 'end';
 
 type Args = {|
-  source: ClientRect,
+  source: Area,
   sourceEdge: Edge,
-  destination: ClientRect,
+  destination: Area,
   destinationEdge: Edge,
   destinationAxis: Axis,
 |}
@@ -33,7 +33,7 @@ export default ({
   destinationEdge,
   destinationAxis,
 }: Args): CenterPosition => {
-  const getCorner = (fragment: ClientRect): Position => patch(
+  const getCorner = (fragment: Area): Position => patch(
     destinationAxis.line,
     // it does not really matter what edge we use here
     // as the difference to the center from edges will be the same

@@ -5,9 +5,9 @@ import {
   getFragment,
 } from '../../../src/state/dimension';
 import { vertical, horizontal } from '../../../src/state/axis';
-import getClientRect, { getWithPosition, getWithSpacing } from '../../../src/state/get-client-rect';
+import getArea, { getWithPosition, getWithSpacing } from '../../../src/state/get-area';
 import type {
-  ClientRect,
+  Area,
   Spacing,
   DroppableDescriptor,
   DraggableDescriptor,
@@ -27,7 +27,7 @@ const draggableDescriptor: DraggableDescriptor = {
   index: 0,
 };
 
-const client: ClientRect = getClientRect({
+const client: Area = getArea({
   top: 10,
   right: 110,
   bottom: 90,
@@ -45,7 +45,7 @@ const windowScroll: Position = {
 };
 const origin: Position = { x: 0, y: 0 };
 
-const getCenter = (rect: ClientRect | Spacing): Position => ({
+const getCenter = (rect: Area | Spacing): Position => ({
   x: (rect.left + rect.right) / 2,
   y: (rect.top + rect.bottom) / 2,
 });
@@ -78,7 +78,7 @@ describe('dimension', () => {
       });
 
       it('should return a portion that considers margins', () => {
-        const rect: ClientRect = getClientRect({
+        const rect: Area = getArea({
           top: client.top - margin.top,
           right: client.right + margin.right,
           bottom: client.bottom + margin.bottom,
@@ -121,7 +121,7 @@ describe('dimension', () => {
       });
 
       it('should return a portion that considers margins', () => {
-        const rect: ClientRect = getClientRect({
+        const rect: Area = getArea({
           top: (client.top - margin.top) + windowScroll.y,
           right: client.right + margin.right + windowScroll.x,
           bottom: client.bottom + margin.bottom + windowScroll.y,
@@ -215,7 +215,7 @@ describe('dimension', () => {
       });
 
       it('should return a portion that does consider margins', () => {
-        const rect: ClientRect = getClientRect({
+        const rect: Area = getArea({
           top: client.top - margin.top,
           left: client.left - margin.left,
           bottom: client.bottom + margin.bottom,
@@ -236,7 +236,7 @@ describe('dimension', () => {
       });
 
       it('should return a portion that considers margins and padding', () => {
-        const rect: ClientRect = getClientRect({
+        const rect: Area = getArea({
           top: client.top - margin.top - padding.top,
           left: client.left - margin.left - padding.left,
           bottom: client.bottom + margin.bottom + padding.bottom,
@@ -259,7 +259,7 @@ describe('dimension', () => {
 
     describe('with scroll (page)', () => {
       it('should return a portion that does not consider margins', () => {
-        const rect: ClientRect = getClientRect({
+        const rect: Area = getArea({
           top: client.top + windowScroll.y,
           left: client.left + windowScroll.x,
           bottom: client.bottom + windowScroll.y,
@@ -280,7 +280,7 @@ describe('dimension', () => {
       });
 
       it('should return a portion that does consider margins', () => {
-        const rect: ClientRect = getClientRect({
+        const rect: Area = getArea({
           top: (client.top + windowScroll.y) - margin.top,
           left: (client.left + windowScroll.x) - margin.left,
           bottom: client.bottom + windowScroll.y + margin.bottom,
@@ -301,7 +301,7 @@ describe('dimension', () => {
       });
 
       it('should return a portion that considers margins and padding', () => {
-        const rect: ClientRect = getClientRect({
+        const rect: Area = getArea({
           top: (client.top + windowScroll.y) - margin.top - padding.top,
           left: (client.left + windowScroll.x) - margin.left - padding.left,
           bottom: client.bottom + windowScroll.y + margin.bottom + padding.bottom,
@@ -350,7 +350,7 @@ describe('dimension', () => {
       });
 
       it('should use the frame rect as the frame if provided', () => {
-        const frameClient: ClientRect = getClientRect({
+        const frameClient: Area = getArea({
           top: 20,
           left: 30,
           right: 40,
@@ -369,13 +369,13 @@ describe('dimension', () => {
       describe('frame clipping', () => {
         describe('frame is smaller than subject', () => {
           it('should clip the subject to the size of the frame', () => {
-            const subject = getClientRect({
+            const subject = getArea({
               top: 0,
               right: 100,
               bottom: 100,
               left: 0,
             });
-            const frameClient = getClientRect({
+            const frameClient = getArea({
               top: 10,
               right: 90,
               bottom: 90,
@@ -394,13 +394,13 @@ describe('dimension', () => {
 
         describe('frame is larger than subject', () => {
           it('should return a clipped size that is equal to that of the subject', () => {
-            const frameClient = getClientRect({
+            const frameClient = getArea({
               top: 0,
               right: 100,
               bottom: 100,
               left: 0,
             });
-            const subject = getClientRect({
+            const subject = getArea({
               top: 10,
               right: 90,
               bottom: 90,
@@ -421,7 +421,7 @@ describe('dimension', () => {
 
     describe('calculating container dimension', () => {
       const id = 'droppable';
-      const droppableRect = getClientRect({
+      const droppableRect = getArea({
         top: 0,
         right: 90,
         bottom: 90,
@@ -442,7 +442,7 @@ describe('dimension', () => {
       });
 
       it('should not include margins if the container is different from the droppable\'s spacing', () => {
-        const container = getClientRect({
+        const container = getArea({
           top: 0,
           right: 10,
           bottom: 10,

@@ -3,7 +3,7 @@ import getClosestDraggable from '../../../../src/state/move-cross-axis/get-close
 import { getDroppableDimension, getDraggableDimension } from '../../../../src/state/dimension';
 import { add, distance, patch } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
-import getClientRect from '../../../../src/state/get-client-rect';
+import getArea from '../../../../src/state/get-area';
 import type {
   Axis,
   Position,
@@ -20,7 +20,7 @@ describe('get closest draggable', () => {
 
     const droppable: DroppableDimension = getDroppableDimension({
       id: 'droppable',
-      clientRect: getClientRect({
+      clientRect: getArea({
         [axis.start]: start,
         [axis.end]: end,
         [axis.crossAxisStart]: crossAxisStart,
@@ -32,7 +32,7 @@ describe('get closest draggable', () => {
     const partialHiddenBackwards: DraggableDimension = getDraggableDimension({
       id: 'partialHiddenBackwards',
       droppableId: droppable.descriptor.id,
-      clientRect: getClientRect({
+      clientRect: getArea({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
         [axis.start]: -10, // -10
@@ -43,7 +43,7 @@ describe('get closest draggable', () => {
     const visible1: DraggableDimension = getDraggableDimension({
       id: 'visible1',
       droppableId: droppable.descriptor.id,
-      clientRect: getClientRect({
+      clientRect: getArea({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
         [axis.start]: 20,
@@ -54,7 +54,7 @@ describe('get closest draggable', () => {
     const visible2: DraggableDimension = getDraggableDimension({
       id: 'visible2',
       droppableId: droppable.descriptor.id,
-      clientRect: getClientRect({
+      clientRect: getArea({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
         [axis.start]: 40,
@@ -66,7 +66,7 @@ describe('get closest draggable', () => {
     const partiallyHiddenForwards: DraggableDimension = getDraggableDimension({
       id: 'partiallyHiddenForwards',
       droppableId: droppable.descriptor.id,
-      clientRect: getClientRect({
+      clientRect: getArea({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
         [axis.start]: 60,
@@ -78,7 +78,7 @@ describe('get closest draggable', () => {
     const hidden: DraggableDimension = getDraggableDimension({
       id: 'hidden',
       droppableId: droppable.descriptor.id,
-      clientRect: getClientRect({
+      clientRect: getArea({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
         [axis.start]: 120,

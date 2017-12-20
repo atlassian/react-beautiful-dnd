@@ -2,7 +2,7 @@
 import { getPreset } from '../../utils/dimension';
 import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
 import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
-import getClientRect from '../../../src/state/get-client-rect';
+import getArea from '../../../src/state/get-area';
 import * as state from '../../utils/simple-state-preset';
 import type {
   Callbacks,
@@ -18,7 +18,7 @@ import type {
   DroppableDimensionMap,
   DraggableId,
   DroppableId,
-  ClientRect,
+  Area,
 } from '../../../src/types';
 
 const getCallbackStub = (): Callbacks => {
@@ -100,7 +100,7 @@ const populateMarshal = (
   return watches;
 };
 
-const fakeClientRect: ClientRect = getClientRect({
+const fakeArea: Area = getArea({
   top: 0, right: 100, bottom: 100, left: 0,
 });
 
@@ -109,7 +109,7 @@ const ofAnotherType: DroppableDimension = getDroppableDimension({
     id: 'of-another-type',
     type: 'another-type',
   },
-  clientRect: fakeClientRect,
+  clientRect: fakeArea,
 });
 const childOfAnotherType: DraggableDimension = getDraggableDimension({
   descriptor: {
@@ -117,7 +117,7 @@ const childOfAnotherType: DraggableDimension = getDraggableDimension({
     droppableId: ofAnotherType.descriptor.id,
     index: 0,
   },
-  clientRect: fakeClientRect,
+  clientRect: fakeArea,
 });
 
 describe('dimension marshal', () => {
@@ -837,7 +837,7 @@ describe('dimension marshal', () => {
               droppableId: preset.home.descriptor.id,
               index: preset.inHomeList.length,
             },
-            clientRect: fakeClientRect,
+            clientRect: fakeArea,
           });
 
           marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
@@ -857,7 +857,7 @@ describe('dimension marshal', () => {
               id: 'my fake id',
               type: preset.home.descriptor.type,
             },
-            clientRect: fakeClientRect,
+            clientRect: fakeArea,
           });
           const droppableCallbacks: DroppableCallbacks = {
             getDimension: () => fake,

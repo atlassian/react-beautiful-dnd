@@ -14,7 +14,7 @@ import type {
   Axis,
   DragImpact,
   Displacement,
-  ClientRect,
+  Area,
 } from '../../types';
 
 export default ({
@@ -72,7 +72,7 @@ export default ({
     return 'start';
   })();
 
-  const viewport: ClientRect = getViewport();
+  const viewport: Area = getViewport();
   const newCenter: Position = moveToEdge({
     source: draggable.page.withoutMargin,
     sourceEdge,

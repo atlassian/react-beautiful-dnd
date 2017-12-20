@@ -17,7 +17,7 @@ import type {
   Axis,
   DragImpact,
   Spacing,
-  ClientRect,
+  Area,
 } from '../../types';
 
 const getIndex = memoizeOne(
@@ -89,7 +89,7 @@ export default ({
   });
 
   // Currently not supporting moving a draggable outside the visibility bounds of a droppable
-  const viewport: ClientRect = getViewport();
+  const viewport: Area = getViewport();
   const isVisible: boolean = (() => {
     const diff: Position = subtract(newCenter, draggable.page.withoutMargin.center);
     const withDiff: Spacing = offset(getSpacingFrom(draggable.page.withMargin), diff);

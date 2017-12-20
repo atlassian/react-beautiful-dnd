@@ -2,7 +2,7 @@
 import type {
   Position,
   Spacing,
-  ClientRect,
+  Area,
 } from '../types';
 
 export const add = (spacing1: Spacing, spacing2: Spacing): Spacing => ({
@@ -40,7 +40,7 @@ export const getCorners = (spacing: Spacing): Position[] => [
 ];
 
 // TODO: should not be required as anything that works with spacing should work with a client rect
-export const getSpacingFrom = (target: ClientRect): Spacing => ({
+export const getSpacingFrom = (target: Area): Spacing => ({
   top: target.top,
   right: target.right,
   bottom: target.bottom,

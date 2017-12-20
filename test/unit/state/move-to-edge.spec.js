@@ -7,7 +7,7 @@ import {
   subtract,
 } from '../../../src/state/position';
 import getFragment from '../../utils/get-fragment';
-import getClientRect from '../../../src/state/get-client-rect';
+import getArea from '../../../src/state/get-area';
 import moveToEdge from '../../../src/state/move-to-edge';
 import { vertical, horizontal } from '../../../src/state/axis';
 import type {
@@ -18,7 +18,7 @@ import type {
 
 // behind the destination
 // width: 40, height: 20
-const behind: DimensionFragment = getFragment(getClientRect({
+const behind: DimensionFragment = getFragment(getArea({
   top: 0,
   left: 0,
   right: 40,
@@ -27,7 +27,7 @@ const behind: DimensionFragment = getFragment(getClientRect({
 
 // in front of the destination
 // width: 50, height: 10
-const infront: DimensionFragment = getFragment(getClientRect({
+const infront: DimensionFragment = getFragment(getArea({
   top: 120,
   left: 150,
   right: 200,
@@ -35,7 +35,7 @@ const infront: DimensionFragment = getFragment(getClientRect({
 }));
 
 // width: 50, height: 60
-const destination: DimensionFragment = getFragment(getClientRect({
+const destination: DimensionFragment = getFragment(getArea({
   top: 50,
   left: 50,
   right: 100,

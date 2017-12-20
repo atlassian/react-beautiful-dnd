@@ -7,7 +7,7 @@ import type {
   Axis,
   Position,
   Displacement,
-  ClientRect,
+  Area,
 } from '../../types';
 import { add, patch } from '../position';
 import getDisplacement from '../get-displacement';
@@ -31,7 +31,7 @@ export default ({
   insideHome,
   previousImpact,
 }: Args): DragImpact => {
-  const viewport: ClientRect = getViewport();
+  const viewport: Area = getViewport();
   const axis: Axis = home.axis;
   const homeScrollDiff: Position = home.viewport.frameScroll.diff;
   // Where the element actually is now
@@ -51,7 +51,7 @@ export default ({
         return false;
       }
 
-      const fragment: ClientRect = child.page.withoutMargin;
+      const fragment: Area = child.page.withoutMargin;
 
       if (isBeyondStartPosition) {
         // 1. item needs to start ahead of the moving item

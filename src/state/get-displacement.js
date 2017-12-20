@@ -7,14 +7,14 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DragImpact,
-  ClientRect,
+  Area,
 } from '../types';
 
 type Args = {|
   draggable: DraggableDimension,
   destination: DroppableDimension,
   previousImpact: DragImpact,
-  viewport: ClientRect,
+  viewport: Area,
 |}
 
 export default ({

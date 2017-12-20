@@ -6,7 +6,7 @@ import type { Edge } from '../../move-to-edge';
 import type { Result } from '../move-cross-axis-types';
 import type {
   Axis,
-  ClientRect,
+  Area,
   Displacement,
   Position,
   DragImpact,
@@ -105,7 +105,7 @@ export default ({
     return insideDroppable.slice(from, to).reverse();
   })();
 
-  const viewport: ClientRect = getViewport();
+  const viewport: Area = getViewport();
   const displaced: Displacement[] = modified
     .map((dimension: DraggableDimension): Displacement => getDisplacement({
       draggable: dimension,

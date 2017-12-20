@@ -1,7 +1,7 @@
 // @flow
-import type { DimensionFragment, ClientRect } from '../../src/types';
+import type { DimensionFragment, Area } from '../../src/types';
 
-export default (clientRect: ClientRect): DimensionFragment => {
+export default (clientRect: Area): DimensionFragment => {
   const { top, left, bottom, right, width, height } = clientRect;
   const center = {
     x: (right + left) / 2,

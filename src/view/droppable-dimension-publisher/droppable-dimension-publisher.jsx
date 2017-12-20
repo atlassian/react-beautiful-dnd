@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import rafSchedule from 'raf-schd';
 import getWindowScrollPosition from '../get-window-scroll-position';
-import getClientRect from '../../state/get-client-rect';
+import getArea from '../../state/get-area';
 import { getDroppableDimension } from '../../state/dimension';
 import getClosestScrollable from '../get-closest-scrollable';
 import { dimensionMarshalKey } from '../context-keys';
@@ -20,7 +20,7 @@ import type {
   DroppableDimension,
   DroppableDescriptor,
   Position,
-  ClientRect,
+  Area,
   Spacing,
   Direction,
 } from '../../types';
@@ -208,7 +208,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       left: parseInt(style.paddingLeft, 10),
     };
 
-    const client: ClientRect = getClientRect(targetRef.getBoundingClientRect());
+    const client: Area = getArea(targetRef.getBoundingClientRect());
 
     // The droppable's own bounds should be treated as the
     // container bounds in the following situations:
@@ -216,7 +216,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     // 2. There is no scroll container
     // 3. The droppable has internal scrolling
 
-    const frameClient: ?ClientRect = (() => {
+    const frameClient: ?Area = (() => {
       if (ignoreContainerClipping) {
         return null;
       }
@@ -226,7 +226,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       if (this.closestScrollable === targetRef) {
         return null;
       }
-      return getClientRect(this.closestScrollable.getBoundingClientRect());
+      return getArea(this.closestScrollable.getBoundingClientRect());
     })();
 
     const dimension: DroppableDimension = getDroppableDimension({

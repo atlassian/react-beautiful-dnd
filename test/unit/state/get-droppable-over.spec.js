@@ -1,7 +1,7 @@
 // @flow
 import getDroppableOver from '../../../src/state/get-droppable-over';
 import { getDroppableDimension, getDraggableDimension } from '../../../src/state/dimension';
-import getClientRect from '../../../src/state/get-client-rect';
+import getArea from '../../../src/state/get-area';
 import type {
   DraggableDimension,
   DroppableDimension,
@@ -15,7 +15,7 @@ const noPosition = { x: 0, y: 0 };
 
 const droppable1: DroppableDimension = getDroppableDimension({
   id: 'drop-1',
-  clientRect: getClientRect({
+  clientRect: getArea({
     top: 0,
     left: 0,
     bottom: 100,
@@ -25,7 +25,7 @@ const droppable1: DroppableDimension = getDroppableDimension({
 
 const droppable2: DroppableDimension = getDroppableDimension({
   id: 'drop-2',
-  clientRect: getClientRect({
+  clientRect: getArea({
     top: 101,
     left: 0,
     bottom: 200,
@@ -34,7 +34,7 @@ const droppable2: DroppableDimension = getDroppableDimension({
 });
 const droppable3: DroppableDimension = getDroppableDimension({
   id: 'drop-3',
-  clientRect: getClientRect({
+  clientRect: getArea({
     top: 0,
     left: 100,
     bottom: 100,
@@ -46,7 +46,7 @@ const draggableMargin = { top: 0, right: 0, bottom: 10, left: 0 };
 const draggable1: DraggableDimension = getDraggableDimension({
   id: 'drag-1',
   droppableId: droppable1.id,
-  clientRect: getClientRect({
+  clientRect: getArea({
     top: 0,
     right: 100,
     bottom: 90,
@@ -58,7 +58,7 @@ const draggable1: DraggableDimension = getDraggableDimension({
 const draggable2: DraggableDimension = getDraggableDimension({
   id: 'drag-2',
   droppableId: droppable2.id,
-  clientRect: getClientRect({
+  clientRect: getArea({
     top: 101,
     right: 100,
     bottom: 190,
@@ -70,7 +70,7 @@ const draggable2: DraggableDimension = getDraggableDimension({
 const draggable3: DraggableDimension = getDraggableDimension({
   id: 'drag-3',
   droppableId: droppable3.id,
-  clientRect: getClientRect({
+  clientRect: getArea({
     top: 0,
     right: 200,
     bottom: 40,

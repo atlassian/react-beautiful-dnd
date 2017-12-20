@@ -6,12 +6,12 @@ import memoizeOne from 'memoize-one';
 import getWindowScrollPosition from '../get-window-scroll-position';
 import { getDraggableDimension } from '../../state/dimension';
 import { dimensionMarshalKey } from '../context-keys';
-import getClientRect from '../../state/get-client-rect';
+import getArea from '../../state/get-area';
 import type {
   DraggableDescriptor,
   DraggableDimension,
   Spacing,
-  ClientRect,
+  Area,
   DraggableId,
   DroppableId,
 } from '../../types';
@@ -89,7 +89,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
     // We do not need to worry about 'box-sizing' because getBoundingClientRect already
     // takes that into account
-    const clientRect: ClientRect = getClientRect(targetRef.getBoundingClientRect());
+    const clientRect: Area = getArea(targetRef.getBoundingClientRect());
 
     const dimension: DraggableDimension = getDraggableDimension({
       descriptor,

@@ -1,7 +1,7 @@
 // @flow
 import fireHooks from '../../../src/state/fire-hooks';
 import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
-import getClientRect from '../../../src/state/get-client-rect';
+import getArea from '../../../src/state/get-area';
 import noImpact from '../../../src/state/no-impact';
 import type {
   DraggableId,
@@ -59,7 +59,7 @@ const state = (() => {
   const draggableDimension: DraggableDimension = getDraggableDimension({
     id: draggableId,
     droppableId,
-    clientRect: getClientRect({
+    clientRect: getArea({
       top: 0,
       right: 100,
       bottom: 100,
@@ -68,7 +68,7 @@ const state = (() => {
   });
   const droppableDimension: DroppableDimension = getDroppableDimension({
     id: droppableId,
-    clientRect: getClientRect({
+    clientRect: getArea({
       top: 0,
       right: 100,
       bottom: 100,
