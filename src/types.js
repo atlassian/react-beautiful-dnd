@@ -105,7 +105,7 @@ export type DroppableDimensionViewport = {|
     current: Position,
     diff: Position,
   |},
-  // the fragment to be clipped by the frame
+  // the area to be clipped by the frame
   subject: Area,
   // this the dimension of the droppable (page.withMargin) through
   // the viewport of the frame.

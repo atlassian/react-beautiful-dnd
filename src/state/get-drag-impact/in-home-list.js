@@ -51,25 +51,25 @@ export default ({
         return false;
       }
 
-      const fragment: Area = child.page.withoutMargin;
+      const area: Area = child.page.withoutMargin;
 
       if (isBeyondStartPosition) {
         // 1. item needs to start ahead of the moving item
         // 2. the dragging item has moved over it
-        if (fragment.center[axis.line] < originalCenter[axis.line]) {
+        if (area.center[axis.line] < originalCenter[axis.line]) {
           return false;
         }
 
-        return currentCenter[axis.line] > fragment[axis.start];
+        return currentCenter[axis.line] > area[axis.start];
       }
       // moving backwards
       // 1. item needs to start behind the moving item
       // 2. the dragging item has moved over it
-      if (originalCenter[axis.line] < fragment.center[axis.line]) {
+      if (originalCenter[axis.line] < area.center[axis.line]) {
         return false;
       }
 
-      return currentCenter[axis.line] < fragment[axis.end];
+      return currentCenter[axis.line] < area[axis.end];
     })
     .map((dimension: DraggableDimension): Displacement => getDisplacement({
       draggable: dimension,

@@ -133,8 +133,7 @@ type GetBufferedDroppableArgs = {
 };
 
 const getWithGrowth = memoizeOne(
-  (fragment: Area, growth: Position): Area =>
-    getArea(addPosition(fragment, growth))
+  (area: Area, growth: Position): Area => getArea(addPosition(area, growth))
 );
 
 const getClippedAreaWithPlaceholder = ({
