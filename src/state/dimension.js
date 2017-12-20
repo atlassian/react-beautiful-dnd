@@ -26,32 +26,32 @@ export const noSpacing: Spacing = {
 
 type GetDraggableArgs = {|
   descriptor: DraggableDescriptor,
-  clientRect: Area,
+  area: Area,
   margin?: Spacing,
   windowScroll?: Position,
 |};
 
 export const getDraggableDimension = ({
   descriptor,
-  clientRect,
+  area,
   margin = noSpacing,
   windowScroll = origin,
 }: GetDraggableArgs): DraggableDimension => {
-  const withScroll = getWithPosition(clientRect, windowScroll);
+  const withScroll = getWithPosition(area, windowScroll);
 
   const dimension: DraggableDimension = {
     descriptor,
     placeholder: {
       margin,
       withoutMargin: {
-        width: clientRect.width,
-        height: clientRect.height,
+        width: area.width,
+        height: area.height,
       },
     },
     // on the viewport
     client: {
-      withoutMargin: getArea(clientRect),
-      withMargin: getArea(getWithSpacing(clientRect, margin)),
+      withoutMargin: getArea(area),
+      withMargin: getArea(getWithSpacing(area, margin)),
     },
     // with scroll
     page: {
@@ -129,7 +129,7 @@ export const getDroppableDimension = ({
 }: GetDroppableArgs): DroppableDimension => {
   const withMargin = getWithSpacing(client, margin);
   const withWindowScroll = getWithPosition(client, windowScroll);
-  // If no containerRect is provided, or if the clientRect matches the containerRect, this
+  // If no containerRect is provided, or if the area matches the containerRect, this
   // droppable is its own container. In this case we include its margin in the container bounds.
   // Otherwise, the container is a scrollable parent. In this case we don't care about margins
   // in the container bounds.

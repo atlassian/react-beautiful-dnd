@@ -31,7 +31,7 @@ describe('hooks integration', () => {
   const droppableId: DroppableId = 'drop-1';
 
   // both our list and item have the same dimension for now
-  const clientRect = getArea({
+  const area = getArea({
     top: 0,
     right: 100,
     bottom: 100,
@@ -40,7 +40,7 @@ describe('hooks integration', () => {
 
   const getMountedApp = () => {
     // Both list and item will have the same dimensions
-    jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => clientRect);
+    jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => area);
 
     // Stubbing out totally - not including margins in this
     jest.spyOn(window, 'getComputedStyle').mockImplementation(() => ({
@@ -113,8 +113,8 @@ describe('hooks integration', () => {
 
   const drag = (() => {
     const initial: Position = {
-      x: clientRect.left + 1,
-      y: clientRect.top + 1,
+      x: area.left + 1,
+      y: area.top + 1,
     };
     const dragStart: Position = {
       x: initial.x,

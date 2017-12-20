@@ -19,7 +19,7 @@ describe('get best cross axis droppable', () => {
       const source = getDroppableDimension({
         id: 'source',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 20,
           right: 30,
@@ -29,7 +29,7 @@ describe('get best cross axis droppable', () => {
       const forward = getDroppableDimension({
         id: 'forward',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 30,
           right: 40,
@@ -55,7 +55,7 @@ describe('get best cross axis droppable', () => {
       const behind = getDroppableDimension({
         id: 'behind',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 20,
           right: 30,
@@ -65,7 +65,7 @@ describe('get best cross axis droppable', () => {
       const source = getDroppableDimension({
         id: 'source',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 30,
           right: 40,
@@ -92,7 +92,7 @@ describe('get best cross axis droppable', () => {
       const source = getDroppableDimension({
         id: 'source',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 20,
           right: 30,
@@ -102,7 +102,7 @@ describe('get best cross axis droppable', () => {
       const behind = getDroppableDimension({
         id: 'behind',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 0,
           right: 10,
@@ -136,7 +136,7 @@ describe('get best cross axis droppable', () => {
       const source = getDroppableDimension({
         id: 'source',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 20,
           right: 30,
@@ -147,7 +147,7 @@ describe('get best cross axis droppable', () => {
         id: 'disabled',
         isEnabled: false,
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 30,
           right: 40,
@@ -173,7 +173,7 @@ describe('get best cross axis droppable', () => {
       const source = getDroppableDimension({
         id: 'source',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 20,
           right: 30,
@@ -183,7 +183,7 @@ describe('get best cross axis droppable', () => {
       const noOverlap = getDroppableDimension({
         id: 'noOverlap',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           // top is below where the source ended
           top: 11,
           left: 30,
@@ -212,7 +212,7 @@ describe('get best cross axis droppable', () => {
       const source = getDroppableDimension({
         id: 'source',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 0,
           right: 20,
@@ -222,7 +222,7 @@ describe('get best cross axis droppable', () => {
       const sibling1 = getDroppableDimension({
         id: 'sibling1',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 20,
           left: 20,
           right: 40,
@@ -241,7 +241,7 @@ describe('get best cross axis droppable', () => {
       const sibling2 = getDroppableDimension({
         id: 'sibling2',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           // shares the bottom edge with sibling1
           top: 40,
           // shares the left edge with the source
@@ -349,7 +349,7 @@ describe('get best cross axis droppable', () => {
       const source = getDroppableDimension({
         id: 'source',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 0,
           right: 20,
@@ -359,7 +359,7 @@ describe('get best cross axis droppable', () => {
       const forward = getDroppableDimension({
         id: 'forward',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 20,
           left: 0,
           right: 20,
@@ -385,7 +385,7 @@ describe('get best cross axis droppable', () => {
       const behind = getDroppableDimension({
         id: 'behind',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 0,
           right: 20,
@@ -395,7 +395,7 @@ describe('get best cross axis droppable', () => {
       const source = getDroppableDimension({
         id: 'source',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 10,
           left: 0,
           right: 20,
@@ -422,7 +422,7 @@ describe('get best cross axis droppable', () => {
       const behind = getDroppableDimension({
         id: 'behind',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 0,
           right: 20,
@@ -432,7 +432,7 @@ describe('get best cross axis droppable', () => {
       const source = getDroppableDimension({
         id: 'source',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 10,
           left: 0,
           right: 20,
@@ -467,7 +467,7 @@ describe('get best cross axis droppable', () => {
       const source = getDroppableDimension({
         id: 'source',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 20,
           right: 30,
@@ -478,7 +478,7 @@ describe('get best cross axis droppable', () => {
         id: 'disabled',
         isEnabled: false,
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 30,
           right: 40,
@@ -504,7 +504,7 @@ describe('get best cross axis droppable', () => {
       const source = getDroppableDimension({
         id: 'source',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 0,
           right: 20,
@@ -514,7 +514,7 @@ describe('get best cross axis droppable', () => {
       const noOverlap = getDroppableDimension({
         id: 'noOverlap',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           // comes after the source
           top: 10,
           // but its left value is > the rigt of the source
@@ -544,7 +544,7 @@ describe('get best cross axis droppable', () => {
       const source = getDroppableDimension({
         id: 'source',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 0,
           right: 100,
@@ -554,7 +554,7 @@ describe('get best cross axis droppable', () => {
       const sibling1 = getDroppableDimension({
         id: 'sibling1',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           // shares an edge with the source
           top: 10,
           // shares the left edge with the source
@@ -566,7 +566,7 @@ describe('get best cross axis droppable', () => {
       const sibling2 = getDroppableDimension({
         id: 'sibling2',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           // shares an edge with the source
           top: 10,
           // shares the left edge with the source

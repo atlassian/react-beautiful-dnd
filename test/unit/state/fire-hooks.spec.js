@@ -59,7 +59,7 @@ const state = (() => {
   const draggableDimension: DraggableDimension = getDraggableDimension({
     id: draggableId,
     droppableId,
-    clientRect: getArea({
+    area: getArea({
       top: 0,
       right: 100,
       bottom: 100,
@@ -68,7 +68,7 @@ const state = (() => {
   });
   const droppableDimension: DroppableDimension = getDroppableDimension({
     id: droppableId,
-    clientRect: getArea({
+    area: getArea({
       top: 0,
       right: 100,
       bottom: 100,

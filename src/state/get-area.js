@@ -24,8 +24,8 @@ const getArea = ({ top, right, bottom, left }: ShouldBeSpacing): Area => ({
 
 export default getArea;
 
-export const getWithPosition = (clientRect: Area, point: Position): Area => {
-  const { top, right, bottom, left } = clientRect;
+export const getWithPosition = (area: Area, point: Position): Area => {
+  const { top, right, bottom, left } = area;
   return getArea({
     top: top + point.y,
     left: left + point.x,
@@ -34,8 +34,8 @@ export const getWithPosition = (clientRect: Area, point: Position): Area => {
   });
 };
 
-export const getWithSpacing = (clientRect: Area, spacing: Spacing): Area => {
-  const { top, right, bottom, left } = clientRect;
+export const getWithSpacing = (area: Area, spacing: Spacing): Area => {
+  const { top, right, bottom, left } = area;
   return getArea({
     // pulling back to increase size
     top: top - spacing.top,

@@ -70,7 +70,7 @@ const draggable: DraggableDimension = getDraggableDimension({
   id: draggableId,
   droppableId: homeDroppableId,
   margin,
-  clientRect: getArea({
+  area: getArea({
     top: 100,
     left: 0,
     right: 100,

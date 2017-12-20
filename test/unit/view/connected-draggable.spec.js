@@ -49,7 +49,7 @@ const make = (() => {
     const dimension: DraggableDimension = getDraggableDimension({
       id,
       droppableId,
-      clientRect: getArea({
+      area: getArea({
         top: 100 * callCount,
         left: 0,
         right: 100,

@@ -60,7 +60,7 @@ const origin: Position = { x: 0, y: 0 };
 const dimension: DraggableDimension = getDraggableDimension({
   id: draggableId,
   droppableId,
-  clientRect: getArea({
+  area: getArea({
     top: 0,
     right: 100,
     bottom: 100,

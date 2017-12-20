@@ -36,14 +36,14 @@ export default ({
   const droppable: DroppableDimension = getDroppableDimension({
     id: droppableId,
     direction,
-    clientRect: getArea(droppableRect),
+    area: getArea(droppableRect),
   });
 
   const draggableDimensions: DraggableDimension[] = draggableRects.map(
     (draggableRect, index) => getDraggableDimension({
       id: `${droppableId}::drag-${index}`,
       droppableId,
-      clientRect: getArea(draggableRect),
+      area: getArea(draggableRect),
     })
   );
 

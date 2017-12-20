@@ -19,7 +19,7 @@ import type {
 const droppableId: DroppableId = 'drop-1';
 const droppable: DroppableDimension = getDroppableDimension({
   id: droppableId,
-  clientRect: getArea({
+  area: getArea({
     top: 0,
     right: 100,
     bottom: 100,
@@ -181,7 +181,7 @@ describe('DraggableDimensionPublisher', () => {
       };
       const expected: DroppableDimension = getDroppableDimension({
         id: droppableId,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           right: 100,
           bottom: 100,
@@ -221,7 +221,7 @@ describe('DraggableDimensionPublisher', () => {
         y: 1000,
       };
       setWindowScroll(windowScroll, { shouldPublish: false });
-      const clientRect: Area = getArea({
+      const area: Area = getArea({
         top: 0,
         right: 100,
         bottom: 100,
@@ -229,10 +229,10 @@ describe('DraggableDimensionPublisher', () => {
       });
       const expected: DroppableDimension = getDroppableDimension({
         id: droppableId,
-        clientRect,
+        area,
         windowScroll,
       });
-      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => clientRect);
+      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => area);
       jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noSpacing);
       wrapper = mount(
         <ScrollableItem {...dispatchProps} />,
@@ -252,7 +252,7 @@ describe('DraggableDimensionPublisher', () => {
       };
       const expected: DroppableDimension = getDroppableDimension({
         id: droppableId,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           right: 100,
           bottom: 100,
@@ -343,17 +343,17 @@ describe('DraggableDimensionPublisher', () => {
 
       const dimensionWithNoScrolling: DroppableDimension = getDroppableDimension({
         id: droppableId,
-        clientRect: droppableRect,
+        area: droppableRect,
         containerRect: droppableRect,
       });
       const dimensionWithInternalScrolling: DroppableDimension = getDroppableDimension({
         id: droppableId,
-        clientRect: droppableRect,
+        area: droppableRect,
         containerRect: droppableRect,
       });
       const dimensionWithScrollParent: DroppableDimension = getDroppableDimension({
         id: droppableId,
-        clientRect: droppableRect,
+        area: droppableRect,
         containerRect: parentRect,
       });
 

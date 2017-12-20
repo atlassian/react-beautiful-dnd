@@ -433,7 +433,7 @@ describe('dimension', () => {
       it('should default to the droppable\'s dimension if none is provided', () => {
         const droppableDimension = getDroppableDimension({
           id,
-          clientRect: droppableRect,
+          area: droppableRect,
           margin: noMargin,
         });
 
@@ -450,7 +450,7 @@ describe('dimension', () => {
         });
         const droppableDimension = getDroppableDimension({
           id,
-          clientRect: droppableRect,
+          area: droppableRect,
           containerRect: container,
           margin: noMargin,
         });
@@ -467,13 +467,13 @@ describe('dimension', () => {
         const container = droppableRect;
         const droppableDimension = getDroppableDimension({
           id,
-          clientRect: droppableRect,
+          area: droppableRect,
           containerRect: container,
           margin: droppableMargin,
         });
         const droppableDimensionNoContainerProvided = getDroppableDimension({
           id,
-          clientRect: droppableRect,
+          area: droppableRect,
           margin: droppableMargin,
         });
         const expectedSpacing = {

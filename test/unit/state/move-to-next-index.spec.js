@@ -31,7 +31,7 @@ describe('move to next index', () => {
       const home: DroppableDimension = getDroppableDimension({
         id: 'home',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 0,
           bottom: 1000,
@@ -43,7 +43,7 @@ describe('move to next index', () => {
       const home1: DraggableDimension = getDraggableDimension({
         id: 'home1',
         droppableId: home.id,
-        clientRect: getArea({
+        area: getArea({
           top: 0,
           left: 0,
           bottom: 100,
@@ -55,7 +55,7 @@ describe('move to next index', () => {
       const home2: DraggableDimension = getDraggableDimension({
         id: 'home2',
         droppableId: home.id,
-        clientRect: getArea({
+        area: getArea({
           top: 101,
           left: 101,
           bottom: 300,
@@ -67,7 +67,7 @@ describe('move to next index', () => {
       const home3: DraggableDimension = getDraggableDimension({
         id: 'home3',
         droppableId: home.id,
-        clientRect: getArea({
+        area: getArea({
           top: 301,
           left: 301,
           bottom: 600,
@@ -79,7 +79,7 @@ describe('move to next index', () => {
       const foreign: DroppableDimension = getDroppableDimension({
         id: 'foreign',
         direction: axis.direction,
-        clientRect: getArea({
+        area: getArea({
           top: 1001,
           left: 1001,
           bottom: 2000,
@@ -91,7 +91,7 @@ describe('move to next index', () => {
       const foreign1: DraggableDimension = getDraggableDimension({
         id: 'foreign1',
         droppableId: foreign.id,
-        clientRect: getArea({
+        area: getArea({
           top: 1001,
           left: 1001,
           bottom: 1100,
@@ -103,7 +103,7 @@ describe('move to next index', () => {
       const foreign2: DraggableDimension = getDraggableDimension({
         id: 'foreign2',
         droppableId: foreign.id,
-        clientRect: getArea({
+        area: getArea({
           top: 1101,
           left: 1101,
           bottom: 1300,
@@ -115,7 +115,7 @@ describe('move to next index', () => {
       const foreign3: DraggableDimension = getDraggableDimension({
         id: 'foreign3',
         droppableId: foreign.id,
-        clientRect: getArea({
+        area: getArea({
           top: 1301,
           left: 1301,
           bottom: 1600,
@@ -137,7 +137,7 @@ describe('move to next index', () => {
           id: 'disabled',
           isEnabled: false,
           direction: axis.direction,
-          clientRect: getArea({
+          area: getArea({
             top: 2001,
             left: 2001,
             bottom: 3000,

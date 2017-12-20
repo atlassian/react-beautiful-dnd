@@ -33,7 +33,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     padding,
     margin,
     windowScroll,
-    clientRect: getArea({
+    area: getArea({
       // would be 0 but pushed forward by margin
       [axis.start]: 10,
       [axis.crossAxisStart]: crossAxisStart,
@@ -51,7 +51,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     margin,
     windowScroll,
     direction: axis.direction,
-    clientRect: getArea({
+    area: getArea({
       // would be 0 but pushed forward by margin
       [axis.start]: 10,
       [axis.crossAxisStart]: foreignCrossAxisStart,
@@ -69,7 +69,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     margin,
     windowScroll,
     direction: axis.direction,
-    clientRect: getArea({
+    area: getArea({
       // would be 0 but pushed forward by margin
       [axis.start]: 10,
       [axis.crossAxisStart]: emptyForeignCrossAxisStart,
@@ -87,7 +87,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     },
     margin,
     windowScroll,
-    clientRect: getArea({
+    area: getArea({
       // starting at start of home
       [axis.start]: 10,
       [axis.crossAxisStart]: crossAxisStart,
@@ -105,7 +105,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     // pushed forward by margin of inHome1
     margin,
     windowScroll,
-    clientRect: getArea({
+    area: getArea({
       [axis.start]: 30,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
@@ -122,7 +122,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     margin,
     windowScroll,
     // pushed forward by margin of inHome2
-    clientRect: getArea({
+    area: getArea({
       [axis.start]: 60,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
@@ -139,7 +139,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     // pushed forward by margin of inHome3
     margin,
     windowScroll,
-    clientRect: getArea({
+    area: getArea({
       [axis.start]: 100,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
@@ -156,7 +156,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     },
     margin,
     windowScroll,
-    clientRect: getArea({
+    area: getArea({
       [axis.start]: 10,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
@@ -173,7 +173,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     // pushed forward by margin of inForeign1
     margin,
     windowScroll,
-    clientRect: getArea({
+    area: getArea({
       [axis.start]: 30,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
@@ -190,7 +190,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     margin,
     windowScroll,
     // pushed forward by margin of inForeign2
-    clientRect: getArea({
+    area: getArea({
       [axis.start]: 60,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
@@ -207,7 +207,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     margin,
     windowScroll,
     // pushed forward by margin of inForeign3
-    clientRect: getArea({
+    area: getArea({
       [axis.start]: 100,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,

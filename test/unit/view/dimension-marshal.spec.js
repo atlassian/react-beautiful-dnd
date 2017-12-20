@@ -109,7 +109,7 @@ const ofAnotherType: DroppableDimension = getDroppableDimension({
     id: 'of-another-type',
     type: 'another-type',
   },
-  clientRect: fakeArea,
+  area: fakeArea,
 });
 const childOfAnotherType: DraggableDimension = getDraggableDimension({
   descriptor: {
@@ -117,7 +117,7 @@ const childOfAnotherType: DraggableDimension = getDraggableDimension({
     droppableId: ofAnotherType.descriptor.id,
     index: 0,
   },
-  clientRect: fakeArea,
+  area: fakeArea,
 });
 
 describe('dimension marshal', () => {
@@ -837,7 +837,7 @@ describe('dimension marshal', () => {
               droppableId: preset.home.descriptor.id,
               index: preset.inHomeList.length,
             },
-            clientRect: fakeArea,
+            area: fakeArea,
           });
 
           marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
@@ -857,7 +857,7 @@ describe('dimension marshal', () => {
               id: 'my fake id',
               type: preset.home.descriptor.type,
             },
-            clientRect: fakeArea,
+            area: fakeArea,
           });
           const droppableCallbacks: DroppableCallbacks = {
             getDimension: () => fake,

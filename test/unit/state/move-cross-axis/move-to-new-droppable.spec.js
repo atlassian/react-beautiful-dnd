@@ -66,7 +66,7 @@ describe('move to new droppable', () => {
           const invalid: DraggableDimension = getDraggableDimension({
             id: 'invalid',
             droppableId: 'some-other-droppable',
-            clientRect: getArea({
+            area: getArea({
               top: 1000,
               left: 1000,
               bottom: 1100,

@@ -20,7 +20,7 @@ describe('get closest draggable', () => {
 
     const droppable: DroppableDimension = getDroppableDimension({
       id: 'droppable',
-      clientRect: getArea({
+      area: getArea({
         [axis.start]: start,
         [axis.end]: end,
         [axis.crossAxisStart]: crossAxisStart,
@@ -32,7 +32,7 @@ describe('get closest draggable', () => {
     const partialHiddenBackwards: DraggableDimension = getDraggableDimension({
       id: 'partialHiddenBackwards',
       droppableId: droppable.descriptor.id,
-      clientRect: getArea({
+      area: getArea({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
         [axis.start]: -10, // -10
@@ -43,7 +43,7 @@ describe('get closest draggable', () => {
     const visible1: DraggableDimension = getDraggableDimension({
       id: 'visible1',
       droppableId: droppable.descriptor.id,
-      clientRect: getArea({
+      area: getArea({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
         [axis.start]: 20,
@@ -54,7 +54,7 @@ describe('get closest draggable', () => {
     const visible2: DraggableDimension = getDraggableDimension({
       id: 'visible2',
       droppableId: droppable.descriptor.id,
-      clientRect: getArea({
+      area: getArea({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
         [axis.start]: 40,
@@ -66,7 +66,7 @@ describe('get closest draggable', () => {
     const partiallyHiddenForwards: DraggableDimension = getDraggableDimension({
       id: 'partiallyHiddenForwards',
       droppableId: droppable.descriptor.id,
-      clientRect: getArea({
+      area: getArea({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
         [axis.start]: 60,
@@ -78,7 +78,7 @@ describe('get closest draggable', () => {
     const hidden: DraggableDimension = getDraggableDimension({
       id: 'hidden',
       droppableId: droppable.descriptor.id,
-      clientRect: getArea({
+      area: getArea({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
         [axis.start]: 120,

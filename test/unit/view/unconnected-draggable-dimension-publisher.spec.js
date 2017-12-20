@@ -20,7 +20,7 @@ const droppableId: DroppableId = 'drop-1';
 const dimension: DraggableDimension = getDraggableDimension({
   id: draggableId,
   droppableId,
-  clientRect: getArea({
+  area: getArea({
     top: 0,
     right: 100,
     bottom: 100,
@@ -132,7 +132,7 @@ describe('DraggableDimensionPublisher', () => {
     const expected: DraggableDimension = getDraggableDimension({
       id: draggableId,
       droppableId,
-      clientRect: getArea({
+      area: getArea({
         top: 0,
         right: 100,
         bottom: 100,
@@ -173,7 +173,7 @@ describe('DraggableDimensionPublisher', () => {
       x: 100,
       y: 200,
     };
-    const clientRect: Area = getArea({
+    const area: Area = getArea({
       top: 0,
       right: 100,
       bottom: 100,
@@ -182,10 +182,10 @@ describe('DraggableDimensionPublisher', () => {
     const expected: DraggableDimension = getDraggableDimension({
       id: draggableId,
       droppableId,
-      clientRect,
+      area,
       windowScroll,
     });
-    jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => clientRect);
+    jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => area);
     jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noSpacing);
     setWindowScroll(windowScroll);
 
