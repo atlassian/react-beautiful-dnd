@@ -11,7 +11,7 @@ import type {
 } from '../../types';
 
 type IsPartiallyVisibleArgs = {|
-  target: Spacing | ClientRect,
+  target: Spacing,
   droppable: DroppableDimension,
   viewport: ClientRect,
 |}

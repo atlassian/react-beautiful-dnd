@@ -1,6 +1,6 @@
 // @flow
 import { distance } from '../position';
-import { isDraggableWithin } from '../is-within-visible-bounds-of-droppable';
+import { isDraggableVisible } from '../visibility/is-within-visible-bounds-of-droppable';
 import type {
   Axis,
   Position,
@@ -28,7 +28,7 @@ export default ({
     return null;
   }
 
-  const isWithinDestination = isDraggableWithin(destination.container.bounds);
+  const isWithinDestination = isDraggableVisible(destination);
 
   const result: DraggableDimension[] = insideDestination
     // Remove any options that are hidden by overflow
