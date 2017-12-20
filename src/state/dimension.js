@@ -129,7 +129,7 @@ export const getDroppableDimension = ({
 }: GetDroppableArgs): DroppableDimension => {
   const withMargin = getWithSpacing(client, margin);
   const withWindowScroll = getWithPosition(client, windowScroll);
-  // If no containerRect is provided, or if the area matches the containerRect, this
+  // If no frameClient is provided, or if the area matches the frameClient, this
   // droppable is its own container. In this case we include its margin in the container bounds.
   // Otherwise, the container is a scrollable parent. In this case we don't care about margins
   // in the container bounds.
