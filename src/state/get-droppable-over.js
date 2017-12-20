@@ -4,7 +4,6 @@ import { getFragment } from './dimension';
 import getClientRect from './get-client-rect';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
 import { isPositionPartiallyWithin } from './visibility/is-partially-within';
-// import { isPositionVisible } from './visibility/is-within-visible-bounds-of-droppable';
 import { patch } from './position';
 import { addPosition } from './spacing';
 import type {

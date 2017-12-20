@@ -2,7 +2,6 @@
 import { closest } from '../position';
 import isWithin from '../is-within';
 import { getCorners } from '../spacing';
-// import { getVisibleBounds } from '../is-within-visible-bounds-of-droppable';
 import { isPartiallyVisible } from '../visibility/is-partially-visible';
 import getViewport from '../visibility/get-viewport';
 import type {

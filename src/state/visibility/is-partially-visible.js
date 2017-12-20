@@ -54,3 +54,27 @@ export const isDraggablePartiallyVisible = ({
   viewport,
 });
 
+type IsPositionVisibleArgs = {|
+  point: Position,
+  droppable: DroppableDimension,
+  viewport: ClientRect,
+|}
+
+export const isPositionVisible = ({
+  point,
+  droppable,
+  viewport,
+}: IsPositionVisibleArgs): boolean => {
+  const target: Spacing = {
+    top: point.y,
+    left: point.x,
+    bottom: point.y,
+    right: point.x,
+  };
+  return isPartiallyVisible({
+    target,
+    droppable,
+    viewport,
+  });
+};
+
