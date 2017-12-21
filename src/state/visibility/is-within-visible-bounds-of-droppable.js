@@ -2,6 +2,7 @@
 import isPartiallyWithin from './is-partially-within';
 import isPositionWithin from './is-position-within';
 import { offset } from '../spacing';
+import { add } from '../position';
 import type {
   DroppableDimension,
   DraggableDimension,
@@ -9,15 +10,24 @@ import type {
   Spacing,
 } from '../../types';
 
-export const isPositionVisible = (droppable: DroppableDimension) =>
-  isPositionWithin(droppable.viewport.clipped);
+export const isPositionVisible = (droppable: DroppableDimension) => {
+  const isVisible = isPositionWithin(droppable.viewport.clipped);
+  const displacement: Position = droppable.viewport.frameScroll.diff.displacement;
+
+  return (point: Position) => {
+    // Taking into account changes in the droppables scroll
+    const withScroll: Position = add(point, displacement);
+
+    return isVisible(withScroll);
+  };
+};
 
 export const isSpacingVisible = (droppable: DroppableDimension) => {
   const isVisible = isPartiallyWithin(droppable.viewport.clipped);
   const displacement: Position = droppable.viewport.frameScroll.diff.displacement;
 
-  // Taking into account changes in the droppables scroll
   return (spacing: Spacing) => {
+    // Taking into account changes in the droppables scroll
     const withScroll: Spacing = offset(spacing, displacement);
 
     return isVisible(withScroll);
@@ -27,10 +37,7 @@ export const isSpacingVisible = (droppable: DroppableDimension) => {
 export const isDraggableVisible = (droppable: DroppableDimension) => {
   const isVisibleInClipped = isSpacingVisible(droppable);
 
-  return (draggable: DraggableDimension): boolean => {
-    const result = isVisibleInClipped(draggable.page.withoutMargin);
-
-    return result;
-  };
+  return (draggable: DraggableDimension): boolean =>
+    isVisibleInClipped(draggable.page.withoutMargin);
 };
 
