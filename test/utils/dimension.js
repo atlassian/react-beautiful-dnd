@@ -33,7 +33,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     padding,
     margin,
     windowScroll,
-    area: getArea({
+    client: getArea({
       // would be 0 but pushed forward by margin
       [axis.start]: 10,
       [axis.crossAxisStart]: crossAxisStart,
@@ -51,7 +51,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     margin,
     windowScroll,
     direction: axis.direction,
-    area: getArea({
+    client: getArea({
       // would be 0 but pushed forward by margin
       [axis.start]: 10,
       [axis.crossAxisStart]: foreignCrossAxisStart,
@@ -69,7 +69,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     margin,
     windowScroll,
     direction: axis.direction,
-    area: getArea({
+    client: getArea({
       // would be 0 but pushed forward by margin
       [axis.start]: 10,
       [axis.crossAxisStart]: emptyForeignCrossAxisStart,
@@ -87,7 +87,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     },
     margin,
     windowScroll,
-    area: getArea({
+    client: getArea({
       // starting at start of home
       [axis.start]: 10,
       [axis.crossAxisStart]: crossAxisStart,
@@ -105,7 +105,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     // pushed forward by margin of inHome1
     margin,
     windowScroll,
-    area: getArea({
+    client: getArea({
       [axis.start]: 30,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
@@ -122,7 +122,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     margin,
     windowScroll,
     // pushed forward by margin of inHome2
-    area: getArea({
+    client: getArea({
       [axis.start]: 60,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
@@ -139,7 +139,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     // pushed forward by margin of inHome3
     margin,
     windowScroll,
-    area: getArea({
+    client: getArea({
       [axis.start]: 100,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
@@ -156,7 +156,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     },
     margin,
     windowScroll,
-    area: getArea({
+    client: getArea({
       [axis.start]: 10,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
@@ -173,7 +173,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     // pushed forward by margin of inForeign1
     margin,
     windowScroll,
-    area: getArea({
+    client: getArea({
       [axis.start]: 30,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
@@ -190,7 +190,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     margin,
     windowScroll,
     // pushed forward by margin of inForeign2
-    area: getArea({
+    client: getArea({
       [axis.start]: 60,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
@@ -207,7 +207,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     margin,
     windowScroll,
     // pushed forward by margin of inForeign3
-    area: getArea({
+    client: getArea({
       [axis.start]: 100,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
@@ -260,35 +260,8 @@ export const getPreset = (axis?: Axis = vertical) => {
   };
 };
 
-export const updateDroppableScroll = (
-  droppable: DroppableDimension,
-  addition: Position
-): DroppableDimension => {
-  const newScroll = add(droppable.container.scroll.initial, addition);
-
-  const result: DroppableDimension = {
-    descriptor: droppable.descriptor,
-    axis: droppable.axis,
-    isEnabled: droppable.isEnabled,
-    client: droppable.client,
-    page: droppable.page,
-    container: {
-      scroll: {
-        initial: droppable.container.scroll.initial,
-        current: newScroll,
-      },
-      bounds: droppable.container.bounds,
-    },
-  };
-
-  return result;
-};
-
+// $ExpectError - using spread
 export const disableDroppable = (droppable: DroppableDimension): DroppableDimension => ({
-  descriptor: droppable.descriptor,
-  axis: droppable.axis,
+  ...droppable,
   isEnabled: false,
-  client: droppable.client,
-  page: droppable.page,
-  container: droppable.container,
 });
