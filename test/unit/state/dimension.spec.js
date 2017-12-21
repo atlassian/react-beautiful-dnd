@@ -44,11 +44,6 @@ const windowScroll: Position = {
 };
 const origin: Position = { x: 0, y: 0 };
 
-const getCenter = (rect: Area | Spacing): Position => ({
-  x: (rect.left + rect.right) / 2,
-  y: (rect.top + rect.bottom) / 2,
-});
-
 const addPosition = (area: Area, point: Position): Area => {
   const { top, right, bottom, left } = area;
   return getArea({
