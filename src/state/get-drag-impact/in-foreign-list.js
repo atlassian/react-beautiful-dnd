@@ -9,7 +9,7 @@ import type {
   Displacement,
   Area,
 } from '../../types';
-import { subtract, patch } from '../position';
+import { add, patch } from '../position';
 import getDisplacement from '../get-displacement';
 import getViewport from '../visibility/get-viewport';
 
@@ -30,10 +30,15 @@ export default ({
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
   const viewport: Area = getViewport();
-  const destinationScrollDisplacement: Position =
-    destination.viewport.frameScroll.diff.displacement;
-  // TODO: is this because we are adding it to the displacement calcs?
-  const currentCenter: Position = subtract(pageCenter, destinationScrollDisplacement);
+
+  // We need to know what point to use to compare to the other
+  // draggables in the list.
+  // To do this we need to consider any displacement caused by
+  // a change in scroll in the droppable we are currently over.
+
+  const destinationScrollDiff: Position =
+    destination.viewport.frameScroll.diff.value;
+  const currentCenter: Position = add(pageCenter, destinationScrollDiff);
 
   const displaced: Displacement[] = insideDestination
     .filter((child: DraggableDimension): boolean => {
