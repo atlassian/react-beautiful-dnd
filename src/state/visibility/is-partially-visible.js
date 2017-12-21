@@ -1,5 +1,5 @@
 // @flow
-import { isSpacingPartiallyWithin } from './is-partially-within';
+import isPartiallyWithin from './is-partially-within';
 import { isSpacingVisible as isPartiallyVisibleInDroppable } from './is-within-visible-bounds-of-droppable';
 import { offset } from '../spacing';
 import type {
@@ -33,7 +33,7 @@ export const isPartiallyVisible = ({
   }
 
   const isVisibleWithinViewport: boolean =
-    isSpacingPartiallyWithin(viewport)(withScroll);
+    isPartiallyWithin(viewport)(withScroll);
 
   return isVisibleWithinViewport;
 };

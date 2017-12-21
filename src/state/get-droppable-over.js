@@ -2,7 +2,7 @@
 import memoizeOne from 'memoize-one';
 import getArea from './get-area';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
-import { isPositionPartiallyWithin } from './visibility/is-partially-within';
+import isPositionWithin from './visibility/is-position-within';
 import { patch } from './position';
 import { addPosition } from './spacing';
 import type {
@@ -205,7 +205,7 @@ export default ({
         });
 
         // TODO: do with placeholder
-        return isPositionPartiallyWithin(clipped)(target);
+        return isPositionWithin(clipped)(target);
       });
 
   return maybe ? maybe.descriptor.id : null;

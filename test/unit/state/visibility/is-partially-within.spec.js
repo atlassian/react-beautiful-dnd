@@ -5,7 +5,7 @@ import type { Spacing } from '../../../../src/types';
 const container: Spacing = {
   top: 0, left: 0, right: 100, bottom: 100,
 };
-const isWithinContainer = isPartiallyWithin(container);
+const isSpacingWithinContainer = isPartiallyWithin(container);
 
 describe('is partially within', () => {
   describe('total visibility', () => {
@@ -17,7 +17,7 @@ describe('is partially within', () => {
         bottom: 30,
       };
 
-      expect(isWithinContainer(target)).toBe(true);
+      expect(isSpacingWithinContainer(target)).toBe(true);
     });
 
     it('should return false when the item is completely invisible', () => {
@@ -28,11 +28,11 @@ describe('is partially within', () => {
         bottom: -10,
       };
 
-      expect(isWithinContainer(target)).toBe(false);
+      expect(isSpacingWithinContainer(target)).toBe(false);
     });
 
     it('should return true when is the same dimensions', () => {
-      expect(isWithinContainer(container)).toBe(true);
+      expect(isSpacingWithinContainer(container)).toBe(true);
     });
   });
 
@@ -49,7 +49,7 @@ describe('is partially within', () => {
         right: 150,
       };
 
-      expect(isWithinContainer(target)).toBe(true);
+      expect(isSpacingWithinContainer(target)).toBe(true);
     });
 
     it('should return false when only partially visible horizontally', () => {
@@ -62,7 +62,7 @@ describe('is partially within', () => {
         right: 150,
       };
 
-      expect(isWithinContainer(target)).toBe(false);
+      expect(isSpacingWithinContainer(target)).toBe(false);
     });
 
     it('should return false when only partially visible vertically', () => {
@@ -75,7 +75,7 @@ describe('is partially within', () => {
         right: 150,
       };
 
-      expect(isWithinContainer(target)).toBe(false);
+      expect(isSpacingWithinContainer(target)).toBe(false);
     });
   });
 });
