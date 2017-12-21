@@ -80,10 +80,9 @@ export default () => {
       const trigger: DropTrigger = current.drop.pending.trigger;
 
       if (trigger === 'DROP') {
-        setStyle(styles.dropping);
+        setStyle(styles.dropAnimating);
         return;
       }
-      console.warn('user cancel styles');
       setStyle(styles.userCancel);
       return;
     }

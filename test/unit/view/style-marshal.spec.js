@@ -3,7 +3,6 @@ import createStyleMarshal from '../../../src/view/style-marshal/style-marshal';
 import getStyles, { type Styles } from '../../../src/view/style-marshal/get-styles';
 import type { StyleMarshal } from '../../../src/view/style-marshal/style-marshal-types';
 import * as state from '../../utils/simple-state-preset';
-import { css } from '../../../src/view/animation';
 import type { State } from '../../../src/types';
 
 const getSelectors = (context: string) => {
@@ -88,7 +87,7 @@ describe('style marshal', () => {
       const styles: Styles = getStyles(marshal.styleContext);
 
       marshal.onPhaseChange(state.dropAnimating());
-      expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.dropping);
+      expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.dropAnimating);
     });
 
     it('should apply the user cancel styles if performing a user directed cancel', () => {
@@ -116,17 +115,19 @@ describe('style marshal', () => {
 
     it('should log an error if attempting to apply styles after unmounted', () => {
       const marshal: StyleMarshal = createStyleMarshal();
+      const styles: Styles = getStyles(marshal.styleContext);
       const selector: string = getSelectors(marshal.styleContext).styleTag;
       // grabbing the element before unmount
       const el: HTMLElement = (document.querySelector(selector): any);
+
       // asserting it has the base styles
-      expect(clean(el.innerHTML)).toEqual(getBaseStyles(marshal.styleContext));
+      expect(el.innerHTML).toEqual(styles.resting);
 
       marshal.unmount();
       marshal.onPhaseChange(state.dragging());
 
       // asserting it has the base styles (not updated)
-      expect(clean(el.innerHTML)).toEqual(getBaseStyles(marshal.styleContext));
+      expect(el.innerHTML).toEqual(styles.resting);
       // an error is logged
       expect(console.error).toHaveBeenCalled();
     });
@@ -135,31 +136,32 @@ describe('style marshal', () => {
   describe('subsequent updates', () => {
     it('should allow multiple updates', () => {
       const marshal: StyleMarshal = createStyleMarshal();
+      const styles: Styles = getStyles(marshal.styleContext);
 
       Array.from({ length: 4 }).forEach(() => {
         // idle
         marshal.onPhaseChange(state.idle);
-        expect(getStyleFromTag(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
+        expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.resting);
 
         // preparing
         marshal.onPhaseChange(state.preparing);
-        expect(getStyleFromTag(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
+        expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.resting);
 
         // initial dimension request
         marshal.onPhaseChange(state.requesting());
-        expect(getStyleFromTag(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
+        expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.resting);
 
         // dragging
         marshal.onPhaseChange(state.dragging());
-        expect(getStyleFromTag(marshal.styleContext)).toEqual(getDraggingStyles(marshal.styleContext));
+        expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.dragging);
 
         // dropping
         marshal.onPhaseChange(state.dropAnimating());
-        expect(getStyleFromTag(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
+        expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.dropAnimating);
 
         // complete
         marshal.onPhaseChange(state.dropComplete());
-        expect(getStyleFromTag(marshal.styleContext)).toEqual(getBaseStyles(marshal.styleContext));
+        expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.resting);
       });
     });
   });

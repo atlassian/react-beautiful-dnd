@@ -4,7 +4,7 @@ import { css } from '../animation';
 export type Styles = {|
   dragging: string,
   resting: string,
-  dropping: string,
+  dropAnimating: string,
   userCancel: string,
 |}
 
@@ -124,7 +124,7 @@ export default (styleContext: string): Styles => {
     draggableStyles.animateMovement,
   ].join('');
 
-  const dropping: string = [
+  const dropAnimating: string = [
     dragHandleStyles.base,
     dragHandleStyles.grabCursor,
     draggableStyles.animateMovement,
@@ -137,6 +137,6 @@ export default (styleContext: string): Styles => {
     draggableStyles.animateMovement,
   ].join('');
 
-  return { resting, dragging, dropping, userCancel };
+  return { resting, dragging, dropAnimating, userCancel };
 };
 
