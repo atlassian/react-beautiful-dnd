@@ -103,12 +103,19 @@ export type DroppableDimensionViewport = {|
   frameScroll: {|
     initial: Position,
     current: Position,
-    diff: Position,
+    diff: {|
+      value: Position,
+      // The actual displacement as a result of a scroll is in the opposite
+      // direction to the scroll itself. When scrolling down items are displaced
+      // upwards. This value is the negated version of the 'value'
+      displacement: Position,
+    |}
   |},
   // the area to be clipped by the frame
+  // this is the initial capture of the subject and is not updated
   subject: Area,
-  // this the dimension of the droppable (page.withMargin) through
-  // the viewport of the frame.
+  // this is the subject through the viewport of the frame
+  // it also takes into account any changes to the viewport scroll
   clipped: Area,
 |}
 

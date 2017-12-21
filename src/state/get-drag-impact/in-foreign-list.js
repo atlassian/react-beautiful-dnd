@@ -9,7 +9,7 @@ import type {
   Displacement,
   Area,
 } from '../../types';
-import { add, patch } from '../position';
+import { subtract, patch } from '../position';
 import getDisplacement from '../get-displacement';
 import getViewport from '../visibility/get-viewport';
 
@@ -30,8 +30,10 @@ export default ({
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
   const viewport: Area = getViewport();
-  const destinationScrollDiff: Position = destination.viewport.frameScroll.diff;
-  const currentCenter: Position = add(pageCenter, destinationScrollDiff);
+  const destinationScrollDisplacement: Position =
+    destination.viewport.frameScroll.diff.displacement;
+  // TODO: is this because we are adding it to the displacement calcs?
+  const currentCenter: Position = subtract(pageCenter, destinationScrollDisplacement);
 
   const displaced: Displacement[] = insideDestination
     .filter((child: DraggableDimension): boolean => {

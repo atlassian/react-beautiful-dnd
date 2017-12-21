@@ -71,7 +71,9 @@ export default class QuoteApp extends Component<Props, State> {
   componentDidMount() {
     // eslint-disable-next-line no-unused-expressions
     injectGlobal`
-      background: ${colors.blue};
+      body {
+        background: ${colors.blue.deep};
+      }
     `;
   }
 

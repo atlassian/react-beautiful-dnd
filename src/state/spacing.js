@@ -25,11 +25,11 @@ export const isEqual = (spacing1: Spacing, spacing2: Spacing): boolean => (
   spacing1.left === spacing2.left
 );
 
-export const offset = (spacing: Spacing, position: Position): Spacing => ({
-  top: spacing.top + position.y,
-  right: spacing.right + position.x,
-  bottom: spacing.bottom + position.y,
-  left: spacing.left + position.x,
+export const offset = (spacing: Spacing, point: Position): Spacing => ({
+  top: spacing.top + point.y,
+  right: spacing.right + point.x,
+  bottom: spacing.bottom + point.y,
+  left: spacing.left + point.x,
 });
 
 export const getCorners = (spacing: Spacing): Position[] => [

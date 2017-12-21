@@ -82,21 +82,17 @@ const getClippedAreaWithPlaceholder = ({
   // We only want to add the buffer to the container dimensions
   // if the droppable isn't clipped by a scroll container
   const isClipped: boolean = subject[droppable.axis.size] > frame[droppable.axis.size];
-  console.log('is clipped?', isClipped);
   if (isClipped) {
     return clipped;
   }
+  console.log('is clipped?', isClipped);
 
   const requiredGrowth: ?Position = getRequiredGrowth(draggable, draggables, droppable);
-  console.log('required growth', requiredGrowth);
 
   // no required growth
   if (!requiredGrowth) {
     return clipped;
   }
-
-  console.log('clipped', clipped);
-  console.log('with growth', getWithGrowth(clipped, requiredGrowth));
 
   return getWithGrowth(clipped, requiredGrowth);
 };
@@ -121,12 +117,11 @@ export default ({
       .map((id: DroppableId): DroppableDimension => droppables[id])
       .find((droppable: DroppableDimension): boolean => {
         // Add the size of a placeholder to a droppable's dimensions (if necessary)
-        const clipped: Area = getClippedAreaWithPlaceholder({
+        const withPlaceholder: Area = getClippedAreaWithPlaceholder({
           draggable, draggables, droppable, previousDroppableOverId,
         });
 
-        // TODO: do with placeholder
-        return isPositionWithin(clipped)(target);
+        return isPositionWithin(withPlaceholder)(target);
       });
 
   return maybe ? maybe.descriptor.id : null;

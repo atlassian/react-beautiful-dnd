@@ -9,7 +9,7 @@ import type {
   Displacement,
   Area,
 } from '../../types';
-import { add, patch } from '../position';
+import { subtract, patch, negate } from '../position';
 import getDisplacement from '../get-displacement';
 import getViewport from '../visibility/get-viewport';
 
@@ -33,9 +33,9 @@ export default ({
 }: Args): DragImpact => {
   const viewport: Area = getViewport();
   const axis: Axis = home.axis;
-  const homeScrollDiff: Position = home.viewport.frameScroll.diff;
+  const homeScrollDiff: Position = home.viewport.frameScroll.diff.displacement;
   // Where the element actually is now
-  const currentCenter: Position = add(pageCenter, homeScrollDiff);
+  const currentCenter: Position = subtract(pageCenter, homeScrollDiff);
   // The starting center position
   const originalCenter: Position = draggable.page.withoutMargin.center;
 

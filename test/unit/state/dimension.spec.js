@@ -6,6 +6,7 @@ import {
 } from '../../../src/state/dimension';
 import { vertical, horizontal } from '../../../src/state/axis';
 import getArea from '../../../src/state/get-area';
+import { negate } from '../../../src/state/position';
 import type {
   Area,
   Spacing,
@@ -143,7 +144,10 @@ describe('dimension', () => {
       expect(dimension.viewport.frameScroll).toEqual({
         initial: frameScroll,
         current: frameScroll,
-        diff: origin,
+        diff: {
+          value: origin,
+          displacement: origin,
+        },
       });
     });
 
@@ -277,7 +281,7 @@ describe('dimension', () => {
         );
       });
 
-      it('should use the frame rect as the frame if provided', () => {
+      it('should use the frameClient as the frame if provided', () => {
         const frameClient: Area = getArea({
           top: 20,
           left: 30,
@@ -389,18 +393,21 @@ describe('dimension', () => {
     });
   });
 
-  describe('scroll droppable', () => {
+  describe('scrolling a droppable', () => {
     it('should update the frame scroll and the clipping', () => {
       const subject = getArea({
+        // 500 px high
         top: 0,
+        bottom: 500,
         right: 100,
-        bottom: 100,
         left: 0,
       });
       const frameClient = getArea({
+        // only viewing top 100px
         top: 0,
-        right: 100,
         bottom: 100,
+        // unchanged
+        right: 100,
         left: 0,
       });
       const frameScroll: Position = { x: 0, y: 0 };
@@ -413,11 +420,11 @@ describe('dimension', () => {
 
       // original frame
       expect(droppable.viewport.frame).toEqual(frameClient);
-      // no original clipping
-      expect(droppable.viewport.clipped).toEqual(subject);
+      // subject is currently clipped by the frame
+      expect(droppable.viewport.clipped).toEqual(frameClient);
 
-      // scrolling
-      const newScroll: Position = { x: 10, y: 10 };
+      // scrolling down
+      const newScroll: Position = { x: 0, y: 100 };
       const updated: DroppableDimension = scrollDroppable(droppable, newScroll);
 
       // unchanged frame client
@@ -427,19 +434,20 @@ describe('dimension', () => {
       expect(updated.viewport.frameScroll).toEqual({
         initial: frameScroll,
         current: newScroll,
-        diff: newScroll,
+        diff: {
+          value: newScroll,
+          displacement: negate(newScroll),
+        },
       });
 
       // updated clipped
+      // can now see the bottom half of the subject
       expect(updated.viewport.clipped).toEqual(getArea({
-        // now lower than the top of the frame
-        top: 10,
-        // cut off by the frame
-        right: 100,
-        // cut off by the frame
+        top: 0,
         bottom: 100,
-        // now further left than the frame
-        left: 10,
+        // unchanged
+        right: 100,
+        left: 0,
       }));
     });
   });

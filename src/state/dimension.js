@@ -2,7 +2,7 @@
 import { vertical, horizontal } from './axis';
 import getArea from './get-area';
 import { add, offset } from './spacing';
-import { subtract } from './position';
+import { subtract, negate } from './position';
 import type {
   DraggableDescriptor,
   DroppableDescriptor,
@@ -115,17 +115,23 @@ export const scrollDroppable = (
   const existing: DroppableDimensionViewport = droppable.viewport;
 
   const scrollDiff: Position = subtract(newScroll, existing.frameScroll.initial);
-  const shiftedSubject: Spacing = offset(existing.subject, scrollDiff);
+  // a positive scroll difference leads to a negative displacement
+  // (scrolling down pulls an item upwards)
+  const scrollDisplacement: Position = negate(scrollDiff);
+  const scrolledSubject: Spacing = offset(existing.subject, scrollDisplacement);
 
   const viewport: DroppableDimensionViewport = {
     frame: existing.frame,
     frameScroll: {
       initial: existing.frameScroll.initial,
       current: newScroll,
-      diff: scrollDiff,
+      diff: {
+        value: scrollDiff,
+        displacement: scrollDisplacement,
+      },
     },
     subject: existing.subject,
-    clipped: clip(existing.frame, shiftedSubject),
+    clipped: clip(existing.frame, scrolledSubject),
   };
 
   // $ExpectError - using spread
@@ -169,7 +175,10 @@ export const getDroppableDimension = ({
       initial: frameScroll,
       // no scrolling yet, so current = initial
       current: frameScroll,
-      diff: origin,
+      diff: {
+        value: origin,
+        displacement: origin,
+      },
     },
     subject,
     clipped: clip(frame, subject),
