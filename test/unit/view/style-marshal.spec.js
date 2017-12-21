@@ -5,21 +5,11 @@ import type { StyleMarshal } from '../../../src/view/style-marshal/style-marshal
 import * as state from '../../utils/simple-state-preset';
 import type { State } from '../../../src/types';
 
-const getSelectors = (context: string) => {
-  const prefix: string = 'data-react-beautiful-dnd';
-  const dragHandle: string = `[${prefix}-drag-handle="${context}"]`;
-  const draggable: string = `[${prefix}-draggable="${context}"]`;
-  const styleTag: string = `style[data-react-beautiful-dnd="${context}"]`;
-
-  return {
-    styleTag,
-    dragHandle,
-    draggable,
-  };
-};
+const getStyleTagSelector = (context: string) =>
+  `style[data-react-beautiful-dnd="${context}"]`;
 
 const getStyleFromTag = (context: string): string => {
-  const selector: string = getSelectors(context).styleTag;
+  const selector: string = getStyleTagSelector(context);
   const el: HTMLStyleElement = (document.querySelector(selector): any);
   return el.innerHTML;
 };
@@ -102,7 +92,7 @@ describe('style marshal', () => {
   describe('unmounting', () => {
     it('should remove the style tag from the head when unmounting', () => {
       const marshal: StyleMarshal = createStyleMarshal();
-      const selector: string = getSelectors(marshal.styleContext).styleTag;
+      const selector: string = getStyleTagSelector(marshal.styleContext);
 
       // the style tag exists
       expect(document.querySelector(selector)).toBeTruthy();
@@ -116,7 +106,7 @@ describe('style marshal', () => {
     it('should log an error if attempting to apply styles after unmounted', () => {
       const marshal: StyleMarshal = createStyleMarshal();
       const styles: Styles = getStyles(marshal.styleContext);
-      const selector: string = getSelectors(marshal.styleContext).styleTag;
+      const selector: string = getStyleTagSelector(marshal.styleContext);
       // grabbing the element before unmount
       const el: HTMLElement = (document.querySelector(selector): any);
 
