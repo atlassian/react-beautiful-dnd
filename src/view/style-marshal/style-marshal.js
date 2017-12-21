@@ -1,4 +1,5 @@
 // @flow
+import memoizeOne from 'memoize-one';
 import getStyles, { type Styles } from './get-styles';
 import type { StyleMarshal } from './style-marshal-types';
 import type {
@@ -10,7 +11,6 @@ import type {
 let count: number = 0;
 
 type State = {
-  applied: ?string,
   isMounted: boolean,
 }
 
@@ -36,7 +36,6 @@ export default () => {
   })();
 
   let state: State = {
-    applied: null,
     isMounted: true,
   };
 
@@ -48,19 +47,13 @@ export default () => {
     state = newState;
   };
 
-  const setStyle = (proposed: string) => {
-    if (state.applied === proposed) {
-      return;
-    }
-
-    setState({
-      applied: proposed,
-    });
-
+  // using memoizeOne as a way of not updating the innerHTML
+  // unless there is a new value required
+  const setStyle = memoizeOne((proposed: string) => {
     // This technique works with ie11+ so no need for a nasty fallback as seen here:
     // https://stackoverflow.com/a/22050778/1374236
     el.innerHTML = proposed;
-  };
+  });
 
   // self initiating
   setStyle(styles.resting);

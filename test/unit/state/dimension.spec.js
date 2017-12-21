@@ -2,10 +2,10 @@
 import {
   getDraggableDimension,
   getDroppableDimension,
-  getFragment,
+  scrollDroppable,
 } from '../../../src/state/dimension';
 import { vertical, horizontal } from '../../../src/state/axis';
-import getArea, { getWithPosition, getWithSpacing } from '../../../src/state/get-area';
+import getArea from '../../../src/state/get-area';
 import type {
   Area,
   Spacing,
@@ -14,7 +14,6 @@ import type {
   Position,
   DraggableDimension,
   DroppableDimension,
-  DimensionFragment,
 } from '../../../src/types';
 
 const droppableDescriptor: DroppableDescriptor = {
@@ -50,11 +49,32 @@ const getCenter = (rect: Area | Spacing): Position => ({
   y: (rect.top + rect.bottom) / 2,
 });
 
+const addPosition = (area: Area, point: Position): Area => {
+  const { top, right, bottom, left } = area;
+  return getArea({
+    top: top + point.y,
+    left: left + point.x,
+    bottom: bottom + point.y,
+    right: right + point.x,
+  });
+};
+
+const addSpacing = (area: Area, spacing: Spacing): Area => {
+  const { top, right, bottom, left } = area;
+  return getArea({
+    // pulling back to increase size
+    top: top - spacing.top,
+    left: left - spacing.left,
+    // pushing forward to increase size
+    bottom: bottom + spacing.bottom,
+    right: right + spacing.right,
+  });
+};
+
 describe('dimension', () => {
   describe('draggable dimension', () => {
     const dimension: DraggableDimension = getDraggableDimension({
-      id: draggableId,
-      droppableId,
+      descriptor: draggableDescriptor,
       client,
       margin,
       windowScroll,
@@ -62,88 +82,54 @@ describe('dimension', () => {
 
     describe('without scroll (client)', () => {
       it('should return a portion that does not account for margins', () => {
-        const fragment: DimensionFragment = {
+        const area: Area = getArea({
           top: client.top,
           right: client.right,
           bottom: client.bottom,
           left: client.left,
-          width: client.width,
-          height: client.height,
-          center: {
-            x: (client.left + client.right) / 2,
-            y: (client.top + client.bottom) / 2,
-          },
-        };
-        expect(dimension.client.withoutMargin).toEqual(fragment);
+        });
+
+        expect(dimension.client.withoutMargin).toEqual(area);
       });
 
       it('should return a portion that considers margins', () => {
-        const rect: Area = getArea({
+        const area: Area = getArea({
           top: client.top - margin.top,
           right: client.right + margin.right,
           bottom: client.bottom + margin.bottom,
           left: client.left - margin.left,
         });
 
-        const fragment: DimensionFragment = {
-          top: rect.top,
-          right: rect.right,
-          bottom: rect.bottom,
-          left: rect.left,
-          width: rect.width,
-          height: rect.height,
-          center: getCenter(rect),
-        };
-        expect(dimension.client.withMargin).toEqual(fragment);
+        expect(dimension.client.withMargin).toEqual(area);
       });
     });
 
     describe('with scroll (page)', () => {
       it('should return a portion that does not account for margins', () => {
-        const top: number = client.top + windowScroll.y;
-        const right: number = client.right + windowScroll.x;
-        const bottom: number = client.bottom + windowScroll.y;
-        const left: number = client.left + windowScroll.x;
+        const area: Area = getArea({
+          top: client.top + windowScroll.y,
+          right: client.right + windowScroll.x,
+          bottom: client.bottom + windowScroll.y,
+          left: client.left + windowScroll.x,
+        });
 
-        const fragment: DimensionFragment = {
-          top,
-          right,
-          bottom,
-          left,
-          width: client.width,
-          height: client.height,
-          center: {
-            x: (left + right) / 2,
-            y: (top + bottom) / 2,
-          },
-        };
-        expect(dimension.page.withoutMargin).toEqual(fragment);
+        expect(dimension.page.withoutMargin).toEqual(area);
       });
 
       it('should return a portion that considers margins', () => {
-        const rect: Area = getArea({
+        const area: Area = getArea({
           top: (client.top - margin.top) + windowScroll.y,
           right: client.right + margin.right + windowScroll.x,
           bottom: client.bottom + margin.bottom + windowScroll.y,
           left: (client.left - margin.left) + windowScroll.x,
         });
 
-        const fragment: DimensionFragment = {
-          top: rect.top,
-          right: rect.right,
-          bottom: rect.bottom,
-          left: rect.left,
-          width: rect.width,
-          height: rect.height,
-          center: getCenter(rect),
-        };
-
-        expect(dimension.page.withMargin).toEqual(fragment);
+        expect(dimension.page.withMargin).toEqual(area);
       });
     });
   });
 
-  describe.only('droppable dimension', () => {
+  describe('droppable dimension', () => {
     const frameScroll: Position = {
       x: 10,
       y: 20,
@@ -201,129 +187,76 @@ describe('dimension', () => {
 
     describe('without scroll (client)', () => {
       it('should return a portion that does not consider margins', () => {
-        const fragment: DimensionFragment = {
+        const area: Area = getArea({
           top: client.top,
           right: client.right,
           bottom: client.bottom,
           left: client.left,
-          width: client.width,
-          height: client.height,
-          center: getCenter(client),
-        };
+        });
 
-        expect(dimension.client.withoutMargin).toEqual(fragment);
+        expect(dimension.client.withoutMargin).toEqual(area);
       });
 
       it('should return a portion that does consider margins', () => {
-        const rect: Area = getArea({
+        const area: Area = getArea({
           top: client.top - margin.top,
           left: client.left - margin.left,
           bottom: client.bottom + margin.bottom,
           right: client.right + margin.right,
         });
 
-        const fragment: DimensionFragment = {
-          top: rect.top,
-          right: rect.right,
-          bottom: rect.bottom,
-          left: rect.left,
-          width: rect.width,
-          height: rect.height,
-          center: getCenter(rect),
-        };
-
-        expect(dimension.client.withMargin).toEqual(fragment);
+        expect(dimension.client.withMargin).toEqual(area);
       });
 
       it('should return a portion that considers margins and padding', () => {
-        const rect: Area = getArea({
+        const area: Area = getArea({
           top: client.top - margin.top - padding.top,
           left: client.left - margin.left - padding.left,
           bottom: client.bottom + margin.bottom + padding.bottom,
           right: client.right + margin.right + padding.right,
         });
 
-        const fragment: DimensionFragment = {
-          top: rect.top,
-          right: rect.right,
-          bottom: rect.bottom,
-          left: rect.left,
-          width: rect.width,
-          height: rect.height,
-          center: getCenter(rect),
-        };
-
-        expect(dimension.client.withMarginAndPadding).toEqual(fragment);
+        expect(dimension.client.withMarginAndPadding).toEqual(area);
       });
     });
 
     describe('with scroll (page)', () => {
       it('should return a portion that does not consider margins', () => {
-        const rect: Area = getArea({
+        const area: Area = getArea({
           top: client.top + windowScroll.y,
           left: client.left + windowScroll.x,
           bottom: client.bottom + windowScroll.y,
           right: client.right + windowScroll.x,
         });
 
-        const fragment: DimensionFragment = {
-          top: rect.top,
-          right: rect.right,
-          bottom: rect.bottom,
-          left: rect.left,
-          width: rect.width,
-          height: rect.height,
-          center: getCenter(rect),
-        };
-
-        expect(dimension.page.withoutMargin).toEqual(fragment);
+        expect(dimension.page.withoutMargin).toEqual(area);
       });
 
       it('should return a portion that does consider margins', () => {
-        const rect: Area = getArea({
+        const area: Area = getArea({
           top: (client.top + windowScroll.y) - margin.top,
           left: (client.left + windowScroll.x) - margin.left,
           bottom: client.bottom + windowScroll.y + margin.bottom,
           right: client.right + windowScroll.x + margin.right,
         });
 
-        const fragment: DimensionFragment = {
-          top: rect.top,
-          right: rect.right,
-          bottom: rect.bottom,
-          left: rect.left,
-          width: rect.width,
-          height: rect.height,
-          center: getCenter(rect),
-        };
-
-        expect(dimension.page.withMargin).toEqual(fragment);
+        expect(dimension.page.withMargin).toEqual(area);
       });
 
       it('should return a portion that considers margins and padding', () => {
-        const rect: Area = getArea({
+        const area: Area = getArea({
           top: (client.top + windowScroll.y) - margin.top - padding.top,
           left: (client.left + windowScroll.x) - margin.left - padding.left,
           bottom: client.bottom + windowScroll.y + margin.bottom + padding.bottom,
           right: client.right + windowScroll.x + margin.right + padding.right,
         });
 
-        const fragment: DimensionFragment = {
-          top: rect.top,
-          right: rect.right,
-          bottom: rect.bottom,
-          left: rect.left,
-          width: rect.width,
-          height: rect.height,
-          center: getCenter(rect),
-        };
-
-        expect(dimension.page.withMarginAndPadding).toEqual(fragment);
+        expect(dimension.page.withMarginAndPadding).toEqual(area);
       });
     });
 
     describe('viewport', () => {
-      it('should use the client rect as the frame if no frame is provided', () => {
+      it('should use the area as the frame if no frame is provided', () => {
         const droppable: DroppableDimension = getDroppableDimension({
           descriptor: droppableDescriptor,
           client,
@@ -332,7 +265,7 @@ describe('dimension', () => {
           frameScroll,
         });
 
-        expect(droppable.viewport.frame).toEqual(getWithSpacing(client, margin));
+        expect(droppable.viewport.frame).toEqual(addSpacing(client, margin));
       });
 
       it('should include the window scroll', () => {
@@ -345,7 +278,7 @@ describe('dimension', () => {
         });
 
         expect(droppable.viewport.frame).toEqual(
-          getWithPosition(getWithSpacing(client, margin), windowScroll),
+          addPosition(addSpacing(client, margin), windowScroll),
         );
       });
 
@@ -388,7 +321,7 @@ describe('dimension', () => {
               frameClient,
             });
 
-            expect(droppable.viewport.clipped).toEqual(getFragment(frameClient));
+            expect(droppable.viewport.clipped).toEqual(frameClient);
           });
         });
 
@@ -413,91 +346,106 @@ describe('dimension', () => {
               frameClient,
             });
 
-            expect(droppable.viewport.clipped).toEqual(getFragment(subject));
+            expect(droppable.viewport.clipped).toEqual(subject);
           });
         });
-      });
-    });
 
-    describe('calculating container dimension', () => {
-      const id = 'droppable';
-      const droppableRect = getArea({
-        top: 0,
-        right: 90,
-        bottom: 90,
-        left: 10,
-      });
-      const droppableMargin = { top: 10, right: 10, bottom: 10, left: 10 };
-      const noMargin = { top: 0, right: 0, bottom: 0, left: 0 };
+        describe('subject clipped on one side by frame', () => {
+          const frameClient = getArea({
+            top: 0,
+            right: 100,
+            bottom: 100,
+            left: 0,
+          });
 
-      it('should default to the droppable\'s dimension if none is provided', () => {
-        const droppableDimension = getDroppableDimension({
-          id,
-          area: droppableRect,
-          margin: noMargin,
+          it('should clip on all sides', () => {
+            // each of these subjects bleeds out past the frame in one direction
+            const subjects: Area[] = [
+              getArea({
+                ...frameClient,
+                top: -10,
+              }),
+              getArea({
+                ...frameClient,
+                right: 110,
+              }),
+              getArea({
+                ...frameClient,
+                bottom: 110,
+              }),
+              getArea({
+                ...frameClient,
+                left: -10,
+              }),
+            ];
+
+            subjects.forEach((subject: Area) => {
+              const droppable: DroppableDimension = getDroppableDimension({
+                descriptor: droppableDescriptor,
+                client: subject,
+                frameClient,
+              });
+
+              expect(droppable.viewport.clipped).toEqual(frameClient);
+            });
+          });
         });
-
-        expect(droppableDimension.container.bounds)
-          .toEqual(droppableDimension.page.withoutMargin);
-      });
-
-      it('should not include margins if the container is different from the droppable\'s spacing', () => {
-        const container = getArea({
-          top: 0,
-          right: 10,
-          bottom: 10,
-          left: 0,
-        });
-        const droppableDimension = getDroppableDimension({
-          id,
-          area: droppableRect,
-          containerRect: container,
-          margin: noMargin,
-        });
-        const expected = {
-          ...container,
-          center: getCenter(container),
-        };
-
-        expect(droppableDimension.container.bounds)
-          .toEqual(expected);
-      });
-
-      it('should include margins if the container is the same as the droppable\'s spacing', () => {
-        const container = droppableRect;
-        const droppableDimension = getDroppableDimension({
-          id,
-          area: droppableRect,
-          containerRect: container,
-          margin: droppableMargin,
-        });
-        const droppableDimensionNoContainerProvided = getDroppableDimension({
-          id,
-          area: droppableRect,
-          margin: droppableMargin,
-        });
-        const expectedSpacing = {
-          top: container.top - droppableMargin.top,
-          right: container.right + droppableMargin.right,
-          bottom: container.bottom + droppableMargin.bottom,
-          left: container.left - droppableMargin.left,
-        };
-        const expected = {
-          ...expectedSpacing,
-          center: getCenter(expectedSpacing),
-          height: expectedSpacing.bottom - expectedSpacing.top,
-          width: expectedSpacing.right - expectedSpacing.left,
-        };
-
-        expect(droppableDimension.container.bounds)
-          .toEqual(expected);
-        expect(droppableDimensionNoContainerProvided.container.bounds)
-          .toEqual(expected);
       });
     });
   });
 
   describe('scroll droppable', () => {
+    it('should update the frame scroll and the clipping', () => {
+      const subject = getArea({
+        top: 0,
+        right: 100,
+        bottom: 100,
+        left: 0,
+      });
+      const frameClient = getArea({
+        top: 0,
+        right: 100,
+        bottom: 100,
+        left: 0,
+      });
+      const frameScroll: Position = { x: 0, y: 0 };
+      const droppable: DroppableDimension = getDroppableDimension({
+        descriptor: droppableDescriptor,
+        client: subject,
+        frameClient,
+        frameScroll,
+      });
 
+      // original frame
+      expect(droppable.viewport.frame).toEqual(frameClient);
+      // no original clipping
+      expect(droppable.viewport.clipped).toEqual(subject);
+
+      // scrolling
+      const newScroll: Position = { x: 10, y: 10 };
+      const updated: DroppableDimension = scrollDroppable(droppable, newScroll);
+
+      // unchanged frame client
+      expect(updated.viewport.frame).toEqual(frameClient);
+
+      // updated scroll info
+      expect(updated.viewport.frameScroll).toEqual({
+        initial: frameScroll,
+        current: newScroll,
+        diff: newScroll,
+      });
+
+      // updated clipped
+      expect(updated.viewport.clipped).toEqual(getArea({
+        // now lower than the top of the frame
+        top: 10,
+        // cut off by the frame
+        right: 100,
+        // cut off by the frame
+        bottom: 100,
+        // now further left than the frame
+        left: 10,
+      }));
+    });
   });
 });
