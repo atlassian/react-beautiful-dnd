@@ -15,84 +15,6 @@ import type {
   Area,
 } from '../types';
 
-// const bufferDimensionFragment = (buffer: Position) => (spacing: Spacing) => (
-//   getFragment(getArea(addPosition(spacing, buffer)))
-// );
-
-// const getClippedAreaWithBuffer = memoizeOne((
-//   buffer: Position,
-//   droppable: DroppableDimension
-// ): DimensionFragment => {
-//   // We only want to add the buffer to the container dimensions
-//   // if the droppable isn't clipped by a scroll container
-
-//   const subject: DimensionFragment = droppable.viewport.subject;
-//   const frame: Area = droppable.viewport.frame;
-//   const clipped: DimensionFragment = droppable.viewport.clipped;
-
-//   const isClipped: boolean = subject[droppable.axis.size] > frame[droppable.axis.size];
-
-//   if (isClipped) {
-//     return clipped;
-//   }
-
-//   return getFragment(getArea(addPosition(clipped, buffer));
-
-//   const { descriptor, axis, isEnabled, client, page } = droppable;
-//   const withBuffer = bufferDimensionFragment(buffer);
-
-//   const newClient = {
-//     withoutMargin: withBuffer(client.withoutMargin),
-//     withMargin: withBuffer(client.withMargin),
-//     withMarginAndPadding: withBuffer(client.withMarginAndPadding),
-//   };
-
-//   const newPage = {
-//     withoutMargin: withBuffer(page.withoutMargin),
-//     withMargin: withBuffer(page.withMargin),
-//     withMarginAndPadding: withBuffer(page.withMarginAndPadding),
-//   };
-
-//   // const shouldBufferContainer = droppable.page.withMargin[droppable.axis.size] <=
-//   // droppable.container.bounds[droppable.axis.size];
-//   const newContainerBounds = shouldBuffer
-//     ? withBuffer(container.bounds)
-//     : { ...container.bounds };
-
-//   const clipped: DimensionFragment = (() => {
-//     const frame: Area = droppable.viewport.frame;
-//     const subject: DimensionFragment = droppable.viewport.subject;
-//     // We only want to add the buffer to the container dimensions
-//     // if the droppable isn't clipped by a scroll container
-//     const isClipped: boolean = subject[droppable.axis.size] < frame[droppable.axis.size];
-
-//     if (!isClipped) {
-//       return frame;
-//     }
-
-//     return frame;
-//   })();
-
-//   const viewport: DroppableDimensionViewport = {
-//     frame: clipped,
-//     frameScroll: droppable.viewport.frameScroll,
-//     subject: droppable.viewport.subject,
-//     clipped: clip(clipped, subjectWithBuffer),
-//   };
-
-//   return {
-//     descriptor,
-//     axis,
-//     isEnabled,
-//     client: newClient,
-//     page: newPage,
-//     container: {
-//       scroll: container.scroll,
-//       bounds: newContainerBounds,
-//     },
-//   };
-// });
-
 const getRequiredGrowth = memoizeOne((
   draggable: DraggableDimension,
   draggables: DraggableDimensionMap,
@@ -103,7 +25,6 @@ const getRequiredGrowth = memoizeOne((
   // some items in it, but not enough to completely fill its size.
   // In this case - when the droppable already contains excess space - we
   // don't need to add the full placeholder size.
-  console.warn('breaking cache');
   const dimensions: DraggableDimension[] = getDraggablesInsideDroppable(droppable, draggables);
 
   if (!dimensions.length) {
