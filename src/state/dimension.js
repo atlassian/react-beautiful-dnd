@@ -100,7 +100,7 @@ type GetDroppableArgs = {|
   isEnabled?: boolean,
 |}
 
-const clip = (frame: Area, subject: Spacing): Area =>
+export const clip = (frame: Area, subject: Spacing): Area =>
   getArea({
     top: Math.max(subject.top, frame.top),
     right: Math.min(subject.right, frame.right),

@@ -5,6 +5,7 @@ import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
 import isPositionWithin from './visibility/is-position-within';
 import { patch } from './position';
 import { addPosition } from './spacing';
+import { clip } from './dimension';
 import type {
   DraggableDimension,
   DraggableDimensionMap,
@@ -63,29 +64,20 @@ const getClippedAreaWithPlaceholder = ({
   droppable,
   previousDroppableOverId,
 }: GetBufferedDroppableArgs): Area => {
-  const isHomeDroppable: boolean = draggable.descriptor.droppableId === droppable.descriptor.id;
-  const isOverDroppable: boolean = Boolean(
+  const isHome: boolean = draggable.descriptor.droppableId === droppable.descriptor.id;
+  const isOver: boolean = Boolean(
     previousDroppableOverId &&
     previousDroppableOverId === droppable.descriptor.id
   );
-
   const subject: Area = droppable.viewport.subject;
   const frame: Area = droppable.viewport.frame;
   const clipped: Area = droppable.viewport.clipped;
 
   // We only include the placeholder size if it's a
   // foreign list and is currently being hovered over
-  if (isHomeDroppable || !isOverDroppable) {
+  if (isHome || !isOver) {
     return clipped;
   }
-
-  // We only want to add the buffer to the container dimensions
-  // if the droppable isn't clipped by a scroll container
-  const isClipped: boolean = subject[droppable.axis.size] > frame[droppable.axis.size];
-  if (isClipped) {
-    return clipped;
-  }
-  console.log('is clipped?', isClipped);
 
   const requiredGrowth: ?Position = getRequiredGrowth(draggable, draggables, droppable);
 
@@ -94,16 +86,23 @@ const getClippedAreaWithPlaceholder = ({
     return clipped;
   }
 
-  return getWithGrowth(clipped, requiredGrowth);
+  const subjectWithGrowth = getWithGrowth(subject, requiredGrowth);
+
+  // We only want to add growth to the frame if the
+  // droppable isn't clipped by a scroll container
+  const isClippedByFrame: boolean = subject[droppable.axis.size] > frame[droppable.axis.size];
+  const frameWithGrowth = isClippedByFrame ? frame : getWithGrowth(frame, requiredGrowth);
+
+  return clip(frameWithGrowth, subjectWithGrowth);
 };
 
-type Args = {
+type Args = {|
   target: Position,
   draggable: DraggableDimension,
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
   previousDroppableOverId: ?DroppableId,
-};
+|};
 
 export default ({
   target,
