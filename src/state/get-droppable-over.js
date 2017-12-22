@@ -115,7 +115,9 @@ export default ({
     Object.keys(droppables)
       .map((id: DroppableId): DroppableDimension => droppables[id])
       .find((droppable: DroppableDimension): boolean => {
-        // Add the size of a placeholder to a droppable's dimensions (if necessary)
+        // If previously dragging over a droppable we give it a
+        // bit of room on the subsequent drags so that user and move
+        // items in the space that the placeholder takes up
         const withPlaceholder: Area = getClippedAreaWithPlaceholder({
           draggable, draggables, droppable, previousDroppableOverId,
         });
