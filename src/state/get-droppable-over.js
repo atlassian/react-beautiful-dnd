@@ -2,7 +2,8 @@
 import memoizeOne from 'memoize-one';
 import getArea from './get-area';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
-import isPositionWithin from './visibility/is-position-within';
+// import isPositionWithin from './visibility/is-position-within';
+import isPositionInFrame from './visibility/is-position-in-frame';
 import { patch } from './position';
 import { addPosition } from './spacing';
 import { clip } from './dimension';
@@ -123,7 +124,9 @@ export default ({
           draggable, draggables, droppable, previousDroppableOverId,
         });
 
-        return isPositionWithin(withPlaceholder)(target);
+        // not checking to see if visible in viewport
+        // as the target might be off screen if dragging a large draggable
+        return isPositionInFrame(withPlaceholder)(target);
       });
 
   return maybe ? maybe.descriptor.id : null;

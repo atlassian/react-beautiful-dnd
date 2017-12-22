@@ -1,5 +1,6 @@
 // @flow
-import { isDraggablePartiallyVisible } from './visibility/is-partially-visible';
+import isVisibleThroughFrame from './visibility/is-visible-through-frame';
+import isVisibleThroughDroppableFrame from './visibility/is-visible-through-droppable-frame';
 import getDisplacementMap, { type DisplacementMap } from './get-displacement-map';
 import type {
   DraggableId,
@@ -26,11 +27,10 @@ export default ({
   const id: DraggableId = draggable.descriptor.id;
   const map: DisplacementMap = getDisplacementMap(previousImpact.movement.displaced);
 
-  const isVisible: boolean = isDraggablePartiallyVisible({
-    draggable,
-    droppable: destination,
-    viewport,
-  });
+  // only displacing items that are visible in the droppable and the viewport
+  const isVisible: boolean =
+    isVisibleThroughDroppableFrame(destination)(draggable.page.withMargin) &&
+    isVisibleThroughFrame(viewport)(draggable.page.withMargin);
 
   const shouldAnimate: boolean = (() => {
     // if should be displaced and not visible

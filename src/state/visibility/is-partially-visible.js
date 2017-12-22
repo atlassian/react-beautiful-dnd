@@ -22,22 +22,28 @@ export const isPartiallyVisible = ({
   viewport,
 }: IsPartiallyVisibleArgs): boolean => {
   // console.log('ehllo?');
+  // TODO: if dimension is bigger than droppable or bigger than viewport - it is visibile
 
   // already takes into account droppable scroll
   const isVisibleWithinDroppable: boolean =
     isPartiallyVisibleInDroppable(droppable)(target);
 
+  console.log('is visible in droppable', isVisibleWithinDroppable);
   // exit early
   if (!isVisibleWithinDroppable) {
-    // console.log('is not visible in droppable');
     return false;
   }
 
   const displacement: Position = droppable.viewport.frameScroll.diff.displacement;
   const withScroll: Spacing = offset(target, displacement);
 
+  console.log('viewport', viewport);
+  console.log('with scroll', withScroll);
+
   const isVisibleWithinViewport: boolean =
     isPartiallyWithin(viewport)(withScroll);
+
+  console.log('is visible in viewport?', isVisibleWithinViewport);
 
   return isVisibleWithinViewport;
 };
@@ -53,15 +59,14 @@ export const isDraggablePartiallyVisible = ({
   droppable,
   viewport,
 }: IsDraggableVisibleArgs): boolean => {
+  console.group('is draggable visible?');
   const result = isPartiallyVisible({
     target: draggable.page.withMargin,
     droppable,
     viewport,
   });
-
-  if (draggable.descriptor.id === 'quote-6') {
-    console.warn('is visible in droppable?', result);
-  }
+  console.warn('is draggable visible?', result);
+  console.groupEnd();
 
   return result;
 };
