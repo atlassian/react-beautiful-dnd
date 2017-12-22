@@ -70,11 +70,11 @@ export default class QuoteApp extends Component<Props, State> {
 
   componentDidMount() {
     // eslint-disable-next-line no-unused-expressions
-    injectGlobal`
-      body {
-        background: ${colors.blue.deep};
-      }
-    `;
+    // injectGlobal`
+    //   body {
+    //     background: ${colors.blue.deep};
+    //   }
+    // `;
   }
 
   render() {
