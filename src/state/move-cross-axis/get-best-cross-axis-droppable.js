@@ -2,8 +2,8 @@
 import { closest } from '../position';
 import isWithin from '../is-within';
 import { getCorners } from '../spacing';
-import { isPartiallyVisible } from '../visibility/is-partially-visible';
 import getViewport from '../visibility/get-viewport';
+import isVisibleThroughFrame from '../visibility/is-visible-through-frame';
 import type {
   Axis,
   DroppableDimension,
@@ -46,11 +46,9 @@ export default ({
     // Remove any options that are not enabled
     .filter((droppable: DroppableDimension): boolean => droppable.isEnabled)
     // Remove any droppables that are not partially visible
-    .filter((droppable: DroppableDimension): boolean => isPartiallyVisible({
-      target: droppable.viewport.clipped,
-      droppable,
-      viewport,
-    }))
+    .filter((droppable: DroppableDimension): boolean => (
+      isVisibleThroughFrame(viewport)(droppable.viewport.frame)
+    ))
     // Get only droppables that are on the desired side
     .filter((droppable: DroppableDimension): boolean => {
       const targetClipped: Area = droppable.viewport.clipped;

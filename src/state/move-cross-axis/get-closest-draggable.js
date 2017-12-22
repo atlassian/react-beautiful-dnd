@@ -1,6 +1,8 @@
 // @flow
 import { distance } from '../position';
-import { isDraggableVisible } from '../visibility/is-within-visible-bounds-of-droppable';
+import isVisibleThroughFrame from '../visibility/is-visible-through-frame';
+import isVisibleThroughDroppableFrame from '../visibility/is-visible-through-droppable-frame';
+import getViewport from '../visibility/get-viewport';
 import type {
   Axis,
   Position,
@@ -28,12 +30,15 @@ export default ({
     return null;
   }
 
-  const isWithinDestination = isDraggableVisible(destination);
+  const inViewport = isVisibleThroughFrame(getViewport());
+  const inDroppable = isVisibleThroughDroppableFrame(destination);
 
   const result: DraggableDimension[] = insideDestination
     // Remove any options that are hidden by overflow
     // Whole draggable must be visible to move to it
-    .filter(isWithinDestination)
+    .filter((draggable: DraggableDimension): boolean =>
+      inViewport(draggable.page.withMargin) &&
+      inDroppable(draggable.page.withMargin))
     .sort((a: DraggableDimension, b: DraggableDimension): number => {
       const distanceToA = distance(pageCenter, a.page.withMargin.center);
       const distanceToB = distance(pageCenter, b.page.withMargin.center);
