@@ -14,8 +14,11 @@ import type {
 const noPosition = { x: 0, y: 0 };
 
 const droppable1: DroppableDimension = getDroppableDimension({
-  id: 'drop-1',
-  area: getArea({
+  descriptor: {
+    id: 'drop-1',
+    type: 'TYPE',
+  },
+  client: getArea({
     top: 0,
     left: 0,
     bottom: 100,
@@ -24,8 +27,11 @@ const droppable1: DroppableDimension = getDroppableDimension({
 });
 
 const droppable2: DroppableDimension = getDroppableDimension({
-  id: 'drop-2',
-  area: getArea({
+  descriptor: {
+    id: 'drop-2',
+    type: 'TYPE',
+  },
+  client: getArea({
     top: 101,
     left: 0,
     bottom: 200,
@@ -33,8 +39,11 @@ const droppable2: DroppableDimension = getDroppableDimension({
   }),
 });
 const droppable3: DroppableDimension = getDroppableDimension({
-  id: 'drop-3',
-  area: getArea({
+  descriptor: {
+    id: 'drop-3',
+    type: 'TYPE',
+  },
+  client: getArea({
     top: 0,
     left: 100,
     bottom: 100,
@@ -44,9 +53,12 @@ const droppable3: DroppableDimension = getDroppableDimension({
 
 const draggableMargin = { top: 0, right: 0, bottom: 10, left: 0 };
 const draggable1: DraggableDimension = getDraggableDimension({
-  id: 'drag-1',
-  droppableId: droppable1.id,
-  area: getArea({
+  descriptor: {
+    id: 'drag-1',
+    droppableId: droppable1.descriptor.id,
+    index: 0,
+  },
+  client: getArea({
     top: 0,
     right: 100,
     bottom: 90,
@@ -56,9 +68,12 @@ const draggable1: DraggableDimension = getDraggableDimension({
   windowScroll: noPosition,
 });
 const draggable2: DraggableDimension = getDraggableDimension({
-  id: 'drag-2',
-  droppableId: droppable2.id,
-  area: getArea({
+  descriptor: {
+    id: 'drag-2',
+    droppableId: droppable2.descriptor.id,
+    index: 1,
+  },
+  client: getArea({
     top: 101,
     right: 100,
     bottom: 190,
@@ -68,9 +83,12 @@ const draggable2: DraggableDimension = getDraggableDimension({
   windowScroll: noPosition,
 });
 const draggable3: DraggableDimension = getDraggableDimension({
-  id: 'drag-3',
-  droppableId: droppable3.id,
-  area: getArea({
+  descriptor: {
+    id: 'drag-3',
+    droppableId: droppable3.descriptor.id,
+    index: 2,
+  },
+  client: getArea({
     top: 0,
     right: 200,
     bottom: 40,
@@ -81,15 +99,15 @@ const draggable3: DraggableDimension = getDraggableDimension({
 });
 
 const droppableMap: DroppableDimensionMap = {
-  [droppable1.id]: droppable1,
-  [droppable2.id]: droppable2,
-  [droppable3.id]: droppable3,
+  [droppable1.descriptor.id]: droppable1,
+  [droppable2.descriptor.id]: droppable2,
+  [droppable3.descriptor.id]: droppable3,
 };
 
 const draggableMap: DraggableDimensionMap = {
-  [draggable1.id]: draggable1,
-  [draggable2.id]: draggable2,
-  [draggable3.id]: draggable3,
+  [draggable1.descriptor.id]: draggable1,
+  [draggable2.descriptor.id]: draggable2,
+  [draggable3.descriptor.id]: draggable3,
 };
 
 // Most functionality is tested by get getInsideDimension
@@ -125,7 +143,7 @@ describe('get droppable over', () => {
       previousDroppableOverId: null,
     });
 
-    expect(result).toBe(droppable1.id);
+    expect(result).toBe(droppable1.descriptor.id);
   });
 
   describe('adding a buffer to the droppable area', () => {
@@ -135,17 +153,17 @@ describe('get droppable over', () => {
         draggable: draggable1,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOverId: droppable1.id,
+        previousDroppableOverId: droppable1.descriptor.id,
       });
       const draggingForeignDraggable: ?DroppableId = getDroppableOver({
         target: { x: 10, y: 110 },
         draggable: draggable2,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOverId: droppable1.id,
+        previousDroppableOverId: droppable1.descriptor.id,
       });
-      expect(draggingHomeDraggable).toBe(droppable2.id);
-      expect(draggingForeignDraggable).toBe(droppable1.id);
+      expect(draggingHomeDraggable).toBe(droppable2.descriptor.id);
+      expect(draggingForeignDraggable).toBe(droppable1.descriptor.id);
     });
 
     it('should only add buffer if this droppable was hovered over on the previous tick', () => {
@@ -154,7 +172,7 @@ describe('get droppable over', () => {
         draggable: draggable1,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOverId: droppable2.id,
+        previousDroppableOverId: droppable2.descriptor.id,
       });
       const wasNotPreviouslyHovered: ?DroppableId = getDroppableOver({
         target: { x: 10, y: 210 },
@@ -163,7 +181,7 @@ describe('get droppable over', () => {
         droppables: droppableMap,
         previousDroppableOverId: null,
       });
-      expect(wasPreviouslyHovered).toBe(droppable2.id);
+      expect(wasPreviouslyHovered).toBe(droppable2.descriptor.id);
       expect(wasNotPreviouslyHovered).toBe(null);
     });
 
@@ -173,16 +191,16 @@ describe('get droppable over', () => {
         draggable: draggable1,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOverId: droppable2.id,
+        previousDroppableOverId: droppable2.descriptor.id,
       });
       const inPlaceholderAreaOnTheCrossAxis: ?DroppableId = getDroppableOver({
         target: { x: 110, y: 150 },
         draggable: draggable1,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOverId: droppable2.id,
+        previousDroppableOverId: droppable2.descriptor.id,
       });
-      expect(inPlaceholderAreaOnTheMainAxis).toBe(droppable2.id);
+      expect(inPlaceholderAreaOnTheMainAxis).toBe(droppable2.descriptor.id);
       expect(inPlaceholderAreaOnTheCrossAxis).toBe(null);
     });
 
@@ -196,7 +214,7 @@ describe('get droppable over', () => {
         draggable: draggable1,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOverId: droppable2.id,
+        previousDroppableOverId: droppable2.descriptor.id,
       });
       const justOutsidePlaceholderArea: ?DroppableId = getDroppableOver({
         target: {
@@ -206,10 +224,10 @@ describe('get droppable over', () => {
         draggable: draggable1,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOverId: droppable2.id,
+        previousDroppableOverId: droppable2.descriptor.id,
       });
 
-      expect(justInsidePlaceholderArea).toBe(droppable2.id);
+      expect(justInsidePlaceholderArea).toBe(droppable2.descriptor.id);
       expect(justOutsidePlaceholderArea).toBe(null);
     });
 
@@ -224,7 +242,7 @@ describe('get droppable over', () => {
         draggable: draggable1,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOverId: droppable3.id,
+        previousDroppableOverId: droppable3.descriptor.id,
       });
       const justOutsidePlaceholderArea: ?DroppableId = getDroppableOver({
         target: {
@@ -234,10 +252,10 @@ describe('get droppable over', () => {
         draggable: draggable1,
         draggables: draggableMap,
         droppables: droppableMap,
-        previousDroppableOverId: droppable3.id,
+        previousDroppableOverId: droppable3.descriptor.id,
       });
 
-      expect(justInsidePlaceholderArea).toBe(droppable3.id);
+      expect(justInsidePlaceholderArea).toBe(droppable3.descriptor.id);
       expect(justOutsidePlaceholderArea).toBe(null);
     });
   });
