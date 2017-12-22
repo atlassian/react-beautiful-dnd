@@ -1,11 +1,13 @@
 // @flow
-import { getDroppableDimension, scrollDroppable } from '../../../../src/state/dimension';
-import { isPositionVisible, isSpacingVisible } from '../../../../src/state/visibility/is-within-visible-bounds-of-droppable';
+import { getDroppableDimension, scrollDroppable, getDraggableDimension } from '../../../../src/state/dimension';
+import { isPositionVisible, isSpacingVisible, isDraggableVisible } from '../../../../src/state/visibility/is-within-visible-bounds-of-droppable';
 import getArea from '../../../../src/state/get-area';
-import { offset, addPosition } from '../../../../src/state/spacing';
+import { offset } from '../../../../src/state/spacing';
 import type {
   Area,
   DroppableDimension,
+  DraggableDimension,
+  DraggableDescriptor,
   Position,
   Spacing,
 } from '../../../../src/types';
@@ -230,6 +232,67 @@ describe('is within visible bounds of droppable', () => {
           expect(isSpacingVisible(updated)(spacing)).toBe(true);
         });
       });
+    });
+  });
+
+  describe('is droppable visible', () => {
+    it('should use the "page.withoutMargin" component of the draggable for comparision', () => {
+      const descriptor: DraggableDescriptor = {
+        id: 'drag-1',
+        droppableId: droppable.descriptor.id,
+        index: 0,
+      };
+
+      const outsideWithoutMargin: DraggableDimension = getDraggableDimension({
+        descriptor,
+        client: getArea({
+          top: 91,
+          right: 92,
+          left: 91,
+          bottom: 92,
+        }),
+      });
+      expect(isDraggableVisible(droppable)(outsideWithoutMargin)).toBe(false);
+
+      const insideWithMargin: DraggableDimension = getDraggableDimension({
+        descriptor,
+        // normally outside
+        client: getArea({
+          top: 91,
+          right: 92,
+          left: 91,
+          bottom: 92,
+        }),
+        // pulled inside by margin
+        // but this is not considered
+        margin: { top: 10, bottom: 10, left: 10, right: 10 },
+      });
+      expect(isDraggableVisible(droppable)(insideWithMargin)).toBe(false);
+
+      const outsideWithWindowScroll: DraggableDimension = getDraggableDimension({
+        descriptor,
+        client: getArea({
+          top: 30,
+          right: 30,
+          left: 50,
+          bottom: 50,
+        }),
+        // will be pushed outside of the bounds scroll
+        windowScroll: { x: 0, y: 1000 },
+      });
+      expect(isDraggableVisible(droppable)(outsideWithWindowScroll)).toBe(false);
+
+      const insideWithWindowScroll: DraggableDimension = getDraggableDimension({
+        descriptor,
+        client: getArea({
+          top: 30,
+          right: 30,
+          left: 50,
+          bottom: 50,
+        }),
+        windowScroll: { x: 1, y: 1 },
+      });
+      expect(isDraggableVisible(droppable)(insideWithWindowScroll)).toBe(true);
     });
   });
 });
