@@ -5,6 +5,7 @@ import type {
   Area,
 } from '../types';
 
+// expands a spacing
 export const add = (spacing1: Spacing, spacing2: Spacing): Spacing => ({
   top: spacing1.top + spacing2.top,
   left: spacing1.left + spacing2.left,

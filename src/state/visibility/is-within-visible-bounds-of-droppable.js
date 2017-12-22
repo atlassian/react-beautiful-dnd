@@ -35,9 +35,9 @@ export const isSpacingVisible = (droppable: DroppableDimension) => {
 };
 
 export const isDraggableVisible = (droppable: DroppableDimension) => {
-  const isVisibleInClipped = isSpacingVisible(droppable);
+  const isVisible = isSpacingVisible(droppable);
 
   return (draggable: DraggableDimension): boolean =>
-    isVisibleInClipped(draggable.page.withoutMargin);
+    isVisible(draggable.page.withoutMargin);
 };
 
