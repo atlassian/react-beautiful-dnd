@@ -208,8 +208,7 @@ describe('get droppable over', () => {
           expect(result).toBe(home.descriptor.id);
         });
 
-        it('should not extend beyond what is required', () => {
-          // at the end of the placeholder
+        it('should not extend beyond what is required to fit a placeholder', () => {
           const target: Position = {
             x: inHome1.page.withMargin.center.x,
             y: inHome1.page.withMargin.bottom + inForeign1.page.withMargin.bottom + 1,
@@ -225,10 +224,30 @@ describe('get droppable over', () => {
 
           expect(result).toBe(null);
         });
+
+        it('should only add buffer on main axis', () => {
+          const target: Position = {
+            // too far to the right
+            x: inHome1.page.withMargin.right + 1,
+            // would otherwise be fine
+            y: inHome1.page.withMargin.bottom + inForeign1.page.withMargin.bottom,
+          };
+
+          const result: ?DroppableId = getDroppableOver({
+            target,
+            draggable: inForeign1,
+            draggables,
+            droppables,
+            previousDroppableOverId: home.descriptor.id,
+          });
+
+          expect(result).toBe(null);
+        });
       });
 
       describe('droppable has scroll container', () => {
         // TODO: as above + frame clipping
+        TODO;
       });
     });
   });

@@ -121,9 +121,10 @@ export default class Board extends Component<Props, State> {
       >
         {(provided: DroppableProvided) => (
           <Container innerRef={provided.innerRef}>
-            {ordered.map((key: string) => (
+            {ordered.map((key: string, index: number) => (
               <Column
                 key={key}
+                index={index}
                 title={key}
                 quotes={columns[key]}
                 autoFocusQuoteId={this.state.autoFocusQuoteId}
