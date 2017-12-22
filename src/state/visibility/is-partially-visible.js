@@ -2,7 +2,6 @@
 import isPartiallyWithin from './is-partially-within';
 import { isSpacingVisible as isPartiallyVisibleInDroppable } from './is-within-visible-bounds-of-droppable';
 import { offset } from '../spacing';
-import { negate } from '../position';
 import type {
   Spacing,
   Position,
@@ -28,7 +27,7 @@ export const isPartiallyVisible = ({
   const isVisibleWithinDroppable: boolean =
     isPartiallyVisibleInDroppable(droppable)(target);
 
-    // exit early
+  // exit early
   if (!isVisibleWithinDroppable) {
     // console.log('is not visible in droppable');
     return false;
@@ -39,12 +38,6 @@ export const isPartiallyVisible = ({
 
   const isVisibleWithinViewport: boolean =
     isPartiallyWithin(viewport)(withScroll);
-
-  if (!isVisibleWithinViewport) {
-    // console.log('not visible in viewport');
-  } else {
-    // console.log('is visible!!');
-  }
 
   return isVisibleWithinViewport;
 };
