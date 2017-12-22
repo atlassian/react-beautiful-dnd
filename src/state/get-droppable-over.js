@@ -124,8 +124,10 @@ export default ({
           draggable, draggables, droppable, previousDroppableOverId,
         });
 
-        // not checking to see if visible in viewport
+        // Not checking to see if visible in viewport
         // as the target might be off screen if dragging a large draggable
+        // Not adjusting target for droppable scroll as we are just checking
+        // if it is over the droppable - not its internal impact
         return isPositionInFrame(withPlaceholder)(target);
       });
 
