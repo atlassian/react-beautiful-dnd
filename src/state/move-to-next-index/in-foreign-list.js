@@ -1,6 +1,7 @@
 // @flow
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { isPositionVisible } from '../visibility/is-partially-visible';
+import isPositionInDroppableFrame from '../visibility/is-position-in-droppable-frame';
+import isPositionInFrame from '../visibility/is-position-in-frame';
 import { patch } from '../position';
 import moveToEdge from '../move-to-edge';
 import getDisplacement from '../get-displacement';
@@ -82,17 +83,21 @@ export default ({
   });
 
   const isVisible: boolean = (() => {
+    const inViewport: boolean = isPositionInFrame(viewport)(newCenter);
+
+    // regardless of where we are moving - if moving out
+    // of the viewport than dont move
+    if (!inViewport) {
+      return false;
+    }
+
     // Moving into placeholder position
     // Usually this would be outside of the visible bounds
     if (isMovingPastLastIndex) {
       return true;
     }
 
-    return isPositionVisible({
-      droppable,
-      point: newCenter,
-      viewport,
-    });
+    return isPositionInDroppableFrame(droppable)(newCenter);
   })();
 
   if (!isVisible) {

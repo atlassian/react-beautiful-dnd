@@ -2,13 +2,13 @@
 import memoizeOne from 'memoize-one';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import { patch, subtract } from '../position';
-import { offset, getSpacingFrom } from '../spacing';
 import getViewport from '../visibility/get-viewport';
 import moveToEdge from '../move-to-edge';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import getDisplacement from '../get-displacement';
-import { isPartiallyVisible } from '../visibility/is-partially-visible';
+import isPositionInDroppableFrame from '../visibility/is-position-in-droppable-frame';
+import isPositionInFrame from '../visibility/is-position-in-frame';
 import type {
   DraggableLocation,
   DraggableDimension,
@@ -16,7 +16,6 @@ import type {
   Displacement,
   Axis,
   DragImpact,
-  Spacing,
   Area,
 } from '../../types';
 
@@ -90,16 +89,9 @@ export default ({
 
   // Currently not supporting moving a draggable outside the visibility bounds of a droppable
   const viewport: Area = getViewport();
-  const isVisible: boolean = (() => {
-    const diff: Position = subtract(newCenter, draggable.page.withoutMargin.center);
-    const withDiff: Spacing = offset(getSpacingFrom(draggable.page.withMargin), diff);
-
-    return isPartiallyVisible({
-      target: withDiff,
-      droppable,
-      viewport,
-    });
-  })();
+  const isVisible: boolean =
+    isPositionInFrame(viewport)(newCenter) &&
+    isPositionInDroppableFrame(droppable)(newCenter);
 
   if (!isVisible) {
     return null;

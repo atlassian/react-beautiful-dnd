@@ -20,4 +20,3 @@ export default (droppable: DroppableDimension) => {
     return isVisible(withScroll);
   };
 };
-
