@@ -99,6 +99,6 @@ Here is some general reading about html5 drag and drop. It is worth having a rea
 
 It is worth looking at other libraries out there to see how they do drag and drop. Things to look at is their philosophy and api. `react-beautiful-dnd` is an opinionated, higher level abstraction than most drag and drop libraries. We do not need to support every use case. We need to find the right level of control while still maintaining a beautiful experience for the user, flexibility of use and a clean, powerful api.
 
-- [`react-dnd`](react-dnd.github.io/react-dnd/) - `react-beautiful-dnd` draws a fair amount of inspiration from `react-dnd`. Something to keep in mind is that `react-dnd` is designed to provide a set of drag and drop primatives which is a different set of goals to this project.
+- [`react-dnd`](react-dnd.github.io/react-dnd/) - `react-beautiful-dnd` draws a fair amount of inspiration from `react-dnd`. Something to keep in mind is that `react-dnd` is designed to provide a set of drag and drop primitives which is a different set of goals to this project.
 - [`react-sortable-hoc`](https://github.com/clauderic/react-sortable-hoc/) - on the surface this library looks similar to `react-beautiful-dnd`. I created a [comparison blog](https://medium.com/@alexandereardon/thanks-for-reaching-out-dimitar-nestorov-8c0bf9abe19) that explains the differences
 - [`jQuery sortable`](http://jqueryui.com/sortable/) - the king of drag and drop for a long time
