@@ -200,7 +200,7 @@ Keep in mind that these periods of inactivity may not always exist.
 
 ### Application 5: no drag axis locking
 
-For now, the library does not support drag axis locking (aka drag rails). This is where the user is restricted to only dragging along one axis. The current thinking is this breaks the physical metaphore we are going for and sends a message to the user that they are interacting with a piece of software rather than moving physical objects around. It is possible to ensure that a user can only drop in a single list by using props `type` and `isDropDisabled`. You can also do some visual treatment to the list `onDragStart` to show the user that this is the only place they can interact with.
+For now, the library does not support drag axis locking (aka drag rails). This is where the user is restricted to only dragging along one axis. The current thinking is this breaks the physical metaphor we are going for and sends a message to the user that they are interacting with a piece of software rather than moving physical objects around. It is possible to ensure that a user can only drop in a single list by using props `type` and `isDropDisabled`. You can also do some visual treatment to the list `onDragStart` to show the user that this is the only place they can interact with.
 
 ### Application 6: natural cross list movement
 
@@ -302,7 +302,7 @@ During a drag the following standard keyboard events are blocked to prevent a ba
 
 ### Limitations of keyboard dragging
 
-There is current limitation of keyboard dragging: **the drag will cancel if the user scrolls the window**. This could be worked around but for now it is the simpliest initial approach.
+There is current limitation of keyboard dragging: **the drag will cancel if the user scrolls the window**. This could be worked around but for now it is the simplest initial approach.
 
 ## Touch dragging
 
