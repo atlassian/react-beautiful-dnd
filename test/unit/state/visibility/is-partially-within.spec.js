@@ -7,6 +7,8 @@ const container: Spacing = {
 };
 const isSpacingWithinContainer = isPartiallyWithin(container);
 
+TODO: update this to check frame of is-visible-through-frame
+
 describe('is partially within', () => {
   describe('total visibility', () => {
     it('should return true when the item is completely visible', () => {

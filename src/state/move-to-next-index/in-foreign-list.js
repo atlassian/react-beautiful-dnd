@@ -1,8 +1,9 @@
 // @flow
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import isPositionInDroppableFrame from '../visibility/is-position-in-droppable-frame';
-import isPositionInFrame from '../visibility/is-position-in-frame';
-import { patch } from '../position';
+import isVisibleThroughFrame from '../visibility/is-visible-through-frame';
+import isVisibleThroughDroppableFrame from '../visibility/is-visible-through-droppable-frame';
+import { patch, subtract } from '../position';
+import { offset } from '../spacing';
 import moveToEdge from '../move-to-edge';
 import getDisplacement from '../get-displacement';
 import getViewport from '../visibility/get-viewport';
@@ -16,6 +17,7 @@ import type {
   DragImpact,
   Displacement,
   Area,
+  Spacing,
 } from '../../types';
 
 export default ({
@@ -83,7 +85,13 @@ export default ({
   });
 
   const isVisible: boolean = (() => {
-    const inViewport: boolean = isPositionInFrame(viewport)(newCenter);
+    // checking the shifted draggable rather than just the new center
+    // as the new center might not be visible but the whole draggable
+    // might be partially visible
+    const diff: Position = subtract(droppable.page.withMargin.center, newCenter);
+    const shifted: Spacing = offset(draggable.page.withMargin, diff);
+
+    const inViewport: boolean = isVisibleThroughFrame(viewport)(shifted);
 
     // regardless of where we are moving - if moving out
     // of the viewport than dont move
@@ -97,7 +105,7 @@ export default ({
       return true;
     }
 
-    return isPositionInDroppableFrame(droppable)(newCenter);
+    return isVisibleThroughDroppableFrame(droppable)(shifted);
   })();
 
   if (!isVisible) {

@@ -2,6 +2,7 @@
 import memoizeOne from 'memoize-one';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import { patch, subtract } from '../position';
+import { offset } from '../spacing';
 import getViewport from '../visibility/get-viewport';
 import moveToEdge from '../move-to-edge';
 import type { Edge } from '../move-to-edge';
@@ -9,6 +10,8 @@ import type { Args, Result } from './move-to-next-index-types';
 import getDisplacement from '../get-displacement';
 import isPositionInDroppableFrame from '../visibility/is-position-in-droppable-frame';
 import isPositionInFrame from '../visibility/is-position-in-frame';
+import isVisibleThroughDroppableFrame from '../visibility/is-visible-through-droppable-frame';
+import isVisibleThroughFrame from '../visibility/is-visible-through-frame';
 import type {
   DraggableLocation,
   DraggableDimension,
@@ -17,6 +20,7 @@ import type {
   Axis,
   DragImpact,
   Area,
+  Spacing,
 } from '../../types';
 
 const getIndex = memoizeOne(
@@ -87,11 +91,23 @@ export default ({
     destinationAxis: droppable.axis,
   });
 
-  // Currently not supporting moving a draggable outside the visibility bounds of a droppable
   const viewport: Area = getViewport();
-  const isVisible: boolean =
-    isPositionInFrame(viewport)(newCenter) &&
-    isPositionInDroppableFrame(droppable)(newCenter);
+
+  const isVisible: boolean = (() => {
+    // checking the shifted draggable rather than just the new center
+    // as the new center might not be visible but the whole draggable
+    // might be partially visible
+    const diff: Position = subtract(droppable.page.withMargin.center, newCenter);
+    const shifted: Spacing = offset(draggable.page.withMargin, diff);
+
+    // Currently not supporting moving a draggable outside the visibility bounds of a droppable
+    // checking the
+    // TODO: what about viewport?
+    // doing a standard check breaks long columns
+    // NEED TO CHECK THE WHOLE DRAGGABLE not just the new center!
+    return isVisibleThroughFrame(viewport)(shifted) &&
+            isVisibleThroughDroppableFrame(droppable)(shifted);
+  })();
 
   if (!isVisible) {
     return null;
