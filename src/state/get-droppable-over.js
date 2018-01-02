@@ -2,7 +2,6 @@
 import memoizeOne from 'memoize-one';
 import getArea from './get-area';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
-// import isPositionWithin from './visibility/is-position-within';
 import isPositionInFrame from './visibility/is-position-in-frame';
 import { patch } from './position';
 import { addPosition } from './spacing';

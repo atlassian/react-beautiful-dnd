@@ -1,7 +1,6 @@
 // @flow
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import isVisibleThroughFrame from '../visibility/is-visible-through-frame';
-import isVisibleThroughDroppableFrame from '../visibility/is-visible-through-droppable-frame';
+import isPartiallyVisible from '../visibility/is-partially-visible';
 import { patch, subtract } from '../position';
 import { offset } from '../spacing';
 import moveToEdge from '../move-to-edge';
@@ -9,7 +8,8 @@ import getDisplacement from '../get-displacement';
 import getViewport from '../visibility/get-viewport';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
-import type {
+import type
+{
   DraggableLocation,
   DraggableDimension,
   Position,
@@ -85,27 +85,23 @@ export default ({
   });
 
   const isVisible: boolean = (() => {
-    // checking the shifted draggable rather than just the new center
-    // as the new center might not be visible but the whole draggable
-    // might be partially visible
-    const diff: Position = subtract(droppable.page.withMargin.center, newCenter);
-    const shifted: Spacing = offset(draggable.page.withMargin, diff);
-
-    const inViewport: boolean = isVisibleThroughFrame(viewport)(shifted);
-
-    // regardless of where we are moving - if moving out
-    // of the viewport than dont move
-    if (!inViewport) {
-      return false;
-    }
-
     // Moving into placeholder position
     // Usually this would be outside of the visible bounds
     if (isMovingPastLastIndex) {
       return true;
     }
 
-    return isVisibleThroughDroppableFrame(droppable)(shifted);
+    // checking the shifted draggable rather than just the new center
+    // as the new center might not be visible but the whole draggable
+    // might be partially visible
+    const diff: Position = subtract(droppable.page.withMargin.center, newCenter);
+    const shifted: Spacing = offset(draggable.page.withMargin, diff);
+
+    return isPartiallyVisible({
+      target: shifted,
+      droppable,
+      viewport,
+    });
   })();
 
   if (!isVisible) {

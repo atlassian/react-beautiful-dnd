@@ -24,6 +24,8 @@ export type Position = {|
   y: number,
 |};
 
+// Kept as a loose type so that functions can
+// accept Spacing and receive an Area or a Spacing
 export type Spacing = {
   top: number,
   right: number,
@@ -36,6 +38,7 @@ export type Area = {|
   right: number,
   bottom: number,
   left: number,
+  // additions to Spacing
   width: number,
   height: number,
   center: Position,

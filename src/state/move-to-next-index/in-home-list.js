@@ -8,11 +8,9 @@ import moveToEdge from '../move-to-edge';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import getDisplacement from '../get-displacement';
-import isPositionInDroppableFrame from '../visibility/is-position-in-droppable-frame';
-import isPositionInFrame from '../visibility/is-position-in-frame';
-import isVisibleThroughDroppableFrame from '../visibility/is-visible-through-droppable-frame';
-import isVisibleThroughFrame from '../visibility/is-visible-through-frame';
-import type {
+import isPartiallyVisible from '../visibility/is-partially-visible';
+import type
+{
   DraggableLocation,
   DraggableDimension,
   Position,
@@ -105,8 +103,11 @@ export default ({
     // TODO: what about viewport?
     // doing a standard check breaks long columns
     // NEED TO CHECK THE WHOLE DRAGGABLE not just the new center!
-    return isVisibleThroughFrame(viewport)(shifted) &&
-            isVisibleThroughDroppableFrame(droppable)(shifted);
+    return isPartiallyVisible({
+      target: shifted,
+      droppable,
+      viewport,
+    });
   })();
 
   if (!isVisible) {

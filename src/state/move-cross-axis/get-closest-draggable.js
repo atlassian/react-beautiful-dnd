@@ -1,9 +1,9 @@
 // @flow
 import { distance } from '../position';
-import isVisibleThroughFrame from '../visibility/is-visible-through-frame';
-import isVisibleThroughDroppableFrame from '../visibility/is-visible-through-droppable-frame';
 import getViewport from '../visibility/get-viewport';
+import isPartiallyVisible from '../visibility/is-partially-visible';
 import type {
+  Area,
   Axis,
   Position,
   DraggableDimension,
@@ -30,15 +30,17 @@ export default ({
     return null;
   }
 
-  const inViewport = isVisibleThroughFrame(getViewport());
-  const inDroppable = isVisibleThroughDroppableFrame(destination);
+  const viewport: Area = getViewport();
 
   const result: DraggableDimension[] = insideDestination
     // Remove any options that are hidden by overflow
     // Whole draggable must be visible to move to it
     .filter((draggable: DraggableDimension): boolean =>
-      inViewport(draggable.page.withMargin) &&
-      inDroppable(draggable.page.withMargin))
+      isPartiallyVisible({
+        target: draggable.page.withMargin,
+        droppable: destination,
+        viewport,
+      }))
     .sort((a: DraggableDimension, b: DraggableDimension): number => {
       const distanceToA = distance(pageCenter, a.page.withMargin.center);
       const distanceToB = distance(pageCenter, b.page.withMargin.center);

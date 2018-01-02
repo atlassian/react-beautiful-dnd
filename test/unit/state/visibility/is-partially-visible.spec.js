@@ -1,6 +1,6 @@
 // @flow
 import getArea from '../../../../src/state/get-area';
-import { isPartiallyVisible } from '../../../../src/state/visibility/is-partially-visible';
+import isPartiallyVisible from '../../../../src/state/visibility/is-partially-visible';
 import { getDroppableDimension } from '../../../../src/state/dimension';
 import { offset } from '../../../../src/state/spacing';
 import type {
@@ -104,65 +104,65 @@ describe('is partially visible', () => {
   });
 
   describe('droppable', () => {
-    // Note: the changes to scroll is covered in the is-within-visible-bounds-of-droppable.spec
-
-    it('should return false if the target is bigger than the droppable', () => {
-      expect(isPartiallyVisible({
-        target: viewport,
-        viewport,
-        droppable: smallDroppable,
-      })).toBe(false);
-    });
-
-    it('should return false if outside the droppable', () => {
-      expect(isPartiallyVisible({
-        target: inViewport2,
-        viewport,
-        droppable: smallDroppable,
-      })).toBe(false);
-    });
-
-    it('should return true if the same size of the droppable', () => {
-      expect(isPartiallyVisible({
-        target: inViewport1,
-        viewport,
-        droppable: smallDroppable,
-      })).toBe(true);
-    });
-
-    it('should return true if within the droppable', () => {
-      const insideDroppable: Spacing = {
-        top: 20,
-        left: 20,
-        right: 80,
-        bottom: 80,
-      };
-
-      expect(isPartiallyVisible({
-        target: insideDroppable,
-        viewport,
-        droppable: smallDroppable,
-      })).toBe(true);
-    });
-
-    it('should return true if partially within the droppable', () => {
-      const partials: Spacing[] = [
-        // bleed over top
-        offset(inViewport1, { x: 0, y: -1 }),
-        // bleed over right
-        offset(inViewport1, { x: 1, y: 0 }),
-        // bleed over bottom
-        offset(inViewport1, { x: 0, y: 1 }),
-        // bleed over left
-        offset(inViewport1, { x: -1, y: 0 }),
-      ];
-
-      partials.forEach((partial: Spacing) => {
+    describe('without changes in droppable scroll', () => {
+      it('should return false if outside the droppable', () => {
         expect(isPartiallyVisible({
-          target: partial,
+          target: inViewport2,
+          viewport,
+          droppable: smallDroppable,
+        })).toBe(false);
+      });
+
+      it('should return true if the target is bigger than the droppable', () => {
+        expect(isPartiallyVisible({
+          target: viewport,
           viewport,
           droppable: smallDroppable,
         })).toBe(true);
+      });
+
+      it('should return true if the same size of the droppable', () => {
+        expect(isPartiallyVisible({
+          target: inViewport1,
+          viewport,
+          droppable: smallDroppable,
+        })).toBe(true);
+      });
+
+      it('should return true if within the droppable', () => {
+        const insideDroppable: Spacing = {
+          top: 20,
+          left: 20,
+          right: 80,
+          bottom: 80,
+        };
+
+        expect(isPartiallyVisible({
+          target: insideDroppable,
+          viewport,
+          droppable: smallDroppable,
+        })).toBe(true);
+      });
+
+      it('should return true if partially within the droppable', () => {
+        const partials: Spacing[] = [
+        // bleed over top
+          offset(inViewport1, { x: 0, y: -1 }),
+          // bleed over right
+          offset(inViewport1, { x: 1, y: 0 }),
+          // bleed over bottom
+          offset(inViewport1, { x: 0, y: 1 }),
+          // bleed over left
+          offset(inViewport1, { x: -1, y: 0 }),
+        ];
+
+        partials.forEach((partial: Spacing) => {
+          expect(isPartiallyVisible({
+            target: partial,
+            viewport,
+            droppable: smallDroppable,
+          })).toBe(true);
+        });
       });
     });
   });

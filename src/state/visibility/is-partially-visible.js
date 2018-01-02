@@ -1,97 +1,36 @@
 // @flow
-import isPartiallyWithin from './is-partially-within';
-import { isSpacingVisible as isPartiallyVisibleInDroppable } from './is-within-visible-bounds-of-droppable';
+import isVisibleThroughFrame from './is-visible-through-frame';
 import { offset } from '../spacing';
 import type {
   Spacing,
   Position,
   Area,
-  DraggableDimension,
   DroppableDimension,
 } from '../../types';
 
-type IsPartiallyVisibleArgs = {|
+type Args = {|
   target: Spacing,
   droppable: DroppableDimension,
   viewport: Area,
 |}
 
-export const isPartiallyVisible = ({
+// will return true if the position is visible:
+// 1. within the viewport AND
+// 2. within the destination droppable
+export default ({
   target,
   droppable,
   viewport,
-}: IsPartiallyVisibleArgs): boolean => {
-  // console.log('ehllo?');
-  // TODO: if dimension is bigger than droppable or bigger than viewport - it is visibile
-
-  // already takes into account droppable scroll
-  const isVisibleWithinDroppable: boolean =
-    isPartiallyVisibleInDroppable(droppable)(target);
-
-  console.log('is visible in droppable', isVisibleWithinDroppable);
-  // exit early
-  if (!isVisibleWithinDroppable) {
+}: Args): boolean => {
+  // not taking into account any changes in scroll for the viewport check
+  if (!isVisibleThroughFrame(viewport)(target)) {
     return false;
   }
 
+  // Taking into account any changes in scroll on the droppable to see if
+  // the target is in the Droppable's updated visual space
   const displacement: Position = droppable.viewport.frameScroll.diff.displacement;
   const withScroll: Spacing = offset(target, displacement);
 
-  console.log('viewport', viewport);
-  console.log('with scroll', withScroll);
-
-  const isVisibleWithinViewport: boolean =
-    isPartiallyWithin(viewport)(withScroll);
-
-  console.log('is visible in viewport?', isVisibleWithinViewport);
-
-  return isVisibleWithinViewport;
+  return isVisibleThroughFrame(droppable.page.withMargin)(withScroll);
 };
-
-type IsDraggableVisibleArgs = {|
-  draggable: DraggableDimension,
-  droppable: DroppableDimension,
-  viewport: Area,
-|}
-
-export const isDraggablePartiallyVisible = ({
-  draggable,
-  droppable,
-  viewport,
-}: IsDraggableVisibleArgs): boolean => {
-  console.group('is draggable visible?');
-  const result = isPartiallyVisible({
-    target: draggable.page.withMargin,
-    droppable,
-    viewport,
-  });
-  console.warn('is draggable visible?', result);
-  console.groupEnd();
-
-  return result;
-};
-
-type IsPositionVisibleArgs = {|
-  point: Position,
-  droppable: DroppableDimension,
-  viewport: Area,
-|}
-
-export const isPositionVisible = ({
-  point,
-  droppable,
-  viewport,
-}: IsPositionVisibleArgs): boolean => {
-  const target: Spacing = {
-    top: point.y,
-    left: point.x,
-    bottom: point.y,
-    right: point.x,
-  };
-  return isPartiallyVisible({
-    target,
-    droppable,
-    viewport,
-  });
-};
-
