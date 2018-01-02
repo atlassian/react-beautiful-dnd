@@ -8,7 +8,7 @@ export default (frame: Spacing) => {
   const isWithinVertical = isWithin(frame.top, frame.bottom);
   const isWithinHorizontal = isWithin(frame.left, frame.right);
 
-  return (target: Spacing) => {
+  return (subject: Spacing) => {
     // situations where target is visible:
     // 1. is completely contained within frame
     // 2. is partially visible on both axis within frame
@@ -17,19 +17,19 @@ export default (frame: Spacing) => {
 
     // completely contained
     const isContained: boolean =
-      isWithinVertical(target.top) &&
-      isWithinVertical(target.bottom) &&
-      isWithinHorizontal(target.left) &&
-      isWithinHorizontal(target.right);
+      isWithinVertical(subject.top) &&
+      isWithinVertical(subject.bottom) &&
+      isWithinHorizontal(subject.left) &&
+      isWithinHorizontal(subject.right);
 
     if (isContained) {
       return true;
     }
 
     const isPartiallyVisibleVertically: boolean =
-      isWithinVertical(target.top) || isWithinVertical(target.bottom);
+      isWithinVertical(subject.top) || isWithinVertical(subject.bottom);
     const isPartiallyVisibleHorizontally: boolean =
-      isWithinHorizontal(target.left) || isWithinHorizontal(target.right);
+      isWithinHorizontal(subject.left) || isWithinHorizontal(subject.right);
 
     // partially visible on both axis
     const isPartiallyContained: boolean =
@@ -39,8 +39,8 @@ export default (frame: Spacing) => {
       return true;
     }
 
-    const isBiggerVertically: boolean = target.top < frame.top && target.bottom > frame.bottom;
-    const isBiggerHorizontally: boolean = target.left < frame.left && target.right > frame.right;
+    const isBiggerVertically: boolean = subject.top < frame.top && subject.bottom > frame.bottom;
+    const isBiggerHorizontally: boolean = subject.left < frame.left && subject.right > frame.right;
 
     // is bigger than frame on both axis
     const isTargetBiggerThanFrame: boolean =
