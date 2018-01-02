@@ -47,6 +47,14 @@ const initial: ItemType[] = [
     ),
   },
   {
+    id: 'checkbox',
+    component: (
+      <label>
+        <input type="checkbox" />
+      </label>
+    )
+  },
+  {
     id: 'content editable',
     component: (
       <div
