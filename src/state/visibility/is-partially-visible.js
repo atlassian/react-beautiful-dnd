@@ -32,5 +32,6 @@ export default ({
   const displacement: Position = destination.viewport.frameScroll.diff.displacement;
   const withScroll: Spacing = offset(target, displacement);
 
-  return isVisibleThroughFrame(destination.page.withMargin)(withScroll);
+  // TODO: use frame? do we even need .clipped?
+  return isVisibleThroughFrame(destination.viewport.clipped)(withScroll);
 };
