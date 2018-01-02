@@ -235,6 +235,73 @@ describe('is partially visible', () => {
     });
 
     describe('with changes in droppable scroll', () => {
+      const frame: Spacing = {
+        top: 10,
+        left: 10,
+        right: 100,
+        // cuts the droppable short
+        bottom: 100,
+      };
+      const clippedDroppable: DroppableDimension = getDroppableDimension({
+        descriptor: {
+          id: 'clipped',
+          type: 'TYPE',
+        },
+        client: getArea({
+          ...frame,
+          // stretches out past frame
+          bottom: 600,
+        }),
+        frameClient: getArea(frame),
+      });
+
+      describe('originally invisible but now invisible', () => {
+        it('should take into account the droppable scroll when detecting visibility', () => {
+          const originallyInvisible: Spacing = {
+            ...frame,
+            top: 110,
+            bottom: 200,
+          };
+
+          // originally invisible
+          expect(isPartiallyVisible({
+            target: originallyInvisible,
+            destination: clippedDroppable,
+            viewport,
+          })).toBe(false);
+
+          // after scroll the target is now visible
+          expect(isPartiallyVisible({
+            target: originallyInvisible,
+            destination: scrollDroppable(clippedDroppable, { x: 0, y: 100 }),
+            viewport,
+          })).toBe(true);
+        });
+      });
+
+      describe('originally visible but now visible', () => {
+        it('should take into account the droppable scroll when detecting visibility', () => {
+          const originallyVisible: Spacing = {
+            ...frame,
+            top: 10,
+            bottom: 20,
+          };
+
+          // originally visible
+          expect(isPartiallyVisible({
+            target: originallyVisible,
+            destination: clippedDroppable,
+            viewport,
+          })).toBe(true);
+
+          // after scroll the target is now invisible
+          expect(isPartiallyVisible({
+            target: originallyVisible,
+            destination: scrollDroppable(clippedDroppable, { x: 0, y: 100 }),
+            viewport,
+          })).toBe(false);
+        });
+      });
     });
   });
 
