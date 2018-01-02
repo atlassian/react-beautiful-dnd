@@ -16,22 +16,21 @@ type Args = {|
 
 // will return true if the position is visible:
 // 1. within the viewport AND
-// 2. within the destination droppable
+// 2. within the destination Droppable
 export default ({
   target,
   destination,
   viewport,
 }: Args): boolean => {
-  // not taking into account any changes in scroll for the viewport check
-  if (!isVisibleThroughFrame(viewport)(target)) {
-    return false;
-  }
-
-  // Taking into account any changes in scroll on the Droppable to see if
-  // the target is in the Droppable's updated visual frame
   const displacement: Position = destination.viewport.frameScroll.diff.displacement;
   const withScroll: Spacing = offset(target, displacement);
 
-  // TODO: use frame? do we even need .clipped?
-  return isVisibleThroughFrame(destination.viewport.clipped)(withScroll);
+  // Taking into account any changes in scroll on the Droppable to see if
+  // the target is in the Droppable's updated visual frame
+  return isVisibleThroughFrame(viewport)(withScroll) &&
+  // Need to also take into account changes in droppable scroll when
+  // checking if the target is visible in the viewport.
+  // Changes in the destination scroll impact the current position
+  // of the target
+    isVisibleThroughFrame(destination.viewport.clipped)(withScroll);
 };
