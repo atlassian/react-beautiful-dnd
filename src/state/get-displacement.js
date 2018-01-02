@@ -29,7 +29,7 @@ export default ({
   // only displacing items that are visible in the droppable and the viewport
   const isVisible: boolean = isPartiallyVisible({
     target: draggable.page.withMargin,
-    droppable: destination,
+    destination,
     viewport,
   });
 

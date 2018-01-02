@@ -38,7 +38,7 @@ export default ({
     .filter((draggable: DraggableDimension): boolean =>
       isPartiallyVisible({
         target: draggable.page.withMargin,
-        droppable: destination,
+        destination,
         viewport,
       }))
     .sort((a: DraggableDimension, b: DraggableDimension): number => {

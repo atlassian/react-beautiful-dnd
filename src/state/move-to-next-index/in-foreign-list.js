@@ -99,7 +99,7 @@ export default ({
 
     return isPartiallyVisible({
       target: shifted,
-      droppable,
+      destination: droppable,
       viewport,
     });
   })();

@@ -61,7 +61,7 @@ describe('is partially visible', () => {
       expect(isPartiallyVisible({
         target: notInViewport,
         viewport,
-        droppable: asBigAsViewport,
+        destination: asBigAsViewport,
       })).toBe(false);
     });
 
@@ -69,7 +69,7 @@ describe('is partially visible', () => {
       expect(isPartiallyVisible({
         target: viewport,
         viewport,
-        droppable: asBigAsViewport,
+        destination: asBigAsViewport,
       })).toBe(true);
     });
 
@@ -77,7 +77,7 @@ describe('is partially visible', () => {
       expect(isPartiallyVisible({
         target: inViewport1,
         viewport,
-        droppable: asBigAsViewport,
+        destination: asBigAsViewport,
       })).toBe(true);
     });
 
@@ -97,7 +97,7 @@ describe('is partially visible', () => {
         expect(isPartiallyVisible({
           target: partial,
           viewport,
-          droppable: asBigAsViewport,
+          destination: asBigAsViewport,
         })).toBe(true);
       });
     });
@@ -109,7 +109,7 @@ describe('is partially visible', () => {
         expect(isPartiallyVisible({
           target: inViewport2,
           viewport,
-          droppable: smallDroppable,
+          destination: smallDroppable,
         })).toBe(false);
       });
 
@@ -117,7 +117,7 @@ describe('is partially visible', () => {
         expect(isPartiallyVisible({
           target: viewport,
           viewport,
-          droppable: smallDroppable,
+          destination: smallDroppable,
         })).toBe(true);
       });
 
@@ -125,7 +125,7 @@ describe('is partially visible', () => {
         expect(isPartiallyVisible({
           target: inViewport1,
           viewport,
-          droppable: smallDroppable,
+          destination: smallDroppable,
         })).toBe(true);
       });
 
@@ -140,7 +140,7 @@ describe('is partially visible', () => {
         expect(isPartiallyVisible({
           target: insideDroppable,
           viewport,
-          droppable: smallDroppable,
+          destination: smallDroppable,
         })).toBe(true);
       });
 
@@ -160,7 +160,7 @@ describe('is partially visible', () => {
           expect(isPartiallyVisible({
             target: partial,
             viewport,
-            droppable: smallDroppable,
+            destination: smallDroppable,
           })).toBe(true);
         });
       });
@@ -172,7 +172,7 @@ describe('is partially visible', () => {
       expect(isPartiallyVisible({
         target: inViewport1,
         viewport,
-        droppable: smallDroppable,
+        destination: smallDroppable,
       })).toBe(true);
     });
 
@@ -180,7 +180,7 @@ describe('is partially visible', () => {
       expect(isPartiallyVisible({
         target: inViewport2,
         viewport,
-        droppable: smallDroppable,
+        destination: smallDroppable,
       })).toBe(false);
     });
 
@@ -198,7 +198,7 @@ describe('is partially visible', () => {
         target: notInViewport,
         // but not visible in the viewport
         viewport,
-        droppable: notVisibleDroppable,
+        destination: notVisibleDroppable,
       })).toBe(false);
     });
   });

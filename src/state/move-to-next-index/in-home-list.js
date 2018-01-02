@@ -9,8 +9,7 @@ import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import getDisplacement from '../get-displacement';
 import isPartiallyVisible from '../visibility/is-partially-visible';
-import type
-{
+import type {
   DraggableLocation,
   DraggableDimension,
   Position,
@@ -105,7 +104,7 @@ export default ({
     // NEED TO CHECK THE WHOLE DRAGGABLE not just the new center!
     return isPartiallyVisible({
       target: shifted,
-      droppable,
+      destination: droppable,
       viewport,
     });
   })();

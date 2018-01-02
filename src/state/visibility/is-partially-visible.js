@@ -10,7 +10,7 @@ import type {
 
 type Args = {|
   target: Spacing,
-  droppable: DroppableDimension,
+  destination: DroppableDimension,
   viewport: Area,
 |}
 
@@ -19,7 +19,7 @@ type Args = {|
 // 2. within the destination droppable
 export default ({
   target,
-  droppable,
+  destination,
   viewport,
 }: Args): boolean => {
   // not taking into account any changes in scroll for the viewport check
@@ -27,10 +27,10 @@ export default ({
     return false;
   }
 
-  // Taking into account any changes in scroll on the droppable to see if
-  // the target is in the Droppable's updated visual space
-  const displacement: Position = droppable.viewport.frameScroll.diff.displacement;
+  // Taking into account any changes in scroll on the Droppable to see if
+  // the target is in the Droppable's updated visual frame
+  const displacement: Position = destination.viewport.frameScroll.diff.displacement;
   const withScroll: Spacing = offset(target, displacement);
 
-  return isVisibleThroughFrame(droppable.page.withMargin)(withScroll);
+  return isVisibleThroughFrame(destination.page.withMargin)(withScroll);
 };
