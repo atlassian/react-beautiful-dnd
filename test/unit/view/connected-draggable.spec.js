@@ -787,7 +787,6 @@ describe('Connected Draggable', () => {
   });
 
   describe('child render behavior', () => {
-    const droppableId: DroppableId = preset.home.descriptor.id;
     // creating our own marshal so we can publish a droppable
     // so that the draggable can publish itself
     const marshal: DimensionMarshal = createDimensionMarshal({
@@ -798,12 +797,14 @@ describe('Connected Draggable', () => {
     });
     const options: Object = combine(
       withStore(),
-      withDroppableId(droppableId),
+      withDroppableId(preset.home.descriptor.id),
       withDimensionMarshal(marshal),
       withStyleContext(),
       withCanLift(),
     );
 
+    // registering a fake droppable so that when a draggable
+    // registers itself the marshal can find its parent
     marshal.registerDroppable(preset.home.descriptor, {
       getDimension: () => preset.home,
       watchScroll: () => { },
