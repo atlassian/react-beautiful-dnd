@@ -1,731 +1,371 @@
 // @flow
-/* eslint-disable react/no-multi-comp */
-import React, { Component } from 'react';
-import { mount } from 'enzyme';
-import Droppable, { makeSelector } from '../../../src/view/droppable/connected-droppable';
-import noImpact from '../../../src/state/no-impact';
-import { getDraggableDimension } from '../../../src/state/dimension';
-import { withStore } from '../../utils/get-context-options';
-import getArea from '../../../src/state/get-area';
-import forceUpdate from '../../utils/force-update';
+import { makeSelector } from '../../../src/view/droppable/connected-droppable';
+import * as state from '../../utils/simple-state-preset';
+import { getPreset } from '../../utils/dimension';
 import type {
-  Phase,
-  DragState,
-  PendingDrop,
-  Position,
-  DraggableId,
-  DroppableId,
-  InitialDrag,
-  DragImpact,
-  DropResult,
-  CurrentDrag,
-  DraggableDimension,
-  DraggableLocation,
-  InitialDragLocation,
-  CurrentDragLocation,
-  Spacing,
-  Placeholder,
-} from '../../../src/types';
-import type {
-  MapProps,
-  Provided,
   Selector,
+  MapProps,
+  OwnProps,
 } from '../../../src/view/droppable/droppable-types';
+import type {
+  DroppableDimension,
+  State,
+  DragImpact,
+} from '../../../src/types';
 
-type ExecuteArgs = {|
-  droppableId: DroppableId,
-  phase: Phase,
-  drag: ?DragState,
-  pending: ?PendingDrop,
-  draggable: ?DraggableDimension,
-  // being simple and defaulting to false (droppable is enabled)
-  isDropDisabled?: boolean,
-|}
+const preset = getPreset();
+const clone = (value: State): State => (JSON.parse(JSON.stringify(value)) : any);
 
-const execute = (selector: Selector) =>
-  ({ phase, drag, draggable, pending, droppableId, isDropDisabled = false }: ExecuteArgs) =>
-    selector.resultFunc(
-      phase, drag, draggable, pending, droppableId, isDropDisabled,
-    );
-
-const defaultMapProps: MapProps = {
-  isDraggingOver: false,
-  placeholder: null,
-};
-
-const homeDroppableId: DroppableId = 'home-id';
-const foreignDroppableId: DroppableId = 'foreign-droppable';
-const draggableId: DraggableId = 'drag-1';
-const origin: Position = { x: 0, y: 0 };
-
-type DragArgs = {|
-  isDraggingOver: false | 'home' | 'foreign'
-|}
-
-const margin: Spacing = {
-  top: 1, left: 2, bottom: 3, right: 4,
-};
-
-const draggable: DraggableDimension = getDraggableDimension({
-  id: draggableId,
-  droppableId: homeDroppableId,
-  margin,
-  area: getArea({
-    top: 100,
-    left: 0,
-    right: 100,
-    bottom: 200,
-  }),
+const getOwnProps = (dimension: DroppableDimension): OwnProps => ({
+  type: dimension.descriptor.type,
+  droppableId: dimension.descriptor.id,
+  children: () => null,
+  isDropDisabled: false,
+  direction: dimension.axis.direction,
+  ignoreContainerClipping: false,
 });
 
-const placeholder: Placeholder = draggable.placeholder;
+describe('Connected Droppable', () => {
+  describe('disabled', () => {
+    it('should return the default map props regardless of phase', () => {
+      const selector: Selector = makeSelector();
+      const ownProps: OwnProps = getOwnProps(preset.home);
+      const defaultMapProps: MapProps = selector(state.idle, ownProps);
+      // $ExpectError - using spread
+      const newProps: OwnProps = {
+        ...ownProps,
+        isDropDisabled: true,
+      };
 
-const perform = (() => {
-  const initial: InitialDrag = (() => {
-    const client: InitialDragLocation = {
-      selection: draggable.client.withoutMargin.center,
-      center: draggable.client.withoutMargin.center,
-    };
-
-    const page: InitialDragLocation = {
-      selection: draggable.page.withoutMargin.center,
-      center: draggable.page.withoutMargin.center,
-    };
-
-    const value: InitialDrag = {
-      source: {
-        index: 0,
-        droppableId: homeDroppableId,
-      },
-      client,
-      page,
-      windowScroll: origin,
-    };
-
-    return value;
-  })();
-
-  const current: CurrentDrag = (() => {
-    const client: CurrentDragLocation = {
-      selection: initial.client.center,
-      center: initial.client.center,
-      offset: origin,
-    };
-
-    const page: CurrentDragLocation = {
-      selection: initial.page.center,
-      center: initial.page.center,
-      offset: origin,
-    };
-
-    const value: CurrentDrag = {
-      id: draggableId,
-      type: 'TYPE',
-      client,
-      page,
-      windowScroll: origin,
-      shouldAnimate: true,
-      isScrollAllowed: true,
-    };
-    return value;
-  })();
-
-  const homeDestination: DraggableLocation = {
-    index: initial.source.index + 1,
-    droppableId: homeDroppableId,
-  };
-  const foreignDestination: DraggableLocation = {
-    index: 0,
-    droppableId: foreignDroppableId,
-  };
-
-  const dragOverHomeImpact: DragImpact = {
-    movement: {
-      draggables: [draggableId],
-      amount: {
-        y: draggable.page.withMargin.height,
-        x: 0,
-      },
-      isBeyondStartPosition: true,
-    },
-    direction: 'vertical',
-    destination: homeDestination,
-  };
-
-  const dragOverForeignImpact: DragImpact = {
-    movement: {
-      draggables: [],
-      amount: {
-        y: draggable.page.withMargin.height,
-        x: 0,
-      },
-      isBeyondStartPosition: false,
-    },
-    direction: 'vertical',
-    destination: foreignDestination,
-  };
-
-  const drag = ({ isDraggingOver }: DragArgs): DragState => {
-    const impact: DragImpact = (() => {
-      if (isDraggingOver === 'home') {
-        return dragOverHomeImpact;
-      }
-      if (isDraggingOver === 'foreign') {
-        return dragOverForeignImpact;
-      }
-      return noImpact;
-    })();
-    const state: DragState = {
-      current,
-      impact,
-      initial,
-    };
-    return state;
-  };
-
-  const drop = ({ isDraggingOver }: DragArgs): PendingDrop => {
-    // some made up position
-    const dontCare: Position = {
-      x: 100,
-      y: 20,
-    };
-
-    const destination: ?DraggableLocation = (() => {
-      if (isDraggingOver === 'home') {
-        return homeDestination;
-      }
-      if (isDraggingOver === 'foreign') {
-        return foreignDestination;
-      }
-      return null;
-    })();
-
-    const impact: DragImpact = drag({ isDraggingOver }).impact;
-
-    const result: DropResult = {
-      draggableId,
-      type: 'TYPE',
-      source: initial.source,
-      destination,
-    };
-
-    const pending: PendingDrop = {
-      trigger: 'DROP',
-      newHomeOffset: dontCare,
-      impact,
-      result,
-    };
-
-    return pending;
-  };
-
-  return { drag, drop };
-})();
-
-describe('Droppable - connected', () => {
-  describe('selector', () => {
-    beforeEach(() => {
-      jest.spyOn(console, 'error').mockImplementation(() => {});
-    });
-
-    afterEach(() => {
-      console.error.mockRestore();
-    });
-
-    describe('dropping is disabled', () => {
-      const phases: Phase[] = ['IDLE', 'COLLECTING_INITIAL_DIMENSIONS', 'DRAGGING', 'DROP_ANIMATING', 'DROP_COMPLETE'];
-
-      it('should always return the default props', () => {
-        phases.forEach((phase: Phase) => {
-          const props: MapProps = execute(makeSelector())({
-            phase,
-            drag: null,
-            pending: null,
-            draggable: null,
-            droppableId: homeDroppableId,
-            isDropDisabled: true,
-          });
-
-          expect(props).toEqual(defaultMapProps);
-        });
-      });
-
-      it('should not break memoization on multiple calls', () => {
-        phases.forEach((phase: Phase) => {
-          const selector = makeSelector();
-
-          const first: MapProps = execute(selector)({
-            phase,
-            drag: null,
-            pending: null,
-            draggable: null,
-            droppableId: homeDroppableId,
-            isDropDisabled: true,
-          });
-          const second: MapProps = execute(selector)({
-            phase,
-            drag: null,
-            pending: null,
-            draggable: null,
-            droppableId: homeDroppableId,
-            isDropDisabled: true,
-          });
-
-          // checking object equality
-          expect(first).toBe(second);
-        });
-      });
-
-      it('should not break memoization between phases', () => {
-        let previous: MapProps;
-        const selector = makeSelector();
-
-        phases.forEach((phase: Phase) => {
-          const result: MapProps = execute(selector)({
-            phase,
-            drag: null,
-            pending: null,
-            draggable: null,
-            droppableId: homeDroppableId,
-            isDropDisabled: true,
-          });
-
-          // seed previous
-          if (!previous) {
-            previous = result;
-            return;
-          }
-
-          // checking object equality
-          expect(result).toBe(previous);
-          expect(result).toEqual(defaultMapProps);
-        });
+      state.allPhases().forEach((current: State) => {
+        const disabledProps: MapProps = selector(current, newProps);
+        expect(disabledProps).toBe(defaultMapProps);
       });
     });
+  });
 
-    describe('while dragging', () => {
-      it('should log an error an return the default props if no drag is available', () => {
-        const props: MapProps = execute(makeSelector())({
-          phase: 'DRAGGING',
-          drag: null,
-          draggable: null,
-          pending: null,
-          droppableId: homeDroppableId,
-        });
+  describe('resting and preparing', () => {
+    it('should return the default map props and not break memoization between calls', () => {
+      const selector: Selector = makeSelector();
+      const ownProps: OwnProps = getOwnProps(preset.home);
+      const defaultMapProps: MapProps = selector(state.idle, ownProps);
 
-        expect(props).toEqual(defaultMapProps);
-        expect(console.error).toHaveBeenCalled();
-      });
-
-      describe('over home droppable', () => {
-        it('should return that it is dragging over', () => {
-          const expected: MapProps = {
-            isDraggingOver: true,
-            placeholder: null,
-          };
-
-          const props: MapProps = execute(makeSelector())({
-            phase: 'DRAGGING',
-            drag: perform.drag({ isDraggingOver: 'home' }),
-            draggable,
-            pending: null,
-            droppableId: homeDroppableId,
-          });
-
-          expect(props).toEqual(expected);
-        });
-
-        it('should not break memoization on multiple drags', () => {
-          const selector = makeSelector();
-          const expected: MapProps = {
-            isDraggingOver: true,
-            placeholder: null,
-          };
-
-          const props1: MapProps = execute(selector)({
-            phase: 'DRAGGING',
-            drag: perform.drag({ isDraggingOver: 'home' }),
-            pending: null,
-            draggable,
-            droppableId: homeDroppableId,
-          });
-          const props2: MapProps = execute(selector)({
-            phase: 'DRAGGING',
-            drag: perform.drag({ isDraggingOver: 'home' }),
-            pending: null,
-            draggable,
-            droppableId: homeDroppableId,
-          });
-
-          // checking object equality
-          expect(props1).toBe(props2);
-          expect(props1).toEqual(expected);
-          expect(props2).toEqual(expected);
-        });
-      });
-
-      describe('over foreign droppable', () => {
-        it('should return that it is dragging over and a placeholder', () => {
-          const expected: MapProps = {
-            isDraggingOver: true,
-            placeholder,
-          };
-
-          const props: MapProps = execute(makeSelector())({
-            phase: 'DRAGGING',
-            drag: perform.drag({ isDraggingOver: 'foreign' }),
-            draggable,
-            pending: null,
-            droppableId: foreignDroppableId,
-          });
-
-          expect(props).toEqual(expected);
-        });
-
-        it('should not break memoization on multiple drags', () => {
-          const selector = makeSelector();
-          const expected: MapProps = {
-            isDraggingOver: true,
-            placeholder,
-          };
-
-          const props1: MapProps = execute(selector)({
-            phase: 'DRAGGING',
-            drag: perform.drag({ isDraggingOver: 'foreign' }),
-            pending: null,
-            draggable,
-            droppableId: foreignDroppableId,
-          });
-          const props2: MapProps = execute(selector)({
-            phase: 'DRAGGING',
-            drag: perform.drag({ isDraggingOver: 'foreign' }),
-            pending: null,
-            draggable,
-            droppableId: foreignDroppableId,
-          });
-
-          // checking object equality
-          expect(props1).toBe(props2);
-          expect(props1.placeholder).toBe(props2.placeholder);
-          expect(props1).toEqual(expected);
-          expect(props2).toEqual(expected);
-        });
-      });
-
-      describe('not dragging over', () => {
-        it('should return that it is not dragging over', () => {
-          const expected: MapProps = {
-            isDraggingOver: false,
-            placeholder: null,
-          };
-
-          const props: MapProps = execute(makeSelector())({
-            phase: 'DRAGGING',
-            drag: perform.drag({ isDraggingOver: false }),
-            pending: null,
-            draggable,
-            droppableId: homeDroppableId,
-          });
-
-          expect(props).toEqual(expected);
-        });
-
-        it('should not break memoization on multiple drags', () => {
-          const selector = makeSelector();
-          const expected: MapProps = {
-            isDraggingOver: false,
-            placeholder: null,
-          };
-
-          const props1: MapProps = execute(selector)({
-            phase: 'DRAGGING',
-            drag: perform.drag({ isDraggingOver: false }),
-            pending: null,
-            draggable,
-            droppableId: homeDroppableId,
-          });
-          const props2: MapProps = execute(selector)({
-            phase: 'DRAGGING',
-            drag: perform.drag({ isDraggingOver: false }),
-            pending: null,
-            draggable,
-            droppableId: homeDroppableId,
-          });
-
-          // checking object equality
-          expect(props1).toBe(props2);
-          expect(props1).toEqual(expected);
-          expect(props2).toEqual(expected);
-        });
-      });
-    });
-
-    describe('while drop animating', () => {
-      it('should log an error an return the default props if no pending drop is available', () => {
-        const props: MapProps = execute(makeSelector())({
-          phase: 'DROP_ANIMATING',
-          drag: null,
-          pending: null,
-          draggable,
-          droppableId: homeDroppableId,
-        });
-
-        expect(props).toEqual(defaultMapProps);
-        expect(console.error).toHaveBeenCalled();
-      });
-
-      describe('was dragging over home droppable', () => {
-        it('should return that it is dragging over', () => {
-          const expected: MapProps = {
-            isDraggingOver: true,
-            placeholder: null,
-          };
-
-          const props: MapProps = execute(makeSelector())({
-            phase: 'DROP_ANIMATING',
-            drag: null,
-            draggable,
-            pending: perform.drop({ isDraggingOver: 'home' }),
-            droppableId: homeDroppableId,
-          });
-
-          expect(props).toEqual(expected);
-        });
-
-        it('should not break memoization from a previous DRAGGING phase', () => {
-          const selector = makeSelector();
-          const expected: MapProps = {
-            isDraggingOver: true,
-            placeholder: null,
-          };
-
-          const dragging: MapProps = execute(selector)({
-            phase: 'DRAGGING',
-            drag: perform.drag({ isDraggingOver: 'home' }),
-            pending: null,
-            draggable,
-            droppableId: homeDroppableId,
-          });
-          const dropAnimating: MapProps = execute(selector)({
-            phase: 'DROP_ANIMATING',
-            drag: null,
-            pending: perform.drop({ isDraggingOver: 'home' }),
-            draggable,
-            droppableId: homeDroppableId,
-          });
-
-          expect(dragging).toEqual(expected);
-          expect(dropAnimating).toEqual(expected);
-          // checking object equality
-          expect(dragging).toBe(dropAnimating);
-        });
-      });
-
-      describe('was dragging over foreign droppable', () => {
-        it('should return that it is dragging over and provide a placeholder', () => {
-          const expected: MapProps = {
-            isDraggingOver: true,
-            placeholder,
-          };
-
-          const props: MapProps = execute(makeSelector())({
-            phase: 'DROP_ANIMATING',
-            drag: null,
-            pending: perform.drop({ isDraggingOver: 'foreign' }),
-            draggable,
-            droppableId: foreignDroppableId,
-          });
-
-          expect(props).toEqual(expected);
-        });
-
-        it('should not break memoization from a previous DRAGGING phase', () => {
-          const selector = makeSelector();
-          const expected: MapProps = {
-            isDraggingOver: true,
-            placeholder,
-          };
-
-          const dragging: MapProps = execute(selector)({
-            phase: 'DRAGGING',
-            drag: perform.drag({ isDraggingOver: 'foreign' }),
-            pending: null,
-            draggable,
-            droppableId: foreignDroppableId,
-          });
-          const dropAnimating: MapProps = execute(selector)({
-            phase: 'DROP_ANIMATING',
-            drag: null,
-            pending: perform.drop({ isDraggingOver: 'foreign' }),
-            draggable,
-            droppableId: foreignDroppableId,
-          });
-
-          expect(dragging).toEqual(expected);
-          expect(dropAnimating).toEqual(expected);
-          // checking object equality
-          expect(dragging).toBe(dropAnimating);
-        });
-      });
-
-      describe('not dragging over', () => {
-        it('should return that it is not dragging over', () => {
-          const expected: MapProps = {
-            isDraggingOver: false,
-            placeholder: null,
-          };
-
-          const props: MapProps = execute(makeSelector())({
-            phase: 'DROP_ANIMATING',
-            drag: null,
-            draggable,
-            pending: perform.drop({ isDraggingOver: false }),
-            droppableId: homeDroppableId,
-          });
-
-          expect(props).toEqual(expected);
-        });
-
-        it('should not break memoization from a previous DRAGGING phase', () => {
-          const selector = makeSelector();
-          const expected: MapProps = {
-            isDraggingOver: false,
-            placeholder: null,
-          };
-
-          const dragging: MapProps = execute(selector)({
-            phase: 'DRAGGING',
-            drag: perform.drag({ isDraggingOver: false }),
-            pending: null,
-            draggable,
-            droppableId: homeDroppableId,
-          });
-          const dropAnimating: MapProps = execute(selector)({
-            phase: 'DROP_ANIMATING',
-            drag: null,
-            pending: perform.drop({ isDraggingOver: false }),
-            draggable,
-            droppableId: homeDroppableId,
-          });
-
-          expect(dragging).toEqual(expected);
-          expect(dropAnimating).toEqual(expected);
-          // checking object equality
-          expect(dragging).toBe(dropAnimating);
-        });
-      });
-    });
-
-    describe('other phases', () => {
-      const others: Phase[] = ['IDLE', 'COLLECTING_INITIAL_DIMENSIONS', 'DROP_COMPLETE'];
-
-      it('should return the default props', () => {
-        const selector = makeSelector();
-
-        others.forEach((phase: Phase): void => {
-          const props: MapProps = execute(selector)({
-            phase,
-            drag: null,
-            pending: null,
-            draggable: null,
-            droppableId: homeDroppableId,
-          });
-
-          expect(props).toEqual(defaultMapProps);
-        });
-      });
-
-      it('should not break memoization on multiple calls', () => {
-        const selector = makeSelector();
-
-        others.forEach((phase: Phase): void => {
-          const first: MapProps = execute(selector)({
-            phase,
-            drag: null,
-            pending: null,
-            draggable: null,
-            droppableId: homeDroppableId,
-          });
-          const second: MapProps = execute(selector)({
-            phase,
-            drag: null,
-            pending: null,
-            draggable: null,
-            droppableId: homeDroppableId,
-          });
-
-          expect(first).toEqual(defaultMapProps);
-          expect(second).toEqual(defaultMapProps);
-          // checking object equality
-          expect(first).toBe(second);
+      [
+        state.idle,
+        state.preparing,
+        state.requesting(),
+        state.dropComplete(),
+      ].forEach((current: State) => {
+        Array.from({ length: 3 }).forEach(() => {
+          expect(selector(current, ownProps)).toBe(defaultMapProps);
         });
       });
     });
   });
 
-  describe('child render behavior', () => {
-    class Person extends Component<{ name: string, provided: Provided }> {
-      render() {
-        const { provided, name } = this.props;
-        return (
-          <div ref={ref => provided.innerRef(ref)}>
-            hello {name}
-          </div>
-        );
-      }
-    }
+  describe('dragging', () => {
+    describe('is not dragging over', () => {
+      const ownProps: OwnProps = getOwnProps(preset.home);
 
-    class App extends Component<{ currentUser: string }> {
-      render() {
-        return (
-          <Droppable droppableId="drop-1">
-            {(provided: Provided) => (
-              <Person
-                name={this.props.currentUser}
-                provided={provided}
-              />
-            )}
-          </Droppable>
-        );
-      }
-    }
+      it('should not render a placeholder or say that it is being dragged over', () => {
+        const selector: Selector = makeSelector();
+        const expected: MapProps = {
+          isDraggingOver: false,
+          placeholder: null,
+        };
 
-    beforeEach(() => {
-      jest.spyOn(Person.prototype, 'render');
-    });
+        // dragging over nothing
+        const result: MapProps = selector(state.dragging(preset.inHome1.descriptor.id), ownProps);
 
-    afterEach(() => {
-      Person.prototype.render.mockRestore();
-    });
-
-    it('should render the child function when the parent renders', () => {
-      const wrapper = mount(<App currentUser="Jake" />, withStore());
-
-      // initial render causes two renders due to setting child ref
-      expect(Person.prototype.render).toHaveBeenCalledTimes(2);
-      expect(wrapper.find(Person).props().name).toBe('Jake');
-    });
-
-    it('should render the child function when the parent re-renders', () => {
-      const wrapper = mount(<App currentUser="Jake" />, withStore());
-
-      forceUpdate(wrapper);
-
-      // initial render causes two renders due to setting child ref
-      expect(Person.prototype.render).toHaveBeenCalledTimes(3);
-      expect(wrapper.find(Person).props().name).toBe('Jake');
-    });
-
-    it('should render the child function when the parents props changes that cause a re-render', () => {
-      const wrapper = mount(<App currentUser="Jake" />, withStore());
-
-      wrapper.setProps({
-        currentUser: 'Finn',
+        expect(result).toEqual(expected);
       });
 
-      // initial render causes two renders due to setting child ref
-      expect(Person.prototype.render).toHaveBeenCalledTimes(3);
-      expect(wrapper.find(Person).props().name).toBe('Finn');
+      it('should not break memoization from previous phases', () => {
+        const selector: Selector = makeSelector();
+        const expected: MapProps = {
+          isDraggingOver: false,
+          placeholder: null,
+        };
+
+        // dragging over nothing
+        const idle: MapProps = selector(state.idle, ownProps);
+        const preparing: MapProps = selector(state.preparing, ownProps);
+        const requesting: MapProps = selector(state.requesting(), ownProps);
+        const dragging: MapProps = selector(state.dragging(), ownProps);
+
+        // checking memoization
+        expect(idle).toBe(preparing);
+        expect(preparing).toBe(requesting);
+        expect(requesting).toBe(dragging);
+        // validating result
+        expect(idle).toEqual(expected);
+      });
+
+      it('should not break memoization between drags', () => {
+        const selector: Selector = makeSelector();
+
+        // dragging over nothing
+        const result1: MapProps = selector(state.dragging(), ownProps);
+        const result2: MapProps = selector(state.dragging(), ownProps);
+
+        expect(result1).toBe(result2);
+      });
     });
+
+    describe('is dragging over', () => {
+      describe('home list', () => {
+        // dragging inHome1 over home
+        const ownProps: OwnProps = getOwnProps(preset.home);
+
+        const current: State = (() => {
+          const base = state.dragging();
+          const impact: DragImpact = {
+            movement: {
+              displaced: [],
+              amount: { x: 0, y: 0 },
+              isBeyondStartPosition: false,
+            },
+            direction: preset.home.axis.direction,
+            destination: {
+              index: 0,
+              droppableId: preset.home.descriptor.id,
+            },
+          };
+          return {
+            ...base,
+            drag: {
+              ...base.drag,
+              impact,
+            },
+          };
+        })();
+
+        it('should say that it is being dragged over - and not add a placeholder (it is already taken care of by draggable)', () => {
+          const selector: Selector = makeSelector();
+
+          const result: MapProps = selector(current, ownProps);
+
+          expect(result).toEqual({
+            isDraggingOver: true,
+            placeholder: null,
+          });
+        });
+
+        it('should not break memoization on multiple calls', () => {
+          const selector: Selector = makeSelector();
+
+          const result1: MapProps = selector(clone(current), ownProps);
+          const result2: MapProps = selector(clone(current), ownProps);
+
+          expect(result1).toBe(result2);
+        });
+      });
+
+      describe('foreign list', () => {
+        // dragging inHome1 over foreign
+        const ownProps: OwnProps = getOwnProps(preset.foreign);
+
+        const current: State = (() => {
+          const base = state.dragging(preset.inHome1.descriptor.id);
+          const impact: DragImpact = {
+            movement: {
+              displaced: [],
+              amount: { x: 0, y: 0 },
+              isBeyondStartPosition: false,
+            },
+            direction: preset.foreign.axis.direction,
+            destination: {
+              index: 0,
+              droppableId: preset.foreign.descriptor.id,
+            },
+          };
+          return {
+            ...base,
+            drag: {
+              ...base.drag,
+              impact,
+            },
+          };
+        })();
+
+        it('should add a placeholder', () => {
+          const selector: Selector = makeSelector();
+          const expected: MapProps = {
+            isDraggingOver: true,
+            placeholder: preset.inHome1.placeholder,
+          };
+
+          const result: MapProps = selector(current, ownProps);
+
+          expect(result).toEqual(expected);
+        });
+
+        it('should not break memoization on multiple calls', () => {
+          const selector: Selector = makeSelector();
+
+          // using spread rather than clone as we do not want to invalidate
+          // the reference to the dimensions in the store
+          const result1: MapProps = selector({ ...current }, ownProps);
+          const result2: MapProps = selector({ ...current }, ownProps);
+
+          expect(result1).toBe(result2);
+        });
+      });
+    });
+  });
+
+  describe('dropping', () => {
+    describe('home list', () => {
+      const ownProps: OwnProps = getOwnProps(preset.home);
+      describe('was not dragging over', () => {
+        it('should not break memoization from the dragging phase', () => {
+          const selector: Selector = makeSelector();
+
+          const dragging: MapProps = selector(state.dragging(), ownProps);
+          const dropping: MapProps = selector(state.dropAnimating(), ownProps);
+
+          expect(dragging).toBe(dropping);
+        });
+      });
+
+      describe('was dragging over', () => {
+        const impact: DragImpact = {
+          movement: {
+            displaced: [],
+            amount: { x: 0, y: 0 },
+            isBeyondStartPosition: false,
+          },
+          direction: preset.home.axis.direction,
+          destination: {
+            index: 0,
+            droppableId: preset.home.descriptor.id,
+          },
+        };
+
+        const dragging: State = (() => {
+          const base: State = state.dragging(preset.inHome1.descriptor.id);
+          return {
+            ...base,
+            drag: {
+              ...base.drag,
+              impact,
+            },
+          };
+        })();
+        const dropping: State = (() => {
+          const base: State = state.dropAnimating(preset.inHome1.descriptor.id);
+          return {
+            ...base,
+            drop: {
+              result: null,
+              pending: {
+                trigger: 'DROP',
+                newHomeOffset: { x: 0, y: 0 },
+                impact,
+                result: {
+                  draggableId: preset.inHome1.descriptor.id,
+                  type: preset.home.descriptor.type,
+                  source: {
+                    index: preset.inHome1.descriptor.index,
+                    droppableId: preset.home.descriptor.id,
+                  },
+                  destination: {
+                    index: preset.inHome1.descriptor.index,
+                    droppableId: preset.home.descriptor.id,
+                  },
+                },
+              },
+            },
+          };
+        })();
+
+        it('should not break memoization from the dragging phase', () => {
+          const selector: Selector = makeSelector();
+
+          const result1: MapProps = selector(dragging, ownProps);
+          const result2: MapProps = selector(dropping, ownProps);
+
+          expect(result1).toBe(result2);
+        });
+      });
+    });
+
+    describe('foreign list', () => {
+      // dragging inHome1
+      const ownProps: OwnProps = getOwnProps(preset.foreign);
+      describe('was not dragging over', () => {
+        it('should not break memoization from the dragging phase', () => {
+          const selector: Selector = makeSelector();
+
+          const dragging: MapProps = selector(state.dragging(), ownProps);
+          const dropping: MapProps = selector(state.dropAnimating(), ownProps);
+
+          expect(dragging).toBe(dropping);
+        });
+      });
+
+      describe('was dragging over', () => {
+        // dragging inHome1 over foreign
+        const impact: DragImpact = {
+          movement: {
+            // not populating correctly
+            displaced: [],
+            amount: { x: 0, y: 0 },
+            isBeyondStartPosition: false,
+          },
+          direction: preset.foreign.axis.direction,
+          destination: {
+            index: 0,
+            droppableId: preset.foreign.descriptor.id,
+          },
+        };
+        const dragging: State = (() => {
+          const base = state.dragging(preset.inHome1.descriptor.id);
+          return {
+            ...base,
+            drag: {
+              ...base.drag,
+              impact,
+            },
+          };
+        })();
+        const dropping: State = (() => {
+          const base: State = state.dropAnimating(preset.inHome1.descriptor.id);
+          return {
+            ...base,
+            drop: {
+              result: null,
+              pending: {
+                trigger: 'DROP',
+                newHomeOffset: { x: 0, y: 0 },
+                impact,
+                result: {
+                  draggableId: preset.inHome1.descriptor.id,
+                  type: preset.home.descriptor.type,
+                  source: {
+                    index: preset.inHome1.descriptor.index,
+                    droppableId: preset.home.descriptor.id,
+                  },
+                  destination: impact.destination,
+                },
+              },
+            },
+          };
+        })();
+
+        it('should not break memoization from the dragging phase', () => {
+          const selector: Selector = makeSelector();
+
+          const result1: MapProps = selector(dragging, ownProps);
+          const result2: MapProps = selector(dropping, ownProps);
+
+          expect(result1).toBe(result2);
+        });
+      });
+    });
+  });
+
+  describe('child render behaviour', () => {
+
   });
 });

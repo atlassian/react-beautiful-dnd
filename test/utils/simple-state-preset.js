@@ -107,7 +107,7 @@ export const dragging = (
   return result;
 };
 
-const getDropAnimating = (id: DraggableId, trigger: DropTrigger) => {
+const getDropAnimating = (id: DraggableId, trigger: DropTrigger): State => {
   const descriptor: DraggableDescriptor = preset.draggables[id].descriptor;
   const home: DroppableDescriptor = preset.droppables[descriptor.droppableId].descriptor;
   const pending: PendingDrop = {
@@ -175,4 +175,14 @@ export const dropComplete = (
   };
   return value;
 };
+
+export const allPhases = (): State[] => [
+  idle,
+  preparing,
+  requesting(),
+  dragging(),
+  dropAnimating(),
+  userCancel(),
+  dropComplete(),
+];
 

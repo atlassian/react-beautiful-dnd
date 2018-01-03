@@ -163,6 +163,7 @@ export type DragMovement = {|
   displaced: Displacement[],
   amount: Position,
   // is moving forward relative to the starting position
+  // TODO: rename to 'shouldDisplaceForward'?
   isBeyondStartPosition: boolean,
 |}
 
