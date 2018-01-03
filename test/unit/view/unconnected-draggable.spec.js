@@ -9,8 +9,9 @@ import DragHandle from '../../../src/view/drag-handle/drag-handle';
 import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
 import Moveable from '../../../src/view/moveable/';
 import Placeholder from '../../../src/view/placeholder';
-import { css } from '../../../src/view/animation';
 import { add, subtract } from '../../../src/state/position';
+import createStyleMarshal from '../../../src/view/style-marshal/style-marshal';
+import type { StyleMarshal } from '../../../src/view/style-marshal/style-marshal-types';
 import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
 import type { DimensionMarshal } from '../../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
@@ -154,24 +155,30 @@ type MountConnected = {|
   ownProps?: OwnProps,
   mapProps?: MapProps,
   dispatchProps?: DispatchProps,
-  WrappedComponent?: any,
+  WrappedComponent ?: any,
+  dimensionMarshal?: DimensionMarshal,
+  styleMarshal?: StyleMarshal,
 |};
+
+const basicDimensionMarshal: DimensionMarshal = createDimensionMarshal({
+  cancel: () => { },
+  publishDraggables: () => { },
+  publishDroppables: () => { },
+  updateDroppableScroll: () => { },
+});
+
+const basicStyleMarshal: StyleMarshal = createStyleMarshal();
 
 const mountDraggable = ({
   ownProps = defaultOwnProps,
   mapProps = defaultMapProps,
   dispatchProps = getDispatchPropsStub(),
   WrappedComponent = Item,
+  dimensionMarshal = basicDimensionMarshal,
+  styleMarshal = basicStyleMarshal,
 }: MountConnected = {}): ReactWrapper => {
-  const marshal: DimensionMarshal = createDimensionMarshal({
-    cancel: () => { },
-    publishDraggables: () => { },
-    publishDroppables: () => { },
-    updateDroppableScroll: () => { },
-  });
-
   // registering the droppable so that publishing the dimension will work correctly
-  marshal.registerDroppable(droppable.descriptor, {
+  dimensionMarshal.registerDroppable(droppable.descriptor, {
     getDimension: () => droppable,
     watchScroll: () => { },
     unwatchScroll: () => { },
@@ -191,8 +198,8 @@ const mountDraggable = ({
     , combine(
       withStore(),
       withDroppableId(droppableId),
-      withStyleContext(),
-      withDimensionMarshal(marshal),
+      withStyleContext(styleMarshal),
+      withDimensionMarshal(dimensionMarshal),
       withCanLift(),
     ));
 
@@ -270,6 +277,21 @@ describe('Draggable - unconnected', () => {
     const node = wrapper.getDOMNode();
 
     expect(node.className).toBe('item');
+  });
+
+  it('should provided a data attribute for global styling', () => {
+    const myMock = jest.fn();
+    const Stubber = getStubber(myMock);
+    const styleMarshal: StyleMarshal = createStyleMarshal();
+
+    mountDraggable({
+      mapProps: defaultMapProps,
+      WrappedComponent: Stubber,
+      styleMarshal,
+    });
+    const provided: Provided = getLastCall(myMock)[0].provided;
+
+    expect(provided.draggableProps['data-react-beautiful-dnd-draggable']).toEqual(styleMarshal.styleContext);
   });
 
   describe('drag handle', () => {

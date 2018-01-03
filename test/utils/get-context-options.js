@@ -5,6 +5,7 @@ import createStore from '../../src/state/create-store';
 import createDimensionMarshal from '../../src/state/dimension-marshal/dimension-marshal';
 import type { DroppableId } from '../../src/types';
 import type { DimensionMarshal } from '../../src/state/dimension-marshal/dimension-marshal-types';
+import type { StyleMarshal } from '../../src/view/style-marshal/style-marshal-types';
 
 // Not using this store - just putting it on the context
 // For any connected components that need it (eg DimensionPublisher)
@@ -31,9 +32,9 @@ export const withDroppableId = (droppableId: DroppableId): Object => ({
   },
 });
 
-export const withStyleContext = (): Object => ({
+export const withStyleContext = (marshal?: StyleMarshal): Object => ({
   context: {
-    [styleContextKey]: 'foo',
+    [styleContextKey]: marshal ? marshal.styleContext : 'fake-style-context',
   },
   childContextTypes: {
     [styleContextKey]: PropTypes.string.isRequired,
