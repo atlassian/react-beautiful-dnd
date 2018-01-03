@@ -24,8 +24,6 @@ import type {
 } from '../drag-handle/drag-handle-types';
 
 export type DraggingStyle = {|
-  // Allow scrolling of the element behind the dragging element
-  pointerEvents: 'none',
 
   // `position: fixed` is used to ensure that the element is always positioned
   // in the correct position and ignores the surrounding position:relative parents
