@@ -1,11 +1,17 @@
 // @flow
-import { makeSelector } from '../../../src/view/droppable/connected-droppable';
+/* eslint-disable react/no-multi-comp */
+import React, { Component } from 'react';
+import { mount } from 'enzyme';
+import { withStore, combine, withDimensionMarshal } from '../../utils/get-context-options';
+import Droppable, { makeSelector } from '../../../src/view/droppable/connected-droppable';
 import * as state from '../../utils/simple-state-preset';
+import forceUpdate from '../../utils/force-update';
 import { getPreset } from '../../utils/dimension';
 import type {
   Selector,
   MapProps,
   OwnProps,
+  Provided,
 } from '../../../src/view/droppable/droppable-types';
 import type {
   DroppableDimension,
@@ -365,7 +371,77 @@ describe('Connected Droppable', () => {
     });
   });
 
-  describe('child render behaviour', () => {
+  describe('child render behavior', () => {
+    const contextOptions = combine(withStore(), withDimensionMarshal());
 
+    class Person extends Component<{ name: string, provided: Provided }> {
+      render() {
+        const { provided, name } = this.props;
+        return (
+          <div ref={ref => provided.innerRef(ref)}>
+            hello {name}
+          </div>
+        );
+      }
+    }
+
+    class App extends Component<{ currentUser: string }> {
+      render() {
+        return (
+          <Droppable droppableId="drop-1">
+            {(provided: Provided) => (
+              <Person
+                name={this.props.currentUser}
+                provided={provided}
+              />
+            )}
+          </Droppable>
+        );
+      }
+    }
+
+    beforeEach(() => {
+      jest.spyOn(Person.prototype, 'render');
+    });
+
+    afterEach(() => {
+      Person.prototype.render.mockRestore();
+    });
+
+    it('should render the child function when the parent renders', () => {
+      const wrapper = mount(<App currentUser="Jake" />, contextOptions);
+
+      // initial render causes two renders due to setting child ref
+      expect(Person.prototype.render).toHaveBeenCalledTimes(2);
+      expect(wrapper.find(Person).props().name).toBe('Jake');
+
+      wrapper.unmount();
+    });
+
+    it('should render the child function when the parent re-renders', () => {
+      const wrapper = mount(<App currentUser="Jake" />, contextOptions);
+
+      forceUpdate(wrapper);
+
+      // initial render causes two renders due to setting child ref
+      expect(Person.prototype.render).toHaveBeenCalledTimes(3);
+      expect(wrapper.find(Person).props().name).toBe('Jake');
+
+      wrapper.unmount();
+    });
+
+    it('should render the child function when the parents props changes that cause a re-render', () => {
+      const wrapper = mount(<App currentUser="Jake" />, contextOptions);
+
+      wrapper.setProps({
+        currentUser: 'Finn',
+      });
+
+      // initial render causes two renders due to setting child ref
+      expect(Person.prototype.render).toHaveBeenCalledTimes(3);
+      expect(wrapper.find(Person).props().name).toBe('Finn');
+
+      wrapper.unmount();
+    });
   });
 });
