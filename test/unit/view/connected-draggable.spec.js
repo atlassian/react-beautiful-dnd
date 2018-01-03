@@ -678,83 +678,94 @@ describe('Connected Draggable', () => {
         });
       });
 
-      describe('user cancel', () => {
-        // looking at inHome2
-        const ownProps: OwnProps = getOwnProps(preset.inHome2);
-        const selector = makeSelector();
-        const amount: Position = { y: preset.inHome1.client.withMargin.height, x: 0 };
-        // moving inHome1 down beyond inHome2
-        const impact: DragImpact = {
-          direction: preset.home.axis.direction,
-          destination: {
-            index: 1,
-            droppableId: preset.home.descriptor.id,
-          },
-          movement: {
-            amount,
-            isBeyondStartPosition: true,
-            displaced: [
-              {
-                draggableId: preset.inHome2.descriptor.id,
-                isVisible: true,
-                shouldAnimate: true,
-              },
-            ],
-          },
-        };
-        const dragging: State = (() => {
-          const previous: State = state.dragging(preset.inHome1.descriptor.id);
-          return {
-            ...previous,
-            drag: {
-              ...previous.drag,
-              impact,
+      describe('drop animating', () => {
+        it('should not break memoization from the dragging phase', () => {
+          // looking at inHome2
+          const ownProps: OwnProps = getOwnProps(preset.inHome2);
+          const selector = makeSelector();
+          const amount: Position = { y: preset.inHome1.client.withMargin.height, x: 0 };
+          // moving inHome1 down beyond inHome2
+          const impact: DragImpact = {
+            direction: preset.home.axis.direction,
+            destination: {
+              index: 1,
+              droppableId: preset.home.descriptor.id,
+            },
+            movement: {
+              amount,
+              isBeyondStartPosition: true,
+              displaced: [
+                {
+                  draggableId: preset.inHome2.descriptor.id,
+                  isVisible: true,
+                  shouldAnimate: true,
+                },
+              ],
             },
           };
-        })();
-        const dropping: State = (() => {
-          const previous: State = state.userCancel(preset.inHome1.descriptor.id);
-          return {
-            ...previous,
-            drop: {
-              ...previous.drop,
-              pending: {
-                // $ExpectError - not checking for null
-                ...previous.drop.pending,
+          const dragging: State = (() => {
+            const previous: State = state.dragging(preset.inHome1.descriptor.id);
+            return {
+              ...previous,
+              drag: {
+                ...previous.drag,
                 impact,
               },
-            },
-          };
-        })();
+            };
+          })();
+          const dropping: State = (() => {
+            const previous: State = state.userCancel(preset.inHome1.descriptor.id);
+            return {
+              ...previous,
+              drop: {
+                ...previous.drop,
+                pending: {
+                  // $ExpectError - not checking for null
+                  ...previous.drop.pending,
+                  impact,
+                },
+              },
+            };
+          })();
 
-        const duringDrag: MapProps = selector(dragging, ownProps);
-        const duringDrop: MapProps = selector(dropping, ownProps);
+          const duringDrag: MapProps = selector(dragging, ownProps);
+          const duringUserCancel: MapProps = selector(dropping, ownProps);
 
-        // memoization check
-        expect(duringDrag).toBe(duringDrop);
-        expect(selector.recomputations()).toBe(1);
-        // validating result
-        expect(duringDrop).toEqual({
-          isDragging: false,
-          isDropAnimating: false,
-          // moving backwards
-          offset: negate(amount),
-          shouldAnimateDisplacement: true,
-          shouldAnimateDragMovement: false,
-          dimension: null,
-          direction: null,
+          // memoization check
+          expect(duringDrag).toBe(duringUserCancel);
+          expect(selector.recomputations()).toBe(1);
+          // validating result
+          expect(duringUserCancel).toEqual({
+            isDragging: false,
+            isDropAnimating: false,
+            // moving backwards
+            offset: negate(amount),
+            shouldAnimateDisplacement: true,
+            shouldAnimateDragMovement: false,
+            dimension: null,
+            direction: null,
+          });
         });
       });
     });
   });
 
   describe('nothing is dragging', () => {
-    it('should return the default map props', () => {
+    it('should return the default map props and not break memoization on multiple calls', () => {
+      const resting: State[] = [
+        state.idle,
+        state.dropComplete(),
+      ];
+      const ownProps: OwnProps = getOwnProps(preset.inHome1);
+      const selector: Selector = makeSelector();
+      const defaultMapProps: MapProps = selector(state.idle, ownProps);
 
-    });
-
-    it('should not break memoization on multiple calls', () => {
-
+      [...resting, ...resting.reverse()].forEach((current: State) => {
+        Array.from({ length: 3 }).forEach(() => {
+          const result: MapProps = selector(current, ownProps);
+          expect(result).toBe(defaultMapProps);
+        });
+      });
     });
   });
 });
