@@ -658,6 +658,7 @@ describe('Connected Draggable', () => {
 
         // checking memoization
         expect(result1).toBe(result2);
+        expect(selector.recomputations()).toBe(1);
         // validating result
         expect(result1).toEqual({
           isDragging: false,
@@ -859,6 +860,7 @@ describe('Connected Draggable', () => {
         Array.from({ length: 3 }).forEach(() => {
           const result: MapProps = selector(current, ownProps);
           expect(result).toBe(defaultMapProps);
+          expect(selector.recomputations()).toBe(1);
         });
       });
     });
