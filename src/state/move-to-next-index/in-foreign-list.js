@@ -1,14 +1,14 @@
 // @flow
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import isPartiallyVisible from '../visibility/is-partially-visible';
-import { patch, subtract } from '../position';
-import { offset } from '../spacing';
+import { patch } from '../position';
 import moveToEdge from '../move-to-edge';
 import getDisplacement from '../get-displacement';
 import getViewport from '../visibility/get-viewport';
+import isVisibleInNewLocation from './is-visible-in-new-location';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import type
+
 {
   DraggableLocation,
   DraggableDimension,
@@ -17,7 +17,6 @@ import type
   DragImpact,
   Displacement,
   Area,
-  Spacing,
 } from '../../types';
 
 export default ({
@@ -94,12 +93,10 @@ export default ({
     // checking the shifted draggable rather than just the new center
     // as the new center might not be visible but the whole draggable
     // might be partially visible
-    const diff: Position = subtract(droppable.page.withMargin.center, newCenter);
-    const shifted: Spacing = offset(draggable.page.withMargin, diff);
-
-    return isPartiallyVisible({
-      target: shifted,
+    return isVisibleInNewLocation({
+      draggable,
       destination: droppable,
+      newCenter,
       viewport,
     });
   })();

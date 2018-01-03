@@ -1,14 +1,13 @@
 // @flow
 import memoizeOne from 'memoize-one';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { patch, subtract } from '../position';
-import { offset } from '../spacing';
+import { patch } from '../position';
+import isVisibleInNewLocation from './is-visible-in-new-location';
 import getViewport from '../visibility/get-viewport';
 import moveToEdge from '../move-to-edge';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import getDisplacement from '../get-displacement';
-import isPartiallyVisible from '../visibility/is-partially-visible';
 import type {
   DraggableLocation,
   DraggableDimension,
@@ -17,7 +16,6 @@ import type {
   Axis,
   DragImpact,
   Area,
-  Spacing,
 } from '../../types';
 
 const getIndex = memoizeOne(
@@ -90,24 +88,12 @@ export default ({
 
   const viewport: Area = getViewport();
 
-  const isVisible: boolean = (() => {
-    // checking the shifted draggable rather than just the new center
-    // as the new center might not be visible but the whole draggable
-    // might be partially visible
-    const diff: Position = subtract(droppable.page.withMargin.center, newCenter);
-    const shifted: Spacing = offset(draggable.page.withMargin, diff);
-
-    // Currently not supporting moving a draggable outside the visibility bounds of a droppable
-    // checking the
-    // TODO: what about viewport?
-    // doing a standard check breaks long columns
-    // NEED TO CHECK THE WHOLE DRAGGABLE not just the new center!
-    return isPartiallyVisible({
-      target: shifted,
-      destination: droppable,
-      viewport,
-    });
-  })();
+  const isVisible: boolean = isVisibleInNewLocation({
+    draggable,
+    destination: droppable,
+    newCenter,
+    viewport,
+  });
 
   if (!isVisible) {
     return null;

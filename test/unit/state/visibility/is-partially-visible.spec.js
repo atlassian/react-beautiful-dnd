@@ -6,8 +6,6 @@ import { offset } from '../../../../src/state/spacing';
 import type {
   Area,
   DroppableDimension,
-  DraggableDimension,
-  Position,
   Spacing,
 } from '../../../../src/types';
 
