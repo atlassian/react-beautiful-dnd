@@ -63,11 +63,29 @@ const getOwnProps = (dimension: DraggableDimension): OwnProps => ({
 });
 
 describe('Connected Draggable', () => {
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => { });
+  });
+
+  afterEach(() => {
+    console.error.mockRestore();
+  });
+
   describe('is currently dragging', () => {
     const ownProps: OwnProps = getOwnProps(preset.inHome1);
 
     it('should log an error when there is invalid drag state', () => {
+      const invalid: State = {
+        ...state.dragging(),
+        drag: null,
+      };
+      const selector: Selector = makeSelector();
+      const defaultMapProps: MapProps = selector(state.idle, ownProps);
 
+      const result: MapProps = selector(invalid, ownProps);
+
+      expect(result).toBe(defaultMapProps);
+      expect(console.error).toHaveBeenCalled();
     });
 
     it('should move the dragging item to the current offset', () => {
@@ -156,6 +174,20 @@ describe('Connected Draggable', () => {
     });
 
     describe('drop animating', () => {
+      it('should log an error when there is invalid drag state', () => {
+        const invalid: State = {
+          ...state.dropAnimating(),
+          drop: null,
+        };
+        const selector: Selector = makeSelector();
+        const defaultMapProps: MapProps = selector(state.idle, ownProps);
+
+        const result: MapProps = selector(invalid, ownProps);
+
+        expect(result).toBe(defaultMapProps);
+        expect(console.error).toHaveBeenCalled();
+      });
+
       it('should move the draggable to the new offset', () => {
         const selector: Selector = makeSelector();
         const current: State = state.dropAnimating();
@@ -211,6 +243,20 @@ describe('Connected Draggable', () => {
   describe('something else is dragging', () => {
     describe('nothing impacted by drag', () => {
       const ownProps: OwnProps = getOwnProps(preset.inHome2);
+
+      it('should log an error when there is invalid drag state', () => {
+        const invalid: State = {
+          ...state.dragging(),
+          drag: null,
+        };
+        const selector: Selector = makeSelector();
+        const defaultMapProps: MapProps = selector(state.idle, ownProps);
+
+        const result: MapProps = selector(invalid, ownProps);
+
+        expect(result).toBe(defaultMapProps);
+        expect(console.error).toHaveBeenCalled();
+      });
 
       it('should return the default map props', () => {
         const selector: Selector = makeSelector();
@@ -626,6 +672,22 @@ describe('Connected Draggable', () => {
       });
 
       describe('drop animating', () => {
+        it('should log an error when there is invalid drag state', () => {
+          const invalid: State = {
+            ...state.dropAnimating(),
+            // invalid
+            drop: null,
+          };
+          const selector: Selector = makeSelector();
+          const ownProps: OwnProps = getOwnProps(preset.inHome2);
+          const defaultMapProps: MapProps = selector(state.idle, ownProps);
+
+          const result: MapProps = selector(invalid, ownProps);
+
+          expect(result).toBe(defaultMapProps);
+          expect(console.error).toHaveBeenCalled();
+        });
+
         it('should not break memoization from the dragging phase', () => {
           // looking at inHome2
           const ownProps: OwnProps = getOwnProps(preset.inHome2);
@@ -696,6 +758,22 @@ describe('Connected Draggable', () => {
       });
 
       describe('drop animating', () => {
+        it('should log an error when there is invalid drag state', () => {
+          const invalid: State = {
+            ...state.userCancel(),
+            // invalid
+            drop: null,
+          };
+          const selector: Selector = makeSelector();
+          const ownProps: OwnProps = getOwnProps(preset.inHome2);
+          const defaultMapProps: MapProps = selector(state.idle, ownProps);
+
+          const result: MapProps = selector(invalid, ownProps);
+
+          expect(result).toBe(defaultMapProps);
+          expect(console.error).toHaveBeenCalled();
+        });
+
         it('should not break memoization from the dragging phase', () => {
           // looking at inHome2
           const ownProps: OwnProps = getOwnProps(preset.inHome2);
