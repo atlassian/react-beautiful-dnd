@@ -1,8 +1,10 @@
 // @flow
 import PropTypes from 'prop-types';
-import { storeKey, droppableIdKey } from '../../src/view/context-keys';
+import { storeKey, droppableIdKey, dimensionMarshalKey, styleContextKey, canLiftContextKey } from '../../src/view/context-keys';
 import createStore from '../../src/state/create-store';
+import createDimensionMarshal from '../../src/state/dimension-marshal/dimension-marshal';
 import type { DroppableId } from '../../src/types';
+import type { DimensionMarshal } from '../../src/state/dimension-marshal/dimension-marshal-types';
 
 // Not using this store - just putting it on the context
 // For any connected components that need it (eg DimensionPublisher)
@@ -26,6 +28,38 @@ export const withDroppableId = (droppableId: DroppableId): Object => ({
   },
   childContextTypes: {
     [droppableIdKey]: PropTypes.string.isRequired,
+  },
+});
+
+export const withStyleContext = (): Object => ({
+  context: {
+    [styleContextKey]: 'foo',
+  },
+  childContextTypes: {
+    [styleContextKey]: PropTypes.string.isRequired,
+  },
+});
+
+export const withCanLift = (): Object => ({
+  context: {
+    [canLiftContextKey]: () => true,
+  },
+  childContextTypes: {
+    [canLiftContextKey]: PropTypes.func.isRequired,
+  },
+});
+
+export const withDimensionMarshal = (marshal?: DimensionMarshal): Object => ({
+  context: {
+    [dimensionMarshalKey]: marshal || createDimensionMarshal({
+      cancel: () => { },
+      publishDraggables: () => { },
+      publishDroppables: () => { },
+      updateDroppableScroll: () => { },
+    }),
+  },
+  childContextTypes: {
+    [dimensionMarshalKey]: PropTypes.object.isRequired,
   },
 });
 

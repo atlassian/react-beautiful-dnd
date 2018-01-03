@@ -1,12 +1,27 @@
 // @flow
-import { makeSelector } from '../../../src/view/draggable/connected-draggable';
+/* eslint-disable react/no-multi-comp */
+import React, { Component } from 'react';
+import { mount } from 'enzyme';
+import Draggable, { makeSelector } from '../../../src/view/draggable/connected-draggable';
 import { getPreset } from '../../utils/dimension';
 import { negate } from '../../../src/state/position';
+import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
 import * as state from '../../utils/simple-state-preset';
+import {
+  combine,
+  withStore,
+  withDroppableId,
+  withDimensionMarshal,
+  withStyleContext,
+  withCanLift,
+} from '../../utils/get-context-options';
+import forceUpdate from '../../utils/force-update';
+import type { DimensionMarshal } from '../../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
   Selector,
   OwnProps,
   MapProps,
+  Provided,
 } from '../../../src/view/draggable/draggable-types';
 import type {
   Position,
@@ -30,6 +45,7 @@ const move = (previous: State, offset: Position): State => {
     drag: {
       ...previous.drag,
       current: {
+        // $ExpectError - not checking for null
         ...previous.drag.current,
         client: clientPositions,
         page: clientPositions,
@@ -83,6 +99,7 @@ describe('Connected Draggable', () => {
         drag: {
           ...previous.drag,
           current: {
+            // $ExpectError - not checking for null
             ...previous.drag.current,
             shouldAnimate: true,
           },
@@ -766,6 +783,105 @@ describe('Connected Draggable', () => {
           expect(result).toBe(defaultMapProps);
         });
       });
+    });
+  });
+
+  describe('child render behavior', () => {
+    const droppableId: DroppableId = preset.home.descriptor.id;
+    // creating our own marshal so we can publish a droppable
+    // so that the draggable can publish itself
+    const marshal: DimensionMarshal = createDimensionMarshal({
+      cancel: () => { },
+      publishDraggables: () => { },
+      publishDroppables: () => { },
+      updateDroppableScroll: () => { },
+    });
+    const options: Object = combine(
+      withStore(),
+      withDroppableId(droppableId),
+      withDimensionMarshal(marshal),
+      withStyleContext(),
+      withCanLift(),
+    );
+
+    marshal.registerDroppable(preset.home.descriptor, {
+      getDimension: () => preset.home,
+      watchScroll: () => { },
+      unwatchScroll: () => { },
+    });
+
+    class Person extends Component<{ name: string, provided: Provided}> {
+      render() {
+        const { provided, name } = this.props;
+        return (
+          <div
+            ref={ref => provided.innerRef(ref)}
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+          >
+            hello {name}
+          </div>
+        );
+      }
+    }
+
+    class App extends Component<{ currentUser: string }> {
+      render() {
+        return (
+          <Draggable draggableId="drag-1">
+            {(dragProvided: Provided) => (
+              <Person
+                name={this.props.currentUser}
+                provided={dragProvided}
+              />
+            )}
+          </Draggable>
+        );
+      }
+    }
+
+    beforeEach(() => {
+      jest.spyOn(Person.prototype, 'render');
+    });
+
+    afterEach(() => {
+      Person.prototype.render.mockRestore();
+    });
+
+    it('should render the child function when the parent renders', () => {
+      const wrapper = mount(<App currentUser="Jake" />, options);
+
+      // initial render causes two renders due to setting child ref
+      expect(Person.prototype.render).toHaveBeenCalledTimes(2);
+      expect(wrapper.find(Person).props().name).toBe('Jake');
+
+      wrapper.unmount();
+    });
+
+    it('should render the child function when the parent re-renders', () => {
+      const wrapper = mount(<App currentUser="Jake" />, options);
+
+      forceUpdate(wrapper);
+
+      // initial render causes two renders due to setting child ref
+      expect(Person.prototype.render).toHaveBeenCalledTimes(3);
+      expect(wrapper.find(Person).props().name).toBe('Jake');
+
+      wrapper.unmount();
+    });
+
+    it('should render the child function when the parents props changes that cause a re-render', () => {
+      const wrapper = mount(<App currentUser="Jake" />, options);
+
+      wrapper.setProps({
+        currentUser: 'Finn',
+      });
+
+      // initial render causes two renders due to setting child ref
+      expect(Person.prototype.render).toHaveBeenCalledTimes(3);
+      expect(wrapper.find(Person).props().name).toBe('Finn');
+
+      wrapper.unmount();
     });
   });
 });
