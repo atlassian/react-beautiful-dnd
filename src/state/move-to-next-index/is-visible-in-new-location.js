@@ -23,6 +23,7 @@ export default ({
   newCenter,
   viewport,
 }: Args): boolean => {
+  // what the new draggable boundary be if it had the new center
   const diff: Position = subtract(newCenter, draggable.page.withMargin.center);
   const shifted: Spacing = offset(draggable.page.withMargin, diff);
 

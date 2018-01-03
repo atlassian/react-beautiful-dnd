@@ -141,7 +141,7 @@ export const makeSelector = (): Selector => {
     };
   };
 
-  const getWithMovement = (id: DraggableId, movement: DragMovement): ?MapProps => {
+  const getOutOfTheWayMovement = (id: DraggableId, movement: DragMovement): ?MapProps => {
     // Doing this cuts 50% of the time to move
     // Otherwise need to loop over every item in every selector (yuck!)
     const map: DisplacementMap = getDisplacementMap(movement.displaced);
@@ -183,7 +183,7 @@ export const makeSelector = (): Selector => {
         return null;
       }
 
-      return getWithMovement(ownProps.draggableId, state.drag.impact.movement);
+      return getOutOfTheWayMovement(ownProps.draggableId, state.drag.impact.movement);
     }
 
     // state.phase === 'DROP_ANIMATING'
@@ -197,7 +197,7 @@ export const makeSelector = (): Selector => {
       return null;
     }
 
-    return getWithMovement(ownProps.draggableId, state.drop.pending.impact.movement);
+    return getOutOfTheWayMovement(ownProps.draggableId, state.drop.pending.impact.movement);
   };
 
   return createSelector(
@@ -207,14 +207,14 @@ export const makeSelector = (): Selector => {
     ],
     (
       dragging: ?MapProps,
-      moving: ?MapProps,
+      movingOutOfTheWay: ?MapProps,
     ): MapProps => {
       if (dragging) {
         return dragging;
       }
 
-      if (moving) {
-        return moving;
+      if (movingOutOfTheWay) {
+        return movingOutOfTheWay;
       }
 
       return defaultMapProps;

@@ -92,7 +92,7 @@ export const dragging = (
       client: clientPositions,
       page: clientPositions,
       windowScroll: origin,
-      shouldAnimate: true,
+      shouldAnimate: false,
     },
     impact: noImpact,
   };
