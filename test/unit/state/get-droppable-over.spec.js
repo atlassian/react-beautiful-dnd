@@ -55,6 +55,32 @@ describe('get droppable over', () => {
     });
   });
 
+  it('should ignore droppables that are disabled', () => {
+    const target: Position = preset.inHome1.page.withoutMargin.center;
+    const withDisabled: DroppableDimensionMap = {
+      ...preset.droppables,
+      [preset.home.descriptor.id]: disableDroppable(preset.home),
+    };
+
+    const whileEnabled: ?DroppableId = getDroppableOver({
+      target,
+      draggable: preset.inHome1,
+      draggables: preset.draggables,
+      droppables: preset.droppables,
+      previousDroppableOverId: null,
+    });
+    const whileDisabled: ?DroppableId = getDroppableOver({
+      target,
+      draggable: preset.inHome1,
+      draggables: preset.draggables,
+      droppables: withDisabled,
+      previousDroppableOverId: null,
+    });
+
+    expect(whileEnabled).toBe(preset.home.descriptor.id);
+    expect(whileDisabled).toBe(null);
+  });
+
   describe('placeholder buffer', () => {
     const margin: Spacing = {
       top: 10, right: 10, bottom: 10, left: 10,
@@ -246,8 +272,55 @@ describe('get droppable over', () => {
       });
 
       describe('droppable has scroll container', () => {
-        // TODO: as above + frame clipping
-        TODO;
+        const custom: DroppableDimension = getDroppableDimension({
+          descriptor: {
+            id: 'has-a-scroll-parent',
+            type: 'TYPE',
+          },
+          client: getArea({
+            top: 0,
+            left: 0,
+            right: 100,
+            // cut off by the frame
+            bottom: 120,
+          }),
+          frameClient: getArea({
+            top: 0,
+            left: 0,
+            right: 100,
+            bottom: 100,
+          }),
+        });
+        // scrolling custom down so that it the bottom is visible
+        const scrolled: DroppableDimension = scrollDroppable(custom, { x: 0, y: 20 });
+
+        const withCustom: DroppableDimensionMap = {
+          ...droppables,
+          [custom.descriptor.id]: scrolled,
+        };
+
+        it('should add a placeholder buffer to the subject', () => {
+          // just below droppable subject
+          // normally cut off by frame
+          const target: Position = {
+            x: 0,
+            y: 100,
+          };
+          // dragging inForeign1 just below inHome1
+          const result: ?DroppableId = getDroppableOver({
+            target,
+            draggable: inForeign1,
+            draggables,
+            droppables: withCustom,
+            previousDroppableOverId: custom.descriptor.id,
+          });
+
+          expect(result).toBe(home.descriptor.id);
+        });
+
+        it('should not a placeholder buffer to the frame', () => {
+
+        });
       });
     });
   });
