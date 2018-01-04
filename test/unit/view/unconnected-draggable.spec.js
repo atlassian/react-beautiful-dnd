@@ -156,28 +156,24 @@ type MountConnected = {|
   mapProps?: MapProps,
   dispatchProps?: DispatchProps,
   WrappedComponent ?: any,
-  dimensionMarshal?: DimensionMarshal,
   styleMarshal?: StyleMarshal,
 |};
-
-const basicDimensionMarshal: DimensionMarshal = createDimensionMarshal({
-  cancel: () => { },
-  publishDraggables: () => { },
-  publishDroppables: () => { },
-  updateDroppableScroll: () => { },
-});
-
-const basicStyleMarshal: StyleMarshal = createStyleMarshal();
 
 const mountDraggable = ({
   ownProps = defaultOwnProps,
   mapProps = defaultMapProps,
   dispatchProps = getDispatchPropsStub(),
   WrappedComponent = Item,
-  dimensionMarshal = basicDimensionMarshal,
-  styleMarshal = basicStyleMarshal,
+  styleMarshal,
 }: MountConnected = {}): ReactWrapper => {
   // registering the droppable so that publishing the dimension will work correctly
+  const dimensionMarshal: DimensionMarshal = createDimensionMarshal({
+    cancel: () => { },
+    publishDraggables: () => { },
+    publishDroppables: () => { },
+    updateDroppableScroll: () => { },
+  });
+
   dimensionMarshal.registerDroppable(droppable.descriptor, {
     getDimension: () => droppable,
     watchScroll: () => { },

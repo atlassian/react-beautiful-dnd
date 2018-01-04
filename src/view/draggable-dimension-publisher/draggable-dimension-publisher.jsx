@@ -31,14 +31,15 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
   };
 
+  publishedDescriptor: ?DraggableDescriptor = null
+
   componentWillMount() {
-    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
     const { draggableId, droppableId, index } = this.props;
     const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
       draggableId, droppableId, index
     );
 
-    marshal.registerDraggable(descriptor, this.getDimension);
+    this.publish(descriptor);
   }
 
   componentWillReceiveProps(nextProps: Props) {
@@ -47,12 +48,11 @@ export default class DraggableDimensionPublisher extends Component<Props> {
       draggableId, droppableId, index
     );
 
-    this.publishDescriptorChange(descriptor);
+    this.publish(descriptor);
   }
 
   componentWillUnmount() {
-    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.unregisterDraggable(this.props.draggableId);
+    this.unpublish();
   }
 
   getMemoizedDescriptor = memoizeOne(
@@ -62,11 +62,33 @@ export default class DraggableDimensionPublisher extends Component<Props> {
       index,
     }));
 
-  publishDescriptorChange = memoizeOne((descriptor: DraggableDescriptor) => {
+  unpublish = () => {
+    if (!this.publishedDescriptor) {
+      console.error('cannot unpublish descriptor when none is published');
+      return;
+    }
+
+    // Using the previously published id to unpublish. This is to guard
+    // against the case where the id dynamically changes. This is not
+    // supported during a drag - but it is good to guard against.
     const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.unregisterDraggable(descriptor.id);
+    marshal.unregisterDraggable(this.publishedDescriptor.id);
+    this.publishedDescriptor = null;
+  }
+
+  publish = (descriptor: DraggableDescriptor) => {
+    if (descriptor === this.publishedDescriptor) {
+      return;
+    }
+
+    if (this.publishedDescriptor) {
+      this.unpublish();
+    }
+
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
     marshal.registerDraggable(descriptor, this.getDimension);
-  })
+    this.publishedDescriptor = descriptor;
+  }
 
   getDimension = (): DraggableDimension => {
     const { targetRef, draggableId, droppableId, index } = this.props;

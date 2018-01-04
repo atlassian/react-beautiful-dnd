@@ -257,6 +257,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     inHomeList,
     inForeignList,
     windowScroll,
+    margin,
   };
 };
 
