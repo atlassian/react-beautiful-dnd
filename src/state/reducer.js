@@ -367,8 +367,9 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const target = state.dimension.droppable[id];
 
     if (!target) {
-      console.error('cannot update enabled flag on droppable that does not have a dimension');
-      return clean();
+      // eslint-disable-next-line
+      console.log('cannot update enabled state for droppable as it has not yet been collected');
+      return state;
     }
 
     if (target.isEnabled === isEnabled) {
@@ -381,7 +382,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       isEnabled,
     };
 
-    return {
+    const result: State = {
       ...state,
       dimension: {
         ...state.dimension,
@@ -391,6 +392,8 @@ export default (state: State = clean('IDLE'), action: Action): State => {
         },
       },
     };
+
+    return updateStateAfterDimensionChange(result);
   }
 
   if (action.type === 'MOVE') {

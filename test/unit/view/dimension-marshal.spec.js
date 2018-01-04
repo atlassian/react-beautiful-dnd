@@ -27,6 +27,7 @@ const getCallbackStub = (): Callbacks => {
     publishDraggables: jest.fn(),
     publishDroppables: jest.fn(),
     updateDroppableScroll: jest.fn(),
+    updateDroppableIsEnabled: jest.fn(),
   };
   return callbacks;
 };
@@ -139,7 +140,7 @@ describe('dimension marshal', () => {
   });
 
   describe('drag starting (including early cancel)', () => {
-    describe('invalid start state', () => {
+    describe.skip('invalid start state', () => {
       it('should cancel the collecting if already collecting', () => {
 
       });
@@ -873,6 +874,80 @@ describe('dimension marshal', () => {
           expect(droppableCallbacks.watchScroll).toHaveBeenCalled();
         });
       });
+    });
+  });
+
+  describe('droppable scroll change', () => {
+    it('should log an error if it a registration for the droppable cannot be found', () => {
+      const callbacks: Callbacks = getCallbackStub();
+      const marshal = createDimensionMarshal(callbacks);
+
+      marshal.updateDroppableScroll(preset.home.descriptor.id, { x: 100, y: 230 });
+
+      expect(console.error).toHaveBeenCalled();
+      expect(callbacks.updateDroppableScroll).not.toHaveBeenCalled();
+    });
+
+    it('should not publish anything if not collecting', () => {
+      const callbacks: Callbacks = getCallbackStub();
+      const marshal = createDimensionMarshal(callbacks);
+      populateMarshal(marshal);
+
+      marshal.updateDroppableScroll(preset.home.descriptor.id, { x: 100, y: 230 });
+
+      expect(console.error).not.toHaveBeenCalled();
+      expect(callbacks.updateDroppableScroll).not.toHaveBeenCalled();
+    });
+
+    it('should publish the change if collecting', () => {
+      const callbacks: Callbacks = getCallbackStub();
+      const marshal = createDimensionMarshal(callbacks);
+      populateMarshal(marshal);
+
+      marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+      marshal.updateDroppableScroll(preset.home.descriptor.id, { x: 100, y: 230 });
+
+      expect(callbacks.updateDroppableScroll)
+        .toHaveBeenCalledTimes(1);
+      expect(callbacks.updateDroppableScroll)
+        .toHaveBeenCalledWith(preset.home.descriptor.id, { x: 100, y: 230 });
+    });
+  });
+
+  describe('droppable enabled change', () => {
+    it('should log an error if it a registration for the droppable cannot be found', () => {
+      const callbacks: Callbacks = getCallbackStub();
+      const marshal = createDimensionMarshal(callbacks);
+
+      marshal.updateDroppableIsEnabled(preset.home.descriptor.id, false);
+
+      expect(console.error).toHaveBeenCalled();
+      expect(callbacks.updateDroppableIsEnabled).not.toHaveBeenCalled();
+    });
+
+    it('should not publish anything if not collecting', () => {
+      const callbacks: Callbacks = getCallbackStub();
+      const marshal = createDimensionMarshal(callbacks);
+      populateMarshal(marshal);
+
+      marshal.updateDroppableIsEnabled(preset.home.descriptor.id, false);
+
+      expect(console.error).not.toHaveBeenCalled();
+      expect(callbacks.updateDroppableIsEnabled).not.toHaveBeenCalled();
+    });
+
+    it('should publish the change if collecting', () => {
+      const callbacks: Callbacks = getCallbackStub();
+      const marshal = createDimensionMarshal(callbacks);
+      populateMarshal(marshal);
+
+      marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+      marshal.updateDroppableIsEnabled(preset.home.descriptor.id, false);
+
+      expect(callbacks.updateDroppableIsEnabled)
+        .toHaveBeenCalledTimes(1);
+      expect(callbacks.updateDroppableIsEnabled)
+        .toHaveBeenCalledWith(preset.home.descriptor.id, false);
     });
   });
 });

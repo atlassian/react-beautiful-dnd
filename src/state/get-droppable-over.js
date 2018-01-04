@@ -115,6 +115,8 @@ export default ({
   const maybe: ?DroppableDimension =
     Object.keys(droppables)
       .map((id: DroppableId): DroppableDimension => droppables[id])
+      // only want enabled droppables
+      .filter((droppable: DroppableDimension) => droppable.isEnabled)
       .find((droppable: DroppableDimension): boolean => {
         // If previously dragging over a droppable we give it a
         // bit of room on the subsequent drags so that user and move

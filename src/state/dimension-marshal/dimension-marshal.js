@@ -8,6 +8,7 @@ import type {
   DroppableDimension,
   State as AppState,
   Phase,
+  Position,
 } from '../../types';
 import type {
   DimensionMarshal,
@@ -132,12 +133,36 @@ export default (callbacks: Callbacks) => {
     // if a droppable is published while collecting - publishing it immediately
     const dimension: DroppableDimension = entry.callbacks.getDimension();
     callbacks.publishDroppables([dimension]);
-    entry.callbacks.watchScroll(callbacks.updateDroppableScroll);
+    entry.callbacks.watchScroll();
+  };
+
+  const updateDroppableIsEnabled = (id: DroppableId, isEnabled: boolean) => {
+    if (!state.droppables[id]) {
+      console.error(`Cannot update the scroll on Droppable ${id} as it is not registered`);
+      return;
+    }
+    // no need to update the application state if a collection is not occurring
+    if (!state.isCollecting) {
+      return;
+    }
+    callbacks.updateDroppableIsEnabled(id, isEnabled);
+  };
+
+  const updateDroppableScroll = (id: DroppableId, newScroll: Position) => {
+    if (!state.droppables[id]) {
+      console.error(`Cannot update the scroll on Droppable ${id} as it is not registered`);
+      return;
+    }
+    // no need to update the application state if a collection is not occurring
+    if (!state.isCollecting) {
+      return;
+    }
+    callbacks.updateDroppableScroll(id, newScroll);
   };
 
   const unregisterDraggable = (id: DraggableId) => {
     if (!state.draggables[id]) {
-      console.error(`Cannot unregister Draggable with id ${id} as as it is not registered`);
+      console.error(`Cannot unregister Draggable with id ${id} as it is not registered`);
       return;
     }
 
@@ -328,7 +353,7 @@ export default (callbacks: Callbacks) => {
         // need to watch the scroll on each droppable
         toBePublished.droppables.forEach((dimension: DroppableDimension) => {
           const entry: DroppableEntry = state.droppables[dimension.descriptor.id];
-          entry.callbacks.watchScroll(callbacks.updateDroppableScroll);
+          entry.callbacks.watchScroll();
         });
 
         setFrameId(null);
@@ -394,9 +419,11 @@ export default (callbacks: Callbacks) => {
 
   const marshal: DimensionMarshal = {
     registerDraggable,
-    registerDroppable,
     unregisterDraggable,
+    registerDroppable,
     unregisterDroppable,
+    updateDroppableIsEnabled,
+    updateDroppableScroll,
     onPhaseChange,
   };
 

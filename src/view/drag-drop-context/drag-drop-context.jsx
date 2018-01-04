@@ -31,6 +31,7 @@ import {
   publishDraggableDimensions,
   publishDroppableDimensions,
   updateDroppableDimensionScroll,
+  updateDroppableDimensionIsEnabled,
 } from '../../state/action-creators';
 
 type Props = {|
@@ -89,8 +90,11 @@ export default class DragDropContext extends React.Component<Props> {
       publishDroppables: (dimensions: DroppableDimension[]) => {
         this.store.dispatch(publishDroppableDimensions(dimensions));
       },
-      updateDroppableScroll: (id: DroppableId, offset: Position) => {
-        this.store.dispatch(updateDroppableDimensionScroll(id, offset));
+      updateDroppableScroll: (id: DroppableId, newScroll: Position) => {
+        this.store.dispatch(updateDroppableDimensionScroll(id, newScroll));
+      },
+      updateDroppableIsEnabled: (id: DroppableId, isEnabled: boolean) => {
+        this.store.dispatch(updateDroppableDimensionIsEnabled(id, isEnabled));
       },
     };
     this.dimensionMarshal = createDimensionMarshal(callbacks);

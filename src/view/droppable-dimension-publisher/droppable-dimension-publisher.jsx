@@ -42,7 +42,6 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
   closestScrollable: ?Element = null;
   isWatchingScroll: boolean = false;
-  updateDroppableScroll: ?UpdateDroppableScrollFn;
   callbacks: DroppableCallbacks;
   publishedDescriptor: ?DroppableDescriptor = null;
 
@@ -62,7 +61,6 @@ export default class DroppableDimensionPublisher extends Component<Props> {
 
   getScrollOffset = (): Position => {
     if (!this.closestScrollable) {
-      console.log('no scroll parent');
       return origin;
     }
 
@@ -75,12 +73,14 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   }
 
   memoizedUpdateScroll = memoizeOne((x: number, y: number) => {
-    const offset: Position = { x, y };
-    if (!this.updateDroppableScroll) {
-      console.error('cannot publish update when there is no listener');
+    if (!this.publishedDescriptor) {
+      console.error('Cannot update scroll on unpublished droppable');
       return;
     }
-    this.updateDroppableScroll(this.props.droppableId, offset);
+
+    const newScroll: Position = { x, y };
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
+    marshal.updateDroppableScroll(this.publishedDescriptor.id, newScroll);
   });
 
   scheduleScrollUpdate = rafSchedule((offset: Position) => {
@@ -94,7 +94,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     this.scheduleScrollUpdate(this.getScrollOffset());
   }
 
-  watchScroll = (updateDroppableScroll: UpdateDroppableScrollFn) => {
+  watchScroll = () => {
     if (!this.props.targetRef) {
       console.error('cannot watch droppable scroll if not in the dom');
       return;
@@ -109,7 +109,6 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       return;
     }
 
-    this.updateDroppableScroll = updateDroppableScroll;
     this.isWatchingScroll = true;
     this.closestScrollable.addEventListener('scroll', this.onClosestScroll, { passive: true });
   };
@@ -148,6 +147,14 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     );
 
     this.publish(descriptor);
+
+    if (this.props.isDropDisabled === nextProps.isDropDisabled) {
+      return;
+    }
+
+    // the enabled state of the droppable is changing
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
+    marshal.updateDroppableIsEnabled(nextProps.droppableId, !nextProps.isDropDisabled);
   }
 
   componentWillUnmount() {
