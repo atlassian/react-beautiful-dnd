@@ -93,7 +93,7 @@ describe('DraggableDimensionPublisher', () => {
 
       const wrapper = mount(<Item />, withDimensionMarshal(marshal));
       expect(marshal.registerDraggable).toHaveBeenCalled();
-      expect(marshal.unregisterDroppable).not.toHaveBeenCalled();
+      expect(marshal.unregisterDraggable).not.toHaveBeenCalled();
 
       wrapper.unmount();
       expect(marshal.unregisterDraggable).toHaveBeenCalledTimes(1);
