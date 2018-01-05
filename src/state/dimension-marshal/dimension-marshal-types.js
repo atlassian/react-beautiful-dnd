@@ -12,7 +12,6 @@ import type {
 
 export type GetDraggableDimensionFn = () => DraggableDimension;
 export type GetDroppableDimensionFn = () => DroppableDimension;
-export type UpdateDroppableScrollFn = (id: DroppableId, offset: Position) => void;
 
 export type DroppableCallbacks = {|
   getDimension: GetDroppableDimensionFn,

@@ -298,7 +298,7 @@ export default (callbacks: Callbacks) => {
     callbacks.publishDroppables([home]);
     callbacks.publishDraggables([draggable]);
     // Watching the scroll of the home droppable
-    homeEntry.callbacks.watchScroll(callbacks.updateDroppableScroll);
+    homeEntry.callbacks.watchScroll();
   };
 
   const setFrameId = (frameId: ?number) => {

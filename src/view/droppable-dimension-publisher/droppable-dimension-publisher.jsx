@@ -12,7 +12,6 @@ import { dimensionMarshalKey } from '../context-keys';
 import type {
   DimensionMarshal,
   DroppableCallbacks,
-  UpdateDroppableScrollFn,
 } from '../../state/dimension-marshal/dimension-marshal-types';
 import type {
   DroppableId,
@@ -120,7 +119,6 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       return;
     }
 
-    this.updateDroppableScroll = null;
     this.isWatchingScroll = false;
 
     if (!this.closestScrollable) {

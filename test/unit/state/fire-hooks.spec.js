@@ -1,23 +1,11 @@
 // @flow
 import fireHooks from '../../../src/state/fire-hooks';
-import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
-import getArea from '../../../src/state/get-area';
-import noImpact from '../../../src/state/no-impact';
 import * as state from '../../utils/simple-state-preset';
 import { getPreset } from '../../utils/dimension';
 import type {
-  DraggableId,
-  DroppableId,
   DropResult,
-  TypeId,
-  DragState,
   Hooks,
-  Position,
   State,
-  InitialDragLocation,
-  CurrentDragLocation,
-  DraggableDimension,
-  DroppableDimension,
   DimensionState,
   DraggableLocation,
   DragStart,

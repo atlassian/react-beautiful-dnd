@@ -13,6 +13,7 @@ import {
   moveForward,
   drop,
   move,
+  updateDroppableDimensionIsEnabled,
 } from '../../../src/state/action-creators';
 import type { DimensionMarshal, Callbacks as DimensionMarshalCallbacks } from '../../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
@@ -42,6 +43,9 @@ const getDimensionMarshal = (store: Store): DimensionMarshal => {
     },
     updateDroppableScroll: (id: DroppableId, offset: Position) => {
       store.dispatch(updateDroppableDimensionScroll(id, offset));
+    },
+    updateDroppableIsEnabled: (id: DroppableId, isEnabled: boolean) => {
+      store.dispatch(updateDroppableDimensionIsEnabled(id, isEnabled));
     },
   };
   const dimensionMarshal: DimensionMarshal = createDimensionMarshal(callbacks);
