@@ -1,8 +1,6 @@
 // @flow
 import moveToNextIndex from '../../../src/state/move-to-next-index/';
 import type { Result } from '../../../src/state/move-to-next-index/move-to-next-index-types';
-import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
-import getArea from '../../../src/state/get-area';
 import { getPreset, disableDroppable } from '../../utils/dimension';
 import moveToEdge from '../../../src/state/move-to-edge';
 import noImpact, { noMovement } from '../../../src/state/no-impact';
@@ -10,11 +8,8 @@ import { patch } from '../../../src/state/position';
 import { vertical, horizontal } from '../../../src/state/axis';
 import type {
   Axis,
-  DragMovement,
   DragImpact,
-  DraggableDimension,
   DroppableDimension,
-  DraggableDimensionMap,
   DraggableLocation,
   Position,
 } from '../../../src/types';
@@ -789,7 +784,7 @@ describe('move to next index', () => {
             });
           });
 
-          describe('moving into last position of the list', () => {
+          describe('moving after the last item in a list', () => {
             // moved home1 into the second last position of the list
             const previousImpact: DragImpact = {
               movement: {
@@ -835,7 +830,7 @@ describe('move to next index', () => {
               expect(result.pageCenter).toEqual(expected);
             });
 
-            it('should remove foreign3 when moving forward', () => {
+            it('should remove foreign4 when moving forward', () => {
               const expected: DragImpact = {
                 movement: {
                   displaced: [],
@@ -902,6 +897,11 @@ describe('move to next index', () => {
                   },
                   {
                     draggableId: preset.inForeign3.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: preset.inForeign4.descriptor.id,
                     isVisible: true,
                     shouldAnimate: true,
                   },
