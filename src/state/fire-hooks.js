@@ -102,7 +102,7 @@ export default (hooks: Hooks, previous: State, current: State): void => {
     }
 
     const descriptor: DraggableDescriptor = previous.drag.initial.descriptor;
-    const home: ?DroppableDimension = previous.dimension[descriptor.droppableId];
+    const home: ?DroppableDimension = previous.dimension.droppable[descriptor.droppableId];
 
     if (!home) {
       console.error('cannot find dimension for home droppable');
@@ -121,6 +121,7 @@ export default (hooks: Hooks, previous: State, current: State): void => {
       destination: null,
     };
     onDragEnd(result);
+    return;
   }
 
   // Drag ended during a drop animation. Not super sure how this can even happen.
