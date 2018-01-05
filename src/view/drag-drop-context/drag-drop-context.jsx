@@ -73,6 +73,15 @@ export default class DragDropContext extends React.Component<Props> {
     };
   }
 
+  // Providing function on the context for drag handles to use to
+  // let them know if they can start a drag or not. This is done
+  // rather than mapping a prop onto the drag handle so that we
+  // do not need to re-render a connected drag handle in order to
+  // pull this state off. It would cause a re-render of all items
+  // on drag start which is too expensive.
+  // This is useful when the user
+  canLift = () => canStartDrag(this.store.getState());
+
   componentWillMount() {
     this.store = createStore();
 
@@ -129,14 +138,12 @@ export default class DragDropContext extends React.Component<Props> {
     });
   }
 
-  // Providing function on the context for drag handles to use to
-  // let them know if they can start a drag or not. This is done
-  // rather than mapping a prop onto the drag handle so that we
-  // do not need to re-render a connected drag handle in order to
-  // pull this state off. It would cause a re-render of all items
-  // on drag start which is too expensive.
-  // This is useful when the user
-  canLift = () => canStartDrag(this.store.getState());
+  componentDidMount() {
+    // need to mount the style marshal after we are in the dom
+    // this cannot be done before otherwise it would break
+    // server side rendering
+    this.styleMarshal.mount();
+  }
 
   componentWillUnmount() {
     this.unsubscribe();
