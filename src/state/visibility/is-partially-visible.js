@@ -25,12 +25,17 @@ export default ({
   const displacement: Position = destination.viewport.frameScroll.diff.displacement;
   const withScroll: Spacing = offset(target, displacement);
 
-  // Taking into account any changes in scroll on the Droppable to see if
-  // the target is in the Droppable's updated visual frame
-  return isVisibleThroughFrame(viewport)(withScroll) &&
-  // Need to also take into account changes in droppable scroll when
-  // checking if the target is visible in the viewport.
-  // Changes in the destination scroll impact the current position
-  // of the target
+  // When considering if the target is visible in the droppable we need
+  // to consider the change in scroll of the droppable. We need to
+  // adjust for the scroll as the clipped viewport takes into account
+  // the scroll of the droppable.
+  const isVisibleInDroppable: boolean =
     isVisibleThroughFrame(destination.viewport.clipped)(withScroll);
+
+  // We also need to consider whether the destination scroll when detecting
+  // if we are visible in the viewport.
+  const isVisibleInViewport: boolean =
+    isVisibleThroughFrame(viewport)(withScroll);
+
+  return isVisibleInDroppable && isVisibleInViewport;
 };

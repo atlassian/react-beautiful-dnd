@@ -142,11 +142,12 @@ class App extends Component {
                     <div>
                       <div
                         ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        {...provided.dragHandleProps}
                         style={getItemStyle(
-                          provided.draggableStyle,
+                          provided.droppableProps.style,
                           snapshot.isDragging
                         )}
-                        {...provided.dragHandleProps}
                       >
                         {item.content}
                       </div>
