@@ -1,7 +1,7 @@
 // @flow
 import getDroppableOver from '../../../src/state/get-droppable-over';
-import { getPreset } from '../../utils/dimension';
-import { getDroppableDimension, getDraggableDimension } from '../../../src/state/dimension';
+import { getPreset, disableDroppable } from '../../utils/dimension';
+import { getDroppableDimension, getDraggableDimension, scrollDroppable } from '../../../src/state/dimension';
 import getArea from '../../../src/state/get-area';
 import type {
   Area,
@@ -299,12 +299,12 @@ describe('get droppable over', () => {
           [custom.descriptor.id]: scrolled,
         };
 
-        it('should add a placeholder buffer to the subject', () => {
-          // just below droppable subject
+        it('should not a placeholder buffer to the frame', () => {
+          // just below frame
           // normally cut off by frame
           const target: Position = {
             x: 0,
-            y: 100,
+            y: 101,
           };
           // dragging inForeign1 just below inHome1
           const result: ?DroppableId = getDroppableOver({
@@ -315,11 +315,7 @@ describe('get droppable over', () => {
             previousDroppableOverId: custom.descriptor.id,
           });
 
-          expect(result).toBe(home.descriptor.id);
-        });
-
-        it('should not a placeholder buffer to the frame', () => {
-
+          expect(result).toBe(null);
         });
       });
     });

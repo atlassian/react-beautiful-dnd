@@ -82,19 +82,20 @@ const getClippedAreaWithPlaceholder = ({
 
   const requiredGrowth: ?Position = getRequiredGrowth(draggable, draggables, droppable);
 
-  // no required growth
   if (!requiredGrowth) {
     return clipped;
   }
 
+  const isClippedByFrame: boolean = subject[droppable.axis.size] !== frame[droppable.axis.size];
   const subjectWithGrowth = getWithGrowth(subject, requiredGrowth);
 
-  // We only want to add growth to the frame if the
-  // droppable isn't clipped by a scroll container
-  const isClippedByFrame: boolean = subject[droppable.axis.size] > frame[droppable.axis.size];
-  const frameWithGrowth = isClippedByFrame ? frame : getWithGrowth(frame, requiredGrowth);
+  if (!isClippedByFrame) {
+    return subjectWithGrowth;
+  }
 
-  return clip(frameWithGrowth, subjectWithGrowth);
+  // We need to clip the new subject by the frame which does not change
+  // This will allow the user to continue to scroll into the placeholder
+  return clip(frame, subjectWithGrowth);
 };
 
 type Args = {|
