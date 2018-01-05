@@ -82,6 +82,9 @@
     "rollup-plugin-uglify": "^2.0.1",
     "styled-components": "^2.2.3"
   },
+  "peerDependencies": {
+    "react": ">=15.4.0"
+  },
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
