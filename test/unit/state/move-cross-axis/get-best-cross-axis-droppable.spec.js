@@ -607,6 +607,49 @@ describe('get best cross axis droppable', () => {
       expect(result).toBe(null);
     });
 
+    it('should exclude options that are not in the viewport', () => {
+      const source = getDroppableDimension({
+        descriptor: {
+          id: 'source',
+          type: 'TYPE',
+        },
+        direction: axis.direction,
+        client: getArea({
+          top: 0,
+          bottom: 10,
+          left: 20,
+          right: 30,
+        }),
+      });
+      const viewport = getViewport();
+      const notInViewport = getDroppableDimension({
+        descriptor: {
+          id: 'notInViewport',
+          type: 'TYPE',
+        },
+        direction: axis.direction,
+        client: getArea({
+          top: 0,
+          bottom: 10,
+          left: viewport.right + 1,
+          right: viewport.right + 10,
+        }),
+      });
+      const droppables: DroppableDimensionMap = {
+        [source.descriptor.id]: source,
+        [notInViewport.descriptor.id]: notInViewport,
+      };
+
+      const result: ?DroppableDimension = getBestCrossAxisDroppable({
+        isMovingForward: true,
+        pageCenter: source.page.withMargin.center,
+        source,
+        droppables,
+      });
+
+      expect(result).toBe(null);
+    });
+
     it('should exclude options that do not overlap on the main axis', () => {
       const source = getDroppableDimension({
         descriptor: {
