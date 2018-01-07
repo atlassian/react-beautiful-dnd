@@ -1,19 +1,23 @@
 // @flow
 import moveToNewDroppable from '../../../../src/state/move-cross-axis/move-to-new-droppable/';
 import type { Result } from '../../../../src/state/move-cross-axis/move-cross-axis-types';
-import { getDraggableDimension } from '../../../../src/state/dimension';
+import { getDraggableDimension, getDroppableDimension } from '../../../../src/state/dimension';
 import getArea from '../../../../src/state/get-area';
 import moveToEdge from '../../../../src/state/move-to-edge';
 import { patch } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
 import { getPreset } from '../../../utils/dimension';
 import noImpact from '../../../../src/state/no-impact';
+import getViewport from '../../../../src/state/visibility/get-viewport';
 import type {
   Axis,
   DragImpact,
   DraggableDimension,
+  DroppableDimension,
   Position,
 } from '../../../../src/types';
+
+const dontCare: Position = { x: 0, y: 0 };
 
 describe('move to new droppable', () => {
   beforeEach(() => {
@@ -40,7 +44,6 @@ describe('move to new droppable', () => {
       } = getPreset(axis);
 
       describe('to home list', () => {
-        const dontCare: Position = { x: 0, y: 0 };
         const draggables: DraggableDimension[] = [
           inHome1, inHome2, inHome3, inHome4,
         ];
@@ -255,6 +258,183 @@ describe('move to new droppable', () => {
             expect(result.impact).toEqual(expected);
           });
         });
+
+        describe('visibility and displacement', () => {
+          it('should indicate when displacement is not visible when not inside droppable frame', () => {
+            const droppable: DroppableDimension = getDroppableDimension({
+              descriptor: {
+                id: 'with-frame',
+                type: 'TYPE',
+              },
+              direction: axis.direction,
+              client: getArea({
+                top: 0,
+                left: 0,
+                right: 100,
+                // will be cut by frame
+                bottom: 200,
+              }),
+              frameClient: getArea({
+                top: 0,
+                left: 0,
+                right: 100,
+                // will be cut by frame
+                bottom: 100,
+              }),
+            });
+            const inside: DraggableDimension = getDraggableDimension({
+              descriptor: {
+                id: 'inside',
+                droppableId: droppable.descriptor.id,
+                index: 0,
+              },
+              client: getArea({
+                top: 0,
+                left: 0,
+                right: 100,
+                bottom: 80,
+              }),
+            });
+            const outside: DraggableDimension = getDraggableDimension({
+              descriptor: {
+                id: 'outside',
+                droppableId: droppable.descriptor.id,
+                index: 1,
+              },
+              client: getArea({
+                left: 0,
+                right: 100,
+                top: 110,
+                bottom: 120,
+              }),
+            });
+            const customDraggables: DraggableDimension[] = [
+              inside, outside,
+            ];
+            // moving outside back into list with closest being 'outside'
+            const expected: DragImpact = {
+              movement: {
+                displaced: [{
+                  draggableId: outside.descriptor.id,
+                  isVisible: false,
+                  shouldAnimate: false,
+                }],
+                amount: patch(axis.line, inside.page.withMargin[axis.size]),
+                isBeyondStartPosition: true,
+              },
+              direction: axis.direction,
+              // moving into the outside position
+              destination: {
+                droppableId: droppable.descriptor.id,
+                index: outside.descriptor.index,
+              },
+            };
+
+            const result: ?Result = moveToNewDroppable({
+              pageCenter: dontCare,
+              draggable: inside,
+              target: outside,
+              destination: droppable,
+              insideDestination: customDraggables,
+              home: {
+                index: inside.descriptor.index,
+                droppableId: droppable.descriptor.id,
+              },
+              previousImpact: noImpact,
+            });
+
+            if (!result || !result.impact) {
+              throw new Error('invalid result');
+            }
+
+            expect(result.impact).toEqual(expected);
+          });
+
+          it('should not displace draggables that are not partially visible in the viewport', () => {
+            const viewport = getViewport();
+            const droppable: DroppableDimension = getDroppableDimension({
+              descriptor: {
+                id: 'with-frame',
+                type: 'TYPE',
+              },
+              direction: axis.direction,
+              client: getArea({
+                top: 0,
+                left: 0,
+                right: 100,
+                // extends beyond the viewport
+                bottom: viewport.bottom + 100,
+              }),
+            });
+            const inside: DraggableDimension = getDraggableDimension({
+              descriptor: {
+                id: 'inside',
+                droppableId: droppable.descriptor.id,
+                index: 0,
+              },
+              client: getArea({
+                left: 0,
+                right: 100,
+                top: 0,
+                bottom: 80,
+              }),
+            });
+            const outside: DraggableDimension = getDraggableDimension({
+              descriptor: {
+                id: 'outside',
+                droppableId: droppable.descriptor.id,
+                index: 1,
+              },
+              client: getArea({
+                left: 0,
+                right: 100,
+                // outside of the viewport but inside the droppable
+                top: viewport.bottom + 1,
+                bottom: viewport.bottom + 10,
+              }),
+            });
+            const customDraggables: DraggableDimension[] = [
+              inside, outside,
+            ];
+            // moving outside back into list with closest being 'outside'
+            const expected: DragImpact = {
+              movement: {
+                displaced: [{
+                  draggableId: outside.descriptor.id,
+                  isVisible: false,
+                  shouldAnimate: false,
+                }],
+                amount: patch(axis.line, inside.page.withMargin[axis.size]),
+                isBeyondStartPosition: true,
+              },
+              direction: axis.direction,
+              // moving into the outside position
+              destination: {
+                droppableId: droppable.descriptor.id,
+                index: outside.descriptor.index,
+              },
+            };
+
+            const result: ?Result = moveToNewDroppable({
+              pageCenter: dontCare,
+              draggable: inside,
+              target: outside,
+              destination: droppable,
+              insideDestination: customDraggables,
+              home: {
+                index: inside.descriptor.index,
+                droppableId: droppable.descriptor.id,
+              },
+              previousImpact: noImpact,
+            });
+
+            if (!result || !result.impact) {
+              throw new Error('invalid result');
+            }
+
+            expect(result.impact).toEqual(expected);
+          });
+        });
       });
 
       describe('to foreign list', () => {
@@ -452,6 +632,214 @@ describe('move to new droppable', () => {
                 index: 2,
               },
             };
+
+            expect(result.impact).toEqual(expected);
+          });
+        });
+
+        describe('visibility and displacement', () => {
+          it('should indicate when displacement is not visible when not inside droppable frame', () => {
+            const customHome: DroppableDimension = getDroppableDimension({
+              descriptor: {
+                id: 'home',
+                type: 'TYPE',
+              },
+              direction: axis.direction,
+              client: getArea({
+                top: 0,
+                left: 0,
+                right: 100,
+                bottom: 100,
+              }),
+            });
+            const customInHome: DraggableDimension = getDraggableDimension({
+              descriptor: {
+                id: 'in-home',
+                droppableId: customHome.descriptor.id,
+                index: 0,
+              },
+              client: getArea({
+                top: 0,
+                left: 0,
+                right: 100,
+                bottom: 80,
+              }),
+            });
+            const customForeign: DroppableDimension = getDroppableDimension({
+              descriptor: {
+                id: 'foreign-with-frame',
+                type: 'TYPE',
+              },
+              direction: axis.direction,
+              client: getArea({
+                top: 0,
+                left: 0,
+                right: 100,
+                // will be cut by frame
+                bottom: 200,
+              }),
+              frameClient: getArea({
+                top: 0,
+                left: 0,
+                right: 100,
+                bottom: 100,
+              }),
+            });
+
+            const customInForeign: DraggableDimension = getDraggableDimension({
+              descriptor: {
+                id: 'foreign-outside-frame',
+                droppableId: customForeign.descriptor.id,
+                index: 0,
+              },
+              client: getArea({
+                left: 0,
+                right: 100,
+                // outside of the foreign frame
+                top: 110,
+                bottom: 120,
+              }),
+            });
+
+            const customInsideForeign: DraggableDimension[] = [
+              customInForeign,
+            ];
+            // moving outside back into list with closest being 'outside'
+            const expected: DragImpact = {
+              movement: {
+                displaced: [{
+                  draggableId: customInForeign.descriptor.id,
+                  isVisible: false,
+                  shouldAnimate: false,
+                }],
+                amount: patch(axis.line, customInHome.page.withMargin[axis.size]),
+                // always false in foreign list
+                isBeyondStartPosition: false,
+              },
+              direction: axis.direction,
+              // moving into the outside position
+              destination: {
+                droppableId: customForeign.descriptor.id,
+                index: customInForeign.descriptor.index,
+              },
+            };
+
+            const result: ?Result = moveToNewDroppable({
+              pageCenter: dontCare,
+              draggable: customInHome,
+              target: customInForeign,
+              destination: customForeign,
+              insideDestination: customInsideForeign,
+              home: {
+                index: customInHome.descriptor.index,
+                droppableId: customHome.descriptor.id,
+              },
+              previousImpact: noImpact,
+            });
+
+            if (!result || !result.impact) {
+              throw new Error('invalid result');
+            }
+
+            expect(result.impact).toEqual(expected);
+          });
+
+          it('should indicate when displacement is not visible when not inside the viewport', () => {
+            const viewport = getViewport();
+            const customHome: DroppableDimension = getDroppableDimension({
+              descriptor: {
+                id: 'home',
+                type: 'TYPE',
+              },
+              direction: axis.direction,
+              client: getArea({
+                top: 0,
+                left: 0,
+                right: 100,
+                bottom: 100,
+              }),
+            });
+            const customInHome: DraggableDimension = getDraggableDimension({
+              descriptor: {
+                id: 'in-home',
+                droppableId: customHome.descriptor.id,
+                index: 0,
+              },
+              client: getArea({
+                top: 0,
+                left: 0,
+                right: 100,
+                bottom: 80,
+              }),
+            });
+            const customForeign: DroppableDimension = getDroppableDimension({
+              descriptor: {
+                id: 'foreign',
+                type: 'TYPE',
+              },
+              direction: axis.direction,
+              client: getArea({
+                top: 0,
+                left: 0,
+                right: 100,
+                // will be cut by frame
+                bottom: viewport.bottom + 100,
+              }),
+            });
+            const customInForeign: DraggableDimension = getDraggableDimension({
+              descriptor: {
+                id: 'foreign',
+                droppableId: customForeign.descriptor.id,
+                index: 0,
+              },
+              client: getArea({
+                left: 0,
+                right: 100,
+                // outside of the viewport
+                top: viewport.bottom + 1,
+                bottom: viewport.bottom + 10,
+              }),
+            });
+
+            const customInsideForeign: DraggableDimension[] = [
+              customInForeign,
+            ];
+            // moving outside back into list with closest being 'outside'
+            const expected: DragImpact = {
+              movement: {
+                displaced: [{
+                  draggableId: customInForeign.descriptor.id,
+                  isVisible: false,
+                  shouldAnimate: false,
+                }],
+                amount: patch(axis.line, customInHome.page.withMargin[axis.size]),
+                // always false in foreign list
+                isBeyondStartPosition: false,
+              },
+              direction: axis.direction,
+              // moving into the outside position
+              destination: {
+                droppableId: customForeign.descriptor.id,
+                index: customInForeign.descriptor.index,
+              },
+            };
+
+            const result: ?Result = moveToNewDroppable({
+              pageCenter: dontCare,
+              draggable: customInHome,
+              target: customInForeign,
+              destination: customForeign,
+              insideDestination: customInsideForeign,
+              home: {
+                index: customInHome.descriptor.index,
+                droppableId: customHome.descriptor.id,
+              },
+              previousImpact: noImpact,
+            });
+
+            if (!result || !result.impact) {
+              throw new Error('invalid result');
+            }
 
             expect(result.impact).toEqual(expected);
           });

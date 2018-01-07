@@ -113,14 +113,9 @@ export default ({
     // add the destination as the most recently impacted
     [destinationDisplacement, ...previousImpact.movement.displaced]);
 
-  // update impact with visiblity - stops redundant work!
+  // update impact with visibility - stops redundant work!
   const displaced: Displacement[] = modified
     .map((displacement: Displacement): Displacement => {
-      // already processed
-      // if (displacement === destinationDisplacement) {
-      //   return displacement;
-      // }
-
       const target: DraggableDimension = draggables[displacement.draggableId];
 
       const updated: Displacement = getDisplacement({
