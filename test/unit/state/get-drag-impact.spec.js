@@ -4,9 +4,9 @@ import getDragImpact from '../../../src/state/get-drag-impact/';
 import noImpact from '../../../src/state/no-impact';
 import { add, patch, subtract } from '../../../src/state/position';
 import { vertical, horizontal } from '../../../src/state/axis';
+import { scrollDroppable } from '../../../src/state/dimension';
 import {
   getPreset,
-  updateDroppableScroll,
   disableDroppable,
 } from '../../utils/dimension';
 import type {
@@ -48,7 +48,7 @@ describe('get drag impact', () => {
           draggable: inHome1,
           draggables,
           droppables,
-          previousDroppableOverId: null,
+          previousImpact: noImpact,
         });
 
         expect(impact).toEqual(noImpact);
@@ -59,7 +59,7 @@ describe('get drag impact', () => {
           const disabled: DroppableDimension = disableDroppable(home);
           const withDisabled: DroppableDimensionMap = {
             ...droppables,
-            [disabled.id]: disabled,
+            [disabled.descriptor.id]: disabled,
           };
           // choosing the center of inHome2 which should have an impact
           const pageCenter: Position = inHome2.page.withoutMargin.center;
@@ -69,7 +69,7 @@ describe('get drag impact', () => {
             draggable: inHome1,
             draggables,
             droppables: withDisabled,
-            previousDroppableOverId: null,
+            previousImpact: noImpact,
           });
 
           expect(impact).toEqual(noImpact);
@@ -81,13 +81,13 @@ describe('get drag impact', () => {
             const pageCenter: Position = inHome1.page.withoutMargin.center;
             const expected: DragImpact = {
               movement: {
+                displaced: [],
                 amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
-                draggables: [],
                 isBeyondStartPosition: false,
               },
               direction: axis.direction,
               destination: {
-                droppableId: home.id,
+                droppableId: home.descriptor.id,
                 index: 0,
               },
             };
@@ -97,7 +97,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables,
-              previousDroppableOverId: null,
+              previousImpact: noImpact,
             });
 
             expect(impact).toEqual(expected);
@@ -117,12 +117,12 @@ describe('get drag impact', () => {
             const expected: DragImpact = {
               movement: {
                 amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
-                draggables: [],
+                displaced: [],
                 isBeyondStartPosition: true,
               },
               direction: axis.direction,
               destination: {
-                droppableId: home.id,
+                droppableId: home.descriptor.id,
                 index: 0,
               },
             };
@@ -132,7 +132,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables,
-              previousDroppableOverId: null,
+              previousImpact: noImpact,
             });
 
             expect(impact).toEqual(expected);
@@ -151,12 +151,23 @@ describe('get drag impact', () => {
             movement: {
               amount: patch(axis.line, inHome2.page.withMargin[axis.size]),
               // ordered by closest to current location
-              draggables: [inHome4.id, inHome3.id],
+              displaced: [
+                {
+                  draggableId: inHome4.descriptor.id,
+                  isVisible: true,
+                  shouldAnimate: true,
+                },
+                {
+                  draggableId: inHome3.descriptor.id,
+                  isVisible: true,
+                  shouldAnimate: true,
+                },
+              ],
               isBeyondStartPosition: true,
             },
             direction: axis.direction,
             destination: {
-              droppableId: home.id,
+              droppableId: home.descriptor.id,
               // is now after inHome4
               index: 3,
             },
@@ -167,7 +178,7 @@ describe('get drag impact', () => {
             draggable: inHome2,
             draggables,
             droppables,
-            previousDroppableOverId: null,
+            previousImpact: noImpact,
           });
 
           expect(impact).toEqual(expected);
@@ -187,12 +198,23 @@ describe('get drag impact', () => {
               movement: {
                 amount: patch(axis.line, inHome3.page.withMargin[axis.size]),
                 // ordered by closest to current location
-                draggables: [inHome1.id, inHome2.id],
+                displaced: [
+                  {
+                    draggableId: inHome1.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inHome2.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                ],
                 isBeyondStartPosition: false,
               },
               direction: axis.direction,
               destination: {
-                droppableId: home.id,
+                droppableId: home.descriptor.id,
                 // is now before inHome1
                 index: 0,
               },
@@ -203,7 +225,7 @@ describe('get drag impact', () => {
               draggable: inHome3,
               draggables,
               droppables,
-              previousDroppableOverId: null,
+              previousImpact: noImpact,
             });
 
             expect(impact).toEqual(expected);
@@ -225,12 +247,12 @@ describe('get drag impact', () => {
                 // need to move over the edge
                 patch(axis.line, 1),
               );
-              const homeWithScroll: DroppableDimension = updateDroppableScroll(
+              const homeWithScroll: DroppableDimension = scrollDroppable(
                 home, distanceNeeded
               );
               const updatedDroppables: DroppableDimensionMap = {
                 ...droppables,
-                [home.id]: homeWithScroll,
+                [home.descriptor.id]: homeWithScroll,
               };
               // no changes in current page center from original
               const pageCenter: Position = inHome1.page.withoutMargin.center;
@@ -238,12 +260,16 @@ describe('get drag impact', () => {
                 movement: {
                   amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
                   // ordered by closest to current location
-                  draggables: [inHome2.id],
+                  displaced: [{
+                    draggableId: inHome2.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  }],
                   isBeyondStartPosition: true,
                 },
                 direction: axis.direction,
                 destination: {
-                  droppableId: home.id,
+                  droppableId: home.descriptor.id,
                   // is now after inHome2
                   index: 1,
                 },
@@ -254,7 +280,7 @@ describe('get drag impact', () => {
                 draggable: inHome1,
                 draggables,
                 droppables: updatedDroppables,
-                previousDroppableOverId: null,
+                previousImpact: noImpact,
               });
 
               expect(impact).toEqual(expected);
@@ -275,12 +301,12 @@ describe('get drag impact', () => {
                 // need to move over the edge
                 patch(axis.line, -1),
               );
-              const homeWithScroll: DroppableDimension = updateDroppableScroll(
+              const homeWithScroll: DroppableDimension = scrollDroppable(
                 home, distanceNeeded
               );
               const updatedDroppables: DroppableDimensionMap = {
                 ...droppables,
-                [home.id]: homeWithScroll,
+                [home.descriptor.id]: homeWithScroll,
               };
               // no changes in current page center from original
               const pageCenter: Position = inHome4.page.withoutMargin.center;
@@ -288,12 +314,23 @@ describe('get drag impact', () => {
                 movement: {
                   amount: patch(axis.line, inHome4.page.withMargin[axis.size]),
                   // ordered by closest to current location
-                  draggables: [inHome2.id, inHome3.id],
+                  displaced: [
+                    {
+                      draggableId: inHome2.descriptor.id,
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                    {
+                      draggableId: inHome3.descriptor.id,
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                  ],
                   isBeyondStartPosition: false,
                 },
                 direction: axis.direction,
                 destination: {
-                  droppableId: home.id,
+                  droppableId: home.descriptor.id,
                   // is now before inHome2
                   index: 1,
                 },
@@ -304,7 +341,7 @@ describe('get drag impact', () => {
                 draggable: inHome4,
                 draggables,
                 droppables: updatedDroppables,
-                previousDroppableOverId: null,
+                previousImpact: noImpact,
               });
 
               expect(impact).toEqual(expected);
@@ -318,7 +355,7 @@ describe('get drag impact', () => {
           const disabled: DroppableDimension = disableDroppable(foreign);
           const withDisabled: DroppableDimensionMap = {
             ...droppables,
-            [foreign.id]: disabled,
+            [foreign.descriptor.id]: disabled,
           };
           // choosing the center of inForeign1 which should have an impact
           const pageCenter: Position = inForeign1.page.withoutMargin.center;
@@ -328,7 +365,7 @@ describe('get drag impact', () => {
             draggable: inHome1,
             draggables,
             droppables: withDisabled,
-            previousDroppableOverId: null,
+            previousImpact: noImpact,
           });
 
           expect(impact).toEqual(noImpact);
@@ -347,13 +384,34 @@ describe('get drag impact', () => {
               movement: {
                 amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
                 // ordered by closest to current location
-                draggables: [inForeign1.id, inForeign2.id, inForeign3.id, inForeign4.id],
+                displaced: [
+                  {
+                    draggableId: inForeign1.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inForeign2.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inForeign3.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inForeign4.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                ],
                 isBeyondStartPosition: false,
               },
               direction: axis.direction,
               destination: {
                 // now in a different droppable
-                droppableId: foreign.id,
+                droppableId: foreign.descriptor.id,
                 // is now before inForeign1
                 index: 0,
               },
@@ -364,7 +422,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables,
-              previousDroppableOverId: null,
+              previousImpact: noImpact,
             });
 
             expect(impact).toEqual(expected);
@@ -383,13 +441,29 @@ describe('get drag impact', () => {
               movement: {
                 amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
                 // ordered by closest to current location
-                draggables: [inForeign2.id, inForeign3.id, inForeign4.id],
+                displaced: [
+                  {
+                    draggableId: inForeign2.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inForeign3.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inForeign4.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                ],
                 isBeyondStartPosition: false,
               },
               direction: axis.direction,
               destination: {
                 // now in a different droppable
-                droppableId: foreign.id,
+                droppableId: foreign.descriptor.id,
                 // is now after inForeign1
                 index: 1,
               },
@@ -400,7 +474,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables,
-              previousDroppableOverId: null,
+              previousImpact: noImpact,
             });
 
             expect(impact).toEqual(expected);
@@ -419,13 +493,13 @@ describe('get drag impact', () => {
               movement: {
                 amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
                 // nothing is moved - moving to the end of the list
-                draggables: [],
+                displaced: [],
                 isBeyondStartPosition: false,
               },
               direction: axis.direction,
               destination: {
                 // now in a different droppable
-                droppableId: foreign.id,
+                droppableId: foreign.descriptor.id,
                 // is now after inForeign1
                 index: 4,
               },
@@ -436,7 +510,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables,
-              previousDroppableOverId: null,
+              previousImpact: noImpact,
             });
 
             expect(impact).toEqual(expected);
@@ -450,13 +524,13 @@ describe('get drag impact', () => {
             const expected: DragImpact = {
               movement: {
                 amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
-                draggables: [],
+                displaced: [],
                 isBeyondStartPosition: false,
               },
               direction: axis.direction,
               destination: {
                 // now in a different droppable
-                droppableId: emptyForeign.id,
+                droppableId: emptyForeign.descriptor.id,
                 // first item in the empty list
                 index: 0,
               },
@@ -467,7 +541,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables,
-              previousDroppableOverId: null,
+              previousImpact: noImpact,
             });
 
             expect(impact).toEqual(expected);
@@ -486,18 +560,34 @@ describe('get drag impact', () => {
             const scroll: Position = patch(axis.line, 1000);
             const map: DroppableDimensionMap = {
               ...droppables,
-              [home.id]: updateDroppableScroll(home, scroll),
+              [home.descriptor.id]: scrollDroppable(home, scroll),
             };
 
             const expected: DragImpact = {
               movement: {
                 amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
-                draggables: [inForeign2.id, inForeign3.id, inForeign4.id],
+                displaced: [
+                  {
+                    draggableId: inForeign2.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inForeign3.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inForeign4.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                ],
                 isBeyondStartPosition: false,
               },
               direction: axis.direction,
               destination: {
-                droppableId: foreign.id,
+                droppableId: foreign.descriptor.id,
                 index: 1,
               },
             };
@@ -507,7 +597,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables: map,
-              previousDroppableOverId: null,
+              previousImpact: noImpact,
             });
 
             expect(impact).toEqual(expected);
@@ -516,12 +606,28 @@ describe('get drag impact', () => {
             const expected: DragImpact = {
               movement: {
                 amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
-                draggables: [inForeign2.id, inForeign3.id, inForeign4.id],
+                displaced: [
+                  {
+                    draggableId: inForeign2.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inForeign3.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inForeign4.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                ],
                 isBeyondStartPosition: false,
               },
               direction: axis.direction,
               destination: {
-                droppableId: foreign.id,
+                droppableId: foreign.descriptor.id,
                 index: 1,
               },
             };
@@ -531,7 +637,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables,
-              previousDroppableOverId: null,
+              previousImpact: noImpact,
             });
 
             expect(impact).toEqual(expected);
@@ -551,18 +657,29 @@ describe('get drag impact', () => {
             const scroll: Position = patch(axis.line, 1);
             const map: DroppableDimensionMap = {
               ...droppables,
-              [foreign.id]: updateDroppableScroll(foreign, scroll),
+              [foreign.descriptor.id]: scrollDroppable(foreign, scroll),
             };
 
             const expected: DragImpact = {
               movement: {
                 amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
-                draggables: [inForeign3.id, inForeign4.id],
+                displaced: [
+                  {
+                    draggableId: inForeign3.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inForeign4.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                ],
                 isBeyondStartPosition: false,
               },
               direction: axis.direction,
               destination: {
-                droppableId: foreign.id,
+                droppableId: foreign.descriptor.id,
                 index: 2,
               },
             };
@@ -572,7 +689,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables: map,
-              previousDroppableOverId: null,
+              previousImpact: noImpact,
             });
 
             expect(impact).toEqual(expected);
@@ -582,12 +699,28 @@ describe('get drag impact', () => {
             const expected: DragImpact = {
               movement: {
                 amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
-                draggables: [inForeign2.id, inForeign3.id, inForeign4.id],
+                displaced: [
+                  {
+                    draggableId: inForeign2.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inForeign3.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inForeign4.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                ],
                 isBeyondStartPosition: false,
               },
               direction: axis.direction,
               destination: {
-                droppableId: foreign.id,
+                droppableId: foreign.descriptor.id,
                 index: 1,
               },
             };
@@ -597,7 +730,7 @@ describe('get drag impact', () => {
               draggable: inHome1,
               draggables,
               droppables,
-              previousDroppableOverId: null,
+              previousImpact: noImpact,
             });
 
             expect(impact).toEqual(expected);
