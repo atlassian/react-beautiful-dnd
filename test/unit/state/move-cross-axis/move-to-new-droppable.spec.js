@@ -7,6 +7,7 @@ import moveToEdge from '../../../../src/state/move-to-edge';
 import { patch } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
 import { getPreset } from '../../../utils/dimension';
+import noImpact from '../../../../src/state/no-impact';
 import type {
   Axis,
   DragImpact,
@@ -54,8 +55,9 @@ describe('move to new droppable', () => {
             insideDestination: draggables,
             home: {
               index: 0,
-              droppableId: home.id,
+              droppableId: home.descriptor.id,
             },
+            previousImpact: noImpact,
           });
 
           expect(result).toBe(null);
@@ -63,26 +65,17 @@ describe('move to new droppable', () => {
         });
 
         it('should return null and log an error if the target is not inside the droppable', () => {
-          const invalid: DraggableDimension = getDraggableDimension({
-            id: 'invalid',
-            droppableId: 'some-other-droppable',
-            area: getArea({
-              top: 1000,
-              left: 1000,
-              bottom: 1100,
-              right: 1100,
-            }),
-          });
           const result: ?Result = moveToNewDroppable({
             pageCenter: dontCare,
             draggable: draggables[0],
-            target: invalid,
+            target: inForeign1,
             destination: home,
             insideDestination: draggables,
             home: {
               index: 0,
-              droppableId: home.id,
+              droppableId: home.descriptor.id,
             },
+            previousImpact: noImpact,
           });
 
           expect(result).toBe(null);
@@ -99,8 +92,9 @@ describe('move to new droppable', () => {
             insideDestination: draggables,
             home: {
               index: 1,
-              droppableId: home.id,
+              droppableId: home.descriptor.id,
             },
+            previousImpact: noImpact,
           });
 
           if (!result) {
@@ -115,13 +109,13 @@ describe('move to new droppable', () => {
           it('should return an empty impact with the original location', () => {
             const expected: DragImpact = {
               movement: {
-                draggables: [],
+                displaced: [],
                 amount: patch(axis.line, inHome2.page.withMargin[axis.size]),
                 isBeyondStartPosition: false,
               },
               direction: axis.direction,
               destination: {
-                droppableId: home.id,
+                droppableId: home.descriptor.id,
                 index: 1,
               },
             };
@@ -140,8 +134,9 @@ describe('move to new droppable', () => {
             insideDestination: draggables,
             home: {
               index: 3,
-              droppableId: home.id,
+              droppableId: home.descriptor.id,
             },
+            previousImpact: noImpact,
           });
 
           if (!result) {
@@ -164,13 +159,24 @@ describe('move to new droppable', () => {
             const expected: DragImpact = {
               movement: {
                 // ordered by closest impacted
-                draggables: [inHome2.id, inHome3.id],
+                displaced: [
+                  {
+                    draggableId: inHome2.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inHome3.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                ],
                 amount: patch(axis.line, inHome4.page.withMargin[axis.size]),
                 isBeyondStartPosition: false,
               },
               direction: axis.direction,
               destination: {
-                droppableId: home.id,
+                droppableId: home.descriptor.id,
                 // original index of target
                 index: 1,
               },
@@ -190,8 +196,9 @@ describe('move to new droppable', () => {
             insideDestination: draggables,
             home: {
               index: 0,
-              droppableId: home.id,
+              droppableId: home.descriptor.id,
             },
+            previousImpact: noImpact,
           });
 
           if (!result) {
@@ -216,14 +223,30 @@ describe('move to new droppable', () => {
             const expected: DragImpact = {
               movement: {
                 // ordered by closest impacted
-                draggables: [inHome4.id, inHome3.id, inHome2.id],
+                displaced: [
+                  {
+                    draggableId: inHome4.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inHome3.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inHome2.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                ],
                 amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
                 // is moving beyond start position
                 isBeyondStartPosition: true,
               },
               direction: axis.direction,
               destination: {
-                droppableId: home.id,
+                droppableId: home.descriptor.id,
                 // original index of target
                 index: 3,
               },
@@ -248,8 +271,9 @@ describe('move to new droppable', () => {
             insideDestination: draggables,
             home: {
               index: 0,
-              droppableId: home.id,
+              droppableId: home.descriptor.id,
             },
+            previousImpact: noImpact,
           });
 
           expect(result).toBe(null);
@@ -264,8 +288,9 @@ describe('move to new droppable', () => {
             insideDestination: [],
             home: {
               index: 0,
-              droppableId: home.id,
+              droppableId: home.descriptor.id,
             },
+            previousImpact: noImpact,
           });
 
           if (!result) {
@@ -287,13 +312,13 @@ describe('move to new droppable', () => {
           it('should return an empty impact', () => {
             const expected: DragImpact = {
               movement: {
-                draggables: [],
+                displaced: [],
                 amount: patch(foreign.axis.line, inHome1.page.withMargin[foreign.axis.size]),
                 isBeyondStartPosition: false,
               },
               direction: foreign.axis.direction,
               destination: {
-                droppableId: foreign.id,
+                droppableId: foreign.descriptor.id,
                 index: 0,
               },
             };
@@ -312,8 +337,9 @@ describe('move to new droppable', () => {
             insideDestination: draggables,
             home: {
               index: 0,
-              droppableId: home.id,
+              droppableId: home.descriptor.id,
             },
+            previousImpact: noImpact,
           });
 
           if (!result) {
@@ -336,13 +362,29 @@ describe('move to new droppable', () => {
             const expected: DragImpact = {
               movement: {
                 // ordered by closest impacted
-                draggables: [inForeign2.id, inForeign3.id, inForeign4.id],
+                displaced: [
+                  {
+                    draggableId: inForeign2.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inForeign3.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inForeign4.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                ],
                 amount: patch(foreign.axis.line, inHome1.page.withMargin[foreign.axis.size]),
                 isBeyondStartPosition: false,
               },
               direction: foreign.axis.direction,
               destination: {
-                droppableId: foreign.id,
+                droppableId: foreign.descriptor.id,
                 // index of foreign2
                 index: 1,
               },
@@ -362,8 +404,9 @@ describe('move to new droppable', () => {
             insideDestination: draggables,
             home: {
               index: 3,
-              droppableId: home.id,
+              droppableId: home.descriptor.id,
             },
+            previousImpact: noImpact,
           });
 
           if (!result) {
@@ -387,13 +430,24 @@ describe('move to new droppable', () => {
             const expected: DragImpact = {
               movement: {
                 // ordered by closest impacted
-                draggables: [inForeign3.id, inForeign4.id],
+                displaced: [
+                  {
+                    draggableId: inForeign3.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                  {
+                    draggableId: inForeign4.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                ],
                 amount: patch(foreign.axis.line, inHome4.page.withMargin[foreign.axis.size]),
                 isBeyondStartPosition: false,
               },
               direction: foreign.axis.direction,
               destination: {
-                droppableId: foreign.id,
+                droppableId: foreign.descriptor.id,
                 // going after target, so index is target index + 1
                 index: 2,
               },
