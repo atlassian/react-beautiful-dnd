@@ -4,6 +4,7 @@ import { getDroppableDimension, getDraggableDimension } from '../../../../src/st
 import { add, distance, patch } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
 import getArea from '../../../../src/state/get-area';
+import getViewport from '../../../../src/state/visibility/get-viewport';
 import type {
   Axis,
   Position,
@@ -19,8 +20,11 @@ describe('get closest draggable', () => {
     const crossAxisEnd: number = 20;
 
     const droppable: DroppableDimension = getDroppableDimension({
-      id: 'droppable',
-      area: getArea({
+      descriptor: {
+        id: 'droppable',
+        type: 'TYPE',
+      },
+      client: getArea({
         [axis.start]: start,
         [axis.end]: end,
         [axis.crossAxisStart]: crossAxisStart,
@@ -28,11 +32,28 @@ describe('get closest draggable', () => {
       }),
     });
 
-    // first item bleeds backwards past the start of the droppable
-    const partialHiddenBackwards: DraggableDimension = getDraggableDimension({
-      id: 'partialHiddenBackwards',
-      droppableId: droppable.descriptor.id,
-      area: getArea({
+    const hiddenBackwards: DraggableDimension = getDraggableDimension({
+      descriptor: {
+        id: 'hiddenBackwards',
+        droppableId: droppable.descriptor.id,
+        index: 0,
+      },
+      client: getArea({
+        [axis.crossAxisStart]: crossAxisStart,
+        [axis.crossAxisEnd]: crossAxisEnd,
+        [axis.start]: -30, // -10
+        [axis.end]: -10,
+      }),
+    });
+
+    // item bleeds backwards past the start of the droppable
+    const partiallyHiddenBackwards: DraggableDimension = getDraggableDimension({
+      descriptor: {
+        id: 'partialHiddenBackwards',
+        droppableId: droppable.descriptor.id,
+        index: 1,
+      },
+      client: getArea({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
         [axis.start]: -10, // -10
@@ -41,9 +62,12 @@ describe('get closest draggable', () => {
     });
 
     const visible1: DraggableDimension = getDraggableDimension({
-      id: 'visible1',
-      droppableId: droppable.descriptor.id,
-      area: getArea({
+      descriptor: {
+        id: 'visible1',
+        droppableId: droppable.descriptor.id,
+        index: 2,
+      },
+      client: getArea({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
         [axis.start]: 20,
@@ -52,9 +76,12 @@ describe('get closest draggable', () => {
     });
 
     const visible2: DraggableDimension = getDraggableDimension({
-      id: 'visible2',
-      droppableId: droppable.descriptor.id,
-      area: getArea({
+      descriptor: {
+        id: 'visible2',
+        droppableId: droppable.descriptor.id,
+        index: 3,
+      },
+      client: getArea({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
         [axis.start]: 40,
@@ -64,9 +91,12 @@ describe('get closest draggable', () => {
 
     // bleeds over the end of the visible boundary
     const partiallyHiddenForwards: DraggableDimension = getDraggableDimension({
-      id: 'partiallyHiddenForwards',
-      droppableId: droppable.descriptor.id,
-      area: getArea({
+      descriptor: {
+        id: 'partiallyHiddenForwards',
+        droppableId: droppable.descriptor.id,
+        index: 4,
+      },
+      client: getArea({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
         [axis.start]: 60,
@@ -75,10 +105,13 @@ describe('get closest draggable', () => {
     });
 
     // totally invisible
-    const hidden: DraggableDimension = getDraggableDimension({
-      id: 'hidden',
-      droppableId: droppable.descriptor.id,
-      area: getArea({
+    const hiddenForwards: DraggableDimension = getDraggableDimension({
+      descriptor: {
+        id: 'hiddenForwards',
+        droppableId: droppable.descriptor.id,
+        index: 5,
+      },
+      client: getArea({
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
         [axis.start]: 120,
@@ -86,12 +119,29 @@ describe('get closest draggable', () => {
       }),
     });
 
+    const viewport = getViewport();
+    const outOfViewport: DraggableDimension = getDraggableDimension({
+      descriptor: {
+        id: 'hidden',
+        droppableId: droppable.descriptor.id,
+        index: 6,
+      },
+      client: getArea({
+        [axis.crossAxisStart]: crossAxisStart,
+        [axis.crossAxisEnd]: crossAxisEnd,
+        [axis.start]: viewport[axis.end] + 1,
+        [axis.end]: viewport[axis.end] + 10,
+      }),
+    });
+
     const insideDestination: DraggableDimension[] = [
-      partialHiddenBackwards,
+      hiddenBackwards,
+      partiallyHiddenBackwards,
       visible1,
       visible2,
       partiallyHiddenForwards,
-      hidden,
+      hiddenForwards,
+      outOfViewport,
     ];
 
     it('should return the closest draggable', () => {
@@ -136,12 +186,10 @@ describe('get closest draggable', () => {
       expect(result).toBe(null);
     });
 
-    describe('removal of draggables that are not entirely within the current visible bounds of a droppable', () => {
-      it('should ignore draggables that have backwards partial visiblility', () => {
-        // point would usually be closest to visible1 -
-        // but it is outside of the visible bounds of the droppable
+    describe('removal of draggables that are visible', () => {
+      it('should ignore draggables backward that have no visiblity', () => {
         const center: Position = patch(
-          axis.line, partialHiddenBackwards.page.withoutMargin.center[axis.line], 100
+          axis.line, hiddenBackwards.page.withoutMargin.center[axis.line], 100
         );
 
         const result: ?DraggableDimension = getClosestDraggable({
@@ -151,10 +199,25 @@ describe('get closest draggable', () => {
           insideDestination,
         });
 
-        expect(result).toBe(visible1);
+        expect(result).toBe(partiallyHiddenBackwards);
       });
 
-      it('should ignore draggables that have forward partial visiblility', () => {
+      it('should not ignore draggables that have backwards partial visiblility', () => {
+        const center: Position = patch(
+          axis.line, partiallyHiddenBackwards.page.withoutMargin.center[axis.line], 100
+        );
+
+        const result: ?DraggableDimension = getClosestDraggable({
+          axis,
+          pageCenter: center,
+          destination: droppable,
+          insideDestination,
+        });
+
+        expect(result).toBe(partiallyHiddenBackwards);
+      });
+
+      it('should not ignore draggables that have forward partial visiblility', () => {
         const center: Position = patch(
           axis.line, partiallyHiddenForwards.page.withoutMargin.center[axis.line], 100
         );
@@ -166,12 +229,12 @@ describe('get closest draggable', () => {
           insideDestination,
         });
 
-        expect(result).toBe(visible2);
+        expect(result).toBe(partiallyHiddenForwards);
       });
 
-      it('should ignore draggables that have no visiblity', () => {
+      it('should ignore draggables forward that have no visiblity', () => {
         const center: Position = patch(
-          axis.line, hidden.page.withoutMargin.center[axis.line], 100
+          axis.line, hiddenForwards.page.withoutMargin.center[axis.line], 100
         );
 
         const result: ?DraggableDimension = getClosestDraggable({
@@ -181,14 +244,29 @@ describe('get closest draggable', () => {
           insideDestination,
         });
 
-        expect(result).toBe(visible2);
+        expect(result).toBe(partiallyHiddenForwards);
+      });
+
+      it('should ignore draggables that are outside of the viewport', () => {
+        const center: Position = patch(
+          axis.line, outOfViewport.page.withoutMargin.center[axis.line], 100
+        );
+
+        const result: ?DraggableDimension = getClosestDraggable({
+          axis,
+          pageCenter: center,
+          destination: droppable,
+          insideDestination,
+        });
+
+        expect(result).toBe(partiallyHiddenForwards);
       });
 
       it('should return null if there are no visible targets', () => {
         const notVisible: DraggableDimension[] = [
-          partialHiddenBackwards,
-          partiallyHiddenForwards,
-          hidden,
+          hiddenBackwards,
+          hiddenForwards,
+          outOfViewport,
         ];
         const center: Position = {
           x: 0,

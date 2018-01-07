@@ -34,7 +34,7 @@ export default ({
 
   const result: DraggableDimension[] = insideDestination
     // Remove any options that are hidden by overflow
-    // Whole draggable must be visible to move to it
+    // Draggable must be partially visible to move to it
     .filter((draggable: DraggableDimension): boolean =>
       isPartiallyVisible({
         target: draggable.page.withMargin,
