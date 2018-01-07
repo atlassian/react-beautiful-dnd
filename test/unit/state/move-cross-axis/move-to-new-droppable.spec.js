@@ -260,7 +260,7 @@ describe('move to new droppable', () => {
         });
 
         describe('visibility and displacement', () => {
-          it('should indicate when displacement is not visible when not inside droppable frame', () => {
+          it('should indicate when displacement is not visible when not partially visible in the droppable frame', () => {
             const droppable: DroppableDimension = getDroppableDimension({
               descriptor: {
                 id: 'with-frame',
@@ -268,18 +268,18 @@ describe('move to new droppable', () => {
               },
               direction: axis.direction,
               client: getArea({
-                top: 0,
-                left: 0,
-                right: 100,
+                [axis.crossAxisStart]: 0,
+                [axis.crossAxisEnd]: 100,
+                [axis.start]: 0,
                 // will be cut by frame
-                bottom: 200,
+                [axis.end]: 200,
               }),
               frameClient: getArea({
-                top: 0,
-                left: 0,
-                right: 100,
-                // will be cut by frame
-                bottom: 100,
+                [axis.crossAxisStart]: 0,
+                [axis.crossAxisEnd]: 100,
+                [axis.start]: 0,
+                // will cut the subject
+                [axis.end]: 100,
               }),
             });
             const inside: DraggableDimension = getDraggableDimension({
@@ -289,10 +289,10 @@ describe('move to new droppable', () => {
                 index: 0,
               },
               client: getArea({
-                top: 0,
-                left: 0,
-                right: 100,
-                bottom: 80,
+                [axis.crossAxisStart]: 0,
+                [axis.crossAxisEnd]: 100,
+                [axis.start]: 0,
+                [axis.end]: 80,
               }),
             });
             const outside: DraggableDimension = getDraggableDimension({
@@ -302,10 +302,11 @@ describe('move to new droppable', () => {
                 index: 1,
               },
               client: getArea({
-                left: 0,
-                right: 100,
-                top: 110,
-                bottom: 120,
+                [axis.crossAxisStart]: 0,
+                [axis.crossAxisEnd]: 100,
+                // outside of the frame
+                [axis.start]: 110,
+                [axis.end]: 120,
               }),
             });
             const customDraggables: DraggableDimension[] = [
@@ -350,7 +351,7 @@ describe('move to new droppable', () => {
             expect(result.impact).toEqual(expected);
           });
 
-          it('should not displace draggables that are not partially visible in the viewport', () => {
+          it('should indicate when displacement is not visible when not partially visible in the viewport', () => {
             const viewport = getViewport();
             const droppable: DroppableDimension = getDroppableDimension({
               descriptor: {
@@ -359,11 +360,11 @@ describe('move to new droppable', () => {
               },
               direction: axis.direction,
               client: getArea({
-                top: 0,
-                left: 0,
-                right: 100,
+                [axis.crossAxisStart]: 0,
+                [axis.crossAxisEnd]: 100,
+                [axis.start]: 0,
                 // extends beyond the viewport
-                bottom: viewport.bottom + 100,
+                [axis.end]: viewport[axis.end] + 100,
               }),
             });
             const inside: DraggableDimension = getDraggableDimension({
@@ -373,10 +374,10 @@ describe('move to new droppable', () => {
                 index: 0,
               },
               client: getArea({
-                left: 0,
-                right: 100,
-                top: 0,
-                bottom: 80,
+                [axis.crossAxisStart]: 0,
+                [axis.crossAxisEnd]: 100,
+                [axis.start]: 0,
+                [axis.end]: viewport[axis.end],
               }),
             });
             const outside: DraggableDimension = getDraggableDimension({
@@ -386,11 +387,11 @@ describe('move to new droppable', () => {
                 index: 1,
               },
               client: getArea({
-                left: 0,
-                right: 100,
+                [axis.crossAxisStart]: 0,
+                [axis.crossAxisEnd]: 100,
                 // outside of the viewport but inside the droppable
-                top: viewport.bottom + 1,
-                bottom: viewport.bottom + 10,
+                [axis.start]: viewport[axis.end] + 1,
+                [axis.end]: viewport[axis.end] + 10,
               }),
             });
             const customDraggables: DraggableDimension[] = [
@@ -646,10 +647,10 @@ describe('move to new droppable', () => {
               },
               direction: axis.direction,
               client: getArea({
-                top: 0,
-                left: 0,
-                right: 100,
-                bottom: 100,
+                [axis.crossAxisStart]: 0,
+                [axis.crossAxisEnd]: 100,
+                [axis.start]: 0,
+                [axis.end]: 100,
               }),
             });
             const customInHome: DraggableDimension = getDraggableDimension({
@@ -659,10 +660,10 @@ describe('move to new droppable', () => {
                 index: 0,
               },
               client: getArea({
-                top: 0,
-                left: 0,
-                right: 100,
-                bottom: 80,
+                [axis.crossAxisStart]: 0,
+                [axis.crossAxisEnd]: 100,
+                [axis.start]: 0,
+                [axis.end]: 80,
               }),
             });
             const customForeign: DroppableDimension = getDroppableDimension({
@@ -693,11 +694,11 @@ describe('move to new droppable', () => {
                 index: 0,
               },
               client: getArea({
-                left: 0,
-                right: 100,
+                [axis.crossAxisStart]: 0,
+                [axis.crossAxisEnd]: 100,
                 // outside of the foreign frame
-                top: 110,
-                bottom: 120,
+                [axis.start]: 110,
+                [axis.end]: 120,
               }),
             });
 
@@ -753,10 +754,10 @@ describe('move to new droppable', () => {
               },
               direction: axis.direction,
               client: getArea({
-                top: 0,
-                left: 0,
-                right: 100,
-                bottom: 100,
+                [axis.crossAxisStart]: 0,
+                [axis.crossAxisEnd]: 100,
+                [axis.start]: 0,
+                [axis.end]: 100,
               }),
             });
             const customInHome: DraggableDimension = getDraggableDimension({
@@ -766,10 +767,10 @@ describe('move to new droppable', () => {
                 index: 0,
               },
               client: getArea({
-                top: 0,
-                left: 0,
-                right: 100,
-                bottom: 80,
+                [axis.crossAxisStart]: 0,
+                [axis.crossAxisEnd]: 100,
+                [axis.start]: 0,
+                [axis.end]: 80,
               }),
             });
             const customForeign: DroppableDimension = getDroppableDimension({
@@ -779,11 +780,12 @@ describe('move to new droppable', () => {
               },
               direction: axis.direction,
               client: getArea({
-                top: 0,
-                left: 0,
-                right: 100,
-                // will be cut by frame
                 bottom: viewport.bottom + 100,
+                [axis.crossAxisStart]: 0,
+                [axis.crossAxisEnd]: 100,
+                [axis.start]: 0,
+                // extending beyond the viewport
+                [axis.end]: viewport[axis.end] + 100,
               }),
             });
             const customInForeign: DraggableDimension = getDraggableDimension({
@@ -793,11 +795,11 @@ describe('move to new droppable', () => {
                 index: 0,
               },
               client: getArea({
-                left: 0,
-                right: 100,
-                // outside of the viewport
-                top: viewport.bottom + 1,
-                bottom: viewport.bottom + 10,
+                [axis.crossAxisStart]: 0,
+                [axis.crossAxisEnd]: 100,
+                // outside of the viewport but inside the droppable
+                [axis.start]: viewport[axis.end] + 1,
+                [axis.end]: viewport[axis.end] + 10,
               }),
             });
 
