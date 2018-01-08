@@ -15,8 +15,8 @@ import DragHandle from '../drag-handle';
 import getWindowScrollPosition from '../get-window-scroll-position';
 // eslint-disable-next-line no-duplicate-imports
 import type {
+  DragHandleProps,
   Callbacks as DragHandleCallbacks,
-  Provided as DragHandleProvided,
 } from '../drag-handle/drag-handle-types';
 import getCenterPosition from '../get-center-position';
 import Placeholder from '../placeholder';
@@ -243,7 +243,7 @@ export default class Draggable extends Component<Props, State> {
       isDropAnimating: boolean,
       shouldAnimateDisplacement: boolean,
       dimension: ?DraggableDimension,
-      dragHandleProps: ?DragHandleProvided,
+      dragHandleProps: ?DragHandleProps,
       movementStyle: MovementStyle,
     ): Provided => {
       const useDraggingStyle: boolean = isDragging || isDropAnimating;
@@ -337,7 +337,7 @@ export default class Draggable extends Component<Props, State> {
               // by default we do not allow dragging on interactive elements
               canDragInteractiveElements={disableInteractiveElementBlocking}
             >
-              {(dragHandleProps: ?DragHandleProvided) =>
+              {(dragHandleProps: ?DragHandleProps) =>
                 children(
                   this.getProvided(
                     isDragging,

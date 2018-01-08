@@ -6,7 +6,7 @@ import type { ReactWrapper } from 'enzyme';
 import DragHandle from '../../../src/view/drag-handle/drag-handle';
 import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
 // eslint-disable-next-line no-duplicate-imports
-import type { Callbacks, Provided } from '../../../src/view/drag-handle/drag-handle-types';
+import type { Callbacks, DragHandleProps } from '../../../src/view/drag-handle/drag-handle-types';
 import {
   dispatchWindowMouseEvent,
   dispatchWindowKeyDownEvent,
@@ -84,7 +84,7 @@ const getCallbackCalls = (callbacks: Callbacks) =>
     [key]: callbacks[key].mock.calls.length,
   }), {});
 
-class Child extends Component<{ dragHandleProps: ?Provided}> {
+class Child extends Component<{ dragHandleProps: ?DragHandleProps}> {
   render() {
     return (
       <div {...this.props.dragHandleProps}>
@@ -175,7 +175,7 @@ describe('drag handle', () => {
         getDraggableRef={() => fakeDraggableRef}
         canDragInteractiveElements={false}
       >
-        {(dragHandleProps: ?Provided) => (
+        {(dragHandleProps: ?DragHandleProps) => (
           <Child dragHandleProps={dragHandleProps} />
         )}
       </DragHandle>,
@@ -206,7 +206,7 @@ describe('drag handle', () => {
         getDraggableRef={() => fakeDraggableRef}
         canDragInteractiveElements={false}
       >
-        {(dragHandleProps: ?Provided) => (
+        {(dragHandleProps: ?DragHandleProps) => (
           myMock(dragHandleProps)
         )}
       </DragHandle>,
@@ -238,7 +238,7 @@ describe('drag handle', () => {
               getDraggableRef={() => fakeDraggableRef}
               canDragInteractiveElements={false}
             >
-              {(dragHandleProps: ?Provided) => (
+              {(dragHandleProps: ?DragHandleProps) => (
                 <Child dragHandleProps={dragHandleProps} />
               )}
             </DragHandle>,
@@ -1172,7 +1172,7 @@ describe('drag handle', () => {
             getDraggableRef={() => fakeDraggableRef}
             canDragInteractiveElements={false}
           >
-            {(dragHandleProps: ?Provided) => (
+            {(dragHandleProps: ?DragHandleProps) => (
               <Child dragHandleProps={dragHandleProps} />
             )}
           </DragHandle>,
@@ -1197,7 +1197,7 @@ describe('drag handle', () => {
             getDraggableRef={() => fakeDraggableRef}
             canDragInteractiveElements={false}
           >
-            {(dragHandleProps: ?Provided) => (
+            {(dragHandleProps: ?DragHandleProps) => (
               <Child dragHandleProps={dragHandleProps} />
             )}
           </DragHandle>,
@@ -1281,7 +1281,7 @@ describe('drag handle', () => {
               getDraggableRef={() => fakeDraggableRef}
               canDragInteractiveElements={false}
             >
-              {(dragHandleProps: ?Provided) => (
+              {(dragHandleProps: ?DragHandleProps) => (
                 <Child dragHandleProps={dragHandleProps} />
               )}
             </DragHandle>,
@@ -2163,7 +2163,7 @@ describe('drag handle', () => {
           getDraggableRef={() => fakeDraggableRef}
           canDragInteractiveElements={false}
         >
-          {(dragHandleProps: ?Provided) => (
+          {(dragHandleProps: ?DragHandleProps) => (
             mock(dragHandleProps)
           )}
         </DragHandle>,
@@ -2402,7 +2402,7 @@ describe('drag handle', () => {
                 getDraggableRef={() => fakeDraggableRef}
                 canDragInteractiveElements={false}
               >
-                {(dragHandleProps: ?Provided) => (
+                {(dragHandleProps: ?DragHandleProps) => (
                   <Child dragHandleProps={dragHandleProps} />
                 )}
               </DragHandle>,
@@ -2432,7 +2432,7 @@ describe('drag handle', () => {
                   getDraggableRef={() => fakeDraggableRef}
                   canDragInteractiveElements={false}
                 >
-                  {(dragHandleProps: ?Provided) => (
+                  {(dragHandleProps: ?DragHandleProps) => (
                     <div
                       {...dragHandleProps}
                       contentEditable
@@ -2466,7 +2466,7 @@ describe('drag handle', () => {
                   getDraggableRef={() => fakeDraggableRef}
                   canDragInteractiveElements={false}
                 >
-                  {(dragHandleProps: ?Provided) => (
+                  {(dragHandleProps: ?DragHandleProps) => (
                     <div {...dragHandleProps}>
                       <div
                         className="editable"
@@ -2503,7 +2503,7 @@ describe('drag handle', () => {
                   getDraggableRef={() => fakeDraggableRef}
                   canDragInteractiveElements={false}
                 >
-                  {(dragHandleProps: ?Provided) => (
+                  {(dragHandleProps: ?DragHandleProps) => (
                     <div {...dragHandleProps}>
                       <div
                         className="editable"
@@ -2545,7 +2545,7 @@ describe('drag handle', () => {
                   getDraggableRef={() => fakeDraggableRef}
                   canDragInteractiveElements={false}
                 >
-                  {(dragHandleProps: ?Provided) => (
+                  {(dragHandleProps: ?DragHandleProps) => (
                     <div {...dragHandleProps}>
                       <div
                         className="editable"
@@ -2591,7 +2591,7 @@ describe('drag handle', () => {
                   // stating that we can drag
                   canDragInteractiveElements
                 >
-                  {(dragHandleProps: ?Provided) => (
+                  {(dragHandleProps: ?DragHandleProps) => (
                     <div {...dragHandleProps}>
                       <div
                         className="editable"
@@ -2632,7 +2632,7 @@ describe('drag handle', () => {
                   // stating that we can drag
                   canDragInteractiveElements
                 >
-                  {(dragHandleProps: ?Provided) => (
+                  {(dragHandleProps: ?DragHandleProps) => (
                     <div {...dragHandleProps}>
                       <div
                         className="editable"

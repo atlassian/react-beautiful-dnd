@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import type {
   Props,
-  Provided,
+  DragHandleProps,
 } from './drag-handle-types';
 import type {
   Sensor,
@@ -179,12 +179,12 @@ export default class DragHandle extends Component<Props> {
   isAnySensorCapturing = (): boolean =>
     this.sensors.some((sensor: Sensor) => sensor.isCapturing())
 
-  getProvided = memoizeOne((isEnabled: boolean, isDragging: boolean): ?Provided => {
+  getProvided = memoizeOne((isEnabled: boolean, isDragging: boolean): ?DragHandleProps => {
     if (!isEnabled) {
       return null;
     }
 
-    const provided: Provided = {
+    const provided: DragHandleProps = {
       onMouseDown: this.onMouseDown,
       onKeyDown: this.onKeyDown,
       onTouchStart: this.onTouchStart,

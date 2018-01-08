@@ -20,7 +20,7 @@ import {
   dropAnimationFinished,
 } from '../../state/action-creators';
 import type {
-  Provided as DragHandleProvided,
+  DragHandleProps,
 } from '../drag-handle/drag-handle-types';
 
 export type DraggingStyle = {|
@@ -81,7 +81,7 @@ export type ZIndexOptions = {|
 |}
 
 // Props that can be spread onto the element directly
-type DraggableProps = {|
+export type DraggableProps = {|
   // inline style
   style: ?DraggableStyle,
   // used for shared global styles
@@ -90,7 +90,8 @@ type DraggableProps = {|
 
 export type Provided = {|
   draggableProps: DraggableProps,
-  dragHandleProps: ?DragHandleProvided,
+  // will be null if the draggable is disabled
+  dragHandleProps: ?DragHandleProps,
   // The following props will be removed once we move to react 16
   innerRef: (?HTMLElement) => void,
   placeholder: ?Node,
