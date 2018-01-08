@@ -172,6 +172,7 @@ const mountDraggable = ({
     publishDraggables: () => { },
     publishDroppables: () => { },
     updateDroppableScroll: () => { },
+    updateDroppableIsEnabled: () => { },
   });
 
   dimensionMarshal.registerDroppable(droppable.descriptor, {

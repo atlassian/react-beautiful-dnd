@@ -903,13 +903,10 @@ describe('move to next index', () => {
               expect(result).toBe(null);
             });
 
-            it('should take into account any changes in the droppables scroll', () => {
+            it.skip('should take into account any changes in the droppables scroll', () => {
               // TODO
             });
           });
-
-
-
         });
       });
 

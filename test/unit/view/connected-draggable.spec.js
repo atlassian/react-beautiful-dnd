@@ -874,6 +874,7 @@ describe('Connected Draggable', () => {
       publishDraggables: () => { },
       publishDroppables: () => { },
       updateDroppableScroll: () => { },
+      updateDroppableIsEnabled: () => { },
     });
     const options: Object = combine(
       withStore(),

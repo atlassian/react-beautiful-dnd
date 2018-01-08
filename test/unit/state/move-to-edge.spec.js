@@ -6,41 +6,40 @@ import {
   patch,
   subtract,
 } from '../../../src/state/position';
-import getFragment from '../../utils/get-fragment';
 import getArea from '../../../src/state/get-area';
 import moveToEdge from '../../../src/state/move-to-edge';
 import { vertical, horizontal } from '../../../src/state/axis';
 import type {
+  Area,
   Axis,
   Position,
-  DimensionFragment,
 } from '../../../src/types';
 
 // behind the destination
 // width: 40, height: 20
-const behind: DimensionFragment = getFragment(getArea({
+const behind: Area = getArea({
   top: 0,
   left: 0,
   right: 40,
   bottom: 20,
-}));
+});
 
 // in front of the destination
 // width: 50, height: 10
-const infront: DimensionFragment = getFragment(getArea({
+const infront: Area = getArea({
   top: 120,
   left: 150,
   right: 200,
   bottom: 130,
-}));
+});
 
 // width: 50, height: 60
-const destination: DimensionFragment = getFragment(getArea({
+const destination: Area = getArea({
   top: 50,
   left: 50,
   right: 100,
   bottom: 110,
-}));
+});
 
 // All results are aligned on the crossAxisStart
 
@@ -52,7 +51,7 @@ const pullBackwardsOnMainAxis = (axis: Axis) => (point: Position) => patch(
 
 // returns the absolute difference of the center position
 // to one of the corners on the axis.end. Choosing axis.end is arbitrary
-const getCenterDiff = (axis: Axis) => (source: DimensionFragment): Position => {
+const getCenterDiff = (axis: Axis) => (source: Area): Position => {
   const corner = patch(
     axis.line, source[axis.end], source[axis.crossAxisStart]
   );
@@ -76,7 +75,7 @@ const getCenterDiff = (axis: Axis) => (source: DimensionFragment): Position => {
 };
 
 describe('move to edge', () => {
-  [behind, infront].forEach((source: DimensionFragment) => {
+  [behind, infront].forEach((source: Area) => {
     describe(`source is ${source === behind ? 'behind' : 'infront of'} destination`, () => {
       describe('moving to a vertical list', () => {
         const pullUpwards = pullBackwardsOnMainAxis(vertical);

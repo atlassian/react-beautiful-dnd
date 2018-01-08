@@ -5,7 +5,6 @@ import TestUtils from 'react-dom/test-utils';
 import { mount } from 'enzyme';
 import { DragDropContext } from '../../../src/';
 import { storeKey, canLiftContextKey } from '../../../src/view/context-keys';
-import canLift from '../../../src/state/can-start-drag';
 
 class App extends Component<*> {
   // Part of reacts api is to use flow types for this.

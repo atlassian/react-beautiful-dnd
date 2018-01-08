@@ -470,7 +470,6 @@ export const lift = (id: DraggableId,
     }
 
     // will communicate with the marshal to start requesting dimensions
-    console.time('lifting');
     dispatch(requestDimensions(id));
 
     // Need to allow an opportunity for the dimensions to be requested.
@@ -484,7 +483,6 @@ export const lift = (id: DraggableId,
       }
 
       dispatch(completeLift(id, client, windowScroll, isScrollAllowed));
-      console.timeEnd('lifting');
     });
   });
 };

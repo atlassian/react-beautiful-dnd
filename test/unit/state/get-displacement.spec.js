@@ -7,7 +7,6 @@ import {
 import getArea from '../../../src/state/get-area';
 import noImpact from '../../../src/state/no-impact';
 import type {
-  DraggableId,
   Displacement,
   DraggableDimension,
   DroppableDimension,

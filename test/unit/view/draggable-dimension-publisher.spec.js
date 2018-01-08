@@ -71,9 +71,11 @@ class Item extends Component<Props, State> {
 
 const getMarshalStub = (): DimensionMarshal => ({
   registerDraggable: jest.fn(),
-  registerDroppable: jest.fn(),
   unregisterDraggable: jest.fn(),
+  registerDroppable: jest.fn(),
   unregisterDroppable: jest.fn(),
+  updateDroppableScroll: jest.fn(),
+  updateDroppableIsEnabled: jest.fn(),
   onPhaseChange: jest.fn(),
 });
 

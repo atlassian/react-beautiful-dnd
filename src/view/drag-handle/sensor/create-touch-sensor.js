@@ -3,13 +3,9 @@
 import stopEvent from '../util/stop-event';
 import createScheduler from '../util/create-scheduler';
 import getWindowFromRef from '../../get-window-from-ref';
-import shouldAllowDraggingFromTarget from '../util/should-allow-dragging-from-target';
 import type {
   Position,
 } from '../../../types';
-import type {
-  Props,
-} from '../drag-handle-types';
 import type { TouchSensor, CreateSensorArgs } from './sensor-types';
 
 type State = {
@@ -37,7 +33,11 @@ const initial: State = {
   longPressTimerId: null,
 };
 
-export default ({ callbacks, getDraggableRef, canStartCapturing }: CreateSensorArgs): TouchSensor => {
+export default ({
+  callbacks,
+  getDraggableRef,
+  canStartCapturing,
+}: CreateSensorArgs): TouchSensor => {
   let state: State = initial;
 
   const setState = (partial: Object): void => {

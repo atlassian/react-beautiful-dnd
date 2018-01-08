@@ -134,9 +134,7 @@ export default class Draggable extends Component<Props, State> {
 
     const windowScroll: Position = getWindowScrollPosition();
 
-    console.time('movement');
     move(draggableId, client, windowScroll);
-    console.timeEnd('movement');
   }
 
   onMoveForward = () => {
@@ -161,17 +159,13 @@ export default class Draggable extends Component<Props, State> {
 
   onWindowScroll = () => {
     this.throwIfCannotDrag();
-    console.time('window scroll move');
     const windowScroll = getWindowScrollPosition();
     this.props.moveByWindowScroll(this.props.draggableId, windowScroll);
-    console.timeEnd('window scroll move');
   }
 
   onDrop = () => {
-    console.time('start drop');
     this.throwIfCannotDrag();
     this.props.drop();
-    console.timeEnd('start drop');
   }
 
   onCancel = () => {

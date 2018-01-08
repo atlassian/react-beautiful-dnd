@@ -15,12 +15,9 @@ import type {
   Position,
 } from '../../../src/types';
 
-const noPosition = { x: 0, y: 0 };
 const preset = getPreset();
 
-// TODO: tests for window scroll changes?
-
-// Most functionality is tested by get getInsideDimension
+// Most functionality is tested by get get\InsideDimension
 describe('get droppable over', () => {
   it('should return null if the target is not over any dimension', () => {
     const target: Position = {

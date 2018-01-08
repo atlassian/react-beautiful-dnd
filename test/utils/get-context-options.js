@@ -57,6 +57,7 @@ export const withDimensionMarshal = (marshal?: DimensionMarshal): Object => ({
       publishDraggables: () => { },
       publishDroppables: () => { },
       updateDroppableScroll: () => { },
+      updateDroppableIsEnabled: () => { },
     }),
   },
   childContextTypes: {

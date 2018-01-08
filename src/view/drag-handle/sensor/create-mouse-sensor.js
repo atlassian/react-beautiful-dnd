@@ -10,10 +10,6 @@ import type {
   Position,
 } from '../../../types';
 import type { MouseSensor, CreateSensorArgs } from './sensor-types';
-import type {
-  Callbacks,
-  Props,
-} from '../drag-handle-types';
 
 // Custom event format for force press inputs
 type MouseForceChangedEvent = MouseEvent & {
@@ -33,7 +29,7 @@ const noop = () => { };
 export default ({
   callbacks,
   getDraggableRef,
-  canStartCapturing
+  canStartCapturing,
 }: CreateSensorArgs): MouseSensor => {
   let state: State = {
     isDragging: false,

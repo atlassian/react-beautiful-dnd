@@ -1,7 +1,6 @@
 // @flow
 import getArea from '../../src/state/get-area';
 import { getDroppableDimension, getDraggableDimension } from '../../src/state/dimension';
-import { add } from '../../src/state/position';
 import { vertical } from '../../src/state/axis';
 import type {
   Axis,
