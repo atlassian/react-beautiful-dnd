@@ -348,6 +348,16 @@ describe('get drag impact', () => {
             });
           });
         });
+
+        describe('invisible displacement', () => {
+          it.skip('should state when a displacement is not visible due to being outside of the droppable frame', () => {
+
+          });
+
+          it.skip('should state when a displacement is not visible due to being outside of the viewport', () => {
+
+          });
+        });
       });
 
       describe('moving into foreign list', () => {
