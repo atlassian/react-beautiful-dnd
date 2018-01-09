@@ -1171,7 +1171,7 @@ Controlling a whole draggable by just a part of it
 
 ### Monkey patching
 
-You can override some of the `dragHandleProvided` props with your own behavior if you need to.
+You can override some of the `dragHandleProps` props with your own behavior if you need to.
 
 ```js
 const myOnClick = event => console.log('clicked on', event.target);
@@ -1260,7 +1260,7 @@ It is possible for your `Draggable` to contain interactive elements. By default 
 - `audio`
 - [`contenteditable`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/contenteditable) (any elements that are `contenteditable` or are within a `contenteditable` container)
 
-You can opt out of this behavior by adding the `disableInteractiveElementBlocking` prop to a `Draggable`. However, it is questionable as to whether you should be doing so because it will render the interactive element unusable. If you need to *conditionally* block dragging from interactive elements you can add the `disableInteractiveElementBlocking` prop to opt out of the default blocking and monkey patch the `dragHandleProps (DragHandleProvided)` event handlers to disable dragging as required.
+You can opt out of this behavior by adding the `disableInteractiveElementBlocking` prop to a `Draggable`. However, it is questionable as to whether you should be doing so because it will render the interactive element unusable. If you need to *conditionally* block dragging from interactive elements you can add the `disableInteractiveElementBlocking` prop to opt out of the default blocking and monkey patch the `dragHandleProps (DragHandleProps)` event handlers to disable dragging as required.
 
 ## Flow usage
 
@@ -1304,7 +1304,7 @@ type DraggableStateSnapshot = {|
 type DraggableProvided = {|
   innerRef: (?HTMLElement) => void,
   draggableProps: ?DraggableProps,
-  dragHandleProps: ?DragHandleProvided,
+  dragHandleProps: ?DragHandleProps,
   placeholder: ?ReactElement,
 |}
 
