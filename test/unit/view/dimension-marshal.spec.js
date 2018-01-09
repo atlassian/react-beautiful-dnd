@@ -471,10 +471,7 @@ describe('dimension marshal', () => {
           };
           const callbacks = getCallbackStub();
           const marshal = createDimensionMarshal(callbacks);
-          populateMarshal(marshal, {
-            draggables,
-            droppables,
-          });
+          populateMarshal(marshal, { draggables, droppables });
 
           marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
           marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
@@ -482,6 +479,63 @@ describe('dimension marshal', () => {
 
           expect(callbacks.publishDroppables.mock.calls[0][0]).not.toContain(ofAnotherType);
           expect(callbacks.publishDraggables.mock.calls[0][0]).not.toContain(childOfAnotherType);
+        });
+
+        it('should not publish draggables if there are none to publish', () => {
+          const droppables: DroppableDimensionMap = {
+            [preset.home.descriptor.id]: preset.home,
+            [preset.foreign.descriptor.id]: preset.foreign,
+          };
+          const draggables: DraggableDimensionMap = {
+            [preset.inHome1.descriptor.id]: preset.inHome1,
+          };
+          const callbacks = getCallbackStub();
+          const marshal = createDimensionMarshal(callbacks);
+          populateMarshal(marshal, { draggables, droppables });
+
+          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          // asserting initial lift occurred
+          expect(callbacks.publishDraggables).toHaveBeenCalledWith([preset.inHome1]);
+          expect(callbacks.publishDroppables).toHaveBeenCalledWith([preset.home]);
+          callbacks.publishDraggables.mockReset();
+          callbacks.publishDroppables.mockReset();
+
+          // perform full lift
+          marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
+          requestAnimationFrame.step(2);
+
+          expect(callbacks.publishDraggables).not.toHaveBeenCalled();
+          expect(callbacks.publishDroppables).toHaveBeenCalledWith([preset.foreign]);
+        });
+
+        it('should not publish droppables if there are none to publish', () => {
+          const droppables: DroppableDimensionMap = {
+            // only one droppable
+            [preset.home.descriptor.id]: preset.home,
+          };
+          const draggables: DraggableDimensionMap = {
+            // dragging
+            [preset.inHome1.descriptor.id]: preset.inHome1,
+            // will be collected in second phase
+            [preset.inHome2.descriptor.id]: preset.inHome2,
+          };
+          const callbacks = getCallbackStub();
+          const marshal = createDimensionMarshal(callbacks);
+          populateMarshal(marshal, { draggables, droppables });
+
+          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          // asserting initial lift occurred
+          expect(callbacks.publishDraggables).toHaveBeenCalledWith([preset.inHome1]);
+          expect(callbacks.publishDroppables).toHaveBeenCalledWith([preset.home]);
+          callbacks.publishDraggables.mockReset();
+          callbacks.publishDroppables.mockReset();
+
+          // perform full lift
+          marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
+          requestAnimationFrame.step(2);
+
+          expect(callbacks.publishDroppables).not.toHaveBeenCalled();
+          expect(callbacks.publishDraggables).toHaveBeenCalledWith([preset.inHome2]);
         });
       });
     });

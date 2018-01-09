@@ -236,8 +236,6 @@ export type DragState = {|
   initial: InitialDrag,
   current: CurrentDrag,
   impact: DragImpact,
-  // TODO: what was using this?
-  // previous?: PreviousDrag,
 |}
 
 export type DropTrigger = 'DROP' | 'CANCEL';

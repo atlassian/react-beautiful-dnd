@@ -356,7 +356,6 @@ export default (callbacks: Callbacks) => {
           }, { draggables: [], droppables: [] }
         );
 
-        // TODO: add test for this
         if (toBePublished.droppables.length) {
           callbacks.publishDroppables(toBePublished.droppables);
         }

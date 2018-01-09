@@ -71,7 +71,6 @@ export default ({
         targetClipped[axis.end]
       );
 
-      // TODO: should this be this way or should there be an && in here?
       return isBetweenSourceClipped(targetClipped[axis.start]) ||
         isBetweenSourceClipped(targetClipped[axis.end]) ||
         isBetweenDestinationClipped(sourceClipped[axis.start]) ||
