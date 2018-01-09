@@ -66,21 +66,24 @@
     "eslint-plugin-jest": "^21.3.2",
     "eslint-plugin-jsx-a11y": "^6.0.2",
     "eslint-plugin-react": "^7.5.1",
-    "flow-bin": "0.60.1",
+    "flow-bin": "0.61.0",
     "flow-copy-source": "^1.2.1",
-    "jest": "^21.2.1",
+    "jest": "^22.0.1",
     "raf-stub": "^2.0.1",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-test-renderer": "^16.2.0",
     "rimraf": "^2.6.2",
-    "rollup": "^0.51.8",
+    "rollup": "^0.52.3",
     "rollup-plugin-babel": "^3.0.2",
     "rollup-plugin-commonjs": "^8.2.6",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-uglify": "^2.0.1",
     "styled-components": "^2.2.3"
+  },
+  "peerDependencies": {
+    "react": ">=15.4.0"
   },
   "license": "Apache-2.0",
   "repository": {
