@@ -73,10 +73,8 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    if (state.draggables[id]) {
-      console.error(`Cannot register Draggable with id ${id} as one is already registered`);
-      return;
-    }
+    // Not checking if the draggable already exists.
+    // This allows for overwriting in particular circumstances
 
     const entry: DraggableEntry = {
       descriptor,
@@ -107,10 +105,9 @@ export default (callbacks: Callbacks) => {
   ) => {
     const id: DroppableId = descriptor.id;
 
-    if (state.droppables[id]) {
-      console.error(`Cannot register Droppable with id ${id} as one is already registered`);
-      return;
-    }
+    // Not checking if there is already a droppable published with the same id
+    // In some situations a Droppable might be published with the same id as
+    // a Droppable that is about to be unmounted - but has not unpublished yet
 
     const entry: DroppableEntry = {
       descriptor,
@@ -160,16 +157,25 @@ export default (callbacks: Callbacks) => {
     callbacks.updateDroppableScroll(id, newScroll);
   };
 
-  const unregisterDraggable = (id: DraggableId) => {
-    if (!state.draggables[id]) {
-      console.error(`Cannot unregister Draggable with id ${id} as it is not registered`);
+  const unregisterDraggable = (descriptor: DraggableDescriptor) => {
+    const entry: ?DraggableEntry = state.draggables[descriptor.id];
+
+    if (!entry) {
+      console.error(`Cannot unregister Draggable with id ${descriptor.id} as it is not registered`);
+      return;
+    }
+
+    // Entry has already been overwritten.
+    // This can happen when a new Draggable with the same draggableId
+    // is mounted before the old Draggable has been removed.
+    if (entry.descriptor !== descriptor) {
       return;
     }
 
     const newMap: DraggableEntryMap = {
       ...state.draggables,
     };
-    delete newMap[id];
+    delete newMap[descriptor.id];
 
     setState({
       draggables: newMap,
@@ -182,9 +188,17 @@ export default (callbacks: Callbacks) => {
     console.warn('currently not supporting unmounting a Draggable during a drag');
   };
 
-  const unregisterDroppable = (id: DroppableId) => {
-    if (!state.droppables[id]) {
-      console.error(`Cannot unregister Droppable with id ${id} as as it is not registered`);
+  const unregisterDroppable = (descriptor: DroppableDescriptor) => {
+    const entry: ?DroppableEntry = state.droppables[descriptor.id];
+
+    if (!entry) {
+      console.error(`Cannot unregister Droppable with id ${descriptor.id} as as it is not registered`);
+      return;
+    }
+
+    // entry has already been overwritten
+    // in which can we will not remove it
+    if (entry.descriptor !== descriptor) {
       return;
     }
 
@@ -195,7 +209,7 @@ export default (callbacks: Callbacks) => {
     const newMap: DroppableEntryMap = {
       ...state.droppables,
     };
-    delete newMap[id];
+    delete newMap[descriptor.id];
 
     setState({
       droppables: newMap,

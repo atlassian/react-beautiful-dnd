@@ -180,7 +180,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     // against the case where the id dynamically changes. This is not
     // supported during a drag - but it is good to guard against.
     const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.unregisterDroppable(this.publishedDescriptor.id);
+    marshal.unregisterDroppable(this.publishedDescriptor);
     this.publishedDescriptor = null;
   }
 

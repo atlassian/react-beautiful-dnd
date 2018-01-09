@@ -18,6 +18,8 @@ import type {
   DroppableDimensionMap,
   DraggableId,
   DroppableId,
+  DraggableDescriptor,
+  DroppableDescriptor,
   Area,
 } from '../../../src/types';
 
@@ -653,16 +655,6 @@ describe('dimension marshal', () => {
 
     describe('dimension added', () => {
       describe('droppable', () => {
-        it('should log an error if there is already an entry with the same id', () => {
-          const marshal = createDimensionMarshal(getCallbackStub());
-
-          marshal.registerDroppable(preset.home.descriptor, droppableCallbacks);
-          expect(console.error).not.toHaveBeenCalled();
-
-          marshal.registerDroppable(preset.home.descriptor, droppableCallbacks);
-          expect(console.error).toHaveBeenCalled();
-        });
-
         it('should be published in the next collection', () => {
           const callbacks = getCallbackStub();
           const marshal = createDimensionMarshal(callbacks);
@@ -676,24 +668,36 @@ describe('dimension marshal', () => {
 
           expect(callbacks.publishDroppables).toHaveBeenCalledWith([preset.home]);
         });
+
+        it('should overwrite an existing entry if needed', () => {
+          const callbacks = getCallbackStub();
+          const marshal = createDimensionMarshal(callbacks);
+          populateMarshal(marshal, {
+            draggables: {}, droppables: {},
+          });
+
+          marshal.registerDroppable(preset.home.descriptor, droppableCallbacks);
+          const newDescriptor: DroppableDescriptor = {
+            id: preset.home.descriptor.id,
+            type: preset.home.descriptor.type,
+          };
+          const newCallbacks: DroppableCallbacks = {
+            getDimension: () => preset.foreign,
+            watchScroll: () => { },
+            unwatchScroll: () => { },
+          };
+          marshal.registerDroppable(newDescriptor, newCallbacks);
+          marshal.registerDraggable(preset.inHome1.descriptor, getDraggableDimensionFn);
+          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+
+          expect(callbacks.publishDroppables).toHaveBeenCalledWith([preset.foreign]);
+          expect(callbacks.publishDroppables).toHaveBeenCalledTimes(1);
+        });
       });
 
       describe('draggable', () => {
         it('should log an error if there is no matching droppable', () => {
           const marshal = createDimensionMarshal(getCallbackStub());
-
-          marshal.registerDraggable(preset.inHome1.descriptor, getDraggableDimensionFn);
-          expect(console.error).toHaveBeenCalled();
-        });
-
-        it('should log an error if there is already an entry with the same id', () => {
-          const marshal = createDimensionMarshal(getCallbackStub());
-
-          // need to register a droppable first
-          marshal.registerDroppable(preset.home.descriptor, droppableCallbacks);
-
-          marshal.registerDraggable(preset.inHome1.descriptor, getDraggableDimensionFn);
-          expect(console.error).not.toHaveBeenCalled();
 
           marshal.registerDraggable(preset.inHome1.descriptor, getDraggableDimensionFn);
           expect(console.error).toHaveBeenCalled();
@@ -712,6 +716,30 @@ describe('dimension marshal', () => {
 
           expect(callbacks.publishDraggables).toHaveBeenCalledWith([preset.inHome1]);
         });
+
+        it('should overwrite an existing entry if needed', () => {
+          const callbacks = getCallbackStub();
+          const marshal = createDimensionMarshal(callbacks);
+          populateMarshal(marshal, {
+            draggables: {}, droppables: {},
+          });
+
+          marshal.registerDroppable(preset.home.descriptor, droppableCallbacks);
+          marshal.registerDraggable(preset.inHome1.descriptor, getDraggableDimensionFn);
+          // registration with a descriptor with the same id
+          // this is faking the situation where an item has moved
+          // to a new droppable before the old draggable has been unmounted
+          const fake: DraggableDescriptor = {
+            id: preset.inHome1.descriptor.id,
+            droppableId: preset.inHome2.descriptor.droppableId,
+            index: preset.inHome1.descriptor.index + 10,
+          };
+          marshal.registerDraggable(fake, () => preset.inHome2);
+          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+
+          expect(callbacks.publishDraggables).toHaveBeenCalledTimes(1);
+          expect(callbacks.publishDraggables).toHaveBeenCalledWith([preset.inHome2]);
+        });
       });
     });
 
@@ -720,7 +748,7 @@ describe('dimension marshal', () => {
         it('should log an error if there is no entry with a matching id', () => {
           const marshal = createDimensionMarshal(getCallbackStub());
 
-          marshal.unregisterDroppable(preset.inHome1.descriptor.id);
+          marshal.unregisterDroppable(preset.home.descriptor);
 
           expect(console.error).toHaveBeenCalled();
         });
@@ -733,7 +761,7 @@ describe('dimension marshal', () => {
           populateMarshal(marshal);
 
           // unregistering the foreign droppable without unregistering its children
-          marshal.unregisterDroppable(preset.foreign.descriptor.id);
+          marshal.unregisterDroppable(preset.foreign.descriptor);
           expect(console.warn).not.toHaveBeenCalled();
         });
 
@@ -744,10 +772,10 @@ describe('dimension marshal', () => {
           const watchers = populateMarshal(marshal);
 
           // unregistering the foreign droppable
-          marshal.unregisterDroppable(preset.foreign.descriptor.id);
+          marshal.unregisterDroppable(preset.foreign.descriptor);
           // unregistering all children to prevent orphan children log
           preset.inForeignList.forEach((dimension: DraggableDimension) => {
-            marshal.unregisterDraggable(dimension.descriptor.id);
+            marshal.unregisterDraggable(dimension.descriptor);
           });
           expect(console.warn).not.toHaveBeenCalled();
 
@@ -776,7 +804,7 @@ describe('dimension marshal', () => {
           const watchers = populateMarshal(marshal);
 
           // unregistering the foreign droppable
-          marshal.unregisterDroppable(preset.foreign.descriptor.id);
+          marshal.unregisterDroppable(preset.foreign.descriptor);
           expect(console.warn).not.toHaveBeenCalled();
           // not unregistering children (bad)
 
@@ -795,13 +823,52 @@ describe('dimension marshal', () => {
           // this should cause an orphan child warning
           expect(console.warn).toHaveBeenCalledTimes(preset.inForeignList.length);
         });
+
+        it('should not remove an overwritten entry', () => {
+          const callbacks: Callbacks = getCallbackStub();
+          const marshal = createDimensionMarshal(callbacks);
+
+          // registering initial dimensions
+          const getOldDimension = jest.fn().mockImplementation(() => preset.home);
+          marshal.registerDroppable(preset.home.descriptor, {
+            getDimension: getOldDimension,
+            watchScroll: () => { },
+            unwatchScroll: () => { },
+          });
+          marshal.registerDraggable(preset.inHome1.descriptor, () => preset.inHome1);
+
+          // overwriting preset.home
+          const newDimension: DroppableDimension = getDroppableDimension({
+            descriptor: {
+              id: preset.home.descriptor.id,
+              type: preset.home.descriptor.type,
+            },
+            client: getArea({
+              top: 0, left: 0, right: 100, bottom: 100,
+            }),
+          });
+          const getNewDimension = jest.fn().mockImplementation(() => newDimension);
+          marshal.registerDroppable(newDimension.descriptor, {
+            getDimension: getNewDimension,
+            watchScroll: () => { },
+            unwatchScroll: () => { },
+          });
+
+          // perform full lift
+          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
+          requestAnimationFrame.step(2);
+
+          expect(getNewDimension).toHaveBeenCalledTimes(1);
+          expect(getOldDimension).not.toHaveBeenCalled();
+        });
       });
 
       describe('draggable', () => {
         it('should log an error if there is no entry with a matching id', () => {
           const marshal = createDimensionMarshal(getCallbackStub());
 
-          marshal.unregisterDraggable(preset.home.descriptor.id);
+          marshal.unregisterDraggable(preset.inHome1.descriptor);
 
           expect(console.error).toHaveBeenCalled();
         });
@@ -810,7 +877,7 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(getCallbackStub());
           const watchers = populateMarshal(marshal);
 
-          marshal.unregisterDraggable(preset.inForeign1.descriptor.id);
+          marshal.unregisterDraggable(preset.inForeign1.descriptor);
           expect(console.error).not.toHaveBeenCalled();
 
           marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
@@ -820,6 +887,48 @@ describe('dimension marshal', () => {
 
           expect(watchers.draggable.getDimension)
             .not.toHaveBeenCalledWith(preset.inForeign1.descriptor.id);
+        });
+
+        it('should not remove an overwritten entry', () => {
+          const marshal = createDimensionMarshal(getCallbackStub());
+          marshal.registerDroppable(preset.home.descriptor, {
+            getDimension: () => preset.home,
+            watchScroll: () => {},
+            unwatchScroll: () => {},
+          });
+          const getOldDimension: GetDraggableDimensionFn =
+            jest.fn().mockImplementation(() => preset.inHome2);
+
+          // original registration
+          marshal.registerDraggable(preset.inHome1.descriptor, () => preset.inHome1);
+          marshal.registerDraggable(preset.inHome2.descriptor, getOldDimension);
+
+          // registering new draggable with the same id as inHome2 before it is unregistered
+          // same id but moved to new position
+          const newDimension: DraggableDimension = getDraggableDimension({
+            descriptor: {
+              id: preset.inHome2.descriptor.id,
+              droppableId: preset.inHome2.descriptor.droppableId,
+              index: 400,
+            },
+            client: getArea({
+              top: 0, left: 0, right: 100, bottom: 100,
+            }),
+          });
+          const getNewDimension: GetDraggableDimensionFn =
+              jest.fn().mockImplementation(() => newDimension);
+          marshal.registerDraggable(newDimension.descriptor, getNewDimension);
+
+          // unregistering original inHome2
+          marshal.unregisterDraggable(preset.inHome2.descriptor);
+
+          // perform full lift
+          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
+          requestAnimationFrame.step(2);
+
+          expect(getNewDimension).toHaveBeenCalledTimes(1);
+          expect(getOldDimension).not.toHaveBeenCalled();
         });
       });
     });

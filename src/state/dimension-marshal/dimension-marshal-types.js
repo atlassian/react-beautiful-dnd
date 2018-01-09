@@ -49,14 +49,14 @@ export type DimensionMarshal = {|
   // Draggable
   registerDraggable: (descriptor: DraggableDescriptor,
     getDimension: GetDraggableDimensionFn) => void,
-  unregisterDraggable: (id: DraggableId) => void,
+  unregisterDraggable: (descriptor: DraggableDescriptor) => void,
   // Droppable
   registerDroppable: (descriptor: DroppableDescriptor,
     callbacks: DroppableCallbacks) => void,
   // it is possible for a droppable to change whether it is enabled during a drag
   updateDroppableIsEnabled: (id: DroppableId, isEnabled: boolean) => void,
   updateDroppableScroll: (id: DroppableId, newScroll: Position) => void,
-  unregisterDroppable: (id: DroppableId) => void,
+  unregisterDroppable: (descriptor: DroppableDescriptor) => void,
   // Entry
   onPhaseChange: (current: State) => void,
 |}

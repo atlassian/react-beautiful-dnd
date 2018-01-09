@@ -18,6 +18,7 @@ import type {
   Position,
   DraggableId,
   DraggableDimension,
+  DraggableDescriptor,
 } from '../../../src/types';
 
 const preset = getPreset();
@@ -99,35 +100,35 @@ describe('DraggableDimensionPublisher', () => {
 
       wrapper.unmount();
       expect(marshal.unregisterDraggable).toHaveBeenCalledTimes(1);
-      expect(marshal.unregisterDraggable).toHaveBeenCalledWith(preset.inHome1.descriptor.id);
+      expect(marshal.unregisterDraggable).toHaveBeenCalledWith(preset.inHome1.descriptor);
     });
 
     it('should update its registration when a descriptor property changes', () => {
       const marshal: DimensionMarshal = getMarshalStub();
 
       const wrapper = mount(<Item index={3} />, withDimensionMarshal(marshal));
-      // asserting shape of original publish
-      expect(marshal.registerDraggable.mock.calls[0][0]).toEqual({
+      const originalDescriptor: DraggableDescriptor = {
         id: preset.inHome1.descriptor.id,
         droppableId: preset.inHome1.descriptor.droppableId,
         index: 3,
-      });
+      };
+      // asserting shape of original publish
+      expect(marshal.registerDraggable.mock.calls[0][0]).toEqual(originalDescriptor);
 
       // updating the index
       wrapper.setProps({
         index: 4,
       });
-      // old descriptor unpublished
-      expect(marshal.unregisterDraggable).toHaveBeenCalledTimes(1);
-      expect(marshal.unregisterDraggable).toHaveBeenCalledWith(
-        preset.inHome1.descriptor.id
-      );
-      // newly published descriptor
-      expect(marshal.registerDraggable.mock.calls[1][0]).toEqual({
+      const newDescriptor: DraggableDescriptor = {
         id: preset.inHome1.descriptor.id,
         droppableId: preset.inHome1.descriptor.droppableId,
         index: 4,
-      });
+      };
+      // old descriptor unpublished
+      expect(marshal.unregisterDraggable).toHaveBeenCalledTimes(1);
+      expect(marshal.unregisterDraggable).toHaveBeenCalledWith(originalDescriptor);
+      // newly published descriptor
+      expect(marshal.registerDraggable.mock.calls[1][0]).toEqual(newDescriptor);
     });
 
     it('should not update its registration when a descriptor property does not change on an update', () => {
@@ -141,7 +142,7 @@ describe('DraggableDimensionPublisher', () => {
       expect(marshal.registerDraggable).not.toHaveBeenCalled();
     });
 
-    it('should unregister with the previous id when changing', () => {
+    it('should unregister with the previous descriptor when changing', () => {
       // this is to guard against the case where the id has changed at run time
       const marshal: DimensionMarshal = getMarshalStub();
 
@@ -156,8 +157,8 @@ describe('DraggableDimensionPublisher', () => {
       // old descriptor unpublished
       expect(marshal.unregisterDraggable).toHaveBeenCalledTimes(1);
       expect(marshal.unregisterDraggable).toHaveBeenCalledWith(
-        // unpublished with old id
-        preset.inHome1.descriptor.id
+        // unpublished with old descriptor
+        preset.inHome1.descriptor
       );
       // newly published descriptor
       expect(marshal.registerDraggable.mock.calls[1][0]).toEqual({

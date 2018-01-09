@@ -135,7 +135,7 @@ describe('DraggableDimensionPublisher', () => {
 
       wrapper.unmount();
       expect(marshal.unregisterDroppable).toHaveBeenCalledTimes(1);
-      expect(marshal.unregisterDroppable).toHaveBeenCalledWith(preset.home.descriptor.id);
+      expect(marshal.unregisterDroppable).toHaveBeenCalledWith(preset.home.descriptor);
     });
 
     it('should update its registration when a descriptor property changes', () => {
@@ -143,10 +143,7 @@ describe('DraggableDimensionPublisher', () => {
 
       const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
       // asserting shape of original publish
-      expect(marshal.registerDroppable.mock.calls[0][0]).toEqual({
-        id: preset.home.descriptor.id,
-        type: preset.home.descriptor.type,
-      });
+      expect(marshal.registerDroppable.mock.calls[0][0]).toEqual(preset.home.descriptor);
 
       // updating the index
       wrapper.setProps({
@@ -154,9 +151,7 @@ describe('DraggableDimensionPublisher', () => {
       });
       // old descriptor unpublished
       expect(marshal.unregisterDroppable).toHaveBeenCalledTimes(1);
-      expect(marshal.unregisterDroppable).toHaveBeenCalledWith(
-        preset.home.descriptor.id
-      );
+      expect(marshal.unregisterDroppable).toHaveBeenCalledWith(preset.home.descriptor);
       // newly published descriptor
       expect(marshal.registerDroppable.mock.calls[1][0]).toEqual({
         id: 'some-fake-id',
@@ -175,15 +170,12 @@ describe('DraggableDimensionPublisher', () => {
       expect(marshal.registerDroppable).not.toHaveBeenCalled();
     });
 
-    it('should unregister with the previous id when changing', () => {
+    it('should unregister with the previous descriptor when changing', () => {
       const marshal: DimensionMarshal = getMarshalStub();
 
       const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
       // asserting shape of original publish
-      expect(marshal.registerDroppable.mock.calls[0][0]).toEqual({
-        id: preset.home.descriptor.id,
-        type: preset.home.descriptor.type,
-      });
+      expect(marshal.registerDroppable.mock.calls[0][0]).toEqual(preset.home.descriptor);
 
       // updating the index
       wrapper.setProps({
@@ -191,9 +183,7 @@ describe('DraggableDimensionPublisher', () => {
       });
       // old descriptor unpublished
       expect(marshal.unregisterDroppable).toHaveBeenCalledTimes(1);
-      expect(marshal.unregisterDroppable).toHaveBeenCalledWith(
-        preset.home.descriptor.id
-      );
+      expect(marshal.unregisterDroppable).toHaveBeenCalledWith(preset.home.descriptor);
       // newly published descriptor
       expect(marshal.registerDroppable.mock.calls[1][0]).toEqual({
         id: 'some-fake-id',

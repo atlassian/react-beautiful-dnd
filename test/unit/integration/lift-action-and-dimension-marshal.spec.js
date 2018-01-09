@@ -84,8 +84,8 @@ describe('lifting and the dimension marshal', () => {
 
             // unregistering draggables
 
-            dimensionMarshal.unregisterDraggable(preset.inHome1.descriptor.id);
-            dimensionMarshal.unregisterDraggable(preset.inHome2.descriptor.id);
+            dimensionMarshal.unregisterDraggable(preset.inHome1.descriptor);
+            dimensionMarshal.unregisterDraggable(preset.inHome2.descriptor);
 
             // registering updated draggables
 

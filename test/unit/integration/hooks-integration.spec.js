@@ -93,6 +93,8 @@ describe('hooks integration', () => {
       onDragEnd: jest.fn(),
     };
     wrapper = getMountedApp();
+    // unmounting during a drag can cause a warning
+    jest.spyOn(console, 'warn').mockImplementation(() => { });
   });
 
   afterEach(() => {
@@ -109,6 +111,8 @@ describe('hooks integration', () => {
     if (window.getComputedStyle.mockRestore) {
       window.getComputedStyle.mockRestore();
     }
+
+    console.warn.mockRestore();
   });
 
   const drag = (() => {

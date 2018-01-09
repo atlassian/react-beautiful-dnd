@@ -33,22 +33,20 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
   publishedDescriptor: ?DraggableDescriptor = null
 
-  componentWillMount() {
-    const { draggableId, droppableId, index } = this.props;
+  getDescriptor(props: Props): DraggableDescriptor {
+    const { draggableId, droppableId, index } = props;
     const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
       draggableId, droppableId, index
     );
+    return descriptor;
+  }
 
-    this.publish(descriptor);
+  componentWillMount() {
+    this.publish(this.getDescriptor(this.props));
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    const { draggableId, droppableId, index } = nextProps;
-    const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
-      draggableId, droppableId, index
-    );
-
-    this.publish(descriptor);
+    this.publish(this.getDescriptor(nextProps));
   }
 
   componentWillUnmount() {
@@ -72,7 +70,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     // against the case where the id dynamically changes. This is not
     // supported during a drag - but it is good to guard against.
     const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.unregisterDraggable(this.publishedDescriptor.id);
+    marshal.unregisterDraggable(this.publishedDescriptor);
     this.publishedDescriptor = null;
   }
 
