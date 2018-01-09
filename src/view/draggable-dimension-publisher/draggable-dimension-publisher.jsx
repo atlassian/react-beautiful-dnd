@@ -18,9 +18,12 @@ import type {
 import type { DimensionMarshal } from '../../state/dimension-marshal/dimension-marshal-types';
 
 type Props = {|
+  // (it is being used)
+  /* eslint-disable react/no-unused-prop-types */
   draggableId: DraggableId,
   droppableId: DroppableId,
   index: number,
+  /* eslint-enable react/no-unused-prop-types */
   targetRef: ?HTMLElement,
   children: Node,
 |}
@@ -89,14 +92,17 @@ export default class DraggableDimensionPublisher extends Component<Props> {
   }
 
   getDimension = (): DraggableDimension => {
-    const { targetRef, draggableId, droppableId, index } = this.props;
+    const targetRef: ?HTMLElement = this.props.targetRef;
+
     if (!targetRef) {
       throw new Error('DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
     }
 
-    const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
-      draggableId, droppableId, index
-    );
+    const descriptor: ?DraggableDescriptor = this.publishedDescriptor;
+
+    if (!descriptor) {
+      throw new Error('Cannot get dimension for unpublished draggable');
+    }
 
     const style = window.getComputedStyle(targetRef);
 

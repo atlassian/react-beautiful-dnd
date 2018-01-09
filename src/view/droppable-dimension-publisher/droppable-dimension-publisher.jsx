@@ -26,6 +26,8 @@ import type {
 
 type Props = {|
   droppableId: DroppableId,
+  // (it is being used)
+  // eslint-disable-next-line react/no-unused-prop-types
   type: TypeId,
   direction: Direction,
   isDropDisabled: boolean,
@@ -57,6 +59,15 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   static contextTypes = {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
   };
+
+  getDescriptor(props: Props) {
+    const { droppableId, type } = props;
+    const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
+      droppableId, type,
+    );
+
+    return descriptor;
+  }
 
   getScrollOffset = (): Position => {
     if (!this.closestScrollable) {
@@ -130,21 +141,11 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   }
 
   componentWillMount() {
-    const { droppableId, type } = this.props;
-    const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
-      droppableId, type
-    );
-
-    this.publish(descriptor);
+    this.publish(this.getDescriptor(this.props));
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    const { droppableId, type } = nextProps;
-    const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
-      droppableId, type,
-    );
-
-    this.publish(descriptor);
+    this.publish(this.getDescriptor(nextProps));
 
     if (this.props.isDropDisabled === nextProps.isDropDisabled) {
       return;
@@ -204,9 +205,8 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       ignoreContainerClipping,
       isDropDisabled,
       targetRef,
-      droppableId,
-      type,
     } = this.props;
+
     if (!targetRef) {
       throw new Error('DimensionPublisher cannot calculate a dimension when not attached to the DOM');
     }
@@ -215,9 +215,11 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       throw new Error('Attempting to recapture Droppable dimension while already watching scroll on previous capture');
     }
 
-    const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
-      droppableId, type
-    );
+    const descriptor: ?DroppableDescriptor = this.publishedDescriptor;
+
+    if (!descriptor) {
+      throw new Error('Cannot get dimension for unpublished droppable');
+    }
 
     // side effect - grabbing it for scroll listening so we know it is the same node
     this.closestScrollable = getClosestScrollable(targetRef);
