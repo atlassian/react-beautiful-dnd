@@ -142,17 +142,45 @@ describe('dimension marshal', () => {
   });
 
   describe('drag starting (including early cancel)', () => {
-    describe.skip('invalid start state', () => {
+    describe.only('invalid start state', () => {
       it('should cancel the collecting if already collecting', () => {
+        const callbacks = getCallbackStub();
+        const marshal = createDimensionMarshal(callbacks);
+        populateMarshal(marshal);
 
+        marshal.onPhaseChange(state.requesting());
+        marshal.onPhaseChange(state.requesting());
+
+        expect(callbacks.cancel).toHaveBeenCalled();
       });
 
       it('should cancel the collection if the draggable cannot be found', () => {
+        const callbacks = getCallbackStub();
+        const marshal = createDimensionMarshal(callbacks);
+        populateMarshal(marshal);
 
+        marshal.onPhaseChange(state.requesting('some-unknown-descriptor'));
+
+        expect(callbacks.cancel).toHaveBeenCalled();
       });
 
       it('should cancel the collection if the home droppable cannot be found', () => {
+        const droppables: DroppableDimensionMap = {
+          ...preset.droppables,
+        };
+        // removing preset.home from the droppables
+        delete droppables[preset.home.descriptor.id];
+        const callbacks = getCallbackStub();
+        const marshal = createDimensionMarshal(callbacks);
+        populateMarshal(marshal, {
+          draggables: preset.draggables,
+          droppables,
+        });
 
+        // there is now no published home droppable
+        marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+
+        expect(callbacks.cancel).toHaveBeenCalled();
       });
     });
 

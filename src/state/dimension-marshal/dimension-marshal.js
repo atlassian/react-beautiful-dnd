@@ -56,6 +56,11 @@ export default (callbacks: Callbacks) => {
 
   const cancel = (...args: mixed[]) => {
     console.error(...args);
+
+    if (!state.isCollecting) {
+      return;
+    }
+
     // eslint-disable-next-line no-use-before-define
     stopCollecting();
     callbacks.cancel();
@@ -69,7 +74,7 @@ export default (callbacks: Callbacks) => {
 
     // Cannot register a draggable if no entry exists for the droppable
     if (!state.droppables[descriptor.droppableId]) {
-      console.error(`Cannot register Draggable ${id} as there is no entry for the Droppable ${descriptor.droppableId}`);
+      cancel(`Cannot register Draggable ${id} as there is no entry for the Droppable ${descriptor.droppableId}`);
       return;
     }
 
@@ -135,7 +140,7 @@ export default (callbacks: Callbacks) => {
 
   const updateDroppableIsEnabled = (id: DroppableId, isEnabled: boolean) => {
     if (!state.droppables[id]) {
-      console.error(`Cannot update the scroll on Droppable ${id} as it is not registered`);
+      cancel(`Cannot update the scroll on Droppable ${id} as it is not registered`);
       return;
     }
     // no need to update the application state if a collection is not occurring
@@ -147,7 +152,7 @@ export default (callbacks: Callbacks) => {
 
   const updateDroppableScroll = (id: DroppableId, newScroll: Position) => {
     if (!state.droppables[id]) {
-      console.error(`Cannot update the scroll on Droppable ${id} as it is not registered`);
+      cancel(`Cannot update the scroll on Droppable ${id} as it is not registered`);
       return;
     }
     // no need to update the application state if a collection is not occurring
@@ -161,7 +166,7 @@ export default (callbacks: Callbacks) => {
     const entry: ?DraggableEntry = state.draggables[descriptor.id];
 
     if (!entry) {
-      console.error(`Cannot unregister Draggable with id ${descriptor.id} as it is not registered`);
+      cancel(`Cannot unregister Draggable with id ${descriptor.id} as it is not registered`);
       return;
     }
 
@@ -192,7 +197,7 @@ export default (callbacks: Callbacks) => {
     const entry: ?DroppableEntry = state.droppables[descriptor.id];
 
     if (!entry) {
-      console.error(`Cannot unregister Droppable with id ${descriptor.id} as as it is not registered`);
+      cancel(`Cannot unregister Droppable with id ${descriptor.id} as as it is not registered`);
       return;
     }
 
