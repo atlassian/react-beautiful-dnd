@@ -919,7 +919,7 @@ The `React` children of a `Draggable` must be a function that returns a `ReactEl
     <div>
       <div
         ref={provided.innerRef}
-        style={provided.draggableStyle}
+        {...provided.draggableProps}
         {...provided.dragHandleProps}
       >
         Drag me!
@@ -937,8 +937,8 @@ The function is provided with two arguments:
 ```js
 type DraggableProvided = {|
   innerRef: (HTMLElement) => void,
-  draggableStyle: ?DraggableStyle,
-  dragHandleProps: ?DragHandleProvided,
+  draggableProps: ?DraggableProps,
+  dragHandleProps: ?DragHandleProps,
   placeholder: ?ReactElement,
 |}
 ```
@@ -959,13 +959,25 @@ Everything within the *provided* object must be applied for the `Draggable` to f
 innerRef: (HTMLElement) => void
 ```
 
-- `provided.draggableStyle (?DraggableStyle)`: This is an `Object` or `null` that contains an a number of styles that needs to be applied to the `Draggable`. This needs to be applied to the same node that you apply `provided.innerRef` to. This controls the movement of the draggable when it is dragging and not dragging. You are welcome to add your own styles to this object – but please do not remove or replace any of the properties.
+- `provided.draggableProps (?DraggableProps)`: This is an Object that contains a `data` attribute and an inline style. This Object needs to be applied to the same node that you apply `provided.innerRef` to. This controls the movement of the draggable when it is dragging and not dragging. You are welcome to add your own styles to `DraggableProps > style` – but please do not remove or replace any of the properties.
+
+### Type information
+
+```js
+// Props that can be spread onto the element directly
+export type DraggableProps = {|
+  // inline style
+  style: ?DraggableStyle,
+  // used for shared global styles
+  'data-react-beautiful-dnd-draggable': string,
+|}
+```
 
 ```js
 <Draggable draggableId="draggable-1">
   {(provided, snapshot) => (
     <div>
-      <div ref={provided.innerRef} style={provided.draggableStyle}>
+      <div ref={provided.innerRef} {...provided.draggableProps}>
         Drag me!
       </div>
     </div>
@@ -983,22 +995,28 @@ It is a contract of this library that it owns the positioning logic of the dragg
 
 This will be changing soon as we move to a [portal solution](https://github.com/atlassian/react-beautiful-dnd/issues/192) where we will be appending the `Draggable` to the end of the body to avoid any parent transforms. If you really need this feature right now we have [created an example](https://www.webpackbin.com/bins/-L-3aZ_bTMiGPl8bqlRB) where we implement a portal on top of the current api. Please note however, this technique is not officially supported and might break in minor / patch releases.
 
-### Extending `draggableStyle`
+### Extending `DraggableProps > style`
 
-If you are using inline styles you are welcome to extend the `draggableStyle` object. You are also welcome to apply the `draggableStyle` object using inline styles and use your own styling solution for the component itself - such as [styled-components](https://github.com/styled-components/styled-components).
+If you are using inline styles you are welcome to extend the `DraggableProps > style` object. You are also welcome to apply the `DraggableProps > style` object using inline styles and use your own styling solution for the component itself - such as [styled-components](https://github.com/styled-components/styled-components).
+
+If you are overriding inline styles be sure to do it after you spread the `provided.draggableProps` or the spread will override your inline style.
 
 ```js
 <Draggable draggable="draggable-1">
   {(provided, snapshot) => {
-    // extending the draggableStyle with our own inline styles
+    // extending the DraggableStyle with our own inline styles
     const style = {
-      ...provided.draggableStyle,
       backgroundColor: snapshot.isDragging ? 'blue' : 'white',
       fontSize: 18,
+      ...provided.draggableProps.style,
     };
     return (
       <div>
-        <div ref={provided.innerRef} style={style}>
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          style={style}
+        >
           Drag me!
         </div>
       </div>
@@ -1061,25 +1079,7 @@ It is an assumption that `Draggable`s and *visible siblings* of one another. The
 ### Type information
 
 ```js
-type DraggableStyle = DraggingStyle | NotDraggingStyle;
-
-// These styles are applied by default to allow for a
-// better touch device drag and drop experience.
-// Users can opt out of these styles or change them if
-// they really need too for their specific use case.
-type BaseStyle = {|
-  // Disable standard long press action
-  WebkitTouchCallout: 'none',
-
-  // Disable grey overlay on active anchors
-  WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-
-  // Avoid pull to refresh action and anchor focus on Android Chrome
-  touchAction: 'manipulation',
-|}
-
 type DraggingStyle = {|
-  ...BaseStyle,
   pointerEvents: 'none',
   position: 'fixed',
   width: number,
@@ -1088,15 +1088,14 @@ type DraggingStyle = {|
   top: number,
   left: number,
   margin: 0,
+  transition: 'none',
   transform: ?string,
   zIndex: ZIndex,
 |}
 
 type NotDraggingStyle = {|
-  ...BaseStyle,
   transition: ?string,
-  transform: ?string,
-  pointerEvents: 'none' | 'auto',
+  transition: null | 'none',
 |};
 ```
 
@@ -1106,7 +1105,7 @@ type NotDraggingStyle = {|
 <Draggable draggableId="draggable-1">
   {(provided, snapshot) => (
     <div>
-      <div ref={provided.innerRef} style={provided.draggableStyle}>
+      <div ref={provided.innerRef} {...provided.draggableProps}>
         Drag me!
       </div>
       {/* Always render me - I will be null if not required */}
@@ -1141,7 +1140,7 @@ type DragHandleProps = {|
     <div>
       <div
         ref={provided.innerRef}
-        style={provided.draggableStyle}
+        {...provided.draggableProps}
         {...provided.dragHandleProps}
       >
         Drag me!
@@ -1160,7 +1159,7 @@ Controlling a whole draggable by just a part of it
 <Draggable draggableId="draggable-1">
   {(provided, snapshot) => (
     <div>
-      <div ref={provided.innerRef} style={provided.draggableStyle}>
+      <div ref={provided.innerRef} {...provided.draggableProps}>
         <h2>Hello there</h2>
         <div {...provided.dragHandleProps}>Drag handle</div>
       </div>
@@ -1199,7 +1198,7 @@ const myOnClick = event => console.log('clicked on', event.target);
       <div>
         <div
           ref={provided.innerRef}
-          style={provided.draggableStyle}
+          {...provided.draggableProps}
           {...provided.dragHandleProps}
           onClick={onClick}
         >
@@ -1226,16 +1225,17 @@ The `children` function is also provided with a small amount of state relating t
 <Draggable draggableId="draggable-1">
   {(provided, snapshot) => {
     const style = {
-      ...provided.draggableStyle,
       backgroundColor: snapshot.isDragging ? 'blue' : 'grey',
+      ...provided.draggableProps.style,
     };
 
     return (
       <div>
         <div
           ref={provided.innerRef}
-          style={style}
+          {...provided.draggableProps}
           {...provided.dragHandleProps}
+          style={style}
         >
           Drag me!
         </div>
@@ -1303,7 +1303,7 @@ type DraggableStateSnapshot = {|
 // Draggable
 type DraggableProvided = {|
   innerRef: (?HTMLElement) => void,
-  draggableStyle: ?DraggableStyle,
+  draggableProps: ?DraggableProps,
   dragHandleProps: ?DragHandleProvided,
   placeholder: ?ReactElement,
 |}
@@ -1312,15 +1312,12 @@ type DraggableStateSnapshot = {|
   isDragging: boolean,
 |}
 
-type DraggableStyle = DraggingStyle | NotDraggingStyle
-
-type BaseStyle = {|
-  WebkitTouchCallout: 'none',
-  WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-  touchAction: 'manipulation',
+export type DraggableProps = {|
+  style: ?DraggableStyle,
+  'data-react-beautiful-dnd-draggable': string,
 |}
+type DraggableStyle = DraggingStyle | NotDraggingStyle
 type DraggingStyle = {|
-  ...BaseStyle,
   pointerEvents: 'none',
   position: 'fixed',
   width: number,
@@ -1329,14 +1326,13 @@ type DraggingStyle = {|
   top: number,
   left: number,
   margin: 0,
+  transition: 'none',
   transform: ?string,
   zIndex: ZIndex,
 |}
 type NotDraggingStyle = {|
-  ...BaseStyle,
   transition: ?string,
-  transform: ?string,
-  pointerEvents: 'none' | 'auto',
+  transition: null | 'none',
 |}
 type DragHandleProvided = {|
   onMouseDown: (event: MouseEvent) => void,
@@ -1378,7 +1374,7 @@ This codebase is typed with [flowtype](flowtype.org) to promote greater internal
 
 This code base employs a number of different testing strategies including unit, performance and integration tests. Testing various aspects of the system helps to promote its quality and stability.
 
-While code coverage is [not a guarantee of code health](https://stackoverflow.com/a/90021/1374236), it is a good indicator. This code base currently sits at **~95% coverage**.
+While code coverage is [not a guarantee of code health](https://stackoverflow.com/a/90021/1374236), it is a good indicator. This code base currently sits at **~90% coverage**.
 
 ### Performance
 
@@ -1391,10 +1387,6 @@ This codebase is designed to be extremely performant - it is part of its DNA. It
 - memoization is used all over the place - thanks [`memoize-one`](https://github.com/alexreardon/memoize-one)
 - conditionally disabling [`pointer-events`](https://developer.mozilla.org/en/docs/Web/CSS/pointer-events) on `Draggable`s while dragging to prevent the browser needing to do redundant work - you can read more about the technique [here](https://www.thecssninja.com/css/pointer-events-60fps)
 - Non primary animations are done on the GPU
-
-| Minimal browser paints | Minimal React updates |
-|------------------------|-----------------------|
-|![minimal-browser-paints](https://github.com/alexreardon/files/blob/master/resources/dnd-browser-paint.gif?raw=true)|![minimal-react-updates](https://github.com/alexreardon/files/blob/master/resources/dnd-react-paint.gif?raw=true)|
 
 ## Size
 
