@@ -81,7 +81,7 @@ const reorder = (list, startIndex, endIndex) => {
 
 // using some little inline style helpers to make the app look okay
 const grid = 8;
-const getItemStyle = (draggableStyle, isDragging) => ({
+const getItemStyle = (isDragging, draggableStyle) => ({
   // some basic styles to make the items look a bit nicer
   userSelect: 'none',
   padding: grid * 2,
@@ -145,8 +145,8 @@ class App extends Component {
                         {...provided.droppableProps}
                         {...provided.dragHandleProps}
                         style={getItemStyle(
-                          provided.droppableProps.style,
                           snapshot.isDragging
+                          provided.droppableProps.style,
                         )}
                       >
                         {item.content}
@@ -427,7 +427,7 @@ There is also an [example codepen](https://codepen.io/alexreardon/project/editor
 
 ## API
 
-So how do you use the library?
+Okay, into the fun stuff - so how do you use the library?
 
 ## `DragDropContext`
 
@@ -529,7 +529,8 @@ It is provided with all the information about a drag:
 
 Because this library does not control your state, it is up to you to *synchronously* reorder your lists based on the `result`.
 
-*Here is what you need to do:*
+#### Here is what you need to do:
+
 - if the `destination` is `null`: all done!
 - if `source.droppableId` equals `destination.droppableId` you need to remove the item from your list and insert it at the correct position.
 - if `source.droppableId` does not equal `destination.droppableId`, then you need to remove the `Draggable` from the `source.droppableId` list and add it into the correct position of the `destination.droppableId` list.
@@ -578,17 +579,6 @@ Here are a few poor user experiences that can occur if you change things *during
 - If you change the dimensions of any node, then it can cause the changed node as well as others to move at incorrect times.
 - If you remove the node that the user is dragging, then the drag will instantly end
 - If you change the dimension of the dragging node, then other things will not move out of the way at the correct time.
-
-#### Add a cursor style and block selection
-
-During a drag it is recommended that you add two styles to the body:
-
-1. `user-select: none;` and
-2. `cursor: grab;` (or whatever cursor you want to use while dragging)
-
-`user-select: none;` prevents the user drag from selecting text on the page as they drag.
-
-`cursor: [your desired cursor];` is needed because we apply `pointer-events: none;` to the dragging item. This prevents you setting your own cursor style on the Draggable directly based on `snapshot.isDragging` (see [`Draggable`](https://github.com/atlassian/react-beautiful-dnd#draggable)).
 
 #### Force focus after a transition between lists
 
@@ -712,6 +702,60 @@ This library supports dragging within scroll containers (DOM elements that have 
 ### Empty `Droppable`s
 
 It is recommended that you put a `min-height` on a vertical `Droppable` or a `min-width` on a horizontal `Droppable`. Otherwise when the `Droppable` is empty there may not be enough of a target for `Draggable` being dragged with touch or mouse inputs to be *over* the `Droppable`.
+
+### Recommended Droppable performance optimisation
+
+When a user drags over a list we re-render the `Droppable` with an updated `DroppableStateSnapshot > isDraggingOver` value. This is useful for styling the `Droppable`. However, by default this will cause a render of all of the children of the `Droppable` - which might be 100's of `Draggable`s! This can result in a noticeable frame rate drop. To avoid this problem we recommend that you create a component that is the child of a `Droppable` who's responsibility it is to avoid rendering children if it is not required.
+
+```js
+import React, { Component } from 'react';
+
+class Student extends Component<{ student: Person }> {
+  render() {
+    // Renders out a draggable student
+  }
+}
+
+class InnerList extends Component<{ students: Person[] }> {
+  // do not re-render if the students list has not changed
+  shouldComponentUpdate(nextProps: Props) {
+    if(this.props.students === nextProps.students) {
+      return false;
+    }
+    return true;
+  }
+  // You could also not do your own shouldComponentUpdate check and just
+  // extend from React.PureComponent
+
+  render() {
+    return this.props.students.map((student: Person) => (
+      <Student student={student} />
+    ))
+  }
+}
+
+class Students extends Component {
+  render() {
+    return (
+      <Droppable droppableId="list">
+        {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
+          <div
+            ref={provided.innerRef}
+            style={{ backgroundColor: provided.isDragging ? 'green' : 'lightblue' }}
+          >
+            <InnerList students={this.props.students} />
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    )
+  }
+}
+```
+
+By using the approach you are able to make style changes to a `Droppable` when it is being dragged over, but you avoid re-rendering all of the children unnecessarily. Keep in mind that if you are using `React.PureComponent` that your component will [not respond to changes in the context](https://github.com/facebook/react/issues/2517).
+
+Unfortunately we are [unable to apply this optimisation for you](https://medium.com/merrickchristensen/function-as-child-components-5f3920a9ace9). It is a byproduct of using the function-as-child pattern.
 
 ### Auto scrolling is not provided (yet!)
 
