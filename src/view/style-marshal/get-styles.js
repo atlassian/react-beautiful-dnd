@@ -104,10 +104,10 @@ export default (styleContext: string): Styles => {
       body {
         cursor: grabbing;
         cursor: -webkit-grabbing;
+        user-select: none;
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
-        user-select: none;
       }
     `,
   };
@@ -118,10 +118,10 @@ export default (styleContext: string): Styles => {
   ].join('');
 
   const dragging: string = [
-    bodyStyles.whileActiveDragging,
     dragHandleStyles.base,
     dragHandleStyles.blockPointerEvents,
     draggableStyles.animateMovement,
+    bodyStyles.whileActiveDragging,
   ].join('');
 
   const dropAnimating: string = [
