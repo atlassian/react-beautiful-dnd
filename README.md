@@ -81,7 +81,7 @@ const reorder = (list, startIndex, endIndex) => {
 
 // using some little inline style helpers to make the app look okay
 const grid = 8;
-const getItemStyle = (draggableStyle, isDragging) => ({
+const getItemStyle = (isDragging, draggableStyle) => ({
   // some basic styles to make the items look a bit nicer
   userSelect: 'none',
   padding: grid * 2,
@@ -142,11 +142,12 @@ class App extends Component {
                     <div>
                       <div
                         ref={provided.innerRef}
-                        style={getItemStyle(
-                          provided.draggableStyle,
-                          snapshot.isDragging
-                        )}
+                        {...provided.droppableProps}
                         {...provided.dragHandleProps}
+                        style={getItemStyle(
+                          snapshot.isDragging
+                          provided.droppableProps.style,
+                        )}
                       >
                         {item.content}
                       </div>
@@ -377,6 +378,114 @@ class App extends React.Component {
 }
 ```
 
+## Preset styles
+
+We apply a number of non-visible styles to facilitate the dragging experience. We do this using combination of styling targets and techniques. It is a goal of the library to provide unopinioned styling. However, we do apply some reasonable `cursor` styling on drag handles by default. This is designed to make the library work as simply as possible out of the box. If you want to use your own cursors you are more than welcome to. All you need to do is override our cursor style rules by using a rule with [higher specificity](https://css-tricks.com/specifics-on-css-specificity/).
+
+Here are the styles that are applied at various points in the drag lifecycle:
+
+### In every phase
+
+#### Always: drag handle
+
+Styles applied to: **drag handle element** using the `data-react-beautiful-dnd-drag-handle` attribute.
+
+A long press on anchors usually pops a content menu that has options for the link such as 'Open in new tab'. Because long press is used to start a drag we need to opt out of this behavior
+
+```css
+-webkit-touch-callout: none;
+```
+
+Webkit based browsers add a grey overlay to anchors when they are active. We remove this tap overlay as it is confusing for users. [more information](https://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/).
+
+```css
+-webkit-tap-highlight-color: rgba(0,0,0,0);
+```
+
+Avoid the *pull to refresh action* and *delayed anchor focus* on Android Chrome
+
+```css
+touch-action: manipulation;
+```
+
+### Phase: resting
+
+#### (Phase: resting): drag handle
+
+Styles applied to: **drag handle element** using the `data-react-beautiful-dnd-drag-handle` attribute.
+
+Adding a cursor style to let the user know this element is draggable. You are welcome to override this.
+
+```css
+cursor: grab;
+```
+
+### Phase: dragging
+
+#### (Phase: dragging): drag handle element
+
+**Styles applied using the `data-react-beautiful-dnd-drag-handle` attribute**
+
+An optimisation to avoid processing `pointer-events` while dragging. Also used to allow scrolling through a drag handle with a track pad or mouse wheel.
+
+```css
+point-events: none;
+```
+
+#### (Phase: dragging): Draggable element
+
+**Styles applied using the `data-react-beautiful-dnd-draggable` attribute**
+
+This is what we use to control `Draggable`s that need to move out of the way of a dragging `Draggable`.
+
+```css
+transition: ${string};
+```
+
+**Styles applied using inline styles**
+
+This is described by the type [`DraggableStyle`](https://github.com/atlassian/react-beautiful-dnd#type-information-1).
+
+#### (Phase: dragging): body element
+
+We apply a cursor while dragging to give user feedback that a drag is occurring. You are welcome to override this. A good point to do this is the `onDragStart` event.
+
+```css
+cursor: grabbing;
+```
+
+To prevent the user selecting text as they drag apply this style
+
+```css
+user-select: none;
+```
+
+### Phase: dropping
+
+#### (Phase: dropping): drag handle element
+
+**Styles applied using the `data-react-beautiful-dnd-drag-handle` attribute**
+
+We apply the grab cursor to all drag handles except the drag handle for the dropping `Draggable`. At this point the user is able to drag other `Draggable`'s if they like.
+
+```css
+cursor: grab;
+```
+
+#### (Phase: dropping): draggable
+
+Same as dragging phase
+
+### Phase: user cancel
+
+> When a user explicitly cancels a drag
+
+This is the same as `Phase: dropping`. However we do not apply a `cursor: grab` to the drag handle. During a user initiated cancel we do not allow the dragging of other items until the drop animation is complete.
+
+### Preset styles are vendor prefixed
+
+All styles applied are vendor prefixed correctly to  meet the requirements of our [supported browser matrix](https://confluence.atlassian.com/cloud/supported-browsers-744721663.html). This is done by hand to avoid adding to react-beautiful-dnd's size by including a css-in-js library
+
 ## Installation
 
 ### Package manager
@@ -404,7 +513,7 @@ You can use the UMD to run `react-beautiful-dnd` directly in the browser.
 <!-- peer dependency -->
 <script src="https://unpkg.com/react@15.6.0/dist/react.js"></script>
 <!-- lib (change x.x.x for the version you would like) -->
-<script src="https://unpkg.com/react-dom@x.x.x/dist/react-beautiful-dnd.js"></script>
+<script src="https://unpkg.com/react-beautiful-dnd@x.x.x/dist/react-beautiful-dnd.js"></script>
 <!-- needed to mount your react app -->
 <script src="https://unpkg.com/react-dom@15.6.0/dist/react-dom.js"></script>
 
@@ -426,7 +535,7 @@ There is also an [example codepen](https://codepen.io/alexreardon/project/editor
 
 ## API
 
-So how do you use the library?
+Okay, into the fun stuff - so how do you use the library?
 
 ## `DragDropContext`
 
@@ -528,7 +637,8 @@ It is provided with all the information about a drag:
 
 Because this library does not control your state, it is up to you to *synchronously* reorder your lists based on the `result`.
 
-*Here is what you need to do:*
+#### Here is what you need to do:
+
 - if the `destination` is `null`: all done!
 - if `source.droppableId` equals `destination.droppableId` you need to remove the item from your list and insert it at the correct position.
 - if `source.droppableId` does not equal `destination.droppableId`, then you need to remove the `Draggable` from the `source.droppableId` list and add it into the correct position of the `destination.droppableId` list.
@@ -578,17 +688,6 @@ Here are a few poor user experiences that can occur if you change things *during
 - If you remove the node that the user is dragging, then the drag will instantly end
 - If you change the dimension of the dragging node, then other things will not move out of the way at the correct time.
 
-#### Add a cursor style and block selection
-
-During a drag it is recommended that you add two styles to the body:
-
-1. `user-select: none;` and
-2. `cursor: grab;` (or whatever cursor you want to use while dragging)
-
-`user-select: none;` prevents the user drag from selecting text on the page as they drag.
-
-`cursor: [your desired cursor];` is needed because we apply `pointer-events: none;` to the dragging item. This prevents you setting your own cursor style on the Draggable directly based on `snapshot.isDragging` (see [`Draggable`](https://github.com/atlassian/react-beautiful-dnd#draggable)).
-
 #### Force focus after a transition between lists
 
 When an item is moved from one list to a different list, it loses browser focus if it had it. This is because `React` creates a new node in this situation. It will not lose focus if transitioned within the same list. The dragging item will always have had browser focus if it is dragging with a keyboard. It is highly recommended that you give the item (which is now in a different list) focus again. You can see an example of how to do this in our stories. Here is an example of how you could do it:
@@ -622,7 +721,7 @@ import { Droppable } from 'react-beautiful-dnd';
 </Droppable>;
 ```
 
-### Props
+### Droppable props
 
 - `droppableId`: A *required* `DroppableId(string)` that uniquely identifies the droppable for the application. Please do not change this prop - especially during a drag.
 - `type`: An *optional* `TypeId(string)` that can be used to simply accept a class of `Draggable`. For example, if you use the type `PERSON` then it will only allow `Draggable`s of type `PERSON` to be dropped on itself. `Draggable`s of type `TASK` would not be able to be dropped on a `Droppable` with type `PERSON`. If no `type` is provided, it will be set to `'DEFAULT'`. Currently the `type` of the `Draggable`s within a `Droppable` **must be** the same. This restriction might be loosened in the future if there is a valid use case.
@@ -712,6 +811,62 @@ This library supports dragging within scroll containers (DOM elements that have 
 
 It is recommended that you put a `min-height` on a vertical `Droppable` or a `min-width` on a horizontal `Droppable`. Otherwise when the `Droppable` is empty there may not be enough of a target for `Draggable` being dragged with touch or mouse inputs to be *over* the `Droppable`.
 
+### Recommended Droppable performance optimisation
+
+When a user drags over, or stops dragging over, a `Droppable` we re-render the `Droppable` with an updated `DroppableStateSnapshot > isDraggingOver` value. This is useful for styling the `Droppable`. However, by default this will cause a render of all of the children of the `Droppable` - which might be 100's of `Draggable`s! This can result in a noticeable frame rate drop. To avoid this problem we recommend that you create a component that is the child of a `Droppable` who's responsibility it is to avoid rendering children if it is not required.
+
+Here is an example of how you could do this:
+
+```js
+import React, { Component } from 'react';
+
+class Student extends Component<{ student: Person }> {
+  render() {
+    // Renders out a draggable student
+  }
+}
+
+class InnerList extends Component<{ students: Person[] }> {
+  // do not re-render if the students list has not changed
+  shouldComponentUpdate(nextProps: Props) {
+    if(this.props.students === nextProps.students) {
+      return false;
+    }
+    return true;
+  }
+  // You could also not do your own shouldComponentUpdate check and just
+  // extend from React.PureComponent
+
+  render() {
+    return this.props.students.map((student: Person) => (
+      <Student student={student} />
+    ))
+  }
+}
+
+class Students extends Component {
+  render() {
+    return (
+      <Droppable droppableId="list">
+        {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
+          <div
+            ref={provided.innerRef}
+            style={{ backgroundColor: provided.isDragging ? 'green' : 'lightblue' }}
+          >
+            <InnerList students={this.props.students} />
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    )
+  }
+}
+```
+
+By using the approach you are able to make style changes to a `Droppable` when it is being dragged over, but you avoid re-rendering all of the children unnecessarily. Keep in mind that if you are using `React.PureComponent` that your component will [not respond to changes in the context](https://github.com/facebook/react/issues/2517).
+
+Unfortunately we are [unable to apply this optimisation for you](https://medium.com/merrickchristensen/function-as-child-components-5f3920a9ace9). It is a byproduct of using the function-as-child pattern.
+
 ### Auto scrolling is not provided (yet!)
 
 Currently auto scrolling of scroll containers is not part of this library. Auto scrolling is where the container automatically scrolls to make room for the dragging item as you drag near the edge of a scroll container. You are welcome to build your own auto scrolling list, or if you would you really like it as part of this library we could provide a auto scrolling `Droppable`.
@@ -734,7 +889,7 @@ import { Draggable } from 'react-beautiful-dnd';
     <div>
       <div
         ref={provided.innerRef}
-        style={provided.draggableStyle}
+        {...provided.draggableProps}
         {...provided.dragHandleProps}
       >
         <h4>My draggable</h4>
@@ -747,7 +902,7 @@ import { Draggable } from 'react-beautiful-dnd';
 
 > Note: when the library moves to React 16 this will be cleaned up a little bit as we will be able to return the placeholder as a sibling to your child function without you needing to create a wrapping element
 
-### Props
+### Draggable Props
 
 - `draggableId`: A *required* `DraggableId(string)` that uniquely identifies the `Draggable` for the application. Please do not change this prop - especially during a drag.
 - `type`: An *optional* type (`TypeId(string)`) of the `Draggable`. This is used to control what `Droppable`s the `Draggable` is permitted to drop on. `Draggable`s can only drop on `Droppable`s that share the same `type`. If no `type` is provided, then it will be set to `'DEFAULT'`. Currently the `type` of a `Draggable` **must be** the same as its container `Droppable`. This restriction might be loosened in the future if there is a valid use case.
@@ -764,7 +919,7 @@ The `React` children of a `Draggable` must be a function that returns a `ReactEl
     <div>
       <div
         ref={provided.innerRef}
-        style={provided.draggableStyle}
+        {...provided.draggableProps}
         {...provided.dragHandleProps}
       >
         Drag me!
@@ -782,8 +937,8 @@ The function is provided with two arguments:
 ```js
 type DraggableProvided = {|
   innerRef: (HTMLElement) => void,
-  draggableStyle: ?DraggableStyle,
-  dragHandleProps: ?DragHandleProvided,
+  draggableProps: ?DraggableProps,
+  dragHandleProps: ?DragHandleProps,
   placeholder: ?ReactElement,
 |}
 ```
@@ -804,13 +959,25 @@ Everything within the *provided* object must be applied for the `Draggable` to f
 innerRef: (HTMLElement) => void
 ```
 
-- `provided.draggableStyle (?DraggableStyle)`: This is an `Object` or `null` that contains an a number of styles that needs to be applied to the `Draggable`. This needs to be applied to the same node that you apply `provided.innerRef` to. This controls the movement of the draggable when it is dragging and not dragging. You are welcome to add your own styles to this object – but please do not remove or replace any of the properties.
+- `provided.draggableProps (?DraggableProps)`: This is an Object that contains a `data` attribute and an inline style. This Object needs to be applied to the same node that you apply `provided.innerRef` to. This controls the movement of the draggable when it is dragging and not dragging. You are welcome to add your own styles to `DraggableProps > style` – but please do not remove or replace any of the properties.
+
+### Type information
+
+```js
+// Props that can be spread onto the element directly
+export type DraggableProps = {|
+  // inline style
+  style: ?DraggableStyle,
+  // used for shared global styles
+  'data-react-beautiful-dnd-draggable': string,
+|}
+```
 
 ```js
 <Draggable draggableId="draggable-1">
   {(provided, snapshot) => (
     <div>
-      <div ref={provided.innerRef} style={provided.draggableStyle}>
+      <div ref={provided.innerRef} {...provided.draggableProps}>
         Drag me!
       </div>
     </div>
@@ -828,22 +995,28 @@ It is a contract of this library that it owns the positioning logic of the dragg
 
 This will be changing soon as we move to a [portal solution](https://github.com/atlassian/react-beautiful-dnd/issues/192) where we will be appending the `Draggable` to the end of the body to avoid any parent transforms. If you really need this feature right now we have [created an example](https://www.webpackbin.com/bins/-L-3aZ_bTMiGPl8bqlRB) where we implement a portal on top of the current api. Please note however, this technique is not officially supported and might break in minor / patch releases.
 
-### Extending `draggableStyle`
+### Extending `DraggableProps > style`
 
-If you are using inline styles you are welcome to extend the `draggableStyle` object. You are also welcome to apply the `draggableStyle` object using inline styles and use your own styling solution for the component itself - such as [styled-components](https://github.com/styled-components/styled-components).
+If you are using inline styles you are welcome to extend the `DraggableProps > style` object. You are also welcome to apply the `DraggableProps > style` object using inline styles and use your own styling solution for the component itself - such as [styled-components](https://github.com/styled-components/styled-components).
+
+If you are overriding inline styles be sure to do it after you spread the `provided.draggableProps` or the spread will override your inline style.
 
 ```js
 <Draggable draggable="draggable-1">
   {(provided, snapshot) => {
-    // extending the draggableStyle with our own inline styles
+    // extending the DraggableStyle with our own inline styles
     const style = {
-      ...provided.draggableStyle,
       backgroundColor: snapshot.isDragging ? 'blue' : 'white',
       fontSize: 18,
+      ...provided.draggableProps.style,
     };
     return (
       <div>
-        <div ref={provided.innerRef} style={style}>
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          style={style}
+        >
           Drag me!
         </div>
       </div>
@@ -906,25 +1079,7 @@ It is an assumption that `Draggable`s and *visible siblings* of one another. The
 ### Type information
 
 ```js
-type DraggableStyle = DraggingStyle | NotDraggingStyle;
-
-// These styles are applied by default to allow for a
-// better touch device drag and drop experience.
-// Users can opt out of these styles or change them if
-// they really need too for their specific use case.
-type BaseStyle = {|
-  // Disable standard long press action
-  WebkitTouchCallout: 'none',
-
-  // Disable grey overlay on active anchors
-  WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-
-  // Avoid pull to refresh action and anchor focus on Android Chrome
-  touchAction: 'manipulation',
-|}
-
 type DraggingStyle = {|
-  ...BaseStyle,
   pointerEvents: 'none',
   position: 'fixed',
   width: number,
@@ -933,15 +1088,14 @@ type DraggingStyle = {|
   top: number,
   left: number,
   margin: 0,
+  transition: 'none',
   transform: ?string,
   zIndex: ZIndex,
 |}
 
 type NotDraggingStyle = {|
-  ...BaseStyle,
   transition: ?string,
-  transform: ?string,
-  pointerEvents: 'none' | 'auto',
+  transition: null | 'none',
 |};
 ```
 
@@ -951,7 +1105,7 @@ type NotDraggingStyle = {|
 <Draggable draggableId="draggable-1">
   {(provided, snapshot) => (
     <div>
-      <div ref={provided.innerRef} style={provided.draggableStyle}>
+      <div ref={provided.innerRef} {...provided.draggableProps}>
         Drag me!
       </div>
       {/* Always render me - I will be null if not required */}
@@ -986,7 +1140,7 @@ type DragHandleProps = {|
     <div>
       <div
         ref={provided.innerRef}
-        style={provided.draggableStyle}
+        {...provided.draggableProps}
         {...provided.dragHandleProps}
       >
         Drag me!
@@ -1005,7 +1159,7 @@ Controlling a whole draggable by just a part of it
 <Draggable draggableId="draggable-1">
   {(provided, snapshot) => (
     <div>
-      <div ref={provided.innerRef} style={provided.draggableStyle}>
+      <div ref={provided.innerRef} {...provided.draggableProps}>
         <h2>Hello there</h2>
         <div {...provided.dragHandleProps}>Drag handle</div>
       </div>
@@ -1017,7 +1171,7 @@ Controlling a whole draggable by just a part of it
 
 ### Monkey patching
 
-You can override some of the `dragHandleProvided` props with your own behavior if you need to.
+You can override some of the `dragHandleProps` props with your own behavior if you need to.
 
 ```js
 const myOnClick = event => console.log('clicked on', event.target);
@@ -1044,7 +1198,7 @@ const myOnClick = event => console.log('clicked on', event.target);
       <div>
         <div
           ref={provided.innerRef}
-          style={provided.draggableStyle}
+          {...provided.draggableProps}
           {...provided.dragHandleProps}
           onClick={onClick}
         >
@@ -1071,16 +1225,17 @@ The `children` function is also provided with a small amount of state relating t
 <Draggable draggableId="draggable-1">
   {(provided, snapshot) => {
     const style = {
-      ...provided.draggableStyle,
       backgroundColor: snapshot.isDragging ? 'blue' : 'grey',
+      ...provided.draggableProps.style,
     };
 
     return (
       <div>
         <div
           ref={provided.innerRef}
-          style={style}
+          {...provided.draggableProps}
           {...provided.dragHandleProps}
+          style={style}
         >
           Drag me!
         </div>
@@ -1105,7 +1260,7 @@ It is possible for your `Draggable` to contain interactive elements. By default 
 - `audio`
 - [`contenteditable`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/contenteditable) (any elements that are `contenteditable` or are within a `contenteditable` container)
 
-You can opt out of this behavior by adding the `disableInteractiveElementBlocking` prop to a `Draggable`. However, it is questionable as to whether you should be doing so because it will render the interactive element unusable. If you need to *conditionally* block dragging from interactive elements you can add the `disableInteractiveElementBlocking` prop to opt out of the default blocking and monkey patch the `dragHandleProps (DragHandleProvided)` event handlers to disable dragging as required.
+You can opt out of this behavior by adding the `disableInteractiveElementBlocking` prop to a `Draggable`. However, it is questionable as to whether you should be doing so because it will render the interactive element unusable. If you need to *conditionally* block dragging from interactive elements you can add the `disableInteractiveElementBlocking` prop to opt out of the default blocking and monkey patch the `dragHandleProps (DragHandleProps)` event handlers to disable dragging as required.
 
 ## Flow usage
 
@@ -1148,8 +1303,8 @@ type DraggableStateSnapshot = {|
 // Draggable
 type DraggableProvided = {|
   innerRef: (?HTMLElement) => void,
-  draggableStyle: ?DraggableStyle,
-  dragHandleProps: ?DragHandleProvided,
+  draggableProps: ?DraggableProps,
+  dragHandleProps: ?DragHandleProps,
   placeholder: ?ReactElement,
 |}
 
@@ -1157,15 +1312,12 @@ type DraggableStateSnapshot = {|
   isDragging: boolean,
 |}
 
-type DraggableStyle = DraggingStyle | NotDraggingStyle
-
-type BaseStyle = {|
-  WebkitTouchCallout: 'none',
-  WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-  touchAction: 'manipulation',
+export type DraggableProps = {|
+  style: ?DraggableStyle,
+  'data-react-beautiful-dnd-draggable': string,
 |}
+type DraggableStyle = DraggingStyle | NotDraggingStyle
 type DraggingStyle = {|
-  ...BaseStyle,
   pointerEvents: 'none',
   position: 'fixed',
   width: number,
@@ -1174,14 +1326,13 @@ type DraggingStyle = {|
   top: number,
   left: number,
   margin: 0,
+  transition: 'none',
   transform: ?string,
   zIndex: ZIndex,
 |}
 type NotDraggingStyle = {|
-  ...BaseStyle,
   transition: ?string,
-  transform: ?string,
-  pointerEvents: 'none' | 'auto',
+  transition: null | 'none',
 |}
 type DragHandleProvided = {|
   onMouseDown: (event: MouseEvent) => void,
@@ -1223,7 +1374,7 @@ This codebase is typed with [flowtype](flowtype.org) to promote greater internal
 
 This code base employs a number of different testing strategies including unit, performance and integration tests. Testing various aspects of the system helps to promote its quality and stability.
 
-While code coverage is [not a guarantee of code health](https://stackoverflow.com/a/90021/1374236), it is a good indicator. This code base currently sits at **~95% coverage**.
+While code coverage is [not a guarantee of code health](https://stackoverflow.com/a/90021/1374236), it is a good indicator. This code base currently sits at **~90% coverage**.
 
 ### Performance
 
@@ -1236,10 +1387,6 @@ This codebase is designed to be extremely performant - it is part of its DNA. It
 - memoization is used all over the place - thanks [`memoize-one`](https://github.com/alexreardon/memoize-one)
 - conditionally disabling [`pointer-events`](https://developer.mozilla.org/en/docs/Web/CSS/pointer-events) on `Draggable`s while dragging to prevent the browser needing to do redundant work - you can read more about the technique [here](https://www.thecssninja.com/css/pointer-events-60fps)
 - Non primary animations are done on the GPU
-
-| Minimal browser paints | Minimal React updates |
-|------------------------|-----------------------|
-|![minimal-browser-paints](https://github.com/alexreardon/files/blob/master/resources/dnd-browser-paint.gif?raw=true)|![minimal-react-updates](https://github.com/alexreardon/files/blob/master/resources/dnd-react-paint.gif?raw=true)|
 
 ## Size
 

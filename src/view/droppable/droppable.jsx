@@ -91,10 +91,10 @@ export default class Droppable extends Component<Props, State> {
     return (
       <DroppableDimensionPublisher
         droppableId={droppableId}
+        type={type}
         direction={direction}
         ignoreContainerClipping={ignoreContainerClipping}
         isDropDisabled={isDropDisabled}
-        type={type}
         targetRef={this.state.ref}
       >
         {children(provided, snapshot)}

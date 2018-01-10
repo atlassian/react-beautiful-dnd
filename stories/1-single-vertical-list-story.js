@@ -5,9 +5,12 @@ import styled from 'styled-components';
 import QuoteApp from './src/vertical/quote-app';
 import { quotes, getQuotes } from './src/data';
 import { grid } from './src/constants';
-import type { Quote } from './src/types';
 
-const bigData: Quote[] = getQuotes(40);
+const data = {
+  small: quotes,
+  medium: getQuotes(40),
+  large: getQuotes(500),
+};
 
 const ScrollContainer = styled.div`
   box-sizing: border-box;
@@ -26,17 +29,17 @@ const Title = styled.h4`
 `;
 
 storiesOf('single vertical list', module)
-  .add('simple example', () => (
-    <QuoteApp initial={quotes} />
+  .add('basic', () => (
+    <QuoteApp initial={data.small} />
   ))
-  .add('with window scrolling', () => (
+  .add('large data set', () => (
     <QuoteApp
-      initial={bigData}
+      initial={data.large}
     />
   ))
   .add('Droppable is a scroll container', () => (
     <QuoteApp
-      initial={bigData}
+      initial={data.medium}
       listStyle={{
         overflowY: 'scroll',
         maxHeight: '80vh',
@@ -46,7 +49,7 @@ storiesOf('single vertical list', module)
   ))
   .add('window scrolling and a Droppable scroll container', () => (
     <QuoteApp
-      initial={bigData}
+      initial={data.medium}
       listStyle={{
         overflowY: 'scroll',
         maxHeight: '120vh',
@@ -58,7 +61,7 @@ storiesOf('single vertical list', module)
     <ScrollContainer>
       <Title>List is within a larger scroll container</Title>
       <QuoteApp
-        initial={bigData}
+        initial={data.medium}
       />
     </ScrollContainer>
   ));

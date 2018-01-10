@@ -1,33 +1,36 @@
 // @flow
 import memoizeOne from 'memoize-one';
-import type { TypeId,
+import type {
   Action,
   State,
   DraggableDimension,
   DroppableDimension,
-  DraggableDimensionMap,
   DroppableId,
   DraggableId,
   DimensionState,
-  DragImpact,
+  DraggableDescriptor,
+  DraggableDimensionMap,
+  DroppableDimensionMap,
   DragState,
   DropResult,
   CurrentDrag,
+  DragImpact,
   InitialDrag,
   PendingDrop,
   Phase,
   DraggableLocation,
-  CurrentDragLocation,
+  CurrentDragPositions,
   Position,
-  InitialDragLocation,
+  InitialDragPositions,
 } from '../types';
-import getInitialImpact from './get-initial-impact';
 import { add, subtract } from './position';
+import { noMovement } from './no-impact';
 import getDragImpact from './get-drag-impact/';
 import moveToNextIndex from './move-to-next-index/';
 import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
 import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';
 import moveCrossAxis from './move-cross-axis/';
+import { scrollDroppable } from './dimension';
 
 const noDimensions: DimensionState = {
   request: null,
@@ -47,17 +50,20 @@ const clean = memoizeOne((phase?: Phase = 'IDLE'): State => ({
 type MoveArgs = {|
   state: State,
   clientSelection: Position,
-  shouldAnimate?: boolean,
+  shouldAnimate: boolean,
   windowScroll ?: Position,
   // force a custom drag impact
   impact?: DragImpact,
 |}
 
+const canPublishDimension = (phase: Phase): boolean =>
+  ['IDLE', 'DROP_ANIMATING', 'DROP_COMPLETE'].indexOf(phase) === -1;
+
 // TODO: move into own file and write tests
 const move = ({
   state,
   clientSelection,
-  shouldAnimate = false,
+  shouldAnimate,
   windowScroll,
   impact,
 }: MoveArgs): State => {
@@ -66,19 +72,21 @@ const move = ({
     return clean();
   }
 
-  if (state.drag == null) {
+  const last: ?DragState = state.drag;
+
+  if (last == null) {
     console.error('cannot move if there is no drag information');
     return clean();
   }
 
-  const previous: CurrentDrag = state.drag.current;
-  const initial: InitialDrag = state.drag.initial;
+  const previous: CurrentDrag = last.current;
+  const initial: InitialDrag = last.initial;
   const currentWindowScroll: Position = windowScroll || previous.windowScroll;
 
-  const client: CurrentDragLocation = (() => {
+  const client: CurrentDragPositions = (() => {
     const offset: Position = subtract(clientSelection, initial.client.selection);
 
-    const result: CurrentDragLocation = {
+    const result: CurrentDragPositions = {
       offset,
       selection: clientSelection,
       center: add(offset, initial.client.center),
@@ -86,47 +94,62 @@ const move = ({
     return result;
   })();
 
-  const page: CurrentDragLocation = {
+  const page: CurrentDragPositions = {
     selection: add(client.selection, currentWindowScroll),
     offset: add(client.offset, currentWindowScroll),
     center: add(client.center, currentWindowScroll),
   };
 
   const current: CurrentDrag = {
-    id: previous.id,
-    type: previous.type,
-    isScrollAllowed: previous.isScrollAllowed,
     client,
     page,
     shouldAnimate,
     windowScroll: currentWindowScroll,
   };
 
-  const previousDroppableOverId: ?DroppableId = state.drag && state.drag.impact.destination
-    ? state.drag.impact.destination.droppableId
-    : null;
-
   const newImpact: DragImpact = (impact || getDragImpact({
     pageCenter: page.center,
-    draggable: state.dimension.draggable[current.id],
+    draggable: state.dimension.draggable[initial.descriptor.id],
     draggables: state.dimension.draggable,
     droppables: state.dimension.droppable,
-    previousDroppableOverId,
+    previousImpact: last.impact,
   }));
 
   const drag: DragState = {
     initial,
     impact: newImpact,
     current,
-    previous: {
-      droppableOverId: previousDroppableOverId,
-    },
   };
 
   return {
     ...state,
     drag,
   };
+};
+
+const updateStateAfterDimensionChange = (newState: State): State => {
+  // not dragging yet
+  if (newState.phase === 'COLLECTING_INITIAL_DIMENSIONS') {
+    return newState;
+  }
+
+  // not calculating movement if not in the DRAGGING phase
+  if (newState.phase !== 'DRAGGING') {
+    return newState;
+  }
+
+  // already dragging - need to recalculate impact
+  if (!newState.drag) {
+    console.error('cannot update a draggable dimension in an existing drag as there is invalid drag state');
+    return clean();
+  }
+
+  return move({
+    state: newState,
+    // use the existing values
+    clientSelection: newState.drag.current.client.selection,
+    shouldAnimate: newState.drag.current.shouldAnimate,
+  });
 };
 
 export default (state: State = clean('IDLE'), action: Action): State => {
@@ -144,110 +167,106 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
-    const typeId: TypeId = action.payload;
+    const id: DraggableId = action.payload;
 
     return {
-      phase: 'COLLECTING_DIMENSIONS',
+      phase: 'COLLECTING_INITIAL_DIMENSIONS',
       drag: null,
       drop: null,
       dimension: {
-        request: typeId,
+        request: id,
         draggable: {},
         droppable: {},
       },
     };
   }
 
-  if (action.type === 'PUBLISH_DRAGGABLE_DIMENSION') {
-    const dimension: DraggableDimension = action.payload;
+  if (action.type === 'PUBLISH_DRAGGABLE_DIMENSIONS') {
+    const dimensions: DraggableDimension[] = action.payload;
 
-    if (state.phase !== 'COLLECTING_DIMENSIONS') {
-      console.warn('dimension rejected as no longer requesting dimensions', dimension);
+    if (!canPublishDimension(state.phase)) {
+      console.warn('dimensions rejected as no longer allowing dimension capture in phase', state.phase);
       return state;
     }
 
-    if (state.dimension.draggable[dimension.id]) {
-      console.error(`dimension already exists for ${dimension.id}`);
-      return state;
-    }
+    const additions: DraggableDimensionMap = dimensions.reduce((previous, current) => {
+      previous[current.descriptor.id] = current;
+      return previous;
+    }, {});
 
-    return {
+    const newState: State = {
       ...state,
       dimension: {
         request: state.dimension.request,
         droppable: state.dimension.droppable,
         draggable: {
           ...state.dimension.draggable,
-          [dimension.id]: dimension,
+          ...additions,
         },
       },
     };
+
+    return updateStateAfterDimensionChange(newState);
   }
 
-  if (action.type === 'PUBLISH_DROPPABLE_DIMENSION') {
-    const dimension: DroppableDimension = action.payload;
+  if (action.type === 'PUBLISH_DROPPABLE_DIMENSIONS') {
+    const dimensions: DroppableDimension[] = action.payload;
 
-    if (state.phase !== 'COLLECTING_DIMENSIONS') {
-      console.warn('dimension rejected as no longer requesting dimensions', dimension);
+    if (!canPublishDimension(state.phase)) {
+      console.warn('dimensions rejected as no longer allowing dimension capture in phase', state.phase);
       return state;
     }
 
-    if (state.dimension.droppable[dimension.id]) {
-      console.error(`dimension already exists for ${dimension.id}`);
-      return state;
-    }
+    const additions: DroppableDimensionMap = dimensions.reduce((previous, current) => {
+      previous[current.descriptor.id] = current;
+      return previous;
+    }, {});
 
-    return {
+    const newState: State = {
       ...state,
       dimension: {
         request: state.dimension.request,
         draggable: state.dimension.draggable,
         droppable: {
           ...state.dimension.droppable,
-          [dimension.id]: dimension,
+          ...additions,
         },
       },
     };
+
+    return updateStateAfterDimensionChange(newState);
   }
 
   if (action.type === 'COMPLETE_LIFT') {
-    if (state.phase !== 'COLLECTING_DIMENSIONS') {
+    if (state.phase !== 'COLLECTING_INITIAL_DIMENSIONS') {
       console.error('trying complete lift without collecting dimensions');
       return state;
     }
 
-    const { id, type, client, windowScroll, isScrollAllowed } = action.payload;
-    const draggables: DraggableDimensionMap = state.dimension.draggable;
-    const draggable: DraggableDimension = state.dimension.draggable[id];
-    const droppable: DroppableDimension = state.dimension.droppable[draggable.droppableId];
-    const page: InitialDragLocation = {
+    const { id, client, windowScroll, isScrollAllowed } = action.payload;
+    const page: InitialDragPositions = {
       selection: add(client.selection, windowScroll),
       center: add(client.center, windowScroll),
     };
 
-    const impact: ?DragImpact = getInitialImpact({
-      draggable,
-      droppable,
-      draggables,
-    });
+    const draggable: ?DraggableDimension = state.dimension.draggable[id];
 
-    if (!impact || !impact.destination) {
-      console.error('invalid lift state');
+    if (!draggable) {
+      console.error('could not find draggable in store after lift');
       return clean();
     }
 
-    const source: DraggableLocation = impact.destination;
+    const descriptor: DraggableDescriptor = draggable.descriptor;
 
     const initial: InitialDrag = {
-      source,
+      descriptor,
+      isScrollAllowed,
       client,
       page,
       windowScroll,
     };
 
     const current: CurrentDrag = {
-      id,
-      type,
       client: {
         selection: client.selection,
         center: client.center,
@@ -259,8 +278,27 @@ export default (state: State = clean('IDLE'), action: Action): State => {
         offset: origin,
       },
       windowScroll,
-      isScrollAllowed,
       shouldAnimate: false,
+    };
+
+    // Calculate initial impact
+
+    const home: ?DroppableDimension = state.dimension.droppable[descriptor.droppableId];
+
+    if (!home) {
+      console.error('Cannot find home dimension for initial lift');
+      return clean();
+    }
+
+    const destination: DraggableLocation = {
+      index: descriptor.index,
+      droppableId: descriptor.droppableId,
+    };
+
+    const impact: DragImpact = {
+      movement: noMovement,
+      direction: home.axis.direction,
+      destination,
     };
 
     return {
@@ -289,7 +327,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     // We do not store whether we are dragging with a keyboard in the state but this flag
     // does this trick. Ideally this check would not exist.
     // Kill the drag instantly
-    if (!state.drag.current.isScrollAllowed) {
+    if (!state.drag.initial.isScrollAllowed) {
       return clean();
     }
 
@@ -298,25 +336,13 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const target: ?DroppableDimension = state.dimension.droppable[id];
 
     if (!target) {
-      console.error('cannot update a droppable that is not inside of the state', id);
-      return clean();
+      console.warn('cannot update scroll for droppable as it has not yet been collected');
+      return state;
     }
 
-    // TODO: do not break an existing dimension.
-    // Rather, have a different structure to store the scroll
-    // $ExpectError - flow does not like spread
-    const dimension: DroppableDimension = {
-      ...target,
-      container: {
-        ...target.container,
-        scroll: {
-          ...target.container.scroll,
-          current: offset,
-        },
-      },
-    };
+    const dimension: DroppableDimension = scrollDroppable(target, offset);
 
-    const withUpdatedDimension: State = {
+    const newState: State = {
       ...state,
       dimension: {
         request: state.dimension.request,
@@ -328,10 +354,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       },
     };
 
-    return move({
-      state: withUpdatedDimension,
-      clientSelection: state.drag.current.client.selection,
-    });
+    return updateStateAfterDimensionChange(newState);
   }
 
   if (action.type === 'UPDATE_DROPPABLE_DIMENSION_IS_ENABLED') {
@@ -343,8 +366,8 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const target = state.dimension.droppable[id];
 
     if (!target) {
-      console.error('cannot update enabled flag on droppable that does not have a dimension');
-      return clean();
+      console.warn('cannot update enabled state for droppable as it has not yet been collected');
+      return state;
     }
 
     if (target.isEnabled === isEnabled) {
@@ -357,7 +380,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       isEnabled,
     };
 
-    return {
+    const result: State = {
       ...state,
       dimension: {
         ...state.dimension,
@@ -367,6 +390,8 @@ export default (state: State = clean('IDLE'), action: Action): State => {
         },
       },
     };
+
+    return updateStateAfterDimensionChange(result);
   }
 
   if (action.type === 'MOVE') {
@@ -375,6 +400,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       state,
       clientSelection: client,
       windowScroll,
+      shouldAnimate: false,
     });
   }
 
@@ -390,6 +416,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       state,
       clientSelection: state.drag.current.client.selection,
       windowScroll,
+      shouldAnimate: false,
     });
   }
 
@@ -418,10 +445,10 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
     const result: ?MoveToNextResult = moveToNextIndex({
       isMovingForward,
-      draggableId: existing.current.id,
-      impact: existing.impact,
+      draggableId: existing.initial.descriptor.id,
       droppable,
       draggables: state.dimension.draggable,
+      previousImpact: existing.impact,
     });
 
     // cannot move anyway (at the beginning or end of a list)
@@ -458,10 +485,14 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     }
 
     const current: CurrentDrag = state.drag.current;
-    const draggableId: DraggableId = current.id;
+    const descriptor: DraggableDescriptor = state.drag.initial.descriptor;
+    const draggableId: DraggableId = descriptor.id;
     const center: Position = current.page.center;
     const droppableId: DroppableId = state.drag.impact.destination.droppableId;
-    const home: DraggableLocation = state.drag.initial.source;
+    const home: DraggableLocation = {
+      index: descriptor.index,
+      droppableId: descriptor.droppableId,
+    };
 
     const result: ?MoveCrossAxisResult = moveCrossAxis({
       isMovingForward: action.type === 'CROSS_AXIS_MOVE_FORWARD',
@@ -471,6 +502,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       home,
       draggables: state.dimension.draggable,
       droppables: state.dimension.droppable,
+      previousImpact: state.drag.impact,
     });
 
     if (!result) {

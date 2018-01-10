@@ -2,6 +2,7 @@
 import getBestCrossAxisDroppable from './get-best-cross-axis-droppable';
 import getClosestDraggable from './get-closest-draggable';
 import moveToNewDroppable from './move-to-new-droppable/';
+import noImpact from '../no-impact';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import type { Result } from './move-cross-axis-types';
 import type {
@@ -13,6 +14,7 @@ import type {
   DraggableDimensionMap,
   DroppableDimensionMap,
   DraggableLocation,
+  DragImpact,
 } from '../../types';
 
 type Args = {|
@@ -28,6 +30,8 @@ type Args = {|
   // all the dimensions in the system
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
+  // any previous impact
+  previousImpact: ?DragImpact,
 |}
 
 export default ({
@@ -38,6 +42,7 @@ export default ({
   home,
   draggables,
   droppables,
+  previousImpact,
 }: Args): ?Result => {
   const draggable: DraggableDimension = draggables[draggableId];
   const source: DroppableDimension = droppables[droppableId];
@@ -80,5 +85,6 @@ export default ({
     target,
     insideDestination,
     home,
+    previousImpact: previousImpact || noImpact,
   });
 };

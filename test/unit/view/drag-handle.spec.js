@@ -6,7 +6,7 @@ import type { ReactWrapper } from 'enzyme';
 import DragHandle from '../../../src/view/drag-handle/drag-handle';
 import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
 // eslint-disable-next-line no-duplicate-imports
-import type { Callbacks, Provided } from '../../../src/view/drag-handle/drag-handle-types';
+import type { Callbacks, DragHandleProps } from '../../../src/view/drag-handle/drag-handle-types';
 import {
   dispatchWindowMouseEvent,
   dispatchWindowKeyDownEvent,
@@ -21,9 +21,10 @@ import * as keyCodes from '../../../src/view/key-codes';
 import getWindowScrollPosition from '../../../src/view/get-window-scroll-position';
 import setWindowScroll from '../../utils/set-window-scroll';
 import forceUpdate from '../../utils/force-update';
-import getClientRect from '../../../src/state/get-client-rect';
+import getArea from '../../../src/state/get-area';
 import { timeForLongPress, forcePressThreshold } from '../../../src/view/drag-handle/sensor/create-touch-sensor';
 import { interactiveTagNames } from '../../../src/view/drag-handle/util/should-allow-dragging-from-target';
+import { styleContextKey, canLiftContextKey } from '../../../src/view/context-keys';
 
 const primaryButton: number = 0;
 const auxiliaryButton: number = 1;
@@ -83,7 +84,7 @@ const getCallbackCalls = (callbacks: Callbacks) =>
     [key]: callbacks[key].mock.calls.length,
   }), {});
 
-class Child extends Component<{ dragHandleProps: ?Provided}> {
+class Child extends Component<{ dragHandleProps: ?DragHandleProps}> {
   render() {
     return (
       <div {...this.props.dragHandleProps}>
@@ -147,9 +148,14 @@ describe('drag handle', () => {
     y: 80,
   };
 
+  const basicContext = {
+    [styleContextKey]: 'hello',
+    [canLiftContextKey]: () => true,
+  };
+
   beforeAll(() => {
     requestAnimationFrame.reset();
-    jest.spyOn(fakeDraggableRef, 'getBoundingClientRect').mockImplementation(() => getClientRect({
+    jest.spyOn(fakeDraggableRef, 'getBoundingClientRect').mockImplementation(() => getArea({
       left: 0,
       top: 0,
       right: fakeCenter.x * 2,
@@ -166,14 +172,14 @@ describe('drag handle', () => {
         direction="vertical"
         isDragging={false}
         isEnabled
-        canLift
         getDraggableRef={() => fakeDraggableRef}
         canDragInteractiveElements={false}
       >
-        {(dragHandleProps: ?Provided) => (
+        {(dragHandleProps: ?DragHandleProps) => (
           <Child dragHandleProps={dragHandleProps} />
         )}
       </DragHandle>,
+      { context: basicContext }
     );
   });
 
@@ -185,6 +191,30 @@ describe('drag handle', () => {
   afterAll(() => {
     requestAnimationFrame.reset();
     fakeDraggableRef.getBoundingClientRect.mockRestore();
+  });
+
+  it('should apply the style context to a data-attribute', () => {
+    const myMock = jest.fn();
+    myMock.mockReturnValue(<div>hello world</div>);
+
+    mount(
+      <DragHandle
+        callbacks={callbacks}
+        isEnabled
+        isDragging={false}
+        direction={null}
+        getDraggableRef={() => fakeDraggableRef}
+        canDragInteractiveElements={false}
+      >
+        {(dragHandleProps: ?DragHandleProps) => (
+          myMock(dragHandleProps)
+        )}
+      </DragHandle>,
+      { context: basicContext }
+    );
+
+    // $ExpectError - using lots of accessors
+    expect(myMock.mock.calls[0][0]['data-react-beautiful-dnd-drag-handle']).toEqual(basicContext[styleContextKey]);
   });
 
   describe('mouse dragging', () => {
@@ -204,15 +234,15 @@ describe('drag handle', () => {
               callbacks={customCallbacks}
               isDragging={false}
               isEnabled
-              canLift
               direction={null}
               getDraggableRef={() => fakeDraggableRef}
               canDragInteractiveElements={false}
             >
-              {(dragHandleProps: ?Provided) => (
+              {(dragHandleProps: ?DragHandleProps) => (
                 <Child dragHandleProps={dragHandleProps} />
               )}
             </DragHandle>,
+            { context: basicContext }
           );
 
           mouseDown(customWrapper, origin);
@@ -257,10 +287,9 @@ describe('drag handle', () => {
         })).toBe(true);
       });
 
-      it('should not start a drag if cannot lift', () => {
-        wrapper.setProps({
-          canLift: false,
-        });
+      it('should not start a drag if another sensor is capturing', () => {
+        // will now be capturing
+        touchStart(wrapper);
 
         // lift
         mouseDown(wrapper);
@@ -1073,11 +1102,11 @@ describe('drag handle', () => {
         expect(wasEventStopped(mockEvent)).toBe(true);
       });
 
-      it('should not lift if told it cannot lift', () => {
-        wrapper.setProps({
-          canLift: false,
-        });
+      it('should not lift if another sensor is capturing', () => {
+        // stealing the capture
+        touchStart(wrapper);
 
+        // would normally start a drag
         pressSpacebar(wrapper);
 
         expect(callbacksCalled(callbacks)({
@@ -1139,15 +1168,15 @@ describe('drag handle', () => {
             callbacks={customCallbacks}
             isDragging={false}
             isEnabled
-            canLift
             direction="vertical"
             getDraggableRef={() => fakeDraggableRef}
             canDragInteractiveElements={false}
           >
-            {(dragHandleProps: ?Provided) => (
+            {(dragHandleProps: ?DragHandleProps) => (
               <Child dragHandleProps={dragHandleProps} />
             )}
           </DragHandle>,
+          { context: basicContext }
         );
 
         pressSpacebar(customWrapper);
@@ -1164,15 +1193,15 @@ describe('drag handle', () => {
             callbacks={customCallbacks}
             isDragging={false}
             isEnabled
-            canLift
             direction={null}
             getDraggableRef={() => fakeDraggableRef}
             canDragInteractiveElements={false}
           >
-            {(dragHandleProps: ?Provided) => (
+            {(dragHandleProps: ?DragHandleProps) => (
               <Child dragHandleProps={dragHandleProps} />
             )}
           </DragHandle>,
+          { context: basicContext }
         );
 
         // lift - all good
@@ -1249,14 +1278,14 @@ describe('drag handle', () => {
               direction="horizontal"
               isDragging={false}
               isEnabled
-              canLift
               getDraggableRef={() => fakeDraggableRef}
               canDragInteractiveElements={false}
             >
-              {(dragHandleProps: ?Provided) => (
+              {(dragHandleProps: ?DragHandleProps) => (
                 <Child dragHandleProps={dragHandleProps} />
               )}
             </DragHandle>,
+            { context: basicContext }
           );
         });
 
@@ -2130,15 +2159,15 @@ describe('drag handle', () => {
           callbacks={callbacks}
           isEnabled={false}
           isDragging={false}
-          canLift
           direction={null}
           getDraggableRef={() => fakeDraggableRef}
           canDragInteractiveElements={false}
         >
-          {(dragHandleProps: ?Provided) => (
+          {(dragHandleProps: ?DragHandleProps) => (
             mock(dragHandleProps)
           )}
         </DragHandle>,
+        { context: basicContext }
       );
 
       expect(mock).toHaveBeenCalledWith(null);
@@ -2356,6 +2385,40 @@ describe('drag handle', () => {
           });
         });
 
+        describe('something else already dragging', () => {
+          it('should not start a drag if something else is already dragging in the system', () => {
+            const customContext = {
+              ...basicContext,
+              // faking a 'false' response
+              [canLiftContextKey]: () => false,
+            };
+            const customCallbacks = getStubCallbacks();
+            const customWrapper = mount(
+              <DragHandle
+                callbacks={customCallbacks}
+                isDragging={false}
+                isEnabled
+                direction={null}
+                getDraggableRef={() => fakeDraggableRef}
+                canDragInteractiveElements={false}
+              >
+                {(dragHandleProps: ?DragHandleProps) => (
+                  <Child dragHandleProps={dragHandleProps} />
+                )}
+              </DragHandle>,
+              { context: customContext }
+            );
+
+            control.preLift();
+            control.lift();
+            control.end(customWrapper);
+
+            expect(callbacksCalled(customCallbacks)({
+              onLift: 0,
+            })).toBe(true);
+          });
+        });
+
         describe('contenteditable interactions', () => {
           describe('interactive interactions are blocked', () => {
             it('should block the drag if the drag handle is itself contenteditable', () => {
@@ -2365,18 +2428,18 @@ describe('drag handle', () => {
                   callbacks={customCallbacks}
                   isDragging={false}
                   isEnabled
-                  canLift
                   direction={null}
                   getDraggableRef={() => fakeDraggableRef}
                   canDragInteractiveElements={false}
                 >
-                  {(dragHandleProps: ?Provided) => (
+                  {(dragHandleProps: ?DragHandleProps) => (
                     <div
                       {...dragHandleProps}
                       contentEditable
                     />
                   )}
                 </DragHandle>,
+                { context: basicContext }
               );
               const target = customWrapper.getDOMNode();
               const options = {
@@ -2399,12 +2462,11 @@ describe('drag handle', () => {
                   callbacks={customCallbacks}
                   isDragging={false}
                   isEnabled
-                  canLift
                   direction={null}
                   getDraggableRef={() => fakeDraggableRef}
                   canDragInteractiveElements={false}
                 >
-                  {(dragHandleProps: ?Provided) => (
+                  {(dragHandleProps: ?DragHandleProps) => (
                     <div {...dragHandleProps}>
                       <div
                         className="editable"
@@ -2413,6 +2475,7 @@ describe('drag handle', () => {
                     </div>
                   )}
                 </DragHandle>,
+                { context: basicContext }
               );
               const target = customWrapper.getDOMNode().querySelector('.editable');
               if (!target) {
@@ -2436,12 +2499,11 @@ describe('drag handle', () => {
                   callbacks={customCallbacks}
                   isDragging={false}
                   isEnabled
-                  canLift
                   direction={null}
                   getDraggableRef={() => fakeDraggableRef}
                   canDragInteractiveElements={false}
                 >
-                  {(dragHandleProps: ?Provided) => (
+                  {(dragHandleProps: ?DragHandleProps) => (
                     <div {...dragHandleProps}>
                       <div
                         className="editable"
@@ -2453,6 +2515,7 @@ describe('drag handle', () => {
                     </div>
                   )}
                 </DragHandle>,
+                { context: basicContext }
               );
               const target = customWrapper.getDOMNode().querySelector('.target');
               if (!target) {
@@ -2478,12 +2541,11 @@ describe('drag handle', () => {
                   callbacks={customCallbacks}
                   isDragging={false}
                   isEnabled
-                  canLift
                   direction={null}
                   getDraggableRef={() => fakeDraggableRef}
                   canDragInteractiveElements={false}
                 >
-                  {(dragHandleProps: ?Provided) => (
+                  {(dragHandleProps: ?DragHandleProps) => (
                     <div {...dragHandleProps}>
                       <div
                         className="editable"
@@ -2495,6 +2557,7 @@ describe('drag handle', () => {
                     </div>
                   )}
                 </DragHandle>,
+                { context: basicContext }
               );
               const target = customWrapper.getDOMNode().querySelector('.target');
               if (!target) {
@@ -2523,13 +2586,12 @@ describe('drag handle', () => {
                   callbacks={customCallbacks}
                   isDragging={false}
                   isEnabled
-                  canLift
                   direction={null}
                   getDraggableRef={() => fakeDraggableRef}
                   // stating that we can drag
                   canDragInteractiveElements
                 >
-                  {(dragHandleProps: ?Provided) => (
+                  {(dragHandleProps: ?DragHandleProps) => (
                     <div {...dragHandleProps}>
                       <div
                         className="editable"
@@ -2538,6 +2600,7 @@ describe('drag handle', () => {
                     </div>
                   )}
                 </DragHandle>,
+                { context: basicContext }
               );
               const target = customWrapper.getDOMNode().querySelector('.editable');
               if (!target) {
@@ -2564,13 +2627,12 @@ describe('drag handle', () => {
                   callbacks={customCallbacks}
                   isDragging={false}
                   isEnabled
-                  canLift
                   direction={null}
                   getDraggableRef={() => fakeDraggableRef}
                   // stating that we can drag
                   canDragInteractiveElements
                 >
-                  {(dragHandleProps: ?Provided) => (
+                  {(dragHandleProps: ?DragHandleProps) => (
                     <div {...dragHandleProps}>
                       <div
                         className="editable"
@@ -2582,6 +2644,7 @@ describe('drag handle', () => {
                     </div>
                   )}
                 </DragHandle>,
+                { context: basicContext }
               );
               const target = customWrapper.getDOMNode().querySelector('.target');
               if (!target) {

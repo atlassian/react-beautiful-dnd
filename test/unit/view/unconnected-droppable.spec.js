@@ -5,7 +5,7 @@ import { mount } from 'enzyme';
 import type { ReactWrapper } from 'enzyme';
 import Droppable from '../../../src/view/droppable/droppable';
 import Placeholder from '../../../src/view/placeholder/';
-import { withStore } from '../../utils/get-context-options';
+import { withStore, combine, withDimensionMarshal } from '../../utils/get-context-options';
 import { getPreset } from '../../utils/dimension';
 import type { DroppableId, DraggableDimension } from '../../../src/types';
 import type { MapProps, OwnProps, Provided, StateSnapshot } from '../../../src/view/droppable/droppable-types';
@@ -65,8 +65,9 @@ const mountDroppable = ({
     {(provided: Provided, snapshot: StateSnapshot) => (
       <WrappedComponent provided={provided} snapshot={snapshot} />
     )}
-  </Droppable>
-  , withStore());
+  </Droppable>,
+  combine(withStore(), withDimensionMarshal())
+);
 
 describe('Droppable - unconnected', () => {
   describe('dragging over home droppable', () => {

@@ -1,16 +1,20 @@
 // @flow
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import type {
   Props,
-  Provided,
+  DragHandleProps,
 } from './drag-handle-types';
 import type {
   Sensor,
   MouseSensor,
   KeyboardSensor,
   TouchSensor,
+  CreateSensorArgs,
 } from './sensor/sensor-types';
+import { styleContextKey, canLiftContextKey } from '../context-keys';
+import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-target';
 import createMouseSensor from './sensor/create-mouse-sensor';
 import createKeyboardSensor from './sensor/create-keyboard-sensor';
 import createTouchSensor from './sensor/create-touch-sensor';
@@ -19,23 +23,47 @@ const getFalse: () => boolean = () => false;
 
 export default class DragHandle extends Component<Props> {
   /* eslint-disable react/sort-comp */
-  mouseSensor: MouseSensor = createMouseSensor(
-    this.props.callbacks,
-    this.props.getDraggableRef
-  );
-  keyboardSensor: KeyboardSensor = createKeyboardSensor(
-    this.props.callbacks,
-    this.props.getDraggableRef
-  );
-  touchSensor: TouchSensor = createTouchSensor(
-    this.props.callbacks,
-    this.props.getDraggableRef
-  );
-  sensors: Sensor[] = [
-    this.mouseSensor,
-    this.keyboardSensor,
-    this.touchSensor,
-  ];
+  mouseSensor: MouseSensor;
+  keyboardSensor: KeyboardSensor;
+  touchSensor: TouchSensor;
+  sensors: Sensor[];
+  styleContext: string;
+  canLift: () => boolean;
+
+  // Need to declare contextTypes without flow
+  // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
+  static contextTypes = {
+    [styleContextKey]: PropTypes.string.isRequired,
+    [canLiftContextKey]: PropTypes.func.isRequired,
+  }
+
+  constructor(props: Props, context: Object) {
+    super(props, context);
+
+    const args: CreateSensorArgs = {
+      callbacks: this.props.callbacks,
+      getDraggableRef: this.props.getDraggableRef,
+      canStartCapturing: this.canStartCapturing,
+    };
+
+    this.mouseSensor = createMouseSensor(args);
+    this.keyboardSensor = createKeyboardSensor(args);
+    this.touchSensor = createTouchSensor(args);
+    this.sensors = [
+      this.mouseSensor,
+      this.keyboardSensor,
+      this.touchSensor,
+    ];
+    this.styleContext = context[styleContextKey];
+
+    // The canLift function is read directly off the context
+    // and will communicate with the store. This is done to avoid
+    // needing to query a property from the store and re-render this component
+    // with that value. By putting it as a function on the context we are able
+    // to avoid re-rendering to pass this information while still allowing
+    // drag-handles to obtain this state if they need it.
+    this.canLift = context[canLiftContextKey];
+  }
 
   componentWillUnmount() {
     this.sensors.forEach((sensor: Sensor) => {
@@ -107,7 +135,7 @@ export default class DragHandle extends Component<Props> {
       return;
     }
 
-    this.mouseSensor.onMouseDown(event, this.props);
+    this.mouseSensor.onMouseDown(event);
   }
 
   onTouchStart = (event: TouchEvent) => {
@@ -117,7 +145,7 @@ export default class DragHandle extends Component<Props> {
       return;
     }
 
-    this.touchSensor.onTouchStart(event, this.props);
+    this.touchSensor.onTouchStart(event);
   }
 
   onTouchMove = (event: TouchEvent) => {
@@ -130,18 +158,33 @@ export default class DragHandle extends Component<Props> {
     this.touchSensor.onClick(event);
   }
 
-  isAnySensorDragging = () =>
+  canStartCapturing = (event: Event) => {
+    // this might be before a drag has started - isolated to this element
+    if (this.isAnySensorCapturing()) {
+      return false;
+    }
+
+    // this will check if anything else in the system is dragging
+    if (!this.canLift()) {
+      return false;
+    }
+
+    // check if we are dragging an interactive element
+    return shouldAllowDraggingFromTarget(event, this.props);
+  }
+
+  isAnySensorDragging = (): boolean =>
     this.sensors.some((sensor: Sensor) => sensor.isDragging())
 
-  isAnySensorCapturing = () =>
+  isAnySensorCapturing = (): boolean =>
     this.sensors.some((sensor: Sensor) => sensor.isCapturing())
 
-  getProvided = memoizeOne((isEnabled: boolean, isDragging: boolean): ?Provided => {
+  getProvided = memoizeOne((isEnabled: boolean, isDragging: boolean): ?DragHandleProps => {
     if (!isEnabled) {
       return null;
     }
 
-    const provided: Provided = {
+    const provided: DragHandleProps = {
       onMouseDown: this.onMouseDown,
       onKeyDown: this.onKeyDown,
       onTouchStart: this.onTouchStart,
@@ -149,6 +192,7 @@ export default class DragHandle extends Component<Props> {
       onClick: this.onClick,
       tabIndex: 0,
       'aria-grabbed': isDragging,
+      'data-react-beautiful-dnd-drag-handle': this.styleContext,
       draggable: false,
       onDragStart: getFalse,
       onDrop: getFalse,

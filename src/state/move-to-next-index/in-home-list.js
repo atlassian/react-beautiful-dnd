@@ -1,18 +1,21 @@
 // @flow
 import memoizeOne from 'memoize-one';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { isPointWithinDroppable } from '../is-within-visible-bounds-of-droppable';
 import { patch } from '../position';
+import isVisibleInNewLocation from './is-visible-in-new-location';
+import getViewport from '../visibility/get-viewport';
 import moveToEdge from '../move-to-edge';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
+import getDisplacement from '../get-displacement';
 import type {
   DraggableLocation,
   DraggableDimension,
   Position,
-  DraggableId,
+  Displacement,
   Axis,
   DragImpact,
+  Area,
 } from '../../types';
 
 const getIndex = memoizeOne(
@@ -24,16 +27,17 @@ const getIndex = memoizeOne(
 export default ({
   isMovingForward,
   draggableId,
-  impact,
+  previousImpact,
   droppable,
   draggables,
 }: Args): ?Result => {
-  if (!impact.destination) {
+  const location: ?DraggableLocation = previousImpact.destination;
+
+  if (!location) {
     console.error('cannot move to next index when there is not previous destination');
     return null;
   }
 
-  const location: DraggableLocation = impact.destination;
   const draggable: DraggableDimension = draggables[draggableId];
   const axis: Axis = droppable.axis;
 
@@ -82,31 +86,57 @@ export default ({
     destinationAxis: droppable.axis,
   });
 
-  // Currently not supporting moving a draggable outside the visibility bounds of a droppable
-  const isVisible: boolean = isPointWithinDroppable(droppable)(newCenter);
+  const viewport: Area = getViewport();
+
+  const isVisible: boolean = isVisibleInNewLocation({
+    draggable,
+    destination: droppable,
+    newCenter,
+    viewport,
+  });
 
   if (!isVisible) {
     return null;
   }
 
   // Calculate DragImpact
+  // at this point we know that the destination is droppable
+  const destinationDisplacement: Displacement = {
+    draggableId: destination.descriptor.id,
+    isVisible: true,
+    shouldAnimate: true,
+  };
 
-  // List is sorted where the items closest to where the draggable is currently go first
-  const moved: DraggableId[] = isMovingTowardStart ?
+  const modified: Displacement[] = (isMovingTowardStart ?
     // remove the most recently impacted
-    impact.movement.draggables.slice(1, impact.movement.draggables.length) :
+    previousImpact.movement.displaced.slice(1, previousImpact.movement.displaced.length) :
     // add the destination as the most recently impacted
-    [destination.id, ...impact.movement.draggables];
+    [destinationDisplacement, ...previousImpact.movement.displaced]);
+
+  // update impact with visibility - stops redundant work!
+  const displaced: Displacement[] = modified
+    .map((displacement: Displacement): Displacement => {
+      const target: DraggableDimension = draggables[displacement.draggableId];
+
+      const updated: Displacement = getDisplacement({
+        draggable: target,
+        destination: droppable,
+        previousImpact,
+        viewport,
+      });
+
+      return updated;
+    });
 
   const newImpact: DragImpact = {
     movement: {
-      draggables: moved,
+      displaced,
       // The amount of movement will always be the size of the dragging item
       amount: patch(axis.line, draggable.page.withMargin[axis.size]),
       isBeyondStartPosition: proposedIndex > startIndex,
     },
     destination: {
-      droppableId: droppable.id,
+      droppableId: droppable.descriptor.id,
       index: proposedIndex,
     },
     direction: droppable.axis.direction,
