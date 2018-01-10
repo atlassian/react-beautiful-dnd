@@ -7,9 +7,7 @@ import getViewport from '../visibility/get-viewport';
 import isVisibleInNewLocation from './is-visible-in-new-location';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
-import type
-
-{
+import type {
   DraggableLocation,
   DraggableDimension,
   Position,
