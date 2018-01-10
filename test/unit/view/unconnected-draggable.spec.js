@@ -9,8 +9,11 @@ import DragHandle from '../../../src/view/drag-handle/drag-handle';
 import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
 import Moveable from '../../../src/view/moveable/';
 import Placeholder from '../../../src/view/placeholder';
-import { css } from '../../../src/view/animation';
 import { add, subtract } from '../../../src/state/position';
+import createStyleMarshal from '../../../src/view/style-marshal/style-marshal';
+import type { StyleMarshal } from '../../../src/view/style-marshal/style-marshal-types';
+import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
+import type { DimensionMarshal } from '../../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
   OwnProps,
   MapProps,
@@ -23,14 +26,15 @@ import type {
 import type {
   Position,
   DraggableDimension,
+  DroppableDimension,
   DraggableId,
   DroppableId,
   TypeId,
-  InitialDragLocation,
+  InitialDragPositions,
 } from '../../../src/types';
-import { getDraggableDimension } from '../../../src/state/dimension';
-import getClientRect from '../../../src/state/get-client-rect';
-import { combine, withStore, withDroppableId } from '../../utils/get-context-options';
+import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
+import getArea from '../../../src/state/get-area';
+import { combine, withStore, withDroppableId, withStyleContext, withDimensionMarshal, withCanLift } from '../../utils/get-context-options';
 import { dispatchWindowMouseEvent, mouseEvent } from '../../utils/user-input-util';
 import setWindowScroll from '../../utils/set-window-scroll';
 import getWindowScrollPosition from '../../../src/view/get-window-scroll-position';
@@ -43,7 +47,7 @@ class Item extends Component<{ provided: Provided }> {
       <div
         className="item"
         ref={ref => provided.innerRef(ref)}
-        style={provided.draggableStyle}
+        {...provided.draggableProps}
         {...provided.dragHandleProps}
       >
         Hello there!
@@ -57,10 +61,26 @@ const droppableId: DroppableId = 'droppable1';
 const type: TypeId = 'ITEM';
 const origin: Position = { x: 0, y: 0 };
 
+const droppable: DroppableDimension = getDroppableDimension({
+  descriptor: {
+    id: droppableId,
+    type,
+  },
+  client: getArea({
+    top: 0,
+    right: 100,
+    bottom: 200,
+    left: 0,
+  }),
+});
+
 const dimension: DraggableDimension = getDraggableDimension({
-  id: draggableId,
-  droppableId,
-  clientRect: getClientRect({
+  descriptor: {
+    id: draggableId,
+    droppableId,
+    index: 0,
+  },
+  client: getArea({
     top: 0,
     right: 100,
     bottom: 100,
@@ -96,62 +116,47 @@ const disabledOwnProps: OwnProps = {
 };
 
 const defaultMapProps: MapProps = {
-  isDropAnimating: false,
   isDragging: false,
-  canLift: true,
-  canAnimate: true,
+  isDropAnimating: false,
+  shouldAnimateDragMovement: false,
+  shouldAnimateDisplacement: true,
   offset: origin,
   dimension: null,
   direction: null,
 };
 
-const somethingElseDraggingMapProps: MapProps = {
-  isDropAnimating: false,
-  isDragging: false,
-  canLift: false,
-  canAnimate: true,
-  offset: origin,
-  dimension: null,
-  direction: null,
-};
+const somethingElseDraggingMapProps: MapProps = defaultMapProps;
 
 const draggingMapProps: MapProps = {
-  isDropAnimating: false,
   isDragging: true,
-  canLift: false,
-  canAnimate: false,
-  dimension,
+  isDropAnimating: false,
+  shouldAnimateDragMovement: false,
+  shouldAnimateDisplacement: false,
   offset: { x: 75, y: 75 },
   // this may or may not be set during a drag
+  dimension,
   direction: null,
+
 };
 
 const dropAnimatingMapProps: MapProps = {
   isDragging: false,
   isDropAnimating: true,
-  canAnimate: true,
-  // cannot lift while dropping
-  canLift: false,
-  dimension,
   offset: { x: 75, y: 75 },
+  shouldAnimateDisplacement: false,
+  shouldAnimateDragMovement: false,
+  dimension,
   direction: null,
 };
 
-const dropCompleteMapProps: MapProps = {
-  offset: origin,
-  canLift: true,
-  isDropAnimating: false,
-  isDragging: false,
-  canAnimate: false,
-  dimension: null,
-  direction: null,
-};
+const dropCompleteMapProps: MapProps = defaultMapProps;
 
 type MountConnected = {|
   ownProps?: OwnProps,
   mapProps?: MapProps,
   dispatchProps?: DispatchProps,
-  WrappedComponent?: any,
+  WrappedComponent ?: any,
+  styleMarshal?: StyleMarshal,
 |};
 
 const mountDraggable = ({
@@ -159,18 +164,44 @@ const mountDraggable = ({
   mapProps = defaultMapProps,
   dispatchProps = getDispatchPropsStub(),
   WrappedComponent = Item,
-}: MountConnected = {}): ReactWrapper => mount(
-  // $ExpectError - using spread for props
-  <Draggable
-    {...ownProps}
-    {...mapProps}
-    {...dispatchProps}
-  >
-    {(provided: Provided, snapshot: StateSnapshot) => (
-      <WrappedComponent provided={provided} snapshot={snapshot} />
-    )}
-  </Draggable>
-  , combine(withStore(), withDroppableId(droppableId)));
+  styleMarshal,
+}: MountConnected = {}): ReactWrapper => {
+  // registering the droppable so that publishing the dimension will work correctly
+  const dimensionMarshal: DimensionMarshal = createDimensionMarshal({
+    cancel: () => { },
+    publishDraggables: () => { },
+    publishDroppables: () => { },
+    updateDroppableScroll: () => { },
+    updateDroppableIsEnabled: () => { },
+  });
+
+  dimensionMarshal.registerDroppable(droppable.descriptor, {
+    getDimension: () => droppable,
+    watchScroll: () => { },
+    unwatchScroll: () => { },
+  });
+
+  const wrapper: ReactWrapper = mount(
+    // $ExpectError - using spread for props
+    <Draggable
+      {...ownProps}
+      {...mapProps}
+      {...dispatchProps}
+    >
+      {(provided: Provided, snapshot: StateSnapshot) => (
+        <WrappedComponent provided={provided} snapshot={snapshot} />
+      )}
+    </Draggable>
+    , combine(
+      withStore(),
+      withDroppableId(droppableId),
+      withStyleContext(styleMarshal),
+      withDimensionMarshal(dimensionMarshal),
+      withCanLift(),
+    ));
+
+  return wrapper;
+};
 
 const mouseDown = mouseEvent.bind(null, 'mousedown');
 const windowMouseMove = dispatchWindowMouseEvent.bind(null, 'mousemove');
@@ -184,9 +215,9 @@ type StartDrag = {|
   isScrollAllowed?: boolean,
 |}
 
-const stubClientRect = (center?: Position = origin): void =>
+const stubArea = (center?: Position = origin): void =>
   // $ExpectError
-  jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => getClientRect({
+  jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => getArea({
     left: 0,
     top: 0,
     right: center.x * 2,
@@ -200,28 +231,9 @@ const executeOnLift = (wrapper: ReactWrapper) => ({
   isScrollAllowed = false,
 }: StartDrag = {}) => {
   setWindowScroll(windowScroll);
-  stubClientRect(center);
+  stubArea(center);
 
   wrapper.find(DragHandle).props().callbacks.onLift({ client: selection, isScrollAllowed });
-};
-
-const getFromLift = (dispatchProps: DispatchProps) => {
-  const [
-    draggableIdArg,
-    typeArg,
-    clientArg,
-    windowScrollArg,
-    isScrollAllowedArg,
-    // $ExpectError - mock property
-  ] = dispatchProps.lift.mock.calls[0];
-
-  return {
-    draggableId: draggableIdArg,
-    type: typeArg,
-    client: clientArg,
-    windowScroll: windowScrollArg,
-    isScrollAllowed: isScrollAllowedArg,
-  };
 };
 
 // $ExpectError - not checking type of mock
@@ -264,13 +276,28 @@ describe('Draggable - unconnected', () => {
     expect(node.className).toBe('item');
   });
 
+  it('should provided a data attribute for global styling', () => {
+    const myMock = jest.fn();
+    const Stubber = getStubber(myMock);
+    const styleMarshal: StyleMarshal = createStyleMarshal();
+
+    mountDraggable({
+      mapProps: defaultMapProps,
+      WrappedComponent: Stubber,
+      styleMarshal,
+    });
+    const provided: Provided = getLastCall(myMock)[0].provided;
+
+    expect(provided.draggableProps['data-react-beautiful-dnd-draggable']).toEqual(styleMarshal.styleContext);
+  });
+
   describe('drag handle', () => {
     const startDragWithHandle = (wrapper: ReactWrapper) => ({
       selection = origin,
       center = origin,
     }: StartDrag = {}) => {
       // fake some position to get the center we want
-      stubClientRect(center);
+      stubArea(center);
 
       mouseDown(wrapper, subtract(selection, { x: 0, y: sloppyClickThreshold }));
       windowMouseMove(selection);
@@ -295,7 +322,7 @@ describe('Draggable - unconnected', () => {
           return (
             <div
               ref={ref => provided.innerRef(ref)}
-              style={provided.draggableStyle}
+              {...provided.draggableProps}
             >
               <div className="cannot-drag">
                 Cannot drag by me
@@ -377,64 +404,29 @@ describe('Draggable - unconnected', () => {
           expect(() => executeOnLift(customWrapper)()).toThrow();
         });
 
-        it('should lift with the draggable id', () => {
-          executeOnLift(wrapper)();
-
-          expect(getFromLift(dispatchProps).draggableId).toBe(draggableId);
-        });
-
-        it('should lift with the draggable type', () => {
-          executeOnLift(wrapper)();
-
-          expect(getFromLift(dispatchProps).type).toBe(type);
-        });
-
-        it('should lift with the client location', () => {
+        it('should lift if permitted', () => {
+          // made up values
           const selection: Position = {
             x: 100,
             y: 200,
           };
-          // made up
           const center: Position = {
             x: 50,
             y: 60,
           };
-          const client: InitialDragLocation = {
+          const initial: InitialDragPositions = {
             selection,
             center,
           };
+          const windowScroll = { x: 100, y: 30 };
+          const isScrollAllowed: boolean = true;
 
-          executeOnLift(wrapper)({ selection, center });
+          executeOnLift(wrapper)({ selection, center, windowScroll, isScrollAllowed });
 
-          expect(getFromLift(dispatchProps).client).toEqual(client);
-        });
-
-        it('should lift with the window scroll', () => {
-          const windowScroll = {
-            x: 20,
-            y: 30,
-          };
-
-          executeOnLift(wrapper)({ windowScroll });
-
-          expect(getFromLift(dispatchProps).windowScroll).toEqual(windowScroll);
-        });
-
-        it('should publish that container scrolling is allowed', () => {
-          const dispatchProps1: DispatchProps = getDispatchPropsStub();
-          const wrapper1: ReactWrapper = mountDraggable({
-            dispatchProps: dispatchProps1,
-          });
-          const dispatchProps2: DispatchProps = getDispatchPropsStub();
-          const wrapper2: ReactWrapper = mountDraggable({
-            dispatchProps: dispatchProps2,
-          });
-
-          executeOnLift(wrapper1)({ isScrollAllowed: true });
-          executeOnLift(wrapper2)({ isScrollAllowed: false });
-
-          expect(getFromLift(dispatchProps1).isScrollAllowed).toEqual(true);
-          expect(getFromLift(dispatchProps2).isScrollAllowed).toEqual(false);
+          // $ExpectError - mock property on lift function
+          expect(dispatchProps.lift.mock.calls[0]).toEqual([
+            draggableId, initial, windowScroll, isScrollAllowed,
+          ]);
         });
       });
 
@@ -832,7 +824,7 @@ describe('Draggable - unconnected', () => {
         WrappedComponent: getStubber(draggingMock),
       });
       const draggingProvided: Provided = getLastCall(draggingMock)[0].provided;
-      const draggingStyle: DraggingStyle = (draggingProvided.draggableStyle : any);
+      const draggingStyle: DraggingStyle = (draggingProvided.draggableProps.style : any);
 
       // not dragging item
       const notDraggingMock = jest.fn();
@@ -841,15 +833,10 @@ describe('Draggable - unconnected', () => {
         WrappedComponent: getStubber(notDraggingMock),
       });
       const notDraggingProvided: Provided = getLastCall(notDraggingMock)[0].provided;
-      const notDraggingStyle: NotDraggingStyle = (notDraggingProvided.draggableStyle : any);
+      const notDraggingStyle: NotDraggingStyle = (notDraggingProvided.draggableProps.style : any);
       const notDraggingExpected: NotDraggingStyle = {
         transform: null,
-        transition: css.outOfTheWay,
-        pointerEvents: 'none',
-        // BaseStyle
-        WebkitTouchCallout: 'none',
-        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-        touchAction: 'manipulation',
+        transition: null,
       };
 
       expect(draggingStyle.zIndex).toBe(zIndexOptions.dragging);
@@ -870,10 +857,10 @@ describe('Draggable - unconnected', () => {
       });
       const returningHomeProvided: Provided = getLastCall(returningHomeMock)[0].provided;
 
-      // $ExpectError - not type checking draggableStyle
-      expect(draggingProvided.draggableStyle.zIndex)
-      // $ExpectError - not type checking draggableStyle
-        .toBeGreaterThan(returningHomeProvided.draggableStyle.zIndex);
+      // $ExpectError - not type checking draggableProps.style
+      expect(draggingProvided.draggableProps.style.zIndex)
+      // $ExpectError - not type checking draggableProps.style
+        .toBeGreaterThan(returningHomeProvided.draggableProps.style.zIndex);
     });
 
     it('should be positioned in the same spot as before the drag', () => {
@@ -884,23 +871,19 @@ describe('Draggable - unconnected', () => {
       });
       const expected: DraggingStyle = {
         position: 'fixed',
-        zIndex: zIndexOptions.dragging,
-        boxSizing: 'border-box',
         width: dimension.page.withMargin.width,
         height: dimension.page.withMargin.height,
+        boxSizing: 'border-box',
         top: dimension.page.withMargin.top,
         left: dimension.page.withMargin.left,
         margin: 0,
+        transition: 'none',
         transform: null,
-        pointerEvents: 'none',
-        // BaseStyle
-        WebkitTouchCallout: 'none',
-        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-        touchAction: 'manipulation',
+        zIndex: zIndexOptions.dragging,
       };
 
       const provided: Provided = getLastCall(myMock)[0].provided;
-      expect(provided.draggableStyle).toEqual(expected);
+      expect(provided.draggableProps.style).toEqual(expected);
     });
 
     it('should be positioned in the correct offset while dragging', () => {
@@ -928,23 +911,19 @@ describe('Draggable - unconnected', () => {
         top: dimension.page.withMargin.top,
         left: dimension.page.withMargin.left,
         margin: 0,
+        transition: 'none',
         transform: `translate(${offset.x}px, ${offset.y}px)`,
-        pointerEvents: 'none',
-        // BaseStyle
-        WebkitTouchCallout: 'none',
-        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-        touchAction: 'manipulation',
       };
 
       const provided: Provided = getLastCall(myMock)[0].provided;
-      expect(provided.draggableStyle).toEqual(expected);
+      expect(provided.draggableProps.style).toEqual(expected);
     });
 
-    it('should move quickly if it can animate', () => {
+    it('should not move instantly if drag animation is enabled', () => {
       // $ExpectError - spread operator on exact type
       const mapProps: MapProps = {
         ...draggingMapProps,
-        canAnimate: true,
+        shouldAnimateDragMovement: true,
       };
 
       const wrapper = mountDraggable({
@@ -960,19 +939,15 @@ describe('Draggable - unconnected', () => {
         // property under test:
         transform: `translate(${draggingMapProps.offset.x}px, ${draggingMapProps.offset.y}px)`,
         // other properties
+        transition: 'none',
         position: 'fixed',
         boxSizing: 'border-box',
-        pointerEvents: 'none',
         zIndex: zIndexOptions.dragging,
         width: dimension.page.withMargin.width,
         height: dimension.page.withMargin.height,
         top: dimension.page.withMargin.top,
         left: dimension.page.withMargin.left,
         margin: 0,
-        // BaseStyle
-        WebkitTouchCallout: 'none',
-        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-        touchAction: 'manipulation',
       };
 
       mountDraggable({
@@ -984,7 +959,7 @@ describe('Draggable - unconnected', () => {
 
       // first call is for the setRef
       const provided: Provided = getLastCall(myMock)[0].provided;
-      const style: DraggingStyle = (provided.draggableStyle: any);
+      const style: DraggingStyle = (provided.draggableProps.style: any);
 
       expect(style).toEqual(expected);
     });
@@ -1022,7 +997,7 @@ describe('Draggable - unconnected', () => {
         requestAnimationFrame.flush();
 
         const provided: Provided = myMock.mock.calls[myMock.mock.calls.length - 1][0].provided;
-        const style: DraggingStyle = (provided.draggableStyle: any);
+        const style: DraggingStyle = (provided.draggableProps.style: any);
         expect(style.transform).toBe(expected);
       });
     });
@@ -1071,7 +1046,7 @@ describe('Draggable - unconnected', () => {
         WrappedComponent: getStubber(notDraggingMock),
       });
       const notDraggingProvided: Provided = getLastCall(notDraggingMock)[0].provided;
-      const notDraggingStyle: NotDraggingStyle = (notDraggingProvided.draggableStyle : any);
+      const notDraggingStyle: NotDraggingStyle = (notDraggingProvided.draggableProps.style : any);
       // returning home
       const dropAnimatingMock = jest.fn();
       mountDraggable({
@@ -1079,15 +1054,10 @@ describe('Draggable - unconnected', () => {
         WrappedComponent: getStubber(dropAnimatingMock),
       });
       const droppingProvided: Provided = getLastCall(dropAnimatingMock)[0].provided;
-      const droppingStyle: DraggingStyle = (droppingProvided.draggableStyle : any);
+      const droppingStyle: DraggingStyle = (droppingProvided.draggableProps.style : any);
       const expectedNotDraggingStyle: NotDraggingStyle = {
-        transition: css.outOfTheWay,
+        transition: null,
         transform: null,
-        pointerEvents: 'none',
-        // BaseStyle
-        WebkitTouchCallout: 'none',
-        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-        touchAction: 'manipulation',
       };
 
       expect(droppingStyle.zIndex).toBe(zIndexOptions.dropAnimating);
@@ -1107,11 +1077,7 @@ describe('Draggable - unconnected', () => {
         left: dimension.page.withMargin.left,
         margin: 0,
         transform: `translate(${offset.x}px, ${offset.y}px)`,
-        pointerEvents: 'none',
-        // BaseStyle
-        WebkitTouchCallout: 'none',
-        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-        touchAction: 'manipulation',
+        transition: 'none',
       };
 
       mountDraggable({
@@ -1122,7 +1088,7 @@ describe('Draggable - unconnected', () => {
       requestAnimationFrame.flush();
 
       const provided: Provided = getLastCall(myMock)[0].provided;
-      expect(provided.draggableStyle).toEqual(expected);
+      expect(provided.draggableProps.style).toEqual(expected);
     });
 
     it('should let consumers know that the item is still dragging', () => {
@@ -1155,14 +1121,9 @@ describe('Draggable - unconnected', () => {
       const style: NotDraggingStyle = {
         transform: null,
         transition: null,
-        pointerEvents: 'auto',
-        // BaseStyle
-        WebkitTouchCallout: 'none',
-        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-        touchAction: 'manipulation',
       };
 
-      expect(provided.draggableStyle).toEqual(style);
+      expect(provided.draggableProps.style).toEqual(style);
     });
 
     it('should let consumers know that the item is not dragging', () => {
@@ -1192,15 +1153,10 @@ describe('Draggable - unconnected', () => {
       it('should have base inline styles', () => {
         const expected: NotDraggingStyle = {
           transform: null,
-          transition: css.outOfTheWay,
-          pointerEvents: 'auto',
-          // BaseStyle
-          WebkitTouchCallout: 'none',
-          WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-          touchAction: 'manipulation',
+          transition: null,
         };
 
-        expect(provided.draggableStyle).toEqual(expected);
+        expect(provided.draggableProps.style).toEqual(expected);
       });
 
       it('should be informed that it is not dragging', () => {
@@ -1230,15 +1186,11 @@ describe('Draggable - unconnected', () => {
 
         it('should return animate out of the way with css', () => {
           const expected: NotDraggingStyle = {
-            transition: css.outOfTheWay,
-            pointerEvents: 'none',
+            // relying on the style marshal
+            transition: null,
             transform: null,
-            // BaseStyle
-            WebkitTouchCallout: 'none',
-            WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-            touchAction: 'manipulation',
           };
-          expect(provided.draggableStyle).toEqual(expected);
+          expect(provided.draggableProps.style).toEqual(expected);
         });
 
         it('should move out of the way without physics', () => {
@@ -1251,16 +1203,11 @@ describe('Draggable - unconnected', () => {
           // $ExpectError - using spread
           const mapProps: MapProps = {
             ...somethingElseDraggingMapProps,
-            canAnimate: false,
+            shouldAnimateDisplacement: false,
           };
           const expected: NotDraggingStyle = {
-            transition: null,
+            transition: 'none',
             transform: null,
-            pointerEvents: 'none',
-            // BaseStyle
-            WebkitTouchCallout: 'none',
-            WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-            touchAction: 'manipulation',
           };
 
           const customWrapper = mountDraggable({
@@ -1271,7 +1218,7 @@ describe('Draggable - unconnected', () => {
 
           const customProvided: Provided = getLastCall(myMock)[0].provided;
           expect(customWrapper.find(Moveable).props().speed).toBe('INSTANT');
-          expect(customProvided.draggableStyle).toEqual(expected);
+          expect(customProvided.draggableProps.style).toEqual(expected);
         });
 
         it('should let consumers know that the item is not dragging', () => {
@@ -1312,16 +1259,12 @@ describe('Draggable - unconnected', () => {
 
         it('should animate out of the way with css', () => {
           const expected: NotDraggingStyle = {
-            pointerEvents: 'none',
-            transition: css.outOfTheWay,
+            // use the style marshal global style
+            transition: null,
             transform: `translate(${offset.x}px, ${offset.y}px)`,
-            // BaseStyle
-            WebkitTouchCallout: 'none',
-            WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-            touchAction: 'manipulation',
           };
 
-          expect(provided.draggableStyle).toEqual(expected);
+          expect(provided.draggableProps.style).toEqual(expected);
         });
 
         it('should move out of the way without physics', () => {
@@ -1337,13 +1280,8 @@ describe('Draggable - unconnected', () => {
             canAnimate: false,
           };
           const expected: NotDraggingStyle = {
-            pointerEvents: 'none',
             transition: null,
             transform: `translate(${offset.x}px, ${offset.y}px)`,
-            // BaseStyle
-            WebkitTouchCallout: 'none',
-            WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-            touchAction: 'manipulation',
           };
 
           const customWrapper = mountDraggable({
@@ -1356,7 +1294,7 @@ describe('Draggable - unconnected', () => {
 
           const customProvided = getLastCall(myMock)[0].provided;
           expect(customWrapper.find(Moveable).props().speed).toBe('INSTANT');
-          expect(customProvided.draggableStyle).toEqual(expected);
+          expect(customProvided.draggableProps.style).toEqual(expected);
         });
 
         it('should let consumers know that the item is not dragging', () => {

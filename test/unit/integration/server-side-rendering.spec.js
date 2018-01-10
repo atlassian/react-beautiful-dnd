@@ -30,8 +30,8 @@ class App extends Component<*, *> {
                 {(dragProvided: DraggableProvided) => (
                   <div>
                     <div
-                      style={dragProvided.draggableStyle}
                       ref={dragProvided.innerRef}
+                      {...dragProvided.draggableProps}
                       {...dragProvided.dragHandleProps}
                     />
                     {dragProvided.placeholder}

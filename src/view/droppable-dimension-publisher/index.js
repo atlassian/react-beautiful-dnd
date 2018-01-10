@@ -1,2 +1,2 @@
 // @flow
-export { default } from './connected-droppable-dimension-publisher';
+export { default } from './droppable-dimension-publisher';

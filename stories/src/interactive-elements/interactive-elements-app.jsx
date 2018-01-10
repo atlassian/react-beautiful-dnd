@@ -134,17 +134,18 @@ export default class InteractiveElementsApp extends React.Component<*, State> {
               <List
                 innerRef={droppableProvided.innerRef}
               >
-                {this.state.items.map((item: ItemType) => (
+                {this.state.items.map((item: ItemType, index: number) => (
                   <Draggable
                     key={item.id}
                     draggableId={item.id}
                     disableInteractiveElementBlocking={canDragInteractiveElements}
+                    index={index}
                   >
                     {(draggableProvided: DraggableProvided) => (
                       <div>
                         <Item
                           innerRef={draggableProvided.innerRef}
-                          style={draggableProvided.draggableStyle}
+                          {...draggableProvided.draggableProps}
                           {...draggableProvided.dragHandleProps}
                         >
                           {item.component}

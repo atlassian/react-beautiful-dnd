@@ -6,11 +6,9 @@ import blockStandardKeyEvents from '../util/block-standard-key-events';
 import * as keyCodes from '../../key-codes';
 import getWindowFromRef from '../../get-window-from-ref';
 import getCenterPosition from '../../get-center-position';
-import shouldAllowDraggingFromTarget from '../util/should-allow-dragging-from-target';
 import type { Position } from '../../../types';
-import type { KeyboardSensor } from './sensor-types';
+import type { KeyboardSensor, CreateSensorArgs } from './sensor-types';
 import type {
-  Callbacks,
   Props,
 } from '../drag-handle-types';
 
@@ -25,7 +23,11 @@ type ExecuteBasedOnDirection = {|
 
 const noop = () => { };
 
-export default (callbacks: Callbacks, getDraggableRef: () =>?HTMLElement): KeyboardSensor => {
+export default ({
+  callbacks,
+  getDraggableRef,
+  canStartCapturing,
+}: CreateSensorArgs): KeyboardSensor => {
   let state: State = {
     isDragging: false,
   };
@@ -54,20 +56,16 @@ export default (callbacks: Callbacks, getDraggableRef: () =>?HTMLElement): Keybo
   const schedule = createScheduler(callbacks, isDragging);
 
   const onKeyDown = (event: KeyboardEvent, props: Props) => {
-    const { canLift, direction } = props;
+    const { direction } = props;
 
     // not yet dragging
     if (!isDragging()) {
       // cannot lift at this time
-      if (!canLift) {
+      if (!canStartCapturing(event)) {
         return;
       }
 
       if (event.keyCode !== keyCodes.space) {
-        return;
-      }
-
-      if (!shouldAllowDraggingFromTarget(event, props)) {
         return;
       }
 
@@ -88,14 +86,6 @@ export default (callbacks: Callbacks, getDraggableRef: () =>?HTMLElement): Keybo
       return;
     }
 
-    // already dragging
-    if (!direction) {
-      console.error('cannot handle keyboard event if direction is not provided');
-      stopEvent(event);
-      cancel();
-      return;
-    }
-
     // Cancelling
     if (event.keyCode === keyCodes.escape) {
       stopEvent(event);
@@ -112,6 +102,14 @@ export default (callbacks: Callbacks, getDraggableRef: () =>?HTMLElement): Keybo
     }
 
     // Movement
+
+    // already dragging
+    if (!direction) {
+      console.error('Cannot handle keyboard movement event if direction is not provided');
+      stopEvent(event);
+      cancel();
+      return;
+    }
 
     const executeBasedOnDirection = (fns: ExecuteBasedOnDirection) => {
       if (direction === 'vertical') {

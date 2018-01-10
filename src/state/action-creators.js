@@ -3,17 +3,18 @@ import type {
   DraggableId,
   DroppableId,
   DropResult,
-  TypeId,
   DragImpact,
   DraggableDimension,
   DroppableDimension,
-  InitialDragLocation,
+  InitialDragPositions,
+  DraggableLocation,
   Position,
   Dispatch,
   State,
   DropTrigger,
   CurrentDrag,
   InitialDrag,
+  DraggableDescriptor,
 } from '../types';
 import noImpact from './no-impact';
 import getNewHomeClientCenter from './get-new-home-client-center';
@@ -37,71 +38,68 @@ const getScrollDiff = ({
     current.windowScroll
   );
 
-  const droppableScrollDiff: Position = droppable ? subtract(
-    droppable.container.scroll.initial,
-    droppable.container.scroll.current
-  ) : origin;
+  const droppableScrollDiff: Position = droppable ?
+    droppable.viewport.frameScroll.diff.displacement :
+    origin;
 
   return add(windowScrollDiff, droppableScrollDiff);
 };
 
 export type RequestDimensionsAction = {|
   type: 'REQUEST_DIMENSIONS',
-  payload: TypeId
+  payload: DraggableId,
 |}
 
-export const requestDimensions = (type: TypeId): RequestDimensionsAction => ({
+export const requestDimensions = (id: DraggableId): RequestDimensionsAction => ({
   type: 'REQUEST_DIMENSIONS',
-  payload: type,
+  payload: id,
 });
 
 export type CompleteLiftAction = {|
   type: 'COMPLETE_LIFT',
   payload: {|
     id: DraggableId,
-    type: TypeId,
-    client: InitialDragLocation,
+    client: InitialDragPositions,
     windowScroll: Position,
     isScrollAllowed: boolean,
   |}
 |}
 
-export const completeLift = (id: DraggableId,
-  type: TypeId,
-  client: InitialDragLocation,
+export const completeLift = (
+  id: DraggableId,
+  client: InitialDragPositions,
   windowScroll: Position,
   isScrollAllowed: boolean,
 ): CompleteLiftAction => ({
   type: 'COMPLETE_LIFT',
   payload: {
     id,
-    type,
     client,
     windowScroll,
     isScrollAllowed,
   },
 });
 
-export type PublishDraggableDimensionAction = {|
-  type: 'PUBLISH_DRAGGABLE_DIMENSION',
-  payload: DraggableDimension
+export type PublishDraggableDimensionsAction = {|
+  type: 'PUBLISH_DRAGGABLE_DIMENSIONS',
+  payload: DraggableDimension[]
 |}
 
-export const publishDraggableDimension =
-  (dimension: DraggableDimension): PublishDraggableDimensionAction => ({
-    type: 'PUBLISH_DRAGGABLE_DIMENSION',
-    payload: dimension,
+export const publishDraggableDimensions =
+  (dimensions: DraggableDimension[]): PublishDraggableDimensionsAction => ({
+    type: 'PUBLISH_DRAGGABLE_DIMENSIONS',
+    payload: dimensions,
   });
 
-export type PublishDroppableDimensionAction = {|
-  type: 'PUBLISH_DROPPABLE_DIMENSION',
-  payload: DroppableDimension
+export type PublishDroppableDimensionsAction = {|
+  type: 'PUBLISH_DROPPABLE_DIMENSIONS',
+  payload: DroppableDimension[]
 |}
 
-export const publishDroppableDimension =
-  (dimension: DroppableDimension): PublishDroppableDimensionAction => ({
-    type: 'PUBLISH_DROPPABLE_DIMENSION',
-    payload: dimension,
+export const publishDroppableDimensions =
+  (dimensions: DroppableDimension[]): PublishDroppableDimensionsAction => ({
+    type: 'PUBLISH_DROPPABLE_DIMENSIONS',
+    payload: dimensions,
   });
 
 export type UpdateDroppableDimensionScrollAction = {|
@@ -282,7 +280,7 @@ export const drop = () =>
     const state: State = getState();
 
     // dropped before a drag officially started - this is fine
-    if (state.phase === 'COLLECTING_DIMENSIONS') {
+    if (state.phase === 'PREPARING' || state.phase === 'COLLECTING_INITIAL_DIMENSIONS') {
       dispatch(clean());
       return;
     }
@@ -301,16 +299,22 @@ export const drop = () =>
     }
 
     const { impact, initial, current } = state.drag;
-    const draggable: DraggableDimension = state.dimension.draggable[current.id];
-    const home: DroppableDimension = state.dimension.droppable[draggable.droppableId];
+    const descriptor: DraggableDescriptor = initial.descriptor;
+    const draggable: DraggableDimension = state.dimension.draggable[initial.descriptor.id];
+    const home: DroppableDimension = state.dimension.droppable[draggable.descriptor.droppableId];
     const destination: ?DroppableDimension = impact.destination ?
       state.dimension.droppable[impact.destination.droppableId] :
       null;
 
+    const source: DraggableLocation = {
+      droppableId: descriptor.droppableId,
+      index: descriptor.index,
+    };
+
     const result: DropResult = {
-      draggableId: current.id,
-      type: current.type,
-      source: initial.source,
+      draggableId: descriptor.id,
+      type: home.descriptor.type,
+      source,
       destination: impact.destination,
     };
 
@@ -367,12 +371,18 @@ export const cancel = () =>
     }
 
     const { initial, current } = state.drag;
-    const droppable: DroppableDimension = state.dimension.droppable[initial.source.droppableId];
+    const descriptor = initial.descriptor;
+    const home: DroppableDimension = state.dimension.droppable[descriptor.droppableId];
+
+    const source: DraggableLocation = {
+      index: descriptor.index,
+      droppableId: descriptor.droppableId,
+    };
 
     const result: DropResult = {
-      draggableId: current.id,
-      type: current.type,
-      source: initial.source,
+      draggableId: descriptor.id,
+      type: home.descriptor.type,
+      source,
       // no destination when cancelling
       destination: null,
     };
@@ -384,7 +394,7 @@ export const cancel = () =>
       return;
     }
 
-    const scrollDiff: Position = getScrollDiff({ initial, current, droppable });
+    const scrollDiff: Position = getScrollDiff({ initial, current, droppable: home });
 
     dispatch(animateDrop({
       trigger: 'CANCEL',
@@ -417,27 +427,30 @@ export type LiftAction = {|
   type: 'LIFT',
   payload: {|
     id: DraggableId,
-    type: TypeId,
-    client: InitialDragLocation,
+    client: InitialDragPositions,
     windowScroll: Position,
     isScrollAllowed: boolean,
   |}
 |}
 
+// lifting with DraggableId rather than descriptor
+// as the descriptor might change after a drop is flushed
 export const lift = (id: DraggableId,
-  type: TypeId,
-  client: InitialDragLocation,
+  client: InitialDragPositions,
   windowScroll: Position,
   isScrollAllowed: boolean,
 ) => (dispatch: Dispatch, getState: Function) => {
   // Phase 1: Quickly finish any current drop animations
   const initial: State = getState();
 
+  // flush dropping animation if needed
+  // this can change the descriptor of the dragging item
   if (initial.phase === 'DROP_ANIMATING') {
     if (!initial.drop || !initial.drop.pending) {
       console.error('cannot flush drop animation if there is no pending');
       dispatch(clean());
     } else {
+      // this can cause descriptor updates in the dimension marshal
       dispatch(completeDrop(initial.drop.pending.result));
     }
   }
@@ -447,7 +460,7 @@ export const lift = (id: DraggableId,
   dispatch(prepare());
 
   setTimeout(() => {
-    // Phase 2: collect all dimensions
+    // Phase 2: collect initial dimensions
     const state: State = getState();
 
     // drag cancelled before timeout finished
@@ -455,7 +468,8 @@ export const lift = (id: DraggableId,
       return;
     }
 
-    dispatch(requestDimensions(type));
+    // will communicate with the marshal to start requesting dimensions
+    dispatch(requestDimensions(id));
 
     // Need to allow an opportunity for the dimensions to be requested.
     setTimeout(() => {
@@ -463,11 +477,11 @@ export const lift = (id: DraggableId,
       const newState: State = getState();
 
       // drag was already cancelled before dimensions all collected
-      if (newState.phase !== 'COLLECTING_DIMENSIONS') {
+      if (newState.phase !== 'COLLECTING_INITIAL_DIMENSIONS') {
         return;
       }
 
-      dispatch(completeLift(id, type, client, windowScroll, isScrollAllowed));
+      dispatch(completeLift(id, client, windowScroll, isScrollAllowed));
     });
   });
 };
@@ -475,8 +489,8 @@ export const lift = (id: DraggableId,
 export type Action =
   CompleteLiftAction |
   RequestDimensionsAction |
-  PublishDraggableDimensionAction |
-  PublishDroppableDimensionAction |
+  PublishDraggableDimensionsAction |
+  PublishDroppableDimensionsAction |
   UpdateDroppableDimensionScrollAction |
   UpdateDroppableDimensionIsEnabledAction |
   MoveByWindowScrollAction |

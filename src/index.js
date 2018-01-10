@@ -30,6 +30,7 @@ export type {
 export type {
   Provided as DraggableProvided,
   StateSnapshot as DraggableStateSnapshot,
+  DraggableProps,
   DraggableStyle,
   DraggingStyle,
   NotDraggingStyle,
@@ -37,5 +38,5 @@ export type {
 
 // DragHandle
 export type {
-  Provided as DragHandleProvided,
+  DragHandleProps,
 } from './view/drag-handle/drag-handle-types';

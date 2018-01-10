@@ -7,60 +7,45 @@ import {
   prepare,
   completeLift,
   requestDimensions,
-  publishDraggableDimension,
-  publishDroppableDimension,
+  publishDraggableDimensions,
+  publishDroppableDimensions,
 } from '../../../src/state/action-creators';
 import createStore from '../../../src/state/create-store';
-import noImpact from '../../../src/state/no-impact';
 import { getPreset } from '../../utils/dimension';
+import * as state from '../../utils/simple-state-preset';
 import type {
   State,
   Position,
   DraggableId,
-  TypeId,
   Store,
-  InitialDragLocation,
-  PendingDrop,
-  DimensionState,
+  InitialDragPositions,
 } from '../../../src/types';
 
-const { home, inHome1 } = getPreset();
-
+const preset = getPreset();
 const origin: Position = { x: 0, y: 0 };
-const noWhere: InitialDragLocation = {
+const noWhere: InitialDragPositions = {
   selection: origin,
   center: origin,
 };
-const noDimensions: DimensionState = {
-  request: null,
-  draggable: {},
-  droppable: {},
-};
-type LiftFnArgs = {
+
+type LiftFnArgs = {|
   id: DraggableId,
-  type: TypeId,
-  client: InitialDragLocation,
+  client: InitialDragPositions,
   windowScroll: Position,
   isScrollAllowed: boolean,
-}
-
-const draggableId: DraggableId = inHome1.id;
-const defaultType: TypeId = 'type';
+|}
 
 const liftDefaults: LiftFnArgs = {
-  id: draggableId,
-  type: defaultType,
+  id: preset.inHome1.descriptor.id,
   windowScroll: origin,
   client: noWhere,
   isScrollAllowed: true,
 };
 
 const liftWithDefaults = (args?: LiftFnArgs = liftDefaults) => {
-  const { id, type, client, windowScroll, isScrollAllowed } = args;
-  return lift(id, type, client, windowScroll, isScrollAllowed);
+  const { id, client, windowScroll, isScrollAllowed } = args;
+  return lift(id, client, windowScroll, isScrollAllowed);
 };
-
-const initialState: State = createStore().getState();
 
 describe('action creators', () => {
   describe('lift', () => {
@@ -89,12 +74,12 @@ describe('action creators', () => {
       // Phase 2: request dimensions after flushing animations
       jest.runOnlyPendingTimers();
 
-      expect(store.dispatch).toHaveBeenCalledWith(requestDimensions(defaultType));
+      expect(store.dispatch).toHaveBeenCalledWith(requestDimensions(preset.inHome1.descriptor.id));
       expect(store.dispatch).toHaveBeenCalledTimes(2);
 
       // publishing some fake dimensions
-      store.dispatch(publishDroppableDimension(home));
-      store.dispatch(publishDraggableDimension(inHome1));
+      store.dispatch(publishDroppableDimensions([preset.home]));
+      store.dispatch(publishDraggableDimensions([preset.inHome1]));
       // now called four times
       expect(store.dispatch).toHaveBeenCalledTimes(4);
 
@@ -103,7 +88,6 @@ describe('action creators', () => {
 
       expect(store.dispatch).toHaveBeenCalledWith(completeLift(
         liftDefaults.id,
-        liftDefaults.type,
         liftDefaults.client,
         liftDefaults.windowScroll,
         liftDefaults.isScrollAllowed
@@ -112,53 +96,27 @@ describe('action creators', () => {
     });
 
     describe('flushing previous drop animations', () => {
-      const dropAnimatingState: State = (() => {
-        const pending: PendingDrop = {
-          trigger: 'CANCEL',
-          newHomeOffset: origin,
-          impact: noImpact,
-          result: {
-            draggableId,
-            type: defaultType,
-            source: {
-              droppableId: 'drop-1',
-              index: 0,
-            },
-            destination: null,
-          },
-        };
-        const state: State = {
-          phase: 'DROP_ANIMATING',
-          drag: null,
-          drop: {
-            pending,
-            result: null,
-          },
-          dimension: noDimensions,
-        };
-        return state;
-      })();
-
       it('should flush any existing drop animation', () => {
+        const current: State = state.dropAnimating();
         const dispatch: Function = jest.fn();
-        const getState: Function = jest.fn(() => dropAnimatingState);
+        const getState: Function = jest.fn(() => current);
 
         liftWithDefaults()(dispatch, getState);
 
         // $ExpectError - not checking for null in state shape
-        expect(dispatch).toHaveBeenCalledWith(completeDrop(dropAnimatingState.drop.pending.result));
+        expect(dispatch).toHaveBeenCalledWith(completeDrop(current.drop.pending.result));
         expect(dispatch).toHaveBeenCalledWith(prepare());
         expect(console.error).not.toHaveBeenCalled();
       });
 
       it('should clean the state and log an error if there is an invalid drop animating state', () => {
-        const state: State = {
-          ...initialState,
+        const current: State = {
+          ...state.idle,
           // hacking the phase
           phase: 'DROP_ANIMATING',
         };
         const dispatch: Function = jest.fn();
-        const getState: Function = jest.fn(() => state);
+        const getState: Function = jest.fn(() => current);
 
         liftWithDefaults()(dispatch, getState);
 
@@ -192,7 +150,6 @@ describe('action creators', () => {
         expect(store.dispatch).not.toHaveBeenCalledWith(
           completeLift(
             liftDefaults.id,
-            liftDefaults.type,
             liftDefaults.client,
             liftDefaults.windowScroll,
             liftDefaults.isScrollAllowed
@@ -218,7 +175,9 @@ describe('action creators', () => {
         // Phase 2: request dimensions after flushing animations
         jest.runOnlyPendingTimers();
 
-        expect(store.dispatch).toHaveBeenCalledWith(requestDimensions(defaultType));
+        expect(store.dispatch).toHaveBeenCalledWith(
+          requestDimensions(preset.inHome1.descriptor.id)
+        );
         expect(store.dispatch).toHaveBeenCalledTimes(2);
 
         // drag is now cancelled before all dimensions are published
@@ -232,7 +191,6 @@ describe('action creators', () => {
         expect(store.dispatch).toHaveBeenCalledTimes(3);
         expect(store.dispatch).not.toHaveBeenCalledWith(completeLift(
           liftDefaults.id,
-          liftDefaults.type,
           liftDefaults.client,
           liftDefaults.windowScroll,
           liftDefaults.isScrollAllowed
@@ -243,7 +201,7 @@ describe('action creators', () => {
         expect(store.dispatch).toHaveBeenCalledTimes(3);
 
         // should be in the idle state
-        expect(store.getState()).toEqual(initialState);
+        expect(store.getState()).toEqual(state.idle);
       });
     });
   });

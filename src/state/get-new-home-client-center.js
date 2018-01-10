@@ -1,12 +1,12 @@
 // @flow
 import type {
   Axis,
-  DimensionFragment,
   DraggableDimension,
   DraggableDimensionMap,
   DragMovement,
   DroppableDimension,
   Position,
+  Area,
 } from '../types';
 import moveToEdge from './move-to-edge';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
@@ -34,13 +34,14 @@ export default ({
     return homeCenter;
   }
 
-  const { draggables: movedDraggables, isBeyondStartPosition } = movement;
+  const { displaced, isBeyondStartPosition } = movement;
   const axis: Axis = destination.axis;
 
-  const isWithinHomeDroppable: boolean = destination.id === draggable.droppableId;
+  const isWithinHomeDroppable: boolean =
+    destination.descriptor.id === draggable.descriptor.droppableId;
 
   // dropping back into home index
-  if (isWithinHomeDroppable && !movedDraggables.length) {
+  if (isWithinHomeDroppable && !displaced.length) {
     return homeCenter;
   }
 
@@ -50,15 +51,15 @@ export default ({
   );
 
   // Find the dimension we need to compare the dragged item with
-  const destinationFragment: DimensionFragment = (() => {
+  const destinationFragment: Area = (() => {
     if (isWithinHomeDroppable) {
-      return draggables[movedDraggables[0]].client.withMargin;
+      return draggables[displaced[0].draggableId].client.withMargin;
     }
 
     // Not in home list
 
-    if (movedDraggables.length) {
-      return draggables[movedDraggables[0]].client.withMargin;
+    if (displaced.length) {
+      return draggables[displaced[0].draggableId].client.withMargin;
     }
 
     // If we're dragging to the last place in a new droppable
@@ -89,7 +90,7 @@ export default ({
 
     // If we're moving in after the last draggable
     // we want to move the draggable below the last item
-    if (!movedDraggables.length && draggablesInDestination.length) {
+    if (!displaced.length && draggablesInDestination.length) {
       return { sourceEdge: 'start', destinationEdge: 'end' };
     }
 
@@ -97,7 +98,7 @@ export default ({
     return { sourceEdge: 'start', destinationEdge: 'start' };
   })();
 
-  const source: DimensionFragment = draggable.client.withMargin;
+  const source: Area = draggable.client.withMargin;
 
   // This is the draggable's new home
   const targetCenter: Position = moveToEdge({

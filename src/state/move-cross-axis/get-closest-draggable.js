@@ -1,7 +1,9 @@
 // @flow
 import { distance } from '../position';
-import { isDraggableWithin } from '../is-within-visible-bounds-of-droppable';
+import getViewport from '../visibility/get-viewport';
+import isPartiallyVisible from '../visibility/is-partially-visible';
 import type {
+  Area,
   Axis,
   Position,
   DraggableDimension,
@@ -28,12 +30,17 @@ export default ({
     return null;
   }
 
-  const isWithinDestination = isDraggableWithin(destination.container.bounds);
+  const viewport: Area = getViewport();
 
   const result: DraggableDimension[] = insideDestination
     // Remove any options that are hidden by overflow
-    // Whole draggable must be visible to move to it
-    .filter(isWithinDestination)
+    // Draggable must be partially visible to move to it
+    .filter((draggable: DraggableDimension): boolean =>
+      isPartiallyVisible({
+        target: draggable.page.withMargin,
+        destination,
+        viewport,
+      }))
     .sort((a: DraggableDimension, b: DraggableDimension): number => {
       const distanceToA = distance(pageCenter, a.page.withMargin.center);
       const distanceToB = distance(pageCenter, b.page.withMargin.center);
