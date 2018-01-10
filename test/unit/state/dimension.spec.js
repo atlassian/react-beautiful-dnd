@@ -3,8 +3,10 @@ import {
   getDraggableDimension,
   getDroppableDimension,
   scrollDroppable,
+  clip,
 } from '../../../src/state/dimension';
 import { vertical, horizontal } from '../../../src/state/axis';
+import { offset } from '../../../src/state/spacing';
 import getArea from '../../../src/state/get-area';
 import { negate } from '../../../src/state/position';
 import type {
@@ -449,6 +451,48 @@ describe('dimension', () => {
         right: 100,
         left: 0,
       }));
+    });
+  });
+
+  describe('subject clipping', () => {
+    it('should select clip a subject in a frame', () => {
+      const subject: Area = getArea({
+        top: 0,
+        left: 0,
+        right: 100,
+        bottom: 100,
+      });
+      const frame: Area = getArea({
+        top: 20,
+        left: 20,
+        right: 50,
+        bottom: 50,
+      });
+
+      expect(clip(frame, subject)).toEqual(frame);
+    });
+
+    it('should return null when the subject it outside the frame on any side', () => {
+      const frame: Area = getArea({
+        top: 0,
+        left: 0,
+        right: 100,
+        bottom: 100,
+      });
+      const outside: Spacing[] = [
+        // top
+        offset(frame, { x: 0, y: -200 }),
+        // right
+        offset(frame, { x: 200, y: 0 }),
+        // bottom
+        offset(frame, { x: 0, y: 200 }),
+        // left
+        offset(frame, { x: -200, y: 0 }),
+      ];
+
+      outside.forEach((subject: Spacing) => {
+        expect(clip(frame, subject)).toEqual(null);
+      });
     });
   });
 });

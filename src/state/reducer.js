@@ -336,8 +336,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const target: ?DroppableDimension = state.dimension.droppable[id];
 
     if (!target) {
-      // eslint-disable-next-line no-console
-      console.log('cannot update scroll for droppable as it has not yet been collected');
+      console.warn('cannot update scroll for droppable as it has not yet been collected');
       return state;
     }
 
@@ -367,8 +366,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const target = state.dimension.droppable[id];
 
     if (!target) {
-      // eslint-disable-next-line
-      console.log('cannot update enabled state for droppable as it has not yet been collected');
+      console.warn('cannot update enabled state for droppable as it has not yet been collected');
       return state;
     }
 

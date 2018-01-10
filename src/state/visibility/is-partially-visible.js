@@ -25,7 +25,8 @@ export default ({
   const displacement: Position = destination.viewport.frameScroll.diff.displacement;
   const withScroll: Spacing = offset(target, displacement);
 
-  // subject is totally hidden by frame
+  // destination subject is totally hidden by frame
+  // this should never happen - but just guarding against it
   if (!destination.viewport.clipped) {
     return false;
   }

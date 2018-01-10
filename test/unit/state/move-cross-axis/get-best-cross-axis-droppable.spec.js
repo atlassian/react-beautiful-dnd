@@ -607,6 +607,57 @@ describe('get best cross axis droppable', () => {
       expect(result).toBe(null);
     });
 
+    it('should exclude options that are not visible in their frame', () => {
+      const source = getDroppableDimension({
+        descriptor: {
+          id: 'source',
+          type: 'TYPE',
+        },
+        direction: axis.direction,
+        client: getArea({
+          [axis.start]: 0,
+          [axis.end]: 100,
+          [axis.crossAxisStart]: 0,
+          [axis.crossAxisEnd]: 100,
+        }),
+      });
+      const subjectNotVisibleThroughFrame = getDroppableDimension({
+        descriptor: {
+          id: 'notInViewport',
+          type: 'TYPE',
+        },
+        direction: axis.direction,
+        // totally hidden by frame
+        client: getArea({
+          [axis.start]: 0,
+          [axis.end]: 100,
+          // would normally be a good candidate
+          [axis.crossAxisStart]: 200,
+          [axis.crossAxisEnd]: 300,
+        }),
+        frameClient: getArea({
+          [axis.start]: 0,
+          [axis.end]: 100,
+          // frame hides subject
+          [axis.crossAxisStart]: 400,
+          [axis.crossAxisEnd]: 500,
+        }),
+      });
+      const droppables: DroppableDimensionMap = {
+        [source.descriptor.id]: source,
+        [subjectNotVisibleThroughFrame.descriptor.id]: subjectNotVisibleThroughFrame,
+      };
+
+      const result: ?DroppableDimension = getBestCrossAxisDroppable({
+        isMovingForward: true,
+        pageCenter: source.page.withMargin.center,
+        source,
+        droppables,
+      });
+
+      expect(result).toBe(null);
+    });
+
     it('should exclude options that are not in the viewport', () => {
       const source = getDroppableDimension({
         descriptor: {

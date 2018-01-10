@@ -107,8 +107,6 @@ export default ({
       getSafeClipped(array[0])[axis.crossAxisStart]
     );
 
-  console.log('candidates', candidates);
-
   // no possible candidates
   if (!candidates.length) {
     return null;
