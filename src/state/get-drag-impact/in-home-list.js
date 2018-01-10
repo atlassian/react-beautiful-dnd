@@ -1,15 +1,17 @@
 // @flow
-import type { DraggableId,
-  DroppableId,
+import type {
   DragMovement,
   DraggableDimension,
   DroppableDimension,
   DragImpact,
-  DimensionFragment,
   Axis,
   Position,
+  Displacement,
+  Area,
 } from '../../types';
-import { add, subtract, patch } from '../position';
+import { add, patch } from '../position';
+import getDisplacement from '../get-displacement';
+import getViewport from '../visibility/get-viewport';
 
 // It is the responsibility of this function
 // to return the impact of a drag
@@ -19,6 +21,7 @@ type Args = {|
   draggable: DraggableDimension,
   home: DroppableDimension,
   insideHome: DraggableDimension[],
+  previousImpact: DragImpact,
 |}
 
 export default ({
@@ -26,67 +29,79 @@ export default ({
   draggable,
   home,
   insideHome,
+  previousImpact,
 }: Args): DragImpact => {
+  const viewport: Area = getViewport();
   const axis: Axis = home.axis;
-  const homeScrollDiff: Position = subtract(
-    home.container.scroll.current, home.container.scroll.initial
-  );
-  // Where the element actually is now
-  const currentCenter: Position = add(pageCenter, homeScrollDiff);
   // The starting center position
   const originalCenter: Position = draggable.page.withoutMargin.center;
+
+  // Where is the element now?
+
+  // Need to take into account the change of scroll in the droppable
+  const homeScrollDiff: Position = home.viewport.frameScroll.diff.value;
+
+  // Where the element actually is now
+  const currentCenter: Position = add(pageCenter, homeScrollDiff);
 
   // not considering margin so that items move based on visible edges
   const isBeyondStartPosition: boolean = currentCenter[axis.line] - originalCenter[axis.line] > 0;
 
-  const moved: DraggableId[] = insideHome
+  const amount: Position = patch(axis.line, draggable.client.withMargin[axis.size]);
+
+  const displaced: Displacement[] = insideHome
     .filter((child: DraggableDimension): boolean => {
       // do not want to move the item that is dragging
       if (child === draggable) {
         return false;
       }
 
-      const fragment: DimensionFragment = child.page.withoutMargin;
+      const area: Area = child.page.withoutMargin;
 
       if (isBeyondStartPosition) {
         // 1. item needs to start ahead of the moving item
         // 2. the dragging item has moved over it
-        if (fragment.center[axis.line] < originalCenter[axis.line]) {
+        if (area.center[axis.line] < originalCenter[axis.line]) {
           return false;
         }
 
-        return currentCenter[axis.line] > fragment[axis.start];
+        return currentCenter[axis.line] > area[axis.start];
       }
       // moving backwards
       // 1. item needs to start behind the moving item
       // 2. the dragging item has moved over it
-      if (originalCenter[axis.line] < fragment.center[axis.line]) {
+      if (originalCenter[axis.line] < area.center[axis.line]) {
         return false;
       }
 
-      return currentCenter[axis.line] < fragment[axis.end];
+      return currentCenter[axis.line] < area[axis.end];
     })
-    .map((dimension: DraggableDimension): DroppableId => dimension.id);
+    .map((dimension: DraggableDimension): Displacement => getDisplacement({
+      draggable: dimension,
+      destination: home,
+      previousImpact,
+      viewport,
+    }));
 
-  // Need to ensure that we always order by the closest impacted item
-  const ordered: DraggableId[] = isBeyondStartPosition ? moved.reverse() : moved;
-
+    // Need to ensure that we always order by the closest impacted item
+  const ordered: Displacement[] = isBeyondStartPosition ? displaced.reverse() : displaced;
   const index: number = (() => {
     const startIndex = insideHome.indexOf(draggable);
-    if (!moved.length) {
+    const length: number = ordered.length;
+    if (!length) {
       return startIndex;
     }
 
     if (isBeyondStartPosition) {
-      return startIndex + moved.length;
+      return startIndex + length;
     }
     // is moving backwards
-    return startIndex - moved.length;
+    return startIndex - length;
   })();
 
   const movement: DragMovement = {
-    amount: patch(axis.line, draggable.client.withMargin[axis.size]),
-    draggables: ordered,
+    amount,
+    displaced: ordered,
     isBeyondStartPosition,
   };
 
@@ -94,7 +109,7 @@ export default ({
     movement,
     direction: axis.direction,
     destination: {
-      droppableId: home.id,
+      droppableId: home.descriptor.id,
       index,
     },
   };

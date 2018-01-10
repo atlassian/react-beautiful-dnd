@@ -3,15 +3,10 @@
 import stopEvent from '../util/stop-event';
 import createScheduler from '../util/create-scheduler';
 import getWindowFromRef from '../../get-window-from-ref';
-import shouldAllowDraggingFromTarget from '../util/should-allow-dragging-from-target';
 import type {
   Position,
 } from '../../../types';
-import type {
-  Callbacks,
-  Props,
-} from '../drag-handle-types';
-import type { TouchSensor } from './sensor-types';
+import type { TouchSensor, CreateSensorArgs } from './sensor-types';
 
 type State = {
   isDragging: boolean,
@@ -38,7 +33,11 @@ const initial: State = {
   longPressTimerId: null,
 };
 
-export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): TouchSensor => {
+export default ({
+  callbacks,
+  getDraggableRef,
+  canStartCapturing,
+}: CreateSensorArgs): TouchSensor => {
   let state: State = initial;
 
   const setState = (partial: Object): void => {
@@ -231,18 +230,14 @@ export default (callbacks: Callbacks, getDraggableRef: () => ?HTMLElement): Touc
   };
 
   // entry point
-  const onTouchStart = (event: TouchEvent, props: Props) => {
-    if (!props.canLift) {
+  const onTouchStart = (event: TouchEvent) => {
+    if (!canStartCapturing(event)) {
       return;
     }
 
     if (isCapturing()) {
       console.error('should not be able to perform a touch start while a drag or pending drag is occurring');
       cancel();
-      return;
-    }
-
-    if (!shouldAllowDraggingFromTarget(event, props)) {
       return;
     }
 

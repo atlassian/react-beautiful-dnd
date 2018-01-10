@@ -14,7 +14,7 @@ export type Callbacks = {|
   onCancel: () => void,
 |}
 
-export type Provided = {|
+export type DragHandleProps = {|
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
   onTouchStart: (event: TouchEvent) => void,
@@ -22,6 +22,9 @@ export type Provided = {|
 
   // Conditionally block clicks
   onClick: (event: MouseEvent) => void,
+
+  // Control styling from style marshal
+  'data-react-beautiful-dnd-drag-handle': string,
 
   // Allow tabbing to this element
   tabIndex: number,
@@ -41,13 +44,11 @@ export type Props = {|
   isEnabled: boolean,
   // whether the application thinks a drag is occurring
   isDragging: boolean,
-  // dragging is otherwise enabled - but cannot lift at this time
-  canLift: boolean,
   // the direction of the current droppable
   direction: ?Direction,
   // get the ref of the draggable
   getDraggableRef: () => ?HTMLElement,
   // whether interactive elements should be permitted to start a drag
   canDragInteractiveElements: boolean,
-  children: (?Provided) => Node,
+  children: (?DragHandleProps) => Node,
 |}

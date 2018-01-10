@@ -1,13 +1,6 @@
 // @flow
 import type { Position } from '../types';
+import getArea from '../state/get-area';
 
-export default (el: HTMLElement): Position => {
-  const { top, right, bottom, left } = el.getBoundingClientRect();
-  const centerX = (left + right) / 2;
-  const centerY = (top + bottom) / 2;
-
-  return {
-    x: centerX,
-    y: centerY,
-  };
-};
+export default (el: HTMLElement): Position =>
+  getArea(el.getBoundingClientRect()).center;

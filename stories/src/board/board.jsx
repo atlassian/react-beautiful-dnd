@@ -14,8 +14,6 @@ import type {
 } from '../../../src/';
 import type { QuoteMap } from '../types';
 
-const isDraggingClassName = 'is-dragging';
-
 const publishOnDragStart = action('onDragStart');
 const publishOnDragEnd = action('onDragEnd');
 
@@ -26,8 +24,7 @@ const ParentContainer = styled.div`
 `;
 
 const Container = styled.div`
-  background: ${colors.blue.deep};
-  height: ${({ height }) => height};
+  min-height: 100vh;
 
   /* like display:flex but will allow bleeding over the window width */
   min-width: 100vw;
@@ -57,19 +54,15 @@ export default class Board extends Component<Props, State> {
   boardRef: ?HTMLElement
 
   componentDidMount() {
-    // eslint-disable-next-line no-unused-expressions
     injectGlobal`
-      body.${isDraggingClassName} {
-        cursor: grabbing;
-        user-select: none;
+      body {
+        background: ${colors.blue.deep};
       }
     `;
   }
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
-    // $ExpectError - body wont be null
-    document.body.classList.add(isDraggingClassName);
 
     this.setState({
       autoFocusQuoteId: null,
@@ -78,8 +71,6 @@ export default class Board extends Component<Props, State> {
 
   onDragEnd = (result: DropResult) => {
     publishOnDragEnd(result);
-    // $ExpectError - body wont be null
-    document.body.classList.remove(isDraggingClassName);
 
     // dropped nowhere
     if (!result.destination) {
@@ -130,9 +121,10 @@ export default class Board extends Component<Props, State> {
       >
         {(provided: DroppableProvided) => (
           <Container innerRef={provided.innerRef}>
-            {ordered.map((key: string) => (
+            {ordered.map((key: string, index: number) => (
               <Column
                 key={key}
+                index={index}
                 title={key}
                 quotes={columns[key]}
                 autoFocusQuoteId={this.state.autoFocusQuoteId}

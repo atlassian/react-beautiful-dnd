@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { borderRadius, colors, grid } from '../constants';
@@ -20,8 +20,6 @@ border-radius: ${borderRadius}px;
 border: 1px solid grey;
 background-color: ${({ isDragging }) => (isDragging ? colors.green : colors.white)};
 
-/* cursor: grabbing is handled by app */
-cursor: grab;
 box-shadow: ${({ isDragging }) => (isDragging ? `2px 2px 1px ${colors.shadow}` : 'none')};
 padding: ${grid}px;
 min-height: 40px;
@@ -95,7 +93,14 @@ text-align: right;
 flex-grow: 1;
 `;
 
-export default class QuoteItem extends Component<Props> {
+// Previously this extended React.Component
+// That was a good thing, because using React.PureComponent can hide
+// issues with the selectors. However, moving it over does can considerable
+// performance improvements when reordering big lists (400ms => 200ms)
+// Need to be super sure we are not relying on PureComponent here for
+// things we should be doing in the selector as we do not know if consumers
+// will be using PureComponent
+export default class QuoteItem extends React.PureComponent<Props> {
   componentDidMount() {
     if (!this.props.autoFocus) {
       return;
@@ -114,7 +119,7 @@ export default class QuoteItem extends Component<Props> {
         href={quote.author.url}
         isDragging={isDragging}
         innerRef={provided.innerRef}
-        style={provided.draggableStyle}
+        {...provided.draggableProps}
         {...provided.dragHandleProps}
       >
         <Avatar src={quote.author.avatarUrl} alt={quote.author.name} />
