@@ -25,6 +25,11 @@ export default ({
   const displacement: Position = destination.viewport.frameScroll.diff.displacement;
   const withScroll: Spacing = offset(target, displacement);
 
+  // subject is totally hidden by frame
+  if (!destination.viewport.clipped) {
+    return false;
+  }
+
   // When considering if the target is visible in the droppable we need
   // to consider the change in scroll of the droppable. We need to
   // adjust for the scroll as the clipped viewport takes into account

@@ -114,12 +114,13 @@ export type DroppableDimensionViewport = {|
       displacement: Position,
     |}
   |},
-  // the area to be clipped by the frame
-  // this is the initial capture of the subject and is not updated
+  // The area to be clipped by the frame
+  // This is the initial capture of the subject and is not updated
   subject: Area,
   // this is the subject through the viewport of the frame
   // it also takes into account any changes to the viewport scroll
-  clipped: Area,
+  // clipped area will be null if it is completely outside of the frame
+  clipped: ?Area,
 |}
 
 export type DroppableDimension = {|

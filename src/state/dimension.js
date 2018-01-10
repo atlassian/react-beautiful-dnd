@@ -100,13 +100,21 @@ type GetDroppableArgs = {|
   isEnabled?: boolean,
 |}
 
-export const clip = (frame: Area, subject: Spacing): Area =>
-  getArea({
+// will return null if the subject is completely not visible within frame
+export const clip = (frame: Area, subject: Spacing): ?Area => {
+  const result: Area = getArea({
     top: Math.max(subject.top, frame.top),
     right: Math.min(subject.right, frame.right),
     bottom: Math.min(subject.bottom, frame.bottom),
     left: Math.max(subject.left, frame.left),
   });
+
+  if (result.width < 0 || result.height < 0) {
+    return null;
+  }
+
+  return result;
+};
 
 export const scrollDroppable = (
   droppable: DroppableDimension,

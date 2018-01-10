@@ -64,7 +64,7 @@ const getClippedAreaWithPlaceholder = ({
   draggables,
   droppable,
   previousDroppableOverId,
-}: GetBufferedDroppableArgs): Area => {
+}: GetBufferedDroppableArgs): ?Area => {
   const isHome: boolean = draggable.descriptor.droppableId === droppable.descriptor.id;
   const isOver: boolean = Boolean(
     previousDroppableOverId &&
@@ -72,7 +72,12 @@ const getClippedAreaWithPlaceholder = ({
   );
   const subject: Area = droppable.viewport.subject;
   const frame: Area = droppable.viewport.frame;
-  const clipped: Area = droppable.viewport.clipped;
+  const clipped: ?Area = droppable.viewport.clipped;
+
+  // clipped area is totally hidden behind frame
+  if (!clipped) {
+    return clipped;
+  }
 
   // We only include the placeholder size if it's a
   // foreign list and is currently being hovered over
@@ -122,9 +127,13 @@ export default ({
         // If previously dragging over a droppable we give it a
         // bit of room on the subsequent drags so that user and move
         // items in the space that the placeholder takes up
-        const withPlaceholder: Area = getClippedAreaWithPlaceholder({
+        const withPlaceholder: ?Area = getClippedAreaWithPlaceholder({
           draggable, draggables, droppable, previousDroppableOverId,
         });
+
+        if (!withPlaceholder) {
+          return false;
+        }
 
         // Not checking to see if visible in viewport
         // as the target might be off screen if dragging a large draggable

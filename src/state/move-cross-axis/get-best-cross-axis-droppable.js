@@ -10,7 +10,6 @@ import type {
   DroppableDimensionMap,
   DroppableId,
   Position,
-  Spacing,
   Area,
 } from '../../types';
 
@@ -24,14 +23,28 @@ type GetBestDroppableArgs = {|
   droppables: DroppableDimensionMap,
 |}
 
+const getSafeClipped = (droppable: DroppableDimension): Area => {
+  const area: ?Area = droppable.viewport.clipped;
+
+  if (!area) {
+    throw new Error('cannot get clipped area from droppable');
+  }
+  return area;
+};
+
 export default ({
   isMovingForward,
   pageCenter,
   source,
   droppables,
 }: GetBestDroppableArgs): ?DroppableDimension => {
+  const sourceClipped: ?Area = source.viewport.clipped;
+
+  if (!sourceClipped) {
+    return null;
+  }
+
   const axis: Axis = source.axis;
-  const sourceClipped: Spacing = source.viewport.clipped;
   const isBetweenSourceClipped = isWithin(
     sourceClipped[axis.start],
     sourceClipped[axis.end]
@@ -45,13 +58,15 @@ export default ({
     .filter((droppable: DroppableDimension): boolean => droppable !== source)
     // Remove any options that are not enabled
     .filter((droppable: DroppableDimension): boolean => droppable.isEnabled)
+    // Remove any droppables that have invisible subjects
+    .filter((droppable: DroppableDimension): boolean => Boolean(droppable.viewport.clipped))
     // Remove any droppables that are not partially visible
     .filter((droppable: DroppableDimension): boolean => (
       isVisibleThroughFrame(viewport)(droppable.viewport.frame)
     ))
-    // Get only droppables that are on the desired side
+
     .filter((droppable: DroppableDimension): boolean => {
-      const targetClipped: Area = droppable.viewport.clipped;
+      const targetClipped: Area = getSafeClipped(droppable);
 
       if (isMovingForward) {
         // is the droppable in front of the source on the cross axis?
@@ -64,7 +79,7 @@ export default ({
     })
     // Must have some overlap on the main axis
     .filter((droppable: DroppableDimension): boolean => {
-      const targetClipped: Area = droppable.viewport.clipped;
+      const targetClipped: Area = getSafeClipped(droppable);
 
       const isBetweenDestinationClipped = isWithin(
         targetClipped[axis.start],
@@ -78,8 +93,8 @@ export default ({
     })
     // Sort on the cross axis
     .sort((a: DroppableDimension, b: DroppableDimension) => {
-      const first: number = a.viewport.clipped[axis.crossAxisStart];
-      const second: number = b.viewport.clipped[axis.crossAxisStart];
+      const first: number = getSafeClipped(a)[axis.crossAxisStart];
+      const second: number = getSafeClipped(b)[axis.crossAxisStart];
 
       if (isMovingForward) {
         return first - second;
@@ -88,9 +103,11 @@ export default ({
     })
     // Find the droppables that have the same cross axis value as the first item
     .filter((droppable: DroppableDimension, index: number, array: DroppableDimension[]): boolean =>
-      droppable.viewport.clipped[axis.crossAxisStart] ===
-      array[0].viewport.clipped[axis.crossAxisStart]
+      getSafeClipped(droppable)[axis.crossAxisStart] ===
+      getSafeClipped(array[0])[axis.crossAxisStart]
     );
+
+  console.log('candidates', candidates);
 
   // no possible candidates
   if (!candidates.length) {
@@ -109,8 +126,8 @@ export default ({
   const contains: DroppableDimension[] = candidates
     .filter((droppable: DroppableDimension) => {
       const isWithinDroppable = isWithin(
-        droppable.viewport.clipped[axis.start],
-        droppable.viewport.clipped[axis.end]
+        getSafeClipped(droppable)[axis.start],
+        getSafeClipped(droppable)[axis.end]
       );
       return isWithinDroppable(pageCenter[axis.line]);
     });
@@ -123,7 +140,7 @@ export default ({
   if (contains.length > 1) {
     // sort on the main axis and choose the first
     return contains.sort((a: DroppableDimension, b: DroppableDimension): number => (
-      a.viewport.clipped[axis.start] - b.viewport.clipped[axis.start]
+      getSafeClipped(a)[axis.start] - getSafeClipped(b)[axis.start]
     ))[0];
   }
 
@@ -131,8 +148,8 @@ export default ({
   // 1. Find the candidate that has the closest corner
   // 2. If there is a tie - choose the one that is first on the main axis
   return candidates.sort((a: DroppableDimension, b: DroppableDimension): number => {
-    const first = closest(pageCenter, getCorners(a.viewport.clipped));
-    const second = closest(pageCenter, getCorners(b.viewport.clipped));
+    const first = closest(pageCenter, getCorners(getSafeClipped(a)));
+    const second = closest(pageCenter, getCorners(getSafeClipped(b)));
 
     // if the distances are not equal - choose the shortest
     if (first !== second) {
@@ -141,6 +158,6 @@ export default ({
 
     // They both have the same distance -
     // choose the one that is first on the main axis
-    return a.viewport.clipped[axis.start] - b.viewport.clipped[axis.start];
+    return getSafeClipped(a)[axis.start] - getSafeClipped(b)[axis.start];
   })[0];
 };
