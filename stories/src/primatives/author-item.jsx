@@ -54,7 +54,7 @@ export default class AuthorItem extends Component<Props> {
     return (
       <Avatar
         innerRef={ref => provided.innerRef(ref)}
-        style={provided.draggableStyle}
+        {...provided.draggableProps}
         {...provided.dragHandleProps}
         src={author.avatarUrl}
         alt={author.name}

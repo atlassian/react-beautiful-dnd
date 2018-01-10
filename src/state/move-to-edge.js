@@ -3,15 +3,15 @@ import { absolute, add, patch, subtract } from './position';
 import type {
   Axis,
   Position,
-  DimensionFragment,
+  Area,
 } from '../types';
 
 export type Edge = 'start' | 'end';
 
 type Args = {|
-  source: DimensionFragment,
+  source: Area,
   sourceEdge: Edge,
-  destination: DimensionFragment,
+  destination: Area,
   destinationEdge: Edge,
   destinationAxis: Axis,
 |}
@@ -33,12 +33,12 @@ export default ({
   destinationEdge,
   destinationAxis,
 }: Args): CenterPosition => {
-  const getCorner = (fragment: DimensionFragment): Position => patch(
+  const getCorner = (area: Area): Position => patch(
     destinationAxis.line,
     // it does not really matter what edge we use here
     // as the difference to the center from edges will be the same
-    fragment[destinationAxis[destinationEdge]],
-    fragment[destinationAxis.crossAxisStart]
+    area[destinationAxis[destinationEdge]],
+    area[destinationAxis.crossAxisStart]
   );
 
   // 1. Find the intersection corner point

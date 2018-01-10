@@ -1,244 +1,393 @@
 // @flow
 import getDroppableOver from '../../../src/state/get-droppable-over';
-import { getDroppableDimension, getDraggableDimension } from '../../../src/state/dimension';
-import getClientRect from '../../../src/state/get-client-rect';
+import { getPreset, disableDroppable } from '../../utils/dimension';
+import { getDroppableDimension, getDraggableDimension, scrollDroppable } from '../../../src/state/dimension';
+import getArea from '../../../src/state/get-area';
 import type {
+  Area,
+  DraggableId,
   DraggableDimension,
   DroppableDimension,
   DraggableDimensionMap,
   DroppableDimensionMap,
+  Spacing,
   DroppableId,
   Position,
 } from '../../../src/types';
 
-const noPosition = { x: 0, y: 0 };
+const preset = getPreset();
 
-const droppable1: DroppableDimension = getDroppableDimension({
-  id: 'drop-1',
-  clientRect: getClientRect({
-    top: 0,
-    left: 0,
-    bottom: 100,
-    right: 100,
-  }),
-});
-
-const droppable2: DroppableDimension = getDroppableDimension({
-  id: 'drop-2',
-  clientRect: getClientRect({
-    top: 101,
-    left: 0,
-    bottom: 200,
-    right: 100,
-  }),
-});
-const droppable3: DroppableDimension = getDroppableDimension({
-  id: 'drop-3',
-  clientRect: getClientRect({
-    top: 0,
-    left: 100,
-    bottom: 100,
-    right: 200,
-  }),
-});
-
-const draggableMargin = { top: 0, right: 0, bottom: 10, left: 0 };
-const draggable1: DraggableDimension = getDraggableDimension({
-  id: 'drag-1',
-  droppableId: droppable1.id,
-  clientRect: getClientRect({
-    top: 0,
-    right: 100,
-    bottom: 90,
-    left: 0,
-  }),
-  margin: draggableMargin,
-  windowScroll: noPosition,
-});
-const draggable2: DraggableDimension = getDraggableDimension({
-  id: 'drag-2',
-  droppableId: droppable2.id,
-  clientRect: getClientRect({
-    top: 101,
-    right: 100,
-    bottom: 190,
-    left: 0,
-  }),
-  margin: draggableMargin,
-  windowScroll: noPosition,
-});
-const draggable3: DraggableDimension = getDraggableDimension({
-  id: 'drag-3',
-  droppableId: droppable3.id,
-  clientRect: getClientRect({
-    top: 0,
-    right: 200,
-    bottom: 40,
-    left: 100,
-  }),
-  margin: draggableMargin,
-  windowScroll: noPosition,
-});
-
-const droppableMap: DroppableDimensionMap = {
-  [droppable1.id]: droppable1,
-  [droppable2.id]: droppable2,
-  [droppable3.id]: droppable3,
-};
-
-const draggableMap: DraggableDimensionMap = {
-  [draggable1.id]: draggable1,
-  [draggable2.id]: draggable2,
-  [draggable3.id]: draggable3,
-};
-
-// Most functionality is tested by get getInsideDimension
+// Most functionality is tested by get get\InsideDimension
 describe('get droppable over', () => {
   it('should return null if the target is not over any dimension', () => {
     const target: Position = {
-      x: 1000,
-      y: 1000,
+      x: 100000,
+      y: 100000,
     };
 
     const result: ?DroppableId = getDroppableOver({
       target,
-      draggable: draggable1,
-      draggables: draggableMap,
-      droppables: droppableMap,
+      draggable: preset.inHome1,
+      draggables: preset.draggables,
+      droppables: preset.droppables,
       previousDroppableOverId: null,
     });
 
     expect(result).toBe(null);
   });
 
-  it('should return the droppable dimension that the target is over', () => {
-    const target: Position = {
-      x: 10,
-      y: 10,
+  it('should return the id of the droppable that the target is over', () => {
+    Object.keys(preset.draggables).forEach((id: DraggableId) => {
+      const draggable: DraggableDimension = preset.draggables[id];
+
+      const result: ?DroppableId = getDroppableOver({
+        target: draggable.page.withoutMargin.center,
+        draggable,
+        draggables: preset.draggables,
+        droppables: preset.droppables,
+        previousDroppableOverId: null,
+      });
+
+      expect(result).toBe(draggable.descriptor.droppableId);
+    });
+  });
+
+  it('should ignore droppables that are disabled', () => {
+    const target: Position = preset.inHome1.page.withoutMargin.center;
+    const withDisabled: DroppableDimensionMap = {
+      ...preset.droppables,
+      [preset.home.descriptor.id]: disableDroppable(preset.home),
     };
 
-    const result: ?DroppableId = getDroppableOver({
+    const whileEnabled: ?DroppableId = getDroppableOver({
       target,
-      draggable: draggable1,
-      draggables: draggableMap,
-      droppables: droppableMap,
+      draggable: preset.inHome1,
+      draggables: preset.draggables,
+      droppables: preset.droppables,
+      previousDroppableOverId: null,
+    });
+    const whileDisabled: ?DroppableId = getDroppableOver({
+      target,
+      draggable: preset.inHome1,
+      draggables: preset.draggables,
+      droppables: withDisabled,
       previousDroppableOverId: null,
     });
 
-    expect(result).toBe(droppable1.id);
+    expect(whileEnabled).toBe(preset.home.descriptor.id);
+    expect(whileDisabled).toBe(null);
   });
 
-  describe('adding a buffer to the droppable area', () => {
-    it('should never add buffer to the home droppable', () => {
-      const draggingHomeDraggable: ?DroppableId = getDroppableOver({
-        target: { x: 10, y: 110 },
-        draggable: draggable1,
-        draggables: draggableMap,
-        droppables: droppableMap,
-        previousDroppableOverId: droppable1.id,
-      });
-      const draggingForeignDraggable: ?DroppableId = getDroppableOver({
-        target: { x: 10, y: 110 },
-        draggable: draggable2,
-        draggables: draggableMap,
-        droppables: droppableMap,
-        previousDroppableOverId: droppable1.id,
-      });
-      expect(draggingHomeDraggable).toBe(droppable2.id);
-      expect(draggingForeignDraggable).toBe(droppable1.id);
+  it('should ignore droppables that are partially hidden by their frames', () => {
+    const droppable: DroppableDimension = getDroppableDimension({
+      descriptor: {
+        id: 'partially hidden subject',
+        type: 'TYPE',
+      },
+      client: getArea({
+        top: 0, left: 0, right: 100, bottom: 100,
+      }),
+      // will partially hide the subject
+      frameClient: getArea({
+        top: 0, left: 0, right: 50, bottom: 100,
+      }),
+    });
+    const draggable: DraggableDimension = getDraggableDimension({
+      descriptor: {
+        id: 'draggable',
+        droppableId: droppable.descriptor.type,
+        index: 0,
+      },
+      client: getArea({
+        top: 0, left: 0, right: 50, bottom: 50,
+      }),
     });
 
-    it('should only add buffer if this droppable was hovered over on the previous tick', () => {
-      const wasPreviouslyHovered: ?DroppableId = getDroppableOver({
-        target: { x: 10, y: 210 },
-        draggable: draggable1,
-        draggables: draggableMap,
-        droppables: droppableMap,
-        previousDroppableOverId: droppable2.id,
-      });
-      const wasNotPreviouslyHovered: ?DroppableId = getDroppableOver({
-        target: { x: 10, y: 210 },
-        draggable: draggable1,
-        draggables: draggableMap,
-        droppables: droppableMap,
-        previousDroppableOverId: null,
-      });
-      expect(wasPreviouslyHovered).toBe(droppable2.id);
-      expect(wasNotPreviouslyHovered).toBe(null);
+    const result: ?DroppableId = getDroppableOver({
+      // over the hidden part of the droppable subject
+      target: { x: 60, y: 50 },
+      draggable,
+      draggables: { [draggable.descriptor.id]: draggable },
+      droppables: { [droppable.descriptor.id]: droppable },
+      previousDroppableOverId: null,
     });
 
-    it('buffer should only be added along the main axis of the droppable', () => {
-      const inPlaceholderAreaOnTheMainAxis: ?DroppableId = getDroppableOver({
-        target: { x: 10, y: 210 },
-        draggable: draggable1,
-        draggables: draggableMap,
-        droppables: droppableMap,
-        previousDroppableOverId: droppable2.id,
-      });
-      const inPlaceholderAreaOnTheCrossAxis: ?DroppableId = getDroppableOver({
-        target: { x: 110, y: 150 },
-        draggable: draggable1,
-        draggables: draggableMap,
-        droppables: droppableMap,
-        previousDroppableOverId: droppable2.id,
-      });
-      expect(inPlaceholderAreaOnTheMainAxis).toBe(droppable2.id);
-      expect(inPlaceholderAreaOnTheCrossAxis).toBe(null);
+    expect(result).toBe(null);
+  });
+
+  it('should ignore droppables that are totally hidden by their frames', () => {
+    const droppable: DroppableDimension = getDroppableDimension({
+      descriptor: {
+        id: 'hidden subject',
+        type: 'TYPE',
+      },
+      client: getArea({
+        top: 0, left: 0, right: 100, bottom: 100,
+      }),
+      // will totally hide the subject
+      frameClient: getArea({
+        top: 0, left: 101, right: 200, bottom: 100,
+      }),
+    });
+    const draggable: DraggableDimension = getDraggableDimension({
+      descriptor: {
+        id: 'draggable',
+        droppableId: droppable.descriptor.type,
+        index: 0,
+      },
+      client: getArea({
+        top: 0, left: 0, right: 50, bottom: 50,
+      }),
     });
 
-    it('buffer should be the size of the draggable, including margin', () => {
-      const target = {
-        x: 10,
-        y: droppable2.page.withMargin.bottom + draggable1.page.withMargin.height,
-      };
-      const justInsidePlaceholderArea: ?DroppableId = getDroppableOver({
-        target,
-        draggable: draggable1,
-        draggables: draggableMap,
-        droppables: droppableMap,
-        previousDroppableOverId: droppable2.id,
-      });
-      const justOutsidePlaceholderArea: ?DroppableId = getDroppableOver({
-        target: {
-          ...target,
-          y: target.y + 1,
-        },
-        draggable: draggable1,
-        draggables: draggableMap,
-        droppables: droppableMap,
-        previousDroppableOverId: droppable2.id,
-      });
-
-      expect(justInsidePlaceholderArea).toBe(droppable2.id);
-      expect(justOutsidePlaceholderArea).toBe(null);
+    const result: ?DroppableId = getDroppableOver({
+      target: { x: 50, y: 50 },
+      draggable,
+      draggables: { [draggable.descriptor.id]: draggable },
+      droppables: { [droppable.descriptor.id]: droppable },
+      previousDroppableOverId: null,
     });
 
-    it('if a droppable is longer than its list of items only as much buffer as is necessary should be added', () => {
-      const target = {
-        x: 150,
-        y: draggable3.page.withMargin.bottom + draggable1.page.withMargin.height,
-      };
+    expect(result).toBe(null);
+  });
 
-      const justInsidePlaceholderArea: ?DroppableId = getDroppableOver({
-        target,
-        draggable: draggable1,
-        draggables: draggableMap,
-        droppables: droppableMap,
-        previousDroppableOverId: droppable3.id,
+  describe('placeholder buffer', () => {
+    const margin: Spacing = {
+      top: 10, right: 10, bottom: 10, left: 10,
+    };
+    const droppableClient: Area = getArea({
+      top: 10,
+      left: 10,
+      right: 90,
+      bottom: 90,
+    });
+    const home: DroppableDimension = getDroppableDimension({
+      descriptor: {
+        id: 'home',
+        type: 'TYPE',
+      },
+      client: droppableClient,
+      margin,
+    });
+    const inHome1: DraggableDimension = getDraggableDimension({
+      descriptor: {
+        id: 'in-home-1',
+        droppableId: home.descriptor.id,
+        index: 0,
+      },
+      client: getArea({
+        top: 10,
+        left: 10,
+        right: 90,
+        // almost takes up the whole droppable
+        bottom: 80,
+      }),
+      margin,
+    });
+    const inForeign1: DraggableDimension = getDraggableDimension({
+      descriptor: {
+        id: 'in-foreign-1',
+        droppableId: 'foreign',
+        index: 0,
+      },
+      client: getArea({
+        // to the right of inHome1
+        left: 200,
+        right: 250,
+        // initially the same vertically
+        top: 10,
+        // almost takes up the whole droppable
+        bottom: 80,
+      }),
+      margin,
+    });
+    const draggables: DraggableDimensionMap = {
+      [inHome1.descriptor.id]: inHome1,
+      [inForeign1.descriptor.id]: inForeign1,
+    };
+    const droppables: DroppableDimensionMap = {
+      [home.descriptor.id]: home,
+    };
+
+    describe('is dragging over nothing', () => {
+      it('should not add any placeholder buffer', () => {
+        const target: Position = {
+          x: 10000,
+          y: 10000,
+        };
+        // dragging inForeign1 just below inHome1
+        const result: ?DroppableId = getDroppableOver({
+          target,
+          draggable: inForeign1,
+          draggables,
+          droppables,
+          previousDroppableOverId: null,
+        });
+
+        expect(result).toBe(null);
       });
-      const justOutsidePlaceholderArea: ?DroppableId = getDroppableOver({
-        target: {
-          ...target,
-          y: target.y + 1,
-        },
-        draggable: draggable1,
-        draggables: draggableMap,
-        droppables: droppableMap,
-        previousDroppableOverId: droppable3.id,
+    });
+
+    describe('is dragging over home droppable', () => {
+      it('should not add any placeholder buffer', () => {
+        // just below home
+        const target: Position = {
+          x: home.page.withMargin.center.x,
+          y: home.page.withMargin.bottom + 1,
+        };
+        // dragging inHome1 just below home
+        const result: ?DroppableId = getDroppableOver({
+          target,
+          draggable: inHome1,
+          draggables,
+          droppables,
+          previousDroppableOverId: null,
+        });
+
+        expect(result).toBe(null);
+      });
+    });
+
+    describe('over foreign droppable', () => {
+      describe('droppable has no scroll container', () => {
+        it('should not add a buffer if it was not previously over the foreign droppable', () => {
+          // just below home
+          const target: Position = {
+            x: home.page.withMargin.center.x,
+            y: home.page.withMargin.bottom + 1,
+          };
+          // dragging inForeign1 just below inHome1
+          const result: ?DroppableId = getDroppableOver({
+            target,
+            draggable: inForeign1,
+            draggables,
+            droppables,
+            previousDroppableOverId: null,
+          });
+
+          expect(result).toBe(null);
+        });
+
+        it('should add a placeholder buffer when previously dragging over', () => {
+          // just below home
+          const target: Position = {
+            x: home.page.withMargin.center.x,
+            y: home.page.withMargin.bottom + 1,
+          };
+          // dragging inForeign1 just below inHome1
+          const result: ?DroppableId = getDroppableOver({
+            target,
+            draggable: inForeign1,
+            draggables,
+            droppables,
+            previousDroppableOverId: home.descriptor.id,
+          });
+
+          expect(result).toBe(home.descriptor.id);
+        });
+
+        it('should add as much space as required to fit a placeholder', () => {
+          // at the end of the placeholder
+          const target: Position = {
+            x: inHome1.page.withMargin.center.x,
+            y: inHome1.page.withMargin.bottom + inForeign1.page.withMargin.bottom,
+          };
+          // dragging inForeign1 just below inHome1
+          const result: ?DroppableId = getDroppableOver({
+            target,
+            draggable: inForeign1,
+            draggables,
+            droppables,
+            previousDroppableOverId: home.descriptor.id,
+          });
+
+          expect(result).toBe(home.descriptor.id);
+        });
+
+        it('should not extend beyond what is required to fit a placeholder', () => {
+          const target: Position = {
+            x: inHome1.page.withMargin.center.x,
+            y: inHome1.page.withMargin.bottom + inForeign1.page.withMargin.bottom + 1,
+          };
+          // dragging inForeign1 just below inHome1
+          const result: ?DroppableId = getDroppableOver({
+            target,
+            draggable: inForeign1,
+            draggables,
+            droppables,
+            previousDroppableOverId: home.descriptor.id,
+          });
+
+          expect(result).toBe(null);
+        });
+
+        it('should only add buffer on main axis', () => {
+          const target: Position = {
+            // too far to the right
+            x: inHome1.page.withMargin.right + 1,
+            // would otherwise be fine
+            y: inHome1.page.withMargin.bottom + inForeign1.page.withMargin.bottom,
+          };
+
+          const result: ?DroppableId = getDroppableOver({
+            target,
+            draggable: inForeign1,
+            draggables,
+            droppables,
+            previousDroppableOverId: home.descriptor.id,
+          });
+
+          expect(result).toBe(null);
+        });
       });
 
-      expect(justInsidePlaceholderArea).toBe(droppable3.id);
-      expect(justOutsidePlaceholderArea).toBe(null);
+      describe('droppable has scroll container', () => {
+        const custom: DroppableDimension = getDroppableDimension({
+          descriptor: {
+            id: 'has-a-scroll-parent',
+            type: 'TYPE',
+          },
+          client: getArea({
+            top: 0,
+            left: 0,
+            right: 100,
+            // cut off by the frame
+            bottom: 120,
+          }),
+          frameClient: getArea({
+            top: 0,
+            left: 0,
+            right: 100,
+            bottom: 100,
+          }),
+        });
+        // scrolling custom down so that it the bottom is visible
+        const scrolled: DroppableDimension = scrollDroppable(custom, { x: 0, y: 20 });
+
+        const withCustom: DroppableDimensionMap = {
+          ...droppables,
+          [custom.descriptor.id]: scrolled,
+        };
+
+        it('should not a placeholder buffer to the frame', () => {
+          // just below frame
+          // normally cut off by frame
+          const target: Position = {
+            x: 0,
+            y: 101,
+          };
+          // dragging inForeign1 just below inHome1
+          const result: ?DroppableId = getDroppableOver({
+            target,
+            draggable: inForeign1,
+            draggables,
+            droppables: withCustom,
+            previousDroppableOverId: custom.descriptor.id,
+          });
+
+          expect(result).toBe(null);
+        });
+      });
     });
   });
 });

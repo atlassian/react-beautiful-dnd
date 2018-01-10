@@ -43,24 +43,26 @@ export const makeSelector = (): Selector => {
 
   const getPlaceholder = memoizeOne(
     (id: DroppableId,
-      source: DraggableLocation,
       destination: ?DraggableLocation,
       draggable: ?DraggableDimension
     ): ?Placeholder => {
+      // not dragging anything
+      if (!draggable) {
+        return null;
+      }
+
+      // not dragging over any droppable
       if (!destination) {
         return null;
       }
-      // no placeholder needed for this droppable
-      if (destination.droppableId !== id) {
+
+      // no placeholder needed when dragging over the home droppable
+      if (id === draggable.descriptor.droppableId) {
         return null;
       }
 
-      // no placeholder needed when dragging over the source list
-      if (source.droppableId === destination.droppableId) {
-        return null;
-      }
-
-      if (!draggable) {
+      // not over this droppable
+      if (id !== destination.droppableId) {
         return null;
       }
 
@@ -104,9 +106,8 @@ export const makeSelector = (): Selector => {
 
         const placeholder: ?Placeholder = getPlaceholder(
           id,
-          drag.initial.source,
           drag.impact.destination,
-          draggable
+          draggable,
         );
         return getMapProps(isDraggingOver, placeholder);
       }
@@ -120,9 +121,8 @@ export const makeSelector = (): Selector => {
         const isDraggingOver = getIsDraggingOver(id, pending.impact.destination);
         const placeholder: ?Placeholder = getPlaceholder(
           id,
-          pending.result.source,
           pending.result.destination,
-          draggable
+          draggable,
         );
         return getMapProps(isDraggingOver, placeholder);
       }

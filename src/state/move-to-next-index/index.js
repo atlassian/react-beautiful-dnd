@@ -8,7 +8,7 @@ export default (args: Args): ?Result => {
   const { draggableId, draggables, droppable } = args;
 
   const draggable: DraggableDimension = draggables[draggableId];
-  const isInHomeList: boolean = draggable.droppableId === droppable.id;
+  const isInHomeList: boolean = draggable.descriptor.droppableId === droppable.descriptor.id;
 
   // Cannot move in list if the list is not enabled (can still cross axis move)
   if (!droppable.isEnabled) {

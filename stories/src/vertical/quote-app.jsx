@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled, { injectGlobal } from 'styled-components';
+import styled from 'styled-components';
 import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src/';
 import QuoteList from '../primatives/quote-list';
@@ -24,8 +24,6 @@ const Root = styled.div`
   align-items: flex-start;
 `;
 
-const isDraggingClassName = 'is-dragging';
-
 type Props = {|
   initial: Quote[],
   listStyle?: Object,
@@ -44,9 +42,6 @@ export default class QuoteApp extends Component<Props, State> {
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
-    // $ExpectError - body could be null?
-    document.body.classList.add(isDraggingClassName);
-
     // Add a little vibration if the browser supports it.
     // Add's a nice little physical feedback
     if (window.navigator.vibrate) {
@@ -56,8 +51,6 @@ export default class QuoteApp extends Component<Props, State> {
 
   onDragEnd = (result: DropResult) => {
     publishOnDragEnd(result);
-    // $ExpectError - body could be null?
-    document.body.classList.remove(isDraggingClassName);
 
     // dropped outside the list
     if (!result.destination) {
@@ -73,16 +66,6 @@ export default class QuoteApp extends Component<Props, State> {
     this.setState({
       quotes,
     });
-  }
-
-  componentDidMount() {
-    // eslint-disable-next-line no-unused-expressions
-    injectGlobal`
-      body.${isDraggingClassName} {
-        cursor: grabbing;
-        user-select: none;
-      }
-    `;
   }
 
   render() {

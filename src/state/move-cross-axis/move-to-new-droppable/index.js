@@ -8,6 +8,7 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DraggableLocation,
+  DragImpact,
 } from '../../../types';
 
 type Args = {|
@@ -24,6 +25,8 @@ type Args = {|
   insideDestination: DraggableDimension[],
   // the source location of the draggable
   home: DraggableLocation,
+  // the impact of a previous drag,
+  previousImpact: DragImpact,
 |}
 
 export default ({
@@ -33,6 +36,7 @@ export default ({
   target,
   home,
   insideDestination,
+  previousImpact,
 }: Args): ?Result => {
   const amount: Position = patch(
     destination.axis.line,
@@ -40,7 +44,7 @@ export default ({
   );
 
   // moving back to the home list
-  if (destination.id === draggable.droppableId) {
+  if (destination.descriptor.id === draggable.descriptor.droppableId) {
     return toHomeList({
       amount,
       originalIndex: home.index,
@@ -48,6 +52,7 @@ export default ({
       insideDroppable: insideDestination,
       draggable,
       droppable: destination,
+      previousImpact,
     });
   }
 
@@ -59,5 +64,6 @@ export default ({
     insideDroppable: insideDestination,
     draggable,
     droppable: destination,
+    previousImpact,
   });
 };

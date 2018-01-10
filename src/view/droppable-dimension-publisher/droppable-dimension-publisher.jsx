@@ -1,28 +1,73 @@
 // @flow
 import { Component } from 'react';
-import invariant from 'invariant';
-import rafScheduler from 'raf-schd';
+import type { Node } from 'react';
+import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
+import rafSchedule from 'raf-schd';
 import getWindowScrollPosition from '../get-window-scroll-position';
-import getClientRect from '../../state/get-client-rect';
+import getArea from '../../state/get-area';
 import { getDroppableDimension } from '../../state/dimension';
 import getClosestScrollable from '../get-closest-scrollable';
-// eslint-disable-next-line no-duplicate-imports
+import { dimensionMarshalKey } from '../context-keys';
 import type {
+  DimensionMarshal,
+  DroppableCallbacks,
+} from '../../state/dimension-marshal/dimension-marshal-types';
+import type {
+  DroppableId,
+  TypeId,
   DroppableDimension,
+  DroppableDescriptor,
   Position,
-  ClientRect,
+  Area,
   Spacing,
+  Direction,
 } from '../../types';
-import type { Props } from './droppable-dimension-publisher-types';
+
+type Props = {|
+  droppableId: DroppableId,
+  // (it is being used)
+  // eslint-disable-next-line react/no-unused-prop-types
+  type: TypeId,
+  direction: Direction,
+  isDropDisabled: boolean,
+  ignoreContainerClipping: boolean,
+  isDropDisabled: boolean,
+  targetRef: ?HTMLElement,
+  children: Node,
+|}
 
 const origin: Position = { x: 0, y: 0 };
 
 export default class DroppableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
-
-  isWatchingScroll: boolean = false;
   closestScrollable: ?Element = null;
+  isWatchingScroll: boolean = false;
+  callbacks: DroppableCallbacks;
+  publishedDescriptor: ?DroppableDescriptor = null;
+
+  constructor(props: Props, context: mixed) {
+    super(props, context);
+    const callbacks: DroppableCallbacks = {
+      getDimension: this.getDimension,
+      watchScroll: this.watchScroll,
+      unwatchScroll: this.unwatchScroll,
+    };
+    this.callbacks = callbacks;
+  }
+
+  static contextTypes = {
+    [dimensionMarshalKey]: PropTypes.object.isRequired,
+  };
+
+  getDescriptor(props: Props) {
+    const { droppableId, type } = props;
+    const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
+      droppableId, type,
+    );
+
+    return descriptor;
+  }
 
   getScrollOffset = (): Position => {
     if (!this.closestScrollable) {
@@ -37,19 +82,148 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     return offset;
   }
 
+  memoizedUpdateScroll = memoizeOne((x: number, y: number) => {
+    if (!this.publishedDescriptor) {
+      console.error('Cannot update scroll on unpublished droppable');
+      return;
+    }
+
+    const newScroll: Position = { x, y };
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
+    marshal.updateDroppableScroll(this.publishedDescriptor.id, newScroll);
+  });
+
+  scheduleScrollUpdate = rafSchedule((offset: Position) => {
+    // might no longer be listening for scroll changes by the time a frame comes back
+    if (this.isWatchingScroll) {
+      this.memoizedUpdateScroll(offset.x, offset.y);
+    }
+  });
+
+  onClosestScroll = () => {
+    this.scheduleScrollUpdate(this.getScrollOffset());
+  }
+
+  watchScroll = () => {
+    if (!this.props.targetRef) {
+      console.error('cannot watch droppable scroll if not in the dom');
+      return;
+    }
+
+    // no closest parent
+    if (this.closestScrollable == null) {
+      return;
+    }
+
+    if (this.isWatchingScroll) {
+      return;
+    }
+
+    this.isWatchingScroll = true;
+    this.closestScrollable.addEventListener('scroll', this.onClosestScroll, { passive: true });
+  };
+
+  unwatchScroll = () => {
+    // it is possible for the dimension publisher to tell this component to unwatch scroll
+    // when it was not listening to a scroll
+    if (!this.isWatchingScroll) {
+      return;
+    }
+
+    this.isWatchingScroll = false;
+
+    if (!this.closestScrollable) {
+      console.error('cannot unbind event listener if element is null');
+      return;
+    }
+
+    this.closestScrollable.removeEventListener('scroll', this.onClosestScroll);
+  }
+
+  componentWillMount() {
+    this.publish(this.getDescriptor(this.props));
+  }
+
+  componentWillReceiveProps(nextProps: Props) {
+    this.publish(this.getDescriptor(nextProps));
+
+    if (this.props.isDropDisabled === nextProps.isDropDisabled) {
+      return;
+    }
+
+    // the enabled state of the droppable is changing
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
+    marshal.updateDroppableIsEnabled(nextProps.droppableId, !nextProps.isDropDisabled);
+  }
+
+  componentWillUnmount() {
+    if (this.isWatchingScroll) {
+      console.warn('unmounting droppable while it was watching scroll');
+      this.unwatchScroll();
+    }
+
+    this.unpublish();
+  }
+
+  getMemoizedDescriptor = memoizeOne(
+    (id: DroppableId, type: TypeId): DroppableDescriptor => ({
+      id,
+      type,
+    }));
+
+  unpublish = () => {
+    if (!this.publishedDescriptor) {
+      console.error('cannot unpublish descriptor when none is published');
+      return;
+    }
+
+    // Using the previously published id to unpublish. This is to guard
+    // against the case where the id dynamically changes. This is not
+    // supported during a drag - but it is good to guard against.
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
+    marshal.unregisterDroppable(this.publishedDescriptor);
+    this.publishedDescriptor = null;
+  }
+
+  publish = (descriptor: DroppableDescriptor) => {
+    if (descriptor === this.publishedDescriptor) {
+      return;
+    }
+
+    if (this.publishedDescriptor) {
+      this.unpublish();
+    }
+
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
+    marshal.registerDroppable(descriptor, this.callbacks);
+    this.publishedDescriptor = descriptor;
+  }
+
   getDimension = (): DroppableDimension => {
     const {
-      droppableId,
       direction,
       ignoreContainerClipping,
       isDropDisabled,
       targetRef,
     } = this.props;
+
     if (!targetRef) {
       throw new Error('DimensionPublisher cannot calculate a dimension when not attached to the DOM');
     }
 
-    const scroll: Position = this.getScrollOffset();
+    if (this.isWatchingScroll) {
+      throw new Error('Attempting to recapture Droppable dimension while already watching scroll on previous capture');
+    }
+
+    const descriptor: ?DroppableDescriptor = this.publishedDescriptor;
+
+    if (!descriptor) {
+      throw new Error('Cannot get dimension for unpublished droppable');
+    }
+
+    // side effect - grabbing it for scroll listening so we know it is the same node
+    this.closestScrollable = getClosestScrollable(targetRef);
+    const frameScroll: Position = this.getScrollOffset();
     const style: Object = window.getComputedStyle(targetRef);
 
     // keeping it simple and always using the margin of the droppable
@@ -67,129 +241,40 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       left: parseInt(style.paddingLeft, 10),
     };
 
-    const clientRect: ClientRect = (targetRef.getBoundingClientRect(): any);
+    const client: Area = getArea(targetRef.getBoundingClientRect());
 
     // The droppable's own bounds should be treated as the
     // container bounds in the following situations:
     // 1. The consumer has opted in to ignoring container clipping
     // 2. There is no scroll container
     // 3. The droppable has internal scrolling
-    const containerRect: ClientRect = ignoreContainerClipping ||
-      !this.closestScrollable ||
-      this.closestScrollable === targetRef
-      ? clientRect
-      : getClientRect(this.closestScrollable.getBoundingClientRect());
+
+    const frameClient: ?Area = (() => {
+      if (ignoreContainerClipping) {
+        return null;
+      }
+      if (!this.closestScrollable) {
+        return null;
+      }
+      if (this.closestScrollable === targetRef) {
+        return null;
+      }
+      return getArea(this.closestScrollable.getBoundingClientRect());
+    })();
 
     const dimension: DroppableDimension = getDroppableDimension({
-      id: droppableId,
+      descriptor,
       direction,
-      clientRect,
-      containerRect,
+      client,
+      frameClient,
+      frameScroll,
       margin,
       padding,
       windowScroll: getWindowScrollPosition(),
-      scroll,
       isEnabled: !isDropDisabled,
     });
 
     return dimension;
-  }
-
-  memoizedUpdateScroll = memoizeOne((x: number, y: number) => {
-    const offset: Position = { x, y };
-    this.props.updateScroll(this.props.droppableId, offset);
-  });
-
-  scheduleScrollUpdate = rafScheduler((offset: Position) => {
-    // might no longer be listening for scroll changes by the time a frame comes back
-    if (this.isWatchingScroll) {
-      this.memoizedUpdateScroll(offset.x, offset.y);
-    }
-  });
-
-  componentWillUnmount() {
-    if (this.isWatchingScroll) {
-      this.unwatchScroll();
-    }
-  }
-
-  onClosestScroll = () => {
-    this.scheduleScrollUpdate(this.getScrollOffset());
-  }
-
-  watchScroll = () => {
-    invariant(this.props.targetRef, 'cannot watch scroll if not in the dom');
-
-    // no closest parent
-    if (this.closestScrollable == null) {
-      return;
-    }
-
-    if (this.isWatchingScroll) {
-      return;
-    }
-
-    this.isWatchingScroll = true;
-    this.closestScrollable.addEventListener('scroll', this.onClosestScroll, { passive: true });
-  }
-
-  unwatchScroll = () => {
-    if (!this.isWatchingScroll) {
-      return;
-    }
-
-    this.isWatchingScroll = false;
-
-    if (!this.closestScrollable) {
-      console.error('cannot unbind event listener if element is null');
-      return;
-    }
-
-    this.closestScrollable.removeEventListener('scroll', this.onClosestScroll);
-  }
-
-  componentWillReceiveProps(nextProps: Props) {
-    // Because the dimension publisher wraps children - it might render even when its props do
-    // not change. We need to ensure that it does not publish when it should not.
-
-    const shouldStartPublishing = !this.props.shouldPublish && nextProps.shouldPublish;
-    const alreadyPublishing = this.props.shouldPublish && nextProps.shouldPublish;
-    const stopPublishing = this.props.shouldPublish && !nextProps.shouldPublish;
-
-    // should no longer watch for scrolling
-    if (stopPublishing) {
-      this.unwatchScroll();
-      return;
-    }
-
-    if (alreadyPublishing) {
-      // if ref changes and watching scroll - unwatch the scroll
-      if (nextProps.targetRef !== this.props.targetRef) {
-        if (this.isWatchingScroll) {
-          console.warn('changing targetRef while watching scroll!');
-          this.unwatchScroll();
-        }
-      }
-
-      // publish any changes to the disabled flag
-      if (nextProps.isDropDisabled !== this.props.isDropDisabled) {
-        this.props.updateIsEnabled(this.props.droppableId, !nextProps.isDropDisabled);
-      }
-
-      return;
-    }
-
-    // This will be the default when nothing is happening
-    if (!shouldStartPublishing) {
-      return;
-    }
-
-    // Need to start publishing
-
-    // discovering the closest scrollable for a drag
-    this.closestScrollable = getClosestScrollable(this.props.targetRef);
-    this.props.publish(this.getDimension());
-    this.watchScroll();
   }
 
   render() {
