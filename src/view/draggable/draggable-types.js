@@ -4,7 +4,6 @@ import type {
   DraggableId,
   DraggableDimension,
   Position,
-  TypeId,
   Direction,
   ZIndex,
 } from '../../types';
@@ -21,32 +20,10 @@ import {
   dropAnimationFinished,
 } from '../../state/action-creators';
 import type {
-  Provided as DragHandleProvided,
+  DragHandleProps,
 } from '../drag-handle/drag-handle-types';
 
-// These styles are applied by default to allow for a
-// better touch device drag and drop experience.
-// Users can opt out of these styles or change them if
-// they really need too for their specific use case.
-export type BaseStyle = {|
-  // A long press on anchors usually pops a content menu that has options for
-  // the link such as 'Open in new tab'. Because long press is used to start
-  // a drag we need to opt out of this behavior
-  WebkitTouchCallout: 'none',
-
-  // Webkit based browsers add a grey overlay to anchors when they are active.
-  // We remove this tap overlay as it is confusing for users
-  // https://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/
-  WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-
-  // Avoid the *pull to refresh action* and *delayed anchor focus* on Android Chrome
-  touchAction: 'manipulation',
-|}
-
 export type DraggingStyle = {|
-  ...BaseStyle,
-  // Allow scrolling of the element behind the dragging element
-  pointerEvents: 'none',
 
   // `position: fixed` is used to ensure that the element is always positioned
   // in the correct position and ignores the surrounding position:relative parents
@@ -76,6 +53,11 @@ export type DraggingStyle = {|
   // but it is cleanest to just remove all the margins rather than only the top and left.
   margin: 0,
 
+  // We need to opt out of the shared global style that is being applied to
+  // all draggables. The movement of moving draggables is either not animated
+  // or handled by react-motion.
+  transition: 'none',
+
   // Move the element in response to a user dragging
   transform: ?string,
 
@@ -85,10 +67,10 @@ export type DraggingStyle = {|
 |}
 
 export type NotDraggingStyle = {|
-  ...BaseStyle,
-  transition: ?string,
   transform: ?string,
-  pointerEvents: 'none' | 'auto',
+  // null: use the global animation style
+  // none: skip animation (used in certain displacement situations)
+  transition: null | 'none',
 |}
 
 export type DraggableStyle = DraggingStyle | NotDraggingStyle;
@@ -98,10 +80,20 @@ export type ZIndexOptions = {|
   dropAnimating: number,
 |}
 
+// Props that can be spread onto the element directly
+export type DraggableProps = {|
+  // inline style
+  style: ?DraggableStyle,
+  // used for shared global styles
+  'data-react-beautiful-dnd-draggable': string,
+|}
+
 export type Provided = {|
+  draggableProps: DraggableProps,
+  // will be null if the draggable is disabled
+  dragHandleProps: ?DragHandleProps,
+  // The following props will be removed once we move to react 16
   innerRef: (?HTMLElement) => void,
-  draggableStyle: ?DraggableStyle,
-  dragHandleProps: ?DragHandleProvided,
   placeholder: ?Node,
 |}
 
@@ -124,12 +116,16 @@ export type DispatchProps = {|
 
 export type MapProps = {|
   isDragging: boolean,
+  // whether or not a drag movement should be animated
+  // used for dropping and keyboard dragging
+  shouldAnimateDragMovement: boolean,
+  // when an item is being displaced by a dragging item,
+  // we need to know if that movement should be animated
+  shouldAnimateDisplacement: boolean,
   // only provided when dragging
   // can be null if not over a droppable
   direction: ?Direction,
   isDropAnimating: boolean,
-  canLift: boolean,
-  canAnimate: boolean,
   offset: Position,
   dimension: ?DraggableDimension,
 |}
@@ -137,13 +133,12 @@ export type MapProps = {|
 export type OwnProps = {|
   draggableId: DraggableId,
   children: (Provided, StateSnapshot) => ?Node,
-  type: TypeId,
+  index: number,
   isDragDisabled: boolean,
   disableInteractiveElementBlocking: boolean,
 |}
 
 export type DefaultProps = {|
-  type: TypeId,
   isDragDisabled: boolean,
   disableInteractiveElementBlocking: boolean
 |}

@@ -1,13 +1,16 @@
 // @flow
 import moveToEdge from '../../move-to-edge';
 import type { Result } from '../move-cross-axis-types';
+import getDisplacement from '../../get-displacement';
+import getViewport from '../../visibility/get-viewport';
 import type {
   Axis,
   Position,
   DragImpact,
-  DraggableId,
+  Area,
   DraggableDimension,
   DroppableDimension,
+  Displacement,
 } from '../../../types';
 
 type Args = {|
@@ -17,6 +20,7 @@ type Args = {|
   insideDroppable: DraggableDimension[],
   draggable: DraggableDimension,
   droppable: DroppableDimension,
+  previousImpact: DragImpact,
 |}
 
 export default ({
@@ -26,6 +30,7 @@ export default ({
   insideDroppable,
   draggable,
   droppable,
+  previousImpact,
 }: Args): ?Result => {
   const axis: Axis = droppable.axis;
   const isGoingBeforeTarget: boolean = Boolean(target &&
@@ -47,13 +52,13 @@ export default ({
 
     const newImpact: DragImpact = {
       movement: {
-        draggables: [],
+        displaced: [],
         amount,
         isBeyondStartPosition: false,
       },
       direction: axis.direction,
       destination: {
-        droppableId: droppable.id,
+        droppableId: droppable.descriptor.id,
         index: 0,
       },
     };
@@ -87,19 +92,25 @@ export default ({
   // if going before: move everything down including the target
   // if going after: move everything down excluding the target
 
-  const needsToMove: DraggableId[] = insideDroppable
+  const viewport: Area = getViewport();
+  const displaced: Displacement[] = insideDroppable
     .slice(proposedIndex, insideDroppable.length)
-    .map((dimension: DraggableDimension): DraggableId => dimension.id);
+    .map((dimension: DraggableDimension): Displacement => getDisplacement({
+      draggable: dimension,
+      destination: droppable,
+      viewport,
+      previousImpact,
+    }));
 
   const newImpact: DragImpact = {
     movement: {
-      draggables: needsToMove,
+      displaced,
       amount,
       isBeyondStartPosition: false,
     },
     direction: axis.direction,
     destination: {
-      droppableId: droppable.id,
+      droppableId: droppable.descriptor.id,
       index: proposedIndex,
     },
   };

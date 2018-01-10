@@ -4,7 +4,7 @@ import type { DragMovement, DragImpact, Position } from '../types';
 const origin: Position = { x: 0, y: 0 };
 
 export const noMovement: DragMovement = {
-  draggables: [],
+  displaced: [],
   amount: origin,
   isBeyondStartPosition: false,
 };

@@ -66,7 +66,18 @@ describe('get new home client center', () => {
             // the movement from the last drag
             const movement: DragMovement = {
               // ordered by closest to impacted
-              draggables: [inHome3.id, inHome2.id],
+              displaced: [
+                {
+                  draggableId: inHome3.descriptor.id,
+                  isVisible: true,
+                  shouldAnimate: true,
+                },
+                {
+                  draggableId: inHome2.descriptor.id,
+                  isVisible: true,
+                  shouldAnimate: true,
+                },
+              ],
               amount: inHome1Size,
               isBeyondStartPosition: true,
             };
@@ -95,7 +106,18 @@ describe('get new home client center', () => {
             // the movement from the last drag
             const movement: DragMovement = {
               // ordered by closest to impacted
-              draggables: [inHome1.id, inHome2.id],
+              displaced: [
+                {
+                  draggableId: inHome1.descriptor.id,
+                  isVisible: true,
+                  shouldAnimate: true,
+                },
+                {
+                  draggableId: inHome2.descriptor.id,
+                  isVisible: true,
+                  shouldAnimate: true,
+                },
+              ],
               amount: inHome1Size,
               // is not beyond start position - going backwards
               isBeyondStartPosition: false,
@@ -126,7 +148,28 @@ describe('get new home client center', () => {
             // the movement from the last drag
             const movement: DragMovement = {
               // ordered by closest to impacted
-              draggables: [inForeign1.id, inForeign2.id, inForeign3.id, inForeign4.id],
+              displaced: [
+                {
+                  draggableId: inForeign1.descriptor.id,
+                  isVisible: true,
+                  shouldAnimate: true,
+                },
+                {
+                  draggableId: inForeign2.descriptor.id,
+                  isVisible: true,
+                  shouldAnimate: true,
+                },
+                {
+                  draggableId: inForeign3.descriptor.id,
+                  isVisible: true,
+                  shouldAnimate: true,
+                },
+                {
+                  draggableId: inForeign4.descriptor.id,
+                  isVisible: true,
+                  shouldAnimate: true,
+                },
+              ],
               amount: inHome1Size,
               // not relevant when moving into new list
               isBeyondStartPosition: false,
@@ -156,7 +199,7 @@ describe('get new home client center', () => {
             // the movement from the last drag
             const movement: DragMovement = {
               // nothing has moved (going to end of list)
-              draggables: [],
+              displaced: [],
               amount: inHome1Size,
               // not relevant when moving into new list
               isBeyondStartPosition: false,
@@ -184,7 +227,7 @@ describe('get new home client center', () => {
             });
             // the movement from the last drag
             const movement: DragMovement = {
-              draggables: [],
+              displaced: [],
               amount: inHome1Size,
               // not relevant when moving into new list
               isBeyondStartPosition: false,

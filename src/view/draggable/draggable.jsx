@@ -6,21 +6,21 @@ import invariant from 'invariant';
 import type {
   Position,
   DraggableDimension,
-  InitialDragLocation,
+  InitialDragPositions,
+  DroppableId,
 } from '../../types';
 import DraggableDimensionPublisher from '../draggable-dimension-publisher/';
 import Moveable from '../moveable/';
 import DragHandle from '../drag-handle';
-import { css } from '../animation';
 import getWindowScrollPosition from '../get-window-scroll-position';
 // eslint-disable-next-line no-duplicate-imports
 import type {
+  DragHandleProps,
   Callbacks as DragHandleCallbacks,
-  Provided as DragHandleProvided,
 } from '../drag-handle/drag-handle-types';
 import getCenterPosition from '../get-center-position';
 import Placeholder from '../placeholder';
-import { droppableIdKey } from '../context-keys';
+import { droppableIdKey, styleContextKey } from '../context-keys';
 import type {
   Props,
   Provided,
@@ -45,6 +45,7 @@ export const zIndexOptions: ZIndexOptions = {
 export default class Draggable extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
   callbacks: DragHandleCallbacks
+  styleContext: string
 
   state: State = {
     ref: null,
@@ -52,7 +53,6 @@ export default class Draggable extends Component<Props, State> {
 
   static defaultProps: DefaultProps = {
     isDragDisabled: false,
-    type: 'DEFAULT',
     // cannot drag interactive elements by default
     disableInteractiveElementBlocking: false,
   }
@@ -61,10 +61,10 @@ export default class Draggable extends Component<Props, State> {
   // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
   static contextTypes = {
     [droppableIdKey]: PropTypes.string.isRequired,
+    [styleContextKey]: PropTypes.string.isRequired,
   }
-  /* eslint-enable */
 
-  constructor(props: Props, context: mixed) {
+  constructor(props: Props, context: Object) {
     super(props, context);
 
     const callbacks: DragHandleCallbacks = {
@@ -80,6 +80,7 @@ export default class Draggable extends Component<Props, State> {
     };
 
     this.callbacks = callbacks;
+    this.styleContext = context[styleContextKey];
   }
 
   // This should already be handled gracefully in DragHandle.
@@ -104,21 +105,21 @@ export default class Draggable extends Component<Props, State> {
   onLift = (options: {client: Position, isScrollAllowed: boolean}) => {
     this.throwIfCannotDrag();
     const { client, isScrollAllowed } = options;
-    const { lift, draggableId, type } = this.props;
+    const { lift, draggableId } = this.props;
     const { ref } = this.state;
 
     if (!ref) {
       throw new Error('cannot lift at this time');
     }
 
-    const initial: InitialDragLocation = {
+    const initial: InitialDragPositions = {
       selection: client,
       center: getCenterPosition(ref),
     };
 
     const windowScroll: Position = getWindowScrollPosition();
 
-    lift(draggableId, type, initial, windowScroll, isScrollAllowed);
+    lift(draggableId, initial, windowScroll, isScrollAllowed);
   }
 
   onMove = (client: Position) => {
@@ -211,37 +212,26 @@ export default class Draggable extends Component<Props, State> {
       const style: DraggingStyle = {
         position: 'fixed',
         boxSizing: 'border-box',
-        pointerEvents: 'none',
         zIndex: isDropAnimating ? zIndexOptions.dropAnimating : zIndexOptions.dragging,
         width,
         height,
         top,
         left,
         margin: 0,
+        transition: 'none',
         transform: movementStyle.transform ? `${movementStyle.transform}` : null,
-        // base style
-        WebkitTouchCallout: 'none',
-        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-        touchAction: 'manipulation',
       };
       return style;
     }
   )
 
   getNotDraggingStyle = memoizeOne(
-    (
-      canAnimate: boolean,
-      movementStyle: MovementStyle,
-      canLift: boolean,
-    ): NotDraggingStyle => {
+    (movementStyle: MovementStyle, shouldAnimateDisplacement: boolean): NotDraggingStyle => {
       const style: NotDraggingStyle = {
-        transition: canAnimate ? css.outOfTheWay : null,
         transform: movementStyle.transform,
-        pointerEvents: canLift ? 'auto' : 'none',
-        // base style
-        WebkitTouchCallout: 'none',
-        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-        touchAction: 'manipulation',
+        // use the global animation for animation - or opt out of it
+        transition: shouldAnimateDisplacement ? null : 'none',
+        // transition: css.outOfTheWay,
       };
       return style;
     }
@@ -251,21 +241,16 @@ export default class Draggable extends Component<Props, State> {
     (
       isDragging: boolean,
       isDropAnimating: boolean,
-      canLift: boolean,
-      canAnimate: boolean,
+      shouldAnimateDisplacement: boolean,
       dimension: ?DraggableDimension,
-      dragHandleProps: ?DragHandleProvided,
+      dragHandleProps: ?DragHandleProps,
       movementStyle: MovementStyle,
     ): Provided => {
       const useDraggingStyle: boolean = isDragging || isDropAnimating;
 
       const draggableStyle: DraggableStyle = (() => {
         if (!useDraggingStyle) {
-          return this.getNotDraggingStyle(
-            canAnimate,
-            movementStyle,
-            canLift,
-          );
+          return this.getNotDraggingStyle(movementStyle, shouldAnimateDisplacement);
         }
 
         invariant(dimension, 'draggable dimension required for dragging');
@@ -277,9 +262,12 @@ export default class Draggable extends Component<Props, State> {
 
       const provided: Provided = {
         innerRef: this.setRef,
-        placeholder: useDraggingStyle ? this.getPlaceholder() : null,
+        draggableProps: {
+          'data-react-beautiful-dnd-draggable': this.styleContext,
+          style: draggableStyle,
+        },
         dragHandleProps,
-        draggableStyle,
+        placeholder: useDraggingStyle ? this.getPlaceholder() : null,
       };
       return provided;
     }
@@ -290,21 +278,16 @@ export default class Draggable extends Component<Props, State> {
   }))
 
   getSpeed = memoizeOne(
-    (isDragging: boolean, isDropAnimating: boolean, canAnimate: boolean): Speed => {
-      if (!canAnimate) {
-        return 'INSTANT';
-      }
-
+    (isDragging: boolean, shouldAnimateDragMovement: boolean, isDropAnimating: boolean): Speed => {
       if (isDropAnimating) {
         return 'STANDARD';
       }
 
       // if dragging and can animate - then move quickly
-      if (isDragging) {
+      if (isDragging && shouldAnimateDragMovement) {
         return 'FAST';
       }
 
-      // Moving out of the way.
       // Animation taken care of by css
       return 'INSTANT';
     })
@@ -312,26 +295,31 @@ export default class Draggable extends Component<Props, State> {
   render() {
     const {
       draggableId,
-      type,
+      index,
       offset,
       isDragging,
       isDropAnimating,
-      canLift,
-      canAnimate,
       isDragDisabled,
       dimension,
       children,
       direction,
+      shouldAnimateDragMovement,
+      shouldAnimateDisplacement,
       disableInteractiveElementBlocking,
     } = this.props;
+    const droppableId: DroppableId = this.context[droppableIdKey];
 
-    const speed = this.getSpeed(isDragging, isDropAnimating, canAnimate);
+    const speed = this.getSpeed(
+      isDragging,
+      shouldAnimateDragMovement,
+      isDropAnimating
+    );
 
     return (
       <DraggableDimensionPublisher
         draggableId={draggableId}
-        droppableId={this.context[droppableIdKey]}
-        type={type}
+        droppableId={droppableId}
+        index={index}
         targetRef={this.state.ref}
       >
         <Moveable
@@ -344,19 +332,17 @@ export default class Draggable extends Component<Props, State> {
               isDragging={isDragging}
               direction={direction}
               isEnabled={!isDragDisabled}
-              canLift={canLift}
               callbacks={this.callbacks}
               getDraggableRef={this.getDraggableRef}
               // by default we do not allow dragging on interactive elements
               canDragInteractiveElements={disableInteractiveElementBlocking}
             >
-              {(dragHandleProps: ?DragHandleProvided) =>
+              {(dragHandleProps: ?DragHandleProps) =>
                 children(
                   this.getProvided(
                     isDragging,
                     isDropAnimating,
-                    canLift,
-                    canAnimate,
+                    shouldAnimateDisplacement,
                     dimension,
                     dragHandleProps,
                     movementStyle,

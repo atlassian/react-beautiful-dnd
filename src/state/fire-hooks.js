@@ -4,9 +4,12 @@ import type {
   Hooks,
   DragStart,
   DropResult,
+  DraggableLocation,
+  DraggableDescriptor,
+  DroppableDimension,
 } from '../types';
 
-export default (hooks: Hooks, current: State, previous: State): void => {
+export default (hooks: Hooks, previous: State, current: State): void => {
   const { onDragStart, onDragEnd } = hooks;
   const currentPhase = current.phase;
   const previousPhase = previous.phase;
@@ -28,10 +31,23 @@ export default (hooks: Hooks, current: State, previous: State): void => {
       return;
     }
 
+    const descriptor: DraggableDescriptor = current.drag.initial.descriptor;
+    const home: ?DroppableDimension = current.dimension.droppable[descriptor.droppableId];
+
+    if (!home) {
+      console.error('cannot find dimension for home droppable');
+      return;
+    }
+
+    const source: DraggableLocation = {
+      index: descriptor.index,
+      droppableId: descriptor.droppableId,
+    };
+
     const start: DragStart = {
-      draggableId: current.drag.current.id,
-      type: current.drag.current.type,
-      source: current.drag.initial.source,
+      draggableId: descriptor.id,
+      type: home.descriptor.type,
+      source,
     };
 
     onDragStart(start);
@@ -75,6 +91,7 @@ export default (hooks: Hooks, current: State, previous: State): void => {
     };
 
     onDragEnd(muted);
+    return;
   }
 
   // Drag ended while dragging
@@ -83,13 +100,28 @@ export default (hooks: Hooks, current: State, previous: State): void => {
       console.error('cannot fire onDragEnd for cancel because cannot find previous drag');
       return;
     }
+
+    const descriptor: DraggableDescriptor = previous.drag.initial.descriptor;
+    const home: ?DroppableDimension = previous.dimension.droppable[descriptor.droppableId];
+
+    if (!home) {
+      console.error('cannot find dimension for home droppable');
+      return;
+    }
+
+    const source: DraggableLocation = {
+      index: descriptor.index,
+      droppableId: descriptor.droppableId,
+    };
+
     const result: DropResult = {
-      draggableId: previous.drag.current.id,
-      type: previous.drag.current.type,
-      source: previous.drag.initial.source,
+      draggableId: descriptor.id,
+      type: home.descriptor.type,
+      source,
       destination: null,
     };
     onDragEnd(result);
+    return;
   }
 
   // Drag ended during a drop animation. Not super sure how this can even happen.
