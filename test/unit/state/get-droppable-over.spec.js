@@ -78,6 +78,79 @@ describe('get droppable over', () => {
     expect(whileDisabled).toBe(null);
   });
 
+  it('should ignore droppables that are partially hidden by their frames', () => {
+    const droppable: DroppableDimension = getDroppableDimension({
+      descriptor: {
+        id: 'partially hidden subject',
+        type: 'TYPE',
+      },
+      client: getArea({
+        top: 0, left: 0, right: 100, bottom: 100,
+      }),
+      // will partially hide the subject
+      frameClient: getArea({
+        top: 0, left: 0, right: 50, bottom: 100,
+      }),
+    });
+    const draggable: DraggableDimension = getDraggableDimension({
+      descriptor: {
+        id: 'draggable',
+        droppableId: droppable.descriptor.type,
+        index: 0,
+      },
+      client: getArea({
+        top: 0, left: 0, right: 50, bottom: 50,
+      }),
+    });
+
+    const result: ?DroppableId = getDroppableOver({
+      // over the hidden part of the droppable subject
+      target: { x: 60, y: 50 },
+      draggable,
+      draggables: { [draggable.descriptor.id]: draggable },
+      droppables: { [droppable.descriptor.id]: droppable },
+      previousDroppableOverId: null,
+    });
+
+    expect(result).toBe(null);
+  });
+
+  it('should ignore droppables that are totally hidden by their frames', () => {
+    const droppable: DroppableDimension = getDroppableDimension({
+      descriptor: {
+        id: 'hidden subject',
+        type: 'TYPE',
+      },
+      client: getArea({
+        top: 0, left: 0, right: 100, bottom: 100,
+      }),
+      // will totally hide the subject
+      frameClient: getArea({
+        top: 0, left: 101, right: 200, bottom: 100,
+      }),
+    });
+    const draggable: DraggableDimension = getDraggableDimension({
+      descriptor: {
+        id: 'draggable',
+        droppableId: droppable.descriptor.type,
+        index: 0,
+      },
+      client: getArea({
+        top: 0, left: 0, right: 50, bottom: 50,
+      }),
+    });
+
+    const result: ?DroppableId = getDroppableOver({
+      target: { x: 50, y: 50 },
+      draggable,
+      draggables: { [draggable.descriptor.id]: draggable },
+      droppables: { [droppable.descriptor.id]: droppable },
+      previousDroppableOverId: null,
+    });
+
+    expect(result).toBe(null);
+  });
+
   describe('placeholder buffer', () => {
     const margin: Spacing = {
       top: 10, right: 10, bottom: 10, left: 10,

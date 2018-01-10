@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled, { injectGlobal } from 'styled-components';
+import styled from 'styled-components';
 import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src/';
 import QuoteList from '../primatives/quote-list';
@@ -66,15 +66,6 @@ export default class QuoteApp extends Component<Props, State> {
     this.setState({
       quotes,
     });
-  }
-
-  componentDidMount() {
-    // eslint-disable-next-line no-unused-expressions
-    // injectGlobal`
-    //   body {
-    //     background: ${colors.blue.deep};
-    //   }
-    // `;
   }
 
   render() {

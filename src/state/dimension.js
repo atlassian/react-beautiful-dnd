@@ -126,10 +126,13 @@ export const scrollDroppable = (
   // a positive scroll difference leads to a negative displacement
   // (scrolling down pulls an item upwards)
   const scrollDisplacement: Position = negate(scrollDiff);
-  const scrolledSubject: Spacing = offset(existing.subject, scrollDisplacement);
+  const displacedSubject: Spacing = offset(existing.subject, scrollDisplacement);
 
   const viewport: DroppableDimensionViewport = {
+    // does not change
     frame: existing.frame,
+    subject: existing.subject,
+    // below here changes
     frameScroll: {
       initial: existing.frameScroll.initial,
       current: newScroll,
@@ -138,8 +141,7 @@ export const scrollDroppable = (
         displacement: scrollDisplacement,
       },
     },
-    subject: existing.subject,
-    clipped: clip(existing.frame, scrolledSubject),
+    clipped: clip(existing.frame, displacedSubject),
   };
 
   // $ExpectError - using spread

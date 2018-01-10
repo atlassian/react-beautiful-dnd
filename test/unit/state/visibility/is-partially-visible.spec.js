@@ -230,6 +230,39 @@ describe('is partially visible', () => {
           })).toBe(true);
         });
       });
+
+      it('should return false if falling on clipped area of droppable', () => {
+        const frame: Spacing = {
+          top: 10,
+          left: 10,
+          right: 100,
+          // cuts the droppable short
+          bottom: 100,
+        };
+        const clippedDroppable: DroppableDimension = getDroppableDimension({
+          descriptor: {
+            id: 'clipped',
+            type: 'TYPE',
+          },
+          client: getArea({
+            ...frame,
+            // stretches out past frame
+            bottom: 600,
+          }),
+          frameClient: getArea(frame),
+        });
+        const inSubjectOutsideFrame: Spacing = {
+          ...frame,
+          top: 110,
+          bottom: 200,
+        };
+
+        expect(isPartiallyVisible({
+          target: inSubjectOutsideFrame,
+          destination: clippedDroppable,
+          viewport,
+        })).toBe(false);
+      });
     });
 
     describe('with changes in droppable scroll', () => {
@@ -299,6 +332,52 @@ describe('is partially visible', () => {
             viewport,
           })).toBe(false);
         });
+      });
+    });
+
+    describe('with invisible subject', () => {
+      const frame: Spacing = {
+        top: 10,
+        left: 10,
+        right: 100,
+        bottom: 600,
+      };
+      const droppable: DroppableDimension = getDroppableDimension({
+        descriptor: {
+          id: 'clipped',
+          type: 'TYPE',
+        },
+        client: getArea({
+          ...frame,
+          // smaller than frame
+          bottom: 100,
+        }),
+        frameClient: getArea(frame),
+      });
+
+      it('should return false when subject is totally invisible', () => {
+        const originallyVisible: Spacing = {
+          ...frame,
+          top: 10,
+          bottom: 20,
+        };
+
+        // originally visible
+        expect(isPartiallyVisible({
+          target: originallyVisible,
+          destination: droppable,
+          viewport,
+        })).toBe(true);
+
+        // subject is now totally invisible
+        const scrolled: DroppableDimension = scrollDroppable(droppable, { x: 0, y: 101 });
+        expect(isPartiallyVisible({
+          target: originallyVisible,
+          destination: scrolled,
+          viewport,
+        })).toBe(false);
+        // asserting frame is not visible
+        expect(scrolled.viewport.clipped).toBe(null);
       });
     });
   });
