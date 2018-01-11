@@ -136,8 +136,8 @@ class App extends Component {
               ref={provided.innerRef}
               style={getListStyle(snapshot.isDraggingOver)}
             >
-              {this.state.items.map(item => (
-                <Draggable key={item.id} draggableId={item.id}>
+              {this.state.items.map((item, index) => (
+                <Draggable key={item.id} draggableId={item.id} index={index}>
                   {(provided, snapshot) => (
                     <div>
                       <div
@@ -862,7 +862,7 @@ Getting keyboard dragging to work with scroll containers is quite difficult. Cur
 ```js
 import { Draggable } from 'react-beautiful-dnd';
 
-<Draggable draggableId="draggable-1" type="PERSON">
+<Draggable draggableId="draggable-1" type="PERSON" index={0}>
   {(provided, snapshot) => (
     <div>
       <div
@@ -892,7 +892,7 @@ import { Draggable } from 'react-beautiful-dnd';
 The `React` children of a `Draggable` must be a function that returns a `ReactElement`.
 
 ```js
-<Draggable draggableId="draggable-1">
+<Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => (
     <div>
       <div
@@ -926,7 +926,7 @@ Everything within the *provided* object must be applied for the `Draggable` to f
 - `provided.innerRef (innerRef: (HTMLElement) => void)`: In order for the `Droppable` to function correctly, **you must** bind the `innerRef` function to the `ReactElement` that you want to be considered the `Draggable` node. We do this in order to avoid needing to use `ReactDOM` to look up your DOM node.
 
 ```js
-<Draggable draggableId="draggable-1">
+<Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => <div ref={provided.innerRef}>Drag me!</div>}
 </Draggable>;
 ```
@@ -952,7 +952,7 @@ export type DraggableProps = {|
 ```
 
 ```js
-<Draggable draggableId="draggable-1">
+<Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => (
     <div>
       <div ref={provided.innerRef} {...provided.draggableProps}>
@@ -980,7 +980,7 @@ If you are using inline styles you are welcome to extend the `DraggableProps > s
 If you are overriding inline styles be sure to do it after you spread the `provided.draggableProps` or the spread will override your inline style.
 
 ```js
-<Draggable draggable="draggable-1">
+<Draggable draggable="draggable-1" index={0}>
   {(provided, snapshot) => {
     // extending the DraggableStyle with our own inline styles
     const style = {
@@ -1013,42 +1013,42 @@ It is an assumption that `Draggable`s and *visible siblings* of one another. The
 
 ```js
 // Direct siblings ✅
-<Draggable draggableId="draggable-1" >
+<Draggable draggableId="draggable-1" index={0}>
   {() => {}}
 </Draggable>
-<Draggable draggableId="draggable-2">
+<Draggable draggableId="draggable-2" index={1}>
   {() => {}}
 </Draggable>
 
 // Not direct siblings, but are visual siblings ✅
 <div>
-  <Draggable draggableId="draggable-1">
+  <Draggable draggableId="draggable-1" index={0}>
     {() => {}}
   </Draggable>
 </div>
 <div>
-  <Draggable draggableId="draggable-2">
+  <Draggable draggableId="draggable-2" index={1}>
     {() => {}}
   </Draggable>
 </div>
 
 // Spacer elements ❌
-<Draggable draggableId="draggable-1">
+<Draggable draggableId="draggable-1" index={0}>
     {() => {}}
 </Draggable>
 <p>I will break things!</p>
-<Draggable draggableId="draggable-2">
+<Draggable draggableId="draggable-2" index={1}>
     {() => {}}
 </Draggable>
 
 // Spacing on non sibling wrappers ❌
 <div style={{padding: 10}}>
-  <Draggable draggableId="draggable-1">
+  <Draggable draggableId="draggable-1" index={0}>
     {() => {}}
   </Draggable>
 </div>
 <div style={{padding: 10}}>
-  <Draggable draggableId="draggable-2">
+  <Draggable draggableId="draggable-2" index={1}>
     {() => {}}
   </Draggable>
 </div>
@@ -1080,7 +1080,7 @@ type NotDraggingStyle = {|
 - `provided.placeholder (?ReactElement)` The `Draggable` element has `position: fixed` applied to it while it is dragging. The role of the `placeholder` is to sit in the place that the `Draggable` was during a drag. It is needed to stop the `Droppable` list from collapsing when you drag. It is advised to render it as a sibling to the `Draggable` node. This is unlike `Droppable` where the `placeholder` needs to be *within* the `Droppable` node. When the library moves to `React` 16 the `placeholder` will be removed from api.
 
 ```js
-<Draggable draggableId="draggable-1">
+<Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => (
     <div>
       <div ref={provided.innerRef} {...provided.draggableProps}>
@@ -1113,7 +1113,7 @@ type DragHandleProps = {|
 ### Example: standard
 
 ```js
-<Draggable draggableId="draggable-1">
+<Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => (
     <div>
       <div
@@ -1134,7 +1134,7 @@ type DragHandleProps = {|
 Controlling a whole draggable by just a part of it
 
 ```js
-<Draggable draggableId="draggable-1">
+<Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => (
     <div>
       <div ref={provided.innerRef} {...provided.draggableProps}>
@@ -1154,7 +1154,7 @@ You can override some of the `dragHandleProps` props with your own behavior if y
 ```js
 const myOnClick = event => console.log('clicked on', event.target);
 
-<Draggable draggableId="draggable-1">
+<Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => {
     const onClick = (() => {
       // dragHandleProps might be null
@@ -1200,7 +1200,7 @@ type DraggableStateSnapshot = {|
 The `children` function is also provided with a small amount of state relating to the current drag state. This can be optionally used to enhance your component. A common use case is changing the appearance of a `Draggable` while it is being dragged. Note: if you want to change the cursor to something like `grab` you will need to add the style to the body. (See `DragDropContext` > **style** above)
 
 ```js
-<Draggable draggableId="draggable-1">
+<Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => {
     const style = {
       backgroundColor: snapshot.isDragging ? 'blue' : 'grey',
