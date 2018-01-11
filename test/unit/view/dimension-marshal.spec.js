@@ -142,7 +142,7 @@ describe('dimension marshal', () => {
   });
 
   describe('drag starting (including early cancel)', () => {
-    describe.only('invalid start state', () => {
+    describe('invalid start state', () => {
       it('should cancel the collecting if already collecting', () => {
         const callbacks = getCallbackStub();
         const marshal = createDimensionMarshal(callbacks);
