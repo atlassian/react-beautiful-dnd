@@ -338,28 +338,6 @@ If we detect a `touchmove` before the long press timer expires we cancel the pen
 
 If the user force presses on the element before they have moved the element (even if a drag has already started) then the drag is cancelled and the standard force press action occurs. For an anchor this is a website preview.
 
-### Preset styles
-
-We add the following styles to `Draggable`s by default to provide a more consistent touch dragging experience across various browsers out of the box. They have no visual impact. You are welcome to change these values or disable them for your specific use cases if you need to.
-
-A long press on anchors usually pops a content menu that has options for the link such as 'Open in new tab'. Because long press is used to start a drag we need to opt out of this behavior
-
-```css
--webkit-touch-callout: none;
-```
-
-Webkit based browsers add a grey overlay to anchors when they are active. We remove this tap overlay as it is confusing for users. [more information](https://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/).
-
-```css
--webkit-tap-highlight-color: rgba(0,0,0,0);
-```
-
-Avoid the *pull to refresh action* and *delayed anchor focus* on Android Chrome
-
-```css
-touch-action: manipulation;
-```
-
 ### Vibration
 
 > This is merely an idea - it is up to you to add this if you want this behavior.
