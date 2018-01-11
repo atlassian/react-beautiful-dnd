@@ -14,8 +14,9 @@ export default {
   output: {
     file: `dist/react-beautiful-dnd${args.min ? '.min' : ''}.js`,
     format: 'umd',
+    name: 'ReactBeautifulDnd',
+    globals: { react: 'React' },
   },
-  name: 'ReactBeautifulDnd',
   plugins: [
     babel({ exclude: 'node_modules/**', babelrc: false }),
     resolve(),
@@ -26,7 +27,5 @@ export default {
   ].concat(
     args.min ? uglify() : []
   ),
-  sourceMap: false,
   external: ['react'],
-  globals: { react: 'React' },
 };
