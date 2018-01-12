@@ -145,8 +145,8 @@ class App extends Component {
                         {...provided.droppableProps}
                         {...provided.dragHandleProps}
                         style={getItemStyle(
-                          snapshot.isDragging
-                          provided.droppableProps.style,
+                          snapshot.isDragging,
+                          provided.draggableProps.style,
                         )}
                       >
                         {item.content}
