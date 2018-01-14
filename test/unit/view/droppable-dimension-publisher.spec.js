@@ -105,6 +105,14 @@ describe('DraggableDimensionPublisher', () => {
     y: window.pageYOffset,
   };
 
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => { });
+  });
+
+  afterEach(() => {
+    console.error.mockRestore();
+  });
+
   afterEach(() => {
     // clean up any stubs
     if (Element.prototype.getBoundingClientRect.mockRestore) {
@@ -124,6 +132,34 @@ describe('DraggableDimensionPublisher', () => {
 
       expect(marshal.registerDroppable).toHaveBeenCalledTimes(1);
       expect(marshal.registerDroppable.mock.calls[0][0]).toEqual(preset.home.descriptor);
+    });
+
+    it('should log an error if no targetRef is provided', () => {
+      const marshal: DimensionMarshal = getMarshalStub();
+
+      const wrapper = mount(
+        <DroppableDimensionPublisher
+          droppableId={preset.home.descriptor.id}
+          type={preset.home.descriptor.type}
+          direction={preset.home.axis.direction}
+          isDropDisabled={false}
+          ignoreContainerClipping={false}
+          targetRef={null}
+        >
+          <div
+            className="scroll-container"
+            style={{ overflowY: 'auto' }}
+          >
+            hi
+          </div>
+        </DroppableDimensionPublisher>
+      );
+
+      // updating without a targetRef
+      forceUpdate(wrapper);
+
+      expect(console.error).toHaveBeenCalled();
+      expect(marshal.registerDroppable).not.toHaveBeenCalled();
     });
 
     it('should unregister itself when unmounting', () => {

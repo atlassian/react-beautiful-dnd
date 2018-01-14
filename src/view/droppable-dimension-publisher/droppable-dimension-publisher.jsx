@@ -26,8 +26,6 @@ import type {
 
 type Props = {|
   droppableId: DroppableId,
-  // (it is being used)
-  // eslint-disable-next-line react/no-unused-prop-types
   type: TypeId,
   direction: Direction,
   isDropDisabled: boolean,
@@ -59,15 +57,6 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   static contextTypes = {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
   };
-
-  getDescriptor(props: Props) {
-    const { droppableId, type } = props;
-    const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
-      droppableId, type,
-    );
-
-    return descriptor;
-  }
 
   getScrollOffset = (): Position => {
     if (!this.closestScrollable) {
@@ -140,12 +129,23 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     this.closestScrollable.removeEventListener('scroll', this.onClosestScroll);
   }
 
-  componentWillMount() {
-    this.publish(this.getDescriptor(this.props));
-  }
-
   componentWillReceiveProps(nextProps: Props) {
-    this.publish(this.getDescriptor(nextProps));
+    if (!nextProps.targetRef) {
+      console.error('Cannot update droppable dimension publisher without a target ref');
+      return;
+    }
+
+    // 1. Update the descriptor
+    // Note: not publishing it on componentDidMount as we do not have a ref at that point
+
+    const { droppableId, type } = nextProps;
+    const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
+      droppableId, type,
+    );
+
+    this.publish(descriptor);
+
+    // 2. Update is enabled
 
     if (this.props.isDropDisabled === nextProps.isDropDisabled) {
       return;
