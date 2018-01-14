@@ -866,6 +866,23 @@ describe('Connected Draggable', () => {
     });
   });
 
+  describe('selector isolation', () => {
+    it('should not break memoization across selectors', () => {
+      const inHome1Selector: Selector = makeSelector();
+      const inHome1OwnProps: OwnProps = getOwnProps(preset.inHome1);
+      const inHome2Selector: Selector = makeSelector();
+      const inHome2OwnProps: OwnProps = getOwnProps(preset.inHome2);
+      const defaultInHome2MapProps: MapProps = inHome2Selector(state.idle, inHome2OwnProps);
+
+      state.allPhases(preset.inHome1.descriptor.id).forEach((current: State) => {
+        // independent selector
+        inHome1Selector(current, inHome1OwnProps);
+        // should not break memoization of inHome2
+        expect(inHome2Selector(current, inHome2OwnProps)).toBe(defaultInHome2MapProps);
+      });
+    });
+  });
+
   describe('child render behavior', () => {
     // creating our own marshal so we can publish a droppable
     // so that the draggable can publish itself
