@@ -371,6 +371,23 @@ describe('Connected Droppable', () => {
     });
   });
 
+  describe('selector isolation', () => {
+    it('should not break memoization across selectors', () => {
+      const homeSelector: Selector = makeSelector();
+      const homeOwnProps: OwnProps = getOwnProps(preset.home);
+      const foreignSelector: Selector = makeSelector();
+      const foreignOwnProps: OwnProps = getOwnProps(preset.foreign);
+      const defaultForeignMapProps: MapProps = foreignSelector(state.idle, foreignOwnProps);
+
+      state.allPhases(preset.inHome1.descriptor.id).forEach((current: State) => {
+        // independent selector
+        homeSelector(current, homeOwnProps);
+        // should not break memoization of inHome2
+        expect(foreignSelector(current, foreignOwnProps)).toBe(defaultForeignMapProps);
+      });
+    });
+  });
+
   describe('child render behavior', () => {
     const contextOptions = combine(withStore(), withDimensionMarshal());
 
