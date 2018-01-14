@@ -21,6 +21,10 @@ See how beautiful it is for yourself!
 
 > We provide different links for touch devices as currently [storybook](https://github.com/storybooks/storybook) does not have a good mobile menu experience [more information](https://github.com/storybooks/storybook/issues/124)
 
+## Upgrading from `3.x` to `4.x`
+
+You can find an upgrade guide in our [release notes](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v4.0.0).
+
 ## Core characteristics
 
 - Beautiful, natural movement of items
@@ -142,7 +146,7 @@ class App extends Component {
                     <div>
                       <div
                         ref={provided.innerRef}
-                        {...provided.droppableProps}
+                        {...provided.draggableProps}
                         {...provided.dragHandleProps}
                         style={getItemStyle(
                           snapshot.isDragging,
