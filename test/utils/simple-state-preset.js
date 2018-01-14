@@ -176,13 +176,13 @@ export const dropComplete = (
   return value;
 };
 
-export const allPhases = (): State[] => [
+export const allPhases = (id? : DraggableId = preset.inHome1.descriptor.id): State[] => [
   idle,
   preparing,
-  requesting(),
-  dragging(),
-  dropAnimating(),
-  userCancel(),
-  dropComplete(),
+  requesting(id),
+  dragging(id),
+  dropAnimating(id),
+  userCancel(id),
+  dropComplete(id),
 ];
 
