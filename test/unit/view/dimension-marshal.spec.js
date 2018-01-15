@@ -1016,10 +1016,11 @@ describe('dimension marshal', () => {
     });
   });
 
+  // Behaviour currently unsupported
   describe('registration change while collecting', () => {
     describe('dimension added', () => {
       describe('draggable', () => {
-        it('should immediately publish the draggable', () => {
+        it('should log an unsupported warning', () => {
           const callbacks = getCallbackStub();
           const marshal = createDimensionMarshal(callbacks);
           populateMarshal(marshal);
@@ -1032,10 +1033,14 @@ describe('dimension marshal', () => {
             client: fakeArea,
           });
 
+          // start a collection
           marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
-
+          callbacks.publishDraggables.mockReset();
+          // now registering
           marshal.registerDraggable(fake.descriptor, () => fake);
-          expect(callbacks.publishDraggables).toHaveBeenCalledWith([fake]);
+
+          expect(callbacks.publishDraggables).not.toHaveBeenCalled();
+          expect(console.warn).toHaveBeenCalled();
         });
       });
 
@@ -1057,12 +1062,17 @@ describe('dimension marshal', () => {
             unwatchScroll: () => { },
           };
 
+          // starting collection
           marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          callbacks.publishDroppables.mockReset();
 
+          // updating registration
           marshal.registerDroppable(fake.descriptor, droppableCallbacks);
-          expect(callbacks.publishDroppables).toHaveBeenCalledWith([fake]);
-          // should subscribe to scrolling immediately
-          expect(droppableCallbacks.watchScroll).toHaveBeenCalled();
+
+          // warning should have been logged and nothing updated
+          expect(console.warn).toHaveBeenCalled();
+          expect(callbacks.publishDroppables).not.toHaveBeenCalled();
+          expect(droppableCallbacks.watchScroll).not.toHaveBeenCalled();
         });
       });
     });

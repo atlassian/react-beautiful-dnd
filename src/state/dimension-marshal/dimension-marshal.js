@@ -98,10 +98,7 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    // if a draggable is published while collecting - publishing it immediately
-
-    const dimension: DraggableDimension = entry.getDimension();
-    callbacks.publishDraggables([dimension]);
+    console.warn('Adding a draggable during a drag is currently not supported');
   };
 
   const registerDroppable = (
@@ -132,10 +129,7 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    // if a droppable is published while collecting - publishing it immediately
-    const dimension: DroppableDimension = entry.callbacks.getDimension();
-    callbacks.publishDroppables([dimension]);
-    entry.callbacks.watchScroll();
+    console.warn('Currently not supporting updating Droppables during a drag');
   };
 
   const updateDroppableIsEnabled = (id: DroppableId, isEnabled: boolean) => {
