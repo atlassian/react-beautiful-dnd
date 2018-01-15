@@ -1246,7 +1246,7 @@ You can opt out of this behavior by adding the `disableInteractiveElementBlockin
 
 ## Flow usage
 
-`react-beautiful-dnd` is typed using [`flowtype`](flowtype.org). This greatly improves internal consistency within the codebase. We also expose a number of public types which will allow you to type your javascript if you would like to. If you are not using `flowtype` this will not inhibit you from using the library. It is just extra safety for those who want it.
+`react-beautiful-dnd` is typed using [`flowtype`](https://flow.org). This greatly improves internal consistency within the codebase. We also expose a number of public types which will allow you to type your javascript if you would like to. If you are not using `flowtype` this will not inhibit you from using the library. It is just extra safety for those who want it.
 
 ### Public flow types
 
@@ -1350,7 +1350,7 @@ We have created a [sample application](https://github.com/alexreardon/react-beau
 
 ### Typed
 
-This codebase is typed with [flowtype](flowtype.org) to promote greater internal consistency and more resilient code.
+This codebase is typed with [flowtype](https://flow.org) to promote greater internal consistency and more resilient code.
 
 ### Tested
 
