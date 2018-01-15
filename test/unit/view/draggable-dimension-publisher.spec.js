@@ -81,6 +81,14 @@ const getMarshalStub = (): DimensionMarshal => ({
 });
 
 describe('DraggableDimensionPublisher', () => {
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => { });
+  });
+
+  afterEach(() => {
+    console.error.mockRestore();
+  });
+
   describe('dimension registration', () => {
     it('should register itself when mounting', () => {
       const marshal: DimensionMarshal = getMarshalStub();
@@ -89,6 +97,27 @@ describe('DraggableDimensionPublisher', () => {
 
       expect(marshal.registerDraggable).toHaveBeenCalledTimes(1);
       expect(marshal.registerDraggable.mock.calls[0][0]).toEqual(preset.inHome1.descriptor);
+    });
+
+    it('should log an error if no targetRef is provided', () => {
+      const marshal: DimensionMarshal = getMarshalStub();
+
+      const wrapper = mount(
+        <DraggableDimensionPublisher
+          draggableId={preset.inHome1.descriptor.id}
+          droppableId={preset.inHome1.descriptor.droppableId}
+          index={preset.inHome1.descriptor.index}
+          targetRef={null}
+        >
+          <div>hi</div>
+        </DraggableDimensionPublisher>,
+        withDimensionMarshal(marshal)
+      );
+
+      forceUpdate(wrapper);
+
+      expect(marshal.registerDraggable).not.toHaveBeenCalled();
+      expect(console.error).toHaveBeenCalled();
     });
 
     it('should unregister itself when unmounting', () => {
