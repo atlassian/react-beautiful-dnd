@@ -18,12 +18,9 @@ import type {
 import type { DimensionMarshal } from '../../state/dimension-marshal/dimension-marshal-types';
 
 type Props = {|
-  // (it is being used)
-  /* eslint-disable react/no-unused-prop-types */
   draggableId: DraggableId,
   droppableId: DroppableId,
   index: number,
-  /* eslint-enable react/no-unused-prop-types */
   targetRef: ?HTMLElement,
   children: Node,
 |}
@@ -36,20 +33,21 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
   publishedDescriptor: ?DraggableDescriptor = null
 
-  getDescriptor(props: Props): DraggableDescriptor {
-    const { draggableId, droppableId, index } = props;
+  componentWillReceiveProps(nextProps: Props) {
+    const { draggableId, droppableId, index, targetRef } = nextProps;
+
+    if (!targetRef) {
+      console.error('Updating draggable dimension handler without a targetRef');
+      return;
+    }
+
+    // Note: not publishing it on componentDidMount as we do not have a ref at that point
+
     const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
       draggableId, droppableId, index
     );
-    return descriptor;
-  }
 
-  componentWillMount() {
-    this.publish(this.getDescriptor(this.props));
-  }
-
-  componentWillReceiveProps(nextProps: Props) {
-    this.publish(this.getDescriptor(nextProps));
+    this.publish(descriptor);
   }
 
   componentWillUnmount() {

@@ -21,6 +21,10 @@ See how beautiful it is for yourself!
 
 > We provide different links for touch devices as currently [storybook](https://github.com/storybooks/storybook) does not have a good mobile menu experience [more information](https://github.com/storybooks/storybook/issues/124)
 
+## Upgrading from `3.x` to `4.x`
+
+You can find an upgrade guide in our [release notes](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v4.0.0).
+
 ## Core characteristics
 
 - Beautiful, natural movement of items
@@ -142,7 +146,7 @@ class App extends Component {
                     <div>
                       <div
                         ref={provided.innerRef}
-                        {...provided.droppableProps}
+                        {...provided.draggableProps}
                         {...provided.dragHandleProps}
                         style={getItemStyle(
                           snapshot.isDragging,
@@ -1242,7 +1246,7 @@ You can opt out of this behavior by adding the `disableInteractiveElementBlockin
 
 ## Flow usage
 
-`react-beautiful-dnd` is typed using [`flowtype`](flowtype.org). This greatly improves internal consistency within the codebase. We also expose a number of public types which will allow you to type your javascript if you would like to. If you are not using `flowtype` this will not inhibit you from using the library. It is just extra safety for those who want it.
+`react-beautiful-dnd` is typed using [`flowtype`](https://flow.org). This greatly improves internal consistency within the codebase. We also expose a number of public types which will allow you to type your javascript if you would like to. If you are not using `flowtype` this will not inhibit you from using the library. It is just extra safety for those who want it.
 
 ### Public flow types
 
@@ -1346,7 +1350,7 @@ We have created a [sample application](https://github.com/alexreardon/react-beau
 
 ### Typed
 
-This codebase is typed with [flowtype](flowtype.org) to promote greater internal consistency and more resilient code.
+This codebase is typed with [flowtype](https://flow.org) to promote greater internal consistency and more resilient code.
 
 ### Tested
 
