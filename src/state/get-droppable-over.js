@@ -26,26 +26,35 @@ const getRequiredGrowth = memoizeOne((
   // some items in it, but not enough to completely fill its size.
   // In this case - when the droppable already contains excess space - we
   // don't need to add the full placeholder size.
+
+  const getResult = (existingSpace: number): ?Position => {
+    // this is the space required for a placeholder
+    const requiredSpace: number = draggable.page.withMargin[droppable.axis.size];
+
+    if (requiredSpace <= existingSpace) {
+      return null;
+    }
+    const requiredGrowth: Position = patch(droppable.axis.line, requiredSpace - existingSpace);
+
+    return requiredGrowth;
+  };
+
   const dimensions: DraggableDimension[] = getDraggablesInsideDroppable(droppable, draggables);
 
+  // Droppable is empty
   if (!dimensions.length) {
-    return null;
+    const existingSpace: number = droppable.page.withMargin[droppable.axis.size];
+    return getResult(existingSpace);
   }
+
+  // Droppable has items in it
 
   const endOfDraggables: number =
     dimensions[dimensions.length - 1].page.withMargin[droppable.axis.end];
   const endOfDroppable: number = droppable.page.withMargin[droppable.axis.end];
   const existingSpace: number = endOfDroppable - endOfDraggables;
-  // this is the space required for a placeholder
-  const requiredSpace: number = draggable.page.withMargin[droppable.axis.size];
 
-  if (requiredSpace <= existingSpace) {
-    return null;
-  }
-
-  const requiredGrowth: Position = patch(droppable.axis.line, requiredSpace - existingSpace);
-
-  return requiredGrowth;
+  return getResult(existingSpace);
 });
 
 type GetBufferedDroppableArgs = {
@@ -66,7 +75,7 @@ const getClippedAreaWithPlaceholder = ({
   previousDroppableOverId,
 }: GetBufferedDroppableArgs): ?Area => {
   const isHome: boolean = draggable.descriptor.droppableId === droppable.descriptor.id;
-  const isOver: boolean = Boolean(
+  const wasOver: boolean = Boolean(
     previousDroppableOverId &&
     previousDroppableOverId === droppable.descriptor.id
   );
@@ -81,7 +90,7 @@ const getClippedAreaWithPlaceholder = ({
 
   // We only include the placeholder size if it's a
   // foreign list and is currently being hovered over
-  if (isHome || !isOver) {
+  if (isHome || !wasOver) {
     return clipped;
   }
 
@@ -92,7 +101,8 @@ const getClippedAreaWithPlaceholder = ({
   }
 
   const isClippedByFrame: boolean = subject[droppable.axis.size] !== frame[droppable.axis.size];
-  const subjectWithGrowth = getWithGrowth(subject, requiredGrowth);
+
+  const subjectWithGrowth = getWithGrowth(clipped, requiredGrowth);
 
   if (!isClippedByFrame) {
     return subjectWithGrowth;

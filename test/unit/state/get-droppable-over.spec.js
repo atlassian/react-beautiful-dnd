@@ -339,37 +339,139 @@ describe('get droppable over', () => {
 
           expect(result).toBe(null);
         });
+
+        describe('empty droppable', () => {
+          it('should add required space to an empty droppable', () => {
+            const empty: DroppableDimension = getDroppableDimension({
+              descriptor: {
+                id: 'empty',
+                type: 'TYPE',
+              },
+              client: getArea({
+                top: 1000,
+                left: 1000,
+                right: 2000,
+                // not big enough to fit inHome1
+                bottom: 1000 + (inHome1.page.withMargin.height / 2),
+              }),
+            });
+            const target: Position = {
+              x: empty.page.withMargin.center.x,
+              y: 1000 + inHome1.page.withMargin.height,
+            };
+            const withEmpty: DroppableDimensionMap = {
+              ...droppables,
+              [empty.descriptor.id]: empty,
+            };
+
+            const result: ?DroppableId = getDroppableOver({
+              target,
+              draggable: inForeign1,
+              draggables,
+              droppables: withEmpty,
+              previousDroppableOverId: empty.descriptor.id,
+            });
+
+            expect(result).toBe(empty.descriptor.id);
+
+            // validating that without previously being dragged over it
+            // would not have added the placeholder buffer
+            // This is to check that our math is correct
+
+            const validation: ?DroppableId = getDroppableOver({
+              target,
+              draggable: inForeign1,
+              draggables,
+              droppables: withEmpty,
+              // not previous dragged over
+              previousDroppableOverId: null,
+            });
+
+            expect(validation).toBe(null);
+          });
+
+          it('should not add any space to an empty droppable if it is not needed', () => {
+            const empty: DroppableDimension = getDroppableDimension({
+              descriptor: {
+                id: 'empty',
+                type: 'TYPE',
+              },
+              client: getArea({
+                top: 1000,
+                left: 1000,
+                right: 2000,
+                // big enough to fit inHome1
+                bottom: 1000 + inHome1.page.withMargin.height,
+              }),
+            });
+            const target: Position = {
+              x: empty.page.withMargin.center.x,
+              y: 1000 + inHome1.page.withMargin.height,
+            };
+            const withEmpty: DroppableDimensionMap = {
+              ...droppables,
+              [empty.descriptor.id]: empty,
+            };
+
+            const result: ?DroppableId = getDroppableOver({
+              target,
+              draggable: inForeign1,
+              draggables,
+              droppables: withEmpty,
+              previousDroppableOverId: empty.descriptor.id,
+            });
+
+            expect(result).toBe(empty.descriptor.id);
+
+            // validating that no growth has actually occurred
+
+            const newTarget: Position = {
+              x: target.x,
+              y: target.y + 1,
+            };
+
+            const validation: ?DroppableId = getDroppableOver({
+              target: newTarget,
+              draggable: inForeign1,
+              draggables,
+              droppables: withEmpty,
+              // not previous dragged over
+              previousDroppableOverId: null,
+            });
+
+            expect(validation).toBe(null);
+          });
+        });
       });
 
       describe('droppable has scroll container', () => {
-        const custom: DroppableDimension = getDroppableDimension({
-          descriptor: {
-            id: 'has-a-scroll-parent',
-            type: 'TYPE',
-          },
-          client: getArea({
-            top: 0,
-            left: 0,
-            right: 100,
-            // cut off by the frame
-            bottom: 120,
-          }),
-          frameClient: getArea({
-            top: 0,
-            left: 0,
-            right: 100,
-            bottom: 100,
-          }),
-        });
-        // scrolling custom down so that it the bottom is visible
-        const scrolled: DroppableDimension = scrollDroppable(custom, { x: 0, y: 20 });
-
-        const withCustom: DroppableDimensionMap = {
-          ...droppables,
-          [custom.descriptor.id]: scrolled,
-        };
-
         it('should not a placeholder buffer to the frame', () => {
+          const custom: DroppableDimension = getDroppableDimension({
+            descriptor: {
+              id: 'has-a-scroll-parent',
+              type: 'TYPE',
+            },
+            client: getArea({
+              top: 0,
+              left: 0,
+              right: 100,
+              // cut off by the frame
+              bottom: 120,
+            }),
+            frameClient: getArea({
+              top: 0,
+              left: 0,
+              right: 100,
+              bottom: 100,
+            }),
+          });
+          // scrolling custom down so that it the bottom is visible
+          const scrolled: DroppableDimension = scrollDroppable(custom, { x: 0, y: 20 });
+
+          const withCustom: DroppableDimensionMap = {
+            ...droppables,
+            [custom.descriptor.id]: scrolled,
+          };
           // just below frame
           // normally cut off by frame
           const target: Position = {
@@ -386,6 +488,52 @@ describe('get droppable over', () => {
           });
 
           expect(result).toBe(null);
+        });
+
+        it('should consider any changes in the droppables scroll', () => {
+          const foreign: DroppableDimension = getDroppableDimension({
+            descriptor: {
+              id: 'my-custom-foreign',
+              type: 'TYPE',
+            },
+            client: getArea({
+              top: 0,
+              left: 0,
+              right: 100,
+              // this will ensure that there is required growth in the droppable
+              bottom: inHome1.page.withMargin.height - 1,
+            }),
+            frameClient: getArea({
+              top: 0,
+              left: 0,
+              right: 100,
+              // currently much bigger than client
+              bottom: 500,
+            }),
+          });
+          const scrolled: DroppableDimension = scrollDroppable(foreign, { x: 0, y: 50 });
+          const clipped: ?Area = scrolled.viewport.clipped;
+
+          if (clipped == null) {
+            throw new Error('invalid test setup');
+          }
+
+          // Just below clipped area
+          // the buffer should be added to this area
+          const target: Position = {
+            x: clipped.center.x,
+            y: clipped.bottom + 1,
+          };
+
+          const result: ?DroppableId = getDroppableOver({
+            target,
+            draggable: inHome1,
+            draggables,
+            droppables: { [scrolled.descriptor.id]: scrolled },
+            previousDroppableOverId: scrolled.descriptor.id,
+          });
+
+          expect(result).toBe(scrolled.descriptor.id);
         });
       });
     });
