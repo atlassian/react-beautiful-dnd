@@ -13,6 +13,9 @@ import type {
   TouchSensor,
   CreateSensorArgs,
 } from './sensor/sensor-types';
+import type {
+  DraggableId,
+} from '../../types';
 import { styleContextKey, canLiftContextKey } from '../context-keys';
 import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-target';
 import createMouseSensor from './sensor/create-mouse-sensor';
@@ -28,7 +31,7 @@ export default class DragHandle extends Component<Props> {
   touchSensor: TouchSensor;
   sensors: Sensor[];
   styleContext: string;
-  canLift: () => boolean;
+  canLift: (id: DraggableId) => boolean;
 
   // Need to declare contextTypes without flow
   // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
@@ -165,7 +168,7 @@ export default class DragHandle extends Component<Props> {
     }
 
     // this will check if anything else in the system is dragging
-    if (!this.canLift()) {
+    if (!this.canLift(this.props.draggableId)) {
       return false;
     }
 
