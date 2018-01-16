@@ -109,7 +109,7 @@ export const clip = (frame: Area, subject: Spacing): ?Area => {
     left: Math.max(subject.left, frame.left),
   });
 
-  if (result.width < 0 || result.height < 0) {
+  if (result.width <= 0 || result.height <= 0) {
     return null;
   }
 
