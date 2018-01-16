@@ -16,7 +16,7 @@ import {
   withKeyboard,
   dispatchWindowEvent,
 } from '../../utils/user-input-util';
-import type { Position } from '../../../src/types';
+import type { Position, DraggableId } from '../../../src/types';
 import * as keyCodes from '../../../src/view/key-codes';
 import getWindowScrollPosition from '../../../src/view/get-window-scroll-position';
 import setWindowScroll from '../../utils/set-window-scroll';
@@ -121,6 +121,7 @@ const windowTouchEnd = dispatchWindowTouchEvent.bind(null, 'touchend');
 const windowTouchCancel = dispatchWindowTouchEvent.bind(null, 'touchcancel');
 
 const origin: Position = { x: 0, y: 0 };
+const draggableId: DraggableId = 'draggable';
 
 type MockEvent = {|
   preventDefault: Function,
@@ -168,6 +169,7 @@ describe('drag handle', () => {
     callbacks = getStubCallbacks();
     wrapper = mount(
       <DragHandle
+        draggableId={draggableId}
         callbacks={callbacks}
         direction="vertical"
         isDragging={false}
@@ -199,6 +201,7 @@ describe('drag handle', () => {
 
     mount(
       <DragHandle
+        draggableId={draggableId}
         callbacks={callbacks}
         isEnabled
         isDragging={false}
@@ -231,6 +234,7 @@ describe('drag handle', () => {
           const customCallbacks = getStubCallbacks();
           const customWrapper = mount(
             <DragHandle
+              draggableId={draggableId}
               callbacks={customCallbacks}
               isDragging={false}
               isEnabled
@@ -1165,6 +1169,7 @@ describe('drag handle', () => {
         const customCallbacks = getStubCallbacks();
         const customWrapper = mount(
           <DragHandle
+            draggableId={draggableId}
             callbacks={customCallbacks}
             isDragging={false}
             isEnabled
@@ -1190,6 +1195,7 @@ describe('drag handle', () => {
         const customCallbacks = getStubCallbacks();
         const customWrapper = mount(
           <DragHandle
+            draggableId={draggableId}
             callbacks={customCallbacks}
             isDragging={false}
             isEnabled
@@ -1274,6 +1280,7 @@ describe('drag handle', () => {
           customCallbacks = getStubCallbacks();
           customWrapper = mount(
             <DragHandle
+              draggableId={draggableId}
               callbacks={customCallbacks}
               direction="horizontal"
               isDragging={false}
@@ -2156,6 +2163,7 @@ describe('drag handle', () => {
 
       mount(
         <DragHandle
+          draggableId={draggableId}
           callbacks={callbacks}
           isEnabled={false}
           isDragging={false}
@@ -2387,14 +2395,16 @@ describe('drag handle', () => {
 
         describe('something else already dragging', () => {
           it('should not start a drag if something else is already dragging in the system', () => {
+            // faking a 'false' response
+            const canLift = jest.fn().mockImplementation(() => false);
             const customContext = {
               ...basicContext,
-              // faking a 'false' response
-              [canLiftContextKey]: () => false,
+              [canLiftContextKey]: canLift,
             };
             const customCallbacks = getStubCallbacks();
             const customWrapper = mount(
               <DragHandle
+                draggableId={draggableId}
                 callbacks={customCallbacks}
                 isDragging={false}
                 isEnabled
@@ -2409,13 +2419,14 @@ describe('drag handle', () => {
               { context: customContext }
             );
 
-            control.preLift();
-            control.lift();
+            control.preLift(customWrapper);
+            control.lift(customWrapper);
             control.end(customWrapper);
 
             expect(callbacksCalled(customCallbacks)({
               onLift: 0,
             })).toBe(true);
+            expect(canLift).toHaveBeenCalledWith(draggableId);
           });
         });
 
@@ -2425,6 +2436,7 @@ describe('drag handle', () => {
               const customCallbacks = getStubCallbacks();
               const customWrapper = mount(
                 <DragHandle
+                  draggableId={draggableId}
                   callbacks={customCallbacks}
                   isDragging={false}
                   isEnabled
@@ -2459,6 +2471,7 @@ describe('drag handle', () => {
               const customCallbacks = getStubCallbacks();
               const customWrapper = mount(
                 <DragHandle
+                  draggableId={draggableId}
                   callbacks={customCallbacks}
                   isDragging={false}
                   isEnabled
@@ -2496,6 +2509,7 @@ describe('drag handle', () => {
               const customCallbacks = getStubCallbacks();
               const customWrapper = mount(
                 <DragHandle
+                  draggableId={draggableId}
                   callbacks={customCallbacks}
                   isDragging={false}
                   isEnabled
@@ -2538,6 +2552,7 @@ describe('drag handle', () => {
               const customCallbacks = getStubCallbacks();
               const customWrapper = mount(
                 <DragHandle
+                  draggableId={draggableId}
                   callbacks={customCallbacks}
                   isDragging={false}
                   isEnabled
@@ -2583,6 +2598,7 @@ describe('drag handle', () => {
               const customCallbacks = getStubCallbacks();
               const customWrapper = mount(
                 <DragHandle
+                  draggableId={draggableId}
                   callbacks={customCallbacks}
                   isDragging={false}
                   isEnabled
@@ -2624,6 +2640,7 @@ describe('drag handle', () => {
               const customCallbacks = getStubCallbacks();
               const customWrapper = mount(
                 <DragHandle
+                  draggableId={draggableId}
                   callbacks={customCallbacks}
                   isDragging={false}
                   isEnabled

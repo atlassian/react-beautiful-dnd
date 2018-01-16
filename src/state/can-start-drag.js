@@ -1,9 +1,9 @@
 // @flow
 import type {
-  State, Phase,
+  State, Phase, DraggableId,
 } from '../types';
 
-export default (state: State): boolean => {
+export default (state: State, id: DraggableId): boolean => {
   const phase: Phase = state.phase;
 
   // ready to go
@@ -30,6 +30,12 @@ export default (state: State): boolean => {
       console.error('Invalid state shape for drop animating');
       return false;
     }
+
+    // Not allowing dragging of the dropping draggable
+    if (state.drop.pending.result.draggableId === id) {
+      return false;
+    }
+
     // if dropping - allow lifting
     // if cancelling - disallow lifting
     return state.drop.pending.trigger === 'DROP';

@@ -877,6 +877,7 @@ describe('Draggable - unconnected', () => {
         top: dimension.page.withMargin.top,
         left: dimension.page.withMargin.left,
         margin: 0,
+        pointerEvents: 'none',
         transition: 'none',
         transform: null,
         zIndex: zIndexOptions.dragging,
@@ -911,6 +912,7 @@ describe('Draggable - unconnected', () => {
         top: dimension.page.withMargin.top,
         left: dimension.page.withMargin.left,
         margin: 0,
+        pointerEvents: 'none',
         transition: 'none',
         transform: `translate(${offset.x}px, ${offset.y}px)`,
       };
@@ -942,6 +944,7 @@ describe('Draggable - unconnected', () => {
         transition: 'none',
         position: 'fixed',
         boxSizing: 'border-box',
+        pointerEvents: 'none',
         zIndex: zIndexOptions.dragging,
         width: dimension.page.withMargin.width,
         height: dimension.page.withMargin.height,
@@ -1070,6 +1073,7 @@ describe('Draggable - unconnected', () => {
       const expected: DraggingStyle = {
         position: 'fixed',
         boxSizing: 'border-box',
+        pointerEvents: 'none',
         zIndex: zIndexOptions.dropAnimating,
         width: dimension.page.withMargin.width,
         height: dimension.page.withMargin.height,

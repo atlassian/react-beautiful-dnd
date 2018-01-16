@@ -64,6 +64,13 @@ export type DraggingStyle = {|
   // When dragging or dropping we control the z-index to ensure that
   // the layering is correct
   zIndex: ZIndex,
+
+  // Avoiding any processing of mouse events.
+  // This is already applied by the shared styles. However, doing it here also prevents
+  // the pointer-events during a drop. The actual drag start blocking is taken care of
+  // by canStartDrag() on the context. But this a little safeguard.
+  // It is also a minor performance optimisation
+  pointerEvents: 'none',
 |}
 
 export type NotDraggingStyle = {|
