@@ -121,12 +121,19 @@ export const scrollDroppable = (
   newScroll: Position
 ): DroppableDimension => {
   const existing: DroppableDimensionViewport = droppable.viewport;
+  const frame: ?Area = existing.frame;
+
+  if (frame == null) {
+    console.error('Cannot scroll Droppable that does not have a frame');
+    return droppable;
+  }
 
   const scrollDiff: Position = subtract(newScroll, existing.frameScroll.initial);
   // a positive scroll difference leads to a negative displacement
   // (scrolling down pulls an item upwards)
   const scrollDisplacement: Position = negate(scrollDiff);
   const displacedSubject: Spacing = offset(existing.subject, scrollDisplacement);
+  const clipped: ?Area = clip(frame, displacedSubject);
 
   const viewport: DroppableDimensionViewport = {
     // does not change
@@ -141,7 +148,7 @@ export const scrollDroppable = (
         displacement: scrollDisplacement,
       },
     },
-    clipped: clip(existing.frame, displacedSubject),
+    clipped,
   };
 
   // $ExpectError - using spread
@@ -172,12 +179,7 @@ export const getDroppableDimension = ({
   const subject: Area = addSpacing(withWindowScroll, margin);
 
   // use client + margin if frameClient is not provided
-  const frame: Area = (() => {
-    if (!frameClient) {
-      return subject;
-    }
-    return addPosition(frameClient, windowScroll);
-  })();
+  const frame: ?Area = frameClient ? addPosition(frameClient, windowScroll) : null;
 
   const viewport: DroppableDimensionViewport = {
     frame,
@@ -191,7 +193,7 @@ export const getDroppableDimension = ({
       },
     },
     subject,
-    clipped: clip(frame, subject),
+    clipped: frame ? clip(frame, subject) : subject,
   };
 
   const dimension: DroppableDimension = {

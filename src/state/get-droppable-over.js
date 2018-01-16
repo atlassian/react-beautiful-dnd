@@ -79,8 +79,7 @@ const getClippedAreaWithPlaceholder = ({
     previousDroppableOverId &&
     previousDroppableOverId === droppable.descriptor.id
   );
-  const subject: Area = droppable.viewport.subject;
-  const frame: Area = droppable.viewport.frame;
+  const frame: ?Area = droppable.viewport.frame;
   const clipped: ?Area = droppable.viewport.clipped;
 
   // clipped area is totally hidden behind frame
@@ -100,11 +99,10 @@ const getClippedAreaWithPlaceholder = ({
     return clipped;
   }
 
-  const isClippedByFrame: boolean = subject[droppable.axis.size] !== frame[droppable.axis.size];
-
   const subjectWithGrowth = getWithGrowth(clipped, requiredGrowth);
 
-  if (!isClippedByFrame) {
+  // The droppable has no scroll container
+  if (!frame) {
     return subjectWithGrowth;
   }
 

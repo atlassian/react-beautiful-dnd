@@ -101,7 +101,8 @@ export type DraggableDimension = {|
 export type DroppableDimensionViewport = {|
   // This is the window through which the droppable is observed
   // It does not change during a drag
-  frame: Area,
+  // frame is null when the droppable has no frame
+  frame: ?Area,
   // keeping track of the scroll
   frameScroll: {|
     initial: Position,
