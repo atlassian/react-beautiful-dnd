@@ -77,7 +77,7 @@ describe('can start drag', () => {
 
     it('should handle every phase', () => {
       state.allPhases().forEach((current: State) => {
-        canStartDrag(current);
+        canStartDrag(current, preset.inHome1.descriptor.id);
         expect(console.warn).not.toHaveBeenCalled();
       });
     });
