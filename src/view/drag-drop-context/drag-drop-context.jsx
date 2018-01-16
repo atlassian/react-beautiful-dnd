@@ -12,6 +12,7 @@ import type {
   Callbacks as DimensionMarshalCallbacks,
 } from '../../state/dimension-marshal/dimension-marshal-types';
 import type {
+  DraggableId,
   Store,
   State,
   Hooks,
@@ -80,7 +81,7 @@ export default class DragDropContext extends React.Component<Props> {
   // pull this state off. It would cause a re-render of all items
   // on drag start which is too expensive.
   // This is useful when the user
-  canLift = () => canStartDrag(this.store.getState());
+  canLift = (id: DraggableId) => canStartDrag(this.store.getState(), id);
 
   componentWillMount() {
     this.store = createStore();
