@@ -1,44 +1,32 @@
 // @flow
 import memoizeOne from 'memoize-one';
-import rafSchedule from 'raf-schd';
+import rafSchd from 'raf-schd';
 import type { Position } from '../../../types';
 import type { Callbacks } from '../drag-handle-types';
 
-export default (callbacks: Callbacks, isDraggingFn: () => boolean) => {
-  const ifDragging = (fn: Function) => {
-    if (isDraggingFn()) {
-      fn();
-    }
-  };
-
+export default (callbacks: Callbacks) => {
   const memoizedMove = memoizeOne((x: number, y: number) => {
     const point: Position = { x, y };
     callbacks.onMove(point);
   });
 
-  const move = rafSchedule((point: Position) => {
-    ifDragging(() => memoizedMove(point.x, point.y));
-  });
+  const move = rafSchd((point: Position) => memoizedMove(point.x, point.y));
+  const moveForward = rafSchd(callbacks.onMoveForward);
+  const moveBackward = rafSchd(callbacks.onMoveBackward);
+  const crossAxisMoveForward = rafSchd(callbacks.onCrossAxisMoveForward);
+  const crossAxisMoveBackward = rafSchd(callbacks.onCrossAxisMoveBackward);
+  const windowScrollMove = rafSchd(callbacks.onWindowScroll);
 
-  const moveForward = rafSchedule(() => {
-    ifDragging(callbacks.onMoveForward);
-  });
+  const cancel = () => {
+    // cancel all of the next animation frames
 
-  const moveBackward = rafSchedule(() => {
-    ifDragging(callbacks.onMoveBackward);
-  });
-
-  const crossAxisMoveForward = rafSchedule(() => {
-    ifDragging(callbacks.onCrossAxisMoveForward);
-  });
-
-  const crossAxisMoveBackward = rafSchedule(() => {
-    ifDragging(callbacks.onCrossAxisMoveBackward);
-  });
-
-  const windowScrollMove = rafSchedule(() => {
-    ifDragging(callbacks.onWindowScroll);
-  });
+    move.cancel();
+    moveForward.cancel();
+    moveBackward.cancel();
+    crossAxisMoveForward.cancel();
+    crossAxisMoveBackward.cancel();
+    windowScrollMove.cancel();
+  };
 
   return {
     move,
@@ -47,5 +35,6 @@ export default (callbacks: Callbacks, isDraggingFn: () => boolean) => {
     crossAxisMoveForward,
     crossAxisMoveBackward,
     windowScrollMove,
+    cancel,
   };
 };
