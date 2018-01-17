@@ -6,6 +6,8 @@ import fireHooks from '../../state/fire-hooks';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
 import createStyleMarshal from '../style-marshal/style-marshal';
 import canStartDrag from '../../state/can-start-drag';
+import createAutoScroll from '../../state/auto-scroll-marshal/auto-scroll-marshal';
+import type { AutoScrollMarshal } from '../../state/auto-scroll-marshal/auto-scroll-marshal-types';
 import type { StyleMarshal } from '../style-marshal/style-marshal-types';
 import type {
   DimensionMarshal,
@@ -108,6 +110,7 @@ export default class DragDropContext extends React.Component<Props> {
       },
     };
     this.dimensionMarshal = createDimensionMarshal(callbacks);
+    const scrollMarshal: AutoScrollMarshal = createAutoScroll();
 
     let previous: State = this.store.getState();
 
@@ -118,7 +121,12 @@ export default class DragDropContext extends React.Component<Props> {
       // functions synchronously trigger more updates
       previous = current;
 
+      if (current.phase === 'DRAGGING') {
+        scrollMarshal.onDrag(current);
+      }
+
       // no lifecycle changes have occurred if phase has not changed
+
       if (current.phase === previousValue.phase) {
         return;
       }
