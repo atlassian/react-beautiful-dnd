@@ -513,7 +513,11 @@ You can use the UMD to run `react-beautiful-dnd` directly in the browser.
 </script>
 ```
 
-There is also an [example codepen](https://codepen.io/alexreardon/project/editor/ZyNMPo) you can use to play with this technique.
+There is also an [example codepen](https://codepen.io/alexreardon/project/editor/ZyNMPo) you can use to play with this installation method.
+
+## [`ClojureScript`](https://clojurescript.org/)
+
+You can consume `react-beautiful-dnd` from within `ClojureScript` using [CLJSJS](https://cljsjs.github.io/);
 
 ## API
 
