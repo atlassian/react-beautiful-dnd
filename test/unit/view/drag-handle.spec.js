@@ -1954,7 +1954,7 @@ describe('drag handle', () => {
         jest.runTimersToTime(timeForLongPress);
 
         // move started but frame not released
-        windowTouchMove({x: 0, y: 100});
+        windowTouchMove({ x: 0, y: 100 });
 
         // finish the drag
         windowTouchEnd();
@@ -2101,7 +2101,7 @@ describe('drag handle', () => {
         jest.runTimersToTime(timeForLongPress);
 
         // move started but frame not released
-        windowTouchMove({x: 0, y: 100});
+        windowTouchMove({ x: 0, y: 100 });
 
         // cancel the drag
         dispatchWindowEvent('orientationchange');
