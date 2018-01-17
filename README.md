@@ -517,7 +517,7 @@ There is also an [example codepen](https://codepen.io/alexreardon/project/editor
 
 ## [`ClojureScript`](https://clojurescript.org/)
 
-You can consume `react-beautiful-dnd` from within `ClojureScript` using [CLJSJS](https://cljsjs.github.io/);
+You can consume `react-beautiful-dnd` from within `ClojureScript` using [CLJSJS](https://cljsjs.github.io/)!
 
 ## API
 
