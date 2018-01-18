@@ -20,8 +20,8 @@ type Args = {|
 
 export const config = {
   // TODO: should these percentages of the container size?
-  distanceToEdgeToStartScrolling: 300,
-  distanceToEdgeForMaxSpeed: 100,
+  distanceToEdgeToStartScrolling: 250,
+  distanceToEdgeForMaxSpeed: 20,
   // pixels per frame
   maxScrollSpeed: 30,
 };
