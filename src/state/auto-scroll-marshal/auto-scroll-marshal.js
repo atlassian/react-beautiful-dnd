@@ -18,10 +18,11 @@ type Args = {|
 |}
 
 export const config = {
-  startDistance: 200,
-  distanceToEdgeForMaxSpeed: 50,
+  // pixels from the edge of a container for when an auto scroll starts
+  distanceToEdgeToStartScrolling: 250,
+  distanceToEdgeForMaxSpeed: 80,
   // pixels per frame
-  maxScrollSpeed: 24,
+  maxScrollSpeed: 10,
 };
 
 // returns null if no scroll is required
@@ -54,21 +55,39 @@ const getRequiredScroll = (container: Area, center: Position): ?Position => {
   // return { x: horizontal, y: vertical }
 
   // small enough distance to start drag
-  if (distance.bottom < config.startDistance) {
+  if (distance.bottom < config.distanceToEdgeToStartScrolling) {
     // the smaller the distance - the closer we move to the max scroll speed
     // if we go into the negative distance - then we use the max scroll speed
 
+    const scrollPlane: number = config.distanceToEdgeToStartScrolling - config.distanceToEdgeForMaxSpeed;
 
 
-    const diff: number = config.startDistance - distance.bottom;
+    // need to figure out the difference form the current position
+    const diff: number = config.distanceToEdgeToStartScrolling - distance.bottom;
 
-    // going below the edge of the window
-    if (diff <= 0) {
+    console.log('diff', diff);
+
+    // going below the scroll plane
+    if (diff >= scrollPlane) {
+      console.log('using max scroll speed');
       return { x: 0, y: config.maxScrollSpeed };
     }
 
-    const percentage: number = diff / config.startDistance;
+    const percentage: number = diff / scrollPlane;
     const speed: number = config.maxScrollSpeed * percentage;
+    console.log('percentage', percentage);
+
+    // console.log({
+    //   bottomDistance: distance.bottom,
+    //   withBUffer: distance.bottom - config.distanceToEdgeForMaxSpeed,
+    //   diff,
+    //   diffBeforeCutoff: config.startDistance - config.distanceToEdgeForMaxSpeed,
+    // })
+
+
+
+    // const percentage: number = diff / config.startDistance;
+    // const speed: number = config.maxScrollSpeed * percentage;
 
     return { x: 0, y: speed };
   }
