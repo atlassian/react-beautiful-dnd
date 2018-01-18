@@ -2,5 +2,5 @@
 import type { State } from '../../types';
 
 export type AutoScrollMarshal = {|
-  onDrag: (state: State) => void,
+  onStateChange: (previous: State, current: State) => void,
 |}

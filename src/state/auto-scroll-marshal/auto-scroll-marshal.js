@@ -17,6 +17,13 @@ type Args = {|
   getClosestScrollable: (id: DroppableId) => ?HTMLElement
 |}
 
+export const config = {
+  startDistance: 200,
+  distanceToEdgeForMaxSpeed: 50,
+  // pixels per frame
+  maxScrollSpeed: 24,
+};
+
 // returns null if no scroll is required
 const getRequiredScroll = (container: Area, center: Position): ?Position => {
   // get distance to each edge
@@ -27,15 +34,53 @@ const getRequiredScroll = (container: Area, center: Position): ?Position => {
     left: center.x - container.left,
   };
 
-  console.log(distance);
+  // 1. Figure out which x,y values are the best target
+  // 2. Can the container scroll in that direction at all?
+  // If no for both directions, then return null
+  // 3. Is the center close enough to a edge to start a drag?
+  // 4. Based on the distance, calculate the speed at which a scroll should occur
+  // The lower distance value the faster the scroll should be.
+  // Maximum speed value should be hit before the distance is 0
+  // Negative values to not continue to increase the speed
 
-  return { x: 0, y: 0 };
+  // const vertical: number = (() => {
+
+  // })();
+
+  // const horizontal: number = (() => {
+
+  // });
+
+  // return { x: horizontal, y: vertical }
+
+  // small enough distance to start drag
+  if (distance.bottom < config.startDistance) {
+    // the smaller the distance - the closer we move to the max scroll speed
+    // if we go into the negative distance - then we use the max scroll speed
+
+
+
+    const diff: number = config.startDistance - distance.bottom;
+
+    // going below the edge of the window
+    if (diff <= 0) {
+      return { x: 0, y: config.maxScrollSpeed };
+    }
+
+    const percentage: number = diff / config.startDistance;
+    const speed: number = config.maxScrollSpeed * percentage;
+
+    return { x: 0, y: speed };
+  }
+
+
+  return null;
 };
 
 export default (): AutoScrollMarshal => {
   // TODO: do not scroll if drag has finished
   const scheduleScroll = rafSchd((change: Position) => {
-    console.log('scrolling window');
+    console.log('scrolling window', change);
     window.scrollBy(change.x, change.y);
   });
 
@@ -84,8 +129,21 @@ export default (): AutoScrollMarshal => {
     // }
   };
 
+  const onStateChange = (previous: State, current: State): void => {
+    // now dragging
+    if (current.phase === 'DRAGGING') {
+      onDrag(current);
+      return;
+    }
+
+    // cancel any pending scrolls if no longer dragging
+    if (previous.phase === 'DRAGGING' && current.phase !== 'DRAGGING') {
+      scheduleScroll.cancel();
+    }
+  };
+
   const marshal: AutoScrollMarshal = {
-    onDrag,
+    onStateChange,
   };
 
   return marshal;

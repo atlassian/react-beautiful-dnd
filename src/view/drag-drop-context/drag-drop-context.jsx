@@ -51,6 +51,7 @@ export default class DragDropContext extends React.Component<Props> {
   store: Store
   dimensionMarshal: DimensionMarshal
   styleMarshal: StyleMarshal
+  scrollMarshal: AutoScrollMarshal
   unsubscribe: Function
 
   // Need to declare childContextTypes without flow
@@ -110,7 +111,7 @@ export default class DragDropContext extends React.Component<Props> {
       },
     };
     this.dimensionMarshal = createDimensionMarshal(callbacks);
-    const scrollMarshal: AutoScrollMarshal = createAutoScroll();
+    this.scrollMarshal = createAutoScroll();
 
     let previous: State = this.store.getState();
 
@@ -121,30 +122,31 @@ export default class DragDropContext extends React.Component<Props> {
       // functions synchronously trigger more updates
       previous = current;
 
-      if (current.phase === 'DRAGGING') {
-        scrollMarshal.onDrag(current);
+      this.onStateChange(previousValue, current);
+
+      if (current.phase !== previousValue.phase) {
+        this.onPhaseChange(previous, current);
       }
-
-      // no lifecycle changes have occurred if phase has not changed
-
-      if (current.phase === previousValue.phase) {
-        return;
-      }
-
-      // Allowing dynamic hooks by re-capturing the hook functions
-      const hooks: Hooks = {
-        onDragStart: this.props.onDragStart,
-        onDragEnd: this.props.onDragEnd,
-      };
-      fireHooks(hooks, previousValue, current);
-
-      // Update the global styles
-      this.styleMarshal.onPhaseChange(current);
-
-      // inform the dimension marshal about updates
-      // this can trigger more actions synchronously so we are placing it last
-      this.dimensionMarshal.onPhaseChange(current);
     });
+  }
+
+  onStateChange(previous: State, current: State) {
+    this.scrollMarshal.onStateChange(previous, current);
+  }
+
+  onPhaseChange(previous: State, current: State) {
+    const hooks: Hooks = {
+      onDragStart: this.props.onDragStart,
+      onDragEnd: this.props.onDragEnd,
+    };
+    fireHooks(hooks, previous, current);
+
+    // Update the global styles
+    this.styleMarshal.onPhaseChange(current);
+
+    // inform the dimension marshal about updates
+    // this can trigger more actions synchronously so we are placing it last
+    this.dimensionMarshal.onPhaseChange(current);
   }
 
   componentDidMount() {
