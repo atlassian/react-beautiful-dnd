@@ -18,7 +18,7 @@ type Args = {|
 |}
 
 export const config = {
-  // pixels from the edge of a container for when an auto scroll starts
+  // TODO: should these percentages of the container size?
   distanceToEdgeToStartScrolling: 250,
   distanceToEdgeForMaxSpeed: 80,
   // pixels per frame
