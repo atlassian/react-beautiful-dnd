@@ -18,4 +18,7 @@ storiesOf('board', module)
   ))
   .add('long lists in a short container', () => (
     <Board initial={data.medium} containerHeight="300px" />
+  ))
+  .add('stick to bottom', () => (
+    <Board initial={authorQuoteMap} stickToBottom />
   ));
