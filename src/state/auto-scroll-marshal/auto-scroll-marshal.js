@@ -1,6 +1,7 @@
 // @flow
 import rafSchd from 'raf-schd';
 import getViewport from '../visibility/get-viewport';
+import { isEqual } from '../position';
 import type { AutoScrollMarshal } from './auto-scroll-marshal-types';
 import type {
   Area,
@@ -19,10 +20,36 @@ type Args = {|
 
 export const config = {
   // TODO: should these percentages of the container size?
-  distanceToEdgeToStartScrolling: 250,
-  distanceToEdgeForMaxSpeed: 80,
+  distanceToEdgeToStartScrolling: 300,
+  distanceToEdgeForMaxSpeed: 100,
   // pixels per frame
-  maxScrollSpeed: 10,
+  maxScrollSpeed: 30,
+};
+
+const origin: Position = { x: 0, y: 0 };
+
+const getSpeed = (distance: number): number => {
+  if (distance > config.distanceToEdgeToStartScrolling) {
+    return 0;
+  }
+
+  // Okay, we need to scroll
+
+  const scrollPlane: number = config.distanceToEdgeToStartScrolling - config.distanceToEdgeForMaxSpeed;
+
+  // need to figure out the difference form the current position
+  const diff: number = config.distanceToEdgeToStartScrolling - distance;
+
+  // going below the scroll plane
+  if (diff >= scrollPlane) {
+    console.log('using max scroll speed');
+    return config.maxScrollSpeed;
+  }
+
+  const percentage: number = diff / scrollPlane;
+  const speed: number = config.maxScrollSpeed * percentage;
+
+  return speed;
 };
 
 // returns null if no scroll is required
@@ -44,62 +71,38 @@ const getRequiredScroll = (container: Area, center: Position): ?Position => {
   // Maximum speed value should be hit before the distance is 0
   // Negative values to not continue to increase the speed
 
-  // const vertical: number = (() => {
+  const vertical: number = (() => {
+    const isCloserToBottom: boolean = distance.bottom < distance.top;
 
-  // })();
-
-  // const horizontal: number = (() => {
-
-  // });
-
-  // return { x: horizontal, y: vertical }
-
-  // small enough distance to start drag
-  if (distance.bottom < config.distanceToEdgeToStartScrolling) {
-    // the smaller the distance - the closer we move to the max scroll speed
-    // if we go into the negative distance - then we use the max scroll speed
-
-    const scrollPlane: number = config.distanceToEdgeToStartScrolling - config.distanceToEdgeForMaxSpeed;
-
-
-    // need to figure out the difference form the current position
-    const diff: number = config.distanceToEdgeToStartScrolling - distance.bottom;
-
-    console.log('diff', diff);
-
-    // going below the scroll plane
-    if (diff >= scrollPlane) {
-      console.log('using max scroll speed');
-      return { x: 0, y: config.maxScrollSpeed };
+    if (isCloserToBottom) {
+      return getSpeed(distance.bottom);
     }
 
-    const percentage: number = diff / scrollPlane;
-    const speed: number = config.maxScrollSpeed * percentage;
-    console.log('percentage', percentage);
+    // closer to top
+    return -1 * getSpeed(distance.top);
+  })();
 
-    // console.log({
-    //   bottomDistance: distance.bottom,
-    //   withBUffer: distance.bottom - config.distanceToEdgeForMaxSpeed,
-    //   diff,
-    //   diffBeforeCutoff: config.startDistance - config.distanceToEdgeForMaxSpeed,
-    // })
+  const horizontal: number = (() => {
+    const isCloserToRight: boolean = distance.right < distance.left;
 
+    if (isCloserToRight) {
+      return getSpeed(distance.right);
+    }
 
+    // closer to left
+    return -1 * getSpeed(distance.left);
+  })();
 
-    // const percentage: number = diff / config.startDistance;
-    // const speed: number = config.maxScrollSpeed * percentage;
+  const scroll: Position = { x: horizontal, y: vertical };
 
-    return { x: 0, y: speed };
-  }
-
-
-  return null;
+  return isEqual(scroll, origin) ? null : scroll;
 };
 
 export default (): AutoScrollMarshal => {
   // TODO: do not scroll if drag has finished
   const scheduleScroll = rafSchd((change: Position) => {
     console.log('scrolling window', change);
+    // TODO: check if can actually scroll this much
     window.scrollBy(change.x, change.y);
   });
 

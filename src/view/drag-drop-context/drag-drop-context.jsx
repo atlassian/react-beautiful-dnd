@@ -122,11 +122,13 @@ export default class DragDropContext extends React.Component<Props> {
       // functions synchronously trigger more updates
       previous = current;
 
-      this.onStateChange(previousValue, current);
-
       if (current.phase !== previousValue.phase) {
-        this.onPhaseChange(previous, current);
+        // executing phase change handlers first
+        this.onPhaseChange(previousValue, current);
       }
+
+      // TODO: should this take the latest previous to prevent scroll post drop?
+      this.onStateChange(previousValue, current);
     });
   }
 
