@@ -176,10 +176,14 @@ export default ({
     orientationchange: cancel,
     // some devices fire resize if the orientation changes
     resize: cancel,
-    // A window scroll will cancel a pending or current drag.
-    // This should not happen as we are calling preventDefault in touchmove,
-    // but just being extra safe
-    scroll: cancel,
+    scroll: () => {
+      // stop a pending drag
+      if (state.pending) {
+        stopPendingDrag();
+        return;
+      }
+      schedule.windowScrollMove();
+    },
     // Long press can bring up a context menu
     // need to opt out of this behavior
     contextmenu: stopEvent,
