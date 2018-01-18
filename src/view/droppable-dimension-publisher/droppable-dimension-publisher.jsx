@@ -23,6 +23,7 @@ import type {
   Spacing,
   Direction,
 } from '../../types';
+import * as logger from '../../log';
 
 type Props = {|
   droppableId: DroppableId,
@@ -73,7 +74,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
 
   memoizedUpdateScroll = memoizeOne((x: number, y: number) => {
     if (!this.publishedDescriptor) {
-      console.error('Cannot update scroll on unpublished droppable');
+      logger.error('Cannot update scroll on unpublished droppable');
       return;
     }
 
@@ -95,7 +96,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
 
   watchScroll = () => {
     if (!this.props.targetRef) {
-      console.error('cannot watch droppable scroll if not in the dom');
+      logger.error('cannot watch droppable scroll if not in the dom');
       return;
     }
 
@@ -122,7 +123,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     this.isWatchingScroll = false;
 
     if (!this.closestScrollable) {
-      console.error('cannot unbind event listener if element is null');
+      logger.error('cannot unbind event listener if element is null');
       return;
     }
 
@@ -131,7 +132,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
 
   componentWillReceiveProps(nextProps: Props) {
     if (!nextProps.targetRef) {
-      console.error('Cannot update droppable dimension publisher without a target ref');
+      logger.error('Cannot update droppable dimension publisher without a target ref');
       return;
     }
 
@@ -158,7 +159,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
 
   componentWillUnmount() {
     if (this.isWatchingScroll) {
-      console.warn('unmounting droppable while it was watching scroll');
+      logger.warn('unmounting droppable while it was watching scroll');
       this.unwatchScroll();
     }
 
@@ -173,7 +174,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
 
   unpublish = () => {
     if (!this.publishedDescriptor) {
-      console.error('cannot unpublish descriptor when none is published');
+      logger.error('cannot unpublish descriptor when none is published');
       return;
     }
 

@@ -21,6 +21,7 @@ import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-tar
 import createMouseSensor from './sensor/create-mouse-sensor';
 import createKeyboardSensor from './sensor/create-keyboard-sensor';
 import createTouchSensor from './sensor/create-touch-sensor';
+import * as logger from '../../log';
 
 const getFalse: () => boolean = () => false;
 
@@ -144,7 +145,7 @@ export default class DragHandle extends Component<Props> {
   onTouchStart = (event: TouchEvent) => {
     // let the keyboard sensor deal with it
     if (this.mouseSensor.isCapturing() || this.keyboardSensor.isCapturing()) {
-      console.error('mouse or keyboard already listening when attempting to touch drag');
+      logger.error('mouse or keyboard already listening when attempting to touch drag');
       return;
     }
 

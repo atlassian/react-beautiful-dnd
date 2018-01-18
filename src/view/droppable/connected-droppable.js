@@ -25,6 +25,7 @@ import type {
   MapProps,
   Selector,
 } from './droppable-types';
+import * as logger from '../../log';
 
 export const makeSelector = (): Selector => {
   const idSelector = (state: State, ownProps: OwnProps) =>
@@ -98,7 +99,7 @@ export const makeSelector = (): Selector => {
 
       if (phase === 'DRAGGING') {
         if (!drag) {
-          console.error('cannot determine dragging over as there is not drag');
+          logger.error('cannot determine dragging over as there is not drag');
           return getMapProps(false, null);
         }
 
@@ -114,7 +115,7 @@ export const makeSelector = (): Selector => {
 
       if (phase === 'DROP_ANIMATING') {
         if (!pending) {
-          console.error('cannot determine dragging over as there is no pending result');
+          logger.error('cannot determine dragging over as there is no pending result');
           return getMapProps(false, null);
         }
 

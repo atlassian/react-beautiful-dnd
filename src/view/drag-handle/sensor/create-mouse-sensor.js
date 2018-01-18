@@ -10,6 +10,7 @@ import type {
   Position,
 } from '../../../types';
 import type { MouseSensor, CreateSensorArgs } from './sensor-types';
+import * as logger from '../../../log';
 
 // Custom event format for force press inputs
 type MouseForceChangedEvent = MouseEvent & {
@@ -105,7 +106,7 @@ export default ({
       }
 
       if (!state.pending) {
-        console.error('invalid state');
+        logger.error('invalid state');
         return;
       }
 
@@ -155,7 +156,7 @@ export default ({
     // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
     webkitmouseforcechanged: (event: MouseForceChangedEvent) => {
       if (event.webkitForce == null || MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null) {
-        console.error('handling a mouse force changed event when it is not supported');
+        logger.error('handling a mouse force changed event when it is not supported');
         return;
       }
 
@@ -197,7 +198,7 @@ export default ({
     }
 
     if (isCapturing()) {
-      console.error('should not be able to perform a mouse down while a drag or pending drag is occurring');
+      logger.error('should not be able to perform a mouse down while a drag or pending drag is occurring');
       cancel();
       return;
     }

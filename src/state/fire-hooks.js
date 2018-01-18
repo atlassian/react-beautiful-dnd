@@ -8,6 +8,7 @@ import type {
   DraggableDescriptor,
   DroppableDimension,
 } from '../types';
+import * as logger from '../log';
 
 export default (hooks: Hooks, previous: State, current: State): void => {
   const { onDragStart, onDragEnd } = hooks;
@@ -27,7 +28,7 @@ export default (hooks: Hooks, previous: State, current: State): void => {
     }
 
     if (!current.drag) {
-      console.error('cannot fire onDragStart hook without drag state', { current, previous });
+      logger.error('cannot fire onDragStart hook without drag state', { current, previous });
       return;
     }
 
@@ -35,7 +36,7 @@ export default (hooks: Hooks, previous: State, current: State): void => {
     const home: ?DroppableDimension = current.dimension.droppable[descriptor.droppableId];
 
     if (!home) {
-      console.error('cannot find dimension for home droppable');
+      logger.error('cannot find dimension for home droppable');
       return;
     }
 
@@ -57,7 +58,7 @@ export default (hooks: Hooks, previous: State, current: State): void => {
   // Drag end
   if (currentPhase === 'DROP_COMPLETE' && previousPhase !== 'DROP_COMPLETE') {
     if (!current.drop || !current.drop.result) {
-      console.error('cannot fire onDragEnd hook without drag state', { current, previous });
+      logger.error('cannot fire onDragEnd hook without drag state', { current, previous });
       return;
     }
 
@@ -97,7 +98,7 @@ export default (hooks: Hooks, previous: State, current: State): void => {
   // Drag ended while dragging
   if (currentPhase === 'IDLE' && previousPhase === 'DRAGGING') {
     if (!previous.drag) {
-      console.error('cannot fire onDragEnd for cancel because cannot find previous drag');
+      logger.error('cannot fire onDragEnd for cancel because cannot find previous drag');
       return;
     }
 
@@ -105,7 +106,7 @@ export default (hooks: Hooks, previous: State, current: State): void => {
     const home: ?DroppableDimension = previous.dimension.droppable[descriptor.droppableId];
 
     if (!home) {
-      console.error('cannot find dimension for home droppable');
+      logger.error('cannot find dimension for home droppable');
       return;
     }
 
@@ -128,7 +129,7 @@ export default (hooks: Hooks, previous: State, current: State): void => {
   // This is being really safe
   if (currentPhase === 'IDLE' && previousPhase === 'DROP_ANIMATING') {
     if (!previous.drop || !previous.drop.pending) {
-      console.error('cannot fire onDragEnd for cancel because cannot find previous pending drop');
+      logger.error('cannot fire onDragEnd for cancel because cannot find previous pending drop');
       return;
     }
 
