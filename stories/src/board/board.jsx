@@ -31,9 +31,17 @@ const Container = styled.div`
   display: inline-flex;
 `;
 
+const stickToBottomStyle = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignContent: 'flex-start',
+  alignItems: 'flex-end',
+};
+
 type Props = {|
   initial: QuoteMap,
   containerHeight?: string,
+  stickToBottom?: boolean,
 |}
 
 type State = {|
@@ -111,6 +119,7 @@ export default class Board extends Component<Props, State> {
     const columns: QuoteMap = this.state.columns;
     const ordered: string[] = this.state.ordered;
     const { containerHeight } = this.props;
+    const containerStyle = this.props.stickToBottom ? stickToBottomStyle : null;
 
     const board = (
       <Droppable
@@ -120,7 +129,7 @@ export default class Board extends Component<Props, State> {
         ignoreContainerClipping={Boolean(containerHeight)}
       >
         {(provided: DroppableProvided) => (
-          <Container innerRef={provided.innerRef}>
+          <Container innerRef={provided.innerRef} style={containerStyle}>
             {ordered.map((key: string, index: number) => (
               <Column
                 key={key}
