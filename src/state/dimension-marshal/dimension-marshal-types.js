@@ -15,6 +15,8 @@ export type GetDroppableDimensionFn = () => DroppableDimension;
 
 export type DroppableCallbacks = {|
   getDimension: GetDroppableDimensionFn,
+  // scroll a droppable
+  scroll: (change: Position) => void,
   // Droppable must listen to scroll events and publish them using the
   // onChange callback. If the Droppable is not in a scroll container then
   // it does not need to do anything
@@ -56,6 +58,7 @@ export type DimensionMarshal = {|
   // it is possible for a droppable to change whether it is enabled during a drag
   updateDroppableIsEnabled: (id: DroppableId, isEnabled: boolean) => void,
   updateDroppableScroll: (id: DroppableId, newScroll: Position) => void,
+  scrollDroppable: (id: DroppableId, change: Position) => void,
   unregisterDroppable: (descriptor: DroppableDescriptor) => void,
   // Entry
   onPhaseChange: (current: State) => void,

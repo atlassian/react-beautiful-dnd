@@ -111,7 +111,9 @@ export default class DragDropContext extends React.Component<Props> {
       },
     };
     this.dimensionMarshal = createDimensionMarshal(callbacks);
-    this.scrollMarshal = createAutoScroll();
+    this.scrollMarshal = createAutoScroll({
+      scrollDroppable: this.dimensionMarshal.scrollDroppable,
+    });
 
     let previous: State = this.store.getState();
 

@@ -2,11 +2,14 @@
 import rafSchd from 'raf-schd';
 import getViewport from '../visibility/get-viewport';
 import { isEqual } from '../position';
+import { vertical, horizontal } from '../axis';
 import type { AutoScrollMarshal } from './auto-scroll-marshal-types';
 import type {
   Area,
+  Axis,
   DroppableId,
   DragState,
+  DraggableLocation,
   DraggableDimension,
   DroppableDimension,
   Position,
@@ -15,38 +18,61 @@ import type {
 } from '../../types';
 
 type Args = {|
-  getClosestScrollable: (id: DroppableId) => ?HTMLElement
+  scrollDroppable: (id: DroppableId, change: Position) => void,
 |}
 
 export const config = {
-  // TODO: should these percentages of the container size?
-  distanceToEdgeToStartScrolling: 250,
-  distanceToEdgeForMaxSpeed: 20,
+  // percentage distance from edge of container:
+  startFrom: 0.18,
+  maxSpeedAt: 0.05,
   // pixels per frame
-  maxScrollSpeed: 30,
+  maxScrollSpeed: 25,
 };
 
 const origin: Position = { x: 0, y: 0 };
 
-const getSpeed = (distance: number): number => {
-  if (distance > config.distanceToEdgeToStartScrolling) {
+type Thresholds = {|
+  startFrom: number,
+  maxSpeedAt: number,
+  accelerationPlane: number,
+|}
+
+const getThresholds = (container: Area, axis: Axis): Thresholds => {
+  const startFrom: number = container[axis.size] * config.startFrom;
+  const maxSpeedAt: number = container[axis.size] * config.maxSpeedAt;
+  const accelerationPlane: number = startFrom - maxSpeedAt;
+
+  const thresholds: Thresholds = {
+    startFrom,
+    maxSpeedAt,
+    accelerationPlane,
+  };
+
+  return thresholds;
+};
+
+const getSpeed = (distance: number, thresholds: Thresholds): number => {
+  // Not close enough to the edge
+  if (distance >= thresholds.startFrom) {
     return 0;
   }
 
-  // Okay, we need to scroll
+  // gone past the edge (currently not supported)
+  // TODO: do not want for window - but need it for droppable?
+  // if (distance < 0) {
+  //   return 0;
+  // }
 
-  const scrollPlane: number = config.distanceToEdgeToStartScrolling - config.distanceToEdgeForMaxSpeed;
+  // Already past the maxSpeedAt point
 
-  // need to figure out the difference form the current position
-  const diff: number = config.distanceToEdgeToStartScrolling - distance;
-
-  // going below the scroll plane
-  if (diff >= scrollPlane) {
-    console.log('using max scroll speed');
+  if (distance <= thresholds.maxSpeedAt) {
     return config.maxScrollSpeed;
   }
 
-  const percentage: number = diff / scrollPlane;
+  // We need to perform a scroll as a percentage of the max scroll speed
+
+  const distancePastStart: number = thresholds.startFrom - distance;
+  const percentage: number = distancePastStart / thresholds.accelerationPlane;
   const speed: number = config.maxScrollSpeed * percentage;
 
   return speed;
@@ -71,40 +97,44 @@ const getRequiredScroll = (container: Area, center: Position): ?Position => {
   // Maximum speed value should be hit before the distance is 0
   // Negative values to not continue to increase the speed
 
-  const vertical: number = (() => {
+  const y: number = (() => {
+    const thresholds: Thresholds = getThresholds(container, vertical);
     const isCloserToBottom: boolean = distance.bottom < distance.top;
 
     if (isCloserToBottom) {
-      return getSpeed(distance.bottom);
+      return getSpeed(distance.bottom, thresholds);
     }
 
     // closer to top
-    return -1 * getSpeed(distance.top);
+    return -1 * getSpeed(distance.top, thresholds);
   })();
 
-  const horizontal: number = (() => {
+  const x: number = (() => {
+    const thresholds: Thresholds = getThresholds(container, horizontal);
     const isCloserToRight: boolean = distance.right < distance.left;
 
     if (isCloserToRight) {
-      return getSpeed(distance.right);
+      return getSpeed(distance.right, thresholds);
     }
 
     // closer to left
-    return -1 * getSpeed(distance.left);
+    return -1 * getSpeed(distance.left, thresholds);
   })();
 
-  const scroll: Position = { x: horizontal, y: vertical };
+  const scroll: Position = { x, y };
 
   return isEqual(scroll, origin) ? null : scroll;
 };
 
-export default (): AutoScrollMarshal => {
+export default ({
+  scrollDroppable,
+}: Args): AutoScrollMarshal => {
   // TODO: do not scroll if drag has finished
-  const scheduleScroll = rafSchd((change: Position) => {
-    console.log('scrolling window', change);
-    // TODO: check if can actually scroll this much
+  const scheduleWindowScroll = rafSchd((change: Position) => {
     window.scrollBy(change.x, change.y);
   });
+
+  const scheduleDroppableScroll = rafSchd(scrollDroppable);
 
   const onDrag = (state: State) => {
     if (state.phase !== 'DRAGGING') {
@@ -119,36 +149,45 @@ export default (): AutoScrollMarshal => {
       return;
     }
 
-    // const descriptor: DraggableDescriptor = drag.initial.descriptor;
     const center: Position = drag.current.page.center;
-    // const draggable: DraggableDimension = state.dimension.draggable[descriptor.id];
-    // const droppable: DroppableDimension = state.dimension.droppable[descriptor.droppableId];
 
-    // TODO: droppable scroll
+    const wasDroppableScrolled: boolean = (() => {
+      const destination: ?DraggableLocation = drag.impact.destination;
 
-    const viewport: Area = getViewport();
+      if (!destination) {
+        return false;
+      }
 
-    const requiredScroll: ?Position = getRequiredScroll(viewport, center);
+      const droppable: DroppableDimension = state.dimension.droppable[destination.droppableId];
+
+      // not a scrollable droppable
+      if (!droppable.viewport.frame) {
+        return false;
+      }
+
+      const requiredScroll: ?Position = getRequiredScroll(droppable.viewport.frame, center);
+
+      if (!requiredScroll) {
+        return false;
+      }
+
+      scheduleDroppableScroll(droppable.descriptor.id, requiredScroll);
+      return true;
+    })();
+
+    if (wasDroppableScrolled) {
+      return;
+    }
+
+    // Now we check to see if we need to scroll the viewport
+
+    const requiredScroll: ?Position = getRequiredScroll(getViewport(), center);
 
     if (!requiredScroll) {
       return;
     }
 
-    scheduleScroll(requiredScroll);
-
-    // const bottomDiff = viewport.bottom - center.y;
-    // const topDiff = center.y - viewport.top;
-
-    // console.log('top diff', topDiff);
-
-    // if (bottomDiff < 100) {
-    //   scheduleScroll({ x: 0, y: 20 });
-    //   return;
-    // }
-
-    // if (topDiff < 100) {
-    //   scheduleScroll({ x: 0, y: -20 });
-    // }
+    scheduleWindowScroll(requiredScroll);
   };
 
   const onStateChange = (previous: State, current: State): void => {
@@ -160,7 +199,8 @@ export default (): AutoScrollMarshal => {
 
     // cancel any pending scrolls if no longer dragging
     if (previous.phase === 'DRAGGING' && current.phase !== 'DRAGGING') {
-      scheduleScroll.cancel();
+      scheduleWindowScroll.cancel();
+      scheduleDroppableScroll.cancel();
     }
   };
 

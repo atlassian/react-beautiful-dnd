@@ -50,6 +50,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       getDimension: this.getDimension,
       watchScroll: this.watchScroll,
       unwatchScroll: this.unwatchScroll,
+      scroll: this.scroll,
     };
     this.callbacks = callbacks;
   }
@@ -91,6 +92,15 @@ export default class DroppableDimensionPublisher extends Component<Props> {
 
   onClosestScroll = () => {
     this.scheduleScrollUpdate(this.getScrollOffset());
+  }
+
+  scroll = (change: Position) => {
+    if (this.closestScrollable == null) {
+      return;
+    }
+
+    this.closestScrollable.scrollTop += change.y;
+    this.closestScrollable.scrollLeft += change.x;
   }
 
   watchScroll = () => {

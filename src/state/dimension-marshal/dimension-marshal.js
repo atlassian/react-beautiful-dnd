@@ -156,6 +156,19 @@ export default (callbacks: Callbacks) => {
     callbacks.updateDroppableScroll(id, newScroll);
   };
 
+  const scrollDroppable = (id: DroppableId, change: Position) => {
+    const entry: ?DroppableEntry = state.droppables[id];
+    if (!entry) {
+      return;
+    }
+
+    if (!state.isCollecting) {
+      return;
+    }
+
+    entry.callbacks.scroll(change);
+  };
+
   const unregisterDraggable = (descriptor: DraggableDescriptor) => {
     const entry: ?DraggableEntry = state.draggables[descriptor.id];
 
@@ -435,6 +448,7 @@ export default (callbacks: Callbacks) => {
     registerDroppable,
     unregisterDroppable,
     updateDroppableIsEnabled,
+    scrollDroppable,
     updateDroppableScroll,
     onPhaseChange,
   };
