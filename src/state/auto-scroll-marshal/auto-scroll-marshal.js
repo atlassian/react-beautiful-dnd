@@ -3,6 +3,7 @@ import rafSchd from 'raf-schd';
 import getViewport from '../visibility/get-viewport';
 import { isEqual } from '../position';
 import { vertical, horizontal } from '../axis';
+import getDroppableFrameOver from './get-droppable-frame-over';
 import type { AutoScrollMarshal } from './auto-scroll-marshal-types';
 import type {
   Area,
@@ -151,16 +152,23 @@ export default ({
 
     const center: Position = drag.current.page.center;
 
-    const wasDroppableScrolled: boolean = (() => {
-      const destination: ?DraggableLocation = drag.impact.destination;
+    // TODO:
+    // improvements: need to find if we are over any FRAME - not just the droppable
+    // window scroll first?
 
-      if (!destination) {
+    const wasDroppableScrolled: boolean = (() => {
+      const droppable: ?DroppableDimension = getDroppableFrameOver({
+        target: center,
+        droppables: state.dimension.droppable,
+      });
+
+      console.log('over frame', droppable && droppable.descriptor.id);
+
+      if (!droppable) {
         return false;
       }
 
-      const droppable: DroppableDimension = state.dimension.droppable[destination.droppableId];
-
-      // not a scrollable droppable
+      // not a scrollable droppable (should not occur)
       if (!droppable.viewport.frame) {
         return false;
       }
