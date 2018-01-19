@@ -45,7 +45,7 @@ export default ({
   };
   const isDragging = (): boolean => state.isDragging;
   const isCapturing = (): boolean => Boolean(state.pending || state.isDragging);
-  const schedule = createScheduler(callbacks, isDragging);
+  const schedule = createScheduler(callbacks);
 
   const startDragging = (fn?: Function = noop) => {
     setState({
@@ -55,7 +55,8 @@ export default ({
     });
     fn();
   };
-  const stopDragging = (fn? : Function = noop) => {
+  const stopDragging = (fn?: Function = noop) => {
+    schedule.cancel();
     unbindWindowEvents();
     setState({
       isDragging: false,

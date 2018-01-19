@@ -628,6 +628,42 @@ describe('drag handle', () => {
 
         expect(callbacks.onDrop).toHaveBeenCalled();
       });
+
+      it('should not execute any pending movements after the drop', () => {
+        // lift
+        mouseDown(wrapper);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+        })).toBe(true);
+
+        // mouse move
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
+        // movement not fired yet
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onMove: 0,
+        })).toBe(true);
+
+        // drop
+        windowMouseUp();
+        expect(callbacksCalled(callbacks)({
+          // movement has not occurred yet
+          onMove: 0,
+          onLift: 1,
+          onDrop: 1,
+        })).toBe(true);
+
+        // flush any pending animation frames
+        requestAnimationFrame.flush();
+
+        expect(callbacksCalled(callbacks)({
+          // movement has not occurred after flush
+          onMove: 0,
+          onLift: 1,
+          onDrop: 1,
+        })).toBe(true);
+      });
     });
 
     describe('cancel', () => {
@@ -696,6 +732,42 @@ describe('drag handle', () => {
         expect(callbacksCalled(callbacks)({
           onLift: 1,
           onMove: 0,
+          onCancel: 1,
+        })).toBe(true);
+      });
+
+      it('should not execute any pending movements after the cancel', () => {
+        // lift
+        mouseDown(wrapper);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+        })).toBe(true);
+
+        // mouse move
+        windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
+        // movement not fired yet
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onMove: 0,
+        })).toBe(true);
+
+        // cancel the drag
+        windowEscape();
+        expect(callbacksCalled(callbacks)({
+          // movement has not occurred yet
+          onMove: 0,
+          onLift: 1,
+          onCancel: 1,
+        })).toBe(true);
+
+        // flush any pending animation frames
+        requestAnimationFrame.flush();
+
+        expect(callbacksCalled(callbacks)({
+          // movement has not occurred after flush
+          onMove: 0,
+          onLift: 1,
           onCancel: 1,
         })).toBe(true);
       });
@@ -775,7 +847,7 @@ describe('drag handle', () => {
     });
 
     describe('disabled mid drag', () => {
-      it('should cancel a pending drag', () => {
+      it.skip('should cancel a pending drag', () => {
 
       });
 
@@ -1876,6 +1948,31 @@ describe('drag handle', () => {
           onDrop: 1,
         })).toBe(true);
       });
+
+      it('should not execute pending movements after a drop', () => {
+        touchStart(wrapper);
+        jest.runTimersToTime(timeForLongPress);
+
+        // move started but frame not released
+        windowTouchMove({ x: 0, y: 100 });
+
+        // finish the drag
+        windowTouchEnd();
+        expect(callbacksCalled(callbacks)({
+          // no movement
+          onMove: 0,
+          onLift: 1,
+          onDrop: 1,
+        })).toBe(true);
+
+        requestAnimationFrame.flush();
+        expect(callbacksCalled(callbacks)({
+          // still no movement
+          onMove: 0,
+          onLift: 1,
+          onDrop: 1,
+        })).toBe(true);
+      });
     });
 
     describe('cancelling a drag that has started', () => {
@@ -1990,10 +2087,35 @@ describe('drag handle', () => {
         });
       });
 
-      it('should if a touchstart event is fired', () => {
+      it('should cancel if a touchstart event is fired', () => {
         dispatchWindowTouchEvent('touchstart');
 
         expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onCancel: 1,
+        })).toBe(true);
+      });
+
+      it('should not execute pending movements after a cancel', () => {
+        touchStart(wrapper);
+        jest.runTimersToTime(timeForLongPress);
+
+        // move started but frame not released
+        windowTouchMove({ x: 0, y: 100 });
+
+        // cancel the drag
+        dispatchWindowEvent('orientationchange');
+        expect(callbacksCalled(callbacks)({
+          // no movement
+          onMove: 0,
+          onLift: 1,
+          onCancel: 1,
+        })).toBe(true);
+
+        requestAnimationFrame.flush();
+        expect(callbacksCalled(callbacks)({
+          // still no movement
+          onMove: 0,
           onLift: 1,
           onCancel: 1,
         })).toBe(true);
