@@ -17,6 +17,7 @@ import type {
 import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';
 import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';
 import * as keyCodes from '../../../src/view/key-codes';
+// eslint-disable-next-line no-unused-vars
 import * as logger from '../../../src/log';
 
 // unmounting during a drag can cause a warning

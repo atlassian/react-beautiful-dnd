@@ -69,9 +69,8 @@ describe('can start drag', () => {
       expect(canStartDrag(fake, preset.inHome1.descriptor.id)).toBe(false);
       expect(logger.warn).toHaveBeenCalled();
     });
-    
+
     it('should handle every phase', () => {
-      //jest.resetAllMocks();
       state.allPhases().forEach((current: State) => {
         canStartDrag(current, preset.inHome1.descriptor.id);
         expect(logger.warn).not.toHaveBeenCalled();

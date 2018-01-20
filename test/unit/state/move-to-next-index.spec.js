@@ -20,6 +20,7 @@ import type {
   DraggableLocation,
   Position,
 } from '../../../src/types';
+// eslint-disable-next-line no-unused-vars
 import * as logger from '../../../src/log';
 
 jest.mock('../../../src/log');
