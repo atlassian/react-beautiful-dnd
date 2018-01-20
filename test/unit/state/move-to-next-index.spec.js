@@ -20,6 +20,9 @@ import type {
   DraggableLocation,
   Position,
 } from '../../../src/types';
+import * as logger from '../../../src/log';
+
+jest.mock('../../../src/log');
 
 const setViewport = (custom: Area): void => {
   window.pageYOffset = custom.top;
@@ -39,12 +42,7 @@ const customViewport: Area = getArea({
 
 describe('move to next index', () => {
   beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => { });
     setViewport(customViewport);
-  });
-
-  afterEach(() => {
-    console.error.mockRestore();
   });
 
   afterAll(() => {

@@ -17,6 +17,10 @@ import type {
 import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';
 import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';
 import * as keyCodes from '../../../src/view/key-codes';
+import * as logger from '../../../src/log';
+
+// unmounting during a drag can cause a warning
+jest.mock('../../../src/log');
 
 const windowMouseMove = dispatchWindowMouseEvent.bind(null, 'mousemove');
 const windowMouseUp = dispatchWindowMouseEvent.bind(null, 'mouseup');
@@ -93,8 +97,6 @@ describe('hooks integration', () => {
       onDragEnd: jest.fn(),
     };
     wrapper = getMountedApp();
-    // unmounting during a drag can cause a warning
-    jest.spyOn(console, 'warn').mockImplementation(() => { });
   });
 
   afterEach(() => {
@@ -111,8 +113,6 @@ describe('hooks integration', () => {
     if (window.getComputedStyle.mockRestore) {
       window.getComputedStyle.mockRestore();
     }
-
-    console.warn.mockRestore();
   });
 
   const drag = (() => {

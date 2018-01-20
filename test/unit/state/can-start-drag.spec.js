@@ -3,6 +3,9 @@ import canStartDrag from '../../../src/state/can-start-drag';
 import * as state from '../../utils/simple-state-preset';
 import { getPreset } from '../../utils/dimension';
 import type { State } from '../../../src/types';
+import * as logger from '../../../src/log';
+
+jest.mock('../../../src/log');
 
 const preset = getPreset();
 
@@ -55,30 +58,23 @@ describe('can start drag', () => {
   });
 
   describe('no unhandled phases', () => {
-    beforeEach(() => {
-      jest.spyOn(console, 'warn').mockImplementation(() => { });
-    });
-
-    afterEach(() => {
-      console.warn.mockRestore();
-    });
-
     it('should log a warning if there is an unhandled phase', () => {
       // this is usually guarded against through the type system
-      // however we want to assert that the console.warn is not called
+      // however we want to assert that the logger.warn is not called
       // (this is needed the validate the next test)
       const fake: State = ({
         ...state.idle,
         phase: 'SOME_MADE_UP_PHASE',
       } : any);
       expect(canStartDrag(fake, preset.inHome1.descriptor.id)).toBe(false);
-      expect(console.warn).toHaveBeenCalled();
+      expect(logger.warn).toHaveBeenCalled();
     });
-
+    
     it('should handle every phase', () => {
+      //jest.resetAllMocks();
       state.allPhases().forEach((current: State) => {
         canStartDrag(current, preset.inHome1.descriptor.id);
-        expect(console.warn).not.toHaveBeenCalled();
+        expect(logger.warn).not.toHaveBeenCalled();
       });
     });
   });

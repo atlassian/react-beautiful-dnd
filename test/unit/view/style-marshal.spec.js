@@ -4,6 +4,9 @@ import getStyles, { type Styles } from '../../../src/view/style-marshal/get-styl
 import type { StyleMarshal } from '../../../src/view/style-marshal/style-marshal-types';
 import * as state from '../../utils/simple-state-preset';
 import type { State } from '../../../src/types';
+import * as logger from '../../../src/log';
+
+jest.mock('../../../src/log');
 
 const getStyleTagSelector = (context: string) =>
   `style[data-react-beautiful-dnd="${context}"]`;
@@ -15,14 +18,6 @@ const getStyleFromTag = (context: string): string => {
 };
 
 describe('style marshal', () => {
-  beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => { });
-  });
-
-  afterEach(() => {
-    console.error.mockRestore();
-  });
-
   describe('not dragging', () => {
     it('should not mount a style tag until mounted', () => {
       const marshal: StyleMarshal = createStyleMarshal();
@@ -40,10 +35,10 @@ describe('style marshal', () => {
       const marshal: StyleMarshal = createStyleMarshal();
 
       marshal.mount();
-      expect(console.error).not.toHaveBeenCalled();
+      expect(logger.error).not.toHaveBeenCalled();
 
       marshal.mount();
-      expect(console.error).toHaveBeenCalled();
+      expect(logger.error).toHaveBeenCalled();
     });
 
     it('should apply the resting styles by default', () => {
@@ -149,7 +144,7 @@ describe('style marshal', () => {
       // asserting it has the base styles (not updated)
       expect(el.innerHTML).toEqual(styles.resting);
       // an error is logged
-      expect(console.error).toHaveBeenCalled();
+      expect(logger.error).toHaveBeenCalled();
     });
   });
 

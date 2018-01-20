@@ -20,6 +20,9 @@ import type {
   DraggableDimension,
   DraggableDescriptor,
 } from '../../../src/types';
+import * as logger from '../../../src/log';
+
+jest.mock('../../../src/log');
 
 const preset = getPreset();
 
@@ -81,14 +84,6 @@ const getMarshalStub = (): DimensionMarshal => ({
 });
 
 describe('DraggableDimensionPublisher', () => {
-  beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => { });
-  });
-
-  afterEach(() => {
-    console.error.mockRestore();
-  });
-
   describe('dimension registration', () => {
     it('should register itself when mounting', () => {
       const marshal: DimensionMarshal = getMarshalStub();
@@ -117,7 +112,7 @@ describe('DraggableDimensionPublisher', () => {
       forceUpdate(wrapper);
 
       expect(marshal.registerDraggable).not.toHaveBeenCalled();
-      expect(console.error).toHaveBeenCalled();
+      expect(logger.error).toHaveBeenCalled();
     });
 
     it('should unregister itself when unmounting', () => {

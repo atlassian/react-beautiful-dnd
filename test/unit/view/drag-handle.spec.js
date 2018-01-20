@@ -25,6 +25,9 @@ import getArea from '../../../src/state/get-area';
 import { timeForLongPress, forcePressThreshold } from '../../../src/view/drag-handle/sensor/create-touch-sensor';
 import { interactiveTagNames } from '../../../src/view/drag-handle/util/should-allow-dragging-from-target';
 import { styleContextKey, canLiftContextKey } from '../../../src/view/context-keys';
+import * as logger from '../../../src/log';
+
+jest.mock('../../../src/log');
 
 const primaryButton: number = 0;
 const auxiliaryButton: number = 1;
@@ -165,7 +168,6 @@ describe('drag handle', () => {
   });
 
   beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => { });
     callbacks = getStubCallbacks();
     wrapper = mount(
       <DragHandle
@@ -187,7 +189,6 @@ describe('drag handle', () => {
 
   afterEach(() => {
     wrapper.unmount();
-    console.error.mockRestore();
   });
 
   afterAll(() => {
@@ -1056,7 +1057,7 @@ describe('drag handle', () => {
         // not providing any force value
         windowMouseForceChange();
 
-        expect(console.error).toHaveBeenCalled();
+        expect(logger.error).toHaveBeenCalled();
       });
 
       it('should log a warning if a mouse force changed event is fired when there is no MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN global', () => {
@@ -1066,7 +1067,7 @@ describe('drag handle', () => {
         mouseDown(wrapper);
         windowMouseForceChange(standardForce);
 
-        expect(console.error).toHaveBeenCalled();
+        expect(logger.error).toHaveBeenCalled();
       });
 
       describe('non error scenarios', () => {
@@ -1288,7 +1289,7 @@ describe('drag handle', () => {
         // boom
         pressArrowDown(customWrapper);
 
-        expect(console.error).toHaveBeenCalled();
+        expect(logger.error).toHaveBeenCalled();
         expect(callbacksCalled(customCallbacks)({
           onLift: 1,
           onCancel: 1,

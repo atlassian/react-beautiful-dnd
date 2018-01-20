@@ -30,6 +30,9 @@ import type {
   DragImpact,
   DraggableDimension,
 } from '../../../src/types';
+import * as logger from '../../../src/log';
+
+jest.mock('../../../src/log');
 
 const preset = getPreset();
 const move = (previous: State, offset: Position): State => {
@@ -63,14 +66,6 @@ const getOwnProps = (dimension: DraggableDimension): OwnProps => ({
 });
 
 describe('Connected Draggable', () => {
-  beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => { });
-  });
-
-  afterEach(() => {
-    console.error.mockRestore();
-  });
-
   describe('is currently dragging', () => {
     const ownProps: OwnProps = getOwnProps(preset.inHome1);
 
@@ -85,7 +80,7 @@ describe('Connected Draggable', () => {
       const result: MapProps = selector(invalid, ownProps);
 
       expect(result).toBe(defaultMapProps);
-      expect(console.error).toHaveBeenCalled();
+      expect(logger.error).toHaveBeenCalled();
     });
 
     it('should move the dragging item to the current offset', () => {
@@ -185,7 +180,7 @@ describe('Connected Draggable', () => {
         const result: MapProps = selector(invalid, ownProps);
 
         expect(result).toBe(defaultMapProps);
-        expect(console.error).toHaveBeenCalled();
+        expect(logger.error).toHaveBeenCalled();
       });
 
       it('should move the draggable to the new offset', () => {
@@ -255,7 +250,7 @@ describe('Connected Draggable', () => {
         const result: MapProps = selector(invalid, ownProps);
 
         expect(result).toBe(defaultMapProps);
-        expect(console.error).toHaveBeenCalled();
+        expect(logger.error).toHaveBeenCalled();
       });
 
       it('should return the default map props', () => {
@@ -686,7 +681,7 @@ describe('Connected Draggable', () => {
           const result: MapProps = selector(invalid, ownProps);
 
           expect(result).toBe(defaultMapProps);
-          expect(console.error).toHaveBeenCalled();
+          expect(logger.error).toHaveBeenCalled();
         });
 
         it('should not break memoization from the dragging phase', () => {
@@ -772,7 +767,7 @@ describe('Connected Draggable', () => {
           const result: MapProps = selector(invalid, ownProps);
 
           expect(result).toBe(defaultMapProps);
-          expect(console.error).toHaveBeenCalled();
+          expect(logger.error).toHaveBeenCalled();
         });
 
         it('should not break memoization from the dragging phase', () => {

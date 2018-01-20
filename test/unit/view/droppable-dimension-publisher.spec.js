@@ -22,6 +22,9 @@ import type {
   DroppableDescriptor,
   TypeId,
 } from '../../../src/types';
+import * as logger from '../../../src/log';
+
+jest.mock('../../../src/log');
 
 const noMargin = {
   marginTop: '0',
@@ -105,14 +108,6 @@ describe('DraggableDimensionPublisher', () => {
     y: window.pageYOffset,
   };
 
-  beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => { });
-  });
-
-  afterEach(() => {
-    console.error.mockRestore();
-  });
-
   afterEach(() => {
     // clean up any stubs
     if (Element.prototype.getBoundingClientRect.mockRestore) {
@@ -158,7 +153,7 @@ describe('DraggableDimensionPublisher', () => {
       // updating without a targetRef
       forceUpdate(wrapper);
 
-      expect(console.error).toHaveBeenCalled();
+      expect(logger.error).toHaveBeenCalled();
       expect(marshal.registerDroppable).not.toHaveBeenCalled();
     });
 
@@ -761,7 +756,7 @@ describe('DraggableDimensionPublisher', () => {
     });
 
     it('should stop watching for scroll events when the component is unmounted', () => {
-      jest.spyOn(console, 'warn').mockImplementation(() => { });
+      jest.spyOn(logger, 'warn').mockImplementation(() => { });
       const marshal: DimensionMarshal = getMarshalStub();
       const wrapper = mount(
         <ScrollableItem />,
@@ -782,10 +777,7 @@ describe('DraggableDimensionPublisher', () => {
       requestAnimationFrame.step();
       expect(marshal.updateDroppableScroll).not.toHaveBeenCalled();
       // also logs a warning
-      expect(console.warn).toHaveBeenCalled();
-
-      // cleanup
-      console.warn.mockRestore();
+      expect(logger.warn).toHaveBeenCalled();
     });
   });
 

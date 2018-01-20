@@ -10,6 +10,9 @@ import type {
   DraggableLocation,
   DragStart,
 } from '../../../src/types';
+import * as logger from '../../../src/log';
+
+jest.mock('../../../src/log');
 
 const preset = getPreset();
 
@@ -27,11 +30,6 @@ describe('fire hooks', () => {
       onDragStart: jest.fn(),
       onDragEnd: jest.fn(),
     };
-    jest.spyOn(console, 'error').mockImplementation(() => { });
-  });
-
-  afterEach(() => {
-    console.error.mockRestore();
   });
 
   describe('drag start', () => {
@@ -56,7 +54,7 @@ describe('fire hooks', () => {
 
       fireHooks(customHooks, state.requesting(), state.dragging());
 
-      expect(console.error).not.toHaveBeenCalled();
+      expect(logger.error).not.toHaveBeenCalled();
     });
 
     it('should log an error and not call the callback if there is no current drag', () => {
@@ -67,7 +65,7 @@ describe('fire hooks', () => {
 
       fireHooks(hooks, state.requesting(), invalid);
 
-      expect(console.error).toHaveBeenCalled();
+      expect(logger.error).toHaveBeenCalled();
     });
 
     it('should not call if only collecting dimensions (not dragging yet)', () => {
@@ -129,7 +127,7 @@ describe('fire hooks', () => {
         fireHooks(hooks, previous, invalid);
 
         expect(hooks.onDragEnd).not.toHaveBeenCalled();
-        expect(console.error).toHaveBeenCalled();
+        expect(logger.error).toHaveBeenCalled();
       });
 
       it('should call onDragEnd with null as the destination if there is no destination', () => {
@@ -222,7 +220,7 @@ describe('fire hooks', () => {
         fireHooks(hooks, state.idle, invalid);
 
         expect(hooks.onDragEnd).not.toHaveBeenCalled();
-        expect(console.error).toHaveBeenCalled();
+        expect(logger.error).toHaveBeenCalled();
       });
     });
 
@@ -253,7 +251,7 @@ describe('fire hooks', () => {
         fireHooks(hooks, invalid, state.idle);
 
         expect(hooks.onDragEnd).not.toHaveBeenCalled();
-        expect(console.error).toHaveBeenCalled();
+        expect(logger.error).toHaveBeenCalled();
       });
     });
   });
