@@ -42,6 +42,7 @@ export default ({
     fn();
   };
   const stopDragging = (fn?: Function = noop) => {
+    schedule.cancel();
     unbindWindowEvents();
     setState({
       isDragging: false,
@@ -53,7 +54,7 @@ export default ({
     stopDragging(callbacks.onCancel);
   };
   const isDragging = (): boolean => state.isDragging;
-  const schedule = createScheduler(callbacks, isDragging);
+  const schedule = createScheduler(callbacks);
 
   const onKeyDown = (event: KeyboardEvent, props: Props) => {
     const { direction } = props;

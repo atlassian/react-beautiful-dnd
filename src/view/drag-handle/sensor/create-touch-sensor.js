@@ -49,7 +49,7 @@ export default ({
   const isDragging = (): boolean => state.isDragging;
   const isCapturing = (): boolean =>
     Boolean(state.pending || state.isDragging || state.longPressTimerId);
-  const schedule = createScheduler(callbacks, isDragging);
+  const schedule = createScheduler(callbacks);
 
   const startDragging = () => {
     const pending: ?Position = state.pending;
@@ -76,6 +76,7 @@ export default ({
     });
   };
   const stopDragging = (fn?: Function = noop) => {
+    schedule.cancel();
     unbindWindowEvents();
     setState({
       ...initial,
@@ -105,6 +106,7 @@ export default ({
 
   const stopPendingDrag = () => {
     clearTimeout(state.longPressTimerId);
+    schedule.cancel();
     unbindWindowEvents();
 
     setState(initial);
