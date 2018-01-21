@@ -5,7 +5,7 @@ import type { Position, Direction, DraggableId } from '../../types';
 export type Callbacks = {|
   onLift: ({ client: Position, isScrollAllowed: boolean }) => void,
   onMove: (point: Position) => void,
-  onWindowScroll: (diff: Position) => void,
+  onWindowScroll: () => void,
   onMoveForward: () => void,
   onMoveBackward: () => void,
   onCrossAxisMoveForward: () => void,

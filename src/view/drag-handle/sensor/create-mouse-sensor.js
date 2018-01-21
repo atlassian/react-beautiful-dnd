@@ -175,6 +175,7 @@ export default ({
 
     eventKeys.forEach((eventKey: string) => {
       if (eventKey === 'scroll') {
+        // eventual consistency is fine because we use position: fixed on the item
         win.addEventListener(eventKey, windowBindings.scroll, { passive: true });
         return;
       }
