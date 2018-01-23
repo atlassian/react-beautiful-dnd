@@ -23,7 +23,7 @@ import type {
   Position,
   InitialDragPositions,
 } from '../types';
-import { add, subtract } from './position';
+import { add, subtract, isEqual } from './position';
 import { noMovement } from './no-impact';
 import getDragImpact from './get-drag-impact/';
 import moveToNextIndex from './move-to-next-index/';
@@ -410,6 +410,12 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     if (!state.drag) {
       console.error('cannot move with window scrolling if no current drag');
       return clean();
+    }
+
+    if (isEqual(windowScroll, state.drag.current.windowScroll)) {
+      // TODO: remove warn
+      console.warn('not computing move by window scroll as it is unchanged');
+      return state;
     }
 
     return move({

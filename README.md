@@ -537,7 +537,7 @@ type Hooks = {|
 
 type Props = {|
   ...Hooks,
-  children?: ReactElement,
+  children: ?Node,
 |}
 ```
 

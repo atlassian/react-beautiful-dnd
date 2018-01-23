@@ -224,6 +224,14 @@ export default ({
         return;
       }
 
+      // For scroll events we are okay with eventual consistency.
+      // Passive scroll listeners is the default behavior for mobile
+      // but we are being really clear here
+      if (eventKey === 'scroll') {
+        win.addEventListener(eventKey, fn, { passive: true });
+        return;
+      }
+
       win.addEventListener(eventKey, fn);
     });
   };
