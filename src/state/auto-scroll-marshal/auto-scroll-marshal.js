@@ -155,36 +155,36 @@ export default ({
     // Need to see if we can drag the droppable (or window if it is first)
     // and if we cannot scroll then move on
 
-    // const wasDroppableScrolled: boolean = (() => {
-    //   const droppable: ?DroppableDimension = getDroppableFrameOver({
-    //     target: center,
-    //     droppables: state.dimension.droppable,
-    //   });
+    const wasDroppableScrolled: boolean = (() => {
+      const droppable: ?DroppableDimension = getDroppableFrameOver({
+        target: center,
+        droppables: state.dimension.droppable,
+      });
 
-    //   console.log('over frame', droppable && droppable.descriptor.id);
+      console.log('over frame', droppable && droppable.descriptor.id);
 
-    //   if (!droppable) {
-    //     return false;
-    //   }
+      if (!droppable) {
+        return false;
+      }
 
-    //   // not a scrollable droppable (should not occur)
-    //   if (!droppable.viewport.frame) {
-    //     return false;
-    //   }
+      // not a scrollable droppable (should not occur)
+      if (!droppable.viewport.frame) {
+        return false;
+      }
 
-    //   const requiredScroll: ?Position = getRequiredScroll(droppable.viewport.frame, center);
+      const requiredScroll: ?Position = getRequiredScroll(droppable.viewport.frame, center);
 
-    //   if (!requiredScroll) {
-    //     return false;
-    //   }
+      if (!requiredScroll) {
+        return false;
+      }
 
-    //   scheduleDroppableScroll(droppable.descriptor.id, requiredScroll);
-    //   return true;
-    // })();
+      scheduleDroppableScroll(droppable.descriptor.id, requiredScroll);
+      return true;
+    })();
 
-    // if (wasDroppableScrolled) {
-    //   return;
-    // }
+    if (wasDroppableScrolled) {
+      return;
+    }
 
     // Now we check to see if we need to scroll the viewport
 
