@@ -84,6 +84,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   });
 
   scheduleScrollUpdate = rafSchedule(() => {
+    // Capturing the scroll now so that it is the latest value
     const offset: Position = this.getClosestScroll();
     this.memoizedUpdateScroll(offset.x, offset.y);
   });
