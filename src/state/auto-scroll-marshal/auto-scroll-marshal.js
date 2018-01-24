@@ -4,15 +4,13 @@ import getViewport from '../visibility/get-viewport';
 import { isEqual } from '../position';
 import { vertical, horizontal } from '../axis';
 import getDroppableFrameOver from './get-droppable-frame-over';
-import scrollWindow from './scroll-window';
+import scrollWindow, { canScroll as canScrollWindow } from './scroll-window';
 import type { AutoScrollMarshal } from './auto-scroll-marshal-types';
 import type {
   Area,
   Axis,
   DroppableId,
   DragState,
-  DraggableLocation,
-  DraggableDimension,
   DroppableDimension,
   Position,
   State,
@@ -133,7 +131,6 @@ export default ({
 }: Args): AutoScrollMarshal => {
   // TODO: do not scroll if drag has finished
   const scheduleWindowScroll = rafSchd(scrollWindow);
-
   const scheduleDroppableScroll = rafSchd(scrollDroppable);
 
   const onDrag = (state: State) => {
@@ -151,53 +148,42 @@ export default ({
 
     const center: Position = drag.current.page.center;
 
-    // TODO:
-    // Need to see if we can drag the droppable (or window if it is first)
-    // and if we cannot scroll then move on
+    // Ideally we would
 
-    const wasDroppableScrolled: boolean = (() => {
-      const droppable: ?DroppableDimension = getDroppableFrameOver({
-        target: center,
-        droppables: state.dimension.droppable,
-      });
-
-      console.log('over frame', droppable && droppable.descriptor.id);
-
-      if (!droppable) {
-        return false;
-      }
-
-      // not a scrollable droppable (should not occur)
-      if (!droppable.viewport.frame) {
-        return false;
-      }
-
-      const requiredScroll: ?Position = getRequiredScroll(droppable.viewport.frame, center);
-
-      if (!requiredScroll) {
-        return false;
-      }
-
-      scheduleDroppableScroll(droppable.descriptor.id, requiredScroll);
-      return true;
-    })();
-
-    if (wasDroppableScrolled) {
-      return;
-    }
-
-    // Now we check to see if we need to scroll the viewport
+    // 1. Can we scroll the viewport?
 
     const viewport: Area = getViewport();
+    const requiredWindowScroll: ?Position = getRequiredScroll(viewport, center);
 
-    const requiredScroll: ?Position = getRequiredScroll(viewport, center);
-
-    // No scroll required
-    if (!requiredScroll) {
+    if (requiredWindowScroll && canScrollWindow(requiredWindowScroll)) {
+      scheduleWindowScroll(requiredWindowScroll);
       return;
     }
 
-    scheduleWindowScroll(requiredScroll);
+    // 2. We are not scrolling the window. Can we scroll the Droppable?
+
+    const droppable: ?DroppableDimension = getDroppableFrameOver({
+      target: center,
+      droppables: state.dimension.droppable,
+    });
+
+    if (!droppable) {
+      return;
+    }
+
+    // not a scrollable droppable (should not occur)
+    if (!droppable.viewport.frame) {
+      return;
+    }
+
+    const requiredFrameScroll: ?Position =
+      getRequiredScroll(droppable.viewport.frame, center);
+
+    if (!requiredFrameScroll) {
+      return;
+    }
+
+    scheduleDroppableScroll(droppable.descriptor.id, requiredFrameScroll);
   };
 
   const onStateChange = (previous: State, current: State): void => {

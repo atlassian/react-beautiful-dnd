@@ -59,7 +59,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
   };
 
-  getScrollOffset = (): Position => {
+  getClosestScroll = (): Position => {
     if (!this.closestScrollable) {
       return origin;
     }
@@ -91,7 +91,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   });
 
   onClosestScroll = () => {
-    this.scheduleScrollUpdate(this.getScrollOffset());
+    this.scheduleScrollUpdate(this.getClosestScroll());
   }
 
   scroll = (change: Position) => {
@@ -233,7 +233,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
 
     // side effect - grabbing it for scroll listening so we know it is the same node
     this.closestScrollable = getClosestScrollable(targetRef);
-    const frameScroll: Position = this.getScrollOffset();
+    const frameScroll: Position = this.getClosestScroll();
     const style: Object = window.getComputedStyle(targetRef);
 
     // keeping it simple and always using the margin of the droppable

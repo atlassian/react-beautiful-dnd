@@ -9,7 +9,7 @@ import type {
 
 // Will return true if can scroll even a little bit in either direction
 // of the change.
-const canScroll = (change: Position): boolean => {
+export const canScroll = (change: Position): boolean => {
   const viewport: Area = getViewport();
 
   const shifted: Spacing = offset(viewport, change);

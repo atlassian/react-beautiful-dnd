@@ -412,15 +412,15 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
-    if (isEqual(windowScroll, state.drag.current.windowScroll)) {
-      // TODO: remove warn
-      console.warn('not computing move by window scroll as it is unchanged');
+    const current: CurrentDrag = state.drag.current;
+
+    if (isEqual(windowScroll, current.windowScroll)) {
       return state;
     }
 
     return move({
       state,
-      clientSelection: state.drag.current.client.selection,
+      clientSelection: current.client.selection,
       windowScroll,
       shouldAnimate: false,
     });
