@@ -121,9 +121,9 @@ const getRequiredScroll = (container: Area, center: Position): ?Position => {
     return -1 * getSpeed(distance.left, thresholds);
   })();
 
-  const scroll: Position = { x, y };
+  const required: Position = { x, y };
 
-  return isEqual(scroll, origin) ? null : scroll;
+  return isEqual(required, origin) ? null : required;
 };
 
 export default ({
