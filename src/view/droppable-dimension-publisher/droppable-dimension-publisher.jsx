@@ -83,16 +83,12 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     marshal.updateDroppableScroll(this.publishedDescriptor.id, newScroll);
   });
 
-  scheduleScrollUpdate = rafSchedule((offset: Position) => {
-    // might no longer be listening for scroll changes by the time a frame comes back
-    if (this.isWatchingScroll) {
-      this.memoizedUpdateScroll(offset.x, offset.y);
-    }
+  scheduleScrollUpdate = rafSchedule(() => {
+    const offset: Position = this.getClosestScroll();
+    this.memoizedUpdateScroll(offset.x, offset.y);
   });
 
-  onClosestScroll = () => {
-    this.scheduleScrollUpdate(this.getClosestScroll());
-  }
+  onClosestScroll = () => this.scheduleScrollUpdate();
 
   scroll = (change: Position) => {
     if (this.closestScrollable == null) {
@@ -130,6 +126,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     }
 
     this.isWatchingScroll = false;
+    this.scheduleScrollUpdate.cancel();
 
     if (!this.closestScrollable) {
       console.error('cannot unbind event listener if element is null');
