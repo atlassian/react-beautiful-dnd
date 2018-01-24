@@ -120,7 +120,7 @@ export default class Board extends Component<Props, State> {
         ignoreContainerClipping={Boolean(containerHeight)}
       >
         {(provided: DroppableProvided) => (
-          <Container innerRef={provided.innerRef}>
+          <Container innerRef={provided.innerRef} {...provided.droppableProps}>
             {ordered.map((key: string, index: number) => (
               <Column
                 key={key}

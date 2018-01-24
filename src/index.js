@@ -24,6 +24,7 @@ export type {
 export type {
   Provided as DroppableProvided,
   StateSnapshot as DroppableStateSnapshot,
+  DroppableProps,
 } from './view/droppable/droppable-types';
 
 // Draggable

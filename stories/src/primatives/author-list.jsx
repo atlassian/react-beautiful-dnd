@@ -95,7 +95,7 @@ export default class AuthorList extends Component<Props> {
     return (
       <Droppable droppableId={listId} type={listType} direction="horizontal">
         {(dropProvided: DroppableProvided, dropSnapshot: DroppableStateSnapshot) => (
-          <Wrapper isDraggingOver={dropSnapshot.isDraggingOver}>
+          <Wrapper isDraggingOver={dropSnapshot.isDraggingOver} {...dropProvided.droppableProps}>
             {internalScroll ? (
               <ScrollContainer>
                 {this.renderBoard(dropProvided)}

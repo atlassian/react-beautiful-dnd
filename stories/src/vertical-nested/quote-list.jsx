@@ -71,6 +71,7 @@ export default class QuoteList extends Component<{ list: NestedQuoteList }> {
         <Container
           innerRef={dropProvided.innerRef}
           isDraggingOver={dropSnapshot.isDraggingOver}
+          {...dropProvided.droppableProps}
         >
           <Title>{list.title}</Title>
           {list.children.map((item: Quote | NestedQuoteList, index: number) => (

@@ -139,6 +139,7 @@ class App extends Component {
             <div
               ref={provided.innerRef}
               style={getListStyle(snapshot.isDraggingOver)}
+              {...provided.droppableProps}
             >
               {this.state.items.map((item, index) => (
                 <Draggable key={item.id} draggableId={item.id} index={index}>
@@ -699,6 +700,7 @@ import { Droppable } from 'react-beautiful-dnd';
     <div
       ref={provided.innerRef}
       style={{ backgroundColor: snapshot.isDraggingOver ? 'blue' : 'grey' }}
+      {...provided.droppableProps}
     >
       <h2>I am a droppable!</h2>
       {provided.placeholder}
@@ -734,18 +736,30 @@ The function is provided with two arguments:
 ```js
 type DroppableProvided = {|
   innerRef: (?HTMLElement) => void,
+  droppableProps: DroppableProps,
   placeholder: ?ReactElement,
 |}
 ```
 
-- `provided.innerRef`: In order for the droppable to function correctly, **you must** bind the `provided.innerRef` to the highest possible DOM node in the `ReactElement`. We do this in order to avoid needing to use `ReactDOM` to look up your DOM node.
-
+- `provided.innerRef`: In order for the droppable to function correctly, **you must** bind the `provided.innerRef` to the highest possible DOM node in the `ReactElement`. We do this in order to avoid needing to use `ReactDOM` to look up your DOM node. *This prop is planned to be removed when we move to React 16*
 - `provided.placeholder`: This is used to create space in the `Droppable` as needed during a drag. This space is needed when a user is dragging over a list that is not the home list. Please be sure to put the placeholder inside of the component for which you have provided the ref. We need to increase the side of the `Droppable` itself. This is different from `Draggable` where the `placeholder` needs to be a *sibling* to the draggable node.
+- `provided.droppableProps (DroppableProps)`: This is an Object that contains properties that need to be applied to a Droppable element. It needs to be applied to the same element that you apply `provided.innerRef` to. It currently contains a `data` attribute that we use to control some non-visible css.
+
+#### Type information
+
+```js
+// Props that can be spread onto the element directly
+export type DroppableProps = {|
+  // used for shared global styles
+  'data-react-beautiful-dnd-droppable': string,
+|}
+```
+
 
 ```js
 <Droppable droppableId="droppable-1">
   {(provided, snapshot) => (
-    <div ref={provided.innerRef}>
+    <div ref={provided.innerRef} {...provided.droppableProps}>
       Good to go
 
       {provided.placeholder}
@@ -770,6 +784,7 @@ The `children` function is also provided with a small amount of state relating t
     <div
       ref={provided.innerRef}
       style={{ backgroundColor: snapshot.isDraggingOver ? 'blue' : 'grey' }}
+      {...provided.droppableProps}
     >
       I am a droppable!
 
@@ -838,6 +853,7 @@ class Students extends Component {
           <div
             ref={provided.innerRef}
             style={{ backgroundColor: provided.isDragging ? 'green' : 'lightblue' }}
+            {...provided.droppableProps}
           >
             <InnerList students={this.props.students} />
             {provided.placeholder}
@@ -923,8 +939,10 @@ The function is provided with two arguments:
 ```js
 type DraggableProvided = {|
   innerRef: (HTMLElement) => void,
-  draggableProps: ?DraggableProps,
+  draggableProps: DraggableProps,
+  // will be null if the draggable is disabled
   dragHandleProps: ?DragHandleProps,
+  // null if not required
   placeholder: ?ReactElement,
 |}
 ```
@@ -939,15 +957,15 @@ Everything within the *provided* object must be applied for the `Draggable` to f
 </Draggable>;
 ```
 
-### Type information
+#### Type information
 
 ```js
 innerRef: (HTMLElement) => void
 ```
 
-- `provided.draggableProps (?DraggableProps)`: This is an Object that contains a `data` attribute and an inline style. This Object needs to be applied to the same node that you apply `provided.innerRef` to. This controls the movement of the draggable when it is dragging and not dragging. You are welcome to add your own styles to `DraggableProps > style` – but please do not remove or replace any of the properties.
+- `provided.draggableProps (DraggableProps)`: This is an Object that contains a `data` attribute and an inline `style`. This Object needs to be applied to the same node that you apply `provided.innerRef` to. This controls the movement of the draggable when it is dragging and not dragging. You are welcome to add your own styles to `DraggableProps > style` – but please do not remove or replace any of the properties.
 
-### Type information
+#### Type information
 
 ```js
 // Props that can be spread onto the element directly
@@ -1290,7 +1308,7 @@ type DraggableStateSnapshot = {|
 // Draggable
 type DraggableProvided = {|
   innerRef: (?HTMLElement) => void,
-  draggableProps: ?DraggableProps,
+  draggableProps: DraggableProps,
   dragHandleProps: ?DragHandleProps,
   placeholder: ?ReactElement,
 |}

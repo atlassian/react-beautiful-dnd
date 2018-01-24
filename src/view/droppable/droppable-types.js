@@ -7,9 +7,15 @@ import type {
   Placeholder,
 } from '../../types';
 
+export type DroppableProps = {|
+  // used for shared global styles
+  'data-react-beautiful-dnd-droppable': string,
+|}
+
 export type Provided = {|
   innerRef: (?HTMLElement) => void,
   placeholder: ?Node,
+  droppableProps: DroppableProps,
 |}
 
 export type StateSnapshot = {|

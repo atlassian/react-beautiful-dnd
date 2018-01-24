@@ -5,7 +5,10 @@ import type { Props, Provided, StateSnapshot, DefaultProps } from './droppable-t
 import type { DroppableId } from '../../types';
 import DroppableDimensionPublisher from '../droppable-dimension-publisher/';
 import Placeholder from '../placeholder/';
-import { droppableIdKey } from '../context-keys';
+import {
+  droppableIdKey,
+  styleContextKey,
+} from '../context-keys';
 
 type State = {|
   ref: ?HTMLElement,
@@ -17,6 +20,8 @@ type Context = {|
 
 export default class Droppable extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
+  styleContext: string
+
   state: State = {
     ref: null,
   }
@@ -26,6 +31,17 @@ export default class Droppable extends Component<Props, State> {
     isDropDisabled: false,
     direction: 'vertical',
     ignoreContainerClipping: false,
+  }
+
+  // Need to declare childContextTypes without flow
+  static contextTypes = {
+    [styleContextKey]: PropTypes.string.isRequired,
+  }
+
+  constructor(props: Props, context: Object) {
+    super(props, context);
+
+    this.styleContext = context[styleContextKey];
   }
 
   // Need to declare childContextTypes without flow
@@ -40,6 +56,7 @@ export default class Droppable extends Component<Props, State> {
     };
     return value;
   }
+
   /* eslint-enable */
 
   // React calls ref callback twice for every render
@@ -83,6 +100,9 @@ export default class Droppable extends Component<Props, State> {
     const provided: Provided = {
       innerRef: this.setRef,
       placeholder: this.getPlaceholder(),
+      droppableProps: {
+        'data-react-beautiful-dnd-droppable': this.styleContext,
+      },
     };
     const snapshot: StateSnapshot = {
       isDraggingOver,

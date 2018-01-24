@@ -395,7 +395,7 @@ describe('Connected Droppable', () => {
       render() {
         const { provided, name } = this.props;
         return (
-          <div ref={ref => provided.innerRef(ref)}>
+          <div ref={ref => provided.innerRef(ref)} {...provided.droppableProps}>
             hello {name}
           </div>
         );

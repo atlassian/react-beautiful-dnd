@@ -61,7 +61,7 @@ describe('hooks integration', () => {
       >
         <Droppable droppableId={droppableId}>
           {(droppableProvided: DroppableProvided) => (
-            <div ref={droppableProvided.innerRef} >
+            <div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
               <h2>Droppable</h2>
               <Draggable draggableId={draggableId} index={0}>
                 {(draggableProvided: DraggableProvided) => (
