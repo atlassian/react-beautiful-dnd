@@ -71,8 +71,7 @@ export default ({
 
     callbacks.onLift({
       client: pending,
-      // not allowing container scrolling for touch movements at this stage
-      isScrollAllowed: false,
+      autoScrollMode: 'FLUID',
     });
   };
   const stopDragging = (fn?: Function = noop) => {

@@ -3,7 +3,7 @@ import { closest } from '../position';
 import isWithin from '../is-within';
 import { getCorners } from '../spacing';
 import getViewport from '../visibility/get-viewport';
-import isVisibleThroughFrame from '../visibility/is-visible-through-frame';
+import isPartiallyVisibleThroughFrame from '../visibility/is-partially-visible-through-frame';
 import type {
   Axis,
   DroppableDimension,
@@ -62,13 +62,12 @@ export default ({
     .filter((droppable: DroppableDimension): boolean => Boolean(droppable.viewport.clipped))
     // Remove any droppables that are not partially visible
     .filter((droppable: DroppableDimension): boolean => {
-      // TODO: verify
       const frame: ?Area = droppable.viewport.frame;
       // Droppable has no scroll container
       if (!frame) {
         return true;
       }
-      return isVisibleThroughFrame(viewport)(frame);
+      return isPartiallyVisibleThroughFrame(viewport)(frame);
     })
     .filter((droppable: DroppableDimension): boolean => {
       const targetClipped: Area = getSafeClipped(droppable);

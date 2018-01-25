@@ -1,9 +1,14 @@
 // @flow
 import type { Node } from 'react';
-import type { Position, Direction, DraggableId } from '../../types';
+import type {
+  AutoScrollMode,
+  Position,
+  Direction,
+  DraggableId,
+} from '../../types';
 
 export type Callbacks = {|
-  onLift: ({ client: Position, isScrollAllowed: boolean }) => void,
+  onLift: ({ client: Position, autoScrollMode: AutoScrollMode }) => void,
   onMove: (point: Position) => void,
   onWindowScroll: () => void,
   onMoveForward: () => void,

@@ -1,8 +1,7 @@
 // @flow
-import memoizeOne from 'memoize-one';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { patch } from '../position';
-import isVisibleInNewLocation from './is-visible-in-new-location';
+import { patch, subtract } from '../position';
+import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 import getViewport from '../visibility/get-viewport';
 import moveToEdge from '../move-to-edge';
 import type { Edge } from '../move-to-edge';
@@ -18,15 +17,10 @@ import type {
   Area,
 } from '../../types';
 
-const getIndex = memoizeOne(
-  (draggables: DraggableDimension[],
-    target: DraggableDimension
-  ): number => draggables.indexOf(target)
-);
-
 export default ({
   isMovingForward,
   draggableId,
+  previousPageCenter,
   previousImpact,
   droppable,
   draggables,
@@ -46,7 +40,7 @@ export default ({
     draggables,
   );
 
-  const startIndex: number = getIndex(insideDroppable, draggable);
+  const startIndex: number = draggable.descriptor.index;
   const currentIndex: number = location.index;
   const proposedIndex = isMovingForward ? currentIndex + 1 : currentIndex - 1;
 
@@ -88,7 +82,7 @@ export default ({
 
   const viewport: Area = getViewport();
 
-  const isVisible: boolean = isVisibleInNewLocation({
+  const isVisible: boolean = isTotallyVisibleInNewLocation({
     draggable,
     destination: droppable,
     newCenter,
@@ -96,7 +90,20 @@ export default ({
   });
 
   if (!isVisible) {
-    return null;
+    // HACK! just experimenting
+    // const diff: Position =
+    // need to get diff from where we are right now
+    const diff: Position = subtract(newCenter, previousPageCenter);
+
+    const result: Result = {
+      pageCenter: previousPageCenter,
+      impact: previousImpact,
+      scrollJumpRequest: diff,
+    };
+    // console.log('diff', diff);
+
+    // window.scrollBy(diff.x, diff.y);
+    return result;
   }
 
   // Calculate DragImpact
@@ -145,6 +152,7 @@ export default ({
   const result: Result = {
     pageCenter: newCenter,
     impact: newImpact,
+    scrollJumpRequest: null,
   };
 
   return result;

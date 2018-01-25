@@ -1,7 +1,8 @@
 // @flow
 import { subtract } from '../position';
 import { offset } from '../spacing';
-import isPartiallyVisible from '../visibility/is-partially-visible';
+import { isTotallyVisible } from '../visibility/is-visible';
+import isTotallyVisibleThroughFrame from '../visibility/is-totally-visible-through-frame';
 import type {
   Area,
   DraggableDimension,
@@ -27,9 +28,15 @@ export default ({
   const diff: Position = subtract(newCenter, draggable.page.withMargin.center);
   const shifted: Spacing = offset(draggable.page.withMargin, diff);
 
-  return isPartiallyVisible({
+  // Must be totally visible, not just partially visible.
+
+  const isVisible: boolean = isTotallyVisible({
     target: shifted,
     destination,
     viewport,
   });
+
+  console.log('is totally visible?', isVisible);
+
+  return isVisible;
 };

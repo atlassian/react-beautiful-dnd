@@ -15,6 +15,8 @@ import type {
   Position,
   State,
   Spacing,
+  DraggableLocation,
+  DraggableDimension,
 } from '../../types';
 
 type Args = {|
@@ -126,6 +128,9 @@ const getRequiredScroll = (container: Area, center: Position): ?Position => {
   return isEqual(required, origin) ? null : required;
 };
 
+const isTooBigForAutoScrolling = (frame: Area, subject: Area): boolean =>
+  subject.width > frame.width || subject.height > frame.height;
+
 export default ({
   scrollDroppable,
 }: Args): AutoScrollMarshal => {
@@ -133,14 +138,8 @@ export default ({
   const scheduleWindowScroll = rafSchd(scrollWindow);
   const scheduleDroppableScroll = rafSchd(scrollDroppable);
 
-  const onDrag = (state: State) => {
-    if (state.phase !== 'DRAGGING') {
-      console.error('Invalid phase for auto scrolling');
-      return;
-    }
-
+  const fluidScroll = (state: State) => {
     const drag: ?DragState = state.drag;
-
     if (!drag) {
       console.error('Invalid drag state');
       return;
@@ -148,11 +147,15 @@ export default ({
 
     const center: Position = drag.current.page.center;
 
-    // Ideally we would
-
     // 1. Can we scroll the viewport?
 
+    const draggable: DraggableDimension = state.dimension.draggable[drag.initial.descriptor.id];
     const viewport: Area = getViewport();
+
+    if (isTooBigForAutoScrolling(viewport, draggable.page.withMargin)) {
+      return;
+    }
+
     const requiredWindowScroll: ?Position = getRequiredScroll(viewport, center);
 
     if (requiredWindowScroll && canScrollWindow(requiredWindowScroll)) {
@@ -186,11 +189,59 @@ export default ({
     scheduleDroppableScroll(droppable.descriptor.id, requiredFrameScroll);
   };
 
+  const jumpScroll = (state: State) => {
+    const drag: DragState = (state.drag: any);
+    const offset: Position = (drag.scrollJumpRequest : any);
+
+    const destination: ?DraggableLocation = drag.impact.destination;
+
+    if (!destination) {
+      console.error('Cannot perform a jump scroll when there is no destination');
+      return;
+    }
+
+    const draggable: DraggableDimension = state.dimension.draggable[drag.initial.descriptor.id];
+    const viewport: Area = getViewport();
+
+    // draggable is too big
+    if (isTooBigForAutoScrolling(viewport, draggable.page.withMargin)) {
+      return;
+    }
+
+    if (canScrollWindow(offset)) {
+      scrollWindow(offset);
+      return;
+    }
+    console.log('cannot scroll window!', offset);
+
+    const droppable: DroppableDimension = state.dimension.droppable[destination.droppableId];
+
+    // scroll the droppable if it is a scroll container
+    if (droppable.viewport.frame) {
+      scrollDroppable(destination.droppableId, offset);
+    }
+  };
+
   const onStateChange = (previous: State, current: State): void => {
     // now dragging
     if (current.phase === 'DRAGGING') {
-      onDrag(current);
-      return;
+      if (!current.drag) {
+        console.error('invalid drag state');
+        return;
+      }
+
+      if (current.drag.initial.autoScrollMode === 'FLUID') {
+        fluidScroll(current);
+        return;
+      }
+
+      // autoScrollMode == 'JUMP'
+
+      if (!current.drag.scrollJumpRequest) {
+        return;
+      }
+
+      jumpScroll(current);
     }
 
     // cancel any pending scrolls if no longer dragging

@@ -1,6 +1,6 @@
 // @flow
 import getDisplacementMap, { type DisplacementMap } from './get-displacement-map';
-import isPartiallyVisible from './visibility/is-partially-visible';
+import { isPartiallyVisible } from './visibility/is-visible';
 import type {
   DraggableId,
   Displacement,

@@ -4,7 +4,7 @@ import { patch } from '../position';
 import moveToEdge from '../move-to-edge';
 import getDisplacement from '../get-displacement';
 import getViewport from '../visibility/get-viewport';
-import isVisibleInNewLocation from './is-visible-in-new-location';
+import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import type {
@@ -91,7 +91,7 @@ export default ({
     // checking the shifted draggable rather than just the new center
     // as the new center might not be visible but the whole draggable
     // might be partially visible
-    return isVisibleInNewLocation({
+    return isTotallyVisibleInNewLocation({
       draggable,
       destination: droppable,
       newCenter,

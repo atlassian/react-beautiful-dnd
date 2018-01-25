@@ -15,6 +15,7 @@ import type {
   CurrentDrag,
   InitialDrag,
   DraggableDescriptor,
+  AutoScrollMode,
 } from '../types';
 import noImpact from './no-impact';
 import getNewHomeClientCenter from './get-new-home-client-center';
@@ -61,7 +62,7 @@ export type CompleteLiftAction = {|
     id: DraggableId,
     client: InitialDragPositions,
     windowScroll: Position,
-    isScrollAllowed: boolean,
+    autoScrollMode: AutoScrollMode,
   |}
 |}
 
@@ -69,14 +70,14 @@ export const completeLift = (
   id: DraggableId,
   client: InitialDragPositions,
   windowScroll: Position,
-  isScrollAllowed: boolean,
+  autoScrollMode: AutoScrollMode,
 ): CompleteLiftAction => ({
   type: 'COMPLETE_LIFT',
   payload: {
     id,
     client,
     windowScroll,
-    isScrollAllowed,
+    autoScrollMode,
   },
 });
 
@@ -429,7 +430,7 @@ export type LiftAction = {|
     id: DraggableId,
     client: InitialDragPositions,
     windowScroll: Position,
-    isScrollAllowed: boolean,
+    autoScrollMode: AutoScrollMode,
   |}
 |}
 
@@ -438,7 +439,7 @@ export type LiftAction = {|
 export const lift = (id: DraggableId,
   client: InitialDragPositions,
   windowScroll: Position,
-  isScrollAllowed: boolean,
+  autoScrollMode: AutoScrollMode,
 ) => (dispatch: Dispatch, getState: Function) => {
   // Phase 1: Quickly finish any current drop animations
   const initial: State = getState();
@@ -481,7 +482,7 @@ export const lift = (id: DraggableId,
         return;
       }
 
-      dispatch(completeLift(id, client, windowScroll, isScrollAllowed));
+      dispatch(completeLift(id, client, windowScroll, autoScrollMode));
     });
   });
 };

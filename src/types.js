@@ -183,10 +183,14 @@ export type InitialDragPositions = {|
   center: Position,
 |}
 
+// When dragging with a pointer such as a mouse or touch input we want to automatically
+// scroll user the under input when we get near the bottom of a Droppable or the window.
+// When Dragging with a keyboard we want to jump as required
+export type AutoScrollMode = 'FLUID' | 'JUMP';
+
 export type InitialDrag = {|
   descriptor: DraggableDescriptor,
-  // whether scrolling is allowed - otherwise a scroll will cancel the drag
-  isScrollAllowed: boolean,
+  autoScrollMode: AutoScrollMode,
   // relative to the viewport when the drag started
   client: InitialDragPositions,
   // viewport + window scroll (position relative to 0, 0)
@@ -237,6 +241,8 @@ export type DropResult = {|
 export type DragState = {|
   initial: InitialDrag,
   current: CurrentDrag,
+  // if we need to jump the scroll - how much we need to jump
+  scrollJumpRequest: ?Position,
   impact: DragImpact,
 |}
 

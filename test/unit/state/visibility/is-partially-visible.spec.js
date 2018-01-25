@@ -1,6 +1,6 @@
 // @flow
 import getArea from '../../../../src/state/get-area';
-import isPartiallyVisible from '../../../../src/state/visibility/is-partially-visible';
+import { isPartiallyVisible } from '../../../../src/state/visibility/is-visible';
 import { getDroppableDimension, scrollDroppable } from '../../../../src/state/dimension';
 import { offset } from '../../../../src/state/spacing';
 import type {

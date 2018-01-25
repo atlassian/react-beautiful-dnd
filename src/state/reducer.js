@@ -119,6 +119,7 @@ const move = ({
     initial,
     impact: newImpact,
     current,
+    scrollJumpRequest: null,
   };
 
   return {
@@ -243,7 +244,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
-    const { id, client, windowScroll, isScrollAllowed } = action.payload;
+    const { id, client, windowScroll, autoScrollMode } = action.payload;
     const page: InitialDragPositions = {
       selection: add(client.selection, windowScroll),
       center: add(client.center, windowScroll),
@@ -260,7 +261,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
     const initial: InitialDrag = {
       descriptor,
-      isScrollAllowed,
+      autoScrollMode,
       client,
       page,
       windowScroll,
@@ -308,6 +309,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
         initial,
         current,
         impact,
+        scrollJumpRequest: null,
       },
     };
   }
@@ -320,14 +322,6 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
     if (state.drag == null) {
       console.error('invalid store state');
-      return clean();
-    }
-
-    // Currently not supporting container scrolling while dragging with a keyboard
-    // We do not store whether we are dragging with a keyboard in the state but this flag
-    // does this trick. Ideally this check would not exist.
-    // Kill the drag instantly
-    if (!state.drag.initial.isScrollAllowed) {
       return clean();
     }
 
@@ -454,12 +448,25 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       draggableId: existing.initial.descriptor.id,
       droppable,
       draggables: state.dimension.draggable,
+      previousPageCenter: existing.current.page.center,
       previousImpact: existing.impact,
     });
 
     // cannot move anyway (at the beginning or end of a list)
     if (!result) {
       return state;
+    }
+
+    // requesting a scroll jump
+    if (result.scrollJumpRequest) {
+      return {
+        ...state,
+        phase: 'DRAGGING',
+        drag: {
+          ...existing,
+          scrollJumpRequest: result.scrollJumpRequest,
+        },
+      };
     }
 
     const impact: DragImpact = result.impact;

@@ -1,5 +1,6 @@
 // @flow
-import isVisibleThroughFrame from './is-visible-through-frame';
+import isPartiallyVisibleThroughFrame from './is-partially-visible-through-frame';
+import isTotallyVisibleThroughFrame from './is-totally-visible-through-frame';
 import { offset } from '../spacing';
 import type {
   Spacing,
@@ -14,14 +15,17 @@ type Args = {|
   viewport: Area,
 |}
 
-// will return true if the position is visible:
-// 1. within the viewport AND
-// 2. within the destination Droppable
-export default ({
+type HelperArgs = {|
+  ...Args,
+  isVisibleThroughFrameFn: (frame: Spacing) => (subject: Spacing) => boolean
+|}
+
+const isVisible = ({
   target,
   destination,
   viewport,
-}: Args): boolean => {
+  isVisibleThroughFrameFn,
+}: HelperArgs): boolean => {
   const displacement: Position = destination.viewport.frameScroll.diff.displacement;
   const withScroll: Spacing = offset(target, displacement);
 
@@ -36,12 +40,34 @@ export default ({
   // adjust for the scroll as the clipped viewport takes into account
   // the scroll of the droppable.
   const isVisibleInDroppable: boolean =
-    isVisibleThroughFrame(destination.viewport.clipped)(withScroll);
+    isVisibleThroughFrameFn(destination.viewport.clipped)(withScroll);
 
   // We also need to consider whether the destination scroll when detecting
   // if we are visible in the viewport.
   const isVisibleInViewport: boolean =
-    isVisibleThroughFrame(viewport)(withScroll);
+    isVisibleThroughFrameFn(viewport)(withScroll);
 
   return isVisibleInDroppable && isVisibleInViewport;
 };
+
+export const isPartiallyVisible = ({
+  target,
+  destination,
+  viewport,
+}: Args): boolean => isVisible({
+  target,
+  destination,
+  viewport,
+  isVisibleThroughFrameFn: isPartiallyVisibleThroughFrame,
+});
+
+export const isTotallyVisible = ({
+  target,
+  destination,
+  viewport,
+}: Args): boolean => isVisible({
+  target,
+  destination,
+  viewport,
+  isVisibleThroughFrameFn: isTotallyVisibleThroughFrame,
+});

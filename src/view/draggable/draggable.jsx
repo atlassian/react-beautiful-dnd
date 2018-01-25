@@ -8,6 +8,7 @@ import type {
   DraggableDimension,
   InitialDragPositions,
   DroppableId,
+  AutoScrollMode,
 } from '../../types';
 import DraggableDimensionPublisher from '../draggable-dimension-publisher/';
 import Moveable from '../moveable/';
@@ -102,9 +103,9 @@ export default class Draggable extends Component<Props, State> {
     this.props.dropAnimationFinished();
   }
 
-  onLift = (options: {client: Position, isScrollAllowed: boolean}) => {
+  onLift = (options: {client: Position, autoScrollMode: AutoScrollMode}) => {
     this.throwIfCannotDrag();
-    const { client, isScrollAllowed } = options;
+    const { client, autoScrollMode } = options;
     const { lift, draggableId } = this.props;
     const { ref } = this.state;
 
@@ -119,7 +120,7 @@ export default class Draggable extends Component<Props, State> {
 
     const windowScroll: Position = getWindowScrollPosition();
 
-    lift(draggableId, initial, windowScroll, isScrollAllowed);
+    lift(draggableId, initial, windowScroll, autoScrollMode);
   }
 
   onMove = (client: Position) => {

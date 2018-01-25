@@ -1,7 +1,7 @@
 // @flow
 import { distance } from '../position';
 import getViewport from '../visibility/get-viewport';
-import isPartiallyVisible from '../visibility/is-partially-visible';
+import { isPartiallyVisible } from '../visibility/is-visible';
 import type {
   Area,
   Axis,

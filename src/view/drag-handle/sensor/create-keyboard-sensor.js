@@ -82,8 +82,10 @@ export default ({
       // using center position as selection
       const center: Position = getCenterPosition(ref);
 
-      // not allowing scrolling with a mouse when lifting with a keyboard
-      startDragging(() => callbacks.onLift({ client: center, isScrollAllowed: false }));
+      startDragging(() => callbacks.onLift({
+        client: center,
+        autoScrollMode: 'JUMP',
+      }));
       return;
     }
 
@@ -162,8 +164,12 @@ export default ({
     // any mouse down kills a drag
     mousedown: cancel,
     resize: cancel,
-    // currently not supporting window scrolling with a keyboard
-    scroll: cancel,
+    // Cancel if the user is using the mouse wheel
+    // We are not supporting wheel / trackpad scrolling with keyboard dragging
+    wheel: cancel,
+    // Need to respond instantly to a jump scroll request
+    // Not using the scheduler
+    scroll: callbacks.onWindowScroll,
   };
 
   const eventKeys: string[] = Object.keys(windowBindings);
