@@ -6052,9 +6052,9 @@ rollup-pluginutils@^2.0.1:
     estree-walker "^0.3.0"
     micromatch "^2.3.11"
 
-rollup@0.54.0:
-  version "0.54.0"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.54.0.tgz#0641b8154ba02706464285d2ead924c486b48ba9"
+rollup@^0.55.1:
+  version "0.55.1"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.55.1.tgz#baf4f23abe3014b29e56dea7d72d9946e56ac7dd"
 
 rst-selector-parser@^2.2.3:
   version "2.2.3"
