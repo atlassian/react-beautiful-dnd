@@ -213,6 +213,7 @@ export default ({
     }
 
     if (canScrollWindow(offset)) {
+      // not scheduling - jump requests need to be performed instantly
       scrollWindow(offset);
       return;
     }
@@ -230,6 +231,7 @@ export default ({
       return;
     }
 
+    // not scheduling - jump requests need to be performed instantly
     scrollDroppable(destination.droppableId, offset);
   };
 

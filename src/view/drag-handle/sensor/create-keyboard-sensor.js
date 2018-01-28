@@ -161,8 +161,9 @@ export default ({
   };
 
   const windowBindings = {
-    // any mouse down kills a drag
+    // any mouse actions kills a drag
     mousedown: cancel,
+    mouseup: cancel,
     resize: cancel,
     // Cancel if the user is using the mouse wheel
     // We are not supporting wheel / trackpad scrolling with keyboard dragging

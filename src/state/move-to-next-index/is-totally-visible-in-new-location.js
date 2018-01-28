@@ -1,7 +1,7 @@
 // @flow
 import { subtract } from '../position';
 import { offset } from '../spacing';
-import { isTotallyVisible } from '../visibility/is-visible';
+import { isTotallyVisible, isPartiallyVisible } from '../visibility/is-visible';
 import isTotallyVisibleThroughFrame from '../visibility/is-totally-visible-through-frame';
 import type {
   Area,
@@ -24,9 +24,12 @@ export default ({
   newCenter,
   viewport,
 }: Args): boolean => {
-  // what the new draggable boundary be if it had the new center
-  const diff: Position = subtract(newCenter, draggable.page.withMargin.center);
-  const shifted: Spacing = offset(draggable.page.withMargin, diff);
+  // What would the location of the Draggable be once the move is completed?
+  // We are not considering margins for this calculation.
+  // This is because a move might move a Draggable slightly outside of the bounds
+  // of a Droppable (which is okay)
+  const diff: Position = subtract(newCenter, draggable.page.withoutMargin.center);
+  const shifted: Spacing = offset(draggable.page.withoutMargin, diff);
 
   // Must be totally visible, not just partially visible.
 
@@ -35,8 +38,6 @@ export default ({
     destination,
     viewport,
   });
-
-  console.log('is totally visible?', isVisible);
 
   return isVisible;
 };

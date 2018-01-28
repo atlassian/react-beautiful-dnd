@@ -90,19 +90,16 @@ export default ({
   });
 
   if (!isVisible) {
-    // HACK! just experimenting
-    // const diff: Position =
     // need to get diff from where we are right now
     const diff: Position = subtract(newCenter, previousPageCenter);
 
+    // request a scroll jump to that position
     const result: Result = {
       pageCenter: previousPageCenter,
       impact: previousImpact,
       scrollJumpRequest: diff,
     };
-    // console.log('diff', diff);
 
-    // window.scrollBy(diff.x, diff.y);
     return result;
   }
 
