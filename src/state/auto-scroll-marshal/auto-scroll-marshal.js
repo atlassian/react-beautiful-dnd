@@ -179,6 +179,10 @@ export default ({
       return;
     }
 
+    if (isTooBigForAutoScrolling(droppable.viewport.frame, draggable.page.withMargin)) {
+      return;
+    }
+
     const requiredFrameScroll: ?Position =
       getRequiredScroll(droppable.viewport.frame, center);
 
@@ -193,6 +197,7 @@ export default ({
     const drag: DragState = (state.drag: any);
     const offset: Position = (drag.scrollJumpRequest : any);
 
+    const draggable: DraggableDimension = state.dimension.draggable[drag.initial.descriptor.id];
     const destination: ?DraggableLocation = drag.impact.destination;
 
     if (!destination) {
@@ -200,10 +205,9 @@ export default ({
       return;
     }
 
-    const draggable: DraggableDimension = state.dimension.draggable[drag.initial.descriptor.id];
-    const viewport: Area = getViewport();
+    // 1. Can we scroll the viewport?
 
-    // draggable is too big
+    const viewport: Area = getViewport();
     if (isTooBigForAutoScrolling(viewport, draggable.page.withMargin)) {
       return;
     }
@@ -212,14 +216,21 @@ export default ({
       scrollWindow(offset);
       return;
     }
-    console.log('cannot scroll window!', offset);
+
+    // 2. Can we scroll the droppable?
 
     const droppable: DroppableDimension = state.dimension.droppable[destination.droppableId];
 
-    // scroll the droppable if it is a scroll container
-    if (droppable.viewport.frame) {
-      scrollDroppable(destination.droppableId, offset);
+    // Current droppable has no frame
+    if (!droppable.viewport.frame) {
+      return;
     }
+
+    if (isTooBigForAutoScrolling(droppable.viewport.frame, draggable.page.withMargin)) {
+      return;
+    }
+
+    scrollDroppable(destination.droppableId, offset);
   };
 
   const onStateChange = (previous: State, current: State): void => {
