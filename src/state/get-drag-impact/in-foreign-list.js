@@ -21,6 +21,8 @@ type Args = {|
   previousImpact: DragImpact,
 |}
 
+const origin: Position = { x: 0, y: 0 };
+
 export default ({
   pageCenter,
   draggable,
@@ -36,8 +38,10 @@ export default ({
   // To do this we need to consider any displacement caused by
   // a change in scroll in the droppable we are currently over.
 
-  const destinationScrollDiff: Position =
-    destination.viewport.frameScroll.diff.value;
+  const destinationScrollDiff: Position = destination.viewport.closestScrollable ?
+    destination.viewport.closestScrollable.scroll.diff.value :
+    origin;
+
   const currentCenter: Position = add(pageCenter, destinationScrollDiff);
 
   const displaced: Displacement[] = insideDestination

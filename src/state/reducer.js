@@ -22,7 +22,6 @@ import type {
   CurrentDragPositions,
   Position,
   InitialDragPositions,
-  ScrollJumpRequest,
 } from '../types';
 import { add, subtract, isEqual } from './position';
 import { noMovement } from './no-impact';
@@ -56,7 +55,7 @@ type MoveArgs = {|
   // force a custom drag impact (optionally provided)
   impact?: DragImpact,
   // provide a scroll jump request (optionally provided - and can be null)
-  scrollJumpRequest?: ?ScrollJumpRequest,
+  scrollJumpRequest?: ?Position,
 |}
 
 const canPublishDimension = (phase: Phase): boolean =>

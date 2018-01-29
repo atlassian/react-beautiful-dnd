@@ -24,6 +24,8 @@ type Args = {|
   previousImpact: DragImpact,
 |}
 
+const origin: Position = { x: 0, y: 0 };
+
 export default ({
   pageCenter,
   draggable,
@@ -39,7 +41,9 @@ export default ({
   // Where is the element now?
 
   // Need to take into account the change of scroll in the droppable
-  const homeScrollDiff: Position = home.viewport.frameScroll.diff.value;
+  const homeScrollDiff: Position = home.viewport.closestScrollable ?
+    home.viewport.closestScrollable.scroll.diff.value :
+    origin;
 
   // Where the element actually is now
   const currentCenter: Position = add(pageCenter, homeScrollDiff);

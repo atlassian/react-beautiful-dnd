@@ -3,7 +3,7 @@ import rafSchd from 'raf-schd';
 import getViewport from '../visibility/get-viewport';
 import { isEqual } from '../position';
 import { vertical, horizontal } from '../axis';
-import getDroppableFrameOver from './get-droppable-frame-over';
+import getScrollableDroppableOver from './get-scrollable-droppable-over';
 import { canScrollDroppable } from '../dimension';
 import scrollWindow, { canScroll as canScrollWindow } from './scroll-window';
 import type { AutoScrollMarshal } from './auto-scroll-marshal-types';
@@ -18,7 +18,6 @@ import type {
   Spacing,
   DraggableLocation,
   DraggableDimension,
-  ScrollJumpRequest,
 } from '../../types';
 
 type Args = {|
@@ -167,7 +166,7 @@ export default ({
 
     // 2. We are not scrolling the window. Can we scroll the Droppable?
 
-    const droppable: ?DroppableDimension = getDroppableFrameOver({
+    const droppable: ?DroppableDimension = getScrollableDroppableOver({
       target: center,
       droppables: state.dimension.droppable,
     });
@@ -202,7 +201,7 @@ export default ({
       return;
     }
 
-    const request: ?ScrollJumpRequest = drag.scrollJumpRequest;
+    const request: ?Position = drag.scrollJumpRequest;
 
     if (!request) {
       return;
@@ -217,8 +216,8 @@ export default ({
     }
 
     const droppable: DroppableDimension = state.dimension.droppable[destination.droppableId];
-
-    if (droppable.viewport.clipped == null) {
+    const clipped: ?Area = droppable.viewport.clipped;
+    if (clipped == null) {
       return;
     }
 
@@ -226,18 +225,18 @@ export default ({
       return;
     }
 
-    if (isTooBigForAutoScrolling(droppable.viewport.clipped, draggable.page.withMargin)) {
+    if (isTooBigForAutoScrolling(clipped, draggable.page.withMargin)) {
       return;
     }
 
-    if (canScrollDroppable(droppable, request.scroll)) {
+    if (canScrollDroppable(droppable, request)) {
       // not scheduling - jump requests need to be performed instantly
-      scrollDroppable(droppable.descriptor.id, request.scroll);
+      scrollDroppable(droppable.descriptor.id, request);
       return;
     }
 
     // not scheduling - jump requests need to be performed instantly
-    scrollWindow(request.scroll);
+    scrollWindow(request);
   };
 
   const onStateChange = (previous: State, current: State): void => {

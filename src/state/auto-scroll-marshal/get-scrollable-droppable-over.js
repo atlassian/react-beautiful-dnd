@@ -2,7 +2,6 @@
 import memoizeOne from 'memoize-one';
 import isPositionInFrame from '../visibility/is-position-in-frame';
 import type {
-  Area,
   DroppableDimension,
   DroppableDimensionMap,
   DroppableId,
@@ -14,7 +13,7 @@ type Args = {|
   droppables: DroppableDimensionMap,
 |};
 
-const getDroppablesWithAFrame = memoizeOne(
+const getScrollableDroppables = memoizeOne(
   (droppables: DroppableDimensionMap): DroppableDimension[] => (
     Object.keys(droppables)
       .map((id: DroppableId): DroppableDimension => droppables[id])
@@ -24,8 +23,8 @@ const getDroppablesWithAFrame = memoizeOne(
           return false;
         }
 
-        // only want droppables that have a frame
-        if (!droppable.viewport.frame) {
+        // only want droppables that are scrollable
+        if (!droppable.viewport.closestScrollable) {
           return false;
         }
 
@@ -39,10 +38,12 @@ export default ({
   droppables,
 }: Args): ?DroppableDimension => {
   const overDroppablesFrame: ?DroppableDimension =
-    getDroppablesWithAFrame(droppables)
+    getScrollableDroppables(droppables)
       .find((droppable: DroppableDimension): boolean => {
-        const frame: Area = (droppable.viewport.frame: any);
-        return isPositionInFrame(frame)(target);
+        if (!droppable.viewport.closestScrollable) {
+          throw new Error('Invalid result');
+        }
+        return isPositionInFrame(droppable.viewport.closestScrollable.frame)(target);
       });
 
   return overDroppablesFrame;

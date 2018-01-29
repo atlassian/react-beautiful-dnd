@@ -4,9 +4,10 @@ import getArea from './get-area';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
 import isPositionInFrame from './visibility/is-position-in-frame';
 import { patch } from './position';
-import { addPosition } from './spacing';
+import { expandByPosition } from './spacing';
 import { clip } from './dimension';
 import type {
+  ClosestScrollable,
   DraggableDimension,
   DraggableDimensionMap,
   DroppableDimension,
@@ -65,7 +66,7 @@ type GetBufferedDroppableArgs = {
 };
 
 const getWithGrowth = memoizeOne(
-  (area: Area, growth: Position): Area => getArea(addPosition(area, growth))
+  (area: Area, growth: Position): Area => getArea(expandByPosition(area, growth))
 );
 
 const getClippedAreaWithPlaceholder = ({
@@ -79,7 +80,6 @@ const getClippedAreaWithPlaceholder = ({
     previousDroppableOverId &&
     previousDroppableOverId === droppable.descriptor.id
   );
-  const frame: ?Area = droppable.viewport.frame;
   const clipped: ?Area = droppable.viewport.clipped;
 
   // clipped area is totally hidden behind frame
@@ -100,15 +100,21 @@ const getClippedAreaWithPlaceholder = ({
   }
 
   const subjectWithGrowth = getWithGrowth(clipped, requiredGrowth);
+  const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
 
   // The droppable has no scroll container
-  if (!frame) {
+  if (!closestScrollable) {
+    return subjectWithGrowth;
+  }
+
+  // We are not clipping the subject
+  if (!closestScrollable.shouldClipSubject) {
     return subjectWithGrowth;
   }
 
   // We need to clip the new subject by the frame which does not change
   // This will allow the user to continue to scroll into the placeholder
-  return clip(frame, subjectWithGrowth);
+  return clip(closestScrollable.frame, subjectWithGrowth);
 };
 
 type Args = {|

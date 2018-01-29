@@ -1,7 +1,7 @@
 // @flow
 import isPartiallyVisibleThroughFrame from './is-partially-visible-through-frame';
 import isTotallyVisibleThroughFrame from './is-totally-visible-through-frame';
-import { offset } from '../spacing';
+import { offsetByPosition } from '../spacing';
 import type {
   Spacing,
   Position,
@@ -20,31 +20,23 @@ type HelperArgs = {|
   isVisibleThroughFrameFn: (frame: Spacing) => (subject: Spacing) => boolean
 |}
 
-export type IsVisibleResult = {|
-  isVisible: boolean,
-  isVisibleInViewport: boolean,
-  isVisibleInDroppable: boolean,
-|}
-
-const nope: IsVisibleResult = {
-  isVisible: false,
-  isVisibleInDroppable: false,
-  isVisibleInViewport: false,
-};
+const origin: Position = { x: 0, y: 0 };
 
 const isVisible = ({
   target,
   destination,
   viewport,
   isVisibleThroughFrameFn,
-}: HelperArgs): IsVisibleResult => {
-  const displacement: Position = destination.viewport.frameScroll.diff.displacement;
-  const withScroll: Spacing = offset(target, displacement);
+}: HelperArgs): boolean => {
+  const displacement: Position = destination.viewport.closestScrollable ?
+    destination.viewport.closestScrollable.scroll.diff.displacement :
+    origin;
+  const withScroll: Spacing = offsetByPosition(target, displacement);
 
   // destination subject is totally hidden by frame
   // this should never happen - but just guarding against it
   if (!destination.viewport.clipped) {
-    return nope;
+    return false;
   }
 
   // When considering if the target is visible in the droppable we need
@@ -59,18 +51,14 @@ const isVisible = ({
   const isVisibleInViewport: boolean =
     isVisibleThroughFrameFn(viewport)(withScroll);
 
-  return {
-    isVisible: isVisibleInDroppable && isVisibleInViewport,
-    isVisibleInDroppable,
-    isVisibleInViewport,
-  };
+  return isVisibleInDroppable && isVisibleInViewport;
 };
 
 export const isPartiallyVisible = ({
   target,
   destination,
   viewport,
-}: Args): IsVisibleResult => isVisible({
+}: Args): boolean => isVisible({
   target,
   destination,
   viewport,
@@ -81,7 +69,7 @@ export const isTotallyVisible = ({
   target,
   destination,
   viewport,
-}: Args): IsVisibleResult => isVisible({
+}: Args): boolean => isVisible({
   target,
   destination,
   viewport,

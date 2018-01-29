@@ -8,7 +8,6 @@ import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location'
 import getResult from './get-result';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
-import type { IsVisibleResult } from '../visibility/is-visible';
 import type {
   DraggableLocation,
   DraggableDimension,

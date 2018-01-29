@@ -40,7 +40,7 @@ export default ({
         target: draggable.page.withMargin,
         destination,
         viewport,
-      }).isVisible)
+      }))
     .sort((a: DraggableDimension, b: DraggableDimension): number => {
       // TODO: need to consider droppable scroll
       const distanceToA = distance(pageCenter, a.page.withMargin.center);

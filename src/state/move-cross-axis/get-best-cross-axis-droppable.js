@@ -58,16 +58,14 @@ export default ({
     .filter((droppable: DroppableDimension): boolean => droppable !== source)
     // Remove any options that are not enabled
     .filter((droppable: DroppableDimension): boolean => droppable.isEnabled)
-    // Remove any droppables that have invisible subjects
-    .filter((droppable: DroppableDimension): boolean => Boolean(droppable.viewport.clipped))
     // Remove any droppables that are not partially visible
     .filter((droppable: DroppableDimension): boolean => {
-      const frame: ?Area = droppable.viewport.frame;
-      // Droppable has no scroll container
-      if (!frame) {
-        return true;
+      const clipped: ?Area = droppable.viewport.clipped;
+      // subject is not visible
+      if (!clipped) {
+        return false;
       }
-      return isPartiallyVisibleThroughFrame(viewport)(frame);
+      return isPartiallyVisibleThroughFrame(viewport)(clipped);
     })
     .filter((droppable: DroppableDimension): boolean => {
       const targetClipped: Area = getSafeClipped(droppable);

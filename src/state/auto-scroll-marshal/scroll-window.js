@@ -1,5 +1,5 @@
 // @flow
-import { offset } from '../spacing';
+import { offsetByPosition } from '../spacing';
 import getViewport from '../visibility/get-viewport';
 import type {
   Area,
@@ -24,7 +24,7 @@ export const canScroll = (change: Position): boolean => {
     y: getSmallestSignedValue(change.y),
   };
 
-  const shifted: Spacing = offset(viewport, smallestChange);
+  const shifted: Spacing = offsetByPosition(viewport, smallestChange);
 
   // TEMP
   // if (shifted.left === 0 && shifted.top === 0) {

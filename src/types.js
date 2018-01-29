@@ -246,17 +246,12 @@ export type DropResult = {|
   destination: ?DraggableLocation,
 |}
 
-export type ScrollJumpRequest = {|
-  scroll: Position,
-  toBeScrolled: 'ANY' | 'DROPPABLE',
-|}
-
 export type DragState = {|
   initial: InitialDrag,
   current: CurrentDrag,
   impact: DragImpact,
   // if we need to jump the scroll (keyboard dragging)
-  scrollJumpRequest: ?ScrollJumpRequest,
+  scrollJumpRequest: ?Position,
 |}
 
 export type DropTrigger = 'DROP' | 'CANCEL';
