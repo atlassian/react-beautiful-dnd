@@ -1,7 +1,7 @@
 // @flow
 import { distance } from '../position';
 import getViewport from '../visibility/get-viewport';
-import { isPartiallyVisible } from '../visibility/is-visible';
+import { isTotallyVisible } from '../visibility/is-visible';
 import type {
   Area,
   Axis,
@@ -34,14 +34,15 @@ export default ({
 
   const result: DraggableDimension[] = insideDestination
     // Remove any options that are hidden by overflow
-    // Draggable must be partially visible to move to it
+    // Draggable must be totally visible to move to it
     .filter((draggable: DraggableDimension): boolean =>
-      isPartiallyVisible({
+      isTotallyVisible({
         target: draggable.page.withMargin,
         destination,
         viewport,
       }).isVisible)
     .sort((a: DraggableDimension, b: DraggableDimension): number => {
+      // TODO: need to consider droppable scroll
       const distanceToA = distance(pageCenter, a.page.withMargin.center);
       const distanceToB = distance(pageCenter, b.page.withMargin.center);
 

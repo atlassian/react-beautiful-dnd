@@ -101,7 +101,7 @@ export default ({
     const requiredScroll: Position = subtract(requiredDistance, scrollDiff);
 
     // need to prioritise scrolling a droppable so that we do not leave its boundaries
-    const toBeScrolled = newLocationVisibility.isVisibleInViewport ? 'DROPPABLE' : 'ANY';
+    const toBeScrolled = newLocationVisibility.isVisibleInDroppable ? 'ANY' : 'DROPPABLE';
 
     const request: ScrollJumpRequest = {
       scroll: requiredScroll,
