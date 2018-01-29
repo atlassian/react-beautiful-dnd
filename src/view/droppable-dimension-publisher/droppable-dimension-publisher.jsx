@@ -96,6 +96,8 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       return;
     }
 
+    console.log('actually scrolling droppable', change);
+
     this.closestScrollable.scrollTop += change.y;
     this.closestScrollable.scrollLeft += change.x;
   }

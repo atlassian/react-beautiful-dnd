@@ -60,6 +60,7 @@ export const canScroll = (change: Position): boolean => {
 // Not guarenteed to scroll by the entire amount
 export default (change: Position): void => {
   if (canScroll(change)) {
+    console.log('scrolling window by ', change);
     window.scrollBy(change.x, change.y);
   } else {
     console.log('cannot scroll window!', change);

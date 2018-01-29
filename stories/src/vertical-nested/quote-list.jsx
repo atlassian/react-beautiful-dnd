@@ -35,9 +35,6 @@ const Container = styled.div`
 const NestedContainer = Container.extend`
   padding: 0;
   margin-bottom: ${grid}px;
-  &:hover {
-    cursor: grab;
-  }
 `;
 
 export default class QuoteList extends Component<{ list: NestedQuoteList }> {

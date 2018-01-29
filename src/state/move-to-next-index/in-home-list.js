@@ -72,7 +72,7 @@ export default ({
     return isMovingForward ? 'start' : 'end';
   })();
 
-  const newCenter: Position = moveToEdge({
+  const newPageCenter: Position = moveToEdge({
     source: draggable.page.withoutMargin,
     sourceEdge: edge,
     destination: destination.page.withoutMargin,
@@ -82,26 +82,8 @@ export default ({
 
   const viewport: Area = getViewport();
 
-  const isVisible: boolean = isTotallyVisibleInNewLocation({
-    draggable,
-    destination: droppable,
-    newCenter,
-    viewport,
-  });
-
-  if (!isVisible) {
-    // need to get diff from where we are right now
-    const diff: Position = subtract(newCenter, previousPageCenter);
-
-    // request a scroll jump to that position
-    const result: Result = {
-      pageCenter: previousPageCenter,
-      impact: previousImpact,
-      scrollJumpRequest: diff,
-    };
-
-    return result;
-  }
+  console.log('old center', previousPageCenter);
+  console.log('new center', newPageCenter);
 
   // Calculate DragImpact
   // at this point we know that the destination is droppable
@@ -146,11 +128,38 @@ export default ({
     direction: droppable.axis.direction,
   };
 
-  const result: Result = {
-    pageCenter: newCenter,
-    impact: newImpact,
-    scrollJumpRequest: null,
-  };
+  const isVisible: boolean = isTotallyVisibleInNewLocation({
+    draggable,
+    destination: droppable,
+    newPageCenter,
+    viewport,
+  });
 
-  return result;
+  if (isVisible) {
+    const scrollDiff: Position = droppable.viewport.frameScroll.diff.value;
+    const withScrollDiff: Position = subtract(newPageCenter, scrollDiff);
+
+    return {
+      pageCenter: withScrollDiff,
+      impact: newImpact,
+      scrollJumpRequest: null,
+    };
+  }
+
+  // The full distance required to get from the previous page center to the new page center
+  const requiredDistance: Position = subtract(newPageCenter, previousPageCenter);
+
+  // We need to consider how much the droppable scroll has changed
+  const scrollDiff: Position = droppable.viewport.frameScroll.diff.value;
+
+  // The actual scroll required to move into the next place
+  const requiredScroll: Position = subtract(requiredDistance, scrollDiff);
+
+  return {
+    // using the previous page center with a new impact
+    // the subsequent droppable scroll
+    pageCenter: newPageCenter,
+    impact: newImpact,
+    scrollJumpRequest: requiredScroll,
+  };
 };

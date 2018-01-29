@@ -231,6 +231,8 @@ export default ({
       return;
     }
 
+    console.log('scrolling droppable by', offset);
+
     // not scheduling - jump requests need to be performed instantly
     scrollDroppable(destination.droppableId, offset);
   };

@@ -14,21 +14,21 @@ import type {
 type Args = {|
   draggable: DraggableDimension,
   destination: DroppableDimension,
-  newCenter: Position,
+  newPageCenter: Position,
   viewport: Area,
 |}
 
 export default ({
   draggable,
   destination,
-  newCenter,
+  newPageCenter,
   viewport,
 }: Args): boolean => {
   // What would the location of the Draggable be once the move is completed?
   // We are not considering margins for this calculation.
   // This is because a move might move a Draggable slightly outside of the bounds
   // of a Droppable (which is okay)
-  const diff: Position = subtract(newCenter, draggable.page.withoutMargin.center);
+  const diff: Position = subtract(newPageCenter, draggable.page.withoutMargin.center);
   const shifted: Spacing = offset(draggable.page.withoutMargin, diff);
 
   // Must be totally visible, not just partially visible.
@@ -38,6 +38,8 @@ export default ({
     destination,
     viewport,
   });
+
+  console.log('is totally visible?', isVisible);
 
   return isVisible;
 };

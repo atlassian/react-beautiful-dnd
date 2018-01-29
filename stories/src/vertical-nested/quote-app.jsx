@@ -42,8 +42,6 @@ const Root = styled.div`
   align-items: flex-start;
 `;
 
-const isDraggingClassName = 'is-dragging';
-
 type State = {|
   list: NestedQuoteList,
 |}
@@ -55,26 +53,12 @@ export default class QuoteApp extends Component<*, State> {
   };
   /* eslint-enable */
 
-  componentDidMount() {
-    // eslint-disable-next-line no-unused-expressions
-    injectGlobal`
-      body.${isDraggingClassName} {
-        cursor: grabbing;
-        user-select: none;
-      }
-    `;
-  }
-
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
-    // $ExpectError - body could be null?
-    document.body.classList.add(isDraggingClassName);
   }
 
   onDragEnd = (result: DropResult) => {
     publishOnDragEnd(result);
-    // $ExpectError - body could be null?
-    document.body.classList.remove(isDraggingClassName);
 
     // dropped outside the list
     if (!result.destination) {
