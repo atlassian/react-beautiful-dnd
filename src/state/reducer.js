@@ -22,6 +22,7 @@ import type {
   CurrentDragPositions,
   Position,
   InitialDragPositions,
+  ScrollJumpRequest,
 } from '../types';
 import { add, subtract, isEqual } from './position';
 import { noMovement } from './no-impact';
@@ -52,8 +53,10 @@ type MoveArgs = {|
   clientSelection: Position,
   shouldAnimate: boolean,
   windowScroll ?: Position,
-  // force a custom drag impact
+  // force a custom drag impact (optionally provided)
   impact?: DragImpact,
+  // provide a scroll jump request (optionally provided - and can be null)
+  scrollJumpRequest?: ?ScrollJumpRequest,
 |}
 
 const canPublishDimension = (phase: Phase): boolean =>
@@ -66,6 +69,7 @@ const move = ({
   shouldAnimate,
   windowScroll,
   impact,
+  scrollJumpRequest,
 }: MoveArgs): State => {
   if (state.phase !== 'DRAGGING') {
     console.error('cannot move while not dragging');
@@ -119,7 +123,7 @@ const move = ({
     initial,
     impact: newImpact,
     current,
-    scrollJumpRequest: null,
+    scrollJumpRequest,
   };
 
   return {
@@ -144,6 +148,14 @@ const updateStateAfterDimensionChange = (newState: State): State => {
     console.error('cannot update a draggable dimension in an existing drag as there is invalid drag state');
     return clean();
   }
+
+  // If in JUMP auto scroll mode - then impacts are calculated before the scroll
+  // actually occurs
+  // const usePreviousImpact: boolean = newState.drag.initial.autoScrollMode === 'JUMP';
+
+  // if (usePreviousImpact) {
+  //   console.log('USING PREVIOUS IMPACT');
+  // }
 
   return move({
     state: newState,
@@ -320,7 +332,9 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
-    if (state.drag == null) {
+    const drag: ?DragState = state.drag;
+
+    if (drag == null) {
       console.error('invalid store state');
       return clean();
     }
@@ -457,18 +471,6 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
-    // requesting a scroll jump
-    if (result.scrollJumpRequest) {
-      return {
-        ...state,
-        phase: 'DRAGGING',
-        drag: {
-          ...existing,
-          scrollJumpRequest: result.scrollJumpRequest,
-        },
-      };
-    }
-
     const impact: DragImpact = result.impact;
     const page: Position = result.pageCenter;
     const client: Position = subtract(page, existing.current.windowScroll);
@@ -478,6 +480,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       impact,
       clientSelection: client,
       shouldAnimate: true,
+      scrollJumpRequest: result.scrollJumpRequest,
     });
   }
 

@@ -156,34 +156,15 @@ export default ({
     direction: droppable.axis.direction,
   };
 
-  const result: IsVisibleResult = (() => {
-    // Moving into placeholder position
-    // Usually this would be outside of the visible bounds
-    if (isMovingPastLastIndex) {
-      return {
-        isVisible: true,
-        isVisibleInViewport: true,
-        isVisibleInDroppable: true,
-      };
-    }
+  if (isMovingPastLastIndex) {
+    // TODO!
+  }
 
-    // checking the shifted draggable rather than just the new center
-    // as the new center might not be visible but the whole draggable
-    // might be partially visible
-    return isTotallyVisibleInNewLocation({
-      draggable,
-      destination: droppable,
-      newPageCenter,
-      viewport,
-    });
-  })();
-
-  // not visible
   return getResult({
+    draggable,
     destination: droppable,
     previousPageCenter,
     newPageCenter,
     newImpact,
-    isVisibleResult: result,
   });
 };

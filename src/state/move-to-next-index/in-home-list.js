@@ -1,6 +1,6 @@
 // @flow
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { patch } from '../position';
+import { subtract, patch } from '../position';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 import type { IsVisibleResult } from '../visibility/is-visible';
 import getViewport from '../visibility/get-viewport';
@@ -8,7 +8,7 @@ import moveToEdge from '../move-to-edge';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import getDisplacement from '../get-displacement';
-import getResult from './get-result';
+import { isTotallyVisible } from '../visibility/is-visible';
 import type {
   DraggableLocation,
   DraggableDimension,
@@ -17,6 +17,7 @@ import type {
   Axis,
   DragImpact,
   Area,
+  ScrollJumpRequest,
 } from '../../types';
 
 export default ({
@@ -82,10 +83,36 @@ export default ({
     destinationAxis: droppable.axis,
   });
 
-  const viewport: Area = getViewport();
+  const willBeVisible: IsVisibleResult = isTotallyVisibleInNewLocation({
+    draggable,
+    destination: droppable,
+    newPageCenter,
+    viewport: getViewport(),
+  });
 
-  console.log('old center', previousPageCenter);
-  console.log('new center', newPageCenter);
+  if (!willBeVisible.isVisible) {
+    // The full distance required to get from the previous page center to the new page center
+    const requiredDistance: Position = subtract(newPageCenter, previousPageCenter);
+
+    // We need to consider how much the droppable scroll has changed
+    const scrollDiff: Position = droppable.viewport.frameScroll.diff.value;
+
+    // The actual scroll required to move into the next place
+    const requiredScroll: Position = subtract(requiredDistance, scrollDiff);
+
+    const request: ScrollJumpRequest = {
+      scroll: requiredScroll,
+      target: isTotallyVisible.isVisibleInDroppable ? 'WINDOW' : 'DROPPABLE',
+    };
+
+    return {
+      // Using the previous page center with a new impact
+      // as we are not visually moving the Draggable
+      pageCenter: previousPageCenter,
+      impact: previousImpact,
+      scrollJumpRequest: request,
+    };
+  }
 
   // Calculate DragImpact
   // at this point we know that the destination is droppable
@@ -102,10 +129,12 @@ export default ({
     [destinationDisplacement, ...previousImpact.movement.displaced]);
 
   // update impact with visibility - stops redundant work!
+  const viewport: Area = getViewport();
   const displaced: Displacement[] = modified
     .map((displacement: Displacement): Displacement => {
       const target: DraggableDimension = draggables[displacement.draggableId];
 
+      // TODO: the visibility post drag might be different to this!
       const updated: Displacement = getDisplacement({
         draggable: target,
         destination: droppable,
@@ -130,18 +159,12 @@ export default ({
     direction: droppable.axis.direction,
   };
 
-  const result: IsVisibleResult = isTotallyVisibleInNewLocation({
-    draggable,
-    destination: droppable,
-    newPageCenter,
-    viewport,
-  });
+  const scrollDiff: Position = droppable.viewport.frameScroll.diff.value;
+  const withScrollDiff: Position = subtract(newPageCenter, scrollDiff);
 
-  return getResult({
-    destination: droppable,
-    previousPageCenter,
-    newPageCenter,
-    newImpact,
-    isVisibleResult: result,
-  });
+  return {
+    pageCenter: withScrollDiff,
+    impact: newImpact,
+    scrollJumpRequest: null,
+  };
 };

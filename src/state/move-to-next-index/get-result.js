@@ -1,9 +1,12 @@
 // @flow
 import { subtract } from '../position';
+import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
+import getViewport from '../visibility/get-viewport';
 import type { Result } from './move-to-next-index-types';
 import type { IsVisibleResult } from '../visibility/is-visible';
 import type {
   DroppableDimension,
+  DraggableDimension,
   Position,
   DragImpact,
   ScrollJumpRequest,
@@ -11,20 +14,27 @@ import type {
 
 type Args = {|
   destination: DroppableDimension,
+  draggable: DraggableDimension,
   previousPageCenter: Position,
   newPageCenter: Position,
   newImpact: DragImpact,
-  isVisibleResult: IsVisibleResult,
 |}
 
 export default ({
   destination,
+  draggable,
   previousPageCenter,
   newPageCenter,
   newImpact,
-  isVisibleResult,
 }: Args): Result => {
-  if (isVisibleResult.isVisible) {
+  const isTotallyVisible: IsVisibleResult = isTotallyVisibleInNewLocation({
+    draggable,
+    destination,
+    newPageCenter,
+    viewport: getViewport(),
+  });
+
+  if (isTotallyVisible.isVisible) {
     const scrollDiff: Position = destination.viewport.frameScroll.diff.value;
     const withScrollDiff: Position = subtract(newPageCenter, scrollDiff);
 
@@ -46,13 +56,13 @@ export default ({
 
   const request: ScrollJumpRequest = {
     scroll: requiredScroll,
-    target: isVisibleResult.isVisibleInDroppable ? 'WINDOW' : 'DROPPABLE',
+    target: isTotallyVisible.isVisibleInDroppable ? 'WINDOW' : 'DROPPABLE',
   };
 
   return {
-    // using the previous page center with a new impact
-    // the subsequent droppable scroll
-    pageCenter: newPageCenter,
+    // Using the previous page center with a new impact
+    // as we are not visually moving the Draggable
+    pageCenter: previousPageCenter,
     impact: newImpact,
     scrollJumpRequest: request,
   };
