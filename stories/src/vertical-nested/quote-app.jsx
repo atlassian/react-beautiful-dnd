@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled, { injectGlobal } from 'styled-components';
+import styled from 'styled-components';
 import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src/';
 import { colors, grid } from '../constants';

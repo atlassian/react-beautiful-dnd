@@ -14,12 +14,6 @@ const getSmallestSignedValue = (value: number) => {
   return value > 0 ? 1 : -1;
 };
 
-type Args = {|
-  draggable: DraggableDimension,
-  change: Position,
-  viewport: Area,
-|}
-
 // Will return true if can scroll even a little bit in either direction
 // of the change.
 export const canScroll = (change: Position): boolean => {

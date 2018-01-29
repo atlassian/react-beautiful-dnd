@@ -31,7 +31,7 @@ export default ({
     target: draggable.page.withMargin,
     destination,
     viewport,
-  });
+  }).isVisible;
 
   const shouldAnimate: boolean = (() => {
     // if should be displaced and not visible

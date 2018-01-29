@@ -20,19 +20,31 @@ type HelperArgs = {|
   isVisibleThroughFrameFn: (frame: Spacing) => (subject: Spacing) => boolean
 |}
 
+export type IsVisibleResult = {|
+  isVisible: boolean,
+  isVisibleInViewport: boolean,
+  isVisibleInDroppable: boolean,
+|}
+
+const nope: IsVisibleResult = {
+  isVisible: false,
+  isVisibleInDroppable: false,
+  isVisibleInViewport: false,
+};
+
 const isVisible = ({
   target,
   destination,
   viewport,
   isVisibleThroughFrameFn,
-}: HelperArgs): boolean => {
+}: HelperArgs): IsVisibleResult => {
   const displacement: Position = destination.viewport.frameScroll.diff.displacement;
   const withScroll: Spacing = offset(target, displacement);
 
   // destination subject is totally hidden by frame
   // this should never happen - but just guarding against it
   if (!destination.viewport.clipped) {
-    return false;
+    return nope;
   }
 
   // When considering if the target is visible in the droppable we need
@@ -47,14 +59,18 @@ const isVisible = ({
   const isVisibleInViewport: boolean =
     isVisibleThroughFrameFn(viewport)(withScroll);
 
-  return isVisibleInDroppable && isVisibleInViewport;
+  return {
+    isVisible: isVisibleInDroppable && isVisibleInViewport,
+    isVisibleInDroppable,
+    isVisibleInViewport,
+  };
 };
 
 export const isPartiallyVisible = ({
   target,
   destination,
   viewport,
-}: Args): boolean => isVisible({
+}: Args): IsVisibleResult => isVisible({
   target,
   destination,
   viewport,
@@ -65,7 +81,7 @@ export const isTotallyVisible = ({
   target,
   destination,
   viewport,
-}: Args): boolean => isVisible({
+}: Args): IsVisibleResult => isVisible({
   target,
   destination,
   viewport,

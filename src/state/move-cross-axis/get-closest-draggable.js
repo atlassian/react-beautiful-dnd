@@ -40,7 +40,7 @@ export default ({
         target: draggable.page.withMargin,
         destination,
         viewport,
-      }))
+      }).isVisible)
     .sort((a: DraggableDimension, b: DraggableDimension): number => {
       const distanceToA = distance(pageCenter, a.page.withMargin.center);
       const distanceToB = distance(pageCenter, b.page.withMargin.center);

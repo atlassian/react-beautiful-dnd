@@ -17,6 +17,7 @@ import type {
   Spacing,
   DraggableLocation,
   DraggableDimension,
+  ScrollJumpRequest,
 } from '../../types';
 
 type Args = {|
@@ -194,8 +195,17 @@ export default ({
   };
 
   const jumpScroll = (state: State) => {
-    const drag: DragState = (state.drag: any);
-    const offset: Position = (drag.scrollJumpRequest : any);
+    const drag: ?DragState = state.drag;
+
+    if (!drag) {
+      return;
+    }
+
+    const request: ?ScrollJumpRequest = drag.scrollJumpRequest;
+
+    if (!request) {
+      return;
+    }
 
     const draggable: DraggableDimension = state.dimension.draggable[drag.initial.descriptor.id];
     const destination: ?DraggableLocation = drag.impact.destination;
@@ -205,25 +215,22 @@ export default ({
       return;
     }
 
-    // 1. Can we scroll the viewport?
+    if (request.target === 'WINDOW') {
+      if (isTooBigForAutoScrolling(getViewport(), draggable.page.withMargin)) {
+        return;
+      }
 
-    const viewport: Area = getViewport();
-    if (isTooBigForAutoScrolling(viewport, draggable.page.withMargin)) {
+      scrollWindow(request.scroll);
       return;
     }
 
-    if (canScrollWindow(offset)) {
-      // not scheduling - jump requests need to be performed instantly
-      scrollWindow(offset);
-      return;
-    }
-
-    // 2. Can we scroll the droppable?
+    // trying to scroll a droppable
 
     const droppable: DroppableDimension = state.dimension.droppable[destination.droppableId];
 
     // Current droppable has no frame
     if (!droppable.viewport.frame) {
+      console.warn('Cannot scroll droppable as requested as it is not scrollable');
       return;
     }
 
@@ -231,10 +238,8 @@ export default ({
       return;
     }
 
-    console.log('scrolling droppable by', offset);
-
     // not scheduling - jump requests need to be performed instantly
-    scrollDroppable(destination.droppableId, offset);
+    scrollDroppable(destination.droppableId, request.scroll);
   };
 
   const onStateChange = (previous: State, current: State): void => {

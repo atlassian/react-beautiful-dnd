@@ -2,6 +2,7 @@
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import { patch, subtract } from '../position';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
+import type { IsVisibleResult } from '../visibility/is-visible';
 import getViewport from '../visibility/get-viewport';
 import moveToEdge from '../move-to-edge';
 import type { Edge } from '../move-to-edge';
@@ -15,6 +16,7 @@ import type {
   Axis,
   DragImpact,
   Area,
+  ScrollJumpRequest,
 } from '../../types';
 
 export default ({
@@ -128,14 +130,14 @@ export default ({
     direction: droppable.axis.direction,
   };
 
-  const isVisible: boolean = isTotallyVisibleInNewLocation({
+  const result: IsVisibleResult = isTotallyVisibleInNewLocation({
     draggable,
     destination: droppable,
     newPageCenter,
     viewport,
   });
 
-  if (isVisible) {
+  if (result.isVisible) {
     const scrollDiff: Position = droppable.viewport.frameScroll.diff.value;
     const withScrollDiff: Position = subtract(newPageCenter, scrollDiff);
 
@@ -155,11 +157,16 @@ export default ({
   // The actual scroll required to move into the next place
   const requiredScroll: Position = subtract(requiredDistance, scrollDiff);
 
+  const request: ScrollJumpRequest = {
+    scroll: requiredScroll,
+    target: result.isVisibleInDroppable ? 'WINDOW' : 'DROPPABLE',
+  };
+
   return {
     // using the previous page center with a new impact
     // the subsequent droppable scroll
     pageCenter: newPageCenter,
     impact: newImpact,
-    scrollJumpRequest: requiredScroll,
+    scrollJumpRequest: request,
   };
 };
