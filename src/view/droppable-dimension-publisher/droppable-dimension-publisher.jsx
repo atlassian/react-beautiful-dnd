@@ -259,25 +259,33 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     // 2. There is no scroll container
     // 3. The droppable has internal scrolling
 
-    const frameClient: ?Area = (() => {
-      if (ignoreContainerClipping) {
+    const closest = (() => {
+      const closestScrollable: ?Element = this.closestScrollable;
+
+      if (!closestScrollable) {
         return null;
       }
-      if (!this.closestScrollable) {
-        return null;
-      }
-      if (this.closestScrollable === targetRef) {
-        return null;
-      }
-      return getArea(this.closestScrollable.getBoundingClientRect());
+
+      // TODO: add margin?
+      const frameClient: Area = getArea(closestScrollable.getBoundingClientRect());
+      const scrollWidth: number = closestScrollable.scrollWidth;
+      const scrollHeight: number = closestScrollable.scrollHeight;
+      const scroll: Position = this.getClosestScroll();
+
+      return {
+        frameClient,
+        scrollWidth,
+        scrollHeight,
+        scroll,
+        shouldClipSubject: !this.props.ignoreContainerClipping,
+      };
     })();
 
     const dimension: DroppableDimension = getDroppableDimension({
       descriptor,
       direction,
       client,
-      frameClient,
-      frameScroll,
+      closest,
       margin,
       padding,
       windowScroll: getWindowScrollPosition(),

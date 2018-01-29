@@ -1,8 +1,8 @@
 // @flow
 import { vertical, horizontal } from './axis';
 import getArea from './get-area';
-import { add, offset } from './spacing';
-import { subtract, negate } from './position';
+import { offsetByPosition, expandBySpacing } from './spacing';
+import { add, subtract, negate } from './position';
 import type {
   DraggableDescriptor,
   DroppableDescriptor,
@@ -13,6 +13,7 @@ import type {
   Spacing,
   Area,
   DroppableDimensionViewport,
+  ClosestScrollable,
 } from '../types';
 
 const origin: Position = { x: 0, y: 0 };
@@ -22,28 +23,6 @@ export const noSpacing: Spacing = {
   right: 0,
   bottom: 0,
   left: 0,
-};
-
-const addPosition = (area: Area, point: Position): Area => {
-  const { top, right, bottom, left } = area;
-  return getArea({
-    top: top + point.y,
-    left: left + point.x,
-    bottom: bottom + point.y,
-    right: right + point.x,
-  });
-};
-
-const addSpacing = (area: Area, spacing: Spacing): Area => {
-  const { top, right, bottom, left } = area;
-  return getArea({
-    // pulling back to increase size
-    top: top - spacing.top,
-    left: left - spacing.left,
-    // pushing forward to increase size
-    bottom: bottom + spacing.bottom,
-    right: right + spacing.right,
-  });
 };
 
 type GetDraggableArgs = {|
@@ -59,7 +38,7 @@ export const getDraggableDimension = ({
   margin = noSpacing,
   windowScroll = origin,
 }: GetDraggableArgs): DraggableDimension => {
-  const withScroll = addPosition(client, windowScroll);
+  const withScroll = offsetByPosition(client, windowScroll);
 
   const dimension: DraggableDimension = {
     descriptor,
@@ -73,12 +52,12 @@ export const getDraggableDimension = ({
     // on the viewport
     client: {
       withoutMargin: getArea(client),
-      withMargin: getArea(addSpacing(client, margin)),
+      withMargin: getArea(expandBySpacing(client, margin)),
     },
     // with scroll
     page: {
       withoutMargin: getArea(withScroll),
-      withMargin: getArea(addSpacing(withScroll, margin)),
+      withMargin: getArea(expandBySpacing(withScroll, margin)),
     },
   };
 
@@ -89,8 +68,13 @@ type GetDroppableArgs = {|
   descriptor: DroppableDescriptor,
   client: Area,
   // optionally provided - and can also be null
-  frameClient?: ?Area,
-  frameScroll?: Position,
+  closest: ?{|
+    frameClient: Area,
+    scrollWidth: number,
+    scrollHeight: number,
+    scroll: Position,
+    shouldClipSubject: boolean,
+  |},
   direction?: Direction,
   margin?: Spacing,
   padding?: Spacing,
@@ -116,38 +100,87 @@ export const clip = (frame: Area, subject: Spacing): ?Area => {
   return result;
 };
 
+const getSmallestSignedValue = (value: number) => {
+  if (value === 0) {
+    return 0;
+  }
+  return value > 0 ? 1 : -1;
+};
+
+export const canScrollDroppable = (
+  droppable: DroppableDimension,
+  newScroll: Position,
+): boolean => {
+  const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
+
+  // Cannot scroll a droppable that does not have a scroll container
+  if (!closestScrollable) {
+    return false;
+  }
+
+  const smallestChange: Position = {
+    x: getSmallestSignedValue(newScroll.x),
+    y: getSmallestSignedValue(newScroll.y),
+  };
+
+  const targetScroll: Position = add(smallestChange, closestScrollable.scroll.initial);
+  const max: Position = closestScrollable.scroll.max;
+  const min: Position = closestScrollable.scroll.min;
+
+  if (targetScroll.y > max.y && targetScroll.x > max.x) {
+    return false;
+  }
+
+  if (targetScroll.y < min.y && targetScroll.x < min.y) {
+    return false;
+  }
+
+  return true;
+};
+
 export const scrollDroppable = (
   droppable: DroppableDimension,
   newScroll: Position
 ): DroppableDimension => {
-  const existing: DroppableDimensionViewport = droppable.viewport;
-  const frame: ?Area = existing.frame;
-
-  if (frame == null) {
-    console.error('Cannot scroll Droppable that does not have a frame');
+  if (!droppable.viewport.closestScrollable) {
+    console.error('Cannot scroll droppble that does not have a closest scrollable');
     return droppable;
   }
 
-  const scrollDiff: Position = subtract(newScroll, existing.frameScroll.initial);
+  const existingScrollable: ClosestScrollable = droppable.viewport.closestScrollable;
+
+  const frame: Area = existingScrollable.frame;
+
+  const scrollDiff: Position = subtract(newScroll, existingScrollable.scroll.initial);
   // a positive scroll difference leads to a negative displacement
   // (scrolling down pulls an item upwards)
   const scrollDisplacement: Position = negate(scrollDiff);
-  const displacedSubject: Spacing = offset(existing.subject, scrollDisplacement);
-  const clipped: ?Area = clip(frame, displacedSubject);
 
-  const viewport: DroppableDimensionViewport = {
-    // does not change
-    frame: existing.frame,
-    subject: existing.subject,
-    // below here changes
-    frameScroll: {
-      initial: existing.frameScroll.initial,
+  const closestScrollable: ClosestScrollable = {
+    frame: existingScrollable.frame,
+    shouldClipSubject: existingScrollable.shouldClipSubject,
+    scroll: {
+      initial: existingScrollable.scroll.initial,
       current: newScroll,
       diff: {
         value: scrollDiff,
         displacement: scrollDisplacement,
       },
+      min: existingScrollable.scroll.min,
+      max: existingScrollable.scroll.max,
     },
+  };
+
+  const displacedSubject: Spacing =
+    offsetByPosition(droppable.viewport.subject, scrollDisplacement);
+
+  const clipped: ?Area = closestScrollable.shouldClipSubject ?
+    clip(frame, displacedSubject) :
+    getArea(displacedSubject);
+
+  const viewport: DroppableDimensionViewport = {
+    closestScrollable,
+    subject: droppable.viewport.subject,
     clipped,
   };
 
@@ -161,39 +194,66 @@ export const scrollDroppable = (
 export const getDroppableDimension = ({
   descriptor,
   client,
-  frameClient,
-  frameScroll = origin,
+  closest,
   direction = 'vertical',
   margin = noSpacing,
   padding = noSpacing,
   windowScroll = origin,
   isEnabled = true,
 }: GetDroppableArgs): DroppableDimension => {
-  const withMargin = addSpacing(client, margin);
-  const withWindowScroll = addPosition(client, windowScroll);
+  const withMargin: Spacing = expandBySpacing(client, margin);
+  const withWindowScroll: Spacing = offsetByPosition(client, windowScroll);
   // If no frameClient is provided, or if the area matches the frameClient, this
   // droppable is its own container. In this case we include its margin in the container bounds.
   // Otherwise, the container is a scrollable parent. In this case we don't care about margins
   // in the container bounds.
 
-  const subject: Area = addSpacing(withWindowScroll, margin);
+  const subject: Area = getArea(expandBySpacing(withWindowScroll, margin));
 
-  // use client + margin if frameClient is not provided
-  const frame: ?Area = frameClient ? addPosition(frameClient, windowScroll) : null;
+  const closestScrollable: ?ClosestScrollable = (() => {
+    if (!closest) {
+      return null;
+    }
+
+    const frame: Area = getArea(offsetByPosition(closest.frameClient, windowScroll));
+
+    const minScroll: Position = {
+      x: frame.left,
+      y: frame.top,
+    };
+
+    const maxScroll: Position = add(minScroll, {
+      x: closest.scrollWidth,
+      y: closest.scrollHeight,
+    });
+
+    const result: ClosestScrollable = {
+      frame,
+      shouldClipSubject: closest.shouldClipSubject,
+      scroll: {
+        initial: closest.scroll,
+        // no scrolling yet, so current = initial
+        current: closest.scroll,
+        min: minScroll,
+        max: maxScroll,
+        diff: {
+          value: origin,
+          displacement: origin,
+        },
+      },
+    };
+
+    return result;
+  })();
+
+  const clipped: ?Area = (closestScrollable && closestScrollable.shouldClipSubject) ?
+    clip(closestScrollable.frame, subject) :
+    subject;
 
   const viewport: DroppableDimensionViewport = {
-    frame,
-    frameScroll: {
-      initial: frameScroll,
-      // no scrolling yet, so current = initial
-      current: frameScroll,
-      diff: {
-        value: origin,
-        displacement: origin,
-      },
-    },
+    closestScrollable,
     subject,
-    clipped: frame ? clip(frame, subject) : subject,
+    clipped,
   };
 
   const dimension: DroppableDimension = {
@@ -203,12 +263,13 @@ export const getDroppableDimension = ({
     client: {
       withoutMargin: getArea(client),
       withMargin: getArea(withMargin),
-      withMarginAndPadding: getArea(addSpacing(withMargin, padding)),
+      withMarginAndPadding: getArea(expandBySpacing(withMargin, padding)),
     },
     page: {
       withoutMargin: getArea(withWindowScroll),
       withMargin: subject,
-      withMarginAndPadding: getArea(addSpacing(withWindowScroll, add(margin, padding))),
+      withMarginAndPadding:
+        getArea(expandBySpacing(withWindowScroll, expandBySpacing(margin, padding))),
     },
     viewport,
   };

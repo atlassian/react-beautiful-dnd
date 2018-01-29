@@ -98,15 +98,20 @@ export type DraggableDimension = {|
   |},
 |}
 
-export type DroppableDimensionViewport = {|
+export type ClosestScrollable = {|
   // This is the window through which the droppable is observed
   // It does not change during a drag
-  // frame is null when the droppable has no frame
-  frame: ?Area,
-  // keeping track of the scroll
-  frameScroll: {|
+  frame: Area,
+  // Whether or not we should clip the subject by the frame
+  // Is controlled by the ignoreContainerClipping prop
+  shouldClipSubject: boolean,
+  scroll: {|
     initial: Position,
     current: Position,
+    // the minimum allowable scroll for the frame
+    min: Position,
+    // the maxium allowable scroll for the frame
+    max: Position,
     diff: {|
       value: Position,
       // The actual displacement as a result of a scroll is in the opposite
@@ -114,13 +119,16 @@ export type DroppableDimensionViewport = {|
       // upwards. This value is the negated version of the 'value'
       displacement: Position,
     |}
-  |},
-  // The area to be clipped by the frame
-  // This is the initial capture of the subject and is not updated
+  |}
+|}
+
+export type DroppableDimensionViewport = {|
+  // will be null if there is no closest scrollable
+  closestScrollable: ?ClosestScrollable,
   subject: Area,
-  // this is the subject through the viewport of the frame
+  // this is the subject through the viewport of the frame (if applicable)
   // it also takes into account any changes to the viewport scroll
-  // clipped area will be null if it is completely outside of the frame
+  // clipped area will be null if it is completely outside of the frame and frame clipping is on
   clipped: ?Area,
 |}
 

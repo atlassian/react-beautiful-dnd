@@ -4,6 +4,7 @@ import getViewport from '../visibility/get-viewport';
 import { isEqual } from '../position';
 import { vertical, horizontal } from '../axis';
 import getDroppableFrameOver from './get-droppable-frame-over';
+import { canScrollDroppable } from '../dimension';
 import scrollWindow, { canScroll as canScrollWindow } from './scroll-window';
 import type { AutoScrollMarshal } from './auto-scroll-marshal-types';
 import type {
@@ -215,33 +216,28 @@ export default ({
       return;
     }
 
+    const droppable: DroppableDimension = state.dimension.droppable[destination.droppableId];
+
+    if (droppable.viewport.clipped == null) {
+      return;
+    }
+
     if (isTooBigForAutoScrolling(getViewport(), draggable.page.withMargin)) {
       return;
     }
 
-    if (request.toBeScrolled === 'ANY') {
-      if (canScrollWindow(request.scroll)) {
-        scrollWindow(request.scroll);
-        return;
-      }
-    }
-
-    // trying to scroll ANY or DROPPABLE
-
-    const droppable: DroppableDimension = state.dimension.droppable[destination.droppableId];
-
-    // Current droppable has no frame
-    if (!droppable.viewport.frame) {
-      console.warn('Cannot scroll droppable as requested as it is not scrollable');
+    if (isTooBigForAutoScrolling(droppable.viewport.clipped, draggable.page.withMargin)) {
       return;
     }
 
-    if (isTooBigForAutoScrolling(droppable.viewport.frame, draggable.page.withMargin)) {
+    if (canScrollDroppable(droppable, request.scroll)) {
+      // not scheduling - jump requests need to be performed instantly
+      scrollDroppable(droppable.descriptor.id, request.scroll);
       return;
     }
 
     // not scheduling - jump requests need to be performed instantly
-    scrollDroppable(destination.droppableId, request.scroll);
+    scrollWindow(request.scroll);
   };
 
   const onStateChange = (previous: State, current: State): void => {
