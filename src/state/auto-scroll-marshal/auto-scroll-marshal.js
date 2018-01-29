@@ -215,16 +215,18 @@ export default ({
       return;
     }
 
-    if (request.target === 'WINDOW') {
-      if (isTooBigForAutoScrolling(getViewport(), draggable.page.withMargin)) {
-        return;
-      }
-
-      scrollWindow(request.scroll);
+    if (isTooBigForAutoScrolling(getViewport(), draggable.page.withMargin)) {
       return;
     }
 
-    // trying to scroll a droppable
+    if (request.toBeScrolled === 'ANY') {
+      if (canScrollWindow(request.scroll)) {
+        scrollWindow(request.scroll);
+        return;
+      }
+    }
+
+    // trying to scroll ANY or DROPPABLE
 
     const droppable: DroppableDimension = state.dimension.droppable[destination.droppableId];
 

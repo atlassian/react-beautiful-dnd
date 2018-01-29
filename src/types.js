@@ -240,7 +240,7 @@ export type DropResult = {|
 
 export type ScrollJumpRequest = {|
   scroll: Position,
-  target: 'WINDOW' | 'DROPPABLE',
+  toBeScrolled: 'ANY' | 'DROPPABLE',
 |}
 
 export type DragState = {|

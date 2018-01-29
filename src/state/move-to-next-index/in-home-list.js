@@ -83,14 +83,14 @@ export default ({
     destinationAxis: droppable.axis,
   });
 
-  const willBeVisible: IsVisibleResult = isTotallyVisibleInNewLocation({
+  const newLocationVisibility: IsVisibleResult = isTotallyVisibleInNewLocation({
     draggable,
     destination: droppable,
     newPageCenter,
     viewport: getViewport(),
   });
 
-  if (!willBeVisible.isVisible) {
+  if (!newLocationVisibility.isVisible) {
     // The full distance required to get from the previous page center to the new page center
     const requiredDistance: Position = subtract(newPageCenter, previousPageCenter);
 
@@ -100,9 +100,12 @@ export default ({
     // The actual scroll required to move into the next place
     const requiredScroll: Position = subtract(requiredDistance, scrollDiff);
 
+    // need to prioritise scrolling a droppable so that we do not leave its boundaries
+    const toBeScrolled = newLocationVisibility.isVisibleInViewport ? 'DROPPABLE' : 'ANY';
+
     const request: ScrollJumpRequest = {
       scroll: requiredScroll,
-      target: isTotallyVisible.isVisibleInDroppable ? 'WINDOW' : 'DROPPABLE',
+      toBeScrolled,
     };
 
     return {
