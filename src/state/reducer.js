@@ -403,6 +403,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
   if (action.type === 'MOVE') {
     const { client, windowScroll } = action.payload;
+    console.log('moving by', client);
     return move({
       state,
       clientSelection: client,

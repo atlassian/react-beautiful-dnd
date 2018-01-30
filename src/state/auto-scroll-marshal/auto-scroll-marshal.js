@@ -1,11 +1,17 @@
 // @flow
 import rafSchd from 'raf-schd';
 import getViewport from '../visibility/get-viewport';
-import { isEqual } from '../position';
+import { add, isEqual } from '../position';
 import { vertical, horizontal } from '../axis';
 import getScrollableDroppableOver from './get-scrollable-droppable-over';
-import { canScrollDroppable, canScrollWindow } from './can-scroll';
+import {
+  canScrollDroppable,
+  canScrollWindow,
+  getWindowOverlap,
+  getDroppableOverlap,
+} from './can-scroll';
 import scrollWindow from './scroll-window';
+import getWindowScrollPosition from '../../view/get-window-scroll-position';
 import type { AutoScrollMarshal } from './auto-scroll-marshal-types';
 import type {
   Area,
@@ -19,10 +25,12 @@ import type {
   DraggableLocation,
   DraggableDimension,
   ClosestScrollable,
+  DraggableId,
 } from '../../types';
 
 type Args = {|
   scrollDroppable: (id: DroppableId, change: Position) => void,
+  move: (id: DraggableId, client: Position, windowScroll: Position) => void,
 |}
 
 // Values used to control how the fluid auto scroll feels
@@ -138,6 +146,7 @@ const isTooBigForAutoScrolling = (frame: Area, subject: Area): boolean =>
 
 export default ({
   scrollDroppable,
+  move,
 }: Args): AutoScrollMarshal => {
   // TODO: do not scroll if drag has finished
   const scheduleWindowScroll = rafSchd(scrollWindow);
@@ -225,6 +234,15 @@ export default ({
 
       if (canScrollDroppable(droppable, request)) {
         // not scheduling - jump requests need to be performed instantly
+
+        const overlap: ?Position = getDroppableOverlap(droppable, request);
+
+        if (overlap) {
+          console.warn('DROPPABLE OVERLAP', overlap);
+          const client: Position = add(drag.current.client.selection, overlap);
+          move(drag.initial.descriptor.id, client, getWindowScrollPosition());
+        }
+
         scrollDroppable(droppable.descriptor.id, request);
         return;
       }
@@ -240,6 +258,14 @@ export default ({
 
     if (!canScrollWindow(request)) {
       console.warn('Jump scroll requested but it cannot be done by Droppable or the Window');
+    }
+
+    const overlap: ?Position = getWindowOverlap(request);
+
+    if (overlap) {
+      console.warn('WINDOW OVERLAP', overlap);
+      const client: Position = add(drag.current.client.selection, overlap);
+      move(drag.initial.descriptor.id, client, getWindowScrollPosition());
     }
 
     // not scheduling - jump requests need to be performed instantly

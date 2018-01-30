@@ -31,6 +31,7 @@ import {
 } from '../context-keys';
 import {
   clean,
+  move,
   publishDraggableDimensions,
   publishDroppableDimensions,
   updateDroppableDimensionScroll,
@@ -113,6 +114,9 @@ export default class DragDropContext extends React.Component<Props> {
     this.dimensionMarshal = createDimensionMarshal(callbacks);
     this.scrollMarshal = createAutoScroll({
       scrollDroppable: this.dimensionMarshal.scrollDroppable,
+      move: (id: DraggableId, client: Position, windowScroll: Position) => {
+        this.store.dispatch(move(id, client, windowScroll));
+      },
     });
 
     let previous: State = this.store.getState();

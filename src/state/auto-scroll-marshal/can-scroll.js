@@ -15,7 +15,7 @@ import type {
 type CanScrollArgs = {|
   max: Position,
   current: Position,
-  proposed: Position,
+  change: Position,
 |}
 
 const origin: Position = { x: 0, y: 0 };
@@ -30,12 +30,12 @@ const getSmallestSignedValue = (value: number) => {
 const canScroll = ({
   max,
   current,
-  proposed,
+  change,
 }: CanScrollArgs): boolean => {
   // Only need to be able to move the smallest amount in the desired direction
   const smallestChange: Position = {
-    x: getSmallestSignedValue(proposed.x),
-    y: getSmallestSignedValue(proposed.y),
+    x: getSmallestSignedValue(change.x),
+    y: getSmallestSignedValue(change.y),
   };
 
   const target: Position = add(current, smallestChange);
@@ -57,15 +57,14 @@ const canScroll = ({
   return true;
 };
 
-export const canScrollWindow = (change: Position): boolean => {
+const getMaxWindowScroll = (): Position => {
   const el: ?HTMLElement = document.documentElement;
 
   if (!el) {
     console.error('Cannot find document element');
-    return false;
+    return origin;
   }
 
-  const current: Position = getWindowScrollPosition();
   const viewport: Area = getViewport();
 
   const maxScroll: Position = getMaxScroll({
@@ -75,12 +74,17 @@ export const canScrollWindow = (change: Position): boolean => {
     height: viewport.height,
   });
 
-  console.log('can scroll window?');
+  return maxScroll;
+};
+
+export const canScrollWindow = (change: Position): boolean => {
+  const maxScroll: Position = getMaxWindowScroll();
+  const currentScroll: Position = getWindowScrollPosition();
 
   return canScroll({
-    current,
+    current: currentScroll,
     max: maxScroll,
-    proposed: change,
+    change,
   });
 };
 
@@ -94,11 +98,76 @@ export const canScrollDroppable = (
     return false;
   }
 
-  console.log('can scroll droppable?');
-
   return canScroll({
     current: closestScrollable.scroll.current,
     max: closestScrollable.scroll.max,
-    proposed: change,
+    change,
+  });
+};
+
+type GetOverlapArgs = {|
+  current: Position,
+  max: Position,
+  change: Position,
+|}
+
+const getOverlap = ({
+  current,
+  max,
+  change,
+}: GetOverlapArgs): ?Position => {
+  const target: Position = add(current, change);
+
+  // too far back
+  if (target.y <= 0 && target.x <= 0) {
+    console.log('forward overlap');
+    const overlap: Position = {
+      x: target.x,
+      y: target.y,
+    };
+    return overlap;
+  }
+
+  // too far forward
+  if (target.y >= max.y && target.x >= max.x) {
+    console.log('backward overlap');
+    const overlap: Position = subtract(target, max);
+    return overlap;
+  }
+
+  // no overlap
+  return null;
+};
+
+export const getWindowOverlap = (change: Position): ?Position => {
+  if (!canScrollWindow(change)) {
+    return null;
+  }
+
+  const max: Position = getMaxWindowScroll();
+  const current: Position = getWindowScrollPosition();
+
+  return getOverlap({
+    current,
+    max,
+    change,
+  });
+};
+
+export const getDroppableOverlap = (droppable: DroppableDimension, change: Position): ?Position => {
+  if (!canScrollDroppable(droppable, change)) {
+    return null;
+  }
+
+  const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
+  // Cannot scroll when there is no scroll container!
+  if (!closestScrollable) {
+    return null;
+  }
+
+  return getOverlap({
+    current: closestScrollable.scroll.current,
+    max: closestScrollable.scroll.max,
+    change,
   });
 };
