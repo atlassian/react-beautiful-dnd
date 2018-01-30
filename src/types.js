@@ -108,9 +108,7 @@ export type ClosestScrollable = {|
   scroll: {|
     initial: Position,
     current: Position,
-    // the minimum allowable scroll for the frame
-    min: Position,
-    // the maxium allowable scroll for the frame
+    // the maximum allowable scroll for the frame
     max: Position,
     diff: {|
       value: Position,

@@ -2,7 +2,8 @@
 import { vertical, horizontal } from './axis';
 import getArea from './get-area';
 import { offsetByPosition, expandBySpacing } from './spacing';
-import { add, subtract, negate } from './position';
+import { subtract, negate } from './position';
+import getMaxScroll from './get-max-scroll';
 import type {
   DraggableDescriptor,
   DroppableDescriptor,
@@ -100,44 +101,6 @@ export const clip = (frame: Area, subject: Spacing): ?Area => {
   return result;
 };
 
-const getSmallestSignedValue = (value: number) => {
-  if (value === 0) {
-    return 0;
-  }
-  return value > 0 ? 1 : -1;
-};
-
-export const canScrollDroppable = (
-  droppable: DroppableDimension,
-  newScroll: Position,
-): boolean => {
-  const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
-
-  // Cannot scroll a droppable that does not have a scroll container
-  if (!closestScrollable) {
-    return false;
-  }
-
-  const smallestChange: Position = {
-    x: getSmallestSignedValue(newScroll.x),
-    y: getSmallestSignedValue(newScroll.y),
-  };
-
-  const targetScroll: Position = add(smallestChange, closestScrollable.scroll.initial);
-  const max: Position = closestScrollable.scroll.max;
-  const min: Position = closestScrollable.scroll.min;
-
-  if (targetScroll.y > max.y && targetScroll.x > max.x) {
-    return false;
-  }
-
-  if (targetScroll.y < min.y && targetScroll.x < min.y) {
-    return false;
-  }
-
-  return true;
-};
-
 export const scrollDroppable = (
   droppable: DroppableDimension,
   newScroll: Position
@@ -166,7 +129,6 @@ export const scrollDroppable = (
         value: scrollDiff,
         displacement: scrollDisplacement,
       },
-      min: existingScrollable.scroll.min,
       max: existingScrollable.scroll.max,
     },
   };
@@ -217,14 +179,11 @@ export const getDroppableDimension = ({
 
     const frame: Area = getArea(offsetByPosition(closest.frameClient, windowScroll));
 
-    const minScroll: Position = {
-      x: frame.left,
-      y: frame.top,
-    };
-
-    const maxScroll: Position = add(minScroll, {
-      x: closest.scrollWidth,
-      y: closest.scrollHeight,
+    const maxScroll: Position = getMaxScroll({
+      scrollHeight: closest.scrollHeight,
+      scrollWidth: closest.scrollWidth,
+      height: frame.height,
+      width: frame.width,
     });
 
     const result: ClosestScrollable = {
@@ -234,7 +193,6 @@ export const getDroppableDimension = ({
         initial: closest.scroll,
         // no scrolling yet, so current = initial
         current: closest.scroll,
-        min: minScroll,
         max: maxScroll,
         diff: {
           value: origin,

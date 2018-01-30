@@ -37,7 +37,7 @@ export default ({
   target,
   droppables,
 }: Args): ?DroppableDimension => {
-  const overDroppablesFrame: ?DroppableDimension =
+  const maybe: ?DroppableDimension =
     getScrollableDroppables(droppables)
       .find((droppable: DroppableDimension): boolean => {
         if (!droppable.viewport.closestScrollable) {
@@ -46,5 +46,5 @@ export default ({
         return isPositionInFrame(droppable.viewport.closestScrollable.frame)(target);
       });
 
-  return overDroppablesFrame;
+  return maybe;
 };

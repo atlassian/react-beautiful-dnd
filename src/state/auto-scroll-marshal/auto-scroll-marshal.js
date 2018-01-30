@@ -4,8 +4,8 @@ import getViewport from '../visibility/get-viewport';
 import { isEqual } from '../position';
 import { vertical, horizontal } from '../axis';
 import getScrollableDroppableOver from './get-scrollable-droppable-over';
-import { canScrollDroppable } from '../dimension';
-import scrollWindow, { canScroll as canScrollWindow } from './scroll-window';
+import { canScrollDroppable, canScrollWindow } from './can-scroll';
+import scrollWindow from './scroll-window';
 import type { AutoScrollMarshal } from './auto-scroll-marshal-types';
 import type {
   Area,
@@ -18,6 +18,7 @@ import type {
   Spacing,
   DraggableLocation,
   DraggableDimension,
+  ClosestScrollable,
 } from '../../types';
 
 type Args = {|
@@ -171,23 +172,25 @@ export default ({
       droppables: state.dimension.droppable,
     });
 
+    // No scrollable targets
     if (!droppable) {
       return;
     }
 
-    // not a scrollable droppable (should not occur)
-    if (!droppable.viewport.frame) {
+    // We know this has a closestScrollable
+    const closestScrollable: ClosestScrollable = (droppable.viewport.closestScrollable : any);
+
+    if (isTooBigForAutoScrolling(closestScrollable.frame, draggable.page.withMargin)) {
       return;
     }
 
-    if (isTooBigForAutoScrolling(droppable.viewport.frame, draggable.page.withMargin)) {
-      return;
-    }
-
-    const requiredFrameScroll: ?Position =
-      getRequiredScroll(droppable.viewport.frame, center);
+    const requiredFrameScroll: ?Position = getRequiredScroll(closestScrollable.frame, center);
 
     if (!requiredFrameScroll) {
+      return;
+    }
+
+    if (!canScrollDroppable(droppable, requiredFrameScroll)) {
       return;
     }
 
@@ -216,23 +219,30 @@ export default ({
     }
 
     const droppable: DroppableDimension = state.dimension.droppable[destination.droppableId];
-    const clipped: ?Area = droppable.viewport.clipped;
-    if (clipped == null) {
-      return;
+    const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
+
+    if (closestScrollable) {
+      if (isTooBigForAutoScrolling(closestScrollable.frame, draggable.page.withMargin)) {
+        return;
+      }
+
+      if (canScrollDroppable(droppable, request)) {
+        // not scheduling - jump requests need to be performed instantly
+        scrollDroppable(droppable.descriptor.id, request);
+        return;
+      }
+
+      // can now check if we need to scroll the window
     }
+
+    // Scroll the window if we can
 
     if (isTooBigForAutoScrolling(getViewport(), draggable.page.withMargin)) {
       return;
     }
 
-    if (isTooBigForAutoScrolling(clipped, draggable.page.withMargin)) {
-      return;
-    }
-
-    if (canScrollDroppable(droppable, request)) {
-      // not scheduling - jump requests need to be performed instantly
-      scrollDroppable(droppable.descriptor.id, request);
-      return;
+    if (!canScrollWindow(request)) {
+      console.warn('Jump scroll requested but it cannot be done by Droppable or the Window');
     }
 
     // not scheduling - jump requests need to be performed instantly

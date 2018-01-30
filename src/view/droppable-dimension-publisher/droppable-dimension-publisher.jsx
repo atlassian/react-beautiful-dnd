@@ -96,6 +96,10 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       return;
     }
 
+    if (!this.isWatchingScroll) {
+      console.warn('Updating Droppable scroll while not watching for updates');
+    }
+
     console.log('DroppableDimensionPublisher: now scrolling', change);
 
     this.closestScrollable.scrollTop += change.y;
