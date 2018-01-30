@@ -35,8 +35,8 @@ If you raise a bug that is not in a supported version we will not be fixing it
 ### Demo
 
 <!--
-Please provide a webpack bin to show the issue. Here is a boilerplate to help you get started:
-https://www.webpackbin.com/bins/-Kr9aE9jnUeWlphY8wsw
+Please provide an example to show the issue. Here is a boilerplate to help you get started:
+https://codesandbox.io/s/k260nyxq9v
 
 If you paste a big block of code it can be difficult to debug it.
 
