@@ -25,28 +25,35 @@ type Args = {|
   scrollDroppable: (id: DroppableId, change: Position) => void,
 |}
 
+// Values used to control how the fluid auto scroll feels
 export const config = {
   // percentage distance from edge of container:
   startFrom: 0.18,
   maxSpeedAt: 0.05,
   // pixels per frame
   maxScrollSpeed: 25,
+  // A function used to ease the distance been the startFrom and maxSpeedAt values
+  // A simple linear function would be: (percentage) => percentage;
+  // percentage is between 0 and 1
+  // result must be between 0 and 1
+  ease: (percentage: number) => Math.pow(percentage, 2),
 };
 
 const origin: Position = { x: 0, y: 0 };
 
-type Thresholds = {|
+type PixelThresholds = {|
   startFrom: number,
   maxSpeedAt: number,
   accelerationPlane: number,
 |}
 
-const getThresholds = (container: Area, axis: Axis): Thresholds => {
+// converts the percentages in the config into actual pixel values
+const getPixelThresholds = (container: Area, axis: Axis): PixelThresholds => {
   const startFrom: number = container[axis.size] * config.startFrom;
   const maxSpeedAt: number = container[axis.size] * config.maxSpeedAt;
   const accelerationPlane: number = startFrom - maxSpeedAt;
 
-  const thresholds: Thresholds = {
+  const thresholds: PixelThresholds = {
     startFrom,
     maxSpeedAt,
     accelerationPlane,
@@ -55,17 +62,11 @@ const getThresholds = (container: Area, axis: Axis): Thresholds => {
   return thresholds;
 };
 
-const getSpeed = (distance: number, thresholds: Thresholds): number => {
+const getSpeed = (distance: number, thresholds: PixelThresholds): number => {
   // Not close enough to the edge
   if (distance >= thresholds.startFrom) {
     return 0;
   }
-
-  // gone past the edge (currently not supported)
-  // TODO: do not want for window - but need it for droppable?
-  // if (distance < 0) {
-  //   return 0;
-  // }
 
   // Already past the maxSpeedAt point
 
@@ -77,7 +78,9 @@ const getSpeed = (distance: number, thresholds: Thresholds): number => {
 
   const distancePastStart: number = thresholds.startFrom - distance;
   const percentage: number = distancePastStart / thresholds.accelerationPlane;
-  const speed: number = config.maxScrollSpeed * percentage;
+  const transformed: number = config.ease(percentage);
+
+  const speed: number = config.maxScrollSpeed * transformed;
 
   return speed;
 };
@@ -102,7 +105,7 @@ const getRequiredScroll = (container: Area, center: Position): ?Position => {
   // Negative values to not continue to increase the speed
 
   const y: number = (() => {
-    const thresholds: Thresholds = getThresholds(container, vertical);
+    const thresholds: PixelThresholds = getPixelThresholds(container, vertical);
     const isCloserToBottom: boolean = distance.bottom < distance.top;
 
     if (isCloserToBottom) {
@@ -114,7 +117,7 @@ const getRequiredScroll = (container: Area, center: Position): ?Position => {
   })();
 
   const x: number = (() => {
-    const thresholds: Thresholds = getThresholds(container, horizontal);
+    const thresholds: PixelThresholds = getPixelThresholds(container, horizontal);
     const isCloserToRight: boolean = distance.right < distance.left;
 
     if (isCloserToRight) {
@@ -186,15 +189,9 @@ export default ({
 
     const requiredFrameScroll: ?Position = getRequiredScroll(closestScrollable.frame, center);
 
-    if (!requiredFrameScroll) {
-      return;
+    if (requiredFrameScroll && canScrollDroppable(droppable, requiredFrameScroll)) {
+      scheduleDroppableScroll(droppable.descriptor.id, requiredFrameScroll);
     }
-
-    if (!canScrollDroppable(droppable, requiredFrameScroll)) {
-      return;
-    }
-
-    scheduleDroppableScroll(droppable.descriptor.id, requiredFrameScroll);
   };
 
   const jumpScroll = (state: State) => {
