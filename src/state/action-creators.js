@@ -143,17 +143,22 @@ export type MoveAction = {|
     id: DraggableId,
     client: Position,
     windowScroll: Position,
+    shouldAnimate: boolean,
   |}
 |}
 
-export const move = (id: DraggableId,
+export const move = (
+  id: DraggableId,
   client: Position,
-  windowScroll: Position): MoveAction => ({
+  windowScroll: Position,
+  shouldAnimate?: boolean = false,
+): MoveAction => ({
   type: 'MOVE',
   payload: {
     id,
     client,
     windowScroll,
+    shouldAnimate,
   },
 });
 

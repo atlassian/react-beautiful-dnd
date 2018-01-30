@@ -402,13 +402,13 @@ export default (state: State = clean('IDLE'), action: Action): State => {
   }
 
   if (action.type === 'MOVE') {
-    const { client, windowScroll } = action.payload;
+    const { client, windowScroll, shouldAnimate } = action.payload;
     console.log('moving by', client);
     return move({
       state,
       clientSelection: client,
       windowScroll,
-      shouldAnimate: false,
+      shouldAnimate,
     });
   }
 

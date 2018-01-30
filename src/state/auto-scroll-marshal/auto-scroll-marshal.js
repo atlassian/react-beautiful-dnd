@@ -30,7 +30,7 @@ import type {
 
 type Args = {|
   scrollDroppable: (id: DroppableId, change: Position) => void,
-  move: (id: DraggableId, client: Position, windowScroll: Position) => void,
+  move: (id: DraggableId, client: Position, windowScroll: Position, shouldAnimate: boolean) => void,
 |}
 
 // Values used to control how the fluid auto scroll feels
@@ -235,12 +235,15 @@ export default ({
       if (canScrollDroppable(droppable, request)) {
         // not scheduling - jump requests need to be performed instantly
 
-        const overlap: ?Position = getDroppableOverlap(droppable, request);
+        // if the window can also not be scrolled - adjust the item
+        if (!canScrollWindow(request)) {
+          const overlap: ?Position = getDroppableOverlap(droppable, request);
 
-        if (overlap) {
-          console.warn('DROPPABLE OVERLAP', overlap);
-          const client: Position = add(drag.current.client.selection, overlap);
-          move(drag.initial.descriptor.id, client, getWindowScrollPosition());
+          if (overlap) {
+            console.warn('DROPPABLE OVERLAP', overlap);
+            const client: Position = add(drag.current.client.selection, overlap);
+            move(drag.initial.descriptor.id, client, getWindowScrollPosition(), true);
+          }
         }
 
         scrollDroppable(droppable.descriptor.id, request);
@@ -265,7 +268,7 @@ export default ({
     if (overlap) {
       console.warn('WINDOW OVERLAP', overlap);
       const client: Position = add(drag.current.client.selection, overlap);
-      move(drag.initial.descriptor.id, client, getWindowScrollPosition());
+      move(drag.initial.descriptor.id, client, getWindowScrollPosition(), true);
     }
 
     // not scheduling - jump requests need to be performed instantly
