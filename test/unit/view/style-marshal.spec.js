@@ -6,8 +6,6 @@ import * as state from '../../utils/simple-state-preset';
 import type { State } from '../../../src/types';
 import * as logger from '../../../src/log';
 
-jest.mock('../../../src/log');
-
 const getStyleTagSelector = (context: string) =>
   `style[data-react-beautiful-dnd="${context}"]`;
 
@@ -18,6 +16,14 @@ const getStyleFromTag = (context: string): string => {
 };
 
 describe('style marshal', () => {
+  let loggerError;
+  beforeEach(() => {
+    loggerError = jest.spyOn(logger, 'error').mockImplementation(() => { });
+  });
+
+  afterEach(() => {
+    loggerError.mockRestore();
+  });
   describe('not dragging', () => {
     it('should not mount a style tag until mounted', () => {
       const marshal: StyleMarshal = createStyleMarshal();
@@ -35,10 +41,10 @@ describe('style marshal', () => {
       const marshal: StyleMarshal = createStyleMarshal();
 
       marshal.mount();
-      expect(logger.error).not.toHaveBeenCalled();
+      expect(loggerError).not.toHaveBeenCalled();
 
       marshal.mount();
-      expect(logger.error).toHaveBeenCalled();
+      expect(loggerError).toHaveBeenCalled();
     });
 
     it('should apply the resting styles by default', () => {
@@ -144,7 +150,7 @@ describe('style marshal', () => {
       // asserting it has the base styles (not updated)
       expect(el.innerHTML).toEqual(styles.resting);
       // an error is logged
-      expect(logger.error).toHaveBeenCalled();
+      expect(loggerError).toHaveBeenCalled();
     });
   });
 

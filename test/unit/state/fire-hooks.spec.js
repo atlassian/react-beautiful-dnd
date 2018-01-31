@@ -12,8 +12,6 @@ import type {
 } from '../../../src/types';
 import * as logger from '../../../src/log';
 
-jest.mock('../../../src/log');
-
 const preset = getPreset();
 
 const noDimensions: DimensionState = {
@@ -24,12 +22,18 @@ const noDimensions: DimensionState = {
 
 describe('fire hooks', () => {
   let hooks: Hooks;
+  let loggerError;
 
   beforeEach(() => {
+    loggerError = jest.spyOn(logger, 'error').mockImplementation(() => { });
     hooks = {
       onDragStart: jest.fn(),
       onDragEnd: jest.fn(),
     };
+  });
+
+  afterEach(() => {
+    loggerError.mockRestore();
   });
 
   describe('drag start', () => {
@@ -54,7 +58,7 @@ describe('fire hooks', () => {
 
       fireHooks(customHooks, state.requesting(), state.dragging());
 
-      expect(logger.error).not.toHaveBeenCalled();
+      expect(loggerError).not.toHaveBeenCalled();
     });
 
     it('should log an error and not call the callback if there is no current drag', () => {
@@ -65,7 +69,7 @@ describe('fire hooks', () => {
 
       fireHooks(hooks, state.requesting(), invalid);
 
-      expect(logger.error).toHaveBeenCalled();
+      expect(loggerError).toHaveBeenCalled();
     });
 
     it('should not call if only collecting dimensions (not dragging yet)', () => {
@@ -127,7 +131,7 @@ describe('fire hooks', () => {
         fireHooks(hooks, previous, invalid);
 
         expect(hooks.onDragEnd).not.toHaveBeenCalled();
-        expect(logger.error).toHaveBeenCalled();
+        expect(loggerError).toHaveBeenCalled();
       });
 
       it('should call onDragEnd with null as the destination if there is no destination', () => {
@@ -220,7 +224,7 @@ describe('fire hooks', () => {
         fireHooks(hooks, state.idle, invalid);
 
         expect(hooks.onDragEnd).not.toHaveBeenCalled();
-        expect(logger.error).toHaveBeenCalled();
+        expect(loggerError).toHaveBeenCalled();
       });
     });
 
@@ -251,7 +255,7 @@ describe('fire hooks', () => {
         fireHooks(hooks, invalid, state.idle);
 
         expect(hooks.onDragEnd).not.toHaveBeenCalled();
-        expect(logger.error).toHaveBeenCalled();
+        expect(loggerError).toHaveBeenCalled();
       });
     });
   });

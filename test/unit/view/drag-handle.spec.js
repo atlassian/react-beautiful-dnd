@@ -27,8 +27,6 @@ import { interactiveTagNames } from '../../../src/view/drag-handle/util/should-a
 import { styleContextKey, canLiftContextKey } from '../../../src/view/context-keys';
 import * as logger from '../../../src/log';
 
-jest.mock('../../../src/log');
-
 const primaryButton: number = 0;
 const auxiliaryButton: number = 1;
 
@@ -145,6 +143,7 @@ const wasEventStopped = (mockEvent: MockEvent): boolean =>
 describe('drag handle', () => {
   let callbacks: Callbacks;
   let wrapper: ReactWrapper;
+  let loggerError;
 
   const fakeDraggableRef: HTMLElement = document.createElement('div');
   const fakeCenter: Position = {
@@ -168,6 +167,7 @@ describe('drag handle', () => {
   });
 
   beforeEach(() => {
+    loggerError = jest.spyOn(logger, 'error').mockImplementation(() => { });
     callbacks = getStubCallbacks();
     wrapper = mount(
       <DragHandle
@@ -188,6 +188,7 @@ describe('drag handle', () => {
   });
 
   afterEach(() => {
+    loggerError.mockRestore();
     wrapper.unmount();
   });
 
@@ -1057,7 +1058,7 @@ describe('drag handle', () => {
         // not providing any force value
         windowMouseForceChange();
 
-        expect(logger.error).toHaveBeenCalled();
+        expect(loggerError).toHaveBeenCalled();
       });
 
       it('should log a warning if a mouse force changed event is fired when there is no MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN global', () => {
@@ -1067,7 +1068,7 @@ describe('drag handle', () => {
         mouseDown(wrapper);
         windowMouseForceChange(standardForce);
 
-        expect(logger.error).toHaveBeenCalled();
+        expect(loggerError).toHaveBeenCalled();
       });
 
       describe('non error scenarios', () => {
@@ -1289,7 +1290,7 @@ describe('drag handle', () => {
         // boom
         pressArrowDown(customWrapper);
 
-        expect(logger.error).toHaveBeenCalled();
+        expect(loggerError).toHaveBeenCalled();
         expect(callbacksCalled(customCallbacks)({
           onLift: 1,
           onCancel: 1,

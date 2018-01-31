@@ -20,9 +20,6 @@ import * as keyCodes from '../../../src/view/key-codes';
 // eslint-disable-next-line no-unused-vars
 import * as logger from '../../../src/log';
 
-// unmounting during a drag can cause a warning
-jest.mock('../../../src/log');
-
 const windowMouseMove = dispatchWindowMouseEvent.bind(null, 'mousemove');
 const windowMouseUp = dispatchWindowMouseEvent.bind(null, 'mouseup');
 const mouseDown = mouseEvent.bind(null, 'mousedown');
@@ -31,6 +28,7 @@ const cancelWithKeyboard = dispatchWindowKeyDownEvent.bind(null, keyCodes.escape
 describe('hooks integration', () => {
   let hooks: Hooks;
   let wrapper;
+  let loggerError;
 
   const draggableId: DraggableId = 'drag-1';
   const droppableId: DroppableId = 'drop-1';
@@ -98,6 +96,8 @@ describe('hooks integration', () => {
       onDragEnd: jest.fn(),
     };
     wrapper = getMountedApp();
+    // unmounting during a drag can cause a warning
+    loggerError = jest.spyOn(logger, 'warn').mockImplementation(() => { });
   });
 
   afterEach(() => {
@@ -106,6 +106,7 @@ describe('hooks integration', () => {
 
     // clean up any loose events
     wrapper.unmount();
+    loggerError.mockRestore();
 
     // clean up any stubs
     if (Element.prototype.getBoundingClientRect.mockRestore) {

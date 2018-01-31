@@ -22,8 +22,6 @@ import type {
 } from '../../../src/types';
 import * as logger from '../../../src/log';
 
-jest.mock('../../../src/log');
-
 const preset = getPreset();
 
 const noSpacing = {
@@ -84,6 +82,14 @@ const getMarshalStub = (): DimensionMarshal => ({
 });
 
 describe('DraggableDimensionPublisher', () => {
+  let loggerError;
+  beforeEach(() => {
+    loggerError = jest.spyOn(logger, 'error').mockImplementation(() => { });
+  });
+
+  afterEach(() => {
+    loggerError.mockRestore();
+  });
   describe('dimension registration', () => {
     it('should register itself when mounting', () => {
       const marshal: DimensionMarshal = getMarshalStub();
@@ -112,7 +118,7 @@ describe('DraggableDimensionPublisher', () => {
       forceUpdate(wrapper);
 
       expect(marshal.registerDraggable).not.toHaveBeenCalled();
-      expect(logger.error).toHaveBeenCalled();
+      expect(loggerError).toHaveBeenCalled();
     });
 
     it('should unregister itself when unmounting', () => {

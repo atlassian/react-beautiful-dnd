@@ -24,8 +24,6 @@ import type {
 } from '../../../src/types';
 import * as logger from '../../../src/log';
 
-jest.mock('../../../src/log');
-
 const noMargin = {
   marginTop: '0',
   marginRight: '0',
@@ -103,10 +101,19 @@ const getMarshalStub = (): DimensionMarshal => ({
 });
 
 describe('DraggableDimensionPublisher', () => {
+  let loggerError;
   const originalWindowScroll: Position = {
     x: window.pageXOffset,
     y: window.pageYOffset,
   };
+
+  beforeEach(() => {
+    loggerError = jest.spyOn(logger, 'error').mockImplementation(() => { });
+  });
+
+  afterEach(() => {
+    loggerError.mockRestore();
+  });
 
   afterEach(() => {
     // clean up any stubs
@@ -153,7 +160,7 @@ describe('DraggableDimensionPublisher', () => {
       // updating without a targetRef
       forceUpdate(wrapper);
 
-      expect(logger.error).toHaveBeenCalled();
+      expect(loggerError).toHaveBeenCalled();
       expect(marshal.registerDroppable).not.toHaveBeenCalled();
     });
 
@@ -591,6 +598,16 @@ describe('DraggableDimensionPublisher', () => {
   });
 
   describe('scroll watching', () => {
+    let loggerWarn;
+
+    beforeEach(() => {
+      loggerWarn = jest.spyOn(logger, 'warn').mockImplementation(() => { });
+    });
+
+    afterEach(() => {
+      loggerWarn.mockRestore();
+    });
+
     const scroll = (el: HTMLElement, target: Position) => {
       el.scrollTop = target.y;
       el.scrollLeft = target.x;
@@ -756,7 +773,6 @@ describe('DraggableDimensionPublisher', () => {
     });
 
     it('should stop watching for scroll events when the component is unmounted', () => {
-      jest.spyOn(logger, 'warn').mockImplementation(() => { });
       const marshal: DimensionMarshal = getMarshalStub();
       const wrapper = mount(
         <ScrollableItem />,
@@ -777,7 +793,7 @@ describe('DraggableDimensionPublisher', () => {
       requestAnimationFrame.step();
       expect(marshal.updateDroppableScroll).not.toHaveBeenCalled();
       // also logs a warning
-      expect(logger.warn).toHaveBeenCalled();
+      expect(loggerWarn).toHaveBeenCalled();
     });
   });
 
