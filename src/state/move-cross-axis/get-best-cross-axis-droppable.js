@@ -61,7 +61,7 @@ export default ({
     // Remove any droppables that are not partially visible
     .filter((droppable: DroppableDimension): boolean => {
       const clipped: ?Area = droppable.viewport.clipped;
-      // subject is not visible
+      // subject is not visible at all in frame
       if (!clipped) {
         return false;
       }

@@ -1,5 +1,5 @@
 // @flow
-import { distance } from '../position';
+import { add, distance } from '../position';
 import getViewport from '../visibility/get-viewport';
 import { isTotallyVisible } from '../visibility/is-visible';
 import type {
@@ -19,6 +19,8 @@ type Args = {|
   insideDestination: DraggableDimension[],
 |}
 
+const origin: Position = { x: 0, y: 0 };
+
 export default ({
   axis,
   pageCenter,
@@ -31,6 +33,9 @@ export default ({
   }
 
   const viewport: Area = getViewport();
+  const scrollDisplacement: Position = destination.viewport.closestScrollable ?
+    destination.viewport.closestScrollable.scroll.diff.displacement :
+    origin;
 
   const result: DraggableDimension[] = insideDestination
     // Remove any options that are hidden by overflow
@@ -42,9 +47,9 @@ export default ({
         viewport,
       }))
     .sort((a: DraggableDimension, b: DraggableDimension): number => {
-      // TODO: need to consider droppable scroll
-      const distanceToA = distance(pageCenter, a.page.withMargin.center);
-      const distanceToB = distance(pageCenter, b.page.withMargin.center);
+      // Need to consider the change in scroll in the destination
+      const distanceToA = distance(pageCenter, add(a.page.withMargin.center, scrollDisplacement));
+      const distanceToB = distance(pageCenter, add(b.page.withMargin.center, scrollDisplacement));
 
       // if a is closer - return a
       if (distanceToA < distanceToB) {

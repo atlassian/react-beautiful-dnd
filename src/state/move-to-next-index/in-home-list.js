@@ -1,8 +1,10 @@
 // @flow
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { subtract, patch } from '../position';
+import { patch } from '../position';
+import withDroppableScroll from '../with-droppable-scroll';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 import getViewport from '../visibility/get-viewport';
+import getScrollJumpResult from './get-scroll-jump-result';
 import moveToEdge from '../move-to-edge';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
@@ -16,8 +18,6 @@ import type {
   DragImpact,
   Area,
 } from '../../types';
-
-const origin: Position = { x: 0, y: 0 };
 
 export default ({
   isMovingForward,
@@ -61,6 +61,7 @@ export default ({
     return null;
   }
 
+  const viewport: Area = getViewport();
   const destination: DraggableDimension = insideDroppable[proposedIndex];
   const isMovingTowardStart = (isMovingForward && proposedIndex <= startIndex) ||
     (!isMovingForward && proposedIndex >= startIndex);
@@ -86,28 +87,16 @@ export default ({
     draggable,
     destination: droppable,
     newPageCenter,
-    viewport: getViewport(),
+    viewport,
   });
 
   if (!isVisibleInNewLocation) {
-    // The full distance required to get from the previous page center to the new page center
-    const requiredDistance: Position = subtract(newPageCenter, previousPageCenter);
-
-    // We need to consider how much the droppable scroll has changed
-    const scrollDiff: Position = droppable.viewport.closestScrollable ?
-      droppable.viewport.closestScrollable.scroll.diff.value :
-      origin;
-
-    // The actual scroll required to move into the next place
-    const requiredScroll: Position = subtract(requiredDistance, scrollDiff);
-
-    return {
-      // Using the previous page center with a new impact
-      // as we are not visually moving the Draggable
-      pageCenter: previousPageCenter,
-      impact: previousImpact,
-      scrollJumpRequest: requiredScroll,
-    };
+    return getScrollJumpResult({
+      newPageCenter,
+      previousPageCenter,
+      droppable,
+      previousImpact,
+    });
   }
 
   // Calculate DragImpact
@@ -125,7 +114,7 @@ export default ({
     [destinationDisplacement, ...previousImpact.movement.displaced]);
 
   // update impact with visibility - stops redundant work!
-  const viewport: Area = getViewport();
+
   const displaced: Displacement[] = modified
     .map((displacement: Displacement): Displacement => {
       const target: DraggableDimension = draggables[displacement.draggableId];
@@ -155,13 +144,8 @@ export default ({
     direction: droppable.axis.direction,
   };
 
-  const scrollDiff: Position = droppable.viewport.closestScrollable ?
-    droppable.viewport.closestScrollable.scroll.diff.value :
-    origin;
-  const withScrollDiff: Position = subtract(newPageCenter, scrollDiff);
-
   return {
-    pageCenter: withScrollDiff,
+    pageCenter: withDroppableScroll(droppable, newPageCenter),
     impact: newImpact,
     scrollJumpRequest: null,
   };

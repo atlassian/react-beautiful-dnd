@@ -23,6 +23,10 @@ type ExecuteBasedOnDirection = {|
 
 const noop = () => { };
 
+const scrollJumpKeys: number[] = [
+  keyCodes.pageDown, keyCodes.pageUp, keyCodes.home, keyCodes.end,
+];
+
 export default ({
   callbacks,
   getDraggableRef,
@@ -158,14 +162,21 @@ export default ({
     }
 
     blockStandardKeyEvents(event);
+
+    // blocking scroll jumping at this time
+    if (scrollJumpKeys.indexOf(event.keyCode) >= 0) {
+      stopEvent(event);
+    }
   };
 
   const windowBindings = {
     // any mouse actions kills a drag
     mousedown: cancel,
     mouseup: cancel,
+    click: cancel,
+    // resizing the browser kills a drag
     resize: cancel,
-    // Cancel if the user is using the mouse wheel
+    // kill if the user is using the mouse wheel
     // We are not supporting wheel / trackpad scrolling with keyboard dragging
     wheel: cancel,
     // Need to respond instantly to a jump scroll request

@@ -1,11 +1,12 @@
 // @flow
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import { patch } from '../position';
+import withDroppableScroll from '../with-droppable-scroll';
 import moveToEdge from '../move-to-edge';
 import getDisplacement from '../get-displacement';
 import getViewport from '../visibility/get-viewport';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
-import getResult from './get-result';
+import getScrollJumpResult from './get-scroll-jump-result';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import type {
@@ -17,6 +18,8 @@ import type {
   Displacement,
   Area,
 } from '../../types';
+
+const origin: Position = { x: 0, y: 0 };
 
 export default ({
   isMovingForward,
@@ -83,27 +86,21 @@ export default ({
     destinationAxis: droppable.axis,
   });
 
-  // const isVisible: boolean = (() => {
-  //   // Moving into placeholder position
-  //   // Usually this would be outside of the visible bounds
-  //   if (isMovingPastLastIndex) {
-  //     return true;
-  //   }
+  const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
+    draggable,
+    destination: droppable,
+    newPageCenter,
+    viewport,
+  });
 
-  //   // checking the shifted draggable rather than just the new center
-  //   // as the new center might not be visible but the whole draggable
-  //   // might be partially visible
-  //   return isTotallyVisibleInNewLocation({
-  //     draggable,
-  //     destination: droppable,
-  //     newCenter,
-  //     viewport,
-  //   });
-  // })();
-
-  // if (!isVisible) {
-  //   return null;
-  // }
+  if (!isVisibleInNewLocation) {
+    return getScrollJumpResult({
+      newPageCenter,
+      previousPageCenter,
+      droppable,
+      previousImpact,
+    });
+  }
 
   // at this point we know that the destination is droppable
   const movingRelativeToDisplacement: Displacement = {
@@ -155,15 +152,9 @@ export default ({
     direction: droppable.axis.direction,
   };
 
-  if (isMovingPastLastIndex) {
-    // TODO!
-  }
-
-  return getResult({
-    draggable,
-    destination: droppable,
-    previousPageCenter,
-    newPageCenter,
-    newImpact,
-  });
+  return {
+    pageCenter: withDroppableScroll(droppable, newPageCenter),
+    impact: newImpact,
+    scrollJumpRequest: null,
+  };
 };

@@ -2,6 +2,7 @@
 import moveToEdge from '../../move-to-edge';
 import getViewport from '../../visibility/get-viewport';
 import getDisplacement from '../../get-displacement';
+import withDroppableScroll from '../../with-droppable-scroll';
 import type { Edge } from '../../move-to-edge';
 import type { Result } from '../move-cross-axis-types';
 import type {
@@ -23,6 +24,8 @@ type Args = {|
   droppable: DroppableDimension,
   previousImpact: DragImpact,
 |}
+
+const origin: Position = { x: 0, y: 0 };
 
 export default ({
   amount,
@@ -128,7 +131,7 @@ export default ({
   };
 
   return {
-    pageCenter: newCenter,
+    pageCenter: withDroppableScroll(droppable, newCenter),
     impact: newImpact,
   };
 };
