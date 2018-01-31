@@ -1,7 +1,7 @@
 // @flow
 import * as log from '../../src/log';
 
-describe.only('log', () => {
+describe('log', () => {
   // cache to help restore process.env
   const env = process.env;
   /* eslint-disable no-console */
