@@ -181,6 +181,7 @@ export default ({
     mousedown: cancel,
     mouseup: cancel,
     click: cancel,
+    touchstart: cancel,
     // resizing the browser kills a drag
     resize: cancel,
     // kill if the user is using the mouse wheel
