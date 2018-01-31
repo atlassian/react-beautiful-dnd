@@ -203,6 +203,16 @@ export default ({
     }
   };
 
+  const performMove = (state: State, offset: Position) => {
+    const drag: ?DragState = state.drag;
+    if (!drag) {
+      return;
+    }
+
+    const client: Position = add(drag.current.client.selection, offset);
+    move(drag.initial.descriptor.id, client, getWindowScrollPosition(), true);
+  };
+
   const jumpScroll = (state: State) => {
     const drag: ?DragState = state.drag;
 
@@ -241,8 +251,7 @@ export default ({
 
           if (overlap) {
             console.warn('DROPPABLE OVERLAP', overlap);
-            const client: Position = add(drag.current.client.selection, overlap);
-            move(drag.initial.descriptor.id, client, getWindowScrollPosition(), true);
+            performMove(state, overlap);
           }
         }
 
@@ -267,8 +276,7 @@ export default ({
 
     if (overlap) {
       console.warn('WINDOW OVERLAP', overlap);
-      const client: Position = add(drag.current.client.selection, overlap);
-      move(drag.initial.descriptor.id, client, getWindowScrollPosition(), true);
+      performMove(state, overlap);
     }
 
     // not scheduling - jump requests need to be performed instantly
