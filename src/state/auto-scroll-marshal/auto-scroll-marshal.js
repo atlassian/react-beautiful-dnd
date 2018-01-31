@@ -239,6 +239,7 @@ export default ({
 
     if (closestScrollable) {
       if (isTooBigForAutoScrolling(closestScrollable.frame, draggable.page.withMargin)) {
+        performMove(state, request);
         return;
       }
 
@@ -265,6 +266,7 @@ export default ({
     // Scroll the window if we can
 
     if (isTooBigForAutoScrolling(getViewport(), draggable.page.withMargin)) {
+      performMove(state, request);
       return;
     }
 

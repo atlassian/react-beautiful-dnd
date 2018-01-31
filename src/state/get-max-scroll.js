@@ -23,11 +23,11 @@ export default ({
 
   // Due to scroll bars sometimes the width / height can be greater
   // than the scrollWidth / scrollHeight
-  const adjustedMaxScroll: Position = {
-    x: Math.max(0, maxScroll.x),
-    y: Math.max(0, maxScroll.y),
-  };
+  // const adjustedMaxScroll: Position = {
+  //   x: Math.max(0, maxScroll.x),
+  //   y: Math.max(0, maxScroll.y),
+  // };
 
-  return adjustedMaxScroll;
+  return maxScroll;
 };
 

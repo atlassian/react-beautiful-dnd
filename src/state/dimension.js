@@ -186,6 +186,8 @@ export const getDroppableDimension = ({
       width: frame.width,
     });
 
+    console.warn('DROPPABLE MAX', maxScroll);
+
     const result: ClosestScrollable = {
       frame,
       shouldClipSubject: closest.shouldClipSubject,

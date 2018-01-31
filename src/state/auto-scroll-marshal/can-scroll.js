@@ -27,6 +27,12 @@ const getSmallestSignedValue = (value: number) => {
   return value > 0 ? 1 : -1;
 };
 
+const isTooFarBack = (targetScroll: Position): boolean =>
+  targetScroll.y < 0 || targetScroll.x < 0;
+
+const isTooFarForward = (targetScroll: Position, maxScroll: Position): boolean =>
+  targetScroll.y > maxScroll.y || targetScroll.x > maxScroll.x;
+
 const canScroll = ({
   max,
   current,
@@ -46,14 +52,12 @@ const canScroll = ({
 
   console.log('smallest change', smallestChange);
 
-  // Too far back
-  if (target.y < 0 || target.x < 0) {
+  if (isTooFarBack(target)) {
     console.log('too far back');
     return false;
   }
 
-  // Too far forward
-  if (target.y > max.y || target.x > max.x) {
+  if (isTooFarForward(target, max)) {
     console.log('too far forward');
     return false;
   }
@@ -70,6 +74,9 @@ const getMaxWindowScroll = (): Position => {
   }
 
   const viewport: Area = getViewport();
+
+  // window.innerWidth / innerHeight includes scrollbar
+  // however the scrollHeight / scrollWidth do not :(
 
   const maxScroll: Position = getMaxScroll({
     scrollHeight: el.scrollHeight,
@@ -127,9 +134,7 @@ const getOverlap = ({
 }: GetOverlapArgs): ?Position => {
   const target: Position = add(current, change);
 
-  // too far back
-  if (target.y <= 0 && target.x <= 0) {
-    console.log('forward overlap');
+  if (isTooFarBack(target)) {
     const overlap: Position = {
       x: target.x,
       y: target.y,
@@ -137,8 +142,7 @@ const getOverlap = ({
     return overlap;
   }
 
-  // too far forward
-  if (target.y >= max.y && target.x >= max.x) {
+  if (isTooFarForward(target, max)) {
     console.log('backward overlap');
     const overlap: Position = subtract(target, max);
     return overlap;

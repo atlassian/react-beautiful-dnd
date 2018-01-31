@@ -269,18 +269,29 @@ export default class DroppableDimensionPublisher extends Component<Props> {
         return null;
       }
 
+      console.log('closest', closestScrollable);
+
       // TODO: add margin to client?
       const frameClient: Area = getArea(closestScrollable.getBoundingClientRect());
       const scrollWidth: number = closestScrollable.scrollWidth;
       const scrollHeight: number = closestScrollable.scrollHeight;
       const scroll: Position = this.getClosestScroll();
 
+      const verticalScrollBarWidth: number = closestScrollable.offsetWidth - closestScrollable.clientWidth;
+      const horizontalScrollBarHeight: number = closestScrollable.offsetHeight - closestScrollable.clientHeight;
+
+      const scrollWidthWithScrollBar: number = scrollWidth + verticalScrollBarWidth;
+      const scrollHeightWithScrollBar: number = scrollHeight + horizontalScrollBarHeight;
+
+      console.log('vertical scroll bar width', verticalScrollBarWidth);
+      console.log('horizontal scroll bar height', horizontalScrollBarHeight);
+
       return {
         frameClient,
-        scrollWidth,
-        scrollHeight,
+        scrollWidth: scrollWidthWithScrollBar,
+        scrollHeight: scrollHeightWithScrollBar,
         scroll,
-        shouldClipSubject: !this.props.ignoreContainerClipping,
+        shouldClipSubject: !ignoreContainerClipping,
       };
     })();
 
