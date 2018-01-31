@@ -16,16 +16,18 @@ import type {
   DroppableDimension,
   Position,
 } from '../../../../src/types';
+import * as logger from '../../../../src/log';
 
 const dontCare: Position = { x: 0, y: 0 };
 
 describe('move to new droppable', () => {
+  let loggerError;
   beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => { });
+    loggerError = jest.spyOn(logger, 'error').mockImplementation(() => { });
   });
 
   afterEach(() => {
-    console.error.mockRestore();
+    loggerError.mockRestore();
   });
 
   [vertical, horizontal].forEach((axis: Axis) => {
@@ -64,7 +66,7 @@ describe('move to new droppable', () => {
           });
 
           expect(result).toBe(null);
-          expect(console.error).toHaveBeenCalled();
+          expect(loggerError).toHaveBeenCalled();
         });
 
         it('should return null and log an error if the target is not inside the droppable', () => {
@@ -82,7 +84,7 @@ describe('move to new droppable', () => {
           });
 
           expect(result).toBe(null);
-          expect(console.error).toHaveBeenCalled();
+          expect(loggerError).toHaveBeenCalled();
         });
 
         describe('moving back into original index', () => {

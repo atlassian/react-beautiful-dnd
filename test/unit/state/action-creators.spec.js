@@ -20,6 +20,7 @@ import type {
   Store,
   InitialDragPositions,
 } from '../../../src/types';
+import * as logger from '../../../src/log';
 
 const preset = getPreset();
 const origin: Position = { x: 0, y: 0 };
@@ -49,14 +50,15 @@ const liftWithDefaults = (args?: LiftFnArgs = liftDefaults) => {
 
 describe('action creators', () => {
   describe('lift', () => {
+    let loggerError;
     beforeEach(() => {
       jest.useFakeTimers();
-      jest.spyOn(console, 'error').mockImplementation(() => { });
+      loggerError = jest.spyOn(logger, 'error').mockImplementation(() => { });
     });
 
     afterEach(() => {
+      loggerError.mockRestore();
       jest.useRealTimers();
-      console.error.mockRestore();
     });
 
     // This test is more a baseline for the others
@@ -106,7 +108,7 @@ describe('action creators', () => {
         // $ExpectError - not checking for null in state shape
         expect(dispatch).toHaveBeenCalledWith(completeDrop(current.drop.pending.result));
         expect(dispatch).toHaveBeenCalledWith(prepare());
-        expect(console.error).not.toHaveBeenCalled();
+        expect(loggerError).not.toHaveBeenCalled();
       });
 
       it('should clean the state and log an error if there is an invalid drop animating state', () => {
@@ -121,7 +123,7 @@ describe('action creators', () => {
         liftWithDefaults()(dispatch, getState);
 
         expect(dispatch).toHaveBeenCalledWith(clean());
-        expect(console.error).toHaveBeenCalled();
+        expect(loggerError).toHaveBeenCalled();
       });
 
       it('should not begin a lift if the drag is cancelled while the animations are flushing', () => {

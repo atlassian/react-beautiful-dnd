@@ -19,6 +19,7 @@ import type {
 import noImpact from './no-impact';
 import getNewHomeClientCenter from './get-new-home-client-center';
 import { add, subtract, isEqual } from './position';
+import * as logger from '../log';
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -287,13 +288,13 @@ export const drop = () =>
 
     // dropped in another phase except for dragging - this is an error
     if (state.phase !== 'DRAGGING') {
-      console.error(`not able to drop in phase: '${state.phase}'`);
+      logger.error(`not able to drop in phase: '${state.phase}'`);
       dispatch(clean());
       return;
     }
 
     if (!state.drag) {
-      console.error('not able to drop when there is invalid drag state', state);
+      logger.error('not able to drop when there is invalid drag state', state);
       dispatch(clean());
       return;
     }
@@ -365,7 +366,7 @@ export const cancel = () =>
     }
 
     if (!state.drag) {
-      console.error('invalid drag state', state);
+      logger.error('invalid drag state', state);
       dispatch(clean());
       return;
     }
@@ -409,13 +410,13 @@ export const dropAnimationFinished = () =>
     const state: State = getState();
 
     if (state.phase !== 'DROP_ANIMATING') {
-      console.error('cannot end drop that is no longer animating', state);
+      logger.error('cannot end drop that is no longer animating', state);
       dispatch(clean());
       return;
     }
 
     if (!state.drop || !state.drop.pending) {
-      console.error('cannot end drop that has no pending state', state);
+      logger.error('cannot end drop that has no pending state', state);
       dispatch(clean());
       return;
     }
@@ -447,7 +448,7 @@ export const lift = (id: DraggableId,
   // this can change the descriptor of the dragging item
   if (initial.phase === 'DROP_ANIMATING') {
     if (!initial.drop || !initial.drop.pending) {
-      console.error('cannot flush drop animation if there is no pending');
+      logger.error('cannot flush drop animation if there is no pending');
       dispatch(clean());
     } else {
       // this can cause descriptor updates in the dimension marshal

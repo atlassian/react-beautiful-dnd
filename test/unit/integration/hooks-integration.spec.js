@@ -17,6 +17,8 @@ import type {
 import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';
 import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';
 import * as keyCodes from '../../../src/view/key-codes';
+// eslint-disable-next-line no-unused-vars
+import * as logger from '../../../src/log';
 
 const windowMouseMove = dispatchWindowMouseEvent.bind(null, 'mousemove');
 const windowMouseUp = dispatchWindowMouseEvent.bind(null, 'mouseup');
@@ -26,6 +28,7 @@ const cancelWithKeyboard = dispatchWindowKeyDownEvent.bind(null, keyCodes.escape
 describe('hooks integration', () => {
   let hooks: Hooks;
   let wrapper;
+  let loggerError;
 
   const draggableId: DraggableId = 'drag-1';
   const droppableId: DroppableId = 'drop-1';
@@ -94,7 +97,7 @@ describe('hooks integration', () => {
     };
     wrapper = getMountedApp();
     // unmounting during a drag can cause a warning
-    jest.spyOn(console, 'warn').mockImplementation(() => { });
+    loggerError = jest.spyOn(logger, 'warn').mockImplementation(() => { });
   });
 
   afterEach(() => {
@@ -103,6 +106,7 @@ describe('hooks integration', () => {
 
     // clean up any loose events
     wrapper.unmount();
+    loggerError.mockRestore();
 
     // clean up any stubs
     if (Element.prototype.getBoundingClientRect.mockRestore) {
@@ -111,8 +115,6 @@ describe('hooks integration', () => {
     if (window.getComputedStyle.mockRestore) {
       window.getComputedStyle.mockRestore();
     }
-
-    console.warn.mockRestore();
   });
 
   const drag = (() => {
