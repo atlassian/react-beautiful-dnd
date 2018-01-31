@@ -44,13 +44,17 @@ const canScroll = ({
     return false;
   }
 
+  console.log('smallest change', smallestChange);
+
   // Too far back
-  if (target.y <= 0 && target.x <= 0) {
+  if (target.y < 0 || target.x < 0) {
+    console.log('too far back');
     return false;
   }
 
   // Too far forward
-  if (target.y >= max.y && target.x >= max.x) {
+  if (target.y > max.y || target.x > max.x) {
+    console.log('too far forward');
     return false;
   }
 
@@ -80,6 +84,11 @@ const getMaxWindowScroll = (): Position => {
 export const canScrollWindow = (change: Position): boolean => {
   const maxScroll: Position = getMaxWindowScroll();
   const currentScroll: Position = getWindowScrollPosition();
+
+  console.group('can scroll window');
+  console.log('max scroll', maxScroll);
+  console.log('current', currentScroll);
+  console.groupEnd();
 
   return canScroll({
     current: currentScroll,

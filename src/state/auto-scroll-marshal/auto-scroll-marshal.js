@@ -270,6 +270,8 @@ export default ({
 
     if (!canScrollWindow(request)) {
       console.warn('Jump scroll requested but it cannot be done by Droppable or the Window');
+      performMove(state, request);
+      return;
     }
 
     const overlap: ?Position = getWindowOverlap(request);
