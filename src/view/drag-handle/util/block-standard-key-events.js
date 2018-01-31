@@ -2,15 +2,19 @@
 import * as keyCodes from '../../key-codes';
 import stopEvent from './stop-event';
 
-const blocked: number[] = [
+type KeyMap = {
+  [key: number]: true
+}
+
+const blocked: KeyMap = {
   // submission
-  keyCodes.enter,
+  [keyCodes.enter]: true,
   // tabbing
-  keyCodes.tab,
-];
+  [keyCodes.tab]: true,
+};
 
 export default (event: KeyboardEvent) => {
-  if (blocked.indexOf(event.keyCode) >= 0) {
+  if (blocked[event.keyCode]) {
     stopEvent(event);
   }
 };

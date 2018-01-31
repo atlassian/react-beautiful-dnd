@@ -21,11 +21,18 @@ type ExecuteBasedOnDirection = {|
   horizontal: () => void,
 |}
 
-const noop = () => { };
+type KeyMap = {
+  [key: number]: true
+}
 
-const scrollJumpKeys: number[] = [
-  keyCodes.pageDown, keyCodes.pageUp, keyCodes.home, keyCodes.end,
-];
+const scrollJumpKeys: KeyMap = {
+  [keyCodes.pageDown]: true,
+  [keyCodes.pageUp]: true,
+  [keyCodes.home]: true,
+  [keyCodes.end]: true,
+};
+
+const noop = () => { };
 
 export default ({
   callbacks,
@@ -164,7 +171,7 @@ export default ({
     blockStandardKeyEvents(event);
 
     // blocking scroll jumping at this time
-    if (scrollJumpKeys.indexOf(event.keyCode) >= 0) {
+    if (scrollJumpKeys[event.keyCode]) {
       stopEvent(event);
     }
   };
