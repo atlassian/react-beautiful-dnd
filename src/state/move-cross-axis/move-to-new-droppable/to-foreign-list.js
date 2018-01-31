@@ -12,6 +12,7 @@ import type {
   DroppableDimension,
   Displacement,
 } from '../../../types';
+import * as logger from '../../../log';
 
 type Args = {|
   amount: Position,
@@ -75,7 +76,7 @@ export default ({
   const proposedIndex: number = isGoingBeforeTarget ? targetIndex : targetIndex + 1;
 
   if (targetIndex === -1) {
-    console.error('could not find target inside destination');
+    logger.error('could not find target inside destination');
     return null;
   }
 

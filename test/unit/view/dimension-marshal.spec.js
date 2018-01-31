@@ -22,6 +22,7 @@ import type {
   DroppableDescriptor,
   Area,
 } from '../../../src/types';
+import * as logger from '../../../src/log';
 
 const getCallbackStub = (): Callbacks => {
   const callbacks: Callbacks = {
@@ -124,21 +125,23 @@ const childOfAnotherType: DraggableDimension = getDraggableDimension({
 });
 
 describe('dimension marshal', () => {
+  let loggerError;
+  let loggerWarn;
   beforeAll(() => {
     requestAnimationFrame.reset();
   });
 
   beforeEach(() => {
     jest.useFakeTimers();
-    jest.spyOn(console, 'error').mockImplementation(() => { });
-    jest.spyOn(console, 'warn').mockImplementation(() => { });
+    loggerError = jest.spyOn(logger, 'error').mockImplementation(() => { });
+    loggerWarn = jest.spyOn(logger, 'warn').mockImplementation(() => { });
   });
 
   afterEach(() => {
     requestAnimationFrame.reset();
     jest.useRealTimers();
-    console.error.mockRestore();
-    console.warn.mockRestore();
+    loggerError.mockRestore();
+    loggerWarn.mockRestore();
   });
 
   describe('drag starting (including early cancel)', () => {
@@ -380,7 +383,7 @@ describe('dimension marshal', () => {
           marshal.onPhaseChange(state.dragging(preset.inHome2.descriptor.id));
 
           expect(callbacks.cancel).toHaveBeenCalled();
-          expect(console.error).toHaveBeenCalled();
+          expect(loggerError).toHaveBeenCalled();
 
           // flush frames to ensure that a collection is not occurring
           requestAnimationFrame.flush();
@@ -782,7 +785,7 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(getCallbackStub());
 
           marshal.registerDraggable(preset.inHome1.descriptor, getDraggableDimensionFn);
-          expect(console.error).toHaveBeenCalled();
+          expect(loggerError).toHaveBeenCalled();
         });
 
         it('should be published in the next collection', () => {
@@ -832,7 +835,7 @@ describe('dimension marshal', () => {
 
           marshal.unregisterDroppable(preset.home.descriptor);
 
-          expect(console.error).toHaveBeenCalled();
+          expect(loggerError).toHaveBeenCalled();
         });
 
         it('should not error if the droppable still has registered draggables', () => {
@@ -844,7 +847,7 @@ describe('dimension marshal', () => {
 
           // unregistering the foreign droppable without unregistering its children
           marshal.unregisterDroppable(preset.foreign.descriptor);
-          expect(console.warn).not.toHaveBeenCalled();
+          expect(loggerWarn).not.toHaveBeenCalled();
         });
 
         it('should remove the dimension if it exists', () => {
@@ -859,7 +862,7 @@ describe('dimension marshal', () => {
           preset.inForeignList.forEach((dimension: DraggableDimension) => {
             marshal.unregisterDraggable(dimension.descriptor);
           });
-          expect(console.warn).not.toHaveBeenCalled();
+          expect(loggerWarn).not.toHaveBeenCalled();
 
           // lift, collect and publish
           marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
@@ -876,7 +879,7 @@ describe('dimension marshal', () => {
             .not.toContain(preset.foreign);
 
           // checking we are not causing an orphan child warning
-          expect(console.warn).not.toHaveBeenCalled();
+          expect(loggerWarn).not.toHaveBeenCalled();
         });
 
         // This should never happen - this test is just checking that the error logging is occurring
@@ -887,7 +890,7 @@ describe('dimension marshal', () => {
 
           // unregistering the foreign droppable
           marshal.unregisterDroppable(preset.foreign.descriptor);
-          expect(console.warn).not.toHaveBeenCalled();
+          expect(loggerWarn).not.toHaveBeenCalled();
           // not unregistering children (bad)
 
           // lift, collect and publish
@@ -903,7 +906,7 @@ describe('dimension marshal', () => {
           });
 
           // this should cause an orphan child warning
-          expect(console.warn).toHaveBeenCalledTimes(preset.inForeignList.length);
+          expect(loggerWarn).toHaveBeenCalledTimes(preset.inForeignList.length);
         });
 
         it('should not remove an overwritten entry', () => {
@@ -952,7 +955,7 @@ describe('dimension marshal', () => {
 
           marshal.unregisterDraggable(preset.inHome1.descriptor);
 
-          expect(console.error).toHaveBeenCalled();
+          expect(loggerError).toHaveBeenCalled();
         });
 
         it('should remove the dimension if it exists', () => {
@@ -960,7 +963,7 @@ describe('dimension marshal', () => {
           const watchers = populateMarshal(marshal);
 
           marshal.unregisterDraggable(preset.inForeign1.descriptor);
-          expect(console.error).not.toHaveBeenCalled();
+          expect(loggerError).not.toHaveBeenCalled();
 
           marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
           // perform full lift
@@ -1040,7 +1043,7 @@ describe('dimension marshal', () => {
           marshal.registerDraggable(fake.descriptor, () => fake);
 
           expect(callbacks.publishDraggables).not.toHaveBeenCalled();
-          expect(console.warn).toHaveBeenCalled();
+          expect(loggerWarn).toHaveBeenCalled();
         });
       });
 
@@ -1070,7 +1073,7 @@ describe('dimension marshal', () => {
           marshal.registerDroppable(fake.descriptor, droppableCallbacks);
 
           // warning should have been logged and nothing updated
-          expect(console.warn).toHaveBeenCalled();
+          expect(loggerWarn).toHaveBeenCalled();
           expect(callbacks.publishDroppables).not.toHaveBeenCalled();
           expect(droppableCallbacks.watchScroll).not.toHaveBeenCalled();
         });
@@ -1085,7 +1088,7 @@ describe('dimension marshal', () => {
 
       marshal.updateDroppableScroll(preset.home.descriptor.id, { x: 100, y: 230 });
 
-      expect(console.error).toHaveBeenCalled();
+      expect(loggerError).toHaveBeenCalled();
       expect(callbacks.updateDroppableScroll).not.toHaveBeenCalled();
     });
 
@@ -1096,7 +1099,7 @@ describe('dimension marshal', () => {
 
       marshal.updateDroppableScroll(preset.home.descriptor.id, { x: 100, y: 230 });
 
-      expect(console.error).not.toHaveBeenCalled();
+      expect(loggerError).not.toHaveBeenCalled();
       expect(callbacks.updateDroppableScroll).not.toHaveBeenCalled();
     });
 
@@ -1122,7 +1125,7 @@ describe('dimension marshal', () => {
 
       marshal.updateDroppableIsEnabled(preset.home.descriptor.id, false);
 
-      expect(console.error).toHaveBeenCalled();
+      expect(loggerError).toHaveBeenCalled();
       expect(callbacks.updateDroppableIsEnabled).not.toHaveBeenCalled();
     });
 
@@ -1133,7 +1136,7 @@ describe('dimension marshal', () => {
 
       marshal.updateDroppableIsEnabled(preset.home.descriptor.id, false);
 
-      expect(console.error).not.toHaveBeenCalled();
+      expect(loggerError).not.toHaveBeenCalled();
       expect(callbacks.updateDroppableIsEnabled).not.toHaveBeenCalled();
     });
 

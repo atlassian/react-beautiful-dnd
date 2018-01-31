@@ -13,6 +13,7 @@ import type {
   DraggableDimension,
   DroppableDimension,
 } from '../../../types';
+import * as logger from '../../../log';
 
 type Args = {|
   amount: Position,
@@ -34,7 +35,7 @@ export default ({
   previousImpact,
 }: Args): ?Result => {
   if (!target) {
-    console.error('there will always be a target in the original list');
+    logger.error('there will always be a target in the original list');
     return null;
   }
 
@@ -42,7 +43,7 @@ export default ({
   const targetIndex: number = insideDroppable.indexOf(target);
 
   if (targetIndex === -1) {
-    console.error('unable to find target in destination droppable');
+    logger.error('unable to find target in destination droppable');
     return null;
   }
 

@@ -22,6 +22,7 @@ import type {
   DroppableEntryMap,
   DraggableEntryMap,
 } from './dimension-marshal-types';
+import * as logger from '../../log';
 
 type State = {|
   // long lived
@@ -55,7 +56,7 @@ export default (callbacks: Callbacks) => {
   };
 
   const cancel = (...args: mixed[]) => {
-    console.error(...args);
+    logger.error(...args);
 
     if (!state.isCollecting) {
       return;
@@ -98,7 +99,7 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    console.warn('Adding a draggable during a drag is currently not supported');
+    logger.warn('Adding a draggable during a drag is currently not supported');
   };
 
   const registerDroppable = (
@@ -129,7 +130,7 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    console.warn('Currently not supporting updating Droppables during a drag');
+    logger.warn('Currently not supporting updating Droppables during a drag');
   };
 
   const updateDroppableIsEnabled = (id: DroppableId, isEnabled: boolean) => {
@@ -184,7 +185,7 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    console.warn('currently not supporting unmounting a Draggable during a drag');
+    logger.warn('currently not supporting unmounting a Draggable during a drag');
   };
 
   const unregisterDroppable = (descriptor: DroppableDescriptor) => {
@@ -218,7 +219,7 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    console.warn('currently not supporting unmounting a Droppable during a drag');
+    logger.warn('currently not supporting unmounting a Droppable during a drag');
   };
 
   const getToBeCollected = (): UnknownDescriptorType[] => {
@@ -227,7 +228,7 @@ export default (callbacks: Callbacks) => {
     const request: ?DraggableId = state.request;
 
     if (!request) {
-      console.error('cannot find request in state');
+      logger.error('cannot find request in state');
       return [];
     }
 
@@ -246,7 +247,7 @@ export default (callbacks: Callbacks) => {
           // This should never happen
           // but it is better to print this information and continue on
           if (!entry) {
-            console.warn(`Orphan Draggable found ${item.id} which says it belongs to unknown Droppable ${item.droppableId}`);
+            logger.warn(`Orphan Draggable found ${item.id} which says it belongs to unknown Droppable ${item.droppableId}`);
             return false;
           }
 

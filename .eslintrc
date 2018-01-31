@@ -83,7 +83,7 @@
     "no-underscore-dangle": ["error", { "allowAfterThis": true }],
 
     // Allowing warning and error console logging
-    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "no-console": "error",
 
     // All blocks must be wrapped in curly braces {}
     // Preventing if(condition) return;

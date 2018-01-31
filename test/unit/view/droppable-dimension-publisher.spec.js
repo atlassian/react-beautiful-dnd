@@ -22,6 +22,7 @@ import type {
   DroppableDescriptor,
   TypeId,
 } from '../../../src/types';
+import * as logger from '../../../src/log';
 
 const noMargin = {
   marginTop: '0',
@@ -100,17 +101,18 @@ const getMarshalStub = (): DimensionMarshal => ({
 });
 
 describe('DraggableDimensionPublisher', () => {
+  let loggerError;
   const originalWindowScroll: Position = {
     x: window.pageXOffset,
     y: window.pageYOffset,
   };
 
   beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => { });
+    loggerError = jest.spyOn(logger, 'error').mockImplementation(() => { });
   });
 
   afterEach(() => {
-    console.error.mockRestore();
+    loggerError.mockRestore();
   });
 
   afterEach(() => {
@@ -158,7 +160,7 @@ describe('DraggableDimensionPublisher', () => {
       // updating without a targetRef
       forceUpdate(wrapper);
 
-      expect(console.error).toHaveBeenCalled();
+      expect(loggerError).toHaveBeenCalled();
       expect(marshal.registerDroppable).not.toHaveBeenCalled();
     });
 
@@ -596,6 +598,16 @@ describe('DraggableDimensionPublisher', () => {
   });
 
   describe('scroll watching', () => {
+    let loggerWarn;
+
+    beforeEach(() => {
+      loggerWarn = jest.spyOn(logger, 'warn').mockImplementation(() => { });
+    });
+
+    afterEach(() => {
+      loggerWarn.mockRestore();
+    });
+
     const scroll = (el: HTMLElement, target: Position) => {
       el.scrollTop = target.y;
       el.scrollLeft = target.x;
@@ -761,7 +773,6 @@ describe('DraggableDimensionPublisher', () => {
     });
 
     it('should stop watching for scroll events when the component is unmounted', () => {
-      jest.spyOn(console, 'warn').mockImplementation(() => { });
       const marshal: DimensionMarshal = getMarshalStub();
       const wrapper = mount(
         <ScrollableItem />,
@@ -782,10 +793,7 @@ describe('DraggableDimensionPublisher', () => {
       requestAnimationFrame.step();
       expect(marshal.updateDroppableScroll).not.toHaveBeenCalled();
       // also logs a warning
-      expect(console.warn).toHaveBeenCalled();
-
-      // cleanup
-      console.warn.mockRestore();
+      expect(loggerWarn).toHaveBeenCalled();
     });
   });
 
