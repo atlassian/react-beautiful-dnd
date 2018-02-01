@@ -27,26 +27,27 @@ const getSmallestSignedValue = (value: number) => {
   return value > 0 ? 1 : -1;
 };
 
-const floor = apply(Math.floor);
+// TODO: should this be round or floor?
+const round = apply(Math.round);
 
 const isTooFarBackInBothDirections = (targetScroll: Position): boolean => {
-  const floored: Position = floor(targetScroll);
-  return floored.y <= 0 && floored.x <= 0;
+  const rounded: Position = round(targetScroll);
+  return rounded.y <= 0 && rounded.x <= 0;
 };
 
 const isTooFarForwardInBothDirections = (targetScroll: Position, maxScroll: Position): boolean => {
-  const floored: Position = floor(targetScroll);
-  return floored.y >= maxScroll.y && floored.x >= maxScroll.x;
+  const rounded: Position = round(targetScroll);
+  return rounded.y >= maxScroll.y && rounded.x >= maxScroll.x;
 };
 
 const isTooFarBackInEitherDirection = (targetScroll: Position): boolean => {
-  const floored: Position = floor(targetScroll);
-  return floored.y < 0 || floored.x < 0;
+  const rounded: Position = round(targetScroll);
+  return rounded.y < 0 || rounded.x < 0;
 };
 
 const isTooFarForwardInEitherDirection = (targetScroll: Position, maxScroll: Position): boolean => {
-  const floored: Position = floor(targetScroll);
-  return floored.y > maxScroll.y || floored.x > maxScroll.x;
+  const rounded: Position = round(targetScroll);
+  return rounded.y > maxScroll.y || rounded.x > maxScroll.x;
 };
 
 const canScroll = ({
