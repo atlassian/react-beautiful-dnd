@@ -80,7 +80,7 @@
     "rollup-plugin-node-resolve": "^3.0.2",
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-uglify": "^2.0.1",
-    "styled-components": "^2.4.0"
+    "styled-components": "^3.1.5"
   },
   "peerDependencies": {
     "react": ">=15.4.0 || ^16.0.0"
