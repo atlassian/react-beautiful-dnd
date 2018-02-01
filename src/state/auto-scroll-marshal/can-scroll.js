@@ -61,7 +61,6 @@ const canScroll = ({
   };
 
   const target: Position = add(current, smallestChange);
-  console.log('floored target', floor(target));
 
   if (isEqual(target, origin)) {
     return false;
