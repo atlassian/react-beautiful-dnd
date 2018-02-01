@@ -27,10 +27,16 @@ const getSmallestSignedValue = (value: number) => {
   return value > 0 ? 1 : -1;
 };
 
-const isTooFarBack = (targetScroll: Position): boolean =>
+const isTooFarBackInBothDirections = (targetScroll: Position): boolean =>
+  targetScroll.y < 0 && targetScroll.x < 0;
+
+const isTooFarForwardInBothDirections = (targetScroll: Position, maxScroll: Position): boolean =>
+  targetScroll.y > maxScroll.y && targetScroll.x > maxScroll.x;
+
+const isTooFarBackInEitherDirection = (targetScroll: Position): boolean =>
   targetScroll.y < 0 || targetScroll.x < 0;
 
-const isTooFarForward = (targetScroll: Position, maxScroll: Position): boolean =>
+const isTooFarForwardInEitherDirection = (targetScroll: Position, maxScroll: Position): boolean =>
   targetScroll.y > maxScroll.y || targetScroll.x > maxScroll.x;
 
 const canScroll = ({
@@ -52,12 +58,12 @@ const canScroll = ({
 
   console.log('smallest change', smallestChange);
 
-  if (isTooFarBack(target)) {
+  if (isTooFarBackInBothDirections(target)) {
     console.log('too far back');
     return false;
   }
 
-  if (isTooFarForward(target, max)) {
+  if (isTooFarForwardInBothDirections(target, max)) {
     console.log('too far forward');
     return false;
   }
@@ -133,18 +139,20 @@ const getOverlap = ({
   change,
 }: GetOverlapArgs): ?Position => {
   const target: Position = add(current, change);
+  console.log('getting overlap');
 
-  if (isTooFarBack(target)) {
-    const overlap: Position = {
-      x: target.x,
-      y: target.y,
-    };
-    return overlap;
+  if (isTooFarBackInEitherDirection(target)) {
+    console.log('backward overlap');
+    return target;
   }
 
-  if (isTooFarForward(target, max)) {
-    console.log('backward overlap');
-    const overlap: Position = subtract(target, max);
+  if (isTooFarForwardInEitherDirection(target, max)) {
+    const trimmedMax: Position = {
+      x: target.x === 0 ? 0 : max.x,
+      y: target.y === 0 ? 0 : max.y,
+    };
+    const overlap: Position = subtract(target, trimmedMax);
+    console.log('forward overlap', target, overlap);
     return overlap;
   }
 

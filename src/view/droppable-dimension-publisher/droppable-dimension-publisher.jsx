@@ -9,6 +9,7 @@ import getArea from '../../state/get-area';
 import { getDroppableDimension } from '../../state/dimension';
 import getClosestScrollable from '../get-closest-scrollable';
 import { dimensionMarshalKey } from '../context-keys';
+import getScrollSafeAreaForElement from '../../state/get-scroll-safe-area-for-element';
 import type {
   DimensionMarshal,
   DroppableCallbacks,
@@ -269,27 +270,16 @@ export default class DroppableDimensionPublisher extends Component<Props> {
         return null;
       }
 
-      console.log('closest', closestScrollable);
-
       // TODO: add margin to client?
-      const frameClient: Area = getArea(closestScrollable.getBoundingClientRect());
+      const frameClient: Area = getScrollSafeAreaForElement((closestScrollable: any));
+      const scroll: Position = this.getClosestScroll();
       const scrollWidth: number = closestScrollable.scrollWidth;
       const scrollHeight: number = closestScrollable.scrollHeight;
-      const scroll: Position = this.getClosestScroll();
-
-      const verticalScrollBarWidth: number = closestScrollable.offsetWidth - closestScrollable.clientWidth;
-      const horizontalScrollBarHeight: number = closestScrollable.offsetHeight - closestScrollable.clientHeight;
-
-      const scrollWidthWithScrollBar: number = scrollWidth + verticalScrollBarWidth;
-      const scrollHeightWithScrollBar: number = scrollHeight + horizontalScrollBarHeight;
-
-      console.log('vertical scroll bar width', verticalScrollBarWidth);
-      console.log('horizontal scroll bar height', horizontalScrollBarHeight);
 
       return {
         frameClient,
-        scrollWidth: scrollWidthWithScrollBar,
-        scrollHeight: scrollHeightWithScrollBar,
+        scrollWidth,
+        scrollHeight,
         scroll,
         shouldClipSubject: !ignoreContainerClipping,
       };
