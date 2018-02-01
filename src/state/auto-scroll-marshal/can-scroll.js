@@ -1,5 +1,5 @@
 // @flow
-import { add, isEqual, subtract } from '../position';
+import { add, apply, isEqual, subtract } from '../position';
 // TODO: state reaching into VIEW :(
 import getWindowScrollPosition from '../../view/get-window-scroll-position';
 import getViewport from '../visibility/get-viewport';
@@ -27,17 +27,27 @@ const getSmallestSignedValue = (value: number) => {
   return value > 0 ? 1 : -1;
 };
 
-const isTooFarBackInBothDirections = (targetScroll: Position): boolean =>
-  targetScroll.y < 0 && targetScroll.x < 0;
+const floor = apply(Math.floor);
 
-const isTooFarForwardInBothDirections = (targetScroll: Position, maxScroll: Position): boolean =>
-  targetScroll.y > maxScroll.y && targetScroll.x > maxScroll.x;
+const isTooFarBackInBothDirections = (targetScroll: Position): boolean => {
+  const floored: Position = floor(targetScroll);
+  return floored.y <= 0 && floored.x <= 0;
+};
 
-const isTooFarBackInEitherDirection = (targetScroll: Position): boolean =>
-  targetScroll.y < 0 || targetScroll.x < 0;
+const isTooFarForwardInBothDirections = (targetScroll: Position, maxScroll: Position): boolean => {
+  const floored: Position = floor(targetScroll);
+  return floored.y >= maxScroll.y && floored.x >= maxScroll.x;
+};
 
-const isTooFarForwardInEitherDirection = (targetScroll: Position, maxScroll: Position): boolean =>
-  targetScroll.y > maxScroll.y || targetScroll.x > maxScroll.x;
+const isTooFarBackInEitherDirection = (targetScroll: Position): boolean => {
+  const floored: Position = floor(targetScroll);
+  return floored.y < 0 || floored.x < 0;
+};
+
+const isTooFarForwardInEitherDirection = (targetScroll: Position, maxScroll: Position): boolean => {
+  const floored: Position = floor(targetScroll);
+  return floored.y > maxScroll.y || floored.x > maxScroll.x;
+};
 
 const canScroll = ({
   max,
@@ -51,6 +61,7 @@ const canScroll = ({
   };
 
   const target: Position = add(current, smallestChange);
+  console.log('floored target', floor(target));
 
   if (isEqual(target, origin)) {
     return false;
@@ -59,12 +70,12 @@ const canScroll = ({
   console.log('smallest change', smallestChange);
 
   if (isTooFarBackInBothDirections(target)) {
-    console.log('too far back');
+    console.log('too far back', { target });
     return false;
   }
 
   if (isTooFarForwardInBothDirections(target, max)) {
-    console.log('too far forward');
+    console.log('too far forward', { target, max });
     return false;
   }
 
@@ -101,6 +112,11 @@ export const canScrollWindow = (change: Position): boolean => {
   console.group('can scroll window');
   console.log('max scroll', maxScroll);
   console.log('current', currentScroll);
+  console.log('can scroll?', canScroll({
+    current: currentScroll,
+    max: maxScroll,
+    change,
+  }));
   console.groupEnd();
 
   return canScroll({
@@ -119,6 +135,8 @@ export const canScrollDroppable = (
   if (!closestScrollable) {
     return false;
   }
+
+  console.warn('can scroll droppable?');
 
   return canScroll({
     current: closestScrollable.scroll.current,
