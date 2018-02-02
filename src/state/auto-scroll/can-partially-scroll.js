@@ -28,35 +28,58 @@ const smallestSigned = apply((value: number) => {
   return value > 0 ? 1 : -1;
 });
 
-const isTooFarBack = (targetScroll: Position): boolean =>
-  targetScroll.x < 0 || targetScroll.y < 0;
+type GetRemainderArgs = {|
+  current: Position,
+  max: Position,
+  change: Position,
+|}
 
-const isTooFarForward = (targetScroll: Position, maxScroll: Position): boolean =>
-  targetScroll.x > maxScroll.x || targetScroll.y > maxScroll.y;
+// We need to figure out how much of the movement
+// cannot be done with a scroll
+export const getRemainder = (() => {
+  const getOverlap = (target: number, max: number): number => {
+    if (target < 0) {
+      return target;
+    }
+    if (target > max) {
+      return target - max;
+    }
+    return 0;
+  };
+
+  return ({
+    current,
+    max,
+    change,
+  }: GetRemainderArgs): ?Position => {
+    const targetScroll: Position = add(current, change);
+
+    const remainder: Position = {
+      x: getOverlap(targetScroll.x, max.x),
+      y: getOverlap(targetScroll.y, max.y),
+    };
+
+    if (isEqual(remainder, origin)) {
+      return null;
+    }
+
+    return remainder;
+  };
+})();
 
 export const canPartiallyScroll = ({
   max,
   current,
   change,
 }: CanScrollArgs): boolean => {
-  // Sure - you can move nowhere if you want
-  if (isEqual(change, origin)) {
-    return true;
-  }
-
   // Only need to be able to move the smallest amount in the desired direction
   const smallestChange: Position = smallestSigned(change);
-  const targetScroll: Position = add(current, smallestChange);
+  const remainder: ?Position = getRemainder({
+    max, current, change: smallestChange,
+  });
 
-  if (isTooFarBack(targetScroll)) {
-    return false;
-  }
-
-  if (isTooFarForward(targetScroll, max)) {
-    return false;
-  }
-
-  return true;
+  // there will be no remainder if you can partially scroll
+  return !remainder;
 };
 
 const getMaxWindowScroll = (): Position => {
@@ -86,8 +109,6 @@ export const canScrollWindow = (change: Position): boolean => {
   const maxScroll: Position = getMaxWindowScroll();
   const currentScroll: Position = getWindowScrollPosition();
 
-  console.warn('can scroll window?');
-
   return canPartiallyScroll({
     current: currentScroll,
     max: maxScroll,
@@ -112,51 +133,6 @@ export const canScrollDroppable = (
     max: closestScrollable.scroll.max,
     change,
   });
-};
-
-type GetOverlapArgs = {|
-  current: Position,
-  max: Position,
-  change: Position,
-|}
-
-// We need to figure out how much of the movement
-// cannot be done with a scroll
-export const getRemainder = ({
-  current,
-  max,
-  change,
-}: GetOverlapArgs): ?Position => {
-  const canScroll: boolean = canPartiallyScroll({
-    current, max, change,
-  });
-
-  if (!canScroll) {
-    return null;
-  }
-
-  const targetScroll: Position = add(current, change);
-
-  if (isTooFarBack(targetScroll)) {
-    // if we are moving backwards, any value that is
-    // positive change be trimmed
-    const trimmed: Position = {
-      x: targetScroll.x > 0 ? 0 : targetScroll.x,
-      y: targetScroll.y > 0 ? 0 : targetScroll.y,
-    };
-    return trimmed;
-  }
-
-  if (isTooFarForward(targetScroll, max)) {
-    const trimmed: Position = {
-      x: targetScroll.x < max.x ? 0 : targetScroll.x - max.x,
-      y: targetScroll.y < max.y ? 0 : targetScroll.y - max.y,
-    };
-    return trimmed;
-  }
-
-  // no overlap
-  return null;
 };
 
 export const getWindowOverlap = (change: Position): ?Position => {

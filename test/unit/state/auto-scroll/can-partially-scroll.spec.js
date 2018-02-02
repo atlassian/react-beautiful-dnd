@@ -180,31 +180,8 @@ describe('can partially scroll', () => {
   });
 });
 
-describe('get overlap', () => {
-  it('should return null if you cannot partially scroll', () => {
-    // moving too far back
-    const current: Position = origin;
-    const max: Position = origin;
-    const tooFarBack: Position = { x: 0, y: -1 };
-
-    const result: ?Position = getRemainder({
-      current, max, change: tooFarBack,
-    });
-
-    expect(result).toBe(null);
-
-    // validating the result
-
-    const validate: boolean = canPartiallyScroll({
-      max,
-      current,
-      change: tooFarBack,
-    });
-
-    expect(validate).toBe(false);
-  });
-
-  it.only('should return the overlap', () => {
+describe('get remainder', () => {
+  describe('returning the remainder', () => {
     const max: Position = { x: 100, y: 100 };
     const current: Position = { x: 50, y: 50 };
 
@@ -213,38 +190,122 @@ describe('get overlap', () => {
       expected: Position,
     |}
 
-    const items: Item[] = [
-      // too far back: top
-      {
-        change: { x: -20, y: -70 },
-        expected: { x: 0, y: -20 },
-      },
-      // too far back: left
-      {
-        change: { x: -70, y: -40 },
-        expected: { x: -20, y: 0 },
-      },
-      // too far forward: right
-      {
-        change: { x: 70, y: 40 },
-        expected: { x: 20, y: 0 },
-      },
-      // too far forward: bottom
-      {
-        change: { x: 20, y: 70 },
-        expected: { x: 0, y: 20 },
-      },
+    it('should return overlap on a single axis', () => {
+      const items: Item[] = [
+        // too far back: top
+        {
+          change: { x: 0, y: -70 },
+          expected: { x: 0, y: -20 },
+        },
+        // too far back: left
+        {
+          change: { x: -70, y: 0 },
+          expected: { x: -20, y: 0 },
+        },
+        // too far forward: right
+        {
+          change: { x: 70, y: 0 },
+          expected: { x: 20, y: 0 },
+        },
+        // too far forward: bottom
+        {
+          change: { x: 0, y: 70 },
+          expected: { x: 0, y: 20 },
+        },
+      ];
 
-    ];
+      items.forEach((item: Item) => {
+        const result: ?Position = getRemainder({
+          current,
+          max,
+          change: item.change,
+        });
 
-    items.forEach((item: Item) => {
-      const result: ?Position = getRemainder({
-        current,
-        max,
-        change: item.change,
+        expect(result).toEqual(item.expected);
       });
+    });
 
-      expect(result).toEqual(item.expected);
+    it('should return overlap on two axis in the same direction', () => {
+      const items: Item[] = [
+        // too far back: top
+        {
+          change: { x: -80, y: -70 },
+          expected: { x: -30, y: -20 },
+        },
+        // too far back: left
+        {
+          change: { x: -70, y: -80 },
+          expected: { x: -20, y: -30 },
+        },
+        // too far forward: right
+        {
+          change: { x: 70, y: 0 },
+          expected: { x: 20, y: 0 },
+        },
+        // too far forward: bottom
+        {
+          change: { x: 80, y: 70 },
+          expected: { x: 30, y: 20 },
+        },
+      ];
+
+      items.forEach((item: Item) => {
+        const result: ?Position = getRemainder({
+          current,
+          max,
+          change: item.change,
+        });
+
+        expect(result).toEqual(item.expected);
+      });
+    });
+
+    it('should return overlap on two axis in different directions', () => {
+
+    });
+
+    it('should trim values that can be scrolled', () => {
+      const items: Item[] = [
+        // too far back: top
+        {
+          // x can be scrolled entirely
+          // y can be partially scrolled
+          change: { x: -20, y: -70 },
+          expected: { x: 0, y: -20 },
+        },
+        // too far back: left
+        {
+          // x can be partially scrolled
+          // y can be scrolled entirely
+          change: { x: -70, y: -40 },
+          expected: { x: -20, y: 0 },
+        },
+        // too far forward: right
+        {
+          // x can be partially scrolled
+          // y can be scrolled entirely
+          change: { x: 70, y: 40 },
+          expected: { x: 20, y: 0 },
+        },
+        // too far forward: bottom
+        {
+          // x can be scrolled entirely
+          // y can be partially scrolled
+          change: { x: 20, y: 70 },
+          expected: { x: 0, y: 20 },
+        },
+
+      ];
+
+      items.forEach((item: Item) => {
+        const result: ?Position = getRemainder({
+          current,
+          max,
+          change: item.change,
+        });
+
+        expect(result).toEqual(item.expected);
+      });
     });
   });
 });
