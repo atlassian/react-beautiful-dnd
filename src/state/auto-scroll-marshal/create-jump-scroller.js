@@ -40,6 +40,8 @@ export default ({
       return;
     }
 
+    console.warn('moving by offset', offset);
+
     const client: Position = add(drag.current.client.selection, offset);
     move(drag.initial.descriptor.id, client, getWindowScrollPosition(), true);
   };
@@ -81,10 +83,14 @@ export default ({
         if (!canScrollWindow(request)) {
           const overlap: ?Position = getDroppableOverlap(droppable, request);
 
+          console.log('droppable overlap?', overlap);
+
           if (overlap) {
             console.warn('DROPPABLE OVERLAP', overlap);
             moveByOffset(state, overlap);
           }
+        } else {
+          console.log('can still scroll window');
         }
 
         scrollDroppable(droppable.descriptor.id, request);

@@ -9,6 +9,7 @@ import getArea from '../../state/get-area';
 import { getDroppableDimension } from '../../state/dimension';
 import getClosestScrollable from '../get-closest-scrollable';
 import { dimensionMarshalKey } from '../context-keys';
+import { apply } from '../../state/position';
 import type {
   DimensionMarshal,
   DroppableCallbacks,
@@ -36,6 +37,7 @@ type Props = {|
 |}
 
 const origin: Position = { x: 0, y: 0 };
+const floor = apply(Math.floor);
 
 const getSafeScrollArea = (el: HTMLElement): Area => {
   const top: number = el.offsetTop;
@@ -79,10 +81,11 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       return origin;
     }
 
-    const offset: Position = {
+    // We are using the floor of all scroll values
+    const offset: Position = floor({
       x: this.closestScrollable.scrollLeft,
       y: this.closestScrollable.scrollTop,
-    };
+    });
 
     return offset;
   }

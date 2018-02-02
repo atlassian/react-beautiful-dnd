@@ -20,35 +20,48 @@ type CanScrollArgs = {|
 
 const origin: Position = { x: 0, y: 0 };
 
-const getSmallestSignedValue = (value: number) => {
+// TODO: should this be round or floor?
+const round = apply(Math.round);
+const floor = apply(Math.floor);
+const smallestSigned = apply((value: number) => {
   if (value === 0) {
     return 0;
   }
   return value > 0 ? 1 : -1;
+});
+
+const isTooFarBack = (targetScroll: Position): boolean => {
+  const floored: Position = floor(targetScroll);
+  console.log('floored', floored);
+
+  return floored.x < 0 || floored.y < 0;
 };
 
-// TODO: should this be round or floor?
-const round = apply(Math.round);
+const isTooFarForward = (targetScroll: Position, maxScroll: Position): boolean => {
+  const floored: Position = floor(targetScroll);
 
-const isTooFarBackInBothDirections = (targetScroll: Position): boolean => {
-  const rounded: Position = round(targetScroll);
-  return rounded.y <= 0 && rounded.x <= 0;
+  return floored.x > maxScroll.x || floored.y > maxScroll.y;
 };
 
-const isTooFarForwardInBothDirections = (targetScroll: Position, maxScroll: Position): boolean => {
-  const rounded: Position = round(targetScroll);
-  return rounded.y >= maxScroll.y && rounded.x >= maxScroll.x;
-};
+// const isTooFarBackInBothDirections = (targetScroll: Position): boolean => {
+//   const rounded: Position = round(targetScroll);
+//   return rounded.y < 0 && rounded.x < 0;
+// };
 
-const isTooFarBackInEitherDirection = (targetScroll: Position): boolean => {
-  const rounded: Position = round(targetScroll);
-  return rounded.y < 0 || rounded.x < 0;
-};
+// const isTooFarForwardInBothDirections = (targetScroll: Position, maxScroll: Position): boolean => {
+//   const rounded: Position = round(targetScroll);
+//   return rounded.y > maxScroll.y && rounded.x > maxScroll.x;
+// };
 
-const isTooFarForwardInEitherDirection = (targetScroll: Position, maxScroll: Position): boolean => {
-  const rounded: Position = round(targetScroll);
-  return rounded.y > maxScroll.y || rounded.x > maxScroll.x;
-};
+// const isTooFarBackInEitherDirection = (targetScroll: Position): boolean => {
+//   const rounded: Position = round(targetScroll);
+//   return rounded.y < 0 || rounded.x < 0;
+// };
+
+// const isTooFarForwardInEitherDirection = (targetScroll: Position, maxScroll: Position): boolean => {
+//   const rounded: Position = round(targetScroll);
+//   return rounded.y > maxScroll.y || rounded.x > maxScroll.x;
+// };
 
 const canScroll = ({
   max,
@@ -56,26 +69,27 @@ const canScroll = ({
   change,
 }: CanScrollArgs): boolean => {
   // Only need to be able to move the smallest amount in the desired direction
-  const smallestChange: Position = {
-    x: getSmallestSignedValue(change.x),
-    y: getSmallestSignedValue(change.y),
-  };
+  const smallestChange: Position = smallestSigned(change);
+  const targetScroll: Position = add(current, smallestChange);
 
-  const target: Position = add(current, smallestChange);
-
-  if (isEqual(target, origin)) {
+  if (isEqual(targetScroll, origin)) {
     return false;
   }
 
+  console.group('canScroll?');
   console.log('smallest change', smallestChange);
+  console.log('current', current);
+  console.log('target', targetScroll);
+  console.log('max', max);
+  console.groupEnd();
 
-  if (isTooFarBackInBothDirections(target)) {
-    console.log('too far back', { target });
+  if (isTooFarBack(targetScroll)) {
+    console.log('too far back', { targetScroll });
     return false;
   }
 
-  if (isTooFarForwardInBothDirections(target, max)) {
-    console.log('too far forward', { target, max });
+  if (isTooFarForward(targetScroll, max)) {
+    console.log('too far forward', { targetScroll, max });
     return false;
   }
 
@@ -109,15 +123,7 @@ export const canScrollWindow = (change: Position): boolean => {
   const maxScroll: Position = getMaxWindowScroll();
   const currentScroll: Position = getWindowScrollPosition();
 
-  console.group('can scroll window');
-  console.log('max scroll', maxScroll);
-  console.log('current', currentScroll);
-  console.log('can scroll?', canScroll({
-    current: currentScroll,
-    max: maxScroll,
-    change,
-  }));
-  console.groupEnd();
+  console.warn('can scroll window?');
 
   return canScroll({
     current: currentScroll,
@@ -156,15 +162,16 @@ const getOverlap = ({
   max,
   change,
 }: GetOverlapArgs): ?Position => {
-  const target: Position = add(current, change);
-  console.log('getting overlap');
+  const target: Position = apply((value: number) =>
+    (value > 0 ? Math.floor(value) : Math.ceil(value))
+  )(change);
 
-  if (isTooFarBackInEitherDirection(target)) {
+  if (isTooFarBack(target)) {
     console.log('backward overlap');
     return target;
   }
 
-  if (isTooFarForwardInEitherDirection(target, max)) {
+  if (isTooFarForward(target, max)) {
     const trimmedMax: Position = {
       x: target.x === 0 ? 0 : max.x,
       y: target.y === 0 ? 0 : max.y,
@@ -186,6 +193,7 @@ export const getWindowOverlap = (change: Position): ?Position => {
   const max: Position = getMaxWindowScroll();
   const current: Position = getWindowScrollPosition();
 
+  console.warn('getting window overlap');
   return getOverlap({
     current,
     max,
@@ -204,6 +212,7 @@ export const getDroppableOverlap = (droppable: DroppableDimension, change: Posit
     return null;
   }
 
+  console.log('getting droppable overlap');
   return getOverlap({
     current: closestScrollable.scroll.current,
     max: closestScrollable.scroll.max,

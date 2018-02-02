@@ -1,19 +1,34 @@
 // @flow
+import { apply } from '../state/position';
 import type { Position } from '../types';
 
-const origin: Position = { x: 0, y: 0 };
+const floor = apply(Math.floor);
 
-export default (): Position => {
-  const el: ?HTMLElement = document.documentElement;
+// The browsers update document.documentElement.scrollTop and window.pageYOffset
+// differently as the window scrolls.
 
-  // should never happen
-  if (!el) {
-    return origin;
-  }
+// Webkit
+// documentElement.scrollTop: no update. Stays at 0
+// window.pageYOffset: updates to whole number
 
-  return {
-    x: el.scrollLeft,
-    y: el.scrollTop,
-  };
-};
+// Chrome
+// documentElement.scrollTop: update with fractional value
+// window.pageYOffset: update with fractional value
+
+// FireFox
+// documentElement.scrollTop: updates to whole number
+// window.pageYOffset: updates to whole number
+
+// IE11 (same as firefox)
+// documentElement.scrollTop: updates to whole number
+// window.pageYOffset: updates to whole number
+
+// Edge (same as webkit)
+// documentElement.scrollTop: no update. Stays at 0
+// window.pageYOffset: updates to whole number
+
+export default (): Position => floor({
+  x: window.pageXOffset,
+  y: window.pageYOffset,
+});
 
