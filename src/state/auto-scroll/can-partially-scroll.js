@@ -21,8 +21,6 @@ type CanScrollArgs = {|
 const origin: Position = { x: 0, y: 0 };
 
 // TODO: should this be round or floor?
-const round = apply(Math.round);
-const floor = apply(Math.floor);
 const smallestSigned = apply((value: number) => {
   if (value === 0) {
     return 0;
@@ -30,66 +28,31 @@ const smallestSigned = apply((value: number) => {
   return value > 0 ? 1 : -1;
 });
 
-const isTooFarBack = (targetScroll: Position): boolean => {
-  const floored: Position = floor(targetScroll);
-  console.log('floored', floored);
+const isTooFarBack = (targetScroll: Position): boolean =>
+  targetScroll.x < 0 || targetScroll.y < 0;
 
-  return floored.x < 0 || floored.y < 0;
-};
+const isTooFarForward = (targetScroll: Position, maxScroll: Position): boolean =>
+  targetScroll.x > maxScroll.x || targetScroll.y > maxScroll.y;
 
-const isTooFarForward = (targetScroll: Position, maxScroll: Position): boolean => {
-  const floored: Position = floor(targetScroll);
-
-  return floored.x > maxScroll.x || floored.y > maxScroll.y;
-};
-
-// const isTooFarBackInBothDirections = (targetScroll: Position): boolean => {
-//   const rounded: Position = round(targetScroll);
-//   return rounded.y < 0 && rounded.x < 0;
-// };
-
-// const isTooFarForwardInBothDirections = (targetScroll: Position, maxScroll: Position): boolean => {
-//   const rounded: Position = round(targetScroll);
-//   return rounded.y > maxScroll.y && rounded.x > maxScroll.x;
-// };
-
-// const isTooFarBackInEitherDirection = (targetScroll: Position): boolean => {
-//   const rounded: Position = round(targetScroll);
-//   return rounded.y < 0 || rounded.x < 0;
-// };
-
-// const isTooFarForwardInEitherDirection = (targetScroll: Position, maxScroll: Position): boolean => {
-//   const rounded: Position = round(targetScroll);
-//   return rounded.y > maxScroll.y || rounded.x > maxScroll.x;
-// };
-
-const canScroll = ({
+export const canPartiallyScroll = ({
   max,
   current,
   change,
 }: CanScrollArgs): boolean => {
+  // Sure - you can move nowhere if you want
+  if (isEqual(change, origin)) {
+    return true;
+  }
+
   // Only need to be able to move the smallest amount in the desired direction
   const smallestChange: Position = smallestSigned(change);
   const targetScroll: Position = add(current, smallestChange);
 
-  if (isEqual(targetScroll, origin)) {
-    return false;
-  }
-
-  console.group('canScroll?');
-  console.log('smallest change', smallestChange);
-  console.log('current', current);
-  console.log('target', targetScroll);
-  console.log('max', max);
-  console.groupEnd();
-
   if (isTooFarBack(targetScroll)) {
-    console.log('too far back', { targetScroll });
     return false;
   }
 
   if (isTooFarForward(targetScroll, max)) {
-    console.log('too far forward', { targetScroll, max });
     return false;
   }
 
@@ -125,7 +88,7 @@ export const canScrollWindow = (change: Position): boolean => {
 
   console.warn('can scroll window?');
 
-  return canScroll({
+  return canPartiallyScroll({
     current: currentScroll,
     max: maxScroll,
     change,
@@ -144,7 +107,7 @@ export const canScrollDroppable = (
 
   console.warn('can scroll droppable?');
 
-  return canScroll({
+  return canPartiallyScroll({
     current: closestScrollable.scroll.current,
     max: closestScrollable.scroll.max,
     change,
@@ -157,28 +120,39 @@ type GetOverlapArgs = {|
   change: Position,
 |}
 
-const getOverlap = ({
+// We need to figure out how much of the movement
+// cannot be done with a scroll
+export const getRemainder = ({
   current,
   max,
   change,
 }: GetOverlapArgs): ?Position => {
-  const target: Position = apply((value: number) =>
-    (value > 0 ? Math.floor(value) : Math.ceil(value))
-  )(change);
+  const canScroll: boolean = canPartiallyScroll({
+    current, max, change,
+  });
 
-  if (isTooFarBack(target)) {
-    console.log('backward overlap');
-    return target;
+  if (!canScroll) {
+    return null;
   }
 
-  if (isTooFarForward(target, max)) {
-    const trimmedMax: Position = {
-      x: target.x === 0 ? 0 : max.x,
-      y: target.y === 0 ? 0 : max.y,
+  const targetScroll: Position = add(current, change);
+
+  if (isTooFarBack(targetScroll)) {
+    // if we are moving backwards, any value that is
+    // positive change be trimmed
+    const trimmed: Position = {
+      x: targetScroll.x > 0 ? 0 : targetScroll.x,
+      y: targetScroll.y > 0 ? 0 : targetScroll.y,
     };
-    const overlap: Position = subtract(target, trimmedMax);
-    console.log('forward overlap', target, overlap);
-    return overlap;
+    return trimmed;
+  }
+
+  if (isTooFarForward(targetScroll, max)) {
+    const trimmed: Position = {
+      x: targetScroll.x < max.x ? 0 : targetScroll.x - max.x,
+      y: targetScroll.y < max.y ? 0 : targetScroll.y - max.y,
+    };
+    return trimmed;
   }
 
   // no overlap
@@ -194,7 +168,7 @@ export const getWindowOverlap = (change: Position): ?Position => {
   const current: Position = getWindowScrollPosition();
 
   console.warn('getting window overlap');
-  return getOverlap({
+  return getRemainder({
     current,
     max,
     change,
@@ -213,7 +187,7 @@ export const getDroppableOverlap = (droppable: DroppableDimension, change: Posit
   }
 
   console.log('getting droppable overlap');
-  return getOverlap({
+  return getRemainder({
     current: closestScrollable.scroll.current,
     max: closestScrollable.scroll.max,
     change,

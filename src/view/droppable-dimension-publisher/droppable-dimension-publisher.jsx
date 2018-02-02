@@ -81,11 +81,10 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       return origin;
     }
 
-    // We are using the floor of all scroll values
-    const offset: Position = floor({
+    const offset: Position = {
       x: this.closestScrollable.scrollLeft,
       y: this.closestScrollable.scrollTop,
-    });
+    };
 
     return offset;
   }
