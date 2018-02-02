@@ -1173,7 +1173,7 @@ type DroppableProvided = {|
   placeholder: ?ReactElement,
 |}
 
-type DraggableStateSnapshot = {|
+type DroppableStateSnapshot = {|
   isDraggingOver: boolean,
 |}
 
