@@ -17,7 +17,6 @@ import type {
   DragImpact,
   Area,
 } from '../../types';
-import * as logger from '../../log';
 
 const getIndex = memoizeOne(
   (draggables: DraggableDimension[],
@@ -35,7 +34,7 @@ export default ({
   const location: ?DraggableLocation = previousImpact.destination;
 
   if (!location) {
-    logger.error('cannot move to next index when there is not previous destination');
+    console.error('cannot move to next index when there is not previous destination');
     return null;
   }
 
@@ -52,7 +51,7 @@ export default ({
   const proposedIndex = isMovingForward ? currentIndex + 1 : currentIndex - 1;
 
   if (startIndex === -1) {
-    logger.error('could not find draggable inside current droppable');
+    console.error('could not find draggable inside current droppable');
     return null;
   }
 

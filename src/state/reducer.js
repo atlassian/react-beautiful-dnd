@@ -31,7 +31,6 @@ import type { Result as MoveToNextResult } from './move-to-next-index/move-to-ne
 import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';
 import moveCrossAxis from './move-cross-axis/';
 import { scrollDroppable } from './dimension';
-import * as logger from '../log';
 
 const noDimensions: DimensionState = {
   request: null,
@@ -69,14 +68,14 @@ const move = ({
   impact,
 }: MoveArgs): State => {
   if (state.phase !== 'DRAGGING') {
-    logger.error('cannot move while not dragging');
+    console.error('cannot move while not dragging');
     return clean();
   }
 
   const last: ?DragState = state.drag;
 
   if (last == null) {
-    logger.error('cannot move if there is no drag information');
+    console.error('cannot move if there is no drag information');
     return clean();
   }
 
@@ -141,7 +140,7 @@ const updateStateAfterDimensionChange = (newState: State): State => {
 
   // already dragging - need to recalculate impact
   if (!newState.drag) {
-    logger.error('cannot update a draggable dimension in an existing drag as there is invalid drag state');
+    console.error('cannot update a draggable dimension in an existing drag as there is invalid drag state');
     return clean();
   }
 
@@ -164,7 +163,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
   if (action.type === 'REQUEST_DIMENSIONS') {
     if (state.phase !== 'PREPARING') {
-      logger.error('trying to start a lift while not preparing for a lift');
+      console.error('trying to start a lift while not preparing for a lift');
       return clean();
     }
 
@@ -186,7 +185,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const dimensions: DraggableDimension[] = action.payload;
 
     if (!canPublishDimension(state.phase)) {
-      logger.warn('dimensions rejected as no longer allowing dimension capture in phase', state.phase);
+      console.warn('dimensions rejected as no longer allowing dimension capture in phase', state.phase);
       return state;
     }
 
@@ -214,7 +213,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const dimensions: DroppableDimension[] = action.payload;
 
     if (!canPublishDimension(state.phase)) {
-      logger.warn('dimensions rejected as no longer allowing dimension capture in phase', state.phase);
+      console.warn('dimensions rejected as no longer allowing dimension capture in phase', state.phase);
       return state;
     }
 
@@ -240,7 +239,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
   if (action.type === 'COMPLETE_LIFT') {
     if (state.phase !== 'COLLECTING_INITIAL_DIMENSIONS') {
-      logger.error('trying complete lift without collecting dimensions');
+      console.error('trying complete lift without collecting dimensions');
       return state;
     }
 
@@ -253,7 +252,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const draggable: ?DraggableDimension = state.dimension.draggable[id];
 
     if (!draggable) {
-      logger.error('could not find draggable in store after lift');
+      console.error('could not find draggable in store after lift');
       return clean();
     }
 
@@ -287,7 +286,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const home: ?DroppableDimension = state.dimension.droppable[descriptor.droppableId];
 
     if (!home) {
-      logger.error('Cannot find home dimension for initial lift');
+      console.error('Cannot find home dimension for initial lift');
       return clean();
     }
 
@@ -315,12 +314,12 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
   if (action.type === 'UPDATE_DROPPABLE_DIMENSION_SCROLL') {
     if (state.phase !== 'DRAGGING') {
-      logger.error('cannot update a droppable dimensions scroll when not dragging');
+      console.error('cannot update a droppable dimensions scroll when not dragging');
       return clean();
     }
 
     if (state.drag == null) {
-      logger.error('invalid store state');
+      console.error('invalid store state');
       return clean();
     }
 
@@ -337,7 +336,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const target: ?DroppableDimension = state.dimension.droppable[id];
 
     if (!target) {
-      logger.warn('cannot update scroll for droppable as it has not yet been collected');
+      console.warn('cannot update scroll for droppable as it has not yet been collected');
       return state;
     }
 
@@ -367,12 +366,12 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const target = state.dimension.droppable[id];
 
     if (!target) {
-      logger.warn('cannot update enabled state for droppable as it has not yet been collected');
+      console.warn('cannot update enabled state for droppable as it has not yet been collected');
       return state;
     }
 
     if (target.isEnabled === isEnabled) {
-      logger.warn(`trying to set droppable isEnabled to ${String(isEnabled)} but it is already ${String(isEnabled)}`);
+      console.warn(`trying to set droppable isEnabled to ${String(isEnabled)} but it is already ${String(isEnabled)}`);
       return state;
     }
 
@@ -409,7 +408,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const { windowScroll } = action.payload;
 
     if (!state.drag) {
-      logger.error('cannot move with window scrolling if no current drag');
+      console.error('cannot move with window scrolling if no current drag');
       return clean();
     }
 
@@ -423,12 +422,12 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
   if (action.type === 'MOVE_FORWARD' || action.type === 'MOVE_BACKWARD') {
     if (state.phase !== 'DRAGGING') {
-      logger.error('cannot move while not dragging', action);
+      console.error('cannot move while not dragging', action);
       return clean();
     }
 
     if (!state.drag) {
-      logger.error('cannot move if there is no drag information');
+      console.error('cannot move if there is no drag information');
       return clean();
     }
 
@@ -436,7 +435,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const isMovingForward: boolean = action.type === 'MOVE_FORWARD';
 
     if (!existing.impact.destination) {
-      logger.error('cannot move if there is no previous destination');
+      console.error('cannot move if there is no previous destination');
       return clean();
     }
 
@@ -471,17 +470,17 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
   if (action.type === 'CROSS_AXIS_MOVE_FORWARD' || action.type === 'CROSS_AXIS_MOVE_BACKWARD') {
     if (state.phase !== 'DRAGGING') {
-      logger.error('cannot move cross axis when not dragging');
+      console.error('cannot move cross axis when not dragging');
       return clean();
     }
 
     if (!state.drag) {
-      logger.error('cannot move cross axis if there is no drag information');
+      console.error('cannot move cross axis if there is no drag information');
       return clean();
     }
 
     if (!state.drag.impact.destination) {
-      logger.error('cannot move cross axis if not in a droppable');
+      console.error('cannot move cross axis if not in a droppable');
       return clean();
     }
 
@@ -525,12 +524,12 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const { trigger, newHomeOffset, impact, result } = action.payload;
 
     if (state.phase !== 'DRAGGING') {
-      logger.error('cannot animate drop while not dragging', action);
+      console.error('cannot animate drop while not dragging', action);
       return state;
     }
 
     if (!state.drag) {
-      logger.error('cannot animate drop - invalid drag state');
+      console.error('cannot animate drop - invalid drag state');
       return clean();
     }
 

@@ -39,7 +39,12 @@ const customViewport: Area = getArea({
 
 describe('move to next index', () => {
   beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => { });
     setViewport(customViewport);
+  });
+
+  afterEach(() => {
+    console.error.mockRestore();
   });
 
   afterAll(() => {

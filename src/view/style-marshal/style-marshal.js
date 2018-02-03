@@ -7,7 +7,6 @@ import type {
   Phase,
   DropTrigger,
 } from '../../types';
-import * as logger from '../../log';
 
 let count: number = 0;
 
@@ -33,7 +32,7 @@ export default () => {
   // unless there is a new value required
   const setStyle = memoizeOne((proposed: string) => {
     if (!state.el) {
-      logger.error('cannot set style of style tag if not mounted');
+      console.error('cannot set style of style tag if not mounted');
       return;
     }
 
@@ -46,7 +45,7 @@ export default () => {
   // server side rendering
   const mount = () => {
     if (state.el) {
-      logger.error('Style marshal already mounted');
+      console.error('Style marshal already mounted');
       return;
     }
 
@@ -73,7 +72,7 @@ export default () => {
   const onPhaseChange = (current: AppState) => {
     // delaying mount until first update to play nicely with server side rendering
     if (!state.el) {
-      logger.error('cannot update styles until style marshal is mounted');
+      console.error('cannot update styles until style marshal is mounted');
       return;
     }
 
@@ -86,7 +85,7 @@ export default () => {
 
     if (phase === 'DROP_ANIMATING') {
       if (!current.drop || !current.drop.pending) {
-        logger.error('Invalid state found in style-marshal');
+        console.error('Invalid state found in style-marshal');
         return;
       }
 
@@ -105,7 +104,7 @@ export default () => {
 
   const unmount = (): void => {
     if (!state.el) {
-      logger.error('Cannot unmount style marshal as it is already unmounted');
+      console.error('Cannot unmount style marshal as it is already unmounted');
       return;
     }
     const previous = state.el;
@@ -116,7 +115,7 @@ export default () => {
 
     // this should never happen - just appeasing flow
     if (!previous.parentNode) {
-      logger.error('Cannot unmount style marshal as cannot find parent');
+      console.error('Cannot unmount style marshal as cannot find parent');
       return;
     }
 

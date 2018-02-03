@@ -10,7 +10,6 @@ import type {
   DraggableLocation,
   DragStart,
 } from '../../../src/types';
-import * as logger from '../../../src/log';
 
 const preset = getPreset();
 
@@ -22,18 +21,17 @@ const noDimensions: DimensionState = {
 
 describe('fire hooks', () => {
   let hooks: Hooks;
-  let loggerError;
 
   beforeEach(() => {
-    loggerError = jest.spyOn(logger, 'error').mockImplementation(() => { });
     hooks = {
       onDragStart: jest.fn(),
       onDragEnd: jest.fn(),
     };
+    jest.spyOn(console, 'error').mockImplementation(() => { });
   });
 
   afterEach(() => {
-    loggerError.mockRestore();
+    console.error.mockRestore();
   });
 
   describe('drag start', () => {
@@ -58,7 +56,7 @@ describe('fire hooks', () => {
 
       fireHooks(customHooks, state.requesting(), state.dragging());
 
-      expect(loggerError).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
     });
 
     it('should log an error and not call the callback if there is no current drag', () => {
@@ -69,7 +67,7 @@ describe('fire hooks', () => {
 
       fireHooks(hooks, state.requesting(), invalid);
 
-      expect(loggerError).toHaveBeenCalled();
+      expect(console.error).toHaveBeenCalled();
     });
 
     it('should not call if only collecting dimensions (not dragging yet)', () => {
@@ -131,7 +129,7 @@ describe('fire hooks', () => {
         fireHooks(hooks, previous, invalid);
 
         expect(hooks.onDragEnd).not.toHaveBeenCalled();
-        expect(loggerError).toHaveBeenCalled();
+        expect(console.error).toHaveBeenCalled();
       });
 
       it('should call onDragEnd with null as the destination if there is no destination', () => {
@@ -224,7 +222,7 @@ describe('fire hooks', () => {
         fireHooks(hooks, state.idle, invalid);
 
         expect(hooks.onDragEnd).not.toHaveBeenCalled();
-        expect(loggerError).toHaveBeenCalled();
+        expect(console.error).toHaveBeenCalled();
       });
     });
 
@@ -255,7 +253,7 @@ describe('fire hooks', () => {
         fireHooks(hooks, invalid, state.idle);
 
         expect(hooks.onDragEnd).not.toHaveBeenCalled();
-        expect(loggerError).toHaveBeenCalled();
+        expect(console.error).toHaveBeenCalled();
       });
     });
   });
