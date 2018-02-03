@@ -2,7 +2,6 @@
 import type {
   State, Phase, DraggableId,
 } from '../types';
-import * as logger from '../log';
 
 export default (state: State, id: DraggableId): boolean => {
   const phase: Phase = state.phase;
@@ -28,7 +27,7 @@ export default (state: State, id: DraggableId): boolean => {
   //   items not in their original position which can lead to bad visuals
   if (phase === 'DROP_ANIMATING') {
     if (!state.drop || !state.drop.pending) {
-      logger.error('Invalid state shape for drop animating');
+      console.error('Invalid state shape for drop animating');
       return false;
     }
 
@@ -43,6 +42,6 @@ export default (state: State, id: DraggableId): boolean => {
   }
 
   // this should not happen
-  logger.warn(`unhandled phase ${phase} in canLift check`);
+  console.warn(`unhandled phase ${phase} in canLift check`);
   return false;
 };

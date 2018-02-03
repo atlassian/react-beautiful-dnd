@@ -8,7 +8,6 @@ import type {
   Phase,
   State,
 } from '../types';
-import * as logger from '../log';
 
 export const phaseSelector = (state: State): Phase => state.phase;
 
@@ -35,7 +34,7 @@ export const draggingDraggableSelector = createSelector([
 ): ?DraggableDimension => {
   if (phase === 'DRAGGING') {
     if (!drag) {
-      logger.error('cannot get placeholder dimensions as there is an invalid drag state');
+      console.error('cannot get placeholder dimensions as there is an invalid drag state');
       return null;
     }
 
@@ -45,7 +44,7 @@ export const draggingDraggableSelector = createSelector([
 
   if (phase === 'DROP_ANIMATING') {
     if (!pending) {
-      logger.error('cannot get placeholder dimensions as there is an invalid drag state');
+      console.error('cannot get placeholder dimensions as there is an invalid drag state');
       return null;
     }
 
