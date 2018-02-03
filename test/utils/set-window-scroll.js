@@ -12,6 +12,7 @@ const defaultOptions: Options = {
 export default (point: Position, options?: Options = defaultOptions) => {
   window.pageXOffset = point.x;
   window.pageYOffset = point.y;
+
   if (options.shouldPublish) {
     window.dispatchEvent(new Event('scroll'));
   }

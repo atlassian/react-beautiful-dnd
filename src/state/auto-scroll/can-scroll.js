@@ -126,8 +126,6 @@ export const canScrollDroppable = (
     return false;
   }
 
-  console.warn('can scroll droppable?');
-
   return canPartiallyScroll({
     current: closestScrollable.scroll.current,
     max: closestScrollable.scroll.max,
@@ -143,7 +141,6 @@ export const getWindowOverlap = (change: Position): ?Position => {
   const max: Position = getMaxWindowScroll();
   const current: Position = getWindowScrollPosition();
 
-  console.warn('getting window overlap');
   return getRemainder({
     current,
     max,
@@ -162,7 +159,6 @@ export const getDroppableOverlap = (droppable: DroppableDimension, change: Posit
     return null;
   }
 
-  console.log('getting droppable overlap');
   return getRemainder({
     current: closestScrollable.scroll.current,
     max: closestScrollable.scroll.max,

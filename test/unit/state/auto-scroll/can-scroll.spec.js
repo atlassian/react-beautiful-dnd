@@ -1,11 +1,21 @@
 // @flow
 import type {
   Position,
+  DroppableDimension,
 } from '../../../../src/types';
-import { canPartiallyScroll, getRemainder } from '../../../../src/state/auto-scroll/can-partially-scroll';
+import {
+  canPartiallyScroll,
+  getRemainder,
+  canScrollDroppable,
+  canScrollWindow,
+} from '../../../../src/state/auto-scroll/can-scroll';
 import { add, subtract } from '../../../../src/state/position';
+import getArea from '../../../../src/state/get-area';
+import { getPreset } from '../../../utils/dimension';
+import { getDroppableDimension } from '../../../../src/state/dimension';
 
 const origin: Position = { x: 0, y: 0 };
+const preset = getPreset();
 
 describe('can partially scroll', () => {
   it('should return true if not scrolling anywhere', () => {
@@ -261,7 +271,30 @@ describe('get remainder', () => {
     });
 
     it('should return overlap on two axis in different directions', () => {
+      const items: Item[] = [
+        // too far back: vertical
+        // too far forward: horizontal
+        {
+          change: { x: 80, y: -70 },
+          expected: { x: 30, y: -20 },
+        },
+        // too far back: horizontal
+        // too far forward: vertical
+        {
+          change: { x: -70, y: 80 },
+          expected: { x: -20, y: 30 },
+        },
+      ];
 
+      items.forEach((item: Item) => {
+        const result: ?Position = getRemainder({
+          current,
+          max,
+          change: item.change,
+        });
+
+        expect(result).toEqual(item.expected);
+      });
     });
 
     it('should trim values that can be scrolled', () => {
@@ -308,4 +341,72 @@ describe('get remainder', () => {
       });
     });
   });
+});
+
+describe('can scroll droppable', () => {
+  const scrollable: DroppableDimension = getDroppableDimension({
+    descriptor: {
+      id: 'drop-1',
+      type: 'TYPE',
+    },
+    client: getArea({
+      top: 0,
+      left: 0,
+      right: 100,
+      bottom: 200,
+    }),
+    closest: {
+      frameClient: getArea({
+        top: 0,
+        left: 0,
+        right: 100,
+        bottom: 100,
+      }),
+      scrollWidth: 100,
+      scrollHeight: 200,
+      scroll: { x: 0, y: 0 },
+      shouldClipSubject: true,
+    },
+  });
+
+  it('should return false if the droppable is not scrollable', () => {
+    const result: boolean = canScrollDroppable(preset.home, { x: 1, y: 1 });
+
+    expect(result).toBe(false);
+  });
+
+  it('should return true if the droppable is able to be scrolled', () => {
+    const result: boolean = canScrollDroppable(scrollable, { x: 0, y: 20 });
+
+    expect(result).toBe(true);
+  });
+
+  it('should return false if the droppable is not able to be scrolled', () => {
+    const result: boolean = canScrollDroppable(scrollable, { x: -1, y: 0 });
+
+    expect(result).toBe(false);
+  });
+});
+
+describe('can scroll window', () => {
+  it('should return true if the window is able to be scrolled', () => {
+    setViewport(getArea({
+      top: 0,
+      left: 0,
+      right: 100,
+      bottom: 100,
+    }, { x: 0, y: 1 }));
+  });
+
+  it('should return false if the window is not able to be scrolled', () => {
+
+  });
+});
+
+describe('get droppable remainder', () => {
+
+});
+
+describe('get window remainder', () => {
+
 });

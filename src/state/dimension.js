@@ -69,7 +69,7 @@ type GetDroppableArgs = {|
   descriptor: DroppableDescriptor,
   client: Area,
   // optionally provided - and can also be null
-  closest: ?{|
+  closest?: {|
     frameClient: Area,
     scrollWidth: number,
     scrollHeight: number,
@@ -185,8 +185,6 @@ export const getDroppableDimension = ({
       height: frame.height,
       width: frame.width,
     });
-
-    console.warn('DROPPABLE MAX', maxScroll);
 
     const result: ClosestScrollable = {
       frame,
