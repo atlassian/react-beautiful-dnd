@@ -7,7 +7,6 @@ import type {
   Position,
 } from '../../../types';
 import type { TouchSensor, CreateSensorArgs } from './sensor-types';
-import * as logger from '../../../log';
 
 type State = {
   isDragging: boolean,
@@ -56,7 +55,7 @@ export default ({
     const pending: ?Position = state.pending;
 
     if (!pending) {
-      logger.error('cannot start a touch drag without a pending position');
+      console.error('cannot start a touch drag without a pending position');
       kill();
       return;
     }
@@ -170,7 +169,7 @@ export default ({
 
       // This should never happen - but just being super safe
       if (isDragging()) {
-        logger.error('touch start fired while already dragging');
+        console.error('touch start fired while already dragging');
         cancel();
       }
     },
@@ -239,7 +238,7 @@ export default ({
     }
 
     if (isCapturing()) {
-      logger.error('should not be able to perform a touch start while a drag or pending drag is occurring');
+      console.error('should not be able to perform a touch start while a drag or pending drag is occurring');
       cancel();
       return;
     }
