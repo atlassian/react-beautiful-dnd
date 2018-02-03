@@ -11,7 +11,6 @@ import type { KeyboardSensor, CreateSensorArgs } from './sensor-types';
 import type {
   Props,
 } from '../drag-handle-types';
-import * as logger from '../../../log';
 
 type State = {|
   isDragging: boolean,
@@ -76,7 +75,7 @@ export default ({
       const ref: ?HTMLElement = getDraggableRef();
 
       if (!ref) {
-        logger.error('cannot start a keyboard drag without a draggable ref');
+        console.error('cannot start a keyboard drag without a draggable ref');
         return;
       }
 
@@ -107,7 +106,7 @@ export default ({
 
     // already dragging
     if (!direction) {
-      logger.error('Cannot handle keyboard movement event if direction is not provided');
+      console.error('Cannot handle keyboard movement event if direction is not provided');
       stopEvent(event);
       cancel();
       return;

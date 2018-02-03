@@ -33,7 +33,6 @@ import type {
   DispatchProps,
   Selector,
 } from './draggable-types';
-import * as logger from '../../log';
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -93,7 +92,7 @@ export const makeSelector = (): Selector => {
 
     if (state.phase === 'DRAGGING') {
       if (!state.drag) {
-        logger.error('invalid drag state found in selector');
+        console.error('invalid drag state found in selector');
         return null;
       }
 
@@ -118,7 +117,7 @@ export const makeSelector = (): Selector => {
     // dropping
 
     if (!state.drop || !state.drop.pending) {
-      logger.error('cannot provide props for dropping item when there is invalid state');
+      console.error('cannot provide props for dropping item when there is invalid state');
       return null;
     }
 
@@ -176,7 +175,7 @@ export const makeSelector = (): Selector => {
 
     if (state.phase === 'DRAGGING') {
       if (!state.drag) {
-        logger.error('cannot correctly move item out of the way when there is invalid state');
+        console.error('cannot correctly move item out of the way when there is invalid state');
         return null;
       }
 
@@ -190,7 +189,7 @@ export const makeSelector = (): Selector => {
 
     // state.phase === 'DROP_ANIMATING'
     if (!state.drop || !state.drop.pending) {
-      logger.error('cannot provide props for dropping item when there is invalid state');
+      console.error('cannot provide props for dropping item when there is invalid state');
       return null;
     }
 

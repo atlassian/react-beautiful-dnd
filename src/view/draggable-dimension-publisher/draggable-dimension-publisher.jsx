@@ -16,7 +16,6 @@ import type {
   DroppableId,
 } from '../../types';
 import type { DimensionMarshal } from '../../state/dimension-marshal/dimension-marshal-types';
-import * as logger from '../../log';
 
 type Props = {|
   draggableId: DraggableId,
@@ -38,7 +37,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     const { draggableId, droppableId, index, targetRef } = nextProps;
 
     if (!targetRef) {
-      logger.error('Updating draggable dimension handler without a targetRef');
+      console.error('Updating draggable dimension handler without a targetRef');
       return;
     }
 
@@ -64,7 +63,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
   unpublish = () => {
     if (!this.publishedDescriptor) {
-      logger.error('cannot unpublish descriptor when none is published');
+      console.error('cannot unpublish descriptor when none is published');
       return;
     }
 

@@ -16,7 +16,6 @@ import type {
   Displacement,
   Area,
 } from '../../types';
-import * as logger from '../../log';
 
 export default ({
   isMovingForward,
@@ -26,7 +25,7 @@ export default ({
   draggables,
 }: Args): ?Result => {
   if (!previousImpact.destination) {
-    logger.error('cannot move to next index when there is not previous destination');
+    console.error('cannot move to next index when there is not previous destination');
     return null;
   }
 
