@@ -36,8 +36,12 @@ type GetRemainderArgs = {|
 
 // We need to figure out how much of the movement
 // cannot be done with a scroll
-export const getRemainder = (() => {
-  const getOverlap = (target: number, max: number): number => {
+export const getOverlap = (() => {
+  const getRemainder = (target: number, max: number): number => {
+    if (target === 0) {
+      return 0;
+    }
+
     if (target < 0) {
       return target;
     }
@@ -54,16 +58,23 @@ export const getRemainder = (() => {
   }: GetRemainderArgs): ?Position => {
     const targetScroll: Position = add(current, change);
 
-    const remainder: Position = {
-      x: getOverlap(targetScroll.x, max.x),
-      y: getOverlap(targetScroll.y, max.y),
+    console.log('target', targetScroll);
+    console.log('max', max);
+    console.log('x', getRemainder(targetScroll.x, max.x));
+    console.log('y', getRemainder(targetScroll.y, max.y));
+
+    const overlap: Position = {
+      x: getRemainder(targetScroll.x, max.x),
+      y: getRemainder(targetScroll.y, max.y),
     };
 
-    if (isEqual(remainder, origin)) {
+    console.log('overlap', overlap);
+
+    if (isEqual(overlap, origin)) {
       return null;
     }
 
-    return remainder;
+    return overlap;
   };
 })();
 
@@ -74,12 +85,14 @@ export const canPartiallyScroll = ({
 }: CanScrollArgs): boolean => {
   // Only need to be able to move the smallest amount in the desired direction
   const smallestChange: Position = smallestSigned(change);
-  const remainder: ?Position = getRemainder({
+  console.log('smallest change', smallestChange);
+
+  const overlap: ?Position = getOverlap({
     max, current, change: smallestChange,
   });
 
   // there will be no remainder if you can partially scroll
-  return !remainder;
+  return !overlap;
 };
 
 const getMaxWindowScroll = (): Position => {
@@ -123,8 +136,13 @@ export const canScrollDroppable = (
   const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
   // Cannot scroll when there is no scroll container!
   if (!closestScrollable) {
+    console.log('no closest scrollable');
     return false;
   }
+
+  console.log('closestScrollable min', closestScrollable.scroll.current);
+  console.log('closestScrollable max', closestScrollable.scroll.max);
+  console.log('change', change);
 
   return canPartiallyScroll({
     current: closestScrollable.scroll.current,
@@ -141,7 +159,7 @@ export const getWindowOverlap = (change: Position): ?Position => {
   const max: Position = getMaxWindowScroll();
   const current: Position = getWindowScroll();
 
-  return getRemainder({
+  return getOverlap({
     current,
     max,
     change,
@@ -150,6 +168,7 @@ export const getWindowOverlap = (change: Position): ?Position => {
 
 export const getDroppableOverlap = (droppable: DroppableDimension, change: Position): ?Position => {
   if (!canScrollDroppable(droppable, change)) {
+    console.log('cannot scroll droppable');
     return null;
   }
 
@@ -159,7 +178,7 @@ export const getDroppableOverlap = (droppable: DroppableDimension, change: Posit
     return null;
   }
 
-  return getRemainder({
+  return getOverlap({
     current: closestScrollable.scroll.current,
     max: closestScrollable.scroll.max,
     change,
