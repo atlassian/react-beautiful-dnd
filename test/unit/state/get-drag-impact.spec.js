@@ -14,7 +14,7 @@ import {
   getPreset,
   disableDroppable,
 } from '../../utils/dimension';
-import getViewport from '../../../src/state/visibility/get-viewport';
+import getViewport from '../../../src/window/get-viewport';
 import type {
   Axis,
   DraggableDimension,

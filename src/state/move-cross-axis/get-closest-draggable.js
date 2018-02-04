@@ -1,6 +1,6 @@
 // @flow
 import { add, distance } from '../position';
-import getViewport from '../visibility/get-viewport';
+import getViewport from '../../window/get-viewport';
 import { isTotallyVisible } from '../visibility/is-visible';
 import type {
   Area,

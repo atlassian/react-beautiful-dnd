@@ -2,7 +2,7 @@
 import { closest } from '../position';
 import isWithin from '../is-within';
 import { getCorners } from '../spacing';
-import getViewport from '../visibility/get-viewport';
+import getViewport from '../../window/get-viewport';
 import isPartiallyVisibleThroughFrame from '../visibility/is-partially-visible-through-frame';
 import type {
   Axis,

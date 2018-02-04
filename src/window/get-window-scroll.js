@@ -2,8 +2,6 @@
 import { apply } from '../state/position';
 import type { Position } from '../types';
 
-const floor = apply(Math.floor);
-
 // The browsers update document.documentElement.scrollTop and window.pageYOffset
 // differently as the window scrolls.
 
@@ -27,7 +25,7 @@ const floor = apply(Math.floor);
 // documentElement.scrollTop: no update. Stays at 0
 // window.pageYOffset: updates to whole number
 
-export default (): Position => floor({
+export default (): Position => ({
   x: window.pageXOffset,
   y: window.pageYOffset,
 });

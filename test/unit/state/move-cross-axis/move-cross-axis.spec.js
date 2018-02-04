@@ -1,7 +1,7 @@
 // @flow
 import moveCrossAxis from '../../../../src/state/move-cross-axis/';
 import noImpact from '../../../../src/state/no-impact';
-import getViewport from '../../../../src/state/visibility/get-viewport';
+import getViewport from '../../../../src/window/get-viewport';
 import getArea from '../../../../src/state/get-area';
 import { getDroppableDimension, getDraggableDimension } from '../../../../src/state/dimension';
 import { getPreset } from '../../../utils/dimension';

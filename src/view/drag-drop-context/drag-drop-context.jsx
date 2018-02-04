@@ -6,8 +6,8 @@ import fireHooks from '../../state/fire-hooks';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
 import createStyleMarshal from '../style-marshal/style-marshal';
 import canStartDrag from '../../state/can-start-drag';
-import createAutoScroll from '../../state/auto-scroll-marshal/auto-scroll-marshal';
-import type { AutoScrollMarshal } from '../../state/auto-scroll-marshal/auto-scroll-marshal-types';
+import createAutoScroll from '../../state/auto-scroll/auto-scroll-marshal';
+import type { AutoScrollMarshal } from '../../state/auto-scroll/auto-scroll-marshal-types';
 import type { StyleMarshal } from '../style-marshal/style-marshal-types';
 import type {
   DimensionMarshal,

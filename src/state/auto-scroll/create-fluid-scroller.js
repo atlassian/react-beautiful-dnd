@@ -1,6 +1,6 @@
 // @flow
 import rafSchd from 'raf-schd';
-import getViewport from '../visibility/get-viewport';
+import getViewport from '../../window/get-viewport';
 import { isEqual } from '../position';
 import isTooBigToAutoScroll from './is-too-big-to-auto-scroll';
 import getScrollableDroppableOver from './get-scrollable-droppable-over';

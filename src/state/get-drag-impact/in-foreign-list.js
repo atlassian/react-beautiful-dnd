@@ -11,7 +11,7 @@ import type {
 } from '../../types';
 import { add, patch } from '../position';
 import getDisplacement from '../get-displacement';
-import getViewport from '../visibility/get-viewport';
+import getViewport from '../../window/get-viewport';
 
 type Args = {|
   pageCenter: Position,

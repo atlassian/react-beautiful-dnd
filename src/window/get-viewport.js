@@ -1,10 +1,10 @@
 // @flow
-import type { Position, Area } from '../../types';
-import getArea from '../get-area';
-import getWindowScrollPosition from '../../view/get-window-scroll-position';
+import type { Position, Area } from '../types';
+import getArea from '../state/get-area';
+import getWindowScroll from './get-window-scroll';
 
 export default (): Area => {
-  const windowScroll: Position = getWindowScrollPosition();
+  const windowScroll: Position = getWindowScroll();
 
   const top: number = windowScroll.y;
   const left: number = windowScroll.x;

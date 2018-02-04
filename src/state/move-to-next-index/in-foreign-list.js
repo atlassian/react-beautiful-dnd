@@ -4,7 +4,7 @@ import { patch } from '../position';
 import withDroppableScroll from '../with-droppable-scroll';
 import moveToEdge from '../move-to-edge';
 import getDisplacement from '../get-displacement';
-import getViewport from '../visibility/get-viewport';
+import getViewport from '../../window/get-viewport';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 import getScrollJumpResult from './get-scroll-jump-result';
 import type { Edge } from '../move-to-edge';

@@ -3,7 +3,7 @@ import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import { patch } from '../position';
 import withDroppableScroll from '../with-droppable-scroll';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
-import getViewport from '../visibility/get-viewport';
+import getViewport from '../../window/get-viewport';
 import getScrollJumpResult from './get-scroll-jump-result';
 import moveToEdge from '../move-to-edge';
 import type { Edge } from '../move-to-edge';

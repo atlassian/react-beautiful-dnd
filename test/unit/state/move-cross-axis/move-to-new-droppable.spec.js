@@ -8,7 +8,7 @@ import { patch } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
 import { getPreset } from '../../../utils/dimension';
 import noImpact from '../../../../src/state/no-impact';
-import getViewport from '../../../../src/state/visibility/get-viewport';
+import getViewport from '../../../../src/window/get-viewport';
 import type {
   Axis,
   DragImpact,

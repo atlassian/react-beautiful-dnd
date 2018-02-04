@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
-import getWindowScrollPosition from '../get-window-scroll-position';
+import getWindowScrollPosition from '../../window/get-window-scroll';
 import { getDraggableDimension } from '../../state/dimension';
 import { dimensionMarshalKey } from '../context-keys';
 import getArea from '../../state/get-area';

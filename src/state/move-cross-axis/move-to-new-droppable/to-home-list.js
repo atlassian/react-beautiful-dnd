@@ -1,6 +1,6 @@
 // @flow
 import moveToEdge from '../../move-to-edge';
-import getViewport from '../../visibility/get-viewport';
+import getViewport from '../../../window/get-viewport';
 import getDisplacement from '../../get-displacement';
 import withDroppableScroll from '../../with-droppable-scroll';
 import type { Edge } from '../../move-to-edge';

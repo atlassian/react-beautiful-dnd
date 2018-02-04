@@ -2,7 +2,7 @@
 import moveToEdge from '../../move-to-edge';
 import type { Result } from '../move-cross-axis-types';
 import getDisplacement from '../../get-displacement';
-import getViewport from '../../visibility/get-viewport';
+import getViewport from '../../../window/get-viewport';
 import { add } from '../../position';
 import type {
   Axis,

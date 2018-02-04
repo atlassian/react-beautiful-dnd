@@ -4,7 +4,7 @@ import { getDroppableDimension } from '../../../../src/state/dimension';
 import getArea from '../../../../src/state/get-area';
 import { add } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
-import getViewport from '../../../../src/state/visibility/get-viewport';
+import getViewport from '../../../../src/window/get-viewport';
 import type {
   Axis,
   Position,

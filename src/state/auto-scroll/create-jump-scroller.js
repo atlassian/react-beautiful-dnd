@@ -1,8 +1,8 @@
 // @flow
 import { add } from '../position';
-import getWindowScrollPosition from '../../view/get-window-scroll-position';
+import getWindowScrollPosition from '../../window/get-window-scroll';
 import isTooBigToAutoScroll from './is-too-big-to-auto-scroll';
-import getViewport from '../visibility/get-viewport';
+import getViewport from '../../window/get-viewport';
 import { move as moveAction } from '../action-creators';
 import {
   canScrollDroppable,

@@ -1,8 +1,8 @@
 // @flow
 import { add, apply, isEqual, subtract } from '../position';
 // TODO: state reaching into VIEW :(
-import getWindowScrollPosition from '../../view/get-window-scroll-position';
-import getViewport from '../visibility/get-viewport';
+import getWindowScroll from '../../window/get-window-scroll';
+import getViewport from '../../window/get-viewport';
 import getMaxScroll from '../get-max-scroll';
 import type {
   ClosestScrollable,
@@ -107,7 +107,7 @@ const getMaxWindowScroll = (): Position => {
 
 export const canScrollWindow = (change: Position): boolean => {
   const maxScroll: Position = getMaxWindowScroll();
-  const currentScroll: Position = getWindowScrollPosition();
+  const currentScroll: Position = getWindowScroll();
 
   return canPartiallyScroll({
     current: currentScroll,
@@ -139,7 +139,7 @@ export const getWindowOverlap = (change: Position): ?Position => {
   }
 
   const max: Position = getMaxWindowScroll();
-  const current: Position = getWindowScrollPosition();
+  const current: Position = getWindowScroll();
 
   return getRemainder({
     current,

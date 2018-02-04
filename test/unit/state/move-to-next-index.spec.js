@@ -6,7 +6,7 @@ import moveToEdge from '../../../src/state/move-to-edge';
 import noImpact, { noMovement } from '../../../src/state/no-impact';
 import { patch } from '../../../src/state/position';
 import { vertical, horizontal } from '../../../src/state/axis';
-import getViewport from '../../../src/state/visibility/get-viewport';
+import getViewport from '../../../src/window/get-viewport';
 import getArea from '../../../src/state/get-area';
 import setWindowScroll from '../../utils/set-window-scroll';
 import { getDroppableDimension, getDraggableDimension } from '../../../src/state/dimension';
