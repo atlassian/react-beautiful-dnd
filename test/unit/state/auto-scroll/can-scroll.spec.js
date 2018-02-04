@@ -467,7 +467,7 @@ describe('can scroll', () => {
     });
 
     // tested in get remainder
-    it.only('should return the overlap', () => {
+    it('should return the overlap', () => {
       // how far the droppable has already
       const scroll: Position = {
         x: 10, y: 20,

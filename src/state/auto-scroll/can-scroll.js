@@ -37,10 +37,6 @@ type GetRemainderArgs = {|
 // cannot be done with a scroll
 export const getOverlap = (() => {
   const getRemainder = (target: number, max: number): number => {
-    if (target === 0) {
-      return 0;
-    }
-
     if (target < 0) {
       return target;
     }

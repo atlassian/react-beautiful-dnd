@@ -11,14 +11,11 @@ export default (): Area => {
 
   const doc: HTMLElement = (document.documentElement : any);
 
-  console.log('doc top', document.documentElement.scrollTop);
-  console.log('window', window.pageYOffset);
-
-  // using these values as they do not consider scrollbars
+  // Using these values as they do not consider scrollbars
   const width: number = doc.clientWidth;
   const height: number = doc.clientHeight;
 
-  // computed
+  // Computed
   const right: number = left + width;
   const bottom: number = top + height;
 

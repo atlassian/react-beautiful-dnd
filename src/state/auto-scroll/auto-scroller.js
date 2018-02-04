@@ -3,7 +3,7 @@ import scrollWindow from './scroll-window';
 import createFluidScroller, { type FluidScroller } from './create-fluid-scroller';
 import createJumpScroller, { type JumpScroller } from './create-jump-scroller';
 import { move as moveAction } from '../action-creators';
-import type { AutoScrollMarshal } from './auto-scroll-marshal-types';
+import type { AutoScroller } from './auto-scroller-types';
 import type {
   DroppableId,
   Position,
@@ -18,7 +18,7 @@ type Args = {|
 export default ({
   scrollDroppable,
   move,
-}: Args): AutoScrollMarshal => {
+}: Args): AutoScroller => {
   const fluidScroll: FluidScroller = createFluidScroller({
     scrollWindow,
     scrollDroppable,
@@ -58,7 +58,7 @@ export default ({
     }
   };
 
-  const marshal: AutoScrollMarshal = {
+  const marshal: AutoScroller = {
     onStateChange,
   };
 
