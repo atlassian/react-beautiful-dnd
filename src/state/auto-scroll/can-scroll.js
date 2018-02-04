@@ -1,5 +1,5 @@
 // @flow
-import { add, apply, isEqual, subtract } from '../position';
+import { add, apply, isEqual } from '../position';
 // TODO: state reaching into VIEW :(
 import getWindowScroll from '../../window/get-window-scroll';
 import getViewport from '../../window/get-viewport';
@@ -7,7 +7,6 @@ import getMaxScroll from '../get-max-scroll';
 import type {
   ClosestScrollable,
   DroppableDimension,
-  Spacing,
   Position,
   Area,
 } from '../../types';
@@ -58,17 +57,10 @@ export const getOverlap = (() => {
   }: GetRemainderArgs): ?Position => {
     const targetScroll: Position = add(current, change);
 
-    console.log('target', targetScroll);
-    console.log('max', max);
-    console.log('x', getRemainder(targetScroll.x, max.x));
-    console.log('y', getRemainder(targetScroll.y, max.y));
-
     const overlap: Position = {
       x: getRemainder(targetScroll.x, max.x),
       y: getRemainder(targetScroll.y, max.y),
     };
-
-    console.log('overlap', overlap);
 
     if (isEqual(overlap, origin)) {
       return null;
@@ -85,7 +77,6 @@ export const canPartiallyScroll = ({
 }: CanScrollArgs): boolean => {
   // Only need to be able to move the smallest amount in the desired direction
   const smallestChange: Position = smallestSigned(change);
-  console.log('smallest change', smallestChange);
 
   const overlap: ?Position = getOverlap({
     max, current, change: smallestChange,
@@ -99,7 +90,6 @@ const getMaxWindowScroll = (): Position => {
   const el: ?HTMLElement = document.documentElement;
 
   if (!el) {
-    console.error('Cannot find document element');
     return origin;
   }
 
@@ -136,13 +126,8 @@ export const canScrollDroppable = (
   const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
   // Cannot scroll when there is no scroll container!
   if (!closestScrollable) {
-    console.log('no closest scrollable');
     return false;
   }
-
-  console.log('closestScrollable min', closestScrollable.scroll.current);
-  console.log('closestScrollable max', closestScrollable.scroll.max);
-  console.log('change', change);
 
   return canPartiallyScroll({
     current: closestScrollable.scroll.current,
@@ -168,7 +153,6 @@ export const getWindowOverlap = (change: Position): ?Position => {
 
 export const getDroppableOverlap = (droppable: DroppableDimension, change: Position): ?Position => {
   if (!canScrollDroppable(droppable, change)) {
-    console.log('cannot scroll droppable');
     return null;
   }
 
