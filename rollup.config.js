@@ -26,7 +26,7 @@ export default {
       'process.env.NODE_ENV': JSON.stringify('production'),
     }),
     strip({
-      debugger: false,
+      debugger: true,
     }),
   ].concat(
     args.min ? uglify() : []
