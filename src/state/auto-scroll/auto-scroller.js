@@ -1,10 +1,9 @@
 // @flow
-import scrollWindow from './scroll-window';
 import createFluidScroller, { type FluidScroller } from './create-fluid-scroller';
 import createJumpScroller, { type JumpScroller } from './create-jump-scroller';
-import { move as moveAction } from '../action-creators';
 import type { AutoScroller } from './auto-scroller-types';
 import type {
+  DraggableId,
   DroppableId,
   Position,
   State,
@@ -12,11 +11,18 @@ import type {
 
 type Args = {|
   scrollDroppable: (id: DroppableId, change: Position) => void,
-  move: typeof moveAction,
+  scrollWindow: (change: Position) => void,
+  move: (
+    id: DraggableId,
+    client: Position,
+    windowScroll: Position,
+    shouldAnimate?: boolean
+  ) => void,
 |}
 
 export default ({
   scrollDroppable,
+  scrollWindow,
   move,
 }: Args): AutoScroller => {
   const fluidScroll: FluidScroller = createFluidScroller({

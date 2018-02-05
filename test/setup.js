@@ -9,12 +9,11 @@ if (typeof window !== 'undefined') {
 
   // overriding these properties in jsdom to allow them to be controlled
 
-  Object.defineProperty(document.documentElement, 'scrollHeight', {
-    writable: true,
-  });
-
-  Object.defineProperty(document.documentElement, 'scrollWidth', {
-    writable: true,
+  Object.defineProperties(document.documentElement, {
+    clientWidth: { writable: true, value: document.documentElement.clientWidth },
+    clientHeight: { writable: true, value: document.documentElement.clientHeight },
+    scrollWidth: { writable: true, value: document.documentElement.scrollWidth },
+    scrollHeight: { writable: true, value: document.documentElement.scrollHeight },
   });
 }
 

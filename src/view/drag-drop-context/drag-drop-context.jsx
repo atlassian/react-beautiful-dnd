@@ -6,8 +6,9 @@ import fireHooks from '../../state/fire-hooks';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
 import createStyleMarshal from '../style-marshal/style-marshal';
 import canStartDrag from '../../state/can-start-drag';
-import createAutoScroll from '../../state/auto-scroll/auto-scroll-marshal';
-import type { AutoScrollMarshal } from '../../state/auto-scroll/auto-scroll-marshal-types';
+import scrollWindow from '../../window/scroll-window';
+import createAutoScroller from '../../state/auto-scroll/auto-scroller';
+import type { AutoScroller } from '../../state/auto-scroll/auto-scroller-types';
 import type { StyleMarshal } from '../style-marshal/style-marshal-types';
 import type {
   DimensionMarshal,
@@ -52,7 +53,7 @@ export default class DragDropContext extends React.Component<Props> {
   store: Store
   dimensionMarshal: DimensionMarshal
   styleMarshal: StyleMarshal
-  scrollMarshal: AutoScrollMarshal
+  autoScroller: AutoScroller
   unsubscribe: Function
 
   // Need to declare childContextTypes without flow
@@ -112,9 +113,15 @@ export default class DragDropContext extends React.Component<Props> {
       },
     };
     this.dimensionMarshal = createDimensionMarshal(callbacks);
-    this.scrollMarshal = createAutoScroll({
+    this.autoScroller = createAutoScroller({
+      scrollWindow,
       scrollDroppable: this.dimensionMarshal.scrollDroppable,
-      move: (id: DraggableId, client: Position, windowScroll: Position, shouldAnimate: boolean) => {
+      move: (
+        id: DraggableId,
+        client: Position,
+        windowScroll: Position,
+        shouldAnimate?: boolean
+      ): void => {
         this.store.dispatch(move(id, client, windowScroll, shouldAnimate));
       },
     });
@@ -139,7 +146,7 @@ export default class DragDropContext extends React.Component<Props> {
   }
 
   onStateChange(previous: State, current: State) {
-    this.scrollMarshal.onStateChange(previous, current);
+    this.autoScroller.onStateChange(previous, current);
   }
 
   onPhaseChange(previous: State, current: State) {

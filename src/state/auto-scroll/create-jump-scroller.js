@@ -3,7 +3,6 @@ import { add } from '../position';
 import getWindowScrollPosition from '../../window/get-window-scroll';
 import isTooBigToAutoScroll from './is-too-big-to-auto-scroll';
 import getViewport from '../../window/get-viewport';
-import { move as moveAction } from '../action-creators';
 import {
   canScrollDroppable,
   canScrollWindow,
@@ -11,6 +10,7 @@ import {
   getDroppableOverlap,
 } from './can-scroll';
 import type {
+  DraggableId,
   DroppableId,
   DragState,
   DroppableDimension,
@@ -24,7 +24,7 @@ import type {
 type Args = {|
   scrollDroppable: (id: DroppableId, offset: Position) => void,
   scrollWindow: (offset: Position) => void,
-  move: typeof moveAction,
+  move: (id: DraggableId, client: Position, windowScroll: Position, shouldAnimate?: boolean) => void,
 |}
 
 export type JumpScroller = (state: State) => void;

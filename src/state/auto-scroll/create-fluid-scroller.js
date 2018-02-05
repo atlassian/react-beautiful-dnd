@@ -38,14 +38,14 @@ const config = {
 
 const origin: Position = { x: 0, y: 0 };
 
-type PixelThresholds = {|
+export type PixelThresholds = {|
   startFrom: number,
   maxSpeedAt: number,
   accelerationPlane: number,
 |}
 
 // converts the percentages in the config into actual pixel values
-const getPixelThresholds = (container: Area, axis: Axis): PixelThresholds => {
+export const getPixelThresholds = (container: Area, axis: Axis): PixelThresholds => {
   const startFrom: number = container[axis.size] * config.startFrom;
   const maxSpeedAt: number = container[axis.size] * config.maxSpeedAt;
   const accelerationPlane: number = startFrom - maxSpeedAt;

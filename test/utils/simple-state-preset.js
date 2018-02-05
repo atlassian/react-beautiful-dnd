@@ -65,25 +65,27 @@ export const requesting = (request?: DraggableId = preset.inHome1.descriptor.id)
 const origin: Position = { x: 0, y: 0 };
 
 export const dragging = (
-  id?: DraggableId = preset.inHome1.descriptor.id
+  id?: DraggableId = preset.inHome1.descriptor.id,
+  selection?: Position,
 ): State => {
   // will populate the dimension state with the initial dimensions
   const draggable: DraggableDimension = preset.draggables[id];
-  const client: Position = draggable.client.withMargin.center;
+  // either use the provided selection or use the draggable's center
+  const clientSelection: Position = selection || draggable.client.withMargin.center;
   const initialPosition: InitialDragPositions = {
-    selection: client,
-    center: client,
+    selection: clientSelection,
+    center: clientSelection,
   };
   const clientPositions: CurrentDragPositions = {
-    selection: client,
-    center: client,
+    selection: clientSelection,
+    center: clientSelection,
     offset: origin,
   };
 
   const drag: DragState = {
     initial: {
       descriptor: draggable.descriptor,
-      isScrollAllowed: true,
+      autoScrollMode: 'FLUID',
       client: initialPosition,
       page: initialPosition,
       windowScroll: origin,
@@ -95,6 +97,7 @@ export const dragging = (
       shouldAnimate: false,
     },
     impact: noImpact,
+    scrollJumpRequest: null,
   };
 
   const result: State = {
