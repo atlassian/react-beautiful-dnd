@@ -58,9 +58,16 @@ describe('auto scroller', () => {
         });
       });
 
-      describe('window scrolling', () => {
-        [vertical, horizontal].forEach((axis: Axis) => {
-          describe(`on the ${axis.direction} axis`, () => {
+      [vertical, horizontal].forEach((axis: Axis) => {
+        describe(`on the ${axis.direction} axis`, () => {
+          type Case = {|
+            name: string,
+            scroll: (change: Position) => void,
+            didScroll: () => boolean,
+            area: Area,
+          |}
+
+          describe('window scrolling', () => {
             const preset = getPreset(axis);
             const thresholds: PixelThresholds = getPixelThresholds(viewport, axis);
             const dragTo = (selection: Position): State =>
@@ -533,25 +540,25 @@ describe('auto scroller', () => {
               });
             });
           });
+
+          describe('droppable scrolling', () => {
+
+          });
+
+          describe('window scrolling before droppable scrolling', () => {
+            // TODO: if window scrolling - do not droppable scroll
+          });
         });
-      });
 
-      describe('droppable scrolling', () => {
+        describe('on drag end', () => {
+          it('should cancel any pending window scroll', () => {
 
-      });
+          });
 
-      describe('window scrolling before droppable scrolling', () => {
-        // TODO: if window scrolling - do not droppable scroll
-      });
-    });
+          it('should cancel any pending droppable scroll', () => {
 
-    describe('on drag end', () => {
-      it('should cancel any pending window scroll', () => {
-
-      });
-
-      it('should cancel any pending droppable scroll', () => {
-
+          });
+        });
       });
     });
   });
