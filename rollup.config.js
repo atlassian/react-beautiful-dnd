@@ -5,6 +5,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import uglify from 'rollup-plugin-uglify';
 import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
+import strip from 'rollup-plugin-strip';
 import yargs from 'yargs';
 
 const args = yargs.argv;
@@ -23,6 +24,9 @@ export default {
     commonjs(),
     replace({
       'process.env.NODE_ENV': JSON.stringify('production'),
+    }),
+    strip({
+      debugger: false,
     }),
   ].concat(
     args.min ? uglify() : []
