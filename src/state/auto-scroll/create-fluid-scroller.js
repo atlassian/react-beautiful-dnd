@@ -1,7 +1,7 @@
 // @flow
 import rafSchd from 'raf-schd';
 import getViewport from '../../window/get-viewport';
-import { isEqual } from '../position';
+import { apply, isEqual } from '../position';
 import isTooBigToAutoScroll from './is-too-big-to-auto-scroll';
 import getScrollableDroppableOver from './get-scrollable-droppable-over';
 import { horizontal, vertical } from '../axis';
@@ -23,7 +23,7 @@ import type {
 } from '../../types';
 
 // Values used to control how the fluid auto scroll feels
-const config = {
+export const config = {
   // percentage distance from edge of container:
   startFrom: 0.25,
   maxSpeedAt: 0.05,
@@ -37,6 +37,9 @@ const config = {
 };
 
 const origin: Position = { x: 0, y: 0 };
+
+// will replace -0 and replace with +0
+const clean = apply((value: number) => (value === 0 ? 0 : value));
 
 export type PixelThresholds = {|
   startFrom: number,
@@ -125,7 +128,7 @@ const getRequiredScroll = (container: Area, center: Position): ?Position => {
     return -1 * getSpeed(distance.left, thresholds);
   })();
 
-  const required: Position = { x, y };
+  const required: Position = clean({ x, y });
 
   return isEqual(required, origin) ? null : required;
 };
