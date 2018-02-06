@@ -5,13 +5,13 @@ import type {
   Position,
   State,
   DraggableDimension,
-  Spacing,
+  DroppableDimension,
 } from '../../../../src/types';
 import type { AutoScroller } from '../../../../src/state/auto-scroll/auto-scroller-types';
 import type { PixelThresholds } from '../../../../src/state/auto-scroll/create-fluid-scroller';
 import { getPixelThresholds, config } from '../../../../src/state/auto-scroll/create-fluid-scroller';
 import setViewport, { resetViewport } from '../../../utils/set-viewport';
-import { patch } from '../../../../src/state/position';
+import { add, patch, subtract } from '../../../../src/state/position';
 import getArea from '../../../../src/state/get-area';
 import setWindowScrollSize, { resetWindowScrollSize } from '../../../utils/set-window-scroll-size';
 import setWindowScroll, { resetWindowScroll } from '../../../utils/set-window-scroll';
@@ -20,7 +20,29 @@ import createAutoScroller from '../../../../src/state/auto-scroll/auto-scroller'
 import * as state from '../../../utils/simple-state-preset';
 import { getPreset } from '../../../utils/dimension';
 import { expandByPosition } from '../../../../src/state/spacing';
-import { getDraggableDimension } from '../../../../src/state/dimension';
+import { getDraggableDimension, getDroppableDimension } from '../../../../src/state/dimension';
+
+const addDroppable = (base: State, droppable: DroppableDimension): State => ({
+  ...base,
+  dimension: {
+    ...base.dimension,
+    droppable: {
+      ...base.dimension.droppable,
+      [droppable.descriptor.id]: droppable,
+    },
+  },
+});
+
+const addDraggable = (base: State, draggable: DraggableDimension): State => ({
+  ...base,
+  dimension: {
+    ...base.dimension,
+    draggable: {
+      ...base.dimension.draggable,
+      [draggable.descriptor.id]: draggable,
+    },
+  },
+});
 
 describe('auto scroller', () => {
   let autoScroller: AutoScroller;
@@ -60,40 +82,34 @@ describe('auto scroller', () => {
 
       [vertical, horizontal].forEach((axis: Axis) => {
         describe(`on the ${axis.direction} axis`, () => {
-          type Case = {|
-            name: string,
-            scroll: (change: Position) => void,
-            didScroll: () => boolean,
-            area: Area,
-          |}
+          const preset = getPreset(axis);
+          const dragTo = (selection: Position): State =>
+            state.dragging(preset.inHome1.descriptor.id, selection);
 
           describe('window scrolling', () => {
-            const preset = getPreset(axis);
             const thresholds: PixelThresholds = getPixelThresholds(viewport, axis);
-            const dragTo = (selection: Position): State =>
-              state.dragging(preset.inHome1.descriptor.id, selection);
-
             describe('moving forward to end of window', () => {
-              it('should not scroll if not past the start threshold', () => {
-                const target: Position = patch(
-                  axis.line,
-                  // to the boundary is not enough to start
-                  (viewport[axis.size] - thresholds.startFrom),
-                  viewport.center[axis.crossLine],
-                );
+              const onStartBoundary: Position = patch(
+                axis.line,
+                // to the boundary is not enough to start
+                (viewport[axis.size] - thresholds.startFrom),
+                viewport.center[axis.crossLine],
+              );
+              const onMaxBoundary: Position = patch(
+                axis.line,
+                (viewport[axis.size] - thresholds.maxSpeedAt),
+                viewport.center[axis.crossLine],
+              );
 
-                autoScroller.onStateChange(state.idle, dragTo(target));
+              it('should not scroll if not past the start threshold', () => {
+                autoScroller.onStateChange(state.idle, dragTo(onStartBoundary));
 
                 requestAnimationFrame.flush();
                 expect(mocks.scrollWindow).not.toHaveBeenCalled();
               });
 
               it('should scroll if moving beyond the start threshold', () => {
-                const target: Position = patch(
-                  axis.line,
-                  (viewport[axis.size] - thresholds.startFrom) + 1,
-                  viewport.center[axis.crossLine],
-                );
+                const target: Position = add(onStartBoundary, patch(axis.line, 1));
 
                 autoScroller.onStateChange(state.idle, dragTo(target));
 
@@ -108,16 +124,8 @@ describe('auto scroller', () => {
               });
 
               it('should throttle multiple scrolls into a single animation frame', () => {
-                const target1: Position = patch(
-                  axis.line,
-                  (viewport[axis.size] - thresholds.startFrom) + 1,
-                  viewport.center[axis.crossLine],
-                );
-                const target2: Position = patch(
-                  axis.line,
-                  (viewport[axis.size] - thresholds.startFrom) + 2,
-                  viewport.center[axis.crossLine],
-                );
+                const target1: Position = add(onStartBoundary, patch(axis.line, 1));
+                const target2: Position = add(onStartBoundary, patch(axis.line, 2));
 
                 autoScroller.onStateChange(state.idle, dragTo(target1));
                 autoScroller.onStateChange(state.idle, dragTo(target2));
@@ -136,16 +144,8 @@ describe('auto scroller', () => {
               });
 
               it('should get faster the closer to the max speed point', () => {
-                const target1: Position = patch(
-                  axis.line,
-                  (viewport[axis.size] - thresholds.startFrom) + 1,
-                  viewport.center[axis.crossLine],
-                );
-                const target2: Position = patch(
-                  axis.line,
-                  (viewport[axis.size] - thresholds.startFrom) + 2,
-                  viewport.center[axis.crossLine],
-                );
+                const target1: Position = add(onStartBoundary, patch(axis.line, 1));
+                const target2: Position = add(onStartBoundary, patch(axis.line, 2));
 
                 autoScroller.onStateChange(state.idle, dragTo(target1));
                 requestAnimationFrame.step();
@@ -165,26 +165,16 @@ describe('auto scroller', () => {
               });
 
               it('should have the top speed at the max speed point', () => {
-                const target: Position = patch(
-                  axis.line,
-                  (viewport[axis.size] - thresholds.maxSpeedAt),
-                  viewport.center[axis.crossLine],
-                );
                 const expected: Position = patch(axis.line, config.maxScrollSpeed);
 
-                autoScroller.onStateChange(state.idle, dragTo(target));
+                autoScroller.onStateChange(state.idle, dragTo(onMaxBoundary));
                 requestAnimationFrame.step();
 
                 expect(mocks.scrollWindow).toHaveBeenCalledWith(expected);
               });
 
               it('should have the top speed when moving beyond the max speed point', () => {
-                const target: Position = patch(
-                  axis.line,
-                  // gone beyond the max scroll at point
-                  (viewport[axis.size] - thresholds.maxSpeedAt) + 1,
-                  viewport.center[axis.crossLine],
-                );
+                const target: Position = add(onMaxBoundary, patch(axis.line, 1));
                 const expected: Position = patch(axis.line, config.maxScrollSpeed);
 
                 autoScroller.onStateChange(state.idle, dragTo(target));
@@ -204,19 +194,14 @@ describe('auto scroller', () => {
                   },
                   client: expanded,
                 });
-                const selection: Position = patch(
-                  axis.line,
-                  // gone beyond the max scroll at point
-                  (viewport[axis.size] - thresholds.maxSpeedAt),
-                  viewport.center[axis.crossLine],
-                );
+                const selection: Position = onMaxBoundary;
                 const custom: State = (() => {
                   const base: State = state.dragging(
                     preset.inHome1.descriptor.id,
                     selection,
                   );
 
-                  return {
+                  const updated: State = {
                     ...base,
                     drag: {
                       ...base.drag,
@@ -226,14 +211,9 @@ describe('auto scroller', () => {
                         descriptor: tooBig.descriptor,
                       },
                     },
-                    dimension: {
-                      ...base.dimension,
-                      draggable: {
-                        ...base.dimension.draggable,
-                        [tooBig.descriptor.id]: tooBig,
-                      },
-                    },
                   };
+
+                  return addDraggable(updated, tooBig);
                 })();
 
                 autoScroller.onStateChange(state.idle, custom);
@@ -247,11 +227,7 @@ describe('auto scroller', () => {
                   scrollHeight: viewport.height,
                   scrollWidth: viewport.width,
                 });
-                const target: Position = patch(
-                  axis.line,
-                  (viewport[axis.size] - thresholds.startFrom) + 1,
-                  viewport.center[axis.crossLine],
-                );
+                const target: Position = onMaxBoundary;
 
                 autoScroller.onStateChange(state.idle, dragTo(target));
 
@@ -262,30 +238,32 @@ describe('auto scroller', () => {
 
             describe('moving backwards towards the start of window', () => {
               const windowScroll: Position = patch(axis.line, 10);
+
               beforeEach(() => {
                 setWindowScroll(windowScroll);
               });
 
-              it('should not scroll if not past the start threshold', () => {
-                const target: Position = patch(
-                  axis.line,
-                  // at the boundary is not enough to start
-                  windowScroll[axis.line] + (thresholds.startFrom),
-                  viewport.center[axis.crossLine],
-                );
+              const onStartBoundary: Position = patch(
+                axis.line,
+                // at the boundary is not enough to start
+                windowScroll[axis.line] + (thresholds.startFrom),
+                viewport.center[axis.crossLine],
+              );
+              const onMaxBoundary: Position = patch(
+                axis.line,
+                (windowScroll[axis.line] + thresholds.maxSpeedAt),
+                viewport.center[axis.crossLine],
+              );
 
-                autoScroller.onStateChange(state.idle, dragTo(target));
+              it('should not scroll if not past the start threshold', () => {
+                autoScroller.onStateChange(state.idle, dragTo(onStartBoundary));
 
                 requestAnimationFrame.flush();
                 expect(mocks.scrollWindow).not.toHaveBeenCalled();
               });
 
               it('should scroll if moving beyond the start threshold', () => {
-                const target: Position = patch(
-                  axis.line,
-                  (windowScroll[axis.line] + thresholds.startFrom) - 1,
-                  viewport.center[axis.crossLine],
-                );
+                const target: Position = subtract(onStartBoundary, patch(axis.line, 1));
 
                 autoScroller.onStateChange(state.idle, dragTo(target));
 
@@ -300,16 +278,8 @@ describe('auto scroller', () => {
               });
 
               it('should throttle multiple scrolls into a single animation frame', () => {
-                const target1: Position = patch(
-                  axis.line,
-                  (windowScroll[axis.line] + thresholds.startFrom) - 1,
-                  viewport.center[axis.crossLine],
-                );
-                const target2: Position = patch(
-                  axis.line,
-                  (windowScroll[axis.line] + thresholds.startFrom) - 2,
-                  viewport.center[axis.crossLine],
-                );
+                const target1: Position = subtract(onStartBoundary, patch(axis.line, 1));
+                const target2: Position = subtract(onStartBoundary, patch(axis.line, 2));
 
                 autoScroller.onStateChange(state.idle, dragTo(target1));
                 autoScroller.onStateChange(state.idle, dragTo(target2));
@@ -328,16 +298,8 @@ describe('auto scroller', () => {
               });
 
               it('should get faster the closer to the max speed point', () => {
-                const target1: Position = patch(
-                  axis.line,
-                  (windowScroll[axis.line] + thresholds.startFrom) - 1,
-                  viewport.center[axis.crossLine],
-                );
-                const target2: Position = patch(
-                  axis.line,
-                  (windowScroll[axis.line] + thresholds.startFrom) - 2,
-                  viewport.center[axis.crossLine],
-                );
+                const target1: Position = subtract(onStartBoundary, patch(axis.line, 1));
+                const target2: Position = subtract(onStartBoundary, patch(axis.line, 2));
 
                 autoScroller.onStateChange(state.idle, dragTo(target1));
                 requestAnimationFrame.step();
@@ -360,11 +322,7 @@ describe('auto scroller', () => {
               });
 
               it('should have the top speed at the max speed point', () => {
-                const target: Position = patch(
-                  axis.line,
-                  (windowScroll[axis.line] + thresholds.maxSpeedAt),
-                  viewport.center[axis.crossLine],
-                );
+                const target: Position = onMaxBoundary;
                 const expected: Position = patch(axis.line, -config.maxScrollSpeed);
 
                 autoScroller.onStateChange(state.idle, dragTo(target));
@@ -374,12 +332,7 @@ describe('auto scroller', () => {
               });
 
               it('should have the top speed when moving beyond the max speed point', () => {
-                const target: Position = patch(
-                  axis.line,
-                  // gone beyond the max scroll at point
-                  (windowScroll[axis.line] + thresholds.maxSpeedAt) - 1,
-                  viewport.center[axis.crossLine],
-                );
+                const target: Position = subtract(onMaxBoundary, patch(axis.line, 1));
                 const expected: Position = patch(axis.line, -config.maxScrollSpeed);
 
                 autoScroller.onStateChange(state.idle, dragTo(target));
@@ -399,18 +352,14 @@ describe('auto scroller', () => {
                   },
                   client: expanded,
                 });
-                const selection: Position = patch(
-                  axis.line,
-                  windowScroll[axis.line] + thresholds.maxSpeedAt,
-                  viewport.center[axis.crossLine],
-                );
+                const selection: Position = onMaxBoundary;
                 const custom: State = (() => {
                   const base: State = state.dragging(
                     preset.inHome1.descriptor.id,
                     selection,
                   );
 
-                  return {
+                  const updated: State = {
                     ...base,
                     drag: {
                       ...base.drag,
@@ -420,14 +369,9 @@ describe('auto scroller', () => {
                         descriptor: tooBig.descriptor,
                       },
                     },
-                    dimension: {
-                      ...base.dimension,
-                      draggable: {
-                        ...base.dimension.draggable,
-                        [tooBig.descriptor.id]: tooBig,
-                      },
-                    },
                   };
+
+                  return addDraggable(updated, tooBig);
                 })();
 
                 autoScroller.onStateChange(state.idle, custom);
@@ -441,11 +385,7 @@ describe('auto scroller', () => {
                   scrollHeight: viewport.height,
                   scrollWidth: viewport.width,
                 });
-                const target: Position = patch(
-                  axis.line,
-                  (windowScroll[axis.line] + thresholds.startFrom) - 1,
-                  viewport.center[axis.crossLine],
-                );
+                const target: Position = onMaxBoundary;
 
                 autoScroller.onStateChange(state.idle, dragTo(target));
 
@@ -461,26 +401,22 @@ describe('auto scroller', () => {
                 axis === vertical ? horizontal : vertical,
               );
 
-              it('should not scroll if not past the start threshold', () => {
-                const target: Position = patch(
-                  axis.line,
-                  viewport.center[axis.line],
-                  // to the boundary is not enough to start
-                  (viewport[axis.crossAxisSize] - crossAxisThresholds.startFrom),
-                );
+              const onStartBoundary: Position = patch(
+                axis.line,
+                viewport.center[axis.line],
+                // to the boundary is not enough to start
+                (viewport[axis.crossAxisSize] - crossAxisThresholds.startFrom),
+              );
 
-                autoScroller.onStateChange(state.idle, dragTo(target));
+              it('should not scroll if not past the start threshold', () => {
+                autoScroller.onStateChange(state.idle, dragTo(onStartBoundary));
 
                 requestAnimationFrame.flush();
                 expect(mocks.scrollWindow).not.toHaveBeenCalled();
               });
 
               it('should scroll if moving beyond the start threshold', () => {
-                const target: Position = patch(
-                  axis.line,
-                  viewport.center[axis.line],
-                  (viewport[axis.crossAxisSize] - crossAxisThresholds.startFrom) + 1,
-                );
+                const target: Position = add(onStartBoundary, patch(axis.crossLine, 1));
 
                 autoScroller.onStateChange(state.idle, dragTo(target));
 
@@ -506,26 +442,22 @@ describe('auto scroller', () => {
                 axis === vertical ? horizontal : vertical,
               );
 
-              it('should not scroll if not past the start threshold', () => {
-                const target: Position = patch(
-                  axis.line,
-                  viewport.center[axis.line],
-                  // to the boundary is not enough to start
-                  windowScroll[axis.crossLine] + (crossAxisThresholds.startFrom)
-                );
+              const onStartBoundary: Position = patch(
+                axis.line,
+                viewport.center[axis.line],
+                // to the boundary is not enough to start
+                windowScroll[axis.crossLine] + (crossAxisThresholds.startFrom)
+              );
 
-                autoScroller.onStateChange(state.idle, dragTo(target));
+              it('should not scroll if not past the start threshold', () => {
+                autoScroller.onStateChange(state.idle, dragTo(onStartBoundary));
 
                 requestAnimationFrame.flush();
                 expect(mocks.scrollWindow).not.toHaveBeenCalled();
               });
 
               it('should scroll if moving beyond the start threshold', () => {
-                const target: Position = patch(
-                  axis.line,
-                  viewport.center[axis.line],
-                  (windowScroll[axis.crossLine] + crossAxisThresholds.startFrom) - 1
-                );
+                const target: Position = subtract(onStartBoundary, patch(axis.crossLine, 1));
 
                 autoScroller.onStateChange(state.idle, dragTo(target));
 
@@ -542,7 +474,86 @@ describe('auto scroller', () => {
           });
 
           describe('droppable scrolling', () => {
+            const scrollableScrollSize = {
+              scrollWidth: 800,
+              scrollHeight: 800,
+            };
+            const frame: Area = getArea({
+              top: 0,
+              left: 0,
+              right: 600,
+              bottom: 600,
+            });
+            const scrollable: DroppableDimension = getDroppableDimension({
+              descriptor: {
+                id: 'drop-1',
+                type: 'TYPE',
+              },
+              client: getArea({
+                top: 0,
+                left: 0,
+                // bigger than the frame
+                right: scrollableScrollSize.scrollWidth,
+                bottom: scrollableScrollSize.scrollHeight,
+              }),
+              closest: {
+                frameClient: frame,
+                scrollWidth: scrollableScrollSize.scrollWidth,
+                scrollHeight: scrollableScrollSize.scrollHeight,
+                scroll: { x: 0, y: 0 },
+                shouldClipSubject: true,
+              },
+            });
 
+            const thresholds: PixelThresholds = getPixelThresholds(frame, axis);
+
+            beforeEach(() => {
+              // avoiding any window scrolling
+              setWindowScrollSize({
+                scrollHeight: viewport.height,
+                scrollWidth: viewport.width,
+              });
+            });
+
+            describe('moving forward to end of droppable', () => {
+              const onStartBoundary: Position = patch(
+                axis.line,
+                // to the boundary is not enough to start
+                (frame[axis.size] - thresholds.startFrom),
+                frame.center[axis.crossLine],
+              );
+
+              it('should not scroll if not past the start threshold', () => {
+                autoScroller.onStateChange(
+                  state.idle,
+                  addDroppable(dragTo(onStartBoundary), scrollable)
+                );
+
+                requestAnimationFrame.flush();
+                expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+              });
+
+              it('should scroll if moving beyond the start threshold', () => {
+                const target: Position = add(onStartBoundary, patch(axis.line, 1));
+
+                autoScroller.onStateChange(
+                  state.idle,
+                  addDroppable(dragTo(target), scrollable),
+                );
+
+                expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+
+                // only called after a frame
+                requestAnimationFrame.step();
+                expect(mocks.scrollDroppable).toHaveBeenCalled();
+                // moving forwards
+                const [id, scroll] = mocks.scrollDroppable.mock.calls[0];
+
+                expect(id).toBe(scrollable.descriptor.id);
+                expect(scroll[axis.line]).toBeGreaterThan(0);
+                expect(scroll[axis.crossLine]).toBe(0);
+              });
+            });
           });
 
           describe('window scrolling before droppable scrolling', () => {

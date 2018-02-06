@@ -36,6 +36,7 @@ const scrollable: DroppableDimension = getDroppableDimension({
     top: 0,
     left: 0,
     right: 100,
+    // bigger than the frame
     bottom: 200,
   }),
   closest: {
