@@ -20,7 +20,7 @@ import createAutoScroller from '../../../../src/state/auto-scroll/auto-scroller'
 import * as state from '../../../utils/simple-state-preset';
 import { getPreset } from '../../../utils/dimension';
 import { expandByPosition } from '../../../../src/state/spacing';
-import { getDraggableDimension, getDroppableDimension } from '../../../../src/state/dimension';
+import { getDraggableDimension, getDroppableDimension, scrollDroppable } from '../../../../src/state/dimension';
 
 const addDroppable = (base: State, droppable: DroppableDimension): State => ({
   ...base,
@@ -88,6 +88,7 @@ describe('auto scroller', () => {
 
           describe('window scrolling', () => {
             const thresholds: PixelThresholds = getPixelThresholds(viewport, axis);
+
             describe('moving forward to end of window', () => {
               const onStartBoundary: Position = patch(
                 axis.line,
@@ -128,7 +129,7 @@ describe('auto scroller', () => {
                 const target2: Position = add(onStartBoundary, patch(axis.line, 2));
 
                 autoScroller.onStateChange(state.idle, dragTo(target1));
-                autoScroller.onStateChange(state.idle, dragTo(target2));
+                autoScroller.onStateChange(dragTo(target1), dragTo(target2));
 
                 expect(mocks.scrollWindow).not.toHaveBeenCalled();
 
@@ -152,7 +153,7 @@ describe('auto scroller', () => {
                 expect(mocks.scrollWindow).toHaveBeenCalledTimes(1);
                 const scroll1: Position = (mocks.scrollWindow.mock.calls[0][0] : any);
 
-                autoScroller.onStateChange(state.idle, dragTo(target2));
+                autoScroller.onStateChange(dragTo(target1), dragTo(target2));
                 requestAnimationFrame.step();
                 expect(mocks.scrollWindow).toHaveBeenCalledTimes(2);
                 const scroll2: Position = (mocks.scrollWindow.mock.calls[1][0] : any);
@@ -246,7 +247,7 @@ describe('auto scroller', () => {
               const onStartBoundary: Position = patch(
                 axis.line,
                 // at the boundary is not enough to start
-                windowScroll[axis.line] + (thresholds.startFrom),
+                windowScroll[axis.line] + thresholds.startFrom,
                 viewport.center[axis.crossLine],
               );
               const onMaxBoundary: Position = patch(
@@ -282,7 +283,7 @@ describe('auto scroller', () => {
                 const target2: Position = subtract(onStartBoundary, patch(axis.line, 2));
 
                 autoScroller.onStateChange(state.idle, dragTo(target1));
-                autoScroller.onStateChange(state.idle, dragTo(target2));
+                autoScroller.onStateChange(dragTo(target1), dragTo(target2));
 
                 expect(mocks.scrollWindow).not.toHaveBeenCalled();
 
@@ -306,7 +307,7 @@ describe('auto scroller', () => {
                 expect(mocks.scrollWindow).toHaveBeenCalledTimes(1);
                 const scroll1: Position = (mocks.scrollWindow.mock.calls[0][0] : any);
 
-                autoScroller.onStateChange(state.idle, dragTo(target2));
+                autoScroller.onStateChange(dragTo(target1), dragTo(target2));
                 requestAnimationFrame.step();
                 expect(mocks.scrollWindow).toHaveBeenCalledTimes(2);
                 const scroll2: Position = (mocks.scrollWindow.mock.calls[1][0] : any);
@@ -522,6 +523,11 @@ describe('auto scroller', () => {
                 (frame[axis.size] - thresholds.startFrom),
                 frame.center[axis.crossLine],
               );
+              const onMaxBoundary: Position = patch(
+                axis.line,
+                (frame[axis.size] - thresholds.maxSpeedAt),
+                frame.center[axis.crossLine],
+              );
 
               it('should not scroll if not past the start threshold', () => {
                 autoScroller.onStateChange(
@@ -552,6 +558,303 @@ describe('auto scroller', () => {
                 expect(id).toBe(scrollable.descriptor.id);
                 expect(scroll[axis.line]).toBeGreaterThan(0);
                 expect(scroll[axis.crossLine]).toBe(0);
+              });
+
+              it('should throttle multiple scrolls into a single animation frame', () => {
+                const target1: Position = add(onStartBoundary, patch(axis.line, 1));
+                const target2: Position = add(onStartBoundary, patch(axis.line, 2));
+
+                autoScroller.onStateChange(
+                  state.idle,
+                  addDroppable(dragTo(target1), scrollable),
+                );
+                autoScroller.onStateChange(
+                  addDroppable(dragTo(target1), scrollable),
+                  addDroppable(dragTo(target2), scrollable),
+                );
+
+                expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+
+                // only called after a frame
+                requestAnimationFrame.step();
+                expect(mocks.scrollDroppable).toHaveBeenCalledTimes(1);
+
+                // verification
+                requestAnimationFrame.flush();
+                expect(mocks.scrollDroppable).toHaveBeenCalledTimes(1);
+
+                // not testing value called as we are not exposing getRequired scroll
+              });
+
+              it('should get faster the closer to the max speed point', () => {
+                const target1: Position = add(onStartBoundary, patch(axis.line, 1));
+                const target2: Position = add(onStartBoundary, patch(axis.line, 2));
+
+                autoScroller.onStateChange(
+                  state.idle,
+                  addDroppable(dragTo(target1), scrollable),
+                );
+                requestAnimationFrame.step();
+                expect(mocks.scrollDroppable).toHaveBeenCalledTimes(1);
+                const scroll1: Position = (mocks.scrollDroppable.mock.calls[0][1] : any);
+
+                autoScroller.onStateChange(
+                  addDroppable(dragTo(target1), scrollable),
+                  addDroppable(dragTo(target2), scrollable),
+                );
+                requestAnimationFrame.step();
+                expect(mocks.scrollDroppable).toHaveBeenCalledTimes(2);
+                const scroll2: Position = (mocks.scrollDroppable.mock.calls[1][1] : any);
+
+                expect(scroll1[axis.line]).toBeLessThan(scroll2[axis.line]);
+
+                // validation
+                expect(scroll1[axis.crossLine]).toBe(0);
+                expect(scroll2[axis.crossLine]).toBe(0);
+              });
+
+              it('should have the top speed at the max speed point', () => {
+                const expected: Position = patch(axis.line, config.maxScrollSpeed);
+
+                autoScroller.onStateChange(
+                  state.idle,
+                  addDroppable(dragTo(onMaxBoundary), scrollable),
+                );
+                requestAnimationFrame.step();
+
+                expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+                  scrollable.descriptor.id,
+                  expected
+                );
+              });
+
+              it('should have the top speed when moving beyond the max speed point', () => {
+                const target: Position = add(onMaxBoundary, patch(axis.line, 1));
+                const expected: Position = patch(axis.line, config.maxScrollSpeed);
+
+                autoScroller.onStateChange(
+                  state.idle,
+                  addDroppable(dragTo(target), scrollable),
+                );
+                requestAnimationFrame.step();
+
+                expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+                  scrollable.descriptor.id,
+                  expected
+                );
+              });
+
+              it('should not scroll if the item is too big', () => {
+                const expanded: Area = getArea(expandByPosition(frame, { x: 1, y: 1 }));
+                const tooBig: DraggableDimension = getDraggableDimension({
+                  descriptor: {
+                    id: 'too big',
+                    droppableId: preset.home.descriptor.id,
+                    // after the last item
+                    index: preset.inHomeList.length,
+                  },
+                  client: expanded,
+                });
+                const selection: Position = onMaxBoundary;
+                const custom: State = (() => {
+                  const base: State = state.dragging(
+                    preset.inHome1.descriptor.id,
+                    selection,
+                  );
+
+                  const updated: State = {
+                    ...base,
+                    drag: {
+                      ...base.drag,
+                      initial: {
+                        // $ExpectError
+                        ...base.drag.initial,
+                        descriptor: tooBig.descriptor,
+                      },
+                    },
+                  };
+
+                  return addDroppable(addDraggable(updated, tooBig), scrollable);
+                })();
+
+                autoScroller.onStateChange(state.idle, custom);
+
+                requestAnimationFrame.flush();
+                expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+              });
+            });
+
+            describe('moving backward to the start of droppable', () => {
+              const droppableScroll: Position = patch(axis.line, 10);
+              const scrolled: DroppableDimension = scrollDroppable(scrollable, droppableScroll);
+
+              const onStartBoundary: Position = patch(
+                axis.line,
+                // to the boundary is not enough to start
+                (frame[axis.start] + thresholds.startFrom),
+                frame.center[axis.crossLine],
+              );
+              const onMaxBoundary: Position = patch(
+                axis.line,
+                (frame[axis.start] + thresholds.maxSpeedAt),
+                frame.center[axis.crossLine],
+              );
+
+              it('should not scroll if not past the start threshold', () => {
+                autoScroller.onStateChange(
+                  state.idle,
+                  addDroppable(dragTo(onStartBoundary), scrolled)
+                );
+
+                requestAnimationFrame.flush();
+                expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+              });
+
+              it('should scroll if moving beyond the start threshold', () => {
+                // going backwards
+                const target: Position = subtract(onStartBoundary, patch(axis.line, 1));
+
+                autoScroller.onStateChange(
+                  state.idle,
+                  addDroppable(dragTo(target), scrolled),
+                );
+
+                expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+
+                // only called after a frame
+                requestAnimationFrame.step();
+                expect(mocks.scrollDroppable).toHaveBeenCalled();
+                const [id, scroll] = mocks.scrollDroppable.mock.calls[0];
+
+                // validation
+                expect(id).toBe(scrollable.descriptor.id);
+                // moving backwards
+                expect(scroll[axis.line]).toBeLessThan(0);
+                expect(scroll[axis.crossLine]).toBe(0);
+              });
+
+              it('should throttle multiple scrolls into a single animation frame', () => {
+                const target1: Position = subtract(onStartBoundary, patch(axis.line, 1));
+                const target2: Position = subtract(onStartBoundary, patch(axis.line, 2));
+
+                autoScroller.onStateChange(
+                  state.idle,
+                  addDroppable(dragTo(target1), scrolled),
+                );
+                autoScroller.onStateChange(
+                  addDroppable(dragTo(target1), scrolled),
+                  addDroppable(dragTo(target2), scrolled),
+                );
+
+                expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+
+                // only called after a frame
+                requestAnimationFrame.step();
+                expect(mocks.scrollDroppable).toHaveBeenCalledTimes(1);
+
+                // verification
+                requestAnimationFrame.flush();
+                expect(mocks.scrollDroppable).toHaveBeenCalledTimes(1);
+
+                // not testing value called as we are not exposing getRequired scroll
+              });
+
+              it('should get faster the closer to the max speed point', () => {
+                const target1: Position = subtract(onStartBoundary, patch(axis.line, 1));
+                const target2: Position = subtract(onStartBoundary, patch(axis.line, 2));
+
+                autoScroller.onStateChange(
+                  state.idle,
+                  addDroppable(dragTo(target1), scrolled),
+                );
+                requestAnimationFrame.step();
+                expect(mocks.scrollDroppable).toHaveBeenCalledTimes(1);
+                const scroll1: Position = (mocks.scrollDroppable.mock.calls[0][1] : any);
+
+                autoScroller.onStateChange(
+                  addDroppable(dragTo(target1), scrolled),
+                  addDroppable(dragTo(target2), scrolled),
+                );
+                requestAnimationFrame.step();
+                expect(mocks.scrollDroppable).toHaveBeenCalledTimes(2);
+                const scroll2: Position = (mocks.scrollDroppable.mock.calls[1][1] : any);
+
+                // moving backwards
+                expect(scroll1[axis.line]).toBeGreaterThan(scroll2[axis.line]);
+
+                // validation
+                expect(scroll1[axis.crossLine]).toBe(0);
+                expect(scroll2[axis.crossLine]).toBe(0);
+              });
+
+              it('should have the top speed at the max speed point', () => {
+                const expected: Position = patch(axis.line, -config.maxScrollSpeed);
+
+                autoScroller.onStateChange(
+                  state.idle,
+                  addDroppable(dragTo(onMaxBoundary), scrolled),
+                );
+                requestAnimationFrame.step();
+
+                expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+                  scrollable.descriptor.id,
+                  expected
+                );
+              });
+
+              it('should have the top speed when moving beyond the max speed point', () => {
+                const target: Position = subtract(onMaxBoundary, patch(axis.line, 1));
+                const expected: Position = patch(axis.line, -config.maxScrollSpeed);
+
+                autoScroller.onStateChange(
+                  state.idle,
+                  addDroppable(dragTo(target), scrolled),
+                );
+                requestAnimationFrame.step();
+
+                expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+                  scrollable.descriptor.id,
+                  expected
+                );
+              });
+
+              it('should not scroll if the item is too big', () => {
+                const expanded: Area = getArea(expandByPosition(frame, { x: 1, y: 1 }));
+                const tooBig: DraggableDimension = getDraggableDimension({
+                  descriptor: {
+                    id: 'too big',
+                    droppableId: preset.home.descriptor.id,
+                    // after the last item
+                    index: preset.inHomeList.length,
+                  },
+                  client: expanded,
+                });
+                const selection: Position = onMaxBoundary;
+                const custom: State = (() => {
+                  const base: State = state.dragging(
+                    preset.inHome1.descriptor.id,
+                    selection,
+                  );
+
+                  const updated: State = {
+                    ...base,
+                    drag: {
+                      ...base.drag,
+                      initial: {
+                        // $ExpectError
+                        ...base.drag.initial,
+                        descriptor: tooBig.descriptor,
+                      },
+                    },
+                  };
+
+                  return addDroppable(addDraggable(updated, tooBig), scrolled);
+                })();
+
+                autoScroller.onStateChange(state.idle, custom);
+
+                requestAnimationFrame.flush();
+                expect(mocks.scrollDroppable).not.toHaveBeenCalled();
               });
             });
           });
