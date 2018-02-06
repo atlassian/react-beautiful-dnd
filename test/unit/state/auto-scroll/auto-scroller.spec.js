@@ -94,12 +94,12 @@ describe('auto scroller', () => {
                 axis.line,
                 // to the boundary is not enough to start
                 (viewport[axis.size] - thresholds.startFrom),
-                viewport.center[axis.crossLine],
+                viewport.center[axis.crossAxisLine],
               );
               const onMaxBoundary: Position = patch(
                 axis.line,
                 (viewport[axis.size] - thresholds.maxSpeedAt),
-                viewport.center[axis.crossLine],
+                viewport.center[axis.crossAxisLine],
               );
 
               it('should not scroll if not past the start threshold', () => {
@@ -161,8 +161,8 @@ describe('auto scroller', () => {
                 expect(scroll1[axis.line]).toBeLessThan(scroll2[axis.line]);
 
                 // validation
-                expect(scroll1[axis.crossLine]).toBe(0);
-                expect(scroll2[axis.crossLine]).toBe(0);
+                expect(scroll1[axis.crossAxisLine]).toBe(0);
+                expect(scroll2[axis.crossAxisLine]).toBe(0);
               });
 
               it('should have the top speed at the max speed point', () => {
@@ -248,12 +248,12 @@ describe('auto scroller', () => {
                 axis.line,
                 // at the boundary is not enough to start
                 windowScroll[axis.line] + thresholds.startFrom,
-                viewport.center[axis.crossLine],
+                viewport.center[axis.crossAxisLine],
               );
               const onMaxBoundary: Position = patch(
                 axis.line,
                 (windowScroll[axis.line] + thresholds.maxSpeedAt),
-                viewport.center[axis.crossLine],
+                viewport.center[axis.crossAxisLine],
               );
 
               it('should not scroll if not past the start threshold', () => {
@@ -318,8 +318,8 @@ describe('auto scroller', () => {
                 expect(Math.abs(scroll1[axis.line])).toBeLessThan(Math.abs(scroll2[axis.line]));
 
                 // validation
-                expect(scroll1[axis.crossLine]).toBe(0);
-                expect(scroll2[axis.crossLine]).toBe(0);
+                expect(scroll1[axis.crossAxisLine]).toBe(0);
+                expect(scroll2[axis.crossAxisLine]).toBe(0);
               });
 
               it('should have the top speed at the max speed point', () => {
@@ -417,7 +417,7 @@ describe('auto scroller', () => {
               });
 
               it('should scroll if moving beyond the start threshold', () => {
-                const target: Position = add(onStartBoundary, patch(axis.crossLine, 1));
+                const target: Position = add(onStartBoundary, patch(axis.crossAxisLine, 1));
 
                 autoScroller.onStateChange(state.idle, dragTo(target));
 
@@ -428,13 +428,13 @@ describe('auto scroller', () => {
                 expect(mocks.scrollWindow).toHaveBeenCalled();
                 // moving forwards
                 const request: Position = mocks.scrollWindow.mock.calls[0][0];
-                expect(request[axis.crossLine]).toBeGreaterThan(0);
+                expect(request[axis.crossAxisLine]).toBeGreaterThan(0);
               });
             });
 
             // just some light tests to ensure that cross axis moving also works
             describe('moving backward on the cross axis', () => {
-              const windowScroll: Position = patch(axis.crossLine, 10);
+              const windowScroll: Position = patch(axis.crossAxisLine, 10);
               beforeEach(() => {
                 setWindowScroll(windowScroll);
               });
@@ -448,7 +448,7 @@ describe('auto scroller', () => {
                 axis.line,
                 viewport.center[axis.line],
                 // to the boundary is not enough to start
-                windowScroll[axis.crossLine] + (crossAxisThresholds.startFrom)
+                windowScroll[axis.crossAxisLine] + (crossAxisThresholds.startFrom)
               );
 
               it('should not scroll if not past the start threshold', () => {
@@ -459,7 +459,7 @@ describe('auto scroller', () => {
               });
 
               it('should scroll if moving beyond the start threshold', () => {
-                const target: Position = subtract(onStartBoundary, patch(axis.crossLine, 1));
+                const target: Position = subtract(onStartBoundary, patch(axis.crossAxisLine, 1));
 
                 autoScroller.onStateChange(state.idle, dragTo(target));
 
@@ -470,7 +470,7 @@ describe('auto scroller', () => {
                 expect(mocks.scrollWindow).toHaveBeenCalled();
                 // moving backwards
                 const request: Position = mocks.scrollWindow.mock.calls[0][0];
-                expect(request[axis.crossLine]).toBeLessThan(0);
+                expect(request[axis.crossAxisLine]).toBeLessThan(0);
               });
             });
           });
@@ -522,12 +522,12 @@ describe('auto scroller', () => {
                 axis.line,
                 // to the boundary is not enough to start
                 (frame[axis.size] - thresholds.startFrom),
-                frame.center[axis.crossLine],
+                frame.center[axis.crossAxisLine],
               );
               const onMaxBoundary: Position = patch(
                 axis.line,
                 (frame[axis.size] - thresholds.maxSpeedAt),
-                frame.center[axis.crossLine],
+                frame.center[axis.crossAxisLine],
               );
 
               it('should not scroll if not past the start threshold', () => {
@@ -558,7 +558,7 @@ describe('auto scroller', () => {
 
                 expect(id).toBe(scrollable.descriptor.id);
                 expect(scroll[axis.line]).toBeGreaterThan(0);
-                expect(scroll[axis.crossLine]).toBe(0);
+                expect(scroll[axis.crossAxisLine]).toBe(0);
               });
 
               it('should throttle multiple scrolls into a single animation frame', () => {
@@ -610,8 +610,8 @@ describe('auto scroller', () => {
                 expect(scroll1[axis.line]).toBeLessThan(scroll2[axis.line]);
 
                 // validation
-                expect(scroll1[axis.crossLine]).toBe(0);
-                expect(scroll2[axis.crossLine]).toBe(0);
+                expect(scroll1[axis.crossAxisLine]).toBe(0);
+                expect(scroll2[axis.crossAxisLine]).toBe(0);
               });
 
               it('should have the top speed at the max speed point', () => {
@@ -711,12 +711,12 @@ describe('auto scroller', () => {
                 axis.line,
                 // to the boundary is not enough to start
                 (frame[axis.start] + thresholds.startFrom),
-                frame.center[axis.crossLine],
+                frame.center[axis.crossAxisLine],
               );
               const onMaxBoundary: Position = patch(
                 axis.line,
                 (frame[axis.start] + thresholds.maxSpeedAt),
-                frame.center[axis.crossLine],
+                frame.center[axis.crossAxisLine],
               );
 
               it('should not scroll if not past the start threshold', () => {
@@ -749,7 +749,7 @@ describe('auto scroller', () => {
                 expect(id).toBe(scrollable.descriptor.id);
                 // moving backwards
                 expect(scroll[axis.line]).toBeLessThan(0);
-                expect(scroll[axis.crossLine]).toBe(0);
+                expect(scroll[axis.crossAxisLine]).toBe(0);
               });
 
               it('should throttle multiple scrolls into a single animation frame', () => {
@@ -802,8 +802,8 @@ describe('auto scroller', () => {
                 expect(scroll1[axis.line]).toBeGreaterThan(scroll2[axis.line]);
 
                 // validation
-                expect(scroll1[axis.crossLine]).toBe(0);
-                expect(scroll2[axis.crossLine]).toBe(0);
+                expect(scroll1[axis.crossAxisLine]).toBe(0);
+                expect(scroll2[axis.crossAxisLine]).toBe(0);
               });
 
               it('should have the top speed at the max speed point', () => {
@@ -896,7 +896,7 @@ describe('auto scroller', () => {
 
             // just some light tests to ensure that cross axis moving also works
             describe('moving forward on the cross axis', () => {
-              const droppableScroll: Position = patch(axis.crossLine, 10);
+              const droppableScroll: Position = patch(axis.crossAxisLine, 10);
               const scrolled: DroppableDimension = scrollDroppable(scrollable, droppableScroll);
 
               const crossAxisThresholds: PixelThresholds = getPixelThresholds(
@@ -919,7 +919,7 @@ describe('auto scroller', () => {
               });
 
               it('should scroll if moving beyond the start threshold', () => {
-                const target: Position = add(onStartBoundary, patch(axis.crossLine, 1));
+                const target: Position = add(onStartBoundary, patch(axis.crossAxisLine, 1));
 
                 autoScroller.onStateChange(
                   state.idle,
@@ -935,13 +935,16 @@ describe('auto scroller', () => {
                 const [id, scroll] = mocks.scrollDroppable.mock.calls[0];
 
                 expect(id).toBe(scrolled.descriptor.id);
-                expect(scroll[axis.crossLine]).toBeGreaterThan(0);
+                expect(scroll[axis.crossAxisLine]).toBeGreaterThan(0);
               });
             });
 
             // just some light tests to ensure that cross axis moving also works
             describe('moving backward on the cross axis', () => {
-              const scrolled: DroppableDimension = scrollDroppable(scrollable, patch(axis.crossLine, 10));
+              const scrolled: DroppableDimension = scrollDroppable(
+                scrollable,
+                patch(axis.crossAxisLine, 10)
+              );
               const crossAxisThresholds: PixelThresholds = getPixelThresholds(
                 viewport,
                 axis === vertical ? horizontal : vertical,
@@ -965,7 +968,7 @@ describe('auto scroller', () => {
               });
 
               it('should scroll if moving beyond the start threshold', () => {
-                const target: Position = subtract(onStartBoundary, patch(axis.crossLine, 1));
+                const target: Position = subtract(onStartBoundary, patch(axis.crossAxisLine, 1));
 
                 autoScroller.onStateChange(
                   state.idle,
@@ -979,7 +982,7 @@ describe('auto scroller', () => {
                 expect(mocks.scrollDroppable).toHaveBeenCalled();
                 // moving backwards
                 const request: Position = mocks.scrollDroppable.mock.calls[0][1];
-                expect(request[axis.crossLine]).toBeLessThan(0);
+                expect(request[axis.crossAxisLine]).toBeLessThan(0);
               });
             });
           });

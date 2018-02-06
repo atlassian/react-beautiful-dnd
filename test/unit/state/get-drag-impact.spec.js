@@ -120,7 +120,7 @@ describe('get drag impact', () => {
               // up to the line but not over it
               inHome2.page.withoutMargin[axis.start],
               // no movement on cross axis
-              inHome1.page.withoutMargin.center[axis.crossLine],
+              inHome1.page.withoutMargin.center[axis.crossAxisLine],
             );
             const expected: DragImpact = {
               movement: {
@@ -153,7 +153,7 @@ describe('get drag impact', () => {
             axis.line,
             inHome4.page.withoutMargin[axis.start] + 1,
             // no change
-            inHome2.page.withoutMargin.center[axis.crossLine],
+            inHome2.page.withoutMargin.center[axis.crossAxisLine],
           );
           const expected: DragImpact = {
             movement: {
@@ -199,7 +199,7 @@ describe('get drag impact', () => {
               axis.line,
               inHome1.page.withoutMargin[axis.end] - 1,
               // no change
-              inHome3.page.withoutMargin.center[axis.crossLine],
+              inHome3.page.withoutMargin.center[axis.crossAxisLine],
             );
 
             const expected: DragImpact = {
@@ -248,7 +248,7 @@ describe('get drag impact', () => {
               const startOfInHome2: Position = patch(
                 axis.line,
                 inHome2.page.withoutMargin[axis.start],
-                inHome2.page.withoutMargin.center[axis.crossLine],
+                inHome2.page.withoutMargin.center[axis.crossAxisLine],
               );
               const distanceNeeded: Position = add(
                 subtract(startOfInHome2, inHome1.page.withoutMargin.center),
@@ -302,7 +302,7 @@ describe('get drag impact', () => {
               const endOfInHome2: Position = patch(
                 axis.line,
                 inHome2.page.withoutMargin[axis.end],
-                inHome2.page.withoutMargin.center[axis.crossLine],
+                inHome2.page.withoutMargin.center[axis.crossAxisLine],
               );
               const distanceNeeded: Position = add(
                 subtract(endOfInHome2, inHome4.page.withoutMargin.center),
@@ -603,7 +603,7 @@ describe('get drag impact', () => {
               axis.line,
               // just before the end of the dimension which is the cut off
               inForeign1.page.withoutMargin[axis.end] - 1,
-              inForeign1.page.withoutMargin.center[axis.crossLine],
+              inForeign1.page.withoutMargin.center[axis.crossAxisLine],
             );
             const expected: DragImpact = {
               movement: {
@@ -660,7 +660,7 @@ describe('get drag impact', () => {
             const pageCenter: Position = patch(
               axis.line,
               inForeign2.page.withoutMargin[axis.end] - 1,
-              inForeign2.page.withoutMargin.center[axis.crossLine],
+              inForeign2.page.withoutMargin.center[axis.crossAxisLine],
             );
             const expected: DragImpact = {
               movement: {
@@ -712,7 +712,7 @@ describe('get drag impact', () => {
             const pageCenter: Position = patch(
               axis.line,
               inForeign4.page.withoutMargin[axis.end],
-              inForeign4.page.withoutMargin.center[axis.crossLine],
+              inForeign4.page.withoutMargin.center[axis.crossAxisLine],
             );
             const expected: DragImpact = {
               movement: {
@@ -777,7 +777,7 @@ describe('get drag impact', () => {
           const pageCenter: Position = patch(
             axis.line,
             inForeign2.page.withoutMargin[axis.end] - 1,
-            inForeign2.page.withoutMargin.center[axis.crossLine],
+            inForeign2.page.withoutMargin.center[axis.crossAxisLine],
           );
 
           it('should have no impact impact the destination (actual)', () => {
@@ -873,7 +873,7 @@ describe('get drag impact', () => {
           const pageCenter: Position = patch(
             axis.line,
             inForeign2.page.withoutMargin[axis.end] - 1,
-            inForeign2.page.withoutMargin.center[axis.crossLine],
+            inForeign2.page.withoutMargin.center[axis.crossAxisLine],
           );
 
           it('should impact the destination (actual)', () => {

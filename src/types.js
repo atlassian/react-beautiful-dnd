@@ -49,10 +49,10 @@ export type Direction = 'horizontal' | 'vertical';
 export type VerticalAxis = {|
   direction: 'vertical',
   line: 'y',
-  crossLine: 'x',
   start: 'top',
   end: 'bottom',
   size: 'height',
+  crossAxisLine: 'x',
   crossAxisStart: 'left',
   crossAxisEnd: 'right',
   crossAxisSize: 'width',
@@ -61,10 +61,10 @@ export type VerticalAxis = {|
 export type HorizontalAxis = {|
   direction: 'horizontal',
   line: 'x',
-  crossLine: 'y',
   start: 'left',
   end: 'right',
   size: 'width',
+  crossAxisLine: 'y',
   crossAxisStart: 'top',
   crossAxisEnd: 'bottom',
   crossAxisSize: 'height',
