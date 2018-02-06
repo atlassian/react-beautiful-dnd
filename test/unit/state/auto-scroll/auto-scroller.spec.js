@@ -941,12 +941,10 @@ describe('auto scroller', () => {
 
             // just some light tests to ensure that cross axis moving also works
             describe('moving backward on the cross axis', () => {
-              const scrolled: DroppableDimension = scrollDroppable(
-                scrollable,
-                patch(axis.crossAxisLine, 10)
-              );
+              const droppableScroll: Position = patch(axis.crossAxisLine, 10);
+              const scrolled: DroppableDimension = scrollDroppable(scrollable, droppableScroll);
               const crossAxisThresholds: PixelThresholds = getPixelThresholds(
-                viewport,
+                frame,
                 axis === vertical ? horizontal : vertical,
               );
 
@@ -954,7 +952,7 @@ describe('auto scroller', () => {
                 axis.line,
                 frame.center[axis.line],
                 // to the boundary is not enough to start
-                (frame[axis.start] + thresholds.startFrom)
+                (frame[axis.crossAxisStart] + crossAxisThresholds.startFrom)
               );
 
               it('should not scroll if not past the start threshold', () => {
