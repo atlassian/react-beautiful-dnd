@@ -986,7 +986,13 @@ describe('auto scroller', () => {
           });
 
           describe('window scrolling before droppable scrolling', () => {
-            // TODO: if window scrolling - do not droppable scroll
+            it('should scroll the window only if both the window and droppable can be scrolled', () => {
+
+            });
+
+            it('should only scroll the window even if there is overlap', () => {
+
+            });
           });
         });
 
@@ -1001,9 +1007,5 @@ describe('auto scroller', () => {
         });
       });
     });
-  });
-
-  describe('jump scrolling', () => {
-
   });
 });
