@@ -70,59 +70,72 @@ export default ({
     const droppable: DroppableDimension = state.dimension.droppable[destination.droppableId];
     const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
 
-    // Unlike the fluid scroller we scroll the droppable first
-    // to prevent the item from moving outside of its container
-    if (closestScrollable) {
-      if (isTooBigToAutoScroll(closestScrollable.frame, draggable.page.withMargin)) {
-        moveByOffset(state, request);
-        return;
-      }
-
-      if (canScrollDroppable(droppable, request)) {
-        // not scheduling - jump requests need to be performed instantly
-
-        // if the window can also not be scrolled - adjust the item
-        if (!canScrollWindow(request)) {
-          const overlap: ?Position = getDroppableOverlap(droppable, request);
-
-          console.log('droppable overlap?', overlap);
-
-          if (overlap) {
-            console.warn('DROPPABLE OVERLAP', overlap);
-            moveByOffset(state, overlap);
-          }
-        } else {
-          console.log('can still scroll window');
-        }
-
-        scrollDroppable(droppable.descriptor.id, request);
-        return;
-      }
-
-      // can now check if we need to scroll the window
-    }
-
-    // Scroll the window if we can
-
+    // 1. Is the draggable too big to auto scroll?
     if (isTooBigToAutoScroll(getViewport(), draggable.page.withMargin)) {
       moveByOffset(state, request);
       return;
     }
 
+    if (closestScrollable) {
+      if (isTooBigToAutoScroll(closestScrollable.frame, draggable.page.withMargin)) {
+        moveByOffset(state, request);
+        return;
+      }
+    }
+
+    // 1. We scroll the droppable first if we can to avoid the draggable
+    // leaving the list
+
+    if (canScrollDroppable(droppable, request)) {
+      const overlap: ?Position = getDroppableOverlap(droppable, request);
+      // Droppable can absorb the entire scroll request
+      if (!overlap) {
+        scrollDroppable(droppable.descriptor.id, request);
+        return;
+      }
+      // there is overlap - can the window absorb it?
+
+      const canWindowScrollOverlap: boolean = canScrollWindow(overlap);
+
+      // window cannot absorb overlap: we need to move it
+      if (!canWindowScrollOverlap) {
+        moveByOffset(state, overlap);
+        return;
+      }
+
+      // how much can the window aborb?
+      const windowOverlap: ?Position = getWindowOverlap(overlap);
+
+      // window can absorb all of the overlap
+      if (!windowOverlap) {
+        scrollWindow(overlap);
+        return;
+      }
+
+      // window can only partially absorb overlap
+      // need to move the item by the remainder and scroll the window
+      moveByOffset(state, windowOverlap);
+      scrollWindow(overlap);
+      return;
+    }
+
+    // 2. Cannot scroll the droppable - can we scroll the window?
+
+    // Cannot scroll the window at all
     if (!canScrollWindow(request)) {
-      console.warn('Jump scroll requested but it cannot be done by Droppable or the Window');
       moveByOffset(state, request);
       return;
     }
 
     const overlap: ?Position = getWindowOverlap(request);
 
-    if (overlap) {
-      console.warn('WINDOW OVERLAP', overlap);
-      moveByOffset(state, overlap);
+    // Window can absorb the entire scroll
+    if (!overlap) {
+      scrollWindow(request);
+      return;
     }
 
-    // not scheduling - jump requests need to be performed instantly
+    moveByOffset(state, overlap);
     scrollWindow(request);
   };
 
