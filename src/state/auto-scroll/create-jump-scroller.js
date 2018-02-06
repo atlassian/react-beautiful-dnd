@@ -70,6 +70,8 @@ export default ({
     const droppable: DroppableDimension = state.dimension.droppable[destination.droppableId];
     const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
 
+    // Unlike the fluid scroller we scroll the droppable first
+    // to prevent the item from moving outside of its container
     if (closestScrollable) {
       if (isTooBigToAutoScroll(closestScrollable.frame, draggable.page.withMargin)) {
         moveByOffset(state, request);

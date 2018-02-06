@@ -44,6 +44,42 @@ const addDraggable = (base: State, draggable: DraggableDimension): State => ({
   },
 });
 
+const windowScrollSize = {
+  scrollHeight: 2000,
+  scrollWidth: 1600,
+};
+
+const scrollableScrollSize = {
+  scrollWidth: 800,
+  scrollHeight: 800,
+};
+const frame: Area = getArea({
+  top: 0,
+  left: 0,
+  right: 600,
+  bottom: 600,
+});
+const scrollable: DroppableDimension = getDroppableDimension({
+  descriptor: {
+    id: 'drop-1',
+    type: 'TYPE',
+  },
+  client: getArea({
+    top: 0,
+    left: 0,
+    // bigger than the frame
+    right: scrollableScrollSize.scrollWidth,
+    bottom: scrollableScrollSize.scrollHeight,
+  }),
+  closest: {
+    frameClient: frame,
+    scrollWidth: scrollableScrollSize.scrollWidth,
+    scrollHeight: scrollableScrollSize.scrollHeight,
+    scroll: { x: 0, y: 0 },
+    shouldClipSubject: true,
+  },
+});
+
 describe('auto scroller', () => {
   let autoScroller: AutoScroller;
   let mocks;
@@ -74,10 +110,7 @@ describe('auto scroller', () => {
 
       beforeEach(() => {
         setViewport(viewport);
-        setWindowScrollSize({
-          scrollHeight: 2000,
-          scrollWidth: 1600,
-        });
+        setWindowScrollSize(windowScrollSize);
       });
 
       [vertical, horizontal].forEach((axis: Axis) => {
@@ -476,37 +509,6 @@ describe('auto scroller', () => {
           });
 
           describe('droppable scrolling', () => {
-            const scrollableScrollSize = {
-              scrollWidth: 800,
-              scrollHeight: 800,
-            };
-            const frame: Area = getArea({
-              top: 0,
-              left: 0,
-              right: 600,
-              bottom: 600,
-            });
-            const scrollable: DroppableDimension = getDroppableDimension({
-              descriptor: {
-                id: 'drop-1',
-                type: 'TYPE',
-              },
-              client: getArea({
-                top: 0,
-                left: 0,
-                // bigger than the frame
-                right: scrollableScrollSize.scrollWidth,
-                bottom: scrollableScrollSize.scrollHeight,
-              }),
-              closest: {
-                frameClient: frame,
-                scrollWidth: scrollableScrollSize.scrollWidth,
-                scrollHeight: scrollableScrollSize.scrollHeight,
-                scroll: { x: 0, y: 0 },
-                shouldClipSubject: true,
-              },
-            });
-
             const thresholds: PixelThresholds = getPixelThresholds(frame, axis);
 
             beforeEach(() => {
@@ -986,23 +988,99 @@ describe('auto scroller', () => {
           });
 
           describe('window scrolling before droppable scrolling', () => {
+            const custom: DroppableDimension = getDroppableDimension({
+              descriptor: {
+                id: 'scrollable that is similiar to the viewport',
+                type: 'TYPE',
+              },
+              client: getArea({
+                top: 0,
+                left: 0,
+                // bigger than the frame
+                right: windowScrollSize.scrollWidth,
+                bottom: windowScrollSize.scrollHeight,
+              }),
+              closest: {
+                frameClient: viewport,
+                scrollWidth: windowScrollSize.scrollWidth,
+                scrollHeight: windowScrollSize.scrollHeight,
+                scroll: { x: 0, y: 0 },
+                shouldClipSubject: true,
+              },
+            });
+            const thresholds: PixelThresholds = getPixelThresholds(viewport, axis);
+
             it('should scroll the window only if both the window and droppable can be scrolled', () => {
+              const onMaxBoundary: Position = patch(
+                axis.line,
+                (viewport[axis.size] - thresholds.maxSpeedAt),
+                viewport.center[axis.crossAxisLine],
+              );
 
-            });
+              autoScroller.onStateChange(
+                state.idle,
+                addDroppable(dragTo(onMaxBoundary), custom),
+              );
+              requestAnimationFrame.step();
 
-            it('should only scroll the window even if there is overlap', () => {
-
+              expect(mocks.scrollWindow).toHaveBeenCalled();
+              expect(mocks.scrollDroppable).not.toHaveBeenCalled();
             });
           });
-        });
 
-        describe('on drag end', () => {
-          it('should cancel any pending window scroll', () => {
+          describe('on drag end', () => {
+            const endDragStates = [
+              state.idle,
+              state.dropAnimating(),
+              state.userCancel(),
+              state.dropComplete(),
+            ];
 
-          });
+            endDragStates.forEach((end: State) => {
+              it('should cancel any pending window scroll', () => {
+                const thresholds: PixelThresholds = getPixelThresholds(viewport, axis);
+                const onMaxBoundary: Position = patch(
+                  axis.line,
+                  (viewport[axis.size] - thresholds.maxSpeedAt),
+                  viewport.center[axis.crossAxisLine],
+                );
 
-          it('should cancel any pending droppable scroll', () => {
+                autoScroller.onStateChange(state.idle, dragTo(onMaxBoundary));
 
+                // frame not cleared
+                expect(mocks.scrollWindow).not.toHaveBeenCalled();
+
+                // should cancel the next frame
+                autoScroller.onStateChange(dragTo(onMaxBoundary), end);
+                requestAnimationFrame.flush();
+
+                expect(mocks.scrollWindow).not.toHaveBeenCalled();
+              });
+
+              it('should cancel any pending droppable scroll', () => {
+                const thresholds: PixelThresholds = getPixelThresholds(frame, axis);
+                const onMaxBoundary: Position = patch(
+                  axis.line,
+                  (frame[axis.size] - thresholds.maxSpeedAt),
+                  frame.center[axis.crossAxisLine],
+                );
+                const drag: State = addDroppable(dragTo(onMaxBoundary), scrollable);
+
+                autoScroller.onStateChange(
+                  state.idle,
+                  drag
+                );
+
+                // frame not cleared
+                expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+
+                // should cancel the next frame
+                autoScroller.onStateChange(drag, end);
+                requestAnimationFrame.flush();
+
+                expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+              });
+            });
           });
         });
       });
