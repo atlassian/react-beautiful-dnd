@@ -432,6 +432,7 @@ describe('auto scroller', () => {
               });
             });
 
+            // just some light tests to ensure that cross axis moving also works
             describe('moving backward on the cross axis', () => {
               const windowScroll: Position = patch(axis.crossLine, 10);
               beforeEach(() => {
@@ -682,6 +683,24 @@ describe('auto scroller', () => {
                 requestAnimationFrame.flush();
                 expect(mocks.scrollDroppable).not.toHaveBeenCalled();
               });
+
+              it('should not scroll if the droppable is unable to be scrolled', () => {
+                const target: Position = onMaxBoundary;
+                if (!scrollable.viewport.closestScrollable) {
+                  throw new Error('Invalid test setup');
+                }
+                // scrolling to max scroll point
+                const maxChange: Position = scrollable.viewport.closestScrollable.scroll.max;
+                const scrolled: DroppableDimension = scrollDroppable(scrollable, maxChange);
+
+                autoScroller.onStateChange(
+                  state.idle,
+                  addDroppable(dragTo(target), scrolled)
+                );
+                requestAnimationFrame.flush();
+
+                expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+              });
             });
 
             describe('moving backward to the start of droppable', () => {
@@ -855,6 +874,93 @@ describe('auto scroller', () => {
 
                 requestAnimationFrame.flush();
                 expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+              });
+            });
+
+            // just some light tests to ensure that cross axis moving also works
+            describe('moving forward on the cross axis', () => {
+              const droppableScroll: Position = patch(axis.crossLine, 10);
+              const scrolled: DroppableDimension = scrollDroppable(scrollable, droppableScroll);
+
+              const crossAxisThresholds: PixelThresholds = getPixelThresholds(
+                frame,
+                axis === vertical ? horizontal : vertical,
+              );
+
+              const onStartBoundary: Position = patch(
+                axis.line,
+                frame.center[axis.line],
+                // to the boundary is not enough to start
+                (frame[axis.crossAxisSize] - crossAxisThresholds.startFrom),
+              );
+
+              it('should not scroll if not past the start threshold', () => {
+                autoScroller.onStateChange(state.idle, dragTo(onStartBoundary));
+
+                requestAnimationFrame.flush();
+                expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+              });
+
+              it('should scroll if moving beyond the start threshold', () => {
+                const target: Position = add(onStartBoundary, patch(axis.crossLine, 1));
+
+                autoScroller.onStateChange(
+                  state.idle,
+                  addDroppable(dragTo(target), scrolled),
+                );
+
+                expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+
+                // only called after a frame
+                requestAnimationFrame.step();
+                expect(mocks.scrollDroppable).toHaveBeenCalled();
+                // moving forwards
+                const [id, scroll] = mocks.scrollDroppable.mock.calls[0];
+
+                expect(id).toBe(scrolled.descriptor.id);
+                expect(scroll[axis.crossLine]).toBeGreaterThan(0);
+              });
+            });
+
+            // just some light tests to ensure that cross axis moving also works
+            describe.skip('moving backward on the cross axis', () => {
+              const windowScroll: Position = patch(axis.crossLine, 10);
+              beforeEach(() => {
+                setWindowScroll(windowScroll);
+              });
+
+              const crossAxisThresholds: PixelThresholds = getPixelThresholds(
+                viewport,
+                axis === vertical ? horizontal : vertical,
+              );
+
+              const onStartBoundary: Position = patch(
+                axis.line,
+                viewport.center[axis.line],
+                // to the boundary is not enough to start
+                windowScroll[axis.crossLine] + (crossAxisThresholds.startFrom)
+              );
+
+              it('should not scroll if not past the start threshold', () => {
+                autoScroller.onStateChange(state.idle, dragTo(onStartBoundary));
+
+                requestAnimationFrame.flush();
+                expect(mocks.scrollWindow).not.toHaveBeenCalled();
+              });
+
+              it('should scroll if moving beyond the start threshold', () => {
+                const target: Position = subtract(onStartBoundary, patch(axis.crossLine, 1));
+
+                autoScroller.onStateChange(state.idle, dragTo(target));
+
+                expect(mocks.scrollWindow).not.toHaveBeenCalled();
+
+                // only called after a frame
+                requestAnimationFrame.step();
+                expect(mocks.scrollWindow).toHaveBeenCalled();
+                // moving backwards
+                const request: Position = mocks.scrollWindow.mock.calls[0][0];
+                expect(request[axis.crossLine]).toBeLessThan(0);
               });
             });
           });
