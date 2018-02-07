@@ -10,7 +10,7 @@ import {
   getDroppableOverlap,
   canScrollDroppable,
   canScrollWindow,
-} from '../../../../src/state/auto-scroll/can-scroll';
+} from '../../../../src/state/auto-scroller/can-scroll';
 import { add, subtract } from '../../../../src/state/position';
 import getArea from '../../../../src/state/get-area';
 import { getPreset } from '../../../utils/dimension';

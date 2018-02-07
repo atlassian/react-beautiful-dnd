@@ -7,16 +7,16 @@ import type {
   DraggableDimension,
   DroppableDimension,
 } from '../../../../src/types';
-import type { AutoScroller } from '../../../../src/state/auto-scroll/auto-scroller-types';
-import type { PixelThresholds } from '../../../../src/state/auto-scroll/create-fluid-scroller';
-import { getPixelThresholds, config } from '../../../../src/state/auto-scroll/create-fluid-scroller';
+import type { AutoScroller } from '../../../../src/state/auto-scroller/auto-scroller-types';
+import type { PixelThresholds } from '../../../../src/state/auto-scroller/fluid-scroller';
+import { getPixelThresholds, config } from '../../../../src/state/auto-scroller/fluid-scroller';
 import { add, patch, subtract } from '../../../../src/state/position';
 import getArea from '../../../../src/state/get-area';
 import setViewport, { resetViewport } from '../../../utils/set-viewport';
 import setWindowScrollSize, { resetWindowScrollSize } from '../../../utils/set-window-scroll-size';
 import setWindowScroll, { resetWindowScroll } from '../../../utils/set-window-scroll';
 import { vertical, horizontal } from '../../../../src/state/axis';
-import createAutoScroller from '../../../../src/state/auto-scroll/auto-scroller';
+import createAutoScroller from '../../../../src/state/auto-scroller/';
 import * as state from '../../../utils/simple-state-preset';
 import { getPreset } from '../../../utils/dimension';
 import { expandByPosition } from '../../../../src/state/spacing';

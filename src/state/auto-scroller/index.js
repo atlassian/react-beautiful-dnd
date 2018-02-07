@@ -1,6 +1,6 @@
 // @flow
-import createFluidScroller, { type FluidScroller } from './create-fluid-scroller';
-import createJumpScroller, { type JumpScroller } from './create-jump-scroller';
+import createFluidScroller, { type FluidScroller } from './fluid-scroller';
+import createJumpScroller, { type JumpScroller } from './jump-scroller';
 import type { AutoScroller } from './auto-scroller-types';
 import type {
   DraggableId,

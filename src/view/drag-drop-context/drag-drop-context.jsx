@@ -7,8 +7,8 @@ import createDimensionMarshal from '../../state/dimension-marshal/dimension-mars
 import createStyleMarshal from '../style-marshal/style-marshal';
 import canStartDrag from '../../state/can-start-drag';
 import scrollWindow from '../../window/scroll-window';
-import createAutoScroller from '../../state/auto-scroll/auto-scroller';
-import type { AutoScroller } from '../../state/auto-scroll/auto-scroller-types';
+import createAutoScroller from '../../state/auto-scroller';
+import type { AutoScroller } from '../../state/auto-scroller/auto-scroller-types';
 import type { StyleMarshal } from '../style-marshal/style-marshal-types';
 import type {
   DimensionMarshal,
