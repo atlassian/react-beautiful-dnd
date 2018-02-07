@@ -97,7 +97,15 @@ export default ({
         scrollDroppable(droppable.descriptor.id, request);
         return;
       }
-      // there is overlap - can the window absorb it?
+
+      // Droppable cannot absorb the entire request
+
+      // Let the droppable scroll what it can
+      const whatTheDroppableCanScroll: Position = subtract(request, overlap);
+      // TODO: is it okay that this is before a move?
+      scrollDroppable(droppable.descriptor.id, whatTheDroppableCanScroll);
+
+      // Okay, now we need to find out where the rest of the movement can come from.
 
       const canWindowScrollOverlap: boolean = canScrollWindow(overlap);
 
@@ -107,7 +115,7 @@ export default ({
         return;
       }
 
-      // how much can the window aborb?
+      // how much can the window absorb?
       const windowOverlap: ?Position = getWindowOverlap(overlap);
 
       // window can absorb all of the overlap
@@ -119,7 +127,10 @@ export default ({
       // window can only partially absorb overlap
       // need to move the item by the remainder and scroll the window
       moveByOffset(state, windowOverlap);
-      scrollWindow(overlap);
+
+      // the amount that the window can actually scroll
+      const whatTheWindowCanScroll: Position = subtract(overlap, windowOverlap);
+      scrollWindow(whatTheWindowCanScroll);
       return;
     }
 
@@ -141,8 +152,8 @@ export default ({
 
     moveByOffset(state, overlap);
     // the amount that the window can actually scroll
-    const canScroll: Position = subtract(request, overlap);
-    scrollWindow(canScroll);
+    const whatTheWindowCanScroll: Position = subtract(request, overlap);
+    scrollWindow(whatTheWindowCanScroll);
   };
 
   return jumpScroller;

@@ -193,6 +193,42 @@ describe('jump auto scrolling', () => {
           });
         });
       });
+
+      describe('droppable scrolling (which can involve some window scrolling)', () => {
+        it('should not scroll if the item is bigger than the viewport', () => {
+
+        });
+
+        describe('moving forwards', () => {
+          it('should scroll droppable the entire request if it is able to', () => {
+
+          });
+
+          describe('draggable is unable to complete the entire scroll', () => {
+            it('should manually move the entire request if it is unable to be completed by the window or the droppabe', () => {
+
+            });
+
+            describe('window cannot absorb any of the scroll', () => {
+              it('should move the remainder', () => {
+
+              });
+            });
+
+            describe('window can absorb some of the scroll', () => {
+              it('should do the entire move if it can', () => {
+
+              });
+
+              it('should scroll the window by what it can, and move the rest', () => {
+
+              });
+            });
+          });
+
+
+        });
+      });
     });
   });
 });
