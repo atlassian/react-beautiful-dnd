@@ -163,21 +163,16 @@ export const getDroppableDimension = ({
   windowScroll = origin,
   isEnabled = true,
 }: GetDroppableArgs): DroppableDimension => {
-  // the displacement (shift) of scroll is its negation
-  const windowScrollDisplacement: Position = negate(windowScroll);
-
   const withMargin: Spacing = expandBySpacing(client, margin);
-  const withWindowScrollDisplacement: Spacing = offsetByPosition(client, windowScrollDisplacement);
-  const subject: Area = getArea(expandBySpacing(withWindowScrollDisplacement, margin));
+  const withWindowScroll: Spacing = offsetByPosition(client, windowScroll);
+  const subject: Area = getArea(expandBySpacing(withWindowScroll, margin));
 
   const closestScrollable: ?ClosestScrollable = (() => {
     if (!closest) {
       return null;
     }
 
-    const frame: Area = getArea(offsetByPosition(closest.frameClient, windowScrollDisplacement));
-    console.log('frame', frame);
-    console.log('frame client', closest.frameClient);
+    const frame: Area = getArea(offsetByPosition(closest.frameClient, windowScroll));
 
     const maxScroll: Position = getMaxScroll({
       scrollHeight: closest.scrollHeight,
@@ -224,10 +219,10 @@ export const getDroppableDimension = ({
       withMarginAndPadding: getArea(expandBySpacing(withMargin, padding)),
     },
     page: {
-      withoutMargin: getArea(withWindowScrollDisplacement),
+      withoutMargin: getArea(withWindowScroll),
       withMargin: subject,
       withMarginAndPadding:
-        getArea(expandBySpacing(withWindowScrollDisplacement, expandBySpacing(margin, padding))),
+        getArea(expandBySpacing(withWindowScroll, expandBySpacing(margin, padding))),
     },
     viewport,
   };

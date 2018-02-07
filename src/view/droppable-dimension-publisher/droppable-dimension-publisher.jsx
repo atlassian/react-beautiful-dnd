@@ -37,22 +37,6 @@ type Props = {|
 |}
 
 const origin: Position = { x: 0, y: 0 };
-const floor = apply(Math.floor);
-
-const getSafeScrollArea = (el: HTMLElement): Area => {
-  const top: number = el.offsetTop;
-  const left: number = el.offsetLeft;
-  const width: number = el.clientWidth;
-  const height: number = el.clientHeight;
-
-  // computed
-  const right: number = left + width;
-  const bottom: number = top + height;
-
-  return getArea({
-    top, left, right, bottom,
-  });
-};
 
 export default class DroppableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
@@ -291,7 +275,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
         return null;
       }
 
-      const frameClient: Area = getSafeScrollArea((closestScrollable: any));
+      const frameClient: Area = getArea(closestScrollable.getBoundingClientRect());
       const scroll: Position = this.getClosestScroll();
       const scrollWidth: number = closestScrollable.scrollWidth;
       const scrollHeight: number = closestScrollable.scrollHeight;
