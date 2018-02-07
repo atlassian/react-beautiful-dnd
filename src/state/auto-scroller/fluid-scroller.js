@@ -169,10 +169,8 @@ export default ({
     }
 
     const requiredWindowScroll: ?Position = getRequiredScroll(viewport, center);
-    console.log('required scroll', requiredWindowScroll);
 
     if (requiredWindowScroll && canScrollWindow(requiredWindowScroll)) {
-      console.log('schedling window scroll');
       scheduleWindowScroll(requiredWindowScroll);
       return;
     }
