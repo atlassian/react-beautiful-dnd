@@ -8,9 +8,8 @@ import type {
   DroppableDimension,
 } from '../../../../src/types';
 import type { AutoScroller } from '../../../../src/state/auto-scroll/auto-scroller-types';
-import type { PixelThresholds } from '../../../../src/state/auto-scroll/create-fluid-scroller';
 import { getPixelThresholds, config } from '../../../../src/state/auto-scroll/create-fluid-scroller';
-import { add, patch, subtract } from '../../../../src/state/position';
+import { add, patch, subtract, negate } from '../../../../src/state/position';
 import getArea from '../../../../src/state/get-area';
 import setViewport, { resetViewport } from '../../../utils/set-viewport';
 import setWindowScrollSize, { resetWindowScrollSize } from '../../../utils/set-window-scroll-size';
@@ -365,7 +364,7 @@ describe('jump auto scrolling', () => {
                 expect(mocks.move).not.toHaveBeenCalled();
               });
 
-              it('should scroll the window by what it can, and move the rest', () => {
+              it('should scroll the droppable and window by what it can, and manually move the rest', () => {
                 // Setting the window scroll so it has a small amount of available space
                 const availableWindowScroll: Position = patch(axis.line, 2);
                 const maxWindowScroll: Position = getMaxScroll({
@@ -411,8 +410,157 @@ describe('jump auto scrolling', () => {
               });
             });
           });
+        });
 
+        describe('moving backwards', () => {
+          describe('droppable is able to complete entire scroll', () => {
+            it('should only scroll the droppable', () => {
+              // move forward slightly to allow us to move forwards
+              const scrolled: DroppableDimension = scrollDroppable(scrollable, patch(axis.line, 1));
+              const request: Position = patch(axis.line, -1);
 
+              autoScroller.onStateChange(
+                state.idle,
+                addDroppable(state.scrollJumpRequest(request), scrolled),
+              );
+
+              expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+                scrolled.descriptor.id,
+                request,
+              );
+              expect(mocks.scrollWindow).not.toHaveBeenCalled();
+              expect(mocks.move).not.toHaveBeenCalled();
+            });
+          });
+
+          describe('droppable is unable to complete the entire scroll', () => {
+            it('should manually move the entire request if it is unable to be partially completed by the window or the droppable', () => {
+              // scrollable cannot scroll backwards by default
+              disableWindowScroll();
+              const request: Position = patch(axis.line, -1);
+              const current: State = state.scrollJumpRequest(request);
+              if (!current.drag) {
+                throw new Error('invalid state');
+              }
+              const expected: Position = add(current.drag.current.client.selection, request);
+
+              autoScroller.onStateChange(
+                state.idle,
+                addDroppable(current, scrollable),
+              );
+
+              expect(mocks.scrollWindow).not.toHaveBeenCalled();
+              expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+              expect(mocks.move).toHaveBeenCalledWith(
+                preset.inHome1.descriptor.id,
+                expected,
+                origin,
+                true,
+              );
+            });
+
+            describe('window is unable to absorb some of the scroll', () => {
+              beforeEach(() => {
+                disableWindowScroll();
+              });
+
+              it('should scroll the droppable what it can and move the rest', () => {
+                // able to scroll 1 pixel forward
+                const scrolled: DroppableDimension = scrollDroppable(
+                  scrollable,
+                  patch(axis.line, 1),
+                );
+                // want to move backwards 3 pixels
+                const request: Position = patch(axis.line, -3);
+                const current: State = state.scrollJumpRequest(request);
+                if (!current.drag) {
+                  throw new Error('invalid state');
+                }
+                // manual move will take what the droppable cannot
+                const expectedManualMove: Position =
+                  add(current.drag.current.client.selection, patch(axis.line, -2));
+
+                autoScroller.onStateChange(
+                  state.idle,
+                  addDroppable(current, scrolled),
+                );
+
+                expect(mocks.scrollWindow).not.toHaveBeenCalled();
+                expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+                  preset.home.descriptor.id,
+                  // can only scroll backwards what it has!
+                  patch(axis.line, -1),
+                );
+                expect(mocks.move).toHaveBeenCalledWith(
+                  preset.inHome1.descriptor.id,
+                  expectedManualMove,
+                  origin,
+                  true,
+                );
+              });
+            });
+
+            describe('window can absorb some of the scroll', () => {
+              it('should scroll the entire overlap if it can', () => {
+                // let the window scroll be enough to move back into
+                setWindowScroll(patch(axis.line, 100));
+                const scrolled: DroppableDimension = scrollDroppable(
+                  scrollable,
+                  patch(axis.line, 1),
+                );
+                // want to move 3 pixels backwards
+                const request: Position = patch(axis.line, -3);
+
+                autoScroller.onStateChange(
+                  state.idle,
+                  addDroppable(state.scrollJumpRequest(request), scrolled),
+                );
+
+                expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+                  scrolled.descriptor.id,
+                  patch(axis.line, -1),
+                );
+                expect(mocks.scrollWindow).toHaveBeenCalledWith(patch(axis.line, -2));
+                expect(mocks.move).not.toHaveBeenCalled();
+              });
+
+              it('should scroll the droppable and window by what it can, and manually move the rest', () => {
+                // Setting the window scroll so it has a small amount of available space
+                const windowScroll: Position = patch(axis.line, 2);
+                setWindowScroll(windowScroll);
+                // Setting the droppable scroll so it has a small amount of available space
+                const droppableScroll: Position = patch(axis.line, 1);
+                const scrolled: DroppableDimension = scrollDroppable(
+                  scrollable,
+                  droppableScroll,
+                );
+                // How much we want to scroll
+                const request: Position = patch(axis.line, -5);
+                // How much we will not be able to absorb with droppable and window scroll
+                const remainder: Position = patch(axis.line, -2);
+                const current = addDroppable(state.scrollJumpRequest(request), scrolled);
+                if (!current.drag) {
+                  throw new Error('invalid state');
+                }
+                const expectedManualMove: Position =
+                  add(current.drag.current.client.selection, remainder);
+
+                autoScroller.onStateChange(state.idle, current);
+
+                expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+                  scrolled.descriptor.id,
+                  negate(droppableScroll),
+                );
+                expect(mocks.scrollWindow).toHaveBeenCalledWith(negate(windowScroll));
+                expect(mocks.move).toHaveBeenCalledWith(
+                  preset.inHome1.descriptor.id,
+                  expectedManualMove,
+                  windowScroll,
+                  true,
+                );
+              });
+            });
+          });
         });
       });
     });
