@@ -7,7 +7,7 @@ import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
 import reorder from '../reorder';
 import type { Quote } from '../types';
-import type { DropResult, DragStart } from '../../../src/types';
+import type { DropResult, DragStart, Announce } from '../../../src/types';
 
 const publishOnDragStart = action('onDragStart');
 const publishOnDragEnd = action('onDragEnd');
@@ -40,7 +40,9 @@ export default class QuoteApp extends Component<Props, State> {
     quotes: this.props.initial,
   };
 
-  onDragStart = (initial: DragStart) => {
+  onDragStart = (initial: DragStart, announce: Announce) => {
+    announce('drag start!');
+    console.log('initial', initial);
     publishOnDragStart(initial);
     // Add a little vibration if the browser supports it.
     // Add's a nice little physical feedback
@@ -49,7 +51,14 @@ export default class QuoteApp extends Component<Props, State> {
     }
   }
 
-  onDragEnd = (result: DropResult) => {
+  onDragUpdate = (current: DropResult, announce: Announce) => {
+    announce('update!');
+    console.log('current', current);
+  }
+
+  onDragEnd = (result: DropResult, announce: Announce) => {
+    announce('on drop!');
+    console.log('result', result);
     publishOnDragEnd(result);
 
     // dropped outside the list
@@ -74,6 +83,7 @@ export default class QuoteApp extends Component<Props, State> {
     return (
       <DragDropContext
         onDragStart={this.onDragStart}
+        onDragUpdate={this.onDragUpdate}
         onDragEnd={this.onDragEnd}
       >
         <Root>

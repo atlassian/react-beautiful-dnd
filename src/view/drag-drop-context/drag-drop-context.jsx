@@ -2,7 +2,7 @@
 import React, { type Node } from 'react';
 import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
-import fireHooks from '../../state/fire-hooks';
+import createHookCaller from '../../state/hooks/hook-caller';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
 import createStyleMarshal from '../style-marshal/style-marshal';
 import canStartDrag from '../../state/can-start-drag';
@@ -18,12 +18,15 @@ import type {
   DraggableId,
   Store,
   State,
-  Hooks,
   DraggableDimension,
   DroppableDimension,
   DroppableId,
   Position,
 } from '../../types';
+import type {
+  HookCaller,
+  Hooks,
+} from '../../state/hooks/hooks-types';
 import {
   storeKey,
   dimensionMarshalKey,
@@ -54,6 +57,7 @@ export default class DragDropContext extends React.Component<Props> {
   dimensionMarshal: DimensionMarshal
   styleMarshal: StyleMarshal
   autoScroller: AutoScroller
+  hookCaller: HookCaller
   unsubscribe: Function
 
   // Need to declare childContextTypes without flow
@@ -90,6 +94,11 @@ export default class DragDropContext extends React.Component<Props> {
 
   componentWillMount() {
     this.store = createStore();
+
+    // create the hook caller
+    this.hookCaller = createHookCaller(
+      (message: string) => console.log(`%c ${message}`, 'color: green; font-size: 20px;')
+    );
 
     // create the style marshal
     this.styleMarshal = createStyleMarshal();
@@ -135,34 +144,26 @@ export default class DragDropContext extends React.Component<Props> {
       // functions synchronously trigger more updates
       previous = current;
 
+      // TODO: this probs needs to be done first
+      const hooks: Hooks = {
+        onDragStart: this.props.onDragStart,
+        onDragEnd: this.props.onDragEnd,
+        onDragUpdate: this.props.onDragUpdate,
+      };
+      this.hookCaller.onStateChange(hooks, previous, current);
+
       if (current.phase !== previousValue.phase) {
         // executing phase change handlers first
-        this.onPhaseChange(previousValue, current);
+        // Update the global styles
+        this.styleMarshal.onPhaseChange(current);
+
+        // inform the dimension marshal about updates
+        // this can trigger more actions synchronously so we are placing it last
+        this.dimensionMarshal.onPhaseChange(current);
       }
 
-      // TODO: should this take the latest previous to prevent scroll post drop?
-      this.onStateChange(previousValue, current);
+      this.autoScroller.onStateChange(previous, current);
     });
-  }
-
-  onStateChange(previous: State, current: State) {
-    this.autoScroller.onStateChange(previous, current);
-  }
-
-  onPhaseChange(previous: State, current: State) {
-    const hooks: Hooks = {
-      onDragStart: this.props.onDragStart,
-      onDragEnd: this.props.onDragEnd,
-      onDragUpdate: this.props.onDragUpdate,
-    };
-    fireHooks(hooks, previous, current);
-
-    // Update the global styles
-    this.styleMarshal.onPhaseChange(current);
-
-    // inform the dimension marshal about updates
-    // this can trigger more actions synchronously so we are placing it last
-    this.dimensionMarshal.onPhaseChange(current);
   }
 
   componentDidMount() {

@@ -1,9 +1,10 @@
 // @flow
 import memoizeOne from 'memoize-one';
+import type { Hooks, HookCaller } from './hooks-types';
 import type {
   Announce,
   State,
-  Hooks,
+  DragState,
   DragStart,
   DropResult,
   DraggableId,
@@ -12,16 +13,16 @@ import type {
   DraggableLocation,
   DraggableDescriptor,
   DroppableDimension,
-} from '../types';
+} from '../../types';
 
-const announce: Announce = (message: string) =>
-  console.log(`%c ${message}`, 'color: green; font-size: 20px;');
+// const announce: Announce = (message: string) =>
+//   console.log(`%c ${message}`, 'color: green; font-size: 20px;');
 
-type State = {|
-  hasMovedFromStartLocation: boolean,
-|}
+// type State = {|
+//   hasMovedFromStartLocation: boolean,
+// |}
 
-export default () => {
+export default (announce: Announce): HookCaller => {
   const getMemoizedDragStart = memoizeOne((
     draggableId: DraggableId,
     droppableId: DroppableId,
@@ -66,12 +67,47 @@ export default () => {
     );
   };
 
-  const onPhaseChange = (hooks: Hooks, previous: State, current: State): void => {
+  const onStateChange = (hooks: Hooks, previous: State, current: State): void => {
     const { onDragStart, onDragUpdate, onDragEnd } = hooks;
     const currentPhase = current.phase;
     const previousPhase = previous.phase;
 
-    // Exit early if phase in unchanged
+    // Dragging in progress
+    if (currentPhase === 'DRAGGING' && previousPhase === 'DRAGGING') {
+      // only call the onDragUpdate hook if something has changed from last time
+      if (!onDragUpdate) {
+        return;
+      }
+
+      const start: ?DragStart = getDragStart(current);
+
+      if (!start) {
+        console.error('Cannot update drag when there is invalid state');
+        return;
+      }
+
+      const drag: ?DragState = current.drag;
+
+      if (!drag) {
+        console.error('Cannot update drag when there is invalid state');
+        return;
+      }
+
+      const destination: ?DraggableLocation = drag.impact.destination;
+
+      const result: DropResult = {
+        draggableId: start.draggableId,
+        type: start.type,
+        source: start.source,
+        destination,
+      };
+
+      onDragUpdate(result, announce);
+      return;
+    }
+
+    // From this point we only care about phase changes
+
     if (currentPhase === previousPhase) {
       return;
     }
@@ -94,15 +130,7 @@ export default () => {
       return;
     }
 
-    // Dragging continuing
-    if (currentPhase === 'DRAGGING' && previousPhase === 'DRAGGING') {
-      // only call the onDragUpdate hook if something has changed from last time
-      if (!onDragUpdate) {
-        return;
-      }
 
-      onDragUpdate(start, )
-    }
 
     // Drag end
     if (currentPhase === 'DROP_COMPLETE' && previousPhase !== 'DROP_COMPLETE') {
@@ -112,11 +140,11 @@ export default () => {
       }
 
       const {
-      source,
+        source,
         destination,
         draggableId,
         type,
-    } = current.drop.result;
+      } = current.drop.result;
 
       // Could be a cancel or a drop nowhere
       if (!destination) {
@@ -191,4 +219,10 @@ export default () => {
       onDragEnd(result, announce);
     }
   };
+
+  const caller: HookCaller = {
+    onStateChange,
+  };
+
+  return caller;
 }

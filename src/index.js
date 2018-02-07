@@ -18,6 +18,7 @@ export type {
   DragStart,
   DropResult,
   DraggableLocation,
+  Announce,
 } from './types';
 
 // Droppable

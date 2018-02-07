@@ -233,9 +233,7 @@ export type DragStart = {|
 
 // published when a drag finishes
 export type DropResult = {|
-  draggableId: DraggableId,
-  type: TypeId,
-  source: DraggableLocation,
+  ...DragStart,
   // may not have any destination (drag to nowhere)
   destination: ?DraggableLocation,
 |}
@@ -313,9 +311,3 @@ export type Dispatch = ReduxDispatch<Action>;
 export type Store = ReduxStore<State, Action, Dispatch>;
 
 export type Announce = (message: string) => void;
-
-export type Hooks = {|
-  onDragStart?: (start: DragStart, announce: Announce) => void,
-  onDragUpdate?: (current: DropResult, announce: Announce) => void,
-  onDragEnd: (result: DropResult, announce: Announce) => void,
-|}
