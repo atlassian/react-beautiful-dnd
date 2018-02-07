@@ -16,6 +16,7 @@ import type {
   PendingDrop,
   DropTrigger,
   DraggableId,
+  DragImpact,
 } from '../../src/types';
 
 const preset = getPreset();
@@ -109,6 +110,62 @@ export const dragging = (
 
   return result;
 };
+
+export const scrollJumpRequest = (request: Position): State => {
+  const id: DraggableId = preset.inHome1.descriptor.id;
+  // will populate the dimension state with the initial dimensions
+  const draggable: DraggableDimension = preset.draggables[id];
+  // either use the provided selection or use the draggable's center
+  const initialPosition: InitialDragPositions = {
+    selection: draggable.client.withMargin.center,
+    center: draggable.client.withMargin.center,
+  };
+  const clientPositions: CurrentDragPositions = {
+    selection: draggable.client.withMargin.center,
+    center: draggable.client.withMargin.center,
+    offset: origin,
+  };
+
+  const impact: DragImpact = {
+    movement: {
+      displaced: [],
+      amount: origin,
+      isBeyondStartPosition: false,
+    },
+    direction: preset.home.axis.direction,
+    destination: {
+      index: preset.inHome1.descriptor.index,
+      droppableId: preset.inHome1.descriptor.droppableId,
+    },
+  };
+
+  const drag: DragState = {
+    initial: {
+      descriptor: draggable.descriptor,
+      autoScrollMode: 'JUMP',
+      client: initialPosition,
+      page: initialPosition,
+      windowScroll: origin,
+    },
+    current: {
+      client: clientPositions,
+      page: clientPositions,
+      windowScroll: origin,
+      shouldAnimate: true,
+    },
+    impact,
+    scrollJumpRequest: request,
+  };
+
+  const result: State = {
+    phase: 'DRAGGING',
+    drag,
+    drop: null,
+    dimension: getDimensionState(id),
+  };
+
+  return result;
+}
 
 const getDropAnimating = (id: DraggableId, trigger: DropTrigger): State => {
   const descriptor: DraggableDescriptor = preset.draggables[id].descriptor;

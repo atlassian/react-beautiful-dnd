@@ -56,6 +56,7 @@ export default ({
       }
 
       jumpScroll(current);
+      return;
     }
 
     // cancel any pending scrolls if no longer dragging

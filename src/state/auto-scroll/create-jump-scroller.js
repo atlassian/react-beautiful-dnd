@@ -1,5 +1,5 @@
 // @flow
-import { add } from '../position';
+import { add, subtract } from '../position';
 import getWindowScrollPosition from '../../window/get-window-scroll';
 import isTooBigToAutoScroll from './is-too-big-to-auto-scroll';
 import getViewport from '../../window/get-viewport';
@@ -24,7 +24,12 @@ import type {
 type Args = {|
   scrollDroppable: (id: DroppableId, offset: Position) => void,
   scrollWindow: (offset: Position) => void,
-  move: (id: DraggableId, client: Position, windowScroll: Position, shouldAnimate?: boolean) => void,
+  move: (
+    id: DraggableId,
+    client: Position,
+    windowScroll: Position,
+    shouldAnimate?: boolean
+  ) => void,
 |}
 
 export type JumpScroller = (state: State) => void;
@@ -136,7 +141,9 @@ export default ({
     }
 
     moveByOffset(state, overlap);
-    scrollWindow(request);
+    // the amount that the window can actually scroll
+    const canScroll: Position = subtract(request, overlap);
+    scrollWindow(canScroll);
   };
 
   return jumpScroller;
