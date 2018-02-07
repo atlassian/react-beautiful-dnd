@@ -133,7 +133,64 @@ describe('jump auto scrolling', () => {
         });
 
         describe('moving backwards', () => {
+          it('should manually move the item if the window is unable to scroll', () => {
+            // unable to scroll backwards to start with
+            const request: Position = patch(axis.line, -1);
+            const current: State = state.scrollJumpRequest(request);
+            if (!current.drag) {
+              throw new Error('invalid state');
+            }
+            const expected: Position = add(current.drag.current.client.selection, request);
 
+            autoScroller.onStateChange(state.idle, current);
+
+            expect(mocks.move).toHaveBeenCalledWith(
+              preset.inHome1.descriptor.id,
+              expected,
+              origin,
+              true,
+            );
+            expect(mocks.scrollWindow).not.toHaveBeenCalled();
+          });
+
+          it('should scroll the window if can absorb all of the movement', () => {
+            setWindowScroll(patch(axis.line, 1));
+            const request: Position = patch(axis.line, -1);
+
+            autoScroller.onStateChange(state.idle, state.scrollJumpRequest(request));
+
+            expect(mocks.scrollWindow).toHaveBeenCalledWith(request);
+            expect(mocks.move).not.toHaveBeenCalled();
+          });
+
+          it('should manually move the item any distance that the window is unable to scroll', () => {
+            // only allowing scrolling by 1 px
+            const windowScroll: Position = patch(axis.line, 1);
+            setWindowScroll(windowScroll);
+            // more than the 1 pixel allowed
+            const request: Position = patch(axis.line, -3);
+            const current: State = state.scrollJumpRequest(request);
+            if (!current.drag) {
+              throw new Error('invalid state');
+            }
+            const expected: Position = add(
+              current.drag.current.client.selection,
+              // the two pixels that could not be done by the window
+              patch(axis.line, -2)
+            );
+
+            autoScroller.onStateChange(state.idle, current);
+
+            // can scroll with what we have
+            expect(mocks.scrollWindow).toHaveBeenCalledWith(patch(axis.line, -1));
+            // remainder to be done by movement
+            expect(mocks.move).toHaveBeenCalledWith(
+              preset.inHome1.descriptor.id,
+              expected,
+              windowScroll,
+              true,
+            );
+          });
         });
       });
     });

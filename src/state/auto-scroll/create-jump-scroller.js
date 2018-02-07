@@ -42,10 +42,9 @@ export default ({
   const moveByOffset = (state: State, offset: Position) => {
     const drag: ?DragState = state.drag;
     if (!drag) {
+      console.error('Cannot move by offset when not dragging');
       return;
     }
-
-    console.warn('moving by offset', offset);
 
     const client: Position = add(drag.current.client.selection, offset);
     move(drag.initial.descriptor.id, client, getWindowScrollPosition(), true);
