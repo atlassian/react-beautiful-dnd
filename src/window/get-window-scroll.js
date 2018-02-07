@@ -1,5 +1,4 @@
 // @flow
-import { apply } from '../state/position';
 import type { Position } from '../types';
 
 // The browsers update document.documentElement.scrollTop and window.pageYOffset

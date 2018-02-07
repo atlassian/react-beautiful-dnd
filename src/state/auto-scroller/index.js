@@ -37,6 +37,7 @@ export default ({
   });
 
   const onStateChange = (previous: State, current: State): void => {
+    return;
     // now dragging
     if (current.phase === 'DRAGGING') {
       if (!current.drag) {

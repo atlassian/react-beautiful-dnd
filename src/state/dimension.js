@@ -1,7 +1,7 @@
 // @flow
 import { vertical, horizontal } from './axis';
 import getArea from './get-area';
-import { offsetByPosition, expandBySpacing } from './spacing';
+import { offsetByPosition, expandBySpacing, expandByPosition } from './spacing';
 import { subtract, negate } from './position';
 import getMaxScroll from './get-max-scroll';
 import type {
@@ -69,7 +69,7 @@ type GetDroppableArgs = {|
   descriptor: DroppableDescriptor,
   client: Area,
   // optionally provided - and can also be null
-  closest?: {|
+  closest?: ?{|
     frameClient: Area,
     scrollWidth: number,
     scrollHeight: number,
@@ -163,21 +163,21 @@ export const getDroppableDimension = ({
   windowScroll = origin,
   isEnabled = true,
 }: GetDroppableArgs): DroppableDimension => {
-  const withMargin: Spacing = expandBySpacing(client, margin);
-  const withWindowScroll: Spacing = offsetByPosition(client, windowScroll);
-  // If no frameClient is provided, or if the area matches the frameClient, this
-  // droppable is its own container. In this case we include its margin in the container bounds.
-  // Otherwise, the container is a scrollable parent. In this case we don't care about margins
-  // in the container bounds.
+  // the displacement (shift) of scroll is its negation
+  const windowScrollDisplacement: Position = negate(windowScroll);
 
-  const subject: Area = getArea(expandBySpacing(withWindowScroll, margin));
+  const withMargin: Spacing = expandBySpacing(client, margin);
+  const withWindowScrollDisplacement: Spacing = offsetByPosition(client, windowScrollDisplacement);
+  const subject: Area = getArea(expandBySpacing(withWindowScrollDisplacement, margin));
 
   const closestScrollable: ?ClosestScrollable = (() => {
     if (!closest) {
       return null;
     }
 
-    const frame: Area = getArea(offsetByPosition(closest.frameClient, windowScroll));
+    const frame: Area = getArea(offsetByPosition(closest.frameClient, windowScrollDisplacement));
+    console.log('frame', frame);
+    console.log('frame client', closest.frameClient);
 
     const maxScroll: Position = getMaxScroll({
       scrollHeight: closest.scrollHeight,
@@ -224,10 +224,10 @@ export const getDroppableDimension = ({
       withMarginAndPadding: getArea(expandBySpacing(withMargin, padding)),
     },
     page: {
-      withoutMargin: getArea(withWindowScroll),
+      withoutMargin: getArea(withWindowScrollDisplacement),
       withMargin: subject,
       withMarginAndPadding:
-        getArea(expandBySpacing(withWindowScroll, expandBySpacing(margin, padding))),
+        getArea(expandBySpacing(withWindowScrollDisplacement, expandBySpacing(margin, padding))),
     },
     viewport,
   };

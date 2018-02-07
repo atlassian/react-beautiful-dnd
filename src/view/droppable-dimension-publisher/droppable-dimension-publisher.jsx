@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import rafSchedule from 'raf-schd';
-import getWindowScrollPosition from '../../window/get-window-scroll';
+import getWindowScroll from '../../window/get-window-scroll';
 import getArea from '../../state/get-area';
 import { getDroppableDimension } from '../../state/dimension';
 import getClosestScrollable from '../get-closest-scrollable';
@@ -105,6 +105,11 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     const offset: Position = this.getClosestScroll();
     this.memoizedUpdateScroll(offset.x, offset.y);
   });
+  // scheduleScrollUpdate = () => {
+  //   // Capturing the scroll now so that it is the latest value
+  //   const offset: Position = this.getClosestScroll();
+  //   this.memoizedUpdateScroll(offset.x, offset.y);
+  // };
 
   onClosestScroll = () => this.scheduleScrollUpdate();
 
@@ -291,8 +296,6 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       const scrollWidth: number = closestScrollable.scrollWidth;
       const scrollHeight: number = closestScrollable.scrollHeight;
 
-      console.log('frameClient', frameClient);
-
       return {
         frameClient,
         scrollWidth,
@@ -309,7 +312,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       closest,
       margin,
       padding,
-      windowScroll: getWindowScrollPosition(),
+      windowScroll: getWindowScroll(),
       isEnabled: !isDropDisabled,
     });
 

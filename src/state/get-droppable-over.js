@@ -99,7 +99,7 @@ const getClippedAreaWithPlaceholder = ({
     return clipped;
   }
 
-  const subjectWithGrowth = getWithGrowth(clipped, requiredGrowth);
+  const subjectWithGrowth: Area = getWithGrowth(clipped, requiredGrowth);
   const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
 
   // The droppable has no scroll container

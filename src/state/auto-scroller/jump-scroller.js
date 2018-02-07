@@ -1,6 +1,6 @@
 // @flow
 import { add, subtract } from '../position';
-import getWindowScrollPosition from '../../window/get-window-scroll';
+import getWindowScroll from '../../window/get-window-scroll';
 import isTooBigToAutoScroll from './is-too-big-to-auto-scroll';
 import getViewport from '../../window/get-viewport';
 import {
@@ -47,7 +47,7 @@ export default ({
     }
 
     const client: Position = add(drag.current.client.selection, offset);
-    move(drag.initial.descriptor.id, client, getWindowScrollPosition(), true);
+    move(drag.initial.descriptor.id, client, getWindowScroll(), true);
   };
 
   const jumpScroller: JumpScroller = (state: State) => {
@@ -125,12 +125,12 @@ export default ({
       }
 
       // window can only partially absorb overlap
-      // need to move the item by the remainder and scroll the window
-      moveByOffset(state, windowOverlap);
 
-      // the amount that the window can actually scroll
       const whatTheWindowCanScroll: Position = subtract(overlap, windowOverlap);
       scrollWindow(whatTheWindowCanScroll);
+
+      // need to move the item by the remainder and scroll the window
+      moveByOffset(state, windowOverlap);
       return;
     }
 
@@ -150,10 +150,10 @@ export default ({
       return;
     }
 
-    moveByOffset(state, overlap);
-    // the amount that the window can actually scroll
     const whatTheWindowCanScroll: Position = subtract(request, overlap);
     scrollWindow(whatTheWindowCanScroll);
+    // manually move to the rest
+    moveByOffset(state, overlap);
   };
 
   return jumpScroller;
