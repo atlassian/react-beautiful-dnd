@@ -224,10 +224,6 @@ export type CurrentDrag = {|
   shouldAnimate: boolean,
 |}
 
-// type PreviousDrag = {
-//   droppableOverId: ?DroppableId,
-// };
-
 // published when a drag starts
 export type DragStart = {|
   draggableId: DraggableId,
@@ -316,7 +312,10 @@ export type Action = ActionCreators;
 export type Dispatch = ReduxDispatch<Action>;
 export type Store = ReduxStore<State, Action, Dispatch>;
 
+export type Announce = (message: string) => void;
+
 export type Hooks = {|
-  onDragStart?: (start: DragStart) => void,
-  onDragEnd: (result: DropResult) => void,
+  onDragStart?: (start: DragStart, announce: Announce) => void,
+  onDragUpdate?: (current: DropResult, announce: Announce) => void,
+  onDragEnd: (result: DropResult, announce: Announce) => void,
 |}

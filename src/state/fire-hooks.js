@@ -1,143 +1,194 @@
 // @flow
+import memoizeOne from 'memoize-one';
 import type {
+  Announce,
   State,
   Hooks,
   DragStart,
   DropResult,
+  DraggableId,
+  DroppableId,
+  TypeId,
   DraggableLocation,
   DraggableDescriptor,
   DroppableDimension,
 } from '../types';
 
-export default (hooks: Hooks, previous: State, current: State): void => {
-  const { onDragStart, onDragEnd } = hooks;
-  const currentPhase = current.phase;
-  const previousPhase = previous.phase;
+const announce: Announce = (message: string) =>
+  console.log(`%c ${message}`, 'color: green; font-size: 20px;');
 
-  // Exit early if phase in unchanged
-  if (currentPhase === previousPhase) {
-    return;
-  }
+type State = {|
+  hasMovedFromStartLocation: boolean,
+|}
 
-  // Drag start
-  if (currentPhase === 'DRAGGING' && previousPhase !== 'DRAGGING') {
-    // onDragStart is optional
-    if (!onDragStart) {
-      return;
-    }
-
-    if (!current.drag) {
-      console.error('cannot fire onDragStart hook without drag state', { current, previous });
-      return;
-    }
-
-    const descriptor: DraggableDescriptor = current.drag.initial.descriptor;
-    const home: ?DroppableDimension = current.dimension.droppable[descriptor.droppableId];
-
-    if (!home) {
-      console.error('cannot find dimension for home droppable');
-      return;
-    }
-
+export default () => {
+  const getMemoizedDragStart = memoizeOne((
+    draggableId: DraggableId,
+    droppableId: DroppableId,
+    type: TypeId,
+    index: number,
+  ): DragStart => {
     const source: DraggableLocation = {
-      index: descriptor.index,
-      droppableId: descriptor.droppableId,
+      index,
+      droppableId,
     };
 
     const start: DragStart = {
-      draggableId: descriptor.id,
-      type: home.descriptor.type,
-      source,
-    };
-
-    onDragStart(start);
-    return;
-  }
-
-  // Drag end
-  if (currentPhase === 'DROP_COMPLETE' && previousPhase !== 'DROP_COMPLETE') {
-    if (!current.drop || !current.drop.result) {
-      console.error('cannot fire onDragEnd hook without drag state', { current, previous });
-      return;
-    }
-
-    const {
-      source,
-      destination,
-      draggableId,
-      type,
-    } = current.drop.result;
-
-    // Could be a cancel or a drop nowhere
-    if (!destination) {
-      onDragEnd(current.drop.result);
-      return;
-    }
-
-    // Do not publish a result.destination where nothing moved
-    const didMove: boolean = source.droppableId !== destination.droppableId ||
-                              source.index !== destination.index;
-
-    if (didMove) {
-      onDragEnd(current.drop.result);
-      return;
-    }
-
-    const muted: DropResult = {
       draggableId,
       type,
       source,
-      destination: null,
     };
 
-    onDragEnd(muted);
-    return;
-  }
+    return start;
+  });
 
-  // Drag ended while dragging
-  if (currentPhase === 'IDLE' && previousPhase === 'DRAGGING') {
-    if (!previous.drag) {
-      console.error('cannot fire onDragEnd for cancel because cannot find previous drag');
-      return;
+  const getMemoizeDragResult = memoizeOne((): DropResult => {
+
+  });
+
+  const getDragStart = (state: State): ?DragStart => {
+    if (!state.drag) {
+      return null;
     }
 
-    const descriptor: DraggableDescriptor = previous.drag.initial.descriptor;
-    const home: ?DroppableDimension = previous.dimension.droppable[descriptor.droppableId];
+    const descriptor: DraggableDescriptor = state.drag.initial.descriptor;
+    const home: ?DroppableDimension = state.dimension.droppable[descriptor.droppableId];
 
     if (!home) {
-      console.error('cannot find dimension for home droppable');
+      return null;
+    }
+
+    return getMemoizedDragStart(
+      descriptor.id,
+      descriptor.droppableId,
+      home.descriptor.type,
+      descriptor.index,
+    );
+  };
+
+  const onPhaseChange = (hooks: Hooks, previous: State, current: State): void => {
+    const { onDragStart, onDragUpdate, onDragEnd } = hooks;
+    const currentPhase = current.phase;
+    const previousPhase = previous.phase;
+
+    // Exit early if phase in unchanged
+    if (currentPhase === previousPhase) {
       return;
     }
 
-    const source: DraggableLocation = {
-      index: descriptor.index,
-      droppableId: descriptor.droppableId,
-    };
+    // Drag start
+    if (currentPhase === 'DRAGGING' && previousPhase !== 'DRAGGING') {
+      // onDragStart is optional
+      if (!onDragStart) {
+        return;
+      }
 
-    const result: DropResult = {
-      draggableId: descriptor.id,
-      type: home.descriptor.type,
+      const start: ?DragStart = getDragStart(current);
+
+      if (!start) {
+        console.error('Unable to publish onDragStart');
+        return;
+      }
+
+      onDragStart(start, announce);
+      return;
+    }
+
+    // Dragging continuing
+    if (currentPhase === 'DRAGGING' && previousPhase === 'DRAGGING') {
+      // only call the onDragUpdate hook if something has changed from last time
+      if (!onDragUpdate) {
+        return;
+      }
+
+      onDragUpdate(start, )
+    }
+
+    // Drag end
+    if (currentPhase === 'DROP_COMPLETE' && previousPhase !== 'DROP_COMPLETE') {
+      if (!current.drop || !current.drop.result) {
+        console.error('cannot fire onDragEnd hook without drag state', { current, previous });
+        return;
+      }
+
+      const {
       source,
-      destination: null,
-    };
-    onDragEnd(result);
-    return;
-  }
+        destination,
+        draggableId,
+        type,
+    } = current.drop.result;
 
-  // Drag ended during a drop animation. Not super sure how this can even happen.
-  // This is being really safe
-  if (currentPhase === 'IDLE' && previousPhase === 'DROP_ANIMATING') {
-    if (!previous.drop || !previous.drop.pending) {
-      console.error('cannot fire onDragEnd for cancel because cannot find previous pending drop');
+      // Could be a cancel or a drop nowhere
+      if (!destination) {
+        onDragEnd(current.drop.result, announce);
+        return;
+      }
+
+      // Do not publish a result.destination where nothing moved
+      const didMove: boolean = source.droppableId !== destination.droppableId ||
+        source.index !== destination.index;
+
+      if (didMove) {
+        onDragEnd(current.drop.result, announce);
+        return;
+      }
+
+      const muted: DropResult = {
+        draggableId,
+        type,
+        source,
+        destination: null,
+      };
+
+      onDragEnd(muted, announce);
       return;
     }
 
-    const result: DropResult = {
-      draggableId: previous.drop.pending.result.draggableId,
-      type: previous.drop.pending.result.type,
-      source: previous.drop.pending.result.source,
-      destination: null,
-    };
-    onDragEnd(result);
-  }
-};
+    // Drag ended while dragging
+    if (currentPhase === 'IDLE' && previousPhase === 'DRAGGING') {
+      if (!previous.drag) {
+        console.error('cannot fire onDragEnd for cancel because cannot find previous drag');
+        return;
+      }
+
+      const descriptor: DraggableDescriptor = previous.drag.initial.descriptor;
+      const home: ?DroppableDimension = previous.dimension.droppable[descriptor.droppableId];
+
+      if (!home) {
+        console.error('cannot find dimension for home droppable');
+        return;
+      }
+
+      const source: DraggableLocation = {
+        index: descriptor.index,
+        droppableId: descriptor.droppableId,
+      };
+
+      const result: DropResult = {
+        draggableId: descriptor.id,
+        type: home.descriptor.type,
+        source,
+        destination: null,
+      };
+      onDragEnd(result, announce);
+      return;
+    }
+
+    // Drag ended during a drop animation. Not super sure how this can even happen.
+    // This is being really safe
+    if (currentPhase === 'IDLE' && previousPhase === 'DROP_ANIMATING') {
+      if (!previous.drop || !previous.drop.pending) {
+        console.error('cannot fire onDragEnd for cancel because cannot find previous pending drop');
+        return;
+      }
+
+      const result: DropResult = {
+        draggableId: previous.drop.pending.result.draggableId,
+        type: previous.drop.pending.result.type,
+        source: previous.drop.pending.result.source,
+        destination: null,
+      };
+      onDragEnd(result, announce);
+    }
+  };
+}

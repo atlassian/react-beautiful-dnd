@@ -153,6 +153,7 @@ export default class DragDropContext extends React.Component<Props> {
     const hooks: Hooks = {
       onDragStart: this.props.onDragStart,
       onDragEnd: this.props.onDragEnd,
+      onDragUpdate: this.props.onDragUpdate,
     };
     fireHooks(hooks, previous, current);
 
