@@ -41,9 +41,8 @@ export default (): Announcer => {
       return;
     }
 
-    state.el.textContent = message;
+    state.el.textContent = message.trim();
     console.log(`%c ${message}`, 'color: green; font-size: 20px;');
-    console.log(state.el);
   };
 
   const mount = () => {
