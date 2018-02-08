@@ -1,9 +1,8 @@
 // @flow
-import memoizeOne from 'memoize-one';
 import type { Hooks, HookCaller } from './hooks-types';
 import type {
   Announce,
-  State,
+  State as AppState,
   DragState,
   DragStart,
   DropResult,
@@ -18,56 +17,82 @@ import type {
 // const announce: Announce = (message: string) =>
 //   console.log(`%c ${message}`, 'color: green; font-size: 20px;');
 
-// type State = {|
-//   hasMovedFromStartLocation: boolean,
-// |}
+type State = {
+  isDragging: boolean,
+  start: ?DraggableLocation,
+  lastDestination: ?DraggableLocation,
+  hasMovedFromStartLocation: boolean,
+}
+
+const initial: State = {
+  isDragging: false,
+  start: null,
+  lastDestination: null,
+  hasMovedFromStartLocation: false,
+};
+
+const areLocationsEqual = (current: ?DraggableLocation, next: ?DraggableLocation) => {
+  // if both are null - we are equal
+  if (current == null && next == null) {
+    return true;
+  }
+
+  // if one is null - then they are not equal
+  if (current == null || next == null) {
+    return false;
+  }
+
+  // compare their actual values
+  return current.droppableId === next.droppableId &&
+    current.index === next.index;
+};
 
 export default (announce: Announce): HookCaller => {
-  const getMemoizedDragStart = memoizeOne((
-    draggableId: DraggableId,
-    droppableId: DroppableId,
-    type: TypeId,
-    index: number,
-  ): DragStart => {
-    const source: DraggableLocation = {
-      index,
-      droppableId,
+  let state: State = initial;
+
+  const setState = (partial: Object): void => {
+    const newState: State = {
+      ...state,
+      ...partial,
     };
+    state = newState;
+  };
 
-    const start: DragStart = {
-      draggableId,
-      type,
-      source,
-    };
-
-    return start;
-  });
-
-  const getMemoizeDragResult = memoizeOne((): DropResult => {
-
-  });
-
-  const getDragStart = (state: State): ?DragStart => {
-    if (!state.drag) {
+  const getDragStart = (appState: AppState): ?DragStart => {
+    if (!appState.drag) {
       return null;
     }
 
-    const descriptor: DraggableDescriptor = state.drag.initial.descriptor;
-    const home: ?DroppableDimension = state.dimension.droppable[descriptor.droppableId];
+    const descriptor: DraggableDescriptor = appState.drag.initial.descriptor;
+    const home: ?DroppableDimension = appState.dimension.droppable[descriptor.droppableId];
 
     if (!home) {
       return null;
     }
 
-    return getMemoizedDragStart(
-      descriptor.id,
-      descriptor.droppableId,
-      home.descriptor.type,
-      descriptor.index,
-    );
+    const source: DraggableLocation = {
+      index: descriptor.index,
+      droppableId: descriptor.droppableId,
+    };
+
+    const start: DragStart = {
+      draggableId: descriptor.id,
+      type: home.descriptor.type,
+      source,
+    };
+
+    return start;
   };
 
-  const onStateChange = (hooks: Hooks, previous: State, current: State): void => {
+  const finish = () => {
+    if (!state.isDragging) {
+      console.error('Drag finished but it had not started!');
+    }
+
+    setState(initial);
+  };
+
+  const onStateChange = (hooks: Hooks, previous: AppState, current: AppState): void => {
     const { onDragStart, onDragUpdate, onDragEnd } = hooks;
     const currentPhase = current.phase;
     const previousPhase = previous.phase;
@@ -75,9 +100,6 @@ export default (announce: Announce): HookCaller => {
     // Dragging in progress
     if (currentPhase === 'DRAGGING' && previousPhase === 'DRAGGING') {
       // only call the onDragUpdate hook if something has changed from last time
-      if (!onDragUpdate) {
-        return;
-      }
 
       const start: ?DragStart = getDragStart(current);
 
@@ -102,7 +124,36 @@ export default (announce: Announce): HookCaller => {
         destination,
       };
 
-      onDragUpdate(result, announce);
+      // has not left the home position
+      if (!state.hasMovedFromStartLocation) {
+        // has not moved past the home yet
+        if (areLocationsEqual(start.source, destination)) {
+          return;
+        }
+
+        setState({
+          lastDestination: destination,
+          hasMovedFromStartLocation: true,
+        });
+
+        if (onDragUpdate) {
+          onDragUpdate(result, announce);
+        }
+        return;
+      }
+
+      // has not moved from the previous location
+      if (areLocationsEqual(state.lastDestination, destination)) {
+        return;
+      }
+
+      setState({
+        lastUpdate: result,
+      });
+
+      if (onDragUpdate) {
+        onDragUpdate(result, announce);
+      }
       return;
     }
 
@@ -114,11 +165,6 @@ export default (announce: Announce): HookCaller => {
 
     // Drag start
     if (currentPhase === 'DRAGGING' && previousPhase !== 'DRAGGING') {
-      // onDragStart is optional
-      if (!onDragStart) {
-        return;
-      }
-
       const start: ?DragStart = getDragStart(current);
 
       if (!start) {
@@ -126,14 +172,24 @@ export default (announce: Announce): HookCaller => {
         return;
       }
 
+      setState({
+        isDragging: true,
+        hasMovedFromStartLocation: false,
+        start,
+      });
+
+      // onDragStart is optional
+      if (!onDragStart) {
+        return;
+      }
+
       onDragStart(start, announce);
       return;
     }
 
-
-
     // Drag end
     if (currentPhase === 'DROP_COMPLETE' && previousPhase !== 'DROP_COMPLETE') {
+      finish();
       if (!current.drop || !current.drop.result) {
         console.error('cannot fire onDragEnd hook without drag state', { current, previous });
         return;
@@ -174,6 +230,8 @@ export default (announce: Announce): HookCaller => {
 
     // Drag ended while dragging
     if (currentPhase === 'IDLE' && previousPhase === 'DRAGGING') {
+      finish();
+
       if (!previous.drag) {
         console.error('cannot fire onDragEnd for cancel because cannot find previous drag');
         return;
@@ -205,6 +263,7 @@ export default (announce: Announce): HookCaller => {
     // Drag ended during a drop animation. Not super sure how this can even happen.
     // This is being really safe
     if (currentPhase === 'IDLE' && previousPhase === 'DROP_ANIMATING') {
+      finish();
       if (!previous.drop || !previous.drop.pending) {
         console.error('cannot fire onDragEnd for cancel because cannot find previous pending drop');
         return;
@@ -225,4 +284,5 @@ export default (announce: Announce): HookCaller => {
   };
 
   return caller;
-}
+};
+

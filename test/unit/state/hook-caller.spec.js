@@ -1,10 +1,11 @@
 // @flow
-import fireHooks from '../../../src/state/fire-hooks';
+import createHookCaller from '../../../src/state/hooks/hook-caller';
+import type { Hooks, HookCaller } from '../../../src/state/hooks/hooks-types';
 import * as state from '../../utils/simple-state-preset';
 import { getPreset } from '../../utils/dimension';
 import type {
+  Announce,
   DropResult,
-  Hooks,
   State,
   DimensionState,
   DraggableLocation,
@@ -21,8 +22,11 @@ const noDimensions: DimensionState = {
 
 describe('fire hooks', () => {
   let hooks: Hooks;
+  let caller: HookCaller;
+  const announceMock: Announce = () => { };
 
   beforeEach(() => {
+    caller = createHookCaller(announceMock);
     hooks = {
       onDragStart: jest.fn(),
       onDragEnd: jest.fn(),
@@ -36,7 +40,7 @@ describe('fire hooks', () => {
 
   describe('drag start', () => {
     it('should call the onDragStart hook when a drag starts', () => {
-      fireHooks(hooks, state.requesting(), state.dragging());
+      caller.onStateChange(hooks, state.requesting(), state.dragging());
       const expected: DragStart = {
         draggableId: preset.inHome1.descriptor.id,
         type: preset.home.descriptor.type,
@@ -46,7 +50,7 @@ describe('fire hooks', () => {
         },
       };
 
-      expect(hooks.onDragStart).toHaveBeenCalledWith(expected);
+      expect(hooks.onDragStart).toHaveBeenCalledWith(expected, announceMock);
     });
 
     it('should do nothing if no onDragStart is not provided', () => {
@@ -54,7 +58,7 @@ describe('fire hooks', () => {
         onDragEnd: jest.fn(),
       };
 
-      fireHooks(customHooks, state.requesting(), state.dragging());
+      caller.onStateChange(customHooks, state.requesting(), state.dragging());
 
       expect(console.error).not.toHaveBeenCalled();
     });
@@ -65,14 +69,14 @@ describe('fire hooks', () => {
         drag: null,
       };
 
-      fireHooks(hooks, state.requesting(), invalid);
+      caller.onStateChange(hooks, state.requesting(), invalid);
 
       expect(console.error).toHaveBeenCalled();
     });
 
     it('should not call if only collecting dimensions (not dragging yet)', () => {
-      fireHooks(hooks, state.idle, state.preparing);
-      fireHooks(hooks, state.preparing, state.requesting());
+      caller.onStateChange(hooks, state.idle, state.preparing);
+      caller.onStateChange(hooks, state.preparing, state.requesting());
 
       expect(hooks.onDragStart).not.toHaveBeenCalled();
     });
@@ -110,14 +114,14 @@ describe('fire hooks', () => {
           dimension: noDimensions,
         };
 
-        fireHooks(hooks, previous, current);
+        caller.onStateChange(hooks, previous, current);
 
         if (!current.drop || !current.drop.result) {
           throw new Error('invalid state');
         }
 
         const provided: DropResult = current.drop.result;
-        expect(hooks.onDragEnd).toHaveBeenCalledWith(provided);
+        expect(hooks.onDragEnd).toHaveBeenCalledWith(provided, announceMock);
       });
 
       it('should log an error and not call the callback if there is no drop result', () => {
@@ -126,7 +130,7 @@ describe('fire hooks', () => {
           drop: null,
         };
 
-        fireHooks(hooks, previous, invalid);
+        caller.onStateChange(hooks, previous, invalid);
 
         expect(hooks.onDragEnd).not.toHaveBeenCalled();
         expect(console.error).toHaveBeenCalled();
@@ -152,9 +156,9 @@ describe('fire hooks', () => {
           dimension: noDimensions,
         };
 
-        fireHooks(hooks, previous, current);
+        caller.onStateChange(hooks, previous, current);
 
-        expect(hooks.onDragEnd).toHaveBeenCalledWith(result);
+        expect(hooks.onDragEnd).toHaveBeenCalledWith(result, announceMock);
       });
 
       it('should call onDragEnd with null if the item did not move', () => {
@@ -185,9 +189,9 @@ describe('fire hooks', () => {
           destination: null,
         };
 
-        fireHooks(hooks, previous, current);
+        caller.onStateChange(hooks, previous, current);
 
-        expect(hooks.onDragEnd).toHaveBeenCalledWith(expected);
+        expect(hooks.onDragEnd).toHaveBeenCalledWith(expected, announceMock);
       });
     });
   });
@@ -206,9 +210,9 @@ describe('fire hooks', () => {
           destination: null,
         };
 
-        fireHooks(hooks, state.dragging(), state.idle);
+        caller.onStateChange(hooks, state.dragging(), state.idle);
 
-        expect(hooks.onDragEnd).toHaveBeenCalledWith(expected);
+        expect(hooks.onDragEnd).toHaveBeenCalledWith(expected, announceMock);
       });
 
       it('should log an error and do nothing if it cannot find a previous drag to publish', () => {
@@ -219,7 +223,7 @@ describe('fire hooks', () => {
           dimension: noDimensions,
         };
 
-        fireHooks(hooks, state.idle, invalid);
+        caller.onStateChange(hooks, state.idle, invalid);
 
         expect(hooks.onDragEnd).not.toHaveBeenCalled();
         expect(console.error).toHaveBeenCalled();
@@ -239,9 +243,9 @@ describe('fire hooks', () => {
           destination: null,
         };
 
-        fireHooks(hooks, state.dropAnimating(), state.idle);
+        caller.onStateChange(hooks, state.dropAnimating(), state.idle);
 
-        expect(hooks.onDragEnd).toHaveBeenCalledWith(expected);
+        expect(hooks.onDragEnd).toHaveBeenCalledWith(expected, announceMock);
       });
 
       it('should log an error and do nothing if it cannot find a previous drag to publish', () => {
@@ -250,7 +254,7 @@ describe('fire hooks', () => {
           drop: null,
         };
 
-        fireHooks(hooks, invalid, state.idle);
+        caller.onStateChange(hooks, invalid, state.idle);
 
         expect(hooks.onDragEnd).not.toHaveBeenCalled();
         expect(console.error).toHaveBeenCalled();
@@ -263,7 +267,7 @@ describe('fire hooks', () => {
       Object.keys(state).forEach((key: string) => {
         const current: State = state[key];
 
-        fireHooks(hooks, current, current);
+        caller.onStateChange(hooks, current, current);
 
         expect(hooks.onDragStart).not.toHaveBeenCalled();
         expect(hooks.onDragEnd).not.toHaveBeenCalled();
