@@ -1,16 +1,18 @@
 // @flow
 import createHookCaller from '../../../src/state/hooks/hook-caller';
-import type { Hooks, HookCaller } from '../../../src/state/hooks/hooks-types';
+import type { HookCaller } from '../../../src/state/hooks/hooks-types';
 import * as state from '../../utils/simple-state-preset';
 import { getPreset } from '../../utils/dimension';
 import noImpact, { noMovement } from '../../../src/state/no-impact';
 import type {
   Announce,
+  Hooks,
   DropResult,
   State,
   DimensionState,
   DraggableLocation,
   DragStart,
+  DragUpdate,
   DragImpact,
 } from '../../../src/types';
 
@@ -116,11 +118,17 @@ describe('fire hooks', () => {
     };
 
     describe('has not moved from home location', () => {
-      it('should not provide an update if the location has not changed since the last drag', () => {
+      beforeEach(() => {
         // start a drag
-        caller.onStateChange(hooks, state.requesting(), state.dragging());
+        caller.onStateChange(
+          hooks,
+          state.requesting(),
+          withImpact(state.dragging(), inHomeImpact),
+        );
         expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+      });
 
+      it('should not provide an update if the location has not changed since the last drag', () => {
         // drag to the same spot
         caller.onStateChange(
           hooks,
@@ -141,7 +149,7 @@ describe('fire hooks', () => {
           direction: preset.home.axis.direction,
           destination,
         };
-        const expected: DropResult = {
+        const expected: DragUpdate = {
           draggableId: start.draggableId,
           type: start.type,
           source: start.source,
@@ -170,7 +178,7 @@ describe('fire hooks', () => {
           direction: preset.home.axis.direction,
           destination,
         };
-        const expected: DropResult = {
+        const expected: DragUpdate = {
           draggableId: start.draggableId,
           type: start.type,
           source: start.source,
@@ -188,7 +196,7 @@ describe('fire hooks', () => {
       });
 
       it('should provide an update if moving from a droppable to nothing', () => {
-        const expected: DropResult = {
+        const expected: DragUpdate = {
           draggableId: start.draggableId,
           type: start.type,
           source: start.source,
@@ -521,6 +529,7 @@ describe('fire hooks', () => {
             droppableId: preset.inHome1.descriptor.droppableId,
             index: preset.inHome1.descriptor.index + 1,
           },
+          reason: 'DROP',
         };
         const current: State = {
           phase: 'DROP_COMPLETE',
@@ -563,6 +572,7 @@ describe('fire hooks', () => {
             index: preset.inHome1.descriptor.index,
           },
           destination: null,
+          reason: 'DROP',
         };
         const current: State = {
           phase: 'DROP_COMPLETE',
@@ -579,7 +589,7 @@ describe('fire hooks', () => {
         expect(hooks.onDragEnd).toHaveBeenCalledWith(result, announceMock);
       });
 
-      it('should call onDragEnd with null if the item did not move', () => {
+      it('should call onDragEnd with original source if the item did not move', () => {
         const source: DraggableLocation = {
           droppableId: preset.inHome1.descriptor.droppableId,
           index: preset.inHome1.descriptor.index,
@@ -589,6 +599,7 @@ describe('fire hooks', () => {
           type: preset.home.descriptor.type,
           source,
           destination: source,
+          reason: 'DROP',
         };
         const current: State = {
           phase: 'DROP_COMPLETE',
@@ -604,7 +615,8 @@ describe('fire hooks', () => {
           type: result.type,
           source: result.source,
           // destination has been cleared
-          destination: null,
+          destination: source,
+          reason: 'DROP',
         };
 
         caller.onStateChange(hooks, previous, current);
@@ -626,6 +638,7 @@ describe('fire hooks', () => {
             droppableId: preset.inHome1.descriptor.droppableId,
           },
           destination: null,
+          reason: 'CANCEL',
         };
 
         caller.onStateChange(hooks, state.dragging(), state.idle);
@@ -659,6 +672,7 @@ describe('fire hooks', () => {
             droppableId: preset.inHome1.descriptor.droppableId,
           },
           destination: null,
+          reason: 'CANCEL',
         };
 
         caller.onStateChange(hooks, state.dropAnimating(), state.idle);

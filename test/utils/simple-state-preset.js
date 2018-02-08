@@ -14,7 +14,7 @@ import type {
   DragState,
   DropResult,
   PendingDrop,
-  DropTrigger,
+  DropReason,
   DraggableId,
   DragImpact,
 } from '../../src/types';
@@ -167,11 +167,10 @@ export const scrollJumpRequest = (request: Position): State => {
   return result;
 };
 
-const getDropAnimating = (id: DraggableId, trigger: DropTrigger): State => {
+const getDropAnimating = (id: DraggableId, reason: DropReason): State => {
   const descriptor: DraggableDescriptor = preset.draggables[id].descriptor;
   const home: DroppableDescriptor = preset.droppables[descriptor.droppableId].descriptor;
   const pending: PendingDrop = {
-    trigger,
     newHomeOffset: origin,
     impact: noImpact,
     result: {
@@ -182,6 +181,7 @@ const getDropAnimating = (id: DraggableId, trigger: DropTrigger): State => {
         index: descriptor.index,
       },
       destination: null,
+      reason,
     },
   };
 
@@ -218,6 +218,7 @@ export const dropComplete = (
       index: descriptor.index,
     },
     destination: null,
+    reason: 'DROP',
   };
 
   const value: State = {

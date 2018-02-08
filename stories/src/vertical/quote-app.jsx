@@ -64,9 +64,10 @@ export default class QuoteApp extends Component<Props, State> {
   onDragEnd = (result: DropResult, announce: Announce) => {
     if (result.reason === 'CANCEL') {
       announce('drop cancelled');
-    } else {
-      announce('drop success');
+      return;
     }
+
+    announce('drop success');
 
     publishOnDragEnd(result);
 
