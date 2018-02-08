@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import styled from 'styled-components';
 import TaskList from './task-list';
 import initial from './data';
 import reorder from '../reorder';
@@ -15,6 +16,12 @@ import type { Task } from './types';
 type State = {|
   tasks: Task[]
 |}
+
+const PositionNicely = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 20vh;
+`;
 
 const getPosition = (index: number, length: number): string => `
   ${index + 1} of ${length} in the list
@@ -84,10 +91,12 @@ export default class TaskApp extends Component<*, State> {
         onDragUpdate={this.onDragUpdate}
         onDragEnd={this.onDragEnd}
       >
-        <TaskList
-          title="Todo"
-          tasks={this.state.tasks}
-        />
+        <PositionNicely>
+          <TaskList
+            title="Todo"
+            tasks={this.state.tasks}
+          />
+        </PositionNicely>
       </DragDropContext>
     );
   }

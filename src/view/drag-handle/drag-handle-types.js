@@ -31,6 +31,9 @@ export type DragHandleProps = {|
   // Control styling from style marshal
   'data-react-beautiful-dnd-drag-handle': string,
 
+  // Aria role (nicer screen reader text)
+  role: string,
+
   // Allow tabbing to this element
   tabIndex: number,
 

@@ -25,13 +25,16 @@ const Title = styled.h3`
 
 const List = styled.div`
   padding: ${grid}px;
+  padding-bottom: 0px;
+  display: flex;
+  flex-direction: column;
 `;
 
 export default class TaskList extends Component<Props> {
   render() {
     return (
       <Droppable droppableId="list">
-        {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
+        {(provided: DroppableProvided) => (
           <Container
             innerRef={provided.innerRef}
             {...provided.droppableProps}

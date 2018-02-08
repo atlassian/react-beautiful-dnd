@@ -10,6 +10,8 @@ import type {
 export type DroppableProps = {|
   // used for shared global styles
   'data-react-beautiful-dnd-droppable': string,
+  // used for improved screen reader messaging
+  role: string,
 |}
 
 export type Provided = {|

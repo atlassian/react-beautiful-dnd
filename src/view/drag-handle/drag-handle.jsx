@@ -192,6 +192,7 @@ export default class DragHandle extends Component<Props> {
       onClick: this.onClick,
       tabIndex: 0,
       'data-react-beautiful-dnd-drag-handle': this.styleContext,
+      role: 'option',
       draggable: false,
       onDragStart: getFalse,
       onDrop: getFalse,
