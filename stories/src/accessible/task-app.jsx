@@ -9,8 +9,9 @@ import { DragDropContext } from '../../../src/';
 import type {
   DragStart,
   DragUpdate,
-  DragResult,
+  DropResult,
   Announce,
+  DraggableLocation,
 } from '../../../src/';
 import type { Task } from './types';
 
@@ -78,7 +79,7 @@ export default class TaskApp extends Component<*, State> {
     announce(`Now ${getPosition(update.destination.index, this.state.tasks.length)}`);
   }
 
-  onDragEnd = (result: DragResult, announce: Announce) => {
+  onDragEnd = (result: DropResult, announce: Announce) => {
     if (result.reason === 'CANCEL') {
       announce(`
         Movement cancelled.
@@ -87,7 +88,9 @@ export default class TaskApp extends Component<*, State> {
       return;
     }
 
-    if (!result.destination) {
+    const desination: ?DraggableLocation = result.destination;
+
+    if (!desination) {
       announce(`
         Item has been dropped while not over a location.
         ${itemReturned(result.source.index, this.state.tasks.length)}
@@ -97,13 +100,13 @@ export default class TaskApp extends Component<*, State> {
 
     announce(`
       Item dropped.
-      It has moved from ${result.source.index + 1} to ${result.destination.index + 1}
+      It has moved from ${result.source.index + 1} to ${desination.index + 1}
     `);
 
     const tasks: Task[] = reorder(
       this.state.tasks,
       result.source.index,
-      result.destination.index
+      desination.index,
     );
 
     this.setState({

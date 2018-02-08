@@ -196,6 +196,7 @@ describe('hooks integration', () => {
       type: 'DEFAULT',
       source,
       destination: null,
+      reason: 'DROP',
     };
 
     const cancelled: DropResult = {
@@ -203,6 +204,7 @@ describe('hooks integration', () => {
       type: 'DEFAULT',
       source,
       destination: null,
+      reason: 'CANCEL',
     };
 
     return { start, completed, cancelled };

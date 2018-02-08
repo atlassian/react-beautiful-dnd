@@ -16,6 +16,7 @@ export type {
 
   // Hooks
   DragStart,
+  DragUpdate,
   DropResult,
   DraggableLocation,
   Announce,
