@@ -102,7 +102,6 @@ export default class Droppable extends Component<Props, State> {
       placeholder: this.getPlaceholder(),
       droppableProps: {
         'data-react-beautiful-dnd-droppable': this.styleContext,
-        role: 'listbox',
       },
     };
     const snapshot: StateSnapshot = {

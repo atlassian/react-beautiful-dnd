@@ -32,7 +32,7 @@ export type DragHandleProps = {|
   'data-react-beautiful-dnd-drag-handle': string,
 
   // Aria role (nicer screen reader text)
-  role: string,
+  'aria-roledescription': string,
 
   // Allow tabbing to this element
   tabIndex: number,

@@ -21,27 +21,27 @@ const onDragUpdate = (update: DragUpdate): string => {
     return 'You are currently not dragging over any droppable area';
   }
   // TODO: list what droppable they are in?
-  return `Item is now in position ${update.destination.index + 1}`;
+  return `You have moved the item to position ${update.destination.index + 1}`;
 };
 
 const onDragEnd = (result: DropResult): string => {
   if (result.reason === 'CANCEL') {
     return `
       Movement cancelled.
-      Item has been returned to its original position of ${result.source.index + 1}
+      The item has returned to its starting position of ${result.source.index + 1}
     `;
   }
 
   if (!result.destination) {
     return `
-      Item has been dropped while not over a location.
-      Item has been returned to its original position of ${result.source.index + 1}
+      The item has been dropped while not over a location.
+      The item has returned to its starting position of ${result.source.index + 1}
     `;
   }
 
   if (result.source.droppableId === result.destination.droppableId) {
     return `
-      Item dropped.
+      You have dropped the item.
       It has moved from position ${result.source.index + 1} to ${result.destination.index + 1}
   `;
   }

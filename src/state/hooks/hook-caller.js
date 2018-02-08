@@ -4,6 +4,7 @@ import type { HookCaller } from './hooks-types';
 import type {
   Announce,
   Hooks,
+  HookProvided,
   State as AppState,
   DragState,
   DragStart,
@@ -42,6 +43,17 @@ const areLocationsEqual = (current: ?DraggableLocation, next: ?DraggableLocation
   // compare their actual values
   return current.droppableId === next.droppableId &&
     current.index === next.index;
+};
+
+const getProvided = (announce: Announce): HookProvided => {
+  const detector = (message: string) => {
+    announce(message);
+    detector.wasCalled = true;
+  };
+
+  return {
+    announce: detector,
+  };
 };
 
 export default (announce: Announce): HookCaller => {
@@ -129,14 +141,18 @@ export default (announce: Announce): HookCaller => {
           hasMovedFromStartLocation: true,
         });
 
-        console.log('has moved from start!');
         if (!onDragUpdate) {
           announce(messagePreset.onDragUpdate(update));
           return;
         }
 
-        const message: ?string = onDragUpdate(update);
-        announce(message || messagePreset.onDragUpdate(update));
+        const provided: HookProvided = getProvided(announce);
+        onDragUpdate(update, provided);
+
+        // if they do not announce - use the default
+        if (!provided.announce.wasCalled) {
+          announce(messagePreset.onDragUpdate(update));
+        }
 
         return;
       }
@@ -155,8 +171,13 @@ export default (announce: Announce): HookCaller => {
         return;
       }
 
-      const message: ?string = onDragUpdate(update);
-      announce(message || messagePreset.onDragUpdate(update));
+      const provided: HookProvided = getProvided(announce);
+      onDragUpdate(update, provided);
+
+      // if they did not announce anything - use the default
+      if (!provided.announce.wasCalled) {
+        announce(messagePreset.onDragUpdate(update));
+      }
 
       return;
     }
@@ -193,9 +214,13 @@ export default (announce: Announce): HookCaller => {
         return;
       }
 
-      const message: ?string = onDragStart(start);
+      const provided: HookProvided = getProvided(announce);
+      onDragStart(start, provided);
 
-      announce(message || messagePreset.onDragStart(start));
+      // if they did not announce anything - use the default
+      if (!provided.announce.wasCalled) {
+        announce(messagePreset.onDragStart(start));
+      }
       return;
     }
 
@@ -206,9 +231,13 @@ export default (announce: Announce): HookCaller => {
         return;
       }
       const result: DropResult = current.drop.result;
-      const message: ?string = onDragEnd(result);
 
-      announce(message || messagePreset.onDragEnd(result));
+      const provided: HookProvided = getProvided(announce);
+      onDragEnd(result, provided);
+
+      if (!provided.announce.wasCalled) {
+        announce(messagePreset.onDragEnd(result));
+      }
       return;
     }
 
@@ -239,9 +268,13 @@ export default (announce: Announce): HookCaller => {
         reason: 'CANCEL',
       };
 
-      const message: ?string = onDragEnd(result);
+      const provided: HookProvided = getProvided(announce);
+      onDragEnd(result, provided);
 
-      announce(message || messagePreset.onDragEnd(result));
+      if (!provided.announce.wasCalled) {
+        announce(messagePreset.onDragEnd(result));
+      }
+
       return;
     }
 
@@ -260,9 +293,12 @@ export default (announce: Announce): HookCaller => {
         destination: null,
         reason: 'CANCEL',
       };
-      const message: ?string = onDragEnd(result);
+      const provided: HookProvided = getProvided(announce);
+      onDragEnd(result, provided);
 
-      announce(message || messagePreset.onDragEnd(result));
+      if (!provided.announce.wasCalled) {
+        announce(messagePreset.onDragEnd(result));
+      }
     }
   };
 

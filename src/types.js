@@ -318,9 +318,13 @@ export type Store = ReduxStore<State, Action, Dispatch>;
 
 export type Announce = (message: string) => void;
 
+export type HookProvided = {|
+  announce: Announce,
+|}
+
 export type Hooks = {|
-  onDragStart?: (start: DragStart) => ?string,
-  onDragUpdate?: (update: DragUpdate) => ?string,
-  onDragEnd: (result: DropResult) => ?string,
+  onDragStart?: (start: DragStart, provided: HookProvided) => void,
+  onDragUpdate?: (update: DragUpdate, provided: HookProvided) => void,
+  onDragEnd: (result: DropResult, provided: HookProvided) => void,
 |}
 

@@ -7,10 +7,12 @@ import reorder from '../reorder';
 import { grid } from '../constants';
 import { DragDropContext } from '../../../src/';
 import type {
+  Announce,
   DragStart,
   DragUpdate,
   DropResult,
   DraggableLocation,
+  HookProvided,
 } from '../../../src/';
 import type { Task } from './types';
 
@@ -20,7 +22,7 @@ type State = {|
 |}
 
 const Container = styled.div`
-  margin-top: 20vh;
+  padding-top: 20vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -38,7 +40,6 @@ const BlurControls = styled.div`
 
 const BlurTitle = styled.h4`
   margin: 0;
-
 `;
 
 const Button = styled.button`
@@ -46,16 +47,9 @@ const Button = styled.button`
   width: ${grid * 5}px;
   font-size: 20px;
   justify-content: center;
-  margin: 0 ${grid * 2}px
+  margin: 0 ${grid * 2}px;
+  cursor: pointer;
 `;
-
-const getPosition = (index: number, length: number): string => `
-  ${index + 1} of ${length} in the list
-`.trim();
-
-const itemReturned = (index: number, length: number): string => `
-  Item has returned to ${getPosition(index, length)}
-`.trim();
 
 export default class TaskApp extends Component<*, State> {
   state: State = {
@@ -63,49 +57,57 @@ export default class TaskApp extends Component<*, State> {
     blur: 0,
   }
 
-  onDragStart = (start: DragStart): string => `
-    Item lifted. ${getPosition(start.source.index, this.state.tasks.length)}.
-    Use the arrow keys to move, space bar to drop, and escape to cancel
-  `
+  // in?
+  onDragStart = (start: DragStart, provided: HookProvided): void => provided.announce(`
+    You have lifted a task.
+    It is in position ${start.source.index + 1} of ${this.state.tasks.length} in the list.
+    Use the arrow keys to move, space bar to drop, and escape to cancel.
+  `)
 
-  onDragUpdate = (update: DragUpdate): string => {
+  onDragUpdate = (update: DragUpdate, provided: HookProvided): void => {
+    const announce: Announce = provided.announce;
     if (!update.destination) {
-      return 'You are currently not dragging over any droppable area';
+      announce('You are currently not dragging over any droppable area');
+      return;
     }
-    return `Now ${getPosition(update.destination.index, this.state.tasks.length)}`;
+    announce(`You have moved the task to position ${update.destination.index + 1}`);
   }
 
-  onDragEnd = (result: DropResult): string => {
+  onDragEnd = (result: DropResult, provided: HookProvided): void => {
+    const announce: Announce = provided.announce;
+    // TODO: not being called on cancel!!!
     if (result.reason === 'CANCEL') {
-      return `
+      announce(`
         Movement cancelled.
-        ${itemReturned(result.source.index, this.state.tasks.length)}
-      `;
+        The task has returned to its starting position of ${result.source.index + 1}
+      `);
+      return;
     }
 
-    const desination: ?DraggableLocation = result.destination;
+    const destination: ?DraggableLocation = result.destination;
 
-    if (!desination) {
-      return `
-        Item has been dropped while not over a location.
-        ${itemReturned(result.source.index, this.state.tasks.length)}
-      `;
+    if (!destination) {
+      announce(`
+        The task has been dropped while not over a location.
+        The task has returned to its starting position of ${result.source.index + 1}
+      `);
+      return;
     }
 
     const tasks: Task[] = reorder(
       this.state.tasks,
       result.source.index,
-      desination.index,
+      destination.index,
     );
 
     this.setState({
       tasks,
     });
 
-    return `
-      Item dropped.
-      It has moved from ${result.source.index + 1} to ${desination.index + 1}
-    `;
+    announce(`
+      You have dropped the task.
+      It has moved from position ${result.source.index + 1} to ${destination.index + 1}
+    `);
   }
 
   render() {

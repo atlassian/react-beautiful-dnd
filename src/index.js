@@ -18,6 +18,8 @@ export type {
   DragStart,
   DragUpdate,
   DropResult,
+  HookProvided,
+  Announce,
   DraggableLocation,
 } from './types';
 
