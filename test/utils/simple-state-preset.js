@@ -165,7 +165,7 @@ export const scrollJumpRequest = (request: Position): State => {
   };
 
   return result;
-}
+};
 
 const getDropAnimating = (id: DraggableId, trigger: DropTrigger): State => {
   const descriptor: DraggableDescriptor = preset.draggables[id].descriptor;

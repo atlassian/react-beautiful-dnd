@@ -3,6 +3,7 @@ import createHookCaller from '../../../src/state/hooks/hook-caller';
 import type { Hooks, HookCaller } from '../../../src/state/hooks/hooks-types';
 import * as state from '../../utils/simple-state-preset';
 import { getPreset } from '../../utils/dimension';
+import noImpact, { noMovement } from '../../../src/state/no-impact';
 import type {
   Announce,
   DropResult,
@@ -10,6 +11,7 @@ import type {
   DimensionState,
   DraggableLocation,
   DragStart,
+  DragImpact,
 } from '../../../src/types';
 
 const preset = getPreset();
@@ -29,6 +31,7 @@ describe('fire hooks', () => {
     caller = createHookCaller(announceMock);
     hooks = {
       onDragStart: jest.fn(),
+      onDragUpdate: jest.fn(),
       onDragEnd: jest.fn(),
     };
     jest.spyOn(console, 'error').mockImplementation(() => { });
@@ -40,7 +43,6 @@ describe('fire hooks', () => {
 
   describe('drag start', () => {
     it('should call the onDragStart hook when a drag starts', () => {
-      caller.onStateChange(hooks, state.requesting(), state.dragging());
       const expected: DragStart = {
         draggableId: preset.inHome1.descriptor.id,
         type: preset.home.descriptor.type,
@@ -49,6 +51,8 @@ describe('fire hooks', () => {
           index: preset.inHome1.descriptor.index,
         },
       };
+
+      caller.onStateChange(hooks, state.requesting(), state.dragging());
 
       expect(hooks.onDragStart).toHaveBeenCalledWith(expected, announceMock);
     });
@@ -79,6 +83,286 @@ describe('fire hooks', () => {
       caller.onStateChange(hooks, state.preparing, state.requesting());
 
       expect(hooks.onDragStart).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('drag update', () => {
+    const withImpact = (current: State, impact: DragImpact) => {
+      if (!current.drag) {
+        throw new Error('invalid state');
+      }
+      return {
+        ...current,
+        drag: {
+          ...current.drag,
+          impact,
+        },
+      };
+    };
+
+    const start: DragStart = {
+      draggableId: preset.inHome1.descriptor.id,
+      type: preset.home.descriptor.type,
+      source: {
+        index: preset.inHome1.descriptor.index,
+        droppableId: preset.inHome1.descriptor.droppableId,
+      },
+    };
+
+    const inHomeImpact: DragImpact = {
+      movement: noMovement,
+      direction: preset.home.axis.direction,
+      destination: start.source,
+    };
+
+    describe('has not moved from home location', () => {
+      it('should not provide an update if the location has not changed since the last drag', () => {
+        // start a drag
+        caller.onStateChange(hooks, state.requesting(), state.dragging());
+        expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+
+        // drag to the same spot
+        caller.onStateChange(
+          hooks,
+          withImpact(state.dragging(), inHomeImpact),
+          withImpact(state.dragging(), inHomeImpact),
+        );
+
+        expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+      });
+
+      it('should provide an update if the index changes', () => {
+        const destination: DraggableLocation = {
+          index: preset.inHome1.descriptor.index + 1,
+          droppableId: preset.inHome1.descriptor.droppableId,
+        };
+        const impact: DragImpact = {
+          movement: noMovement,
+          direction: preset.home.axis.direction,
+          destination,
+        };
+        const expected: DropResult = {
+          draggableId: start.draggableId,
+          type: start.type,
+          source: start.source,
+          destination,
+        };
+
+        // drag to the same spot
+        caller.onStateChange(
+          hooks,
+          withImpact(state.dragging(), inHomeImpact),
+          withImpact(state.dragging(), impact),
+        );
+
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith(expected, announceMock);
+      });
+
+      it('should provide an update if the droppable changes', () => {
+        const destination: DraggableLocation = {
+          // same index
+          index: preset.inHome1.descriptor.index,
+          // different droppable
+          droppableId: preset.foreign.descriptor.id,
+        };
+        const impact: DragImpact = {
+          movement: noMovement,
+          direction: preset.home.axis.direction,
+          destination,
+        };
+        const expected: DropResult = {
+          draggableId: start.draggableId,
+          type: start.type,
+          source: start.source,
+          destination,
+        };
+
+        // drag to the same spot
+        caller.onStateChange(
+          hooks,
+          withImpact(state.dragging(), inHomeImpact),
+          withImpact(state.dragging(), impact),
+        );
+
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith(expected, announceMock);
+      });
+
+      it('should provide an update if moving from a droppable to nothing', () => {
+        const expected: DropResult = {
+          draggableId: start.draggableId,
+          type: start.type,
+          source: start.source,
+          destination: null,
+        };
+
+        // drag to the same spot
+        caller.onStateChange(
+          hooks,
+          withImpact(state.dragging(), inHomeImpact),
+          withImpact(state.dragging(), noImpact),
+        );
+
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith(expected, announceMock);
+      });
+    });
+
+    describe('no longer in home location', () => {
+      const firstImpact: DragImpact = {
+        movement: noMovement,
+        direction: preset.home.axis.direction,
+        // moved into the second index
+        destination: {
+          index: preset.inHome1.descriptor.index + 1,
+          droppableId: preset.inHome1.descriptor.droppableId,
+        },
+      };
+
+      beforeEach(() => {
+        // initial lift
+        caller.onStateChange(
+          hooks,
+          state.requesting(),
+          withImpact(state.dragging(), inHomeImpact),
+        );
+        // checking everything is well
+        expect(hooks.onDragStart).toHaveBeenCalled();
+        expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+
+        // first move into new location
+        caller.onStateChange(
+          hooks,
+          withImpact(state.dragging(), inHomeImpact),
+          withImpact(state.dragging(), firstImpact),
+        );
+
+        expect(hooks.onDragUpdate).toHaveBeenCalled();
+        hooks.onDragUpdate.mockReset();
+      });
+
+      it('should not provide an update if the location has not changed since the last drag', () => {
+        // drag to the same spot
+        caller.onStateChange(
+          hooks,
+          withImpact(state.dragging(), firstImpact),
+          withImpact(state.dragging(), firstImpact),
+        );
+
+        expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+      });
+
+      it('should provide an update if the index changes', () => {
+        const destination: DraggableLocation = {
+          index: preset.inHome1.descriptor.index + 2,
+          droppableId: preset.inHome1.descriptor.droppableId,
+        };
+        const secondImpact: DragImpact = {
+          movement: noMovement,
+          direction: preset.home.axis.direction,
+          destination,
+        };
+        const expected: DropResult = {
+          draggableId: start.draggableId,
+          type: start.type,
+          source: start.source,
+          destination,
+        };
+
+        // drag to the same spot
+        caller.onStateChange(
+          hooks,
+          withImpact(state.dragging(), firstImpact),
+          withImpact(state.dragging(), secondImpact),
+        );
+
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith(expected, announceMock);
+      });
+
+      it('should provide an update if the droppable changes', () => {
+        const destination: DraggableLocation = {
+          index: preset.inHome1.descriptor.index + 1,
+          droppableId: preset.foreign.descriptor.id,
+        };
+        const secondImpact: DragImpact = {
+          movement: noMovement,
+          direction: preset.home.axis.direction,
+          destination,
+        };
+        const expected: DropResult = {
+          draggableId: start.draggableId,
+          type: start.type,
+          source: start.source,
+          destination,
+        };
+
+        // drag to the same spot
+        caller.onStateChange(
+          hooks,
+          withImpact(state.dragging(), firstImpact),
+          withImpact(state.dragging(), secondImpact),
+        );
+
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith(expected, announceMock);
+      });
+
+      it('should provide an update if moving from a droppable to nothing', () => {
+        const secondImpact: DragImpact = {
+          movement: noMovement,
+          direction: null,
+          destination: null,
+        };
+        const expected: DropResult = {
+          draggableId: start.draggableId,
+          type: start.type,
+          source: start.source,
+          destination: null,
+        };
+
+        // drag to the same spot
+        caller.onStateChange(
+          hooks,
+          withImpact(state.dragging(), firstImpact),
+          withImpact(state.dragging(), secondImpact),
+        );
+
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith(expected, announceMock);
+      });
+
+      it('should provide an update if moving back to the home location', () => {
+        const impact: DragImpact = {
+          movement: noMovement,
+          direction: preset.home.axis.direction,
+          destination: null,
+        };
+
+        // drag to nowhere
+        caller.onStateChange(
+          hooks,
+          withImpact(state.dragging(), inHomeImpact),
+          withImpact(state.dragging(), impact),
+        );
+        const first: DropResult = {
+          draggableId: start.draggableId,
+          type: start.type,
+          source: start.source,
+          destination: null,
+        };
+
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith(first, announceMock);
+
+        // drag back to home
+        caller.onStateChange(
+          hooks,
+          withImpact(state.dragging(), impact),
+          withImpact(state.dragging(), inHomeImpact),
+        );
+        const second: DropResult = {
+          draggableId: start.draggableId,
+          type: start.type,
+          source: start.source,
+          destination: start.source,
+        };
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith(second, announceMock);
+      });
     });
   });
 
