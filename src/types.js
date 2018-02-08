@@ -222,6 +222,8 @@ export type CurrentDrag = {|
   windowScroll: Position,
   // whether or not draggable movements should be animated
   shouldAnimate: boolean,
+  // has the initial dimension capture completed?
+  // isInitialDimensionCaptureCompleted: boolean,
 |}
 
 // published when a drag starts
@@ -317,8 +319,8 @@ export type Store = ReduxStore<State, Action, Dispatch>;
 export type Announce = (message: string) => void;
 
 export type Hooks = {|
-  onDragStart?: (start: DragStart, announce: Announce) => void,
-  onDragUpdate?: (update: DragUpdate, announce: Announce) => void,
-  onDragEnd: (result: DropResult, announce: Announce) => void,
+  onDragStart?: (start: DragStart) => ?string,
+  onDragUpdate?: (update: DragUpdate) => ?string,
+  onDragEnd: (result: DropResult) => ?string,
 |}
 

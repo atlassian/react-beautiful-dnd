@@ -10,7 +10,6 @@ import type {
   DragStart,
   DragUpdate,
   DropResult,
-  Announce,
   DraggableLocation,
 } from '../../../src/';
 import type { Task } from './types';
@@ -64,44 +63,34 @@ export default class TaskApp extends Component<*, State> {
     blur: 0,
   }
 
-  onDragStart = (start: DragStart, announce: Announce) => {
-    announce(`
-      Item lifted. ${getPosition(start.source.index, this.state.tasks.length)}.
-      Use the arrow keys to move, space bar to drop, and escape to cancel
-    `);
-  }
+  onDragStart = (start: DragStart): string => `
+    Item lifted. ${getPosition(start.source.index, this.state.tasks.length)}.
+    Use the arrow keys to move, space bar to drop, and escape to cancel
+  `
 
-  onDragUpdate = (update: DragUpdate, announce: Announce) => {
+  onDragUpdate = (update: DragUpdate): string => {
     if (!update.destination) {
-      announce('You are currently not dragging over any droppable area');
-      return;
+      return 'You are currently not dragging over any droppable area';
     }
-    announce(`Now ${getPosition(update.destination.index, this.state.tasks.length)}`);
+    return `Now ${getPosition(update.destination.index, this.state.tasks.length)}`;
   }
 
-  onDragEnd = (result: DropResult, announce: Announce) => {
+  onDragEnd = (result: DropResult): string => {
     if (result.reason === 'CANCEL') {
-      announce(`
+      return `
         Movement cancelled.
         ${itemReturned(result.source.index, this.state.tasks.length)}
-      `);
-      return;
+      `;
     }
 
     const desination: ?DraggableLocation = result.destination;
 
     if (!desination) {
-      announce(`
+      return `
         Item has been dropped while not over a location.
         ${itemReturned(result.source.index, this.state.tasks.length)}
-      `);
-      return;
+      `;
     }
-
-    announce(`
-      Item dropped.
-      It has moved from ${result.source.index + 1} to ${desination.index + 1}
-    `);
 
     const tasks: Task[] = reorder(
       this.state.tasks,
@@ -112,6 +101,11 @@ export default class TaskApp extends Component<*, State> {
     this.setState({
       tasks,
     });
+
+    return `
+      Item dropped.
+      It has moved from ${result.source.index + 1} to ${desination.index + 1}
+    `;
   }
 
   render() {

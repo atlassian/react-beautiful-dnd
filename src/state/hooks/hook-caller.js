@@ -1,4 +1,5 @@
 // @flow
+import messagePreset from './message-preset';
 import type { HookCaller } from './hooks-types';
 import type {
   Announce,
@@ -128,9 +129,15 @@ export default (announce: Announce): HookCaller => {
           hasMovedFromStartLocation: true,
         });
 
-        if (onDragUpdate) {
-          onDragUpdate(update, announce);
+        console.log('has moved from start!');
+        if (!onDragUpdate) {
+          announce(messagePreset.onDragUpdate(update));
+          return;
         }
+
+        const message: ?string = onDragUpdate(update);
+        announce(message || messagePreset.onDragUpdate(update));
+
         return;
       }
 
@@ -143,9 +150,14 @@ export default (announce: Announce): HookCaller => {
         lastDestination: destination,
       });
 
-      if (onDragUpdate) {
-        onDragUpdate(update, announce);
+      if (!onDragUpdate) {
+        announce(messagePreset.onDragUpdate(update));
+        return;
       }
+
+      const message: ?string = onDragUpdate(update);
+      announce(message || messagePreset.onDragUpdate(update));
+
       return;
     }
 
@@ -177,10 +189,13 @@ export default (announce: Announce): HookCaller => {
 
       // onDragStart is optional
       if (!onDragStart) {
+        announce(messagePreset.onDragStart(start));
         return;
       }
 
-      onDragStart(start, announce);
+      const message: ?string = onDragStart(start);
+
+      announce(message || messagePreset.onDragStart(start));
       return;
     }
 
@@ -190,8 +205,11 @@ export default (announce: Announce): HookCaller => {
         console.error('cannot fire onDragEnd hook without drag state', { current, previous });
         return;
       }
+      const result: DropResult = current.drop.result;
+      const message: ?string = onDragEnd(result);
 
-      onDragEnd(current.drop.result, announce);
+      announce(message || messagePreset.onDragEnd(result));
+      return;
     }
 
     // Drag ended while dragging
@@ -221,7 +239,9 @@ export default (announce: Announce): HookCaller => {
         reason: 'CANCEL',
       };
 
-      onDragEnd(result, announce);
+      const message: ?string = onDragEnd(result);
+
+      announce(message || messagePreset.onDragEnd(result));
       return;
     }
 
@@ -240,7 +260,9 @@ export default (announce: Announce): HookCaller => {
         destination: null,
         reason: 'CANCEL',
       };
-      onDragEnd(result, announce);
+      const message: ?string = onDragEnd(result);
+
+      announce(message || messagePreset.onDragEnd(result));
     }
   };
 

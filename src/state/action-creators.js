@@ -102,6 +102,24 @@ export const publishDroppableDimensions =
     payload: dimensions,
   });
 
+export type BulkPublishDimensionsAction = {|
+  type: 'BULK_DIMENSION_PUBLISH',
+  payload: {|
+    draggables: DraggableDimension[],
+    droppables: DroppableDimension[],
+  |}
+|}
+
+export const bulkPublishDimensions = (
+  draggables: DraggableDimension[],
+  droppables: DroppableDimension[]
+): BulkPublishDimensionsAction => ({
+  type: 'BULK_DIMENSION_PUBLISH',
+  payload: {
+    draggables, droppables,
+  },
+});
+
 export type UpdateDroppableDimensionScrollAction = {|
   type: 'UPDATE_DROPPABLE_DIMENSION_SCROLL',
   payload: {
@@ -492,6 +510,7 @@ export type Action =
   RequestDimensionsAction |
   PublishDraggableDimensionsAction |
   PublishDroppableDimensionsAction |
+  BulkPublishDimensionsAction |
   UpdateDroppableDimensionScrollAction |
   UpdateDroppableDimensionIsEnabledAction |
   MoveByWindowScrollAction |

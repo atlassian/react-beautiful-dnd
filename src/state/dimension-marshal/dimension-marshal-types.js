@@ -68,6 +68,10 @@ export type Callbacks = {|
   cancel: () => void,
   publishDraggables: (DraggableDimension[]) => void,
   publishDroppables: (DroppableDimension[]) => void,
+  bulkPublish: (
+    draggables: DraggableDimension[],
+    droppables: DroppableDimension[],
+  ) => void,
   updateDroppableScroll: (id: DroppableId, newScroll: Position) => void,
   updateDroppableIsEnabled: (id: DroppableId, isEnabled: boolean) => void,
 |}

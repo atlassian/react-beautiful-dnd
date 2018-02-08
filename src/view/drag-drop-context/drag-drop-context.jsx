@@ -42,6 +42,7 @@ import {
   publishDroppableDimensions,
   updateDroppableDimensionScroll,
   updateDroppableDimensionIsEnabled,
+  bulkPublishDimensions,
 } from '../../state/action-creators';
 
 type Props = {|
@@ -116,6 +117,9 @@ export default class DragDropContext extends React.Component<Props> {
       },
       publishDroppables: (dimensions: DroppableDimension[]) => {
         this.store.dispatch(publishDroppableDimensions(dimensions));
+      },
+      bulkPublish: (draggables: DraggableDimension[], droppables: DroppableDimension[]) => {
+        this.store.dispatch(bulkPublishDimensions(draggables, droppables));
       },
       updateDroppableScroll: (id: DroppableId, newScroll: Position) => {
         this.store.dispatch(updateDroppableDimensionScroll(id, newScroll));

@@ -249,6 +249,43 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     return updateStateAfterDimensionChange(newState);
   }
 
+  if (action.type === 'BULK_DIMENSION_PUBLISH') {
+    const draggables: DraggableDimension[] = action.payload.draggables;
+    const droppables: DroppableDimension[] = action.payload.droppables;
+
+    if (!canPublishDimension(state.phase)) {
+      console.warn('dimensions rejected as no longer allowing dimension capture in phase', state.phase);
+      return state;
+    }
+
+    const newDraggables: DraggableDimensionMap = draggables.reduce((previous, current) => {
+      previous[current.descriptor.id] = current;
+      return previous;
+    }, {});
+
+    const newDroppables: DroppableDimensionMap = droppables.reduce((previous, current) => {
+      previous[current.descriptor.id] = current;
+      return previous;
+    }, {});
+
+    const newState: State = {
+      ...state,
+      dimension: {
+        request: state.dimension.request,
+        draggable: {
+          ...state.dimension.draggable,
+          ...newDraggables,
+        },
+        droppable: {
+          ...state.dimension.droppable,
+          ...newDroppables,
+        },
+      },
+    };
+
+    return updateStateAfterDimensionChange(newState);
+  }
+
   if (action.type === 'COMPLETE_LIFT') {
     if (state.phase !== 'COLLECTING_INITIAL_DIMENSIONS') {
       console.error('trying complete lift without collecting dimensions');

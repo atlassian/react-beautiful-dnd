@@ -368,18 +368,18 @@ export default (callbacks: Callbacks) => {
           }, { draggables: [], droppables: [] }
         );
 
-        if (toBePublished.droppables.length) {
-          callbacks.publishDroppables(toBePublished.droppables);
-        }
-        if (toBePublished.draggables.length) {
-          callbacks.publishDraggables(toBePublished.draggables);
-        }
+        callbacks.bulkPublish(
+          toBePublished.draggables,
+          toBePublished.droppables,
+        );
 
         // need to watch the scroll on each droppable
         toBePublished.droppables.forEach((dimension: DroppableDimension) => {
           const entry: DroppableEntry = state.droppables[dimension.descriptor.id];
           entry.callbacks.watchScroll();
         });
+
+        // callbacks.initialCollectionComplete();
 
         setFrameId(null);
       });
