@@ -8,8 +8,24 @@ type State = {|
 
 let count: number = 0;
 
+// https://allyjs.io/tutorials/hiding-elements.html
+// Element is v hidden but is readable by screen readers
+const visuallyHidden: Object = {
+  position: 'absolute',
+  width: '1px',
+  height: '1px',
+  margin: '-1px',
+  border: '0',
+  padding: '0',
+  overflow: 'hidden',
+  clip: 'rect(0 0 0 0)',
+  // for if 'clip' is ever removed
+  'clip-path': 'inset(100%)',
+};
+
 export default (): Announcer => {
-  const id: string = `data-react-beautiful-dnd-announcement-${count++}`;
+  const id: string = `react-beautiful-dnd-announcement-${count++}`;
+  // const id: string = 'react-beautiful-dnd-announcement';
 
   let state: State = {
     el: null,
@@ -48,13 +64,8 @@ export default (): Announcer => {
     // must read the whole thing every time
     el.setAttribute('aria-atomic', 'true');
 
-    // style
-    el.style.position = 'absolute';
-    el.style.top = '0px';
-    el.style.fontSize = '30px';
-    el.style.backgroundColor = 'rgba(255,255,255,0.4)';
-
-    // aria
+    // hide the element
+    Object.assign(el.style, visuallyHidden);
 
     if (!document.body) {
       throw new Error('Cannot find the head to append a style to');
@@ -88,7 +99,7 @@ export default (): Announcer => {
 
   const announcer: Announcer = {
     announce,
-    describedBy: id,
+    id,
     mount,
     unmount,
   };

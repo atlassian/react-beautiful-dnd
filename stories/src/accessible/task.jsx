@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Draggable } from '../../../src/';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../src/';
 import type { Task as TaskType } from './types';
-import { grid, borderRadius } from '../constants';
+import { colors, grid, borderRadius } from '../constants';
 
 type Props = {|
   task: TaskType,
@@ -12,11 +12,14 @@ type Props = {|
 |}
 
 const Container = styled.div`
-  background: lightblue;
+  border-bottom: 1px solid #ccc;
+  background: ${colors.white};
   padding: ${grid}px;
   margin-bottom: ${grid}px;
   border-radius: ${borderRadius}px;
-  font-size: 24px;
+  font-size: 18px;
+
+  ${({ isDragging }) => (isDragging ? 'box-shadow: 1px 1px 1px grey' : '')}
 `;
 
 const Wrapper = styled.div``;
@@ -32,6 +35,7 @@ export default class Task extends Component<Props> {
           <Wrapper>
             <Container
               innerRef={provided.innerRef}
+              isDragging={snapshot.isDragging}
               {...provided.draggableProps}
               {...provided.dragHandleProps}
             >
