@@ -136,6 +136,8 @@ Traditionally drag and drop interactions have been exclusively a mouse or touch 
 
 In addition to supporting keyboard, we have also audited how the keyboard shortcuts interact with standard browser keyboard interactions. When the user is not dragging they can use their keyboard as they normally would. While dragging we override and disable certain browser shortcuts (such as `tab`) to ensure a fluid experience for the user.
 
+We also provide **support for screen readers** through the `announce` function provided to all of the `hooks`. This means that users who have visual (or other) impairments are able to complete all drag and drop operations through keyboard and audio feedback.
+
 ## Mouse dragging
 
 ### Sloppy clicks and click blocking 🐱🎁
@@ -563,6 +565,29 @@ Here are a few poor user experiences that can occur if you change things *during
 - If you change the dimensions of any node, then it can cause the changed node as well as others to move at incorrect times.
 - If you remove the node that the user is dragging, then the drag will instantly end
 - If you change the dimension of the dragging node, then other things will not move out of the way at the correct time.
+
+### Accessibility ❤️
+
+All of our lifecycle `hooks` provide the ability to `announce` a change to screen readers. It is a function that accepts a `string` and will print it to the user:
+
+```js
+export type Announce = (message: string) => void;
+```
+
+Based on the information passed to in the `hooks` you are able to provide meaningful messages to screen readers.
+
+On lift
+
+On update
+- item has moved index
+- item has moved droppable
+- item is no longer over a droppable (only possible with pointer based dragging)
+
+onDragEnd
+- item was dropped in a new location
+- item was dropped in the same location it started in
+- item was dropped while in no location (only possible with pointer based dragging)
+- drag was cancelled (may be due a user directly cancelling, a user cancelling indirectly through an action such as a browser resize, or an error).
 
 #### Force focus after a transition between lists
 

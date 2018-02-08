@@ -213,7 +213,6 @@ export default (announce: Announce): HookCaller => {
         index: descriptor.index,
         droppableId: descriptor.droppableId,
       };
-
       const result: DropResult = {
         draggableId: descriptor.id,
         type: home.descriptor.type,
@@ -221,6 +220,7 @@ export default (announce: Announce): HookCaller => {
         destination: null,
         reason: 'CANCEL',
       };
+
       onDragEnd(result, announce);
       return;
     }

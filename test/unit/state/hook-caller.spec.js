@@ -269,7 +269,7 @@ describe('fire hooks', () => {
           direction: preset.home.axis.direction,
           destination,
         };
-        const expected: DropResult = {
+        const expected: DragUpdate = {
           draggableId: start.draggableId,
           type: start.type,
           source: start.source,
@@ -296,7 +296,7 @@ describe('fire hooks', () => {
           direction: preset.home.axis.direction,
           destination,
         };
-        const expected: DropResult = {
+        const expected: DragUpdate = {
           draggableId: start.draggableId,
           type: start.type,
           source: start.source,
@@ -319,7 +319,7 @@ describe('fire hooks', () => {
           direction: null,
           destination: null,
         };
-        const expected: DropResult = {
+        const expected: DragUpdate = {
           draggableId: start.draggableId,
           type: start.type,
           source: start.source,
@@ -349,7 +349,7 @@ describe('fire hooks', () => {
           withImpact(state.dragging(), inHomeImpact),
           withImpact(state.dragging(), impact),
         );
-        const first: DropResult = {
+        const first: DragUpdate = {
           draggableId: start.draggableId,
           type: start.type,
           source: start.source,
@@ -364,7 +364,7 @@ describe('fire hooks', () => {
           withImpact(state.dragging(), impact),
           withImpact(state.dragging(), inHomeImpact),
         );
-        const second: DropResult = {
+        const second: DragUpdate = {
           draggableId: start.draggableId,
           type: start.type,
           source: start.source,
