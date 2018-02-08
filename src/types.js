@@ -231,11 +231,18 @@ export type DragStart = {|
   source: DraggableLocation,
 |}
 
-// published when a drag finishes
-export type DropResult = {|
+export type DragUpdate = {|
   ...DragStart,
   // may not have any destination (drag to nowhere)
   destination: ?DraggableLocation,
+|}
+
+export type DropReason = 'DROP' | 'CANCEL';
+
+// published when a drag finishes
+export type DropResult = {|
+  ...DragUpdate,
+  reason: DropReason,
 |}
 
 export type DragState = {|
@@ -246,10 +253,7 @@ export type DragState = {|
   scrollJumpRequest: ?Position,
 |}
 
-export type DropTrigger = 'DROP' | 'CANCEL';
-
 export type PendingDrop = {|
-  trigger: DropTrigger,
   newHomeOffset: Position,
   impact: DragImpact,
   result: DropResult,
@@ -311,3 +315,10 @@ export type Dispatch = ReduxDispatch<Action>;
 export type Store = ReduxStore<State, Action, Dispatch>;
 
 export type Announce = (message: string) => void;
+
+export type Hooks = {|
+  onDragStart?: (start: DragStart, announce: Announce) => void,
+  onDragUpdate?: (update: DragUpdate, announce: Announce) => void,
+  onDragEnd: (result: DropResult, announce: Announce) => void,
+|}
+

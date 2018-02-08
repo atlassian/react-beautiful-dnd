@@ -11,7 +11,6 @@ import type {
   Position,
   Dispatch,
   State,
-  DropTrigger,
   CurrentDrag,
   InitialDrag,
   DraggableDescriptor,
@@ -242,7 +241,6 @@ export const prepare = (): PrepareAction => ({
 export type DropAnimateAction = {
   type: 'DROP_ANIMATE',
   payload: {|
-    trigger: DropTrigger,
     newHomeOffset: Position,
     impact: DragImpact,
     result: DropResult,
@@ -250,21 +248,18 @@ export type DropAnimateAction = {
 }
 
 type AnimateDropArgs = {|
-  trigger: DropTrigger,
   newHomeOffset: Position,
   impact: DragImpact,
   result: DropResult
 |}
 
 const animateDrop = ({
-  trigger,
   newHomeOffset,
   impact,
   result,
 }: AnimateDropArgs): DropAnimateAction => ({
   type: 'DROP_ANIMATE',
   payload: {
-    trigger,
     newHomeOffset,
     impact,
     result,
@@ -322,6 +317,7 @@ export const drop = () =>
       type: home.descriptor.type,
       source,
       destination: impact.destination,
+      reason: 'DROP',
     };
 
     const newCenter: Position = getNewHomeClientCenter({
@@ -353,7 +349,6 @@ export const drop = () =>
     }
 
     dispatch(animateDrop({
-      trigger: 'DROP',
       newHomeOffset,
       impact,
       result,
@@ -391,6 +386,7 @@ export const cancel = () =>
       source,
       // no destination when cancelling
       destination: null,
+      reason: 'CANCEL',
     };
 
     const isAnimationRequired = !isEqual(current.client.offset, origin);
@@ -403,7 +399,6 @@ export const cancel = () =>
     const scrollDiff: Position = getScrollDiff({ initial, current, droppable: home });
 
     dispatch(animateDrop({
-      trigger: 'CANCEL',
       newHomeOffset: scrollDiff,
       impact: noImpact,
       result,

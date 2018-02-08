@@ -7,7 +7,7 @@ import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
 import reorder from '../reorder';
 import type { Quote } from '../types';
-import type { DropResult, DragStart, Announce } from '../../../src/types';
+import type { DropResult, DragStart, DragUpdate, Announce } from '../../../src/types';
 
 const publishOnDragStart = action('onDragStart');
 const publishOnDragEnd = action('onDragEnd');
@@ -41,7 +41,10 @@ export default class QuoteApp extends Component<Props, State> {
   };
 
   onDragStart = (initial: DragStart, announce: Announce) => {
-    announce(`drag start: item ${initial.draggableId} lifted in pos ${initial.source.index}`);
+    announce(`
+      You have started dragging the quote in position ${initial.source.index + 1} of ${this.state.quotes.length}.
+      You can use your arrow keys to move the quote around, space bar to drop, and escape to cancel.
+    `);
     publishOnDragStart(initial);
     // Add a little vibration if the browser supports it.
     // Add's a nice little physical feedback
@@ -50,12 +53,21 @@ export default class QuoteApp extends Component<Props, State> {
     }
   }
 
-  onDragUpdate = (current: DropResult, announce: Announce) => {
-    announce(`update: item ${current.draggableId} moved to pos ${current.destination ? current.destination.index : 'nowhere'}`);
+  onDragUpdate = (update: DragUpdate, announce: Announce) => {
+    if (!update.destination) {
+      announce('You are currently not dragging over any droppable area');
+      return;
+    }
+    announce(`You have moved the quote into position ${update.destination.index + 1} of ${this.state.quotes.length}`);
   }
 
   onDragEnd = (result: DropResult, announce: Announce) => {
-    announce('on drop!');
+    if (result.reason === 'CANCEL') {
+      announce('drop cancelled');
+    } else {
+      announce('drop success');
+    }
+
     publishOnDragEnd(result);
 
     // dropped outside the list

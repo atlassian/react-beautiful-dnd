@@ -15,7 +15,7 @@ type Props = {
 
 type HTMLElement = any;
 
-const Container = styled.a`
+const Container = styled.div`
 border-radius: ${borderRadius}px;
 border: 1px solid grey;
 background-color: ${({ isDragging }) => (isDragging ? colors.green : colors.white)};
@@ -116,7 +116,7 @@ export default class QuoteItem extends React.PureComponent<Props> {
 
     return (
       <Container
-        href={quote.author.url}
+        // href={quote.author.url}
         isDragging={isDragging}
         innerRef={provided.innerRef}
         {...provided.draggableProps}

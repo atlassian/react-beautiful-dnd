@@ -1,10 +1,12 @@
 // @flow
-import type { Hooks, HookCaller } from './hooks-types';
+import type { HookCaller } from './hooks-types';
 import type {
   Announce,
+  Hooks,
   State as AppState,
   DragState,
   DragStart,
+  DragUpdate,
   DropResult,
   DraggableLocation,
   DraggableDescriptor,
@@ -107,7 +109,7 @@ export default (announce: Announce): HookCaller => {
 
       const destination: ?DraggableLocation = drag.impact.destination;
 
-      const result: DropResult = {
+      const update: DragUpdate = {
         draggableId: start.draggableId,
         type: start.type,
         source: start.source,
@@ -127,7 +129,7 @@ export default (announce: Announce): HookCaller => {
         });
 
         if (onDragUpdate) {
-          onDragUpdate(result, announce);
+          onDragUpdate(update, announce);
         }
         return;
       }
@@ -142,7 +144,7 @@ export default (announce: Announce): HookCaller => {
       });
 
       if (onDragUpdate) {
-        onDragUpdate(result, announce);
+        onDragUpdate(update, announce);
       }
       return;
     }
@@ -189,37 +191,7 @@ export default (announce: Announce): HookCaller => {
         return;
       }
 
-      const {
-        source,
-        destination,
-        draggableId,
-        type,
-      } = current.drop.result;
-
-      // Could be a cancel or a drop nowhere
-      if (!destination) {
-        onDragEnd(current.drop.result, announce);
-        return;
-      }
-
-      // Do not publish a result.destination where nothing moved
-      const didMove: boolean = source.droppableId !== destination.droppableId ||
-        source.index !== destination.index;
-
-      if (didMove) {
-        onDragEnd(current.drop.result, announce);
-        return;
-      }
-
-      const muted: DropResult = {
-        draggableId,
-        type,
-        source,
-        destination: null,
-      };
-
-      onDragEnd(muted, announce);
-      return;
+      onDragEnd(current.drop.result, announce);
     }
 
     // Drag ended while dragging
@@ -247,6 +219,7 @@ export default (announce: Announce): HookCaller => {
         type: home.descriptor.type,
         source,
         destination: null,
+        reason: 'CANCEL',
       };
       onDragEnd(result, announce);
       return;
@@ -265,6 +238,7 @@ export default (announce: Announce): HookCaller => {
         type: previous.drop.pending.result.type,
         source: previous.drop.pending.result.source,
         destination: null,
+        reason: 'CANCEL',
       };
       onDragEnd(result, announce);
     }

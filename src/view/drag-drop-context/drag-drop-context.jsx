@@ -24,10 +24,10 @@ import type {
   DroppableDimension,
   DroppableId,
   Position,
+  Hooks,
 } from '../../types';
 import type {
   HookCaller,
-  Hooks,
 } from '../../state/hooks/hooks-types';
 import {
   storeKey,
