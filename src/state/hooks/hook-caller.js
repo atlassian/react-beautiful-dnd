@@ -85,6 +85,10 @@ export default (announce: Announce): HookCaller => {
 
     // Dragging in progress
     if (currentPhase === 'DRAGGING' && previousPhase === 'DRAGGING') {
+      if (!state.isDragging) {
+        console.error('Cannot process dragging update if drag has not started');
+        return;
+      }
       // only call the onDragUpdate hook if something has changed from last time
 
       const start: ?DragStart = getDragStart(current);

@@ -34,9 +34,6 @@ export type DragHandleProps = {|
   // Allow tabbing to this element
   tabIndex: number,
 
-  // Aria
-  'aria-grabbed': boolean,
-
   // Stop html5 drag and drop
   draggable: boolean,
   onDragStart: () => boolean,
