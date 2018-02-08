@@ -150,7 +150,7 @@ export default class DragDropContext extends React.Component<Props> {
         onDragEnd: this.props.onDragEnd,
         onDragUpdate: this.props.onDragUpdate,
       };
-      this.hookCaller.onStateChange(hooks, previous, current);
+      this.hookCaller.onStateChange(hooks, previousValue, current);
 
       if (current.phase !== previousValue.phase) {
         // executing phase change handlers first
@@ -162,7 +162,7 @@ export default class DragDropContext extends React.Component<Props> {
         this.dimensionMarshal.onPhaseChange(current);
       }
 
-      this.autoScroller.onStateChange(previous, current);
+      this.autoScroller.onStateChange(previousValue, current);
     });
   }
 

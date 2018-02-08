@@ -236,6 +236,7 @@ describe('fire hooks', () => {
         );
 
         expect(hooks.onDragUpdate).toHaveBeenCalled();
+        // $ExpectError - no mock reset property
         hooks.onDragUpdate.mockReset();
       });
 
@@ -362,6 +363,139 @@ describe('fire hooks', () => {
           destination: start.source,
         };
         expect(hooks.onDragUpdate).toHaveBeenCalledWith(second, announceMock);
+      });
+    });
+
+    describe('multiple updates', () => {
+      it('should correctly update across multiple updates', () => {
+        // initial lift
+        caller.onStateChange(
+          hooks,
+          state.requesting(),
+          withImpact(state.dragging(), inHomeImpact),
+        );
+        // checking everything is well
+        expect(hooks.onDragStart).toHaveBeenCalled();
+        expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+
+        // first move into new location
+        const firstImpact: DragImpact = {
+          movement: noMovement,
+          direction: preset.home.axis.direction,
+          // moved into the second index
+          destination: {
+            index: preset.inHome1.descriptor.index + 1,
+            droppableId: preset.inHome1.descriptor.droppableId,
+          },
+        };
+        caller.onStateChange(
+          hooks,
+          withImpact(state.dragging(), inHomeImpact),
+          withImpact(state.dragging(), firstImpact),
+        );
+
+        expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith({
+          draggableId: start.draggableId,
+          type: start.type,
+          source: start.source,
+          destination: firstImpact.destination,
+        }, announceMock);
+
+        // second move into new location
+        const secondImpact: DragImpact = {
+          movement: noMovement,
+          direction: preset.home.axis.direction,
+          // moved into the second index
+          destination: {
+            index: preset.inHome1.descriptor.index + 2,
+            droppableId: preset.inHome1.descriptor.droppableId,
+          },
+        };
+        caller.onStateChange(
+          hooks,
+          withImpact(state.dragging(), firstImpact),
+          withImpact(state.dragging(), secondImpact),
+        );
+
+        expect(hooks.onDragUpdate).toHaveBeenCalledTimes(2);
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith({
+          draggableId: start.draggableId,
+          type: start.type,
+          source: start.source,
+          destination: secondImpact.destination,
+        }, announceMock);
+      });
+
+      it('should update correctly across multiple drags', () => {
+        // initial lift
+        caller.onStateChange(
+          hooks,
+          state.requesting(),
+          withImpact(state.dragging(), inHomeImpact),
+        );
+        // checking everything is well
+        expect(hooks.onDragStart).toHaveBeenCalled();
+        expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+
+        // first move into new location
+        const firstImpact: DragImpact = {
+          movement: noMovement,
+          direction: preset.home.axis.direction,
+          // moved into the second index
+          destination: {
+            index: preset.inHome1.descriptor.index + 1,
+            droppableId: preset.inHome1.descriptor.droppableId,
+          },
+        };
+        caller.onStateChange(
+          hooks,
+          withImpact(state.dragging(), inHomeImpact),
+          withImpact(state.dragging(), firstImpact),
+        );
+        expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith({
+          draggableId: start.draggableId,
+          type: start.type,
+          source: start.source,
+          destination: firstImpact.destination,
+        }, announceMock);
+        // resetting the mock
+        // $ExpectError - resetting mock
+        hooks.onDragUpdate.mockReset();
+
+        // drop
+        caller.onStateChange(
+          hooks,
+          withImpact(state.dragging(), firstImpact),
+          state.idle,
+        );
+
+        expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+
+        // a new lift!
+        caller.onStateChange(
+          hooks,
+          state.requesting(),
+          withImpact(state.dragging(), inHomeImpact),
+        );
+        // checking everything is well
+        expect(hooks.onDragStart).toHaveBeenCalled();
+        expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+
+        // first move into new location
+        caller.onStateChange(
+          hooks,
+          withImpact(state.dragging(), inHomeImpact),
+          withImpact(state.dragging(), firstImpact),
+        );
+        expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith({
+          draggableId: start.draggableId,
+          type: start.type,
+          source: start.source,
+          destination: firstImpact.destination,
+        }, announceMock);
       });
     });
   });

@@ -6,9 +6,6 @@ import type {
   DragState,
   DragStart,
   DropResult,
-  DraggableId,
-  DroppableId,
-  TypeId,
   DraggableLocation,
   DraggableDescriptor,
   DroppableDimension,
@@ -84,14 +81,6 @@ export default (announce: Announce): HookCaller => {
     return start;
   };
 
-  const finish = () => {
-    if (!state.isDragging) {
-      console.error('Drag finished but it had not started!');
-    }
-
-    setState(initial);
-  };
-
   const onStateChange = (hooks: Hooks, previous: AppState, current: AppState): void => {
     const { onDragStart, onDragUpdate, onDragEnd } = hooks;
     const currentPhase = current.phase;
@@ -148,13 +137,18 @@ export default (announce: Announce): HookCaller => {
       }
 
       setState({
-        lastUpdate: result,
+        lastDestination: destination,
       });
 
       if (onDragUpdate) {
         onDragUpdate(result, announce);
       }
       return;
+    }
+
+    // We are not in the dragging phase so we can clear this state
+    if (state.isDragging) {
+      setState(initial);
     }
 
     // From this point we only care about phase changes
@@ -189,7 +183,6 @@ export default (announce: Announce): HookCaller => {
 
     // Drag end
     if (currentPhase === 'DROP_COMPLETE' && previousPhase !== 'DROP_COMPLETE') {
-      finish();
       if (!current.drop || !current.drop.result) {
         console.error('cannot fire onDragEnd hook without drag state', { current, previous });
         return;
@@ -230,8 +223,6 @@ export default (announce: Announce): HookCaller => {
 
     // Drag ended while dragging
     if (currentPhase === 'IDLE' && previousPhase === 'DRAGGING') {
-      finish();
-
       if (!previous.drag) {
         console.error('cannot fire onDragEnd for cancel because cannot find previous drag');
         return;
@@ -263,7 +254,6 @@ export default (announce: Announce): HookCaller => {
     // Drag ended during a drop animation. Not super sure how this can even happen.
     // This is being really safe
     if (currentPhase === 'IDLE' && previousPhase === 'DROP_ANIMATING') {
-      finish();
       if (!previous.drop || !previous.drop.pending) {
         console.error('cannot fire onDragEnd for cancel because cannot find previous pending drop');
         return;

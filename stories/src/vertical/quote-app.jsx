@@ -41,7 +41,7 @@ export default class QuoteApp extends Component<Props, State> {
   };
 
   onDragStart = (initial: DragStart, announce: Announce) => {
-    announce('drag start!');
+    announce(`drag start: item ${initial.draggableId} lifted in pos ${initial.source.index}`);
     console.log('initial', initial);
     publishOnDragStart(initial);
     // Add a little vibration if the browser supports it.
@@ -52,7 +52,7 @@ export default class QuoteApp extends Component<Props, State> {
   }
 
   onDragUpdate = (current: DropResult, announce: Announce) => {
-    announce('update!');
+    announce(`drag start: item ${current.draggableId} moved to pos ${current.destination ? current.destination.index : 'nowhere'}`);
     console.log('current', current);
   }
 
