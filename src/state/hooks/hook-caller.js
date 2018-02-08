@@ -11,9 +11,6 @@ import type {
   DroppableDimension,
 } from '../../types';
 
-// const announce: Announce = (message: string) =>
-//   console.log(`%c ${message}`, 'color: green; font-size: 20px;');
-
 type State = {
   isDragging: boolean,
   start: ?DraggableLocation,

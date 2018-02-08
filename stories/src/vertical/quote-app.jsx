@@ -52,7 +52,7 @@ export default class QuoteApp extends Component<Props, State> {
   }
 
   onDragUpdate = (current: DropResult, announce: Announce) => {
-    announce(`drag start: item ${current.draggableId} moved to pos ${current.destination ? current.destination.index : 'nowhere'}`);
+    announce(`update: item ${current.draggableId} moved to pos ${current.destination ? current.destination.index : 'nowhere'}`);
     console.log('current', current);
   }
 

@@ -402,6 +402,8 @@ export default (state: State = clean('IDLE'), action: Action): State => {
   }
 
   if (action.type === 'MOVE') {
+    // TODO: finished initial collection?
+    // Otherwise get an incorrect index calculated before the other dimensions are published
     const { client, windowScroll, shouldAnimate } = action.payload;
     return move({
       state,
