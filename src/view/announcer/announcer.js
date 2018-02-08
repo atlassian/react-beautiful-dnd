@@ -36,13 +36,13 @@ export default (): Announcer => {
   };
 
   const announce: Announce = (message: string): void => {
-    if (!state.el) {
+    const el: ?HTMLElement = state.el;
+    if (!el) {
       console.error('Cannot announce to unmounted node');
       return;
     }
 
-    state.el.textContent = message.trim();
-    console.log(`%c ${message}`, 'color: green; font-size: 20px;');
+    el.textContent = message;
   };
 
   const mount = () => {
@@ -63,7 +63,7 @@ export default (): Announcer => {
     // must read the whole thing every time
     el.setAttribute('aria-atomic', 'true');
 
-    // hide the element
+    // hide the element visually
     Object.assign(el.style, visuallyHidden);
 
     if (!document.body) {
@@ -82,18 +82,18 @@ export default (): Announcer => {
       console.error('Will not unmount annoucer as it is already unmounted');
       return;
     }
-    const previous = state.el;
+    const node: HTMLElement = state.el;
 
     setState({
       el: null,
     });
 
-    if (!previous.parentNode) {
+    if (!node.parentNode) {
       console.error('Cannot unmount style marshal as cannot find parent');
       return;
     }
 
-    previous.parentNode.removeChild(previous);
+    node.parentNode.removeChild(node);
   };
 
   const announcer: Announcer = {
