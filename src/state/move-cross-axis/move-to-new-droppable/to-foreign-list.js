@@ -3,7 +3,7 @@ import moveToEdge from '../../move-to-edge';
 import type { Result } from '../move-cross-axis-types';
 import getDisplacement from '../../get-displacement';
 import getViewport from '../../../window/get-viewport';
-import { add } from '../../position';
+import withDroppableDisplacement from '../../with-droppable-displacement';
 import type {
   Axis,
   Position,
@@ -13,8 +13,6 @@ import type {
   DroppableDimension,
   Displacement,
 } from '../../../types';
-
-const origin: Position = { x: 0, y: 0 };
 
 type Args = {|
   amount: Position,
@@ -118,13 +116,8 @@ export default ({
     },
   };
 
-  const scrollDisplacement: Position = droppable.viewport.closestScrollable ?
-    droppable.viewport.closestScrollable.scroll.diff.displacement :
-    origin;
-  const withDisplacement: Position = add(newCenter, scrollDisplacement);
-
   return {
-    pageCenter: withDisplacement,
+    pageCenter: withDroppableDisplacement(droppable, newCenter),
     impact: newImpact,
   };
 };
