@@ -7,7 +7,7 @@ import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
 import reorder from '../reorder';
 import type { Quote } from '../types';
-import type { DropResult, DragStart, DragUpdate, Announce } from '../../../src/types';
+import type { DropResult, DragStart } from '../../../src/types';
 
 const publishOnDragStart = action('onDragStart');
 const publishOnDragEnd = action('onDragEnd');
@@ -40,11 +40,7 @@ export default class QuoteApp extends Component<Props, State> {
     quotes: this.props.initial,
   };
 
-  onDragStart = (initial: DragStart, announce: Announce) => {
-    announce(`
-      Item lifted. ${initial.source.index + 1} of ${this.state.quotes.length} in the list.
-      Use the arrow keys to move, space bar to drop, and escape to cancel.
-    `);
+  onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
     // Add a little vibration if the browser supports it.
     // Add's a nice little physical feedback
@@ -53,30 +49,7 @@ export default class QuoteApp extends Component<Props, State> {
     }
   }
 
-  onDragUpdate = (update: DragUpdate, announce: Announce) => {
-    if (!update.destination) {
-      announce('You are currently not dragging over any droppable area');
-      return;
-    }
-    announce(`Now ${update.destination.index + 1} of ${this.state.quotes.length} in the list`);
-  }
-
-  onDragEnd = (result: DropResult, announce: Announce) => {
-    if (result.reason === 'CANCEL') {
-      announce('drop cancelled');
-      return;
-    }
-
-    if (!result.destination) {
-      announce(`
-        Item has been dropped while not over a location.
-        It has been returned to its original position of ${result.source.index + 1} of ${this.state.quotes.length}
-      `);
-      return;
-    }
-
-    announce(`Item dropped. It has moved from position ${result.source.index + 1} to ${result.destination.index + 1}`);
-
+  onDragEnd = (result: DropResult) => {
     publishOnDragEnd(result);
 
     // dropped outside the list
@@ -101,7 +74,6 @@ export default class QuoteApp extends Component<Props, State> {
     return (
       <DragDropContext
         onDragStart={this.onDragStart}
-        onDragUpdate={this.onDragUpdate}
         onDragEnd={this.onDragEnd}
       >
         <Root>

@@ -1,10 +1,10 @@
 // @flow
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { patch } from '../position';
+import { patch, subtract } from '../position';
 import withDroppableScroll from '../with-droppable-scroll';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 import getViewport from '../../window/get-viewport';
-import getScrollJumpResult from './get-scroll-jump-result';
+// import getScrollJumpResult from './get-scroll-jump-result';
 import moveToEdge from '../move-to-edge';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
@@ -18,6 +18,8 @@ import type {
   DragImpact,
   Area,
 } from '../../types';
+
+const origin: Position = { x: 0, y: 0 };
 
 export default ({
   isMovingForward,
@@ -83,22 +85,6 @@ export default ({
     destinationAxis: droppable.axis,
   });
 
-  const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
-    draggable,
-    destination: droppable,
-    newPageCenter,
-    viewport,
-  });
-
-  if (!isVisibleInNewLocation) {
-    return getScrollJumpResult({
-      newPageCenter,
-      previousPageCenter,
-      droppable,
-      previousImpact,
-    });
-  }
-
   // Calculate DragImpact
   // at this point we know that the destination is droppable
   const destinationDisplacement: Displacement = {
@@ -144,9 +130,35 @@ export default ({
     direction: droppable.axis.direction,
   };
 
+  const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
+    draggable,
+    destination: droppable,
+    newPageCenter,
+    viewport,
+  });
+
+  if (isVisibleInNewLocation) {
+    return {
+      pageCenter: withDroppableScroll(droppable, newPageCenter),
+      impact: newImpact,
+      scrollJumpRequest: null,
+    };
+  }
+
+  // The full distance required to get from the previous page center to the new page center
+  const requiredDistance: Position = subtract(newPageCenter, previousPageCenter);
+
+  // We need to consider how much the droppable scroll has changed
+  const scrollDiff: Position = droppable.viewport.closestScrollable ?
+    droppable.viewport.closestScrollable.scroll.diff.value :
+    origin;
+
+    // The actual scroll required to move into the next place
+  const requiredScroll: Position = subtract(requiredDistance, scrollDiff);
+
   return {
-    pageCenter: withDroppableScroll(droppable, newPageCenter),
+    pageCenter: previousPageCenter,
     impact: newImpact,
-    scrollJumpRequest: null,
+    scrollJumpRequest: requiredScroll,
   };
 };

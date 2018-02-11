@@ -53,7 +53,7 @@ type MoveArgs = {|
   shouldAnimate: boolean,
   windowScroll ?: Position,
   // force a custom drag impact (optionally provided)
-  impact?: DragImpact,
+  impact?: ?DragImpact,
   // provide a scroll jump request (optionally provided - and can be null)
   scrollJumpRequest?: ?Position,
 |}
@@ -131,7 +131,7 @@ const move = ({
   };
 };
 
-const updateStateAfterDimensionChange = (newState: State): State => {
+const updateStateAfterDimensionChange = (newState: State, impact?: ?DragImpact): State => {
   // not dragging yet
   if (newState.phase === 'COLLECTING_INITIAL_DIMENSIONS') {
     return newState;
@@ -148,19 +148,12 @@ const updateStateAfterDimensionChange = (newState: State): State => {
     return clean();
   }
 
-  // If in JUMP auto scroll mode - then impacts are calculated before the scroll
-  // actually occurs
-  // const usePreviousImpact: boolean = newState.drag.initial.autoScrollMode === 'JUMP';
-
-  // if (usePreviousImpact) {
-  //   console.log('USING PREVIOUS IMPACT');
-  // }
-
   return move({
     state: newState,
     // use the existing values
     clientSelection: newState.drag.current.client.selection,
     shouldAnimate: newState.drag.current.shouldAnimate,
+    impact,
   });
 };
 
@@ -386,6 +379,10 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
     const dimension: DroppableDimension = scrollDroppable(target, offset);
 
+    // If we are jump scrolling - dimension changes should not update the impact
+    const impact: ?DragImpact = drag.initial.autoScrollMode === 'JUMP' ?
+      drag.impact : null;
+
     const newState: State = {
       ...state,
       dimension: {
@@ -398,7 +395,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       },
     };
 
-    return updateStateAfterDimensionChange(newState);
+    return updateStateAfterDimensionChange(newState, impact);
   }
 
   if (action.type === 'UPDATE_DROPPABLE_DIMENSION_IS_ENABLED') {
@@ -442,33 +439,51 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     // TODO: finished initial collection?
     // Otherwise get an incorrect index calculated before the other dimensions are published
     const { client, windowScroll, shouldAnimate } = action.payload;
+    const drag: ?DragState = state.drag;
+
+    if (!drag) {
+      console.error('Cannot move while there is no drag state');
+      return state;
+    }
+
+    // If we are jump scrolling - manual movements should not update the impact
+    const impact: ?DragImpact = drag.initial.autoScrollMode === 'JUMP' ?
+      drag.impact : null;
+
     return move({
       state,
       clientSelection: client,
       windowScroll,
       shouldAnimate,
+      impact,
     });
   }
 
   if (action.type === 'MOVE_BY_WINDOW_SCROLL') {
     const { windowScroll } = action.payload;
+    const drag: ?DragState = state.drag;
 
-    if (!state.drag) {
+    if (!drag) {
       console.error('cannot move with window scrolling if no current drag');
       return clean();
     }
 
-    const current: CurrentDrag = state.drag.current;
-
-    if (isEqual(windowScroll, current.windowScroll)) {
+    if (isEqual(windowScroll, drag.current.windowScroll)) {
       return state;
     }
 
+    // return state;
+    const isJumpScrolling: boolean = drag.initial.autoScrollMode === 'JUMP';
+
+    // If we are jump scrolling - any window scrolls should not update the impact
+    const impact: ?DragImpact = isJumpScrolling ? drag.impact : null;
+
     return move({
       state,
-      clientSelection: current.client.selection,
+      clientSelection: drag.current.client.selection,
       windowScroll,
       shouldAnimate: false,
+      impact,
     });
   }
 
