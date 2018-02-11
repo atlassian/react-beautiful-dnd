@@ -1,12 +1,11 @@
 // @flow
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { patch } from '../position';
-import withDroppableScroll from '../with-droppable-scroll';
+import { patch, subtract } from '../position';
+import withDroppableDisplacement from '../with-droppable-displacement';
 import moveToEdge from '../move-to-edge';
 import getDisplacement from '../get-displacement';
 import getViewport from '../../window/get-viewport';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
-import getScrollJumpResult from './get-scroll-jump-result';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import type {
@@ -18,8 +17,6 @@ import type {
   Displacement,
   Area,
 } from '../../types';
-
-const origin: Position = { x: 0, y: 0 };
 
 export default ({
   isMovingForward,
@@ -93,15 +90,6 @@ export default ({
     viewport,
   });
 
-  if (!isVisibleInNewLocation) {
-    return getScrollJumpResult({
-      newPageCenter,
-      previousPageCenter,
-      droppable,
-      previousImpact,
-    });
-  }
-
   // at this point we know that the destination is droppable
   const movingRelativeToDisplacement: Displacement = {
     draggableId: movingRelativeTo.descriptor.id,
@@ -152,9 +140,21 @@ export default ({
     direction: droppable.axis.direction,
   };
 
+  if (isVisibleInNewLocation) {
+    return {
+      pageCenter: withDroppableDisplacement(droppable, newPageCenter),
+      impact: newImpact,
+      scrollJumpRequest: null,
+    };
+  }
+
+  // The full distance required to get from the previous page center to the new page center
+  const requiredDistance: Position = subtract(newPageCenter, previousPageCenter);
+  const requiredScroll: Position = withDroppableDisplacement(droppable, requiredDistance);
+
   return {
-    pageCenter: withDroppableScroll(droppable, newPageCenter),
+    pageCenter: previousPageCenter,
     impact: newImpact,
-    scrollJumpRequest: null,
+    scrollJumpRequest: requiredScroll,
   };
 };

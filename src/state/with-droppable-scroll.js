@@ -1,5 +1,5 @@
 // @flow
-import { subtract } from './position';
+import { add } from './position';
 import type {
   Position,
   ClosestScrollable,
@@ -12,5 +12,5 @@ export default (droppable: DroppableDimension, point: Position): Position => {
     return point;
   }
 
-  return subtract(point, closestScrollable.scroll.diff.value);
+  return add(point, closestScrollable.scroll.diff.value);
 };
