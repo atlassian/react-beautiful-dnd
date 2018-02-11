@@ -19,7 +19,7 @@ const Container = styled.div`
   border-radius: ${borderRadius}px;
   font-size: 18px;
 
-  ${({ isDragging }) => (isDragging ? 'box-shadow: 1px 1px 1px grey' : '')}
+  ${({ isDragging }) => (isDragging ? 'box-shadow: 1px 1px 1px grey; background: lightblue' : '')}
 `;
 
 const Wrapper = styled.div``;
