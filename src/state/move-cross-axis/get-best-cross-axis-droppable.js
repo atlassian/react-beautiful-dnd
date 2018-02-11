@@ -65,6 +65,7 @@ export default ({
       if (!clipped) {
         return false;
       }
+      // TODO: only need to be totally visible on the cross axis
       return isPartiallyVisibleThroughFrame(viewport)(clipped);
     })
     .filter((droppable: DroppableDimension): boolean => {
