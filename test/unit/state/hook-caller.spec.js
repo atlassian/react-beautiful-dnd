@@ -469,6 +469,7 @@ describe('fire hooks', () => {
         );
 
         expect(hooks.onDragUpdate).toHaveBeenCalled();
+        // cleaning the hook
         // $ExpectError - no mock reset property
         hooks.onDragUpdate.mockReset();
       });
@@ -605,6 +606,114 @@ describe('fire hooks', () => {
         };
         expect(hooks.onDragUpdate).toHaveBeenCalledWith(second, {
           announce: expect.any(Function),
+        });
+      });
+
+      describe('announcements', () => {
+        const destination: DraggableLocation = {
+          // new index
+          index: preset.inHome1.descriptor.index + 2,
+          // different droppable
+          droppableId: preset.inHome1.descriptor.droppableId,
+        };
+        const secondImpact: DragImpact = {
+          movement: noMovement,
+          direction: preset.home.axis.direction,
+          destination,
+        };
+        const secondUpdate: DragUpdate = {
+          draggableId: start.draggableId,
+          type: start.type,
+          source: start.source,
+          destination,
+        };
+        const withFirstUpdate = withImpact(state.dragging(), firstImpact);
+        const withSecondUpdate = withImpact(state.dragging(), secondImpact);
+
+        const perform = (myHooks: Hooks) => {
+          caller.onStateChange(myHooks, withFirstUpdate, withSecondUpdate);
+        };
+
+        beforeEach(() => {
+          // clear its state from previous updates
+          announceMock.mockReset();
+        });
+
+        it('should announce with the default update message if no message is provided', () => {
+          caller.onStateChange(hooks, withFirstUpdate, withSecondUpdate);
+
+          expect(announceMock).toHaveBeenCalledWith(messagePreset.onDragUpdate(secondUpdate));
+        });
+
+        it('should announce with the default update message if no onDragUpdate hook is provided', () => {
+          const customHooks: Hooks = {
+            onDragEnd: jest.fn(),
+          };
+
+          perform(customHooks);
+
+          expect(announceMock).toHaveBeenCalledWith(messagePreset.onDragUpdate(secondUpdate));
+        });
+
+        it('should announce with a provided message', () => {
+          const customHooks: Hooks = {
+            onDragUpdate: (update: DragUpdate, provided: HookProvided) => provided.announce('test'),
+            onDragEnd: jest.fn(),
+          };
+
+          perform(customHooks);
+
+          expect(announceMock).toHaveBeenCalledTimes(1);
+          expect(announceMock).toHaveBeenCalledWith('test');
+        });
+
+        it('should prevent double announcing', () => {
+          let myAnnounce: ?Announce;
+          const customHooks: Hooks = {
+            onDragUpdate: (update: DragUpdate, provided: HookProvided) => {
+              myAnnounce = provided.announce;
+              myAnnounce('test');
+            },
+            onDragEnd: jest.fn(),
+          };
+
+          perform(customHooks);
+
+          expect(announceMock).toHaveBeenCalledWith('test');
+          expect(announceMock).toHaveBeenCalledTimes(1);
+          expect(console.warn).not.toHaveBeenCalled();
+
+          if (!myAnnounce) {
+            throw new Error('Invalid test setup');
+          }
+
+          myAnnounce('second');
+
+          expect(announceMock).toHaveBeenCalledTimes(1);
+          expect(console.warn).toHaveBeenCalled();
+        });
+
+        it('should prevent async announcing', () => {
+          const customHooks: Hooks = {
+            onDragUpdate: (update: DragUpdate, provided: HookProvided) => {
+              setTimeout(() => {
+                // boom
+                provided.announce('too late');
+              });
+            },
+            onDragEnd: jest.fn(),
+          };
+
+          perform(customHooks);
+
+          expect(announceMock).toHaveBeenCalledWith(messagePreset.onDragUpdate(secondUpdate));
+          expect(console.warn).not.toHaveBeenCalled();
+
+          // not releasing the async message
+          jest.runOnlyPendingTimers();
+
+          expect(announceMock).toHaveBeenCalledTimes(1);
+          expect(console.warn).toHaveBeenCalled();
         });
       });
     });
