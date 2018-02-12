@@ -322,9 +322,14 @@ export type HookProvided = {|
   announce: Announce,
 |}
 
+export type OnDragStartHook = (start: DragStart, provided: HookProvided) => void;
+export type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => void;
+export type OnDragEndHook = (result: DropResult, provided: HookProvided) => void;
+
 export type Hooks = {|
-  onDragStart?: (start: DragStart, provided: HookProvided) => void,
-  onDragUpdate?: (update: DragUpdate, provided: HookProvided) => void,
-  onDragEnd: (result: DropResult, provided: HookProvided) => void,
+  onDragStart?: OnDragStartHook,
+  onDragUpdate?: OnDragUpdateHook,
+  // always required
+  onDragEnd: OnDragEndHook,
 |}
 

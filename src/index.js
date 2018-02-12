@@ -21,6 +21,9 @@ export type {
   HookProvided,
   Announce,
   DraggableLocation,
+  OnDragStartHook,
+  OnDragUpdateHook,
+  OnDragEndHook,
 } from './types';
 
 // Droppable

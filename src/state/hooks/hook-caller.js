@@ -13,6 +13,9 @@ import type {
   DraggableLocation,
   DraggableDescriptor,
   DroppableDimension,
+  OnDragStartHook,
+  OnDragUpdateHook,
+  OnDragEndHook,
 } from '../../types';
 
 type State = {
@@ -21,6 +24,8 @@ type State = {
   lastDestination: ?DraggableLocation,
   hasMovedFromStartLocation: boolean,
 }
+
+type AnyHookFn = OnDragStartHook | OnDragUpdateHook | OnDragEndHook;
 
 const notDragging: State = {
   isDragging: false,
@@ -73,12 +78,12 @@ const getAnnouncerForConsumer = (announce: Announce) => {
   };
 
   // getter for isExpired
+  // using this technique so that a consumer cannot
+  // set the isExpired or wasCalled flags
   result.wasCalled = (): boolean => wasCalled;
 
   return result;
 };
-
-type OnDragUpdate = (update: DragUpdate, provided: HookProvided) => void;
 
 export default (announce: Announce): HookCaller => {
   let state: State = notDragging;
@@ -117,73 +122,79 @@ export default (announce: Announce): HookCaller => {
     return start;
   };
 
-  const onDrag = (() => {
-    const announceMessage = (update: DragUpdate, onDragUpdate: ?OnDragUpdate) => {
-      if (!onDragUpdate) {
-        announce(messagePreset.onDragUpdate(update));
-        return;
-      }
+  const execute = (
+    hook: ?AnyHookFn,
+    data: DragStart | DragUpdate | DropResult,
+    getDefaultMessage: () => string,
+  ) => {
+    // if no hook: announce the default message
+    if (!hook) {
+      announce(getDefaultMessage());
+      return;
+    }
 
-      const provided: HookProvided = {
-        announce: getAnnouncerForConsumer(announce),
-      };
-      onDragUpdate(update, provided);
-
-      // if they do not announce - use the default
-      if (!provided.announce.wasCalled()) {
-        announce(messagePreset.onDragUpdate(update));
-      }
+    const managed: Announce = getAnnouncerForConsumer(announce);
+    const provided: HookProvided = {
+      announce: managed,
     };
 
-    return (current: AppState, onDragUpdate?: OnDragUpdate) => {
-      if (!state.isDragging) {
-        console.error('Cannot process dragging update if drag has not started');
+    hook((data: any), provided);
+
+    if (!managed.wasCalled()) {
+      announce(getDefaultMessage());
+    }
+  };
+
+  const onDrag = (current: AppState, onDragUpdate: ?OnDragUpdateHook) => {
+    if (!state.isDragging) {
+      console.error('Cannot process dragging update if drag has not started');
+      return;
+    }
+
+    const drag: ?DragState = current.drag;
+    const start: ?DragStart = getDragStart(current);
+    if (!start || !drag) {
+      console.error('Cannot update drag when there is invalid state');
+      return;
+    }
+
+    const destination: ?DraggableLocation = drag.impact.destination;
+    const update: DragUpdate = {
+      draggableId: start.draggableId,
+      type: start.type,
+      source: start.source,
+      destination,
+    };
+
+    if (!state.hasMovedFromStartLocation) {
+      // has not moved past the home yet
+      if (areLocationsEqual(start.source, destination)) {
         return;
       }
 
-      const drag: ?DragState = current.drag;
-      const start: ?DragStart = getDragStart(current);
-      if (!start || !drag) {
-        console.error('Cannot update drag when there is invalid state');
-        return;
-      }
-
-      const destination: ?DraggableLocation = drag.impact.destination;
-      const update: DragUpdate = {
-        draggableId: start.draggableId,
-        type: start.type,
-        source: start.source,
-        destination,
-      };
-
-      if (!state.hasMovedFromStartLocation) {
-        // has not moved past the home yet
-        if (areLocationsEqual(start.source, destination)) {
-          return;
-        }
-
-        // We have now moved past the home location
-        setState({
-          lastDestination: destination,
-          hasMovedFromStartLocation: true,
-        });
-
-        announceMessage(update, onDragUpdate);
-        return;
-      }
-
-      // has not moved from the previous location
-      if (areLocationsEqual(state.lastDestination, destination)) {
-        return;
-      }
-
+      // We have now moved past the home location
       setState({
         lastDestination: destination,
+        hasMovedFromStartLocation: true,
       });
 
-      announceMessage(update, onDragUpdate);
-    };
-  })();
+      execute(onDragUpdate, update, () => messagePreset.onDragUpdate(update));
+
+      // announceMessage(update, onDragUpdate);
+      return;
+    }
+
+    // has not moved from the previous location
+    if (areLocationsEqual(state.lastDestination, destination)) {
+      return;
+    }
+
+    setState({
+      lastDestination: destination,
+    });
+
+    execute(onDragUpdate, update, () => messagePreset.onDragUpdate(update));
+  };
 
   const onStateChange = (hooks: Hooks, previous: AppState, current: AppState): void => {
     const { onDragStart, onDragUpdate, onDragEnd } = hooks;
@@ -223,20 +234,7 @@ export default (announce: Announce): HookCaller => {
       });
 
       // onDragStart is optional
-      if (!onDragStart) {
-        announce(messagePreset.onDragStart(start));
-        return;
-      }
-
-      const provided: HookProvided = {
-        announce: getAnnouncerForConsumer(announce),
-      };
-      onDragStart(start, provided);
-
-      // if they did not announce anything - use the default
-      if (!provided.announce.wasCalled()) {
-        announce(messagePreset.onDragStart(start));
-      }
+      execute(onDragStart, start, () => messagePreset.onDragStart(start));
       return;
     }
 
@@ -248,14 +246,7 @@ export default (announce: Announce): HookCaller => {
       }
       const result: DropResult = current.drop.result;
 
-      const provided: HookProvided = {
-        announce: getAnnouncerForConsumer(announce),
-      };
-      onDragEnd(result, provided);
-
-      if (!provided.announce.wasCalled()) {
-        announce(messagePreset.onDragEnd(result));
-      }
+      execute(onDragEnd, result, () => messagePreset.onDragEnd(result));
       return;
     }
 
@@ -286,15 +277,7 @@ export default (announce: Announce): HookCaller => {
         reason: 'CANCEL',
       };
 
-      const provided: HookProvided = {
-        announce: getAnnouncerForConsumer(announce),
-      };
-      onDragEnd(result, provided);
-
-      if (!provided.announce.wasCalled()) {
-        announce(messagePreset.onDragEnd(result));
-      }
-
+      execute(onDragEnd, result, () => messagePreset.onDragEnd(result));
       return;
     }
 
@@ -314,14 +297,7 @@ export default (announce: Announce): HookCaller => {
         reason: 'CANCEL',
       };
 
-      const provided: HookProvided = {
-        announce: getAnnouncerForConsumer(announce),
-      };
-      onDragEnd(result, provided);
-
-      if (!provided.announce.wasCalled()) {
-        announce(messagePreset.onDragEnd(result));
-      }
+      execute(onDragEnd, result, () => messagePreset.onDragEnd(result));
     }
   };
 
