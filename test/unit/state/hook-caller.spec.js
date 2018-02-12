@@ -860,117 +860,227 @@ describe('fire hooks', () => {
       state.userCancel(),
     ];
 
-    preEndStates.forEach((previous: State): void => {
-      it('should call onDragEnd with the drop result', () => {
-        const result: DropResult = {
-          draggableId: preset.inHome1.descriptor.id,
-          type: preset.home.descriptor.type,
-          source: {
+    preEndStates.forEach((previous: State, index: number): void => {
+      describe(`end state ${index}`, () => {
+        it('should call onDragEnd with the drop result', () => {
+          const result: DropResult = {
+            draggableId: preset.inHome1.descriptor.id,
+            type: preset.home.descriptor.type,
+            source: {
+              droppableId: preset.inHome1.descriptor.droppableId,
+              index: preset.inHome1.descriptor.index,
+            },
+            destination: {
+              droppableId: preset.inHome1.descriptor.droppableId,
+              index: preset.inHome1.descriptor.index + 1,
+            },
+            reason: 'DROP',
+          };
+          const current: State = {
+            phase: 'DROP_COMPLETE',
+            drop: {
+              pending: null,
+              result,
+            },
+            drag: null,
+            dimension: noDimensions,
+          };
+
+          caller.onStateChange(hooks, previous, current);
+
+          if (!current.drop || !current.drop.result) {
+            throw new Error('invalid state');
+          }
+
+          const provided: DropResult = current.drop.result;
+          expect(hooks.onDragEnd).toHaveBeenCalledWith(provided, {
+            announce: expect.any(Function),
+          });
+        });
+
+        it('should log an error and not call the callback if there is no drop result', () => {
+          const invalid: State = {
+            ...state.dropComplete(),
+            drop: null,
+          };
+
+          caller.onStateChange(hooks, previous, invalid);
+
+          expect(hooks.onDragEnd).not.toHaveBeenCalled();
+          expect(console.error).toHaveBeenCalled();
+        });
+
+        it('should call onDragEnd with null as the destination if there is no destination', () => {
+          const result: DropResult = {
+            draggableId: preset.inHome1.descriptor.id,
+            type: preset.home.descriptor.type,
+            source: {
+              droppableId: preset.inHome1.descriptor.droppableId,
+              index: preset.inHome1.descriptor.index,
+            },
+            destination: null,
+            reason: 'DROP',
+          };
+          const current: State = {
+            phase: 'DROP_COMPLETE',
+            drop: {
+              pending: null,
+              result,
+            },
+            drag: null,
+            dimension: noDimensions,
+          };
+
+          caller.onStateChange(hooks, previous, current);
+
+          expect(hooks.onDragEnd).toHaveBeenCalledWith(result, {
+            announce: expect.any(Function),
+          });
+        });
+
+        it('should call onDragEnd with original source if the item did not move', () => {
+          const source: DraggableLocation = {
             droppableId: preset.inHome1.descriptor.droppableId,
             index: preset.inHome1.descriptor.index,
-          },
-          destination: {
-            droppableId: preset.inHome1.descriptor.droppableId,
-            index: preset.inHome1.descriptor.index + 1,
-          },
-          reason: 'DROP',
-        };
-        const current: State = {
-          phase: 'DROP_COMPLETE',
-          drop: {
-            pending: null,
-            result,
-          },
-          drag: null,
-          dimension: noDimensions,
-        };
+          };
+          const result: DropResult = {
+            draggableId: preset.inHome1.descriptor.id,
+            type: preset.home.descriptor.type,
+            source,
+            destination: source,
+            reason: 'DROP',
+          };
+          const current: State = {
+            phase: 'DROP_COMPLETE',
+            drop: {
+              pending: null,
+              result,
+            },
+            drag: null,
+            dimension: noDimensions,
+          };
+          const expected: DropResult = {
+            draggableId: result.draggableId,
+            type: result.type,
+            source: result.source,
+            // destination has been cleared
+            destination: source,
+            reason: 'DROP',
+          };
 
-        caller.onStateChange(hooks, previous, current);
+          caller.onStateChange(hooks, previous, current);
 
-        if (!current.drop || !current.drop.result) {
-          throw new Error('invalid state');
-        }
-
-        const provided: DropResult = current.drop.result;
-        expect(hooks.onDragEnd).toHaveBeenCalledWith(provided, {
-          announce: expect.any(Function),
+          expect(hooks.onDragEnd).toHaveBeenCalledWith(expected, {
+            announce: expect.any(Function),
+          });
         });
-      });
 
-      it('should log an error and not call the callback if there is no drop result', () => {
-        const invalid: State = {
-          ...state.dropComplete(),
-          drop: null,
-        };
+        describe('announcements', () => {
+          const result: DropResult = {
+            draggableId: preset.inHome1.descriptor.id,
+            type: preset.home.descriptor.type,
+            source: {
+              droppableId: preset.inHome1.descriptor.droppableId,
+              index: preset.inHome1.descriptor.index,
+            },
+            destination: {
+              droppableId: preset.inHome1.descriptor.droppableId,
+              index: preset.inHome1.descriptor.index + 1,
+            },
+            reason: 'DROP',
+          };
+          const current: State = {
+            phase: 'DROP_COMPLETE',
+            drop: {
+              pending: null,
+              result,
+            },
+            drag: null,
+            dimension: noDimensions,
+          };
 
-        caller.onStateChange(hooks, previous, invalid);
+          const perform = (myHooks: Hooks) => {
+            caller.onStateChange(myHooks, previous, current);
+          };
 
-        expect(hooks.onDragEnd).not.toHaveBeenCalled();
-        expect(console.error).toHaveBeenCalled();
-      });
+          beforeEach(() => {
+            // clear its state from previous updates
+            announceMock.mockReset();
+          });
 
-      it('should call onDragEnd with null as the destination if there is no destination', () => {
-        const result: DropResult = {
-          draggableId: preset.inHome1.descriptor.id,
-          type: preset.home.descriptor.type,
-          source: {
-            droppableId: preset.inHome1.descriptor.droppableId,
-            index: preset.inHome1.descriptor.index,
-          },
-          destination: null,
-          reason: 'DROP',
-        };
-        const current: State = {
-          phase: 'DROP_COMPLETE',
-          drop: {
-            pending: null,
-            result,
-          },
-          drag: null,
-          dimension: noDimensions,
-        };
+          it('should announce with the default update message if no message is provided', () => {
+            perform(hooks);
 
-        caller.onStateChange(hooks, previous, current);
+            expect(announceMock).toHaveBeenCalledWith(messagePreset.onDragEnd(result));
+          });
 
-        expect(hooks.onDragEnd).toHaveBeenCalledWith(result, {
-          announce: expect.any(Function),
-        });
-      });
+          it('should announce with the default update message if no onDragEnd hook is provided', () => {
+            const customHooks: Hooks = {
+              onDragEnd: jest.fn(),
+            };
 
-      it('should call onDragEnd with original source if the item did not move', () => {
-        const source: DraggableLocation = {
-          droppableId: preset.inHome1.descriptor.droppableId,
-          index: preset.inHome1.descriptor.index,
-        };
-        const result: DropResult = {
-          draggableId: preset.inHome1.descriptor.id,
-          type: preset.home.descriptor.type,
-          source,
-          destination: source,
-          reason: 'DROP',
-        };
-        const current: State = {
-          phase: 'DROP_COMPLETE',
-          drop: {
-            pending: null,
-            result,
-          },
-          drag: null,
-          dimension: noDimensions,
-        };
-        const expected : DropResult = {
-          draggableId: result.draggableId,
-          type: result.type,
-          source: result.source,
-          // destination has been cleared
-          destination: source,
-          reason: 'DROP',
-        };
+            perform(customHooks);
 
-        caller.onStateChange(hooks, previous, current);
+            expect(announceMock).toHaveBeenCalledWith(messagePreset.onDragEnd(result));
+          });
 
-        expect(hooks.onDragEnd).toHaveBeenCalledWith(expected, {
-          announce: expect.any(Function),
+          it('should announce with a provided message', () => {
+            const customHooks: Hooks = {
+              onDragEnd: (drop: DropResult, provided: HookProvided) => provided.announce('the end'),
+            };
+
+            perform(customHooks);
+
+            expect(announceMock).toHaveBeenCalledTimes(1);
+            expect(announceMock).toHaveBeenCalledWith('the end');
+          });
+
+          it('should prevent double announcing', () => {
+            let myAnnounce: ?Announce;
+            const customHooks: Hooks = {
+              onDragEnd: (drop: DropResult, provided: HookProvided) => {
+                myAnnounce = provided.announce;
+                myAnnounce('test');
+              },
+            };
+
+            perform(customHooks);
+
+            expect(announceMock).toHaveBeenCalledWith('test');
+            expect(announceMock).toHaveBeenCalledTimes(1);
+            expect(console.warn).not.toHaveBeenCalled();
+
+            if (!myAnnounce) {
+              throw new Error('Invalid test setup');
+            }
+
+            myAnnounce('second');
+
+            expect(announceMock).toHaveBeenCalledTimes(1);
+            expect(console.warn).toHaveBeenCalled();
+          });
+
+          it('should prevent async announcing', () => {
+            const customHooks: Hooks = {
+              onDragEnd: (drop: DropResult, provided: HookProvided) => {
+                setTimeout(() => {
+                  // boom
+                  provided.announce('too late');
+                });
+              },
+            };
+
+            perform(customHooks);
+
+            expect(announceMock).toHaveBeenCalledWith(messagePreset.onDragEnd(result));
+            expect(console.warn).not.toHaveBeenCalled();
+
+            // not releasing the async message
+            jest.runOnlyPendingTimers();
+
+            expect(announceMock).toHaveBeenCalledTimes(1);
+            expect(console.warn).toHaveBeenCalled();
+          });
         });
       });
     });
@@ -1056,6 +1166,7 @@ describe('fire hooks', () => {
         caller.onStateChange(hooks, current, current);
 
         expect(hooks.onDragStart).not.toHaveBeenCalled();
+        expect(hooks.onDragUpdate).not.toHaveBeenCalled();
         expect(hooks.onDragEnd).not.toHaveBeenCalled();
       });
     });
