@@ -57,6 +57,7 @@ describe('hooks integration', () => {
     return mount(
       <DragDropContext
         onDragStart={hooks.onDragStart}
+        onDragUpdate={hooks.onDragUpdate}
         onDragEnd={hooks.onDragEnd}
       >
         <Droppable droppableId={droppableId}>
@@ -90,6 +91,7 @@ describe('hooks integration', () => {
     jest.useFakeTimers();
     hooks = {
       onDragStart: jest.fn(),
+      onDragUpdate: jest.fn(),
       onDragEnd: jest.fn(),
     };
     wrapper = getMountedApp();

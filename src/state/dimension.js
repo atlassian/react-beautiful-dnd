@@ -222,7 +222,7 @@ export const getDroppableDimension = ({
       withoutMargin: getArea(withWindowScroll),
       withMargin: subject,
       withMarginAndPadding:
-        getArea(expandBySpacing(withWindowScroll, expandBySpacing(margin, padding))),
+        getArea(expandBySpacing(expandBySpacing(withWindowScroll, margin), padding)),
     },
     viewport,
   };
