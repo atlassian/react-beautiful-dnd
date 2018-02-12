@@ -1088,22 +1088,21 @@ describe('fire hooks', () => {
 
   describe('drag cleared', () => {
     describe('cleared while dragging', () => {
+      const drop: DropResult = {
+        draggableId: preset.inHome1.descriptor.id,
+        type: preset.home.descriptor.type,
+        // $ExpectError - not checking for null
+        source: {
+          index: preset.inHome1.descriptor.index,
+          droppableId: preset.inHome1.descriptor.droppableId,
+        },
+        destination: null,
+        reason: 'CANCEL',
+      };
       it('should return a result with a null destination', () => {
-        const expected: DropResult = {
-          draggableId: preset.inHome1.descriptor.id,
-          type: preset.home.descriptor.type,
-          // $ExpectError - not checking for null
-          source: {
-            index: preset.inHome1.descriptor.index,
-            droppableId: preset.inHome1.descriptor.droppableId,
-          },
-          destination: null,
-          reason: 'CANCEL',
-        };
-
         caller.onStateChange(hooks, state.dragging(), state.idle);
 
-        expect(hooks.onDragEnd).toHaveBeenCalledWith(expected, {
+        expect(hooks.onDragEnd).toHaveBeenCalledWith(drop, {
           announce: expect.any(Function),
         });
       });
@@ -1120,6 +1119,91 @@ describe('fire hooks', () => {
 
         expect(hooks.onDragEnd).not.toHaveBeenCalled();
         expect(console.error).toHaveBeenCalled();
+      });
+
+      describe('announcements', () => {
+        const perform = (myHooks: Hooks) => {
+          caller.onStateChange(myHooks, state.dragging(), state.idle);
+        };
+
+        beforeEach(() => {
+          // clear its state from previous updates
+          announceMock.mockReset();
+        });
+
+        it('should announce with the default update message if no message is provided', () => {
+          perform(hooks);
+
+          expect(announceMock).toHaveBeenCalledWith(messagePreset.onDragEnd(drop));
+        });
+
+        it('should announce with the default update message if no onDragEnd hook is provided', () => {
+          const customHooks: Hooks = {
+            onDragEnd: jest.fn(),
+          };
+
+          perform(customHooks);
+
+          expect(announceMock).toHaveBeenCalledWith(messagePreset.onDragEnd(drop));
+        });
+
+        it('should announce with a provided message', () => {
+          const customHooks: Hooks = {
+            onDragEnd: (dropResult: DropResult, provided: HookProvided) => provided.announce('the end'),
+          };
+
+          perform(customHooks);
+
+          expect(announceMock).toHaveBeenCalledTimes(1);
+          expect(announceMock).toHaveBeenCalledWith('the end');
+        });
+
+        it('should prevent double announcing', () => {
+          let myAnnounce: ?Announce;
+          const customHooks: Hooks = {
+            onDragEnd: (dropResult: DropResult, provided: HookProvided) => {
+              myAnnounce = provided.announce;
+              myAnnounce('test');
+            },
+          };
+
+          perform(customHooks);
+
+          expect(announceMock).toHaveBeenCalledWith('test');
+          expect(announceMock).toHaveBeenCalledTimes(1);
+          expect(console.warn).not.toHaveBeenCalled();
+
+          if (!myAnnounce) {
+            throw new Error('Invalid test setup');
+          }
+
+          myAnnounce('second');
+
+          expect(announceMock).toHaveBeenCalledTimes(1);
+          expect(console.warn).toHaveBeenCalled();
+        });
+
+        it('should prevent async announcing', () => {
+          const customHooks: Hooks = {
+            onDragEnd: (dropResult: DropResult, provided: HookProvided) => {
+              setTimeout(() => {
+                // boom
+                provided.announce('too late');
+              });
+            },
+          };
+
+          perform(customHooks);
+
+          expect(announceMock).toHaveBeenCalledWith(messagePreset.onDragEnd(drop));
+          expect(console.warn).not.toHaveBeenCalled();
+
+          // not releasing the async message
+          jest.runOnlyPendingTimers();
+
+          expect(announceMock).toHaveBeenCalledTimes(1);
+          expect(console.warn).toHaveBeenCalled();
+        });
       });
     });
 
