@@ -222,8 +222,11 @@ export type CurrentDrag = {|
   windowScroll: Position,
   // whether or not draggable movements should be animated
   shouldAnimate: boolean,
-  // has the initial dimension capture completed?
-  // isInitialDimensionCaptureCompleted: boolean,
+  // We do not want to calculate drag impacts until we have completed
+  // the first bulk publish. Otherwise the onDragUpdate hook will
+  // be called with incorrect indexes.
+  // Before the first bulk publish the calculations will return incorrect indexes.
+  hasCompletedFirstBulkPublish: boolean,
 |}
 
 // published when a drag starts

@@ -321,8 +321,8 @@ export default (callbacks: Callbacks) => {
     const home: DroppableDimension = homeEntry.callbacks.getDimension();
     const draggable: DraggableDimension = draggableEntry.getDimension();
     // Publishing dimensions
-    callbacks.publishDroppables([home]);
-    callbacks.publishDraggables([draggable]);
+    callbacks.publishDroppable(home);
+    callbacks.publishDraggable(draggable);
     // Watching the scroll of the home droppable
     homeEntry.callbacks.watchScroll();
   };
@@ -378,8 +378,6 @@ export default (callbacks: Callbacks) => {
           const entry: DroppableEntry = state.droppables[dimension.descriptor.id];
           entry.callbacks.watchScroll();
         });
-
-        // callbacks.initialCollectionComplete();
 
         setFrameId(null);
       });

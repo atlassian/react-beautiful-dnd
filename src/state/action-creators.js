@@ -80,26 +80,26 @@ export const completeLift = (
   },
 });
 
-export type PublishDraggableDimensionsAction = {|
-  type: 'PUBLISH_DRAGGABLE_DIMENSIONS',
-  payload: DraggableDimension[]
+export type PublishDraggableDimensionAction = {|
+  type: 'PUBLISH_DRAGGABLE_DIMENSION',
+  payload: DraggableDimension,
 |}
 
-export const publishDraggableDimensions =
-  (dimensions: DraggableDimension[]): PublishDraggableDimensionsAction => ({
-    type: 'PUBLISH_DRAGGABLE_DIMENSIONS',
-    payload: dimensions,
+export const publishDraggableDimension =
+  (dimension: DraggableDimension): PublishDraggableDimensionAction => ({
+    type: 'PUBLISH_DRAGGABLE_DIMENSION',
+    payload: dimension,
   });
 
-export type PublishDroppableDimensionsAction = {|
-  type: 'PUBLISH_DROPPABLE_DIMENSIONS',
-  payload: DroppableDimension[]
+export type PublishDroppableDimensionAction = {|
+  type: 'PUBLISH_DROPPABLE_DIMENSION',
+  payload: DroppableDimension,
 |}
 
-export const publishDroppableDimensions =
-  (dimensions: DroppableDimension[]): PublishDroppableDimensionsAction => ({
-    type: 'PUBLISH_DROPPABLE_DIMENSIONS',
-    payload: dimensions,
+export const publishDroppableDimension =
+  (dimension: DroppableDimension): PublishDroppableDimensionAction => ({
+    type: 'PUBLISH_DROPPABLE_DIMENSION',
+    payload: dimension,
   });
 
 export type BulkPublishDimensionsAction = {|
@@ -508,8 +508,8 @@ export const lift = (id: DraggableId,
 export type Action =
   CompleteLiftAction |
   RequestDimensionsAction |
-  PublishDraggableDimensionsAction |
-  PublishDroppableDimensionsAction |
+  PublishDraggableDimensionAction |
+  PublishDroppableDimensionAction |
   BulkPublishDimensionsAction |
   UpdateDroppableDimensionScrollAction |
   UpdateDroppableDimensionIsEnabledAction |

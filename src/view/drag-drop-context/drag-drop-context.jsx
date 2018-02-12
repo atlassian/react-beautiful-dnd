@@ -38,8 +38,8 @@ import {
 import {
   clean,
   move,
-  publishDraggableDimensions,
-  publishDroppableDimensions,
+  publishDraggableDimension,
+  publishDroppableDimension,
   updateDroppableDimensionScroll,
   updateDroppableDimensionIsEnabled,
   bulkPublishDimensions,
@@ -112,11 +112,11 @@ export default class DragDropContext extends React.Component<Props> {
       cancel: () => {
         this.store.dispatch(clean());
       },
-      publishDraggables: (dimensions: DraggableDimension[]) => {
-        this.store.dispatch(publishDraggableDimensions(dimensions));
+      publishDraggable: (dimension: DraggableDimension) => {
+        this.store.dispatch(publishDraggableDimension(dimension));
       },
-      publishDroppables: (dimensions: DroppableDimension[]) => {
-        this.store.dispatch(publishDroppableDimensions(dimensions));
+      publishDroppable: (dimension: DroppableDimension) => {
+        this.store.dispatch(publishDroppableDimension(dimension));
       },
       bulkPublish: (draggables: DraggableDimension[], droppables: DroppableDimension[]) => {
         this.store.dispatch(bulkPublishDimensions(draggables, droppables));

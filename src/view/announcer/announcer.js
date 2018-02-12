@@ -43,7 +43,6 @@ export default (): Announcer => {
     }
 
     el.textContent = message;
-    // console.log('announcing:', message);
   };
 
   const mount = () => {

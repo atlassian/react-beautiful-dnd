@@ -66,8 +66,8 @@ export type DimensionMarshal = {|
 
 export type Callbacks = {|
   cancel: () => void,
-  publishDraggables: (DraggableDimension[]) => void,
-  publishDroppables: (DroppableDimension[]) => void,
+  publishDraggable: (DraggableDimension) => void,
+  publishDroppable: (DroppableDimension) => void,
   bulkPublish: (
     draggables: DraggableDimension[],
     droppables: DroppableDimension[],
