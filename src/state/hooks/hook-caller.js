@@ -26,6 +26,7 @@ type State = {
 }
 
 type AnyHookFn = OnDragStartHook | OnDragUpdateHook | OnDragEndHook;
+type AnyHookData = DragStart | DragUpdate | DropResult;
 
 const notDragging: State = {
   isDragging: false,
@@ -124,12 +125,12 @@ export default (announce: Announce): HookCaller => {
 
   const execute = (
     hook: ?AnyHookFn,
-    data: DragStart | DragUpdate | DropResult,
-    getDefaultMessage: () => string,
+    data: AnyHookData,
+    getDefaultMessage: (data: any) => string,
   ) => {
     // if no hook: announce the default message
     if (!hook) {
-      announce(getDefaultMessage());
+      announce(getDefaultMessage(data));
       return;
     }
 
@@ -141,7 +142,7 @@ export default (announce: Announce): HookCaller => {
     hook((data: any), provided);
 
     if (!managed.wasCalled()) {
-      announce(getDefaultMessage());
+      announce(getDefaultMessage(data));
     }
   };
 
@@ -178,7 +179,7 @@ export default (announce: Announce): HookCaller => {
         hasMovedFromStartLocation: true,
       });
 
-      execute(onDragUpdate, update, () => messagePreset.onDragUpdate(update));
+      execute(onDragUpdate, update, messagePreset.onDragUpdate);
 
       // announceMessage(update, onDragUpdate);
       return;
@@ -193,7 +194,7 @@ export default (announce: Announce): HookCaller => {
       lastDestination: destination,
     });
 
-    execute(onDragUpdate, update, () => messagePreset.onDragUpdate(update));
+    execute(onDragUpdate, update, messagePreset.onDragUpdate);
   };
 
   const onStateChange = (hooks: Hooks, previous: AppState, current: AppState): void => {
@@ -234,7 +235,7 @@ export default (announce: Announce): HookCaller => {
       });
 
       // onDragStart is optional
-      execute(onDragStart, start, () => messagePreset.onDragStart(start));
+      execute(onDragStart, start, messagePreset.onDragStart);
       return;
     }
 
@@ -246,7 +247,7 @@ export default (announce: Announce): HookCaller => {
       }
       const result: DropResult = current.drop.result;
 
-      execute(onDragEnd, result, () => messagePreset.onDragEnd(result));
+      execute(onDragEnd, result, messagePreset.onDragEnd);
       return;
     }
 
@@ -277,7 +278,7 @@ export default (announce: Announce): HookCaller => {
         reason: 'CANCEL',
       };
 
-      execute(onDragEnd, result, () => messagePreset.onDragEnd(result));
+      execute(onDragEnd, result, messagePreset.onDragEnd);
       return;
     }
 
@@ -297,7 +298,7 @@ export default (announce: Announce): HookCaller => {
         reason: 'CANCEL',
       };
 
-      execute(onDragEnd, result, () => messagePreset.onDragEnd(result));
+      execute(onDragEnd, result, messagePreset.onDragEnd);
     }
   };
 
