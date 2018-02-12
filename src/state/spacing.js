@@ -11,15 +11,6 @@ export const offsetByPosition = (spacing: Spacing, point: Position): Spacing => 
   right: spacing.right + point.x,
 });
 
-export const expandBySpacing = (spacing1: Spacing, spacing2: Spacing): Spacing => ({
-  // pulling back to increase size
-  top: spacing1.top - spacing2.top,
-  left: spacing1.left - spacing2.left,
-  // pushing forward to increase size
-  bottom: spacing1.bottom + spacing2.bottom,
-  right: spacing1.right + spacing2.right,
-});
-
 export const expandByPosition = (spacing: Spacing, position: Position): Spacing => ({
   // pulling back to increase size
   top: spacing.top - position.y,
@@ -27,6 +18,15 @@ export const expandByPosition = (spacing: Spacing, position: Position): Spacing 
   // pushing forward to increase size
   right: spacing.right + position.x,
   bottom: spacing.bottom + position.y,
+});
+
+export const expandBySpacing = (spacing1: Spacing, spacing2: Spacing): Spacing => ({
+  // pulling back to increase size
+  top: spacing1.top - spacing2.top,
+  left: spacing1.left - spacing2.left,
+  // pushing forward to increase size
+  bottom: spacing1.bottom + spacing2.bottom,
+  right: spacing1.right + spacing2.right,
 });
 
 export const isEqual = (spacing1: Spacing, spacing2: Spacing): boolean => (
