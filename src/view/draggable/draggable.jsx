@@ -275,8 +275,13 @@ export default class Draggable extends Component<Props, State> {
     }
   )
 
-  getSnapshot = memoizeOne((isDragging: boolean, isDropAnimating: boolean): StateSnapshot => ({
+  getSnapshot = memoizeOne((
+    isDragging: boolean,
+    isDropAnimating: boolean,
+    draggingOver: ?DroppableId,
+  ): StateSnapshot => ({
     isDragging: (isDragging || isDropAnimating),
+    draggingOver,
   }))
 
   getSpeed = memoizeOne(
@@ -303,11 +308,12 @@ export default class Draggable extends Component<Props, State> {
       isDropAnimating,
       isDragDisabled,
       dimension,
-      children,
+      draggingOver,
       direction,
       shouldAnimateDragMovement,
       shouldAnimateDisplacement,
       disableInteractiveElementBlocking,
+      children,
     } = this.props;
     const droppableId: DroppableId = this.context[droppableIdKey];
 
@@ -350,7 +356,11 @@ export default class Draggable extends Component<Props, State> {
                     dragHandleProps,
                     movementStyle,
                   ),
-                  this.getSnapshot(isDragging, isDropAnimating)
+                  this.getSnapshot(
+                    isDragging,
+                    isDropAnimating,
+                    draggingOver,
+                  )
                 )
               }
             </DragHandle>

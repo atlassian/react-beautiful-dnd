@@ -95,6 +95,7 @@ export default class Droppable extends Component<Props, State> {
       ignoreContainerClipping,
       isDraggingOver,
       isDropDisabled,
+      draggingOverWith,
       type,
     } = this.props;
     const provided: Provided = {
@@ -106,6 +107,7 @@ export default class Droppable extends Component<Props, State> {
     };
     const snapshot: StateSnapshot = {
       isDraggingOver,
+      draggingOverWith,
     };
 
     return (

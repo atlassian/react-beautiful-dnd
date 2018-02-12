@@ -22,7 +22,7 @@ type State = {
   hasMovedFromStartLocation: boolean,
 }
 
-const initial: State = {
+const notDragging: State = {
   isDragging: false,
   start: null,
   lastDestination: null,
@@ -45,19 +45,43 @@ const areLocationsEqual = (current: ?DraggableLocation, next: ?DraggableLocation
     current.index === next.index;
 };
 
-const getProvided = (announce: Announce): HookProvided => {
-  const detector = (message: string) => {
+const getAnnouncerForConsumer = (announce: Announce) => {
+  let wasCalled: boolean = false;
+  let isExpired: boolean = false;
+
+  // not allowing async announcements
+  setTimeout(() => {
+    isExpired = true;
+  });
+
+  const result = (message: string): void => {
+    if (wasCalled) {
+      console.warn('Announcement already made. Not making a second announcement');
+      return;
+    }
+
+    if (isExpired) {
+      console.warn(`
+        Announcements cannot be made asynchronously.
+        Default message has already been announced.
+      `);
+      return;
+    }
+
+    wasCalled = true;
     announce(message);
-    detector.wasCalled = true;
   };
 
-  return {
-    announce: detector,
-  };
+  // getter for isExpired
+  result.wasCalled = (): boolean => wasCalled;
+
+  return result;
 };
 
+type OnDragUpdate = (update: DragUpdate, provided: HookProvided) => void;
+
 export default (announce: Announce): HookCaller => {
-  let state: State = initial;
+  let state: State = notDragging;
 
   const setState = (partial: Object): void => {
     const newState: State = {
@@ -93,35 +117,38 @@ export default (announce: Announce): HookCaller => {
     return start;
   };
 
-  const onStateChange = (hooks: Hooks, previous: AppState, current: AppState): void => {
-    const { onDragStart, onDragUpdate, onDragEnd } = hooks;
-    const currentPhase = current.phase;
-    const previousPhase = previous.phase;
+  const onDrag = (() => {
+    const announceMessage = (update: DragUpdate, onDragUpdate: ?OnDragUpdate) => {
+      if (!onDragUpdate) {
+        announce(messagePreset.onDragUpdate(update));
+        return;
+      }
 
-    // Dragging in progress
-    if (currentPhase === 'DRAGGING' && previousPhase === 'DRAGGING') {
+      const provided: HookProvided = {
+        announce: getAnnouncerForConsumer(announce),
+      };
+      onDragUpdate(update, provided);
+
+      // if they do not announce - use the default
+      if (!provided.announce.wasCalled()) {
+        announce(messagePreset.onDragUpdate(update));
+      }
+    };
+
+    return (current: AppState, onDragUpdate?: OnDragUpdate) => {
       if (!state.isDragging) {
         console.error('Cannot process dragging update if drag has not started');
         return;
       }
-      // only call the onDragUpdate hook if something has changed from last time
-
-      const start: ?DragStart = getDragStart(current);
-
-      if (!start) {
-        console.error('Cannot update drag when there is invalid state');
-        return;
-      }
 
       const drag: ?DragState = current.drag;
-
-      if (!drag) {
+      const start: ?DragStart = getDragStart(current);
+      if (!start || !drag) {
         console.error('Cannot update drag when there is invalid state');
         return;
       }
 
       const destination: ?DraggableLocation = drag.impact.destination;
-
       const update: DragUpdate = {
         draggableId: start.draggableId,
         type: start.type,
@@ -129,31 +156,19 @@ export default (announce: Announce): HookCaller => {
         destination,
       };
 
-      // has not left the home position
       if (!state.hasMovedFromStartLocation) {
         // has not moved past the home yet
         if (areLocationsEqual(start.source, destination)) {
           return;
         }
 
+        // We have now moved past the home location
         setState({
           lastDestination: destination,
           hasMovedFromStartLocation: true,
         });
 
-        if (!onDragUpdate) {
-          announce(messagePreset.onDragUpdate(update));
-          return;
-        }
-
-        const provided: HookProvided = getProvided(announce);
-        onDragUpdate(update, provided);
-
-        // if they do not announce - use the default
-        if (!provided.announce.wasCalled) {
-          announce(messagePreset.onDragUpdate(update));
-        }
-
+        announceMessage(update, onDragUpdate);
         return;
       }
 
@@ -166,25 +181,24 @@ export default (announce: Announce): HookCaller => {
         lastDestination: destination,
       });
 
-      if (!onDragUpdate) {
-        announce(messagePreset.onDragUpdate(update));
-        return;
-      }
+      announceMessage(update, onDragUpdate);
+    };
+  })();
 
-      const provided: HookProvided = getProvided(announce);
-      onDragUpdate(update, provided);
+  const onStateChange = (hooks: Hooks, previous: AppState, current: AppState): void => {
+    const { onDragStart, onDragUpdate, onDragEnd } = hooks;
+    const currentPhase = current.phase;
+    const previousPhase = previous.phase;
 
-      // if they did not announce anything - use the default
-      if (!provided.announce.wasCalled) {
-        announce(messagePreset.onDragUpdate(update));
-      }
-
+    // Dragging in progress
+    if (currentPhase === 'DRAGGING' && previousPhase === 'DRAGGING') {
+      onDrag(current, onDragUpdate);
       return;
     }
 
     // We are not in the dragging phase so we can clear this state
     if (state.isDragging) {
-      setState(initial);
+      setState(notDragging);
     }
 
     // From this point we only care about phase changes
@@ -214,11 +228,13 @@ export default (announce: Announce): HookCaller => {
         return;
       }
 
-      const provided: HookProvided = getProvided(announce);
+      const provided: HookProvided = {
+        announce: getAnnouncerForConsumer(announce),
+      };
       onDragStart(start, provided);
 
       // if they did not announce anything - use the default
-      if (!provided.announce.wasCalled) {
+      if (!provided.announce.wasCalled()) {
         announce(messagePreset.onDragStart(start));
       }
       return;
@@ -232,10 +248,12 @@ export default (announce: Announce): HookCaller => {
       }
       const result: DropResult = current.drop.result;
 
-      const provided: HookProvided = getProvided(announce);
+      const provided: HookProvided = {
+        announce: getAnnouncerForConsumer(announce),
+      };
       onDragEnd(result, provided);
 
-      if (!provided.announce.wasCalled) {
+      if (!provided.announce.wasCalled()) {
         announce(messagePreset.onDragEnd(result));
       }
       return;
@@ -268,10 +286,12 @@ export default (announce: Announce): HookCaller => {
         reason: 'CANCEL',
       };
 
-      const provided: HookProvided = getProvided(announce);
+      const provided: HookProvided = {
+        announce: getAnnouncerForConsumer(announce),
+      };
       onDragEnd(result, provided);
 
-      if (!provided.announce.wasCalled) {
+      if (!provided.announce.wasCalled()) {
         announce(messagePreset.onDragEnd(result));
       }
 
@@ -293,10 +313,13 @@ export default (announce: Announce): HookCaller => {
         destination: null,
         reason: 'CANCEL',
       };
-      const provided: HookProvided = getProvided(announce);
+
+      const provided: HookProvided = {
+        announce: getAnnouncerForConsumer(announce),
+      };
       onDragEnd(result, provided);
 
-      if (!provided.announce.wasCalled) {
+      if (!provided.announce.wasCalled()) {
         announce(messagePreset.onDragEnd(result));
       }
     }

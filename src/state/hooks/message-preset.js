@@ -11,6 +11,8 @@ export type MessagePreset = {|
   onDragEnd: (result: DropResult) => string,
 |}
 
+// We cannot list what index the Droppable is in automatically as we are not sure how
+// the Droppable's have been configured
 const onDragStart = (start: DragStart): string => `
   You have lifted an item in position ${start.source.index + 1}.
   Use the arrow keys to move, space bar to drop, and escape to cancel.
@@ -20,8 +22,18 @@ const onDragUpdate = (update: DragUpdate): string => {
   if (!update.destination) {
     return 'You are currently not dragging over any droppable area';
   }
-  // TODO: list what droppable they are in?
-  return `You have moved the item to position ${update.destination.index + 1}`;
+
+  // Moving in the same list
+  if (update.source.droppableId === update.destination.droppableId) {
+    return `You have moved the item to position ${update.destination.index + 1}`;
+  }
+
+  // Moving into a new list
+
+  return `
+    You have moved the item from list ${update.source.droppableId} in position ${update.source.index + 1}
+    to list ${update.destination.droppableId} in position ${update.destination.index + 1}
+  `;
 };
 
 const onDragEnd = (result: DropResult): string => {
@@ -32,13 +44,15 @@ const onDragEnd = (result: DropResult): string => {
     `;
   }
 
+  // Not moved anywhere (such as when dropped over no list)
   if (!result.destination) {
     return `
-      The item has been dropped while not over a location.
+      The item has been dropped while not over a droppable location.
       The item has returned to its starting position of ${result.source.index + 1}
     `;
   }
 
+  // Dropped in home list
   if (result.source.droppableId === result.destination.droppableId) {
     return `
       You have dropped the item.
@@ -46,8 +60,9 @@ const onDragEnd = (result: DropResult): string => {
   `;
   }
 
+  // Dropped in a new list
   return `
-    Item dropped.
+    You have dropped the item.
     It has moved from position ${result.source.index + 1} in list ${result.source.droppableId}
     to position ${result.destination.index + 1} in list ${result.destination.droppableId}
   `;

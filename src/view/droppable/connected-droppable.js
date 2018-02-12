@@ -16,6 +16,7 @@ import type {
   DragState,
   State,
   DroppableId,
+  DraggableId,
   DraggableLocation,
   DraggableDimension,
   Placeholder,
@@ -71,8 +72,12 @@ export const makeSelector = (): Selector => {
   );
 
   const getMapProps = memoizeOne(
-    (isDraggingOver: boolean, placeholder: ?Placeholder): MapProps => ({
+    (isDraggingOver: boolean,
+      draggingOverWith: ?DraggableId,
+      placeholder: ?Placeholder,
+    ): MapProps => ({
       isDraggingOver,
+      draggingOverWith,
       placeholder,
     })
   );
@@ -103,13 +108,16 @@ export const makeSelector = (): Selector => {
         }
 
         const isDraggingOver = getIsDraggingOver(id, drag.impact.destination);
+        const draggingOverWith: ?DraggableId = isDraggingOver ?
+          drag.initial.descriptor.id : null;
 
         const placeholder: ?Placeholder = getPlaceholder(
           id,
           drag.impact.destination,
           draggable,
         );
-        return getMapProps(isDraggingOver, placeholder);
+
+        return getMapProps(isDraggingOver, draggingOverWith, placeholder);
       }
 
       if (phase === 'DROP_ANIMATING') {
@@ -119,12 +127,15 @@ export const makeSelector = (): Selector => {
         }
 
         const isDraggingOver = getIsDraggingOver(id, pending.impact.destination);
+        const draggingOverWith: ?DraggableId = isDraggingOver ?
+          pending.result.draggableId : null;
+
         const placeholder: ?Placeholder = getPlaceholder(
           id,
           pending.result.destination,
           draggable,
         );
-        return getMapProps(isDraggingOver, placeholder);
+        return getMapProps(isDraggingOver, draggingOverWith, placeholder);
       }
 
       return getMapProps(false, null);

@@ -1,5 +1,6 @@
 // @flow
 import createHookCaller from '../../../src/state/hooks/hook-caller';
+import messagePreset from '../../../src/state/hooks/message-preset';
 import type { HookCaller } from '../../../src/state/hooks/hooks-types';
 import * as state from '../../utils/simple-state-preset';
 import { getPreset } from '../../utils/dimension';
@@ -7,10 +8,13 @@ import noImpact, { noMovement } from '../../../src/state/no-impact';
 import type {
   Announce,
   Hooks,
+  HookProvided,
   DropResult,
   State,
   DimensionState,
   DraggableLocation,
+  DraggableDescriptor,
+  DroppableDimension,
   DragStart,
   DragUpdate,
   DragImpact,
@@ -27,9 +31,11 @@ const noDimensions: DimensionState = {
 describe('fire hooks', () => {
   let hooks: Hooks;
   let caller: HookCaller;
-  const announceMock: Announce = () => { };
+  let announceMock: Announce;
 
   beforeEach(() => {
+    jest.useFakeTimers();
+    announceMock = jest.fn();
     caller = createHookCaller(announceMock);
     hooks = {
       onDragStart: jest.fn(),
@@ -37,10 +43,13 @@ describe('fire hooks', () => {
       onDragEnd: jest.fn(),
     };
     jest.spyOn(console, 'error').mockImplementation(() => { });
+    jest.spyOn(console, 'warn').mockImplementation(() => { });
   });
 
   afterEach(() => {
     console.error.mockRestore();
+    console.warn.mockRestore();
+    jest.useRealTimers();
   });
 
   describe('drag start', () => {
@@ -56,17 +65,9 @@ describe('fire hooks', () => {
 
       caller.onStateChange(hooks, state.requesting(), state.dragging());
 
-      expect(hooks.onDragStart).toHaveBeenCalledWith(expected, announceMock);
-    });
-
-    it('should do nothing if no onDragStart is not provided', () => {
-      const customHooks: Hooks = {
-        onDragEnd: jest.fn(),
-      };
-
-      caller.onStateChange(customHooks, state.requesting(), state.dragging());
-
-      expect(console.error).not.toHaveBeenCalled();
+      expect(hooks.onDragStart).toHaveBeenCalledWith(expected, {
+        announce: expect.any(Function),
+      });
     });
 
     it('should log an error and not call the callback if there is no current drag', () => {
@@ -85,6 +86,114 @@ describe('fire hooks', () => {
       caller.onStateChange(hooks, state.preparing, state.requesting());
 
       expect(hooks.onDragStart).not.toHaveBeenCalled();
+    });
+
+    describe('announcements', () => {
+      const getDragStart = (appState: State): ?DragStart => {
+        if (!appState.drag) {
+          return null;
+        }
+
+        const descriptor: DraggableDescriptor = appState.drag.initial.descriptor;
+        const home: ?DroppableDimension = appState.dimension.droppable[descriptor.droppableId];
+
+        if (!home) {
+          return null;
+        }
+
+        const source: DraggableLocation = {
+          index: descriptor.index,
+          droppableId: descriptor.droppableId,
+        };
+
+        const start: DragStart = {
+          draggableId: descriptor.id,
+          type: home.descriptor.type,
+          source,
+        };
+
+        return start;
+      };
+
+      const dragStart: ?DragStart = getDragStart(state.dragging());
+      if (!dragStart) {
+        throw new Error('Invalid test setup');
+      }
+
+      it('should announce with the default lift message if no message is provided', () => {
+        caller.onStateChange(hooks, state.requesting(), state.dragging());
+
+        expect(announceMock).toHaveBeenCalledWith(messagePreset.onDragStart(dragStart));
+      });
+
+      it('should announce with the default lift message if no onDragStart hook is provided', () => {
+        const customHooks: Hooks = {
+          onDragEnd: jest.fn(),
+        };
+
+        caller.onStateChange(customHooks, state.requesting(), state.dragging());
+
+        expect(announceMock).toHaveBeenCalledWith(messagePreset.onDragStart(dragStart));
+      });
+
+      it('should announce with a provided message', () => {
+        const customHooks: Hooks = {
+          onDragStart: (start: DragStart, provided: HookProvided) => provided.announce('test'),
+          onDragEnd: jest.fn(),
+        };
+
+        caller.onStateChange(customHooks, state.requesting(), state.dragging());
+
+        expect(announceMock).toHaveBeenCalledTimes(1);
+        expect(announceMock).toHaveBeenCalledWith('test');
+      });
+
+      it('should prevent double announcing', () => {
+        let myAnnounce: ?Announce;
+        const customHooks: Hooks = {
+          onDragStart: (start: DragStart, provided: HookProvided) => {
+            myAnnounce = provided.announce;
+            myAnnounce('test');
+          },
+          onDragEnd: jest.fn(),
+        };
+
+        caller.onStateChange(customHooks, state.requesting(), state.dragging());
+        expect(announceMock).toHaveBeenCalledWith('test');
+        expect(announceMock).toHaveBeenCalledTimes(1);
+        expect(console.warn).not.toHaveBeenCalled();
+
+        if (!myAnnounce) {
+          throw new Error('Invalid test setup');
+        }
+
+        myAnnounce('second');
+
+        expect(announceMock).toHaveBeenCalledTimes(1);
+        expect(console.warn).toHaveBeenCalled();
+      });
+
+      it('should prevent async announcing', () => {
+        const customHooks: Hooks = {
+          onDragStart: (start: DragStart, provided: HookProvided) => {
+            setTimeout(() => {
+              // boom
+              provided.announce('too late');
+            });
+          },
+          onDragEnd: jest.fn(),
+        };
+
+        caller.onStateChange(customHooks, state.requesting(), state.dragging());
+        expect(announceMock).toHaveBeenCalledWith(messagePreset.onDragStart(dragStart));
+        expect(console.warn).not.toHaveBeenCalled();
+
+        // not releasing the async message
+        jest.runOnlyPendingTimers();
+
+        expect(announceMock).toHaveBeenCalledTimes(1);
+        expect(console.warn).toHaveBeenCalled();
+      });
     });
   });
 
@@ -163,7 +272,9 @@ describe('fire hooks', () => {
           withImpact(state.dragging(), impact),
         );
 
-        expect(hooks.onDragUpdate).toHaveBeenCalledWith(expected, announceMock);
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith(expected, {
+          announce: expect.any(Function),
+        });
       });
 
       it('should provide an update if the droppable changes', () => {
@@ -192,7 +303,9 @@ describe('fire hooks', () => {
           withImpact(state.dragging(), impact),
         );
 
-        expect(hooks.onDragUpdate).toHaveBeenCalledWith(expected, announceMock);
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith(expected, {
+          announce: expect.any(Function),
+        });
       });
 
       it('should provide an update if moving from a droppable to nothing', () => {
@@ -210,7 +323,9 @@ describe('fire hooks', () => {
           withImpact(state.dragging(), noImpact),
         );
 
-        expect(hooks.onDragUpdate).toHaveBeenCalledWith(expected, announceMock);
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith(expected, {
+          announce: expect.any(Function),
+        });
       });
     });
 
@@ -283,7 +398,9 @@ describe('fire hooks', () => {
           withImpact(state.dragging(), secondImpact),
         );
 
-        expect(hooks.onDragUpdate).toHaveBeenCalledWith(expected, announceMock);
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith(expected, {
+          announce: expect.any(Function),
+        });
       });
 
       it('should provide an update if the droppable changes', () => {
@@ -310,7 +427,9 @@ describe('fire hooks', () => {
           withImpact(state.dragging(), secondImpact),
         );
 
-        expect(hooks.onDragUpdate).toHaveBeenCalledWith(expected, announceMock);
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith(expected, {
+          announce: expect.any(Function),
+        });
       });
 
       it('should provide an update if moving from a droppable to nothing', () => {
@@ -333,7 +452,9 @@ describe('fire hooks', () => {
           withImpact(state.dragging(), secondImpact),
         );
 
-        expect(hooks.onDragUpdate).toHaveBeenCalledWith(expected, announceMock);
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith(expected, {
+          announce: expect.any(Function),
+        });
       });
 
       it('should provide an update if moving back to the home location', () => {
@@ -356,7 +477,9 @@ describe('fire hooks', () => {
           destination: null,
         };
 
-        expect(hooks.onDragUpdate).toHaveBeenCalledWith(first, announceMock);
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith(first, {
+          announce: expect.any(Function),
+        });
 
         // drag back to home
         caller.onStateChange(
@@ -370,7 +493,9 @@ describe('fire hooks', () => {
           source: start.source,
           destination: start.source,
         };
-        expect(hooks.onDragUpdate).toHaveBeenCalledWith(second, announceMock);
+        expect(hooks.onDragUpdate).toHaveBeenCalledWith(second, {
+          announce: expect.any(Function),
+        });
       });
     });
 
@@ -408,7 +533,7 @@ describe('fire hooks', () => {
           type: start.type,
           source: start.source,
           destination: firstImpact.destination,
-        }, announceMock);
+        }, { announce: expect.any(Function) });
 
         // second move into new location
         const secondImpact: DragImpact = {
@@ -432,7 +557,7 @@ describe('fire hooks', () => {
           type: start.type,
           source: start.source,
           destination: secondImpact.destination,
-        }, announceMock);
+        }, { announce: expect.any(Function) });
       });
 
       it('should update correctly across multiple drags', () => {
@@ -467,7 +592,7 @@ describe('fire hooks', () => {
           type: start.type,
           source: start.source,
           destination: firstImpact.destination,
-        }, announceMock);
+        }, { announce: expect.any(Function) });
         // resetting the mock
         // $ExpectError - resetting mock
         hooks.onDragUpdate.mockReset();
@@ -503,7 +628,7 @@ describe('fire hooks', () => {
           type: start.type,
           source: start.source,
           destination: firstImpact.destination,
-        }, announceMock);
+        }, { announce: expect.any(Function) });
       });
     });
   });
@@ -548,7 +673,9 @@ describe('fire hooks', () => {
         }
 
         const provided: DropResult = current.drop.result;
-        expect(hooks.onDragEnd).toHaveBeenCalledWith(provided, announceMock);
+        expect(hooks.onDragEnd).toHaveBeenCalledWith(provided, {
+          announce: expect.any(Function),
+        });
       });
 
       it('should log an error and not call the callback if there is no drop result', () => {
@@ -586,7 +713,9 @@ describe('fire hooks', () => {
 
         caller.onStateChange(hooks, previous, current);
 
-        expect(hooks.onDragEnd).toHaveBeenCalledWith(result, announceMock);
+        expect(hooks.onDragEnd).toHaveBeenCalledWith(result, {
+          announce: expect.any(Function),
+        });
       });
 
       it('should call onDragEnd with original source if the item did not move', () => {
@@ -621,7 +750,9 @@ describe('fire hooks', () => {
 
         caller.onStateChange(hooks, previous, current);
 
-        expect(hooks.onDragEnd).toHaveBeenCalledWith(expected, announceMock);
+        expect(hooks.onDragEnd).toHaveBeenCalledWith(expected, {
+          announce: expect.any(Function),
+        });
       });
     });
   });
@@ -643,7 +774,9 @@ describe('fire hooks', () => {
 
         caller.onStateChange(hooks, state.dragging(), state.idle);
 
-        expect(hooks.onDragEnd).toHaveBeenCalledWith(expected, announceMock);
+        expect(hooks.onDragEnd).toHaveBeenCalledWith(expected, {
+          announce: expect.any(Function),
+        });
       });
 
       it('should log an error and do nothing if it cannot find a previous drag to publish', () => {
@@ -677,7 +810,9 @@ describe('fire hooks', () => {
 
         caller.onStateChange(hooks, state.dropAnimating(), state.idle);
 
-        expect(hooks.onDragEnd).toHaveBeenCalledWith(expected, announceMock);
+        expect(hooks.onDragEnd).toHaveBeenCalledWith(expected, {
+          announce: expect.any(Function),
+        });
       });
 
       it('should log an error and do nothing if it cannot find a previous drag to publish', () => {
