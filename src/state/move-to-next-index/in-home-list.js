@@ -83,8 +83,7 @@ export default ({
     destinationAxis: droppable.axis,
   });
 
-  // Calculate DragImpact
-  // at this point we know that the destination is droppable
+  // As this is a forced displacement we always want it to be visible and animate
   const destinationDisplacement: Displacement = {
     draggableId: destination.descriptor.id,
     isVisible: true,
