@@ -70,7 +70,7 @@ describe('move to next index', () => {
         expect(result).toEqual(null);
       });
 
-      describe.only('in home list', () => {
+      describe('in home list', () => {
         describe('moving forwards', () => {
           it('should return null if cannot move forward', () => {
             const previousImpact: DragImpact = {
@@ -747,51 +747,51 @@ describe('move to next index', () => {
                 id: 'much bigger than viewport',
                 type: 'huge',
               },
+              direction: axis.direction,
               client: getArea({
                 top: 0,
                 right: 10000,
                 bottom: 10000,
                 left: 0,
               }),
-              direction: axis.direction,
             });
-            const asBigAsViewport: DraggableDimension = getDraggableDimension({
-              descriptor: {
-                id: 'inside',
-                index: 0,
-                droppableId: droppable.descriptor.id,
-              },
-              client: customViewport,
-            });
-            const outsideViewport: DraggableDimension = getDraggableDimension({
-              descriptor: {
-                id: 'outside',
-                index: 1,
-                droppableId: droppable.descriptor.id,
-              },
-              client: getArea({
-                // is bottom left of the viewport
-                top: customViewport.bottom + 1,
-                right: customViewport.right + 100,
-                left: customViewport.right + 1,
-                bottom: customViewport.bottom + 100,
-              }),
-            });
-            // inViewport is in its original position
-            const previousImpact: DragImpact = {
-              movement: noMovement,
-              direction: axis.direction,
-              destination: {
-                index: 0,
-                droppableId: droppable.descriptor.id,
-              },
-            };
-            const draggables: DraggableDimensionMap = {
-              [asBigAsViewport.descriptor.id]: asBigAsViewport,
-              [outsideViewport.descriptor.id]: outsideViewport,
-            };
 
-            it.only('should request a jump scroll for movement that is outside of the viewport', () => {
+            it('should request a jump scroll for movement that is outside of the viewport', () => {
+              const asBigAsViewport: DraggableDimension = getDraggableDimension({
+                descriptor: {
+                  id: 'inside',
+                  index: 0,
+                  droppableId: droppable.descriptor.id,
+                },
+                client: customViewport,
+              });
+              const outsideViewport: DraggableDimension = getDraggableDimension({
+                descriptor: {
+                  id: 'outside',
+                  index: 1,
+                  droppableId: droppable.descriptor.id,
+                },
+                client: getArea({
+                  // is bottom left of the viewport
+                  top: customViewport.bottom + 1,
+                  right: customViewport.right + 100,
+                  left: customViewport.right + 1,
+                  bottom: customViewport.bottom + 100,
+                }),
+              });
+              // inViewport is in its original position
+              const previousImpact: DragImpact = {
+                movement: noMovement,
+                direction: axis.direction,
+                destination: {
+                  index: 0,
+                  droppableId: droppable.descriptor.id,
+                },
+              };
+              const draggables: DraggableDimensionMap = {
+                [asBigAsViewport.descriptor.id]: asBigAsViewport,
+                [outsideViewport.descriptor.id]: outsideViewport,
+              };
               const expectedCenter = moveToEdge({
                 source: asBigAsViewport.page.withoutMargin,
                 sourceEdge: 'end',
@@ -805,7 +805,8 @@ describe('move to next index', () => {
                 movement: {
                   displaced: [{
                     draggableId: outsideViewport.descriptor.id,
-                    // as the item started in an invisible place
+                    // Even though the item started in an invisible place we force
+                    // the displacement to be visible.
                     isVisible: true,
                     shouldAnimate: true,
                   }],
@@ -838,24 +839,57 @@ describe('move to next index', () => {
               expect(result.impact).toEqual(expectedImpact);
             });
 
-            it('should take into account any changes in the droppables scroll', () => {
-              // scrolling so that outsideViewport is now visible
-              setWindowScroll({ x: 200, y: 200 });
-              const expectedCenter = moveToEdge({
-                source: asBigAsViewport.page.withoutMargin,
-                sourceEdge: 'end',
-                destination: outsideViewport.page.withMargin,
-                destinationEdge: 'end',
-                destinationAxis: axis,
+            it('should force visible displacement when displacing an invisible item', () => {
+              const visible: DraggableDimension = getDraggableDimension({
+                descriptor: {
+                  id: 'inside',
+                  index: 0,
+                  droppableId: droppable.descriptor.id,
+                },
+                client: getArea({
+                  top: 0,
+                  left: 0,
+                  right: customViewport.right - 100,
+                  bottom: customViewport.bottom - 100,
+                }),
               });
+              const invisible: DraggableDimension = getDraggableDimension({
+                descriptor: {
+                  id: 'partial',
+                  index: 1,
+                  droppableId: droppable.descriptor.id,
+                },
+                client: getArea({
+                  top: customViewport.bottom + 1,
+                  left: customViewport.right + 1,
+                  bottom: customViewport.bottom + 100,
+                  right: customViewport.right + 100,
+                }),
+              });
+              // inViewport is in its original position
+              const previousImpact: DragImpact = {
+                movement: noMovement,
+                direction: axis.direction,
+                destination: {
+                  index: 0,
+                  droppableId: droppable.descriptor.id,
+                },
+              };
+              const draggables: DraggableDimensionMap = {
+                [visible.descriptor.id]: visible,
+                [invisible.descriptor.id]: invisible,
+              };
+              const previousPageCenter: Position = visible.page.withoutMargin.center;
               const expectedImpact: DragImpact = {
                 movement: {
                   displaced: [{
-                    draggableId: outsideViewport.descriptor.id,
+                    draggableId: invisible.descriptor.id,
+                    // Even though the item started in an invisible place we force
+                    // the displacement to be visible.
                     isVisible: true,
                     shouldAnimate: true,
                   }],
-                  amount: patch(axis.line, asBigAsViewport.page.withMargin[axis.size]),
+                  amount: patch(axis.line, visible.page.withMargin[axis.size]),
                   isBeyondStartPosition: true,
                 },
                 destination: {
@@ -867,28 +901,29 @@ describe('move to next index', () => {
 
               const result: ?Result = moveToNextIndex({
                 isMovingForward: true,
-                draggableId: asBigAsViewport.descriptor.id,
+                draggableId: visible.descriptor.id,
                 previousImpact,
+                previousPageCenter,
                 draggables,
                 droppable,
               });
 
               if (!result) {
-                throw new Error('invalid result');
+                throw new Error('Invalid test setup');
               }
 
-              expect(result.pageCenter).toEqual(expectedCenter);
               expect(result.impact).toEqual(expectedImpact);
             });
           });
 
           describe('droppable visibility', () => {
-            it('should not permit movement into areas that outside of the droppable frame', () => {
+            it('should request a scroll jump into non-visible areas', () => {
               const droppable: DroppableDimension = getDroppableDimension({
                 descriptor: {
                   id: 'much bigger than viewport',
                   type: 'huge',
                 },
+                direction: axis.direction,
                 client: getArea({
                   top: 0,
                   left: 0,
@@ -896,13 +931,18 @@ describe('move to next index', () => {
                   bottom: 200,
                   right: 200,
                 }),
-                frameClient: getArea({
-                  top: 0,
-                  left: 0,
-                  right: 100,
-                  bottom: 100,
-                }),
-                direction: axis.direction,
+                closest: {
+                  frameClient: getArea({
+                    top: 0,
+                    left: 0,
+                    right: 100,
+                    bottom: 100,
+                  }),
+                  scrollHeight: 200,
+                  scrollWidth: 200,
+                  scroll: { x: 0, y: 0 },
+                  shouldClipSubject: true,
+                },
               });
               const inside: DraggableDimension = getDraggableDimension({
                 descriptor: {
@@ -932,7 +972,6 @@ describe('move to next index', () => {
                   bottom: 180,
                 }),
               });
-              // inViewport is in its original position
               const previousImpact: DragImpact = {
                 movement: noMovement,
                 direction: axis.direction,
@@ -945,16 +984,50 @@ describe('move to next index', () => {
                 [inside.descriptor.id]: inside,
                 [outside.descriptor.id]: outside,
               };
+              const previousPageCenter: Position = inside.page.withoutMargin.center;
+              const expectedCenter = moveToEdge({
+                source: inside.page.withoutMargin,
+                sourceEdge: 'end',
+                destination: outside.page.withMargin,
+                destinationEdge: 'end',
+                destinationAxis: axis,
+              });
+              const expectedScrollJump: Position = subtract(expectedCenter, previousPageCenter);
+              const expectedImpact: DragImpact = {
+                movement: {
+                  displaced: [{
+                    draggableId: outside.descriptor.id,
+                    // Even though the item started in an invisible place we force
+                    // the displacement to be visible.
+                    isVisible: true,
+                    shouldAnimate: true,
+                  }],
+                  amount: patch(axis.line, inside.page.withMargin[axis.size]),
+                  isBeyondStartPosition: true,
+                },
+                destination: {
+                  droppableId: droppable.descriptor.id,
+                  index: 1,
+                },
+                direction: axis.direction,
+              };
 
               const result: ?Result = moveToNextIndex({
                 isMovingForward: true,
                 draggableId: inside.descriptor.id,
                 previousImpact,
+                previousPageCenter,
                 draggables,
                 droppable,
               });
 
-              expect(result).toBe(null);
+              if (!result) {
+                throw new Error('Invalid test setup');
+              }
+
+              expect(result.pageCenter).toEqual(previousPageCenter);
+              expect(result.impact).toEqual(expectedImpact);
+              expect(result.scrollJumpRequest).toEqual(expectedScrollJump);
             });
 
             it.skip('should take into account any changes in the droppables scroll', () => {

@@ -37,8 +37,8 @@ export default ({
   // The starting center position
   const originalCenter: Position = draggable.page.withoutMargin.center;
 
+  // Where the element actually is now.
   // Need to take into account the change of scroll in the droppable
-  // Where the element actually is now
   const currentCenter: Position = withDroppableScroll(home, pageCenter);
 
   // not considering margin so that items move based on visible edges
