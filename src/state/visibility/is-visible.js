@@ -31,7 +31,7 @@ const isVisible = ({
   const displacement: Position = destination.viewport.closestScrollable ?
     destination.viewport.closestScrollable.scroll.diff.displacement :
     origin;
-  const withScroll: Spacing = offsetByPosition(target, displacement);
+  const withDisplacement: Spacing = offsetByPosition(target, displacement);
 
   // destination subject is totally hidden by frame
   // this should never happen - but just guarding against it
@@ -44,12 +44,12 @@ const isVisible = ({
   // adjust for the scroll as the clipped viewport takes into account
   // the scroll of the droppable.
   const isVisibleInDroppable: boolean =
-    isVisibleThroughFrameFn(destination.viewport.clipped)(withScroll);
+    isVisibleThroughFrameFn(destination.viewport.clipped)(withDisplacement);
 
   // We also need to consider whether the destination scroll when detecting
   // if we are visible in the viewport.
   const isVisibleInViewport: boolean =
-    isVisibleThroughFrameFn(viewport)(withScroll);
+    isVisibleThroughFrameFn(viewport)(withDisplacement);
 
   return isVisibleInDroppable && isVisibleInViewport;
 };

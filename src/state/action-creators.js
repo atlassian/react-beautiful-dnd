@@ -17,6 +17,7 @@ import type {
   AutoScrollMode,
 } from '../types';
 import noImpact from './no-impact';
+import withDroppableDisplacement from './with-droppable-displacement';
 import getNewHomeClientCenter from './get-new-home-client-center';
 import { add, subtract, isEqual } from './position';
 
@@ -38,11 +39,11 @@ const getScrollDiff = ({
     current.windowScroll
   );
 
-  const droppableScrollDiff: Position = droppable && droppable.viewport.closestScrollable ?
-    droppable.viewport.closestScrollable.scroll.diff.displacement :
-    origin;
+  if(!droppable) {
+    return windowScrollDiff;
+  }
 
-  return add(windowScrollDiff, droppableScrollDiff);
+  return withDroppableDisplacement(droppable, windowScrollDiff);
 };
 
 export type RequestDimensionsAction = {|

@@ -17,6 +17,13 @@ if (typeof window !== 'undefined') {
   });
 }
 
+// Setting initial viewport
+// Need to set clientWidth and clientHeight as jsdom does not set these properties
+if (typeof document !== 'undefined' && typeof window !== 'undefined') {
+  document.documentElement.clientWidth = window.innerWidth;
+  document.documentElement.clientHeight = window.innerHeight;
+}
+
 // setting up global enzyme
 const Enzyme = require('enzyme');
 

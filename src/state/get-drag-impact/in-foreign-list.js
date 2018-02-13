@@ -9,9 +9,10 @@ import type {
   Displacement,
   Area,
 } from '../../types';
-import { add, patch } from '../position';
+import { patch } from '../position';
 import getDisplacement from '../get-displacement';
 import getViewport from '../../window/get-viewport';
+import withDroppableScroll from '../with-droppable-scroll';
 
 type Args = {|
   pageCenter: Position,
@@ -20,8 +21,6 @@ type Args = {|
   insideDestination: DraggableDimension[],
   previousImpact: DragImpact,
 |}
-
-const origin: Position = { x: 0, y: 0 };
 
 export default ({
   pageCenter,
@@ -38,11 +37,7 @@ export default ({
   // To do this we need to consider any displacement caused by
   // a change in scroll in the droppable we are currently over.
 
-  const destinationScrollDiff: Position = destination.viewport.closestScrollable ?
-    destination.viewport.closestScrollable.scroll.diff.value :
-    origin;
-
-  const currentCenter: Position = add(pageCenter, destinationScrollDiff);
+  const currentCenter: Position = withDroppableScroll(destination, pageCenter);
 
   const displaced: Displacement[] = insideDestination
     .filter((child: DraggableDimension): boolean => {

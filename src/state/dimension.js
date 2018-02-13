@@ -1,7 +1,7 @@
 // @flow
 import { vertical, horizontal } from './axis';
 import getArea from './get-area';
-import { offsetByPosition, expandBySpacing, expandByPosition } from './spacing';
+import { offsetByPosition, expandBySpacing } from './spacing';
 import { subtract, negate } from './position';
 import getMaxScroll from './get-max-scroll';
 import type {

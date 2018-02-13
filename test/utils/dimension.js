@@ -1,8 +1,11 @@
 // @flow
 import getArea from '../../src/state/get-area';
+import { patch } from '../../src/state/position';
+import { expandByPosition } from '../../src/state/spacing';
 import { getDroppableDimension, getDraggableDimension } from '../../src/state/dimension';
 import { vertical } from '../../src/state/axis';
 import type {
+  Area,
   Axis,
   Position,
   Spacing,
@@ -12,16 +15,54 @@ import type {
   DroppableDimensionMap,
 } from '../../src/types';
 
+const margin: Spacing = { top: 10, left: 10, bottom: 5, right: 5 };
+const padding: Spacing = { top: 2, left: 2, bottom: 2, right: 2 };
+const windowScroll: Position = { x: 50, y: 100 };
+const crossAxisStart: number = 0;
+const crossAxisEnd: number = 100;
+const foreignCrossAxisStart: number = 100;
+const foreignCrossAxisEnd: number = 200;
+const emptyForeignCrossAxisStart: number = 200;
+const emptyForeignCrossAxisEnd: number = 300;
+
+export const makeScrollable = (droppable: DroppableDimension, amount?: number = 20) => {
+  const axis: Axis = droppable.axis;
+  const client: Area = droppable.client.withoutMargin;
+  // is 10px smaller than the client on the main axis
+  // this will leave 10px of scrollable area.
+  // only expanding on one axis
+  const frameClient: Area = getArea({
+    top: client.top,
+    left: client.left,
+    right: axis === vertical ? client.right : client.right - amount,
+    bottom: axis === vertical ? client.bottom - amount : client.bottom,
+  });
+
+  // add scroll space on the main axis
+  const scrollSize = {
+    width: axis === vertical ? client.width : client.width + amount,
+    height: axis === vertical ? client.height + amount : client.height,
+  };
+
+  return getDroppableDimension({
+    descriptor: droppable.descriptor,
+    direction: axis.direction,
+    padding,
+    margin,
+    windowScroll,
+    client,
+    closest: {
+      frameClient,
+      scrollWidth: scrollSize.width,
+      scrollHeight: scrollSize.height,
+      scroll: { x: 0, y: 0 },
+      shouldClipSubject: true,
+    },
+  });
+}
+
 export const getPreset = (axis?: Axis = vertical) => {
-  const margin: Spacing = { top: 10, left: 10, bottom: 5, right: 5 };
-  const padding: Spacing = { top: 2, left: 2, bottom: 2, right: 2 };
-  const windowScroll: Position = { x: 50, y: 100 };
-  const crossAxisStart: number = 0;
-  const crossAxisEnd: number = 100;
-  const foreignCrossAxisStart: number = 100;
-  const foreignCrossAxisEnd: number = 200;
-  const emptyForeignCrossAxisStart: number = 200;
-  const emptyForeignCrossAxisEnd: number = 300;
+
 
   const home: DroppableDimension = getDroppableDimension({
     descriptor: {
