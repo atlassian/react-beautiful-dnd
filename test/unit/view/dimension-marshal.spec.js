@@ -421,34 +421,6 @@ describe('dimension marshal', () => {
           expect(callbacks.bulkPublish).not.toHaveBeenCalled();
         });
 
-        it('should publish all the collected draggables', () => {
-          const callbacks = getCallbackStub();
-          const marshal = createDimensionMarshal(callbacks);
-          populateMarshal(marshal);
-
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
-
-          marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
-          requestAnimationFrame.step(2);
-
-          // calls are batched
-          expect(callbacks.bulkPublish).toHaveBeenCalledTimes(1);
-          const result: DraggableDimension[] = callbacks.bulkPublish.mock.calls[0][0];
-
-          // not calling for the dragging item
-          expect(result.length).toBe(Object.keys(preset.draggables).length - 1);
-
-          // super explicit test
-          // - doing it like this because the order of Object.keys is not guarenteed
-          Object.keys(preset.draggables).forEach((id: DraggableId) => {
-            if (id === preset.inHome1.descriptor.id) {
-              expect(result).not.toContain(preset.inHome1);
-              return;
-            }
-            expect(result).toContain(preset.draggables[id]);
-          });
-        });
-
         it('should publish all the collected droppables', () => {
           const callbacks = getCallbackStub();
           const marshal = createDimensionMarshal(callbacks);
@@ -461,7 +433,7 @@ describe('dimension marshal', () => {
 
           // calls are batched
           expect(callbacks.bulkPublish).toHaveBeenCalledTimes(1);
-          const result: DroppableDimension[] = callbacks.bulkPublish.mock.calls[0][1];
+          const result: DroppableDimension[] = callbacks.bulkPublish.mock.calls[0][0];
           // not calling for the dragging item
           expect(result.length).toBe(Object.keys(preset.droppables).length - 1);
           // super explicit test
@@ -472,6 +444,34 @@ describe('dimension marshal', () => {
               return;
             }
             expect(result.includes(preset.droppables[id])).toBe(true);
+          });
+        });
+
+        it('should publish all the collected draggables', () => {
+          const callbacks = getCallbackStub();
+          const marshal = createDimensionMarshal(callbacks);
+          populateMarshal(marshal);
+
+          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+
+          marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
+          requestAnimationFrame.step(2);
+
+          // calls are batched
+          expect(callbacks.bulkPublish).toHaveBeenCalledTimes(1);
+          const result: DraggableDimension[] = callbacks.bulkPublish.mock.calls[0][1];
+
+          // not calling for the dragging item
+          expect(result.length).toBe(Object.keys(preset.draggables).length - 1);
+
+          // super explicit test
+          // - doing it like this because the order of Object.keys is not guarenteed
+          Object.keys(preset.draggables).forEach((id: DraggableId) => {
+            if (id === preset.inHome1.descriptor.id) {
+              expect(result).not.toContain(preset.inHome1);
+              return;
+            }
+            expect(result).toContain(preset.draggables[id]);
           });
         });
 
@@ -511,13 +511,13 @@ describe('dimension marshal', () => {
           marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
           requestAnimationFrame.step(2);
 
-          expect(callbacks.bulkPublish.mock.calls[0][0]).not.toContain(childOfAnotherType);
+          expect(callbacks.bulkPublish.mock.calls[0][0]).not.toContain(ofAnotherType);
           // validation
-          expect(callbacks.bulkPublish.mock.calls[0][0]).toContain(preset.inHome2);
+          expect(callbacks.bulkPublish.mock.calls[0][0]).toContain(preset.foreign);
 
-          expect(callbacks.bulkPublish.mock.calls[0][1]).not.toContain(ofAnotherType);
+          expect(callbacks.bulkPublish.mock.calls[0][1]).not.toContain(childOfAnotherType);
           // validation
-          expect(callbacks.bulkPublish.mock.calls[0][1]).toContain(preset.foreign);
+          expect(callbacks.bulkPublish.mock.calls[0][1]).toContain(preset.inHome2);
         });
 
         it('should not publish draggables if there are none to publish', () => {
@@ -541,7 +541,7 @@ describe('dimension marshal', () => {
           marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
           requestAnimationFrame.step(2);
 
-          expect(callbacks.bulkPublish).toHaveBeenCalledWith([], [preset.foreign]);
+          expect(callbacks.bulkPublish).toHaveBeenCalledWith([preset.foreign], []);
         });
 
         it('should not publish droppables if there are none to publish', () => {
@@ -568,7 +568,7 @@ describe('dimension marshal', () => {
           marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
           requestAnimationFrame.step(2);
 
-          expect(callbacks.bulkPublish).toHaveBeenCalledWith([preset.inHome2], []);
+          expect(callbacks.bulkPublish).toHaveBeenCalledWith([], [preset.inHome2]);
         });
       });
     });
@@ -881,10 +881,10 @@ describe('dimension marshal', () => {
 
           expect(watchers.droppable.getDimension)
             .not.toHaveBeenCalledWith(preset.foreign.descriptor.id);
-          expect(callbacks.bulkPublish.mock.calls[0][1])
+          expect(callbacks.bulkPublish.mock.calls[0][0])
             .not.toContain(preset.foreign);
           // validation
-          expect(callbacks.bulkPublish.mock.calls[0][1]).toContain(preset.emptyForeign);
+          expect(callbacks.bulkPublish.mock.calls[0][0]).toContain(preset.emptyForeign);
 
           // checking we are not causing an orphan child warning
           expect(console.warn).not.toHaveBeenCalled();
@@ -990,6 +990,7 @@ describe('dimension marshal', () => {
             getDimension: () => preset.home,
             watchScroll: () => {},
             unwatchScroll: () => {},
+            scroll: () => {},
           });
           const getOldDimension: GetDraggableDimensionFn =
             jest.fn().mockImplementation(() => preset.inHome2);
@@ -1073,6 +1074,7 @@ describe('dimension marshal', () => {
             getDimension: () => fake,
             watchScroll: jest.fn(),
             unwatchScroll: () => { },
+            scroll: () => {},
           };
 
           // starting collection

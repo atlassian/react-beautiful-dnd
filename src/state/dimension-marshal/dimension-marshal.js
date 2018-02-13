@@ -33,8 +33,8 @@ type State = {|
 |}
 
 type ToBePublished = {|
-  draggables: DraggableDimension[],
   droppables: DroppableDimension[],
+  draggables: DraggableDimension[],
 |}
 
 export default (callbacks: Callbacks) => {
@@ -369,8 +369,8 @@ export default (callbacks: Callbacks) => {
         );
 
         callbacks.bulkPublish(
-          toBePublished.draggables,
           toBePublished.droppables,
+          toBePublished.draggables,
         );
 
         // need to watch the scroll on each droppable

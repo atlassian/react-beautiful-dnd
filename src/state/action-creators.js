@@ -39,7 +39,7 @@ const getScrollDiff = ({
     current.windowScroll
   );
 
-  if(!droppable) {
+  if (!droppable) {
     return windowScrollDiff;
   }
 
@@ -106,18 +106,19 @@ export const publishDroppableDimension =
 export type BulkPublishDimensionsAction = {|
   type: 'BULK_DIMENSION_PUBLISH',
   payload: {|
-    draggables: DraggableDimension[],
     droppables: DroppableDimension[],
+    draggables: DraggableDimension[],
   |}
 |}
 
 export const bulkPublishDimensions = (
+  droppables: DroppableDimension[],
   draggables: DraggableDimension[],
-  droppables: DroppableDimension[]
 ): BulkPublishDimensionsAction => ({
   type: 'BULK_DIMENSION_PUBLISH',
   payload: {
-    draggables, droppables,
+    droppables,
+    draggables,
   },
 });
 

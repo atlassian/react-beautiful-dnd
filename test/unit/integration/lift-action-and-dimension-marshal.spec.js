@@ -42,8 +42,8 @@ const getDimensionMarshal = (store: Store): DimensionMarshal => {
     publishDroppable: (dimension: DroppableDimension) => {
       store.dispatch(publishDroppableDimension(dimension));
     },
-    bulkPublish: (draggables: DraggableDimension[], droppables: DroppableDimension[]) => {
-      store.dispatch(bulkPublishDimensions(draggables, droppables));
+    bulkPublish: (droppables: DroppableDimension[], draggables: DraggableDimension[]) => {
+      store.dispatch(bulkPublishDimensions(droppables, draggables));
     },
     updateDroppableScroll: (id: DroppableId, offset: Position) => {
       store.dispatch(updateDroppableDimensionScroll(id, offset));

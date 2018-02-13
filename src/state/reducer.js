@@ -463,7 +463,6 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const impact: ?DragImpact = (() => {
       // we do not want to recalculate the initial impact until the first bulk publish is finished
       if (!drag.current.hasCompletedFirstBulkPublish) {
-        console.log('have not completed first bulk publish');
         return drag.impact;
       }
 

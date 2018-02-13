@@ -118,8 +118,8 @@ export default class DragDropContext extends React.Component<Props> {
       publishDroppable: (dimension: DroppableDimension) => {
         this.store.dispatch(publishDroppableDimension(dimension));
       },
-      bulkPublish: (draggables: DraggableDimension[], droppables: DroppableDimension[]) => {
-        this.store.dispatch(bulkPublishDimensions(draggables, droppables));
+      bulkPublish: (droppables: DroppableDimension[], draggables: DraggableDimension[]) => {
+        this.store.dispatch(bulkPublishDimensions(droppables, draggables));
       },
       updateDroppableScroll: (id: DroppableId, newScroll: Position) => {
         this.store.dispatch(updateDroppableDimensionScroll(id, newScroll));
