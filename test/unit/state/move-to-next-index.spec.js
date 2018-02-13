@@ -1078,6 +1078,7 @@ describe('move to next index', () => {
               isMovingForward: true,
               draggableId: preset.inHome1.descriptor.id,
               previousImpact,
+              previousPageCenter: preset.inHome1.page.withoutMargin.center,
               droppable: preset.foreign,
               draggables: preset.draggables,
             });
@@ -1153,6 +1154,7 @@ describe('move to next index', () => {
               isMovingForward: true,
               draggableId: preset.inHome1.descriptor.id,
               previousImpact,
+              previousPageCenter: preset.inHome1.page.withoutMargin.center,
               droppable: preset.foreign,
               draggables: preset.draggables,
             });
@@ -1212,6 +1214,8 @@ describe('move to next index', () => {
               isMovingForward: true,
               draggableId: preset.inHome1.descriptor.id,
               previousImpact,
+              // roughly correct
+              previousPageCenter: preset.inHome4.page.withoutMargin.center,
               droppable: preset.foreign,
               draggables: preset.draggables,
             });
@@ -1265,6 +1269,8 @@ describe('move to next index', () => {
               isMovingForward: false,
               draggableId: preset.inHome1.descriptor.id,
               previousImpact,
+              // roughly correct
+              previousPageCenter: preset.inForeign1.page.withoutMargin.center,
               droppable: preset.foreign,
               draggables: preset.draggables,
             });
@@ -1296,6 +1302,8 @@ describe('move to next index', () => {
               isMovingForward: false,
               draggableId: preset.inHome1.descriptor.id,
               previousImpact,
+              // roughly correct
+              previousPageCenter: preset.inForeign4.page.withoutMargin.center,
               droppable: preset.foreign,
               draggables: preset.draggables,
             });
@@ -1383,6 +1391,8 @@ describe('move to next index', () => {
               isMovingForward: false,
               draggableId: preset.inHome1.descriptor.id,
               previousImpact,
+              // roughly correct
+              previousPageCenter: preset.inForeign2.page.withoutMargin.center,
               droppable: preset.foreign,
               draggables: preset.draggables,
             });
