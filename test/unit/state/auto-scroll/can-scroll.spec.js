@@ -1,5 +1,6 @@
 // @flow
 import type {
+  Area,
   Position,
   DroppableDimension,
 } from '../../../../src/types';
@@ -18,6 +19,7 @@ import { getDroppableDimension, scrollDroppable } from '../../../../src/state/di
 import setViewport, { resetViewport } from '../../../utils/set-viewport';
 import setWindowScroll, { resetWindowScroll } from '../../../utils/set-window-scroll';
 import setWindowScrollSize, { resetWindowScrollSize } from '../../../utils/set-window-scroll-size';
+import getMaxScroll from '../../../../src/state/get-max-scroll';
 
 const origin: Position = { x: 0, y: 0 };
 const preset = getPreset();
@@ -55,9 +57,9 @@ const scrollable: DroppableDimension = getDroppableDimension({
 
 describe('can scroll', () => {
   afterEach(() => {
-    resetViewport();
     resetWindowScroll();
     resetWindowScrollSize();
+    resetViewport();
   });
 
   describe('can partially scroll', () => {
@@ -527,15 +529,16 @@ describe('can scroll', () => {
 
     // tested in get remainder
     it('should return the overlap', () => {
-      setViewport(getArea({
+      const viewport: Area = getArea({
         top: 0,
         left: 0,
         right: 100,
         bottom: 100,
-      }));
+      });
+      setViewport(viewport);
       const windowScrollSize = {
         scrollHeight: 200,
-        scrollWidth: 100,
+        scrollWidth: 200,
       };
       setWindowScrollSize(windowScrollSize);
       const windowScroll: Position = {
@@ -543,16 +546,27 @@ describe('can scroll', () => {
         y: 50,
       };
       setWindowScroll(windowScroll);
-      const change: Position = { x: 300, y: 300 };
-      const space: Position = {
-        x: windowScrollSize.scrollWidth - windowScroll.x,
-        y: windowScrollSize.scrollHeight - windowScroll.y,
+
+      // little validation
+      const maxScroll: Position = getMaxScroll({
+        scrollHeight: windowScrollSize.scrollHeight,
+        scrollWidth: windowScrollSize.scrollWidth,
+        height: viewport.height,
+        width: viewport.width,
+      });
+      expect(maxScroll).toEqual({ x: 100, y: 100 });
+
+      const availableScrollSpace: Position = {
+        x: 50,
+        y: 50,
       };
-      const overlap: Position = subtract(change, space);
+      // cannot be absorbed in the current scroll plane
+      const bigChange: Position = { x: 300, y: 300 };
+      const expectedOverlap: Position = subtract(bigChange, availableScrollSpace);
 
-      const result: ?Position = getWindowOverlap(change);
+      const result: ?Position = getWindowOverlap(bigChange);
 
-      expect(result).toEqual(overlap);
+      expect(result).toEqual(expectedOverlap);
     });
 
     it('should return null if there is no overlap', () => {
@@ -563,7 +577,7 @@ describe('can scroll', () => {
         bottom: 100,
       }));
       const scrollSize = {
-        scrollHeight: 200,
+        scrollHeight: 100,
         scrollWidth: 100,
       };
       setWindowScrollSize(scrollSize);
