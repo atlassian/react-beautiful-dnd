@@ -78,8 +78,22 @@ export const canPartiallyScroll = ({
     max, current, change: smallestChange,
   });
 
-  // there will be no remainder if you can partially scroll
-  return !overlap;
+  // no overlap at all - we can move there!
+  if (!overlap) {
+    return true;
+  }
+
+  // if there was an x value, but there is no x overlap - then we can scroll on the x!
+  if (smallestChange.x !== 0 && overlap.x === 0) {
+    return true;
+  }
+
+  // if there was an y value, but there is no y overlap - then we can scroll on the y!
+  if (smallestChange.y !== 0 && overlap.y === 0) {
+    return true;
+  }
+
+  return false;
 };
 
 const getMaxWindowScroll = (): Position => {

@@ -152,46 +152,46 @@ describe('can scroll', () => {
       });
     });
 
-    it('should return false if can only scroll in one direction', () => {
-      const max: Position = { x: 100, y: 200 };
-
     type Item = {|
       current: Position,
       change: Position,
     |}
 
-    const changes: Item[] = [
-      // Can move back in the y direction, but not back in the x direction
-      {
-        current: { x: 0, y: 1 },
-        change: { x: -1, y: -1 },
-      },
-      // Can move back in the x direction, but not back in the y direction
-      {
-        current: { x: 1, y: 0 },
-        change: { x: -1, y: -1 },
-      },
-      // Can move forward in the y direction, but not forward in the x direction
-      {
-        current: subtract(max, { x: 0, y: 1 }),
-        change: { x: 1, y: 1 },
-      },
-      // Can move forward in the x direction, but not forward in the y direction
-      {
-        current: subtract(max, { x: 1, y: 0 }),
-        change: { x: 1, y: 1 },
-      },
-    ];
+    it('should return true if can only partially move in one direction', () => {
+      const max: Position = { x: 100, y: 200 };
 
-    changes.forEach((item: Item) => {
-      const result: boolean = canPartiallyScroll({
-        max,
-        current: item.current,
-        change: item.change,
+      const changes: Item[] = [
+        // Can move back in the y direction, but not back in the x direction
+        {
+          current: { x: 0, y: 1 },
+          change: { x: -1, y: -1 },
+        },
+        // Can move back in the x direction, but not back in the y direction
+        {
+          current: { x: 1, y: 0 },
+          change: { x: -1, y: -1 },
+        },
+        // Can move forward in the y direction, but not forward in the x direction
+        {
+          current: subtract(max, { x: 0, y: 1 }),
+          change: { x: 1, y: 1 },
+        },
+        // Can move forward in the x direction, but not forward in the y direction
+        {
+          current: subtract(max, { x: 1, y: 0 }),
+          change: { x: 1, y: 1 },
+        },
+      ];
+
+      changes.forEach((item: Item) => {
+        const result: boolean = canPartiallyScroll({
+          max,
+          current: item.current,
+          change: item.change,
+        });
+
+        expect(result).toBe(true);
       });
-
-      expect(result).toBe(false);
-    });
     });
 
     it('should return false if on the min point and move backward in any direction', () => {
