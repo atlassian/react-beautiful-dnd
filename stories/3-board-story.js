@@ -13,9 +13,11 @@ storiesOf('board', module)
   .add('simple', () => (
     <Board initial={authorQuoteMap} />
   ))
-  // TODO: revert to large
-  .add('large data set', () => (
+  .add('medium data set', () => (
     <Board initial={data.medium} />
+  ))
+  .add('large data set', () => (
+    <Board initial={data.large} />
   ))
   .add('long lists in a short container', () => (
     <Board initial={data.medium} containerHeight="60vh" />

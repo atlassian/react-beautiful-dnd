@@ -1,12 +1,13 @@
 // @flow
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { patch, subtract } from '../position';
+import { patch, subtract, negate } from '../position';
 import withDroppableDisplacement from '../with-droppable-displacement';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 import getViewport from '../../window/get-viewport';
 // import getScrollJumpResult from './get-scroll-jump-result';
 import moveToEdge from '../move-to-edge';
 import getDisplacement from '../get-displacement';
+import { shiftDraggable } from '../dimension';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import type {
