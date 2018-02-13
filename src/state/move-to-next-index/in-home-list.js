@@ -7,7 +7,6 @@ import getViewport from '../../window/get-viewport';
 // import getScrollJumpResult from './get-scroll-jump-result';
 import moveToEdge from '../move-to-edge';
 import getDisplacement from '../get-displacement';
-import { shiftDraggable } from '../dimension';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import type {
@@ -101,11 +100,13 @@ export default ({
   // update impact with visibility - stops redundant work!
   const displaced: Displacement[] = modified
     .map((displacement: Displacement): Displacement => {
-      const target: DraggableDimension = draggables[displacement.draggableId];
+      // we have already calculated the displacement for this item
+      if (displacement === destinationDisplacement) {
+        return displacement;
+      }
 
-      // TODO: need to adjust target so that it is in the new location
       const updated: Displacement = getDisplacement({
-        draggable: target,
+        draggable: draggables[displacement.draggableId],
         destination: droppable,
         previousImpact,
         viewport,
