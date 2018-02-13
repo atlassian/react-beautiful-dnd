@@ -65,26 +65,6 @@ export const getDraggableDimension = ({
   return dimension;
 };
 
-type GetDroppableArgs = {|
-  descriptor: DroppableDescriptor,
-  client: Area,
-  // optionally provided - and can also be null
-  closest?: ?{|
-    frameClient: Area,
-    scrollWidth: number,
-    scrollHeight: number,
-    scroll: Position,
-    shouldClipSubject: boolean,
-  |},
-  direction?: Direction,
-  margin?: Spacing,
-  padding?: Spacing,
-  windowScroll?: Position,
-  // Whether or not the droppable is currently enabled (can change at during a drag)
-  // defaults to true
-  isEnabled?: boolean,
-|}
-
 // will return null if the subject is completely not visible within frame
 export const clip = (frame: Area, subject: Spacing): ?Area => {
   const result: Area = getArea({
@@ -152,6 +132,26 @@ export const scrollDroppable = (
     viewport,
   };
 };
+
+type GetDroppableArgs = {|
+  descriptor: DroppableDescriptor,
+  client: Area,
+  // optionally provided - and can also be null
+  closest?: ?{|
+    frameClient: Area,
+    scrollWidth: number,
+    scrollHeight: number,
+    scroll: Position,
+    shouldClipSubject: boolean,
+  |},
+  direction?: Direction,
+  margin?: Spacing,
+  padding?: Spacing,
+  windowScroll?: Position,
+  // Whether or not the droppable is currently enabled (can change at during a drag)
+  // defaults to true
+  isEnabled?: boolean,
+|}
 
 export const getDroppableDimension = ({
   descriptor,

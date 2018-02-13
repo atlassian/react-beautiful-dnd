@@ -4,7 +4,7 @@ import type { Result } from '../../../src/state/move-to-next-index/move-to-next-
 import { getPreset, disableDroppable } from '../../utils/dimension';
 import moveToEdge from '../../../src/state/move-to-edge';
 import noImpact, { noMovement } from '../../../src/state/no-impact';
-import { patch } from '../../../src/state/position';
+import { patch, subtract } from '../../../src/state/position';
 import { vertical, horizontal } from '../../../src/state/axis';
 import getViewport from '../../../src/window/get-viewport';
 import getArea from '../../../src/state/get-area';
@@ -61,6 +61,7 @@ describe('move to next index', () => {
         const result: ?Result = moveToNextIndex({
           isMovingForward: true,
           draggableId: preset.inHome1.descriptor.id,
+          previousPageCenter: preset.inHome1.page.withoutMargin.center,
           previousImpact: noImpact,
           droppable: disabled,
           draggables: preset.draggables,
@@ -69,7 +70,7 @@ describe('move to next index', () => {
         expect(result).toEqual(null);
       });
 
-      describe('in home list', () => {
+      describe.only('in home list', () => {
         describe('moving forwards', () => {
           it('should return null if cannot move forward', () => {
             const previousImpact: DragImpact = {
@@ -87,6 +88,7 @@ describe('move to next index', () => {
               isMovingForward: true,
               draggableId: preset.inHome3.descriptor.id,
               previousImpact,
+              previousPageCenter: preset.inHome3.page.withoutMargin.center,
               droppable: preset.home,
               draggables: preset.draggables,
             });
@@ -110,6 +112,7 @@ describe('move to next index', () => {
                 isMovingForward: true,
                 draggableId: preset.inHome1.descriptor.id,
                 previousImpact,
+                previousPageCenter: preset.inHome1.page.withoutMargin.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
               });
@@ -167,6 +170,7 @@ describe('move to next index', () => {
                 isMovingForward: true,
                 draggableId: preset.inHome2.descriptor.id,
                 previousImpact,
+                previousPageCenter: preset.inHome2.page.withoutMargin.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
               });
@@ -229,10 +233,14 @@ describe('move to next index', () => {
                   index: 1,
                 },
               };
+
               const result: ?Result = moveToNextIndex({
                 isMovingForward: true,
                 draggableId: preset.inHome1.descriptor.id,
                 previousImpact,
+                // roughly correct previous page center
+                // not calculating the exact point as it is not required for this test
+                previousPageCenter: preset.inHome2.page.withoutMargin.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
               });
@@ -311,6 +319,8 @@ describe('move to next index', () => {
                 isMovingForward: true,
                 draggableId: preset.inHome2.descriptor.id,
                 previousImpact,
+                // roughly correct:
+                previousPageCenter: preset.inHome1.page.withoutMargin.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
               });
@@ -384,6 +394,8 @@ describe('move to next index', () => {
                 isMovingForward: true,
                 draggableId: preset.inHome3.descriptor.id,
                 previousImpact,
+                // this is roughly correct
+                previousPageCenter: preset.inHome1.page.withoutMargin.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
               });
@@ -449,6 +461,7 @@ describe('move to next index', () => {
               isMovingForward: false,
               draggableId: preset.inHome1.descriptor.id,
               previousImpact,
+              previousPageCenter: preset.inHome1.page.withoutMargin.center,
               draggables: preset.draggables,
               droppable: preset.home,
             });
@@ -475,6 +488,7 @@ describe('move to next index', () => {
                 isMovingForward: false,
                 draggableId: preset.inHome2.descriptor.id,
                 previousImpact,
+                previousPageCenter: preset.inHome2.page.withoutMargin.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
               });
@@ -535,6 +549,7 @@ describe('move to next index', () => {
                 isMovingForward: false,
                 draggableId: preset.inHome3.descriptor.id,
                 previousImpact,
+                previousPageCenter: preset.inHome3.page.withoutMargin.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
               });
@@ -603,6 +618,8 @@ describe('move to next index', () => {
                 isMovingForward: false,
                 draggableId: preset.inHome2.descriptor.id,
                 previousImpact,
+                // roughly correct
+                previousPageCenter: preset.inHome3.page.withoutMargin.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
               });
@@ -676,6 +693,8 @@ describe('move to next index', () => {
                 isMovingForward: false,
                 draggableId: preset.inHome1.descriptor.id,
                 previousImpact,
+                // roughly correct
+                previousPageCenter: preset.inHome3.page.withoutMargin.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
               });
@@ -736,7 +755,7 @@ describe('move to next index', () => {
               }),
               direction: axis.direction,
             });
-            const inViewport: DraggableDimension = getDraggableDimension({
+            const asBigAsViewport: DraggableDimension = getDraggableDimension({
               descriptor: {
                 id: 'inside',
                 index: 0,
@@ -768,27 +787,62 @@ describe('move to next index', () => {
               },
             };
             const draggables: DraggableDimensionMap = {
-              [inViewport.descriptor.id]: inViewport,
+              [asBigAsViewport.descriptor.id]: asBigAsViewport,
               [outsideViewport.descriptor.id]: outsideViewport,
             };
 
-            it('should not permit movement into areas that are outside the viewport', () => {
+            it.only('should request a jump scroll for movement that is outside of the viewport', () => {
+              const expectedCenter = moveToEdge({
+                source: asBigAsViewport.page.withoutMargin,
+                sourceEdge: 'end',
+                destination: outsideViewport.page.withMargin,
+                destinationEdge: 'end',
+                destinationAxis: axis,
+              });
+              const previousPageCenter: Position = asBigAsViewport.page.withoutMargin.center;
+              const expectedScrollJump: Position = subtract(expectedCenter, previousPageCenter);
+              const expectedImpact: DragImpact = {
+                movement: {
+                  displaced: [{
+                    draggableId: outsideViewport.descriptor.id,
+                    // as the item started in an invisible place
+                    isVisible: true,
+                    shouldAnimate: true,
+                  }],
+                  amount: patch(axis.line, asBigAsViewport.page.withMargin[axis.size]),
+                  isBeyondStartPosition: true,
+                },
+                destination: {
+                  droppableId: droppable.descriptor.id,
+                  index: 1,
+                },
+                direction: axis.direction,
+              };
+
               const result: ?Result = moveToNextIndex({
                 isMovingForward: true,
-                draggableId: inViewport.descriptor.id,
+                draggableId: asBigAsViewport.descriptor.id,
                 previousImpact,
+                previousPageCenter,
                 draggables,
                 droppable,
               });
 
-              expect(result).toBe(null);
+              if (!result) {
+                throw new Error('Invalid test setup');
+              }
+
+              // not updating the page center (visually the item will not move)
+              expect(result.pageCenter).toEqual(previousPageCenter);
+              expect(result.scrollJumpRequest).toEqual(expectedScrollJump);
+              expect(result.impact).toEqual(expectedImpact);
             });
 
             it('should take into account any changes in the droppables scroll', () => {
               // scrolling so that outsideViewport is now visible
               setWindowScroll({ x: 200, y: 200 });
               const expectedCenter = moveToEdge({
-                source: inViewport.page.withoutMargin,
+                source: asBigAsViewport.page.withoutMargin,
                 sourceEdge: 'end',
                 destination: outsideViewport.page.withMargin,
                 destinationEdge: 'end',
@@ -801,7 +855,7 @@ describe('move to next index', () => {
                     isVisible: true,
                     shouldAnimate: true,
                   }],
-                  amount: patch(axis.line, inViewport.page.withMargin[axis.size]),
+                  amount: patch(axis.line, asBigAsViewport.page.withMargin[axis.size]),
                   isBeyondStartPosition: true,
                 },
                 destination: {
@@ -813,7 +867,7 @@ describe('move to next index', () => {
 
               const result: ?Result = moveToNextIndex({
                 isMovingForward: true,
-                draggableId: inViewport.descriptor.id,
+                draggableId: asBigAsViewport.descriptor.id,
                 previousImpact,
                 draggables,
                 droppable,

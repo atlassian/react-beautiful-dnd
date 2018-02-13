@@ -98,12 +98,11 @@ export default ({
     [destinationDisplacement, ...previousImpact.movement.displaced]);
 
   // update impact with visibility - stops redundant work!
-
   const displaced: Displacement[] = modified
     .map((displacement: Displacement): Displacement => {
       const target: DraggableDimension = draggables[displacement.draggableId];
 
-      // TODO: the visibility post drag might be different to this!
+      // TODO: need to adjust target so that it is in the new location
       const updated: Displacement = getDisplacement({
         draggable: target,
         destination: droppable,
