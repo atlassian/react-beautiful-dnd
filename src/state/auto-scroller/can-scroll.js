@@ -19,7 +19,6 @@ type CanScrollArgs = {|
 
 const origin: Position = { x: 0, y: 0 };
 
-// TODO: should this be round or floor?
 const smallestSigned = apply((value: number) => {
   if (value === 0) {
     return 0;
