@@ -25,8 +25,6 @@ type Args = {|
   previousImpact: DragImpact,
 |}
 
-const origin: Position = { x: 0, y: 0 };
-
 export default ({
   pageCenter,
   draggable,

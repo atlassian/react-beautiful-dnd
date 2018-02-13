@@ -62,8 +62,6 @@ export const makeScrollable = (droppable: DroppableDimension, amount?: number = 
 }
 
 export const getPreset = (axis?: Axis = vertical) => {
-
-
   const home: DroppableDimension = getDroppableDimension({
     descriptor: {
       id: 'home',
