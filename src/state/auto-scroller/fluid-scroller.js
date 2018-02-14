@@ -1,13 +1,15 @@
 // @flow
 import rafSchd from 'raf-schd';
+import memoizeOne from 'memoize-one';
 import getViewport from '../../window/get-viewport';
-import { apply, isEqual } from '../position';
+import { add, apply, isEqual } from '../position';
 import isTooBigToAutoScroll from './is-too-big-to-auto-scroll';
 import getBestScrollableDroppable from './get-best-scrollable-droppable';
 import { horizontal, vertical } from '../axis';
 import {
   canScrollDroppable,
   canScrollWindow,
+  canScrollDroppableWithPlaceholder,
 } from './can-scroll';
 import type {
   Area,
@@ -20,6 +22,7 @@ import type {
   State,
   DraggableDimension,
   ClosestScrollable,
+  DroppableDimensionViewport,
 } from '../../types';
 
 // Values used to control how the fluid auto scroll feels
@@ -133,6 +136,61 @@ const getRequiredScroll = (container: Area, center: Position): ?Position => {
   return isEqual(required, origin) ? null : required;
 };
 
+const withPlaceholder = (
+  droppable: DroppableDimension,
+  draggable: DraggableDimension,
+): DroppableDimension => {
+  const isOverHome: boolean = droppable.descriptor.id === draggable.descriptor.droppableId;
+
+  // only need to add the buffer for foreign lists
+  if (isOverHome) {
+    return droppable;
+  }
+
+  const closest: ?ClosestScrollable = droppable.viewport.closestScrollable;
+
+  // not scrollable
+  if (!closest) {
+    return droppable;
+  }
+
+  const placeholder: Position = {
+    x: draggable.placeholder.withoutMargin.width,
+    y: draggable.placeholder.withoutMargin.height,
+  };
+
+  const max: Position = add(closest.scroll.max, placeholder);
+  const current: Position = {
+    x: Math.min(closest.scroll.current.x, max.x),
+    y: Math.min(closest.scroll.current.y, max.y),
+  };
+
+  const withBuffer: ClosestScrollable = {
+    frame: closest.frame,
+    shouldClipSubject: closest.shouldClipSubject,
+    scroll: {
+      initial: closest.scroll.initial,
+      current,
+      max,
+      diff: closest.scroll.diff,
+    },
+  };
+
+  const viewport: DroppableDimensionViewport = {
+    closestScrollable: withBuffer,
+    subject: droppable.viewport.subject,
+    clipped: droppable.viewport.clipped,
+  };
+
+  // $ExpectError - using spread
+  const modified: DroppableDimension = {
+    ...droppable,
+    viewport,
+  };
+
+  return modified;
+};
+
 type Api = {|
   scrollWindow: (offset: Position) => void,
   scrollDroppable: (id: DroppableId, offset: Position) => void,
@@ -196,8 +254,9 @@ export default ({
     }
 
     const requiredFrameScroll: ?Position = getRequiredScroll(closestScrollable.frame, center);
+    const extended: DroppableDimension = withPlaceholder(droppable, draggable);
 
-    if (requiredFrameScroll && canScrollDroppable(droppable, requiredFrameScroll)) {
+    if (requiredFrameScroll && canScrollDroppable(extended, requiredFrameScroll)) {
       scheduleDroppableScroll(droppable.descriptor.id, requiredFrameScroll);
     }
   };

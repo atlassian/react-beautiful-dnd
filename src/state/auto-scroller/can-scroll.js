@@ -5,7 +5,6 @@ import getViewport from '../../window/get-viewport';
 import getMaxScroll from '../get-max-scroll';
 import type {
   ClosestScrollable,
-  DraggableDimension,
   DroppableDimension,
   Position,
   Area,
