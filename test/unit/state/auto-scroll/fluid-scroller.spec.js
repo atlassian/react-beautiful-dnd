@@ -18,7 +18,7 @@ import setWindowScroll, { resetWindowScroll } from '../../../utils/set-window-sc
 import { vertical, horizontal } from '../../../../src/state/axis';
 import createAutoScroller from '../../../../src/state/auto-scroller/';
 import * as state from '../../../utils/simple-state-preset';
-import { getPreset } from '../../../utils/dimension';
+import { getInitialImpact, getPreset, withImpact } from '../../../utils/dimension';
 import { expandByPosition } from '../../../../src/state/spacing';
 import { getDraggableDimension, getDroppableDimension, scrollDroppable } from '../../../../src/state/dimension';
 
@@ -111,8 +111,10 @@ describe('fluid auto scrolling', () => {
   [vertical, horizontal].forEach((axis: Axis) => {
     describe(`on the ${axis.direction} axis`, () => {
       const preset = getPreset(axis);
-      const dragTo = (selection: Position): State =>
-        state.dragging(preset.inHome1.descriptor.id, selection);
+      const dragTo = (
+        selection: Position,
+        impact?: DragImpact = getInitialImpact(axis, preset.inHome1)
+      ): State => withImpact(state.dragging(preset.inHome1.descriptor.id, selection), impact);
 
       describe('window scrolling', () => {
         const thresholds: PixelThresholds = getPixelThresholds(viewport, axis);
@@ -524,6 +526,11 @@ describe('fluid auto scrolling', () => {
           const onMaxBoundary: Position = patch(
             axis.line,
             (frame[axis.size] - thresholds.maxSpeedAt),
+            frame.center[axis.crossAxisLine],
+          );
+          const onEndOfFrame: Position = patch(
+            axis.line,
+            frame[axis.size],
             frame.center[axis.crossAxisLine],
           );
 
@@ -979,6 +986,10 @@ describe('fluid auto scrolling', () => {
             const request: Position = mocks.scrollDroppable.mock.calls[0][1];
             expect(request[axis.crossAxisLine]).toBeLessThan(0);
           });
+        });
+
+        describe('over frame but not a subject', () => {
+
         });
       });
 

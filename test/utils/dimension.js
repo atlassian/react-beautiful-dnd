@@ -2,11 +2,14 @@
 import getArea from '../../src/state/get-area';
 import { patch } from '../../src/state/position';
 import { expandByPosition } from '../../src/state/spacing';
+import { noMovement } from '../../src/state/no-impact';
 import { getDroppableDimension, getDraggableDimension } from '../../src/state/dimension';
 import { vertical } from '../../src/state/axis';
 import type {
   Area,
   Axis,
+  DragImpact,
+  State,
   Position,
   Spacing,
   DroppableDimension,
@@ -59,7 +62,32 @@ export const makeScrollable = (droppable: DroppableDimension, amount?: number = 
       shouldClipSubject: true,
     },
   });
-}
+};
+
+export const getInitialImpact = (axis: Axis, draggable: DraggableDimension) => {
+  const impact: DragImpact = {
+    movement: noMovement,
+    direction: axis.direction,
+    destination: {
+      index: draggable.descriptor.index,
+      droppableId: draggable.descriptor.droppableId,
+    },
+  };
+  return impact;
+};
+
+export const withImpact = (state: State, impact: DragImpact) => {
+  if (!state.drag) {
+    throw new Error('invalid state');
+  }
+  return {
+    ...state,
+    drag: {
+      ...state.drag,
+      impact,
+    },
+  };
+};
 
 export const getPreset = (axis?: Axis = vertical) => {
   const home: DroppableDimension = getDroppableDimension({

@@ -1,11 +1,11 @@
 // @flow
 import { add, apply, isEqual } from '../position';
-// TODO: state reaching into VIEW :(
 import getWindowScroll from '../../window/get-window-scroll';
 import getViewport from '../../window/get-viewport';
 import getMaxScroll from '../get-max-scroll';
 import type {
   ClosestScrollable,
+  DraggableDimension,
   DroppableDimension,
   Position,
   Area,

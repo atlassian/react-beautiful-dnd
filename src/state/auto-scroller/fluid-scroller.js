@@ -3,7 +3,7 @@ import rafSchd from 'raf-schd';
 import getViewport from '../../window/get-viewport';
 import { apply, isEqual } from '../position';
 import isTooBigToAutoScroll from './is-too-big-to-auto-scroll';
-import getScrollableDroppableOver from './get-scrollable-droppable-over';
+import getBestScrollableDroppable from './get-best-scrollable-droppable';
 import { horizontal, vertical } from '../axis';
 import {
   canScrollDroppable,
@@ -175,14 +175,15 @@ export default ({
       return;
     }
 
-    // 2. We are not scrolling the window. Can we scroll the Droppable?
+    // 2. We are not scrolling the window. Can we scroll a Droppable?
 
-    const droppable: ?DroppableDimension = getScrollableDroppableOver({
-      target: center,
+    const droppable: ?DroppableDimension = getBestScrollableDroppable({
+      center,
+      destination: drag.impact.destination,
       droppables: state.dimension.droppable,
     });
 
-      // No scrollable targets
+    // No scrollable targets
     if (!droppable) {
       return;
     }

@@ -2,16 +2,12 @@
 import memoizeOne from 'memoize-one';
 import isPositionInFrame from '../visibility/is-position-in-frame';
 import type {
+  Position,
+  DroppableId,
   DroppableDimension,
   DroppableDimensionMap,
-  DroppableId,
-  Position,
+  DraggableLocation,
 } from '../../types';
-
-type Args = {|
-  target: Position,
-  droppables: DroppableDimensionMap,
-|};
 
 const getScrollableDroppables = memoizeOne(
   (droppables: DroppableDimensionMap): DroppableDimension[] => (
@@ -33,10 +29,10 @@ const getScrollableDroppables = memoizeOne(
   )
 );
 
-export default ({
-  target,
-  droppables,
-}: Args): ?DroppableDimension => {
+const getScrollableDroppableOver = (
+  target: Position,
+  droppables: DroppableDimensionMap
+): ?DroppableDimension => {
   const maybe: ?DroppableDimension =
     getScrollableDroppables(droppables)
       .find((droppable: DroppableDimension): boolean => {
@@ -47,4 +43,35 @@ export default ({
       });
 
   return maybe;
+};
+
+type Api = {|
+  center: Position,
+  destination: ?DraggableLocation,
+  droppables: DroppableDimensionMap,
+|}
+
+export default ({
+  center,
+  destination,
+  droppables,
+}: Api): ?DroppableDimension => {
+  // We need to scroll the best droppable frame we can so that the
+  // placeholder buffer logic works correctly
+
+  if (destination) {
+    const dimension: DroppableDimension = droppables[destination.droppableId];
+    if (!dimension.viewport.closestScrollable) {
+      return null;
+    }
+    return dimension;
+  }
+
+  // 2. If we are not over a droppable - are we over a droppable frame?
+  const dimension: ?DroppableDimension = getScrollableDroppableOver(
+    center,
+    droppables,
+  );
+
+  return dimension;
 };
