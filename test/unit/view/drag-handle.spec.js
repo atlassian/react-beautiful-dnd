@@ -18,7 +18,7 @@ import {
 } from '../../utils/user-input-util';
 import type { Position, DraggableId } from '../../../src/types';
 import * as keyCodes from '../../../src/view/key-codes';
-import getWindowScrollPosition from '../../../src/view/get-window-scroll-position';
+import getWindowScroll from '../../../src/window/get-window-scroll';
 import setWindowScroll from '../../utils/set-window-scroll';
 import forceUpdate from '../../utils/force-update';
 import getArea from '../../../src/state/get-area';
@@ -515,7 +515,7 @@ describe('drag handle', () => {
     });
 
     describe('window scroll during drag', () => {
-      const originalScroll: Position = getWindowScrollPosition();
+      const originalScroll: Position = getWindowScroll();
 
       beforeEach(() => {
         setWindowScroll(origin, { shouldPublish: false });

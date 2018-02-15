@@ -37,7 +37,7 @@ import getArea from '../../../src/state/get-area';
 import { combine, withStore, withDroppableId, withStyleContext, withDimensionMarshal, withCanLift } from '../../utils/get-context-options';
 import { dispatchWindowMouseEvent, mouseEvent } from '../../utils/user-input-util';
 import setWindowScroll from '../../utils/set-window-scroll';
-import getWindowScrollPosition from '../../../src/view/get-window-scroll-position';
+import getWindowScroll from '../../../src/window/get-window-scroll';
 
 class Item extends Component<{ provided: Provided }> {
   render() {
@@ -206,7 +206,7 @@ const mountDraggable = ({
 const mouseDown = mouseEvent.bind(null, 'mousedown');
 const windowMouseMove = dispatchWindowMouseEvent.bind(null, 'mousemove');
 
-const originalWindowScroll: Position = getWindowScrollPosition();
+const originalWindowScroll: Position = getWindowScroll();
 
 type StartDrag = {|
   selection?: Position,
