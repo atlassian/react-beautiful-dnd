@@ -447,7 +447,8 @@ describe('dimension', () => {
       }));
     });
 
-    it('should increase the max scroll position if the requested scroll is bigger than the max', () => {
+    it('should allow scrolling beyond the max position', () => {
+      // this is to allow for scrolling into a foreign placeholder
       const scrollable: DroppableDimension = getDroppableDimension({
         descriptor: droppableDescriptor,
         client: getArea({
@@ -472,7 +473,10 @@ describe('dimension', () => {
 
       const scrolled: DroppableDimension = scrollDroppable(scrollable, { x: 300, y: 300 });
 
-      expect(getClosestScrollable(scrolled).scroll.max).toEqual({ x: 300, y: 300 });
+      // current is larger than max
+      expect(getClosestScrollable(scrolled).scroll.current).toEqual({ x: 300, y: 300 });
+      // current max is unchanged
+      expect(getClosestScrollable(scrolled).scroll.max).toEqual({ x: 100, y: 100 });
       // original max
       expect(getClosestScrollable(scrollable).scroll.max).toEqual({ x: 100, y: 100 });
     });

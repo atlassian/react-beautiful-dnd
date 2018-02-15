@@ -16,7 +16,7 @@ import getArea from '../../../../src/state/get-area';
 import setViewport, { resetViewport } from '../../../utils/set-viewport';
 import setWindowScrollSize, { resetWindowScrollSize } from '../../../utils/set-window-scroll-size';
 import setWindowScroll, { resetWindowScroll } from '../../../utils/set-window-scroll';
-import { noMovement } from '../../../../src/state/no-impact';
+import noImpact, { noMovement } from '../../../../src/state/no-impact';
 import { vertical, horizontal } from '../../../../src/state/axis';
 import createAutoScroller from '../../../../src/state/auto-scroller/';
 import getStatePreset from '../../../utils/get-simple-state-preset';
@@ -64,7 +64,7 @@ describe('fluid auto scrolling', () => {
     requestAnimationFrame.reset();
   });
 
-  [horizontal].forEach((axis: Axis) => {
+  [vertical, horizontal].forEach((axis: Axis) => {
     describe(`on the ${axis.direction} axis`, () => {
       const preset = getPreset(axis);
       const state = getStatePreset(axis);
@@ -499,6 +499,7 @@ describe('fluid auto scrolling', () => {
 
       describe('droppable scrolling', () => {
         const thresholds: PixelThresholds = getPixelThresholds(frame, axis);
+        const maxScrollSpeed: Position = patch(axis.line, config.maxScrollSpeed);
 
         beforeEach(() => {
           // avoiding any window scrolling
@@ -1061,7 +1062,87 @@ describe('fluid auto scrolling', () => {
         });
 
         describe('over frame but not a subject', () => {
+          const withSmallSubject: DroppableDimension = getDroppableDimension({
+            // stealing the home descriptor
+            descriptor: preset.home.descriptor,
+            direction: axis.direction,
+            client: getArea({
+              top: 0,
+              left: 0,
+              right: 100,
+              bottom: 100,
+            }),
+            closest: {
+              frameClient: getArea({
+                top: 0,
+                left: 0,
+                right: 5000,
+                bottom: 5000,
+              }),
+              scrollWidth: 10000,
+              scrollHeight: 10000,
+              scroll: { x: 0, y: 0 },
+              shouldClipSubject: true,
+            },
+          });
 
+          const endOfSubject: Position = patch(axis.line, 100);
+          const endOfFrame: Position = patch(
+            axis.line,
+            // on the end
+            5000,
+            // half way
+            2500,
+          );
+
+          it.only('should scroll a frame if it is being dragged over, even if not over the subject', () => {
+            const scrolled: DroppableDimension = scrollDroppable(
+              withSmallSubject,
+              // scrolling the whole client away
+              endOfSubject,
+            );
+            // subject no longer visible
+            expect(scrolled.viewport.clipped).toBe(null);
+            // const target: Position = add(endOfFrame, patch(axis.line, 1));
+
+            autoScroller.onStateChange(
+              state.idle,
+              withImpact(
+                addDroppable(dragTo(endOfFrame), scrolled),
+                // being super clear that we are not currently over any droppable
+                noImpact,
+              )
+            );
+            requestAnimationFrame.step();
+
+            expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+              scrolled.descriptor.id,
+              maxScrollSpeed,
+            );
+          });
+
+          it('should not scroll the frame if not over the frame', () => {
+            const scrolled: DroppableDimension = scrollDroppable(
+              withSmallSubject,
+              // scrolling the whole client away
+              endOfSubject,
+            );
+            // subject no longer visible
+            expect(scrolled.viewport.clipped).toBe(null);
+            const target: Position = add(endOfFrame, patch(axis.line, 1));
+
+            autoScroller.onStateChange(
+              state.idle,
+              withImpact(
+                addDroppable(dragTo(target), scrolled),
+                // being super clear that we are not currently over any droppable
+                noImpact,
+              )
+            );
+            requestAnimationFrame.step();
+
+            expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+          });
         });
       });
 
