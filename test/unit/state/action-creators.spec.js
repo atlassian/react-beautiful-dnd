@@ -12,7 +12,7 @@ import {
 } from '../../../src/state/action-creators';
 import createStore from '../../../src/state/create-store';
 import { getPreset } from '../../utils/dimension';
-import * as state from '../../utils/simple-state-preset';
+import getStatePreset from '../../utils/get-simple-state-preset';
 import type {
   State,
   Position,
@@ -41,6 +41,8 @@ const liftDefaults: LiftFnArgs = {
   client: noWhere,
   isScrollAllowed: true,
 };
+
+const state = getStatePreset();
 
 const liftWithDefaults = (args?: LiftFnArgs = liftDefaults) => {
   const { id, client, windowScroll, isScrollAllowed } = args;

@@ -1,7 +1,9 @@
 // @flow
 import { getPreset } from './dimension';
 import noImpact from '../../src/state/no-impact';
+import { vertical } from '../../src/state/axis';
 import type {
+  Axis,
   State,
   DraggableDescriptor,
   DroppableDescriptor,
@@ -19,7 +21,7 @@ import type {
   DragImpact,
 } from '../../src/types';
 
-export default (axis: Axis) => {
+export default (axis?: Axis = vertical) => {
   const preset = getPreset(axis);
 
   const getDimensionState = (request: DraggableId): DimensionState => {

@@ -15,7 +15,7 @@ import setWindowScrollSize, { resetWindowScrollSize } from '../../../utils/set-w
 import setWindowScroll, { resetWindowScroll } from '../../../utils/set-window-scroll';
 import { vertical, horizontal } from '../../../../src/state/axis';
 import createAutoScroller from '../../../../src/state/auto-scroller';
-import * as state from '../../../utils/simple-state-preset';
+import getStatePreset from '../../../utils/get-simple-state-preset';
 import { getPreset } from '../../../utils/dimension';
 import { expandByPosition } from '../../../../src/state/spacing';
 import { getDraggableDimension, getDroppableDimension, scrollDroppable } from '../../../../src/state/dimension';
@@ -87,6 +87,7 @@ describe('jump auto scrolling', () => {
   [vertical, horizontal].forEach((axis: Axis) => {
     describe(`on the ${axis.direction} axis`, () => {
       const preset = getPreset(axis);
+      const state = getStatePreset(axis);
 
       describe('window scrolling', () => {
         it('should not scroll if the item is bigger than the viewport', () => {
@@ -459,7 +460,10 @@ describe('jump auto scrolling', () => {
                 setWindowScroll(windowScroll);
                 // Setting the droppable scroll so it has a small amount of available space
                 const availableDroppableScroll: Position = patch(axis.line, 1);
-                const droppableScroll: Position = subtract(maxDroppableScroll, availableDroppableScroll);
+                const droppableScroll: Position = subtract(
+                  maxDroppableScroll,
+                  availableDroppableScroll
+                );
                 const scrolled: DroppableDimension = scrollDroppable(
                   scrollable,
                   droppableScroll,

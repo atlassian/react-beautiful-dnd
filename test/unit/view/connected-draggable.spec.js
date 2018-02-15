@@ -6,7 +6,7 @@ import Draggable, { makeSelector } from '../../../src/view/draggable/connected-d
 import { getPreset } from '../../utils/dimension';
 import { negate } from '../../../src/state/position';
 import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
-import * as state from '../../utils/simple-state-preset';
+import getStatePreset from '../../utils/get-simple-state-preset';
 import {
   combine,
   withStore,
@@ -32,6 +32,7 @@ import type {
 } from '../../../src/types';
 
 const preset = getPreset();
+const state = getStatePreset();
 const move = (previous: State, offset: Position): State => {
   const clientPositions: CurrentDragPositions = {
     offset,

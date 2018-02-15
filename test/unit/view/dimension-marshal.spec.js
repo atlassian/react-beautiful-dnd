@@ -3,7 +3,7 @@ import { getPreset } from '../../utils/dimension';
 import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
 import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
 import getArea from '../../../src/state/get-area';
-import * as state from '../../utils/simple-state-preset';
+import getStatePreset from '../../utils/get-simple-state-preset';
 import type {
   Callbacks,
   DimensionMarshal,
@@ -41,6 +41,7 @@ type PopulateMarshalState = {|
 |}
 
 const preset = getPreset();
+const state = getStatePreset();
 
 const defaultArgs: PopulateMarshalState = {
   draggables: preset.draggables,

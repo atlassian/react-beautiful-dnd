@@ -2,7 +2,7 @@
 import createHookCaller from '../../../src/state/hooks/hook-caller';
 import messagePreset from '../../../src/state/hooks/message-preset';
 import type { HookCaller } from '../../../src/state/hooks/hooks-types';
-import * as state from '../../utils/simple-state-preset';
+import getStatePreset from '../../utils/get-simple-state-preset';
 import { getPreset } from '../../utils/dimension';
 import noImpact, { noMovement } from '../../../src/state/no-impact';
 import type {
@@ -21,6 +21,7 @@ import type {
 } from '../../../src/types';
 
 const preset = getPreset();
+const state = getStatePreset();
 
 const noDimensions: DimensionState = {
   request: null,

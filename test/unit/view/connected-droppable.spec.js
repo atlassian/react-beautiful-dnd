@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { mount } from 'enzyme';
 import { withStore, combine, withDimensionMarshal } from '../../utils/get-context-options';
 import Droppable, { makeSelector } from '../../../src/view/droppable/connected-droppable';
-import * as state from '../../utils/simple-state-preset';
+import getStatePreset from '../../utils/get-simple-state-preset';
 import forceUpdate from '../../utils/force-update';
 import { getPreset } from '../../utils/dimension';
 import type {
@@ -20,6 +20,7 @@ import type {
 } from '../../../src/types';
 
 const preset = getPreset();
+const state = getStatePreset();
 const clone = (value: State): State => (JSON.parse(JSON.stringify(value)) : any);
 
 const getOwnProps = (dimension: DroppableDimension): OwnProps => ({
