@@ -65,7 +65,7 @@ export default ({
     };
 
     return {
-      pageCenter: newCenter,
+      pageCenter: withDroppableDisplacement(droppable, newCenter),
       impact: newImpact,
     };
   }
