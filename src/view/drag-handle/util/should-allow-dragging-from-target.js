@@ -35,6 +35,14 @@ const isContentEditable = (parent: Element, current: ?Element): boolean => {
   return isContentEditable(parent, current.parentElement);
 };
 
+const isBooleanTag = (current: ?Element): boolean => {
+  if (current == null) {
+    return false;
+  }
+
+  return current.type === 'checkbox' || current.type === 'radio';
+};
+
 export default (event: Event, props: Props): boolean => {
   // Allowing drag with all element types
   if (props.canDragInteractiveElements) {
@@ -51,7 +59,7 @@ export default (event: Event, props: Props): boolean => {
   const isTargetInteractive: boolean =
     interactiveTagNames.indexOf(target.tagName.toLowerCase()) !== -1;
 
-  if (isTargetInteractive) {
+  if (isTargetInteractive && !isBooleanTag(target)) {
     return false;
   }
 
