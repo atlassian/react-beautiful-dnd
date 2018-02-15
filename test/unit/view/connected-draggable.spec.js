@@ -105,6 +105,7 @@ describe('Connected Draggable', () => {
         shouldAnimateDisplacement: false,
         dimension: preset.inHome1,
         direction: null,
+        draggingOver: null,
       });
     });
 
@@ -210,6 +211,7 @@ describe('Connected Draggable', () => {
           // animation now controlled by isDropAnimating flag
           shouldAnimateDisplacement: false,
           shouldAnimateDragMovement: false,
+          draggingOver: null,
         });
       });
     });
@@ -236,6 +238,7 @@ describe('Connected Draggable', () => {
           // animation now controlled by isDropAnimating flag
           shouldAnimateDisplacement: false,
           shouldAnimateDragMovement: false,
+          draggingOver: null,
         });
       });
     });
@@ -453,6 +456,7 @@ describe('Connected Draggable', () => {
           shouldAnimateDragMovement: false,
           dimension: null,
           direction: null,
+          draggingOver: null,
         });
       });
 
@@ -500,6 +504,7 @@ describe('Connected Draggable', () => {
           shouldAnimateDragMovement: false,
           dimension: null,
           direction: null,
+          draggingOver: null,
         });
       });
 
@@ -586,6 +591,7 @@ describe('Connected Draggable', () => {
           shouldAnimateDragMovement: false,
           dimension: null,
           direction: null,
+          draggingOver: null,
         });
       });
 
@@ -670,6 +676,7 @@ describe('Connected Draggable', () => {
           shouldAnimateDragMovement: false,
           dimension: null,
           direction: null,
+          draggingOver: null,
         });
       });
 
@@ -755,6 +762,7 @@ describe('Connected Draggable', () => {
             shouldAnimateDragMovement: false,
             dimension: null,
             direction: null,
+            draggingOver: null,
           });
         });
       });
@@ -841,6 +849,7 @@ describe('Connected Draggable', () => {
             shouldAnimateDragMovement: false,
             dimension: null,
             direction: null,
+            draggingOver: null,
           });
         });
       });
@@ -889,10 +898,11 @@ describe('Connected Draggable', () => {
     // so that the draggable can publish itself
     const marshal: DimensionMarshal = createDimensionMarshal({
       cancel: () => { },
-      publishDraggables: () => { },
-      publishDroppables: () => { },
+      publishDraggable: () => { },
+      publishDroppable: () => { },
       updateDroppableScroll: () => { },
       updateDroppableIsEnabled: () => { },
+      bulkPublish: () => { },
     });
     const options: Object = combine(
       withStore(),
@@ -908,6 +918,7 @@ describe('Connected Draggable', () => {
       getDimension: () => preset.home,
       watchScroll: () => { },
       unwatchScroll: () => { },
+      scroll: () => { },
     });
 
     class Person extends Component<{ name: string, provided: Provided}> {
