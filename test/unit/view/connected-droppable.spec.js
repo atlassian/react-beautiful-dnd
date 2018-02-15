@@ -2,7 +2,7 @@
 /* eslint-disable react/no-multi-comp */
 import React, { Component } from 'react';
 import { mount } from 'enzyme';
-import { withStore, combine, withDimensionMarshal } from '../../utils/get-context-options';
+import { withStore, combine, withDimensionMarshal, withStyleContext } from '../../utils/get-context-options';
 import Droppable, { makeSelector } from '../../../src/view/droppable/connected-droppable';
 import getStatePreset from '../../utils/get-simple-state-preset';
 import forceUpdate from '../../utils/force-update';
@@ -78,6 +78,7 @@ describe('Connected Droppable', () => {
         const selector: Selector = makeSelector();
         const expected: MapProps = {
           isDraggingOver: false,
+          draggingOverWith: null,
           placeholder: null,
         };
 
@@ -91,6 +92,7 @@ describe('Connected Droppable', () => {
         const selector: Selector = makeSelector();
         const expected: MapProps = {
           isDraggingOver: false,
+          draggingOverWith: null,
           placeholder: null,
         };
 
@@ -154,6 +156,7 @@ describe('Connected Droppable', () => {
 
           expect(result).toEqual({
             isDraggingOver: true,
+            draggingOverWith: preset.inHome1.descriptor.id,
             placeholder: null,
           });
         });
@@ -199,6 +202,7 @@ describe('Connected Droppable', () => {
           const selector: Selector = makeSelector();
           const expected: MapProps = {
             isDraggingOver: true,
+            draggingOverWith: preset.inHome1.descriptor.id,
             placeholder: preset.inHome1.placeholder,
           };
 
@@ -266,7 +270,6 @@ describe('Connected Droppable', () => {
             drop: {
               result: null,
               pending: {
-                trigger: 'DROP',
                 newHomeOffset: { x: 0, y: 0 },
                 impact,
                 result: {
@@ -280,6 +283,7 @@ describe('Connected Droppable', () => {
                     index: preset.inHome1.descriptor.index,
                     droppableId: preset.home.descriptor.id,
                   },
+                  reason: 'DROP',
                 },
               },
             },
@@ -343,7 +347,6 @@ describe('Connected Droppable', () => {
             drop: {
               result: null,
               pending: {
-                trigger: 'DROP',
                 newHomeOffset: { x: 0, y: 0 },
                 impact,
                 result: {
@@ -354,6 +357,7 @@ describe('Connected Droppable', () => {
                     droppableId: preset.home.descriptor.id,
                   },
                   destination: impact.destination,
+                  reason: 'DROP',
                 },
               },
             },
@@ -390,7 +394,11 @@ describe('Connected Droppable', () => {
   });
 
   describe('child render behavior', () => {
-    const contextOptions = combine(withStore(), withDimensionMarshal());
+    const contextOptions = combine(
+      withStore(),
+      withDimensionMarshal(),
+      withStyleContext(),
+    );
 
     class Person extends Component<{ name: string, provided: Provided }> {
       render() {

@@ -98,13 +98,13 @@ export const makeSelector = (): Selector => {
       isDropDisabled: boolean,
     ): MapProps => {
       if (isDropDisabled) {
-        return getMapProps(false, null);
+        return getMapProps(false, null, null);
       }
 
       if (phase === 'DRAGGING') {
         if (!drag) {
           console.error('cannot determine dragging over as there is not drag');
-          return getMapProps(false, null);
+          return getMapProps(false, null, null);
         }
 
         const isDraggingOver = getIsDraggingOver(id, drag.impact.destination);
@@ -123,7 +123,7 @@ export const makeSelector = (): Selector => {
       if (phase === 'DROP_ANIMATING') {
         if (!pending) {
           console.error('cannot determine dragging over as there is no pending result');
-          return getMapProps(false, null);
+          return getMapProps(false, null, null);
         }
 
         const isDraggingOver = getIsDraggingOver(id, pending.impact.destination);
@@ -138,7 +138,7 @@ export const makeSelector = (): Selector => {
         return getMapProps(isDraggingOver, draggingOverWith, placeholder);
       }
 
-      return getMapProps(false, null);
+      return getMapProps(false, null, null);
     },
   );
 };
