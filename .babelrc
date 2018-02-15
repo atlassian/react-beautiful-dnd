@@ -1,8 +1,15 @@
 {
   "presets": [
     "react",
-    "env",
-    "flow"
+    "flow",
+    ["env", {
+      "targets": {
+        "browsers": [
+          "> 1%",
+          "ie >= 11"
+        ]
+      }
+    }]
   ],
   "plugins": [
     "transform-runtime",
