@@ -30,20 +30,25 @@ const emptyForeignCrossAxisEnd: number = 300;
 export const makeScrollable = (droppable: DroppableDimension, amount?: number = 20) => {
   const axis: Axis = droppable.axis;
   const client: Area = droppable.client.withoutMargin;
+
+  const horizontalGrowth: number = axis === vertical ? 0 : amount;
+  const verticalGrowth: number = axis === vertical ? amount : 0;
+
   // is 10px smaller than the client on the main axis
   // this will leave 10px of scrollable area.
   // only expanding on one axis
-  const frameClient: Area = getArea({
+  const newClient: Area = getArea({
     top: client.top,
     left: client.left,
-    right: axis === vertical ? client.right : client.right - amount,
-    bottom: axis === vertical ? client.bottom - amount : client.bottom,
+    // growing the client to account for the scrollable area
+    right: client.right + horizontalGrowth,
+    bottom: client.bottom + verticalGrowth,
   });
 
   // add scroll space on the main axis
   const scrollSize = {
-    width: axis === vertical ? client.width : client.width + amount,
-    height: axis === vertical ? client.height + amount : client.height,
+    width: client.width + horizontalGrowth,
+    height: client.height + verticalGrowth,
   };
 
   return getDroppableDimension({
@@ -52,9 +57,9 @@ export const makeScrollable = (droppable: DroppableDimension, amount?: number = 
     padding,
     margin,
     windowScroll,
-    client,
+    client: newClient,
     closest: {
-      frameClient,
+      frameClient: client,
       scrollWidth: scrollSize.width,
       scrollHeight: scrollSize.height,
       scroll: { x: 0, y: 0 },

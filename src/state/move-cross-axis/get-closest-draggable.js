@@ -1,5 +1,5 @@
 // @flow
-import { add, distance } from '../position';
+import { distance } from '../position';
 import getViewport from '../../window/get-viewport';
 import { isTotallyVisible } from '../visibility/is-visible';
 import withDroppableDisplacement from '../with-droppable-displacement';
@@ -19,8 +19,6 @@ type Args = {|
   // the droppables inside the destination
   insideDestination: DraggableDimension[],
 |}
-
-const origin: Position = { x: 0, y: 0 };
 
 export default ({
   axis,
