@@ -123,6 +123,7 @@ const defaultMapProps: MapProps = {
   offset: origin,
   dimension: null,
   direction: null,
+  draggingOver: null,
 };
 
 const somethingElseDraggingMapProps: MapProps = defaultMapProps;
@@ -136,7 +137,7 @@ const draggingMapProps: MapProps = {
   // this may or may not be set during a drag
   dimension,
   direction: null,
-
+  draggingOver: null,
 };
 
 const dropAnimatingMapProps: MapProps = {
@@ -147,6 +148,7 @@ const dropAnimatingMapProps: MapProps = {
   shouldAnimateDragMovement: false,
   dimension,
   direction: null,
+  draggingOver: null,
 };
 
 const dropCompleteMapProps: MapProps = defaultMapProps;
@@ -169,16 +171,18 @@ const mountDraggable = ({
   // registering the droppable so that publishing the dimension will work correctly
   const dimensionMarshal: DimensionMarshal = createDimensionMarshal({
     cancel: () => { },
-    publishDraggables: () => { },
-    publishDroppables: () => { },
+    publishDraggable: () => { },
+    publishDroppable: () => { },
     updateDroppableScroll: () => { },
     updateDroppableIsEnabled: () => { },
+    bulkPublish: () => { },
   });
 
   dimensionMarshal.registerDroppable(droppable.descriptor, {
     getDimension: () => droppable,
     watchScroll: () => { },
     unwatchScroll: () => { },
+    scroll: () => {},
   });
 
   const wrapper: ReactWrapper = mount(
@@ -228,12 +232,14 @@ const executeOnLift = (wrapper: ReactWrapper) => ({
   selection = origin,
   center = origin,
   windowScroll = origin,
-  isScrollAllowed = false,
 }: StartDrag = {}) => {
   setWindowScroll(windowScroll);
   stubArea(center);
 
-  wrapper.find(DragHandle).props().callbacks.onLift({ client: selection, isScrollAllowed });
+  wrapper.find(DragHandle).props().callbacks.onLift({
+    client: selection,
+    autoScrollMode: 'FLUID',
+  });
 };
 
 // $ExpectError - not checking type of mock
@@ -419,13 +425,12 @@ describe('Draggable - unconnected', () => {
             center,
           };
           const windowScroll = { x: 100, y: 30 };
-          const isScrollAllowed: boolean = true;
 
-          executeOnLift(wrapper)({ selection, center, windowScroll, isScrollAllowed });
+          executeOnLift(wrapper)({ selection, center, windowScroll });
 
           // $ExpectError - mock property on lift function
           expect(dispatchProps.lift.mock.calls[0]).toEqual([
-            draggableId, initial, windowScroll, isScrollAllowed,
+            draggableId, initial, windowScroll, 'FLUID',
           ]);
         });
       });
@@ -1015,6 +1020,42 @@ describe('Draggable - unconnected', () => {
 
       const snapshot: StateSnapshot = getLastCall(myMock)[0].snapshot;
       expect(snapshot.isDragging).toBe(true);
+    });
+
+    it('should let consumers know if draggging and over a droppable', () => {
+      // $ExpectError - using spread
+      const mapProps: MapProps = {
+        ...draggingMapProps,
+        draggingOver: 'foobar',
+      };
+
+      const myMock = jest.fn();
+
+      mountDraggable({
+        mapProps,
+        WrappedComponent: getStubber(myMock),
+      });
+
+      const snapshot: StateSnapshot = getLastCall(myMock)[0].snapshot;
+      expect(snapshot.draggingOver).toBe('foobar');
+    });
+
+    it('should let consumers know if dragging and not over a droppable', () => {
+      // $ExpectError - using spread
+      const mapProps: MapProps = {
+        ...draggingMapProps,
+        draggingOver: null,
+      };
+
+      const myMock = jest.fn();
+
+      mountDraggable({
+        mapProps,
+        WrappedComponent: getStubber(myMock),
+      });
+
+      const snapshot: StateSnapshot = getLastCall(myMock)[0].snapshot;
+      expect(snapshot.draggingOver).toBe(null);
     });
   });
 
