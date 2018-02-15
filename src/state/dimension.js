@@ -2,7 +2,7 @@
 import { vertical, horizontal } from './axis';
 import getArea from './get-area';
 import { offsetByPosition, expandBySpacing } from './spacing';
-import { subtract, negate } from './position';
+import { subtract, negate, isEqual } from './position';
 import getMaxScroll from './get-max-scroll';
 import type {
   DraggableDescriptor,
@@ -99,6 +99,9 @@ export const scrollDroppable = (
   // (scrolling down pulls an item upwards)
   const scrollDisplacement: Position = negate(scrollDiff);
 
+  // Sometimes it is possible to scroll beyond the max point.
+  // This can occur when scrolling a foreign list that now has a placeholder.
+
   const closestScrollable: ClosestScrollable = {
     frame: existingScrollable.frame,
     shouldClipSubject: existingScrollable.shouldClipSubject,
@@ -109,6 +112,7 @@ export const scrollDroppable = (
         value: scrollDiff,
         displacement: scrollDisplacement,
       },
+      // TODO: rename 'softMax?'
       max: existingScrollable.scroll.max,
     },
   };

@@ -10,6 +10,7 @@ import { offsetByPosition } from '../../../src/state/spacing';
 import getArea from '../../../src/state/get-area';
 import { negate } from '../../../src/state/position';
 import getMaxScroll from '../../../src/state/get-max-scroll';
+import { getClosestScrollable } from '../../utils/dimension';
 import type {
   Area,
   Spacing,
@@ -48,13 +49,6 @@ const windowScroll: Position = {
   y: 80,
 };
 const origin: Position = { x: 0, y: 0 };
-
-const getClosestScrollable = (droppable: DroppableDimension): ClosestScrollable => {
-  if (!droppable.viewport.closestScrollable) {
-    throw new Error('Cannot get closest scrollable');
-  }
-  return droppable.viewport.closestScrollable;
-};
 
 describe('dimension', () => {
   describe('draggable dimension', () => {
@@ -379,19 +373,23 @@ describe('dimension', () => {
 
   describe('scrolling a droppable', () => {
     it('should update the frame scroll and the clipping', () => {
+      const scrollSize = {
+        scrollHeight: 500,
+        scrollWidth: 100,
+      };
       const subject = getArea({
         // 500 px high
         top: 0,
-        bottom: 500,
-        right: 100,
+        bottom: scrollSize.scrollHeight,
+        right: scrollSize.scrollWidth,
         left: 0,
       });
       const frameClient = getArea({
         // only viewing top 100px
-        top: 0,
         bottom: 100,
         // unchanged
-        right: 100,
+        top: 0,
+        right: scrollSize.scrollWidth,
         left: 0,
       });
       const frameScroll: Position = { x: 0, y: 0 };
@@ -401,8 +399,8 @@ describe('dimension', () => {
         closest: {
           frameClient,
           scroll: frameScroll,
-          scrollWidth: 500,
-          scrollHeight: 100,
+          scrollWidth: scrollSize.scrollWidth,
+          scrollHeight: scrollSize.scrollHeight,
           shouldClipSubject: true,
         },
       });
@@ -431,8 +429,8 @@ describe('dimension', () => {
           displacement: negate(newScroll),
         },
         max: getMaxScroll({
-          scrollHeight: 100,
-          scrollWidth: 500,
+          scrollWidth: scrollSize.scrollWidth,
+          scrollHeight: scrollSize.scrollHeight,
           width: frameClient.width,
           height: frameClient.height,
         }),
@@ -447,6 +445,36 @@ describe('dimension', () => {
         right: 100,
         left: 0,
       }));
+    });
+
+    it('should increase the max scroll position if the requested scroll is bigger than the max', () => {
+      const scrollable: DroppableDimension = getDroppableDimension({
+        descriptor: droppableDescriptor,
+        client: getArea({
+          top: 0,
+          left: 0,
+          right: 200,
+          bottom: 200,
+        }),
+        closest: {
+          frameClient: getArea({
+            top: 0,
+            left: 0,
+            right: 100,
+            bottom: 100,
+          }),
+          scroll: { x: 0, y: 0 },
+          scrollWidth: 200,
+          scrollHeight: 200,
+          shouldClipSubject: true,
+        },
+      });
+
+      const scrolled: DroppableDimension = scrollDroppable(scrollable, { x: 300, y: 300 });
+
+      expect(getClosestScrollable(scrolled).scroll.max).toEqual({ x: 300, y: 300 });
+      // original max
+      expect(getClosestScrollable(scrollable).scroll.max).toEqual({ x: 100, y: 100 });
     });
   });
 

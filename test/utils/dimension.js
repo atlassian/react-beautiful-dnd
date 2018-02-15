@@ -1,7 +1,5 @@
 // @flow
 import getArea from '../../src/state/get-area';
-import { patch } from '../../src/state/position';
-import { expandByPosition } from '../../src/state/spacing';
 import { noMovement } from '../../src/state/no-impact';
 import { getDroppableDimension, getDraggableDimension } from '../../src/state/dimension';
 import { vertical } from '../../src/state/axis';
@@ -11,6 +9,7 @@ import type {
   DragImpact,
   State,
   Position,
+  ClosestScrollable,
   Spacing,
   DroppableDimension,
   DraggableDimension,
@@ -87,6 +86,35 @@ export const withImpact = (state: State, impact: DragImpact) => {
       impact,
     },
   };
+};
+
+export const addDroppable = (base: State, droppable: DroppableDimension): State => ({
+  ...base,
+  dimension: {
+    ...base.dimension,
+    droppable: {
+      ...base.dimension.droppable,
+      [droppable.descriptor.id]: droppable,
+    },
+  },
+});
+
+export const addDraggable = (base: State, draggable: DraggableDimension): State => ({
+  ...base,
+  dimension: {
+    ...base.dimension,
+    draggable: {
+      ...base.dimension.draggable,
+      [draggable.descriptor.id]: draggable,
+    },
+  },
+});
+
+export const getClosestScrollable = (droppable: DroppableDimension): ClosestScrollable => {
+  if (!droppable.viewport.closestScrollable) {
+    throw new Error('Cannot get closest scrollable');
+  }
+  return droppable.viewport.closestScrollable;
 };
 
 export const getPreset = (axis?: Axis = vertical) => {

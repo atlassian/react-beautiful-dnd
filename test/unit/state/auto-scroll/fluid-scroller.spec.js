@@ -6,6 +6,7 @@ import type {
   State,
   DraggableDimension,
   DroppableDimension,
+  DragImpact,
 } from '../../../../src/types';
 import type { AutoScroller } from '../../../../src/state/auto-scroller/auto-scroller-types';
 import type { PixelThresholds } from '../../../../src/state/auto-scroller/fluid-scroller';
@@ -15,65 +16,20 @@ import getArea from '../../../../src/state/get-area';
 import setViewport, { resetViewport } from '../../../utils/set-viewport';
 import setWindowScrollSize, { resetWindowScrollSize } from '../../../utils/set-window-scroll-size';
 import setWindowScroll, { resetWindowScroll } from '../../../utils/set-window-scroll';
+import { noMovement } from '../../../../src/state/no-impact';
 import { vertical, horizontal } from '../../../../src/state/axis';
 import createAutoScroller from '../../../../src/state/auto-scroller/';
-import * as state from '../../../utils/simple-state-preset';
-import { getInitialImpact, getPreset, withImpact } from '../../../utils/dimension';
+import getStatePreset from '../../../utils/get-simple-state-preset';
+import {
+  getInitialImpact,
+  getClosestScrollable,
+  getPreset,
+  withImpact,
+  addDraggable,
+  addDroppable,
+} from '../../../utils/dimension';
 import { expandByPosition } from '../../../../src/state/spacing';
 import { getDraggableDimension, getDroppableDimension, scrollDroppable } from '../../../../src/state/dimension';
-
-const addDroppable = (base: State, droppable: DroppableDimension): State => ({
-  ...base,
-  dimension: {
-    ...base.dimension,
-    droppable: {
-      ...base.dimension.droppable,
-      [droppable.descriptor.id]: droppable,
-    },
-  },
-});
-
-const addDraggable = (base: State, draggable: DraggableDimension): State => ({
-  ...base,
-  dimension: {
-    ...base.dimension,
-    draggable: {
-      ...base.dimension.draggable,
-      [draggable.descriptor.id]: draggable,
-    },
-  },
-});
-
-const scrollableScrollSize = {
-  scrollWidth: 800,
-  scrollHeight: 800,
-};
-const frame: Area = getArea({
-  top: 0,
-  left: 0,
-  right: 600,
-  bottom: 600,
-});
-const scrollable: DroppableDimension = getDroppableDimension({
-  descriptor: {
-    id: 'drop-1',
-    type: 'TYPE',
-  },
-  client: getArea({
-    top: 0,
-    left: 0,
-    // bigger than the frame
-    right: scrollableScrollSize.scrollWidth,
-    bottom: scrollableScrollSize.scrollHeight,
-  }),
-  closest: {
-    frameClient: frame,
-    scrollWidth: scrollableScrollSize.scrollWidth,
-    scrollHeight: scrollableScrollSize.scrollHeight,
-    scroll: { x: 0, y: 0 },
-    shouldClipSubject: true,
-  },
-});
 
 const windowScrollSize = {
   scrollHeight: 2000,
@@ -108,13 +64,49 @@ describe('fluid auto scrolling', () => {
     requestAnimationFrame.reset();
   });
 
-  [vertical, horizontal].forEach((axis: Axis) => {
+  [horizontal].forEach((axis: Axis) => {
     describe(`on the ${axis.direction} axis`, () => {
       const preset = getPreset(axis);
+      const state = getStatePreset(axis);
+      const scrollableScrollSize = {
+        scrollWidth: 800,
+        scrollHeight: 800,
+      };
+      const frame: Area = getArea({
+        top: 0,
+        left: 0,
+        right: 600,
+        bottom: 600,
+      });
+
+      const scrollable: DroppableDimension = getDroppableDimension({
+        // stealing the home descriptor
+        descriptor: preset.home.descriptor,
+        direction: axis.direction,
+        client: getArea({
+          top: 0,
+          left: 0,
+          // bigger than the frame
+          right: scrollableScrollSize.scrollWidth,
+          bottom: scrollableScrollSize.scrollHeight,
+        }),
+        closest: {
+          frameClient: frame,
+          scrollWidth: scrollableScrollSize.scrollWidth,
+          scrollHeight: scrollableScrollSize.scrollHeight,
+          scroll: { x: 0, y: 0 },
+          shouldClipSubject: true,
+        },
+      });
+
       const dragTo = (
         selection: Position,
-        impact?: DragImpact = getInitialImpact(axis, preset.inHome1)
-      ): State => withImpact(state.dragging(preset.inHome1.descriptor.id, selection), impact);
+        // seeding that we are over the home droppable
+        impact?: DragImpact = getInitialImpact(axis, preset.inHome1),
+      ): State => withImpact(
+        state.dragging(preset.inHome1.descriptor.id, selection),
+        impact,
+      );
 
       describe('window scrolling', () => {
         const thresholds: PixelThresholds = getPixelThresholds(viewport, axis);
@@ -688,22 +680,102 @@ describe('fluid auto scrolling', () => {
             expect(mocks.scrollDroppable).not.toHaveBeenCalled();
           });
 
-          it('should not scroll if the droppable is unable to be scrolled', () => {
-            const target: Position = onMaxBoundary;
-            if (!scrollable.viewport.closestScrollable) {
-              throw new Error('Invalid test setup');
-            }
+          it('should allow scrolling to the end of the droppable', () => {
+            const target: Position = onEndOfFrame;
             // scrolling to max scroll point
-            const maxChange: Position = scrollable.viewport.closestScrollable.scroll.max;
+            const maxChange: Position = getClosestScrollable(scrollable).scroll.max;
             const scrolled: DroppableDimension = scrollDroppable(scrollable, maxChange);
 
             autoScroller.onStateChange(
               state.idle,
-              addDroppable(dragTo(target), scrolled)
+              addDroppable(dragTo(target), scrolled),
             );
             requestAnimationFrame.flush();
 
             expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+          });
+
+          describe('over home list', () => {
+            it('should not scroll if the droppable if moving past the end of the frame', () => {
+              const target: Position = add(onEndOfFrame, patch(axis.line, 1));
+              // scrolling to max scroll point
+              const maxChange: Position = getClosestScrollable(scrollable).scroll.max;
+              const scrolled: DroppableDimension = scrollDroppable(scrollable, maxChange);
+
+              autoScroller.onStateChange(
+                state.idle,
+                addDroppable(dragTo(target), scrolled),
+              );
+              requestAnimationFrame.flush();
+
+              expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+            });
+          });
+
+          describe('over foreign list', () => {
+            // $ExpectError - using spread
+            const foreign: DroppableDimension = {
+              ...scrollable,
+              descriptor: preset.foreign.descriptor,
+            };
+            const placeholder: Position = patch(
+              axis.line,
+              preset.inHome1.placeholder.withoutMargin[axis.size],
+            );
+            const overForeign: DragImpact = {
+              movement: noMovement,
+              direction: foreign.axis.direction,
+              destination: {
+                index: 0,
+                droppableId: foreign.descriptor.id,
+              },
+            };
+
+            it('should allow scrolling up to the end of the frame + the size of the placeholder', () => {
+              // scrolling to just before the end of the placeholder
+              // this goes beyond the usual max scroll.
+              const scroll: Position = add(
+                // usual max scroll
+                getClosestScrollable(foreign).scroll.max,
+                // with a small bit of room towards the end of the placeholder space
+                subtract(placeholder, patch(axis.line, 1))
+              );
+              const scrolledForeign: DroppableDimension = scrollDroppable(foreign, scroll);
+              const target: Position = add(onEndOfFrame, placeholder);
+              const expected: Position = patch(axis.line, config.maxScrollSpeed);
+
+              autoScroller.onStateChange(
+                state.idle,
+                addDroppable(dragTo(target, overForeign), scrolledForeign),
+              );
+              requestAnimationFrame.step();
+
+              expect(mocks.scrollDroppable).toHaveBeenCalledWith(foreign.descriptor.id, expected);
+            });
+
+            it('should not allow scrolling past the placeholder buffer', () => {
+              // already on the placeholder
+              const scroll: Position = add(
+                // usual max scroll
+                getClosestScrollable(foreign).scroll.max,
+                // with the placeholder
+                placeholder,
+              );
+              const scrolledForeign: DroppableDimension = scrollDroppable(foreign, scroll);
+              // targeting beyond the placeholder
+              const target: Position = add(
+                add(onEndOfFrame, placeholder),
+                patch(axis.line, 1),
+              );
+
+              autoScroller.onStateChange(
+                state.idle,
+                addDroppable(dragTo(target, overForeign), scrolledForeign),
+              );
+              requestAnimationFrame.flush();
+
+              expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+            });
           });
         });
 

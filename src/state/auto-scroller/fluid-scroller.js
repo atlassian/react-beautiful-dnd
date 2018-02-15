@@ -1,15 +1,13 @@
 // @flow
 import rafSchd from 'raf-schd';
-import memoizeOne from 'memoize-one';
 import getViewport from '../../window/get-viewport';
-import { add, apply, isEqual } from '../position';
+import { add, apply, isEqual, patch } from '../position';
 import isTooBigToAutoScroll from './is-too-big-to-auto-scroll';
 import getBestScrollableDroppable from './get-best-scrollable-droppable';
 import { horizontal, vertical } from '../axis';
 import {
-  canScrollDroppable,
   canScrollWindow,
-  canScrollDroppableWithPlaceholder,
+  canPartiallyScroll,
 } from './can-scroll';
 import type {
   Area,
@@ -22,7 +20,6 @@ import type {
   State,
   DraggableDimension,
   ClosestScrollable,
-  DroppableDimensionViewport,
 } from '../../types';
 
 // Values used to control how the fluid auto scroll feels
@@ -136,59 +133,49 @@ const getRequiredScroll = (container: Area, center: Position): ?Position => {
   return isEqual(required, origin) ? null : required;
 };
 
+type WithPlaceholderResult = {|
+  current: Position,
+  max: Position,
+|}
+
 const withPlaceholder = (
   droppable: DroppableDimension,
   draggable: DraggableDimension,
-): DroppableDimension => {
+): ?WithPlaceholderResult => {
+  const closest: ?ClosestScrollable = droppable.viewport.closestScrollable;
+
+  if (!closest) {
+    return null;
+  }
+
   const isOverHome: boolean = droppable.descriptor.id === draggable.descriptor.droppableId;
+  const max: Position = closest.scroll.max;
+  const current: Position = closest.scroll.current;
 
   // only need to add the buffer for foreign lists
   if (isOverHome) {
-    return droppable;
+    return { max, current };
   }
 
-  const closest: ?ClosestScrollable = droppable.viewport.closestScrollable;
+  const spaceForPlaceholder: Position = patch(
+    droppable.axis.line,
+    draggable.placeholder.withoutMargin[droppable.axis.size]
+  );
 
-  // not scrollable
-  if (!closest) {
-    return droppable;
-  }
-
-  const placeholder: Position = {
-    x: draggable.placeholder.withoutMargin.width,
-    y: draggable.placeholder.withoutMargin.height,
+  const newMax: Position = add(max, spaceForPlaceholder);
+  // because we are pulling the max forward, on subsequent updates
+  // it is possible for the current position to be greater than the max
+  // as such we need to ensure that the current position is never bigger
+  // than the max position
+  const newCurrent: Position = {
+    x: Math.min(current.x, newMax.x),
+    y: Math.min(current.y, newMax.y),
   };
 
-  const max: Position = add(closest.scroll.max, placeholder);
-  const current: Position = {
-    x: Math.min(closest.scroll.current.x, max.x),
-    y: Math.min(closest.scroll.current.y, max.y),
+  return {
+    max: newMax,
+    current: newCurrent,
   };
-
-  const withBuffer: ClosestScrollable = {
-    frame: closest.frame,
-    shouldClipSubject: closest.shouldClipSubject,
-    scroll: {
-      initial: closest.scroll.initial,
-      current,
-      max,
-      diff: closest.scroll.diff,
-    },
-  };
-
-  const viewport: DroppableDimensionViewport = {
-    closestScrollable: withBuffer,
-    subject: droppable.viewport.subject,
-    clipped: droppable.viewport.clipped,
-  };
-
-  // $ExpectError - using spread
-  const modified: DroppableDimension = {
-    ...droppable,
-    viewport,
-  };
-
-  return modified;
 };
 
 type Api = {|
@@ -208,7 +195,7 @@ export default ({
   const scheduleWindowScroll = rafSchd(scrollWindow);
   const scheduleDroppableScroll = rafSchd(scrollDroppable);
 
-  const result = (state: State): void => {
+  const scroller = (state: State): void => {
     const drag: ?DragState = state.drag;
     if (!drag) {
       console.error('Invalid drag state');
@@ -254,18 +241,36 @@ export default ({
     }
 
     const requiredFrameScroll: ?Position = getRequiredScroll(closestScrollable.frame, center);
-    const extended: DroppableDimension = withPlaceholder(droppable, draggable);
 
-    if (requiredFrameScroll && canScrollDroppable(extended, requiredFrameScroll)) {
+    if (!requiredFrameScroll) {
+      return;
+    }
+
+    // need to adjust the current and max scroll positions to account for placeholders
+    const result: ?WithPlaceholderResult = withPlaceholder(droppable, draggable);
+
+    if (!result) {
+      return;
+    }
+
+    // using the can partially scroll function directly as we want to control
+    // the current and max values without modifying the droppable
+    const canScrollDroppable: boolean = canPartiallyScroll({
+      max: result.max,
+      current: result.current,
+      change: requiredFrameScroll,
+    });
+
+    if (canScrollDroppable) {
       scheduleDroppableScroll(droppable.descriptor.id, requiredFrameScroll);
     }
   };
 
-  result.cancel = () => {
+  scroller.cancel = () => {
     scheduleWindowScroll.cancel();
     scheduleDroppableScroll.cancel();
   };
 
-  return result;
+  return scroller;
 };
 
