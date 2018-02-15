@@ -47,6 +47,12 @@ const initial: ItemType[] = [
     ),
   },
   {
+    id: 'range',
+    component: (
+      <input type="range" min="1" max="100" />
+    ),
+  },
+  {
     id: 'content editable',
     component: (
       <div

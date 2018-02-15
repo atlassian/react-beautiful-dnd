@@ -68,7 +68,7 @@ export const makeScrollable = (droppable: DroppableDimension, amount?: number = 
   });
 };
 
-export const getInitialImpact = (axis: Axis, draggable: DraggableDimension) => {
+export const getInitialImpact = (draggable: DraggableDimension, axis?: Axis = vertical) => {
   const impact: DragImpact = {
     movement: noMovement,
     direction: axis.direction,
@@ -81,16 +81,31 @@ export const getInitialImpact = (axis: Axis, draggable: DraggableDimension) => {
 };
 
 export const withImpact = (state: State, impact: DragImpact) => {
-  if (!state.drag) {
-    throw new Error('invalid state');
+  // while dragging
+  if (state.drag) {
+    return {
+      ...state,
+      drag: {
+        ...state.drag,
+        impact,
+      },
+    };
   }
-  return {
-    ...state,
-    drag: {
-      ...state.drag,
-      impact,
-    },
-  };
+  // while drop animating
+  if (state.drop && state.drop.pending) {
+    return {
+      ...state,
+      drop: {
+        ...state.drop,
+        pending: {
+          ...state.drop.pending,
+          impact,
+        },
+      },
+    };
+  }
+
+  throw new Error('unable to apply impact');
 };
 
 export const addDroppable = (base: State, droppable: DroppableDimension): State => ({

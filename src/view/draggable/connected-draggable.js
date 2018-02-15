@@ -141,6 +141,8 @@ export const makeSelector = (): Selector => {
 
     const draggingOver: ?DroppableId = pending.result.destination ?
       pending.result.destination.droppableId : null;
+    const direction: ?Direction = pending.impact.direction ?
+      pending.impact.direction : null;
 
     // not memoized as it is the only execution
     return {
@@ -150,8 +152,7 @@ export const makeSelector = (): Selector => {
       // still need to provide the dimension for the placeholder
       dimension: state.dimension.draggable[ownProps.draggableId],
       draggingOver,
-      // direction no longer needed as drag handle is unbound
-      direction: null,
+      direction,
       // animation will be controlled by the isDropAnimating flag
       shouldAnimateDragMovement: false,
       // not relevant,

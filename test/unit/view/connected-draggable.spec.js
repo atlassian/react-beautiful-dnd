@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import { mount } from 'enzyme';
 import Draggable, { makeSelector } from '../../../src/view/draggable/connected-draggable';
-import { getPreset } from '../../utils/dimension';
+import { getPreset, getInitialImpact, withImpact } from '../../utils/dimension';
 import { negate } from '../../../src/state/position';
 import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
 import getStatePreset from '../../utils/get-simple-state-preset';
@@ -29,6 +29,7 @@ import type {
   CurrentDragPositions,
   DragImpact,
   DraggableDimension,
+  DraggableLocation,
 } from '../../../src/types';
 
 const preset = getPreset();
@@ -89,156 +90,304 @@ describe('Connected Draggable', () => {
       expect(console.error).toHaveBeenCalled();
     });
 
-    it('should move the dragging item to the current offset', () => {
-      const selector: Selector = makeSelector();
-
-      const result: MapProps = selector(
-        move(state.dragging(), { x: 20, y: 30 }),
-        ownProps
-      );
-
-      expect(result).toEqual({
-        isDropAnimating: false,
-        isDragging: true,
-        offset: { x: 20, y: 30 },
-        shouldAnimateDragMovement: false,
-        shouldAnimateDisplacement: false,
-        dimension: preset.inHome1,
-        direction: null,
-        draggingOver: null,
-      });
-    });
-
-    it('should control whether drag movement is allowed based the current state', () => {
-      const selector: Selector = makeSelector();
-      const previous: State = move(state.dragging(), { x: 20, y: 30 });
-
-      // drag animation is allowed
-      const allowed: State = {
-        ...previous,
-        drag: {
-          ...previous.drag,
-          current: {
-            // $ExpectError - not checking for null
-            ...previous.drag.current,
-            shouldAnimate: true,
-          },
-        },
-      };
-      expect(selector(allowed, ownProps).shouldAnimateDragMovement).toBe(true);
-
-      // drag animation is not allowed
-      const notAllowed: State = {
-        ...previous,
-        drag: {
-          ...previous.drag,
-          current: {
-            // $ExpectError - not checking for null
-            ...previous.drag.current,
-            shouldAnimate: false,
-          },
-        },
-      };
-      expect(selector(notAllowed, ownProps).shouldAnimateDragMovement).toBe(false);
-    });
-
-    it('should not break memoization on multiple calls to the same offset', () => {
-      const selector: Selector = makeSelector();
-
-      const result1: MapProps = selector(
-        move(state.dragging(), { x: 100, y: 200 }),
-        ownProps
-      );
-      const result2: MapProps = selector(
-        move(state.dragging(), { x: 100, y: 200 }),
-        ownProps
-      );
-
-      expect(result1).toBe(result2);
-      expect(selector.recomputations()).toBe(1);
-    });
-
-    it('should break memoization on multiple calls if moving to a new position', () => {
-      const selector: Selector = makeSelector();
-
-      const result1: MapProps = selector(
-        move(state.dragging(), { x: 100, y: 200 }),
-        ownProps
-      );
-      const result2: MapProps = selector(
-        move({ ...state.dragging() }, { x: 101, y: 200 }),
-        ownProps
-      );
-
-      expect(result1).not.toBe(result2);
-      expect(result1).not.toEqual(result2);
-      expect(selector.recomputations()).toBe(2);
-    });
-
-    describe('drop animating', () => {
-      it('should log an error when there is invalid drag state', () => {
-        const invalid: State = {
-          ...state.dropAnimating(),
-          drop: null,
-        };
+    describe('is not over a droppable', () => {
+      it('should move the dragging item to the current offset', () => {
         const selector: Selector = makeSelector();
-        const defaultMapProps: MapProps = selector(state.idle, ownProps);
-
-        const result: MapProps = selector(invalid, ownProps);
-
-        expect(result).toBe(defaultMapProps);
-        expect(console.error).toHaveBeenCalled();
-      });
-
-      it('should move the draggable to the new offset', () => {
-        const selector: Selector = makeSelector();
-        const current: State = state.dropAnimating();
 
         const result: MapProps = selector(
-          current,
-          ownProps,
+          move(state.dragging(), { x: 20, y: 30 }),
+          ownProps
         );
 
         expect(result).toEqual({
-          // no longer dragging
-          isDragging: false,
-          // is now drop animating
-          isDropAnimating: true,
-          // $ExpectError - not testing for null
-          offset: current.drop.pending.newHomeOffset,
+          isDropAnimating: false,
+          isDragging: true,
+          offset: { x: 20, y: 30 },
+          shouldAnimateDragMovement: false,
+          shouldAnimateDisplacement: false,
           dimension: preset.inHome1,
           direction: null,
-          // animation now controlled by isDropAnimating flag
-          shouldAnimateDisplacement: false,
-          shouldAnimateDragMovement: false,
           draggingOver: null,
+        });
+      });
+
+      it('should control whether drag movement is allowed based the current state', () => {
+        const selector: Selector = makeSelector();
+        const previous: State = move(state.dragging(), { x: 20, y: 30 });
+
+        // drag animation is allowed
+        const allowed: State = {
+          ...previous,
+          drag: {
+            ...previous.drag,
+            current: {
+              // $ExpectError - not checking for null
+              ...previous.drag.current,
+              shouldAnimate: true,
+            },
+          },
+        };
+        expect(selector(allowed, ownProps).shouldAnimateDragMovement).toBe(true);
+
+        // drag animation is not allowed
+        const notAllowed: State = {
+          ...previous,
+          drag: {
+            ...previous.drag,
+            current: {
+              // $ExpectError - not checking for null
+              ...previous.drag.current,
+              shouldAnimate: false,
+            },
+          },
+        };
+        expect(selector(notAllowed, ownProps).shouldAnimateDragMovement).toBe(false);
+      });
+
+      it('should not break memoization on multiple calls to the same offset', () => {
+        const selector: Selector = makeSelector();
+
+        const result1: MapProps = selector(
+          move(state.dragging(), { x: 100, y: 200 }),
+          ownProps
+        );
+        const result2: MapProps = selector(
+          move(state.dragging(), { x: 100, y: 200 }),
+          ownProps
+        );
+
+        expect(result1).toBe(result2);
+        expect(selector.recomputations()).toBe(1);
+      });
+
+      it('should break memoization on multiple calls if moving to a new position', () => {
+        const selector: Selector = makeSelector();
+
+        const result1: MapProps = selector(
+          move(state.dragging(), { x: 100, y: 200 }),
+          ownProps
+        );
+        const result2: MapProps = selector(
+          move({ ...state.dragging() }, { x: 101, y: 200 }),
+          ownProps
+        );
+
+        expect(result1).not.toBe(result2);
+        expect(result1).not.toEqual(result2);
+        expect(selector.recomputations()).toBe(2);
+      });
+
+      describe('drop animating', () => {
+        it('should log an error when there is invalid drag state', () => {
+          const invalid: State = {
+            ...state.dropAnimating(),
+            drop: null,
+          };
+          const selector: Selector = makeSelector();
+          const defaultMapProps: MapProps = selector(state.idle, ownProps);
+
+          const result: MapProps = selector(invalid, ownProps);
+
+          expect(result).toBe(defaultMapProps);
+          expect(console.error).toHaveBeenCalled();
+        });
+
+        it('should move the draggable to the new offset', () => {
+          const selector: Selector = makeSelector();
+          const current: State = state.dropAnimating();
+
+          const result: MapProps = selector(
+            current,
+            ownProps,
+          );
+
+          expect(result).toEqual({
+            // no longer dragging
+            isDragging: false,
+            // is now drop animating
+            isDropAnimating: true,
+            // $ExpectError - not testing for null
+            offset: current.drop.pending.newHomeOffset,
+            dimension: preset.inHome1,
+            direction: null,
+            // animation now controlled by isDropAnimating flag
+            shouldAnimateDisplacement: false,
+            shouldAnimateDragMovement: false,
+            draggingOver: null,
+          });
+        });
+      });
+
+      describe('user cancel', () => {
+        it('should move the draggable to the new offset', () => {
+          const selector: Selector = makeSelector();
+          const current: State = state.userCancel();
+
+          const result: MapProps = selector(
+            current,
+            ownProps,
+          );
+
+          expect(result).toEqual({
+            // no longer dragging
+            isDragging: false,
+            // is now drop animating
+            isDropAnimating: true,
+            // $ExpectError - not testing for null
+            offset: current.drop.pending.newHomeOffset,
+            dimension: preset.inHome1,
+            direction: null,
+            // animation now controlled by isDropAnimating flag
+            shouldAnimateDisplacement: false,
+            shouldAnimateDragMovement: false,
+            draggingOver: null,
+          });
         });
       });
     });
 
-    describe('user cancel', () => {
-      it('should move the draggable to the new offset', () => {
+    describe('is over a droppable (test subset)', () => {
+      it('should move the dragging item to the current offset', () => {
         const selector: Selector = makeSelector();
-        const current: State = state.userCancel();
 
         const result: MapProps = selector(
-          current,
-          ownProps,
+          withImpact(
+            move(state.dragging(), { x: 20, y: 30 }),
+            getInitialImpact(preset.inHome1),
+          ),
+          ownProps
         );
 
         expect(result).toEqual({
-          // no longer dragging
-          isDragging: false,
-          // is now drop animating
-          isDropAnimating: true,
-          // $ExpectError - not testing for null
-          offset: current.drop.pending.newHomeOffset,
-          dimension: preset.inHome1,
-          direction: null,
-          // animation now controlled by isDropAnimating flag
-          shouldAnimateDisplacement: false,
+          isDropAnimating: false,
+          isDragging: true,
+          offset: { x: 20, y: 30 },
           shouldAnimateDragMovement: false,
-          draggingOver: null,
+          shouldAnimateDisplacement: false,
+          dimension: preset.inHome1,
+          direction: preset.home.axis.direction,
+          draggingOver: preset.home.descriptor.id,
+        });
+      });
+
+      it('should not break memoization on multiple calls to the same offset', () => {
+        const selector: Selector = makeSelector();
+
+        const result1: MapProps = selector(
+          withImpact(
+            move(state.dragging(), { x: 100, y: 200 }),
+            getInitialImpact(preset.inHome1),
+          ),
+          ownProps
+        );
+        const result2: MapProps = selector(
+          withImpact(
+            move(state.dragging(), { x: 100, y: 200 }),
+            getInitialImpact(preset.inHome1),
+          ),
+          ownProps
+        );
+
+        expect(result1).toBe(result2);
+        expect(selector.recomputations()).toBe(1);
+      });
+
+      it('should break memoization on multiple calls if moving to a new position', () => {
+        const selector: Selector = makeSelector();
+
+        const result1: MapProps = selector(
+          withImpact(
+            move(state.dragging(), { x: 100, y: 200 }),
+            getInitialImpact(preset.inHome1)
+          ),
+          ownProps
+        );
+        const result2: MapProps = selector(
+          withImpact(
+            move({ ...state.dragging() }, { x: 101, y: 200 }),
+            getInitialImpact(preset.inHome1),
+          ),
+          ownProps
+        );
+
+        expect(result1).not.toBe(result2);
+        expect(result1).not.toEqual(result2);
+        expect(selector.recomputations()).toBe(2);
+      });
+
+      describe('drop animating', () => {
+        it('should move the draggable to the new offset', () => {
+          const selector: Selector = makeSelector();
+          const destination: DraggableLocation = {
+            index: preset.inHome1.descriptor.index,
+            droppableId: preset.inHome1.descriptor.droppableId,
+          };
+          const current: State = withImpact(
+            state.dropAnimating(),
+            getInitialImpact(preset.inHome1)
+          );
+          if (!current.drop || !current.drop.pending) {
+            throw new Error('invalid test setup');
+          }
+          current.drop.pending.result.destination = destination;
+
+          const result: MapProps = selector(
+            current,
+            ownProps,
+          );
+
+          expect(result).toEqual({
+            // no longer dragging
+            isDragging: false,
+            // is now drop animating
+            isDropAnimating: true,
+            // $ExpectError - not testing for null
+            offset: current.drop.pending.newHomeOffset,
+            dimension: preset.inHome1,
+            direction: preset.home.axis.direction,
+            draggingOver: preset.home.descriptor.id,
+            // animation now controlled by isDropAnimating flag
+            shouldAnimateDisplacement: false,
+            shouldAnimateDragMovement: false,
+          });
+        });
+      });
+
+      describe('user cancel', () => {
+        it('should move the draggable to the new offset', () => {
+          const selector: Selector = makeSelector()
+          const destination: DraggableLocation = {
+            index: preset.inHome1.descriptor.index,
+            droppableId: preset.inHome1.descriptor.droppableId,
+          };
+          const current: State = withImpact(
+            state.userCancel(),
+            getInitialImpact(preset.inHome1)
+          );
+          if (!current.drop || !current.drop.pending) {
+            throw new Error('invalid test setup');
+          }
+          current.drop.pending.result.destination = destination;
+
+          const result: MapProps = selector(
+            current,
+            ownProps,
+          );
+
+          expect(result).toEqual({
+            // no longer dragging
+            isDragging: false,
+            // is now drop animating
+            isDropAnimating: true,
+            // $ExpectError - not testing for null
+            offset: current.drop.pending.newHomeOffset,
+            dimension: preset.inHome1,
+            direction: preset.home.axis.direction,
+            draggingOver: preset.home.descriptor.id,
+            // animation now controlled by isDropAnimating flag
+            shouldAnimateDisplacement: false,
+            shouldAnimateDragMovement: false,
+          });
         });
       });
     });
