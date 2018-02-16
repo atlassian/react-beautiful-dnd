@@ -220,6 +220,32 @@ describe('drag handle', () => {
     expect(myMock.mock.calls[0][0]['data-react-beautiful-dnd-drag-handle']).toEqual(basicContext[styleContextKey]);
   });
 
+  it('should apply a default aria roledescription containing lift instructions', () => {
+    const myMock = jest.fn();
+    myMock.mockReturnValue(<div>hello world</div>);
+
+    mount(
+      <DragHandle
+        draggableId={draggableId}
+        callbacks={callbacks}
+        isEnabled
+        isDragging={false}
+        direction={null}
+        getDraggableRef={() => fakeDraggableRef}
+        canDragInteractiveElements={false}
+      >
+        {(dragHandleProps: ?DragHandleProps) => (
+          myMock(dragHandleProps)
+        )}
+      </DragHandle>,
+      { context: basicContext }
+    );
+
+    // $ExpectError - using lots of accessors
+    expect(myMock.mock.calls[0][0]['aria-roledescription'])
+      .toBe('Draggable item. Press space bar to lift');
+  });
+
   describe('mouse dragging', () => {
     describe('initiation', () => {
       it('should start a drag if there was sufficient mouse movement in any direction', () => {
@@ -253,7 +279,7 @@ describe('drag handle', () => {
           windowMouseMove(point);
 
           expect(customCallbacks.onLift)
-            .toHaveBeenCalledWith({ client: point, isScrollAllowed: true });
+            .toHaveBeenCalledWith({ client: point, autoScrollMode: 'FLUID' });
 
           customWrapper.unmount();
         });
@@ -1166,7 +1192,7 @@ describe('drag handle', () => {
 
         expect(callbacks.onLift).toHaveBeenCalledWith({
           client: fakeCenter,
-          isScrollAllowed: false,
+          autoScrollMode: 'JUMP',
         });
       });
 
@@ -1261,6 +1287,39 @@ describe('drag handle', () => {
         expect(callbacksCalled(customCallbacks)({
           onLift: 1,
         })).toBe(true);
+      });
+
+      it('should instantly fire a scroll action when the window scrolls', () => {
+        // lift
+        pressSpacebar(wrapper);
+        // scroll event
+        window.dispatchEvent(new Event('scroll'));
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onWindowScroll: 1,
+        })).toBe(true);
+      });
+
+      it.only('should prevent using keyboard keys that modify scroll', () => {
+        const keys: number[] = [
+          keyCodes.pageUp,
+          keyCodes.pageDown,
+          keyCodes.home,
+          keyCodes.end,
+        ];
+
+        // lift
+        pressSpacebar(wrapper);
+
+        keys.forEach((keyCode: number) => {
+          const trigger = dispatchWindowKeyDownEvent.bind(null, keyCode);
+
+          const event: KeyboardEvent = trigger();
+
+          expect(event.defaultPrevented).toBe(true);
+          expect(callbacks.onWindowScroll).not.toHaveBeenCalled();
+        });
       });
 
       it('should stop dragging if the keyboard is used after a lift and a direction is not provided', () => {
@@ -1557,28 +1616,8 @@ describe('drag handle', () => {
         });
       });
 
-      it('should cancel when the window is resized', () => {
-        // lift
-        pressSpacebar(wrapper);
-        // resize event
-        window.dispatchEvent(new Event('resize'));
-
-        expect(callbacksCalled(callbacks)({
-          onLift: 1,
-          onCancel: 1,
-        })).toBe(true);
-      });
-
-      it('should cancel if the window is scrolled', () => {
-        // lift
-        pressSpacebar(wrapper);
-        // scroll event
-        window.dispatchEvent(new Event('scroll'));
-
-        expect(callbacksCalled(callbacks)({
-          onLift: 1,
-          onCancel: 1,
-        })).toBe(true);
+      it.skip('should cancel on a page visibility change', () => {
+        // TODO
       });
 
       it('should not do anything if there is nothing dragging', () => {
@@ -1737,7 +1776,10 @@ describe('drag handle', () => {
         touchStart(wrapper, client);
         jest.runTimersToTime(timeForLongPress);
 
-        expect(callbacks.onLift).toHaveBeenCalledWith({ client, isScrollAllowed: false });
+        expect(callbacks.onLift).toHaveBeenCalledWith({
+          client,
+          autoScrollMode: 'FLUID',
+        });
       });
 
       it('should not fire a second lift after movement that would have otherwise have started a drag', () => {
@@ -1935,6 +1977,25 @@ describe('drag handle', () => {
 
         expect(event.defaultPrevented).toBe(true);
       });
+
+      it('should schedule a window scroll move on window scroll', () => {
+        start();
+
+        dispatchWindowEvent('scroll');
+        dispatchWindowEvent('scroll');
+        dispatchWindowEvent('scroll');
+
+        // not called initially
+        expect(callbacks.onWindowScroll).not.toHaveBeenCalled();
+
+        // called after a requestAnimationFrame
+        requestAnimationFrame.step();
+        expect(callbacks.onWindowScroll).toHaveBeenCalledTimes(1);
+
+        // should not add any additional calls
+        requestAnimationFrame.flush();
+        expect(callbacks.onWindowScroll).toHaveBeenCalledTimes(1);
+      });
     });
 
     describe('dropping', () => {
@@ -2045,15 +2106,6 @@ describe('drag handle', () => {
 
       it('should cancel the drag after a orientation change', () => {
         dispatchWindowEvent('orientationchange');
-
-        expect(callbacksCalled(callbacks)({
-          onLift: 1,
-          onCancel: 1,
-        })).toBe(true);
-      });
-
-      it('should cancel the drag after a window scroll', () => {
-        dispatchWindowEvent('scroll');
 
         expect(callbacksCalled(callbacks)({
           onLift: 1,
@@ -2366,9 +2418,6 @@ describe('drag handle', () => {
 
     const controls: Control[] = [mouse, keyboard, touch];
 
-    const getAria = (wrap?: ReactWrapper = wrapper): boolean =>
-      Boolean(wrap.find(Child).props().dragHandleProps['aria-grabbed']);
-
     beforeEach(() => {
       jest.useFakeTimers();
     });
@@ -2379,37 +2428,6 @@ describe('drag handle', () => {
 
     controls.forEach((control: Control) => {
       describe(`control: ${control.name}`, () => {
-        describe('aria', () => {
-          it('should not set the aria attribute of dragging if not dragging', () => {
-            expect(getAria()).toBe(false);
-          });
-
-          it('should not set the aria attribute of dragging if a drag is pending', () => {
-            control.preLift();
-            forceUpdate(wrapper);
-
-            expect(getAria()).toBe(false);
-          });
-
-          it('should set the aria attribute of dragging if a drag is occurring', () => {
-            control.preLift();
-            control.lift();
-            forceUpdate(wrapper);
-
-            expect(getAria()).toBe(true);
-          });
-
-          it('should set the aria attribute if drag is finished', () => {
-            control.preLift();
-            control.lift();
-            forceUpdate(wrapper);
-            control.end();
-            forceUpdate(wrapper);
-
-            expect(getAria()).toBe(false);
-          });
-        });
-
         describe('window bindings', () => {
           it('should unbind all window listeners when drag ends', () => {
             jest.spyOn(window, 'addEventListener');

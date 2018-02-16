@@ -355,7 +355,7 @@ describe('Connected Draggable', () => {
 
       describe('user cancel', () => {
         it('should move the draggable to the new offset', () => {
-          const selector: Selector = makeSelector()
+          const selector: Selector = makeSelector();
           const destination: DraggableLocation = {
             index: preset.inHome1.descriptor.index,
             droppableId: preset.inHome1.descriptor.droppableId,
