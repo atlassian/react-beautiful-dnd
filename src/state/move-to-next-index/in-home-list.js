@@ -90,7 +90,7 @@ export default ({
   const displaced: Displacement[] = (() => {
     if (isMovingTowardStart) {
       return withFirstRemoved({
-        distanceMoving: absolute(distanceWithScroll),
+        distanceMoving: distanceWithScroll,
         previousImpact,
         droppable,
         draggables,

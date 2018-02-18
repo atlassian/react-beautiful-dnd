@@ -440,21 +440,6 @@ describe('move to next index', () => {
                 expect(result.impact).toEqual(expected);
               });
             });
-
-            describe('forced visibility displacement', () => {
-              // TODO ><
-              it('should force the displacement of the closest item to be visible', () => {
-
-              });
-
-              it('should use a previous displacement if it was visible', () => {
-
-              });
-
-              it('should consider any change in the droppables scroll', () => {
-
-              });
-            });
           });
         });
 
@@ -1467,6 +1452,20 @@ describe('move to next index', () => {
               expect(result.impact).toEqual(expected);
             });
           });
+        });
+      });
+
+      describe('forced visibility displacement', () => {
+        it('should force the displacement of the closest item to be visible', () => {
+
+        });
+
+        it('should use a previous displacement if it was visible', () => {
+
+        });
+
+        it('should consider any change in the droppables scroll', () => {
+
         });
       });
     });

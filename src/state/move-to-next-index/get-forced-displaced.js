@@ -82,13 +82,15 @@ export const withFirstRemoved = ({
   const removed: Displacement[] = last.slice(1, last.length);
 
   const axis: Axis = droppable.axis;
-  let buffer: number = distanceMoving[axis.line];
+  let buffer: number = Math.abs(distanceMoving[axis.line]);
 
   const withUpdatedVisibility: Displacement[] =
     removed.map((displacement: Displacement): Displacement => {
       // we need to ensure that the previous items up to the size of the
       // dragging item has a visible movement. This is because a movement
-      // can result in a combination of scrolls that have this effect
+      // can result in a combination of scrolls that have this effect.
+      // Technicall we could just do this when the destination is not visible - but
+      // there is no harm doing it all the time for simplicity
       if (buffer > 0) {
         const current: DraggableDimension = draggables[displacement.draggableId];
         const size: number = current.page.withMargin[axis.size];
