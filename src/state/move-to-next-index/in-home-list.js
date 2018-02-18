@@ -1,12 +1,12 @@
 // @flow
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { patch, subtract, negate } from '../position';
+import { patch, subtract, absolute } from '../position';
 import withDroppableDisplacement from '../with-droppable-displacement';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 import getViewport from '../../window/get-viewport';
 // import getScrollJumpResult from './get-scroll-jump-result';
 import moveToEdge from '../move-to-edge';
-import getDisplacement from '../get-displacement';
+import { withFirstAdded, withFirstRemoved } from './get-forced-displaced';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import type {
@@ -83,41 +83,32 @@ export default ({
     destinationAxis: droppable.axis,
   });
 
-  // As this is a forced displacement we always want it to be visible and animate
-  const destinationDisplacement: Displacement = {
-    draggableId: destination.descriptor.id,
-    isVisible: true,
-    shouldAnimate: true,
-  };
+  // The full distance required to get from the previous page center to the new page center
+  const distance: Position = subtract(newPageCenter, previousPageCenter);
+  const distanceWithScroll: Position = withDroppableDisplacement(droppable, distance);
 
-  const modified: Displacement[] = (isMovingTowardStart ?
-    // remove the most recently impacted
-    previousImpact.movement.displaced.slice(1, previousImpact.movement.displaced.length) :
-    // add the destination as the most recently impacted
-    [destinationDisplacement, ...previousImpact.movement.displaced]);
-
-  // update impact with visibility - stops redundant work!
-  const displaced: Displacement[] = modified
-    .map((displacement: Displacement): Displacement => {
-      // we have already calculated the displacement for this item
-      if (displacement === destinationDisplacement) {
-        return displacement;
-      }
-
-      const updated: Displacement = getDisplacement({
-        draggable: draggables[displacement.draggableId],
-        destination: droppable,
+  const displaced: Displacement[] = (() => {
+    if (isMovingTowardStart) {
+      return withFirstRemoved({
+        distanceMoving: absolute(distanceWithScroll),
         previousImpact,
+        droppable,
+        draggables,
         viewport,
       });
-
-      return updated;
+    }
+    return withFirstAdded({
+      add: destination.descriptor.id,
+      previousImpact,
+      droppable,
+      draggables,
+      viewport,
     });
+  })();
 
   const newImpact: DragImpact = {
     movement: {
       displaced,
-      // The amount of movement will always be the size of the dragging item
       amount: patch(axis.line, draggable.page.withMargin[axis.size]),
       isBeyondStartPosition: proposedIndex > startIndex,
     },
@@ -143,13 +134,9 @@ export default ({
     };
   }
 
-  // The full distance required to get from the previous page center to the new page center
-  const requiredDistance: Position = subtract(newPageCenter, previousPageCenter);
-  const requiredScroll: Position = withDroppableDisplacement(droppable, requiredDistance);
-
   return {
     pageCenter: previousPageCenter,
     impact: newImpact,
-    scrollJumpRequest: requiredScroll,
+    scrollJumpRequest: distanceWithScroll,
   };
 };
