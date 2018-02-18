@@ -1,16 +1,20 @@
 // @flow
 import type { Props } from '../drag-handle-types';
 
-export const interactiveTagNames: string[] = [
-  'input',
-  'button',
-  'textarea',
-  'select',
-  'option',
-  'optgroup',
-  'video',
-  'audio',
-];
+export type TagNameMap = {
+  [tagName: string]: true
+}
+
+export const interactiveTagNames: TagNameMap = {
+  input: true,
+  button: true,
+  textarea: true,
+  select: true,
+  option: true,
+  optgroup: true,
+  video: true,
+  audio: true,
+};
 
 const isContentEditable = (parent: Element, current: ?Element): boolean => {
   if (current == null) {
@@ -48,8 +52,7 @@ export default (event: Event, props: Props): boolean => {
     return true;
   }
 
-  const isTargetInteractive: boolean =
-    interactiveTagNames.indexOf(target.tagName.toLowerCase()) !== -1;
+  const isTargetInteractive: boolean = Boolean(interactiveTagNames[target.tagName.toLowerCase()]);
 
   if (isTargetInteractive) {
     return false;

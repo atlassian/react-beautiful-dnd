@@ -20,10 +20,10 @@ import type { Position, DraggableId } from '../../../src/types';
 import * as keyCodes from '../../../src/view/key-codes';
 import getWindowScroll from '../../../src/window/get-window-scroll';
 import setWindowScroll from '../../utils/set-window-scroll';
-import forceUpdate from '../../utils/force-update';
 import getArea from '../../../src/state/get-area';
 import { timeForLongPress, forcePressThreshold } from '../../../src/view/drag-handle/sensor/create-touch-sensor';
 import { interactiveTagNames } from '../../../src/view/drag-handle/util/should-allow-dragging-from-target';
+import type { TagNameMap } from '../../../src/view/drag-handle/util/should-allow-dragging-from-target';
 import { styleContextKey, canLiftContextKey } from '../../../src/view/context-keys';
 
 const primaryButton: number = 0;
@@ -1301,7 +1301,7 @@ describe('drag handle', () => {
         })).toBe(true);
       });
 
-      it.only('should prevent using keyboard keys that modify scroll', () => {
+      it('should prevent using keyboard keys that modify scroll', () => {
         const keys: number[] = [
           keyCodes.pageUp,
           keyCodes.pageDown,
@@ -1313,11 +1313,12 @@ describe('drag handle', () => {
         pressSpacebar(wrapper);
 
         keys.forEach((keyCode: number) => {
-          const trigger = dispatchWindowKeyDownEvent.bind(null, keyCode);
+          const mockEvent: MockEvent = createMockEvent();
+          const trigger = withKeyboard(keyCode);
 
-          const event: KeyboardEvent = trigger();
+          trigger(wrapper, mockEvent);
 
-          expect(event.defaultPrevented).toBe(true);
+          expect(wasEventStopped(mockEvent)).toBe(true);
           expect(callbacks.onWindowScroll).not.toHaveBeenCalled();
         });
       });
@@ -2459,9 +2460,9 @@ describe('drag handle', () => {
         });
 
         describe('interactive element interactions', () => {
-          const mixedCase = (items: string[]): string[] => [
-            ...items.map((i: string): string => i.toLowerCase()),
-            ...items.map((i: string): string => i.toUpperCase()),
+          const mixedCase = (map: TagNameMap): string[] => [
+            ...Object.keys(map).map((tagName: string) => tagName.toLowerCase()),
+            ...Object.keys(map).map((tagName: string) => tagName.toUpperCase()),
           ];
 
           it('should not start a drag if the target is an interactive element', () => {
@@ -2502,9 +2503,12 @@ describe('drag handle', () => {
           });
 
           it('should start a drag if the target is not an interactive element', () => {
-            const nonInteractiveTagNames: string[] = [
-              'a', 'div', 'span', 'header',
-            ];
+            const nonInteractiveTagNames: TagNameMap = {
+              a: true,
+              div: true,
+              span: true,
+              header: true,
+            };
 
             // counting call count between loops
             let count: number = 0;
