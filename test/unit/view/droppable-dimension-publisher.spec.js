@@ -97,6 +97,7 @@ const getMarshalStub = (): DimensionMarshal => ({
   updateDroppableScroll: jest.fn(),
   updateDroppableIsEnabled: jest.fn(),
   onPhaseChange: jest.fn(),
+  scrollDroppable: jest.fn(),
 });
 
 describe('DraggableDimensionPublisher', () => {

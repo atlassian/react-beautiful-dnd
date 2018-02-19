@@ -249,7 +249,13 @@ describe('is partially visible', () => {
             // stretches out past frame
             bottom: 600,
           }),
-          frameClient: getArea(frame),
+          closest: {
+            frameClient: getArea(frame),
+            scrollHeight: 600,
+            scrollWidth: getArea(frame).width,
+            scroll: { x: 0, y: 0 },
+            shouldClipSubject: true,
+          },
         });
         const inSubjectOutsideFrame: Spacing = {
           ...frame,
