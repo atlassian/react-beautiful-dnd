@@ -20,7 +20,7 @@ const onDragStart = (start: DragStart): string => `
 
 const onDragUpdate = (update: DragUpdate): string => {
   if (!update.destination) {
-    return 'You are currently not dragging over any droppable area';
+    return 'You are currently not dragging over a droppable area';
   }
 
   // Moving in the same list

@@ -84,26 +84,24 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     marshal.updateDroppableScroll(this.publishedDescriptor.id, newScroll);
   });
 
+  // TODO: when keyboard dragging we probably want this to be instant!
   scheduleScrollUpdate = rafSchedule(() => {
     // Capturing the scroll now so that it is the latest value
     const offset: Position = this.getClosestScroll();
     this.memoizedUpdateScroll(offset.x, offset.y);
   });
-  // scheduleScrollUpdate = () => {
-  //   // Capturing the scroll now so that it is the latest value
-  //   const offset: Position = this.getClosestScroll();
-  //   this.memoizedUpdateScroll(offset.x, offset.y);
-  // };
 
   onClosestScroll = () => this.scheduleScrollUpdate();
 
   scroll = (change: Position) => {
     if (this.closestScrollable == null) {
+      console.error('Cannot scroll a droppable with no closest scrollable');
       return;
     }
 
     if (!this.isWatchingScroll) {
-      console.warn('Updating Droppable scroll while not watching for updates');
+      console.error('Updating Droppable scroll while not watching for updates');
+      return;
     }
 
     this.closestScrollable.scrollTop += change.y;

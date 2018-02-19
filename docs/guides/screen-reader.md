@@ -10,6 +10,10 @@ This guide has been written to assist you in creating your own messaging that is
 
 For the default messages we have gone for a friendly tone. We have also chosen to use personal language; preferring phases such as 'You have dropped the item' over 'Item dropped'. It is a little more wordy but is a friendlier experience. You are welcome to choose your own tone for your messaging.
 
+## `HookProvided` > `Announce`
+
+The `announce` function that is provided to each of the `Hook` functions can be used to provide your own screen reader message. This message will be immediately read out. In order to provide a fast and responsive experience to users **you must provide this message sycnously**. If you attempt to hold onto the `announce` function and call it later it will not work and will just print a warning to the console. Additionally, if you try to call `announce` twice for the same event then only the first will be read by the screen reader with subsequent calls to `announce` being ignored and a warning printed.
+
 ## Step 1: instructions
 
 When a user `tabs` to a `Draggable` we need to instruct them on how they can start a drag. We do this by using the `aria-roledescription` property on a `drag handle`.
@@ -94,6 +98,42 @@ While this is not possible to do with a keyboard, it is worth having a message f
 
 You will want to simply explain that they are not over a droppable area.
 
-**Default message**: "You are currently not dragging over any droppable area".
+**Default message**: "You are currently not dragging over a droppable area".
 
-## Step 3: drop
+## Step 3: on drop
+
+In this phase we give a small summary of what the user has achieved.
+
+There are two ways a drop can occur. Either the drag was cancelled or the user released the dragging item. You are able to control the messaging for these events using the `DragDropContext` > `onDragEnd` hook.
+
+### Cancel
+
+A `DropResult` object has a `reason` property which can either be `DROP` or `CANCEL`. You can use this to display your cancel annoucement.
+
+```js
+onDragEnd = (result: DropResult, provided: HookProvided) => {
+  if(result.reason === 'CANCEL') {
+    provided.announce('Your cancel message');
+    return;
+  }
+}
+```
+
+This announcement should:
+
+- Inform the user that the drag have been cancelled
+- Let the user know where the item has returned to
+
+**Default message**: "Movement cancelled. The item has returned to its starting position of ${result.source.index + 1}"
+
+You are also welcome to add information about the size of the list, and the name of the list you have dropped into.
+
+**Suggestion** "Movement cancelled. The item has returned to list ${listName} to its starting position of ${startPosition} of ${listLength}".
+
+
+### Drop: in the home list
+
+### Drop: in a foreign list
+
+### Drop: no destination
+
