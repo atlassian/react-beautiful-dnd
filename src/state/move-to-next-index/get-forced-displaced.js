@@ -59,15 +59,31 @@ export const withFirstAdded = ({
 };
 
 type WithLastRemoved = {|
-  distanceMoving: Position,
+  dragging: DraggableId,
+  isVisibleInNewLocation: boolean,
   previousImpact: DragImpact,
   droppable: DroppableDimension,
   draggables: DraggableDimensionMap,
   viewport: Area,
 |}
 
+const forceVisibleDisplacement = (current: Displacement): Displacement => {
+  // if already visible - can use the existing displacement
+  if (current.isVisible) {
+    return current;
+  }
+
+  // if not visible - immediately force visibility
+  return {
+    draggableId: current.draggableId,
+    isVisible: true,
+    shouldAnimate: false,
+  };
+};
+
 export const withFirstRemoved = ({
-  distanceMoving,
+  dragging,
+  isVisibleInNewLocation,
   previousImpact,
   droppable,
   draggables,
@@ -79,66 +95,55 @@ export const withFirstRemoved = ({
     return [];
   }
 
-  const removed: Displacement[] = last.slice(1, last.length);
+  const withFirstRestored: Displacement[] = last.slice(1, last.length);
 
-  const axis: Axis = droppable.axis;
-  let buffer: number = Math.abs(distanceMoving[axis.line]);
+  // list is now empty
+  if (!withFirstRestored.length) {
+    return withFirstRestored;
+  }
+
+  console.log('is visibile in new location?', isVisibleInNewLocation);
+
+  // Simple case: no forced movement required
+  // no displacement visibility will be updated by this move
+  // so we can simply return the previous values
+  if (isVisibleInNewLocation) {
+    return withFirstRestored;
+  }
 
   console.group('forced');
-  console.log('starting buffer', buffer);
+  const axis: Axis = droppable.axis;
+
+
+  const toBeRestored: DraggableDimension = draggables[last[0].draggableId];
+  const sizeOfRestored: number = toBeRestored.page.withMargin[axis.size];
+  const sizeOfDragging: number = draggables[dragging].page.withMargin[axis.size];
+  let buffer: number = sizeOfRestored + sizeOfDragging;
+  console.log('buffer start size', buffer);
 
   const withUpdatedVisibility: Displacement[] =
-    removed.map((displacement: Displacement): Displacement => {
-      // we need to ensure that the previous items up to the size of the
-      // dragging item has a visible movement. This is because a movement
-      // can result in a combination of scrolls that have this effect.
-      // Technically we could just do this when the destination is not visible - but
-      // there is no harm doing it all the time for simplicity
-
-      // It seems to provide a more accurate experience to force displacement when buffer >= 0
-      // rather than just > 0.
-      console.log('buffer', buffer);
-      if (buffer >= 0) {
-        const current: DraggableDimension = draggables[displacement.draggableId];
-
-        // Using the 'withoutMargin' size. When moving often we do not consider the margin
-        // as a part of the calculations for determining the new center position. As such,
-        // we do not reduce the buffer by the size of the margin.
-        const size: number = current.page.withoutMargin[axis.size];
-        buffer -= size;
-
-        // displacement was already visible - can leave it unmodified
-        if (displacement.isVisible) {
-          console.log('returning original for', displacement.draggableId);
-          return displacement;
-        }
-
-        // the displacement was not visible - we need to force it to be visible and in
-        // place immediately.
-        console.log('forcing for', displacement.draggableId);
-        return {
-          draggableId: displacement.draggableId,
-          isVisible: true,
-          shouldAnimate: false,
-        };
+    withFirstRestored.map((displacement: Displacement, index: number): Displacement => {
+      // we are ripping this one away and forcing it to move
+      if (index === 0) {
+        console.log('forcing displacement for first:', displacement.draggableId);
+        return forceVisibleDisplacement(displacement);
       }
 
-      console.log('recalculating for', displacement.draggableId, getDisplacement({
-        draggable: draggables[displacement.draggableId],
-        destination: droppable,
-        previousImpact,
-        viewport,
-      }));
+      if (buffer > 0) {
+        const current: DraggableDimension = draggables[displacement.draggableId];
+        const size: number = current.page.withMargin[axis.size];
+        buffer -= size;
+        console.log('buffer losing', size, 'on', displacement.draggableId, 'it is now', buffer);
 
-      // We are outside of the buffer - we can now execute standard visibility checks
-      const updated: Displacement = getDisplacement({
-        draggable: draggables[displacement.draggableId],
-        destination: droppable,
-        previousImpact,
-        viewport,
-      });
+        return forceVisibleDisplacement(displacement);
+      }
 
-      return updated;
+      // We know that these items cannot be visible after the move
+      return {
+        draggableId: displacement.draggableId,
+        isVisible: false,
+        shouldAnimate: false,
+      };
     });
 
   console.groupEnd();

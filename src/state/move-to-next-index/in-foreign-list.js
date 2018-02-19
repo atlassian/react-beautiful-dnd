@@ -82,14 +82,19 @@ export default ({
     destinationEdge,
     destinationAxis: droppable.axis,
   });
-  // The full distance required to get from the previous page center to the new page center
-  const distanceMoving: Position = subtract(newPageCenter, previousPageCenter);
-  const distanceWithScroll: Position = withDroppableDisplacement(droppable, distanceMoving);
+
+  const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
+    draggable,
+    destination: droppable,
+    newPageCenter,
+    viewport,
+  });
 
   const displaced: Displacement[] = (() => {
     if (isMovingForward) {
       return withFirstRemoved({
-        distanceMoving: distanceWithScroll,
+        dragging: draggableId,
+        isVisibleInNewLocation,
         previousImpact,
         droppable,
         draggables,
@@ -119,13 +124,6 @@ export default ({
     direction: droppable.axis.direction,
   };
 
-  const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
-    draggable,
-    destination: droppable,
-    newPageCenter,
-    viewport,
-  });
-
   if (isVisibleInNewLocation) {
     return {
       pageCenter: withDroppableDisplacement(droppable, newPageCenter),
@@ -133,6 +131,10 @@ export default ({
       scrollJumpRequest: null,
     };
   }
+
+  // The full distance required to get from the previous page center to the new page center
+  const distanceMoving: Position = subtract(newPageCenter, previousPageCenter);
+  const distanceWithScroll: Position = withDroppableDisplacement(droppable, distanceMoving);
 
   return {
     pageCenter: previousPageCenter,
