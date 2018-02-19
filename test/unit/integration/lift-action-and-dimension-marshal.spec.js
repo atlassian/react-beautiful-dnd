@@ -1,9 +1,10 @@
 // @flow
 import createStore from '../../../src/state/create-store';
 import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
+import createHookCaller from '../../../src/state/hooks/hook-caller';
+import type { HookCaller } from '../../../src/state/hooks/hooks-types';
 import { getPreset } from '../../utils/dimension';
 import { add } from '../../../src/state/position';
-import fireHooks from '../../../src/state/fire-hooks';
 import {
   lift,
   clean,

@@ -6,7 +6,7 @@ import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location'
 import getViewport from '../../window/get-viewport';
 // import getScrollJumpResult from './get-scroll-jump-result';
 import moveToEdge from '../move-to-edge';
-import { withFirstAdded, withFirstRemoved } from './get-forced-displaced';
+import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import type {
@@ -98,7 +98,6 @@ export default ({
         previousImpact,
         droppable,
         draggables,
-        viewport,
       });
     }
     return withFirstAdded({

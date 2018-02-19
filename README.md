@@ -21,9 +21,12 @@ See how beautiful it is for yourself!
 
 > We provide different links for touch devices as currently [storybook](https://github.com/storybooks/storybook) does not have a good mobile menu experience [more information](https://github.com/storybooks/storybook/issues/124)
 
-## Upgrading from `3.x` to `4.x`
+## Upgrading
 
-You can find an upgrade guide in our [release notes](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v4.0.0).
+We have created some upgrade instructions in our release notes to help you upgrade to the latest version!
+
+- [Upgrading from `4.x` to `5.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v5.0.0);
+- [Upgrading from `3.x` to `4.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v4.0.0);
 
 ## Core characteristics
 
@@ -39,12 +42,14 @@ You can find an upgrade guide in our [release notes](https://github.com/atlassia
 - Horizontal lists ↔
 - Movement between lists (▤ ↔ ▤)
 - Mouse 🐭, keyboard 🎹 and touch 👉📱 (mobile, tablet and so on) support
+- Auto scrolling - automatically scroll containers and the window as required during a drag (even with keyboard!!)
+- Incredible screen reader support - we provide an greate experience for english screen readers out of the box 📦, while also providing complete customisation control and internationalisation support 💖
 - Conditional [dragging](https://github.com/atlassian/react-beautiful-dnd#props-1) and [dropping](https://github.com/atlassian/react-beautiful-dnd#conditionally-dropping)
 - Multiple independent lists on the one page
-- Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
-- Flexible item sizes - the draggable items can have different heights (vertical) or widths (horizontal))
-- Custom drag handle - you can drag a whole item by just a part of it
+- Flexible item sizes - the draggable items can have different heights (vertical) or widths (horizontal)
+- Custom drag handles - you can drag a whole item by just a part of it
 - A droppable list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
+- Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
 - Server side rendering compatible
 - Plays well with [nested interactive elements](https://github.com/atlassian/react-beautiful-dnd#interactive-child-elements-within-a-draggable) by default
 
@@ -130,13 +135,27 @@ How it is composed:
 
 `react-beautiful-dnd` does not create any wrapper elements. This means that it will not impact the usual tab flow of a document. For example, if you are wrapping an *anchor* tag then the user will tab to the anchor directly and not an element surrounding the *anchor*. Whatever element you wrap will be given a `tab-index` to ensure that users can tab to the element to perform keyboard dragging.
 
+### Auto scrolling
+
+When a user drags a `Draggable` near the edge of a scrollable `Droppable` or the `window` we automatically scroll the container as we are able to in order make room for the `Draggable`.
+
+#### For mouse and touch inputs
+
+When the center of a `Draggable` gets within a small distance from the edge of a container we start auto scrolling. As the user gets closer to the edge of the container we increase the speed of the auto scroll. This acceleration uses an easing function to exponentially increase the rate of acceleration the closer we move towards the edge. We reach a maximum rate of acceleration a small distance from the true edge of a container so that the user does not need to be extremely precise to obtain the maximum scroll speed.
+
+#### For keyboard dragging
+
+We also correctly update the scroll position as required when keyboard dragging. In order to move a `Draggable` into the correct position we can do a combination of a `Droppable` scroll, `window` scroll and manual movements to ensure the `Draggable` ends up in the correct position in response to user movement instructions. This is lit 🔥.
+
 ### Accessibility
 
 Traditionally drag and drop interactions have been exclusively a mouse or touch interaction. This library ships with support for drag and drop interactions **using only a keyboard**. This enables power users to drive their experience entirely from the keyboard. As well as opening up these experiences to users who would have been excluded previously.
 
 In addition to supporting keyboard, we have also audited how the keyboard shortcuts interact with standard browser keyboard interactions. When the user is not dragging they can use their keyboard as they normally would. While dragging we override and disable certain browser shortcuts (such as `tab`) to ensure a fluid experience for the user.
 
-We also provide **support for screen readers** through the `announce` function provided to all of the `hooks`. This means that users who have visual (or other) impairments are able to complete all drag and drop operations through keyboard and audio feedback.
+We also provide **fantastic support for screen readers** to assist users with visual (or other) impairments. We ship with english messaging out of the box. However, you are welcome to override these messages by using the `announce` function that it provided to all of the `DragDropContext > hook` functions.
+
+See our [accessibility guide](TODO) for a guide on crafting useful screen reader messaging.
 
 ## Mouse dragging
 
@@ -196,10 +215,6 @@ During a drag the following standard keyboard events are blocked to prevent a ba
 
 - **tab** <kbd>tab ↹</kbd> - blocking tabbing
 - **enter** <kbd>⏎</kbd> - blocking submission
-
-### Limitations of keyboard dragging
-
-There is current limitation of keyboard dragging: **the drag will cancel if the user scrolls the window**. This could be worked around but for now it is the simplest initial approach.
 
 ## Touch dragging
 
@@ -782,16 +797,6 @@ class Students extends Component {
 By using the approach you are able to make style changes to a `Droppable` when it is being dragged over, but you avoid re-rendering all of the children unnecessarily. Keep in mind that if you are using `React.PureComponent` that your component will [not respond to changes in the context](https://github.com/facebook/react/issues/2517).
 
 Unfortunately we are [unable to apply this optimisation for you](https://medium.com/merrickchristensen/function-as-child-components-5f3920a9ace9). It is a byproduct of using the function-as-child pattern.
-
-### Auto scrolling is not provided (yet!)
-
-Currently auto scrolling of scroll containers is not part of this library. Auto scrolling is where the container automatically scrolls to make room for the dragging item as you drag near the edge of a scroll container. You are welcome to build your own auto scrolling list, or if you would you really like it as part of this library we could provide a auto scrolling `Droppable`.
-
-Users will be able to scroll a scroll container while dragging by using their trackpad or mouse wheel.
-
-### Keyboard dragging limitation
-
-Getting keyboard dragging to work with scroll containers is quite difficult. Currently there is a limitation: you cannot drag with a keyboard beyond the visible edge of a scroll container. This limitation could be removed if we introduced auto scrolling. Scrolling a container with a mouse during a keyboard drag will cancel the drag.
 
 ## `Draggable`
 

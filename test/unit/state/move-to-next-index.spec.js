@@ -448,8 +448,8 @@ describe('move to next index', () => {
               const crossAxisEnd: number = 100;
 
               const droppableScrollSize = {
-                scrollHeight: axis === vertical ? 350 : crossAxisEnd,
-                scrollWidth: axis === horizontal ? 350 : crossAxisEnd,
+                scrollHeight: axis === vertical ? 400 : crossAxisEnd,
+                scrollWidth: axis === horizontal ? 400 : crossAxisEnd,
               };
 
               const home: DroppableDimension = getDroppableDimension({
@@ -462,7 +462,7 @@ describe('move to next index', () => {
                   [axis.crossAxisStart]: crossAxisStart,
                   [axis.crossAxisEnd]: crossAxisEnd,
                   [axis.start]: 0,
-                  [axis.end]: 350,
+                  [axis.end]: 400,
                 }),
                 closest: {
                   frameClient: getArea({
@@ -510,7 +510,6 @@ describe('move to next index', () => {
                 }),
               });
 
-              // half
               const inHome3: DraggableDimension = getDraggableDimension({
                 descriptor: {
                   id: 'inHome3',
@@ -525,7 +524,6 @@ describe('move to next index', () => {
                 }),
               });
 
-              // half as big as the frame (50px)
               const inHome4: DraggableDimension = getDraggableDimension({
                 descriptor: {
                   id: 'inHome4',
@@ -540,7 +538,6 @@ describe('move to next index', () => {
                 }),
               });
 
-              // half as big as the frame (50px)
               const inHome5: DraggableDimension = getDraggableDimension({
                 descriptor: {
                   id: 'inHome5',
@@ -555,15 +552,30 @@ describe('move to next index', () => {
                 }),
               });
 
+              const inHome6: DraggableDimension = getDraggableDimension({
+                descriptor: {
+                  id: 'inHome5',
+                  droppableId: home.descriptor.id,
+                  index: 5,
+                },
+                client: getArea({
+                  [axis.crossAxisStart]: crossAxisStart,
+                  [axis.crossAxisEnd]: crossAxisEnd,
+                  [axis.start]: 350,
+                  [axis.end]: 400,
+                }),
+              });
+
               const draggables: DraggableDimensionMap = {
                 [inHome1.descriptor.id]: inHome1,
                 [inHome2.descriptor.id]: inHome2,
                 [inHome3.descriptor.id]: inHome3,
                 [inHome4.descriptor.id]: inHome4,
                 [inHome5.descriptor.id]: inHome5,
+                [inHome6.descriptor.id]: inHome6,
               };
 
-              it('should force the displacement of the items up to the distance of the movement', () => {
+              it('should force the displacement of the items up to the size of the item dragging and the item no longer being displaced', () => {
                 // We have moved inHome1 to the end of the list
                 const previousImpact: DragImpact = {
                   movement: {
@@ -572,14 +584,19 @@ describe('move to next index', () => {
                       // the last impact would have been before the last addition.
                       // At this point the last two items would have been visible
                       {
+                        draggableId: inHome6.descriptor.id,
+                        isVisible: true,
+                        shouldAnimate: true,
+                      },
+                      {
                         draggableId: inHome5.descriptor.id,
                         isVisible: true,
                         shouldAnimate: true,
                       },
                       {
                         draggableId: inHome4.descriptor.id,
-                        isVisible: true,
-                        shouldAnimate: true,
+                        isVisible: false,
+                        shouldAnimate: false,
                       },
                       {
                         draggableId: inHome3.descriptor.id,
@@ -607,6 +624,11 @@ describe('move to next index', () => {
 
                 // validation of previous impact
                 expect(isPartiallyVisible({
+                  target: inHome6.page.withMargin,
+                  destination: scrolled,
+                  viewport: customViewport,
+                })).toBe(true);
+                expect(isPartiallyVisible({
                   target: inHome5.page.withMargin,
                   destination: scrolled,
                   viewport: customViewport,
@@ -615,8 +637,7 @@ describe('move to next index', () => {
                   target: inHome4.page.withMargin,
                   destination: scrolled,
                   viewport: customViewport,
-                })).toBe(true);
-                // this one is really important - because we will be forcing it to be true
+                })).toBe(false);
                 expect(isPartiallyVisible({
                   target: inHome3.page.withMargin,
                   destination: scrolled,
@@ -635,17 +656,26 @@ describe('move to next index', () => {
                     displaced: [
                       // shouldAnimate has not changed to false - using previous impact
                       {
-                        draggableId: inHome4.descriptor.id,
+                        draggableId: inHome5.descriptor.id,
                         isVisible: true,
                         shouldAnimate: true,
                       },
-                      // forced to be visible
+                      // was not visibile - now forcing to be visible
+                      // (within the size of the dragging item (50px) and the moving item (50px))
+                      {
+                        draggableId: inHome4.descriptor.id,
+                        isVisible: true,
+                        shouldAnimate: false,
+                      },
+                      // was not visibile - now forcing to be visible
+                      // (within the size of the dragging item (50px) and the moving item (50px))
                       {
                         draggableId: inHome3.descriptor.id,
                         isVisible: true,
                         shouldAnimate: false,
                       },
                       // still not visible
+                      // not within the 100px buffer
                       {
                         draggableId: inHome2.descriptor.id,
                         isVisible: false,
@@ -1269,10 +1299,6 @@ describe('move to next index', () => {
               expect(result.pageCenter).toEqual(previousPageCenter);
               expect(result.impact).toEqual(expectedImpact);
               expect(result.scrollJumpRequest).toEqual(expectedScrollJump);
-            });
-
-            it.skip('should take into account any changes in the droppables scroll', () => {
-              // TODO
             });
           });
         });

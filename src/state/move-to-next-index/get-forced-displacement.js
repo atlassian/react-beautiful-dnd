@@ -64,7 +64,6 @@ type WithLastRemoved = {|
   previousImpact: DragImpact,
   droppable: DroppableDimension,
   draggables: DraggableDimensionMap,
-  viewport: Area,
 |}
 
 const forceVisibleDisplacement = (current: Displacement): Displacement => {
@@ -87,7 +86,6 @@ export const withFirstRemoved = ({
   previousImpact,
   droppable,
   draggables,
-  viewport,
 }: WithLastRemoved): Displacement[] => {
   const last: Displacement[] = previousImpact.movement.displaced;
   if (!last.length) {
@@ -102,8 +100,6 @@ export const withFirstRemoved = ({
     return withFirstRestored;
   }
 
-  console.log('is visibile in new location?', isVisibleInNewLocation);
-
   // Simple case: no forced movement required
   // no displacement visibility will be updated by this move
   // so we can simply return the previous values
@@ -111,21 +107,19 @@ export const withFirstRemoved = ({
     return withFirstRestored;
   }
 
-  console.group('forced');
   const axis: Axis = droppable.axis;
 
-
-  const toBeRestored: DraggableDimension = draggables[last[0].draggableId];
-  const sizeOfRestored: number = toBeRestored.page.withMargin[axis.size];
+  // When we are forcing this displacement, we need to adjust the visibility of draggables
+  // within a particular range. This range is the size of the dragging item and the item
+  // that is being restored to its original
+  const sizeOfRestored: number = draggables[last[0].draggableId].page.withMargin[axis.size];
   const sizeOfDragging: number = draggables[dragging].page.withMargin[axis.size];
   let buffer: number = sizeOfRestored + sizeOfDragging;
-  console.log('buffer start size', buffer);
 
   const withUpdatedVisibility: Displacement[] =
     withFirstRestored.map((displacement: Displacement, index: number): Displacement => {
       // we are ripping this one away and forcing it to move
       if (index === 0) {
-        console.log('forcing displacement for first:', displacement.draggableId);
         return forceVisibleDisplacement(displacement);
       }
 
@@ -133,7 +127,6 @@ export const withFirstRemoved = ({
         const current: DraggableDimension = draggables[displacement.draggableId];
         const size: number = current.page.withMargin[axis.size];
         buffer -= size;
-        console.log('buffer losing', size, 'on', displacement.draggableId, 'it is now', buffer);
 
         return forceVisibleDisplacement(displacement);
       }
@@ -145,8 +138,6 @@ export const withFirstRemoved = ({
         shouldAnimate: false,
       };
     });
-
-  console.groupEnd();
 
   return withUpdatedVisibility;
 };

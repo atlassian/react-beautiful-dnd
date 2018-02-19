@@ -1,11 +1,11 @@
 // @flow
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { patch, subtract, absolute } from '../position';
+import { patch, subtract } from '../position';
 import withDroppableDisplacement from '../with-droppable-displacement';
 import moveToEdge from '../move-to-edge';
 import getViewport from '../../window/get-viewport';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
-import { withFirstAdded, withFirstRemoved } from './get-forced-displaced';
+import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import type {
@@ -98,7 +98,6 @@ export default ({
         previousImpact,
         droppable,
         draggables,
-        viewport,
       });
     }
     return withFirstAdded({
