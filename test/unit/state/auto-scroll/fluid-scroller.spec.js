@@ -102,7 +102,7 @@ describe('fluid auto scrolling', () => {
       const dragTo = (
         selection: Position,
         // seeding that we are over the home droppable
-        impact?: DragImpact = getInitialImpact(axis, preset.inHome1),
+        impact?: DragImpact = getInitialImpact(preset.inHome1, axis),
       ): State => withImpact(
         state.dragging(preset.inHome1.descriptor.id, selection),
         impact,
@@ -1095,7 +1095,7 @@ describe('fluid auto scrolling', () => {
             2500,
           );
 
-          it.only('should scroll a frame if it is being dragged over, even if not over the subject', () => {
+          it('should scroll a frame if it is being dragged over, even if not over the subject', () => {
             const scrolled: DroppableDimension = scrollDroppable(
               withSmallSubject,
               // scrolling the whole client away

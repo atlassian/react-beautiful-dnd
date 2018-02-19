@@ -197,7 +197,8 @@ describe('hooks integration', () => {
       draggableId,
       type: 'DEFAULT',
       source,
-      destination: null,
+      // did not move anywhere
+      destination: source,
       reason: 'DROP',
     };
 

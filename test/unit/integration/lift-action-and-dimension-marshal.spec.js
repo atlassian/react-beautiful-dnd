@@ -131,7 +131,7 @@ describe('lifting and the dimension marshal', () => {
             return;
           }
 
-          caller(hooks, previousValue, current);
+          caller.onStateChange(hooks, previousValue, current);
           dimensionMarshal.onPhaseChange(current);
         });
 
