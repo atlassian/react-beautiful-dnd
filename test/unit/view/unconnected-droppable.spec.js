@@ -7,8 +7,17 @@ import Droppable from '../../../src/view/droppable/droppable';
 import Placeholder from '../../../src/view/placeholder/';
 import { withStore, combine, withDimensionMarshal, withStyleContext } from '../../utils/get-context-options';
 import { getPreset } from '../../utils/dimension';
-import type { DroppableId, DraggableDimension } from '../../../src/types';
-import type { MapProps, OwnProps, Provided, StateSnapshot } from '../../../src/view/droppable/droppable-types';
+import type {
+  DraggableId,
+  DroppableId,
+  DraggableDimension,
+} from '../../../src/types';
+import type {
+  MapProps,
+  OwnProps,
+  Provided,
+  StateSnapshot,
+} from '../../../src/view/droppable/droppable-types';
 
 const getStubber = (mock: Function) =>
   class Stubber extends Component<{provided: Provided, snapshot: StateSnapshot}> {

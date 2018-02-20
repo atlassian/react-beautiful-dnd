@@ -1,6 +1,6 @@
 // @flow
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { patch, subtract, absolute } from '../position';
+import { patch, subtract } from '../position';
 import withDroppableDisplacement from '../with-droppable-displacement';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 import getViewport from '../../window/get-viewport';

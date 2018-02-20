@@ -3,7 +3,6 @@ import getDisplacement from '../get-displacement';
 import type {
   Area,
   Axis,
-  Position,
   DraggableId,
   DragImpact,
   DraggableDimensionMap,

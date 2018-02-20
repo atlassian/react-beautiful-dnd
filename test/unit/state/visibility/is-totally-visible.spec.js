@@ -1,6 +1,6 @@
 // @flow
 import getArea from '../../../../src/state/get-area';
-import { isPartiallyVisible } from '../../../../src/state/visibility/is-visible';
+import { isTotallyVisible, isPartiallyVisible } from '../../../../src/state/visibility/is-visible';
 import { getDroppableDimension, scrollDroppable } from '../../../../src/state/dimension';
 import { offsetByPosition } from '../../../../src/state/spacing';
 import { getClosestScrollable } from '../../../utils/dimension';
@@ -54,11 +54,11 @@ const asBigAsInViewport1: DroppableDimension = getDroppableDimension({
   client: getArea(inViewport1),
 });
 
-describe('is partially visible', () => {
+describe('is totally visible', () => {
   describe('viewport', () => {
     describe('without changes in droppable scroll', () => {
       it('should return false if the item is not in the viewport', () => {
-        expect(isPartiallyVisible({
+        expect(isTotallyVisible({
           target: notInViewport,
           viewport,
           destination: asBigAsViewport,
@@ -66,7 +66,7 @@ describe('is partially visible', () => {
       });
 
       it('should return true if item takes up entire viewport', () => {
-        expect(isPartiallyVisible({
+        expect(isTotallyVisible({
           target: viewport,
           viewport,
           destination: asBigAsViewport,
@@ -74,14 +74,14 @@ describe('is partially visible', () => {
       });
 
       it('should return true if the item is totally visible in the viewport', () => {
-        expect(isPartiallyVisible({
+        expect(isTotallyVisible({
           target: inViewport1,
           viewport,
           destination: asBigAsViewport,
         })).toBe(true);
       });
 
-      it('should return true if the item is partially visible in the viewport', () => {
+      it('should return false if the item is partially visible in the viewport', () => {
         const partials: Spacing[] = [
           // bleed over top
           offsetByPosition(viewport, { x: 0, y: -1 }),
@@ -94,6 +94,13 @@ describe('is partially visible', () => {
         ];
 
         partials.forEach((partial: Spacing) => {
+          expect(isTotallyVisible({
+            target: partial,
+            viewport,
+            destination: asBigAsViewport,
+          })).toBe(false);
+
+          // validation
           expect(isPartiallyVisible({
             target: partial,
             viewport,
@@ -135,14 +142,14 @@ describe('is partially visible', () => {
           };
 
           // originally invisible
-          expect(isPartiallyVisible({
+          expect(isTotallyVisible({
             target: originallyInvisible,
             destination: clippedByViewport,
             viewport,
           })).toBe(false);
 
           // after scroll the target is now visible
-          expect(isPartiallyVisible({
+          expect(isTotallyVisible({
             target: originallyInvisible,
             destination: scrollDroppable(clippedByViewport, { x: 0, y: 100 }),
             viewport,
@@ -160,14 +167,14 @@ describe('is partially visible', () => {
           };
 
           // originally visible
-          expect(isPartiallyVisible({
+          expect(isTotallyVisible({
             target: originallyVisible,
             destination: clippedByViewport,
             viewport,
           })).toBe(true);
 
           // after scroll the target is now invisible
-          expect(isPartiallyVisible({
+          expect(isTotallyVisible({
             target: originallyVisible,
             destination: scrollDroppable(clippedByViewport, { x: 0, y: 100 }),
             viewport,
@@ -208,23 +215,23 @@ describe('is partially visible', () => {
 
     describe('without changes in droppable scroll', () => {
       it('should return false if outside the droppable', () => {
-        expect(isPartiallyVisible({
+        expect(isTotallyVisible({
           target: inViewport2,
           viewport,
           destination: asBigAsInViewport1,
         })).toBe(false);
       });
 
-      it('should return true if the target is bigger than the droppable', () => {
-        expect(isPartiallyVisible({
+      it('should return false if the target is bigger than the droppable', () => {
+        expect(isTotallyVisible({
           target: viewport,
           viewport,
           destination: asBigAsInViewport1,
-        })).toBe(true);
+        })).toBe(false);
       });
 
       it('should return true if the same size of the droppable', () => {
-        expect(isPartiallyVisible({
+        expect(isTotallyVisible({
           target: inViewport1,
           viewport,
           destination: asBigAsInViewport1,
@@ -239,14 +246,14 @@ describe('is partially visible', () => {
           bottom: 80,
         };
 
-        expect(isPartiallyVisible({
+        expect(isTotallyVisible({
           target: insideDroppable,
           viewport,
           destination: asBigAsInViewport1,
         })).toBe(true);
       });
 
-      it('should return true if partially within the droppable', () => {
+      it('should return false if partially within the droppable', () => {
         const partials: Spacing[] = [
         // bleed over top
           offsetByPosition(inViewport1, { x: 0, y: -1 }),
@@ -259,6 +266,13 @@ describe('is partially visible', () => {
         ];
 
         partials.forEach((partial: Spacing) => {
+          expect(isTotallyVisible({
+            target: partial,
+            viewport,
+            destination: asBigAsInViewport1,
+          })).toBe(false);
+
+          // validation
           expect(isPartiallyVisible({
             target: partial,
             viewport,
@@ -299,7 +313,7 @@ describe('is partially visible', () => {
           bottom: 200,
         };
 
-        expect(isPartiallyVisible({
+        expect(isTotallyVisible({
           target: inSubjectOutsideFrame,
           destination: clippedDroppable,
           viewport,
@@ -318,16 +332,17 @@ describe('is partially visible', () => {
           };
 
           // originally invisible
-          expect(isPartiallyVisible({
+          expect(isTotallyVisible({
             target: originallyInvisible,
             destination: scrollable,
             viewport,
           })).toBe(false);
 
           // after scroll the target is now visible
-          expect(isPartiallyVisible({
+          const scrolled: DroppableDimension = scrollDroppable(scrollable, { x: 0, y: 100 });
+          expect(isTotallyVisible({
             target: originallyInvisible,
-            destination: scrollDroppable(scrollable, { x: 0, y: 100 }),
+            destination: scrolled,
             viewport,
           })).toBe(true);
         });
@@ -342,14 +357,14 @@ describe('is partially visible', () => {
           };
 
           // originally visible
-          expect(isPartiallyVisible({
+          expect(isTotallyVisible({
             target: originallyVisible,
             destination: scrollable,
             viewport,
           })).toBe(true);
 
           // after scroll the target is now invisible
-          expect(isPartiallyVisible({
+          expect(isTotallyVisible({
             target: originallyVisible,
             destination: scrollDroppable(scrollable, { x: 0, y: 100 }),
             viewport,
@@ -393,7 +408,7 @@ describe('is partially visible', () => {
         };
 
         // originally visible
-        expect(isPartiallyVisible({
+        expect(isTotallyVisible({
           target: originallyVisible,
           destination: droppable,
           viewport,
@@ -408,7 +423,7 @@ describe('is partially visible', () => {
         expect(scrolled.viewport.clipped).toBe(null);
 
         // now asserting that this check will fail
-        expect(isPartiallyVisible({
+        expect(isTotallyVisible({
           target: originallyVisible,
           destination: scrolled,
           viewport,
@@ -419,7 +434,7 @@ describe('is partially visible', () => {
 
   describe('viewport + droppable', () => {
     it('should return true if visible in the viewport and the droppable', () => {
-      expect(isPartiallyVisible({
+      expect(isTotallyVisible({
         target: inViewport1,
         viewport,
         destination: asBigAsInViewport1,
@@ -427,7 +442,7 @@ describe('is partially visible', () => {
     });
 
     it('should return false if not visible in the droppable even if visible in the viewport', () => {
-      expect(isPartiallyVisible({
+      expect(isTotallyVisible({
         target: inViewport2,
         viewport,
         destination: asBigAsInViewport1,
@@ -443,7 +458,7 @@ describe('is partially visible', () => {
         client: getArea(notInViewport),
       });
 
-      expect(isPartiallyVisible({
+      expect(isTotallyVisible({
         // is visibile in the droppable
         target: notInViewport,
         // but not visible in the viewport

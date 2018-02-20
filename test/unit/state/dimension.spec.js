@@ -219,6 +219,7 @@ describe('dimension', () => {
 
     describe('closest scrollable', () => {
       describe('basic info about the scrollable', () => {
+        // eslint-disable-next-line no-shadow
         const client: Area = getArea({
           top: 0,
           right: 300,

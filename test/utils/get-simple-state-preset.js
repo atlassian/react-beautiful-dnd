@@ -266,7 +266,10 @@ export default (axis?: Axis = vertical) => {
   const allPhases = (id? : DraggableId = preset.inHome1.descriptor.id): State[] => [
     idle,
     preparing,
-    requesting(id),
+    requesting({
+      draggableId: id,
+      scrollOptions: scheduled,
+    }),
     dragging(id),
     dropAnimating(id),
     userCancel(id),

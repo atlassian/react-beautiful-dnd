@@ -9,9 +9,7 @@ import { vertical, horizontal } from '../../../src/state/axis';
 import { isPartiallyVisible } from '../../../src/state/visibility/is-visible';
 import getViewport from '../../../src/window/get-viewport';
 import getArea from '../../../src/state/get-area';
-import setWindowScroll from '../../utils/set-window-scroll';
 import { getDroppableDimension, getDraggableDimension, scrollDroppable } from '../../../src/state/dimension';
-import getMaxScroll from '../../../src/state/get-max-scroll';
 import type {
   Area,
   Axis,
@@ -21,7 +19,6 @@ import type {
   DroppableDimension,
   DraggableLocation,
   Position,
-  Displacement,
 } from '../../../src/types';
 
 const setViewport = (custom: Area): void => {

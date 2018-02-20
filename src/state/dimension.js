@@ -2,7 +2,7 @@
 import { vertical, horizontal } from './axis';
 import getArea from './get-area';
 import { offsetByPosition, expandBySpacing } from './spacing';
-import { subtract, negate, isEqual } from './position';
+import { subtract, negate } from './position';
 import getMaxScroll from './get-max-scroll';
 import type {
   DraggableDescriptor,
