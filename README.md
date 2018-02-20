@@ -299,6 +299,16 @@ Avoid the *pull to refresh action* and *delayed anchor focus* on Android Chrome
 touch-action: manipulation;
 ```
 
+#### Always: Droppable
+
+Styles applied to: **droppable element** using the `data-react-beautiful-dnd-droppable` attribute.
+
+Opting out of the browser feature which tries to maintain the scroll position when the DOM changes above the fold. We already correctly maintain the scroll position. The automatic `overflow-anchor` behavior leads to incorrect scroll positioning post drop.
+
+```css
+overflow-anchor: none;
+```
+
 ### Phase: resting
 
 #### (Phase: resting): drag handle
@@ -440,9 +450,16 @@ In order to use drag and drop, you need to have the part of your `React` tree th
 
 ```js
 type Hooks = {|
-  onDragStart?: (initial: DragStart) => void,
-  onDragEnd: (result: DropResult) => void,
+  // optional
+  onDragStart?: OnDragStartHook,
+  onDragUpdate?: OnDragUpdateHook,
+  // always required
+  onDragEnd: OnDragEndHook,
 |}
+
+type OnDragStartHook = (start: DragStart, provided: HookProvided) => void;
+type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => void;
+type OnDragEndHook = (result: DropResult, provided: HookProvided) => void;
 
 type Props = {|
   ...Hooks,
@@ -459,14 +476,18 @@ class App extends React.Component {
   onDragStart = () => {
     /*...*/
   };
-  onDragEnd = () => {
+  onDragUpdate = () => {
     /*...*/
+  }
+  onDragEnd = () => {
+    // the only one that is required
   };
 
   render() {
     return (
       <DragDropContext
         onDragStart={this.onDragStart}
+        onDragUpdate={this.onDragUpdate}
         onDragEnd={this.onDragEnd}
       >
         <div>Hello world</div>
@@ -478,24 +499,48 @@ class App extends React.Component {
 
 ### `Hook`s
 
-These are top level application events that you can use to perform your own state updates.
+These are top level application events that you can use to perform your own state updates as well as to make screen reader announcements. For more information about controlling the screen reader see our [screen reader guide](TODO)
+
+### `provided: HookProvided`
+
+```js
+type HookProvided = {|
+  announce: Announce,
+|}
+
+type Announce = (message: string) => void;
+```
+
+All hooks are provided with a second argument: `HookProvided`. This object has one property: `announce`. This function is used to synchronously announce a message to screen readers. If you do not use this function we will announce a default english message. We have created a [guide for screen reader usage](TODO) which we recommend using if you are interested in controlling the screen reader messages for yourself and to support internationalisation. If you are using `announce` it must be called synchronously.
 
 ### `onDragStart` (optional)
 
-This function will get notified when a drag starts. You are provided with the following details:
+```js
+type OnDragStartHook = (start: DragStart, provided: HookProvided) => void;
+```
 
-### `initial: DragStart`
+`onDragStart` will get notified when a drag starts. This hook is *optional* and therefore does not need to be provided. It is **highly recommended** that you use this function to block updates to all `Draggable` and `Droppable` components during a drag. (See [*Best practices for `hooks` *](https://github.com/atlassian/react-beautiful-dnd#best-practices-for-hooks))
 
-- `initial.draggableId`: the id of the `Draggable` that is now dragging
-- `initial.type`: the `type` of the `Draggable` that is now dragging
-- `initial.source`: the location (`droppableId` and `index`) of where the dragging item has started within a `Droppable`.
+You are provided with the following details:
 
-This function is *optional* and therefore does not need to be provided. It is **highly recommended** that you use this function to block updates to all `Draggable` and `Droppable` components during a drag. (See [*Best practices for `hooks` *](https://github.com/atlassian/react-beautiful-dnd#best-practices-for-hooks))
-
-### `onDragStart` type information
+#### `start: DragStart`
 
 ```js
-onDragStart?: (initial: DragStart) => void
+type DragStart = {|
+  draggableId: DraggableId,
+  type: TypeId,
+  source: DraggableLocation,
+|}
+```
+
+- `start.draggableId`: the id of the `Draggable` that is now dragging
+- `start.type`: the `type` of the `Draggable` that is now dragging
+- `start.source`: the location (`droppableId` and `index`) of where the dragging item has started within a `Droppable`.
+
+#### `onDragStart` type information
+
+```js
+type OnDragStartHook = (start: DragStart, provided: HookProvided) => void;
 
 // supporting types
 type DragStart = {|
@@ -515,24 +560,63 @@ type DroppableId = Id;
 type TypeId = Id;
 ```
 
+### `onDragUpdate` (optional)
+
+```js
+type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => void;
+```
+
+This function is called whenever something changes during a drag. The possible changes are:
+
+- The position of the `Draggable` has changed
+- The `Draggable` is now over a different `Droppable`
+- The `Draggable` is now over no `Droppable`
+
+It is important that you not do too much work as a result of this function as it will slow down the drag.
+
+#### `update: DragUpdate`
+
+```js
+type DragUpdate = {|
+  ...DragStart,
+  // may not have any destination (drag to nowhere)
+  destination: ?DraggableLocation,
+|}
+```
+
+- `update.draggableId`: the id of the `Draggable` that is now dragging
+- `update.type`: the `type` of the `Draggable` that is now dragging
+- `update.source`: the location (`droppableId` and `index`) of where the dragging item has started within a `Droppable`.
+- `update.destination`: the location (`droppableId` and `index`) of where the dragging item is now. This can be null if the user is currently not dragging over any `Droppable`.
+
 ### `onDragEnd` (required)
 
 This function is *extremely* important and has an critical role to play in the application lifecycle. **This function must result in the *synchronous* reordering of a list of `Draggables`**
 
 It is provided with all the information about a drag:
 
-### `result: DropResult`
+#### `result: DropResult`
+
+```js
+type DropResult = {|
+  ...DragUpdate,
+  reason: DropReason,
+|}
+
+type DropReason = 'DROP' | 'CANCEL';
+```
 
 - `result.draggableId`: the id of the `Draggable` that was dragging.
 - `result.type`: the `type` of the `Draggable` that was dragging.
 - `result.source`: the location where the `Draggable` started.
-- `result.destination`: the location where the `Draggable` finished. The `destination` will be `null` if the user dropped into no position (such as outside any list) *or* if they dropped the `Draggable` back into the same position in which it started.
+- `result.destination`: the location where the `Draggable` finished. The `destination` will be `null` if the user dropped while not over a `Droppable`.
+- `result.reason`: the reason a drop occurred. This information can be helpful in crafting more useful messaging in the `HookProvided` > `announce` function.
 
 ### Synchronous reordering
 
-Because this library does not control your state, it is up to you to *synchronously* reorder your lists based on the `result`.
+Because this library does not control your state, it is up to you to *synchronously* reorder your lists based on the `result: DropResult`.
 
-#### Here is what you need to do:
+#### Here is what you need to do
 
 - if the `destination` is `null`: all done!
 - if `source.droppableId` equals `destination.droppableId` you need to remove the item from your list and insert it at the correct position.
@@ -541,31 +625,6 @@ Because this library does not control your state, it is up to you to *synchronou
 ### Persisting a reorder
 
 If you need to persist a reorder to a remote data store - update the list synchronously on the client and fire off a request in the background to persist the change. If the remote save fails it is up to you how to communicate that to the user and update, or not update, the list.
-
-### `onDragEnd` type information
-
-```js
-onDragEnd: (result: DropResult) => void
-
-// supporting types
-type DropResult = {|
-  draggableId: DraggableId,
-  type: TypeId,
-  source: DraggableLocation,
-  // may not have any destination (drag to nowhere)
-  destination: ?DraggableLocation
-|}
-
-type Id = string;
-type DroppableId = Id;
-type DraggableId = Id;
-type TypeId = Id;
-type DraggableLocation = {|
-  droppableId: DroppableId,
-  // the position of the droppable within a droppable
-  index: number
-|};
-```
 
 ### Best practices for `hooks`
 
@@ -582,29 +641,6 @@ Here are a few poor user experiences that can occur if you change things *during
 - If you change the dimensions of any node, then it can cause the changed node as well as others to move at incorrect times.
 - If you remove the node that the user is dragging, then the drag will instantly end
 - If you change the dimension of the dragging node, then other things will not move out of the way at the correct time.
-
-### Accessibility ❤️
-
-All of our lifecycle `hooks` provide the ability to `announce` a change to screen readers. It is a function that accepts a `string` and will print it to the user:
-
-```js
-export type Announce = (message: string) => void;
-```
-
-Based on the information passed to in the `hooks` you are able to provide meaningful messages to screen readers.
-
-On lift
-
-On update
-- item has moved index
-- item has moved droppable
-- item is no longer over a droppable (only possible with pointer based dragging)
-
-onDragEnd
-- item was dropped in a new location
-- item was dropped in the same location it started in
-- item was dropped while in no location (only possible with pointer based dragging)
-- drag was cancelled (may be due a user directly cancelling, a user cancelling indirectly through an action such as a browser resize, or an error).
 
 #### Force focus after a transition between lists
 
@@ -703,7 +739,10 @@ export type DroppableProps = {|
 
 ```js
 type DroppableStateSnapshot = {|
+  // Is the Droppable being dragged over?
   isDraggingOver: boolean,
+  // What is the id of the draggable that is dragging over the Droppable?
+  draggingOverWith: ?DraggableId,
 |};
 ```
 
@@ -1137,11 +1176,13 @@ const myOnClick = event => console.log('clicked on', event.target);
 </Draggable>;
 ```
 
-#### 2. snapshot: (DraggableStateSnapshot)**
+#### 2. Snapshot: (DraggableStateSnapshot)**
 
 ```js
 type DraggableStateSnapshot = {|
   isDragging: boolean,
+  // What Droppable (if any) the Draggable is currently over
+  draggingOver: ?DroppableId,
 |};
 ```
 
@@ -1202,13 +1243,24 @@ type DroppableId = Id;
 type DraggableId = Id;
 
 // hooks
-type DropResult = {|
+type DragStart = {|
   draggableId: DraggableId,
   type: TypeId,
   source: DraggableLocation,
-  // may not have any destination (drag to nowhere)
-  destination: ?DraggableLocation
 |}
+
+type DragUpdate = {|
+  ...DragStart,
+  // may not have any destination (drag to nowhere)
+  destination: ?DraggableLocation,
+|}
+
+type DropResult = {|
+  ...DragUpdate,
+  reason: DropReason,
+|}
+
+type DropReason = 'DROP' | 'CANCEL'
 
 type DraggableLocation = {|
   droppableId: DroppableId,
@@ -1224,6 +1276,7 @@ type DroppableProvided = {|
 
 type DroppableStateSnapshot = {|
   isDraggingOver: boolean,
+  draggingOverWith: ?DraggableId,
 |}
 
 // Draggable
@@ -1236,6 +1289,7 @@ type DraggableProvided = {|
 
 type DraggableStateSnapshot = {|
   isDragging: boolean,
+  draggingOver: ?DroppableId,
 |}
 
 export type DraggableProps = {|
@@ -1268,7 +1322,7 @@ type DragHandleProvided = {|
   onTouchStart: (event: TouchEvent) => void,
   onTouchMove: (event: TouchEvent) => void,
   tabIndex: number,
-  'aria-grabbed': boolean,
+  'aria-roledescription': string,
   draggable: boolean,
   onDragStart: () => boolean,
   onDrop: () => boolean
