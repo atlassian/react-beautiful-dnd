@@ -14,7 +14,9 @@ import type {
   CurrentDrag,
   InitialDrag,
   DraggableDescriptor,
+  InitialLiftRequest,
   AutoScrollMode,
+  ScrollOptions,
 } from '../types';
 import noImpact from './no-impact';
 import withDroppableDisplacement from './with-droppable-displacement';
@@ -48,12 +50,12 @@ const getScrollDiff = ({
 
 export type RequestDimensionsAction = {|
   type: 'REQUEST_DIMENSIONS',
-  payload: DraggableId,
+  payload: InitialLiftRequest,
 |}
 
-export const requestDimensions = (id: DraggableId): RequestDimensionsAction => ({
+export const requestDimensions = (request: InitialLiftRequest): RequestDimensionsAction => ({
   type: 'REQUEST_DIMENSIONS',
-  payload: id,
+  payload: request,
 });
 
 export type CompleteLiftAction = {|
@@ -490,7 +492,14 @@ export const lift = (id: DraggableId,
     }
 
     // will communicate with the marshal to start requesting dimensions
-    dispatch(requestDimensions(id));
+    const scrollOptions: ScrollOptions = {
+      shouldPublishImmediately: autoScrollMode === 'JUMP',
+    };
+    const request: InitialLiftRequest = {
+      draggableId: id,
+      scrollOptions,
+    };
+    dispatch(requestDimensions(request));
 
     // Need to allow an opportunity for the dimensions to be requested.
     setTimeout(() => {

@@ -9,6 +9,8 @@ import type {
   State as AppState,
   Phase,
   Position,
+  InitialLiftRequest,
+  ScrollOptions,
 } from '../../types';
 import type {
   DimensionMarshal,
@@ -27,8 +29,10 @@ type State = {|
   // long lived
   droppables: DroppableEntryMap,
   draggables: DraggableEntryMap,
+  // short lived
   isCollecting: boolean,
-  request: ?DraggableId,
+  scrollOptions: ?ScrollOptions,
+  request: ?InitialLiftRequest,
   frameId: ?number,
 |}
 
@@ -42,6 +46,7 @@ export default (callbacks: Callbacks) => {
     droppables: {},
     draggables: {},
     isCollecting: false,
+    scrollOptions: null,
     request: null,
     frameId: null,
   };
@@ -237,14 +242,14 @@ export default (callbacks: Callbacks) => {
   const getToBeCollected = (): UnknownDescriptorType[] => {
     const draggables: DraggableEntryMap = state.draggables;
     const droppables: DroppableEntryMap = state.droppables;
-    const request: ?DraggableId = state.request;
+    const request: ?InitialLiftRequest = state.request;
 
     if (!request) {
       console.error('cannot find request in state');
       return [];
     }
-
-    const descriptor: DraggableDescriptor = draggables[request].descriptor;
+    const draggableId: DraggableId = request.draggableId;
+    const descriptor: DraggableDescriptor = draggables[draggableId].descriptor;
     const home: DroppableDescriptor = droppables[descriptor.droppableId].descriptor;
 
     const draggablesToBeCollected: DraggableDescriptor[] =
@@ -285,7 +290,7 @@ export default (callbacks: Callbacks) => {
     return toBeCollected;
   };
 
-  const processPrimaryDimensions = (request: ?DraggableId) => {
+  const processPrimaryDimensions = (request: ?InitialLiftRequest) => {
     if (state.isCollecting) {
       cancel('Cannot start capturing dimensions for a drag it is already dragging');
       return;
@@ -296,6 +301,8 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
+    const draggableId: DraggableId = request.draggableId;
+
     setState({
       isCollecting: true,
       request,
@@ -303,17 +310,20 @@ export default (callbacks: Callbacks) => {
 
     const draggables: DraggableEntryMap = state.draggables;
     const droppables: DroppableEntryMap = state.droppables;
-    const draggableEntry: ?DraggableEntry = draggables[request];
+    const draggableEntry: ?DraggableEntry = draggables[draggableId];
 
     if (!draggableEntry) {
-      cancel(`Cannot find Draggable with id ${request} to start collecting dimensions`);
+      cancel(`Cannot find Draggable with id ${draggableId} to start collecting dimensions`);
       return;
     }
 
     const homeEntry: ?DroppableEntry = droppables[draggableEntry.descriptor.droppableId];
 
     if (!homeEntry) {
-      cancel(`Cannot find home Droppable [id:${draggableEntry.descriptor.droppableId}] for Draggable [id:${request}]`);
+      cancel(`
+        Cannot find home Droppable [id:${draggableEntry.descriptor.droppableId}]
+        for Draggable [id:${request.draggableId}]
+      `);
       return;
     }
 
@@ -324,7 +334,7 @@ export default (callbacks: Callbacks) => {
     callbacks.publishDroppable(home);
     callbacks.publishDraggable(draggable);
     // Watching the scroll of the home droppable
-    homeEntry.callbacks.watchScroll();
+    homeEntry.callbacks.watchScroll(request.scrollOptions);
   };
 
   const setFrameId = (frameId: ?number) => {
@@ -336,6 +346,13 @@ export default (callbacks: Callbacks) => {
   const processSecondaryDimensions = (): void => {
     if (!state.isCollecting) {
       cancel('Cannot collect secondary dimensions when collection is not occurring');
+      return;
+    }
+
+    const request: ?InitialLiftRequest = state.request;
+
+    if (!request) {
+      console.error('Cannot process secondary dimensions without a request');
       return;
     }
 
@@ -376,7 +393,7 @@ export default (callbacks: Callbacks) => {
         // need to watch the scroll on each droppable
         toBePublished.droppables.forEach((dimension: DroppableDimension) => {
           const entry: DroppableEntry = state.droppables[dimension.descriptor.id];
-          entry.callbacks.watchScroll();
+          entry.callbacks.watchScroll(request.scrollOptions);
         });
 
         setFrameId(null);

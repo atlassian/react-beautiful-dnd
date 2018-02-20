@@ -289,13 +289,22 @@ export type Phase =
   // This will result in the onDragEnd hook being fired
   'DROP_COMPLETE';
 
+export type ScrollOptions = {|
+  shouldPublishImmediately: boolean,
+|}
+
+export type InitialLiftRequest = {|
+  draggableId: DraggableId,
+  scrollOptions: ScrollOptions,
+|}
+
 export type DimensionState = {|
   // using the draggable id rather than the descriptor as the descriptor
   // may change as a result of the initial flush. This means that the lift
   // descriptor may not be the same as the actual descriptor. To avoid
   // confusion the request is just an id which is looked up
   // in the dimension-marshal post-flush
-  request: ?DraggableId,
+  request: ?InitialLiftRequest,
   draggable: DraggableDimensionMap,
   droppable: DroppableDimensionMap,
 |};

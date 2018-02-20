@@ -8,6 +8,7 @@ import type {
   DroppableId,
   State,
   Position,
+  ScrollOptions,
 } from '../../types';
 
 export type GetDraggableDimensionFn = () => DraggableDimension;
@@ -20,7 +21,7 @@ export type DroppableCallbacks = {|
   // Droppable must listen to scroll events and publish them using the
   // onChange callback. If the Droppable is not in a scroll container then
   // it does not need to do anything
-  watchScroll: () => void,
+  watchScroll: (options: ScrollOptions) => void,
   // If the Droppable is listening for scrol events - it needs to stop!
   // This may be called even if watchScroll was not previously called
   unwatchScroll: () => void,

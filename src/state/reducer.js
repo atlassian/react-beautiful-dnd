@@ -22,6 +22,7 @@ import type {
   CurrentDragPositions,
   Position,
   InitialDragPositions,
+  InitialLiftRequest,
 } from '../types';
 import { add, subtract, isEqual } from './position';
 import { noMovement } from './no-impact';
@@ -173,14 +174,14 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
-    const id: DraggableId = action.payload;
+    const request: InitialLiftRequest = action.payload;
 
     return {
       phase: 'COLLECTING_INITIAL_DIMENSIONS',
       drag: null,
       drop: null,
       dimension: {
-        request: id,
+        request,
         draggable: {},
         droppable: {},
       },

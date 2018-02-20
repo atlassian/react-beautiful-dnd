@@ -15,6 +15,7 @@ import type {
 } from '../../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
   Area,
+  ScrollOptions,
   Spacing,
   DroppableId,
   DroppableDimension,
@@ -179,6 +180,13 @@ const getMarshalStub = (): DimensionMarshal => ({
   onPhaseChange: jest.fn(),
   scrollDroppable: jest.fn(),
 });
+
+const scheduled: ScrollOptions = {
+  shouldPublishImmediately: false,
+};
+const immediate: ScrollOptions = {
+  shouldPublishImmediately: true,
+};
 
 describe('DraggableDimensionPublisher', () => {
   const originalWindowScroll: Position = {
@@ -411,7 +419,7 @@ describe('DraggableDimensionPublisher', () => {
         y: 1000,
       };
       setWindowScroll(windowScroll, { shouldPublish: false });
-      const client: Area = getArea({
+      const ourClient: Area = getArea({
         top: 0,
         right: 100,
         bottom: 100,
@@ -423,9 +431,9 @@ describe('DraggableDimensionPublisher', () => {
           type: 'fake',
         },
         windowScroll,
-        client,
+        client: ourClient,
       });
-      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => client);
+      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => ourClient);
       jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noSpacing);
 
       mount(
@@ -655,99 +663,194 @@ describe('DraggableDimensionPublisher', () => {
       el.dispatchEvent(new Event('scroll'));
     };
 
-    it('should publish the scroll offset of the closest scrollable', () => {
-      const marshal: DimensionMarshal = getMarshalStub();
-      const wrapper = mount(
-        <ScrollableItem />,
-        withDimensionMarshal(marshal),
-      );
-      const container: HTMLElement = wrapper.getDOMNode();
+    describe('should immediately publish updates', () => {
+      it('should immediately publish the scroll offset of the closest scrollable', () => {
+        const marshal: DimensionMarshal = getMarshalStub();
+        const wrapper = mount(
+          <ScrollableItem />,
+          withDimensionMarshal(marshal),
+        );
+        const container: HTMLElement = wrapper.getDOMNode();
 
-      if (!container.classList.contains('scroll-container')) {
-        throw new Error('incorrect dom node collected');
-      }
+        if (!container.classList.contains('scroll-container')) {
+          throw new Error('incorrect dom node collected');
+        }
 
-      // tell the droppable to watch for scrolling
-      const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
-      // watch scroll will only be called after the dimension is requested
-      callbacks.getDimension();
-      callbacks.watchScroll();
+        // tell the droppable to watch for scrolling
+        const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+        // watch scroll will only be called after the dimension is requested
+        callbacks.getDimension();
+        callbacks.watchScroll(immediate);
 
-      scroll(container, { x: 500, y: 1000 });
-      // release the update animation frame
-      requestAnimationFrame.step();
+        scroll(container, { x: 500, y: 1000 });
 
-      expect(marshal.updateDroppableScroll).toHaveBeenCalledWith(
-        preset.home.descriptor.id, { x: 500, y: 1000 },
-      );
+        expect(marshal.updateDroppableScroll).toHaveBeenCalledWith(
+          preset.home.descriptor.id, { x: 500, y: 1000 },
+        );
+      });
+
+      it('should not fire a scroll if the value has not changed since the previous call', () => {
+        // this can happen if you scroll backward and forward super quick
+        const marshal: DimensionMarshal = getMarshalStub();
+        const wrapper = mount(
+          <ScrollableItem />,
+          withDimensionMarshal(marshal),
+        );
+        const container: HTMLElement = wrapper.getDOMNode();
+        // tell the droppable to watch for scrolling
+        const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+
+        // watch scroll will only be called after the dimension is requested
+        callbacks.getDimension();
+        callbacks.watchScroll(immediate);
+
+        // first event
+        scroll(container, { x: 500, y: 1000 });
+        expect(marshal.updateDroppableScroll).toHaveBeenCalledTimes(1);
+        expect(marshal.updateDroppableScroll).toHaveBeenCalledWith(
+          preset.home.descriptor.id, { x: 500, y: 1000 }
+        );
+        marshal.updateDroppableScroll.mockReset();
+
+        // second event - scroll to same spot
+        scroll(container, { x: 500, y: 1000 });
+        expect(marshal.updateDroppableScroll).not.toHaveBeenCalled();
+
+        // third event - new value
+        scroll(container, { x: 500, y: 1001 });
+        expect(marshal.updateDroppableScroll).toHaveBeenCalledWith(
+          preset.home.descriptor.id, { x: 500, y: 1001 }
+        );
+      });
     });
 
-    it('should throttle multiple scrolls into a animation frame', () => {
-      const marshal: DimensionMarshal = getMarshalStub();
-      const wrapper = mount(
-        <ScrollableItem />,
-        withDimensionMarshal(marshal),
-      );
-      const container: HTMLElement = wrapper.getDOMNode();
-      // tell the droppable to watch for scrolling
-      const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+    describe('should schedule publish updates', () => {
+      it('should publish the scroll offset of the closest scrollable', () => {
+        const marshal: DimensionMarshal = getMarshalStub();
+        const wrapper = mount(
+          <ScrollableItem />,
+          withDimensionMarshal(marshal),
+        );
+        const container: HTMLElement = wrapper.getDOMNode();
 
-      // watch scroll will only be called after the dimension is requested
-      callbacks.getDimension();
-      callbacks.watchScroll();
+        if (!container.classList.contains('scroll-container')) {
+          throw new Error('incorrect dom node collected');
+        }
 
-      // first event
-      scroll(container, { x: 500, y: 1000 });
-      // second event in same frame
-      scroll(container, { x: 200, y: 800 });
+        // tell the droppable to watch for scrolling
+        const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+        // watch scroll will only be called after the dimension is requested
+        callbacks.getDimension();
+        callbacks.watchScroll(scheduled);
 
-      // release the update animation frame
-      requestAnimationFrame.step();
+        scroll(container, { x: 500, y: 1000 });
+        // release the update animation frame
+        requestAnimationFrame.step();
 
-      expect(marshal.updateDroppableScroll).toHaveBeenCalledTimes(1);
-      expect(marshal.updateDroppableScroll).toHaveBeenCalledWith(
-        preset.home.descriptor.id, { x: 200, y: 800 },
-      );
+        expect(marshal.updateDroppableScroll).toHaveBeenCalledWith(
+          preset.home.descriptor.id, { x: 500, y: 1000 },
+        );
+      });
 
-      // also checking that no loose frames are stored up
-      requestAnimationFrame.flush();
-      expect(marshal.updateDroppableScroll).toHaveBeenCalledTimes(1);
-    });
+      it('should throttle multiple scrolls into a animation frame', () => {
+        const marshal: DimensionMarshal = getMarshalStub();
+        const wrapper = mount(
+          <ScrollableItem />,
+          withDimensionMarshal(marshal),
+        );
+        const container: HTMLElement = wrapper.getDOMNode();
+        // tell the droppable to watch for scrolling
+        const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
 
-    it('should not fire a scroll if the value has not changed since the previous frame', () => {
-      // this can happen if you scroll backward and forward super quick
-      const marshal: DimensionMarshal = getMarshalStub();
-      const wrapper = mount(
-        <ScrollableItem />,
-        withDimensionMarshal(marshal),
-      );
-      const container: HTMLElement = wrapper.getDOMNode();
-      // tell the droppable to watch for scrolling
-      const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+        // watch scroll will only be called after the dimension is requested
+        callbacks.getDimension();
+        callbacks.watchScroll(scheduled);
 
-      // watch scroll will only be called after the dimension is requested
-      callbacks.getDimension();
-      callbacks.watchScroll();
+        // first event
+        scroll(container, { x: 500, y: 1000 });
+        // second event in same frame
+        scroll(container, { x: 200, y: 800 });
 
-      // first event
-      scroll(container, { x: 500, y: 1000 });
-      // release the frame
-      requestAnimationFrame.step();
-      expect(marshal.updateDroppableScroll).toHaveBeenCalledTimes(1);
-      expect(marshal.updateDroppableScroll).toHaveBeenCalledWith(
-        preset.home.descriptor.id, { x: 500, y: 1000 }
-      );
-      marshal.updateDroppableScroll.mockReset();
+        // release the update animation frame
+        requestAnimationFrame.step();
 
-      // second event
-      scroll(container, { x: 501, y: 1001 });
-      // no frame to release change yet
+        expect(marshal.updateDroppableScroll).toHaveBeenCalledTimes(1);
+        expect(marshal.updateDroppableScroll).toHaveBeenCalledWith(
+          preset.home.descriptor.id, { x: 200, y: 800 },
+        );
 
-      // third event - back to original value
-      scroll(container, { x: 500, y: 1000 });
-      // release the frame
-      requestAnimationFrame.step();
-      expect(marshal.updateDroppableScroll).not.toHaveBeenCalled();
+        // also checking that no loose frames are stored up
+        requestAnimationFrame.flush();
+        expect(marshal.updateDroppableScroll).toHaveBeenCalledTimes(1);
+      });
+
+      it('should not fire a scroll if the value has not changed since the previous frame', () => {
+        // this can happen if you scroll backward and forward super quick
+        const marshal: DimensionMarshal = getMarshalStub();
+        const wrapper = mount(
+          <ScrollableItem />,
+          withDimensionMarshal(marshal),
+        );
+        const container: HTMLElement = wrapper.getDOMNode();
+        // tell the droppable to watch for scrolling
+        const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+
+        // watch scroll will only be called after the dimension is requested
+        callbacks.getDimension();
+        callbacks.watchScroll(scheduled);
+
+        // first event
+        scroll(container, { x: 500, y: 1000 });
+        // release the frame
+        requestAnimationFrame.step();
+        expect(marshal.updateDroppableScroll).toHaveBeenCalledTimes(1);
+        expect(marshal.updateDroppableScroll).toHaveBeenCalledWith(
+          preset.home.descriptor.id, { x: 500, y: 1000 }
+        );
+        marshal.updateDroppableScroll.mockReset();
+
+        // second event
+        scroll(container, { x: 501, y: 1001 });
+        // no frame to release change yet
+
+        // third event - back to original value
+        scroll(container, { x: 500, y: 1000 });
+        // release the frame
+        requestAnimationFrame.step();
+        expect(marshal.updateDroppableScroll).not.toHaveBeenCalled();
+      });
+
+      it('should not publish a scroll update after requested not to update while an animation frame is occurring', () => {
+        const marshal: DimensionMarshal = getMarshalStub();
+        const wrapper = mount(
+          <ScrollableItem />,
+          withDimensionMarshal(marshal),
+        );
+        const container: HTMLElement = wrapper.getDOMNode();
+        // tell the droppable to watch for scrolling
+        const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+
+        // watch scroll will only be called after the dimension is requested
+        callbacks.getDimension();
+        callbacks.watchScroll(scheduled);
+
+        // first event
+        scroll(container, { x: 500, y: 1000 });
+        requestAnimationFrame.step();
+        expect(marshal.updateDroppableScroll).toHaveBeenCalledTimes(1);
+        marshal.updateDroppableScroll.mockReset();
+
+        // second event
+        scroll(container, { x: 400, y: 100 });
+        // no animation frame to release event fired yet
+
+        // unwatching before frame fired
+        callbacks.unwatchScroll();
+
+        // flushing any frames
+        requestAnimationFrame.flush();
+        expect(marshal.updateDroppableScroll).not.toHaveBeenCalled();
+      });
     });
 
     it('should stop watching scroll when no longer required to publish', () => {
@@ -763,12 +866,10 @@ describe('DraggableDimensionPublisher', () => {
 
       // watch scroll will only be called after the dimension is requested
       callbacks.getDimension();
-      callbacks.watchScroll();
+      callbacks.watchScroll(immediate);
 
       // first event
       scroll(container, { x: 500, y: 1000 });
-      // release the frame
-      requestAnimationFrame.step();
       expect(marshal.updateDroppableScroll).toHaveBeenCalledTimes(1);
       marshal.updateDroppableScroll.mockReset();
 
@@ -776,40 +877,6 @@ describe('DraggableDimensionPublisher', () => {
 
       // scroll event after no longer watching
       scroll(container, { x: 190, y: 400 });
-      // let any frames go that want to
-      requestAnimationFrame.flush();
-      expect(marshal.updateDroppableScroll).not.toHaveBeenCalled();
-    });
-
-    it('should not publish a scroll update after requested not to update while an animation frame is occurring', () => {
-      const marshal: DimensionMarshal = getMarshalStub();
-      const wrapper = mount(
-        <ScrollableItem />,
-        withDimensionMarshal(marshal),
-      );
-      const container: HTMLElement = wrapper.getDOMNode();
-      // tell the droppable to watch for scrolling
-      const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
-
-      // watch scroll will only be called after the dimension is requested
-      callbacks.getDimension();
-      callbacks.watchScroll();
-
-      // first event
-      scroll(container, { x: 500, y: 1000 });
-      requestAnimationFrame.step();
-      expect(marshal.updateDroppableScroll).toHaveBeenCalledTimes(1);
-      marshal.updateDroppableScroll.mockReset();
-
-      // second event
-      scroll(container, { x: 400, y: 100 });
-      // no animation frame to release event fired yet
-
-      // unwatching before frame fired
-      callbacks.unwatchScroll();
-
-      // flushing any frames
-      requestAnimationFrame.flush();
       expect(marshal.updateDroppableScroll).not.toHaveBeenCalled();
     });
 
@@ -826,13 +893,12 @@ describe('DraggableDimensionPublisher', () => {
 
       // watch scroll will only be called after the dimension is requested
       callbacks.getDimension();
-      callbacks.watchScroll();
+      callbacks.watchScroll(immediate);
 
       wrapper.unmount();
 
       // second event - will not fire any updates
       scroll(container, { x: 100, y: 300 });
-      requestAnimationFrame.step();
       expect(marshal.updateDroppableScroll).not.toHaveBeenCalled();
       // also logs a warning
       expect(console.warn).toHaveBeenCalled();
@@ -867,7 +933,7 @@ describe('DraggableDimensionPublisher', () => {
       const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
       // request the droppable start listening for scrolling
       callbacks.getDimension();
-      callbacks.watchScroll();
+      callbacks.watchScroll(scheduled);
       expect(console.error).not.toHaveBeenCalled();
 
       // ask it to scroll
@@ -900,7 +966,7 @@ describe('DraggableDimensionPublisher', () => {
         const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
         // watch scroll will only be called after the dimension is requested
         callbacks.getDimension();
-        callbacks.watchScroll();
+        callbacks.watchScroll(scheduled);
 
         callbacks.scroll({ x: 500, y: 1000 });
 

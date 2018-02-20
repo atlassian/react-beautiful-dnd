@@ -9,7 +9,6 @@ import getArea from '../../state/get-area';
 import { getDroppableDimension } from '../../state/dimension';
 import getClosestScrollable from '../get-closest-scrollable';
 import { dimensionMarshalKey } from '../context-keys';
-import { apply } from '../../state/position';
 import type {
   DimensionMarshal,
   DroppableCallbacks,
@@ -23,6 +22,7 @@ import type {
   Area,
   Spacing,
   Direction,
+  ScrollOptions,
 } from '../../types';
 
 type Props = {|
@@ -42,6 +42,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
   closestScrollable: ?Element = null;
   isWatchingScroll: boolean = false;
+  scrollOptions: ?ScrollOptions = null;
   callbacks: DroppableCallbacks;
   publishedDescriptor: ?DroppableDescriptor = null;
 
@@ -84,14 +85,24 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     marshal.updateDroppableScroll(this.publishedDescriptor.id, newScroll);
   });
 
-  // TODO: when keyboard dragging we probably want this to be instant!
-  scheduleScrollUpdate = rafSchedule(() => {
-    // Capturing the scroll now so that it is the latest value
+  updateScroll = () => {
     const offset: Position = this.getClosestScroll();
     this.memoizedUpdateScroll(offset.x, offset.y);
-  });
+  }
 
-  onClosestScroll = () => this.scheduleScrollUpdate();
+  scheduleScrollUpdate = rafSchedule(this.updateScroll);
+
+  onClosestScroll = () => {
+    if (!this.scrollOptions) {
+      console.error('Cannot find scroll options while scrolling');
+      return;
+    }
+    if (this.scrollOptions.shouldPublishImmediately) {
+      this.updateScroll();
+      return;
+    }
+    this.scheduleScrollUpdate();
+  }
 
   scroll = (change: Position) => {
     if (this.closestScrollable == null) {
@@ -108,7 +119,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     this.closestScrollable.scrollLeft += change.x;
   }
 
-  watchScroll = () => {
+  watchScroll = (options: ScrollOptions) => {
     if (!this.props.targetRef) {
       console.error('cannot watch droppable scroll if not in the dom');
       return;
@@ -124,6 +135,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     }
 
     this.isWatchingScroll = true;
+    this.scrollOptions = options;
     this.closestScrollable.addEventListener('scroll', this.onClosestScroll, { passive: true });
   };
 
@@ -135,6 +147,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     }
 
     this.isWatchingScroll = false;
+    this.scrollOptions = null;
     this.scheduleScrollUpdate.cancel();
 
     if (!this.closestScrollable) {
