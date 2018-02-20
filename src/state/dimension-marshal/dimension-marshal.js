@@ -432,7 +432,7 @@ export default (callbacks: Callbacks) => {
     }
 
     if (phase === 'DRAGGING') {
-      if (current.dimension.request !== state.request) {
+      if (current.dimension.request.draggableId !== state.request.draggableId) {
         cancel('Request in local state does not match that of the store');
         return;
       }

@@ -19,6 +19,7 @@ import type {
   DraggableId,
   Store,
   InitialDragPositions,
+  InitialLiftRequest,
 } from '../../../src/types';
 
 const preset = getPreset();
@@ -76,7 +77,13 @@ describe('action creators', () => {
       // Phase 2: request dimensions after flushing animations
       jest.runOnlyPendingTimers();
 
-      expect(store.dispatch).toHaveBeenCalledWith(requestDimensions(preset.inHome1.descriptor.id));
+      const request: InitialLiftRequest = {
+        draggableId: preset.inHome1.descriptor.id,
+        scrollOptions: {
+          shouldPublishImmediately: false,
+        },
+      };
+      expect(store.dispatch).toHaveBeenCalledWith(requestDimensions(request));
       expect(store.dispatch).toHaveBeenCalledTimes(2);
 
       // publishing some fake dimensions
@@ -178,7 +185,12 @@ describe('action creators', () => {
         jest.runOnlyPendingTimers();
 
         expect(store.dispatch).toHaveBeenCalledWith(
-          requestDimensions(preset.inHome1.descriptor.id)
+          requestDimensions({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: {
+              shouldPublishImmediately: false,
+            },
+          })
         );
         expect(store.dispatch).toHaveBeenCalledTimes(2);
 

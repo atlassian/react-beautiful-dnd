@@ -12,6 +12,7 @@ import type {
   DroppableDimension,
   CurrentDragPositions,
   InitialDragPositions,
+  InitialLiftRequest,
   Position,
   DragState,
   DropResult,
@@ -19,13 +20,18 @@ import type {
   DropReason,
   DraggableId,
   DragImpact,
+  ScrollOptions,
 } from '../../src/types';
+
+const scheduled: ScrollOptions = {
+  shouldPublishImmediately: false,
+};
 
 export default (axis?: Axis = vertical) => {
   const preset = getPreset(axis);
 
-  const getDimensionState = (request: DraggableId): DimensionState => {
-    const draggable: DraggableDimension = preset.draggables[request];
+  const getDimensionState = (request: InitialLiftRequest): DimensionState => {
+    const draggable: DraggableDimension = preset.draggables[request.draggableId];
     const home: DroppableDimension = preset.droppables[draggable.descriptor.droppableId];
 
     const result: DimensionState = {
@@ -52,7 +58,13 @@ export default (axis?: Axis = vertical) => {
     phase: 'PREPARING',
   };
 
-  const requesting = (request?: DraggableId = preset.inHome1.descriptor.id): State => {
+  const defaultLiftRequest: InitialLiftRequest = {
+    draggableId: preset.inHome1.descriptor.id,
+    scrollOptions: {
+      shouldPublishImmediately: false,
+    },
+  };
+  const requesting = (request?: InitialLiftRequest = defaultLiftRequest): State => {
     const result: State = {
       phase: 'COLLECTING_INITIAL_DIMENSIONS',
       drag: null,
@@ -109,7 +121,10 @@ export default (axis?: Axis = vertical) => {
       phase: 'DRAGGING',
       drag,
       drop: null,
-      dimension: getDimensionState(id),
+      dimension: getDimensionState({
+        draggableId: id,
+        scrollOptions: scheduled,
+      }),
     };
 
     return result;
@@ -166,7 +181,10 @@ export default (axis?: Axis = vertical) => {
       phase: 'DRAGGING',
       drag,
       drop: null,
-      dimension: getDimensionState(id),
+      dimension: getDimensionState({
+        draggableId: id,
+        scrollOptions: scheduled,
+      }),
     };
 
     return result;
@@ -197,7 +215,10 @@ export default (axis?: Axis = vertical) => {
         pending,
         result: null,
       },
-      dimension: getDimensionState(descriptor.id),
+      dimension: getDimensionState({
+        draggableId: descriptor.id,
+        scrollOptions: scheduled,
+      }),
     };
     return result;
   };
