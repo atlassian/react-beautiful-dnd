@@ -59,7 +59,6 @@ type MoveArgs = {|
   scrollJumpRequest?: ?Position,
 |}
 
-// TODO: use map
 const canPublishDimension = (phase: Phase): boolean =>
   ['IDLE', 'DROP_ANIMATING', 'DROP_COMPLETE'].indexOf(phase) === -1;
 
