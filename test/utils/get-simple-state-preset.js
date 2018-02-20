@@ -12,7 +12,7 @@ import type {
   DroppableDimension,
   CurrentDragPositions,
   InitialDragPositions,
-  InitialLiftRequest,
+  LiftRequest,
   Position,
   DragState,
   DropResult,
@@ -30,7 +30,7 @@ const scheduled: ScrollOptions = {
 export default (axis?: Axis = vertical) => {
   const preset = getPreset(axis);
 
-  const getDimensionState = (request: InitialLiftRequest): DimensionState => {
+  const getDimensionState = (request: LiftRequest): DimensionState => {
     const draggable: DraggableDimension = preset.draggables[request.draggableId];
     const home: DroppableDimension = preset.droppables[draggable.descriptor.droppableId];
 
@@ -58,13 +58,13 @@ export default (axis?: Axis = vertical) => {
     phase: 'PREPARING',
   };
 
-  const defaultLiftRequest: InitialLiftRequest = {
+  const defaultLiftRequest: LiftRequest = {
     draggableId: preset.inHome1.descriptor.id,
     scrollOptions: {
       shouldPublishImmediately: false,
     },
   };
-  const requesting = (request?: InitialLiftRequest = defaultLiftRequest): State => {
+  const requesting = (request?: LiftRequest = defaultLiftRequest): State => {
     const result: State = {
       phase: 'COLLECTING_INITIAL_DIMENSIONS',
       drag: null,

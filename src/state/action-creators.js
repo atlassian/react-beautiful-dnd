@@ -14,7 +14,7 @@ import type {
   CurrentDrag,
   InitialDrag,
   DraggableDescriptor,
-  InitialLiftRequest,
+  LiftRequest,
   AutoScrollMode,
   ScrollOptions,
 } from '../types';
@@ -50,10 +50,10 @@ const getScrollDiff = ({
 
 export type RequestDimensionsAction = {|
   type: 'REQUEST_DIMENSIONS',
-  payload: InitialLiftRequest,
+  payload: LiftRequest,
 |}
 
-export const requestDimensions = (request: InitialLiftRequest): RequestDimensionsAction => ({
+export const requestDimensions = (request: LiftRequest): RequestDimensionsAction => ({
   type: 'REQUEST_DIMENSIONS',
   payload: request,
 });
@@ -495,7 +495,7 @@ export const lift = (id: DraggableId,
     const scrollOptions: ScrollOptions = {
       shouldPublishImmediately: autoScrollMode === 'JUMP',
     };
-    const request: InitialLiftRequest = {
+    const request: LiftRequest = {
       draggableId: id,
       scrollOptions,
     };

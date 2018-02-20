@@ -293,7 +293,7 @@ export type ScrollOptions = {|
   shouldPublishImmediately: boolean,
 |}
 
-export type InitialLiftRequest = {|
+export type LiftRequest = {|
   draggableId: DraggableId,
   scrollOptions: ScrollOptions,
 |}
@@ -304,7 +304,7 @@ export type DimensionState = {|
   // descriptor may not be the same as the actual descriptor. To avoid
   // confusion the request is just an id which is looked up
   // in the dimension-marshal post-flush
-  request: ?InitialLiftRequest,
+  request: ?LiftRequest,
   draggable: DraggableDimensionMap,
   droppable: DroppableDimensionMap,
 |};

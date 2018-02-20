@@ -22,7 +22,7 @@ import type {
   CurrentDragPositions,
   Position,
   InitialDragPositions,
-  InitialLiftRequest,
+  LiftRequest,
 } from '../types';
 import { add, subtract, isEqual } from './position';
 import { noMovement } from './no-impact';
@@ -59,6 +59,7 @@ type MoveArgs = {|
   scrollJumpRequest?: ?Position,
 |}
 
+// TODO: use map
 const canPublishDimension = (phase: Phase): boolean =>
   ['IDLE', 'DROP_ANIMATING', 'DROP_COMPLETE'].indexOf(phase) === -1;
 
@@ -174,7 +175,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
-    const request: InitialLiftRequest = action.payload;
+    const request: LiftRequest = action.payload;
 
     return {
       phase: 'COLLECTING_INITIAL_DIMENSIONS',

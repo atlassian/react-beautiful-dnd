@@ -19,7 +19,7 @@ import type {
   DraggableId,
   Store,
   InitialDragPositions,
-  InitialLiftRequest,
+  LiftRequest,
 } from '../../../src/types';
 
 const preset = getPreset();
@@ -77,7 +77,7 @@ describe('action creators', () => {
       // Phase 2: request dimensions after flushing animations
       jest.runOnlyPendingTimers();
 
-      const request: InitialLiftRequest = {
+      const request: LiftRequest = {
         draggableId: preset.inHome1.descriptor.id,
         scrollOptions: {
           shouldPublishImmediately: false,

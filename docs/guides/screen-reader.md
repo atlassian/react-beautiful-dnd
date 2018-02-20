@@ -12,7 +12,7 @@ For the default messages we have gone for a friendly tone. We have also chosen t
 
 ## `HookProvided` > `Announce`
 
-The `announce` function that is provided to each of the `Hook` functions can be used to provide your own screen reader message. This message will be immediately read out. In order to provide a fast and responsive experience to users **you must provide this message sycnously**. If you attempt to hold onto the `announce` function and call it later it will not work and will just print a warning to the console. Additionally, if you try to call `announce` twice for the same event then only the first will be read by the screen reader with subsequent calls to `announce` being ignored and a warning printed.
+The `announce` function that is provided to each of the `Hook` functions can be used to provide your own screen reader message. This message will be immediately read out. In order to provide a fast and responsive experience to users **you must provide this message synchronously**. If you attempt to hold onto the `announce` function and call it later it will not work and will just print a warning to the console. Additionally, if you try to call `announce` twice for the same event then only the first will be read by the screen reader with subsequent calls to `announce` being ignored and a warning printed.
 
 ## Step 1: instructions
 

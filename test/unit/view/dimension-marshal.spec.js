@@ -21,7 +21,6 @@ import type {
   DraggableDescriptor,
   DroppableDescriptor,
   ScrollOptions,
-  InitialLiftRequest,
   Area,
 } from '../../../src/types';
 
@@ -147,9 +146,9 @@ const withScrollOptions = (current: State, scrollOptions: ScrollOptions) => {
       request: {
         ...current.dimension.request,
         scrollOptions,
-      }
+      },
     },
-  }
+  };
 };
 
 describe('dimension marshal', () => {
@@ -580,7 +579,7 @@ describe('dimension marshal', () => {
 
             marshal.onPhaseChange(withScrollOptions(
               state.dragging(preset.inHome1.descriptor.id),
-              withScrollOptions,
+              scrollOptions,
             ));
             requestAnimationFrame.step(2);
 

@@ -9,7 +9,7 @@ import type {
   State as AppState,
   Phase,
   Position,
-  InitialLiftRequest,
+  LiftRequest,
   ScrollOptions,
 } from '../../types';
 import type {
@@ -32,7 +32,7 @@ type State = {|
   // short lived
   isCollecting: boolean,
   scrollOptions: ?ScrollOptions,
-  request: ?InitialLiftRequest,
+  request: ?LiftRequest,
   frameId: ?number,
 |}
 
@@ -242,7 +242,7 @@ export default (callbacks: Callbacks) => {
   const getToBeCollected = (): UnknownDescriptorType[] => {
     const draggables: DraggableEntryMap = state.draggables;
     const droppables: DroppableEntryMap = state.droppables;
-    const request: ?InitialLiftRequest = state.request;
+    const request: ?LiftRequest = state.request;
 
     if (!request) {
       console.error('cannot find request in state');
@@ -290,7 +290,7 @@ export default (callbacks: Callbacks) => {
     return toBeCollected;
   };
 
-  const processPrimaryDimensions = (request: ?InitialLiftRequest) => {
+  const processPrimaryDimensions = (request: ?LiftRequest) => {
     if (state.isCollecting) {
       cancel('Cannot start capturing dimensions for a drag it is already dragging');
       return;
@@ -343,16 +343,26 @@ export default (callbacks: Callbacks) => {
     });
   };
 
-  const processSecondaryDimensions = (): void => {
+  const processSecondaryDimensions = (requestInAppState: ?LiftRequest): void => {
     if (!state.isCollecting) {
       cancel('Cannot collect secondary dimensions when collection is not occurring');
       return;
     }
 
-    const request: ?InitialLiftRequest = state.request;
+    const request: ?LiftRequest = state.request;
 
     if (!request) {
-      console.error('Cannot process secondary dimensions without a request');
+      cancel('Cannot process secondary dimensions without a request');
+      return;
+    }
+
+    if (!requestInAppState) {
+      cancel('Cannot process secondary dimensions without a request on the state');
+      return;
+    }
+
+    if (requestInAppState.draggableId !== request.draggableId) {
+      cancel('Cannot process secondary dimensions as local request does not match app state');
       return;
     }
 
@@ -432,12 +442,7 @@ export default (callbacks: Callbacks) => {
     }
 
     if (phase === 'DRAGGING') {
-      if (current.dimension.request.draggableId !== state.request.draggableId) {
-        cancel('Request in local state does not match that of the store');
-        return;
-      }
-
-      processSecondaryDimensions();
+      processSecondaryDimensions(current.dimension.request);
       return;
     }
 
