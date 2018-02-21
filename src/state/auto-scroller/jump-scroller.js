@@ -1,7 +1,7 @@
 // @flow
 import { add, subtract } from '../position';
 import getWindowScroll from '../../window/get-window-scroll';
-import isTooBigToAutoScroll from './is-too-big-to-auto-scroll';
+import { isTooBigToAutoScrollDroppable, isTooBigToAutoScrollViewport } from './is-too-big-to-auto-scroll';
 import getViewport from '../../window/get-viewport';
 import {
   canScrollDroppable,
@@ -75,13 +75,17 @@ export default ({
     const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
 
     // 1. Is the draggable too big to auto scroll?
-    if (isTooBigToAutoScroll(getViewport(), draggable.page.withMargin)) {
+    if (isTooBigToAutoScrollViewport(getViewport(), draggable.page.withMargin)) {
       moveByOffset(state, request);
       return;
     }
 
     if (closestScrollable) {
-      if (isTooBigToAutoScroll(closestScrollable.frame, draggable.page.withMargin)) {
+      if (isTooBigToAutoScrollDroppable(
+        droppable.axis,
+        closestScrollable.frame,
+        draggable.page.withMargin
+      )) {
         moveByOffset(state, request);
         return;
       }

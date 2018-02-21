@@ -1,5 +1,9 @@
 // @flow
-import type { Area } from '../../types';
+import type { Area, Axis } from '../../types';
 
-export default (frame: Area, subject: Area): boolean =>
-  subject.width > frame.width || subject.height > frame.height;
+export const isTooBigToAutoScrollDroppable = (axis: Axis, frame: Area, subject: Area): boolean =>
+  subject[axis.size] > frame[axis.size];
+
+export const isTooBigToAutoScrollViewport = (viewport: Area, subject: Area): boolean =>
+  subject.width > viewport.width || subject.height > viewport.height;
+

@@ -722,7 +722,6 @@ export type DroppableProps = {|
 |}
 ```
 
-
 ```js
 <Droppable droppableId="droppable-1">
   {(provided, snapshot) => (
@@ -1341,7 +1340,7 @@ import type { DroppableProvided } from 'react-beautiful-dnd';
 
 If you are using [TypeScript](https://www.typescriptlang.org/) you can use the community maintained [DefinitelyTyped type definitions](https://www.npmjs.com/package/@types/react-beautiful-dnd). [Installation instructions](http://definitelytyped.org/).
 
-### Sample application
+### Sample application with flow types
 
 We have created a [sample application](https://github.com/alexreardon/react-beautiful-dnd-flow-example) which exercises the flowtypes. It is a super simple `React` project based on [`react-create-app`](https://github.com/facebookincubator/create-react-app). You can use this as a reference to see how to set things up correctly.
 
@@ -1359,19 +1358,14 @@ While code coverage is [not a guarantee of code health](https://stackoverflow.co
 
 ### Performance
 
-This codebase is designed to be extremely performant - it is part of its DNA. It builds on prior investigations into `React` performance that you can read about [here](https://medium.com/@alexandereardon/performance-optimisations-for-react-applications-b453c597b191) and [here](https://medium.com/@alexandereardon/performance-optimisations-for-react-applications-round-2-2042e5c9af97). It is designed to perform the minimum number of renders required for each task.
+This codebase is designed to be **extremely performant** - it is part of its DNA. It is designed to perform the smallest amount of updates possible. You can have a read about performance work done for `react-beautiful-dnd` here:
 
-#### Highlights
-
-- using connected-components with memoization to ensure the only components that render are the ones that need to - thanks [`react-redux`](https://github.com/reactjs/react-redux), [`reselect`](https://github.com/reactjs/reselect) and [`memoize-one`](https://github.com/alexreardon/memoize-one)
-- all movements are throttled with a [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame) - thanks [`raf-schd`](https://github.com/alexreardon/raf-schd)
-- memoization is used all over the place - thanks [`memoize-one`](https://github.com/alexreardon/memoize-one)
-- conditionally disabling [`pointer-events`](https://developer.mozilla.org/en/docs/Web/CSS/pointer-events) on `Draggable`s while dragging to prevent the browser needing to do redundant work - you can read more about the technique [here](https://www.thecssninja.com/css/pointer-events-60fps)
-- Non primary animations are done on the GPU
+- [Rethinking drag and drop](https://medium.com/@alexandereardon/rethinking-drag-and-drop-d9f5770b4e6b)
+- [Dragging React performance forward](https://medium.com/@alexandereardon/dragging-react-performance-forward-688b30d40a33)
 
 ## Size
 
-Great care has been taken to keep the library as light as possible. It is currently **~34kb (gzip)** in size. There could be a smaller net cost if you where already using one of the underlying dependencies.
+Great care has been taken to keep the library as light as possible. It is currently **~38kb (gzip)** in size. There could be a smaller net cost if you where already using one of the underlying dependencies.
 
 ## Supported browsers
 

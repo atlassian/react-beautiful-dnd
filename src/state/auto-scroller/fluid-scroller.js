@@ -2,7 +2,7 @@
 import rafSchd from 'raf-schd';
 import getViewport from '../../window/get-viewport';
 import { add, apply, isEqual, patch } from '../position';
-import isTooBigToAutoScroll from './is-too-big-to-auto-scroll';
+import { isTooBigToAutoScrollDroppable, isTooBigToAutoScrollViewport } from './is-too-big-to-auto-scroll';
 import getBestScrollableDroppable from './get-best-scrollable-droppable';
 import { horizontal, vertical } from '../axis';
 import {
@@ -209,7 +209,7 @@ export default ({
     const draggable: DraggableDimension = state.dimension.draggable[drag.initial.descriptor.id];
     const viewport: Area = getViewport();
 
-    if (isTooBigToAutoScroll(viewport, draggable.page.withMargin)) {
+    if (isTooBigToAutoScrollViewport(viewport, draggable.page.withMargin)) {
       return;
     }
 
@@ -236,7 +236,11 @@ export default ({
     // We know this has a closestScrollable
     const closestScrollable: ClosestScrollable = (droppable.viewport.closestScrollable : any);
 
-    if (isTooBigToAutoScroll(closestScrollable.frame, draggable.page.withMargin)) {
+    if (isTooBigToAutoScrollDroppable(
+      droppable.axis,
+      closestScrollable.frame,
+      draggable.page.withMargin
+    )) {
       return;
     }
 
