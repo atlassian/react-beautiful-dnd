@@ -1,8 +1,6 @@
 // @flow
 import { add, subtract } from '../position';
 import getWindowScroll from '../../window/get-window-scroll';
-import { isTooBigToAutoScrollDroppable, isTooBigToAutoScrollViewport } from './is-too-big-to-auto-scroll';
-import getViewport from '../../window/get-viewport';
 import {
   canScrollDroppable,
   canScrollWindow,
@@ -17,8 +15,6 @@ import type {
   Position,
   State,
   DraggableLocation,
-  DraggableDimension,
-  ClosestScrollable,
 } from '../../types';
 
 type Args = {|
@@ -63,7 +59,6 @@ export default ({
       return;
     }
 
-    const draggable: DraggableDimension = state.dimension.draggable[drag.initial.descriptor.id];
     const destination: ?DraggableLocation = drag.impact.destination;
 
     if (!destination) {
@@ -72,30 +67,13 @@ export default ({
     }
 
     const droppable: DroppableDimension = state.dimension.droppable[destination.droppableId];
-    const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
-
-    // 1. Is the draggable too big to auto scroll?
-    if (isTooBigToAutoScrollViewport(getViewport(), draggable.page.withMargin, request)) {
-      moveByOffset(state, request);
-      return;
-    }
-
-    if (closestScrollable) {
-      if (isTooBigToAutoScrollDroppable(
-        droppable.axis,
-        closestScrollable.frame,
-        draggable.page.withMargin
-      )) {
-        moveByOffset(state, request);
-        return;
-      }
-    }
 
     // 1. We scroll the droppable first if we can to avoid the draggable
     // leaving the list
 
     if (canScrollDroppable(droppable, request)) {
       const overlap: ?Position = getDroppableOverlap(droppable, request);
+
       // Droppable can absorb the entire scroll request
       if (!overlap) {
         scrollDroppable(droppable.descriptor.id, request);
@@ -106,7 +84,6 @@ export default ({
 
       // Let the droppable scroll what it can
       const whatTheDroppableCanScroll: Position = subtract(request, overlap);
-      // TODO: is it okay that this is before a move?
       scrollDroppable(droppable.descriptor.id, whatTheDroppableCanScroll);
 
       // Okay, now we need to find out where the rest of the movement can come from.
