@@ -90,43 +90,6 @@ describe('jump auto scrolling', () => {
       const state = getStatePreset(axis);
 
       describe('window scrolling', () => {
-        it('should not scroll if the item is bigger than the viewport', () => {
-          const expanded: Area = getArea(expandByPosition(viewport, { x: 1, y: 1 }));
-          const tooBig: DraggableDimension = getDraggableDimension({
-            descriptor: {
-              id: 'too big',
-              droppableId: preset.home.descriptor.id,
-              // after the last item
-              index: preset.inHomeList.length,
-            },
-            client: expanded,
-          });
-          const request: Position = patch(axis.line, 1);
-          const current: State = (() => {
-            const base: State = state.scrollJumpRequest(request);
-
-            // $ExpectError - not checking for null
-            base.drag.initial.descriptor = tooBig.descriptor;
-
-            return addDraggable(base, tooBig);
-          })();
-          if (!current.drag) {
-            throw new Error('invalid state');
-          }
-          const expected: Position = add(current.drag.current.client.selection, request);
-
-          autoScroller.onStateChange(state.idle, current);
-
-          expect(mocks.scrollDroppable).not.toHaveBeenCalled();
-          expect(mocks.scrollWindow).not.toHaveBeenCalled();
-          expect(mocks.move).toHaveBeenCalledWith(
-            tooBig.descriptor.id,
-            expected,
-            origin,
-            true,
-          );
-        });
-
         describe('moving forwards', () => {
           it('should manually move the item if the window is unable to scroll', () => {
             disableWindowScroll();
@@ -288,50 +251,6 @@ describe('jump auto scrolling', () => {
 
         const maxDroppableScroll: Position =
           scrollable.viewport.closestScrollable.scroll.max;
-
-        it('should not scroll if the item is bigger than the droppable', () => {
-          const expanded: Area = getArea(expandByPosition(frame, { x: 1, y: 1 }));
-          // setting viewport to be bigger
-          setViewport(getArea({
-            top: 0,
-            left: 0,
-            right: 10000,
-            bottom: 10000,
-          }));
-          const tooBig: DraggableDimension = getDraggableDimension({
-            descriptor: {
-              id: 'too big',
-              droppableId: preset.home.descriptor.id,
-              // after the last item
-              index: preset.inHomeList.length,
-            },
-            client: expanded,
-          });
-          const request: Position = patch(axis.line, 1);
-          const current: State = (() => {
-            const base: State = state.scrollJumpRequest(request);
-
-            // $ExpectError - not checking for null
-            base.drag.initial.descriptor = tooBig.descriptor;
-
-            return addDroppable(addDraggable(base, tooBig), scrollable);
-          })();
-          if (!current.drag) {
-            throw new Error('invalid state');
-          }
-          const expected: Position = add(current.drag.current.client.selection, request);
-
-          autoScroller.onStateChange(state.idle, current);
-
-          expect(mocks.scrollDroppable).not.toHaveBeenCalled();
-          expect(mocks.scrollWindow).not.toHaveBeenCalled();
-          expect(mocks.move).toHaveBeenCalledWith(
-            tooBig.descriptor.id,
-            expected,
-            origin,
-            true,
-          );
-        });
 
         describe('moving forwards', () => {
           describe('droppable is able to complete entire scroll', () => {
