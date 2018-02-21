@@ -489,6 +489,150 @@ describe('fluid auto scrolling', () => {
             expect(request[axis.crossAxisLine]).toBeLessThan(0);
           });
         });
+
+        describe('big draggable', () => {
+          const onMaxBoundaryOfBoth: Position = patch(
+            axis.line,
+            (viewport[axis.size] - thresholds.maxSpeedAt),
+            (viewport[axis.crossAxisSize] - crossAxisThresholds.maxSpeedAt),
+          );
+
+          describe('bigger on the main axis', () => {
+            it('should not allow scrolling on the main axis, but allow scrolling on the cross axis', () => {
+              const expanded: Area = getArea(expandByPosition(viewport, patch(axis.line, 1)));
+              const tooBigOnMainAxis: DraggableDimension = getDraggableDimension({
+                descriptor: {
+                  id: 'too big',
+                  droppableId: preset.home.descriptor.id,
+                  // after the last item
+                  index: preset.inHomeList.length,
+                },
+                client: expanded,
+              });
+
+              const selection: Position = onMaxBoundaryOfBoth;
+              const custom: State = (() => {
+                const base: State = state.dragging(
+                  preset.inHome1.descriptor.id,
+                  selection,
+                );
+
+                const updated: State = {
+                  ...base,
+                  drag: {
+                    ...base.drag,
+                    initial: {
+                      // $ExpectError
+                      ...base.drag.initial,
+                      descriptor: tooBigOnMainAxis.descriptor,
+                    },
+                  },
+                };
+
+                return addDraggable(updated, tooBigOnMainAxis);
+              })();
+
+              autoScroller.onStateChange(state.idle, custom);
+
+              requestAnimationFrame.step();
+              expect(mocks.scrollWindow).toHaveBeenCalledWith(
+                // scroll ocurred on the cross axis, but not on the main axis
+                patch(axis.crossAxisLine, config.maxScrollSpeed)
+              );
+            });
+          });
+
+          describe('bigger on the cross axis', () => {
+            it('should not allow scrolling on the cross axis, but allow scrolling on the main axis', () => {
+              const expanded: Area = getArea(
+                expandByPosition(viewport, patch(axis.crossAxisLine, 1))
+              );
+              const tooBigOnCrossAxis: DraggableDimension = getDraggableDimension({
+                descriptor: {
+                  id: 'too big',
+                  droppableId: preset.home.descriptor.id,
+                  // after the last item
+                  index: preset.inHomeList.length,
+                },
+                client: expanded,
+              });
+
+              const selection: Position = onMaxBoundaryOfBoth;
+              const custom: State = (() => {
+                const base: State = state.dragging(
+                  preset.inHome1.descriptor.id,
+                  selection,
+                );
+
+                const updated: State = {
+                  ...base,
+                  drag: {
+                    ...base.drag,
+                    initial: {
+                      // $ExpectError
+                      ...base.drag.initial,
+                      descriptor: tooBigOnCrossAxis.descriptor,
+                    },
+                  },
+                };
+
+                return addDraggable(updated, tooBigOnCrossAxis);
+              })();
+
+              autoScroller.onStateChange(state.idle, custom);
+
+              requestAnimationFrame.step();
+              expect(mocks.scrollWindow).toHaveBeenCalledWith(
+                // scroll ocurred on the main axis, but not on the cross axis
+                patch(axis.line, config.maxScrollSpeed)
+              );
+            });
+          });
+
+          describe('bigger on both axis', () => {
+            it('should not allow scrolling on any axis', () => {
+              const expanded: Area = getArea(
+                expandByPosition(viewport, patch(axis.line, 1, 1))
+              );
+              const tooBig: DraggableDimension = getDraggableDimension({
+                descriptor: {
+                  id: 'too big',
+                  droppableId: preset.home.descriptor.id,
+                  // after the last item
+                  index: preset.inHomeList.length,
+                },
+                client: expanded,
+              });
+
+              const selection: Position = onMaxBoundaryOfBoth;
+              const custom: State = (() => {
+                const base: State = state.dragging(
+                  preset.inHome1.descriptor.id,
+                  selection,
+                );
+
+                const updated: State = {
+                  ...base,
+                  drag: {
+                    ...base.drag,
+                    initial: {
+                      // $ExpectError
+                      ...base.drag.initial,
+                      descriptor: tooBig.descriptor,
+                    },
+                  },
+                };
+
+                return addDraggable(updated, tooBig);
+              })();
+
+              autoScroller.onStateChange(state.idle, custom);
+
+              requestAnimationFrame.step();
+              expect(mocks.scrollWindow).not.toHaveBeenCalled();
+            });
+          });
+        });
       });
 
       describe('droppable scrolling', () => {
@@ -753,6 +897,50 @@ describe('fluid auto scrolling', () => {
                   // scroll ocurred on the main axis, but not on the cross axis
                   patch(axis.line, config.maxScrollSpeed)
                 );
+              });
+            });
+
+            describe('bigger on both axis', () => {
+              it('should not allow scrolling on the cross axis, but allow scrolling on the main axis', () => {
+                const expanded: Area = getArea(
+                  expandByPosition(frame, patch(axis.line, 1, 1))
+                );
+                const tooBig: DraggableDimension = getDraggableDimension({
+                  descriptor: {
+                    id: 'too big',
+                    droppableId: preset.home.descriptor.id,
+                    // after the last item
+                    index: preset.inHomeList.length,
+                  },
+                  client: expanded,
+                });
+
+                const selection: Position = onMaxBoundaryOfBoth;
+                const custom: State = (() => {
+                  const base: State = state.dragging(
+                    preset.inHome1.descriptor.id,
+                    selection,
+                  );
+
+                  const updated: State = {
+                    ...base,
+                    drag: {
+                      ...base.drag,
+                      initial: {
+                        // $ExpectError
+                        ...base.drag.initial,
+                        descriptor: tooBig.descriptor,
+                      },
+                    },
+                  };
+
+                  return addDroppable(addDraggable(updated, tooBig), scrollable);
+                })();
+
+                autoScroller.onStateChange(state.idle, custom);
+
+                requestAnimationFrame.step();
+                expect(mocks.scrollDroppable).not.toHaveBeenCalled();
               });
             });
           });
