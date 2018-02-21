@@ -110,6 +110,10 @@ describe('fluid auto scrolling', () => {
 
       describe('window scrolling', () => {
         const thresholds: PixelThresholds = getPixelThresholds(viewport, axis);
+        const crossAxisThresholds: PixelThresholds = getPixelThresholds(
+          viewport,
+          axis === vertical ? horizontal : vertical,
+        );
 
         describe('moving forward to end of window', () => {
           const onStartBoundary: Position = patch(
@@ -419,11 +423,6 @@ describe('fluid auto scrolling', () => {
 
         // just some light tests to ensure that cross axis moving also works
         describe('moving forward on the cross axis', () => {
-          const crossAxisThresholds: PixelThresholds = getPixelThresholds(
-            viewport,
-            axis === vertical ? horizontal : vertical,
-          );
-
           const onStartBoundary: Position = patch(
             axis.line,
             viewport.center[axis.line],
@@ -461,11 +460,6 @@ describe('fluid auto scrolling', () => {
             setWindowScroll(windowScroll);
           });
 
-          const crossAxisThresholds: PixelThresholds = getPixelThresholds(
-            viewport,
-            axis === vertical ? horizontal : vertical,
-          );
-
           const onStartBoundary: Position = patch(
             axis.line,
             viewport.center[axis.line],
@@ -499,6 +493,10 @@ describe('fluid auto scrolling', () => {
 
       describe('droppable scrolling', () => {
         const thresholds: PixelThresholds = getPixelThresholds(frame, axis);
+        const crossAxisThresholds: PixelThresholds = getPixelThresholds(
+          frame,
+          axis === vertical ? horizontal : vertical
+        );
         const maxScrollSpeed: Position = patch(axis.line, config.maxScrollSpeed);
 
         beforeEach(() => {
@@ -642,88 +640,6 @@ describe('fluid auto scrolling', () => {
             );
           });
 
-          it('should not scroll if the item is too big on the main axis', () => {
-            const expanded: Area = getArea(expandByPosition(frame, patch(axis.line, 1)));
-            const tooBigOnMainAxis: DraggableDimension = getDraggableDimension({
-              descriptor: {
-                id: 'too big',
-                droppableId: preset.home.descriptor.id,
-                // after the last item
-                index: preset.inHomeList.length,
-              },
-              client: expanded,
-            });
-            const selection: Position = onMaxBoundary;
-            const custom: State = (() => {
-              const base: State = state.dragging(
-                preset.inHome1.descriptor.id,
-                selection,
-              );
-
-              const updated: State = {
-                ...base,
-                drag: {
-                  ...base.drag,
-                  initial: {
-                    // $ExpectError
-                    ...base.drag.initial,
-                    descriptor: tooBigOnMainAxis.descriptor,
-                  },
-                },
-              };
-
-              return addDroppable(addDraggable(updated, tooBigOnMainAxis), scrollable);
-            })();
-
-            autoScroller.onStateChange(state.idle, custom);
-
-            requestAnimationFrame.flush();
-            expect(mocks.scrollDroppable).not.toHaveBeenCalled();
-          });
-
-          it('should allow scrolling if the item is bigger than the droppable on the cross axis', () => {
-            const expanded: Area = getArea(expandByPosition(frame, patch(axis.crossAxisLine, 1)));
-            const expected: Position = patch(axis.line, config.maxScrollSpeed);
-            const tooBigOnCrossAxis: DraggableDimension = getDraggableDimension({
-              descriptor: {
-                id: 'too big',
-                droppableId: preset.home.descriptor.id,
-                // after the last item
-                index: preset.inHomeList.length,
-              },
-              client: expanded,
-            });
-            const selection: Position = onMaxBoundary;
-            const custom: State = (() => {
-              const base: State = state.dragging(
-                preset.inHome1.descriptor.id,
-                selection,
-              );
-
-              const updated: State = {
-                ...base,
-                drag: {
-                  ...base.drag,
-                  initial: {
-                    // $ExpectError
-                    ...base.drag.initial,
-                    descriptor: tooBigOnCrossAxis.descriptor,
-                  },
-                },
-              };
-
-              return addDroppable(addDraggable(updated, tooBigOnCrossAxis), scrollable);
-            })();
-
-            autoScroller.onStateChange(state.idle, custom);
-
-            requestAnimationFrame.flush();
-            expect(mocks.scrollDroppable).toHaveBeenCalledWith(
-              scrollable.descriptor.id,
-              expected
-            );
-          });
-
           it('should allow scrolling to the end of the droppable', () => {
             const target: Position = onEndOfFrame;
             // scrolling to max scroll point
@@ -737,6 +653,108 @@ describe('fluid auto scrolling', () => {
             requestAnimationFrame.flush();
 
             expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+          });
+
+          describe('big draggable', () => {
+            const onMaxBoundaryOfBoth: Position = patch(
+              axis.line,
+              (frame[axis.size] - thresholds.maxSpeedAt),
+              (frame[axis.crossAxisSize] - crossAxisThresholds.maxSpeedAt),
+            );
+
+            describe('bigger on the main axis', () => {
+              it('should not allow scrolling on the main axis, but allow scrolling on the cross axis', () => {
+                const expanded: Area = getArea(expandByPosition(frame, patch(axis.line, 1)));
+                const tooBigOnMainAxis: DraggableDimension = getDraggableDimension({
+                  descriptor: {
+                    id: 'too big',
+                    droppableId: preset.home.descriptor.id,
+                    // after the last item
+                    index: preset.inHomeList.length,
+                  },
+                  client: expanded,
+                });
+
+                const selection: Position = onMaxBoundaryOfBoth;
+                const custom: State = (() => {
+                  const base: State = state.dragging(
+                    preset.inHome1.descriptor.id,
+                    selection,
+                  );
+
+                  const updated: State = {
+                    ...base,
+                    drag: {
+                      ...base.drag,
+                      initial: {
+                        // $ExpectError
+                        ...base.drag.initial,
+                        descriptor: tooBigOnMainAxis.descriptor,
+                      },
+                    },
+                  };
+
+                  return addDroppable(addDraggable(updated, tooBigOnMainAxis), scrollable);
+                })();
+
+                autoScroller.onStateChange(state.idle, custom);
+
+                requestAnimationFrame.flush();
+                expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+                  scrollable.descriptor.id,
+                  // scroll ocurred on the cross axis, but not on the main axis
+                  patch(axis.crossAxisLine, config.maxScrollSpeed)
+                );
+              });
+            });
+
+            describe('bigger on the cross axis', () => {
+              it('should not allow scrolling on the cross axis, but allow scrolling on the main axis', () => {
+                const expanded: Area = getArea(
+                  expandByPosition(frame, patch(axis.crossAxisLine, 1))
+                );
+                const tooBigOnCrossAxis: DraggableDimension = getDraggableDimension({
+                  descriptor: {
+                    id: 'too big',
+                    droppableId: preset.home.descriptor.id,
+                    // after the last item
+                    index: preset.inHomeList.length,
+                  },
+                  client: expanded,
+                });
+
+                const selection: Position = onMaxBoundaryOfBoth;
+                const custom: State = (() => {
+                  const base: State = state.dragging(
+                    preset.inHome1.descriptor.id,
+                    selection,
+                  );
+
+                  const updated: State = {
+                    ...base,
+                    drag: {
+                      ...base.drag,
+                      initial: {
+                        // $ExpectError
+                        ...base.drag.initial,
+                        descriptor: tooBigOnCrossAxis.descriptor,
+                      },
+                    },
+                  };
+
+                  return addDroppable(addDraggable(updated, tooBigOnCrossAxis), scrollable);
+                })();
+
+                autoScroller.onStateChange(state.idle, custom);
+
+                requestAnimationFrame.flush();
+                expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+                  scrollable.descriptor.id,
+                  // scroll ocurred on the main axis, but not on the cross axis
+                  patch(axis.line, config.maxScrollSpeed)
+                );
+              });
+            });
           });
 
           describe('over home list', () => {
@@ -1019,11 +1037,6 @@ describe('fluid auto scrolling', () => {
           const droppableScroll: Position = patch(axis.crossAxisLine, 10);
           const scrolled: DroppableDimension = scrollDroppable(scrollable, droppableScroll);
 
-          const crossAxisThresholds: PixelThresholds = getPixelThresholds(
-            frame,
-            axis === vertical ? horizontal : vertical,
-          );
-
           const onStartBoundary: Position = patch(
             axis.line,
             frame.center[axis.line],
@@ -1063,10 +1076,6 @@ describe('fluid auto scrolling', () => {
         describe('moving backward on the cross axis', () => {
           const droppableScroll: Position = patch(axis.crossAxisLine, 10);
           const scrolled: DroppableDimension = scrollDroppable(scrollable, droppableScroll);
-          const crossAxisThresholds: PixelThresholds = getPixelThresholds(
-            frame,
-            axis === vertical ? horizontal : vertical,
-          );
 
           const onStartBoundary: Position = patch(
             axis.line,

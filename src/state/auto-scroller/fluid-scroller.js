@@ -2,7 +2,6 @@
 import rafSchd from 'raf-schd';
 import getViewport from '../../window/get-viewport';
 import { add, apply, isEqual, patch } from '../position';
-import { isTooBigToAutoScrollDroppable, isTooBigToAutoScrollViewport } from './is-too-big-to-auto-scroll';
 import getBestScrollableDroppable from './get-best-scrollable-droppable';
 import { horizontal, vertical } from '../axis';
 import {
@@ -143,16 +142,18 @@ const getRequiredScroll = ({ container, subject, center }: Args): ?Position => {
   }
 
   // need to not scroll in a direction that we are too big to scroll in
-  return adjustForSizeLimits({
+  const limited: ?Position = adjustForSizeLimits({
     container,
     subject,
     proposedScroll: required,
   });
-};
 
-// type BlockArgs = {|
-//   container: Area,
-// |}
+  if (!limited) {
+    return null;
+  }
+
+  return isEqual(limited, origin) ? null : limited;
+};
 
 type WithPlaceholderResult = {|
   current: Position,
