@@ -9,6 +9,7 @@ import {
   canScrollWindow,
   canPartiallyScroll,
 } from './can-scroll';
+import adjustForSizeLimits from './adjust-for-size-limits';
 import type {
   Area,
   Axis,
@@ -85,8 +86,14 @@ const getSpeed = (distance: number, thresholds: PixelThresholds): number => {
   return speed;
 };
 
+type Args = {|
+  container: Area,
+  subject: Area,
+  center: Position,
+|}
+
 // returns null if no scroll is required
-const getRequiredScroll = (container: Area, center: Position): ?Position => {
+const getRequiredScroll = ({ container, subject, center }: Args): ?Position => {
   // get distance to each edge
   const distance: Spacing = {
     top: center.y - container.top,
@@ -130,8 +137,22 @@ const getRequiredScroll = (container: Area, center: Position): ?Position => {
 
   const required: Position = clean({ x, y });
 
-  return isEqual(required, origin) ? null : required;
+  // nothing required
+  if (isEqual(required, origin)) {
+    return null;
+  }
+
+  // need to not scroll in a direction that we are too big to scroll in
+  return adjustForSizeLimits({
+    container,
+    subject,
+    proposedScroll: required,
+  });
 };
+
+// type BlockArgs = {|
+//   container: Area,
+// |}
 
 type WithPlaceholderResult = {|
   current: Position,
@@ -207,13 +228,13 @@ export default ({
     // 1. Can we scroll the viewport?
 
     const draggable: DraggableDimension = state.dimension.draggable[drag.initial.descriptor.id];
+    const subject: Area = draggable.page.withMargin;
     const viewport: Area = getViewport();
-
-    if (isTooBigToAutoScrollViewport(viewport, draggable.page.withMargin)) {
-      return;
-    }
-
-    const requiredWindowScroll: ?Position = getRequiredScroll(viewport, center);
+    const requiredWindowScroll: ?Position = getRequiredScroll({
+      container: viewport,
+      subject,
+      center,
+    });
 
     if (requiredWindowScroll && canScrollWindow(requiredWindowScroll)) {
       scheduleWindowScroll(requiredWindowScroll);
@@ -236,15 +257,11 @@ export default ({
     // We know this has a closestScrollable
     const closestScrollable: ClosestScrollable = (droppable.viewport.closestScrollable : any);
 
-    if (isTooBigToAutoScrollDroppable(
-      droppable.axis,
-      closestScrollable.frame,
-      draggable.page.withMargin
-    )) {
-      return;
-    }
-
-    const requiredFrameScroll: ?Position = getRequiredScroll(closestScrollable.frame, center);
+    const requiredFrameScroll: ?Position = getRequiredScroll({
+      container: closestScrollable.frame,
+      subject,
+      center,
+    });
 
     if (!requiredFrameScroll) {
       return;

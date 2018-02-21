@@ -75,7 +75,7 @@ export default ({
     const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
 
     // 1. Is the draggable too big to auto scroll?
-    if (isTooBigToAutoScrollViewport(getViewport(), draggable.page.withMargin)) {
+    if (isTooBigToAutoScrollViewport(getViewport(), draggable.page.withMargin, request)) {
       moveByOffset(state, request);
       return;
     }
