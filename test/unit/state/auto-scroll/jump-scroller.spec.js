@@ -4,7 +4,6 @@ import type {
   Axis,
   Position,
   State,
-  DraggableDimension,
   DroppableDimension,
 } from '../../../../src/types';
 import type { AutoScroller } from '../../../../src/state/auto-scroller/auto-scroller-types';
@@ -16,9 +15,8 @@ import setWindowScroll, { resetWindowScroll } from '../../../utils/set-window-sc
 import { vertical, horizontal } from '../../../../src/state/axis';
 import createAutoScroller from '../../../../src/state/auto-scroller';
 import getStatePreset from '../../../utils/get-simple-state-preset';
-import { getPreset } from '../../../utils/dimension';
-import { expandByPosition } from '../../../../src/state/spacing';
-import { getDraggableDimension, getDroppableDimension, scrollDroppable } from '../../../../src/state/dimension';
+import { getPreset, addDroppable } from '../../../utils/dimension';
+import { getDroppableDimension, scrollDroppable } from '../../../../src/state/dimension';
 import getMaxScroll from '../../../../src/state/get-max-scroll';
 
 const origin: Position = { x: 0, y: 0 };
@@ -32,27 +30,6 @@ const viewport: Area = getArea({
   left: 0,
   right: 800,
   bottom: 1000,
-});
-
-const addDroppable = (base: State, droppable: DroppableDimension): State => ({
-  ...base,
-  dimension: {
-    ...base.dimension,
-    droppable: {
-      ...base.dimension.droppable,
-      [droppable.descriptor.id]: droppable,
-    },
-  },
-});
-const addDraggable = (base: State, draggable: DraggableDimension): State => ({
-  ...base,
-  dimension: {
-    ...base.dimension,
-    draggable: {
-      ...base.dimension.draggable,
-      [draggable.descriptor.id]: draggable,
-    },
-  },
 });
 
 const disableWindowScroll = () => {
