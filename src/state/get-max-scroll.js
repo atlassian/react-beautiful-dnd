@@ -27,7 +27,5 @@ export default ({
   };
 
   return adjustedMaxScroll;
-
-  // return maxScroll;
 };
 

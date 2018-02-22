@@ -287,7 +287,12 @@ export default ({
     }
 
     // We know this has a closestScrollable
-    const closestScrollable: ClosestScrollable = (droppable.viewport.closestScrollable : any);
+    const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
+
+    // this should never happen - just being safe
+    if (!closestScrollable) {
+      return;
+    }
 
     const requiredFrameScroll: ?Position = getRequiredScroll({
       container: closestScrollable.frame,
