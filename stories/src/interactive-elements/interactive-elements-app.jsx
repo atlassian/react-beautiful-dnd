@@ -67,7 +67,7 @@ const initial: ItemType[] = [
     component: (
       <div>
         <label htmlFor="myRadio">
-          <input id="myRadio1" type="radio" name="myRadio"/>
+          <input id="myRadio1" type="radio" name="myRadio" />
           Option 1
         </label>
         <br />
