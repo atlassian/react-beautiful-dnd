@@ -25,7 +25,6 @@ const visuallyHidden: Object = {
 
 export default (): Announcer => {
   const id: string = `react-beautiful-dnd-announcement-${count++}`;
-  // const id: string = 'react-beautiful-dnd-announcement';
 
   let state: State = {
     el: null,
