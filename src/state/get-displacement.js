@@ -1,6 +1,6 @@
 // @flow
 import getDisplacementMap, { type DisplacementMap } from './get-displacement-map';
-import isPartiallyVisible from './visibility/is-partially-visible';
+import { isPartiallyVisible } from './visibility/is-visible';
 import type {
   DraggableId,
   Displacement,
@@ -16,6 +16,10 @@ type Args = {|
   previousImpact: DragImpact,
   viewport: Area,
 |}
+
+// Note: it is also an optimisation to undo the displacement on
+// items when they are no longer visible.
+// This prevents a lot of .render() calls when leaving a list
 
 export default ({
   draggable,

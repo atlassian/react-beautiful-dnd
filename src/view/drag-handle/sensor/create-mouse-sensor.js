@@ -116,7 +116,10 @@ export default ({
         return;
       }
 
-      startDragging(() => callbacks.onLift({ client: point, isScrollAllowed: true }));
+      startDragging(() => callbacks.onLift({
+        client: point,
+        autoScrollMode: 'FLUID',
+      }));
     },
     mouseup: () => {
       if (state.pending) {
@@ -175,6 +178,7 @@ export default ({
 
     eventKeys.forEach((eventKey: string) => {
       if (eventKey === 'scroll') {
+        // eventual consistency is fine because we use position: fixed on the item
         win.addEventListener(eventKey, windowBindings.scroll, { passive: true });
         return;
       }

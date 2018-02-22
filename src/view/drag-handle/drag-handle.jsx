@@ -176,13 +176,10 @@ export default class DragHandle extends Component<Props> {
     return shouldAllowDraggingFromTarget(event, this.props);
   }
 
-  isAnySensorDragging = (): boolean =>
-    this.sensors.some((sensor: Sensor) => sensor.isDragging())
-
   isAnySensorCapturing = (): boolean =>
     this.sensors.some((sensor: Sensor) => sensor.isCapturing())
 
-  getProvided = memoizeOne((isEnabled: boolean, isDragging: boolean): ?DragHandleProps => {
+  getProvided = memoizeOne((isEnabled: boolean): ?DragHandleProps => {
     if (!isEnabled) {
       return null;
     }
@@ -194,8 +191,9 @@ export default class DragHandle extends Component<Props> {
       onTouchMove: this.onTouchMove,
       onClick: this.onClick,
       tabIndex: 0,
-      'aria-grabbed': isDragging,
       'data-react-beautiful-dnd-drag-handle': this.styleContext,
+      // English default. Consumers are welcome to add their own start instruction
+      'aria-roledescription': 'Draggable item. Press space bar to lift',
       draggable: false,
       onDragStart: getFalse,
       onDrop: getFalse,
@@ -207,6 +205,6 @@ export default class DragHandle extends Component<Props> {
   render() {
     const { children, isEnabled } = this.props;
 
-    return children(this.getProvided(isEnabled, this.isAnySensorDragging()));
+    return children(this.getProvided(isEnabled));
   }
 }

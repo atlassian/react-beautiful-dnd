@@ -12,7 +12,6 @@ const Avatar = styled.img`
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  cursor: grab;
   margin-right: ${grid}px;
   border-color: ${({ isDragging }) => (isDragging ? colors.green : colors.white)};
   border-style: solid;

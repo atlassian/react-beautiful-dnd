@@ -9,9 +9,10 @@ import type {
   Displacement,
   Area,
 } from '../../types';
-import { add, patch } from '../position';
+import { patch } from '../position';
 import getDisplacement from '../get-displacement';
-import getViewport from '../visibility/get-viewport';
+import withDroppableScroll from '../with-droppable-scroll';
+import getViewport from '../../window/get-viewport';
 
 // It is the responsibility of this function
 // to return the impact of a drag
@@ -36,13 +37,9 @@ export default ({
   // The starting center position
   const originalCenter: Position = draggable.page.withoutMargin.center;
 
-  // Where is the element now?
-
+  // Where the element actually is now.
   // Need to take into account the change of scroll in the droppable
-  const homeScrollDiff: Position = home.viewport.frameScroll.diff.value;
-
-  // Where the element actually is now
-  const currentCenter: Position = add(pageCenter, homeScrollDiff);
+  const currentCenter: Position = withDroppableScroll(home, pageCenter);
 
   // not considering margin so that items move based on visible edges
   const isBeyondStartPosition: boolean = currentCenter[axis.line] - originalCenter[axis.line] > 0;

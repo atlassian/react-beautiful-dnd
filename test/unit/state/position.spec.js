@@ -1,6 +1,7 @@
 // @flow
 import {
   add,
+  apply,
   subtract,
   isEqual,
   negate,
@@ -49,6 +50,10 @@ describe('position', () => {
 
     it('should return false when two objects have different values', () => {
       expect(isEqual(point1, point2)).toBe(false);
+    });
+
+    it('should return true when -origin is compared with +origin', () => {
+      expect(isEqual({ x: -0, y: -0 }, { x: 0, y: 0 })).toBe(true);
     });
   });
 
@@ -123,6 +128,14 @@ describe('position', () => {
       const option2 = { x: 2, y: 2 };
 
       expect(closest(origin, [option1, option2])).toEqual(distance(origin, option1));
+    });
+  });
+
+  describe('apply', () => {
+    it('should apply the function to both values', () => {
+      const add1 = apply((value: number) => value + 1);
+
+      expect(add1({ x: 1, y: 2 })).toEqual({ x: 2, y: 3 });
     });
   });
 });

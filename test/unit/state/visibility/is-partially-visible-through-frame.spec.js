@@ -1,29 +1,29 @@
 // @flow
-import isVisibleThroughFrame from '../../../../src/state/visibility/is-visible-through-frame';
-import { add, offset } from '../../../../src/state/spacing';
+import isPartiallyVisibleThroughFrame from '../../../../src/state/visibility/is-partially-visible-through-frame';
+import { offsetByPosition, expandBySpacing } from '../../../../src/state/spacing';
 import type { Spacing } from '../../../../src/types';
 
 const frame: Spacing = {
   top: 0, left: 0, right: 100, bottom: 100,
 };
 
-describe('is visible through frame', () => {
+describe('is partially visible through frame', () => {
   describe('subject is smaller than frame', () => {
     describe('completely outside frame', () => {
       it('should return false if subject is outside frame on any side', () => {
         const outside: Spacing[] = [
           // outside on top
-          offset(frame, { x: 0, y: -101 }),
+          offsetByPosition(frame, { x: 0, y: -101 }),
           // outside on right
-          offset(frame, { x: 101, y: 0 }),
+          offsetByPosition(frame, { x: 101, y: 0 }),
           // outside on bottom
-          offset(frame, { x: 0, y: 101 }),
+          offsetByPosition(frame, { x: 0, y: 101 }),
           // outside on left
-          offset(frame, { x: -101, y: 0 }),
+          offsetByPosition(frame, { x: -101, y: 0 }),
         ];
 
         outside.forEach((subject: Spacing) => {
-          expect(isVisibleThroughFrame(frame)(subject)).toBe(false);
+          expect(isPartiallyVisibleThroughFrame(frame)(subject)).toBe(false);
         });
       });
     });
@@ -37,7 +37,7 @@ describe('is visible through frame', () => {
           bottom: 90,
         };
 
-        expect(isVisibleThroughFrame(frame)(subject)).toBe(true);
+        expect(isPartiallyVisibleThroughFrame(frame)(subject)).toBe(true);
       });
     });
 
@@ -54,55 +54,29 @@ describe('is visible through frame', () => {
           right: 150,
         };
 
-        expect(isVisibleThroughFrame(frame)(subject)).toBe(true);
-      });
-
-      it('should return false when only partially visible horizontally', () => {
-        const subject: Spacing = {
-          // visible
-          left: 50,
-          // not visible
-          top: 110,
-          bottom: 150,
-          right: 150,
-        };
-
-        expect(isVisibleThroughFrame(frame)(subject)).toBe(false);
-      });
-
-      it('should return false when only partially visible vertically', () => {
-        const subject: Spacing = {
-          // visible
-          top: 10,
-          // not visible
-          bottom: 110,
-          left: 110,
-          right: 150,
-        };
-
-        expect(isVisibleThroughFrame(frame)(subject)).toBe(false);
+        expect(isPartiallyVisibleThroughFrame(frame)(subject)).toBe(true);
       });
     });
   });
 
   describe('subject is equal to frame', () => {
     it('should return true when the frame is equal to the subject', () => {
-      expect(isVisibleThroughFrame(frame)(frame)).toBe(true);
-      expect(isVisibleThroughFrame(frame)({ ...frame })).toBe(true);
+      expect(isPartiallyVisibleThroughFrame(frame)(frame)).toBe(true);
+      expect(isPartiallyVisibleThroughFrame(frame)({ ...frame })).toBe(true);
     });
   });
 
   describe('subject is bigger than frame', () => {
-    const bigSubject: Spacing = add(frame, frame);
+    const bigSubject: Spacing = expandBySpacing(frame, frame);
 
     it('should return false if the subject has no overlap with the frame', () => {
-      const subject: Spacing = offset(bigSubject, { x: 1000, y: 1000 });
+      const subject: Spacing = offsetByPosition(bigSubject, { x: 1000, y: 1000 });
 
-      expect(isVisibleThroughFrame(frame)(subject)).toBe(false);
+      expect(isPartiallyVisibleThroughFrame(frame)(subject)).toBe(false);
     });
 
     it('should return true if subject is bigger on every side', () => {
-      expect(isVisibleThroughFrame(frame)(bigSubject)).toBe(true);
+      expect(isPartiallyVisibleThroughFrame(frame)(bigSubject)).toBe(true);
     });
 
     describe('partially visible', () => {
@@ -120,7 +94,7 @@ describe('is visible through frame', () => {
         ];
 
         subjects.forEach((subject: Spacing) => {
-          expect(isVisibleThroughFrame(frame)(subject)).toBe(true);
+          expect(isPartiallyVisibleThroughFrame(frame)(subject)).toBe(true);
         });
       });
 
@@ -134,7 +108,7 @@ describe('is visible through frame', () => {
           right: 500,
         };
 
-        expect(isVisibleThroughFrame(frame)(subject)).toEqual(false);
+        expect(isPartiallyVisibleThroughFrame(frame)(subject)).toEqual(false);
       });
 
       it('should return false when only partially visible vertically', () => {
@@ -147,7 +121,7 @@ describe('is visible through frame', () => {
           right: 500,
         };
 
-        expect(isVisibleThroughFrame(frame)(subject)).toEqual(false);
+        expect(isPartiallyVisibleThroughFrame(frame)(subject)).toEqual(false);
       });
     });
   });

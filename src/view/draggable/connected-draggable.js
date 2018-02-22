@@ -22,10 +22,12 @@ import type {
   State,
   Position,
   DraggableId,
+  DroppableId,
   DragMovement,
   DraggableDimension,
   Direction,
   Displacement,
+  PendingDrop,
 } from '../../types';
 import type {
   MapProps,
@@ -47,6 +49,7 @@ const defaultMapProps: MapProps = {
   // these properties are only populated when the item is dragging
   dimension: null,
   direction: null,
+  draggingOver: null,
 };
 
 export const makeSelector = (): Selector => {
@@ -66,6 +69,7 @@ export const makeSelector = (): Selector => {
       shouldAnimateDragMovement: false,
       dimension: null,
       direction: null,
+      draggingOver: null,
     }),
   );
 
@@ -75,6 +79,8 @@ export const makeSelector = (): Selector => {
     dimension: DraggableDimension,
     // direction of the droppable you are over
     direction: ?Direction,
+    // the id of the droppable you are over
+    draggingOver: ?DroppableId,
   ): MapProps => ({
     isDragging: true,
     isDropAnimating: false,
@@ -83,6 +89,7 @@ export const makeSelector = (): Selector => {
     shouldAnimateDragMovement,
     dimension,
     direction,
+    draggingOver,
   }));
 
   const draggingSelector = (state: State, ownProps: OwnProps): ?MapProps => {
@@ -105,36 +112,47 @@ export const makeSelector = (): Selector => {
       const dimension: DraggableDimension = state.dimension.draggable[ownProps.draggableId];
       const direction: ?Direction = state.drag.impact.direction;
       const shouldAnimateDragMovement: boolean = state.drag.current.shouldAnimate;
+      const draggingOver: ?DroppableId = state.drag.impact.destination ?
+        state.drag.impact.destination.droppableId :
+        null;
 
       return getDraggingProps(
         memoizedOffset(offset.x, offset.y),
         shouldAnimateDragMovement,
         dimension,
         direction,
+        draggingOver,
       );
     }
 
     // dropping
 
-    if (!state.drop || !state.drop.pending) {
+    const pending: ?PendingDrop = state.drop && state.drop.pending;
+
+    if (!pending) {
       console.error('cannot provide props for dropping item when there is invalid state');
       return null;
     }
 
     // this was not the dragging item
-    if (state.drop.pending.result.draggableId !== ownProps.draggableId) {
+    if (pending.result.draggableId !== ownProps.draggableId) {
       return null;
     }
+
+    const draggingOver: ?DroppableId = pending.result.destination ?
+      pending.result.destination.droppableId : null;
+    const direction: ?Direction = pending.impact.direction ?
+      pending.impact.direction : null;
 
     // not memoized as it is the only execution
     return {
       isDragging: false,
       isDropAnimating: true,
-      offset: state.drop.pending.newHomeOffset,
+      offset: pending.newHomeOffset,
       // still need to provide the dimension for the placeholder
       dimension: state.dimension.draggable[ownProps.draggableId],
-      // direction no longer needed as drag handle is unbound
-      direction: null,
+      draggingOver,
+      direction,
       // animation will be controlled by the isDropAnimating flag
       shouldAnimateDragMovement: false,
       // not relevant,

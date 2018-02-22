@@ -2,8 +2,8 @@
 import { closest } from '../position';
 import isWithin from '../is-within';
 import { getCorners } from '../spacing';
-import getViewport from '../visibility/get-viewport';
-import isVisibleThroughFrame from '../visibility/is-visible-through-frame';
+import getViewport from '../../window/get-viewport';
+import isPartiallyVisibleThroughFrame from '../visibility/is-partially-visible-through-frame';
 import type {
   Axis,
   DroppableDimension,
@@ -58,13 +58,16 @@ export default ({
     .filter((droppable: DroppableDimension): boolean => droppable !== source)
     // Remove any options that are not enabled
     .filter((droppable: DroppableDimension): boolean => droppable.isEnabled)
-    // Remove any droppables that have invisible subjects
-    .filter((droppable: DroppableDimension): boolean => Boolean(droppable.viewport.clipped))
     // Remove any droppables that are not partially visible
-    .filter((droppable: DroppableDimension): boolean => (
-      isVisibleThroughFrame(viewport)(droppable.viewport.frame)
-    ))
-
+    .filter((droppable: DroppableDimension): boolean => {
+      const clipped: ?Area = droppable.viewport.clipped;
+      // subject is not visible at all in frame
+      if (!clipped) {
+        return false;
+      }
+      // TODO: only need to be totally visible on the cross axis
+      return isPartiallyVisibleThroughFrame(viewport)(clipped);
+    })
     .filter((droppable: DroppableDimension): boolean => {
       const targetClipped: Area = getSafeClipped(droppable);
 

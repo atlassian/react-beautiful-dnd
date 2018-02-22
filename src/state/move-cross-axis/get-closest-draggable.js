@@ -1,7 +1,8 @@
 // @flow
 import { distance } from '../position';
-import getViewport from '../visibility/get-viewport';
-import isPartiallyVisible from '../visibility/is-partially-visible';
+import getViewport from '../../window/get-viewport';
+import { isTotallyVisible } from '../visibility/is-visible';
+import withDroppableDisplacement from '../with-droppable-displacement';
 import type {
   Area,
   Axis,
@@ -34,16 +35,23 @@ export default ({
 
   const result: DraggableDimension[] = insideDestination
     // Remove any options that are hidden by overflow
-    // Draggable must be partially visible to move to it
+    // Draggable must be totally visible to move to it
     .filter((draggable: DraggableDimension): boolean =>
-      isPartiallyVisible({
+      isTotallyVisible({
         target: draggable.page.withMargin,
         destination,
         viewport,
       }))
     .sort((a: DraggableDimension, b: DraggableDimension): number => {
-      const distanceToA = distance(pageCenter, a.page.withMargin.center);
-      const distanceToB = distance(pageCenter, b.page.withMargin.center);
+      // Need to consider the change in scroll in the destination
+      const distanceToA = distance(
+        pageCenter,
+        withDroppableDisplacement(destination, a.page.withMargin.center)
+      );
+      const distanceToB = distance(
+        pageCenter,
+        withDroppableDisplacement(destination, b.page.withMargin.center)
+      );
 
       // if a is closer - return a
       if (distanceToA < distanceToB) {
