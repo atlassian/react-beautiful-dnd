@@ -73,7 +73,7 @@ export default ({
     return remainder;
   };
 
-  const scrollWindowAsMuchAsItCan = (change: Position): ?Remainder => {
+  const scrollWindowAsMuchAsItCan = (change: Position): ?Position => {
     // window cannot absorb any of the scroll
     if (!canScrollWindow(change)) {
       return change;
@@ -130,7 +130,7 @@ export default ({
 
     const windowRemainder: ?Position = scrollWindowAsMuchAsItCan(droppableRemainder);
 
-    // window could absorb all droppable remainder
+    // window could absorb all the droppable remainder
     if (!windowRemainder) {
       return;
     }
