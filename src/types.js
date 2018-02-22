@@ -49,10 +49,10 @@ export type Direction = 'horizontal' | 'vertical';
 export type VerticalAxis = {|
   direction: 'vertical',
   line: 'y',
-  crossLine: 'x',
   start: 'top',
   end: 'bottom',
   size: 'height',
+  crossAxisLine: 'x',
   crossAxisStart: 'left',
   crossAxisEnd: 'right',
   crossAxisSize: 'width',
@@ -61,10 +61,10 @@ export type VerticalAxis = {|
 export type HorizontalAxis = {|
   direction: 'horizontal',
   line: 'x',
-  crossLine: 'y',
   start: 'left',
   end: 'right',
   size: 'width',
+  crossAxisLine: 'y',
   crossAxisStart: 'top',
   crossAxisEnd: 'bottom',
   crossAxisSize: 'height',
@@ -98,14 +98,18 @@ export type DraggableDimension = {|
   |},
 |}
 
-export type DroppableDimensionViewport = {|
+export type ClosestScrollable = {|
   // This is the window through which the droppable is observed
   // It does not change during a drag
   frame: Area,
-  // keeping track of the scroll
-  frameScroll: {|
+  // Whether or not we should clip the subject by the frame
+  // Is controlled by the ignoreContainerClipping prop
+  shouldClipSubject: boolean,
+  scroll: {|
     initial: Position,
     current: Position,
+    // the maximum allowable scroll for the frame
+    max: Position,
     diff: {|
       value: Position,
       // The actual displacement as a result of a scroll is in the opposite
@@ -113,13 +117,16 @@ export type DroppableDimensionViewport = {|
       // upwards. This value is the negated version of the 'value'
       displacement: Position,
     |}
-  |},
-  // The area to be clipped by the frame
-  // This is the initial capture of the subject and is not updated
+  |}
+|}
+
+export type DroppableDimensionViewport = {|
+  // will be null if there is no closest scrollable
+  closestScrollable: ?ClosestScrollable,
   subject: Area,
-  // this is the subject through the viewport of the frame
+  // this is the subject through the viewport of the frame (if applicable)
   // it also takes into account any changes to the viewport scroll
-  // clipped area will be null if it is completely outside of the frame
+  // clipped area will be null if it is completely outside of the frame and frame clipping is on
   clipped: ?Area,
 |}
 
@@ -182,10 +189,14 @@ export type InitialDragPositions = {|
   center: Position,
 |}
 
+// When dragging with a pointer such as a mouse or touch input we want to automatically
+// scroll user the under input when we get near the bottom of a Droppable or the window.
+// When Dragging with a keyboard we want to jump as required
+export type AutoScrollMode = 'FLUID' | 'JUMP';
+
 export type InitialDrag = {|
   descriptor: DraggableDescriptor,
-  // whether scrolling is allowed - otherwise a scroll will cancel the drag
-  isScrollAllowed: boolean,
+  autoScrollMode: AutoScrollMode,
   // relative to the viewport when the drag started
   client: InitialDragPositions,
   // viewport + window scroll (position relative to 0, 0)
@@ -211,11 +222,12 @@ export type CurrentDrag = {|
   windowScroll: Position,
   // whether or not draggable movements should be animated
   shouldAnimate: boolean,
+  // We do not want to calculate drag impacts until we have completed
+  // the first bulk publish. Otherwise the onDragUpdate hook will
+  // be called with incorrect indexes.
+  // Before the first bulk publish the calculations will return incorrect indexes.
+  hasCompletedFirstBulkPublish: boolean,
 |}
-
-// type PreviousDrag = {
-//   droppableOverId: ?DroppableId,
-// };
 
 // published when a drag starts
 export type DragStart = {|
@@ -224,25 +236,29 @@ export type DragStart = {|
   source: DraggableLocation,
 |}
 
-// published when a drag finishes
-export type DropResult = {|
-  draggableId: DraggableId,
-  type: TypeId,
-  source: DraggableLocation,
+export type DragUpdate = {|
+  ...DragStart,
   // may not have any destination (drag to nowhere)
   destination: ?DraggableLocation,
+|}
+
+export type DropReason = 'DROP' | 'CANCEL';
+
+// published when a drag finishes
+export type DropResult = {|
+  ...DragUpdate,
+  reason: DropReason,
 |}
 
 export type DragState = {|
   initial: InitialDrag,
   current: CurrentDrag,
   impact: DragImpact,
+  // if we need to jump the scroll (keyboard dragging)
+  scrollJumpRequest: ?Position,
 |}
 
-export type DropTrigger = 'DROP' | 'CANCEL';
-
 export type PendingDrop = {|
-  trigger: DropTrigger,
   newHomeOffset: Position,
   impact: DragImpact,
   result: DropResult,
@@ -273,13 +289,22 @@ export type Phase =
   // This will result in the onDragEnd hook being fired
   'DROP_COMPLETE';
 
+export type ScrollOptions = {|
+  shouldPublishImmediately: boolean,
+|}
+
+export type LiftRequest = {|
+  draggableId: DraggableId,
+  scrollOptions: ScrollOptions,
+|}
+
 export type DimensionState = {|
   // using the draggable id rather than the descriptor as the descriptor
   // may change as a result of the initial flush. This means that the lift
   // descriptor may not be the same as the actual descriptor. To avoid
   // confusion the request is just an id which is looked up
   // in the dimension-marshal post-flush
-  request: ?DraggableId,
+  request: ?LiftRequest,
   draggable: DraggableDimensionMap,
   droppable: DroppableDimensionMap,
 |};
@@ -303,7 +328,20 @@ export type Action = ActionCreators;
 export type Dispatch = ReduxDispatch<Action>;
 export type Store = ReduxStore<State, Action, Dispatch>;
 
-export type Hooks = {|
-  onDragStart?: (start: DragStart) => void,
-  onDragEnd: (result: DropResult) => void,
+export type Announce = (message: string) => void;
+
+export type HookProvided = {|
+  announce: Announce,
 |}
+
+export type OnDragStartHook = (start: DragStart, provided: HookProvided) => void;
+export type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => void;
+export type OnDragEndHook = (result: DropResult, provided: HookProvided) => void;
+
+export type Hooks = {|
+  onDragStart?: OnDragStartHook,
+  onDragUpdate?: OnDragUpdateHook,
+  // always required
+  onDragEnd: OnDragEndHook,
+|}
+

@@ -38,7 +38,7 @@ export default (state: State, id: DraggableId): boolean => {
 
     // if dropping - allow lifting
     // if cancelling - disallow lifting
-    return state.drop.pending.trigger === 'DROP';
+    return state.drop.pending.result.reason === 'DROP';
   }
 
   // this should not happen

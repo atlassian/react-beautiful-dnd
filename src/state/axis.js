@@ -4,7 +4,7 @@ import type { HorizontalAxis, VerticalAxis } from '../types';
 export const vertical: VerticalAxis = {
   direction: 'vertical',
   line: 'y',
-  crossLine: 'x',
+  crossAxisLine: 'x',
   start: 'top',
   end: 'bottom',
   size: 'height',
@@ -16,7 +16,7 @@ export const vertical: VerticalAxis = {
 export const horizontal: HorizontalAxis = {
   direction: 'horizontal',
   line: 'x',
-  crossLine: 'y',
+  crossAxisLine: 'y',
   start: 'left',
   end: 'right',
   size: 'width',

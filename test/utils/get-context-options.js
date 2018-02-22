@@ -54,10 +54,11 @@ export const withDimensionMarshal = (marshal?: DimensionMarshal): Object => ({
   context: {
     [dimensionMarshalKey]: marshal || createDimensionMarshal({
       cancel: () => { },
-      publishDraggables: () => { },
-      publishDroppables: () => { },
+      publishDraggable: () => { },
+      publishDroppable: () => { },
       updateDroppableScroll: () => { },
       updateDroppableIsEnabled: () => { },
+      bulkPublish: () => { },
     }),
   },
   childContextTypes: {

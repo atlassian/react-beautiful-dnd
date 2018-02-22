@@ -11,12 +11,15 @@ import type {
   Position,
   Dispatch,
   State,
-  DropTrigger,
   CurrentDrag,
   InitialDrag,
   DraggableDescriptor,
+  LiftRequest,
+  AutoScrollMode,
+  ScrollOptions,
 } from '../types';
 import noImpact from './no-impact';
+import withDroppableDisplacement from './with-droppable-displacement';
 import getNewHomeClientCenter from './get-new-home-client-center';
 import { add, subtract, isEqual } from './position';
 
@@ -38,21 +41,21 @@ const getScrollDiff = ({
     current.windowScroll
   );
 
-  const droppableScrollDiff: Position = droppable ?
-    droppable.viewport.frameScroll.diff.displacement :
-    origin;
+  if (!droppable) {
+    return windowScrollDiff;
+  }
 
-  return add(windowScrollDiff, droppableScrollDiff);
+  return withDroppableDisplacement(droppable, windowScrollDiff);
 };
 
 export type RequestDimensionsAction = {|
   type: 'REQUEST_DIMENSIONS',
-  payload: DraggableId,
+  payload: LiftRequest,
 |}
 
-export const requestDimensions = (id: DraggableId): RequestDimensionsAction => ({
+export const requestDimensions = (request: LiftRequest): RequestDimensionsAction => ({
   type: 'REQUEST_DIMENSIONS',
-  payload: id,
+  payload: request,
 });
 
 export type CompleteLiftAction = {|
@@ -61,7 +64,7 @@ export type CompleteLiftAction = {|
     id: DraggableId,
     client: InitialDragPositions,
     windowScroll: Position,
-    isScrollAllowed: boolean,
+    autoScrollMode: AutoScrollMode,
   |}
 |}
 
@@ -69,38 +72,57 @@ export const completeLift = (
   id: DraggableId,
   client: InitialDragPositions,
   windowScroll: Position,
-  isScrollAllowed: boolean,
+  autoScrollMode: AutoScrollMode,
 ): CompleteLiftAction => ({
   type: 'COMPLETE_LIFT',
   payload: {
     id,
     client,
     windowScroll,
-    isScrollAllowed,
+    autoScrollMode,
   },
 });
 
-export type PublishDraggableDimensionsAction = {|
-  type: 'PUBLISH_DRAGGABLE_DIMENSIONS',
-  payload: DraggableDimension[]
+export type PublishDraggableDimensionAction = {|
+  type: 'PUBLISH_DRAGGABLE_DIMENSION',
+  payload: DraggableDimension,
 |}
 
-export const publishDraggableDimensions =
-  (dimensions: DraggableDimension[]): PublishDraggableDimensionsAction => ({
-    type: 'PUBLISH_DRAGGABLE_DIMENSIONS',
-    payload: dimensions,
+export const publishDraggableDimension =
+  (dimension: DraggableDimension): PublishDraggableDimensionAction => ({
+    type: 'PUBLISH_DRAGGABLE_DIMENSION',
+    payload: dimension,
   });
 
-export type PublishDroppableDimensionsAction = {|
-  type: 'PUBLISH_DROPPABLE_DIMENSIONS',
-  payload: DroppableDimension[]
+export type PublishDroppableDimensionAction = {|
+  type: 'PUBLISH_DROPPABLE_DIMENSION',
+  payload: DroppableDimension,
 |}
 
-export const publishDroppableDimensions =
-  (dimensions: DroppableDimension[]): PublishDroppableDimensionsAction => ({
-    type: 'PUBLISH_DROPPABLE_DIMENSIONS',
-    payload: dimensions,
+export const publishDroppableDimension =
+  (dimension: DroppableDimension): PublishDroppableDimensionAction => ({
+    type: 'PUBLISH_DROPPABLE_DIMENSION',
+    payload: dimension,
   });
+
+export type BulkPublishDimensionsAction = {|
+  type: 'BULK_DIMENSION_PUBLISH',
+  payload: {|
+    droppables: DroppableDimension[],
+    draggables: DraggableDimension[],
+  |}
+|}
+
+export const bulkPublishDimensions = (
+  droppables: DroppableDimension[],
+  draggables: DraggableDimension[],
+): BulkPublishDimensionsAction => ({
+  type: 'BULK_DIMENSION_PUBLISH',
+  payload: {
+    droppables,
+    draggables,
+  },
+});
 
 export type UpdateDroppableDimensionScrollAction = {|
   type: 'UPDATE_DROPPABLE_DIMENSION_SCROLL',
@@ -142,17 +164,22 @@ export type MoveAction = {|
     id: DraggableId,
     client: Position,
     windowScroll: Position,
+    shouldAnimate: boolean,
   |}
 |}
 
-export const move = (id: DraggableId,
+export const move = (
+  id: DraggableId,
   client: Position,
-  windowScroll: Position): MoveAction => ({
+  windowScroll: Position,
+  shouldAnimate?: boolean = false,
+): MoveAction => ({
   type: 'MOVE',
   payload: {
     id,
     client,
     windowScroll,
+    shouldAnimate,
   },
 });
 
@@ -236,7 +263,6 @@ export const prepare = (): PrepareAction => ({
 export type DropAnimateAction = {
   type: 'DROP_ANIMATE',
   payload: {|
-    trigger: DropTrigger,
     newHomeOffset: Position,
     impact: DragImpact,
     result: DropResult,
@@ -244,21 +270,18 @@ export type DropAnimateAction = {
 }
 
 type AnimateDropArgs = {|
-  trigger: DropTrigger,
   newHomeOffset: Position,
   impact: DragImpact,
   result: DropResult
 |}
 
 const animateDrop = ({
-  trigger,
   newHomeOffset,
   impact,
   result,
 }: AnimateDropArgs): DropAnimateAction => ({
   type: 'DROP_ANIMATE',
   payload: {
-    trigger,
     newHomeOffset,
     impact,
     result,
@@ -316,6 +339,7 @@ export const drop = () =>
       type: home.descriptor.type,
       source,
       destination: impact.destination,
+      reason: 'DROP',
     };
 
     const newCenter: Position = getNewHomeClientCenter({
@@ -347,7 +371,6 @@ export const drop = () =>
     }
 
     dispatch(animateDrop({
-      trigger: 'DROP',
       newHomeOffset,
       impact,
       result,
@@ -385,6 +408,7 @@ export const cancel = () =>
       source,
       // no destination when cancelling
       destination: null,
+      reason: 'CANCEL',
     };
 
     const isAnimationRequired = !isEqual(current.client.offset, origin);
@@ -397,7 +421,6 @@ export const cancel = () =>
     const scrollDiff: Position = getScrollDiff({ initial, current, droppable: home });
 
     dispatch(animateDrop({
-      trigger: 'CANCEL',
       newHomeOffset: scrollDiff,
       impact: noImpact,
       result,
@@ -429,7 +452,7 @@ export type LiftAction = {|
     id: DraggableId,
     client: InitialDragPositions,
     windowScroll: Position,
-    isScrollAllowed: boolean,
+    autoScrollMode: AutoScrollMode,
   |}
 |}
 
@@ -438,7 +461,7 @@ export type LiftAction = {|
 export const lift = (id: DraggableId,
   client: InitialDragPositions,
   windowScroll: Position,
-  isScrollAllowed: boolean,
+  autoScrollMode: AutoScrollMode,
 ) => (dispatch: Dispatch, getState: Function) => {
   // Phase 1: Quickly finish any current drop animations
   const initial: State = getState();
@@ -469,7 +492,14 @@ export const lift = (id: DraggableId,
     }
 
     // will communicate with the marshal to start requesting dimensions
-    dispatch(requestDimensions(id));
+    const scrollOptions: ScrollOptions = {
+      shouldPublishImmediately: autoScrollMode === 'JUMP',
+    };
+    const request: LiftRequest = {
+      draggableId: id,
+      scrollOptions,
+    };
+    dispatch(requestDimensions(request));
 
     // Need to allow an opportunity for the dimensions to be requested.
     setTimeout(() => {
@@ -481,7 +511,7 @@ export const lift = (id: DraggableId,
         return;
       }
 
-      dispatch(completeLift(id, client, windowScroll, isScrollAllowed));
+      dispatch(completeLift(id, client, windowScroll, autoScrollMode));
     });
   });
 };
@@ -489,8 +519,9 @@ export const lift = (id: DraggableId,
 export type Action =
   CompleteLiftAction |
   RequestDimensionsAction |
-  PublishDraggableDimensionsAction |
-  PublishDroppableDimensionsAction |
+  PublishDraggableDimensionAction |
+  PublishDroppableDimensionAction |
+  BulkPublishDimensionsAction |
   UpdateDroppableDimensionScrollAction |
   UpdateDroppableDimensionIsEnabledAction |
   MoveByWindowScrollAction |

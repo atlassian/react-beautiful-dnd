@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import rafSchedule from 'raf-schd';
-import getWindowScrollPosition from '../get-window-scroll-position';
+import getWindowScroll from '../../window/get-window-scroll';
 import getArea from '../../state/get-area';
 import { getDroppableDimension } from '../../state/dimension';
 import getClosestScrollable from '../get-closest-scrollable';
@@ -22,6 +22,7 @@ import type {
   Area,
   Spacing,
   Direction,
+  ScrollOptions,
 } from '../../types';
 
 type Props = {|
@@ -41,6 +42,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
   closestScrollable: ?Element = null;
   isWatchingScroll: boolean = false;
+  scrollOptions: ?ScrollOptions = null;
   callbacks: DroppableCallbacks;
   publishedDescriptor: ?DroppableDescriptor = null;
 
@@ -50,6 +52,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       getDimension: this.getDimension,
       watchScroll: this.watchScroll,
       unwatchScroll: this.unwatchScroll,
+      scroll: this.scroll,
     };
     this.callbacks = callbacks;
   }
@@ -58,7 +61,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
   };
 
-  getScrollOffset = (): Position => {
+  getClosestScroll = (): Position => {
     if (!this.closestScrollable) {
       return origin;
     }
@@ -82,18 +85,41 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     marshal.updateDroppableScroll(this.publishedDescriptor.id, newScroll);
   });
 
-  scheduleScrollUpdate = rafSchedule((offset: Position) => {
-    // might no longer be listening for scroll changes by the time a frame comes back
-    if (this.isWatchingScroll) {
-      this.memoizedUpdateScroll(offset.x, offset.y);
-    }
-  });
-
-  onClosestScroll = () => {
-    this.scheduleScrollUpdate(this.getScrollOffset());
+  updateScroll = () => {
+    const offset: Position = this.getClosestScroll();
+    this.memoizedUpdateScroll(offset.x, offset.y);
   }
 
-  watchScroll = () => {
+  scheduleScrollUpdate = rafSchedule(this.updateScroll);
+
+  onClosestScroll = () => {
+    if (!this.scrollOptions) {
+      console.error('Cannot find scroll options while scrolling');
+      return;
+    }
+    if (this.scrollOptions.shouldPublishImmediately) {
+      this.updateScroll();
+      return;
+    }
+    this.scheduleScrollUpdate();
+  }
+
+  scroll = (change: Position) => {
+    if (this.closestScrollable == null) {
+      console.error('Cannot scroll a droppable with no closest scrollable');
+      return;
+    }
+
+    if (!this.isWatchingScroll) {
+      console.error('Updating Droppable scroll while not watching for updates');
+      return;
+    }
+
+    this.closestScrollable.scrollTop += change.y;
+    this.closestScrollable.scrollLeft += change.x;
+  }
+
+  watchScroll = (options: ScrollOptions) => {
     if (!this.props.targetRef) {
       console.error('cannot watch droppable scroll if not in the dom');
       return;
@@ -109,6 +135,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     }
 
     this.isWatchingScroll = true;
+    this.scrollOptions = options;
     this.closestScrollable.addEventListener('scroll', this.onClosestScroll, { passive: true });
   };
 
@@ -120,6 +147,8 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     }
 
     this.isWatchingScroll = false;
+    this.scrollOptions = null;
+    this.scheduleScrollUpdate.cancel();
 
     if (!this.closestScrollable) {
       console.error('cannot unbind event listener if element is null');
@@ -223,7 +252,6 @@ export default class DroppableDimensionPublisher extends Component<Props> {
 
     // side effect - grabbing it for scroll listening so we know it is the same node
     this.closestScrollable = getClosestScrollable(targetRef);
-    const frameScroll: Position = this.getScrollOffset();
     const style: Object = window.getComputedStyle(targetRef);
 
     // keeping it simple and always using the margin of the droppable
@@ -249,28 +277,35 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     // 2. There is no scroll container
     // 3. The droppable has internal scrolling
 
-    const frameClient: ?Area = (() => {
-      if (ignoreContainerClipping) {
+    const closest = (() => {
+      const closestScrollable: ?Element = this.closestScrollable;
+
+      if (!closestScrollable) {
         return null;
       }
-      if (!this.closestScrollable) {
-        return null;
-      }
-      if (this.closestScrollable === targetRef) {
-        return null;
-      }
-      return getArea(this.closestScrollable.getBoundingClientRect());
+
+      const frameClient: Area = getArea(closestScrollable.getBoundingClientRect());
+      const scroll: Position = this.getClosestScroll();
+      const scrollWidth: number = closestScrollable.scrollWidth;
+      const scrollHeight: number = closestScrollable.scrollHeight;
+
+      return {
+        frameClient,
+        scrollWidth,
+        scrollHeight,
+        scroll,
+        shouldClipSubject: !ignoreContainerClipping,
+      };
     })();
 
     const dimension: DroppableDimension = getDroppableDimension({
       descriptor,
       direction,
       client,
-      frameClient,
-      frameScroll,
+      closest,
       margin,
       padding,
-      windowScroll: getWindowScrollPosition(),
+      windowScroll: getWindowScroll(),
       isEnabled: !isDropDisabled,
     });
 

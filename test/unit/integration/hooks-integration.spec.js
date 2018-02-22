@@ -57,11 +57,12 @@ describe('hooks integration', () => {
     return mount(
       <DragDropContext
         onDragStart={hooks.onDragStart}
+        onDragUpdate={hooks.onDragUpdate}
         onDragEnd={hooks.onDragEnd}
       >
         <Droppable droppableId={droppableId}>
           {(droppableProvided: DroppableProvided) => (
-            <div ref={droppableProvided.innerRef} >
+            <div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
               <h2>Droppable</h2>
               <Draggable draggableId={draggableId} index={0}>
                 {(draggableProvided: DraggableProvided) => (
@@ -90,6 +91,7 @@ describe('hooks integration', () => {
     jest.useFakeTimers();
     hooks = {
       onDragStart: jest.fn(),
+      onDragUpdate: jest.fn(),
       onDragEnd: jest.fn(),
     };
     wrapper = getMountedApp();
@@ -195,7 +197,9 @@ describe('hooks integration', () => {
       draggableId,
       type: 'DEFAULT',
       source,
-      destination: null,
+      // did not move anywhere
+      destination: source,
+      reason: 'DROP',
     };
 
     const cancelled: DropResult = {
@@ -203,6 +207,7 @@ describe('hooks integration', () => {
       type: 'DEFAULT',
       source,
       destination: null,
+      reason: 'CANCEL',
     };
 
     return { start, completed, cancelled };

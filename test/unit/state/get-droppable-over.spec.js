@@ -87,10 +87,16 @@ describe('get droppable over', () => {
       client: getArea({
         top: 0, left: 0, right: 100, bottom: 100,
       }),
-      // will partially hide the subject
-      frameClient: getArea({
-        top: 0, left: 0, right: 50, bottom: 100,
-      }),
+      closest: {
+        // will partially hide the subject
+        frameClient: getArea({
+          top: 0, left: 0, right: 50, bottom: 100,
+        }),
+        scrollHeight: 100,
+        scrollWidth: 100,
+        scroll: { x: 0, y: 0 },
+        shouldClipSubject: true,
+      },
     });
     const draggable: DraggableDimension = getDraggableDimension({
       descriptor: {
@@ -124,10 +130,17 @@ describe('get droppable over', () => {
       client: getArea({
         top: 0, left: 0, right: 100, bottom: 100,
       }),
-      // will totally hide the subject
-      frameClient: getArea({
-        top: 0, left: 101, right: 200, bottom: 100,
-      }),
+      closest: {
+        // will partially hide the subject
+        // will totally hide the subject
+        frameClient: getArea({
+          top: 0, left: 101, right: 200, bottom: 100,
+        }),
+        scrollHeight: 100,
+        scrollWidth: 200,
+        scroll: { x: 0, y: 0 },
+        shouldClipSubject: true,
+      },
     });
     const draggable: DraggableDimension = getDraggableDimension({
       descriptor: {
@@ -458,12 +471,18 @@ describe('get droppable over', () => {
               // cut off by the frame
               bottom: 120,
             }),
-            frameClient: getArea({
-              top: 0,
-              left: 0,
-              right: 100,
-              bottom: 100,
-            }),
+            closest: {
+              frameClient: getArea({
+                top: 0,
+                left: 0,
+                right: 100,
+                bottom: 100,
+              }),
+              scrollHeight: 120,
+              scrollWidth: 100,
+              scroll: { x: 0, y: 0 },
+              shouldClipSubject: true,
+            },
           });
           // scrolling custom down so that it the bottom is visible
           const scrolled: DroppableDimension = scrollDroppable(custom, { x: 0, y: 20 });
@@ -503,13 +522,19 @@ describe('get droppable over', () => {
               // this will ensure that there is required growth in the droppable
               bottom: inHome1.page.withMargin.height - 1,
             }),
-            frameClient: getArea({
-              top: 0,
-              left: 0,
-              right: 100,
-              // currently much bigger than client
-              bottom: 500,
-            }),
+            closest: {
+              frameClient: getArea({
+                top: 0,
+                left: 0,
+                right: 100,
+                // currently much bigger than client
+                bottom: 500,
+              }),
+              scrollWidth: 100,
+              scrollHeight: 500,
+              scroll: { x: 0, y: 0 },
+              shouldClipSubject: true,
+            },
           });
           const scrolled: DroppableDimension = scrollDroppable(foreign, { x: 0, y: 50 });
           const clipped: ?Area = scrolled.viewport.clipped;

@@ -7,18 +7,19 @@ import {
   prepare,
   completeLift,
   requestDimensions,
-  publishDraggableDimensions,
-  publishDroppableDimensions,
+  publishDraggableDimension,
+  publishDroppableDimension,
 } from '../../../src/state/action-creators';
 import createStore from '../../../src/state/create-store';
 import { getPreset } from '../../utils/dimension';
-import * as state from '../../utils/simple-state-preset';
+import getStatePreset from '../../utils/get-simple-state-preset';
 import type {
   State,
   Position,
   DraggableId,
   Store,
   InitialDragPositions,
+  LiftRequest,
 } from '../../../src/types';
 
 const preset = getPreset();
@@ -32,19 +33,21 @@ type LiftFnArgs = {|
   id: DraggableId,
   client: InitialDragPositions,
   windowScroll: Position,
-  isScrollAllowed: boolean,
+  autoScrollMode: 'FLUID' | 'JUMP',
 |}
 
 const liftDefaults: LiftFnArgs = {
   id: preset.inHome1.descriptor.id,
   windowScroll: origin,
   client: noWhere,
-  isScrollAllowed: true,
+  autoScrollMode: 'FLUID',
 };
 
+const state = getStatePreset();
+
 const liftWithDefaults = (args?: LiftFnArgs = liftDefaults) => {
-  const { id, client, windowScroll, isScrollAllowed } = args;
-  return lift(id, client, windowScroll, isScrollAllowed);
+  const { id, client, windowScroll, autoScrollMode } = args;
+  return lift(id, client, windowScroll, autoScrollMode);
 };
 
 describe('action creators', () => {
@@ -74,12 +77,18 @@ describe('action creators', () => {
       // Phase 2: request dimensions after flushing animations
       jest.runOnlyPendingTimers();
 
-      expect(store.dispatch).toHaveBeenCalledWith(requestDimensions(preset.inHome1.descriptor.id));
+      const request: LiftRequest = {
+        draggableId: preset.inHome1.descriptor.id,
+        scrollOptions: {
+          shouldPublishImmediately: false,
+        },
+      };
+      expect(store.dispatch).toHaveBeenCalledWith(requestDimensions(request));
       expect(store.dispatch).toHaveBeenCalledTimes(2);
 
       // publishing some fake dimensions
-      store.dispatch(publishDroppableDimensions([preset.home]));
-      store.dispatch(publishDraggableDimensions([preset.inHome1]));
+      store.dispatch(publishDroppableDimension(preset.home));
+      store.dispatch(publishDraggableDimension(preset.inHome1));
       // now called four times
       expect(store.dispatch).toHaveBeenCalledTimes(4);
 
@@ -90,7 +99,7 @@ describe('action creators', () => {
         liftDefaults.id,
         liftDefaults.client,
         liftDefaults.windowScroll,
-        liftDefaults.isScrollAllowed
+        liftDefaults.autoScrollMode,
       ));
       expect(store.dispatch).toHaveBeenCalledTimes(5);
     });
@@ -152,7 +161,7 @@ describe('action creators', () => {
             liftDefaults.id,
             liftDefaults.client,
             liftDefaults.windowScroll,
-            liftDefaults.isScrollAllowed
+            liftDefaults.autoScrollMode,
           )
         );
 
@@ -176,7 +185,12 @@ describe('action creators', () => {
         jest.runOnlyPendingTimers();
 
         expect(store.dispatch).toHaveBeenCalledWith(
-          requestDimensions(preset.inHome1.descriptor.id)
+          requestDimensions({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: {
+              shouldPublishImmediately: false,
+            },
+          })
         );
         expect(store.dispatch).toHaveBeenCalledTimes(2);
 
@@ -193,7 +207,7 @@ describe('action creators', () => {
           liftDefaults.id,
           liftDefaults.client,
           liftDefaults.windowScroll,
-          liftDefaults.isScrollAllowed
+          liftDefaults.autoScrollMode,
         ));
 
         // being super careful

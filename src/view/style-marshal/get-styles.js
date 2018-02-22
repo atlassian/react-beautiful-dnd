@@ -13,6 +13,7 @@ const prefix: string = 'data-react-beautiful-dnd';
 export default (styleContext: string): Styles => {
   const dragHandleSelector: string = `[${prefix}-drag-handle="${styleContext}"]`;
   const draggableSelector: string = `[${prefix}-draggable="${styleContext}"]`;
+  const droppableSelector: string = `[${prefix}-droppable="${styleContext}"]`;
 
   // ## Drag handle styles
 
@@ -87,6 +88,25 @@ export default (styleContext: string): Styles => {
     `,
   };
 
+  // ## Droppable styles
+
+  // ### Base
+  // > Applied at all times
+
+  // overflow-anchor: none;
+  // Opting out of the browser feature which tries to maintain
+  // the scroll position when the DOM changes above the fold.
+  // This does not work well with reordering DOM nodes.
+  // When we drop a Draggable it already has the correct scroll applied.
+
+  const droppableStyles = {
+    base: `
+      ${droppableSelector} {
+        overflow-anchor: none;
+      }
+    `,
+  };
+
   // ## Body styles
 
   // ### While active dragging
@@ -112,20 +132,25 @@ export default (styleContext: string): Styles => {
     `,
   };
 
-  const resting: string = [
+  const base: string[] = [
     dragHandleStyles.base,
+    droppableStyles.base,
+  ];
+
+  const resting: string = [
+    ...base,
     dragHandleStyles.grabCursor,
   ].join('');
 
   const dragging: string = [
-    dragHandleStyles.base,
+    ...base,
     dragHandleStyles.blockPointerEvents,
     draggableStyles.animateMovement,
     bodyStyles.whileActiveDragging,
   ].join('');
 
   const dropAnimating: string = [
-    dragHandleStyles.base,
+    ...base,
     dragHandleStyles.grabCursor,
     draggableStyles.animateMovement,
   ].join('');
@@ -133,7 +158,7 @@ export default (styleContext: string): Styles => {
   // Not applying grab cursor during a cancel as it is not possible for users to reorder
   // items during a cancel
   const userCancel: string = [
-    dragHandleStyles.base,
+    ...base,
     draggableStyles.animateMovement,
   ].join('');
 

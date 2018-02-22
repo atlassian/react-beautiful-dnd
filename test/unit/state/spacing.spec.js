@@ -1,10 +1,10 @@
 // @flow
 import {
-  add,
-  addPosition,
   isEqual,
-  offset,
   getCorners,
+  expandByPosition,
+  offsetByPosition,
+  expandBySpacing,
 } from '../../../src/state/spacing';
 import type { Position, Spacing } from '../../../src/types';
 
@@ -23,21 +23,9 @@ const spacing2: Spacing = {
 };
 
 describe('spacing', () => {
-  describe('add', () => {
-    it('should add two spacing boxes together', () => {
-      const expected: Spacing = {
-        top: 11,
-        right: 26,
-        bottom: 37,
-        left: 14,
-      };
-      expect(add(spacing1, spacing2)).toEqual(expected);
-    });
-  });
-
-  describe('addPosition', () => {
-    it('should add a position to the right and bottom bounds of a spacing box', () => {
-      const spacing = {
+  describe('expandByPosition', () => {
+    it('should increase the size of the spacing', () => {
+      const spacing: Spacing = {
         top: 0,
         right: 10,
         bottom: 10,
@@ -48,12 +36,32 @@ describe('spacing', () => {
         y: 5,
       };
       const expected = {
-        top: 0,
+        top: -5,
         right: 15,
         bottom: 15,
+        left: -5,
+      };
+
+      expect(expandByPosition(spacing, position)).toEqual(expected);
+    });
+  });
+
+  describe('expandBySpacing', () => {
+    it('should increase the size of a spacing by the size of another', () => {
+      const spacing: Spacing = {
+        top: 10,
+        right: 20,
+        bottom: 20,
+        left: 10,
+      };
+      const expected: Spacing = {
+        top: 0,
+        right: 40,
+        bottom: 40,
         left: 0,
       };
-      expect(addPosition(spacing, position)).toEqual(expected);
+
+      expect(expandBySpacing(spacing, spacing)).toEqual(expected);
     });
   });
 
@@ -72,7 +80,7 @@ describe('spacing', () => {
     });
   });
 
-  describe('offset', () => {
+  describe('offsetByPosition', () => {
     it('should add x/y values to top/right/bottom/left dimensions', () => {
       const offsetPosition: Position = {
         x: 10,
@@ -84,7 +92,7 @@ describe('spacing', () => {
         bottom: 28,
         left: 15,
       };
-      expect(offset(spacing1, offsetPosition)).toEqual(expected);
+      expect(offsetByPosition(spacing1, offsetPosition)).toEqual(expected);
     });
   });
 

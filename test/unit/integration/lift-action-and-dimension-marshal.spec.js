@@ -1,14 +1,16 @@
 // @flow
 import createStore from '../../../src/state/create-store';
 import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
+import createHookCaller from '../../../src/state/hooks/hook-caller';
+import type { HookCaller } from '../../../src/state/hooks/hooks-types';
 import { getPreset } from '../../utils/dimension';
 import { add } from '../../../src/state/position';
-import fireHooks from '../../../src/state/fire-hooks';
 import {
   lift,
   clean,
-  publishDraggableDimensions,
-  publishDroppableDimensions,
+  publishDraggableDimension,
+  publishDroppableDimension,
+  bulkPublishDimensions,
   updateDroppableDimensionScroll,
   moveForward,
   drop,
@@ -35,11 +37,14 @@ const getDimensionMarshal = (store: Store): DimensionMarshal => {
     cancel: () => {
       store.dispatch(clean());
     },
-    publishDraggables: (dimensions: DraggableDimension[]) => {
-      store.dispatch(publishDraggableDimensions(dimensions));
+    publishDraggable: (dimension: DraggableDimension) => {
+      store.dispatch(publishDraggableDimension(dimension));
     },
-    publishDroppables: (dimensions: DroppableDimension[]) => {
-      store.dispatch(publishDroppableDimensions(dimensions));
+    publishDroppable: (dimension: DroppableDimension) => {
+      store.dispatch(publishDroppableDimension(dimension));
+    },
+    bulkPublish: (droppables: DroppableDimension[], draggables: DraggableDimension[]) => {
+      store.dispatch(bulkPublishDimensions(droppables, draggables));
     },
     updateDroppableScroll: (id: DroppableId, offset: Position) => {
       store.dispatch(updateDroppableDimensionScroll(id, offset));
@@ -66,12 +71,14 @@ describe('lifting and the dimension marshal', () => {
       it('should have the correct indexes in the descriptor post lift', () => {
         const store: Store = createStore();
         const dimensionMarshal: DimensionMarshal = getDimensionMarshal(store);
+        const caller: HookCaller = createHookCaller(() => { });
 
         // register home dimensions
         dimensionMarshal.registerDroppable(preset.home.descriptor, {
           getDimension: () => preset.home,
           watchScroll: () => { },
           unwatchScroll: () => { },
+          scroll: () => { },
         });
         preset.inHomeList.forEach((dimension: DraggableDimension) => {
           dimensionMarshal.registerDraggable(dimension.descriptor, () => dimension);
@@ -124,7 +131,7 @@ describe('lifting and the dimension marshal', () => {
             return;
           }
 
-          fireHooks(hooks, previousValue, current);
+          caller.onStateChange(hooks, previousValue, current);
           dimensionMarshal.onPhaseChange(current);
         });
 
@@ -137,7 +144,7 @@ describe('lifting and the dimension marshal', () => {
           preset.inHome1.descriptor.id,
           initial,
           preset.windowScroll,
-          true
+          'JUMP',
         )(store.dispatch, store.getState);
 
         // drag should be started after flushing all timers
@@ -188,7 +195,7 @@ describe('lifting and the dimension marshal', () => {
           preset.inHome3.descriptor.id,
           forSecondDrag,
           origin,
-          true,
+          'JUMP',
         )(store.dispatch, store.getState);
 
         // drag should be started after flushing all timers and all state will be published

@@ -16,14 +16,21 @@ export type {
 
   // Hooks
   DragStart,
+  DragUpdate,
   DropResult,
+  HookProvided,
+  Announce,
   DraggableLocation,
+  OnDragStartHook,
+  OnDragUpdateHook,
+  OnDragEndHook,
 } from './types';
 
 // Droppable
 export type {
   Provided as DroppableProvided,
   StateSnapshot as DroppableStateSnapshot,
+  DroppableProps,
 } from './view/droppable/droppable-types';
 
 // Draggable
