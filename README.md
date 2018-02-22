@@ -146,6 +146,16 @@ When a user drags a `Draggable` near the edge of a *container* we automatically 
 
 > A *container* is either a `Droppable` that is scrollable or has a scroll parent - or the `window`.
 
+| Mouse and touch  | Keyboard |
+| ------------------ | ---------- |
+| ![auto-scroll-mouse](https://user-images.githubusercontent.com/2182637/36520373-c9e2cb7e-17e4-11e8-9e93-4d2389d51fa4.gif)  | ![auto-scroll-keyboard](https://user-images.githubusercontent.com/2182637/36520375-cc1aa45c-17e4-11e8-842d-94aed694428a.gif)  |
+
+It also works in multi list configurations with all input types
+
+| Mouse and touch  | Keyboard |
+| ------------------ | ---------- |
+| ![auto-scroll-board-mouse](https://user-images.githubusercontent.com/2182637/36520670-57752526-17e6-11e8-95b3-b5a3978a5312.gif) | ![auto-scroll-board-keyboard](https://user-images.githubusercontent.com/2182637/36520650-3d3638f8-17e6-11e8-9cba-1fb439070285.gif) |
+
 #### For mouse and touch inputs 🐭📱
 
 When the center of a `Draggable` gets within a small distance from the edge of a container we start auto scrolling. As the user gets closer to the edge of the container we increase the speed of the auto scroll. This acceleration uses an easing function to exponentially increase the rate of acceleration the closer we move towards the edge. We reach a maximum rate of acceleration a small distance from the true edge of a container so that the user does not need to be extremely precise to obtain the maximum scroll speed. This logic applies for any edge that is scrollable.

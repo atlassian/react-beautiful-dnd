@@ -49,19 +49,33 @@ const initial: ItemType[] = [
   {
     id: 'checkbox',
     component: (
-      <label htmlFor="myCheckbox">
-        <input id="myCheckbox" type="checkbox" />
-        My checkbox
-      </label>
+      <div>
+        <label htmlFor="myCheckbox1">
+          <input id="myCheckbox1" type="checkbox" name="myCheckbox" />
+          Checkbox 1
+        </label>
+        <br />
+        <label htmlFor="myCheckbox2">
+          <input id="myCheckbox2" type="checkbox" name="myCheckbox" />
+          Checkbox 2
+        </label>
+      </div>
     ),
   },
   {
     id: 'radio',
     component: (
-      <label htmlFor="myRadio">
-        <input id="myRadio" type="radio" />
-        My radio
-      </label>
+      <div>
+        <label htmlFor="myRadio">
+          <input id="myRadio1" type="radio" name="myRadio"/>
+          Option 1
+        </label>
+        <br />
+        <label htmlFor="myRadio">
+          <input id="myRadio2" type="radio" name="myRadio" />
+          Option 2
+        </label>
+      </div>
     ),
   },
   {
