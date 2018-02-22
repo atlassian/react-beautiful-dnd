@@ -10,11 +10,11 @@ This guide has been written to assist you in creating your own messaging that is
 
 For the default messages we have gone for a friendly tone. We have also chosen to use personal language; preferring phases such as 'You have dropped the item' over 'Item dropped'. It is a little more wordy but is a friendlier experience. You are welcome to choose your own tone for your messaging.
 
-## `HookProvided` > `Announce`
+## How to control announcements
 
-The `announce` function that is provided to each of the `Hook` functions can be used to provide your own screen reader message. This message will be immediately read out. In order to provide a fast and responsive experience to users **you must provide this message synchronously**. If you attempt to hold onto the `announce` function and call it later it will not work and will just print a warning to the console. Additionally, if you try to call `announce` twice for the same event then only the first will be read by the screen reader with subsequent calls to `announce` being ignored and a warning printed.
+The `announce` function that is provided to each of the `DragDropContext` > `Hook` functions can be used to provide your own screen reader message. This message will be immediately read out. In order to provide a fast and responsive experience to users **you must provide this message synchronously**. If you attempt to hold onto the `announce` function and call it later it will not work and will just print a warning to the console. Additionally, if you try to call `announce` twice for the same event then only the first will be read by the screen reader with subsequent calls to `announce` being ignored and a warning printed.
 
-## Step 1: instructions
+## Step 1: lift instructions
 
 When a user `tabs` to a `Draggable` we need to instruct them on how they can start a drag. We do this by using the `aria-roledescription` property on a `drag handle`.
 
@@ -108,7 +108,7 @@ There are two ways a drop can occur. Either the drag was cancelled or the user r
 
 ### Cancel
 
-A `DropResult` object has a `reason` property which can either be `DROP` or `CANCEL`. You can use this to display your cancel annoucement.
+A `DropResult` object has a `reason` property which can either be `DROP` or `CANCEL`. You can use this to announce your cancel message.
 
 ```js
 onDragEnd = (result: DropResult, provided: HookProvided) => {
@@ -130,10 +130,34 @@ You are also welcome to add information about the size of the list, and the name
 
 **Suggestion** "Movement cancelled. The item has returned to list ${listName} to its starting position of ${startPosition} of ${listLength}".
 
+### Drop in the home list
 
-### Drop: in the home list
+This announcement should:
 
-### Drop: in a foreign list
+- Inform the user that they have completed the drag
+- Let them know what position the item is in now
 
-### Drop: no destination
+**Default message**: "You have dropped the item. It has moved from position ${result.source.index + 1} to ${result.destination.index + 1}"
 
+You may also want to provide a different message if they drop in the same position that they started in.
+
+**Default message**: "You have dropped the item. It has been dropped on its starting position of ${result.source.index + 1}"
+
+### Drop in a foreign list
+
+The messaging for this scenario should be similar to that of dropping in the home list, with the additional information of what list the item started in and where it finished.
+
+**Default message**: "You have dropped the item. It has moved from position ${result.source.index + 1} in list ${result.source.droppableId} to position ${result.destination.index + 1} in list ${result.destination.droppableId}"
+
+You may want to extend this to include the name of the `Droppable` rather than the id. Also, if your `Droppable`s are ordered you may also want to include some positioning information.
+
+### Drop on no destination
+
+It is possible for a user to drop on no Droppable. This is not possible to do with a keyboard. However, if a user is using a pointer input such as a mouse. Our messaging is geared towards keyboard usage. However, it is a good idea to provide messaging for this scenario also.
+
+In this message you should:
+
+- Let the user know that they dropped while not over a droppable location
+- Let them know where the item has returned to
+
+**Default message**: "The item has been dropped while not over a droppable location. The item has returned to its starting position of ${result.source.index + 1}"

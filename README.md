@@ -21,9 +21,18 @@ See how beautiful it is for yourself!
 
 > We provide different links for touch devices as currently [storybook](https://github.com/storybooks/storybook) does not have a good mobile menu experience [more information](https://github.com/storybooks/storybook/issues/124)
 
+## Basic usage examples
+
+We have created some basic examples on `codesandbox` for you to play with directly:
+
+- [simple vertical list](https://codesandbox.io/s/k260nyxq9v)
+- [simple horizontal list](https://codesandbox.io/s/mmrp44okvj)
+
+> Coming soon: a getting starting guide!
+
 ## Upgrading
 
-We have created some upgrade instructions in our release notes to help you upgrade to the latest version!
+We have created upgrade instructions in our release notes to help you upgrade to the latest version!
 
 - [Upgrading from `4.x` to `5.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v5.0.0);
 - [Upgrading from `3.x` to `4.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v4.0.0);
@@ -35,6 +44,7 @@ We have created some upgrade instructions in our release notes to help you upgra
 - Plays extremely well with standard browser interactions
 - Unopinionated styling
 - No creation of additional wrapper dom nodes - flexbox and focus management friendly!
+- Accessible
 
 ## Currently supported feature set
 
@@ -42,13 +52,13 @@ We have created some upgrade instructions in our release notes to help you upgra
 - Horizontal lists ↔
 - Movement between lists (▤ ↔ ▤)
 - Mouse 🐭, keyboard 🎹 and touch 👉📱 (mobile, tablet and so on) support
-- Auto scrolling - automatically scroll containers and the window as required during a drag (even with keyboard!!)
-- Incredible screen reader support - we provide an greate experience for english screen readers out of the box 📦, while also providing complete customisation control and internationalisation support 💖
+- Auto scrolling - automatically scroll containers and the window as required during a drag (even with keyboard 🔥)
+- Incredible screen reader support - we provide an amazing experience for english screen readers out of the box 📦. We also provide complete customisation control and internationalisation support for those who need it 💖
 - Conditional [dragging](https://github.com/atlassian/react-beautiful-dnd#props-1) and [dropping](https://github.com/atlassian/react-beautiful-dnd#conditionally-dropping)
 - Multiple independent lists on the one page
-- Flexible item sizes - the draggable items can have different heights (vertical) or widths (horizontal)
+- Flexible item sizes - the draggable items can have different heights (vertical lists) or widths (horizontal lists)
 - Custom drag handles - you can drag a whole item by just a part of it
-- A droppable list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
+- A `Droppable` list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
 - Server side rendering compatible
 - Plays well with [nested interactive elements](https://github.com/atlassian/react-beautiful-dnd#interactive-child-elements-within-a-draggable) by default
@@ -62,13 +72,6 @@ You can check out all the features that will be landing soon [on our issue page]
 There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing [`react-dnd`](https://github.com/react-dnd/react-dnd). It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **`react-beautiful-dnd` is a higher level abstraction specifically built for vertical and horizontal lists**. Within that subset of functionality `react-beautiful-dnd` offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by react-dnd. So this library might not be for you depending on what your use case is.
 
 `react-beautiful-dnd` [uses `position: fixed` to position the dragging element](#positioning-ownership). In some layouts, this might break how the element is rendered. One example is a `<table>`-based layout which will lose column widths for dragged `<tr>`s. Follow [#103](https://github.com/atlassian/react-beautiful-dnd/issues/103) for updates on support for this use case.
-
-## Basic usage examples on `codesandbox`
-
-We have created some basic examples for you to play with directly:
-
-- [vertical list](https://codesandbox.io/s/k260nyxq9v)
-- [horizontal list](https://codesandbox.io/s/mmrp44okvj)
 
 ## Driving philosophy: physicality
 
@@ -139,25 +142,37 @@ How it is composed:
 
 ### Auto scrolling
 
-When a user drags a `Draggable` near the edge of a scrollable `Droppable` or the `window` we automatically scroll the container as we are able to in order make room for the `Draggable`.
+When a user drags a `Draggable` near the edge of a *container* we automatically scroll the container as we are able to in order make room for the `Draggable`.
 
-#### For mouse and touch inputs
+> A *container* is either a `Droppable` that is scrollable or has a scroll parent - or the `window`.
 
-When the center of a `Draggable` gets within a small distance from the edge of a container we start auto scrolling. As the user gets closer to the edge of the container we increase the speed of the auto scroll. This acceleration uses an easing function to exponentially increase the rate of acceleration the closer we move towards the edge. We reach a maximum rate of acceleration a small distance from the true edge of a container so that the user does not need to be extremely precise to obtain the maximum scroll speed.
+#### For mouse and touch inputs 🐭📱
 
-#### For keyboard dragging
+When the center of a `Draggable` gets within a small distance from the edge of a container we start auto scrolling. As the user gets closer to the edge of the container we increase the speed of the auto scroll. This acceleration uses an easing function to exponentially increase the rate of acceleration the closer we move towards the edge. We reach a maximum rate of acceleration a small distance from the true edge of a container so that the user does not need to be extremely precise to obtain the maximum scroll speed. This logic applies for any edge that is scrollable.
 
-We also correctly update the scroll position as required when keyboard dragging. In order to move a `Draggable` into the correct position we can do a combination of a `Droppable` scroll, `window` scroll and manual movements to ensure the `Draggable` ends up in the correct position in response to user movement instructions. This is lit 🔥.
+The distances required for auto scrolling are based on a percentage of the height or width of the container for vertical and horizontal scrolling respectively. By using percentages rather than raw pixel values we are able to have a great experience regardless of the size and shape of your containers.
+
+##### A note about big `Draggable`s
+
+If the `Draggable` is bigger than a container on the axis you are trying to scroll - we will not permit scrolling on that axis. For example, if you have a `Draggable` that is longer than the height of the window we will not auto scroll vertically. However, we will still permit scrolling to occur horizontally.
+
+##### iOS auto scroll shake 📱🤕
+
+When auto scrolling on an iOS browser (webkit) the `Draggable` noticeably shakes. This is due to a [bug with webkit](https://bugs.webkit.org/show_bug.cgi?id=181954) that has no known work around. We tried for a long time to work around the issue! If you are interesting in seeing this improved please engage with the [webkit issue](https://bugs.webkit.org/show_bug.cgi?id=181954).
+
+#### For keyboard dragging 🎹
+
+We also correctly update the scroll position as required when keyboard dragging. In order to move a `Draggable` into the correct position we can do a combination of a `Droppable` scroll, `window` scroll and manual movements to ensure the `Draggable` ends up in the correct position in response to user movement instructions. This is boss 🔥.
+
+This is amazing for users with visual impairments as they can correctly move items around in big lists without needing to use mouse positioning.
 
 ### Accessibility
 
 Traditionally drag and drop interactions have been exclusively a mouse or touch interaction. This library ships with support for drag and drop interactions **using only a keyboard**. This enables power users to drive their experience entirely from the keyboard. As well as opening up these experiences to users who would have been excluded previously.
 
-In addition to supporting keyboard, we have also audited how the keyboard shortcuts interact with standard browser keyboard interactions. When the user is not dragging they can use their keyboard as they normally would. While dragging we override and disable certain browser shortcuts (such as `tab`) to ensure a fluid experience for the user.
+We provide **fantastic support for screen readers** to assist users with visual (or other) impairments. We ship with english messaging out of the box 📦. However, you are welcome to override these messages by using the `announce` function that it provided to all of the `DragDropContext > hook` functions.
 
-We also provide **fantastic support for screen readers** to assist users with visual (or other) impairments. We ship with english messaging out of the box. However, you are welcome to override these messages by using the `announce` function that it provided to all of the `DragDropContext > hook` functions.
-
-See our [accessibility guide](TODO) for a guide on crafting useful screen reader messaging.
+See our [screen reader guide](TODO) for a guide on crafting useful screen reader messaging.
 
 ## Mouse dragging
 
@@ -186,7 +201,7 @@ Other than these explicitly blocked keyboard events all standard keyboard events
 
 ## Keyboard dragging
 
-`react-beautiful-dnd` supports dragging with only a keyboard
+`react-beautiful-dnd` supports dragging with only a keyboard. We have audited how our keyboard shortcuts interact with standard browser keyboard interactions. When the user is not dragging they can use their keyboard as they normally would. While dragging we override and disable certain browser shortcuts (such as `tab`) to ensure a fluid experience for the user.
 
 ### Keyboard shortcuts: keyboard dragging
 
@@ -566,7 +581,7 @@ type TypeId = Id;
 type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => void;
 ```
 
-This function is called whenever something changes during a drag. The possible changes are:
+This hook is called whenever something changes during a drag. The possible changes are:
 
 - The position of the `Draggable` has changed
 - The `Draggable` is now over a different `Droppable`

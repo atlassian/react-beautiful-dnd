@@ -54,10 +54,19 @@ const onDragEnd = (result: DropResult): string => {
 
   // Dropped in home list
   if (result.source.droppableId === result.destination.droppableId) {
+    // It is in the position that it started in
+    if (result.source.index === result.destination.index) {
+      return `
+        You have dropped the item.
+        It has been dropped on its starting position of ${result.source.index + 1}
+      `;
+    }
+
+    // It is in a new position
     return `
       You have dropped the item.
       It has moved from position ${result.source.index + 1} to ${result.destination.index + 1}
-  `;
+    `;
   }
 
   // Dropped in a new list
