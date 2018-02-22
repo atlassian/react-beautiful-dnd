@@ -1,14 +1,14 @@
 // @flow
 import moveToNewDroppable from '../../../../src/state/move-cross-axis/move-to-new-droppable/';
 import type { Result } from '../../../../src/state/move-cross-axis/move-cross-axis-types';
-import { getDraggableDimension, getDroppableDimension } from '../../../../src/state/dimension';
+import { getDraggableDimension, getDroppableDimension, scrollDroppable } from '../../../../src/state/dimension';
 import getArea from '../../../../src/state/get-area';
 import moveToEdge from '../../../../src/state/move-to-edge';
-import { patch } from '../../../../src/state/position';
+import { add, negate, patch } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset, makeScrollable } from '../../../utils/dimension';
 import noImpact from '../../../../src/state/no-impact';
-import getViewport from '../../../../src/state/visibility/get-viewport';
+import getViewport from '../../../../src/window/get-viewport';
 import type {
   Axis,
   DragImpact,
@@ -86,129 +86,217 @@ describe('move to new droppable', () => {
         });
 
         describe('moving back into original index', () => {
-          // the second draggable is moving back into its home
-          const result: ?Result = moveToNewDroppable({
-            pageCenter: dontCare,
-            draggable: inHome2,
-            target: inHome2,
-            destination: home,
-            insideDestination: draggables,
-            home: {
-              index: 1,
-              droppableId: home.descriptor.id,
-            },
-            previousImpact: noImpact,
-          });
-
-          if (!result) {
-            throw new Error('invalid test setup');
-          }
-
-          it('should return the original center without margin', () => {
-            expect(result.pageCenter).toBe(inHome2.page.withoutMargin.center);
-            expect(result.pageCenter).not.toEqual(inHome2.page.withMargin.center);
-          });
-
-          it('should return an empty impact with the original location', () => {
-            const expected: DragImpact = {
-              movement: {
-                displaced: [],
-                amount: patch(axis.line, inHome2.page.withMargin[axis.size]),
-                isBeyondStartPosition: false,
-              },
-              direction: axis.direction,
-              destination: {
-                droppableId: home.descriptor.id,
+          describe('without droppable scroll', () => {
+            // the second draggable is moving back into its home
+            const result: ?Result = moveToNewDroppable({
+              pageCenter: dontCare,
+              draggable: inHome2,
+              target: inHome2,
+              destination: home,
+              insideDestination: draggables,
+              home: {
                 index: 1,
+                droppableId: home.descriptor.id,
               },
-            };
+              previousImpact: noImpact,
+            });
 
-            expect(result.impact).toEqual(expected);
+            if (!result) {
+              throw new Error('invalid test setup');
+            }
+
+            it('should return the original center without margin', () => {
+              expect(result.pageCenter).toBe(inHome2.page.withoutMargin.center);
+              expect(result.pageCenter).not.toEqual(inHome2.page.withMargin.center);
+            });
+
+            it('should return an empty impact with the original location', () => {
+              const expected: DragImpact = {
+                movement: {
+                  displaced: [],
+                  amount: patch(axis.line, inHome2.page.withMargin[axis.size]),
+                  isBeyondStartPosition: false,
+                },
+                direction: axis.direction,
+                destination: {
+                  droppableId: home.descriptor.id,
+                  index: 1,
+                },
+              };
+
+              expect(result.impact).toEqual(expected);
+            });
+          });
+
+          describe('with droppable scroll', () => {
+            const scrollable: DroppableDimension = makeScrollable(home, 10);
+            const scroll: Position = patch(axis.line, 10);
+            const displacement: Position = negate(scroll);
+            const scrolled: DroppableDimension = scrollDroppable(scrollable, patch(axis.line, 10));
+
+            const result: ?Result = moveToNewDroppable({
+              pageCenter: dontCare,
+              draggable: inHome2,
+              target: inHome2,
+              destination: scrolled,
+              insideDestination: draggables,
+              home: {
+                index: 1,
+                droppableId: home.descriptor.id,
+              },
+              previousImpact: noImpact,
+            });
+
+            if (!result) {
+              throw new Error('Invalid result');
+            }
+
+            it('should account for changes in droppable scroll', () => {
+              const expected: Position = add(inHome2.page.withoutMargin.center, displacement);
+
+              expect(result.pageCenter).toEqual(expected);
+            });
+
+            it('should return an empty impact with the original location', () => {
+              const expected: DragImpact = {
+                movement: {
+                  displaced: [],
+                  amount: patch(axis.line, inHome2.page.withMargin[axis.size]),
+                  isBeyondStartPosition: false,
+                },
+                direction: axis.direction,
+                destination: {
+                  droppableId: home.descriptor.id,
+                  index: 1,
+                },
+              };
+
+              expect(result.impact).toEqual(expected);
+            });
           });
         });
 
         describe('moving before the original index', () => {
-          // moving inHome4 into the inHome2 position
-          const result: ?Result = moveToNewDroppable({
-            pageCenter: dontCare,
-            draggable: inHome4,
-            target: inHome2,
-            destination: home,
-            insideDestination: draggables,
-            home: {
-              index: 3,
-              droppableId: home.descriptor.id,
-            },
-            previousImpact: noImpact,
-          });
-
-          if (!result) {
-            throw new Error('invalid test setup');
-          }
-
-          it('should align to the start of the target', () => {
-            const expected: Position = moveToEdge({
-              source: inHome4.page.withoutMargin,
-              sourceEdge: 'start',
-              destination: inHome2.page.withMargin,
-              destinationEdge: 'start',
-              destinationAxis: axis,
+          describe('without droppable scroll', () => {
+            // moving inHome4 into the inHome2 position
+            const result: ?Result = moveToNewDroppable({
+              pageCenter: dontCare,
+              draggable: inHome4,
+              target: inHome2,
+              destination: home,
+              insideDestination: draggables,
+              home: {
+                index: 3,
+                droppableId: home.descriptor.id,
+              },
+              previousImpact: noImpact,
             });
 
-            expect(result.pageCenter).toEqual(expected);
+            if (!result) {
+              throw new Error('invalid test setup');
+            }
+
+            it('should align to the start of the target', () => {
+              const expected: Position = moveToEdge({
+                source: inHome4.page.withoutMargin,
+                sourceEdge: 'start',
+                destination: inHome2.page.withMargin,
+                destinationEdge: 'start',
+                destinationAxis: axis,
+              });
+
+              expect(result.pageCenter).toEqual(expected);
+            });
+
+            it('should move the everything from the target index to the original index forward', () => {
+              const expected: DragImpact = {
+                movement: {
+                  // ordered by closest impacted
+                  displaced: [
+                    {
+                      draggableId: inHome2.descriptor.id,
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                    {
+                      draggableId: inHome3.descriptor.id,
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                  ],
+                  amount: patch(axis.line, inHome4.page.withMargin[axis.size]),
+                  isBeyondStartPosition: false,
+                },
+                direction: axis.direction,
+                destination: {
+                  droppableId: home.descriptor.id,
+                  // original index of target
+                  index: 1,
+                },
+              };
+
+              expect(result.impact).toEqual(expected);
+            });
           });
 
-          it('should move the everything from the target index to the original index forward', () => {
-            const expected: DragImpact = {
-              movement: {
-                // ordered by closest impacted
-                displaced: [
-                  {
-                    draggableId: inHome2.descriptor.id,
-                    isVisible: true,
-                    shouldAnimate: true,
-                  },
-                  {
-                    draggableId: inHome3.descriptor.id,
-                    isVisible: true,
-                    shouldAnimate: true,
-                  },
-                ],
-                amount: patch(axis.line, inHome4.page.withMargin[axis.size]),
-                isBeyondStartPosition: false,
-              },
-              direction: axis.direction,
-              destination: {
-                droppableId: home.descriptor.id,
-                // original index of target
-                index: 1,
-              },
-            };
+          describe('with droppable scroll', () => {
+            const scrollable: DroppableDimension = makeScrollable(home, 10);
+            const scroll: Position = patch(axis.line, 10);
+            const displacement: Position = negate(scroll);
+            const scrolled: DroppableDimension = scrollDroppable(scrollable, patch(axis.line, 10));
 
-            expect(result.impact).toEqual(expected);
+            const result: ?Result = moveToNewDroppable({
+              pageCenter: dontCare,
+              draggable: inHome4,
+              target: inHome2,
+              destination: scrolled,
+              insideDestination: draggables,
+              home: {
+                index: 3,
+                droppableId: home.descriptor.id,
+              },
+              previousImpact: noImpact,
+            });
+
+            if (!result) {
+              throw new Error('Invalid result');
+            }
+
+            it('should account for changes in droppable scroll', () => {
+              const withoutScroll: Position = moveToEdge({
+                source: inHome4.page.withoutMargin,
+                sourceEdge: 'start',
+                destination: inHome2.page.withMargin,
+                destinationEdge: 'start',
+                destinationAxis: axis,
+              });
+              const expected: Position = add(withoutScroll, displacement);
+
+              expect(result.pageCenter).toEqual(expected);
+            });
           });
         });
 
         describe('moving after the original index', () => {
-          // moving inHome1 into the inHome4 position
-          const result: ?Result = moveToNewDroppable({
-            pageCenter: dontCare,
-            draggable: inHome1,
-            target: inHome4,
-            destination: home,
-            insideDestination: draggables,
-            home: {
-              index: 0,
-              droppableId: home.descriptor.id,
-            },
-            previousImpact: noImpact,
-          });
+          describe('without droppable scroll', () => {
+            // moving inHome1 into the inHome4 position
+            const result: ?Result = moveToNewDroppable({
+              pageCenter: dontCare,
+              draggable: inHome1,
+              target: inHome4,
+              destination: home,
+              insideDestination: draggables,
+              home: {
+                index: 0,
+                droppableId: home.descriptor.id,
+              },
+              previousImpact: noImpact,
+            });
 
-          if (!result) {
-            throw new Error('invalid test setup');
-          }
+            if (!result) {
+              throw new Error('invalid test setup');
+            }
 
-          describe('center', () => {
             it('should align to the bottom of the target', () => {
               const expected: Position = moveToEdge({
                 source: inHome1.page.withoutMargin,
@@ -220,42 +308,79 @@ describe('move to new droppable', () => {
 
               expect(result.pageCenter).toEqual(expected);
             });
+
+            it('should move the everything from the target index to the original index forward', () => {
+              const expected: DragImpact = {
+                movement: {
+                  // ordered by closest impacted
+                  displaced: [
+                    {
+                      draggableId: inHome4.descriptor.id,
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                    {
+                      draggableId: inHome3.descriptor.id,
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                    {
+                      draggableId: inHome2.descriptor.id,
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                  ],
+                  amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
+                  // is moving beyond start position
+                  isBeyondStartPosition: true,
+                },
+                direction: axis.direction,
+                destination: {
+                  droppableId: home.descriptor.id,
+                  // original index of target
+                  index: 3,
+                },
+              };
+
+              expect(result.impact).toEqual(expected);
+            });
           });
 
-          it('should move the everything from the target index to the original index forward', () => {
-            const expected: DragImpact = {
-              movement: {
-                // ordered by closest impacted
-                displaced: [
-                  {
-                    draggableId: inHome4.descriptor.id,
-                    isVisible: true,
-                    shouldAnimate: true,
-                  },
-                  {
-                    draggableId: inHome3.descriptor.id,
-                    isVisible: true,
-                    shouldAnimate: true,
-                  },
-                  {
-                    draggableId: inHome2.descriptor.id,
-                    isVisible: true,
-                    shouldAnimate: true,
-                  },
-                ],
-                amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
-                // is moving beyond start position
-                isBeyondStartPosition: true,
-              },
-              direction: axis.direction,
-              destination: {
-                droppableId: home.descriptor.id,
-                // original index of target
-                index: 3,
-              },
-            };
+          describe('with droppable scroll', () => {
+            const scrollable: DroppableDimension = makeScrollable(home, 10);
+            const scroll: Position = patch(axis.line, 10);
+            const displacement: Position = negate(scroll);
+            const scrolled: DroppableDimension = scrollDroppable(scrollable, patch(axis.line, 10));
 
-            expect(result.impact).toEqual(expected);
+            const result: ?Result = moveToNewDroppable({
+              pageCenter: dontCare,
+              draggable: inHome1,
+              target: inHome4,
+              destination: scrolled,
+              insideDestination: draggables,
+              home: {
+                index: 0,
+                droppableId: home.descriptor.id,
+              },
+              previousImpact: noImpact,
+            });
+
+            if (!result) {
+              throw new Error('Invalid result');
+            }
+
+            it('should account for changes in droppable scroll', () => {
+              const withoutScroll: Position = moveToEdge({
+                source: inHome1.page.withoutMargin,
+                sourceEdge: 'end',
+                destination: inHome4.page.withoutMargin,
+                destinationEdge: 'end',
+                destinationAxis: axis,
+              });
+              const expected: Position = add(withoutScroll, displacement);
+
+              expect(result.pageCenter).toEqual(expected);
+            });
           });
         });
 
@@ -274,13 +399,19 @@ describe('move to new droppable', () => {
                 // will be cut by frame
                 [axis.end]: 200,
               }),
-              frameClient: getArea({
-                [axis.crossAxisStart]: 0,
-                [axis.crossAxisEnd]: 100,
-                [axis.start]: 0,
-                // will cut the subject
-                [axis.end]: 100,
-              }),
+              closest: {
+                frameClient: getArea({
+                  [axis.crossAxisStart]: 0,
+                  [axis.crossAxisEnd]: 100,
+                  [axis.start]: 0,
+                  // will cut the subject
+                  [axis.end]: 100,
+                }),
+                scrollWidth: 200,
+                scrollHeight: 200,
+                scroll: { x: 0, y: 0 },
+                shouldClipSubject: true,
+              },
             });
             const inside: DraggableDimension = getDraggableDimension({
               descriptor: {
@@ -461,180 +592,298 @@ describe('move to new droppable', () => {
         });
 
         describe('moving into an unpopulated list', () => {
-          const result: ?Result = moveToNewDroppable({
-            pageCenter: inHome1.page.withMargin.center,
-            draggable: inHome1,
-            target: null,
-            destination: foreign,
-            insideDestination: [],
-            home: {
-              index: 0,
-              droppableId: home.descriptor.id,
-            },
-            previousImpact: noImpact,
-          });
-
-          if (!result) {
-            throw new Error('invalid test setup');
-          }
-
-          it('should move to the start edge of the droppable (including its padding)', () => {
-            const expected: Position = moveToEdge({
-              source: inHome1.page.withoutMargin,
-              sourceEdge: 'start',
-              destination: foreign.page.withMarginAndPadding,
-              destinationEdge: 'start',
-              destinationAxis: foreign.axis,
+          describe('without droppable scroll', () => {
+            const result: ?Result = moveToNewDroppable({
+              pageCenter: inHome1.page.withMargin.center,
+              draggable: inHome1,
+              target: null,
+              destination: foreign,
+              insideDestination: [],
+              home: {
+                index: 0,
+                droppableId: home.descriptor.id,
+              },
+              previousImpact: noImpact,
             });
 
-            expect(result.pageCenter).toEqual(expected);
+            if (!result) {
+              throw new Error('invalid test setup');
+            }
+
+            it('should move to the start edge of the droppable (including its padding)', () => {
+              const expected: Position = moveToEdge({
+                source: inHome1.page.withoutMargin,
+                sourceEdge: 'start',
+                destination: foreign.page.withMarginAndPadding,
+                destinationEdge: 'start',
+                destinationAxis: foreign.axis,
+              });
+
+              expect(result.pageCenter).toEqual(expected);
+            });
+
+            it('should return an empty impact', () => {
+              const expected: DragImpact = {
+                movement: {
+                  displaced: [],
+                  amount: patch(foreign.axis.line, inHome1.page.withMargin[foreign.axis.size]),
+                  isBeyondStartPosition: false,
+                },
+                direction: foreign.axis.direction,
+                destination: {
+                  droppableId: foreign.descriptor.id,
+                  index: 0,
+                },
+              };
+
+              expect(result.impact).toEqual(expected);
+            });
           });
 
-          it('should return an empty impact', () => {
-            const expected: DragImpact = {
-              movement: {
-                displaced: [],
-                amount: patch(foreign.axis.line, inHome1.page.withMargin[foreign.axis.size]),
-                isBeyondStartPosition: false,
-              },
-              direction: foreign.axis.direction,
-              destination: {
-                droppableId: foreign.descriptor.id,
-                index: 0,
-              },
-            };
+          describe('with droppable scroll', () => {
+            const scrollable: DroppableDimension = makeScrollable(foreign, 10);
+            const scroll: Position = patch(axis.line, 10);
+            const displacement: Position = negate(scroll);
+            const scrolled: DroppableDimension = scrollDroppable(scrollable, patch(axis.line, 10));
 
-            expect(result.impact).toEqual(expected);
+            const result: ?Result = moveToNewDroppable({
+              pageCenter: inHome1.page.withMargin.center,
+              draggable: inHome1,
+              target: null,
+              destination: scrolled,
+              insideDestination: [],
+              home: {
+                index: 0,
+                droppableId: home.descriptor.id,
+              },
+              previousImpact: noImpact,
+            });
+
+            if (!result) {
+              throw new Error('Invalid result');
+            }
+
+            it('should account for changes in droppable scroll', () => {
+              const withoutScroll: Position = moveToEdge({
+                source: inHome1.page.withoutMargin,
+                sourceEdge: 'start',
+                destination: foreign.page.withMarginAndPadding,
+                destinationEdge: 'start',
+                destinationAxis: foreign.axis,
+              });
+              const expected: Position = add(withoutScroll, displacement);
+
+              expect(result.pageCenter).toEqual(expected);
+            });
           });
         });
 
         describe('is moving before the target', () => {
-          // moving home1 into the second position of the list
-          const result: ?Result = moveToNewDroppable({
-            pageCenter: inHome1.page.withMargin.center,
-            draggable: inHome1,
-            target: inForeign2,
-            destination: foreign,
-            insideDestination: draggables,
-            home: {
-              index: 0,
-              droppableId: home.descriptor.id,
-            },
-            previousImpact: noImpact,
-          });
-
-          if (!result) {
-            throw new Error('invalid test setup');
-          }
-
-          it('should move before the target', () => {
-            const expected: Position = moveToEdge({
-              source: inHome1.page.withoutMargin,
-              sourceEdge: 'start',
-              destination: inForeign2.page.withMargin,
-              destinationEdge: 'start',
-              destinationAxis: foreign.axis,
+          describe('without droppable scroll', () => {
+            // moving home1 into the second position of the list
+            const result: ?Result = moveToNewDroppable({
+              pageCenter: inHome1.page.withMargin.center,
+              draggable: inHome1,
+              target: inForeign2,
+              destination: foreign,
+              insideDestination: draggables,
+              home: {
+                index: 0,
+                droppableId: home.descriptor.id,
+              },
+              previousImpact: noImpact,
             });
 
-            expect(result.pageCenter).toEqual(expected);
+            if (!result) {
+              throw new Error('invalid test setup');
+            }
+
+            it('should move before the target', () => {
+              const expected: Position = moveToEdge({
+                source: inHome1.page.withoutMargin,
+                sourceEdge: 'start',
+                destination: inForeign2.page.withMargin,
+                destinationEdge: 'start',
+                destinationAxis: foreign.axis,
+              });
+
+              expect(result.pageCenter).toEqual(expected);
+            });
+
+            it('should move the target and everything below it forward', () => {
+              const expected: DragImpact = {
+                movement: {
+                  // ordered by closest impacted
+                  displaced: [
+                    {
+                      draggableId: inForeign2.descriptor.id,
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                    {
+                      draggableId: inForeign3.descriptor.id,
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                    {
+                      draggableId: inForeign4.descriptor.id,
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                  ],
+                  amount: patch(foreign.axis.line, inHome1.page.withMargin[foreign.axis.size]),
+                  isBeyondStartPosition: false,
+                },
+                direction: foreign.axis.direction,
+                destination: {
+                  droppableId: foreign.descriptor.id,
+                  // index of foreign2
+                  index: 1,
+                },
+              };
+
+              expect(result.impact).toEqual(expected);
+            });
           });
 
-          it('should move the target and everything below it forward', () => {
-            const expected: DragImpact = {
-              movement: {
-                // ordered by closest impacted
-                displaced: [
-                  {
-                    draggableId: inForeign2.descriptor.id,
-                    isVisible: true,
-                    shouldAnimate: true,
-                  },
-                  {
-                    draggableId: inForeign3.descriptor.id,
-                    isVisible: true,
-                    shouldAnimate: true,
-                  },
-                  {
-                    draggableId: inForeign4.descriptor.id,
-                    isVisible: true,
-                    shouldAnimate: true,
-                  },
-                ],
-                amount: patch(foreign.axis.line, inHome1.page.withMargin[foreign.axis.size]),
-                isBeyondStartPosition: false,
-              },
-              direction: foreign.axis.direction,
-              destination: {
-                droppableId: foreign.descriptor.id,
-                // index of foreign2
-                index: 1,
-              },
-            };
+          describe('with droppable scroll', () => {
+            const scrollable: DroppableDimension = makeScrollable(foreign, 10);
+            const scroll: Position = patch(axis.line, 10);
+            const displacement: Position = negate(scroll);
+            const scrolled: DroppableDimension = scrollDroppable(scrollable, patch(axis.line, 10));
 
-            expect(result.impact).toEqual(expected);
+            const result: ?Result = moveToNewDroppable({
+              pageCenter: inHome1.page.withMargin.center,
+              draggable: inHome1,
+              target: inForeign2,
+              destination: scrolled,
+              insideDestination: draggables,
+              home: {
+                index: 0,
+                droppableId: home.descriptor.id,
+              },
+              previousImpact: noImpact,
+            });
+
+            if (!result) {
+              throw new Error('Invalid result');
+            }
+
+            it('should account for changes in droppable scroll', () => {
+              const withoutScroll: Position = moveToEdge({
+                source: inHome1.page.withoutMargin,
+                sourceEdge: 'start',
+                destination: inForeign2.page.withMargin,
+                destinationEdge: 'start',
+                destinationAxis: foreign.axis,
+              });
+              const expected: Position = add(withoutScroll, displacement);
+
+              expect(result.pageCenter).toEqual(expected);
+            });
           });
         });
 
         describe('is moving after the target', () => {
-          // moving home4 into the second position of the foreign list
-          const result: ?Result = moveToNewDroppable({
-            pageCenter: inHome4.page.withMargin.center,
-            draggable: inHome4,
-            target: inForeign2,
-            destination: foreign,
-            insideDestination: draggables,
-            home: {
-              index: 3,
-              droppableId: home.descriptor.id,
-            },
-            previousImpact: noImpact,
-          });
-
-          if (!result) {
-            throw new Error('invalid test setup');
-          }
-
-          it('should move after the target', () => {
-            const expected = moveToEdge({
-              source: inHome4.page.withoutMargin,
-              sourceEdge: 'start',
-              destination: inForeign2.page.withMargin,
-              // going after
-              destinationEdge: 'end',
-              destinationAxis: foreign.axis,
+          describe('without droppable scroll', () => {
+            // moving home4 into the second position of the foreign list
+            const result: ?Result = moveToNewDroppable({
+              pageCenter: inHome4.page.withMargin.center,
+              draggable: inHome4,
+              target: inForeign2,
+              destination: foreign,
+              insideDestination: draggables,
+              home: {
+                index: 3,
+                droppableId: home.descriptor.id,
+              },
+              previousImpact: noImpact,
             });
 
-            expect(result.pageCenter).toEqual(expected);
+            if (!result) {
+              throw new Error('invalid test setup');
+            }
+
+            it('should move after the target', () => {
+              const expected = moveToEdge({
+                source: inHome4.page.withoutMargin,
+                sourceEdge: 'start',
+                destination: inForeign2.page.withMargin,
+                // going after
+                destinationEdge: 'end',
+                destinationAxis: foreign.axis,
+              });
+
+              expect(result.pageCenter).toEqual(expected);
+            });
+
+            it('should move everything after the proposed index forward', () => {
+              const expected: DragImpact = {
+                movement: {
+                  // ordered by closest impacted
+                  displaced: [
+                    {
+                      draggableId: inForeign3.descriptor.id,
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                    {
+                      draggableId: inForeign4.descriptor.id,
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                  ],
+                  amount: patch(foreign.axis.line, inHome4.page.withMargin[foreign.axis.size]),
+                  isBeyondStartPosition: false,
+                },
+                direction: foreign.axis.direction,
+                destination: {
+                  droppableId: foreign.descriptor.id,
+                  // going after target, so index is target index + 1
+                  index: 2,
+                },
+              };
+
+              expect(result.impact).toEqual(expected);
+            });
           });
 
-          it('should move everything after the proposed index forward', () => {
-            const expected: DragImpact = {
-              movement: {
-                // ordered by closest impacted
-                displaced: [
-                  {
-                    draggableId: inForeign3.descriptor.id,
-                    isVisible: true,
-                    shouldAnimate: true,
-                  },
-                  {
-                    draggableId: inForeign4.descriptor.id,
-                    isVisible: true,
-                    shouldAnimate: true,
-                  },
-                ],
-                amount: patch(foreign.axis.line, inHome4.page.withMargin[foreign.axis.size]),
-                isBeyondStartPosition: false,
-              },
-              direction: foreign.axis.direction,
-              destination: {
-                droppableId: foreign.descriptor.id,
-                // going after target, so index is target index + 1
-                index: 2,
-              },
-            };
+          describe('with droppable scroll', () => {
+            const scrollable: DroppableDimension = makeScrollable(foreign, 10);
+            const scroll: Position = patch(axis.line, 10);
+            const displacement: Position = negate(scroll);
+            const scrolled: DroppableDimension = scrollDroppable(scrollable, patch(axis.line, 10));
 
-            expect(result.impact).toEqual(expected);
+            const result: ?Result = moveToNewDroppable({
+              pageCenter: inHome4.page.withMargin.center,
+              draggable: inHome4,
+              target: inForeign2,
+              destination: scrolled,
+              insideDestination: draggables,
+              home: {
+                index: 3,
+                droppableId: home.descriptor.id,
+              },
+              previousImpact: noImpact,
+            });
+
+            if (!result) {
+              throw new Error('Invalid result');
+            }
+
+            it('should account for changes in droppable scroll', () => {
+              const withoutScroll: Position = moveToEdge({
+                source: inHome4.page.withoutMargin,
+                sourceEdge: 'start',
+                destination: inForeign2.page.withMargin,
+                // going after
+                destinationEdge: 'end',
+                destinationAxis: foreign.axis,
+              });
+              const expected: Position = add(withoutScroll, displacement);
+
+              expect(result.pageCenter).toEqual(expected);
+            });
           });
         });
 
@@ -679,12 +928,18 @@ describe('move to new droppable', () => {
                 // will be cut by frame
                 bottom: 200,
               }),
-              frameClient: getArea({
-                top: 0,
-                left: 0,
-                right: 100,
-                bottom: 100,
-              }),
+              closest: {
+                frameClient: getArea({
+                  top: 0,
+                  left: 0,
+                  right: 100,
+                  bottom: 100,
+                }),
+                scrollWidth: 200,
+                scrollHeight: 200,
+                scroll: { x: 0, y: 0 },
+                shouldClipSubject: true,
+              },
             });
 
             const customInForeign: DraggableDimension = getDraggableDimension({

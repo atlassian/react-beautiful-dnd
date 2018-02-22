@@ -35,9 +35,6 @@ const Container = styled.div`
 const NestedContainer = Container.extend`
   padding: 0;
   margin-bottom: ${grid}px;
-  &:hover {
-    cursor: grab;
-  }
 `;
 
 export default class QuoteList extends Component<{ list: NestedQuoteList }> {
@@ -71,6 +68,7 @@ export default class QuoteList extends Component<{ list: NestedQuoteList }> {
         <Container
           innerRef={dropProvided.innerRef}
           isDraggingOver={dropSnapshot.isDraggingOver}
+          {...dropProvided.droppableProps}
         >
           <Title>{list.title}</Title>
           {list.children.map((item: Quote | NestedQuoteList, index: number) => (

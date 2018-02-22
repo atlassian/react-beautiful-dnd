@@ -1,10 +1,11 @@
 // @flow
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { patch } from '../position';
+import { patch, subtract } from '../position';
+import withDroppableDisplacement from '../with-droppable-displacement';
 import moveToEdge from '../move-to-edge';
-import getDisplacement from '../get-displacement';
-import getViewport from '../visibility/get-viewport';
-import isVisibleInNewLocation from './is-visible-in-new-location';
+import getViewport from '../../window/get-viewport';
+import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
+import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import type {
@@ -21,6 +22,7 @@ export default ({
   isMovingForward,
   draggableId,
   previousImpact,
+  previousPageCenter,
   droppable,
   draggables,
 }: Args): ?Result => {
@@ -73,7 +75,7 @@ export default ({
   })();
 
   const viewport: Area = getViewport();
-  const newCenter: Position = moveToEdge({
+  const newPageCenter: Position = moveToEdge({
     source: draggable.page.withoutMargin,
     sourceEdge,
     destination: movingRelativeTo.page.withMargin,
@@ -81,67 +83,35 @@ export default ({
     destinationAxis: droppable.axis,
   });
 
-  const isVisible: boolean = (() => {
-    // Moving into placeholder position
-    // Usually this would be outside of the visible bounds
-    if (isMovingPastLastIndex) {
-      return true;
-    }
+  const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
+    draggable,
+    destination: droppable,
+    newPageCenter,
+    viewport,
+  });
 
-    // checking the shifted draggable rather than just the new center
-    // as the new center might not be visible but the whole draggable
-    // might be partially visible
-    return isVisibleInNewLocation({
-      draggable,
-      destination: droppable,
-      newCenter,
+  const displaced: Displacement[] = (() => {
+    if (isMovingForward) {
+      return withFirstRemoved({
+        dragging: draggableId,
+        isVisibleInNewLocation,
+        previousImpact,
+        droppable,
+        draggables,
+      });
+    }
+    return withFirstAdded({
+      add: movingRelativeTo.descriptor.id,
+      previousImpact,
+      droppable,
+      draggables,
       viewport,
     });
   })();
 
-  if (!isVisible) {
-    return null;
-  }
-
-  // at this point we know that the destination is droppable
-  const movingRelativeToDisplacement: Displacement = {
-    draggableId: movingRelativeTo.descriptor.id,
-    isVisible: true,
-    shouldAnimate: true,
-  };
-
-  // When we are in foreign list we are only displacing items forward
-  // This list is always sorted by the closest impacted draggable
-  const modified: Displacement[] = (isMovingForward ?
-    // Stop displacing the closest draggable forward
-    previousImpact.movement.displaced.slice(1, previousImpact.movement.displaced.length) :
-    // Add the draggable that we are moving into the place of
-    [movingRelativeToDisplacement, ...previousImpact.movement.displaced]);
-
-  // update displacement to consider viewport and droppable visibility
-  const displaced: Displacement[] = modified
-    .map((displacement: Displacement): Displacement => {
-    // already processed
-      if (displacement === movingRelativeToDisplacement) {
-        return displacement;
-      }
-
-      const target: DraggableDimension = draggables[displacement.draggableId];
-
-      const updated: Displacement = getDisplacement({
-        draggable: target,
-        destination: droppable,
-        viewport,
-        previousImpact,
-      });
-
-      return updated;
-    });
-
   const newImpact: DragImpact = {
     movement: {
       displaced,
-      // The amount of movement will always be the size of the dragging item
       amount: patch(axis.line, draggable.page.withMargin[axis.size]),
       // When we are in foreign list we are only displacing items forward
       isBeyondStartPosition: false,
@@ -153,8 +123,21 @@ export default ({
     direction: droppable.axis.direction,
   };
 
+  if (isVisibleInNewLocation) {
+    return {
+      pageCenter: withDroppableDisplacement(droppable, newPageCenter),
+      impact: newImpact,
+      scrollJumpRequest: null,
+    };
+  }
+
+  // The full distance required to get from the previous page center to the new page center
+  const distanceMoving: Position = subtract(newPageCenter, previousPageCenter);
+  const distanceWithScroll: Position = withDroppableDisplacement(droppable, distanceMoving);
+
   return {
-    pageCenter: newCenter,
+    pageCenter: previousPageCenter,
     impact: newImpact,
+    scrollJumpRequest: distanceWithScroll,
   };
 };

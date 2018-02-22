@@ -47,6 +47,44 @@ const initial: ItemType[] = [
     ),
   },
   {
+    id: 'checkbox',
+    component: (
+      <div>
+        <label htmlFor="myCheckbox1">
+          <input id="myCheckbox1" type="checkbox" name="myCheckbox" />
+          Checkbox 1
+        </label>
+        <br />
+        <label htmlFor="myCheckbox2">
+          <input id="myCheckbox2" type="checkbox" name="myCheckbox" />
+          Checkbox 2
+        </label>
+      </div>
+    ),
+  },
+  {
+    id: 'radio',
+    component: (
+      <div>
+        <label htmlFor="myRadio">
+          <input id="myRadio1" type="radio" name="myRadio"/>
+          Option 1
+        </label>
+        <br />
+        <label htmlFor="myRadio">
+          <input id="myRadio2" type="radio" name="myRadio" />
+          Option 2
+        </label>
+      </div>
+    ),
+  },
+  {
+    id: 'range',
+    component: (
+      <input type="range" min="1" max="100" />
+    ),
+  },
+  {
     id: 'content editable',
     component: (
       <div
@@ -54,7 +92,7 @@ const initial: ItemType[] = [
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{
           __html: `
-            floating text
+            A content editable with
             <strong>my super cool content</strong>
           `,
         }}
@@ -133,6 +171,7 @@ export default class InteractiveElementsApp extends React.Component<*, State> {
             {(droppableProvided: DroppableProvided) => (
               <List
                 innerRef={droppableProvided.innerRef}
+                {...droppableProvided.droppableProps}
               >
                 {this.state.items.map((item: ItemType, index: number) => (
                   <Draggable

@@ -13,8 +13,6 @@ type Props = {
   autoFocus?: boolean,
 }
 
-type HTMLElement = any;
-
 const Container = styled.a`
 border-radius: ${borderRadius}px;
 border: 1px solid grey;
@@ -107,7 +105,7 @@ export default class QuoteItem extends React.PureComponent<Props> {
     }
 
     // eslint-disable-next-line react/no-find-dom-node
-    const node: HTMLElement = ReactDOM.findDOMNode(this);
+    const node: HTMLElement = (ReactDOM.findDOMNode(this) : any);
     node.focus();
   }
 

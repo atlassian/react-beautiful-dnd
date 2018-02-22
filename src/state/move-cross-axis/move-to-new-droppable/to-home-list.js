@@ -1,7 +1,8 @@
 // @flow
 import moveToEdge from '../../move-to-edge';
-import getViewport from '../../visibility/get-viewport';
+import getViewport from '../../../window/get-viewport';
 import getDisplacement from '../../get-displacement';
+import withDroppableDisplacement from '../../with-droppable-displacement';
 import type { Edge } from '../../move-to-edge';
 import type { Result } from '../move-cross-axis-types';
 import type {
@@ -64,7 +65,7 @@ export default ({
     };
 
     return {
-      pageCenter: newCenter,
+      pageCenter: withDroppableDisplacement(droppable, newCenter),
       impact: newImpact,
     };
   }
@@ -128,7 +129,7 @@ export default ({
   };
 
   return {
-    pageCenter: newCenter,
+    pageCenter: withDroppableDisplacement(droppable, newCenter),
     impact: newImpact,
   };
 };

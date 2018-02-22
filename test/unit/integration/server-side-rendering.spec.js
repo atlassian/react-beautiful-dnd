@@ -25,7 +25,7 @@ class App extends Component<*, *> {
       >
         <Droppable droppableId="drop-1">
           {(provided: DroppableProvided) => (
-            <div ref={provided.innerRef}>
+            <div ref={provided.innerRef} {...provided.droppableProps}>
               <Draggable draggableId="drag-1">
                 {(dragProvided: DraggableProvided) => (
                   <div>

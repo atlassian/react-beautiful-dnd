@@ -1,10 +1,15 @@
 // @flow
 import getArea from '../../src/state/get-area';
+import { noMovement } from '../../src/state/no-impact';
 import { getDroppableDimension, getDraggableDimension } from '../../src/state/dimension';
 import { vertical } from '../../src/state/axis';
 import type {
+  Area,
   Axis,
+  DragImpact,
+  State,
   Position,
+  ClosestScrollable,
   Spacing,
   DroppableDimension,
   DraggableDimension,
@@ -12,17 +17,127 @@ import type {
   DroppableDimensionMap,
 } from '../../src/types';
 
-export const getPreset = (axis?: Axis = vertical) => {
-  const margin: Spacing = { top: 10, left: 10, bottom: 5, right: 5 };
-  const padding: Spacing = { top: 2, left: 2, bottom: 2, right: 2 };
-  const windowScroll: Position = { x: 50, y: 100 };
-  const crossAxisStart: number = 0;
-  const crossAxisEnd: number = 100;
-  const foreignCrossAxisStart: number = 100;
-  const foreignCrossAxisEnd: number = 200;
-  const emptyForeignCrossAxisStart: number = 200;
-  const emptyForeignCrossAxisEnd: number = 300;
+const margin: Spacing = { top: 10, left: 10, bottom: 5, right: 5 };
+const padding: Spacing = { top: 2, left: 2, bottom: 2, right: 2 };
+const windowScroll: Position = { x: 50, y: 100 };
+const crossAxisStart: number = 0;
+const crossAxisEnd: number = 100;
+const foreignCrossAxisStart: number = 100;
+const foreignCrossAxisEnd: number = 200;
+const emptyForeignCrossAxisStart: number = 200;
+const emptyForeignCrossAxisEnd: number = 300;
 
+export const makeScrollable = (droppable: DroppableDimension, amount?: number = 20) => {
+  const axis: Axis = droppable.axis;
+  const client: Area = droppable.client.withoutMargin;
+
+  const horizontalGrowth: number = axis === vertical ? 0 : amount;
+  const verticalGrowth: number = axis === vertical ? amount : 0;
+
+  // is 10px smaller than the client on the main axis
+  // this will leave 10px of scrollable area.
+  // only expanding on one axis
+  const newClient: Area = getArea({
+    top: client.top,
+    left: client.left,
+    // growing the client to account for the scrollable area
+    right: client.right + horizontalGrowth,
+    bottom: client.bottom + verticalGrowth,
+  });
+
+  // add scroll space on the main axis
+  const scrollSize = {
+    width: client.width + horizontalGrowth,
+    height: client.height + verticalGrowth,
+  };
+
+  return getDroppableDimension({
+    descriptor: droppable.descriptor,
+    direction: axis.direction,
+    padding,
+    margin,
+    windowScroll,
+    client: newClient,
+    closest: {
+      frameClient: client,
+      scrollWidth: scrollSize.width,
+      scrollHeight: scrollSize.height,
+      scroll: { x: 0, y: 0 },
+      shouldClipSubject: true,
+    },
+  });
+};
+
+export const getInitialImpact = (draggable: DraggableDimension, axis?: Axis = vertical) => {
+  const impact: DragImpact = {
+    movement: noMovement,
+    direction: axis.direction,
+    destination: {
+      index: draggable.descriptor.index,
+      droppableId: draggable.descriptor.droppableId,
+    },
+  };
+  return impact;
+};
+
+export const withImpact = (state: State, impact: DragImpact) => {
+  // while dragging
+  if (state.drag) {
+    return {
+      ...state,
+      drag: {
+        ...state.drag,
+        impact,
+      },
+    };
+  }
+  // while drop animating
+  if (state.drop && state.drop.pending) {
+    return {
+      ...state,
+      drop: {
+        ...state.drop,
+        pending: {
+          ...state.drop.pending,
+          impact,
+        },
+      },
+    };
+  }
+
+  throw new Error('unable to apply impact');
+};
+
+export const addDroppable = (base: State, droppable: DroppableDimension): State => ({
+  ...base,
+  dimension: {
+    ...base.dimension,
+    droppable: {
+      ...base.dimension.droppable,
+      [droppable.descriptor.id]: droppable,
+    },
+  },
+});
+
+export const addDraggable = (base: State, draggable: DraggableDimension): State => ({
+  ...base,
+  dimension: {
+    ...base.dimension,
+    draggable: {
+      ...base.dimension.draggable,
+      [draggable.descriptor.id]: draggable,
+    },
+  },
+});
+
+export const getClosestScrollable = (droppable: DroppableDimension): ClosestScrollable => {
+  if (!droppable.viewport.closestScrollable) {
+    throw new Error('Cannot get closest scrollable');
+  }
+  return droppable.viewport.closestScrollable;
+};
+
+export const getPreset = (axis?: Axis = vertical) => {
   const home: DroppableDimension = getDroppableDimension({
     descriptor: {
       id: 'home',

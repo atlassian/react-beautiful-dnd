@@ -21,6 +21,17 @@ type ExecuteBasedOnDirection = {|
   horizontal: () => void,
 |}
 
+type KeyMap = {
+  [key: number]: true
+}
+
+const scrollJumpKeys: KeyMap = {
+  [keyCodes.pageDown]: true,
+  [keyCodes.pageUp]: true,
+  [keyCodes.home]: true,
+  [keyCodes.end]: true,
+};
+
 const noop = () => { };
 
 export default ({
@@ -82,8 +93,10 @@ export default ({
       // using center position as selection
       const center: Position = getCenterPosition(ref);
 
-      // not allowing scrolling with a mouse when lifting with a keyboard
-      startDragging(() => callbacks.onLift({ client: center, isScrollAllowed: false }));
+      startDragging(() => callbacks.onLift({
+        client: center,
+        autoScrollMode: 'JUMP',
+      }));
       return;
     }
 
@@ -156,14 +169,27 @@ export default ({
     }
 
     blockStandardKeyEvents(event);
+
+    // blocking scroll jumping at this time
+    if (scrollJumpKeys[event.keyCode]) {
+      stopEvent(event);
+    }
   };
 
   const windowBindings = {
-    // any mouse down kills a drag
+    // any mouse actions kills a drag
     mousedown: cancel,
+    mouseup: cancel,
+    click: cancel,
+    touchstart: cancel,
+    // resizing the browser kills a drag
     resize: cancel,
-    // currently not supporting window scrolling with a keyboard
-    scroll: cancel,
+    // kill if the user is using the mouse wheel
+    // We are not supporting wheel / trackpad scrolling with keyboard dragging
+    wheel: cancel,
+    // Need to respond instantly to a jump scroll request
+    // Not using the scheduler
+    scroll: callbacks.onWindowScroll,
   };
 
   const eventKeys: string[] = Object.keys(windowBindings);

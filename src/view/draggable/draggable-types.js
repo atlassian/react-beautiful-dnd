@@ -2,6 +2,7 @@
 import type { Node } from 'react';
 import type {
   DraggableId,
+  DroppableId,
   DraggableDimension,
   Position,
   Direction,
@@ -106,6 +107,7 @@ export type Provided = {|
 
 export type StateSnapshot = {|
   isDragging: boolean,
+  draggingOver: ?DroppableId,
 |}
 
 export type DispatchProps = {|
@@ -129,12 +131,13 @@ export type MapProps = {|
   // when an item is being displaced by a dragging item,
   // we need to know if that movement should be animated
   shouldAnimateDisplacement: boolean,
+  isDropAnimating: boolean,
+  offset: Position,
   // only provided when dragging
   // can be null if not over a droppable
   direction: ?Direction,
-  isDropAnimating: boolean,
-  offset: Position,
   dimension: ?DraggableDimension,
+  draggingOver: ?DroppableId,
 |}
 
 export type OwnProps = {|

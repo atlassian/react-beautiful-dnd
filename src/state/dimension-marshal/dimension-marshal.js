@@ -9,6 +9,8 @@ import type {
   State as AppState,
   Phase,
   Position,
+  LiftRequest,
+  ScrollOptions,
 } from '../../types';
 import type {
   DimensionMarshal,
@@ -27,14 +29,16 @@ type State = {|
   // long lived
   droppables: DroppableEntryMap,
   draggables: DraggableEntryMap,
+  // short lived
   isCollecting: boolean,
-  request: ?DraggableId,
+  scrollOptions: ?ScrollOptions,
+  request: ?LiftRequest,
   frameId: ?number,
 |}
 
 type ToBePublished = {|
-  draggables: DraggableDimension[],
   droppables: DroppableDimension[],
+  draggables: DraggableDimension[],
 |}
 
 export default (callbacks: Callbacks) => {
@@ -42,6 +46,7 @@ export default (callbacks: Callbacks) => {
     droppables: {},
     draggables: {},
     isCollecting: false,
+    scrollOptions: null,
     request: null,
     frameId: null,
   };
@@ -156,6 +161,19 @@ export default (callbacks: Callbacks) => {
     callbacks.updateDroppableScroll(id, newScroll);
   };
 
+  const scrollDroppable = (id: DroppableId, change: Position) => {
+    const entry: ?DroppableEntry = state.droppables[id];
+    if (!entry) {
+      return;
+    }
+
+    if (!state.isCollecting) {
+      return;
+    }
+
+    entry.callbacks.scroll(change);
+  };
+
   const unregisterDraggable = (descriptor: DraggableDescriptor) => {
     const entry: ?DraggableEntry = state.draggables[descriptor.id];
 
@@ -224,14 +242,14 @@ export default (callbacks: Callbacks) => {
   const getToBeCollected = (): UnknownDescriptorType[] => {
     const draggables: DraggableEntryMap = state.draggables;
     const droppables: DroppableEntryMap = state.droppables;
-    const request: ?DraggableId = state.request;
+    const request: ?LiftRequest = state.request;
 
     if (!request) {
       console.error('cannot find request in state');
       return [];
     }
-
-    const descriptor: DraggableDescriptor = draggables[request].descriptor;
+    const draggableId: DraggableId = request.draggableId;
+    const descriptor: DraggableDescriptor = draggables[draggableId].descriptor;
     const home: DroppableDescriptor = droppables[descriptor.droppableId].descriptor;
 
     const draggablesToBeCollected: DraggableDescriptor[] =
@@ -272,7 +290,7 @@ export default (callbacks: Callbacks) => {
     return toBeCollected;
   };
 
-  const processPrimaryDimensions = (request: ?DraggableId) => {
+  const processPrimaryDimensions = (request: ?LiftRequest) => {
     if (state.isCollecting) {
       cancel('Cannot start capturing dimensions for a drag it is already dragging');
       return;
@@ -283,6 +301,8 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
+    const draggableId: DraggableId = request.draggableId;
+
     setState({
       isCollecting: true,
       request,
@@ -290,17 +310,20 @@ export default (callbacks: Callbacks) => {
 
     const draggables: DraggableEntryMap = state.draggables;
     const droppables: DroppableEntryMap = state.droppables;
-    const draggableEntry: ?DraggableEntry = draggables[request];
+    const draggableEntry: ?DraggableEntry = draggables[draggableId];
 
     if (!draggableEntry) {
-      cancel(`Cannot find Draggable with id ${request} to start collecting dimensions`);
+      cancel(`Cannot find Draggable with id ${draggableId} to start collecting dimensions`);
       return;
     }
 
     const homeEntry: ?DroppableEntry = droppables[draggableEntry.descriptor.droppableId];
 
     if (!homeEntry) {
-      cancel(`Cannot find home Droppable [id:${draggableEntry.descriptor.droppableId}] for Draggable [id:${request}]`);
+      cancel(`
+        Cannot find home Droppable [id:${draggableEntry.descriptor.droppableId}]
+        for Draggable [id:${request.draggableId}]
+      `);
       return;
     }
 
@@ -308,10 +331,10 @@ export default (callbacks: Callbacks) => {
     const home: DroppableDimension = homeEntry.callbacks.getDimension();
     const draggable: DraggableDimension = draggableEntry.getDimension();
     // Publishing dimensions
-    callbacks.publishDroppables([home]);
-    callbacks.publishDraggables([draggable]);
+    callbacks.publishDroppable(home);
+    callbacks.publishDraggable(draggable);
     // Watching the scroll of the home droppable
-    homeEntry.callbacks.watchScroll();
+    homeEntry.callbacks.watchScroll(request.scrollOptions);
   };
 
   const setFrameId = (frameId: ?number) => {
@@ -320,9 +343,26 @@ export default (callbacks: Callbacks) => {
     });
   };
 
-  const processSecondaryDimensions = (): void => {
+  const processSecondaryDimensions = (requestInAppState: ?LiftRequest): void => {
     if (!state.isCollecting) {
       cancel('Cannot collect secondary dimensions when collection is not occurring');
+      return;
+    }
+
+    const request: ?LiftRequest = state.request;
+
+    if (!request) {
+      cancel('Cannot process secondary dimensions without a request');
+      return;
+    }
+
+    if (!requestInAppState) {
+      cancel('Cannot process secondary dimensions without a request on the state');
+      return;
+    }
+
+    if (requestInAppState.draggableId !== request.draggableId) {
+      cancel('Cannot process secondary dimensions as local request does not match app state');
       return;
     }
 
@@ -355,17 +395,15 @@ export default (callbacks: Callbacks) => {
           }, { draggables: [], droppables: [] }
         );
 
-        if (toBePublished.droppables.length) {
-          callbacks.publishDroppables(toBePublished.droppables);
-        }
-        if (toBePublished.draggables.length) {
-          callbacks.publishDraggables(toBePublished.draggables);
-        }
+        callbacks.bulkPublish(
+          toBePublished.droppables,
+          toBePublished.draggables,
+        );
 
         // need to watch the scroll on each droppable
         toBePublished.droppables.forEach((dimension: DroppableDimension) => {
           const entry: DroppableEntry = state.droppables[dimension.descriptor.id];
-          entry.callbacks.watchScroll();
+          entry.callbacks.watchScroll(request.scrollOptions);
         });
 
         setFrameId(null);
@@ -404,12 +442,7 @@ export default (callbacks: Callbacks) => {
     }
 
     if (phase === 'DRAGGING') {
-      if (current.dimension.request !== state.request) {
-        cancel('Request in local state does not match that of the store');
-        return;
-      }
-
-      processSecondaryDimensions();
+      processSecondaryDimensions(current.dimension.request);
       return;
     }
 
@@ -435,6 +468,7 @@ export default (callbacks: Callbacks) => {
     registerDroppable,
     unregisterDroppable,
     updateDroppableIsEnabled,
+    scrollDroppable,
     updateDroppableScroll,
     onPhaseChange,
   };

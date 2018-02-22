@@ -2,10 +2,15 @@
 import React, { type Node } from 'react';
 import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
-import fireHooks from '../../state/fire-hooks';
+import createHookCaller from '../../state/hooks/hook-caller';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
 import createStyleMarshal from '../style-marshal/style-marshal';
 import canStartDrag from '../../state/can-start-drag';
+import scrollWindow from '../../window/scroll-window';
+import createAnnouncer from '../announcer/announcer';
+import type { Announcer } from '../announcer/announcer-types';
+import createAutoScroller from '../../state/auto-scroller';
+import type { AutoScroller } from '../../state/auto-scroller/auto-scroller-types';
 import type { StyleMarshal } from '../style-marshal/style-marshal-types';
 import type {
   DimensionMarshal,
@@ -15,12 +20,15 @@ import type {
   DraggableId,
   Store,
   State,
-  Hooks,
   DraggableDimension,
   DroppableDimension,
   DroppableId,
   Position,
+  Hooks,
 } from '../../types';
+import type {
+  HookCaller,
+} from '../../state/hooks/hooks-types';
 import {
   storeKey,
   dimensionMarshalKey,
@@ -29,10 +37,12 @@ import {
 } from '../context-keys';
 import {
   clean,
-  publishDraggableDimensions,
-  publishDroppableDimensions,
+  move,
+  publishDraggableDimension,
+  publishDroppableDimension,
   updateDroppableDimensionScroll,
   updateDroppableDimensionIsEnabled,
+  bulkPublishDimensions,
 } from '../../state/action-creators';
 
 type Props = {|
@@ -49,6 +59,9 @@ export default class DragDropContext extends React.Component<Props> {
   store: Store
   dimensionMarshal: DimensionMarshal
   styleMarshal: StyleMarshal
+  autoScroller: AutoScroller
+  hookCaller: HookCaller
+  announcer: Announcer
   unsubscribe: Function
 
   // Need to declare childContextTypes without flow
@@ -86,6 +99,11 @@ export default class DragDropContext extends React.Component<Props> {
   componentWillMount() {
     this.store = createStore();
 
+    this.announcer = createAnnouncer();
+
+    // create the hook caller
+    this.hookCaller = createHookCaller(this.announcer.announce);
+
     // create the style marshal
     this.styleMarshal = createStyleMarshal();
 
@@ -94,11 +112,14 @@ export default class DragDropContext extends React.Component<Props> {
       cancel: () => {
         this.store.dispatch(clean());
       },
-      publishDraggables: (dimensions: DraggableDimension[]) => {
-        this.store.dispatch(publishDraggableDimensions(dimensions));
+      publishDraggable: (dimension: DraggableDimension) => {
+        this.store.dispatch(publishDraggableDimension(dimension));
       },
-      publishDroppables: (dimensions: DroppableDimension[]) => {
-        this.store.dispatch(publishDroppableDimensions(dimensions));
+      publishDroppable: (dimension: DroppableDimension) => {
+        this.store.dispatch(publishDroppableDimension(dimension));
+      },
+      bulkPublish: (droppables: DroppableDimension[], draggables: DraggableDimension[]) => {
+        this.store.dispatch(bulkPublishDimensions(droppables, draggables));
       },
       updateDroppableScroll: (id: DroppableId, newScroll: Position) => {
         this.store.dispatch(updateDroppableDimensionScroll(id, newScroll));
@@ -108,6 +129,18 @@ export default class DragDropContext extends React.Component<Props> {
       },
     };
     this.dimensionMarshal = createDimensionMarshal(callbacks);
+    this.autoScroller = createAutoScroller({
+      scrollWindow,
+      scrollDroppable: this.dimensionMarshal.scrollDroppable,
+      move: (
+        id: DraggableId,
+        client: Position,
+        windowScroll: Position,
+        shouldAnimate?: boolean
+      ): void => {
+        this.store.dispatch(move(id, client, windowScroll, shouldAnimate));
+      },
+    });
 
     let previous: State = this.store.getState();
 
@@ -118,24 +151,25 @@ export default class DragDropContext extends React.Component<Props> {
       // functions synchronously trigger more updates
       previous = current;
 
-      // no lifecycle changes have occurred if phase has not changed
-      if (current.phase === previousValue.phase) {
-        return;
-      }
-
-      // Allowing dynamic hooks by re-capturing the hook functions
+      // TODO: this probs needs to be done first
       const hooks: Hooks = {
         onDragStart: this.props.onDragStart,
         onDragEnd: this.props.onDragEnd,
+        onDragUpdate: this.props.onDragUpdate,
       };
-      fireHooks(hooks, previousValue, current);
+      this.hookCaller.onStateChange(hooks, previousValue, current);
 
-      // Update the global styles
-      this.styleMarshal.onPhaseChange(current);
+      if (current.phase !== previousValue.phase) {
+        // executing phase change handlers first
+        // Update the global styles
+        this.styleMarshal.onPhaseChange(current);
 
-      // inform the dimension marshal about updates
-      // this can trigger more actions synchronously so we are placing it last
-      this.dimensionMarshal.onPhaseChange(current);
+        // inform the dimension marshal about updates
+        // this can trigger more actions synchronously so we are placing it last
+        this.dimensionMarshal.onPhaseChange(current);
+      }
+
+      this.autoScroller.onStateChange(previousValue, current);
     });
   }
 
@@ -144,11 +178,13 @@ export default class DragDropContext extends React.Component<Props> {
     // this cannot be done before otherwise it would break
     // server side rendering
     this.styleMarshal.mount();
+    this.announcer.mount();
   }
 
   componentWillUnmount() {
     this.unsubscribe();
     this.styleMarshal.unmount();
+    this.announcer.unmount();
   }
 
   render() {

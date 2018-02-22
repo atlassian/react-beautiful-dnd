@@ -46,7 +46,7 @@ const destination: Area = getArea({
 const pullBackwardsOnMainAxis = (axis: Axis) => (point: Position) => patch(
   axis.line,
   -point[axis.line],
-  point[axis.crossLine]
+  point[axis.crossAxisLine]
 );
 
 // returns the absolute difference of the center position

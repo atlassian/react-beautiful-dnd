@@ -55,7 +55,7 @@ export default ({
     destinationAxis.line,
     // if moving to the end edge - we need to pull the source backwards
     (sourceEdge === 'end' ? -1 : 1) * centerDiff[destinationAxis.line],
-    centerDiff[destinationAxis.crossLine],
+    centerDiff[destinationAxis.crossAxisLine],
   );
 
   return add(corner, signed);

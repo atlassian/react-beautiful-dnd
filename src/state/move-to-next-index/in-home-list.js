@@ -1,13 +1,14 @@
 // @flow
-import memoizeOne from 'memoize-one';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { patch } from '../position';
-import isVisibleInNewLocation from './is-visible-in-new-location';
-import getViewport from '../visibility/get-viewport';
+import { patch, subtract } from '../position';
+import withDroppableDisplacement from '../with-droppable-displacement';
+import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
+import getViewport from '../../window/get-viewport';
+// import getScrollJumpResult from './get-scroll-jump-result';
 import moveToEdge from '../move-to-edge';
+import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
 import type { Edge } from '../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
-import getDisplacement from '../get-displacement';
 import type {
   DraggableLocation,
   DraggableDimension,
@@ -18,15 +19,10 @@ import type {
   Area,
 } from '../../types';
 
-const getIndex = memoizeOne(
-  (draggables: DraggableDimension[],
-    target: DraggableDimension
-  ): number => draggables.indexOf(target)
-);
-
 export default ({
   isMovingForward,
   draggableId,
+  previousPageCenter,
   previousImpact,
   droppable,
   draggables,
@@ -46,7 +42,7 @@ export default ({
     draggables,
   );
 
-  const startIndex: number = getIndex(insideDroppable, draggable);
+  const startIndex: number = draggable.descriptor.index;
   const currentIndex: number = location.index;
   const proposedIndex = isMovingForward ? currentIndex + 1 : currentIndex - 1;
 
@@ -65,6 +61,7 @@ export default ({
     return null;
   }
 
+  const viewport: Area = getViewport();
   const destination: DraggableDimension = insideDroppable[proposedIndex];
   const isMovingTowardStart = (isMovingForward && proposedIndex <= startIndex) ||
     (!isMovingForward && proposedIndex >= startIndex);
@@ -78,7 +75,7 @@ export default ({
     return isMovingForward ? 'start' : 'end';
   })();
 
-  const newCenter: Position = moveToEdge({
+  const newPageCenter: Position = moveToEdge({
     source: draggable.page.withoutMargin,
     sourceEdge: edge,
     destination: destination.page.withoutMargin,
@@ -86,52 +83,35 @@ export default ({
     destinationAxis: droppable.axis,
   });
 
-  const viewport: Area = getViewport();
-
-  const isVisible: boolean = isVisibleInNewLocation({
+  const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
     draggable,
     destination: droppable,
-    newCenter,
+    newPageCenter,
     viewport,
   });
 
-  if (!isVisible) {
-    return null;
-  }
-
-  // Calculate DragImpact
-  // at this point we know that the destination is droppable
-  const destinationDisplacement: Displacement = {
-    draggableId: destination.descriptor.id,
-    isVisible: true,
-    shouldAnimate: true,
-  };
-
-  const modified: Displacement[] = (isMovingTowardStart ?
-    // remove the most recently impacted
-    previousImpact.movement.displaced.slice(1, previousImpact.movement.displaced.length) :
-    // add the destination as the most recently impacted
-    [destinationDisplacement, ...previousImpact.movement.displaced]);
-
-  // update impact with visibility - stops redundant work!
-  const displaced: Displacement[] = modified
-    .map((displacement: Displacement): Displacement => {
-      const target: DraggableDimension = draggables[displacement.draggableId];
-
-      const updated: Displacement = getDisplacement({
-        draggable: target,
-        destination: droppable,
+  const displaced: Displacement[] = (() => {
+    if (isMovingTowardStart) {
+      return withFirstRemoved({
+        dragging: draggableId,
+        isVisibleInNewLocation,
         previousImpact,
-        viewport,
+        droppable,
+        draggables,
       });
-
-      return updated;
+    }
+    return withFirstAdded({
+      add: destination.descriptor.id,
+      previousImpact,
+      droppable,
+      draggables,
+      viewport,
     });
+  })();
 
   const newImpact: DragImpact = {
     movement: {
       displaced,
-      // The amount of movement will always be the size of the dragging item
       amount: patch(axis.line, draggable.page.withMargin[axis.size]),
       isBeyondStartPosition: proposedIndex > startIndex,
     },
@@ -142,10 +122,21 @@ export default ({
     direction: droppable.axis.direction,
   };
 
-  const result: Result = {
-    pageCenter: newCenter,
-    impact: newImpact,
-  };
+  if (isVisibleInNewLocation) {
+    return {
+      pageCenter: withDroppableDisplacement(droppable, newPageCenter),
+      impact: newImpact,
+      scrollJumpRequest: null,
+    };
+  }
 
-  return result;
+  // The full distance required to get from the previous page center to the new page center
+  const distance: Position = subtract(newPageCenter, previousPageCenter);
+  const distanceWithScroll: Position = withDroppableDisplacement(droppable, distance);
+
+  return {
+    pageCenter: previousPageCenter,
+    impact: newImpact,
+    scrollJumpRequest: distanceWithScroll,
+  };
 };

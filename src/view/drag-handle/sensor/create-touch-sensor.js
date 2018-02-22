@@ -71,8 +71,7 @@ export default ({
 
     callbacks.onLift({
       client: pending,
-      // not allowing container scrolling for touch movements at this stage
-      isScrollAllowed: false,
+      autoScrollMode: 'FLUID',
     });
   };
   const stopDragging = (fn?: Function = noop) => {
@@ -178,10 +177,14 @@ export default ({
     orientationchange: cancel,
     // some devices fire resize if the orientation changes
     resize: cancel,
-    // A window scroll will cancel a pending or current drag.
-    // This should not happen as we are calling preventDefault in touchmove,
-    // but just being extra safe
-    scroll: cancel,
+    scroll: () => {
+      // stop a pending drag
+      if (state.pending) {
+        stopPendingDrag();
+        return;
+      }
+      schedule.windowScrollMove();
+    },
     // Long press can bring up a context menu
     // need to opt out of this behavior
     contextmenu: stopEvent,
@@ -217,6 +220,14 @@ export default ({
         // opting out of passive touchmove (default) so as to prevent scrolling while moving
         // Not worried about performance as effect of move is throttled in requestAnimationFrame
         win.addEventListener(eventKey, fn, { passive: false });
+        return;
+      }
+
+      // For scroll events we are okay with eventual consistency.
+      // Passive scroll listeners is the default behavior for mobile
+      // but we are being really clear here
+      if (eventKey === 'scroll') {
+        win.addEventListener(eventKey, fn, { passive: true });
         return;
       }
 

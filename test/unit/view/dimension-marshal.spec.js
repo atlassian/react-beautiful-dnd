@@ -3,7 +3,7 @@ import { getPreset } from '../../utils/dimension';
 import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
 import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
 import getArea from '../../../src/state/get-area';
-import * as state from '../../utils/simple-state-preset';
+import getStatePreset from '../../utils/get-simple-state-preset';
 import type {
   Callbacks,
   DimensionMarshal,
@@ -20,14 +20,16 @@ import type {
   DroppableId,
   DraggableDescriptor,
   DroppableDescriptor,
+  ScrollOptions,
   Area,
 } from '../../../src/types';
 
 const getCallbackStub = (): Callbacks => {
   const callbacks: Callbacks = {
     cancel: jest.fn(),
-    publishDraggables: jest.fn(),
-    publishDroppables: jest.fn(),
+    publishDraggable: jest.fn(),
+    publishDroppable: jest.fn(),
+    bulkPublish: jest.fn(),
     updateDroppableScroll: jest.fn(),
     updateDroppableIsEnabled: jest.fn(),
   };
@@ -40,6 +42,7 @@ type PopulateMarshalState = {|
 |}
 
 const preset = getPreset();
+const state = getStatePreset();
 
 const defaultArgs: PopulateMarshalState = {
   draggables: preset.draggables,
@@ -80,12 +83,13 @@ const populateMarshal = (
         watches.droppable.getDimension(id);
         return droppable;
       },
-      watchScroll: () => {
-        watches.droppable.watchScroll(id);
+      watchScroll: (options: ScrollOptions) => {
+        watches.droppable.watchScroll(id, options);
       },
       unwatchScroll: () => {
         watches.droppable.unwatchScroll(id);
       },
+      scroll: () => {},
     };
 
     marshal.registerDroppable(droppable.descriptor, callbacks);
@@ -123,6 +127,30 @@ const childOfAnotherType: DraggableDimension = getDraggableDimension({
   client: fakeArea,
 });
 
+const immediate: ScrollOptions = {
+  shouldPublishImmediately: true,
+};
+const scheduled: ScrollOptions = {
+  shouldPublishImmediately: false,
+};
+
+const withScrollOptions = (current: State, scrollOptions: ScrollOptions) => {
+  if (!current.dimension.request) {
+    throw new Error('Invalid test setup');
+  }
+
+  return {
+    ...current,
+    dimension: {
+      ...current.dimension,
+      request: {
+        ...current.dimension.request,
+        scrollOptions,
+      },
+    },
+  };
+};
+
 describe('dimension marshal', () => {
   beforeAll(() => {
     requestAnimationFrame.reset();
@@ -159,7 +187,10 @@ describe('dimension marshal', () => {
         const marshal = createDimensionMarshal(callbacks);
         populateMarshal(marshal);
 
-        marshal.onPhaseChange(state.requesting('some-unknown-descriptor'));
+        marshal.onPhaseChange(state.requesting({
+          draggableId: 'some-unknown-descriptor',
+          scrollOptions: scheduled,
+        }));
 
         expect(callbacks.cancel).toHaveBeenCalled();
       });
@@ -178,7 +209,10 @@ describe('dimension marshal', () => {
         });
 
         // there is now no published home droppable
-        marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+        marshal.onPhaseChange(state.requesting({
+          draggableId: preset.inHome1.descriptor.id,
+          scrollOptions: scheduled,
+        }));
 
         expect(callbacks.cancel).toHaveBeenCalled();
       });
@@ -190,24 +224,52 @@ describe('dimension marshal', () => {
         const marshal = createDimensionMarshal(callbacks);
         populateMarshal(marshal);
 
-        marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+        marshal.onPhaseChange(state.requesting({
+          draggableId: preset.inHome1.descriptor.id,
+          scrollOptions: scheduled,
+        }));
 
-        expect(callbacks.publishDraggables).toHaveBeenCalledTimes(1);
-        expect(callbacks.publishDraggables).toBeCalledWith([preset.inHome1]);
-        expect(callbacks.publishDroppables).toHaveBeenCalledTimes(1);
-        expect(callbacks.publishDroppables).toBeCalledWith([preset.home]);
+        expect(callbacks.publishDraggable).toHaveBeenCalledTimes(1);
+        expect(callbacks.publishDraggable).toBeCalledWith(preset.inHome1);
+        expect(callbacks.publishDroppable).toHaveBeenCalledTimes(1);
+        expect(callbacks.publishDroppable).toBeCalledWith(preset.home);
+        expect(callbacks.bulkPublish).not.toHaveBeenCalled();
       });
 
-      it('should ask the home droppable to start listening to scrolling', () => {
+      it('should ask the home droppable to start listening to scrolling (scheduled scroll)', () => {
         const callbacks = getCallbackStub();
         const marshal = createDimensionMarshal(callbacks);
         const watches = populateMarshal(marshal);
 
-        marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+        marshal.onPhaseChange(state.requesting({
+          draggableId: preset.inHome1.descriptor.id,
+          scrollOptions: scheduled,
+        }));
 
         // it should not watch scroll on the other droppables at this stage
         expect(watches.droppable.watchScroll).toHaveBeenCalledTimes(1);
-        expect(watches.droppable.watchScroll).toHaveBeenCalledWith(preset.home.descriptor.id);
+        expect(watches.droppable.watchScroll).toHaveBeenCalledWith(
+          preset.home.descriptor.id,
+          scheduled,
+        );
+      });
+
+      it('should ask the home droppable to start listening to scrolling (immediate scroll)', () => {
+        const callbacks = getCallbackStub();
+        const marshal = createDimensionMarshal(callbacks);
+        const watches = populateMarshal(marshal);
+
+        marshal.onPhaseChange(state.requesting({
+          draggableId: preset.inHome1.descriptor.id,
+          scrollOptions: immediate,
+        }));
+
+        // it should not watch scroll on the other droppables at this stage
+        expect(watches.droppable.watchScroll).toHaveBeenCalledTimes(1);
+        expect(watches.droppable.watchScroll).toHaveBeenCalledWith(
+          preset.home.descriptor.id,
+          immediate,
+        );
       });
     });
 
@@ -218,9 +280,14 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           populateMarshal(marshal);
 
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
-          expect(callbacks.publishDroppables).toHaveBeenCalledTimes(1);
-          expect(callbacks.publishDraggables).toHaveBeenCalledTimes(1);
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
+          expect(callbacks.publishDraggable).toHaveBeenCalledTimes(1);
+          expect(callbacks.publishDroppable).toHaveBeenCalledTimes(1);
+          callbacks.publishDraggable.mockReset();
+          callbacks.publishDroppable.mockReset();
           // moving to idle state before moving to dragging state
           marshal.onPhaseChange(state.idle);
 
@@ -229,8 +296,9 @@ describe('dimension marshal', () => {
           requestAnimationFrame.flush();
 
           // nothing happened
-          expect(callbacks.publishDroppables).toHaveBeenCalledTimes(1);
-          expect(callbacks.publishDraggables).toHaveBeenCalledTimes(1);
+          expect(callbacks.bulkPublish).not.toHaveBeenCalled();
+          expect(callbacks.publishDroppable).not.toHaveBeenCalled();
+          expect(callbacks.publishDraggable).not.toHaveBeenCalled();
         });
       });
 
@@ -240,11 +308,15 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           const watchers = populateMarshal(marshal);
 
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
-          expect(callbacks.publishDroppables).toHaveBeenCalledTimes(1);
-          expect(callbacks.publishDraggables).toHaveBeenCalledTimes(1);
-          callbacks.publishDroppables.mockClear();
-          callbacks.publishDraggables.mockClear();
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
+          expect(callbacks.publishDroppable).toHaveBeenCalledTimes(1);
+          expect(callbacks.publishDraggable).toHaveBeenCalledTimes(1);
+          expect(callbacks.bulkPublish).not.toHaveBeenCalled();
+          callbacks.publishDroppable.mockClear();
+          callbacks.publishDraggable.mockClear();
           watchers.draggable.getDimension.mockClear();
           watchers.droppable.getDimension.mockClear();
 
@@ -255,7 +327,7 @@ describe('dimension marshal', () => {
           // flush all timers - would normally collect and publish
           requestAnimationFrame.flush();
 
-          expect(callbacks.publishDraggables).not.toHaveBeenCalled();
+          expect(callbacks.publishDraggable).not.toHaveBeenCalled();
           expect(watchers.droppable.getDimension).not.toHaveBeenCalled();
         });
 
@@ -264,7 +336,10 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           const watchers = populateMarshal(marshal);
 
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
           expect(watchers.draggable.getDimension).toHaveBeenCalledTimes(1);
           expect(watchers.droppable.getDimension).toHaveBeenCalledTimes(1);
           watchers.draggable.getDimension.mockClear();
@@ -297,7 +372,10 @@ describe('dimension marshal', () => {
             droppables,
           });
 
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
           // clearing the initial calls
           watchers.draggable.getDimension.mockClear();
           watchers.droppable.getDimension.mockClear();
@@ -323,7 +401,10 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           const watchers = populateMarshal(marshal);
 
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
 
           // called straight away
           expect(watchers.draggable.getDimension)
@@ -345,7 +426,10 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           const watchers = populateMarshal(marshal);
 
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
 
           // called straight away
           expect(watchers.droppable.getDimension)
@@ -367,7 +451,10 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           const watchers = populateMarshal(marshal);
 
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
 
           // called straight away
           expect(watchers.droppable.getDimension)
@@ -395,10 +482,13 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           populateMarshal(marshal);
 
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
           // clearing initial calls
-          callbacks.publishDraggables.mockClear();
-          callbacks.publishDroppables.mockClear();
+          callbacks.publishDraggable.mockClear();
+          callbacks.publishDroppable.mockClear();
 
           // execute collection frame
           marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
@@ -409,36 +499,9 @@ describe('dimension marshal', () => {
           requestAnimationFrame.step();
 
           // nothing additional called
-          expect(callbacks.publishDraggables).not.toHaveBeenCalled();
-          expect(callbacks.publishDroppables).not.toHaveBeenCalled();
-        });
-
-        it('should publish all the collected draggables', () => {
-          const callbacks = getCallbackStub();
-          const marshal = createDimensionMarshal(callbacks);
-          populateMarshal(marshal);
-
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
-          // clearing initial calls
-          callbacks.publishDraggables.mockClear();
-
-          marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
-          requestAnimationFrame.step(2);
-
-          // calls are batched
-          expect(callbacks.publishDraggables).toHaveBeenCalledTimes(1);
-          const result: DraggableDimension[] = callbacks.publishDraggables.mock.calls[0][0];
-          // not calling for the dragging item
-          expect(result.length).toBe(Object.keys(preset.draggables).length - 1);
-          // super explicit test
-          // - doing it like this because the order of Object.keys is not guarenteed
-          Object.keys(preset.draggables).forEach((id: DraggableId) => {
-            if (id === preset.inHome1.descriptor.id) {
-              expect(result).not.toContain(preset.inHome1);
-              return;
-            }
-            expect(result).toContain(preset.draggables[id]);
-          });
+          expect(callbacks.publishDraggable).not.toHaveBeenCalled();
+          expect(callbacks.publishDroppable).not.toHaveBeenCalled();
+          expect(callbacks.bulkPublish).not.toHaveBeenCalled();
         });
 
         it('should publish all the collected droppables', () => {
@@ -446,16 +509,17 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           populateMarshal(marshal);
 
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
-          // clearing initial calls
-          callbacks.publishDroppables.mockClear();
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
 
           marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
           requestAnimationFrame.step(2);
 
           // calls are batched
-          expect(callbacks.publishDroppables).toHaveBeenCalledTimes(1);
-          const result: DroppableDimension[] = callbacks.publishDroppables.mock.calls[0][0];
+          expect(callbacks.bulkPublish).toHaveBeenCalledTimes(1);
+          const result: DroppableDimension[] = callbacks.bulkPublish.mock.calls[0][0];
           // not calling for the dragging item
           expect(result.length).toBe(Object.keys(preset.droppables).length - 1);
           // super explicit test
@@ -469,23 +533,63 @@ describe('dimension marshal', () => {
           });
         });
 
-        it('should request all the droppables to start listening to scroll events', () => {
+        it('should publish all the collected draggables', () => {
           const callbacks = getCallbackStub();
           const marshal = createDimensionMarshal(callbacks);
-          const watchers = populateMarshal(marshal);
+          populateMarshal(marshal);
 
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
-          // initial droppable
-          expect(watchers.droppable.watchScroll).toHaveBeenCalledTimes(1);
-          // clearing this initial call
-          watchers.droppable.watchScroll.mockClear();
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
 
           marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
           requestAnimationFrame.step(2);
 
-          // excluding the home droppable
-          const expectedLength: number = Object.keys(preset.droppables).length - 1;
-          expect(watchers.droppable.watchScroll).toHaveBeenCalledTimes(expectedLength);
+          // calls are batched
+          expect(callbacks.bulkPublish).toHaveBeenCalledTimes(1);
+          const result: DraggableDimension[] = callbacks.bulkPublish.mock.calls[0][1];
+
+          // not calling for the dragging item
+          expect(result.length).toBe(Object.keys(preset.draggables).length - 1);
+
+          // super explicit test
+          // - doing it like this because the order of Object.keys is not guarenteed
+          Object.keys(preset.draggables).forEach((id: DraggableId) => {
+            if (id === preset.inHome1.descriptor.id) {
+              expect(result).not.toContain(preset.inHome1);
+              return;
+            }
+            expect(result).toContain(preset.draggables[id]);
+          });
+        });
+
+        [scheduled, immediate].forEach((scrollOptions: ScrollOptions) => {
+          it('should request all the droppables to start listening to scroll events', () => {
+            const callbacks = getCallbackStub();
+            const marshal = createDimensionMarshal(callbacks);
+            const watchers = populateMarshal(marshal);
+
+            marshal.onPhaseChange(state.requesting({
+              draggableId: preset.inHome1.descriptor.id,
+              scrollOptions,
+            }));
+            // initial droppable
+            expect(watchers.droppable.watchScroll).toHaveBeenCalledTimes(1);
+
+            marshal.onPhaseChange(withScrollOptions(
+              state.dragging(preset.inHome1.descriptor.id),
+              scrollOptions,
+            ));
+            requestAnimationFrame.step(2);
+
+            const expectedLength: number = Object.keys(preset.droppables).length;
+            expect(watchers.droppable.watchScroll).toHaveBeenCalledTimes(expectedLength);
+
+            Object.keys(preset.droppables).forEach((id: DroppableId) => {
+              expect(watchers.droppable.watchScroll).toHaveBeenCalledWith(id, scrollOptions);
+            });
+          });
         });
 
         it('should not publish dimensions that where not collected', () => {
@@ -501,12 +605,20 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           populateMarshal(marshal, { draggables, droppables });
 
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
           marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
           requestAnimationFrame.step(2);
 
-          expect(callbacks.publishDroppables.mock.calls[0][0]).not.toContain(ofAnotherType);
-          expect(callbacks.publishDraggables.mock.calls[0][0]).not.toContain(childOfAnotherType);
+          expect(callbacks.bulkPublish.mock.calls[0][0]).not.toContain(ofAnotherType);
+          // validation
+          expect(callbacks.bulkPublish.mock.calls[0][0]).toContain(preset.foreign);
+
+          expect(callbacks.bulkPublish.mock.calls[0][1]).not.toContain(childOfAnotherType);
+          // validation
+          expect(callbacks.bulkPublish.mock.calls[0][1]).toContain(preset.inHome2);
         });
 
         it('should not publish draggables if there are none to publish', () => {
@@ -521,19 +633,19 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           populateMarshal(marshal, { draggables, droppables });
 
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
           // asserting initial lift occurred
-          expect(callbacks.publishDraggables).toHaveBeenCalledWith([preset.inHome1]);
-          expect(callbacks.publishDroppables).toHaveBeenCalledWith([preset.home]);
-          callbacks.publishDraggables.mockReset();
-          callbacks.publishDroppables.mockReset();
+          expect(callbacks.publishDraggable).toHaveBeenCalledWith(preset.inHome1);
+          expect(callbacks.publishDroppable).toHaveBeenCalledWith(preset.home);
 
           // perform full lift
           marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
           requestAnimationFrame.step(2);
 
-          expect(callbacks.publishDraggables).not.toHaveBeenCalled();
-          expect(callbacks.publishDroppables).toHaveBeenCalledWith([preset.foreign]);
+          expect(callbacks.bulkPublish).toHaveBeenCalledWith([preset.foreign], []);
         });
 
         it('should not publish droppables if there are none to publish', () => {
@@ -551,19 +663,19 @@ describe('dimension marshal', () => {
           const marshal = createDimensionMarshal(callbacks);
           populateMarshal(marshal, { draggables, droppables });
 
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
           // asserting initial lift occurred
-          expect(callbacks.publishDraggables).toHaveBeenCalledWith([preset.inHome1]);
-          expect(callbacks.publishDroppables).toHaveBeenCalledWith([preset.home]);
-          callbacks.publishDraggables.mockReset();
-          callbacks.publishDroppables.mockReset();
+          expect(callbacks.publishDraggable).toHaveBeenCalledWith(preset.inHome1);
+          expect(callbacks.publishDroppable).toHaveBeenCalledWith(preset.home);
 
           // perform full lift
           marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
           requestAnimationFrame.step(2);
 
-          expect(callbacks.publishDroppables).not.toHaveBeenCalled();
-          expect(callbacks.publishDraggables).toHaveBeenCalledWith([preset.inHome2]);
+          expect(callbacks.bulkPublish).toHaveBeenCalledWith([], [preset.inHome2]);
         });
       });
     });
@@ -580,13 +692,16 @@ describe('dimension marshal', () => {
         const watchers = populateMarshal(marshal);
 
         // do initial work
-        marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+        marshal.onPhaseChange(state.requesting({
+          draggableId: preset.inHome1.descriptor.id,
+          scrollOptions: scheduled,
+        }));
         marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
         requestAnimationFrame.step(2);
 
         // currently only watching
         Object.keys(preset.droppables).forEach((id: DroppableId) => {
-          expect(watchers.droppable.watchScroll).toHaveBeenCalledWith(id);
+          expect(watchers.droppable.watchScroll).toHaveBeenCalledWith(id, scheduled);
           expect(watchers.droppable.unwatchScroll).not.toHaveBeenCalledWith(id);
         });
 
@@ -608,8 +723,9 @@ describe('dimension marshal', () => {
     let watchers;
 
     const resetMocks = () => {
-      callbacks.publishDraggables.mockClear();
-      callbacks.publishDroppables.mockClear();
+      callbacks.publishDraggable.mockClear();
+      callbacks.publishDroppable.mockClear();
+      callbacks.bulkPublish.mockClear();
       watchers.draggable.getDimension.mockClear();
       watchers.droppable.getDimension.mockClear();
       watchers.droppable.watchScroll.mockClear();
@@ -622,107 +738,129 @@ describe('dimension marshal', () => {
       watchers = populateMarshal(marshal);
     });
 
-    const shouldHaveProcessedInitialDimensions = (): void => {
-      expect(callbacks.publishDroppables).toHaveBeenCalledWith([preset.home]);
-      expect(callbacks.publishDroppables).toHaveBeenCalledTimes(1);
-      expect(callbacks.publishDraggables).toHaveBeenCalledWith([preset.inHome1]);
-      expect(callbacks.publishDraggables).toHaveBeenCalledTimes(1);
+    const shouldHaveProcessedInitialDimensions = (scrollOptions: ScrollOptions): void => {
+      expect(callbacks.publishDroppable).toHaveBeenCalledWith(preset.home);
+      expect(callbacks.publishDroppable).toHaveBeenCalledTimes(1);
+      expect(callbacks.publishDraggable).toHaveBeenCalledWith(preset.inHome1);
+      expect(callbacks.publishDraggable).toHaveBeenCalledTimes(1);
+      expect(callbacks.bulkPublish).not.toHaveBeenCalled();
       expect(watchers.droppable.getDimension).toHaveBeenCalledTimes(1);
       expect(watchers.draggable.getDimension).toHaveBeenCalledTimes(1);
-      expect(watchers.droppable.watchScroll).toHaveBeenCalledWith(preset.home.descriptor.id);
       expect(watchers.droppable.watchScroll).toHaveBeenCalledTimes(1);
+      expect(watchers.droppable.watchScroll).toHaveBeenCalledWith(
+        preset.home.descriptor.id, scrollOptions
+      );
       expect(watchers.droppable.unwatchScroll).not.toHaveBeenCalled();
     };
 
     const shouldNotHavePublishedDimensions = (): void => {
-      expect(callbacks.publishDroppables).not.toHaveBeenCalled();
-      expect(callbacks.publishDroppables).not.toHaveBeenCalled();
+      expect(callbacks.publishDroppable).not.toHaveBeenCalled();
+      expect(callbacks.publishDroppable).not.toHaveBeenCalled();
+      expect(callbacks.bulkPublish).not.toHaveBeenCalled();
     };
 
-    it('should support subsequent drags after a completed collection', () => {
-      Array.from({ length: 4 }).forEach(() => {
-        // initial publish
-        marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+    [immediate, scheduled].forEach((scrollOptions: ScrollOptions) => {
+      it('should support subsequent drags after a completed collection', () => {
+        Array.from({ length: 4 }).forEach(() => {
+          // initial publish
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions,
+          }));
 
-        shouldHaveProcessedInitialDimensions();
+          shouldHaveProcessedInitialDimensions(scrollOptions);
 
-        // resetting mock state so future assertions do not include these calls
-        resetMocks();
+          // resetting mock state so future assertions do not include these calls
+          resetMocks();
 
-        // collection and publish of secondary dimensions
-        marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
-        requestAnimationFrame.step(2);
+          // collection and publish of secondary dimensions
+          marshal.onPhaseChange(withScrollOptions(
+            state.dragging(preset.inHome1.descriptor.id),
+            scrollOptions,
+          ));
+          requestAnimationFrame.step(2);
 
-        expect(callbacks.publishDroppables).toHaveBeenCalledTimes(1);
-        expect(callbacks.publishDraggables).toHaveBeenCalledTimes(1);
-        expect(watchers.droppable.getDimension).toHaveBeenCalledTimes(droppableCount - 1);
-        expect(watchers.droppable.watchScroll).toHaveBeenCalledTimes(droppableCount - 1);
-        expect(watchers.draggable.getDimension).toHaveBeenCalledTimes(draggableCount - 1);
-        expect(watchers.droppable.unwatchScroll).not.toHaveBeenCalled();
+          expect(callbacks.publishDroppable).not.toHaveBeenCalled();
+          expect(callbacks.publishDraggable).not.toHaveBeenCalled();
+          expect(callbacks.bulkPublish).toHaveBeenCalledTimes(1);
+          expect(watchers.droppable.getDimension).toHaveBeenCalledTimes(droppableCount - 1);
+          expect(watchers.droppable.watchScroll).toHaveBeenCalledTimes(droppableCount - 1);
+          expect(watchers.draggable.getDimension).toHaveBeenCalledTimes(draggableCount - 1);
+          expect(watchers.droppable.unwatchScroll).not.toHaveBeenCalled();
 
-        // finish the collection
-        marshal.onPhaseChange(state.dropComplete(preset.inHome1.descriptor.id));
+          // finish the collection
+          marshal.onPhaseChange(state.dropComplete(preset.inHome1.descriptor.id));
 
-        expect(watchers.droppable.unwatchScroll).toHaveBeenCalledTimes(droppableCount);
+          expect(watchers.droppable.unwatchScroll).toHaveBeenCalledTimes(droppableCount);
 
-        resetMocks();
+          resetMocks();
+        });
       });
-    });
 
-    it('should support subsequent drags after a cancelled dimension request', () => {
-      Array.from({ length: 4 }).forEach(() => {
-        // start the collection
-        marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+      it('should support subsequent drags after a cancelled dimension request', () => {
+        Array.from({ length: 4 }).forEach(() => {
+          // start the collection
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions,
+          }));
 
-        shouldHaveProcessedInitialDimensions();
-        resetMocks();
+          shouldHaveProcessedInitialDimensions(scrollOptions);
+          resetMocks();
 
-        // cancelled
-        marshal.onPhaseChange(state.idle);
+          // cancelled
+          marshal.onPhaseChange(state.idle);
 
-        shouldNotHavePublishedDimensions();
+          shouldNotHavePublishedDimensions();
 
-        resetMocks();
+          resetMocks();
+        });
       });
-    });
 
-    it('should support subsequent drags after a cancelled drag', () => {
-      Array.from({ length: 4 }).forEach(() => {
-        // start the collection
-        marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+      it('should support subsequent drags after a cancelled drag', () => {
+        Array.from({ length: 4 }).forEach(() => {
+          // start the collection
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions,
+          }));
 
-        shouldHaveProcessedInitialDimensions();
-        resetMocks();
+          shouldHaveProcessedInitialDimensions(scrollOptions);
+          resetMocks();
 
-        // drag started but collection not started
-        marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
+          // drag started but collection not started
+          marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
 
-        shouldNotHavePublishedDimensions();
+          shouldNotHavePublishedDimensions();
 
-        // cancelled
-        marshal.onPhaseChange(state.idle);
-        resetMocks();
+          // cancelled
+          marshal.onPhaseChange(state.idle);
+          resetMocks();
+        });
       });
-    });
 
-    it('should support subsequent drags after a cancelled collection', () => {
-      Array.from({ length: 4 }).forEach(() => {
-        // start the collection
-        marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+      it('should support subsequent drags after a cancelled collection', () => {
+        Array.from({ length: 4 }).forEach(() => {
+          // start the collection
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions,
+          }));
 
-        shouldHaveProcessedInitialDimensions();
-        resetMocks();
+          shouldHaveProcessedInitialDimensions(scrollOptions);
+          resetMocks();
 
-        // drag started but collection not started
-        marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
-        // executing collection step but not publish
-        requestAnimationFrame.step();
+          // drag started but collection not started
+          marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
+          // executing collection step but not publish
+          requestAnimationFrame.step();
 
-        shouldNotHavePublishedDimensions();
+          shouldNotHavePublishedDimensions();
 
-        // cancelled
-        marshal.onPhaseChange(state.idle);
-        resetMocks();
+          // cancelled
+          marshal.onPhaseChange(state.idle);
+          resetMocks();
+        });
       });
     });
   });
@@ -732,6 +870,7 @@ describe('dimension marshal', () => {
       getDimension: () => preset.home,
       watchScroll: () => { },
       unwatchScroll: () => { },
+      scroll: () => {},
     };
     const getDraggableDimensionFn: GetDraggableDimensionFn = () => preset.inHome1;
 
@@ -746,9 +885,12 @@ describe('dimension marshal', () => {
 
           marshal.registerDroppable(preset.home.descriptor, droppableCallbacks);
           marshal.registerDraggable(preset.inHome1.descriptor, getDraggableDimensionFn);
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
 
-          expect(callbacks.publishDroppables).toHaveBeenCalledWith([preset.home]);
+          expect(callbacks.publishDroppable).toHaveBeenCalledWith(preset.home);
         });
 
         it('should overwrite an existing entry if needed', () => {
@@ -759,7 +901,7 @@ describe('dimension marshal', () => {
           });
 
           marshal.registerDroppable(preset.home.descriptor, droppableCallbacks);
-          const newDescriptor: DroppableDescriptor = {
+          const newHomeDescriptor: DroppableDescriptor = {
             id: preset.home.descriptor.id,
             type: preset.home.descriptor.type,
           };
@@ -767,13 +909,17 @@ describe('dimension marshal', () => {
             getDimension: () => preset.foreign,
             watchScroll: () => { },
             unwatchScroll: () => { },
+            scroll: () => { },
           };
-          marshal.registerDroppable(newDescriptor, newCallbacks);
+          marshal.registerDroppable(newHomeDescriptor, newCallbacks);
           marshal.registerDraggable(preset.inHome1.descriptor, getDraggableDimensionFn);
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
 
-          expect(callbacks.publishDroppables).toHaveBeenCalledWith([preset.foreign]);
-          expect(callbacks.publishDroppables).toHaveBeenCalledTimes(1);
+          expect(callbacks.publishDroppable).toHaveBeenCalledWith(preset.foreign);
+          expect(callbacks.publishDroppable).toHaveBeenCalledTimes(1);
         });
       });
 
@@ -794,9 +940,12 @@ describe('dimension marshal', () => {
 
           marshal.registerDroppable(preset.home.descriptor, droppableCallbacks);
           marshal.registerDraggable(preset.inHome1.descriptor, getDraggableDimensionFn);
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
 
-          expect(callbacks.publishDraggables).toHaveBeenCalledWith([preset.inHome1]);
+          expect(callbacks.publishDraggable).toHaveBeenCalledWith(preset.inHome1);
         });
 
         it('should overwrite an existing entry if needed', () => {
@@ -817,10 +966,13 @@ describe('dimension marshal', () => {
             index: preset.inHome1.descriptor.index + 10,
           };
           marshal.registerDraggable(fake, () => preset.inHome2);
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
 
-          expect(callbacks.publishDraggables).toHaveBeenCalledTimes(1);
-          expect(callbacks.publishDraggables).toHaveBeenCalledWith([preset.inHome2]);
+          expect(callbacks.publishDraggable).toHaveBeenCalledTimes(1);
+          expect(callbacks.publishDraggable).toHaveBeenCalledWith(preset.inHome2);
         });
       });
     });
@@ -862,9 +1014,10 @@ describe('dimension marshal', () => {
           expect(console.warn).not.toHaveBeenCalled();
 
           // lift, collect and publish
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
-          // clearing state from original publish
-          callbacks.publishDroppables.mockClear();
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
 
           // execute full lift
           marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
@@ -872,8 +1025,10 @@ describe('dimension marshal', () => {
 
           expect(watchers.droppable.getDimension)
             .not.toHaveBeenCalledWith(preset.foreign.descriptor.id);
-          expect(callbacks.publishDroppables.mock.calls[0][0])
+          expect(callbacks.bulkPublish.mock.calls[0][0])
             .not.toContain(preset.foreign);
+          // validation
+          expect(callbacks.bulkPublish.mock.calls[0][0]).toContain(preset.emptyForeign);
 
           // checking we are not causing an orphan child warning
           expect(console.warn).not.toHaveBeenCalled();
@@ -891,7 +1046,10 @@ describe('dimension marshal', () => {
           // not unregistering children (bad)
 
           // lift, collect and publish
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
           // perform full lift
           marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
           requestAnimationFrame.step(2);
@@ -916,6 +1074,7 @@ describe('dimension marshal', () => {
             getDimension: getOldDimension,
             watchScroll: () => { },
             unwatchScroll: () => { },
+            scroll: () => { },
           });
           marshal.registerDraggable(preset.inHome1.descriptor, () => preset.inHome1);
 
@@ -934,10 +1093,14 @@ describe('dimension marshal', () => {
             getDimension: getNewDimension,
             watchScroll: () => { },
             unwatchScroll: () => { },
+            scroll: () => { },
           });
 
           // perform full lift
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
           marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
           requestAnimationFrame.step(2);
 
@@ -962,7 +1125,10 @@ describe('dimension marshal', () => {
           marshal.unregisterDraggable(preset.inForeign1.descriptor);
           expect(console.error).not.toHaveBeenCalled();
 
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
           // perform full lift
           marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
           requestAnimationFrame.step(2);
@@ -977,6 +1143,7 @@ describe('dimension marshal', () => {
             getDimension: () => preset.home,
             watchScroll: () => {},
             unwatchScroll: () => {},
+            scroll: () => {},
           });
           const getOldDimension: GetDraggableDimensionFn =
             jest.fn().mockImplementation(() => preset.inHome2);
@@ -1005,7 +1172,10 @@ describe('dimension marshal', () => {
           marshal.unregisterDraggable(preset.inHome2.descriptor);
 
           // perform full lift
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
           marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
           requestAnimationFrame.step(2);
 
@@ -1034,12 +1204,15 @@ describe('dimension marshal', () => {
           });
 
           // start a collection
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
-          callbacks.publishDraggables.mockReset();
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
+          callbacks.publishDraggable.mockReset();
           // now registering
           marshal.registerDraggable(fake.descriptor, () => fake);
 
-          expect(callbacks.publishDraggables).not.toHaveBeenCalled();
+          expect(callbacks.publishDraggable).not.toHaveBeenCalled();
           expect(console.warn).toHaveBeenCalled();
         });
       });
@@ -1060,18 +1233,22 @@ describe('dimension marshal', () => {
             getDimension: () => fake,
             watchScroll: jest.fn(),
             unwatchScroll: () => { },
+            scroll: () => {},
           };
 
           // starting collection
-          marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
-          callbacks.publishDroppables.mockReset();
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
+          callbacks.publishDroppable.mockReset();
 
           // updating registration
           marshal.registerDroppable(fake.descriptor, droppableCallbacks);
 
           // warning should have been logged and nothing updated
           expect(console.warn).toHaveBeenCalled();
-          expect(callbacks.publishDroppables).not.toHaveBeenCalled();
+          expect(callbacks.publishDroppable).not.toHaveBeenCalled();
           expect(droppableCallbacks.watchScroll).not.toHaveBeenCalled();
         });
       });
@@ -1105,7 +1282,7 @@ describe('dimension marshal', () => {
       const marshal = createDimensionMarshal(callbacks);
       populateMarshal(marshal);
 
-      marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+      marshal.onPhaseChange(state.requesting());
       marshal.updateDroppableScroll(preset.home.descriptor.id, { x: 100, y: 230 });
 
       expect(callbacks.updateDroppableScroll)
@@ -1142,7 +1319,10 @@ describe('dimension marshal', () => {
       const marshal = createDimensionMarshal(callbacks);
       populateMarshal(marshal);
 
-      marshal.onPhaseChange(state.requesting(preset.inHome1.descriptor.id));
+      marshal.onPhaseChange(state.requesting({
+        draggableId: preset.inHome1.descriptor.id,
+        scrollOptions: scheduled,
+      }));
       marshal.updateDroppableIsEnabled(preset.home.descriptor.id, false);
 
       expect(callbacks.updateDroppableIsEnabled)

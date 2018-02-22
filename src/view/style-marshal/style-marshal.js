@@ -5,7 +5,7 @@ import type { StyleMarshal } from './style-marshal-types';
 import type {
   State as AppState,
   Phase,
-  DropTrigger,
+  DropReason,
 } from '../../types';
 
 let count: number = 0;
@@ -89,9 +89,9 @@ export default () => {
         return;
       }
 
-      const trigger: DropTrigger = current.drop.pending.trigger;
+      const reason: DropReason = current.drop.pending.result.reason;
 
-      if (trigger === 'DROP') {
+      if (reason === 'DROP') {
         setStyle(styles.dropAnimating);
         return;
       }

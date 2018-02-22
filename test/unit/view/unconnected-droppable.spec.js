@@ -5,10 +5,19 @@ import { mount } from 'enzyme';
 import type { ReactWrapper } from 'enzyme';
 import Droppable from '../../../src/view/droppable/droppable';
 import Placeholder from '../../../src/view/placeholder/';
-import { withStore, combine, withDimensionMarshal } from '../../utils/get-context-options';
+import { withStore, combine, withDimensionMarshal, withStyleContext } from '../../utils/get-context-options';
 import { getPreset } from '../../utils/dimension';
-import type { DroppableId, DraggableDimension } from '../../../src/types';
-import type { MapProps, OwnProps, Provided, StateSnapshot } from '../../../src/view/droppable/droppable-types';
+import type {
+  DraggableId,
+  DroppableId,
+  DraggableDimension,
+} from '../../../src/types';
+import type {
+  MapProps,
+  OwnProps,
+  Provided,
+  StateSnapshot,
+} from '../../../src/view/droppable/droppable-types';
 
 const getStubber = (mock: Function) =>
   class Stubber extends Component<{provided: Provided, snapshot: StateSnapshot}> {
@@ -23,12 +32,15 @@ const getStubber = (mock: Function) =>
     }
   };
 const defaultDroppableId: DroppableId = 'droppable-1';
+const draggableId: DraggableId = 'draggable-1';
 const notDraggingOverMapProps: MapProps = {
   isDraggingOver: false,
+  draggingOverWith: null,
   placeholder: null,
 };
 const isDraggingOverHomeMapProps: MapProps = {
   isDraggingOver: true,
+  draggingOverWith: draggableId,
   placeholder: null,
 };
 
@@ -37,6 +49,7 @@ const inHome1: DraggableDimension = data.inHome1;
 
 const isDraggingOverForeignMapProps: MapProps = {
   isDraggingOver: true,
+  draggingOverWith: 'draggable-1',
   placeholder: inHome1.placeholder,
 };
 
@@ -66,7 +79,11 @@ const mountDroppable = ({
       <WrappedComponent provided={provided} snapshot={snapshot} />
     )}
   </Droppable>,
-  combine(withStore(), withDimensionMarshal())
+  combine(
+    withStore(),
+    withDimensionMarshal(),
+    withStyleContext(),
+  )
 );
 
 describe('Droppable - unconnected', () => {
@@ -82,6 +99,7 @@ describe('Droppable - unconnected', () => {
       const snapshot: StateSnapshot = myMock.mock.calls[0][0].snapshot;
       expect(provided.innerRef).toBeInstanceOf(Function);
       expect(snapshot.isDraggingOver).toBe(true);
+      expect(snapshot.draggingOverWith).toBe(draggableId);
       expect(provided.placeholder).toBe(null);
     });
   });
@@ -98,6 +116,7 @@ describe('Droppable - unconnected', () => {
       const snapshot: StateSnapshot = myMock.mock.calls[0][0].snapshot;
       expect(provided.innerRef).toBeInstanceOf(Function);
       expect(snapshot.isDraggingOver).toBe(true);
+      expect(snapshot.draggingOverWith).toBe(draggableId);
       // $ExpectError - type property of placeholder
       expect(provided.placeholder.type).toBe(Placeholder);
       // $ExpectError - props property of placeholder
@@ -117,6 +136,7 @@ describe('Droppable - unconnected', () => {
         const snapshot: StateSnapshot = myMock.mock.calls[0][0].snapshot;
         expect(provided.innerRef).toBeInstanceOf(Function);
         expect(snapshot.isDraggingOver).toBe(false);
+        expect(snapshot.draggingOverWith).toBe(null);
         expect(provided.placeholder).toBe(null);
       });
     });
