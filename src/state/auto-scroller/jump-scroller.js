@@ -30,6 +30,8 @@ type Args = {|
 
 export type JumpScroller = (state: State) => void;
 
+type Remainder = Position;
+
 export default ({
   move,
   scrollDroppable,
@@ -44,6 +46,53 @@ export default ({
 
     const client: Position = add(drag.current.client.selection, offset);
     move(drag.initial.descriptor.id, client, getWindowScroll(), true);
+  };
+
+  const scrollDroppableAsMuchAsItCan = (
+    droppable: DroppableDimension,
+    change: Position
+  ): ?Remainder => {
+    // Droppable cannot absorb any of the scroll
+    if (!canScrollDroppable(droppable, change)) {
+      return change;
+    }
+
+    const overlap: ?Position = getDroppableOverlap(droppable, change);
+
+    // Droppable can absorb the entire change
+    if (!overlap) {
+      scrollDroppable(droppable.descriptor.id, change);
+      return null;
+    }
+
+    // Droppable can only absorb a part of the change
+    const whatTheDroppableCanScroll: Position = subtract(change, overlap);
+    scrollDroppable(droppable.descriptor.id, whatTheDroppableCanScroll);
+
+    const remainder: Position = subtract(change, whatTheDroppableCanScroll);
+    return remainder;
+  };
+
+  const scrollWindowAsMuchAsItCan = (change: Position): ?Remainder => {
+    // window cannot absorb any of the scroll
+    if (!canScrollWindow(change)) {
+      return change;
+    }
+
+    const overlap: ?Position = getWindowOverlap(change);
+
+    // window can absorb entire scroll
+    if (!overlap) {
+      scrollWindow(change);
+      return null;
+    }
+
+    // window can only absorb a part of the scroll
+    const whatTheWindowCanScroll: Position = subtract(change, overlap);
+    scrollWindow(whatTheWindowCanScroll);
+
+    const remainder: Position = subtract(change, whatTheWindowCanScroll);
+    return remainder;
   };
 
   const jumpScroller: JumpScroller = (state: State) => {
@@ -66,75 +115,29 @@ export default ({
       return;
     }
 
-    const droppable: DroppableDimension = state.dimension.droppable[destination.droppableId];
-
     // 1. We scroll the droppable first if we can to avoid the draggable
     // leaving the list
 
-    if (canScrollDroppable(droppable, request)) {
-      const overlap: ?Position = getDroppableOverlap(droppable, request);
+    const droppableRemainder: ?Position = scrollDroppableAsMuchAsItCan(
+      state.dimension.droppable[destination.droppableId],
+      request,
+    );
 
-      // Droppable can absorb the entire scroll request
-      if (!overlap) {
-        scrollDroppable(droppable.descriptor.id, request);
-        return;
-      }
-
-      // Droppable cannot absorb the entire request
-
-      // Let the droppable scroll what it can
-      const whatTheDroppableCanScroll: Position = subtract(request, overlap);
-      scrollDroppable(droppable.descriptor.id, whatTheDroppableCanScroll);
-
-      // Okay, now we need to find out where the rest of the movement can come from.
-
-      const canWindowScrollOverlap: boolean = canScrollWindow(overlap);
-
-      // window cannot absorb overlap: we need to move it
-      if (!canWindowScrollOverlap) {
-        moveByOffset(state, overlap);
-        return;
-      }
-
-      // how much can the window absorb?
-      const windowOverlap: ?Position = getWindowOverlap(overlap);
-
-      // window can absorb all of the overlap
-      if (!windowOverlap) {
-        scrollWindow(overlap);
-        return;
-      }
-
-      // window can only partially absorb overlap
-
-      const whatTheWindowCanScroll: Position = subtract(overlap, windowOverlap);
-      scrollWindow(whatTheWindowCanScroll);
-
-      // need to move the item by the remainder and scroll the window
-      moveByOffset(state, windowOverlap);
+    // droppable absorbed the entire scroll
+    if (!droppableRemainder) {
       return;
     }
 
-    // 2. Cannot scroll the droppable - can we scroll the window?
+    const windowRemainder: ?Position = scrollWindowAsMuchAsItCan(droppableRemainder);
 
-    // Cannot scroll the window at all
-    if (!canScrollWindow(request)) {
-      moveByOffset(state, request);
+    // window could absorb all droppable remainder
+    if (!windowRemainder) {
       return;
     }
 
-    const overlap: ?Position = getWindowOverlap(request);
-
-    // Window can absorb the entire scroll
-    if (!overlap) {
-      scrollWindow(request);
-      return;
-    }
-
-    const whatTheWindowCanScroll: Position = subtract(request, overlap);
-    scrollWindow(whatTheWindowCanScroll);
-    // manually move to the rest
-    moveByOffset(state, overlap);
+    // The entire scroll could not be absorbed by the droppable and window
+    // so we manually move whatever is left
+    moveByOffset(state, windowRemainder);
   };
 
   return jumpScroller;
