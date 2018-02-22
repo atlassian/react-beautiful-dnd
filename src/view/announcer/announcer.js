@@ -9,7 +9,7 @@ type State = {|
 let count: number = 0;
 
 // https://allyjs.io/tutorials/hiding-elements.html
-// Element is v hidden but is readable by screen readers
+// Element is visually hidden but is readable by screen readers
 const visuallyHidden: Object = {
   position: 'absolute',
   width: '1px',
