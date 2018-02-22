@@ -787,6 +787,8 @@ This library supports dragging within scroll containers (DOM elements that have 
 1. The `Droppable` can itself be a scroll container with **no scrollable parents**
 2. The `Droppable` has **one scrollable parent**
 
+where a *scrollable parent* refers to a scroll container that is not the window itself.
+
 ### Empty `Droppable`s
 
 It is recommended that you put a `min-height` on a vertical `Droppable` or a `min-width` on a horizontal `Droppable`. Otherwise when the `Droppable` is empty there may not be enough of a target for `Draggable` being dragged with touch or mouse inputs to be *over* the `Droppable`.
@@ -928,7 +930,7 @@ Everything within the *provided* object must be applied for the `Draggable` to f
 </Draggable>;
 ```
 
-- `provided.draggableProps (DraggableProps)`: This is an Object that contains a `data` attribute and an inline `style`. This Object needs to be applied to the same node that you apply `provided.innerRef` to. This controls the movement of the draggable when it is dragging and not dragging. You are welcome to add your own styles to `DraggableProps > style` – but please do not remove or replace any of the properties.
+- `provided.draggableProps (DraggableProps)`: This is an Object that contains a `data` attribute and an inline `style`. This Object needs to be applied to the same node that you apply `provided.innerRef` to. This controls the movement of the draggable when it is dragging and not dragging. You are welcome to add your own styles to `DraggableProps.style` – but please do not remove or replace any of the properties.
 
 ##### `draggableProps` Type information
 
@@ -986,9 +988,9 @@ It is a contract of this library that it owns the positioning logic of the dragg
 
 This will be changing soon as we move to a [portal solution](https://github.com/atlassian/react-beautiful-dnd/issues/192) where we will be appending the `Draggable` to the end of the body to avoid any parent transforms. If you really need this feature right now we have [created an example](https://www.webpackbin.com/bins/-L-3aZ_bTMiGPl8bqlRB) where we implement a portal on top of the current api. Please note however, this technique is not officially supported and might break in minor / patch releases.
 
-##### Extending `DraggableProps > style`
+##### Extending `DraggableProps.style`
 
-If you are using inline styles you are welcome to extend the `DraggableProps > style` object. You are also welcome to apply the `DraggableProps > style` object using inline styles and use your own styling solution for the component itself - such as [styled-components](https://github.com/styled-components/styled-components).
+If you are using inline styles you are welcome to extend the `DraggableProps.style` object. You are also welcome to apply the `DraggableProps.style` object using inline styles and use your own styling solution for the component itself - such as [styled-components](https://github.com/styled-components/styled-components).
 
 If you are overriding inline styles be sure to do it after you spread the `provided.draggableProps` or the spread will override your inline style.
 
@@ -1033,7 +1035,7 @@ It is an assumption that `Draggable`s are *visible siblings* of one another. The
   {() => {}}
 </Draggable>
 
-// Not direct siblings, but are visual siblings ✅
+// Not direct siblings, but are visible siblings ✅
 <div>
   <Draggable draggableId="draggable-1" index={0}>
     {() => {}}
@@ -1191,7 +1193,7 @@ type DraggableStateSnapshot = {|
 |};
 ```
 
-The `children` function is also provided with a small amount of state relating to the current drag state. This can be optionally used to enhance your component. A common use case is changing the appearance of a `Draggable` while it is being dragged. Note: if you want to change the cursor to something like `grab` you will need to add the style to the draggable. (See [`DragDropContext` > style](#extending-draggableprops-style) above)
+The `children` function is also provided with a small amount of state relating to the current drag state. This can be optionally used to enhance your component. A common use case is changing the appearance of a `Draggable` while it is being dragged. Note: if you want to change the cursor to something like `grab` you will need to add the style to the draggable. (See [Extending `DraggableProps.style`](#extending-draggableprops-style) above)
 
 ```js
 <Draggable draggableId="draggable-1" index={0}>
