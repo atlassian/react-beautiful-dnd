@@ -172,7 +172,7 @@ Traditionally drag and drop interactions have been exclusively a mouse or touch 
 
 We provide **fantastic support for screen readers** to assist users with visual (or other) impairments. We ship with english messaging out of the box 📦. However, you are welcome to override these messages by using the `announce` function that it provided to all of the `DragDropContext > hook` functions.
 
-See our [screen reader guide](TODO) for a guide on crafting useful screen reader messaging.
+See our [screen reader guide](docs/guides/screen-reader.md) for a guide on crafting useful screen reader messaging.
 
 ## Mouse dragging
 
@@ -514,7 +514,7 @@ class App extends React.Component {
 
 ### `Hook`s
 
-These are top level application events that you can use to perform your own state updates as well as to make screen reader announcements. For more information about controlling the screen reader see our [screen reader guide](TODO)
+These are top level application events that you can use to perform your own state updates as well as to make screen reader announcements. For more information about controlling the screen reader see our [screen reader guide](docs/guides/screen-reader.md)
 
 ### `provided: HookProvided`
 
@@ -526,7 +526,7 @@ type HookProvided = {|
 type Announce = (message: string) => void;
 ```
 
-All hooks are provided with a second argument: `HookProvided`. This object has one property: `announce`. This function is used to synchronously announce a message to screen readers. If you do not use this function we will announce a default english message. We have created a [guide for screen reader usage](TODO) which we recommend using if you are interested in controlling the screen reader messages for yourself and to support internationalisation. If you are using `announce` it must be called synchronously.
+All hooks are provided with a second argument: `HookProvided`. This object has one property: `announce`. This function is used to synchronously announce a message to screen readers. If you do not use this function we will announce a default english message. We have created a [guide for screen reader usage](docs/guides/screen-reader.md) which we recommend using if you are interested in controlling the screen reader messages for yourself and to support internationalisation. If you are using `announce` it must be called synchronously.
 
 ### `onDragStart` (optional)
 
