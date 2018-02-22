@@ -721,21 +721,16 @@ type DroppableProvided = {|
   droppableProps: DroppableProps,
   placeholder: ?ReactElement,
 |}
+
+type DroppableProps = {|
+  // used for shared global styles
+  'data-react-beautiful-dnd-droppable': string,
+|}
 ```
 
 - `provided.innerRef`: In order for the droppable to function correctly, **you must** bind the `provided.innerRef` to the highest possible DOM node in the `ReactElement`. We do this in order to avoid needing to use `ReactDOM` to look up your DOM node. *This prop is planned to be removed when we move to React 16*
 - `provided.placeholder`: This is used to create space in the `Droppable` as needed during a drag. This space is needed when a user is dragging over a list that is not the home list. Please be sure to put the placeholder inside of the component for which you have provided the ref. We need to increase the size of the `Droppable` itself. This is different from `Draggable` where the `placeholder` needs to be a *sibling* to the draggable node.
 - `provided.droppableProps (DroppableProps)`: This is an Object that contains properties that need to be applied to a Droppable element. It needs to be applied to the same element that you apply `provided.innerRef` to. It currently contains a `data` attribute that we use to control some non-visible css.
-
-#### Type information
-
-```js
-// Props that can be spread onto the element directly
-export type DroppableProps = {|
-  // used for shared global styles
-  'data-react-beautiful-dnd-droppable': string,
-|}
-```
 
 ```js
 <Droppable droppableId="droppable-1">
@@ -925,21 +920,17 @@ Everything within the *provided* object must be applied for the `Draggable` to f
 
 - `provided.innerRef (innerRef: (HTMLElement) => void)`: In order for the `Droppable` to function correctly, **you must** bind the `innerRef` function to the `ReactElement` that you want to be considered the `Draggable` node. We do this in order to avoid needing to use `ReactDOM` to look up your DOM node.
 
+##### `innerRef` Example
+
 ```js
 <Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => <div ref={provided.innerRef}>Drag me!</div>}
 </Draggable>;
 ```
 
-#### Type information
-
-```js
-innerRef: (HTMLElement) => void
-```
-
 - `provided.draggableProps (DraggableProps)`: This is an Object that contains a `data` attribute and an inline `style`. This Object needs to be applied to the same node that you apply `provided.innerRef` to. This controls the movement of the draggable when it is dragging and not dragging. You are welcome to add your own styles to `DraggableProps > style` – but please do not remove or replace any of the properties.
 
-#### Type information
+##### `draggableProps` Type information
 
 ```js
 // Props that can be spread onto the element directly
@@ -949,7 +940,29 @@ export type DraggableProps = {|
   // used for shared global styles
   'data-react-beautiful-dnd-draggable': string,
 |}
+
+type DraggableStyle = DraggingStyle | NotDraggingStyle
+type DraggingStyle = {|
+  pointerEvents: 'none',
+  position: 'fixed',
+  width: number,
+  height: number,
+  boxSizing: 'border-box',
+  pointerEvents: 'none',
+  top: number,
+  left: number,
+  margin: 0,
+  transition: 'none',
+  transform: ?string,
+  zIndex: ZIndex,
+|}
+type NotDraggingStyle = {|
+  transition: ?string,
+  transition: null | 'none',
+|}
 ```
+
+##### `draggableProps` Example
 
 ```js
 <Draggable draggableId="draggable-1" index={0}>
@@ -963,17 +976,17 @@ export type DraggableProps = {|
 </Draggable>;
 ```
 
-### Positioning ownership
+##### Positioning ownership
 
 It is a contract of this library that it owns the positioning logic of the dragging element. This includes properties such as `top`, `right`, `bottom`, `left` and `transform`. The library may change how it positions things and which properties it uses without performing a major version bump. It is also recommended that you do not apply your own `transition` property to the dragging element.
 
-### Warning: `position: fixed`
+##### Warning: `position: fixed`
 
 `react-beautiful-dnd` uses `position: fixed` to position the dragging element. This is quite robust and allows for you to have `position: relative | absolute | fixed` parents. However, unfortunately `position:fixed` is [impacted by `transform`](http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/) (such as `transform: rotate(10deg);`). This means that if you have a `transform: *` on one of the parents of a `Draggable` then the positioning logic will be incorrect while dragging. Lame! For most consumers this will not be an issue.
 
 This will be changing soon as we move to a [portal solution](https://github.com/atlassian/react-beautiful-dnd/issues/192) where we will be appending the `Draggable` to the end of the body to avoid any parent transforms. If you really need this feature right now we have [created an example](https://www.webpackbin.com/bins/-L-3aZ_bTMiGPl8bqlRB) where we implement a portal on top of the current api. Please note however, this technique is not officially supported and might break in minor / patch releases.
 
-### Extending `DraggableProps > style`
+##### Extending `DraggableProps > style`
 
 If you are using inline styles you are welcome to extend the `DraggableProps > style` object. You are also welcome to apply the `DraggableProps > style` object using inline styles and use your own styling solution for the component itself - such as [styled-components](https://github.com/styled-components/styled-components).
 
@@ -1003,13 +1016,13 @@ If you are overriding inline styles be sure to do it after you spread the `provi
 </Draggable>;
 ```
 
-### Avoid margin collapsing between `Draggable`s
+##### Avoid margin collapsing between `Draggable`s
 
 [margin collapsing](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model/Mastering_margin_collapsing) is one of those really hard parts of CSS. For our purposes, if you have one `Draggable` with a `margin-bottom: 10px` and the next `Draggable` has a `margin-top: 12px` these margins will *collapse* and the resulting margin will be the greater of the two: `12px`. When we do our calculations we are currently not accounting for margin collapsing. If you do want to have a margin on the siblings, wrap them both in a `div` and apply the margin to the inner `div` so they are not direct siblings.
 
-### `Draggable`s should be visible siblings
+##### `Draggable`s should be visible siblings
 
-It is an assumption that `Draggable`s and *visible siblings* of one another. There can be other elements in between, but these elements should not take up any additional space. You probably will not do this anyway, but just calling it out to be super clear
+It is an assumption that `Draggable`s are *visible siblings* of one another. There can be other elements in between, but these elements should not take up any additional space. You probably will not do this anyway, but just calling it out to be super clear.
 
 ```js
 // Direct siblings ✅
@@ -1054,49 +1067,9 @@ It is an assumption that `Draggable`s and *visible siblings* of one another. The
 </div>
 ```
 
-### Type information
-
-```js
-type DraggingStyle = {|
-  pointerEvents: 'none',
-  position: 'fixed',
-  width: number,
-  height: number,
-  pointerEvents: 'none',
-  boxSizing: 'border-box',
-  top: number,
-  left: number,
-  margin: 0,
-  transition: 'none',
-  transform: ?string,
-  zIndex: ZIndex,
-|}
-
-type NotDraggingStyle = {|
-  transition: ?string,
-  transition: null | 'none',
-|};
-```
-
-- `provided.placeholder (?ReactElement)` The `Draggable` element has `position: fixed` applied to it while it is dragging. The role of the `placeholder` is to sit in the place that the `Draggable` was during a drag. It is needed to stop the `Droppable` list from collapsing when you drag. It is advised to render it as a sibling to the `Draggable` node. This is unlike `Droppable` where the `placeholder` needs to be *within* the `Droppable` node. When the library moves to `React` 16 the `placeholder` will be removed from api.
-
-```js
-<Draggable draggableId="draggable-1" index={0}>
-  {(provided, snapshot) => (
-    <div>
-      <div ref={provided.innerRef} {...provided.draggableProps}>
-        Drag me!
-      </div>
-      {/* Always render me - I will be null if not required */}
-      {provided.placeholder}
-    </div>
-  )}
-</Draggable>;
-```
-
 - `provided.dragHandleProps (?DragHandleProps)` every `Draggable` has a *drag handle*. This is what is used to drag the whole `Draggable`. Often this will be the same node as the `Draggable`, but sometimes it can be a child of the `Draggable`. `DragHandleProps` need to be applied to the node that you want to be the drag handle. This is a number of props that need to be applied to the `Draggable` node. The simplest approach is to spread the props onto the draggable node (`{...provided.dragHandleProps}`). However, you are also welcome to [monkey patch](https://davidwalsh.name/monkey-patching) these props if you also need to respond to them. DragHandleProps will be `null` when `isDragDisabled` is set to `true`.
 
-### Type information
+##### `dragHandleProps` Type information
 
 ```js
 type DragHandleProps = {|
@@ -1111,7 +1084,7 @@ type DragHandleProps = {|
 |};
 ```
 
-### Example: standard
+##### `dragHandleProps` Example: standard
 
 ```js
 <Draggable draggableId="draggable-1" index={0}>
@@ -1130,7 +1103,7 @@ type DragHandleProps = {|
 </Draggable>;
 ```
 
-### Example: custom drag handle
+##### `dragHandleProps` Example: custom drag handle
 
 Controlling a whole draggable by just a part of it
 
@@ -1148,7 +1121,7 @@ Controlling a whole draggable by just a part of it
 </Draggable>;
 ```
 
-### Monkey patching
+##### `dragHandleProps` Monkey patching
 
 You can override some of the `dragHandleProps` props with your own behavior if you need to.
 
@@ -1190,6 +1163,24 @@ const myOnClick = event => console.log('clicked on', event.target);
 </Draggable>;
 ```
 
+- `provided.placeholder (?ReactElement)` The `Draggable` element has `position: fixed` applied to it while it is dragging. The role of the `placeholder` is to sit in the place that the `Draggable` was during a drag. It is needed to stop the `Droppable` list from collapsing when you drag. It is advised to render it as a sibling to the `Draggable` node. This is unlike `Droppable` where the `placeholder` needs to be *within* the `Droppable` node. When the library moves to `React` 16 the `placeholder` will be removed from api.
+
+##### `placeholder` example
+
+```js
+<Draggable draggableId="draggable-1" index={0}>
+  {(provided, snapshot) => (
+    <div>
+      <div ref={provided.innerRef} {...provided.draggableProps}>
+        Drag me!
+      </div>
+      {/* Always render me - I will be null if not required */}
+      {provided.placeholder}
+    </div>
+  )}
+</Draggable>;
+```
+
 #### 2. Snapshot: (DraggableStateSnapshot)**
 
 ```js
@@ -1200,7 +1191,7 @@ type DraggableStateSnapshot = {|
 |};
 ```
 
-The `children` function is also provided with a small amount of state relating to the current drag state. This can be optionally used to enhance your component. A common use case is changing the appearance of a `Draggable` while it is being dragged. Note: if you want to change the cursor to something like `grab` you will need to add the style to the body. (See `DragDropContext` > **style** above)
+The `children` function is also provided with a small amount of state relating to the current drag state. This can be optionally used to enhance your component. A common use case is changing the appearance of a `Draggable` while it is being dragged. Note: if you want to change the cursor to something like `grab` you will need to add the style to the draggable. (See [`DragDropContext` > style](#extending-draggableprops-style) above)
 
 ```js
 <Draggable draggableId="draggable-1" index={0}>
@@ -1229,7 +1220,7 @@ The `children` function is also provided with a small amount of state relating t
 
 ### Interactive child elements within a `Draggable`
 
-It is possible for your `Draggable` to contain interactive elements. By default we block dragging on these elements. By doing this we allow those elements to function in the usual way. Here is the list of interactive elements that block dragging from by default:
+It is possible for your `Draggable` to contain interactive elements. By default we block dragging on these elements. By doing this we allow those elements to function in the usual way. Here is the list of interactive elements that we block dragging from by default:
 
 - `input`
 - `button`
