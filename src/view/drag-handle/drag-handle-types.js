@@ -1,11 +1,16 @@
 // @flow
 import type { Node } from 'react';
-import type { Position, Direction, DraggableId } from '../../types';
+import type {
+  AutoScrollMode,
+  Position,
+  Direction,
+  DraggableId,
+} from '../../types';
 
 export type Callbacks = {|
-  onLift: ({ client: Position, isScrollAllowed: boolean }) => void,
+  onLift: ({ client: Position, autoScrollMode: AutoScrollMode }) => void,
   onMove: (point: Position) => void,
-  onWindowScroll: (diff: Position) => void,
+  onWindowScroll: () => void,
   onMoveForward: () => void,
   onMoveBackward: () => void,
   onCrossAxisMoveForward: () => void,
@@ -26,11 +31,11 @@ export type DragHandleProps = {|
   // Control styling from style marshal
   'data-react-beautiful-dnd-drag-handle': string,
 
+  // Aria role (nicer screen reader text)
+  'aria-roledescription': string,
+
   // Allow tabbing to this element
   tabIndex: number,
-
-  // Aria
-  'aria-grabbed': boolean,
 
   // Stop html5 drag and drop
   draggable: boolean,

@@ -1,5 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`server side rendering should support rendering to a string 1`] = `"<div data-reactroot=\\"\\" data-reactid=\\"1\\" data-react-checksum=\\"-1247785131\\"><div data-reactid=\\"2\\"><div data-react-beautiful-dnd-draggable=\\"0\\" tabindex=\\"0\\" aria-grabbed=\\"false\\" data-react-beautiful-dnd-drag-handle=\\"0\\" draggable=\\"false\\" data-reactid=\\"3\\"></div></div></div>"`;
+exports[`server side rendering should support rendering to a string 1`] = `"<div data-react-beautiful-dnd-droppable=\\"0\\" data-reactroot=\\"\\" data-reactid=\\"1\\" data-react-checksum=\\"-1823773523\\"><div data-reactid=\\"2\\"><div data-react-beautiful-dnd-draggable=\\"0\\" tabindex=\\"0\\" data-react-beautiful-dnd-drag-handle=\\"0\\" aria-roledescription=\\"Draggable item. Press space bar to lift\\" draggable=\\"false\\" data-reactid=\\"3\\"></div></div></div>"`;
 
-exports[`server side rendering should support rendering to static markup 1`] = `"<div><div><div data-react-beautiful-dnd-draggable=\\"1\\" tabindex=\\"0\\" aria-grabbed=\\"false\\" data-react-beautiful-dnd-drag-handle=\\"1\\" draggable=\\"false\\"></div></div></div>"`;
+exports[`server side rendering should support rendering to static markup 1`] = `"<div data-react-beautiful-dnd-droppable=\\"1\\"><div><div data-react-beautiful-dnd-draggable=\\"1\\" tabindex=\\"0\\" data-react-beautiful-dnd-drag-handle=\\"1\\" aria-roledescription=\\"Draggable item. Press space bar to lift\\" draggable=\\"false\\"></div></div></div>"`;

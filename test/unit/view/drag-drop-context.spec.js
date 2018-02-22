@@ -105,7 +105,7 @@ describe('DragDropContext', () => {
               <DragDropContext onDragEnd={() => { }}>
                 <Droppable droppableId="droppable">
                   {(droppableProvided: DroppableProvided) => (
-                    <div ref={droppableProvided.innerRef}>
+                    <div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
                       <Draggable draggableId="draggableId">
                         {(draggableProvided: DraggableProvided) => (
                           <div>
@@ -141,7 +141,7 @@ describe('DragDropContext', () => {
             <DragDropContext onDragEnd={() => { }}>
               <Droppable droppableId="droppable">
                 {(droppableProvided: DroppableProvided) => (
-                  <div ref={droppableProvided.innerRef}>
+                  <div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
                     <Draggable draggableId="draggableId">
                       {(draggableProvided: DraggableProvided) => (
                         <div>

@@ -22,8 +22,9 @@ import type {
   CurrentDragPositions,
   Position,
   InitialDragPositions,
+  LiftRequest,
 } from '../types';
-import { add, subtract } from './position';
+import { add, subtract, isEqual } from './position';
 import { noMovement } from './no-impact';
 import getDragImpact from './get-drag-impact/';
 import moveToNextIndex from './move-to-next-index/';
@@ -52,8 +53,10 @@ type MoveArgs = {|
   clientSelection: Position,
   shouldAnimate: boolean,
   windowScroll ?: Position,
-  // force a custom drag impact
-  impact?: DragImpact,
+  // force a custom drag impact (optionally provided)
+  impact?: ?DragImpact,
+  // provide a scroll jump request (optionally provided - and can be null)
+  scrollJumpRequest?: ?Position,
 |}
 
 const canPublishDimension = (phase: Phase): boolean =>
@@ -66,6 +69,7 @@ const move = ({
   shouldAnimate,
   windowScroll,
   impact,
+  scrollJumpRequest,
 }: MoveArgs): State => {
   if (state.phase !== 'DRAGGING') {
     console.error('cannot move while not dragging');
@@ -105,6 +109,7 @@ const move = ({
     page,
     shouldAnimate,
     windowScroll: currentWindowScroll,
+    hasCompletedFirstBulkPublish: previous.hasCompletedFirstBulkPublish,
   };
 
   const newImpact: DragImpact = (impact || getDragImpact({
@@ -119,6 +124,7 @@ const move = ({
     initial,
     impact: newImpact,
     current,
+    scrollJumpRequest,
   };
 
   return {
@@ -127,7 +133,7 @@ const move = ({
   };
 };
 
-const updateStateAfterDimensionChange = (newState: State): State => {
+const updateStateAfterDimensionChange = (newState: State, impact?: ?DragImpact): State => {
   // not dragging yet
   if (newState.phase === 'COLLECTING_INITIAL_DIMENSIONS') {
     return newState;
@@ -149,6 +155,7 @@ const updateStateAfterDimensionChange = (newState: State): State => {
     // use the existing values
     clientSelection: newState.drag.current.client.selection,
     shouldAnimate: newState.drag.current.shouldAnimate,
+    impact,
   });
 };
 
@@ -167,32 +174,27 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
-    const id: DraggableId = action.payload;
+    const request: LiftRequest = action.payload;
 
     return {
       phase: 'COLLECTING_INITIAL_DIMENSIONS',
       drag: null,
       drop: null,
       dimension: {
-        request: id,
+        request,
         draggable: {},
         droppable: {},
       },
     };
   }
 
-  if (action.type === 'PUBLISH_DRAGGABLE_DIMENSIONS') {
-    const dimensions: DraggableDimension[] = action.payload;
+  if (action.type === 'PUBLISH_DRAGGABLE_DIMENSION') {
+    const dimension: DraggableDimension = action.payload;
 
     if (!canPublishDimension(state.phase)) {
       console.warn('dimensions rejected as no longer allowing dimension capture in phase', state.phase);
       return state;
     }
-
-    const additions: DraggableDimensionMap = dimensions.reduce((previous, current) => {
-      previous[current.descriptor.id] = current;
-      return previous;
-    }, {});
 
     const newState: State = {
       ...state,
@@ -201,7 +203,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
         droppable: state.dimension.droppable,
         draggable: {
           ...state.dimension.draggable,
-          ...additions,
+          [dimension.descriptor.id]: dimension,
         },
       },
     };
@@ -209,18 +211,13 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     return updateStateAfterDimensionChange(newState);
   }
 
-  if (action.type === 'PUBLISH_DROPPABLE_DIMENSIONS') {
-    const dimensions: DroppableDimension[] = action.payload;
+  if (action.type === 'PUBLISH_DROPPABLE_DIMENSION') {
+    const dimension: DroppableDimension = action.payload;
 
     if (!canPublishDimension(state.phase)) {
       console.warn('dimensions rejected as no longer allowing dimension capture in phase', state.phase);
       return state;
     }
-
-    const additions: DroppableDimensionMap = dimensions.reduce((previous, current) => {
-      previous[current.descriptor.id] = current;
-      return previous;
-    }, {});
 
     const newState: State = {
       ...state,
@@ -229,7 +226,67 @@ export default (state: State = clean('IDLE'), action: Action): State => {
         draggable: state.dimension.draggable,
         droppable: {
           ...state.dimension.droppable,
-          ...additions,
+          [dimension.descriptor.id]: dimension,
+        },
+      },
+    };
+
+    return updateStateAfterDimensionChange(newState);
+  }
+
+  if (action.type === 'BULK_DIMENSION_PUBLISH') {
+    const draggables: DraggableDimension[] = action.payload.draggables;
+    const droppables: DroppableDimension[] = action.payload.droppables;
+
+    if (!canPublishDimension(state.phase)) {
+      console.warn('dimensions rejected as no longer allowing dimension capture in phase', state.phase);
+      return state;
+    }
+
+    const newDraggables: DraggableDimensionMap = draggables.reduce((previous, current) => {
+      previous[current.descriptor.id] = current;
+      return previous;
+    }, {});
+
+    const newDroppables: DroppableDimensionMap = droppables.reduce((previous, current) => {
+      previous[current.descriptor.id] = current;
+      return previous;
+    }, {});
+
+    const drag: ?DragState = (() => {
+      const existing: ?DragState = state.drag;
+      if (!existing) {
+        return null;
+      }
+
+      if (existing.current.hasCompletedFirstBulkPublish) {
+        return existing;
+      }
+
+      // $ExpectError - using spread
+      const newDrag: DragState = {
+        ...existing,
+        current: {
+          ...existing.current,
+          hasCompletedFirstBulkPublish: true,
+        },
+      };
+
+      return newDrag;
+    })();
+
+    const newState: State = {
+      ...state,
+      drag,
+      dimension: {
+        request: state.dimension.request,
+        draggable: {
+          ...state.dimension.draggable,
+          ...newDraggables,
+        },
+        droppable: {
+          ...state.dimension.droppable,
+          ...newDroppables,
         },
       },
     };
@@ -243,7 +300,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
-    const { id, client, windowScroll, isScrollAllowed } = action.payload;
+    const { id, client, windowScroll, autoScrollMode } = action.payload;
     const page: InitialDragPositions = {
       selection: add(client.selection, windowScroll),
       center: add(client.center, windowScroll),
@@ -260,7 +317,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
     const initial: InitialDrag = {
       descriptor,
-      isScrollAllowed,
+      autoScrollMode,
       client,
       page,
       windowScroll,
@@ -278,6 +335,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
         offset: origin,
       },
       windowScroll,
+      hasCompletedFirstBulkPublish: false,
       shouldAnimate: false,
     };
 
@@ -308,6 +366,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
         initial,
         current,
         impact,
+        scrollJumpRequest: null,
       },
     };
   }
@@ -318,16 +377,10 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
-    if (state.drag == null) {
-      console.error('invalid store state');
-      return clean();
-    }
+    const drag: ?DragState = state.drag;
 
-    // Currently not supporting container scrolling while dragging with a keyboard
-    // We do not store whether we are dragging with a keyboard in the state but this flag
-    // does this trick. Ideally this check would not exist.
-    // Kill the drag instantly
-    if (!state.drag.initial.isScrollAllowed) {
+    if (drag == null) {
+      console.error('invalid store state');
       return clean();
     }
 
@@ -342,6 +395,10 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
     const dimension: DroppableDimension = scrollDroppable(target, offset);
 
+    // If we are jump scrolling - dimension changes should not update the impact
+    const impact: ?DragImpact = drag.initial.autoScrollMode === 'JUMP' ?
+      drag.impact : null;
+
     const newState: State = {
       ...state,
       dimension: {
@@ -354,7 +411,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       },
     };
 
-    return updateStateAfterDimensionChange(newState);
+    return updateStateAfterDimensionChange(newState, impact);
   }
 
   if (action.type === 'UPDATE_DROPPABLE_DIMENSION_IS_ENABLED') {
@@ -395,28 +452,63 @@ export default (state: State = clean('IDLE'), action: Action): State => {
   }
 
   if (action.type === 'MOVE') {
-    const { client, windowScroll } = action.payload;
+    // Otherwise get an incorrect index calculated before the other dimensions are published
+    const { client, windowScroll, shouldAnimate } = action.payload;
+    const drag: ?DragState = state.drag;
+
+    if (!drag) {
+      console.error('Cannot move while there is no drag state');
+      return state;
+    }
+
+    const impact: ?DragImpact = (() => {
+      // we do not want to recalculate the initial impact until the first bulk publish is finished
+      if (!drag.current.hasCompletedFirstBulkPublish) {
+        return drag.impact;
+      }
+
+      // If we are jump scrolling - manual movements should not update the impact
+      if (drag.initial.autoScrollMode === 'JUMP') {
+        return drag.impact;
+      }
+
+      return null;
+    })();
+
     return move({
       state,
       clientSelection: client,
       windowScroll,
-      shouldAnimate: false,
+      shouldAnimate,
+      impact,
     });
   }
 
   if (action.type === 'MOVE_BY_WINDOW_SCROLL') {
     const { windowScroll } = action.payload;
+    const drag: ?DragState = state.drag;
 
-    if (!state.drag) {
+    if (!drag) {
       console.error('cannot move with window scrolling if no current drag');
       return clean();
     }
 
+    if (isEqual(windowScroll, drag.current.windowScroll)) {
+      return state;
+    }
+
+    // return state;
+    const isJumpScrolling: boolean = drag.initial.autoScrollMode === 'JUMP';
+
+    // If we are jump scrolling - any window scrolls should not update the impact
+    const impact: ?DragImpact = isJumpScrolling ? drag.impact : null;
+
     return move({
       state,
-      clientSelection: state.drag.current.client.selection,
+      clientSelection: drag.current.client.selection,
       windowScroll,
       shouldAnimate: false,
+      impact,
     });
   }
 
@@ -448,6 +540,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       draggableId: existing.initial.descriptor.id,
       droppable,
       draggables: state.dimension.draggable,
+      previousPageCenter: existing.current.page.center,
       previousImpact: existing.impact,
     });
 
@@ -465,6 +558,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       impact,
       clientSelection: client,
       shouldAnimate: true,
+      scrollJumpRequest: result.scrollJumpRequest,
     });
   }
 
@@ -521,7 +615,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
   }
 
   if (action.type === 'DROP_ANIMATE') {
-    const { trigger, newHomeOffset, impact, result } = action.payload;
+    const { newHomeOffset, impact, result } = action.payload;
 
     if (state.phase !== 'DRAGGING') {
       console.error('cannot animate drop while not dragging', action);
@@ -534,7 +628,6 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     }
 
     const pending: PendingDrop = {
-      trigger,
       newHomeOffset,
       result,
       impact,

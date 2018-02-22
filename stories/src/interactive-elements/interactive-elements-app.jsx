@@ -47,6 +47,12 @@ const initial: ItemType[] = [
     ),
   },
   {
+    id: 'range',
+    component: (
+      <input type="range" min="1" max="100" />
+    ),
+  },
+  {
     id: 'content editable',
     component: (
       <div
@@ -133,6 +139,7 @@ export default class InteractiveElementsApp extends React.Component<*, State> {
             {(droppableProvided: DroppableProvided) => (
               <List
                 innerRef={droppableProvided.innerRef}
+                {...droppableProvided.droppableProps}
               >
                 {this.state.items.map((item: ItemType, index: number) => (
                   <Draggable

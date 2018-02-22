@@ -51,3 +51,10 @@ export const distance = (point1: Position, point2: Position): number =>
 // When given a list of points, it finds the smallest distance to any point
 export const closest = (target: Position, points: Position[]): number =>
   Math.min(...points.map((point: Position) => distance(target, point)));
+
+// used to apply any function to both values of a point
+// eg: const floor = apply(Math.floor)(point);
+export const apply = (fn: (value: number) => number) => (point: Position): Position => ({
+  x: fn(point.x),
+  y: fn(point.y),
+});

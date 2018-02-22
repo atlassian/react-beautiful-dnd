@@ -77,6 +77,7 @@ const getMarshalStub = (): DimensionMarshal => ({
   unregisterDroppable: jest.fn(),
   updateDroppableScroll: jest.fn(),
   updateDroppableIsEnabled: jest.fn(),
+  scrollDroppable: jest.fn(),
   onPhaseChange: jest.fn(),
 });
 

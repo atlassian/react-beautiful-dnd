@@ -4,7 +4,7 @@ import { getDroppableDimension } from '../../../../src/state/dimension';
 import getArea from '../../../../src/state/get-area';
 import { add } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
-import getViewport from '../../../../src/state/visibility/get-viewport';
+import getViewport from '../../../../src/window/get-viewport';
 import type {
   Axis,
   Position,
@@ -309,14 +309,20 @@ describe('get best cross axis droppable', () => {
           // long droppable inside a shorter container - this should be clipped
           bottom: 80,
         }),
-        frameClient: getArea({
-          // not the same top value as source
-          top: 20,
-          // shares the left edge with the source
-          left: 20,
-          right: 40,
-          bottom: 40,
-        }),
+        closest: {
+          frameClient: getArea({
+            // not the same top value as source
+            top: 20,
+            // shares the left edge with the source
+            left: 20,
+            right: 40,
+            bottom: 40,
+          }),
+          scrollWidth: 20,
+          scrollHeight: 80,
+          scroll: { x: 0, y: 0 },
+          shouldClipSubject: true,
+        },
       });
       const sibling2 = getDroppableDimension({
         descriptor: {
@@ -635,13 +641,19 @@ describe('get best cross axis droppable', () => {
           [axis.crossAxisStart]: 200,
           [axis.crossAxisEnd]: 300,
         }),
-        frameClient: getArea({
-          [axis.start]: 0,
-          [axis.end]: 100,
-          // frame hides subject
-          [axis.crossAxisStart]: 400,
-          [axis.crossAxisEnd]: 500,
-        }),
+        closest: {
+          frameClient: getArea({
+            [axis.start]: 0,
+            [axis.end]: 100,
+            // frame hides subject
+            [axis.crossAxisStart]: 400,
+            [axis.crossAxisEnd]: 500,
+          }),
+          scroll: { x: 0, y: 0 },
+          scrollWidth: 100,
+          scrollHeight: 100,
+          shouldClipSubject: true,
+        },
       });
       const droppables: DroppableDimensionMap = {
         [source.descriptor.id]: source,

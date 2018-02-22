@@ -1,9 +1,11 @@
 // @flow
 import createStyleMarshal from '../../../src/view/style-marshal/style-marshal';
 import getStyles, { type Styles } from '../../../src/view/style-marshal/get-styles';
+import getStatePreset from '../../utils/get-simple-state-preset';
 import type { StyleMarshal } from '../../../src/view/style-marshal/style-marshal-types';
-import * as state from '../../utils/simple-state-preset';
 import type { State } from '../../../src/types';
+
+const state = getStatePreset();
 
 const getStyleTagSelector = (context: string) =>
   `style[data-react-beautiful-dnd="${context}"]`;

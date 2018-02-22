@@ -8,6 +8,7 @@ import { grid } from './src/constants';
 
 const data = {
   small: quotes,
+  // small: getQuotes(3),
   medium: getQuotes(40),
   large: getQuotes(500),
 };
