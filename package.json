@@ -67,7 +67,7 @@
     "eslint-plugin-jest": "^21.6.1",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.5.1",
-    "flow-bin": "0.61.0",
+    "flow-bin": "0.66.0",
     "flow-copy-source": "^1.2.1",
     "jest": "^22.0.5",
     "raf-stub": "^2.0.1",
