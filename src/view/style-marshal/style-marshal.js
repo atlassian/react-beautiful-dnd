@@ -16,6 +16,10 @@ type State = {|
 
 const prefix: string = 'data-react-beautiful-dnd';
 
+export function resetContext() {
+  count = 0;
+}
+
 export default () => {
   const context: string = `${count++}`;
   const styles: Styles = getStyles(context);
