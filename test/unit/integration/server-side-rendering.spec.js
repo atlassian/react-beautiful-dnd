@@ -4,7 +4,7 @@
 // @flow
 import React, { Component } from 'react';
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
-import { DragDropContext, Droppable, Draggable } from '../../../src/';
+import { DragDropContext, Droppable, Draggable, resetServerContext } from '../../../src/';
 import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';
 import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';
 
@@ -47,6 +47,11 @@ class App extends Component<*, *> {
 }
 
 describe('server side rendering', () => {
+  beforeEach(() => {
+    // Reset server context between tests to prevent state being shared between them
+    resetServerContext();
+  });
+
   // Checking that the browser globals are not available in this test file
   if (typeof window !== 'undefined' || typeof document !== 'undefined') {
     throw new Error('browser globals found in node test');
@@ -64,5 +69,15 @@ describe('server side rendering', () => {
 
     expect(result).toEqual(expect.any(String));
     expect(result).toMatchSnapshot();
+  });
+
+  it('should render identical content when resetting context between renders', () => {
+    const firstRender = renderToString(<App />);
+    const nextRenderBeforeReset = renderToString(<App />);
+    expect(firstRender).not.toEqual(nextRenderBeforeReset);
+
+    resetServerContext();
+    const nextRenderAfterReset = renderToString(<App />);
+    expect(firstRender).toEqual(nextRenderAfterReset);
   });
 });
