@@ -13,13 +13,13 @@
   "env": {
     "cjs": {
       "plugins": [
-        "transform-runtime",
+        ["transform-runtime", { "polyfill": false }],
         "transform-es2015-modules-commonjs"
       ]
     },
     "test": {
       "plugins": [
-        "transform-runtime",
+        ["transform-runtime", { "polyfill": false }],
         "transform-es2015-modules-commonjs"
       ]
     }
