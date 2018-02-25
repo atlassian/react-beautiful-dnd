@@ -1266,8 +1266,6 @@ resetServerContext();
 renderToString(...);
 ```
 
-This is required so that client and server markup are always identical.
-
 ## Flow usage
 
 `react-beautiful-dnd` is typed using [`flowtype`](https://flow.org). This greatly improves internal consistency within the codebase. We also expose a number of public types which will allow you to type your javascript if you would like to. If you are not using `flowtype` this will not inhibit you from using the library. It is just extra safety for those who want it.

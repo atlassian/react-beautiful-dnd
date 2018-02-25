@@ -1,5 +1,5 @@
 // @flow
-import createStyleMarshal from '../../../src/view/style-marshal/style-marshal';
+import createStyleMarshal, { resetStyleContext } from '../../../src/view/style-marshal/style-marshal';
 import getStyles, { type Styles } from '../../../src/view/style-marshal/get-styles';
 import getStatePreset from '../../utils/get-simple-state-preset';
 import type { StyleMarshal } from '../../../src/view/style-marshal/style-marshal-types';
@@ -16,9 +16,18 @@ const getStyleFromTag = (context: string): string => {
   return el.innerHTML;
 };
 
+const removeStyles = () => {
+  const styleEls = document.querySelectorAll('style[data-react-beautiful-dnd]');
+  styleEls.forEach((el) => {
+    el.remove();
+  });
+};
+
 describe('style marshal', () => {
   beforeEach(() => {
     jest.spyOn(console, 'error').mockImplementation(() => { });
+    resetStyleContext();
+    removeStyles();
   });
 
   afterEach(() => {
@@ -186,6 +195,15 @@ describe('style marshal', () => {
         marshal.onPhaseChange(state.dropComplete());
         expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.resting);
       });
+    });
+  });
+
+  describe('resetStyleContext', () => {
+    it('should reset the style context counter for subsequent marshals', () => {
+      expect(createStyleMarshal().styleContext).toBe('0');
+      expect(createStyleMarshal().styleContext).toBe('1');
+      resetStyleContext();
+      expect(createStyleMarshal().styleContext).toBe('0');
     });
   });
 });
