@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
 import createHookCaller from '../../state/hooks/hook-caller';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
-import createStyleMarshal from '../style-marshal/style-marshal';
+import createStyleMarshal, { resetStyleContext } from '../style-marshal/style-marshal';
 import canStartDrag from '../../state/can-start-drag';
 import scrollWindow from '../../window/scroll-window';
 import createAnnouncer from '../announcer/announcer';
@@ -53,6 +53,11 @@ type Props = {|
 type Context = {
   [string]: Store
 }
+
+// Reset any context that gets persisted across server side renders
+export const resetServerContext = () => {
+  resetStyleContext();
+};
 
 export default class DragDropContext extends React.Component<Props> {
   /* eslint-disable react/sort-comp */

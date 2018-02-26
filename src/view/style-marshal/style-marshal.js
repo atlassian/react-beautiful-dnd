@@ -16,6 +16,11 @@ type State = {|
 
 const prefix: string = 'data-react-beautiful-dnd';
 
+// Required for server side rendering as count is persisted across requests
+export const resetStyleContext = () => {
+  count = 0;
+};
+
 export default () => {
   const context: string = `${count++}`;
   const styles: Styles = getStyles(context);
