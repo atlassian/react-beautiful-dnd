@@ -34,8 +34,8 @@ We have created some basic examples on `codesandbox` for you to play with direct
 
 We have created upgrade instructions in our release notes to help you upgrade to the latest version!
 
-- [Upgrading from `4.x` to `5.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v5.0.0);
-- [Upgrading from `3.x` to `4.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v4.0.0);
+- [Upgrading from `4.x` to `5.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v5.0.0)
+- [Upgrading from `3.x` to `4.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v4.0.0)
 
 ## Core characteristics
 
