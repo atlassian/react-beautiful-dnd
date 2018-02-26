@@ -20,7 +20,7 @@ export default {
   plugins: [
     babel({
       exclude: 'node_modules/**',
-      plugins: ['external-helpers'],
+      runtimeHelpers: true,
     }),
     resolve({
       extensions: ['.js', '.jsx'],

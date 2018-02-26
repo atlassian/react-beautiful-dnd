@@ -5,6 +5,7 @@
     ["env", { "modules": false, "loose": true }]
   ],
   "plugins": [
+    "transform-runtime",
     "transform-class-properties",
     "transform-object-rest-spread",
     "transform-export-extensions"
@@ -13,13 +14,11 @@
   "env": {
     "cjs": {
       "plugins": [
-        ["transform-runtime", { "polyfill": false }],
         "transform-es2015-modules-commonjs"
       ]
     },
     "test": {
       "plugins": [
-        ["transform-runtime", { "polyfill": false }],
         "transform-es2015-modules-commonjs"
       ]
     }
