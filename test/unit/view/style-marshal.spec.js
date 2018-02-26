@@ -1,5 +1,5 @@
 // @flow
-import createStyleMarshal from '../../../src/view/style-marshal/style-marshal';
+import createStyleMarshal, { resetStyleContext } from '../../../src/view/style-marshal/style-marshal';
 import getStyles, { type Styles } from '../../../src/view/style-marshal/get-styles';
 import getStatePreset from '../../utils/get-simple-state-preset';
 import type { StyleMarshal } from '../../../src/view/style-marshal/style-marshal-types';
@@ -17,17 +17,21 @@ const getStyleFromTag = (context: string): string => {
 };
 
 describe('style marshal', () => {
+  let marshal: StyleMarshal;
+
   beforeEach(() => {
     jest.spyOn(console, 'error').mockImplementation(() => { });
+    resetStyleContext();
+    marshal = createStyleMarshal();
   });
 
   afterEach(() => {
+    marshal.unmount();
     console.error.mockRestore();
   });
 
   describe('not dragging', () => {
     it('should not mount a style tag until mounted', () => {
-      const marshal: StyleMarshal = createStyleMarshal();
       const selector: string = getStyleTagSelector(marshal.styleContext);
 
       // initially there is no style tag
@@ -39,8 +43,6 @@ describe('style marshal', () => {
     });
 
     it('should log an error if mounting after already mounting', () => {
-      const marshal: StyleMarshal = createStyleMarshal();
-
       marshal.mount();
       expect(console.error).not.toHaveBeenCalled();
 
@@ -49,7 +51,6 @@ describe('style marshal', () => {
     });
 
     it('should apply the resting styles by default', () => {
-      const marshal: StyleMarshal = createStyleMarshal();
       const styles: Styles = getStyles(marshal.styleContext);
       marshal.mount();
       const active: string = getStyleFromTag(marshal.styleContext);
@@ -59,7 +60,6 @@ describe('style marshal', () => {
 
     it('should apply the resting styles while not dragging', () => {
       [state.idle, state.dropComplete()].forEach((current: State) => {
-        const marshal: StyleMarshal = createStyleMarshal();
         marshal.mount();
         const styles: Styles = getStyles(marshal.styleContext);
 
@@ -74,7 +74,6 @@ describe('style marshal', () => {
   describe('drag preparing', () => {
     it('should apply the resting styles', () => {
       [state.preparing, state.requesting()].forEach((current: State) => {
-        const marshal: StyleMarshal = createStyleMarshal();
         marshal.mount();
         const styles: Styles = getStyles(marshal.styleContext);
 
@@ -88,7 +87,6 @@ describe('style marshal', () => {
 
   describe('dragging', () => {
     it('should apply the dragging styles', () => {
-      const marshal: StyleMarshal = createStyleMarshal();
       marshal.mount();
       const styles: Styles = getStyles(marshal.styleContext);
 
@@ -101,7 +99,6 @@ describe('style marshal', () => {
 
   describe('dropping', () => {
     it('should apply the dropping styles if dropping', () => {
-      const marshal: StyleMarshal = createStyleMarshal();
       marshal.mount();
       const styles: Styles = getStyles(marshal.styleContext);
 
@@ -110,7 +107,6 @@ describe('style marshal', () => {
     });
 
     it('should apply the user cancel styles if performing a user directed cancel', () => {
-      const marshal: StyleMarshal = createStyleMarshal();
       marshal.mount();
       const styles: Styles = getStyles(marshal.styleContext);
 
@@ -121,7 +117,6 @@ describe('style marshal', () => {
 
   describe('unmounting', () => {
     it('should remove the style tag from the head when unmounting', () => {
-      const marshal: StyleMarshal = createStyleMarshal();
       marshal.mount();
       const selector: string = getStyleTagSelector(marshal.styleContext);
 
@@ -135,7 +130,6 @@ describe('style marshal', () => {
     });
 
     it('should log an error if attempting to apply styles after unmounted', () => {
-      const marshal: StyleMarshal = createStyleMarshal();
       marshal.mount();
       const styles: Styles = getStyles(marshal.styleContext);
       const selector: string = getStyleTagSelector(marshal.styleContext);
@@ -157,7 +151,6 @@ describe('style marshal', () => {
 
   describe('subsequent updates', () => {
     it('should allow multiple updates', () => {
-      const marshal: StyleMarshal = createStyleMarshal();
       marshal.mount();
       const styles: Styles = getStyles(marshal.styleContext);
 
@@ -186,6 +179,20 @@ describe('style marshal', () => {
         marshal.onPhaseChange(state.dropComplete());
         expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.resting);
       });
+    });
+  });
+
+  describe('resetStyleContext', () => {
+    it('should reset the style context counter for subsequent marshals', () => {
+      expect(marshal.styleContext).toBe('0');
+      const marshalBeforeReset = createStyleMarshal();
+      expect(marshalBeforeReset.styleContext).toBe('1');
+      resetStyleContext();
+      const marshalAfterReset = createStyleMarshal();
+      expect(marshalAfterReset.styleContext).toBe('0');
+
+      marshalBeforeReset.unmount();
+      marshalAfterReset.unmount();
     });
   });
 });
