@@ -38,6 +38,7 @@
     "babel-runtime": "^6.26.0",
     "invariant": "^2.2.2",
     "memoize-one": "^3.0.1",
+    "object-assign": "^4.1.1",
     "prop-types": "^15.6.0",
     "raf-schd": "^2.1.0",
     "react-motion": "^0.5.2",

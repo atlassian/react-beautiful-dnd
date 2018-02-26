@@ -1,4 +1,5 @@
 // @flow
+import assign from 'object-assign';
 import type { Announce } from '../../types';
 import type { Announcer } from './announcer-types';
 
@@ -63,7 +64,7 @@ export default (): Announcer => {
     el.setAttribute('aria-atomic', 'true');
 
     // hide the element visually
-    Object.assign(el.style, visuallyHidden);
+    assign(el.style, visuallyHidden);
 
     if (!document.body) {
       throw new Error('Cannot find the head to append a style to');
