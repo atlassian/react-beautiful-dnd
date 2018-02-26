@@ -614,7 +614,7 @@ describe('move to new droppable', () => {
               const expected: Position = moveToEdge({
                 source: inHome1.page.withoutMargin,
                 sourceEdge: 'start',
-                destination: foreign.page.withMarginAndPadding,
+                destination: foreign.page.withoutPadding,
                 destinationEdge: 'start',
                 destinationAxis: foreign.axis,
               });
@@ -667,7 +667,7 @@ describe('move to new droppable', () => {
               const withoutScroll: Position = moveToEdge({
                 source: inHome1.page.withoutMargin,
                 sourceEdge: 'start',
-                destination: foreign.page.withMarginAndPadding,
+                destination: foreign.page.withoutPadding,
                 destinationEdge: 'start',
                 destinationAxis: foreign.axis,
               });

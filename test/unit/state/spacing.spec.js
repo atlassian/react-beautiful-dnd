@@ -5,6 +5,7 @@ import {
   expandByPosition,
   offsetByPosition,
   expandBySpacing,
+  shrinkBySpacing,
 } from '../../../src/state/spacing';
 import type { Position, Spacing } from '../../../src/types';
 
@@ -62,6 +63,33 @@ describe('spacing', () => {
       };
 
       expect(expandBySpacing(spacing, spacing)).toEqual(expected);
+    });
+  });
+
+  describe('shrinkBySpacing', () => {
+    it('should descrease the size of a spacing by the size of another', () => {
+      const base: Spacing = {
+        top: 20,
+        right: 40,
+        bottom: 40,
+        left: 20,
+      };
+      const change: Spacing = {
+        top: 5,
+        right: 5,
+        bottom: 5,
+        left: 5,
+      };
+      const expected: Spacing = {
+        // pushed forward
+        top: 25,
+        left: 25,
+        // pulled backwards
+        right: 35,
+        bottom: 35,
+      };
+
+      expect(shrinkBySpacing(base, change)).toEqual(expected);
     });
   });
 

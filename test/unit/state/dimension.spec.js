@@ -170,15 +170,15 @@ describe('dimension', () => {
         expect(dimension.client.withMargin).toEqual(area);
       });
 
-      it('should return a portion that considers margins and padding', () => {
+      it('should return a portion that removes the padding', () => {
         const area: Area = getArea({
-          top: client.top - margin.top - padding.top,
-          left: client.left - margin.left - padding.left,
-          bottom: client.bottom + margin.bottom + padding.bottom,
-          right: client.right + margin.right + padding.right,
+          top: client.top + padding.top,
+          left: client.left + padding.left,
+          bottom: client.bottom - padding.bottom,
+          right: client.right - padding.right,
         });
 
-        expect(dimension.client.withMarginAndPadding).toEqual(area);
+        expect(dimension.client.withoutPadding).toEqual(area);
       });
     });
 
@@ -205,15 +205,17 @@ describe('dimension', () => {
         expect(dimension.page.withMargin).toEqual(area);
       });
 
-      it('should return a portion that considers margins and padding', () => {
+      it('should return a portion that removes padding', () => {
         const area: Area = getArea({
-          top: (client.top + windowScroll.y) - margin.top - padding.top,
-          left: (client.left + windowScroll.x) - margin.left - padding.left,
-          bottom: (client.bottom + windowScroll.y) + margin.bottom + padding.bottom,
-          right: (client.right + windowScroll.x) + margin.right + padding.right,
+          // pushing forward
+          top: (client.top + windowScroll.y) + padding.top,
+          left: (client.left + windowScroll.x) + padding.left,
+          // pulling backward
+          bottom: (client.bottom + windowScroll.y) - padding.bottom,
+          right: (client.right + windowScroll.x) - padding.right,
         });
 
-        expect(dimension.page.withMarginAndPadding).toEqual(area);
+        expect(dimension.page.withoutPadding).toEqual(area);
       });
     });
 
