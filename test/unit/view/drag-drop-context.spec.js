@@ -6,9 +6,11 @@ import TestUtils from 'react-dom/test-utils';
 import { mount } from 'enzyme';
 import { Provider, connect } from 'react-redux';
 import { createStore } from 'redux';
-import { Droppable, Draggable, DragDropContext } from '../../../src/';
+import { Droppable, Draggable, DragDropContext, resetServerContext } from '../../../src/';
 import type { DraggableProvided, DroppableProvided } from '../../../src/';
 import { storeKey, canLiftContextKey } from '../../../src/view/context-keys';
+// Imported as wildcard so we can mock `resetStyleContext` using spyOn
+import * as StyleMarshal from '../../../src/view/style-marshal/style-marshal';
 
 class App extends Component<*> {
   // Part of reacts api is to use flow types for this.
@@ -170,5 +172,16 @@ describe('DragDropContext', () => {
 
       expect(wrapper.find(Container).text()).toBe(original.foo);
     });
+  });
+});
+
+describe('resetServerContext', () => {
+  it('should reset the style marshal context', () => {
+    const spy = jest.spyOn(StyleMarshal, 'resetStyleContext');
+    expect(spy).not.toHaveBeenCalled();
+    resetServerContext();
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    spy.mockRestore();
   });
 });
