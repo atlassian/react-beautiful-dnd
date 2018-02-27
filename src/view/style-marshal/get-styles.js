@@ -40,16 +40,15 @@ export default (styleContext: string): Styles => {
   // bake it right in. Consumers can opt out of this by adding a selector with higher specificity
   // The cursor will not apply when pointer-events is set to none
 
-  // ### Block pointer events
+  // ## While active dragging
+  // > these are applied while a drag is occurring
 
   // pointer-events: none
-  // this is used to prevent pointer events firing on draggables during a drag
-  // Reasons:
-  // 1. performance: it stops the other draggables from processing mouse events
-  // 2. scrolling: it allows the user to scroll through the current draggable
-  // to scroll the list behind
-  // 3.* function: it blocks other draggables from starting. This is not relied on though as there
-  // is a function on the context (canLift) which is a more robust way of controlling this
+  // this is used to prevent pointer events firing on draggables during a drag.
+  // This is a performance optimisation
+
+  // cursor: grabbing
+  // we want to override the cursor for the element while dragging
 
   const dragHandleStyles = {
     base: `
@@ -65,7 +64,7 @@ export default (styleContext: string): Styles => {
         cursor: grab;
       }
     `,
-    whileDragging: `
+    whileActiveDragging: `
       ${dragHandleSelector} {
         pointer-events: none;
         cursor: grabbing;
@@ -117,6 +116,7 @@ export default (styleContext: string): Styles => {
   // cursor: grab
   // We apply this by default for an improved user experience. It is such a common default that we
   // bake it right in. Consumers can opt out of this by adding a selector with higher specificity
+  // We apply it to the body in case the user pointer slips off the drag handle
 
   // user-select: none
   // This prevents the user from selecting text on the page while dragging
@@ -146,7 +146,7 @@ export default (styleContext: string): Styles => {
 
   const dragging: string = [
     ...base,
-    dragHandleStyles.whileDragging,
+    dragHandleStyles.whileActiveDragging,
     draggableStyles.animateMovement,
     bodyStyles.whileActiveDragging,
   ].join('');
