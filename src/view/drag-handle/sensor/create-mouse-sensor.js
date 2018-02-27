@@ -51,13 +51,15 @@ export default ({
     setState({
       pending: null,
       isDragging: true,
-      preventClick: true,
     });
     fn();
   };
-  const stopDragging = (fn?: Function = noop) => {
+  const stopDragging = (fn?: Function = noop, shouldBlockClick?: boolean = true) => {
     schedule.cancel();
     unbindWindowEvents();
+    if (shouldBlockClick) {
+      bindPostDragOnWindowClick();
+    }
     setState({
       isDragging: false,
       pending: null,
@@ -65,14 +67,12 @@ export default ({
     fn();
   };
   const startPendingDrag = (point: Position) => {
+    unbindPostDragOnWindowClick();
     setState({ pending: point, isDragging: false });
     bindWindowEvents();
   };
   const stopPendingDrag = () => {
-    setState({
-      preventClick: false,
-    });
-    stopDragging();
+    stopDragging(noop, false);
   };
 
   const kill = (fn?: Function = noop) => {
@@ -223,23 +223,25 @@ export default ({
     startPendingDrag(point);
   };
 
-  const onClick = (event: MouseEvent): void => {
-    if (!state.preventClick) {
-      return;
-    }
-
-    // preventing click
-
-    // only want to prevent the first click
-    setState({
-      preventClick: false,
-    });
+  const postDragWindowOnClick = (event: MouseEvent) => {
     stopEvent(event);
+    // unbinding self
+    unbindPostDragOnWindowClick();
+  };
+
+  const bindPostDragOnWindowClick = () => {
+    console.log('binding post drag window events');
+    window.addEventListener('click', postDragWindowOnClick, { capture: true });
+  };
+
+  const unbindPostDragOnWindowClick = () => {
+    console.log('unbinding post drag event');
+    window.removeEventListener('click', postDragWindowOnClick, { capture: true });
   };
 
   const sensor: MouseSensor = {
     onMouseDown,
-    onClick,
+    // onClick,
     kill,
     isCapturing,
     isDragging,

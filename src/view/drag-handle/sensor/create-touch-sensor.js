@@ -284,7 +284,6 @@ export default ({
   const sensor: TouchSensor = {
     onTouchStart,
     onTouchMove,
-    onClick,
     kill,
     isCapturing,
     isDragging,
