@@ -114,7 +114,7 @@ export default (styleContext: string): Styles => {
   // > Applied while the user is actively dragging
 
   // cursor: grab
-  // We apply apply this style to the body in case the user pointer
+  // We apply this style to the body in case the user pointer
   // slips off the drag handle
 
   // user-select: none
