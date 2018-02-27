@@ -965,12 +965,11 @@ export type DraggableProps = {|
 
 type DraggableStyle = DraggingStyle | NotDraggingStyle
 type DraggingStyle = {|
-  pointerEvents: 'none',
   position: 'fixed',
   width: number,
   height: number,
   boxSizing: 'border-box',
-  pointerEvents: 'none',
+  pointerEvents: 'auto',
   top: number,
   left: number,
   margin: 0,
@@ -1341,12 +1340,11 @@ export type DraggableProps = {|
 |}
 type DraggableStyle = DraggingStyle | NotDraggingStyle
 type DraggingStyle = {|
-  pointerEvents: 'none',
   position: 'fixed',
   width: number,
   height: number,
   boxSizing: 'border-box',
-  pointerEvents: 'none',
+  pointerEvents: 'auto',
   top: number,
   left: number,
   margin: 0,
