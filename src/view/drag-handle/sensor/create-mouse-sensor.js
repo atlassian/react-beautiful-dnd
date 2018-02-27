@@ -18,8 +18,8 @@ type MouseForceChangedEvent = MouseEvent & {
 
 type State = {
   isDragging: boolean,
-  preventClick: boolean,
   pending: ?Position,
+  isPostDragBlockBound: boolean,
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
@@ -34,7 +34,7 @@ export default ({
   let state: State = {
     isDragging: false,
     pending: null,
-    preventClick: false,
+    isPostDragBlockBound: false,
   };
   const setState = (partial: Object): void => {
     const newState: State = {
@@ -67,7 +67,9 @@ export default ({
     fn();
   };
   const startPendingDrag = (point: Position) => {
-    unbindPostDragOnWindowClick();
+    if (state.isPostDragBlockBound) {
+      unbindPostDragOnWindowClick();
+    }
     setState({ pending: point, isDragging: false });
     bindWindowEvents();
   };
@@ -230,18 +232,37 @@ export default ({
   };
 
   const bindPostDragOnWindowClick = () => {
+    if (state.isPostDragBlockBound) {
+      console.error('Cannot bind post drag block when already bound');
+      return;
+    }
     console.log('binding post drag window events');
+    setState({
+      isPostDragBlockBound: true,
+    });
     window.addEventListener('click', postDragWindowOnClick, { capture: true });
+
+    // Only block clicks for the current call stack
+    // after this we can allow clicks again.
+    // This is to guard against the situation where a click event does
+    // not fire on the element. In that case we do not want to block a click
+    // on another element
+    setTimeout(unbindPostDragOnWindowClick);
   };
 
   const unbindPostDragOnWindowClick = () => {
+    if (!state.isPostDragBlockBound) {
+      return;
+    }
     console.log('unbinding post drag event');
+    setState({
+      isPostDragBlockBound: false,
+    });
     window.removeEventListener('click', postDragWindowOnClick, { capture: true });
   };
 
   const sensor: MouseSensor = {
     onMouseDown,
-    // onClick,
     kill,
     isCapturing,
     isDragging,
