@@ -219,7 +219,7 @@ export default class Draggable extends Component<Props, State> {
         top,
         left,
         margin: 0,
-        pointerEvents: 'none',
+        pointerEvents: 'auto',
         transition: 'none',
         transform: movementStyle.transform ? `${movementStyle.transform}` : null,
       };

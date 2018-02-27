@@ -71,7 +71,7 @@ export type DraggingStyle = {|
   // the pointer-events during a drop. The actual drag start blocking is taken care of
   // by canStartDrag() on the context. But this a little safeguard.
   // It is also a minor performance optimisation
-  pointerEvents: 'none',
+  pointerEvents: 'auto',
 |}
 
 export type NotDraggingStyle = {|

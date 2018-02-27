@@ -65,9 +65,11 @@ export default (styleContext: string): Styles => {
         cursor: grab;
       }
     `,
-    blockPointerEvents: `
+    whileDragging: `
       ${dragHandleSelector} {
         pointer-events: none;
+        cursor: grabbing;
+        cursor: -webkit-grabbing;
       }
     `,
   };
@@ -144,7 +146,7 @@ export default (styleContext: string): Styles => {
 
   const dragging: string = [
     ...base,
-    dragHandleStyles.blockPointerEvents,
+    dragHandleStyles.whileDragging,
     draggableStyles.animateMovement,
     bodyStyles.whileActiveDragging,
   ].join('');
