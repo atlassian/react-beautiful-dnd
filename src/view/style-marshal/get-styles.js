@@ -38,7 +38,6 @@ export default (styleContext: string): Styles => {
   // cursor: grab
   // We apply this by default for an improved user experience. It is such a common default that we
   // bake it right in. Consumers can opt out of this by adding a selector with higher specificity
-  // The cursor will not apply when pointer-events is set to none
 
   // ## While active dragging
   // > these are applied while a drag is occurring
@@ -48,7 +47,8 @@ export default (styleContext: string): Styles => {
   // This is a performance optimisation
 
   // cursor: grabbing
-  // we want to override the cursor for the element while dragging
+  // We apply this by default for an improved user experience. It is such a common default that we
+  // bake it right in. Consumers can opt out of this by adding a selector with higher specificity
 
   const dragHandleStyles = {
     base: `
@@ -114,9 +114,8 @@ export default (styleContext: string): Styles => {
   // > Applied while the user is actively dragging
 
   // cursor: grab
-  // We apply this by default for an improved user experience. It is such a common default that we
-  // bake it right in. Consumers can opt out of this by adding a selector with higher specificity
-  // We apply it to the body in case the user pointer slips off the drag handle
+  // We apply apply this style to the body in case the user pointer
+  // slips off the drag handle
 
   // user-select: none
   // This prevents the user from selecting text on the page while dragging
