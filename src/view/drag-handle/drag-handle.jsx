@@ -7,7 +7,6 @@ import type {
   DragHandleProps,
 } from './drag-handle-types';
 import type {
-  Sensor,
   MouseSensor,
   KeyboardSensor,
   TouchSensor,
@@ -23,6 +22,8 @@ import createKeyboardSensor from './sensor/create-keyboard-sensor';
 import createTouchSensor from './sensor/create-touch-sensor';
 
 const getFalse: () => boolean = () => false;
+
+type Sensor = MouseSensor | KeyboardSensor | TouchSensor;
 
 export default class DragHandle extends Component<Props> {
   /* eslint-disable react/sort-comp */

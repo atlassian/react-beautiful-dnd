@@ -287,7 +287,7 @@ export default ({
   };
 
   const unbindPostDragOnWindowClick = () => {
-    window.removeEventListener('click', postDragWindowOnClick, { capture: true });
+    window.removeEventListener('click', postDragWindowOnClick);
   };
 
   const sensor: TouchSensor = {
