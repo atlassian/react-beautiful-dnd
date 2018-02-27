@@ -1256,6 +1256,22 @@ It is possible for your `Draggable` to contain interactive elements. By default 
 
 You can opt out of this behavior by adding the `disableInteractiveElementBlocking` prop to a `Draggable`. However, it is questionable as to whether you should be doing so because it will render the interactive element unusable. If you need to *conditionally* block dragging from interactive elements you can add the `disableInteractiveElementBlocking` prop to opt out of the default blocking and monkey patch the `dragHandleProps (DragHandleProps)` event handlers to disable dragging as required.
 
+## `resetServerContext`
+
+The `resetServerContext` function should be used when server side rendering (SSR). It ensures context state does not persist across multiple renders on the server which would result in client/server markup mismatches after multiple requests are rendered on the server.
+
+Use it before calling the server side render method:
+
+```js
+import { resetServerContext } from 'react-beautiful-dnd';
+import { renderToString } from 'react-dom/server';
+
+...
+
+resetServerContext();
+renderToString(...);
+```
+
 ## Flow usage
 
 `react-beautiful-dnd` is typed using [`flowtype`](https://flow.org). This greatly improves internal consistency within the codebase. We also expose a number of public types which will allow you to type your javascript if you would like to. If you are not using `flowtype` this will not inhibit you from using the library. It is just extra safety for those who want it.
