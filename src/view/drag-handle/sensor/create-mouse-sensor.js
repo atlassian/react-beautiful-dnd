@@ -16,11 +16,10 @@ type MouseForceChangedEvent = MouseEvent & {
   webkitForce?: number,
 }
 
-type State = {
+type State = {|
   isDragging: boolean,
   pending: ?Position,
-  isPostDragBlockBound: boolean,
-}
+|}
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 const primaryButton = 0;
@@ -34,13 +33,8 @@ export default ({
   let state: State = {
     isDragging: false,
     pending: null,
-    isPostDragBlockBound: false,
   };
-  const setState = (partial: Object): void => {
-    const newState: State = {
-      ...state,
-      ...partial,
-    };
+  const setState = (newState: State): void => {
     state = newState;
   };
   const isDragging = (): boolean => state.isDragging;
@@ -67,9 +61,7 @@ export default ({
     fn();
   };
   const startPendingDrag = (point: Position) => {
-    if (state.isPostDragBlockBound) {
-      unbindPostDragOnWindowClick();
-    }
+    unbindPostDragOnWindowClick();
     setState({ pending: point, isDragging: false });
     bindWindowEvents();
   };
@@ -227,19 +219,11 @@ export default ({
 
   const postDragWindowOnClick = (event: MouseEvent) => {
     stopEvent(event);
-    // unbinding self
+    // unbinding self after single use
     unbindPostDragOnWindowClick();
   };
 
   const bindPostDragOnWindowClick = () => {
-    if (state.isPostDragBlockBound) {
-      console.error('Cannot bind post drag block when already bound');
-      return;
-    }
-    console.log('binding post drag window events');
-    setState({
-      isPostDragBlockBound: true,
-    });
     window.addEventListener('click', postDragWindowOnClick, { capture: true });
 
     // Only block clicks for the current call stack
@@ -251,13 +235,6 @@ export default ({
   };
 
   const unbindPostDragOnWindowClick = () => {
-    if (!state.isPostDragBlockBound) {
-      return;
-    }
-    console.log('unbinding post drag event');
-    setState({
-      isPostDragBlockBound: false,
-    });
     window.removeEventListener('click', postDragWindowOnClick, { capture: true });
   };
 

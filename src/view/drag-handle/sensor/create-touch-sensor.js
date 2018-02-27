@@ -11,7 +11,6 @@ import type { TouchSensor, CreateSensorArgs } from './sensor-types';
 type State = {
   isDragging: boolean,
   hasMoved: boolean,
-  preventClick: boolean,
   longPressTimerId: ?number,
   pending: ?Position,
 }
@@ -29,7 +28,6 @@ const initial: State = {
   isDragging: false,
   pending: null,
   hasMoved: false,
-  preventClick: false,
   longPressTimerId: null,
 };
 
@@ -77,10 +75,8 @@ export default ({
   const stopDragging = (fn?: Function = noop) => {
     schedule.cancel();
     unbindWindowEvents();
-    setState({
-      ...initial,
-      preventClick: true,
-    });
+    bindPostDragOnWindowClick();
+    setState(initial);
     fn();
   };
 
@@ -100,6 +96,7 @@ export default ({
       isDragging: false,
       hasMoved: false,
     });
+    unbindPostDragOnWindowClick();
     bindWindowEvents();
   };
 
@@ -272,13 +269,25 @@ export default ({
     }
   };
 
-  const onClick = (event: MouseEvent) => {
-    if (!state.preventClick) {
-      return;
-    }
-
+  const postDragWindowOnClick = (event: MouseEvent) => {
     stopEvent(event);
-    setState(initial);
+    // unbinding self after single use
+    unbindPostDragOnWindowClick();
+  };
+
+  const bindPostDragOnWindowClick = () => {
+    window.addEventListener('click', postDragWindowOnClick, { capture: true });
+
+    // Only block clicks for the current call stack
+    // after this we can allow clicks again.
+    // This is to guard against the situation where a click event does
+    // not fire on the element. In that case we do not want to block a click
+    // on another element
+    setTimeout(unbindPostDragOnWindowClick);
+  };
+
+  const unbindPostDragOnWindowClick = () => {
+    window.removeEventListener('click', postDragWindowOnClick, { capture: true });
   };
 
   const sensor: TouchSensor = {
