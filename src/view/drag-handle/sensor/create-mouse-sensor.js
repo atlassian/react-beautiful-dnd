@@ -6,6 +6,7 @@ import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-ex
 import getWindowFromRef from '../../get-window-from-ref';
 import * as keyCodes from '../../key-codes';
 import blockStandardKeyEvents from '../util/block-standard-key-events';
+import createClickBlocker, { type ClickBlocker } from '../util/create-click-blocker';
 import type {
   Position,
 } from '../../../types';
@@ -40,6 +41,7 @@ export default ({
   const isDragging = (): boolean => state.isDragging;
   const isCapturing = (): boolean => Boolean(state.pending || state.isDragging);
   const schedule = createScheduler(callbacks);
+  const clickBlocker: ClickBlocker = createClickBlocker();
 
   const startDragging = (fn?: Function = noop) => {
     setState({
@@ -52,7 +54,7 @@ export default ({
     schedule.cancel();
     unbindWindowEvents();
     if (shouldBlockClick) {
-      bindPostDragOnWindowClick();
+      clickBlocker.blockNext();
     }
     setState({
       isDragging: false,
@@ -61,7 +63,7 @@ export default ({
     fn();
   };
   const startPendingDrag = (point: Position) => {
-    unbindPostDragOnWindowClick();
+    clickBlocker.reset();
     setState({ pending: point, isDragging: false });
     bindWindowEvents();
   };
@@ -215,27 +217,6 @@ export default ({
     };
 
     startPendingDrag(point);
-  };
-
-  const postDragWindowOnClick = (event: MouseEvent) => {
-    stopEvent(event);
-    // unbinding self after single use
-    unbindPostDragOnWindowClick();
-  };
-
-  const bindPostDragOnWindowClick = () => {
-    window.addEventListener('click', postDragWindowOnClick, { capture: true });
-
-    // Only block clicks for the current call stack
-    // after this we can allow clicks again.
-    // This is to guard against the situation where a click event does
-    // not fire on the element. In that case we do not want to block a click
-    // on another element
-    setTimeout(unbindPostDragOnWindowClick);
-  };
-
-  const unbindPostDragOnWindowClick = () => {
-    window.removeEventListener('click', postDragWindowOnClick, { capture: true });
   };
 
   const sensor: MouseSensor = {

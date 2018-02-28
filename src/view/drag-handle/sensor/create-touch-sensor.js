@@ -3,6 +3,7 @@
 import stopEvent from '../util/stop-event';
 import createScheduler from '../util/create-scheduler';
 import getWindowFromRef from '../../get-window-from-ref';
+import createClickBlocker, { type ClickBlocker } from '../util/create-click-blocker';
 import type {
   Position,
 } from '../../../types';
@@ -48,6 +49,7 @@ export default ({
   const isCapturing = (): boolean =>
     Boolean(state.pending || state.isDragging || state.longPressTimerId);
   const schedule = createScheduler(callbacks);
+  const clickBlocker: ClickBlocker = createClickBlocker();
 
   const startDragging = () => {
     const pending: ?Position = state.pending;
@@ -75,7 +77,7 @@ export default ({
   const stopDragging = (fn?: Function = noop) => {
     schedule.cancel();
     unbindWindowEvents();
-    bindPostDragOnWindowClick();
+    clickBlocker.blockNext();
     setState(initial);
     fn();
   };
@@ -96,7 +98,7 @@ export default ({
       isDragging: false,
       hasMoved: false,
     });
-    unbindPostDragOnWindowClick();
+    clickBlocker.reset();
     bindWindowEvents();
   };
 
@@ -267,27 +269,6 @@ export default ({
     if (state.pending) {
       stopPendingDrag();
     }
-  };
-
-  const postDragWindowOnClick = (event: MouseEvent) => {
-    stopEvent(event);
-    // unbinding self after single use
-    unbindPostDragOnWindowClick();
-  };
-
-  const bindPostDragOnWindowClick = () => {
-    window.addEventListener('click', postDragWindowOnClick, { capture: true });
-
-    // Only block clicks for the current call stack
-    // after this we can allow clicks again.
-    // This is to guard against the situation where a click event does
-    // not fire on the element. In that case we do not want to block a click
-    // on another element
-    setTimeout(unbindPostDragOnWindowClick);
-  };
-
-  const unbindPostDragOnWindowClick = () => {
-    window.removeEventListener('click', postDragWindowOnClick);
   };
 
   const sensor: TouchSensor = {
