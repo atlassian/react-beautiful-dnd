@@ -1092,12 +1092,15 @@ It is an assumption that `Draggable`s are *visible siblings* of one another. The
 type DragHandleProps = {|
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
+  onTouchStart: (event: TouchEvent) => void,
+  onTouchMove: (event: TouchEvent) => void,
+  'data-react-beautiful-dnd-drag-handle': string,
+  'aria-roledescription': string,
   tabIndex: number,
-  'aria-grabbed': boolean,
   draggable: boolean,
-  onDragStart: () => void,
-  onDrop: () => void,
-|};
+  onDragStart: () => boolean,
+  onDrop: () => boolean
+|}
 ```
 
 ##### `dragHandleProps` Example: standard
@@ -1356,12 +1359,15 @@ type NotDraggingStyle = {|
 type DragHandleProps = {|
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
+  onTouchStart: (event: TouchEvent) => void,
+  onTouchMove: (event: TouchEvent) => void,
+  'data-react-beautiful-dnd-drag-handle': string,
+  'aria-roledescription': string,
   tabIndex: number,
-  'aria-grabbed': boolean,
   draggable: boolean,
-  onDragStart: () => void,
-  onDrop: () => void,
-|};
+  onDragStart: () => boolean,
+  onDrop: () => boolean
+|}
 ```
 
 ### Using the flow types
