@@ -162,6 +162,10 @@ When the center of a `Draggable` gets within a small distance from the edge of a
 
 The distances required for auto scrolling are based on a percentage of the height or width of the container for vertical and horizontal scrolling respectively. By using percentages rather than raw pixel values we are able to have a great experience regardless of the size and shape of your containers.
 
+##### Mouse wheel and trackpads
+
+In addition to auto scrolling we also allow users to scroll the window or a `Droppable` manually using their *mouse wheel* or *trackpad* 👌
+
 ##### A note about big `Draggable`s
 
 If the `Draggable` is bigger than a container on the axis you are trying to scroll - we will not permit scrolling on that axis. For example, if you have a `Draggable` that is longer than the height of the window we will not auto scroll vertically. However, we will still permit scrolling to occur horizontally.
