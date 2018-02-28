@@ -50,7 +50,7 @@ export const getDraggableDimension = ({
     },
     // on the viewport
     client: {
-      paddingBox: getArea(paddingBox),
+      paddingBox,
       marginBox: getArea(expandBySpacing(paddingBox, margin)),
     },
     // with scroll
