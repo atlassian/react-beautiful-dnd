@@ -18,7 +18,8 @@
   "main": "lib/index.js",
   "files": [
     "/lib",
-    "/dist"
+    "/dist",
+    "/src"
   ],
   "scripts": {
     "test": "jest --config ./jest.config.js",
@@ -27,9 +28,9 @@
     "typecheck": "flow check",
     "build": "yarn run build:clean && yarn run build:lib && yarn run build:flow && yarn run build:dist",
     "build:clean": "rimraf lib && rimraf dist",
-    "build:dist": "rollup -c && rollup -c --min",
-    "build:lib": "babel src -d lib",
-    "build:flow": "flow-copy-source --verbose src lib",
+    "build:dist": "rollup -c && cross-env NODE_ENV=min rollup -c",
+    "build:lib": "cross-env NODE_ENV=cjs babel src -d lib",
+    "build:flow": "echo \"// @flow\n\nexport * from '../src';\" > lib/index.js.flow",
     "storybook": "start-storybook -p 9002",
     "build-storybook": "build-storybook -c .storybook -o site",
     "prepublish": "yarn run build"
@@ -52,12 +53,14 @@
     "babel-cli": "^6.26.0",
     "babel-eslint": "^8.2.1",
     "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-export-extensions": "^6.22.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-flow": "^6.23.0",
     "babel-preset-react": "^6.24.1",
+    "cross-env": "^5.1.3",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-15": "^1.0.5",
     "eslint": "^4.15.0",
@@ -68,7 +71,6 @@
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.5.1",
     "flow-bin": "0.61.0",
-    "flow-copy-source": "^1.2.1",
     "jest": "^22.0.5",
     "raf-stub": "^2.0.1",
     "react": "^15.6.2",
