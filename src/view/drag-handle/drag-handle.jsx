@@ -7,7 +7,6 @@ import type {
   DragHandleProps,
 } from './drag-handle-types';
 import type {
-  Sensor,
   MouseSensor,
   KeyboardSensor,
   TouchSensor,
@@ -23,6 +22,8 @@ import createKeyboardSensor from './sensor/create-keyboard-sensor';
 import createTouchSensor from './sensor/create-touch-sensor';
 
 const getFalse: () => boolean = () => false;
+
+type Sensor = MouseSensor | KeyboardSensor | TouchSensor;
 
 export default class DragHandle extends Component<Props> {
   /* eslint-disable react/sort-comp */
@@ -155,12 +156,6 @@ export default class DragHandle extends Component<Props> {
     this.touchSensor.onTouchMove(event);
   }
 
-  onClick = (event: MouseEvent) => {
-    // The mouse or touch sensor may want to block the click
-    this.mouseSensor.onClick(event);
-    this.touchSensor.onClick(event);
-  }
-
   canStartCapturing = (event: Event) => {
     // this might be before a drag has started - isolated to this element
     if (this.isAnySensorCapturing()) {
@@ -189,7 +184,6 @@ export default class DragHandle extends Component<Props> {
       onKeyDown: this.onKeyDown,
       onTouchStart: this.onTouchStart,
       onTouchMove: this.onTouchMove,
-      onClick: this.onClick,
       tabIndex: 0,
       'data-react-beautiful-dnd-drag-handle': this.styleContext,
       // English default. Consumers are welcome to add their own start instruction

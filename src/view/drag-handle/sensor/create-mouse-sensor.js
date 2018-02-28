@@ -6,6 +6,7 @@ import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-ex
 import getWindowFromRef from '../../get-window-from-ref';
 import * as keyCodes from '../../key-codes';
 import blockStandardKeyEvents from '../util/block-standard-key-events';
+import createClickBlocker, { type ClickBlocker } from '../util/create-click-blocker';
 import type {
   Position,
 } from '../../../types';
@@ -16,11 +17,10 @@ type MouseForceChangedEvent = MouseEvent & {
   webkitForce?: number,
 }
 
-type State = {
+type State = {|
   isDragging: boolean,
-  preventClick: boolean,
   pending: ?Position,
-}
+|}
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 const primaryButton = 0;
@@ -34,30 +34,28 @@ export default ({
   let state: State = {
     isDragging: false,
     pending: null,
-    preventClick: false,
   };
-  const setState = (partial: Object): void => {
-    const newState: State = {
-      ...state,
-      ...partial,
-    };
+  const setState = (newState: State): void => {
     state = newState;
   };
   const isDragging = (): boolean => state.isDragging;
   const isCapturing = (): boolean => Boolean(state.pending || state.isDragging);
   const schedule = createScheduler(callbacks);
+  const clickBlocker: ClickBlocker = createClickBlocker();
 
   const startDragging = (fn?: Function = noop) => {
     setState({
       pending: null,
       isDragging: true,
-      preventClick: true,
     });
     fn();
   };
-  const stopDragging = (fn?: Function = noop) => {
+  const stopDragging = (fn?: Function = noop, shouldBlockClick?: boolean = true) => {
     schedule.cancel();
     unbindWindowEvents();
+    if (shouldBlockClick) {
+      clickBlocker.blockNext();
+    }
     setState({
       isDragging: false,
       pending: null,
@@ -65,14 +63,12 @@ export default ({
     fn();
   };
   const startPendingDrag = (point: Position) => {
+    clickBlocker.reset();
     setState({ pending: point, isDragging: false });
     bindWindowEvents();
   };
   const stopPendingDrag = () => {
-    setState({
-      preventClick: false,
-    });
-    stopDragging();
+    stopDragging(noop, false);
   };
 
   const kill = (fn?: Function = noop) => {
@@ -223,23 +219,8 @@ export default ({
     startPendingDrag(point);
   };
 
-  const onClick = (event: MouseEvent): void => {
-    if (!state.preventClick) {
-      return;
-    }
-
-    // preventing click
-
-    // only want to prevent the first click
-    setState({
-      preventClick: false,
-    });
-    stopEvent(event);
-  };
-
   const sensor: MouseSensor = {
     onMouseDown,
-    onClick,
     kill,
     isCapturing,
     isDragging,
