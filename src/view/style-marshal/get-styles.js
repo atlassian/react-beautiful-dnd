@@ -38,17 +38,18 @@ export default (styleContext: string): Styles => {
   // cursor: grab
   // We apply this by default for an improved user experience. It is such a common default that we
   // bake it right in. Consumers can opt out of this by adding a selector with higher specificity
+  // The cursor will not apply when pointer-events is set to none
 
-  // ## While active dragging
-  // > these are applied while a drag is occurring
+  // ### Block pointer events
 
   // pointer-events: none
-  // this is used to prevent pointer events firing on draggables during a drag.
-  // This is a performance optimisation
-
-  // cursor: grabbing
-  // We apply this by default for an improved user experience. It is such a common default that we
-  // bake it right in. Consumers can opt out of this by adding a selector with higher specificity
+  // this is used to prevent pointer events firing on draggables during a drag
+  // Reasons:
+  // 1. performance: it stops the other draggables from processing mouse events
+  // 2. scrolling: it allows the user to scroll through the current draggable
+  // to scroll the list behind
+  // 3.* function: it blocks other draggables from starting. This is not relied on though as there
+  // is a function on the context (canLift) which is a more robust way of controlling this
 
   const dragHandleStyles = {
     base: `
@@ -64,11 +65,9 @@ export default (styleContext: string): Styles => {
         cursor: grab;
       }
     `,
-    whileActiveDragging: `
+    blockPointerEvents: `
       ${dragHandleSelector} {
         pointer-events: none;
-        cursor: grabbing;
-        cursor: -webkit-grabbing;
       }
     `,
   };
@@ -114,8 +113,8 @@ export default (styleContext: string): Styles => {
   // > Applied while the user is actively dragging
 
   // cursor: grab
-  // We apply this style to the body in case the user pointer
-  // slips off the drag handle
+  // We apply this by default for an improved user experience. It is such a common default that we
+  // bake it right in. Consumers can opt out of this by adding a selector with higher specificity
 
   // user-select: none
   // This prevents the user from selecting text on the page while dragging
@@ -145,7 +144,7 @@ export default (styleContext: string): Styles => {
 
   const dragging: string = [
     ...base,
-    dragHandleStyles.whileActiveDragging,
+    dragHandleStyles.blockPointerEvents,
     draggableStyles.animateMovement,
     bodyStyles.whileActiveDragging,
   ].join('');
