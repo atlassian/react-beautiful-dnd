@@ -1096,7 +1096,6 @@ It is an assumption that `Draggable`s are *visible siblings* of one another. The
 type DragHandleProps = {|
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
-  onClick: (event: MouseEvent) => void,
   tabIndex: number,
   'aria-grabbed': boolean,
   draggable: boolean,
@@ -1147,23 +1146,20 @@ Controlling a whole draggable by just a part of it
 You can override some of the `dragHandleProps` props with your own behavior if you need to.
 
 ```js
-const myOnClick = event => console.log('clicked on', event.target);
+const myOnMouseDown = event => console.log('mouse down on', event.target);
 
 <Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => {
-    const onClick = (() => {
+    const onMouseDown = (() => {
       // dragHandleProps might be null
       if (!provided.dragHandleProps) {
-        return myOnClick;
+        return onMouseDown;
       }
 
-      // creating a new onClick function that calls my onClick
-      // event as well as the provided one.
-      return event => {
-        provided.dragHandleProps.onClick(event);
-        // You may want to check if event.defaultPrevented
-        // is true and optionally fire your handler
-        myOnClick(event);
+      // creating a new onMouseDown function that calls myOnMouseDown as well as the drag handle one.
+      return (event) => {
+        provided.dragHandleProps.onMouseDown(event);
+        myOnMouseDown(event);
       };
     })();
 
@@ -1173,7 +1169,7 @@ const myOnClick = event => console.log('clicked on', event.target);
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          onClick={onClick}
+          onMouseDown={onMouseDown}
         >
           Drag me!
         </div>
@@ -1356,18 +1352,16 @@ type NotDraggingStyle = {|
   transition: ?string,
   transition: null | 'none',
 |}
-type DragHandleProvided = {|
+
+type DragHandleProps = {|
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
-  onClick: (event: MouseEvent) => void,
-  onTouchStart: (event: TouchEvent) => void,
-  onTouchMove: (event: TouchEvent) => void,
   tabIndex: number,
-  'aria-roledescription': string,
+  'aria-grabbed': boolean,
   draggable: boolean,
-  onDragStart: () => boolean,
-  onDrop: () => boolean
-|}
+  onDragStart: () => void,
+  onDrop: () => void,
+|};
 ```
 
 ### Using the flow types
