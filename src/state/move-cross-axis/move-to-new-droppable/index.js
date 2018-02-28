@@ -40,7 +40,7 @@ export default ({
 }: Args): ?Result => {
   const amount: Position = patch(
     destination.axis.line,
-    draggable.client.withMargin[destination.axis.size]
+    draggable.client.marginBox[destination.axis.size]
   );
 
   // moving back to the home list

@@ -212,7 +212,7 @@ const withPlaceholder = (
 
   const spaceForPlaceholder: Position = patch(
     droppable.axis.line,
-    draggable.placeholder.withoutMargin[droppable.axis.size]
+    draggable.placeholder.paddingBox[droppable.axis.size]
   );
 
   const newMax: Position = add(max, spaceForPlaceholder);
@@ -260,7 +260,7 @@ export default ({
     // 1. Can we scroll the viewport?
 
     const draggable: DraggableDimension = state.dimension.draggable[drag.initial.descriptor.id];
-    const subject: Area = draggable.page.withMargin;
+    const subject: Area = draggable.page.marginBox;
     const viewport: Area = getViewport();
     const requiredWindowScroll: ?Position = getRequiredScroll({
       container: viewport,

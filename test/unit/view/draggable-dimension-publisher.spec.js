@@ -225,12 +225,12 @@ describe('DraggableDimensionPublisher', () => {
       });
 
       jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => ({
-        top: expected.page.withoutMargin.top,
-        bottom: expected.page.withoutMargin.bottom,
-        left: expected.page.withoutMargin.left,
-        right: expected.page.withoutMargin.right,
-        height: expected.page.withoutMargin.height,
-        width: expected.page.withoutMargin.width,
+        top: expected.page.paddingBox.top,
+        bottom: expected.page.paddingBox.bottom,
+        left: expected.page.paddingBox.left,
+        right: expected.page.paddingBox.right,
+        height: expected.page.paddingBox.height,
+        width: expected.page.paddingBox.width,
       }));
       jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noSpacing);
       const marshal: DimensionMarshal = getMarshalStub();
@@ -273,12 +273,12 @@ describe('DraggableDimensionPublisher', () => {
         margin,
       });
       jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => ({
-        top: expected.page.withoutMargin.top,
-        bottom: expected.page.withoutMargin.bottom,
-        left: expected.page.withoutMargin.left,
-        right: expected.page.withoutMargin.right,
-        height: expected.page.withoutMargin.height,
-        width: expected.page.withoutMargin.width,
+        top: expected.page.paddingBox.top,
+        bottom: expected.page.paddingBox.bottom,
+        left: expected.page.paddingBox.left,
+        right: expected.page.paddingBox.right,
+        height: expected.page.paddingBox.height,
+        width: expected.page.paddingBox.width,
       }));
       jest.spyOn(window, 'getComputedStyle').mockImplementation(() => ({
         marginTop: `${margin.top}`,

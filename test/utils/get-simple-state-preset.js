@@ -87,7 +87,7 @@ export default (axis?: Axis = vertical) => {
     // will populate the dimension state with the initial dimensions
     const draggable: DraggableDimension = preset.draggables[id];
     // either use the provided selection or use the draggable's center
-    const clientSelection: Position = selection || draggable.client.withMargin.center;
+    const clientSelection: Position = selection || draggable.client.marginBox.center;
     const initialPosition: InitialDragPositions = {
       selection: clientSelection,
       center: clientSelection,
@@ -136,12 +136,12 @@ export default (axis?: Axis = vertical) => {
     const draggable: DraggableDimension = preset.draggables[id];
     // either use the provided selection or use the draggable's center
     const initialPosition: InitialDragPositions = {
-      selection: draggable.client.withMargin.center,
-      center: draggable.client.withMargin.center,
+      selection: draggable.client.marginBox.center,
+      center: draggable.client.marginBox.center,
     };
     const clientPositions: CurrentDragPositions = {
-      selection: draggable.client.withMargin.center,
-      center: draggable.client.withMargin.center,
+      selection: draggable.client.marginBox.center,
+      center: draggable.client.marginBox.center,
       offset: origin,
     };
 

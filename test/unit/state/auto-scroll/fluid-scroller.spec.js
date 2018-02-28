@@ -970,7 +970,7 @@ describe('fluid auto scrolling', () => {
             };
             const placeholder: Position = patch(
               axis.line,
-              preset.inHome1.placeholder.withoutMargin[axis.size],
+              preset.inHome1.placeholder.paddingBox[axis.size],
             );
             const overForeign: DragImpact = {
               movement: noMovement,

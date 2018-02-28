@@ -50,7 +50,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.withMargin.center,
+        pageCenter: source.page.marginBox.center,
         source,
         droppables,
       });
@@ -93,7 +93,7 @@ describe('get best cross axis droppable', () => {
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         // moving backwards
         isMovingForward: false,
-        pageCenter: source.page.withMargin.center,
+        pageCenter: source.page.marginBox.center,
         source,
         droppables,
       });
@@ -135,7 +135,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.withMargin.center,
+        pageCenter: source.page.marginBox.center,
         source,
         droppables,
       });
@@ -144,7 +144,7 @@ describe('get best cross axis droppable', () => {
       // checking that it would have been returned if was moving in the other direction
       const result2: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: false,
-        pageCenter: source.page.withMargin.center,
+        pageCenter: source.page.marginBox.center,
         source,
         droppables,
       });
@@ -186,7 +186,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.withMargin.center,
+        pageCenter: source.page.marginBox.center,
         source,
         droppables,
       });
@@ -229,7 +229,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.withMargin.center,
+        pageCenter: source.page.marginBox.center,
         source,
         droppables,
       });
@@ -273,7 +273,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.withMargin.center,
+        pageCenter: source.page.marginBox.center,
         source,
         droppables,
       });
@@ -468,7 +468,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.withMargin.center,
+        pageCenter: source.page.marginBox.center,
         source,
         droppables,
       });
@@ -511,7 +511,7 @@ describe('get best cross axis droppable', () => {
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         // moving backwards
         isMovingForward: false,
-        pageCenter: source.page.withMargin.center,
+        pageCenter: source.page.marginBox.center,
         source,
         droppables,
       });
@@ -554,7 +554,7 @@ describe('get best cross axis droppable', () => {
       // now moving in the other direction
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.withMargin.center,
+        pageCenter: source.page.marginBox.center,
         source,
         droppables,
       });
@@ -563,7 +563,7 @@ describe('get best cross axis droppable', () => {
       // Ensuring that normally it would be returned if moving in the right direction
       const result2: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: false,
-        pageCenter: source.page.withMargin.center,
+        pageCenter: source.page.marginBox.center,
         source,
         droppables,
       });
@@ -605,7 +605,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.withMargin.center,
+        pageCenter: source.page.marginBox.center,
         source,
         droppables,
       });
@@ -662,7 +662,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.withMargin.center,
+        pageCenter: source.page.marginBox.center,
         source,
         droppables,
       });
@@ -705,7 +705,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.withMargin.center,
+        pageCenter: source.page.marginBox.center,
         source,
         droppables,
       });
@@ -750,7 +750,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.withMargin.center,
+        pageCenter: source.page.marginBox.center,
         source,
         droppables,
       });

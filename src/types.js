@@ -75,7 +75,7 @@ export type Axis = VerticalAxis | HorizontalAxis
 export type Placeholder = {|
   // We apply the margin separately to maintain margin collapsing
   // behavior of the original element
-  withoutMargin: {|
+  paddingBox: {|
     height: number,
     width: number,
   |},
@@ -88,13 +88,13 @@ export type DraggableDimension = {|
   placeholder: Placeholder,
   // relative to the viewport when the drag started
   client: {|
-    withMargin: Area,
-    withoutMargin: Area,
+    marginBox: Area,
+    paddingBox: Area,
   |},
   // relative to the whole page
   page: {|
-    withMargin: Area,
-    withoutMargin: Area,
+    marginBox: Area,
+    paddingBox: Area,
   |},
 |}
 
@@ -136,17 +136,16 @@ export type DroppableDimension = {|
   isEnabled: boolean,
   // relative to the current viewport
   client: {|
-    withMargin: Area,
-    withoutMargin: Area,
-    // the area in which content presses up against
-    withoutPadding: Area,
+    marginBox: Area,
+    paddingBox: Area,
+    contentBox: Area,
   |},
   // relative to the whole page
   page: {|
-    withMargin: Area,
-    withoutMargin: Area,
+    marginBox: Area,
+    paddingBox: Area,
     // the area in which content presses up against
-    withoutPadding: Area,
+    contentBox: Area,
   |},
   // The container of the droppable
   viewport: DroppableDimensionViewport,

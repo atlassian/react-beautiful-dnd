@@ -29,7 +29,7 @@ const emptyForeignCrossAxisEnd: number = 300;
 
 export const makeScrollable = (droppable: DroppableDimension, amount?: number = 20) => {
   const axis: Axis = droppable.axis;
-  const client: Area = droppable.client.withoutMargin;
+  const client: Area = droppable.client.paddingBox;
 
   const horizontalGrowth: number = axis === vertical ? 0 : amount;
   const verticalGrowth: number = axis === vertical ? amount : 0;

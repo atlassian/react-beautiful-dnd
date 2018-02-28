@@ -13,7 +13,7 @@ export default class Placeholder extends PureComponent<Props> {
 
     const placeholder: PlaceholderType = this.props.placeholder;
     const { top, left, bottom, right } = placeholder.margin;
-    const { width, height } = placeholder.withoutMargin;
+    const { width, height } = placeholder.paddingBox;
 
     const style = {
       width,

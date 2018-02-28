@@ -45,20 +45,20 @@ export const getDraggableDimension = ({
     descriptor,
     placeholder: {
       margin,
-      withoutMargin: {
+      paddingBox: {
         width: client.width,
         height: client.height,
       },
     },
     // on the viewport
     client: {
-      withoutMargin: getArea(client),
-      withMargin: getArea(expandBySpacing(client, margin)),
+      paddingBox: getArea(client),
+      marginBox: getArea(expandBySpacing(client, margin)),
     },
     // with scroll
     page: {
-      withoutMargin: getArea(withScroll),
-      withMargin: getArea(expandBySpacing(withScroll, margin)),
+      paddingBox: getArea(withScroll),
+      marginBox: getArea(expandBySpacing(withScroll, margin)),
     },
   };
 
@@ -167,7 +167,7 @@ export const getDroppableDimension = ({
   windowScroll = origin,
   isEnabled = true,
 }: GetDroppableArgs): DroppableDimension => {
-  const withMargin: Spacing = expandBySpacing(client, margin);
+  const marginBox: Spacing = expandBySpacing(client, margin);
   const withWindowScroll: Spacing = offsetByPosition(client, windowScroll);
   const subject: Area = getArea(expandBySpacing(withWindowScroll, margin));
 
@@ -213,22 +213,22 @@ export const getDroppableDimension = ({
     clipped,
   };
 
-  const withoutPadding: Spacing = shrinkBySpacing(client, padding);
+  const contentBox: Spacing = shrinkBySpacing(client, padding);
 
   const dimension: DroppableDimension = {
     descriptor,
     isEnabled,
     axis: direction === 'vertical' ? vertical : horizontal,
     client: {
-      withoutMargin: getArea(client),
-      withMargin: getArea(withMargin),
-      withoutPadding: getArea(withoutPadding),
+      paddingBox: getArea(client),
+      marginBox: getArea(marginBox),
+      contentBox: getArea(contentBox),
     },
     page: {
-      withoutMargin: getArea(withWindowScroll),
-      withMargin: subject,
-      withoutPadding:
-        getArea(offsetByPosition(withoutPadding, windowScroll)),
+      paddingBox: getArea(withWindowScroll),
+      marginBox: subject,
+      contentBox:
+        getArea(offsetByPosition(contentBox, windowScroll)),
     },
     viewport,
   };

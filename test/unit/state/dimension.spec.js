@@ -68,7 +68,7 @@ describe('dimension', () => {
           left: client.left,
         });
 
-        expect(dimension.client.withoutMargin).toEqual(area);
+        expect(dimension.client.paddingBox).toEqual(area);
       });
 
       it('should return a portion that considers margins', () => {
@@ -79,7 +79,7 @@ describe('dimension', () => {
           left: client.left - margin.left,
         });
 
-        expect(dimension.client.withMargin).toEqual(area);
+        expect(dimension.client.marginBox).toEqual(area);
       });
     });
 
@@ -92,7 +92,7 @@ describe('dimension', () => {
           left: client.left + windowScroll.x,
         });
 
-        expect(dimension.page.withoutMargin).toEqual(area);
+        expect(dimension.page.paddingBox).toEqual(area);
       });
 
       it('should return a portion that considers margins', () => {
@@ -103,7 +103,7 @@ describe('dimension', () => {
           left: (client.left - margin.left) + windowScroll.x,
         });
 
-        expect(dimension.page.withMargin).toEqual(area);
+        expect(dimension.page.marginBox).toEqual(area);
       });
     });
   });
@@ -156,7 +156,7 @@ describe('dimension', () => {
           left: client.left,
         });
 
-        expect(dimension.client.withoutMargin).toEqual(area);
+        expect(dimension.client.paddingBox).toEqual(area);
       });
 
       it('should return a portion that does consider margins', () => {
@@ -167,7 +167,7 @@ describe('dimension', () => {
           right: client.right + margin.right,
         });
 
-        expect(dimension.client.withMargin).toEqual(area);
+        expect(dimension.client.marginBox).toEqual(area);
       });
 
       it('should return a portion that removes the padding', () => {
@@ -178,7 +178,7 @@ describe('dimension', () => {
           right: client.right - padding.right,
         });
 
-        expect(dimension.client.withoutPadding).toEqual(area);
+        expect(dimension.client.contentBox).toEqual(area);
       });
     });
 
@@ -191,7 +191,7 @@ describe('dimension', () => {
           right: client.right + windowScroll.x,
         });
 
-        expect(dimension.page.withoutMargin).toEqual(area);
+        expect(dimension.page.paddingBox).toEqual(area);
       });
 
       it('should return a portion that does consider margins', () => {
@@ -202,7 +202,7 @@ describe('dimension', () => {
           right: client.right + windowScroll.x + margin.right,
         });
 
-        expect(dimension.page.withMargin).toEqual(area);
+        expect(dimension.page.marginBox).toEqual(area);
       });
 
       it('should return a portion that removes padding', () => {
@@ -215,7 +215,7 @@ describe('dimension', () => {
           right: (client.right + windowScroll.x) - padding.right,
         });
 
-        expect(dimension.page.withoutPadding).toEqual(area);
+        expect(dimension.page.contentBox).toEqual(area);
       });
     });
 

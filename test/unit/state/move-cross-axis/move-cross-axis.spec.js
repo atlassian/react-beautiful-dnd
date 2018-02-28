@@ -27,8 +27,8 @@ describe('move cross axis', () => {
         type: 'TYPE',
       },
       client: getArea({
-        left: preset.home.client.withMargin.left + 1,
-        right: preset.home.client.withMargin.left + 10,
+        left: preset.home.client.marginBox.left + 1,
+        right: preset.home.client.marginBox.left + 10,
         top: 0,
         bottom: viewport.bottom + 200,
       }),
@@ -40,8 +40,8 @@ describe('move cross axis', () => {
         index: 0,
       },
       client: getArea({
-        left: preset.home.client.withMargin.left + 1,
-        right: preset.home.client.withMargin.left + 10,
+        left: preset.home.client.marginBox.left + 1,
+        right: preset.home.client.marginBox.left + 10,
         // outside of the viewport
         top: viewport.bottom + 1,
         bottom: viewport.bottom + 10,
@@ -58,7 +58,7 @@ describe('move cross axis', () => {
 
     const result: ?Result = moveCrossAxis({
       isMovingForward: true,
-      pageCenter: preset.inHome1.page.withMargin.center,
+      pageCenter: preset.inHome1.page.marginBox.center,
       draggableId: preset.inHome1.descriptor.id,
       droppableId: preset.home.descriptor.id,
       home: {
@@ -77,7 +77,7 @@ describe('move cross axis', () => {
   it('should return a droppable if its children are visible (and all other criteria are met)', () => {
     const result: ?Result = moveCrossAxis({
       isMovingForward: true,
-      pageCenter: preset.inHome1.page.withMargin.center,
+      pageCenter: preset.inHome1.page.marginBox.center,
       draggableId: preset.inHome1.descriptor.id,
       droppableId: preset.home.descriptor.id,
       home: {

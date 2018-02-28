@@ -153,7 +153,7 @@ describe('get closest draggable', () => {
       it('should return the closest draggable', () => {
         // closet to visible1
         const center1: Position = patch(
-          axis.line, visible1.page.withoutMargin.center[axis.line], 100
+          axis.line, visible1.page.paddingBox.center[axis.line], 100
         );
         const result1: ?DraggableDimension = getClosestDraggable({
           axis,
@@ -165,7 +165,7 @@ describe('get closest draggable', () => {
 
         // closest to visible2
         const center2: Position = patch(
-          axis.line, visible2.page.withoutMargin.center[axis.line], 100
+          axis.line, visible2.page.paddingBox.center[axis.line], 100
         );
         const result2: ?DraggableDimension = getClosestDraggable({
           axis,
@@ -211,7 +211,7 @@ describe('get closest draggable', () => {
         );
         const center: Position = patch(
           axis.line,
-          visible1.page.withoutMargin.center[axis.line],
+          visible1.page.paddingBox.center[axis.line],
           100
         );
 
@@ -238,7 +238,7 @@ describe('get closest draggable', () => {
         it('should ignore draggables backward that have no total visiblity', () => {
           const center: Position = patch(
             axis.line,
-            hiddenBackwards.page.withoutMargin.center[axis.line],
+            hiddenBackwards.page.paddingBox.center[axis.line],
             100,
           );
 
@@ -255,7 +255,7 @@ describe('get closest draggable', () => {
         it('should ignore draggables that have backwards partial visiblility', () => {
           const center: Position = patch(
             axis.line,
-            partiallyHiddenBackwards.page.withoutMargin.center[axis.line],
+            partiallyHiddenBackwards.page.paddingBox.center[axis.line],
             100,
           );
 
@@ -271,7 +271,7 @@ describe('get closest draggable', () => {
 
         it('should ignore draggables that have forward partial visiblility', () => {
           const center: Position = patch(
-            axis.line, partiallyHiddenForwards.page.withoutMargin.center[axis.line], 100
+            axis.line, partiallyHiddenForwards.page.paddingBox.center[axis.line], 100
           );
 
           const result: ?DraggableDimension = getClosestDraggable({
@@ -286,7 +286,7 @@ describe('get closest draggable', () => {
 
         it('should ignore draggables forward that have no visiblity', () => {
           const center: Position = patch(
-            axis.line, hiddenForwards.page.withoutMargin.center[axis.line], 100
+            axis.line, hiddenForwards.page.paddingBox.center[axis.line], 100
           );
 
           const result: ?DraggableDimension = getClosestDraggable({
@@ -301,7 +301,7 @@ describe('get closest draggable', () => {
 
         it('should ignore draggables that are outside of the viewport', () => {
           const center: Position = patch(
-            axis.line, outOfViewport.page.withoutMargin.center[axis.line], 100
+            axis.line, outOfViewport.page.paddingBox.center[axis.line], 100
           );
 
           const result: ?DraggableDimension = getClosestDraggable({
@@ -341,7 +341,7 @@ describe('get closest draggable', () => {
         const center: Position = patch(
           axis.line,
           // this is shared edge
-          visible2.page.withoutMargin[axis.start],
+          visible2.page.paddingBox[axis.start],
           100
         );
 
@@ -357,8 +357,8 @@ describe('get closest draggable', () => {
         // validating test assumptions
 
         // 1. that they have equal distances
-        expect(distance(center, visible1.page.withoutMargin.center))
-          .toEqual(distance(center, visible2.page.withoutMargin.center));
+        expect(distance(center, visible1.page.paddingBox.center))
+          .toEqual(distance(center, visible2.page.paddingBox.center));
 
         // 2. if we move beyond the edge visible2 will be selected
         const result2: ?DraggableDimension = getClosestDraggable({

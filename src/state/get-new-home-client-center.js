@@ -27,7 +27,7 @@ export default ({
   draggables,
   destination,
 }: NewHomeArgs): Position => {
-  const homeCenter: Position = draggable.client.withMargin.center;
+  const homeCenter: Position = draggable.client.marginBox.center;
 
   // not dropping anywhere
   if (destination == null) {
@@ -53,13 +53,13 @@ export default ({
   // Find the dimension we need to compare the dragged item with
   const destinationFragment: Area = (() => {
     if (isWithinHomeDroppable) {
-      return draggables[displaced[0].draggableId].client.withMargin;
+      return draggables[displaced[0].draggableId].client.marginBox;
     }
 
     // Not in home list
 
     if (displaced.length) {
-      return draggables[displaced[0].draggableId].client.withMargin;
+      return draggables[displaced[0].draggableId].client.marginBox;
     }
 
     // If we're dragging to the last place in a new droppable
@@ -67,12 +67,12 @@ export default ({
     if (draggablesInDestination.length) {
       return draggablesInDestination[
         draggablesInDestination.length - 1
-      ].client.withMargin;
+      ].client.marginBox;
     }
 
     // Otherwise, return the dimension of the empty foreign droppable
     // $ExpectError - flow does not correctly type this as non optional
-    return destination.client.withoutPadding;
+    return destination.client.contentBox;
   })();
 
   const { sourceEdge, destinationEdge } = (() => {
@@ -98,7 +98,7 @@ export default ({
     return { sourceEdge: 'start', destinationEdge: 'start' };
   })();
 
-  const source: Area = draggable.client.withMargin;
+  const source: Area = draggable.client.marginBox;
 
   // This is the draggable's new home
   const targetCenter: Position = moveToEdge({

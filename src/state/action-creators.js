@@ -349,7 +349,7 @@ export const drop = () =>
       destination,
     });
 
-    const clientOffset: Position = subtract(newCenter, draggable.client.withMargin.center);
+    const clientOffset: Position = subtract(newCenter, draggable.client.marginBox.center);
     const scrollDiff: Position = getScrollDiff({
       initial,
       current,
