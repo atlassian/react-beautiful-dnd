@@ -221,7 +221,7 @@ describe('get new home client center', () => {
             const targetCenter: Position = moveToEdge({
               source: inHome1.client.withMargin,
               sourceEdge: 'start',
-              destination: emptyForeign.client.withMarginAndPadding,
+              destination: emptyForeign.client.withoutPadding,
               destinationEdge: 'start',
               destinationAxis: axis,
             });

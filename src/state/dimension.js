@@ -1,7 +1,7 @@
 // @flow
 import { vertical, horizontal } from './axis';
 import getArea from './get-area';
-import { offsetByPosition, expandBySpacing } from './spacing';
+import { offsetByPosition, expandBySpacing, shrinkBySpacing } from './spacing';
 import { subtract, negate } from './position';
 import getMaxScroll from './get-max-scroll';
 import type {
@@ -213,6 +213,8 @@ export const getDroppableDimension = ({
     clipped,
   };
 
+  const withoutPadding: Spacing = shrinkBySpacing(client, padding);
+
   const dimension: DroppableDimension = {
     descriptor,
     isEnabled,
@@ -220,13 +222,13 @@ export const getDroppableDimension = ({
     client: {
       withoutMargin: getArea(client),
       withMargin: getArea(withMargin),
-      withMarginAndPadding: getArea(expandBySpacing(withMargin, padding)),
+      withoutPadding: getArea(withoutPadding),
     },
     page: {
       withoutMargin: getArea(withWindowScroll),
       withMargin: subject,
-      withMarginAndPadding:
-        getArea(expandBySpacing(expandBySpacing(withWindowScroll, margin), padding)),
+      withoutPadding:
+        getArea(offsetByPosition(withoutPadding, windowScroll)),
     },
     viewport,
   };

@@ -72,7 +72,7 @@ export default ({
 
     // Otherwise, return the dimension of the empty foreign droppable
     // $ExpectError - flow does not correctly type this as non optional
-    return destination.client.withMarginAndPadding;
+    return destination.client.withoutPadding;
   })();
 
   const { sourceEdge, destinationEdge } = (() => {
