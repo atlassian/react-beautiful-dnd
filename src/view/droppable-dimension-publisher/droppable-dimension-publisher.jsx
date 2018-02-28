@@ -284,13 +284,13 @@ export default class DroppableDimensionPublisher extends Component<Props> {
         return null;
       }
 
-      const frameClient: Area = getArea(closestScrollable.getBoundingClientRect());
+      const framePaddingBox: Area = getArea(closestScrollable.getBoundingClientRect());
       const scroll: Position = this.getClosestScroll();
       const scrollWidth: number = closestScrollable.scrollWidth;
       const scrollHeight: number = closestScrollable.scrollHeight;
 
       return {
-        frameClient,
+        framePaddingBox,
         scrollWidth,
         scrollHeight,
         scroll,

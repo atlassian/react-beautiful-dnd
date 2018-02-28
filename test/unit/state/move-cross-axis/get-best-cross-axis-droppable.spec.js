@@ -310,7 +310,7 @@ describe('get best cross axis droppable', () => {
           bottom: 80,
         }),
         closest: {
-          frameClient: getArea({
+          framePaddingBox: getArea({
             // not the same top value as source
             top: 20,
             // shares the left edge with the source
@@ -642,7 +642,7 @@ describe('get best cross axis droppable', () => {
           [axis.crossAxisEnd]: 300,
         }),
         closest: {
-          frameClient: getArea({
+          framePaddingBox: getArea({
             [axis.start]: 0,
             [axis.end]: 100,
             // frame hides subject

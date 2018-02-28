@@ -228,7 +228,7 @@ describe('dimension', () => {
           bottom: 300,
           left: 0,
         });
-        const frameClient: Area = getArea({
+        const framePaddingBox: Area = getArea({
           top: 0,
           right: 100,
           bottom: 100,
@@ -240,7 +240,7 @@ describe('dimension', () => {
           paddingBox,
           windowScroll,
           closest: {
-            frameClient,
+            framePaddingBox,
             scrollWidth: 500,
             scrollHeight: 500,
             scroll: { x: 10, y: 10 },
@@ -261,7 +261,7 @@ describe('dimension', () => {
 
         it('should offset the frame client by the window scroll', () => {
           expect(getClosestScrollable(withScrollable).frame).toEqual(
-            getArea(offsetByPosition(frameClient, windowScroll))
+            getArea(offsetByPosition(framePaddingBox, windowScroll))
           );
         });
 
@@ -271,7 +271,7 @@ describe('dimension', () => {
       });
 
       describe('frame clipping', () => {
-        const frameClient = getArea({
+        const framePaddingBox = getArea({
           top: 0,
           left: 0,
           right: 100,
@@ -281,7 +281,7 @@ describe('dimension', () => {
           descriptor: droppableDescriptor,
           paddingBox: subject,
           closest: {
-            frameClient,
+            framePaddingBox,
             scrollWidth: 300,
             scrollHeight: 300,
             scroll: origin,
@@ -295,7 +295,7 @@ describe('dimension', () => {
             paddingBox,
             windowScroll,
             closest: {
-              frameClient,
+              framePaddingBox,
               scrollWidth: 300,
               scrollHeight: 300,
               scroll: origin,
@@ -321,7 +321,7 @@ describe('dimension', () => {
 
             const droppable: DroppableDimension = getWithClient(subject);
 
-            expect(droppable.viewport.clipped).toEqual(frameClient);
+            expect(droppable.viewport.clipped).toEqual(framePaddingBox);
           });
         });
 
@@ -346,19 +346,19 @@ describe('dimension', () => {
             // each of these subjects bleeds out past the frame in one direction
             const subjects: Area[] = [
               getArea({
-                ...frameClient,
+                ...framePaddingBox,
                 top: -10,
               }),
               getArea({
-                ...frameClient,
+                ...framePaddingBox,
                 right: 110,
               }),
               getArea({
-                ...frameClient,
+                ...framePaddingBox,
                 bottom: 110,
               }),
               getArea({
-                ...frameClient,
+                ...framePaddingBox,
                 left: -10,
               }),
             ];
@@ -366,7 +366,7 @@ describe('dimension', () => {
             subjects.forEach((subject: Area) => {
               const droppable: DroppableDimension = getWithClient(subject);
 
-              expect(droppable.viewport.clipped).toEqual(frameClient);
+              expect(droppable.viewport.clipped).toEqual(framePaddingBox);
             });
           });
         });
@@ -387,7 +387,7 @@ describe('dimension', () => {
         right: scrollSize.scrollWidth,
         left: 0,
       });
-      const frameClient = getArea({
+      const framePaddingBox = getArea({
         // only viewing top 100px
         bottom: 100,
         // unchanged
@@ -400,7 +400,7 @@ describe('dimension', () => {
         descriptor: droppableDescriptor,
         paddingBox: subject,
         closest: {
-          frameClient,
+          framePaddingBox,
           scroll: frameScroll,
           scrollWidth: scrollSize.scrollWidth,
           scrollHeight: scrollSize.scrollHeight,
@@ -411,9 +411,9 @@ describe('dimension', () => {
       const closestScrollable: ClosestScrollable = getClosestScrollable(droppable);
 
       // original frame
-      expect(closestScrollable.frame).toEqual(frameClient);
+      expect(closestScrollable.frame).toEqual(framePaddingBox);
       // subject is currently clipped by the frame
-      expect(droppable.viewport.clipped).toEqual(frameClient);
+      expect(droppable.viewport.clipped).toEqual(framePaddingBox);
 
       // scrolling down
       const newScroll: Position = { x: 0, y: 100 };
@@ -421,7 +421,7 @@ describe('dimension', () => {
       const updatedClosest: ClosestScrollable = getClosestScrollable(updated);
 
       // unchanged frame client
-      expect(updatedClosest.frame).toEqual(frameClient);
+      expect(updatedClosest.frame).toEqual(framePaddingBox);
 
       // updated scroll info
       expect(updatedClosest.scroll).toEqual({
@@ -434,8 +434,8 @@ describe('dimension', () => {
         max: getMaxScroll({
           scrollWidth: scrollSize.scrollWidth,
           scrollHeight: scrollSize.scrollHeight,
-          width: frameClient.width,
-          height: frameClient.height,
+          width: framePaddingBox.width,
+          height: framePaddingBox.height,
         }),
       });
 
@@ -461,7 +461,7 @@ describe('dimension', () => {
           bottom: 200,
         }),
         closest: {
-          frameClient: getArea({
+          framePaddingBox: getArea({
             top: 0,
             left: 0,
             right: 100,

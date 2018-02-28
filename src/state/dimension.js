@@ -140,7 +140,7 @@ type GetDroppableArgs = {|
   paddingBox: Area,
   // optionally provided - and can also be null
   closest?: ?{|
-    frameClient: Area,
+    framePaddingBox: Area,
     scrollWidth: number,
     scrollHeight: number,
     scroll: Position,
@@ -182,7 +182,7 @@ export const getDroppableDimension = ({
       return null;
     }
 
-    const frame: Area = getArea(offsetByPosition(closest.frameClient, windowScroll));
+    const frame: Area = getArea(offsetByPosition(closest.framePaddingBox, windowScroll));
 
     const maxScroll: Position = getMaxScroll({
       scrollHeight: closest.scrollHeight,

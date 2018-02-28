@@ -89,7 +89,7 @@ describe('get droppable over', () => {
       }),
       closest: {
         // will partially hide the subject
-        frameClient: getArea({
+        framePaddingBox: getArea({
           top: 0, left: 0, right: 50, bottom: 100,
         }),
         scrollHeight: 100,
@@ -133,7 +133,7 @@ describe('get droppable over', () => {
       closest: {
         // will partially hide the subject
         // will totally hide the subject
-        frameClient: getArea({
+        framePaddingBox: getArea({
           top: 0, left: 101, right: 200, bottom: 100,
         }),
         scrollHeight: 100,
@@ -472,7 +472,7 @@ describe('get droppable over', () => {
               bottom: 120,
             }),
             closest: {
-              frameClient: getArea({
+              framePaddingBox: getArea({
                 top: 0,
                 left: 0,
                 right: 100,
@@ -523,7 +523,7 @@ describe('get droppable over', () => {
               bottom: inHome1.page.marginBox.height - 1,
             }),
             closest: {
-              frameClient: getArea({
+              framePaddingBox: getArea({
                 top: 0,
                 left: 0,
                 right: 100,

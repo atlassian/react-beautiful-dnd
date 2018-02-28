@@ -198,7 +198,7 @@ describe('get closest draggable', () => {
           direction: axis.direction,
           paddingBox,
           closest: {
-            frameClient: getArea(expandByPosition(paddingBox, patch(axis.line, 100))),
+            framePaddingBox: getArea(expandByPosition(paddingBox, patch(axis.line, 100))),
             scrollHeight: paddingBox.width + 100,
             scrollWidth: paddingBox.height + 100,
             scroll: { x: 0, y: 0 },

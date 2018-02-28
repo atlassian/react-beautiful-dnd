@@ -91,7 +91,7 @@ describe('fluid auto scrolling', () => {
           bottom: scrollableScrollSize.scrollHeight,
         }),
         closest: {
-          frameClient: frame,
+          framePaddingBox: frame,
           scrollWidth: scrollableScrollSize.scrollWidth,
           scrollHeight: scrollableScrollSize.scrollHeight,
           scroll: { x: 0, y: 0 },
@@ -1313,7 +1313,7 @@ describe('fluid auto scrolling', () => {
               bottom: 100,
             }),
             closest: {
-              frameClient: getArea({
+              framePaddingBox: getArea({
                 top: 0,
                 left: 0,
                 right: 5000,
@@ -1400,7 +1400,7 @@ describe('fluid auto scrolling', () => {
             bottom: windowScrollSize.scrollHeight,
           }),
           closest: {
-            frameClient: viewport,
+            framePaddingBox: viewport,
             scrollWidth: windowScrollSize.scrollWidth,
             scrollHeight: windowScrollSize.scrollHeight,
             scroll: { x: 0, y: 0 },

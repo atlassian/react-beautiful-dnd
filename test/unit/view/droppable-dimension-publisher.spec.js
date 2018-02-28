@@ -484,7 +484,7 @@ describe('DraggableDimensionPublisher', () => {
             descriptor,
             paddingBox: frame,
             closest: {
-              frameClient: frame,
+              framePaddingBox: frame,
               scrollWidth: frame.width,
               scrollHeight: frame.height,
               scroll: { x: 0, y: 0 },
@@ -529,7 +529,7 @@ describe('DraggableDimensionPublisher', () => {
             descriptor,
             paddingBox,
             closest: {
-              frameClient: frame,
+              framePaddingBox: frame,
               scrollWidth: frame.width,
               scrollHeight: frame.height,
               scroll: { x: 0, y: 0 },
@@ -564,7 +564,7 @@ describe('DraggableDimensionPublisher', () => {
             descriptor,
             paddingBox,
             closest: {
-              frameClient: paddingBox,
+              framePaddingBox: paddingBox,
               scrollWidth: paddingBox.width,
               scrollHeight: paddingBox.height,
               scroll: { x: 0, y: 0 },
@@ -603,7 +603,7 @@ describe('DraggableDimensionPublisher', () => {
           descriptor,
           paddingBox,
           closest: {
-            frameClient: frame,
+            framePaddingBox: frame,
             scrollWidth: frame.width,
             scrollHeight: frame.height,
             scroll: frameScroll,
@@ -638,7 +638,7 @@ describe('DraggableDimensionPublisher', () => {
           descriptor,
           paddingBox,
           closest: {
-            frameClient: frame,
+            framePaddingBox: frame,
             scrollWidth: frame.width,
             scrollHeight: frame.height,
             scroll: { x: 0, y: 0 },

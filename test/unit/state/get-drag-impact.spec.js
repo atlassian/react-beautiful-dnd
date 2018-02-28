@@ -380,7 +380,7 @@ describe('get drag impact', () => {
                 [axis.end]: 200,
               }),
               closest: {
-                frameClient: getArea({
+                framePaddingBox: getArea({
                   [axis.crossAxisStart]: 0,
                   [axis.crossAxisEnd]: 100,
                   [axis.start]: 0,
@@ -1029,7 +1029,7 @@ describe('get drag impact', () => {
                 [axis.end]: 200,
               }),
               closest: {
-                frameClient: getArea({
+                framePaddingBox: getArea({
                   [axis.crossAxisStart]: foreignCrossAxisStart,
                   [axis.crossAxisEnd]: foreignCrossAxisEnd,
                   [axis.start]: 0,

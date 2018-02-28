@@ -117,7 +117,7 @@ describe('is partially visible', () => {
           right: viewport.right,
         }),
         closest: {
-          frameClient: viewport,
+          framePaddingBox: viewport,
           scrollWidth: viewport.width,
           scrollHeight: viewport.bottom + 100,
           scroll: { x: 0, y: 0 },
@@ -198,7 +198,7 @@ describe('is partially visible', () => {
       },
       paddingBox,
       closest: {
-        frameClient: frame,
+        framePaddingBox: frame,
         scrollHeight: paddingBox.height,
         scrollWidth: paddingBox.width,
         scroll: { x: 0, y: 0 },
@@ -286,7 +286,7 @@ describe('is partially visible', () => {
             bottom: 600,
           }),
           closest: {
-            frameClient: getArea(ourFrame),
+            framePaddingBox: getArea(ourFrame),
             scrollHeight: 600,
             scrollWidth: getArea(ourFrame).width,
             scroll: { x: 0, y: 0 },
@@ -373,7 +373,7 @@ describe('is partially visible', () => {
             right: 100,
           }),
           closest: {
-            frameClient: getArea({
+            framePaddingBox: getArea({
               top: 0,
               left: 0,
               bottom: 100,

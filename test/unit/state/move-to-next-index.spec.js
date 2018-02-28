@@ -462,7 +462,7 @@ describe('move to next index', () => {
                   [axis.end]: 400,
                 }),
                 closest: {
-                  frameClient: getArea({
+                  framePaddingBox: getArea({
                     [axis.crossAxisStart]: crossAxisStart,
                     [axis.crossAxisEnd]: crossAxisEnd,
                     [axis.start]: 0,
@@ -1200,7 +1200,7 @@ describe('move to next index', () => {
                   right: 200,
                 }),
                 closest: {
-                  frameClient: getArea({
+                  framePaddingBox: getArea({
                     top: 0,
                     left: 0,
                     right: 100,

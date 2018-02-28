@@ -400,7 +400,7 @@ describe('move to new droppable', () => {
                 [axis.end]: 200,
               }),
               closest: {
-                frameClient: getArea({
+                framePaddingBox: getArea({
                   [axis.crossAxisStart]: 0,
                   [axis.crossAxisEnd]: 100,
                   [axis.start]: 0,
@@ -929,7 +929,7 @@ describe('move to new droppable', () => {
                 bottom: 200,
               }),
               closest: {
-                frameClient: getArea({
+                framePaddingBox: getArea({
                   top: 0,
                   left: 0,
                   right: 100,

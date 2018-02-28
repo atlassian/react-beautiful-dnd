@@ -42,7 +42,7 @@ const scrollable: DroppableDimension = getDroppableDimension({
     bottom: 200,
   }),
   closest: {
-    frameClient: getArea({
+    framePaddingBox: getArea({
       top: 0,
       left: 0,
       right: 100,

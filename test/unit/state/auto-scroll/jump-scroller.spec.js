@@ -214,7 +214,7 @@ describe('jump auto scrolling', () => {
             bottom: scrollableScrollSize.scrollHeight,
           }),
           closest: {
-            frameClient: frame,
+            framePaddingBox: frame,
             scrollWidth: scrollableScrollSize.scrollWidth,
             scrollHeight: scrollableScrollSize.scrollHeight,
             scroll: { x: 0, y: 0 },

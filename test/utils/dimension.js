@@ -59,7 +59,7 @@ export const makeScrollable = (droppable: DroppableDimension, amount?: number = 
     windowScroll,
     paddingBox: newPaddingBox,
     closest: {
-      frameClient: paddingBox,
+      framePaddingBox: paddingBox,
       scrollWidth: scrollSize.width,
       scrollHeight: scrollSize.height,
       scroll: { x: 0, y: 0 },
