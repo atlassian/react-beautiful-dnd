@@ -3,6 +3,7 @@
 import stopEvent from '../util/stop-event';
 import createScheduler from '../util/create-scheduler';
 import getWindowFromRef from '../../get-window-from-ref';
+import createClickBlocker, { type ClickBlocker } from '../util/create-click-blocker';
 import type {
   Position,
 } from '../../../types';
@@ -11,7 +12,6 @@ import type { TouchSensor, CreateSensorArgs } from './sensor-types';
 type State = {
   isDragging: boolean,
   hasMoved: boolean,
-  preventClick: boolean,
   longPressTimerId: ?number,
   pending: ?Position,
 }
@@ -29,7 +29,6 @@ const initial: State = {
   isDragging: false,
   pending: null,
   hasMoved: false,
-  preventClick: false,
   longPressTimerId: null,
 };
 
@@ -50,6 +49,7 @@ export default ({
   const isCapturing = (): boolean =>
     Boolean(state.pending || state.isDragging || state.longPressTimerId);
   const schedule = createScheduler(callbacks);
+  const clickBlocker: ClickBlocker = createClickBlocker();
 
   const startDragging = () => {
     const pending: ?Position = state.pending;
@@ -77,10 +77,8 @@ export default ({
   const stopDragging = (fn?: Function = noop) => {
     schedule.cancel();
     unbindWindowEvents();
-    setState({
-      ...initial,
-      preventClick: true,
-    });
+    clickBlocker.blockNext();
+    setState(initial);
     fn();
   };
 
@@ -100,6 +98,7 @@ export default ({
       isDragging: false,
       hasMoved: false,
     });
+    clickBlocker.reset();
     bindWindowEvents();
   };
 
@@ -272,19 +271,9 @@ export default ({
     }
   };
 
-  const onClick = (event: MouseEvent) => {
-    if (!state.preventClick) {
-      return;
-    }
-
-    stopEvent(event);
-    setState(initial);
-  };
-
   const sensor: TouchSensor = {
     onTouchStart,
     onTouchMove,
-    onClick,
     kill,
     isCapturing,
     isDragging,

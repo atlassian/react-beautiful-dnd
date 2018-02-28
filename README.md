@@ -868,6 +868,8 @@ Unfortunately we are [unable to apply this optimisation for you](https://medium.
 
 `Draggable` components can be dragged around and dropped onto `Droppable`s. A `Draggable` must always be contained within a `Droppable`. It is **possible** to reorder a `Draggable` within its home `Droppable` or move to another `Droppable`. It is **possible** because a `Droppable` is free to control what it allows to be dropped on it.
 
+Every `Draggable` has a *drag handle*. A *drag handle* is the element that the user interacts with in order to drag a `Draggable`. A *drag handle* can be a the `Draggable` element itself, or a child of the `Draggable`.
+
 ```js
 import { Draggable } from 'react-beautiful-dnd';
 
@@ -959,7 +961,6 @@ export type DraggableProps = {|
 
 type DraggableStyle = DraggingStyle | NotDraggingStyle
 type DraggingStyle = {|
-  pointerEvents: 'none',
   position: 'fixed',
   width: number,
   height: number,
@@ -1091,13 +1092,15 @@ It is an assumption that `Draggable`s are *visible siblings* of one another. The
 type DragHandleProps = {|
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
-  onClick: (event: MouseEvent) => void,
+  onTouchStart: (event: TouchEvent) => void,
+  onTouchMove: (event: TouchEvent) => void,
+  'data-react-beautiful-dnd-drag-handle': string,
+  'aria-roledescription': string,
   tabIndex: number,
-  'aria-grabbed': boolean,
   draggable: boolean,
-  onDragStart: () => void,
-  onDrop: () => void,
-|};
+  onDragStart: () => boolean,
+  onDrop: () => boolean
+|}
 ```
 
 ##### `dragHandleProps` Example: standard
@@ -1137,28 +1140,25 @@ Controlling a whole draggable by just a part of it
 </Draggable>;
 ```
 
-##### `dragHandleProps` Monkey patching
+##### `dragHandleProps` monkey patching
 
 You can override some of the `dragHandleProps` props with your own behavior if you need to.
 
 ```js
-const myOnClick = event => console.log('clicked on', event.target);
+const myOnMouseDown = event => console.log('mouse down on', event.target);
 
 <Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => {
-    const onClick = (() => {
+    const onMouseDown = (() => {
       // dragHandleProps might be null
       if (!provided.dragHandleProps) {
-        return myOnClick;
+        return onMouseDown;
       }
 
-      // creating a new onClick function that calls my onClick
-      // event as well as the provided one.
-      return event => {
-        provided.dragHandleProps.onClick(event);
-        // You may want to check if event.defaultPrevented
-        // is true and optionally fire your handler
-        myOnClick(event);
+      // creating a new onMouseDown function that calls myOnMouseDown as well as the drag handle one.
+      return (event) => {
+        provided.dragHandleProps.onMouseDown(event);
+        myOnMouseDown(event);
       };
     })();
 
@@ -1168,7 +1168,7 @@ const myOnClick = event => console.log('clicked on', event.target);
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          onClick={onClick}
+          onMouseDown={onMouseDown}
         >
           Drag me!
         </div>
@@ -1233,6 +1233,10 @@ The `children` function is also provided with a small amount of state relating t
   }}
 </Draggable>;
 ```
+
+### Adding an `onClick` handler to a `Draggable` or a *drag handle*
+
+You are welcome to add your own `onClick` handler to a `Draggable` or a *drag handle* (which might be the same element). `onClick` events handlers will only be called if we do not block the click. We block click events from occurring when the user was dragging an item. See [#sloppy-clicks-and-click-blocking-](sloppy clicks and click blocking) for more information.
 
 ### Interactive child elements within a `Draggable`
 
@@ -1335,7 +1339,6 @@ export type DraggableProps = {|
 |}
 type DraggableStyle = DraggingStyle | NotDraggingStyle
 type DraggingStyle = {|
-  pointerEvents: 'none',
   position: 'fixed',
   width: number,
   height: number,
@@ -1352,14 +1355,15 @@ type NotDraggingStyle = {|
   transition: ?string,
   transition: null | 'none',
 |}
-type DragHandleProvided = {|
+
+type DragHandleProps = {|
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
-  onClick: (event: MouseEvent) => void,
   onTouchStart: (event: TouchEvent) => void,
   onTouchMove: (event: TouchEvent) => void,
-  tabIndex: number,
+  'data-react-beautiful-dnd-drag-handle': string,
   'aria-roledescription': string,
+  tabIndex: number,
   draggable: boolean,
   onDragStart: () => boolean,
   onDrop: () => boolean
