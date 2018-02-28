@@ -139,14 +139,14 @@ export type DroppableDimension = {|
     withMargin: Area,
     withoutMargin: Area,
     // the area in which content presses up against
-    withMarginAndPadding: Area,
+    withoutPadding: Area,
   |},
   // relative to the whole page
   page: {|
     withMargin: Area,
     withoutMargin: Area,
     // the area in which content presses up against
-    withMarginAndPadding: Area,
+    withoutPadding: Area,
   |},
   // The container of the droppable
   viewport: DroppableDimensionViewport,

@@ -29,6 +29,15 @@ export const expandBySpacing = (spacing1: Spacing, spacing2: Spacing): Spacing =
   right: spacing1.right + spacing2.right,
 });
 
+export const shrinkBySpacing = (spacing1: Spacing, spacing2: Spacing): Spacing => ({
+  // pushing forward to descrease size
+  top: spacing1.top + spacing2.top,
+  left: spacing1.left + spacing2.left,
+  // pulling backwards to descrease size
+  bottom: spacing1.bottom - spacing2.bottom,
+  right: spacing1.right - spacing2.right,
+});
+
 export const isEqual = (spacing1: Spacing, spacing2: Spacing): boolean => (
   spacing1.top === spacing2.top &&
   spacing1.right === spacing2.right &&
