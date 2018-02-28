@@ -18,7 +18,8 @@
   "main": "lib/index.js",
   "files": [
     "/lib",
-    "/dist"
+    "/dist",
+    "/src"
   ],
   "scripts": {
     "test": "jest --config ./jest.config.js",
@@ -29,7 +30,7 @@
     "build:clean": "rimraf lib && rimraf dist",
     "build:dist": "rollup -c && cross-env NODE_ENV=min rollup -c",
     "build:lib": "cross-env NODE_ENV=cjs babel src -d lib",
-    "build:flow": "flow-copy-source --verbose src lib",
+    "build:flow": "echo \"// @flow\n\nexport * from '../src';\" > lib/index.js.flow",
     "storybook": "start-storybook -p 9002",
     "build-storybook": "build-storybook -c .storybook -o site",
     "prepublish": "yarn run build"
@@ -70,7 +71,6 @@
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.5.1",
     "flow-bin": "0.61.0",
-    "flow-copy-source": "^1.2.1",
     "jest": "^22.0.5",
     "raf-stub": "^2.0.1",
     "react": "^15.6.2",
