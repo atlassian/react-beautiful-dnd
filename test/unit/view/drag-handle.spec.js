@@ -98,6 +98,7 @@ class Child extends Component<{ dragHandleProps: ?DragHandleProps}> {
 const windowMouseUp = dispatchWindowMouseEvent.bind(null, 'mouseup');
 const windowMouseDown = dispatchWindowMouseEvent.bind(null, 'mousedown');
 const windowMouseMove = dispatchWindowMouseEvent.bind(null, 'mousemove');
+const windowMouseClick = dispatchWindowMouseEvent.bind(null, 'click');
 const mouseDown = mouseEvent.bind(null, 'mousedown');
 const click = mouseEvent.bind(null, 'click');
 // keyboard events
@@ -139,6 +140,22 @@ const wasEventStopped = (mockEvent: MockEvent): boolean =>
     mockEvent.stopPropagation.mock.calls.length
   );
 
+const isAWindowClickBlocked = (): boolean => {
+  jest.spyOn(Event.prototype, 'preventDefault');
+  jest.spyOn(Event.prototype, 'stopPropagation');
+
+  const event: Event = windowMouseClick();
+
+  const result: boolean =
+    event.preventDefault.mock.calls.length === 1 &&
+    event.stopPropagation.mock.calls.length === 1;
+
+  Event.prototype.preventDefault.mockRestore();
+  Event.prototype.stopPropagation.mockRestore();
+
+  return result;
+};
+
 describe('drag handle', () => {
   let callbacks: Callbacks;
   let wrapper: ReactWrapper;
@@ -156,6 +173,7 @@ describe('drag handle', () => {
 
   beforeAll(() => {
     requestAnimationFrame.reset();
+    jest.useFakeTimers();
     jest.spyOn(fakeDraggableRef, 'getBoundingClientRect').mockImplementation(() => getArea({
       left: 0,
       top: 0,
@@ -188,6 +206,10 @@ describe('drag handle', () => {
   afterEach(() => {
     wrapper.unmount();
     console.error.mockRestore();
+
+    // we need to run all timers rather than clear them as the
+    // post drag click blocking needs to be cleared
+    jest.runAllTimers();
   });
 
   afterAll(() => {
@@ -806,8 +828,6 @@ describe('drag handle', () => {
 
     describe('post drag click prevention', () => {
       it('should prevent clicks after a successful drag', () => {
-        const mock = jest.fn();
-
         mouseDown(wrapper);
         windowMouseMove({ x: 0, y: sloppyClickThreshold });
         windowMouseUp({ x: 0, y: sloppyClickThreshold });
@@ -816,13 +836,11 @@ describe('drag handle', () => {
           onDrop: 1,
         })).toBe(true);
 
-        click(wrapper, origin, primaryButton, { preventDefault: mock });
-        expect(mock).toHaveBeenCalled();
+        // post drag click
+        expect(isAWindowClickBlocked()).toBe(true);
       });
 
       it('should prevent clicks after a drag was cancelled', () => {
-        const mock = jest.fn();
-
         mouseDown(wrapper);
         windowMouseMove({ x: 0, y: sloppyClickThreshold });
         windowEscape();
@@ -831,13 +849,10 @@ describe('drag handle', () => {
           onCancel: 1,
         })).toBe(true);
 
-        click(wrapper, origin, primaryButton, { preventDefault: mock });
-        expect(mock).toHaveBeenCalled();
+        expect(isAWindowClickBlocked()).toBe(true);
       });
 
       it('should not prevent a click if the sloppy click threshold was not exceeded', () => {
-        const mock = jest.fn();
-
         mouseDown(wrapper);
         windowMouseMove({ x: 0, y: sloppyClickThreshold - 1 });
         windowMouseUp({ x: 0, y: sloppyClickThreshold - 1 });
@@ -847,8 +862,47 @@ describe('drag handle', () => {
           onDrop: 0,
         })).toBe(true);
 
-        click(wrapper, origin, primaryButton, { preventDefault: mock });
-        expect(mock).not.toHaveBeenCalled();
+        expect(isAWindowClickBlocked()).toBe(false);
+      });
+
+      describe('timeout management', () => {
+        // This is to guard against the case where a click does not
+        // actually fire on the element after a drag. We do not
+        // want to block other clicks
+        it('should not block a click after a timeout', () => {
+          mouseDown(wrapper);
+          windowMouseMove({ x: 0, y: sloppyClickThreshold });
+          windowEscape();
+          expect(callbacksCalled(callbacks)({
+            onLift: 1,
+            onCancel: 1,
+          })).toBe(true);
+
+          // a single tick
+          jest.runTimersToTime(1);
+
+          expect(isAWindowClickBlocked()).toBe(false);
+        });
+
+        it('should not interfer with a new click', () => {
+          mouseDown(wrapper);
+          windowMouseMove({ x: 0, y: sloppyClickThreshold });
+          windowEscape();
+          expect(callbacksCalled(callbacks)({
+            onLift: 1,
+            onCancel: 1,
+          })).toBe(true);
+
+          // beginning a new drag
+          mouseDown(wrapper);
+
+          // a single tick
+          jest.runTimersToTime(1);
+
+          // a click should not really occur like this - but checking
+          // that we are not blocking it
+          expect(isAWindowClickBlocked()).toBe(false);
+        });
       });
 
       describe('subsequent interactions', () => {
@@ -861,20 +915,32 @@ describe('drag handle', () => {
             onDrop: 1,
           })).toBe(true);
 
-          const mock1 = jest.fn();
-          click(wrapper, origin, primaryButton, { preventDefault: mock1 });
-          expect(mock1).toHaveBeenCalled();
-
-          const mock2 = jest.fn();
-          click(wrapper, origin, primaryButton, { preventDefault: mock2 });
-          expect(mock2).not.toHaveBeenCalled();
+          // first click is blocked
+          expect(isAWindowClickBlocked()).toBe(true);
+          // second click is not blocked
+          expect(isAWindowClickBlocked()).toBe(false);
         });
       });
     });
 
     describe('disabled mid drag', () => {
-      it.skip('should cancel a pending drag', () => {
+      it('should cancel a pending drag', () => {
+        // lift
+        mouseDown(wrapper);
 
+        expect(callbacksCalled(callbacks)({
+          onLift: 0,
+        })).toBe(true);
+
+        wrapper.setProps({ isEnabled: false });
+
+        // would normally be enough to start a drag
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 0,
+          onCancel: 0,
+        })).toBe(true);
       });
 
       it('should cancel an existing drag', () => {
@@ -1098,11 +1164,6 @@ describe('drag handle', () => {
       describe('non error scenarios', () => {
         beforeEach(() => {
           setForceDownThreshold(mouseForcePressThreshold);
-          jest.useFakeTimers();
-        });
-
-        afterEach(() => {
-          jest.useRealTimers();
         });
 
         it('should not cancel a pending drag if the press is not a force press', () => {
@@ -1748,15 +1809,6 @@ describe('drag handle', () => {
   });
 
   describe('touch dragging', () => {
-    beforeEach(() => {
-      jest.useFakeTimers();
-    });
-
-    afterEach(() => {
-      jest.clearAllTimers();
-      jest.useRealTimers();
-    });
-
     const start = () => {
       touchStart(wrapper, origin);
       jest.runTimersToTime(timeForLongPress);
@@ -2249,47 +2301,45 @@ describe('drag handle', () => {
 
     describe('click prevention', () => {
       it('should prevent a click if a drag has occurred', () => {
-        const mockEvent: MockEvent = createMockEvent();
-
         start();
         end();
-        click(wrapper, origin, primaryButton, mockEvent);
 
-        expect(mockEvent.preventDefault).toHaveBeenCalled();
+        expect(isAWindowClickBlocked()).toBe(true);
       });
 
       it('should not prevent a click if no drag has occurred', () => {
-        const mockEvent: MockEvent = createMockEvent();
-
         touchStart(wrapper);
         // drag has not started yet
         expect(callbacks.onLift).not.toHaveBeenCalled();
         // drag ended
         end();
         // then a click
-        click(wrapper, origin, primaryButton, mockEvent);
-
-        expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+        expect(isAWindowClickBlocked()).toBe(false);
       });
 
       it('should only prevent a single click', () => {
-        const mockEvent: MockEvent = createMockEvent();
-
         start();
         end();
 
         // first click blocked
-        click(wrapper, origin, primaryButton, mockEvent);
-        expect(mockEvent.preventDefault).toHaveBeenCalledTimes(1);
+        expect(isAWindowClickBlocked()).toBe(true);
 
         // second click not blocked
-        click(wrapper, origin, primaryButton, mockEvent);
-        expect(mockEvent.preventDefault).toHaveBeenCalledTimes(1);
+        expect(isAWindowClickBlocked()).toBe(false);
+      });
+
+      it('should not prevent a click after a timeout', () => {
+        start();
+        end();
+
+        // a single tick
+        jest.runTimersToTime(1);
+
+        // click is not blocked now
+        expect(isAWindowClickBlocked()).toBe(false);
       });
 
       it('should not prevent clicks on subsequent unsuccessful drags', () => {
-        const mockEvent: MockEvent = createMockEvent();
-
         // first drag
         start();
         end();
@@ -2308,8 +2358,7 @@ describe('drag handle', () => {
         })).toBe(true);
 
         // click after unsuccessful drag is not blocked
-        click(wrapper, origin, primaryButton, mockEvent);
-        expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+        expect(isAWindowClickBlocked()).toBe(false);
       });
     });
 
@@ -2360,6 +2409,7 @@ describe('drag handle', () => {
   describe('generic', () => {
     type Control = {|
       name: string,
+      hasPostDragClickBlocking: boolean,
       preLift: (wrap?: ReactWrapper, options?: Object) => void,
       lift: (wrap?: ReactWrapper, options?: Object) => void,
       end: (wrap?: ReactWrapper) => void,
@@ -2377,6 +2427,7 @@ describe('drag handle', () => {
 
     const touch: Control = {
       name: 'touch',
+      hasPostDragClickBlocking: true,
       preLift: (wrap?: ReactWrapper = wrapper, options?: Object = {}) =>
         touchStart(wrap, origin, 0, options),
       lift: (wrap?: ReactWrapper = wrapper) => {
@@ -2390,6 +2441,7 @@ describe('drag handle', () => {
 
     const keyboard: Control = {
       name: 'keyboard',
+      hasPostDragClickBlocking: false,
       // no pre lift required
       preLift: () => {},
       lift: (wrap?: ReactWrapper = wrapper, options?: Object = {}) => {
@@ -2406,6 +2458,7 @@ describe('drag handle', () => {
 
     const mouse: Control = {
       name: 'mouse',
+      hasPostDragClickBlocking: true,
       preLift: (wrap?: ReactWrapper = wrapper, options?: Object = {}) =>
         mouseDown(wrap, origin, primaryButton, options),
       lift: (wrap?: ReactWrapper = wrapper) => {
@@ -2418,14 +2471,6 @@ describe('drag handle', () => {
     };
 
     const controls: Control[] = [mouse, keyboard, touch];
-
-    beforeEach(() => {
-      jest.useFakeTimers();
-    });
-
-    afterEach(() => {
-      jest.useRealTimers();
-    });
 
     controls.forEach((control: Control) => {
       describe(`control: ${control.name}`, () => {
@@ -2446,12 +2491,24 @@ describe('drag handle', () => {
             // ending the drag
             control.end();
 
-            expect(window.addEventListener.mock.calls.length)
-              .toBe(window.removeEventListener.mock.calls.length);
-
             // validation
             expect(window.addEventListener.mock.calls.length).toBeGreaterThan(1);
             expect(window.removeEventListener.mock.calls.length).toBeGreaterThan(1);
+
+            if (!control.hasPostDragClickBlocking) {
+              expect(window.addEventListener.mock.calls.length)
+                .toBe(window.removeEventListener.mock.calls.length);
+            } else {
+              // we have added a post drag listener after the drag
+              expect(window.addEventListener.mock.calls.length)
+                .toBe(window.removeEventListener.mock.calls.length + 1);
+
+              // single tick to flush post drag click handler
+              jest.runTimersToTime(1);
+
+              expect(window.addEventListener.mock.calls.length)
+                .toBe(window.removeEventListener.mock.calls.length);
+            }
 
             // cleanup
             window.addEventListener.mockRestore();

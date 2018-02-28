@@ -25,9 +25,6 @@ export type DragHandleProps = {|
   onTouchStart: (event: TouchEvent) => void,
   onTouchMove: (event: TouchEvent) => void,
 
-  // Conditionally block clicks
-  onClick: (event: MouseEvent) => void,
-
   // Control styling from style marshal
   'data-react-beautiful-dnd-drag-handle': string,
 
