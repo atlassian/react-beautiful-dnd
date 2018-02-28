@@ -130,23 +130,42 @@ export type DroppableDimensionViewport = {|
   clipped: ?Area,
 |}
 
+// Maps to the CSS box model
+// https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model/Introduction_to_the_CSS_box_model
+type BoxModel = {|
+  // the element with margin added (outer)
+  marginBox: Area,
+  // the element inclusive of padding but without margin
+  paddingBox: Area,
+  // the element without margin or padding (inner)
+  contentBox: Area,
+|}
+
+/*
+------------------------------
+|           MARGIN           |  (marginBox)
+|  ------------------------  |               => this is where the border of the element will be
+|  |       PADDING        |  |  (paddingBox)
+|  |  ------------------  |  |
+|  |  |    CONTENT     |  |  |  (contentBox)
+|  |  |                |  |  |
+|  |  |                |  |  |
+|  |  |                |  |  |
+|  |  ------------------  |  |
+|  |                      |  |
+|  ------------------------  |
+|                            |
+------------------------------
+*/
+
 export type DroppableDimension = {|
   descriptor: DroppableDescriptor,
   axis: Axis,
   isEnabled: boolean,
   // relative to the current viewport
-  client: {|
-    marginBox: Area,
-    paddingBox: Area,
-    contentBox: Area,
-  |},
+  client: BoxModel,
   // relative to the whole page
-  page: {|
-    marginBox: Area,
-    paddingBox: Area,
-    // the area in which content presses up against
-    contentBox: Area,
-  |},
+  page: BoxModel,
   // The container of the droppable
   viewport: DroppableDimensionViewport,
 |}
