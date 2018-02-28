@@ -75,10 +75,7 @@ export type Axis = VerticalAxis | HorizontalAxis
 export type Placeholder = {|
   // We apply the margin separately to maintain margin collapsing
   // behavior of the original element
-  paddingBox: {|
-    height: number,
-    width: number,
-  |},
+  paddingBox: Area,
   margin: Spacing,
 |}
 
@@ -132,7 +129,7 @@ export type DroppableDimensionViewport = {|
 
 // Maps to the CSS box model
 // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model/Introduction_to_the_CSS_box_model
-type BoxModel = {|
+export type BoxModel = {|
   // the element with margin added (outer)
   marginBox: Area,
   // the element inclusive of padding but without margin

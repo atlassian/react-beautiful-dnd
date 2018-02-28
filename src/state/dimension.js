@@ -15,6 +15,7 @@ import type {
   Area,
   DroppableDimensionViewport,
   ClosestScrollable,
+  BoxModel,
 } from '../types';
 
 const origin: Position = { x: 0, y: 0 };
@@ -28,37 +29,34 @@ export const noSpacing: Spacing = {
 
 type GetDraggableArgs = {|
   descriptor: DraggableDescriptor,
-  client: Area,
+  paddingBox: Area,
   margin?: Spacing,
   windowScroll?: Position,
 |};
 
 export const getDraggableDimension = ({
   descriptor,
-  client,
+  paddingBox,
   margin = noSpacing,
   windowScroll = origin,
 }: GetDraggableArgs): DraggableDimension => {
-  const withScroll = offsetByPosition(client, windowScroll);
+  const pagePaddingBox = offsetByPosition(paddingBox, windowScroll);
 
   const dimension: DraggableDimension = {
     descriptor,
     placeholder: {
       margin,
-      paddingBox: {
-        width: client.width,
-        height: client.height,
-      },
+      paddingBox,
     },
     // on the viewport
     client: {
-      paddingBox: getArea(client),
-      marginBox: getArea(expandBySpacing(client, margin)),
+      paddingBox: getArea(paddingBox),
+      marginBox: getArea(expandBySpacing(paddingBox, margin)),
     },
     // with scroll
     page: {
-      paddingBox: getArea(withScroll),
-      marginBox: getArea(expandBySpacing(withScroll, margin)),
+      paddingBox: getArea(pagePaddingBox),
+      marginBox: getArea(expandBySpacing(pagePaddingBox, margin)),
     },
   };
 
@@ -139,7 +137,7 @@ export const scrollDroppable = (
 
 type GetDroppableArgs = {|
   descriptor: DroppableDescriptor,
-  client: Area,
+  paddingBox: Area,
   // optionally provided - and can also be null
   closest?: ?{|
     frameClient: Area,
@@ -159,7 +157,7 @@ type GetDroppableArgs = {|
 
 export const getDroppableDimension = ({
   descriptor,
-  client,
+  paddingBox,
   closest,
   direction = 'vertical',
   margin = noSpacing,
@@ -167,9 +165,17 @@ export const getDroppableDimension = ({
   windowScroll = origin,
   isEnabled = true,
 }: GetDroppableArgs): DroppableDimension => {
-  const marginBox: Spacing = expandBySpacing(client, margin);
-  const withWindowScroll: Spacing = offsetByPosition(client, windowScroll);
-  const subject: Area = getArea(expandBySpacing(withWindowScroll, margin));
+  const client: BoxModel = {
+    paddingBox,
+    marginBox: getArea(expandBySpacing(paddingBox, margin)),
+    contentBox: getArea(shrinkBySpacing(paddingBox, padding)),
+  };
+  const page: BoxModel = {
+    marginBox: getArea(offsetByPosition(client.marginBox, windowScroll)),
+    paddingBox: getArea(offsetByPosition(client.paddingBox, windowScroll)),
+    contentBox: getArea(offsetByPosition(client.contentBox, windowScroll)),
+  };
+  const subject: Area = page.marginBox;
 
   const closestScrollable: ?ClosestScrollable = (() => {
     if (!closest) {
@@ -213,23 +219,12 @@ export const getDroppableDimension = ({
     clipped,
   };
 
-  const contentBox: Spacing = shrinkBySpacing(client, padding);
-
   const dimension: DroppableDimension = {
     descriptor,
     isEnabled,
     axis: direction === 'vertical' ? vertical : horizontal,
-    client: {
-      paddingBox: getArea(client),
-      marginBox: getArea(marginBox),
-      contentBox: getArea(contentBox),
-    },
-    page: {
-      paddingBox: getArea(withWindowScroll),
-      marginBox: subject,
-      contentBox:
-        getArea(offsetByPosition(contentBox, windowScroll)),
-    },
+    client,
+    page,
     viewport,
   };
 

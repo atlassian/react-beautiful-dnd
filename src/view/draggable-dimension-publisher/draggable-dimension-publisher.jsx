@@ -113,11 +113,11 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
     // We do not need to worry about 'box-sizing' because getBoundingClientRect already
     // takes that into account
-    const client: Area = getArea(targetRef.getBoundingClientRect());
+    const paddingBox: Area = getArea(targetRef.getBoundingClientRect());
 
     const dimension: DraggableDimension = getDraggableDimension({
       descriptor,
-      client,
+      paddingBox,
       margin,
       windowScroll: getWindowScroll(),
     });
