@@ -366,12 +366,6 @@ point-events: none;
 
 **Styles applied using the `data-react-beautiful-dnd-draggable` attribute**
 
-We apply a cursor while dragging to give user feedback that a drag is occurring. You are welcome to override this by applying your own cursor to the element with a greater specificity.
-
-```css
-cursor: grabbing;
-```
-
 This is what we use to control `Draggable`s that need to move out of the way of a dragging `Draggable`.
 
 ```css
@@ -384,7 +378,7 @@ This is described by the type [`DraggableStyle`](https://github.com/atlassian/re
 
 #### (Phase: dragging): body element
 
-We apply a cursor while dragging to give user feedback that a drag is occurring. You are welcome to override this. A good point to do this is the `onDragStart` event. This style is applied on both the `drag handle` as well as the `body`. We apply it to the `body` in case the user pointer *slips* off the `drag handle` during a drag. This is possible as we throttle movements into request animation frames.
+We apply a cursor while dragging to give user feedback that a drag is occurring. You are welcome to override this. A good point to do this is the `onDragStart` event.
 
 ```css
 cursor: grabbing;
