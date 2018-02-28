@@ -868,6 +868,8 @@ Unfortunately we are [unable to apply this optimisation for you](https://medium.
 
 `Draggable` components can be dragged around and dropped onto `Droppable`s. A `Draggable` must always be contained within a `Droppable`. It is **possible** to reorder a `Draggable` within its home `Droppable` or move to another `Droppable`. It is **possible** because a `Droppable` is free to control what it allows to be dropped on it.
 
+Every `Draggable` has a *drag handle*. A *drag handle* is the element that the user interacts with in order to drag a `Draggable`. A *drag handle* can be a the `Draggable` element itself, or a child of the `Draggable`.
+
 ```js
 import { Draggable } from 'react-beautiful-dnd';
 
@@ -1135,7 +1137,7 @@ Controlling a whole draggable by just a part of it
 </Draggable>;
 ```
 
-##### `dragHandleProps` Monkey patching
+##### `dragHandleProps` monkey patching
 
 You can override some of the `dragHandleProps` props with your own behavior if you need to.
 
@@ -1228,6 +1230,10 @@ The `children` function is also provided with a small amount of state relating t
   }}
 </Draggable>;
 ```
+
+### Adding an `onClick` handler to a `Draggable` or a *drag handle*
+
+You are welcome to add your own `onClick` handler to a `Draggable` or a *drag handle* (which might be the same element). `onClick` events handlers will only be called if we do not block the click. We block click events from occurring when the user was dragging an item. See [#sloppy-clicks-and-click-blocking-](sloppy clicks and click blocking) for more information.
 
 ### Interactive child elements within a `Draggable`
 
