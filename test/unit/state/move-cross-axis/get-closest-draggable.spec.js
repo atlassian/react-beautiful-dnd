@@ -22,7 +22,7 @@ describe('get closest draggable', () => {
       const crossAxisStart: number = 0;
       const crossAxisEnd: number = 20;
 
-      const client: Area = getArea({
+      const paddingBox: Area = getArea({
         [axis.start]: start,
         [axis.end]: end,
         [axis.crossAxisStart]: crossAxisStart,
@@ -35,7 +35,7 @@ describe('get closest draggable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        client,
+        paddingBox,
       });
 
       const hiddenBackwards: DraggableDimension = getDraggableDimension({
@@ -44,7 +44,7 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 0,
         },
-        client: getArea({
+        paddingBox: getArea({
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: -30, // -10
@@ -59,7 +59,7 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 1,
         },
-        client: getArea({
+        paddingBox: getArea({
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: -10, // -10
@@ -73,7 +73,7 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 2,
         },
-        client: getArea({
+        paddingBox: getArea({
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: 20,
@@ -87,7 +87,7 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 3,
         },
-        client: getArea({
+        paddingBox: getArea({
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: 40,
@@ -102,7 +102,7 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 4,
         },
-        client: getArea({
+        paddingBox: getArea({
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: 60,
@@ -117,7 +117,7 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 5,
         },
-        client: getArea({
+        paddingBox: getArea({
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: 120,
@@ -132,7 +132,7 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 6,
         },
-        client: getArea({
+        paddingBox: getArea({
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: viewport[axis.end] + 1,
@@ -196,11 +196,11 @@ describe('get closest draggable', () => {
         const scrollable: DroppableDimension = getDroppableDimension({
           descriptor: droppable.descriptor,
           direction: axis.direction,
-          client,
+          paddingBox,
           closest: {
-            frameClient: getArea(expandByPosition(client, patch(axis.line, 100))),
-            scrollHeight: client.width + 100,
-            scrollWidth: client.height + 100,
+            frameClient: getArea(expandByPosition(paddingBox, patch(axis.line, 100))),
+            scrollHeight: paddingBox.width + 100,
+            scrollWidth: paddingBox.height + 100,
             scroll: { x: 0, y: 0 },
             shouldClipSubject: true,
           },

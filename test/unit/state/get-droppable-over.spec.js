@@ -84,7 +84,7 @@ describe('get droppable over', () => {
         id: 'partially hidden subject',
         type: 'TYPE',
       },
-      client: getArea({
+      paddingBox: getArea({
         top: 0, left: 0, right: 100, bottom: 100,
       }),
       closest: {
@@ -104,7 +104,7 @@ describe('get droppable over', () => {
         droppableId: droppable.descriptor.type,
         index: 0,
       },
-      client: getArea({
+      paddingBox: getArea({
         top: 0, left: 0, right: 50, bottom: 50,
       }),
     });
@@ -127,7 +127,7 @@ describe('get droppable over', () => {
         id: 'hidden subject',
         type: 'TYPE',
       },
-      client: getArea({
+      paddingBox: getArea({
         top: 0, left: 0, right: 100, bottom: 100,
       }),
       closest: {
@@ -148,7 +148,7 @@ describe('get droppable over', () => {
         droppableId: droppable.descriptor.type,
         index: 0,
       },
-      client: getArea({
+      paddingBox: getArea({
         top: 0, left: 0, right: 50, bottom: 50,
       }),
     });
@@ -168,7 +168,7 @@ describe('get droppable over', () => {
     const margin: Spacing = {
       top: 10, right: 10, bottom: 10, left: 10,
     };
-    const droppableClient: Area = getArea({
+    const droppablePaddingBox: Area = getArea({
       top: 10,
       left: 10,
       right: 90,
@@ -179,7 +179,7 @@ describe('get droppable over', () => {
         id: 'home',
         type: 'TYPE',
       },
-      client: droppableClient,
+      paddingBox: droppablePaddingBox,
       margin,
     });
     const inHome1: DraggableDimension = getDraggableDimension({
@@ -188,7 +188,7 @@ describe('get droppable over', () => {
         droppableId: home.descriptor.id,
         index: 0,
       },
-      client: getArea({
+      paddingBox: getArea({
         top: 10,
         left: 10,
         right: 90,
@@ -203,7 +203,7 @@ describe('get droppable over', () => {
         droppableId: 'foreign',
         index: 0,
       },
-      client: getArea({
+      paddingBox: getArea({
         // to the right of inHome1
         left: 200,
         right: 250,
@@ -360,7 +360,7 @@ describe('get droppable over', () => {
                 id: 'empty',
                 type: 'TYPE',
               },
-              client: getArea({
+              paddingBox: getArea({
                 top: 1000,
                 left: 1000,
                 right: 2000,
@@ -409,7 +409,7 @@ describe('get droppable over', () => {
                 id: 'empty',
                 type: 'TYPE',
               },
-              client: getArea({
+              paddingBox: getArea({
                 top: 1000,
                 left: 1000,
                 right: 2000,
@@ -464,7 +464,7 @@ describe('get droppable over', () => {
               id: 'has-a-scroll-parent',
               type: 'TYPE',
             },
-            client: getArea({
+            paddingBox: getArea({
               top: 0,
               left: 0,
               right: 100,
@@ -515,7 +515,7 @@ describe('get droppable over', () => {
               id: 'my-custom-foreign',
               type: 'TYPE',
             },
-            client: getArea({
+            paddingBox: getArea({
               top: 0,
               left: 0,
               right: 100,

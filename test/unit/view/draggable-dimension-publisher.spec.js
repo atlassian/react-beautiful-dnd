@@ -216,7 +216,7 @@ describe('DraggableDimensionPublisher', () => {
           droppableId: preset.home.descriptor.id,
           index: 10,
         },
-        client: getArea({
+        paddingBox: getArea({
           top: 0,
           right: 100,
           bottom: 100,
@@ -264,7 +264,7 @@ describe('DraggableDimensionPublisher', () => {
           droppableId: preset.home.descriptor.id,
           index: 10,
         },
-        client: getArea({
+        paddingBox: getArea({
           top: 0,
           right: 100,
           bottom: 100,
@@ -314,7 +314,7 @@ describe('DraggableDimensionPublisher', () => {
         x: 100,
         y: 200,
       };
-      const client: Area = getArea({
+      const paddingBox: Area = getArea({
         top: 0,
         right: 100,
         bottom: 100,
@@ -326,10 +326,10 @@ describe('DraggableDimensionPublisher', () => {
           droppableId: preset.home.descriptor.id,
           index: 10,
         },
-        client,
+        paddingBox,
         windowScroll,
       });
-      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => client);
+      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => paddingBox);
       jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noSpacing);
       setWindowScroll(windowScroll);
 

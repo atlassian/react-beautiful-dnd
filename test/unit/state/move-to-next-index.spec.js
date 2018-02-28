@@ -455,7 +455,7 @@ describe('move to next index', () => {
                   type: 'TYPE',
                 },
                 direction: axis.direction,
-                client: getArea({
+                paddingBox: getArea({
                   [axis.crossAxisStart]: crossAxisStart,
                   [axis.crossAxisEnd]: crossAxisEnd,
                   [axis.start]: 0,
@@ -485,7 +485,7 @@ describe('move to next index', () => {
                   droppableId: home.descriptor.id,
                   index: 0,
                 },
-                client: getArea({
+                paddingBox: getArea({
                   [axis.crossAxisStart]: crossAxisStart,
                   [axis.crossAxisEnd]: crossAxisEnd,
                   [axis.start]: 0,
@@ -499,7 +499,7 @@ describe('move to next index', () => {
                   droppableId: home.descriptor.id,
                   index: 1,
                 },
-                client: getArea({
+                paddingBox: getArea({
                   [axis.crossAxisStart]: crossAxisStart,
                   [axis.crossAxisEnd]: crossAxisEnd,
                   [axis.start]: 50,
@@ -513,7 +513,7 @@ describe('move to next index', () => {
                   droppableId: home.descriptor.id,
                   index: 2,
                 },
-                client: getArea({
+                paddingBox: getArea({
                   [axis.crossAxisStart]: crossAxisStart,
                   [axis.crossAxisEnd]: crossAxisEnd,
                   [axis.start]: 100,
@@ -527,7 +527,7 @@ describe('move to next index', () => {
                   droppableId: home.descriptor.id,
                   index: 3,
                 },
-                client: getArea({
+                paddingBox: getArea({
                   [axis.crossAxisStart]: crossAxisStart,
                   [axis.crossAxisEnd]: crossAxisEnd,
                   [axis.start]: 200,
@@ -541,7 +541,7 @@ describe('move to next index', () => {
                   droppableId: home.descriptor.id,
                   index: 4,
                 },
-                client: getArea({
+                paddingBox: getArea({
                   [axis.crossAxisStart]: crossAxisStart,
                   [axis.crossAxisEnd]: crossAxisEnd,
                   [axis.start]: 300,
@@ -555,7 +555,7 @@ describe('move to next index', () => {
                   droppableId: home.descriptor.id,
                   index: 5,
                 },
-                client: getArea({
+                paddingBox: getArea({
                   [axis.crossAxisStart]: crossAxisStart,
                   [axis.crossAxisEnd]: crossAxisEnd,
                   [axis.start]: 350,
@@ -1016,7 +1016,7 @@ describe('move to next index', () => {
                 type: 'huge',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 top: 0,
                 right: 10000,
                 bottom: 10000,
@@ -1031,7 +1031,7 @@ describe('move to next index', () => {
                   index: 0,
                   droppableId: droppable.descriptor.id,
                 },
-                client: customViewport,
+                paddingBox: customViewport,
               });
               const outsideViewport: DraggableDimension = getDraggableDimension({
                 descriptor: {
@@ -1039,7 +1039,7 @@ describe('move to next index', () => {
                   index: 1,
                   droppableId: droppable.descriptor.id,
                 },
-                client: getArea({
+                paddingBox: getArea({
                   // is bottom left of the viewport
                   top: customViewport.bottom + 1,
                   right: customViewport.right + 100,
@@ -1114,7 +1114,7 @@ describe('move to next index', () => {
                   index: 0,
                   droppableId: droppable.descriptor.id,
                 },
-                client: getArea({
+                paddingBox: getArea({
                   top: 0,
                   left: 0,
                   right: customViewport.right - 100,
@@ -1127,7 +1127,7 @@ describe('move to next index', () => {
                   index: 1,
                   droppableId: droppable.descriptor.id,
                 },
-                client: getArea({
+                paddingBox: getArea({
                   top: customViewport.bottom + 1,
                   left: customViewport.right + 1,
                   bottom: customViewport.bottom + 100,
@@ -1192,7 +1192,7 @@ describe('move to next index', () => {
                   type: 'huge',
                 },
                 direction: axis.direction,
-                client: getArea({
+                paddingBox: getArea({
                   top: 0,
                   left: 0,
                   // cut off by frame
@@ -1218,7 +1218,7 @@ describe('move to next index', () => {
                   index: 0,
                   droppableId: droppable.descriptor.id,
                 },
-                client: getArea({
+                paddingBox: getArea({
                   top: 0,
                   left: 0,
                   // bleeding over the frame
@@ -1232,7 +1232,7 @@ describe('move to next index', () => {
                   index: 1,
                   droppableId: droppable.descriptor.id,
                 },
-                client: getArea({
+                paddingBox: getArea({
                   // in the droppable, but outside the frame
                   top: 120,
                   left: 120,

@@ -22,7 +22,7 @@ const asBigAsViewport: DroppableDimension = getDroppableDimension({
     id: 'same-as-viewport',
     type: 'TYPE',
   },
-  client: viewport,
+  paddingBox: viewport,
 });
 
 const inViewport1: Spacing = {
@@ -51,7 +51,7 @@ const asBigAsInViewport1: DroppableDimension = getDroppableDimension({
     id: 'subset',
     type: 'TYPE',
   },
-  client: getArea(inViewport1),
+  paddingBox: getArea(inViewport1),
 });
 
 describe('is totally visible', () => {
@@ -116,7 +116,7 @@ describe('is totally visible', () => {
           id: 'clipped',
           type: 'TYPE',
         },
-        client: getArea({
+        paddingBox: getArea({
           top: viewport.top,
           // stretches out the bottom of the viewport
           bottom: viewport.bottom + 100,
@@ -185,7 +185,7 @@ describe('is totally visible', () => {
   });
 
   describe('droppable', () => {
-    const client: Area = getArea({
+    const paddingBox: Area = getArea({
       top: 0,
       left: 0,
       right: 600,
@@ -203,11 +203,11 @@ describe('is totally visible', () => {
         id: 'clipped',
         type: 'TYPE',
       },
-      client,
+      paddingBox,
       closest: {
         frameClient: frame,
-        scrollHeight: client.height,
-        scrollWidth: client.width,
+        scrollHeight: paddingBox.height,
+        scrollWidth: paddingBox.width,
         scroll: { x: 0, y: 0 },
         shouldClipSubject: true,
       },
@@ -294,7 +294,7 @@ describe('is totally visible', () => {
             id: 'clipped',
             type: 'TYPE',
           },
-          client: getArea({
+          paddingBox: getArea({
             ...ourFrame,
             // stretches out past frame
             bottom: 600,
@@ -381,7 +381,7 @@ describe('is totally visible', () => {
             id: 'droppable',
             type: 'TYPE',
           },
-          client: getArea({
+          paddingBox: getArea({
             top: 0,
             left: 0,
             bottom: 100,
@@ -455,7 +455,7 @@ describe('is totally visible', () => {
           id: 'not-visible',
           type: 'TYPE',
         },
-        client: getArea(notInViewport),
+        paddingBox: getArea(notInViewport),
       });
 
       expect(isTotallyVisible({

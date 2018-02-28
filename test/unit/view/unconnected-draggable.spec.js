@@ -66,7 +66,7 @@ const droppable: DroppableDimension = getDroppableDimension({
     id: droppableId,
     type,
   },
-  client: getArea({
+  paddingBox: getArea({
     top: 0,
     right: 100,
     bottom: 200,
@@ -80,7 +80,7 @@ const dimension: DraggableDimension = getDraggableDimension({
     droppableId,
     index: 0,
   },
-  client: getArea({
+  paddingBox: getArea({
     top: 0,
     right: 100,
     bottom: 100,

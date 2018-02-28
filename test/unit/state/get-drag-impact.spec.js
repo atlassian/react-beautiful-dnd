@@ -372,7 +372,7 @@ describe('get drag impact', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -399,7 +399,7 @@ describe('get drag impact', () => {
                 droppableId: droppable.descriptor.id,
                 index: 0,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -412,7 +412,7 @@ describe('get drag impact', () => {
                 droppableId: droppable.descriptor.id,
                 index: 1,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // inside the frame, but not in the visible area
@@ -426,7 +426,7 @@ describe('get drag impact', () => {
                 droppableId: droppable.descriptor.id,
                 index: 2,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // inside the frame, but not in the visible area
@@ -490,7 +490,7 @@ describe('get drag impact', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -503,7 +503,7 @@ describe('get drag impact', () => {
                 droppableId: droppable.descriptor.id,
                 index: 0,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -516,7 +516,7 @@ describe('get drag impact', () => {
                 droppableId: droppable.descriptor.id,
                 index: 1,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // inside the droppable, but not in the visible area
@@ -530,7 +530,7 @@ describe('get drag impact', () => {
                 droppableId: droppable.descriptor.id,
                 index: 2,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // inside the droppable, but not in the visible area
@@ -991,7 +991,7 @@ describe('get drag impact', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -1004,7 +1004,7 @@ describe('get drag impact', () => {
                 droppableId: source.descriptor.id,
                 index: 0,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -1021,7 +1021,7 @@ describe('get drag impact', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 [axis.start]: 0,
@@ -1048,7 +1048,7 @@ describe('get drag impact', () => {
                 droppableId: destination.descriptor.id,
                 index: 0,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 [axis.start]: 0,
@@ -1061,7 +1061,7 @@ describe('get drag impact', () => {
                 droppableId: destination.descriptor.id,
                 index: 1,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 // inside the droppable, but not in the visible area
@@ -1130,7 +1130,7 @@ describe('get drag impact', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -1143,7 +1143,7 @@ describe('get drag impact', () => {
                 droppableId: source.descriptor.id,
                 index: 0,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -1158,7 +1158,7 @@ describe('get drag impact', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 [axis.start]: 0,
@@ -1172,7 +1172,7 @@ describe('get drag impact', () => {
                 droppableId: destination.descriptor.id,
                 index: 0,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 [axis.start]: 0,
@@ -1185,7 +1185,7 @@ describe('get drag impact', () => {
                 droppableId: destination.descriptor.id,
                 index: 1,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 // inside the droppable, but not in the visible area

@@ -392,7 +392,7 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -419,7 +419,7 @@ describe('move to new droppable', () => {
                 droppableId: droppable.descriptor.id,
                 index: 0,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -432,7 +432,7 @@ describe('move to new droppable', () => {
                 droppableId: droppable.descriptor.id,
                 index: 1,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the frame
@@ -490,7 +490,7 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -504,7 +504,7 @@ describe('move to new droppable', () => {
                 droppableId: droppable.descriptor.id,
                 index: 0,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -517,7 +517,7 @@ describe('move to new droppable', () => {
                 droppableId: droppable.descriptor.id,
                 index: 1,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the viewport but inside the droppable
@@ -895,7 +895,7 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -908,7 +908,7 @@ describe('move to new droppable', () => {
                 droppableId: customHome.descriptor.id,
                 index: 0,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -921,7 +921,7 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 top: 0,
                 left: 0,
                 right: 100,
@@ -948,7 +948,7 @@ describe('move to new droppable', () => {
                 droppableId: customForeign.descriptor.id,
                 index: 0,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the foreign frame
@@ -1008,7 +1008,7 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -1021,7 +1021,7 @@ describe('move to new droppable', () => {
                 droppableId: customHome.descriptor.id,
                 index: 0,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -1034,7 +1034,7 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 bottom: viewport.bottom + 100,
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
@@ -1049,7 +1049,7 @@ describe('move to new droppable', () => {
                 droppableId: customForeign.descriptor.id,
                 index: 0,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the viewport but inside the droppable

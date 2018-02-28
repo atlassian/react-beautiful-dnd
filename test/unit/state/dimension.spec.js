@@ -32,7 +32,7 @@ const draggableDescriptor: DraggableDescriptor = {
   index: 0,
 };
 
-const client: Area = getArea({
+const paddingBox: Area = getArea({
   top: 10,
   right: 110,
   bottom: 90,
@@ -54,7 +54,7 @@ describe('dimension', () => {
   describe('draggable dimension', () => {
     const dimension: DraggableDimension = getDraggableDimension({
       descriptor: draggableDescriptor,
-      client,
+      paddingBox,
       margin,
       windowScroll,
     });
@@ -62,10 +62,10 @@ describe('dimension', () => {
     describe('without scroll (client)', () => {
       it('should return a portion that does not account for margins', () => {
         const area: Area = getArea({
-          top: client.top,
-          right: client.right,
-          bottom: client.bottom,
-          left: client.left,
+          top: paddingBox.top,
+          right: paddingBox.right,
+          bottom: paddingBox.bottom,
+          left: paddingBox.left,
         });
 
         expect(dimension.client.paddingBox).toEqual(area);
@@ -73,10 +73,10 @@ describe('dimension', () => {
 
       it('should return a portion that considers margins', () => {
         const area: Area = getArea({
-          top: client.top - margin.top,
-          right: client.right + margin.right,
-          bottom: client.bottom + margin.bottom,
-          left: client.left - margin.left,
+          top: paddingBox.top - margin.top,
+          right: paddingBox.right + margin.right,
+          bottom: paddingBox.bottom + margin.bottom,
+          left: paddingBox.left - margin.left,
         });
 
         expect(dimension.client.marginBox).toEqual(area);
@@ -86,10 +86,10 @@ describe('dimension', () => {
     describe('with scroll (page)', () => {
       it('should return a portion that does not account for margins', () => {
         const area: Area = getArea({
-          top: client.top + windowScroll.y,
-          right: client.right + windowScroll.x,
-          bottom: client.bottom + windowScroll.y,
-          left: client.left + windowScroll.x,
+          top: paddingBox.top + windowScroll.y,
+          right: paddingBox.right + windowScroll.x,
+          bottom: paddingBox.bottom + windowScroll.y,
+          left: paddingBox.left + windowScroll.x,
         });
 
         expect(dimension.page.paddingBox).toEqual(area);
@@ -97,10 +97,10 @@ describe('dimension', () => {
 
       it('should return a portion that considers margins', () => {
         const area: Area = getArea({
-          top: (client.top - margin.top) + windowScroll.y,
-          right: client.right + margin.right + windowScroll.x,
-          bottom: client.bottom + margin.bottom + windowScroll.y,
-          left: (client.left - margin.left) + windowScroll.x,
+          top: (paddingBox.top - margin.top) + windowScroll.y,
+          right: paddingBox.right + margin.right + windowScroll.x,
+          bottom: paddingBox.bottom + margin.bottom + windowScroll.y,
+          left: (paddingBox.left - margin.left) + windowScroll.x,
         });
 
         expect(dimension.page.marginBox).toEqual(area);
@@ -111,7 +111,7 @@ describe('dimension', () => {
   describe('droppable dimension', () => {
     const dimension: DroppableDimension = getDroppableDimension({
       descriptor: droppableDescriptor,
-      client,
+      paddingBox,
       margin,
       padding,
       windowScroll,
@@ -120,20 +120,20 @@ describe('dimension', () => {
     it('should apply the correct axis', () => {
       const withDefault: DroppableDimension = getDroppableDimension({
         descriptor: droppableDescriptor,
-        client,
+        paddingBox,
         margin,
         windowScroll,
       });
       const withVertical: DroppableDimension = getDroppableDimension({
         descriptor: droppableDescriptor,
-        client,
+        paddingBox,
         margin,
         windowScroll,
         direction: 'vertical',
       });
       const withHorizontal: DroppableDimension = getDroppableDimension({
         descriptor: droppableDescriptor,
-        client,
+        paddingBox,
         margin,
         windowScroll,
         direction: 'horizontal',
@@ -150,10 +150,10 @@ describe('dimension', () => {
     describe('without window scroll (client)', () => {
       it('should return a portion that does not consider margins', () => {
         const area: Area = getArea({
-          top: client.top,
-          right: client.right,
-          bottom: client.bottom,
-          left: client.left,
+          top: paddingBox.top,
+          right: paddingBox.right,
+          bottom: paddingBox.bottom,
+          left: paddingBox.left,
         });
 
         expect(dimension.client.paddingBox).toEqual(area);
@@ -161,10 +161,10 @@ describe('dimension', () => {
 
       it('should return a portion that does consider margins', () => {
         const area: Area = getArea({
-          top: client.top - margin.top,
-          left: client.left - margin.left,
-          bottom: client.bottom + margin.bottom,
-          right: client.right + margin.right,
+          top: paddingBox.top - margin.top,
+          left: paddingBox.left - margin.left,
+          bottom: paddingBox.bottom + margin.bottom,
+          right: paddingBox.right + margin.right,
         });
 
         expect(dimension.client.marginBox).toEqual(area);
@@ -172,10 +172,10 @@ describe('dimension', () => {
 
       it('should return a portion that removes the padding', () => {
         const area: Area = getArea({
-          top: client.top + padding.top,
-          left: client.left + padding.left,
-          bottom: client.bottom - padding.bottom,
-          right: client.right - padding.right,
+          top: paddingBox.top + padding.top,
+          left: paddingBox.left + padding.left,
+          bottom: paddingBox.bottom - padding.bottom,
+          right: paddingBox.right - padding.right,
         });
 
         expect(dimension.client.contentBox).toEqual(area);
@@ -185,10 +185,10 @@ describe('dimension', () => {
     describe('with window scroll (page)', () => {
       it('should return a portion that does not consider margins', () => {
         const area: Area = getArea({
-          top: client.top + windowScroll.y,
-          left: client.left + windowScroll.x,
-          bottom: client.bottom + windowScroll.y,
-          right: client.right + windowScroll.x,
+          top: paddingBox.top + windowScroll.y,
+          left: paddingBox.left + windowScroll.x,
+          bottom: paddingBox.bottom + windowScroll.y,
+          right: paddingBox.right + windowScroll.x,
         });
 
         expect(dimension.page.paddingBox).toEqual(area);
@@ -196,10 +196,10 @@ describe('dimension', () => {
 
       it('should return a portion that does consider margins', () => {
         const area: Area = getArea({
-          top: (client.top + windowScroll.y) - margin.top,
-          left: (client.left + windowScroll.x) - margin.left,
-          bottom: client.bottom + windowScroll.y + margin.bottom,
-          right: client.right + windowScroll.x + margin.right,
+          top: (paddingBox.top + windowScroll.y) - margin.top,
+          left: (paddingBox.left + windowScroll.x) - margin.left,
+          bottom: paddingBox.bottom + windowScroll.y + margin.bottom,
+          right: paddingBox.right + windowScroll.x + margin.right,
         });
 
         expect(dimension.page.marginBox).toEqual(area);
@@ -208,11 +208,11 @@ describe('dimension', () => {
       it('should return a portion that removes padding', () => {
         const area: Area = getArea({
           // pushing forward
-          top: (client.top + windowScroll.y) + padding.top,
-          left: (client.left + windowScroll.x) + padding.left,
+          top: (paddingBox.top + windowScroll.y) + padding.top,
+          left: (paddingBox.left + windowScroll.x) + padding.left,
           // pulling backward
-          bottom: (client.bottom + windowScroll.y) - padding.bottom,
-          right: (client.right + windowScroll.x) - padding.right,
+          bottom: (paddingBox.bottom + windowScroll.y) - padding.bottom,
+          right: (paddingBox.right + windowScroll.x) - padding.right,
         });
 
         expect(dimension.page.contentBox).toEqual(area);
@@ -222,7 +222,7 @@ describe('dimension', () => {
     describe('closest scrollable', () => {
       describe('basic info about the scrollable', () => {
         // eslint-disable-next-line no-shadow
-        const client: Area = getArea({
+        const paddingBox: Area = getArea({
           top: 0,
           right: 300,
           bottom: 300,
@@ -237,7 +237,7 @@ describe('dimension', () => {
 
         const withScrollable: DroppableDimension = getDroppableDimension({
           descriptor: droppableDescriptor,
-          client,
+          paddingBox,
           windowScroll,
           closest: {
             frameClient,
@@ -251,7 +251,7 @@ describe('dimension', () => {
         it('should not have a closest scrollable if there is no closest scrollable', () => {
           const noClosestScrollable: DroppableDimension = getDroppableDimension({
             descriptor: droppableDescriptor,
-            client,
+            paddingBox,
           });
 
           expect(noClosestScrollable.viewport.closestScrollable).toBe(null);
@@ -279,7 +279,7 @@ describe('dimension', () => {
         });
         const getWithClient = (subject: Area): DroppableDimension => getDroppableDimension({
           descriptor: droppableDescriptor,
-          client: subject,
+          paddingBox: subject,
           closest: {
             frameClient,
             scrollWidth: 300,
@@ -292,7 +292,7 @@ describe('dimension', () => {
         it('should not clip the frame if requested not to', () => {
           const withoutClipping: DroppableDimension = getDroppableDimension({
             descriptor: droppableDescriptor,
-            client,
+            paddingBox,
             windowScroll,
             closest: {
               frameClient,
@@ -398,7 +398,7 @@ describe('dimension', () => {
       const frameScroll: Position = { x: 0, y: 0 };
       const droppable: DroppableDimension = getDroppableDimension({
         descriptor: droppableDescriptor,
-        client: subject,
+        paddingBox: subject,
         closest: {
           frameClient,
           scroll: frameScroll,
@@ -454,7 +454,7 @@ describe('dimension', () => {
       // this is to allow for scrolling into a foreign placeholder
       const scrollable: DroppableDimension = getDroppableDimension({
         descriptor: droppableDescriptor,
-        client: getArea({
+        paddingBox: getArea({
           top: 0,
           left: 0,
           right: 200,

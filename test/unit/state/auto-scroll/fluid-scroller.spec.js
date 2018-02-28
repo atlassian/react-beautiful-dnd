@@ -83,7 +83,7 @@ describe('fluid auto scrolling', () => {
         // stealing the home descriptor
         descriptor: preset.home.descriptor,
         direction: axis.direction,
-        client: getArea({
+        paddingBox: getArea({
           top: 0,
           left: 0,
           // bigger than the frame
@@ -219,7 +219,7 @@ describe('fluid auto scrolling', () => {
                 // after the last item
                 index: preset.inHomeList.length,
               },
-              client: expanded,
+              paddingBox: expanded,
             });
             const selection: Position = onMaxBoundary;
             const custom: State = (() => {
@@ -377,7 +377,7 @@ describe('fluid auto scrolling', () => {
                 // after the last item
                 index: preset.inHomeList.length,
               },
-              client: expanded,
+              paddingBox: expanded,
             });
             const selection: Position = onMaxBoundary;
             const custom: State = (() => {
@@ -507,7 +507,7 @@ describe('fluid auto scrolling', () => {
                   // after the last item
                   index: preset.inHomeList.length,
                 },
-                client: expanded,
+                paddingBox: expanded,
               });
 
               const selection: Position = onMaxBoundaryOfBoth;
@@ -554,7 +554,7 @@ describe('fluid auto scrolling', () => {
                   // after the last item
                   index: preset.inHomeList.length,
                 },
-                client: expanded,
+                paddingBox: expanded,
               });
 
               const selection: Position = onMaxBoundaryOfBoth;
@@ -601,7 +601,7 @@ describe('fluid auto scrolling', () => {
                   // after the last item
                   index: preset.inHomeList.length,
                 },
-                client: expanded,
+                paddingBox: expanded,
               });
 
               const selection: Position = onMaxBoundaryOfBoth;
@@ -816,7 +816,7 @@ describe('fluid auto scrolling', () => {
                     // after the last item
                     index: preset.inHomeList.length,
                   },
-                  client: expanded,
+                  paddingBox: expanded,
                 });
 
                 const selection: Position = onMaxBoundaryOfBoth;
@@ -864,7 +864,7 @@ describe('fluid auto scrolling', () => {
                     // after the last item
                     index: preset.inHomeList.length,
                   },
-                  client: expanded,
+                  paddingBox: expanded,
                 });
 
                 const selection: Position = onMaxBoundaryOfBoth;
@@ -912,7 +912,7 @@ describe('fluid auto scrolling', () => {
                     // after the last item
                     index: preset.inHomeList.length,
                   },
-                  client: expanded,
+                  paddingBox: expanded,
                 });
 
                 const selection: Position = onMaxBoundaryOfBoth;
@@ -1172,7 +1172,7 @@ describe('fluid auto scrolling', () => {
                 // after the last item
                 index: preset.inHomeList.length,
               },
-              client: expanded,
+              paddingBox: expanded,
             });
             const selection: Position = onMaxBoundary;
             const custom: State = (() => {
@@ -1306,7 +1306,7 @@ describe('fluid auto scrolling', () => {
             // stealing the home descriptor
             descriptor: preset.home.descriptor,
             direction: axis.direction,
-            client: getArea({
+            paddingBox: getArea({
               top: 0,
               left: 0,
               right: 100,
@@ -1392,7 +1392,7 @@ describe('fluid auto scrolling', () => {
             id: 'scrollable that is similiar to the viewport',
             type: 'TYPE',
           },
-          client: getArea({
+          paddingBox: getArea({
             top: 0,
             left: 0,
             // bigger than the frame
