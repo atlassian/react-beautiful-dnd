@@ -34,7 +34,7 @@ const droppable: DroppableDimension = getDroppableDimension({
     id: 'drop',
     type: 'TYPE',
   },
-  client: subject,
+  paddingBox: subject,
 });
 
 const inViewport: DraggableDimension = getDraggableDimension({
@@ -43,7 +43,7 @@ const inViewport: DraggableDimension = getDraggableDimension({
     droppableId: droppable.descriptor.id,
     index: 0,
   },
-  client: getArea({
+  paddingBox: getArea({
     top: 0,
     left: 0,
     right: 200,
@@ -58,7 +58,7 @@ const notInViewport: DraggableDimension = getDraggableDimension({
     index: 1,
   },
   // outside of viewport but within droppable
-  client: getArea({
+  paddingBox: getArea({
     top: 810,
     left: 0,
     right: 200,

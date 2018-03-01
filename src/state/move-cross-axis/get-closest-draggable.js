@@ -38,7 +38,7 @@ export default ({
     // Draggable must be totally visible to move to it
     .filter((draggable: DraggableDimension): boolean =>
       isTotallyVisible({
-        target: draggable.page.withMargin,
+        target: draggable.page.marginBox,
         destination,
         viewport,
       }))
@@ -46,11 +46,11 @@ export default ({
       // Need to consider the change in scroll in the destination
       const distanceToA = distance(
         pageCenter,
-        withDroppableDisplacement(destination, a.page.withMargin.center)
+        withDroppableDisplacement(destination, a.page.marginBox.center)
       );
       const distanceToB = distance(
         pageCenter,
-        withDroppableDisplacement(destination, b.page.withMargin.center)
+        withDroppableDisplacement(destination, b.page.marginBox.center)
       );
 
       // if a is closer - return a
@@ -65,7 +65,7 @@ export default ({
 
       // if the distance to a and b are the same:
       // return the one that appears first on the main axis
-      return a.page.withMargin[axis.start] - b.page.withMargin[axis.start];
+      return a.page.marginBox[axis.start] - b.page.marginBox[axis.start];
     });
 
   return result.length ? result[0] : null;

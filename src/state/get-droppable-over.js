@@ -30,7 +30,7 @@ const getRequiredGrowth = memoizeOne((
 
   const getResult = (existingSpace: number): ?Position => {
     // this is the space required for a placeholder
-    const requiredSpace: number = draggable.page.withMargin[droppable.axis.size];
+    const requiredSpace: number = draggable.page.marginBox[droppable.axis.size];
 
     if (requiredSpace <= existingSpace) {
       return null;
@@ -44,15 +44,15 @@ const getRequiredGrowth = memoizeOne((
 
   // Droppable is empty
   if (!dimensions.length) {
-    const existingSpace: number = droppable.page.withMargin[droppable.axis.size];
+    const existingSpace: number = droppable.page.marginBox[droppable.axis.size];
     return getResult(existingSpace);
   }
 
   // Droppable has items in it
 
   const endOfDraggables: number =
-    dimensions[dimensions.length - 1].page.withMargin[droppable.axis.end];
-  const endOfDroppable: number = droppable.page.withMargin[droppable.axis.end];
+    dimensions[dimensions.length - 1].page.marginBox[droppable.axis.end];
+  const endOfDroppable: number = droppable.page.marginBox[droppable.axis.end];
   const existingSpace: number = endOfDroppable - endOfDraggables;
 
   return getResult(existingSpace);

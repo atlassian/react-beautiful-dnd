@@ -28,7 +28,7 @@ describe('get new home client center', () => {
         draggables,
       } = getPreset(axis);
 
-      const inHome1Size: Position = patch(axis.line, inHome1.page.withMargin[axis.size]);
+      const inHome1Size: Position = patch(axis.line, inHome1.page.marginBox[axis.size]);
 
       it('should return the original center dropped on no destination', () => {
         const result: Position = getNewHomeClientCenter({
@@ -38,7 +38,7 @@ describe('get new home client center', () => {
           destination: null,
         });
 
-        expect(result).toEqual(inHome1.client.withMargin.center);
+        expect(result).toEqual(inHome1.client.marginBox.center);
       });
 
       describe('dropping in home list', () => {
@@ -50,16 +50,16 @@ describe('get new home client center', () => {
             destination: home,
           });
 
-          expect(newCenter).toEqual(inHome1.client.withMargin.center);
+          expect(newCenter).toEqual(inHome1.client.marginBox.center);
         });
 
         describe('is moving forward (is always beyond start position)', () => {
           // moving the first item forward past the third item
           it('should move after the closest impacted draggable', () => {
             const targetCenter: Position = moveToEdge({
-              source: inHome1.client.withMargin,
+              source: inHome1.client.marginBox,
               sourceEdge: 'end',
-              destination: inHome3.client.withMargin,
+              destination: inHome3.client.marginBox,
               destinationEdge: 'end',
               destinationAxis: axis,
             });
@@ -97,9 +97,9 @@ describe('get new home client center', () => {
           // moving inHome3 back past inHome1
           it('should move before the closest impacted draggable', () => {
             const targetCenter: Position = moveToEdge({
-              source: inHome3.client.withMargin,
+              source: inHome3.client.marginBox,
               sourceEdge: 'start',
-              destination: inHome1.client.withMargin,
+              destination: inHome1.client.marginBox,
               destinationEdge: 'start',
               destinationAxis: axis,
             });
@@ -139,9 +139,9 @@ describe('get new home client center', () => {
         describe('is moving into a populated list', () => {
           it('should move above the target', () => {
             const targetCenter: Position = moveToEdge({
-              source: inHome1.client.withMargin,
+              source: inHome1.client.marginBox,
               sourceEdge: 'start',
-              destination: inForeign1.client.withMargin,
+              destination: inForeign1.client.marginBox,
               destinationEdge: 'start',
               destinationAxis: axis,
             });
@@ -189,10 +189,10 @@ describe('get new home client center', () => {
         describe('is moving to end of a list', () => {
           it('should draggable below the last item in the list', () => {
             const targetCenter: Position = moveToEdge({
-              source: inHome1.client.withMargin,
+              source: inHome1.client.marginBox,
               sourceEdge: 'start',
               // will target the last in the foreign droppable
-              destination: inForeign4.client.withMargin,
+              destination: inForeign4.client.marginBox,
               destinationEdge: 'end',
               destinationAxis: axis,
             });
@@ -219,9 +219,9 @@ describe('get new home client center', () => {
         describe('is moving to empty list', () => {
           it('should move to the start of the list', () => {
             const targetCenter: Position = moveToEdge({
-              source: inHome1.client.withMargin,
+              source: inHome1.client.marginBox,
               sourceEdge: 'start',
-              destination: emptyForeign.client.withoutPadding,
+              destination: emptyForeign.client.contentBox,
               destinationEdge: 'start',
               destinationAxis: axis,
             });

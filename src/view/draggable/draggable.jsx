@@ -208,7 +208,7 @@ export default class Draggable extends Component<Props, State> {
     (dimension: DraggableDimension,
       isDropAnimating: boolean,
       movementStyle: MovementStyle): DraggingStyle => {
-      const { width, height, top, left } = dimension.client.withoutMargin;
+      const { width, height, top, left } = dimension.client.paddingBox;
       // For an explanation of properties see `draggable-types`.
       const style: DraggingStyle = {
         position: 'fixed',

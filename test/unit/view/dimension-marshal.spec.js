@@ -116,7 +116,7 @@ const ofAnotherType: DroppableDimension = getDroppableDimension({
     id: 'of-another-type',
     type: 'another-type',
   },
-  client: fakeArea,
+  paddingBox: fakeArea,
 });
 const childOfAnotherType: DraggableDimension = getDraggableDimension({
   descriptor: {
@@ -124,7 +124,7 @@ const childOfAnotherType: DraggableDimension = getDraggableDimension({
     droppableId: ofAnotherType.descriptor.id,
     index: 0,
   },
-  client: fakeArea,
+  paddingBox: fakeArea,
 });
 
 const immediate: ScrollOptions = {
@@ -1084,7 +1084,7 @@ describe('dimension marshal', () => {
               id: preset.home.descriptor.id,
               type: preset.home.descriptor.type,
             },
-            client: getArea({
+            paddingBox: getArea({
               top: 0, left: 0, right: 100, bottom: 100,
             }),
           });
@@ -1160,7 +1160,7 @@ describe('dimension marshal', () => {
               droppableId: preset.inHome2.descriptor.droppableId,
               index: 400,
             },
-            client: getArea({
+            paddingBox: getArea({
               top: 0, left: 0, right: 100, bottom: 100,
             }),
           });
@@ -1200,7 +1200,7 @@ describe('dimension marshal', () => {
               droppableId: preset.home.descriptor.id,
               index: preset.inHomeList.length,
             },
-            client: fakeArea,
+            paddingBox: fakeArea,
           });
 
           // start a collection
@@ -1227,7 +1227,7 @@ describe('dimension marshal', () => {
               id: 'my fake id',
               type: preset.home.descriptor.type,
             },
-            client: fakeArea,
+            paddingBox: fakeArea,
           });
           const droppableCallbacks: DroppableCallbacks = {
             getDimension: () => fake,

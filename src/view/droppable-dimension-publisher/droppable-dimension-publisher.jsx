@@ -269,7 +269,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       left: parseInt(style.paddingLeft, 10),
     };
 
-    const client: Area = getArea(targetRef.getBoundingClientRect());
+    const paddingBox: Area = getArea(targetRef.getBoundingClientRect());
 
     // The droppable's own bounds should be treated as the
     // container bounds in the following situations:
@@ -284,13 +284,13 @@ export default class DroppableDimensionPublisher extends Component<Props> {
         return null;
       }
 
-      const frameClient: Area = getArea(closestScrollable.getBoundingClientRect());
+      const framePaddingBox: Area = getArea(closestScrollable.getBoundingClientRect());
       const scroll: Position = this.getClosestScroll();
       const scrollWidth: number = closestScrollable.scrollWidth;
       const scrollHeight: number = closestScrollable.scrollHeight;
 
       return {
-        frameClient,
+        framePaddingBox,
         scrollWidth,
         scrollHeight,
         scroll,
@@ -301,7 +301,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     const dimension: DroppableDimension = getDroppableDimension({
       descriptor,
       direction,
-      client,
+      paddingBox,
       closest,
       margin,
       padding,
