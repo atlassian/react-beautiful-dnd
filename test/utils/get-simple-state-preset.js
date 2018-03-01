@@ -2,6 +2,7 @@
 import { getPreset } from './dimension';
 import noImpact from '../../src/state/no-impact';
 import { vertical } from '../../src/state/axis';
+import getViewport from '../../src/view/window/get-viewport';
 import type {
   Axis,
   State,
@@ -104,12 +105,12 @@ export default (axis?: Axis = vertical) => {
         autoScrollMode: 'FLUID',
         client: initialPosition,
         page: initialPosition,
-        windowScroll: origin,
+        viewport: getViewport(),
       },
       current: {
         client: clientPositions,
         page: clientPositions,
-        windowScroll: origin,
+        viewport: getViewport(),
         shouldAnimate: false,
         hasCompletedFirstBulkPublish: true,
       },
@@ -164,14 +165,14 @@ export default (axis?: Axis = vertical) => {
         autoScrollMode: 'JUMP',
         client: initialPosition,
         page: initialPosition,
-        windowScroll: origin,
+        viewport: getViewport(),
       },
       current: {
         client: clientPositions,
         page: clientPositions,
-        windowScroll: origin,
         shouldAnimate: true,
         hasCompletedFirstBulkPublish: true,
+        viewport: getViewport(),
       },
       impact,
       scrollJumpRequest: request,

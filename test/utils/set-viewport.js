@@ -1,6 +1,6 @@
 // @flow
-import type { Area } from '../../src/types';
-import getArea from '../../src/state/get-area';
+import type { Viewport } from '../../src/types';
+import getViewport from '../../src/view/window/get-viewport';
 
 const getDoc = (): HTMLElement => {
   const el: ?HTMLElement = document.documentElement;
@@ -12,35 +12,32 @@ const getDoc = (): HTMLElement => {
   return el;
 };
 
-const setViewport = (custom: Area) => {
-  if (custom.top !== 0 || custom.left !== 0) {
-    throw new Error('not setting window scroll with setViewport. Use set-window-scroll');
+const setViewport = (custom: Viewport) => {
+  if (custom.scroll.x !== custom.subject.left) {
+    throw new Error('scroll x must match left of subject');
+  }
+  if (custom.scroll.y !== custom.subject.top) {
+    throw new Error('scroll y must match top of subject');
   }
 
-  if (window.pageXOffset !== 0 || window.pageYOffset !== 0) {
-    throw new Error('Setting viewport on scrolled window');
-  }
-
-  window.pageYOffset = 0;
-  window.pageXOffset = 0;
+  window.pageYOffset = custom.scroll.y;
+  window.pageXOffset = custom.scroll.x;
 
   const doc: HTMLElement = getDoc();
-  doc.clientWidth = custom.width;
-  doc.clientHeight = custom.height;
+  doc.clientWidth = custom.subject.width;
+  doc.clientHeight = custom.subject.height;
+
+  // reverse engineering these values
+  const scrollHeight: number = custom.maxScroll.y + custom.subject.height;
+  const scrollWidth: number = custom.maxScroll.x + custom.subject.width;
+
+  doc.scrollHeight = scrollHeight;
+  doc.scrollWidth = scrollWidth;
 };
 
-export const getCurrent = (): Area => {
-  const doc: HTMLElement = getDoc();
+export const getCurrent = (): Viewport => getViewport();
 
-  return getArea({
-    top: window.pageYOffset,
-    left: window.pageXOffset,
-    width: doc.clientWidth,
-    height: doc.clientHeight,
-  });
-};
-
-const original: Area = getCurrent();
+const original: Viewport = getCurrent();
 
 export const resetViewport = () => setViewport(original);
 

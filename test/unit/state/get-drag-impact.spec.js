@@ -15,7 +15,7 @@ import {
   disableDroppable,
   makeScrollable,
 } from '../../utils/dimension';
-import getViewport from '../../../src/window/get-viewport';
+import getViewport from '../../../src/view/window/get-viewport';
 import type {
   Axis,
   DraggableDimension,
@@ -24,7 +24,10 @@ import type {
   DragImpact,
   Position,
   DraggableDimensionMap,
+  Viewport,
 } from '../../../src/types';
+
+const viewport: Viewport = getViewport();
 
 describe('get drag impact', () => {
   [vertical, horizontal].forEach((axis: Axis) => {
@@ -58,6 +61,7 @@ describe('get drag impact', () => {
           draggables,
           droppables,
           previousImpact: noImpact,
+          viewport,
         });
 
         expect(impact).toEqual(noImpact);
@@ -79,6 +83,7 @@ describe('get drag impact', () => {
             draggables,
             droppables: withDisabled,
             previousImpact: noImpact,
+            viewport,
           });
 
           expect(impact).toEqual(noImpact);
@@ -107,6 +112,7 @@ describe('get drag impact', () => {
               draggables,
               droppables,
               previousImpact: noImpact,
+              viewport,
             });
 
             expect(impact).toEqual(expected);
@@ -142,6 +148,7 @@ describe('get drag impact', () => {
               draggables,
               droppables,
               previousImpact: noImpact,
+              viewport,
             });
 
             expect(impact).toEqual(expected);
@@ -188,6 +195,7 @@ describe('get drag impact', () => {
             draggables,
             droppables,
             previousImpact: noImpact,
+            viewport,
           });
 
           expect(impact).toEqual(expected);
@@ -235,6 +243,7 @@ describe('get drag impact', () => {
               draggables,
               droppables,
               previousImpact: noImpact,
+              viewport,
             });
 
             expect(impact).toEqual(expected);
@@ -296,6 +305,7 @@ describe('get drag impact', () => {
                 draggables,
                 droppables: updatedDroppables,
                 previousImpact: noImpact,
+                viewport,
               });
 
               expect(impact).toEqual(expected);
@@ -357,6 +367,7 @@ describe('get drag impact', () => {
                 draggables,
                 droppables: updatedDroppables,
                 previousImpact: noImpact,
+                viewport,
               });
 
               expect(impact).toEqual(expected);
@@ -477,13 +488,13 @@ describe('get drag impact', () => {
               draggables: customDraggables,
               droppables: customDroppables,
               previousImpact: noImpact,
+              viewport,
             });
 
             expect(impact).toEqual(expected);
           });
 
           it('should indicate when a displacement is not visible due to being outside of the viewport', () => {
-            const viewport = getViewport();
             const droppable: DroppableDimension = getDroppableDimension({
               descriptor: {
                 id: 'my-custom-droppable',
@@ -494,7 +505,7 @@ describe('get drag impact', () => {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
-                [axis.end]: viewport[axis.end] + 100,
+                [axis.end]: viewport.subject[axis.end] + 100,
               }),
             });
             const visible: DraggableDimension = getDraggableDimension({
@@ -507,7 +518,7 @@ describe('get drag impact', () => {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
-                [axis.end]: viewport[axis.end],
+                [axis.end]: viewport.subject[axis.end],
               }),
             });
             const notVisible1: DraggableDimension = getDraggableDimension({
@@ -520,8 +531,8 @@ describe('get drag impact', () => {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // inside the droppable, but not in the visible area
-                [axis.start]: viewport[axis.end] + 10,
-                [axis.end]: viewport[axis.end] + 20,
+                [axis.start]: viewport.subject[axis.end] + 10,
+                [axis.end]: viewport.subject[axis.end] + 20,
               }),
             });
             const notVisible2: DraggableDimension = getDraggableDimension({
@@ -534,8 +545,8 @@ describe('get drag impact', () => {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // inside the droppable, but not in the visible area
-                [axis.start]: viewport[axis.end] + 30,
-                [axis.end]: viewport[axis.end] + 40,
+                [axis.start]: viewport.subject[axis.end] + 30,
+                [axis.end]: viewport.subject[axis.end] + 40,
               }),
             });
             const customDraggables: DraggableDimensionMap = {
@@ -581,6 +592,7 @@ describe('get drag impact', () => {
               draggables: customDraggables,
               droppables: customDroppables,
               previousImpact: noImpact,
+              viewport,
             });
 
             expect(impact).toEqual(expected);
@@ -604,6 +616,7 @@ describe('get drag impact', () => {
             draggables,
             droppables: withDisabled,
             previousImpact: noImpact,
+            viewport,
           });
 
           expect(impact).toEqual(noImpact);
@@ -661,6 +674,7 @@ describe('get drag impact', () => {
               draggables,
               droppables,
               previousImpact: noImpact,
+              viewport,
             });
 
             expect(impact).toEqual(expected);
@@ -713,6 +727,7 @@ describe('get drag impact', () => {
               draggables,
               droppables,
               previousImpact: noImpact,
+              viewport,
             });
 
             expect(impact).toEqual(expected);
@@ -749,6 +764,7 @@ describe('get drag impact', () => {
               draggables,
               droppables,
               previousImpact: noImpact,
+              viewport,
             });
 
             expect(impact).toEqual(expected);
@@ -780,6 +796,7 @@ describe('get drag impact', () => {
               draggables,
               droppables,
               previousImpact: noImpact,
+              viewport,
             });
 
             expect(impact).toEqual(expected);
@@ -837,6 +854,7 @@ describe('get drag impact', () => {
               draggables,
               droppables: map,
               previousImpact: noImpact,
+              viewport,
             });
 
             expect(impact).toEqual(expected);
@@ -877,6 +895,7 @@ describe('get drag impact', () => {
               draggables,
               droppables,
               previousImpact: noImpact,
+              viewport,
             });
 
             expect(impact).toEqual(expected);
@@ -935,6 +954,7 @@ describe('get drag impact', () => {
               draggables,
               droppables: map,
               previousImpact: noImpact,
+              viewport,
             });
 
             expect(impact).toEqual(expected);
@@ -976,6 +996,7 @@ describe('get drag impact', () => {
               draggables,
               droppables,
               previousImpact: noImpact,
+              viewport,
             });
 
             expect(impact).toEqual(expected);
@@ -984,7 +1005,6 @@ describe('get drag impact', () => {
 
         describe('displacement of invisible items', () => {
           it('should indicate when a displacement is not visible due to being outside of the droppable frame', () => {
-            const viewport = getViewport();
             const source: DroppableDimension = getDroppableDimension({
               descriptor: {
                 id: 'source',
@@ -1052,7 +1072,7 @@ describe('get drag impact', () => {
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 [axis.start]: 0,
-                [axis.end]: viewport[axis.end],
+                [axis.end]: viewport.subject[axis.end],
               }),
             });
             const notVisible: DraggableDimension = getDraggableDimension({
@@ -1117,13 +1137,13 @@ describe('get drag impact', () => {
               draggables: customDraggables,
               droppables: customDroppables,
               previousImpact: noImpact,
+              viewport,
             });
 
             expect(impact).toEqual(expected);
           });
 
           it('should indicate when a displacement is not visible due to being outside of the viewport', () => {
-            const viewport = getViewport();
             const source: DroppableDimension = getDroppableDimension({
               descriptor: {
                 id: 'source',
@@ -1163,7 +1183,7 @@ describe('get drag impact', () => {
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 [axis.start]: 0,
                 // stretches longer than viewport
-                [axis.end]: viewport[axis.end] + 100,
+                [axis.end]: viewport.subject[axis.end] + 100,
               }),
             });
             const visible: DraggableDimension = getDraggableDimension({
@@ -1176,7 +1196,7 @@ describe('get drag impact', () => {
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 [axis.start]: 0,
-                [axis.end]: viewport[axis.end],
+                [axis.end]: viewport.subject[axis.end],
               }),
             });
             const notVisible: DraggableDimension = getDraggableDimension({
@@ -1189,8 +1209,8 @@ describe('get drag impact', () => {
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 // inside the droppable, but not in the visible area
-                [axis.start]: viewport[axis.end] + 10,
-                [axis.end]: viewport[axis.end] + 20,
+                [axis.start]: viewport.subject[axis.end] + 10,
+                [axis.end]: viewport.subject[axis.end] + 20,
               }),
             });
 
@@ -1242,6 +1262,7 @@ describe('get drag impact', () => {
               draggables: customDraggables,
               droppables: customDroppables,
               previousImpact: noImpact,
+              viewport,
             });
 
             expect(impact).toEqual(expected);

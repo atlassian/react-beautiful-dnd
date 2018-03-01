@@ -1,9 +1,8 @@
 // @flow
-import type { Position, Area, Viewport } from '../types';
-import getArea from '../state/get-area';
+import type { Position, Area, Viewport } from '../../types';
+import getArea from '../../state/get-area';
 import getWindowScroll from './get-window-scroll';
-// TODO: should this function live here?
-import getMaxScroll from '../state/get-max-scroll';
+import getMaxScroll from '../../state/get-max-scroll';
 
 export default (): Viewport => {
   const scroll: Position = getWindowScroll();

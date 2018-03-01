@@ -13,7 +13,7 @@ import type {
 import DraggableDimensionPublisher from '../draggable-dimension-publisher/';
 import Moveable from '../moveable/';
 import DragHandle from '../drag-handle';
-import getViewport from '../../window/get-viewport';
+import getViewport from '../window/get-viewport';
 // eslint-disable-next-line no-duplicate-imports
 import type {
   DragHandleProps,

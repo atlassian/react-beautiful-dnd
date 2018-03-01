@@ -20,7 +20,7 @@ export default (): Store => createStore(
       // debugging logger
       // require('./debug-middleware/log-middleware').default,
       // debugging timer
-      require('./debug-middleware/timing-middleware').default,
+      // require('./debug-middleware/timing-middleware').default,
     ),
   ),
 );
