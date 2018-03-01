@@ -106,15 +106,15 @@ describe('move to new droppable', () => {
             }
 
             it('should return the original center without margin', () => {
-              expect(result.pageCenter).toBe(inHome2.page.withoutMargin.center);
-              expect(result.pageCenter).not.toEqual(inHome2.page.withMargin.center);
+              expect(result.pageCenter).toBe(inHome2.page.paddingBox.center);
+              expect(result.pageCenter).not.toEqual(inHome2.page.marginBox.center);
             });
 
             it('should return an empty impact with the original location', () => {
               const expected: DragImpact = {
                 movement: {
                   displaced: [],
-                  amount: patch(axis.line, inHome2.page.withMargin[axis.size]),
+                  amount: patch(axis.line, inHome2.page.marginBox[axis.size]),
                   isBeyondStartPosition: false,
                 },
                 direction: axis.direction,
@@ -152,7 +152,7 @@ describe('move to new droppable', () => {
             }
 
             it('should account for changes in droppable scroll', () => {
-              const expected: Position = add(inHome2.page.withoutMargin.center, displacement);
+              const expected: Position = add(inHome2.page.paddingBox.center, displacement);
 
               expect(result.pageCenter).toEqual(expected);
             });
@@ -161,7 +161,7 @@ describe('move to new droppable', () => {
               const expected: DragImpact = {
                 movement: {
                   displaced: [],
-                  amount: patch(axis.line, inHome2.page.withMargin[axis.size]),
+                  amount: patch(axis.line, inHome2.page.marginBox[axis.size]),
                   isBeyondStartPosition: false,
                 },
                 direction: axis.direction,
@@ -198,9 +198,9 @@ describe('move to new droppable', () => {
 
             it('should align to the start of the target', () => {
               const expected: Position = moveToEdge({
-                source: inHome4.page.withoutMargin,
+                source: inHome4.page.paddingBox,
                 sourceEdge: 'start',
-                destination: inHome2.page.withMargin,
+                destination: inHome2.page.marginBox,
                 destinationEdge: 'start',
                 destinationAxis: axis,
               });
@@ -224,7 +224,7 @@ describe('move to new droppable', () => {
                       shouldAnimate: true,
                     },
                   ],
-                  amount: patch(axis.line, inHome4.page.withMargin[axis.size]),
+                  amount: patch(axis.line, inHome4.page.marginBox[axis.size]),
                   isBeyondStartPosition: false,
                 },
                 direction: axis.direction,
@@ -264,9 +264,9 @@ describe('move to new droppable', () => {
 
             it('should account for changes in droppable scroll', () => {
               const withoutScroll: Position = moveToEdge({
-                source: inHome4.page.withoutMargin,
+                source: inHome4.page.paddingBox,
                 sourceEdge: 'start',
-                destination: inHome2.page.withMargin,
+                destination: inHome2.page.marginBox,
                 destinationEdge: 'start',
                 destinationAxis: axis,
               });
@@ -299,9 +299,9 @@ describe('move to new droppable', () => {
 
             it('should align to the bottom of the target', () => {
               const expected: Position = moveToEdge({
-                source: inHome1.page.withoutMargin,
+                source: inHome1.page.paddingBox,
                 sourceEdge: 'end',
-                destination: inHome4.page.withoutMargin,
+                destination: inHome4.page.paddingBox,
                 destinationEdge: 'end',
                 destinationAxis: axis,
               });
@@ -330,7 +330,7 @@ describe('move to new droppable', () => {
                       shouldAnimate: true,
                     },
                   ],
-                  amount: patch(axis.line, inHome1.page.withMargin[axis.size]),
+                  amount: patch(axis.line, inHome1.page.marginBox[axis.size]),
                   // is moving beyond start position
                   isBeyondStartPosition: true,
                 },
@@ -371,9 +371,9 @@ describe('move to new droppable', () => {
 
             it('should account for changes in droppable scroll', () => {
               const withoutScroll: Position = moveToEdge({
-                source: inHome1.page.withoutMargin,
+                source: inHome1.page.paddingBox,
                 sourceEdge: 'end',
-                destination: inHome4.page.withoutMargin,
+                destination: inHome4.page.paddingBox,
                 destinationEdge: 'end',
                 destinationAxis: axis,
               });
@@ -392,7 +392,7 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -400,7 +400,7 @@ describe('move to new droppable', () => {
                 [axis.end]: 200,
               }),
               closest: {
-                frameClient: getArea({
+                framePaddingBox: getArea({
                   [axis.crossAxisStart]: 0,
                   [axis.crossAxisEnd]: 100,
                   [axis.start]: 0,
@@ -419,7 +419,7 @@ describe('move to new droppable', () => {
                 droppableId: droppable.descriptor.id,
                 index: 0,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -432,7 +432,7 @@ describe('move to new droppable', () => {
                 droppableId: droppable.descriptor.id,
                 index: 1,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the frame
@@ -451,7 +451,7 @@ describe('move to new droppable', () => {
                   isVisible: false,
                   shouldAnimate: false,
                 }],
-                amount: patch(axis.line, inside.page.withMargin[axis.size]),
+                amount: patch(axis.line, inside.page.marginBox[axis.size]),
                 isBeyondStartPosition: true,
               },
               direction: axis.direction,
@@ -490,7 +490,7 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -504,7 +504,7 @@ describe('move to new droppable', () => {
                 droppableId: droppable.descriptor.id,
                 index: 0,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -517,7 +517,7 @@ describe('move to new droppable', () => {
                 droppableId: droppable.descriptor.id,
                 index: 1,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the viewport but inside the droppable
@@ -536,7 +536,7 @@ describe('move to new droppable', () => {
                   isVisible: false,
                   shouldAnimate: false,
                 }],
-                amount: patch(axis.line, inside.page.withMargin[axis.size]),
+                amount: patch(axis.line, inside.page.marginBox[axis.size]),
                 isBeyondStartPosition: true,
               },
               direction: axis.direction,
@@ -576,7 +576,7 @@ describe('move to new droppable', () => {
 
         it('should return null when the target is not within the list - cannot really happen', () => {
           const result: ?Result = moveToNewDroppable({
-            pageCenter: inHome1.page.withMargin.center,
+            pageCenter: inHome1.page.marginBox.center,
             draggable: inHome1,
             target: inHome2,
             destination: foreign,
@@ -594,7 +594,7 @@ describe('move to new droppable', () => {
         describe('moving into an unpopulated list', () => {
           describe('without droppable scroll', () => {
             const result: ?Result = moveToNewDroppable({
-              pageCenter: inHome1.page.withMargin.center,
+              pageCenter: inHome1.page.marginBox.center,
               draggable: inHome1,
               target: null,
               destination: foreign,
@@ -612,9 +612,9 @@ describe('move to new droppable', () => {
 
             it('should move to the start edge of the droppable (including its padding)', () => {
               const expected: Position = moveToEdge({
-                source: inHome1.page.withoutMargin,
+                source: inHome1.page.paddingBox,
                 sourceEdge: 'start',
-                destination: foreign.page.withoutPadding,
+                destination: foreign.page.contentBox,
                 destinationEdge: 'start',
                 destinationAxis: foreign.axis,
               });
@@ -626,7 +626,7 @@ describe('move to new droppable', () => {
               const expected: DragImpact = {
                 movement: {
                   displaced: [],
-                  amount: patch(foreign.axis.line, inHome1.page.withMargin[foreign.axis.size]),
+                  amount: patch(foreign.axis.line, inHome1.page.marginBox[foreign.axis.size]),
                   isBeyondStartPosition: false,
                 },
                 direction: foreign.axis.direction,
@@ -647,7 +647,7 @@ describe('move to new droppable', () => {
             const scrolled: DroppableDimension = scrollDroppable(scrollable, patch(axis.line, 10));
 
             const result: ?Result = moveToNewDroppable({
-              pageCenter: inHome1.page.withMargin.center,
+              pageCenter: inHome1.page.marginBox.center,
               draggable: inHome1,
               target: null,
               destination: scrolled,
@@ -665,9 +665,9 @@ describe('move to new droppable', () => {
 
             it('should account for changes in droppable scroll', () => {
               const withoutScroll: Position = moveToEdge({
-                source: inHome1.page.withoutMargin,
+                source: inHome1.page.paddingBox,
                 sourceEdge: 'start',
-                destination: foreign.page.withoutPadding,
+                destination: foreign.page.contentBox,
                 destinationEdge: 'start',
                 destinationAxis: foreign.axis,
               });
@@ -682,7 +682,7 @@ describe('move to new droppable', () => {
           describe('without droppable scroll', () => {
             // moving home1 into the second position of the list
             const result: ?Result = moveToNewDroppable({
-              pageCenter: inHome1.page.withMargin.center,
+              pageCenter: inHome1.page.marginBox.center,
               draggable: inHome1,
               target: inForeign2,
               destination: foreign,
@@ -700,9 +700,9 @@ describe('move to new droppable', () => {
 
             it('should move before the target', () => {
               const expected: Position = moveToEdge({
-                source: inHome1.page.withoutMargin,
+                source: inHome1.page.paddingBox,
                 sourceEdge: 'start',
-                destination: inForeign2.page.withMargin,
+                destination: inForeign2.page.marginBox,
                 destinationEdge: 'start',
                 destinationAxis: foreign.axis,
               });
@@ -731,7 +731,7 @@ describe('move to new droppable', () => {
                       shouldAnimate: true,
                     },
                   ],
-                  amount: patch(foreign.axis.line, inHome1.page.withMargin[foreign.axis.size]),
+                  amount: patch(foreign.axis.line, inHome1.page.marginBox[foreign.axis.size]),
                   isBeyondStartPosition: false,
                 },
                 direction: foreign.axis.direction,
@@ -753,7 +753,7 @@ describe('move to new droppable', () => {
             const scrolled: DroppableDimension = scrollDroppable(scrollable, patch(axis.line, 10));
 
             const result: ?Result = moveToNewDroppable({
-              pageCenter: inHome1.page.withMargin.center,
+              pageCenter: inHome1.page.marginBox.center,
               draggable: inHome1,
               target: inForeign2,
               destination: scrolled,
@@ -771,9 +771,9 @@ describe('move to new droppable', () => {
 
             it('should account for changes in droppable scroll', () => {
               const withoutScroll: Position = moveToEdge({
-                source: inHome1.page.withoutMargin,
+                source: inHome1.page.paddingBox,
                 sourceEdge: 'start',
-                destination: inForeign2.page.withMargin,
+                destination: inForeign2.page.marginBox,
                 destinationEdge: 'start',
                 destinationAxis: foreign.axis,
               });
@@ -788,7 +788,7 @@ describe('move to new droppable', () => {
           describe('without droppable scroll', () => {
             // moving home4 into the second position of the foreign list
             const result: ?Result = moveToNewDroppable({
-              pageCenter: inHome4.page.withMargin.center,
+              pageCenter: inHome4.page.marginBox.center,
               draggable: inHome4,
               target: inForeign2,
               destination: foreign,
@@ -806,9 +806,9 @@ describe('move to new droppable', () => {
 
             it('should move after the target', () => {
               const expected = moveToEdge({
-                source: inHome4.page.withoutMargin,
+                source: inHome4.page.paddingBox,
                 sourceEdge: 'start',
-                destination: inForeign2.page.withMargin,
+                destination: inForeign2.page.marginBox,
                 // going after
                 destinationEdge: 'end',
                 destinationAxis: foreign.axis,
@@ -833,7 +833,7 @@ describe('move to new droppable', () => {
                       shouldAnimate: true,
                     },
                   ],
-                  amount: patch(foreign.axis.line, inHome4.page.withMargin[foreign.axis.size]),
+                  amount: patch(foreign.axis.line, inHome4.page.marginBox[foreign.axis.size]),
                   isBeyondStartPosition: false,
                 },
                 direction: foreign.axis.direction,
@@ -855,7 +855,7 @@ describe('move to new droppable', () => {
             const scrolled: DroppableDimension = scrollDroppable(scrollable, patch(axis.line, 10));
 
             const result: ?Result = moveToNewDroppable({
-              pageCenter: inHome4.page.withMargin.center,
+              pageCenter: inHome4.page.marginBox.center,
               draggable: inHome4,
               target: inForeign2,
               destination: scrolled,
@@ -873,9 +873,9 @@ describe('move to new droppable', () => {
 
             it('should account for changes in droppable scroll', () => {
               const withoutScroll: Position = moveToEdge({
-                source: inHome4.page.withoutMargin,
+                source: inHome4.page.paddingBox,
                 sourceEdge: 'start',
-                destination: inForeign2.page.withMargin,
+                destination: inForeign2.page.marginBox,
                 // going after
                 destinationEdge: 'end',
                 destinationAxis: foreign.axis,
@@ -895,7 +895,7 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -908,7 +908,7 @@ describe('move to new droppable', () => {
                 droppableId: customHome.descriptor.id,
                 index: 0,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -921,7 +921,7 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 top: 0,
                 left: 0,
                 right: 100,
@@ -929,7 +929,7 @@ describe('move to new droppable', () => {
                 bottom: 200,
               }),
               closest: {
-                frameClient: getArea({
+                framePaddingBox: getArea({
                   top: 0,
                   left: 0,
                   right: 100,
@@ -948,7 +948,7 @@ describe('move to new droppable', () => {
                 droppableId: customForeign.descriptor.id,
                 index: 0,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the foreign frame
@@ -968,7 +968,7 @@ describe('move to new droppable', () => {
                   isVisible: false,
                   shouldAnimate: false,
                 }],
-                amount: patch(axis.line, customInHome.page.withMargin[axis.size]),
+                amount: patch(axis.line, customInHome.page.marginBox[axis.size]),
                 // always false in foreign list
                 isBeyondStartPosition: false,
               },
@@ -1008,7 +1008,7 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -1021,7 +1021,7 @@ describe('move to new droppable', () => {
                 droppableId: customHome.descriptor.id,
                 index: 0,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -1034,7 +1034,7 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              client: getArea({
+              paddingBox: getArea({
                 bottom: viewport.bottom + 100,
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
@@ -1049,7 +1049,7 @@ describe('move to new droppable', () => {
                 droppableId: customForeign.descriptor.id,
                 index: 0,
               },
-              client: getArea({
+              paddingBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the viewport but inside the droppable
@@ -1069,7 +1069,7 @@ describe('move to new droppable', () => {
                   isVisible: false,
                   shouldAnimate: false,
                 }],
-                amount: patch(axis.line, customInHome.page.withMargin[axis.size]),
+                amount: patch(axis.line, customInHome.page.marginBox[axis.size]),
                 // always false in foreign list
                 isBeyondStartPosition: false,
               },

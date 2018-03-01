@@ -76,9 +76,9 @@ export default ({
   })();
 
   const newPageCenter: Position = moveToEdge({
-    source: draggable.page.withoutMargin,
+    source: draggable.page.paddingBox,
     sourceEdge: edge,
-    destination: destination.page.withoutMargin,
+    destination: destination.page.paddingBox,
     destinationEdge: edge,
     destinationAxis: droppable.axis,
   });
@@ -112,7 +112,7 @@ export default ({
   const newImpact: DragImpact = {
     movement: {
       displaced,
-      amount: patch(axis.line, draggable.page.withMargin[axis.size]),
+      amount: patch(axis.line, draggable.page.marginBox[axis.size]),
       isBeyondStartPosition: proposedIndex > startIndex,
     },
     destination: {

@@ -35,7 +35,7 @@ export default ({
   const viewport: Area = getViewport();
   const axis: Axis = home.axis;
   // The starting center position
-  const originalCenter: Position = draggable.page.withoutMargin.center;
+  const originalCenter: Position = draggable.page.paddingBox.center;
 
   // Where the element actually is now.
   // Need to take into account the change of scroll in the droppable
@@ -44,7 +44,7 @@ export default ({
   // not considering margin so that items move based on visible edges
   const isBeyondStartPosition: boolean = currentCenter[axis.line] - originalCenter[axis.line] > 0;
 
-  const amount: Position = patch(axis.line, draggable.client.withMargin[axis.size]);
+  const amount: Position = patch(axis.line, draggable.client.marginBox[axis.size]);
 
   const displaced: Displacement[] = insideHome
     .filter((child: DraggableDimension): boolean => {
@@ -53,7 +53,7 @@ export default ({
         return false;
       }
 
-      const area: Area = child.page.withoutMargin;
+      const area: Area = child.page.paddingBox;
 
       if (isBeyondStartPosition) {
         // 1. item needs to start ahead of the moving item

@@ -206,7 +206,7 @@ describe('jump auto scrolling', () => {
           // stealing the home descriptor so that the dragging item will
           // be within in
           descriptor: preset.home.descriptor,
-          client: getArea({
+          paddingBox: getArea({
             top: 0,
             left: 0,
             // bigger than the frame
@@ -214,7 +214,7 @@ describe('jump auto scrolling', () => {
             bottom: scrollableScrollSize.scrollHeight,
           }),
           closest: {
-            frameClient: frame,
+            framePaddingBox: frame,
             scrollWidth: scrollableScrollSize.scrollWidth,
             scrollHeight: scrollableScrollSize.scrollHeight,
             scroll: { x: 0, y: 0 },

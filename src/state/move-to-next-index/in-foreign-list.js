@@ -76,9 +76,9 @@ export default ({
 
   const viewport: Area = getViewport();
   const newPageCenter: Position = moveToEdge({
-    source: draggable.page.withoutMargin,
+    source: draggable.page.paddingBox,
     sourceEdge,
-    destination: movingRelativeTo.page.withMargin,
+    destination: movingRelativeTo.page.marginBox,
     destinationEdge,
     destinationAxis: droppable.axis,
   });
@@ -112,7 +112,7 @@ export default ({
   const newImpact: DragImpact = {
     movement: {
       displaced,
-      amount: patch(axis.line, draggable.page.withMargin[axis.size]),
+      amount: patch(axis.line, draggable.page.marginBox[axis.size]),
       // When we are in foreign list we are only displacing items forward
       isBeyondStartPosition: false,
     },

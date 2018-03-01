@@ -456,7 +456,7 @@ describe('Connected Draggable', () => {
             droppableId: preset.home.descriptor.id,
           },
           movement: {
-            amount: { y: preset.inHome1.client.withMargin.height, x: 0 },
+            amount: { y: preset.inHome1.client.marginBox.height, x: 0 },
             isBeyondStartPosition: true,
             displaced: [
               {
@@ -501,7 +501,7 @@ describe('Connected Draggable', () => {
             droppableId: preset.home.descriptor.id,
           },
           movement: {
-            amount: { y: preset.inHome1.client.withMargin.height, x: 0 },
+            amount: { y: preset.inHome1.client.marginBox.height, x: 0 },
             isBeyondStartPosition: true,
             displaced: [
               {
@@ -520,7 +520,7 @@ describe('Connected Draggable', () => {
             droppableId: preset.home.descriptor.id,
           },
           movement: {
-            amount: { y: preset.inHome1.client.withMargin.height, x: 0 },
+            amount: { y: preset.inHome1.client.marginBox.height, x: 0 },
             isBeyondStartPosition: true,
             displaced: [
               {
@@ -565,7 +565,7 @@ describe('Connected Draggable', () => {
         // looking at inHome2
         const ownProps: OwnProps = getOwnProps(preset.inHome2);
         const selector = makeSelector();
-        const amount: Position = { y: preset.inHome1.client.withMargin.height, x: 0 };
+        const amount: Position = { y: preset.inHome1.client.marginBox.height, x: 0 };
         // moving inHome1 down beyond inHome2
         const impact: DragImpact = {
           direction: preset.home.axis.direction,
@@ -613,7 +613,7 @@ describe('Connected Draggable', () => {
         // looking at inHome1
         const ownProps: OwnProps = getOwnProps(preset.inHome1);
         const selector = makeSelector();
-        const amount: Position = { y: preset.inHome2.client.withMargin.height, x: 0 };
+        const amount: Position = { y: preset.inHome2.client.marginBox.height, x: 0 };
         // moving inHome2 up beyond inHome1
         const impact: DragImpact = {
           direction: preset.home.axis.direction,
@@ -662,7 +662,7 @@ describe('Connected Draggable', () => {
         const ownProps: OwnProps = getOwnProps(preset.inHome2);
         const selector = makeSelector();
         const defaultMapProps: MapProps = selector(state.idle, ownProps);
-        const amount: Position = { y: preset.inHome1.client.withMargin.height, x: 0 };
+        const amount: Position = { y: preset.inHome1.client.marginBox.height, x: 0 };
         // moving inHome1 down beyond inHome2
         const impact: DragImpact = {
           direction: preset.home.axis.direction,
@@ -700,7 +700,7 @@ describe('Connected Draggable', () => {
         // looking at inHome2
         const ownProps: OwnProps = getOwnProps(preset.inHome2);
         const selector = makeSelector();
-        const amount: Position = { y: preset.inHome1.client.withMargin.height, x: 0 };
+        const amount: Position = { y: preset.inHome1.client.marginBox.height, x: 0 };
         // moving inHome1 down beyond inHome2
         const impact: DragImpact = {
           direction: preset.home.axis.direction,
@@ -748,7 +748,7 @@ describe('Connected Draggable', () => {
         // looking at inHome4
         const ownProps: OwnProps = getOwnProps(preset.inHome2);
         const selector = makeSelector();
-        const amount: Position = { y: preset.inHome1.client.withMargin.height, x: 0 };
+        const amount: Position = { y: preset.inHome1.client.marginBox.height, x: 0 };
         // moving inHome1 down beyond inHome2
         const impact1: DragImpact = {
           direction: preset.home.axis.direction,
@@ -850,7 +850,7 @@ describe('Connected Draggable', () => {
           // looking at inHome2
           const ownProps: OwnProps = getOwnProps(preset.inHome2);
           const selector = makeSelector();
-          const amount: Position = { y: preset.inHome1.client.withMargin.height, x: 0 };
+          const amount: Position = { y: preset.inHome1.client.marginBox.height, x: 0 };
           // moving inHome1 down beyond inHome2
           const impact: DragImpact = {
             direction: preset.home.axis.direction,
@@ -937,7 +937,7 @@ describe('Connected Draggable', () => {
           // looking at inHome2
           const ownProps: OwnProps = getOwnProps(preset.inHome2);
           const selector = makeSelector();
-          const amount: Position = { y: preset.inHome1.client.withMargin.height, x: 0 };
+          const amount: Position = { y: preset.inHome1.client.marginBox.height, x: 0 };
           // moving inHome1 down beyond inHome2
           const impact: DragImpact = {
             direction: preset.home.axis.direction,

@@ -41,7 +41,7 @@ describe('get droppable over', () => {
       const draggable: DraggableDimension = preset.draggables[id];
 
       const result: ?DroppableId = getDroppableOver({
-        target: draggable.page.withoutMargin.center,
+        target: draggable.page.paddingBox.center,
         draggable,
         draggables: preset.draggables,
         droppables: preset.droppables,
@@ -53,7 +53,7 @@ describe('get droppable over', () => {
   });
 
   it('should ignore droppables that are disabled', () => {
-    const target: Position = preset.inHome1.page.withoutMargin.center;
+    const target: Position = preset.inHome1.page.paddingBox.center;
     const withDisabled: DroppableDimensionMap = {
       ...preset.droppables,
       [preset.home.descriptor.id]: disableDroppable(preset.home),
@@ -84,12 +84,12 @@ describe('get droppable over', () => {
         id: 'partially hidden subject',
         type: 'TYPE',
       },
-      client: getArea({
+      paddingBox: getArea({
         top: 0, left: 0, right: 100, bottom: 100,
       }),
       closest: {
         // will partially hide the subject
-        frameClient: getArea({
+        framePaddingBox: getArea({
           top: 0, left: 0, right: 50, bottom: 100,
         }),
         scrollHeight: 100,
@@ -104,7 +104,7 @@ describe('get droppable over', () => {
         droppableId: droppable.descriptor.type,
         index: 0,
       },
-      client: getArea({
+      paddingBox: getArea({
         top: 0, left: 0, right: 50, bottom: 50,
       }),
     });
@@ -127,13 +127,13 @@ describe('get droppable over', () => {
         id: 'hidden subject',
         type: 'TYPE',
       },
-      client: getArea({
+      paddingBox: getArea({
         top: 0, left: 0, right: 100, bottom: 100,
       }),
       closest: {
         // will partially hide the subject
         // will totally hide the subject
-        frameClient: getArea({
+        framePaddingBox: getArea({
           top: 0, left: 101, right: 200, bottom: 100,
         }),
         scrollHeight: 100,
@@ -148,7 +148,7 @@ describe('get droppable over', () => {
         droppableId: droppable.descriptor.type,
         index: 0,
       },
-      client: getArea({
+      paddingBox: getArea({
         top: 0, left: 0, right: 50, bottom: 50,
       }),
     });
@@ -168,7 +168,7 @@ describe('get droppable over', () => {
     const margin: Spacing = {
       top: 10, right: 10, bottom: 10, left: 10,
     };
-    const droppableClient: Area = getArea({
+    const droppablePaddingBox: Area = getArea({
       top: 10,
       left: 10,
       right: 90,
@@ -179,7 +179,7 @@ describe('get droppable over', () => {
         id: 'home',
         type: 'TYPE',
       },
-      client: droppableClient,
+      paddingBox: droppablePaddingBox,
       margin,
     });
     const inHome1: DraggableDimension = getDraggableDimension({
@@ -188,7 +188,7 @@ describe('get droppable over', () => {
         droppableId: home.descriptor.id,
         index: 0,
       },
-      client: getArea({
+      paddingBox: getArea({
         top: 10,
         left: 10,
         right: 90,
@@ -203,7 +203,7 @@ describe('get droppable over', () => {
         droppableId: 'foreign',
         index: 0,
       },
-      client: getArea({
+      paddingBox: getArea({
         // to the right of inHome1
         left: 200,
         right: 250,
@@ -245,8 +245,8 @@ describe('get droppable over', () => {
       it('should not add any placeholder buffer', () => {
         // just below home
         const target: Position = {
-          x: home.page.withMargin.center.x,
-          y: home.page.withMargin.bottom + 1,
+          x: home.page.marginBox.center.x,
+          y: home.page.marginBox.bottom + 1,
         };
         // dragging inHome1 just below home
         const result: ?DroppableId = getDroppableOver({
@@ -266,8 +266,8 @@ describe('get droppable over', () => {
         it('should not add a buffer if it was not previously over the foreign droppable', () => {
           // just below home
           const target: Position = {
-            x: home.page.withMargin.center.x,
-            y: home.page.withMargin.bottom + 1,
+            x: home.page.marginBox.center.x,
+            y: home.page.marginBox.bottom + 1,
           };
           // dragging inForeign1 just below inHome1
           const result: ?DroppableId = getDroppableOver({
@@ -284,8 +284,8 @@ describe('get droppable over', () => {
         it('should add a placeholder buffer when previously dragging over', () => {
           // just below home
           const target: Position = {
-            x: home.page.withMargin.center.x,
-            y: home.page.withMargin.bottom + 1,
+            x: home.page.marginBox.center.x,
+            y: home.page.marginBox.bottom + 1,
           };
           // dragging inForeign1 just below inHome1
           const result: ?DroppableId = getDroppableOver({
@@ -302,8 +302,8 @@ describe('get droppable over', () => {
         it('should add as much space as required to fit a placeholder', () => {
           // at the end of the placeholder
           const target: Position = {
-            x: inHome1.page.withMargin.center.x,
-            y: inHome1.page.withMargin.bottom + inForeign1.page.withMargin.bottom,
+            x: inHome1.page.marginBox.center.x,
+            y: inHome1.page.marginBox.bottom + inForeign1.page.marginBox.bottom,
           };
           // dragging inForeign1 just below inHome1
           const result: ?DroppableId = getDroppableOver({
@@ -319,8 +319,8 @@ describe('get droppable over', () => {
 
         it('should not extend beyond what is required to fit a placeholder', () => {
           const target: Position = {
-            x: inHome1.page.withMargin.center.x,
-            y: inHome1.page.withMargin.bottom + inForeign1.page.withMargin.bottom + 1,
+            x: inHome1.page.marginBox.center.x,
+            y: inHome1.page.marginBox.bottom + inForeign1.page.marginBox.bottom + 1,
           };
           // dragging inForeign1 just below inHome1
           const result: ?DroppableId = getDroppableOver({
@@ -337,9 +337,9 @@ describe('get droppable over', () => {
         it('should only add buffer on main axis', () => {
           const target: Position = {
             // too far to the right
-            x: inHome1.page.withMargin.right + 1,
+            x: inHome1.page.marginBox.right + 1,
             // would otherwise be fine
-            y: inHome1.page.withMargin.bottom + inForeign1.page.withMargin.bottom,
+            y: inHome1.page.marginBox.bottom + inForeign1.page.marginBox.bottom,
           };
 
           const result: ?DroppableId = getDroppableOver({
@@ -360,17 +360,17 @@ describe('get droppable over', () => {
                 id: 'empty',
                 type: 'TYPE',
               },
-              client: getArea({
+              paddingBox: getArea({
                 top: 1000,
                 left: 1000,
                 right: 2000,
                 // not big enough to fit inHome1
-                bottom: 1000 + (inHome1.page.withMargin.height / 2),
+                bottom: 1000 + (inHome1.page.marginBox.height / 2),
               }),
             });
             const target: Position = {
-              x: empty.page.withMargin.center.x,
-              y: 1000 + inHome1.page.withMargin.height,
+              x: empty.page.marginBox.center.x,
+              y: 1000 + inHome1.page.marginBox.height,
             };
             const withEmpty: DroppableDimensionMap = {
               ...droppables,
@@ -409,17 +409,17 @@ describe('get droppable over', () => {
                 id: 'empty',
                 type: 'TYPE',
               },
-              client: getArea({
+              paddingBox: getArea({
                 top: 1000,
                 left: 1000,
                 right: 2000,
                 // big enough to fit inHome1
-                bottom: 1000 + inHome1.page.withMargin.height,
+                bottom: 1000 + inHome1.page.marginBox.height,
               }),
             });
             const target: Position = {
-              x: empty.page.withMargin.center.x,
-              y: 1000 + inHome1.page.withMargin.height,
+              x: empty.page.marginBox.center.x,
+              y: 1000 + inHome1.page.marginBox.height,
             };
             const withEmpty: DroppableDimensionMap = {
               ...droppables,
@@ -464,7 +464,7 @@ describe('get droppable over', () => {
               id: 'has-a-scroll-parent',
               type: 'TYPE',
             },
-            client: getArea({
+            paddingBox: getArea({
               top: 0,
               left: 0,
               right: 100,
@@ -472,7 +472,7 @@ describe('get droppable over', () => {
               bottom: 120,
             }),
             closest: {
-              frameClient: getArea({
+              framePaddingBox: getArea({
                 top: 0,
                 left: 0,
                 right: 100,
@@ -515,15 +515,15 @@ describe('get droppable over', () => {
               id: 'my-custom-foreign',
               type: 'TYPE',
             },
-            client: getArea({
+            paddingBox: getArea({
               top: 0,
               left: 0,
               right: 100,
               // this will ensure that there is required growth in the droppable
-              bottom: inHome1.page.withMargin.height - 1,
+              bottom: inHome1.page.marginBox.height - 1,
             }),
             closest: {
-              frameClient: getArea({
+              framePaddingBox: getArea({
                 top: 0,
                 left: 0,
                 right: 100,

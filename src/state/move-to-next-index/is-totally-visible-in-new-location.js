@@ -27,8 +27,8 @@ export default ({
   // We are not considering margins for this calculation.
   // This is because a move might move a Draggable slightly outside of the bounds
   // of a Droppable (which is okay)
-  const diff: Position = subtract(newPageCenter, draggable.page.withoutMargin.center);
-  const shifted: Spacing = offsetByPosition(draggable.page.withoutMargin, diff);
+  const diff: Position = subtract(newPageCenter, draggable.page.paddingBox.center);
+  const shifted: Spacing = offsetByPosition(draggable.page.paddingBox, diff);
 
   // Must be totally visible, not just partially visible.
 

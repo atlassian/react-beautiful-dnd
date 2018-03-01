@@ -35,7 +35,7 @@ export default ({
 }: Args): ?Result => {
   const axis: Axis = droppable.axis;
   const isGoingBeforeTarget: boolean = Boolean(target &&
-    pageCenter[droppable.axis.line] < target.page.withMargin.center[droppable.axis.line]);
+    pageCenter[droppable.axis.line] < target.page.marginBox.center[droppable.axis.line]);
 
   // Moving to an empty list
 
@@ -44,9 +44,9 @@ export default ({
     // based on the axis of the destination
 
     const newCenter: Position = moveToEdge({
-      source: draggable.page.withoutMargin,
+      source: draggable.page.paddingBox,
       sourceEdge: 'start',
-      destination: droppable.page.withoutPadding,
+      destination: droppable.page.contentBox,
       destinationEdge: 'start',
       destinationAxis: axis,
     });
@@ -82,9 +82,9 @@ export default ({
 
   const newCenter: Position = moveToEdge({
     // Aligning to visible top of draggable
-    source: draggable.page.withoutMargin,
+    source: draggable.page.paddingBox,
     sourceEdge: 'start',
-    destination: target.page.withMargin,
+    destination: target.page.marginBox,
     destinationEdge: isGoingBeforeTarget ? 'start' : 'end',
     destinationAxis: axis,
   });
