@@ -7,11 +7,10 @@ import type {
   Axis,
   Position,
   Displacement,
-  Area,
+  Viewport,
 } from '../../types';
 import { patch } from '../position';
 import getDisplacement from '../get-displacement';
-import getViewport from '../../window/get-viewport';
 import withDroppableScroll from '../with-droppable-scroll';
 
 type Args = {|
@@ -20,6 +19,7 @@ type Args = {|
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
   previousImpact: DragImpact,
+  viewport: Viewport,
 |}
 
 export default ({
@@ -28,9 +28,9 @@ export default ({
   destination,
   insideDestination,
   previousImpact,
+  viewport,
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
-  const viewport: Area = getViewport();
 
   // We need to know what point to use to compare to the other
   // draggables in the list.
@@ -49,7 +49,7 @@ export default ({
       draggable: dimension,
       destination,
       previousImpact,
-      viewport,
+      viewport: viewport.subject,
     }));
 
   const newIndex: number = insideDestination.length - displaced.length;

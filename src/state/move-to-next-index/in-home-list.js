@@ -3,7 +3,6 @@ import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import { patch, subtract } from '../position';
 import withDroppableDisplacement from '../with-droppable-displacement';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
-import getViewport from '../../window/get-viewport';
 // import getScrollJumpResult from './get-scroll-jump-result';
 import moveToEdge from '../move-to-edge';
 import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
@@ -16,7 +15,6 @@ import type {
   Displacement,
   Axis,
   DragImpact,
-  Area,
 } from '../../types';
 
 export default ({
@@ -26,6 +24,7 @@ export default ({
   previousImpact,
   droppable,
   draggables,
+  viewport,
 }: Args): ?Result => {
   const location: ?DraggableLocation = previousImpact.destination;
 
@@ -61,7 +60,6 @@ export default ({
     return null;
   }
 
-  const viewport: Area = getViewport();
   const destination: DraggableDimension = insideDroppable[proposedIndex];
   const isMovingTowardStart = (isMovingForward && proposedIndex <= startIndex) ||
     (!isMovingForward && proposedIndex >= startIndex);
@@ -87,7 +85,7 @@ export default ({
     draggable,
     destination: droppable,
     newPageCenter,
-    viewport,
+    viewport: viewport.subject,
   });
 
   const displaced: Displacement[] = (() => {

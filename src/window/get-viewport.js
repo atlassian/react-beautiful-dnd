@@ -1,13 +1,15 @@
 // @flow
-import type { Position, Area } from '../types';
+import type { Position, Area, Viewport } from '../types';
 import getArea from '../state/get-area';
 import getWindowScroll from './get-window-scroll';
+// TODO: should this function live here?
+import getMaxScroll from '../state/get-max-scroll';
 
-export default (): Area => {
-  const windowScroll: Position = getWindowScroll();
+export default (): Viewport => {
+  const scroll: Position = getWindowScroll();
 
-  const top: number = windowScroll.y;
-  const left: number = windowScroll.x;
+  const top: number = scroll.y;
+  const left: number = scroll.x;
 
   const doc: HTMLElement = (document.documentElement : any);
 
@@ -19,7 +21,22 @@ export default (): Area => {
   const right: number = left + width;
   const bottom: number = top + height;
 
-  return getArea({
+  const subject: Area = getArea({
     top, left, right, bottom,
   });
+
+  const maxScroll: Position = getMaxScroll({
+    scrollHeight: doc.scrollHeight,
+    scrollWidth: doc.scrollWidth,
+    width: subject.width,
+    height: subject.height,
+  });
+
+  const viewport: Viewport = {
+    subject,
+    maxScroll,
+    scroll,
+  };
+
+  return viewport;
 };

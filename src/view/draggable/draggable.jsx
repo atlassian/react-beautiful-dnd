@@ -13,7 +13,7 @@ import type {
 import DraggableDimensionPublisher from '../draggable-dimension-publisher/';
 import Moveable from '../moveable/';
 import DragHandle from '../drag-handle';
-import getWindowScroll from '../../window/get-window-scroll';
+import getViewport from '../../window/get-viewport';
 // eslint-disable-next-line no-duplicate-imports
 import type {
   DragHandleProps,
@@ -118,9 +118,7 @@ export default class Draggable extends Component<Props, State> {
       center: getCenterPosition(ref),
     };
 
-    const windowScroll: Position = getWindowScroll();
-
-    lift(draggableId, initial, windowScroll, autoScrollMode);
+    lift(draggableId, initial, getViewport(), autoScrollMode);
   }
 
   onMove = (client: Position) => {
@@ -133,9 +131,7 @@ export default class Draggable extends Component<Props, State> {
       return;
     }
 
-    const windowScroll: Position = getWindowScroll();
-
-    move(draggableId, client, windowScroll);
+    move(draggableId, client, getViewport());
   }
 
   onMoveForward = () => {
@@ -160,8 +156,7 @@ export default class Draggable extends Component<Props, State> {
 
   onWindowScroll = () => {
     this.throwIfCannotDrag();
-    const windowScroll = getWindowScroll();
-    this.props.moveByWindowScroll(this.props.draggableId, windowScroll);
+    this.props.moveByWindowScroll(this.props.draggableId, getViewport());
   }
 
   onDrop = () => {

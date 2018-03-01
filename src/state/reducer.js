@@ -23,6 +23,7 @@ import type {
   Position,
   InitialDragPositions,
   LiftRequest,
+  Viewport,
 } from '../types';
 import { add, subtract, isEqual } from './position';
 import { noMovement } from './no-impact';
@@ -52,7 +53,7 @@ type MoveArgs = {|
   state: State,
   clientSelection: Position,
   shouldAnimate: boolean,
-  windowScroll ?: Position,
+  viewport?: Viewport,
   // force a custom drag impact (optionally provided)
   impact?: ?DragImpact,
   // provide a scroll jump request (optionally provided - and can be null)
@@ -67,7 +68,7 @@ const move = ({
   state,
   clientSelection,
   shouldAnimate,
-  windowScroll,
+  viewport: proposedViewport,
   impact,
   scrollJumpRequest,
 }: MoveArgs): State => {
@@ -85,7 +86,8 @@ const move = ({
 
   const previous: CurrentDrag = last.current;
   const initial: InitialDrag = last.initial;
-  const currentWindowScroll: Position = windowScroll || previous.windowScroll;
+  const viewport: Viewport = proposedViewport || previous.viewport;
+  const currentWindowScroll: Position = viewport.scroll;
 
   const client: CurrentDragPositions = (() => {
     const offset: Position = subtract(clientSelection, initial.client.selection);
@@ -108,7 +110,7 @@ const move = ({
     client,
     page,
     shouldAnimate,
-    windowScroll: currentWindowScroll,
+    viewport,
     hasCompletedFirstBulkPublish: previous.hasCompletedFirstBulkPublish,
   };
 
@@ -118,6 +120,7 @@ const move = ({
     draggables: state.dimension.draggable,
     droppables: state.dimension.droppable,
     previousImpact: last.impact,
+    viewport,
   }));
 
   const drag: DragState = {
@@ -300,10 +303,10 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
-    const { id, client, windowScroll, autoScrollMode } = action.payload;
+    const { id, client, viewport, autoScrollMode } = action.payload;
     const page: InitialDragPositions = {
-      selection: add(client.selection, windowScroll),
-      center: add(client.center, windowScroll),
+      selection: add(client.selection, viewport.scroll),
+      center: add(client.center, viewport.scroll),
     };
 
     const draggable: ?DraggableDimension = state.dimension.draggable[id];
@@ -320,7 +323,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       autoScrollMode,
       client,
       page,
-      windowScroll,
+      viewport,
     };
 
     const current: CurrentDrag = {
@@ -334,7 +337,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
         center: page.center,
         offset: origin,
       },
-      windowScroll,
+      viewport,
       hasCompletedFirstBulkPublish: false,
       shouldAnimate: false,
     };
@@ -453,7 +456,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
   if (action.type === 'MOVE') {
     // Otherwise get an incorrect index calculated before the other dimensions are published
-    const { client, windowScroll, shouldAnimate } = action.payload;
+    const { client, viewport, shouldAnimate } = action.payload;
     const drag: ?DragState = state.drag;
 
     if (!drag) {
@@ -478,14 +481,14 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     return move({
       state,
       clientSelection: client,
-      windowScroll,
+      viewport,
       shouldAnimate,
       impact,
     });
   }
 
   if (action.type === 'MOVE_BY_WINDOW_SCROLL') {
-    const { windowScroll } = action.payload;
+    const { viewport } = action.payload;
     const drag: ?DragState = state.drag;
 
     if (!drag) {
@@ -493,7 +496,8 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
-    if (isEqual(windowScroll, drag.current.windowScroll)) {
+    // TODO: need to improve this so that it compares the whole viewport
+    if (isEqual(viewport.scroll, drag.current.viewport.scroll)) {
       return state;
     }
 
@@ -506,7 +510,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     return move({
       state,
       clientSelection: drag.current.client.selection,
-      windowScroll,
+      viewport,
       shouldAnimate: false,
       impact,
     });
@@ -542,6 +546,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       draggables: state.dimension.draggable,
       previousPageCenter: existing.current.page.center,
       previousImpact: existing.impact,
+      viewport: existing.current.viewport,
     });
 
     // cannot move anyway (at the beginning or end of a list)
@@ -551,7 +556,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
     const impact: DragImpact = result.impact;
     const page: Position = result.pageCenter;
-    const client: Position = subtract(page, existing.current.windowScroll);
+    const client: Position = subtract(page, existing.current.viewport.scroll);
 
     return move({
       state,
@@ -597,6 +602,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       draggables: state.dimension.draggable,
       droppables: state.dimension.droppable,
       previousImpact: state.drag.impact,
+      viewport: current.viewport,
     });
 
     if (!result) {
@@ -604,7 +610,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     }
 
     const page: Position = result.pageCenter;
-    const client: Position = subtract(page, current.windowScroll);
+    const client: Position = subtract(page, current.viewport.scroll);
 
     return move({
       state,

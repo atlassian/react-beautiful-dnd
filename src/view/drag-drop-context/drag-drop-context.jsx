@@ -25,6 +25,7 @@ import type {
   DroppableId,
   Position,
   Hooks,
+  Viewport,
 } from '../../types';
 import type {
   HookCaller,
@@ -140,10 +141,10 @@ export default class DragDropContext extends React.Component<Props> {
       move: (
         id: DraggableId,
         client: Position,
-        windowScroll: Position,
+        viewport: Viewport,
         shouldAnimate?: boolean
       ): void => {
-        this.store.dispatch(move(id, client, windowScroll, shouldAnimate));
+        this.store.dispatch(move(id, client, viewport, shouldAnimate));
       },
     });
 
