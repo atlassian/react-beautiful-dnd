@@ -13,7 +13,7 @@ import type { PixelThresholds } from '../../../../src/state/auto-scroller/fluid-
 import { getPixelThresholds, config } from '../../../../src/state/auto-scroller/fluid-scroller';
 import { add, patch, subtract } from '../../../../src/state/position';
 import getArea from '../../../../src/state/get-area';
-import setViewport, { resetViewport } from '../../../utils/set-viewport';
+import setViewport, { resetViewport } from '../../../utils/viewport';
 import setWindowScrollSize, { resetWindowScrollSize } from '../../../utils/set-window-scroll-size';
 import setWindowScroll, { resetWindowScroll } from '../../../utils/set-window-scroll';
 import noImpact, { noMovement } from '../../../../src/state/no-impact';

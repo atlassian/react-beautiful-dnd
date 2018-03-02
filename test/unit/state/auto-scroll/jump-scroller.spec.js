@@ -9,7 +9,7 @@ import type {
 import type { AutoScroller } from '../../../../src/state/auto-scroller/auto-scroller-types';
 import { add, patch, subtract, negate } from '../../../../src/state/position';
 import getArea from '../../../../src/state/get-area';
-import setViewport, { resetViewport } from '../../../utils/set-viewport';
+import setViewport, { resetViewport } from '../../../utils/viewport';
 import setWindowScrollSize, { resetWindowScrollSize } from '../../../utils/set-window-scroll-size';
 import setWindowScroll, { resetWindowScroll } from '../../../utils/set-window-scroll';
 import { vertical, horizontal } from '../../../../src/state/axis';

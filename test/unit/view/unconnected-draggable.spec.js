@@ -38,7 +38,7 @@ import getArea from '../../../src/state/get-area';
 import { combine, withStore, withDroppableId, withStyleContext, withDimensionMarshal, withCanLift } from '../../utils/get-context-options';
 import { dispatchWindowMouseEvent, mouseEvent } from '../../utils/user-input-util';
 import getViewport from '../../../src/view/window/get-viewport';
-import setViewport, { resetViewport } from '../../utils/set-viewport';
+import setViewport, { resetViewport } from '../../utils/viewport';
 
 class Item extends Component<{ provided: Provided }> {
   render() {

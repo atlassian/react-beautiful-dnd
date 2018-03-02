@@ -1,6 +1,11 @@
 // @flow
-import type { Viewport } from '../../src/types';
+import type {
+  Area,
+  Viewport,
+  Position,
+} from '../../src/types';
 import getViewport from '../../src/view/window/get-viewport';
+import getMaxScroll from '../../src/state/get-max-scroll';
 
 const getDoc = (): HTMLElement => {
   const el: ?HTMLElement = document.documentElement;
@@ -12,7 +17,7 @@ const getDoc = (): HTMLElement => {
   return el;
 };
 
-const setViewport = (custom: Viewport) => {
+export const setViewport = (custom: Viewport) => {
   if (custom.scroll.x !== custom.subject.left) {
     throw new Error('scroll x must match left of subject');
   }
@@ -41,4 +46,28 @@ const original: Viewport = getCurrent();
 
 export const resetViewport = () => setViewport(original);
 
-export default setViewport;
+type CreateViewportArgs = {|
+  subject: Area,
+  scroll: Position,
+  scrollHeight: number,
+  scrollWidth: number,
+|}
+
+export const createViewport = ({
+  subject,
+  scroll,
+  scrollHeight,
+  scrollWidth,
+}: CreateViewportArgs): Viewport => {
+  const viewport: Viewport = {
+    subject,
+    scroll,
+    maxScroll: getMaxScroll({
+      scrollHeight,
+      scrollWidth,
+      width: subject.width,
+      height: subject.height,
+    }),
+  };
+  return viewport;
+};
