@@ -22,6 +22,7 @@ import type {
   DraggableId,
   DragImpact,
   ScrollOptions,
+  Viewport,
 } from '../../src/types';
 
 const scheduled: ScrollOptions = {
@@ -84,6 +85,7 @@ export default (axis?: Axis = vertical) => {
   const dragging = (
     id?: DraggableId = preset.inHome1.descriptor.id,
     selection?: Position,
+    viewport?: Viewport = getViewport(),
   ): State => {
     // will populate the dimension state with the initial dimensions
     const draggable: DraggableDimension = preset.draggables[id];
@@ -105,12 +107,12 @@ export default (axis?: Axis = vertical) => {
         autoScrollMode: 'FLUID',
         client: initialPosition,
         page: initialPosition,
-        viewport: getViewport(),
+        viewport,
       },
       current: {
         client: clientPositions,
         page: clientPositions,
-        viewport: getViewport(),
+        viewport,
         shouldAnimate: false,
         hasCompletedFirstBulkPublish: true,
       },
@@ -131,7 +133,7 @@ export default (axis?: Axis = vertical) => {
     return result;
   };
 
-  const scrollJumpRequest = (request: Position): State => {
+  const scrollJumpRequest = (request: Position, viewport?: Viewport = getViewport()): State => {
     const id: DraggableId = preset.inHome1.descriptor.id;
     // will populate the dimension state with the initial dimensions
     const draggable: DraggableDimension = preset.draggables[id];
@@ -165,14 +167,14 @@ export default (axis?: Axis = vertical) => {
         autoScrollMode: 'JUMP',
         client: initialPosition,
         page: initialPosition,
-        viewport: getViewport(),
+        viewport,
       },
       current: {
         client: clientPositions,
         page: clientPositions,
         shouldAnimate: true,
         hasCompletedFirstBulkPublish: true,
-        viewport: getViewport(),
+        viewport,
       },
       impact,
       scrollJumpRequest: request,

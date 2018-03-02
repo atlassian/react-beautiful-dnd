@@ -6,6 +6,9 @@ import type {
 } from '../../src/types';
 import getViewport from '../../src/view/window/get-viewport';
 import getMaxScroll from '../../src/state/get-max-scroll';
+import { offsetByPosition } from '../../src/state/spacing';
+import { subtract, negate } from '../../src/state/position';
+import getArea from '../../src/state/get-area';
 
 const getDoc = (): HTMLElement => {
   const el: ?HTMLElement = document.documentElement;
@@ -70,4 +73,38 @@ export const createViewport = ({
     }),
   };
   return viewport;
+};
+
+type WithWindowScrollSizeArgs = {|
+  viewport: Viewport,
+  scrollWidth: number,
+  scrollHeight: number,
+|}
+
+export const withWindowScrollSize = ({
+  viewport,
+  scrollWidth,
+  scrollHeight,
+}: WithWindowScrollSizeArgs): Viewport =>
+  createViewport({
+    subject: viewport.subject,
+    scroll: viewport.scroll,
+    scrollHeight,
+    scrollWidth,
+  });
+
+export const scrollViewport = (viewport: Viewport, newScroll: Position) => {
+  const diff: Position = subtract(viewport.scroll, newScroll);
+  const displacement: Position = negate(diff);
+
+  // reverse engineering these values
+  const scrollHeight: number = viewport.maxScroll.y + viewport.subject.height;
+  const scrollWidth: number = viewport.maxScroll.x + viewport.subject.width;
+
+  return createViewport({
+    subject: getArea(offsetByPosition(viewport.subject, displacement)),
+    scroll: newScroll,
+    scrollHeight,
+    scrollWidth,
+  });
 };
