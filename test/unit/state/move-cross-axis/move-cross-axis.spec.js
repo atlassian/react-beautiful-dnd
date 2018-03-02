@@ -1,12 +1,13 @@
 // @flow
 import moveCrossAxis from '../../../../src/state/move-cross-axis/';
 import noImpact from '../../../../src/state/no-impact';
-import getViewport from '../../../../src/window/get-viewport';
+import getViewport from '../../../../src/view/window/get-viewport';
 import getArea from '../../../../src/state/get-area';
 import { getDroppableDimension, getDraggableDimension } from '../../../../src/state/dimension';
 import { getPreset } from '../../../utils/dimension';
 import type { Result } from '../../../../src/state/move-cross-axis/move-cross-axis-types';
 import type {
+  Viewport,
   DraggableDimension,
   DroppableDimension,
   DraggableDimensionMap,
@@ -14,13 +15,13 @@ import type {
 } from '../../../../src/types';
 
 const preset = getPreset();
+const viewport: Viewport = getViewport();
 
 // The functionality of move-cross-axis is covered by other files in this folder.
 // This spec file is directed any any logic in move-cross-axis/index.js
 
 describe('move cross axis', () => {
   it('should return null if there are draggables in a destination list but none are visible', () => {
-    const viewport = getViewport();
     const custom: DroppableDimension = getDroppableDimension({
       descriptor: {
         id: 'custom',
@@ -30,7 +31,7 @@ describe('move cross axis', () => {
         left: preset.home.client.marginBox.left + 1,
         right: preset.home.client.marginBox.left + 10,
         top: 0,
-        bottom: viewport.bottom + 200,
+        bottom: viewport.subject.bottom + 200,
       }),
     });
     const notVisible: DraggableDimension = getDraggableDimension({
@@ -43,8 +44,8 @@ describe('move cross axis', () => {
         left: preset.home.client.marginBox.left + 1,
         right: preset.home.client.marginBox.left + 10,
         // outside of the viewport
-        top: viewport.bottom + 1,
-        bottom: viewport.bottom + 10,
+        top: viewport.subject.bottom + 1,
+        bottom: viewport.subject.bottom + 10,
       }),
     });
     const draggables: DraggableDimensionMap = {
@@ -68,6 +69,7 @@ describe('move cross axis', () => {
       draggables,
       droppables,
       previousImpact: noImpact,
+      viewport,
     });
 
     expect(result).toBe(null);
@@ -87,6 +89,7 @@ describe('move cross axis', () => {
       draggables: preset.draggables,
       droppables: preset.droppables,
       previousImpact: noImpact,
+      viewport,
     });
 
     // not asserting anything about the behaviour - just that something was returned
