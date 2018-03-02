@@ -5,11 +5,12 @@ import type {
   Position,
   State,
   DroppableDimension,
+  Viewport,
 } from '../../../../src/types';
 import type { AutoScroller } from '../../../../src/state/auto-scroller/auto-scroller-types';
 import { add, patch, subtract, negate } from '../../../../src/state/position';
 import getArea from '../../../../src/state/get-area';
-import setViewport, { resetViewport } from '../../../utils/viewport';
+import { setViewport, resetViewport, createViewport } from '../../../utils/viewport';
 import setWindowScrollSize, { resetWindowScrollSize } from '../../../utils/set-window-scroll-size';
 import setWindowScroll, { resetWindowScroll } from '../../../utils/set-window-scroll';
 import { vertical, horizontal } from '../../../../src/state/axis';
@@ -25,17 +26,22 @@ const windowScrollSize = {
   scrollHeight: 2000,
   scrollWidth: 1600,
 };
-const viewport: Area = getArea({
-  top: 0,
-  left: 0,
-  right: 800,
-  bottom: 1000,
+const viewport: Viewport = createViewport({
+  subject: getArea({
+    top: 0,
+    left: 0,
+    right: 800,
+    bottom: 1000,
+  }),
+  scrollHeight: windowScrollSize.scrollHeight,
+  scrollWidth: windowScrollSize.scrollWidth,
+  scroll: origin,
 });
 
 const disableWindowScroll = () => {
   setWindowScrollSize({
-    scrollHeight: viewport.height,
-    scrollWidth: viewport.width,
+    scrollHeight: viewport.subject.height,
+    scrollWidth: viewport.subject.width,
   });
 };
 
@@ -100,8 +106,8 @@ describe('jump auto scrolling', () => {
           it('should manually move the item any distance that the window is unable to scroll', () => {
             // only allowing scrolling by 1 px
             setWindowScrollSize({
-              scrollHeight: viewport.height + 1,
-              scrollWidth: viewport.width + 1,
+              scrollHeight: viewport.subject.height + 1,
+              scrollWidth: viewport.subject.width + 1,
             });
             // more than the 1 pixel allowed
             const request: Position = patch(axis.line, 3);
@@ -349,8 +355,8 @@ describe('jump auto scrolling', () => {
                 const maxWindowScroll: Position = getMaxScroll({
                   scrollHeight: windowScrollSize.scrollHeight,
                   scrollWidth: windowScrollSize.scrollWidth,
-                  height: viewport.height,
-                  width: viewport.width,
+                  height: viewport.subject.height,
+                  width: viewport.subject.width,
                 });
                 const windowScroll: Position = subtract(maxWindowScroll, availableWindowScroll);
                 setWindowScroll(windowScroll);

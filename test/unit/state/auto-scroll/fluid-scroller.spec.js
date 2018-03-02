@@ -15,8 +15,8 @@ import { getPixelThresholds, config } from '../../../../src/state/auto-scroller/
 import { add, patch, subtract } from '../../../../src/state/position';
 import getArea from '../../../../src/state/get-area';
 import { setViewport, resetViewport, createViewport } from '../../../utils/viewport';
-import setWindowScrollSize, { resetWindowScrollSize } from '../../../utils/set-window-scroll-size';
-import setWindowScroll, { resetWindowScroll } from '../../../utils/set-window-scroll';
+import setWindowScrollSize from '../../../utils/set-window-scroll-size';
+import setWindowScroll from '../../../utils/set-window-scroll';
 import noImpact, { noMovement } from '../../../../src/state/no-impact';
 import { vertical, horizontal } from '../../../../src/state/axis';
 import createAutoScroller from '../../../../src/state/auto-scroller/';
