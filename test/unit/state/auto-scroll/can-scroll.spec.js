@@ -16,9 +16,7 @@ import { add, subtract } from '../../../../src/state/position';
 import getArea from '../../../../src/state/get-area';
 import { getPreset } from '../../../utils/dimension';
 import { getDroppableDimension, scrollDroppable } from '../../../../src/state/dimension';
-import { resetViewport, createViewport } from '../../../utils/viewport';
-import setWindowScroll, { resetWindowScroll } from '../../../utils/set-window-scroll';
-import setWindowScrollSize, { resetWindowScrollSize } from '../../../utils/set-window-scroll-size';
+import { createViewport } from '../../../utils/viewport';
 import getMaxScroll from '../../../../src/state/get-max-scroll';
 
 const origin: Position = { x: 0, y: 0 };
@@ -68,12 +66,6 @@ const customViewport: Viewport = createViewport({
 });
 
 describe('can scroll', () => {
-  afterEach(() => {
-    resetWindowScroll();
-    resetWindowScrollSize();
-    resetViewport();
-  });
-
   describe('can partially scroll', () => {
     it('should return true if not scrolling anywhere', () => {
       const result: boolean = canPartiallyScroll({

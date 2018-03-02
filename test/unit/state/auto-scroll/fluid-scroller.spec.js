@@ -15,10 +15,7 @@ import { getPixelThresholds, config } from '../../../../src/state/auto-scroller/
 import { add, patch, subtract } from '../../../../src/state/position';
 import getArea from '../../../../src/state/get-area';
 import {
-  setViewport,
-  resetViewport,
   createViewport,
-  withWindowScrollSize,
   scrollViewport,
 } from '../../../utils/viewport';
 import noImpact, { noMovement } from '../../../../src/state/no-impact';

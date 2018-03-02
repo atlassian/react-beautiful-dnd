@@ -464,7 +464,6 @@ export const lift = (id: DraggableId,
   viewport: Viewport,
   autoScrollMode: AutoScrollMode,
 ) => (dispatch: Dispatch, getState: Function) => {
-  console.time('LIFT');
   // Phase 1: Quickly finish any current drop animations
   const initial: State = getState();
 
@@ -514,7 +513,6 @@ export const lift = (id: DraggableId,
       }
 
       dispatch(completeLift(id, client, viewport, autoScrollMode));
-      console.timeEnd('LIFT');
     });
   });
 };
