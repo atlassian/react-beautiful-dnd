@@ -5,14 +5,17 @@ import { add, distance, patch } from '../../../../src/state/position';
 import { expandByPosition } from '../../../../src/state/spacing';
 import { horizontal, vertical } from '../../../../src/state/axis';
 import getArea from '../../../../src/state/get-area';
-import getViewport from '../../../../src/window/get-viewport';
+import getViewport from '../../../../src/view/window/get-viewport';
 import type {
   Area,
   Axis,
   Position,
   DraggableDimension,
   DroppableDimension,
+  Viewport,
 } from '../../../../src/types';
+
+const viewport: Viewport = getViewport();
 
 describe('get closest draggable', () => {
   [vertical, horizontal].forEach((axis: Axis) => {
@@ -125,7 +128,6 @@ describe('get closest draggable', () => {
         }),
       });
 
-      const viewport = getViewport();
       const outOfViewport: DraggableDimension = getDraggableDimension({
         descriptor: {
           id: 'hidden',
@@ -135,8 +137,8 @@ describe('get closest draggable', () => {
         paddingBox: getArea({
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
-          [axis.start]: viewport[axis.end] + 1,
-          [axis.end]: viewport[axis.end] + 10,
+          [axis.start]: viewport.subject[axis.end] + 1,
+          [axis.end]: viewport.subject[axis.end] + 10,
         }),
       });
 
@@ -160,6 +162,7 @@ describe('get closest draggable', () => {
           pageCenter: center1,
           destination: droppable,
           insideDestination,
+          viewport,
         });
         expect(result1).toBe(visible1);
 
@@ -172,6 +175,7 @@ describe('get closest draggable', () => {
           pageCenter: center2,
           destination: droppable,
           insideDestination,
+          viewport,
         });
         expect(result2).toBe(visible2);
       });
@@ -187,6 +191,7 @@ describe('get closest draggable', () => {
           pageCenter: center,
           destination: droppable,
           insideDestination: [],
+          viewport,
         });
 
         expect(result).toBe(null);
@@ -220,6 +225,7 @@ describe('get closest draggable', () => {
           pageCenter: center,
           destination: scrolled,
           insideDestination,
+          viewport,
         });
 
         expect(result).toBe(visible2);
@@ -230,6 +236,7 @@ describe('get closest draggable', () => {
           pageCenter: center,
           destination: droppable,
           insideDestination,
+          viewport,
         });
         expect(result1).toBe(visible1);
       });
@@ -247,6 +254,7 @@ describe('get closest draggable', () => {
             pageCenter: center,
             destination: droppable,
             insideDestination,
+            viewport,
           });
 
           expect(result).toBe(visible1);
@@ -264,6 +272,7 @@ describe('get closest draggable', () => {
             pageCenter: center,
             destination: droppable,
             insideDestination,
+            viewport,
           });
 
           expect(result).toBe(visible1);
@@ -279,6 +288,7 @@ describe('get closest draggable', () => {
             pageCenter: center,
             destination: droppable,
             insideDestination,
+            viewport,
           });
 
           expect(result).toBe(visible2);
@@ -294,6 +304,7 @@ describe('get closest draggable', () => {
             pageCenter: center,
             destination: droppable,
             insideDestination,
+            viewport,
           });
 
           expect(result).toBe(visible2);
@@ -309,6 +320,7 @@ describe('get closest draggable', () => {
             pageCenter: center,
             destination: droppable,
             insideDestination,
+            viewport,
           });
 
           expect(result).toBe(visible2);
@@ -330,6 +342,7 @@ describe('get closest draggable', () => {
             pageCenter: center,
             destination: droppable,
             insideDestination: notVisible,
+            viewport,
           });
 
           expect(result).toBe(null);
@@ -350,6 +363,7 @@ describe('get closest draggable', () => {
           pageCenter: center,
           destination: droppable,
           insideDestination,
+          viewport,
         });
 
         expect(result).toBe(visible1);
@@ -366,6 +380,7 @@ describe('get closest draggable', () => {
           pageCenter: add(center, patch(axis.line, 1)),
           destination: droppable,
           insideDestination,
+          viewport,
         });
         expect(result2).toBe(visible2);
       });
