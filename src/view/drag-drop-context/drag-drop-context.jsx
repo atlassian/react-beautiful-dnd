@@ -150,25 +150,27 @@ export default class DragDropContext extends React.Component<Props> {
     let previous: State = this.store.getState();
 
     this.unsubscribe = this.store.subscribe(() => {
-      const previousInThisExecution: State = previous;
       const current = this.store.getState();
-      // setting previous now incase any of the
-      // functions synchronously trigger more updates
+      const previousInThisExecution: State = previous;
+      const isPhaseChanging: boolean = current.phase !== previous.phase;
+      // setting previous now rather than at the end of this function
+      // incase a function is called that syncorously causes a state update
+      // which will re-invoke this function before it has completed a previous
+      // invokation.
       previous = current;
-
-      const isPhaseChanging: boolean = current.phase !== previousInThisExecution.phase;
 
       // Style updates do not cause more actions. It is important to update styles
       // before hooks are called: specifically the onDragEnd hook. We need to clear
       // the transition styles off the elements before a reorder to prevent strange
-      // post drag animations in firefox. Even though we clear the transition straight
-      // after the reorder - firefox continues to apply the transition.
+      // post drag animations in firefox. Even though we clear the transition off
+      // a Draggable - if it is done after a reorder firefox will still apply the
+      // transition.
       if (isPhaseChanging) {
         this.styleMarshal.onPhaseChange(current);
       }
 
-      // Creating a new hooks object on the fly. We recreate this object so
-      // that consumers can pass in new hook functions at any time.
+      // We recreate the Hook object so that consumers can pass in new
+      // hook props at any time (eg if they are using arrow functions)
       const hooks: Hooks = {
         onDragStart: this.props.onDragStart,
         onDragEnd: this.props.onDragEnd,
@@ -184,10 +186,9 @@ export default class DragDropContext extends React.Component<Props> {
         this.dimensionMarshal.onPhaseChange(current);
       }
 
-      // The dimension marshal has caused an action syncronously. If this happened we can
-      // bail out of the previous auto scroller update as the auto scroller would have already
-      // been called with the post update values
-
+      // We could block this action from being called if this function has been reinvoked
+      // before completing and dragging and autoScrollMode === 'FLUID'.
+      // However, it is not needed at this time
       this.autoScroller.onStateChange(previousInThisExecution, current);
     });
   }
