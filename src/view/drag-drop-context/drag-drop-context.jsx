@@ -150,31 +150,45 @@ export default class DragDropContext extends React.Component<Props> {
     let previous: State = this.store.getState();
 
     this.unsubscribe = this.store.subscribe(() => {
-      const previousValue: State = previous;
+      const previousInThisExecution: State = previous;
       const current = this.store.getState();
       // setting previous now incase any of the
       // functions synchronously trigger more updates
       previous = current;
 
-      // TODO: this probs needs to be done first
+      const isPhaseChanging: boolean = current.phase !== previousInThisExecution.phase;
+
+      // Style updates do not cause more actions. It is important to update styles
+      // before hooks are called: specifically the onDragEnd hook. We need to clear
+      // the transition styles off the elements before a reorder to prevent strange
+      // post drag animations in firefox. Even though we clear the transition straight
+      // after the reorder - firefox continues to apply the transition.
+      if (isPhaseChanging) {
+        this.styleMarshal.onPhaseChange(current);
+      }
+
+      // Creating a new hooks object on the fly. We recreate this object so
+      // that consumers can pass in new hook functions at any time.
       const hooks: Hooks = {
         onDragStart: this.props.onDragStart,
         onDragEnd: this.props.onDragEnd,
         onDragUpdate: this.props.onDragUpdate,
       };
-      this.hookCaller.onStateChange(hooks, previousValue, current);
+      this.hookCaller.onStateChange(hooks, previousInThisExecution, current);
 
-      if (current.phase !== previousValue.phase) {
-        // executing phase change handlers first
-        // Update the global styles
-        this.styleMarshal.onPhaseChange(current);
+      // The following two functions are dangerous. They can both syncronously
+      // create new actions that update the application state. That will cause
+      // this subscription function to be called again before the next line is called.
 
-        // inform the dimension marshal about updates
-        // this can trigger more actions synchronously so we are placing it last
+      if (isPhaseChanging) {
         this.dimensionMarshal.onPhaseChange(current);
       }
 
-      this.autoScroller.onStateChange(previousValue, current);
+      // The dimension marshal has caused an action syncronously. If this happened we can
+      // bail out of the previous auto scroller update as the auto scroller would have already
+      // been called with the post update values
+
+      this.autoScroller.onStateChange(previousInThisExecution, current);
     });
   }
 
