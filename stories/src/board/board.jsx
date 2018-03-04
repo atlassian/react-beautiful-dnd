@@ -54,6 +54,7 @@ export default class Board extends Component<Props, State> {
   boardRef: ?HTMLElement
 
   componentDidMount() {
+    // eslint-disable-next-line no-unused-expressions
     injectGlobal`
       body {
         background: ${colors.blue.deep};

@@ -151,31 +151,46 @@ export default class DragDropContext extends React.Component<Props> {
     let previous: State = this.store.getState();
 
     this.unsubscribe = this.store.subscribe(() => {
-      const previousValue: State = previous;
       const current = this.store.getState();
-      // setting previous now incase any of the
-      // functions synchronously trigger more updates
+      const previousInThisExecution: State = previous;
+      const isPhaseChanging: boolean = current.phase !== previous.phase;
+      // setting previous now rather than at the end of this function
+      // incase a function is called that syncorously causes a state update
+      // which will re-invoke this function before it has completed a previous
+      // invokation.
       previous = current;
 
-      // TODO: this probs needs to be done first
+      // Style updates do not cause more actions. It is important to update styles
+      // before hooks are called: specifically the onDragEnd hook. We need to clear
+      // the transition styles off the elements before a reorder to prevent strange
+      // post drag animations in firefox. Even though we clear the transition off
+      // a Draggable - if it is done after a reorder firefox will still apply the
+      // transition.
+      if (isPhaseChanging) {
+        this.styleMarshal.onPhaseChange(current);
+      }
+
+      // We recreate the Hook object so that consumers can pass in new
+      // hook props at any time (eg if they are using arrow functions)
       const hooks: Hooks = {
         onDragStart: this.props.onDragStart,
         onDragEnd: this.props.onDragEnd,
         onDragUpdate: this.props.onDragUpdate,
       };
-      this.hookCaller.onStateChange(hooks, previousValue, current);
+      this.hookCaller.onStateChange(hooks, previousInThisExecution, current);
 
-      if (current.phase !== previousValue.phase) {
-        // executing phase change handlers first
-        // Update the global styles
-        this.styleMarshal.onPhaseChange(current);
+      // The following two functions are dangerous. They can both syncronously
+      // create new actions that update the application state. That will cause
+      // this subscription function to be called again before the next line is called.
 
-        // inform the dimension marshal about updates
-        // this can trigger more actions synchronously so we are placing it last
+      if (isPhaseChanging) {
         this.dimensionMarshal.onPhaseChange(current);
       }
 
-      this.autoScroller.onStateChange(previousValue, current);
+      // We could block this action from being called if this function has been reinvoked
+      // before completing and dragging and autoScrollMode === 'FLUID'.
+      // However, it is not needed at this time
+      this.autoScroller.onStateChange(previousInThisExecution, current);
     });
   }
 

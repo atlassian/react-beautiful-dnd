@@ -898,6 +898,22 @@ import { Draggable } from 'react-beautiful-dnd';
 ### Draggable Props
 
 - `draggableId`: A *required* `DraggableId(string)` that uniquely identifies the `Draggable` for the application. Please do not change this prop - especially during a drag.
+- `index`: A *required* `number` that matches the order of the `Draggable` in the `Droppable`. It is simply the index of the `Draggable` in the list. The `index` needs to be unique within a `Droppable` but does not need to be unique between `Droppables`. Typically the `index` value will simply be the `index` provided by a `Array.prototype.map` function:
+
+```js
+{this.props.items.map((item, index) => (
+  <Draggable draggableId={item.id} index={index}>
+    {(provided, snapshot) => (
+      <div>
+        <div ref={provided.innerRef} {...provided.draggableProps}>
+          {item.content}
+        </div>
+      </div>
+    )}
+  </Draggable>
+))}
+```
+
 - `type`: An *optional* type (`TypeId(string)`) of the `Draggable`. This is used to control what `Droppable`s the `Draggable` is permitted to drop on. `Draggable`s can only drop on `Droppable`s that share the same `type`. If no `type` is provided, then it will be set to `'DEFAULT'`. Currently the `type` of a `Draggable` **must be** the same as its container `Droppable`. This restriction might be loosened in the future if there is a valid use case.
 - `isDragDisabled`: An *optional* flag to control whether or not the `Draggable` is permitted to drag. You can use this to implement your own conditional drag logic. It will default to `false`.
 - `disableInteractiveElementBlocking`: An *optional* flag to opt out of blocking a drag from interactive elements. For more information refer to the section *Interactive child elements within a `Draggable`*
