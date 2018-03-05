@@ -21,6 +21,7 @@
   "files": [
     "/lib",
     "/dist",
+    "/esm",
     "/src"
   ],
   "scripts": {
