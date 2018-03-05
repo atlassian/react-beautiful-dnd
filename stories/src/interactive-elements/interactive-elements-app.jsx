@@ -19,7 +19,20 @@ const initial: ItemType[] = [
   {
     id: 'button',
     component: (
-      <button>hello world</button>
+      <div>
+        <p>Standard</p>
+        <button>hello world</button><br />
+        <p>With child {' '}
+          <a
+            href="https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+              phrasing content
+          </a>
+        </p>
+        <button>hello <strong>world</strong></button>
+      </div>
     ),
   },
   {
@@ -108,7 +121,7 @@ const List = styled.div`
 `;
 
 const Item = styled.div`
-  height: 80px;
+  min-height: 80px;
   background-color: ${colors.white};
   border: 1px solid ${colors.grey};
   padding: ${grid}px;
