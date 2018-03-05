@@ -16,9 +16,15 @@ export const interactiveTagNames: TagNameMap = {
   audio: true,
 };
 
-const isContentEditable = (parent: Element, current: ?Element): boolean => {
+const isAnInteractiveElement = (parent: Element, current: ?Element): boolean => {
   if (current == null) {
     return false;
+  }
+
+  const hasAnInteractiveTag: boolean = Boolean(interactiveTagNames[current.tagName.toLowerCase()]);
+
+  if (hasAnInteractiveTag) {
+    return true;
   }
 
   // contenteditable="true" or contenteditable="" are valid ways
@@ -36,7 +42,7 @@ const isContentEditable = (parent: Element, current: ?Element): boolean => {
   }
 
   // recursion to check parent
-  return isContentEditable(parent, current.parentElement);
+  return isAnInteractiveElement(parent, current.parentElement);
 };
 
 export default (event: Event, props: Props): boolean => {
@@ -52,17 +58,6 @@ export default (event: Event, props: Props): boolean => {
     return true;
   }
 
-  const isTargetInteractive: boolean = Boolean(interactiveTagNames[target.tagName.toLowerCase()]);
-
-  if (isTargetInteractive) {
-    return false;
-  }
-
-  // Need to see if any element between event.target and event.currentTarget (inclusive)
-  // is contenteditable. A contenteditable element can contain other elements
-  // - event.currentTarget = the drag handle
-  // - event.target = the node that was interacted with (can be a child of the drag handle)
-
-  return !isContentEditable(currentTarget, target);
+  return !isAnInteractiveElement(currentTarget, target);
 };
 
