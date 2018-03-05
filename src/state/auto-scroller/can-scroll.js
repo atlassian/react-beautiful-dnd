@@ -1,13 +1,10 @@
 // @flow
 import { add, apply, isEqual } from '../position';
-import getWindowScroll from '../../window/get-window-scroll';
-import getViewport from '../../window/get-viewport';
-import getMaxScroll from '../get-max-scroll';
 import type {
   ClosestScrollable,
   DroppableDimension,
   Position,
-  Area,
+  Viewport,
 } from '../../types';
 
 type CanScrollArgs = {|
@@ -94,38 +91,12 @@ export const canPartiallyScroll = ({
   return false;
 };
 
-const getMaxWindowScroll = (): Position => {
-  const el: ?HTMLElement = document.documentElement;
-
-  if (!el) {
-    return origin;
-  }
-
-  const viewport: Area = getViewport();
-
-  // window.innerWidth / innerHeight includes scrollbar
-  // however the scrollHeight / scrollWidth do not :(
-
-  const maxScroll: Position = getMaxScroll({
-    scrollHeight: el.scrollHeight,
-    scrollWidth: el.scrollWidth,
-    width: viewport.width,
-    height: viewport.height,
-  });
-
-  return maxScroll;
-};
-
-export const canScrollWindow = (change: Position): boolean => {
-  const maxScroll: Position = getMaxWindowScroll();
-  const currentScroll: Position = getWindowScroll();
-
-  return canPartiallyScroll({
-    current: currentScroll,
-    max: maxScroll,
+export const canScrollWindow = (viewport: Viewport, change: Position): boolean =>
+  canPartiallyScroll({
+    current: viewport.scroll,
+    max: viewport.maxScroll,
     change,
   });
-};
 
 export const canScrollDroppable = (
   droppable: DroppableDimension,
@@ -144,13 +115,13 @@ export const canScrollDroppable = (
   });
 };
 
-export const getWindowOverlap = (change: Position): ?Position => {
-  if (!canScrollWindow(change)) {
+export const getWindowOverlap = (viewport: Viewport, change: Position): ?Position => {
+  if (!canScrollWindow(viewport, change)) {
     return null;
   }
 
-  const max: Position = getMaxWindowScroll();
-  const current: Position = getWindowScroll();
+  const max: Position = viewport.maxScroll;
+  const current: Position = viewport.scroll;
 
   return getOverlap({
     current,

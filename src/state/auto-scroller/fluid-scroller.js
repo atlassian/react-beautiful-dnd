@@ -1,6 +1,5 @@
 // @flow
 import rafSchd from 'raf-schd';
-import getViewport from '../../window/get-viewport';
 import { add, apply, isEqual, patch } from '../position';
 import getBestScrollableDroppable from './get-best-scrollable-droppable';
 import { horizontal, vertical } from '../axis';
@@ -19,6 +18,7 @@ import type {
   State,
   DraggableDimension,
   ClosestScrollable,
+  Viewport,
 } from '../../types';
 
 // Values used to control how the fluid auto scroll feels
@@ -261,14 +261,14 @@ export default ({
 
     const draggable: DraggableDimension = state.dimension.draggable[drag.initial.descriptor.id];
     const subject: Area = draggable.page.marginBox;
-    const viewport: Area = getViewport();
+    const viewport: Viewport = drag.current.viewport;
     const requiredWindowScroll: ?Position = getRequiredScroll({
-      container: viewport,
+      container: viewport.subject,
       subject,
       center,
     });
 
-    if (requiredWindowScroll && canScrollWindow(requiredWindowScroll)) {
+    if (requiredWindowScroll && canScrollWindow(viewport, requiredWindowScroll)) {
       scheduleWindowScroll(requiredWindowScroll);
       return;
     }

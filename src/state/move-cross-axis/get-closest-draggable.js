@@ -1,10 +1,9 @@
 // @flow
 import { distance } from '../position';
-import getViewport from '../../window/get-viewport';
 import { isTotallyVisible } from '../visibility/is-visible';
 import withDroppableDisplacement from '../with-droppable-displacement';
 import type {
-  Area,
+  Viewport,
   Axis,
   Position,
   DraggableDimension,
@@ -13,6 +12,7 @@ import type {
 
 type Args = {|
   axis: Axis,
+  viewport: Viewport,
   pageCenter: Position,
   // the droppable that is being moved to
   destination: DroppableDimension,
@@ -22,6 +22,7 @@ type Args = {|
 
 export default ({
   axis,
+  viewport,
   pageCenter,
   destination,
   insideDestination,
@@ -31,8 +32,6 @@ export default ({
     return null;
   }
 
-  const viewport: Area = getViewport();
-
   const result: DraggableDimension[] = insideDestination
     // Remove any options that are hidden by overflow
     // Draggable must be totally visible to move to it
@@ -40,7 +39,7 @@ export default ({
       isTotallyVisible({
         target: draggable.page.marginBox,
         destination,
-        viewport,
+        viewport: viewport.subject,
       }))
     .sort((a: DraggableDimension, b: DraggableDimension): number => {
       // Need to consider the change in scroll in the destination

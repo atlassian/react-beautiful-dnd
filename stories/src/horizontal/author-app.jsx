@@ -49,6 +49,10 @@ export default class AuthorApp extends Component<Props, State> {
       return;
     }
 
+    if (result.destination.index === result.source.index) {
+      return;
+    }
+
     const quotes = reorder(
       this.state.quotes,
       result.source.index,

@@ -15,6 +15,7 @@ import type {
   DroppableDimensionMap,
   DraggableLocation,
   DragImpact,
+  Viewport,
 } from '../../types';
 
 type Args = {|
@@ -32,6 +33,8 @@ type Args = {|
   droppables: DroppableDimensionMap,
   // any previous impact
   previousImpact: ?DragImpact,
+  // the current viewport
+  viewport: Viewport,
 |}
 
 export default ({
@@ -43,6 +46,7 @@ export default ({
   draggables,
   droppables,
   previousImpact,
+  viewport,
 }: Args): ?Result => {
   const draggable: DraggableDimension = draggables[draggableId];
   const source: DroppableDimension = droppables[droppableId];
@@ -54,6 +58,7 @@ export default ({
     pageCenter,
     source,
     droppables,
+    viewport,
   });
 
   // nothing available to move to
@@ -70,6 +75,7 @@ export default ({
     pageCenter,
     destination,
     insideDestination,
+    viewport,
   });
 
   // Draggables available, but none are candidates for movement (eg none are visible)
@@ -86,5 +92,6 @@ export default ({
     insideDestination,
     home,
     previousImpact: previousImpact || noImpact,
+    viewport,
   });
 };

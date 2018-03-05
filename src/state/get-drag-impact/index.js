@@ -7,6 +7,7 @@ import type {
   DroppableDimensionMap,
   DragImpact,
   Position,
+  Viewport,
 } from '../../types';
 import getDroppableOver from '../get-droppable-over';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
@@ -21,6 +22,7 @@ type Args = {|
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
   previousImpact: DragImpact,
+  viewport: Viewport,
 |}
 
 export default ({
@@ -29,6 +31,7 @@ export default ({
   draggables,
   droppables,
   previousImpact,
+  viewport,
 }: Args): DragImpact => {
   const previousDroppableOverId: ?DroppableId =
     previousImpact.destination &&
@@ -67,6 +70,7 @@ export default ({
       home,
       insideHome: insideDestination,
       previousImpact: previousImpact || noImpact,
+      viewport,
     });
   }
 
@@ -76,5 +80,6 @@ export default ({
     destination,
     insideDestination,
     previousImpact: previousImpact || noImpact,
+    viewport,
   });
 };

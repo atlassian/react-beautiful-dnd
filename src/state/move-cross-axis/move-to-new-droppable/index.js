@@ -9,6 +9,7 @@ import type {
   DroppableDimension,
   DraggableLocation,
   DragImpact,
+  Viewport,
 } from '../../../types';
 
 type Args = {|
@@ -27,6 +28,8 @@ type Args = {|
   home: DraggableLocation,
   // the impact of a previous drag,
   previousImpact: DragImpact,
+  // the viewport
+  viewport: Viewport,
 |}
 
 export default ({
@@ -37,6 +40,7 @@ export default ({
   home,
   insideDestination,
   previousImpact,
+  viewport,
 }: Args): ?Result => {
   const amount: Position = patch(
     destination.axis.line,
@@ -53,6 +57,7 @@ export default ({
       draggable,
       droppable: destination,
       previousImpact,
+      viewport,
     });
   }
 
@@ -65,5 +70,6 @@ export default ({
     draggable,
     droppable: destination,
     previousImpact,
+    viewport,
   });
 };

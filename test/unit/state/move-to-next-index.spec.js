@@ -7,11 +7,10 @@ import noImpact, { noMovement } from '../../../src/state/no-impact';
 import { patch, subtract } from '../../../src/state/position';
 import { vertical, horizontal } from '../../../src/state/axis';
 import { isPartiallyVisible } from '../../../src/state/visibility/is-visible';
-import getViewport from '../../../src/window/get-viewport';
 import getArea from '../../../src/state/get-area';
 import { getDroppableDimension, getDraggableDimension, scrollDroppable } from '../../../src/state/dimension';
 import type {
-  Area,
+  Viewport,
   Axis,
   DragImpact,
   DraggableDimension,
@@ -21,34 +20,26 @@ import type {
   Position,
 } from '../../../src/types';
 
-const setViewport = (custom: Area): void => {
-  window.pageYOffset = custom.top;
-  window.pageXOffset = custom.left;
-  window.innerWidth = custom.width;
-  window.innerHeight = custom.height;
+const origin: Position = { x: 0, y: 0 };
+
+const customViewport: Viewport = {
+  subject: getArea({
+    top: 0,
+    left: 0,
+    bottom: 1000,
+    right: 1000,
+  }),
+  scroll: origin,
+  maxScroll: origin,
 };
-
-const originalViewport: Area = getViewport();
-
-const customViewport: Area = getArea({
-  top: 0,
-  left: 0,
-  bottom: 1000,
-  right: 1000,
-});
 
 describe('move to next index', () => {
   beforeEach(() => {
     jest.spyOn(console, 'error').mockImplementation(() => { });
-    setViewport(customViewport);
   });
 
   afterEach(() => {
     console.error.mockRestore();
-  });
-
-  afterAll(() => {
-    setViewport(originalViewport);
   });
 
   [vertical, horizontal].forEach((axis: Axis) => {
@@ -65,6 +56,7 @@ describe('move to next index', () => {
           previousImpact: noImpact,
           droppable: disabled,
           draggables: preset.draggables,
+          viewport: customViewport,
         });
 
         expect(result).toEqual(null);
@@ -91,6 +83,7 @@ describe('move to next index', () => {
               previousPageCenter: preset.inHome3.page.paddingBox.center,
               droppable: preset.home,
               draggables: preset.draggables,
+              viewport: customViewport,
             });
 
             expect(result).toBe(null);
@@ -115,6 +108,7 @@ describe('move to next index', () => {
                 previousPageCenter: preset.inHome1.page.paddingBox.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
+                viewport: customViewport,
               });
 
               if (!result) {
@@ -173,6 +167,7 @@ describe('move to next index', () => {
                 previousPageCenter: preset.inHome2.page.paddingBox.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
+                viewport: customViewport,
               });
 
               if (!result) {
@@ -243,6 +238,7 @@ describe('move to next index', () => {
                 previousPageCenter: preset.inHome2.page.paddingBox.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
+                viewport: customViewport,
               });
 
               if (!result) {
@@ -322,6 +318,7 @@ describe('move to next index', () => {
                 // roughly correct:
                 previousPageCenter: preset.inHome1.page.paddingBox.center,
                 draggables: preset.draggables,
+                viewport: customViewport,
                 droppable: preset.home,
               });
 
@@ -397,6 +394,7 @@ describe('move to next index', () => {
                 // this is roughly correct
                 previousPageCenter: preset.inHome1.page.paddingBox.center,
                 draggables: preset.draggables,
+                viewport: customViewport,
                 droppable: preset.home,
               });
 
@@ -623,28 +621,28 @@ describe('move to next index', () => {
                 expect(isPartiallyVisible({
                   target: inHome6.page.marginBox,
                   destination: scrolled,
-                  viewport: customViewport,
+                  viewport: customViewport.subject,
                 })).toBe(true);
                 expect(isPartiallyVisible({
                   target: inHome5.page.marginBox,
                   destination: scrolled,
-                  viewport: customViewport,
+                  viewport: customViewport.subject,
                 })).toBe(true);
                 expect(isPartiallyVisible({
                   target: inHome4.page.marginBox,
                   destination: scrolled,
-                  viewport: customViewport,
+                  viewport: customViewport.subject,
                 })).toBe(false);
                 expect(isPartiallyVisible({
                   target: inHome3.page.marginBox,
                   destination: scrolled,
-                  viewport: customViewport,
+                  viewport: customViewport.subject,
                 })).toBe(false);
                 // this one will remain invisible
                 expect(isPartiallyVisible({
                   target: inHome2.page.marginBox,
                   destination: scrolled,
-                  viewport: customViewport,
+                  viewport: customViewport.subject,
                 })).toBe(false);
 
                 const expected: DragImpact = {
@@ -697,6 +695,7 @@ describe('move to next index', () => {
                   // roughly correct:
                   previousPageCenter: inHome1.page.paddingBox.center,
                   draggables,
+                  viewport: customViewport,
                   droppable: scrolled,
                 });
 
@@ -732,6 +731,7 @@ describe('move to next index', () => {
               previousPageCenter: preset.inHome1.page.paddingBox.center,
               draggables: preset.draggables,
               droppable: preset.home,
+              viewport: customViewport,
             });
 
             expect(result).toBe(null);
@@ -759,6 +759,7 @@ describe('move to next index', () => {
                 previousPageCenter: preset.inHome2.page.paddingBox.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
+                viewport: customViewport,
               });
 
               if (!result) {
@@ -820,6 +821,7 @@ describe('move to next index', () => {
                 previousPageCenter: preset.inHome3.page.paddingBox.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
+                viewport: customViewport,
               });
 
               if (!result) {
@@ -889,6 +891,7 @@ describe('move to next index', () => {
                 // roughly correct
                 previousPageCenter: preset.inHome3.page.paddingBox.center,
                 draggables: preset.draggables,
+                viewport: customViewport,
                 droppable: preset.home,
               });
 
@@ -964,6 +967,7 @@ describe('move to next index', () => {
                 // roughly correct
                 previousPageCenter: preset.inHome3.page.paddingBox.center,
                 draggables: preset.draggables,
+                viewport: customViewport,
                 droppable: preset.home,
               });
 
@@ -1031,7 +1035,7 @@ describe('move to next index', () => {
                   index: 0,
                   droppableId: droppable.descriptor.id,
                 },
-                paddingBox: customViewport,
+                paddingBox: customViewport.subject,
               });
               const outsideViewport: DraggableDimension = getDraggableDimension({
                 descriptor: {
@@ -1041,10 +1045,10 @@ describe('move to next index', () => {
                 },
                 paddingBox: getArea({
                   // is bottom left of the viewport
-                  top: customViewport.bottom + 1,
-                  right: customViewport.right + 100,
-                  left: customViewport.right + 1,
-                  bottom: customViewport.bottom + 100,
+                  top: customViewport.subject.bottom + 1,
+                  right: customViewport.subject.right + 100,
+                  left: customViewport.subject.right + 1,
+                  bottom: customViewport.subject.bottom + 100,
                 }),
               });
               // inViewport is in its original position
@@ -1095,6 +1099,7 @@ describe('move to next index', () => {
                 previousPageCenter,
                 draggables,
                 droppable,
+                viewport: customViewport,
               });
 
               if (!result) {
@@ -1117,8 +1122,8 @@ describe('move to next index', () => {
                 paddingBox: getArea({
                   top: 0,
                   left: 0,
-                  right: customViewport.right - 100,
-                  bottom: customViewport.bottom - 100,
+                  right: customViewport.subject.right - 100,
+                  bottom: customViewport.subject.bottom - 100,
                 }),
               });
               const invisible: DraggableDimension = getDraggableDimension({
@@ -1128,10 +1133,10 @@ describe('move to next index', () => {
                   droppableId: droppable.descriptor.id,
                 },
                 paddingBox: getArea({
-                  top: customViewport.bottom + 1,
-                  left: customViewport.right + 1,
-                  bottom: customViewport.bottom + 100,
-                  right: customViewport.right + 100,
+                  top: customViewport.subject.bottom + 1,
+                  left: customViewport.subject.right + 1,
+                  bottom: customViewport.subject.bottom + 100,
+                  right: customViewport.subject.right + 100,
                 }),
               });
               // inViewport is in its original position
@@ -1174,6 +1179,7 @@ describe('move to next index', () => {
                 previousPageCenter,
                 draggables,
                 droppable,
+                viewport: customViewport,
               });
 
               if (!result) {
@@ -1287,6 +1293,7 @@ describe('move to next index', () => {
                 previousPageCenter,
                 draggables,
                 droppable,
+                viewport: customViewport,
               });
 
               if (!result) {
@@ -1345,6 +1352,7 @@ describe('move to next index', () => {
               previousPageCenter: preset.inHome1.page.paddingBox.center,
               droppable: preset.foreign,
               draggables: preset.draggables,
+              viewport: customViewport,
             });
 
             if (!result) {
@@ -1421,6 +1429,7 @@ describe('move to next index', () => {
               previousPageCenter: preset.inHome1.page.paddingBox.center,
               droppable: preset.foreign,
               draggables: preset.draggables,
+              viewport: customViewport,
             });
 
             if (!result) {
@@ -1481,6 +1490,7 @@ describe('move to next index', () => {
               // roughly correct
               previousPageCenter: preset.inHome4.page.paddingBox.center,
               droppable: preset.foreign,
+              viewport: customViewport,
               draggables: preset.draggables,
             });
 
@@ -1536,6 +1546,7 @@ describe('move to next index', () => {
               // roughly correct
               previousPageCenter: preset.inForeign1.page.paddingBox.center,
               droppable: preset.foreign,
+              viewport: customViewport,
               draggables: preset.draggables,
             });
 
@@ -1569,6 +1580,7 @@ describe('move to next index', () => {
               // roughly correct
               previousPageCenter: preset.inForeign4.page.paddingBox.center,
               droppable: preset.foreign,
+              viewport: customViewport,
               draggables: preset.draggables,
             });
 
@@ -1658,6 +1670,7 @@ describe('move to next index', () => {
               // roughly correct
               previousPageCenter: preset.inForeign2.page.paddingBox.center,
               droppable: preset.foreign,
+              viewport: customViewport,
               draggables: preset.draggables,
             });
 
