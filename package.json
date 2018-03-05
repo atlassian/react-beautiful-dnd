@@ -16,6 +16,8 @@
     "url": "https://github.com/atlassian/react-beautiful-dnd/issues"
   },
   "main": "lib/index.js",
+  "module": "lib/es/index.js",
+  "sideEffects": false,
   "files": [
     "/lib",
     "/dist",
@@ -26,8 +28,9 @@
     "validate": "yarn run lint && yarn run typecheck",
     "lint": "eslint .",
     "typecheck": "flow check",
-    "build": "yarn run build:clean && yarn run build:lib && yarn run build:flow && yarn run build:dist",
+    "build": "yarn run build:clean && yarn run build:lib && yarn run build:flow && yarn run build:dist && yarn run build:es",
     "build:clean": "rimraf lib && rimraf dist",
+    "build:es": "cross-env NODE_ENV=production BABEL_ENV=es babel ./src --out-dir ./lib/es",
     "build:dist": "rollup -c && cross-env NODE_ENV=min rollup -c",
     "build:lib": "cross-env NODE_ENV=cjs babel src -d lib",
     "build:flow": "echo \"// @flow\n\nexport * from '../src';\" > lib/index.js.flow",
