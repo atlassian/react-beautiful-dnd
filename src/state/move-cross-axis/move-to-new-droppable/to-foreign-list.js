@@ -2,16 +2,15 @@
 import moveToEdge from '../../move-to-edge';
 import type { Result } from '../move-cross-axis-types';
 import getDisplacement from '../../get-displacement';
-import getViewport from '../../../window/get-viewport';
 import withDroppableDisplacement from '../../with-droppable-displacement';
 import type {
   Axis,
   Position,
   DragImpact,
-  Area,
   DraggableDimension,
   DroppableDimension,
   Displacement,
+  Viewport,
 } from '../../../types';
 
 type Args = {|
@@ -22,6 +21,7 @@ type Args = {|
   draggable: DraggableDimension,
   droppable: DroppableDimension,
   previousImpact: DragImpact,
+  viewport: Viewport,
 |}
 
 export default ({
@@ -32,6 +32,7 @@ export default ({
   draggable,
   droppable,
   previousImpact,
+  viewport,
 }: Args): ?Result => {
   const axis: Axis = droppable.axis;
   const isGoingBeforeTarget: boolean = Boolean(target &&
@@ -93,13 +94,12 @@ export default ({
   // if going before: move everything down including the target
   // if going after: move everything down excluding the target
 
-  const viewport: Area = getViewport();
   const displaced: Displacement[] = insideDroppable
     .slice(proposedIndex, insideDroppable.length)
     .map((dimension: DraggableDimension): Displacement => getDisplacement({
       draggable: dimension,
       destination: droppable,
-      viewport,
+      viewport: viewport.subject,
       previousImpact,
     }));
 

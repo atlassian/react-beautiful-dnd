@@ -31,13 +31,14 @@ import type {
   DroppableId,
   TypeId,
   InitialDragPositions,
+  Viewport,
 } from '../../../src/types';
 import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
 import getArea from '../../../src/state/get-area';
 import { combine, withStore, withDroppableId, withStyleContext, withDimensionMarshal, withCanLift } from '../../utils/get-context-options';
 import { dispatchWindowMouseEvent, mouseEvent } from '../../utils/user-input-util';
-import setWindowScroll from '../../utils/set-window-scroll';
-import getWindowScroll from '../../../src/window/get-window-scroll';
+import getViewport from '../../../src/view/window/get-viewport';
+import { setViewport, resetViewport } from '../../utils/viewport';
 
 class Item extends Component<{ provided: Provided }> {
   render() {
@@ -210,12 +211,10 @@ const mountDraggable = ({
 const mouseDown = mouseEvent.bind(null, 'mousedown');
 const windowMouseMove = dispatchWindowMouseEvent.bind(null, 'mousemove');
 
-const originalWindowScroll: Position = getWindowScroll();
-
 type StartDrag = {|
   selection?: Position,
   center ?: Position,
-  windowScroll?: Position,
+  viewport?: Viewport,
   isScrollAllowed?: boolean,
 |}
 
@@ -231,15 +230,17 @@ const stubArea = (center?: Position = origin): void =>
 const executeOnLift = (wrapper: ReactWrapper) => ({
   selection = origin,
   center = origin,
-  windowScroll = origin,
+  viewport = getViewport(),
 }: StartDrag = {}) => {
-  setWindowScroll(windowScroll);
   stubArea(center);
+  setViewport(viewport);
 
   wrapper.find(DragHandle).props().callbacks.onLift({
     client: selection,
     autoScrollMode: 'FLUID',
   });
+
+  resetViewport();
 };
 
 // $ExpectError - not checking type of mock
@@ -257,6 +258,12 @@ const getStubber = stub =>
     }
   };
 
+const customViewport: Viewport = {
+  scroll: { x: 100, y: 200 },
+  maxScroll: { x: 600, y: 600 },
+  subject: getArea({ top: 200, left: 100, right: 300, bottom: 300 }),
+};
+
 describe('Draggable - unconnected', () => {
   beforeAll(() => {
     requestAnimationFrame.reset();
@@ -267,7 +274,7 @@ describe('Draggable - unconnected', () => {
       Element.prototype.getBoundingClientRect.mockRestore();
     }
     requestAnimationFrame.reset();
-    setWindowScroll(originalWindowScroll, { shouldPublish: false });
+    resetViewport();
   });
 
   afterAll(() => {
@@ -424,13 +431,12 @@ describe('Draggable - unconnected', () => {
             selection,
             center,
           };
-          const windowScroll = { x: 100, y: 30 };
 
-          executeOnLift(wrapper)({ selection, center, windowScroll });
+          executeOnLift(wrapper)({ selection, center, viewport: customViewport });
 
           // $ExpectError - mock property on lift function
           expect(dispatchProps.lift.mock.calls[0]).toEqual([
-            draggableId, initial, windowScroll, 'FLUID',
+            draggableId, initial, customViewport, 'FLUID',
           ]);
         });
       });
@@ -495,13 +501,7 @@ describe('Draggable - unconnected', () => {
           expect(client).toEqual(expected);
         });
 
-        it('should publish the window scroll', () => {
-          const windowScroll: Position = {
-            x: 10,
-            y: 20,
-          };
-          setWindowScroll(windowScroll);
-
+        it('should publish the viewport', () => {
           const dispatchProps = getDispatchPropsStub();
           const wrapper = mountDraggable({
             mapProps: draggingMapProps,
@@ -511,7 +511,7 @@ describe('Draggable - unconnected', () => {
           wrapper.find(DragHandle).props().callbacks.onMove(origin);
           const [, , windowScrollResult] = getLastCall(dispatchProps.move);
 
-          expect(windowScrollResult).toEqual(windowScroll);
+          expect(windowScrollResult).toEqual(getViewport());
         });
       });
 
@@ -770,11 +770,7 @@ describe('Draggable - unconnected', () => {
         });
 
         it('should call the move forward action', () => {
-          const windowScroll: Position = {
-            x: 250,
-            y: 321,
-          };
-          setWindowScroll(windowScroll);
+          setViewport(customViewport);
           const dispatchProps = getDispatchPropsStub();
           const wrapper = mountDraggable({
             mapProps: draggingMapProps,
@@ -784,8 +780,9 @@ describe('Draggable - unconnected', () => {
           wrapper.find(DragHandle).props().callbacks.onWindowScroll();
 
           expect(dispatchProps.moveByWindowScroll).toBeCalledWith(
-            draggableId, windowScroll,
+            draggableId, getViewport(),
           );
+          resetViewport();
         });
       });
     });

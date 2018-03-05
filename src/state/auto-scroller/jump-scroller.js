@@ -1,6 +1,5 @@
 // @flow
 import { add, subtract } from '../position';
-import getWindowScroll from '../../window/get-window-scroll';
 import {
   canScrollDroppable,
   canScrollWindow,
@@ -15,6 +14,7 @@ import type {
   Position,
   State,
   DraggableLocation,
+  Viewport,
 } from '../../types';
 
 type Args = {|
@@ -23,7 +23,7 @@ type Args = {|
   move: (
     id: DraggableId,
     client: Position,
-    windowScroll: Position,
+    viewport: Viewport,
     shouldAnimate?: boolean
   ) => void,
 |}
@@ -45,7 +45,7 @@ export default ({
     }
 
     const client: Position = add(drag.current.client.selection, offset);
-    move(drag.initial.descriptor.id, client, getWindowScroll(), true);
+    move(drag.initial.descriptor.id, client, drag.current.viewport, true);
   };
 
   const scrollDroppableAsMuchAsItCan = (
@@ -73,13 +73,13 @@ export default ({
     return remainder;
   };
 
-  const scrollWindowAsMuchAsItCan = (change: Position): ?Position => {
+  const scrollWindowAsMuchAsItCan = (viewport: Viewport, change: Position): ?Position => {
     // window cannot absorb any of the scroll
-    if (!canScrollWindow(change)) {
+    if (!canScrollWindow(viewport, change)) {
       return change;
     }
 
-    const overlap: ?Position = getWindowOverlap(change);
+    const overlap: ?Position = getWindowOverlap(viewport, change);
 
     // window can absorb entire scroll
     if (!overlap) {
@@ -128,7 +128,8 @@ export default ({
       return;
     }
 
-    const windowRemainder: ?Position = scrollWindowAsMuchAsItCan(droppableRemainder);
+    const viewport: Viewport = drag.current.viewport;
+    const windowRemainder: ?Position = scrollWindowAsMuchAsItCan(viewport, droppableRemainder);
 
     // window could absorb all the droppable remainder
     if (!windowRemainder) {

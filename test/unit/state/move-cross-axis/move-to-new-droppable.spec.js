@@ -8,8 +8,9 @@ import { add, negate, patch } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
 import { getPreset, makeScrollable } from '../../../utils/dimension';
 import noImpact from '../../../../src/state/no-impact';
-import getViewport from '../../../../src/window/get-viewport';
+import getViewport from '../../../../src/view/window/get-viewport';
 import type {
+  Viewport,
   Axis,
   DragImpact,
   DraggableDimension,
@@ -18,6 +19,7 @@ import type {
 } from '../../../../src/types';
 
 const dontCare: Position = { x: 0, y: 0 };
+const viewport: Viewport = getViewport();
 
 describe('move to new droppable', () => {
   beforeEach(() => {
@@ -61,6 +63,7 @@ describe('move to new droppable', () => {
               droppableId: home.descriptor.id,
             },
             previousImpact: noImpact,
+            viewport,
           });
 
           expect(result).toBe(null);
@@ -79,6 +82,7 @@ describe('move to new droppable', () => {
               droppableId: home.descriptor.id,
             },
             previousImpact: noImpact,
+            viewport,
           });
 
           expect(result).toBe(null);
@@ -99,6 +103,7 @@ describe('move to new droppable', () => {
                 droppableId: home.descriptor.id,
               },
               previousImpact: noImpact,
+              viewport,
             });
 
             if (!result) {
@@ -145,6 +150,7 @@ describe('move to new droppable', () => {
                 droppableId: home.descriptor.id,
               },
               previousImpact: noImpact,
+              viewport,
             });
 
             if (!result) {
@@ -190,6 +196,7 @@ describe('move to new droppable', () => {
                 droppableId: home.descriptor.id,
               },
               previousImpact: noImpact,
+              viewport,
             });
 
             if (!result) {
@@ -256,6 +263,7 @@ describe('move to new droppable', () => {
                 droppableId: home.descriptor.id,
               },
               previousImpact: noImpact,
+              viewport,
             });
 
             if (!result) {
@@ -291,6 +299,7 @@ describe('move to new droppable', () => {
                 droppableId: home.descriptor.id,
               },
               previousImpact: noImpact,
+              viewport,
             });
 
             if (!result) {
@@ -363,6 +372,7 @@ describe('move to new droppable', () => {
                 droppableId: home.descriptor.id,
               },
               previousImpact: noImpact,
+              viewport,
             });
 
             if (!result) {
@@ -473,6 +483,7 @@ describe('move to new droppable', () => {
                 droppableId: droppable.descriptor.id,
               },
               previousImpact: noImpact,
+              viewport,
             });
 
             if (!result || !result.impact) {
@@ -483,7 +494,6 @@ describe('move to new droppable', () => {
           });
 
           it('should indicate when displacement is not visible when not partially visible in the viewport', () => {
-            const viewport = getViewport();
             const droppable: DroppableDimension = getDroppableDimension({
               descriptor: {
                 id: 'with-frame',
@@ -495,7 +505,7 @@ describe('move to new droppable', () => {
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 // extends beyond the viewport
-                [axis.end]: viewport[axis.end] + 100,
+                [axis.end]: viewport.subject[axis.end] + 100,
               }),
             });
             const inside: DraggableDimension = getDraggableDimension({
@@ -508,7 +518,7 @@ describe('move to new droppable', () => {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
-                [axis.end]: viewport[axis.end],
+                [axis.end]: viewport.subject[axis.end],
               }),
             });
             const outside: DraggableDimension = getDraggableDimension({
@@ -521,8 +531,8 @@ describe('move to new droppable', () => {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the viewport but inside the droppable
-                [axis.start]: viewport[axis.end] + 1,
-                [axis.end]: viewport[axis.end] + 10,
+                [axis.start]: viewport.subject[axis.end] + 1,
+                [axis.end]: viewport.subject[axis.end] + 10,
               }),
             });
             const customDraggables: DraggableDimension[] = [
@@ -558,6 +568,7 @@ describe('move to new droppable', () => {
                 droppableId: droppable.descriptor.id,
               },
               previousImpact: noImpact,
+              viewport,
             });
 
             if (!result || !result.impact) {
@@ -586,6 +597,7 @@ describe('move to new droppable', () => {
               droppableId: home.descriptor.id,
             },
             previousImpact: noImpact,
+            viewport,
           });
 
           expect(result).toBe(null);
@@ -604,6 +616,7 @@ describe('move to new droppable', () => {
                 droppableId: home.descriptor.id,
               },
               previousImpact: noImpact,
+              viewport,
             });
 
             if (!result) {
@@ -657,6 +670,7 @@ describe('move to new droppable', () => {
                 droppableId: home.descriptor.id,
               },
               previousImpact: noImpact,
+              viewport,
             });
 
             if (!result) {
@@ -692,6 +706,7 @@ describe('move to new droppable', () => {
                 droppableId: home.descriptor.id,
               },
               previousImpact: noImpact,
+              viewport,
             });
 
             if (!result) {
@@ -763,6 +778,7 @@ describe('move to new droppable', () => {
                 droppableId: home.descriptor.id,
               },
               previousImpact: noImpact,
+              viewport,
             });
 
             if (!result) {
@@ -798,6 +814,7 @@ describe('move to new droppable', () => {
                 droppableId: home.descriptor.id,
               },
               previousImpact: noImpact,
+              viewport,
             });
 
             if (!result) {
@@ -865,6 +882,7 @@ describe('move to new droppable', () => {
                 droppableId: home.descriptor.id,
               },
               previousImpact: noImpact,
+              viewport,
             });
 
             if (!result) {
@@ -991,6 +1009,7 @@ describe('move to new droppable', () => {
                 droppableId: customHome.descriptor.id,
               },
               previousImpact: noImpact,
+              viewport,
             });
 
             if (!result || !result.impact) {
@@ -1001,7 +1020,6 @@ describe('move to new droppable', () => {
           });
 
           it('should indicate when displacement is not visible when not inside the viewport', () => {
-            const viewport = getViewport();
             const customHome: DroppableDimension = getDroppableDimension({
               descriptor: {
                 id: 'home',
@@ -1035,12 +1053,12 @@ describe('move to new droppable', () => {
               },
               direction: axis.direction,
               paddingBox: getArea({
-                bottom: viewport.bottom + 100,
+                bottom: viewport.subject.bottom + 100,
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 // extending beyond the viewport
-                [axis.end]: viewport[axis.end] + 100,
+                [axis.end]: viewport.subject[axis.end] + 100,
               }),
             });
             const customInForeign: DraggableDimension = getDraggableDimension({
@@ -1053,8 +1071,8 @@ describe('move to new droppable', () => {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the viewport but inside the droppable
-                [axis.start]: viewport[axis.end] + 1,
-                [axis.end]: viewport[axis.end] + 10,
+                [axis.start]: viewport.subject[axis.end] + 1,
+                [axis.end]: viewport.subject[axis.end] + 10,
               }),
             });
 
@@ -1092,6 +1110,7 @@ describe('move to new droppable', () => {
                 droppableId: customHome.descriptor.id,
               },
               previousImpact: noImpact,
+              viewport,
             });
 
             if (!result || !result.impact) {

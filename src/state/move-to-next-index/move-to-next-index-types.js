@@ -5,6 +5,7 @@ import type {
   DragImpact,
   DroppableDimension,
   DraggableDimensionMap,
+  Viewport,
 } from '../../types';
 
 export type Args = {|
@@ -14,6 +15,7 @@ export type Args = {|
   previousImpact: DragImpact,
   droppable: DroppableDimension,
   draggables: DraggableDimensionMap,
+  viewport: Viewport,
 |}
 
 export type Result = {|

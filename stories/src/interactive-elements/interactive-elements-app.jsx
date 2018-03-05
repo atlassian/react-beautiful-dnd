@@ -144,6 +144,10 @@ export default class InteractiveElementsApp extends React.Component<*, State> {
       return;
     }
 
+    if (result.source.index === result.destination.index) {
+      return;
+    }
+
     const items = reorder(
       this.state.items,
       result.source.index,

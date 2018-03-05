@@ -2,7 +2,6 @@
 import { closest } from '../position';
 import isWithin from '../is-within';
 import { getCorners } from '../spacing';
-import getViewport from '../../window/get-viewport';
 import isPartiallyVisibleThroughFrame from '../visibility/is-partially-visible-through-frame';
 import type {
   Axis,
@@ -11,6 +10,7 @@ import type {
   DroppableId,
   Position,
   Area,
+  Viewport,
 } from '../../types';
 
 type GetBestDroppableArgs = {|
@@ -21,6 +21,7 @@ type GetBestDroppableArgs = {|
   source: DroppableDimension,
   // all the droppables in the system
   droppables: DroppableDimensionMap,
+  viewport: Viewport,
 |}
 
 const getSafeClipped = (droppable: DroppableDimension): Area => {
@@ -37,6 +38,7 @@ export default ({
   pageCenter,
   source,
   droppables,
+  viewport,
 }: GetBestDroppableArgs): ?DroppableDimension => {
   const sourceClipped: ?Area = source.viewport.clipped;
 
@@ -49,8 +51,6 @@ export default ({
     sourceClipped[axis.start],
     sourceClipped[axis.end]
   );
-  const viewport: Area = getViewport();
-
   // const candidates: Candidate[] = Object.keys(droppables)
   const candidates: DroppableDimension[] = Object.keys(droppables)
     .map((id: DroppableId): DroppableDimension => droppables[id])
@@ -66,7 +66,7 @@ export default ({
         return false;
       }
       // TODO: only need to be totally visible on the cross axis
-      return isPartiallyVisibleThroughFrame(viewport)(clipped);
+      return isPartiallyVisibleThroughFrame(viewport.subject)(clipped);
     })
     .filter((droppable: DroppableDimension): boolean => {
       const targetClipped: Area = getSafeClipped(droppable);

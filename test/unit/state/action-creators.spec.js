@@ -12,6 +12,7 @@ import {
 } from '../../../src/state/action-creators';
 import createStore from '../../../src/state/create-store';
 import { getPreset } from '../../utils/dimension';
+import getViewport from '../../../src/view/window/get-viewport';
 import getStatePreset from '../../utils/get-simple-state-preset';
 import type {
   State,
@@ -20,6 +21,7 @@ import type {
   Store,
   InitialDragPositions,
   LiftRequest,
+  Viewport,
 } from '../../../src/types';
 
 const preset = getPreset();
@@ -32,13 +34,13 @@ const noWhere: InitialDragPositions = {
 type LiftFnArgs = {|
   id: DraggableId,
   client: InitialDragPositions,
-  windowScroll: Position,
+  viewport: Viewport,
   autoScrollMode: 'FLUID' | 'JUMP',
 |}
 
 const liftDefaults: LiftFnArgs = {
   id: preset.inHome1.descriptor.id,
-  windowScroll: origin,
+  viewport: getViewport(),
   client: noWhere,
   autoScrollMode: 'FLUID',
 };
@@ -46,8 +48,8 @@ const liftDefaults: LiftFnArgs = {
 const state = getStatePreset();
 
 const liftWithDefaults = (args?: LiftFnArgs = liftDefaults) => {
-  const { id, client, windowScroll, autoScrollMode } = args;
-  return lift(id, client, windowScroll, autoScrollMode);
+  const { id, client, viewport, autoScrollMode } = args;
+  return lift(id, client, viewport, autoScrollMode);
 };
 
 describe('action creators', () => {
@@ -98,7 +100,7 @@ describe('action creators', () => {
       expect(store.dispatch).toHaveBeenCalledWith(completeLift(
         liftDefaults.id,
         liftDefaults.client,
-        liftDefaults.windowScroll,
+        liftDefaults.viewport,
         liftDefaults.autoScrollMode,
       ));
       expect(store.dispatch).toHaveBeenCalledTimes(5);
@@ -160,7 +162,7 @@ describe('action creators', () => {
           completeLift(
             liftDefaults.id,
             liftDefaults.client,
-            liftDefaults.windowScroll,
+            liftDefaults.viewport,
             liftDefaults.autoScrollMode,
           )
         );
@@ -206,7 +208,7 @@ describe('action creators', () => {
         expect(store.dispatch).not.toHaveBeenCalledWith(completeLift(
           liftDefaults.id,
           liftDefaults.client,
-          liftDefaults.windowScroll,
+          liftDefaults.viewport,
           liftDefaults.autoScrollMode,
         ));
 
