@@ -209,6 +209,12 @@ export type InitialDragPositions = {|
 // When Dragging with a keyboard we want to jump as required
 export type AutoScrollMode = 'FLUID' | 'JUMP';
 
+export type Viewport = {|
+  scroll: Position,
+  maxScroll: Position,
+  subject: Area,
+|}
+
 export type InitialDrag = {|
   descriptor: DraggableDescriptor,
   autoScrollMode: AutoScrollMode,
@@ -216,9 +222,9 @@ export type InitialDrag = {|
   client: InitialDragPositions,
   // viewport + window scroll (position relative to 0, 0)
   page: InitialDragPositions,
-  // Storing scroll directly to support movement during a window scroll.
+  // Storing viewport directly to support movement during a window scroll.
   // Value required for comparison with current scroll
-  windowScroll: Position,
+  viewport: Viewport,
 |}
 
 export type CurrentDragPositions = {|
@@ -232,9 +238,6 @@ export type CurrentDrag = {|
   client: CurrentDragPositions,
   // viewport + scroll
   page: CurrentDragPositions,
-  // Storing scroll directly to support movement during a window scroll.
-  // Value required for comparison with current scroll
-  windowScroll: Position,
   // whether or not draggable movements should be animated
   shouldAnimate: boolean,
   // We do not want to calculate drag impacts until we have completed
@@ -242,6 +245,7 @@ export type CurrentDrag = {|
   // be called with incorrect indexes.
   // Before the first bulk publish the calculations will return incorrect indexes.
   hasCompletedFirstBulkPublish: boolean,
+  viewport: Viewport
 |}
 
 // published when a drag starts

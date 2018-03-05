@@ -4,13 +4,16 @@ import { getDroppableDimension } from '../../../../src/state/dimension';
 import getArea from '../../../../src/state/get-area';
 import { add } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
-import getViewport from '../../../../src/window/get-viewport';
+import getViewport from '../../../../src/view/window/get-viewport';
 import type {
+  Viewport,
   Axis,
   Position,
   DroppableDimension,
   DroppableDimensionMap,
 } from '../../../../src/types';
+
+const viewport: Viewport = getViewport();
 
 describe('get best cross axis droppable', () => {
   describe('on the vertical axis', () => {
@@ -53,6 +56,7 @@ describe('get best cross axis droppable', () => {
         pageCenter: source.page.marginBox.center,
         source,
         droppables,
+        viewport,
       });
 
       expect(result).toBe(forward);
@@ -95,6 +99,7 @@ describe('get best cross axis droppable', () => {
         isMovingForward: false,
         pageCenter: source.page.marginBox.center,
         source,
+        viewport,
         droppables,
       });
 
@@ -138,6 +143,7 @@ describe('get best cross axis droppable', () => {
         pageCenter: source.page.marginBox.center,
         source,
         droppables,
+        viewport,
       });
       expect(result).toBe(null);
 
@@ -147,6 +153,7 @@ describe('get best cross axis droppable', () => {
         pageCenter: source.page.marginBox.center,
         source,
         droppables,
+        viewport,
       });
       expect(result2).toBe(behind);
     });
@@ -189,6 +196,7 @@ describe('get best cross axis droppable', () => {
         pageCenter: source.page.marginBox.center,
         source,
         droppables,
+        viewport,
       });
 
       expect(result).toBe(null);
@@ -208,7 +216,6 @@ describe('get best cross axis droppable', () => {
           bottom: 10,
         }),
       });
-      const viewport = getViewport();
       const outsideViewport = getDroppableDimension({
         descriptor: {
           id: 'outsideViewport',
@@ -218,8 +225,8 @@ describe('get best cross axis droppable', () => {
         paddingBox: getArea({
           left: 30,
           right: 40,
-          top: viewport.bottom + 1,
-          bottom: viewport.bottom + 10,
+          top: viewport.subject.bottom + 1,
+          bottom: viewport.subject.bottom + 10,
         }),
       });
       const droppables: DroppableDimensionMap = {
@@ -232,6 +239,7 @@ describe('get best cross axis droppable', () => {
         pageCenter: source.page.marginBox.center,
         source,
         droppables,
+        viewport,
       });
 
       expect(result).toBe(null);
@@ -276,6 +284,7 @@ describe('get best cross axis droppable', () => {
         pageCenter: source.page.marginBox.center,
         source,
         droppables,
+        viewport,
       });
 
       expect(result).toBe(null);
@@ -357,6 +366,7 @@ describe('get best cross axis droppable', () => {
           pageCenter: center,
           source,
           droppables,
+          viewport,
         });
 
         expect(result).toBe(sibling2);
@@ -376,6 +386,7 @@ describe('get best cross axis droppable', () => {
           pageCenter: center,
           source,
           droppables,
+          viewport,
         });
 
         expect(result).toBe(sibling2);
@@ -395,6 +406,7 @@ describe('get best cross axis droppable', () => {
             pageCenter: center,
             source,
             droppables,
+            viewport,
           });
 
           expect(result).toBe(sibling1);
@@ -413,6 +425,7 @@ describe('get best cross axis droppable', () => {
             pageCenter: center,
             source,
             droppables,
+            viewport,
           });
 
           expect(result).toBe(sibling1);
@@ -424,6 +437,7 @@ describe('get best cross axis droppable', () => {
             pageCenter: center2,
             source,
             droppables,
+            viewport,
           });
           expect(result2).toBe(sibling2);
         });
@@ -471,6 +485,7 @@ describe('get best cross axis droppable', () => {
         pageCenter: source.page.marginBox.center,
         source,
         droppables,
+        viewport,
       });
 
       expect(result).toBe(forward);
@@ -513,6 +528,7 @@ describe('get best cross axis droppable', () => {
         isMovingForward: false,
         pageCenter: source.page.marginBox.center,
         source,
+        viewport,
         droppables,
       });
 
@@ -557,6 +573,7 @@ describe('get best cross axis droppable', () => {
         pageCenter: source.page.marginBox.center,
         source,
         droppables,
+        viewport,
       });
       expect(result).toBe(null);
 
@@ -566,6 +583,7 @@ describe('get best cross axis droppable', () => {
         pageCenter: source.page.marginBox.center,
         source,
         droppables,
+        viewport,
       });
       expect(result2).toBe(behind);
     });
@@ -608,6 +626,7 @@ describe('get best cross axis droppable', () => {
         pageCenter: source.page.marginBox.center,
         source,
         droppables,
+        viewport,
       });
 
       expect(result).toBe(null);
@@ -665,6 +684,7 @@ describe('get best cross axis droppable', () => {
         pageCenter: source.page.marginBox.center,
         source,
         droppables,
+        viewport,
       });
 
       expect(result).toBe(null);
@@ -684,7 +704,6 @@ describe('get best cross axis droppable', () => {
           right: 30,
         }),
       });
-      const viewport = getViewport();
       const notInViewport = getDroppableDimension({
         descriptor: {
           id: 'notInViewport',
@@ -694,8 +713,8 @@ describe('get best cross axis droppable', () => {
         paddingBox: getArea({
           top: 0,
           bottom: 10,
-          left: viewport.right + 1,
-          right: viewport.right + 10,
+          left: viewport.subject.right + 1,
+          right: viewport.subject.right + 10,
         }),
       });
       const droppables: DroppableDimensionMap = {
@@ -708,6 +727,7 @@ describe('get best cross axis droppable', () => {
         pageCenter: source.page.marginBox.center,
         source,
         droppables,
+        viewport,
       });
 
       expect(result).toBe(null);
@@ -753,6 +773,7 @@ describe('get best cross axis droppable', () => {
         pageCenter: source.page.marginBox.center,
         source,
         droppables,
+        viewport,
       });
 
       expect(result).toBe(null);
@@ -821,6 +842,7 @@ describe('get best cross axis droppable', () => {
           pageCenter: center,
           source,
           droppables,
+          viewport,
         });
 
         expect(result).toBe(sibling2);
@@ -841,6 +863,7 @@ describe('get best cross axis droppable', () => {
             pageCenter: center,
             source,
             droppables,
+            viewport,
           });
 
           expect(result).toBe(sibling1);
@@ -859,6 +882,7 @@ describe('get best cross axis droppable', () => {
             pageCenter: center,
             source,
             droppables,
+            viewport,
           });
 
           expect(result).toBe(sibling1);
@@ -871,6 +895,7 @@ describe('get best cross axis droppable', () => {
             pageCenter: center2,
             source,
             droppables,
+            viewport,
           });
 
           expect(result2).toBe(sibling2);

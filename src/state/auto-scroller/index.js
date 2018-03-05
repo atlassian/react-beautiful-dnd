@@ -7,6 +7,7 @@ import type {
   DroppableId,
   Position,
   State,
+  Viewport,
 } from '../../types';
 
 type Args = {|
@@ -15,7 +16,7 @@ type Args = {|
   move: (
     id: DraggableId,
     client: Position,
-    windowScroll: Position,
+    viewport: Viewport,
     shouldAnimate?: boolean
   ) => void,
 |}

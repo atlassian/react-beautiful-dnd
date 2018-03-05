@@ -18,7 +18,7 @@ import {
 } from '../../utils/user-input-util';
 import type { Position, DraggableId } from '../../../src/types';
 import * as keyCodes from '../../../src/view/key-codes';
-import getWindowScroll from '../../../src/window/get-window-scroll';
+import getWindowScroll from '../../../src/view/window/get-window-scroll';
 import setWindowScroll from '../../utils/set-window-scroll';
 import getArea from '../../../src/state/get-area';
 import { timeForLongPress, forcePressThreshold } from '../../../src/view/drag-handle/sensor/create-touch-sensor';

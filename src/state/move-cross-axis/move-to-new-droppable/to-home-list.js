@@ -1,13 +1,12 @@
 // @flow
 import moveToEdge from '../../move-to-edge';
-import getViewport from '../../../window/get-viewport';
 import getDisplacement from '../../get-displacement';
 import withDroppableDisplacement from '../../with-droppable-displacement';
 import type { Edge } from '../../move-to-edge';
 import type { Result } from '../move-cross-axis-types';
 import type {
   Axis,
-  Area,
+  Viewport,
   Displacement,
   Position,
   DragImpact,
@@ -23,6 +22,7 @@ type Args = {|
   draggable: DraggableDimension,
   droppable: DroppableDimension,
   previousImpact: DragImpact,
+  viewport: Viewport,
 |}
 
 export default ({
@@ -33,6 +33,7 @@ export default ({
   draggable,
   droppable,
   previousImpact,
+  viewport,
 }: Args): ?Result => {
   if (!target) {
     console.error('there will always be a target in the original list');
@@ -106,13 +107,12 @@ export default ({
     return insideDroppable.slice(from, to).reverse();
   })();
 
-  const viewport: Area = getViewport();
   const displaced: Displacement[] = modified
     .map((dimension: DraggableDimension): Displacement => getDisplacement({
       draggable: dimension,
       destination: droppable,
       previousImpact,
-      viewport,
+      viewport: viewport.subject,
     }));
 
   const newImpact: DragImpact = {

@@ -2,9 +2,10 @@
 import createStore from '../../../src/state/create-store';
 import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
 import createHookCaller from '../../../src/state/hooks/hook-caller';
-import type { HookCaller } from '../../../src/state/hooks/hooks-types';
 import { getPreset } from '../../utils/dimension';
 import { add } from '../../../src/state/position';
+import getArea from '../../../src/state/get-area';
+import { createViewport } from '../../utils/viewport';
 import {
   lift,
   clean,
@@ -17,8 +18,10 @@ import {
   move,
   updateDroppableDimensionIsEnabled,
 } from '../../../src/state/action-creators';
+import type { HookCaller } from '../../../src/state/hooks/hooks-types';
 import type { DimensionMarshal, Callbacks as DimensionMarshalCallbacks } from '../../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
+  Viewport,
   State,
   Store,
   DraggableDimension,
@@ -30,7 +33,18 @@ import type {
 } from '../../../src/types';
 
 const preset = getPreset();
-const origin: Position = { x: 0, y: 0 };
+
+const scrolledViewport: Viewport = createViewport({
+  subject: getArea({
+    top: 0,
+    left: 0,
+    right: 1000,
+    bottom: 1000,
+  }),
+  scrollHeight: 2000,
+  scrollWidth: 2000,
+  scroll: preset.windowScroll,
+});
 
 const getDimensionMarshal = (store: Store): DimensionMarshal => {
   const callbacks: DimensionMarshalCallbacks = {
@@ -143,7 +157,7 @@ describe('lifting and the dimension marshal', () => {
         lift(
           preset.inHome1.descriptor.id,
           initial,
-          preset.windowScroll,
+          scrolledViewport,
           'JUMP',
         )(store.dispatch, store.getState);
 
@@ -165,7 +179,7 @@ describe('lifting and the dimension marshal', () => {
         const center: Position = store.getState().drag.current.client.center;
         const shifted: Position = add(center, { x: 1, y: 1 });
         store.dispatch(
-          move(preset.inHome1.descriptor.id, shifted, preset.windowScroll)
+          move(preset.inHome1.descriptor.id, shifted, scrolledViewport)
         );
 
         // will start a drop animation
@@ -194,7 +208,7 @@ describe('lifting and the dimension marshal', () => {
         lift(
           preset.inHome3.descriptor.id,
           forSecondDrag,
-          origin,
+          scrolledViewport,
           'JUMP',
         )(store.dispatch, store.getState);
 

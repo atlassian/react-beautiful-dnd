@@ -1,7 +1,7 @@
 // @flow
 import getDisplacement from '../get-displacement';
 import type {
-  Area,
+  Viewport,
   Axis,
   DraggableId,
   DragImpact,
@@ -16,7 +16,7 @@ type WithAdded = {|
   previousImpact: DragImpact,
   droppable: DroppableDimension,
   draggables: DraggableDimensionMap,
-  viewport: Area,
+  viewport: Viewport,
 |}
 
 export const withFirstAdded = ({
@@ -48,7 +48,7 @@ export const withFirstAdded = ({
         draggable: draggables[current.draggableId],
         destination: droppable,
         previousImpact,
-        viewport,
+        viewport: viewport.subject,
       });
 
       return updated;

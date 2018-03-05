@@ -3,7 +3,6 @@ import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import { patch, subtract } from '../position';
 import withDroppableDisplacement from '../with-droppable-displacement';
 import moveToEdge from '../move-to-edge';
-import getViewport from '../../window/get-viewport';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
 import type { Edge } from '../move-to-edge';
@@ -15,7 +14,6 @@ import type {
   Axis,
   DragImpact,
   Displacement,
-  Area,
 } from '../../types';
 
 export default ({
@@ -25,6 +23,7 @@ export default ({
   previousPageCenter,
   droppable,
   draggables,
+  viewport,
 }: Args): ?Result => {
   if (!previousImpact.destination) {
     console.error('cannot move to next index when there is not previous destination');
@@ -74,7 +73,6 @@ export default ({
     return 'start';
   })();
 
-  const viewport: Area = getViewport();
   const newPageCenter: Position = moveToEdge({
     source: draggable.page.paddingBox,
     sourceEdge,
@@ -87,7 +85,7 @@ export default ({
     draggable,
     destination: droppable,
     newPageCenter,
-    viewport,
+    viewport: viewport.subject,
   });
 
   const displaced: Displacement[] = (() => {

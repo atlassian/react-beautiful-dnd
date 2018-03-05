@@ -1,5 +1,5 @@
 // @flow
-import type { Position } from '../types';
+import type { Position } from '../../types';
 
 // The browsers update document.documentElement.scrollTop and window.pageYOffset
 // differently as the window scrolls.
