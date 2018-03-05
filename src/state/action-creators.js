@@ -17,6 +17,7 @@ import type {
   LiftRequest,
   AutoScrollMode,
   ScrollOptions,
+  Viewport,
 } from '../types';
 import noImpact from './no-impact';
 import withDroppableDisplacement from './with-droppable-displacement';
@@ -37,8 +38,8 @@ const getScrollDiff = ({
   droppable,
 }: ScrollDiffArgs): Position => {
   const windowScrollDiff: Position = subtract(
-    initial.windowScroll,
-    current.windowScroll
+    initial.viewport.scroll,
+    current.viewport.scroll,
   );
 
   if (!droppable) {
@@ -63,7 +64,7 @@ export type CompleteLiftAction = {|
   payload: {|
     id: DraggableId,
     client: InitialDragPositions,
-    windowScroll: Position,
+    viewport: Viewport,
     autoScrollMode: AutoScrollMode,
   |}
 |}
@@ -71,14 +72,14 @@ export type CompleteLiftAction = {|
 export const completeLift = (
   id: DraggableId,
   client: InitialDragPositions,
-  windowScroll: Position,
+  viewport: Viewport,
   autoScrollMode: AutoScrollMode,
 ): CompleteLiftAction => ({
   type: 'COMPLETE_LIFT',
   payload: {
     id,
     client,
-    windowScroll,
+    viewport,
     autoScrollMode,
   },
 });
@@ -163,7 +164,7 @@ export type MoveAction = {|
   payload: {|
     id: DraggableId,
     client: Position,
-    windowScroll: Position,
+    viewport: Viewport,
     shouldAnimate: boolean,
   |}
 |}
@@ -171,14 +172,14 @@ export type MoveAction = {|
 export const move = (
   id: DraggableId,
   client: Position,
-  windowScroll: Position,
+  viewport: Viewport,
   shouldAnimate?: boolean = false,
 ): MoveAction => ({
   type: 'MOVE',
   payload: {
     id,
     client,
-    windowScroll,
+    viewport,
     shouldAnimate,
   },
 });
@@ -187,16 +188,16 @@ export type MoveByWindowScrollAction = {|
   type: 'MOVE_BY_WINDOW_SCROLL',
   payload: {|
     id: DraggableId,
-    windowScroll: Position,
+    viewport: Viewport,
   |}
 |}
 
 export const moveByWindowScroll =
-  (id: DraggableId, windowScroll: Position): MoveByWindowScrollAction => ({
+  (id: DraggableId, viewport: Viewport): MoveByWindowScrollAction => ({
     type: 'MOVE_BY_WINDOW_SCROLL',
     payload: {
       id,
-      windowScroll,
+      viewport,
     },
   });
 
@@ -451,7 +452,7 @@ export type LiftAction = {|
   payload: {|
     id: DraggableId,
     client: InitialDragPositions,
-    windowScroll: Position,
+    viewport: Viewport,
     autoScrollMode: AutoScrollMode,
   |}
 |}
@@ -460,7 +461,7 @@ export type LiftAction = {|
 // as the descriptor might change after a drop is flushed
 export const lift = (id: DraggableId,
   client: InitialDragPositions,
-  windowScroll: Position,
+  viewport: Viewport,
   autoScrollMode: AutoScrollMode,
 ) => (dispatch: Dispatch, getState: Function) => {
   // Phase 1: Quickly finish any current drop animations
@@ -511,7 +512,7 @@ export const lift = (id: DraggableId,
         return;
       }
 
-      dispatch(completeLift(id, client, windowScroll, autoScrollMode));
+      dispatch(completeLift(id, client, viewport, autoScrollMode));
     });
   });
 };

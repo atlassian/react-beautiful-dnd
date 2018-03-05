@@ -8,11 +8,11 @@ import type {
   Position,
   Displacement,
   Area,
+  Viewport,
 } from '../../types';
 import { patch } from '../position';
 import getDisplacement from '../get-displacement';
 import withDroppableScroll from '../with-droppable-scroll';
-import getViewport from '../../window/get-viewport';
 
 // It is the responsibility of this function
 // to return the impact of a drag
@@ -23,6 +23,7 @@ type Args = {|
   home: DroppableDimension,
   insideHome: DraggableDimension[],
   previousImpact: DragImpact,
+  viewport: Viewport,
 |}
 
 export default ({
@@ -31,8 +32,8 @@ export default ({
   home,
   insideHome,
   previousImpact,
+  viewport,
 }: Args): DragImpact => {
-  const viewport: Area = getViewport();
   const axis: Axis = home.axis;
   // The starting center position
   const originalCenter: Position = draggable.page.paddingBox.center;
@@ -77,7 +78,7 @@ export default ({
       draggable: dimension,
       destination: home,
       previousImpact,
-      viewport,
+      viewport: viewport.subject,
     }));
 
     // Need to ensure that we always order by the closest impacted item

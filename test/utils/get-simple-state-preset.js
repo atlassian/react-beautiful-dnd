@@ -2,6 +2,7 @@
 import { getPreset } from './dimension';
 import noImpact from '../../src/state/no-impact';
 import { vertical } from '../../src/state/axis';
+import getViewport from '../../src/view/window/get-viewport';
 import type {
   Axis,
   State,
@@ -21,6 +22,7 @@ import type {
   DraggableId,
   DragImpact,
   ScrollOptions,
+  Viewport,
 } from '../../src/types';
 
 const scheduled: ScrollOptions = {
@@ -83,6 +85,7 @@ export default (axis?: Axis = vertical) => {
   const dragging = (
     id?: DraggableId = preset.inHome1.descriptor.id,
     selection?: Position,
+    viewport?: Viewport = getViewport(),
   ): State => {
     // will populate the dimension state with the initial dimensions
     const draggable: DraggableDimension = preset.draggables[id];
@@ -104,12 +107,12 @@ export default (axis?: Axis = vertical) => {
         autoScrollMode: 'FLUID',
         client: initialPosition,
         page: initialPosition,
-        windowScroll: origin,
+        viewport,
       },
       current: {
         client: clientPositions,
         page: clientPositions,
-        windowScroll: origin,
+        viewport,
         shouldAnimate: false,
         hasCompletedFirstBulkPublish: true,
       },
@@ -130,7 +133,7 @@ export default (axis?: Axis = vertical) => {
     return result;
   };
 
-  const scrollJumpRequest = (request: Position): State => {
+  const scrollJumpRequest = (request: Position, viewport?: Viewport = getViewport()): State => {
     const id: DraggableId = preset.inHome1.descriptor.id;
     // will populate the dimension state with the initial dimensions
     const draggable: DraggableDimension = preset.draggables[id];
@@ -164,14 +167,14 @@ export default (axis?: Axis = vertical) => {
         autoScrollMode: 'JUMP',
         client: initialPosition,
         page: initialPosition,
-        windowScroll: origin,
+        viewport,
       },
       current: {
         client: clientPositions,
         page: clientPositions,
-        windowScroll: origin,
         shouldAnimate: true,
         hasCompletedFirstBulkPublish: true,
+        viewport,
       },
       impact,
       scrollJumpRequest: request,

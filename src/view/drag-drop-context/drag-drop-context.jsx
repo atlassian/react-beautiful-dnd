@@ -6,7 +6,7 @@ import createHookCaller from '../../state/hooks/hook-caller';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
 import createStyleMarshal, { resetStyleContext } from '../style-marshal/style-marshal';
 import canStartDrag from '../../state/can-start-drag';
-import scrollWindow from '../../window/scroll-window';
+import scrollWindow from '../window/scroll-window';
 import createAnnouncer from '../announcer/announcer';
 import type { Announcer } from '../announcer/announcer-types';
 import createAutoScroller from '../../state/auto-scroller';
@@ -25,6 +25,7 @@ import type {
   DroppableId,
   Position,
   Hooks,
+  Viewport,
 } from '../../types';
 import type {
   HookCaller,
@@ -140,10 +141,10 @@ export default class DragDropContext extends React.Component<Props> {
       move: (
         id: DraggableId,
         client: Position,
-        windowScroll: Position,
+        viewport: Viewport,
         shouldAnimate?: boolean
       ): void => {
-        this.store.dispatch(move(id, client, windowScroll, shouldAnimate));
+        this.store.dispatch(move(id, client, viewport, shouldAnimate));
       },
     });
 

@@ -57,6 +57,10 @@ export default class QuoteApp extends Component<Props, State> {
       return;
     }
 
+    if (result.destination.index === result.source.index) {
+      return;
+    }
+
     const quotes = reorder(
       this.state.quotes,
       result.source.index,

@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import rafSchedule from 'raf-schd';
-import getWindowScroll from '../../window/get-window-scroll';
+import getWindowScroll from '../window/get-window-scroll';
 import getArea from '../../state/get-area';
 import { getDroppableDimension } from '../../state/dimension';
 import getClosestScrollable from '../get-closest-scrollable';

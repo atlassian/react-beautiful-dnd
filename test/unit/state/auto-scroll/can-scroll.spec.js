@@ -1,8 +1,8 @@
 // @flow
 import type {
-  Area,
   Position,
   DroppableDimension,
+  Viewport,
 } from '../../../../src/types';
 import {
   canPartiallyScroll,
@@ -16,9 +16,7 @@ import { add, subtract } from '../../../../src/state/position';
 import getArea from '../../../../src/state/get-area';
 import { getPreset } from '../../../utils/dimension';
 import { getDroppableDimension, scrollDroppable } from '../../../../src/state/dimension';
-import setViewport, { resetViewport } from '../../../utils/set-viewport';
-import setWindowScroll, { resetWindowScroll } from '../../../utils/set-window-scroll';
-import setWindowScrollSize, { resetWindowScrollSize } from '../../../utils/set-window-scroll-size';
+import { createViewport } from '../../../utils/viewport';
 import getMaxScroll from '../../../../src/state/get-max-scroll';
 
 const origin: Position = { x: 0, y: 0 };
@@ -55,13 +53,19 @@ const scrollable: DroppableDimension = getDroppableDimension({
   },
 });
 
-describe('can scroll', () => {
-  afterEach(() => {
-    resetWindowScroll();
-    resetWindowScrollSize();
-    resetViewport();
-  });
+const customViewport: Viewport = createViewport({
+  subject: getArea({
+    top: 0,
+    left: 0,
+    right: 100,
+    bottom: 100,
+  }),
+  scroll: origin,
+  scrollHeight: 100,
+  scrollWidth: 100,
+});
 
+describe('can scroll', () => {
   describe('can partially scroll', () => {
     it('should return true if not scrolling anywhere', () => {
       const result: boolean = canPartiallyScroll({
@@ -410,41 +414,31 @@ describe('can scroll', () => {
 
   describe('can scroll window', () => {
     it('should return true if the window is able to be scrolled', () => {
-      setViewport(getArea({
-        top: 0,
-        left: 0,
-        right: 100,
-        bottom: 100,
-      }));
-      setWindowScrollSize({
+      const viewport: Viewport = createViewport({
+        subject: customViewport.subject,
         scrollHeight: 200,
         scrollWidth: 100,
+        scroll: origin,
       });
-      setWindowScroll(origin);
 
-      const result: boolean = canScrollWindow({ x: 0, y: 50 });
+      const result: boolean = canScrollWindow(viewport, { x: 0, y: 50 });
 
       expect(result).toBe(true);
     });
 
     it('should return false if the window is not able to be scrolled', () => {
-      setViewport(getArea({
-        top: 0,
-        left: 0,
-        right: 100,
-        bottom: 100,
-      }));
-      setWindowScrollSize({
+      const viewport: Viewport = createViewport({
+        subject: customViewport.subject,
         scrollHeight: 200,
         scrollWidth: 100,
-      });
-      // already at the max scroll
-      setWindowScroll({
-        x: 0,
-        y: 200,
+        // already at the max scroll
+        scroll: {
+          x: 0,
+          y: 200,
+        },
       });
 
-      const result: boolean = canScrollWindow({ x: 0, y: 1 });
+      const result: boolean = canScrollWindow(viewport, { x: 0, y: 1 });
 
       expect(result).toBe(false);
     });
@@ -506,53 +500,40 @@ describe('can scroll', () => {
 
   describe('get window overlap', () => {
     it('should return null if the window cannot be scrolled', () => {
-      setViewport(getArea({
-        top: 0,
-        left: 0,
-        right: 100,
-        bottom: 100,
-      }));
-      setWindowScrollSize({
+      const viewport: Viewport = createViewport({
+        subject: customViewport.subject,
         scrollHeight: 200,
         scrollWidth: 100,
-      });
-      // already at the max scroll
-      setWindowScroll({
-        x: 0,
-        y: 200,
+        // already at the max scroll
+        scroll: {
+          x: 0,
+          y: 200,
+        },
       });
 
-      const result: ?Position = getWindowOverlap({ x: 0, y: 1 });
+      const result: ?Position = getWindowOverlap(viewport, { x: 0, y: 1 });
 
       expect(result).toBe(null);
     });
 
     // tested in get remainder
     it('should return the overlap', () => {
-      const viewport: Area = getArea({
-        top: 0,
-        left: 0,
-        right: 100,
-        bottom: 100,
-      });
-      setViewport(viewport);
-      const windowScrollSize = {
+      const viewport: Viewport = createViewport({
+        subject: customViewport.subject,
         scrollHeight: 200,
         scrollWidth: 200,
-      };
-      setWindowScrollSize(windowScrollSize);
-      const windowScroll: Position = {
-        x: 50,
-        y: 50,
-      };
-      setWindowScroll(windowScroll);
+        scroll: {
+          x: 50,
+          y: 50,
+        },
+      });
 
       // little validation
       const maxScroll: Position = getMaxScroll({
-        scrollHeight: windowScrollSize.scrollHeight,
-        scrollWidth: windowScrollSize.scrollWidth,
-        height: viewport.height,
-        width: viewport.width,
+        scrollHeight: 200,
+        scrollWidth: 200,
+        height: viewport.subject.height,
+        width: viewport.subject.width,
       });
       expect(maxScroll).toEqual({ x: 100, y: 100 });
 
@@ -564,26 +545,20 @@ describe('can scroll', () => {
       const bigChange: Position = { x: 300, y: 300 };
       const expectedOverlap: Position = subtract(bigChange, availableScrollSpace);
 
-      const result: ?Position = getWindowOverlap(bigChange);
+      const result: ?Position = getWindowOverlap(viewport, bigChange);
 
       expect(result).toEqual(expectedOverlap);
     });
 
     it('should return null if there is no overlap', () => {
-      setViewport(getArea({
-        top: 0,
-        left: 0,
-        right: 100,
-        bottom: 100,
-      }));
-      const scrollSize = {
-        scrollHeight: 100,
-        scrollWidth: 100,
-      };
-      setWindowScrollSize(scrollSize);
-      setWindowScroll(origin);
+      const viewport: Viewport = createViewport({
+        subject: customViewport.subject,
+        scrollHeight: 200,
+        scrollWidth: 200,
+        scroll: origin,
+      });
 
-      const result: ?Position = getWindowOverlap({ x: 10, y: 10 });
+      const result: ?Position = getWindowOverlap(viewport, { x: 10, y: 10 });
 
       expect(result).toBe(null);
     });
