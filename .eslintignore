@@ -1,4 +1,5 @@
 # Generated files
 dist/
 lib/
+esm/
 flow-typed/
