@@ -1,11 +1,12 @@
 // @flow
 /* eslint-disable no-use-before-define */
-import stopEvent from '../util/stop-event';
 import createScheduler from '../util/create-scheduler';
-import blockStandardKeyEvents from '../util/block-standard-key-events';
+import preventStandardKeyEvents from '../util/prevent-standard-key-events';
 import * as keyCodes from '../../key-codes';
 import getWindowFromRef from '../../get-window-from-ref';
 import getCenterPosition from '../../get-center-position';
+import { bindEvents, unbindEvents } from '../util/bind-events';
+import type { EventBinding } from '../util/event-types';
 import type { Position } from '../../../types';
 import type { KeyboardSensor, CreateSensorArgs } from './sensor-types';
 import type {
@@ -45,6 +46,8 @@ export default ({
   const setState = (newState: State): void => {
     state = newState;
   };
+  const getWindow = (): HTMLElement => getWindowFromRef(getDraggableRef());
+
   const startDragging = (fn?: Function = noop) => {
     setState({
       isDragging: true,
@@ -55,9 +58,7 @@ export default ({
   const stopDragging = (fn?: Function = noop) => {
     schedule.cancel();
     unbindWindowEvents();
-    setState({
-      isDragging: false,
-    });
+    setState({ isDragging: false });
     fn();
   };
   const kill = () => stopDragging();
@@ -72,6 +73,13 @@ export default ({
 
     // not yet dragging
     if (!isDragging()) {
+      // We may already be lifting on a child draggable.
+      // We do not need to use an EventMarshal here as
+      // we always call preventDefault on the first input
+      if (event.defaultPrevented) {
+        return;
+      }
+
       // cannot lift at this time
       if (!canStartCapturing(event)) {
         return;
@@ -80,8 +88,6 @@ export default ({
       if (event.keyCode !== keyCodes.space) {
         return;
       }
-
-      stopEvent(event);
 
       const ref: ?HTMLElement = getDraggableRef();
 
@@ -93,6 +99,8 @@ export default ({
       // using center position as selection
       const center: Position = getCenterPosition(ref);
 
+      // we are using this event for part of the drag
+      event.preventDefault();
       startDragging(() => callbacks.onLift({
         client: center,
         autoScrollMode: 'JUMP',
@@ -102,7 +110,7 @@ export default ({
 
     // Cancelling
     if (event.keyCode === keyCodes.escape) {
-      stopEvent(event);
+      event.preventDefault();
       cancel();
       return;
     }
@@ -110,7 +118,7 @@ export default ({
     // Dropping
     if (event.keyCode === keyCodes.space) {
       // need to stop parent Draggable's thinking this is a lift
-      stopEvent(event);
+      event.preventDefault();
       stopDragging(callbacks.onDrop);
       return;
     }
@@ -120,7 +128,7 @@ export default ({
     // already dragging
     if (!direction) {
       console.error('Cannot handle keyboard movement event if direction is not provided');
-      stopEvent(event);
+      event.preventDefault();
       cancel();
       return;
     }
@@ -134,7 +142,7 @@ export default ({
     };
 
     if (event.keyCode === keyCodes.arrowDown) {
-      stopEvent(event);
+      event.preventDefault();
       executeBasedOnDirection({
         vertical: schedule.moveForward,
         horizontal: schedule.crossAxisMoveForward,
@@ -143,7 +151,7 @@ export default ({
     }
 
     if (event.keyCode === keyCodes.arrowUp) {
-      stopEvent(event);
+      event.preventDefault();
       executeBasedOnDirection({
         vertical: schedule.moveBackward,
         horizontal: schedule.crossAxisMoveBackward,
@@ -152,7 +160,7 @@ export default ({
     }
 
     if (event.keyCode === keyCodes.arrowRight) {
-      stopEvent(event);
+      event.preventDefault();
       executeBasedOnDirection({
         vertical: schedule.crossAxisMoveForward,
         horizontal: schedule.moveForward,
@@ -161,53 +169,65 @@ export default ({
     }
 
     if (event.keyCode === keyCodes.arrowLeft) {
-      stopEvent(event);
+      event.preventDefault();
       executeBasedOnDirection({
         vertical: schedule.crossAxisMoveBackward,
         horizontal: schedule.moveBackward,
       });
     }
 
-    blockStandardKeyEvents(event);
-
-    // blocking scroll jumping at this time
+    // preventing scroll jumping at this time
     if (scrollJumpKeys[event.keyCode]) {
-      stopEvent(event);
+      event.preventDefault();
+      return;
     }
+
+    preventStandardKeyEvents(event);
   };
 
-  const windowBindings = {
+  const windowBindings: EventBinding[] = [
     // any mouse actions kills a drag
-    mousedown: cancel,
-    mouseup: cancel,
-    click: cancel,
-    touchstart: cancel,
+    {
+      eventName: 'mousedown',
+      fn: cancel,
+    },
+    {
+      eventName: 'mouseup',
+      fn: cancel,
+    },
+    {
+      eventName: 'click',
+      fn: cancel,
+    },
+    {
+      eventName: 'touchstart',
+      fn: cancel,
+    },
     // resizing the browser kills a drag
-    resize: cancel,
+    {
+      eventName: 'resize',
+      fn: cancel,
+    },
     // kill if the user is using the mouse wheel
     // We are not supporting wheel / trackpad scrolling with keyboard dragging
-    wheel: cancel,
+    {
+      eventName: 'wheel',
+      fn: cancel,
+    },
     // Need to respond instantly to a jump scroll request
     // Not using the scheduler
-    scroll: callbacks.onWindowScroll,
-  };
-
-  const eventKeys: string[] = Object.keys(windowBindings);
+    {
+      eventName: 'scroll',
+      fn: callbacks.onWindowScroll,
+    },
+  ];
 
   const bindWindowEvents = () => {
-    const win: HTMLElement = getWindowFromRef(getDraggableRef());
-
-    eventKeys.forEach((eventKey: string) => {
-      win.addEventListener(eventKey, windowBindings[eventKey]);
-    });
+    bindEvents(getWindow(), windowBindings, { capture: true });
   };
 
   const unbindWindowEvents = () => {
-    const win: HTMLElement = getWindowFromRef(getDraggableRef());
-
-    eventKeys.forEach((eventKey: string) => {
-      win.removeEventListener(eventKey, windowBindings[eventKey]);
-    });
+    unbindEvents(getWindow(), windowBindings, { capture: true });
   };
 
   const sensor: KeyboardSensor = {

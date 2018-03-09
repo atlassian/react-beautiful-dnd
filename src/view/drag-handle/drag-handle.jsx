@@ -21,7 +21,9 @@ import createMouseSensor from './sensor/create-mouse-sensor';
 import createKeyboardSensor from './sensor/create-keyboard-sensor';
 import createTouchSensor from './sensor/create-touch-sensor';
 
-const getFalse: () => boolean = () => false;
+const preventHtml5Dnd = (event: DragEvent) => {
+  event.preventDefault();
+};
 
 type Sensor = MouseSensor | KeyboardSensor | TouchSensor;
 
@@ -189,8 +191,7 @@ export default class DragHandle extends Component<Props> {
       // English default. Consumers are welcome to add their own start instruction
       'aria-roledescription': 'Draggable item. Press space bar to lift',
       draggable: false,
-      onDragStart: getFalse,
-      onDrop: getFalse,
+      onDragStart: preventHtml5Dnd,
     };
 
     return provided;

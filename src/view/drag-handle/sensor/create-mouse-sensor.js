@@ -1,12 +1,14 @@
 // @flow
 /* eslint-disable no-use-before-define */
-import stopEvent from '../util/stop-event';
 import createScheduler from '../util/create-scheduler';
 import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
 import getWindowFromRef from '../../get-window-from-ref';
 import * as keyCodes from '../../key-codes';
-import blockStandardKeyEvents from '../util/block-standard-key-events';
-import createClickBlocker, { type ClickBlocker } from '../util/create-click-blocker';
+import preventStandardKeyEvents from '../util/prevent-standard-key-events';
+import createPostDragEventPreventer, { type EventPreventer } from '../util/create-post-drag-event-preventer';
+import { bindEvents, unbindEvents } from '../util/bind-events';
+import createEventMarshal, { type EventMarshal } from '../util/create-event-marshal';
+import type { EventBinding } from '../util/event-types';
 import type {
   Position,
 } from '../../../types';
@@ -26,6 +28,9 @@ type State = {|
 const primaryButton = 0;
 const noop = () => { };
 
+// shared management of mousedown without needing to call preventDefault()
+const mouseDownMarshal: EventMarshal = createEventMarshal();
+
 export default ({
   callbacks,
   getDraggableRef,
@@ -41,7 +46,8 @@ export default ({
   const isDragging = (): boolean => state.isDragging;
   const isCapturing = (): boolean => Boolean(state.pending || state.isDragging);
   const schedule = createScheduler(callbacks);
-  const clickBlocker: ClickBlocker = createClickBlocker();
+  const getWindow = (): HTMLElement => getWindowFromRef(getDraggableRef());
+  const postDragEventPreveter: EventPreventer = createPostDragEventPreventer(getWindow);
 
   const startDragging = (fn?: Function = noop) => {
     setState({
@@ -53,8 +59,9 @@ export default ({
   const stopDragging = (fn?: Function = noop, shouldBlockClick?: boolean = true) => {
     schedule.cancel();
     unbindWindowEvents();
+    mouseDownMarshal.reset();
     if (shouldBlockClick) {
-      clickBlocker.blockNext();
+      postDragEventPreveter.preventNext();
     }
     setState({
       isDragging: false,
@@ -63,7 +70,6 @@ export default ({
     fn();
   };
   const startPendingDrag = (point: Position) => {
-    clickBlocker.reset();
     setState({ pending: point, isDragging: false });
     bindWindowEvents();
   };
@@ -83,115 +89,141 @@ export default ({
     kill(callbacks.onCancel);
   };
 
-  const windowBindings = {
-    mousemove: (event: MouseEvent) => {
-      const { button, clientX, clientY } = event;
-      if (button !== primaryButton) {
-        return;
-      }
+  const windowBindings: EventBinding[] = [
+    {
+      eventName: 'mousemove',
+      fn: (event: MouseEvent) => {
+        const { button, clientX, clientY } = event;
+        if (button !== primaryButton) {
+          return;
+        }
 
-      const point: Position = {
-        x: clientX,
-        y: clientY,
-      };
+        const point: Position = {
+          x: clientX,
+          y: clientY,
+        };
 
-      if (state.isDragging) {
-        schedule.move(point);
-        return;
-      }
+        if (state.isDragging) {
+          // preventing default as we are using this event
+          event.preventDefault();
+          schedule.move(point);
+          return;
+        }
 
-      if (!state.pending) {
-        console.error('invalid state');
-        return;
-      }
+        if (!state.pending) {
+          console.error('invalid state');
+          return;
+        }
 
-      // drag is pending
+        // drag is pending
 
-      // threshold not yet exceeded
-      if (!isSloppyClickThresholdExceeded(state.pending, point)) {
-        return;
-      }
+        // threshold not yet exceeded
+        if (!isSloppyClickThresholdExceeded(state.pending, point)) {
+          return;
+        }
 
-      startDragging(() => callbacks.onLift({
-        client: point,
-        autoScrollMode: 'FLUID',
-      }));
+        // preventing default as we are using this event
+        event.preventDefault();
+        startDragging(() => callbacks.onLift({
+          client: point,
+          autoScrollMode: 'FLUID',
+        }));
+      },
     },
-    mouseup: () => {
-      if (state.pending) {
-        stopPendingDrag();
-        return;
-      }
+    {
+      eventName: 'mouseup',
+      fn: (event: MouseEvent) => {
+        if (state.pending) {
+          stopPendingDrag();
+          return;
+        }
 
-      stopDragging(callbacks.onDrop);
+        // preventing default as we are using this event
+        event.preventDefault();
+        stopDragging(callbacks.onDrop);
+      },
     },
-    mousedown: () => {
-      // this can happen during a drag when the user clicks a button
-      // other than the primary mouse button
-      stopDragging(callbacks.onCancel);
-    },
-    keydown: (event: KeyboardEvent) => {
-      // cancelling
-      if (event.keyCode === keyCodes.escape) {
-        stopEvent(event);
-        cancel();
-        return;
-      }
+    {
+      eventName: 'mousedown',
+      fn: (event: MouseEvent) => {
+        // this can happen during a drag when the user clicks a button
+        // other than the primary mouse button
+        if (state.isDragging) {
+          event.preventDefault();
+        }
 
-      blockStandardKeyEvents(event);
+        stopDragging(callbacks.onCancel);
+      },
     },
-    resize: cancel,
-    scroll: () => {
-      // stop a pending drag
-      if (state.pending) {
-        stopPendingDrag();
-        return;
-      }
-      schedule.windowScrollMove();
+    {
+      eventName: 'keydown',
+      fn: (event: KeyboardEvent) => {
+        // cancelling
+        if (event.keyCode === keyCodes.escape) {
+          if (state.isDragging) {
+            event.preventDefault();
+          }
+          cancel();
+          return;
+        }
+
+        preventStandardKeyEvents(event);
+      },
+    },
+    {
+      eventName: 'resize',
+      fn: cancel,
+    },
+    {
+      eventName: 'scroll',
+      // eventual consistency is fine because we use position: fixed on the item
+      options: { passive: true },
+      fn: () => {
+        // stop a pending drag
+        if (state.pending) {
+          stopPendingDrag();
+          return;
+        }
+        schedule.windowScrollMove();
+      },
     },
     // Need to opt out of dragging if the user is a force press
     // Only for safari which has decided to introduce its own custom way of doing things
     // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
-    webkitmouseforcechanged: (event: MouseForceChangedEvent) => {
-      if (event.webkitForce == null || MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null) {
-        console.error('handling a mouse force changed event when it is not supported');
-        return;
-      }
+    {
+      eventName: 'webkitmouseforcechanged',
+      fn: (event: MouseForceChangedEvent) => {
+        if (event.webkitForce == null || MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null) {
+          console.error('handling a mouse force changed event when it is not supported');
+          return;
+        }
 
-      const forcePressThreshold: number = (MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN : any);
-      const isForcePressing: boolean = event.webkitForce >= forcePressThreshold;
+        const forcePressThreshold: number = (MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN : any);
+        const isForcePressing: boolean = event.webkitForce >= forcePressThreshold;
 
-      if (isForcePressing) {
-        cancel();
-      }
+        if (isForcePressing) {
+          cancel();
+        }
+      },
     },
-  };
-
-  const eventKeys = Object.keys(windowBindings);
+  ];
 
   const bindWindowEvents = () => {
-    const win: HTMLElement = getWindowFromRef(getDraggableRef());
-
-    eventKeys.forEach((eventKey: string) => {
-      if (eventKey === 'scroll') {
-        // eventual consistency is fine because we use position: fixed on the item
-        win.addEventListener(eventKey, windowBindings.scroll, { passive: true });
-        return;
-      }
-
-      win.addEventListener(eventKey, windowBindings[eventKey]);
-    });
+    const win: HTMLElement = getWindow();
+    bindEvents(win, windowBindings, { capture: true });
   };
 
   const unbindWindowEvents = () => {
-    const win: HTMLElement = getWindowFromRef(getDraggableRef());
-
-    eventKeys.forEach((eventKey: string) =>
-      win.removeEventListener(eventKey, windowBindings[eventKey])
-    );
+    const win: HTMLElement = getWindow();
+    unbindEvents(win, windowBindings, { capture: true });
   };
 
   const onMouseDown = (event: MouseEvent): void => {
+    if (mouseDownMarshal.isHandled()) {
+      console.log('event already managed', event);
+      return;
+    }
+
     if (!canStartCapturing(event)) {
       return;
     }
@@ -209,8 +241,11 @@ export default ({
       return;
     }
 
-    // stopping the event from publishing to parents
-    stopEvent(event);
+    // indicating that this event has been processed
+    // event.preventDefault();
+    mouseDownMarshal.handle();
+    // event.preventDefault();
+
     const point: Position = {
       x: clientX,
       y: clientY,

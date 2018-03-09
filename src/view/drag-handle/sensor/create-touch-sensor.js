@@ -1,9 +1,11 @@
 // @flow
 /* eslint-disable no-use-before-define */
-import stopEvent from '../util/stop-event';
 import createScheduler from '../util/create-scheduler';
 import getWindowFromRef from '../../get-window-from-ref';
-import createClickBlocker, { type ClickBlocker } from '../util/create-click-blocker';
+import createPostDragEventPreventer, { type EventPreventer } from '../util/create-post-drag-event-preventer';
+import createEventMarshal, { type EventMarshal } from '../util/create-event-marshal';
+import { bindEvents, unbindEvents } from '../util/bind-events';
+import type { EventBinding } from '../util/event-types';
 import type {
   Position,
 } from '../../../types';
@@ -22,6 +24,7 @@ type TouchWithForce = Touch & {
 
 export const timeForLongPress: number = 150;
 export const forcePressThreshold: number = 0.15;
+const touchStartMarshal: EventMarshal = createEventMarshal();
 
 const noop = (): void => { };
 
@@ -39,6 +42,7 @@ export default ({
 }: CreateSensorArgs): TouchSensor => {
   let state: State = initial;
 
+  const getWindow = (): HTMLElement => getWindowFromRef(getDraggableRef());
   const setState = (partial: Object): void => {
     state = {
       ...state,
@@ -49,7 +53,7 @@ export default ({
   const isCapturing = (): boolean =>
     Boolean(state.pending || state.isDragging || state.longPressTimerId);
   const schedule = createScheduler(callbacks);
-  const clickBlocker: ClickBlocker = createClickBlocker();
+  const postDragEventPreventer: EventPreventer = createPostDragEventPreventer(getWindow);
 
   const startDragging = () => {
     const pending: ?Position = state.pending;
@@ -76,8 +80,9 @@ export default ({
   };
   const stopDragging = (fn?: Function = noop) => {
     schedule.cancel();
+    touchStartMarshal.reset();
     unbindWindowEvents();
-    clickBlocker.blockNext();
+    postDragEventPreventer.preventNext();
     setState(initial);
     fn();
   };
@@ -98,13 +103,13 @@ export default ({
       isDragging: false,
       hasMoved: false,
     });
-    clickBlocker.reset();
     bindWindowEvents();
   };
 
   const stopPendingDrag = () => {
     clearTimeout(state.longPressTimerId);
     schedule.cancel();
+    touchStartMarshal.reset();
     unbindWindowEvents();
 
     setState(initial);
@@ -122,127 +127,153 @@ export default ({
     kill(callbacks.onCancel);
   };
 
-  const windowBindings = {
-    touchmove: (event: TouchEvent) => {
-      // Drag has not yet started and we are waiting for a long press.
-      if (state.pending) {
-        stopPendingDrag();
-        return;
-      }
+  const windowBindings: EventBinding[] = [
+    {
+      eventName: 'touchmove',
+      // opting out of passive touchmove (default) so as to prevent scrolling while moving
+      // Not worried about performance as effect of move is throttled in requestAnimationFrame
+      options: { passive: false },
+      fn: (event: TouchEvent) => {
+        // Drag has not yet started and we are waiting for a long press.
+        if (state.pending) {
+          stopPendingDrag();
+          return;
+        }
 
-      // At this point we are dragging
+        // At this point we are dragging
 
-      if (!state.hasMoved) {
-        setState({
-          hasMoved: true,
-        });
-      }
+        if (!state.hasMoved) {
+          setState({
+            hasMoved: true,
+          });
+        }
 
-      stopEvent(event);
+        const { clientX, clientY } = event.touches[0];
 
-      const { clientX, clientY } = event.touches[0];
+        const point: Position = {
+          x: clientX,
+          y: clientY,
+        };
 
-      const point: Position = {
-        x: clientX,
-        y: clientY,
-      };
-
-      // already dragging
-      schedule.move(point);
+        // already dragging
+        event.preventDefault();
+        schedule.move(point);
+      },
     },
-    touchend: (event: TouchEvent) => {
-      if (state.pending) {
-        stopPendingDrag();
-        // not stopping the event as this can be registered as a tap
-        return;
-      }
+    {
+      eventName: 'touchend',
+      fn: (event: TouchEvent) => {
+        if (state.pending) {
+          stopPendingDrag();
+          return;
+        }
 
-      // already dragging
-      stopDragging(callbacks.onDrop);
-      stopEvent(event);
+        // already dragging
+        event.preventDefault();
+        stopDragging(callbacks.onDrop);
+      },
     },
-    touchcancel: cancel,
-    touchstart: () => {
-      // this will also intercept the initial touchstart
-
-      // This should never happen - but just being super safe
-      if (isDragging()) {
-        console.error('touch start fired while already dragging');
+    {
+      eventName: 'touchcancel',
+      fn: (event: TouchEvent) => {
+        if (state.isDragging) {
+          event.preventDefault();
+        }
         cancel();
-      }
+      },
+    },
+    {
+      eventName: 'touchstart',
+      fn: () => {
+        // this will also intercept the initial touchstart
+
+        // event has already been processed
+        if (touchStartMarshal.isHandled()) {
+          return;
+        }
+
+        // This should never happen - but just being super safe
+        if (isDragging()) {
+          console.error('touch start fired while already dragging');
+          cancel();
+        }
+      },
     },
     // If the orientation of the device changes - kill the drag
     // https://davidwalsh.name/orientation-change
-    orientationchange: cancel,
+    {
+      eventName: 'orientationchange',
+      fn: cancel,
+    },
     // some devices fire resize if the orientation changes
-    resize: cancel,
-    scroll: () => {
-      // stop a pending drag
-      if (state.pending) {
-        stopPendingDrag();
-        return;
-      }
-      schedule.windowScrollMove();
+    {
+      eventName: 'resize',
+      fn: cancel,
+    },
+    // For scroll events we are okay with eventual consistency.
+    // Passive scroll listeners is the default behavior for mobile
+    // but we are being really clear here
+    {
+      eventName: 'scroll',
+      options: { passive: true },
+      fn: () => {
+        // stop a pending drag
+        if (state.pending) {
+          stopPendingDrag();
+          return;
+        }
+        schedule.windowScrollMove();
+      },
     },
     // Long press can bring up a context menu
     // need to opt out of this behavior
-    contextmenu: stopEvent,
+    {
+      eventName: 'contextmenu',
+      fn: (event: Event) => {
+        // always opting out of context menu events
+        event.preventDefault();
+      },
+    },
     // On some devices it is possible to have a touch interface with a keyboard.
     // On any keyboard event we cancel a touch drag
-    keydown: cancel,
+    {
+      eventName: 'keydown',
+      fn: cancel,
+    },
     // Need to opt out of dragging if the user is a force press
     // Only for safari which has decided to introduce its own custom way of doing things
     // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
-    touchforcechange: (event: TouchEvent) => {
-      // force push action will no longer fire after a touchmove
-      if (state.hasMoved) {
-        return;
-      }
+    {
+      eventName: 'touchforcechange',
+      fn: (event: TouchEvent) => {
+        // force push action will no longer fire after a touchmove
+        if (state.hasMoved) {
+          return;
+        }
 
-      const touch: TouchWithForce = (event.touches[0] : any);
+        const touch: TouchWithForce = (event.touches[0] : any);
 
-      if (touch.force >= forcePressThreshold) {
-        cancel();
-      }
+        if (touch.force >= forcePressThreshold) {
+          cancel();
+        }
+      },
     },
-  };
-
-  const eventKeys = Object.keys(windowBindings);
+  ];
 
   const bindWindowEvents = () => {
-    const win: HTMLElement = getWindowFromRef(getDraggableRef());
-
-    eventKeys.forEach((eventKey: string) => {
-      const fn: Function = windowBindings[eventKey];
-
-      if (eventKey === 'touchmove') {
-        // opting out of passive touchmove (default) so as to prevent scrolling while moving
-        // Not worried about performance as effect of move is throttled in requestAnimationFrame
-        win.addEventListener(eventKey, fn, { passive: false });
-        return;
-      }
-
-      // For scroll events we are okay with eventual consistency.
-      // Passive scroll listeners is the default behavior for mobile
-      // but we are being really clear here
-      if (eventKey === 'scroll') {
-        win.addEventListener(eventKey, fn, { passive: true });
-        return;
-      }
-
-      win.addEventListener(eventKey, fn);
-    });
+    bindEvents(getWindow(), windowBindings, { capture: true });
   };
 
   const unbindWindowEvents = () => {
-    const win: HTMLElement = getWindowFromRef(getDraggableRef());
-
-    eventKeys.forEach((eventKey: string) =>
-      win.removeEventListener(eventKey, windowBindings[eventKey]));
+    unbindEvents(getWindow(), windowBindings, { capture: true });
   };
 
   // entry point
   const onTouchStart = (event: TouchEvent) => {
+    if (touchStartMarshal.isHandled()) {
+      return;
+    }
+
     if (!canStartCapturing(event)) {
       return;
     }
@@ -258,7 +289,8 @@ export default ({
     // browser interactions as possible.
     // event.preventDefault() in an onTouchStart blocks almost
     // every other event including force press
-    event.stopPropagation();
+    // event.stopPropagation();
+    touchStartMarshal.handle();
 
     startPendingDrag(event);
   };
