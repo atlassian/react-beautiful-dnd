@@ -123,6 +123,11 @@ export default ({
     stopDragging(fn);
   };
 
+  const unmount = () => {
+    kill();
+    postDragEventPreventer.abort();
+  };
+
   const cancel = () => {
     kill(callbacks.onCancel);
   };
@@ -309,6 +314,7 @@ export default ({
     kill,
     isCapturing,
     isDragging,
+    unmount,
   };
 
   return sensor;

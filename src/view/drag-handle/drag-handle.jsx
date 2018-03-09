@@ -74,13 +74,9 @@ export default class DragHandle extends Component<Props> {
   componentWillUnmount() {
     this.sensors.forEach((sensor: Sensor) => {
       // kill the current drag and fire a cancel event if
-      const wasCapturing = sensor.isCapturing();
       const wasDragging = sensor.isDragging();
 
-      // stop capturing
-      if (wasCapturing) {
-        sensor.kill();
-      }
+      sensor.unmount();
       // cancel if drag was occurring
       if (wasDragging) {
         this.props.callbacks.onCancel();

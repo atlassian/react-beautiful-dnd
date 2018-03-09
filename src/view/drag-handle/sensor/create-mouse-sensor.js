@@ -85,6 +85,11 @@ export default ({
     stopDragging(fn);
   };
 
+  const unmount = (): void => {
+    kill();
+    postDragEventPreveter.abort();
+  };
+
   const cancel = () => {
     kill(callbacks.onCancel);
   };
@@ -220,7 +225,6 @@ export default ({
 
   const onMouseDown = (event: MouseEvent): void => {
     if (mouseDownMarshal.isHandled()) {
-      console.log('event already managed', event);
       return;
     }
 
@@ -241,10 +245,12 @@ export default ({
       return;
     }
 
-    // indicating that this event has been processed
-    // event.preventDefault();
+    // Registering that this event has been handled.
+    // This is to prevent parent draggables using this event
+    // to start also.
+    // Not using preventDefault() as we are not sure
+    // if this mouse down is part of a drag interaction
     mouseDownMarshal.handle();
-    // event.preventDefault();
 
     const point: Position = {
       x: clientX,
@@ -259,6 +265,7 @@ export default ({
     kill,
     isCapturing,
     isDragging,
+    unmount,
   };
 
   return sensor;

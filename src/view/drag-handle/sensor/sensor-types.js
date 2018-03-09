@@ -9,6 +9,8 @@ type SensorBase = {|
   // Is the sensor listening for events.
   // This can happen before a drag starts
   isCapturing: () => boolean,
+  // perform any cleanup tasks required when unmounting
+  unmount: () => void,
 |}
 
 export type CreateSensorArgs = {|

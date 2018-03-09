@@ -9,11 +9,12 @@ const records: Records = {};
 const flag: string = '__react-beautiful-dnd-debug-hook__';
 
 // temp
-window[flag] = true;
+// window[flag] = true;
 
 const isTimingsEnabled = (): boolean => Boolean(window[flag]);
 
 if (process.env.NODE_ENV === 'development') {
+  // eslint-disable-next-line no-console
   console.log(`Set window['${flag}'] = true to enable timings`);
 }
 
@@ -41,6 +42,7 @@ export const finish = (key: string) => {
 
   const result: number = now - previous;
 
+  // eslint-disable-next-line no-console
   console.log(`%cTiming (${key}): %c${result} %cms`, 'font-weight: bold;', 'color: blue;', 'color: grey;');
 };
 

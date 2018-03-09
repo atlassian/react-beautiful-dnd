@@ -128,6 +128,8 @@ export default ({
     // already dragging
     if (!direction) {
       console.error('Cannot handle keyboard movement event if direction is not provided');
+      // calling prevent default here as the action resulted in the drop
+      // this one is border line
       event.preventDefault();
       cancel();
       return;
@@ -236,6 +238,8 @@ export default ({
     isDragging,
     // a drag starts instantly so capturing is the same as dragging
     isCapturing: isDragging,
+    // no additional cleanup needed other then what it is kill
+    unmount: kill,
   };
 
   return sensor;

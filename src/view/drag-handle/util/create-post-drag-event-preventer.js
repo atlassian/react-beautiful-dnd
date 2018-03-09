@@ -7,6 +7,7 @@ type GetWindowFn = () => HTMLElement
 
 export type EventPreventer = {|
   preventNext: () => void,
+  abort: () => void,
 |}
 
 export default (getWindow: GetWindowFn): EventPreventer => {
@@ -36,16 +37,11 @@ export default (getWindow: GetWindowFn): EventPreventer => {
         unbind();
       },
     },
+    // These events signal that the click prevention is no longer needed
     {
       eventName: 'mousedown',
       // a new mouse interaction is starting: we can unbind
       fn: unbind,
-    },
-    {
-      eventName: 'touchend',
-      fn: (event: TouchEvent) => {
-        event.preventDefault();
-      },
     },
     {
       eventName: 'touchstart',
@@ -63,6 +59,7 @@ export default (getWindow: GetWindowFn): EventPreventer => {
 
   const preventer: EventPreventer = {
     preventNext,
+    abort: unbind,
   };
 
   return preventer;
