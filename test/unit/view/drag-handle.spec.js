@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { mount } from 'enzyme';
 // eslint-disable-next-line no-duplicate-imports
 import type { ReactWrapper } from 'enzyme';
@@ -84,10 +85,16 @@ const getCallbackCalls = (callbacks: Callbacks) =>
     [key]: callbacks[key].mock.calls.length,
   }), {});
 
-class Child extends Component<{ dragHandleProps: ?DragHandleProps}> {
+type ChildProps = {|
+  dragHandleProps: ?DragHandleProps,
+  className?: string,
+  children?: Node,
+|}
+
+class Child extends Component<ChildProps> {
   render() {
     return (
-      <div {...this.props.dragHandleProps}>
+      <div {...this.props.dragHandleProps} className={this.props.className}>
         Drag me!
         {this.props.children}
       </div>
@@ -138,47 +145,52 @@ const isAWindowClickPrevented = (): boolean => {
   return event.defaultPrevented;
 };
 
-const fakeDraggableRef: HTMLElement = document.createElement('div');
-const fakeCenter: Position = {
-  x: 50,
-  y: 80,
-};
-jest.spyOn(fakeDraggableRef, 'getBoundingClientRect').mockImplementation(() => getArea({
-  left: 0,
-  top: 0,
-  right: fakeCenter.x * 2,
-  bottom: fakeCenter.y * 2,
-}));
-
 const basicContext = {
   [styleContextKey]: 'hello',
   [canLiftContextKey]: () => true,
 };
 
-const getNestedWrapper = (parentCallbacks: Callbacks, childCallbacks: Callbacks): ReactWrapper => {
-  return mount(
+const fakeCenter: Position = {
+  x: 50,
+  y: 80,
+};
+const parentRef: HTMLElement = document.createElement('div');
+const childRef: HTMLElement = document.createElement('div');
+const singleRef: HTMLElement = document.createElement('div');
+
+[parentRef, childRef, singleRef].forEach((ref: HTMLElement) => {
+  jest.spyOn(ref, 'getBoundingClientRect').mockImplementation(() => getArea({
+    left: 0,
+    top: 0,
+    right: fakeCenter.x * 2,
+    bottom: fakeCenter.y * 2,
+  }));
+});
+
+const getNestedWrapper = (parentCallbacks: Callbacks, childCallbacks: Callbacks): ReactWrapper =>
+  mount(
     <DragHandle
       draggableId="parent"
       callbacks={parentCallbacks}
       direction="vertical"
       isDragging={false}
       isEnabled
-      getDraggableRef={() => fakeDraggableRef}
+      getDraggableRef={() => parentRef}
       canDragInteractiveElements={false}
     >
       {(parentProps: ?DragHandleProps) => (
-        <Child dragHandleProps={parentProps}>
+        <Child dragHandleProps={parentProps} className="parent">
           <DragHandle
             draggableId="child"
             callbacks={childCallbacks}
             direction="vertical"
             isDragging={false}
             isEnabled
-            getDraggableRef={() => fakeDraggableRef}
+            getDraggableRef={() => childRef}
             canDragInteractiveElements={false}
           >
             {(childProps: ?DragHandleProps) => (
-              <Child dragHandleProps={childProps}>
+              <Child dragHandleProps={childProps} className="child">
                 Child!
               </Child>
             )}
@@ -188,7 +200,6 @@ const getNestedWrapper = (parentCallbacks: Callbacks, childCallbacks: Callbacks)
     </DragHandle>,
     { context: basicContext }
   );
-};
 
 const getWrapper = (callbacks: Callbacks): ReactWrapper =>
   mount(
@@ -198,7 +209,7 @@ const getWrapper = (callbacks: Callbacks): ReactWrapper =>
       direction="vertical"
       isDragging={false}
       isEnabled
-      getDraggableRef={() => fakeDraggableRef}
+      getDraggableRef={() => singleRef}
       canDragInteractiveElements={false}
     >
       {(dragHandleProps: ?DragHandleProps) => (
@@ -206,9 +217,7 @@ const getWrapper = (callbacks: Callbacks): ReactWrapper =>
       )}
     </DragHandle>,
     { context: basicContext }
-  )
-
-
+  );
 
 describe('drag handle', () => {
   let callbacks: Callbacks;
@@ -237,7 +246,7 @@ describe('drag handle', () => {
 
   afterAll(() => {
     requestAnimationFrame.reset();
-    fakeDraggableRef.getBoundingClientRect.mockRestore();
+    singleRef.getBoundingClientRect.mockRestore();
   });
 
   it('should apply the style context to a data-attribute', () => {
@@ -251,7 +260,7 @@ describe('drag handle', () => {
         isEnabled
         isDragging={false}
         direction={null}
-        getDraggableRef={() => fakeDraggableRef}
+        getDraggableRef={() => singleRef}
         canDragInteractiveElements={false}
       >
         {(dragHandleProps: ?DragHandleProps) => (
@@ -276,7 +285,7 @@ describe('drag handle', () => {
         isEnabled
         isDragging={false}
         direction={null}
-        getDraggableRef={() => fakeDraggableRef}
+        getDraggableRef={() => singleRef}
         canDragInteractiveElements={false}
       >
         {(dragHandleProps: ?DragHandleProps) => (
@@ -291,7 +300,7 @@ describe('drag handle', () => {
       .toBe('Draggable item. Press space bar to lift');
   });
 
-  describe('mouse dragging', () => {
+  describe.only('mouse dragging', () => {
     describe('initiation', () => {
       it('should start a drag if there was sufficient mouse movement in any direction', () => {
         const valid: Position[] = [
@@ -310,7 +319,7 @@ describe('drag handle', () => {
               isDragging={false}
               isEnabled
               direction={null}
-              getDraggableRef={() => fakeDraggableRef}
+              getDraggableRef={() => singleRef}
               canDragInteractiveElements={false}
             >
               {(dragHandleProps: ?DragHandleProps) => (
@@ -403,14 +412,40 @@ describe('drag handle', () => {
         })).toBe(true);
       });
 
-      it('should not start a drag if a child drag handle has already received the event', () => {
+      describe('nested drag handles', () => {
+        it('should not start a drag on a parent if a child drag handle has already received the event', () => {
+          const parentCallbacks = getStubCallbacks();
+          const childCallbacks = getStubCallbacks();
+          const nested: ReactWrapper = getNestedWrapper(parentCallbacks, childCallbacks);
 
+          mouseDown(nested.find('.child').first(), origin);
+          windowMouseMove({ x: 0, y: sloppyClickThreshold });
+
+          expect(childCallbacks.onLift).toHaveBeenCalled();
+          expect(parentCallbacks.onLift).not.toHaveBeenCalled();
+
+          nested.unmount();
+        });
+
+        it('should start a drag on a parent the event is trigged on the parent', () => {
+          const parentCallbacks = getStubCallbacks();
+          const childCallbacks = getStubCallbacks();
+          const nested: ReactWrapper = getNestedWrapper(parentCallbacks, childCallbacks);
+
+          mouseDown(nested.find('.parent').first(), origin);
+          windowMouseMove({ x: 0, y: sloppyClickThreshold });
+
+          expect(childCallbacks.onLift).not.toHaveBeenCalled();
+          expect(parentCallbacks.onLift).toHaveBeenCalled();
+
+          nested.unmount();
+        });
       });
 
       describe('cancelled before moved enough', () => {
         describe('cancelled with escape', () => {
           it('should not call execute any callbacks', () => {
-            mouseDown(wrapper, origin, auxiliaryButton);
+            mouseDown(wrapper, origin, primaryButton);
             // not moved enough yet
             windowMouseMove({ x: 0, y: sloppyClickThreshold - 1 });
             windowEscape();
@@ -1337,7 +1372,7 @@ describe('drag handle', () => {
     });
   });
 
-  describe('keyboard dragging', () => {
+  describe.only('keyboard dragging', () => {
     describe('initiation', () => {
       it('should lift when a user presses the space bar and use the center as the selection point', () => {
         const event: MockEvent = createMockEvent();
@@ -1435,7 +1470,7 @@ describe('drag handle', () => {
             isDragging={false}
             isEnabled
             direction="vertical"
-            getDraggableRef={() => fakeDraggableRef}
+            getDraggableRef={() => singleRef}
             canDragInteractiveElements={false}
           >
             {(dragHandleProps: ?DragHandleProps) => (
@@ -1498,7 +1533,7 @@ describe('drag handle', () => {
             isDragging={false}
             isEnabled
             direction={null}
-            getDraggableRef={() => fakeDraggableRef}
+            getDraggableRef={() => singleRef}
             canDragInteractiveElements={false}
           >
             {(dragHandleProps: ?DragHandleProps) => (
@@ -1600,7 +1635,7 @@ describe('drag handle', () => {
               direction="horizontal"
               isDragging={false}
               isEnabled
-              getDraggableRef={() => fakeDraggableRef}
+              getDraggableRef={() => singleRef}
               canDragInteractiveElements={false}
             >
               {(dragHandleProps: ?DragHandleProps) => (
@@ -2559,7 +2594,7 @@ describe('drag handle', () => {
           isEnabled={false}
           isDragging={false}
           direction={null}
-          getDraggableRef={() => fakeDraggableRef}
+          getDraggableRef={() => singleRef}
           canDragInteractiveElements={false}
         >
           {(dragHandleProps: ?DragHandleProps) => (
@@ -2777,7 +2812,7 @@ describe('drag handle', () => {
                 isDragging={false}
                 isEnabled
                 direction={null}
-                getDraggableRef={() => fakeDraggableRef}
+                getDraggableRef={() => singleRef}
                 canDragInteractiveElements={false}
               >
                 {(dragHandleProps: ?DragHandleProps) => (
@@ -2809,7 +2844,7 @@ describe('drag handle', () => {
                   isDragging={false}
                   isEnabled
                   direction={null}
-                  getDraggableRef={() => fakeDraggableRef}
+                  getDraggableRef={() => singleRef}
                   canDragInteractiveElements={false}
                 >
                   {(dragHandleProps: ?DragHandleProps) => (
@@ -2844,7 +2879,7 @@ describe('drag handle', () => {
                   isDragging={false}
                   isEnabled
                   direction={null}
-                  getDraggableRef={() => fakeDraggableRef}
+                  getDraggableRef={() => singleRef}
                   canDragInteractiveElements={false}
                 >
                   {(dragHandleProps: ?DragHandleProps) => (
@@ -2882,7 +2917,7 @@ describe('drag handle', () => {
                   isDragging={false}
                   isEnabled
                   direction={null}
-                  getDraggableRef={() => fakeDraggableRef}
+                  getDraggableRef={() => singleRef}
                   canDragInteractiveElements={false}
                 >
                   {(dragHandleProps: ?DragHandleProps) => (
@@ -2925,7 +2960,7 @@ describe('drag handle', () => {
                   isDragging={false}
                   isEnabled
                   direction={null}
-                  getDraggableRef={() => fakeDraggableRef}
+                  getDraggableRef={() => singleRef}
                   canDragInteractiveElements={false}
                 >
                   {(dragHandleProps: ?DragHandleProps) => (
@@ -2971,7 +3006,7 @@ describe('drag handle', () => {
                   isDragging={false}
                   isEnabled
                   direction={null}
-                  getDraggableRef={() => fakeDraggableRef}
+                  getDraggableRef={() => singleRef}
                   // stating that we can drag
                   canDragInteractiveElements
                 >
@@ -3013,7 +3048,7 @@ describe('drag handle', () => {
                   isDragging={false}
                   isEnabled
                   direction={null}
-                  getDraggableRef={() => fakeDraggableRef}
+                  getDraggableRef={() => singleRef}
                   // stating that we can drag
                   canDragInteractiveElements
                 >
