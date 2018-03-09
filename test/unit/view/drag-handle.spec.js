@@ -300,7 +300,7 @@ describe('drag handle', () => {
       .toBe('Draggable item. Press space bar to lift');
   });
 
-  describe.only('mouse dragging', () => {
+  describe('mouse dragging', () => {
     describe('initiation', () => {
       it('should start a drag if there was sufficient mouse movement in any direction', () => {
         const valid: Position[] = [
@@ -1372,7 +1372,7 @@ describe('drag handle', () => {
     });
   });
 
-  describe.only('keyboard dragging', () => {
+  describe('keyboard dragging', () => {
     describe('initiation', () => {
       it('should lift when a user presses the space bar and use the center as the selection point', () => {
         const event: MockEvent = createMockEvent();
@@ -2031,7 +2031,7 @@ describe('drag handle', () => {
     });
   });
 
-  describe('touch dragging', () => {
+  describe.only('touch dragging', () => {
     const start = () => {
       touchStart(wrapper, origin);
       jest.runTimersToTime(timeForLongPress);
@@ -2064,10 +2064,6 @@ describe('drag handle', () => {
         touchStart(wrapper, origin, 0, mockEvent);
 
         expect(mockEvent.preventDefault).not.toHaveBeenCalled();
-      });
-
-      it('should prevent parent drag handles from starting a drag', () => {
-
       });
     });
 
