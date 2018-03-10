@@ -108,7 +108,7 @@ const windowMouseDown = dispatchWindowMouseEvent.bind(null, 'mousedown');
 const windowMouseMove = dispatchWindowMouseEvent.bind(null, 'mousemove');
 const windowMouseClick = dispatchWindowMouseEvent.bind(null, 'click');
 const mouseDown = mouseEvent.bind(null, 'mousedown');
-const click = mouseEvent.bind(null, 'click');
+const mouseClick = mouseEvent.bind(null, 'click');
 // keyboard events
 const pressSpacebar = withKeyboard(keyCodes.space);
 const windowSpacebar = dispatchWindowKeyDownEvent.bind(null, keyCodes.space);
@@ -227,7 +227,6 @@ describe('drag handle', () => {
   beforeAll(() => {
     requestAnimationFrame.reset();
     jest.useFakeTimers();
-
   });
 
   beforeEach(() => {
@@ -343,7 +342,7 @@ describe('drag handle', () => {
       it('should not interfere with standard click events', () => {
         const mock = jest.fn();
 
-        click(wrapper, origin, primaryButton, { preventDefault: mock });
+        mouseClick(wrapper, origin, primaryButton, { preventDefault: mock });
 
         expect(mock).not.toHaveBeenCalled();
       });
@@ -468,7 +467,7 @@ describe('drag handle', () => {
 
             const mock = jest.fn();
 
-            click(wrapper, origin, primaryButton, { preventDefault: mock });
+            mouseClick(wrapper, origin, primaryButton, { preventDefault: mock });
 
             expect(mock).not.toHaveBeenCalled();
           });
@@ -507,7 +506,7 @@ describe('drag handle', () => {
           it('should not prevent subsequent click actions if a pending drag is cancelled', () => {
             const mock = jest.fn();
 
-            click(wrapper, origin, primaryButton, { preventDefault: mock });
+            mouseClick(wrapper, origin, primaryButton, { preventDefault: mock });
 
             expect(mock).not.toHaveBeenCalled();
           });
@@ -951,8 +950,32 @@ describe('drag handle', () => {
         })).toBe(true);
       });
 
-      it.skip('should block a click after a cancel', () => {
+      it('should block a click after a cancel', () => {
+        // start
+        mouseDown(wrapper);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
+        // cancel
+        windowEscape();
+
+        // validation
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onCancel: 1,
+        })).toBe(true);
+
+        // a small amount of time has passed
+        jest.runTimersToTime(10);
+
+        // mouse is still down (not preventing mouse moves)
+        const move: MouseEvent = windowMouseMove();
+        expect(move.defaultPrevented).toBe(false);
+        // mouse is going up (not preventing mouse up)
+        const up: MouseEvent = windowMouseUp();
+        expect(up.defaultPrevented).toBe(false);
+        // click is firering (preventing click!)
+        const click: MouseEvent = windowMouseClick();
+        expect(click.defaultPrevented).toBe(true);
       });
 
       it('should not do anything if there is nothing dragging', () => {
@@ -1864,7 +1887,7 @@ describe('drag handle', () => {
         pressArrowDown(wrapper);
         pressSpacebar(wrapper);
 
-        click(wrapper, origin, primaryButton, mockEvent);
+        mouseClick(wrapper, origin, primaryButton, mockEvent);
 
         expect(mockEvent.preventDefault).not.toHaveBeenCalled();
       });
