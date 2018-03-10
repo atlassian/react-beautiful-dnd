@@ -187,22 +187,11 @@ export default ({
         cancel();
       },
     },
+    // another touch start should not happen without a
+    // touchend or touchcancel. However, just being super safe
     {
       eventName: 'touchstart',
-      fn: () => {
-        // this will also intercept the initial touchstart
-
-        // event has already been processed
-        if (touchStartMarshal.isHandled()) {
-          return;
-        }
-
-        // This should never happen - but just being super safe
-        if (isDragging()) {
-          console.error('touch start fired while already dragging');
-          cancel();
-        }
-      },
+      fn: cancel,
     },
     // If the orientation of the device changes - kill the drag
     // https://davidwalsh.name/orientation-change
