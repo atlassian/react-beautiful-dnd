@@ -5,6 +5,7 @@ import getWindowFromRef from '../../get-window-from-ref';
 import createPostDragEventPreventer, { type EventPreventer } from '../util/create-post-drag-event-preventer';
 import createEventMarshal, { type EventMarshal } from '../util/create-event-marshal';
 import { bindEvents, unbindEvents } from '../util/bind-events';
+import * as keyCodes from '../../key-codes';
 import type { EventBinding } from '../util/event-types';
 import type {
   Position,
@@ -232,7 +233,16 @@ export default ({
     // On any keyboard event we cancel a touch drag
     {
       eventName: 'keydown',
-      fn: cancel,
+      fn: (event: KeyboardEvent) => {
+        // direct cancel: we are preventing the default action
+        // indirect cancel: we are not preventing the default action
+
+        // escape is a direct cancel
+        if (event.keyCode === keyCodes.escape) {
+          event.preventDefault();
+        }
+        cancel();
+      },
     },
     // Need to opt out of dragging if the user is a force press
     // Only for safari which has decided to introduce its own custom way of doing things

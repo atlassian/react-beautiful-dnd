@@ -2295,6 +2295,31 @@ describe('drag handle', () => {
         })).toBe(true);
       });
 
+      it('should prevent the next click event', () => {
+        start();
+
+        // cancel drag
+        const keydown: KeyboardEvent = windowEscape();
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onCancel: 1,
+        })).toBe(true);
+
+        // post drag
+        const move: Event = windowTouchMove();
+        const end: Event = windowTouchEnd();
+        // and a click
+        const click: MouseEvent = windowMouseClick();
+
+        // a direct cancel has its default action prevented
+        expect(keydown.defaultPrevented).toBe(true);
+        // events no longer being controlled
+        expect(move.defaultPrevented).toBe(false);
+        expect(end.defaultPrevented).toBe(false);
+        // but we still block the final click
+        expect(click.defaultPrevented).toBe(true);
+      });
+
       it('should cancel a drag if unmounted', () => {
         wrapper.unmount();
 
@@ -2371,7 +2396,7 @@ describe('drag handle', () => {
           start();
 
           // should kill the drag
-          dispatchWindowKeyDownEvent(keyCodes[key]);
+          const event: KeyboardEvent = dispatchWindowKeyDownEvent(keyCodes[key]);
 
           expect(callbacksCalled(callbacks)({
             // initial lift + index + 1
@@ -2381,6 +2406,14 @@ describe('drag handle', () => {
             // initial drop
             onDrop: 1,
           })).toBe(true);
+
+          // explicit cancel
+          if (keyCodes[key] === keyCodes.escape) {
+            expect(event.defaultPrevented).toBe(true);
+            return;
+          }
+          // indirect cancel
+          expect(event.defaultPrevented).toBe(false);
         });
       });
 
