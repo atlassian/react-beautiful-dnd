@@ -45,9 +45,9 @@ window.addEventListener('click', (event: MouseEvent) => {
 });
 ```
 
-### Direct and indirect events
+### Direct and indirect actions
 
-Some user events directly cause actions: such as a `mousemove` when dragging with a mouse or the **up arrow** <kbd>↑</kbd> `keydown` event while dragging with a keyboard. These direct events will have `event.preventDefault()` called on them. Some events indirectly impact a drag such as a `resize` event which cancels a drag. For events that indirectly impact a drag we do not call `preventDefault()` on them. These events are usually events that cancel a drag
+Some user events directly cause actions: such as a `mousemove` when dragging with a mouse or the **up arrow** <kbd>↑</kbd> `keydown` event while dragging with a keyboard. These direct events will have `event.preventDefault()` called on them. Some events indirectly impact a drag such as a `resize` event which cancels a drag. For events that indirectly impact a drag we do not call `preventDefault()` on them.
 
 ## Mouse dragging 🐭
 
@@ -61,11 +61,12 @@ When the user first performs a `mousedown` on a *drag handle* we are not sure if
 
 - `preventDefault()` not called on `mousemove`
 
-The user needs to move a small threshold before we consider the movement to be a drag. In this period of time we do not call `preventDefault()` on any `mousemove` events as we are not sure if they are dragging or just performing a [sloppy click](https://github.com/atlassian/react-beautiful-dnd#sloppy-clicks-and-click-blocking-)
+The user needs to move a small threshold before we consider the movement to be a drag. In this period of time we do not call `preventDefault()` on any `mousemove` events as we are not sure if they are dragging or just performing a [sloppy click](https://github.com/atlassian/react-beautiful-dnd#sloppy-clicks-and-click-prevention-)
 
 ### The user has indicated that they are not mouse dragging
 
 - `preventDefault()` not called on the event that caused the pending drag to end (such as `mouseup` and `keydown`)
+- `preventDefault()` is not called on the subsequent `click` event if there is one
 
 ### A mouse drag has started and the user is now dragging
 
@@ -76,8 +77,8 @@ The user needs to move a small threshold before we consider the movement to be a
 ### A drag is ending
 
 - `preventDefault()` is called on a `mouseup` if it ended the drag
-- `preventDefault()` is called on a **escape** <kbd>esc</kbd> `keydown` as it explicitly ends the drag
-- `preventDefault()` is called on the next `click` event regardless of how the drag ended. See [sloppy clicks and click blocking](https://github.com/atlassian/react-beautiful-dnd#sloppy-clicks-and-click-blocking-)
+- `preventDefault()` is called on a **escape** <kbd>esc</kbd> `keydown` as it directly ended the drag
+- `preventDefault()` is called on the next `click` event regardless of how the drag ended. See [sloppy clicks and click prevention](https://github.com/atlassian/react-beautiful-dnd#sloppy-clicks-and-click-prevention-)
 - `preventDefault()` is not called on other events such as `resize` that indirectly ended a drag
 - `preventDefault()` is not called on `keyup` events
 
