@@ -169,12 +169,13 @@ export default ({
     {
       eventName: 'touchend',
       fn: (event: TouchEvent) => {
+        // drag had not started yet - do not prevent the default action
         if (state.pending) {
           stopPendingDrag();
           return;
         }
 
-        // already dragging
+        // already dragging - this event is directly ending a drag
         event.preventDefault();
         stopDragging(callbacks.onDrop);
       },
@@ -182,10 +183,15 @@ export default ({
     {
       eventName: 'touchcancel',
       fn: (event: TouchEvent) => {
-        if (state.isDragging) {
-          event.preventDefault();
+        // drag had not started yet - do not prevent the default action
+        if (state.pending) {
+          stopPendingDrag();
+          return;
         }
-        cancel();
+
+        // already dragging - this event is directly ending a drag
+        event.preventDefault();
+        stopDragging(callbacks.onCancel);
       },
     },
     // another touch start should not happen without a
