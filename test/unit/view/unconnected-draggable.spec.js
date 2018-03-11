@@ -267,7 +267,6 @@ const customViewport: Viewport = {
 describe('Draggable - unconnected', () => {
   beforeAll(() => {
     requestAnimationFrame.reset();
-    jest.useFakeTimers();
   });
 
   afterEach(() => {
@@ -276,14 +275,10 @@ describe('Draggable - unconnected', () => {
     }
     requestAnimationFrame.reset();
     resetViewport();
-    // clearing any post drag handle start timers
-    // used to mark start events as used to block parent lifting
-    jest.runOnlyPendingTimers();
   });
 
   afterAll(() => {
     requestAnimationFrame.reset();
-    jest.useRealTimers();
   });
 
   it('should not create any wrapping elements', () => {
@@ -310,6 +305,10 @@ describe('Draggable - unconnected', () => {
   });
 
   describe('drag handle', () => {
+    // we need to unmount after each test to avoid
+    // cross EventMarshal contamination
+    let managedWrapper: ?ReactWrapper = null;
+
     const startDragWithHandle = (wrapper: ReactWrapper) => ({
       selection = origin,
       center = origin,
@@ -321,14 +320,20 @@ describe('Draggable - unconnected', () => {
       windowMouseMove(selection);
     };
 
+    afterEach(() => {
+      if (managedWrapper) {
+        managedWrapper.unmount();
+      }
+    });
+
     it('should allow you to attach a drag handle', () => {
       const dispatchProps: DispatchProps = getDispatchPropsStub();
-      const wrapper = mountDraggable({
+      managedWrapper = mountDraggable({
         dispatchProps,
         WrappedComponent: Item,
       });
 
-      startDragWithHandle(wrapper.find(Item))();
+      startDragWithHandle(managedWrapper.find(Item))();
 
       expect(dispatchProps.lift).toHaveBeenCalled();
     });
@@ -355,36 +360,36 @@ describe('Draggable - unconnected', () => {
 
       it('should allow the ability to have the drag handle to be a child of the draggable', () => {
         const dispatchProps: DispatchProps = getDispatchPropsStub();
-        const wrapper = mountDraggable({
+        managedWrapper = mountDraggable({
           dispatchProps,
           WrappedComponent: WithNestedHandle,
         });
 
-        startDragWithHandle(wrapper.find(WithNestedHandle).find('.can-drag'))();
+        startDragWithHandle(managedWrapper.find(WithNestedHandle).find('.can-drag'))();
 
         expect(dispatchProps.lift).toHaveBeenCalled();
       });
 
       it('should not drag by the draggable element', () => {
         const dispatchProps: DispatchProps = getDispatchPropsStub();
-        const wrapper = mountDraggable({
+        managedWrapper = mountDraggable({
           dispatchProps,
           WrappedComponent: WithNestedHandle,
         });
 
-        startDragWithHandle(wrapper.find(WithNestedHandle))();
+        startDragWithHandle(managedWrapper.find(WithNestedHandle))();
 
         expect(dispatchProps.lift).not.toHaveBeenCalled();
       });
 
       it('should not drag by other elements', () => {
         const dispatchProps: DispatchProps = getDispatchPropsStub();
-        const wrapper = mountDraggable({
+        managedWrapper = mountDraggable({
           dispatchProps,
           WrappedComponent: WithNestedHandle,
         });
 
-        startDragWithHandle(wrapper.find(WithNestedHandle).find('.cannot-drag'))();
+        startDragWithHandle(managedWrapper.find(WithNestedHandle).find('.cannot-drag'))();
 
         expect(dispatchProps.lift).not.toHaveBeenCalled();
       });
@@ -393,17 +398,12 @@ describe('Draggable - unconnected', () => {
     describe('handling events', () => {
       describe('onLift', () => {
         let dispatchProps;
-        let wrapper;
 
         beforeEach(() => {
           dispatchProps = getDispatchPropsStub();
-          wrapper = mountDraggable({
+          managedWrapper = mountDraggable({
             dispatchProps,
           });
-        });
-
-        afterEach(() => {
-          wrapper.unmount();
         });
 
         it('should throw if lifted when dragging is not enabled', () => {
@@ -437,7 +437,7 @@ describe('Draggable - unconnected', () => {
             center,
           };
 
-          executeOnLift(wrapper)({ selection, center, viewport: customViewport });
+          executeOnLift(managedWrapper)({ selection, center, viewport: customViewport });
 
           // $ExpectError - mock property on lift function
           expect(dispatchProps.lift.mock.calls[0]).toEqual([
