@@ -267,6 +267,7 @@ const customViewport: Viewport = {
 describe('Draggable - unconnected', () => {
   beforeAll(() => {
     requestAnimationFrame.reset();
+    jest.useFakeTimers();
   });
 
   afterEach(() => {
@@ -275,10 +276,14 @@ describe('Draggable - unconnected', () => {
     }
     requestAnimationFrame.reset();
     resetViewport();
+    // clearing any post drag handle start timers
+    // used to mark start events as used to block parent lifting
+    jest.runOnlyPendingTimers();
   });
 
   afterAll(() => {
     requestAnimationFrame.reset();
+    jest.useRealTimers();
   });
 
   it('should not create any wrapping elements', () => {
