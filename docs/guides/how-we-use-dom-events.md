@@ -1,6 +1,6 @@
 # How we use DOM events
 
-> This page details how we use DOM input events, what we do with them, and how you can build things on top of our usage. Generally you will not need to know this information but it can be helpful if you are also binding your own event handlers to the window or to a *drag handle*.
+> This page details how we use DOM input events, what we do with them, and how you can build things on top of our usage. **Generally you will not need to know this information** but it can be helpful if you are also binding your own event handlers to the window or to a *drag handle*.
 
 ## Prior knowledge
 
@@ -15,10 +15,10 @@ Without needing going into all the details below, here are the safest event hand
 
 > These can be added on the *drag handle*, anywhere else higher on the tree or to the window directly.
 
-- `onClick`: the `event.defaultPrevented` property will be set to `true` if occurred as a part of the drag interaction.
+- `onClick`: the `event.defaultPrevented` property will be set to `true` if occurred as a part of the drag interaction. This is true even if the drag was not finished with a pre-click action such as `mouseup` or `touchend`. See [sloppy clicks and click prevention](https://github.com/atlassian/react-beautiful-dnd#sloppy-clicks-and-click-prevention-).
 - `onKeyDown`: the `event.defaultPrevented` property will be set to `true` if it was used as a part of a drag. If you add `onKeyDown` to the *drag handle* you will need to monkey patch the [`DragHandleProps`](https://github.com/atlassian/react-beautiful-dnd#draghandleprops-type-information) `onKeyDown` event handler.
 
-You may need to provide your event handlers with information from [`onDragStart`](https://github.com/atlassian/react-beautiful-dnd#ondragstart-optional) and [`onDragEnd`](https://github.com/atlassian/react-beautiful-dnd#ondragend-required) to know about whether a drag is occuring while those events fire.
+You may need to enchance the logic of your event handlers with information from [`onDragStart`](https://github.com/atlassian/react-beautiful-dnd#ondragstart-optional) and [`onDragEnd`](https://github.com/atlassian/react-beautiful-dnd#ondragend-required) to know about whether a drag is occuring while those events fire.
 
 You are welcome to add other event handlers but you may be more reliant on `onDragStart` and `onDragEnd` information.
 
@@ -26,7 +26,10 @@ You are welcome to add other event handlers but you may be more reliant on `onDr
 
 ### Event prevention
 
-When we use an input event as part of a drag and drop interaction we generally call `event.preventDefault()` on the event to opt out of standard browser behaviour for the event. We **do not stop** the propagation of events (~~`event.stopPropagation()`~~) that we call `event.preventDefault()` on so even though we may use a `mousemove` event for dragging **we will not block** that event from being published and received by your event handlers.
+When we use an input event as part of a drag and drop interaction we generally call `event.preventDefault()` on the event to opt out of standard browser behaviour for the event. We **do not stop** the propagation of events that we call `event.preventDefault()` on so even though we may use a `mousemove` event for dragging **we will not block** that event from being published (propagating) and received by your event handlers.
+
+- we use: `event.preventDefault()`
+- we do not use: `event.stopPropagation()`
 
 Some event handlers we add on the *drag handle* itself (see [`DragHandleProps`](https://github.com/atlassian/react-beautiful-dnd#draghandleprops-type-information)) and others we add to the `window` in the [capture phase](https://javascript.info/bubbling-and-capturing#capturing). What this means is as long as you are applying your events handlers in the [bubbling phase](https://javascript.info/bubbling-and-capturing#bubbling) (which is the default for event handlers) then behaviour of events will be as described on this page.
 
@@ -47,7 +50,7 @@ window.addEventListener('click', (event: MouseEvent) => {
 
 ### Direct and indirect actions
 
-Some user events directly cause actions: such as a `mousemove` when dragging with a mouse or the **up arrow** <kbd>↑</kbd> `keydown` event while dragging with a keyboard. These direct events will have `event.preventDefault()` called on them. Some events indirectly impact a drag such as a `resize` event which cancels a drag. For events that indirectly impact a drag we do not call `preventDefault()` on them.
+Some user events have a direct impact on a drag: such as a `mousemove` when dragging with a mouse or the **up arrow** <kbd>↑</kbd> `keydown` event while dragging with a keyboard. These direct events will have `event.preventDefault()` called on them to prevent their default browser behaviours. Some events indirectly impact a drag such as a `resize` event which cancels a drag. For events that indirectly impact a drag we do not call `event.preventDefault()` on them. Generally indirect events that impact are drag are events that cancel a drag such as `reize` or `orientationchange` events.
 
 ## Mouse dragging 🐭
 
@@ -65,7 +68,7 @@ The user needs to move a small threshold before we consider the movement to be a
 
 ### The user has indicated that they are not mouse dragging
 
-- `preventDefault()` not called on the event that caused the pending drag to end (such as `mouseup` and `keydown`)
+- `preventDefault()` not called on the event that caused the pending drag to end (such as `mouseup` and `keydown`). Any `keydown` event that is firered while there is a pending drag will be considered an indirect cancel
 - `preventDefault()` is not called on the subsequent `click` event if there is one
 
 ### A mouse drag has started and the user is now dragging
@@ -77,10 +80,10 @@ The user needs to move a small threshold before we consider the movement to be a
 ### A drag is ending
 
 - `preventDefault()` is called on a `mouseup` if it ended the drag
-- `preventDefault()` is called on a **escape** <kbd>esc</kbd> `keydown` as it directly ended the drag
+- `preventDefault()` is called on a **escape** <kbd>esc</kbd> `keydown` if it ended the drag as it directly ended the drag
 - `preventDefault()` is called on the next `click` event regardless of how the drag ended. See [sloppy clicks and click prevention](https://github.com/atlassian/react-beautiful-dnd#sloppy-clicks-and-click-prevention-)
 - `preventDefault()` is not called on other events such as `resize` that indirectly ended a drag
-- `preventDefault()` is not called on `keyup` events
+- `preventDefault()` is not called on `keyup` events even if they caused the drag to end
 
 ## Touch dragging 📱
 
@@ -110,7 +113,16 @@ It is possible to cancel a touch drag with over events such as an `orientationch
 
 - `preventDefault()` is called on `touchend`
 - `preventDefault()` is called on `touchcancel`
+- `preventDefault()` is called on an **escape** <kbd>esc</kbd> `keydown` as a direct cancel. `preventDefault()` is not call on any other `keydown` as it is an indirect cancel.
 - `preventDefault()` is not called on other events such as `orientationchange` that can cancel a drag
+
+### Force press
+
+> See [force press support](https://github.com/atlassian/react-beautiful-dnd#force-press-support)
+
+- `preventDefault()` is not called on `touchforcechange` if a drag has not started yet
+- `preventDefault()` is not called on `touchforcechange` a drag that has started but no movement has occurred yet. The force press cancels the drag and is an indirect cancel.
+- `preventDefault()` is called after on `touchforcechange` a drag has started and a `touchmove` has fired. This is defensive as a force press `touchforcechange` should not occur after a `touchmove`.
 
 ## Keyboard dragging 🎹
 

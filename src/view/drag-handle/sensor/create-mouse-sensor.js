@@ -108,6 +108,7 @@ export default ({
           y: clientY,
         };
 
+        // Already dragging
         if (state.isDragging) {
           // preventing default as we are using this event
           event.preventDefault();
@@ -163,11 +164,16 @@ export default ({
     {
       eventName: 'keydown',
       fn: (event: KeyboardEvent) => {
-        // cancelling
+        // firing a keyboard event before the drag has started
+        // treat this as an indirect cancel
+        if (!state.isDragging) {
+          cancel();
+          return;
+        }
+
+        // cancelling a drag
         if (event.keyCode === keyCodes.escape) {
-          if (state.isDragging) {
-            event.preventDefault();
-          }
+          event.preventDefault();
           cancel();
           return;
         }
@@ -207,6 +213,8 @@ export default ({
         const isForcePressing: boolean = event.webkitForce >= forcePressThreshold;
 
         if (isForcePressing) {
+          // it is considered a indirect cancel so we do not
+          // prevent default in any situation.
           cancel();
         }
       },

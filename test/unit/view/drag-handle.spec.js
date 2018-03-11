@@ -413,63 +413,69 @@ describe('drag handle', () => {
       });
 
       describe('cancelled before moved enough', () => {
-        describe('cancelled with escape', () => {
-          it('should not call execute any callbacks', () => {
-            mouseDown(wrapper, origin, primaryButton);
-            // not moved enough yet
-            windowMouseMove({ x: 0, y: sloppyClickThreshold - 1 });
-            windowEscape();
+        describe('cancelled with any keydown', () => {
+          Object.keys(keyCodes).forEach((key: string) => {
+            describe(`with the ${key} key`, () => {
+              it('should not call execute any callbacks', () => {
+                mouseDown(wrapper, origin, primaryButton);
+                // not moved enough yet
+                windowMouseMove({ x: 0, y: sloppyClickThreshold - 1 });
 
-            // should normally start a drag
-            windowMouseMove({ x: 0, y: sloppyClickThreshold });
+                dispatchWindowKeyDownEvent(keyCodes[key]);
 
-            // should normally end a drag
-            windowMouseUp();
+                // should normally start a drag
+                windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
-            expect(callbacksCalled(callbacks)({
-              onLift: 0,
-              onCancel: 0,
-              onDrop: 0,
-            })).toBe(true);
-          });
+                // should normally end a drag
+                windowMouseUp();
 
-          it('should not prevent any input events', () => {
-            const mouseDownMock: MockEvent = createMockEvent();
-            mouseDown(wrapper, origin, auxiliaryButton, mouseDownMock);
-            // not moved enough yet
-            const preMouseMove: MouseEvent = windowMouseMove({ x: 0, y: sloppyClickThreshold - 1 });
-            const escape: KeyboardEvent = windowEscape();
+                expect(callbacksCalled(callbacks)({
+                  onLift: 0,
+                  onCancel: 0,
+                  onDrop: 0,
+                })).toBe(true);
+              });
 
-            // should normally start a drag
-            const postMouseMove: MouseEvent = windowMouseMove({ x: 0, y: sloppyClickThreshold });
+              it('should not prevent any input events', () => {
+                const mouseDownMock: MockEvent = createMockEvent();
+                mouseDown(wrapper, origin, auxiliaryButton, mouseDownMock);
+                // not moved enough yet
+                const preMouseMove: MouseEvent = windowMouseMove({ x: 0, y: sloppyClickThreshold - 1 });
+                // cancelling
+                const keyDown: KeyboardEvent = dispatchWindowKeyDownEvent(keyCodes[key]);
 
-            // should normally end a drag
-            const postMouseUp: MouseEvent = windowMouseUp();
+                // should normally start a drag
+                const postMouseMove: MouseEvent = windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
-            expect(mouseDownMock.preventDefault).not.toHaveBeenCalled();
-            expect(preMouseMove.defaultPrevented).toBe(false);
-            expect(escape.defaultPrevented).toBe(false);
-            expect(postMouseMove.defaultPrevented).toBe(false);
-            expect(postMouseUp.defaultPrevented).toBe(false);
-          });
+                // should normally end a drag
+                const postMouseUp: MouseEvent = windowMouseUp();
 
-          it('should not prevent subsequent click actions if a pending drag is cancelled', () => {
-            mouseDown(wrapper, origin, auxiliaryButton);
-            // not moved enough yet
-            windowMouseMove({ x: 0, y: sloppyClickThreshold - 1 });
-            windowEscape();
+                expect(mouseDownMock.preventDefault).not.toHaveBeenCalled();
+                expect(preMouseMove.defaultPrevented).toBe(false);
+                expect(keyDown.defaultPrevented).toBe(false);
+                expect(postMouseMove.defaultPrevented).toBe(false);
+                expect(postMouseUp.defaultPrevented).toBe(false);
+              });
 
-            // should normally start a drag
-            windowMouseMove({ x: 0, y: sloppyClickThreshold });
+              it('should not prevent subsequent click actions if a pending drag is cancelled', () => {
+                mouseDown(wrapper, origin, auxiliaryButton);
+                // not moved enough yet
+                windowMouseMove({ x: 0, y: sloppyClickThreshold - 1 });
+                dispatchWindowKeyDownEvent(keyCodes[key]);
 
-            // should normally end a drag
-            windowMouseUp();
+                // should normally start a drag
+                windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
-            const mock = jest.fn();
+                // should normally end a drag
+                windowMouseUp();
 
-            mouseClick(wrapper, origin, primaryButton, { preventDefault: mock });
+                const mock = jest.fn();
 
-            expect(mock).not.toHaveBeenCalled();
+                mouseClick(wrapper, origin, primaryButton, { preventDefault: mock });
+
+                expect(mock).not.toHaveBeenCalled();
+              });
+            });
           });
         });
 
@@ -2072,6 +2078,14 @@ describe('drag handle', () => {
         })).toBe(true);
       });
 
+      it('should not prevent the initial touchstart event', () => {
+        const mockEvent: MockEvent = createMockEvent();
+
+        touchStart(wrapper, origin, 0, mockEvent);
+
+        expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+      });
+
       it('should not start a drag if the user moves their finger before a long press (movement captured on element)', () => {
         const mockEvent: MockEvent = createMockEvent();
 
@@ -2103,71 +2117,77 @@ describe('drag handle', () => {
       it('should not start a drag if a touchend is fired', () => {
         touchStart(wrapper);
         // ended before timer finished
-        windowTouchEnd();
+        const event: Event = windowTouchEnd();
         // flush all timers
         jest.runAllTimers();
 
         expect(callbacksCalled(callbacks)({
           onLift: 0,
         })).toBe(true);
+        expect(event.defaultPrevented).toBe(false);
       });
 
       it('should not start a drag if a touchcancel is fired', () => {
         touchStart(wrapper);
         // cancelled before timer finished
-        windowTouchCancel();
+        const event: Event = windowTouchCancel();
         // flush all timers
         jest.runAllTimers();
 
         expect(callbacksCalled(callbacks)({
           onLift: 0,
         })).toBe(true);
+        expect(event.defaultPrevented).toBe(false);
       });
 
       it('should not start a drag if a touchstart is fired', () => {
         touchStart(wrapper);
         // this should not be possible - but testing it anyway
-        windowTouchStart();
+        const event: Event = windowTouchStart();
         // flush all timers
         jest.runAllTimers();
 
         expect(callbacksCalled(callbacks)({
           onLift: 0,
         })).toBe(true);
+        expect(event.defaultPrevented).toBe(false);
       });
 
       it('should not start a drag after a resize', () => {
         touchStart(wrapper);
         // resize before timer finished
-        dispatchWindowEvent('resize');
+        const event: Event = dispatchWindowEvent('resize');
         // flush all timers
         jest.runAllTimers();
 
         expect(callbacksCalled(callbacks)({
           onLift: 0,
         })).toBe(true);
+        expect(event.defaultPrevented).toBe(false);
       });
 
       it('should not start a drag after a orientation change', () => {
         touchStart(wrapper);
-        dispatchWindowEvent('orientationchange');
+        const event: Event = dispatchWindowEvent('orientationchange');
         // flush all timers
         jest.runAllTimers();
 
         expect(callbacksCalled(callbacks)({
           onLift: 0,
         })).toBe(true);
+        expect(event.defaultPrevented).toBe(false);
       });
 
       it('should not start a drag after a window scroll', () => {
         touchStart(wrapper);
-        dispatchWindowEvent('scroll');
+        const event: Event = dispatchWindowEvent('scroll');
         // flush all timers
         jest.runAllTimers();
 
         expect(callbacksCalled(callbacks)({
           onLift: 0,
         })).toBe(true);
+        expect(event.defaultPrevented).toBe(false);
       });
 
       it('should not start a drag if unmounted', () => {
@@ -2187,8 +2207,8 @@ describe('drag handle', () => {
           // start a pending drag
           touchStart(wrapper);
 
-          // should cancel the pending drag
-          dispatchWindowKeyDownEvent(keyCodes[key]);
+          // should cancel the pending drag without preventing the default action
+          const event: KeyboardEvent = dispatchWindowKeyDownEvent(keyCodes[key]);
 
           // would normally start a drag
           jest.runAllTimers();
@@ -2196,6 +2216,7 @@ describe('drag handle', () => {
           expect(callbacksCalled(callbacks)({
             onLift: 0,
           })).toBe(true);
+          expect(event.defaultPrevented).toBe(false);
         });
       });
     });
@@ -2205,7 +2226,7 @@ describe('drag handle', () => {
         const target: Position = { x: 100, y: 50 };
 
         start();
-        windowTouchMove(target);
+        const event: Event = windowTouchMove(target);
 
         // scheduled move has not yet occurred
         expect(callbacks.onMove).not.toHaveBeenCalled();
@@ -2213,6 +2234,8 @@ describe('drag handle', () => {
         // releasing the movement
         requestAnimationFrame.step();
         expect(callbacks.onMove).toHaveBeenCalledWith(target);
+        // directly using the event as a part of the drag
+        expect(event.defaultPrevented).toBe(true);
       });
 
       it('should prevent any context menu from popping', () => {
@@ -2247,12 +2270,13 @@ describe('drag handle', () => {
       it('should drop a drag on touchend', () => {
         touchStart(wrapper);
         jest.runTimersToTime(timeForLongPress);
-        windowTouchEnd();
+        const event: Event = windowTouchEnd();
 
         expect(callbacksCalled(callbacks)({
           onLift: 1,
           onDrop: 1,
         })).toBe(true);
+        expect(event.defaultPrevented).toBe(true);
       });
 
       it('should not execute pending movements after a drop', () => {
@@ -2346,41 +2370,48 @@ describe('drag handle', () => {
           })).toBe(true);
 
           // should have no impact
-          windowTouchMove({ x: 100, y: 200 });
+          const event: Event = windowTouchMove({ x: 100, y: 200 });
           requestAnimationFrame.step();
 
           expect(callbacksCalled(callbacks)({
             onLift: 1,
             onCancel: 0,
           })).toBe(true);
+          expect(event.defaultPrevented).toBe(false);
         });
       });
 
       it('should cancel the drag if a touchcancel is fired', () => {
-        windowTouchCancel();
+        const event: Event = windowTouchCancel();
 
         expect(callbacksCalled(callbacks)({
           onLift: 1,
           onCancel: 1,
         })).toBe(true);
+        // a direct cancel
+        expect(event.defaultPrevented).toBe(true);
       });
 
       it('should cancel the drag after a resize', () => {
-        dispatchWindowEvent('resize');
+        const event: Event = dispatchWindowEvent('resize');
 
         expect(callbacksCalled(callbacks)({
           onLift: 1,
           onCancel: 1,
         })).toBe(true);
+        // an indirect cancel
+        expect(event.defaultPrevented).toBe(false);
       });
 
       it('should cancel the drag after a orientation change', () => {
-        dispatchWindowEvent('orientationchange');
+        const event: Event = dispatchWindowEvent('orientationchange');
 
         expect(callbacksCalled(callbacks)({
           onLift: 1,
           onCancel: 1,
         })).toBe(true);
+        // an indirect cancel
+        expect(event.defaultPrevented).toBe(false);
       });
 
       it('should cancel a drag if any keypress is made', () => {
@@ -2407,7 +2438,7 @@ describe('drag handle', () => {
             onDrop: 1,
           })).toBe(true);
 
-          // explicit cancel
+          // direct cancel
           if (keyCodes[key] === keyCodes.escape) {
             expect(event.defaultPrevented).toBe(true);
             return;
@@ -2456,29 +2487,30 @@ describe('drag handle', () => {
     });
 
     describe('force press', () => {
-      const forcePress = (force?: number = forcePressThreshold): void => {
+      const windowForcePress = (force?: number = forcePressThreshold): Event =>
         dispatchWindowEvent('touchforcechange', {
           touches: [{
             force,
           }],
         });
-      };
 
       describe('drag not yet started', () => {
         it('should not start a drag if a force press occurs', () => {
           touchStart(wrapper);
-          forcePress(forcePressThreshold);
+          const event: Event = windowForcePress(forcePressThreshold);
           // would normally start a drag
           jest.runAllTimers();
 
           expect(callbacksCalled(callbacks)({
             onLift: 0,
           })).toBe(true);
+          // This is an indirect cancel
+          expect(event.defaultPrevented).toBe(false);
         });
 
         it('should not block lifting if the force press is not strong enough', () => {
           touchStart(wrapper);
-          forcePress(forcePressThreshold - 0.1);
+          windowForcePress(forcePressThreshold - 0.1);
           // would normally start a drag
           jest.runAllTimers();
 
@@ -2491,23 +2523,42 @@ describe('drag handle', () => {
       describe('drag started', () => {
         it('should cancel the drag if no movement has occurred yet', () => {
           start();
-          forcePress();
+          const event: Event = windowForcePress();
 
           expect(callbacksCalled(callbacks)({
             onLift: 1,
             onCancel: 1,
           })).toBe(true);
+          // we are not preventing the force press
+          expect(event.defaultPrevented).toBe(false);
         });
 
-        it('should not cancel the drag if movement has occurred before the force press', () => {
-          start();
-          windowTouchMove({ x: 10, y: 20 });
-          forcePress();
+        describe('force press after drag movement', () => {
+          // This situation should not be possible, but we are being extra careful
 
-          expect(callbacksCalled(callbacks)({
-            onLift: 1,
-            onCancel: 0,
-          })).toBe(true);
+          it('should not cancel the drag', () => {
+            start();
+            windowTouchMove({ x: 10, y: 20 });
+            // drag has started
+            windowForcePress();
+
+            expect(callbacksCalled(callbacks)({
+              onLift: 1,
+              onCancel: 0,
+            })).toBe(true);
+          });
+
+          it('should prevent a force press action', () => {
+            start();
+            windowTouchMove({ x: 10, y: 20 });
+
+            const weak: Event = windowForcePress(0);
+            const strong: Event = windowForcePress(forcePressThreshold);
+
+            // does not matter what type of force press
+            expect(weak.defaultPrevented).toBe(true);
+            expect(strong.defaultPrevented).toBe(true);
+          });
         });
       });
     });

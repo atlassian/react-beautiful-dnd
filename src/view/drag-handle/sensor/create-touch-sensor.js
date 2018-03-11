@@ -141,7 +141,7 @@ export default ({
       options: { passive: false },
       fn: (event: TouchEvent) => {
         // Drag has not yet started and we are waiting for a long press.
-        if (state.pending) {
+        if (!state.isDragging) {
           stopPendingDrag();
           return;
         }
@@ -170,7 +170,7 @@ export default ({
       eventName: 'touchend',
       fn: (event: TouchEvent) => {
         // drag had not started yet - do not prevent the default action
-        if (state.pending) {
+        if (!state.isDragging) {
           stopPendingDrag();
           return;
         }
@@ -184,7 +184,7 @@ export default ({
       eventName: 'touchcancel',
       fn: (event: TouchEvent) => {
         // drag had not started yet - do not prevent the default action
-        if (state.pending) {
+        if (!state.isDragging) {
           stopPendingDrag();
           return;
         }
@@ -240,6 +240,11 @@ export default ({
     {
       eventName: 'keydown',
       fn: (event: KeyboardEvent) => {
+        if (!state.isDragging) {
+          cancel();
+          return;
+        }
+
         // direct cancel: we are preventing the default action
         // indirect cancel: we are not preventing the default action
 
@@ -256,14 +261,21 @@ export default ({
     {
       eventName: 'touchforcechange',
       fn: (event: TouchEvent) => {
-        // force push action will no longer fire after a touchmove
+        // A force push action will no longer fire after a touchmove
         if (state.hasMoved) {
+          // This is being super safe. While this situation should not occur we
+          // are still expressing that we want to opt out of force pressing
+          event.preventDefault();
           return;
         }
+
+        // A drag could be pending or has already started but no movement has occurred
 
         const touch: TouchWithForce = (event.touches[0] : any);
 
         if (touch.force >= forcePressThreshold) {
+          // this is an indirect cancel so we do not preventDefault
+          // we also want to allow the force press to occur
           cancel();
         }
       },
