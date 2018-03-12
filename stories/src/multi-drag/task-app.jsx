@@ -5,10 +5,10 @@ import { DragDropContext } from '../../../src/';
 import initial from './data';
 import Column from './column';
 import type { Result as ReorderResult } from './utils';
-import { reorderBetweenColumns, getHomeColumn } from './utils';
+import { reorderBetweenColumns, multiSelectTo as multiSelect } from './utils';
 import type { DragStart, DropResult, DraggableLocation } from '../../../src/';
 import type { Task, Id } from '../types';
-import type { Entities, Column as ColumnType } from './types';
+import type { Entities } from './types';
 
 const Container = styled.div`
   display: flex;
@@ -98,26 +98,47 @@ export default class TaskApp extends Component<*, State> {
     this.unselectAll();
   }
 
-  select = (taskId: Id) => {
+  toggleSelection = (taskId: Id) => {
+    const selectedTaskIds: Id[] = this.state.selectedTaskIds;
+    const wasSelected: boolean = selectedTaskIds.includes(taskId);
+
+    const newTaskIds: Id[] = (() => {
+      // Task was not previously selected
+      // now will be the only selected item
+      if (!wasSelected) {
+        return [taskId];
+      }
+
+      // Task was part of a selected group
+      // will now become the only selected item
+      if (selectedTaskIds.length > 1) {
+        return [taskId];
+      }
+
+      // task was previously selected but not in a group
+      // we will now clear the selection
+      return [];
+    })();
+
     this.setState({
-      selectedTaskIds: [taskId],
+      selectedTaskIds: newTaskIds,
     });
   }
 
-  addToSelection = (taskId: Id) => {
-    this.setState({
-      selectedTaskIds: [...this.state.selectedTaskIds, taskId],
-    });
-  }
+  toggleSelectionInGroup = (taskId: Id) => {
+    const selectedTaskIds: Id[] = this.state.selectedTaskIds;
+    const index: number = selectedTaskIds.indexOf(taskId);
 
-  removeFromSelection = (taskId: Id) => {
-    const index: number = this.state.selectedTaskIds.indexOf(taskId);
-
+    // if not selected - add it to the selected items
     if (index === -1) {
-      throw new Error('Cannot find task in selected list');
+      this.setState({
+        selectedTaskIds: [...selectedTaskIds, taskId],
+      });
+      return;
     }
 
-    const shallow: Id[] = [...this.state.selectedTaskIds];
+    // it was previously selected and now needs to be removed from the group
+    const shallow: Id[] = [...selectedTaskIds];
     shallow.splice(index, 1);
     this.setState({
       selectedTaskIds: shallow,
@@ -126,60 +147,18 @@ export default class TaskApp extends Component<*, State> {
 
   // This behaviour matches the MacOSX finder selection
   multiSelectTo = (newTaskId: Id) => {
-    const selectedTaskIds: Id[] = this.state.selectedTaskIds;
-    // Nothing already selected
-    if (!selectedTaskIds.length) {
-      this.setState({
-        selectedTaskIds: [newTaskId],
-      });
+    const updated: ?Id[] = multiSelect(
+      this.state.entities,
+      this.state.selectedTaskIds,
+      newTaskId
+    );
+
+    if (updated == null) {
       return;
     }
-
-    // TODO: move to util file
-    const columnOfNew: ColumnType = getHomeColumn(this.state.entities, newTaskId);
-    const indexOfNew: number = columnOfNew.taskIds.indexOf(newTaskId);
-
-    const lastSelected: Id = selectedTaskIds[selectedTaskIds.length - 1];
-    const columnOfLast: ColumnType = getHomeColumn(this.state.entities, lastSelected);
-    const indexOfLast: number = columnOfLast.taskIds.indexOf(lastSelected);
-
-    // multi selecting to another column
-    // select everything up to the index of the current item
-    if (columnOfNew !== columnOfLast) {
-      this.setState({
-        selectedTaskIds: columnOfNew.taskIds.slice(0, indexOfNew + 1),
-      });
-      return;
-    }
-
-    // multi selecting in the same column
-    // need to select everything between the last index and the current index inclusive
-
-    // nothing to do here
-    if (indexOfNew === indexOfLast) {
-      return;
-    }
-
-    const isSelectingForwards: boolean = indexOfNew > indexOfLast;
-    const start: number = isSelectingForwards ? indexOfLast : indexOfNew;
-    const end: number = isSelectingForwards ? indexOfNew : indexOfLast;
-
-    const inBetween: Id[] = columnOfNew.taskIds.slice(start, end + 1);
-
-    const toAdd: Id[] = inBetween
-      .filter((taskId: Id): boolean => {
-        // if already selected: then no need to select it again
-        if (selectedTaskIds.includes(taskId)) {
-          return false;
-        }
-        return true;
-      });
-
-    const sorted: Id[] = isSelectingForwards ? toAdd : [...toAdd].reverse();
-    const combined: Id[] = [...selectedTaskIds, ...sorted];
 
     this.setState({
-      selectedTaskIds: combined,
+      selectedTaskIds: updated,
     });
   }
 
@@ -208,12 +187,10 @@ export default class TaskApp extends Component<*, State> {
               tasks={getTasks(entities, columnId)}
               selectedTaskIds={selected}
               key={columnId}
-              select={this.select}
-              unselect={this.unselect}
-              multiSelectTo={this.multiSelectTo}
-              addToSelection={this.addToSelection}
-              removeFromSelection={this.removeFromSelection}
               isSomethingDragging={this.state.isDragging}
+              toggleSelection={this.toggleSelection}
+              toggleSelectionInGroup={this.toggleSelectionInGroup}
+              multiSelectTo={this.multiSelectTo}
             />
           ))}
         </Container>

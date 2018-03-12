@@ -13,12 +13,11 @@ type Props = {|
   column: ColumnType,
   tasks: TaskType[],
   selectedTaskIds: Id[],
-  select: (taskId: Id) => void,
-  unselect: (taskId: Id) => void,
   multiSelectTo: (taskId: Id) => void,
-  addToSelection: (taskId: Id) => void,
-  removeFromSelection: (taskId: Id) => void,
   isSomethingDragging: boolean,
+  toggleSelection: (taskId: Id) => void,
+  toggleSelectionInGroup: (taskId: Id) => void,
+  multiSelectTo: (taskId: Id) => void,
 |}
 
 const Container = styled.div`
@@ -75,14 +74,12 @@ export default class Column extends Component<Props> {
                   task={task}
                   index={index}
                   key={task.id}
-                  select={this.props.select}
-                  unselect={this.props.unselect}
                   isSelected={Boolean(getSelectedMap(selectedTaskIds)[task.id])}
                   isGhosting={getSelectedMap(selectedTaskIds)[task.id] && isSomethingDragging}
-                  multiSelectTo={this.props.multiSelectTo}
                   selectionCount={selectedTaskIds.length}
-                  addToSelection={this.props.addToSelection}
-                  removeFromSelection={this.props.removeFromSelection}
+                  toggleSelection={this.props.toggleSelection}
+                  toggleSelectionInGroup={this.props.toggleSelectionInGroup}
+                  multiSelectTo={this.props.multiSelectTo}
                 />
               ))}
               {provided.placeholder}

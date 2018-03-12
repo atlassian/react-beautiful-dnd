@@ -209,3 +209,55 @@ export const reorderBetweenColumns = (args: Args): Result => {
   }
   return reorderSingleDrag(args);
 };
+
+export const multiSelectTo = (
+  entities: Entities,
+  selectedTaskIds: Id[],
+  newTaskId: TaskId,
+): ?Id[] => {
+  // Nothing already selected
+  if (!selectedTaskIds.length) {
+    return [newTaskId];
+  }
+
+  const columnOfNew: Column = getHomeColumn(entities, newTaskId);
+  const indexOfNew: number = columnOfNew.taskIds.indexOf(newTaskId);
+
+  const lastSelected: Id = selectedTaskIds[selectedTaskIds.length - 1];
+  const columnOfLast: Column = getHomeColumn(entities, lastSelected);
+  const indexOfLast: number = columnOfLast.taskIds.indexOf(lastSelected);
+
+  // multi selecting to another column
+  // select everything up to the index of the current item
+  if (columnOfNew !== columnOfLast) {
+    return columnOfNew.taskIds.slice(0, indexOfNew + 1);
+  }
+
+  // multi selecting in the same column
+  // need to select everything between the last index and the current index inclusive
+
+  // nothing to do here
+  if (indexOfNew === indexOfLast) {
+    return null;
+  }
+
+  const isSelectingForwards: boolean = indexOfNew > indexOfLast;
+  const start: number = isSelectingForwards ? indexOfLast : indexOfNew;
+  const end: number = isSelectingForwards ? indexOfNew : indexOfLast;
+
+  const inBetween: Id[] = columnOfNew.taskIds.slice(start, end + 1);
+
+  const toAdd: Id[] = inBetween
+    .filter((taskId: Id): boolean => {
+      // if already selected: then no need to select it again
+      if (selectedTaskIds.includes(taskId)) {
+        return false;
+      }
+      return true;
+    });
+
+  const sorted: Id[] = isSelectingForwards ? toAdd : [...toAdd].reverse();
+  const combined: Id[] = [...selectedTaskIds, ...sorted];
+
+  return combined;
+};

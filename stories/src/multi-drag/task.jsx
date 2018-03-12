@@ -15,11 +15,9 @@ type Props = {|
   isSelected: boolean,
   isGhosting: boolean,
   selectionCount: number,
-  select: (taskId: Id) => void,
-  unselect: (taskId: Id) => void,
+  toggleSelection: (taskId: Id) => void,
+  toggleSelectionInGroup: (taskId: Id) => void,
   multiSelectTo: (taskId: Id) => void,
-  addToSelection: (taskId: Id) => void,
-  removeFromSelection: (taskId: Id) => void,
 |}
 
 type GetBackgroundColorArgs= {|
@@ -56,7 +54,6 @@ const Container = styled.div`
 
   ${props => (props.isDragging ? `box-shadow: 1px 1px 1px grey; background: ${colors.blue.light};` : '')}
   ${props => (!props.isDragging && props.isGhosting ? 'opacity: 0.8;' : '')}
-
 
   /* needed for SelectionCount */
   position: relative;
@@ -100,21 +97,15 @@ export default class Task extends Component<Props> {
   onKeyUp = (event: KeyboardEvent, snapshot: DraggableStateSnapshot) => {
     if (event.keyCode === keyCodes.enter) {
       const {
-        isSelected,
         task,
-        addToSelection,
-        removeFromSelection,
+        toggleSelection,
       } = this.props;
 
       if (snapshot.isDragging) {
         return;
       }
 
-      if (isSelected) {
-        removeFromSelection(task.id);
-        return;
-      }
-      addToSelection(task.id);
+      toggleSelection(task.id);
     }
   }
 
@@ -122,13 +113,10 @@ export default class Task extends Component<Props> {
   // preventing if there was a drag
   onClick = (event: MouseEvent) => {
     const {
-      isSelected,
       task,
-      addToSelection,
-      removeFromSelection,
+      toggleSelection,
+      toggleSelectionInGroup,
       multiSelectTo,
-      unselect,
-      select,
     } = this.props;
 
     if (event.defaultPrevented) {
@@ -153,20 +141,11 @@ export default class Task extends Component<Props> {
     const wasMetaKeyUsed: boolean = event.metaKey;
 
     if (wasMetaKeyUsed) {
-      if (isSelected) {
-        removeFromSelection(task.id);
-        return;
-      }
-      addToSelection(task.id);
+      toggleSelectionInGroup(task.id);
       return;
     }
 
-    if (isSelected) {
-      unselect(task.id);
-      return;
-    }
-
-    select(task.id);
+    toggleSelection(task.id);
   };
 
   render() {
