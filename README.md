@@ -212,12 +212,12 @@ When a drag **is occurring** with a *mouse* the user is able to execute the foll
 
 - **escape** <kbd>esc</kbd> - cancel the drag
 
-During a mouse drag the following standard keyboard events are blocked to prevent a bad experience:
+During a mouse drag the following standard keyboard events are prevented to prevent a bad experience:
 
-- **tab** <kbd>tab ↹</kbd> - blocking tabbing
-- **enter** <kbd>⏎</kbd> - blocking submission
+- **tab** <kbd>tab ↹</kbd> - preventing tabbing
+- **enter** <kbd>⏎</kbd> - preventing submission
 
-Other than these explicitly blocked keyboard events all standard keyboard events should work as expected.
+Other than these explicitly prevented keyboard events all standard keyboard events should work as expected.
 
 ## Keyboard dragging
 
@@ -250,10 +250,10 @@ The following commands are also available but they depend on the `type` of `Drop
 - **Right arrow** <kbd>→</kbd> - move a `Draggable` to the *right* in the current `Droppable`
 - **Left arrow** <kbd>←</kbd> - move a `Draggable` to the *left* in the current `Droppable`
 
-During a drag the following standard keyboard events are blocked to prevent a bad experience:
+During a drag the following standard keyboard events have their default behaviour prevented (through `event.preventDefault()`) to avoid a bad experience:
 
-- **tab** <kbd>tab ↹</kbd> - blocking tabbing
-- **enter** <kbd>⏎</kbd> - blocking submission
+- **tab** <kbd>tab ↹</kbd> - preventing tabbing
+- **enter** <kbd>⏎</kbd> - preventing submission
 
 ## Touch dragging
 
@@ -1262,7 +1262,7 @@ The `children` function is also provided with a small amount of state relating t
 
 ### Adding an `onClick` handler to a `Draggable` or a *drag handle*
 
-You are welcome to add your own `onClick` handler to a `Draggable` or a *drag handle* (which might be the same element). `onClick` events handlers will only be called if we do not block the click. We block click events from occurring when the user was dragging an item. See [#sloppy-clicks-and-click-prevention-](sloppy clicks and click prevention) for more information.
+You are welcome to add your own `onClick` handler to a `Draggable` or a *drag handle* (which might be the same element). `onClick` events handlers will always be called if a click occurred. If we are preventing the click then we the `event.defaultPrevented` property will be set to `true`. We prevent click events from occurring when the user was dragging an item. See [#sloppy-clicks-and-click-prevention-](sloppy clicks and click prevention) for more information.
 
 ### Interactive child elements within a `Draggable`
 

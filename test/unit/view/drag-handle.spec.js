@@ -416,7 +416,7 @@ describe('drag handle', () => {
         describe('cancelled with any keydown', () => {
           Object.keys(keyCodes).forEach((key: string) => {
             describe(`with the ${key} key`, () => {
-              it('should not call execute any callbacks', () => {
+              it('should not execute any callbacks', () => {
                 mouseDown(wrapper, origin, primaryButton);
                 // not moved enough yet
                 windowMouseMove({ x: 0, y: sloppyClickThreshold - 1 });
@@ -958,7 +958,7 @@ describe('drag handle', () => {
         })).toBe(true);
       });
 
-      it('should block a click after a cancel', () => {
+      it('should preventprevented a click after a cancel', () => {
         // start
         mouseDown(wrapper);
         windowMouseMove({ x: 0, y: sloppyClickThreshold });
@@ -1034,7 +1034,7 @@ describe('drag handle', () => {
       });
 
       describe('subsequent interactions', () => {
-        it('should allow subsequent clicks through after blocking one after a drag', () => {
+        it('should allow subsequent clicks through after preventing one after a drag', () => {
           mouseDown(wrapper);
           windowMouseMove({ x: 0, y: sloppyClickThreshold });
           windowMouseUp({ x: 0, y: sloppyClickThreshold });
@@ -1043,9 +1043,9 @@ describe('drag handle', () => {
             onDrop: 1,
           })).toBe(true);
 
-          // first click is blocked
+          // first click is prevented
           expect(isAWindowClickPrevented()).toBe(true);
-          // second click is not blocked
+          // second click is not prevented
           expect(isAWindowClickPrevented()).toBe(false);
         });
       });
@@ -2574,9 +2574,9 @@ describe('drag handle', () => {
       // flush any timers
       jest.runAllTimers();
 
-      // initial touch start not blocked
+      // initial touch start not prevented
       expect(mockEvent.preventDefault).not.toHaveBeenCalled();
-      // end of lift not blocked
+      // end of lift not prevented
       expect(endEvent.defaultPrevented).toBe(false);
     });
 
@@ -2602,10 +2602,10 @@ describe('drag handle', () => {
         start();
         end();
 
-        // first click blocked
+        // first click prevented
         expect(isAWindowClickPrevented()).toBe(true);
 
-        // second click not blocked
+        // second click not prevented
         expect(isAWindowClickPrevented()).toBe(false);
       });
 
@@ -2615,7 +2615,7 @@ describe('drag handle', () => {
 
         jest.runTimersToTime(10);
 
-        // click is not blocked now
+        // click is not prevented now
         expect(isAWindowClickPrevented()).toBe(true);
       });
 
@@ -2640,7 +2640,7 @@ describe('drag handle', () => {
           onDrop: 1,
         })).toBe(true);
 
-        // click after unsuccessful drag is not blocked
+        // click after unsuccessful drag is not prevented
         expect(isAWindowClickPrevented()).toBe(false);
       });
     });

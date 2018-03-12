@@ -47,7 +47,7 @@ export default ({
   const isCapturing = (): boolean => Boolean(state.pending || state.isDragging);
   const schedule = createScheduler(callbacks);
   const getWindow = (): HTMLElement => getWindowFromRef(getDraggableRef());
-  const postDragEventPreveter: EventPreventer = createPostDragEventPreventer(getWindow);
+  const postDragEventPreventer: EventPreventer = createPostDragEventPreventer(getWindow);
 
   const startDragging = (fn?: Function = noop) => {
     setState({
@@ -61,7 +61,7 @@ export default ({
     unbindWindowEvents();
     mouseDownMarshal.reset();
     if (shouldBlockClick) {
-      postDragEventPreveter.preventNext();
+      postDragEventPreventer.preventNext();
     }
     setState({
       isDragging: false,
@@ -87,7 +87,7 @@ export default ({
 
   const unmount = (): void => {
     kill();
-    postDragEventPreveter.abort();
+    postDragEventPreventer.abort();
   };
 
   const cancel = () => {
