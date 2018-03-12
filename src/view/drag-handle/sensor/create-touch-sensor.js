@@ -309,9 +309,6 @@ export default ({
     // We need to stop parents from responding to this event - which may cause a double lift
     // We also need to NOT call event.preventDefault() so as to maintain as much standard
     // browser interactions as possible.
-    // event.preventDefault() in an onTouchStart blocks almost
-    // every other event including force press
-    // event.stopPropagation();
     touchStartMarshal.handle();
 
     startPendingDrag(event);

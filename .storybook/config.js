@@ -11,23 +11,3 @@ function loadStories() {
 }
 
 configure(loadStories, module);
-
-// console.log('Adding some window event handlers to the story');
-
-// [
-//   'click',
-//   'mousedown',
-//   'mousemove',
-//   'mouseup',
-//   'keydown',
-//   'keyup',
-//   'touchstart',
-//   'touchend',
-//   'touchmove',
-// ].forEach((name: String) => {
-//   window.addEventListener(name, (event: Event) => console.warn(`
-//     window event received
-//     event: ${name}.
-//     defaultPrevented: ${event.defaultPrevented}
-//   `));
-// });
