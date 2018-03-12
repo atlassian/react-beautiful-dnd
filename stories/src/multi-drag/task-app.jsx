@@ -8,7 +8,7 @@ import type { Result as ReorderResult } from './utils';
 import { reorderBetweenColumns, getHomeColumn } from './utils';
 import type { DragStart, DropResult, DraggableLocation } from '../../../src/';
 import type { Task, Id } from '../types';
-import type { Entities } from './types';
+import type { Entities, Column as ColumnType } from './types';
 
 const Container = styled.div`
   display: flex;
@@ -34,12 +34,12 @@ export default class TaskApp extends Component<*, State> {
   }
 
   componentDidMount() {
-    window.addEventListener('click', this.unselectAll);
+    window.addEventListener('click', this.onWindowClick);
     window.addEventListener('keydown', this.onWindowKeyDown);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('click', this.unselectAll);
+    window.removeEventListener('click', this.onWindowClick);
     window.removeEventListener('keydown', this.onWindowKeyDown);
   }
 
@@ -61,7 +61,10 @@ export default class TaskApp extends Component<*, State> {
     const source: DraggableLocation = result.source;
 
     // nothing to do
-    if (!destination) {
+    if (!destination || result.reason === 'CANCEL') {
+      this.setState({
+        isDragging: false,
+      });
       return;
     }
 
@@ -79,11 +82,20 @@ export default class TaskApp extends Component<*, State> {
   }
 
   onWindowKeyDown = (event: KeyboardEvent) => {
-    // escape
-    if (event.keyCode === 27) {
-      console.log('clearing selection in task-app');
+    if (event.defaultPrevented) {
+      return;
+    }
+
+    if (event.key === 'Escape') {
       this.unselectAll();
     }
+  }
+
+  onWindowClick = (event: KeyboardEvent) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+    this.unselectAll();
   }
 
   select = (taskId: Id) => {
@@ -113,26 +125,62 @@ export default class TaskApp extends Component<*, State> {
   }
 
   // This behaviour matches the MacOSX finder selection
-  multiSelectTo = (taskId: Id) => {
+  multiSelectTo = (newTaskId: Id) => {
     const selectedTaskIds: Id[] = this.state.selectedTaskIds;
     // Nothing already selected
     if (!selectedTaskIds.length) {
+      this.setState({
+        selectedTaskIds: [newTaskId],
+      });
       return;
     }
 
     // TODO: move to util file
-    const columnOfCurrent: Column = getHomeColumn(this.state.entities, taskId);
-    const indexOfCurrent: Id = columnOfCurrent.taskIds.indexOf(taskId);
+    const columnOfNew: ColumnType = getHomeColumn(this.state.entities, newTaskId);
+    const indexOfNew: number = columnOfNew.taskIds.indexOf(newTaskId);
 
     const lastSelected: Id = selectedTaskIds[selectedTaskIds.length - 1];
-    const columnOfLast: Id = getHomeColumn(this.state.entities, lastSelected);
-
-    // multi selecting in the same column
-    if (columnOfCurrent === columnOfLast) {
-
-    }
+    const columnOfLast: ColumnType = getHomeColumn(this.state.entities, lastSelected);
+    const indexOfLast: number = columnOfLast.taskIds.indexOf(lastSelected);
 
     // multi selecting to another column
+    // select everything up to the index of the current item
+    if (columnOfNew !== columnOfLast) {
+      this.setState({
+        selectedTaskIds: columnOfNew.taskIds.slice(0, indexOfNew + 1),
+      });
+      return;
+    }
+
+    // multi selecting in the same column
+    // need to select everything between the last index and the current index inclusive
+
+    // nothing to do here
+    if (indexOfNew === indexOfLast) {
+      return;
+    }
+
+    const isSelectingForwards: boolean = indexOfNew > indexOfLast;
+    const start: number = isSelectingForwards ? indexOfLast : indexOfNew;
+    const end: number = isSelectingForwards ? indexOfNew : indexOfLast;
+
+    const inBetween: Id[] = columnOfNew.taskIds.slice(start, end + 1);
+
+    const toAdd: Id[] = inBetween
+      .filter((taskId: Id): boolean => {
+        // if already selected: then no need to select it again
+        if (selectedTaskIds.includes(taskId)) {
+          return false;
+        }
+        return true;
+      });
+
+    const sorted: Id[] = isSelectingForwards ? toAdd : [...toAdd].reverse();
+    const combined: Id[] = [...selectedTaskIds, ...sorted];
+
+    this.setState({
+      selectedTaskIds: combined,
+    });
   }
 
   unselect = () => {

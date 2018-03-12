@@ -115,19 +115,6 @@ export default class Task extends Component<Props> {
         return;
       }
       addToSelection(task.id);
-      return;
-    }
-
-    if (event.keyCode === keyCodes.escape) {
-      const {
-        isSelected,
-        task,
-        unselect,
-      } = this.props;
-
-      if (isSelected) {
-        unselect(task.id);
-      }
     }
   }
 
