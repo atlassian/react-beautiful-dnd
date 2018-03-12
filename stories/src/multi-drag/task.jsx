@@ -90,12 +90,15 @@ const SelectionCount = styled.div`
 const keyCodes = {
   enter: 13,
   escape: 27,
+  arrowDown: 40,
+  arrowUp: 38,
+  tab: 9,
 };
 
 export default class Task extends Component<Props> {
   // Using onKeyUp so that we did not need to monkey patch onKeyDown
   onKeyUp = (event: KeyboardEvent, snapshot: DraggableStateSnapshot) => {
-    if (event.keyCode !== keyCodes.enter) {
+    if (snapshot.isDragging) {
       return;
     }
 
@@ -104,14 +107,29 @@ export default class Task extends Component<Props> {
       toggleSelection,
     } = this.props;
 
-    if (snapshot.isDragging) {
-      return;
+    if (event.keyCode === keyCodes.enter) {
+      event.preventDefault();
+      toggleSelection(task.id);
     }
 
-    // we are using the event
-    event.preventDefault();
-    toggleSelection(task.id);
+    // if (event.keyCode === keyCodes.arrowDown) {
+    //   event.preventDefault();
+    //   const tab: KeyboardEvent = new KeyboardEvent('keydown', {
+    //     keyCode: keyCodes.tab,
+    //   });
+    //   window.dispatchEvent(tab);
+    //   return;
+    // }
+
+    // if (event.keyCode === keyCodes.arrowUp) {
+    //   event.preventDefault();
+    //   selectBackward();
+    // }
   }
+
+  // onFocus = () => {
+  //   this.props.toggleSelection(this.props.task.id);
+  // }
 
   // Using onClick as it will be correctly
   // preventing if there was a drag

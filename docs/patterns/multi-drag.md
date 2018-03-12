@@ -41,7 +41,7 @@ If a user clicks on an item the selected state of the item should be toggled. Ad
 - Attach an `onKeyUp` handler to your *drag handle* or `Draggable`. You could apply a `onKeyDown` but if you are applying it to a *drag handle* you will need to monkey patch the `DragHandleProvided > onKeyDown` event.
 - Prevent the default action on the `onKeyUp` if you are toggling selection as you are using it for selection
 
-#### Toggle selection impact
+#### Toggle selection behaviour
 
 - If the item was not previously selected - make it the only selected item
 - If the item was previously selected **and was not a part** of a selection group: unselect the item
@@ -67,7 +67,7 @@ if (wasMetaKeyUsed) {
 }
 ```
 
-#### Toggle selection in a group impact
+#### Toggle selection in a group behaviour
 
 - If the item was not selected then add the item to the selected items
 - If the item was previously selected then remove it from the selected items.
@@ -77,6 +77,23 @@ if (wasMetaKeyUsed) {
 The ability to click on an item further down a list and select everything inbetween.
 
 #### `onClick` event handler
+
+- Use the same `onClick` event handler you used for [toggle selection](#toggle-section).
+- If the [shift key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey) was used in addition then select up to this up
+
+### Mutli select to: behaviour
+
+This behaviour is the most complex. It deviates slightly from the `MacOSX` behaviour for simplicity.
+
+#### Nothing was selected
+
+If nothing is previously selected when the user triggers this action: simply set the selected item as the only selected item.
+
+#### Selecting to a different list
+
+If the user is selecting to an item that is in a different list to the last selected item: clear all the selected items and select everything up to the index of the selected to item in the new list
+
+#### Selecting to in the same list
 
 
 
