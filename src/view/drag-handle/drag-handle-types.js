@@ -36,8 +36,7 @@ export type DragHandleProps = {|
 
   // Stop html5 drag and drop
   draggable: boolean,
-  onDragStart: () => boolean,
-  onDrop: () => boolean
+  onDragStart: (event: DragEvent) => void,
 |}
 
 export type Props = {|

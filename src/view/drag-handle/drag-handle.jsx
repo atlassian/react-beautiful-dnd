@@ -21,7 +21,9 @@ import createMouseSensor from './sensor/create-mouse-sensor';
 import createKeyboardSensor from './sensor/create-keyboard-sensor';
 import createTouchSensor from './sensor/create-touch-sensor';
 
-const getFalse: () => boolean = () => false;
+const preventHtml5Dnd = (event: DragEvent) => {
+  event.preventDefault();
+};
 
 type Sensor = MouseSensor | KeyboardSensor | TouchSensor;
 
@@ -72,13 +74,9 @@ export default class DragHandle extends Component<Props> {
   componentWillUnmount() {
     this.sensors.forEach((sensor: Sensor) => {
       // kill the current drag and fire a cancel event if
-      const wasCapturing = sensor.isCapturing();
       const wasDragging = sensor.isDragging();
 
-      // stop capturing
-      if (wasCapturing) {
-        sensor.kill();
-      }
+      sensor.unmount();
       // cancel if drag was occurring
       if (wasDragging) {
         this.props.callbacks.onCancel();
@@ -189,8 +187,7 @@ export default class DragHandle extends Component<Props> {
       // English default. Consumers are welcome to add their own start instruction
       'aria-roledescription': 'Draggable item. Press space bar to lift',
       draggable: false,
-      onDragStart: getFalse,
-      onDrop: getFalse,
+      onDragStart: preventHtml5Dnd,
     };
 
     return provided;

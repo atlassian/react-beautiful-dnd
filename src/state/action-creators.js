@@ -23,6 +23,7 @@ import noImpact from './no-impact';
 import withDroppableDisplacement from './with-droppable-displacement';
 import getNewHomeClientCenter from './get-new-home-client-center';
 import { add, subtract, isEqual } from './position';
+import * as timings from '../debug/timings';
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -513,6 +514,7 @@ export const lift = (id: DraggableId,
       }
 
       dispatch(completeLift(id, client, viewport, autoScrollMode));
+      timings.finish('LIFT');
     });
   });
 };

@@ -1,12 +1,11 @@
 // @flow
 import * as keyCodes from '../../key-codes';
-import stopEvent from './stop-event';
 
 type KeyMap = {
   [key: number]: true
 }
 
-const blocked: KeyMap = {
+const preventedKeys: KeyMap = {
   // submission
   [keyCodes.enter]: true,
   // tabbing
@@ -14,7 +13,7 @@ const blocked: KeyMap = {
 };
 
 export default (event: KeyboardEvent) => {
-  if (blocked[event.keyCode]) {
-    stopEvent(event);
+  if (preventedKeys[event.keyCode]) {
+    event.preventDefault();
   }
 };
