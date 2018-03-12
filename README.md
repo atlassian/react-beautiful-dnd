@@ -1124,8 +1124,7 @@ type DragHandleProps = {|
   'aria-roledescription': string,
   tabIndex: number,
   draggable: boolean,
-  onDragStart: () => boolean,
-  onDrop: () => boolean
+  onDragStart: (event: DragEvent) => void,
 |}
 ```
 
@@ -1391,8 +1390,7 @@ type DragHandleProps = {|
   'aria-roledescription': string,
   tabIndex: number,
   draggable: boolean,
-  onDragStart: () => boolean,
-  onDrop: () => boolean
+  onDragStart: (event: DragEvent) => void,
 |}
 ```
 
