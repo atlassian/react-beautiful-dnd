@@ -35,21 +35,20 @@ const getBackgroundColor = ({
     return colors.blue.light;
   }
   if (isGhosting) {
-    return colors.grey;
+    return colors.green;
   }
   if (isSelected) {
     return colors.blue.light;
   }
-  return colors.white;
+  return colors.grey2.light;
 };
 
 const Container = styled.div`
-  border-bottom: 1px solid #ccc;
   background-color: ${props => getBackgroundColor(props)};
-  color: ${props => (props.isSelected ? colors.blue.deep : colors.black)};
+  color: ${props => (props.isSelected || props.isDragging ? colors.blue.deep : colors.black)};
   padding: ${grid}px;
   margin-bottom: ${grid}px;
-  border-radius: ${borderRadius}px;
+  border-radius: ${borderRadius}px;4
   font-size: 18px;
 
   ${props => (props.isDragging ? `box-shadow: 1px 1px 1px grey; background: ${colors.blue.light};` : '')}
@@ -64,7 +63,9 @@ const Container = styled.div`
 
   /* avoid default outline which looks lame with the position: absolute; */
   &:focus {
-    outline: 2px solid ${colors.blue.light};
+    outline: none;
+    /* TODO: also need to add dragging shadow */
+    box-shadow: 0 0 0 1px ${colors.blue.deep};
   }
 `;
 
@@ -102,34 +103,25 @@ export default class Task extends Component<Props> {
       return;
     }
 
+    if (event.keyCode !== keyCodes.enter) {
+      return;
+    }
+
     const {
       task,
       toggleSelection,
+      toggleSelectionInGroup,
     } = this.props;
 
-    if (event.keyCode === keyCodes.enter) {
-      event.preventDefault();
-      toggleSelection(task.id);
+    event.preventDefault();
+    const wasShiftKeyUsed: boolean = event.shiftKey;
+
+    if (wasShiftKeyUsed) {
+      toggleSelectionInGroup(task.id);
+      return;
     }
-
-    // if (event.keyCode === keyCodes.arrowDown) {
-    //   event.preventDefault();
-    //   const tab: KeyboardEvent = new KeyboardEvent('keydown', {
-    //     keyCode: keyCodes.tab,
-    //   });
-    //   window.dispatchEvent(tab);
-    //   return;
-    // }
-
-    // if (event.keyCode === keyCodes.arrowUp) {
-    //   event.preventDefault();
-    //   selectBackward();
-    // }
+    toggleSelection(task.id);
   }
-
-  // onFocus = () => {
-  //   this.props.toggleSelection(this.props.task.id);
-  // }
 
   // Using onClick as it will be correctly
   // preventing if there was a drag
