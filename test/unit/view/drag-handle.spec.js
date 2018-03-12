@@ -3276,14 +3276,10 @@ describe('drag handle', () => {
             const childCallbacks = getStubCallbacks();
             const nested: ReactWrapper = getNestedWrapper(parentCallbacks, childCallbacks);
             const child: ReactWrapper = nested.find('.child').first();
-            const parent: ReactWrapper = nested.find('.parent').first();
 
-            // fireing the events on both child and parent to mimic browser behaviour
-            // enzyme will not publish the simulated events up the tree
+            // React enzyme will bubble events within a wrapper
             control.preLift(child);
-            control.preLift(parent);
             control.lift(child);
-            control.preLift(parent);
 
             expect(childCallbacks.onLift).toHaveBeenCalled();
             expect(parentCallbacks.onLift).not.toHaveBeenCalled();
