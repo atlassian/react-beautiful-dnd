@@ -95,38 +95,81 @@ If the user is selecting to an item that is in a different list to the last sele
 
 #### Selecting to in the same list
 
+- Select everything between the newly selected item and the last selected item.
 
+> MacOSX is a little more complicated than this, but for our purposes this seems like a good default
+
+- If selecting the same index as we started on - we do not need to do anything
+
+### Action: clear selection
 
 #### `window` `click` handler
 
-We add a `click` handler to the `window` to detect for a click that is not on a `Draggable`. We call `stopPropagation` in our `onClick` handler so `click` events should only bubble up here if they did not perform selection management (such as by clicking outside of a `Draggable`). If a click is detected it should unselect all the currently selected items
-
-```js
-componentDidMount() {
-  window.addEventListener('click', this.unselectAll);
-}
-```
+We add a `click` handler to the `window` to detect for a click that is not on a `Draggable`. We call `preventDefault` in our selection `onClick` handler so `click` events used for selection will have the `event.defaultPrevented` property set to `true`. Additionally, if a drag occurred the default `click` action [will be prevented](https://github.com/atlassian/react-beautiful-dnd#sloppy-clicks-and-click-prevention-). So if we receive a `click` event on the window that has not has `event.defaultPrevented` set to false we clear the current selection.
 
 #### `window` `keyup` handler
 
-Here you want to listen to
+This event handler operates in a similar way to the *`window` `click` handler* described above. If a `keyup` event that is not prevented and is the **escape** key then we clear the current selection.
 
+### Putting it all together
 
-### Keyboard
+[DEMO]
 
-- Add an `onKeyUp` handler to a *drag handle* element. It the user presses the `enter` key - toggle the selected state of the `Draggable`.
-- As with a mouse handler
+## Dragging
 
+Just before dragging we need to do one check in `onDragStart`. If the user is dragging something that is not selected then we need to clear the selection
 
-### Touch
+As the drag starts we need to add a few visual affordances:
 
+1. Add a count to the dragging item to indicate how many items this drag is represenative of
+2. Change the appearance of the selected items that are not dragging to a greyed out / disabled state.
 
+We do not remove the selected items from the list. If we remove the items completely that can change the dimensions of the list which can lead to list collapsing and scroll jumps. If we leave them in the list and just make them invisible then there are these big blank sections in a list that have no meaning and can be confusing to interact with.
 
-## Performance
+## Dropping
 
-Doing a multi drag interaction in a performant way can be challenging. The core thing you want to do is to avoid calling `render()` on components that do not need to update. Here are some pitfalls:
+As much as possible we want to preserve the selection that the user had before the drag started. That way they could continue to move the same item or items around after the drag.
+
+### No change
+
+This occurs when you cancel the drag, drop nowhere or drop in the same location. No reordering is required and you can keep the previous selection
+
+### Dropping in a different list
+
+When moving the items to the new list they should be inserted into the new list at the index in which the dragging item was dropped. We suggest the moved items be placed in the following order:
+
+1. Move the selected item to the first position
+
+This is done to ensure that the item the user is dragging does not disappear suddenly on drop.
+
+2. Order by the items natural indexes regardless of list. For example if 'item alpha' started in column 1 of index 2 and 'item beta' started in column 2 of index 2 then 'item beta' should be placed before 'item alpha'
+
+This gives priority to original index. However, you might want to give priority to list. So that items selected in previous lists go before items selected in subsequent lists.
+
+3. In the event of a tie then sort by the order in which the item was selected.
+
+This strategy does change the order of items symantically: specifically step 1 which always moves the selected item to the top. If you do not want this you do not have to do it - however it is much nicer visually and helps to keep the user grounded on a drop.
+
+### Dropping in the same list
+
+The goal is to move the selected items to their new location. We want to insert all the items in at the index at which the dragging item was dropped. As with the strategy above we suggest the following order for the dropped items:
+
+1. Move the selected item to the first position
+2. Order the rest by their natural index
+
+## Other: performance
+
+Doing a multi drag interaction in a performant way can be challenging. The core thing you want to do is to avoid calling `render()` on components that do not need to update.
 
 ### Selection state change
 
-You do not want to re-render **any** `Droppable` or `Draggable` in response to changes in the selected state. You do not want to re render `Draggables` whose selection state is not changing. Additionally, you do not even want to render the component whose selection state is changing.......
+In response to a selection change you want to render the minimum amount of `Draggable` and `Droppable` components as possible. In our example application whenever the selection changes we re-render the entire tree. This approach will not scale. Right now the best solution for this is `redux` in combination with `react-redux`, `reselect` and `memoizeOne`. You would move your selection state into a store and have connected components that read their selection state from the store.
 
+This approach is not complete. In the event of a 'unselect all action' you might need to render a lot of components at once to clear their selected styles. For most usages this will be fine. If you want to go further you will need to avoid calling `render` for selection style changes.
+
+- You could look into using the [dynamic shared styles pattern](https://medium.com/@alexandereardon/dragging-react-performance-forward-688b30d40a33).
+- You could apply a **unique** data attribute to each item and then apply the *selected* style to it using selectors dynamically in a parent component.
+
+### Ghosting
+
+When a user starts dragging we 'ghost'

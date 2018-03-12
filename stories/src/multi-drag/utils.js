@@ -247,6 +247,9 @@ export const multiSelectTo = (
 
   const inBetween: Id[] = columnOfNew.taskIds.slice(start, end + 1);
 
+  // everything inbetween needs to have it's selection toggled.
+  // with the exception of the start and end values which will always be selected
+
   const toAdd: Id[] = inBetween
     .filter((taskId: Id): boolean => {
       // if already selected: then no need to select it again
