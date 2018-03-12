@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Droppable } from '../../../src/';
 import Task from './task';
 import type { DroppableProvided, DroppableStateSnapshot } from '../../../src/';
-import type { Task as TaskType } from './types';
+import type { Task as TaskType } from '../types';
 import { colors, grid, borderRadius } from '../constants';
 
 type Props = {|

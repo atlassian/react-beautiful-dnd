@@ -1,15 +1,17 @@
 // @flow
 import type { DraggableId, DraggableLocation } from '../../src/types';
 
+export type Id = string;
+
 export type Author = {|
-  id: string,
+  id: Id,
   name: string,
   avatarUrl: string,
   url: string,
 |}
 
 export type Quote = {|
-  id: string,
+  id: Id,
   content: string,
   author: Author
 |}
@@ -22,3 +24,8 @@ export type Dragging = {|
 export type QuoteMap = {
   [key: string]: Quote[]
 }
+
+export type Task = {|
+  id: Id,
+  content: string,
+|}

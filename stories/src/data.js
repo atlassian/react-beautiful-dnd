@@ -1,5 +1,5 @@
 // @flow
-import type { Author, Quote, QuoteMap } from './types';
+import type { Author, Quote, QuoteMap, Task } from './types';
 
 const jake: Author = {
   id: '1',
