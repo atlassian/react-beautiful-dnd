@@ -95,18 +95,22 @@ const keyCodes = {
 export default class Task extends Component<Props> {
   // Using onKeyUp so that we did not need to monkey patch onKeyDown
   onKeyUp = (event: KeyboardEvent, snapshot: DraggableStateSnapshot) => {
-    if (event.keyCode === keyCodes.enter) {
-      const {
-        task,
-        toggleSelection,
-      } = this.props;
-
-      if (snapshot.isDragging) {
-        return;
-      }
-
-      toggleSelection(task.id);
+    if (event.keyCode !== keyCodes.enter) {
+      return;
     }
+
+    const {
+      task,
+      toggleSelection,
+    } = this.props;
+
+    if (snapshot.isDragging) {
+      return;
+    }
+
+    // we are using the event
+    event.preventDefault();
+    toggleSelection(task.id);
   }
 
   // Using onClick as it will be correctly
@@ -127,9 +131,8 @@ export default class Task extends Component<Props> {
       return;
     }
 
+    // marking the event as used
     event.preventDefault();
-    // Stopping the event so that it is not picked up by our window click handler
-    event.stopPropagation();
 
     const wasShiftKeyUsed: boolean = event.shiftKey;
 

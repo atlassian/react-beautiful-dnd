@@ -25,7 +25,7 @@ type State = {|
 |}
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
-const primaryButton = 0;
+const primaryButton: number = 0;
 const noop = () => { };
 
 // shared management of mousedown without needing to call preventDefault()

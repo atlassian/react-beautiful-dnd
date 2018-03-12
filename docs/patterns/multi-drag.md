@@ -1,74 +1,84 @@
 # Mutli drag pattern
 
-Dragging multiple `Draggable`s at once (multi drag) is currently a pattern that needs to be built on top of `react-beautiful-dnd`. We have not baked the interaction into the library itself. This is done because a multi drag experience introduces a lot of concepts and decisions that are not required for standard list reordering. This page is designed to guide you through building your own mutil drag experience to your `react-beautiful-dnd` lists.
+> This page is designed to guide you through adding your own mutli drag experience to your `react-beautiful-dnd` lists.
 
-We have create **two** reference applications which implement the multi drag pattern.
+Dragging multiple `Draggable`s at once (multi drag) is currently a pattern that needs to be built on top of `react-beautiful-dnd`. We have not included the interaction into the library itself. This is done because a multi drag experience introduces a lot of concepts, decisions and opinions. However, we have done a lot of work to ensure there is a standard base of [dom event management](/docs/guides/how-we-use-dom-events.md) to build on.
 
-1. Simple example
+We have created a [reference application](TODO) ([source](TODO)) which implements the multi drag pattern. The application is fairly basic and does not handle performance in large lists well. As such, there is are [a few performance recommendations](TODO) that we suggest you also add on to our reference application if you want to support lists greater than 50 in size.
 
-This example is fairly simple and should be fine for lists with small amounts of data (less than 50 items). This example is great to introduce yourself to the concepts of the pattern without getting distracted by performance optimisation techniques.
+## Experience
 
-2. Performant example
+We have decided on a simple, but very flexible and scalable mutli drag pattern to start with. It is not as *beautiful* as our standard drag interactions - but it is a great base to build from and will scale across many problem spaces.
 
-This example addresses some of the main performance bottleknecks of the first approach.
+## User experience
+
+We can break the user experience down in three phases.
+
+1. [**Selection**](#selection): The user selects one or more items.
+2. [**Dragging**](#dragging): The user drags one item as a representation of the whole group.
+3. [**Reordering**](#reordering): The user drops an item into a new location. We move all of the selected items into the new location
 
 ## Selection
 
-The core experience that needs to be built to enable a multi drag experience is *selection management*. This is an interaction that occurs *before a drag has started*. The user selects one or more `Draggable`s using a variety of selection techniques.
+Before a drag starts we need to allow the user to *optionally* select a number of `Draggable`s to drag. We an item is selected you should apply a style update to the `Draggable` such as a background color change to indicate that the item is selected.
 
-Here are our recommended interactions:
+### Selection interaction recommendations
 
-### Mouse
+> These are based on the Mac OSX [*Finder*](https://support.apple.com/en-au/HT201732).
 
-#### `onClick` on *drag handle*
+### Action: toggle section
 
-- `click`: toggle the selected state of the `Draggable`. This should clear any other previously selected items
-- `click + event.metaKey`: if a meta key is used while a click occurs pressed then add / remove the `Draggable` from the list of selected items.
-- only update the selection if the user is using the primary mouse button `event.button === 0`.
-- if updating the selection then call `event.preventDefault()` and `event.stopPropagation()` to stop the default behaviour of the click and to stop the event moving up the DOM tree
+If a user clicks on an item the selected state of the item should be toggled. Additionally, the selected state of the item should be updated when the user presses **enter** key. The **enter** key is quite nice because we do not use it for lifting or dropping - we use **space** for those.
+
+#### `onClick` event handler
+
+- Attach an `onClick` handler to your *drag handle* or `Draggable`
+- Only toggle selection if the user is using the [`primaryButton`](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button) (`event.button === 0`)
+- Prevent the default action on the `click` as you are using it for selection (it is only useful to call `event.preventDefault()` for [selection clearing](TODO)).
+
+#### `onKeyUp` event handler
+
+- Attach an `onKeyUp` handler to your *drag handle* or `Draggable`. You could apply a `onKeyDown` but if you are applying it to a *drag handle* you will need to monkey patch the `DragHandleProvided > onKeyDown` event.
+- Prevent the default action on the `onKeyUp` if you are toggling selection as you are using it for selection
+
+#### Toggle selection impact
+
+- If the item was not previously selected - make it the only selected item
+- If the item was previously selected **and was not a part** of a selection group: unselect the item
+- If the item was previous selected **and was a part** of a selection group: make it the only selected item
+
+### Action: toggle selection in a group
+
+This is providing the ability for a user to add or remove items to a selection group.
+
+#### `onClick` event handler
+
+- Use the same `onClick` event handler you used for [toggle selection](#toggle-section).
+- If the [meta key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey) was used in addition to the click then toggle the selection in the group
+
+> Note: On Macintosh keyboards, this is the `⌘ Command` key. On Windows keyboards, this is the Windows key (`⊞ Windows`) - [MDN](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey)
 
 ```js
-onClick = (event: MouseEvent) => {
-    const {
-      isSelected,
-      task,
-      addToSelection,
-      removeFromSelection,
-      unselect,
-      select,
-    } = this.props;
+const wasMetaKeyUsed: boolean = event.metaKey;
 
-    const primaryButton: number = 0;
-
-    // Not performing selection management if not using the
-    // primary mouse button
-    if (event.button !== primaryButton) {
-      return;
-    }
-
-    event.preventDefault();
-    // Stopping the event so that it is not picked up by our window click handler
-    event.stopPropagation();
-
-    const wasMetaKeyUsed: boolean = event.metaKey;
-
-    if (wasMetaKeyUsed) {
-      if (isSelected) {
-        removeFromSelection(task.id);
-        return;
-      }
-      addToSelection(task.id);
-      return;
-    }
-
-    if (isSelected) {
-      unselect(task.id);
-      return;
-    }
-
-    select(task.id);
-  };
+if (wasMetaKeyUsed) {
+  toggleSelectionInGroup(task.id);
+  return;
+}
 ```
+
+#### Toggle selection in a group impact
+
+- If the item was not selected then add the item to the selected items
+- If the item was previously selected then remove it from the selected items.
+
+### Action: mutli select to
+
+The ability to click on an item further down a list and select everything inbetween.
+
+#### `onClick` event handler
+
+
 
 #### `window` `click` handler
 
