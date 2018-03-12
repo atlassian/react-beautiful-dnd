@@ -307,7 +307,7 @@ describe('Draggable - unconnected', () => {
   describe('drag handle', () => {
     // we need to unmount after each test to avoid
     // cross EventMarshal contamination
-    let managedWrapper: ?ReactWrapper = null;
+    let managedWrapper: ReactWrapper;
 
     const startDragWithHandle = (wrapper: ReactWrapper) => ({
       selection = origin,

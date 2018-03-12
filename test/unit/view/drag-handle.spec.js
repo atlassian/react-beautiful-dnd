@@ -440,12 +440,14 @@ describe('drag handle', () => {
                 const mouseDownMock: MockEvent = createMockEvent();
                 mouseDown(wrapper, origin, auxiliaryButton, mouseDownMock);
                 // not moved enough yet
-                const preMouseMove: MouseEvent = windowMouseMove({ x: 0, y: sloppyClickThreshold - 1 });
+                const preMouseMove: MouseEvent =
+                  windowMouseMove({ x: 0, y: sloppyClickThreshold - 1 });
                 // cancelling
                 const keyDown: KeyboardEvent = dispatchWindowKeyDownEvent(keyCodes[key]);
 
                 // should normally start a drag
-                const postMouseMove: MouseEvent = windowMouseMove({ x: 0, y: sloppyClickThreshold });
+                const postMouseMove: MouseEvent =
+                  windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
                 // should normally end a drag
                 const postMouseUp: MouseEvent = windowMouseUp();
@@ -2323,25 +2325,25 @@ describe('drag handle', () => {
         start();
 
         // cancel drag
-        const keydown: KeyboardEvent = windowEscape();
+        const keyDownEvent: KeyboardEvent = windowEscape();
         expect(callbacksCalled(callbacks)({
           onLift: 1,
           onCancel: 1,
         })).toBe(true);
 
         // post drag
-        const move: Event = windowTouchMove();
-        const end: Event = windowTouchEnd();
+        const moveEvent: Event = windowTouchMove();
+        const endEvent: Event = windowTouchEnd();
         // and a click
-        const click: MouseEvent = windowMouseClick();
+        const clickEvent: MouseEvent = windowMouseClick();
 
         // a direct cancel has its default action prevented
-        expect(keydown.defaultPrevented).toBe(true);
+        expect(keyDownEvent.defaultPrevented).toBe(true);
         // events no longer being controlled
-        expect(move.defaultPrevented).toBe(false);
-        expect(end.defaultPrevented).toBe(false);
+        expect(moveEvent.defaultPrevented).toBe(false);
+        expect(endEvent.defaultPrevented).toBe(false);
         // but we still block the final click
-        expect(click.defaultPrevented).toBe(true);
+        expect(clickEvent.defaultPrevented).toBe(true);
       });
 
       it('should cancel a drag if unmounted', () => {
