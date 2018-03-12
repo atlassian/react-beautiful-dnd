@@ -25,7 +25,7 @@ const isAnInteractiveElement = (parent: Element, current: ?Element): boolean => 
   // See 'Permitted content' on https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button
   // Rather than having two different functions we can consolidate our checks into this single
   // function to keep things simple.
-  // There is no harm checking if the parent is has an interactive tag name even if it cannot have
+  // There is no harm checking if the parent has an interactive tag name even if it cannot have
   // any children. We need to perform this loop anyway to check for the contenteditable attribute
   const hasAnInteractiveTag: boolean = Boolean(interactiveTagNames[current.tagName.toLowerCase()]);
 
