@@ -22,6 +22,7 @@ import type {
 import getCenterPosition from '../get-center-position';
 import Placeholder from '../placeholder';
 import { droppableIdKey, styleContextKey } from '../context-keys';
+import * as timings from '../../debug/timings';
 import type {
   Props,
   Provided,
@@ -104,6 +105,7 @@ export default class Draggable extends Component<Props, State> {
   }
 
   onLift = (options: {client: Position, autoScrollMode: AutoScrollMode}) => {
+    timings.start('LIFT');
     this.throwIfCannotDrag();
     const { client, autoScrollMode } = options;
     const { lift, draggableId } = this.props;

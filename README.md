@@ -194,13 +194,15 @@ See our [screen reader guide](docs/guides/screen-reader.md) for a guide on craft
 
 ## Mouse dragging
 
-### Sloppy clicks and click blocking 🐱🎁
+### Sloppy clicks and click prevention 🐱🎁
 
-When a user presses the mouse down on an element, we cannot determine if the user was clicking or dragging. Also, sometimes when a user clicks they can move the cursor slightly — a sloppy click. So we only start a drag once the user has moved beyond a certain distance with the mouse down (the drag threshold) — more than they would if they were just making a sloppy click. If the drag threshold is not exceeded then the user interaction behaves just like a regular click. If the drag threshold is exceeded then the interaction will be classified as a drag and the standard click action will not occur.
+When a user presses the mouse down on an element, we cannot determine if the user was clicking or dragging. Also, sometimes when a user clicks they can move the cursor slightly — a sloppy click. So we only start a drag once the user has moved beyond a certain distance with the mouse down (the drag threshold) — more than they would if they were just making a sloppy click. If the drag threshold is not exceeded then the user interaction behaves just like a regular click. If the drag threshold is exceeded then the interaction will be classified as a drag and the standard click behaviour will not occur.
 
 This allows consumers to wrap interactive elements such as an anchor and have it be both a standard anchor as well as a draggable item in a natural way.
 
 (🐱🎁 is a [schrodinger's cat](https://www.youtube.com/watch?v=IOYyCHGWJq4) joke)
+
+> To see more indepth information about how we impact standard browser events see our [how we use DOM events guide](docs/guides/how-we-use-dom-events.md)
 
 ### Keyboard shortcuts: mouse dragging
 
@@ -210,16 +212,18 @@ When a drag **is occurring** with a *mouse* the user is able to execute the foll
 
 - **escape** <kbd>esc</kbd> - cancel the drag
 
-During a mouse drag the following standard keyboard events are blocked to prevent a bad experience:
+During a mouse drag the following standard keyboard events are prevented to prevent a bad experience:
 
-- **tab** <kbd>tab ↹</kbd> - blocking tabbing
-- **enter** <kbd>⏎</kbd> - blocking submission
+- **tab** <kbd>tab ↹</kbd> - preventing tabbing
+- **enter** <kbd>⏎</kbd> - preventing submission
 
-Other than these explicitly blocked keyboard events all standard keyboard events should work as expected.
+Other than these explicitly prevented keyboard events all standard keyboard events should work as expected.
 
 ## Keyboard dragging
 
 `react-beautiful-dnd` supports dragging with only a keyboard. We have audited how our keyboard shortcuts interact with standard browser keyboard interactions. When the user is not dragging they can use their keyboard as they normally would. While dragging we override and disable certain browser shortcuts (such as `tab`) to ensure a fluid experience for the user.
+
+> To see more indepth information about how we impact standard browser events see our [how we use DOM events guide](docs/guides/how-we-use-dom-events.md)
 
 ### Keyboard shortcuts: keyboard dragging
 
@@ -246,10 +250,10 @@ The following commands are also available but they depend on the `type` of `Drop
 - **Right arrow** <kbd>→</kbd> - move a `Draggable` to the *right* in the current `Droppable`
 - **Left arrow** <kbd>←</kbd> - move a `Draggable` to the *left* in the current `Droppable`
 
-During a drag the following standard keyboard events are blocked to prevent a bad experience:
+During a drag the following standard keyboard events have their default behaviour prevented (through `event.preventDefault()`) to avoid a bad experience:
 
-- **tab** <kbd>tab ↹</kbd> - blocking tabbing
-- **enter** <kbd>⏎</kbd> - blocking submission
+- **tab** <kbd>tab ↹</kbd> - preventing tabbing
+- **enter** <kbd>⏎</kbd> - preventing submission
 
 ## Touch dragging
 
@@ -262,6 +266,8 @@ During a drag the following standard keyboard events are blocked to prevent a ba
 ### Understanding intention: tap, force press, scroll and drag
 
 When a user presses their finger (or other input) on a `Draggable` we are not sure if they where intending to *tap*, *force press*, *scroll the container* or *drag*. **As much as possible `react-beautiful-dnd` aims to ensure that a users default interaction experience remains unaffected**.
+
+> To see more indepth information about how we impact standard browser events see our [how we use DOM events guide](docs/guides/how-we-use-dom-events.md)
 
 ### Starting a drag: long press
 
@@ -1118,8 +1124,7 @@ type DragHandleProps = {|
   'aria-roledescription': string,
   tabIndex: number,
   draggable: boolean,
-  onDragStart: () => boolean,
-  onDrop: () => boolean
+  onDragStart: (event: DragEvent) => void,
 |}
 ```
 
@@ -1256,7 +1261,7 @@ The `children` function is also provided with a small amount of state relating t
 
 ### Adding an `onClick` handler to a `Draggable` or a *drag handle*
 
-You are welcome to add your own `onClick` handler to a `Draggable` or a *drag handle* (which might be the same element). `onClick` events handlers will only be called if we do not block the click. We block click events from occurring when the user was dragging an item. See [#sloppy-clicks-and-click-blocking-](sloppy clicks and click blocking) for more information.
+You are welcome to add your own `onClick` handler to a `Draggable` or a *drag handle* (which might be the same element). `onClick` events handlers will always be called if a click occurred. If we are preventing the click then we the `event.defaultPrevented` property will be set to `true`. We prevent click events from occurring when the user was dragging an item. See [#sloppy-clicks-and-click-prevention-](sloppy clicks and click prevention) for more information.
 
 ### Interactive child elements within a `Draggable`
 
@@ -1385,8 +1390,7 @@ type DragHandleProps = {|
   'aria-roledescription': string,
   tabIndex: number,
   draggable: boolean,
-  onDragStart: () => boolean,
-  onDrop: () => boolean
+  onDragStart: (event: DragEvent) => void,
 |}
 ```
 
