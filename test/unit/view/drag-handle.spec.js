@@ -2826,60 +2826,28 @@ describe('drag handle', () => {
             ...Object.keys(map).map((tagName: string) => tagName.toUpperCase()),
           ];
 
-          it('should not start a drag if the target is an interactive element', () => {
-            mixedCase(interactiveTagNames).forEach((tagName: string) => {
-              const element: HTMLElement = document.createElement(tagName);
-              const options = {
-                target: element,
-              };
+          describe('interactive elements', () => {
+            it('should not start a drag if the target is an interactive element', () => {
+              mixedCase(interactiveTagNames).forEach((tagName: string) => {
+                const element: HTMLElement = document.createElement(tagName);
+                const options = {
+                  target: element,
+                };
 
-              control.preLift(wrapper, options);
-              control.lift(wrapper, options);
+                control.preLift(wrapper, options);
+                control.lift(wrapper, options);
 
-              expect(callbacksCalled(callbacks)({
-                onLift: 0,
-              })).toBe(true);
+                expect(callbacksCalled(callbacks)({
+                  onLift: 0,
+                })).toBe(true);
+              });
             });
-          });
 
-          it('should start a drag on an interactive element if asked to by user', () => {
-            // allowing dragging from interactive elements
-            wrapper.setProps({ canDragInteractiveElements: true });
+            it('should start a drag on an interactive element if asked to by user', () => {
+              // allowing dragging from interactive elements
+              wrapper.setProps({ canDragInteractiveElements: true });
 
-            mixedCase(interactiveTagNames).forEach((tagName: string, index: number) => {
-              const element: HTMLElement = document.createElement(tagName);
-              const options = {
-                target: element,
-              };
-
-              control.preLift(wrapper, options);
-              control.lift(wrapper, options);
-              control.drop(wrapper);
-
-              expect(callbacksCalled(callbacks)({
-                onLift: index + 1,
-                onDrop: index + 1,
-              })).toBe(true);
-            });
-          });
-
-          it('should start a drag if the target is not an interactive element', () => {
-            const nonInteractiveTagNames: TagNameMap = {
-              a: true,
-              div: true,
-              span: true,
-              header: true,
-            };
-
-            // counting call count between loops
-            let count: number = 0;
-
-            [true, false].forEach((bool: boolean) => {
-              // doesn't matter if this is set or not
-              wrapper.setProps({ canDragInteractiveElements: bool });
-
-              mixedCase(nonInteractiveTagNames).forEach((tagName: string) => {
-                count++;
+              mixedCase(interactiveTagNames).forEach((tagName: string, index: number) => {
                 const element: HTMLElement = document.createElement(tagName);
                 const options = {
                   target: element,
@@ -2890,48 +2858,125 @@ describe('drag handle', () => {
                 control.drop(wrapper);
 
                 expect(callbacksCalled(callbacks)({
-                  onLift: count,
-                  onDrop: count,
+                  onLift: index + 1,
+                  onDrop: index + 1,
                 })).toBe(true);
               });
             });
+
+            it('should start a drag if the target is not an interactive element', () => {
+              const nonInteractiveTagNames: TagNameMap = {
+                a: true,
+                div: true,
+                span: true,
+                header: true,
+              };
+
+              // counting call count between loops
+              let count: number = 0;
+
+              [true, false].forEach((bool: boolean) => {
+                // doesn't matter if this is set or not
+                wrapper.setProps({ canDragInteractiveElements: bool });
+
+                mixedCase(nonInteractiveTagNames).forEach((tagName: string) => {
+                  count++;
+                  const element: HTMLElement = document.createElement(tagName);
+                  const options = {
+                    target: element,
+                  };
+
+                  control.preLift(wrapper, options);
+                  control.lift(wrapper, options);
+                  control.drop(wrapper);
+
+                  expect(callbacksCalled(callbacks)({
+                    onLift: count,
+                    onDrop: count,
+                  })).toBe(true);
+                });
+              });
+            });
           });
-        });
 
-        describe('something else already dragging', () => {
-          it('should not start a drag if something else is already dragging in the system', () => {
-            // faking a 'false' response
-            const canLift = jest.fn().mockImplementation(() => false);
-            const customContext = {
-              ...basicContext,
-              [canLiftContextKey]: canLift,
-            };
-            const customCallbacks = getStubCallbacks();
-            const customWrapper = mount(
-              <DragHandle
-                draggableId={draggableId}
-                callbacks={customCallbacks}
-                isDragging={false}
-                isEnabled
-                direction={null}
-                getDraggableRef={() => singleRef}
-                canDragInteractiveElements={false}
-              >
-                {(dragHandleProps: ?DragHandleProps) => (
-                  <Child dragHandleProps={dragHandleProps} />
-                )}
-              </DragHandle>,
-              { context: customContext }
-            );
+          describe('interactive parents', () => {
+            it('should not start a drag if the parent is an interactive element', () => {
+              mixedCase(interactiveTagNames).forEach((tagName: string) => {
+                const parent: HTMLElement = document.createElement(tagName);
+                const child: HTMLElement = document.createElement('span');
+                parent.appendChild(child);
+                const options = {
+                  target: child,
+                };
 
-            control.preLift(customWrapper);
-            control.lift(customWrapper);
-            control.drop(customWrapper);
+                control.preLift(wrapper, options);
+                control.lift(wrapper, options);
+                control.drop(wrapper);
 
-            expect(callbacksCalled(customCallbacks)({
-              onLift: 0,
-            })).toBe(true);
-            expect(canLift).toHaveBeenCalledWith(draggableId);
+                expect(callbacksCalled(callbacks)({
+                  onLift: 0,
+                })).toBe(true);
+              });
+            });
+
+            it('should start a drag on an element with an interactive parent if asked to by user', () => {
+              // allowing dragging from interactive elements
+              wrapper.setProps({ canDragInteractiveElements: true });
+
+              mixedCase(interactiveTagNames).forEach((tagName: string, index: number) => {
+                const parent: HTMLElement = document.createElement(tagName);
+                const child: HTMLElement = document.createElement('span');
+                parent.appendChild(child);
+                const options = {
+                  target: child,
+                };
+
+                control.preLift(wrapper, options);
+                control.lift(wrapper, options);
+                control.drop(wrapper);
+
+                expect(callbacksCalled(callbacks)({
+                  onLift: index + 1,
+                  onDrop: index + 1,
+                })).toBe(true);
+              });
+            });
+
+            it('should start a drag if the target has no interactive parents', () => {
+              const nonInteractiveTagNames: TagNameMap = {
+                a: true,
+                div: true,
+                span: true,
+                header: true,
+              };
+
+              // counting call count between loops
+              let count: number = 0;
+
+              [true, false].forEach((bool: boolean) => {
+                // doesn't matter if this is set or not
+                wrapper.setProps({ canDragInteractiveElements: bool });
+
+                mixedCase(nonInteractiveTagNames).forEach((tagName: string) => {
+                  count++;
+                  const parent: HTMLElement = document.createElement(tagName);
+                  const child: HTMLElement = document.createElement('span');
+                  parent.appendChild(child);
+                  const options = {
+                    target: child,
+                  };
+
+                  control.preLift(wrapper, options);
+                  control.lift(wrapper, options);
+                  control.drop(wrapper);
+
+                  expect(callbacksCalled(callbacks)({
+                    onLift: count,
+                    onDrop: count,
+                  })).toBe(true);
+                });
+              });
+            });
           });
         });
 
@@ -3185,6 +3230,43 @@ describe('drag handle', () => {
                 onDrop: 1,
               })).toBe(true);
             });
+          });
+        });
+
+        describe('something else already dragging', () => {
+          it('should not start a drag if something else is already dragging in the system', () => {
+            // faking a 'false' response
+            const canLift = jest.fn().mockImplementation(() => false);
+            const customContext = {
+              ...basicContext,
+              [canLiftContextKey]: canLift,
+            };
+            const customCallbacks = getStubCallbacks();
+            const customWrapper = mount(
+              <DragHandle
+                draggableId={draggableId}
+                callbacks={customCallbacks}
+                isDragging={false}
+                isEnabled
+                direction={null}
+                getDraggableRef={() => singleRef}
+                canDragInteractiveElements={false}
+              >
+                {(dragHandleProps: ?DragHandleProps) => (
+                  <Child dragHandleProps={dragHandleProps} />
+                )}
+              </DragHandle>,
+              { context: customContext }
+            );
+
+            control.preLift(customWrapper);
+            control.lift(customWrapper);
+            control.drop(customWrapper);
+
+            expect(callbacksCalled(customCallbacks)({
+              onLift: 0,
+            })).toBe(true);
+            expect(canLift).toHaveBeenCalledWith(draggableId);
           });
         });
 

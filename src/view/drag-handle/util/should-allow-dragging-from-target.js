@@ -16,15 +16,26 @@ export const interactiveTagNames: TagNameMap = {
   audio: true,
 };
 
-const isContentEditable = (parent: Element, current: ?Element): boolean => {
+const isAnInteractiveElement = (parent: Element, current: ?Element): boolean => {
   if (current == null) {
     return false;
+  }
+
+  // Most interactive elements cannot have children. However, some can such as 'button'.
+  // See 'Permitted content' on https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button
+  // Rather than having two different functions we can consolidate our checks into this single
+  // function to keep things simple.
+  // There is no harm checking if the parent has an interactive tag name even if it cannot have
+  // any children. We need to perform this loop anyway to check for the contenteditable attribute
+  const hasAnInteractiveTag: boolean = Boolean(interactiveTagNames[current.tagName.toLowerCase()]);
+
+  if (hasAnInteractiveTag) {
+    return true;
   }
 
   // contenteditable="true" or contenteditable="" are valid ways
   // of creating a contenteditable container
   // https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/contenteditable
-
   const attribute: ?string = current.getAttribute('contenteditable');
   if (attribute === 'true' || attribute === '') {
     return true;
@@ -36,7 +47,7 @@ const isContentEditable = (parent: Element, current: ?Element): boolean => {
   }
 
   // recursion to check parent
-  return isContentEditable(parent, current.parentElement);
+  return isAnInteractiveElement(parent, current.parentElement);
 };
 
 export default (event: Event, props: Props): boolean => {
@@ -52,17 +63,6 @@ export default (event: Event, props: Props): boolean => {
     return true;
   }
 
-  const isTargetInteractive: boolean = Boolean(interactiveTagNames[target.tagName.toLowerCase()]);
-
-  if (isTargetInteractive) {
-    return false;
-  }
-
-  // Need to see if any element between event.target and event.currentTarget (inclusive)
-  // is contenteditable. A contenteditable element can contain other elements
-  // - event.currentTarget = the drag handle
-  // - event.target = the node that was interacted with (can be a child of the drag handle)
-
-  return !isContentEditable(currentTarget, target);
+  return !isAnInteractiveElement(currentTarget, target);
 };
 
