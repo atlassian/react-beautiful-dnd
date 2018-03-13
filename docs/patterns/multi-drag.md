@@ -215,13 +215,23 @@ We add a `click` handler to the `window` to detect for a click that is not on a 
 
 This event handler operates in a similar way to the *`window` `click` handler* described above. If a `keydown` event that is not prevented and is the **escape** key then we clear the current selection. The **escape** `keydown` event will be prevented if it is used to cancel a drag.
 
-### Action: Item walking
+### Mobile selection
+
+Rather than performing a 'toggle selection' action when the user presses an item using a touch input, the 'toggle selection in group' should be performed. On a touch device there is no way of adding extra input such as a `metaKey` or `shiftKey`.
+
+You can use the `onTouchEnd` event on the element to trigger this action. As with the other handlers - only trigger a selection changed if the `event.defaultPrevented` property is `false`. When fire an action be sure to call `event.preventDefault()` to mark the event as used.
+
+You will also want to add a `window` `touchend` handler which works in the same way as the `click` and `keydown` `window` handlers. This handler will be used to unselect everything when the user performs a `touchend` that is not a part of a drag or a selection.
+
+We use `touchend` because that is part of the drag and drop lifecycle. We do not call `preventDefault()` on a `touchstart` as we do not know at that point if the event is a part of a drag or not. [More information](/docs/guides/how-we-use-dom-events.md).
+
+### Action: tem walking
 
 > This is not implemented in our reference application
 
 You are welcome to build a selection walking keyboard interaction pattern. You could use the arrow keys (<kbd>↑</kbd> <kbd>↓</kbd> <kbd>→</kbd> <kbd>←</kbd>) to move the selection around. Ideally these movements would also shift browser focus so that a user can press **spacebar** <kbd>space</kbd> to lift immediately.
 
-### Action Mouse selection box
+### Action: mouse selection box
 
 > This is not implemented in our reference application
 

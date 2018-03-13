@@ -154,6 +154,18 @@ export default class Task extends Component<Props> {
     this.performAction(wasMetaKeyUsed, wasShiftKeyUsed);
   };
 
+  onTouchEnd = (event: TouchEvent) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+
+    // marking the event as used
+    // we would also need to add some extra logic to prevent the click
+    // if this element was an anchor
+    event.preventDefault();
+    this.props.toggleSelectionInGroup(this.props.task.id);
+  }
+
   performAction = (wasMetaKeyUsed: boolean, wasShiftKeyUsed: boolean) => {
     const {
       task,
@@ -193,6 +205,7 @@ export default class Task extends Component<Props> {
                 {...provided.draggableProps}
                 {...provided.dragHandleProps}
                 onClick={this.onClick}
+                onTouchEnd={this.onTouchEnd}
                 onKeyDown={(event: KeyboardEvent) => this.onKeyDown(event, provided, snapshot)}
                 isDragging={snapshot.isDragging}
                 isSelected={isSelected}

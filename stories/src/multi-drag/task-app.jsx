@@ -36,11 +36,13 @@ export default class TaskApp extends Component<*, State> {
   componentDidMount() {
     window.addEventListener('click', this.onWindowClick);
     window.addEventListener('keydown', this.onWindowKeyDown);
+    window.addEventListener('touchend', this.onWindowTouchEnd);
   }
 
   componentWillUnmount() {
     window.removeEventListener('click', this.onWindowClick);
     window.removeEventListener('keydown', this.onWindowKeyDown);
+    window.removeEventListener('touchend', this.onWindowTouchEnd);
   }
 
   onDragStart = (start: DragStart) => {
@@ -92,6 +94,13 @@ export default class TaskApp extends Component<*, State> {
   }
 
   onWindowClick = (event: KeyboardEvent) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+    this.unselectAll();
+  }
+
+  onWindowTouchEnd = (event: TouchEvent) => {
     if (event.defaultPrevented) {
       return;
     }
