@@ -25,7 +25,7 @@ type State = {|
 |}
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
-const primaryButton = 0;
+const primaryButton: number = 0;
 const noop = () => { };
 
 // shared management of mousedown without needing to call preventDefault()
@@ -256,9 +256,15 @@ export default ({
     // Registering that this event has been handled.
     // This is to prevent parent draggables using this event
     // to start also.
-    // Not using preventDefault() as we are not sure
+    // Ideally we would not use preventDefault() as we are not sure
     // if this mouse down is part of a drag interaction
+    // Unfortunately we do to prevent the element obtaining focus (see below).
     mouseDownMarshal.handle();
+
+    // Unfortunately we do need to prevent the drag handle from getting focus on mousedown.
+    // This goes against our policy on not blocking events before a drag has started.
+    // See [How we use dom events](/docs/guides/how-we-use-dom-events.md).
+    event.preventDefault();
 
     const point: Position = {
       x: clientX,

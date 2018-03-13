@@ -170,7 +170,7 @@ export default class DragDropContext extends React.Component<Props> {
         this.styleMarshal.onPhaseChange(current);
       }
 
-      const isDragEnding: boolean = current.phase !== 'DRAGGING' && previousInThisExecution.phase === 'DRAGGING';
+      const isDragEnding: boolean = previousInThisExecution.phase === 'DRAGGING' && current.phase !== 'DRAGGING';
 
       // in the case that a drag is ending we need to instruct the dimension marshal
       // to stop listening to changes. Otherwise it will try to process

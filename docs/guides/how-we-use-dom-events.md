@@ -56,9 +56,11 @@ Some user events have a direct impact on a drag: such as a `mousemove` when drag
 
 ### Initial `mousedown`
 
-- `preventDefault()` not called on `mousedown`
+- `preventDefault()` **is called on `mousedown`** 😞
 
-When the user first performs a `mousedown` on a *drag handle* we are not sure if they are intending to click or drag. Because at this stage we are not sure, we do not call `preventDefault()` on the event.
+> This is the only known exception to our rule set. It is unfortunate that it is the first one to appear in this guide!
+
+When the user first performs a `mousedown` on a *drag handle* we are not sure if they are intending to click or drag. Ideally we would not call `preventDefault()` on this event as we are not sure if it is a part of a drag. However, we need to call `preventDefault()` in order to avoid the item obtaining focus as it has a `tabIndex`.
 
 ### We are not sure yet if a drag will start
 

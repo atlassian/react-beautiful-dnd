@@ -1,5 +1,5 @@
 // @flow
-import type { Task } from './types';
+import type { Task } from '../types';
 
 const tasks: Task[] = [
   {
