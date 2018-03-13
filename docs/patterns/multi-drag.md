@@ -20,6 +20,10 @@ We can break the user experience down in three phases.
 2. [**Dragging**](#dragging): The user drags one item as a representation of the whole group.
 3. [**Dropping**](#dropping): The user drops an item into a new location. We move all of the selected items into the new location
 
+## Anouncements
+
+Keep in mind that internally `react-beautiful-dnd` is not aware of multi drag. Therefore it is advised that you use the `HookProvided > Announce` to announce meaningful screen reader messages for a multi drag.
+
 ## Selection
 
 Before a drag starts we need to allow the user to *optionally* select a number of `Draggable`s to drag. We an item is selected you should apply a style update to the `Draggable` such as a background color change to indicate that the item is selected.
