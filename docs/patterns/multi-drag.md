@@ -2,9 +2,11 @@
 
 > This page is designed to guide you through adding your own mutli drag experience to your `react-beautiful-dnd` lists.
 
-Dragging multiple `Draggable`s at once (multi drag) is currently a pattern that needs to be built on top of `react-beautiful-dnd`. We have not included the interaction into the library itself. This is done because a multi drag experience introduces a lot of concepts, decisions and opinions. However, we have done a lot of work to ensure there is a standard base of [dom event management](/docs/guides/how-we-use-dom-events.md) to build on.
+Dragging multiple `Draggable`s at once (multi drag) is currently a pattern that needs to be built on top of `react-beautiful-dnd`. We have not included the interaction into the library itself. This is done because a multi drag experience introduces a lot of concepts, decisions and opinions. We have done a lot of work to ensure there is a standard base of [dom event management](/docs/guides/how-we-use-dom-events.md) to build on.
 
 We have created a [reference application](TODO) ([source](TODO)) which implements the multi drag pattern. The application is fairly basic and does not handle performance in large lists well. As such, there is are [a few performance recommendations](TODO) that we suggest you also add on to our reference application if you want to support lists greater than 50 in size.
+
+![demo](https://user-images.githubusercontent.com/2182637/37322724-7843a218-26d3-11e8-9ebb-8d5853387bb3.gif)
 
 ## Experience
 
@@ -16,7 +18,7 @@ We can break the user experience down in three phases.
 
 1. [**Selection**](#selection): The user selects one or more items.
 2. [**Dragging**](#dragging): The user drags one item as a representation of the whole group.
-3. [**Reordering**](#reordering): The user drops an item into a new location. We move all of the selected items into the new location
+3. [**Dropping**](#dropping): The user drops an item into a new location. We move all of the selected items into the new location
 
 ## Selection
 
@@ -34,7 +36,7 @@ If a user clicks on an item the selected state of the item should be toggled. Ad
 
 - Attach an `onClick` handler to your *drag handle* or `Draggable`
 - Only toggle selection if the user is using the [`primaryButton`](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button) (`event.button === 0`)
-- Prevent the default action on the `click` as you are using it for selection (it is only useful to call `event.preventDefault()` for [selection clearing](TODO)).
+- Prevent the default action on the `click` as you are using it for selection (it is only useful to call `event.preventDefault()` to avoid *selection clearing*)
 
 #### Keyboard event handler
 
@@ -249,6 +251,14 @@ The goal is to move the selected items to their new location. We want to insert 
 1. Move the selected item to the first position
 2. Order the rest by their natural index
 
+## Action: item walking
+
+You are welcome to build a selection walking keyboard interaction pattern. You could use the arrow keys (<kbd>↑</kbd> <kbd>↓</kbd> <kbd>→</kbd> <kbd>←</kbd>) to move the selection around. Ideally these movements would also shift browser focus so that a user can press **spacebar** <kbd>space</kbd> to lift immediately.
+
+## Action: mouse selection box
+
+You could build your own abstraction (or use some elses) to add the idea of a selection box. You could use this to allow a user to drag a box around the items they want to select. [Example](http://threedubmedia.com/code/event/drop/demo/selection)
+
 ## Other: performance
 
 Doing a multi drag interaction in a performant way can be challenging. The core thing you want to do is to avoid calling `render()` on components that do not need to update. The current best practice for this is to use [`redux`](https://github.com/reactjs/redux) in combination with [`react-redux`](https://github.com/reactjs/react-redux), [`reselect`](https://github.com/reactjs/reselect) and [`memoize-one`](https://github.com/alexreardon/memoize-one). We recommend you take a look at these resources:
@@ -259,17 +269,16 @@ Doing a multi drag interaction in a performant way can be challenging. The core 
 
 ### Selection state change
 
-In response to a selection change you want to render the minimum amount of `Draggable` and `Droppable` components as possible. In our example application whenever the selection changes we re-render the entire tree. This approach will not scale.
+In response to a selection change you want to call `render` on the minimum amount of `Draggable` and `Droppable` components as possible. In our example application whenever the selection changes we re-render the entire tree. This approach will not scale. Therefore we suggest using the optimisations listed above.
 
-
-This approach is not complete. In the event of a 'unselect all action' you might need to render a lot of components at once to clear their selected styles. For most usages this will be fine. If you want to go further you will need to avoid calling `render` for selection style changes.
+In the event of a 'unselect all action' you might need to render a lot of components at once to clear their selected styles. For most usages this will be fine. If you want to go further you will need to avoid calling `render` for selection style changes.
 
 - You could look into using the [dynamic shared styles pattern](https://medium.com/@alexandereardon/dragging-react-performance-forward-688b30d40a33).
 - You could apply a **unique** data attribute to each item and then apply the *selected* style to it using selectors dynamically in a parent component.
 
 ### Drag count
 
-When dragging you need to display a count of the items that are dragging. In our example we provide this information down by re-rendering the tree. As with selection changes it would be good to only render the item that needs the change. You could publish this information down using `redux` and `redux-select`. You could use [unstated](https://github.com/jamiebuilds/unstated) or the new [React context](https://github.com/reactjs/rfcs/blob/master/text/0002-new-version-of-context.md) but this would trigger a render for all subscribers.
+When dragging you need to display a count of the items that are dragging. In our example we provide this information down by re-rendering the tree. As with selection changes it would be good to only render the item that needs the change. You could publish this information down using `redux` and `redux-select`. For this particular problem you might be able to get away with [`unstated`](https://github.com/jamiebuilds/unstated) or the new [React 16.3 `Context` api](https://github.com/reactjs/rfcs/blob/master/text/0002-new-version-of-context.md).
 
 ### Ghosting
 

@@ -28,31 +28,43 @@ type GetBackgroundColorArgs= {|
 
 const getBackgroundColor = ({
   isSelected,
-  isDragging,
   isGhosting,
 }: GetBackgroundColorArgs): string => {
-  if (isDragging) {
-    return colors.blue.light;
-  }
   if (isGhosting) {
-    return colors.green;
+    return colors.grey2.light;
   }
+
   if (isSelected) {
     return colors.blue.light;
   }
+
   return colors.grey2.light;
+};
+
+const getColor = ({
+  isSelected,
+  isGhosting,
+}): string => {
+  if (isGhosting) {
+    return 'darkgrey';
+  }
+  if (isSelected) {
+    return colors.blue.deep;
+  }
+  return colors.black;
 };
 
 const Container = styled.div`
   background-color: ${props => getBackgroundColor(props)};
-  color: ${props => (props.isSelected || props.isDragging ? colors.blue.deep : colors.black)};
+  color: ${props => getColor(props)};
   padding: ${grid}px;
   margin-bottom: ${grid}px;
   border-radius: ${borderRadius}px;4
   font-size: 18px;
+  border: 1px solid ${colors.shadow};
 
-  ${props => (props.isDragging ? `box-shadow: 1px 1px 1px grey; background: ${colors.blue.light};` : '')}
-  ${props => (!props.isDragging && props.isGhosting ? 'opacity: 0.8;' : '')}
+  ${props => (props.isDragging ? `box-shadow: 2px 2px 1px ${colors.shadow};` : '')}
+  ${props => (props.isGhosting ? 'opacity: 0.8;' : '')}
 
   /* needed for SelectionCount */
   position: relative;
@@ -65,7 +77,7 @@ const Container = styled.div`
   &:focus {
     outline: none;
     /* TODO: also need to add dragging shadow */
-    box-shadow: 0 0 0 1px ${colors.blue.deep};
+    border-color: ${colors.blue.deep};
   }
 `;
 
@@ -176,26 +188,28 @@ export default class Task extends Component<Props> {
     const isGhosting: boolean = this.props.isGhosting;
     return (
       <Draggable draggableId={task.id} index={index}>
-        {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
-          <div>
-            <Container
-              innerRef={provided.innerRef}
-              {...provided.draggableProps}
-              {...provided.dragHandleProps}
-              onClick={this.onClick}
-              onKeyDown={(event: KeyboardEvent) => this.onKeyDown(event, provided, snapshot)}
-              isDragging={snapshot.isDragging}
-              isSelected={isSelected}
-              isGhosting={isGhosting}
-            >
-              <Content>{task.content}</Content>
-              {snapshot.isDragging && selectionCount > 1 ?
-                <SelectionCount>{selectionCount}</SelectionCount> : null
-              }
-            </Container>
-            {provided.placeholder}
-          </div>
-        )}
+        {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => {
+          const shouldShowSelection: boolean = snapshot.isDragging && selectionCount > 1;
+
+          return (
+            <div>
+              <Container
+                innerRef={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+                onClick={this.onClick}
+                onKeyDown={(event: KeyboardEvent) => this.onKeyDown(event, provided, snapshot)}
+                isDragging={snapshot.isDragging}
+                isSelected={isSelected}
+                isGhosting={isGhosting}
+              >
+                <Content>{task.content}</Content>
+                {shouldShowSelection ? <SelectionCount>{selectionCount}</SelectionCount> : null}
+              </Container>
+              {provided.placeholder}
+            </div>
+          );
+        }}
       </Draggable>
     );
   }

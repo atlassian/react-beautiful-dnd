@@ -14,7 +14,7 @@ type Props = {|
   tasks: TaskType[],
   selectedTaskIds: Id[],
   multiSelectTo: (taskId: Id) => void,
-  isSomethingDragging: boolean,
+  draggingTaskId: ?Id,
   toggleSelection: (taskId: Id) => void,
   toggleSelectionInGroup: (taskId: Id) => void,
   multiSelectTo: (taskId: Id) => void,
@@ -60,7 +60,7 @@ export default class Column extends Component<Props> {
     const column: ColumnType = this.props.column;
     const tasks: TaskType[] = this.props.tasks;
     const selectedTaskIds: Id[] = this.props.selectedTaskIds;
-    const isSomethingDragging: boolean = this.props.isSomethingDragging;
+    const draggingTaskId: ?Id = this.props.draggingTaskId;
     return (
       <Container>
         <Title>{column.title}</Title>
@@ -71,19 +71,24 @@ export default class Column extends Component<Props> {
               isDraggingOver={snapshot.isDraggingOver}
               {...provided.droppableProps}
             >
-              {tasks.map((task: TaskType, index: number) => (
-                <Task
-                  task={task}
-                  index={index}
-                  key={task.id}
-                  isSelected={Boolean(getSelectedMap(selectedTaskIds)[task.id])}
-                  isGhosting={getSelectedMap(selectedTaskIds)[task.id] && isSomethingDragging}
-                  selectionCount={selectedTaskIds.length}
-                  toggleSelection={this.props.toggleSelection}
-                  toggleSelectionInGroup={this.props.toggleSelectionInGroup}
-                  multiSelectTo={this.props.multiSelectTo}
-                />
-              ))}
+              {tasks.map((task: TaskType, index: number) => {
+                const isSelected: boolean = Boolean(getSelectedMap(selectedTaskIds)[task.id]);
+                const isGhosting: boolean =
+                  isSelected && Boolean(draggingTaskId) && draggingTaskId !== task.id;
+                return (
+                  <Task
+                    task={task}
+                    index={index}
+                    key={task.id}
+                    isSelected={isSelected}
+                    isGhosting={isGhosting}
+                    selectionCount={selectedTaskIds.length}
+                    toggleSelection={this.props.toggleSelection}
+                    toggleSelectionInGroup={this.props.toggleSelectionInGroup}
+                    multiSelectTo={this.props.multiSelectTo}
+                  />
+                );
+              })}
               {provided.placeholder}
             </TaskList>
           )}

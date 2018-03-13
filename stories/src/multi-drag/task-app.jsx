@@ -19,7 +19,7 @@ type State = {|
   entities: Entities,
   selectedTaskIds: Id[],
   // sad times
-  isDragging: boolean,
+  draggingTaskId: ?Id,
 |}
 
 const getTasks = (entities: Entities, columnId: Id): Task[] =>
@@ -30,7 +30,7 @@ export default class TaskApp extends Component<*, State> {
   state: State = {
     entities: initial,
     selectedTaskIds: [],
-    isDragging: false,
+    draggingTaskId: null,
   }
 
   componentDidMount() {
@@ -52,7 +52,7 @@ export default class TaskApp extends Component<*, State> {
       this.unselectAll();
     }
     this.setState({
-      isDragging: true,
+      draggingTaskId: start.draggableId,
     });
   }
 
@@ -63,7 +63,7 @@ export default class TaskApp extends Component<*, State> {
     // nothing to do
     if (!destination || result.reason === 'CANCEL') {
       this.setState({
-        isDragging: false,
+        draggingTaskId: null,
       });
       return;
     }
@@ -77,7 +77,7 @@ export default class TaskApp extends Component<*, State> {
 
     this.setState({
       ...processed,
-      isDragging: false,
+      draggingTaskId: null,
     });
   }
 
@@ -187,7 +187,7 @@ export default class TaskApp extends Component<*, State> {
               tasks={getTasks(entities, columnId)}
               selectedTaskIds={selected}
               key={columnId}
-              isSomethingDragging={this.state.isDragging}
+              draggingTaskId={this.state.draggingTaskId}
               toggleSelection={this.toggleSelection}
               toggleSelectionInGroup={this.toggleSelectionInGroup}
               multiSelectTo={this.multiSelectTo}
