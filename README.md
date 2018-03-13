@@ -309,6 +309,12 @@ class App extends React.Component {
 }
 ```
 
+## Multi drag
+
+We have created a [multi drag pattern](/docs/patterns/multi-drag.md) that you can build on top of `react-beautiful-dnd` in order to support dragging multiple `Draggable` items at once.
+
+![multi drag demo](https://user-images.githubusercontent.com/2182637/37322724-7843a218-26d3-11e8-9ebb-8d5853387bb3.gif)
+
 ## Preset styles
 
 We apply a number of non-visible styles to facilitate the dragging experience. We do this using combination of styling targets and techniques. It is a goal of the library to provide unopinioned styling. However, we do apply some reasonable `cursor` styling on drag handles by default. This is designed to make the library work as simply as possible out of the box. If you want to use your own cursors you are more than welcome to. All you need to do is override our cursor style rules by using a rule with [higher specificity](https://css-tricks.com/specifics-on-css-specificity/).
