@@ -1,6 +1,6 @@
 // @flow
 import type { Column, ColumnMap, Entities } from './types';
-import type { Task, Id } from '../types';
+import type { Id } from '../types';
 import type { DraggableLocation } from '../../../src/types';
 import reorder from '../reorder';
 
