@@ -209,18 +209,18 @@ This event handler operates in a similar way to the *`window` `click` handler* d
 
 ## Dragging
 
-Just before dragging we need to do one check in `onDragStart`. If the user is dragging something that is not selected then we need to clear the selection
+We need to do one check in `onDragStart`. If the user is starting to drag something that is not selected then we need to clear the selection.
 
 As the drag starts we need to add a few visual affordances:
 
-1. Add a count to the dragging item to indicate how many items this drag is represenative of
+1. Add a count to the dragging item to indicate how many items this drag is represenative of. If only a single item is dragging then do not show a count.
 2. Change the appearance of the selected items that are not dragging to a greyed out / disabled state.
 
-We do not remove the selected items from the list. If we remove the items completely that can change the dimensions of the list which can lead to list collapsing and scroll jumps. If we leave them in the list and just make them invisible then there are these big blank sections in a list that have no meaning and can be confusing to interact with.
+We do not remove the selected items from the list. If we remove the items completely that can change the dimensions of the list which can lead to list collapsing and scroll jumps. If we leave them in the list and make them invisible then there are big blank sections in a list that have no meaning and can be confusing to interact with. Therefore we recommend leaving the items in the list and giving them a visual change.
 
 ## Dropping
 
-As much as possible we want to preserve the selection that the user had before the drag started. That way they could continue to move the same item or items around after the drag.
+As much as possible we want to preserve the selection that the user had before the drag started. That way they could continue to move the same items around after the drag.
 
 ### No change
 
@@ -251,16 +251,25 @@ The goal is to move the selected items to their new location. We want to insert 
 
 ## Other: performance
 
-Doing a multi drag interaction in a performant way can be challenging. The core thing you want to do is to avoid calling `render()` on components that do not need to update.
+Doing a multi drag interaction in a performant way can be challenging. The core thing you want to do is to avoid calling `render()` on components that do not need to update. The current best practice for this is to use [`redux`](https://github.com/reactjs/redux) in combination with [`react-redux`](https://github.com/reactjs/react-redux), [`reselect`](https://github.com/reactjs/reselect) and [`memoize-one`](https://github.com/alexreardon/memoize-one). We recommend you take a look at these resources:
+
+- [An introduction to React performance](https://medium.com/@alexandereardon/performance-optimisations-for-react-applications-b453c597b191)
+- [How `redux` can help you write fast apps](https://medium.com/@alexandereardon/performance-optimisations-for-react-applications-round-2-2042e5c9af97)
+- [Advanced optimisations](https://medium.com/@alexandereardon/dragging-react-performance-forward-688b30d40a33)
 
 ### Selection state change
 
-In response to a selection change you want to render the minimum amount of `Draggable` and `Droppable` components as possible. In our example application whenever the selection changes we re-render the entire tree. This approach will not scale. Right now the best solution for this is `redux` in combination with `react-redux`, `reselect` and `memoizeOne`. You would move your selection state into a store and have connected components that read their selection state from the store.
+In response to a selection change you want to render the minimum amount of `Draggable` and `Droppable` components as possible. In our example application whenever the selection changes we re-render the entire tree. This approach will not scale.
+
 
 This approach is not complete. In the event of a 'unselect all action' you might need to render a lot of components at once to clear their selected styles. For most usages this will be fine. If you want to go further you will need to avoid calling `render` for selection style changes.
 
 - You could look into using the [dynamic shared styles pattern](https://medium.com/@alexandereardon/dragging-react-performance-forward-688b30d40a33).
 - You could apply a **unique** data attribute to each item and then apply the *selected* style to it using selectors dynamically in a parent component.
+
+### Drag count
+
+When dragging you need to display a count of the items that are dragging. In our example we provide this information down by re-rendering the tree. As with selection changes it would be good to only render the item that needs the change. You could publish this information down using `redux` and `redux-select`. You could use [unstated](https://github.com/jamiebuilds/unstated) or the new [React context](https://github.com/reactjs/rfcs/blob/master/text/0002-new-version-of-context.md) but this would trigger a render for all subscribers.
 
 ### Ghosting
 
