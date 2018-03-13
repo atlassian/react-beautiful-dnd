@@ -36,6 +36,8 @@ Before a drag starts we need to allow the user to *optionally* select a number o
 
 If a user clicks on an item the selected state of the item should be toggled. Additionally, the selected state of the item should be updated when the user presses **enter** key. The **enter** key is quite nice because we do not use it for lifting or dropping - we use **space** for those.
 
+![toggle-selection](https://user-images.githubusercontent.com/2182637/37323080-6d67f04a-26d5-11e8-8bc1-8ff5178018bc.gif)
+
 #### `onClick` event handler
 
 - Attach an `onClick` handler to your *drag handle* or `Draggable`
@@ -59,6 +61,8 @@ If a user clicks on an item the selected state of the item should be toggled. Ad
 
 This is providing the ability for a user to add or remove items to a selection group.
 
+ ![toggle-selection-in-a-group](https://user-images.githubusercontent.com/2182637/37323084-73c31eec-26d5-11e8-8c5c-7a1fc82f098b.gif)
+
 #### Event handlers
 
 We perform this action if the user performs a `click` or presses the **enter** key in addition to holding the the [meta key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey).
@@ -70,7 +74,7 @@ We perform this action if the user performs a `click` or presses the **enter** k
 - If the item was not selected then add the item to the selected items
 - If the item was previously selected then remove it from the selected items.
 
-### Action: mutli select to
+### Action: mutli select
 
 The ability to click on an item further down a list and select everything inbetween.
 
@@ -78,9 +82,11 @@ The ability to click on an item further down a list and select everything inbetw
 
 We perform this action if the user performs a `click` or presses the **enter** key in addition to holding the the [shift key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/shiftKey).
 
-### Mutli select to: behaviour
+### Mutli select: behaviour
 
-This behaviour is the most complex. It deviates slightly from the `MacOSX` behaviour for simplicity.
+With this action the user is able to select multiple items using a single command. This behaviour is the most complex. It deviates slightly from the `MacOSX` behaviour for simplicity.
+
+![multi-select](https://user-images.githubusercontent.com/2182637/37323230-7a108d60-26d6-11e8-84b1-1a608bab3686.gif)
 
 #### Nothing was selected
 
@@ -209,10 +215,6 @@ We add a `click` handler to the `window` to detect for a click that is not on a 
 
 This event handler operates in a similar way to the *`window` `click` handler* described above. If a `keydown` event that is not prevented and is the **escape** key then we clear the current selection. The **escape** `keydown` event will be prevented if it is used to cancel a drag.
 
-### Putting it all together
-
-[DEMO]
-
 ## Dragging
 
 We need to do one check in `onDragStart`. If the user is starting to drag something that is not selected then we need to clear the selection.
@@ -255,11 +257,11 @@ The goal is to move the selected items to their new location. We want to insert 
 1. Move the selected item to the first position
 2. Order the rest by their natural index
 
-## Action: item walking
+## Item walking
 
 You are welcome to build a selection walking keyboard interaction pattern. You could use the arrow keys (<kbd>↑</kbd> <kbd>↓</kbd> <kbd>→</kbd> <kbd>←</kbd>) to move the selection around. Ideally these movements would also shift browser focus so that a user can press **spacebar** <kbd>space</kbd> to lift immediately.
 
-## Action: mouse selection box
+## Mouse selection box
 
 You could build your own abstraction (or use some elses) to add the idea of a selection box. You could use this to allow a user to drag a box around the items they want to select. [Example](http://threedubmedia.com/code/event/drop/demo/selection)
 
