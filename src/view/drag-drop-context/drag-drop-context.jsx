@@ -170,6 +170,15 @@ export default class DragDropContext extends React.Component<Props> {
         this.styleMarshal.onPhaseChange(current);
       }
 
+      const isDragEnding: boolean = current.phase !== 'DRAGGING' && previousInThisExecution.phase === 'DRAGGING';
+
+      // in the case that a drag is ending we need to instruct the dimension marshal
+      // to stop listening to changes. Otherwise it will try to process
+      // changes after the reorder in onDragEnd
+      if (isDragEnding) {
+        this.dimensionMarshal.onPhaseChange(current);
+      }
+
       // We recreate the Hook object so that consumers can pass in new
       // hook props at any time (eg if they are using arrow functions)
       const hooks: Hooks = {
@@ -183,7 +192,8 @@ export default class DragDropContext extends React.Component<Props> {
       // create new actions that update the application state. That will cause
       // this subscription function to be called again before the next line is called.
 
-      if (isPhaseChanging) {
+      // if isDragEnding we have already called the marshal
+      if (isPhaseChanging && !isDragEnding) {
         this.dimensionMarshal.onPhaseChange(current);
       }
 
