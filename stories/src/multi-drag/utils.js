@@ -203,7 +203,7 @@ const reorderMultiDrag = ({
   };
 };
 
-export const reorderBetweenColumns = (args: Args): Result => {
+export const mutliDragAwareReorder = (args: Args): Result => {
   if (args.selectedTaskIds.length > 1) {
     return reorderMultiDrag(args);
   }
