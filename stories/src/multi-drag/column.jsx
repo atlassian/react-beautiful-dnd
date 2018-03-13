@@ -24,8 +24,8 @@ const Container = styled.div`
   width: 300px;
   margin: ${grid}px;
   border-radius: ${borderRadius}px;
-  border: 1px solid ${colors.grey};
-  background-color: ${colors.grey2.medium};
+  border: 1px solid ${colors.grey.dark};
+  background-color: ${colors.grey.medium};
 
   /* we want the column to take up its full height */
   display: flex;
@@ -42,7 +42,7 @@ const TaskList = styled.div`
   min-height: 200px;
   flex-grow: 1;
   transition: background-color 0.2s ease;
-  ${props => (props.isDraggingOver ? `background-color: ${colors.grey2.darker}` : '')};
+  ${props => (props.isDraggingOver ? `background-color: ${colors.grey.darker}` : '')};
 `;
 
 type TaskIdMap = {

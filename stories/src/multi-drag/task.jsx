@@ -31,14 +31,14 @@ const getBackgroundColor = ({
   isGhosting,
 }: GetBackgroundColorArgs): string => {
   if (isGhosting) {
-    return colors.grey2.light;
+    return colors.grey.light;
   }
 
   if (isSelected) {
     return colors.blue.light;
   }
 
-  return colors.grey2.light;
+  return colors.grey.light;
 };
 
 const getColor = ({
@@ -70,7 +70,7 @@ const Container = styled.div`
   position: relative;
 
   &:hover {
-    /*background-color: ${colors.grey};*/
+    /*background-color: ${colors.grey.dark};*/
   }
 
   /* avoid default outline which looks lame with the position: absolute; */

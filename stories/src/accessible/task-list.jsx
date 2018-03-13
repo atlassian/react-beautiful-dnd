@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Droppable } from '../../../src/';
 import Task from './task';
-import type { DroppableProvided, DroppableStateSnapshot } from '../../../src/';
+import type { DroppableProvided } from '../../../src/';
 import type { Task as TaskType } from '../types';
 import { colors, grid, borderRadius } from '../constants';
 
@@ -14,7 +14,7 @@ type Props = {|
 
 const Container = styled.div`
   width: 300px;
-  background-color: ${colors.grey};
+  background-color: ${colors.grey.dark};
   border-radius: ${borderRadius}px;
 `;
 

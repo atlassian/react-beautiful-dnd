@@ -123,7 +123,7 @@ const List = styled.div`
 const Item = styled.div`
   min-height: 80px;
   background-color: ${colors.white};
-  border: 1px solid ${colors.grey};
+  border: 1px solid ${colors.grey.dark};
   padding: ${grid}px;
   margin-bottom: ${grid}px;
 `;

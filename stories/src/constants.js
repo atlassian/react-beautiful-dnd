@@ -8,8 +8,7 @@ export const colors = {
   },
   black: '#4d4d4d',
   shadow: 'rgba(0,0,0,0.2)',
-  grey: '#E2E4E6',
-  grey2: {
+  grey: {
     darker: '#C1C7D0',
     dark: '#E2E4E6',
     medium: '#DFE1E5',
