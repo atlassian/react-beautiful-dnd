@@ -4,9 +4,9 @@
 
 Dragging multiple `Draggable`s at once (multi drag) is currently a pattern that needs to be built on top of `react-beautiful-dnd`. We have not included the interaction into the library itself. This is done because a multi drag experience introduces a lot of concepts, decisions and opinions. We have done a lot of work to ensure there is a standard base of [dom event management](/docs/guides/how-we-use-dom-events.md) to build on.
 
-We have created a [reference application](TODO) ([source](TODO)) which implements the multi drag pattern. The application is fairly basic and does not handle performance in large lists well. As such, there is are [a few performance recommendations](TODO) that we suggest you also add on to our reference application if you want to support lists greater than 50 in size.
+We have created a [reference application](react-beautiful-dnd.netlify.com/iframe.html?selectedKind=Multi%20drag&selectedStory=pattern&full=0&down=1&left=1&panelRight=0&downPanel=storybook%2Factions%2Factions-panel) ([source](/stories/9-multi-drag-story.js)) which implements this multi drag pattern. The application is fairly basic and does not handle performance in large lists well. As such, there is are [a few performance recommendations](#performance) that we suggest you also add on to our reference application if you want to support lists greater than 50 in size.
 
-![demo](https://user-images.githubusercontent.com/2182637/37322724-7843a218-26d3-11e8-9ebb-8d5853387bb3.gif)
+![mutli drag demo](https://user-images.githubusercontent.com/2182637/37322724-7843a218-26d3-11e8-9ebb-8d5853387bb3.gif)
 
 ## Experience
 
@@ -259,7 +259,7 @@ You are welcome to build a selection walking keyboard interaction pattern. You c
 
 You could build your own abstraction (or use some elses) to add the idea of a selection box. You could use this to allow a user to drag a box around the items they want to select. [Example](http://threedubmedia.com/code/event/drop/demo/selection)
 
-## Other: performance
+## Performance
 
 Doing a multi drag interaction in a performant way can be challenging. The core thing you want to do is to avoid calling `render()` on components that do not need to update. The current best practice for this is to use [`redux`](https://github.com/reactjs/redux) in combination with [`react-redux`](https://github.com/reactjs/react-redux), [`reselect`](https://github.com/reactjs/reselect) and [`memoize-one`](https://github.com/alexreardon/memoize-one). We recommend you take a look at these resources:
 
@@ -279,7 +279,3 @@ In the event of a 'unselect all action' you might need to render a lot of compon
 ### Drag count
 
 When dragging you need to display a count of the items that are dragging. In our example we provide this information down by re-rendering the tree. As with selection changes it would be good to only render the item that needs the change. You could publish this information down using `redux` and `redux-select`. For this particular problem you might be able to get away with [`unstated`](https://github.com/jamiebuilds/unstated) or the new [React 16.3 `Context` api](https://github.com/reactjs/rfcs/blob/master/text/0002-new-version-of-context.md).
-
-### Ghosting
-
-When a user starts dragging we 'ghost'
