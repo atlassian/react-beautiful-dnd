@@ -347,12 +347,12 @@ describe('drag handle', () => {
         expect(mock).not.toHaveBeenCalled();
       });
 
-      it('should not call preventDefault on the initial mousedown event', () => {
+      it('should call preventDefault on the initial mousedown event to prevent the element gaining focus', () => {
         const mockEvent: MockEvent = createMockEvent();
 
         mouseDown(wrapper, origin, primaryButton, mockEvent);
 
-        expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
       });
 
       it('should not call preventDefault on mouse movements while we are not sure if a drag is starting', () => {

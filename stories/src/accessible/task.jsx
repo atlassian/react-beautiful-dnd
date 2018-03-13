@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Draggable } from '../../../src/';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../src/';
-import type { Task as TaskType } from './types';
+import type { Task as TaskType } from '../types';
 import { colors, grid, borderRadius } from '../constants';
 
 type Props = {|

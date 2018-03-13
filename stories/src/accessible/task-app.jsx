@@ -14,7 +14,7 @@ import type {
   DraggableLocation,
   HookProvided,
 } from '../../../src/';
-import type { Task } from './types';
+import type { Task } from '../types';
 
 type State = {|
   tasks: Task[],

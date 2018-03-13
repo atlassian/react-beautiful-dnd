@@ -6,10 +6,7 @@ type Records = {
 
 const records: Records = {};
 
-const flag: string = '__react-beautiful-dnd-debug-hook__';
-
-// temp
-// window[flag] = true;
+const flag: string = '__react-beautiful-dnd-debug-timings-hook__';
 
 const isTimingsEnabled = (): boolean => Boolean(window[flag]);
 

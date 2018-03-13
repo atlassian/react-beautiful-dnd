@@ -53,6 +53,7 @@ We have created upgrade instructions in our release notes to help you upgrade to
 - Movement between lists (▤ ↔ ▤)
 - Mouse 🐭, keyboard 🎹 and touch 👉📱 (mobile, tablet and so on) support
 - Auto scrolling - automatically scroll containers and the window as required during a drag (even with keyboard 🔥)
+- [Multi drag support](/docs/patterns/multi-drag.md)
 - Incredible screen reader support - we provide an amazing experience for english screen readers out of the box 📦. We also provide complete customisation control and internationalisation support for those who need it 💖
 - Conditional [dragging](https://github.com/atlassian/react-beautiful-dnd#props-1) and [dropping](https://github.com/atlassian/react-beautiful-dnd#conditionally-dropping)
 - Multiple independent lists on the one page
@@ -307,6 +308,12 @@ class App extends React.Component {
   /*...*/
 }
 ```
+
+## Multi drag
+
+We have created a [multi drag pattern](/docs/patterns/multi-drag.md) that you can build on top of `react-beautiful-dnd` in order to support dragging multiple `Draggable` items at once.
+
+![multi drag demo](https://user-images.githubusercontent.com/2182637/37322724-7843a218-26d3-11e8-9ebb-8d5853387bb3.gif)
 
 ## Preset styles
 
