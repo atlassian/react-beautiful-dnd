@@ -69,14 +69,9 @@ const Container = styled.div`
   /* needed for SelectionCount */
   position: relative;
 
-  &:hover {
-    /*background-color: ${colors.grey.dark};*/
-  }
-
   /* avoid default outline which looks lame with the position: absolute; */
   &:focus {
     outline: none;
-    /* TODO: also need to add dragging shadow */
     border-color: ${colors.blue.deep};
   }
 `;
