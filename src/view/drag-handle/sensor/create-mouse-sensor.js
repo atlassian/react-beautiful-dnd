@@ -258,7 +258,7 @@ export default ({
     // to start also.
     // Ideally we would not use preventDefault() as we are not sure
     // if this mouse down is part of a drag interaction
-    // Unfortunately we do (see below).
+    // Unfortunately we do to prevent the element obtaining focus (see below).
     mouseDownMarshal.handle();
 
     // Unfortunately we do need to prevent the drag handle from getting focus on mousedown.
