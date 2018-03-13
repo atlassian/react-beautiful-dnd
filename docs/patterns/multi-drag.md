@@ -216,7 +216,7 @@ We need to do one check in `onDragStart`. If the user is starting to drag someth
 As the drag starts we need to add a few visual affordances:
 
 1. Add a count to the dragging item to indicate how many items this drag is represenative of. If only a single item is dragging then do not show a count.
-2. Change the appearance of the selected items that are not dragging to a greyed out / disabled state.
+2. Change the appearance of the selected items that are not dragging to a greyed out / disabled state. This can be a [performance](#performance) issue at scale.
 
 We do not remove the selected items from the list. If we remove the items completely that can change the dimensions of the list which can lead to list collapsing and scroll jumps. If we leave them in the list and make them invisible then there are big blank sections in a list that have no meaning and can be confusing to interact with. Therefore we recommend leaving the items in the list and giving them a visual change.
 
@@ -271,10 +271,12 @@ Doing a multi drag interaction in a performant way can be challenging. The core 
 
 In response to a selection change you want to call `render` on the minimum amount of `Draggable` and `Droppable` components as possible. In our example application whenever the selection changes we re-render the entire tree. This approach will not scale. Therefore we suggest using the optimisations listed above.
 
-In the event of a 'unselect all action' you might need to render a lot of components at once to clear their selected styles. For most usages this will be fine. If you want to go further you will need to avoid calling `render` for selection style changes.
+In the event of a 'unselect all' action you might need to render a lot of components at once to clear their selected styles. For most usages this will be fine. If you want to go further you will need to avoid calling `render` for selection style changes.
 
 - You could look into using the [dynamic shared styles pattern](https://medium.com/@alexandereardon/dragging-react-performance-forward-688b30d40a33).
 - You could apply a **unique** data attribute to each item and then apply the *selected* style to it using selectors dynamically in a parent component.
+
+Additionally, when a drag starts we can also update the appearance of a lot of `Draggables` at once. Therefore you will need to solve this problem in the same was as the 'unselect all' action.
 
 ### Drag count
 
