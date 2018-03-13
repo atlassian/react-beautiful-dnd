@@ -97,8 +97,19 @@ const keyCodes = {
 };
 
 export default class Task extends Component<Props> {
-  // Using onKeyUp so that we did not need to monkey patch onKeyDown
-  onKeyUp = (event: KeyboardEvent, snapshot: DraggableStateSnapshot) => {
+  onKeyDown = (
+    event: KeyboardEvent,
+    provided: DraggableProvided,
+    snapshot: DraggableStateSnapshot
+  ) => {
+    if (provided.dragHandleProps) {
+      provided.dragHandleProps.onKeyDown(event);
+    }
+
+    if (event.defaultPrevented) {
+      return;
+    }
+
     if (snapshot.isDragging) {
       return;
     }
@@ -107,32 +118,18 @@ export default class Task extends Component<Props> {
       return;
     }
 
-    const {
-      task,
-      toggleSelection,
-      toggleSelectionInGroup,
-    } = this.props;
-
+    // we are using the event for selection
     event.preventDefault();
+
+    const wasMetaKeyUsed: boolean = event.metaKey;
     const wasShiftKeyUsed: boolean = event.shiftKey;
 
-    if (wasShiftKeyUsed) {
-      toggleSelectionInGroup(task.id);
-      return;
-    }
-    toggleSelection(task.id);
+    this.performAction(wasMetaKeyUsed, wasShiftKeyUsed);
   }
 
   // Using onClick as it will be correctly
   // preventing if there was a drag
   onClick = (event: MouseEvent) => {
-    const {
-      task,
-      toggleSelection,
-      toggleSelectionInGroup,
-      multiSelectTo,
-    } = this.props;
-
     if (event.defaultPrevented) {
       return;
     }
@@ -144,22 +141,32 @@ export default class Task extends Component<Props> {
     // marking the event as used
     event.preventDefault();
 
+    const wasMetaKeyUsed: boolean = event.metaKey;
     const wasShiftKeyUsed: boolean = event.shiftKey;
 
-    if (wasShiftKeyUsed) {
-      multiSelectTo(task.id);
-      return;
-    }
+    this.performAction(wasMetaKeyUsed, wasShiftKeyUsed);
+  };
 
-    const wasMetaKeyUsed: boolean = event.metaKey;
+  performAction = (wasMetaKeyUsed: boolean, wasShiftKeyUsed: boolean) => {
+    const {
+      task,
+      toggleSelection,
+      toggleSelectionInGroup,
+      multiSelectTo,
+    } = this.props;
 
     if (wasMetaKeyUsed) {
       toggleSelectionInGroup(task.id);
       return;
     }
 
+    if (wasShiftKeyUsed) {
+      multiSelectTo(task.id);
+      return;
+    }
+
     toggleSelection(task.id);
-  };
+  }
 
   render() {
     const task: TaskType = this.props.task;
@@ -176,7 +183,7 @@ export default class Task extends Component<Props> {
               {...provided.draggableProps}
               {...provided.dragHandleProps}
               onClick={this.onClick}
-              onKeyUp={(event: KeyboardEvent) => this.onKeyUp(event, snapshot)}
+              onKeyDown={(event: KeyboardEvent) => this.onKeyDown(event, provided, snapshot)}
               isDragging={snapshot.isDragging}
               isSelected={isSelected}
               isGhosting={isGhosting}

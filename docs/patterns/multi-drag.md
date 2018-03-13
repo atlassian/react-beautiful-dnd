@@ -36,10 +36,12 @@ If a user clicks on an item the selected state of the item should be toggled. Ad
 - Only toggle selection if the user is using the [`primaryButton`](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button) (`event.button === 0`)
 - Prevent the default action on the `click` as you are using it for selection (it is only useful to call `event.preventDefault()` for [selection clearing](TODO)).
 
-#### `onKeyUp` event handler
+#### Keyboard event handler
 
-- Attach an `onKeyUp` handler to your *drag handle* or `Draggable`. You could apply a `onKeyDown` but if you are applying it to a *drag handle* you will need to monkey patch the `DragHandleProvided > onKeyDown` event.
-- Prevent the default action on the `onKeyUp` if you are toggling selection as you are using it for selection
+- When the user presses **enter** toggle the selection of the item
+- **Option 1**: Attach an `onKeyDown` handler to your *drag handle* or `Draggable`. You will need to monkey patch the `DragHandleProvided > onKeyDown` keyboard handler.
+- **Option 2**: Attach an `onKeyUp` handler to your *drag hanlde*. Then you will not need to monkey patch the `onKeyDown` handler. However, `keyup` events will not have their default action prevented so you will not be able to check `event.defaultPrevented` to see if the keypress was used for a drag. If you are only using the **enter** key in your event handler then you should be fine as that is not used as a part of dragging.
+- Prevent the default action on the `keydown` / `keyup` event if you are toggling selection as you are using it for selection as you want to opt out of the standard browser behaviour and also provide a clue that this event has been used.
 
 #### Toggle selection behaviour
 
@@ -51,21 +53,11 @@ If a user clicks on an item the selected state of the item should be toggled. Ad
 
 This is providing the ability for a user to add or remove items to a selection group.
 
-#### `onClick` event handler
+#### Event handlers
 
-- Use the same `onClick` event handler you used for [toggle selection](#toggle-section).
-- If the [meta key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey) was used in addition to the click then toggle the selection in the group
+We perform this action if the user performs a `click` or presses the **enter** key in addition to holding the the [meta key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey).
 
 > Note: On Macintosh keyboards, this is the `⌘ Command` key. On Windows keyboards, this is the Windows key (`⊞ Windows`) - [MDN](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey)
-
-```js
-const wasMetaKeyUsed: boolean = event.metaKey;
-
-if (wasMetaKeyUsed) {
-  toggleSelectionInGroup(task.id);
-  return;
-}
-```
 
 #### Toggle selection in a group behaviour
 
@@ -76,10 +68,9 @@ if (wasMetaKeyUsed) {
 
 The ability to click on an item further down a list and select everything inbetween.
 
-#### `onClick` event handler
+#### Event handlers
 
-- Use the same `onClick` event handler you used for [toggle selection](#toggle-section).
-- If the [shift key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey) was used in addition then select up to this up
+We perform this action if the user performs a `click` or presses the **enter** key in addition to holding the the [shift key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/shiftKey).
 
 ### Mutli select to: behaviour
 
@@ -99,7 +90,108 @@ If the user is selecting to an item that is in a different list to the last sele
 
 > MacOSX is a little more complicated than this, but for our purposes this seems like a good default
 
-- If selecting the same index as we started on - we do not need to do anything
+- If dropping on the same index as we started on - we do not need to do anything
+
+### Event logic map
+
+Here is an example of composing the above event handling logic in a component
+
+```js
+class Task extends Component<Props> {
+  onKeyDown = (
+    event: KeyboardEvent,
+    // we will be monkey patching this
+    provided: DraggableProvided,
+    snapshot: DraggableStateSnapshot
+  ) => {
+    if (provided.dragHandleProps) {
+      provided.dragHandleProps.onKeyDown(event);
+    }
+
+    if (event.defaultPrevented) {
+      return;
+    }
+
+    if (snapshot.isDragging) {
+      return;
+    }
+
+    if (event.keyCode !== keyCodes.enter) {
+      return;
+    }
+
+    // we are using the event for selection
+    event.preventDefault();
+
+    const wasMetaKeyUsed: boolean = event.metaKey;
+    const wasShiftKeyUsed: boolean = event.shiftKey;
+
+    this.performAction(wasMetaKeyUsed, wasShiftKeyUsed);
+  }
+
+  // Using onClick as it will be correctly
+  // preventing if there was a drag
+  onClick = (event: MouseEvent) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+
+    if (event.button !== primaryButton) {
+      return;
+    }
+
+    // marking the event as used
+    event.preventDefault();
+
+    const wasMetaKeyUsed: boolean = event.metaKey;
+    const wasShiftKeyUsed: boolean = event.shiftKey;
+
+    this.performAction(wasMetaKeyUsed, wasShiftKeyUsed);
+  };
+
+  performAction = (wasMetaKeyUsed: boolean, wasShiftKeyUsed: boolean) => {
+    const {
+      task,
+      toggleSelection,
+      toggleSelectionInGroup,
+      multiSelectTo,
+    } = this.props;
+
+    if (wasMetaKeyUsed) {
+      toggleSelectionInGroup(task.id);
+      return;
+    }
+
+    if (wasShiftKeyUsed) {
+      multiSelectTo(task.id);
+      return;
+    }
+
+    toggleSelection(task.id);
+  }
+
+  render() {
+    return (
+      <Draggable draggableId={task.id} index={this.props.index}>
+        {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
+          <div>
+            <Container
+              innerRef={provided.innerRef}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+              onClick={this.onClick}
+              onKeyDown={(event: KeyboardEvent) => this.onKeyDown(event, provided, snapshot)}
+            >
+              {task.content}
+            </Container>
+            {provided.placeholder}
+          </div>
+        )}
+      </Draggable>
+    );
+  }
+}
+```
 
 ### Action: clear selection
 
@@ -107,9 +199,9 @@ If the user is selecting to an item that is in a different list to the last sele
 
 We add a `click` handler to the `window` to detect for a click that is not on a `Draggable`. We call `preventDefault` in our selection `onClick` handler so `click` events used for selection will have the `event.defaultPrevented` property set to `true`. Additionally, if a drag occurred the default `click` action [will be prevented](https://github.com/atlassian/react-beautiful-dnd#sloppy-clicks-and-click-prevention-). So if we receive a `click` event on the window that has not has `event.defaultPrevented` set to false we clear the current selection.
 
-#### `window` `keyup` handler
+#### `window` `keydown` handler
 
-This event handler operates in a similar way to the *`window` `click` handler* described above. If a `keyup` event that is not prevented and is the **escape** key then we clear the current selection.
+This event handler operates in a similar way to the *`window` `click` handler* described above. If a `keydown` event that is not prevented and is the **escape** key then we clear the current selection. The **escape** `keydown` event will be prevented if it is used to cancel a drag.
 
 ### Putting it all together
 
