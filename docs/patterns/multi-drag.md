@@ -215,6 +215,18 @@ We add a `click` handler to the `window` to detect for a click that is not on a 
 
 This event handler operates in a similar way to the *`window` `click` handler* described above. If a `keydown` event that is not prevented and is the **escape** key then we clear the current selection. The **escape** `keydown` event will be prevented if it is used to cancel a drag.
 
+### Action: Item walking
+
+> This is not implemented in our reference application
+
+You are welcome to build a selection walking keyboard interaction pattern. You could use the arrow keys (<kbd>↑</kbd> <kbd>↓</kbd> <kbd>→</kbd> <kbd>←</kbd>) to move the selection around. Ideally these movements would also shift browser focus so that a user can press **spacebar** <kbd>space</kbd> to lift immediately.
+
+### Action Mouse selection box
+
+> This is not implemented in our reference application
+
+You could build your own abstraction (or use some elses) to add the idea of a selection box. You could use this to allow a user to drag a box around the items they want to select. [Example](http://threedubmedia.com/code/event/drop/demo/selection)
+
 ## Dragging
 
 We need to do one check in `onDragStart`. If the user is starting to drag something that is not selected then we need to clear the selection.
@@ -256,14 +268,6 @@ The goal is to move the selected items to their new location. We want to insert 
 
 1. Move the selected item to the first position
 2. Order the rest by their natural index
-
-## Item walking
-
-You are welcome to build a selection walking keyboard interaction pattern. You could use the arrow keys (<kbd>↑</kbd> <kbd>↓</kbd> <kbd>→</kbd> <kbd>←</kbd>) to move the selection around. Ideally these movements would also shift browser focus so that a user can press **spacebar** <kbd>space</kbd> to lift immediately.
-
-## Mouse selection box
-
-You could build your own abstraction (or use some elses) to add the idea of a selection box. You could use this to allow a user to drag a box around the items they want to select. [Example](http://threedubmedia.com/code/event/drop/demo/selection)
 
 ## Performance
 
