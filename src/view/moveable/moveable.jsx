@@ -89,9 +89,8 @@ export default class Movable extends Component<Props> {
       // Expecting a flow error
       // React Motion type: children: (interpolatedStyle: PlainStyle) => ReactElement
       // Our type: children: (Position) => (Style) => React.Node
-      // $ExpectError
       <Motion defaultStyle={origin} style={final} onRest={this.onRest}>
-        {(current: Position) =>
+        {(current: { [string]: number }) =>
           this.props.children(
             getStyle(isNotMoving, current.x, current.y)
           )}

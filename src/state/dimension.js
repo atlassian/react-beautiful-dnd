@@ -128,11 +128,10 @@ export const scrollDroppable = (
     clipped,
   };
 
-  // $ExpectError - using spread
-  return {
+  return ({
     ...droppable,
     viewport,
-  };
+  }: any);
 };
 
 type GetDroppableArgs = {|

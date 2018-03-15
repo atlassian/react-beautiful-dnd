@@ -243,7 +243,6 @@ export const makeSelector = (): Selector => {
 
 const makeMapStateToProps = () => {
   const selector: Selector = makeSelector();
-  // $FlowFixMe - no idea how to type this correctly
   return (state: State, props: OwnProps) => selector(state, props);
 };
 
@@ -266,7 +265,7 @@ const mapDispatchToProps: DispatchProps = {
 export default connect(
   // returning a function to ensure each
   // Draggable gets its own selector
-  makeMapStateToProps,
+  (makeMapStateToProps: any),
   mapDispatchToProps,
   null,
   { storeKey },

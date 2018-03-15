@@ -12,7 +12,7 @@ export type Props = {|
   speed: Speed,
   destination: Position,
   onMoveEnd: () => void,
-  children: (Style) => Node,
+  children: (Style) => React.Element<*>,
 |}
 
 export type DefaultProps = {|
