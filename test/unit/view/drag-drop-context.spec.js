@@ -42,7 +42,9 @@ describe('DragDropContext', () => {
 
     const app = TestUtils.findRenderedComponentWithType(tree, App);
 
-    if (!app) return;
+    if (!app) {
+      return;
+    }
 
     expect(app.context[storeKey]).toHaveProperty('dispatch');
     expect(app.context[storeKey].dispatch).toBeInstanceOf(Function);
@@ -78,7 +80,9 @@ describe('DragDropContext', () => {
 
       const app = TestUtils.findRenderedComponentWithType(tree, App);
 
-      if (!app) return;
+      if (!app) {
+        return;
+      }
 
       expect(app.context[canLiftContextKey]).toBeInstanceOf(Function);
     });

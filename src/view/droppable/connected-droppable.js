@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import memoizeOne from 'memoize-one';
@@ -23,6 +24,7 @@ import type {
 } from '../../types';
 import type {
   OwnProps,
+  DefaultProps,
   MapProps,
   Selector,
 } from './droppable-types';
@@ -151,13 +153,20 @@ const makeMapStateToProps = () => {
 // Leaning heavily on the default shallow equality checking
 // that `connect` provides.
 // It avoids needing to do it own within `Droppable`
-const connectedDroppable: React.ComponentType<OwnProps> = connect(
+const connectedDroppable: OwnProps => Node = (connect(
   // returning a function to ensure each
   // Droppable gets its own selector
   (makeMapStateToProps: any),
   null,
   null,
   { storeKey },
-)(Droppable);
+): any)(Droppable);
+
+connectedDroppable.defaultProps = ({
+  type: 'DEFAULT',
+  isDropDisabled: false,
+  direction: 'vertical',
+  ignoreContainerClipping: false,
+}: DefaultProps);
 
 export default connectedDroppable;

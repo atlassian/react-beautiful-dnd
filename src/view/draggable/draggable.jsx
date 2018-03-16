@@ -53,12 +53,6 @@ export default class Draggable extends Component<Props, State> {
     ref: null,
   }
 
-  static defaultProps: DefaultProps = {
-    isDragDisabled: false,
-    // cannot drag interactive elements by default
-    disableInteractiveElementBlocking: false,
-  }
-
   // Need to declare contextTypes without flow
   // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
   static contextTypes = {
