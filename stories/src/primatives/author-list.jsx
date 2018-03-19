@@ -11,6 +11,7 @@ import type {
   DraggableProvided,
   DraggableStateSnapshot,
 } from '../../../src/';
+import type { DraggableLock } from '../../../src/types';
 
 const Wrapper = styled.div`
   background-color: ${({ isDraggingOver }) => (isDraggingOver ? colors.blue.lighter : colors.blue.light)};
@@ -54,6 +55,7 @@ type Props = {|
   listType?: string,
   internalScroll?: boolean,
   autoFocusQuoteId?: ?string,
+  lock?: ?DraggableLock
 |}
 
 export default class AuthorList extends Component<Props> {
@@ -69,6 +71,7 @@ export default class AuthorList extends Component<Props> {
               draggableId={quote.id}
               type={listType}
               index={index}
+              lock={this.props.lock}
             >
               {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
                 <div>

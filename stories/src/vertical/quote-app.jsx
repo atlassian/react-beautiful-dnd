@@ -7,7 +7,7 @@ import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
 import reorder from '../reorder';
 import type { Quote } from '../types';
-import type { DropResult, DragStart } from '../../../src/types';
+import type { DropResult, DragStart, DraggableLock } from '../../../src/types';
 
 const publishOnDragStart = action('onDragStart');
 const publishOnDragEnd = action('onDragEnd');
@@ -27,6 +27,7 @@ const Root = styled.div`
 type Props = {|
   initial: Quote[],
   listStyle?: Object,
+  lock?: ?DraggableLock
 |}
 
 type State = {|
@@ -85,6 +86,7 @@ export default class QuoteApp extends Component<Props, State> {
             listId="list"
             style={this.props.listStyle}
             quotes={quotes}
+            lock={this.props.lock}
           />
         </Root>
       </DragDropContext>

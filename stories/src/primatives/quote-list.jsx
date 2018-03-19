@@ -13,6 +13,7 @@ import type {
   DraggableProvided,
   DraggableStateSnapshot,
 } from '../../../src/';
+import type { DraggableLock } from '../../../src/types';
 
 const Wrapper = styled.div`
   background-color: ${({ isDraggingOver }) => (isDraggingOver ? colors.blue.lighter : colors.blue.light)};
@@ -53,11 +54,13 @@ type Props = {|
   // may not be provided - and might be null
   autoFocusQuoteId?: ?string,
   ignoreContainerClipping?: boolean,
+  lock?: ?DraggableLock
 |}
 
 type QuoteListProps = {|
   quotes: Quote[],
   autoFocusQuoteId: ?string,
+  lock?: ?DraggableLock
 |}
 
 class InnerQuoteList extends Component<QuoteListProps> {
@@ -73,7 +76,7 @@ class InnerQuoteList extends Component<QuoteListProps> {
     return (
       <div>
         {this.props.quotes.map((quote: Quote, index: number) => (
-          <Draggable key={quote.id} draggableId={quote.id} index={index}>
+          <Draggable key={quote.id} draggableId={quote.id} index={index} lock={this.props.lock}>
             {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
               <div>
                 <QuoteItem
@@ -98,6 +101,7 @@ type InnerListProps = {|
   quotes: Quote[],
   title: ?string,
   autoFocusQuoteId: ?string,
+  lock?: ?DraggableLock
 |}
 
 class InnerList extends Component<InnerListProps> {
@@ -114,6 +118,7 @@ class InnerList extends Component<InnerListProps> {
           <InnerQuoteList
             quotes={quotes}
             autoFocusQuoteId={autoFocusQuoteId}
+            lock={this.props.lock}
           />
           {dropProvided.placeholder}
         </DropZone>
@@ -165,6 +170,7 @@ export default class QuoteList extends Component<Props> {
                 title={title}
                 dropProvided={dropProvided}
                 autoFocusQuoteId={autoFocusQuoteId}
+                lock={this.props.lock}
               />
             )}
           </Wrapper>

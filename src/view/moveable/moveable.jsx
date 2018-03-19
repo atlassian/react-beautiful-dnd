@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Motion, spring } from 'react-motion';
 import { physics } from '../animation';
-import type { Position } from '../../types';
+import type { Position, DraggableLock } from '../../types';
 import type { Props, DefaultProps, Style } from './moveable-types';
 
 type PositionLike = {|
@@ -22,7 +22,7 @@ const noMovement: Style = {
 const isAtOrigin = (point: PositionLike): boolean =>
   point.x === origin.x && point.y === origin.y;
 
-const getStyle = (isNotMoving: boolean, x: number, y: number): Style => {
+const getStyle = (isNotMoving: boolean, x: number, y: number, lock: ?DraggableLock): Style => {
   if (isNotMoving) {
     return noMovement;
   }
@@ -33,12 +33,12 @@ const getStyle = (isNotMoving: boolean, x: number, y: number): Style => {
     return noMovement;
   }
   const style: Style = {
-    transform: `translate(${point.x}px, ${point.y}px)`,
+    transform: `translate(${lock === 'x' ? 0 : point.x}px, ${lock === 'y' ? 0 : point.y}px)`,
   };
   return style;
 };
 
-export default class Movable extends Component<Props> {
+export default class Moveable extends Component<Props> {
   /* eslint-disable react/sort-comp */
 
   static defaultProps: DefaultProps = {
@@ -93,7 +93,7 @@ export default class Movable extends Component<Props> {
       <Motion defaultStyle={origin} style={final} onRest={this.onRest}>
         {(current: Position) =>
           this.props.children(
-            getStyle(isNotMoving, current.x, current.y)
+            getStyle(isNotMoving, current.x, current.y, this.props.lock)
           )}
       </Motion>
     );

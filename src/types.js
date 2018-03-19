@@ -364,3 +364,4 @@ export type Hooks = {|
   onDragEnd: OnDragEndHook,
 |}
 
+export type DraggableLock = 'x' | 'y';

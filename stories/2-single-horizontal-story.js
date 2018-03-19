@@ -23,4 +23,7 @@ storiesOf('single horizontal list', module)
     <WideWindow>
       <AuthorApp initial={bigData} internalScroll />
     </WideWindow>
+  ))
+  .add('with y-lock', () => (
+    <AuthorApp initial={quotes} lock="y" />
   ));

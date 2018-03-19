@@ -2,7 +2,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import Moveable from '../../../src/view/moveable/';
-import type { Position } from '../../../src/types';
+import type { Position, DraggableLock } from '../../../src/types';
 import type { Speed, Style } from '../../../src/view/moveable/moveable-types';
 
 describe('Moveable', () => {
@@ -31,11 +31,12 @@ describe('Moveable', () => {
     requestAnimationFrame.reset();
   });
 
-  const moveTo = (point: Position, speed?: Speed = 'STANDARD', onMoveEnd?: () => void) => {
+  const moveTo = (point: Position, speed?: Speed = 'STANDARD', lock?: ?DraggableLock, onMoveEnd?: () => void) => {
     wrapper.setProps({
       destination: point,
       onMoveEnd,
       speed,
+      lock,
     });
 
     // flush the animation
@@ -64,6 +65,30 @@ describe('Moveable', () => {
     expect(childFn).toHaveBeenCalledWith(getStyle(destination));
   });
 
+  it('should lock by x', () => {
+    const destination: Position = {
+      x: 100,
+      y: 200,
+    };
+    const expected: Style = { transform: 'translate(0px, 200px)' };
+
+    moveTo(destination, 'STANDARD', 'x');
+
+    expect(childFn).toHaveBeenCalledWith(expected);
+  });
+
+  it('should lock by y', () => {
+    const destination: Position = {
+      x: 100,
+      y: 200,
+    };
+    const expected: Style = { transform: 'translate(100px, 0px)' };
+
+    moveTo(destination, 'STANDARD', 'y');
+
+    expect(childFn).toHaveBeenCalledWith(expected);
+  });
+
   it('should call onMoveEnd when the movement is finished', () => {
     const myMock = jest.fn();
     const destination: Position = {
@@ -71,7 +96,7 @@ describe('Moveable', () => {
       y: 200,
     };
 
-    moveTo(destination, 'STANDARD', myMock);
+    moveTo(destination, 'STANDARD', undefined, myMock);
 
     expect(myMock).toHaveBeenCalled();
   });
