@@ -7,6 +7,7 @@ import type {
   DropResult,
   DragStart,
 } from '../../../src';
+import type { DraggableLock } from '../../../src/types';
 import type { Quote } from '../types';
 import AuthorList from '../primatives/author-list';
 import reorder from '../reorder';
@@ -18,6 +19,7 @@ const publishOnDragEnd = action('onDragEnd');
 type Props = {|
   initial: Quote[],
   internalScroll?: boolean,
+  lock?: ?DraggableLock
 |}
 
 type State = {|
@@ -75,6 +77,7 @@ export default class AuthorApp extends Component<Props, State> {
             listId="AUTHOR"
             internalScroll={this.props.internalScroll}
             quotes={this.state.quotes}
+            lock={this.props.lock}
           />
         </Root>
       </DragDropContext>

@@ -65,4 +65,7 @@ storiesOf('single vertical list', module)
         initial={data.medium}
       />
     </ScrollContainer>
+  ))
+  .add('with x-lock', () => (
+    <QuoteApp initial={data.small} lock="x" />
   ));

@@ -330,6 +330,7 @@ export default class Draggable extends Component<Props, State> {
         <Moveable
           speed={speed}
           destination={offset}
+          lock={this.props.lock}
           onMoveEnd={this.onMoveEnd}
         >
           {(movementStyle: MovementStyle) => (
