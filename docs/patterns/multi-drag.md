@@ -1,4 +1,4 @@
-# Mutli drag pattern
+# Mutli drag
 
 > This page is designed to guide you through adding your own mutli drag experience to your `react-beautiful-dnd` lists.
 
@@ -22,7 +22,7 @@ We can break the user experience down in three phases.
 
 ## Anouncements
 
-Keep in mind that internally `react-beautiful-dnd` is not aware of multi drag. Therefore it is advised that you use the `HookProvided > Announce` to announce meaningful screen reader messages for a multi drag.
+Keep in mind that internally `react-beautiful-dnd` is not aware of multi drag. Therefore it is advised that you use the `HookProvided > Announce` to announce meaningful screen reader messages for a multi drag. See our [screen reader guide](docs/guides/screen-reader.md) for details on how to control screen reader messaging.
 
 ## Selection
 
@@ -30,11 +30,11 @@ Before a drag starts we need to allow the user to *optionally* select a number o
 
 ### Selection interaction recommendations
 
-> These are based on the Mac OSX [*Finder*](https://support.apple.com/en-au/HT201732).
+> These interactions are based on the Mac OSX [*Finder*](https://support.apple.com/en-au/HT201732) (file browser) application.
 
 ### Action: toggle section
 
-If a user clicks on an item the selected state of the item should be toggled. Additionally, the selected state of the item should be updated when the user presses **enter** key. The **enter** key is quite nice because we do not use it for lifting or dropping - we use **space** for those.
+If a user clicks on an item the selected state of the item should be toggled. Additionally, the selected state of the item should be updated when the user presses **enter** <kbd>⏎</kbd> key. The **enter** <kbd>⏎</kbd> key is quite nice because we do not use it for lifting or dropping - we use **spacebar** <kbd>space</kbd> for those.
 
 ![toggle-selection](https://user-images.githubusercontent.com/2182637/37323080-6d67f04a-26d5-11e8-8bc1-8ff5178018bc.gif)
 
@@ -46,9 +46,9 @@ If a user clicks on an item the selected state of the item should be toggled. Ad
 
 #### Keyboard event handler
 
-- When the user presses **enter** toggle the selection of the item
+- When the user presses **enter** <kbd>⏎</kbd> toggle the selection of the item
 - **Option 1**: Attach an `onKeyDown` handler to your *drag handle* or `Draggable`. You will need to monkey patch the `DragHandleProvided > onKeyDown` keyboard handler.
-- **Option 2**: Attach an `onKeyUp` handler to your *drag hanlde*. Then you will not need to monkey patch the `onKeyDown` handler. However, `keyup` events will not have their default action prevented so you will not be able to check `event.defaultPrevented` to see if the keypress was used for a drag. If you are only using the **enter** key in your event handler then you should be fine as that is not used as a part of dragging.
+- **Option 2**: Attach an `onKeyUp` handler to your *drag hanlde*. Then you will not need to monkey patch the `onKeyDown` handler. However, `keyup` events will not have their default action prevented so you will not be able to check `event.defaultPrevented` to see if the keypress was used for a drag. If you are only using the **enter** <kbd>⏎</kbd> key in your event handler then you should be fine as that is not used as a part of dragging.
 - Prevent the default action on the `keydown` / `keyup` event if you are toggling selection as you are using it for selection as you want to opt out of the standard browser behaviour and also provide a clue that this event has been used.
 
 #### Toggle selection behaviour
@@ -65,7 +65,7 @@ This is providing the ability for a user to add or remove items to a selection g
 
 #### Event handlers
 
-We perform this action if the user performs a `click` or presses the **enter** key in addition to holding the the [meta key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey).
+We perform this action if the user performs a `click` or presses the **enter** <kbd>⏎</kbd> key in addition to holding the the [meta key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey).
 
 > Note: On Macintosh keyboards, this is the `⌘ Command` key. On Windows keyboards, this is the Windows key (`⊞ Windows`) - [MDN](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey)
 
@@ -80,7 +80,7 @@ The ability to click on an item further down a list and select everything inbetw
 
 #### Event handlers
 
-We perform this action if the user performs a `click` or presses the **enter** key in addition to holding the the [shift key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/shiftKey).
+We perform this action if the user performs a `click` or presses the **enter** <kbd>⏎</kbd> key in addition to holding the the [shift key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/shiftKey).
 
 ### Mutli select: behaviour
 
