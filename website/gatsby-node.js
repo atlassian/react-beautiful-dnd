@@ -14,13 +14,8 @@ exports.onCreateNode = ({ node, boundActionCreators, getNode }) => {
       Object.prototype.hasOwnProperty.call(node.frontmatter, 'slug')
     ) {
       slug = `/${_.kebabCase(node.frontmatter.slug)}`;
-    }
-    if (
-      Object.prototype.hasOwnProperty.call(node, 'frontmatter') &&
-      Object.prototype.hasOwnProperty.call(node.frontmatter, 'title')
-    ) {
-      slug = `/${_.kebabCase(node.frontmatter.title)}`;
     } else if (parsedFilePath.name !== 'index' && parsedFilePath.dir !== '') {
+      createNodeField({ node, name: 'dir', value: parsedFilePath.dir });
       slug = `/${parsedFilePath.dir}/${parsedFilePath.name}/`;
     } else if (parsedFilePath.dir === '') {
       slug = `/${parsedFilePath.name}/`;
@@ -54,6 +49,7 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
                 }
                 fields {
                   slug
+                  dir
                 }
               }
             }
@@ -94,6 +90,7 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
               component: lessonPage,
               context: {
                 slug: edge.node.fields.slug,
+                dir: edge.node.fields.dir,
               },
             });
           }

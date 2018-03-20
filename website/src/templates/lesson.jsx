@@ -1,18 +1,18 @@
-import React from "react"
-import Helmet from "react-helmet"
-import styled from "styled-components"
-import Link from 'gatsby-link'
+// @flow
+import React, { Component } from 'react';
+import Helmet from 'react-helmet';
+import styled from 'styled-components';
 
-import SEO from "../components/SEO"
-import SiteHeader from '../components/Layout/Header'
-import config from "../../data/SiteConfig"
-import TableOfContents from "../components/Layout/TableOfContents"
+import SEO from '../components/SEO';
+import SiteHeader from '../components/Layout/Header';
+import config from '../../data/SiteConfig';
+import TableOfContents from '../components/Layout/TableOfContents';
 
-export default class LessonTemplate extends React.Component {
+export default class LessonTemplate extends Component {
   render() {
-    const {slug} = this.props.pathContext
-    const postNode = this.props.data.postBySlug
-    const post = postNode.frontmatter
+    const { slug } = this.props.pathContext;
+    const postNode = this.props.data.postBySlug;
+    const post = postNode.frontmatter;
     if (!post.id) {
       post.id = slug;
     }
@@ -24,14 +24,14 @@ export default class LessonTemplate extends React.Component {
         <Helmet>
           <title>{`${post.title} | ${config.siteTitle}`}</title>
         </Helmet>
-        <SEO postPath={slug} postNode={postNode} postSEO/>
+        <SEO postPath={slug} postNode={postNode} postSEO />
         <BodyGrid>
           <HeaderContainer>
-            <SiteHeader location={this.props.location}/>
+            <SiteHeader location={this.props.location} />
           </HeaderContainer>
           <ToCContainer>
             <TableOfContents
-              posts={this.props.data.tableOfContents}
+              contents={this.props.data.lookit}
             />
           </ToCContainer>
           <BodyContainer>
@@ -39,7 +39,7 @@ export default class LessonTemplate extends React.Component {
               <h1>
                 {post.title}
               </h1>
-              <div dangerouslySetInnerHTML={{__html: postNode.html}}/>
+              <div dangerouslySetInnerHTML={{ __html: postNode.html }} />
             </div>
           </BodyContainer>
         </BodyGrid>
@@ -53,13 +53,13 @@ const BodyGrid = styled.div`
   display: grid;
   grid-template-rows: 75px 1fr;
   grid-template-columns: 300px 1fr;
-  
+
   @media screen and (max-width: 600px) {
     display: flex;
     flex-direction: column;
     height: inherit;
   }
-`
+`;
 
 const BodyContainer = styled.div`
   grid-column: 2 / 3;
@@ -71,16 +71,16 @@ const BodyContainer = styled.div`
   @media screen and (max-width: 600px) {
     order: 2;
   }
-  
+
   & > div {
     max-width: ${props => props.theme.contentWidthLaptop};
     margin: auto;
   }
-  
+
   & > h1 {
     color: ${props => props.theme.accentDark};
   }
-`
+`;
 
 const HeaderContainer = styled.div`
   grid-column: 1 / 3;
@@ -89,7 +89,7 @@ const HeaderContainer = styled.div`
    @media screen and (max-width: 600px) {
     order: 1;
   }
-`
+`;
 
 const ToCContainer = styled.div`
   grid-column: 1 / 2;
@@ -100,11 +100,11 @@ const ToCContainer = styled.div`
     order: 3;
     overflow: inherit;
   }
-`
+`;
 
-/* eslint no-undef: "off"*/
+/* eslint no-undef: "off" */
 export const pageQuery = graphql`
-  query LessonBySlug($slug: String!) {
+  query LessonBySlug($slug: String!, $dir: String!) {
   postBySlug: markdownRemark(fields: { slug: { eq: $slug } }) {
     html
     timeToRead
@@ -117,66 +117,23 @@ export const pageQuery = graphql`
       tags
     }
   }
-  tableOfContents: lessonsJson {
-      coolness
-      chapters {
-        one {
-          subchapter_one_one {
-            post {
-              id
-              childMarkdownRemark {
-                fields {
-                  slug
-                }
-                frontmatter {
-                  title
-                }
-              }
-            }
-          }
-          subchapter_one_two {
-            post {
-              id
-              childMarkdownRemark {
-                fields {
-                  slug
-                }
-                frontmatter {
-                  title
-                }
-              }
-            }
-          }
+  lookit: allMarkdownRemark(
+    limit: 2000
+    sort: { fields: [frontmatter___date], order: DESC }
+    filter: { fields: { dir: { eq: $dir } } }
+  ) {
+    edges {
+      node {
+        fields {
+          slug
         }
-        two {
-          subchapter_two_one {
-            post {
-              id
-              childMarkdownRemark {
-                fields {
-                  slug
-                }
-                frontmatter {
-                  title
-                }
-              }
-            }
-          }
-        }
-        three {
-          post {
-            id
-            childMarkdownRemark {
-              fields {
-                slug
-              }
-              frontmatter {
-                title
-              }
-            }
-          }
+        excerpt
+        timeToRead
+        frontmatter {
+          title
         }
       }
     }
+  }
   }
 `;
