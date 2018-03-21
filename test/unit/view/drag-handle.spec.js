@@ -927,7 +927,7 @@ describe('drag handle', () => {
         mouseDown(wrapper);
         windowMouseMove({ x: 0, y: sloppyClickThreshold });
         // resize event
-        const event: Event = new Event('visibilitychange');
+        const event: Event = new Event('webkitvisibilitychange');
         window.dispatchEvent(event);
 
         expect(callbacksCalled(callbacks)({
