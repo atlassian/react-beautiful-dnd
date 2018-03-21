@@ -922,6 +922,23 @@ describe('drag handle', () => {
         expect(event.defaultPrevented).toBe(false);
       });
 
+      it('should cancel when the window is not visibile', () => {
+        // lift
+        mouseDown(wrapper);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
+        // resize event
+        const event: Event = new Event('visibilitychange');
+        window.dispatchEvent(event);
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 1,
+          onMove: 0,
+          onCancel: 1,
+        })).toBe(true);
+        // This is not a direct cancel so we do not prevent the default action
+        expect(event.defaultPrevented).toBe(false);
+      });
+
       it('should not execute any pending movements after the cancel', () => {
         // lift
         mouseDown(wrapper);

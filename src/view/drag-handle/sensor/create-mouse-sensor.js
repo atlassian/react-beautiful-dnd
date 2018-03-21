@@ -13,6 +13,7 @@ import type {
   Position,
 } from '../../../types';
 import type { MouseSensor, CreateSensorArgs } from './sensor-types';
+import addVisibilityEvent from '../util/create-visibility-event';
 
 // Custom event format for force press inputs
 type MouseForceChangedEvent = MouseEvent & {
@@ -219,6 +220,7 @@ export default ({
         }
       },
     },
+    addVisibilityEvent(cancel),
   ];
 
   const bindWindowEvents = () => {

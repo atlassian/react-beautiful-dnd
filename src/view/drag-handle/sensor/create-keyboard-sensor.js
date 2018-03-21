@@ -12,6 +12,7 @@ import type { KeyboardSensor, CreateSensorArgs } from './sensor-types';
 import type {
   Props,
 } from '../drag-handle-types';
+import addVisibilityEvent from '../util/create-visibility-event';
 
 type State = {|
   isDragging: boolean,
@@ -222,6 +223,7 @@ export default ({
       eventName: 'scroll',
       fn: callbacks.onWindowScroll,
     },
+    addVisibilityEvent(cancel),
   ];
 
   const bindWindowEvents = () => {

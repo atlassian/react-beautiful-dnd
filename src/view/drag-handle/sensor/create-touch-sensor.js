@@ -11,6 +11,7 @@ import type {
   Position,
 } from '../../../types';
 import type { TouchSensor, CreateSensorArgs } from './sensor-types';
+import addVisibilityEvent from '../util/create-visibility-event';
 
 type State = {
   isDragging: boolean,
@@ -280,6 +281,7 @@ export default ({
         }
       },
     },
+    addVisibilityEvent(cancel),
   ];
 
   const bindWindowEvents = () => {
