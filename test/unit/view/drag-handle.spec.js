@@ -2919,6 +2919,28 @@ describe('drag handle', () => {
               });
             });
 
+            it('should not start a drag if the child is an SVG', () => {
+              // $ExpectError - flow does not know about SVGElement yet
+              const svg: SVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+              expect(svg instanceof SVGElement).toBe(true);
+
+              mixedCase(interactiveTagNames).forEach((tagName: string) => {
+                const parent: HTMLElement = document.createElement(tagName);
+                parent.appendChild(svg);
+                const options = {
+                  target: svg,
+                };
+
+                control.preLift(wrapper, options);
+                control.lift(wrapper, options);
+                control.drop(wrapper);
+
+                expect(callbacksCalled(callbacks)({
+                  onLift: 0,
+                })).toBe(true);
+              });
+            });
+
             it('should start a drag on an element with an interactive parent if asked to by user', () => {
               // allowing dragging from interactive elements
               wrapper.setProps({ canDragInteractiveElements: true });

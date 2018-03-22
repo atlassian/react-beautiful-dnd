@@ -10,11 +10,6 @@ const flag: string = '__react-beautiful-dnd-debug-timings-hook__';
 
 const isTimingsEnabled = (): boolean => Boolean(window[flag]);
 
-if (process.env.NODE_ENV === 'development') {
-  // eslint-disable-next-line no-console
-  console.log(`Set window['${flag}'] = true to enable timings`);
-}
-
 export const start = (key: string) => {
   if (!isTimingsEnabled()) {
     return;
