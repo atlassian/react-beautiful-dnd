@@ -266,14 +266,13 @@ export default (state: State = clean('IDLE'), action: Action): State => {
         return existing;
       }
 
-      // $ExpectError - using spread
-      const newDrag: DragState = {
+      const newDrag: DragState = ({
         ...existing,
         current: {
           ...existing.current,
           hasCompletedFirstBulkPublish: true,
         },
-      };
+      }: any);
 
       return newDrag;
     })();

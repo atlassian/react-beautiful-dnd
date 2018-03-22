@@ -204,12 +204,15 @@ export default ({
     {
       eventName: 'webkitmouseforcechanged',
       fn: (event: MouseForceChangedEvent) => {
-        if (event.webkitForce == null || MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null) {
+        if (
+          event.webkitForce == null ||
+          (MouseEvent: any).WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null
+        ) {
           console.error('handling a mouse force changed event when it is not supported');
           return;
         }
 
-        const forcePressThreshold: number = (MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN : any);
+        const forcePressThreshold: number = (MouseEvent: any).WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN;
         const isForcePressing: boolean = event.webkitForce >= forcePressThreshold;
 
         if (isForcePressing) {
