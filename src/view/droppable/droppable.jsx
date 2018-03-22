@@ -26,13 +26,6 @@ export default class Droppable extends Component<Props, State> {
     ref: null,
   }
 
-  static defaultProps: DefaultProps = {
-    type: 'DEFAULT',
-    isDropDisabled: false,
-    direction: 'vertical',
-    ignoreContainerClipping: false,
-  }
-
   // Need to declare childContextTypes without flow
   static contextTypes = {
     [styleContextKey]: PropTypes.string.isRequired,

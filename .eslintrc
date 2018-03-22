@@ -12,6 +12,11 @@
     "node": true,
     "jest/globals": true
   },
+  "globals": {
+    "TimeoutID": true,
+    "IntervalID": true,
+    "AnimationFrameID": true
+  },
   // custom rules
   "rules": {
     // http://eslint.org/docs/rules/comma-dangle
