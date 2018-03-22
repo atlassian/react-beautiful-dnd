@@ -33,7 +33,7 @@ type State = {|
   isCollecting: boolean,
   scrollOptions: ?ScrollOptions,
   request: ?LiftRequest,
-  frameId: ?number,
+  frameId: ?AnimationFrameID,
 |}
 
 type ToBePublished = {|
@@ -337,7 +337,7 @@ export default (callbacks: Callbacks) => {
     homeEntry.callbacks.watchScroll(request.scrollOptions);
   };
 
-  const setFrameId = (frameId: ?number) => {
+  const setFrameId = (frameId: ?AnimationFrameID) => {
     setState({
       frameId,
     });
@@ -369,7 +369,7 @@ export default (callbacks: Callbacks) => {
     const toBeCollected: UnknownDescriptorType[] = getToBeCollected();
 
     // Phase 1: collect dimensions in a single frame
-    const collectFrameId: number = requestAnimationFrame(() => {
+    const collectFrameId: AnimationFrameID = requestAnimationFrame(() => {
       const toBePublishedBuffer: UnknownDimensionType[] = toBeCollected.map(
         (descriptor: UnknownDescriptorType): UnknownDimensionType => {
           // is a droppable
@@ -382,7 +382,7 @@ export default (callbacks: Callbacks) => {
       );
 
       // Phase 2: publish all dimensions to the store
-      const publishFrameId: number = requestAnimationFrame(() => {
+      const publishFrameId: AnimationFrameID = requestAnimationFrame(() => {
         const toBePublished: ToBePublished = toBePublishedBuffer.reduce(
           (previous: ToBePublished, dimension: UnknownDimensionType): ToBePublished => {
             // is a draggable

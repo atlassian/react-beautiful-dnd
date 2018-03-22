@@ -15,7 +15,7 @@ import type { TouchSensor, CreateSensorArgs } from './sensor-types';
 type State = {
   isDragging: boolean,
   hasMoved: boolean,
-  longPressTimerId: ?number,
+  longPressTimerId: ?TimeoutID,
   pending: ?Position,
 }
 
@@ -96,7 +96,7 @@ export default ({
       y: clientY,
     };
 
-    const longPressTimerId: number = setTimeout(startDragging, timeForLongPress);
+    const longPressTimerId: TimeoutID = setTimeout(startDragging, timeForLongPress);
 
     setState({
       longPressTimerId,
@@ -108,7 +108,9 @@ export default ({
   };
 
   const stopPendingDrag = () => {
-    clearTimeout(state.longPressTimerId);
+    if (state.longPressTimerId) {
+      clearTimeout(state.longPressTimerId);
+    }
     schedule.cancel();
     touchStartMarshal.reset();
     unbindWindowEvents();

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import memoizeOne from 'memoize-one';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
@@ -32,6 +33,7 @@ import type {
 import type {
   MapProps,
   OwnProps,
+  DefaultProps,
   DispatchProps,
   Selector,
 } from './draggable-types';
@@ -243,7 +245,6 @@ export const makeSelector = (): Selector => {
 
 const makeMapStateToProps = () => {
   const selector: Selector = makeSelector();
-  // $FlowFixMe - no idea how to type this correctly
   return (state: State, props: OwnProps) => selector(state, props);
 };
 
@@ -263,12 +264,19 @@ const mapDispatchToProps: DispatchProps = {
 // Leaning heavily on the default shallow equality checking
 // that `connect` provides.
 // It avoids needing to do it own within `Draggable`
-export default connect(
+const ConnectedDraggable: OwnProps => Node = (connect(
   // returning a function to ensure each
   // Draggable gets its own selector
-  makeMapStateToProps,
-  mapDispatchToProps,
+  (makeMapStateToProps: any),
+  (mapDispatchToProps: any),
   null,
   { storeKey },
-)(Draggable);
+): any)(Draggable);
 
+ConnectedDraggable.defaultProps = ({
+  isDragDisabled: false,
+  // cannot drag interactive elements by default
+  disableInteractiveElementBlocking: false,
+}: DefaultProps);
+
+export default ConnectedDraggable;
