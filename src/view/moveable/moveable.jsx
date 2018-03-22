@@ -90,7 +90,7 @@ export default class Movable extends Component<Props> {
       // React Motion type: children: (interpolatedStyle: PlainStyle) => ReactElement
       // Our type: children: (Position) => (Style) => React.Node
       <Motion defaultStyle={origin} style={final} onRest={this.onRest}>
-        {(current: { [string]: number }) =>
+        {(current: { [string]: number }): any =>
           this.props.children(
             getStyle(isNotMoving, current.x, current.y)
           )}

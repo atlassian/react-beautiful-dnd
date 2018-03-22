@@ -1,5 +1,5 @@
 // @flow
-import type { Element } from 'react';
+import type { Node } from 'react';
 import type { Position } from '../../types';
 
 export type Speed = 'INSTANT' | 'STANDARD' | 'FAST';
@@ -12,7 +12,7 @@ export type Props = {|
   speed: Speed,
   destination: Position,
   onMoveEnd: () => void,
-  children: (Style) => Element<*>,
+  children: (Style) => Node,
 |}
 
 export type DefaultProps = {|

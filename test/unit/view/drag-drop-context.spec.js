@@ -43,7 +43,7 @@ describe('DragDropContext', () => {
     const app = TestUtils.findRenderedComponentWithType(tree, App);
 
     if (!app) {
-      return;
+      throw new Error('Invalid test setup');
     }
 
     expect(app.context[storeKey]).toHaveProperty('dispatch');
@@ -81,7 +81,7 @@ describe('DragDropContext', () => {
       const app = TestUtils.findRenderedComponentWithType(tree, App);
 
       if (!app) {
-        return;
+        throw new Error('Invalid test setup');
       }
 
       expect(app.context[canLiftContextKey]).toBeInstanceOf(Function);
