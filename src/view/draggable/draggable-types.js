@@ -7,6 +7,7 @@ import type {
   Position,
   Direction,
   ZIndex,
+  TypeId,
 } from '../../types';
 import {
   lift,
@@ -146,6 +147,7 @@ export type OwnProps = {|
   index: number,
   isDragDisabled: boolean,
   disableInteractiveElementBlocking: boolean,
+  type: ?TypeId
 |}
 
 export type DefaultProps = {|
