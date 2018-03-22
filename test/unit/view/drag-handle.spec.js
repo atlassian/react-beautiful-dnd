@@ -42,6 +42,12 @@ const getStubCallbacks = (): Callbacks => ({
   onWindowScroll: jest.fn(),
 });
 
+const resetCallbacks = (callbacks: Callbacks) => {
+  Object.keys(callbacks).forEach((key: string) => {
+    callbacks[key].mockReset();
+  });
+};
+
 type CallBacksCalledFn = {|
   onLift?: number,
   onMove?: number,
@@ -2941,7 +2947,47 @@ describe('drag handle', () => {
               });
             });
 
-            it('should start a drag on an element with an interactive parent if asked to by user', () => {
+            it('should start a drag on a Element with an interactive parent if asked to by user', () => {
+              // allowing dragging from interactive elements
+              wrapper.setProps({ canDragInteractiveElements: true });
+
+              // $ExpectError - flow does not know about SVGElement yet
+              const svg: SVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+              expect(svg instanceof SVGElement).toBe(true);
+
+              const div: HTMLElement = document.createElement('div');
+              expect(div instanceof HTMLElement).toBe(true);
+
+              [div, svg].forEach((child: Element) => {
+                mixedCase(interactiveTagNames).forEach((tagName: string) => {
+                  const parent: HTMLElement = document.createElement(tagName);
+                  parent.appendChild(child);
+                  const options = {
+                    target: child,
+                  };
+
+                  expect(callbacksCalled(callbacks)({
+                    onLift: 0,
+                    onDrop: 0,
+                  })).toBe(true);
+
+                  control.preLift(wrapper, options);
+                  control.lift(wrapper, options);
+                  control.drop(wrapper);
+
+                  expect(callbacksCalled(callbacks)({
+                    onLift: 1,
+                    onDrop: 1,
+                  })).toBe(true);
+
+                  // cleanup
+                  resetCallbacks(callbacks);
+                  parent.removeChild(child);
+                });
+              });
+            });
+
+            it('should start a drag on a SVGElement with an interactive parent if asked to by user', () => {
               // allowing dragging from interactive elements
               wrapper.setProps({ canDragInteractiveElements: true });
 
