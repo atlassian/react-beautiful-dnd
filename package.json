@@ -77,8 +77,8 @@
     "flow-bin": "0.68.0",
     "jest": "^22.0.5",
     "raf-stub": "^2.0.2",
-    "react": "^15.6.2",
-    "react-dom": "^15.6.2",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
     "react-test-renderer": "^16.2.0",
     "rimraf": "^2.6.2",
     "rollup": "^0.56.2",
@@ -91,7 +91,7 @@
     "styled-components": "^3.2.0"
   },
   "peerDependencies": {
-    "react": ">=15.4.0 || ^16.0.0"
+    "react": "^16.2.0"
   },
   "license": "Apache-2.0",
   "repository": {
