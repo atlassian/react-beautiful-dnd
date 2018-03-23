@@ -1,53 +1,57 @@
 # Screen reader guide
 
-`react-beautiful-dnd` ships with great screen reader support in english out of the box 📦! So if you are looking to just get started there is nothing you need to do.
+> Because great features should be accessible for everyone
 
-However, you have total control over all of the messages. This allows you to tailor the messaging for your particular usages as well as for internationalisation purposes.
+`react-beautiful-dnd` ships with great screen reader support, in English, out of the box. If you just want to get started, then there's nothing you have to do. But if it's tailored messaging you're after, you have total control of that too.
 
-This guide has been written to assist you in creating your own messaging that is functional and delights users. It is possible for a user who is using a screen reader to use any input type. However, we have the screen reader experience to be focused on keyboard interactions.
+This guide is here to help you create messaging that supports and delights your users. The screen reader experience is focused on keyboard interactions, but it's possible for a screen reader user to use any input type (for example mouse and keyboard).
 
 ## Tone
 
-For the default messages we have gone for a friendly tone. We have also chosen to use personal language; preferring phases such as 'You have dropped the item' over 'Item dropped'. It is a little more wordy but is a friendlier experience. You are welcome to choose your own tone for your messaging.
+In the default messages we went for a friendly tone, choosing phrases such as "You have dropped the item" over "Item dropped". We know it's wordier, but we think the pronoun makes it personal and sound less like a computer.
+
+Choose a tone that best supports what your audience is trying to do. If you need some inspiration and best practice guides, head to [https://atlassian.design](https://atlassian.design) and see how we communicate with our customers here at Atlassian.
 
 ## How to control announcements
 
-The `announce` function that is provided to each of the `DragDropContext` > `Hook` functions can be used to provide your own screen reader message. This message will be immediately read out. In order to provide a fast and responsive experience to users **you must provide this message synchronously**. If you attempt to hold onto the `announce` function and call it later it will not work and will just print a warning to the console. Additionally, if you try to call `announce` twice for the same event then only the first will be read by the screen reader with subsequent calls to `announce` being ignored and a warning printed.
+The `announce` function is provided to each of the `DragDropContext > Hook` functions and can be used to deliver your own screen reader messages. Messages will be immediately read out. It's important to deliver messages immediately, so your users have a fast and responsive experience.
 
-## Step 1: lift instructions
+If you attempt to hold onto the `announce` function and call it later, it won't work and will just print a warning to the console. If you try to call announce twice for the same event, only the first will be read by the screen reader with subsequent calls to announce being ignored and a warning printed.
 
-When a user `tabs` to a `Draggable` we need to instruct them on how they can start a drag. We do this by using the `aria-roledescription` property on a `drag handle`.
+## Instructions to cover
+
+### Step 1: Introduce draggable item
+
+When a user `tabs` to a `Draggable`, we need to tell them how to start a drag. We do this by using the `aria-roledescription` property on a *drag handle*.
 
 **Default message**: "Draggable item. Press space bar to lift"
 
-Things to note:
+We tell the user the following:
 
-- We tell the user that the item is draggable
-- We tell the user how they can start a drag
+- The item is draggable
+- How to start a drag
 
-We do not give all the drag movement instructions at this point as they are not needed until a user starts a drag.
+You don't need to give all the drag movement instructions at this point, let's wait until the user decides to start a drag.
 
-The **default** message is fairly robust, however, you may prefer to substitute the word "item" for a noun that more closely matches your problem domain, such as "task" or "issue". You may also want to drop the word "item" altogether.
+Think about substituting the word "item" for a noun that matches your problem domain, for example, "task" or "issue". You might also want to drop the word "item" altogether.
 
-## Step 2: drag start
+### Step 2: Start drag
 
-When a user lifts a `Draggable` by using the `spacebar` we want to tell them a few things:
+When a user lifts a `Draggable` by using the `spacebar` we want to tell them a number of things.
 
-- they have lifted the item
-- what position the item is in
-- how to move the item around
+**Default message**: "You have lifted an item in position `${start.source.index + 1}`. Use the arrow keys to move, space bar to drop, and escape to cancel."
 
-**Default message**: "You have lifted an item in position ${start.source.index + 1}. Use the arrow keys to move, space bar to drop, and escape to cancel."
+We tell the user the following:
 
-By default we do not say they are in position `1 of x`. This is because we do not have access to the size of the list in the current api. We have kept it like this for now to keep the api light and future proof as we move towards virtual lists. You are welcome to add the `1 of x` language yourself if you like!
+- They have lifted the item
+- What position the item is in
+- How to move the item around
 
-You may also want to say what list the item is in and potentially the index of the list.
+Notice that we don't tell them that they are in position `1 of x`. This is because we don't have access to the size of the list in the current api. It is like this for now to keep the api light and future proof as we move towards virtual lists. Feel free to add the the `1 of x` in your own messaging, and what list the item is in.
 
-Here is an message that has a little more information:
+**Message with more info**: "You have lifted an item in position `${startPosition}` of `${listLength}` in the `${listName}` list. Use the arrow keys to move, space bar to drop, and escape to cancel."
 
-"You have lifted an item in position ${startPosition} of ${listLength} in the ${listName} list. Use the arrow keys to move, space bar to drop, and escape to cancel."
-
-You can control the message printed to the user by using the `DragDropContext` > `onDragStart` hook
+You control the message printed to the user through the `DragDropContext` > `onDragStart` hook
 
 ```js
 onDragStart = (start: DragStart, provided: HookProvided) => {
@@ -55,11 +59,11 @@ onDragStart = (start: DragStart, provided: HookProvided) => {
 }
 ```
 
-## Step 3: drag movement
+### Step 3: Drag movement
 
-When something changes in response to a user interaction we want to announce the current state of the drag to the user. There are a lot of different things that can happen so we will need a different message for these different stages.
+When a user has started a drag, there are different scenarios that can spring from that, so we'll create different messaging for each scenario.
 
-We can control the announcement by using the `DragDropContext` > `onDragUpdate` hook.
+We can control the announcement through the `DragDropContext` > `onDragUpdate` hook.
 
 ```js
 onDragUpdate = (update: DragUpdate, provided: HookProvided) => {
@@ -67,46 +71,44 @@ onDragUpdate = (update: DragUpdate, provided: HookProvided) => {
 }
 ```
 
-### Moved in the same list
+#### Scenario 1. Moved in the same list
 
-In this scenario the user has moved backwards or forwards within the same list. We want to instruct the user what position they are now in.
+The user has moved backwards or forwards within the same list, so we want to tell the user what position they are now in.
 
-**Default message**: "You have moved the item to position ${update.destination.index + 1}".
+**Default message**: "You have moved the item to position `${update.destination.index + 1}`".
 
-You may also want to include `of ${listLength}` in your messaging.
+Think about including of `${listLength}` in your messaging.
 
-### Moved into a different list
+#### Scenario 2. Moved into a different list
 
-In this case we want to tell the user
+The user has moved on the cross axis into a different list, so we want to tell them a number of things.
 
-- they have moved to a new list
-- some information about the new list
-- what position they have moved from
-- what position they are now in
+**Default message**: "You have moved the item from list `${update.source.droppableId}` in position `${update.source.index + 1}` to list `${update.destination.droppableId}` in position `${update.destination.index + 1}`".
 
-**Default message**: "You have moved the item from list ${update.source.droppableId} in position ${update.source.index + 1} to list ${update.destination.droppableId} in position ${update.destination.index + 1}".
+We tell the user the following:
 
-You will probably want to change this messaging to use some friendly text for the name of the droppable. It would also be good to say the size of the lists in the message
+- They have moved to a new list
+- Some information about the new list
+- What position they have moved from
+- What position they are now in
 
-Suggestion:
+Think about using friendlier text for the name of the droppable, and including the length of the lists in the messaging.
 
-"You have moved the item from list ${sourceName} in position ${lastIndex} of ${sourceLength} to list ${destinationName} in position ${newIndex} of ${destinationLength}".
+**Message with more info**: "You have moved the item from list `${sourceName}` in position `${lastIndex}` of `${sourceLength}` to list `${destinationName}` in position `${newIndex}` of `${destinationLength}`".
 
-### Moved over no list
+#### Scenario 3. Moved over no list
 
-While this is not possible to do with a keyboard, it is worth having a message for this in case a screen reader user is using a pointer for dragging.
-
-You will want to simply explain that they are not over a droppable area.
+You can't do this with a keyboard, but it's worthwhile having a message for this scenario, in case the user has a pointer for dragging.
 
 **Default message**: "You are currently not dragging over a droppable area".
 
-## Step 3: on drop
+Think about how you could make this messaging friendlier and clearer.
 
-In this phase we give a small summary of what the user has achieved.
+### Step 4: On drop
 
-There are two ways a drop can occur. Either the drag was cancelled or the user released the dragging item. You are able to control the messaging for these events using the `DragDropContext` > `onDragEnd` hook.
+There are two ways a drop can happen. Either the drag is cancelled or the user drops the dragging item. You can control the messaging for these events using the `DragDropContext > onDragEnd` hook.
 
-### Cancel
+#### Scenario 1. Drag cancelled
 
 A `DropResult` object has a `reason` property which can either be `DROP` or `CANCEL`. You can use this to announce your cancel message.
 
@@ -119,45 +121,57 @@ onDragEnd = (result: DropResult, provided: HookProvided) => {
 }
 ```
 
-This announcement should:
-
-- Inform the user that the drag have been cancelled
-- Let the user know where the item has returned to
-
 **Default message**: "Movement cancelled. The item has returned to its starting position of ${result.source.index + 1}"
 
-You are also welcome to add information about the size of the list, and the name of the list you have dropped into.
+We tell the user the following:
 
-**Suggestion** "Movement cancelled. The item has returned to list ${listName} to its starting position of ${startPosition} of ${listLength}".
+- The drag has been cancelled
+- Where the item has returned to
 
-### Drop in the home list
+Think about adding information about the length of the list, and the name of the list you have dropped into.
+
+**Message with more info**: "Movement cancelled. The item has returned to list `${listName}` to its starting position of `${startPosition}` of` ${listLength}`".
+
+#### Scenario 2. Dropped in the home list (in new position)
+
+**Default message**: "You have dropped the item. It has moved from position `${result.source.index + 1}` to `${result.destination.index + 1}`"
 
 This announcement should:
 
-- Inform the user that they have completed the drag
-- Let them know what position the item is in now
+We tell the user the following:
 
-**Default message**: "You have dropped the item. It has moved from position ${result.source.index + 1} to ${result.destination.index + 1}"
+- They have completed the drag
+- What position the item is in now
 
-You may also want to provide a different message if they drop in the same position that they started in.
+#### Scenario 3. Dropped in the home list (in original position)
 
-**Default message**: "You have dropped the item. It has been dropped on its starting position of ${result.source.index + 1}"
+**Default message**: "You have dropped the item. It has been dropped on its starting position of `${result.source.index + 1}`"
 
-### Drop in a foreign list
+We tell the user the following:
 
-The messaging for this scenario should be similar to that of dropping in the home list, with the additional information of what list the item started in and where it finished.
+- They have completed the drag
+- That they dropped the item in the starting position
+- The starting position
 
-**Default message**: "You have dropped the item. It has moved from position ${result.source.index + 1} in list ${result.source.droppableId} to position ${result.destination.index + 1} in list ${result.destination.droppableId}"
+#### Scenario 4. Dropped on a foreign list
 
-You may want to extend this to include the name of the `Droppable` rather than the id. Also, if your `Droppable`s are ordered you may also want to include some positioning information.
+The messaging for this scenario should be similar to 'dropped in a home list', but we also add what list the item started in and where it finished.
 
-### Drop on no destination
+**Default message**: "You have dropped the item. It has moved from position `${result.source.index + 1}` in list `${result.source.droppableId}` to position `${result.destination.index + 1}` in list `${result.destination.droppableId}`"
 
-It is possible for a user to drop on no Droppable. This is not possible to do with a keyboard. However, if a user is using a pointer input such as a mouse. Our messaging is geared towards keyboard usage. However, it is a good idea to provide messaging for this scenario also.
+Think about including the name of the `Droppable`, instead of the ID. You might also want to include the position if your `Droppable`s are ordered.
 
-In this message you should:
+#### Scenario 5. Dropped on no destination
 
-- Let the user know that they dropped while not over a droppable location
-- Let them know where the item has returned to
+You can't do this with a keyboard, but it's worthwhile having a message for this scenario, in case the user has a pointer for dragging.
 
 **Default message**: "The item has been dropped while not over a droppable location. The item has returned to its starting position of ${result.source.index + 1}"
+
+We tell the user the following:
+
+- They dropped over a location that is not droppable
+- Where the item has returned to
+
+## That's all folks
+
+We hope you find this guide useful. Feel free to send in suggestions for scenarios you'd like to see included, or you might want to share your own default messages and grow the knowledge even further 🙂.
