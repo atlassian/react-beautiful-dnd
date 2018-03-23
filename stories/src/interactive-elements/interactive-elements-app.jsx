@@ -22,7 +22,7 @@ const initial: ItemType[] = [
       <div>
         <p>Standard</p>
         <button>hello world</button><br />
-        <p>With child {' '}
+        <p>With child{' '}
           <a
             href="https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content"
             target="_blank"
@@ -32,6 +32,21 @@ const initial: ItemType[] = [
           </a>
         </p>
         <button>why <strong>hello <em>there!</em></strong></button>
+        <p>With child{' '}
+          <a
+            href="https://developer.mozilla.org/en-US/docs/Web/API/SVGElement"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            SVGElement
+          </a>
+        </p>
+        <button>
+          My circle <br />
+          <svg width="40" height="40">
+            <circle cx="20" cy="20" r="20" />
+          </svg>
+        </button>
       </div>
     ),
   },
