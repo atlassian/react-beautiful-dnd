@@ -2925,7 +2925,7 @@ describe('drag handle', () => {
               });
             });
 
-            it('should not start a drag if the child is an SVG', () => {
+            it('should not start a drag if the parent is interactive and the child is an SVG', () => {
               // $ExpectError - flow does not know about SVGElement yet
               const svg: SVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
               expect(svg instanceof SVGElement).toBe(true);
@@ -2984,29 +2984,6 @@ describe('drag handle', () => {
                   resetCallbacks(callbacks);
                   parent.removeChild(child);
                 });
-              });
-            });
-
-            it('should start a drag on a SVGElement with an interactive parent if asked to by user', () => {
-              // allowing dragging from interactive elements
-              wrapper.setProps({ canDragInteractiveElements: true });
-
-              mixedCase(interactiveTagNames).forEach((tagName: string, index: number) => {
-                const parent: HTMLElement = document.createElement(tagName);
-                const child: HTMLElement = document.createElement('span');
-                parent.appendChild(child);
-                const options = {
-                  target: child,
-                };
-
-                control.preLift(wrapper, options);
-                control.lift(wrapper, options);
-                control.drop(wrapper);
-
-                expect(callbacksCalled(callbacks)({
-                  onLift: index + 1,
-                  onDrop: index + 1,
-                })).toBe(true);
               });
             });
 
