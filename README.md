@@ -25,8 +25,8 @@ See how beautiful it is for yourself!
 
 We have created some basic examples on `codesandbox` for you to play with directly:
 
-- [simple vertical list](https://codesandbox.io/s/k260nyxq9v)
-- [simple horizontal list](https://codesandbox.io/s/mmrp44okvj)
+- [Simple vertical list](https://codesandbox.io/s/k260nyxq9v)
+- [Simple horizontal list](https://codesandbox.io/s/mmrp44okvj)
 
 > Coming soon: a getting starting guide!
 
