@@ -6,35 +6,50 @@ import uglify from 'rollup-plugin-uglify';
 import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
 import strip from 'rollup-plugin-strip';
+import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
 
-const min = process.env.NODE_ENV === 'min';
+const getUMDConfig = ({ env, file }) => {
+  const config = {
+    input: './src/index.js',
+    output: {
+      file,
+      format: 'umd',
+      name: 'ReactBeautifulDnd',
+      globals: { react: 'React' },
+    },
+    plugins: [
+      babel({
+        exclude: 'node_modules/**',
+        runtimeHelpers: true,
+      }),
+      resolve({
+        extensions: ['.js', '.jsx'],
+      }),
+      commonjs({
+        include: 'node_modules/**',
+      }),
+      replace({
+        'process.env.NODE_ENV': JSON.stringify(env),
+      }),
+      strip({
+        debugger: true,
+      }),
+    ],
+    external: ['react'],
+  };
 
-export default {
-  input: './src/index.js',
-  output: {
-    file: `dist/react-beautiful-dnd${min ? '.min' : ''}.js`,
-    format: 'umd',
-    name: 'ReactBeautifulDnd',
-    globals: { react: 'React' },
-  },
-  plugins: [
-    babel({
-      exclude: 'node_modules/**',
-      runtimeHelpers: true,
-    }),
-    resolve({
-      extensions: ['.js', '.jsx'],
-    }),
-    commonjs({
-      include: 'node_modules/**',
-    }),
-    replace({
-      'process.env.NODE_ENV': JSON.stringify('production'),
-    }),
-    strip({
-      debugger: true,
-    }),
-    min ? uglify() : {},
-  ],
-  external: ['react'],
+  if (env === 'development') {
+    config.plugins.push(sizeSnapshot());
+  }
+
+  if (env === 'production') {
+    config.plugins.push(uglify());
+  }
+
+  return config;
 };
+
+export default [
+  getUMDConfig({ env: 'development', file: 'dist/react-beautiful-dnd.js' }),
+  getUMDConfig({ env: 'production', file: 'dist/react-beautiful-dnd.min.js' }),
+];
