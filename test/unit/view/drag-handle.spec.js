@@ -2773,10 +2773,7 @@ describe('drag handle', () => {
       },
     };
 
-    // const controls: Control[] = [mouse, keyboard, touch];
-    // const controls: Control[] = [touch, keyboard];
-    // const controls: Control[] = [mouse, keyboard];
-    const controls: Control[] = [keyboard];
+    const controls: Control[] = [mouse, keyboard, touch];
 
     controls.forEach((control: Control) => {
       describe(`control: ${control.name}`, () => {
@@ -2785,47 +2782,44 @@ describe('drag handle', () => {
         });
 
         describe('window bindings', () => {
-          it.only('should unbind all window listeners when drag ends', () => {
-            // Window event listeners capturing the 'error' handlers that react is adding
-            // Therefore we need to filter out any error event handlers
+          it('should unbind all window listeners when drag ends', () => {
+            jest.spyOn(window, 'addEventListener');
+            jest.spyOn(window, 'removeEventListener');
+            // We need to exclude event listener bindings for error events
+            // Enzyme adds them to support componentDidCatch testing
+            const countWithErrorsExcluded = (stub): number => stub.mock.calls
+              .filter((args: mixed[]) => args[0] !== 'error').length;
+            const getAddCount = (): number =>
+              countWithErrorsExcluded(window.addEventListener);
+            const getRemoveCount = (): number =>
+              countWithErrorsExcluded(window.removeEventListener);
 
-            let addCount: number = 0;
-            jest.spyOn(window, 'addEventListener').mockImplementation((eventName: string) => {
-              if (eventName !== 'error') {
-                addCount++;
-              }
-            });
-            let removeCount: number = 0;
-            jest.spyOn(window, 'removeEventListener').mockImplementation((eventName: string) => {
-              if (eventName !== 'error') {
-                removeCount++;
-              }
-            });
-
-            expect(addCount).toBe(0);
-            expect(removeCount).toBe(0);
+            // initial validation
+            expect(getAddCount()).toBe(0);
+            expect(getRemoveCount()).toBe(0);
 
             control.preLift();
             control.lift();
 
             // window events bound
-            expect(addCount).toBeGreaterThan(0);
+            expect(getAddCount()).toBeGreaterThan(0);
             // nothing unbound yet
-            expect(removeCount).toBe(0);
+            expect(getRemoveCount()).toBe(0);
 
             // ending the drag
             control.drop();
 
             if (!control.hasPostDragClickBlocking) {
-              expect(addCount).toBe(removeCount);
+              expect(getAddCount()).toBe(getRemoveCount());
             } else {
               // we have added post drag listeners
-              expect(addCount).toBeGreaterThan(removeCount);
+              expect(getAddCount()).toBeGreaterThan(getRemoveCount());
 
               // finish the post drag blocking
               windowMouseClick();
 
-              expect(addCount).toBe(removeCount);
+              // everything is now unbound
+              expect(getAddCount()).toBe(getRemoveCount());
             }
 
             // cleanup

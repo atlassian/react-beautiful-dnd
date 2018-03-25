@@ -112,6 +112,18 @@
     "function-paren-newline": "off",
 
     // Require // @flow at the top of files
-    "flowtype/require-valid-file-annotation": ["error", "always", { "annotationStyle": "line" }]
+    "flowtype/require-valid-file-annotation": ["error", "always", { "annotationStyle": "line" }],
+
+    // Forcing consistent use of 'it' for jest
+    "jest/consistent-test-it":  ["error", {"fn": "it"}],
+
+    // No .only tests allowed
+    "jest/no-focused-tests": "error",
+
+    // Must actually assert something in your jest test
+    "jest/valid-expect": "error",
+
+    // Force valid describe blocks
+    "jest/valid-describe": "error"
   }
 }
