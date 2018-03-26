@@ -106,6 +106,11 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
   });
 };
 
+exports.modifyBabelrc = ({ babelrc }) => ({
+  ...babelrc,
+  presets: babelrc.presets.concat(['flow']),
+});
+
 exports.modifyWebpackConfig = ({ config, stage }) => {
   if (stage === 'build-javascript') {
     config.plugin('Lodash', webpackLodashPlugin, null);

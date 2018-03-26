@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 import config from '../../data/SiteConfig';
 import Navigation from '../components/Layout/Navigation';
+import theme from '../layouts/theme';
 
 class Index extends Component {
   render() {
@@ -43,6 +44,7 @@ const Hero = styled.div`
   & > h1 {
     font-weight: 600;
   }
+  color: ${theme.lightGrey}
 `;
 
 const BodyContainer = styled.div`
@@ -53,7 +55,7 @@ const BodyContainer = styled.div`
 
 export const pageQuery = graphql`
   query IndexQuery {
-  markdownRemark(headings: {value: {eq: "react-beautiful-dnd"}, depth: {eq: 1}}) {
+  markdownRemark(fields: {dir: {eq: null} slug:{eq: "/README/"} }) {
     tableOfContents
     html
   }

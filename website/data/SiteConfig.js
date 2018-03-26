@@ -1,9 +1,5 @@
 // @flow
 module.exports = {
-  publicExamplesDir: 'examples/visible',
-  privateExamplesDir: 'examples/hidden',
-  blogPostDir: 'posts', // The name of directory that contains your posts.
-  lessonsDir: 'lessons', // The name of the directory that contains lessons or docs.
   siteTitle: 'react beautiful dnd', // Site title.
   siteTitleAlt: 'Beautiful, accessible drag and drop for lists with React.js', // Alternative site title for SEO.
   siteLogo: '/logos/logo-1024.png', // Logo used for SEO and manifest.
