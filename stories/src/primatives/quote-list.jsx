@@ -1,6 +1,6 @@
 // @flow
 /* eslint-disable react/no-multi-comp */
-import React, { Component } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Droppable, Draggable } from '../../../src';
 import QuoteItem from '../primatives/quote-item';
@@ -60,7 +60,7 @@ type QuoteListProps = {|
   autoFocusQuoteId: ?string,
 |}
 
-class InnerQuoteList extends Component<QuoteListProps> {
+class InnerQuoteList extends React.Component<QuoteListProps> {
   shouldComponentUpdate(nextProps: QuoteListProps) {
     if (nextProps.quotes !== this.props.quotes) {
       return true;
@@ -75,7 +75,7 @@ class InnerQuoteList extends Component<QuoteListProps> {
         {this.props.quotes.map((quote: Quote, index: number) => (
           <Draggable key={quote.id} draggableId={quote.id} index={index}>
             {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
-              <div>
+              <React.Fragment>
                 <QuoteItem
                   key={quote.id}
                   quote={quote}
@@ -84,7 +84,7 @@ class InnerQuoteList extends Component<QuoteListProps> {
                   autoFocus={this.props.autoFocusQuoteId === quote.id}
                 />
                 {dragProvided.placeholder}
-              </div>
+              </React.Fragment>
           )}
           </Draggable>
         ))}
@@ -100,7 +100,7 @@ type InnerListProps = {|
   autoFocusQuoteId: ?string,
 |}
 
-class InnerList extends Component<InnerListProps> {
+class InnerList extends React.Component<InnerListProps> {
   render() {
     const { quotes, dropProvided, autoFocusQuoteId } = this.props;
     const title = this.props.title ? (
@@ -122,7 +122,7 @@ class InnerList extends Component<InnerListProps> {
   }
 }
 
-export default class QuoteList extends Component<Props> {
+export default class QuoteList extends React.Component<Props> {
   render() {
     const {
       ignoreContainerClipping,

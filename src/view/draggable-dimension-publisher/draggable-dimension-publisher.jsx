@@ -102,15 +102,15 @@ export default class DraggableDimensionPublisher extends Component<Props> {
       throw new Error('Cannot get dimension for unpublished draggable');
     }
 
+    const tagName: string = targetRef.tagName.toLowerCase();
     const style = window.getComputedStyle(targetRef);
-
+    const display: string = style.display;
     const margin: Spacing = {
       top: parseInt(style.marginTop, 10),
       right: parseInt(style.marginRight, 10),
       bottom: parseInt(style.marginBottom, 10),
       left: parseInt(style.marginLeft, 10),
     };
-
     // We do not need to worry about 'box-sizing' because getBoundingClientRect already
     // takes that into account
     const paddingBox: Area = getArea(targetRef.getBoundingClientRect());
@@ -119,6 +119,8 @@ export default class DraggableDimensionPublisher extends Component<Props> {
       descriptor,
       paddingBox,
       margin,
+      tagName,
+      display,
       windowScroll: getWindowScroll(),
     });
 
