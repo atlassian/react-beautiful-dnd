@@ -20,7 +20,6 @@ class TableOfContents extends React.Component {
   )
 
   render() {
-    console.log(this.props.contents.edges);
     return (
       <TableOfContentsContainer>
         <ul>

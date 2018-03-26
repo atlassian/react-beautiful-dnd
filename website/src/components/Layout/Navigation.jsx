@@ -45,8 +45,8 @@ class Navigation extends Component {
       <NavContainer>
         <section>
           <Link className="nav-link" to="/" > Home </Link>
-          <Link className="nav-link" to="/about" > About </Link>
-          <Link className="nav-link" to="/docs" > Documentation </Link>
+          {/* <Link className="nav-link" to="/about" > About </Link> */}
+          <Link className="nav-link" to="/patterns" > Patterns </Link>
           <Link className="nav-link" to="/guides" > Guides </Link>
           <Link className="nav-link" to="/examples" > Examples </Link>
         </section>

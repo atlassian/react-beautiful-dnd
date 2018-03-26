@@ -15,7 +15,7 @@ const ListItem = ({ fields, frontmatter }) => (
   <ul key={fields.slug}><Link to={fields.slug}>{frontmatter.title}</Link></ul>
 );
 
-class GuidesPage extends Component<*, *> {
+class DocsPage extends Component<*, *> {
   render() {
     let guideEdges = this.props.data.allMarkdownRemark && this.props.data.allMarkdownRemark.edges;
     guideEdges = guideEdges || [];
@@ -30,7 +30,7 @@ class GuidesPage extends Component<*, *> {
             logo={config.siteLogo}
           />
           <BodyContainer>
-            <h1>Guides</h1>
+            <h1>Patterns</h1>
             <ul>
               {guideEdges.map(n => ListItem(n.node))}
             </ul>
@@ -41,14 +41,14 @@ class GuidesPage extends Component<*, *> {
   }
 }
 
-export default GuidesPage;
+export default DocsPage;
 
-export const pageQuery = graphql`
-  query guidesQuery {
+export const PatternQuery = graphql`
+  query patternsQuery {
     allMarkdownRemark(
       limit: 2000
-      sort: { fields: [fields___slug], order: DESC }
-      filter: { fields: { dir: { eq: "guides" } } }
+      sort: { fields: [fields___slug], order: ASC }
+      filter: { fields: { dir: { eq: "patterns" } } }
     ) {
       edges {
         node {
