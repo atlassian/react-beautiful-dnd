@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import React, { Component } from 'react';
 import Helmet from 'react-helmet';
 import styled from 'styled-components';
 
@@ -11,7 +11,15 @@ import config from '../../data/SiteConfig';
 import './b16-tomorrow-dark.css';
 import SiteHeader from '../components/Layout/Header';
 
-export default class PostTemplate extends React.Component {
+type Props = {
+  pathContext: { slug: string },
+  data: {
+    markdownRemark: any
+  },
+  location: string,
+}
+
+export default class PostTemplate extends Component<Props, *> {
   render() {
     const { slug } = this.props.pathContext;
     const postNode = this.props.data.markdownRemark;
@@ -36,6 +44,7 @@ export default class PostTemplate extends React.Component {
             <h1>
               {post.title}
             </h1>
+            {/* eslint-disable react/no-danger */}
             <div dangerouslySetInnerHTML={{ __html: postNode.html }} />
             <div className="post-meta">
               <SocialLinks postPath={slug} postNode={postNode} />
@@ -77,7 +86,8 @@ const HeaderContainer = styled.div`
   z-index: 2;
 `;
 
-/* eslint no-undef: "off" */
+/* eslint-disable no-undef */
+// $FlowFixMe
 export const pageQuery = graphql`
   query BlogPostBySlug($slug: String!) {
     markdownRemark(fields: { slug: { eq: $slug } }) {

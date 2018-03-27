@@ -39,16 +39,16 @@ const NavContainer = styled.div`
   }
 `;
 
-class Navigation extends Component {
+class Navigation extends Component<*, *> {
   render() {
     return (
       <NavContainer>
         <section>
-          <Link className="nav-link" to="/" > Home </Link>
+          <Link className="nav-link" to="/" href="/" > Home </Link>
           {/* <Link className="nav-link" to="/about" > About </Link> */}
-          <Link className="nav-link" to="/patterns" > Patterns </Link>
-          <Link className="nav-link" to="/guides" > Guides </Link>
-          <Link className="nav-link" to="/examples" > Examples </Link>
+          <Link className="nav-link" href="/patterns" to="/patterns" > Patterns </Link>
+          <Link className="nav-link" href="/guides" to="/guides" > Guides </Link>
+          <Link className="nav-link" href="/examples" to="/examples" > Examples </Link>
         </section>
         <span><UserLinks /></span>
       </NavContainer>

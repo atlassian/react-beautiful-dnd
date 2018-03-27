@@ -1,17 +1,36 @@
 // @flow
-import React from 'react';
+import React, { Component, type Node } from 'react';
 import Link from 'gatsby-link';
 import styled from 'styled-components';
 
-class TableOfContents extends React.Component {
+export type nodeType = {
+    fields: {
+      slug: string,
+    },
+    frontmatter: {
+      title: string
+    }
+  }
+
+type ToC = {
+  contents: {
+    edges: [
+      { node: nodeType },
+    ]
+  }
+}
+
+class TableOfContents extends Component<ToC, *> {
   constructor() {
     super();
     this.currentLevel = 0;
   }
 
-  renderUL = ({ node }) => (
+  currentLevel: number
+
+  renderUL: ({ node: nodeType }) => Node = ({ node }) => (
     <LessonLIContainer key={node.fields.slug}>
-      <Link to={node.fields.slug}>
+      <Link href={node.fields.slug} to={node.fields.slug}>
         <li>
           <h6>{node.frontmatter.title}</h6>
         </li>
@@ -60,24 +79,6 @@ const LessonLIContainer = styled.div`
         border-bottom: 1px solid black;
       }
     }
-  }
-`;
-
-const ChapterLIContainer = styled.li`
-  h5 {
-     font-weight: 200;
-     font-size: 2.8rem;
-     color: ${props => props.theme.brand};
-     margin-bottom: 10px;
-  }
-
-`;
-
-const SubchapterLIContainer = styled.li`
-  h5 {
-     font-weight: 600;
-     color: black;
-     margin-bottom: 5px;
   }
 `;
 

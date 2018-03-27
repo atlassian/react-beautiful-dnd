@@ -1,3 +1,4 @@
+// @flow
 const theme = {
   // named colors:
   brand: '#0079BF',

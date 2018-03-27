@@ -1,19 +1,15 @@
 // @flow
 import React, { Component } from 'react';
-import Link from 'gatsby-link';
 import Helmet from 'react-helmet';
 import styled from 'styled-components';
 
 import config from '../../data/SiteConfig';
 import MainHeader from '../components/Layout/Header';
+import ListItem from '../components/ListItem';
 
 const BodyContainer = styled.div`
   padding: ${props => props.theme.sitePadding};
 `;
-
-const ListItem = ({ fields, frontmatter }) => (
-  <ul key={fields.slug}><Link to={fields.slug}>{frontmatter.title}</Link></ul>
-);
 
 class DocsPage extends Component<*, *> {
   render() {
@@ -43,6 +39,8 @@ class DocsPage extends Component<*, *> {
 
 export default DocsPage;
 
+/* eslint-disable no-undef */
+// $FlowFixMe
 export const PatternQuery = graphql`
   query patternsQuery {
     allMarkdownRemark(

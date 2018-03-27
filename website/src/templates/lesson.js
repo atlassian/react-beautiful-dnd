@@ -3,28 +3,30 @@ import React, { Component } from 'react';
 import Helmet from 'react-helmet';
 import styled from 'styled-components';
 
-import SEO from '../components/SEO';
 import SiteHeader from '../components/Layout/Header';
 import config from '../../data/SiteConfig';
-import TableOfContents from '../components/Layout/TableOfContents';
+import TableOfContents, { type nodeType } from '../components/Layout/TableOfContents';
 
-export default class LessonTemplate extends Component {
+type Props = {
+  data: {
+    postBySlug: { html: string, frontmatter: { title: string } },
+    toc: {
+      edges: [
+        { node: nodeType },
+      ]}
+  },
+  location: string,
+}
+
+export default class LessonTemplate extends Component<Props, *> {
   render() {
-    const { slug } = this.props.pathContext;
     const postNode = this.props.data.postBySlug;
     const post = postNode.frontmatter;
-    if (!post.id) {
-      post.id = slug;
-    }
-    if (!post.id) {
-      post.category_id = config.postDefaultCategoryID;
-    }
     return (
       <div>
         <Helmet>
           <title>{`${post.title} | ${config.siteTitle}`}</title>
         </Helmet>
-        <SEO postPath={slug} postNode={postNode} postSEO />
         <BodyGrid>
           <HeaderContainer>
             <SiteHeader location={this.props.location} />
@@ -39,6 +41,7 @@ export default class LessonTemplate extends Component {
               <h1>
                 {post.title}
               </h1>
+              {/* eslint-disable react/no-danger */}
               <div dangerouslySetInnerHTML={{ __html: postNode.html }} />
             </div>
           </BodyContainer>
@@ -102,7 +105,8 @@ const ToCContainer = styled.div`
   }
 `;
 
-/* eslint no-undef: "off" */
+/* eslint-disable no-undef */
+// $FlowFixMe
 export const pageQuery = graphql`
   query LessonBySlug($slug: String!, $dir: String!) {
   postBySlug: markdownRemark(fields: { slug: { eq: $slug } }) {

@@ -1,6 +1,5 @@
 // @flow
 import React from 'react';
-import { storiesOf } from '@storybook/react';
 import QuoteApp from '../../components/examples/multiple-vertical/quote-app';
 import { getQuotes } from '../../components/examples/data';
 import type { QuoteMap } from '../../components/examples/types';

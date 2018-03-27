@@ -29,7 +29,7 @@ const iconStyle = {
   height: '20px',
 };
 
-class UserLinks extends Component {
+class UserLinks extends Component<*, *> {
   render() {
     return (
       <Container className="user-links">

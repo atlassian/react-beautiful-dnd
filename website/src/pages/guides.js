@@ -1,21 +1,26 @@
 // @flow
 import React, { Component } from 'react';
-import Link from 'gatsby-link';
 import Helmet from 'react-helmet';
 import styled from 'styled-components';
 
 import config from '../../data/SiteConfig';
 import MainHeader from '../components/Layout/Header';
+import ListItem, { type ListItemType } from '../components/ListItem';
 
 const BodyContainer = styled.div`
   padding: ${props => props.theme.sitePadding};
 `;
 
-const ListItem = ({ fields, frontmatter }) => (
-  <ul key={fields.slug}><Link to={fields.slug}>{frontmatter.title}</Link></ul>
-);
+type Props = {
+  location: string,
+  data: {
+    allMarkdownRemark: {
+      edges: Array<{ node: ListItemType }>
+    }
+  }
+}
 
-class GuidesPage extends Component<*, *> {
+class GuidesPage extends Component<Props, *> {
   render() {
     let guideEdges = this.props.data.allMarkdownRemark && this.props.data.allMarkdownRemark.edges;
     guideEdges = guideEdges || [];
@@ -43,6 +48,8 @@ class GuidesPage extends Component<*, *> {
 
 export default GuidesPage;
 
+/* eslint-disable no-undef */
+// $FlowFixMe
 export const pageQuery = graphql`
   query guidesQuery {
     allMarkdownRemark(

@@ -3,7 +3,26 @@ const path = require('path');
 const _ = require('lodash');
 const webpackLodashPlugin = require('lodash-webpack-plugin');
 
-exports.onCreateNode = ({ node, boundActionCreators, getNode }) => {
+type boundActionCreatorsType = {
+  createNodeField: (any) => any,
+  createPage: (any) => any,
+}
+
+type createNode = {
+  node: {
+    internal: {
+      type: string,
+    },
+    parent: any,
+    frontmatter: {
+      slug: string,
+    }
+  },
+  boundActionCreators: boundActionCreatorsType,
+  getNode: (any) => any,
+}
+
+exports.onCreateNode = ({ node, boundActionCreators, getNode }: createNode) => {
   const { createNodeField } = boundActionCreators;
   let slug;
   if (node.internal.type === 'MarkdownRemark') {
@@ -26,7 +45,12 @@ exports.onCreateNode = ({ node, boundActionCreators, getNode }) => {
   }
 };
 
-exports.createPages = ({ graphql, boundActionCreators }) => {
+type createPages = {
+  graphql: any,
+  boundActionCreators: boundActionCreatorsType,
+}
+
+exports.createPages = ({ graphql, boundActionCreators }: createPages): Promise<any> => {
   const { createPage } = boundActionCreators;
 
   return new Promise((resolve, reject) => {
@@ -54,6 +78,7 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
       `
       ).then((result) => {
         if (result.errors) {
+          /* eslint-disable no-console */
           console.log(result.errors);
           reject(result.errors);
         }
@@ -79,7 +104,7 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
                 slug: edge.node.fields.slug,
               },
             });
-          } else {
+          } else if (edge.node.fields.dir && edge.node.fields.slug) {
             createPage({
               path: edge.node.fields.slug,
               component: lessonPage,
@@ -106,12 +131,23 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
   });
 };
 
-exports.modifyBabelrc = ({ babelrc }) => ({
+type modifyBabelrc = {
+  babelrc: any
+}
+
+exports.modifyBabelrc = ({ babelrc }: modifyBabelrc) => ({
   ...babelrc,
   presets: babelrc.presets.concat(['flow']),
 });
 
-exports.modifyWebpackConfig = ({ config, stage }) => {
+type modifyWebpackConfig = {
+  config: {
+    plugin: (any, any, any) => any,
+  },
+  stage: string,
+}
+
+exports.modifyWebpackConfig = ({ config, stage }: modifyWebpackConfig) => {
   if (stage === 'build-javascript') {
     config.plugin('Lodash', webpackLodashPlugin, null);
   }

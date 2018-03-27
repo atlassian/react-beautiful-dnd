@@ -11,17 +11,18 @@ const BodyContainer = styled.div`
   padding: ${props => props.theme.sitePadding};
 `;
 
-const ListItem = ({ path }) => {
+const ListItem = ({ path }: { path: string }) => {
   const bits = path.split('/').filter(a => a);
   let titleBits = bits[bits.length - 1].split('-');
 
+  /* eslint-disable no-restricted-globals */
   if (!isNaN(titleBits[0])) {
     titleBits = titleBits.slice(1);
   }
 
   const title = titleBits.map(s => s[0].toUpperCase() + s.slice(1)).join(' ');
 
-  return <ul key={path}><Link to={path}>{title}</Link></ul>;
+  return <ul key={path}><Link href={path} to={path}>{title}</Link></ul>;
 };
 
 class ExamplePage extends Component<*, *> {
@@ -51,6 +52,8 @@ class ExamplePage extends Component<*, *> {
 
 export default ExamplePage;
 
+/* eslint-disable no-undef */
+// $FlowFixMe
 export const pageQuery = graphql`
   query examplesQuery {
   allSitePage(filter: {

@@ -7,7 +7,16 @@ import config from '../../data/SiteConfig';
 import Navigation from '../components/Layout/Navigation';
 import theme from '../layouts/theme';
 
-class Index extends Component {
+type Props = {
+  data: {
+    markdownRemark: {
+      html: string,
+      tableOfContents: string,
+    }
+  }
+}
+
+class Index extends Component<Props, *> {
   render() {
     const readMe = this.props.data.markdownRemark;
     return (
@@ -22,6 +31,7 @@ class Index extends Component {
             </Hero>
           </IndexHeadContainer>
           <BodyContainer>
+            {/* eslint-disable react/no-danger */}
             <div dangerouslySetInnerHTML={{ __html: readMe.html }} />
             <div dangerouslySetInnerHTML={{ __html: readMe.tableOfContents }} />
           </BodyContainer>
@@ -53,6 +63,8 @@ const BodyContainer = styled.div`
   margin: 0 auto;
 `;
 
+/* eslint-disable no-undef */
+// $FlowFixMe
 export const pageQuery = graphql`
   query IndexQuery {
   markdownRemark(fields: {dir: {eq: null} slug:{eq: "/README/"} }) {
