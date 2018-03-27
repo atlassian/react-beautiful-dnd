@@ -922,23 +922,6 @@ describe('drag handle', () => {
         expect(event.defaultPrevented).toBe(false);
       });
 
-      it('should cancel when the window is not visibile', () => {
-        // lift
-        mouseDown(wrapper);
-        windowMouseMove({ x: 0, y: sloppyClickThreshold });
-        // resize event
-        const event: Event = new Event('webkitvisibilitychange');
-        window.dispatchEvent(event);
-
-        expect(callbacksCalled(callbacks)({
-          onLift: 1,
-          onMove: 0,
-          onCancel: 1,
-        })).toBe(true);
-        // This is not a direct cancel so we do not prevent the default action
-        expect(event.defaultPrevented).toBe(false);
-      });
-
       it('should not execute any pending movements after the cancel', () => {
         // lift
         mouseDown(wrapper);
@@ -3317,6 +3300,25 @@ describe('drag handle', () => {
             expect(parentCallbacks.onLift).toHaveBeenCalled();
 
             nested.unmount();
+          });
+        });
+
+        describe('dragging when page is not visible', () => {
+          beforeAll(() => {
+            // need to mock the the page is not visible
+            Object.defineProperty(document, 'hidden', { value: true });
+          });
+          afterAll(() => {
+            Object.defineProperty(document, 'hidden', { value: false });
+          });
+          it('should cancel the drag when the window is not visible', () => {
+            control.preLift();
+            control.lift();
+            dispatchWindowEvent('visibilitychange');
+            expect(callbacksCalled(callbacks)({
+              onLift: 1,
+              onCancel: 1,
+            })).toBe(true);
           });
         });
       });
