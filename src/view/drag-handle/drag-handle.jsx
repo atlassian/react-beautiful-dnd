@@ -182,6 +182,8 @@ export default class DragHandle extends Component<Props> {
       onKeyDown: this.onKeyDown,
       onTouchStart: this.onTouchStart,
       onTouchMove: this.onTouchMove,
+      onFocus: this.props.callbacks.onFocus,
+      onBlur: this.props.callbacks.onBlur,
       tabIndex: 0,
       'data-react-beautiful-dnd-drag-handle': this.styleContext,
       // English default. Consumers are welcome to add their own start instruction

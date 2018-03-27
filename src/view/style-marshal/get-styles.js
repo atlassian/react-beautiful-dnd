@@ -11,7 +11,10 @@ export type Styles = {|
 const prefix: string = 'data-react-beautiful-dnd';
 
 export default (styleContext: string): Styles => {
-  const dragHandleSelector: string = `[${prefix}-drag-handle="${styleContext}"]`;
+  const dragHandleSelector = {
+    unscoped: `[${prefix}-drag-handle]`,
+    scoped: `[${prefix}-drag-handle="${styleContext}"]`,
+  };
   const draggableSelector: string = `[${prefix}-draggable="${styleContext}"]`;
   const droppableSelector: string = `[${prefix}-droppable="${styleContext}"]`;
 
@@ -53,20 +56,20 @@ export default (styleContext: string): Styles => {
 
   const dragHandleStyles = {
     base: `
-      ${dragHandleSelector} {
+      ${dragHandleSelector.unscoped} {
         -webkit-touch-callout: none;
         -webkit-tap-highlight-color: rgba(0,0,0,0);
         touch-action: manipulation;
       }
     `,
     grabCursor: `
-      ${dragHandleSelector} {
+      ${dragHandleSelector.scoped} {
         cursor: -webkit-grab;
         cursor: grab;
       }
     `,
     blockPointerEvents: `
-      ${dragHandleSelector} {
+      ${dragHandleSelector.scoped} {
         pointer-events: none;
       }
     `,

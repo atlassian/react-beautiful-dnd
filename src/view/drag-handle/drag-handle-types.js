@@ -8,6 +8,8 @@ import type {
 } from '../../types';
 
 export type Callbacks = {|
+  onFocus: () => void,
+  onBlur: () => void,
   onLift: ({ client: Position, autoScrollMode: AutoScrollMode }) => void,
   onMove: (point: Position) => void,
   onWindowScroll: () => void,
@@ -20,6 +22,10 @@ export type Callbacks = {|
 |}
 
 export type DragHandleProps = {|
+  // TEMP
+  onFocus: () => void,
+  onBlur: () => void,
+
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
   onTouchStart: (event: TouchEvent) => void,
