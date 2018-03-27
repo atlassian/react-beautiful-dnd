@@ -203,6 +203,7 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
+    // TODO: this can now occur due to React 16
     console.warn('currently not supporting unmounting a Draggable during a drag');
   };
 

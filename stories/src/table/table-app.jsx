@@ -66,7 +66,7 @@ class TableCell extends React.Component<TableCellProps, TableCellState> {
   }
 
   componentWillMount() {
-    console.log('TableCell: WillMount', this.props.quoteId);
+    // console.log('TableCell: WillMount', this.props.quoteId);
     // const state: ?TableCellState = cache[this.props.quoteId];
     // console.log('cache', cache);
 
@@ -76,10 +76,7 @@ class TableCell extends React.Component<TableCellProps, TableCellState> {
 
     // console.log('setting state from state', state);
     // this.state = state;
-
   }
-
-
 
   componentWillUnmount() {
     console.log('TableCell: WillUnmount', this.props.quoteId);
@@ -240,7 +237,7 @@ export default class TableApp extends Component<AppProps, AppState> {
           <Table layout={this.state.layout}>
             <thead>
               <tr>
-                <th style={{ xwidth: '200px' }}>Author</th>
+                <th>Author</th>
                 <th>Content</th>
               </tr>
             </thead>
