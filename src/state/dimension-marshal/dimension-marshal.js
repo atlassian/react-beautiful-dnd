@@ -185,6 +185,7 @@ export default (callbacks: Callbacks) => {
     // Entry has already been overwritten.
     // This can happen when a new Draggable with the same draggableId
     // is mounted before the old Draggable has been removed.
+    // TODO: It also occurs in React 16 as old elements are removed after new ones are added?
     if (entry.descriptor !== descriptor) {
       return;
     }

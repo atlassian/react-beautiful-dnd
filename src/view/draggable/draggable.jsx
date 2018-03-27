@@ -124,15 +124,17 @@ export default class Draggable extends Component<Props, State> {
   }
 
   componentWillUnmount() {
-    console.log('unmounting', this.props.draggableId);
+    console.warn('DRAGGABLE UNMOUNTING', this.props.draggableId);
   }
 
   // This should already be handled gracefully in DragHandle.
   // Just being extra clear here
   throwIfCannotDrag() {
     invariant(this.state.ref,
-      'Draggable: cannot drag as no DOM node has been provided'
-    );
+      `
+      Draggable: cannot drag as no DOM node has been provided
+      Please ensure you provide a DOM node using the DraggableProvided > innerRef function
+    `);
     invariant(!this.props.isDragDisabled,
       'Draggable: cannot drag as dragging is not enabled'
     );
