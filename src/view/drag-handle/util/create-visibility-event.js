@@ -1,39 +1,50 @@
 // @flow
+import memoizeOne from 'memoize-one';
 import type { EventBinding } from './event-types';
 
-const getVisibiltyEvent = () : ?{hidden:string, name:string} => {
-  const prefixes = ['ms', 'webkit', 'moz', 'o'];
-  let browserPrefix;
-  prefixes.forEach((prefix) => {
-    if (`${prefix}Hidden` in document) {
-      browserPrefix = {
-        hidden: `${prefix}Hidden`,
-        name: `${prefix}visibilitychange`,
-      };
-    }
-  });
-  if (!browserPrefix && 'hidden' in document) { // Opera 12.10 and Firefox 18 and later support
-    return {
-      hidden: 'hidden',
-      name: 'visibilitychange',
-    };
-  }
-  return browserPrefix;
+type Pair = {
+ hidden: string,
+ name: string
 };
+
+const defaultPair :Pair = {
+  hidden: 'hidden',
+  name: 'visibilitychange',
+};
+
+const getVisibiltyEvent = memoizeOne(() : Pair => {
+  // non prefixed event is supported
+  if ('hidden' in document) {
+    return defaultPair;
+  }
+
+  const prefix: ?string = ['ms', 'webkit', 'moz', 'o']
+    .find((prefixItem: string): boolean => `${prefixItem}Hidden` in document);
+
+  // if no prefixed event is supported - simply return the defaultPair.
+  // It will not cause any errors to bind to this event - it just won't do anything on
+  // visibility change
+  if (!prefix) {
+    return defaultPair;
+  }
+
+  return {
+    hidden: `${prefix}Hidden`,
+    name: `${prefix}visibilitychange`,
+  };
+});
 
 export default (cancel: Function = () => {}) : EventBinding => {
   if (typeof window !== 'undefined') {
     const visEvent = getVisibiltyEvent();
-    if (visEvent) {
-      return {
-        eventName: visEvent.name,
-        fn: () => {
-          if (document[visEvent.hidden]) {
-            cancel();
-          }
-        },
-      };
-    }
+    return {
+      eventName: visEvent.name,
+      fn: () => {
+        if (document[visEvent.hidden]) {
+          cancel();
+        }
+      },
+    };
   }
   return {
     eventName: '',
