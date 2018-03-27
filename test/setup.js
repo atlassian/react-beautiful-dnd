@@ -22,9 +22,6 @@ if (typeof window !== 'undefined') {
 if (typeof document !== 'undefined' && typeof window !== 'undefined') {
   document.documentElement.clientWidth = window.innerWidth;
   document.documentElement.clientHeight = window.innerHeight;
-  // So that we can test window visibility within tests.
-  document.webkitvisibilitychange = () => {};
-  document.webkitHidden = true;
 }
 // setting up global enzyme
 const Enzyme = require('enzyme');
