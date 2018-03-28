@@ -4,7 +4,7 @@ const { singleListContainer, firstCard, secondCard } = require('./../utils/css.j
 
 const urlSingleList = 'http://localhost:9002/iframe.html?selectedKind=single%20vertical%20list&selectedStory=basic';
 
-const timeout = 10000;
+const timeout = 30000;
 
 const returnPositionAndText = async (page, elem) =>
   page.$$eval(elem, el =>
