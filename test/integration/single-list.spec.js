@@ -1,6 +1,8 @@
+/**
+* @jest-environment node
+*/
 // @flow
 const puppeteer = require('puppeteer');
-const { singleListContainer, firstCard, secondCard } = require('./../utils/css.js');
 
 const urlSingleList = 'http://localhost:9002/iframe.html?selectedKind=single%20vertical%20list&selectedStory=basic';
 
@@ -14,6 +16,11 @@ const returnPositionAndText = async (page, elem) =>
       top: el[0].offsetTop,
       text: el[0].innerText,
     }));
+
+/* Css selectors used */
+const singleListContainer = '[data-react-beautiful-dnd-droppable="0"]';
+const firstCard = '#root div > div:nth-child(1) > a';
+const secondCard = '#root div > div:nth-child(2) > a';
 
 describe('Single List > ', () => {
   let browser;
