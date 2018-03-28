@@ -1,5 +1,6 @@
 // @flow
 import messagePreset from './message-preset';
+import * as timings from '../../debug/timings';
 import type { HookCaller } from './hooks-types';
 import type {
   Announce,
@@ -27,6 +28,12 @@ type State = {
 
 type AnyHookFn = OnDragStartHook | OnDragUpdateHook | OnDragEndHook;
 type AnyHookData = DragStart | DragUpdate | DropResult;
+
+const withTimings = (key: string, fn: Function) => {
+  timings.start(key);
+  fn();
+  timings.finish(key);
+};
 
 const notDragging: State = {
   isDragging: false,
@@ -235,7 +242,7 @@ export default (announce: Announce): HookCaller => {
       });
 
       // onDragStart is optional
-      execute(onDragStart, start, messagePreset.onDragStart);
+      withTimings('hook:onDragStart', () => execute(onDragStart, start, messagePreset.onDragStart));
       return;
     }
 
@@ -247,7 +254,7 @@ export default (announce: Announce): HookCaller => {
       }
       const result: DropResult = current.drop.result;
 
-      execute(onDragEnd, result, messagePreset.onDragEnd);
+      withTimings('hook:onDragEnd', () => execute(onDragEnd, result, messagePreset.onDragEnd));
       return;
     }
 
@@ -278,7 +285,7 @@ export default (announce: Announce): HookCaller => {
         reason: 'CANCEL',
       };
 
-      execute(onDragEnd, result, messagePreset.onDragEnd);
+      withTimings('hook:onDragEnd (cancel)', () => execute(onDragEnd, result, messagePreset.onDragEnd));
       return;
     }
 

@@ -10,21 +10,14 @@ import {
   styleContextKey,
 } from '../context-keys';
 
-type State = {|
-  ref: ?HTMLElement,
-|}
-
 type Context = {|
   [typeof droppableIdKey]: DroppableId
 |}
 
-export default class Droppable extends Component<Props, State> {
+export default class Droppable extends Component<Props> {
   /* eslint-disable react/sort-comp */
   styleContext: string
-
-  state: State = {
-    ref: null,
-  }
+  ref: ?HTMLElement = null
 
   // Need to declare childContextTypes without flow
   static contextTypes = {
@@ -60,15 +53,14 @@ export default class Droppable extends Component<Props, State> {
       return;
     }
 
-    if (ref === this.state.ref) {
+    if (ref === this.ref) {
       return;
     }
 
-    // need to trigger a child render when ref changes
-    this.setState({
-      ref,
-    });
+    this.ref = ref;
   }
+
+  getDroppableRef = (): ?HTMLElement => this.ref;
 
   getPlaceholder() {
     if (!this.props.placeholder) {
@@ -110,7 +102,7 @@ export default class Droppable extends Component<Props, State> {
         direction={direction}
         ignoreContainerClipping={ignoreContainerClipping}
         isDropDisabled={isDropDisabled}
-        targetRef={this.state.ref}
+        getDroppableRef={this.getDroppableRef}
       >
         {children(provided, snapshot)}
       </DroppableDimensionPublisher>

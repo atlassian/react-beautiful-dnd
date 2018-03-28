@@ -21,7 +21,7 @@ type Props = {|
   draggableId: DraggableId,
   droppableId: DroppableId,
   index: number,
-  targetRef: ?HTMLElement,
+  getDraggableRef: () => ?HTMLElement,
   children: Node,
 |}
 
@@ -34,17 +34,20 @@ export default class DraggableDimensionPublisher extends Component<Props> {
   publishedDescriptor: ?DraggableDescriptor = null
 
   componentWillReceiveProps(nextProps: Props) {
-    const { draggableId, droppableId, index, targetRef } = nextProps;
-
-    if (!targetRef) {
-      console.error('Updating draggable dimension handler without a targetRef');
-      return;
-    }
-
-    // Note: not publishing it on componentDidMount as we do not have a ref at that point
-
     const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
-      draggableId, droppableId, index
+      nextProps.draggableId,
+      nextProps.droppableId,
+      nextProps.index,
+    );
+
+    this.publish(descriptor);
+  }
+
+  componentDidMount() {
+    const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
+      this.props.draggableId,
+      this.props.droppableId,
+      this.props.index
     );
 
     this.publish(descriptor);
@@ -90,7 +93,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
   }
 
   getDimension = (): DraggableDimension => {
-    const targetRef: ?HTMLElement = this.props.targetRef;
+    const targetRef: ?HTMLElement = this.props.getDraggableRef();
 
     if (!targetRef) {
       throw new Error('DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');

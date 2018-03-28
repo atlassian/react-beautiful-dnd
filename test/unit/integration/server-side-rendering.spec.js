@@ -28,14 +28,11 @@ class App extends Component<*, *> {
             <div ref={provided.innerRef} {...provided.droppableProps}>
               <Draggable draggableId="drag-1">
                 {(dragProvided: DraggableProvided) => (
-                  <div>
-                    <div
-                      ref={dragProvided.innerRef}
-                      {...dragProvided.draggableProps}
-                      {...dragProvided.dragHandleProps}
-                    />
-                    {dragProvided.placeholder}
-                  </div>
+                  <div
+                    ref={dragProvided.innerRef}
+                    {...dragProvided.draggableProps}
+                    {...dragProvided.dragHandleProps}
+                  />
                 )}
               </Draggable>
             </div>

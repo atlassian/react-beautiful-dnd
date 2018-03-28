@@ -145,11 +145,13 @@ export type OwnProps = {|
   index: number,
   isDragDisabled: boolean,
   disableInteractiveElementBlocking: boolean,
+  shouldUsePortal: boolean,
 |}
 
 export type DefaultProps = {|
   isDragDisabled: boolean,
-  disableInteractiveElementBlocking: boolean
+  disableInteractiveElementBlocking: boolean,
+  shouldUsePortal: boolean,
 |}
 
 export type Props = {|

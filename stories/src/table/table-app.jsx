@@ -24,6 +24,14 @@ const Table = styled.table`
   table-layout: ${props => props.layout};
 `;
 
+const TBody = styled.tbody`
+  border: 0;
+`;
+
+const THead = styled.thead`
+  border: 0;
+`;
+
 // const AuthorCell = styled.td`
 //   xwidth: 20%;
 // `;
@@ -36,9 +44,12 @@ const Row = styled.tr`
   ${props => (props.isDragging ? 'display: table; table-layout: fixed; background: lightblue;' : '')}
 `;
 
+const Cell = styled.td`
+  box-sizing: border-box;
+`;
+
 type TableCellProps = {|
   children: Node,
-  quoteId: string,
   isDragOccurring: boolean,
 |}
 
@@ -46,42 +57,11 @@ type TableCellState = {|
   width: ?number,
   height: ?number,
 |}
-
-type TableCellEntry = {|
-  quoteId: string,
-  state: TableCellState,
-|}
-
-type TableCellCache = {
-  [quoteId: string]: TableCellState,
-}
-
-const cache: TableCellCache = {};
-
 class TableCell extends React.Component<TableCellProps, TableCellState> {
   ref: ?HTMLElement
   state: TableCellState = {
     width: null,
     height: null,
-  }
-
-  componentWillMount() {
-    // console.log('TableCell: WillMount', this.props.quoteId);
-    // const state: ?TableCellState = cache[this.props.quoteId];
-    // console.log('cache', cache);
-
-    // if (!state) {
-    //   return;
-    // }
-
-    // console.log('setting state from state', state);
-    // this.state = state;
-  }
-
-  componentWillUnmount() {
-    console.log('TableCell: WillUnmount', this.props.quoteId);
-    // cache[this.props.quoteId] = this.state;
-    // console.log('new cache', cache);
   }
 
   componentWillReceiveProps(nextProps: TableCellProps) {
@@ -117,16 +97,15 @@ class TableCell extends React.Component<TableCellProps, TableCellState> {
     const style = {
       width: this.state.width,
       height: this.state.height,
-      boxSizing: this.state.width == null ? null : 'border-box',
     };
 
     return (
-      <td
-        ref={this.setRef}
+      <Cell
+        innerRef={this.setRef}
         style={style}
       >
         {this.props.children}
-      </td>
+      </Cell>
     );
   }
 }
@@ -141,32 +120,20 @@ type TableRowProps = {|
 class TableRow extends Component<TableRowProps> {
   render() {
     const { snapshot, quote, provided, isDragOccurring } = this.props;
-    const row: Node = (
+    return (
       <Row
         innerRef={provided.innerRef}
         isDragging={snapshot.isDragging}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
       >
-        <TableCell isDragOccurring={isDragOccurring} quoteId={quote.id}>
+        <TableCell isDragOccurring={isDragOccurring}>
           {quote.author.name}
         </TableCell>
-        <TableCell isDragOccurring={isDragOccurring} quoteId={quote.id}>
+        <TableCell isDragOccurring={isDragOccurring}>
           {quote.content}
         </TableCell>
       </Row>
-    );
-
-    if (!snapshot.isDragging) {
-      return row;
-    }
-
-    return (
-      <table>
-        <tbody>
-          {row}
-        </tbody>
-      </table>
     );
   }
 }
@@ -235,16 +202,16 @@ export default class TableApp extends Component<AppProps, AppState> {
           </button>
           <code>table-layout: {this.state.layout}</code>
           <Table layout={this.state.layout}>
-            <thead>
+            <THead>
               <tr>
                 <th>Author</th>
                 <th>Content</th>
               </tr>
-            </thead>
+            </THead>
             <Droppable droppableId="table">
               {(droppableProvided: DroppableProvided) => (
-                <tbody
-                  ref={droppableProvided.innerRef}
+                <TBody
+                  innerRef={droppableProvided.innerRef}
                   {...droppableProvided.droppableProps}
                 >
                   {this.state.quotes.map((quote: Quote, index: number) => (
@@ -259,7 +226,7 @@ export default class TableApp extends Component<AppProps, AppState> {
                     )}
                     </Draggable>
                   ))}
-                </tbody>
+                </TBody>
                 )}
             </Droppable>
           </Table>

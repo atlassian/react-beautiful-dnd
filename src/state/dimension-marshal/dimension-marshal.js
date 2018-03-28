@@ -78,10 +78,11 @@ export default (callbacks: Callbacks) => {
     const id: DraggableId = descriptor.id;
 
     // Cannot register a draggable if no entry exists for the droppable
-    if (!state.droppables[descriptor.droppableId]) {
-      cancel(`Cannot register Draggable ${id} as there is no entry for the Droppable ${descriptor.droppableId}`);
-      return;
-    }
+    // console.log('registering draggable without droppable');
+    // if (!state.droppables[descriptor.droppableId]) {
+    //   cancel(`Cannot register Draggable ${id} as there is no entry for the Droppable ${descriptor.droppableId}`);
+    //   return;
+    // }
 
     // Not checking if the draggable already exists.
     // This allows for overwriting in particular circumstances
@@ -102,6 +103,8 @@ export default (callbacks: Callbacks) => {
     if (!state.isCollecting) {
       return;
     }
+
+    // TODO: do not warn if the `type` is different to the dragging item
 
     console.warn('Adding a draggable during a drag is currently not supported');
   };
@@ -133,6 +136,8 @@ export default (callbacks: Callbacks) => {
     if (!state.isCollecting) {
       return;
     }
+
+    // TODO: do not warn if the `type` is different to the dragging item.
 
     console.warn('Currently not supporting updating Droppables during a drag');
   };
@@ -203,6 +208,8 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
+    // TODO: do not error if the type is different to that of the dragging item
+
     // TODO: this can now occur due to React 16
     console.warn('currently not supporting unmounting a Draggable during a drag');
   };
@@ -237,6 +244,8 @@ export default (callbacks: Callbacks) => {
     if (!state.isCollecting) {
       return;
     }
+
+    // TODO: do not warn if the `type` is different to the dragging item
 
     console.warn('currently not supporting unmounting a Droppable during a drag');
   };

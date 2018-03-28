@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import type { Node, Portal } from 'react';
+import type { Node } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
@@ -37,10 +37,6 @@ import type {
 } from './draggable-types';
 import type { Speed, Style as MovementStyle } from '../moveable/moveable-types';
 
-type State = {|
-  ref: ?HTMLElement,
-|}
-
 export const zIndexOptions: ZIndexOptions = {
   dragging: 5000,
   dropAnimating: 4500,
@@ -65,14 +61,19 @@ const getPortal = memoizeOne((): HTMLElement => {
   return portal;
 });
 
+type State = {|
+  isDraggingOrDropping: boolean,
+|}
+
 export default class Draggable extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
   callbacks: DragHandleCallbacks
   styleContext: string
   isFocused: boolean = false
+  ref: ?HTMLElement = null
 
   state: State = {
-    ref: null,
+    isDraggingOrDropping: false,
   }
 
   // Need to declare contextTypes without flow
@@ -103,35 +104,27 @@ export default class Draggable extends Component<Props, State> {
     this.styleContext = context[styleContextKey];
   }
 
-  componentDidUpdate(previousProps: Props, previousState: State) {
-    if (!this.state.ref) {
+  componentWillReceiveProps(nextProps: Props) {
+    const isDraggingOrDropping: boolean = nextProps.isDragging || nextProps.isDropAnimating;
+
+    if (this.state.isDraggingOrDropping === isDraggingOrDropping) {
       return;
     }
 
-    const hasRefChanged: boolean = this.state.ref !== previousState.ref;
-
-    if (!hasRefChanged) {
-      return;
-    }
-
-    if (!this.isFocused) {
-      return;
-    }
-
-    // ref has changed and is recording that it has focus
-
-    this.state.ref.focus();
+    this.setState({
+      isDraggingOrDropping,
+    });
   }
 
   componentWillUnmount() {
-    console.warn('DRAGGABLE UNMOUNTING', this.props.draggableId);
+    // releasing reference to ref for cleanup
+    this.ref = null;
   }
 
   // This should already be handled gracefully in DragHandle.
   // Just being extra clear here
   throwIfCannotDrag() {
-    invariant(this.state.ref,
-      `
+    invariant(this.ref, `
       Draggable: cannot drag as no DOM node has been provided
       Please ensure you provide a DOM node using the DraggableProvided > innerRef function
     `);
@@ -153,7 +146,7 @@ export default class Draggable extends Component<Props, State> {
     this.throwIfCannotDrag();
     const { client, autoScrollMode } = options;
     const { lift, draggableId } = this.props;
-    const { ref } = this.state;
+    const ref: ?HTMLElement = this.ref;
 
     if (!ref) {
       throw new Error('cannot lift at this time');
@@ -229,22 +222,27 @@ export default class Draggable extends Component<Props, State> {
   // React calls ref callback twice for every render
   // https://github.com/facebook/react/pull/8333/files
   setRef = ((ref: ?HTMLElement) => {
-    // TODO: need to clear this.state.ref on unmount
     if (ref === null) {
       return;
     }
 
-    if (ref === this.state.ref) {
+    if (ref === this.ref) {
       return;
     }
 
-    // need to trigger a child render when ref changes
-    this.setState({
-      ref,
-    });
+    // At this point the ref has been changed or initially populated
+
+    this.ref = ref;
+
+    // After a ref change we might need to manually force focus onto the ref.
+    // When moving something into or out of a portal the element looses focus
+    // https://github.com/facebook/react/issues/12454
+    if (this.ref && this.isFocused) {
+      this.ref.focus();
+    }
   })
 
-  getDraggableRef = (): ?HTMLElement => this.state.ref;
+  getDraggableRef = (): ?HTMLElement => this.ref;
 
   getDraggingStyle = memoizeOne(
     (dimension: DraggableDimension,
@@ -350,6 +348,7 @@ export default class Draggable extends Component<Props, State> {
       draggingOver,
       shouldAnimateDisplacement,
       children,
+      shouldUsePortal,
     } = this.props;
 
     const child: ?Node = children(
@@ -368,28 +367,29 @@ export default class Draggable extends Component<Props, State> {
       )
     );
 
-    const shouldUsePortal: boolean = isDragging || isDropAnimating;
+    const isDraggingOrDropping: boolean = (isDragging || isDropAnimating);
 
-    if (!shouldUsePortal) {
-      return child;
-    }
+    const placeholder: ?Node = (() => {
+      if (!isDraggingOrDropping) {
+        return null;
+      }
 
-    if (!dimension) {
-      console.error('dimension is required for dragging');
-      return null;
-    }
+      if (!dimension) {
+        console.error('dimension is required for dragging');
+        return null;
+      }
 
-    // When dragging we put the Draggable into a portal
+      return <Placeholder placeholder={dimension.placeholder} />;
+    })();
 
-    const inPortal: Portal = ReactDOM.createPortal(
-      child,
-      getPortal(),
-    );
+    const item: Node = isDraggingOrDropping && shouldUsePortal ?
+      ReactDOM.createPortal(child, getPortal()) :
+      child;
 
     return (
       <React.Fragment>
-        {inPortal}
-        <Placeholder placeholder={dimension.placeholder} />
+        {item}
+        {placeholder}
       </React.Fragment>
     );
   }
@@ -416,11 +416,11 @@ export default class Draggable extends Component<Props, State> {
 
     return (
       <DraggableDimensionPublisher
+        key={draggableId}
         draggableId={draggableId}
         droppableId={droppableId}
         index={index}
-        targetRef={this.state.ref}
-        key={draggableId}
+        getDraggableRef={this.getDraggableRef}
       >
         <Moveable
           speed={speed}
