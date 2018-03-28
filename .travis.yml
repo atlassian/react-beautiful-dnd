@@ -27,5 +27,5 @@ before_install: yarn global add greenkeeper-lockfile@1
 before_script: 
   - greenkeeper-lockfile-update
   - yarn global add wait-port
-  - yarn storybook & ./node_modules/.bin/wait-port -t 50000 localhost:9002
+  - yarn storybook & wait-port -t 50000 localhost:9002
 after_script: greenkeeper-lockfile-upload
