@@ -19,7 +19,7 @@ describe('Single List > ', () => {
   let browser;
   let page;
   beforeAll(async () => {
-    browser = await puppeteer.launch({ headless: true, slowMo: 100 });
+    browser = await puppeteer.launch({ headless: true, slowMo: 100, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
     page = await browser.newPage();
     await page.goto(urlSingleList);
     await page.waitForSelector(singleListContainer);
