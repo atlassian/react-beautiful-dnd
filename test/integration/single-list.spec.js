@@ -19,6 +19,8 @@ describe('Single List > ', () => {
   let browser;
   let page;
   beforeAll(async () => {
+    /* args are supplied to avoid issues in Travis CI to launch chromium:
+     https://github.com/GoogleChrome/puppeteer/issues/807 */
     browser = await puppeteer.launch({ headless: true, slowMo: 100, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
     page = await browser.newPage();
     await page.goto(urlSingleList);
