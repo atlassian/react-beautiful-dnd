@@ -24,5 +24,7 @@ env:
 # Required for lock file generation
 # https://github.com/greenkeeperio/greenkeeper-lockfile
 before_install: yarn global add greenkeeper-lockfile@1
-before_script: greenkeeper-lockfile-update
+before_script: 
+  - greenkeeper-lockfile-update
+  - yarn storybook & sleep 7
 after_script: greenkeeper-lockfile-upload
