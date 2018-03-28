@@ -25,7 +25,7 @@
     "/src"
   ],
   "scripts": {
-    "test": "jest --config ./jest.config.js",
+    "test": "cross-env SNAPSHOT=check yarn build:dist && jest --config ./jest.config.js",
     "validate": "yarn run lint && yarn run typecheck",
     "lint": "eslint .",
     "typecheck": "flow check",

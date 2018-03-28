@@ -8,6 +8,8 @@ import replace from 'rollup-plugin-replace';
 import strip from 'rollup-plugin-strip';
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
 
+const checkSnapshot = process.env.SNAPSHOT === 'check';
+
 const getUMDConfig = ({ env, file }) => {
   const config = {
     input: './src/index.js',
@@ -39,7 +41,7 @@ const getUMDConfig = ({ env, file }) => {
   };
 
   if (env === 'development') {
-    config.plugins.push(sizeSnapshot());
+    config.plugins.push(sizeSnapshot({ updateSnapshot: !checkSnapshot }));
   }
 
   if (env === 'production') {
