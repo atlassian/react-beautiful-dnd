@@ -27,7 +27,7 @@
   "scripts": {
     "test": "jest --config ./jest.config.js",
     "validate": "yarn run lint && yarn run typecheck",
-    "lint": "eslint .",
+    "lint": "yarn eslint .",
     "typecheck": "flow check",
     "build": "yarn run build:clean && yarn run build:lib && yarn run build:esm && yarn run build:flow && yarn run build:dist",
     "build:clean": "rimraf lib && rimraf esm && rimraf dist",
@@ -37,7 +37,9 @@
     "build:flow": "echo \"// @flow\n\nexport * from '../src';\" | tee lib/index.js.flow esm/index.js.flow",
     "storybook": "start-storybook -p 9002",
     "build-storybook": "build-storybook -c .storybook -o site",
-    "prepublish": "yarn run build"
+    "prepublish": "yarn run build && cd website && yarn",
+    "website:dev": "cd website && gatsby develop",
+    "website:build": "cd website && yarn gatsby build"
   },
   "dependencies": {
     "babel-runtime": "^6.26.0",
