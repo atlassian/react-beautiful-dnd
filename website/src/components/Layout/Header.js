@@ -3,10 +3,10 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import Navigation from './Navigation';
 
-class MainHeader extends Component<*, *> {
+class MainHeader extends Component<{ padding?: string }, *> {
   render() {
     return (
-      <SiteContainer>
+      <SiteContainer padding={this.props.padding || '25px'}>
         <Navigation />
       </SiteContainer>
     );
@@ -19,7 +19,7 @@ const SiteContainer = styled.div`
   justify-content: space-between;
   background: ${props => props.theme.brand};
   height: 100%;
-  padding:  25px;
+  padding: ${({ padding }) => padding};
 `;
 
 export default MainHeader;

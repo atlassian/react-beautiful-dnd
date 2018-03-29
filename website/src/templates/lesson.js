@@ -29,7 +29,7 @@ export default class LessonTemplate extends Component<Props, *> {
         </Helmet>
         <BodyGrid>
           <HeaderContainer>
-            <SiteHeader location={this.props.location} />
+            <SiteHeader padding="0 25px" location={this.props.location} />
           </HeaderContainer>
           <ToCContainer>
             <TableOfContents
@@ -37,13 +37,13 @@ export default class LessonTemplate extends Component<Props, *> {
             />
           </ToCContainer>
           <BodyContainer>
-            <div>
+            <ContainerContainer>
               <h1>
                 {post.title}
               </h1>
               {/* eslint-disable react/no-danger */}
               <div dangerouslySetInnerHTML={{ __html: postNode.html }} />
-            </div>
+            </ContainerContainer>
           </BodyContainer>
         </BodyGrid>
       </div>
@@ -55,6 +55,7 @@ const BodyGrid = styled.div`
   height: 100vh;
   display: grid;
   grid-template-columns: 300px 1fr;
+  grid-template-rows: 90px 1fr;
 
   @media screen and (max-width: 600px) {
     display: flex;
@@ -63,13 +64,16 @@ const BodyGrid = styled.div`
   }
 `;
 
+const ContainerContainer = styled.div`
+  padding: ${props => props.theme.sitePadding};
+`;
+
 const BodyContainer = styled.div`
   grid-column: 2 / 3;
   grid-row: 2 / 3;
   overflow: scroll;
   justify-self: center;
   width: 100%;
-  padding: ${props => props.theme.sitePadding};
   @media screen and (max-width: 600px) {
     order: 2;
   }

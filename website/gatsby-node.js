@@ -1,8 +1,7 @@
 // @flow
 /* eslint-disable spaced-comment */
 const path = require('path');
-const _ = require('lodash');
-const webpackLodashPlugin = require('lodash-webpack-plugin');
+const kebabCase = require('lodash.kebabcase');
 
 /*::
 type boundActionCreatorsType = {
@@ -35,7 +34,7 @@ exports.onCreateNode = ({ node, boundActionCreators, getNode }/*: createNode*/) 
       Object.prototype.hasOwnProperty.call(node, 'frontmatter') &&
       Object.prototype.hasOwnProperty.call(node.frontmatter, 'slug')
     ) {
-      slug = `/${_.kebabCase(node.frontmatter.slug)}`;
+      slug = `/${kebabCase(node.frontmatter.slug)}`;
     } else if (parsedFilePath.name !== 'index' && parsedFilePath.dir !== '') {
       createNodeField({ node, name: 'dir', value: parsedFilePath.dir });
       slug = `/${parsedFilePath.dir}/${parsedFilePath.name}/`;
@@ -124,7 +123,7 @@ exports.createPages = ({ graphql, boundActionCreators }/*: createPages*/)/*: Pro
         const categoryList = Array.from(categorySet);
         categoryList.forEach((category) => {
           createPage({
-            path: `/categories/${_.kebabCase(category)}/`,
+            path: `/categories/${kebabCase(category)}/`,
             component: categoryPage,
             context: {
               category,
@@ -155,9 +154,3 @@ type modifyWebpackConfig = {
   stage: string,
 }
 */
-
-exports.modifyWebpackConfig = ({ config, stage }/*: modifyWebpackConfig*/) => {
-  if (stage === 'build-javascript') {
-    config.plugin('Lodash', webpackLodashPlugin, null);
-  }
-};
