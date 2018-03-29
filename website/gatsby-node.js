@@ -1,8 +1,10 @@
 // @flow
+/* eslint-disable spaced-comment */
 const path = require('path');
 const _ = require('lodash');
 const webpackLodashPlugin = require('lodash-webpack-plugin');
 
+/*::
 type boundActionCreatorsType = {
   createNodeField: (any) => any,
   createPage: (any) => any,
@@ -21,8 +23,9 @@ type createNode = {
   boundActionCreators: boundActionCreatorsType,
   getNode: (any) => any,
 }
+*/
 
-exports.onCreateNode = ({ node, boundActionCreators, getNode }: createNode) => {
+exports.onCreateNode = ({ node, boundActionCreators, getNode }/*: createNode*/) => {
   const { createNodeField } = boundActionCreators;
   let slug;
   if (node.internal.type === 'MarkdownRemark') {
@@ -45,12 +48,14 @@ exports.onCreateNode = ({ node, boundActionCreators, getNode }: createNode) => {
   }
 };
 
+/*::
 type createPages = {
   graphql: any,
   boundActionCreators: boundActionCreatorsType,
 }
+*/
 
-exports.createPages = ({ graphql, boundActionCreators }: createPages): Promise<any> => {
+exports.createPages = ({ graphql, boundActionCreators }/*: createPages*/)/*: Promise<any>*/ => {
   const { createPage } = boundActionCreators;
 
   return new Promise((resolve, reject) => {
@@ -131,23 +136,27 @@ exports.createPages = ({ graphql, boundActionCreators }: createPages): Promise<a
   });
 };
 
+/*::
 type modifyBabelrc = {
   babelrc: any
 }
+*/
 
-exports.modifyBabelrc = ({ babelrc }: modifyBabelrc) => ({
+exports.modifyBabelrc = ({ babelrc }/*: modifyBabelrc */) => ({
   ...babelrc,
   presets: babelrc.presets.concat(['flow']),
 });
 
+/*::
 type modifyWebpackConfig = {
   config: {
     plugin: (any, any, any) => any,
   },
   stage: string,
 }
+*/
 
-exports.modifyWebpackConfig = ({ config, stage }: modifyWebpackConfig) => {
+exports.modifyWebpackConfig = ({ config, stage }/*: modifyWebpackConfig*/) => {
   if (stage === 'build-javascript') {
     config.plugin('Lodash', webpackLodashPlugin, null);
   }

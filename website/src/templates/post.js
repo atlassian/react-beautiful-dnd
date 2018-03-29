@@ -4,7 +4,6 @@ import Helmet from 'react-helmet';
 import styled from 'styled-components';
 
 import UserInfo from '../components/UserInfo';
-import Disqus from '../components/Disqus/Disqus';
 import SocialLinks from '../components/SocialLinks/SocialLinks';
 import SEO from '../components/SEO';
 import config from '../../data/SiteConfig';
@@ -50,7 +49,6 @@ export default class PostTemplate extends Component<Props, *> {
               <SocialLinks postPath={slug} postNode={postNode} />
             </div>
             <UserInfo config={config} />
-            <Disqus postNode={postNode} />
           </BodyContainer>
         </BodyGrid>
       </div>

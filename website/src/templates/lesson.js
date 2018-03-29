@@ -54,7 +54,6 @@ export default class LessonTemplate extends Component<Props, *> {
 const BodyGrid = styled.div`
   height: 100vh;
   display: grid;
-  grid-template-rows: 75px 1fr;
   grid-template-columns: 300px 1fr;
 
   @media screen and (max-width: 600px) {

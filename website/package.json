@@ -4,6 +4,7 @@
   "version": "1.0.1",
   "author": "Eric Windmill <eric@ericwindmill.com>",
   "dependencies": {
+    "@atlaskit/css-reset": "^1.2.3",
     "babel-plugin-lodash": "^3.2.11",
     "gatsby": "^1.9.231",
     "gatsby-cli": "^1.1.49",
