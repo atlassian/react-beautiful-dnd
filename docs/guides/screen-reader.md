@@ -136,8 +136,6 @@ Think about adding information about the length of the list, and the name of the
 
 **Default message**: "You have dropped the item. It has moved from position `${result.source.index + 1}` to `${result.destination.index + 1}`"
 
-This announcement should:
-
 We tell the user the following:
 
 - They have completed the drag
