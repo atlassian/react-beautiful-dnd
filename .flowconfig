@@ -1,5 +1,7 @@
 [ignore]
 .*/node_modules/styled-components/.*
+.*/website/public/.*
+.*/website/.cache/.*
 
 [options]
 
