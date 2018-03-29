@@ -80,7 +80,7 @@
     "jest": "^22.0.5",
     "puppeteer": "^1.2.0",
     "raf-stub": "^2.0.2",
-    "react": "^15.6.2",
+    "react": "^16.3.0",
     "react-dom": "^15.6.2",
     "react-test-renderer": "^16.2.0",
     "rimraf": "^2.6.2",
