@@ -277,9 +277,6 @@ ConnectedDraggable.defaultProps = ({
   isDragDisabled: false,
   // cannot drag interactive elements by default
   disableInteractiveElementBlocking: false,
-  // Due to performance reasons we disable the use of portals by default.
-  // However, users can opt into using them if they need to
-  shouldUsePortal: false,
 }: DefaultProps);
 
 export default ConnectedDraggable;

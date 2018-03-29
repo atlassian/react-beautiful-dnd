@@ -2,6 +2,7 @@
 import type {
   DraggableId,
   DroppableId,
+  TypeId,
   DroppableDescriptor,
   DraggableDescriptor,
   DraggableDimension,
@@ -33,6 +34,7 @@ type State = {|
   isCollecting: boolean,
   scrollOptions: ?ScrollOptions,
   request: ?LiftRequest,
+  requestType: ?TypeId,
   frameId: ?AnimationFrameID,
 |}
 
@@ -48,6 +50,7 @@ export default (callbacks: Callbacks) => {
     isCollecting: false,
     scrollOptions: null,
     request: null,
+    requestType: null,
     frameId: null,
   };
 
@@ -71,21 +74,55 @@ export default (callbacks: Callbacks) => {
     callbacks.cancel();
   };
 
+  const cancelIfModifyingActiveDraggable = (descriptor: DraggableDescriptor) => {
+    if (!state.isCollecting) {
+      return;
+    }
+
+    const home: ?DroppableEntry = state.droppables[descriptor.droppableId];
+
+    // In React 16 children are mounted before parents are.
+    // This case can happen when a list of Draggables are being
+    // moved using a React.Portal.
+    if (!home) {
+      return;
+    }
+
+    // Adding something of a different type - not relevant to the drag
+    if (home.descriptor.type !== state.requestType) {
+      return;
+    }
+
+    // Technically we could let the drag go on - but this is being more explicit
+    // with consumers to prevent undesirable states
+    cancel('Adding or removing a Draggable during a drag is currently not supported');
+  };
+
+  const cancelIfModifyingActiveDroppable = (descriptor: DroppableDescriptor) => {
+    if (!state.isCollecting) {
+      return;
+    }
+
+    // Adding something of a different type - not relevant to the drag
+    // This can happen when dragging a Draggable that has a child Droppable
+    // when using a React.Portal as the child Droppable component will be remounted
+    if (descriptor.type !== state.requestType) {
+      return;
+    }
+
+    cancel('Adding or removing a Droppable during a drag is currently not supported');
+  };
+
   const registerDraggable = (
     descriptor: DraggableDescriptor,
     getDimension: GetDraggableDimensionFn
   ) => {
     const id: DraggableId = descriptor.id;
 
-    // Cannot register a draggable if no entry exists for the droppable
-    // console.log('registering draggable without droppable');
-    // if (!state.droppables[descriptor.droppableId]) {
-    //   cancel(`Cannot register Draggable ${id} as there is no entry for the Droppable ${descriptor.droppableId}`);
-    //   return;
-    // }
-
     // Not checking if the draggable already exists.
-    // This allows for overwriting in particular circumstances
+    // - This allows for overwriting in particular circumstances.
+    // Not checking if a parent droppable exists.
+    // - In React 16 children are mounted before their parents
 
     const entry: DraggableEntry = {
       descriptor,
@@ -100,13 +137,7 @@ export default (callbacks: Callbacks) => {
       draggables,
     });
 
-    if (!state.isCollecting) {
-      return;
-    }
-
-    // TODO: do not warn if the `type` is different to the dragging item
-
-    console.warn('Adding a draggable during a drag is currently not supported');
+    cancelIfModifyingActiveDraggable(descriptor);
   };
 
   const registerDroppable = (
@@ -133,13 +164,7 @@ export default (callbacks: Callbacks) => {
       droppables,
     });
 
-    if (!state.isCollecting) {
-      return;
-    }
-
-    // TODO: do not warn if the `type` is different to the dragging item.
-
-    console.warn('Currently not supporting updating Droppables during a drag');
+    cancelIfModifyingActiveDroppable(descriptor);
   };
 
   const updateDroppableIsEnabled = (id: DroppableId, isEnabled: boolean) => {
@@ -190,7 +215,6 @@ export default (callbacks: Callbacks) => {
     // Entry has already been overwritten.
     // This can happen when a new Draggable with the same draggableId
     // is mounted before the old Draggable has been removed.
-    // TODO: It also occurs in React 16 as old elements are removed after new ones are added?
     if (entry.descriptor !== descriptor) {
       return;
     }
@@ -204,14 +228,7 @@ export default (callbacks: Callbacks) => {
       draggables: newMap,
     });
 
-    if (!state.isCollecting) {
-      return;
-    }
-
-    // TODO: do not error if the type is different to that of the dragging item
-
-    // TODO: this can now occur due to React 16
-    console.warn('currently not supporting unmounting a Draggable during a drag');
+    cancelIfModifyingActiveDraggable(descriptor);
   };
 
   const unregisterDroppable = (descriptor: DroppableDescriptor) => {
@@ -241,13 +258,7 @@ export default (callbacks: Callbacks) => {
       droppables: newMap,
     });
 
-    if (!state.isCollecting) {
-      return;
-    }
-
-    // TODO: do not warn if the `type` is different to the dragging item
-
-    console.warn('currently not supporting unmounting a Droppable during a drag');
+    cancelIfModifyingActiveDroppable(descriptor);
   };
 
   const getToBeCollected = (): UnknownDescriptorType[] => {
@@ -312,15 +323,9 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    const draggableId: DraggableId = request.draggableId;
-
-    setState({
-      isCollecting: true,
-      request,
-    });
-
     const draggables: DraggableEntryMap = state.draggables;
     const droppables: DroppableEntryMap = state.droppables;
+    const draggableId: DraggableId = request.draggableId;
     const draggableEntry: ?DraggableEntry = draggables[draggableId];
 
     if (!draggableEntry) {
@@ -337,6 +342,12 @@ export default (callbacks: Callbacks) => {
       `);
       return;
     }
+
+    setState({
+      isCollecting: true,
+      request,
+      requestType: homeEntry.descriptor.type,
+    });
 
     // Get the minimum dimensions to start a drag
     const home: DroppableDimension = homeEntry.callbacks.getDimension();

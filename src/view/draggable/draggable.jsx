@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'invariant';
@@ -29,7 +28,6 @@ import type {
   Props,
   Provided,
   StateSnapshot,
-  DefaultProps,
   DraggingStyle,
   NotDraggingStyle,
   DraggableStyle,
@@ -42,39 +40,12 @@ export const zIndexOptions: ZIndexOptions = {
   dropAnimating: 4500,
 };
 
-const getPortal = memoizeOne((): HTMLElement => {
-  const portal: HTMLElement = document.createElement('div');
-  portal.className = 'react-beautiful-dnd-draggable-portal';
-  const styles = {
-    position: 'absolute',
-    top: '0',
-    left: '0',
-  };
-
-  Object.assign(portal.style, styles);
-
-  if (!document.body) {
-    throw new Error('Unable to start portal as body is null');
-  }
-
-  document.body.appendChild(portal);
-  return portal;
-});
-
-type State = {|
-  isDraggingOrDropping: boolean,
-|}
-
-export default class Draggable extends Component<Props, State> {
+export default class Draggable extends Component<Props> {
   /* eslint-disable react/sort-comp */
   callbacks: DragHandleCallbacks
   styleContext: string
   isFocused: boolean = false
   ref: ?HTMLElement = null
-
-  state: State = {
-    isDraggingOrDropping: false,
-  }
 
   // Need to declare contextTypes without flow
   // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
@@ -102,18 +73,6 @@ export default class Draggable extends Component<Props, State> {
 
     this.callbacks = callbacks;
     this.styleContext = context[styleContextKey];
-  }
-
-  componentWillReceiveProps(nextProps: Props) {
-    const isDraggingOrDropping: boolean = nextProps.isDragging || nextProps.isDropAnimating;
-
-    if (this.state.isDraggingOrDropping === isDraggingOrDropping) {
-      return;
-    }
-
-    this.setState({
-      isDraggingOrDropping,
-    });
   }
 
   componentWillUnmount() {
@@ -348,7 +307,6 @@ export default class Draggable extends Component<Props, State> {
       draggingOver,
       shouldAnimateDisplacement,
       children,
-      shouldUsePortal,
     } = this.props;
 
     const child: ?Node = children(
@@ -382,13 +340,9 @@ export default class Draggable extends Component<Props, State> {
       return <Placeholder placeholder={dimension.placeholder} />;
     })();
 
-    const item: Node = isDraggingOrDropping && shouldUsePortal ?
-      ReactDOM.createPortal(child, getPortal()) :
-      child;
-
     return (
       <React.Fragment>
-        {item}
+        {child}
         {placeholder}
       </React.Fragment>
     );
