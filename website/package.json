@@ -1,8 +1,8 @@
 {
-  "name": "gatsby-docs-starter",
-  "description": "GatsbyJS starter designed with documentation and tutorial websites in mind.",
+  "name": "react-beautiful-dnd-docs",
+  "description": "Documentation for react-beautiful-dnd",
   "version": "1.0.1",
-  "author": "Eric Windmill <eric@ericwindmill.com>",
+  "author": "Alex Reardon <areardon@atlassian.com>",
   "dependencies": {
     "@atlaskit/css-reset": "^1.2.3",
     "babel-plugin-lodash": "^3.2.11",
@@ -45,7 +45,7 @@
   "keywords": [
     "gatsby"
   ],
-  "license": "MIT",
+  "license": "Apache-2.0",
   "main": "n/a",
   "scripts": {
     "develop": "gatsby develop",
