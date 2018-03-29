@@ -78,6 +78,7 @@
     "eslint-plugin-react": "^7.5.1",
     "flow-bin": "0.68.0",
     "jest": "^22.0.5",
+    "puppeteer": "^1.2.0",
     "raf-stub": "^2.0.2",
     "react": "^15.6.2",
     "react-dom": "^15.6.2",
