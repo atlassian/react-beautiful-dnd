@@ -138,7 +138,6 @@ export default ({
   // Safari 11.3 hack
   // Safari does not allow event.preventDefault() in dynamically added handlers
   // So we add an always listening event handler to get around this :(
-  console.log('HELLO WORLD');
   (() => {
     // Do nothing when server side rendering
     if (typeof window === 'undefined') {
@@ -146,18 +145,17 @@ export default ({
     }
 
     const isUsingSafari11: RegExp = /AppleWebKit.*Version\/11/g;
+
+    // No using Safari 11
     if (!isUsingSafari11.test(window.navigator.userAgent)) {
-      console.log('not on safari 11');
       return;
     }
 
-    // Using safari 11 with no touch support - no point adding the touch listeners
+    // Using Safari 11 with no touch support - no point adding the touch listeners
     if (!('ontouchstart' in window)) {
-      console.log('not a touch device');
       return;
     }
 
-    console.log('adding the touchmove listener');
     window.addEventListener('touchmove', (event: TouchEvent) => {
       if (!state.isDragging) {
         return;
