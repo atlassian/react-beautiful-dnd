@@ -37,12 +37,12 @@ const noop = (): void => { };
 // So we add an always listening event handler to get around this :(
 // webkit bug: https://bugs.webkit.org/show_bug.cgi?id=184250
 const safariHack: SafariHack = (() => {
-  const shouldBlock: boolean = (() => {
-    // Do nothing when server side rendering
-    if (typeof window === 'undefined') {
-      return false;
-    }
+  // Do nothing when server side rendering
+  if (typeof window === 'undefined') {
+    return { start: noop, stop: noop };
+  }
 
+  const shouldBlock: boolean = (() => {
     const isUsingSafari11: RegExp = /AppleWebKit.*Version\/11/g;
 
     // Not using Safari 11
@@ -58,7 +58,7 @@ const safariHack: SafariHack = (() => {
     return true;
   })();
 
-  if (!shouldBlock || typeof window === 'undefined') {
+  if (!shouldBlock) {
     return { start: noop, stop: noop };
   }
 
@@ -72,11 +72,14 @@ const safariHack: SafariHack = (() => {
 
   // Adding a persistent event handler
   window.addEventListener('touchmove', (event: TouchEvent) => {
+    // We let the event go through as normal as nothing
+    // is blocking the touchmove
     if (!isBlocking) {
       return;
     }
 
     // Our normal event handler should have done this
+    // But it won't. Although I live in hope
     if (event.defaultPrevented) {
       return;
     }
