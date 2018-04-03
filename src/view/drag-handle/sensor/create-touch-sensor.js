@@ -135,10 +135,50 @@ export default ({
     kill(callbacks.onCancel);
   };
 
+  // Safari 11.3 hack
+  // Safari does not allow event.preventDefault() in dynamically added handlers
+  // So we add an always listening event handler to get around this :(
+  console.log('HELLO WORLD');
+  (() => {
+    // Do nothing when server side rendering
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const isUsingSafari11: RegExp = /AppleWebKit.*Version\/11/g;
+    if (!isUsingSafari11.test(window.navigator.userAgent)) {
+      console.log('not on safari 11');
+      return;
+    }
+
+    // Using safari 11 with no touch support - no point adding the touch listeners
+    if (!('ontouchstart' in window)) {
+      console.log('not a touch device');
+      return;
+    }
+
+    console.log('adding the touchmove listener');
+    window.addEventListener('touchmove', (event: TouchEvent) => {
+      if (!state.isDragging) {
+        return;
+      }
+
+      // event should have had the event default prevented
+      if (event.defaultPrevented) {
+        return;
+      }
+
+      event.preventDefault();
+    // Forcing this to be non-passive so we can get every touchmove
+    // Not activating in the capture phase like the dynamic touchmove we add.
+    // Technically it would not matter if we did this in the capture phase
+    }, { passive: false, capture: false });
+  })();
+
   const windowBindings: EventBinding[] = [
     {
       eventName: 'touchmove',
-      // opting out of passive touchmove (default) so as to prevent scrolling while moving
+      // Opting out of passive touchmove (default) so as to prevent scrolling while moving
       // Not worried about performance as effect of move is throttled in requestAnimationFrame
       options: { passive: false },
       fn: (event: TouchEvent) => {
@@ -163,7 +203,9 @@ export default ({
           y: clientY,
         };
 
-        // already dragging
+        // We need to prevent the default event in order to block native scrolling
+        // Also because we are using it as part of a drag we prevent the default action
+        // as a sign that we are using the event
         event.preventDefault();
         schedule.move(point);
       },
