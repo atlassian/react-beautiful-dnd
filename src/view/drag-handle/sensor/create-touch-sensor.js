@@ -23,11 +23,74 @@ type TouchWithForce = Touch & {
   force: number
 }
 
+type SafariHack = {|
+  start: () => void,
+  stop: () => void,
+|}
+
 export const timeForLongPress: number = 150;
 export const forcePressThreshold: number = 0.15;
 const touchStartMarshal: EventMarshal = createEventMarshal();
-
 const noop = (): void => { };
+
+// Safari does not allow event.preventDefault() in dynamically added handlers
+// So we add an always listening event handler to get around this :(
+// webkit bug: https://bugs.webkit.org/show_bug.cgi?id=184250
+const safariHack: SafariHack = (() => {
+  const shouldBlock: boolean = (() => {
+    // Do nothing when server side rendering
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    const isUsingSafari11: RegExp = /AppleWebKit.*Version\/11/g;
+
+    // Not using Safari 11
+    if (!isUsingSafari11.test(window.navigator.userAgent)) {
+      return false;
+    }
+
+    // Using Safari 11 with no touch support - no point adding the touch listeners
+    if (!('ontouchstart' in window)) {
+      return false;
+    }
+
+    return true;
+  })();
+
+  if (!shouldBlock || typeof window === 'undefined') {
+    return { start: noop, stop: noop };
+  }
+
+  let isBlocking: boolean = false;
+  const start = () => {
+    isBlocking = true;
+  };
+  const stop = () => {
+    isBlocking = false;
+  };
+
+  // Adding a persistent event handler
+  window.addEventListener('touchmove', (event: TouchEvent) => {
+    if (!isBlocking) {
+      return;
+    }
+
+    // Our normal event handler should have done this
+    if (event.defaultPrevented) {
+      return;
+    }
+
+    // Okay, now we need to step in and fix things
+    event.preventDefault();
+
+    // Forcing this to be non-passive so we can get every touchmove
+    // Not activating in the capture phase like the dynamic touchmove we add.
+    // Technically it would not matter if we did this in the capture phase
+  }, { passive: false, capture: false });
+
+  return { start, stop };
+})();
 
 const initial: State = {
   isDragging: false,
@@ -82,6 +145,7 @@ export default ({
   const stopDragging = (fn?: Function = noop) => {
     schedule.cancel();
     touchStartMarshal.reset();
+    safariHack.stop();
     unbindWindowEvents();
     postDragEventPreventer.preventNext();
     setState(initial);
@@ -113,6 +177,7 @@ export default ({
     }
     schedule.cancel();
     touchStartMarshal.reset();
+    safariHack.stop();
     unbindWindowEvents();
 
     setState(initial);
@@ -134,48 +199,6 @@ export default ({
   const cancel = () => {
     kill(callbacks.onCancel);
   };
-
-  // Safari 11.3 hack
-  // Safari does not allow event.preventDefault() in dynamically added handlers
-  // So we add an always listening event handler to get around this :(
-  // webkit bug: https://bugs.webkit.org/show_bug.cgi?id=184250
-  (() => {
-    // Do nothing when server side rendering
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    const isUsingSafari11: RegExp = /AppleWebKit.*Version\/11/g;
-
-    // Not using Safari 11
-    if (!isUsingSafari11.test(window.navigator.userAgent)) {
-      return;
-    }
-
-    // Using Safari 11 with no touch support - no point adding the touch listeners
-    if (!('ontouchstart' in window)) {
-      return;
-    }
-
-    // Adding a persistent event handler
-    window.addEventListener('touchmove', (event: TouchEvent) => {
-      if (!state.isDragging) {
-        return;
-      }
-
-      // Our normal event handler should have done this
-      if (event.defaultPrevented) {
-        return;
-      }
-
-      // Okay, now we need to step in and fix things
-      event.preventDefault();
-
-      // Forcing this to be non-passive so we can get every touchmove
-      // Not activating in the capture phase like the dynamic touchmove we add.
-      // Technically it would not matter if we did this in the capture phase
-    }, { passive: false, capture: false });
-  })();
 
   const windowBindings: EventBinding[] = [
     {
@@ -358,6 +381,7 @@ export default ({
     // This includes navigation on anchors which we want to preserve
     touchStartMarshal.handle();
 
+    safariHack.start();
     startPendingDrag(event);
   };
 
