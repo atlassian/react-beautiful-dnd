@@ -37,37 +37,24 @@ const noop = (): void => { };
 // So we add an always listening event handler to get around this :(
 // webkit bug: https://bugs.webkit.org/show_bug.cgi?id=184250
 const webkitHack: WebkitHack = (() => {
+  const stub: WebkitHack = {
+    preventTouchMove: noop,
+    releaseTouchMove: noop,
+  };
+
   // Do nothing when server side rendering
   if (typeof window === 'undefined') {
-    return { preventTouchMove: noop, releaseTouchMove: noop };
+    return stub;
   }
 
-  const shouldBlock: boolean = (() => {
-    // All browsers on iPhone or iPad
-    const target: RegExp = /OS\s11_\d\slike\sMac\sOS\sX/g;
-    if (!target.test(window.navigator.userAgent)) {
-      return false;
-    }
-
-    // Device has no touch support - no point adding the touch listeners
-    if (!('ontouchstart' in window)) {
-      return false;
-    }
-
-    return true;
-  })();
-
-  if (!shouldBlock) {
-    return { preventTouchMove: noop, releaseTouchMove: noop };
+  // Device has no touch support - no point adding the touch listener
+  if (!('ontouchstart' in window)) {
+    return stub;
   }
+
+  // Not adding any user agent testing as everything pretends to be webkit
 
   let isBlocking: boolean = false;
-  const preventTouchMove = () => {
-    isBlocking = true;
-  };
-  const releaseTouchMove = () => {
-    isBlocking = false;
-  };
 
   // Adding a persistent event handler
   window.addEventListener('touchmove', (event: TouchEvent) => {
@@ -77,8 +64,8 @@ const webkitHack: WebkitHack = (() => {
       return;
     }
 
-    // Our normal event handler should have done this
-    // But it won't. Although I live in hope
+    // Our event handler would have worked correctly if the browser
+    // was not webkit based, or an older version of webkit.
     if (event.defaultPrevented) {
       return;
     }
@@ -90,6 +77,13 @@ const webkitHack: WebkitHack = (() => {
     // Not activating in the capture phase like the dynamic touchmove we add.
     // Technically it would not matter if we did this in the capture phase
   }, { passive: false, capture: false });
+
+  const preventTouchMove = () => {
+    isBlocking = true;
+  };
+  const releaseTouchMove = () => {
+    isBlocking = false;
+  };
 
   return { preventTouchMove, releaseTouchMove };
 })();
