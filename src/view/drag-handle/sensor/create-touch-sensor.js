@@ -138,6 +138,7 @@ export default ({
   // Safari 11.3 hack
   // Safari does not allow event.preventDefault() in dynamically added handlers
   // So we add an always listening event handler to get around this :(
+  // webkit bug: https://bugs.webkit.org/show_bug.cgi?id=184250
   (() => {
     // Do nothing when server side rendering
     if (typeof window === 'undefined') {
@@ -146,7 +147,7 @@ export default ({
 
     const isUsingSafari11: RegExp = /AppleWebKit.*Version\/11/g;
 
-    // No using Safari 11
+    // Not using Safari 11
     if (!isUsingSafari11.test(window.navigator.userAgent)) {
       return;
     }
@@ -156,20 +157,23 @@ export default ({
       return;
     }
 
+    // Adding a persistent event handler
     window.addEventListener('touchmove', (event: TouchEvent) => {
       if (!state.isDragging) {
         return;
       }
 
-      // event should have had the event default prevented
+      // Our normal event handler should have done this
       if (event.defaultPrevented) {
         return;
       }
 
+      // Okay, now we need to step in and fix things
       event.preventDefault();
-    // Forcing this to be non-passive so we can get every touchmove
-    // Not activating in the capture phase like the dynamic touchmove we add.
-    // Technically it would not matter if we did this in the capture phase
+
+      // Forcing this to be non-passive so we can get every touchmove
+      // Not activating in the capture phase like the dynamic touchmove we add.
+      // Technically it would not matter if we did this in the capture phase
     }, { passive: false, capture: false });
   })();
 
@@ -351,6 +355,7 @@ export default ({
     // We need to stop parents from responding to this event - which may cause a double lift
     // We also need to NOT call event.preventDefault() so as to maintain as much standard
     // browser interactions as possible.
+    // This includes navigation on anchors which we want to preserve
     touchStartMarshal.handle();
 
     startPendingDrag(event);
