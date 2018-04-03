@@ -33,7 +33,7 @@ export const forcePressThreshold: number = 0.15;
 const touchStartMarshal: EventMarshal = createEventMarshal();
 const noop = (): void => { };
 
-// Safari does not allow event.preventDefault() in dynamically added handlers
+// Webkit does not allow event.preventDefault() in dynamically added handlers
 // So we add an always listening event handler to get around this :(
 // webkit bug: https://bugs.webkit.org/show_bug.cgi?id=184250
 const webkitHack: WebkitHack = (() => {
@@ -44,13 +44,12 @@ const webkitHack: WebkitHack = (() => {
 
   const shouldBlock: boolean = (() => {
     // All browsers on iPhone or iPad
-    // https://regexr.com/3n8fr
     const target: RegExp = /OS\s11_\d\slike\sMac\sOS\sX/g;
     if (!target.test(window.navigator.userAgent)) {
       return false;
     }
 
-    // Using Safari 11 with no touch support - no point adding the touch listeners
+    // Device has no touch support - no point adding the touch listeners
     if (!('ontouchstart' in window)) {
       return false;
     }
@@ -328,7 +327,7 @@ export default ({
       },
     },
     // Need to opt out of dragging if the user is a force press
-    // Only for safari which has decided to introduce its own custom way of doing things
+    // Only for webkit which has decided to introduce its own custom way of doing things
     // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
     {
       eventName: 'touchforcechange',
@@ -384,7 +383,7 @@ export default ({
     // This includes navigation on anchors which we want to preserve
     touchStartMarshal.handle();
 
-    // A Safari only hack to prevent touch move events
+    // A webkit only hack to prevent touch move events
     webkitHack.preventTouchMove();
     startPendingDrag(event);
   };
