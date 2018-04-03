@@ -23,9 +23,9 @@ type TouchWithForce = Touch & {
   force: number
 }
 
-type SafariHack = {|
-  start: () => void,
-  stop: () => void,
+type WebkitHack = {|
+  preventTouchMove: () => void,
+  releaseTouchMove: () => void,
 |}
 
 export const timeForLongPress: number = 150;
@@ -36,17 +36,17 @@ const noop = (): void => { };
 // Safari does not allow event.preventDefault() in dynamically added handlers
 // So we add an always listening event handler to get around this :(
 // webkit bug: https://bugs.webkit.org/show_bug.cgi?id=184250
-const safariHack: SafariHack = (() => {
+const webkitHack: WebkitHack = (() => {
   // Do nothing when server side rendering
   if (typeof window === 'undefined') {
-    return { start: noop, stop: noop };
+    return { preventTouchMove: noop, releaseTouchMove: noop };
   }
 
   const shouldBlock: boolean = (() => {
-    const isUsingSafari11: RegExp = /AppleWebKit.*Version\/11/g;
-
-    // Not using Safari 11
-    if (!isUsingSafari11.test(window.navigator.userAgent)) {
+    // All browsers on iPhone or iPad
+    // https://regexr.com/3n8fr
+    const target: RegExp = /OS\s11_\d\slike\sMac\sOS\sX/g;
+    if (!target.test(window.navigator.userAgent)) {
       return false;
     }
 
@@ -59,14 +59,14 @@ const safariHack: SafariHack = (() => {
   })();
 
   if (!shouldBlock) {
-    return { start: noop, stop: noop };
+    return { preventTouchMove: noop, releaseTouchMove: noop };
   }
 
   let isBlocking: boolean = false;
-  const start = () => {
+  const preventTouchMove = () => {
     isBlocking = true;
   };
-  const stop = () => {
+  const releaseTouchMove = () => {
     isBlocking = false;
   };
 
@@ -92,7 +92,7 @@ const safariHack: SafariHack = (() => {
     // Technically it would not matter if we did this in the capture phase
   }, { passive: false, capture: false });
 
-  return { start, stop };
+  return { preventTouchMove, releaseTouchMove };
 })();
 
 const initial: State = {
@@ -148,7 +148,7 @@ export default ({
   const stopDragging = (fn?: Function = noop) => {
     schedule.cancel();
     touchStartMarshal.reset();
-    safariHack.stop();
+    webkitHack.releaseTouchMove();
     unbindWindowEvents();
     postDragEventPreventer.preventNext();
     setState(initial);
@@ -180,7 +180,7 @@ export default ({
     }
     schedule.cancel();
     touchStartMarshal.reset();
-    safariHack.stop();
+    webkitHack.releaseTouchMove();
     unbindWindowEvents();
 
     setState(initial);
@@ -384,7 +384,8 @@ export default ({
     // This includes navigation on anchors which we want to preserve
     touchStartMarshal.handle();
 
-    safariHack.start();
+    // A Safari only hack to prevent touch move events
+    webkitHack.preventTouchMove();
     startPendingDrag(event);
   };
 
