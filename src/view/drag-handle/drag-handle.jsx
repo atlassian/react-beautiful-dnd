@@ -84,14 +84,14 @@ export default class DragHandle extends Component<Props> {
     });
   }
 
-  componentWillReceiveProps(nextProps: Props) {
+  componentDidUpdate(prevProps: Props) {
     const isCapturing: boolean = this.isAnySensorCapturing();
 
     if (!isCapturing) {
       return;
     }
 
-    const isDragStopping: boolean = (this.props.isDragging && !nextProps.isDragging);
+    const isDragStopping: boolean = (prevProps.isDragging && !this.props.isDragging);
 
     // if the application cancels a drag we need to unbind the handlers
     if (isDragStopping) {
@@ -105,7 +105,7 @@ export default class DragHandle extends Component<Props> {
     }
 
     // dragging disabled mid drag
-    if (!nextProps.isEnabled) {
+    if (!this.props.isEnabled) {
       this.sensors.forEach((sensor: Sensor) => {
         if (sensor.isCapturing()) {
           const wasDragging: boolean = sensor.isDragging();

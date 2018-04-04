@@ -33,24 +33,12 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
   publishedDescriptor: ?DraggableDescriptor = null
 
-  componentWillReceiveProps(nextProps: Props) {
-    const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
-      nextProps.draggableId,
-      nextProps.droppableId,
-      nextProps.index,
-    );
-
-    this.publish(descriptor);
+  componentDidUpdate() {
+    this.publish();
   }
 
   componentDidMount() {
-    const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
-      this.props.draggableId,
-      this.props.droppableId,
-      this.props.index
-    );
-
-    this.publish(descriptor);
+    this.publish();
   }
 
   componentWillUnmount() {
@@ -78,7 +66,14 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     this.publishedDescriptor = null;
   }
 
-  publish = (descriptor: DraggableDescriptor) => {
+  publish = () => {
+    const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
+      this.props.draggableId,
+      this.props.droppableId,
+      this.props.index
+    );
+
+    // No changes to the descriptor
     if (descriptor === this.publishedDescriptor) {
       return;
     }

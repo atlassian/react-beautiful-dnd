@@ -13,7 +13,6 @@ import type {
   DraggableStateSnapshot,
 } from '../../../src';
 
-
 // const Row = styled.tr`
 //   xvertical-align: middle;
 // `;
@@ -64,6 +63,7 @@ class TableCell extends React.Component<TableCellProps, TableCellState> {
     height: null,
   }
 
+  // TODO: use different lifecycle method
   componentWillReceiveProps(nextProps: TableCellProps) {
     const isDragStarting: boolean = nextProps.isDragOccurring && !this.props.isDragOccurring;
     const isDragEnding: boolean = !nextProps.isDragOccurring && this.props.isDragOccurring;

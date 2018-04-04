@@ -158,35 +158,25 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     this.closestScrollable.removeEventListener('scroll', this.onClosestScroll);
   }
 
-  componentWillReceiveProps(nextProps: Props) {
+  componentDidMount() {
+    this.publish();
+  }
+
+  componentDidUpdate(prevProps: Props) {
     // 1. Update the descriptor
-    // Note: not publishing it on componentDidMount as we do not have a ref at that point
-
-    const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
-      nextProps.droppableId,
-      nextProps.type,
-    );
-
-    this.publish(descriptor);
+    this.publish();
 
     // 2. Update is enabled
 
-    if (this.props.isDropDisabled === nextProps.isDropDisabled) {
+    // nothing has changed
+    if (this.props.isDropDisabled === prevProps.isDropDisabled) {
       return;
     }
 
     // the enabled state of the droppable is changing
+    // TODO: what if mounted while disabled!?
     const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.updateDroppableIsEnabled(nextProps.droppableId, !nextProps.isDropDisabled);
-  }
-
-  componentDidMount() {
-    const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
-      this.props.droppableId,
-      this.props.type,
-    );
-
-    this.publish(descriptor);
+    marshal.updateDroppableIsEnabled(this.props.droppableId, this.props.isDropDisabled);
   }
 
   componentWillUnmount() {
@@ -218,7 +208,12 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     this.publishedDescriptor = null;
   }
 
-  publish = (descriptor: DroppableDescriptor) => {
+  publish = () => {
+    const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
+      this.props.droppableId,
+      this.props.type,
+    );
+
     if (descriptor === this.publishedDescriptor) {
       return;
     }
