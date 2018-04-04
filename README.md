@@ -1035,7 +1035,26 @@ It is a contract of this library that it owns the positioning logic of the dragg
 
 `react-beautiful-dnd` uses `position: fixed` to position the dragging element. This is quite robust and allows for you to have `position: relative | absolute | fixed` parents. However, unfortunately `position:fixed` is [impacted by `transform`](http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/) (such as `transform: rotate(10deg);`). This means that if you have a `transform: *` on one of the parents of a `Draggable` then the positioning logic will be incorrect while dragging. Lame! For most consumers this will not be an issue.
 
-This will be changing soon as we move to a [portal solution](https://github.com/atlassian/react-beautiful-dnd/issues/192) where we will be appending the `Draggable` to the end of the body to avoid any parent transforms. If you really need this feature right now we have [created an example](https://www.webpackbin.com/bins/-L-3aZ_bTMiGPl8bqlRB) where we implement a portal on top of the current api. Please note however, this technique is not officially supported and might break in minor / patch releases.
+If your draggable has an ancestor that uses `transform`, `perspective`, or `filter`, simply add `transformRef` to the parent of the div that has `innerRef`:
+
+```js
+import { Draggable } from 'react-beautiful-dnd';
+
+<Draggable draggableId="draggable-1" index={0}>
+  {(provided, snapshot) => (
+    <div ref={provided.transformRef}>
+      <div
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+      >
+        <h4>My draggable</h4>
+      </div>
+      {provided.placeholder}
+    </div>
+  )}
+</Draggable>;
+```
 
 ##### Extending `DraggableProps.style`
 

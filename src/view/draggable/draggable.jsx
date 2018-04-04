@@ -48,6 +48,7 @@ export default class Draggable extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
   callbacks: DragHandleCallbacks
   styleContext: string
+  transformRef: ?HTMLElement
 
   state: State = {
     ref: null,
@@ -184,6 +185,10 @@ export default class Draggable extends Component<Props, State> {
     });
   })
 
+  setTransformRef = ((ref: ?HTMLElement) => {
+    this.transformRef = ref;
+  })
+
   getDraggableRef = (): ?HTMLElement => this.state.ref;
 
   getPlaceholder() {
@@ -195,11 +200,23 @@ export default class Draggable extends Component<Props, State> {
     );
   }
 
+  getTransformOffset = memoizeOne((transformRef: ?HTMLElement): Object => {
+    if (transformRef) {
+      const { left, top } = transformRef.getBoundingClientRect();
+      return { left, top };
+    }
+    return {
+      left: 0,
+      top: 0,
+    };
+  });
+
   getDraggingStyle = memoizeOne(
     (dimension: DraggableDimension,
       isDropAnimating: boolean,
       movementStyle: MovementStyle): DraggingStyle => {
       const { width, height, top, left } = dimension.client.paddingBox;
+      const transformOffset = this.getTransformOffset(this.transformRef);
       // For an explanation of properties see `draggable-types`.
       const style: DraggingStyle = {
         position: 'fixed',
@@ -207,8 +224,8 @@ export default class Draggable extends Component<Props, State> {
         zIndex: isDropAnimating ? zIndexOptions.dropAnimating : zIndexOptions.dragging,
         width,
         height,
-        top,
-        left,
+        top: top - transformOffset.top,
+        left: left - transformOffset.left,
         margin: 0,
         pointerEvents: 'none',
         transition: 'none',
@@ -255,6 +272,7 @@ export default class Draggable extends Component<Props, State> {
 
       const provided: Provided = {
         innerRef: this.setRef,
+        transformRef: this.setTransformRef,
         draggableProps: {
           'data-react-beautiful-dnd-draggable': this.styleContext,
           style: draggableStyle,
