@@ -32,8 +32,6 @@ export type DragHandleProps = {|
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
   onTouchStart: (event: TouchEvent) => void,
-  // TODO: can we remove this?
-  onTouchMove: (event: TouchEvent) => void,
 
   // Control styling from style marshal
   'data-react-beautiful-dnd-drag-handle': string,

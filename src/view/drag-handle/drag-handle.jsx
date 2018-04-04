@@ -150,10 +150,6 @@ export default class DragHandle extends Component<Props> {
     this.touchSensor.onTouchStart(event);
   }
 
-  onTouchMove = (event: TouchEvent) => {
-    this.touchSensor.onTouchMove(event);
-  }
-
   canStartCapturing = (event: Event) => {
     // this might be before a drag has started - isolated to this element
     if (this.isAnySensorCapturing()) {
@@ -181,7 +177,6 @@ export default class DragHandle extends Component<Props> {
       onMouseDown: this.onMouseDown,
       onKeyDown: this.onKeyDown,
       onTouchStart: this.onTouchStart,
-      onTouchMove: this.onTouchMove,
       onFocus: this.props.callbacks.onFocus,
       onBlur: this.props.callbacks.onBlur,
       tabIndex: 0,
