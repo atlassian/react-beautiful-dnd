@@ -256,7 +256,7 @@ export default ({
       return;
     }
 
-    // if pressing any key while using a mouse down - do not start a drag
+    // Do not start a drag if any modifier key is pressed
     if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
       return;
     }
