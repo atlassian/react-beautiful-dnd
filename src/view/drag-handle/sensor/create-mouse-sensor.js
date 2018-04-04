@@ -256,6 +256,11 @@ export default ({
       return;
     }
 
+    // if pressing any key while using a mouse down - do not start a drag
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+      return;
+    }
+
     // Registering that this event has been handled.
     // This is to prevent parent draggables using this event
     // to start also.
