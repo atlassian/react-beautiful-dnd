@@ -22,13 +22,17 @@ export type Callbacks = {|
 |}
 
 export type DragHandleProps = {|
-  // TEMP
+  // If a consumer is using a portal then the item will loose focus
+  // when moving to the portal. This breaks keyboard dragging.
+  // To get around this we manually apply focus if needed when mounting
   onFocus: () => void,
   onBlur: () => void,
 
+  // Used to initiate dragging
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
   onTouchStart: (event: TouchEvent) => void,
+  // TODO: can we remove this?
   onTouchMove: (event: TouchEvent) => void,
 
   // Control styling from style marshal
