@@ -54,7 +54,7 @@
     "reselect": "^3.0.1"
   },
   "devDependencies": {
-    "@atlaskit/css-reset": "^1.2.0",
+    "@atlaskit/css-reset": "^2.0.0",
     "@storybook/react": "^3.2.16",
     "babel-cli": "^6.26.0",
     "babel-eslint": "^8.2.1",
