@@ -46,15 +46,13 @@ type Props = {|
 class Item extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
 
-  state = {
-    ref: null,
-  }
+  ref: ?HTMLElement
 
   setRef = (ref: ?HTMLElement) => {
-    this.setState({
-      ref,
-    });
+    this.ref = ref;
   }
+
+  getRef = (): ?HTMLElement => this.ref;
 
   render() {
     return (
@@ -62,7 +60,7 @@ class Item extends Component<Props, State> {
         draggableId={this.props.draggableId || preset.inHome1.descriptor.id}
         droppableId={preset.inHome1.descriptor.droppableId}
         index={this.props.index || preset.inHome1.descriptor.index}
-        targetRef={this.state.ref}
+        getDraggableRef={this.getRef}
       >
         <div ref={this.setRef}>hi</div>
       </DraggableDimensionPublisher>
@@ -98,27 +96,6 @@ describe('DraggableDimensionPublisher', () => {
 
       expect(marshal.registerDraggable).toHaveBeenCalledTimes(1);
       expect(marshal.registerDraggable.mock.calls[0][0]).toEqual(preset.inHome1.descriptor);
-    });
-
-    it('should log an error if no targetRef is provided', () => {
-      const marshal: DimensionMarshal = getMarshalStub();
-
-      const wrapper = mount(
-        <DraggableDimensionPublisher
-          draggableId={preset.inHome1.descriptor.id}
-          droppableId={preset.inHome1.descriptor.droppableId}
-          index={preset.inHome1.descriptor.index}
-          targetRef={null}
-        >
-          <div>hi</div>
-        </DraggableDimensionPublisher>,
-        withDimensionMarshal(marshal)
-      );
-
-      forceUpdate(wrapper);
-
-      expect(marshal.registerDraggable).not.toHaveBeenCalled();
-      expect(console.error).toHaveBeenCalled();
     });
 
     it('should unregister itself when unmounting', () => {
@@ -349,6 +326,32 @@ describe('DraggableDimensionPublisher', () => {
       expect(result).toEqual(expected);
 
       setWindowScroll(originalScroll);
+    });
+
+    it('should throw an error if no ref is provided when attempting to get a dimension', () => {
+      class NoRefItem extends Component<*> {
+        render() {
+          return (
+            <DraggableDimensionPublisher
+              draggableId={preset.inHome1.descriptor.id}
+              droppableId={preset.inHome1.descriptor.droppableId}
+              index={preset.inHome1.descriptor.index}
+              getDraggableRef={() => undefined}
+            >
+              <div>hi</div>
+            </DraggableDimensionPublisher>
+          );
+        }
+      }
+      const marshal: DimensionMarshal = getMarshalStub();
+
+      mount(<NoRefItem />, withDimensionMarshal(marshal));
+
+      // pull the get dimension function out
+      const getDimension: GetDraggableDimensionFn = marshal.registerDraggable.mock.calls[0][1];
+
+      // when we call the get dimension function without a ref things will explode
+      expect(getDimension).toThrow();
     });
   });
 });

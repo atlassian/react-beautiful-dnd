@@ -1,5 +1,4 @@
 // @flow
-/* eslint-disable react/no-multi-comp */
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Droppable, Draggable } from '../../../../../src';

@@ -1,5 +1,4 @@
 // @flow
-/* eslint-disable react/no-multi-comp, react/sort-comp */
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import styled from 'styled-components';
