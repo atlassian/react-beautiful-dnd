@@ -161,13 +161,9 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   componentDidMount() {
     this.publish();
 
-    if (!this.props.isDropDisabled) {
-      return;
-    }
-
-    // If mounting while disabled - let the marshal know
-    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.updateDroppableIsEnabled(this.props.droppableId, this.props.isDropDisabled);
+    // Note: not calling `marshal.updateDroppableIsEnabled()`
+    // If the dimension marshal needs to get the dimension immediately
+    // then it will get the enabled state of the dimension at that point
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -183,7 +179,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
 
     // the enabled state of the droppable is changing
     const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.updateDroppableIsEnabled(this.props.droppableId, this.props.isDropDisabled);
+    marshal.updateDroppableIsEnabled(this.props.droppableId, !this.props.isDropDisabled);
   }
 
   componentWillUnmount() {
