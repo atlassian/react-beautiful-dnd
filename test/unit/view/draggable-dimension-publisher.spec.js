@@ -34,16 +34,12 @@ const noSpacing = {
   paddingLeft: '0',
 };
 
-type State = {
-  ref: ?HTMLElement
-}
-
 type Props = {|
   index?: number,
   draggableId?: DraggableId,
 |}
 
-class Item extends Component<Props, State> {
+class Item extends Component<Props> {
   /* eslint-disable react/sort-comp */
 
   ref: ?HTMLElement
