@@ -13,10 +13,6 @@ import type {
   DraggableStateSnapshot,
 } from '../../../src';
 
-// const Row = styled.tr`
-//   xvertical-align: middle;
-// `;
-
 const Table = styled.table`
   width: 500px;
   margin: 0 auto;
@@ -31,14 +27,6 @@ const THead = styled.thead`
   border: 0;
 `;
 
-// const AuthorCell = styled.td`
-//   xwidth: 20%;
-// `;
-
-// const QuoteCell = styled.td`
-//   xwidth: 80%;
-// `;
-
 const Row = styled.tr`
   ${props => (props.isDragging ? 'display: table; table-layout: fixed; background: lightblue;' : '')}
 `;
@@ -52,41 +40,64 @@ type TableCellProps = {|
   isDragOccurring: boolean,
 |}
 
-type TableCellState = {|
-  width: ?number,
-  height: ?number,
+type TableCellSnapshot = {|
+  width: number,
+  height: number,
 |}
-class TableCell extends React.Component<TableCellProps, TableCellState> {
+class TableCell extends React.Component<TableCellProps> {
   ref: ?HTMLElement
-  state: TableCellState = {
-    width: null,
-    height: null,
+
+  getSnapshotBeforeUpdate(prevProps: TableCellProps): ?TableCellSnapshot {
+    if (!this.ref) {
+      return null;
+    }
+
+    const isDragStarting: boolean = this.props.isDragOccurring && !prevProps.isDragOccurring;
+
+    if (!isDragStarting) {
+      return null;
+    }
+
+    const { width, height } = this.ref.getBoundingClientRect();
+
+    const snapshot: TableCellSnapshot = {
+      width, height,
+    };
+
+    return snapshot;
   }
 
-  // TODO: use different lifecycle method
-  componentWillReceiveProps(nextProps: TableCellProps) {
-    const isDragStarting: boolean = nextProps.isDragOccurring && !this.props.isDragOccurring;
-    const isDragEnding: boolean = !nextProps.isDragOccurring && this.props.isDragOccurring;
-
-    if (isDragStarting) {
-      if (!this.ref) {
-        throw new Error('Cannot set width and height without a ref');
-      }
-      const { width, height } = this.ref.getBoundingClientRect();
-
-      this.setState({
-        width,
-        height,
-      });
+  componentDidUpdate(
+    prevProps: TableCellProps,
+    prevState: mixed,
+    snapshot: ?TableCellSnapshot
+  ) {
+    const ref: ?HTMLElement = this.ref;
+    if (!ref) {
       return;
     }
 
-    if (isDragEnding) {
-      this.setState({
-        width: null,
-        height: null,
-      });
+    if (snapshot) {
+      if (ref.style.width === snapshot.width) {
+        return;
+      }
+      ref.style.width = `${snapshot.width}px`;
+      ref.style.height = `${snapshot.height}px`;
+      return;
     }
+
+    if (this.props.isDragOccurring) {
+      return;
+    }
+
+    // inline styles not applied
+    if (ref.style.width == null) {
+      return;
+    }
+
+    // no snapshot and drag is finished - clear the inline styles
+    ref.style.removeProperty('height');
+    ref.style.removeProperty('width');
   }
 
   setRef = (ref: ?HTMLElement) => {
@@ -94,16 +105,8 @@ class TableCell extends React.Component<TableCellProps, TableCellState> {
   }
 
   render() {
-    const style = {
-      width: this.state.width,
-      height: this.state.height,
-    };
-
     return (
-      <Cell
-        innerRef={this.setRef}
-        style={style}
-      >
+      <Cell innerRef={this.setRef}>
         {this.props.children}
       </Cell>
     );
