@@ -93,7 +93,7 @@ exports.createPages = ({ graphql, boundActionCreators }/* : NodeParams */)/* : P
   const { createPage } = boundActionCreators;
 
   return new Promise((resolve, reject) => {
-    const markdownPage = path.resolve('src/templates/markdown.js');
+    const markdownPage = path.resolve('src/templates/markdown.jsx');
     resolve(
       graphql(
         `
@@ -115,6 +115,8 @@ exports.createPages = ({ graphql, boundActionCreators }/* : NodeParams */)/* : P
           console.log(result.errors);
           reject(result.errors);
         }
+
+        console.log('DO THE THINGS', markdownPage);
 
         result.data.allMarkdownRemark.edges.forEach((edge) => {
           createPage({
