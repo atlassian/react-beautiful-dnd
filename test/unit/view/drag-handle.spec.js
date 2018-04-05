@@ -2094,22 +2094,7 @@ describe('drag handle', () => {
         expect(mockEvent.preventDefault).not.toHaveBeenCalled();
       });
 
-      it('should not start a drag if the user moves their finger before a long press (movement captured on element)', () => {
-        const mockEvent: MockEvent = createMockEvent();
-
-        touchStart(wrapper);
-        touchMove(wrapper, origin, 0, mockEvent);
-        // would normally start a drag
-        jest.runTimersToTime(timeForLongPress);
-
-        expect(callbacksCalled(callbacks)({
-          onLift: 0,
-        })).toBe(true);
-        // letting the movement event flow through - this enables native scrolling
-        expect(mockEvent.preventDefault).not.toHaveBeenCalled();
-      });
-
-      it('should not start a drag if the user moves their finger before a long press (movement captured on window)', () => {
+      it('should not start a drag if the user moves their finger before a long press', () => {
         touchStart(wrapper);
         const event: Event = windowTouchMove(origin);
         // would normally start a drag
