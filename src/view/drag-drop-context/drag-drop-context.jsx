@@ -70,39 +70,9 @@ export default class DragDropContext extends React.Component<Props> {
   announcer: Announcer
   unsubscribe: Function
 
-  // Need to declare childContextTypes without flow
-  // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
-  static childContextTypes = {
-    [storeKey]: PropTypes.shape({
-      dispatch: PropTypes.func.isRequired,
-      subscribe: PropTypes.func.isRequired,
-      getState: PropTypes.func.isRequired,
-    }).isRequired,
-    [dimensionMarshalKey]: PropTypes.object.isRequired,
-    [styleContextKey]: PropTypes.string.isRequired,
-    [canLiftContextKey]: PropTypes.func.isRequired,
-  }
-  /* eslint-enable */
+  constructor(props: Props, context: mixed) {
+    super(props, context);
 
-  getChildContext(): Context {
-    return {
-      [storeKey]: this.store,
-      [dimensionMarshalKey]: this.dimensionMarshal,
-      [styleContextKey]: this.styleMarshal.styleContext,
-      [canLiftContextKey]: this.canLift,
-    };
-  }
-
-  // Providing function on the context for drag handles to use to
-  // let them know if they can start a drag or not. This is done
-  // rather than mapping a prop onto the drag handle so that we
-  // do not need to re-render a connected drag handle in order to
-  // pull this state off. It would cause a re-render of all items
-  // on drag start which is too expensive.
-  // This is useful when the user
-  canLift = (id: DraggableId) => canStartDrag(this.store.getState(), id);
-
-  componentWillMount() {
     this.store = createStore();
 
     this.announcer = createAnnouncer();
@@ -157,7 +127,7 @@ export default class DragDropContext extends React.Component<Props> {
       // setting previous now rather than at the end of this function
       // incase a function is called that syncorously causes a state update
       // which will re-invoke this function before it has completed a previous
-      // invokation.
+      // invocation.
       previous = current;
 
       // Style updates do not cause more actions. It is important to update styles
@@ -203,11 +173,39 @@ export default class DragDropContext extends React.Component<Props> {
       this.autoScroller.onStateChange(previousInThisExecution, current);
     });
   }
+  // Need to declare childContextTypes without flow
+  // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
+  static childContextTypes = {
+    [storeKey]: PropTypes.shape({
+      dispatch: PropTypes.func.isRequired,
+      subscribe: PropTypes.func.isRequired,
+      getState: PropTypes.func.isRequired,
+    }).isRequired,
+    [dimensionMarshalKey]: PropTypes.object.isRequired,
+    [styleContextKey]: PropTypes.string.isRequired,
+    [canLiftContextKey]: PropTypes.func.isRequired,
+  }
+  /* eslint-enable */
+
+  getChildContext(): Context {
+    return {
+      [storeKey]: this.store,
+      [dimensionMarshalKey]: this.dimensionMarshal,
+      [styleContextKey]: this.styleMarshal.styleContext,
+      [canLiftContextKey]: this.canLift,
+    };
+  }
+
+  // Providing function on the context for drag handles to use to
+  // let them know if they can start a drag or not. This is done
+  // rather than mapping a prop onto the drag handle so that we
+  // do not need to re-render a connected drag handle in order to
+  // pull this state off. It would cause a re-render of all items
+  // on drag start which is too expensive.
+  // This is useful when the user
+  canLift = (id: DraggableId) => canStartDrag(this.store.getState(), id);
 
   componentDidMount() {
-    // need to mount the style marshal after we are in the dom
-    // this cannot be done before otherwise it would break
-    // server side rendering
     this.styleMarshal.mount();
     this.announcer.mount();
   }
