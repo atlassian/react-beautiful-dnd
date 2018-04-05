@@ -32,7 +32,9 @@ class App extends Component<*, *> {
                     ref={dragProvided.innerRef}
                     {...dragProvided.draggableProps}
                     {...dragProvided.dragHandleProps}
-                  />
+                  >
+                    Drag me!
+                  </div>
                 )}
               </Draggable>
             </div>

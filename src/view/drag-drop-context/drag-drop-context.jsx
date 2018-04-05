@@ -8,8 +8,8 @@ import createStyleMarshal, { resetStyleContext } from '../style-marshal/style-ma
 import canStartDrag from '../../state/can-start-drag';
 import scrollWindow from '../window/scroll-window';
 import createAnnouncer from '../announcer/announcer';
-import type { Announcer } from '../announcer/announcer-types';
 import createAutoScroller from '../../state/auto-scroller';
+import type { Announcer } from '../announcer/announcer-types';
 import type { AutoScroller } from '../../state/auto-scroller/auto-scroller-types';
 import type { StyleMarshal } from '../style-marshal/style-marshal-types';
 import type {
