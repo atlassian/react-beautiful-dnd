@@ -6,5 +6,5 @@ import { quotes } from './src/data';
 
 storiesOf('Tables', module)
   .add('Symantec table reordering', () => (
-    <TableApp initial={quotes.slice(0, 2)} />
+    <TableApp initial={quotes} />
   ));

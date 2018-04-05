@@ -107,9 +107,7 @@ export default class Draggable extends Component<Props> {
     const { lift, draggableId } = this.props;
     const ref: ?HTMLElement = this.ref;
 
-    if (!ref) {
-      throw new Error('cannot lift at this time');
-    }
+    invariant(ref, 'Cannot lift at this time as there is no ref')
 
     const initial: InitialDragPositions = {
       selection: client,

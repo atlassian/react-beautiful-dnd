@@ -160,6 +160,14 @@ export default class DroppableDimensionPublisher extends Component<Props> {
 
   componentDidMount() {
     this.publish();
+
+    if (!this.props.isDropDisabled) {
+      return;
+    }
+
+    // If mounting while disabled - let the marshal know
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
+    marshal.updateDroppableIsEnabled(this.props.droppableId, this.props.isDropDisabled);
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -174,7 +182,6 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     }
 
     // the enabled state of the droppable is changing
-    // TODO: what if mounted while disabled!?
     const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
     marshal.updateDroppableIsEnabled(this.props.droppableId, this.props.isDropDisabled);
   }
@@ -194,20 +201,6 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       type,
     }));
 
-  unpublish = () => {
-    if (!this.publishedDescriptor) {
-      console.error('Cannot unpublish descriptor when none is published');
-      return;
-    }
-
-    // Using the previously published id to unpublish. This is to guard
-    // against the case where the id dynamically changes. This is not
-    // supported during a drag - but it is good to guard against.
-    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.unregisterDroppable(this.publishedDescriptor);
-    this.publishedDescriptor = null;
-  }
-
   publish = () => {
     const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
       this.props.droppableId,
@@ -225,6 +218,20 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
     marshal.registerDroppable(descriptor, this.callbacks);
     this.publishedDescriptor = descriptor;
+  }
+
+  unpublish = () => {
+    if (!this.publishedDescriptor) {
+      console.error('Cannot unpublish descriptor when none is published');
+      return;
+    }
+
+    // Using the previously published id to unpublish. This is to guard
+    // against the case where the id dynamically changes. This is not
+    // supported during a drag - but it is good to guard against.
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
+    marshal.unregisterDroppable(this.publishedDescriptor);
+    this.publishedDescriptor = null;
   }
 
   getDimension = (): DroppableDimension => {

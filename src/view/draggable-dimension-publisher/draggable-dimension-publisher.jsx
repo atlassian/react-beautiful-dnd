@@ -33,11 +33,11 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
   publishedDescriptor: ?DraggableDescriptor = null
 
-  componentDidUpdate() {
+  componentDidMount() {
     this.publish();
   }
 
-  componentDidMount() {
+  componentDidUpdate() {
     this.publish();
   }
 
@@ -51,20 +51,6 @@ export default class DraggableDimensionPublisher extends Component<Props> {
       droppableId,
       index,
     }));
-
-  unpublish = () => {
-    if (!this.publishedDescriptor) {
-      console.error('cannot unpublish descriptor when none is published');
-      return;
-    }
-
-    // Using the previously published id to unpublish. This is to guard
-    // against the case where the id dynamically changes. This is not
-    // supported during a drag - but it is good to guard against.
-    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.unregisterDraggable(this.publishedDescriptor);
-    this.publishedDescriptor = null;
-  }
 
   publish = () => {
     const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
@@ -85,6 +71,20 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
     marshal.registerDraggable(descriptor, this.getDimension);
     this.publishedDescriptor = descriptor;
+  }
+
+  unpublish = () => {
+    if (!this.publishedDescriptor) {
+      console.error('cannot unpublish descriptor when none is published');
+      return;
+    }
+
+    // Using the previously published id to unpublish. This is to guard
+    // against the case where the id dynamically changes. This is not
+    // supported during a drag - but it is good to guard against.
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
+    marshal.unregisterDraggable(this.publishedDescriptor);
+    this.publishedDescriptor = null;
   }
 
   getDimension = (): DraggableDimension => {
