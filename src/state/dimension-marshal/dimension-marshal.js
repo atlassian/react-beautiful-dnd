@@ -176,6 +176,9 @@ export default (callbacks: Callbacks) => {
     if (!state.isCollecting) {
       return;
     }
+    // At this point a non primary droppable dimension might not yet be published
+    // but may have its enabled state changed. For now we still publish this change
+    // and let the reducer exit early if it cannot find the dimension in the state.
     callbacks.updateDroppableIsEnabled(id, isEnabled);
   };
 
