@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../../../src/';
 import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
@@ -9,8 +8,10 @@ import reorder from '../reorder';
 import type { Quote } from '../types';
 import type { DropResult, DragStart } from '../../../../../src/types';
 
-const publishOnDragStart = action('onDragStart');
-const publishOnDragEnd = action('onDragEnd');
+/* eslint-disable no-console */
+const publishOnDragStart = (v?: any) => console.log('onDragStart', v);
+const publishOnDragEnd = (v?: any) => console.log('onDragEnd', v);
+/* eslint-enable no-console */
 
 const Root = styled.div`
   background-color: ${colors.blue.deep};
@@ -38,7 +39,7 @@ export default class QuoteApp extends Component<Props, State> {
 
   state: State = {
     quotes: this.props.initial,
-  };
+  }
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
