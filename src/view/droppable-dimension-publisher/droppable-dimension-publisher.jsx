@@ -167,17 +167,17 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    // 1. Update the descriptor
+    // Update the descriptor if needed
     this.publish();
 
-    // 2. Update is enabled
+    // We now need to check if the disabled flag has changed
 
-    // nothing has changed
     if (this.props.isDropDisabled === prevProps.isDropDisabled) {
       return;
     }
 
-    // the enabled state of the droppable is changing
+    // The enabled state of the droppable is changing.
+    // We need to let the marshal know incase a drag is currently occurring
     const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
     marshal.updateDroppableIsEnabled(this.props.droppableId, !this.props.isDropDisabled);
   }
