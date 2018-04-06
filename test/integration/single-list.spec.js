@@ -4,23 +4,34 @@
 // @flow
 const puppeteer = require('puppeteer');
 
-const urlSingleList = 'http://localhost:9002/iframe.html?selectedKind=single%20vertical%20list&selectedStory=basic';
+const urlSingleList: string = 'http://localhost:9002/iframe.html?selectedKind=single%20vertical%20list&selectedStory=basic';
 
-const timeout = 30000;
+const timeout: number = 30000;
 
-const returnPositionAndText = async (page, elem) =>
-  page.$$eval(elem, el =>
-    ({
-      height: el[0].offsetHeight,
-      left: el[0].offsetLeft,
-      top: el[0].offsetTop,
-      text: el[0].innerText,
-    }));
+type Selector = string;
+
+const returnPositionAndText = async (page: Object, selector: Selector) =>
+  page.$eval(selector, (el: ?HTMLElement) => {
+    if (!el) {
+      throw new Error(`Unable to find element for selector "${selector}"`);
+    }
+
+    if (!(el instanceof HTMLElement)) {
+      throw new Error('Element returned not of type HTMLElement');
+    }
+
+    return {
+      height: el.offsetHeight,
+      left: el.offsetLeft,
+      top: el.offsetTop,
+      text: el.innerText,
+    };
+  });
 
 /* Css selectors used */
-const singleListContainer = '[data-react-beautiful-dnd-droppable="0"]';
-const firstCard = '#root div > div:nth-child(1) > a';
-const secondCard = '#root div > div:nth-child(2) > a';
+const singleListContainer: string = '[data-react-beautiful-dnd-droppable]';
+const firstCard: string = '[data-react-beautiful-dnd-drag-handle]:nth-child(1)';
+const secondCard: string = '[data-react-beautiful-dnd-drag-handle]:nth-child(2)';
 
 describe('Single List > ', () => {
   let browser;
@@ -40,25 +51,25 @@ describe('Single List > ', () => {
 
   it('should be able to drag the first card under the second', async () => {
     /* Before drag */
-    let firstPosition = await returnPositionAndText(page, firstCard);
-    let secondPosition = await returnPositionAndText(page, secondCard);
-    const beforeDragFirstCardContent = firstPosition.text;
-    const beforeDragSecondCardContent = secondPosition.text;
+    let inFirstPosition = await returnPositionAndText(page, firstCard);
+    let inSecondPosition = await returnPositionAndText(page, secondCard);
+    const beforeDragFirstCardContent = inFirstPosition.text;
+    const beforeDragSecondCardContent = inSecondPosition.text;
     // Check
     // - Cards should not be at the same position
     // - Texts content should not be the same
-    expect(firstPosition.top).toBeLessThan(secondPosition.top);
-    expect(firstPosition.text).not.toBe(secondPosition.text);
+    expect(inFirstPosition.top).toBeLessThan(inSecondPosition.top);
+    expect(inFirstPosition.text).not.toBe(inSecondPosition.text);
     // Select first element and move to the second place
     await page.keyboard.press('Tab');
     await page.keyboard.press('Space');
     await page.keyboard.press('ArrowDown');
     await page.keyboard.press('Space');
     /* After drag first and second cards are swapped */
-    firstPosition = await returnPositionAndText(page, firstCard);
-    secondPosition = await returnPositionAndText(page, secondCard);
-    const afterDragFirstCardContent = firstPosition.text;
-    const afterDragSecondCardContent = secondPosition.text;
+    inFirstPosition = await returnPositionAndText(page, firstCard);
+    inSecondPosition = await returnPositionAndText(page, secondCard);
+    const afterDragFirstCardContent = inFirstPosition.text;
+    const afterDragSecondCardContent = inSecondPosition.text;
     // Check
     // - Texts content should not be the same after drag
     expect(beforeDragFirstCardContent).toEqual(afterDragSecondCardContent);
