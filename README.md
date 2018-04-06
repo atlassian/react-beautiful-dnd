@@ -915,10 +915,8 @@ import { Draggable } from 'react-beautiful-dnd';
 {this.props.items.map((item, index) => (
   <Draggable draggableId={item.id} index={index}>
     {(provided, snapshot) => (
-      <div>
-        <div ref={provided.innerRef} {...provided.draggableProps}>
-          {item.content}
-        </div>
+      <div ref={provided.innerRef} {...provided.draggableProps}>
+        {item.content}
       </div>
     )}
   </Draggable>
@@ -929,7 +927,7 @@ import { Draggable } from 'react-beautiful-dnd';
 - `isDragDisabled`: An *optional* flag to control whether or not the `Draggable` is permitted to drag. You can use this to implement your own conditional drag logic. It will default to `false`.
 - `disableInteractiveElementBlocking`: An *optional* flag to opt out of blocking a drag from interactive elements. For more information refer to the section *Interactive child elements within a `Draggable`*
 
-### Children function
+### Children function (render props)
 
 The `React` children of a `Draggable` must be a function that returns a `ReactElement`.
 
@@ -1012,10 +1010,8 @@ type NotDraggingStyle = {|
 ```js
 <Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => (
-    <div>
-      <div ref={provided.innerRef} {...provided.draggableProps}>
-        Drag me!
-      </div>
+    <div ref={provided.innerRef} {...provided.draggableProps}>
+      Drag me!
     </div>
   )}
 </Draggable>;
@@ -1029,7 +1025,7 @@ It is a contract of this library that it owns the positioning logic of the dragg
 
 `react-beautiful-dnd` uses `position: fixed` to position the dragging element. This is quite robust and allows for you to have `position: relative | absolute | fixed` parents. However, unfortunately `position:fixed` is [impacted by `transform`](http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/) (such as `transform: rotate(10deg);`). This means that if you have a `transform: *` on one of the parents of a `Draggable` then the positioning logic will be incorrect while dragging. Lame! For most consumers this will not be an issue.
 
-This will be changing soon as we move to a [portal solution](https://github.com/atlassian/react-beautiful-dnd/issues/192) where we will be appending the `Draggable` to the end of the body to avoid any parent transforms. If you really need this feature right now we have [created an example](https://www.webpackbin.com/bins/-L-3aZ_bTMiGPl8bqlRB) where we implement a portal on top of the current api. Please note however, this technique is not officially supported and might break in minor / patch releases.
+To get around this we can use [`React.Portal`](https://reactjs.org/docs/portals.html). We do not enable this functionality by default as it has performance problems. We have [portal guide](/guides/using-a-portal.md) explaining the performance problem in more detail and how you can set up your own `React.Portal` if you want to.
 
 ##### Extending `DraggableProps.style`
 
@@ -1047,14 +1043,12 @@ If you are overriding inline styles be sure to do it after you spread the `provi
       ...provided.draggableProps.style,
     };
     return (
-      <div>
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          style={style}
-        >
-          Drag me!
-        </div>
+      <div
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        style={style}
+      >
+        Drag me!
       </div>
     );
   }}
@@ -1230,6 +1224,10 @@ The `children` function is also provided with a small amount of state relating t
   }}
 </Draggable>;
 ```
+
+### `Draggable` placeholder
+
+When dragging a `Draggable` we leave behind a *placeholder* `React.Element` to maintain space in the `Droppable` in order to prevent it from collapsing. The placeholder mimics the styling and layout (including `width`, `height`, `margin`, `tagName` and `display`) to ensure the list dimensions remain unaffected while dragging. It will be inserted as a direct sibling to the `React.Node` returned by the `Draggable` children function.
 
 ### Adding an `onClick` handler to a `Draggable` or a *drag handle*
 
