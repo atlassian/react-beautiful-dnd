@@ -74,16 +74,13 @@ class InnerQuoteList extends Component<QuoteListProps> {
         {this.props.quotes.map((quote: Quote, index: number) => (
           <Draggable key={quote.id} draggableId={quote.id} index={index}>
             {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
-              <div>
-                <QuoteItem
-                  key={quote.id}
-                  quote={quote}
-                  isDragging={dragSnapshot.isDragging}
-                  provided={dragProvided}
-                  autoFocus={this.props.autoFocusQuoteId === quote.id}
-                />
-                {dragProvided.placeholder}
-              </div>
+              <QuoteItem
+                key={quote.id}
+                quote={quote}
+                isDragging={dragSnapshot.isDragging}
+                provided={dragProvided}
+                autoFocus={this.props.autoFocusQuoteId === quote.id}
+              />
           )}
           </Draggable>
         ))}

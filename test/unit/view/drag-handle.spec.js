@@ -31,6 +31,8 @@ const primaryButton: number = 0;
 const auxiliaryButton: number = 1;
 
 const getStubCallbacks = (): Callbacks => ({
+  onFocus: jest.fn(),
+  onBlur: jest.fn(),
   onLift: jest.fn(),
   onMove: jest.fn(),
   onMoveForward: jest.fn(),

@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import type { Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
@@ -107,7 +107,7 @@ export default class Draggable extends Component<Props> {
     const { lift, draggableId } = this.props;
     const ref: ?HTMLElement = this.ref;
 
-    invariant(ref, 'Cannot lift at this time as there is no ref')
+    invariant(ref, 'Cannot lift at this time as there is no ref');
 
     const initial: InitialDragPositions = {
       selection: client,
@@ -339,10 +339,10 @@ export default class Draggable extends Component<Props> {
     })();
 
     return (
-      <React.Fragment>
+      <Fragment>
         {child}
         {placeholder}
-      </React.Fragment>
+      </Fragment>
     );
   }
 

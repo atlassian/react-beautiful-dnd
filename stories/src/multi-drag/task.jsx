@@ -199,23 +199,20 @@ export default class Task extends Component<Props> {
           const shouldShowSelection: boolean = snapshot.isDragging && selectionCount > 1;
 
           return (
-            <div>
-              <Container
-                innerRef={provided.innerRef}
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}
-                onClick={this.onClick}
-                onTouchEnd={this.onTouchEnd}
-                onKeyDown={(event: KeyboardEvent) => this.onKeyDown(event, provided, snapshot)}
-                isDragging={snapshot.isDragging}
-                isSelected={isSelected}
-                isGhosting={isGhosting}
-              >
-                <Content>{task.content}</Content>
-                {shouldShowSelection ? <SelectionCount>{selectionCount}</SelectionCount> : null}
-              </Container>
-              {provided.placeholder}
-            </div>
+            <Container
+              innerRef={provided.innerRef}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+              onClick={this.onClick}
+              onTouchEnd={this.onTouchEnd}
+              onKeyDown={(event: KeyboardEvent) => this.onKeyDown(event, provided, snapshot)}
+              isDragging={snapshot.isDragging}
+              isSelected={isSelected}
+              isGhosting={isGhosting}
+            >
+              <Content>{task.content}</Content>
+              {shouldShowSelection ? <SelectionCount>{selectionCount}</SelectionCount> : null}
+            </Container>
           );
         }}
       </Draggable>

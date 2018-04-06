@@ -213,19 +213,16 @@ export default class InteractiveElementsApp extends React.Component<*, State> {
                     index={index}
                   >
                     {(draggableProvided: DraggableProvided) => (
-                      <div>
-                        <Item
-                          innerRef={draggableProvided.innerRef}
-                          {...draggableProvided.draggableProps}
-                          {...draggableProvided.dragHandleProps}
-                        >
-                          {item.component}
-                        </Item>
-                        {draggableProvided.placeholder}
-                      </div>
+                      <Item
+                        innerRef={draggableProvided.innerRef}
+                        {...draggableProvided.draggableProps}
+                        {...draggableProvided.dragHandleProps}
+                      >
+                        {item.component}
+                      </Item>
                   )}
                   </Draggable>
-              ))}
+                ))}
                 {droppableProvided.placeholder}
               </List>
           )}

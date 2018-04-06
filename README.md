@@ -893,15 +893,12 @@ import { Draggable } from 'react-beautiful-dnd';
 
 <Draggable draggableId="draggable-1" type="PERSON" index={0}>
   {(provided, snapshot) => (
-    <div>
-      <div
-        ref={provided.innerRef}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
-      >
-        <h4>My draggable</h4>
-      </div>
-      {provided.placeholder}
+    <div
+      ref={provided.innerRef}
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+    >
+      <h4>My draggable</h4>
     </div>
   )}
 </Draggable>;
@@ -939,7 +936,6 @@ The `React` children of a `Draggable` must be a function that returns a `ReactEl
 ```js
 <Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => (
-    <div>
       <div
         ref={provided.innerRef}
         {...provided.draggableProps}
@@ -947,8 +943,6 @@ The `React` children of a `Draggable` must be a function that returns a `ReactEl
       >
         Drag me!
       </div>
-      {provided.placeholder}
-    </div>
   )}
 </Draggable>;
 ```
@@ -1141,15 +1135,12 @@ type DragHandleProps = {|
 ```js
 <Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => (
-    <div>
-      <div
-        ref={provided.innerRef}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
-      >
-        Drag me!
-      </div>
-      {provided.placeholder}
+    <div
+      ref={provided.innerRef}
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+    >
+      Drag me!
     </div>
   )}
 </Draggable>;
@@ -1162,12 +1153,9 @@ Controlling a whole draggable by just a part of it
 ```js
 <Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => (
-    <div>
-      <div ref={provided.innerRef} {...provided.draggableProps}>
-        <h2>Hello there</h2>
-        <div {...provided.dragHandleProps}>Drag handle</div>
-      </div>
-      {provided.placeholder}
+    <div ref={provided.innerRef} {...provided.draggableProps}>
+      <h2>Hello there</h2>
+      <div {...provided.dragHandleProps}>Drag handle</div>
     </div>
   )}
 </Draggable>;
@@ -1196,37 +1184,16 @@ const myOnMouseDown = event => console.log('mouse down on', event.target);
     })();
 
     return (
-      <div>
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          onMouseDown={onMouseDown}
-        >
-          Drag me!
-        </div>
-        {provided.placeholder}
+      <div
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        onMouseDown={onMouseDown}
+      >
+        Drag me!
       </div>
     );
   }}
-</Draggable>;
-```
-
-- `provided.placeholder (?ReactElement)` The `Draggable` element has `position: fixed` applied to it while it is dragging. The role of the `placeholder` is to sit in the place that the `Draggable` was during a drag. It is needed to stop the `Droppable` list from collapsing when you drag. It is advised to render it as a sibling to the `Draggable` node. This is unlike `Droppable` where the `placeholder` needs to be *within* the `Droppable` node. When the library moves to `React` 16 the `placeholder` will be removed from api.
-
-##### `placeholder` example
-
-```js
-<Draggable draggableId="draggable-1" index={0}>
-  {(provided, snapshot) => (
-    <div>
-      <div ref={provided.innerRef} {...provided.draggableProps}>
-        Drag me!
-      </div>
-      {/* Always render me - I will be null if not required */}
-      {provided.placeholder}
-    </div>
-  )}
 </Draggable>;
 ```
 
@@ -1251,16 +1218,13 @@ The `children` function is also provided with a small amount of state relating t
     };
 
     return (
-      <div>
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          style={style}
-        >
-          Drag me!
-        </div>
-        {provided.placeholder}
+      <div
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        style={style}
+      >
+        Drag me!
       </div>
     );
   }}

@@ -118,15 +118,12 @@ describe('DragDropContext', () => {
                     <div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
                       <Draggable draggableId="draggableId">
                         {(draggableProvided: DraggableProvided) => (
-                          <div>
-                            <div
-                              ref={draggableProvided.innerRef}
-                              {...draggableProvided.dragHandleProps}
-                              {...draggableProvided.draggableProps}
-                            >
-                              <Connected />
-                            </div>
-                            {draggableProvided.placeholder}
+                          <div
+                            ref={draggableProvided.innerRef}
+                            {...draggableProvided.dragHandleProps}
+                            {...draggableProvided.draggableProps}
+                          >
+                            <Connected />
                           </div>
                         )}
                       </Draggable>
@@ -154,17 +151,14 @@ describe('DragDropContext', () => {
                   <div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
                     <Draggable draggableId="draggableId">
                       {(draggableProvided: DraggableProvided) => (
-                        <div>
-                          <div
-                            ref={draggableProvided.innerRef}
-                            {...draggableProvided.dragHandleProps}
-                            {...draggableProvided.draggableProps}
-                          >
-                            <Provider store={store}>
-                              <Connected />
-                            </Provider>
-                          </div>
-                          {draggableProvided.placeholder}
+                        <div
+                          ref={draggableProvided.innerRef}
+                          {...draggableProvided.dragHandleProps}
+                          {...draggableProvided.draggableProps}
+                        >
+                          <Provider store={store}>
+                            <Connected />
+                          </Provider>
                         </div>
                       )}
                     </Draggable>

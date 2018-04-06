@@ -66,16 +66,13 @@ describe('hooks integration', () => {
               <h2>Droppable</h2>
               <Draggable draggableId={draggableId} index={0}>
                 {(draggableProvided: DraggableProvided) => (
-                  <div>
-                    <div
-                      className="drag-handle"
-                      ref={draggableProvided.innerRef}
-                      {...draggableProvided.draggableProps}
-                      {...draggableProvided.dragHandleProps}
-                    >
-                      <h4>Draggable</h4>
-                    </div>
-                    {draggableProvided.placeholder}
+                  <div
+                    className="drag-handle"
+                    ref={draggableProvided.innerRef}
+                    {...draggableProvided.draggableProps}
+                    {...draggableProvided.dragHandleProps}
+                  >
+                    <h4>Draggable</h4>
                   </div>
                 )}
               </Draggable>

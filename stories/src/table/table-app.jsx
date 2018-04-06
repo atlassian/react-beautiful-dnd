@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import type { Node } from 'react';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
@@ -44,6 +44,7 @@ type TableCellSnapshot = {|
   height: number,
 |}
 class TableCell extends React.Component<TableCellProps> {
+  // eslint-disable-next-line react/sort-comp
   ref: ?HTMLElement
 
   getSnapshotBeforeUpdate(prevProps: TableCellProps): ?TableCellSnapshot {
@@ -198,7 +199,7 @@ export default class TableApp extends Component<AppProps, AppState> {
   render() {
     return (
       <DragDropContext onDragStart={this.onDragStart} onDragEnd={this.onDragEnd}>
-        <React.Fragment>
+        <Fragment>
           <button onClick={this.toggleTableLayout}>
             Toggle table layout
           </button>
@@ -232,7 +233,7 @@ export default class TableApp extends Component<AppProps, AppState> {
                 )}
             </Droppable>
           </Table>
-        </React.Fragment>
+        </Fragment>
       </DragDropContext>
     );
   }

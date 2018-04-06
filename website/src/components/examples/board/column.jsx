@@ -8,11 +8,6 @@ import QuoteList from '../primatives/quote-list';
 import Title from '../primatives/title';
 import type { Quote } from '../types';
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
 const Container = styled.div`
   margin: ${grid}px;
   display: flex;
@@ -48,28 +43,25 @@ export default class Column extends Component<Props> {
     return (
       <Draggable draggableId={title} index={index}>
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
-          <Wrapper>
-            <Container
-              innerRef={provided.innerRef}
-              {...provided.draggableProps}
-            >
-              <Header isDragging={snapshot.isDragging}>
-                <Title
-                  isDragging={snapshot.isDragging}
-                  {...provided.dragHandleProps}
-                >
-                  {title}
-                </Title>
-              </Header>
-              <QuoteList
-                listId={title}
-                listType="QUOTE"
-                quotes={quotes}
-                autoFocusQuoteId={this.props.autoFocusQuoteId}
-              />
-            </Container>
-            {provided.placeholder}
-          </Wrapper>
+          <Container
+            innerRef={provided.innerRef}
+            {...provided.draggableProps}
+          >
+            <Header isDragging={snapshot.isDragging}>
+              <Title
+                isDragging={snapshot.isDragging}
+                {...provided.dragHandleProps}
+              >
+                {title}
+              </Title>
+            </Header>
+            <QuoteList
+              listId={title}
+              listType="QUOTE"
+              quotes={quotes}
+              autoFocusQuoteId={this.props.autoFocusQuoteId}
+            />
+          </Container>
         )}
 
       </Draggable>
