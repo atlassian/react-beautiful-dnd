@@ -130,7 +130,6 @@ const pressEnter = withKeyboard(keyCodes.enter);
 const windowEnter = dispatchWindowKeyDownEvent.bind(null, keyCodes.enter);
 // touch events
 const touchStart = touchEvent.bind(null, 'touchstart');
-const touchMove = touchEvent.bind(null, 'touchmove');
 const windowTouchStart = dispatchWindowTouchEvent.bind(null, 'touchstart');
 const windowTouchMove = dispatchWindowTouchEvent.bind(null, 'touchmove');
 const windowTouchEnd = dispatchWindowTouchEvent.bind(null, 'touchend');
