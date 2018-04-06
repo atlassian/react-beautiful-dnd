@@ -240,6 +240,9 @@ describe('hooks integration', () => {
       drag.start();
 
       wasDragStarted();
+
+      // cleanup
+      drag.stop();
     });
 
     it('should not call onDragStart while the drag is occurring', () => {
@@ -250,6 +253,9 @@ describe('hooks integration', () => {
 
       // should not have called on drag start again
       expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+
+      // cleanup
+      drag.stop();
     });
   });
 
