@@ -10,14 +10,21 @@
     "gatsby-plugin-react-helmet": "^2.0.8",
     "gatsby-source-filesystem": "^1.5.28",
     "gatsby-transformer-remark": "^1.7.39",
-    "lodash.startcase": "^4.4.0",
+    "lodash.lowercase": "^4.3.0",
     "react-helmet": "^5.2.0"
   },
-  "keywords": ["gatsby"],
+  "keywords": [
+    "drag and drop",
+    "dnd",
+    "sortable",
+    "react",
+    "react.js",
+    "natural",
+    "beautiful"
+  ],
   "license": "Apache-2.0",
   "scripts": {
     "build": "gatsby build",
-    "develop": "gatsby develop",
-    "format": "prettier --write 'src/**/*.js'"
+    "develop": "gatsby develop"
   }
 }

@@ -5,7 +5,7 @@
  * See: https://www.gatsbyjs.org/docs/node-apis/
  */
 const path = require('path');
-const startCase = require('lodash.startcase');
+const lowerCase = require('lodash.lowercase');
 
 /* ::
 type fileNode = { relativePath: string }
@@ -69,18 +69,20 @@ exports.onCreateNode = ({ node, boundActionCreators, getNode }/* : NodeParams */
     const fileNode = getNode(node.parent);
     const parsedFilePath = path.parse(fileNode.relativePath);
     let slug = '/docs';
-    let name = '';
+    let title = '';
     if (parsedFilePath.dir) {
       slug += `/${parsedFilePath.dir.toLowerCase()}`;
-      name = startCase(parsedFilePath.dir);
+      title = lowerCase(parsedFilePath.dir);
     }
     if (parsedFilePath.name !== 'index') {
       slug += `/${parsedFilePath.name.toLowerCase()}`;
-      name = startCase(parsedFilePath.name);
+      title = lowerCase(parsedFilePath.name);
     }
 
+    title = title.charAt(0).toUpperCase() + title.slice(1);
+
     createNodeField({ node, name: 'slug', value: slug });
-    createNodeField({ node, name: 'title', value: name });
+    createNodeField({ node, name: 'title', value: title });
     createNodeField({
       node,
       name: 'dir',
@@ -111,12 +113,10 @@ exports.createPages = ({ graphql, boundActionCreators }/* : NodeParams */)/* : P
         `
       ).then((result) => {
         if (result.errors) {
-          /* eslint-disable no-console */
+          /* eslint-disable-next-line no-console */
           console.log(result.errors);
           reject(result.errors);
         }
-
-        console.log('DO THE THINGS', markdownPage);
 
         result.data.allMarkdownRemark.edges.forEach((edge) => {
           createPage({

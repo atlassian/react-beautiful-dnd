@@ -1,6 +1,5 @@
 // @flow
 import React, { type Node } from 'react';
-import PropTypes from 'prop-types';
 import Helmet from 'react-helmet';
 /* eslint-disable-next-line import/extensions */
 import '@atlaskit/css-reset';
@@ -10,7 +9,7 @@ import Header from '../components/Header';
 const TemplateWrapper = ({ children }: { children: () => Node }) => (
   <div>
     <Helmet
-      title="Gatsby Default Starter"
+      title="React-beautiful-dnd"
       meta={[
         { name: 'description', content: 'react-beautiful-dnd' },
       ]}
@@ -28,9 +27,5 @@ const TemplateWrapper = ({ children }: { children: () => Node }) => (
     </div>
   </div>
 );
-
-TemplateWrapper.propTypes = {
-  children: PropTypes.func,
-};
 
 export default TemplateWrapper;
