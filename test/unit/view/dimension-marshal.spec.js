@@ -356,7 +356,7 @@ describe('dimension marshal', () => {
             .toHaveBeenCalledTimes(Object.keys(preset.droppables).length - 1);
         });
 
-        it('should only collect dimensions have the same type as the dragging item', () => {
+        it('should collect dimensions have the same type as the dragging item', () => {
           const droppables: DroppableDimensionMap = {
             ...preset.droppables,
             [ofAnotherType.descriptor.id]: ofAnotherType,
@@ -650,7 +650,7 @@ describe('dimension marshal', () => {
 
         it('should not publish droppables if there are none to publish', () => {
           const droppables: DroppableDimensionMap = {
-            // only one droppable
+            // one droppable
             [preset.home.descriptor.id]: preset.home,
           };
           const draggables: DraggableDimensionMap = {
@@ -699,7 +699,7 @@ describe('dimension marshal', () => {
         marshal.onPhaseChange(state.dragging(preset.inHome1.descriptor.id));
         requestAnimationFrame.step(2);
 
-        // currently only watching
+        // currently watching
         Object.keys(preset.droppables).forEach((id: DroppableId) => {
           expect(watchers.droppable.watchScroll).toHaveBeenCalledWith(id, scheduled);
           expect(watchers.droppable.unwatchScroll).not.toHaveBeenCalledWith(id);
@@ -924,11 +924,11 @@ describe('dimension marshal', () => {
       });
 
       describe('draggable', () => {
-        it('should log an error if there is no matching droppable', () => {
+        it('should not log an error if there is no matching droppable (children are mounted before parents in React 16)', () => {
           const marshal = createDimensionMarshal(getCallbackStub());
 
           marshal.registerDraggable(preset.inHome1.descriptor, getDraggableDimensionFn);
-          expect(console.error).toHaveBeenCalled();
+          expect(console.error).not.toHaveBeenCalled();
         });
 
         it('should be published in the next collection', () => {
@@ -1190,7 +1190,7 @@ describe('dimension marshal', () => {
   describe('registration change while collecting', () => {
     describe('dimension added', () => {
       describe('draggable', () => {
-        it('should log an unsupported warning', () => {
+        it('should cancel the drag if the dimension is of the same type as the dragging item', () => {
           const callbacks = getCallbackStub();
           const marshal = createDimensionMarshal(callbacks);
           populateMarshal(marshal);
@@ -1208,50 +1208,118 @@ describe('dimension marshal', () => {
             draggableId: preset.inHome1.descriptor.id,
             scrollOptions: scheduled,
           }));
-          callbacks.publishDraggable.mockReset();
-          // now registering
+          // initial publish has occurred
+          expect(callbacks.publishDraggable).toHaveBeenCalledTimes(1);
+          expect(callbacks.publishDroppable).toHaveBeenCalledTimes(1);
+          // cancel not called yet
+          expect(callbacks.cancel).not.toHaveBeenCalled();
+
+          // now registering new descriptor
           marshal.registerDraggable(fake.descriptor, () => fake);
 
-          expect(callbacks.publishDraggable).not.toHaveBeenCalled();
-          expect(console.warn).toHaveBeenCalled();
+          expect(callbacks.cancel).toHaveBeenCalled();
         });
-      });
 
-      describe('droppable', () => {
-        it('should immediately publish the droppable', () => {
+        it('should not cancel the drag if the dimension is not of the same type as the dragging item', () => {
+          const droppables: DroppableDimensionMap = {
+            ...preset.droppables,
+            [ofAnotherType.descriptor.id]: ofAnotherType,
+          };
           const callbacks = getCallbackStub();
           const marshal = createDimensionMarshal(callbacks);
-          populateMarshal(marshal);
-          const fake: DroppableDimension = getDroppableDimension({
-            descriptor: {
-              id: 'my fake id',
-              type: preset.home.descriptor.type,
-            },
-            paddingBox: fakeArea,
+          populateMarshal(marshal, {
+            droppables,
+            draggables: preset.draggables,
           });
-          const droppableCallbacks: DroppableCallbacks = {
-            getDimension: () => fake,
-            watchScroll: jest.fn(),
-            unwatchScroll: () => { },
-            scroll: () => {},
-          };
 
-          // starting collection
+          // start a collection
           marshal.onPhaseChange(state.requesting({
             draggableId: preset.inHome1.descriptor.id,
             scrollOptions: scheduled,
           }));
-          callbacks.publishDroppable.mockReset();
+          // initial publish occurred
+          expect(callbacks.publishDraggable).toHaveBeenCalledTimes(1);
+          expect(callbacks.publishDroppable).toHaveBeenCalledTimes(1);
+          // cancel not called yet
+          expect(callbacks.cancel).not.toHaveBeenCalled();
 
-          // updating registration
-          marshal.registerDroppable(fake.descriptor, droppableCallbacks);
+          // now registering new descriptor
+          marshal.registerDraggable(childOfAnotherType.descriptor, () => childOfAnotherType);
 
-          // warning should have been logged and nothing updated
-          expect(console.warn).toHaveBeenCalled();
-          expect(callbacks.publishDroppable).not.toHaveBeenCalled();
-          expect(droppableCallbacks.watchScroll).not.toHaveBeenCalled();
+          // because it was of another type it did not impact the drag
+          expect(callbacks.cancel).not.toHaveBeenCalled();
         });
       });
+
+      describe('droppable', () => {
+        it('should cancel the drag if the droppable was of the same type as the dragging item', () => {
+          const droppables: DroppableDimensionMap = {
+            ...preset.droppables,
+          };
+          // removing the foreign droppable
+          delete droppables.foreign;
+          const callbacks = getCallbackStub();
+          const marshal = createDimensionMarshal(callbacks);
+          populateMarshal(marshal, {
+            droppables,
+            draggables: preset.draggables,
+          });
+
+          // start a collection
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
+          // initial publish has occurred
+          expect(callbacks.publishDraggable).toHaveBeenCalledTimes(1);
+          expect(callbacks.publishDroppable).toHaveBeenCalledTimes(1);
+          // cancel not called yet
+          expect(callbacks.cancel).not.toHaveBeenCalled();
+
+          // Add a new droppable of the same type
+          const droppableCallbacks: DroppableCallbacks = {
+            getDimension: () => preset.foreign,
+            watchScroll: () => { },
+            unwatchScroll: () => { },
+            scroll: () => {},
+          };
+          marshal.registerDroppable(preset.foreign.descriptor, droppableCallbacks);
+
+          expect(callbacks.cancel).toHaveBeenCalled();
+        });
+
+        it('should not cancel the drag if the droppable is a different type to the dragging item', () => {
+          const callbacks = getCallbackStub();
+          const marshal = createDimensionMarshal(callbacks);
+          populateMarshal(marshal);
+
+          // start a collection
+          marshal.onPhaseChange(state.requesting({
+            draggableId: preset.inHome1.descriptor.id,
+            scrollOptions: scheduled,
+          }));
+          // initial publish has occurred
+          expect(callbacks.publishDraggable).toHaveBeenCalledTimes(1);
+          expect(callbacks.publishDroppable).toHaveBeenCalledTimes(1);
+          // cancel not called yet
+          expect(callbacks.cancel).not.toHaveBeenCalled();
+
+          // Add a new droppable of a different type
+          const droppableCallbacks: DroppableCallbacks = {
+            getDimension: () => ofAnotherType,
+            watchScroll: () => { },
+            unwatchScroll: () => { },
+            scroll: () => {},
+          };
+          marshal.registerDroppable(ofAnotherType.descriptor, droppableCallbacks);
+
+          expect(callbacks.cancel).not.toHaveBeenCalled();
+        });
+      });
+    });
+
+    describe('dimension changed', () => {
+      // TODO: but same code path as dimension added
     });
   });
 

@@ -65,13 +65,16 @@ export default (callbacks: Callbacks) => {
   const cancel = (...args: mixed[]) => {
     console.error(...args);
 
+    // We want to cancel the drag even if we are not collecting yet
+    // This is true when trying to lift something that has not been published
+    callbacks.cancel();
+
     if (!state.isCollecting) {
       return;
     }
 
     // eslint-disable-next-line no-use-before-define
     stopCollecting();
-    callbacks.cancel();
   };
 
   const cancelIfModifyingActiveDraggable = (descriptor: DraggableDescriptor) => {
