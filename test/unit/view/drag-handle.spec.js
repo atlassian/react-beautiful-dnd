@@ -405,6 +405,26 @@ describe('drag handle', () => {
         })).toBe(true);
       });
 
+      it('should not start a drag if a modifier key was used while pressing the mouse down', () => {
+        // if any drag is started with these keys pressed then we do not start a drag
+        const withKeys = [
+          { ctrlKey: true },
+          { altKey: true },
+          { shiftKey: true },
+          { metaKey: true },
+        ];
+
+        withKeys.forEach((withKey: Object) => {
+          mouseDown(wrapper, origin, primaryButton, withKey);
+          windowMouseMove({ x: 0, y: sloppyClickThreshold });
+          windowMouseUp();
+
+          expect(callbacksCalled(callbacks)({
+            onLift: 0,
+          })).toBe(true);
+        });
+      });
+
       it('should not start a drag if another sensor is capturing', () => {
         // will now be capturing
         touchStart(wrapper);
