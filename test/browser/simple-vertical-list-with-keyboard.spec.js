@@ -33,7 +33,7 @@ const singleListContainer: string = '[data-react-beautiful-dnd-droppable]';
 const firstCard: string = '[data-react-beautiful-dnd-drag-handle]:nth-child(1)';
 const secondCard: string = '[data-react-beautiful-dnd-drag-handle]:nth-child(2)';
 
-describe('Single List > ', () => {
+describe('Browser test: single vertical list with keyboard', () => {
   let browser;
   let page;
   beforeAll(async () => {
