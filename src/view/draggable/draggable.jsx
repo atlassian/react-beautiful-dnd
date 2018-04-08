@@ -118,12 +118,10 @@ export default class Draggable extends Component<Props> {
   }
 
   onFocus = () => {
-    console.warn('is focused!', this.props.draggableId);
     this.isFocused = true;
   }
 
   onBlur = () => {
-    console.warn('no longer focused', this.props.draggableId);
     this.isFocused = false;
   }
 
@@ -331,7 +329,7 @@ export default class Draggable extends Component<Props> {
       }
 
       if (!dimension) {
-        console.error('dimension is required for dragging');
+        console.error('Draggable: Dimension is required for dragging');
         return null;
       }
 
