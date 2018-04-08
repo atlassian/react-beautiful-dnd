@@ -249,10 +249,13 @@ export default ({
       return;
     }
 
-    const { button, clientX, clientY } = event;
-
     // only starting a drag if dragging with the primary mouse button
-    if (button !== primaryButton) {
+    if (event.button !== primaryButton) {
+      return;
+    }
+
+    // Do not start a drag if any modifier key is pressed
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
       return;
     }
 
@@ -270,8 +273,8 @@ export default ({
     event.preventDefault();
 
     const point: Position = {
-      x: clientX,
-      y: clientY,
+      x: event.clientX,
+      y: event.clientY,
     };
 
     startPendingDrag(point);
