@@ -1371,13 +1371,14 @@ describe('Draggable - unconnected', () => {
     });
   });
 
-  describe.only('Portal usage', () => {
+  describe('Portal usage', () => {
     const body: ?HTMLElement = document.body;
     if (!body) {
       throw new Error('Portal test requires document.body to be present');
     }
 
     class WithPortal extends Component<{ provided: Provided, snapshot: StateSnapshot }> {
+      // eslint-disable-next-line react/sort-comp
       portal: ?HTMLElement;
 
       componentDidMount() {
