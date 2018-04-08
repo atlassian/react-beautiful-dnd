@@ -157,7 +157,7 @@ const LayoutControl = styled.div`
 `;
 
 const CopyTableButton = styled.button`
-`
+`;
 
 type AppProps = {|
   initial: Quote[],
