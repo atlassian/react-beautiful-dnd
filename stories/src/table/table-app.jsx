@@ -4,6 +4,7 @@ import type { Node } from 'react';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import reorder from '../reorder';
+import { colors, grid } from '../constants';
 import type { Quote } from '../types';
 import type {
   DropResult,
@@ -24,14 +25,16 @@ const TBody = styled.tbody`
 
 const THead = styled.thead`
   border: 0;
+  border-bottom: 2px solid grey;
 `;
 
 const Row = styled.tr`
-  ${props => (props.isDragging ? 'display: table; table-layout: fixed; background: lightblue;' : '')}
+  ${props => (props.isDragging ? `background: ${colors.green};` : '')}
 `;
 
 const Cell = styled.td`
   box-sizing: border-box;
+  padding: ${grid}px;
 `;
 
 type TableCellProps = {|
@@ -141,6 +144,16 @@ class TableRow extends Component<TableRowProps> {
   }
 }
 
+const Controls = styled.div`
+  background: lightblue;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  margin: 0 auto;
+  margin-bottom: ${grid * 2}px;
+`;
+
 type AppProps = {|
   initial: Quote[],
 |}
@@ -150,7 +163,6 @@ type AppState = {|
   layout: 'fixed' | 'auto',
   isDragging: boolean,
 |}
-
 export default class TableApp extends Component<AppProps, AppState> {
   state: AppState = {
     quotes: this.props.initial,
@@ -200,10 +212,12 @@ export default class TableApp extends Component<AppProps, AppState> {
     return (
       <DragDropContext onDragStart={this.onDragStart} onDragEnd={this.onDragEnd}>
         <Fragment>
-          <button onClick={this.toggleTableLayout}>
-            Toggle table layout
-          </button>
-          <code>table-layout: {this.state.layout}</code>
+          <Controls>
+            <button onClick={this.toggleTableLayout}>
+              Toggle table layout
+            </button>
+            <code>table-layout: {this.state.layout}</code>
+          </Controls>
           <Table layout={this.state.layout}>
             <THead>
               <tr>
