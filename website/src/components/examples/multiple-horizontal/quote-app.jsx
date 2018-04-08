@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../../../src/';
 import AuthorList from '../primatives/author-list';
 import { colors, grid } from '../constants';
@@ -10,8 +9,10 @@ import type { ReorderQuoteMapResult } from '../reorder';
 import type { QuoteMap } from '../types';
 import type { DropResult, DragStart } from '../../../../../src/types';
 
-const publishOnDragStart = action('onDragStart');
-const publishOnDragEnd = action('onDragEnd');
+/* eslint-disable no-console */
+const publishOnDragStart = (v?: any) => console.log('onDragStart', v);
+const publishOnDragEnd = (v?: any) => console.log('onDragEnd', v);
+/* eslint-enable no-console */
 
 const Root = styled.div`
   background-color: ${colors.blue.deep};
@@ -28,7 +29,7 @@ type Props = {|
   initial: QuoteMap,
 |}
 
-type State = ReorderQuoteMapResult;
+type State = ReorderQuoteMapResult
 
 export default class QuoteApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
@@ -36,7 +37,7 @@ export default class QuoteApp extends Component<Props, State> {
   state: State = {
     quoteMap: this.props.initial,
     autoFocusQuoteId: null,
-  };
+  }
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
@@ -50,11 +51,13 @@ export default class QuoteApp extends Component<Props, State> {
       return;
     }
 
-    this.setState(reorderQuoteMap({
-      quoteMap: this.state.quoteMap,
-      source: result.source,
-      destination: result.destination,
-    }));
+    this.setState(
+      reorderQuoteMap({
+        quoteMap: this.state.quoteMap,
+        source: result.source,
+        destination: result.destination,
+      })
+    );
   }
 
   render() {

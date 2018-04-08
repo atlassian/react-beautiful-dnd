@@ -1,19 +1,17 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../../../src/';
-import type {
-  DropResult,
-  DragStart,
-} from '../../../../../src/';
+import type { DropResult, DragStart } from '../../../../../src/';
 import type { Quote } from '../types';
 import AuthorList from '../primatives/author-list';
 import reorder from '../reorder';
 import { colors, grid } from '../constants';
 
-const publishOnDragStart = action('onDragStart');
-const publishOnDragEnd = action('onDragEnd');
+/* eslint-disable no-console */
+const publishOnDragStart = (v?: any) => console.log('onDragStart', v);
+const publishOnDragEnd = (v?: any) => console.log('onDragEnd', v);
+/* eslint-enable no-console */
 
 type Props = {|
   initial: Quote[],

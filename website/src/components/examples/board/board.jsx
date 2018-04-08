@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import styled, { injectGlobal } from 'styled-components';
-import { action } from '@storybook/addon-actions';
 import Column from './column';
 import { colors } from '../constants';
 import reorder, { reorderQuoteMap } from '../reorder';
@@ -14,8 +13,10 @@ import type {
 } from '../../../../../src/';
 import type { QuoteMap } from '../types';
 
-const publishOnDragStart = action('onDragStart');
-const publishOnDragEnd = action('onDragEnd');
+/* eslint-disable no-console */
+const publishOnDragStart = (v?: any) => console.log('onDragStart', v);
+const publishOnDragEnd = (v?: any) => console.log('onDragEnd', v);
+/* eslint-enable no-console */
 
 const ParentContainer = styled.div`
   height: ${({ height }) => height};
@@ -82,8 +83,10 @@ export default class Board extends Component<Props, State> {
     const destination: DraggableLocation = result.destination;
 
     // did not move anywhere - can bail early
-    if (source.droppableId === destination.droppableId &&
-      source.index === destination.index) {
+    if (
+      source.droppableId === destination.droppableId &&
+      source.index === destination.index
+    ) {
       return;
     }
 
