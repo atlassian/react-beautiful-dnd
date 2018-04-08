@@ -144,15 +144,20 @@ class TableRow extends Component<TableRowProps> {
   }
 }
 
-const Controls = styled.div`
-  background: lightblue;
-  width: 200px;
+// TODO: make this look nicer!
+const Header = styled.header`
   display: flex;
   flex-direction: column;
-  text-align: center;
+  width: 500px;
   margin: 0 auto;
   margin-bottom: ${grid * 2}px;
 `;
+
+const LayoutControl = styled.div`
+`;
+
+const CopyTableButton = styled.button`
+`
 
 type AppProps = {|
   initial: Quote[],
@@ -164,6 +169,8 @@ type AppState = {|
   isDragging: boolean,
 |}
 export default class TableApp extends Component<AppProps, AppState> {
+  tableRef: ?HTMLElement
+
   state: AppState = {
     quotes: this.props.initial,
     layout: 'auto',
@@ -208,16 +215,51 @@ export default class TableApp extends Component<AppProps, AppState> {
     });
   }
 
+  copyTableToClipboard = () => {
+    const tableRef: ?HTMLElement = this.tableRef;
+    if (tableRef == null) {
+      return;
+    }
+
+    const range: Range = document.createRange();
+    range.selectNode(tableRef);
+    window.getSelection().addRange(range);
+
+    const wasCopied: boolean = (() => {
+      try {
+        const result: boolean = document.execCommand('copy');
+        return result;
+      } catch (e) {
+        return false;
+      }
+    })();
+
+    console.log('was copied?', wasCopied);
+
+    // clear selection
+    window.getSelection().removeAllRanges();
+  }
+
   render() {
     return (
       <DragDropContext onDragStart={this.onDragStart} onDragEnd={this.onDragEnd}>
         <Fragment>
-          <Controls>
-            <button onClick={this.toggleTableLayout}>
-              Toggle table layout
-            </button>
-            <code>table-layout: {this.state.layout}</code>
-          </Controls>
+          <Header>
+            <LayoutControl>
+              Current layout: <code>{this.state.layout}</code>
+              <button onClick={this.toggleTableLayout}>
+                Toggle
+              </button>
+            </LayoutControl>
+            <div>
+              Copy table to clipboard:
+              <CopyTableButton
+                onClick={this.copyTableToClipboard}
+              >
+                Copy
+              </CopyTableButton>
+            </div>
+          </Header>
           <Table layout={this.state.layout}>
             <THead>
               <tr>
@@ -228,7 +270,10 @@ export default class TableApp extends Component<AppProps, AppState> {
             <Droppable droppableId="table">
               {(droppableProvided: DroppableProvided) => (
                 <TBody
-                  innerRef={droppableProvided.innerRef}
+                  innerRef={(ref: ?HTMLElement) => {
+                    this.tableRef = ref;
+                    droppableProvided.innerRef(ref);
+                  }}
                   {...droppableProvided.droppableProps}
                 >
                   {this.state.quotes.map((quote: Quote, index: number) => (
