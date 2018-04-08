@@ -1,17 +1,22 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../../../src/';
 import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
 import { reorderQuoteMap } from '../reorder';
 import type { ReorderQuoteMapResult } from '../reorder';
 import type { QuoteMap } from '../types';
-import type { DropResult, DragStart, DraggableLocation } from '../../../../../src/types';
+import type {
+  DropResult,
+  DragStart,
+  DraggableLocation,
+} from '../../../../../src/types';
 
-const publishOnDragStart = action('onDragStart');
-const publishOnDragEnd = action('onDragEnd');
+/* eslint-disable no-console */
+const publishOnDragStart = (v?: any) => console.log('onDragStart', v);
+const publishOnDragEnd = (v?: any) => console.log('onDragEnd', v);
+/* eslint-enable no-console */
 
 const Root = styled.div`
   background-color: ${colors.blue.deep};
@@ -66,7 +71,7 @@ export default class QuoteApp extends Component<Props, State> {
   state: State = {
     quoteMap: this.props.initial,
     autoFocusQuoteId: null,
-  };
+  }
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
@@ -86,11 +91,13 @@ export default class QuoteApp extends Component<Props, State> {
     const source: DraggableLocation = result.source;
     const destination: DraggableLocation = result.destination;
 
-    this.setState(reorderQuoteMap({
-      quoteMap: this.state.quoteMap,
-      source,
-      destination,
-    }));
+    this.setState(
+      reorderQuoteMap({
+        quoteMap: this.state.quoteMap,
+        source,
+        destination,
+      })
+    );
   }
 
   // TODO

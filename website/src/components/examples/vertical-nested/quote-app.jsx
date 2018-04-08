@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../../../src/';
 import { colors, grid } from '../constants';
 import QuoteList from './quote-list';
@@ -27,8 +26,10 @@ const initialList: NestedQuoteList = {
   ],
 };
 
-const publishOnDragStart = action('onDragStart');
-const publishOnDragEnd = action('onDragEnd');
+/* eslint-disable no-console */
+const publishOnDragStart = (v?: any) => console.log('onDragStart', v);
+const publishOnDragEnd = (v?: any) => console.log('onDragEnd', v);
+/* eslint-enable no-console */
 
 const Root = styled.div`
   background-color: ${colors.blue.deep};
@@ -50,7 +51,7 @@ export default class QuoteApp extends Component<*, State> {
   /* eslint-disable react/sort-comp */
   state: State = {
     list: initialList,
-  };
+  }
   /* eslint-enable */
 
   onDragStart = (initial: DragStart) => {
@@ -69,7 +70,7 @@ export default class QuoteApp extends Component<*, State> {
       const children = reorder(
         this.state.list.children,
         result.source.index,
-        result.destination.index,
+        result.destination.index
       );
 
       // $ExpectError - using spread
@@ -86,8 +87,9 @@ export default class QuoteApp extends Component<*, State> {
 
     if (result.type === 'second-level') {
       const nested: ?NestedQuoteList = (this.state.list.children.filter(
-        (item: mixed): boolean => Object.prototype.hasOwnProperty.call(item, 'children')
-      )[0] : any);
+        (item: mixed): boolean =>
+          Object.prototype.hasOwnProperty.call(item, 'children')
+      )[0]: any);
 
       if (!nested) {
         console.error('could not find nested list');
@@ -101,7 +103,7 @@ export default class QuoteApp extends Component<*, State> {
           nested.children,
           result.source.index,
           // $ExpectError - already checked for null
-          result.destination.index,
+          result.destination.index
         ),
       };
 
