@@ -34,6 +34,20 @@ const SimpleQuote = styled.div`
   margin-bottom: ${grid}px;
   background-color: ${colors.blue.light};
   border: 1px solid ${colors.blue.deep};
+  /* used for positioning the after content */
+  position: relative;
+
+  /* add little portal indicator when in a portal */
+  ${props => (props.inPortal ? (`
+    ::after {
+      position: absolute;
+      background: lightgreen;
+      padding: ${grid}px;
+      bottom: 0;
+      right: 0;
+      content: "in portal";
+    }
+  `) : '')}
 `;
 
 class PortalAwareItem extends Component<ItemProps> {
@@ -42,17 +56,20 @@ class PortalAwareItem extends Component<ItemProps> {
     const snapshot: DraggableStateSnapshot = this.props.snapshot;
     const quote: Quote = this.props.quote;
 
+    const usePortal: boolean = snapshot.isDragging;
+
     const child: Node = (
       <SimpleQuote
         innerRef={provided.innerRef}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
+        inPortal={usePortal}
       >
         {quote.content} <small>- {quote.author.name}</small>
       </SimpleQuote>
     );
 
-    if (!snapshot.isDragging) {
+    if (!usePortal) {
       return child;
     }
 
