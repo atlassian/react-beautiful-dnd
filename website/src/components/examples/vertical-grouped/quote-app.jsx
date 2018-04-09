@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../../../src/';
 import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
@@ -9,8 +8,10 @@ import { reorderQuoteMap } from '../reorder';
 import type { QuoteMap } from '../types';
 import type { DropResult, DragStart } from '../../../../../src/types';
 
-const publishOnDragStart = action('onDragStart');
-const publishOnDragEnd = action('onDragEnd');
+/* eslint-disable no-console */
+const publishOnDragStart = (v?: any) => console.log('onDragStart', v);
+const publishOnDragEnd = (v?: any) => console.log('onDragEnd', v);
+/* eslint-enable no-console */
 
 const Root = styled.div`
   background: ${colors.blue.deep};
@@ -50,7 +51,7 @@ export default class QuoteApp extends Component<Props, State> {
 
   state: State = {
     quoteMap: this.props.initial,
-  };
+  }
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
@@ -85,11 +86,7 @@ export default class QuoteApp extends Component<Props, State> {
             {Object.keys(quoteMap).map((key: string) => (
               <Group key={key}>
                 <Title>{key}</Title>
-                <QuoteList
-                  quotes={quoteMap[key]}
-                  listId={key}
-                  listType={key}
-                />
+                <QuoteList quotes={quoteMap[key]} listId={key} listType={key} />
               </Group>
             ))}
           </Column>

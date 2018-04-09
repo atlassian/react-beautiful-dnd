@@ -1,132 +1,131 @@
 // @flow
-/* eslint-disable spaced-comment */
+/**
+ * Implement Gatsby's Node APIs in this file.
+ *
+ * See: https://www.gatsbyjs.org/docs/node-apis/
+ */
 const path = require('path');
-const kebabCase = require('lodash.kebabcase');
+const lowerCase = require('lodash.lowercase');
 
-/*::
-type boundActionCreatorsType = {
-  createNodeField: (any) => any,
-  createPage: (any) => any,
+/* ::
+type fileNode = { relativePath: string }
+
+type Node = {
+  parent: any,
+  internal: {
+    type: string,
+  }
 }
 
-type createNode = {
+type nodeField = { node: Node,  name: string, value: string }
+
+type markdownEdge = {
   node: {
-    internal: {
-      type: string,
-    },
-    parent: any,
-    frontmatter: {
+    fields: {
       slug: string,
+      dir: string,
+      name: string,
     }
+  }
+}
+
+type markdownGraphQLResult = {
+  errors?: any,
+  data: {
+    allMarkdownRemark: {
+      edges: [
+
+      ]
+    }
+  }
+}
+
+type Page = {
+  path: string,
+  component: any,
+  context: {
+    slug: string,
+    dir: string,
+    name: string,
   },
-  boundActionCreators: boundActionCreatorsType,
-  getNode: (any) => any,
+}
+
+type boundActionCreators = {
+  createNodeField: (nodeField) => mixed,
+  createPage: (Page) => mixed
+}
+
+type NodeParams = {
+  node: Node,
+  boundActionCreators: boundActionCreators,
+  getNode: (string) => fileNode,
+  graphql: (string) => Promise<markdownGraphQLResult>
 }
 */
 
-exports.onCreateNode = ({ node, boundActionCreators, getNode }/*: createNode*/) => {
+exports.onCreateNode = ({ node, boundActionCreators, getNode }/* : NodeParams */) => {
   const { createNodeField } = boundActionCreators;
-  let slug;
   if (node.internal.type === 'MarkdownRemark') {
     const fileNode = getNode(node.parent);
     const parsedFilePath = path.parse(fileNode.relativePath);
-    if (
-      Object.prototype.hasOwnProperty.call(node, 'frontmatter') &&
-      Object.prototype.hasOwnProperty.call(node.frontmatter, 'slug')
-    ) {
-      slug = `/${kebabCase(node.frontmatter.slug)}`;
-    } else if (parsedFilePath.name !== 'index' && parsedFilePath.dir !== '') {
-      createNodeField({ node, name: 'dir', value: parsedFilePath.dir });
-      slug = `/${parsedFilePath.dir}/${parsedFilePath.name}/`;
-    } else if (parsedFilePath.dir === '') {
-      slug = `/${parsedFilePath.name}/`;
-    } else {
-      slug = `/${parsedFilePath.dir}/`;
+    let slug = '/docs';
+    let title = '';
+    if (parsedFilePath.dir) {
+      slug += `/${parsedFilePath.dir.toLowerCase()}`;
+      title = lowerCase(parsedFilePath.dir);
     }
+    if (parsedFilePath.name !== 'index') {
+      slug += `/${parsedFilePath.name.toLowerCase()}`;
+      title = lowerCase(parsedFilePath.name);
+    }
+
+    title = title.charAt(0).toUpperCase() + title.slice(1);
+
     createNodeField({ node, name: 'slug', value: slug });
+    createNodeField({ node, name: 'title', value: title });
+    createNodeField({
+      node,
+      name: 'dir',
+      value: parsedFilePath.dir.toLowerCase(),
+    });
   }
 };
 
-/*::
-type createPages = {
-  graphql: any,
-  boundActionCreators: boundActionCreatorsType,
-}
-*/
-
-exports.createPages = ({ graphql, boundActionCreators }/*: createPages*/)/*: Promise<any>*/ => {
+exports.createPages = ({ graphql, boundActionCreators }/* : NodeParams */)/* : Promise<any> */ => {
   const { createPage } = boundActionCreators;
 
   return new Promise((resolve, reject) => {
-    const postPage = path.resolve('src/templates/post.js');
-    const lessonPage = path.resolve('src/templates/lesson.js');
-    const categoryPage = path.resolve('src/templates/category.js');
+    const markdownPage = path.resolve('src/templates/markdown.jsx');
     resolve(
       graphql(
         `
-        {
-          allMarkdownRemark {
-            edges {
-              node {
-                frontmatter {
-                  title
-                }
-                fields {
-                  slug
-                  dir
+          {
+            allMarkdownRemark {
+              edges {
+                node {
+                  fields {
+                    slug
+                  }
                 }
               }
             }
           }
-        }
-      `
+        `
       ).then((result) => {
         if (result.errors) {
-          /* eslint-disable no-console */
+          /* eslint-disable-next-line no-console */
           console.log(result.errors);
           reject(result.errors);
         }
 
-        const tagSet = new Set();
-        const categorySet = new Set();
-
         result.data.allMarkdownRemark.edges.forEach((edge) => {
-          if (edge.node.frontmatter.tags) {
-            edge.node.frontmatter.tags.forEach((tag) => {
-              tagSet.add(tag);
-            });
-          }
-
-          if (edge.node.frontmatter.category) {
-            categorySet.add(edge.node.frontmatter.category);
-          }
-          if (edge.node.frontmatter.type === 'post') {
-            createPage({
-              path: edge.node.fields.slug,
-              component: postPage,
-              context: {
-                slug: edge.node.fields.slug,
-              },
-            });
-          } else if (edge.node.fields.dir && edge.node.fields.slug) {
-            createPage({
-              path: edge.node.fields.slug,
-              component: lessonPage,
-              context: {
-                slug: edge.node.fields.slug,
-                dir: edge.node.fields.dir,
-              },
-            });
-          }
-        });
-
-        const categoryList = Array.from(categorySet);
-        categoryList.forEach((category) => {
           createPage({
-            path: `/categories/${kebabCase(category)}/`,
-            component: categoryPage,
+            path: edge.node.fields.slug,
+            component: markdownPage,
             context: {
-              category,
+              slug: edge.node.fields.slug,
+              dir: edge.node.fields.dir,
+              name: edge.node.fields.name,
             },
           });
         });
@@ -134,23 +133,3 @@ exports.createPages = ({ graphql, boundActionCreators }/*: createPages*/)/*: Pro
     );
   });
 };
-
-/*::
-type modifyBabelrc = {
-  babelrc: any
-}
-*/
-
-exports.modifyBabelrc = ({ babelrc }/*: modifyBabelrc */) => ({
-  ...babelrc,
-  presets: babelrc.presets.concat(['flow']),
-});
-
-/*::
-type modifyWebpackConfig = {
-  config: {
-    plugin: (any, any, any) => any,
-  },
-  stage: string,
-}
-*/
