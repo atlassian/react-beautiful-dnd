@@ -121,7 +121,7 @@ class TableCell extends React.Component<TableCellProps> {
   }
 
   componentWillUnmount() {
-    const snapshot: TableCellSnapshot = this.getSnapshot();
+    const snapshot: ?TableCellSnapshot = this.getSnapshot();
     if (!snapshot) {
       return;
     }

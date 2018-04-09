@@ -59,7 +59,8 @@ We have created upgrade instructions in our release notes to help you upgrade to
 - Conditional [dragging](https://github.com/atlassian/react-beautiful-dnd#props-1) and [dropping](https://github.com/atlassian/react-beautiful-dnd#conditionally-dropping)
 - Multiple independent lists on the one page
 - Flexible item sizes - the draggable items can have different heights (vertical lists) or widths (horizontal lists)
-- Compatible with semantic table reordering - [guide](/docs/guides/tables.md)
+- Compatible with semantic table reordering - [table pattern](/docs/patterns/tables.md)
+- Compatible with [`React.Portal`](https://reactjs.org/docs/portals.html) - [portal pattern](/docs/patterns/using-a-portal.md)
 - Custom drag handles - you can drag a whole item by just a part of it
 - A `Droppable` list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
