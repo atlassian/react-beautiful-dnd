@@ -62,3 +62,5 @@ It seems like the only way to get things working is to:
 
 1. In `componentWillUnmount` of the `tr` read the current widths of the cells from the DOM. You then store this value outside of the component so that it can be read by new components that are mounting.
 2. If a component is mounting and `DraggableStateSnapshot > isDragging` is true then you can see if there is a previously recorded width. If there is then you can apply that width.
+
+This gets a little complicated - so we [created another example](TODO) for you showing you how this technique works! You're welcome!
