@@ -8,9 +8,13 @@ import replace from 'rollup-plugin-replace';
 import strip from 'rollup-plugin-strip';
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
 
+const pkg = require('./package.json');
+
 const input = './src/index.js';
 
 const extensions = ['.js', '.jsx'];
+
+const isExternal = id => !id.startsWith('.') && !id.startsWith('/');
 
 const getBabelOptions = () => ({
   exclude: 'node_modules/**',
@@ -47,6 +51,36 @@ const getUMDConfig = ({ env, file }) => {
 };
 
 export default [
-  getUMDConfig({ env: 'development', file: 'dist/react-beautiful-dnd.js' }),
+  getUMDConfig({ env: 'development', file: 'dist/react-beautiful-dnd.umd.js' }),
+
   getUMDConfig({ env: 'production', file: 'dist/react-beautiful-dnd.min.js' }),
+
+  {
+    input,
+    output: {
+      file: pkg.main,
+      format: 'cjs',
+    },
+    external: isExternal,
+    plugins: [
+      resolve({ extensions }),
+      babel(getBabelOptions()),
+      strip({ debugger: true }),
+    ],
+  },
+
+  {
+    input,
+    output: {
+      file: pkg.module,
+      format: 'es',
+    },
+    external: isExternal,
+    plugins: [
+      resolve({ extensions }),
+      babel(getBabelOptions()),
+      strip({ debugger: true }),
+      sizeSnapshot({ updateSnapshot: !checkSnapshot }),
+    ],
+  },
 ];
