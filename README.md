@@ -59,6 +59,7 @@ We have created upgrade instructions in our release notes to help you upgrade to
 - Conditional [dragging](https://github.com/atlassian/react-beautiful-dnd#props-1) and [dropping](https://github.com/atlassian/react-beautiful-dnd#conditionally-dropping)
 - Multiple independent lists on the one page
 - Flexible item sizes - the draggable items can have different heights (vertical lists) or widths (horizontal lists)
+- Compatible with semantic table reordering - [guide](/docs/guides/tables.md)
 - Custom drag handles - you can drag a whole item by just a part of it
 - A `Droppable` list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
@@ -1025,7 +1026,7 @@ It is a contract of this library that it owns the positioning logic of the dragg
 
 `react-beautiful-dnd` uses `position: fixed` to position the dragging element. This is quite robust and allows for you to have `position: relative | absolute | fixed` parents. However, unfortunately `position:fixed` is [impacted by `transform`](http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/) (such as `transform: rotate(10deg);`). This means that if you have a `transform: *` on one of the parents of a `Draggable` then the positioning logic will be incorrect while dragging. Lame! For most consumers this will not be an issue.
 
-To get around this we can use [`React.Portal`](https://reactjs.org/docs/portals.html). We do not enable this functionality by default as it has performance problems. We have [portal guide](/guides/using-a-portal.md) explaining the performance problem in more detail and how you can set up your own `React.Portal` if you want to.
+To get around this you can use [`React.Portal`](https://reactjs.org/docs/portals.html). We do not enable this functionality by default as it has performance problems. We have a [using a portal guide](/guides/using-a-portal.md) explaining the performance problem in more detail and how you can set up your own `React.Portal` if you want to.
 
 ##### Extending `DraggableProps.style`
 

@@ -25,7 +25,8 @@ const TBody = styled.tbody`
 
 const THead = styled.thead`
   border: 0;
-  border-bottom: 2px solid grey;
+  border-bottom: none;
+  background-color: ${colors.grey.light};
 `;
 
 const Row = styled.tr`
