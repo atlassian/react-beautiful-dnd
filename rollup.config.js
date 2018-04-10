@@ -14,6 +14,8 @@ const input = './src/index.js';
 
 const extensions = ['.js', '.jsx'];
 
+// Treat as externals all not relative and not absolute paths
+// e.g. 'react'
 const isExternal = id => !id.startsWith('.') && !id.startsWith('/');
 
 const getBabelOptions = () => ({
@@ -57,29 +59,21 @@ export default [
 
   {
     input,
-    output: {
-      file: pkg.main,
-      format: 'cjs',
-    },
+    output: { file: pkg.main, format: 'cjs' },
     external: isExternal,
     plugins: [
       resolve({ extensions }),
       babel(getBabelOptions()),
-      strip({ debugger: true }),
     ],
   },
 
   {
     input,
-    output: {
-      file: pkg.module,
-      format: 'es',
-    },
+    output: { file: pkg.module, format: 'es' },
     external: isExternal,
     plugins: [
       resolve({ extensions }),
       babel(getBabelOptions()),
-      strip({ debugger: true }),
       sizeSnapshot({ updateSnapshot: !checkSnapshot }),
     ],
   },
