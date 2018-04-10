@@ -19,8 +19,8 @@ type State = {|
 |}
 
 type ExecuteBasedOnDirection = {|
-  vertical: () => void,
-  horizontal: () => void,
+  vertical: Function,
+  horizontal: Function,
 |}
 
 type KeyMap = {

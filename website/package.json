@@ -1,0 +1,30 @@
+{
+  "name": "react-beautiful-dnd-docs",
+  "description": "Documentation for react-beautiful-dnd",
+  "version": "1.0.1",
+  "author": "Alex Reardon <areardon@atlassian.com>",
+  "dependencies": {
+    "@atlaskit/css-reset": "^2.0.0",
+    "gatsby": "^1.9.241",
+    "gatsby-link": "^1.6.39",
+    "gatsby-plugin-react-helmet": "^2.0.8",
+    "gatsby-source-filesystem": "^1.5.28",
+    "gatsby-transformer-remark": "^1.7.39",
+    "lodash.lowercase": "^4.3.0",
+    "react-helmet": "^5.2.0"
+  },
+  "keywords": [
+    "drag and drop",
+    "dnd",
+    "sortable",
+    "react",
+    "react.js",
+    "natural",
+    "beautiful"
+  ],
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "gatsby build",
+    "develop": "gatsby develop"
+  }
+}

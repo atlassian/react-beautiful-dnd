@@ -205,12 +205,15 @@ export default ({
     {
       eventName: 'webkitmouseforcechanged',
       fn: (event: MouseForceChangedEvent) => {
-        if (event.webkitForce == null || MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null) {
+        if (
+          event.webkitForce == null ||
+          (MouseEvent: any).WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null
+        ) {
           console.error('handling a mouse force changed event when it is not supported');
           return;
         }
 
-        const forcePressThreshold: number = (MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN : any);
+        const forcePressThreshold: number = (MouseEvent: any).WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN;
         const isForcePressing: boolean = event.webkitForce >= forcePressThreshold;
 
         if (isForcePressing) {
@@ -248,10 +251,13 @@ export default ({
       return;
     }
 
-    const { button, clientX, clientY } = event;
-
     // only starting a drag if dragging with the primary mouse button
-    if (button !== primaryButton) {
+    if (event.button !== primaryButton) {
+      return;
+    }
+
+    // Do not start a drag if any modifier key is pressed
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
       return;
     }
 
@@ -269,8 +275,8 @@ export default ({
     event.preventDefault();
 
     const point: Position = {
-      x: clientX,
-      y: clientY,
+      x: event.clientX,
+      y: event.clientY,
     };
 
     startPendingDrag(point);

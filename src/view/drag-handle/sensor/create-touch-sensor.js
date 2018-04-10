@@ -16,7 +16,7 @@ import addVisibilityEvent from '../util/create-visibility-event';
 type State = {
   isDragging: boolean,
   hasMoved: boolean,
-  longPressTimerId: ?number,
+  longPressTimerId: ?TimeoutID,
   pending: ?Position,
 }
 
@@ -24,11 +24,70 @@ type TouchWithForce = Touch & {
   force: number
 }
 
+type WebkitHack = {|
+  preventTouchMove: () => void,
+  releaseTouchMove: () => void,
+|}
+
 export const timeForLongPress: number = 150;
 export const forcePressThreshold: number = 0.15;
 const touchStartMarshal: EventMarshal = createEventMarshal();
-
 const noop = (): void => { };
+
+// Webkit does not allow event.preventDefault() in dynamically added handlers
+// So we add an always listening event handler to get around this :(
+// webkit bug: https://bugs.webkit.org/show_bug.cgi?id=184250
+const webkitHack: WebkitHack = (() => {
+  const stub: WebkitHack = {
+    preventTouchMove: noop,
+    releaseTouchMove: noop,
+  };
+
+  // Do nothing when server side rendering
+  if (typeof window === 'undefined') {
+    return stub;
+  }
+
+  // Device has no touch support - no point adding the touch listener
+  if (!('ontouchstart' in window)) {
+    return stub;
+  }
+
+  // Not adding any user agent testing as everything pretends to be webkit
+
+  let isBlocking: boolean = false;
+
+  // Adding a persistent event handler
+  window.addEventListener('touchmove', (event: TouchEvent) => {
+    // We let the event go through as normal as nothing
+    // is blocking the touchmove
+    if (!isBlocking) {
+      return;
+    }
+
+    // Our event handler would have worked correctly if the browser
+    // was not webkit based, or an older version of webkit.
+    if (event.defaultPrevented) {
+      return;
+    }
+
+    // Okay, now we need to step in and fix things
+    event.preventDefault();
+
+    // Forcing this to be non-passive so we can get every touchmove
+    // Not activating in the capture phase like the dynamic touchmove we add.
+    // Technically it would not matter if we did this in the capture phase
+  }, { passive: false, capture: false });
+
+  const preventTouchMove = () => {
+    isBlocking = true;
+  };
+  const releaseTouchMove = () => {
+    isBlocking = false;
+  };
+
+  return { preventTouchMove, releaseTouchMove };
+})();
 
 const initial: State = {
   isDragging: false,
@@ -83,6 +142,7 @@ export default ({
   const stopDragging = (fn?: Function = noop) => {
     schedule.cancel();
     touchStartMarshal.reset();
+    webkitHack.releaseTouchMove();
     unbindWindowEvents();
     postDragEventPreventer.preventNext();
     setState(initial);
@@ -97,7 +157,7 @@ export default ({
       y: clientY,
     };
 
-    const longPressTimerId: number = setTimeout(startDragging, timeForLongPress);
+    const longPressTimerId: TimeoutID = setTimeout(startDragging, timeForLongPress);
 
     setState({
       longPressTimerId,
@@ -109,9 +169,12 @@ export default ({
   };
 
   const stopPendingDrag = () => {
-    clearTimeout(state.longPressTimerId);
+    if (state.longPressTimerId) {
+      clearTimeout(state.longPressTimerId);
+    }
     schedule.cancel();
     touchStartMarshal.reset();
+    webkitHack.releaseTouchMove();
     unbindWindowEvents();
 
     setState(initial);
@@ -137,7 +200,7 @@ export default ({
   const windowBindings: EventBinding[] = [
     {
       eventName: 'touchmove',
-      // opting out of passive touchmove (default) so as to prevent scrolling while moving
+      // Opting out of passive touchmove (default) so as to prevent scrolling while moving
       // Not worried about performance as effect of move is throttled in requestAnimationFrame
       options: { passive: false },
       fn: (event: TouchEvent) => {
@@ -162,7 +225,9 @@ export default ({
           y: clientY,
         };
 
-        // already dragging
+        // We need to prevent the default event in order to block native scrolling
+        // Also because we are using it as part of a drag we prevent the default action
+        // as a sign that we are using the event
         event.preventDefault();
         schedule.move(point);
       },
@@ -257,7 +322,7 @@ export default ({
       },
     },
     // Need to opt out of dragging if the user is a force press
-    // Only for safari which has decided to introduce its own custom way of doing things
+    // Only for webkit which has decided to introduce its own custom way of doing things
     // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
     {
       eventName: 'touchforcechange',
@@ -311,8 +376,11 @@ export default ({
     // We need to stop parents from responding to this event - which may cause a double lift
     // We also need to NOT call event.preventDefault() so as to maintain as much standard
     // browser interactions as possible.
+    // This includes navigation on anchors which we want to preserve
     touchStartMarshal.handle();
 
+    // A webkit only hack to prevent touch move events
+    webkitHack.preventTouchMove();
     startPendingDrag(event);
   };
 

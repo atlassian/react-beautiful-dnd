@@ -42,6 +42,12 @@ const getStubCallbacks = (): Callbacks => ({
   onWindowScroll: jest.fn(),
 });
 
+const resetCallbacks = (callbacks: Callbacks) => {
+  Object.keys(callbacks).forEach((key: string) => {
+    callbacks[key].mockReset();
+  });
+};
+
 type CallBacksCalledFn = {|
   onLift?: number,
   onMove?: number,
@@ -397,6 +403,26 @@ describe('drag handle', () => {
         expect(callbacksCalled(callbacks)({
           onLift: 0,
         })).toBe(true);
+      });
+
+      it('should not start a drag if a modifier key was used while pressing the mouse down', () => {
+        // if any drag is started with these keys pressed then we do not start a drag
+        const withKeys = [
+          { ctrlKey: true },
+          { altKey: true },
+          { shiftKey: true },
+          { metaKey: true },
+        ];
+
+        withKeys.forEach((withKey: Object) => {
+          mouseDown(wrapper, origin, primaryButton, withKey);
+          windowMouseMove({ x: 0, y: sloppyClickThreshold });
+          windowMouseUp();
+
+          expect(callbacksCalled(callbacks)({
+            onLift: 0,
+          })).toBe(true);
+        });
       });
 
       it('should not start a drag if another sensor is capturing', () => {
@@ -2919,16 +2945,16 @@ describe('drag handle', () => {
               });
             });
 
-            it('should start a drag on an element with an interactive parent if asked to by user', () => {
-              // allowing dragging from interactive elements
-              wrapper.setProps({ canDragInteractiveElements: true });
+            it('should not start a drag if the parent is interactive and the child is an SVG', () => {
+              // $ExpectError - flow does not know about SVGElement yet
+              const svg: SVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+              expect(svg instanceof SVGElement).toBe(true);
 
-              mixedCase(interactiveTagNames).forEach((tagName: string, index: number) => {
+              mixedCase(interactiveTagNames).forEach((tagName: string) => {
                 const parent: HTMLElement = document.createElement(tagName);
-                const child: HTMLElement = document.createElement('span');
-                parent.appendChild(child);
+                parent.appendChild(svg);
                 const options = {
-                  target: child,
+                  target: svg,
                 };
 
                 control.preLift(wrapper, options);
@@ -2936,9 +2962,48 @@ describe('drag handle', () => {
                 control.drop(wrapper);
 
                 expect(callbacksCalled(callbacks)({
-                  onLift: index + 1,
-                  onDrop: index + 1,
+                  onLift: 0,
                 })).toBe(true);
+              });
+            });
+
+            it('should start a drag on a Element with an interactive parent if asked to by user', () => {
+              // allowing dragging from interactive elements
+              wrapper.setProps({ canDragInteractiveElements: true });
+
+              // $ExpectError - flow does not know about SVGElement yet
+              const svg: SVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+              expect(svg instanceof SVGElement).toBe(true);
+
+              const div: HTMLElement = document.createElement('div');
+              expect(div instanceof HTMLElement).toBe(true);
+
+              [div, svg].forEach((child: Element) => {
+                mixedCase(interactiveTagNames).forEach((tagName: string) => {
+                  const parent: HTMLElement = document.createElement(tagName);
+                  parent.appendChild(child);
+                  const options = {
+                    target: child,
+                  };
+
+                  expect(callbacksCalled(callbacks)({
+                    onLift: 0,
+                    onDrop: 0,
+                  })).toBe(true);
+
+                  control.preLift(wrapper, options);
+                  control.lift(wrapper, options);
+                  control.drop(wrapper);
+
+                  expect(callbacksCalled(callbacks)({
+                    onLift: 1,
+                    onDrop: 1,
+                  })).toBe(true);
+
+                  // cleanup
+                  resetCallbacks(callbacks);
+                  parent.removeChild(child);
+                });
               });
             });
 

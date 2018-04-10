@@ -1,16 +1,16 @@
-# Mutli drag pattern
+# Multi drag
 
-> This page is designed to guide you through adding your own mutli drag experience to your `react-beautiful-dnd` lists.
+> This page is designed to guide you through adding your own multi drag experience to your `react-beautiful-dnd` lists.
 
 Dragging multiple `Draggable`s at once (multi drag) is currently a pattern that needs to be built on top of `react-beautiful-dnd`. We have not included the interaction into the library itself. This is done because a multi drag experience introduces a lot of concepts, decisions and opinions. We have done a lot of work to ensure there is a standard base of [dom event management](/docs/guides/how-we-use-dom-events.md) to build on.
 
 We have created a [reference application](react-beautiful-dnd.netlify.com/iframe.html?selectedKind=Multi%20drag&selectedStory=pattern&full=0&down=1&left=1&panelRight=0&downPanel=storybook%2Factions%2Factions-panel) ([source](/stories/9-multi-drag-story.js)) which implements this multi drag pattern. The application is fairly basic and does not handle performance in large lists well. As such, there is are [a few performance recommendations](#performance) that we suggest you also add on to our reference application if you want to support lists greater than 50 in size.
 
-![mutli drag demo](https://user-images.githubusercontent.com/2182637/37322724-7843a218-26d3-11e8-9ebb-8d5853387bb3.gif)
+![multi drag demo](https://user-images.githubusercontent.com/2182637/37322724-7843a218-26d3-11e8-9ebb-8d5853387bb3.gif)
 
 ## Experience
 
-We have decided on a simple, but very flexible and scalable mutli drag pattern to start with. It is not as *beautiful* as our standard drag interactions - but it is a great base to build from and will scale across many problem spaces.
+We have decided on a simple, but very flexible and scalable multi drag pattern to start with. It is not as *beautiful* as our standard drag interactions - but it is a great base to build from and will scale across many problem spaces.
 
 ## User experience
 
@@ -20,9 +20,9 @@ We can break the user experience down in three phases.
 2. [**Dragging**](#dragging): The user drags one item as a representation of the whole group.
 3. [**Dropping**](#dropping): The user drops an item into a new location. We move all of the selected items into the new location
 
-## Anouncements
+## Announcements
 
-Keep in mind that internally `react-beautiful-dnd` is not aware of multi drag. Therefore it is advised that you use the `HookProvided > Announce` to announce meaningful screen reader messages for a multi drag.
+Keep in mind that internally `react-beautiful-dnd` is not aware of multi drag. Therefore it is advised that you use the `HookProvided > Announce` to announce meaningful screen reader messages for a multi drag. See our [screen reader guide](docs/guides/screen-reader.md) for details on how to control screen reader messaging.
 
 ## Selection
 
@@ -30,11 +30,11 @@ Before a drag starts we need to allow the user to *optionally* select a number o
 
 ### Selection interaction recommendations
 
-> These are based on the Mac OSX [*Finder*](https://support.apple.com/en-au/HT201732).
+> These interactions are based on the Mac OSX [*Finder*](https://support.apple.com/en-au/HT201732) (file browser) application.
 
 ### Action: toggle section
 
-If a user clicks on an item the selected state of the item should be toggled. Additionally, the selected state of the item should be updated when the user presses **enter** key. The **enter** key is quite nice because we do not use it for lifting or dropping - we use **space** for those.
+If a user clicks on an item the selected state of the item should be toggled. Additionally, the selected state of the item should be updated when the user presses **enter** <kbd>⏎</kbd> key. The **enter** <kbd>⏎</kbd> key is quite nice because we do not use it for lifting or dropping - we use **spacebar** <kbd>space</kbd> for those.
 
 ![toggle-selection](https://user-images.githubusercontent.com/2182637/37323080-6d67f04a-26d5-11e8-8bc1-8ff5178018bc.gif)
 
@@ -46,9 +46,9 @@ If a user clicks on an item the selected state of the item should be toggled. Ad
 
 #### Keyboard event handler
 
-- When the user presses **enter** toggle the selection of the item
+- When the user presses **enter** <kbd>⏎</kbd> toggle the selection of the item
 - **Option 1**: Attach an `onKeyDown` handler to your *drag handle* or `Draggable`. You will need to monkey patch the `DragHandleProvided > onKeyDown` keyboard handler.
-- **Option 2**: Attach an `onKeyUp` handler to your *drag hanlde*. Then you will not need to monkey patch the `onKeyDown` handler. However, `keyup` events will not have their default action prevented so you will not be able to check `event.defaultPrevented` to see if the keypress was used for a drag. If you are only using the **enter** key in your event handler then you should be fine as that is not used as a part of dragging.
+- **Option 2**: Attach an `onKeyUp` handler to your *drag handle*. Then you will not need to monkey patch the `onKeyDown` handler. However, `keyup` events will not have their default action prevented so you will not be able to check `event.defaultPrevented` to see if the keypress was used for a drag. If you are only using the **enter** <kbd>⏎</kbd> key in your event handler then you should be fine as that is not used as a part of dragging.
 - Prevent the default action on the `keydown` / `keyup` event if you are toggling selection as you are using it for selection as you want to opt out of the standard browser behaviour and also provide a clue that this event has been used.
 
 #### Toggle selection behaviour
@@ -65,7 +65,7 @@ This is providing the ability for a user to add or remove items to a selection g
 
 #### Event handlers
 
-We perform this action if the user performs a `click` or presses the **enter** key in addition to holding the the [meta key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey).
+We perform this action if the user performs a `click` or presses the **enter** <kbd>⏎</kbd> key in addition to holding the the [meta key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey).
 
 > Note: On Macintosh keyboards, this is the `⌘ Command` key. On Windows keyboards, this is the Windows key (`⊞ Windows`) - [MDN](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey)
 
@@ -74,15 +74,15 @@ We perform this action if the user performs a `click` or presses the **enter** k
 - If the item was not selected then add the item to the selected items
 - If the item was previously selected then remove it from the selected items.
 
-### Action: mutli select
+### Action: multi select
 
 The ability to click on an item further down a list and select everything inbetween.
 
 #### Event handlers
 
-We perform this action if the user performs a `click` or presses the **enter** key in addition to holding the the [shift key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/shiftKey).
+We perform this action if the user performs a `click` or presses the **enter** <kbd>⏎</kbd> key in addition to holding the the [shift key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/shiftKey).
 
-### Mutli select: behaviour
+### multi select: behaviour
 
 With this action the user is able to select multiple items using a single command. This behaviour is the most complex. It deviates slightly from the `MacOSX` behaviour for simplicity.
 
@@ -243,7 +243,7 @@ We need to do one check in `onDragStart`. If the user is starting to drag someth
 
 As the drag starts we need to add a few visual affordances:
 
-1. Add a count to the dragging item to indicate how many items this drag is represenative of. If only a single item is dragging then do not show a count.
+1. Add a count to the dragging item to indicate how many items this drag is representative of. If only a single item is dragging then do not show a count.
 2. Change the appearance of the selected items that are not dragging to a greyed out / disabled state. This can be a [performance](#performance) issue at scale.
 
 We do not remove the selected items from the list. If we remove the items completely that can change the dimensions of the list which can lead to list collapsing and scroll jumps. If we leave them in the list and make them invisible then there are big blank sections in a list that have no meaning and can be confusing to interact with. Therefore we recommend leaving the items in the list and giving them a visual change.
@@ -270,7 +270,7 @@ This gives priority to original index. However, you might want to give priority 
 
 3. In the event of a tie then sort by the order in which the item was selected.
 
-This strategy does change the order of items symantically: specifically step 1 which always moves the selected item to the top. If you do not want this you do not have to do it - however it is much nicer visually and helps to keep the user grounded on a drop.
+This strategy does change the order of items semantically: specifically step 1 which always moves the selected item to the top. If you do not want this you do not have to do it - however it is much nicer visually and helps to keep the user grounded on a drop.
 
 ### Dropping in the same list
 

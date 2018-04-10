@@ -59,7 +59,7 @@ export default (event: Event, props: Props): boolean => {
   const { target, currentTarget } = event;
 
   // Technically target and currentTarget are EventTarget's and do not have to be elements
-  if (!(target instanceof HTMLElement) || !(currentTarget instanceof HTMLElement)) {
+  if (!(target instanceof Element) || !(currentTarget instanceof Element)) {
     return true;
   }
 
