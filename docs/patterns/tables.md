@@ -7,7 +7,7 @@
 | Can copy paste the table into other applications | Browser                 |
 | Can reorder items in the table!                  | `react-beautiful-dnd` 😎|
 
-`react-beautiful-dnd` supports requires no additional wrapping elements to create `Draggable` and `Droppable` components. Therefore it is possible to have a `<table>` that has valid HTML as well as supporting drag and drop.
+`react-beautiful-dnd` requires no additional wrapping elements to create `Draggable` and `Droppable` components. Therefore it is possible to have a `<table>` that has valid HTML as well as supporting drag and drop.
 
 > We have not found a way to achieve semantic reordering of table columns at this stage. This is because there is no one element that represents a table column - rather, a column is a result of cell placements within repeating rows. As such as cannot wrap a `Draggable` around a 'column' in order to make it draggable. PR's to this guide are welcome if you find a working approach!
 
@@ -24,7 +24,7 @@ In order to use this strategy the widths of your columns need to be fixed - that
 
 The only thing you need to do is set `display: table` on a `Draggable` row while it is dragging.
 
-[See example code here](TODO)
+[See example code here](https://react-beautiful-dnd.netlify.com/?selectedKind=Tables&selectedStory=with%20fixed%20width%20columns&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel)
 
 ### Strategy 2: dimension locking
 
@@ -39,7 +39,7 @@ This has poor performance characteristics at scale as it requires:
 
 For tables with less than 50 rows this should approach be fine!
 
-[See example code here](TODO)
+[See example code here](https://react-beautiful-dnd.netlify.com/?selectedKind=Tables&selectedStory=with%20dimension%20locking&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel)
 
 ## Advanced: using [`React.Portal`](https://reactjs.org/docs/portals.html)
 
@@ -63,4 +63,4 @@ It seems like the only way to get things working is to:
 1. In `componentWillUnmount` of the `tr` read the current widths of the cells from the DOM. You then store this value outside of the component so that it can be read by new components that are mounting.
 2. If a component is mounting and `DraggableStateSnapshot > isDragging` is true then you can see if there is a previously recorded width. If there is then you can apply that width.
 
-This gets a little complicated - so we [created another example](TODO) for you showing you how this technique works! You're welcome!
+This gets a little complicated - so we [created another example](https://react-beautiful-dnd.netlify.com/?selectedKind=Tables&selectedStory=with%20portal&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel) for you showing you how this technique works! You're welcome!

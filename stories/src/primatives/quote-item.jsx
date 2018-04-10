@@ -107,15 +107,9 @@ export default class QuoteItem extends React.PureComponent<Props> {
     // eslint-disable-next-line react/no-find-dom-node
     const node: HTMLElement = (ReactDOM.findDOMNode(this) : any);
     node.focus();
-    // console.log('quote item mounted', this.props.quote.id);
-  }
-
-  componentWillUnmount() {
-    // console.log('quote item unmounted', this.props.quote.id);
   }
 
   render() {
-    // console.log('quote item rendered', this.props.quote.id);
     const { quote, isDragging, provided } = this.props;
 
     return (
