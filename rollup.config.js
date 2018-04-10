@@ -25,11 +25,11 @@ const getBabelOptions = () => ({
 
 const checkSnapshot = process.env.SNAPSHOT === 'check';
 
-const getUMDConfig = ({ env, file }) => {
-  const config = {
+export default [
+  {
     input,
     output: {
-      file,
+      file: 'dist/react-beautiful-dnd.umd.js',
       format: 'umd',
       name: 'ReactBeautifulDnd',
       globals: { react: 'React' },
@@ -39,23 +39,30 @@ const getUMDConfig = ({ env, file }) => {
       babel(getBabelOptions()),
       resolve({ extensions }),
       commonjs({ include: 'node_modules/**' }),
-      replace({ 'process.env.NODE_ENV': JSON.stringify(env) }),
-      strip({ debugger: true }),
+      replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
       sizeSnapshot({ updateSnapshot: !checkSnapshot }),
     ],
-  };
+  },
 
-  if (env === 'production') {
-    config.plugins.push(uglify());
-  }
-
-  return config;
-};
-
-export default [
-  getUMDConfig({ env: 'development', file: 'dist/react-beautiful-dnd.umd.js' }),
-
-  getUMDConfig({ env: 'production', file: 'dist/react-beautiful-dnd.min.js' }),
+  {
+    input,
+    output: {
+      file: 'dist/react-beautiful-dnd.min.js',
+      format: 'umd',
+      name: 'ReactBeautifulDnd',
+      globals: { react: 'React' },
+    },
+    external: ['react'],
+    plugins: [
+      babel(getBabelOptions()),
+      resolve({ extensions }),
+      commonjs({ include: 'node_modules/**' }),
+      replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
+      strip({ debugger: true }),
+      sizeSnapshot({ updateSnapshot: !checkSnapshot }),
+      uglify(),
+    ],
+  },
 
   {
     input,
