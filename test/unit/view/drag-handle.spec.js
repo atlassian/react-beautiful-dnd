@@ -3364,19 +3364,21 @@ describe('drag handle', () => {
           });
         });
 
-        it('should cancel the drag on page visibility changes', () => {
-          control.preLift();
-          control.lift();
+        describe('page visibility changes', () => {
+          it('should cancel the drag on page visibility changes', () => {
+            control.preLift();
+            control.lift();
 
-          dispatchWindowEvent('visibilitychange');
+            dispatchWindowEvent('visibilitychange');
 
-          expect(callbacksCalled(callbacks)({
-            onLift: 1,
-            onCancel: 1,
-          })).toBe(true);
+            expect(callbacksCalled(callbacks)({
+              onLift: 1,
+              onCancel: 1,
+            })).toBe(true);
 
-          control.drop();
-        });
+            control.drop();
+          });
+        })
       });
     });
   });
