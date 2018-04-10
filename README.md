@@ -957,8 +957,6 @@ type DraggableProvided = {|
   draggableProps: DraggableProps,
   // will be null if the draggable is disabled
   dragHandleProps: ?DragHandleProps,
-  // null if not required
-  placeholder: ?ReactElement,
 |}
 ```
 
@@ -1114,10 +1112,11 @@ It is an assumption that `Draggable`s are *visible siblings* of one another. The
 
 ```js
 type DragHandleProps = {|
+  onFocus: () => void,
+  onBlur: () => void,
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
   onTouchStart: (event: TouchEvent) => void,
-  onTouchMove: (event: TouchEvent) => void,
   'data-react-beautiful-dnd-drag-handle': string,
   'aria-roledescription': string,
   tabIndex: number,
@@ -1322,7 +1321,6 @@ type DraggableProvided = {|
   innerRef: (?HTMLElement) => void,
   draggableProps: DraggableProps,
   dragHandleProps: ?DragHandleProps,
-  placeholder: ?ReactElement,
 |}
 
 type DraggableStateSnapshot = {|
@@ -1354,10 +1352,11 @@ type NotDraggingStyle = {|
 |}
 
 type DragHandleProps = {|
+  onFocus: () => void,
+  onBlur: () => void,
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
   onTouchStart: (event: TouchEvent) => void,
-  onTouchMove: (event: TouchEvent) => void,
   'data-react-beautiful-dnd-drag-handle': string,
   'aria-roledescription': string,
   tabIndex: number,
