@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@atlaskit/css-reset@^1.2.0":
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/@atlaskit/css-reset/-/css-reset-1.2.3.tgz#001690620e4c1602b0cd12951ae016add121678c"
+"@atlaskit/css-reset@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/css-reset/-/css-reset-2.0.0.tgz#ed831c8461e32f5c7d1a040fb5a1630faff1e947"
   dependencies:
     "@atlaskit/util-shared-styles" "^2.10.3"
 
