@@ -3364,33 +3364,18 @@ describe('drag handle', () => {
           });
         });
 
-        describe.only('dragging when page is not visible', () => {
-          const hidePage = () => {
-            document.hidden = true;
-            dispatchWindowEvent('visibilitychange');
-          };
+        it('should cancel the drag on page visibility changes', () => {
+          control.preLift();
+          control.lift();
 
-          beforeAll(() => {
-            // page is visible by default
-            Object.defineProperty(document, 'hidden', {
-              value: false,
-              writable: true,
-            });
-          });
+          dispatchWindowEvent('visibilitychange');
 
-          it('should cancel the drag when the window is not visible', () => {
-            control.preLift();
-            control.lift();
+          expect(callbacksCalled(callbacks)({
+            onLift: 1,
+            onCancel: 1,
+          })).toBe(true);
 
-            hidePage();
-
-            expect(callbacksCalled(callbacks)({
-              onLift: 1,
-              onCancel: 1,
-            })).toBe(true);
-
-            control.drop();
-          });
+          control.drop();
         });
       });
     });

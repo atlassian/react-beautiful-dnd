@@ -6,7 +6,7 @@ import createPostDragEventPreventer, { type EventPreventer } from '../util/creat
 import createEventMarshal, { type EventMarshal } from '../util/create-event-marshal';
 import { bindEvents, unbindEvents } from '../util/bind-events';
 import * as keyCodes from '../../key-codes';
-import cancelOnPageVisibilityChange from '../util/cancel-on-page-visibility-change';
+import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
 import type { EventBinding } from '../util/event-types';
 import type {
   Position,
@@ -346,7 +346,11 @@ export default ({
         }
       },
     },
-    cancelOnPageVisibilityChange(cancel),
+    // Cancel on page visibility change
+    {
+      eventName: supportedPageVisibilityEventName,
+      fn: cancel,
+    },
   ];
 
   const bindWindowEvents = () => {

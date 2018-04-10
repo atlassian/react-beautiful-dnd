@@ -6,7 +6,7 @@ import * as keyCodes from '../../key-codes';
 import getWindowFromRef from '../../get-window-from-ref';
 import getCenterPosition from '../../get-center-position';
 import { bindEvents, unbindEvents } from '../util/bind-events';
-import cancelOnPageVisibilityChange from '../util/cancel-on-page-visibility-change';
+import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
 import type { EventBinding } from '../util/event-types';
 import type { Position } from '../../../types';
 import type { KeyboardSensor, CreateSensorArgs } from './sensor-types';
@@ -223,7 +223,11 @@ export default ({
       eventName: 'scroll',
       fn: callbacks.onWindowScroll,
     },
-    cancelOnPageVisibilityChange(cancel),
+    // Cancel on page visibility change
+    {
+      eventName: supportedPageVisibilityEventName,
+      fn: cancel,
+    },
   ];
 
   const bindWindowEvents = () => {
