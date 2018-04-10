@@ -3378,7 +3378,7 @@ describe('drag handle', () => {
 
             control.drop();
           });
-        })
+        });
       });
     });
   });
