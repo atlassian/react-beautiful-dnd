@@ -6,12 +6,12 @@ import createPostDragEventPreventer, { type EventPreventer } from '../util/creat
 import createEventMarshal, { type EventMarshal } from '../util/create-event-marshal';
 import { bindEvents, unbindEvents } from '../util/bind-events';
 import * as keyCodes from '../../key-codes';
+import cancelOnPageVisibilityChange from '../util/cancel-on-page-visibility-change';
 import type { EventBinding } from '../util/event-types';
 import type {
   Position,
 } from '../../../types';
 import type { TouchSensor, CreateSensorArgs } from './sensor-types';
-import addVisibilityEvent from '../util/create-visibility-event';
 
 type State = {
   isDragging: boolean,
@@ -346,7 +346,7 @@ export default ({
         }
       },
     },
-    addVisibilityEvent(cancel),
+    cancelOnPageVisibilityChange(cancel),
   ];
 
   const bindWindowEvents = () => {

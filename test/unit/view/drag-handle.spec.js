@@ -1888,10 +1888,6 @@ describe('drag handle', () => {
         });
       });
 
-      it.skip('should cancel on a page visibility change', () => {
-        // TODO
-      });
-
       it('should not do anything if there is nothing dragging', () => {
         const event: KeyboardEvent = windowEscape();
 
@@ -3368,22 +3364,32 @@ describe('drag handle', () => {
           });
         });
 
-        describe('dragging when page is not visible', () => {
+        describe.only('dragging when page is not visible', () => {
+          const hidePage = () => {
+            document.hidden = true;
+            dispatchWindowEvent('visibilitychange');
+          };
+
           beforeAll(() => {
-            // need to mock the the page is not visible
-            Object.defineProperty(document, 'hidden', { value: true });
+            // page is visible by default
+            Object.defineProperty(document, 'hidden', {
+              value: false,
+              writable: true,
+            });
           });
-          afterAll(() => {
-            Object.defineProperty(document, 'hidden', { value: false });
-          });
+
           it('should cancel the drag when the window is not visible', () => {
             control.preLift();
             control.lift();
-            dispatchWindowEvent('visibilitychange');
+
+            hidePage();
+
             expect(callbacksCalled(callbacks)({
               onLift: 1,
               onCancel: 1,
             })).toBe(true);
+
+            control.drop();
           });
         });
       });

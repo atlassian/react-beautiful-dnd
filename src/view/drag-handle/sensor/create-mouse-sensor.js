@@ -8,12 +8,12 @@ import preventStandardKeyEvents from '../util/prevent-standard-key-events';
 import createPostDragEventPreventer, { type EventPreventer } from '../util/create-post-drag-event-preventer';
 import { bindEvents, unbindEvents } from '../util/bind-events';
 import createEventMarshal, { type EventMarshal } from '../util/create-event-marshal';
+import cancelOnPageVisibilityChange from '../util/cancel-on-page-visibility-change';
 import type { EventBinding } from '../util/event-types';
 import type {
   Position,
 } from '../../../types';
 import type { MouseSensor, CreateSensorArgs } from './sensor-types';
-import addVisibilityEvent from '../util/create-visibility-event';
 
 // Custom event format for force press inputs
 type MouseForceChangedEvent = MouseEvent & {
@@ -223,7 +223,7 @@ export default ({
         }
       },
     },
-    addVisibilityEvent(cancel),
+    cancelOnPageVisibilityChange(cancel),
   ];
 
   const bindWindowEvents = () => {

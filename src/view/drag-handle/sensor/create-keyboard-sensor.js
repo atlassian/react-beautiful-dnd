@@ -6,13 +6,13 @@ import * as keyCodes from '../../key-codes';
 import getWindowFromRef from '../../get-window-from-ref';
 import getCenterPosition from '../../get-center-position';
 import { bindEvents, unbindEvents } from '../util/bind-events';
+import cancelOnPageVisibilityChange from '../util/cancel-on-page-visibility-change';
 import type { EventBinding } from '../util/event-types';
 import type { Position } from '../../../types';
 import type { KeyboardSensor, CreateSensorArgs } from './sensor-types';
 import type {
   Props,
 } from '../drag-handle-types';
-import addVisibilityEvent from '../util/create-visibility-event';
 
 type State = {|
   isDragging: boolean,
@@ -223,7 +223,7 @@ export default ({
       eventName: 'scroll',
       fn: callbacks.onWindowScroll,
     },
-    addVisibilityEvent(cancel),
+    cancelOnPageVisibilityChange(cancel),
   ];
 
   const bindWindowEvents = () => {
