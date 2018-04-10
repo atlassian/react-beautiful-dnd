@@ -5,6 +5,7 @@ node_js:
 script:
 - yarn run validate
 - yarn run test
+- yarn run check-size-changes
 # Currently disabled travis deploys
 # deploy:
 #   provider: npm
@@ -24,7 +25,7 @@ env:
 # Required for lock file generation
 # https://github.com/greenkeeperio/greenkeeper-lockfile
 before_install: yarn global add greenkeeper-lockfile@1
-before_script: 
+before_script:
   - greenkeeper-lockfile-update
   - yarn global add wait-port@0.2.2
   - yarn storybook & wait-port -t 10000 localhost:9002
