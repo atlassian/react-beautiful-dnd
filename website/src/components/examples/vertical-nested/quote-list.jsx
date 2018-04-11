@@ -46,14 +46,11 @@ export default class QuoteList extends Component<{ list: NestedQuoteList }> {
       index={index}
     >
       {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
-        <div>
-          <QuoteItem
-            quote={quote}
-            isDragging={snapshot.isDragging}
-            provided={provided}
-          />
-          {provided.placeholder}
-        </div>
+        <QuoteItem
+          quote={quote}
+          isDragging={snapshot.isDragging}
+          provided={provided}
+        />
       )}
     </Draggable>
   )
@@ -82,17 +79,14 @@ export default class QuoteList extends Component<{ list: NestedQuoteList }> {
                   index={index}
                 >
                   {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
-                    <div>
-                      <NestedContainer
-                        innerRef={dragProvided.innerRef}
-                        isDragging={dragSnapshot.isDragging}
-                        {...dragProvided.draggableProps}
-                        {...dragProvided.dragHandleProps}
-                      >
-                        {this.renderList((item : any), level + 1)}
-                      </NestedContainer>
-                      {dragProvided.placeholder}
-                    </div>
+                    <NestedContainer
+                      innerRef={dragProvided.innerRef}
+                      isDragging={dragSnapshot.isDragging}
+                      {...dragProvided.draggableProps}
+                      {...dragProvided.dragHandleProps}
+                    >
+                      {this.renderList((item : any), level + 1)}
+                    </NestedContainer>
                   )}
                 </Draggable>
               )

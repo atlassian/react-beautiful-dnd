@@ -186,18 +186,15 @@ class Task extends Component<Props> {
     return (
       <Draggable draggableId={task.id} index={this.props.index}>
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
-          <div>
-            <Container
-              innerRef={provided.innerRef}
-              {...provided.draggableProps}
-              {...provided.dragHandleProps}
-              onClick={this.onClick}
-              onKeyDown={(event: KeyboardEvent) => this.onKeyDown(event, provided, snapshot)}
-            >
-              {task.content}
-            </Container>
-            {provided.placeholder}
-          </div>
+          <Container
+            innerRef={provided.innerRef}
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+            onClick={this.onClick}
+            onKeyDown={(event: KeyboardEvent) => this.onKeyDown(event, provided, snapshot)}
+          >
+            {task.content}
+          </Container>
         )}
       </Draggable>
     );

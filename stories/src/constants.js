@@ -20,6 +20,6 @@ export const colors = {
   purple: 'rebeccapurple',
 };
 
-export const grid = 8;
+export const grid: number = 8;
 
-export const borderRadius = 2;
+export const borderRadius: number = 2;

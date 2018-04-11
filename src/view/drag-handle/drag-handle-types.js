@@ -8,6 +8,8 @@ import type {
 } from '../../types';
 
 export type Callbacks = {|
+  onFocus: () => void,
+  onBlur: () => void,
   onLift: ({ client: Position, autoScrollMode: AutoScrollMode }) => void,
   onMove: (point: Position) => void,
   onWindowScroll: () => void,
@@ -20,10 +22,16 @@ export type Callbacks = {|
 |}
 
 export type DragHandleProps = {|
+  // If a consumer is using a portal then the item will loose focus
+  // when moving to the portal. This breaks keyboard dragging.
+  // To get around this we manually apply focus if needed when mounting
+  onFocus: () => void,
+  onBlur: () => void,
+
+  // Used to initiate dragging
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
   onTouchStart: (event: TouchEvent) => void,
-  onTouchMove: (event: TouchEvent) => void,
 
   // Control styling from style marshal
   'data-react-beautiful-dnd-drag-handle': string,

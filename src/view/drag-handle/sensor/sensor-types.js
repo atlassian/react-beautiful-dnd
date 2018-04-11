@@ -32,5 +32,4 @@ export type KeyboardSensor = {|
 export type TouchSensor = {|
   ...SensorBase,
   onTouchStart: (event: TouchEvent) => void,
-  onTouchMove: (event: TouchEvent) => void,
 |}

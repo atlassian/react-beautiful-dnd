@@ -82,19 +82,16 @@ export default class App extends Component {
               {this.state.items.map((item, index) => (
                 <Draggable key={item.id} draggableId={item.id} index={index}>
                   {(draggableProvided, draggableSnapshot) => (
-                    <div>
-                      <div
-                        ref={draggableProvided.innerRef}
-                        {...draggableProvided.draggableProps}
-                        {...draggableProvided.dragHandleProps}
-                        style={getItemStyle(
-                          draggableSnapshot.isDragging,
-                          draggableProvided.draggableProps.style
-                        )}
-                      >
-                        {item.content}
-                      </div>
-                      {draggableProvided.placeholder}
+                    <div
+                      ref={draggableProvided.innerRef}
+                      {...draggableProvided.draggableProps}
+                      {...draggableProvided.dragHandleProps}
+                      style={getItemStyle(
+                        draggableSnapshot.isDragging,
+                        draggableProvided.draggableProps.style
+                      )}
+                    >
+                      {item.content}
                     </div>
                   )}
                 </Draggable>

@@ -388,17 +388,8 @@ export default ({
     startPendingDrag(event);
   };
 
-  // a touch move can happen very quickly - before the window handlers are bound
-  // so we need to also add some logic here to ensure that a pending drag is cancelled if needed
-  const onTouchMove = () => {
-    if (state.pending) {
-      stopPendingDrag();
-    }
-  };
-
   const sensor: TouchSensor = {
     onTouchStart,
-    onTouchMove,
     kill,
     isCapturing,
     isDragging,

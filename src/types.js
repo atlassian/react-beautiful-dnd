@@ -77,6 +77,8 @@ export type Placeholder = {|
   // behavior of the original element
   paddingBox: Area,
   margin: Spacing,
+  tagName: string,
+  display: string,
 |}
 
 export type DraggableDimension = {|
