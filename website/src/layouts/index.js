@@ -4,14 +4,14 @@ import Helmet from 'react-helmet';
 /* eslint-disable-next-line import/extensions */
 import '@atlaskit/css-reset';
 
-import Header from '../components/Header';
+import Header from '../components/header';
 
 const TemplateWrapper = ({ children }: { children: () => Node }) => (
   <div>
     <Helmet
-      title="React-beautiful-dnd"
+      title="react-beautiful-dnd"
       meta={[
-        { name: 'description', content: 'react-beautiful-dnd' },
+        { name: 'description', content: 'react-beautiful-dnd: Beautiful, accessible drag and drop for lists with React.js' },
       ]}
     />
     <Header />
