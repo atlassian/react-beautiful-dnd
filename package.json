@@ -34,9 +34,10 @@
     "build:flow": "echo \"// @flow\n\nexport * from '../src';\" > dist/react-beautiful-dnd.cjs.js.flow",
     "storybook": "start-storybook -p 9002",
     "build-storybook": "build-storybook -c .storybook -o site",
-    "prepublish": "yarn run build && cd website && yarn",
     "website:start": "cd website && yarn develop",
-    "website:build": "cd website && yarn build"
+    "website:build": "cd website && yarn build",
+    "prepare": "cd website && yarn",
+    "prepublishOnly": "yarn run build"
   },
   "dependencies": {
     "babel-runtime": "^6.26.0",
