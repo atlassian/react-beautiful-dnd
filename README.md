@@ -894,7 +894,7 @@ Every `Draggable` has a *drag handle*. A *drag handle* is the element that the u
 ```js
 import { Draggable } from 'react-beautiful-dnd';
 
-<Draggable draggableId="draggable-1" type="PERSON" index={0}>
+<Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => (
     <div
       ref={provided.innerRef}
@@ -926,7 +926,6 @@ import { Draggable } from 'react-beautiful-dnd';
 ))}
 ```
 
-- `type`: An *optional* type (`TypeId(string)`) of the `Draggable`. This is used to control what `Droppable`s the `Draggable` is permitted to drop on. `Draggable`s can only drop on `Droppable`s that share the same `type`. If no `type` is provided, then it will be set to `'DEFAULT'`. Currently the `type` of a `Draggable` **must be** the same as its container `Droppable`. This restriction might be loosened in the future if there is a valid use case.
 - `isDragDisabled`: An *optional* flag to control whether or not the `Draggable` is permitted to drag. You can use this to implement your own conditional drag logic. It will default to `false`.
 - `disableInteractiveElementBlocking`: An *optional* flag to opt out of blocking a drag from interactive elements. For more information refer to the section *Interactive child elements within a `Draggable`*
 
