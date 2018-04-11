@@ -37,7 +37,8 @@
     "build-storybook": "build-storybook -c .storybook -o site",
     "website:start": "cd website && yarn develop",
     "website:build": "cd website && yarn build",
-    "prepare": "yarn run build && cd website && yarn"
+    "prepare": "cd website && yarn",
+    "prepublishOnly": "yarn build"
   },
   "dependencies": {
     "babel-runtime": "^6.26.0",
