@@ -1,4 +1,4 @@
-// @flow
+/* eslint-disable flowtype/require-valid-file-annotation */
 
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
@@ -8,21 +8,21 @@ import replace from 'rollup-plugin-replace';
 import strip from 'rollup-plugin-strip';
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
 
-const pkg: Object = require('./package.json');
+const pkg = require('./package.json');
 
-const input: string = './src/index.js';
-const extensions: string[] = ['.js', '.jsx'];
+const input = './src/index.js';
+const extensions = ['.js', '.jsx'];
 
 // Treat as externals all not relative and not absolute paths
 // e.g. 'react'
-const excludeAllExternals = (id: string): boolean => !id.startsWith('.') && !id.startsWith('/');
+const excludeAllExternals = id => !id.startsWith('.') && !id.startsWith('/');
 
 const getBabelOptions = () => ({
   exclude: 'node_modules/**',
   runtimeHelpers: true,
 });
 
-const shouldCheckSnapshot: boolean = process.env.SNAPSHOT === 'check';
+const shouldCheckSnapshot = process.env.SNAPSHOT === 'check';
 
 export default [
   // Universal module definition (UMD) build
