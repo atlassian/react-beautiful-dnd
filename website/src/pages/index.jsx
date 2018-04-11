@@ -1,11 +1,27 @@
 // @flow
 import React from 'react';
-import Link from 'gatsby-link';
+import styled from 'styled-components';
+import { Rect } from 'glamorous';
 
-const IndexPage = () => (
-  <div>
-    <h1>react-beautiful-dnd</h1>
-  </div>
-);
+const Title = styled.h1`
+  text-align: center;
+`;
 
-export default IndexPage;
+const Tagline = styled.p`
+
+`;
+
+export default class IndexPage extends React.Component<*> {
+  render() {
+    return 'TEMP';
+  }
+}
+
+// const IndexPage = () => (
+//   <div>
+//     <Title>react-beautiful-dnd</Title>
+//     <Tagline>Hi there</Tagline>
+//   </div>
+// );
+
+// export default IndexPage;
