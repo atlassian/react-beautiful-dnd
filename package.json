@@ -26,12 +26,12 @@
   ],
   "scripts": {
     "test": "jest --config ./jest.config.js",
-    "validate": "yarn run lint && yarn run typecheck",
+    "validate": "yarn lint && yarn typecheck",
     "lint": "yarn eslint .",
     "typecheck": "flow check",
     "check-bundle-sizes": "cross-env SNAPSHOT=check yarn build:dist && yarn build:clean",
     "update-bundle-sizes": "yarn build:dist && yarn build:clean",
-    "build": "yarn run build:clean && yarn run build:dist && yarn run build:flow",
+    "build": "yarn build:clean && yarn build:dist && yarn build:flow",
     "build:clean": "rimraf dist",
     "build:dist": "rollup -c",
     "build:flow": "echo \"// @flow\n\nexport * from '../src';\" > dist/react-beautiful-dnd.cjs.js.flow",
@@ -55,7 +55,7 @@
     "reselect": "^3.0.1"
   },
   "devDependencies": {
-    "@atlaskit/css-reset": "^1.2.0",
+    "@atlaskit/css-reset": "^2.0.0",
     "@storybook/react": "^3.2.16",
     "babel-cli": "^6.26.0",
     "babel-eslint": "^8.2.1",
