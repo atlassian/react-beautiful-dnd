@@ -462,11 +462,11 @@ You can use the UMD to run `react-beautiful-dnd` directly in the browser.
 
 ```html
 <!-- peer dependency -->
-<script src="https://unpkg.com/react@16.3.1/dist/react.js"></script>
+<script src="https://unpkg.com/react@16.3.1/umd/react.development.js"></script>
 <!-- lib (change x.x.x for the version you would like) -->
 <script src="https://unpkg.com/react-beautiful-dnd@x.x.x/dist/react-beautiful-dnd.js"></script>
 <!-- needed to mount your react app -->
-<script src="https://unpkg.com/react-dom@16.3.1/dist/react-dom.js"></script>
+<script src="https://unpkg.com/react-dom@16.3.1/umd/react-dom.development.js"></script>
 
 <script>
   const React = window.React;
