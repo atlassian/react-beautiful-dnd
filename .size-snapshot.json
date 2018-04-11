@@ -17,5 +17,10 @@
       "rollup": 77388,
       "webpack": 78984
     }
+  },
+  "dist/react-beautiful-dnd.js": {
+    "bundled": 372144,
+    "minified": 142587,
+    "gzipped": 40258
   }
 }

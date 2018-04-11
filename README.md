@@ -34,6 +34,7 @@ We have created some basic examples on `codesandbox` for you to play with direct
 
 We have created upgrade instructions in our release notes to help you upgrade to the latest version!
 
+- [Upgrading from `6.x` to `7.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v7.0.0)
 - [Upgrading from `5.x` to `6.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v6.0.0)
 - [Upgrading from `4.x` to `5.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v5.0.0)
 - [Upgrading from `3.x` to `4.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v4.0.0)
@@ -461,11 +462,11 @@ You can use the UMD to run `react-beautiful-dnd` directly in the browser.
 
 ```html
 <!-- peer dependency -->
-<script src="https://unpkg.com/react@15.6.0/dist/react.js"></script>
+<script src="https://unpkg.com/react@16.3.1/dist/react.js"></script>
 <!-- lib (change x.x.x for the version you would like) -->
 <script src="https://unpkg.com/react-beautiful-dnd@x.x.x/dist/react-beautiful-dnd.js"></script>
 <!-- needed to mount your react app -->
-<script src="https://unpkg.com/react-dom@15.6.0/dist/react-dom.js"></script>
+<script src="https://unpkg.com/react-dom@16.3.1/dist/react-dom.js"></script>
 
 <script>
   const React = window.React;
