@@ -5,7 +5,7 @@ node_js:
 script:
 - yarn run validate
 - yarn run test
-- yarn run check-size-changes
+- yarn run check-bundle-sizes
 # Currently disabled travis deploys
 # deploy:
 #   provider: npm
