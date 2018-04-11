@@ -15,13 +15,11 @@
   "bugs": {
     "url": "https://github.com/atlassian/react-beautiful-dnd/issues"
   },
-  "main": "lib/index.js",
-  "module": "esm/index.js",
+  "main": "dist/react-beautiful-dnd.cjs.js",
+  "module": "dist/react-beautiful-dnd.esm.js",
   "sideEffects": false,
   "files": [
-    "/lib",
     "/dist",
-    "/esm",
     "/src"
   ],
   "scripts": {
@@ -29,12 +27,10 @@
     "validate": "yarn run lint && yarn run typecheck",
     "lint": "yarn eslint .",
     "typecheck": "flow check",
-    "build": "yarn run build:clean && yarn run build:lib && yarn run build:esm && yarn run build:flow && yarn run build:dist",
-    "build:clean": "rimraf lib && rimraf esm && rimraf dist",
-    "build:lib": "cross-env NODE_ENV=cjs babel src -d lib",
-    "build:esm": "babel src -d esm",
+    "build": "yarn run build:clean && yarn run build:dist && yarn run build:flow",
+    "build:clean": "rimraf dist",
     "build:dist": "rollup -c",
-    "build:flow": "echo \"// @flow\n\nexport * from '../src';\" | tee lib/index.js.flow esm/index.js.flow",
+    "build:flow": "echo \"// @flow\n\nexport * from '../src';\" > dist/react-beautiful-dnd.cjs.js.flow",
     "storybook": "start-storybook -p 9002",
     "build-storybook": "build-storybook -c .storybook -o site",
     "prepublish": "yarn run build && cd website && yarn",
@@ -89,7 +85,7 @@
     "rollup-plugin-commonjs": "^8.2.6",
     "rollup-plugin-node-resolve": "^3.0.2",
     "rollup-plugin-replace": "^2.0.0",
-    "rollup-plugin-size-snapshot": "^0.2.1",
+    "rollup-plugin-size-snapshot": "^0.3.0",
     "rollup-plugin-strip": "^1.1.1",
     "rollup-plugin-uglify": "^2.0.1",
     "styled-components": "^3.2.0"
