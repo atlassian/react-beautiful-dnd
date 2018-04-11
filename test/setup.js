@@ -23,7 +23,6 @@ if (typeof document !== 'undefined' && typeof window !== 'undefined') {
   document.documentElement.clientWidth = window.innerWidth;
   document.documentElement.clientHeight = window.innerHeight;
 }
-
 // setting up global enzyme
 const Enzyme = require('enzyme');
 
