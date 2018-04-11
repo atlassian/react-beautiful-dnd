@@ -22,8 +22,6 @@ const Container = styled.div`
   ${({ isDragging }) => (isDragging ? 'box-shadow: 1px 1px 1px grey; background: lightblue' : '')}
 `;
 
-const Wrapper = styled.div``;
-
 export default class Task extends Component<Props> {
   render() {
     const task: TaskType = this.props.task;
@@ -32,18 +30,15 @@ export default class Task extends Component<Props> {
     return (
       <Draggable draggableId={task.id} index={index}>
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
-          <Wrapper>
-            <Container
-              innerRef={provided.innerRef}
-              isDragging={snapshot.isDragging}
-              {...provided.draggableProps}
-              {...provided.dragHandleProps}
-              aria-roledescription="Draggable task. Press space bar to lift"
-            >
-              {this.props.task.content}
-            </Container>
-            {provided.placeholder}
-          </Wrapper>
+          <Container
+            innerRef={provided.innerRef}
+            isDragging={snapshot.isDragging}
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+            aria-roledescription="Draggable task. Press space bar to lift"
+          >
+            {this.props.task.content}
+          </Container>
         )}
       </Draggable>
     );

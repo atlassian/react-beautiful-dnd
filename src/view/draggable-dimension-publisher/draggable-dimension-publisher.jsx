@@ -21,7 +21,7 @@ type Props = {|
   draggableId: DraggableId,
   droppableId: DroppableId,
   index: number,
-  targetRef: ?HTMLElement,
+  getDraggableRef: () => ?HTMLElement,
   children: Node,
 |}
 
@@ -33,21 +33,12 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
   publishedDescriptor: ?DraggableDescriptor = null
 
-  componentWillReceiveProps(nextProps: Props) {
-    const { draggableId, droppableId, index, targetRef } = nextProps;
+  componentDidMount() {
+    this.publish();
+  }
 
-    if (!targetRef) {
-      console.error('Updating draggable dimension handler without a targetRef');
-      return;
-    }
-
-    // Note: not publishing it on componentDidMount as we do not have a ref at that point
-
-    const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
-      draggableId, droppableId, index
-    );
-
-    this.publish(descriptor);
+  componentDidUpdate() {
+    this.publish();
   }
 
   componentWillUnmount() {
@@ -60,6 +51,27 @@ export default class DraggableDimensionPublisher extends Component<Props> {
       droppableId,
       index,
     }));
+
+  publish = () => {
+    const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
+      this.props.draggableId,
+      this.props.droppableId,
+      this.props.index
+    );
+
+    // No changes to the descriptor
+    if (descriptor === this.publishedDescriptor) {
+      return;
+    }
+
+    if (this.publishedDescriptor) {
+      this.unpublish();
+    }
+
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
+    marshal.registerDraggable(descriptor, this.getDimension);
+    this.publishedDescriptor = descriptor;
+  }
 
   unpublish = () => {
     if (!this.publishedDescriptor) {
@@ -75,22 +87,8 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     this.publishedDescriptor = null;
   }
 
-  publish = (descriptor: DraggableDescriptor) => {
-    if (descriptor === this.publishedDescriptor) {
-      return;
-    }
-
-    if (this.publishedDescriptor) {
-      this.unpublish();
-    }
-
-    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.registerDraggable(descriptor, this.getDimension);
-    this.publishedDescriptor = descriptor;
-  }
-
   getDimension = (): DraggableDimension => {
-    const targetRef: ?HTMLElement = this.props.targetRef;
+    const targetRef: ?HTMLElement = this.props.getDraggableRef();
 
     if (!targetRef) {
       throw new Error('DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
@@ -102,15 +100,15 @@ export default class DraggableDimensionPublisher extends Component<Props> {
       throw new Error('Cannot get dimension for unpublished draggable');
     }
 
+    const tagName: string = targetRef.tagName.toLowerCase();
     const style = window.getComputedStyle(targetRef);
-
+    const display: string = style.display;
     const margin: Spacing = {
       top: parseInt(style.marginTop, 10),
       right: parseInt(style.marginRight, 10),
       bottom: parseInt(style.marginBottom, 10),
       left: parseInt(style.marginLeft, 10),
     };
-
     // We do not need to worry about 'box-sizing' because getBoundingClientRect already
     // takes that into account
     const paddingBox: Area = getArea(targetRef.getBoundingClientRect());
@@ -119,6 +117,8 @@ export default class DraggableDimensionPublisher extends Component<Props> {
       descriptor,
       paddingBox,
       margin,
+      tagName,
+      display,
       windowScroll: getWindowScroll(),
     });
 

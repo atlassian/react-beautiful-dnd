@@ -84,14 +84,14 @@ export default class DragHandle extends Component<Props> {
     });
   }
 
-  componentWillReceiveProps(nextProps: Props) {
+  componentDidUpdate(prevProps: Props) {
     const isCapturing: boolean = this.isAnySensorCapturing();
 
     if (!isCapturing) {
       return;
     }
 
-    const isDragStopping: boolean = (this.props.isDragging && !nextProps.isDragging);
+    const isDragStopping: boolean = (prevProps.isDragging && !this.props.isDragging);
 
     // if the application cancels a drag we need to unbind the handlers
     if (isDragStopping) {
@@ -105,7 +105,7 @@ export default class DragHandle extends Component<Props> {
     }
 
     // dragging disabled mid drag
-    if (!nextProps.isEnabled) {
+    if (!this.props.isEnabled) {
       this.sensors.forEach((sensor: Sensor) => {
         if (sensor.isCapturing()) {
           const wasDragging: boolean = sensor.isDragging();
@@ -150,10 +150,6 @@ export default class DragHandle extends Component<Props> {
     this.touchSensor.onTouchStart(event);
   }
 
-  onTouchMove = (event: TouchEvent) => {
-    this.touchSensor.onTouchMove(event);
-  }
-
   canStartCapturing = (event: Event) => {
     // this might be before a drag has started - isolated to this element
     if (this.isAnySensorCapturing()) {
@@ -181,7 +177,8 @@ export default class DragHandle extends Component<Props> {
       onMouseDown: this.onMouseDown,
       onKeyDown: this.onKeyDown,
       onTouchStart: this.onTouchStart,
-      onTouchMove: this.onTouchMove,
+      onFocus: this.props.callbacks.onFocus,
+      onBlur: this.props.callbacks.onBlur,
       tabIndex: 0,
       'data-react-beautiful-dnd-drag-handle': this.styleContext,
       // English default. Consumers are welcome to add their own start instruction

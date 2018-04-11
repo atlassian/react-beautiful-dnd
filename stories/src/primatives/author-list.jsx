@@ -71,15 +71,12 @@ export default class AuthorList extends Component<Props> {
               index={index}
             >
               {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
-                <div>
-                  <Author
-                    author={quote.author}
-                    provided={dragProvided}
-                    snapshot={dragSnapshot}
-                    autoFocus={this.props.autoFocusQuoteId === quote.id}
-                  />
-                  {dragProvided.placeholder}
-                </div>
+                <Author
+                  author={quote.author}
+                  provided={dragProvided}
+                  snapshot={dragSnapshot}
+                  autoFocus={this.props.autoFocusQuoteId === quote.id}
+                />
             )}
             </Draggable>
           ))}

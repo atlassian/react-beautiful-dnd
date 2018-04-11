@@ -32,7 +32,7 @@ type Props = {|
   isDropDisabled: boolean,
   ignoreContainerClipping: boolean,
   isDropDisabled: boolean,
-  targetRef: ?HTMLElement,
+  getDroppableRef: () => ?HTMLElement,
   children: Node,
 |}
 
@@ -120,7 +120,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   }
 
   watchScroll = (options: ScrollOptions) => {
-    if (!this.props.targetRef) {
+    if (!this.props.getDroppableRef()) {
       console.error('cannot watch droppable scroll if not in the dom');
       return;
     }
@@ -158,31 +158,28 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     this.closestScrollable.removeEventListener('scroll', this.onClosestScroll);
   }
 
-  componentWillReceiveProps(nextProps: Props) {
-    if (!nextProps.targetRef) {
-      console.error('Cannot update droppable dimension publisher without a target ref');
+  componentDidMount() {
+    this.publish();
+
+    // Note: not calling `marshal.updateDroppableIsEnabled()`
+    // If the dimension marshal needs to get the dimension immediately
+    // then it will get the enabled state of the dimension at that point
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    // Update the descriptor if needed
+    this.publish();
+
+    // We now need to check if the disabled flag has changed
+
+    if (this.props.isDropDisabled === prevProps.isDropDisabled) {
       return;
     }
 
-    // 1. Update the descriptor
-    // Note: not publishing it on componentDidMount as we do not have a ref at that point
-
-    const { droppableId, type } = nextProps;
-    const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
-      droppableId, type,
-    );
-
-    this.publish(descriptor);
-
-    // 2. Update is enabled
-
-    if (this.props.isDropDisabled === nextProps.isDropDisabled) {
-      return;
-    }
-
-    // the enabled state of the droppable is changing
+    // The enabled state of the droppable is changing.
+    // We need to let the marshal know incase a drag is currently occurring
     const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.updateDroppableIsEnabled(nextProps.droppableId, !nextProps.isDropDisabled);
+    marshal.updateDroppableIsEnabled(this.props.droppableId, !this.props.isDropDisabled);
   }
 
   componentWillUnmount() {
@@ -200,21 +197,12 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       type,
     }));
 
-  unpublish = () => {
-    if (!this.publishedDescriptor) {
-      console.error('cannot unpublish descriptor when none is published');
-      return;
-    }
+  publish = () => {
+    const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
+      this.props.droppableId,
+      this.props.type,
+    );
 
-    // Using the previously published id to unpublish. This is to guard
-    // against the case where the id dynamically changes. This is not
-    // supported during a drag - but it is good to guard against.
-    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.unregisterDroppable(this.publishedDescriptor);
-    this.publishedDescriptor = null;
-  }
-
-  publish = (descriptor: DroppableDescriptor) => {
     if (descriptor === this.publishedDescriptor) {
       return;
     }
@@ -228,13 +216,29 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     this.publishedDescriptor = descriptor;
   }
 
+  unpublish = () => {
+    if (!this.publishedDescriptor) {
+      console.error('Cannot unpublish descriptor when none is published');
+      return;
+    }
+
+    // Using the previously published id to unpublish. This is to guard
+    // against the case where the id dynamically changes. This is not
+    // supported during a drag - but it is good to guard against.
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
+    marshal.unregisterDroppable(this.publishedDescriptor);
+    this.publishedDescriptor = null;
+  }
+
   getDimension = (): DroppableDimension => {
     const {
       direction,
       ignoreContainerClipping,
       isDropDisabled,
-      targetRef,
+      getDroppableRef,
     } = this.props;
+
+    const targetRef: ?HTMLElement = getDroppableRef();
 
     if (!targetRef) {
       throw new Error('DimensionPublisher cannot calculate a dimension when not attached to the DOM');
@@ -277,7 +281,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     // 2. There is no scroll container
     // 3. The droppable has internal scrolling
 
-    const closest = (() => {
+    const closest: ?Object = (() => {
       const closestScrollable: ?Element = this.closestScrollable;
 
       if (!closestScrollable) {

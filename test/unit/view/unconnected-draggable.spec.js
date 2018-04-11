@@ -1,6 +1,8 @@
 // @flow
 /* eslint-disable react/no-multi-comp */
 import React, { Component } from 'react';
+import type { Node } from 'react';
+import ReactDOM from 'react-dom';
 import { mount } from 'enzyme';
 // eslint-disable-next-line no-duplicate-imports
 import type { ReactWrapper } from 'enzyme';
@@ -797,30 +799,53 @@ describe('Draggable - unconnected', () => {
     it('should render a placeholder', () => {
       const myMock = jest.fn();
 
-      mountDraggable({
+      const wrapper: ReactWrapper = mountDraggable({
         mapProps: draggingMapProps,
         WrappedComponent: getStubber(myMock),
       });
 
-      const provided: Provided = getLastCall(myMock)[0].provided;
-      // $ExpectError - because we do not have the correct React type for placeholder
-      expect(provided.placeholder.type).toBe(Placeholder);
+      expect(wrapper.find(Placeholder).exists()).toBe(true);
     });
 
-    it('should give a placeholder the same dimension of the element being moved', () => {
+    it('should give a placeholder the same details as the element being moved', () => {
       const myMock = jest.fn();
       const Stubber = getStubber(myMock);
 
-      mountDraggable({
+      const wrapper: ReactWrapper = mountDraggable({
         mapProps: draggingMapProps,
         WrappedComponent: Stubber,
       });
       // finish moving to the initial position
       requestAnimationFrame.flush();
 
-      const provided: Provided = getLastCall(myMock)[0].provided;
-      // $ExpectError - because we do not have the correct React type for placeholder
-      expect(provided.placeholder.props.placeholder).toBe(dimension.placeholder);
+      const placeholder: ?ReactWrapper = wrapper.find(Placeholder).first();
+
+      if (!placeholder) {
+        throw new Error('Unable to find placeholder');
+      }
+
+      expect(placeholder.props().placeholder).toBe(dimension.placeholder);
+
+      const child: ?ReactWrapper = placeholder.children();
+
+      if (!child) {
+        throw new Error('Unable to find placeholder element');
+      }
+
+      const props: Object = child.props();
+
+      expect(props.style).toEqual({
+        width: dimension.placeholder.paddingBox.width,
+        height: dimension.placeholder.paddingBox.height,
+        marginTop: dimension.placeholder.margin.top,
+        marginBottom: dimension.placeholder.margin.bottom,
+        marginLeft: dimension.placeholder.margin.left,
+        marginRight: dimension.placeholder.margin.right,
+        display: dimension.placeholder.display,
+        boxSizing: 'border-box',
+        pointerEvents: 'none',
+      });
+      expect(child.type()).toBe(dimension.placeholder.tagName);
     });
 
     it('should be above Draggables that are not dragging', () => {
@@ -1063,17 +1088,11 @@ describe('Draggable - unconnected', () => {
 
   describe('drop animating', () => {
     it('should render a placeholder', () => {
-      const myMock = jest.fn();
-
-      mountDraggable({
+      const wrapper = mountDraggable({
         mapProps: dropAnimatingMapProps,
-        WrappedComponent: getStubber(myMock),
       });
 
-      const provided: Provided = getLastCall(myMock)[0].provided;
-
-      // $ExpectError - because we do not have the correct React type for placeholder
-      expect(provided.placeholder.type).toBe(Placeholder);
+      expect(wrapper.find(Placeholder).exists()).toBe(true);
     });
 
     it('should move back to home with standard speed', () => {
@@ -1153,7 +1172,7 @@ describe('Draggable - unconnected', () => {
 
   describe('drop complete', () => {
     const myMock = jest.fn();
-    mountDraggable({
+    const wrapper = mountDraggable({
       mapProps: dropCompleteMapProps,
       WrappedComponent: getStubber(myMock),
     });
@@ -1161,7 +1180,7 @@ describe('Draggable - unconnected', () => {
     const snapshot: StateSnapshot = getLastCall(myMock)[0].snapshot;
 
     it('should not render a placeholder', () => {
-      expect(provided.placeholder).toBe(null);
+      expect(wrapper.find(Placeholder).exists()).toBe(false);
     });
 
     it('should not be moved from its original position', () => {
@@ -1182,10 +1201,11 @@ describe('Draggable - unconnected', () => {
     describe('nothing else is dragging', () => {
       let provided: Provided;
       let snapshot: StateSnapshot;
+      let wrapper: ReactWrapper;
 
       beforeEach(() => {
         const myMock = jest.fn();
-        mountDraggable({
+        wrapper = mountDraggable({
           mapProps: defaultMapProps,
           WrappedComponent: getStubber(myMock),
         });
@@ -1194,7 +1214,7 @@ describe('Draggable - unconnected', () => {
       });
 
       it('should not render a placeholder', () => {
-        expect(provided.placeholder).toBe(null);
+        expect(wrapper.find(Placeholder).exists()).toBe(false);
       });
 
       it('should have base inline styles', () => {
@@ -1228,7 +1248,7 @@ describe('Draggable - unconnected', () => {
         });
 
         it('should not render a placeholder', () => {
-          expect(provided.placeholder).toBe(null);
+          expect(wrapper.find(Placeholder).exists()).toBe(false);
         });
 
         it('should return animate out of the way with css', () => {
@@ -1301,7 +1321,7 @@ describe('Draggable - unconnected', () => {
         });
 
         it('should not render a placeholder', () => {
-          expect(provided.placeholder).toBe(null);
+          expect(wrapper.find(Placeholder).exists()).toBe(false);
         });
 
         it('should animate out of the way with css', () => {
@@ -1348,6 +1368,135 @@ describe('Draggable - unconnected', () => {
           expect(snapshot.isDragging).toBe(false);
         });
       });
+    });
+  });
+
+  describe('Portal usage', () => {
+    const body: ?HTMLElement = document.body;
+    if (!body) {
+      throw new Error('Portal test requires document.body to be present');
+    }
+
+    class WithPortal extends Component<{ provided: Provided, snapshot: StateSnapshot }> {
+      // eslint-disable-next-line react/sort-comp
+      portal: ?HTMLElement;
+
+      componentDidMount() {
+        this.portal = document.createElement('div');
+        body.appendChild(this.portal);
+      }
+      componentWillUnmount() {
+        if (!this.portal) {
+          return;
+        }
+        body.removeChild(this.portal);
+        this.portal = null;
+      }
+      render() {
+        const provided: Provided = this.props.provided;
+        const snapshot: StateSnapshot = this.props.snapshot;
+
+        const child: Node = (
+          <div
+            ref={provided.innerRef}
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+          >
+            Drag me!
+          </div>
+        );
+
+        if (!snapshot.isDragging) {
+          return child;
+        }
+
+        // if dragging - put the item in a portal
+        if (!this.portal) {
+          throw new Error('could not find portal');
+        }
+
+        return ReactDOM.createPortal(child, this.portal);
+      }
+    }
+
+    it('should keep focus if moving to a portal', () => {
+      const wrapper = mountDraggable({
+        WrappedComponent: WithPortal,
+      });
+      const original: HTMLElement = wrapper.getDOMNode();
+      // originally does not have focus
+      expect(original).not.toBe(document.activeElement);
+
+      // giving focus to draggable
+      original.focus();
+      // ensuring that the focus event handler is called
+      wrapper.simulate('focus');
+      // new focused element!
+      expect(original).toBe(document.activeElement);
+
+      // starting a drag
+      wrapper.setProps({
+        ...draggingMapProps,
+      });
+
+      // now moved to portal
+      const inPortal: HTMLElement = wrapper.getDOMNode();
+      expect(inPortal).not.toBe(original);
+      expect(inPortal.parentElement).toBe(wrapper.find(WithPortal).instance().portal);
+
+      // assert that focus was transferred to new element
+      expect(inPortal).toBe(document.activeElement);
+      expect(original).not.toBe(document.activeElement);
+
+      // finishing a drag
+      wrapper.setProps({
+        ...defaultMapProps,
+      });
+
+      // non portaled element should now have focus passed back to it
+      const latest: HTMLElement = wrapper.getDOMNode();
+      expect(latest).toBe(document.activeElement);
+      // latest will not be the same as the original ref as it is remounted after leaving the portal
+      expect(latest).not.toBe(original);
+      // no longer in a portal
+      expect(latest).not.toBe(wrapper.find(WithPortal).instance().portal);
+    });
+
+    it('should not take focus if moving to a portal and did not previously have focus', () => {
+      const wrapper = mountDraggable({
+        WrappedComponent: WithPortal,
+      });
+      const original: HTMLElement = wrapper.getDOMNode();
+
+      // originally does not have focus
+      expect(original).not.toBe(document.activeElement);
+
+      // starting a drag
+      wrapper.setProps({
+        ...draggingMapProps,
+      });
+
+      // now moved to portal
+      const inPortal: HTMLElement = wrapper.getDOMNode();
+      expect(inPortal).not.toBe(original);
+      expect(inPortal.parentElement).toBe(wrapper.find(WithPortal).instance().portal);
+
+      // assert that focus was not transferred to new element
+      expect(inPortal).not.toBe(document.activeElement);
+      expect(original).not.toBe(document.activeElement);
+
+      // finishing a drag
+      wrapper.setProps({
+        ...defaultMapProps,
+      });
+
+      // non portaled element should not take focus
+      const latest: HTMLElement = wrapper.getDOMNode();
+      expect(latest).not.toBe(document.activeElement);
+      // latest will not be the same as the original ref as it is remounted after leaving the portal
+      expect(latest).not.toBe(original);
+      // no longer in a portal
+      expect(latest).not.toBe(wrapper.find(WithPortal).instance().portal);
     });
   });
 });

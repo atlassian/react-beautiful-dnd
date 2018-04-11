@@ -102,7 +102,6 @@ export type Provided = {|
   dragHandleProps: ?DragHandleProps,
   // The following props will be removed once we move to react 16
   innerRef: (?HTMLElement) => void,
-  placeholder: ?Node,
 |}
 
 export type StateSnapshot = {|
@@ -150,7 +149,7 @@ export type OwnProps = {|
 
 export type DefaultProps = {|
   isDragDisabled: boolean,
-  disableInteractiveElementBlocking: boolean
+  disableInteractiveElementBlocking: boolean,
 |}
 
 export type Props = {|

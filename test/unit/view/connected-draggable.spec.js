@@ -1111,8 +1111,7 @@ describe('Connected Draggable', () => {
     it('should render the child function when the parent renders', () => {
       const wrapper = mount(<App currentUser="Jake" />, options);
 
-      // initial render causes two renders due to setting child ref
-      expect(Person.prototype.render).toHaveBeenCalledTimes(2);
+      expect(Person.prototype.render).toHaveBeenCalledTimes(1);
       expect(wrapper.find(Person).props().name).toBe('Jake');
 
       wrapper.unmount();
@@ -1123,8 +1122,7 @@ describe('Connected Draggable', () => {
 
       forceUpdate(wrapper);
 
-      // initial render causes two renders due to setting child ref
-      expect(Person.prototype.render).toHaveBeenCalledTimes(3);
+      expect(Person.prototype.render).toHaveBeenCalledTimes(2);
       expect(wrapper.find(Person).props().name).toBe('Jake');
 
       wrapper.unmount();
@@ -1137,8 +1135,7 @@ describe('Connected Draggable', () => {
         currentUser: 'Finn',
       });
 
-      // initial render causes two renders due to setting child ref
-      expect(Person.prototype.render).toHaveBeenCalledTimes(3);
+      expect(Person.prototype.render).toHaveBeenCalledTimes(2);
       expect(wrapper.find(Person).props().name).toBe('Finn');
 
       wrapper.unmount();

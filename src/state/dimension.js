@@ -30,6 +30,8 @@ export const noSpacing: Spacing = {
 type GetDraggableArgs = {|
   descriptor: DraggableDescriptor,
   paddingBox: Area,
+  tagName?: string,
+  display?: string,
   margin?: Spacing,
   windowScroll?: Position,
 |};
@@ -37,6 +39,8 @@ type GetDraggableArgs = {|
 export const getDraggableDimension = ({
   descriptor,
   paddingBox,
+  tagName = 'div',
+  display = 'block',
   margin = noSpacing,
   windowScroll = origin,
 }: GetDraggableArgs): DraggableDimension => {
@@ -47,6 +51,8 @@ export const getDraggableDimension = ({
     placeholder: {
       margin,
       paddingBox,
+      tagName,
+      display,
     },
     // on the viewport
     client: {

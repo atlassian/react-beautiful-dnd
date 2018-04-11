@@ -66,16 +66,13 @@ describe('hooks integration', () => {
               <h2>Droppable</h2>
               <Draggable draggableId={draggableId} index={0}>
                 {(draggableProvided: DraggableProvided) => (
-                  <div>
-                    <div
-                      className="drag-handle"
-                      ref={draggableProvided.innerRef}
-                      {...draggableProvided.draggableProps}
-                      {...draggableProvided.dragHandleProps}
-                    >
-                      <h4>Draggable</h4>
-                    </div>
-                    {draggableProvided.placeholder}
+                  <div
+                    className="drag-handle"
+                    ref={draggableProvided.innerRef}
+                    {...draggableProvided.draggableProps}
+                    {...draggableProvided.dragHandleProps}
+                  >
+                    <h4>Draggable</h4>
                   </div>
                 )}
               </Draggable>
@@ -240,6 +237,9 @@ describe('hooks integration', () => {
       drag.start();
 
       wasDragStarted();
+
+      // cleanup
+      drag.stop();
     });
 
     it('should not call onDragStart while the drag is occurring', () => {
@@ -250,6 +250,9 @@ describe('hooks integration', () => {
 
       // should not have called on drag start again
       expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+
+      // cleanup
+      drag.stop();
     });
   });
 

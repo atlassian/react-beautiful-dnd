@@ -31,6 +31,8 @@ const primaryButton: number = 0;
 const auxiliaryButton: number = 1;
 
 const getStubCallbacks = (): Callbacks => ({
+  onFocus: jest.fn(),
+  onBlur: jest.fn(),
   onLift: jest.fn(),
   onMove: jest.fn(),
   onMoveForward: jest.fn(),
@@ -130,7 +132,6 @@ const pressEnter = withKeyboard(keyCodes.enter);
 const windowEnter = dispatchWindowKeyDownEvent.bind(null, keyCodes.enter);
 // touch events
 const touchStart = touchEvent.bind(null, 'touchstart');
-const touchMove = touchEvent.bind(null, 'touchmove');
 const windowTouchStart = dispatchWindowTouchEvent.bind(null, 'touchstart');
 const windowTouchMove = dispatchWindowTouchEvent.bind(null, 'touchmove');
 const windowTouchEnd = dispatchWindowTouchEvent.bind(null, 'touchend');
@@ -2110,22 +2111,7 @@ describe('drag handle', () => {
         expect(mockEvent.preventDefault).not.toHaveBeenCalled();
       });
 
-      it('should not start a drag if the user moves their finger before a long press (movement captured on element)', () => {
-        const mockEvent: MockEvent = createMockEvent();
-
-        touchStart(wrapper);
-        touchMove(wrapper, origin, 0, mockEvent);
-        // would normally start a drag
-        jest.runTimersToTime(timeForLongPress);
-
-        expect(callbacksCalled(callbacks)({
-          onLift: 0,
-        })).toBe(true);
-        // letting the movement event flow through - this enables native scrolling
-        expect(mockEvent.preventDefault).not.toHaveBeenCalled();
-      });
-
-      it('should not start a drag if the user moves their finger before a long press (movement captured on window)', () => {
+      it('should not start a drag if the user moves their finger before a long press', () => {
         touchStart(wrapper);
         const event: Event = windowTouchMove(origin);
         // would normally start a drag
@@ -2789,10 +2775,7 @@ describe('drag handle', () => {
       },
     };
 
-    // const controls: Control[] = [mouse, keyboard, touch];
-    // const controls: Control[] = [touch, keyboard];
-    // const controls: Control[] = [mouse, keyboard];
-    const controls: Control[] = [mouse, touch, keyboard];
+    const controls: Control[] = [mouse, keyboard, touch];
 
     controls.forEach((control: Control) => {
       describe(`control: ${control.name}`, () => {
@@ -2804,36 +2787,41 @@ describe('drag handle', () => {
           it('should unbind all window listeners when drag ends', () => {
             jest.spyOn(window, 'addEventListener');
             jest.spyOn(window, 'removeEventListener');
+            // We need to exclude event listener bindings for error events
+            // Enzyme adds them to support componentDidCatch testing
+            const countWithErrorsExcluded = (stub): number => stub.mock.calls
+              .filter((args: mixed[]) => args[0] !== 'error').length;
+            const getAddCount = (): number =>
+              countWithErrorsExcluded(window.addEventListener);
+            const getRemoveCount = (): number =>
+              countWithErrorsExcluded(window.removeEventListener);
+
+            // initial validation
+            expect(getAddCount()).toBe(0);
+            expect(getRemoveCount()).toBe(0);
 
             control.preLift();
             control.lift();
 
             // window events bound
-            expect(window.addEventListener).toHaveBeenCalled();
-
-            // nothing unabound yet
-            expect(window.removeEventListener).not.toHaveBeenCalled();
+            expect(getAddCount()).toBeGreaterThan(0);
+            // nothing unbound yet
+            expect(getRemoveCount()).toBe(0);
 
             // ending the drag
             control.drop();
 
-            // validation
-            expect(window.addEventListener.mock.calls.length).toBeGreaterThan(1);
-            expect(window.removeEventListener.mock.calls.length).toBeGreaterThan(1);
-
             if (!control.hasPostDragClickBlocking) {
-              expect(window.addEventListener.mock.calls.length)
-                .toBe(window.removeEventListener.mock.calls.length);
+              expect(getAddCount()).toBe(getRemoveCount());
             } else {
               // we have added post drag listeners
-              expect(window.addEventListener.mock.calls.length)
-                .toBeGreaterThan(window.removeEventListener.mock.calls.length);
+              expect(getAddCount()).toBeGreaterThan(getRemoveCount());
 
               // finish the post drag blocking
               windowMouseClick();
 
-              expect(window.addEventListener.mock.calls.length)
-                .toBe(window.removeEventListener.mock.calls.length);
+              // everything is now unbound
+              expect(getAddCount()).toBe(getRemoveCount());
             }
 
             // cleanup

@@ -424,13 +424,16 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const { id, isEnabled } = action.payload;
     const target = state.dimension.droppable[id];
 
+    // This can happen if the enabled state changes on the droppable between
+    // a onDragStart and the initial publishing of the Droppable.
+    // The isEnabled state will be correctly populated when the Droppable dimension
+    // is published. Therefore we do not need to log any error here
     if (!target) {
-      console.warn('cannot update enabled state for droppable as it has not yet been collected');
       return state;
     }
 
     if (target.isEnabled === isEnabled) {
-      console.warn(`trying to set droppable isEnabled to ${String(isEnabled)} but it is already ${String(isEnabled)}`);
+      console.warn(`Trying to set droppable isEnabled to ${String(isEnabled)} but it is already ${String(isEnabled)}`);
       return state;
     }
 

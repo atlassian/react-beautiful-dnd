@@ -59,6 +59,8 @@ We have created upgrade instructions in our release notes to help you upgrade to
 - Conditional [dragging](https://github.com/atlassian/react-beautiful-dnd#props-1) and [dropping](https://github.com/atlassian/react-beautiful-dnd#conditionally-dropping)
 - Multiple independent lists on the one page
 - Flexible item sizes - the draggable items can have different heights (vertical lists) or widths (horizontal lists)
+- Compatible with semantic table reordering - [table pattern](/docs/patterns/tables.md)
+- Compatible with [`React.Portal`](https://reactjs.org/docs/portals.html) - [portal pattern](/docs/patterns/using-a-portal.md)
 - Custom drag handles - you can drag a whole item by just a part of it
 - A `Droppable` list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
@@ -893,15 +895,12 @@ import { Draggable } from 'react-beautiful-dnd';
 
 <Draggable draggableId="draggable-1" type="PERSON" index={0}>
   {(provided, snapshot) => (
-    <div>
-      <div
-        ref={provided.innerRef}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
-      >
-        <h4>My draggable</h4>
-      </div>
-      {provided.placeholder}
+    <div
+      ref={provided.innerRef}
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+    >
+      <h4>My draggable</h4>
     </div>
   )}
 </Draggable>;
@@ -918,10 +917,8 @@ import { Draggable } from 'react-beautiful-dnd';
 {this.props.items.map((item, index) => (
   <Draggable draggableId={item.id} index={index}>
     {(provided, snapshot) => (
-      <div>
-        <div ref={provided.innerRef} {...provided.draggableProps}>
-          {item.content}
-        </div>
+      <div ref={provided.innerRef} {...provided.draggableProps}>
+        {item.content}
       </div>
     )}
   </Draggable>
@@ -932,14 +929,13 @@ import { Draggable } from 'react-beautiful-dnd';
 - `isDragDisabled`: An *optional* flag to control whether or not the `Draggable` is permitted to drag. You can use this to implement your own conditional drag logic. It will default to `false`.
 - `disableInteractiveElementBlocking`: An *optional* flag to opt out of blocking a drag from interactive elements. For more information refer to the section *Interactive child elements within a `Draggable`*
 
-### Children function
+### Children function (render props)
 
 The `React` children of a `Draggable` must be a function that returns a `ReactElement`.
 
 ```js
 <Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => (
-    <div>
       <div
         ref={provided.innerRef}
         {...provided.draggableProps}
@@ -947,8 +943,6 @@ The `React` children of a `Draggable` must be a function that returns a `ReactEl
       >
         Drag me!
       </div>
-      {provided.placeholder}
-    </div>
   )}
 </Draggable>;
 ```
@@ -963,8 +957,6 @@ type DraggableProvided = {|
   draggableProps: DraggableProps,
   // will be null if the draggable is disabled
   dragHandleProps: ?DragHandleProps,
-  // null if not required
-  placeholder: ?ReactElement,
 |}
 ```
 
@@ -1018,10 +1010,8 @@ type NotDraggingStyle = {|
 ```js
 <Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => (
-    <div>
-      <div ref={provided.innerRef} {...provided.draggableProps}>
-        Drag me!
-      </div>
+    <div ref={provided.innerRef} {...provided.draggableProps}>
+      Drag me!
     </div>
   )}
 </Draggable>;
@@ -1035,7 +1025,7 @@ It is a contract of this library that it owns the positioning logic of the dragg
 
 `react-beautiful-dnd` uses `position: fixed` to position the dragging element. This is quite robust and allows for you to have `position: relative | absolute | fixed` parents. However, unfortunately `position:fixed` is [impacted by `transform`](http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/) (such as `transform: rotate(10deg);`). This means that if you have a `transform: *` on one of the parents of a `Draggable` then the positioning logic will be incorrect while dragging. Lame! For most consumers this will not be an issue.
 
-This will be changing soon as we move to a [portal solution](https://github.com/atlassian/react-beautiful-dnd/issues/192) where we will be appending the `Draggable` to the end of the body to avoid any parent transforms. If you really need this feature right now we have [created an example](https://www.webpackbin.com/bins/-L-3aZ_bTMiGPl8bqlRB) where we implement a portal on top of the current api. Please note however, this technique is not officially supported and might break in minor / patch releases.
+To get around this you can use [`React.Portal`](https://reactjs.org/docs/portals.html). We do not enable this functionality by default as it has performance problems. We have a [using a portal guide](/guides/using-a-portal.md) explaining the performance problem in more detail and how you can set up your own `React.Portal` if you want to.
 
 ##### Extending `DraggableProps.style`
 
@@ -1053,14 +1043,12 @@ If you are overriding inline styles be sure to do it after you spread the `provi
       ...provided.draggableProps.style,
     };
     return (
-      <div>
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          style={style}
-        >
-          Drag me!
-        </div>
+      <div
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        style={style}
+      >
+        Drag me!
       </div>
     );
   }}
@@ -1124,10 +1112,11 @@ It is an assumption that `Draggable`s are *visible siblings* of one another. The
 
 ```js
 type DragHandleProps = {|
+  onFocus: () => void,
+  onBlur: () => void,
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
   onTouchStart: (event: TouchEvent) => void,
-  onTouchMove: (event: TouchEvent) => void,
   'data-react-beautiful-dnd-drag-handle': string,
   'aria-roledescription': string,
   tabIndex: number,
@@ -1141,15 +1130,12 @@ type DragHandleProps = {|
 ```js
 <Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => (
-    <div>
-      <div
-        ref={provided.innerRef}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
-      >
-        Drag me!
-      </div>
-      {provided.placeholder}
+    <div
+      ref={provided.innerRef}
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+    >
+      Drag me!
     </div>
   )}
 </Draggable>;
@@ -1162,12 +1148,9 @@ Controlling a whole draggable by just a part of it
 ```js
 <Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => (
-    <div>
-      <div ref={provided.innerRef} {...provided.draggableProps}>
-        <h2>Hello there</h2>
-        <div {...provided.dragHandleProps}>Drag handle</div>
-      </div>
-      {provided.placeholder}
+    <div ref={provided.innerRef} {...provided.draggableProps}>
+      <h2>Hello there</h2>
+      <div {...provided.dragHandleProps}>Drag handle</div>
     </div>
   )}
 </Draggable>;
@@ -1196,37 +1179,16 @@ const myOnMouseDown = event => console.log('mouse down on', event.target);
     })();
 
     return (
-      <div>
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          onMouseDown={onMouseDown}
-        >
-          Drag me!
-        </div>
-        {provided.placeholder}
+      <div
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        onMouseDown={onMouseDown}
+      >
+        Drag me!
       </div>
     );
   }}
-</Draggable>;
-```
-
-- `provided.placeholder (?ReactElement)` The `Draggable` element has `position: fixed` applied to it while it is dragging. The role of the `placeholder` is to sit in the place that the `Draggable` was during a drag. It is needed to stop the `Droppable` list from collapsing when you drag. It is advised to render it as a sibling to the `Draggable` node. This is unlike `Droppable` where the `placeholder` needs to be *within* the `Droppable` node. When the library moves to `React` 16 the `placeholder` will be removed from api.
-
-##### `placeholder` example
-
-```js
-<Draggable draggableId="draggable-1" index={0}>
-  {(provided, snapshot) => (
-    <div>
-      <div ref={provided.innerRef} {...provided.draggableProps}>
-        Drag me!
-      </div>
-      {/* Always render me - I will be null if not required */}
-      {provided.placeholder}
-    </div>
-  )}
 </Draggable>;
 ```
 
@@ -1251,21 +1213,22 @@ The `children` function is also provided with a small amount of state relating t
     };
 
     return (
-      <div>
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          style={style}
-        >
-          Drag me!
-        </div>
-        {provided.placeholder}
+      <div
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        style={style}
+      >
+        Drag me!
       </div>
     );
   }}
 </Draggable>;
 ```
+
+### `Draggable` placeholder
+
+When dragging a `Draggable` we leave behind a *placeholder* `React.Element` to maintain space in the `Droppable` in order to prevent it from collapsing. The placeholder mimics the styling and layout (including `width`, `height`, `margin`, `tagName` and `display`) to ensure the list dimensions remain unaffected while dragging. It will be inserted as a direct sibling to the `React.Node` returned by the `Draggable` children function.
 
 ### Adding an `onClick` handler to a `Draggable` or a *drag handle*
 
@@ -1358,7 +1321,6 @@ type DraggableProvided = {|
   innerRef: (?HTMLElement) => void,
   draggableProps: DraggableProps,
   dragHandleProps: ?DragHandleProps,
-  placeholder: ?ReactElement,
 |}
 
 type DraggableStateSnapshot = {|
@@ -1390,10 +1352,11 @@ type NotDraggingStyle = {|
 |}
 
 type DragHandleProps = {|
+  onFocus: () => void,
+  onBlur: () => void,
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
   onTouchStart: (event: TouchEvent) => void,
-  onTouchMove: (event: TouchEvent) => void,
   'data-react-beautiful-dnd-drag-handle': string,
   'aria-roledescription': string,
   tabIndex: number,
