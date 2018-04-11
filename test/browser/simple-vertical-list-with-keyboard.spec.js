@@ -6,7 +6,7 @@ const puppeteer = require('puppeteer');
 
 const urlSingleList: string = 'http://localhost:9002/iframe.html?selectedKind=single%20vertical%20list&selectedStory=basic';
 
-const timeout: number = 30000;
+const timeout: number = 60000;
 
 type Selector = string;
 
