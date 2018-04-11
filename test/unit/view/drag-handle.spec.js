@@ -1889,10 +1889,6 @@ describe('drag handle', () => {
         });
       });
 
-      it.skip('should cancel on a page visibility change', () => {
-        // TODO
-      });
-
       it('should not do anything if there is nothing dragging', () => {
         const event: KeyboardEvent = windowEscape();
 
@@ -3353,6 +3349,22 @@ describe('drag handle', () => {
             expect(parentCallbacks.onLift).toHaveBeenCalled();
 
             nested.unmount();
+          });
+        });
+
+        describe('page visibility changes', () => {
+          it('should cancel the drag on page visibility changes', () => {
+            control.preLift();
+            control.lift();
+
+            dispatchWindowEvent('visibilitychange');
+
+            expect(callbacksCalled(callbacks)({
+              onLift: 1,
+              onCancel: 1,
+            })).toBe(true);
+
+            control.drop();
           });
         });
       });
