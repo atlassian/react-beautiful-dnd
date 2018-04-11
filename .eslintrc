@@ -61,7 +61,7 @@
     // This was turned off for wc - but should be re-enabled eventually
     "react/no-unknown-property": ["off"],
 
-    // Allowing components to have multiple components in it
+    // Allowing files to have multiple components in it
     "react/no-multi-comp": "off",
 
     // http://eslint.org/docs/rules/no-multiple-empty-lines
