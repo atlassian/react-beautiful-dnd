@@ -1,12 +1,11 @@
 // @flow
-import { type Node } from 'react';
+export type ItemId = string;
+export type ColumnId = string;
 
-type ItemId = string;
-type ColumnId = string;
-
-export type Feature = {|
+export type Item = {|
   id: ItemId,
-  component: Node,
+  title: string,
+  content: string,
 |}
 
 export type Column = {|
@@ -19,13 +18,13 @@ export type ColumnMap = {
   [id: ColumnId]: Column,
 }
 
-export type FeatureMap = {
-  [id: ItemId]: ItemId,
+export type ItemMap = {
+  [id: ItemId]: Item,
 }
 
 export type Entities = {|
   columnOrder: ColumnId[],
   columns: ColumnMap,
-  features: FeatureMap,
+  items: ItemMap,
 |}
 
