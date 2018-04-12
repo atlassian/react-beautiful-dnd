@@ -30,6 +30,12 @@
     source-map "^0.5.0"
     trim-right "^1.0.1"
 
+"@babel/helper-annotate-as-pure@^7.0.0-beta.37":
+  version "7.0.0-beta.44"
+  resolved "https://registry.yarnpkg.com/@babel/helper-annotate-as-pure/-/helper-annotate-as-pure-7.0.0-beta.44.tgz#8ecf33cc5235295afcc7f160a63cab17ce7776f4"
+  dependencies:
+    "@babel/types" "7.0.0-beta.44"
+
 "@babel/helper-function-name@7.0.0-beta.42":
   version "7.0.0-beta.42"
   resolved "https://registry.yarnpkg.com/@babel/helper-function-name/-/helper-function-name-7.0.0-beta.42.tgz#b38b8f4f85168d1812c543dd700b5d549b0c4658"
@@ -85,6 +91,14 @@
 "@babel/types@7.0.0-beta.42", "@babel/types@^7.0.0-beta.40":
   version "7.0.0-beta.42"
   resolved "https://registry.yarnpkg.com/@babel/types/-/types-7.0.0-beta.42.tgz#1e2118767684880f6963801b272fd2b3348efacc"
+  dependencies:
+    esutils "^2.0.2"
+    lodash "^4.2.0"
+    to-fast-properties "^2.0.0"
+
+"@babel/types@7.0.0-beta.44":
+  version "7.0.0-beta.44"
+  resolved "https://registry.yarnpkg.com/@babel/types/-/types-7.0.0-beta.44.tgz#6b1b164591f77dec0a0342aca995f2d046b3a757"
   dependencies:
     esutils "^2.0.2"
     lodash "^4.2.0"
@@ -1043,6 +1057,14 @@ babel-plugin-react-docgen@^1.8.3:
     babel-types "^6.24.1"
     lodash "^4.17.0"
     react-docgen "^3.0.0-beta11"
+
+babel-plugin-styled-components@^1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/babel-plugin-styled-components/-/babel-plugin-styled-components-1.5.1.tgz#31dbeb696d1354d1585e60d66c7905f5e474afcd"
+  dependencies:
+    "@babel/helper-annotate-as-pure" "^7.0.0-beta.37"
+    babel-types "^6.26.0"
+    stylis "^3.0.0"
 
 babel-plugin-syntax-async-functions@^6.8.0:
   version "6.13.0"
@@ -7815,7 +7837,7 @@ stylis-rule-sheet@^0.0.10:
   version "0.0.10"
   resolved "https://registry.yarnpkg.com/stylis-rule-sheet/-/stylis-rule-sheet-0.0.10.tgz#44e64a2b076643f4b52e5ff71efc04d8c3c4a430"
 
-stylis@^3.5.0:
+stylis@^3.0.0, stylis@^3.5.0:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/stylis/-/stylis-3.5.0.tgz#016fa239663d77f868fef5b67cf201c4b7c701e1"
 

@@ -59,6 +59,7 @@
     "@storybook/react": "^3.2.16",
     "babel-cli": "^6.26.0",
     "babel-eslint": "^8.2.1",
+    "babel-plugin-styled-components": "^1.5.1",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-export-extensions": "^6.22.0",
