@@ -15,10 +15,8 @@ export default class Placeholder extends PureComponent<Props> {
 
     const style = {
       display,
-      // These width and height properties will already be adjusted
-      // to the correct box-sizing
-      // box-sizing: content-box => width includes padding
-      // box-sizing: border-box => width does not include padding
+      // These are the computed borderBox width and height properties
+      // at the time of a drag start
       width: borderBox.width,
       height: borderBox.height,
       marginTop: margin.top,
@@ -26,7 +24,7 @@ export default class Placeholder extends PureComponent<Props> {
       marginBottom: margin.bottom,
       marginRight: margin.right,
       pointerEvents: 'none',
-      // Because we are applying the borderBox sizing directly we want to use this box-sizing
+      // Because we are not applying padding or borders we can use any box sizing we like
       boxSizing: 'border-box',
       // Avoiding the collapsing or growing of this element when pushed by flex child siblings.
       // We have already taken a snapshot the current dimensions we do not want this element
