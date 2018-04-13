@@ -30,6 +30,7 @@ export default class Placeholder extends PureComponent<Props> {
       // Avoiding the collapsing or growing of this element when pushed by flex child siblings.
       // We have already taken a snapshot the current dimensions we do not want this element
       // to recalculate its dimensions
+      // It is okay for these properties to be applied on elements that are not flex children
       flexShrink: '0',
       flexGrow: '0',
     };
