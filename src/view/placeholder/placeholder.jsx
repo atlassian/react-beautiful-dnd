@@ -11,7 +11,7 @@ export default class Placeholder extends PureComponent<Props> {
     // We apply the margin separately to maintain margin collapsing
     // behavior of the original element
     const placeholder: PlaceholderType = this.props.placeholder;
-    const { paddingBox, margin, display, tagName } = placeholder;
+    const { borderBox, margin, display, tagName } = placeholder;
 
     const style = {
       display,
@@ -19,13 +19,14 @@ export default class Placeholder extends PureComponent<Props> {
       // to the correct box-sizing
       // box-sizing: content-box => width includes padding
       // box-sizing: border-box => width does not include padding
-      width: paddingBox.width,
-      height: paddingBox.height,
+      width: borderBox.width,
+      height: borderBox.height,
       marginTop: margin.top,
       marginLeft: margin.left,
       marginBottom: margin.bottom,
       marginRight: margin.right,
       pointerEvents: 'none',
+      // Because we are applying the borderBox sizing directly we want to use this box-sizing
       boxSizing: 'border-box',
       // Avoiding the collapsing or growing of this element when pushed by flex child siblings.
       // We have already taken a snapshot the current dimensions we do not want this element

@@ -36,7 +36,7 @@ export default ({
 }: Args): DragImpact => {
   const axis: Axis = home.axis;
   // The starting center position
-  const originalCenter: Position = draggable.page.paddingBox.center;
+  const originalCenter: Position = draggable.page.borderBox.center;
 
   // Where the element actually is now.
   // Need to take into account the change of scroll in the droppable
@@ -54,7 +54,7 @@ export default ({
         return false;
       }
 
-      const area: Area = child.page.paddingBox;
+      const area: Area = child.page.borderBox;
 
       if (isBeyondStartPosition) {
         // 1. item needs to start ahead of the moving item

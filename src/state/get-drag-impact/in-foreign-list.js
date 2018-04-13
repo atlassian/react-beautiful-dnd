@@ -42,7 +42,7 @@ export default ({
   const displaced: Displacement[] = insideDestination
     .filter((child: DraggableDimension): boolean => {
       // Items will be displaced forward if they sit ahead of the dragging item
-      const threshold: number = child.page.paddingBox[axis.end];
+      const threshold: number = child.page.borderBox[axis.end];
       return threshold > currentCenter[axis.line];
     })
     .map((dimension: DraggableDimension): Displacement => getDisplacement({
