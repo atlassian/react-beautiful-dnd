@@ -22,7 +22,7 @@ const asBigAsViewport: DroppableDimension = getDroppableDimension({
     id: 'same-as-viewport',
     type: 'TYPE',
   },
-  paddingBox: viewport,
+  borderBox: viewport,
 });
 
 const inViewport1: Spacing = {
@@ -51,7 +51,7 @@ const asBigAsInViewport1: DroppableDimension = getDroppableDimension({
     id: 'subset',
     type: 'TYPE',
   },
-  paddingBox: getArea(inViewport1),
+  borderBox: getArea(inViewport1),
 });
 
 describe('is totally visible', () => {
@@ -116,7 +116,7 @@ describe('is totally visible', () => {
           id: 'clipped',
           type: 'TYPE',
         },
-        paddingBox: getArea({
+        borderBox: getArea({
           top: viewport.top,
           // stretches out the bottom of the viewport
           bottom: viewport.bottom + 100,
@@ -124,7 +124,7 @@ describe('is totally visible', () => {
           right: viewport.right,
         }),
         closest: {
-          framePaddingBox: viewport,
+          frameBorderBox: viewport,
           scrollWidth: viewport.width,
           scrollHeight: viewport.bottom + 100,
           scroll: { x: 0, y: 0 },
@@ -185,7 +185,7 @@ describe('is totally visible', () => {
   });
 
   describe('droppable', () => {
-    const paddingBox: Area = getArea({
+    const borderBox: Area = getArea({
       top: 0,
       left: 0,
       right: 600,
@@ -203,11 +203,11 @@ describe('is totally visible', () => {
         id: 'clipped',
         type: 'TYPE',
       },
-      paddingBox,
+      borderBox,
       closest: {
-        framePaddingBox: frame,
-        scrollHeight: paddingBox.height,
-        scrollWidth: paddingBox.width,
+        frameBorderBox: frame,
+        scrollHeight: borderBox.height,
+        scrollWidth: borderBox.width,
         scroll: { x: 0, y: 0 },
         shouldClipSubject: true,
       },
@@ -294,13 +294,13 @@ describe('is totally visible', () => {
             id: 'clipped',
             type: 'TYPE',
           },
-          paddingBox: getArea({
+          borderBox: getArea({
             ...ourFrame,
             // stretches out past frame
             bottom: 600,
           }),
           closest: {
-            framePaddingBox: getArea(ourFrame),
+            frameBorderBox: getArea(ourFrame),
             scrollHeight: 600,
             scrollWidth: getArea(ourFrame).width,
             scroll: { x: 0, y: 0 },
@@ -381,14 +381,14 @@ describe('is totally visible', () => {
             id: 'droppable',
             type: 'TYPE',
           },
-          paddingBox: getArea({
+          borderBox: getArea({
             top: 0,
             left: 0,
             bottom: 100,
             right: 100,
           }),
           closest: {
-            framePaddingBox: getArea({
+            frameBorderBox: getArea({
               top: 0,
               left: 0,
               bottom: 100,
@@ -455,7 +455,7 @@ describe('is totally visible', () => {
           id: 'not-visible',
           type: 'TYPE',
         },
-        paddingBox: getArea(notInViewport),
+        borderBox: getArea(notInViewport),
       });
 
       expect(isTotallyVisible({

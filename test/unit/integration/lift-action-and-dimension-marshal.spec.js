@@ -151,8 +151,8 @@ describe('lifting and the dimension marshal', () => {
 
         // perform a drag - moving inHome1 from index 0 to index 1
         const initial: InitialDragPositions = {
-          selection: preset.inHome1.client.paddingBox.center,
-          center: preset.inHome1.client.paddingBox.center,
+          selection: preset.inHome1.client.borderBox.center,
+          center: preset.inHome1.client.borderBox.center,
         };
         lift(
           preset.inHome1.descriptor.id,
@@ -202,8 +202,8 @@ describe('lifting and the dimension marshal', () => {
 
         // before drop animation is finished we start another drag
         const forSecondDrag: InitialDragPositions = {
-          selection: preset.inHome3.client.paddingBox.center,
-          center: preset.inHome3.client.paddingBox.center,
+          selection: preset.inHome3.client.borderBox.center,
+          center: preset.inHome3.client.borderBox.center,
         };
         lift(
           preset.inHome3.descriptor.id,

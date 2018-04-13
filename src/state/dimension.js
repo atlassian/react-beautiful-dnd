@@ -172,17 +172,20 @@ export const getDroppableDimension = ({
   windowScroll = origin,
   isEnabled = true,
 }: GetDroppableArgs): DroppableDimension => {
+  const marginBox: Area = getArea(expandBySpacing(borderBox, margin));
+  const paddingBox: Area = getArea(shrinkBySpacing(borderBox, border));
+  const contentBox: Area = getArea(shrinkBySpacing(paddingBox, padding));
+
   const client: BoxModel = {
     borderBox,
-    // borderBox with margin
-    marginBox: getArea(expandBySpacing(borderBox, margin)),
-    // borderBox without border and without borders
-    contentBox: getArea(shrinkBySpacing(shrinkBySpacing(borderBox, padding), border)),
+    marginBox,
+    contentBox,
   };
+
   const page: BoxModel = {
-    marginBox: getArea(offsetByPosition(client.marginBox, windowScroll)),
-    borderBox: getArea(offsetByPosition(client.borderBox, windowScroll)),
-    contentBox: getArea(offsetByPosition(client.contentBox, windowScroll)),
+    marginBox: getArea(offsetByPosition(marginBox, windowScroll)),
+    borderBox: getArea(offsetByPosition(borderBox, windowScroll)),
+    contentBox: getArea(offsetByPosition(contentBox, windowScroll)),
   };
   const subject: Area = page.marginBox;
 

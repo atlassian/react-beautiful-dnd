@@ -51,7 +51,7 @@ export default ({
   // Moving back to original index
   // Super simple - just move it back to the original center with no impact
   if (targetIndex === originalIndex) {
-    const newCenter: Position = draggable.page.paddingBox.center;
+    const newCenter: Position = draggable.page.borderBox.center;
     const newImpact: DragImpact = {
       movement: {
         displaced: [],
@@ -83,9 +83,9 @@ export default ({
   const edge: Edge = isMovingPastOriginalIndex ? 'end' : 'start';
 
   const newCenter: Position = moveToEdge({
-    source: draggable.page.paddingBox,
+    source: draggable.page.borderBox,
     sourceEdge: edge,
-    destination: isMovingPastOriginalIndex ? target.page.paddingBox : target.page.marginBox,
+    destination: isMovingPastOriginalIndex ? target.page.borderBox : target.page.marginBox,
     destinationEdge: edge,
     destinationAxis: axis,
   });

@@ -254,8 +254,6 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       throw new Error('Cannot get dimension for unpublished droppable');
     }
 
-    // side effect - grabbing it for scroll listening so we know it is the same node
-    this.closestScrollable = getClosestScrollable(targetRef);
     const style: Object = window.getComputedStyle(targetRef);
 
     // keeping it simple and always using the margin of the droppable
@@ -281,6 +279,9 @@ export default class DroppableDimensionPublisher extends Component<Props> {
 
     // getBoundingClientRect always returns the borderBox
     const borderBox: Area = getArea(targetRef.getBoundingClientRect());
+
+    // side effect - grabbing it for scroll listening so we know it is the same node
+    this.closestScrollable = getClosestScrollable(targetRef);
 
     // The droppable's own bounds should be treated as the
     // container bounds in the following situations:

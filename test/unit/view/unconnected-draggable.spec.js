@@ -69,7 +69,7 @@ const droppable: DroppableDimension = getDroppableDimension({
     id: droppableId,
     type,
   },
-  paddingBox: getArea({
+  borderBox: getArea({
     top: 0,
     right: 100,
     bottom: 200,
@@ -83,7 +83,7 @@ const dimension: DraggableDimension = getDraggableDimension({
     droppableId,
     index: 0,
   },
-  paddingBox: getArea({
+  borderBox: getArea({
     top: 0,
     right: 100,
     bottom: 100,
@@ -835,8 +835,8 @@ describe('Draggable - unconnected', () => {
       const props: Object = child.props();
 
       expect(props.style).toEqual({
-        width: dimension.placeholder.paddingBox.width,
-        height: dimension.placeholder.paddingBox.height,
+        width: dimension.placeholder.borderBox.width,
+        height: dimension.placeholder.borderBox.height,
         marginTop: dimension.placeholder.margin.top,
         marginBottom: dimension.placeholder.margin.bottom,
         marginLeft: dimension.placeholder.margin.left,

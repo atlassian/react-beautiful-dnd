@@ -75,7 +75,7 @@ describe('get drag impact', () => {
             [disabled.descriptor.id]: disabled,
           };
           // choosing the center of inHome2 which should have an impact
-          const pageCenter: Position = inHome2.page.paddingBox.center;
+          const pageCenter: Position = inHome2.page.borderBox.center;
 
           const impact: DragImpact = getDragImpact({
             pageCenter,
@@ -92,7 +92,7 @@ describe('get drag impact', () => {
         // moving inHome1 no where
         describe('moving over original position', () => {
           it('should return no impact', () => {
-            const pageCenter: Position = inHome1.page.paddingBox.center;
+            const pageCenter: Position = inHome1.page.borderBox.center;
             const expected: DragImpact = {
               movement: {
                 displaced: [],
@@ -125,9 +125,9 @@ describe('get drag impact', () => {
             const pageCenter: Position = patch(
               axis.line,
               // up to the line but not over it
-              inHome2.page.paddingBox[axis.start],
+              inHome2.page.borderBox[axis.start],
               // no movement on cross axis
-              inHome1.page.paddingBox.center[axis.crossAxisLine],
+              inHome1.page.borderBox.center[axis.crossAxisLine],
             );
             const expected: DragImpact = {
               movement: {
@@ -159,9 +159,9 @@ describe('get drag impact', () => {
         describe('moving beyond start position', () => {
           const pageCenter: Position = patch(
             axis.line,
-            inHome4.page.paddingBox[axis.start] + 1,
+            inHome4.page.borderBox[axis.start] + 1,
             // no change
-            inHome2.page.paddingBox.center[axis.crossAxisLine],
+            inHome2.page.borderBox.center[axis.crossAxisLine],
           );
           const expected: DragImpact = {
             movement: {
@@ -206,9 +206,9 @@ describe('get drag impact', () => {
           it('should move into the correct position', () => {
             const pageCenter: Position = patch(
               axis.line,
-              inHome1.page.paddingBox[axis.end] - 1,
+              inHome1.page.borderBox[axis.end] - 1,
               // no change
-              inHome3.page.paddingBox.center[axis.crossAxisLine],
+              inHome3.page.borderBox.center[axis.crossAxisLine],
             );
 
             const expected: DragImpact = {
@@ -263,11 +263,11 @@ describe('get drag impact', () => {
               // the middle of the target edge
               const startOfInHome2: Position = patch(
                 axis.line,
-                inHome2.page.paddingBox[axis.start],
-                inHome2.page.paddingBox.center[axis.crossAxisLine],
+                inHome2.page.borderBox[axis.start],
+                inHome2.page.borderBox.center[axis.crossAxisLine],
               );
               const distanceNeeded: Position = add(
-                subtract(startOfInHome2, inHome1.page.paddingBox.center),
+                subtract(startOfInHome2, inHome1.page.borderBox.center),
                 // need to move over the edge
                 patch(axis.line, 1),
               );
@@ -279,7 +279,7 @@ describe('get drag impact', () => {
                 [home.descriptor.id]: scrolledHome,
               };
               // no changes in current page center from original
-              const pageCenter: Position = inHome1.page.paddingBox.center;
+              const pageCenter: Position = inHome1.page.borderBox.center;
               const expected: DragImpact = {
                 movement: {
                   amount: patch(axis.line, inHome1.page.marginBox[axis.size]),
@@ -318,11 +318,11 @@ describe('get drag impact', () => {
               // the middle of the target edge
               const endOfInHome2: Position = patch(
                 axis.line,
-                inHome2.page.paddingBox[axis.end],
-                inHome2.page.paddingBox.center[axis.crossAxisLine],
+                inHome2.page.borderBox[axis.end],
+                inHome2.page.borderBox.center[axis.crossAxisLine],
               );
               const distanceNeeded: Position = add(
-                subtract(endOfInHome2, inHome4.page.paddingBox.center),
+                subtract(endOfInHome2, inHome4.page.borderBox.center),
                 // need to move over the edge
                 patch(axis.line, -1),
               );
@@ -334,7 +334,7 @@ describe('get drag impact', () => {
                 [home.descriptor.id]: scrolledHome,
               };
               // no changes in current page center from original
-              const pageCenter: Position = inHome4.page.paddingBox.center;
+              const pageCenter: Position = inHome4.page.borderBox.center;
               const expected: DragImpact = {
                 movement: {
                   amount: patch(axis.line, inHome4.page.marginBox[axis.size]),
@@ -383,7 +383,7 @@ describe('get drag impact', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              paddingBox: getArea({
+              borderBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -391,7 +391,7 @@ describe('get drag impact', () => {
                 [axis.end]: 200,
               }),
               closest: {
-                framePaddingBox: getArea({
+                frameBorderBox: getArea({
                   [axis.crossAxisStart]: 0,
                   [axis.crossAxisEnd]: 100,
                   [axis.start]: 0,
@@ -410,7 +410,7 @@ describe('get drag impact', () => {
                 droppableId: droppable.descriptor.id,
                 index: 0,
               },
-              paddingBox: getArea({
+              borderBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -423,7 +423,7 @@ describe('get drag impact', () => {
                 droppableId: droppable.descriptor.id,
                 index: 1,
               },
-              paddingBox: getArea({
+              borderBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // inside the frame, but not in the visible area
@@ -437,7 +437,7 @@ describe('get drag impact', () => {
                 droppableId: droppable.descriptor.id,
                 index: 2,
               },
-              paddingBox: getArea({
+              borderBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // inside the frame, but not in the visible area
@@ -501,7 +501,7 @@ describe('get drag impact', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              paddingBox: getArea({
+              borderBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -514,7 +514,7 @@ describe('get drag impact', () => {
                 droppableId: droppable.descriptor.id,
                 index: 0,
               },
-              paddingBox: getArea({
+              borderBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -527,7 +527,7 @@ describe('get drag impact', () => {
                 droppableId: droppable.descriptor.id,
                 index: 1,
               },
-              paddingBox: getArea({
+              borderBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // inside the droppable, but not in the visible area
@@ -541,7 +541,7 @@ describe('get drag impact', () => {
                 droppableId: droppable.descriptor.id,
                 index: 2,
               },
-              paddingBox: getArea({
+              borderBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // inside the droppable, but not in the visible area
@@ -608,7 +608,7 @@ describe('get drag impact', () => {
             [foreign.descriptor.id]: disabled,
           };
           // choosing the center of inForeign1 which should have an impact
-          const pageCenter: Position = inForeign1.page.paddingBox.center;
+          const pageCenter: Position = inForeign1.page.borderBox.center;
 
           const impact: DragImpact = getDragImpact({
             pageCenter,
@@ -628,8 +628,8 @@ describe('get drag impact', () => {
             const pageCenter: Position = patch(
               axis.line,
               // just before the end of the dimension which is the cut off
-              inForeign1.page.paddingBox[axis.end] - 1,
-              inForeign1.page.paddingBox.center[axis.crossAxisLine],
+              inForeign1.page.borderBox[axis.end] - 1,
+              inForeign1.page.borderBox.center[axis.crossAxisLine],
             );
             const expected: DragImpact = {
               movement: {
@@ -686,8 +686,8 @@ describe('get drag impact', () => {
           it('should move everything after inHome2 forward', () => {
             const pageCenter: Position = patch(
               axis.line,
-              inForeign2.page.paddingBox[axis.end] - 1,
-              inForeign2.page.paddingBox.center[axis.crossAxisLine],
+              inForeign2.page.borderBox[axis.end] - 1,
+              inForeign2.page.borderBox.center[axis.crossAxisLine],
             );
             const expected: DragImpact = {
               movement: {
@@ -739,8 +739,8 @@ describe('get drag impact', () => {
           it('should not displace anything', () => {
             const pageCenter: Position = patch(
               axis.line,
-              inForeign4.page.paddingBox[axis.end],
-              inForeign4.page.paddingBox.center[axis.crossAxisLine],
+              inForeign4.page.borderBox[axis.end],
+              inForeign4.page.borderBox.center[axis.crossAxisLine],
             );
             const expected: DragImpact = {
               movement: {
@@ -774,7 +774,7 @@ describe('get drag impact', () => {
         describe('moving to an empty droppable', () => {
           it('should not displace anything an move into the first position', () => {
             // over the center of the empty droppable
-            const pageCenter: Position = emptyForeign.page.paddingBox.center;
+            const pageCenter: Position = emptyForeign.page.borderBox.center;
             const expected: DragImpact = {
               movement: {
                 amount: patch(axis.line, inHome1.page.marginBox[axis.size]),
@@ -806,8 +806,8 @@ describe('get drag impact', () => {
         describe('home droppable is updated during a drag', () => {
           const pageCenter: Position = patch(
             axis.line,
-            inForeign2.page.paddingBox[axis.end] - 1,
-            inForeign2.page.paddingBox.center[axis.crossAxisLine],
+            inForeign2.page.borderBox[axis.end] - 1,
+            inForeign2.page.borderBox.center[axis.crossAxisLine],
           );
 
           it('should have no impact impact the destination (actual)', () => {
@@ -911,8 +911,8 @@ describe('get drag impact', () => {
 
           const pageCenter: Position = patch(
             axis.line,
-            inForeign2.page.paddingBox[axis.end] - 1,
-            inForeign2.page.paddingBox.center[axis.crossAxisLine],
+            inForeign2.page.borderBox[axis.end] - 1,
+            inForeign2.page.borderBox.center[axis.crossAxisLine],
           );
 
           it('should impact the destination (actual)', () => {
@@ -1011,7 +1011,7 @@ describe('get drag impact', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              paddingBox: getArea({
+              borderBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -1024,7 +1024,7 @@ describe('get drag impact', () => {
                 droppableId: source.descriptor.id,
                 index: 0,
               },
-              paddingBox: getArea({
+              borderBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -1041,7 +1041,7 @@ describe('get drag impact', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              paddingBox: getArea({
+              borderBox: getArea({
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 [axis.start]: 0,
@@ -1049,7 +1049,7 @@ describe('get drag impact', () => {
                 [axis.end]: 200,
               }),
               closest: {
-                framePaddingBox: getArea({
+                frameBorderBox: getArea({
                   [axis.crossAxisStart]: foreignCrossAxisStart,
                   [axis.crossAxisEnd]: foreignCrossAxisEnd,
                   [axis.start]: 0,
@@ -1068,7 +1068,7 @@ describe('get drag impact', () => {
                 droppableId: destination.descriptor.id,
                 index: 0,
               },
-              paddingBox: getArea({
+              borderBox: getArea({
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 [axis.start]: 0,
@@ -1081,7 +1081,7 @@ describe('get drag impact', () => {
                 droppableId: destination.descriptor.id,
                 index: 1,
               },
-              paddingBox: getArea({
+              borderBox: getArea({
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 // inside the droppable, but not in the visible area
@@ -1150,7 +1150,7 @@ describe('get drag impact', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              paddingBox: getArea({
+              borderBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -1163,7 +1163,7 @@ describe('get drag impact', () => {
                 droppableId: source.descriptor.id,
                 index: 0,
               },
-              paddingBox: getArea({
+              borderBox: getArea({
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
@@ -1178,7 +1178,7 @@ describe('get drag impact', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              paddingBox: getArea({
+              borderBox: getArea({
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 [axis.start]: 0,
@@ -1192,7 +1192,7 @@ describe('get drag impact', () => {
                 droppableId: destination.descriptor.id,
                 index: 0,
               },
-              paddingBox: getArea({
+              borderBox: getArea({
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 [axis.start]: 0,
@@ -1205,7 +1205,7 @@ describe('get drag impact', () => {
                 droppableId: destination.descriptor.id,
                 index: 1,
               },
-              paddingBox: getArea({
+              borderBox: getArea({
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 // inside the droppable, but not in the visible area
