@@ -842,6 +842,8 @@ describe('Draggable - unconnected', () => {
         marginLeft: dimension.placeholder.margin.left,
         marginRight: dimension.placeholder.margin.right,
         display: dimension.placeholder.display,
+        flexShrink: '0',
+        flexGrow: '0',
         boxSizing: 'border-box',
         pointerEvents: 'none',
       });
