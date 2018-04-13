@@ -3,19 +3,14 @@ import React from 'react';
 import styled from 'styled-components';
 import { colors } from '@atlaskit/theme';
 import { Draggable, Droppable } from '../../../../../src';
-import Item from './item';
+import Quote from './quote';
 import { grid } from '../../../layouts/constants';
 import type { DroppableProvided, DraggableProvided, DroppableStateSnapshot } from '../../../../../src';
-import type {
-  Entities,
-  ColumnId,
-  ItemId,
-  Item as ItemType,
-  Column as ColumnType,
-} from './types';
+import type { Column as ColumnType } from './board-types';
+import type { Quote as QuoteType } from '../../types';
 
 type InnerListProps = {|
-  items: ItemType[],
+  quotes: QuoteType[],
 |}
 
 // A performance optimisation to avoid rendering all the children
@@ -23,16 +18,16 @@ type InnerListProps = {|
 class InnerList extends React.Component<InnerListProps> {
   shouldComponentUpdate(nextProps: InnerListProps) {
     // items have not changed
-    // TODO: check that this is not broken by the map function above
-    if (this.props.items === nextProps.items) {
+    if (this.props.quotes === nextProps.quotes) {
       return false;
     }
     return true;
   }
 
   render() {
-    return this.props.items.map((item: ItemType, index: number) => (
-      <Item key={item.id} item={item} index={index} />
+    return null;
+    return this.props.quotes.map((quote: QuoteType, index: number) => (
+      <Quote key={quote.id} quote={quote} index={index} />
     ));
   }
 }
@@ -69,7 +64,7 @@ const List = styled.div`
 
 type Props = {|
   column: ColumnType,
-  items: ItemType[],
+  quotes: QuoteType[],
   index: number,
 |}
 
@@ -77,7 +72,7 @@ export default class Column extends React.Component<Props> {
   render() {
     const column: ColumnType = this.props.column;
     const index: number = this.props.index;
-    const items: ItemType[] = this.props.items;
+    const quotes: QuoteType[] = this.props.quotes;
 
     return (
       <Draggable draggableId={column.id} index={index}>
@@ -88,16 +83,16 @@ export default class Column extends React.Component<Props> {
           >
             {/* Making the column draggable from the column */}
             <Header {...draggableProvided.dragHandleProps}>
-              {column.title}
+              {column.author.name}
             </Header>
-            <Droppable droppableId={column.id} type="item">
+            <Droppable droppableId={column.id} type="quote">
               {(droppableProvided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
                 <List
                   innerRef={droppableProvided.innerRef}
                   {...droppableProvided.droppableProps}
                   isDraggingOver={snapshot.isDraggingOver}
                 >
-                  <InnerList items={items} />
+                  <InnerList quotes={quotes} />
                   {droppableProvided.placeholder}
                 </List>
               )}
