@@ -18,15 +18,15 @@ export default class Placeholder extends PureComponent<Props> {
       // borderBox = content + padding + border
       width: borderBox.width,
       height: borderBox.height,
+      // We want to be sure that if any border or padding is applied to the element
+      // then it should not change the width and height of it
+      boxSizing: 'border-box',
       // We apply the margin separately to maintain margin collapsing
       // behavior of the original element
       marginTop: margin.top,
       marginLeft: margin.left,
       marginBottom: margin.bottom,
       marginRight: margin.right,
-      // Because we are not applying padding or borders we can use any box sizing we like
-      // Using border-box to be super explicit
-      boxSizing: 'border-box',
       // Avoiding the collapsing or growing of this element when pushed by flex child siblings.
       // We have already taken a snapshot the current dimensions we do not want this element
       // to recalculate its dimensions
