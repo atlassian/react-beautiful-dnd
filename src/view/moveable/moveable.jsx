@@ -13,9 +13,6 @@ export default class Movable extends Component<Props> {
       return;
     }
 
-    // This needs to be async otherwise Motion will not re-execute if
-    // offset or start change
-
     // Could check to see if another move has started
     // and abort the previous onMoveEnd
     setTimeout(() => onMoveEnd());
