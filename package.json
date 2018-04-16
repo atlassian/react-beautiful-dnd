@@ -48,11 +48,11 @@
     "memoize-one": "^3.1.1",
     "prop-types": "^15.6.0",
     "raf-schd": "^2.1.1",
-    "react-motion": "^0.5.2",
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
-    "reselect": "^3.0.1"
+    "reselect": "^3.0.1",
+    "wobble": "^1.5.0"
   },
   "devDependencies": {
     "@atlaskit/css-reset": "^2.0.0",
