@@ -5,7 +5,7 @@ import { colors } from '@atlaskit/theme';
 import { Draggable } from '../../../../../src';
 import { grid } from '../../../layouts/constants';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../../../src';
-import type { Quote as QuoteType } from '../../types';
+import type { Quote as QuoteType, Author as AuthorType } from '../../types';
 
 type Props = {|
   quote: QuoteType,
@@ -14,7 +14,7 @@ type Props = {|
 
 const Container = styled.div`
   background-color: ${props => (
-    props.isDragging ? props.author.colors.whileDraggingBackground : colors.N0
+    props.isDragging ? props.author.colors.soft : colors.N0
   )};
   box-shadow: ${props => (
     props.isDragging ? `1px 1px 1px ${colors.N50}` : 'none'
@@ -22,7 +22,7 @@ const Container = styled.div`
   border-width: 1px;
   border-style: solid;
   border-color: ${props => (
-    props.isDragging ? props.author.colors.border : 'transparent'
+    props.isDragging ? props.author.colors.medium : 'transparent'
   )};
   margin-bottom: ${grid}px;
   padding: ${grid}px;
@@ -31,7 +31,7 @@ const Container = styled.div`
   display: flex;
 
   &:focus {
-    outline: 2px solid ${props => props.author.colors.border};
+    outline: 2px solid ${props => props.author.colors.medium};
     box-shadow: none;
   }
 `;
@@ -40,7 +40,6 @@ const Avatar = styled.img`
   border-radius: 50%;
   width: 40px;
   height: 40px;
-  xborder: 1px solid ${props => props.author.colors.border};
   margin-right: ${grid}px;
   flex-shrink: 0;
   flex-grow: 0;
@@ -64,20 +63,22 @@ const BlockQuote = styled.div`
 
 const Attribution = styled.small`
   margin: 0;
-  xmargin-left: ${grid}px;
   margin-top: ${grid}px;
   text-align: right;
   flex-grow: 1;
-  background-color: ${props => props.author.colors.whileDraggingBackground};
+  background-color: ${(props) => {
+    const author: AuthorType = props.author;
+    return author.colors.soft;
+  }};
   border-radius: 2px;
   padding: ${grid / 2}px ${grid}px;
 `;
 
 export default class Item extends React.Component<Props> {
   render() {
-    const quote: Quote = this.props.quote;
+    const quote: QuoteType = this.props.quote;
     const index: number = this.props.index;
-    const author: Author = quote.author;
+    const author: AuthorType = quote.author;
     return (
       <Draggable draggableId={quote.id} index={index}>
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
@@ -95,7 +96,12 @@ export default class Item extends React.Component<Props> {
             />
             <Content>
               <BlockQuote>{quote.content}</BlockQuote>
-              <Attribution author={author}>-{' '}{author.name}</Attribution>
+              <Attribution
+                author={author}
+                isDragging={snapshot.isDragging}
+              >
+                -{' '}{author.name}
+              </Attribution>
             </Content>
           </Container>
         )}

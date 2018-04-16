@@ -6,8 +6,9 @@ export type Author = {|
   name: string,
   avatarUrl: string,
   colors: {|
-    border: string,
-    whileDraggingBackground: string,
+    soft: string,
+    medium: string,
+    // strong: string,
   |}
 |}
 
