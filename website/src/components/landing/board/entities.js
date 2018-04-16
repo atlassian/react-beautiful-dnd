@@ -7,15 +7,21 @@ import type {
   Entities,
 } from './board-types';
 
-const columns: Column[] = authors.map((author: Author): Column => {
-  const quoteIds: Id[] = getByAuthor(author, quotes).map((quote: Quote): Id => quote.id);
-  const column: Column = {
-    id: `column-${author.id}`,
-    author,
-    quoteIds,
-  };
-  return column;
-});
+const half: number = quotes.length / 2;
+
+const first: Column = {
+  id: 'column-1',
+  title: 'Quotes that I ❤️',
+  quoteIds: quotes.slice(0, half).map((quote: Quote): Id => quote.id),
+};
+
+const second: Column = {
+  id: 'column-2',
+  title: 'Other quotes',
+  quoteIds: quotes.slice(half, quotes.length - 1).map((quote: Quote): Id => quote.id),
+};
+
+const columns: Column[] = [first, second];
 
 const columnMap: ColumnMap = columns.reduce((previous: ColumnMap, current: Column) => {
   previous[current.id] = current;

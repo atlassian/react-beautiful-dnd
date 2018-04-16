@@ -5,7 +5,12 @@ import { colors } from '@atlaskit/theme';
 import { Draggable, Droppable } from '../../../../../src';
 import Quote from './quote';
 import { grid } from '../../../layouts/constants';
-import type { DroppableProvided, DraggableProvided, DroppableStateSnapshot } from '../../../../../src';
+import type {
+  DroppableProvided,
+  DraggableProvided,
+  DroppableStateSnapshot,
+  DraggableStateSnapshot
+} from '../../../../../src';
 import type { Column as ColumnType } from './board-types';
 import type { Quote as QuoteType } from '../../types';
 
@@ -31,8 +36,10 @@ class InnerList extends React.Component<InnerListProps> {
   }
 }
 
+const interactive: string = colors.G50;
+
 const Container = styled.div`
-  background-color: ${colors.N30};
+  background-color: ${props => (props.isDragging ? interactive : colors.N30)};
   margin: ${grid}px;
   color: ${colors.N800};
   border-radius: 2px;
@@ -48,7 +55,7 @@ const Header = styled.div`
   border-top-right-radius: 2px;
 
   &:hover {
-    background-color: ${colors.G50};
+    background-color: ${interactive};
   }
 `;
 
@@ -58,7 +65,7 @@ const List = styled.div`
   transition: background-color 0.2s ease;
 
   ${props => (props.isDraggingOver ? `
-    background-color: ${colors.B50};
+    background-color: ${colors.R50};
   ` : '')}
 `;
 
@@ -76,21 +83,22 @@ export default class Column extends React.Component<Props> {
 
     return (
       <Draggable draggableId={column.id} index={index}>
-        {(draggableProvided: DraggableProvided) => (
+        {(draggableProvided: DraggableProvided, draggableSnapshot: DraggableStateSnapshot) => (
           <Container
             innerRef={draggableProvided.innerRef}
             {...draggableProvided.draggableProps}
+            isDragging={draggableSnapshot.isDragging}
           >
             {/* Making the column draggable from the column */}
             <Header {...draggableProvided.dragHandleProps}>
-              {column.author.name}
+              {column.title}
             </Header>
             <Droppable droppableId={column.id} type="quote">
-              {(droppableProvided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
+              {(droppableProvided: DroppableProvided, droppableSnapshot: DroppableStateSnapshot) => (
                 <List
                   innerRef={droppableProvided.innerRef}
                   {...droppableProvided.droppableProps}
-                  isDraggingOver={snapshot.isDraggingOver}
+                  isDraggingOver={droppableSnapshot.isDraggingOver}
                 >
                   <InnerList quotes={quotes} />
                   {droppableProvided.placeholder}

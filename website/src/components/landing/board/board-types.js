@@ -1,9 +1,9 @@
 // @flow
-import type { Id, Author, QuoteMap } from '../../types';
+import type { Id, QuoteMap } from '../../types';
 
 export type Column = {|
   id: Id,
-  author: Author,
+  title: string,
   quoteIds: Id[],
 |}
 
