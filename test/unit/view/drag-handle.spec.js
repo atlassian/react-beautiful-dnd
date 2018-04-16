@@ -2828,6 +2828,31 @@ describe('drag handle', () => {
             window.addEventListener.mockRestore();
             window.removeEventListener.mockRestore();
           });
+
+          it('should bind window scroll listeners as non-capture to avoid picking up droppable scroll events', () => {
+            jest.spyOn(window, 'addEventListener');
+            jest.spyOn(window, 'removeEventListener');
+
+            control.preLift();
+            control.lift();
+
+            const binding = window.addEventListener.mock.calls.find(call => call[0] === 'scroll');
+
+            if(!binding) {
+              throw new Error('Count not find scroll binding');
+            }
+
+            // 0: function name
+            // 1: function
+            // 2: options
+            const options: Object = binding[2];
+            expect(options.capture).toBe(false);
+
+            // cleanup
+            window.addEventListener.mockRestore();
+            window.removeEventListener.mockRestore();
+            control.drop();
+          });
         });
 
         describe('interactive element interactions', () => {
