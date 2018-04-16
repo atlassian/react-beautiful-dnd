@@ -5,7 +5,8 @@ node_js:
 script:
 - yarn run validate
 - yarn run test
-- yarn run check-bundle-sizes
+# Disabling bundle size check until we can get fuzzy thresholds
+# - yarn run check-bundle-sizes
 # Currently disabled travis deploys
 # deploy:
 #   provider: npm

@@ -74,7 +74,7 @@ export default ({
   })();
 
   const newPageCenter: Position = moveToEdge({
-    source: draggable.page.paddingBox,
+    source: draggable.page.borderBox,
     sourceEdge,
     destination: movingRelativeTo.page.marginBox,
     destinationEdge,

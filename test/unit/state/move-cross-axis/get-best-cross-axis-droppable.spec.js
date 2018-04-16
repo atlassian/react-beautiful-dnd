@@ -26,7 +26,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           left: 20,
           right: 30,
@@ -39,7 +39,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           left: 30,
           right: 40,
@@ -69,7 +69,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           left: 20,
           right: 30,
@@ -82,7 +82,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           left: 30,
           right: 40,
@@ -113,7 +113,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           left: 20,
           right: 30,
@@ -126,7 +126,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           left: 0,
           right: 10,
@@ -165,7 +165,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           left: 20,
           right: 30,
@@ -179,7 +179,7 @@ describe('get best cross axis droppable', () => {
         },
         isEnabled: false,
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           left: 30,
           right: 40,
@@ -209,7 +209,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           left: 20,
           right: 30,
@@ -222,7 +222,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           left: 30,
           right: 40,
           top: viewport.subject.bottom + 1,
@@ -252,7 +252,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           left: 20,
           right: 30,
@@ -265,7 +265,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           // top is below where the source ended
           top: 11,
           left: 30,
@@ -298,7 +298,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           left: 0,
           right: 20,
@@ -311,7 +311,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 20,
           left: 20,
           right: 40,
@@ -319,7 +319,7 @@ describe('get best cross axis droppable', () => {
           bottom: 80,
         }),
         closest: {
-          framePaddingBox: getArea({
+          frameBorderBox: getArea({
             // not the same top value as source
             top: 20,
             // shares the left edge with the source
@@ -339,7 +339,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           // shares the bottom edge with sibling1
           top: 40,
           // shares the left edge with the source
@@ -455,7 +455,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           left: 0,
           right: 20,
@@ -468,7 +468,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 20,
           left: 0,
           right: 20,
@@ -498,7 +498,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           left: 0,
           right: 20,
@@ -511,7 +511,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 10,
           left: 0,
           right: 20,
@@ -542,7 +542,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           left: 0,
           right: 20,
@@ -555,7 +555,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 10,
           left: 0,
           right: 20,
@@ -595,7 +595,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           left: 20,
           right: 30,
@@ -609,7 +609,7 @@ describe('get best cross axis droppable', () => {
         },
         isEnabled: false,
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           left: 30,
           right: 40,
@@ -639,7 +639,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           [axis.start]: 0,
           [axis.end]: 100,
           [axis.crossAxisStart]: 0,
@@ -653,7 +653,7 @@ describe('get best cross axis droppable', () => {
         },
         direction: axis.direction,
         // totally hidden by frame
-        paddingBox: getArea({
+        borderBox: getArea({
           [axis.start]: 0,
           [axis.end]: 100,
           // would normally be a good candidate
@@ -661,7 +661,7 @@ describe('get best cross axis droppable', () => {
           [axis.crossAxisEnd]: 300,
         }),
         closest: {
-          framePaddingBox: getArea({
+          frameBorderBox: getArea({
             [axis.start]: 0,
             [axis.end]: 100,
             // frame hides subject
@@ -697,7 +697,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           bottom: 10,
           left: 20,
@@ -710,7 +710,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           bottom: 10,
           left: viewport.subject.right + 1,
@@ -740,7 +740,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           left: 0,
           right: 20,
@@ -753,7 +753,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           // comes after the source
           top: 10,
           // but its left value is > the rigt of the source
@@ -787,7 +787,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           left: 0,
           right: 100,
@@ -800,7 +800,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           // shares an edge with the source
           top: 10,
           // shares the left edge with the source
@@ -815,7 +815,7 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        paddingBox: getArea({
+        borderBox: getArea({
           // shares an edge with the source
           top: 10,
           // shares the left edge with the source

@@ -212,7 +212,7 @@ const withPlaceholder = (
 
   const spaceForPlaceholder: Position = patch(
     droppable.axis.line,
-    draggable.placeholder.paddingBox[droppable.axis.size]
+    draggable.placeholder.borderBox[droppable.axis.size]
   );
 
   const newMax: Position = add(max, spaceForPlaceholder);

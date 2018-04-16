@@ -27,7 +27,7 @@ describe('move cross axis', () => {
         id: 'custom',
         type: 'TYPE',
       },
-      paddingBox: getArea({
+      borderBox: getArea({
         left: preset.home.client.marginBox.left + 1,
         right: preset.home.client.marginBox.left + 10,
         top: 0,
@@ -40,7 +40,7 @@ describe('move cross axis', () => {
         droppableId: custom.descriptor.id,
         index: 0,
       },
-      paddingBox: getArea({
+      borderBox: getArea({
         left: preset.home.client.marginBox.left + 1,
         right: preset.home.client.marginBox.left + 10,
         // outside of the viewport

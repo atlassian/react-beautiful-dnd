@@ -75,7 +75,7 @@ export type Axis = VerticalAxis | HorizontalAxis
 export type Placeholder = {|
   // We apply the margin separately to maintain margin collapsing
   // behavior of the original element
-  paddingBox: Area,
+  borderBox: Area,
   margin: Spacing,
   tagName: string,
   display: string,
@@ -88,12 +88,12 @@ export type DraggableDimension = {|
   // relative to the viewport when the drag started
   client: {|
     marginBox: Area,
-    paddingBox: Area,
+    borderBox: Area,
   |},
   // relative to the whole page
   page: {|
     marginBox: Area,
-    paddingBox: Area,
+    borderBox: Area,
   |},
 |}
 
@@ -129,33 +129,62 @@ export type DroppableDimensionViewport = {|
   clipped: ?Area,
 |}
 
-// Maps to the CSS box model
-// https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model/Introduction_to_the_CSS_box_model
+/*
+# The CSS box model
+> https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model/Introduction_to_the_CSS_box_model
+
+------------------------------------
+|              MARGIN              |  (marginBox)
+|  ------------------------------  |
+|  |           BORDER           |  |  (borderBox)
+|  |  ------------------------  |  |
+|  |  |       PADDING        |  |  |  (paddingBox) - not used by anything really
+|  |  |  ------------------  |  |  |
+|  |  |  |    CONTENT     |  |  |  |  (contentBox)
+|  |  |  |                |  |  |  |
+|  |  |  |                |  |  |  |
+|  |  |  |                |  |  |  |
+|  |  |  ------------------  |  |  |
+|  |  |                      |  |  |
+|  |  ------------------------  |  |
+|  |                            |  |
+|  ------------------------------  |
+|                                  |
+|----------------------------------|
+
+Example (https://codepen.io/alexreardon/pen/oqRBEq)
+- width: 100px;
+- padding: 10px;
+- border: 5px;
+
+## box-sizing: content-box;
+
+Any 'width' property is set on the contextBox and padding and border is adding on top
+
+So the borderBox width would be 130px (border: 5px * 2 + padding: 10px * 2 + content 100px)
+
+## box-sizing: border-box;
+
+Any 'width' property is set on the borderBox
+
+So the borderBox width would be 100px and the contentBox would be 70px
+100 - (border: 5px * 2 + padding: 10px * 2)
+
+## Element.getBoundingClientRect()
+
+This always returns the borderBox sizes, regardless of box-sizing.
+- for content-box with would be 130px
+- for border-box it would be 100px
+*/
+
 export type BoxModel = {|
-  // the element with margin added (outer)
+  // the borderBox with margin added (outer)
   marginBox: Area,
-  // the element inclusive of padding but without margin
-  paddingBox: Area,
-  // the element without margin or padding (inner)
+  // the element inclusive of padding and border
+  borderBox: Area,
+  // the element without margin or padding or border (inner)
   contentBox: Area,
 |}
-
-/*
-------------------------------
-|           MARGIN           |  (marginBox)
-|  ------------------------  |               => this is where the border of the element will be
-|  |       PADDING        |  |  (paddingBox)
-|  |  ------------------  |  |
-|  |  |    CONTENT     |  |  |  (contentBox)
-|  |  |                |  |  |
-|  |  |                |  |  |
-|  |  |                |  |  |
-|  |  ------------------  |  |
-|  |                      |  |
-|  ------------------------  |
-|                            |
-------------------------------
-*/
 
 export type DroppableDimension = {|
   descriptor: DroppableDescriptor,
