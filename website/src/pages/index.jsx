@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import Board from '../components/landing/board';
 import CallToAction from '../components/landing/call-to-action';
 import GithubStarButton from '../components/landing/github-star-button';
+import ScreenReaderWatcher from '../components/landing/screen-reader-watcher';
 import { grid } from '../layouts/constants';
 
 const Title = styled.h1`
@@ -31,6 +32,7 @@ const IndexPage = () => (
     <Tagline>Beautiful, accessible drag and drop for lists with React.js </Tagline>
     <GithubStarButton />
     <Board />
+    <ScreenReaderWatcher />
     <CallToAction />
   </Landing>
 );

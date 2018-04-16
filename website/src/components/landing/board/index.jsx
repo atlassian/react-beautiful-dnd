@@ -87,7 +87,6 @@ export default class Board extends React.Component<*, State> {
         ...entities.columns,
         [start.id]: withQuotes(start, reordered),
       };
-      console.log('amp', newColumnMap);
       const updated: Entities = {
         columnOrder: entities.columnOrder,
         quotes: entities.quotes,
@@ -121,7 +120,6 @@ export default class Board extends React.Component<*, State> {
 
   render() {
     const entities: Entities = this.state.entities;
-    console.log('entities', entities);
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
         <Droppable droppableId="board" type="column" direction="horizontal">
@@ -148,7 +146,6 @@ export default class Board extends React.Component<*, State> {
               {provided.placeholder}
             </Container>
           )}
-
         </Droppable>
       </DragDropContext>
     );
