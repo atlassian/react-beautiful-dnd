@@ -119,7 +119,7 @@ describe('Moveable', () => {
 
   it('should return no movement if the item is at the origin', () => {
     const expected: Style = {
-      transform: null,
+      transform: 'translate(0px, 0px)',
     };
 
     moveTo({ x: 0, y: 0 });
