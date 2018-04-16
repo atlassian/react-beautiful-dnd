@@ -12,17 +12,40 @@ const Container = styled.div`
   color: ${colors.N0};
   padding: ${grid}px;
   width: 300px;
-  margin: 0 auto;
   min-height: 100px;
   border-radius: 3px;
   text-align: center;
+
+  /* pull out of the document flow*/
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin-top: ${grid}px;
+  margin-right: ${grid}px;
+
+  /* Super basic: just hiding on smaller screens */
+
+  @media screen and (max-width: 1200px) {
+    display: none;
+  }
 `;
 
 const Title = styled.h4`
   margin-bottom: ${grid}px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const TitleIcon = styled.span`
+  margin-left: ${grid}px;
 `;
 
 const Speach = styled.div`
+`;
+
+const defaultMessage: string = `
+  (This is what the screen reader will announce)
 `;
 
 type State = {|
@@ -103,9 +126,14 @@ export default class ScreenReaderWatcher extends React.Component<*, State> {
       <Container isReady={Boolean(this.observer)}>
         <Title>
           Screen reader announcement
-          <FeedbackIcon label="speaker icon" />
+          <TitleIcon>
+            <FeedbackIcon
+              label="speaker icon"
+              size="large"
+            />
+          </TitleIcon>
         </Title>
-        <Speach>{this.state.message}</Speach>
+        <Speach>{this.state.message || defaultMessage}</Speach>
       </Container>
     );
   }

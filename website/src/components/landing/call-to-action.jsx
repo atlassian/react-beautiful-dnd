@@ -9,7 +9,7 @@ import styled, { keyframes } from 'styled-components';
 import { grid } from '../../layouts/constants';
 
 const ActionBox = styled.div`
-  margin: 0 auto;
+  margin: ${grid * 2}px auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -18,7 +18,7 @@ const ActionBox = styled.div`
 
 const ActionLink = styled(Link)`
   border: 2px solid grey;
-  margin: ${grid}px;
+  margin: 0 ${grid}px;
   padding: ${grid * 2}px ${grid * 3}px;
   border-radius: 2px;
   border-radius: 2px;

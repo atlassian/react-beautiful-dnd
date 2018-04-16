@@ -23,7 +23,22 @@ const Landing = styled.div`
   background: #0079BF;
 
   color: white;
-  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+`;
+
+const Footer = styled.div`
+  flex-growth: 0;
+  flex-shrink: 0;
+`;
+
+const BoardContainer = styled.div`
+  flex-grow: 1;
+  flex-shrink: 1;
+  overflow: auto;
+  max-width: 600px;
+  margin: 0 auto;
 `;
 
 const IndexPage = () => (
@@ -31,9 +46,13 @@ const IndexPage = () => (
     <Title>react-beautiful-dnd</Title>
     <Tagline>Beautiful, accessible drag and drop for lists with React.js </Tagline>
     <GithubStarButton />
-    <Board />
-    <ScreenReaderWatcher />
-    <CallToAction />
+    <BoardContainer>
+      <Board />
+      <ScreenReaderWatcher />
+    </BoardContainer>
+    <Footer>
+      <CallToAction />
+    </Footer>
   </Landing>
 );
 
