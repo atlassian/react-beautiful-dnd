@@ -18,7 +18,7 @@ export default (): Store => createStore(
     applyMiddleware(
       thunk,
       // debugging logger
-      // require('./debug-middleware/log-middleware').default,
+      // require('./debug-middleware/log-middleware'),
       // debugging timer
       // require('./debug-middleware/timing-middleware').default,
       // average action timer

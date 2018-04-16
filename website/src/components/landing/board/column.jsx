@@ -9,7 +9,7 @@ import type {
   DroppableProvided,
   DraggableProvided,
   DroppableStateSnapshot,
-  DraggableStateSnapshot
+  DraggableStateSnapshot,
 } from '../../../../../src';
 import type { Column as ColumnType } from './board-types';
 import type { Quote as QuoteType } from '../../types';
@@ -62,6 +62,8 @@ const Header = styled.div`
 const List = styled.div`
   min-height: 100px;
   padding: ${grid}px;
+  /* The list will already been pushed down by the cards */
+  xpadding-bottom: 0;
   transition: background-color 0.2s ease;
 
   ${props => (props.isDraggingOver ? `
