@@ -3,9 +3,19 @@ import React, { Component } from 'react';
 import { Spring } from 'react-spring';
 import { physics } from '../animation';
 import type { Position } from '../../types';
-import type { Props, Style } from './moveable-types';
+import type { Props, DefaultProps, Style } from './moveable-types';
+
+const origin: Position = {
+  x: 0,
+  y: 0,
+};
 
 export default class Movable extends Component<Props> {
+  /* eslint-disable react/sort-comp */
+
+  static defaultProps: DefaultProps = {
+    destination: origin,
+  }
   /* eslint-enable */
   onRest = () => {
     const { onMoveEnd } = this.props;
@@ -21,9 +31,9 @@ export default class Movable extends Component<Props> {
 
   render() {
     const speed = this.props.speed;
-    const destination: Position = this.props.destination;
+    const destination = this.props.destination;
     const immediate = speed === 'INSTANT';
-    const from = { transform: `translate(0px, 0px)` };
+    const from = { transform: `translate(${origin.x}px, ${origin.y}px)` };
     const to = { transform: `translate(${destination.x}px, ${destination.y}px)` };
     const config = speed === 'FAST' ? physics.fast : physics.standard;
     return (

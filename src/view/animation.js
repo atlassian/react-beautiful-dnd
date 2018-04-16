@@ -4,6 +4,8 @@ export const physics = (() => {
     tension: 1000, // fast
     // tension: 100, // slow
     friction: 60,
+    restSpeedThreshold: 0.9,
+    restDisplacementThreshold: 0.9,
   };
 
   const standard = {
