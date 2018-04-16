@@ -277,12 +277,17 @@ export default ({
       eventName: 'resize',
       fn: cancel,
     },
+    // ## Passive: true
     // For scroll events we are okay with eventual consistency.
     // Passive scroll listeners is the default behavior for mobile
     // but we are being really clear here
+    // ## Capture: false
+    // Scroll events on elements do not bubble, but they go through the capture phase
+    // https://twitter.com/alexandereardon/status/985994224867819520
+    // Using capture: false here as we want to avoid intercepting droppable scroll requests
     {
       eventName: 'scroll',
-      options: { passive: true },
+      options: { passive: true, capture: false },
       fn: () => {
         // stop a pending drag
         if (state.pending) {
