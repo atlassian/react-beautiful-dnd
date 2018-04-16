@@ -2830,6 +2830,8 @@ describe('drag handle', () => {
           });
 
           it('should bind window scroll listeners as non-capture to avoid picking up droppable scroll events', () => {
+            // Scroll events on elements do not bubble, but they go through the capture phase
+            // https://twitter.com/alexandereardon/status/985994224867819520
             jest.spyOn(window, 'addEventListener');
             jest.spyOn(window, 'removeEventListener');
 
