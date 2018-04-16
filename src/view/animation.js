@@ -1,28 +1,24 @@
 // @flow
-import type { SpringHelperConfig } from 'react-motion/lib/Types';
+import type { SpringConfig } from 'wobble'
 
 export const physics = (() => {
   const base = {
-    stiffness: 1000, // fast
-    // stiffness: 100, // slow
+    stiffness: 1000,
     damping: 60,
-    // precision: 0.5,
-    precision: 0.99,
-  };
+  }
 
-  const standard: SpringHelperConfig = {
+  const standard: SpringConfig = {
     ...base,
-  };
+  }
 
-  const fast: SpringHelperConfig = {
+  const fast: SpringConfig = {
     ...base,
     stiffness: base.stiffness * 2,
-  };
+  }
 
-  return { standard, fast };
-})();
+  return { standard, fast }
+})()
 
 export const css = {
   outOfTheWay: 'transform 0.2s cubic-bezier(0.2, 0, 0, 1)',
-};
-
+}
