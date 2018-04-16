@@ -2840,7 +2840,7 @@ describe('drag handle', () => {
 
             const binding = window.addEventListener.mock.calls.find(call => call[0] === 'scroll');
 
-            if(!binding) {
+            if (!binding) {
               throw new Error('Count not find scroll binding');
             }
 
