@@ -1335,7 +1335,7 @@ describe('Draggable - unconnected', () => {
           expect(wrapper.find(Moveable).props().speed).toBe('INSTANT');
         });
 
-        it('should instantly move out of the way without css if animation is disabled', () => {
+        it('should instantly move out of the way without css if displacement animation is disabled', () => {
           const myMock = jest.fn();
           const CustomStubber = getStubber(myMock);
           const customProps: MapProps = {
@@ -1343,7 +1343,7 @@ describe('Draggable - unconnected', () => {
             shouldAnimateDisplacement: false,
           };
           const expected: NotDraggingStyle = {
-            transition: null,
+            transition: 'none',
             transform: `translate(${offset.x}px, ${offset.y}px)`,
           };
 
