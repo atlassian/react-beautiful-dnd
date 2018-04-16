@@ -31,7 +31,7 @@ export default [
   {
     input,
     output: {
-      file: 'dist/react-beautiful-dnd.umd.js',
+      file: 'dist/react-beautiful-dnd.js',
       format: 'umd',
       name: 'ReactBeautifulDnd',
       globals: { react: 'React' },

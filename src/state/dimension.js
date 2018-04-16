@@ -29,7 +29,7 @@ export const noSpacing: Spacing = {
 
 type GetDraggableArgs = {|
   descriptor: DraggableDescriptor,
-  paddingBox: Area,
+  borderBox: Area,
   tagName?: string,
   display?: string,
   margin?: Spacing,
@@ -38,31 +38,31 @@ type GetDraggableArgs = {|
 
 export const getDraggableDimension = ({
   descriptor,
-  paddingBox,
+  borderBox,
   tagName = 'div',
   display = 'block',
   margin = noSpacing,
   windowScroll = origin,
 }: GetDraggableArgs): DraggableDimension => {
-  const pagePaddingBox = offsetByPosition(paddingBox, windowScroll);
+  const pageBorderBox: Spacing = offsetByPosition(borderBox, windowScroll);
 
   const dimension: DraggableDimension = {
     descriptor,
     placeholder: {
+      borderBox,
       margin,
-      paddingBox,
       tagName,
       display,
     },
     // on the viewport
     client: {
-      paddingBox,
-      marginBox: getArea(expandBySpacing(paddingBox, margin)),
+      borderBox,
+      marginBox: getArea(expandBySpacing(borderBox, margin)),
     },
     // with scroll
     page: {
-      paddingBox: getArea(pagePaddingBox),
-      marginBox: getArea(expandBySpacing(pagePaddingBox, margin)),
+      borderBox: getArea(pageBorderBox),
+      marginBox: getArea(expandBySpacing(pageBorderBox, margin)),
     },
   };
 
@@ -142,10 +142,10 @@ export const scrollDroppable = (
 
 type GetDroppableArgs = {|
   descriptor: DroppableDescriptor,
-  paddingBox: Area,
+  borderBox: Area,
   // optionally provided - and can also be null
   closest?: ?{|
-    framePaddingBox: Area,
+    frameBorderBox: Area,
     scrollWidth: number,
     scrollHeight: number,
     scroll: Position,
@@ -153,7 +153,8 @@ type GetDroppableArgs = {|
   |},
   direction?: Direction,
   margin?: Spacing,
-  padding?: Spacing,
+  padding ?: Spacing,
+  border?: Spacing,
   windowScroll?: Position,
   // Whether or not the droppable is currently enabled (can change at during a drag)
   // defaults to true
@@ -162,23 +163,29 @@ type GetDroppableArgs = {|
 
 export const getDroppableDimension = ({
   descriptor,
-  paddingBox,
+  borderBox,
   closest,
   direction = 'vertical',
   margin = noSpacing,
   padding = noSpacing,
+  border = noSpacing,
   windowScroll = origin,
   isEnabled = true,
 }: GetDroppableArgs): DroppableDimension => {
+  const marginBox: Area = getArea(expandBySpacing(borderBox, margin));
+  const paddingBox: Area = getArea(shrinkBySpacing(borderBox, border));
+  const contentBox: Area = getArea(shrinkBySpacing(paddingBox, padding));
+
   const client: BoxModel = {
-    paddingBox,
-    marginBox: getArea(expandBySpacing(paddingBox, margin)),
-    contentBox: getArea(shrinkBySpacing(paddingBox, padding)),
+    borderBox,
+    marginBox,
+    contentBox,
   };
+
   const page: BoxModel = {
-    marginBox: getArea(offsetByPosition(client.marginBox, windowScroll)),
-    paddingBox: getArea(offsetByPosition(client.paddingBox, windowScroll)),
-    contentBox: getArea(offsetByPosition(client.contentBox, windowScroll)),
+    marginBox: getArea(offsetByPosition(marginBox, windowScroll)),
+    borderBox: getArea(offsetByPosition(borderBox, windowScroll)),
+    contentBox: getArea(offsetByPosition(contentBox, windowScroll)),
   };
   const subject: Area = page.marginBox;
 
@@ -187,7 +194,7 @@ export const getDroppableDimension = ({
       return null;
     }
 
-    const frame: Area = getArea(offsetByPosition(closest.framePaddingBox, windowScroll));
+    const frame: Area = getArea(offsetByPosition(closest.frameBorderBox, windowScroll));
 
     const maxScroll: Position = getMaxScroll({
       scrollHeight: closest.scrollHeight,

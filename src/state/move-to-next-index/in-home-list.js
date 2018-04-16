@@ -74,9 +74,9 @@ export default ({
   })();
 
   const newPageCenter: Position = moveToEdge({
-    source: draggable.page.paddingBox,
+    source: draggable.page.borderBox,
     sourceEdge: edge,
-    destination: destination.page.paddingBox,
+    destination: destination.page.borderBox,
     destinationEdge: edge,
     destinationAxis: droppable.axis,
   });

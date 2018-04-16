@@ -254,8 +254,6 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       throw new Error('Cannot get dimension for unpublished droppable');
     }
 
-    // side effect - grabbing it for scroll listening so we know it is the same node
-    this.closestScrollable = getClosestScrollable(targetRef);
     const style: Object = window.getComputedStyle(targetRef);
 
     // keeping it simple and always using the margin of the droppable
@@ -272,8 +270,18 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       bottom: parseInt(style.paddingBottom, 10),
       left: parseInt(style.paddingLeft, 10),
     };
+    const border: Spacing = {
+      top: parseInt(style.borderTopWidth, 10),
+      right: parseInt(style.borderRightWidth, 10),
+      bottom: parseInt(style.borderBottomWidth, 10),
+      left: parseInt(style.borderLeftWidth, 10),
+    };
 
-    const paddingBox: Area = getArea(targetRef.getBoundingClientRect());
+    // getBoundingClientRect always returns the borderBox
+    const borderBox: Area = getArea(targetRef.getBoundingClientRect());
+
+    // side effect - grabbing it for scroll listening so we know it is the same node
+    this.closestScrollable = getClosestScrollable(targetRef);
 
     // The droppable's own bounds should be treated as the
     // container bounds in the following situations:
@@ -288,13 +296,13 @@ export default class DroppableDimensionPublisher extends Component<Props> {
         return null;
       }
 
-      const framePaddingBox: Area = getArea(closestScrollable.getBoundingClientRect());
+      const frameBorderBox: Area = getArea(closestScrollable.getBoundingClientRect());
       const scroll: Position = this.getClosestScroll();
       const scrollWidth: number = closestScrollable.scrollWidth;
       const scrollHeight: number = closestScrollable.scrollHeight;
 
       return {
-        framePaddingBox,
+        frameBorderBox,
         scrollWidth,
         scrollHeight,
         scroll,
@@ -305,7 +313,8 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     const dimension: DroppableDimension = getDroppableDimension({
       descriptor,
       direction,
-      paddingBox,
+      borderBox,
+      border,
       closest,
       margin,
       padding,

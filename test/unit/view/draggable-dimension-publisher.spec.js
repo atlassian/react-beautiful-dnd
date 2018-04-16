@@ -189,7 +189,7 @@ describe('DraggableDimensionPublisher', () => {
           droppableId: preset.home.descriptor.id,
           index: 10,
         },
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           right: 100,
           bottom: 100,
@@ -198,12 +198,12 @@ describe('DraggableDimensionPublisher', () => {
       });
 
       jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => ({
-        top: expected.page.paddingBox.top,
-        bottom: expected.page.paddingBox.bottom,
-        left: expected.page.paddingBox.left,
-        right: expected.page.paddingBox.right,
-        height: expected.page.paddingBox.height,
-        width: expected.page.paddingBox.width,
+        top: expected.page.borderBox.top,
+        bottom: expected.page.borderBox.bottom,
+        left: expected.page.borderBox.left,
+        right: expected.page.borderBox.right,
+        height: expected.page.borderBox.height,
+        width: expected.page.borderBox.width,
       }));
       jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noSpacing);
       const marshal: DimensionMarshal = getMarshalStub();
@@ -237,7 +237,7 @@ describe('DraggableDimensionPublisher', () => {
           droppableId: preset.home.descriptor.id,
           index: 10,
         },
-        paddingBox: getArea({
+        borderBox: getArea({
           top: 0,
           right: 100,
           bottom: 100,
@@ -246,12 +246,12 @@ describe('DraggableDimensionPublisher', () => {
         margin,
       });
       jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => ({
-        top: expected.page.paddingBox.top,
-        bottom: expected.page.paddingBox.bottom,
-        left: expected.page.paddingBox.left,
-        right: expected.page.paddingBox.right,
-        height: expected.page.paddingBox.height,
-        width: expected.page.paddingBox.width,
+        top: expected.page.borderBox.top,
+        bottom: expected.page.borderBox.bottom,
+        left: expected.page.borderBox.left,
+        right: expected.page.borderBox.right,
+        height: expected.page.borderBox.height,
+        width: expected.page.borderBox.width,
       }));
       jest.spyOn(window, 'getComputedStyle').mockImplementation(() => ({
         marginTop: `${margin.top}`,
@@ -287,7 +287,7 @@ describe('DraggableDimensionPublisher', () => {
         x: 100,
         y: 200,
       };
-      const paddingBox: Area = getArea({
+      const borderBox: Area = getArea({
         top: 0,
         right: 100,
         bottom: 100,
@@ -299,10 +299,10 @@ describe('DraggableDimensionPublisher', () => {
           droppableId: preset.home.descriptor.id,
           index: 10,
         },
-        paddingBox,
+        borderBox,
         windowScroll,
       });
-      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => paddingBox);
+      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => borderBox);
       jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noSpacing);
       setWindowScroll(windowScroll);
 

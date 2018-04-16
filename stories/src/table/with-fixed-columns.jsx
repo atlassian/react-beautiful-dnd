@@ -1,6 +1,5 @@
 // @flow
 import React, { Component, Fragment } from 'react';
-import type { Node } from 'react';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import reorder from '../reorder';
@@ -94,6 +93,7 @@ type AppState = {|
   layout: 'fixed' | 'auto',
 |}
 export default class TableApp extends Component<AppProps, AppState> {
+  // eslint-disable-next-line react/sort-comp
   tableRef: ?HTMLElement
 
   state: AppState = {
@@ -148,6 +148,7 @@ export default class TableApp extends Component<AppProps, AppState> {
       }
     })();
 
+    // eslint-disable-next-line no-console
     console.log('was copied?', wasCopied);
 
     // clear selection

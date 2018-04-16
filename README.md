@@ -34,6 +34,7 @@ We have created some basic examples on `codesandbox` for you to play with direct
 
 We have created upgrade instructions in our release notes to help you upgrade to the latest version!
 
+- [Upgrading from `6.x` to `7.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v7.0.0)
 - [Upgrading from `5.x` to `6.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v6.0.0)
 - [Upgrading from `4.x` to `5.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v5.0.0)
 - [Upgrading from `3.x` to `4.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v4.0.0)
@@ -461,11 +462,11 @@ You can use the UMD to run `react-beautiful-dnd` directly in the browser.
 
 ```html
 <!-- peer dependency -->
-<script src="https://unpkg.com/react@15.6.0/dist/react.js"></script>
+<script src="https://unpkg.com/react@16.3.1/umd/react.development.js"></script>
 <!-- lib (change x.x.x for the version you would like) -->
 <script src="https://unpkg.com/react-beautiful-dnd@x.x.x/dist/react-beautiful-dnd.js"></script>
 <!-- needed to mount your react app -->
-<script src="https://unpkg.com/react-dom@15.6.0/dist/react-dom.js"></script>
+<script src="https://unpkg.com/react-dom@16.3.1/umd/react-dom.development.js"></script>
 
 <script>
   const React = window.React;
@@ -811,7 +812,7 @@ The `children` function is also provided with a small amount of state relating t
 
 - `Droppable`s can only be dropped on by `Draggable`s who share the same `type`. This is a simple way of allowing conditional dropping. If you do not provide a `type` for the `Droppable`, then it will only accept `Draggable`s which also have the default type. `Draggable`s and `Droppable`s both will have their `types` set to `'DEFAULT'` when none is provided. There is currently no way to set multiple `types`, or a `type` wildcard that will accept `Draggable`s of multiple any types. This could be added if there is a valid use case.
 - Using the `isDropDisabled` prop you can conditionally allow dropping. This allows you to do arbitrarily complex conditional transitions. This will only be considered if the `type` of the `Droppable` matches the `type` of the currently dragging `Draggable`.
-- You can disable dropping on a `Droppable` altogether by always setting `isDropDisabled` to false. You can do this to create a list that is never able to be dropped on, but contains `Draggable`s.
+- You can disable dropping on a `Droppable` altogether by always setting `isDropDisabled` to `true`. You can do this to create a list that is never able to be dropped on, but contains `Draggable`s.
 - Technically you do not need to use `type` and do all of your conditional drop logic with the `isDropDisabled` function. The `type` parameter is a convenient shortcut for a common use case.
 
 ### Scroll containers
@@ -893,7 +894,7 @@ Every `Draggable` has a *drag handle*. A *drag handle* is the element that the u
 ```js
 import { Draggable } from 'react-beautiful-dnd';
 
-<Draggable draggableId="draggable-1" type="PERSON" index={0}>
+<Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => (
     <div
       ref={provided.innerRef}
@@ -925,7 +926,6 @@ import { Draggable } from 'react-beautiful-dnd';
 ))}
 ```
 
-- `type`: An *optional* type (`TypeId(string)`) of the `Draggable`. This is used to control what `Droppable`s the `Draggable` is permitted to drop on. `Draggable`s can only drop on `Droppable`s that share the same `type`. If no `type` is provided, then it will be set to `'DEFAULT'`. Currently the `type` of a `Draggable` **must be** the same as its container `Droppable`. This restriction might be loosened in the future if there is a valid use case.
 - `isDragDisabled`: An *optional* flag to control whether or not the `Draggable` is permitted to drag. You can use this to implement your own conditional drag logic. It will default to `false`.
 - `disableInteractiveElementBlocking`: An *optional* flag to opt out of blocking a drag from interactive elements. For more information refer to the section *Interactive child elements within a `Draggable`*
 
