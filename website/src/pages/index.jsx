@@ -4,6 +4,7 @@ import { colors } from '@atlaskit/theme';
 import styled from 'styled-components';
 import Board from '../components/landing/board';
 import CallToAction from '../components/landing/call-to-action';
+import GithubStarButton from '../components/landing/github-star-button';
 import { grid } from '../layouts/constants';
 
 const Title = styled.h1`
@@ -17,7 +18,8 @@ const Tagline = styled.p`
 `;
 
 const Landing = styled.div`
-  background: rgb(0, 121, 191);
+  /* Trello blue 500 https://design.trello.com/style/color */
+  background: #0079BF;
 
   color: white;
   min-height: 100vh;
@@ -27,6 +29,7 @@ const IndexPage = () => (
   <Landing>
     <Title>react-beautiful-dnd</Title>
     <Tagline>Beautiful, accessible drag and drop for lists with React.js </Tagline>
+    <GithubStarButton />
     <Board />
     <CallToAction />
   </Landing>

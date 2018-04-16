@@ -25,7 +25,6 @@ class InnerList extends React.Component<InnerListProps> {
   }
 
   render() {
-    return null;
     return this.props.quotes.map((quote: QuoteType, index: number) => (
       <Quote key={quote.id} quote={quote} index={index} />
     ));
@@ -56,9 +55,10 @@ const Header = styled.div`
 const List = styled.div`
   min-height: 100px;
   padding: ${grid}px;
+  transition: background-color 1s ease;
 
   ${props => (props.isDraggingOver ? `
-    background-color: green;
+    background-color: ${colors.G100};
   ` : '')}
 `;
 

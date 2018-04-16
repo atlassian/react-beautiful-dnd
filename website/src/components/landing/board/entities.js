@@ -10,7 +10,7 @@ import type {
 const columns: Column[] = authors.map((author: Author): Column => {
   const quoteIds: Id[] = getByAuthor(author, quotes).map((quote: Quote): Id => quote.id);
   const column: Column = {
-    id: author.id,
+    id: `column-${author.id}`,
     author,
     quoteIds,
   };

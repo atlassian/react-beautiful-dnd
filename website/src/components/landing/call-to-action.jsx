@@ -6,7 +6,7 @@ import SendIcon from '@atlaskit/icon/glyph/send';
 import BookIcon from '@atlaskit/icon/glyph/book';
 import EditIcon from '@atlaskit/icon/glyph/edit';
 import styled, { keyframes } from 'styled-components';
-import { grid } from '../../../layouts/constants';
+import { grid } from '../../layouts/constants';
 
 const ActionBox = styled.div`
   margin: 0 auto;
