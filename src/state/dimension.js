@@ -134,10 +134,11 @@ export const scrollDroppable = (
     clipped,
   };
 
-  return ({
+  const result: DroppableDimension = {
     ...droppable,
     viewport,
-  }: any);
+  };
+  return result;
 };
 
 type GetDroppableArgs = {|

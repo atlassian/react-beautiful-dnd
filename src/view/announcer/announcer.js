@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'invariant';
 import type { Announce } from '../../types';
 import type { Announcer } from './announcer-types';
 
@@ -65,9 +66,7 @@ export default (): Announcer => {
     // hide the element visually
     Object.assign(el.style, visuallyHidden);
 
-    if (!document.body) {
-      throw new Error('Cannot find the head to append a style to');
-    }
+    invariant(document.body, 'Cannot find the head to append a style to');
 
     // add el tag to body
     document.body.appendChild(el);

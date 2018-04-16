@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'invariant';
 import memoizeOne from 'memoize-one';
 import isPositionInFrame from '../visibility/is-position-in-frame';
 import type {
@@ -36,9 +37,7 @@ const getScrollableDroppableOver = (
   const maybe: ?DroppableDimension =
     getScrollableDroppables(droppables)
       .find((droppable: DroppableDimension): boolean => {
-        if (!droppable.viewport.closestScrollable) {
-          throw new Error('Invalid result');
-        }
+        invariant(droppable.viewport.closestScrollable, 'Invalid result');
         return isPositionInFrame(droppable.viewport.closestScrollable.frame)(target);
       });
 

@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'invariant';
 import { closest } from '../position';
 import isWithin from '../is-within';
 import { getCorners } from '../spacing';
@@ -27,9 +28,8 @@ type GetBestDroppableArgs = {|
 const getSafeClipped = (droppable: DroppableDimension): Area => {
   const area: ?Area = droppable.viewport.clipped;
 
-  if (!area) {
-    throw new Error('cannot get clipped area from droppable');
-  }
+  invariant(area, 'Cannot get clipped area from droppable');
+
   return area;
 };
 

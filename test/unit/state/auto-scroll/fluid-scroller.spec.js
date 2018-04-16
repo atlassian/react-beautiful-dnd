@@ -288,12 +288,15 @@ describe('fluid auto scrolling', () => {
                 selection,
               );
 
+              if (!base.drag) {
+                throw new Error('Invalid state');
+              }
+
               const updated: State = {
                 ...base,
                 drag: {
                   ...base.drag,
                   initial: {
-                    // $ExpectError
                     ...base.drag.initial,
                     descriptor: tooBig.descriptor,
                   },
@@ -486,12 +489,15 @@ describe('fluid auto scrolling', () => {
                 selection,
               );
 
+              if (!base.drag) {
+                throw new Error('Invalid state');
+              }
+
               const updated: State = {
                 ...base,
                 drag: {
                   ...base.drag,
                   initial: {
-                    // $ExpectError
                     ...base.drag.initial,
                     descriptor: tooBig.descriptor,
                   },
@@ -1108,7 +1114,6 @@ describe('fluid auto scrolling', () => {
           });
 
           describe('over foreign list', () => {
-            // $ExpectError - using spread
             const foreign: DroppableDimension = {
               ...scrollable,
               descriptor: preset.foreign.descriptor,

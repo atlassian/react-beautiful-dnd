@@ -250,9 +250,7 @@ export default class Draggable extends Component<Props> {
           return this.getNotDraggingStyle(movementStyle, shouldAnimateDisplacement);
         }
 
-        if (!dimension) {
-          throw new Error('draggable dimension required for dragging');
-        }
+        invariant(dimension, 'draggable dimension required for dragging');
 
         // Need to position element in original visual position. To do this
         // we position it without

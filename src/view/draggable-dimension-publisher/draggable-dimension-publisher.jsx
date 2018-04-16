@@ -1,6 +1,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
+import invariant from 'invariant';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import getWindowScroll from '../window/get-window-scroll';
@@ -90,15 +91,11 @@ export default class DraggableDimensionPublisher extends Component<Props> {
   getDimension = (): DraggableDimension => {
     const targetRef: ?HTMLElement = this.props.getDraggableRef();
 
-    if (!targetRef) {
-      throw new Error('DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
-    }
+    invariant(targetRef, 'DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
 
     const descriptor: ?DraggableDescriptor = this.publishedDescriptor;
 
-    if (!descriptor) {
-      throw new Error('Cannot get dimension for unpublished draggable');
-    }
+    invariant(descriptor, 'Cannot get dimension for unpublished draggable');
 
     const tagName: string = targetRef.tagName.toLowerCase();
     const style = window.getComputedStyle(targetRef);

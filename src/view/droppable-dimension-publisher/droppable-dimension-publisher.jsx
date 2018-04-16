@@ -1,6 +1,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
+import invariant from 'invariant';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import rafSchedule from 'raf-schd';
@@ -239,20 +240,11 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     } = this.props;
 
     const targetRef: ?HTMLElement = getDroppableRef();
-
-    if (!targetRef) {
-      throw new Error('DimensionPublisher cannot calculate a dimension when not attached to the DOM');
-    }
-
-    if (this.isWatchingScroll) {
-      throw new Error('Attempting to recapture Droppable dimension while already watching scroll on previous capture');
-    }
-
     const descriptor: ?DroppableDescriptor = this.publishedDescriptor;
 
-    if (!descriptor) {
-      throw new Error('Cannot get dimension for unpublished droppable');
-    }
+    invariant(targetRef, 'DimensionPublisher cannot calculate a dimension when not attached to the DOM');
+    invariant(!this.isWatchingScroll, 'Attempting to recapture Droppable dimension while already watching scroll on previous capture');
+    invariant(descriptor, 'Cannot get dimension for unpublished droppable');
 
     const style: Object = window.getComputedStyle(targetRef);
 
