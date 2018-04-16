@@ -41,7 +41,7 @@ describe('get droppable over', () => {
       const draggable: DraggableDimension = preset.draggables[id];
 
       const result: ?DroppableId = getDroppableOver({
-        target: draggable.page.paddingBox.center,
+        target: draggable.page.borderBox.center,
         draggable,
         draggables: preset.draggables,
         droppables: preset.droppables,
@@ -53,7 +53,7 @@ describe('get droppable over', () => {
   });
 
   it('should ignore droppables that are disabled', () => {
-    const target: Position = preset.inHome1.page.paddingBox.center;
+    const target: Position = preset.inHome1.page.borderBox.center;
     const withDisabled: DroppableDimensionMap = {
       ...preset.droppables,
       [preset.home.descriptor.id]: disableDroppable(preset.home),
@@ -84,12 +84,12 @@ describe('get droppable over', () => {
         id: 'partially hidden subject',
         type: 'TYPE',
       },
-      paddingBox: getArea({
+      borderBox: getArea({
         top: 0, left: 0, right: 100, bottom: 100,
       }),
       closest: {
         // will partially hide the subject
-        framePaddingBox: getArea({
+        frameBorderBox: getArea({
           top: 0, left: 0, right: 50, bottom: 100,
         }),
         scrollHeight: 100,
@@ -104,7 +104,7 @@ describe('get droppable over', () => {
         droppableId: droppable.descriptor.type,
         index: 0,
       },
-      paddingBox: getArea({
+      borderBox: getArea({
         top: 0, left: 0, right: 50, bottom: 50,
       }),
     });
@@ -127,13 +127,13 @@ describe('get droppable over', () => {
         id: 'hidden subject',
         type: 'TYPE',
       },
-      paddingBox: getArea({
+      borderBox: getArea({
         top: 0, left: 0, right: 100, bottom: 100,
       }),
       closest: {
         // will partially hide the subject
         // will totally hide the subject
-        framePaddingBox: getArea({
+        frameBorderBox: getArea({
           top: 0, left: 101, right: 200, bottom: 100,
         }),
         scrollHeight: 100,
@@ -148,7 +148,7 @@ describe('get droppable over', () => {
         droppableId: droppable.descriptor.type,
         index: 0,
       },
-      paddingBox: getArea({
+      borderBox: getArea({
         top: 0, left: 0, right: 50, bottom: 50,
       }),
     });
@@ -179,7 +179,7 @@ describe('get droppable over', () => {
         id: 'home',
         type: 'TYPE',
       },
-      paddingBox: droppablePaddingBox,
+      borderBox: droppablePaddingBox,
       margin,
     });
     const inHome1: DraggableDimension = getDraggableDimension({
@@ -188,7 +188,7 @@ describe('get droppable over', () => {
         droppableId: home.descriptor.id,
         index: 0,
       },
-      paddingBox: getArea({
+      borderBox: getArea({
         top: 10,
         left: 10,
         right: 90,
@@ -203,7 +203,7 @@ describe('get droppable over', () => {
         droppableId: 'foreign',
         index: 0,
       },
-      paddingBox: getArea({
+      borderBox: getArea({
         // to the right of inHome1
         left: 200,
         right: 250,
@@ -360,7 +360,7 @@ describe('get droppable over', () => {
                 id: 'empty',
                 type: 'TYPE',
               },
-              paddingBox: getArea({
+              borderBox: getArea({
                 top: 1000,
                 left: 1000,
                 right: 2000,
@@ -409,7 +409,7 @@ describe('get droppable over', () => {
                 id: 'empty',
                 type: 'TYPE',
               },
-              paddingBox: getArea({
+              borderBox: getArea({
                 top: 1000,
                 left: 1000,
                 right: 2000,
@@ -464,7 +464,7 @@ describe('get droppable over', () => {
               id: 'has-a-scroll-parent',
               type: 'TYPE',
             },
-            paddingBox: getArea({
+            borderBox: getArea({
               top: 0,
               left: 0,
               right: 100,
@@ -472,7 +472,7 @@ describe('get droppable over', () => {
               bottom: 120,
             }),
             closest: {
-              framePaddingBox: getArea({
+              frameBorderBox: getArea({
                 top: 0,
                 left: 0,
                 right: 100,
@@ -515,7 +515,7 @@ describe('get droppable over', () => {
               id: 'my-custom-foreign',
               type: 'TYPE',
             },
-            paddingBox: getArea({
+            borderBox: getArea({
               top: 0,
               left: 0,
               right: 100,
@@ -523,7 +523,7 @@ describe('get droppable over', () => {
               bottom: inHome1.page.marginBox.height - 1,
             }),
             closest: {
-              framePaddingBox: getArea({
+              frameBorderBox: getArea({
                 top: 0,
                 left: 0,
                 right: 100,

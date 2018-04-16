@@ -8,21 +8,34 @@ type Props = {|
 
 export default class Placeholder extends PureComponent<Props> {
   render() {
-    // We apply the margin separately to maintain margin collapsing
-    // behavior of the original element
     const placeholder: PlaceholderType = this.props.placeholder;
-    const { paddingBox, margin, display, tagName } = placeholder;
+    const { borderBox, margin, display, tagName } = placeholder;
 
     const style = {
-      width: paddingBox.width,
-      height: paddingBox.height,
+      display,
+      // These are the computed borderBox width and height properties
+      // at the time of a drag start
+      // borderBox = content + padding + border
+      width: borderBox.width,
+      height: borderBox.height,
+      // We want to be sure that if any border or padding is applied to the element
+      // then it should not change the width and height of it
+      boxSizing: 'border-box',
+      // We apply the margin separately to maintain margin collapsing
+      // behavior of the original element
       marginTop: margin.top,
       marginLeft: margin.left,
       marginBottom: margin.bottom,
       marginRight: margin.right,
+      // Avoiding the collapsing or growing of this element when pushed by flex child siblings.
+      // We have already taken a snapshot the current dimensions we do not want this element
+      // to recalculate its dimensions
+      // It is okay for these properties to be applied on elements that are not flex children
+      flexShrink: '0',
+      flexGrow: '0',
+      // Just a little performance optimisation: avoiding the browser needing
+      // to worry about pointer events for this element
       pointerEvents: 'none',
-      boxSizing: 'border-box',
-      display,
     };
 
     return React.createElement(tagName, { style });

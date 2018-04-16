@@ -29,7 +29,7 @@ const emptyForeignCrossAxisEnd: number = 300;
 
 export const makeScrollable = (droppable: DroppableDimension, amount?: number = 20) => {
   const axis: Axis = droppable.axis;
-  const paddingBox: Area = droppable.client.paddingBox;
+  const borderBox: Area = droppable.client.borderBox;
 
   const horizontalGrowth: number = axis === vertical ? 0 : amount;
   const verticalGrowth: number = axis === vertical ? amount : 0;
@@ -38,17 +38,17 @@ export const makeScrollable = (droppable: DroppableDimension, amount?: number = 
   // this will leave 10px of scrollable area.
   // only expanding on one axis
   const newPaddingBox: Area = getArea({
-    top: paddingBox.top,
-    left: paddingBox.left,
+    top: borderBox.top,
+    left: borderBox.left,
     // growing the client to account for the scrollable area
-    right: paddingBox.right + horizontalGrowth,
-    bottom: paddingBox.bottom + verticalGrowth,
+    right: borderBox.right + horizontalGrowth,
+    bottom: borderBox.bottom + verticalGrowth,
   });
 
   // add scroll space on the main axis
   const scrollSize = {
-    width: paddingBox.width + horizontalGrowth,
-    height: paddingBox.height + verticalGrowth,
+    width: borderBox.width + horizontalGrowth,
+    height: borderBox.height + verticalGrowth,
   };
 
   return getDroppableDimension({
@@ -57,9 +57,9 @@ export const makeScrollable = (droppable: DroppableDimension, amount?: number = 
     padding,
     margin,
     windowScroll,
-    paddingBox: newPaddingBox,
+    borderBox: newPaddingBox,
     closest: {
-      framePaddingBox: paddingBox,
+      frameBorderBox: borderBox,
       scrollWidth: scrollSize.width,
       scrollHeight: scrollSize.height,
       scroll: { x: 0, y: 0 },
@@ -147,7 +147,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     padding,
     margin,
     windowScroll,
-    paddingBox: getArea({
+    borderBox: getArea({
       // would be 0 but pushed forward by margin
       [axis.start]: 10,
       [axis.crossAxisStart]: crossAxisStart,
@@ -165,7 +165,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     margin,
     windowScroll,
     direction: axis.direction,
-    paddingBox: getArea({
+    borderBox: getArea({
       // would be 0 but pushed forward by margin
       [axis.start]: 10,
       [axis.crossAxisStart]: foreignCrossAxisStart,
@@ -183,7 +183,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     margin,
     windowScroll,
     direction: axis.direction,
-    paddingBox: getArea({
+    borderBox: getArea({
       // would be 0 but pushed forward by margin
       [axis.start]: 10,
       [axis.crossAxisStart]: emptyForeignCrossAxisStart,
@@ -201,7 +201,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     },
     margin,
     windowScroll,
-    paddingBox: getArea({
+    borderBox: getArea({
       // starting at start of home
       [axis.start]: 10,
       [axis.crossAxisStart]: crossAxisStart,
@@ -219,7 +219,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     // pushed forward by margin of inHome1
     margin,
     windowScroll,
-    paddingBox: getArea({
+    borderBox: getArea({
       [axis.start]: 30,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
@@ -236,7 +236,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     margin,
     windowScroll,
     // pushed forward by margin of inHome2
-    paddingBox: getArea({
+    borderBox: getArea({
       [axis.start]: 60,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
@@ -253,7 +253,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     // pushed forward by margin of inHome3
     margin,
     windowScroll,
-    paddingBox: getArea({
+    borderBox: getArea({
       [axis.start]: 100,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
@@ -270,7 +270,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     },
     margin,
     windowScroll,
-    paddingBox: getArea({
+    borderBox: getArea({
       [axis.start]: 10,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
@@ -287,7 +287,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     // pushed forward by margin of inForeign1
     margin,
     windowScroll,
-    paddingBox: getArea({
+    borderBox: getArea({
       [axis.start]: 30,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
@@ -304,7 +304,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     margin,
     windowScroll,
     // pushed forward by margin of inForeign2
-    paddingBox: getArea({
+    borderBox: getArea({
       [axis.start]: 60,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
@@ -321,7 +321,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     margin,
     windowScroll,
     // pushed forward by margin of inForeign3
-    paddingBox: getArea({
+    borderBox: getArea({
       [axis.start]: 100,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
