@@ -55,10 +55,10 @@ const Header = styled.div`
 const List = styled.div`
   min-height: 100px;
   padding: ${grid}px;
-  transition: background-color 1s ease;
+  transition: background-color 0.2s ease;
 
   ${props => (props.isDraggingOver ? `
-    background-color: ${colors.G100};
+    background-color: ${colors.B50};
   ` : '')}
 `;
 

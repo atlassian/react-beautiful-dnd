@@ -14,10 +14,16 @@ type Props = {|
 
 const Container = styled.div`
   background-color: ${colors.N0};
-  border: 1px solid ${colors.N40};
+  border: 3px solid ${props => props.author.colors.border};
   margin-bottom: ${grid}px;
   padding: ${grid}px;
   border-radius: 2px;
+`;
+
+const Avatar = styled.img`
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
 `;
 
 export default class Item extends React.Component<Props> {
@@ -30,8 +36,12 @@ export default class Item extends React.Component<Props> {
             innerRef={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
+            author={quote.author}
           >
-            Quote: {quote.id}
+            <Avatar
+              src={quote.author.avatarUrl}
+              title={quote.author.name}
+            />
           </Container>
         )}
       </Draggable>
