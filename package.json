@@ -58,6 +58,7 @@
     "@atlaskit/css-reset": "^2.0.0",
     "@storybook/react": "^3.4.1",
     "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.3",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
