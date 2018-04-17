@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import type { Position, Area, Viewport } from '../../types';
 import getArea from '../../state/get-area';
 import getWindowScroll from './get-window-scroll';
@@ -10,7 +11,9 @@ export default (): Viewport => {
   const top: number = scroll.y;
   const left: number = scroll.x;
 
-  const doc: HTMLElement = (document.documentElement : any);
+  const doc: ?HTMLElement = document.documentElement;
+
+  invariant(doc, 'Could not find document.documentElement');
 
   // Using these values as they do not consider scrollbars
   const width: number = doc.clientWidth;

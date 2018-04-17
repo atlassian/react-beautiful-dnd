@@ -53,10 +53,13 @@ const isDraggingOverForeignMapProps: MapProps = {
   placeholder: inHome1.placeholder,
 };
 
-// $ExpectError - not providing children
 const defaultOwnProps: OwnProps = {
   droppableId: defaultDroppableId,
   isDropDisabled: false,
+  type: 'TYPE',
+  direction: 'vertical',
+  ignoreContainerClipping: false,
+  children: () => null,
 };
 
 type MountArgs = {|

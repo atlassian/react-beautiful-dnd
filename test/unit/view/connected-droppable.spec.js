@@ -38,7 +38,6 @@ describe('Connected Droppable', () => {
       const selector: Selector = makeSelector();
       const ownProps: OwnProps = getOwnProps(preset.home);
       const defaultMapProps: MapProps = selector(state.idle, ownProps);
-      // $ExpectError - using spread
       const newProps: OwnProps = {
         ...ownProps,
         isDropDisabled: true,

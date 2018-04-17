@@ -1,5 +1,6 @@
 // @flow
 import memoizeOne from 'memoize-one';
+import invariant from 'tiny-invariant';
 import getStyles, { type Styles } from './get-styles';
 import type { StyleMarshal } from './style-marshal-types';
 import type {
@@ -60,9 +61,7 @@ export default () => {
     el.setAttribute(prefix, context);
     const head: ?HTMLElement = document.querySelector('head');
 
-    if (!head) {
-      throw new Error('Cannot find the head to append a style to');
-    }
+    invariant(head, 'Cannot find the head to append a style to');
 
     // add style tag to head
     head.appendChild(el);
