@@ -1,9 +1,9 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import invariant from 'invariant';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
+import invariant from '../../invariant';
 import rafSchedule from 'raf-schd';
 import getWindowScroll from '../window/get-window-scroll';
 import getArea from '../../state/get-area';

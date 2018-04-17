@@ -1,5 +1,5 @@
 // @flow
-import invariant from 'invariant';
+import invariant from '../../invariant';
 import { closest } from '../position';
 import isWithin from '../is-within';
 import { getCorners } from '../spacing';

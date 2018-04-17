@@ -1,6 +1,6 @@
 // @flow
 import memoizeOne from 'memoize-one';
-import invariant from 'invariant';
+import invariant from '../../invariant';
 import getStyles, { type Styles } from './get-styles';
 import type { StyleMarshal } from './style-marshal-types';
 import type {

@@ -1,6 +1,6 @@
 // @flow
-import invariant from 'invariant';
 import memoizeOne from 'memoize-one';
+import invariant from '../../invariant';
 import isPositionInFrame from '../visibility/is-position-in-frame';
 import type {
   Position,
