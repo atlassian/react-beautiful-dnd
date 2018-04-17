@@ -188,8 +188,13 @@ export default ({
     },
     {
       eventName: 'scroll',
-      // eventual consistency is fine because we use position: fixed on the item
-      options: { passive: true },
+      // ## Passive: true
+      // Eventual consistency is fine because we use position: fixed on the item
+      // ## Capture: false
+      // Scroll events on elements do not bubble, but they go through the capture phase
+      // https://twitter.com/alexandereardon/status/985994224867819520
+      // Using capture: false here as we want to avoid intercepting droppable scroll requests
+      options: { passive: true, capture: false },
       fn: () => {
         // stop a pending drag
         if (state.pending) {

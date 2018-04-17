@@ -374,7 +374,6 @@ export const getPreset = (axis?: Axis = vertical) => {
   };
 };
 
-// $ExpectError - using spread
 export const disableDroppable = (droppable: DroppableDimension): DroppableDimension => ({
   ...droppable,
   isEnabled: false,

@@ -221,6 +221,10 @@ export default ({
     // Not using the scheduler
     {
       eventName: 'scroll',
+      // Scroll events on elements do not bubble, but they go through the capture phase
+      // https://twitter.com/alexandereardon/status/985994224867819520
+      // Using capture: false here as we want to avoid intercepting droppable scroll requests
+      options: { capture: false },
       fn: callbacks.onWindowScroll,
     },
     // Cancel on page visibility change
