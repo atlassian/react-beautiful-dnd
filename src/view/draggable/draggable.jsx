@@ -6,6 +6,7 @@ import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import type {
   Position,
+  DraggableId,
   DraggableDimension,
   InitialDragPositions,
   DroppableId,
@@ -40,6 +41,14 @@ export const zIndexOptions: ZIndexOptions = {
   dropAnimating: 4500,
 };
 
+// When moving an item from one list to another
+// the component is:
+// - unmounted from the old list
+// - remounted in the new list
+// We help consumers by preserving focus when moving a
+// draggable from one list to another
+let lastFocused: ?DraggableId;
+
 export default class Draggable extends Component<Props> {
   /* eslint-disable react/sort-comp */
   callbacks: DragHandleCallbacks
@@ -73,6 +82,24 @@ export default class Draggable extends Component<Props> {
 
     this.callbacks = callbacks;
     this.styleContext = context[styleContextKey];
+  }
+
+  componentDidMount() {
+    if (!this.ref) {
+      console.error(`
+        Draggable has not been provided with a ref.
+        Please use the DraggableProvided > innerRef function
+      `);
+      return;
+    }
+
+    // This draggable was not previously focused
+    if (this.props.draggableId !== lastFocused) {
+      return;
+    }
+
+    // This draggable was previously focused - give it focus!
+    this.ref.focus();
   }
 
   componentWillUnmount() {
@@ -119,10 +146,14 @@ export default class Draggable extends Component<Props> {
 
   onFocus = () => {
     this.isFocused = true;
+    // Record that this was the last focused draggable
+    lastFocused = this.props.draggableId;
   }
 
   onBlur = () => {
     this.isFocused = false;
+    // On blur we can clear our last focused
+    lastFocused = null;
   }
 
   onMove = (client: Position) => {
