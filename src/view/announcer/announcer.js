@@ -1,5 +1,5 @@
 // @flow
-import invariant from '../../invariant';
+import invariant from 'tiny-invariant';
 import type { Announce } from '../../types';
 import type { Announcer } from './announcer-types';
 

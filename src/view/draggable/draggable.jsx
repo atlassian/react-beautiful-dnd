@@ -3,7 +3,7 @@ import React, { Component, Fragment } from 'react';
 import type { Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
-import invariant from '../../invariant';
+import invariant from 'tiny-invariant';
 import type {
   Position,
   DraggableDimension,

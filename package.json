@@ -51,7 +51,8 @@
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
-    "reselect": "^3.0.1"
+    "reselect": "^3.0.1",
+    "tiny-invariant": "^0.0.3"
   },
   "devDependencies": {
     "@atlaskit/css-reset": "^2.0.0",

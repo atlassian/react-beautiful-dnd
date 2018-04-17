@@ -1,5 +1,5 @@
 // @flow
-import invariant from '../../invariant';
+import invariant from 'tiny-invariant';
 import type { Position, Area, Viewport } from '../../types';
 import getArea from '../../state/get-area';
 import getWindowScroll from './get-window-scroll';
