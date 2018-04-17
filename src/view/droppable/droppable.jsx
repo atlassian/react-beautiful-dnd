@@ -43,6 +43,15 @@ export default class Droppable extends Component<Props> {
     return value;
   }
 
+  componentDidMount() {
+    if (!this.ref) {
+      console.error(`
+        Droppable has not been provided with a ref.
+        Please use the DroppableProvided > innerRef function
+      `);
+    }
+  }
+
   /* eslint-enable */
 
   // React calls ref callback twice for every render
