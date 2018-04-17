@@ -17,7 +17,7 @@ const first: Column = {
 
 const second: Column = {
   id: 'column-2',
-  title: 'Other quotes',
+  title: 'Awesome quotes',
   quoteIds: quotes.slice(half, quotes.length - 1).map((quote: Quote): Id => quote.id),
 };
 

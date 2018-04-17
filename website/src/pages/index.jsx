@@ -31,6 +31,11 @@ const Landing = styled.div`
 const Footer = styled.div`
   flex-growth: 0;
   flex-shrink: 0;
+
+  margin-top: ${grid * 2}px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const BoardContainer = styled.div`
@@ -41,16 +46,22 @@ const BoardContainer = styled.div`
   margin: 0 auto;
 `;
 
+const Heading = styled.header`
+  margin-bottom: ${grid * 2}px;
+`;
+
 const IndexPage = () => (
   <Landing>
-    <Title>react-beautiful-dnd</Title>
-    <Tagline>Beautiful, accessible drag and drop for lists with React.js </Tagline>
-    <GithubStarButton />
+    <Heading>
+      <Title>react-beautiful-dnd</Title>
+      <Tagline>Beautiful, accessible drag and drop for lists with React.js </Tagline>
+    </Heading>
     <BoardContainer>
       <Board />
       <ScreenReaderWatcher />
     </BoardContainer>
     <Footer>
+      <GithubStarButton />
       <CallToAction />
     </Footer>
   </Landing>

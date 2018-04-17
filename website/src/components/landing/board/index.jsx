@@ -122,7 +122,12 @@ export default class Board extends React.Component<*, State> {
     const entities: Entities = this.state.entities;
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
-        <Droppable droppableId="board" type="column" direction="horizontal">
+        <Droppable
+          droppableId="board"
+          type="column"
+          direction="horizontal"
+          ignoreContainerClipping
+        >
           {(provided: DroppableProvided) => (
             <Container
               innerRef={provided.innerRef}

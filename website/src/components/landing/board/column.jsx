@@ -40,7 +40,7 @@ const interactive: string = colors.G50;
 
 const Container = styled.div`
   background-color: ${props => (props.isDragging ? interactive : colors.N30)};
-  margin: ${grid}px;
+  margin: 0 ${grid}px;
   color: ${colors.N800};
   border-radius: 2px;
   font-weight: bold;
@@ -56,6 +56,10 @@ const Header = styled.div`
 
   &:hover {
     background-color: ${interactive};
+  }
+
+  &:focus {
+    outline: 3px solid ${colors.P300};
   }
 `;
 
