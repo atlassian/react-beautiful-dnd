@@ -49,22 +49,23 @@ const BoardContainer = styled.div`
 const Heading = styled.header`
   margin-bottom: ${grid * 2}px;
 `;
-
 const IndexPage = () => (
-  <Landing>
-    <Heading>
-      <Title>react-beautiful-dnd</Title>
-      <Tagline>Beautiful, accessible drag and drop for lists with React.js </Tagline>
-    </Heading>
-    <BoardContainer>
-      <Board />
-      <ScreenReaderWatcher />
-    </BoardContainer>
-    <Footer>
-      <GithubStarButton />
-      <CallToAction />
-    </Footer>
-  </Landing>
+  <React.Fragment>
+    <ScreenReaderWatcher />
+    <Landing>
+      <Heading>
+        <Title>react-beautiful-dnd</Title>
+        <Tagline>Beautiful, accessible drag and drop for lists with React.js </Tagline>
+      </Heading>
+      <BoardContainer>
+        <Board />
+      </BoardContainer>
+      <Footer>
+        <GithubStarButton />
+        <CallToAction />
+      </Footer>
+    </Landing>
+  </React.Fragment>
 );
 
 export default IndexPage;

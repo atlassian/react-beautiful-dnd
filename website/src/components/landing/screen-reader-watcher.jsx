@@ -9,14 +9,14 @@ const isMutationObserverSupported: boolean = typeof MutationObserver !== 'undefi
 
 const Container = styled.div`
   background-color: ${colors.T300};
+  border-radius: 3px;
   color: ${colors.N0};
   padding: ${grid}px;
-  width: 300px;
-  min-height: 100px;
-  border-radius: 3px;
+  min-height: 110px;
   text-align: center;
+  width: 300px;
 
-  /* pull out of the document flow*/
+  /* pull out of the document flow */
   position: absolute;
   top: 0;
   right: 0;
@@ -41,7 +41,7 @@ const TitleIcon = styled.span`
   margin-left: ${grid}px;
 `;
 
-const Speach = styled.div`
+const Speech = styled.div`
 `;
 
 const defaultMessage: string = `
@@ -53,6 +53,7 @@ type State = {|
 |}
 
 export default class ScreenReaderWatcher extends React.Component<*, State> {
+  // eslint-disable-next-line react/sort-comp
   observer: ?MutationObserver
 
   state: State = {
@@ -125,7 +126,7 @@ export default class ScreenReaderWatcher extends React.Component<*, State> {
     return (
       <Container isReady={Boolean(this.observer)}>
         <Title>
-          Screen reader announcement
+          <span>Screen reader announcement</span>
           <TitleIcon>
             <FeedbackIcon
               label="speaker icon"
@@ -133,7 +134,7 @@ export default class ScreenReaderWatcher extends React.Component<*, State> {
             />
           </TitleIcon>
         </Title>
-        <Speach>{this.state.message || defaultMessage}</Speach>
+        <Speech>{this.state.message || defaultMessage}</Speech>
       </Container>
     );
   }
