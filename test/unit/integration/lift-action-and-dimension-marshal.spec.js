@@ -110,7 +110,6 @@ describe('lifting and the dimension marshal', () => {
 
             // registering updated draggables
 
-            // $ExpectError - using spread
             const postDragInHome1: DraggableDimension = {
               ...preset.inHome1,
               descriptor: {
@@ -119,7 +118,6 @@ describe('lifting and the dimension marshal', () => {
                 index: 1,
               },
             };
-            // $ExpectError - using spread
             const postDragInHome2: DraggableDimension = {
               ...preset.inHome2,
               descriptor: {

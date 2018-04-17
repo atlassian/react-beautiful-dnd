@@ -266,13 +266,13 @@ export default (state: State = clean('IDLE'), action: Action): State => {
         return existing;
       }
 
-      const newDrag: DragState = ({
+      const newDrag: DragState = {
         ...existing,
         current: {
           ...existing.current,
           hasCompletedFirstBulkPublish: true,
         },
-      }: any);
+      };
 
       return newDrag;
     })();

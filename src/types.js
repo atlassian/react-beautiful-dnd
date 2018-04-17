@@ -364,7 +364,7 @@ export type DropState = {|
   result: ?DropResult,
 |}
 
-export type State = {
+export type State = {|
   phase: Phase,
   dimension: DimensionState,
   // null if not dragging
@@ -372,7 +372,7 @@ export type State = {
 
   // available when dropping or cancelling
   drop: ?DropState,
-};
+|};
 
 export type Action = ActionCreators;
 export type Dispatch = ReduxDispatch<Action>;

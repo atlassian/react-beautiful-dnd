@@ -924,7 +924,6 @@ describe('Draggable - unconnected', () => {
     it('should be positioned in the correct offset while dragging', () => {
       const myMock = jest.fn();
       const offset: Position = { x: 10, y: 20 };
-      // $ExpectError - using spread
       const mapProps: MapProps = {
         ...draggingMapProps,
         offset,
@@ -1052,7 +1051,6 @@ describe('Draggable - unconnected', () => {
     });
 
     it('should let consumers know if draggging and over a droppable', () => {
-      // $ExpectError - using spread
       const mapProps: MapProps = {
         ...draggingMapProps,
         draggingOver: 'foobar',
@@ -1070,7 +1068,6 @@ describe('Draggable - unconnected', () => {
     });
 
     it('should let consumers know if dragging and not over a droppable', () => {
-      // $ExpectError - using spread
       const mapProps: MapProps = {
         ...draggingMapProps,
         draggingOver: null,
@@ -1269,7 +1266,6 @@ describe('Draggable - unconnected', () => {
         it('should instantly move out of the way without css if animation is disabled', () => {
           const myMock = jest.fn();
           const CustomStubber = getStubber(myMock);
-          // $ExpectError - using spread
           const mapProps: MapProps = {
             ...somethingElseDraggingMapProps,
             shouldAnimateDisplacement: false,
@@ -1302,7 +1298,6 @@ describe('Draggable - unconnected', () => {
 
         const offset: Position = { x: 0, y: 200 };
 
-        // $ExpectError - spread
         const mapProps: MapProps = {
           ...somethingElseDraggingMapProps,
           offset,
@@ -1340,16 +1335,15 @@ describe('Draggable - unconnected', () => {
           expect(wrapper.find(Moveable).props().speed).toBe('INSTANT');
         });
 
-        it('should instantly move out of the way without css if animation is disabled', () => {
+        it('should instantly move out of the way without css if displacement animation is disabled', () => {
           const myMock = jest.fn();
           const CustomStubber = getStubber(myMock);
-          // $ExpectError - using spread
           const customProps: MapProps = {
             ...mapProps,
-            canAnimate: false,
+            shouldAnimateDisplacement: false,
           };
           const expected: NotDraggingStyle = {
-            transition: null,
+            transition: 'none',
             transform: `translate(${offset.x}px, ${offset.y}px)`,
           };
 

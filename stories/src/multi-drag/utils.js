@@ -38,7 +38,6 @@ const reorderSingleDrag = ({
       destination.index,
     );
 
-    // $ExpectError - using spread
     const updated: Entities = {
       ...entities,
       columns: {
@@ -68,7 +67,6 @@ const reorderSingleDrag = ({
   const newForeignTaskIds: Id[] = [...foreign.taskIds];
   newForeignTaskIds.splice(destination.index, 0, taskId);
 
-  // $ExpectError - using spread
   const updated: Entities = {
     ...entities,
     columns: {
@@ -191,7 +189,6 @@ const reorderMultiDrag = ({
     [final.id]: withNewTaskIds(final, withInserted),
   };
 
-  // $ExpectError - using spread
   const updated: Entities = {
     ...entities,
     columns: withAddedTasks,
