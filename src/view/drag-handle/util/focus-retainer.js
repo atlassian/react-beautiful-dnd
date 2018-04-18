@@ -1,7 +1,6 @@
 // @flow
 import focusOnDragHandle from './focus-on-drag-handle';
-import * as attributes from '../data-attributes';
-import type { DraggableId } from '../../types';
+import type { DraggableId } from '../../../types';
 
 type FocusRetainer = {|
   retain: (draggableId: DraggableId) => void,
@@ -40,7 +39,6 @@ const clearRetentionOnFocusChange = (() => {
 
   // focusin will fire after the focus event fires on the element
   const onWindowFocusChange = () => {
-    console.log('ON WINDOW FOCUS CHANGE');
     // unbinding self after single use
     unbind();
     retainingFocusFor = null;

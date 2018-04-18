@@ -1390,6 +1390,9 @@ describe('Draggable - unconnected', () => {
         // Asserting that it is now the focused element
         expect(original).toBe(document.activeElement);
 
+        // now dragging
+        executeOnLift(first);
+
         // unmounting original
         first.unmount();
 

@@ -8,8 +8,6 @@ import type {
 } from '../../types';
 
 export type Callbacks = {|
-  onFocus: () => void,
-  onBlur: () => void,
   onLift: ({ client: Position, autoScrollMode: AutoScrollMode }) => void,
   onMove: (point: Position) => void,
   onWindowScroll: () => void,
@@ -54,6 +52,8 @@ export type Props = {|
   isEnabled: boolean,
   // whether the application thinks a drag is occurring
   isDragging: boolean,
+  // whether the application thinks a drop is occurring
+  isDropAnimating: boolean,
   // the direction of the current droppable
   direction: ?Direction,
   // get the ref of the draggable

@@ -6,7 +6,6 @@ import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import type {
   Position,
-  DraggableId,
   DraggableDimension,
   InitialDragPositions,
   DroppableId,
@@ -15,8 +14,6 @@ import type {
 import DraggableDimensionPublisher from '../draggable-dimension-publisher/';
 import Moveable from '../moveable/';
 import DragHandle from '../drag-handle';
-import focusRetainer from './focus-retainer';
-import focusOnDragHandle from './focus-on-drag-handle';
 import getViewport from '../window/get-viewport';
 // eslint-disable-next-line no-duplicate-imports
 import type {
@@ -47,7 +44,6 @@ export default class Draggable extends Component<Props> {
   /* eslint-disable react/sort-comp */
   callbacks: DragHandleCallbacks
   styleContext: string
-  isDragHandleFocused: boolean = false
   ref: ?HTMLElement = null
 
   // Need to declare contextTypes without flow
@@ -61,8 +57,6 @@ export default class Draggable extends Component<Props> {
     super(props, context);
 
     const callbacks: DragHandleCallbacks = {
-      onFocus: this.onDragHandleFocus,
-      onBlur: this.onDragHandleBlur,
       onLift: this.onLift,
       onMove: this.onMove,
       onDrop: this.onDrop,
@@ -84,29 +78,12 @@ export default class Draggable extends Component<Props> {
         Draggable has not been provided with a ref.
         Please use the DraggableProvided > innerRef function
       `);
-      return;
     }
-
-    focusRetainer.tryRestoreFocus(this.props.draggableId, this.ref);
   }
 
   componentWillUnmount() {
     // releasing reference to ref for cleanup
     this.ref = null;
-
-    // Was not focused
-    if (!this.isDragHandleFocused) {
-      return;
-    }
-
-    const wasDragging: boolean = this.props.isDragging || this.props.isDropAnimating;
-
-    if (!wasDragging) {
-      return;
-    }
-
-    // Attempting to retain focus when moving between lists
-    focusRetainer.retain(this.props.draggableId);
   }
 
   // This should already be handled gracefully in DragHandle.
@@ -144,14 +121,6 @@ export default class Draggable extends Component<Props> {
     };
 
     lift(draggableId, initial, getViewport(), autoScrollMode);
-  }
-
-  onDragHandleFocus = () => {
-    this.isDragHandleFocused = true;
-  }
-
-  onDragHandleBlur = () => {
-    this.isDragHandleFocused = false;
   }
 
   onMove = (client: Position) => {
@@ -217,13 +186,6 @@ export default class Draggable extends Component<Props> {
     // At this point the ref has been changed or initially populated
 
     this.ref = ref;
-
-    // After a ref change we might need to manually force focus onto the ref.
-    // When moving something into or out of a portal the element looses focus
-    // https://github.com/facebook/react/issues/12454
-    if (this.ref && this.isDragHandleFocused) {
-      focusOnDragHandle(this.ref);
-    }
   })
 
   getDraggableRef = (): ?HTMLElement => this.ref;
@@ -408,6 +370,7 @@ export default class Draggable extends Component<Props> {
             <DragHandle
               draggableId={draggableId}
               isDragging={isDragging}
+              isDropAnimating={isDropAnimating}
               direction={direction}
               isEnabled={!isDragDisabled}
               callbacks={this.callbacks}

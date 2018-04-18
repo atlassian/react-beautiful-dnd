@@ -2,6 +2,7 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
+import getWindowFromRef from '../get-window-from-ref';
 import type {
   Props,
   DragHandleProps,
@@ -12,10 +13,12 @@ import type {
   TouchSensor,
   CreateSensorArgs,
 } from './sensor/sensor-types';
+import focusOnDragHandle from './util/focus-on-drag-handle';
 import type {
   DraggableId,
 } from '../../types';
 import { styleContextKey, canLiftContextKey } from '../context-keys';
+import focusRetainer from './util/focus-retainer';
 import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-target';
 import createMouseSensor from './sensor/create-mouse-sensor';
 import createKeyboardSensor from './sensor/create-keyboard-sensor';
@@ -35,6 +38,8 @@ export default class DragHandle extends Component<Props> {
   sensors: Sensor[];
   styleContext: string;
   canLift: (id: DraggableId) => boolean;
+  isFocused: boolean = false;
+  lastDraggableRef: ?HTMLElement;
 
   // Need to declare contextTypes without flow
   // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
@@ -46,9 +51,12 @@ export default class DragHandle extends Component<Props> {
   constructor(props: Props, context: Object) {
     super(props, context);
 
+    const getWindow = (): HTMLElement => getWindowFromRef(this.props.getDraggableRef());
+
     const args: CreateSensorArgs = {
       callbacks: this.props.callbacks,
       getDraggableRef: this.props.getDraggableRef,
+      getWindow,
       canStartCapturing: this.canStartCapturing,
     };
 
@@ -71,20 +79,34 @@ export default class DragHandle extends Component<Props> {
     this.canLift = context[canLiftContextKey];
   }
 
-  componentWillUnmount() {
-    this.sensors.forEach((sensor: Sensor) => {
-      // kill the current drag and fire a cancel event if
-      const wasDragging = sensor.isDragging();
+  componentDidMount() {
+    const draggableRef: ?HTMLElement = this.props.getDraggableRef();
 
-      sensor.unmount();
-      // cancel if drag was occurring
-      if (wasDragging) {
-        this.props.callbacks.onCancel();
-      }
-    });
+    // storing a reference for later
+    this.lastDraggableRef = draggableRef;
+
+    if (!draggableRef) {
+      console.error('Cannot get draggable ref from drag handle');
+      return;
+    }
+
+    focusRetainer.tryRestoreFocus(this.props.draggableId, draggableRef);
   }
 
   componentDidUpdate(prevProps: Props) {
+    const ref: ?HTMLElement = this.props.getDraggableRef();
+
+    if (ref !== this.lastDraggableRef) {
+      this.lastDraggableRef = ref;
+
+      // After a ref change we might need to manually force focus onto the ref.
+      // When moving something into or out of a portal the element looses focus
+      // https://github.com/facebook/react/issues/12454
+      if (ref && this.isFocused) {
+        focusOnDragHandle(ref);
+      }
+    }
+
     const isCapturing: boolean = this.isAnySensorCapturing();
 
     if (!isCapturing) {
@@ -120,6 +142,41 @@ export default class DragHandle extends Component<Props> {
         }
       });
     }
+  }
+
+  componentWillUnmount() {
+    this.sensors.forEach((sensor: Sensor) => {
+      // kill the current drag and fire a cancel event if
+      const wasDragging = sensor.isDragging();
+
+      sensor.unmount();
+      // cancel if drag was occurring
+      if (wasDragging) {
+        this.props.callbacks.onCancel();
+      }
+    });
+
+    const shouldRetainFocus: boolean = (() => {
+      // not already focused
+      if (!this.isFocused) {
+        return false;
+      }
+
+      // a drag is finishing
+      return (this.props.isDragging || this.props.isDropAnimating);
+    })();
+
+    if (shouldRetainFocus) {
+      focusRetainer.retain(this.props.draggableId);
+    }
+  }
+
+  onFocus = () => {
+    this.isFocused = true;
+  }
+
+  onBlur = () => {
+    this.isFocused = false;
   }
 
   onKeyDown = (event: KeyboardEvent) => {
@@ -177,8 +234,8 @@ export default class DragHandle extends Component<Props> {
       onMouseDown: this.onMouseDown,
       onKeyDown: this.onKeyDown,
       onTouchStart: this.onTouchStart,
-      onFocus: this.props.callbacks.onFocus,
-      onBlur: this.props.callbacks.onBlur,
+      onFocus: this.onFocus,
+      onBlur: this.onBlur,
       tabIndex: 0,
       'data-react-beautiful-dnd-drag-handle': this.styleContext,
       // English default. Consumers are welcome to add their own start instruction

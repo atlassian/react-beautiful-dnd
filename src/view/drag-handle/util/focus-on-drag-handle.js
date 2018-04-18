@@ -1,5 +1,5 @@
 // @flow
-import { dragHandle } from '../data-attributes';
+import { dragHandle } from '../../data-attributes';
 
 const selector: string = `[${dragHandle}]`;
 
