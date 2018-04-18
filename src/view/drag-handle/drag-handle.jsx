@@ -3,6 +3,7 @@ import { Component } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import getWindowFromRef from '../get-window-from-ref';
+import getDragHandleRef from './util/get-drag-handle-ref';
 import type {
   Props,
   DragHandleProps,
@@ -13,7 +14,6 @@ import type {
   TouchSensor,
   CreateSensorArgs,
 } from './sensor/sensor-types';
-import focusOnDragHandle from './util/focus-on-drag-handle';
 import type {
   DraggableId,
 } from '../../types';
@@ -90,12 +90,11 @@ export default class DragHandle extends Component<Props> {
       return;
     }
 
-    focusRetainer.tryRestoreFocus(this.props.draggableId, draggableRef);
+    focusRetainer.tryRestoreFocus(this.props.draggableId, getDragHandleRef(draggableRef));
   }
 
   componentDidUpdate(prevProps: Props) {
     const ref: ?HTMLElement = this.props.getDraggableRef();
-
     if (ref !== this.lastDraggableRef) {
       this.lastDraggableRef = ref;
 
@@ -103,7 +102,7 @@ export default class DragHandle extends Component<Props> {
       // When moving something into or out of a portal the element looses focus
       // https://github.com/facebook/react/issues/12454
       if (ref && this.isFocused) {
-        focusOnDragHandle(ref);
+        getDragHandleRef(ref).focus();
       }
     }
 

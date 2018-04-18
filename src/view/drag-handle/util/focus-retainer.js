@@ -1,5 +1,5 @@
 // @flow
-import focusOnDragHandle from './focus-on-drag-handle';
+import getDragHandleRef from './get-drag-handle-ref';
 import type { DraggableId } from '../../../types';
 
 type FocusRetainer = {|
@@ -70,7 +70,7 @@ const tryRestoreFocus = (id: DraggableId, draggableRef: HTMLElement) => {
   retainingFocusFor = null;
   // no need to clear it - we are already clearing it
   clearRetentionOnFocusChange.cancel();
-  focusOnDragHandle(draggableRef);
+  getDragHandleRef(draggableRef).focus();
 };
 
 const retainer: FocusRetainer = {
