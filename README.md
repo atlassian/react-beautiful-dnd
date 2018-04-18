@@ -76,8 +76,6 @@ You can check out all the features that will be landing soon [on our issue page]
 
 There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing [`react-dnd`](https://github.com/react-dnd/react-dnd). It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **`react-beautiful-dnd` is a higher level abstraction specifically built for vertical and horizontal lists**. Within that subset of functionality `react-beautiful-dnd` offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by react-dnd. So this library might not be for you depending on what your use case is.
 
-`react-beautiful-dnd` [uses `position: fixed` to position the dragging element](#positioning-ownership). In some layouts, this might break how the element is rendered. One example is a `<table>`-based layout which will lose column widths for dragged `<tr>`s. Follow [#103](https://github.com/atlassian/react-beautiful-dnd/issues/103) for updates on support for this use case.
-
 ## Driving philosophy: physicality
 
 The core design idea of `react-beautiful-dnd` is physicality: we want users to feel like they are moving physical objects around
