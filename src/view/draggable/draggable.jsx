@@ -68,8 +68,8 @@ export default class Draggable extends Component<Props> {
     super(props, context);
 
     const callbacks: DragHandleCallbacks = {
-      onFocus: this.onFocus,
-      onBlur: this.onBlur,
+      onFocus: this.onDragHandleFocus,
+      onBlur: this.onDragHandleBlur,
       onLift: this.onLift,
       onMove: this.onMove,
       onDrop: this.onDrop,
@@ -145,13 +145,13 @@ export default class Draggable extends Component<Props> {
     lift(draggableId, initial, getViewport(), autoScrollMode);
   }
 
-  onFocus = () => {
+  onDragHandleFocus = () => {
     this.isDragHandleFocused = true;
     // Record that this was the last focused draggable
     lastFocused = this.props.draggableId;
   }
 
-  onBlur = () => {
+  onDragHandleBlur = () => {
     this.isDragHandleFocused = false;
     // On blur we can clear our last focused
     lastFocused = null;

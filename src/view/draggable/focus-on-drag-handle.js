@@ -9,13 +9,11 @@ const getDragHandleRef = (draggableRef: HTMLElement): ?HTMLElement => {
   }
 
   // find the first nested drag handle
+  // querySelector will return the first match on a breadth first search which is what we want
+  // https://codepen.io/alexreardon/pen/erOqyZ
   const el: ?HTMLElement = draggableRef.querySelector(selector);
 
-  if (!el) {
-    return null;
-  }
-
-  return el;
+  return el || null;
 };
 
 const focusOnDragHandle = (draggableRef: HTMLElement) => {

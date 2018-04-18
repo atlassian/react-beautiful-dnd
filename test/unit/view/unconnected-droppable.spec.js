@@ -27,7 +27,12 @@ const getStubber = (mock: Function) =>
         snapshot: this.props.snapshot,
       });
       return (
-        <div>Hey there</div>
+        <div
+          ref={this.props.provided.innerRef}
+          {...this.props.provided.droppableProps}
+        >
+          Hey there
+        </div>
       );
     }
   };

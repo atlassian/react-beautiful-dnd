@@ -25,8 +25,8 @@ export type DragHandleProps = {|
   // If a consumer is using a portal then the item will loose focus
   // when moving to the portal. This breaks keyboard dragging.
   // To get around this we manually apply focus if needed when mounting
-  onFocus: (event: FocusEvent) => void,
-  onBlur: (event: FocusEvent) => void,
+  onFocus: () => void,
+  onBlur: () => void,
 
   // Used to initiate dragging
   onMouseDown: (event: MouseEvent) => void,

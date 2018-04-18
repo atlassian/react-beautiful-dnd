@@ -272,6 +272,24 @@ const looseFocus = (wrapper: ReactWrapper) => {
   el.blur();
   // let the wrapper know about it
   wrapper.simulate('blur');
+};
+class WithNestedHandle extends Component<{ provided: Provided }> {
+  render() {
+    const provided: Provided = this.props.provided;
+    return (
+      <div
+        ref={ref => provided.innerRef(ref)}
+        {...provided.draggableProps}
+      >
+        <div className="cannot-drag">
+          Cannot drag by me
+        </div>
+        <div className="can-drag" {...provided.dragHandleProps}>
+          Can drag by me
+        </div>
+      </div>
+    );
+  }
 }
 
 describe('Draggable - unconnected', () => {
@@ -349,25 +367,6 @@ describe('Draggable - unconnected', () => {
     });
 
     describe('non standard drag handle', () => {
-      class WithNestedHandle extends Component<{ provided: Provided }> {
-        render() {
-          const provided: Provided = this.props.provided;
-          return (
-            <div
-              ref={ref => provided.innerRef(ref)}
-              {...provided.draggableProps}
-            >
-              <div className="cannot-drag">
-                Cannot drag by me
-              </div>
-              <div className="can-drag" {...provided.dragHandleProps}>
-                Can drag by me
-              </div>
-            </div>
-          );
-        }
-      }
-
       it('should allow the ability to have the drag handle to be a child of the draggable', () => {
         const dispatchProps: DispatchProps = getDispatchPropsStub();
         managedWrapper = mountDraggable({
@@ -1376,101 +1375,157 @@ describe('Draggable - unconnected', () => {
   });
 
   describe('Cross list movement focus retention', () => {
-    it('should maintain focus when mounted into a different list', () => {
-      const first = mountDraggable();
-      const original: HTMLElement = first.getDOMNode();
+    describe('draggable is the drag handle', () => {
+      it('should maintain focus when mounted into a different list', () => {
+        const first = mountDraggable();
+        const original: HTMLElement = first.getDOMNode();
 
-      // Originally does not have focus
-      expect(original).not.toBe(document.activeElement);
+        // Originally does not have focus
+        expect(original).not.toBe(document.activeElement);
 
-      // Giving focus to draggable
-      original.focus();
-      // Ensuring that the focus event handler is called
-      first.simulate('focus');
-      // Asserting that it is now the focused element
-      expect(original).toBe(document.activeElement);
+        // Giving focus to draggable
+        original.focus();
+        // Ensuring that the focus event handler is called
+        first.simulate('focus');
+        // Asserting that it is now the focused element
+        expect(original).toBe(document.activeElement);
 
-      // unmounting original
-      first.unmount();
+        // unmounting original
+        first.unmount();
 
-      const second = mountDraggable();
-      const last: HTMLElement = second.getDOMNode();
+        const second = mountDraggable();
+        const last: HTMLElement = second.getDOMNode();
 
-      expect(last).toBe(document.activeElement);
+        expect(last).toBe(document.activeElement);
 
-      // cleanup
-      looseFocus(second);
-    });
-
-    it('should not maintain focus if it did not have it when moving into a new list', () => {
-      const wrapper = mountDraggable();
-      const node: HTMLElement = wrapper.getDOMNode();
-
-      // Originally does not have focus
-      expect(node).not.toBe(document.activeElement);
-
-      const second = mountDraggable();
-      const fresh: HTMLElement = second.getDOMNode();
-
-      // Still does not have focus
-      expect(fresh).not.toBe(document.activeElement);
-    });
-
-    it('should not obtain focus if focus is lost before remount', () => {
-      const firstWrapper = mountDraggable();
-      const firstNode: HTMLElement = firstWrapper.getDOMNode();
-
-      // Originally does not have focus
-      expect(firstNode).not.toBe(document.activeElement);
-
-      // Giving focus to draggable
-      firstNode.focus();
-      // Ensuring that the focus event handler is called
-      firstWrapper.simulate('focus');
-      // Asserting that it is now the focused element
-      expect(firstNode).toBe(document.activeElement);
-
-      // Now loosing focus
-      firstNode.blur();
-      firstWrapper.simulate('blur');
-      expect(firstNode).not.toBe(document.activeElement);
-
-      // unmounting original
-      firstWrapper.unmount();
-
-      const secondWrapper = mountDraggable();
-      const secondNode: HTMLElement = secondWrapper.getDOMNode();
-
-      expect(secondNode).not.toBe(document.activeElement);
-    });
-
-    it('should not give focus to a mounting draggable that did not have the last focused id', () => {
-      const firstWrapper = mountDraggable();
-      const firstNode: HTMLElement = firstWrapper.getDOMNode();
-
-      // Originally does not have focus
-      expect(firstNode).not.toBe(document.activeElement);
-
-      // Giving focus to draggable
-      firstNode.focus();
-      // Ensuring that the focus event handler is called
-      firstWrapper.simulate('focus');
-      // Asserting that it is now the focused element
-      expect(firstNode).toBe(document.activeElement);
-
-      // Mounting new draggable with different id - it should not get focus
-      const secondProps: OwnProps = {
-        ...defaultOwnProps,
-        draggableId: 'my cool new id',
-      };
-      const secondWrapper = mountDraggable({
-        ownProps: secondProps,
+        // cleanup
+        looseFocus(second);
+        first.unmount();
+        second.unmount();
       });
-      const secondNode: HTMLElement = secondWrapper.getDOMNode();
-      expect(secondNode).not.toBe(document.activeElement);
 
-      // cleanup
-      looseFocus(firstWrapper);
+      it('should not maintain focus if it did not have it when moving into a new list', () => {
+        const wrapper = mountDraggable();
+        const node: HTMLElement = wrapper.getDOMNode();
+
+        // Originally does not have focus
+        expect(node).not.toBe(document.activeElement);
+
+        const second = mountDraggable();
+        const fresh: HTMLElement = second.getDOMNode();
+
+        // Still does not have focus
+        expect(fresh).not.toBe(document.activeElement);
+
+        wrapper.unmount();
+      });
+
+      it('should not obtain focus if focus is lost before remount', () => {
+        const firstWrapper = mountDraggable();
+        const firstNode: HTMLElement = firstWrapper.getDOMNode();
+
+        // Originally does not have focus
+        expect(firstNode).not.toBe(document.activeElement);
+
+        // Giving focus to draggable
+        firstNode.focus();
+        // Ensuring that the focus event handler is called
+        firstWrapper.simulate('focus');
+        // Asserting that it is now the focused element
+        expect(firstNode).toBe(document.activeElement);
+
+        // Now loosing focus
+        firstNode.blur();
+        firstWrapper.simulate('blur');
+        expect(firstNode).not.toBe(document.activeElement);
+
+        // unmounting original
+        firstWrapper.unmount();
+
+        const secondWrapper = mountDraggable();
+        const secondNode: HTMLElement = secondWrapper.getDOMNode();
+
+        expect(secondNode).not.toBe(document.activeElement);
+
+        // cleanup
+        firstWrapper.unmount();
+        secondWrapper.unmount();
+      });
+
+      it('should not give focus to a mounting draggable that did not have the last focused id', () => {
+        const firstWrapper = mountDraggable();
+        const firstNode: HTMLElement = firstWrapper.getDOMNode();
+
+        // Originally does not have focus
+        expect(firstNode).not.toBe(document.activeElement);
+
+        // Giving focus to draggable
+        firstNode.focus();
+        // Ensuring that the focus event handler is called
+        firstWrapper.simulate('focus');
+        // Asserting that it is now the focused element
+        expect(firstNode).toBe(document.activeElement);
+
+        // Mounting new draggable with different id - it should not get focus
+        const secondProps: OwnProps = {
+          ...defaultOwnProps,
+          draggableId: 'my cool new id',
+        };
+        const secondWrapper = mountDraggable({
+          ownProps: secondProps,
+        });
+        const secondNode: HTMLElement = secondWrapper.getDOMNode();
+        expect(secondNode).not.toBe(document.activeElement);
+
+        // cleanup
+        looseFocus(firstWrapper);
+        firstWrapper.unmount();
+        secondWrapper.unmount();
+      });
+    });
+
+    describe('draggable is not the drag handle', () => {
+      it('should restore focus after an unmount', () => {
+        const original = mountDraggable({
+          WrappedComponent: WithNestedHandle,
+        });
+        const handle: ?HTMLElement = original.getDOMNode().querySelector('.can-drag');
+
+        if (!handle) {
+          throw new Error('Could not find drag handle');
+        }
+
+        // Should not have focus by default
+        expect(handle).not.toBe(document.activeElement);
+        // Lets give it focus
+        handle.focus();
+        original.find('.can-drag').simulate('focus');
+        // Okay, it now has focus
+        expect(handle).toBe(document.activeElement);
+
+        // Goodbye old friend
+        original.unmount();
+
+        const next = mountDraggable({
+          WrappedComponent: WithNestedHandle,
+        });
+
+        const newHandle: ?HTMLElement = next.getDOMNode().querySelector('.can-drag');
+
+        if (!newHandle) {
+          throw new Error('Could not find drag handle');
+        }
+
+        expect(newHandle).toBe(document.activeElement);
+
+        // cleanup
+        // remove focus
+        handle.blur();
+        next.find('.can-drag').simulate('blur');
+        // unmount all the things
+        next.unmount();
+        original.unmount();
+      });
     });
   });
 
