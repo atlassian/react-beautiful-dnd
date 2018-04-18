@@ -1567,6 +1567,7 @@ describe('Draggable - unconnected', () => {
       });
     });
 
+    // A lighter set of tests
     describe('draggable is not the drag handle', () => {
       it('should restore focus after an unmount', () => {
         const original = mountDraggable({
