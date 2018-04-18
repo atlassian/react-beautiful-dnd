@@ -93,6 +93,20 @@ export default class Draggable extends Component<Props> {
   componentWillUnmount() {
     // releasing reference to ref for cleanup
     this.ref = null;
+
+    // Was not focused
+    if (!this.isDragHandleFocused) {
+      return;
+    }
+
+    const wasDragging: boolean = this.props.isDragging || this.props.isDropAnimating;
+
+    if (!wasDragging) {
+      return;
+    }
+
+    // Attempting to retain focus when moving between lists
+    focusRetainer.retain(this.props.draggableId);
   }
 
   // This should already be handled gracefully in DragHandle.
@@ -134,12 +148,10 @@ export default class Draggable extends Component<Props> {
 
   onDragHandleFocus = () => {
     this.isDragHandleFocused = true;
-    focusRetainer.onDragHandleFocus(this.props.draggableId);
   }
 
   onDragHandleBlur = () => {
     this.isDragHandleFocused = false;
-    focusRetainer.onDragHandleBlur();
   }
 
   onMove = (client: Position) => {

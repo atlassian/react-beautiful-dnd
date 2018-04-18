@@ -4,8 +4,7 @@ import * as attributes from '../data-attributes';
 import type { DraggableId } from '../../types';
 
 type FocusRetainer = {|
-  onDragHandleFocus: (draggableId: DraggableId) => void,
-  onDragHandleBlur: () => void,
+  retain: (draggableId: DraggableId) => void,
   tryRestoreFocus: (draggableId: DraggableId, draggableRef: HTMLElement) => void,
 |}
 
@@ -13,7 +12,7 @@ type FocusRetainer = {|
 let retainingFocusFor: ?DraggableId = null;
 
 // If we focus on
-const clearRetentionOnFocusShift = (() => {
+const clearRetentionOnFocusChange = (() => {
   let isBound: boolean = false;
 
   const bind = () => {
@@ -40,22 +39,11 @@ const clearRetentionOnFocusShift = (() => {
   };
 
   // focusin will fire after the focus event fires on the element
-  const onWindowFocusChange = (event: FocusEvent) => {
+  const onWindowFocusChange = () => {
+    console.log('ON WINDOW FOCUS CHANGE');
     // unbinding self after single use
     unbind();
-
-    if (!(event.target instanceof HTMLElement)) {
-      // we are not focusing on a drag handle
-      retainingFocusFor = null;
-      return;
-    }
-
-    const isADragHandle: boolean = Boolean(event.target.getAttribute(attributes.dragHandle));
-
-    // The focus has shifted away from a drag handle - we can clear our retention
-    if (!isADragHandle) {
-      retainingFocusFor = null;
-    }
+    retainingFocusFor = null;
   };
 
   const result = () => bind();
@@ -64,18 +52,10 @@ const clearRetentionOnFocusShift = (() => {
   return result;
 })();
 
-const clearRetention = () => {
-  retainingFocusFor = null;
-  // no need to clear it - we are already clearing it
-  clearRetentionOnFocusShift.cancel();
-};
-
-const onDragHandleFocus = (id: DraggableId) => {
+const retain = (id: DraggableId) => {
   retainingFocusFor = id;
-  clearRetentionOnFocusShift();
+  clearRetentionOnFocusChange();
 };
-
-const onDragHandleBlur = () => clearRetention();
 
 const tryRestoreFocus = (id: DraggableId, draggableRef: HTMLElement) => {
   // Not needing to retain focus
@@ -89,13 +69,14 @@ const tryRestoreFocus = (id: DraggableId, draggableRef: HTMLElement) => {
 
   // We are about to force force onto a drag handle
 
-  clearRetention();
+  retainingFocusFor = null;
+  // no need to clear it - we are already clearing it
+  clearRetentionOnFocusChange.cancel();
   focusOnDragHandle(draggableRef);
 };
 
 const retainer: FocusRetainer = {
-  onDragHandleFocus,
-  onDragHandleBlur,
+  retain,
   tryRestoreFocus,
 };
 

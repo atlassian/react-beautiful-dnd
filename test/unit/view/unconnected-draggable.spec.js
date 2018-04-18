@@ -1376,7 +1376,7 @@ describe('Draggable - unconnected', () => {
 
   describe('Cross list movement focus retention', () => {
     describe('draggable is the drag handle', () => {
-      it('should maintain focus when mounted into a different list', () => {
+      it('should maintain focus when moving to a different list', () => {
         const first = mountDraggable();
         const original: HTMLElement = first.getDOMNode();
 
