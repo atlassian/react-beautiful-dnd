@@ -15,6 +15,7 @@ import type {
 import DraggableDimensionPublisher from '../draggable-dimension-publisher/';
 import Moveable from '../moveable/';
 import DragHandle from '../drag-handle';
+import focusRetainer from './focus-retainer';
 import focusOnDragHandle from './focus-on-drag-handle';
 import getViewport from '../window/get-viewport';
 // eslint-disable-next-line no-duplicate-imports
@@ -41,14 +42,6 @@ export const zIndexOptions: ZIndexOptions = {
   dragging: 5000,
   dropAnimating: 4500,
 };
-
-// When moving an item from one list to another
-// the component is:
-// - unmounted from the old list
-// - remounted in the new list
-// We help consumers by preserving focus when moving a
-// draggable from one list to another
-let lastFocused: ?DraggableId;
 
 export default class Draggable extends Component<Props> {
   /* eslint-disable react/sort-comp */
@@ -94,13 +87,7 @@ export default class Draggable extends Component<Props> {
       return;
     }
 
-    // This draggable was not previously focused
-    if (this.props.draggableId !== lastFocused) {
-      return;
-    }
-
-    // This drag handle was previously focused - give it focus!
-    focusOnDragHandle(this.ref);
+    focusRetainer.tryRestoreFocus(this.props.draggableId, this.ref);
   }
 
   componentWillUnmount() {
@@ -147,14 +134,12 @@ export default class Draggable extends Component<Props> {
 
   onDragHandleFocus = () => {
     this.isDragHandleFocused = true;
-    // Record that this was the last focused draggable
-    lastFocused = this.props.draggableId;
+    focusRetainer.onDragHandleFocus(this.props.draggableId);
   }
 
   onDragHandleBlur = () => {
     this.isDragHandleFocused = false;
-    // On blur we can clear our last focused
-    lastFocused = null;
+    focusRetainer.onDragHandleBlur();
   }
 
   onMove = (client: Position) => {

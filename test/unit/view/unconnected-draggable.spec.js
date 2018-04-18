@@ -1454,8 +1454,8 @@ describe('Draggable - unconnected', () => {
 
       it('should not give focus to a mounting draggable that did not have the last focused id', () => {
         const firstWrapper = mountDraggable();
-        const firstNode: HTMLElement = firstWrapper.getDOMNode();
 
+        const firstNode: HTMLElement = firstWrapper.getDOMNode();
         // Originally does not have focus
         expect(firstNode).not.toBe(document.activeElement);
 
@@ -1481,6 +1481,48 @@ describe('Draggable - unconnected', () => {
         looseFocus(firstWrapper);
         firstWrapper.unmount();
         secondWrapper.unmount();
+      });
+
+      it('should not give focus draggable if something else on the page has been focused on', () => {
+        const body: ?HTMLElement = document.body;
+        if (!body) {
+          throw new Error('document.body required for test');
+        }
+        const button: HTMLButtonElement = document.createElement('button');
+        body.appendChild(button);
+
+        const firstWrapper = mountDraggable();
+        const firstNode: HTMLElement = firstWrapper.getDOMNode();
+
+        // Originally does not have focus
+        expect(firstNode).not.toBe(document.activeElement);
+
+        // Giving focus to draggable
+        firstNode.focus();
+        // Ensuring that the focus event handler is called
+        firstWrapper.simulate('focus');
+        // Asserting that it is now the focused element
+        expect(firstNode).toBe(document.activeElement);
+
+        // unmounting original
+        firstWrapper.unmount();
+
+        // now focusing on something else
+        button.focus();
+        expect(button).toBe(document.activeElement);
+
+        const secondWrapper = mountDraggable();
+        const secondNode: HTMLElement = secondWrapper.getDOMNode();
+
+        // does not get focus as button has it
+        expect(secondNode).not.toBe(document.activeElement);
+        expect(button).toBe(document.activeElement);
+
+        // cleanup
+        firstWrapper.unmount();
+        secondWrapper.unmount();
+        button.blur();
+        body.removeChild(button);
       });
     });
 
