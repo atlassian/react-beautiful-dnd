@@ -1404,6 +1404,47 @@ describe('Draggable - unconnected', () => {
         second.unmount();
       });
 
+      it('should maintain focus if another component is mounted before the focused component', () => {
+        const first = mountDraggable();
+        const firstNode: HTMLElement = first.getDOMNode();
+
+        // Originally does not have focus
+        expect(firstNode).not.toBe(document.activeElement);
+
+        // Giving focus to draggable
+        firstNode.focus();
+        // Ensuring that the focus event handler is called
+        first.simulate('focus');
+        // Asserting that it is now the focused element
+        expect(firstNode).toBe(document.activeElement);
+
+        // unmounting original
+        first.unmount();
+
+        // mounting another draggable that should not take focus
+        const otherProps: OwnProps = {
+          ...defaultOwnProps,
+          draggableId: 'my cool new id',
+        };
+        const other = mountDraggable({
+          ownProps: otherProps,
+        });
+        const otherNode: HTMLElement = other.getDOMNode();
+        expect(otherNode).not.toBe(document.activeElement);
+
+        // Now when we mount the component that should get focus
+
+        const second = mountDraggable();
+        const secondNode: HTMLElement = second.getDOMNode();
+
+        expect(secondNode).toBe(document.activeElement);
+
+        // cleanup
+        looseFocus(second);
+        second.unmount();
+        other.unmount();
+      });
+
       it('should not maintain focus if it did not have it when moving into a new list', () => {
         const wrapper = mountDraggable();
         const node: HTMLElement = wrapper.getDOMNode();
