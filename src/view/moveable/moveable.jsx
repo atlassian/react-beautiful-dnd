@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { Spring } from 'react-spring';
+import Spring from 'react-spring/dist/NumericalSpring';
 import { physics } from '../animation';
 import type { Position } from '../../types';
 import type { Props, DefaultProps, Style } from './moveable-types';
@@ -33,12 +33,12 @@ export default class Movable extends Component<Props> {
     const speed = this.props.speed;
     const destination = this.props.destination;
     const immediate = speed === 'INSTANT';
-    const from = { transform: `translate(${origin.x}px, ${origin.y}px)` };
-    const to = { transform: `translate(${destination.x}px, ${destination.y}px)` };
+    const from = { x: origin.x, y: origin.y };
+    const to = { x: destination.x, y: destination.y };
     const config = speed === 'FAST' ? physics.fast : physics.standard;
     return (
       <Spring immediate={immediate} config={config} from={from} to={to} onRest={this.onRest}>
-        {this.props.children}
+        {({ x, y }) => this.props.children({ transform: `translate3d(${x}px, ${y}px, 0)` })}
       </Spring>
     );
   }
