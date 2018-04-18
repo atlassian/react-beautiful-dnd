@@ -2,13 +2,14 @@
 import createStyleMarshal, { resetStyleContext } from '../../../src/view/style-marshal/style-marshal';
 import getStyles, { type Styles } from '../../../src/view/style-marshal/get-styles';
 import getStatePreset from '../../utils/get-simple-state-preset';
+import { prefix } from '../../../src/view/data-attributes';
 import type { StyleMarshal } from '../../../src/view/style-marshal/style-marshal-types';
 import type { State } from '../../../src/types';
 
 const state = getStatePreset();
 
 const getStyleTagSelector = (context: string) =>
-  `style[data-react-beautiful-dnd="${context}"]`;
+  `style[${prefix}="${context}"]`;
 
 const getStyleFromTag = (context: string): string => {
   const selector: string = getStyleTagSelector(context);

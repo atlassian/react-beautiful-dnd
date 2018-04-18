@@ -15,6 +15,7 @@ import type {
 import DraggableDimensionPublisher from '../draggable-dimension-publisher/';
 import Moveable from '../moveable/';
 import DragHandle from '../drag-handle';
+import focusOnDragHandle from './focus-on-drag-handle';
 import getViewport from '../window/get-viewport';
 // eslint-disable-next-line no-duplicate-imports
 import type {
@@ -53,7 +54,7 @@ export default class Draggable extends Component<Props> {
   /* eslint-disable react/sort-comp */
   callbacks: DragHandleCallbacks
   styleContext: string
-  isFocused: boolean = false
+  isDragHandleFocused: boolean = false
   ref: ?HTMLElement = null
 
   // Need to declare contextTypes without flow
@@ -98,8 +99,8 @@ export default class Draggable extends Component<Props> {
       return;
     }
 
-    // This draggable was previously focused - give it focus!
-    this.ref.focus();
+    // This drag handle was previously focused - give it focus!
+    focusOnDragHandle(this.ref);
   }
 
   componentWillUnmount() {
@@ -145,13 +146,13 @@ export default class Draggable extends Component<Props> {
   }
 
   onFocus = () => {
-    this.isFocused = true;
+    this.isDragHandleFocused = true;
     // Record that this was the last focused draggable
     lastFocused = this.props.draggableId;
   }
 
   onBlur = () => {
-    this.isFocused = false;
+    this.isDragHandleFocused = false;
     // On blur we can clear our last focused
     lastFocused = null;
   }
@@ -223,8 +224,8 @@ export default class Draggable extends Component<Props> {
     // After a ref change we might need to manually force focus onto the ref.
     // When moving something into or out of a portal the element looses focus
     // https://github.com/facebook/react/issues/12454
-    if (this.ref && this.isFocused) {
-      this.ref.focus();
+    if (this.ref && this.isDragHandleFocused) {
+      focusOnDragHandle(this.ref);
     }
   })
 

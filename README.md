@@ -1018,6 +1018,10 @@ It is a contract of this library that it owns the positioning logic of the dragg
 
 To get around this you can use [`React.Portal`](https://reactjs.org/docs/portals.html). We do not enable this functionality by default as it has performance problems. We have a [using a portal guide](/guides/using-a-portal.md) explaining the performance problem in more detail and how you can set up your own `React.Portal` if you want to.
 
+##### Focus retention on movement
+
+When moving a `Draggable` from one list to another the default browser behaviour is for the *drag handle* element to loose focus. This is not good when dragging with a keyboard as the user is then unable to continue to interact with the element. To improve this user experience we give a *drag handle* focus as it mounts if it had browser focus when it unmounted and nothing else has obtained browser focus.
+
 ##### Extending `DraggableProps.style`
 
 If you are using inline styles you are welcome to extend the `DraggableProps.style` object. You are also welcome to apply the `DraggableProps.style` object using inline styles and use your own styling solution for the component itself - such as [styled-components](https://github.com/styled-components/styled-components).

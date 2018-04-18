@@ -41,6 +41,7 @@ import { combine, withStore, withDroppableId, withStyleContext, withDimensionMar
 import { dispatchWindowMouseEvent, mouseEvent } from '../../utils/user-input-util';
 import getViewport from '../../../src/view/window/get-viewport';
 import { setViewport, resetViewport } from '../../utils/viewport';
+import * as attributes from '../../../src/view/data-attributes';
 
 class Item extends Component<{ provided: Provided }> {
   render() {
@@ -310,7 +311,7 @@ describe('Draggable - unconnected', () => {
     });
     const provided: Provided = getLastCall(myMock)[0].provided;
 
-    expect(provided.draggableProps['data-react-beautiful-dnd-draggable']).toEqual(styleMarshal.styleContext);
+    expect(provided.draggableProps[attributes.draggable]).toEqual(styleMarshal.styleContext);
   });
 
   describe('drag handle', () => {
