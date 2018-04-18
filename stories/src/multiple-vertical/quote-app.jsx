@@ -65,7 +65,6 @@ export default class QuoteApp extends Component<Props, State> {
 
   state: State = {
     quoteMap: this.props.initial,
-    autoFocusQuoteId: null,
   };
 
   onDragStart = (initial: DragStart) => {
@@ -107,7 +106,7 @@ export default class QuoteApp extends Component<Props, State> {
   }
 
   render() {
-    const { quoteMap, autoFocusQuoteId } = this.state;
+    const { quoteMap } = this.state;
     const disabledDroppable = 'TODO';
 
     return (
@@ -124,7 +123,6 @@ export default class QuoteApp extends Component<Props, State> {
                 listType="card"
                 isDropDisabled={disabledDroppable === 'alpha'}
                 quotes={quoteMap.alpha}
-                autoFocusQuoteId={autoFocusQuoteId}
               />
             </Column>
             <Column>
@@ -134,7 +132,6 @@ export default class QuoteApp extends Component<Props, State> {
                 listType="card"
                 isDropDisabled={disabledDroppable === 'beta'}
                 quotes={quoteMap.beta}
-                autoFocusQuoteId={autoFocusQuoteId}
               />
             </Column>
             <Column>
@@ -144,7 +141,6 @@ export default class QuoteApp extends Component<Props, State> {
                 listType="card"
                 isDropDisabled={disabledDroppable === 'gamma'}
                 quotes={quoteMap.gamma}
-                autoFocusQuoteId={autoFocusQuoteId}
               />
             </Column>
           </HorizontalScrollContainer>
@@ -156,7 +152,6 @@ export default class QuoteApp extends Component<Props, State> {
               listType="card"
               isDropDisabled={disabledDroppable === 'delta'}
               quotes={quoteMap.delta}
-              autoFocusQuoteId={autoFocusQuoteId}
             />
             <QuoteList
               title="epsilon"
@@ -165,7 +160,6 @@ export default class QuoteApp extends Component<Props, State> {
               internalScroll
               isDropDisabled={disabledDroppable === 'epsilon'}
               quotes={quoteMap.epsilon}
-              autoFocusQuoteId={autoFocusQuoteId}
             />
           </Column>
           <VerticalScrollContainer>
@@ -176,7 +170,6 @@ export default class QuoteApp extends Component<Props, State> {
                 listType="card"
                 isDropDisabled={disabledDroppable === 'zeta'}
                 quotes={quoteMap.zeta}
-                autoFocusQuoteId={autoFocusQuoteId}
               />
             </Column>
             <Column>
@@ -186,7 +179,6 @@ export default class QuoteApp extends Component<Props, State> {
                 listType="card"
                 isDropDisabled={disabledDroppable === 'eta'}
                 quotes={quoteMap.eta}
-                autoFocusQuoteId={autoFocusQuoteId}
               />
             </Column>
             <Column>
@@ -196,7 +188,6 @@ export default class QuoteApp extends Component<Props, State> {
                 listType="card"
                 isDropDisabled={disabledDroppable === 'theta'}
                 quotes={quoteMap.theta}
-                autoFocusQuoteId={autoFocusQuoteId}
               />
             </Column>
           </VerticalScrollContainer>
@@ -207,7 +198,6 @@ export default class QuoteApp extends Component<Props, State> {
               listType="card"
               isDropDisabled={disabledDroppable === 'iota'}
               quotes={quoteMap.iota}
-              autoFocusQuoteId={autoFocusQuoteId}
             />
           </Column>
           <Column>
@@ -218,7 +208,6 @@ export default class QuoteApp extends Component<Props, State> {
               internalScroll
               isDropDisabled={disabledDroppable === 'kappa'}
               quotes={quoteMap.kappa}
-              autoFocusQuoteId={autoFocusQuoteId}
             />
           </Column>
         </Root>

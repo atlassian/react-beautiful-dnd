@@ -692,15 +692,6 @@ Here are a few poor user experiences that can occur if you change things *during
 - If you remove the node that the user is dragging, then the drag will instantly end
 - If you change the dimension of the dragging node, then other things will not move out of the way at the correct time.
 
-#### Force focus after a transition between lists
-
-When an item is moved from one list to a different list, it loses browser focus if it had it. This is because `React` creates a new node in this situation. It will not lose focus if transitioned within the same list. The dragging item will always have had browser focus if it is dragging with a keyboard. It is highly recommended that you give the item (which is now in a different list) focus again. You can see an example of how to do this in our stories. Here is an example of how you could do it:
-
-- `onDragEnd`: move the item into the new list and record the id of the item that has moved
-- When rendering the reordered list, pass down a prop which will tell the newly moved item to obtain focus
-- In the `componentDidMount` lifecycle call back check if the item needs to gain focus based on its props (such as an `autoFocus` prop)
-- If focus is required - call `.focus` on the node. You can obtain the node by using `ReactDOM.findDOMNode` or monkey patching the `provided.innerRef` callback.
-
 ### `onDragStart` and `onDragEnd` pairing
 
 We try very hard to ensure that each `onDragStart` event is paired with a single `onDragEnd` event. However, there maybe a rogue situation where this is not the case. If that occurs - it is a bug. Currently there is no mechanism to tell the library to cancel a current drag externally.

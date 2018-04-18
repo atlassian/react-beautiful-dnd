@@ -10,7 +10,6 @@ type Props = {
   quote: Quote,
   isDragging: boolean,
   provided: DraggableProvided,
-  autoFocus?: boolean,
 }
 
 const Container = styled.a`
