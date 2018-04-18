@@ -22,6 +22,9 @@ const clearRetentionOnFocusShift = (() => {
     }
 
     isBound = true;
+    // Using capture: true as focus events do not bubble
+    // Additionally doing this prevents us from intercepting the initial
+    // focus event as it does not bubble up to this listener
     // eslint-disable-next-line no-use-before-define
     window.addEventListener('focus', onWindowFocusChange, { capture: true });
   };
