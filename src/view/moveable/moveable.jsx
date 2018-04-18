@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import Spring from 'react-spring/dist/NumericalSpring';
+import { Spring } from 'react-spring-numerical';
 import { physics } from '../animation';
 import type { Position } from '../../types';
 import type { Props, DefaultProps, Style } from './moveable-types';
