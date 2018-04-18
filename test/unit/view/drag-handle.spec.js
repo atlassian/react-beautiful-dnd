@@ -31,8 +31,6 @@ const primaryButton: number = 0;
 const auxiliaryButton: number = 1;
 
 const getStubCallbacks = (): Callbacks => ({
-  onFocus: jest.fn(),
-  onBlur: jest.fn(),
   onLift: jest.fn(),
   onMove: jest.fn(),
   onMoveForward: jest.fn(),
@@ -182,6 +180,7 @@ const getNestedWrapper = (parentCallbacks: Callbacks, childCallbacks: Callbacks)
       callbacks={parentCallbacks}
       direction="vertical"
       isDragging={false}
+      isDropAnimating={false}
       isEnabled
       getDraggableRef={() => parentRef}
       canDragInteractiveElements={false}
@@ -193,6 +192,7 @@ const getNestedWrapper = (parentCallbacks: Callbacks, childCallbacks: Callbacks)
             callbacks={childCallbacks}
             direction="vertical"
             isDragging={false}
+            isDropAnimating={false}
             isEnabled
             getDraggableRef={() => childRef}
             canDragInteractiveElements={false}
@@ -216,6 +216,7 @@ const getWrapper = (callbacks: Callbacks): ReactWrapper =>
       callbacks={callbacks}
       direction="vertical"
       isDragging={false}
+      isDropAnimating={false}
       isEnabled
       getDraggableRef={() => singleRef}
       canDragInteractiveElements={false}
@@ -266,6 +267,7 @@ describe('drag handle', () => {
         callbacks={callbacks}
         isEnabled
         isDragging={false}
+        isDropAnimating={false}
         direction={null}
         getDraggableRef={() => singleRef}
         canDragInteractiveElements={false}
@@ -291,6 +293,7 @@ describe('drag handle', () => {
         callbacks={callbacks}
         isEnabled
         isDragging={false}
+        isDropAnimating={false}
         direction={null}
         getDraggableRef={() => singleRef}
         canDragInteractiveElements={false}
@@ -324,6 +327,7 @@ describe('drag handle', () => {
               draggableId={draggableId}
               callbacks={customCallbacks}
               isDragging={false}
+              isDropAnimating={false}
               isEnabled
               direction={null}
               getDraggableRef={() => singleRef}
@@ -1497,6 +1501,7 @@ describe('drag handle', () => {
             draggableId={draggableId}
             callbacks={customCallbacks}
             isDragging={false}
+            isDropAnimating={false}
             isEnabled
             direction="vertical"
             getDraggableRef={() => singleRef}
@@ -1560,6 +1565,7 @@ describe('drag handle', () => {
             draggableId={draggableId}
             callbacks={customCallbacks}
             isDragging={false}
+            isDropAnimating={false}
             isEnabled
             direction={null}
             getDraggableRef={() => singleRef}
@@ -1663,6 +1669,7 @@ describe('drag handle', () => {
               callbacks={customCallbacks}
               direction="horizontal"
               isDragging={false}
+              isDropAnimating={false}
               isEnabled
               getDraggableRef={() => singleRef}
               canDragInteractiveElements={false}
@@ -2682,6 +2689,7 @@ describe('drag handle', () => {
           callbacks={callbacks}
           isEnabled={false}
           isDragging={false}
+          isDropAnimating={false}
           direction={null}
           getDraggableRef={() => singleRef}
           canDragInteractiveElements={false}
@@ -3065,6 +3073,7 @@ describe('drag handle', () => {
                   draggableId={draggableId}
                   callbacks={customCallbacks}
                   isDragging={false}
+                  isDropAnimating={false}
                   isEnabled
                   direction={null}
                   getDraggableRef={() => singleRef}
@@ -3100,6 +3109,7 @@ describe('drag handle', () => {
                   draggableId={draggableId}
                   callbacks={customCallbacks}
                   isDragging={false}
+                  isDropAnimating={false}
                   isEnabled
                   direction={null}
                   getDraggableRef={() => singleRef}
@@ -3138,6 +3148,7 @@ describe('drag handle', () => {
                   draggableId={draggableId}
                   callbacks={customCallbacks}
                   isDragging={false}
+                  isDropAnimating={false}
                   isEnabled
                   direction={null}
                   getDraggableRef={() => singleRef}
@@ -3181,6 +3192,7 @@ describe('drag handle', () => {
                   draggableId={draggableId}
                   callbacks={customCallbacks}
                   isDragging={false}
+                  isDropAnimating={false}
                   isEnabled
                   direction={null}
                   getDraggableRef={() => singleRef}
@@ -3227,6 +3239,7 @@ describe('drag handle', () => {
                   draggableId={draggableId}
                   callbacks={customCallbacks}
                   isDragging={false}
+                  isDropAnimating={false}
                   isEnabled
                   direction={null}
                   getDraggableRef={() => singleRef}
@@ -3269,6 +3282,7 @@ describe('drag handle', () => {
                   draggableId={draggableId}
                   callbacks={customCallbacks}
                   isDragging={false}
+                  isDropAnimating={false}
                   isEnabled
                   direction={null}
                   getDraggableRef={() => singleRef}
@@ -3323,6 +3337,7 @@ describe('drag handle', () => {
                 draggableId={draggableId}
                 callbacks={customCallbacks}
                 isDragging={false}
+                isDropAnimating={false}
                 isEnabled
                 direction={null}
                 getDraggableRef={() => singleRef}
