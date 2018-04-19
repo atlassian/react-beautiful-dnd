@@ -24,19 +24,30 @@ const Landing = styled.div`
 
   color: white;
   min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const SideBySide = styled.div`
-  display: flex;
-  justify-content: center;
   padding-top: ${grid * 10}px;
   padding-left: ${grid * 6}px;
   padding-right: ${grid * 6}px;
+  width: 100%;
   max-width: 1400px;
-  margin: 0 auto;
+
+  /* Flex parent */
+  display: flex;
+  justify-content: center;
+
+  /* Flex child */
+  /* Take up as much room as the footer does not take up */
+  flex-grow: 1;
 
   @media screen and (max-width: 1200px) {
     flex-direction: column;
+    align-items: center;
   }
 `;
 
@@ -52,7 +63,10 @@ const Example = styled.div`
   flex-grow: 0;
 `;
 
-const Footer = styled.footer``;
+const Footer = styled.footer`
+  flex-grow: 0;
+  flex-shrink: 0;
+`;
 
 // const Footer = styled.div`
 //   flex-growth: 0;
@@ -91,7 +105,7 @@ const IndexPage = () => (
         </Example>
       </SideBySide>
       <Footer>
-        {/*<GithubStarButton />*/}
+        <GithubStarButton />
       </Footer>
     </Landing>
   </React.Fragment>

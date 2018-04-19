@@ -47,6 +47,7 @@ const ActionLink = styled(Link)`
   font-size: 1.1rem;
   font-weight: bold;
   user-select: none;
+  box-sizing: border-box;
 
   /* shared border styles */
   border-width: 4px;
@@ -77,18 +78,21 @@ const GetStartedLink = ActionLink.extend`
   background-color: ${colors.G300};
   border-color: ${colors.G100};
   font-size: 1.5rem;
+  padding-top: ${grid * 1.4}px;
+  padding-bottom: ${grid * 1.4}px;
 
   :hover, :active {
     background-color: ${colors.G200};
   }
 `;
 
-const smallButtonWidth: number = 150;
+const smallButtonWidth: number = 200;
 
 const ExampleLink = ActionLink.extend`
   background-color: ${colors.Y300};
   border-color: ${colors.Y100};
   width: ${smallButtonWidth}px;
+  margin-left: 0;
 
   :hover, :active {
     background-color: ${colors.Y200};
