@@ -70,7 +70,14 @@ const tryRestoreFocus = (id: DraggableId, draggableRef: HTMLElement) => {
   retainingFocusFor = null;
   // no need to clear it - we are already clearing it
   clearRetentionOnFocusChange.cancel();
-  getDragHandleRef(draggableRef).focus();
+
+  const dragHandleRef: ?HTMLElement = getDragHandleRef(draggableRef);
+
+  if (!dragHandleRef) {
+    console.warn('Could not find drag handle in the DOM to focus on it');
+    return;
+  }
+  dragHandleRef.focus();
 };
 
 const retainer: FocusRetainer = {

@@ -50,7 +50,7 @@ class Item extends Component<{ provided: Provided }> {
     return (
       <div
         className="item"
-        ref={ref => provided.innerRef(ref)}
+        ref={provided.innerRef}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
       >
@@ -255,7 +255,13 @@ const getStubber = stub =>
       const snapshot: StateSnapshot = this.props.snapshot;
       stub({ provided, snapshot });
       return (
-        <div ref={provided.innerRef} />
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+        >
+          Drag me!
+        </div>
       );
     }
   };
@@ -278,7 +284,7 @@ class WithNestedHandle extends Component<{ provided: Provided }> {
     const provided: Provided = this.props.provided;
     return (
       <div
-        ref={ref => provided.innerRef(ref)}
+        ref={provided.innerRef}
         {...provided.draggableProps}
       >
         <div className="cannot-drag">

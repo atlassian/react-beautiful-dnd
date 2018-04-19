@@ -2,6 +2,7 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
+import invariant from 'tiny-invariant';
 import getWindowFromRef from '../get-window-from-ref';
 import getDragHandleRef from './util/get-drag-handle-ref';
 import type {
@@ -90,7 +91,15 @@ export default class DragHandle extends Component<Props> {
       return;
     }
 
-    focusRetainer.tryRestoreFocus(this.props.draggableId, getDragHandleRef(draggableRef));
+    // drag handle ref will not be available when not enabled
+    if (!this.props.isEnabled) {
+      return;
+    }
+
+    const dragHandleRef: ?HTMLElement = getDragHandleRef(draggableRef);
+    invariant(dragHandleRef, 'DragHandle could not find drag handle element');
+
+    focusRetainer.tryRestoreFocus(this.props.draggableId, dragHandleRef);
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -101,9 +110,21 @@ export default class DragHandle extends Component<Props> {
       // After a ref change we might need to manually force focus onto the ref.
       // When moving something into or out of a portal the element looses focus
       // https://github.com/facebook/react/issues/12454
-      if (ref && this.isFocused) {
-        getDragHandleRef(ref).focus();
+
+      // No need to focus
+      if (!ref || !this.isFocused) {
+        return;
       }
+
+      // No drag handle ref will be available to focus on
+      if (!this.props.isEnabled) {
+        return;
+      }
+
+      const dragHandleRef: ?HTMLElement = getDragHandleRef(ref);
+      invariant(dragHandleRef, 'DragHandle could not find drag handle element');
+
+      dragHandleRef.focus();
     }
 
     const isCapturing: boolean = this.isAnySensorCapturing();
@@ -156,6 +177,10 @@ export default class DragHandle extends Component<Props> {
     });
 
     const shouldRetainFocus: boolean = (() => {
+      if (!this.props.isEnabled) {
+        return false;
+      }
+
       // not already focused
       if (!this.isFocused) {
         return false;
