@@ -24,7 +24,6 @@ type ReorderQuoteMapArgs = {|
 
 export type ReorderQuoteMapResult = {|
   quoteMap: QuoteMap,
-  autoFocusQuoteId: ?string,
 |}
 
 export const reorderQuoteMap = ({
@@ -49,8 +48,6 @@ export const reorderQuoteMap = ({
     };
     return {
       quoteMap: result,
-      // not auto focusing in own list
-      autoFocusQuoteId: null,
     };
   }
 
@@ -69,7 +66,6 @@ export const reorderQuoteMap = ({
 
   return {
     quoteMap: result,
-    autoFocusQuoteId: target.id,
   };
 };
 

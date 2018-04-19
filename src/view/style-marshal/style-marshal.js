@@ -2,6 +2,7 @@
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import getStyles, { type Styles } from './get-styles';
+import { prefix } from '../data-attributes';
 import type { StyleMarshal } from './style-marshal-types';
 import type {
   State as AppState,
@@ -14,8 +15,6 @@ let count: number = 0;
 type State = {|
   el: ?HTMLStyleElement,
 |}
-
-const prefix: string = 'data-react-beautiful-dnd';
 
 // Required for server side rendering as count is persisted across requests
 export const resetStyleContext = () => {

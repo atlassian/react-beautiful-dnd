@@ -32,7 +32,6 @@ type Props = {|
   title: string,
   quotes: Quote[],
   index: number,
-  autoFocusQuoteId: ?string,
 |}
 
 export default class Column extends Component<Props> {
@@ -59,7 +58,6 @@ export default class Column extends Component<Props> {
               listId={title}
               listType="QUOTE"
               quotes={quotes}
-              autoFocusQuoteId={this.props.autoFocusQuoteId}
             />
           </Container>
         )}

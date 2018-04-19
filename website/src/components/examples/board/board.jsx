@@ -40,7 +40,6 @@ type Props = {|
 type State = {|
   columns: QuoteMap,
   ordered: string[],
-  autoFocusQuoteId: ?string,
 |}
 
 export default class Board extends Component<Props, State> {
@@ -49,7 +48,6 @@ export default class Board extends Component<Props, State> {
   state: State = {
     columns: this.props.initial,
     ordered: Object.keys(this.props.initial),
-    autoFocusQuoteId: null,
   }
 
   boardRef: ?HTMLElement
@@ -65,10 +63,6 @@ export default class Board extends Component<Props, State> {
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
-
-    this.setState({
-      autoFocusQuoteId: null,
-    });
   }
 
   onDragEnd = (result: DropResult) => {
@@ -113,7 +107,6 @@ export default class Board extends Component<Props, State> {
 
     this.setState({
       columns: data.quoteMap,
-      autoFocusQuoteId: data.autoFocusQuoteId,
     });
   }
 
@@ -137,7 +130,6 @@ export default class Board extends Component<Props, State> {
                 index={index}
                 title={key}
                 quotes={columns[key]}
-                autoFocusQuoteId={this.state.autoFocusQuoteId}
               />
             ))}
           </Container>

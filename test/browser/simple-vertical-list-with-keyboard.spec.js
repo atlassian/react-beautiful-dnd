@@ -2,6 +2,8 @@
 * @jest-environment node
 */
 // @flow
+import * as attributes from '../../src/view/data-attributes';
+
 const puppeteer = require('puppeteer');
 
 const urlSingleList: string = 'http://localhost:9002/iframe.html?selectedKind=single%20vertical%20list&selectedStory=basic';
@@ -29,9 +31,9 @@ const returnPositionAndText = async (page: Object, selector: Selector) =>
   });
 
 /* Css selectors used */
-const singleListContainer: string = '[data-react-beautiful-dnd-droppable]';
-const firstCard: string = '[data-react-beautiful-dnd-drag-handle]:nth-child(1)';
-const secondCard: string = '[data-react-beautiful-dnd-drag-handle]:nth-child(2)';
+const singleListContainer: string = `[${attributes.droppable}]`;
+const firstCard: string = `[${attributes.dragHandle}]:nth-child(1)`;
+const secondCard: string = `[${attributes.dragHandle}]:nth-child(2)`;
 
 describe('Browser test: single vertical list with keyboard', () => {
   let browser;
