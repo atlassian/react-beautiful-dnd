@@ -60,7 +60,8 @@ export default class ScreenReaderWatcher extends React.Component<*, State> {
     message: null,
   }
   componentDidMount() {
-    const target: ?HTMLElement = document.getElementById('react-beautiful-dnd-announcement-0');
+    // finding the first announcement
+    const target: ?HTMLElement = document.querySelector('[id^=react-beautiful-dnd-announcement]');
 
     if (!target) {
       console.error('Could not find screen reader target');

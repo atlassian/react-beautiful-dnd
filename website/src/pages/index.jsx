@@ -51,7 +51,6 @@ const Heading = styled.header`
 `;
 const IndexPage = () => (
   <React.Fragment>
-    <ScreenReaderWatcher />
     <Landing>
       <Heading>
         <Title>react-beautiful-dnd</Title>
@@ -65,6 +64,7 @@ const IndexPage = () => (
         <CallToAction />
       </Footer>
     </Landing>
+    <ScreenReaderWatcher />
   </React.Fragment>
 );
 
