@@ -31,19 +31,9 @@ type Props = {|
   author: Author,
   provided: DraggableProvided,
   snapshot: DraggableStateSnapshot,
-  autoFocus?: boolean,
 |}
 
 export default class AuthorItem extends Component<Props> {
-  componentDidMount() {
-    if (!this.props.autoFocus) {
-      return;
-    }
-
-    // eslint-disable-next-line react/no-find-dom-node
-    const node: HTMLElement = ReactDOM.findDOMNode(this);
-    node.focus();
-  }
 
   render() {
     const author: Author = this.props.author;

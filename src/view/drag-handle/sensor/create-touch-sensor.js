@@ -1,7 +1,6 @@
 // @flow
 /* eslint-disable no-use-before-define */
 import createScheduler from '../util/create-scheduler';
-import getWindowFromRef from '../../get-window-from-ref';
 import createPostDragEventPreventer, { type EventPreventer } from '../util/create-post-drag-event-preventer';
 import createEventMarshal, { type EventMarshal } from '../util/create-event-marshal';
 import { bindEvents, unbindEvents } from '../util/bind-events';
@@ -98,12 +97,11 @@ const initial: State = {
 
 export default ({
   callbacks,
-  getDraggableRef,
+  getWindow,
   canStartCapturing,
 }: CreateSensorArgs): TouchSensor => {
   let state: State = initial;
 
-  const getWindow = (): HTMLElement => getWindowFromRef(getDraggableRef());
   const setState = (partial: Object): void => {
     state = {
       ...state,

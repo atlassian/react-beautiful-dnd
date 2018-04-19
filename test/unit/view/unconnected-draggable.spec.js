@@ -41,6 +41,7 @@ import { combine, withStore, withDroppableId, withStyleContext, withDimensionMar
 import { dispatchWindowMouseEvent, mouseEvent } from '../../utils/user-input-util';
 import getViewport from '../../../src/view/window/get-viewport';
 import { setViewport, resetViewport } from '../../utils/viewport';
+import * as attributes from '../../../src/view/data-attributes';
 
 class Item extends Component<{ provided: Provided }> {
   render() {
@@ -49,7 +50,7 @@ class Item extends Component<{ provided: Provided }> {
     return (
       <div
         className="item"
-        ref={ref => provided.innerRef(ref)}
+        ref={provided.innerRef}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
       >
@@ -104,18 +105,17 @@ const getDispatchPropsStub = (): DispatchProps => ({
   dropAnimationFinished: jest.fn(),
 });
 
-// $ExpectError - not setting children function
 const defaultOwnProps: OwnProps = {
   draggableId,
+  index: 0,
   isDragDisabled: false,
-  type,
+  disableInteractiveElementBlocking: false,
+  children: () => null,
 };
 
-// $ExpectError - not setting children function
 const disabledOwnProps: OwnProps = {
-  draggableId,
+  ...defaultOwnProps,
   isDragDisabled: true,
-  type,
 };
 
 const defaultMapProps: MapProps = {
@@ -255,7 +255,13 @@ const getStubber = stub =>
       const snapshot: StateSnapshot = this.props.snapshot;
       stub({ provided, snapshot });
       return (
-        <div ref={provided.innerRef} />
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+        >
+          Drag me!
+        </div>
       );
     }
   };
@@ -265,6 +271,32 @@ const customViewport: Viewport = {
   maxScroll: { x: 600, y: 600 },
   subject: getArea({ top: 200, left: 100, right: 300, bottom: 300 }),
 };
+
+const looseFocus = (wrapper: ReactWrapper) => {
+  const el: HTMLElement = wrapper.getDOMNode();
+  // raw event
+  el.blur();
+  // let the wrapper know about it
+  wrapper.simulate('blur');
+};
+class WithNestedHandle extends Component<{ provided: Provided }> {
+  render() {
+    const provided: Provided = this.props.provided;
+    return (
+      <div
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+      >
+        <div className="cannot-drag">
+          Cannot drag by me
+        </div>
+        <div className="can-drag" {...provided.dragHandleProps}>
+          Can drag by me
+        </div>
+      </div>
+    );
+  }
+}
 
 describe('Draggable - unconnected', () => {
   beforeAll(() => {
@@ -303,7 +335,7 @@ describe('Draggable - unconnected', () => {
     });
     const provided: Provided = getLastCall(myMock)[0].provided;
 
-    expect(provided.draggableProps['data-react-beautiful-dnd-draggable']).toEqual(styleMarshal.styleContext);
+    expect(provided.draggableProps[attributes.draggable]).toEqual(styleMarshal.styleContext);
   });
 
   describe('drag handle', () => {
@@ -341,25 +373,6 @@ describe('Draggable - unconnected', () => {
     });
 
     describe('non standard drag handle', () => {
-      class WithNestedHandle extends Component<{ provided: Provided }> {
-        render() {
-          const provided: Provided = this.props.provided;
-          return (
-            <div
-              ref={ref => provided.innerRef(ref)}
-              {...provided.draggableProps}
-            >
-              <div className="cannot-drag">
-                Cannot drag by me
-              </div>
-              <div className="can-drag" {...provided.dragHandleProps}>
-                Can drag by me
-              </div>
-            </div>
-          );
-        }
-      }
-
       it('should allow the ability to have the drag handle to be a child of the draggable', () => {
         const dispatchProps: DispatchProps = getDispatchPropsStub();
         managedWrapper = mountDraggable({
@@ -1367,7 +1380,10 @@ describe('Draggable - unconnected', () => {
     });
   });
 
-  describe('Portal usage', () => {
+  // This is covered in focus-management.spec
+  // But I have included in here also to ensure that the entire
+  // consumer experience is tested (this is how a consumer would use it)
+  describe('Portal usage (Draggable consumer)', () => {
     const body: ?HTMLElement = document.body;
     if (!body) {
       throw new Error('Portal test requires document.body to be present');
@@ -1456,6 +1472,9 @@ describe('Draggable - unconnected', () => {
       expect(latest).not.toBe(original);
       // no longer in a portal
       expect(latest).not.toBe(wrapper.find(WithPortal).instance().portal);
+
+      // cleanup
+      looseFocus(wrapper);
     });
 
     it('should not take focus if moving to a portal and did not previously have focus', () => {

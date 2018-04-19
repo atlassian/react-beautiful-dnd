@@ -2,7 +2,6 @@
 /* eslint-disable no-use-before-define */
 import createScheduler from '../util/create-scheduler';
 import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
-import getWindowFromRef from '../../get-window-from-ref';
 import * as keyCodes from '../../key-codes';
 import preventStandardKeyEvents from '../util/prevent-standard-key-events';
 import createPostDragEventPreventer, { type EventPreventer } from '../util/create-post-drag-event-preventer';
@@ -34,7 +33,7 @@ const mouseDownMarshal: EventMarshal = createEventMarshal();
 
 export default ({
   callbacks,
-  getDraggableRef,
+  getWindow,
   canStartCapturing,
 }: CreateSensorArgs): MouseSensor => {
   let state: State = {
@@ -47,7 +46,6 @@ export default ({
   const isDragging = (): boolean => state.isDragging;
   const isCapturing = (): boolean => Boolean(state.pending || state.isDragging);
   const schedule = createScheduler(callbacks);
-  const getWindow = (): HTMLElement => getWindowFromRef(getDraggableRef());
   const postDragEventPreventer: EventPreventer = createPostDragEventPreventer(getWindow);
 
   const startDragging = (fn?: Function = noop) => {
