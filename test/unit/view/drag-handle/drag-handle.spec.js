@@ -4,10 +4,10 @@ import type { Node } from 'react';
 import { mount } from 'enzyme';
 // eslint-disable-next-line no-duplicate-imports
 import type { ReactWrapper } from 'enzyme';
-import DragHandle from '../../../src/view/drag-handle/drag-handle';
-import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
+import DragHandle from '../../../../src/view/drag-handle/drag-handle';
+import { sloppyClickThreshold } from '../../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
 // eslint-disable-next-line no-duplicate-imports
-import type { Callbacks, DragHandleProps } from '../../../src/view/drag-handle/drag-handle-types';
+import type { Callbacks, DragHandleProps } from '../../../../src/view/drag-handle/drag-handle-types';
 import {
   dispatchWindowMouseEvent,
   dispatchWindowKeyDownEvent,
@@ -16,23 +16,22 @@ import {
   touchEvent,
   withKeyboard,
   dispatchWindowEvent,
-} from '../../utils/user-input-util';
-import type { Position, DraggableId } from '../../../src/types';
-import * as keyCodes from '../../../src/view/key-codes';
-import getWindowScroll from '../../../src/view/window/get-window-scroll';
-import setWindowScroll from '../../utils/set-window-scroll';
-import getArea from '../../../src/state/get-area';
-import { timeForLongPress, forcePressThreshold } from '../../../src/view/drag-handle/sensor/create-touch-sensor';
-import { interactiveTagNames } from '../../../src/view/drag-handle/util/should-allow-dragging-from-target';
-import type { TagNameMap } from '../../../src/view/drag-handle/util/should-allow-dragging-from-target';
-import { styleContextKey, canLiftContextKey } from '../../../src/view/context-keys';
+} from '../../../utils/user-input-util';
+import type { Position, DraggableId } from '../../../../src/types';
+import * as keyCodes from '../../../../src/view/key-codes';
+import getWindowScroll from '../../../../src/view/window/get-window-scroll';
+import setWindowScroll from '../../../utils/set-window-scroll';
+import getArea from '../../../../src/state/get-area';
+import { timeForLongPress, forcePressThreshold } from '../../../../src/view/drag-handle/sensor/create-touch-sensor';
+import { interactiveTagNames } from '../../../../src/view/drag-handle/util/should-allow-dragging-from-target';
+import type { TagNameMap } from '../../../../src/view/drag-handle/util/should-allow-dragging-from-target';
+import { styleContextKey, canLiftContextKey } from '../../../../src/view/context-keys';
+import * as attributes from '../../../../src/view/data-attributes';
 
 const primaryButton: number = 0;
 const auxiliaryButton: number = 1;
 
 const getStubCallbacks = (): Callbacks => ({
-  onFocus: jest.fn(),
-  onBlur: jest.fn(),
   onLift: jest.fn(),
   onMove: jest.fn(),
   onMoveForward: jest.fn(),
@@ -167,6 +166,9 @@ const childRef: HTMLElement = document.createElement('div');
 const singleRef: HTMLElement = document.createElement('div');
 
 [parentRef, childRef, singleRef].forEach((ref: HTMLElement) => {
+  // faking that they are drag handles
+  ref.setAttribute(attributes.dragHandle, 'yolo');
+
   jest.spyOn(ref, 'getBoundingClientRect').mockImplementation(() => getArea({
     left: 0,
     top: 0,
@@ -182,6 +184,7 @@ const getNestedWrapper = (parentCallbacks: Callbacks, childCallbacks: Callbacks)
       callbacks={parentCallbacks}
       direction="vertical"
       isDragging={false}
+      isDropAnimating={false}
       isEnabled
       getDraggableRef={() => parentRef}
       canDragInteractiveElements={false}
@@ -193,6 +196,7 @@ const getNestedWrapper = (parentCallbacks: Callbacks, childCallbacks: Callbacks)
             callbacks={childCallbacks}
             direction="vertical"
             isDragging={false}
+            isDropAnimating={false}
             isEnabled
             getDraggableRef={() => childRef}
             canDragInteractiveElements={false}
@@ -216,6 +220,7 @@ const getWrapper = (callbacks: Callbacks): ReactWrapper =>
       callbacks={callbacks}
       direction="vertical"
       isDragging={false}
+      isDropAnimating={false}
       isEnabled
       getDraggableRef={() => singleRef}
       canDragInteractiveElements={false}
@@ -266,6 +271,7 @@ describe('drag handle', () => {
         callbacks={callbacks}
         isEnabled
         isDragging={false}
+        isDropAnimating={false}
         direction={null}
         getDraggableRef={() => singleRef}
         canDragInteractiveElements={false}
@@ -291,6 +297,7 @@ describe('drag handle', () => {
         callbacks={callbacks}
         isEnabled
         isDragging={false}
+        isDropAnimating={false}
         direction={null}
         getDraggableRef={() => singleRef}
         canDragInteractiveElements={false}
@@ -324,6 +331,7 @@ describe('drag handle', () => {
               draggableId={draggableId}
               callbacks={customCallbacks}
               isDragging={false}
+              isDropAnimating={false}
               isEnabled
               direction={null}
               getDraggableRef={() => singleRef}
@@ -1497,6 +1505,7 @@ describe('drag handle', () => {
             draggableId={draggableId}
             callbacks={customCallbacks}
             isDragging={false}
+            isDropAnimating={false}
             isEnabled
             direction="vertical"
             getDraggableRef={() => singleRef}
@@ -1560,6 +1569,7 @@ describe('drag handle', () => {
             draggableId={draggableId}
             callbacks={customCallbacks}
             isDragging={false}
+            isDropAnimating={false}
             isEnabled
             direction={null}
             getDraggableRef={() => singleRef}
@@ -1663,6 +1673,7 @@ describe('drag handle', () => {
               callbacks={customCallbacks}
               direction="horizontal"
               isDragging={false}
+              isDropAnimating={false}
               isEnabled
               getDraggableRef={() => singleRef}
               canDragInteractiveElements={false}
@@ -2682,6 +2693,7 @@ describe('drag handle', () => {
           callbacks={callbacks}
           isEnabled={false}
           isDragging={false}
+          isDropAnimating={false}
           direction={null}
           getDraggableRef={() => singleRef}
           canDragInteractiveElements={false}
@@ -3065,6 +3077,7 @@ describe('drag handle', () => {
                   draggableId={draggableId}
                   callbacks={customCallbacks}
                   isDragging={false}
+                  isDropAnimating={false}
                   isEnabled
                   direction={null}
                   getDraggableRef={() => singleRef}
@@ -3100,6 +3113,7 @@ describe('drag handle', () => {
                   draggableId={draggableId}
                   callbacks={customCallbacks}
                   isDragging={false}
+                  isDropAnimating={false}
                   isEnabled
                   direction={null}
                   getDraggableRef={() => singleRef}
@@ -3138,6 +3152,7 @@ describe('drag handle', () => {
                   draggableId={draggableId}
                   callbacks={customCallbacks}
                   isDragging={false}
+                  isDropAnimating={false}
                   isEnabled
                   direction={null}
                   getDraggableRef={() => singleRef}
@@ -3181,6 +3196,7 @@ describe('drag handle', () => {
                   draggableId={draggableId}
                   callbacks={customCallbacks}
                   isDragging={false}
+                  isDropAnimating={false}
                   isEnabled
                   direction={null}
                   getDraggableRef={() => singleRef}
@@ -3227,6 +3243,7 @@ describe('drag handle', () => {
                   draggableId={draggableId}
                   callbacks={customCallbacks}
                   isDragging={false}
+                  isDropAnimating={false}
                   isEnabled
                   direction={null}
                   getDraggableRef={() => singleRef}
@@ -3269,6 +3286,7 @@ describe('drag handle', () => {
                   draggableId={draggableId}
                   callbacks={customCallbacks}
                   isDragging={false}
+                  isDropAnimating={false}
                   isEnabled
                   direction={null}
                   getDraggableRef={() => singleRef}
@@ -3323,6 +3341,7 @@ describe('drag handle', () => {
                 draggableId={draggableId}
                 callbacks={customCallbacks}
                 isDragging={false}
+                isDropAnimating={false}
                 isEnabled
                 direction={null}
                 getDraggableRef={() => singleRef}

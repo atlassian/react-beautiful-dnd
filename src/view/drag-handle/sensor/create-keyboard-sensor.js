@@ -3,7 +3,6 @@
 import createScheduler from '../util/create-scheduler';
 import preventStandardKeyEvents from '../util/prevent-standard-key-events';
 import * as keyCodes from '../../key-codes';
-import getWindowFromRef from '../../get-window-from-ref';
 import getCenterPosition from '../../get-center-position';
 import { bindEvents, unbindEvents } from '../util/bind-events';
 import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
@@ -38,6 +37,7 @@ const noop = () => { };
 
 export default ({
   callbacks,
+  getWindow,
   getDraggableRef,
   canStartCapturing,
 }: CreateSensorArgs): KeyboardSensor => {
@@ -47,8 +47,6 @@ export default ({
   const setState = (newState: State): void => {
     state = newState;
   };
-  const getWindow = (): HTMLElement => getWindowFromRef(getDraggableRef());
-
   const startDragging = (fn?: Function = noop) => {
     setState({
       isDragging: true,

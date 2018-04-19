@@ -36,7 +36,6 @@ export default class QuoteApp extends Component<Props, State> {
 
   state: State = {
     quoteMap: this.props.initial,
-    autoFocusQuoteId: null,
   }
 
   onDragStart = (initial: DragStart) => {
@@ -61,7 +60,7 @@ export default class QuoteApp extends Component<Props, State> {
   }
 
   render() {
-    const { quoteMap, autoFocusQuoteId } = this.state;
+    const { quoteMap } = this.state;
 
     return (
       <DragDropContext
@@ -76,7 +75,6 @@ export default class QuoteApp extends Component<Props, State> {
               listId={key}
               listType="CARD"
               quotes={quoteMap[key]}
-              autoFocusQuoteId={autoFocusQuoteId}
             />
           ))}
         </Root>

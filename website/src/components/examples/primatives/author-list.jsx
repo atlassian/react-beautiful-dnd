@@ -53,7 +53,6 @@ type Props = {|
   listId: string,
   listType?: string,
   internalScroll?: boolean,
-  autoFocusQuoteId?: ?string,
 |}
 
 export default class AuthorList extends Component<Props> {
@@ -75,7 +74,6 @@ export default class AuthorList extends Component<Props> {
                   author={quote.author}
                   provided={dragProvided}
                   snapshot={dragSnapshot}
-                  autoFocus={this.props.autoFocusQuoteId === quote.id}
                 />
             )}
             </Draggable>

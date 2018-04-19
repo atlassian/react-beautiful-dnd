@@ -10,7 +10,6 @@ type Props = {
   quote: Quote,
   isDragging: boolean,
   provided: DraggableProvided,
-  autoFocus?: boolean,
 }
 
 const Container = styled.a`
@@ -99,16 +98,6 @@ flex-grow: 1;
 // things we should be doing in the selector as we do not know if consumers
 // will be using PureComponent
 export default class QuoteItem extends React.PureComponent<Props> {
-  componentDidMount() {
-    if (!this.props.autoFocus) {
-      return;
-    }
-
-    // eslint-disable-next-line react/no-find-dom-node
-    const node: HTMLElement = (ReactDOM.findDOMNode(this) : any);
-    node.focus();
-  }
-
   render() {
     const { quote, isDragging, provided } = this.props;
 

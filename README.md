@@ -76,8 +76,6 @@ You can check out all the features that will be landing soon [on our issue page]
 
 There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing [`react-dnd`](https://github.com/react-dnd/react-dnd). It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **`react-beautiful-dnd` is a higher level abstraction specifically built for vertical and horizontal lists**. Within that subset of functionality `react-beautiful-dnd` offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by react-dnd. So this library might not be for you depending on what your use case is.
 
-`react-beautiful-dnd` [uses `position: fixed` to position the dragging element](#positioning-ownership). In some layouts, this might break how the element is rendered. One example is a `<table>`-based layout which will lose column widths for dragged `<tr>`s. Follow [#103](https://github.com/atlassian/react-beautiful-dnd/issues/103) for updates on support for this use case.
-
 ## Driving philosophy: physicality
 
 The core design idea of `react-beautiful-dnd` is physicality: we want users to feel like they are moving physical objects around
@@ -692,15 +690,6 @@ Here are a few poor user experiences that can occur if you change things *during
 - If you remove the node that the user is dragging, then the drag will instantly end
 - If you change the dimension of the dragging node, then other things will not move out of the way at the correct time.
 
-#### Force focus after a transition between lists
-
-When an item is moved from one list to a different list, it loses browser focus if it had it. This is because `React` creates a new node in this situation. It will not lose focus if transitioned within the same list. The dragging item will always have had browser focus if it is dragging with a keyboard. It is highly recommended that you give the item (which is now in a different list) focus again. You can see an example of how to do this in our stories. Here is an example of how you could do it:
-
-- `onDragEnd`: move the item into the new list and record the id of the item that has moved
-- When rendering the reordered list, pass down a prop which will tell the newly moved item to obtain focus
-- In the `componentDidMount` lifecycle call back check if the item needs to gain focus based on its props (such as an `autoFocus` prop)
-- If focus is required - call `.focus` on the node. You can obtain the node by using `ReactDOM.findDOMNode` or monkey patching the `provided.innerRef` callback.
-
 ### `onDragStart` and `onDragEnd` pairing
 
 We try very hard to ensure that each `onDragStart` event is paired with a single `onDragEnd` event. However, there maybe a rogue situation where this is not the case. If that occurs - it is a bug. Currently there is no mechanism to tell the library to cancel a current drag externally.
@@ -1026,6 +1015,10 @@ It is a contract of this library that it owns the positioning logic of the dragg
 `react-beautiful-dnd` uses `position: fixed` to position the dragging element. This is quite robust and allows for you to have `position: relative | absolute | fixed` parents. However, unfortunately `position:fixed` is [impacted by `transform`](http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/) (such as `transform: rotate(10deg);`). This means that if you have a `transform: *` on one of the parents of a `Draggable` then the positioning logic will be incorrect while dragging. Lame! For most consumers this will not be an issue.
 
 To get around this you can use [`React.Portal`](https://reactjs.org/docs/portals.html). We do not enable this functionality by default as it has performance problems. We have a [using a portal guide](/guides/using-a-portal.md) explaining the performance problem in more detail and how you can set up your own `React.Portal` if you want to.
+
+##### Focus retention when moving between lists
+
+When moving a `Draggable` from one list to another the default browser behaviour is for the *drag handle* element to loose focus. This is because the old element is being destroyed and a new one is being created. The loss of focus is not good when dragging with a keyboard as the user is then unable to continue to interact with the element. To improve this user experience we give a *drag handle* focus as it mounts if it had browser focus when it unmounted and nothing else has obtained browser focus.
 
 ##### Extending `DraggableProps.style`
 

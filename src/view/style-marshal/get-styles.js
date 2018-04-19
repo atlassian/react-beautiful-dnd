@@ -1,5 +1,6 @@
 // @flow
 import { css } from '../animation';
+import * as attributes from '../data-attributes';
 
 export type Styles = {|
   dragging: string,
@@ -8,12 +9,10 @@ export type Styles = {|
   userCancel: string,
 |}
 
-const prefix: string = 'data-react-beautiful-dnd';
-
 export default (styleContext: string): Styles => {
-  const dragHandleSelector: string = `[${prefix}-drag-handle="${styleContext}"]`;
-  const draggableSelector: string = `[${prefix}-draggable="${styleContext}"]`;
-  const droppableSelector: string = `[${prefix}-droppable="${styleContext}"]`;
+  const dragHandleSelector: string = `[${attributes.dragHandle}="${styleContext}"]`;
+  const draggableSelector: string = `[${attributes.draggable}="${styleContext}"]`;
+  const droppableSelector: string = `[${attributes.droppable}="${styleContext}"]`;
 
   // ## Drag handle styles
 

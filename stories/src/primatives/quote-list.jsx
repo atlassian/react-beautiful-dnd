@@ -50,13 +50,11 @@ type Props = {|
   isDropDisabled ?: boolean,
   style?: Object,
   // may not be provided - and might be null
-  autoFocusQuoteId?: ?string,
   ignoreContainerClipping?: boolean,
 |}
 
 type QuoteListProps = {|
   quotes: Quote[],
-  autoFocusQuoteId: ?string,
 |}
 
 class InnerQuoteList extends React.Component<QuoteListProps> {
@@ -77,7 +75,6 @@ class InnerQuoteList extends React.Component<QuoteListProps> {
             quote={quote}
             isDragging={dragSnapshot.isDragging}
             provided={dragProvided}
-            autoFocus={this.props.autoFocusQuoteId === quote.id}
           />
         )}
       </Draggable>
@@ -89,12 +86,11 @@ type InnerListProps = {|
   dropProvided: DroppableProvided,
   quotes: Quote[],
   title: ?string,
-  autoFocusQuoteId: ?string,
 |}
 
 class InnerList extends React.Component<InnerListProps> {
   render() {
-    const { quotes, dropProvided, autoFocusQuoteId } = this.props;
+    const { quotes, dropProvided } = this.props;
     const title = this.props.title ? (
       <Title>{this.props.title}</Title>
     ) : null;
@@ -105,7 +101,6 @@ class InnerList extends React.Component<InnerListProps> {
         <DropZone innerRef={dropProvided.innerRef}>
           <InnerQuoteList
             quotes={quotes}
-            autoFocusQuoteId={autoFocusQuoteId}
           />
           {dropProvided.placeholder}
         </DropZone>
@@ -124,7 +119,6 @@ export default class QuoteList extends React.Component<Props> {
       listType,
       style,
       quotes,
-      autoFocusQuoteId,
       title,
     } = this.props;
 
@@ -148,7 +142,6 @@ export default class QuoteList extends React.Component<Props> {
                   quotes={quotes}
                   title={title}
                   dropProvided={dropProvided}
-                  autoFocusQuoteId={autoFocusQuoteId}
                 />
               </ScrollContainer>
             ) : (
@@ -156,7 +149,6 @@ export default class QuoteList extends React.Component<Props> {
                 quotes={quotes}
                 title={title}
                 dropProvided={dropProvided}
-                autoFocusQuoteId={autoFocusQuoteId}
               />
             )}
           </Wrapper>
