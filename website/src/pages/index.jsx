@@ -9,12 +9,13 @@ import ScreenReaderWatcher from '../components/landing/screen-reader-watcher';
 import { grid } from '../layouts/constants';
 
 const Title = styled.h1`
-  text-align: center;
-  font-size: 50px;
+  font-family: 'Clicker Script', cursive;
+  font-weight: normal;
+  font-size: 90px;
 `;
 
 const Tagline = styled.p`
-  text-align: center;
+  xpadding-top: ${grid * 2}px;
   font-size: 20px;
 `;
 
@@ -24,47 +25,64 @@ const Landing = styled.div`
 
   color: white;
   height: 100vh;
-  display: flex;
-  flex-direction: column;
 `;
 
-const Footer = styled.div`
-  flex-growth: 0;
-  flex-shrink: 0;
-
-  margin-top: ${grid * 2}px;
+const SideBySide = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const BoardContainer = styled.div`
-  flex-grow: 1;
-  flex-shrink: 1;
-  overflow: auto;
-  max-width: 600px;
+  justify-content: center;
+  padding-top: ${grid * 10}px;
+  max-width: 1400px;
   margin: 0 auto;
 `;
 
-const Heading = styled.header`
-  margin-bottom: ${grid * 2}px;
+const Content = styled.div`
+  margin-top: ${grid * 8}px;
+  flex-basis: 100%;
 `;
+const Example = styled.div`
+  flex-basis: 100%;
+`;
+
+const Footer = styled.footer``;
+
+// const Footer = styled.div`
+//   flex-growth: 0;
+//   flex-shrink: 0;
+
+//   margin-top: ${grid * 2}px;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+// `;
+
+// const BoardContainer = styled.div`
+//   flex-grow: 1;
+//   flex-shrink: 1;
+//   overflow: auto;
+//   max-width: 600px;
+//   margin: 0 auto;
+// `;
+
+// const Heading = styled.header`
+//   margin-bottom: ${grid * 2}px;
+// `;
 const IndexPage = () => (
   <React.Fragment>
     <Landing>
-      <Heading>
-        <Title>react-beautiful-dnd</Title>
-        <Tagline>Beautiful, accessible drag and drop for lists with React.js </Tagline>
-      </Heading>
-      <BoardContainer>
-        <Board />
-      </BoardContainer>
+      <SideBySide>
+        <Content>
+          <Title>React-Beautiful-Dnd</Title>
+          <Tagline>Beautiful, accessible drag and drop for lists with React.js </Tagline>
+          <CallToAction />
+        </Content>
+        <Example>
+          <Board />
+        </Example>
+      </SideBySide>
       <Footer>
-        <GithubStarButton />
-        <CallToAction />
+        {/*<GithubStarButton />*/}
       </Footer>
     </Landing>
-    <ScreenReaderWatcher />
   </React.Fragment>
 );
 

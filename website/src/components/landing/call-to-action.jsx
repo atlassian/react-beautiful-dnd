@@ -9,16 +9,15 @@ import styled, { keyframes } from 'styled-components';
 import { grid } from '../../layouts/constants';
 
 const ActionBox = styled.div`
-  margin: ${grid * 2}px auto;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: ${grid * 2}px;
 `;
 
 const ActionLink = styled(Link)`
   border: 2px solid grey;
-  margin: 0 ${grid}px;
+  margin-bottom: ${grid}px;
   padding: ${grid * 2}px ${grid * 3}px;
   border-radius: 2px;
   border-radius: 2px;
@@ -108,18 +107,19 @@ const DocumentationLink = ActionLink.extend`
 
 export default () => (
   <ActionBox>
+    <GetStartedLink to="/guides/get-started">
+      Get started
+      <ButtonIcon>
+        <SendIcon size="large" label="Get started" />
+      </ButtonIcon>
+    </GetStartedLink>
     <ExampleLink to="/examples">
       <span>Examples</span>
       <ButtonIcon>
         <EditIcon size="medium" label="Examples" />
       </ButtonIcon>
     </ExampleLink>
-    <GetStartedLink to="/guides/get-started">
-        Get started
-      <ButtonIcon>
-        <SendIcon size="large" label="Get started" />
-      </ButtonIcon>
-    </GetStartedLink>
+
     <DocumentationLink to="/documentation">
       <span>Documentation</span>
       <ButtonIcon>

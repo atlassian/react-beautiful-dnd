@@ -17,12 +17,11 @@ type Props = {
 
 const PageTemplate = ({ children } : Props) => (
   <div>
-    <Helmet
-      title="react-beautiful-dnd"
-      meta={[
-            { name: 'description', content: 'react-beautiful-dnd: Beautiful, accessible drag and drop for lists with React.js' },
-          ]}
-    />
+    <Helmet>
+      <title>react-beautiful-dnd</title>
+      <meta name="description" content="react-beautiful-dnd: Beautiful, accessible drag and drop for lists with React.js" />
+      <link href="https://fonts.googleapis.com/css?family=Clicker+Script" rel="stylesheet" />
+    </Helmet>
     {children()}
   </div>
 );
