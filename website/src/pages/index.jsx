@@ -15,7 +15,6 @@ const Title = styled.h1`
 `;
 
 const Tagline = styled.p`
-  xpadding-top: ${grid * 2}px;
   font-size: 20px;
 `;
 
@@ -24,23 +23,33 @@ const Landing = styled.div`
   background: #0079BF;
 
   color: white;
-  height: 100vh;
+  min-height: 100vh;
 `;
 
 const SideBySide = styled.div`
   display: flex;
   justify-content: center;
   padding-top: ${grid * 10}px;
+  padding-left: ${grid * 6}px;
+  padding-right: ${grid * 6}px;
   max-width: 1400px;
   margin: 0 auto;
+
+  @media screen and (max-width: 1200px) {
+    flex-direction: column;
+  }
+`;
+
+const Actions = styled.div`
+  margin-top: ${grid * 2}px;
 `;
 
 const Content = styled.div`
   margin-top: ${grid * 8}px;
-  flex-basis: 100%;
+  flex-grow: 1;
 `;
 const Example = styled.div`
-  flex-basis: 100%;
+  flex-grow: 0;
 `;
 
 const Footer = styled.footer``;
@@ -73,7 +82,9 @@ const IndexPage = () => (
         <Content>
           <Title>React-Beautiful-Dnd</Title>
           <Tagline>Beautiful, accessible drag and drop for lists with React.js </Tagline>
-          <CallToAction />
+          <Actions>
+            <CallToAction />
+          </Actions>
         </Content>
         <Example>
           <Board />

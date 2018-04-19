@@ -8,40 +8,6 @@ import EditIcon from '@atlaskit/icon/glyph/edit';
 import styled, { keyframes } from 'styled-components';
 import { grid } from '../../layouts/constants';
 
-const ActionBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-top: ${grid * 2}px;
-`;
-
-const ActionLink = styled(Link)`
-  border: 2px solid grey;
-  margin-bottom: ${grid}px;
-  padding: ${grid * 2}px ${grid * 3}px;
-  border-radius: 2px;
-  border-radius: 2px;
-  color: ${colors.N10};
-  font-size: 1.1rem;
-  font-weight: bold;
-  user-select: none;
-
-  /* shared border styles */
-  border-width: 4px;
-  border-style: solid;
-
-  /* used to align the text next to the icon */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  :hover {
-    cursor: pointer;
-    text-decoration: none;
-    color: ${colors.N10};
-  }
-`;
-
 const movement: number = 6;
 
 const shake = keyframes`
@@ -66,6 +32,38 @@ const shake = keyframes`
   }
 `;
 
+const ActionBox = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const ActionLink = styled(Link)`
+  border: 2px solid grey;
+  margin: ${grid}px;
+  padding: ${grid * 1}px ${grid * 2}px;
+  border-radius: 2px;
+  border-radius: 2px;
+  color: ${colors.N10};
+  font-size: 1.1rem;
+  font-weight: bold;
+  user-select: none;
+
+  /* shared border styles */
+  border-width: 4px;
+  border-style: solid;
+
+  /* used to align the text next to the icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  :hover {
+    cursor: pointer;
+    text-decoration: none;
+    color: ${colors.N10};
+  }
+`;
+
 const ButtonIcon = styled.span`
   display: flex;
   margin-left: ${grid / 2}px;
@@ -85,10 +83,12 @@ const GetStartedLink = ActionLink.extend`
   }
 `;
 
+const smallButtonWidth: number = 150;
+
 const ExampleLink = ActionLink.extend`
   background-color: ${colors.Y300};
   border-color: ${colors.Y100};
-  width: 160px;
+  width: ${smallButtonWidth}px;
 
   :hover, :active {
     background-color: ${colors.Y200};
@@ -98,7 +98,7 @@ const ExampleLink = ActionLink.extend`
 const DocumentationLink = ActionLink.extend`
   background-color: ${colors.P300}
   border-color: ${colors.P100};
-  width: 160px;
+  width: ${smallButtonWidth}px;
 
   :hover, :active {
     background-color: ${colors.P200};
@@ -107,19 +107,18 @@ const DocumentationLink = ActionLink.extend`
 
 export default () => (
   <ActionBox>
-    <GetStartedLink to="/guides/get-started">
-      Get started
-      <ButtonIcon>
-        <SendIcon size="large" label="Get started" />
-      </ButtonIcon>
-    </GetStartedLink>
     <ExampleLink to="/examples">
       <span>Examples</span>
       <ButtonIcon>
         <EditIcon size="medium" label="Examples" />
       </ButtonIcon>
     </ExampleLink>
-
+    <GetStartedLink to="/guides/get-started">
+      Get started
+      <ButtonIcon>
+        <SendIcon size="large" label="Get started" />
+      </ButtonIcon>
+    </GetStartedLink>
     <DocumentationLink to="/documentation">
       <span>Documentation</span>
       <ButtonIcon>
