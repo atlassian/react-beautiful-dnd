@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { DragDropContext, Droppable } from '../../../../../src';
 import Column from './column';
 import initial from './entities';
-import { grid } from '../../../layouts/constants';
+import { grid } from '../../constants';
 import reorder from '../../reorder';
 import type {
   DroppableProvided,

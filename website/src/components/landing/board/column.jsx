@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { colors } from '@atlaskit/theme';
 import { Draggable, Droppable } from '../../../../../src';
 import Quote from './quote';
-import { grid } from '../../../layouts/constants';
+import { grid } from '../../constants';
 import type {
   DroppableProvided,
   DraggableProvided,

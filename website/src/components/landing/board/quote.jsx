@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { colors } from '@atlaskit/theme';
 import { Draggable } from '../../../../../src';
-import { grid } from '../../../layouts/constants';
+import { grid } from '../../constants';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../../../src';
 import type { Quote as QuoteType, Author as AuthorType } from '../../types';
 

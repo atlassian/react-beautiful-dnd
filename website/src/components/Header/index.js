@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import Link from 'gatsby-link';
-import { colors, grid } from '../../layouts/constants';
+import { colors, grid } from '../constants';
 
 const Header = () => (
   <div
