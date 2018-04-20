@@ -1,5 +1,6 @@
 // @flow
 import { keyframes } from 'styled-components';
+
 const movement: number = 6;
 
 const minorRotation = keyframes`

@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { colors } from '@atlaskit/theme';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import Board from '../components/landing/board';
 import CallToAction from '../components/landing/call-to-action';
@@ -9,10 +9,7 @@ import SocialIcons from '../components/landing/social-icons';
 import GithubStarButton from '../components/landing/github-star-button';
 import ScreenReaderWatcher from '../components/landing/screen-reader-watcher';
 import { grid } from '../layouts/constants';
-
-const media = {
-  singleColumn: (...args: mixed[]) => `@media screen and (max-width: 1350px) { ${css(...args)} }`,
-};
+import * as media from '../layouts/media';
 
 const Title = styled.h1`
   font-family: 'Clicker Script', cursive;
@@ -21,13 +18,13 @@ const Title = styled.h1`
 
   ${media.singleColumn`
     text-align: center;
-    font-size: 12vw;
+    font-size: 10vw;
+    white-space: nowrap;
   `}
 `;
 
 const Tagline = styled.p`
   font-size: 20px;
-
   ${media.singleColumn`text-align: center`}
 `;
 
@@ -56,13 +53,20 @@ const SideBySide = styled.div`
   `}
 `;
 
-const Actions = styled.div`
-  margin-top: ${grid * 2}px;
+const VerticalRhythm = styled.div`
+  margin-top: ${grid * 4}px;
 `;
 
 const Content = styled.div`
   margin-top: ${grid * 8}px;
   flex-grow: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  ${media.singleColumn`
+    align-items: center;
+  `}
 `;
 const Example = styled.div`
   flex-grow: 0;
@@ -75,10 +79,12 @@ const IndexPage = () => (
         <Content>
           <Title>React-Beautiful-Dnd</Title>
           <Tagline>Beautiful, accessible drag and drop for lists with React.js </Tagline>
-          <Actions>
+          <VerticalRhythm>
             <CallToAction />
-          </Actions>
-          <SocialIcons />
+          </VerticalRhythm>
+          <VerticalRhythm>
+            <SocialIcons />
+          </VerticalRhythm>
         </Content>
         <Example>
           <Board />

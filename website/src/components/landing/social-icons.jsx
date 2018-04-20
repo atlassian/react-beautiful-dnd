@@ -5,7 +5,7 @@ import { colors } from '@atlaskit/theme';
 import GithubIcon from 'react-icons/lib/fa/github';
 import TwitterIcon from 'react-icons/lib/fa/twitter';
 import { grid } from '../../layouts/constants';
-import { shake } from '../animations';
+import { shake } from '../../layouts/animations';
 
 const Container = styled.div`
   display: flex;
@@ -17,12 +17,23 @@ const ExternalLink = styled.a`
 
   :hover, :active {
     animation: ${shake};
-    color: ${colors.T75};
+    /* fallback */
+    color: ${colors.N0};
   }
 `;
 
 const TwitterLink = ExternalLink.extend`
   margin-left: ${grid}px;
+
+  :hover, :active {
+    color: ${colors.T75};
+  }
+`;
+
+const GithubLink = ExternalLink.extend`
+  :hover, :active {
+    color: ${colors.N70};
+  }
 `;
 
 const iconProps: Object = {
@@ -34,7 +45,7 @@ export default class SocialIcons extends React.Component <*> {
   render() {
     return (
       <Container>
-        <ExternalLink href="https://github.com/atlassian/react-beautiful-dnd"><GithubIcon {...iconProps} /></ExternalLink>
+        <GithubLink href="https://github.com/atlassian/react-beautiful-dnd"><GithubIcon {...iconProps} /></GithubLink>
         <TwitterLink href="https://twitter.com/alexandereardon"><TwitterIcon {...iconProps} /></TwitterLink>
       </Container>
     );

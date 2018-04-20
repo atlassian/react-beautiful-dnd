@@ -7,16 +7,23 @@ import BookIcon from '@atlaskit/icon/glyph/book';
 import EditIcon from '@atlaskit/icon/glyph/edit';
 import styled from 'styled-components';
 import { grid } from '../../layouts/constants';
-import { shake } from '../animations';
+import { shake } from '../../layouts/animations';
+import * as media from '../../layouts/media';
 
 const ActionBox = styled.div`
   display: flex;
   align-items: center;
+
+  ${media.singleColumn`
+    flex-direction: column;
+    align-items: stretch;
+    min-width: 60vw;
+  `}
 `;
 
 const ActionLink = styled(Link)`
   border: 2px solid grey;
-  margin: ${grid}px;
+  margin: 0 ${grid}px;
   padding: ${grid * 1}px ${grid * 2}px;
   border-radius: 2px;
   border-radius: 2px;
@@ -40,6 +47,12 @@ const ActionLink = styled(Link)`
     text-decoration: none;
     color: ${colors.N10};
   }
+
+  ${media.singleColumn`
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 8px;
+  `}
 `;
 
 const ButtonIcon = styled.span`
@@ -54,22 +67,16 @@ const ButtonIcon = styled.span`
 const GetStartedLink = ActionLink.extend`
   background-color: ${colors.G300};
   border-color: ${colors.G100};
-  font-size: 1.5rem;
-  padding-top: ${grid * 1.4}px;
-  padding-bottom: ${grid * 1.4}px;
+  margin-left: 0;
 
   :hover, :active {
     background-color: ${colors.G200};
   }
 `;
 
-const smallButtonWidth: number = 200;
-
 const ExampleLink = ActionLink.extend`
   background-color: ${colors.Y300};
   border-color: ${colors.Y100};
-  width: ${smallButtonWidth}px;
-  margin-left: 0;
 
   :hover, :active {
     background-color: ${colors.Y200};
@@ -79,31 +86,34 @@ const ExampleLink = ActionLink.extend`
 const DocumentationLink = ActionLink.extend`
   background-color: ${colors.P300}
   border-color: ${colors.P100};
-  width: ${smallButtonWidth}px;
 
   :hover, :active {
     background-color: ${colors.P200};
   }
+
+  ${media.singleColumn`
+    margin-bottom: 0;
+  `}
 `;
 
 export default () => (
   <ActionBox>
-    <ExampleLink to="/examples">
-      <span>Examples</span>
-      <ButtonIcon>
-        <EditIcon size="medium" label="Examples" />
-      </ButtonIcon>
-    </ExampleLink>
     <GetStartedLink to="/guides/get-started">
-      Get started
+      <span>Get started</span>
       <ButtonIcon>
         <SendIcon size="large" label="Get started" />
       </ButtonIcon>
     </GetStartedLink>
+    <ExampleLink to="/examples">
+      <span>Examples</span>
+      <ButtonIcon>
+        <EditIcon size="large" label="Examples" />
+      </ButtonIcon>
+    </ExampleLink>
     <DocumentationLink to="/documentation">
       <span>Documentation</span>
       <ButtonIcon>
-        <BookIcon size="medium" label="Documentation" />
+        <BookIcon size="large" label="Documentation" />
       </ButtonIcon>
     </DocumentationLink>
   </ActionBox>
