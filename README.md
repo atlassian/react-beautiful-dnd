@@ -1018,7 +1018,12 @@ To get around this you can use [`React.Portal`](https://reactjs.org/docs/portals
 
 ##### Focus retention when moving between lists
 
-When moving a `Draggable` from one list to another the default browser behaviour is for the *drag handle* element to loose focus. This is because the old element is being destroyed and a new one is being created. The loss of focus is not good when dragging with a keyboard as the user is then unable to continue to interact with the element. To improve this user experience we give a *drag handle* focus as it mounts if it had browser focus when it unmounted and nothing else has obtained browser focus.
+When moving a `Draggable` from one list to another the default browser behaviour is for the *drag handle* element to loose focus. This is because the old element is being destroyed and a new one is being created. The loss of focus is not good when dragging with a keyboard as the user is then unable to continue to interact with the element. To improve this user experience we automatically give a *drag handle* focus when:
+
+- It was unmounted at the end of a drag
+- It had focus
+- It is enabled when mounted
+- No other elements have gained browser focus before the drag handle has mounted
 
 ##### Extending `DraggableProps.style`
 

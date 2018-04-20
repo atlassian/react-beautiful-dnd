@@ -108,7 +108,7 @@ export default class DragHandle extends Component<Props> {
       this.lastDraggableRef = ref;
 
       // After a ref change we might need to manually force focus onto the ref.
-      // When moving something into or out of a portal the element looses focus
+      // When moving something into or out of a portal the element loses focus
       // https://github.com/facebook/react/issues/12454
 
       // No need to focus

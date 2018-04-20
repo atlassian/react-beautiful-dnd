@@ -272,7 +272,7 @@ const customViewport: Viewport = {
   subject: getArea({ top: 200, left: 100, right: 300, bottom: 300 }),
 };
 
-const looseFocus = (wrapper: ReactWrapper) => {
+const loseFocus = (wrapper: ReactWrapper) => {
   const el: HTMLElement = wrapper.getDOMNode();
   // raw event
   el.blur();
@@ -1474,7 +1474,7 @@ describe('Draggable - unconnected', () => {
       expect(latest).not.toBe(wrapper.find(WithPortal).instance().portal);
 
       // cleanup
-      looseFocus(wrapper);
+      loseFocus(wrapper);
     });
 
     it('should not take focus if moving to a portal and did not previously have focus', () => {
