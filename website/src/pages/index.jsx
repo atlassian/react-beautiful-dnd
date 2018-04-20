@@ -1,13 +1,10 @@
 // @flow
 import React from 'react';
-import { colors } from '@atlaskit/theme';
 import styled from 'styled-components';
 import Media from 'react-media';
 import Board from '../components/landing/board';
 import CallToAction from '../components/landing/call-to-action';
 import SocialIcons from '../components/landing/social-icons';
-import GithubStarButton from '../components/landing/github-star-button';
-import ScreenReaderWatcher from '../components/landing/screen-reader-watcher';
 import { grid } from '../layouts/constants';
 import { singleColumn } from '../layouts/media';
 
@@ -78,27 +75,25 @@ const Example = styled.div`
 `;
 
 const IndexPage = () => (
-  <React.Fragment>
-    <Landing>
-      <SideBySide>
-        <Content>
-          <Title>React-Beautiful-Dnd</Title>
-          <Tagline>Beautiful, accessible drag and drop for lists with React.js </Tagline>
-          <VerticalRhythm>
-            <CallToAction />
-          </VerticalRhythm>
-          <VerticalRhythm>
-            <SocialIcons />
-          </VerticalRhythm>
-        </Content>
-        <Example>
-          <Media query={singleColumn.query}>
-            {(matches: boolean) => <Board numberOfColumns={matches ? 1 : 2} />}
-          </Media>
-        </Example>
-      </SideBySide>
-    </Landing>
-  </React.Fragment>
+  <Landing>
+    <SideBySide>
+      <Content>
+        <Title>React-Beautiful-Dnd</Title>
+        <Tagline>Beautiful, accessible drag and drop for lists with React.js </Tagline>
+        <VerticalRhythm>
+          <CallToAction />
+        </VerticalRhythm>
+        <VerticalRhythm>
+          <SocialIcons />
+        </VerticalRhythm>
+      </Content>
+      <Example>
+        <Media query={singleColumn.query}>
+          {(matches: boolean) => <Board numberOfColumns={matches ? 1 : 2} />}
+        </Media>
+      </Example>
+    </SideBySide>
+  </Landing>
 );
 
 export default IndexPage;

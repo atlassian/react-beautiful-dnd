@@ -8,6 +8,7 @@ type MediaRule = {|
   fn: WhenRuleFn,
 |}
 
+// eslint-disable-next-line import/prefer-default-export
 export const singleColumn: MediaRule = (() => {
   const query: string = 'screen and (max-width: 1300px)';
 
@@ -15,5 +16,5 @@ export const singleColumn: MediaRule = (() => {
 
   return {
     query, fn,
-  }
+  };
 })();

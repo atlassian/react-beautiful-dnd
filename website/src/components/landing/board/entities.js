@@ -1,7 +1,7 @@
 // @flow
 import loveColumnHeader from './love-column-header';
-import { authors, quotes, quoteMap, getByAuthor } from '../../quotes';
-import type { Author, Quote, Id } from '../../types';
+import { quotes, quoteMap } from '../../quotes';
+import type { Quote, Id } from '../../types';
 import type {
   Column,
   ColumnMap,

@@ -25,4 +25,5 @@ const minorRotation = keyframes`
   }
 `;
 
+// eslint-disable-next-line import/prefer-default-export
 export const shake = `${minorRotation} 0.4s linear infinite`;
