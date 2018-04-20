@@ -1,4 +1,5 @@
 // @flow
+import loveColumnHeader from './love-column-header';
 import { authors, quotes, quoteMap, getByAuthor } from '../../quotes';
 import type { Author, Quote, Id } from '../../types';
 import type {
@@ -11,13 +12,13 @@ const half: number = quotes.length / 2;
 
 const first: Column = {
   id: 'column-1',
-  title: 'Quotes that I ❤️',
+  title: loveColumnHeader,
   quoteIds: quotes.slice(0, half).map((quote: Quote): Id => quote.id),
 };
 
 const second: Column = {
   id: 'column-2',
-  title: 'Awesome quotes',
+  title: () => 'Awesome quotes',
   quoteIds: quotes.slice(half, quotes.length - 1).map((quote: Quote): Id => quote.id),
 };
 

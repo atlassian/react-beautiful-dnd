@@ -97,7 +97,7 @@ export default class Column extends React.Component<Props> {
           >
             {/* Making the column draggable from the column */}
             <Header {...draggableProvided.dragHandleProps}>
-              {column.title}
+              {column.title()}
             </Header>
             <Droppable droppableId={column.id} type="quote">
               {(droppableProvided: DroppableProvided, droppableSnapshot: DroppableStateSnapshot) => (
