@@ -5,7 +5,6 @@ import { colors } from '@atlaskit/theme';
 import GithubIcon from 'react-icons/lib/fa/github';
 import TwitterIcon from 'react-icons/lib/fa/twitter';
 import { grid } from '../constants';
-import { shake } from '../animations';
 
 const Container = styled.div`
   display: flex;
