@@ -1,26 +1,99 @@
 // @flow
 import React from 'react';
-import Link from 'gatsby-link';
+import styled from 'styled-components';
+import Media from 'react-media';
+import Board from '../components/landing/board';
+import CallToAction from '../components/landing/call-to-action';
+import SocialIcons from '../components/landing/social-icons';
+import { grid } from '../layouts/constants';
+import { singleColumn } from '../layouts/media';
+
+const Title = styled.h1`
+  font-family: 'Clicker Script', cursive;
+  font-weight: normal;
+  font-size: 90px;
+
+  ${singleColumn.fn`
+    text-align: center;
+    font-size: 10vw;
+    white-space: nowrap;
+  `}
+`;
+
+const Tagline = styled.p`
+  font-size: 20px;
+  ${singleColumn.fn`text-align: center`}
+`;
+
+const Landing = styled.div`
+  /* Trello blue 500 https://design.trello.com/style/color */
+  background: #0079BF;
+
+  color: white;
+  min-height: 100vh;
+`;
+
+const SideBySide = styled.div`
+  padding-top: ${grid * 10}px;
+  padding-left: ${grid * 6}px;
+  padding-right: ${grid * 6}px;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  display: flex;
+  /* wrap early if we need it (hopefully not!)*/
+  /* flex-wrap: wrap; */
+
+  ${singleColumn.fn`
+    flex-direction: column;
+    align-items: center;
+  `}
+`;
+
+const verticalSpacing = `margin-top: ${grid * 4}px;`;
+
+const VerticalRhythm = styled.div`
+  ${verticalSpacing}
+`;
+
+const Content = styled.div`
+  margin-top: ${grid * 8}px;
+  flex-grow: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  ${singleColumn.fn`
+    align-items: center;
+  `}
+`;
+
+const Example = styled.div`
+  flex-grow: 0;
+
+  ${singleColumn.fn`${verticalSpacing}`}
+`;
 
 const IndexPage = () => (
-  <div>
-    <h1>React Beautiful-DnD</h1>
-    <p>
-      This site is still under construction. You can view our examples{' '}
-      <Link href="/examples" to="/examples">
-        here
-      </Link>, or check out or existing docs{' '}
-      <a href="https://github.com/atlassian/react-beautiful-dnd">
-        on github
-      </a>.
-    </p>
-    <p>
-      New docs will live{' '}
-      <Link href="/docs" to="/docs">
-        here
-      </Link>
-    </p>
-  </div>
+  <Landing>
+    <SideBySide>
+      <Content>
+        <Title>React-Beautiful-Dnd</Title>
+        <Tagline>Beautiful, accessible drag and drop for lists with React.js </Tagline>
+        <VerticalRhythm>
+          <CallToAction />
+        </VerticalRhythm>
+        <VerticalRhythm>
+          <SocialIcons />
+        </VerticalRhythm>
+      </Content>
+      <Example>
+        <Media query={singleColumn.query}>
+          {(matches: boolean) => <Board numberOfColumns={matches ? 1 : 2} />}
+        </Media>
+      </Example>
+    </SideBySide>
+  </Landing>
 );
 
 export default IndexPage;
