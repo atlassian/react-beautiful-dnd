@@ -65,7 +65,7 @@ const tryRestoreFocus = (id: DraggableId, draggableRef: HTMLElement) => {
     return;
   }
 
-  // We are about to force force onto a drag handle
+  // We are about to force focus onto a drag handle
 
   retainingFocusFor = null;
   // no need to clear it - we are already clearing it
