@@ -5,13 +5,21 @@
   "author": "Alex Reardon <areardon@atlassian.com>",
   "dependencies": {
     "@atlaskit/css-reset": "^2.0.0",
+    "@atlaskit/icon": "^11.0.0",
+    "@atlaskit/theme": "^3.0.0",
     "gatsby": "^1.9.241",
     "gatsby-link": "^1.6.39",
     "gatsby-plugin-react-helmet": "^2.0.8",
+    "gatsby-plugin-styled-components": "^2.0.11",
     "gatsby-source-filesystem": "^1.5.28",
     "gatsby-transformer-remark": "^1.7.39",
     "lodash.lowercase": "^4.3.0",
-    "react-helmet": "^5.2.0"
+    "react": "^16.3.1",
+    "react-dom": "^16.3.1",
+    "react-helmet": "^5.2.0",
+    "react-icons": "^2.2.7",
+    "react-media": "^1.8.0",
+    "styled-components": "^3.2.5"
   },
   "keywords": [
     "drag and drop",

@@ -1,13 +1,13 @@
 // @flow
 import React from 'react';
 import Link from 'gatsby-link';
-import theme from '../../layouts/theme';
+import { colors, grid } from '../../layouts/constants';
 
 const Header = () => (
   <div
     style={{
-      background: theme.brand,
-      marginBottom: '1.45rem',
+      background: colors.brand,
+      marginBottom: grid,
     }}
   >
     <div
@@ -26,7 +26,7 @@ const Header = () => (
             textDecoration: 'none',
           }}
         >
-          react beatuiful-dnd
+          react-beautiful-dnd
         </Link>
       </h1>
     </div>
