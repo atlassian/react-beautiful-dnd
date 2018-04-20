@@ -5,8 +5,8 @@ import Media from 'react-media';
 import Board from './board';
 import CallToAction from './call-to-action';
 import SocialIcons from './social-icons';
-import { grid } from '../../layouts/constants';
-import { singleColumn } from '../../layouts/media';
+import { grid } from '../constants';
+import { singleColumn } from '../media';
 
 const Title = styled.h1`
   font-family: 'Clicker Script', cursive;

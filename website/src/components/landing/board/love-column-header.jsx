@@ -2,7 +2,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import HeartIcon from 'react-icons/lib/go/heart';
-import { grid } from '../../../layouts/constants';
+import { grid } from '../../constants';
 
 const LoveContainer = styled.div`
   display: flex;

@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { colors } from '@atlaskit/theme';
 import FeedbackIcon from '@atlaskit/icon/glyph/feedback';
-import { grid } from '../../layouts/constants';
+import { grid } from '../constants';
 
 const isMutationObserverSupported: boolean = typeof MutationObserver !== 'undefined';
 

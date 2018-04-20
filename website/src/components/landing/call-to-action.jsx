@@ -6,9 +6,9 @@ import SendIcon from '@atlaskit/icon/glyph/send';
 import BookIcon from '@atlaskit/icon/glyph/book';
 import EditIcon from '@atlaskit/icon/glyph/edit';
 import styled from 'styled-components';
-import { grid } from '../../layouts/constants';
-import { shake } from '../../layouts/animations';
-import { singleColumn } from '../../layouts/media';
+import { grid } from '../constants';
+import { shake } from '../animations';
+import { singleColumn } from '../media';
 
 const ActionBox = styled.div`
   display: flex;
