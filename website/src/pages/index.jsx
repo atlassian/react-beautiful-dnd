@@ -1,21 +1,34 @@
 // @flow
 import React from 'react';
 import { colors } from '@atlaskit/theme';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+
 import Board from '../components/landing/board';
 import CallToAction from '../components/landing/call-to-action';
+import SocialIcons from '../components/landing/social-icons';
 import GithubStarButton from '../components/landing/github-star-button';
 import ScreenReaderWatcher from '../components/landing/screen-reader-watcher';
 import { grid } from '../layouts/constants';
+
+const media = {
+  singleColumn: (...args: mixed[]) => `@media screen and (max-width: 1350px) { ${css(...args)} }`,
+};
 
 const Title = styled.h1`
   font-family: 'Clicker Script', cursive;
   font-weight: normal;
   font-size: 90px;
+
+  ${media.singleColumn`
+    text-align: center;
+    font-size: 12vw;
+  `}
 `;
 
 const Tagline = styled.p`
   font-size: 20px;
+
+  ${media.singleColumn`text-align: center`}
 `;
 
 const Landing = styled.div`
@@ -24,31 +37,23 @@ const Landing = styled.div`
 
   color: white;
   min-height: 100vh;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 `;
 
 const SideBySide = styled.div`
   padding-top: ${grid * 10}px;
   padding-left: ${grid * 6}px;
   padding-right: ${grid * 6}px;
-  width: 100%;
   max-width: 1400px;
+  margin: 0 auto;
 
-  /* Flex parent */
   display: flex;
-  justify-content: center;
+  /* wrap early if we need it (hopefully not!)*/
+  /* flex-wrap: wrap; */
 
-  /* Flex child */
-  /* Take up as much room as the footer does not take up */
-  flex-grow: 1;
-
-  @media screen and (max-width: 1200px) {
+  ${media.singleColumn`
     flex-direction: column;
     align-items: center;
-  }
+  `}
 `;
 
 const Actions = styled.div`
@@ -63,32 +68,6 @@ const Example = styled.div`
   flex-grow: 0;
 `;
 
-const Footer = styled.footer`
-  flex-grow: 0;
-  flex-shrink: 0;
-`;
-
-// const Footer = styled.div`
-//   flex-growth: 0;
-//   flex-shrink: 0;
-
-//   margin-top: ${grid * 2}px;
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-// `;
-
-// const BoardContainer = styled.div`
-//   flex-grow: 1;
-//   flex-shrink: 1;
-//   overflow: auto;
-//   max-width: 600px;
-//   margin: 0 auto;
-// `;
-
-// const Heading = styled.header`
-//   margin-bottom: ${grid * 2}px;
-// `;
 const IndexPage = () => (
   <React.Fragment>
     <Landing>
@@ -99,14 +78,12 @@ const IndexPage = () => (
           <Actions>
             <CallToAction />
           </Actions>
+          <SocialIcons />
         </Content>
         <Example>
           <Board />
         </Example>
       </SideBySide>
-      <Footer>
-        <GithubStarButton />
-      </Footer>
     </Landing>
   </React.Fragment>
 );

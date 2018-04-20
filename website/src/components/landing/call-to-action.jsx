@@ -5,32 +5,9 @@ import { colors } from '@atlaskit/theme';
 import SendIcon from '@atlaskit/icon/glyph/send';
 import BookIcon from '@atlaskit/icon/glyph/book';
 import EditIcon from '@atlaskit/icon/glyph/edit';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import { grid } from '../../layouts/constants';
-
-const movement: number = 6;
-
-const shake = keyframes`
-  0% {
-    transform: rotate(0deg);
-  }
-
-  25% {
-    transform: rotate(${movement}deg);
-  }
-
-  50% {
-    transform: rotate(0deg);
-  }
-
-  75% {
-    transform: rotate(-${movement}deg);
-  }
-
-  100% {
-    transform: rotate(0deg);
-  }
-`;
+import { shake } from '../animations';
 
 const ActionBox = styled.div`
   display: flex;
@@ -70,7 +47,7 @@ const ButtonIcon = styled.span`
   margin-left: ${grid / 2}px;
 
   ${ActionLink}:hover &, ${ActionLink}:active & {
-    animation: ${shake} 0.4s linear infinite;
+    animation: ${shake};
   }
 `;
 
