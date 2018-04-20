@@ -8,13 +8,13 @@ import EditIcon from '@atlaskit/icon/glyph/edit';
 import styled from 'styled-components';
 import { grid } from '../../layouts/constants';
 import { shake } from '../../layouts/animations';
-import * as media from '../../layouts/media';
+import { singleColumn } from '../../layouts/media';
 
 const ActionBox = styled.div`
   display: flex;
   align-items: center;
 
-  ${media.singleColumn`
+  ${singleColumn.fn`
     flex-direction: column;
     align-items: stretch;
     min-width: 60vw;
@@ -48,7 +48,7 @@ const ActionLink = styled(Link)`
     color: ${colors.N10};
   }
 
-  ${media.singleColumn`
+  ${singleColumn.fn`
     margin-left: 0;
     margin-right: 0;
     margin-bottom: 8px;
@@ -91,7 +91,7 @@ const DocumentationLink = ActionLink.extend`
     background-color: ${colors.P200};
   }
 
-  ${media.singleColumn`
+  ${singleColumn.fn`
     margin-bottom: 0;
   `}
 `;

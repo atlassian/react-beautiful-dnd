@@ -14,12 +14,6 @@ const Container = styled.div`
 const ExternalLink = styled.a`
   color: ${colors.N0};
   transition: color 0.2s ease;
-
-  :hover, :active {
-    animation: ${shake};
-    /* fallback */
-    color: ${colors.N0};
-  }
 `;
 
 const TwitterLink = ExternalLink.extend`

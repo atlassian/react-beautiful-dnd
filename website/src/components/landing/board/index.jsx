@@ -18,6 +18,10 @@ type State = {|
   entities: Entities,
 |}
 
+type Props = {|
+  numberOfColumns: 1 | 2,
+|}
+
 const Container = styled.div`
   display: flex;
   justify-content: center;
@@ -33,10 +37,14 @@ const withQuotes = (column: ColumnType, quoteIds: Id[]): ColumnType => {
   return updated;
 };
 
-export default class Board extends React.Component<*, State> {
+export default class Board extends React.Component<Props, State> {
+  static defaultProps = {
+    numberOfColumns: 2,
+  }
+
   state: State = {
     entities: initial,
-  }
+  };
 
   onDragEnd = (result: DropResult) => {
     // dropped nowhere
@@ -120,6 +128,8 @@ export default class Board extends React.Component<*, State> {
 
   render() {
     const entities: Entities = this.state.entities;
+    const numberOfColumns: number = this.props.numberOfColumns;
+
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
         <Droppable
@@ -133,7 +143,7 @@ export default class Board extends React.Component<*, State> {
               innerRef={provided.innerRef}
               {...provided.droppableProps}
             >
-              {entities.columnOrder.map((columnId: Id, index: number) => {
+              {entities.columnOrder.slice(0, numberOfColumns).map((columnId: Id, index: number) => {
                 const column: ColumnType = entities.columns[columnId];
                 // Get the items for this column
                 const quotes: Quote[] = column.quoteIds.map(

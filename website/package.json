@@ -18,6 +18,7 @@
     "react-dom": "^16.3.1",
     "react-helmet": "^5.2.0",
     "react-icons": "^2.2.7",
+    "react-media": "^1.8.0",
     "styled-components": "^3.2.5"
   },
   "keywords": [
