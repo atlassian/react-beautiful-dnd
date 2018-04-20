@@ -9,7 +9,7 @@ type MediaRule = {|
 |}
 
 export const singleColumn: MediaRule = (() => {
-  const query: string = 'screen and (max-width: 1350px)';
+  const query: string = 'screen and (max-width: 1300px)';
 
   const fn: WhenRuleFn = (...args: mixed[]) => `@media ${query} { ${css(...args)} }`;
 
