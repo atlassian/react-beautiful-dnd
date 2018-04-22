@@ -7287,9 +7287,9 @@ rollup-plugin-replace@^2.0.0:
     minimatch "^3.0.2"
     rollup-pluginutils "^2.0.1"
 
-rollup-plugin-size-snapshot@^0.3.1:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-size-snapshot/-/rollup-plugin-size-snapshot-0.3.1.tgz#b963b0cd1c446e734888068e30c997625eb9ee0f"
+rollup-plugin-size-snapshot@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-size-snapshot/-/rollup-plugin-size-snapshot-0.4.0.tgz#59cf69ceaae595d36f5bb60a702a58824a567e03"
   dependencies:
     bytes "^3.0.0"
     chalk "^2.3.2"
@@ -7297,6 +7297,7 @@ rollup-plugin-size-snapshot@^0.3.1:
     gzip-size "^4.1.0"
     jest-diff "^22.4.0"
     memory-fs "^0.4.1"
+    rollup-plugin-replace "^2.0.0"
     uglify-es "^3.3.9"
     webpack "^4.5.0"
 
