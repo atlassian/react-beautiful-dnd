@@ -4,7 +4,10 @@ import type { Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
+import { getBox, withScroll } from 'css-box-model';
+import type { BoxModel } from 'css-box-model';
 import rafSchedule from 'raf-schd';
+import { vertical, horizontal } from '../../state/axis';
 import getWindowScroll from '../window/get-window-scroll';
 import getArea from '../../state/get-area';
 import { getDroppableDimension } from '../../state/dimension';
@@ -246,31 +249,8 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     invariant(!this.isWatchingScroll, 'Attempting to recapture Droppable dimension while already watching scroll on previous capture');
     invariant(descriptor, 'Cannot get dimension for unpublished droppable');
 
-    const style: Object = window.getComputedStyle(targetRef);
-
-    // keeping it simple and always using the margin of the droppable
-
-    const margin: Spacing = {
-      top: parseInt(style.marginTop, 10),
-      right: parseInt(style.marginRight, 10),
-      bottom: parseInt(style.marginBottom, 10),
-      left: parseInt(style.marginLeft, 10),
-    };
-    const padding: Spacing = {
-      top: parseInt(style.paddingTop, 10),
-      right: parseInt(style.paddingRight, 10),
-      bottom: parseInt(style.paddingBottom, 10),
-      left: parseInt(style.paddingLeft, 10),
-    };
-    const border: Spacing = {
-      top: parseInt(style.borderTopWidth, 10),
-      right: parseInt(style.borderRightWidth, 10),
-      bottom: parseInt(style.borderBottomWidth, 10),
-      left: parseInt(style.borderLeftWidth, 10),
-    };
-
-    // getBoundingClientRect always returns the borderBox
-    const borderBox: Area = getArea(targetRef.getBoundingClientRect());
+    const client: BoxModel = getBox(targetRef);
+    const page: BoxModel = withScroll(client, getWindowScroll());
 
     // side effect - grabbing it for scroll listening so we know it is the same node
     this.closestScrollable = getClosestScrollable(targetRef);
@@ -281,38 +261,39 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     // 2. There is no scroll container
     // 3. The droppable has internal scrolling
 
-    const closest: ?Object = (() => {
-      const closestScrollable: ?Element = this.closestScrollable;
+    // const closest: ?Object = (() => {
+    //   const closestScrollable: ?Element = this.closestScrollable;
 
-      if (!closestScrollable) {
-        return null;
-      }
+    //   if (!closestScrollable) {
+    //     return null;
+    //   }
 
-      const frameBorderBox: Area = getArea(closestScrollable.getBoundingClientRect());
-      const scroll: Position = this.getClosestScroll();
-      const scrollWidth: number = closestScrollable.scrollWidth;
-      const scrollHeight: number = closestScrollable.scrollHeight;
+    //   const frameBorderBox: Area = getArea(closestScrollable.getBoundingClientRect());
+    //   const scroll: Position = this.getClosestScroll();
+    //   const scrollWidth: number = closestScrollable.scrollWidth;
+    //   const scrollHeight: number = closestScrollable.scrollHeight;
 
-      return {
-        frameBorderBox,
-        scrollWidth,
-        scrollHeight,
-        scroll,
-        shouldClipSubject: !ignoreContainerClipping,
-      };
-    })();
+    //   return {
+    //     frameBorderBox,
+    //     scrollWidth,
+    //     scrollHeight,
+    //     scroll,
+    //     shouldClipSubject: !ignoreContainerClipping,
+    //   };
+    // })();
 
-    const dimension: DroppableDimension = getDroppableDimension({
+    const dimension: DroppableDimension = {
       descriptor,
-      direction,
-      borderBox,
-      border,
-      closest,
-      margin,
-      padding,
-      windowScroll: getWindowScroll(),
+      axis: direction === 'vertical' ? vertical : horizontal,
       isEnabled: !isDropDisabled,
-    });
+      client,
+      page,
+      viewport: {
+        closestScrollable: null,
+        subject: page.borderBox,
+        clipped: page.borderBox,
+      },
+    };
 
     return dimension;
   }

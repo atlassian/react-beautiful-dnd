@@ -167,12 +167,10 @@ export const getDroppableDimension = ({
   borderBox,
   closest,
   direction = 'vertical',
-  margin = noSpacing,
-  padding = noSpacing,
-  border = noSpacing,
-  windowScroll = origin,
   isEnabled = true,
 }: GetDroppableArgs): DroppableDimension => {
+  throw new Error('Deprected');
+
   const marginBox: Area = getArea(expandBySpacing(borderBox, margin));
   const paddingBox: Area = getArea(shrinkBySpacing(borderBox, border));
   const contentBox: Area = getArea(shrinkBySpacing(paddingBox, padding));

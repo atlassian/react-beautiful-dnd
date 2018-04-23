@@ -1,5 +1,6 @@
 // @flow
 import type { Store as ReduxStore, Dispatch as ReduxDispatch } from 'redux';
+import type { BoxModel, Rect } from 'css-box-model';
 import type { Action as ActionCreators } from './state/action-creators';
 
 export type Id = string;
@@ -73,10 +74,7 @@ export type HorizontalAxis = {|
 export type Axis = VerticalAxis | HorizontalAxis
 
 export type Placeholder = {|
-  // We apply the margin separately to maintain margin collapsing
-  // behavior of the original element
-  borderBox: Area,
-  margin: Spacing,
+  client: BoxModel,
   tagName: string,
   display: string,
 |}
@@ -86,15 +84,9 @@ export type DraggableDimension = {|
   // the placeholder for the draggable
   placeholder: Placeholder,
   // relative to the viewport when the drag started
-  client: {|
-    marginBox: Area,
-    borderBox: Area,
-  |},
+  client: BoxModel,
   // relative to the whole page
-  page: {|
-    marginBox: Area,
-    borderBox: Area,
-  |},
+  page: BoxModel,
 |}
 
 export type ClosestScrollable = {|
@@ -122,68 +114,11 @@ export type ClosestScrollable = {|
 export type DroppableDimensionViewport = {|
   // will be null if there is no closest scrollable
   closestScrollable: ?ClosestScrollable,
-  subject: Area,
+  subject: Rect,
   // this is the subject through the viewport of the frame (if applicable)
   // it also takes into account any changes to the viewport scroll
   // clipped area will be null if it is completely outside of the frame and frame clipping is on
-  clipped: ?Area,
-|}
-
-/*
-# The CSS box model
-> https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model/Introduction_to_the_CSS_box_model
-
-------------------------------------
-|              MARGIN              |  (marginBox)
-|  ------------------------------  |
-|  |           BORDER           |  |  (borderBox)
-|  |  ------------------------  |  |
-|  |  |       PADDING        |  |  |  (paddingBox) - not used by anything really
-|  |  |  ------------------  |  |  |
-|  |  |  |    CONTENT     |  |  |  |  (contentBox)
-|  |  |  |                |  |  |  |
-|  |  |  |                |  |  |  |
-|  |  |  |                |  |  |  |
-|  |  |  ------------------  |  |  |
-|  |  |                      |  |  |
-|  |  ------------------------  |  |
-|  |                            |  |
-|  ------------------------------  |
-|                                  |
-|----------------------------------|
-
-Example (https://codepen.io/alexreardon/pen/oqRBEq)
-- width: 100px;
-- padding: 10px;
-- border: 5px;
-
-## box-sizing: content-box;
-
-Any 'width' property is set on the contextBox and padding and border is adding on top
-
-So the borderBox width would be 130px (border: 5px * 2 + padding: 10px * 2 + content 100px)
-
-## box-sizing: border-box;
-
-Any 'width' property is set on the borderBox
-
-So the borderBox width would be 100px and the contentBox would be 70px
-100 - (border: 5px * 2 + padding: 10px * 2)
-
-## Element.getBoundingClientRect()
-
-This always returns the borderBox sizes, regardless of box-sizing.
-- for content-box with would be 130px
-- for border-box it would be 100px
-*/
-
-export type BoxModel = {|
-  // the borderBox with margin added (outer)
-  marginBox: Area,
-  // the element inclusive of padding and border
-  borderBox: Area,
-  // the element without margin or padding or border (inner)
-  contentBox: Area,
+  clipped: ?Rect,
 |}
 
 export type DroppableDimension = {|
@@ -243,7 +178,7 @@ export type AutoScrollMode = 'FLUID' | 'JUMP';
 export type Viewport = {|
   scroll: Position,
   maxScroll: Position,
-  subject: Area,
+  subject: BoxModel,
 |}
 
 export type InitialDrag = {|
