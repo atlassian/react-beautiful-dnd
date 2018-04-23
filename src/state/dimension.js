@@ -1,6 +1,7 @@
 // @flow
+import { getRect } from 'css-box-model';
+import type { Rect } from 'css-box-model';
 import { vertical, horizontal } from './axis';
-import getArea from './get-area';
 import { offsetByPosition, expandBySpacing, shrinkBySpacing } from './spacing';
 import { subtract, negate } from './position';
 import getMaxScroll from './get-max-scroll';
@@ -15,7 +16,6 @@ import type {
   Area,
   DroppableDimensionViewport,
   ClosestScrollable,
-  BoxModel,
 } from '../types';
 
 const origin: Position = { x: 0, y: 0 };
@@ -27,51 +27,9 @@ export const noSpacing: Spacing = {
   left: 0,
 };
 
-type GetDraggableArgs = {|
-  descriptor: DraggableDescriptor,
-  borderBox: Area,
-  tagName?: string,
-  display?: string,
-  margin?: Spacing,
-  windowScroll?: Position,
-|};
-
-export const getDraggableDimension = ({
-  descriptor,
-  borderBox,
-  tagName = 'div',
-  display = 'block',
-  margin = noSpacing,
-  windowScroll = origin,
-}: GetDraggableArgs): DraggableDimension => {
-  const pageBorderBox: Spacing = offsetByPosition(borderBox, windowScroll);
-
-  const dimension: DraggableDimension = {
-    descriptor,
-    placeholder: {
-      borderBox,
-      margin,
-      tagName,
-      display,
-    },
-    // on the viewport
-    client: {
-      borderBox,
-      marginBox: getArea(expandBySpacing(borderBox, margin)),
-    },
-    // with scroll
-    page: {
-      borderBox: getArea(pageBorderBox),
-      marginBox: getArea(expandBySpacing(pageBorderBox, margin)),
-    },
-  };
-
-  return dimension;
-};
-
 // will return null if the subject is completely not visible within frame
-export const clip = (frame: Area, subject: Spacing): ?Area => {
-  const result: Area = getArea({
+export const clip = (frame: Rect, subject: Rect): ?Rect => {
+  const result: Rect = getRect({
     top: Math.max(subject.top, frame.top),
     right: Math.min(subject.right, frame.right),
     bottom: Math.min(subject.bottom, frame.bottom),
@@ -124,9 +82,9 @@ export const scrollDroppable = (
   const displacedSubject: Spacing =
     offsetByPosition(droppable.viewport.subject, scrollDisplacement);
 
-  const clipped: ?Area = closestScrollable.shouldClipSubject ?
+  const clipped: ?Rect = closestScrollable.shouldClipSubject ?
     clip(frame, displacedSubject) :
-    getArea(displacedSubject);
+    getRect(displacedSubject);
 
   const viewport: DroppableDimensionViewport = {
     closestScrollable,

@@ -1,6 +1,6 @@
 // @flow
 import type { Store as ReduxStore, Dispatch as ReduxDispatch } from 'redux';
-import type { BoxModel, Rect } from 'css-box-model';
+import type { BoxModel, Rect, Position as PositionType, Spacing as SpacingType } from 'css-box-model';
 import type { Action as ActionCreators } from './state/action-creators';
 
 export type Id = string;
@@ -20,30 +20,14 @@ export type DraggableDescriptor = {|
   index: number,
 |}
 
-export type Position = {|
-  x: number,
-  y: number,
-|};
+export type Position = PositionType;
 
 // Kept as a loose type so that functions can
 // accept Spacing and receive an Area or a Spacing
-export type Spacing = {
-  top: number,
-  right: number,
-  bottom: number,
-  left: number,
-}
+export type Spacing = SpacingType;
 
-export type Area = {|
-  top: number,
-  right: number,
-  bottom: number,
-  left: number,
-  // additions to Spacing
-  width: number,
-  height: number,
-  center: Position,
-|}
+// TODO: update
+export type Area = Rect;
 
 export type Direction = 'horizontal' | 'vertical';
 
