@@ -10,7 +10,7 @@ import type {
   DroppableDimensionMap,
   DroppableId,
   Position,
-  Area,
+  Rect,
   Viewport,
 } from '../../types';
 
@@ -25,12 +25,12 @@ type GetBestDroppableArgs = {|
   viewport: Viewport,
 |}
 
-const getSafeClipped = (droppable: DroppableDimension): Area => {
-  const area: ?Area = droppable.viewport.clipped;
+const getSafeClipped = (droppable: DroppableDimension): Rect => {
+  const rect: ?Rect = droppable.viewport.clipped;
 
-  invariant(area, 'Cannot get clipped area from droppable');
+  invariant(rect, 'Cannot get clipped area from droppable');
 
-  return area;
+  return rect;
 };
 
 export default ({
@@ -40,7 +40,7 @@ export default ({
   droppables,
   viewport,
 }: GetBestDroppableArgs): ?DroppableDimension => {
-  const sourceClipped: ?Area = source.viewport.clipped;
+  const sourceClipped: ?Rect = source.viewport.clipped;
 
   if (!sourceClipped) {
     return null;
@@ -60,7 +60,7 @@ export default ({
     .filter((droppable: DroppableDimension): boolean => droppable.isEnabled)
     // Remove any droppables that are not partially visible
     .filter((droppable: DroppableDimension): boolean => {
-      const clipped: ?Area = droppable.viewport.clipped;
+      const clipped: ?Rect = droppable.viewport.clipped;
       // subject is not visible at all in frame
       if (!clipped) {
         return false;
@@ -69,7 +69,7 @@ export default ({
       return isPartiallyVisibleThroughFrame(viewport.subject)(clipped);
     })
     .filter((droppable: DroppableDimension): boolean => {
-      const targetClipped: Area = getSafeClipped(droppable);
+      const targetClipped: Rect = getSafeClipped(droppable);
 
       if (isMovingForward) {
         // is the droppable in front of the source on the cross axis?
@@ -82,7 +82,7 @@ export default ({
     })
     // Must have some overlap on the main axis
     .filter((droppable: DroppableDimension): boolean => {
-      const targetClipped: Area = getSafeClipped(droppable);
+      const targetClipped: Rect = getSafeClipped(droppable);
 
       const isBetweenDestinationClipped = isWithin(
         targetClipped[axis.start],

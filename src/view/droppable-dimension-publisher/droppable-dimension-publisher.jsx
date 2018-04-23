@@ -9,8 +9,7 @@ import type { BoxModel } from 'css-box-model';
 import rafSchedule from 'raf-schd';
 import { vertical, horizontal } from '../../state/axis';
 import getWindowScroll from '../window/get-window-scroll';
-import getArea from '../../state/get-area';
-import { getDroppableDimension } from '../../state/dimension';
+// import { getDroppableDimension } from '../../state/dimension';
 import getClosestScrollable from '../get-closest-scrollable';
 import { dimensionMarshalKey } from '../context-keys';
 import type {
@@ -23,8 +22,6 @@ import type {
   DroppableDimension,
   DroppableDescriptor,
   Position,
-  Area,
-  Spacing,
   Direction,
   ScrollOptions,
 } from '../../types';

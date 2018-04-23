@@ -1,6 +1,6 @@
 // @flow
 import memoizeOne from 'memoize-one';
-import getArea from './get-area';
+import { getRect, type Rect } from 'css-box-model';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
 import isPositionInFrame from './visibility/is-position-in-frame';
 import { patch } from './position';
@@ -14,7 +14,6 @@ import type {
   DroppableDimensionMap,
   DroppableId,
   Position,
-  Area,
 } from '../types';
 
 const getRequiredGrowth = memoizeOne((
@@ -66,21 +65,21 @@ type GetBufferedDroppableArgs = {
 };
 
 const getWithGrowth = memoizeOne(
-  (area: Area, growth: Position): Area => getArea(expandByPosition(area, growth))
+  (area: Rect, growth: Position): Rect => getRect(expandByPosition(area, growth))
 );
 
-const getClippedAreaWithPlaceholder = ({
+const getClippedRectWithPlaceholder = ({
   draggable,
   draggables,
   droppable,
   previousDroppableOverId,
-}: GetBufferedDroppableArgs): ?Area => {
+}: GetBufferedDroppableArgs): ?Rect => {
   const isHome: boolean = draggable.descriptor.droppableId === droppable.descriptor.id;
   const wasOver: boolean = Boolean(
     previousDroppableOverId &&
     previousDroppableOverId === droppable.descriptor.id
   );
-  const clipped: ?Area = droppable.viewport.clipped;
+  const clipped: ?Rect = droppable.viewport.clipped;
 
   // clipped area is totally hidden behind frame
   if (!clipped) {
@@ -99,7 +98,7 @@ const getClippedAreaWithPlaceholder = ({
     return clipped;
   }
 
-  const subjectWithGrowth: Area = getWithGrowth(clipped, requiredGrowth);
+  const subjectWithGrowth: Rect = getWithGrowth(clipped, requiredGrowth);
   const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
 
   // The droppable has no scroll container
@@ -141,7 +140,7 @@ export default ({
         // If previously dragging over a droppable we give it a
         // bit of room on the subsequent drags so that user and move
         // items in the space that the placeholder takes up
-        const withPlaceholder: ?Area = getClippedAreaWithPlaceholder({
+        const withPlaceholder: ?Rect = getClippedRectWithPlaceholder({
           draggable, draggables, droppable, previousDroppableOverId,
         });
 

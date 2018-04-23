@@ -3,7 +3,7 @@ import { subtract } from '../position';
 import { offsetByPosition } from '../spacing';
 import { isTotallyVisible } from '../visibility/is-visible';
 import type {
-  Area,
+  Rect,
   DraggableDimension,
   DroppableDimension,
   Position,
@@ -14,7 +14,7 @@ type Args = {|
   draggable: DraggableDimension,
   destination: DroppableDimension,
   newPageCenter: Position,
-  viewport: Area,
+  viewport: Rect,
 |}
 
 export default ({

@@ -7,14 +7,14 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DragImpact,
-  Area,
+  Rect,
 } from '../types';
 
 type Args = {|
   draggable: DraggableDimension,
   destination: DroppableDimension,
   previousImpact: DragImpact,
-  viewport: Area,
+  viewport: Rect,
 |}
 
 // Note: it is also an optimisation to undo the displacement on

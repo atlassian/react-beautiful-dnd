@@ -1,6 +1,6 @@
 // @flow
 import type { Store as ReduxStore, Dispatch as ReduxDispatch } from 'redux';
-import type { BoxModel, Rect, Position as PositionType, Spacing as SpacingType } from 'css-box-model';
+import type { BoxModel, Rect as RectType, Position as PositionType, Spacing as SpacingType } from 'css-box-model';
 import type { Action as ActionCreators } from './state/action-creators';
 
 export type Id = string;
@@ -27,7 +27,7 @@ export type Position = PositionType;
 export type Spacing = SpacingType;
 
 // TODO: update
-export type Area = Rect;
+export type Rect = RectType;
 
 export type Direction = 'horizontal' | 'vertical';
 
@@ -76,7 +76,7 @@ export type DraggableDimension = {|
 export type ClosestScrollable = {|
   // This is the window through which the droppable is observed
   // It does not change during a drag
-  frame: Area,
+  frame: Rect,
   // Whether or not we should clip the subject by the frame
   // Is controlled by the ignoreContainerClipping prop
   shouldClipSubject: boolean,
@@ -162,7 +162,7 @@ export type AutoScrollMode = 'FLUID' | 'JUMP';
 export type Viewport = {|
   scroll: Position,
   maxScroll: Position,
-  subject: BoxModel,
+  subject: Rect,
 |}
 
 export type InitialDrag = {|

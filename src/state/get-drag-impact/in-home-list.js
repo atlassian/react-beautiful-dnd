@@ -7,7 +7,7 @@ import type {
   Axis,
   Position,
   Displacement,
-  Area,
+  Rect,
   Viewport,
 } from '../../types';
 import { patch } from '../position';
@@ -54,25 +54,25 @@ export default ({
         return false;
       }
 
-      const area: Area = child.page.borderBox;
+      const rect: Rect = child.page.borderBox;
 
       if (isBeyondStartPosition) {
         // 1. item needs to start ahead of the moving item
         // 2. the dragging item has moved over it
-        if (area.center[axis.line] < originalCenter[axis.line]) {
+        if (rect.center[axis.line] < originalCenter[axis.line]) {
           return false;
         }
 
-        return currentCenter[axis.line] > area[axis.start];
+        return currentCenter[axis.line] > rect[axis.start];
       }
       // moving backwards
       // 1. item needs to start behind the moving item
       // 2. the dragging item has moved over it
-      if (originalCenter[axis.line] < area.center[axis.line]) {
+      if (originalCenter[axis.line] < rect.center[axis.line]) {
         return false;
       }
 
-      return currentCenter[axis.line] < area[axis.end];
+      return currentCenter[axis.line] < rect[axis.end];
     })
     .map((dimension: DraggableDimension): Displacement => getDisplacement({
       draggable: dimension,

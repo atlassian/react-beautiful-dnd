@@ -5,14 +5,14 @@ import { offsetByPosition } from '../spacing';
 import type {
   Spacing,
   Position,
-  Area,
+  Rect,
   DroppableDimension,
 } from '../../types';
 
 type Args = {|
   target: Spacing,
   destination: DroppableDimension,
-  viewport: Area,
+  viewport: Rect,
 |}
 
 type HelperArgs = {|

@@ -6,14 +6,12 @@ import { offsetByPosition, expandBySpacing, shrinkBySpacing } from './spacing';
 import { subtract, negate } from './position';
 import getMaxScroll from './get-max-scroll';
 import type {
-  DraggableDescriptor,
   DroppableDescriptor,
   Position,
   DraggableDimension,
   DroppableDimension,
   Direction,
   Spacing,
-  Area,
   DroppableDimensionViewport,
   ClosestScrollable,
 } from '../types';
