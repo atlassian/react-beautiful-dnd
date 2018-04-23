@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import { mount } from 'enzyme';
 import DraggableDimensionPublisher from '../../../src/view/draggable-dimension-publisher/draggable-dimension-publisher';
-import { getDraggableDimension } from '../../../src/state/dimension';
 import getArea from '../../../src/state/get-area';
 import setWindowScroll from '../../utils/set-window-scroll';
 import { getPreset } from '../../utils/dimension';
