@@ -19,7 +19,7 @@ import type {
   Position,
   DraggableDimension,
   DroppableDimension,
-  ClosestScrollable,
+  Scrollable,
 } from '../../../src/types';
 
 const droppableDescriptor: DroppableDescriptor = {
@@ -408,7 +408,7 @@ describe('dimension', () => {
         },
       });
 
-      const closestScrollable: ClosestScrollable = getClosestScrollable(droppable);
+      const closestScrollable: Scrollable = getClosestScrollable(droppable);
 
       // original frame
       expect(closestScrollable.frame).toEqual(frameBorderBox);
@@ -418,7 +418,7 @@ describe('dimension', () => {
       // scrolling down
       const newScroll: Position = { x: 0, y: 100 };
       const updated: DroppableDimension = scrollDroppable(droppable, newScroll);
-      const updatedClosest: ClosestScrollable = getClosestScrollable(updated);
+      const updatedClosest: Scrollable = getClosestScrollable(updated);
 
       // unchanged frame client
       expect(updatedClosest.frame).toEqual(frameBorderBox);

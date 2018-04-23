@@ -9,7 +9,7 @@ import type {
   DragImpact,
   State,
   Position,
-  ClosestScrollable,
+  Scrollable,
   Spacing,
   DroppableDimension,
   DraggableDimension,
@@ -130,7 +130,7 @@ export const addDraggable = (base: State, draggable: DraggableDimension): State 
   },
 });
 
-export const getClosestScrollable = (droppable: DroppableDimension): ClosestScrollable => {
+export const getClosestScrollable = (droppable: DroppableDimension): Scrollable => {
   if (!droppable.viewport.closestScrollable) {
     throw new Error('Cannot get closest scrollable');
   }

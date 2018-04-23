@@ -17,7 +17,7 @@ import type {
   Position,
   State,
   DraggableDimension,
-  ClosestScrollable,
+  Scrollable,
   Viewport,
 } from '../../types';
 
@@ -195,7 +195,7 @@ const withPlaceholder = (
   droppable: DroppableDimension,
   draggable: DraggableDimension,
 ): ?WithPlaceholderResult => {
-  const closest: ?ClosestScrollable = droppable.viewport.closestScrollable;
+  const closest: ?Scrollable = droppable.viewport.closestScrollable;
 
   if (!closest) {
     return null;
@@ -287,7 +287,7 @@ export default ({
     }
 
     // We know this has a closestScrollable
-    const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
+    const closestScrollable: ?Scrollable = droppable.viewport.closestScrollable;
 
     // this should never happen - just being safe
     if (!closestScrollable) {

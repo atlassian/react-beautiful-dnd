@@ -7,7 +7,7 @@ import { patch } from './position';
 import { expandByPosition } from './spacing';
 import { clip } from './dimension';
 import type {
-  ClosestScrollable,
+  Scrollable,
   DraggableDimension,
   DraggableDimensionMap,
   DroppableDimension,
@@ -99,7 +99,7 @@ const getClippedRectWithPlaceholder = ({
   }
 
   const subjectWithGrowth: Rect = getWithGrowth(clipped, requiredGrowth);
-  const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
+  const closestScrollable: ?Scrollable = droppable.viewport.closestScrollable;
 
   // The droppable has no scroll container
   if (!closestScrollable) {

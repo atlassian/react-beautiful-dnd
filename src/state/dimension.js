@@ -13,7 +13,7 @@ import type {
   Direction,
   Spacing,
   DroppableDimensionViewport,
-  ClosestScrollable,
+  Scrollable,
 } from '../types';
 
 const origin: Position = { x: 0, y: 0 };
@@ -50,7 +50,7 @@ export const scrollDroppable = (
     return droppable;
   }
 
-  const existingScrollable: ClosestScrollable = droppable.viewport.closestScrollable;
+  const existingScrollable: Scrollable = droppable.viewport.closestScrollable;
 
   const frame: Area = existingScrollable.frame;
 
@@ -62,7 +62,7 @@ export const scrollDroppable = (
   // Sometimes it is possible to scroll beyond the max point.
   // This can occur when scrolling a foreign list that now has a placeholder.
 
-  const closestScrollable: ClosestScrollable = {
+  const closestScrollable: Scrollable = {
     frame: existingScrollable.frame,
     shouldClipSubject: existingScrollable.shouldClipSubject,
     scroll: {
@@ -144,7 +144,7 @@ export const getDroppableDimension = ({
   };
   const subject: Area = page.marginBox;
 
-  const closestScrollable: ?ClosestScrollable = (() => {
+  const closestScrollable: ?Scrollable = (() => {
     if (!closest) {
       return null;
     }
@@ -158,7 +158,7 @@ export const getDroppableDimension = ({
       width: frame.width,
     });
 
-    const result: ClosestScrollable = {
+    const result: Scrollable = {
       frame,
       shouldClipSubject: closest.shouldClipSubject,
       scroll: {

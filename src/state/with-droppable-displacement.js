@@ -2,12 +2,12 @@
 import { add } from './position';
 import type {
   Position,
-  ClosestScrollable,
+  Scrollable,
   DroppableDimension,
 } from '../types';
 
 export default (droppable: DroppableDimension, point: Position): Position => {
-  const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
+  const closestScrollable: ?Scrollable = droppable.viewport.closestScrollable;
   if (!closestScrollable) {
     return point;
   }
