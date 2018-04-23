@@ -8,7 +8,7 @@ import { getBox, withScroll } from 'css-box-model';
 import type { BoxModel } from 'css-box-model';
 import rafSchedule from 'raf-schd';
 import { vertical, horizontal } from '../../state/axis';
-import getWindowScroll from '../window/get-window-scroll';
+import getMaxScroll from '../../state/get-max-scroll';
 // import { getDroppableDimension } from '../../state/dimension';
 import getClosestScrollable from '../get-closest-scrollable';
 import { dimensionMarshalKey } from '../context-keys';
@@ -24,6 +24,7 @@ import type {
   Position,
   Direction,
   ScrollOptions,
+  Scrollable,
 } from '../../types';
 
 type Props = {|
@@ -38,6 +39,11 @@ type Props = {|
 |}
 
 const origin: Position = { x: 0, y: 0 };
+
+const getScroll = (el: Element): Position => ({
+  x: el.scrollLeft,
+  y: el.scrollTop,
+});
 
 export default class DroppableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
@@ -67,12 +73,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       return origin;
     }
 
-    const offset: Position = {
-      x: this.closestScrollable.scrollLeft,
-      y: this.closestScrollable.scrollTop,
-    };
-
-    return offset;
+    return getScroll(this.closestScrollable);
   }
 
   memoizedUpdateScroll = memoizeOne((x: number, y: number) => {
@@ -247,10 +248,60 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     invariant(descriptor, 'Cannot get dimension for unpublished droppable');
 
     const client: BoxModel = getBox(targetRef);
-    const page: BoxModel = withScroll(client, getWindowScroll());
+    const page: BoxModel = withScroll(client);
+    const closestScrollable: ?Element = getClosestScrollable(targetRef);
+
+    // side effect
+    this.closestScrollable = closestScrollable;
+
+    const scrollable: ?Scrollable = (() => {
+      // No scroll parent
+      if (!closestScrollable) {
+        return null;
+      }
+
+      const scrollWidth: number = closestScrollable.scrollWidth;
+      const scrollHeight: number = closestScrollable.scrollHeight;
+
+      const frameClient: BoxModel = (() => {
+        // Droppable is not a scroll container
+        if (targetRef !== closestScrollable) {
+          return getBox(closestScrollable);
+        }
+
+        // Droppable is a scroll container
+        // TODO: hack the box!
+        return getBox(closestScrollable);
+      })();
+      const framePage: BoxModel = withScroll(frameClient);
+      const scroll: Position = getScroll(closestScrollable);
+
+      const maxScroll: Position = getMaxScroll({
+        scrollHeight,
+        scrollWidth,
+        // scrollHeight and scrollWidth are based on the padding box
+        // TODO: add test
+        height: frameClient.paddingBox.height,
+        width: frameClient.paddingBox.width,
+      });
+
+      return {
+        frame: framePage.borderBox,
+        shouldClipSubject: !ignoreContainerClipping,
+        scroll: {
+          initial: scroll,
+          current: scroll,
+          max: maxScroll,
+          diff: {
+            value: origin,
+            displacement: origin,
+          },
+        },
+      };
+    })();
 
     // side effect - grabbing it for scroll listening so we know it is the same node
-    this.closestScrollable = getClosestScrollable(targetRef);
+    // this.closestScrollable = getClosestScrollable(targetRef);
 
     // The droppable's own bounds should be treated as the
     // container bounds in the following situations:
@@ -286,7 +337,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       client,
       page,
       viewport: {
-        closestScrollable: null,
+        closestScrollable: scrollable,
         subject: page.borderBox,
         clipped: page.borderBox,
       },

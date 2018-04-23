@@ -73,7 +73,7 @@ export type DraggableDimension = {|
   page: BoxModel,
 |}
 
-export type ClosestScrollable = {|
+export type Scrollable = {|
   // This is the window through which the droppable is observed
   // It does not change during a drag
   frame: Rect,
@@ -97,7 +97,7 @@ export type ClosestScrollable = {|
 
 export type DroppableDimensionViewport = {|
   // will be null if there is no closest scrollable
-  closestScrollable: ?ClosestScrollable,
+  closestScrollable: ?Scrollable,
   subject: Rect,
   // this is the subject through the viewport of the frame (if applicable)
   // it also takes into account any changes to the viewport scroll
