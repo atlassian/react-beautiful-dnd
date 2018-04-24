@@ -1,6 +1,5 @@
 // @flow
 import type {
-  Area,
   Axis,
   Position,
   State,
