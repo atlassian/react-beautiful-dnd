@@ -32,7 +32,7 @@ import moveToNextIndex from './move-to-next-index/';
 import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
 import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';
 import moveCrossAxis from './move-cross-axis/';
-import { scrollDroppable } from './dimension';
+import { scrollDroppable } from './droppable-dimension';
 
 const noDimensions: DimensionState = {
   request: null,

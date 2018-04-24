@@ -15,7 +15,7 @@ import { negate } from '../../../src/state/position';
 import getMaxScroll from '../../../src/state/get-max-scroll';
 import { getClosestScrollable } from '../../utils/dimension';
 import { noSpacing } from '../../../src/state/dimension';
-import { expandBySpacing, shrinkBySpacing } from '../../utils/spacing';
+import { expandBySpacing } from '../../utils/spacing';
 import type {
   Spacing,
   DroppableDescriptor,
