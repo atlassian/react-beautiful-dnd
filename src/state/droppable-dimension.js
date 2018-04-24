@@ -1,20 +1,24 @@
 // @flow
+import invariant from 'tiny-invariant';
 import {
   getRect,
   type BoxModel,
   type Position,
   type Rect,
+  type Spacing,
 } from 'css-box-model';
 import { vertical, horizontal } from './axis';
+import { subtract, negate } from './position';
+import { offsetByPosition } from './spacing';
+import getMaxScroll from './get-max-scroll';
 import type {
   DroppableDimension,
   DroppableDescriptor,
   Scrollable,
   DroppableDimensionViewport,
 } from '../types';
-import getMaxScroll from './get-max-scroll';
 
-export const clip = (frame: Rect, subject: Rect): ?Rect => {
+export const clip = (frame: Spacing, subject: Spacing): ?Rect => {
   const result: Rect = getRect({
     top: Math.max(subject.top, frame.top),
     right: Math.min(subject.right, frame.right),
@@ -109,4 +113,54 @@ export const getDroppableDimension = ({
   return dimension;
 };
 
-export const scrollDroppable = () => { };
+export const scrollDroppable = (
+  droppable: DroppableDimension,
+  newScroll: Position,
+): DroppableDimension => {
+  invariant(droppable.viewport.closestScrollable);
+
+  const scrollable: Scrollable = droppable.viewport.closestScrollable;
+  const frame: Rect = scrollable.frame;
+
+  const scrollDiff: Position = subtract(newScroll, scrollable.scroll.initial);
+  // a positive scroll difference leads to a negative displacement
+  // (scrolling down pulls an item upwards)
+  const scrollDisplacement: Position = negate(scrollDiff);
+
+  // Sometimes it is possible to scroll beyond the max point.
+  // This can occur when scrolling a foreign list that now has a placeholder.
+
+  const closestScrollable: Scrollable = {
+    frame: scrollable.frame,
+    shouldClipSubject: scrollable.shouldClipSubject,
+    scroll: {
+      initial: scrollable.scroll.initial,
+      current: newScroll,
+      diff: {
+        value: scrollDiff,
+        displacement: scrollDisplacement,
+      },
+      // TODO: rename 'softMax?'
+      max: scrollable.scroll.max,
+    },
+  };
+
+  const displacedSubject: Spacing =
+    offsetByPosition(droppable.viewport.subject, scrollDisplacement);
+
+  const clipped: ?Rect = closestScrollable.shouldClipSubject ?
+    clip(frame, displacedSubject) :
+    getRect(displacedSubject);
+
+  const viewport: DroppableDimensionViewport = {
+    closestScrollable,
+    subject: droppable.viewport.subject,
+    clipped,
+  };
+
+  const result: DroppableDimension = {
+    ...droppable,
+    viewport,
+  };
+  return result;
+};

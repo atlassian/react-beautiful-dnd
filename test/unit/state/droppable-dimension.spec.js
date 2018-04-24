@@ -11,7 +11,6 @@ import {
   clip,
 } from '../../../src/state/droppable-dimension';
 import { offsetByPosition } from '../../../src/state/spacing';
-import getArea from '../../../src/state/get-area';
 import { negate } from '../../../src/state/position';
 import getMaxScroll from '../../../src/state/get-max-scroll';
 import { getClosestScrollable } from '../../utils/dimension';
@@ -258,28 +257,38 @@ describe('scrolling a droppable', () => {
       scrollHeight: 500,
       scrollWidth: 100,
     };
-    const subject = getArea({
-      // 500 px high
-      top: 0,
-      bottom: scrollSize.scrollHeight,
-      right: scrollSize.scrollWidth,
-      left: 0,
+    const customClient: BoxModel = createBox({
+      borderBox: {
+        // 500 px high
+        top: 0,
+        left: 0,
+        bottom: scrollSize.scrollHeight,
+        right: scrollSize.scrollWidth,
+      },
     });
-    const frameBorderBox = getArea({
-      // only viewing top 100px
-      bottom: 100,
-      // unchanged
-      top: 0,
-      right: scrollSize.scrollWidth,
-      left: 0,
+    const customPage: BoxModel = customClient;
+    const frameClient: BoxModel = createBox({
+      borderBox: {
+        // only viewing top 100px
+        bottom: 100,
+        // unchanged
+        top: 0,
+        right: scrollSize.scrollWidth,
+        left: 0,
+      },
     });
-    const frameScroll: Position = { x: 0, y: 0 };
+    const framePage: BoxModel = frameClient;
+    const originalFrameScroll: Position = { x: 0, y: 0 };
     const droppable: DroppableDimension = getDroppableDimension({
       descriptor,
-      borderBox: subject,
+      client: customClient,
+      page: customPage,
+      direction: 'vertical',
+      isEnabled: true,
       closest: {
-        frameBorderBox,
-        scroll: frameScroll,
+        client: frameClient,
+        page: framePage,
+        scroll: originalFrameScroll,
         scrollWidth: scrollSize.scrollWidth,
         scrollHeight: scrollSize.scrollHeight,
         shouldClipSubject: true,
@@ -289,9 +298,9 @@ describe('scrolling a droppable', () => {
     const closestScrollable: Scrollable = getClosestScrollable(droppable);
 
     // original frame
-    expect(closestScrollable.frame).toEqual(frameBorderBox);
+    expect(closestScrollable.frame).toEqual(framePage.borderBox);
     // subject is currently clipped by the frame
-    expect(droppable.viewport.clipped).toEqual(frameBorderBox);
+    expect(droppable.viewport.clipped).toEqual(framePage.borderBox);
 
     // scrolling down
     const newScroll: Position = { x: 0, y: 100 };
@@ -299,11 +308,11 @@ describe('scrolling a droppable', () => {
     const updatedClosest: Scrollable = getClosestScrollable(updated);
 
     // unchanged frame client
-    expect(updatedClosest.frame).toEqual(frameBorderBox);
+    expect(updatedClosest.frame).toEqual(framePage.borderBox);
 
     // updated scroll info
     expect(updatedClosest.scroll).toEqual({
-      initial: frameScroll,
+      initial: originalFrameScroll,
       current: newScroll,
       diff: {
         value: newScroll,
@@ -312,14 +321,14 @@ describe('scrolling a droppable', () => {
       max: getMaxScroll({
         scrollWidth: scrollSize.scrollWidth,
         scrollHeight: scrollSize.scrollHeight,
-        width: frameBorderBox.width,
-        height: frameBorderBox.height,
+        width: frameClient.borderBox.width,
+        height: frameClient.borderBox.height,
       }),
     });
 
     // updated clipped
     // can now see the bottom half of the subject
-    expect(updated.viewport.clipped).toEqual(getArea({
+    expect(updated.viewport.clipped).toEqual(getRect({
       top: 0,
       bottom: 100,
       // unchanged
@@ -329,22 +338,32 @@ describe('scrolling a droppable', () => {
   });
 
   it('should allow scrolling beyond the max position', () => {
-    // this is to allow for scrolling into a foreign placeholder
-    const scrollable: DroppableDimension = getDroppableDimension({
-      descriptor,
-      borderBox: getArea({
+    const customClient: BoxModel = createBox({
+      borderBox: {
         top: 0,
         left: 0,
         right: 200,
         bottom: 200,
-      }),
+      },
+    });
+    const frameClient: BoxModel = createBox({
+      borderBox: {
+        top: 0,
+        left: 0,
+        right: 100,
+        bottom: 100,
+      },
+    });
+    // this is to allow for scrolling into a foreign placeholder
+    const scrollable: DroppableDimension = getDroppableDimension({
+      descriptor,
+      client: customClient,
+      page: customClient,
+      isEnabled: true,
+      direction: 'vertical',
       closest: {
-        frameBorderBox: getArea({
-          top: 0,
-          left: 0,
-          right: 100,
-          bottom: 100,
-        }),
+        client: frameClient,
+        page: frameClient,
         scroll: { x: 0, y: 0 },
         scrollWidth: 200,
         scrollHeight: 200,
@@ -365,29 +384,29 @@ describe('scrolling a droppable', () => {
 
 describe('clip', () => {
   it('should select clip a subject in a frame', () => {
-    const subject: Area = getArea({
+    const subject: Spacing = {
       top: 0,
       left: 0,
       right: 100,
       bottom: 100,
-    });
-    const frame: Area = getArea({
+    };
+    const frame: Spacing = {
       top: 20,
       left: 20,
       right: 50,
       bottom: 50,
-    });
+    };
 
-    expect(clip(frame, subject)).toEqual(frame);
+    expect(clip(frame, subject)).toEqual(getRect(frame));
   });
 
   it('should return null when the subject it outside the frame on any side', () => {
-    const frame: Area = getArea({
+    const frame: Spacing = {
       top: 0,
       left: 0,
       right: 100,
       bottom: 100,
-    });
+    };
     const outside: Spacing[] = [
       // top
       offsetByPosition(frame, { x: 0, y: -200 }),
