@@ -10,6 +10,7 @@ import {
 import { noMovement } from '../../src/state/no-impact';
 import { vertical } from '../../src/state/axis';
 import { noSpacing } from '../../src/state/dimension';
+import { getDroppableDimension as getDroppable, type Closest } from '../../src/state/droppable-dimension';
 import type {
   Axis,
   Placeholder,
@@ -201,40 +202,42 @@ export const getDraggableDimension = ({
 type GetDroppableArgs = {|
   descriptor: DroppableDescriptor,
   borderBox: Spacing,
-  axis?: Axis,
-  margin?: Spacing,
+  direction?: 'vertical' | 'horizontal',
+  margin ?: Spacing,
+  border?: Spacing,
   padding?: Spacing,
   windowScroll?: Position,
+  closest ?: ? Closest,
+  isEnabled?: boolean,
 |}
 
-const getDroppableDimension = ({
+export const getDroppableDimension = ({
   descriptor,
   borderBox,
   margin,
   padding,
+  border,
   windowScroll,
-  axis = vertical,
+  closest,
+  isEnabled = true,
+  direction = 'vertical',
 }: GetDroppableArgs): DroppableDimension => {
   const client: BoxModel = createBox({
     borderBox,
     margin,
     padding,
+    border,
   });
+  const page: BoxModel = withScroll(client, windowScroll);
 
-  const result: DroppableDimension = {
+  return getDroppable({
     descriptor,
-    axis,
-    isEnabled: true,
+    isEnabled,
+    direction,
     client,
-    page: withScroll(client, windowScroll),
-    viewport: {
-      closestScrollable: null,
-      clipped: null,
-      subject: withScroll(client, windowScroll).borderBox,
-    },
-  };
-
-  return result;
+    page,
+    closest,
+  });
 };
 
 export const getPreset = (axis?: Axis = vertical) => {
@@ -263,7 +266,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     margin,
     padding,
     windowScroll,
-    axis,
+    direction: axis.direction,
   });
 
   const foreign: DroppableDimension = getDroppableDimension({
@@ -280,7 +283,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     margin,
     padding,
     windowScroll,
-    axis,
+    direction: axis.direction,
   });
 
   const emptyForeign: DroppableDimension = getDroppableDimension({
@@ -298,7 +301,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     margin,
     padding,
     windowScroll,
-    axis,
+    direction: axis.direction,
   });
 
   const inHome1: DraggableDimension = getDraggableDimension({

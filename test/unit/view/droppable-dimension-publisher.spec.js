@@ -2,10 +2,13 @@
 /* eslint-disable react/no-multi-comp */
 import React, { Component } from 'react';
 import { mount } from 'enzyme';
+import { createBox, type BoxModel } from 'css-box-model';
 import DroppableDimensionPublisher from '../../../src/view/droppable-dimension-publisher/droppable-dimension-publisher';
-import { getDroppableDimension } from '../../../src/state/dimension';
-import { getPreset } from '../../utils/dimension';
-import getArea from '../../../src/state/get-area';
+import {
+  getPreset,
+  getComputedSpacing,
+  getDroppableDimension,
+} from '../../utils/dimension';
 import setWindowScroll from '../../utils/set-window-scroll';
 import forceUpdate from '../../utils/force-update';
 import { withDimensionMarshal } from '../../utils/get-context-options';
@@ -13,8 +16,8 @@ import type {
   DimensionMarshal,
   DroppableCallbacks,
 } from '../../../src/state/dimension-marshal/dimension-marshal-types';
+import type { Closest } from '../../../src/state/droppable-dimension';
 import type {
-  Area,
   ScrollOptions,
   Spacing,
   DroppableId,
@@ -24,41 +27,58 @@ import type {
   TypeId,
 } from '../../../src/types';
 
-const noMargin = {
-  marginTop: '0',
-  marginRight: '0',
-  marginBottom: '0',
-  marginLeft: '0',
-};
-const noPadding = {
-  paddingTop: '0',
-  paddingRight: '0',
-  paddingBottom: '0',
-  paddingLeft: '0',
-};
-const noBorder = {
-  borderTopWidth: '0',
-  borderRightWidth: '0',
-  borderBottomWidth: '0',
-  borderLeftWidth: '0',
-};
-
-const noComputedSpacing = {
-  ...noMargin,
-  ...noPadding,
-  ...noBorder,
-};
-
 const preset = getPreset();
 
-type ScrollableItemProps = {
+type ScrollableItemProps = {|
   // scrollable item prop (default: false)
-  isDropDisabled?: boolean,
-  droppableId?: DroppableId,
-  type?: TypeId,
-}
+  isScrollable: boolean,
+  isDropDisabled: boolean,
+  droppableId: DroppableId,
+  type: TypeId,
+|}
+
+const margin: Spacing = {
+  top: 1, right: 2, bottom: 3, left: 4,
+};
+const padding: Spacing = {
+  top: 5, right: 6, bottom: 7, left: 8,
+};
+const border: Spacing = {
+  top: 9, right: 10, bottom: 11, left: 12,
+};
+const frameClient: BoxModel = createBox({
+  borderBox: {
+    top: 0,
+    left: 0,
+    right: 150,
+    bottom: 150,
+  },
+  margin,
+  padding,
+  border,
+});
+
+const client: BoxModel = createBox({
+  borderBox: {
+    top: 0,
+    left: 0,
+    right: 100,
+    bottom: 100,
+  },
+  margin,
+  padding,
+  border,
+});
+
+const withSpacing = getComputedSpacing({ padding, margin, border });
 
 class ScrollableItem extends Component<ScrollableItemProps> {
+  static defaultProps = {
+    isScrollable: true,
+    type: preset.home.descriptor.type,
+    droppableId: preset.home.descriptor.id,
+    isDropDisabled: false,
+  }
   /* eslint-disable react/sort-comp */
   ref: ?HTMLElement;
 
@@ -71,16 +91,22 @@ class ScrollableItem extends Component<ScrollableItemProps> {
   render() {
     return (
       <DroppableDimensionPublisher
-        droppableId={this.props.droppableId || preset.home.descriptor.id}
-        type={this.props.type || preset.home.descriptor.type}
+        droppableId={this.props.droppableId}
+        type={this.props.type}
         direction={preset.home.axis.direction}
-        isDropDisabled={this.props.isDropDisabled === true}
+        isDropDisabled={this.props.isDropDisabled}
         ignoreContainerClipping={false}
         getDroppableRef={this.getRef}
       >
         <div
           className="scroll-container"
-          style={{ overflowY: 'auto' }}
+          style={{
+            boxSizing: 'border-box',
+            height: client.borderBox.height,
+            width: client.borderBox.width,
+            ...withSpacing,
+            overflow: this.props.isScrollable ? 'scroll' : 'visible',
+          }}
           ref={this.setRef}
         >
           hi
@@ -90,35 +116,24 @@ class ScrollableItem extends Component<ScrollableItemProps> {
   }
 }
 
-type AppProps = {
-  droppableIsScrollable?: boolean,
-  parentIsScrollable?: boolean,
-  ignoreContainerClipping: boolean,
-};
-
-const frame: Area = getArea({
-  top: 0,
-  left: 0,
-  right: 150,
-  bottom: 150,
-});
-const borderBox: Area = getArea({
-  top: 0,
-  left: 0,
-  right: 100,
-  bottom: 100,
-});
 const descriptor: DroppableDescriptor = {
   id: 'a cool droppable',
   type: 'cool',
 };
 
+type AppProps = {|
+  droppableIsScrollable: boolean,
+  parentIsScrollable: boolean,
+  ignoreContainerClipping: boolean,
+|};
+
 class App extends Component<AppProps> {
   ref: ?HTMLElement
   static defaultProps = {
-    onPublish: () => {},
     ignoreContainerClipping: false,
-  }
+    droppableIsScrollable: false,
+    parentIsScrollable: false,
+  };
 
   setRef = (ref: ?HTMLElement) => {
     this.ref = ref;
@@ -135,11 +150,10 @@ class App extends Component<AppProps> {
       <div
         className="scroll-parent"
         style={{
-          height: frame.height,
-          width: frame.width,
-          padding: 0,
-          margin: 0,
-          borderWidth: 0,
+          boxSizing: 'border-box',
+          height: frameClient.borderBox.height,
+          width: frameClient.borderBox.width,
+          ...withSpacing,
           overflow: parentIsScrollable ? 'scroll' : 'visible',
         }}
       >
@@ -148,11 +162,10 @@ class App extends Component<AppProps> {
             ref={this.setRef}
             className="droppable"
             style={{
-              height: borderBox.height,
-              width: borderBox.width,
-              padding: 0,
-              margin: 0,
-              borderWidth: 0,
+              boxSizing: 'border-box',
+              height: client.borderBox.height,
+              width: client.borderBox.width,
+              ...withSpacing,
               overflow: droppableIsScrollable ? 'scroll' : 'visible',
             }}
           >
@@ -300,134 +313,19 @@ describe('DraggableDimensionPublisher', () => {
           id: 'fake-id',
           type: 'fake',
         },
-        borderBox: getArea({
-          top: 0,
-          right: 100,
-          bottom: 100,
-          left: 0,
-        }),
-      });
-
-      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => ({
-        top: expected.page.borderBox.top,
-        bottom: expected.page.borderBox.bottom,
-        left: expected.page.borderBox.left,
-        right: expected.page.borderBox.right,
-        height: expected.page.borderBox.height,
-        width: expected.page.borderBox.width,
-      }));
-      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noComputedSpacing);
-
-      mount(
-        <ScrollableItem
-          droppableId={expected.descriptor.id}
-          type={expected.descriptor.type}
-        />,
-        withDimensionMarshal(marshal),
-      );
-
-      // pull the get dimension function out
-      const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
-      // execute it to get the dimension
-      const result: DroppableDimension = callbacks.getDimension();
-
-      expect(result).toEqual(expected);
-    });
-
-    it('should consider any margins when calculating dimensions', () => {
-      const marshal: DimensionMarshal = getMarshalStub();
-      const margin: Spacing = {
-        top: 10,
-        right: 30,
-        bottom: 40,
-        left: 50,
-      };
-      const expected: DroppableDimension = getDroppableDimension({
-        descriptor: {
-          id: 'fake-id',
-          type: 'fake',
-        },
-        borderBox: getArea({
-          top: 0,
-          right: 100,
-          bottom: 100,
-          left: 0,
-        }),
+        borderBox: client.borderBox,
         margin,
-      });
-      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => ({
-        top: expected.page.borderBox.top,
-        bottom: expected.page.borderBox.bottom,
-        left: expected.page.borderBox.left,
-        right: expected.page.borderBox.right,
-        height: expected.page.borderBox.height,
-        width: expected.page.borderBox.width,
-      }));
-      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => ({
-        marginTop: `${margin.top}`,
-        marginRight: `${margin.right}`,
-        marginBottom: `${margin.bottom}`,
-        marginLeft: `${margin.left}`,
-        ...noPadding,
-        ...noBorder,
-      }));
-
-      mount(
-        <ScrollableItem
-          droppableId={expected.descriptor.id}
-          type={expected.descriptor.type}
-        />,
-        withDimensionMarshal(marshal),
-      );
-
-      // pull the get dimension function out
-      const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
-      // execute it to get the dimension
-      const result: DroppableDimension = callbacks.getDimension();
-
-      expect(result).toEqual(expected);
-    });
-
-    it('should consider borders and padding when calculating the content box', () => {
-      const marshal: DimensionMarshal = getMarshalStub();
-      const border: Spacing = {
-        top: 10,
-        right: 10,
-        bottom: 10,
-        left: 10,
-      };
-      const padding: Spacing = {
-        top: 20,
-        right: 20,
-        bottom: 20,
-        left: 20,
-      };
-      const expected: DroppableDimension = getDroppableDimension({
-        descriptor: {
-          id: 'fake-id',
-          type: 'fake',
-        },
-        borderBox,
-        border,
         padding,
+        border,
       });
-      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => borderBox);
-      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => ({
-        borderTopWidth: `${border.top}`,
-        borderRightWidth: `${border.right}`,
-        borderBottomWidth: `${border.bottom}`,
-        borderLeftWidth: `${border.left}`,
-        paddingTop: `${padding.top}`,
-        paddingRight: `${padding.right}`,
-        paddingBottom: `${padding.bottom}`,
-        paddingLeft: `${padding.left}`,
-        ...noMargin,
-      }));
+
+      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => expected.client.borderBox);
 
       mount(
         <ScrollableItem
           droppableId={expected.descriptor.id}
           type={expected.descriptor.type}
+          isScrollable={false}
         />,
         withDimensionMarshal(marshal),
       );
@@ -438,12 +336,10 @@ describe('DraggableDimensionPublisher', () => {
       const result: DroppableDimension = callbacks.getDimension();
 
       expect(result).toEqual(expected);
-      expect(result.client.contentBox).toEqual(getArea({
-        top: borderBox.top + border.top + padding.top,
-        right: borderBox.right - border.right - padding.right,
-        left: borderBox.left + border.left + padding.left,
-        bottom: borderBox.bottom - border.bottom - padding.bottom,
-      }));
+      // Goes without saying, but just being really clear here
+      expect(result.client.border).toEqual(border);
+      expect(result.client.margin).toEqual(margin);
+      expect(result.client.padding).toEqual(padding);
     });
 
     it('should consider the window scroll when calculating dimensions', () => {
@@ -453,27 +349,24 @@ describe('DraggableDimensionPublisher', () => {
         y: 1000,
       };
       setWindowScroll(windowScroll, { shouldPublish: false });
-      const ourPaddingBox: Area = getArea({
-        top: 0,
-        right: 100,
-        bottom: 100,
-        left: 0,
-      });
       const expected: DroppableDimension = getDroppableDimension({
         descriptor: {
           id: 'fake-id',
           type: 'fake',
         },
+        borderBox: client.borderBox,
+        margin,
+        padding,
+        border,
         windowScroll,
-        borderBox: ourPaddingBox,
       });
-      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => ourPaddingBox);
-      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noComputedSpacing);
+      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => client.borderBox);
 
       mount(
         <ScrollableItem
           droppableId={expected.descriptor.id}
           type={expected.descriptor.type}
+          isScrollable={false}
         />,
         withDimensionMarshal(marshal),
       );
@@ -486,16 +379,15 @@ describe('DraggableDimensionPublisher', () => {
       expect(result).toEqual(expected);
     });
 
-    it.skip('should throw an error if no ref is provided', () => {
-      // TODO!
-    });
-
     describe('closest scrollable', () => {
       describe('no closest scrollable', () => {
         it('should return null for the closest scrollable if there is no scroll container', () => {
           const expected: DroppableDimension = getDroppableDimension({
             descriptor,
-            borderBox,
+            borderBox: client.borderBox,
+            border,
+            margin,
+            padding,
           });
           const marshal: DimensionMarshal = getMarshalStub();
           const wrapper = mount(
@@ -505,7 +397,7 @@ describe('DraggableDimensionPublisher', () => {
             withDimensionMarshal(marshal),
           );
           const el: HTMLElement = wrapper.instance().getRef();
-          jest.spyOn(el, 'getBoundingClientRect').mockImplementation(() => borderBox);
+          jest.spyOn(el, 'getBoundingClientRect').mockImplementation(() => client.borderBox);
 
           // pull the get dimension function out
           const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
@@ -517,28 +409,31 @@ describe('DraggableDimensionPublisher', () => {
       });
 
       describe('droppable is scrollable', () => {
-        it('should capture the frame', () => {
+        it('should collect information about the scrollable', () => {
+          const closest: Closest = {
+            client,
+            page: client,
+            scrollWidth: client.paddingBox.width,
+            scrollHeight: client.paddingBox.height,
+            scroll: { x: 0, y: 0 },
+            shouldClipSubject: true,
+          };
           const expected: DroppableDimension = getDroppableDimension({
             descriptor,
-            borderBox: frame,
-            closest: {
-              frameBorderBox: frame,
-              scrollWidth: frame.width,
-              scrollHeight: frame.height,
-              scroll: { x: 0, y: 0 },
-              shouldClipSubject: true,
-            },
+            borderBox: client.borderBox,
+            closest,
+            margin,
+            padding,
+            border,
           });
           const marshal: DimensionMarshal = getMarshalStub();
           // both the droppable and the parent are scrollable
           const wrapper = mount(
-            <App
-              droppableIsScrollable
-            />,
+            <App droppableIsScrollable />,
             withDimensionMarshal(marshal),
           );
           const el: HTMLElement = wrapper.instance().getRef();
-          jest.spyOn(el, 'getBoundingClientRect').mockImplementation(() => frame);
+          jest.spyOn(el, 'getBoundingClientRect').mockImplementation(() => client.borderBox);
 
           // pull the get dimension function out
           const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
@@ -550,7 +445,22 @@ describe('DraggableDimensionPublisher', () => {
       });
 
       describe('parent of droppable is scrollable', () => {
-        it('should capture the frame', () => {
+        it('should collect information about the scrollable', () => {
+          const expected: DroppableDimension = getDroppableDimension({
+            descriptor,
+            borderBox: client.borderBox,
+            margin,
+            padding,
+            border,
+            closest: {
+              client: frameClient,
+              page: frameClient,
+              scrollWidth: frameClient.paddingBox.width,
+              scrollHeight: frameClient.paddingBox.height,
+              scroll: { x: 0, y: 0 },
+              shouldClipSubject: true,
+            },
+          });
           const marshal: DimensionMarshal = getMarshalStub();
           const wrapper = mount(
             <App
@@ -559,21 +469,10 @@ describe('DraggableDimensionPublisher', () => {
             />,
             withDimensionMarshal(marshal),
           );
-          const parent: HTMLElement = wrapper.getDOMNode();
           const droppable: HTMLElement = wrapper.instance().getRef();
-          jest.spyOn(parent, 'getBoundingClientRect').mockImplementation(() => frame);
-          jest.spyOn(droppable, 'getBoundingClientRect').mockImplementation(() => borderBox);
-          const expected: DroppableDimension = getDroppableDimension({
-            descriptor,
-            borderBox,
-            closest: {
-              frameBorderBox: frame,
-              scrollWidth: frame.width,
-              scrollHeight: frame.height,
-              scroll: { x: 0, y: 0 },
-              shouldClipSubject: true,
-            },
-          });
+          jest.spyOn(droppable, 'getBoundingClientRect').mockImplementation(() => client.borderBox);
+          const parent: HTMLElement = wrapper.getDOMNode();
+          jest.spyOn(parent, 'getBoundingClientRect').mockImplementation(() => frameClient.borderBox);
 
           // pull the get dimension function out
           const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
@@ -586,6 +485,21 @@ describe('DraggableDimensionPublisher', () => {
 
       describe('both droppable and parent is scrollable', () => {
         it('should only consider the closest scrollable - which is the droppable', () => {
+          const expected: DroppableDimension = getDroppableDimension({
+            descriptor,
+            borderBox: client.borderBox,
+            margin,
+            padding,
+            border,
+            closest: {
+              client,
+              page: client,
+              scrollWidth: client.paddingBox.width,
+              scrollHeight: client.paddingBox.height,
+              scroll: { x: 0, y: 0 },
+              shouldClipSubject: true,
+            },
+          });
           const marshal: DimensionMarshal = getMarshalStub();
           const wrapper = mount(
             <App
@@ -594,20 +508,12 @@ describe('DraggableDimensionPublisher', () => {
             />,
             withDimensionMarshal(marshal),
           );
-          const parent: HTMLElement = wrapper.getDOMNode();
           const droppable: HTMLElement = wrapper.instance().getRef();
-          jest.spyOn(parent, 'getBoundingClientRect').mockImplementation(() => frame);
-          jest.spyOn(droppable, 'getBoundingClientRect').mockImplementation(() => borderBox);
-          const expected: DroppableDimension = getDroppableDimension({
-            descriptor,
-            borderBox,
-            closest: {
-              frameBorderBox: borderBox,
-              scrollWidth: borderBox.width,
-              scrollHeight: borderBox.height,
-              scroll: { x: 0, y: 0 },
-              shouldClipSubject: true,
-            },
+          const parent: HTMLElement = wrapper.getDOMNode();
+          jest.spyOn(droppable, 'getBoundingClientRect').mockImplementation(() => client.borderBox);
+          // should never be called!
+          jest.spyOn(parent, 'getBoundingClientRect').mockImplementation(() => {
+            throw new Error('Should not be getting the boundingClientRect on the parent');
           });
 
           // pull the get dimension function out
@@ -619,7 +525,7 @@ describe('DraggableDimensionPublisher', () => {
         });
       });
 
-      it('should capture the initial scroll of the scrollest scrollable', () => {
+      it('should capture the initial scroll of the closest scrollable', () => {
         // in this case the parent of the droppable is the closest scrollable
         const frameScroll: Position = { x: 10, y: 20 };
         const marshal: DimensionMarshal = getMarshalStub();
@@ -635,15 +541,19 @@ describe('DraggableDimensionPublisher', () => {
         // manually setting the scroll of the parent node
         parent.scrollTop = frameScroll.y;
         parent.scrollLeft = frameScroll.x;
-        jest.spyOn(parent, 'getBoundingClientRect').mockImplementation(() => frame);
-        jest.spyOn(droppable, 'getBoundingClientRect').mockImplementation(() => borderBox);
+        jest.spyOn(droppable, 'getBoundingClientRect').mockImplementation(() => client.borderBox);
+        jest.spyOn(parent, 'getBoundingClientRect').mockImplementation(() => frameClient.borderBox);
         const expected: DroppableDimension = getDroppableDimension({
           descriptor,
-          borderBox,
+          borderBox: client.borderBox,
+          margin,
+          border,
+          padding,
           closest: {
-            frameBorderBox: frame,
-            scrollWidth: frame.width,
-            scrollHeight: frame.height,
+            client: frameClient,
+            page: frameClient,
+            scrollWidth: frameClient.paddingBox.width,
+            scrollHeight: frameClient.paddingBox.height,
             scroll: frameScroll,
             shouldClipSubject: true,
           },
@@ -670,15 +580,19 @@ describe('DraggableDimensionPublisher', () => {
         );
         const droppable: HTMLElement = wrapper.instance().getRef();
         const parent: HTMLElement = wrapper.getDOMNode();
-        jest.spyOn(parent, 'getBoundingClientRect').mockImplementation(() => frame);
-        jest.spyOn(droppable, 'getBoundingClientRect').mockImplementation(() => borderBox);
+        jest.spyOn(droppable, 'getBoundingClientRect').mockImplementation(() => client.borderBox);
+        jest.spyOn(parent, 'getBoundingClientRect').mockImplementation(() => frameClient.borderBox);
         const expected: DroppableDimension = getDroppableDimension({
           descriptor,
-          borderBox,
+          borderBox: client.borderBox,
+          margin,
+          padding,
+          border,
           closest: {
-            frameBorderBox: frame,
-            scrollWidth: frame.width,
-            scrollHeight: frame.height,
+            client: frameClient,
+            page: frameClient,
+            scrollWidth: frameClient.paddingBox.width,
+            scrollHeight: frameClient.paddingBox.height,
             scroll: { x: 0, y: 0 },
             shouldClipSubject: false,
           },
@@ -957,10 +871,10 @@ describe('DraggableDimensionPublisher', () => {
         />,
         withDimensionMarshal(marshal),
       );
-      const parent: HTMLElement = wrapper.getDOMNode();
       const droppable: HTMLElement = wrapper.instance().getRef();
-      jest.spyOn(parent, 'getBoundingClientRect').mockImplementation(() => frame);
-      jest.spyOn(droppable, 'getBoundingClientRect').mockImplementation(() => borderBox);
+      const parent: HTMLElement = wrapper.getDOMNode();
+      jest.spyOn(droppable, 'getBoundingClientRect').mockImplementation(() => frameClient.borderBox);
+      jest.spyOn(parent, 'getBoundingClientRect').mockImplementation(() => client.borderBox);
 
       // validating no initial scroll
       expect(parent.scrollTop).toBe(0);
