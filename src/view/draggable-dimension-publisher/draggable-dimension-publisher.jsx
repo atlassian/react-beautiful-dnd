@@ -7,14 +7,11 @@ import invariant from 'tiny-invariant';
 import { calculateBox, withScroll } from 'css-box-model';
 import type { BoxModel } from 'css-box-model';
 import getWindowScroll from '../window/get-window-scroll';
-import { getDraggableDimension } from '../../state/dimension';
 import { dimensionMarshalKey } from '../context-keys';
 import type {
   DraggableDescriptor,
   DraggableDimension,
   Placeholder,
-  Spacing,
-  Rect,
   DraggableId,
   DroppableId,
 } from '../../types';
