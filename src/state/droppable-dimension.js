@@ -109,4 +109,4 @@ export const getDroppableDimension = ({
   return dimension;
 };
 
-export const scroll = () => { };
+export const scrollDroppable = () => { };

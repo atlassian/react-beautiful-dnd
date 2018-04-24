@@ -20,6 +20,7 @@ export const expandByPosition = (spacing: Spacing, position: Position): Spacing 
   bottom: spacing.bottom + position.y,
 });
 
+// TODO: remove
 export const expandBySpacing = (spacing1: Spacing, spacing2: Spacing): Spacing => ({
   // pulling back to increase size
   top: spacing1.top - spacing2.top,
@@ -29,6 +30,7 @@ export const expandBySpacing = (spacing1: Spacing, spacing2: Spacing): Spacing =
   right: spacing1.right + spacing2.right,
 });
 
+// TODO: remove
 export const shrinkBySpacing = (spacing1: Spacing, spacing2: Spacing): Spacing => ({
   // pushing forward to descrease size
   top: spacing1.top + spacing2.top,
@@ -38,6 +40,7 @@ export const shrinkBySpacing = (spacing1: Spacing, spacing2: Spacing): Spacing =
   right: spacing1.right - spacing2.right,
 });
 
+// TODO: needed?
 export const isEqual = (spacing1: Spacing, spacing2: Spacing): boolean => (
   spacing1.top === spacing2.top &&
   spacing1.right === spacing2.right &&
