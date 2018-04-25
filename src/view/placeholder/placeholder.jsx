@@ -1,12 +1,15 @@
 // @flow
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import type { Placeholder as PlaceholderType } from '../../types';
+import shallowCompare from 'react-addons-shallow-compare';
 
 type Props = {|
   placeholder: PlaceholderType,
-|}
+|};
 
-export default class Placeholder extends PureComponent<Props> {
+export default class Placeholder extends Component<Props> {
+  shouldComponentUpdate = (nextProps, nextState) => !shallowCompare(this, nextProps, this.props);
+
   render() {
     const placeholder: PlaceholderType = this.props.placeholder;
     const { borderBox, margin, display, tagName } = placeholder;
