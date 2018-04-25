@@ -1,13 +1,13 @@
 // @flow
+import { getRect, createBox, type Rect, type BoxModel } from 'css-box-model';
 import getClosestDraggable from '../../../../src/state/move-cross-axis/get-closest-draggable';
-import { getDroppableDimension, getDraggableDimension, scrollDroppable } from '../../../../src/state/dimension';
+import { scrollDroppable } from '../../../../src/state/dimension';
 import { add, distance, patch } from '../../../../src/state/position';
+import { getDroppableDimension, getDraggableDimension } from '../../../utils/dimension';
 import { expandByPosition } from '../../../../src/state/spacing';
 import { horizontal, vertical } from '../../../../src/state/axis';
-import getArea from '../../../../src/state/get-area';
 import getViewport from '../../../../src/view/window/get-viewport';
 import type {
-  Area,
   Axis,
   Position,
   DraggableDimension,
@@ -25,7 +25,7 @@ describe('get closest draggable', () => {
       const crossAxisStart: number = 0;
       const crossAxisEnd: number = 20;
 
-      const borderBox: Area = getArea({
+      const borderBox: Rect = getRect({
         [axis.start]: start,
         [axis.end]: end,
         [axis.crossAxisStart]: crossAxisStart,
@@ -47,12 +47,12 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 0,
         },
-        borderBox: getArea({
+        borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: -30, // -10
           [axis.end]: -10,
-        }),
+        },
       });
 
       // item bleeds backwards past the start of the droppable
@@ -62,12 +62,12 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 1,
         },
-        borderBox: getArea({
+        borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: -10, // -10
           [axis.end]: 20,
-        }),
+        },
       });
 
       const visible1: DraggableDimension = getDraggableDimension({
@@ -76,12 +76,12 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 2,
         },
-        borderBox: getArea({
+        borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: 20,
           [axis.end]: 40,
-        }),
+        },
       });
 
       const visible2: DraggableDimension = getDraggableDimension({
@@ -90,12 +90,12 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 3,
         },
-        borderBox: getArea({
+        borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: 40,
           [axis.end]: 60,
-        }),
+        },
       });
 
       // bleeds over the end of the visible boundary
@@ -105,12 +105,12 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 4,
         },
-        borderBox: getArea({
+        borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: 60,
           [axis.end]: 120,
-        }),
+        },
       });
 
       // totally invisible
@@ -120,12 +120,12 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 5,
         },
-        borderBox: getArea({
+        borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: 120,
           [axis.end]: 140,
-        }),
+        },
       });
 
       const outOfViewport: DraggableDimension = getDraggableDimension({
@@ -134,12 +134,12 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 6,
         },
-        borderBox: getArea({
+        borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: viewport.subject[axis.end] + 1,
           [axis.end]: viewport.subject[axis.end] + 10,
-        }),
+        },
       });
 
       const insideDestination: DraggableDimension[] = [
@@ -198,12 +198,16 @@ describe('get closest draggable', () => {
       });
 
       it('should take into account the change in droppable scroll', () => {
+        const frameClient: BoxModel = createBox({
+          borderBox: expandByPosition(borderBox, patch(axis.line, 100)),
+        });
         const scrollable: DroppableDimension = getDroppableDimension({
           descriptor: droppable.descriptor,
           direction: axis.direction,
           borderBox,
           closest: {
-            frameBorderBox: getArea(expandByPosition(borderBox, patch(axis.line, 100))),
+            client: frameClient,
+            page: frameClient,
             scrollHeight: borderBox.width + 100,
             scrollWidth: borderBox.height + 100,
             scroll: { x: 0, y: 0 },
