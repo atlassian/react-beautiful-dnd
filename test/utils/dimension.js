@@ -207,7 +207,7 @@ type GetDroppableArgs = {|
   border?: Spacing,
   padding?: Spacing,
   windowScroll?: Position,
-  closest ?: ? Closest,
+  closest ?: ?Closest,
   isEnabled?: boolean,
 |}
 
