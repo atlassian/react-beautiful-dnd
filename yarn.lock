@@ -2468,9 +2468,9 @@ crypto-browserify@^3.11.0:
     randombytes "^2.0.0"
     randomfill "^1.0.3"
 
-css-box-model@^0.0.11:
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/css-box-model/-/css-box-model-0.0.11.tgz#f6696661efe5618a8939c490d5eb3404ee9b8e6e"
+css-box-model@^0.0.12:
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/css-box-model/-/css-box-model-0.0.12.tgz#82bacc038d890d46f12f3c5454bb16c0bd404f44"
 
 css-color-keywords@^1.0.0:
   version "1.0.0"
