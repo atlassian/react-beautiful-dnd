@@ -35,7 +35,7 @@ const isVisible = ({
 
   // destination subject is totally hidden by frame
   // this should never happen - but just guarding against it
-  if (!destination.viewport.clipped) {
+  if (!destination.viewport.clippedMarginBox) {
     return false;
   }
 
@@ -44,7 +44,7 @@ const isVisible = ({
   // adjust for the scroll as the clipped viewport takes into account
   // the scroll of the droppable.
   const isVisibleInDroppable: boolean =
-    isVisibleThroughFrameFn(destination.viewport.clipped)(withDisplacement);
+    isVisibleThroughFrameFn(destination.viewport.clippedMarginBox)(withDisplacement);
 
   // We also need to consider whether the destination scroll when detecting
   // if we are visible in the viewport.

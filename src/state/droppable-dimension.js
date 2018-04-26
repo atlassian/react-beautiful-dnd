@@ -75,7 +75,7 @@ export const getDroppableDimension = ({
     });
 
     return {
-      frame: closest.page.marginBox,
+      frameMarginBox: closest.page.marginBox,
       shouldClipSubject: closest.shouldClipSubject,
       scroll: {
         initial: closest.scroll,
@@ -89,16 +89,16 @@ export const getDroppableDimension = ({
     };
   })();
 
-  const subject: Rect = page.marginBox;
+  const subjectMarginBox: Rect = page.marginBox;
 
-  const clipped: ?Rect = (scrollable && scrollable.shouldClipSubject) ?
-    clip(scrollable.frame, subject) :
-    subject;
+  const clippedMarginBox: ?Rect = (scrollable && scrollable.shouldClipSubject) ?
+    clip(scrollable.frameMarginBox, subjectMarginBox) :
+    subjectMarginBox;
 
   const viewport: DroppableDimensionViewport = {
     closestScrollable: scrollable,
-    subject,
-    clipped,
+    subjectMarginBox,
+    clippedMarginBox,
   };
 
   const dimension: DroppableDimension = {
@@ -120,7 +120,7 @@ export const scrollDroppable = (
   invariant(droppable.viewport.closestScrollable);
 
   const scrollable: Scrollable = droppable.viewport.closestScrollable;
-  const frame: Rect = scrollable.frame;
+  const frameMarginBox: Rect = scrollable.frameMarginBox;
 
   const scrollDiff: Position = subtract(newScroll, scrollable.scroll.initial);
   // a positive scroll difference leads to a negative displacement
@@ -131,7 +131,7 @@ export const scrollDroppable = (
   // This can occur when scrolling a foreign list that now has a placeholder.
 
   const closestScrollable: Scrollable = {
-    frame: scrollable.frame,
+    frameMarginBox: scrollable.frameMarginBox,
     shouldClipSubject: scrollable.shouldClipSubject,
     scroll: {
       initial: scrollable.scroll.initial,
@@ -146,16 +146,16 @@ export const scrollDroppable = (
   };
 
   const displacedSubject: Spacing =
-    offsetByPosition(droppable.viewport.subject, scrollDisplacement);
+    offsetByPosition(droppable.viewport.subjectMarginBox, scrollDisplacement);
 
-  const clipped: ?Rect = closestScrollable.shouldClipSubject ?
-    clip(frame, displacedSubject) :
+  const clippedMarginBox: ?Rect = closestScrollable.shouldClipSubject ?
+    clip(frameMarginBox, displacedSubject) :
     getRect(displacedSubject);
 
   const viewport: DroppableDimensionViewport = {
     closestScrollable,
-    subject: droppable.viewport.subject,
-    clipped,
+    subjectMarginBox: droppable.viewport.subjectMarginBox,
+    clippedMarginBox,
   };
 
   const result: DroppableDimension = {

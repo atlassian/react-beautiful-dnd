@@ -403,7 +403,7 @@ describe('is partially visible', () => {
           getClosestScrollable(droppable).scroll.max,
         );
         // asserting frame is not visible
-        expect(scrolled.viewport.clipped).toBe(null);
+        expect(scrolled.viewport.clippedMarginBox).toBe(null);
 
         // now asserting that this check will fail
         expect(isPartiallyVisible({

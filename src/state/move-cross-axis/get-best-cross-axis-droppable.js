@@ -26,7 +26,7 @@ type GetBestDroppableArgs = {|
 |}
 
 const getSafeClipped = (droppable: DroppableDimension): Rect => {
-  const rect: ?Rect = droppable.viewport.clipped;
+  const rect: ?Rect = droppable.viewport.clippedMarginBox;
 
   invariant(rect, 'Cannot get clipped area from droppable');
 
@@ -40,7 +40,7 @@ export default ({
   droppables,
   viewport,
 }: GetBestDroppableArgs): ?DroppableDimension => {
-  const sourceClipped: ?Rect = source.viewport.clipped;
+  const sourceClipped: ?Rect = source.viewport.clippedMarginBox;
 
   if (!sourceClipped) {
     return null;
@@ -59,13 +59,13 @@ export default ({
     .filter((droppable: DroppableDimension): boolean => droppable.isEnabled)
     // Remove any droppables that are not partially visible
     .filter((droppable: DroppableDimension): boolean => {
-      const clipped: ?Rect = droppable.viewport.clipped;
+      const clippedMarginBox: ?Rect = droppable.viewport.clippedMarginBox;
       // subject is not visible at all in frame
-      if (!clipped) {
+      if (!clippedMarginBox) {
         return false;
       }
       // TODO: only need to be totally visible on the cross axis
-      return isPartiallyVisibleThroughFrame(viewport.subject)(clipped);
+      return isPartiallyVisibleThroughFrame(viewport.subject)(clippedMarginBox);
     })
     .filter((droppable: DroppableDimension): boolean => {
       const targetClipped: Rect = getSafeClipped(droppable);

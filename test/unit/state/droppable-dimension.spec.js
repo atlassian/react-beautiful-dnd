@@ -74,7 +74,8 @@ describe('creating a droppable dimension', () => {
         });
 
         expect(dimension.viewport.closestScrollable).toBe(null);
-        expect(dimension.viewport.subject).toEqual(dimension.viewport.clipped);
+        expect(dimension.viewport.subjectMarginBox).toEqual(dimension.viewport.clippedMarginBox);
+        expect(dimension.viewport.subjectMarginBox).toEqual(dimension.page.marginBox);
       });
     });
 
@@ -96,7 +97,7 @@ describe('creating a droppable dimension', () => {
       });
 
       it('should offset the frame client by the window scroll', () => {
-        expect(getClosestScrollable(dimension).frame).toEqual(page.marginBox);
+        expect(getClosestScrollable(dimension).frameMarginBox).toEqual(page.marginBox);
       });
 
       it('should capture the viewport information', () => {
@@ -109,7 +110,7 @@ describe('creating a droppable dimension', () => {
         });
         const expected: DroppableDimensionViewport = {
           closestScrollable: {
-            frame: page.marginBox,
+            frameMarginBox: page.marginBox,
             shouldClipSubject: true,
             scroll: {
               initial: { x: 10, y: 10 },
@@ -121,8 +122,8 @@ describe('creating a droppable dimension', () => {
               },
             },
           },
-          subject: page.marginBox,
-          clipped: page.marginBox,
+          subjectMarginBox: page.marginBox,
+          clippedMarginBox: page.marginBox,
         };
 
         expect(dimension.viewport).toEqual(expected);
@@ -184,8 +185,8 @@ describe('creating a droppable dimension', () => {
         );
 
         // Not clipped
-        expect(droppable.viewport.subject).toEqual(expandedPage.marginBox);
-        expect(droppable.viewport.clipped).toEqual(expandedPage.marginBox);
+        expect(droppable.viewport.subjectMarginBox).toEqual(expandedPage.marginBox);
+        expect(droppable.viewport.clippedMarginBox).toEqual(expandedPage.marginBox);
         expect(getClosestScrollable(droppable).shouldClipSubject).toBe(false);
       });
 
@@ -193,7 +194,7 @@ describe('creating a droppable dimension', () => {
         it('should not clip the subject', () => {
           const droppable: DroppableDimension = getWithClient(frameClient);
 
-          expect(droppable.viewport.clipped).toEqual(framePage.marginBox);
+          expect(droppable.viewport.clippedMarginBox).toEqual(framePage.marginBox);
         });
       });
 
@@ -209,7 +210,7 @@ describe('creating a droppable dimension', () => {
 
           const droppable: DroppableDimension = getWithClient(bigClient);
 
-          expect(droppable.viewport.clipped).toEqual(framePage.marginBox);
+          expect(droppable.viewport.clippedMarginBox).toEqual(framePage.marginBox);
         });
       });
 
@@ -218,7 +219,7 @@ describe('creating a droppable dimension', () => {
           // client is already smaller than frame
           const droppable: DroppableDimension = getWithClient(client);
 
-          expect(droppable.viewport.clipped).toEqual(page.marginBox);
+          expect(droppable.viewport.clippedMarginBox).toEqual(page.marginBox);
         });
       });
 
@@ -242,7 +243,7 @@ describe('creating a droppable dimension', () => {
 
             const droppable: DroppableDimension = getWithClient(custom);
 
-            expect(droppable.viewport.clipped).toEqual(framePage.marginBox);
+            expect(droppable.viewport.clippedMarginBox).toEqual(framePage.marginBox);
           });
         });
       });
@@ -297,9 +298,9 @@ describe('scrolling a droppable', () => {
     const closestScrollable: Scrollable = getClosestScrollable(droppable);
 
     // original frame
-    expect(closestScrollable.frame).toEqual(framePage.marginBox);
+    expect(closestScrollable.frameMarginBox).toEqual(framePage.marginBox);
     // subject is currently clipped by the frame
-    expect(droppable.viewport.clipped).toEqual(framePage.marginBox);
+    expect(droppable.viewport.clippedMarginBox).toEqual(framePage.marginBox);
 
     // scrolling down
     const newScroll: Position = { x: 0, y: 100 };
@@ -307,7 +308,7 @@ describe('scrolling a droppable', () => {
     const updatedClosest: Scrollable = getClosestScrollable(updated);
 
     // unchanged frame client
-    expect(updatedClosest.frame).toEqual(framePage.marginBox);
+    expect(updatedClosest.frameMarginBox).toEqual(framePage.marginBox);
 
     // updated scroll info
     expect(updatedClosest.scroll).toEqual({
@@ -327,7 +328,7 @@ describe('scrolling a droppable', () => {
 
     // updated clipped
     // can now see the bottom half of the subject
-    expect(updated.viewport.clipped).toEqual(getRect({
+    expect(updated.viewport.clippedMarginBox).toEqual(getRect({
       top: 0,
       bottom: 100,
       // unchanged

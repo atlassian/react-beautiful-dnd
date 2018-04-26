@@ -295,7 +295,7 @@ export default ({
     }
 
     const requiredFrameScroll: ?Position = getRequiredScroll({
-      container: closestScrollable.frame,
+      container: closestScrollable.frameMarginBox,
       subject,
       center,
     });
