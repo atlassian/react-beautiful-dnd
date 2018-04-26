@@ -1,7 +1,6 @@
 // @flow
-import React, { Component, Fragment } from 'react';
+import React, { Component, Fragment, type Node } from 'react';
 import ReactDOM from 'react-dom';
-import type { Node } from 'react';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import reorder from '../reorder';

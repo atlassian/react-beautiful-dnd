@@ -1,6 +1,7 @@
 // @flow
 import isTotallyVisibleThroughFrame from '../../../../src/state/visibility/is-totally-visible-through-frame';
-import { offsetByPosition, expandBySpacing } from '../../../../src/state/spacing';
+import { offsetByPosition } from '../../../../src/state/spacing';
+import { expandBySpacing } from '../../../utils/spacing';
 import type { Spacing } from '../../../../src/types';
 
 const frame: Spacing = {

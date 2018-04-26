@@ -1,7 +1,6 @@
 // @flow
 /* eslint-disable react/no-multi-comp */
-import React, { Component } from 'react';
-import type { Node } from 'react';
+import React, { Component, type Node } from 'react';
 import ReactDOM from 'react-dom';
 import { mount, type ReactWrapper } from 'enzyme';
 import { getRect } from 'css-box-model';

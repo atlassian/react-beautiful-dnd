@@ -1,6 +1,5 @@
 // @flow
-import { Component } from 'react';
-import type { Node } from 'react';
+import { Component, type Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
