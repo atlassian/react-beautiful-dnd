@@ -68,7 +68,7 @@ exports.onCreateNode = ({ node, boundActionCreators, getNode }/* : NodeParams */
   if (node.internal.type === 'MarkdownRemark') {
     const fileNode = getNode(node.parent);
     const parsedFilePath = path.parse(fileNode.relativePath);
-    let slug = '/docs';
+    let slug = '/documentation';
     let title = '';
     if (parsedFilePath.dir) {
       slug += `/${parsedFilePath.dir.toLowerCase()}`;
@@ -131,5 +131,23 @@ exports.createPages = ({ graphql, boundActionCreators }/* : NodeParams */)/* : P
         });
       })
     );
+  });
+};
+
+exports.onCreatePage = async ({ page, boundActionCreators }) => {
+  const { createPage } = boundActionCreators;
+
+  return new Promise((resolve, reject) => {
+    if (page.path === '/') {
+      page.layout = 'landing';
+      // Update the page.
+      createPage(page);
+    }
+    // else if (page.path.match(/^\/(examples|internal)\/./)) {
+    //   page.layout = 'example';
+    //   createPage(page);
+    // }
+
+    resolve();
   });
 };

@@ -16,7 +16,7 @@ export default ({ data }: Props) => (
 /* eslint-disable no-undef */
 // $FlowFixMe
 export const query = graphql`
-  query docsBySlug($slug: String!) {
+  query markdownQuery($slug: String!) {
     markdownRemark(fields: { slug: { eq: $slug } }) {
       html
     }

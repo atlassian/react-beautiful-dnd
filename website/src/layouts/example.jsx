@@ -1,22 +1,10 @@
 // @flow
-import React, { type Node } from 'react';
-import Helmet from 'react-helmet';
-/* eslint-disable-next-line import/extensions */
-import '@atlaskit/css-reset';
-
-import PageWrapper from '../components/PageWrapper';
+import React from 'react';
+import ExampleWrapper, { gatsbyUrlToCSBPath } from '../components/ExampleWrapper';
 import CommonPage from '../components/CommonPage';
-import type { SidebarData } from '../components/types';
+import PageWrapper from '../components/PageWrapper';
 
-type Props = {
-  children: () => Node,
-  location: { pathname: string },
-  data: SidebarData
-};
-
-const regex = /^\/(documentation|examples|internal)/;
-
-const PageTemplate = ({ children, location, data }: Props) => (
+const ExamplePage = ({ children, data, location, ...rest }) => (
   <CommonPage>
     <PageWrapper
       examples={data.examples}
@@ -24,17 +12,21 @@ const PageTemplate = ({ children, location, data }: Props) => (
       internal={data.internal}
       showInternal={data.site.siteMetadata.development}
     >
-      {children()}
+      <ExampleWrapper
+        path={gatsbyUrlToCSBPath(location.pathname)}
+      >
+        {children()}
+      </ExampleWrapper>
     </PageWrapper>
   </CommonPage>
 );
 
-export default PageTemplate;
+export default ExamplePage;
 
 /* eslint-disable no-undef */
 // $FlowFixMe
 export const query = graphql`
-  query sidebarInfo {
+  query examplesSidebarInfo {
     examples: allSitePage(filter: { path: { regex: "/^/examples/.+/" } }) {
       edges {
         node {
