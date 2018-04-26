@@ -51,7 +51,6 @@ export default ({
     sourceClipped[axis.start],
     sourceClipped[axis.end]
   );
-  // const candidates: Candidate[] = Object.keys(droppables)
   const candidates: DroppableDimension[] = Object.keys(droppables)
     .map((id: DroppableId): DroppableDimension => droppables[id])
     // Remove the source droppable from the list

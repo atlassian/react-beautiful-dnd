@@ -1,6 +1,6 @@
 // @flow
 import getBestCrossAxisDroppable from '../../../../src/state/move-cross-axis/get-best-cross-axis-droppable';
-import { getDroppableDimension, withAssortedSpacing } from '../../../utils/dimension';
+import { getDroppableDimension } from '../../../utils/dimension';
 import { add } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
 import getViewport from '../../../../src/view/window/get-viewport';
@@ -31,7 +31,6 @@ describe('get best cross axis droppable', () => {
           right: 30,
           bottom: 10,
         },
-        ...withAssortedSpacing(),
       });
       const forward = getDroppableDimension({
         descriptor: {
@@ -40,12 +39,11 @@ describe('get best cross axis droppable', () => {
         },
         direction: axis.direction,
         borderBox: {
-          top: source.client.marginBox.top + 50,
-          left: source.client.marginBox.right + 50,
-          right: source.client.marginBox.right + 100,
-          bottom: source.client.marginBox.top + 100,
+          top: 0,
+          left: 30,
+          right: 40,
+          bottom: 10,
         },
-        ...withAssortedSpacing(),
       });
       const droppables: DroppableDimensionMap = {
         [source.descriptor.id]: source,
