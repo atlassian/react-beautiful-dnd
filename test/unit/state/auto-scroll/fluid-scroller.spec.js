@@ -114,8 +114,7 @@ describe('fluid auto scrolling', () => {
           bottom: scrollableScrollSize.scrollHeight,
         },
         closest: {
-          client: frameClient,
-          page: frameClient,
+          borderBox: frameClient.borderBox,
           scrollWidth: scrollableScrollSize.scrollWidth,
           scrollHeight: scrollableScrollSize.scrollHeight,
           scroll: origin,
@@ -1537,8 +1536,7 @@ describe('fluid auto scrolling', () => {
               bottom: 100,
             },
             closest: {
-              client: customFrameClient,
-              page: customFrameClient,
+              borderBox: customFrameClient.borderBox,
               scrollWidth: 10000,
               scrollHeight: 10000,
               scroll: origin,
@@ -1626,8 +1624,7 @@ describe('fluid auto scrolling', () => {
             bottom: windowScrollSize.scrollHeight,
           },
           closest: {
-            client: createBox({ borderBox: scrollableViewport.subject }),
-            page: createBox({ borderBox: scrollableViewport.subject }),
+            borderBox: scrollableViewport.subject,
             scrollWidth: windowScrollSize.scrollWidth,
             scrollHeight: windowScrollSize.scrollHeight,
             scroll: origin,

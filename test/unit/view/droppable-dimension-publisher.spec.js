@@ -410,21 +410,22 @@ describe('DraggableDimensionPublisher', () => {
 
       describe('droppable is scrollable', () => {
         it('should collect information about the scrollable', () => {
-          const closest: Closest = {
-            client,
-            page: client,
-            scrollWidth: client.paddingBox.width,
-            scrollHeight: client.paddingBox.height,
-            scroll: { x: 0, y: 0 },
-            shouldClipSubject: true,
-          };
           const expected: DroppableDimension = getDroppableDimension({
             descriptor,
             borderBox: client.borderBox,
-            closest,
             margin,
             padding,
             border,
+            closest: {
+              borderBox: client.borderBox,
+              margin,
+              padding,
+              border,
+              scrollWidth: client.paddingBox.width,
+              scrollHeight: client.paddingBox.height,
+              scroll: { x: 0, y: 0 },
+              shouldClipSubject: true,
+            },
           });
           const marshal: DimensionMarshal = getMarshalStub();
           // both the droppable and the parent are scrollable
@@ -453,8 +454,10 @@ describe('DraggableDimensionPublisher', () => {
             padding,
             border,
             closest: {
-              client: frameClient,
-              page: frameClient,
+              borderBox: frameClient.borderBox,
+              margin,
+              padding,
+              border,
               scrollWidth: frameClient.paddingBox.width,
               scrollHeight: frameClient.paddingBox.height,
               scroll: { x: 0, y: 0 },
@@ -492,8 +495,10 @@ describe('DraggableDimensionPublisher', () => {
             padding,
             border,
             closest: {
-              client,
-              page: client,
+              borderBox: client.borderBox,
+              margin,
+              padding,
+              border,
               scrollWidth: client.paddingBox.width,
               scrollHeight: client.paddingBox.height,
               scroll: { x: 0, y: 0 },
@@ -550,8 +555,10 @@ describe('DraggableDimensionPublisher', () => {
           border,
           padding,
           closest: {
-            client: frameClient,
-            page: frameClient,
+            borderBox: frameClient.borderBox,
+            margin,
+            border,
+            padding,
             scrollWidth: frameClient.paddingBox.width,
             scrollHeight: frameClient.paddingBox.height,
             scroll: frameScroll,
@@ -589,8 +596,10 @@ describe('DraggableDimensionPublisher', () => {
           padding,
           border,
           closest: {
-            client: frameClient,
-            page: frameClient,
+            borderBox: frameClient.borderBox,
+            margin,
+            padding,
+            border,
             scrollWidth: frameClient.paddingBox.width,
             scrollHeight: frameClient.paddingBox.height,
             scroll: { x: 0, y: 0 },

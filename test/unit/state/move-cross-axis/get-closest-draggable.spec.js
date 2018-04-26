@@ -198,16 +198,12 @@ describe('get closest draggable', () => {
       });
 
       it('should take into account the change in droppable scroll', () => {
-        const frameClient: BoxModel = createBox({
-          borderBox: expandByPosition(borderBox, patch(axis.line, 100)),
-        });
         const scrollable: DroppableDimension = getDroppableDimension({
           descriptor: droppable.descriptor,
           direction: axis.direction,
           borderBox,
           closest: {
-            client: frameClient,
-            page: frameClient,
+            borderBox: expandByPosition(borderBox, patch(axis.line, 100)),
             scrollHeight: borderBox.width + 100,
             scrollWidth: borderBox.height + 100,
             scroll: { x: 0, y: 0 },

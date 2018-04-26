@@ -1,7 +1,7 @@
 // @flow
 import getBestCrossAxisDroppable from '../../../../src/state/move-cross-axis/get-best-cross-axis-droppable';
-import { getDroppableDimension } from '../../../../src/state/dimension';
 import getArea from '../../../../src/state/get-area';
+import { getDroppableDimension } from '../../../utils/dimension';
 import { add } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
 import getViewport from '../../../../src/view/window/get-viewport';
@@ -319,14 +319,14 @@ describe('get best cross axis droppable', () => {
           bottom: 80,
         }),
         closest: {
-          frameBorderBox: getArea({
+          borderBox: {
             // not the same top value as source
             top: 20,
             // shares the left edge with the source
             left: 20,
             right: 40,
             bottom: 40,
-          }),
+          },
           scrollWidth: 20,
           scrollHeight: 80,
           scroll: { x: 0, y: 0 },
@@ -653,15 +653,15 @@ describe('get best cross axis droppable', () => {
         },
         direction: axis.direction,
         // totally hidden by frame
-        borderBox: getArea({
+        borderBox: {
           [axis.start]: 0,
           [axis.end]: 100,
           // would normally be a good candidate
           [axis.crossAxisStart]: 200,
           [axis.crossAxisEnd]: 300,
-        }),
+        },
         closest: {
-          frameBorderBox: getArea({
+          borderBox: getArea({
             [axis.start]: 0,
             [axis.end]: 100,
             // frame hides subject

@@ -210,6 +210,17 @@ export const getDraggableDimension = ({
   return result;
 };
 
+type ClosestSubset = {|
+  borderBox: Spacing,
+  margin?: Spacing,
+  border?: Spacing,
+  padding?: Spacing,
+  scrollHeight: number,
+  scrollWidth: number,
+  scroll: Position,
+  shouldClipSubject: boolean,
+|}
+
 type GetDroppableArgs = {|
   descriptor: DroppableDescriptor,
   borderBox: Spacing,
@@ -218,7 +229,7 @@ type GetDroppableArgs = {|
   border?: Spacing,
   padding?: Spacing,
   windowScroll?: Position,
-  closest ?: ?Closest,
+  closest?: ?ClosestSubset,
   isEnabled?: boolean,
 |}
 
@@ -241,13 +252,39 @@ export const getDroppableDimension = ({
   });
   const page: BoxModel = withScroll(client, windowScroll);
 
+  const closestScrollable: ?Closest = (() => {
+    if (!closest) {
+      return null;
+    }
+
+    const frameClient: BoxModel = createBox({
+      borderBox: closest.borderBox,
+      border: closest.border,
+      padding: closest.padding,
+      margin: closest.margin,
+    });
+
+    const framePage: BoxModel = withScroll(frameClient, windowScroll);
+
+    const result: Closest = {
+      client: frameClient,
+      page: framePage,
+      scrollHeight: closest.scrollHeight,
+      scrollWidth: closest.scrollWidth,
+      scroll: closest.scroll,
+      shouldClipSubject: closest.shouldClipSubject,
+    };
+
+    return result;
+  })();
+
   return getDroppable({
     descriptor,
     isEnabled,
     direction,
     client,
     page,
-    closest,
+    closest: closestScrollable,
   });
 };
 

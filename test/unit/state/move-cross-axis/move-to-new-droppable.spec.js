@@ -1,5 +1,4 @@
 // @flow
-import { createBox, type BoxModel } from 'css-box-model';
 import moveToNewDroppable from '../../../../src/state/move-cross-axis/move-to-new-droppable/';
 import type { Result } from '../../../../src/state/move-cross-axis/move-cross-axis-types';
 import { scrollDroppable } from '../../../../src/state/dimension';
@@ -396,15 +395,6 @@ describe('move to new droppable', () => {
 
         describe('visibility and displacement', () => {
           it('should indicate when displacement is not visible when not partially visible in the droppable frame', () => {
-            const frameClient: BoxModel = createBox({
-              borderBox: {
-                [axis.crossAxisStart]: 0,
-                [axis.crossAxisEnd]: 100,
-                [axis.start]: 0,
-                // will cut the subject
-                [axis.end]: 100,
-              },
-            });
             const droppable: DroppableDimension = getDroppableDimension({
               descriptor: {
                 id: 'with-frame',
@@ -419,8 +409,13 @@ describe('move to new droppable', () => {
                 [axis.end]: 200,
               },
               closest: {
-                client: frameClient,
-                page: frameClient,
+                borderBox: {
+                  [axis.crossAxisStart]: 0,
+                  [axis.crossAxisEnd]: 100,
+                  [axis.start]: 0,
+                  // will cut the subject
+                  [axis.end]: 100,
+                },
                 scrollWidth: 200,
                 scrollHeight: 200,
                 scroll: { x: 0, y: 0 },
@@ -937,15 +932,6 @@ describe('move to new droppable', () => {
                 [axis.end]: 80,
               },
             });
-            const foreignFrameClient: BoxModel = createBox({
-              borderBox: {
-                top: 0,
-                left: 0,
-                right: 100,
-                bottom: 100,
-              },
-            });
-
             const customForeign: DroppableDimension = getDroppableDimension({
               descriptor: {
                 id: 'foreign-with-frame',
@@ -960,8 +946,12 @@ describe('move to new droppable', () => {
                 bottom: 200,
               },
               closest: {
-                client: foreignFrameClient,
-                page: foreignFrameClient,
+                borderBox: {
+                  top: 0,
+                  left: 0,
+                  right: 100,
+                  bottom: 100,
+                },
                 scrollWidth: 200,
                 scrollHeight: 200,
                 scroll: { x: 0, y: 0 },
