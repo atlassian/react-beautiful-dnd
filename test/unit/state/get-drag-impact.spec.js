@@ -13,7 +13,6 @@ import {
   makeScrollable,
   getDroppableDimension,
   getDraggableDimension,
-  withAssortedSpacing,
 } from '../../utils/dimension';
 import getViewport from '../../../src/view/window/get-viewport';
 import type {

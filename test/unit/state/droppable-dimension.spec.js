@@ -74,8 +74,10 @@ describe('creating a droppable dimension', () => {
         });
 
         expect(dimension.viewport.closestScrollable).toBe(null);
-        expect(dimension.viewport.subjectPageMarginBox).toEqual(dimension.viewport.clippedPageMarginBox);
-        expect(dimension.viewport.subjectPageMarginBox).toEqual(dimension.page.marginBox);
+        expect(dimension.viewport.subjectPageMarginBox)
+          .toEqual(dimension.viewport.clippedPageMarginBox);
+        expect(dimension.viewport.subjectPageMarginBox)
+          .toEqual(dimension.page.marginBox);
       });
     });
 
