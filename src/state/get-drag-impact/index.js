@@ -16,7 +16,7 @@ import inHomeList from './in-home-list';
 import inForeignList from './in-foreign-list';
 
 type Args = {|
-  pageCenter: Position,
+  pageBorderBoxCenter: Position,
   draggable: DraggableDimension,
   // all dimensions in system
   draggables: DraggableDimensionMap,
@@ -26,7 +26,7 @@ type Args = {|
 |}
 
 export default ({
-  pageCenter,
+  pageBorderBoxCenter,
   draggable,
   draggables,
   droppables,
@@ -38,7 +38,7 @@ export default ({
     previousImpact.destination.droppableId;
 
   const destinationId: ?DroppableId = getDroppableOver({
-    target: pageCenter,
+    target: pageBorderBoxCenter,
     draggable,
     draggables,
     droppables,
@@ -65,7 +65,7 @@ export default ({
 
   if (isWithinHomeDroppable) {
     return inHomeList({
-      pageCenter,
+      pageBorderBoxCenter,
       draggable,
       home,
       insideHome: insideDestination,
@@ -75,7 +75,7 @@ export default ({
   }
 
   return inForeignList({
-    pageCenter,
+    pageBorderBoxCenter,
     draggable,
     destination,
     insideDestination,

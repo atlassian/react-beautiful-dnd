@@ -14,7 +14,7 @@ import type {
 
 type Args = {|
   // the current center position of the draggable
-  pageCenter: Position,
+  pageBorderBoxCenter: Position,
   // the draggable that is dragging and needs to move
   draggable: DraggableDimension,
   // what the draggable is moving towards
@@ -33,7 +33,7 @@ type Args = {|
 |}
 
 export default ({
-  pageCenter,
+  pageBorderBoxCenter,
   destination,
   draggable,
   target,
@@ -64,7 +64,7 @@ export default ({
   // moving to a foreign list
   return toForeignList({
     amount,
-    pageCenter,
+    pageBorderBoxCenter,
     target,
     insideDroppable: insideDestination,
     draggable,

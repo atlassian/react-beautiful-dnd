@@ -52,7 +52,7 @@ describe('move to next index', () => {
         const result: ?Result = moveToNextIndex({
           isMovingForward: true,
           draggableId: preset.inHome1.descriptor.id,
-          previousPageCenter: preset.inHome1.page.borderBox.center,
+          previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
           previousImpact: noImpact,
           droppable: disabled,
           draggables: preset.draggables,
@@ -80,7 +80,7 @@ describe('move to next index', () => {
               isMovingForward: true,
               draggableId: preset.inHome3.descriptor.id,
               previousImpact,
-              previousPageCenter: preset.inHome3.page.borderBox.center,
+              previousPageBorderBoxCenter: preset.inHome3.page.borderBox.center,
               droppable: preset.home,
               draggables: preset.draggables,
               viewport: customViewport,
@@ -105,7 +105,7 @@ describe('move to next index', () => {
                 isMovingForward: true,
                 draggableId: preset.inHome1.descriptor.id,
                 previousImpact,
-                previousPageCenter: preset.inHome1.page.borderBox.center,
+                previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
                 viewport: customViewport,
@@ -124,7 +124,7 @@ describe('move to next index', () => {
                   destinationAxis: axis,
                 });
 
-                expect(result.pageCenter).toEqual(expected);
+                expect(result.pageBorderBoxCenter).toEqual(expected);
               });
 
               it('should move the item into the second spot and move the second item out of the way', () => {
@@ -164,7 +164,7 @@ describe('move to next index', () => {
                 isMovingForward: true,
                 draggableId: preset.inHome2.descriptor.id,
                 previousImpact,
-                previousPageCenter: preset.inHome2.page.borderBox.center,
+                previousPageBorderBoxCenter: preset.inHome2.page.borderBox.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
                 viewport: customViewport,
@@ -183,7 +183,7 @@ describe('move to next index', () => {
                   destinationAxis: axis,
                 });
 
-                expect(result.pageCenter).toEqual(expected);
+                expect(result.pageBorderBoxCenter).toEqual(expected);
               });
 
               it('should move the dragging item into the third spot and move the third item out of the way', () => {
@@ -235,7 +235,7 @@ describe('move to next index', () => {
                 previousImpact,
                 // roughly correct previous page center
                 // not calculating the exact point as it is not required for this test
-                previousPageCenter: preset.inHome2.page.borderBox.center,
+                previousPageBorderBoxCenter: preset.inHome2.page.borderBox.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
                 viewport: customViewport,
@@ -255,7 +255,7 @@ describe('move to next index', () => {
                   destinationAxis: axis,
                 });
 
-                expect(result.pageCenter).toEqual(expected);
+                expect(result.pageBorderBoxCenter).toEqual(expected);
               });
 
               it('should move the third item out of the way', () => {
@@ -316,7 +316,7 @@ describe('move to next index', () => {
                 draggableId: preset.inHome2.descriptor.id,
                 previousImpact,
                 // roughly correct:
-                previousPageCenter: preset.inHome1.page.borderBox.center,
+                previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
                 draggables: preset.draggables,
                 viewport: customViewport,
                 droppable: preset.home,
@@ -335,9 +335,9 @@ describe('move to next index', () => {
                   destinationAxis: axis,
                 });
 
-                expect(result.pageCenter).toEqual(expected);
+                expect(result.pageBorderBoxCenter).toEqual(expected);
                 // is now back at its original position
-                expect(result.pageCenter).toEqual(preset.inHome2.page.borderBox.center);
+                expect(result.pageBorderBoxCenter).toEqual(preset.inHome2.page.borderBox.center);
               });
 
               it('should return an empty impact', () => {
@@ -392,7 +392,7 @@ describe('move to next index', () => {
                 draggableId: preset.inHome3.descriptor.id,
                 previousImpact,
                 // this is roughly correct
-                previousPageCenter: preset.inHome1.page.borderBox.center,
+                previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
                 draggables: preset.draggables,
                 viewport: customViewport,
                 droppable: preset.home,
@@ -411,7 +411,7 @@ describe('move to next index', () => {
                   destinationAxis: axis,
                 });
 
-                expect(result.pageCenter).toEqual(expected);
+                expect(result.pageBorderBoxCenter).toEqual(expected);
               });
 
               it('should remove the first dimension from the impact', () => {
@@ -693,7 +693,7 @@ describe('move to next index', () => {
                   draggableId: inHome1.descriptor.id,
                   previousImpact,
                   // roughly correct:
-                  previousPageCenter: inHome1.page.borderBox.center,
+                  previousPageBorderBoxCenter: inHome1.page.borderBox.center,
                   draggables,
                   viewport: customViewport,
                   droppable: scrolled,
@@ -728,7 +728,7 @@ describe('move to next index', () => {
               isMovingForward: false,
               draggableId: preset.inHome1.descriptor.id,
               previousImpact,
-              previousPageCenter: preset.inHome1.page.borderBox.center,
+              previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
               draggables: preset.draggables,
               droppable: preset.home,
               viewport: customViewport,
@@ -756,7 +756,7 @@ describe('move to next index', () => {
                 isMovingForward: false,
                 draggableId: preset.inHome2.descriptor.id,
                 previousImpact,
-                previousPageCenter: preset.inHome2.page.borderBox.center,
+                previousPageBorderBoxCenter: preset.inHome2.page.borderBox.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
                 viewport: customViewport,
@@ -775,7 +775,7 @@ describe('move to next index', () => {
                   destinationAxis: axis,
                 });
 
-                expect(result.pageCenter).toEqual(expected);
+                expect(result.pageBorderBoxCenter).toEqual(expected);
               });
 
               it('should add the first draggable to the drag impact', () => {
@@ -818,7 +818,7 @@ describe('move to next index', () => {
                 isMovingForward: false,
                 draggableId: preset.inHome3.descriptor.id,
                 previousImpact,
-                previousPageCenter: preset.inHome3.page.borderBox.center,
+                previousPageBorderBoxCenter: preset.inHome3.page.borderBox.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
                 viewport: customViewport,
@@ -837,7 +837,7 @@ describe('move to next index', () => {
                   destinationAxis: axis,
                 });
 
-                expect(result.pageCenter).toEqual(expected);
+                expect(result.pageBorderBoxCenter).toEqual(expected);
               });
 
               it('should add the second draggable to the drag impact', () => {
@@ -889,7 +889,7 @@ describe('move to next index', () => {
                 draggableId: preset.inHome2.descriptor.id,
                 previousImpact,
                 // roughly correct
-                previousPageCenter: preset.inHome3.page.borderBox.center,
+                previousPageBorderBoxCenter: preset.inHome3.page.borderBox.center,
                 draggables: preset.draggables,
                 viewport: customViewport,
                 droppable: preset.home,
@@ -909,9 +909,9 @@ describe('move to next index', () => {
                   destinationAxis: axis,
                 });
 
-                expect(result.pageCenter).toEqual(expected);
+                expect(result.pageBorderBoxCenter).toEqual(expected);
                 // moved back to its original position
-                expect(result.pageCenter).toEqual(preset.inHome2.page.borderBox.center);
+                expect(result.pageBorderBoxCenter).toEqual(preset.inHome2.page.borderBox.center);
               });
 
               it('should return an empty impact', () => {
@@ -965,7 +965,7 @@ describe('move to next index', () => {
                 draggableId: preset.inHome1.descriptor.id,
                 previousImpact,
                 // roughly correct
-                previousPageCenter: preset.inHome3.page.borderBox.center,
+                previousPageBorderBoxCenter: preset.inHome3.page.borderBox.center,
                 draggables: preset.draggables,
                 viewport: customViewport,
                 droppable: preset.home,
@@ -984,7 +984,7 @@ describe('move to next index', () => {
                   destinationAxis: axis,
                 });
 
-                expect(result.pageCenter).toEqual(expected);
+                expect(result.pageBorderBoxCenter).toEqual(expected);
               });
 
               it('should remove the third draggable from the drag impact', () => {
@@ -1071,8 +1071,11 @@ describe('move to next index', () => {
                 destinationEdge: 'end',
                 destinationAxis: axis,
               });
-              const previousPageCenter: Position = asBigAsViewport.page.borderBox.center;
-              const expectedScrollJump: Position = subtract(expectedCenter, previousPageCenter);
+              const previousPageBorderBoxCenter: Position = asBigAsViewport.page.borderBox.center;
+              const expectedScrollJump: Position = subtract(
+                expectedCenter,
+                previousPageBorderBoxCenter
+              );
               const expectedImpact: DragImpact = {
                 movement: {
                   displaced: [{
@@ -1096,7 +1099,7 @@ describe('move to next index', () => {
                 isMovingForward: true,
                 draggableId: asBigAsViewport.descriptor.id,
                 previousImpact,
-                previousPageCenter,
+                previousPageBorderBoxCenter,
                 draggables,
                 droppable,
                 viewport: customViewport,
@@ -1107,7 +1110,7 @@ describe('move to next index', () => {
               }
 
               // not updating the page center (visually the item will not move)
-              expect(result.pageCenter).toEqual(previousPageCenter);
+              expect(result.pageBorderBoxCenter).toEqual(previousPageBorderBoxCenter);
               expect(result.scrollJumpRequest).toEqual(expectedScrollJump);
               expect(result.impact).toEqual(expectedImpact);
             });
@@ -1152,7 +1155,7 @@ describe('move to next index', () => {
                 [visible.descriptor.id]: visible,
                 [invisible.descriptor.id]: invisible,
               };
-              const previousPageCenter: Position = visible.page.borderBox.center;
+              const previousPageBorderBoxCenter: Position = visible.page.borderBox.center;
               const expectedImpact: DragImpact = {
                 movement: {
                   displaced: [{
@@ -1176,7 +1179,7 @@ describe('move to next index', () => {
                 isMovingForward: true,
                 draggableId: visible.descriptor.id,
                 previousImpact,
-                previousPageCenter,
+                previousPageBorderBoxCenter,
                 draggables,
                 droppable,
                 viewport: customViewport,
@@ -1258,7 +1261,7 @@ describe('move to next index', () => {
                 [inside.descriptor.id]: inside,
                 [outside.descriptor.id]: outside,
               };
-              const previousPageCenter: Position = inside.page.borderBox.center;
+              const previousPageBorderBoxCenter: Position = inside.page.borderBox.center;
               const expectedCenter = moveToEdge({
                 source: inside.page.borderBox,
                 sourceEdge: 'end',
@@ -1266,7 +1269,10 @@ describe('move to next index', () => {
                 destinationEdge: 'end',
                 destinationAxis: axis,
               });
-              const expectedScrollJump: Position = subtract(expectedCenter, previousPageCenter);
+              const expectedScrollJump: Position = subtract(
+                expectedCenter,
+                previousPageBorderBoxCenter
+              );
               const expectedImpact: DragImpact = {
                 movement: {
                   displaced: [{
@@ -1290,7 +1296,7 @@ describe('move to next index', () => {
                 isMovingForward: true,
                 draggableId: inside.descriptor.id,
                 previousImpact,
-                previousPageCenter,
+                previousPageBorderBoxCenter,
                 draggables,
                 droppable,
                 viewport: customViewport,
@@ -1300,7 +1306,7 @@ describe('move to next index', () => {
                 throw new Error('Invalid test setup');
               }
 
-              expect(result.pageCenter).toEqual(previousPageCenter);
+              expect(result.pageBorderBoxCenter).toEqual(previousPageBorderBoxCenter);
               expect(result.impact).toEqual(expectedImpact);
               expect(result.scrollJumpRequest).toEqual(expectedScrollJump);
             });
@@ -1349,7 +1355,7 @@ describe('move to next index', () => {
               isMovingForward: true,
               draggableId: preset.inHome1.descriptor.id,
               previousImpact,
-              previousPageCenter: preset.inHome1.page.borderBox.center,
+              previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
               droppable: preset.foreign,
               draggables: preset.draggables,
               viewport: customViewport,
@@ -1368,7 +1374,7 @@ describe('move to next index', () => {
                 destinationAxis: preset.foreign.axis,
               });
 
-              expect(result.pageCenter).toEqual(expected);
+              expect(result.pageBorderBoxCenter).toEqual(expected);
             });
 
             it('should remove foreign1 when moving forward', () => {
@@ -1426,7 +1432,7 @@ describe('move to next index', () => {
               isMovingForward: true,
               draggableId: preset.inHome1.descriptor.id,
               previousImpact,
-              previousPageCenter: preset.inHome1.page.borderBox.center,
+              previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
               droppable: preset.foreign,
               draggables: preset.draggables,
               viewport: customViewport,
@@ -1445,7 +1451,7 @@ describe('move to next index', () => {
                 destinationAxis: preset.foreign.axis,
               });
 
-              expect(result.pageCenter).toEqual(expected);
+              expect(result.pageBorderBoxCenter).toEqual(expected);
             });
 
             it('should remove foreign4 when moving forward', () => {
@@ -1488,7 +1494,7 @@ describe('move to next index', () => {
               draggableId: preset.inHome1.descriptor.id,
               previousImpact,
               // roughly correct
-              previousPageCenter: preset.inHome4.page.borderBox.center,
+              previousPageBorderBoxCenter: preset.inHome4.page.borderBox.center,
               droppable: preset.foreign,
               viewport: customViewport,
               draggables: preset.draggables,
@@ -1544,7 +1550,7 @@ describe('move to next index', () => {
               draggableId: preset.inHome1.descriptor.id,
               previousImpact,
               // roughly correct
-              previousPageCenter: preset.inForeign1.page.borderBox.center,
+              previousPageBorderBoxCenter: preset.inForeign1.page.borderBox.center,
               droppable: preset.foreign,
               viewport: customViewport,
               draggables: preset.draggables,
@@ -1578,7 +1584,7 @@ describe('move to next index', () => {
               draggableId: preset.inHome1.descriptor.id,
               previousImpact,
               // roughly correct
-              previousPageCenter: preset.inForeign4.page.borderBox.center,
+              previousPageBorderBoxCenter: preset.inForeign4.page.borderBox.center,
               droppable: preset.foreign,
               viewport: customViewport,
               draggables: preset.draggables,
@@ -1597,7 +1603,7 @@ describe('move to next index', () => {
                 destinationAxis: axis,
               });
 
-              expect(result.pageCenter).toEqual(expected);
+              expect(result.pageBorderBoxCenter).toEqual(expected);
             });
 
             it('should add foreign3 to the drag impact', () => {
@@ -1668,7 +1674,7 @@ describe('move to next index', () => {
               draggableId: preset.inHome1.descriptor.id,
               previousImpact,
               // roughly correct
-              previousPageCenter: preset.inForeign2.page.borderBox.center,
+              previousPageBorderBoxCenter: preset.inForeign2.page.borderBox.center,
               droppable: preset.foreign,
               viewport: customViewport,
               draggables: preset.draggables,
@@ -1687,7 +1693,7 @@ describe('move to next index', () => {
                 destinationAxis: axis,
               });
 
-              expect(result.pageCenter).toEqual(expected);
+              expect(result.pageBorderBoxCenter).toEqual(expected);
             });
 
             it('should add foreign1 to the impact', () => {

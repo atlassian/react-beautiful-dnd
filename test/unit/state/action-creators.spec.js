@@ -28,7 +28,7 @@ const preset = getPreset();
 const origin: Position = { x: 0, y: 0 };
 const noWhere: InitialDragPositions = {
   selection: origin,
-  center: origin,
+  borderBoxCenter: origin,
 };
 
 type LiftFnArgs = {|

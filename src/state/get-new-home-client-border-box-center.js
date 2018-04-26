@@ -27,11 +27,11 @@ export default ({
   draggables,
   destination,
 }: NewHomeArgs): Position => {
-  const homeCenter: Position = draggable.client.marginBox.center;
+  const originalCenter: Position = draggable.client.borderBox.center;
 
   // not dropping anywhere
   if (destination == null) {
-    return homeCenter;
+    return originalCenter;
   }
 
   const { displaced, isBeyondStartPosition } = movement;
@@ -42,7 +42,7 @@ export default ({
 
   // dropping back into home index
   if (isWithinHomeDroppable && !displaced.length) {
-    return homeCenter;
+    return originalCenter;
   }
 
   // All the draggables in the destination (even the ones that haven't moved)
@@ -50,16 +50,39 @@ export default ({
     destination, draggables
   );
 
+  // const data = (() => {
+  //   if (isWithinHomeDroppable) {
+  //     const closest: DraggableId = displaced[0].draggableId;
+  //     const isGoingAfter: boolean = isBeyondStartPosition;
+  //     return {
+  //       sourceEdge: 'end',
+  //       destinationEdge: isGoingAfter ? 'end' : 'start',
+  //       destination: draggables[closest].client.borderBox,
+  //     };
+  //   }
+
+  //   // In foreign droppable
+
+  //   // The list has had things moved in it
+  //   // We will always be going before
+  //   if (displaced.length) {
+  //     const closest: DraggableId = displaced[0].draggableId;
+  //     return {
+
+  //     }
+  //   }
+  // })();
+
   // Find the dimension we need to compare the dragged item with
-  const destinationFragment: Rect = (() => {
+  const movingRelativeTo: Rect = (() => {
     if (isWithinHomeDroppable) {
-      return draggables[displaced[0].draggableId].client.marginBox;
+      return draggables[displaced[0].draggableId].client.borderBox;
     }
 
-    // Not in home list
+    // In a foreign list
 
     if (displaced.length) {
-      return draggables[displaced[0].draggableId].client.marginBox;
+      return draggables[displaced[0].draggableId].client.borderBox;
     }
 
     // If we're dragging to the last place in a new droppable
@@ -97,13 +120,13 @@ export default ({
     return { sourceEdge: 'start', destinationEdge: 'start' };
   })();
 
-  const source: Rect = draggable.client.marginBox;
+  const source: Rect = draggable.client.borderBox;
 
   // This is the draggable's new home
   const targetCenter: Position = moveToEdge({
     source,
     sourceEdge,
-    destination: destinationFragment,
+    destination: movingRelativeTo,
     destinationEdge,
     destinationAxis: axis,
   });

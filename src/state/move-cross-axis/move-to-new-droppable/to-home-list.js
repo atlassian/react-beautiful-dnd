@@ -66,7 +66,7 @@ export default ({
     };
 
     return {
-      pageCenter: withDroppableDisplacement(droppable, newCenter),
+      pageBorderBoxCenter: withDroppableDisplacement(droppable, newCenter),
       impact: newImpact,
     };
   }
@@ -129,7 +129,7 @@ export default ({
   };
 
   return {
-    pageCenter: withDroppableDisplacement(droppable, newCenter),
+    pageBorderBoxCenter: withDroppableDisplacement(droppable, newCenter),
     impact: newImpact,
   };
 };

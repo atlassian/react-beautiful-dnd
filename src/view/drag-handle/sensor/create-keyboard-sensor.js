@@ -3,7 +3,7 @@
 import createScheduler from '../util/create-scheduler';
 import preventStandardKeyEvents from '../util/prevent-standard-key-events';
 import * as keyCodes from '../../key-codes';
-import getCenterPosition from '../../get-center-position';
+import getBorderBoxCenterPosition from '../../get-border-box-center-position';
 import { bindEvents, unbindEvents } from '../util/bind-events';
 import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
 import type { EventBinding } from '../util/event-types';
@@ -96,7 +96,7 @@ export default ({
       }
 
       // using center position as selection
-      const center: Position = getCenterPosition(ref);
+      const center: Position = getBorderBoxCenterPosition(ref);
 
       // we are using this event for part of the drag
       event.preventDefault();

@@ -39,7 +39,7 @@ const move = (previous: State, offset: Position): State => {
     offset,
     // not calculating for this test
     selection: { x: 0, y: 0 },
-    center: { x: 0, y: 0 },
+    borderBoxCenter: { x: 0, y: 0 },
   };
 
   return {

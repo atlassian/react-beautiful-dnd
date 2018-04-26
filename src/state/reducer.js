@@ -95,7 +95,7 @@ const move = ({
     const result: CurrentDragPositions = {
       offset,
       selection: clientSelection,
-      center: add(offset, initial.client.center),
+      borderBoxCenter: add(offset, initial.client.borderBoxCenter),
     };
     return result;
   })();
@@ -103,7 +103,7 @@ const move = ({
   const page: CurrentDragPositions = {
     selection: add(client.selection, currentWindowScroll),
     offset: add(client.offset, currentWindowScroll),
-    center: add(client.center, currentWindowScroll),
+    borderBoxCenter: add(client.borderBoxCenter, currentWindowScroll),
   };
 
   const current: CurrentDrag = {
@@ -115,7 +115,7 @@ const move = ({
   };
 
   const newImpact: DragImpact = (impact || getDragImpact({
-    pageCenter: page.center,
+    pageBorderBoxCenter: page.borderBoxCenter,
     draggable: state.dimension.draggable[initial.descriptor.id],
     draggables: state.dimension.draggable,
     droppables: state.dimension.droppable,
@@ -305,7 +305,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const { id, client, viewport, autoScrollMode } = action.payload;
     const page: InitialDragPositions = {
       selection: add(client.selection, viewport.scroll),
-      center: add(client.center, viewport.scroll),
+      borderBoxCenter: add(client.borderBoxCenter, viewport.scroll),
     };
 
     const draggable: ?DraggableDimension = state.dimension.draggable[id];
@@ -328,12 +328,12 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const current: CurrentDrag = {
       client: {
         selection: client.selection,
-        center: client.center,
+        borderBoxCenter: client.borderBoxCenter,
         offset: origin,
       },
       page: {
         selection: page.selection,
-        center: page.center,
+        borderBoxCenter: page.borderBoxCenter,
         offset: origin,
       },
       viewport,
@@ -546,7 +546,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       draggableId: existing.initial.descriptor.id,
       droppable,
       draggables: state.dimension.draggable,
-      previousPageCenter: existing.current.page.center,
+      previousPageBorderBoxCenter: existing.current.page.borderBoxCenter,
       previousImpact: existing.impact,
       viewport: existing.current.viewport,
     });
@@ -557,13 +557,15 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     }
 
     const impact: DragImpact = result.impact;
-    const page: Position = result.pageCenter;
-    const client: Position = subtract(page, existing.current.viewport.scroll);
+    const pageBorderBoxCenter: Position = result.pageBorderBoxCenter;
+    const clientBorderBoxCenter: Position = subtract(
+      pageBorderBoxCenter, existing.current.viewport.scroll
+    );
 
     return move({
       state,
       impact,
-      clientSelection: client,
+      clientSelection: clientBorderBoxCenter,
       shouldAnimate: true,
       scrollJumpRequest: result.scrollJumpRequest,
     });
@@ -588,7 +590,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const current: CurrentDrag = state.drag.current;
     const descriptor: DraggableDescriptor = state.drag.initial.descriptor;
     const draggableId: DraggableId = descriptor.id;
-    const center: Position = current.page.center;
+    const pageBorderBoxCenter: Position = current.page.borderBoxCenter;
     const droppableId: DroppableId = state.drag.impact.destination.droppableId;
     const home: DraggableLocation = {
       index: descriptor.index,
@@ -597,7 +599,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
     const result: ?MoveCrossAxisResult = moveCrossAxis({
       isMovingForward: action.type === 'CROSS_AXIS_MOVE_FORWARD',
-      pageCenter: center,
+      pageBorderBoxCenter,
       draggableId,
       droppableId,
       home,
@@ -611,7 +613,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
-    const page: Position = result.pageCenter;
+    const page: Position = result.pageBorderBoxCenter;
     const client: Position = subtract(page, current.viewport.scroll);
 
     return move({

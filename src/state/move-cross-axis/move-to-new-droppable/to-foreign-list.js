@@ -15,7 +15,7 @@ import type {
 
 type Args = {|
   amount: Position,
-  pageCenter: Position,
+  pageBorderBoxCenter: Position,
   target: ?DraggableDimension,
   insideDroppable: DraggableDimension[],
   draggable: DraggableDimension,
@@ -26,8 +26,7 @@ type Args = {|
 
 export default ({
   amount,
-  // TODO: borderBoxPageCenter
-  pageCenter,
+  pageBorderBoxCenter,
   target,
   insideDroppable,
   draggable,
@@ -37,7 +36,7 @@ export default ({
 }: Args): ?Result => {
   const axis: Axis = droppable.axis;
   const isGoingBeforeTarget: boolean = Boolean(target &&
-    pageCenter[droppable.axis.line] < target.page.borderBox.center[droppable.axis.line]);
+    pageBorderBoxCenter[droppable.axis.line] < target.page.borderBox.center[droppable.axis.line]);
 
   // Moving to an empty list
 
@@ -67,7 +66,7 @@ export default ({
     };
 
     return {
-      pageCenter: withDroppableDisplacement(droppable, newCenter),
+      pageBorderBoxCenter: withDroppableDisplacement(droppable, newCenter),
       impact: newImpact,
     };
   }
@@ -118,7 +117,7 @@ export default ({
   };
 
   return {
-    pageCenter: withDroppableDisplacement(droppable, newCenter),
+    pageBorderBoxCenter: withDroppableDisplacement(droppable, newCenter),
     impact: newImpact,
   };
 };

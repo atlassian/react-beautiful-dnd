@@ -13,7 +13,7 @@ import type {
 type Args = {|
   axis: Axis,
   viewport: Viewport,
-  pageCenter: Position,
+  pageBorderBoxCenter: Position,
   // the droppable that is being moved to
   destination: DroppableDimension,
   // the droppables inside the destination
@@ -23,7 +23,7 @@ type Args = {|
 export default ({
   axis,
   viewport,
-  pageCenter,
+  pageBorderBoxCenter,
   destination,
   insideDestination,
 }: Args): ?DraggableDimension => {
@@ -44,11 +44,11 @@ export default ({
     .sort((a: DraggableDimension, b: DraggableDimension): number => {
       // Need to consider the change in scroll in the destination
       const distanceToA = distance(
-        pageCenter,
+        pageBorderBoxCenter,
         withDroppableDisplacement(destination, a.page.borderBox.center)
       );
       const distanceToB = distance(
-        pageCenter,
+        pageBorderBoxCenter,
         withDroppableDisplacement(destination, b.page.borderBox.center)
       );
 

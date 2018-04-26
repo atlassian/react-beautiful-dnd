@@ -13,6 +13,7 @@ import {
   makeScrollable,
   getDroppableDimension,
   getDraggableDimension,
+  withAssortedSpacing,
 } from '../../utils/dimension';
 import getViewport from '../../../src/view/window/get-viewport';
 import type {
@@ -55,7 +56,7 @@ describe('get drag impact', () => {
         };
 
         const impact: DragImpact = getDragImpact({
-          pageCenter: farAway,
+          pageBorderBoxCenter: farAway,
           draggable: inHome1,
           draggables,
           droppables,
@@ -74,10 +75,10 @@ describe('get drag impact', () => {
             [disabled.descriptor.id]: disabled,
           };
           // choosing the center of inHome2 which should have an impact
-          const pageCenter: Position = inHome2.page.borderBox.center;
+          const pageBorderBoxCenter: Position = inHome2.page.borderBox.center;
 
           const impact: DragImpact = getDragImpact({
-            pageCenter,
+            pageBorderBoxCenter,
             draggable: inHome1,
             draggables,
             droppables: withDisabled,
@@ -91,7 +92,7 @@ describe('get drag impact', () => {
         // moving inHome1 no where
         describe('moving over original position', () => {
           it('should return no impact', () => {
-            const pageCenter: Position = inHome1.page.borderBox.center;
+            const pageBorderBoxCenter: Position = inHome1.page.borderBox.center;
             const expected: DragImpact = {
               movement: {
                 displaced: [],
@@ -106,7 +107,7 @@ describe('get drag impact', () => {
             };
 
             const impact: DragImpact = getDragImpact({
-              pageCenter,
+              pageBorderBoxCenter,
               draggable: inHome1,
               draggables,
               droppables,
@@ -121,7 +122,7 @@ describe('get drag impact', () => {
         // moving inHome1 forward towards but not past inHome2
         describe('have not moved enough to impact others', () => {
           it('should return no impact', () => {
-            const pageCenter: Position = patch(
+            const pageBorderBoxCenter: Position = patch(
               axis.line,
               // up to the line but not over it
               inHome2.page.borderBox[axis.start],
@@ -142,7 +143,7 @@ describe('get drag impact', () => {
             };
 
             const impact: DragImpact = getDragImpact({
-              pageCenter,
+              pageBorderBoxCenter,
               draggable: inHome1,
               draggables,
               droppables,
@@ -156,7 +157,7 @@ describe('get drag impact', () => {
 
         // moving inHome2 forwards past inHome4
         describe('moving beyond start position', () => {
-          const pageCenter: Position = patch(
+          const pageBorderBoxCenter: Position = patch(
             axis.line,
             inHome4.page.borderBox[axis.start] + 1,
             // no change
@@ -189,7 +190,7 @@ describe('get drag impact', () => {
           };
 
           const impact: DragImpact = getDragImpact({
-            pageCenter,
+            pageBorderBoxCenter,
             draggable: inHome2,
             draggables,
             droppables,
@@ -203,7 +204,7 @@ describe('get drag impact', () => {
         // moving inHome3 back past inHome1
         describe('moving back past start position', () => {
           it('should move into the correct position', () => {
-            const pageCenter: Position = patch(
+            const pageBorderBoxCenter: Position = patch(
               axis.line,
               inHome1.page.borderBox[axis.end] - 1,
               // no change
@@ -237,7 +238,7 @@ describe('get drag impact', () => {
             };
 
             const impact: DragImpact = getDragImpact({
-              pageCenter,
+              pageBorderBoxCenter,
               draggable: inHome3,
               draggables,
               droppables,
@@ -278,7 +279,7 @@ describe('get drag impact', () => {
                 [home.descriptor.id]: scrolledHome,
               };
               // no changes in current page center from original
-              const pageCenter: Position = inHome1.page.borderBox.center;
+              const pageBorderBoxCenter: Position = inHome1.page.borderBox.center;
               const expected: DragImpact = {
                 movement: {
                   amount: patch(axis.line, inHome1.page.marginBox[axis.size]),
@@ -299,7 +300,7 @@ describe('get drag impact', () => {
               };
 
               const impact: DragImpact = getDragImpact({
-                pageCenter,
+                pageBorderBoxCenter,
                 draggable: inHome1,
                 draggables,
                 droppables: updatedDroppables,
@@ -333,7 +334,7 @@ describe('get drag impact', () => {
                 [home.descriptor.id]: scrolledHome,
               };
               // no changes in current page center from original
-              const pageCenter: Position = inHome4.page.borderBox.center;
+              const pageBorderBoxCenter: Position = inHome4.page.borderBox.center;
               const expected: DragImpact = {
                 movement: {
                   amount: patch(axis.line, inHome4.page.marginBox[axis.size]),
@@ -361,7 +362,7 @@ describe('get drag impact', () => {
               };
 
               const impact: DragImpact = getDragImpact({
-                pageCenter,
+                pageBorderBoxCenter,
                 draggable: inHome4,
                 draggables,
                 droppables: updatedDroppables,
@@ -481,7 +482,7 @@ describe('get drag impact', () => {
 
             const impact: DragImpact = getDragImpact({
               // moving backwards to near the start of the droppable
-              pageCenter: { x: 1, y: 1 },
+              pageBorderBoxCenter: { x: 1, y: 1 },
               // dragging the notVisible2 draggable backwards
               draggable: notVisible2,
               draggables: customDraggables,
@@ -585,7 +586,7 @@ describe('get drag impact', () => {
 
             const impact: DragImpact = getDragImpact({
               // moving backwards to near the start of the droppable
-              pageCenter: { x: 1, y: 1 },
+              pageBorderBoxCenter: { x: 1, y: 1 },
               // dragging the notVisible2 draggable backwards
               draggable: notVisible2,
               draggables: customDraggables,
@@ -607,10 +608,10 @@ describe('get drag impact', () => {
             [foreign.descriptor.id]: disabled,
           };
           // choosing the center of inForeign1 which should have an impact
-          const pageCenter: Position = inForeign1.page.borderBox.center;
+          const pageBorderBoxCenter: Position = inForeign1.page.borderBox.center;
 
           const impact: DragImpact = getDragImpact({
-            pageCenter,
+            pageBorderBoxCenter,
             draggable: inHome1,
             draggables,
             droppables: withDisabled,
@@ -624,7 +625,7 @@ describe('get drag impact', () => {
         // moving inHome1 above inForeign1
         describe('moving into the start of a populated droppable', () => {
           it('should move everything in the foreign list forward', () => {
-            const pageCenter: Position = patch(
+            const pageBorderBoxCenter: Position = patch(
               axis.line,
               // just before the end of the dimension which is the cut off
               inForeign1.page.borderBox[axis.end] - 1,
@@ -668,7 +669,7 @@ describe('get drag impact', () => {
             };
 
             const impact: DragImpact = getDragImpact({
-              pageCenter,
+              pageBorderBoxCenter,
               draggable: inHome1,
               draggables,
               droppables,
@@ -683,7 +684,7 @@ describe('get drag impact', () => {
         // moving inHome1 just after the start of inForeign2
         describe('moving into the middle of a populated droppable', () => {
           it('should move everything after inHome2 forward', () => {
-            const pageCenter: Position = patch(
+            const pageBorderBoxCenter: Position = patch(
               axis.line,
               inForeign2.page.borderBox[axis.end] - 1,
               inForeign2.page.borderBox.center[axis.crossAxisLine],
@@ -721,7 +722,7 @@ describe('get drag impact', () => {
             };
 
             const impact: DragImpact = getDragImpact({
-              pageCenter,
+              pageBorderBoxCenter,
               draggable: inHome1,
               draggables,
               droppables,
@@ -736,7 +737,7 @@ describe('get drag impact', () => {
         // moving inHome1 after inForeign4
         describe('moving into the end of a populated dropppable', () => {
           it('should not displace anything', () => {
-            const pageCenter: Position = patch(
+            const pageBorderBoxCenter: Position = patch(
               axis.line,
               inForeign4.page.borderBox[axis.end],
               inForeign4.page.borderBox.center[axis.crossAxisLine],
@@ -758,7 +759,7 @@ describe('get drag impact', () => {
             };
 
             const impact: DragImpact = getDragImpact({
-              pageCenter,
+              pageBorderBoxCenter,
               draggable: inHome1,
               draggables,
               droppables,
@@ -773,7 +774,7 @@ describe('get drag impact', () => {
         describe('moving to an empty droppable', () => {
           it('should not displace anything an move into the first position', () => {
             // over the center of the empty droppable
-            const pageCenter: Position = emptyForeign.page.borderBox.center;
+            const pageBorderBoxCenter: Position = emptyForeign.page.borderBox.center;
             const expected: DragImpact = {
               movement: {
                 amount: patch(axis.line, inHome1.page.marginBox[axis.size]),
@@ -790,7 +791,7 @@ describe('get drag impact', () => {
             };
 
             const impact: DragImpact = getDragImpact({
-              pageCenter,
+              pageBorderBoxCenter,
               draggable: inHome1,
               draggables,
               droppables,
@@ -803,7 +804,7 @@ describe('get drag impact', () => {
         });
 
         describe('home droppable is updated during a drag', () => {
-          const pageCenter: Position = patch(
+          const pageBorderBoxCenter: Position = patch(
             axis.line,
             inForeign2.page.borderBox[axis.end] - 1,
             inForeign2.page.borderBox.center[axis.crossAxisLine],
@@ -848,7 +849,7 @@ describe('get drag impact', () => {
             };
 
             const impact: DragImpact = getDragImpact({
-              pageCenter,
+              pageBorderBoxCenter,
               draggable: inHome1,
               draggables,
               droppables: map,
@@ -889,7 +890,7 @@ describe('get drag impact', () => {
             };
 
             const impact: DragImpact = getDragImpact({
-              pageCenter,
+              pageBorderBoxCenter,
               draggable: inHome1,
               draggables,
               droppables,
@@ -908,7 +909,7 @@ describe('get drag impact', () => {
             [foreign.descriptor.id]: scrollableForeign,
           };
 
-          const pageCenter: Position = patch(
+          const pageBorderBoxCenter: Position = patch(
             axis.line,
             inForeign2.page.borderBox[axis.end] - 1,
             inForeign2.page.borderBox.center[axis.crossAxisLine],
@@ -948,7 +949,7 @@ describe('get drag impact', () => {
             };
 
             const impact: DragImpact = getDragImpact({
-              pageCenter,
+              pageBorderBoxCenter,
               draggable: inHome1,
               draggables,
               droppables: map,
@@ -990,7 +991,7 @@ describe('get drag impact', () => {
             };
 
             const impact: DragImpact = getDragImpact({
-              pageCenter,
+              pageBorderBoxCenter,
               draggable: inHome1,
               draggables,
               droppables,
@@ -1123,13 +1124,12 @@ describe('get drag impact', () => {
                 index: 0,
               },
             };
-
             const impact: DragImpact = getDragImpact({
               // moving into the top corner of the destination to move everything forward
-              pageCenter: patch(
+              pageBorderBoxCenter: patch(
                 axis.line,
-                destination.page.marginBox[axis.start],
-                destination.page.marginBox[axis.crossAxisStart]
+                destination.page.borderBox[axis.start],
+                destination.page.borderBox[axis.crossAxisStart]
               ),
               // dragging inSource1 over destination
               draggable: inSource1,
@@ -1251,10 +1251,10 @@ describe('get drag impact', () => {
 
             const impact: DragImpact = getDragImpact({
               // moving into the top corner of the destination to move everything forward
-              pageCenter: patch(
+              pageBorderBoxCenter: patch(
                 axis.line,
-                destination.page.marginBox[axis.start],
-                destination.page.marginBox[axis.crossAxisStart]
+                destination.page.borderBox[axis.start],
+                destination.page.borderBox[axis.crossAxisStart]
               ),
               // dragging inSource1 over destination
               draggable: inSource1,

@@ -1,5 +1,5 @@
 // @flow
-import getNewHomeClientCenter from '../../../src/state/get-new-home-client-center';
+import getNewHomeClientBorderBoxCenter from '../../../src/state/get-new-home-client-border-box-center';
 import { noMovement } from '../../../src/state/no-impact';
 import { patch } from '../../../src/state/position';
 import { vertical, horizontal } from '../../../src/state/axis';
@@ -28,38 +28,38 @@ describe('get new home client center', () => {
         draggables,
       } = getPreset(axis);
 
-      const inHome1Size: Position = patch(axis.line, inHome1.page.marginBox[axis.size]);
+      const inHome1Size: Position = patch(axis.line, inHome1.page.borderBox[axis.size]);
 
       it('should return the original center dropped on no destination', () => {
-        const result: Position = getNewHomeClientCenter({
+        const result: Position = getNewHomeClientBorderBoxCenter({
           movement: noMovement,
           draggables,
           draggable: inHome1,
           destination: null,
         });
 
-        expect(result).toEqual(inHome1.client.marginBox.center);
+        expect(result).toEqual(inHome1.client.borderBox.center);
       });
 
       describe('dropping in home list', () => {
         it('should return the original center if moving back into the same spot', () => {
-          const newCenter: Position = getNewHomeClientCenter({
+          const newCenter: Position = getNewHomeClientBorderBoxCenter({
             movement: noMovement,
             draggables,
             draggable: inHome1,
             destination: home,
           });
 
-          expect(newCenter).toEqual(inHome1.client.marginBox.center);
+          expect(newCenter).toEqual(inHome1.client.borderBox.center);
         });
 
         describe('is moving forward (is always beyond start position)', () => {
           // moving the first item forward past the third item
           it('should move after the closest impacted draggable', () => {
             const targetCenter: Position = moveToEdge({
-              source: inHome1.client.marginBox,
+              source: inHome1.client.borderBox,
               sourceEdge: 'end',
-              destination: inHome3.client.marginBox,
+              destination: inHome3.client.borderBox,
               destinationEdge: 'end',
               destinationAxis: axis,
             });
@@ -82,7 +82,7 @@ describe('get new home client center', () => {
               isBeyondStartPosition: true,
             };
 
-            const newCenter = getNewHomeClientCenter({
+            const newCenter = getNewHomeClientBorderBoxCenter({
               movement,
               draggables,
               draggable: inHome1,
@@ -97,9 +97,9 @@ describe('get new home client center', () => {
           // moving inHome3 back past inHome1
           it('should move before the closest impacted draggable', () => {
             const targetCenter: Position = moveToEdge({
-              source: inHome3.client.marginBox,
+              source: inHome3.client.borderBox,
               sourceEdge: 'start',
-              destination: inHome1.client.marginBox,
+              destination: inHome1.client.borderBox,
               destinationEdge: 'start',
               destinationAxis: axis,
             });
@@ -123,7 +123,7 @@ describe('get new home client center', () => {
               isBeyondStartPosition: false,
             };
 
-            const newCenter = getNewHomeClientCenter({
+            const newCenter = getNewHomeClientBorderBoxCenter({
               movement,
               draggables,
               draggable: inHome3,
@@ -139,9 +139,9 @@ describe('get new home client center', () => {
         describe('is moving into a populated list', () => {
           it('should move above the target', () => {
             const targetCenter: Position = moveToEdge({
-              source: inHome1.client.marginBox,
+              source: inHome1.client.borderBox,
               sourceEdge: 'start',
-              destination: inForeign1.client.marginBox,
+              destination: inForeign1.client.borderBox,
               destinationEdge: 'start',
               destinationAxis: axis,
             });
@@ -175,7 +175,7 @@ describe('get new home client center', () => {
               isBeyondStartPosition: false,
             };
 
-            const newCenter = getNewHomeClientCenter({
+            const newCenter = getNewHomeClientBorderBoxCenter({
               movement,
               draggables,
               draggable: inHome1,
@@ -189,7 +189,7 @@ describe('get new home client center', () => {
         describe('is moving to end of a list', () => {
           it('should draggable below the last item in the list', () => {
             const targetCenter: Position = moveToEdge({
-              source: inHome1.client.marginBox,
+              source: inHome1.client.borderBox,
               sourceEdge: 'start',
               // will target the last in the foreign droppable
               destination: inForeign4.client.marginBox,
@@ -205,7 +205,7 @@ describe('get new home client center', () => {
               isBeyondStartPosition: false,
             };
 
-            const newCenter = getNewHomeClientCenter({
+            const newCenter = getNewHomeClientBorderBoxCenter({
               movement,
               draggables,
               draggable: inHome1,
@@ -219,7 +219,7 @@ describe('get new home client center', () => {
         describe('is moving to empty list', () => {
           it('should move to the start of the list', () => {
             const targetCenter: Position = moveToEdge({
-              source: inHome1.client.marginBox,
+              source: inHome1.client.borderBox,
               sourceEdge: 'start',
               destination: emptyForeign.client.contentBox,
               destinationEdge: 'start',
@@ -233,7 +233,7 @@ describe('get new home client center', () => {
               isBeyondStartPosition: false,
             };
 
-            const newCenter = getNewHomeClientCenter({
+            const newCenter = getNewHomeClientBorderBoxCenter({
               movement,
               draggables,
               draggable: inHome1,

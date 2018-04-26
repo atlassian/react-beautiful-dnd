@@ -148,8 +148,7 @@ export type InitialDragPositions = {|
   // where the user initially selected
   selection: Position,
   // the current center of the item
-  // TODO: borderBoxCenter
-  center: Position,
+  borderBoxCenter: Position,
 |}
 
 // When dragging with a pointer such as a mouse or touch input we want to automatically

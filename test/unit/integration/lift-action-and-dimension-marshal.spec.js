@@ -150,7 +150,7 @@ describe('lifting and the dimension marshal', () => {
         // perform a drag - moving inHome1 from index 0 to index 1
         const initial: InitialDragPositions = {
           selection: preset.inHome1.client.borderBox.center,
-          center: preset.inHome1.client.borderBox.center,
+          borderBoxCenter: preset.inHome1.client.borderBox.center,
         };
         lift(
           preset.inHome1.descriptor.id,
@@ -174,8 +174,8 @@ describe('lifting and the dimension marshal', () => {
         // move slightly so that we are not exactly over the drop location
         // if we are exactly over the drop location there will be no drop animation
         // $ExpectError - not checking for null
-        const center: Position = store.getState().drag.current.client.center;
-        const shifted: Position = add(center, { x: 1, y: 1 });
+        const borderBoxCenter: Position = store.getState().drag.current.client.borderBoxCenter;
+        const shifted: Position = add(borderBoxCenter, { x: 1, y: 1 });
         store.dispatch(
           move(preset.inHome1.descriptor.id, shifted, scrolledViewport)
         );
@@ -201,7 +201,7 @@ describe('lifting and the dimension marshal', () => {
         // before drop animation is finished we start another drag
         const forSecondDrag: InitialDragPositions = {
           selection: preset.inHome3.client.borderBox.center,
-          center: preset.inHome3.client.borderBox.center,
+          borderBoxCenter: preset.inHome3.client.borderBox.center,
         };
         lift(
           preset.inHome3.descriptor.id,

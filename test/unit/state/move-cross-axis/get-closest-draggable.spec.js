@@ -167,7 +167,7 @@ describe('get closest draggable', () => {
         );
         const result1: ?DraggableDimension = getClosestDraggable({
           axis,
-          pageCenter: center1,
+          pageBorderBoxCenter: center1,
           destination: droppable,
           insideDestination,
           viewport,
@@ -180,7 +180,7 @@ describe('get closest draggable', () => {
         );
         const result2: ?DraggableDimension = getClosestDraggable({
           axis,
-          pageCenter: center2,
+          pageBorderBoxCenter: center2,
           destination: droppable,
           insideDestination,
           viewport,
@@ -196,7 +196,7 @@ describe('get closest draggable', () => {
 
         const result: ?DraggableDimension = getClosestDraggable({
           axis,
-          pageCenter: center,
+          pageBorderBoxCenter: center,
           destination: droppable,
           insideDestination: [],
           viewport,
@@ -230,7 +230,7 @@ describe('get closest draggable', () => {
 
         const result: ?DraggableDimension = getClosestDraggable({
           axis,
-          pageCenter: center,
+          pageBorderBoxCenter: center,
           destination: scrolled,
           insideDestination,
           viewport,
@@ -241,7 +241,7 @@ describe('get closest draggable', () => {
         // validation - with no scroll applied we are normally closer to visible1
         const result1: ?DraggableDimension = getClosestDraggable({
           axis,
-          pageCenter: center,
+          pageBorderBoxCenter: center,
           destination: droppable,
           insideDestination,
           viewport,
@@ -259,7 +259,7 @@ describe('get closest draggable', () => {
 
           const result: ?DraggableDimension = getClosestDraggable({
             axis,
-            pageCenter: center,
+            pageBorderBoxCenter: center,
             destination: droppable,
             insideDestination,
             viewport,
@@ -277,7 +277,7 @@ describe('get closest draggable', () => {
 
           const result: ?DraggableDimension = getClosestDraggable({
             axis,
-            pageCenter: center,
+            pageBorderBoxCenter: center,
             destination: droppable,
             insideDestination,
             viewport,
@@ -293,7 +293,7 @@ describe('get closest draggable', () => {
 
           const result: ?DraggableDimension = getClosestDraggable({
             axis,
-            pageCenter: center,
+            pageBorderBoxCenter: center,
             destination: droppable,
             insideDestination,
             viewport,
@@ -309,7 +309,7 @@ describe('get closest draggable', () => {
 
           const result: ?DraggableDimension = getClosestDraggable({
             axis,
-            pageCenter: center,
+            pageBorderBoxCenter: center,
             destination: droppable,
             insideDestination,
             viewport,
@@ -325,7 +325,7 @@ describe('get closest draggable', () => {
 
           const result: ?DraggableDimension = getClosestDraggable({
             axis,
-            pageCenter: center,
+            pageBorderBoxCenter: center,
             destination: droppable,
             insideDestination,
             viewport,
@@ -347,7 +347,7 @@ describe('get closest draggable', () => {
 
           const result: ?DraggableDimension = getClosestDraggable({
             axis,
-            pageCenter: center,
+            pageBorderBoxCenter: center,
             destination: droppable,
             insideDestination: notVisible,
             viewport,
@@ -368,7 +368,7 @@ describe('get closest draggable', () => {
 
         const result: ?DraggableDimension = getClosestDraggable({
           axis,
-          pageCenter: center,
+          pageBorderBoxCenter: center,
           destination: droppable,
           insideDestination,
           viewport,
@@ -385,7 +385,7 @@ describe('get closest draggable', () => {
         // 2. if we move beyond the edge visible2 will be selected
         const result2: ?DraggableDimension = getClosestDraggable({
           axis,
-          pageCenter: add(center, patch(axis.line, 1)),
+          pageBorderBoxCenter: add(center, patch(axis.line, 1)),
           destination: droppable,
           insideDestination,
           viewport,

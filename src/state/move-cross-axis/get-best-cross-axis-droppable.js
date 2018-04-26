@@ -17,7 +17,7 @@ import type {
 type GetBestDroppableArgs = {|
   isMovingForward: boolean,
   // the current position of the dragging item
-  pageCenter: Position,
+  pageBorderBoxCenter: Position,
   // the home of the draggable
   source: DroppableDimension,
   // all the droppables in the system
@@ -35,7 +35,7 @@ const getSafeClipped = (droppable: DroppableDimension): Rect => {
 
 export default ({
   isMovingForward,
-  pageCenter,
+  pageBorderBoxCenter,
   source,
   droppables,
   viewport,
@@ -130,7 +130,7 @@ export default ({
         getSafeClipped(droppable)[axis.start],
         getSafeClipped(droppable)[axis.end]
       );
-      return isWithinDroppable(pageCenter[axis.line]);
+      return isWithinDroppable(pageBorderBoxCenter[axis.line]);
     });
 
   if (contains.length === 1) {
@@ -149,8 +149,8 @@ export default ({
   // 1. Find the candidate that has the closest corner
   // 2. If there is a tie - choose the one that is first on the main axis
   return candidates.sort((a: DroppableDimension, b: DroppableDimension): number => {
-    const first = closest(pageCenter, getCorners(getSafeClipped(a)));
-    const second = closest(pageCenter, getCorners(getSafeClipped(b)));
+    const first = closest(pageBorderBoxCenter, getCorners(getSafeClipped(a)));
+    const second = closest(pageBorderBoxCenter, getCorners(getSafeClipped(b)));
 
     // if the distances are not equal - choose the shortest
     if (first !== second) {

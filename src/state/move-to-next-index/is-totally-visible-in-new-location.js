@@ -13,21 +13,21 @@ import type {
 type Args = {|
   draggable: DraggableDimension,
   destination: DroppableDimension,
-  newPageCenter: Position,
+  newPageBorderBoxCenter: Position,
   viewport: Rect,
 |}
 
 export default ({
   draggable,
   destination,
-  newPageCenter,
+  newPageBorderBoxCenter,
   viewport,
 }: Args): boolean => {
   // What would the location of the Draggable be once the move is completed?
   // We are not considering margins for this calculation.
   // This is because a move might move a Draggable slightly outside of the bounds
   // of a Droppable (which is okay)
-  const diff: Position = subtract(newPageCenter, draggable.page.borderBox.center);
+  const diff: Position = subtract(newPageBorderBoxCenter, draggable.page.borderBox.center);
   const shifted: Spacing = offsetByPosition(draggable.page.borderBox, diff);
 
   // Must be totally visible, not just partially visible.

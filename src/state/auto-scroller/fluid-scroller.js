@@ -255,7 +255,7 @@ export default ({
       return;
     }
 
-    const center: Position = drag.current.page.center;
+    const center: Position = drag.current.page.borderBoxCenter;
 
     // 1. Can we scroll the viewport?
 

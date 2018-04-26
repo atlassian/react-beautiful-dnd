@@ -57,7 +57,7 @@ describe('move cross axis', () => {
 
     const result: ?Result = moveCrossAxis({
       isMovingForward: true,
-      pageCenter: preset.inHome1.page.borderBox.center,
+      pageBorderBoxCenter: preset.inHome1.page.borderBox.center,
       draggableId: preset.inHome1.descriptor.id,
       droppableId: preset.home.descriptor.id,
       home: {
@@ -77,7 +77,7 @@ describe('move cross axis', () => {
   it('should return a droppable if its children are visible (and all other criteria are met)', () => {
     const result: ?Result = moveCrossAxis({
       isMovingForward: true,
-      pageCenter: preset.inHome1.page.borderBox.center,
+      pageBorderBoxCenter: preset.inHome1.page.borderBox.center,
       draggableId: preset.inHome1.descriptor.id,
       droppableId: preset.home.descriptor.id,
       home: {

@@ -18,7 +18,7 @@ import withDroppableScroll from '../with-droppable-scroll';
 // to return the impact of a drag
 
 type Args = {|
-  pageCenter: Position,
+  pageBorderBoxCenter: Position,
   draggable: DraggableDimension,
   home: DroppableDimension,
   insideHome: DraggableDimension[],
@@ -27,7 +27,7 @@ type Args = {|
 |}
 
 export default ({
-  pageCenter,
+  pageBorderBoxCenter,
   draggable,
   home,
   insideHome,
@@ -40,11 +40,13 @@ export default ({
 
   // Where the element actually is now.
   // Need to take into account the change of scroll in the droppable
-  const currentCenter: Position = withDroppableScroll(home, pageCenter);
+  const currentCenter: Position = withDroppableScroll(home, pageBorderBoxCenter);
 
   // not considering margin so that items move based on visible edges
-  const isBeyondStartPosition: boolean = currentCenter[axis.line] - originalCenter[axis.line] > 0;
+  const isBeyondStartPosition: boolean =
+    currentCenter[axis.line] - originalCenter[axis.line] > 0;
 
+  // Amount to move needs to include the margins
   const amount: Position = patch(axis.line, draggable.client.marginBox[axis.size]);
 
   const displaced: Displacement[] = insideHome
@@ -54,25 +56,25 @@ export default ({
         return false;
       }
 
-      const rect: Rect = child.page.borderBox;
+      const borderBox: Rect = child.page.borderBox;
 
       if (isBeyondStartPosition) {
         // 1. item needs to start ahead of the moving item
         // 2. the dragging item has moved over it
-        if (rect.center[axis.line] < originalCenter[axis.line]) {
+        if (borderBox.center[axis.line] < originalCenter[axis.line]) {
           return false;
         }
 
-        return currentCenter[axis.line] > rect[axis.start];
+        return currentCenter[axis.line] > borderBox[axis.start];
       }
       // moving backwards
       // 1. item needs to start behind the moving item
       // 2. the dragging item has moved over it
-      if (originalCenter[axis.line] < rect.center[axis.line]) {
+      if (originalCenter[axis.line] < borderBox.center[axis.line]) {
         return false;
       }
 
-      return currentCenter[axis.line] < rect[axis.end];
+      return currentCenter[axis.line] < borderBox[axis.end];
     })
     .map((dimension: DraggableDimension): Displacement => getDisplacement({
       draggable: dimension,
