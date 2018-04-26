@@ -96,7 +96,7 @@ describe('creating a droppable dimension', () => {
       });
 
       it('should offset the frame client by the window scroll', () => {
-        expect(getClosestScrollable(dimension).frame).toEqual(page.borderBox);
+        expect(getClosestScrollable(dimension).frame).toEqual(page.marginBox);
       });
 
       it('should capture the viewport information', () => {
@@ -109,7 +109,7 @@ describe('creating a droppable dimension', () => {
         });
         const expected: DroppableDimensionViewport = {
           closestScrollable: {
-            frame: page.borderBox,
+            frame: page.marginBox,
             shouldClipSubject: true,
             scroll: {
               initial: { x: 10, y: 10 },
@@ -121,8 +121,8 @@ describe('creating a droppable dimension', () => {
               },
             },
           },
-          subject: page.borderBox,
-          clipped: page.borderBox,
+          subject: page.marginBox,
+          clipped: page.marginBox,
         };
 
         expect(dimension.viewport).toEqual(expected);
@@ -184,8 +184,8 @@ describe('creating a droppable dimension', () => {
         );
 
         // Not clipped
-        expect(droppable.viewport.subject).toEqual(expandedPage.borderBox);
-        expect(droppable.viewport.clipped).toEqual(expandedPage.borderBox);
+        expect(droppable.viewport.subject).toEqual(expandedPage.marginBox);
+        expect(droppable.viewport.clipped).toEqual(expandedPage.marginBox);
         expect(getClosestScrollable(droppable).shouldClipSubject).toBe(false);
       });
 
@@ -193,7 +193,7 @@ describe('creating a droppable dimension', () => {
         it('should not clip the subject', () => {
           const droppable: DroppableDimension = getWithClient(frameClient);
 
-          expect(droppable.viewport.clipped).toEqual(framePage.borderBox);
+          expect(droppable.viewport.clipped).toEqual(framePage.marginBox);
         });
       });
 
@@ -209,7 +209,7 @@ describe('creating a droppable dimension', () => {
 
           const droppable: DroppableDimension = getWithClient(bigClient);
 
-          expect(droppable.viewport.clipped).toEqual(framePage.borderBox);
+          expect(droppable.viewport.clipped).toEqual(framePage.marginBox);
         });
       });
 
@@ -218,7 +218,7 @@ describe('creating a droppable dimension', () => {
           // client is already smaller than frame
           const droppable: DroppableDimension = getWithClient(client);
 
-          expect(droppable.viewport.clipped).toEqual(page.borderBox);
+          expect(droppable.viewport.clipped).toEqual(page.marginBox);
         });
       });
 
@@ -242,7 +242,7 @@ describe('creating a droppable dimension', () => {
 
             const droppable: DroppableDimension = getWithClient(custom);
 
-            expect(droppable.viewport.clipped).toEqual(framePage.borderBox);
+            expect(droppable.viewport.clipped).toEqual(framePage.marginBox);
           });
         });
       });
@@ -297,9 +297,9 @@ describe('scrolling a droppable', () => {
     const closestScrollable: Scrollable = getClosestScrollable(droppable);
 
     // original frame
-    expect(closestScrollable.frame).toEqual(framePage.borderBox);
+    expect(closestScrollable.frame).toEqual(framePage.marginBox);
     // subject is currently clipped by the frame
-    expect(droppable.viewport.clipped).toEqual(framePage.borderBox);
+    expect(droppable.viewport.clipped).toEqual(framePage.marginBox);
 
     // scrolling down
     const newScroll: Position = { x: 0, y: 100 };
@@ -307,7 +307,7 @@ describe('scrolling a droppable', () => {
     const updatedClosest: Scrollable = getClosestScrollable(updated);
 
     // unchanged frame client
-    expect(updatedClosest.frame).toEqual(framePage.borderBox);
+    expect(updatedClosest.frame).toEqual(framePage.marginBox);
 
     // updated scroll info
     expect(updatedClosest.scroll).toEqual({
@@ -320,8 +320,8 @@ describe('scrolling a droppable', () => {
       max: getMaxScroll({
         scrollWidth: scrollSize.scrollWidth,
         scrollHeight: scrollSize.scrollHeight,
-        width: frameClient.borderBox.width,
-        height: frameClient.borderBox.height,
+        width: frameClient.paddingBox.width,
+        height: frameClient.paddingBox.height,
       }),
     });
 

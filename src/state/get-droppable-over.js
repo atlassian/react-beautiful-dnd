@@ -64,6 +64,7 @@ type GetBufferedDroppableArgs = {
   previousDroppableOverId: ?DroppableId,
 };
 
+// TODO: should only expand on the main axis
 const getWithGrowth = memoizeOne(
   (area: Rect, growth: Position): Rect => getRect(expandByPosition(area, growth))
 );

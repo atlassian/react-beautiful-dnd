@@ -3,7 +3,7 @@ import { getRect, type Rect } from 'css-box-model';
 import getClosestDraggable from '../../../../src/state/move-cross-axis/get-closest-draggable';
 import { scrollDroppable } from '../../../../src/state/droppable-dimension';
 import { add, distance, patch } from '../../../../src/state/position';
-import { getDroppableDimension, getDraggableDimension } from '../../../utils/dimension';
+import { getDroppableDimension, getDraggableDimension, withAssortedSpacing } from '../../../utils/dimension';
 import { expandByPosition } from '../../../../src/state/spacing';
 import { horizontal, vertical } from '../../../../src/state/axis';
 import getViewport from '../../../../src/view/window/get-viewport';
@@ -39,6 +39,7 @@ describe('get closest draggable', () => {
         },
         direction: axis.direction,
         borderBox,
+        ...withAssortedSpacing(),
       });
 
       const hiddenBackwards: DraggableDimension = getDraggableDimension({
@@ -53,6 +54,7 @@ describe('get closest draggable', () => {
           [axis.start]: -30, // -10
           [axis.end]: -10,
         },
+        ...withAssortedSpacing(),
       });
 
       // item bleeds backwards past the start of the droppable
@@ -68,6 +70,7 @@ describe('get closest draggable', () => {
           [axis.start]: -10, // -10
           [axis.end]: 20,
         },
+        ...withAssortedSpacing(),
       });
 
       const visible1: DraggableDimension = getDraggableDimension({
@@ -82,6 +85,7 @@ describe('get closest draggable', () => {
           [axis.start]: 20,
           [axis.end]: 40,
         },
+        ...withAssortedSpacing(),
       });
 
       const visible2: DraggableDimension = getDraggableDimension({
@@ -96,6 +100,7 @@ describe('get closest draggable', () => {
           [axis.start]: 40,
           [axis.end]: 60,
         },
+        ...withAssortedSpacing(),
       });
 
       // bleeds over the end of the visible boundary
@@ -111,6 +116,7 @@ describe('get closest draggable', () => {
           [axis.start]: 60,
           [axis.end]: 120,
         },
+        ...withAssortedSpacing(),
       });
 
       // totally invisible
@@ -126,6 +132,7 @@ describe('get closest draggable', () => {
           [axis.start]: 120,
           [axis.end]: 140,
         },
+        ...withAssortedSpacing(),
       });
 
       const outOfViewport: DraggableDimension = getDraggableDimension({
@@ -140,6 +147,7 @@ describe('get closest draggable', () => {
           [axis.start]: viewport.subject[axis.end] + 1,
           [axis.end]: viewport.subject[axis.end] + 10,
         },
+        ...withAssortedSpacing(),
       });
 
       const insideDestination: DraggableDimension[] = [

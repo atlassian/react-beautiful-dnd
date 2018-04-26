@@ -75,7 +75,7 @@ export const getDroppableDimension = ({
     });
 
     return {
-      frame: closest.page.borderBox,
+      frame: closest.page.marginBox,
       shouldClipSubject: closest.shouldClipSubject,
       scroll: {
         initial: closest.scroll,
@@ -89,7 +89,7 @@ export const getDroppableDimension = ({
     };
   })();
 
-  const subject: Rect = page.borderBox;
+  const subject: Rect = page.marginBox;
 
   const clipped: ?Rect = (scrollable && scrollable.shouldClipSubject) ?
     clip(scrollable.frame, subject) :

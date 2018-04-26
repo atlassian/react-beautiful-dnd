@@ -186,7 +186,9 @@ type GetDraggableArgs = {|
   descriptor: DraggableDescriptor,
   borderBox: Spacing,
   windowScroll?: Position,
-  margin?: Spacing
+  margin ?: Spacing,
+  padding ?: Spacing,
+  border?: Spacing,
 |}
 
 export const getDraggableDimension = ({
@@ -194,10 +196,14 @@ export const getDraggableDimension = ({
   borderBox,
   windowScroll,
   margin,
+  border,
+  padding,
 }: GetDraggableArgs): DraggableDimension => {
   const client: BoxModel = createBox({
     borderBox,
     margin,
+    padding,
+    border,
   });
 
   const result: DraggableDimension = {
@@ -288,9 +294,15 @@ export const getDroppableDimension = ({
   });
 };
 
-export const getPreset = (axis?: Axis = vertical) => {
+export const withAssortedSpacing = () => {
   const margin: Spacing = { top: 10, left: 10, bottom: 5, right: 5 };
   const padding: Spacing = { top: 2, left: 2, bottom: 2, right: 2 };
+  const border: Spacing = { top: 1, left: 2, bottom: 3, right: 4 };
+
+  return { margin, padding, border };
+};
+
+export const getPreset = (axis?: Axis = vertical) => {
   const windowScroll: Position = { x: 50, y: 100 };
   const crossAxisStart: number = 0;
   const crossAxisEnd: number = 100;
@@ -311,8 +323,7 @@ export const getPreset = (axis?: Axis = vertical) => {
       [axis.crossAxisEnd]: crossAxisEnd,
       [axis.end]: 200,
     },
-    margin,
-    padding,
+    ...withAssortedSpacing(),
     windowScroll,
     direction: axis.direction,
   });
@@ -328,8 +339,7 @@ export const getPreset = (axis?: Axis = vertical) => {
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
       [axis.end]: 200,
     },
-    margin,
-    padding,
+    ...withAssortedSpacing(),
     windowScroll,
     direction: axis.direction,
   });
@@ -346,8 +356,7 @@ export const getPreset = (axis?: Axis = vertical) => {
       [axis.crossAxisEnd]: emptyForeignCrossAxisEnd,
       [axis.end]: 200,
     },
-    margin,
-    padding,
+    ...withAssortedSpacing(),
     windowScroll,
     direction: axis.direction,
   });
@@ -366,7 +375,7 @@ export const getPreset = (axis?: Axis = vertical) => {
       [axis.end]: 20,
     },
     windowScroll,
-    margin,
+    ...withAssortedSpacing(),
   });
     // size: 20
   const inHome2: DraggableDimension = getDraggableDimension({
@@ -382,8 +391,8 @@ export const getPreset = (axis?: Axis = vertical) => {
       [axis.crossAxisEnd]: crossAxisEnd,
       [axis.end]: 50,
     },
+    ...withAssortedSpacing(),
     windowScroll,
-    margin,
   });
   // size: 30
   const inHome3: DraggableDimension = getDraggableDimension({
@@ -398,8 +407,8 @@ export const getPreset = (axis?: Axis = vertical) => {
       [axis.crossAxisEnd]: crossAxisEnd,
       [axis.end]: 90,
     },
+    ...withAssortedSpacing(),
     windowScroll,
-    margin,
   });
     // size: 40
   const inHome4: DraggableDimension = getDraggableDimension({
@@ -414,8 +423,8 @@ export const getPreset = (axis?: Axis = vertical) => {
       [axis.crossAxisEnd]: crossAxisEnd,
       [axis.end]: 140,
     },
+    ...withAssortedSpacing(),
     windowScroll,
-    margin,
   });
 
     // size: 10
@@ -431,8 +440,8 @@ export const getPreset = (axis?: Axis = vertical) => {
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
       [axis.end]: 20,
     },
+    ...withAssortedSpacing(),
     windowScroll,
-    margin,
   });
   // size: 20
   const inForeign2: DraggableDimension = getDraggableDimension({
@@ -447,8 +456,8 @@ export const getPreset = (axis?: Axis = vertical) => {
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
       [axis.end]: 50,
     },
+    ...withAssortedSpacing(),
     windowScroll,
-    margin,
   });
   // size: 30
   const inForeign3: DraggableDimension = getDraggableDimension({
@@ -463,8 +472,8 @@ export const getPreset = (axis?: Axis = vertical) => {
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
       [axis.end]: 90,
     },
+    ...withAssortedSpacing(),
     windowScroll,
-    margin,
   });
   // size: 40
   const inForeign4: DraggableDimension = getDraggableDimension({
@@ -479,8 +488,8 @@ export const getPreset = (axis?: Axis = vertical) => {
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
       [axis.end]: 140,
     },
+    ...withAssortedSpacing(),
     windowScroll,
-    margin,
   });
 
   const droppables: DroppableDimensionMap = {

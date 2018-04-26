@@ -16,7 +16,6 @@ import type {
   DimensionMarshal,
   DroppableCallbacks,
 } from '../../../src/state/dimension-marshal/dimension-marshal-types';
-import type { Closest } from '../../../src/state/droppable-dimension';
 import type {
   ScrollOptions,
   Spacing,
