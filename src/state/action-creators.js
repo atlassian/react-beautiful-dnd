@@ -351,7 +351,6 @@ export const drop = () =>
       destination,
     });
 
-    // TODO: WHAT!@?
     const clientOffset: Position = subtract(newBorderBoxCenter, draggable.client.borderBox.center);
     const scrollDiff: Position = getScrollDiff({
       initial,

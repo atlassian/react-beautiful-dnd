@@ -50,29 +50,6 @@ export default ({
     destination, draggables
   );
 
-  // const data = (() => {
-  //   if (isWithinHomeDroppable) {
-  //     const closest: DraggableId = displaced[0].draggableId;
-  //     const isGoingAfter: boolean = isBeyondStartPosition;
-  //     return {
-  //       sourceEdge: 'end',
-  //       destinationEdge: isGoingAfter ? 'end' : 'start',
-  //       destination: draggables[closest].client.borderBox,
-  //     };
-  //   }
-
-  //   // In foreign droppable
-
-  //   // The list has had things moved in it
-  //   // We will always be going before
-  //   if (displaced.length) {
-  //     const closest: DraggableId = displaced[0].draggableId;
-  //     return {
-
-  //     }
-  //   }
-  // })();
-
   // Find the dimension we need to compare the dragged item with
   const movingRelativeTo: Rect = (() => {
     if (isWithinHomeDroppable) {
