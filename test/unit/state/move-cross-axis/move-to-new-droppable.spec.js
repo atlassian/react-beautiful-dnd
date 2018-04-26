@@ -1,12 +1,12 @@
 // @flow
+import { createBox, type BoxModel } from 'css-box-model';
 import moveToNewDroppable from '../../../../src/state/move-cross-axis/move-to-new-droppable/';
 import type { Result } from '../../../../src/state/move-cross-axis/move-cross-axis-types';
-import { getDraggableDimension, getDroppableDimension, scrollDroppable } from '../../../../src/state/dimension';
-import getArea from '../../../../src/state/get-area';
+import { scrollDroppable } from '../../../../src/state/dimension';
 import moveToEdge from '../../../../src/state/move-to-edge';
 import { add, negate, patch } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
-import { getPreset, makeScrollable } from '../../../utils/dimension';
+import { getPreset, makeScrollable, getDraggableDimension, getDroppableDimension } from '../../../utils/dimension';
 import noImpact from '../../../../src/state/no-impact';
 import getViewport from '../../../../src/view/window/get-viewport';
 import type {
@@ -396,27 +396,31 @@ describe('move to new droppable', () => {
 
         describe('visibility and displacement', () => {
           it('should indicate when displacement is not visible when not partially visible in the droppable frame', () => {
+            const frameClient: BoxModel = createBox({
+              borderBox: {
+                [axis.crossAxisStart]: 0,
+                [axis.crossAxisEnd]: 100,
+                [axis.start]: 0,
+                // will cut the subject
+                [axis.end]: 100,
+              },
+            });
             const droppable: DroppableDimension = getDroppableDimension({
               descriptor: {
                 id: 'with-frame',
                 type: 'TYPE',
               },
               direction: axis.direction,
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 // will be cut by frame
                 [axis.end]: 200,
-              }),
+              },
               closest: {
-                frameBorderBox: getArea({
-                  [axis.crossAxisStart]: 0,
-                  [axis.crossAxisEnd]: 100,
-                  [axis.start]: 0,
-                  // will cut the subject
-                  [axis.end]: 100,
-                }),
+                client: frameClient,
+                page: frameClient,
                 scrollWidth: 200,
                 scrollHeight: 200,
                 scroll: { x: 0, y: 0 },
@@ -429,12 +433,12 @@ describe('move to new droppable', () => {
                 droppableId: droppable.descriptor.id,
                 index: 0,
               },
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 [axis.end]: 80,
-              }),
+              },
             });
             const outside: DraggableDimension = getDraggableDimension({
               descriptor: {
@@ -442,13 +446,13 @@ describe('move to new droppable', () => {
                 droppableId: droppable.descriptor.id,
                 index: 1,
               },
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the frame
                 [axis.start]: 110,
                 [axis.end]: 120,
-              }),
+              },
             });
             const customDraggables: DraggableDimension[] = [
               inside, outside,
@@ -500,13 +504,13 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 // extends beyond the viewport
                 [axis.end]: viewport.subject[axis.end] + 100,
-              }),
+              },
             });
             const inside: DraggableDimension = getDraggableDimension({
               descriptor: {
@@ -514,12 +518,12 @@ describe('move to new droppable', () => {
                 droppableId: droppable.descriptor.id,
                 index: 0,
               },
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 [axis.end]: viewport.subject[axis.end],
-              }),
+              },
             });
             const outside: DraggableDimension = getDraggableDimension({
               descriptor: {
@@ -527,13 +531,13 @@ describe('move to new droppable', () => {
                 droppableId: droppable.descriptor.id,
                 index: 1,
               },
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the viewport but inside the droppable
                 [axis.start]: viewport.subject[axis.end] + 1,
                 [axis.end]: viewport.subject[axis.end] + 10,
-              }),
+              },
             });
             const customDraggables: DraggableDimension[] = [
               inside, outside,
@@ -913,12 +917,12 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 [axis.end]: 100,
-              }),
+              },
             });
             const customInHome: DraggableDimension = getDraggableDimension({
               descriptor: {
@@ -926,33 +930,38 @@ describe('move to new droppable', () => {
                 droppableId: customHome.descriptor.id,
                 index: 0,
               },
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 [axis.end]: 80,
-              }),
+              },
             });
+            const foreignFrameClient: BoxModel = createBox({
+              borderBox: {
+                top: 0,
+                left: 0,
+                right: 100,
+                bottom: 100,
+              },
+            });
+
             const customForeign: DroppableDimension = getDroppableDimension({
               descriptor: {
                 id: 'foreign-with-frame',
                 type: 'TYPE',
               },
               direction: axis.direction,
-              borderBox: getArea({
+              borderBox: {
                 top: 0,
                 left: 0,
                 right: 100,
                 // will be cut by frame
                 bottom: 200,
-              }),
+              },
               closest: {
-                frameBorderBox: getArea({
-                  top: 0,
-                  left: 0,
-                  right: 100,
-                  bottom: 100,
-                }),
+                client: foreignFrameClient,
+                page: foreignFrameClient,
                 scrollWidth: 200,
                 scrollHeight: 200,
                 scroll: { x: 0, y: 0 },
@@ -966,13 +975,13 @@ describe('move to new droppable', () => {
                 droppableId: customForeign.descriptor.id,
                 index: 0,
               },
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the foreign frame
                 [axis.start]: 110,
                 [axis.end]: 120,
-              }),
+              },
             });
 
             const customInsideForeign: DraggableDimension[] = [
@@ -1026,12 +1035,12 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 [axis.end]: 100,
-              }),
+              },
             });
             const customInHome: DraggableDimension = getDraggableDimension({
               descriptor: {
@@ -1039,12 +1048,12 @@ describe('move to new droppable', () => {
                 droppableId: customHome.descriptor.id,
                 index: 0,
               },
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 [axis.end]: 80,
-              }),
+              },
             });
             const customForeign: DroppableDimension = getDroppableDimension({
               descriptor: {
@@ -1052,14 +1061,14 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              borderBox: getArea({
+              borderBox: {
                 bottom: viewport.subject.bottom + 100,
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
-                // extending beyond the viewport
+                // exteding beyond the viewport
                 [axis.end]: viewport.subject[axis.end] + 100,
-              }),
+              },
             });
             const customInForeign: DraggableDimension = getDraggableDimension({
               descriptor: {
@@ -1067,13 +1076,13 @@ describe('move to new droppable', () => {
                 droppableId: customForeign.descriptor.id,
                 index: 0,
               },
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the viewport but inside the droppable
                 [axis.start]: viewport.subject[axis.end] + 1,
                 [axis.end]: viewport.subject[axis.end] + 10,
-              }),
+              },
             });
 
             const customInsideForeign: DraggableDimension[] = [

@@ -64,7 +64,7 @@ export const makeScrollable = (droppable: DroppableDimension, amount?: number = 
   // is 10px smaller than the client on the main axis
   // this will leave 10px of scrollable area.
   // only expanding on one axis
-  const newPaddingBox: Rect = getRect({
+  const newBorderBox: Rect = getRect({
     top: borderBox.top,
     left: borderBox.left,
     // growing the client to account for the scrollable area
@@ -78,16 +78,27 @@ export const makeScrollable = (droppable: DroppableDimension, amount?: number = 
     height: borderBox.height + verticalGrowth,
   };
 
-  // TODO
-  return getDroppableDimension({
+  const newClient: BoxModel = createBox({
+    borderBox: newBorderBox,
+    border: droppable.client.border,
+    padding: droppable.client.padding,
+    margin: droppable.client.margin,
+  });
+
+  // eslint-disable-next-line no-use-before-define
+  const preset = getPreset();
+  const newPage: BoxModel = withScroll(newClient, preset.windowScroll);
+
+  return getDroppable({
     descriptor: droppable.descriptor,
+    isEnabled: droppable.isEnabled,
     direction: axis.direction,
-    padding,
-    margin,
-    windowScroll,
-    borderBox: newPaddingBox,
+    client: newClient,
+    page: newPage,
     closest: {
-      frameBorderBox: borderBox,
+      // using old dimensions for frame
+      client: droppable.client,
+      page: droppable.page,
       scrollWidth: scrollSize.width,
       scrollHeight: scrollSize.height,
       scroll: { x: 0, y: 0 },

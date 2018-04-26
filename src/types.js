@@ -151,6 +151,7 @@ export type InitialDragPositions = {|
   // where the user initially selected
   selection: Position,
   // the current center of the item
+  // TODO: borderBoxCenter
   center: Position,
 |}
 

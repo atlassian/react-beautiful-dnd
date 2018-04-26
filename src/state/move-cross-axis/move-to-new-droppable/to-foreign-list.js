@@ -26,6 +26,7 @@ type Args = {|
 
 export default ({
   amount,
+  // TODO: borderBoxPageCenter
   pageCenter,
   target,
   insideDroppable,
@@ -36,7 +37,7 @@ export default ({
 }: Args): ?Result => {
   const axis: Axis = droppable.axis;
   const isGoingBeforeTarget: boolean = Boolean(target &&
-    pageCenter[droppable.axis.line] < target.page.marginBox.center[droppable.axis.line]);
+    pageCenter[droppable.axis.line] < target.page.borderBox.center[droppable.axis.line]);
 
   // Moving to an empty list
 
