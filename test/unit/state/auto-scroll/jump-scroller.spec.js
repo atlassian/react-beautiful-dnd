@@ -18,7 +18,7 @@ import { vertical, horizontal } from '../../../../src/state/axis';
 import createAutoScroller from '../../../../src/state/auto-scroller';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import { getPreset, addDroppable, getDroppableDimension } from '../../../utils/dimension';
-import { scrollDroppable } from '../../../../src/state/dimension';
+import { scrollDroppable } from '../../../../src/state/droppable-dimension';
 import getMaxScroll from '../../../../src/state/get-max-scroll';
 
 const origin: Position = { x: 0, y: 0 };

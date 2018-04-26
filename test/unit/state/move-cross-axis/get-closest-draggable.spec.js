@@ -1,7 +1,7 @@
 // @flow
-import { getRect, createBox, type Rect, type BoxModel } from 'css-box-model';
+import { getRect, type Rect } from 'css-box-model';
 import getClosestDraggable from '../../../../src/state/move-cross-axis/get-closest-draggable';
-import { scrollDroppable } from '../../../../src/state/dimension';
+import { scrollDroppable } from '../../../../src/state/droppable-dimension';
 import { add, distance, patch } from '../../../../src/state/position';
 import { getDroppableDimension, getDraggableDimension } from '../../../utils/dimension';
 import { expandByPosition } from '../../../../src/state/spacing';

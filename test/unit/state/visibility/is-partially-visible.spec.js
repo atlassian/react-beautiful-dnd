@@ -1,7 +1,7 @@
 // @flow
 import { getRect, type Rect, type Spacing } from 'css-box-model';
 import { isPartiallyVisible } from '../../../../src/state/visibility/is-visible';
-import { scrollDroppable } from '../../../../src/state/dimension';
+import { scrollDroppable } from '../../../../src/state/droppable-dimension';
 import { offsetByPosition } from '../../../../src/state/spacing';
 import { getDroppableDimension, getClosestScrollable } from '../../../utils/dimension';
 import type {

@@ -5,7 +5,7 @@ import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
 import isPositionInFrame from './visibility/is-position-in-frame';
 import { patch } from './position';
 import { expandByPosition } from './spacing';
-import { clip } from './dimension';
+import { clip } from './droppable-dimension';
 import type {
   Scrollable,
   DraggableDimension,

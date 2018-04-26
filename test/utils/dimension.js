@@ -9,7 +9,7 @@ import {
 } from 'css-box-model';
 import { noMovement } from '../../src/state/no-impact';
 import { vertical } from '../../src/state/axis';
-import { noSpacing } from '../../src/state/dimension';
+import { noSpacing } from '../../src/state/spacing';
 import { getDroppableDimension as getDroppable, type Closest } from '../../src/state/droppable-dimension';
 import type {
   Axis,

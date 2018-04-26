@@ -1,8 +1,5 @@
 // @flow
-import type {
-  Position,
-  Spacing,
-} from '../types';
+import type { Spacing, Position } from 'css-box-model';
 
 export const offsetByPosition = (spacing: Spacing, point: Position): Spacing => ({
   top: spacing.top + point.y,
@@ -20,37 +17,13 @@ export const expandByPosition = (spacing: Spacing, position: Position): Spacing 
   bottom: spacing.bottom + position.y,
 });
 
-// TODO: remove
-export const expandBySpacing = (spacing1: Spacing, spacing2: Spacing): Spacing => ({
-  // pulling back to increase size
-  top: spacing1.top - spacing2.top,
-  left: spacing1.left - spacing2.left,
-  // pushing forward to increase size
-  bottom: spacing1.bottom + spacing2.bottom,
-  right: spacing1.right + spacing2.right,
-});
-
-// TODO: remove
-export const shrinkBySpacing = (spacing1: Spacing, spacing2: Spacing): Spacing => ({
-  // pushing forward to descrease size
-  top: spacing1.top + spacing2.top,
-  left: spacing1.left + spacing2.left,
-  // pulling backwards to descrease size
-  bottom: spacing1.bottom - spacing2.bottom,
-  right: spacing1.right - spacing2.right,
-});
-
-// TODO: needed?
-export const isEqual = (spacing1: Spacing, spacing2: Spacing): boolean => (
-  spacing1.top === spacing2.top &&
-  spacing1.right === spacing2.right &&
-  spacing1.bottom === spacing2.bottom &&
-  spacing1.left === spacing2.left
-);
-
 export const getCorners = (spacing: Spacing): Position[] => [
   { x: spacing.left, y: spacing.top },
   { x: spacing.right, y: spacing.top },
   { x: spacing.left, y: spacing.bottom },
   { x: spacing.right, y: spacing.bottom },
 ];
+
+export const noSpacing: Spacing = {
+  top: 0, right: 0, bottom: 0, left: 0,
+};

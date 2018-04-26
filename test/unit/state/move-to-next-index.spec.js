@@ -1,14 +1,14 @@
 // @flow
+import { getRect } from 'css-box-model';
 import moveToNextIndex from '../../../src/state/move-to-next-index/';
 import type { Result } from '../../../src/state/move-to-next-index/move-to-next-index-types';
-import { getPreset, disableDroppable, getClosestScrollable } from '../../utils/dimension';
+import { scrollDroppable } from '../../../src/state/droppable-dimension';
+import { getPreset, disableDroppable, getClosestScrollable, getDroppableDimension, getDraggableDimension } from '../../utils/dimension';
 import moveToEdge from '../../../src/state/move-to-edge';
 import noImpact, { noMovement } from '../../../src/state/no-impact';
 import { patch, subtract } from '../../../src/state/position';
 import { vertical, horizontal } from '../../../src/state/axis';
 import { isPartiallyVisible } from '../../../src/state/visibility/is-visible';
-import getArea from '../../../src/state/get-area';
-import { getDroppableDimension, getDraggableDimension, scrollDroppable } from '../../../src/state/dimension';
 import type {
   Viewport,
   Axis,
@@ -23,7 +23,7 @@ import type {
 const origin: Position = { x: 0, y: 0 };
 
 const customViewport: Viewport = {
-  subject: getArea({
+  subject: getRect({
     top: 0,
     left: 0,
     bottom: 1000,
@@ -453,20 +453,20 @@ describe('move to next index', () => {
                   type: 'TYPE',
                 },
                 direction: axis.direction,
-                borderBox: getArea({
+                borderBox: {
                   [axis.crossAxisStart]: crossAxisStart,
                   [axis.crossAxisEnd]: crossAxisEnd,
                   [axis.start]: 0,
                   [axis.end]: 400,
-                }),
+                },
                 closest: {
-                  frameBorderBox: getArea({
+                  borderBox: {
                     [axis.crossAxisStart]: crossAxisStart,
                     [axis.crossAxisEnd]: crossAxisEnd,
                     [axis.start]: 0,
                     // will cut off the subject
                     [axis.end]: 100,
-                  }),
+                  },
                   scrollHeight: droppableScrollSize.scrollHeight,
                   scrollWidth: droppableScrollSize.scrollWidth,
                   shouldClipSubject: true,
@@ -483,12 +483,12 @@ describe('move to next index', () => {
                   droppableId: home.descriptor.id,
                   index: 0,
                 },
-                borderBox: getArea({
+                borderBox: {
                   [axis.crossAxisStart]: crossAxisStart,
                   [axis.crossAxisEnd]: crossAxisEnd,
                   [axis.start]: 0,
                   [axis.end]: 50,
-                }),
+                },
               });
 
               const inHome2: DraggableDimension = getDraggableDimension({
@@ -497,12 +497,12 @@ describe('move to next index', () => {
                   droppableId: home.descriptor.id,
                   index: 1,
                 },
-                borderBox: getArea({
+                borderBox: {
                   [axis.crossAxisStart]: crossAxisStart,
                   [axis.crossAxisEnd]: crossAxisEnd,
                   [axis.start]: 50,
                   [axis.end]: 100,
-                }),
+                },
               });
 
               const inHome3: DraggableDimension = getDraggableDimension({
@@ -511,12 +511,12 @@ describe('move to next index', () => {
                   droppableId: home.descriptor.id,
                   index: 2,
                 },
-                borderBox: getArea({
+                borderBox: {
                   [axis.crossAxisStart]: crossAxisStart,
                   [axis.crossAxisEnd]: crossAxisEnd,
                   [axis.start]: 100,
                   [axis.end]: 150,
-                }),
+                },
               });
 
               const inHome4: DraggableDimension = getDraggableDimension({
@@ -525,12 +525,12 @@ describe('move to next index', () => {
                   droppableId: home.descriptor.id,
                   index: 3,
                 },
-                borderBox: getArea({
+                borderBox: {
                   [axis.crossAxisStart]: crossAxisStart,
                   [axis.crossAxisEnd]: crossAxisEnd,
                   [axis.start]: 200,
                   [axis.end]: 250,
-                }),
+                },
               });
 
               const inHome5: DraggableDimension = getDraggableDimension({
@@ -539,12 +539,12 @@ describe('move to next index', () => {
                   droppableId: home.descriptor.id,
                   index: 4,
                 },
-                borderBox: getArea({
+                borderBox: {
                   [axis.crossAxisStart]: crossAxisStart,
                   [axis.crossAxisEnd]: crossAxisEnd,
                   [axis.start]: 300,
                   [axis.end]: 350,
-                }),
+                },
               });
 
               const inHome6: DraggableDimension = getDraggableDimension({
@@ -553,12 +553,12 @@ describe('move to next index', () => {
                   droppableId: home.descriptor.id,
                   index: 5,
                 },
-                borderBox: getArea({
+                borderBox: {
                   [axis.crossAxisStart]: crossAxisStart,
                   [axis.crossAxisEnd]: crossAxisEnd,
                   [axis.start]: 350,
                   [axis.end]: 400,
-                }),
+                },
               });
 
               const draggables: DraggableDimensionMap = {
@@ -1020,12 +1020,12 @@ describe('move to next index', () => {
                 type: 'huge',
               },
               direction: axis.direction,
-              borderBox: getArea({
+              borderBox: {
                 top: 0,
                 right: 10000,
                 bottom: 10000,
                 left: 0,
-              }),
+              },
             });
 
             it('should request a jump scroll for movement that is outside of the viewport', () => {
@@ -1043,13 +1043,13 @@ describe('move to next index', () => {
                   index: 1,
                   droppableId: droppable.descriptor.id,
                 },
-                borderBox: getArea({
+                borderBox: {
                   // is bottom left of the viewport
                   top: customViewport.subject.bottom + 1,
                   right: customViewport.subject.right + 100,
                   left: customViewport.subject.right + 1,
                   bottom: customViewport.subject.bottom + 100,
-                }),
+                },
               });
               // inViewport is in its original position
               const previousImpact: DragImpact = {
@@ -1119,12 +1119,12 @@ describe('move to next index', () => {
                   index: 0,
                   droppableId: droppable.descriptor.id,
                 },
-                borderBox: getArea({
+                borderBox: {
                   top: 0,
                   left: 0,
                   right: customViewport.subject.right - 100,
                   bottom: customViewport.subject.bottom - 100,
-                }),
+                },
               });
               const invisible: DraggableDimension = getDraggableDimension({
                 descriptor: {
@@ -1132,12 +1132,12 @@ describe('move to next index', () => {
                   index: 1,
                   droppableId: droppable.descriptor.id,
                 },
-                borderBox: getArea({
+                borderBox: {
                   top: customViewport.subject.bottom + 1,
                   left: customViewport.subject.right + 1,
                   bottom: customViewport.subject.bottom + 100,
                   right: customViewport.subject.right + 100,
-                }),
+                },
               });
               // inViewport is in its original position
               const previousImpact: DragImpact = {
@@ -1198,20 +1198,20 @@ describe('move to next index', () => {
                   type: 'huge',
                 },
                 direction: axis.direction,
-                borderBox: getArea({
+                borderBox: {
                   top: 0,
                   left: 0,
                   // cut off by frame
                   bottom: 200,
                   right: 200,
-                }),
+                },
                 closest: {
-                  frameBorderBox: getArea({
+                  borderBox: {
                     top: 0,
                     left: 0,
                     right: 100,
                     bottom: 100,
-                  }),
+                  },
                   scrollHeight: 200,
                   scrollWidth: 200,
                   scroll: { x: 0, y: 0 },
@@ -1224,13 +1224,13 @@ describe('move to next index', () => {
                   index: 0,
                   droppableId: droppable.descriptor.id,
                 },
-                borderBox: getArea({
+                borderBox: {
                   top: 0,
                   left: 0,
                   // bleeding over the frame
                   right: 110,
                   bottom: 110,
-                }),
+                },
               });
               const outside: DraggableDimension = getDraggableDimension({
                 descriptor: {
@@ -1238,13 +1238,13 @@ describe('move to next index', () => {
                   index: 1,
                   droppableId: droppable.descriptor.id,
                 },
-                borderBox: getArea({
+                borderBox: {
                   // in the droppable, but outside the frame
                   top: 120,
                   left: 120,
                   right: 180,
                   bottom: 180,
-                }),
+                },
               });
               const previousImpact: DragImpact = {
                 movement: noMovement,

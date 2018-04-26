@@ -1,7 +1,7 @@
 // @flow
 import moveToNewDroppable from '../../../../src/state/move-cross-axis/move-to-new-droppable/';
 import type { Result } from '../../../../src/state/move-cross-axis/move-cross-axis-types';
-import { scrollDroppable } from '../../../../src/state/dimension';
+import { scrollDroppable } from '../../../../src/state/droppable-dimension';
 import moveToEdge from '../../../../src/state/move-to-edge';
 import { add, negate, patch } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';

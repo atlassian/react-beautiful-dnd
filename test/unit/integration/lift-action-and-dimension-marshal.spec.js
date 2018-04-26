@@ -1,10 +1,10 @@
 // @flow
+import { getRect } from 'css-box-model';
 import createStore from '../../../src/state/create-store';
 import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
 import createHookCaller from '../../../src/state/hooks/hook-caller';
 import { getPreset } from '../../utils/dimension';
 import { add } from '../../../src/state/position';
-import getArea from '../../../src/state/get-area';
 import { createViewport } from '../../utils/viewport';
 import {
   lift,
@@ -35,7 +35,7 @@ import type {
 const preset = getPreset();
 
 const scrolledViewport: Viewport = createViewport({
-  subject: getArea({
+  subject: getRect({
     top: 0,
     left: 0,
     right: 1000,

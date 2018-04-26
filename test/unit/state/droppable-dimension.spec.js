@@ -10,11 +10,10 @@ import {
   scrollDroppable,
   clip,
 } from '../../../src/state/droppable-dimension';
-import { offsetByPosition } from '../../../src/state/spacing';
+import { offsetByPosition, noSpacing } from '../../../src/state/spacing';
 import { negate } from '../../../src/state/position';
 import getMaxScroll from '../../../src/state/get-max-scroll';
 import { getClosestScrollable } from '../../utils/dimension';
-import { noSpacing } from '../../../src/state/dimension';
 import { expandBySpacing } from '../../utils/spacing';
 import type {
   Spacing,

@@ -1,5 +1,6 @@
 // @flow
 import {
+  getRect,
   createBox,
   type Spacing,
   type BoxModel,
@@ -17,7 +18,6 @@ import type { AutoScroller } from '../../../../src/state/auto-scroller/auto-scro
 import type { PixelThresholds } from '../../../../src/state/auto-scroller/fluid-scroller';
 import { getPixelThresholds, config } from '../../../../src/state/auto-scroller/fluid-scroller';
 import { add, patch, subtract } from '../../../../src/state/position';
-import getArea from '../../../../src/state/get-area';
 import {
   createViewport,
   scrollViewport,
@@ -37,7 +37,7 @@ import {
   addDroppable,
 } from '../../../utils/dimension';
 import { expandByPosition } from '../../../../src/state/spacing';
-import { scrollDroppable } from '../../../../src/state/dimension';
+import { scrollDroppable } from '../../../../src/state/droppable-dimension';
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -46,7 +46,7 @@ const windowScrollSize = {
   scrollWidth: 1600,
 };
 const scrollableViewport: Viewport = createViewport({
-  subject: getArea({
+  subject: getRect({
     top: 0,
     left: 0,
     right: 800,
@@ -58,7 +58,7 @@ const scrollableViewport: Viewport = createViewport({
 });
 
 const unscrollableViewport: Viewport = {
-  subject: getArea({
+  subject: getRect({
     top: 0,
     left: 0,
     right: 800,

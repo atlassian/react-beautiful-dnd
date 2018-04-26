@@ -20,13 +20,10 @@ export type DraggableDescriptor = {|
   index: number,
 |}
 
+// For simplicity exporting these from here as they are used
+// very frequently within the code
 export type Position = PositionType;
-
-// Kept as a loose type so that functions can
-// accept Spacing and receive an Area or a Spacing
 export type Spacing = SpacingType;
-
-// TODO: update
 export type Rect = RectType;
 
 export type Direction = 'horizontal' | 'vertical';
