@@ -536,17 +536,17 @@ describe('get droppable over', () => {
             },
           });
           const scrolled: DroppableDimension = scrollDroppable(foreign, { x: 0, y: 50 });
-          const clippedMarginBox: ?Rect = scrolled.viewport.clippedMarginBox;
+          const clippedPageMarginBox: ?Rect = scrolled.viewport.clippedPageMarginBox;
 
-          if (clippedMarginBox == null) {
+          if (clippedPageMarginBox == null) {
             throw new Error('invalid test setup');
           }
 
           // Just below clipped area
           // the buffer should be added to this area
           const target: Position = {
-            x: clippedMarginBox.center.x,
-            y: clippedMarginBox.bottom + 1,
+            x: clippedPageMarginBox.center.x,
+            y: clippedPageMarginBox.bottom + 1,
           };
 
           const result: ?DroppableId = getDroppableOver({

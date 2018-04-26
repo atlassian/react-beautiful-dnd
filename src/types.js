@@ -73,7 +73,7 @@ export type DraggableDimension = {|
 export type Scrollable = {|
   // This is the window through which the droppable is observed
   // It does not change during a drag
-  frameMarginBox: Rect,
+  framePageMarginBox: Rect,
   // Whether or not we should clip the subject by the frame
   // Is controlled by the ignoreContainerClipping prop
   shouldClipSubject: boolean,
@@ -95,11 +95,11 @@ export type Scrollable = {|
 export type DroppableDimensionViewport = {|
   // will be null if there is no closest scrollable
   closestScrollable: ?Scrollable,
-  subjectMarginBox: Rect,
+  subjectPageMarginBox: Rect,
   // this is the subject through the viewport of the frame (if applicable)
   // it also takes into account any changes to the viewport scroll
   // clipped area will be null if it is completely outside of the frame and frame clipping is on
-  clippedMarginBox: ?Rect,
+  clippedPageMarginBox: ?Rect,
 |}
 
 export type DroppableDimension = {|

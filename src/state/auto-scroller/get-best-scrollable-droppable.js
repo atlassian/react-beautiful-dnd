@@ -38,7 +38,7 @@ const getScrollableDroppableOver = (
     getScrollableDroppables(droppables)
       .find((droppable: DroppableDimension): boolean => {
         invariant(droppable.viewport.closestScrollable, 'Invalid result');
-        return isPositionInFrame(droppable.viewport.closestScrollable.frameMarginBox)(target);
+        return isPositionInFrame(droppable.viewport.closestScrollable.framePageMarginBox)(target);
       });
 
   return maybe;

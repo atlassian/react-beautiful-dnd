@@ -1560,7 +1560,7 @@ describe('fluid auto scrolling', () => {
               endOfSubject,
             );
             // subject no longer visible
-            expect(scrolled.viewport.clippedMarginBox).toBe(null);
+            expect(scrolled.viewport.clippedPageMarginBox).toBe(null);
             // const target: Position = add(endOfFrame, patch(axis.line, 1));
 
             autoScroller.onStateChange(
@@ -1589,7 +1589,7 @@ describe('fluid auto scrolling', () => {
               endOfSubject,
             );
             // subject no longer visible
-            expect(scrolled.viewport.clippedMarginBox).toBe(null);
+            expect(scrolled.viewport.clippedPageMarginBox).toBe(null);
             const target: Position = add(endOfFrame, patch(axis.line, 1));
 
             autoScroller.onStateChange(

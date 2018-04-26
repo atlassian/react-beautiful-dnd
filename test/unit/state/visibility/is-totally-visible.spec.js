@@ -419,7 +419,7 @@ describe('is totally visible', () => {
           getClosestScrollable(droppable).scroll.max,
         );
         // asserting frame is not visible
-        expect(scrolled.viewport.clippedMarginBox).toBe(null);
+        expect(scrolled.viewport.clippedPageMarginBox).toBe(null);
 
         // now asserting that this check will fail
         expect(isTotallyVisible({

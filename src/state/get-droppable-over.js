@@ -80,26 +80,26 @@ const getClippedRectWithPlaceholder = ({
     previousDroppableOverId &&
     previousDroppableOverId === droppable.descriptor.id
   );
-  const clippedMarginBox: ?Rect = droppable.viewport.clippedMarginBox;
+  const clippedPageMarginBox: ?Rect = droppable.viewport.clippedPageMarginBox;
 
   // clipped area is totally hidden behind frame
-  if (!clippedMarginBox) {
-    return clippedMarginBox;
+  if (!clippedPageMarginBox) {
+    return clippedPageMarginBox;
   }
 
   // We only include the placeholder size if it's a
   // foreign list and is currently being hovered over
   if (isHome || !wasOver) {
-    return clippedMarginBox;
+    return clippedPageMarginBox;
   }
 
   const requiredGrowth: ?Position = getRequiredGrowth(draggable, draggables, droppable);
 
   if (!requiredGrowth) {
-    return clippedMarginBox;
+    return clippedPageMarginBox;
   }
 
-  const subjectWithGrowth: Rect = getWithGrowth(clippedMarginBox, requiredGrowth);
+  const subjectWithGrowth: Rect = getWithGrowth(clippedPageMarginBox, requiredGrowth);
   const closestScrollable: ?Scrollable = droppable.viewport.closestScrollable;
 
   // The droppable has no scroll container
@@ -114,7 +114,7 @@ const getClippedRectWithPlaceholder = ({
 
   // We need to clip the new subject by the frame which does not change
   // This will allow the user to continue to scroll into the placeholder
-  return clip(closestScrollable.frameMarginBox, subjectWithGrowth);
+  return clip(closestScrollable.framePageMarginBox, subjectWithGrowth);
 };
 
 type Args = {|
