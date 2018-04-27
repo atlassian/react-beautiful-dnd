@@ -3,7 +3,7 @@ import { Component, type Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
-import { getBox, withScroll, type BoxModel, type Position } from 'css-box-model';
+import { getBox, withScroll, createBox, type BoxModel, type Position, type Spacing } from 'css-box-model';
 import rafSchedule from 'raf-schd';
 import getClosestScrollable from '../get-closest-scrollable';
 import { dimensionMarshalKey } from '../context-keys';
@@ -241,28 +241,70 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     invariant(!this.isWatchingScroll, 'Attempting to recapture Droppable dimension while already watching scroll on previous capture');
     invariant(descriptor, 'Cannot get dimension for unpublished droppable');
 
-    // Reading once and supplying to all functions
+    const scrollableRef: ?Element = getClosestScrollable(targetRef);
+    // side effect: storing the reference for scroll watching
+    this.closestScrollable = scrollableRef;
 
-    const client: BoxModel = getBox(targetRef);
+    const client: BoxModel = (() => {
+      const base: BoxModel = getBox(targetRef);
+
+      if (!scrollableRef) {
+        return base;
+      }
+
+      if (targetRef !== scrollableRef) {
+        return base;
+      }
+
+      // Droppable is scrollable
+      // In this case getBoundingClientRect will return the borderBox of the visible
+      // element and not the full size of the list. Therefore, we create our own
+      // version of the visible list
+
+      // debugger;
+      const top: number = base.paddingBox.top - scrollableRef.scrollTop;
+      const left: number = base.paddingBox.left - scrollableRef.scrollLeft;
+      const bottom: number = top + scrollableRef.scrollHeight;
+      const right: number = left + scrollableRef.scrollWidth;
+
+      const paddingBox: Spacing = {
+        top, right, bottom, left,
+      };
+        // console.log('paddingBox', paddingBox);
+      const border: Spacing = base.border;
+      const borderBox: Spacing = {
+        top: paddingBox.top - border.top,
+        right: paddingBox.right + border.right,
+        bottom: paddingBox.bottom + border.bottom,
+        left: paddingBox.left - border.left,
+      };
+        // console.log('borderBox', borderBox);
+
+      const custom: BoxModel = createBox({
+        borderBox,
+        margin: base.margin,
+        border: base.border,
+        padding: base.padding,
+      });
+
+      return custom;
+    })();
+
     const page: BoxModel = withScroll(client);
-    const closestScrollable: ?Element = getClosestScrollable(targetRef);
-
-    // side effect
-    this.closestScrollable = closestScrollable;
 
     const closest: ?Closest = (() => {
-      if (!closestScrollable) {
+      if (!scrollableRef) {
         return null;
       }
 
-      const closestClient: BoxModel = getBox(closestScrollable);
+      const frameClient: BoxModel = getBox(scrollableRef);
 
       return {
-        client: closestClient,
-        page: withScroll(closestClient),
-        scrollHeight: closestScrollable.scrollHeight,
-        scrollWidth: closestScrollable.scrollWidth,
-        scroll: getScroll(closestScrollable),
+        client: frameClient,
+        page: withScroll(frameClient),
+        scrollHeight: scrollableRef.scrollHeight,
+        scrollWidth: scrollableRef.scrollWidth,
+        scroll: getScroll(scrollableRef),
         shouldClipSubject: !ignoreContainerClipping,
       };
     })();
