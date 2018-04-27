@@ -3,8 +3,7 @@ import { Component, type Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
-import { calculateBox, withScroll } from 'css-box-model';
-import type { BoxModel } from 'css-box-model';
+import { calculateBox, withScroll, type BoxModel } from 'css-box-model';
 import getWindowScroll from '../window/get-window-scroll';
 import { dimensionMarshalKey } from '../context-keys';
 import type {

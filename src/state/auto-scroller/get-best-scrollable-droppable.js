@@ -1,7 +1,7 @@
 // @flow
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
-import type { Position } from 'css-box-model';
+import { type Position } from 'css-box-model';
 import isPositionInFrame from '../visibility/is-position-in-frame';
 import type {
   DroppableId,
