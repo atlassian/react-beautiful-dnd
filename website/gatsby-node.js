@@ -63,7 +63,9 @@ type NodeParams = {
 }
 */
 
-exports.onCreateNode = ({ node, boundActionCreators, getNode }/* : NodeParams */) => {
+exports.onCreateNode = (
+  { node, boundActionCreators, getNode } /* : NodeParams */
+) => {
   const { createNodeField } = boundActionCreators;
   if (node.internal.type === 'MarkdownRemark') {
     const fileNode = getNode(node.parent);
@@ -91,7 +93,9 @@ exports.onCreateNode = ({ node, boundActionCreators, getNode }/* : NodeParams */
   }
 };
 
-exports.createPages = ({ graphql, boundActionCreators }/* : NodeParams */)/* : Promise<any> */ => {
+exports.createPages = (
+  { graphql, boundActionCreators } /* : NodeParams */ /* : Promise<any> */
+) => {
   const { createPage } = boundActionCreators;
 
   return new Promise((resolve, reject) => {
@@ -142,12 +146,10 @@ exports.onCreatePage = async ({ page, boundActionCreators }) => {
       page.layout = 'landing';
       // Update the page.
       createPage(page);
+    } else if (page.path.match(/^\/(examples|internal)\/./)) {
+      page.layout = 'example';
+      createPage(page);
     }
-    // else if (page.path.match(/^\/(examples|internal)\/./)) {
-    //   page.layout = 'example';
-    //   createPage(page);
-    // }
-
     resolve();
   });
 };

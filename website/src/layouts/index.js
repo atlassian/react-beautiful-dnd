@@ -1,8 +1,5 @@
 // @flow
 import React, { type Node } from 'react';
-import Helmet from 'react-helmet';
-/* eslint-disable-next-line import/extensions */
-import '@atlaskit/css-reset';
 
 import PageWrapper from '../components/PageWrapper';
 import CommonPage from '../components/CommonPage';

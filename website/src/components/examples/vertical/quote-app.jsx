@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { DragDropContext } from '../../../../../src/';
+import { DragDropContext } from '../../../../../src';
 import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
 import reorder from '../reorder';
@@ -27,19 +27,19 @@ const Root = styled.div`
 
 type Props = {|
   initial: Quote[],
-  listStyle?: Object,
-|}
+  listStyle?: Object
+|};
 
 type State = {|
-  quotes: Quote[],
-|}
+  quotes: Quote[]
+|};
 
 export default class QuoteApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
 
   state: State = {
     quotes: this.props.initial,
-  }
+  };
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
@@ -48,7 +48,7 @@ export default class QuoteApp extends Component<Props, State> {
     if (window.navigator.vibrate) {
       window.navigator.vibrate(100);
     }
-  }
+  };
 
   onDragEnd = (result: DropResult) => {
     publishOnDragEnd(result);
@@ -71,7 +71,7 @@ export default class QuoteApp extends Component<Props, State> {
     this.setState({
       quotes,
     });
-  }
+  };
 
   render() {
     const { quotes } = this.state;

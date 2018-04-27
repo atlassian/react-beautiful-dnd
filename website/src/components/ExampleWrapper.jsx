@@ -3,9 +3,10 @@ import React from 'react';
 import Codesandboxer from 'react-codesandboxer';
 
 const gitInfo = {
-  account: 'atlassian',
+  account: 'noviny',
   repository: 'react-beautiful-dnd',
   host: 'github',
+  branch: 'website-layout',
 };
 
 // this needs to handle internal v external
@@ -17,9 +18,11 @@ const ExampleWrapper = ({ children, path }) => (
     <Codesandboxer
       gitInfo={gitInfo}
       examplePath={path}
-      pkgJSON="package.json"
+      allowJSX
       preload
-      onLoadComplete={something => console.log('we completed loading of', something, path)}
+      importReplacements={[['src', 'react-beautiful-dnd']]}
+      onLoadComplete={something =>
+        console.log('we completed loading of', something, path)}
     >
       {() => <button>Take 1</button>}
     </Codesandboxer>
