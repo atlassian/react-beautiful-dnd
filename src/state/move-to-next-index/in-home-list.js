@@ -4,7 +4,6 @@ import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import { patch, subtract } from '../position';
 import withDroppableDisplacement from '../with-droppable-displacement';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
-// import getScrollJumpResult from './get-scroll-jump-result';
 import moveToEdge from '../move-to-edge';
 import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
 import type { Edge } from '../move-to-edge';
