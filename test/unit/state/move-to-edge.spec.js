@@ -1,5 +1,5 @@
 // @flow
-import { getRect } from 'css-box-model';
+import { getRect, type Position, type Rect } from 'css-box-model';
 import {
   add,
   absolute,
@@ -9,11 +9,7 @@ import {
 } from '../../../src/state/position';
 import moveToEdge from '../../../src/state/move-to-edge';
 import { vertical, horizontal } from '../../../src/state/axis';
-import type {
-  Axis,
-  Position,
-  Rect,
-} from '../../../src/types';
+import type { Axis } from '../../../src/types';
 
 // behind the destination
 // width: 40, height: 20

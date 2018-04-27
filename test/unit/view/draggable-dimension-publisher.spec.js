@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { type Position, type Spacing } from 'css-box-model';
 import { mount } from 'enzyme';
 import DraggableDimensionPublisher from '../../../src/view/draggable-dimension-publisher/draggable-dimension-publisher';
 import setWindowScroll from '../../utils/set-window-scroll';
@@ -11,8 +12,6 @@ import type {
 import { withDimensionMarshal } from '../../utils/get-context-options';
 import forceUpdate from '../../utils/force-update';
 import type {
-  Spacing,
-  Position,
   DraggableId,
   DraggableDimension,
   DraggableDescriptor,

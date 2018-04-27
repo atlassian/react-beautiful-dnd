@@ -1,5 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
+import { type Position, type Rect } from 'css-box-model';
 import { closest } from '../position';
 import isWithin from '../is-within';
 import { getCorners } from '../spacing';
@@ -9,8 +10,6 @@ import type {
   DroppableDimension,
   DroppableDimensionMap,
   DroppableId,
-  Position,
-  Rect,
   Viewport,
 } from '../../types';
 

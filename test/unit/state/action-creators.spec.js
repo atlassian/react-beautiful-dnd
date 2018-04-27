@@ -1,4 +1,5 @@
 // @flow
+import { type Position } from 'css-box-model';
 import {
   cancel,
   clean,
@@ -16,7 +17,6 @@ import getViewport from '../../../src/view/window/get-viewport';
 import getStatePreset from '../../utils/get-simple-state-preset';
 import type {
   State,
-  Position,
   DraggableId,
   Store,
   InitialDragPositions,

@@ -1,4 +1,5 @@
 // @flow
+import { type Position } from 'css-box-model';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import { patch, subtract } from '../position';
 import withDroppableDisplacement from '../with-droppable-displacement';
@@ -11,7 +12,6 @@ import type { Args, Result } from './move-to-next-index-types';
 import type {
   DraggableLocation,
   DraggableDimension,
-  Position,
   Displacement,
   Axis,
   DragImpact,

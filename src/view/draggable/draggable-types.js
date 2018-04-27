@@ -1,10 +1,10 @@
 // @flow
-import type { Node } from 'react';
+import { type Position } from 'css-box-model';
+import { type Node } from 'react';
 import type {
   DraggableId,
   DroppableId,
   DraggableDimension,
-  Position,
   Direction,
   ZIndex,
 } from '../../types';

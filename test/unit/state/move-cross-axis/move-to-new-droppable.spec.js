@@ -1,4 +1,5 @@
 // @flow
+import { type Position } from 'css-box-model';
 import moveToNewDroppable from '../../../../src/state/move-cross-axis/move-to-new-droppable/';
 import type { Result } from '../../../../src/state/move-cross-axis/move-cross-axis-types';
 import { scrollDroppable } from '../../../../src/state/droppable-dimension';
@@ -14,7 +15,6 @@ import type {
   DragImpact,
   DraggableDimension,
   DroppableDimension,
-  Position,
 } from '../../../../src/types';
 
 const dontCare: Position = { x: 0, y: 0 };

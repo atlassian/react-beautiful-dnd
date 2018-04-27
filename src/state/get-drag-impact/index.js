@@ -1,4 +1,5 @@
 // @flow
+import { type Position } from 'css-box-model';
 import type {
   DroppableId,
   DraggableDimension,
@@ -6,7 +7,6 @@ import type {
   DraggableDimensionMap,
   DroppableDimensionMap,
   DragImpact,
-  Position,
   Viewport,
 } from '../../types';
 import getDroppableOver from '../get-droppable-over';

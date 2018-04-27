@@ -1,11 +1,11 @@
 // @flow
+import type { Position } from 'css-box-model';
 import createFluidScroller, { type FluidScroller } from './fluid-scroller';
 import createJumpScroller, { type JumpScroller } from './jump-scroller';
 import type { AutoScroller } from './auto-scroller-types';
 import type {
   DraggableId,
   DroppableId,
-  Position,
   State,
   Viewport,
 } from '../../types';

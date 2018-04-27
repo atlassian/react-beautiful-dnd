@@ -1,17 +1,15 @@
 // @flow
+import { type Position, type Spacing, type Rect } from 'css-box-model';
 import getDroppableOver from '../../../src/state/get-droppable-over';
 import { getPreset, disableDroppable, getDroppableDimension, getDraggableDimension } from '../../utils/dimension';
 import { scrollDroppable } from '../../../src/state/droppable-dimension';
 import type {
-  Rect,
   DraggableId,
   DraggableDimension,
   DroppableDimension,
   DraggableDimensionMap,
   DroppableDimensionMap,
-  Spacing,
   DroppableId,
-  Position,
 } from '../../../src/types';
 
 const preset = getPreset();

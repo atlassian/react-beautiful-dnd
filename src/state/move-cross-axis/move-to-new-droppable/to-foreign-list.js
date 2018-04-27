@@ -1,11 +1,11 @@
 // @flow
+import { type Position } from 'css-box-model';
 import moveToEdge from '../../move-to-edge';
 import type { Result } from '../move-cross-axis-types';
 import getDisplacement from '../../get-displacement';
 import withDroppableDisplacement from '../../with-droppable-displacement';
 import type {
   Axis,
-  Position,
   DragImpact,
   DraggableDimension,
   DroppableDimension,

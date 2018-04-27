@@ -1,7 +1,7 @@
 // @flow
+import { type Position } from 'css-box-model';
 import { add } from './position';
 import type {
-  Position,
   Scrollable,
   DroppableDimension,
 } from '../types';

@@ -1,4 +1,5 @@
 // @flow
+import { type Rect } from 'css-box-model';
 import getDisplacementMap, { type DisplacementMap } from './get-displacement-map';
 import { isPartiallyVisible } from './visibility/is-visible';
 import type {
@@ -7,7 +8,6 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DragImpact,
-  Rect,
 } from '../types';
 
 type Args = {|

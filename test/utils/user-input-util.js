@@ -1,6 +1,6 @@
 // @flow
 import type { ReactWrapper } from 'enzyme';
-import type { Position } from '../../src/types';
+import { type Position } from 'css-box-model';
 
 const primaryButton: number = 0;
 const origin: Position = { x: 0, y: 0 };

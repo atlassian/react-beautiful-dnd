@@ -1,8 +1,8 @@
 // @flow
+import { type Spacing } from 'css-box-model';
 import isPartiallyVisibleThroughFrame from '../../../../src/state/visibility/is-partially-visible-through-frame';
 import { offsetByPosition } from '../../../../src/state/spacing';
 import { expandBySpacing } from '../../../utils/spacing';
-import type { Spacing } from '../../../../src/types';
 
 const frame: Spacing = {
   top: 0, left: 0, right: 100, bottom: 100,

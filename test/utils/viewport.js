@@ -1,9 +1,6 @@
 // @flow
-import { getRect, type Rect } from 'css-box-model';
-import type {
-  Viewport,
-  Position,
-} from '../../src/types';
+import { getRect, type Rect, type Position } from 'css-box-model';
+import type { Viewport } from '../../src/types';
 import getViewport from '../../src/view/window/get-viewport';
 import getMaxScroll from '../../src/state/get-max-scroll';
 import { offsetByPosition } from '../../src/state/spacing';

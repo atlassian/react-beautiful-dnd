@@ -3,10 +3,10 @@ import {
   createBox,
   getRect,
   type BoxModel,
+  type Position,
 } from 'css-box-model';
 import type {
   Axis,
-  Position,
   State,
   DroppableDimension,
   Viewport,

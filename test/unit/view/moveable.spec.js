@@ -1,8 +1,8 @@
 // @flow
 import React from 'react';
+import { type Position } from 'css-box-model';
 import { mount } from 'enzyme';
 import Moveable from '../../../src/view/moveable/';
-import type { Position } from '../../../src/types';
 import type { Speed, Style } from '../../../src/view/moveable/moveable-types';
 
 describe('Moveable', () => {

@@ -1,13 +1,10 @@
 // @flow
-import { getRect, type Rect } from 'css-box-model';
+import { getRect, type Rect, type Spacing } from 'css-box-model';
 import { isTotallyVisible, isPartiallyVisible } from '../../../../src/state/visibility/is-visible';
 import { scrollDroppable } from '../../../../src/state/droppable-dimension';
 import { offsetByPosition } from '../../../../src/state/spacing';
 import { getDroppableDimension, getClosestScrollable } from '../../../utils/dimension';
-import type {
-  DroppableDimension,
-  Spacing,
-} from '../../../../src/types';
+import type { DroppableDimension } from '../../../../src/types';
 
 const viewport: Rect = getRect({
   right: 800,

@@ -1,5 +1,5 @@
 // @flow
-import type { Position } from '../../src/types';
+import { type Position } from 'css-box-model';
 
 type Options = {|
   shouldPublish: boolean,

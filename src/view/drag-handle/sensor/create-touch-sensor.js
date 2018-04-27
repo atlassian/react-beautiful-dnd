@@ -1,5 +1,6 @@
 // @flow
 /* eslint-disable no-use-before-define */
+import { type Position } from 'css-box-model';
 import createScheduler from '../util/create-scheduler';
 import createPostDragEventPreventer, { type EventPreventer } from '../util/create-post-drag-event-preventer';
 import createEventMarshal, { type EventMarshal } from '../util/create-event-marshal';
@@ -7,9 +8,6 @@ import { bindEvents, unbindEvents } from '../util/bind-events';
 import * as keyCodes from '../../key-codes';
 import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
 import type { EventBinding } from '../util/event-types';
-import type {
-  Position,
-} from '../../../types';
 import type { TouchSensor, CreateSensorArgs } from './sensor-types';
 
 type State = {

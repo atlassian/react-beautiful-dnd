@@ -1,5 +1,5 @@
 // @flow
-import { getRect, type Rect } from 'css-box-model';
+import { getRect, type Rect, type Position } from 'css-box-model';
 import getClosestDraggable from '../../../../src/state/move-cross-axis/get-closest-draggable';
 import { scrollDroppable } from '../../../../src/state/droppable-dimension';
 import { add, distance, patch } from '../../../../src/state/position';
@@ -9,7 +9,6 @@ import { horizontal, vertical } from '../../../../src/state/axis';
 import getViewport from '../../../../src/view/window/get-viewport';
 import type {
   Axis,
-  Position,
   DraggableDimension,
   DroppableDimension,
   Viewport,

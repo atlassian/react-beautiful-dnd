@@ -1,4 +1,5 @@
 // @flow
+import { type Position } from 'css-box-model';
 import getBestCrossAxisDroppable from '../../../../src/state/move-cross-axis/get-best-cross-axis-droppable';
 import { getDroppableDimension } from '../../../utils/dimension';
 import { add } from '../../../../src/state/position';
@@ -7,7 +8,6 @@ import getViewport from '../../../../src/view/window/get-viewport';
 import type {
   Viewport,
   Axis,
-  Position,
   DroppableDimension,
   DroppableDimensionMap,
 } from '../../../../src/types';

@@ -2,6 +2,7 @@
 /* eslint-disable react/no-multi-comp */
 import React, { Component } from 'react';
 import { mount } from 'enzyme';
+import { type Position } from 'css-box-model';
 import Draggable, { makeSelector } from '../../../src/view/draggable/connected-draggable';
 import { getPreset, getInitialImpact, withImpact } from '../../utils/dimension';
 import { negate } from '../../../src/state/position';
@@ -24,7 +25,6 @@ import type {
   Provided,
 } from '../../../src/view/draggable/draggable-types';
 import type {
-  Position,
   State,
   CurrentDragPositions,
   DragImpact,

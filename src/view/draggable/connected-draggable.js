@@ -1,4 +1,5 @@
 // @flow
+import { type Position } from 'css-box-model';
 import type { Node } from 'react';
 import memoizeOne from 'memoize-one';
 import { connect } from 'react-redux';
@@ -21,7 +22,6 @@ import {
 } from '../../state/action-creators';
 import type {
   State,
-  Position,
   DraggableId,
   DroppableId,
   DragMovement,

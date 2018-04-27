@@ -1,13 +1,12 @@
 // @flow
+import { type Position, type Rect } from 'css-box-model';
 import type {
   DragMovement,
   DraggableDimension,
   DroppableDimension,
   DragImpact,
   Axis,
-  Position,
   Displacement,
-  Rect,
   Viewport,
 } from '../../types';
 import { patch } from '../position';

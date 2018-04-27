@@ -1,4 +1,5 @@
 // @flow
+import { type Position } from 'css-box-model';
 import getNewHomeClientBorderBoxCenter from '../../../src/state/get-new-home-client-border-box-center';
 import { noMovement } from '../../../src/state/no-impact';
 import { patch } from '../../../src/state/position';
@@ -8,7 +9,6 @@ import { getPreset } from '../../utils/dimension';
 import type {
   Axis,
   DragMovement,
-  Position,
 } from '../../../src/types';
 
 describe('get new home client center', () => {

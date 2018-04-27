@@ -1,10 +1,8 @@
 // @flow
-/* eslint-disable react/no-multi-comp */
 import React, { Component, type Node } from 'react';
 import ReactDOM from 'react-dom';
 import { mount, type ReactWrapper } from 'enzyme';
-import { getRect } from 'css-box-model';
-// eslint-disable-next-line no-duplicate-imports
+import { getRect, type Position } from 'css-box-model';
 import Draggable, { zIndexOptions } from '../../../src/view/draggable/draggable';
 import DragHandle from '../../../src/view/drag-handle/drag-handle';
 import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
@@ -25,7 +23,6 @@ import type {
   StateSnapshot,
 } from '../../../src/view/draggable/draggable-types';
 import type {
-  Position,
   DraggableDimension,
   DroppableDimension,
   DraggableId,

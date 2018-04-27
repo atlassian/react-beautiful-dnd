@@ -1,7 +1,6 @@
 // @flow
-import { getRect } from 'css-box-model';
+import { getRect, type Position } from 'css-box-model';
 import type {
-  Position,
   DroppableDimension,
   Viewport,
 } from '../../../../src/types';

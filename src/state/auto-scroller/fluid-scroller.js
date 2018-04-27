@@ -1,6 +1,6 @@
 // @flow
 import rafSchd from 'raf-schd';
-import type { Rect } from 'css-box-model';
+import type { Rect, Position, Spacing } from 'css-box-model';
 import { add, apply, isEqual, patch } from '../position';
 import getBestScrollableDroppable from './get-best-scrollable-droppable';
 import { horizontal, vertical } from '../axis';
@@ -10,11 +10,9 @@ import {
 } from './can-scroll';
 import type {
   Axis,
-  Spacing,
   DroppableId,
   DragState,
   DroppableDimension,
-  Position,
   State,
   DraggableDimension,
   Scrollable,

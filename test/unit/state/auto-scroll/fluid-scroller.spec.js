@@ -4,10 +4,10 @@ import {
   createBox,
   type Spacing,
   type BoxModel,
+  type Position,
 } from 'css-box-model';
 import type {
   Axis,
-  Position,
   State,
   DraggableDimension,
   DroppableDimension,

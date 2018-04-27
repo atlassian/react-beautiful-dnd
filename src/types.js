@@ -1,6 +1,6 @@
 // @flow
 import type { Store as ReduxStore, Dispatch as ReduxDispatch } from 'redux';
-import type { BoxModel, Rect as RectType, Position as PositionType, Spacing as SpacingType } from 'css-box-model';
+import type { BoxModel, Rect, Position } from 'css-box-model';
 import type { Action as ActionCreators } from './state/action-creators';
 
 export type Id = string;
@@ -19,12 +19,6 @@ export type DraggableDescriptor = {|
   droppableId: DroppableId,
   index: number,
 |}
-
-// For simplicity exporting these from here as they are used
-// very frequently within the code
-export type Position = PositionType;
-export type Spacing = SpacingType;
-export type Rect = RectType;
 
 export type Direction = 'horizontal' | 'vertical';
 

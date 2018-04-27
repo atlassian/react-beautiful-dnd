@@ -1,13 +1,9 @@
 // @flow
+import { type Position, type Spacing, type Rect } from 'css-box-model';
 import isPartiallyVisibleThroughFrame from './is-partially-visible-through-frame';
 import isTotallyVisibleThroughFrame from './is-totally-visible-through-frame';
 import { offsetByPosition } from '../spacing';
-import type {
-  Spacing,
-  Position,
-  Rect,
-  DroppableDimension,
-} from '../../types';
+import type { DroppableDimension } from '../../types';
 
 type Args = {|
   target: Spacing,

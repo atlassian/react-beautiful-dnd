@@ -1,5 +1,5 @@
 // @flow
-import { getRect } from 'css-box-model';
+import { getRect, type Position } from 'css-box-model';
 import createStore from '../../../src/state/create-store';
 import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
 import createHookCaller from '../../../src/state/hooks/hook-caller';
@@ -26,7 +26,6 @@ import type {
   Store,
   DraggableDimension,
   DroppableDimension,
-  Position,
   DroppableId,
   InitialDragPositions,
   Hooks,

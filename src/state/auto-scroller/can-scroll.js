@@ -1,9 +1,9 @@
 // @flow
+import type { Position } from 'css-box-model';
 import { add, apply, isEqual } from '../position';
 import type {
   Scrollable,
   DroppableDimension,
-  Position,
   Viewport,
 } from '../../types';
 

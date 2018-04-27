@@ -1,9 +1,8 @@
 // @flow
+import { type Position, type Rect } from 'css-box-model';
 import { absolute, add, patch, subtract } from './position';
 import type {
   Axis,
-  Position,
-  Rect,
 } from '../types';
 
 export type Edge = 'start' | 'end';

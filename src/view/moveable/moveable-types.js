@@ -1,6 +1,6 @@
 // @flow
-import type { Node } from 'react';
-import type { Position } from '../../types';
+import { type Node } from 'react';
+import { type Position } from 'css-box-model';
 
 export type Speed = 'INSTANT' | 'STANDARD' | 'FAST';
 

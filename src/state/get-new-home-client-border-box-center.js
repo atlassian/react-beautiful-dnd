@@ -1,12 +1,11 @@
 // @flow
+import { type Position, type Rect } from 'css-box-model';
 import type {
   Axis,
   DraggableDimension,
   DraggableDimensionMap,
   DragMovement,
   DroppableDimension,
-  Position,
-  Rect,
 } from '../types';
 import moveToEdge from './move-to-edge';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';

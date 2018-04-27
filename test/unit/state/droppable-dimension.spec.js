@@ -4,6 +4,8 @@ import {
   withScroll,
   getRect,
   type BoxModel,
+  type Spacing,
+  type Position,
 } from 'css-box-model';
 import {
   getDroppableDimension,
@@ -16,9 +18,7 @@ import getMaxScroll from '../../../src/state/get-max-scroll';
 import { getClosestScrollable } from '../../utils/dimension';
 import { expandBySpacing } from '../../utils/spacing';
 import type {
-  Spacing,
   DroppableDescriptor,
-  Position,
   DroppableDimension,
   Scrollable,
   DroppableDimensionViewport,

@@ -1,10 +1,10 @@
 // @flow
+import { type Position, type Spacing } from 'css-box-model';
 import {
   getCorners,
   expandByPosition,
   offsetByPosition,
 } from '../../../src/state/spacing';
-import type { Position, Spacing } from '../../../src/types';
 
 const base: Spacing = {
   top: 8,

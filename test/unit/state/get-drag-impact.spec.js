@@ -1,5 +1,5 @@
 // @flow
-// eslint-disable-next-line no-duplicate-imports
+import { type Position } from 'css-box-model';
 import getDragImpact from '../../../src/state/get-drag-impact/';
 import noImpact from '../../../src/state/no-impact';
 import { add, patch, subtract } from '../../../src/state/position';
@@ -21,7 +21,6 @@ import type {
   DroppableDimension,
   DroppableDimensionMap,
   DragImpact,
-  Position,
   DraggableDimensionMap,
   Viewport,
 } from '../../../src/types';

@@ -3,7 +3,7 @@ import { Component, type Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
-import { getBox, withScroll, type BoxModel } from 'css-box-model';
+import { getBox, withScroll, type BoxModel, type Position } from 'css-box-model';
 import rafSchedule from 'raf-schd';
 import getClosestScrollable from '../get-closest-scrollable';
 import { dimensionMarshalKey } from '../context-keys';
@@ -17,7 +17,6 @@ import type {
   TypeId,
   DroppableDimension,
   DroppableDescriptor,
-  Position,
   Direction,
   ScrollOptions,
 } from '../../types';

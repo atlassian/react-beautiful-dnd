@@ -1,4 +1,5 @@
 // @flow
+import type { Position } from 'css-box-model';
 import type {
   DraggableId,
   DroppableId,
@@ -8,7 +9,6 @@ import type {
   DroppableDimension,
   InitialDragPositions,
   DraggableLocation,
-  Position,
   Dispatch,
   State,
   CurrentDrag,

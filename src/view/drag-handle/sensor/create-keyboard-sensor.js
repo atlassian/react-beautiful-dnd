@@ -1,5 +1,6 @@
 // @flow
 /* eslint-disable no-use-before-define */
+import { type Position } from 'css-box-model';
 import createScheduler from '../util/create-scheduler';
 import preventStandardKeyEvents from '../util/prevent-standard-key-events';
 import * as keyCodes from '../../key-codes';
@@ -7,11 +8,8 @@ import getBorderBoxCenterPosition from '../../get-border-box-center-position';
 import { bindEvents, unbindEvents } from '../util/bind-events';
 import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
 import type { EventBinding } from '../util/event-types';
-import type { Position } from '../../../types';
 import type { KeyboardSensor, CreateSensorArgs } from './sensor-types';
-import type {
-  Props,
-} from '../drag-handle-types';
+import type { Props } from '../drag-handle-types';
 
 type State = {|
   isDragging: boolean,

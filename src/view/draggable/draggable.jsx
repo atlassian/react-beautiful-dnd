@@ -1,10 +1,10 @@
 // @flow
 import React, { Component, Fragment, type Node } from 'react';
+import { type Position } from 'css-box-model';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import type {
-  Position,
   DraggableDimension,
   InitialDragPositions,
   DroppableId,

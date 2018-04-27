@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { mount } from 'enzyme';
-import { getRect, type Rect } from 'css-box-model';
+import { getRect, type Rect, type Position } from 'css-box-model';
 import { DragDropContext, Draggable, Droppable } from '../../../src/';
 import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
 import { dispatchWindowMouseEvent, dispatchWindowKeyDownEvent, mouseEvent } from '../../utils/user-input-util';
@@ -12,7 +12,6 @@ import type {
   DroppableId,
   DragStart,
   DropResult,
-  Position,
 } from '../../../src/types';
 import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';
 import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';

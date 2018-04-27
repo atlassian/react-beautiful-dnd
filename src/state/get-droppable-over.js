@@ -1,6 +1,6 @@
 // @flow
 import memoizeOne from 'memoize-one';
-import { getRect, type Rect } from 'css-box-model';
+import { getRect, type Rect, type Position } from 'css-box-model';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
 import isPositionInFrame from './visibility/is-position-in-frame';
 import { patch } from './position';
@@ -13,7 +13,6 @@ import type {
   DroppableDimension,
   DroppableDimensionMap,
   DroppableId,
-  Position,
 } from '../types';
 
 const getRequiredGrowth = memoizeOne((

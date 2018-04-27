@@ -2,7 +2,7 @@
 /* eslint-disable react/no-multi-comp */
 import React, { Component } from 'react';
 import { mount } from 'enzyme';
-import { createBox, type BoxModel } from 'css-box-model';
+import { createBox, type BoxModel, type Spacing, type Position } from 'css-box-model';
 import DroppableDimensionPublisher from '../../../src/view/droppable-dimension-publisher/droppable-dimension-publisher';
 import {
   getPreset,
@@ -18,10 +18,8 @@ import type {
 } from '../../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
   ScrollOptions,
-  Spacing,
   DroppableId,
   DroppableDimension,
-  Position,
   DroppableDescriptor,
   TypeId,
 } from '../../../src/types';

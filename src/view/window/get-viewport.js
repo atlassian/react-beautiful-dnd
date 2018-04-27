@@ -1,7 +1,7 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { getRect, type Rect } from 'css-box-model';
-import type { Position, Viewport } from '../../types';
+import { getRect, type Rect, type Position } from 'css-box-model';
+import type { Viewport } from '../../types';
 import getWindowScroll from './get-window-scroll';
 import getMaxScroll from '../../state/get-max-scroll';
 

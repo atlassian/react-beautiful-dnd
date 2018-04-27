@@ -6,6 +6,7 @@ import {
   type Rect,
   type BoxModel,
   type Spacing,
+  type Position,
 } from 'css-box-model';
 import { noMovement } from '../../src/state/no-impact';
 import { vertical } from '../../src/state/axis';
@@ -16,7 +17,6 @@ import type {
   Placeholder,
   DragImpact,
   State,
-  Position,
   Scrollable,
   DraggableDescriptor,
   DroppableDescriptor,

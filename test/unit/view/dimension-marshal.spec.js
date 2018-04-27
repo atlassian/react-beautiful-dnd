@@ -1,4 +1,5 @@
 // @flow
+import { type Spacing } from 'css-box-model';
 import { getPreset, getDraggableDimension, getDroppableDimension } from '../../utils/dimension';
 import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
 import getStatePreset from '../../utils/get-simple-state-preset';
@@ -19,7 +20,6 @@ import type {
   DraggableDescriptor,
   DroppableDescriptor,
   ScrollOptions,
-  Spacing,
 } from '../../../src/types';
 
 const getCallbackStub = (): Callbacks => {

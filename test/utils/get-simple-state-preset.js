@@ -1,4 +1,5 @@
 // @flow
+import { type Position } from 'css-box-model';
 import { getPreset } from './dimension';
 import noImpact from '../../src/state/no-impact';
 import { vertical } from '../../src/state/axis';
@@ -14,7 +15,6 @@ import type {
   CurrentDragPositions,
   InitialDragPositions,
   LiftRequest,
-  Position,
   DragState,
   DropResult,
   PendingDrop,

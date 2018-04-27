@@ -1,5 +1,6 @@
 // @flow
 import memoizeOne from 'memoize-one';
+import { type Position } from 'css-box-model';
 import type {
   Action,
   State,
@@ -20,7 +21,6 @@ import type {
   Phase,
   DraggableLocation,
   CurrentDragPositions,
-  Position,
   InitialDragPositions,
   LiftRequest,
   Viewport,
