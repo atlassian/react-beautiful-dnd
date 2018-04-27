@@ -3,7 +3,7 @@ import { Component, type Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
-import { getBox, withScroll, type BoxModel, type Position } from 'css-box-model';
+import { getBox, withScroll, createBox, type BoxModel, type Position, type Spacing } from 'css-box-model';
 import rafSchedule from 'raf-schd';
 import getClosestScrollable from '../get-closest-scrollable';
 import { dimensionMarshalKey } from '../context-keys';
@@ -241,28 +241,75 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     invariant(!this.isWatchingScroll, 'Attempting to recapture Droppable dimension while already watching scroll on previous capture');
     invariant(descriptor, 'Cannot get dimension for unpublished droppable');
 
-    // Reading once and supplying to all functions
+    const scrollableRef: ?Element = getClosestScrollable(targetRef);
+    // side effect: storing the reference for scroll watching
+    this.closestScrollable = scrollableRef;
 
-    const client: BoxModel = getBox(targetRef);
+    const client: BoxModel = (() => {
+      const base: BoxModel = getBox(targetRef);
+
+      // Droppable has no scroll parent
+      if (!scrollableRef) {
+        return base;
+      }
+
+      // Droppable is not the same as the closest scrollable
+      if (targetRef !== scrollableRef) {
+        return base;
+      }
+
+      // Droppable is scrollable
+
+      // Element.getBoundingClient() returns:
+      // When not scrollable: the full size of the element
+      // When scrollable: the visible size of the element
+      // (which is not the full width of its scrollable content)
+      // So we recalculate the borderBox of a scrollable droppable to give
+      // it its full dimensions. This will be cut to the correct size by the frame
+
+      // Creating the paddingBox based on scrollWidth / scrollTop
+      // scrollWidth / scrollHeight are based on the paddingBox of an element
+      // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight
+      const top: number = base.paddingBox.top - scrollableRef.scrollTop;
+      const left: number = base.paddingBox.left - scrollableRef.scrollLeft;
+      const bottom: number = top + scrollableRef.scrollHeight;
+      const right: number = left + scrollableRef.scrollWidth;
+
+      const paddingBox: Spacing = {
+        top, right, bottom, left,
+      };
+
+      // Creating the borderBox by adding the borders to the paddingBox
+      const borderBox: Spacing = {
+        top: paddingBox.top - base.border.top,
+        right: paddingBox.right + base.border.right,
+        bottom: paddingBox.bottom + base.border.bottom,
+        left: paddingBox.left - base.border.left,
+      };
+
+      return createBox({
+        borderBox,
+        margin: base.margin,
+        border: base.border,
+        padding: base.padding,
+      });
+    })();
+
     const page: BoxModel = withScroll(client);
-    const closestScrollable: ?Element = getClosestScrollable(targetRef);
-
-    // side effect
-    this.closestScrollable = closestScrollable;
 
     const closest: ?Closest = (() => {
-      if (!closestScrollable) {
+      if (!scrollableRef) {
         return null;
       }
 
-      const closestClient: BoxModel = getBox(closestScrollable);
+      const frameClient: BoxModel = getBox(scrollableRef);
 
       return {
-        client: closestClient,
-        page: withScroll(closestClient),
-        scrollHeight: closestScrollable.scrollHeight,
-        scrollWidth: closestScrollable.scrollWidth,
-        scroll: getScroll(closestScrollable),
+        client: frameClient,
+        page: withScroll(frameClient),
+        scrollHeight: scrollableRef.scrollHeight,
+        scrollWidth: scrollableRef.scrollWidth,
+        scroll: getScroll(scrollableRef),
         shouldClipSubject: !ignoreContainerClipping,
       };
     })();
