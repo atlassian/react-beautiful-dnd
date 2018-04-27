@@ -256,12 +256,17 @@ export default class DroppableDimensionPublisher extends Component<Props> {
         return base;
       }
 
-      // Droppable is scrollable
-      // In this case getBoundingClientRect will return the borderBox of the visible
-      // element and not the full size of the list. Therefore, we create our own
-      // version of the visible list
+      // ## Droppable is scrollable
+      // Element.getBoundingClient() returns:
+      // When not scrollable: the full size of the element
+      // When scrollable: the visible size of the element
+      // (which is not the full width of its scrollable content)
+      // So we recalculate the borderBox of a scrollable droppable to give
+      // it its full dimensions. This will be cut to the correct size by the frame
 
-      // debugger;
+      // scrollWidth / scrollHeight are based on the paddingBox of an element
+      // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight
+
       const top: number = base.paddingBox.top - scrollableRef.scrollTop;
       const left: number = base.paddingBox.left - scrollableRef.scrollLeft;
       const bottom: number = top + scrollableRef.scrollHeight;
@@ -270,15 +275,14 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       const paddingBox: Spacing = {
         top, right, bottom, left,
       };
-        // console.log('paddingBox', paddingBox);
-      const border: Spacing = base.border;
       const borderBox: Spacing = {
-        top: paddingBox.top - border.top,
-        right: paddingBox.right + border.right,
-        bottom: paddingBox.bottom + border.bottom,
-        left: paddingBox.left - border.left,
+        top: paddingBox.top - base.border.top,
+        right: paddingBox.right + base.border.right,
+        bottom: paddingBox.bottom + base.border.bottom,
+        left: paddingBox.left - base.border.left,
       };
-        // console.log('borderBox', borderBox);
+
+      console.log('borderBox', borderBox);
 
       const custom: BoxModel = createBox({
         borderBox,
@@ -286,6 +290,8 @@ export default class DroppableDimensionPublisher extends Component<Props> {
         border: base.border,
         padding: base.padding,
       });
+
+      console.log('marginBox', custom.marginBox)
 
       return custom;
     })();
