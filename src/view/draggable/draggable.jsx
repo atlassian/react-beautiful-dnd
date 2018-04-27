@@ -1,11 +1,10 @@
 // @flow
-import React, { Component, Fragment } from 'react';
-import type { Node } from 'react';
+import React, { Component, Fragment, type Node } from 'react';
+import { type Position } from 'css-box-model';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import type {
-  Position,
   DraggableDimension,
   InitialDragPositions,
   DroppableId,
@@ -15,12 +14,11 @@ import DraggableDimensionPublisher from '../draggable-dimension-publisher/';
 import Moveable from '../moveable/';
 import DragHandle from '../drag-handle';
 import getViewport from '../window/get-viewport';
-// eslint-disable-next-line no-duplicate-imports
 import type {
   DragHandleProps,
   Callbacks as DragHandleCallbacks,
 } from '../drag-handle/drag-handle-types';
-import getCenterPosition from '../get-center-position';
+import getBorderBoxCenterPosition from '../get-border-box-center-position';
 import Placeholder from '../placeholder';
 import { droppableIdKey, styleContextKey } from '../context-keys';
 import * as timings from '../../debug/timings';
@@ -117,7 +115,7 @@ export default class Draggable extends Component<Props> {
 
     const initial: InitialDragPositions = {
       selection: client,
-      center: getCenterPosition(ref),
+      borderBoxCenter: getBorderBoxCenterPosition(ref),
     };
 
     lift(draggableId, initial, getViewport(), autoScrollMode);

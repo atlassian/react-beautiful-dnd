@@ -1,11 +1,11 @@
 // @flow
+import { type Position } from 'css-box-model';
 import type {
   DragMovement,
   DraggableDimension,
   DroppableDimension,
   DragImpact,
   Axis,
-  Position,
   Displacement,
   Viewport,
 } from '../../types';
@@ -14,7 +14,7 @@ import getDisplacement from '../get-displacement';
 import withDroppableScroll from '../with-droppable-scroll';
 
 type Args = {|
-  pageCenter: Position,
+  pageBorderBoxCenter: Position,
   draggable: DraggableDimension,
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
@@ -23,7 +23,7 @@ type Args = {|
 |}
 
 export default ({
-  pageCenter,
+  pageBorderBoxCenter,
   draggable,
   destination,
   insideDestination,
@@ -37,7 +37,7 @@ export default ({
   // To do this we need to consider any displacement caused by
   // a change in scroll in the droppable we are currently over.
 
-  const currentCenter: Position = withDroppableScroll(destination, pageCenter);
+  const currentCenter: Position = withDroppableScroll(destination, pageBorderBoxCenter);
 
   const displaced: Displacement[] = insideDestination
     .filter((child: DraggableDimension): boolean => {

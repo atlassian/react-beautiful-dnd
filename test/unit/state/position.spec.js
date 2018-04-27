@@ -1,4 +1,5 @@
 // @flow
+import { type Position } from 'css-box-model';
 import {
   add,
   apply,
@@ -9,7 +10,6 @@ import {
   distance,
   closest,
 } from '../../../src/state/position';
-import type { Position } from '../../../src/types';
 
 const point1: Position = {
   x: 10,

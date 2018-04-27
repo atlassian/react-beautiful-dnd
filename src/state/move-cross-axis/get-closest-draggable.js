@@ -1,11 +1,11 @@
 // @flow
+import { type Position } from 'css-box-model';
 import { distance } from '../position';
 import { isTotallyVisible } from '../visibility/is-visible';
 import withDroppableDisplacement from '../with-droppable-displacement';
 import type {
   Viewport,
   Axis,
-  Position,
   DraggableDimension,
   DroppableDimension,
 } from '../../types';
@@ -13,7 +13,7 @@ import type {
 type Args = {|
   axis: Axis,
   viewport: Viewport,
-  pageCenter: Position,
+  pageBorderBoxCenter: Position,
   // the droppable that is being moved to
   destination: DroppableDimension,
   // the droppables inside the destination
@@ -23,7 +23,7 @@ type Args = {|
 export default ({
   axis,
   viewport,
-  pageCenter,
+  pageBorderBoxCenter,
   destination,
   insideDestination,
 }: Args): ?DraggableDimension => {
@@ -37,19 +37,19 @@ export default ({
     // Draggable must be totally visible to move to it
     .filter((draggable: DraggableDimension): boolean =>
       isTotallyVisible({
-        target: draggable.page.marginBox,
+        target: draggable.page.borderBox,
         destination,
         viewport: viewport.subject,
       }))
     .sort((a: DraggableDimension, b: DraggableDimension): number => {
       // Need to consider the change in scroll in the destination
       const distanceToA = distance(
-        pageCenter,
-        withDroppableDisplacement(destination, a.page.marginBox.center)
+        pageBorderBoxCenter,
+        withDroppableDisplacement(destination, a.page.borderBox.center)
       );
       const distanceToB = distance(
-        pageCenter,
-        withDroppableDisplacement(destination, b.page.marginBox.center)
+        pageBorderBoxCenter,
+        withDroppableDisplacement(destination, b.page.borderBox.center)
       );
 
       // if a is closer - return a
@@ -64,7 +64,7 @@ export default ({
 
       // if the distance to a and b are the same:
       // return the one that appears first on the main axis
-      return a.page.marginBox[axis.start] - b.page.marginBox[axis.start];
+      return a.page.borderBox[axis.start] - b.page.borderBox[axis.start];
     });
 
   return result.length ? result[0] : null;

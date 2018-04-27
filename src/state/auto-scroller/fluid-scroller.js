@@ -1,5 +1,6 @@
 // @flow
 import rafSchd from 'raf-schd';
+import type { Rect, Position, Spacing } from 'css-box-model';
 import { add, apply, isEqual, patch } from '../position';
 import getBestScrollableDroppable from './get-best-scrollable-droppable';
 import { horizontal, vertical } from '../axis';
@@ -8,16 +9,13 @@ import {
   canPartiallyScroll,
 } from './can-scroll';
 import type {
-  Area,
   Axis,
-  Spacing,
   DroppableId,
   DragState,
   DroppableDimension,
-  Position,
   State,
   DraggableDimension,
-  ClosestScrollable,
+  Scrollable,
   Viewport,
 } from '../../types';
 
@@ -47,7 +45,7 @@ export type PixelThresholds = {|
 |}
 
 // converts the percentages in the config into actual pixel values
-export const getPixelThresholds = (container: Area, axis: Axis): PixelThresholds => {
+export const getPixelThresholds = (container: Rect, axis: Axis): PixelThresholds => {
   const startFrom: number = container[axis.size] * config.startFrom;
   const maxSpeedAt: number = container[axis.size] * config.maxSpeedAt;
   const accelerationPlane: number = startFrom - maxSpeedAt;
@@ -85,8 +83,8 @@ const getSpeed = (distance: number, thresholds: PixelThresholds): number => {
 };
 
 type AdjustForSizeLimitsArgs = {|
-  container: Area,
-  subject: Area,
+  container: Rect,
+  subject: Rect,
   proposedScroll: Position,
 |}
 
@@ -117,8 +115,8 @@ const adjustForSizeLimits = ({
 };
 
 type GetRequiredScrollArgs = {|
-  container: Area,
-  subject: Area,
+  container: Rect,
+  subject: Rect,
   center: Position,
 |}
 
@@ -195,7 +193,7 @@ const withPlaceholder = (
   droppable: DroppableDimension,
   draggable: DraggableDimension,
 ): ?WithPlaceholderResult => {
-  const closest: ?ClosestScrollable = droppable.viewport.closestScrollable;
+  const closest: ?Scrollable = droppable.viewport.closestScrollable;
 
   if (!closest) {
     return null;
@@ -212,7 +210,7 @@ const withPlaceholder = (
 
   const spaceForPlaceholder: Position = patch(
     droppable.axis.line,
-    draggable.placeholder.borderBox[droppable.axis.size]
+    draggable.placeholder.client.borderBox[droppable.axis.size]
   );
 
   const newMax: Position = add(max, spaceForPlaceholder);
@@ -255,12 +253,12 @@ export default ({
       return;
     }
 
-    const center: Position = drag.current.page.center;
+    const center: Position = drag.current.page.borderBoxCenter;
 
     // 1. Can we scroll the viewport?
 
     const draggable: DraggableDimension = state.dimension.draggable[drag.initial.descriptor.id];
-    const subject: Area = draggable.page.marginBox;
+    const subject: Rect = draggable.page.marginBox;
     const viewport: Viewport = drag.current.viewport;
     const requiredWindowScroll: ?Position = getRequiredScroll({
       container: viewport.subject,
@@ -287,7 +285,7 @@ export default ({
     }
 
     // We know this has a closestScrollable
-    const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
+    const closestScrollable: ?Scrollable = droppable.viewport.closestScrollable;
 
     // this should never happen - just being safe
     if (!closestScrollable) {
@@ -295,7 +293,7 @@ export default ({
     }
 
     const requiredFrameScroll: ?Position = getRequiredScroll({
-      container: closestScrollable.frame,
+      container: closestScrollable.framePageMarginBox,
       subject,
       center,
     });

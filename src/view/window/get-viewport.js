@@ -1,7 +1,7 @@
 // @flow
 import invariant from 'tiny-invariant';
-import type { Position, Area, Viewport } from '../../types';
-import getArea from '../../state/get-area';
+import { getRect, type Rect, type Position } from 'css-box-model';
+import type { Viewport } from '../../types';
 import getWindowScroll from './get-window-scroll';
 import getMaxScroll from '../../state/get-max-scroll';
 
@@ -23,7 +23,7 @@ export default (): Viewport => {
   const right: number = left + width;
   const bottom: number = top + height;
 
-  const subject: Area = getArea({
+  const subject: Rect = getRect({
     top, left, right, bottom,
   });
 

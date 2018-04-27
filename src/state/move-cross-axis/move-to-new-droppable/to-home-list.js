@@ -1,4 +1,5 @@
 // @flow
+import { type Position } from 'css-box-model';
 import moveToEdge from '../../move-to-edge';
 import getDisplacement from '../../get-displacement';
 import withDroppableDisplacement from '../../with-droppable-displacement';
@@ -8,7 +9,6 @@ import type {
   Axis,
   Viewport,
   Displacement,
-  Position,
   DragImpact,
   DraggableDimension,
   DroppableDimension,
@@ -66,7 +66,7 @@ export default ({
     };
 
     return {
-      pageCenter: withDroppableDisplacement(droppable, newCenter),
+      pageBorderBoxCenter: withDroppableDisplacement(droppable, newCenter),
       impact: newImpact,
     };
   }
@@ -129,7 +129,7 @@ export default ({
   };
 
   return {
-    pageCenter: withDroppableDisplacement(droppable, newCenter),
+    pageBorderBoxCenter: withDroppableDisplacement(droppable, newCenter),
     impact: newImpact,
   };
 };

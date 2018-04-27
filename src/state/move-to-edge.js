@@ -1,17 +1,16 @@
 // @flow
+import { type Position, type Rect } from 'css-box-model';
 import { absolute, add, patch, subtract } from './position';
 import type {
   Axis,
-  Position,
-  Area,
 } from '../types';
 
 export type Edge = 'start' | 'end';
 
 type Args = {|
-  source: Area,
+  source: Rect,
   sourceEdge: Edge,
-  destination: Area,
+  destination: Rect,
   destinationEdge: Edge,
   destinationAxis: Axis,
 |}
@@ -33,7 +32,7 @@ export default ({
   destinationEdge,
   destinationAxis,
 }: Args): CenterPosition => {
-  const getCorner = (area: Area): Position => patch(
+  const getCorner = (area: Rect): Position => patch(
     destinationAxis.line,
     // it does not really matter what edge we use here
     // as the difference to the center from edges will be the same

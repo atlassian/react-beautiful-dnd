@@ -1,11 +1,8 @@
 // @flow
-/* eslint-disable react/no-multi-comp */
-import React, { Component } from 'react';
-import type { Node } from 'react';
+import React, { Component, type Node } from 'react';
 import ReactDOM from 'react-dom';
-import { mount } from 'enzyme';
-// eslint-disable-next-line no-duplicate-imports
-import type { ReactWrapper } from 'enzyme';
+import { mount, type ReactWrapper } from 'enzyme';
+import { getRect, type Position } from 'css-box-model';
 import Draggable, { zIndexOptions } from '../../../src/view/draggable/draggable';
 import DragHandle from '../../../src/view/drag-handle/drag-handle';
 import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
@@ -26,7 +23,6 @@ import type {
   StateSnapshot,
 } from '../../../src/view/draggable/draggable-types';
 import type {
-  Position,
   DraggableDimension,
   DroppableDimension,
   DraggableId,
@@ -35,8 +31,7 @@ import type {
   InitialDragPositions,
   Viewport,
 } from '../../../src/types';
-import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
-import getArea from '../../../src/state/get-area';
+import { getDraggableDimension, getDroppableDimension } from '../../utils/dimension';
 import { combine, withStore, withDroppableId, withStyleContext, withDimensionMarshal, withCanLift } from '../../utils/get-context-options';
 import { dispatchWindowMouseEvent, mouseEvent } from '../../utils/user-input-util';
 import getViewport from '../../../src/view/window/get-viewport';
@@ -70,12 +65,12 @@ const droppable: DroppableDimension = getDroppableDimension({
     id: droppableId,
     type,
   },
-  borderBox: getArea({
+  borderBox: {
     top: 0,
     right: 100,
     bottom: 200,
     left: 0,
-  }),
+  },
 });
 
 const dimension: DraggableDimension = getDraggableDimension({
@@ -84,12 +79,12 @@ const dimension: DraggableDimension = getDraggableDimension({
     droppableId,
     index: 0,
   },
-  borderBox: getArea({
+  borderBox: {
     top: 0,
     right: 100,
     bottom: 100,
     left: 0,
-  }),
+  },
 });
 
 const getDispatchPropsStub = (): DispatchProps => ({
@@ -215,26 +210,26 @@ const windowMouseMove = dispatchWindowMouseEvent.bind(null, 'mousemove');
 
 type StartDrag = {|
   selection?: Position,
-  center ?: Position,
+  borderBoxCenter ?: Position,
   viewport?: Viewport,
   isScrollAllowed?: boolean,
 |}
 
-const stubArea = (center?: Position = origin): void =>
+const stubArea = (borderBoxCenter?: Position = origin): void =>
   // $ExpectError
-  jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => getArea({
+  jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => getRect({
     left: 0,
     top: 0,
-    right: center.x * 2,
-    bottom: center.y * 2,
+    right: borderBoxCenter.x * 2,
+    bottom: borderBoxCenter.y * 2,
   }));
 
 const executeOnLift = (wrapper: ReactWrapper) => ({
   selection = origin,
-  center = origin,
+  borderBoxCenter = origin,
   viewport = getViewport(),
 }: StartDrag = {}) => {
-  stubArea(center);
+  stubArea(borderBoxCenter);
   setViewport(viewport);
 
   wrapper.find(DragHandle).props().callbacks.onLift({
@@ -269,7 +264,7 @@ const getStubber = stub =>
 const customViewport: Viewport = {
   scroll: { x: 100, y: 200 },
   maxScroll: { x: 600, y: 600 },
-  subject: getArea({ top: 200, left: 100, right: 300, bottom: 300 }),
+  subject: getRect({ top: 200, left: 100, right: 300, bottom: 300 }),
 };
 
 const loseFocus = (wrapper: ReactWrapper) => {
@@ -345,10 +340,10 @@ describe('Draggable - unconnected', () => {
 
     const startDragWithHandle = (wrapper: ReactWrapper) => ({
       selection = origin,
-      center = origin,
+      borderBoxCenter = origin,
     }: StartDrag = {}) => {
       // fake some position to get the center we want
-      stubArea(center);
+      stubArea(borderBoxCenter);
 
       mouseDown(wrapper, subtract(selection, { x: 0, y: sloppyClickThreshold }));
       windowMouseMove(selection);
@@ -443,16 +438,16 @@ describe('Draggable - unconnected', () => {
             x: 100,
             y: 200,
           };
-          const center: Position = {
+          const borderBoxCenter: Position = {
             x: 50,
             y: 60,
           };
           const initial: InitialDragPositions = {
             selection,
-            center,
+            borderBoxCenter,
           };
 
-          executeOnLift(managedWrapper)({ selection, center, viewport: customViewport });
+          executeOnLift(managedWrapper)({ selection, borderBoxCenter, viewport: customViewport });
 
           // $ExpectError - mock property on lift function
           expect(dispatchProps.lift.mock.calls[0]).toEqual([
@@ -848,12 +843,12 @@ describe('Draggable - unconnected', () => {
       const props: Object = child.props();
 
       expect(props.style).toEqual({
-        width: dimension.placeholder.borderBox.width,
-        height: dimension.placeholder.borderBox.height,
-        marginTop: dimension.placeholder.margin.top,
-        marginBottom: dimension.placeholder.margin.bottom,
-        marginLeft: dimension.placeholder.margin.left,
-        marginRight: dimension.placeholder.margin.right,
+        width: dimension.placeholder.client.borderBox.width,
+        height: dimension.placeholder.client.borderBox.height,
+        marginTop: dimension.placeholder.client.margin.top,
+        marginBottom: dimension.placeholder.client.margin.bottom,
+        marginLeft: dimension.placeholder.client.margin.left,
+        marginRight: dimension.placeholder.client.margin.right,
         display: dimension.placeholder.display,
         flexShrink: '0',
         flexGrow: '0',

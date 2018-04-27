@@ -1,8 +1,8 @@
 // @flow
 import React, { Component } from 'react';
+import { type Position } from 'css-box-model';
 import { Motion, spring } from 'react-motion';
 import { physics } from '../animation';
-import type { Position } from '../../types';
 import type { Props, DefaultProps, Style } from './moveable-types';
 
 type PositionLike = {|

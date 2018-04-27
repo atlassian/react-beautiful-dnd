@@ -1,35 +1,62 @@
 // @flow
-import getArea from '../../src/state/get-area';
+import {
+  createBox,
+  getRect,
+  withScroll,
+  type Rect,
+  type BoxModel,
+  type Spacing,
+  type Position,
+} from 'css-box-model';
 import { noMovement } from '../../src/state/no-impact';
-import { getDroppableDimension, getDraggableDimension } from '../../src/state/dimension';
 import { vertical } from '../../src/state/axis';
+import { noSpacing } from '../../src/state/spacing';
+import { getDroppableDimension as getDroppable, type Closest } from '../../src/state/droppable-dimension';
 import type {
-  Area,
   Axis,
+  Placeholder,
   DragImpact,
   State,
-  Position,
-  ClosestScrollable,
-  Spacing,
+  Scrollable,
+  DraggableDescriptor,
+  DroppableDescriptor,
   DroppableDimension,
   DraggableDimension,
   DraggableDimensionMap,
   DroppableDimensionMap,
 } from '../../src/types';
 
-const margin: Spacing = { top: 10, left: 10, bottom: 5, right: 5 };
-const padding: Spacing = { top: 2, left: 2, bottom: 2, right: 2 };
-const windowScroll: Position = { x: 50, y: 100 };
-const crossAxisStart: number = 0;
-const crossAxisEnd: number = 100;
-const foreignCrossAxisStart: number = 100;
-const foreignCrossAxisEnd: number = 200;
-const emptyForeignCrossAxisStart: number = 200;
-const emptyForeignCrossAxisEnd: number = 300;
+type GetComputedSpacingArgs = {|
+  margin?: Spacing,
+  padding?: Spacing,
+  border ?: Spacing,
+  display?: string,
+|}
+
+export const getComputedSpacing = ({
+  margin = noSpacing,
+  padding = noSpacing,
+  border = noSpacing,
+  display = 'block',
+}: GetComputedSpacingArgs): Object => ({
+  paddingTop: `${padding.top}px`,
+  paddingRight: `${padding.right}px`,
+  paddingBottom: `${padding.bottom}px`,
+  paddingLeft: `${padding.left}px`,
+  marginTop: `${margin.top}px`,
+  marginRight: `${margin.right}px`,
+  marginBottom: `${margin.bottom}px`,
+  marginLeft: `${margin.left}px`,
+  borderTopWidth: `${border.top}px`,
+  borderRightWidth: `${border.right}px`,
+  borderBottomWidth: `${border.bottom}px`,
+  borderLeftWidth: `${border.left}px`,
+  display,
+});
 
 export const makeScrollable = (droppable: DroppableDimension, amount?: number = 20) => {
   const axis: Axis = droppable.axis;
-  const borderBox: Area = droppable.client.borderBox;
+  const borderBox: Rect = droppable.client.borderBox;
 
   const horizontalGrowth: number = axis === vertical ? 0 : amount;
   const verticalGrowth: number = axis === vertical ? amount : 0;
@@ -37,7 +64,7 @@ export const makeScrollable = (droppable: DroppableDimension, amount?: number = 
   // is 10px smaller than the client on the main axis
   // this will leave 10px of scrollable area.
   // only expanding on one axis
-  const newPaddingBox: Area = getArea({
+  const newBorderBox: Rect = getRect({
     top: borderBox.top,
     left: borderBox.left,
     // growing the client to account for the scrollable area
@@ -51,15 +78,27 @@ export const makeScrollable = (droppable: DroppableDimension, amount?: number = 
     height: borderBox.height + verticalGrowth,
   };
 
-  return getDroppableDimension({
+  const newClient: BoxModel = createBox({
+    borderBox: newBorderBox,
+    border: droppable.client.border,
+    padding: droppable.client.padding,
+    margin: droppable.client.margin,
+  });
+
+  // eslint-disable-next-line no-use-before-define
+  const preset = getPreset();
+  const newPage: BoxModel = withScroll(newClient, preset.windowScroll);
+
+  return getDroppable({
     descriptor: droppable.descriptor,
+    isEnabled: droppable.isEnabled,
     direction: axis.direction,
-    padding,
-    margin,
-    windowScroll,
-    borderBox: newPaddingBox,
+    client: newClient,
+    page: newPage,
     closest: {
-      frameBorderBox: borderBox,
+      // using old dimensions for frame
+      client: droppable.client,
+      page: droppable.page,
       scrollWidth: scrollSize.width,
       scrollHeight: scrollSize.height,
       scroll: { x: 0, y: 0 },
@@ -130,30 +169,163 @@ export const addDraggable = (base: State, draggable: DraggableDimension): State 
   },
 });
 
-export const getClosestScrollable = (droppable: DroppableDimension): ClosestScrollable => {
+const getPlaceholder = (client: BoxModel): Placeholder => ({
+  client,
+  tagName: 'div',
+  display: 'block',
+});
+
+export const getClosestScrollable = (droppable: DroppableDimension): Scrollable => {
   if (!droppable.viewport.closestScrollable) {
     throw new Error('Cannot get closest scrollable');
   }
   return droppable.viewport.closestScrollable;
 };
 
+type GetDraggableArgs = {|
+  descriptor: DraggableDescriptor,
+  borderBox: Spacing,
+  windowScroll?: Position,
+  margin ?: Spacing,
+  padding ?: Spacing,
+  border?: Spacing,
+|}
+
+export const getDraggableDimension = ({
+  descriptor,
+  borderBox,
+  windowScroll,
+  margin,
+  border,
+  padding,
+}: GetDraggableArgs): DraggableDimension => {
+  const client: BoxModel = createBox({
+    borderBox,
+    margin,
+    padding,
+    border,
+  });
+
+  const result: DraggableDimension = {
+    descriptor,
+    client,
+    page: withScroll(client, windowScroll),
+    placeholder: getPlaceholder(client),
+  };
+
+  return result;
+};
+
+type ClosestSubset = {|
+  borderBox: Spacing,
+  margin?: Spacing,
+  border?: Spacing,
+  padding?: Spacing,
+  scrollHeight: number,
+  scrollWidth: number,
+  scroll: Position,
+  shouldClipSubject: boolean,
+|}
+
+type GetDroppableArgs = {|
+  descriptor: DroppableDescriptor,
+  borderBox: Spacing,
+  direction?: 'vertical' | 'horizontal',
+  margin ?: Spacing,
+  border?: Spacing,
+  padding?: Spacing,
+  windowScroll?: Position,
+  closest?: ?ClosestSubset,
+  isEnabled?: boolean,
+|}
+
+export const getDroppableDimension = ({
+  descriptor,
+  borderBox,
+  margin,
+  padding,
+  border,
+  windowScroll,
+  closest,
+  isEnabled = true,
+  direction = 'vertical',
+}: GetDroppableArgs): DroppableDimension => {
+  const client: BoxModel = createBox({
+    borderBox,
+    margin,
+    padding,
+    border,
+  });
+  const page: BoxModel = withScroll(client, windowScroll);
+
+  const closestScrollable: ?Closest = (() => {
+    if (!closest) {
+      return null;
+    }
+
+    const frameClient: BoxModel = createBox({
+      borderBox: closest.borderBox,
+      border: closest.border,
+      padding: closest.padding,
+      margin: closest.margin,
+    });
+
+    const framePage: BoxModel = withScroll(frameClient, windowScroll);
+
+    const result: Closest = {
+      client: frameClient,
+      page: framePage,
+      scrollHeight: closest.scrollHeight,
+      scrollWidth: closest.scrollWidth,
+      scroll: closest.scroll,
+      shouldClipSubject: closest.shouldClipSubject,
+    };
+
+    return result;
+  })();
+
+  return getDroppable({
+    descriptor,
+    isEnabled,
+    direction,
+    client,
+    page,
+    closest: closestScrollable,
+  });
+};
+
+export const withAssortedSpacing = () => {
+  const margin: Spacing = { top: 10, left: 10, bottom: 5, right: 5 };
+  const padding: Spacing = { top: 2, left: 2, bottom: 2, right: 2 };
+  const border: Spacing = { top: 1, left: 2, bottom: 3, right: 4 };
+
+  return { margin, padding, border };
+};
+
 export const getPreset = (axis?: Axis = vertical) => {
+  const windowScroll: Position = { x: 50, y: 100 };
+  const crossAxisStart: number = 0;
+  const crossAxisEnd: number = 100;
+  const foreignCrossAxisStart: number = 100;
+  const foreignCrossAxisEnd: number = 200;
+  const emptyForeignCrossAxisStart: number = 200;
+  const emptyForeignCrossAxisEnd: number = 300;
+
   const home: DroppableDimension = getDroppableDimension({
     descriptor: {
       id: 'home',
       type: 'TYPE',
     },
-    direction: axis.direction,
-    padding,
-    margin,
-    windowScroll,
-    borderBox: getArea({
+    borderBox: {
       // would be 0 but pushed forward by margin
       [axis.start]: 10,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
       [axis.end]: 200,
-    }),
+    },
+    ...withAssortedSpacing(),
+    windowScroll,
+    direction: axis.direction,
   });
 
   const foreign: DroppableDimension = getDroppableDimension({
@@ -161,17 +333,15 @@ export const getPreset = (axis?: Axis = vertical) => {
       id: 'foreign',
       type: 'TYPE',
     },
-    padding,
-    margin,
-    windowScroll,
-    direction: axis.direction,
-    borderBox: getArea({
-      // would be 0 but pushed forward by margin
+    borderBox: {
       [axis.start]: 10,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
       [axis.end]: 200,
-    }),
+    },
+    ...withAssortedSpacing(),
+    windowScroll,
+    direction: axis.direction,
   });
 
   const emptyForeign: DroppableDimension = getDroppableDimension({
@@ -179,37 +349,35 @@ export const getPreset = (axis?: Axis = vertical) => {
       id: 'empty-foreign',
       type: 'TYPE',
     },
-    padding,
-    margin,
-    windowScroll,
-    direction: axis.direction,
-    borderBox: getArea({
+    borderBox: {
       // would be 0 but pushed forward by margin
       [axis.start]: 10,
       [axis.crossAxisStart]: emptyForeignCrossAxisStart,
       [axis.crossAxisEnd]: emptyForeignCrossAxisEnd,
       [axis.end]: 200,
-    }),
+    },
+    ...withAssortedSpacing(),
+    windowScroll,
+    direction: axis.direction,
   });
 
-  // size: 10
   const inHome1: DraggableDimension = getDraggableDimension({
     descriptor: {
       id: 'inhome1',
       droppableId: home.descriptor.id,
       index: 0,
     },
-    margin,
-    windowScroll,
-    borderBox: getArea({
+    borderBox: {
       // starting at start of home
       [axis.start]: 10,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
       [axis.end]: 20,
-    }),
+    },
+    windowScroll,
+    ...withAssortedSpacing(),
   });
-  // size: 20
+    // size: 20
   const inHome2: DraggableDimension = getDraggableDimension({
     descriptor: {
       id: 'inhome2',
@@ -217,14 +385,14 @@ export const getPreset = (axis?: Axis = vertical) => {
       index: 1,
     },
     // pushed forward by margin of inHome1
-    margin,
-    windowScroll,
-    borderBox: getArea({
+    borderBox: {
       [axis.start]: 30,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
       [axis.end]: 50,
-    }),
+    },
+    ...withAssortedSpacing(),
+    windowScroll,
   });
   // size: 30
   const inHome3: DraggableDimension = getDraggableDimension({
@@ -233,49 +401,47 @@ export const getPreset = (axis?: Axis = vertical) => {
       droppableId: home.descriptor.id,
       index: 2,
     },
-    margin,
-    windowScroll,
-    // pushed forward by margin of inHome2
-    borderBox: getArea({
+    borderBox: {
       [axis.start]: 60,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
       [axis.end]: 90,
-    }),
+    },
+    ...withAssortedSpacing(),
+    windowScroll,
   });
-  // size: 40
+    // size: 40
   const inHome4: DraggableDimension = getDraggableDimension({
     descriptor: {
       id: 'inhome4',
       droppableId: home.descriptor.id,
       index: 3,
     },
-    // pushed forward by margin of inHome3
-    margin,
-    windowScroll,
-    borderBox: getArea({
+    borderBox: {
       [axis.start]: 100,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
       [axis.end]: 140,
-    }),
+    },
+    ...withAssortedSpacing(),
+    windowScroll,
   });
 
-  // size: 10
+    // size: 10
   const inForeign1: DraggableDimension = getDraggableDimension({
     descriptor: {
       id: 'inForeign1',
       droppableId: foreign.descriptor.id,
       index: 0,
     },
-    margin,
-    windowScroll,
-    borderBox: getArea({
+    borderBox: {
       [axis.start]: 10,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
       [axis.end]: 20,
-    }),
+    },
+    ...withAssortedSpacing(),
+    windowScroll,
   });
   // size: 20
   const inForeign2: DraggableDimension = getDraggableDimension({
@@ -284,15 +450,14 @@ export const getPreset = (axis?: Axis = vertical) => {
       droppableId: foreign.descriptor.id,
       index: 1,
     },
-    // pushed forward by margin of inForeign1
-    margin,
-    windowScroll,
-    borderBox: getArea({
+    borderBox: {
       [axis.start]: 30,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
       [axis.end]: 50,
-    }),
+    },
+    ...withAssortedSpacing(),
+    windowScroll,
   });
   // size: 30
   const inForeign3: DraggableDimension = getDraggableDimension({
@@ -301,15 +466,14 @@ export const getPreset = (axis?: Axis = vertical) => {
       droppableId: foreign.descriptor.id,
       index: 2,
     },
-    margin,
-    windowScroll,
-    // pushed forward by margin of inForeign2
-    borderBox: getArea({
+    borderBox: {
       [axis.start]: 60,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
       [axis.end]: 90,
-    }),
+    },
+    ...withAssortedSpacing(),
+    windowScroll,
   });
   // size: 40
   const inForeign4: DraggableDimension = getDraggableDimension({
@@ -318,15 +482,14 @@ export const getPreset = (axis?: Axis = vertical) => {
       droppableId: foreign.descriptor.id,
       index: 3,
     },
-    margin,
-    windowScroll,
-    // pushed forward by margin of inForeign3
-    borderBox: getArea({
+    borderBox: {
       [axis.start]: 100,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
       [axis.end]: 140,
-    }),
+    },
+    ...withAssortedSpacing(),
+    windowScroll,
   });
 
   const droppables: DroppableDimensionMap = {

@@ -1,4 +1,5 @@
 // @flow
+import { type Position } from 'css-box-model';
 import type {
   DraggableId,
   DroppableId,
@@ -8,7 +9,6 @@ import type {
   DroppableDimension,
   InitialDragPositions,
   DraggableLocation,
-  Position,
   Dispatch,
   State,
   CurrentDrag,
@@ -21,7 +21,7 @@ import type {
 } from '../types';
 import noImpact from './no-impact';
 import withDroppableDisplacement from './with-droppable-displacement';
-import getNewHomeClientCenter from './get-new-home-client-center';
+import getNewHomeClientBorderBoxCenter from './get-new-home-client-border-box-center';
 import { add, subtract, isEqual } from './position';
 import * as timings from '../debug/timings';
 
@@ -344,14 +344,14 @@ export const drop = () =>
       reason: 'DROP',
     };
 
-    const newCenter: Position = getNewHomeClientCenter({
+    const newBorderBoxCenter: Position = getNewHomeClientBorderBoxCenter({
       movement: impact.movement,
       draggable,
       draggables: state.dimension.draggable,
       destination,
     });
 
-    const clientOffset: Position = subtract(newCenter, draggable.client.marginBox.center);
+    const clientOffset: Position = subtract(newBorderBoxCenter, draggable.client.borderBox.center);
     const scrollDiff: Position = getScrollDiff({
       initial,
       current,

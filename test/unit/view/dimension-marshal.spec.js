@@ -1,8 +1,7 @@
 // @flow
-import { getPreset } from '../../utils/dimension';
+import { type Spacing } from 'css-box-model';
+import { getPreset, getDraggableDimension, getDroppableDimension } from '../../utils/dimension';
 import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
-import { getDraggableDimension, getDroppableDimension } from '../../../src/state/dimension';
-import getArea from '../../../src/state/get-area';
 import getStatePreset from '../../utils/get-simple-state-preset';
 import type {
   Callbacks,
@@ -21,7 +20,6 @@ import type {
   DraggableDescriptor,
   DroppableDescriptor,
   ScrollOptions,
-  Area,
 } from '../../../src/types';
 
 const getCallbackStub = (): Callbacks => {
@@ -107,16 +105,16 @@ const populateMarshal = (
   return watches;
 };
 
-const fakeArea: Area = getArea({
+const fakeBorderBox: Spacing = {
   top: 0, right: 100, bottom: 100, left: 0,
-});
+};
 
 const ofAnotherType: DroppableDimension = getDroppableDimension({
   descriptor: {
     id: 'of-another-type',
     type: 'another-type',
   },
-  borderBox: fakeArea,
+  borderBox: fakeBorderBox,
 });
 const childOfAnotherType: DraggableDimension = getDraggableDimension({
   descriptor: {
@@ -124,7 +122,7 @@ const childOfAnotherType: DraggableDimension = getDraggableDimension({
     droppableId: ofAnotherType.descriptor.id,
     index: 0,
   },
-  borderBox: fakeArea,
+  borderBox: fakeBorderBox,
 });
 
 const immediate: ScrollOptions = {
@@ -1084,9 +1082,9 @@ describe('dimension marshal', () => {
               id: preset.home.descriptor.id,
               type: preset.home.descriptor.type,
             },
-            borderBox: getArea({
+            borderBox: {
               top: 0, left: 0, right: 100, bottom: 100,
-            }),
+            },
           });
           const getNewDimension = jest.fn().mockImplementation(() => newDimension);
           marshal.registerDroppable(newDimension.descriptor, {
@@ -1160,9 +1158,9 @@ describe('dimension marshal', () => {
               droppableId: preset.inHome2.descriptor.droppableId,
               index: 400,
             },
-            borderBox: getArea({
+            borderBox: {
               top: 0, left: 0, right: 100, bottom: 100,
-            }),
+            },
           });
           const getNewDimension: GetDraggableDimensionFn =
               jest.fn().mockImplementation(() => newDimension);
@@ -1200,7 +1198,7 @@ describe('dimension marshal', () => {
               droppableId: preset.home.descriptor.id,
               index: preset.inHomeList.length,
             },
-            borderBox: fakeArea,
+            borderBox: fakeBorderBox,
           });
 
           // start a collection

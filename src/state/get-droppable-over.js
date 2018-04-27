@@ -1,20 +1,18 @@
 // @flow
 import memoizeOne from 'memoize-one';
-import getArea from './get-area';
+import { getRect, type Rect, type Position } from 'css-box-model';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
 import isPositionInFrame from './visibility/is-position-in-frame';
 import { patch } from './position';
 import { expandByPosition } from './spacing';
-import { clip } from './dimension';
+import { clip } from './droppable-dimension';
 import type {
-  ClosestScrollable,
+  Scrollable,
   DraggableDimension,
   DraggableDimensionMap,
   DroppableDimension,
   DroppableDimensionMap,
   DroppableId,
-  Position,
-  Area,
 } from '../types';
 
 const getRequiredGrowth = memoizeOne((
@@ -65,42 +63,43 @@ type GetBufferedDroppableArgs = {
   previousDroppableOverId: ?DroppableId,
 };
 
+// TODO: should only expand on the main axis
 const getWithGrowth = memoizeOne(
-  (area: Area, growth: Position): Area => getArea(expandByPosition(area, growth))
+  (area: Rect, growth: Position): Rect => getRect(expandByPosition(area, growth))
 );
 
-const getClippedAreaWithPlaceholder = ({
+const getClippedRectWithPlaceholder = ({
   draggable,
   draggables,
   droppable,
   previousDroppableOverId,
-}: GetBufferedDroppableArgs): ?Area => {
+}: GetBufferedDroppableArgs): ?Rect => {
   const isHome: boolean = draggable.descriptor.droppableId === droppable.descriptor.id;
   const wasOver: boolean = Boolean(
     previousDroppableOverId &&
     previousDroppableOverId === droppable.descriptor.id
   );
-  const clipped: ?Area = droppable.viewport.clipped;
+  const clippedPageMarginBox: ?Rect = droppable.viewport.clippedPageMarginBox;
 
   // clipped area is totally hidden behind frame
-  if (!clipped) {
-    return clipped;
+  if (!clippedPageMarginBox) {
+    return clippedPageMarginBox;
   }
 
   // We only include the placeholder size if it's a
   // foreign list and is currently being hovered over
   if (isHome || !wasOver) {
-    return clipped;
+    return clippedPageMarginBox;
   }
 
   const requiredGrowth: ?Position = getRequiredGrowth(draggable, draggables, droppable);
 
   if (!requiredGrowth) {
-    return clipped;
+    return clippedPageMarginBox;
   }
 
-  const subjectWithGrowth: Area = getWithGrowth(clipped, requiredGrowth);
-  const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
+  const subjectWithGrowth: Rect = getWithGrowth(clippedPageMarginBox, requiredGrowth);
+  const closestScrollable: ?Scrollable = droppable.viewport.closestScrollable;
 
   // The droppable has no scroll container
   if (!closestScrollable) {
@@ -114,7 +113,7 @@ const getClippedAreaWithPlaceholder = ({
 
   // We need to clip the new subject by the frame which does not change
   // This will allow the user to continue to scroll into the placeholder
-  return clip(closestScrollable.frame, subjectWithGrowth);
+  return clip(closestScrollable.framePageMarginBox, subjectWithGrowth);
 };
 
 type Args = {|
@@ -141,7 +140,7 @@ export default ({
         // If previously dragging over a droppable we give it a
         // bit of room on the subsequent drags so that user and move
         // items in the space that the placeholder takes up
-        const withPlaceholder: ?Area = getClippedAreaWithPlaceholder({
+        const withPlaceholder: ?Rect = getClippedRectWithPlaceholder({
           draggable, draggables, droppable, previousDroppableOverId,
         });
 

@@ -1,5 +1,5 @@
 // @flow
-import type { Node } from 'react';
+import { type Node } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import memoizeOne from 'memoize-one';

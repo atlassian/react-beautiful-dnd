@@ -1,21 +1,24 @@
 // @flow
+import {
+  createBox,
+  getRect,
+  type BoxModel,
+  type Position,
+} from 'css-box-model';
 import type {
-  Area,
   Axis,
-  Position,
   State,
   DroppableDimension,
   Viewport,
 } from '../../../../src/types';
 import type { AutoScroller } from '../../../../src/state/auto-scroller/auto-scroller-types';
 import { add, patch, subtract, negate } from '../../../../src/state/position';
-import getArea from '../../../../src/state/get-area';
 import { createViewport, withWindowScrollSize, scrollViewport } from '../../../utils/viewport';
 import { vertical, horizontal } from '../../../../src/state/axis';
 import createAutoScroller from '../../../../src/state/auto-scroller';
 import getStatePreset from '../../../utils/get-simple-state-preset';
-import { getPreset, addDroppable } from '../../../utils/dimension';
-import { getDroppableDimension, scrollDroppable } from '../../../../src/state/dimension';
+import { getPreset, addDroppable, getDroppableDimension } from '../../../utils/dimension';
+import { scrollDroppable } from '../../../../src/state/droppable-dimension';
 import getMaxScroll from '../../../../src/state/get-max-scroll';
 
 const origin: Position = { x: 0, y: 0 };
@@ -25,7 +28,7 @@ const windowScrollSize = {
   scrollWidth: 1600,
 };
 const scrollableViewport: Viewport = createViewport({
-  subject: getArea({
+  subject: getRect({
     top: 0,
     left: 0,
     right: 800,
@@ -199,25 +202,27 @@ describe('jump auto scrolling', () => {
           scrollWidth: 800,
           scrollHeight: 800,
         };
-        const frame: Area = getArea({
-          top: 0,
-          left: 0,
-          right: 600,
-          bottom: 600,
+        const frameClient: BoxModel = createBox({
+          borderBox: {
+            top: 0,
+            left: 0,
+            right: 600,
+            bottom: 600,
+          },
         });
         const scrollable: DroppableDimension = getDroppableDimension({
           // stealing the home descriptor so that the dragging item will
           // be within in
           descriptor: preset.home.descriptor,
-          borderBox: getArea({
+          borderBox: {
             top: 0,
             left: 0,
             // bigger than the frame
             right: scrollableScrollSize.scrollWidth,
             bottom: scrollableScrollSize.scrollHeight,
-          }),
+          },
           closest: {
-            frameBorderBox: frame,
+            borderBox: frameClient.borderBox,
             scrollWidth: scrollableScrollSize.scrollWidth,
             scrollHeight: scrollableScrollSize.scrollHeight,
             scroll: { x: 0, y: 0 },

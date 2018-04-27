@@ -1,5 +1,6 @@
 // @flow
 import React, { type Node } from 'react';
+import { type Position } from 'css-box-model';
 import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
 import createHookCaller from '../../state/hooks/hook-caller';
@@ -23,7 +24,6 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DroppableId,
-  Position,
   Hooks,
   Viewport,
 } from '../../types';

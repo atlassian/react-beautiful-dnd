@@ -1,7 +1,8 @@
 // @flow
+import { type Spacing } from 'css-box-model';
 import isTotallyVisibleThroughFrame from '../../../../src/state/visibility/is-totally-visible-through-frame';
-import { offsetByPosition, expandBySpacing } from '../../../../src/state/spacing';
-import type { Spacing } from '../../../../src/types';
+import { offsetByPosition } from '../../../../src/state/spacing';
+import { expandBySpacing } from '../../../utils/spacing';
 
 const frame: Spacing = {
   top: 0, left: 0, right: 100, bottom: 100,

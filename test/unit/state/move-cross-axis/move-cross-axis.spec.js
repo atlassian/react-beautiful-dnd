@@ -2,9 +2,7 @@
 import moveCrossAxis from '../../../../src/state/move-cross-axis/';
 import noImpact from '../../../../src/state/no-impact';
 import getViewport from '../../../../src/view/window/get-viewport';
-import getArea from '../../../../src/state/get-area';
-import { getDroppableDimension, getDraggableDimension } from '../../../../src/state/dimension';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset, getDroppableDimension, getDraggableDimension } from '../../../utils/dimension';
 import type { Result } from '../../../../src/state/move-cross-axis/move-cross-axis-types';
 import type {
   Viewport,
@@ -27,12 +25,12 @@ describe('move cross axis', () => {
         id: 'custom',
         type: 'TYPE',
       },
-      borderBox: getArea({
-        left: preset.home.client.marginBox.left + 1,
-        right: preset.home.client.marginBox.left + 10,
+      borderBox: {
+        left: preset.home.client.borderBox.left + 1,
+        right: preset.home.client.borderBox.left + 10,
         top: 0,
         bottom: viewport.subject.bottom + 200,
-      }),
+      },
     });
     const notVisible: DraggableDimension = getDraggableDimension({
       descriptor: {
@@ -40,13 +38,13 @@ describe('move cross axis', () => {
         droppableId: custom.descriptor.id,
         index: 0,
       },
-      borderBox: getArea({
-        left: preset.home.client.marginBox.left + 1,
-        right: preset.home.client.marginBox.left + 10,
+      borderBox: {
+        left: preset.home.client.borderBox.left + 1,
+        right: preset.home.client.borderBox.left + 10,
         // outside of the viewport
         top: viewport.subject.bottom + 1,
         bottom: viewport.subject.bottom + 10,
-      }),
+      },
     });
     const draggables: DraggableDimensionMap = {
       ...preset.draggables,
@@ -59,7 +57,7 @@ describe('move cross axis', () => {
 
     const result: ?Result = moveCrossAxis({
       isMovingForward: true,
-      pageCenter: preset.inHome1.page.marginBox.center,
+      pageBorderBoxCenter: preset.inHome1.page.borderBox.center,
       draggableId: preset.inHome1.descriptor.id,
       droppableId: preset.home.descriptor.id,
       home: {
@@ -79,7 +77,7 @@ describe('move cross axis', () => {
   it('should return a droppable if its children are visible (and all other criteria are met)', () => {
     const result: ?Result = moveCrossAxis({
       isMovingForward: true,
-      pageCenter: preset.inHome1.page.marginBox.center,
+      pageBorderBoxCenter: preset.inHome1.page.borderBox.center,
       draggableId: preset.inHome1.descriptor.id,
       droppableId: preset.home.descriptor.id,
       home: {

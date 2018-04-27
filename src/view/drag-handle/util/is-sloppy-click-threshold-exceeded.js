@@ -1,5 +1,5 @@
 // @flow
-import type { Position } from '../../../types';
+import { type Position } from 'css-box-model';
 // The amount of pixels that need to move before we consider the movement
 // a drag rather than a click.
 export const sloppyClickThreshold: number = 5;

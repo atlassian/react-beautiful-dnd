@@ -1,12 +1,11 @@
 // @flow
+import { type Position, type Rect } from 'css-box-model';
 import type {
   Axis,
   DraggableDimension,
   DraggableDimensionMap,
   DragMovement,
   DroppableDimension,
-  Position,
-  Area,
 } from '../types';
 import moveToEdge from './move-to-edge';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
@@ -27,11 +26,11 @@ export default ({
   draggables,
   destination,
 }: NewHomeArgs): Position => {
-  const homeCenter: Position = draggable.client.marginBox.center;
+  const originalCenter: Position = draggable.client.borderBox.center;
 
   // not dropping anywhere
   if (destination == null) {
-    return homeCenter;
+    return originalCenter;
   }
 
   const { displaced, isBeyondStartPosition } = movement;
@@ -42,7 +41,7 @@ export default ({
 
   // dropping back into home index
   if (isWithinHomeDroppable && !displaced.length) {
-    return homeCenter;
+    return originalCenter;
   }
 
   // All the draggables in the destination (even the ones that haven't moved)
@@ -51,15 +50,15 @@ export default ({
   );
 
   // Find the dimension we need to compare the dragged item with
-  const destinationFragment: Area = (() => {
+  const movingRelativeTo: Rect = (() => {
     if (isWithinHomeDroppable) {
-      return draggables[displaced[0].draggableId].client.marginBox;
+      return draggables[displaced[0].draggableId].client.borderBox;
     }
 
-    // Not in home list
+    // In a foreign list
 
     if (displaced.length) {
-      return draggables[displaced[0].draggableId].client.marginBox;
+      return draggables[displaced[0].draggableId].client.borderBox;
     }
 
     // If we're dragging to the last place in a new droppable
@@ -97,13 +96,13 @@ export default ({
     return { sourceEdge: 'start', destinationEdge: 'start' };
   })();
 
-  const source: Area = draggable.client.marginBox;
+  const source: Rect = draggable.client.borderBox;
 
   // This is the draggable's new home
   const targetCenter: Position = moveToEdge({
     source,
     sourceEdge,
-    destination: destinationFragment,
+    destination: movingRelativeTo,
     destinationEdge,
     destinationAxis: axis,
   });

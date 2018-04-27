@@ -1,10 +1,10 @@
 // @flow
 import React from 'react';
 import { mount } from 'enzyme';
+import { getRect, type Rect, type Position } from 'css-box-model';
 import { DragDropContext, Draggable, Droppable } from '../../../src/';
 import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
 import { dispatchWindowMouseEvent, dispatchWindowKeyDownEvent, mouseEvent } from '../../utils/user-input-util';
-import getArea from '../../../src/state/get-area';
 import type {
   Hooks,
   DraggableLocation,
@@ -12,11 +12,11 @@ import type {
   DroppableId,
   DragStart,
   DropResult,
-  Position,
 } from '../../../src/types';
 import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';
 import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';
 import * as keyCodes from '../../../src/view/key-codes';
+import { getComputedSpacing } from '../../utils/dimension';
 
 const windowMouseMove = dispatchWindowMouseEvent.bind(null, 'mousemove');
 const windowMouseUp = dispatchWindowMouseEvent.bind(null, 'mouseup');
@@ -31,7 +31,7 @@ describe('hooks integration', () => {
   const droppableId: DroppableId = 'drop-1';
 
   // both our list and item have the same dimension for now
-  const area = getArea({
+  const borderBox: Rect = getRect({
     top: 0,
     right: 100,
     bottom: 100,
@@ -40,19 +40,10 @@ describe('hooks integration', () => {
 
   const getMountedApp = () => {
     // Both list and item will have the same dimensions
-    jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => area);
+    jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => borderBox);
 
     // Stubbing out totally - not including margins in this
-    jest.spyOn(window, 'getComputedStyle').mockImplementation(() => ({
-      marginTop: '0',
-      marginRight: '0',
-      marginBottom: '0',
-      marginLeft: '0',
-      paddingTop: '0',
-      paddingRight: '0',
-      paddingBottom: '0',
-      paddingLeft: '0',
-    }));
+    jest.spyOn(window, 'getComputedStyle').mockImplementation(() => getComputedSpacing({}));
 
     return mount(
       <DragDropContext
@@ -116,8 +107,8 @@ describe('hooks integration', () => {
 
   const drag = (() => {
     const initial: Position = {
-      x: area.left + 1,
-      y: area.top + 1,
+      x: borderBox.left + 1,
+      y: borderBox.top + 1,
     };
     const dragStart: Position = {
       x: initial.x,

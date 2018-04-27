@@ -1,12 +1,12 @@
 // @flow
+import { type Position } from 'css-box-model';
 import moveToNewDroppable from '../../../../src/state/move-cross-axis/move-to-new-droppable/';
 import type { Result } from '../../../../src/state/move-cross-axis/move-cross-axis-types';
-import { getDraggableDimension, getDroppableDimension, scrollDroppable } from '../../../../src/state/dimension';
-import getArea from '../../../../src/state/get-area';
+import { scrollDroppable } from '../../../../src/state/droppable-dimension';
 import moveToEdge from '../../../../src/state/move-to-edge';
 import { add, negate, patch } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
-import { getPreset, makeScrollable } from '../../../utils/dimension';
+import { getPreset, makeScrollable, getDraggableDimension, getDroppableDimension } from '../../../utils/dimension';
 import noImpact from '../../../../src/state/no-impact';
 import getViewport from '../../../../src/view/window/get-viewport';
 import type {
@@ -15,7 +15,6 @@ import type {
   DragImpact,
   DraggableDimension,
   DroppableDimension,
-  Position,
 } from '../../../../src/types';
 
 const dontCare: Position = { x: 0, y: 0 };
@@ -53,7 +52,7 @@ describe('move to new droppable', () => {
         it('should return null and log an error if no target is found', () => {
           // this should never happen but just being safe
           const result: ?Result = moveToNewDroppable({
-            pageCenter: dontCare,
+            pageBorderBoxCenter: dontCare,
             draggable: inHome1,
             target: null,
             destination: home,
@@ -72,7 +71,7 @@ describe('move to new droppable', () => {
 
         it('should return null and log an error if the target is not inside the droppable', () => {
           const result: ?Result = moveToNewDroppable({
-            pageCenter: dontCare,
+            pageBorderBoxCenter: dontCare,
             draggable: draggables[0],
             target: inForeign1,
             destination: home,
@@ -93,7 +92,7 @@ describe('move to new droppable', () => {
           describe('without droppable scroll', () => {
             // the second draggable is moving back into its home
             const result: ?Result = moveToNewDroppable({
-              pageCenter: dontCare,
+              pageBorderBoxCenter: dontCare,
               draggable: inHome2,
               target: inHome2,
               destination: home,
@@ -111,8 +110,8 @@ describe('move to new droppable', () => {
             }
 
             it('should return the original center without margin', () => {
-              expect(result.pageCenter).toBe(inHome2.page.borderBox.center);
-              expect(result.pageCenter).not.toEqual(inHome2.page.marginBox.center);
+              expect(result.pageBorderBoxCenter).toBe(inHome2.page.borderBox.center);
+              expect(result.pageBorderBoxCenter).not.toEqual(inHome2.page.marginBox.center);
             });
 
             it('should return an empty impact with the original location', () => {
@@ -140,7 +139,7 @@ describe('move to new droppable', () => {
             const scrolled: DroppableDimension = scrollDroppable(scrollable, patch(axis.line, 10));
 
             const result: ?Result = moveToNewDroppable({
-              pageCenter: dontCare,
+              pageBorderBoxCenter: dontCare,
               draggable: inHome2,
               target: inHome2,
               destination: scrolled,
@@ -160,7 +159,7 @@ describe('move to new droppable', () => {
             it('should account for changes in droppable scroll', () => {
               const expected: Position = add(inHome2.page.borderBox.center, displacement);
 
-              expect(result.pageCenter).toEqual(expected);
+              expect(result.pageBorderBoxCenter).toEqual(expected);
             });
 
             it('should return an empty impact with the original location', () => {
@@ -186,7 +185,7 @@ describe('move to new droppable', () => {
           describe('without droppable scroll', () => {
             // moving inHome4 into the inHome2 position
             const result: ?Result = moveToNewDroppable({
-              pageCenter: dontCare,
+              pageBorderBoxCenter: dontCare,
               draggable: inHome4,
               target: inHome2,
               destination: home,
@@ -212,7 +211,7 @@ describe('move to new droppable', () => {
                 destinationAxis: axis,
               });
 
-              expect(result.pageCenter).toEqual(expected);
+              expect(result.pageBorderBoxCenter).toEqual(expected);
             });
 
             it('should move the everything from the target index to the original index forward', () => {
@@ -253,7 +252,7 @@ describe('move to new droppable', () => {
             const scrolled: DroppableDimension = scrollDroppable(scrollable, patch(axis.line, 10));
 
             const result: ?Result = moveToNewDroppable({
-              pageCenter: dontCare,
+              pageBorderBoxCenter: dontCare,
               draggable: inHome4,
               target: inHome2,
               destination: scrolled,
@@ -280,7 +279,7 @@ describe('move to new droppable', () => {
               });
               const expected: Position = add(withoutScroll, displacement);
 
-              expect(result.pageCenter).toEqual(expected);
+              expect(result.pageBorderBoxCenter).toEqual(expected);
             });
           });
         });
@@ -289,7 +288,7 @@ describe('move to new droppable', () => {
           describe('without droppable scroll', () => {
             // moving inHome1 into the inHome4 position
             const result: ?Result = moveToNewDroppable({
-              pageCenter: dontCare,
+              pageBorderBoxCenter: dontCare,
               draggable: inHome1,
               target: inHome4,
               destination: home,
@@ -315,7 +314,7 @@ describe('move to new droppable', () => {
                 destinationAxis: axis,
               });
 
-              expect(result.pageCenter).toEqual(expected);
+              expect(result.pageBorderBoxCenter).toEqual(expected);
             });
 
             it('should move the everything from the target index to the original index forward', () => {
@@ -362,7 +361,7 @@ describe('move to new droppable', () => {
             const scrolled: DroppableDimension = scrollDroppable(scrollable, patch(axis.line, 10));
 
             const result: ?Result = moveToNewDroppable({
-              pageCenter: dontCare,
+              pageBorderBoxCenter: dontCare,
               draggable: inHome1,
               target: inHome4,
               destination: scrolled,
@@ -389,7 +388,7 @@ describe('move to new droppable', () => {
               });
               const expected: Position = add(withoutScroll, displacement);
 
-              expect(result.pageCenter).toEqual(expected);
+              expect(result.pageBorderBoxCenter).toEqual(expected);
             });
           });
         });
@@ -402,21 +401,21 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 // will be cut by frame
                 [axis.end]: 200,
-              }),
+              },
               closest: {
-                frameBorderBox: getArea({
+                borderBox: {
                   [axis.crossAxisStart]: 0,
                   [axis.crossAxisEnd]: 100,
                   [axis.start]: 0,
                   // will cut the subject
                   [axis.end]: 100,
-                }),
+                },
                 scrollWidth: 200,
                 scrollHeight: 200,
                 scroll: { x: 0, y: 0 },
@@ -429,12 +428,12 @@ describe('move to new droppable', () => {
                 droppableId: droppable.descriptor.id,
                 index: 0,
               },
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 [axis.end]: 80,
-              }),
+              },
             });
             const outside: DraggableDimension = getDraggableDimension({
               descriptor: {
@@ -442,13 +441,13 @@ describe('move to new droppable', () => {
                 droppableId: droppable.descriptor.id,
                 index: 1,
               },
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the frame
                 [axis.start]: 110,
                 [axis.end]: 120,
-              }),
+              },
             });
             const customDraggables: DraggableDimension[] = [
               inside, outside,
@@ -473,7 +472,7 @@ describe('move to new droppable', () => {
             };
 
             const result: ?Result = moveToNewDroppable({
-              pageCenter: dontCare,
+              pageBorderBoxCenter: dontCare,
               draggable: inside,
               target: outside,
               destination: droppable,
@@ -500,13 +499,13 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 // extends beyond the viewport
                 [axis.end]: viewport.subject[axis.end] + 100,
-              }),
+              },
             });
             const inside: DraggableDimension = getDraggableDimension({
               descriptor: {
@@ -514,12 +513,12 @@ describe('move to new droppable', () => {
                 droppableId: droppable.descriptor.id,
                 index: 0,
               },
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 [axis.end]: viewport.subject[axis.end],
-              }),
+              },
             });
             const outside: DraggableDimension = getDraggableDimension({
               descriptor: {
@@ -527,13 +526,13 @@ describe('move to new droppable', () => {
                 droppableId: droppable.descriptor.id,
                 index: 1,
               },
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the viewport but inside the droppable
                 [axis.start]: viewport.subject[axis.end] + 1,
                 [axis.end]: viewport.subject[axis.end] + 10,
-              }),
+              },
             });
             const customDraggables: DraggableDimension[] = [
               inside, outside,
@@ -558,7 +557,7 @@ describe('move to new droppable', () => {
             };
 
             const result: ?Result = moveToNewDroppable({
-              pageCenter: dontCare,
+              pageBorderBoxCenter: dontCare,
               draggable: inside,
               target: outside,
               destination: droppable,
@@ -587,7 +586,7 @@ describe('move to new droppable', () => {
 
         it('should return null when the target is not within the list - cannot really happen', () => {
           const result: ?Result = moveToNewDroppable({
-            pageCenter: inHome1.page.marginBox.center,
+            pageBorderBoxCenter: inHome1.page.borderBox.center,
             draggable: inHome1,
             target: inHome2,
             destination: foreign,
@@ -606,7 +605,7 @@ describe('move to new droppable', () => {
         describe('moving into an unpopulated list', () => {
           describe('without droppable scroll', () => {
             const result: ?Result = moveToNewDroppable({
-              pageCenter: inHome1.page.marginBox.center,
+              pageBorderBoxCenter: inHome1.page.borderBox.center,
               draggable: inHome1,
               target: null,
               destination: foreign,
@@ -632,7 +631,7 @@ describe('move to new droppable', () => {
                 destinationAxis: foreign.axis,
               });
 
-              expect(result.pageCenter).toEqual(expected);
+              expect(result.pageBorderBoxCenter).toEqual(expected);
             });
 
             it('should return an empty impact', () => {
@@ -660,7 +659,7 @@ describe('move to new droppable', () => {
             const scrolled: DroppableDimension = scrollDroppable(scrollable, patch(axis.line, 10));
 
             const result: ?Result = moveToNewDroppable({
-              pageCenter: inHome1.page.marginBox.center,
+              pageBorderBoxCenter: inHome1.page.borderBox.center,
               draggable: inHome1,
               target: null,
               destination: scrolled,
@@ -687,7 +686,7 @@ describe('move to new droppable', () => {
               });
               const expected: Position = add(withoutScroll, displacement);
 
-              expect(result.pageCenter).toEqual(expected);
+              expect(result.pageBorderBoxCenter).toEqual(expected);
             });
           });
         });
@@ -696,7 +695,7 @@ describe('move to new droppable', () => {
           describe('without droppable scroll', () => {
             // moving home1 into the second position of the list
             const result: ?Result = moveToNewDroppable({
-              pageCenter: inHome1.page.marginBox.center,
+              pageBorderBoxCenter: inHome1.page.borderBox.center,
               draggable: inHome1,
               target: inForeign2,
               destination: foreign,
@@ -722,7 +721,7 @@ describe('move to new droppable', () => {
                 destinationAxis: foreign.axis,
               });
 
-              expect(result.pageCenter).toEqual(expected);
+              expect(result.pageBorderBoxCenter).toEqual(expected);
             });
 
             it('should move the target and everything below it forward', () => {
@@ -768,7 +767,7 @@ describe('move to new droppable', () => {
             const scrolled: DroppableDimension = scrollDroppable(scrollable, patch(axis.line, 10));
 
             const result: ?Result = moveToNewDroppable({
-              pageCenter: inHome1.page.marginBox.center,
+              pageBorderBoxCenter: inHome1.page.borderBox.center,
               draggable: inHome1,
               target: inForeign2,
               destination: scrolled,
@@ -795,7 +794,7 @@ describe('move to new droppable', () => {
               });
               const expected: Position = add(withoutScroll, displacement);
 
-              expect(result.pageCenter).toEqual(expected);
+              expect(result.pageBorderBoxCenter).toEqual(expected);
             });
           });
         });
@@ -804,7 +803,7 @@ describe('move to new droppable', () => {
           describe('without droppable scroll', () => {
             // moving home4 into the second position of the foreign list
             const result: ?Result = moveToNewDroppable({
-              pageCenter: inHome4.page.marginBox.center,
+              pageBorderBoxCenter: inHome4.page.borderBox.center,
               draggable: inHome4,
               target: inForeign2,
               destination: foreign,
@@ -831,7 +830,7 @@ describe('move to new droppable', () => {
                 destinationAxis: foreign.axis,
               });
 
-              expect(result.pageCenter).toEqual(expected);
+              expect(result.pageBorderBoxCenter).toEqual(expected);
             });
 
             it('should move everything after the proposed index forward', () => {
@@ -872,7 +871,7 @@ describe('move to new droppable', () => {
             const scrolled: DroppableDimension = scrollDroppable(scrollable, patch(axis.line, 10));
 
             const result: ?Result = moveToNewDroppable({
-              pageCenter: inHome4.page.marginBox.center,
+              pageBorderBoxCenter: inHome4.page.borderBox.center,
               draggable: inHome4,
               target: inForeign2,
               destination: scrolled,
@@ -900,7 +899,7 @@ describe('move to new droppable', () => {
               });
               const expected: Position = add(withoutScroll, displacement);
 
-              expect(result.pageCenter).toEqual(expected);
+              expect(result.pageBorderBoxCenter).toEqual(expected);
             });
           });
         });
@@ -913,12 +912,12 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 [axis.end]: 100,
-              }),
+              },
             });
             const customInHome: DraggableDimension = getDraggableDimension({
               descriptor: {
@@ -926,12 +925,12 @@ describe('move to new droppable', () => {
                 droppableId: customHome.descriptor.id,
                 index: 0,
               },
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 [axis.end]: 80,
-              }),
+              },
             });
             const customForeign: DroppableDimension = getDroppableDimension({
               descriptor: {
@@ -939,20 +938,20 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              borderBox: getArea({
+              borderBox: {
                 top: 0,
                 left: 0,
                 right: 100,
                 // will be cut by frame
                 bottom: 200,
-              }),
+              },
               closest: {
-                frameBorderBox: getArea({
+                borderBox: {
                   top: 0,
                   left: 0,
                   right: 100,
                   bottom: 100,
-                }),
+                },
                 scrollWidth: 200,
                 scrollHeight: 200,
                 scroll: { x: 0, y: 0 },
@@ -966,13 +965,13 @@ describe('move to new droppable', () => {
                 droppableId: customForeign.descriptor.id,
                 index: 0,
               },
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the foreign frame
                 [axis.start]: 110,
                 [axis.end]: 120,
-              }),
+              },
             });
 
             const customInsideForeign: DraggableDimension[] = [
@@ -999,7 +998,7 @@ describe('move to new droppable', () => {
             };
 
             const result: ?Result = moveToNewDroppable({
-              pageCenter: dontCare,
+              pageBorderBoxCenter: dontCare,
               draggable: customInHome,
               target: customInForeign,
               destination: customForeign,
@@ -1026,12 +1025,12 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 [axis.end]: 100,
-              }),
+              },
             });
             const customInHome: DraggableDimension = getDraggableDimension({
               descriptor: {
@@ -1039,12 +1038,12 @@ describe('move to new droppable', () => {
                 droppableId: customHome.descriptor.id,
                 index: 0,
               },
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 [axis.end]: 80,
-              }),
+              },
             });
             const customForeign: DroppableDimension = getDroppableDimension({
               descriptor: {
@@ -1052,14 +1051,14 @@ describe('move to new droppable', () => {
                 type: 'TYPE',
               },
               direction: axis.direction,
-              borderBox: getArea({
+              borderBox: {
                 bottom: viewport.subject.bottom + 100,
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
-                // extending beyond the viewport
+                // exteding beyond the viewport
                 [axis.end]: viewport.subject[axis.end] + 100,
-              }),
+              },
             });
             const customInForeign: DraggableDimension = getDraggableDimension({
               descriptor: {
@@ -1067,13 +1066,13 @@ describe('move to new droppable', () => {
                 droppableId: customForeign.descriptor.id,
                 index: 0,
               },
-              borderBox: getArea({
+              borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the viewport but inside the droppable
                 [axis.start]: viewport.subject[axis.end] + 1,
                 [axis.end]: viewport.subject[axis.end] + 10,
-              }),
+              },
             });
 
             const customInsideForeign: DraggableDimension[] = [
@@ -1100,7 +1099,7 @@ describe('move to new droppable', () => {
             };
 
             const result: ?Result = moveToNewDroppable({
-              pageCenter: dontCare,
+              pageBorderBoxCenter: dontCare,
               draggable: customInHome,
               target: customInForeign,
               destination: customForeign,

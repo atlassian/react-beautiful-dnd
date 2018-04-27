@@ -1,5 +1,6 @@
 // @flow
 /* eslint-disable no-use-before-define */
+import { type Position } from 'css-box-model';
 import createScheduler from '../util/create-scheduler';
 import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
 import * as keyCodes from '../../key-codes';
@@ -9,9 +10,6 @@ import { bindEvents, unbindEvents } from '../util/bind-events';
 import createEventMarshal, { type EventMarshal } from '../util/create-event-marshal';
 import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
 import type { EventBinding } from '../util/event-types';
-import type {
-  Position,
-} from '../../../types';
 import type { MouseSensor, CreateSensorArgs } from './sensor-types';
 
 // Custom event format for force press inputs

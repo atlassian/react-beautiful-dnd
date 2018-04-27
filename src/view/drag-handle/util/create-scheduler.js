@@ -1,7 +1,7 @@
 // @flow
+import { type Position } from 'css-box-model';
 import memoizeOne from 'memoize-one';
 import rafSchd from 'raf-schd';
-import type { Position } from '../../../types';
 import type { Callbacks } from '../drag-handle-types';
 
 export default (callbacks: Callbacks) => {
