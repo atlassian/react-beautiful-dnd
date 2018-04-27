@@ -1,4 +1,5 @@
 // @flow
+import { type Position } from 'css-box-model';
 import type {
   DraggableDescriptor,
   DroppableDescriptor,
@@ -7,7 +8,6 @@ import type {
   DraggableId,
   DroppableId,
   State,
-  Position,
   ScrollOptions,
 } from '../../types';
 

@@ -1,14 +1,10 @@
 // @flow
-import type {
-  Area,
-  Viewport,
-  Position,
-} from '../../src/types';
+import { getRect, type Rect, type Position } from 'css-box-model';
+import type { Viewport } from '../../src/types';
 import getViewport from '../../src/view/window/get-viewport';
 import getMaxScroll from '../../src/state/get-max-scroll';
 import { offsetByPosition } from '../../src/state/spacing';
 import { subtract, negate } from '../../src/state/position';
-import getArea from '../../src/state/get-area';
 
 const getDoc = (): HTMLElement => {
   const el: ?HTMLElement = document.documentElement;
@@ -50,7 +46,7 @@ const original: Viewport = getCurrent();
 export const resetViewport = () => setViewport(original);
 
 type CreateViewportArgs = {|
-  subject: Area,
+  subject: Rect,
   scroll: Position,
   scrollHeight: number,
   scrollWidth: number,
@@ -102,7 +98,7 @@ export const scrollViewport = (viewport: Viewport, newScroll: Position) => {
   const scrollWidth: number = viewport.maxScroll.x + viewport.subject.width;
 
   return createViewport({
-    subject: getArea(offsetByPosition(viewport.subject, displacement)),
+    subject: getRect(offsetByPosition(viewport.subject, displacement)),
     scroll: newScroll,
     scrollHeight,
     scrollWidth,

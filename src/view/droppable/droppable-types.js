@@ -1,5 +1,5 @@
 // @flow
-import type { Node } from 'react';
+import { type Node } from 'react';
 import type {
   DraggableId,
   DroppableId,

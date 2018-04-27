@@ -1,6 +1,6 @@
 // @flow
+import { getRect, type Position } from 'css-box-model';
 import type {
-  Position,
   DroppableDimension,
   Viewport,
 } from '../../../../src/types';
@@ -13,9 +13,8 @@ import {
   canScrollWindow,
 } from '../../../../src/state/auto-scroller/can-scroll';
 import { add, subtract } from '../../../../src/state/position';
-import getArea from '../../../../src/state/get-area';
-import { getPreset } from '../../../utils/dimension';
-import { getDroppableDimension, scrollDroppable } from '../../../../src/state/dimension';
+import { getPreset, getDroppableDimension } from '../../../utils/dimension';
+import { scrollDroppable } from '../../../../src/state/droppable-dimension';
 import { createViewport } from '../../../utils/viewport';
 import getMaxScroll from '../../../../src/state/get-max-scroll';
 
@@ -32,20 +31,20 @@ const scrollable: DroppableDimension = getDroppableDimension({
     id: 'drop-1',
     type: 'TYPE',
   },
-  borderBox: getArea({
+  borderBox: {
     top: 0,
     left: 0,
     right: 100,
     // bigger than the frame
     bottom: 200,
-  }),
+  },
   closest: {
-    frameBorderBox: getArea({
+    borderBox: {
       top: 0,
       left: 0,
       right: 100,
       bottom: 100,
-    }),
+    },
     scrollWidth: scrollableScrollSize.scrollWidth,
     scrollHeight: scrollableScrollSize.scrollHeight,
     scroll: { x: 0, y: 0 },
@@ -54,7 +53,7 @@ const scrollable: DroppableDimension = getDroppableDimension({
 });
 
 const customViewport: Viewport = createViewport({
-  subject: getArea({
+  subject: getRect({
     top: 0,
     left: 0,
     right: 100,

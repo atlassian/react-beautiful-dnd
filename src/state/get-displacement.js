@@ -1,4 +1,5 @@
 // @flow
+import { type Rect } from 'css-box-model';
 import getDisplacementMap, { type DisplacementMap } from './get-displacement-map';
 import { isPartiallyVisible } from './visibility/is-visible';
 import type {
@@ -7,14 +8,13 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DragImpact,
-  Area,
 } from '../types';
 
 type Args = {|
   draggable: DraggableDimension,
   destination: DroppableDimension,
   previousImpact: DragImpact,
-  viewport: Area,
+  viewport: Rect,
 |}
 
 // Note: it is also an optimisation to undo the displacement on

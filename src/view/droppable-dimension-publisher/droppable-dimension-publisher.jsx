@@ -1,15 +1,13 @@
 // @flow
-import { Component } from 'react';
-import type { Node } from 'react';
+import { Component, type Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
+import { getBox, withScroll, type BoxModel, type Position } from 'css-box-model';
 import rafSchedule from 'raf-schd';
-import getWindowScroll from '../window/get-window-scroll';
-import getArea from '../../state/get-area';
-import { getDroppableDimension } from '../../state/dimension';
 import getClosestScrollable from '../get-closest-scrollable';
 import { dimensionMarshalKey } from '../context-keys';
+import { getDroppableDimension, type Closest } from '../../state/droppable-dimension';
 import type {
   DimensionMarshal,
   DroppableCallbacks,
@@ -19,9 +17,6 @@ import type {
   TypeId,
   DroppableDimension,
   DroppableDescriptor,
-  Position,
-  Area,
-  Spacing,
   Direction,
   ScrollOptions,
 } from '../../types';
@@ -38,6 +33,11 @@ type Props = {|
 |}
 
 const origin: Position = { x: 0, y: 0 };
+
+const getScroll = (el: Element): Position => ({
+  x: el.scrollLeft,
+  y: el.scrollTop,
+});
 
 export default class DroppableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
@@ -67,12 +67,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       return origin;
     }
 
-    const offset: Position = {
-      x: this.closestScrollable.scrollLeft,
-      y: this.closestScrollable.scrollTop,
-    };
-
-    return offset;
+    return getScroll(this.closestScrollable);
   }
 
   memoizedUpdateScroll = memoizeOne((x: number, y: number) => {
@@ -246,75 +241,40 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     invariant(!this.isWatchingScroll, 'Attempting to recapture Droppable dimension while already watching scroll on previous capture');
     invariant(descriptor, 'Cannot get dimension for unpublished droppable');
 
-    const style: Object = window.getComputedStyle(targetRef);
+    // Reading once and supplying to all functions
 
-    // keeping it simple and always using the margin of the droppable
+    const client: BoxModel = getBox(targetRef);
+    const page: BoxModel = withScroll(client);
+    const closestScrollable: ?Element = getClosestScrollable(targetRef);
 
-    const margin: Spacing = {
-      top: parseInt(style.marginTop, 10),
-      right: parseInt(style.marginRight, 10),
-      bottom: parseInt(style.marginBottom, 10),
-      left: parseInt(style.marginLeft, 10),
-    };
-    const padding: Spacing = {
-      top: parseInt(style.paddingTop, 10),
-      right: parseInt(style.paddingRight, 10),
-      bottom: parseInt(style.paddingBottom, 10),
-      left: parseInt(style.paddingLeft, 10),
-    };
-    const border: Spacing = {
-      top: parseInt(style.borderTopWidth, 10),
-      right: parseInt(style.borderRightWidth, 10),
-      bottom: parseInt(style.borderBottomWidth, 10),
-      left: parseInt(style.borderLeftWidth, 10),
-    };
+    // side effect
+    this.closestScrollable = closestScrollable;
 
-    // getBoundingClientRect always returns the borderBox
-    const borderBox: Area = getArea(targetRef.getBoundingClientRect());
-
-    // side effect - grabbing it for scroll listening so we know it is the same node
-    this.closestScrollable = getClosestScrollable(targetRef);
-
-    // The droppable's own bounds should be treated as the
-    // container bounds in the following situations:
-    // 1. The consumer has opted in to ignoring container clipping
-    // 2. There is no scroll container
-    // 3. The droppable has internal scrolling
-
-    const closest: ?Object = (() => {
-      const closestScrollable: ?Element = this.closestScrollable;
-
+    const closest: ?Closest = (() => {
       if (!closestScrollable) {
         return null;
       }
 
-      const frameBorderBox: Area = getArea(closestScrollable.getBoundingClientRect());
-      const scroll: Position = this.getClosestScroll();
-      const scrollWidth: number = closestScrollable.scrollWidth;
-      const scrollHeight: number = closestScrollable.scrollHeight;
+      const closestClient: BoxModel = getBox(closestScrollable);
 
       return {
-        frameBorderBox,
-        scrollWidth,
-        scrollHeight,
-        scroll,
+        client: closestClient,
+        page: withScroll(closestClient),
+        scrollHeight: closestScrollable.scrollHeight,
+        scrollWidth: closestScrollable.scrollWidth,
+        scroll: getScroll(closestScrollable),
         shouldClipSubject: !ignoreContainerClipping,
       };
     })();
 
-    const dimension: DroppableDimension = getDroppableDimension({
+    return getDroppableDimension({
       descriptor,
-      direction,
-      borderBox,
-      border,
-      closest,
-      margin,
-      padding,
-      windowScroll: getWindowScroll(),
       isEnabled: !isDropDisabled,
+      direction,
+      client,
+      page,
+      closest,
     });
-
-    return dimension;
   }
 
   render() {

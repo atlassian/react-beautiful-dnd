@@ -1,9 +1,9 @@
 // @flow
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
+import { type Position } from 'css-box-model';
 import isPositionInFrame from '../visibility/is-position-in-frame';
 import type {
-  Position,
   DroppableId,
   DroppableDimension,
   DroppableDimensionMap,
@@ -38,7 +38,7 @@ const getScrollableDroppableOver = (
     getScrollableDroppables(droppables)
       .find((droppable: DroppableDimension): boolean => {
         invariant(droppable.viewport.closestScrollable, 'Invalid result');
-        return isPositionInFrame(droppable.viewport.closestScrollable.frame)(target);
+        return isPositionInFrame(droppable.viewport.closestScrollable.framePageMarginBox)(target);
       });
 
   return maybe;

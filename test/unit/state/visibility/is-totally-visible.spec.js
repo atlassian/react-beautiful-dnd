@@ -1,16 +1,12 @@
 // @flow
-import getArea from '../../../../src/state/get-area';
+import { getRect, type Rect, type Spacing } from 'css-box-model';
 import { isTotallyVisible, isPartiallyVisible } from '../../../../src/state/visibility/is-visible';
-import { getDroppableDimension, scrollDroppable } from '../../../../src/state/dimension';
+import { scrollDroppable } from '../../../../src/state/droppable-dimension';
 import { offsetByPosition } from '../../../../src/state/spacing';
-import { getClosestScrollable } from '../../../utils/dimension';
-import type {
-  Area,
-  DroppableDimension,
-  Spacing,
-} from '../../../../src/types';
+import { getDroppableDimension, getClosestScrollable } from '../../../utils/dimension';
+import type { DroppableDimension } from '../../../../src/types';
 
-const viewport: Area = getArea({
+const viewport: Rect = getRect({
   right: 800,
   top: 0,
   left: 0,
@@ -51,7 +47,7 @@ const asBigAsInViewport1: DroppableDimension = getDroppableDimension({
     id: 'subset',
     type: 'TYPE',
   },
-  borderBox: getArea(inViewport1),
+  borderBox: inViewport1,
 });
 
 describe('is totally visible', () => {
@@ -116,15 +112,15 @@ describe('is totally visible', () => {
           id: 'clipped',
           type: 'TYPE',
         },
-        borderBox: getArea({
+        borderBox: {
           top: viewport.top,
           // stretches out the bottom of the viewport
           bottom: viewport.bottom + 100,
           left: viewport.left,
           right: viewport.right,
-        }),
+        },
         closest: {
-          frameBorderBox: viewport,
+          borderBox: viewport,
           scrollWidth: viewport.width,
           scrollHeight: viewport.bottom + 100,
           scroll: { x: 0, y: 0 },
@@ -185,13 +181,13 @@ describe('is totally visible', () => {
   });
 
   describe('droppable', () => {
-    const borderBox: Area = getArea({
+    const borderBox: Rect = getRect({
       top: 0,
       left: 0,
       right: 600,
       bottom: 600,
     });
-    const frame: Area = getArea({
+    const frame: Rect = getRect({
       top: 0,
       left: 0,
       right: 100,
@@ -205,7 +201,7 @@ describe('is totally visible', () => {
       },
       borderBox,
       closest: {
-        frameBorderBox: frame,
+        borderBox: frame,
         scrollHeight: borderBox.height,
         scrollWidth: borderBox.width,
         scroll: { x: 0, y: 0 },
@@ -294,15 +290,15 @@ describe('is totally visible', () => {
             id: 'clipped',
             type: 'TYPE',
           },
-          borderBox: getArea({
+          borderBox: {
             ...ourFrame,
             // stretches out past frame
             bottom: 600,
-          }),
+          },
           closest: {
-            frameBorderBox: getArea(ourFrame),
+            borderBox: ourFrame,
             scrollHeight: 600,
-            scrollWidth: getArea(ourFrame).width,
+            scrollWidth: getRect(ourFrame).width,
             scroll: { x: 0, y: 0 },
             shouldClipSubject: true,
           },
@@ -381,19 +377,19 @@ describe('is totally visible', () => {
             id: 'droppable',
             type: 'TYPE',
           },
-          borderBox: getArea({
+          borderBox: {
             top: 0,
             left: 0,
             bottom: 100,
             right: 100,
-          }),
+          },
           closest: {
-            frameBorderBox: getArea({
+            borderBox: {
               top: 0,
               left: 0,
               bottom: 100,
               right: 100,
-            }),
+            },
             scrollHeight: 600,
             scrollWidth: 600,
             scroll: { x: 0, y: 0 },
@@ -420,7 +416,7 @@ describe('is totally visible', () => {
           getClosestScrollable(droppable).scroll.max,
         );
         // asserting frame is not visible
-        expect(scrolled.viewport.clipped).toBe(null);
+        expect(scrolled.viewport.clippedPageMarginBox).toBe(null);
 
         // now asserting that this check will fail
         expect(isTotallyVisible({
@@ -455,7 +451,7 @@ describe('is totally visible', () => {
           id: 'not-visible',
           type: 'TYPE',
         },
-        borderBox: getArea(notInViewport),
+        borderBox: notInViewport,
       });
 
       expect(isTotallyVisible({

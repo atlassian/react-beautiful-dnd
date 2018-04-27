@@ -1,4 +1,5 @@
 // @flow
+import { type Position } from 'css-box-model';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import { patch, subtract } from '../position';
 import withDroppableDisplacement from '../with-droppable-displacement';
@@ -11,7 +12,6 @@ import type { Args, Result } from './move-to-next-index-types';
 import type {
   DraggableLocation,
   DraggableDimension,
-  Position,
   Displacement,
   Axis,
   DragImpact,
@@ -20,7 +20,7 @@ import type {
 export default ({
   isMovingForward,
   draggableId,
-  previousPageCenter,
+  previousPageBorderBoxCenter,
   previousImpact,
   droppable,
   draggables,
@@ -73,7 +73,7 @@ export default ({
     return isMovingForward ? 'start' : 'end';
   })();
 
-  const newPageCenter: Position = moveToEdge({
+  const newPageBorderBoxCenter: Position = moveToEdge({
     source: draggable.page.borderBox,
     sourceEdge: edge,
     destination: destination.page.borderBox,
@@ -84,7 +84,7 @@ export default ({
   const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
     draggable,
     destination: droppable,
-    newPageCenter,
+    newPageBorderBoxCenter,
     viewport: viewport.subject,
   });
 
@@ -122,18 +122,18 @@ export default ({
 
   if (isVisibleInNewLocation) {
     return {
-      pageCenter: withDroppableDisplacement(droppable, newPageCenter),
+      pageBorderBoxCenter: withDroppableDisplacement(droppable, newPageBorderBoxCenter),
       impact: newImpact,
       scrollJumpRequest: null,
     };
   }
 
   // The full distance required to get from the previous page center to the new page center
-  const distance: Position = subtract(newPageCenter, previousPageCenter);
+  const distance: Position = subtract(newPageBorderBoxCenter, previousPageBorderBoxCenter);
   const distanceWithScroll: Position = withDroppableDisplacement(droppable, distance);
 
   return {
-    pageCenter: previousPageCenter,
+    pageBorderBoxCenter: previousPageBorderBoxCenter,
     impact: newImpact,
     scrollJumpRequest: distanceWithScroll,
   };

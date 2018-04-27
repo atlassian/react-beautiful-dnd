@@ -19,6 +19,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   opacity: ${({ isDropDisabled }) => (isDropDisabled ? 0.5 : 'inherit')};
   padding: ${grid}px;
+  border: ${grid}px;
   padding-bottom: 0;
   transition: background-color 0.1s ease, opacity 0.1s ease;
   user-select: none;

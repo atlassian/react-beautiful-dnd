@@ -1,18 +1,15 @@
 // @flow
-import { Component } from 'react';
-import type { Node } from 'react';
+import { Component, type Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
+import { calculateBox, withScroll, type BoxModel } from 'css-box-model';
 import getWindowScroll from '../window/get-window-scroll';
-import { getDraggableDimension } from '../../state/dimension';
 import { dimensionMarshalKey } from '../context-keys';
-import getArea from '../../state/get-area';
 import type {
   DraggableDescriptor,
   DraggableDimension,
-  Spacing,
-  Area,
+  Placeholder,
   DraggableId,
   DroppableId,
 } from '../../types';
@@ -90,33 +87,28 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
   getDimension = (): DraggableDimension => {
     const targetRef: ?HTMLElement = this.props.getDraggableRef();
-
-    invariant(targetRef, 'DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
-
     const descriptor: ?DraggableDescriptor = this.publishedDescriptor;
 
+    invariant(targetRef, 'DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
     invariant(descriptor, 'Cannot get dimension for unpublished draggable');
 
-    const tagName: string = targetRef.tagName.toLowerCase();
-    const style = window.getComputedStyle(targetRef);
-    const display: string = style.display;
-    const margin: Spacing = {
-      top: parseInt(style.marginTop, 10),
-      right: parseInt(style.marginRight, 10),
-      bottom: parseInt(style.marginBottom, 10),
-      left: parseInt(style.marginLeft, 10),
-    };
-    // getBoundingClientRect returns the 'border-box' of the element (content + padding + border)
-    const borderBox: Area = getArea(targetRef.getBoundingClientRect());
+    const style: CSSStyleDeclaration = window.getComputedStyle(targetRef);
 
-    const dimension: DraggableDimension = getDraggableDimension({
+    const client: BoxModel = calculateBox(targetRef.getBoundingClientRect(), style);
+    const page: BoxModel = withScroll(client, getWindowScroll());
+
+    const placeholder: Placeholder = {
+      client,
+      tagName: targetRef.tagName.toLowerCase(),
+      display: style.display,
+    };
+
+    const dimension: DraggableDimension = {
       descriptor,
-      borderBox,
-      margin,
-      tagName,
-      display,
-      windowScroll: getWindowScroll(),
-    });
+      placeholder,
+      client,
+      page,
+    };
 
     return dimension;
   }

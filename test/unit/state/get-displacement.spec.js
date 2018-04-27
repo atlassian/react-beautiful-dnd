@@ -1,27 +1,23 @@
 // @flow
+import { getRect, type Rect } from 'css-box-model';
 import getDisplacement from '../../../src/state/get-displacement';
-import {
-  getDroppableDimension,
-  getDraggableDimension,
-} from '../../../src/state/dimension';
-import getArea from '../../../src/state/get-area';
 import noImpact from '../../../src/state/no-impact';
+import { getDroppableDimension, getDraggableDimension } from '../../utils/dimension';
 import type {
   Displacement,
   DraggableDimension,
   DroppableDimension,
   DragImpact,
-  Area,
 } from '../../../src/types';
 
-const viewport: Area = getArea({
+const viewport: Rect = getRect({
   top: 0,
   right: 800,
   left: 0,
   bottom: 600,
 });
 
-const subject: Area = getArea({
+const subject: Rect = getRect({
   top: 0,
   left: 0,
   right: 800,
@@ -43,12 +39,12 @@ const inViewport: DraggableDimension = getDraggableDimension({
     droppableId: droppable.descriptor.id,
     index: 0,
   },
-  borderBox: getArea({
+  borderBox: {
     top: 0,
     left: 0,
     right: 200,
     bottom: 200,
-  }),
+  },
 });
 
 const notInViewport: DraggableDimension = getDraggableDimension({
@@ -58,12 +54,12 @@ const notInViewport: DraggableDimension = getDraggableDimension({
     index: 1,
   },
   // outside of viewport but within droppable
-  borderBox: getArea({
+  borderBox: {
     top: 810,
     left: 0,
     right: 200,
     bottom: 850,
-  }),
+  },
 });
 
 describe('get displacement', () => {
@@ -196,7 +192,7 @@ describe('get displacement', () => {
           },
         };
         // scrolled down 800px
-        const scrolledViewport: Area = getArea({
+        const scrolledViewport: Rect = getRect({
           top: 800,
           right: 800,
           left: 0,
@@ -240,7 +236,7 @@ describe('get displacement', () => {
           },
         };
         // scrolled down 800px
-        const scrolledViewport: Area = getArea({
+        const scrolledViewport: Rect = getRect({
           top: 800,
           right: 800,
           left: 0,

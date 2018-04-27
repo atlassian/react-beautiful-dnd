@@ -1,4 +1,5 @@
 // @flow
+import { type Position } from 'css-box-model';
 import {
   cancel,
   clean,
@@ -16,7 +17,6 @@ import getViewport from '../../../src/view/window/get-viewport';
 import getStatePreset from '../../utils/get-simple-state-preset';
 import type {
   State,
-  Position,
   DraggableId,
   Store,
   InitialDragPositions,
@@ -28,7 +28,7 @@ const preset = getPreset();
 const origin: Position = { x: 0, y: 0 };
 const noWhere: InitialDragPositions = {
   selection: origin,
-  center: origin,
+  borderBoxCenter: origin,
 };
 
 type LiftFnArgs = {|

@@ -1,13 +1,9 @@
 // @flow
+import { getRect, type Rect, type Position } from 'css-box-model';
 import isPositionInFrame from '../../../../src/state/visibility/is-position-in-frame';
-import getArea from '../../../../src/state/get-area';
-import type {
-  Position,
-  Area,
-} from '../../../../src/types';
 
 describe('is position in frame', () => {
-  const frame: Area = getArea({
+  const frame: Rect = getRect({
     top: 0, left: 0, right: 100, bottom: 100,
   });
 

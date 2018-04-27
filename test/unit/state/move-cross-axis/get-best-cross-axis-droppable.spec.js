@@ -1,14 +1,13 @@
 // @flow
+import { type Position } from 'css-box-model';
 import getBestCrossAxisDroppable from '../../../../src/state/move-cross-axis/get-best-cross-axis-droppable';
-import { getDroppableDimension } from '../../../../src/state/dimension';
-import getArea from '../../../../src/state/get-area';
+import { getDroppableDimension } from '../../../utils/dimension';
 import { add } from '../../../../src/state/position';
 import { horizontal, vertical } from '../../../../src/state/axis';
 import getViewport from '../../../../src/view/window/get-viewport';
 import type {
   Viewport,
   Axis,
-  Position,
   DroppableDimension,
   DroppableDimensionMap,
 } from '../../../../src/types';
@@ -26,12 +25,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           left: 20,
           right: 30,
           bottom: 10,
-        }),
+        },
       });
       const forward = getDroppableDimension({
         descriptor: {
@@ -39,12 +38,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           left: 30,
           right: 40,
           bottom: 10,
-        }),
+        },
       });
       const droppables: DroppableDimensionMap = {
         [source.descriptor.id]: source,
@@ -53,7 +52,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.marginBox.center,
+        pageBorderBoxCenter: source.page.borderBox.center,
         source,
         droppables,
         viewport,
@@ -69,12 +68,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           left: 20,
           right: 30,
           bottom: 10,
-        }),
+        },
       });
       const source = getDroppableDimension({
         descriptor: {
@@ -82,12 +81,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           left: 30,
           right: 40,
           bottom: 10,
-        }),
+        },
       });
       const droppables: DroppableDimensionMap = {
         [behind.descriptor.id]: behind,
@@ -97,7 +96,7 @@ describe('get best cross axis droppable', () => {
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         // moving backwards
         isMovingForward: false,
-        pageCenter: source.page.marginBox.center,
+        pageBorderBoxCenter: source.page.borderBox.center,
         source,
         viewport,
         droppables,
@@ -113,12 +112,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           left: 20,
           right: 30,
           bottom: 10,
-        }),
+        },
       });
       const behind = getDroppableDimension({
         descriptor: {
@@ -126,12 +125,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           left: 0,
           right: 10,
           bottom: 10,
-        }),
+        },
       });
       const droppables: DroppableDimensionMap = {
         [behind.descriptor.id]: behind,
@@ -140,7 +139,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.marginBox.center,
+        pageBorderBoxCenter: source.page.borderBox.center,
         source,
         droppables,
         viewport,
@@ -150,7 +149,7 @@ describe('get best cross axis droppable', () => {
       // checking that it would have been returned if was moving in the other direction
       const result2: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: false,
-        pageCenter: source.page.marginBox.center,
+        pageBorderBoxCenter: source.page.borderBox.center,
         source,
         droppables,
         viewport,
@@ -165,12 +164,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           left: 20,
           right: 30,
           bottom: 10,
-        }),
+        },
       });
       const disabled = getDroppableDimension({
         descriptor: {
@@ -179,12 +178,12 @@ describe('get best cross axis droppable', () => {
         },
         isEnabled: false,
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           left: 30,
           right: 40,
           bottom: 10,
-        }),
+        },
       });
       const droppables: DroppableDimensionMap = {
         [source.descriptor.id]: source,
@@ -193,7 +192,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.marginBox.center,
+        pageBorderBoxCenter: source.page.borderBox.center,
         source,
         droppables,
         viewport,
@@ -209,12 +208,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           left: 20,
           right: 30,
           bottom: 10,
-        }),
+        },
       });
       const outsideViewport = getDroppableDimension({
         descriptor: {
@@ -222,12 +221,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           left: 30,
           right: 40,
           top: viewport.subject.bottom + 1,
           bottom: viewport.subject.bottom + 10,
-        }),
+        },
       });
       const droppables: DroppableDimensionMap = {
         [source.descriptor.id]: source,
@@ -236,7 +235,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.marginBox.center,
+        pageBorderBoxCenter: source.page.borderBox.center,
         source,
         droppables,
         viewport,
@@ -252,12 +251,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           left: 20,
           right: 30,
           bottom: 10,
-        }),
+        },
       });
       const noOverlap = getDroppableDimension({
         descriptor: {
@@ -265,13 +264,13 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           // top is below where the source ended
           top: 11,
           left: 30,
           right: 40,
           bottom: 20,
-        }),
+        },
       });
 
       const droppables: DroppableDimensionMap = {
@@ -281,7 +280,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.marginBox.center,
+        pageBorderBoxCenter: source.page.borderBox.center,
         source,
         droppables,
         viewport,
@@ -298,12 +297,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           left: 0,
           right: 20,
           bottom: 100,
-        }),
+        },
       });
       const sibling1 = getDroppableDimension({
         descriptor: {
@@ -311,22 +310,22 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 20,
           left: 20,
           right: 40,
           // long droppable inside a shorter container - this should be clipped
           bottom: 80,
-        }),
+        },
         closest: {
-          frameBorderBox: getArea({
+          borderBox: {
             // not the same top value as source
             top: 20,
             // shares the left edge with the source
             left: 20,
             right: 40,
             bottom: 40,
-          }),
+          },
           scrollWidth: 20,
           scrollHeight: 80,
           scroll: { x: 0, y: 0 },
@@ -339,14 +338,14 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           // shares the bottom edge with sibling1
           top: 40,
           // shares the left edge with the source
           left: 20,
           right: 40,
           bottom: 60,
-        }),
+        },
       });
       const droppables: DroppableDimensionMap = {
         [source.descriptor.id]: source,
@@ -363,7 +362,7 @@ describe('get best cross axis droppable', () => {
 
         const result: ?DroppableDimension = getBestCrossAxisDroppable({
           isMovingForward: true,
-          pageCenter: center,
+          pageBorderBoxCenter: center,
           source,
           droppables,
           viewport,
@@ -383,7 +382,7 @@ describe('get best cross axis droppable', () => {
         // if not, we'll land in sibling1
         const result: ?DroppableDimension = getBestCrossAxisDroppable({
           isMovingForward: true,
-          pageCenter: center,
+          pageBorderBoxCenter: center,
           source,
           droppables,
           viewport,
@@ -403,7 +402,7 @@ describe('get best cross axis droppable', () => {
 
           const result: ?DroppableDimension = getBestCrossAxisDroppable({
             isMovingForward: true,
-            pageCenter: center,
+            pageBorderBoxCenter: center,
             source,
             droppables,
             viewport,
@@ -422,7 +421,7 @@ describe('get best cross axis droppable', () => {
 
           const result: ?DroppableDimension = getBestCrossAxisDroppable({
             isMovingForward: true,
-            pageCenter: center,
+            pageBorderBoxCenter: center,
             source,
             droppables,
             viewport,
@@ -434,7 +433,7 @@ describe('get best cross axis droppable', () => {
           const center2: Position = add(center, { x: 0, y: 1 });
           const result2: ?DroppableDimension = getBestCrossAxisDroppable({
             isMovingForward: true,
-            pageCenter: center2,
+            pageBorderBoxCenter: center2,
             source,
             droppables,
             viewport,
@@ -455,12 +454,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           left: 0,
           right: 20,
           bottom: 20,
-        }),
+        },
       });
       const forward = getDroppableDimension({
         descriptor: {
@@ -468,12 +467,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 20,
           left: 0,
           right: 20,
           bottom: 30,
-        }),
+        },
       });
       const droppables: DroppableDimensionMap = {
         [source.descriptor.id]: source,
@@ -482,7 +481,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.marginBox.center,
+        pageBorderBoxCenter: source.page.borderBox.center,
         source,
         droppables,
         viewport,
@@ -498,12 +497,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           left: 0,
           right: 20,
           bottom: 10,
-        }),
+        },
       });
       const source = getDroppableDimension({
         descriptor: {
@@ -511,12 +510,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 10,
           left: 0,
           right: 20,
           bottom: 20,
-        }),
+        },
       });
       const droppables: DroppableDimensionMap = {
         [behind.descriptor.id]: behind,
@@ -526,7 +525,7 @@ describe('get best cross axis droppable', () => {
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         // moving backwards
         isMovingForward: false,
-        pageCenter: source.page.marginBox.center,
+        pageBorderBoxCenter: source.page.borderBox.center,
         source,
         viewport,
         droppables,
@@ -542,12 +541,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           left: 0,
           right: 20,
           bottom: 10,
-        }),
+        },
       });
       const source = getDroppableDimension({
         descriptor: {
@@ -555,12 +554,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 10,
           left: 0,
           right: 20,
           bottom: 20,
-        }),
+        },
       });
       const droppables: DroppableDimensionMap = {
         [behind.descriptor.id]: behind,
@@ -570,7 +569,7 @@ describe('get best cross axis droppable', () => {
       // now moving in the other direction
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.marginBox.center,
+        pageBorderBoxCenter: source.page.borderBox.center,
         source,
         droppables,
         viewport,
@@ -580,7 +579,7 @@ describe('get best cross axis droppable', () => {
       // Ensuring that normally it would be returned if moving in the right direction
       const result2: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: false,
-        pageCenter: source.page.marginBox.center,
+        pageBorderBoxCenter: source.page.borderBox.center,
         source,
         droppables,
         viewport,
@@ -595,12 +594,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           left: 20,
           right: 30,
           bottom: 10,
-        }),
+        },
       });
       const disabled = getDroppableDimension({
         descriptor: {
@@ -609,12 +608,12 @@ describe('get best cross axis droppable', () => {
         },
         isEnabled: false,
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           left: 30,
           right: 40,
           bottom: 10,
-        }),
+        },
       });
       const droppables: DroppableDimensionMap = {
         [source.descriptor.id]: source,
@@ -623,7 +622,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.marginBox.center,
+        pageBorderBoxCenter: source.page.borderBox.center,
         source,
         droppables,
         viewport,
@@ -639,12 +638,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           [axis.start]: 0,
           [axis.end]: 100,
           [axis.crossAxisStart]: 0,
           [axis.crossAxisEnd]: 100,
-        }),
+        },
       });
       const subjectNotVisibleThroughFrame = getDroppableDimension({
         descriptor: {
@@ -653,21 +652,21 @@ describe('get best cross axis droppable', () => {
         },
         direction: axis.direction,
         // totally hidden by frame
-        borderBox: getArea({
+        borderBox: {
           [axis.start]: 0,
           [axis.end]: 100,
           // would normally be a good candidate
           [axis.crossAxisStart]: 200,
           [axis.crossAxisEnd]: 300,
-        }),
+        },
         closest: {
-          frameBorderBox: getArea({
+          borderBox: {
             [axis.start]: 0,
             [axis.end]: 100,
             // frame hides subject
             [axis.crossAxisStart]: 400,
             [axis.crossAxisEnd]: 500,
-          }),
+          },
           scroll: { x: 0, y: 0 },
           scrollWidth: 100,
           scrollHeight: 100,
@@ -681,7 +680,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.marginBox.center,
+        pageBorderBoxCenter: source.page.borderBox.center,
         source,
         droppables,
         viewport,
@@ -697,12 +696,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           bottom: 10,
           left: 20,
           right: 30,
-        }),
+        },
       });
       const notInViewport = getDroppableDimension({
         descriptor: {
@@ -710,12 +709,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           bottom: 10,
           left: viewport.subject.right + 1,
           right: viewport.subject.right + 10,
-        }),
+        },
       });
       const droppables: DroppableDimensionMap = {
         [source.descriptor.id]: source,
@@ -724,7 +723,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.marginBox.center,
+        pageBorderBoxCenter: source.page.borderBox.center,
         source,
         droppables,
         viewport,
@@ -740,12 +739,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           left: 0,
           right: 20,
           bottom: 10,
-        }),
+        },
       });
       const noOverlap = getDroppableDimension({
         descriptor: {
@@ -753,14 +752,14 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           // comes after the source
           top: 10,
           // but its left value is > the rigt of the source
           left: 30,
           right: 40,
           bottom: 20,
-        }),
+        },
       });
 
       const droppables: DroppableDimensionMap = {
@@ -770,7 +769,7 @@ describe('get best cross axis droppable', () => {
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({
         isMovingForward: true,
-        pageCenter: source.page.marginBox.center,
+        pageBorderBoxCenter: source.page.borderBox.center,
         source,
         droppables,
         viewport,
@@ -787,12 +786,12 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           left: 0,
           right: 100,
           bottom: 10,
-        }),
+        },
       });
       const sibling1 = getDroppableDimension({
         descriptor: {
@@ -800,14 +799,14 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           // shares an edge with the source
           top: 10,
           // shares the left edge with the source
           left: 20,
           right: 40,
           bottom: 20,
-        }),
+        },
       });
       const sibling2 = getDroppableDimension({
         descriptor: {
@@ -815,14 +814,14 @@ describe('get best cross axis droppable', () => {
           type: 'TYPE',
         },
         direction: axis.direction,
-        borderBox: getArea({
+        borderBox: {
           // shares an edge with the source
           top: 10,
           // shares the left edge with the source
           left: 40,
           right: 60,
           bottom: 20,
-        }),
+        },
       });
       const droppables: DroppableDimensionMap = {
         [source.descriptor.id]: source,
@@ -839,7 +838,7 @@ describe('get best cross axis droppable', () => {
 
         const result: ?DroppableDimension = getBestCrossAxisDroppable({
           isMovingForward: true,
-          pageCenter: center,
+          pageBorderBoxCenter: center,
           source,
           droppables,
           viewport,
@@ -860,7 +859,7 @@ describe('get best cross axis droppable', () => {
 
           const result: ?DroppableDimension = getBestCrossAxisDroppable({
             isMovingForward: true,
-            pageCenter: center,
+            pageBorderBoxCenter: center,
             source,
             droppables,
             viewport,
@@ -879,7 +878,7 @@ describe('get best cross axis droppable', () => {
 
           const result: ?DroppableDimension = getBestCrossAxisDroppable({
             isMovingForward: true,
-            pageCenter: center,
+            pageBorderBoxCenter: center,
             source,
             droppables,
             viewport,
@@ -892,7 +891,7 @@ describe('get best cross axis droppable', () => {
           const center2: Position = add(center, { y: 0, x: 1 });
           const result2: ?DroppableDimension = getBestCrossAxisDroppable({
             isMovingForward: true,
-            pageCenter: center2,
+            pageBorderBoxCenter: center2,
             source,
             droppables,
             viewport,

@@ -1,4 +1,5 @@
 // @flow
+import { type Position } from 'css-box-model';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import { patch, subtract } from '../position';
 import withDroppableDisplacement from '../with-droppable-displacement';
@@ -10,7 +11,6 @@ import type { Args, Result } from './move-to-next-index-types';
 import type {
   DraggableLocation,
   DraggableDimension,
-  Position,
   Axis,
   DragImpact,
   Displacement,
@@ -20,7 +20,7 @@ export default ({
   isMovingForward,
   draggableId,
   previousImpact,
-  previousPageCenter,
+  previousPageBorderBoxCenter,
   droppable,
   draggables,
   viewport,
@@ -73,7 +73,7 @@ export default ({
     return 'start';
   })();
 
-  const newPageCenter: Position = moveToEdge({
+  const newPageBorderBoxCenter: Position = moveToEdge({
     source: draggable.page.borderBox,
     sourceEdge,
     destination: movingRelativeTo.page.marginBox,
@@ -84,7 +84,7 @@ export default ({
   const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
     draggable,
     destination: droppable,
-    newPageCenter,
+    newPageBorderBoxCenter,
     viewport: viewport.subject,
   });
 
@@ -123,18 +123,18 @@ export default ({
 
   if (isVisibleInNewLocation) {
     return {
-      pageCenter: withDroppableDisplacement(droppable, newPageCenter),
+      pageBorderBoxCenter: withDroppableDisplacement(droppable, newPageBorderBoxCenter),
       impact: newImpact,
       scrollJumpRequest: null,
     };
   }
 
   // The full distance required to get from the previous page center to the new page center
-  const distanceMoving: Position = subtract(newPageCenter, previousPageCenter);
+  const distanceMoving: Position = subtract(newPageBorderBoxCenter, previousPageBorderBoxCenter);
   const distanceWithScroll: Position = withDroppableDisplacement(droppable, distanceMoving);
 
   return {
-    pageCenter: previousPageCenter,
+    pageBorderBoxCenter: previousPageBorderBoxCenter,
     impact: newImpact,
     scrollJumpRequest: distanceWithScroll,
   };

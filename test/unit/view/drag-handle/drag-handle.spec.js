@@ -1,13 +1,9 @@
 // @flow
-import React, { Component } from 'react';
-import type { Node } from 'react';
-import { mount } from 'enzyme';
-// eslint-disable-next-line no-duplicate-imports
-import type { ReactWrapper } from 'enzyme';
+import React, { Component, type Node } from 'react';
+import { getRect, type Position } from 'css-box-model';
+import { mount, type ReactWrapper } from 'enzyme';
 import DragHandle from '../../../../src/view/drag-handle/drag-handle';
 import { sloppyClickThreshold } from '../../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
-// eslint-disable-next-line no-duplicate-imports
-import type { Callbacks, DragHandleProps } from '../../../../src/view/drag-handle/drag-handle-types';
 import {
   dispatchWindowMouseEvent,
   dispatchWindowKeyDownEvent,
@@ -17,13 +13,13 @@ import {
   withKeyboard,
   dispatchWindowEvent,
 } from '../../../utils/user-input-util';
-import type { Position, DraggableId } from '../../../../src/types';
 import * as keyCodes from '../../../../src/view/key-codes';
 import getWindowScroll from '../../../../src/view/window/get-window-scroll';
 import setWindowScroll from '../../../utils/set-window-scroll';
-import getArea from '../../../../src/state/get-area';
 import { timeForLongPress, forcePressThreshold } from '../../../../src/view/drag-handle/sensor/create-touch-sensor';
 import { interactiveTagNames } from '../../../../src/view/drag-handle/util/should-allow-dragging-from-target';
+import type { Callbacks, DragHandleProps } from '../../../../src/view/drag-handle/drag-handle-types';
+import type { DraggableId } from '../../../../src/types';
 import type { TagNameMap } from '../../../../src/view/drag-handle/util/should-allow-dragging-from-target';
 import { styleContextKey, canLiftContextKey } from '../../../../src/view/context-keys';
 import * as attributes from '../../../../src/view/data-attributes';
@@ -169,7 +165,7 @@ const singleRef: HTMLElement = document.createElement('div');
   // faking that they are drag handles
   ref.setAttribute(attributes.dragHandle, 'yolo');
 
-  jest.spyOn(ref, 'getBoundingClientRect').mockImplementation(() => getArea({
+  jest.spyOn(ref, 'getBoundingClientRect').mockImplementation(() => getRect({
     left: 0,
     top: 0,
     right: fakeCenter.x * 2,

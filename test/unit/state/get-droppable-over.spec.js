@@ -1,18 +1,15 @@
 // @flow
+import { type Position, type Spacing, type Rect } from 'css-box-model';
 import getDroppableOver from '../../../src/state/get-droppable-over';
-import { getPreset, disableDroppable } from '../../utils/dimension';
-import { getDroppableDimension, getDraggableDimension, scrollDroppable } from '../../../src/state/dimension';
-import getArea from '../../../src/state/get-area';
+import { getPreset, disableDroppable, getDroppableDimension, getDraggableDimension } from '../../utils/dimension';
+import { scrollDroppable } from '../../../src/state/droppable-dimension';
 import type {
-  Area,
   DraggableId,
   DraggableDimension,
   DroppableDimension,
   DraggableDimensionMap,
   DroppableDimensionMap,
-  Spacing,
   DroppableId,
-  Position,
 } from '../../../src/types';
 
 const preset = getPreset();
@@ -84,14 +81,14 @@ describe('get droppable over', () => {
         id: 'partially hidden subject',
         type: 'TYPE',
       },
-      borderBox: getArea({
+      borderBox: {
         top: 0, left: 0, right: 100, bottom: 100,
-      }),
+      },
       closest: {
         // will partially hide the subject
-        frameBorderBox: getArea({
+        borderBox: {
           top: 0, left: 0, right: 50, bottom: 100,
-        }),
+        },
         scrollHeight: 100,
         scrollWidth: 100,
         scroll: { x: 0, y: 0 },
@@ -104,9 +101,9 @@ describe('get droppable over', () => {
         droppableId: droppable.descriptor.type,
         index: 0,
       },
-      borderBox: getArea({
+      borderBox: {
         top: 0, left: 0, right: 50, bottom: 50,
-      }),
+      },
     });
 
     const result: ?DroppableId = getDroppableOver({
@@ -127,15 +124,15 @@ describe('get droppable over', () => {
         id: 'hidden subject',
         type: 'TYPE',
       },
-      borderBox: getArea({
+      borderBox: {
         top: 0, left: 0, right: 100, bottom: 100,
-      }),
+      },
       closest: {
         // will partially hide the subject
         // will totally hide the subject
-        frameBorderBox: getArea({
+        borderBox: {
           top: 0, left: 101, right: 200, bottom: 100,
-        }),
+        },
         scrollHeight: 100,
         scrollWidth: 200,
         scroll: { x: 0, y: 0 },
@@ -148,9 +145,9 @@ describe('get droppable over', () => {
         droppableId: droppable.descriptor.type,
         index: 0,
       },
-      borderBox: getArea({
+      borderBox: {
         top: 0, left: 0, right: 50, bottom: 50,
-      }),
+      },
     });
 
     const result: ?DroppableId = getDroppableOver({
@@ -168,18 +165,18 @@ describe('get droppable over', () => {
     const margin: Spacing = {
       top: 10, right: 10, bottom: 10, left: 10,
     };
-    const droppablePaddingBox: Area = getArea({
+    const borderBox: Spacing = {
       top: 10,
       left: 10,
       right: 90,
       bottom: 90,
-    });
+    };
     const home: DroppableDimension = getDroppableDimension({
       descriptor: {
         id: 'home',
         type: 'TYPE',
       },
-      borderBox: droppablePaddingBox,
+      borderBox,
       margin,
     });
     const inHome1: DraggableDimension = getDraggableDimension({
@@ -188,13 +185,13 @@ describe('get droppable over', () => {
         droppableId: home.descriptor.id,
         index: 0,
       },
-      borderBox: getArea({
+      borderBox: {
         top: 10,
         left: 10,
         right: 90,
         // almost takes up the whole droppable
         bottom: 80,
-      }),
+      },
       margin,
     });
     const inForeign1: DraggableDimension = getDraggableDimension({
@@ -203,7 +200,7 @@ describe('get droppable over', () => {
         droppableId: 'foreign',
         index: 0,
       },
-      borderBox: getArea({
+      borderBox: {
         // to the right of inHome1
         left: 200,
         right: 250,
@@ -211,7 +208,7 @@ describe('get droppable over', () => {
         top: 10,
         // almost takes up the whole droppable
         bottom: 80,
-      }),
+      },
       margin,
     });
     const draggables: DraggableDimensionMap = {
@@ -360,13 +357,13 @@ describe('get droppable over', () => {
                 id: 'empty',
                 type: 'TYPE',
               },
-              borderBox: getArea({
+              borderBox: {
                 top: 1000,
                 left: 1000,
                 right: 2000,
                 // not big enough to fit inHome1
                 bottom: 1000 + (inHome1.page.marginBox.height / 2),
-              }),
+              },
             });
             const target: Position = {
               x: empty.page.marginBox.center.x,
@@ -409,13 +406,13 @@ describe('get droppable over', () => {
                 id: 'empty',
                 type: 'TYPE',
               },
-              borderBox: getArea({
+              borderBox: {
                 top: 1000,
                 left: 1000,
                 right: 2000,
                 // big enough to fit inHome1
                 bottom: 1000 + inHome1.page.marginBox.height,
-              }),
+              },
             });
             const target: Position = {
               x: empty.page.marginBox.center.x,
@@ -464,20 +461,20 @@ describe('get droppable over', () => {
               id: 'has-a-scroll-parent',
               type: 'TYPE',
             },
-            borderBox: getArea({
+            borderBox: {
               top: 0,
               left: 0,
               right: 100,
               // cut off by the frame
               bottom: 120,
-            }),
+            },
             closest: {
-              frameBorderBox: getArea({
+              borderBox: {
                 top: 0,
                 left: 0,
                 right: 100,
                 bottom: 100,
-              }),
+              },
               scrollHeight: 120,
               scrollWidth: 100,
               scroll: { x: 0, y: 0 },
@@ -515,21 +512,21 @@ describe('get droppable over', () => {
               id: 'my-custom-foreign',
               type: 'TYPE',
             },
-            borderBox: getArea({
+            borderBox: {
               top: 0,
               left: 0,
               right: 100,
               // this will ensure that there is required growth in the droppable
               bottom: inHome1.page.marginBox.height - 1,
-            }),
+            },
             closest: {
-              frameBorderBox: getArea({
+              borderBox: {
                 top: 0,
                 left: 0,
                 right: 100,
                 // currently much bigger than client
                 bottom: 500,
-              }),
+              },
               scrollWidth: 100,
               scrollHeight: 500,
               scroll: { x: 0, y: 0 },
@@ -537,17 +534,17 @@ describe('get droppable over', () => {
             },
           });
           const scrolled: DroppableDimension = scrollDroppable(foreign, { x: 0, y: 50 });
-          const clipped: ?Area = scrolled.viewport.clipped;
+          const clippedPageMarginBox: ?Rect = scrolled.viewport.clippedPageMarginBox;
 
-          if (clipped == null) {
+          if (clippedPageMarginBox == null) {
             throw new Error('invalid test setup');
           }
 
           // Just below clipped area
           // the buffer should be added to this area
           const target: Position = {
-            x: clipped.center.x,
-            y: clipped.bottom + 1,
+            x: clippedPageMarginBox.center.x,
+            y: clippedPageMarginBox.bottom + 1,
           };
 
           const result: ?DroppableId = getDroppableOver({

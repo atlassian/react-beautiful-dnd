@@ -1,4 +1,5 @@
 // @flow
+import { getRect, type Position, type Rect } from 'css-box-model';
 import {
   add,
   absolute,
@@ -6,18 +7,13 @@ import {
   patch,
   subtract,
 } from '../../../src/state/position';
-import getArea from '../../../src/state/get-area';
 import moveToEdge from '../../../src/state/move-to-edge';
 import { vertical, horizontal } from '../../../src/state/axis';
-import type {
-  Area,
-  Axis,
-  Position,
-} from '../../../src/types';
+import type { Axis } from '../../../src/types';
 
 // behind the destination
 // width: 40, height: 20
-const behind: Area = getArea({
+const behind: Rect = getRect({
   top: 0,
   left: 0,
   right: 40,
@@ -26,7 +22,7 @@ const behind: Area = getArea({
 
 // in front of the destination
 // width: 50, height: 10
-const infront: Area = getArea({
+const infront: Rect = getRect({
   top: 120,
   left: 150,
   right: 200,
@@ -34,7 +30,7 @@ const infront: Area = getArea({
 });
 
 // width: 50, height: 60
-const destination: Area = getArea({
+const destination: Rect = getRect({
   top: 50,
   left: 50,
   right: 100,
@@ -51,7 +47,7 @@ const pullBackwardsOnMainAxis = (axis: Axis) => (point: Position) => patch(
 
 // returns the absolute difference of the center position
 // to one of the corners on the axis.end. Choosing axis.end is arbitrary
-const getCenterDiff = (axis: Axis) => (source: Area): Position => {
+const getCenterDiff = (axis: Axis) => (source: Rect): Position => {
   const corner = patch(
     axis.line, source[axis.end], source[axis.crossAxisStart]
   );
@@ -75,7 +71,7 @@ const getCenterDiff = (axis: Axis) => (source: Area): Position => {
 };
 
 describe('move to edge', () => {
-  [behind, infront].forEach((source: Area) => {
+  [behind, infront].forEach((source: Rect) => {
     describe(`source is ${source === behind ? 'behind' : 'infront of'} destination`, () => {
       describe('moving to a vertical list', () => {
         const pullUpwards = pullBackwardsOnMainAxis(vertical);

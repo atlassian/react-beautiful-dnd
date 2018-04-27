@@ -1,15 +1,14 @@
 // @flow
+import { getRect, type Rect, type Position } from 'css-box-model';
 import getClosestDraggable from '../../../../src/state/move-cross-axis/get-closest-draggable';
-import { getDroppableDimension, getDraggableDimension, scrollDroppable } from '../../../../src/state/dimension';
+import { scrollDroppable } from '../../../../src/state/droppable-dimension';
 import { add, distance, patch } from '../../../../src/state/position';
+import { getDroppableDimension, getDraggableDimension, withAssortedSpacing } from '../../../utils/dimension';
 import { expandByPosition } from '../../../../src/state/spacing';
 import { horizontal, vertical } from '../../../../src/state/axis';
-import getArea from '../../../../src/state/get-area';
 import getViewport from '../../../../src/view/window/get-viewport';
 import type {
-  Area,
   Axis,
-  Position,
   DraggableDimension,
   DroppableDimension,
   Viewport,
@@ -25,7 +24,7 @@ describe('get closest draggable', () => {
       const crossAxisStart: number = 0;
       const crossAxisEnd: number = 20;
 
-      const borderBox: Area = getArea({
+      const borderBox: Rect = getRect({
         [axis.start]: start,
         [axis.end]: end,
         [axis.crossAxisStart]: crossAxisStart,
@@ -39,6 +38,7 @@ describe('get closest draggable', () => {
         },
         direction: axis.direction,
         borderBox,
+        ...withAssortedSpacing(),
       });
 
       const hiddenBackwards: DraggableDimension = getDraggableDimension({
@@ -47,12 +47,13 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 0,
         },
-        borderBox: getArea({
+        borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: -30, // -10
           [axis.end]: -10,
-        }),
+        },
+        ...withAssortedSpacing(),
       });
 
       // item bleeds backwards past the start of the droppable
@@ -62,12 +63,13 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 1,
         },
-        borderBox: getArea({
+        borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: -10, // -10
           [axis.end]: 20,
-        }),
+        },
+        ...withAssortedSpacing(),
       });
 
       const visible1: DraggableDimension = getDraggableDimension({
@@ -76,12 +78,13 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 2,
         },
-        borderBox: getArea({
+        borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: 20,
           [axis.end]: 40,
-        }),
+        },
+        ...withAssortedSpacing(),
       });
 
       const visible2: DraggableDimension = getDraggableDimension({
@@ -90,12 +93,13 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 3,
         },
-        borderBox: getArea({
+        borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: 40,
           [axis.end]: 60,
-        }),
+        },
+        ...withAssortedSpacing(),
       });
 
       // bleeds over the end of the visible boundary
@@ -105,12 +109,13 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 4,
         },
-        borderBox: getArea({
+        borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: 60,
           [axis.end]: 120,
-        }),
+        },
+        ...withAssortedSpacing(),
       });
 
       // totally invisible
@@ -120,12 +125,13 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 5,
         },
-        borderBox: getArea({
+        borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: 120,
           [axis.end]: 140,
-        }),
+        },
+        ...withAssortedSpacing(),
       });
 
       const outOfViewport: DraggableDimension = getDraggableDimension({
@@ -134,12 +140,13 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           index: 6,
         },
-        borderBox: getArea({
+        borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           [axis.start]: viewport.subject[axis.end] + 1,
           [axis.end]: viewport.subject[axis.end] + 10,
-        }),
+        },
+        ...withAssortedSpacing(),
       });
 
       const insideDestination: DraggableDimension[] = [
@@ -159,7 +166,7 @@ describe('get closest draggable', () => {
         );
         const result1: ?DraggableDimension = getClosestDraggable({
           axis,
-          pageCenter: center1,
+          pageBorderBoxCenter: center1,
           destination: droppable,
           insideDestination,
           viewport,
@@ -172,7 +179,7 @@ describe('get closest draggable', () => {
         );
         const result2: ?DraggableDimension = getClosestDraggable({
           axis,
-          pageCenter: center2,
+          pageBorderBoxCenter: center2,
           destination: droppable,
           insideDestination,
           viewport,
@@ -188,7 +195,7 @@ describe('get closest draggable', () => {
 
         const result: ?DraggableDimension = getClosestDraggable({
           axis,
-          pageCenter: center,
+          pageBorderBoxCenter: center,
           destination: droppable,
           insideDestination: [],
           viewport,
@@ -203,7 +210,7 @@ describe('get closest draggable', () => {
           direction: axis.direction,
           borderBox,
           closest: {
-            frameBorderBox: getArea(expandByPosition(borderBox, patch(axis.line, 100))),
+            borderBox: expandByPosition(borderBox, patch(axis.line, 100)),
             scrollHeight: borderBox.width + 100,
             scrollWidth: borderBox.height + 100,
             scroll: { x: 0, y: 0 },
@@ -222,7 +229,7 @@ describe('get closest draggable', () => {
 
         const result: ?DraggableDimension = getClosestDraggable({
           axis,
-          pageCenter: center,
+          pageBorderBoxCenter: center,
           destination: scrolled,
           insideDestination,
           viewport,
@@ -233,7 +240,7 @@ describe('get closest draggable', () => {
         // validation - with no scroll applied we are normally closer to visible1
         const result1: ?DraggableDimension = getClosestDraggable({
           axis,
-          pageCenter: center,
+          pageBorderBoxCenter: center,
           destination: droppable,
           insideDestination,
           viewport,
@@ -251,7 +258,7 @@ describe('get closest draggable', () => {
 
           const result: ?DraggableDimension = getClosestDraggable({
             axis,
-            pageCenter: center,
+            pageBorderBoxCenter: center,
             destination: droppable,
             insideDestination,
             viewport,
@@ -269,7 +276,7 @@ describe('get closest draggable', () => {
 
           const result: ?DraggableDimension = getClosestDraggable({
             axis,
-            pageCenter: center,
+            pageBorderBoxCenter: center,
             destination: droppable,
             insideDestination,
             viewport,
@@ -285,7 +292,7 @@ describe('get closest draggable', () => {
 
           const result: ?DraggableDimension = getClosestDraggable({
             axis,
-            pageCenter: center,
+            pageBorderBoxCenter: center,
             destination: droppable,
             insideDestination,
             viewport,
@@ -301,7 +308,7 @@ describe('get closest draggable', () => {
 
           const result: ?DraggableDimension = getClosestDraggable({
             axis,
-            pageCenter: center,
+            pageBorderBoxCenter: center,
             destination: droppable,
             insideDestination,
             viewport,
@@ -317,7 +324,7 @@ describe('get closest draggable', () => {
 
           const result: ?DraggableDimension = getClosestDraggable({
             axis,
-            pageCenter: center,
+            pageBorderBoxCenter: center,
             destination: droppable,
             insideDestination,
             viewport,
@@ -339,7 +346,7 @@ describe('get closest draggable', () => {
 
           const result: ?DraggableDimension = getClosestDraggable({
             axis,
-            pageCenter: center,
+            pageBorderBoxCenter: center,
             destination: droppable,
             insideDestination: notVisible,
             viewport,
@@ -360,7 +367,7 @@ describe('get closest draggable', () => {
 
         const result: ?DraggableDimension = getClosestDraggable({
           axis,
-          pageCenter: center,
+          pageBorderBoxCenter: center,
           destination: droppable,
           insideDestination,
           viewport,
@@ -377,7 +384,7 @@ describe('get closest draggable', () => {
         // 2. if we move beyond the edge visible2 will be selected
         const result2: ?DraggableDimension = getClosestDraggable({
           axis,
-          pageCenter: add(center, patch(axis.line, 1)),
+          pageBorderBoxCenter: add(center, patch(axis.line, 1)),
           destination: droppable,
           insideDestination,
           viewport,

@@ -1,11 +1,10 @@
 // @flow
 import React, { Component } from 'react';
+import { type Position, type Spacing } from 'css-box-model';
 import { mount } from 'enzyme';
 import DraggableDimensionPublisher from '../../../src/view/draggable-dimension-publisher/draggable-dimension-publisher';
-import { getDraggableDimension } from '../../../src/state/dimension';
-import getArea from '../../../src/state/get-area';
 import setWindowScroll from '../../utils/set-window-scroll';
-import { getPreset } from '../../utils/dimension';
+import { getPreset, getDraggableDimension, getComputedSpacing } from '../../utils/dimension';
 import type {
   DimensionMarshal,
   GetDraggableDimensionFn,
@@ -13,9 +12,6 @@ import type {
 import { withDimensionMarshal } from '../../utils/get-context-options';
 import forceUpdate from '../../utils/force-update';
 import type {
-  Spacing,
-  Area,
-  Position,
   DraggableId,
   DraggableDimension,
   DraggableDescriptor,
@@ -23,16 +19,7 @@ import type {
 
 const preset = getPreset();
 
-const noSpacing = {
-  marginTop: '0',
-  marginRight: '0',
-  marginBottom: '0',
-  marginLeft: '0',
-  paddingTop: '0',
-  paddingRight: '0',
-  paddingBottom: '0',
-  paddingLeft: '0',
-};
+const noComputedSpacing = getComputedSpacing({});
 
 type Props = {|
   index?: number,
@@ -189,23 +176,16 @@ describe('DraggableDimensionPublisher', () => {
           droppableId: preset.home.descriptor.id,
           index: 10,
         },
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           right: 100,
           bottom: 100,
           left: 0,
-        }),
+        },
       });
 
-      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => ({
-        top: expected.page.borderBox.top,
-        bottom: expected.page.borderBox.bottom,
-        left: expected.page.borderBox.left,
-        right: expected.page.borderBox.right,
-        height: expected.page.borderBox.height,
-        width: expected.page.borderBox.width,
-      }));
-      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noSpacing);
+      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => expected.client.borderBox);
+      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noComputedSpacing);
       const marshal: DimensionMarshal = getMarshalStub();
 
       mount(
@@ -237,28 +217,16 @@ describe('DraggableDimensionPublisher', () => {
           droppableId: preset.home.descriptor.id,
           index: 10,
         },
-        borderBox: getArea({
+        borderBox: {
           top: 0,
           right: 100,
           bottom: 100,
           left: 0,
-        }),
+        },
         margin,
       });
-      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => ({
-        top: expected.page.borderBox.top,
-        bottom: expected.page.borderBox.bottom,
-        left: expected.page.borderBox.left,
-        right: expected.page.borderBox.right,
-        height: expected.page.borderBox.height,
-        width: expected.page.borderBox.width,
-      }));
-      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => ({
-        marginTop: `${margin.top}`,
-        marginRight: `${margin.right}`,
-        marginBottom: `${margin.bottom}`,
-        marginLeft: `${margin.left}`,
-      }));
+      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => expected.client.borderBox);
+      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => getComputedSpacing({ margin }));
       const marshal: DimensionMarshal = getMarshalStub();
 
       mount(
@@ -287,12 +255,12 @@ describe('DraggableDimensionPublisher', () => {
         x: 100,
         y: 200,
       };
-      const borderBox: Area = getArea({
+      const borderBox: Spacing = {
         top: 0,
         right: 100,
         bottom: 100,
         left: 0,
-      });
+      };
       const expected: DraggableDimension = getDraggableDimension({
         descriptor: {
           id: 'fake-id',
@@ -303,7 +271,7 @@ describe('DraggableDimensionPublisher', () => {
         windowScroll,
       });
       jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => borderBox);
-      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noSpacing);
+      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noComputedSpacing);
       setWindowScroll(windowScroll);
 
       mount(

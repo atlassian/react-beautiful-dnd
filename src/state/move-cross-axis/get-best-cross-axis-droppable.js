@@ -1,5 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
+import { type Position, type Rect } from 'css-box-model';
 import { closest } from '../position';
 import isWithin from '../is-within';
 import { getCorners } from '../spacing';
@@ -9,15 +10,13 @@ import type {
   DroppableDimension,
   DroppableDimensionMap,
   DroppableId,
-  Position,
-  Area,
   Viewport,
 } from '../../types';
 
 type GetBestDroppableArgs = {|
   isMovingForward: boolean,
   // the current position of the dragging item
-  pageCenter: Position,
+  pageBorderBoxCenter: Position,
   // the home of the draggable
   source: DroppableDimension,
   // all the droppables in the system
@@ -25,22 +24,22 @@ type GetBestDroppableArgs = {|
   viewport: Viewport,
 |}
 
-const getSafeClipped = (droppable: DroppableDimension): Area => {
-  const area: ?Area = droppable.viewport.clipped;
+const getSafeClipped = (droppable: DroppableDimension): Rect => {
+  const rect: ?Rect = droppable.viewport.clippedPageMarginBox;
 
-  invariant(area, 'Cannot get clipped area from droppable');
+  invariant(rect, 'Cannot get clipped area from droppable');
 
-  return area;
+  return rect;
 };
 
 export default ({
   isMovingForward,
-  pageCenter,
+  pageBorderBoxCenter,
   source,
   droppables,
   viewport,
 }: GetBestDroppableArgs): ?DroppableDimension => {
-  const sourceClipped: ?Area = source.viewport.clipped;
+  const sourceClipped: ?Rect = source.viewport.clippedPageMarginBox;
 
   if (!sourceClipped) {
     return null;
@@ -51,7 +50,6 @@ export default ({
     sourceClipped[axis.start],
     sourceClipped[axis.end]
   );
-  // const candidates: Candidate[] = Object.keys(droppables)
   const candidates: DroppableDimension[] = Object.keys(droppables)
     .map((id: DroppableId): DroppableDimension => droppables[id])
     // Remove the source droppable from the list
@@ -60,16 +58,16 @@ export default ({
     .filter((droppable: DroppableDimension): boolean => droppable.isEnabled)
     // Remove any droppables that are not partially visible
     .filter((droppable: DroppableDimension): boolean => {
-      const clipped: ?Area = droppable.viewport.clipped;
+      const clippedPageMarginBox: ?Rect = droppable.viewport.clippedPageMarginBox;
       // subject is not visible at all in frame
-      if (!clipped) {
+      if (!clippedPageMarginBox) {
         return false;
       }
       // TODO: only need to be totally visible on the cross axis
-      return isPartiallyVisibleThroughFrame(viewport.subject)(clipped);
+      return isPartiallyVisibleThroughFrame(viewport.subject)(clippedPageMarginBox);
     })
     .filter((droppable: DroppableDimension): boolean => {
-      const targetClipped: Area = getSafeClipped(droppable);
+      const targetClipped: Rect = getSafeClipped(droppable);
 
       if (isMovingForward) {
         // is the droppable in front of the source on the cross axis?
@@ -82,7 +80,7 @@ export default ({
     })
     // Must have some overlap on the main axis
     .filter((droppable: DroppableDimension): boolean => {
-      const targetClipped: Area = getSafeClipped(droppable);
+      const targetClipped: Rect = getSafeClipped(droppable);
 
       const isBetweenDestinationClipped = isWithin(
         targetClipped[axis.start],
@@ -130,7 +128,7 @@ export default ({
         getSafeClipped(droppable)[axis.start],
         getSafeClipped(droppable)[axis.end]
       );
-      return isWithinDroppable(pageCenter[axis.line]);
+      return isWithinDroppable(pageBorderBoxCenter[axis.line]);
     });
 
   if (contains.length === 1) {
@@ -149,8 +147,8 @@ export default ({
   // 1. Find the candidate that has the closest corner
   // 2. If there is a tie - choose the one that is first on the main axis
   return candidates.sort((a: DroppableDimension, b: DroppableDimension): number => {
-    const first = closest(pageCenter, getCorners(getSafeClipped(a)));
-    const second = closest(pageCenter, getCorners(getSafeClipped(b)));
+    const first = closest(pageBorderBoxCenter, getCorners(getSafeClipped(a)));
+    const second = closest(pageBorderBoxCenter, getCorners(getSafeClipped(b)));
 
     // if the distances are not equal - choose the shortest
     if (first !== second) {

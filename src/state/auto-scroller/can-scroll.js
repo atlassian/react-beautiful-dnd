@@ -1,9 +1,9 @@
 // @flow
+import { type Position } from 'css-box-model';
 import { add, apply, isEqual } from '../position';
 import type {
-  ClosestScrollable,
+  Scrollable,
   DroppableDimension,
-  Position,
   Viewport,
 } from '../../types';
 
@@ -102,7 +102,7 @@ export const canScrollDroppable = (
   droppable: DroppableDimension,
   change: Position,
 ): boolean => {
-  const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
+  const closestScrollable: ?Scrollable = droppable.viewport.closestScrollable;
   // Cannot scroll when there is no scroll container!
   if (!closestScrollable) {
     return false;
@@ -135,7 +135,7 @@ export const getDroppableOverlap = (droppable: DroppableDimension, change: Posit
     return null;
   }
 
-  const closestScrollable: ?ClosestScrollable = droppable.viewport.closestScrollable;
+  const closestScrollable: ?Scrollable = droppable.viewport.closestScrollable;
   // Cannot scroll when there is no scroll container!
   if (!closestScrollable) {
     return null;
