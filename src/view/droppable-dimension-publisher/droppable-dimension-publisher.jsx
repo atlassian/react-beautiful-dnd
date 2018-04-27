@@ -282,16 +282,12 @@ export default class DroppableDimensionPublisher extends Component<Props> {
         left: paddingBox.left - base.border.left,
       };
 
-      console.log('borderBox', borderBox);
-
       const custom: BoxModel = createBox({
         borderBox,
         margin: base.margin,
         border: base.border,
         padding: base.padding,
       });
-
-      console.log('marginBox', custom.marginBox)
 
       return custom;
     })();

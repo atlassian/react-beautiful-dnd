@@ -2,14 +2,7 @@
 /* eslint-disable react/no-multi-comp */
 import React, { Component } from 'react';
 import { mount } from 'enzyme';
-import {
-  createBox,
-  getRect,
-  type BoxModel,
-  type Spacing,
-  type Position,
-  type Rect,
-} from 'css-box-model';
+import { createBox, type BoxModel, type Spacing, type Position } from 'css-box-model';
 import DroppableDimensionPublisher from '../../../src/view/droppable-dimension-publisher/droppable-dimension-publisher';
 import {
   getPreset,
@@ -466,16 +459,17 @@ describe('DraggableDimensionPublisher', () => {
           expect(result).toEqual(expected);
         });
 
-        it.only('should account for a change in scroll when crafting its custom borderBox', () => {
+        it('should account for a change in scroll when crafting its custom borderBox', () => {
           const scroll: Position = {
             x: 10,
             y: 10,
           };
-          console.log('big client', bigClient);
+          // the displacement of a scroll is in the opposite direction to a scroll
+          const displacement: Position = negate(scroll);
           const expected: DroppableDimension = getDroppableDimension({
             descriptor,
             // as expected
-            borderBox: bigClient.borderBox,
+            borderBox: offsetByPosition(bigClient.borderBox, displacement),
             margin,
             padding,
             border,
@@ -492,8 +486,6 @@ describe('DraggableDimensionPublisher', () => {
               shouldClipSubject: true,
             },
           });
-          const actualBoundingRect: Rect =
-            getRect(offsetByPosition(smallFrameClient.borderBox, scroll));
 
           const marshal: DimensionMarshal = getMarshalStub();
           // both the droppable and the parent are scrollable
@@ -504,8 +496,7 @@ describe('DraggableDimensionPublisher', () => {
           const el: HTMLElement = wrapper.instance().getRef();
           // returning smaller border box as this is what occurs when the element is scrollable
           jest.spyOn(el, 'getBoundingClientRect')
-            .mockImplementationOnce(() => actualBoundingRect)
-            .mockImplementationOnce(() => smallFrameClient.borderBox);
+            .mockImplementation(() => smallFrameClient.borderBox);
           // scrollWidth / scrollHeight are based on the paddingBox of an element
           Object.defineProperty(el, 'scrollWidth', {
             value: bigClient.paddingBox.width,
