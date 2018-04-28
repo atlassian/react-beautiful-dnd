@@ -1,5 +1,5 @@
 [ignore]
-.*/node_modules/styled-components/.*
+.*/website/node_modules/@atlaskit/theme/dist/cjs/components/AtlaskitThemeProvider.js.flow
 .*/website/public/.*
 .*/website/.cache/.*
 
