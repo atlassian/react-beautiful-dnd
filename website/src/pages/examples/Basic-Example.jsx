@@ -1,12 +1,13 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { DragDropContext } from '../../../../../src';
-import QuoteList from '../primatives/quote-list';
-import { colors, grid } from '../constants';
-import reorder from '../reorder';
-import type { Quote } from '../types';
-import type { DropResult, DragStart } from '../../../../../src/types';
+import { DragDropContext } from '../../../../src';
+import QuoteList from '../../components/examples/primatives/quote-list';
+import { colors, grid } from '../../components/examples/constants';
+import reorder from '../../components/examples/reorder';
+import type { Quote } from '../../components/examples/types';
+import { quotes as initialQuotes } from '../../components/examples/data';
+import type { DropResult, DragStart } from '../../../../src/types';
 
 /* eslint-disable no-console */
 const publishOnDragStart = (v?: any) => console.log('onDragStart', v);
@@ -26,7 +27,6 @@ const Root = styled.div`
 `;
 
 type Props = {|
-  initial: Quote[],
   listStyle?: Object
 |};
 
@@ -38,7 +38,7 @@ export default class QuoteApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
 
   state: State = {
-    quotes: this.props.initial,
+    quotes: initialQuotes,
   };
 
   onDragStart = (initial: DragStart) => {

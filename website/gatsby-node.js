@@ -6,15 +6,24 @@
  */
 const path = require('path');
 const lowerCase = require('lodash.lowercase');
+const fs = require('fs');
 
 /* ::
 type fileNode = { relativePath: string }
 
-type Node = {
-  parent: any,
+type BaseNode = {
   internal: {
     type: string,
   }
+}
+
+type Node = {
+  internal: {
+    type: 'SitePage | MarkdownRemark',
+  },
+  layout: string,
+  componentPath: string,
+  parent: any,
 }
 
 type nodeField = { node: Node,  name: string, value: string }
@@ -41,6 +50,7 @@ type markdownGraphQLResult = {
 }
 
 type Page = {
+  layout?: string,
   path: string,
   component: any,
   context: {
@@ -61,37 +71,59 @@ type NodeParams = {
   getNode: (string) => fileNode,
   graphql: (string) => Promise<markdownGraphQLResult>
 }
+
+type PageParams = {
+  page: Page,
+  boundActionCreators: boundActionCreators,
+}
 */
 
-exports.onCreateNode = ({ node, boundActionCreators, getNode }/* : NodeParams */) => {
-  const { createNodeField } = boundActionCreators;
-  if (node.internal.type === 'MarkdownRemark') {
-    const fileNode = getNode(node.parent);
-    const parsedFilePath = path.parse(fileNode.relativePath);
-    let slug = '/docs';
-    let title = '';
-    if (parsedFilePath.dir) {
-      slug += `/${parsedFilePath.dir.toLowerCase()}`;
-      title = lowerCase(parsedFilePath.dir);
-    }
-    if (parsedFilePath.name !== 'index') {
-      slug += `/${parsedFilePath.name.toLowerCase()}`;
-      title = lowerCase(parsedFilePath.name);
-    }
+const addMD = ({ getNode, node, createNodeField }) => {
+  const fileNode = getNode(node.parent);
+  const parsedFilePath = path.parse(fileNode.relativePath);
+  let slug = '/documentation';
+  let title = '';
+  if (parsedFilePath.dir) {
+    slug += `/${parsedFilePath.dir.toLowerCase()}`;
+    title = lowerCase(parsedFilePath.dir);
+  }
+  if (parsedFilePath.name !== 'index') {
+    slug += `/${parsedFilePath.name.toLowerCase()}`;
+    title = lowerCase(parsedFilePath.name);
+  }
 
-    title = title.charAt(0).toUpperCase() + title.slice(1);
+  title = title.charAt(0).toUpperCase() + title.slice(1);
 
-    createNodeField({ node, name: 'slug', value: slug });
-    createNodeField({ node, name: 'title', value: title });
-    createNodeField({
-      node,
-      name: 'dir',
-      value: parsedFilePath.dir.toLowerCase(),
-    });
+  createNodeField({ node, name: 'slug', value: slug });
+  createNodeField({ node, name: 'title', value: title });
+  createNodeField({
+    node,
+    name: 'dir',
+    value: parsedFilePath.dir.toLowerCase(),
+  });
+};
+
+const addRaw = (node, createNodeField) => {
+  if (node.layout === 'example') {
+    const raw = fs.readFileSync(node.componentPath, 'utf-8');
+    createNodeField({ node, name: 'raw', value: raw });
+  } else {
+    createNodeField({ node, name: 'raw', value: '' });
   }
 };
 
-exports.createPages = ({ graphql, boundActionCreators }/* : NodeParams */)/* : Promise<any> */ => {
+exports.onCreateNode = (
+  { node, boundActionCreators, getNode } /* : NodeParams */
+) => {
+  const { createNodeField } = boundActionCreators;
+  if (node.internal.type === 'MarkdownRemark') {
+    addMD({ getNode, node, createNodeField });
+  } else if (node.internal.type === 'SitePage') {
+    addRaw(node, createNodeField);
+  }
+};
+
+exports.createPages = ({ graphql, boundActionCreators } /* : NodeParams */) => {
   const { createPage } = boundActionCreators;
 
   return new Promise((resolve, reject) => {
@@ -131,5 +163,23 @@ exports.createPages = ({ graphql, boundActionCreators }/* : NodeParams */)/* : P
         });
       })
     );
+  });
+};
+
+exports.onCreatePage = async (
+  { page, boundActionCreators } /* : PageParams  */
+) => {
+  const { createPage } = boundActionCreators;
+
+  return new Promise((resolve) => {
+    if (page.path === '/') {
+      page.layout = 'landing';
+      // Update the page.
+      createPage(page);
+    } else if (page.path.match(/^\/(examples|internal)\/./)) {
+      page.layout = 'example';
+      createPage(page);
+    }
+    resolve();
   });
 };

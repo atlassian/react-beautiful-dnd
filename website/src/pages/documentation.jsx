@@ -25,12 +25,12 @@ const ExamplesList = ({ data }: { data: Data }) => (
     <h1>All Documentation</h1>
     <ul>
       {data.allMarkdownRemark.edges.map(({ node }) => (
-        <ul key={node.fields.slug}>
+        <li key={node.fields.slug}>
           <Link to={node.fields.slug} href={node.fields.slug}>
             {node.fields.dir && `${node.fields.dir} - `}
             {node.fields.title}
           </Link>
-        </ul>
+        </li>
       ))}
     </ul>
   </div>
@@ -43,7 +43,7 @@ export default ExamplesList;
 export const query = graphql`
   query docsList {
     allMarkdownRemark(
-      filter: { fields: { slug: { regex: "/^/docs//" } } }
+      filter: { fields: { slug: { regex: "/^/documentation//" } } }
       sort: { fields: [fields___dir], order: ASC }
     ) {
       edges {
