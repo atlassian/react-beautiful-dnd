@@ -22,12 +22,12 @@ const getBabelOptions = () => ({
   runtimeHelpers: true,
 });
 
-const shouldCheckSnapshot = process.env.SNAPSHOT === 'check';
+const matchSnapshot = process.env.SNAPSHOT === 'match';
 
 export default [
   // Universal module definition (UMD) build
   // - including console.* statements
-  // - conditionally used to check snapshot size
+  // - conditionally used to match snapshot size
   {
     input,
     output: {
@@ -43,7 +43,7 @@ export default [
       resolve({ extensions }),
       commonjs({ include: 'node_modules/**' }),
       replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
-      sizeSnapshot({ updateSnapshot: !shouldCheckSnapshot }),
+      sizeSnapshot({ matchSnapshot }),
     ],
   },
   // Minified UMD build
@@ -64,7 +64,7 @@ export default [
       resolve({ extensions }),
       commonjs({ include: 'node_modules/**' }),
       strip({ debugger: true }),
-      sizeSnapshot({ updateSnapshot: !shouldCheckSnapshot }),
+      sizeSnapshot({ matchSnapshot }),
       uglify(),
     ],
   },
@@ -90,7 +90,7 @@ export default [
     plugins: [
       resolve({ extensions }),
       babel(getBabelOptions()),
-      sizeSnapshot({ updateSnapshot: !shouldCheckSnapshot }),
+      sizeSnapshot({ matchSnapshot }),
     ],
   },
 ];
