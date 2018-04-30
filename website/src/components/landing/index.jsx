@@ -88,8 +88,8 @@ const IndexPage = () => (
         </VerticalRhythm>
       </Content>
       <Example>
-        <Media query={singleColumn.query}>
-          {(matches: boolean) => <Board numberOfColumns={matches ? 1 : 2} />}
+        <Media query={singleColumn.negatedQuery}>
+          {(matches: boolean) => <Board numberOfColumns={matches ? 2 : 1} />}
         </Media>
       </Example>
     </SideBySide>

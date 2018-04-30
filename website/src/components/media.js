@@ -5,17 +5,19 @@ type WhenRuleFn = (...args: mixed[]) => mixed;
 
 type MediaRule = {|
   query: string,
+  negatedQuery: string,
   fn: WhenRuleFn,
 |}
 
 // eslint-disable-next-line import/prefer-default-export
 export const singleColumn: MediaRule = (() => {
-  const query: string = 'screen and (max-width: 1300px)';
+  const query: string = '(max-width: 1300px)';
+  const negatedQuery: string = '(min-width: 1300px)';
 
   // $ExpectError - incorrect typing for css function
   const fn: WhenRuleFn = (...args) => `@media ${query} { ${css(...args)} }`;
 
   return {
-    query, fn,
+    query, fn, negatedQuery,
   };
 })();
