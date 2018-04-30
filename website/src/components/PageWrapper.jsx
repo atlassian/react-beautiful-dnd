@@ -6,7 +6,7 @@ import Media from 'react-media';
 import { colors as akColors } from '@atlaskit/theme';
 import Sidebar from './sidebar';
 import type { sitePage, docsPage } from './types';
-import { singleColumn } from '../components/media';
+import { smallView } from '../components/media';
 import { grid, sidebarWidth } from '../constants';
 
 const gutter: number = grid * 2;
@@ -18,7 +18,7 @@ const Content = styled.div`
   display: flex;
   justify-content: center;
 
-  ${singleColumn.fn`
+  ${smallView.fn`
     margin-left: 16px;
   `}
 `;
@@ -54,7 +54,7 @@ type ExternalProps = {|
 
 type InternalProps = {|
   ...ExternalProps,
-  isInSingleColumn: boolean,
+  isInLargeView: boolean,
 |}
 
 type State = {|
@@ -62,13 +62,11 @@ type State = {|
 |}
 
 class WithConditionalSidebar extends React.Component<InternalProps, State> {
+  // Show the sidebar if moving into large view
+  // Hide the sidebar is moving into small view
   static getDerivedStateFromProps = (nextProps: InternalProps): State => ({
-    showSidebar: !nextProps.isInSingleColumn,
+    showSidebar: nextProps.isInLargeView,
   })
-
-  state: State = {
-    showSidebar: !this.props.isInSingleColumn,
-  };
 
   onMenuToggle = () => {
     this.setState({
@@ -77,7 +75,7 @@ class WithConditionalSidebar extends React.Component<InternalProps, State> {
   }
 
   render() {
-    const { examples, docs, internal, showInternal, children, isInSingleColumn } = this.props;
+    const { examples, docs, internal, showInternal, children, isInLargeView } = this.props;
     const { showSidebar } = this.state;
 
     const sidebar: Node = showSidebar ? (
@@ -88,8 +86,7 @@ class WithConditionalSidebar extends React.Component<InternalProps, State> {
         showInternal={showInternal}
       />) : null;
 
-    const topbar: Node = isInSingleColumn ?
-      <MobileTopBar onMenuToggle={this.onMenuToggle} /> : null;
+    const topbar: Node = isInLargeView ? null : <MobileTopBar onMenuToggle={this.onMenuToggle} />;
 
     return (
       <React.Fragment>
@@ -106,7 +103,7 @@ class WithConditionalSidebar extends React.Component<InternalProps, State> {
 }
 
 export default (props: ExternalProps) => (
-  <Media query={singleColumn.negatedQuery}>
-    {(matches: boolean) => <WithConditionalSidebar {...props} isInSingleColumn={!matches} />}
+  <Media query={smallView.negatedQuery}>
+    {(matches: boolean) => <WithConditionalSidebar {...props} isInLargeView={matches} />}
   </Media>
 );

@@ -10,7 +10,7 @@ type MediaRule = {|
 |}
 
 // eslint-disable-next-line import/prefer-default-export
-export const singleColumn: MediaRule = (() => {
+export const smallView: MediaRule = (() => {
   const query: string = '(max-width: 1300px)';
   const negatedQuery: string = '(min-width: 1300px)';
 
