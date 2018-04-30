@@ -2,75 +2,128 @@
 import React, { type Node } from 'react';
 import styled from 'styled-components';
 import Link from 'gatsby-link';
+import Media from 'react-media';
 import { colors as akColors } from '@atlaskit/theme';
-import Sidebar from './Sidebar';
+import Sidebar from './sidebar';
 import type { sitePage, docsPage } from './types';
-import { colors, grid } from '../constants';
+import { smallView } from '../components/media';
+import { grid, sidebarWidth } from '../constants';
 
-const Contents = styled.div`
-  min-height: 100vh;
-  width: 600px;
-  padding: 64px;
-`;
-
-const Wrapper = styled.div`
-  background-color: ${colors.blue.deep};
-`;
+const gutter: number = grid * 2;
 
 const Content = styled.div`
-  max-width: 800px;
-  background-color: white;
-  margin: auto;
+  margin-left: ${sidebarWidth + gutter}px;
+  margin-right: ${gutter}px;
+  margin-top ${grid * 4}px;
   display: flex;
-  flex-direction: row;
-  border-top-left-radius: ${grid}px;
-  border-top-right-radius: ${grid}px;
-`;
-
-const HeaderLink = styled(Link)`
-  margin: 0 ${grid}px;
-  padding: ${grid * 1}px ${grid * 2}px;
-  color: ${akColors.N10};
-  font-weight: bold;
-  user-select: none;
-  box-sizing: border-box;
-
-  /* used to align the text next to the icon */
-  display: flex;
-  align-items: center;
   justify-content: center;
 
-  :hover {
-    cursor: pointer;
-    text-decoration: none;
-    color: ${akColors.N10};
+  ${smallView.fn`
+    margin-left: 16px;
+  `}
+`;
+
+const ContentSpacing = styled.div`
+  background: lightgreen;
+  max-width: 960px;
+  width: 100%;
+  min-height: 100vh;
+`;
+
+type MobileTopBarProps = {|
+  onMenuToggle: () => void,
+|}
+class MobileTopBar extends React.Component<MobileTopBarProps> {
+  render() {
+    return (
+      <div>
+        Mobile topbar
+        <button onClick={this.props.onMenuToggle}>Toggle menu</button>
+      </div>
+    );
   }
-`;
+}
 
-const Header = styled.div`
-  max-width: ${grid * 100}px;
-  margin: auto;
-  font-family: 'Clicker Script', cursive;
-  font-weight: normal;
-  font-size: ${grid * 5}px;
-  color: white;
-  text-align: center;
-`;
-
-type Props = {
+type ExternalProps = {|
   examples: sitePage,
   docs: docsPage,
   internal: sitePage,
   showInternal: boolean,
   children: Node,
+|}
+
+type InternalProps = {|
+  ...ExternalProps,
+  isInLargeView: boolean,
+|}
+
+type State = {|
+  showSidebar: boolean,
+|}
+
+class WithConditionalSidebar extends React.Component<InternalProps, State> {
+  // Show the sidebar if moving into large view
+  // Hide the sidebar is moving into small view
+  static getDerivedStateFromProps = (nextProps: InternalProps): State => ({
+    showSidebar: nextProps.isInLargeView,
+  })
+
+  state: State = {
+    showSidebar: false,
+  };
+
+  onMenuToggle = () => {
+    this.setState({
+      showSidebar: !this.state.showSidebar,
+    });
+  }
+
+  onContentClick = () => {
+    // We want to close the sidebar if it is open
+    // while in the mobile view
+    if (this.props.isInLargeView) {
+      return;
+    }
+
+    if (!this.state.showSidebar) {
+      return;
+    }
+
+    this.setState({
+      showSidebar: false,
+    });
+  }
+
+  render() {
+    const { examples, docs, internal, showInternal, children, isInLargeView } = this.props;
+    const { showSidebar } = this.state;
+
+    const sidebar: Node = showSidebar ? (
+      <Sidebar
+        examples={examples}
+        docs={docs}
+        internal={internal}
+        showInternal={showInternal}
+      />) : null;
+
+    const topbar: Node = isInLargeView ? null : <MobileTopBar onMenuToggle={this.onMenuToggle} />;
+
+    return (
+      <React.Fragment>
+        {sidebar}
+        {topbar}
+        <Content onClick={this.onContentClick}>
+          <ContentSpacing>
+            {children}
+          </ContentSpacing>
+        </Content>
+      </React.Fragment>
+    );
+  }
 }
 
-export default ({ examples, docs, internal, showInternal, children }: Props) => (
-  <Wrapper>
-    <Header><HeaderLink to="/" href="/">React-Beautiful-Dnd</HeaderLink></Header>
-    <Content>
-      <Sidebar examples={examples} docs={docs} internal={internal} showInternal={showInternal} />
-      <Contents>{children}</Contents>
-    </Content>
-  </Wrapper>
+export default (props: ExternalProps) => (
+  <Media query={smallView.negatedQuery}>
+    {(matches: boolean) => <WithConditionalSidebar {...props} isInLargeView={matches} />}
+  </Media>
 );
