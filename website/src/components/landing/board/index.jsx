@@ -135,7 +135,6 @@ export default class Board extends React.Component<Props, State> {
           droppableId="board"
           type="column"
           direction="horizontal"
-          ignoreContainerClipping
         >
           {(provided: DroppableProvided) => (
             <Container

@@ -6,14 +6,14 @@ import Board from './board';
 import CallToAction from './call-to-action';
 import SocialIcons from './social-icons';
 import { grid } from '../constants';
-import { singleColumn } from '../media';
+import { smallView } from '../media';
 
 const Title = styled.h1`
   font-family: 'Clicker Script', cursive;
   font-weight: normal;
   font-size: 90px;
 
-  ${singleColumn.fn`
+  ${smallView.fn`
     text-align: center;
     font-size: 10vw;
     white-space: nowrap;
@@ -22,7 +22,7 @@ const Title = styled.h1`
 
 const Tagline = styled.p`
   font-size: 20px;
-  ${singleColumn.fn`text-align: center`}
+  ${smallView.fn`text-align: center`}
 `;
 
 const Landing = styled.div`
@@ -44,7 +44,7 @@ const SideBySide = styled.div`
   /* wrap early if we need it (hopefully not!)*/
   /* flex-wrap: wrap; */
 
-  ${singleColumn.fn`
+  ${smallView.fn`
     flex-direction: column;
     align-items: center;
   `}
@@ -63,7 +63,7 @@ const Content = styled.div`
   display: flex;
   flex-direction: column;
 
-  ${singleColumn.fn`
+  ${smallView.fn`
     align-items: center;
   `}
 `;
@@ -71,7 +71,7 @@ const Content = styled.div`
 const Example = styled.div`
   flex-grow: 0;
 
-  ${singleColumn.fn`${verticalSpacing}`}
+  ${smallView.fn`${verticalSpacing}`}
 `;
 
 const IndexPage = () => (
@@ -88,8 +88,8 @@ const IndexPage = () => (
         </VerticalRhythm>
       </Content>
       <Example>
-        <Media query={singleColumn.query}>
-          {(matches: boolean) => <Board numberOfColumns={matches ? 1 : 2} />}
+        <Media query={smallView.negatedQuery}>
+          {(matches: boolean) => <Board numberOfColumns={matches ? 2 : 1} />}
         </Media>
       </Example>
     </SideBySide>
