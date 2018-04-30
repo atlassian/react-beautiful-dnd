@@ -12,7 +12,8 @@ type MediaRule = {|
 export const singleColumn: MediaRule = (() => {
   const query: string = 'screen and (max-width: 1300px)';
 
-  const fn: WhenRuleFn = (...args: mixed[]) => `@media ${query} { ${css(...args)} }`;
+  // $ExpectError - incorrect typing for css function
+  const fn: WhenRuleFn = (...args) => `@media ${query} { ${css(...args)} }`;
 
   return {
     query, fn,
