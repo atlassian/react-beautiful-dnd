@@ -1,16 +1,22 @@
 // @flow
 import React, { type Node } from 'react';
-
-import PageWrapper from '../components/PageWrapper';
+import ExampleWrapper, {
+  gatsbyUrlToCSBPath,
+} from '../components/ExampleWrapper';
 import CommonPage from '../components/CommonPage';
+import PageWrapper from '../components/PageWrapper';
+import { getTitleFromExamplePath } from '../utils';
 import type { SidebarData } from '../components/types';
 
 type Props = {
+  data: SidebarData,
   children: () => Node,
-  data: SidebarData
-};
+  location: {
+    pathname: string
+  }
+}
 
-const PageTemplate = ({ children, data }: Props) => (
+const ExamplePage = ({ children, data, location }: Props) => (
   <CommonPage>
     <PageWrapper
       examples={data.examples}
@@ -18,17 +24,22 @@ const PageTemplate = ({ children, data }: Props) => (
       internal={data.internal}
       showInternal={data.site.siteMetadata.isDevelopment}
     >
-      {children()}
+      <ExampleWrapper
+        title={getTitleFromExamplePath(location.pathname, '/examples/')}
+        path={gatsbyUrlToCSBPath(location.pathname)}
+      >
+        {children()}
+      </ExampleWrapper>
     </PageWrapper>
   </CommonPage>
 );
 
-export default PageTemplate;
+export default ExamplePage;
 
 /* eslint-disable no-undef */
 // $FlowFixMe
 export const query = graphql`
-  query sidebarInfo {
+  query examplesSidebarInfo {
     examples: allSitePage(filter: { path: { regex: "/^/examples/.+/" } }) {
       edges {
         node {
