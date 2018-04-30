@@ -7,19 +7,16 @@ import type { SidebarData } from '../components/types';
 
 type Props = {
   children: () => Node,
-  location: { pathname: string },
   data: SidebarData
 };
 
-const regex = /^\/(documentation|examples|internal)/;
-
-const PageTemplate = ({ children, location, data }: Props) => (
+const PageTemplate = ({ children, data }: Props) => (
   <CommonPage>
     <PageWrapper
       examples={data.examples}
       docs={data.docs}
       internal={data.internal}
-      showInternal={data.site.siteMetadata.development}
+      showInternal={data.site.siteMetadata.isDevelopment}
     >
       {children()}
     </PageWrapper>
@@ -62,7 +59,7 @@ export const query = graphql`
     }
     site: site {
       siteMetadata {
-        development
+        isDevelopment
       }
     }
   }

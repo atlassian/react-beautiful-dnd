@@ -19,11 +19,11 @@ const ExamplesList = ({ data }: { data: ExampleData }) => (
     <h1>List Of Examples</h1>
     <ul>
       {data.allSitePage.edges.map(({ node }) => (
-        <ul key={node.path}>
+        <li key={node.path}>
           <Link to={node.path} href={node.path}>
             {node.path.replace('/examples/', '').replace(/\/$/, '')}
           </Link>
-        </ul>
+        </li>
       ))}
     </ul>
   </div>

@@ -1961,9 +1961,9 @@ codesandbox@^1.1.14:
     shortid "^2.2.8"
     update-notifier "^2.2.0"
 
-codesandboxer@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/codesandboxer/-/codesandboxer-0.2.0.tgz#7b44c126452c4bd69d64f4ddc270948ce51dc33f"
+codesandboxer@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/codesandboxer/-/codesandboxer-0.2.1.tgz#83ce9bae3b0fad17e8703f6c705bb4754f18eeb9"
   dependencies:
     codesandbox "^1.1.14"
     isomorphic-unfetch "^2.0.0"
@@ -7326,11 +7326,11 @@ rc@^1.0.1, rc@^1.1.6, rc@^1.1.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-codesandboxer@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/react-codesandboxer/-/react-codesandboxer-2.0.2.tgz#ff83b0a8970dc77be9a531aca6c4ee48dab003bf"
+react-codesandboxer@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/react-codesandboxer/-/react-codesandboxer-2.0.3.tgz#09000747a85fef9618007c0d11ff19938833b887"
   dependencies:
-    codesandboxer "^0.2.0"
+    codesandboxer "^0.2.1"
     react-node-resolver "^1.0.1"
 
 react-deep-force-update@^2.1.1:

@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 import { colors as akColors } from '@atlaskit/theme';
 import { colors } from '../../constants';
 import type { docsPage, sitePage } from '../types';
+import { getTitleFromExamplePath } from '../../utils';
 
 const Sidebar = styled.div`
   min-height: 100vh;
@@ -38,7 +39,8 @@ const StyledLink = styled(Link)`
 type NavItemProps = {
   level: number,
   href: string,
-  title: string
+  title: string,
+  hoverColor?: string
 }
 
 const NavItem = ({ level, href, title, hoverColor }: NavItemProps) => {
@@ -71,7 +73,7 @@ const NavFromUrls = ({ pages, href, title }: NavFromUrlsProsp) => (
         hoverColor={akColors.Y300}
         level={2}
         href={path}
-        title={path.replace(href, '').replace(/\/$/, '').replace(/-/g, ' ')}
+        title={getTitleFromExamplePath(path, href)}
       />
     );
   })}

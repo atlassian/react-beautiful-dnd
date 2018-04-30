@@ -1,8 +1,8 @@
 // @flow
-import React from 'react';
+import React, { type Node } from 'react';
 import CommonPage from '../components/CommonPage';
 
-const Landing = ({ children }) => (
+const Landing = ({ children }: { children: () => Node }) => (
   <CommonPage>{children()}</CommonPage>
 );
 

@@ -1,18 +1,31 @@
 // @flow
-import React from 'react';
-import ExampleWrapper, { gatsbyUrlToCSBPath } from '../components/ExampleWrapper';
+import React, { type Node } from 'react';
+import ExampleWrapper, {
+  gatsbyUrlToCSBPath,
+} from '../components/ExampleWrapper';
 import CommonPage from '../components/CommonPage';
 import PageWrapper from '../components/PageWrapper';
+import { getTitleFromExamplePath } from '../utils';
+import type { SidebarData } from '../components/types';
 
-const ExamplePage = ({ children, data, location, ...rest }) => (
+type Props = {
+  data: SidebarData,
+  children: () => Node,
+  location: {
+    pathname: string
+  }
+}
+
+const ExamplePage = ({ children, data, location }: Props) => (
   <CommonPage>
     <PageWrapper
       examples={data.examples}
       docs={data.docs}
       internal={data.internal}
-      showInternal={data.site.siteMetadata.development}
+      showInternal={data.site.siteMetadata.isDevelopment}
     >
       <ExampleWrapper
+        title={getTitleFromExamplePath(location.pathname, '/examples/')}
         path={gatsbyUrlToCSBPath(location.pathname)}
       >
         {children()}
@@ -57,7 +70,7 @@ export const query = graphql`
     }
     site: site {
       siteMetadata {
-        development
+        isDevelopment
       }
     }
   }

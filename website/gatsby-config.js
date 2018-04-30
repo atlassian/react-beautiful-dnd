@@ -2,7 +2,7 @@
 module.exports = {
   siteMetadata: {
     title: 'react beautiful-dnd',
-    development: process.env.NODE_ENV === 'development',
+    isDevelopment: process.env.NODE_ENV === 'development',
   },
   plugins: [
     'gatsby-plugin-react-helmet',

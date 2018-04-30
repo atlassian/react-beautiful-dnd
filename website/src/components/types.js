@@ -48,7 +48,7 @@ export type SidebarData = {
   docs: docsPage,
   site: {
     siteMetadata: {
-      development: boolean
+      isDevelopment: boolean
     }
   }
 };
