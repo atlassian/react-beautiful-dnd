@@ -1,57 +1,79 @@
 // @flow
 import React, { Fragment } from 'react';
 import Link from 'gatsby-link';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { colors as akColors } from '@atlaskit/theme';
-import { colors } from '../../constants';
+import { grid, sidebarWidth } from '../../constants';
 import type { docsPage, sitePage } from '../types';
 import { getTitleFromExamplePath } from '../../utils';
 
 const Sidebar = styled.div`
-  min-height: 100vh;
-  min-width: 128px;
-  padding-left: 16px;
-  padding-right: 16px;
-  padding-top: 64px;
-  border-right: 2px solid ${colors.grey.darker};
+  height: 100vh;
+  width: ${sidebarWidth}px;
+  box-sizing: border-box;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background: ${akColors.G50};
+  overflow: auto;
+  padding-bottom: ${grid * 2}px;
+
+  ::-webkit-scrollbar {
+    width: ${grid}px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: pink;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+  }
 `;
 
-const NavItemStyles = css`
-  padding-bottom: 8px;
-  margin: 0;
+const Section = styled.div`
+  margin-top: ${grid * 3}px;
+  display: flex;
+  flex-direction: column;
 `;
 
-const H1 = styled.h1`
-  ${NavItemStyles} font-size: 20px;
+const Title = styled.h3`
+  font-size: 20px;
+  padding: ${grid}px;
+  padding-left ${grid * 2}px;
 `;
-const H2 = styled.h2`
-  ${NavItemStyles} font-size: 12px;
+const Item = styled.h4`
+  padding: ${grid}px;
+  padding-left: ${grid * 3}px;
 `;
 
 const StyledLink = styled(Link)`
   color: ${akColors.N600};
+  transition: background-color ease 0.2s, color ease 0.2s;
 
-  :hover {
-    color: ${({ hoverColor }) => (hoverColor || akColors.P300)};
+  :hover, :active, :focus {
+    color: white;
+    background: ${props => props.hoverColor};
+    text-decoration: none;
   }
 `;
 
-type NavItemProps = {
-  level: number,
+type NavItemProps = {|
   href: string,
   title: string,
-  hoverColor?: string
-}
+  hoverColor: string,
+  // TODO
+  // isActive?: boolean,
+  isTitle?: boolean,
+|}
 
-const NavItem = ({ level, href, title, hoverColor }: NavItemProps) => {
-  const Heading = level === 1 ? H1 : H2;
+const NavItem = ({ isTitle, href, title, hoverColor }: NavItemProps) => {
+  const Wrapper = isTitle ? Title : Item;
   return (
     <StyledLink hoverColor={hoverColor} to={href} href={href}>
-      <div style={{ width: '100%' }}>
-        <Heading>
-          {title}
-        </Heading>
-      </div>
+      <Wrapper>
+        {title}
+      </Wrapper>
     </StyledLink>
   );
 };
@@ -64,14 +86,13 @@ type NavFromUrlsProsp = {
 
 const NavFromUrls = ({ pages, href, title }: NavFromUrlsProsp) => (
   <Fragment>
-    <NavItem hoverColor={akColors.Y300} level={1} href={href} title={title} />
+    <NavItem hoverColor={akColors.Y300} isTitle href={href} title={title} />
     {pages.edges.map((page) => {
     const { path } = page.node;
     return (
       <NavItem
         key={path}
         hoverColor={akColors.Y300}
-        level={2}
         href={path}
         title={getTitleFromExamplePath(path, href)}
       />
@@ -89,12 +110,17 @@ type Props = {
 
 export default ({ docs, examples, internal, showInternal }: Props) => (
   <Sidebar>
-    <NavItem level={1} href="/documentation" title="Documentation" />
-    {docs.edges.map((page) => {
-      const { slug, title } = page.node.fields;
-      return <NavItem key={slug} level={2} href={slug} title={title} />;
-    })}
-    <NavFromUrls href="/examples/" title="Examples" pages={examples} />
-    {showInternal ? <NavFromUrls href="/internal/" title="Internal Examples" pages={internal} /> : null}
+    <h2>Header goes here</h2>
+    <Section>
+      <NavItem isTitle href="/documentation" title="Documentation" hoverColor={akColors.B300} />
+      {docs.edges.map((page) => {
+        const { slug, title } = page.node.fields;
+        return <NavItem key={slug} href={slug} title={title} hoverColor={akColors.B300} />;
+      })}
+    </Section>
+    <Section>
+      <NavFromUrls href="/examples/" title="Examples" pages={examples} />
+    </Section>
+    {showInternal ? <Section><NavFromUrls href="/internal/" title="Internal Examples" pages={internal} /></Section> : null}
   </Sidebar>
 );
