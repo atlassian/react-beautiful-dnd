@@ -68,9 +68,29 @@ class WithConditionalSidebar extends React.Component<InternalProps, State> {
     showSidebar: nextProps.isInLargeView,
   })
 
+  state: State = {
+    showSidebar: false,
+  };
+
   onMenuToggle = () => {
     this.setState({
       showSidebar: !this.state.showSidebar,
+    });
+  }
+
+  onContentClick = () => {
+    // We want to close the sidebar if it is open
+    // while in the mobile view
+    if (this.props.isInLargeView) {
+      return;
+    }
+
+    if (!this.state.showSidebar) {
+      return;
+    }
+
+    this.setState({
+      showSidebar: false,
     });
   }
 
@@ -92,7 +112,7 @@ class WithConditionalSidebar extends React.Component<InternalProps, State> {
       <React.Fragment>
         {sidebar}
         {topbar}
-        <Content>
+        <Content onClick={this.onContentClick}>
           <ContentSpacing>
             {children}
           </ContentSpacing>
