@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import QuoteList from '../primatives/quote-list';
 import { DragDropContext } from '../../../src/';
 import { generateQuoteMap, authors } from '../data';
-import reorder from '../reorder';
+import { reorderQuoteMap } from '../reorder';
 import type { Quote, QuoteMap, Author } from '../types';
 import type { DropResult } from '../../../src/types';
 import { grid } from '../constants';
@@ -152,15 +152,11 @@ export default class QuoteApp extends React.Component<*, State> {
       return;
     }
 
-    const quotes = reorder(
-      this.state.quotes,
-      result.source.index,
-      result.destination.index
-    );
-
-    this.setState({
-      quotes,
-    });
+    this.setState(reorderQuoteMap({
+      quoteMap: this.state.quoteMap,
+      source: result.source,
+      destination: result.destination,
+    }));
   }
 
   render() {
