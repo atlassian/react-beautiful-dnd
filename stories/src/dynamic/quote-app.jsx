@@ -3,14 +3,16 @@ import React from 'react';
 import styled from 'styled-components';
 import QuoteList from '../primatives/quote-list';
 import { DragDropContext } from '../../../src/';
-import { quotes as initial } from '../data';
+import { generateQuoteMap, authors } from '../data';
 import reorder from '../reorder';
-import type { Quote, Author } from '../types';
+import type { Quote, QuoteMap, Author } from '../types';
 import type { DropResult } from '../../../src/types';
 import { grid } from '../constants';
 
+const intial: QuoteMap = generateQuoteMap(20);
+
 const ControlSection = styled.div`
-  margin-left: ${grid * 4}px;
+  margin: ${grid * 4}px;
 `;
 
 class Controls extends React.Component<*> {
@@ -30,11 +32,12 @@ class Controls extends React.Component<*> {
 }
 
 type State = {|
-  quotes: Quote[],
+  quoteMap: QuoteMap,
 |}
 
 const Container = styled.div`
   display: flex;
+  align-items: flex-start;
 `;
 
 const createQuote = (() => {
@@ -42,7 +45,7 @@ const createQuote = (() => {
 
   return (): Quote => {
     const id: string = `generated-${++count}`;
-    const author: Author = initial[count % (initial.length - 1)].author;
+    const author: Author = authors[count % authors.length];
 
     const quote: Quote = {
       id,
@@ -56,7 +59,15 @@ const createQuote = (() => {
 
 export default class QuoteApp extends React.Component<*, State> {
   state: State = {
-    quotes: initial,
+    quoteMap: intial,
+  }
+
+  componentDidMount() {
+    window.addEventListener('keydown', this.onWindowKeyDown);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.onWindowKeyDown);
   }
 
   onWindowKeyDown = (event: KeyboardEvent) => {
@@ -65,46 +76,69 @@ export default class QuoteApp extends React.Component<*, State> {
       return;
     }
 
-    const quotes: Quote[] = this.state.quotes;
+    const quoteMap: QuoteMap = this.state.quoteMap;
 
     console.log('event.key', event.key);
 
     // Add quote to start of list ('before')
     if (event.key === 'b') {
+      const map: QuoteMap = Object.keys(quoteMap)
+        .reduce((previous: QuoteMap, key: string): QuoteMap => {
+          const quotes: Quote[] = quoteMap[key];
+          console.log('quotes', quotes);
+          previous[key] = [createQuote(), ...quotes];
+          return previous;
+        }, {});
+
+      console.log('map', map);
+
       this.setState({
-        quotes: [createQuote(), ...quotes],
+        quoteMap: map,
       });
       return;
     }
 
     // Add quote to end of list ('after')
     if (event.key === 'a') {
+      const map: QuoteMap = Object.keys(quoteMap)
+        .reduce((previous: QuoteMap, key: string): QuoteMap => {
+          const quotes: Quote[] = quoteMap[key];
+          previous[key] = [...quotes, createQuote()];
+          return previous;
+        }, {});
+
       this.setState({
-        quotes: [...quotes, createQuote()],
+        quoteMap: map,
       });
       return;
     }
 
     // Remove quote from end of list
     if (event.key === 'e') {
-      if (!quotes.length) {
-        return;
-      }
-      console.log('Remove quote from end of list');
+      const map: QuoteMap = Object.keys(quoteMap)
+        .reduce((previous: QuoteMap, key: string): QuoteMap => {
+          const quotes: Quote[] = quoteMap[key];
+          previous[key] = quotes.length ? quotes.slice(0, quotes.length - 1) : [];
+          return previous;
+        }, {});
+
       this.setState({
-        quotes: quotes.slice(0, quotes.length - 1),
+        quoteMap: map,
       });
       return;
     }
 
     // Remove quote from start of list
     if (event.key === 's') {
-      if (!quotes.length) {
-        return;
-      }
-      console.log('Remove quote from start of list');
+      const map: QuoteMap = Object.keys(quoteMap)
+        .reduce((previous: QuoteMap, key: string): QuoteMap => {
+          const quotes: Quote[] = quoteMap[key];
+          previous[key] = quotes.length ? quotes.slice(1, quotes.length) : [];
+          return previous;
+        }, {});
+
       this.setState({
-        quotes: quotes.slice(1, quotes.length),
+        quoteMap: map,
       });
     }
   }
@@ -129,23 +163,18 @@ export default class QuoteApp extends React.Component<*, State> {
     });
   }
 
-  componentDidMount() {
-    window.addEventListener('keydown', this.onWindowKeyDown);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.onWindowKeyDown);
-  }
-
   render() {
+    const { quoteMap } = this.state;
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
+        <Controls />
         <Container>
-          <QuoteList
-            listId="list"
-            quotes={this.state.quotes}
-          />
-          <Controls />
+          {Object.keys(quoteMap).map((key: string) => (
+            <QuoteList
+              listId={key}
+              quotes={quoteMap[key]}
+            />
+          ))}
         </Container>
       </DragDropContext>
     );

@@ -66,7 +66,7 @@ export const quotes: Quote[] = [
   },
   {
     id: '7',
-    content: 'That\'s it! The answer was so simple, I was too smart to see it!, That\'s it! The answer was so simple, I was too smart to see it!, That\'s it! The answer was so simple, I was too smart to see it!, That\'s it! The answer was so simple, I was too smart to see it!',
+    content: 'That\'s it! The answer was so simple, I was too smart to see it!',
     author: princess,
   },
   {
@@ -134,10 +134,10 @@ export const authorQuoteMap: QuoteMap =
     [author.name]: getByAuthor(author, quotes),
   }), {});
 
-export const generateQuoteMap = (total: number): QuoteMap => authors.reduce(
+export const generateQuoteMap = (quoteCount: number): QuoteMap => authors.reduce(
   (previous: QuoteMap, author: Author) => ({
     ...previous,
-    [author.name]: getQuotes(total / authors.length),
+    [author.name]: getQuotes(quoteCount / authors.length),
   }),
   {}
 );
