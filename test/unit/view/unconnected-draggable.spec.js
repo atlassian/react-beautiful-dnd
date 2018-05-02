@@ -877,8 +877,8 @@ describe('Draggable - unconnected', () => {
       const notDraggingProvided: Provided = getLastCall(notDraggingMock)[0].provided;
       const notDraggingStyle: NotDraggingStyle = (notDraggingProvided.draggableProps.style : any);
       const notDraggingExpected: NotDraggingStyle = {
-        transform: null,
-        transition: null,
+        transform: undefined,
+        transition: undefined,
       };
 
       expect(draggingStyle.zIndex).toBe(zIndexOptions.dragging);
@@ -921,7 +921,7 @@ describe('Draggable - unconnected', () => {
         margin: 0,
         pointerEvents: 'none',
         transition: 'none',
-        transform: null,
+        transform: undefined,
         zIndex: zIndexOptions.dragging,
       };
 
@@ -1128,8 +1128,8 @@ describe('Draggable - unconnected', () => {
       const droppingProvided: Provided = getLastCall(dropAnimatingMock)[0].provided;
       const droppingStyle: DraggingStyle = (droppingProvided.draggableProps.style : any);
       const expectedNotDraggingStyle: NotDraggingStyle = {
-        transition: null,
-        transform: null,
+        transition: undefined,
+        transform: undefined,
       };
 
       expect(droppingStyle.zIndex).toBe(zIndexOptions.dropAnimating);
@@ -1192,8 +1192,8 @@ describe('Draggable - unconnected', () => {
 
     it('should not be moved from its original position', () => {
       const style: NotDraggingStyle = {
-        transform: null,
-        transition: null,
+        transform: undefined,
+        transition: undefined,
       };
 
       expect(provided.draggableProps.style).toEqual(style);
@@ -1226,8 +1226,8 @@ describe('Draggable - unconnected', () => {
 
       it('should have base inline styles', () => {
         const expected: NotDraggingStyle = {
-          transform: null,
-          transition: null,
+          transform: undefined,
+          transition: undefined,
         };
 
         expect(provided.draggableProps.style).toEqual(expected);
@@ -1261,8 +1261,8 @@ describe('Draggable - unconnected', () => {
         it('should return animate out of the way with css', () => {
           const expected: NotDraggingStyle = {
             // relying on the style marshal
-            transition: null,
-            transform: null,
+            transition: undefined,
+            transform: undefined,
           };
           expect(provided.draggableProps.style).toEqual(expected);
         });
@@ -1280,7 +1280,7 @@ describe('Draggable - unconnected', () => {
           };
           const expected: NotDraggingStyle = {
             transition: 'none',
-            transform: null,
+            transform: undefined,
           };
 
           const customWrapper = mountDraggable({
@@ -1332,7 +1332,7 @@ describe('Draggable - unconnected', () => {
         it('should animate out of the way with css', () => {
           const expected: NotDraggingStyle = {
             // use the style marshal global style
-            transition: null,
+            transition: undefined,
             transform: `translate(${offset.x}px, ${offset.y}px)`,
           };
 

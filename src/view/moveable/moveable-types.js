@@ -5,7 +5,7 @@ import { type Position } from 'css-box-model';
 export type Speed = 'INSTANT' | 'STANDARD' | 'FAST';
 
 export type Style = {|
-  transform: ?string,
+  transform?: string,
 |}
 
 export type Props = {|

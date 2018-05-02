@@ -205,7 +205,7 @@ export default class Draggable extends Component<Props> {
         margin: 0,
         pointerEvents: 'none',
         transition: 'none',
-        transform: movementStyle.transform ? `${movementStyle.transform}` : null,
+        transform: movementStyle.transform ? `${movementStyle.transform}` : undefined,
       };
       return style;
     }
@@ -216,7 +216,7 @@ export default class Draggable extends Component<Props> {
       const style: NotDraggingStyle = {
         transform: movementStyle.transform,
         // use the global animation for animation - or opt out of it
-        transition: shouldAnimateDisplacement ? null : 'none',
+        transition: shouldAnimateDisplacement ? undefined : 'none',
         // transition: css.outOfTheWay,
       };
       return style;
