@@ -24,7 +24,7 @@ class Controls extends React.Component<*> {
           <li><kbd>b</kbd>: add Draggable to <strong>start</strong> of list</li>
           <li><kbd>a</kbd>: add Draggable to <strong>end</strong> of list</li>
           <li><kbd>s</kbd>: remove Draggable from <strong>start</strong> of list</li>
-          <li><kbd>e</kbd>: remove Draggable from <strong>end</strong> of list</li>
+          <li><kbd>d</kbd>: remove Draggable from <strong>end</strong> of list</li>
         </ul>
       </ControlSection>
     );
@@ -114,7 +114,7 @@ export default class QuoteApp extends React.Component<*, State> {
     }
 
     // Remove quote from end of list
-    if (event.key === 'e') {
+    if (event.key === 'd') {
       const map: QuoteMap = Object.keys(quoteMap)
         .reduce((previous: QuoteMap, key: string): QuoteMap => {
           const quotes: Quote[] = quoteMap[key];
