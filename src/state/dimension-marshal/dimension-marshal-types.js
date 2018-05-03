@@ -12,10 +12,10 @@ import type {
 } from '../../types';
 
 export type GetDraggableDimensionFn = () => DraggableDimension;
-export type GetDroppableDimensionFn = () => DroppableDimension;
+export type GetDroppableDimensionFn = (options: ScrollOptions) => DroppableDimension;
 
 export type DroppableCallbacks = {|
-  getDimension: GetDroppableDimensionFn,
+  getDimensionAndWatchScroll: GetDroppableDimensionFn,
   // scroll a droppable
   scroll: (change: Position) => void,
   // Droppable must listen to scroll events and publish them using the
@@ -60,12 +60,26 @@ export type Collection = {|
 
 export type DimensionMarshal = {|
   // Draggable
-  registerDraggable: (descriptor: DraggableDescriptor,
-    getDimension: GetDraggableDimensionFn) => void,
+  registerDraggable: (
+    descriptor: DraggableDescriptor,
+    getDimension: GetDraggableDimensionFn
+  ) => void,
+  updateDraggable: (
+    previousId: DraggableId,
+    descriptor: DraggableDescriptor,
+    getDimension: GetDraggableDimensionFn
+  ) => void,
   unregisterDraggable: (descriptor: DraggableDescriptor) => void,
   // Droppable
-  registerDroppable: (descriptor: DroppableDescriptor,
-    callbacks: DroppableCallbacks) => void,
+  registerDroppable: (
+    descriptor: DroppableDescriptor,
+    callbacks: DroppableCallbacks
+  ) => void,
+  updateDroppable: (
+    previousId: DroppableId,
+    descriptor: DroppableDescriptor,
+    callbacks: DroppableCallbacks,
+  ) => void,
   // it is possible for a droppable to change whether it is enabled during a drag
   updateDroppableIsEnabled: (id: DroppableId, isEnabled: boolean) => void,
   updateDroppableScroll: (id: DroppableId, newScroll: Position) => void,
