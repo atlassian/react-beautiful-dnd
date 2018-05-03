@@ -50,6 +50,14 @@ export type ToBeCollected = {|
   droppables: DroppableId[],
 |}
 
+export type Collection = {|
+  scrollOptions: ScrollOptions,
+  critical: {|
+    draggable: DraggableDescriptor,
+    droppable: DroppableDescriptor,
+  |}
+|}
+
 export type DimensionMarshal = {|
   // Draggable
   registerDraggable: (descriptor: DraggableDescriptor,

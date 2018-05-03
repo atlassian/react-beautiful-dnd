@@ -7,6 +7,7 @@ import type {
   DraggableDimension,
   DroppableDimension,
   ScrollOptions,
+  Collection,
 } from '../../types';
 import type { ToBeCollected } from './dimension-marshal-types';
 
@@ -28,6 +29,13 @@ export type Collector = {|
   collect: () => void,
 |}
 
+type CollectionOptions = {|
+  exclude: {
+    draggableId: DraggableId,
+    droppableId: DroppableId,
+  },
+|}
+
 export default ({
   publish,
   getDraggable,
@@ -39,17 +47,21 @@ export default ({
   let isQueued: boolean = false;
   let isRunning: boolean = false;
 
-  const collectFromDOM = (toBeCollected: ToBeCollected): Collected => {
+  const collectFromDOM = (toBeCollected: ToBeCollected, options?: CollectionOptions): Collected => {
+    invariant(isActive, 'Should not collect when not active');
+
     const droppables: DroppableDimension[] = toBeCollected.droppables
+      .filter((id: DroppableId): boolean => Boolean(options && options.exclude.droppableId === id))
       .map((id: DroppableId): DroppableDimension => getDroppable(id));
 
     const draggables: DraggableDimension[] = toBeCollected.draggables
+      .filter((id: DraggableId): boolean => Boolean(options && options.exclude.draggableId === id))
       .map((id: DraggableId): DraggableDimension => getDraggable(id));
 
     return { draggables, droppables };
   };
 
-  const run = () => {
+  const run = (options?: CollectionOptions) => {
     invariant(isRunning, 'Cannot start a new run when a run is already occurring');
 
     isRunning = true;
@@ -58,7 +70,7 @@ export default ({
     frameId = requestAnimationFrame(() => {
       timings.start('DOM collection');
       const toBeCollected: ToBeCollected = getToBeCollected();
-      const collected: Collected = collectFromDOM(toBeCollected);
+      const collected: Collected = collectFromDOM(toBeCollected, options);
       timings.finish('DOM collection');
 
       // Perform publish in next frame
@@ -80,9 +92,18 @@ export default ({
     });
   };
 
-  const start = () => {
+  const start = (collection: Collection) => {
     invariant(!isActive, 'Collector has already been started');
     isActive = true;
+
+    // Start a collection - but there is no need to collect the
+    // critical dimensions as they have already been collected
+    run({
+      exclude: {
+        draggableId: collection.critical.draggable.descriptor.id,
+        droppableId: collection.critical.droppable.descriptor.id,
+      },
+    });
   };
 
   const collect = () => {

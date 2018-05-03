@@ -24,15 +24,8 @@ import type {
   DraggableEntry,
   DroppableEntryMap,
   DraggableEntryMap,
+  Collection,
 } from './dimension-marshal-types';
-
-type Collection = {|
-  scrollOptions: ScrollOptions,
-  critical: {|
-    draggable: DraggableDescriptor,
-    droppable: DroppableDescriptor,
-  |}
-|}
 
 type Entries = {|
   droppables: DroppableEntryMap,
@@ -85,16 +78,18 @@ export default (callbacks: Callbacks) => {
   const collector: Collector = createCollector({
     publish: callbacks.bulkPublish,
     getDraggable: (id: DraggableId): DraggableDimension => {
+      invariant(collection);
       const entry: ?DraggableEntry = entries.draggables[id];
       invariant(entry);
 
       return entry.getDimension();
     },
     getDroppable: (id: DroppableId): DroppableDimension => {
+      invariant(collection);
       const entry: ?DroppableEntry = entries.droppables[id];
       invariant(entry);
 
-      return entry.callbacks.getDimension();
+      return entry.callbacks.getDimension(collection.scrollOptions);
     },
     getToBeCollected,
   });
