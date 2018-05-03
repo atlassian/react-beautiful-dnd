@@ -16,6 +16,13 @@ type Collected = {|
   droppables: DroppableDimension[],
 |}
 
+type CollectionOptions = {|
+  exclude: {
+    draggableId: DraggableId,
+    droppableId: DroppableId,
+  },
+|}
+
 type Args = {|
   getToBeCollected: () => ToBeCollected,
   getDraggable: (id: DraggableId) => DraggableDimension,
@@ -24,16 +31,9 @@ type Args = {|
 |}
 
 export type Collector = {|
-  start: (options: ScrollOptions) => void,
+  start: (excludingCritical: CollectionOptions) => void,
   stop: () => void,
   collect: () => void,
-|}
-
-type CollectionOptions = {|
-  exclude: {
-    draggableId: DraggableId,
-    droppableId: DroppableId,
-  },
 |}
 
 export default ({
@@ -92,18 +92,13 @@ export default ({
     });
   };
 
-  const start = (collection: Collection) => {
+  const start = (excludingCritical: CollectionOptions) => {
     invariant(!isActive, 'Collector has already been started');
     isActive = true;
 
     // Start a collection - but there is no need to collect the
     // critical dimensions as they have already been collected
-    run({
-      exclude: {
-        draggableId: collection.critical.draggable.descriptor.id,
-        droppableId: collection.critical.droppable.descriptor.id,
-      },
-    });
+    run(excludingCritical);
   };
 
   const collect = () => {

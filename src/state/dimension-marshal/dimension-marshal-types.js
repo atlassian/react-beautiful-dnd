@@ -65,7 +65,7 @@ export type DimensionMarshal = {|
     getDimension: GetDraggableDimensionFn
   ) => void,
   updateDraggable: (
-    previousId: DraggableId,
+    previous: DraggableDescriptor,
     descriptor: DraggableDescriptor,
     getDimension: GetDraggableDimensionFn
   ) => void,
@@ -76,7 +76,7 @@ export type DimensionMarshal = {|
     callbacks: DroppableCallbacks
   ) => void,
   updateDroppable: (
-    previousId: DroppableId,
+    previous: DroppableDescriptor,
     descriptor: DroppableDescriptor,
     callbacks: DroppableCallbacks,
   ) => void,

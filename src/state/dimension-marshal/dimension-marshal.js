@@ -2,6 +2,7 @@
 import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import createCollector, { type Collector } from './collector';
+import * as timings from '../../debug/timings';
 import type {
   DraggableId,
   DroppableId,
@@ -12,7 +13,6 @@ import type {
   State as AppState,
   Phase,
   LiftRequest,
-  ScrollOptions,
 } from '../../types';
 import type {
   DimensionMarshal,
@@ -78,18 +78,16 @@ export default (callbacks: Callbacks) => {
   const collector: Collector = createCollector({
     publish: callbacks.bulkPublish,
     getDraggable: (id: DraggableId): DraggableDimension => {
-      invariant(collection);
       const entry: ?DraggableEntry = entries.draggables[id];
-      invariant(entry);
+      invariant(collection && entry);
 
       return entry.getDimension();
     },
     getDroppable: (id: DroppableId): DroppableDimension => {
-      invariant(collection);
       const entry: ?DroppableEntry = entries.droppables[id];
-      invariant(entry);
+      invariant(collection && entry);
 
-      return entry.callbacks.getDimension(collection.scrollOptions);
+      return entry.callbacks.getDimensionAndWatchScroll(collection.scrollOptions);
     },
     getToBeCollected,
   });
@@ -132,6 +130,43 @@ export default (callbacks: Callbacks) => {
     collector.collect();
   };
 
+  const updateDraggable = (
+    previous: DraggableDescriptor,
+    descriptor: DraggableDescriptor,
+    getDimension: GetDraggableDimensionFn,
+  ) => {
+    invariant(entries.draggables[previous.id], 'Cannot update draggable registration as no previous registration was found');
+
+    if (collection) {
+      invariant(descriptor.id === previous.id, 'Cannot update a Draggables id during a drag');
+      invariant(descriptor.droppableId === previous.droppableId, 'Cannot update a Draggables droppable during a drag');
+    }
+
+    delete entries.draggables[previous.id];
+
+    registerDraggable(descriptor, getDimension);
+  };
+
+  const unregisterDraggable = (descriptor: DraggableDescriptor) => {
+    const entry: ?DraggableEntry = entries.draggables[descriptor.id];
+    invariant(entry, `Cannot unregister Draggable with id ${descriptor.id} as it is not registered`);
+
+    // Entry has already been overwritten.
+    // This can happen when a new Draggable with the same draggableId
+    // is mounted before the old Draggable has been removed.
+    if (entry.descriptor !== descriptor) {
+      return;
+    }
+
+    delete entries.draggables[descriptor.id];
+
+    if (!collection) {
+      return;
+    }
+
+    console.warn('TODO: batch unpublish draggable');
+  };
+
   const registerDroppable = (
     descriptor: DroppableDescriptor,
     droppableCallbacks: DroppableCallbacks,
@@ -161,61 +196,21 @@ export default (callbacks: Callbacks) => {
     collector.collect();
   };
 
-  const updateDroppableIsEnabled = (id: DroppableId, isEnabled: boolean) => {
-    // no need to update the application state if a collection is not occurring
-    if (!collection) {
-      return;
+  const updateDroppable = (
+    previous: DroppableDescriptor,
+    descriptor: DroppableDescriptor,
+    droppableCallbacks: DroppableCallbacks,
+  ) => {
+    invariant(entries.droppables[previous.id], 'Cannot update droppable registration as no previous registration was found');
+
+    if (collection) {
+      invariant(descriptor.id === previous.id, 'Cannot update a Droppables id during a drag');
+      invariant(descriptor.type === previous.type, 'Cannot update a Droppables type during a drag');
     }
 
-    invariant(entries.droppables[id], `Cannot update the scroll on Droppable ${id} as it is not registered`);
+    delete entries.droppables[previous.id];
 
-    // At this point a non primary droppable dimension might not yet be published
-    // but may have its enabled state changed. For now we still publish this change
-    // and let the reducer exit early if it cannot find the dimension in the state.
-    callbacks.updateDroppableIsEnabled(id, isEnabled);
-  };
-
-  const updateDroppableScroll = (id: DroppableId, newScroll: Position) => {
-    invariant(entries.droppables[id], `Cannot update the scroll on Droppable ${id} as it is not registered`);
-
-    // no need to update the application state if a collection is not occurring
-    if (!collecting) {
-      return;
-    }
-    callbacks.updateDroppableScroll(id, newScroll);
-  };
-
-  const scrollDroppable = (id: DroppableId, change: Position) => {
-    const entry: ?DroppableEntry = entries.droppables[id];
-
-    invariant(entry, 'Cannot scroll Droppable if not in entries');
-
-    if (!collection) {
-      return;
-    }
-
-    entry.callbacks.scroll(change);
-  };
-
-  const unregisterDraggable = (descriptor: DraggableDescriptor) => {
-    const entry: ?DraggableEntry = entries.draggables[descriptor.id];
-
-    invariant(entry, `Cannot unregister Draggable with id ${descriptor.id} as it is not registered`);
-
-    // Entry has already been overwritten.
-    // This can happen when a new Draggable with the same draggableId
-    // is mounted before the old Draggable has been removed.
-    if (entry.descriptor !== descriptor) {
-      return;
-    }
-
-    delete entries.draggables[descriptor.id];
-
-    if (!collection) {
-      return;
-    }
-
-    console.warn('TODO: batch unpublish draggable');
+    registerDroppable(descriptor, droppableCallbacks);
   };
 
   const unregisterDroppable = (descriptor: DroppableDescriptor) => {
@@ -240,6 +235,42 @@ export default (callbacks: Callbacks) => {
     }
 
     console.warn('TODO: publish droppable unpublish');
+  };
+
+  const updateDroppableIsEnabled = (id: DroppableId, isEnabled: boolean) => {
+    // no need to update the application state if a collection is not occurring
+    if (!collection) {
+      return;
+    }
+
+    invariant(entries.droppables[id], `Cannot update the scroll on Droppable ${id} as it is not registered`);
+
+    // At this point a non primary droppable dimension might not yet be published
+    // but may have its enabled state changed. For now we still publish this change
+    // and let the reducer exit early if it cannot find the dimension in the state.
+    callbacks.updateDroppableIsEnabled(id, isEnabled);
+  };
+
+  const updateDroppableScroll = (id: DroppableId, newScroll: Position) => {
+    invariant(entries.droppables[id], `Cannot update the scroll on Droppable ${id} as it is not registered`);
+
+    // no need to update the application state if a collection is not occurring
+    if (!collection) {
+      return;
+    }
+    callbacks.updateDroppableScroll(id, newScroll);
+  };
+
+  const scrollDroppable = (id: DroppableId, change: Position) => {
+    const entry: ?DroppableEntry = entries.droppables[id];
+
+    invariant(entry, 'Cannot scroll Droppable if not in entries');
+
+    if (!collection) {
+      return;
+    }
+
+    entry.callbacks.scroll(change);
   };
 
   const collectCriticalDimensions = (request: ?LiftRequest) => {
@@ -269,10 +300,13 @@ export default (callbacks: Callbacks) => {
     };
 
     // Get the minimum dimensions to start a drag
-    const home: DroppableDimension = homeEntry.callbacks.getDimension();
+    timings.start('initial collection and publish');
+    const home: DroppableDimension =
+    homeEntry.callbacks.getDimensionAndWatchScroll(request.scrollOptions);
     const draggable: DraggableDimension = draggableEntry.getDimension();
     callbacks.publishDroppable(home);
     callbacks.publishDraggable(draggable);
+    timings.finish('initial collection and publish');
   };
 
   const stopCollecting = () => {
@@ -308,7 +342,12 @@ export default (callbacks: Callbacks) => {
         'Recorded scroll options does not match app state'
       );
 
-      collector.start(collection);
+      collector.start({
+        exclude: {
+          draggableId: collection.critical.draggable.id,
+          droppableId: collection.critical.droppable.id,
+        },
+      });
       return;
     }
 
@@ -319,8 +358,10 @@ export default (callbacks: Callbacks) => {
 
   const marshal: DimensionMarshal = {
     registerDraggable,
+    updateDraggable,
     unregisterDraggable,
     registerDroppable,
+    updateDroppable,
     unregisterDroppable,
     updateDroppableIsEnabled,
     scrollDroppable,
