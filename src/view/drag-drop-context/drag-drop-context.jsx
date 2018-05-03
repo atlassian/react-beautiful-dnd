@@ -205,6 +205,14 @@ export default class DragDropContext extends React.Component<Props> {
   // This is useful when the user
   canLift = (id: DraggableId) => canStartDrag(this.store.getState(), id);
 
+  componentDidCatch(error: Error) {
+    console.warn('Error caught in DragDropContext. Cancelling any drag', error);
+    this.store.dispatch(clean());
+
+    // Not swallowing the error - letting it pass through
+    throw error;
+  }
+
   componentDidMount() {
     this.styleMarshal.mount();
     this.announcer.mount();

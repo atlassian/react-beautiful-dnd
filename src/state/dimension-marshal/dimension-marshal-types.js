@@ -45,8 +45,10 @@ export type DroppableEntryMap = {
   [key: DroppableId]: DroppableEntry,
 }
 
-export type UnknownDescriptorType = DraggableDescriptor | DroppableDescriptor;
-export type UnknownDimensionType = DraggableDimension | DroppableDimension;
+export type ToBeCollected = {|
+  draggables: DraggableId[],
+  droppables: DroppableId[],
+|}
 
 export type DimensionMarshal = {|
   // Draggable

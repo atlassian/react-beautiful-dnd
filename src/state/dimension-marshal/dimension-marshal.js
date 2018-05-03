@@ -1,9 +1,10 @@
 // @flow
 import { type Position } from 'css-box-model';
+import invariant from 'tiny-invariant';
+import createCollector, { type Collector } from './collector';
 import type {
   DraggableId,
   DroppableId,
-  TypeId,
   DroppableDescriptor,
   DraggableDescriptor,
   DraggableDimension,
@@ -18,103 +19,85 @@ import type {
   Callbacks,
   GetDraggableDimensionFn,
   DroppableCallbacks,
-  UnknownDimensionType,
-  UnknownDescriptorType,
+  ToBeCollected,
   DroppableEntry,
   DraggableEntry,
   DroppableEntryMap,
   DraggableEntryMap,
 } from './dimension-marshal-types';
 
-type State = {|
-  // long lived
-  droppables: DroppableEntryMap,
-  draggables: DraggableEntryMap,
-  // short lived
-  isCollecting: boolean,
-  scrollOptions: ?ScrollOptions,
-  request: ?LiftRequest,
-  requestType: ?TypeId,
-  frameId: ?AnimationFrameID,
+type Collection = {|
+  scrollOptions: ScrollOptions,
+  critical: {|
+    draggable: DraggableDescriptor,
+    droppable: DroppableDescriptor,
+  |}
 |}
 
-type ToBePublished = {|
-  droppables: DroppableDimension[],
-  draggables: DraggableDimension[],
+type Entries = {|
+  droppables: DroppableEntryMap,
+  draggables: DraggableEntryMap,
 |}
 
 export default (callbacks: Callbacks) => {
-  let state: State = {
+  const entries: Entries = {
     droppables: {},
     draggables: {},
-    isCollecting: false,
-    scrollOptions: null,
-    request: null,
-    requestType: null,
-    frameId: null,
   };
+  let collection: ?Collection = null;
 
-  const setState = (partial: Object) => {
-    const newState: State = {
-      ...state,
-      ...partial,
+  const getToBeCollected = (): ToBeCollected => {
+    invariant(collection, 'Cannot collect dimensions when no collection is occurring');
+
+    const home: DroppableDescriptor = collection.critical.droppable;
+
+    const draggables: DraggableId[] =
+      Object.keys(entries.draggables)
+        // remove draggables that do not have the same droppable type
+        .filter((id: DraggableId): boolean => {
+          const entry: DraggableEntry = entries.draggables[id];
+          const parent: ?DroppableEntry = entries.droppables[entry.descriptor.droppableId];
+
+          // This should never happen
+          // but it is better to print this information and continue on
+          if (!parent) {
+            console.warn(`
+              Orphan Draggable found [id: ${entry.descriptor.id}] which says
+              it belongs to unknown Droppable ${entry.descriptor.droppableId}
+            `);
+            return false;
+          }
+
+          return parent.descriptor.type === home.type;
+        });
+
+    const droppables: DroppableId[] =
+      Object.keys(entries.droppables)
+        // remove droppables with a different type
+        .filter((id: DroppableId): boolean => entries.droppables[id].descriptor.type === home.type);
+
+    return {
+      draggables,
+      droppables,
     };
-    state = newState;
   };
 
-  const cancel = (...args: mixed[]) => {
-    console.error(...args);
+  const collector: Collector = createCollector({
+    publish: callbacks.bulkPublish,
+    getDraggable: (id: DraggableId): DraggableDimension => {
+      const entry: ?DraggableEntry = entries.draggables[id];
+      invariant(entry);
 
-    // We want to cancel the drag even if we are not collecting yet
-    // This is true when trying to lift something that has not been published
-    callbacks.cancel();
+      return entry.getDimension();
+    },
+    getDroppable: (id: DroppableId): DroppableDimension => {
+      const entry: ?DroppableEntry = entries.droppables[id];
+      invariant(entry);
 
-    if (!state.isCollecting) {
-      return;
-    }
-
-    // eslint-disable-next-line no-use-before-define
-    stopCollecting();
-  };
-
-  const cancelIfModifyingActiveDraggable = (descriptor: DraggableDescriptor) => {
-    if (!state.isCollecting) {
-      return;
-    }
-
-    const home: ?DroppableEntry = state.droppables[descriptor.droppableId];
-
-    // In React 16 children are mounted before parents are.
-    // This case can happen when a list of Draggables are being
-    // moved using a React.Portal.
-    if (!home) {
-      return;
-    }
-
-    // Adding something of a different type - not relevant to the drag
-    if (home.descriptor.type !== state.requestType) {
-      return;
-    }
-
-    // Technically we could let the drag go on - but this is being more explicit
-    // with consumers to prevent undesirable states
-    cancel('Adding or removing a Draggable during a drag is currently not supported');
-  };
-
-  const cancelIfModifyingActiveDroppable = (descriptor: DroppableDescriptor) => {
-    if (!state.isCollecting) {
-      return;
-    }
-
-    // Adding something of a different type - not relevant to the drag
-    // This can happen when dragging a Draggable that has a child Droppable
-    // when using a React.Portal as the child Droppable component will be remounted
-    if (descriptor.type !== state.requestType) {
-      return;
-    }
-
-    cancel('Adding or removing a Droppable during a drag is currently not supported');
-  };
+      return entry.callbacks.getDimension();
+    },
+    getToBeCollected,
+  });
 
   const registerDraggable = (
     descriptor: DraggableDescriptor,
@@ -131,16 +114,27 @@ export default (callbacks: Callbacks) => {
       descriptor,
       getDimension,
     };
-    const draggables: DraggableEntryMap = {
-      ...state.draggables,
-      [id]: entry,
-    };
+    entries.draggables[id] = entry;
 
-    setState({
-      draggables,
-    });
+    if (!collection) {
+      return;
+    }
 
-    cancelIfModifyingActiveDraggable(descriptor);
+    const home: ?DroppableEntry = entries.droppables[descriptor.droppableId];
+
+    // In React 16 children are mounted before parents are.
+    // This case can happen when a list of Draggables are being
+    // moved using a React.Portal.
+    if (!home) {
+      return;
+    }
+
+    // Adding something of a different type - not relevant to the drag
+    if (home.descriptor.type !== collection.critical.droppable.type) {
+      return;
+    }
+
+    collector.collect();
   };
 
   const registerDroppable = (
@@ -158,27 +152,28 @@ export default (callbacks: Callbacks) => {
       callbacks: droppableCallbacks,
     };
 
-    const droppables: DroppableEntryMap = {
-      ...state.droppables,
-      [id]: entry,
-    };
+    entries.droppables[id] = entry;
 
-    setState({
-      droppables,
-    });
+    if (!collection) {
+      return;
+    }
 
-    cancelIfModifyingActiveDroppable(descriptor);
+    // Not of the same type - we do not need to publish
+    if (descriptor.type !== collection.critical.droppable.type) {
+      return;
+    }
+
+    collector.collect();
   };
 
   const updateDroppableIsEnabled = (id: DroppableId, isEnabled: boolean) => {
-    if (!state.droppables[id]) {
-      cancel(`Cannot update the scroll on Droppable ${id} as it is not registered`);
-      return;
-    }
     // no need to update the application state if a collection is not occurring
-    if (!state.isCollecting) {
+    if (!collection) {
       return;
     }
+
+    invariant(entries.droppables[id], `Cannot update the scroll on Droppable ${id} as it is not registered`);
+
     // At this point a non primary droppable dimension might not yet be published
     // but may have its enabled state changed. For now we still publish this change
     // and let the reducer exit early if it cannot find the dimension in the state.
@@ -186,24 +181,21 @@ export default (callbacks: Callbacks) => {
   };
 
   const updateDroppableScroll = (id: DroppableId, newScroll: Position) => {
-    if (!state.droppables[id]) {
-      cancel(`Cannot update the scroll on Droppable ${id} as it is not registered`);
-      return;
-    }
+    invariant(entries.droppables[id], `Cannot update the scroll on Droppable ${id} as it is not registered`);
+
     // no need to update the application state if a collection is not occurring
-    if (!state.isCollecting) {
+    if (!collecting) {
       return;
     }
     callbacks.updateDroppableScroll(id, newScroll);
   };
 
   const scrollDroppable = (id: DroppableId, change: Position) => {
-    const entry: ?DroppableEntry = state.droppables[id];
-    if (!entry) {
-      return;
-    }
+    const entry: ?DroppableEntry = entries.droppables[id];
 
-    if (!state.isCollecting) {
+    invariant(entry, 'Cannot scroll Droppable if not in entries');
+
+    if (!collection) {
       return;
     }
 
@@ -211,12 +203,9 @@ export default (callbacks: Callbacks) => {
   };
 
   const unregisterDraggable = (descriptor: DraggableDescriptor) => {
-    const entry: ?DraggableEntry = state.draggables[descriptor.id];
+    const entry: ?DraggableEntry = entries.draggables[descriptor.id];
 
-    if (!entry) {
-      cancel(`Cannot unregister Draggable with id ${descriptor.id} as it is not registered`);
-      return;
-    }
+    invariant(entry, `Cannot unregister Draggable with id ${descriptor.id} as it is not registered`);
 
     // Entry has already been overwritten.
     // This can happen when a new Draggable with the same draggableId
@@ -225,25 +214,19 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    const newMap: DraggableEntryMap = {
-      ...state.draggables,
-    };
-    delete newMap[descriptor.id];
+    delete entries.draggables[descriptor.id];
 
-    setState({
-      draggables: newMap,
-    });
+    if (!collection) {
+      return;
+    }
 
-    cancelIfModifyingActiveDraggable(descriptor);
+    console.warn('TODO: batch unpublish draggable');
   };
 
   const unregisterDroppable = (descriptor: DroppableDescriptor) => {
-    const entry: ?DroppableEntry = state.droppables[descriptor.id];
+    const entry: ?DroppableEntry = entries.droppables[descriptor.id];
 
-    if (!entry) {
-      cancel(`Cannot unregister Droppable with id ${descriptor.id} as as it is not registered`);
-      return;
-    }
+    invariant(entry, `Cannot unregister Droppable with id ${descriptor.id} as as it is not registered`);
 
     // entry has already been overwritten
     // in which can we will not remove it
@@ -255,238 +238,87 @@ export default (callbacks: Callbacks) => {
     // unmounts parents before it unmounts children:
     // https://twitter.com/alexandereardon/status/941514612624703488
 
-    const newMap: DroppableEntryMap = {
-      ...state.droppables,
-    };
-    delete newMap[descriptor.id];
+    delete entries.droppables[descriptor.id];
 
-    setState({
-      droppables: newMap,
-    });
-
-    cancelIfModifyingActiveDroppable(descriptor);
-  };
-
-  const getToBeCollected = (): UnknownDescriptorType[] => {
-    const draggables: DraggableEntryMap = state.draggables;
-    const droppables: DroppableEntryMap = state.droppables;
-    const request: ?LiftRequest = state.request;
-
-    if (!request) {
-      console.error('cannot find request in state');
-      return [];
-    }
-    const draggableId: DraggableId = request.draggableId;
-    const descriptor: DraggableDescriptor = draggables[draggableId].descriptor;
-    const home: DroppableDescriptor = droppables[descriptor.droppableId].descriptor;
-
-    const draggablesToBeCollected: DraggableDescriptor[] =
-      Object.keys(draggables)
-        .map((id: DraggableId): DraggableDescriptor => draggables[id].descriptor)
-        // remove the original draggable from the list
-        .filter((item: DraggableDescriptor): boolean => item.id !== descriptor.id)
-        // remove draggables that do not have the same droppable type
-        .filter((item: DraggableDescriptor): boolean => {
-          const entry: ?DroppableEntry = droppables[item.droppableId];
-
-          // This should never happen
-          // but it is better to print this information and continue on
-          if (!entry) {
-            console.warn(`Orphan Draggable found ${item.id} which says it belongs to unknown Droppable ${item.droppableId}`);
-            return false;
-          }
-
-          return entry.descriptor.type === home.type;
-        });
-
-    const droppablesToBeCollected: DroppableDescriptor[] =
-      Object.keys(droppables)
-        .map((id: DroppableId): DroppableDescriptor => droppables[id].descriptor)
-        // remove the home droppable from the list
-        .filter((item: DroppableDescriptor): boolean => item.id !== home.id)
-        // remove droppables with a different type
-        .filter((item: DroppableDescriptor): boolean => {
-          const droppable: DroppableDescriptor = droppables[item.id].descriptor;
-          return droppable.type === home.type;
-        });
-
-    const toBeCollected: UnknownDescriptorType[] = [
-      ...droppablesToBeCollected,
-      ...draggablesToBeCollected,
-    ];
-
-    return toBeCollected;
-  };
-
-  const processPrimaryDimensions = (request: ?LiftRequest) => {
-    if (state.isCollecting) {
-      cancel('Cannot start capturing dimensions for a drag it is already dragging');
+    if (!collection) {
       return;
     }
 
-    if (!request) {
-      cancel('Cannot start capturing dimensions with an invalid request', request);
-      return;
-    }
+    console.warn('TODO: publish droppable unpublish');
+  };
 
-    const draggables: DraggableEntryMap = state.draggables;
-    const droppables: DroppableEntryMap = state.droppables;
+  const collectCriticalDimensions = (request: ?LiftRequest) => {
+    invariant(collection, 'Cannot start capturing dimensions for a drag it is already dragging');
+    invariant(request, 'Cannot start capturing dimensions with an invalid request', request);
+
+    const draggables: DraggableEntryMap = entries.draggables;
+    const droppables: DroppableEntryMap = entries.droppables;
     const draggableId: DraggableId = request.draggableId;
     const draggableEntry: ?DraggableEntry = draggables[draggableId];
 
-    if (!draggableEntry) {
-      cancel(`Cannot find Draggable with id ${draggableId} to start collecting dimensions`);
-      return;
-    }
+    invariant(draggableEntry, `Cannot find Draggable with id ${draggableId} to start collecting dimensions`);
 
     const homeEntry: ?DroppableEntry = droppables[draggableEntry.descriptor.droppableId];
 
-    if (!homeEntry) {
-      cancel(`
-        Cannot find home Droppable [id:${draggableEntry.descriptor.droppableId}]
-        for Draggable [id:${request.draggableId}]
-      `);
-      return;
-    }
+    invariant(homeEntry, `
+      Cannot find home Droppable [id:${draggableEntry.descriptor.droppableId}]
+      for Draggable [id:${request.draggableId}]
+    `);
 
-    setState({
-      isCollecting: true,
-      request,
-      requestType: homeEntry.descriptor.type,
-    });
+    collection = {
+      scrollOptions: request.scrollOptions,
+      critical: {
+        draggable: draggableEntry.descriptor,
+        droppable: homeEntry.descriptor,
+      },
+    };
 
     // Get the minimum dimensions to start a drag
     const home: DroppableDimension = homeEntry.callbacks.getDimension();
     const draggable: DraggableDimension = draggableEntry.getDimension();
-    // Publishing dimensions
     callbacks.publishDroppable(home);
     callbacks.publishDraggable(draggable);
-    // Watching the scroll of the home droppable
-    homeEntry.callbacks.watchScroll(request.scrollOptions);
-  };
-
-  const setFrameId = (frameId: ?AnimationFrameID) => {
-    setState({
-      frameId,
-    });
-  };
-
-  const processSecondaryDimensions = (requestInAppState: ?LiftRequest): void => {
-    if (!state.isCollecting) {
-      cancel('Cannot collect secondary dimensions when collection is not occurring');
-      return;
-    }
-
-    const request: ?LiftRequest = state.request;
-
-    if (!request) {
-      cancel('Cannot process secondary dimensions without a request');
-      return;
-    }
-
-    if (!requestInAppState) {
-      cancel('Cannot process secondary dimensions without a request on the state');
-      return;
-    }
-
-    if (requestInAppState.draggableId !== request.draggableId) {
-      cancel('Cannot process secondary dimensions as local request does not match app state');
-      return;
-    }
-
-    const toBeCollected: UnknownDescriptorType[] = getToBeCollected();
-
-    // Phase 1: collect dimensions in a single frame
-    const collectFrameId: AnimationFrameID = requestAnimationFrame(() => {
-      const toBePublishedBuffer: UnknownDimensionType[] = toBeCollected.map(
-        (descriptor: UnknownDescriptorType): UnknownDimensionType => {
-          // is a droppable
-          if (descriptor.type) {
-            return state.droppables[descriptor.id].callbacks.getDimension();
-          }
-          // is a draggable
-          return state.draggables[descriptor.id].getDimension();
-        }
-      );
-
-      // Phase 2: publish all dimensions to the store
-      const publishFrameId: AnimationFrameID = requestAnimationFrame(() => {
-        const toBePublished: ToBePublished = toBePublishedBuffer.reduce(
-          (previous: ToBePublished, dimension: UnknownDimensionType): ToBePublished => {
-            // is a draggable
-            if (dimension.placeholder) {
-              previous.draggables.push(dimension);
-            } else {
-              previous.droppables.push(dimension);
-            }
-            return previous;
-          }, { draggables: [], droppables: [] }
-        );
-
-        callbacks.bulkPublish(
-          toBePublished.droppables,
-          toBePublished.draggables,
-        );
-
-        // need to watch the scroll on each droppable
-        toBePublished.droppables.forEach((dimension: DroppableDimension) => {
-          const entry: DroppableEntry = state.droppables[dimension.descriptor.id];
-          entry.callbacks.watchScroll(request.scrollOptions);
-        });
-
-        setFrameId(null);
-      });
-
-      setFrameId(publishFrameId);
-    });
-
-    setFrameId(collectFrameId);
   };
 
   const stopCollecting = () => {
+    invariant(collection, 'Cannot stop collecting when there is no collection');
+
     // Tell all droppables to stop watching scroll
     // all good if they where not already listening
-    Object.keys(state.droppables)
-      .forEach((id: DroppableId) => state.droppables[id].callbacks.unwatchScroll());
+    Object.keys(entries.droppables)
+      .forEach((id: DroppableId) => entries.droppables[id].callbacks.unwatchScroll());
 
-    if (state.frameId) {
-      cancelAnimationFrame(state.frameId);
-    }
-
-    // reset collections state
-    setState({
-      isCollecting: false,
-      request: null,
-      frameId: null,
-    });
+    collection = null;
+    collector.stop();
   };
 
   const onPhaseChange = (current: AppState) => {
     const phase: Phase = current.phase;
 
     if (phase === 'COLLECTING_INITIAL_DIMENSIONS') {
-      processPrimaryDimensions(current.dimension.request);
+      collectCriticalDimensions(current.dimension.request);
       return;
     }
 
     if (phase === 'DRAGGING') {
-      processSecondaryDimensions(current.dimension.request);
+      invariant(collection, 'Cannot start a drag without a collection');
+
+      // Sanity checking that our recorded collection matches the request in app state
+      const request: ?LiftRequest = current.dimension.request;
+      invariant(request);
+      invariant(request.draggableId === collection.critical.draggable.id,
+        'Recorded request does not match app state'
+      );
+      invariant(request.scrollOptions === collection.scrollOptions,
+        'Recorded scroll options does not match app state'
+      );
+
+      collector.start(collection);
       return;
     }
 
-    // No need to collect any more as the user has finished interacting
-    if (phase === 'DROP_ANIMATING' || phase === 'DROP_COMPLETE') {
-      if (state.isCollecting) {
-        stopCollecting();
-      }
-      return;
-    }
-
-    // drag potentially cleaned
-    if (phase === 'IDLE') {
-      if (state.isCollecting) {
-        stopCollecting();
-      }
+    if (collection) {
+      stopCollecting();
     }
   };
 
