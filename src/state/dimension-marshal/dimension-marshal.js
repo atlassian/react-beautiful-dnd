@@ -137,14 +137,18 @@ export default (callbacks: Callbacks) => {
   ) => {
     invariant(entries.draggables[previous.id], 'Cannot update draggable registration as no previous registration was found');
 
-    if (collection) {
-      invariant(descriptor.id === previous.id, 'Cannot update a Draggables id during a drag');
-      invariant(descriptor.droppableId === previous.droppableId, 'Cannot update a Draggables droppable during a drag');
+    if (!collection) {
+      delete entries.draggables[previous.id];
+      registerDraggable(descriptor, getDimension);
+      return;
     }
 
-    delete entries.draggables[previous.id];
+    // A collection is occurring
+    invariant(descriptor.id === previous.id, 'Cannot update a Draggables id during a drag');
+    invariant(descriptor.droppableId === previous.droppableId, 'Cannot update a Draggables droppable during a drag');
 
-    registerDraggable(descriptor, getDimension);
+    const home: ?DroppableEntry = entries.droppables[descriptor.droppableId];
+    invariant(home, 'Cannot update a Draggable that does not have a home');
   };
 
   const unregisterDraggable = (descriptor: DraggableDescriptor) => {
