@@ -5,9 +5,9 @@ import QuoteList from '../primatives/quote-list';
 import { DragDropContext } from '../../../src/';
 import { generateQuoteMap, authors } from '../data';
 import { reorderQuoteMap } from '../reorder';
+import { grid } from '../constants';
 import type { Quote, QuoteMap, Author } from '../types';
 import type { DropResult } from '../../../src/types';
-import { grid } from '../constants';
 
 const intial: QuoteMap = generateQuoteMap(20);
 
@@ -167,6 +167,7 @@ export default class QuoteApp extends React.Component<*, State> {
         <Container>
           {Object.keys(quoteMap).map((key: string) => (
             <QuoteList
+              key={key}
               listId={key}
               quotes={quoteMap[key]}
             />

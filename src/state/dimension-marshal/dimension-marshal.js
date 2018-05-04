@@ -273,9 +273,8 @@ export default (callbacks: Callbacks) => {
     entry.callbacks.scroll(change);
   };
 
-  const collectCriticalDimensions = (request: ?LiftRequest) => {
-    invariant(collection, 'Cannot start capturing dimensions for a drag it is already dragging');
-    invariant(request, 'Cannot start capturing dimensions with an invalid request', request);
+  const collectCriticalDimensions = (request: LiftRequest) => {
+    invariant(!collection, 'Cannot start capturing critical dimensions as there is already a collection');
 
     const draggables: DraggableEntryMap = entries.draggables;
     const droppables: DroppableEntryMap = entries.droppables;
@@ -311,10 +310,11 @@ export default (callbacks: Callbacks) => {
 
   const stopCollecting = () => {
     invariant(collection, 'Cannot stop collecting when there is no collection');
-
     // Tell all droppables to stop watching scroll
     // all good if they where not already listening
     Object.keys(entries.droppables)
+      .filter((id: DroppableId): boolean =>
+        entries.droppables[id].descriptor.type === collection.critical.droppable.type)
       .forEach((id: DroppableId) => entries.droppables[id].callbacks.unwatchScroll());
 
     collection = null;
@@ -325,6 +325,7 @@ export default (callbacks: Callbacks) => {
     const phase: Phase = current.phase;
 
     if (phase === 'COLLECTING_INITIAL_DIMENSIONS') {
+      invariant(current.dimension.request, 'Cannot start collecting dimensions without a request');
       collectCriticalDimensions(current.dimension.request);
       return;
     }

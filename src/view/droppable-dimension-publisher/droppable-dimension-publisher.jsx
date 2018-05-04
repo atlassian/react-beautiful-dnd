@@ -43,6 +43,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
   closestScrollable: ?Element = null;
   isWatchingScroll: boolean = false;
+  isDragOccurring: boolean = false;
   scrollOptions: ?ScrollOptions = null;
   callbacks: DroppableCallbacks;
   publishedDescriptor: ?DroppableDescriptor = null;
@@ -129,10 +130,11 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   };
 
   unwatchScroll = () => {
-    invariant(this.isWatchingScroll,
-      `Droppable should not be instructed to stop watching a scroll
-      when it was not listening to scroll changes`
-    );
+    // It is possible for a Droppable to be asked to unwatch a scroll
+    // (Eg it has not been collected yet, and the drag ends)
+    if (!this.isWatchingScroll) {
+      return;
+    }
 
     this.isWatchingScroll = false;
     this.scrollOptions = null;
@@ -196,6 +198,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
 
     if (!this.publishedDescriptor) {
       marshal.registerDroppable(descriptor, this.callbacks);
+      this.publishedDescriptor = descriptor;
       return;
     }
 
@@ -205,15 +208,12 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     }
 
     // already published and there has been changes
-    marshal.updateDroppable(this.publishedDescriptor.id, descriptor, this.callbacks);
+    marshal.updateDroppable(this.publishedDescriptor, descriptor, this.callbacks);
     this.publishedDescriptor = descriptor;
   }
 
   unpublish = () => {
-    if (!this.publishedDescriptor) {
-      console.error('Cannot unpublish descriptor when none is published');
-      return;
-    }
+    invariant(this.publishedDescriptor, 'Cannot unpublish descriptor when none is published');
 
     // Using the previously published id to unpublish. This is to guard
     // against the case where the id dynamically changes. This is not
@@ -234,8 +234,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     const targetRef: ?HTMLElement = getDroppableRef();
     const descriptor: ?DroppableDescriptor = this.publishedDescriptor;
 
-    invariant(targetRef, 'DimensionPublisher cannot calculate a dimension when not attached to the DOM');
-    invariant(!this.isWatchingScroll, 'Attempting to recapture Droppable dimension while already watching scroll on previous capture');
+    invariant(targetRef, 'Cannot calculate a dimension when not attached to the DOM');
     invariant(descriptor, 'Cannot get dimension for unpublished droppable');
 
     const scrollableRef: ?Element = getClosestScrollable(targetRef);

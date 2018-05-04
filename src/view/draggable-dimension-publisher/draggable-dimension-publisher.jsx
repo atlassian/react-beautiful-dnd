@@ -51,23 +51,25 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     }));
 
   publish = () => {
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
     const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
       this.props.draggableId,
       this.props.droppableId,
       this.props.index
     );
 
+    if (!this.publishedDescriptor) {
+      marshal.registerDraggable(descriptor, this.getDimension);
+      this.publishedDescriptor = descriptor;
+      return;
+    }
+
     // No changes to the descriptor
     if (descriptor === this.publishedDescriptor) {
       return;
     }
 
-    if (this.publishedDescriptor) {
-      this.unpublish();
-    }
-
-    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.registerDraggable(descriptor, this.getDimension);
+    marshal.updateDraggable(this.publishedDescriptor, descriptor, this.getDimension);
     this.publishedDescriptor = descriptor;
   }
 

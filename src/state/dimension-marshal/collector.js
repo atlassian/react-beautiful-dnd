@@ -6,8 +6,6 @@ import type {
   DroppableId,
   DraggableDimension,
   DroppableDimension,
-  ScrollOptions,
-  Collection,
 } from '../../types';
 import type { ToBeCollected } from './dimension-marshal-types';
 
@@ -49,20 +47,21 @@ export default ({
 
   const collectFromDOM = (toBeCollected: ToBeCollected, options?: CollectionOptions): Collected => {
     invariant(isActive, 'Should not collect when not active');
+    console.log('excluding', options);
 
     const droppables: DroppableDimension[] = toBeCollected.droppables
-      .filter((id: DroppableId): boolean => Boolean(options && options.exclude.droppableId === id))
+      .filter((id: DroppableId): boolean => Boolean(options && options.exclude.droppableId !== id))
       .map((id: DroppableId): DroppableDimension => getDroppable(id));
 
     const draggables: DraggableDimension[] = toBeCollected.draggables
-      .filter((id: DraggableId): boolean => Boolean(options && options.exclude.draggableId === id))
+      .filter((id: DraggableId): boolean => Boolean(options && options.exclude.draggableId !== id))
       .map((id: DraggableId): DraggableDimension => getDraggable(id));
 
     return { draggables, droppables };
   };
 
   const run = (options?: CollectionOptions) => {
-    invariant(isRunning, 'Cannot start a new run when a run is already occurring');
+    invariant(!isRunning, 'Cannot start a new run when a run is already occurring');
 
     isRunning = true;
 
@@ -112,6 +111,7 @@ export default ({
     // Queue another run
     if (isRunning) {
       isQueued = true;
+      return;
     }
 
     run();
