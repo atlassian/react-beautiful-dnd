@@ -76,20 +76,14 @@ export default (): Announcer => {
   };
 
   const unmount = () => {
-    if (!state.el) {
-      console.error('Will not unmount annoucer as it is already unmounted');
-      return;
-    }
-    const node: HTMLElement = state.el;
+    const node: ?HTMLElement = state.el;
+    invariant(node, 'Will not unmount annoucer as it is already unmounted');
 
     setState({
       el: null,
     });
 
-    if (!node.parentNode) {
-      console.error('Cannot unmount style marshal as cannot find parent');
-      return;
-    }
+    invariant(node.parentNode, 'Cannot unmount style marshal as cannot find parent');
 
     node.parentNode.removeChild(node);
   };

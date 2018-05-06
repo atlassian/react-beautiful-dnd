@@ -1,13 +1,22 @@
 // @flow
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import type { BoxModel } from 'css-box-model';
 import type { Placeholder as PlaceholderType } from '../../types';
+import { styleContextKey } from '../context-keys';
+import * as attributes from '../data-attributes';
 
 type Props = {|
   placeholder: PlaceholderType,
 |}
 
 export default class Placeholder extends PureComponent<Props> {
+  // Need to declare contextTypes without flow
+  // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
+  static contextTypes = {
+    [styleContextKey]: PropTypes.string.isRequired,
+  }
+
   render() {
     const placeholder: PlaceholderType = this.props.placeholder;
     const client: BoxModel = placeholder.client;
@@ -41,6 +50,9 @@ export default class Placeholder extends PureComponent<Props> {
       pointerEvents: 'none',
     };
 
-    return React.createElement(tagName, { style });
+    return React.createElement(tagName, {
+      style,
+      [attributes.placeholder]: this.context[styleContextKey],
+    });
   }
 }

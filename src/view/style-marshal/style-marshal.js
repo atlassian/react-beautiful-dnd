@@ -12,10 +12,6 @@ import type {
 
 let count: number = 0;
 
-type State = {|
-  el: ?HTMLStyleElement,
-|}
-
 // Required for server side rendering as count is persisted across requests
 export const resetStyleContext = () => {
   count = 0;
@@ -24,49 +20,31 @@ export const resetStyleContext = () => {
 export default () => {
   const context: string = `${count++}`;
   const styles: Styles = getStyles(context);
-
-  let state: State = {
-    el: null,
-  };
-
-  const setState = (newState: State) => {
-    state = newState;
-  };
+  let el: ?HTMLStyleElement = null;
 
   // using memoizeOne as a way of not updating the innerHTML
   // unless there is a new value required
   const setStyle = memoizeOne((proposed: string) => {
-    if (!state.el) {
-      console.error('cannot set style of style tag if not mounted');
-      return;
-    }
-
+    invariant(el, 'Cannot set style of style tag if not mounted');
     // This technique works with ie11+ so no need for a nasty fallback as seen here:
     // https://stackoverflow.com/a/22050778/1374236
-    state.el.innerHTML = proposed;
+    el.innerHTML = proposed;
   });
 
   // exposing this as a seperate step so that it works nicely with
   // server side rendering
   const mount = () => {
-    if (state.el) {
-      console.error('Style marshal already mounted');
-      return;
-    }
+    invariant(!el, 'Style marshal already mounted');
 
-    const el: HTMLStyleElement = document.createElement('style');
+    el = document.createElement('style');
     el.type = 'text/css';
     // for easy identification
     el.setAttribute(prefix, context);
-    const head: ?HTMLElement = document.querySelector('head');
-
-    invariant(head, 'Cannot find the head to append a style to');
 
     // add style tag to head
+    const head: ?HTMLElement = document.querySelector('head');
+    invariant(head, 'Cannot find the head to append a style to');
     head.appendChild(el);
-    setState({
-      el,
-    });
 
     // set initial style
     setStyle(styles.resting);
@@ -74,10 +52,7 @@ export default () => {
 
   const onPhaseChange = (current: AppState) => {
     // delaying mount until first update to play nicely with server side rendering
-    if (!state.el) {
-      console.error('cannot update styles until style marshal is mounted');
-      return;
-    }
+    invariant(el, 'cannot update styles until style marshal is mounted');
 
     const phase: Phase = current.phase;
 
@@ -87,10 +62,7 @@ export default () => {
     }
 
     if (phase === 'DROP_ANIMATING') {
-      if (!current.drop || !current.drop.pending) {
-        console.error('Invalid state found in style-marshal');
-        return;
-      }
+      invariant(current.drop && current.drop.pending, 'Invalid state found in style-marshal');
 
       const reason: DropReason = current.drop.pending.result.reason;
 
@@ -106,23 +78,10 @@ export default () => {
   };
 
   const unmount = (): void => {
-    if (!state.el) {
-      console.error('Cannot unmount style marshal as it is already unmounted');
-      return;
-    }
-    const previous = state.el;
+    invariant(el, 'Cannot unmount style marshal as it is already unmounted');
+    invariant(el.parentNode, 'Cannot unmount style marshal as cannot find parent');
 
-    setState({
-      el: null,
-    });
-
-    // this should never happen - just appeasing flow
-    if (!previous.parentNode) {
-      console.error('Cannot unmount style marshal as cannot find parent');
-      return;
-    }
-
-    previous.parentNode.removeChild(previous);
+    el.parentNode.removeChild(el);
   };
 
   const marshal: StyleMarshal = {
