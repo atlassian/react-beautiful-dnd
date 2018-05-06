@@ -94,15 +94,16 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     invariant(targetRef, 'DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
     invariant(descriptor, 'Cannot get dimension for unpublished draggable');
 
-    const style: CSSStyleDeclaration = window.getComputedStyle(targetRef);
+    const computedStyles: CSSStyleDeclaration = window.getComputedStyle(targetRef);
 
-    const client: BoxModel = calculateBox(targetRef.getBoundingClientRect(), style);
+    const client: BoxModel = calculateBox(targetRef.getBoundingClientRect(), computedStyles);
     const page: BoxModel = withScroll(client, getWindowScroll());
 
     const placeholder: Placeholder = {
       client,
       tagName: targetRef.tagName.toLowerCase(),
-      display: style.display,
+      display: computedStyles.display,
+      boxSizing: computedStyles.boxSizing,
     };
 
     const dimension: DraggableDimension = {

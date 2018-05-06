@@ -1,10 +1,9 @@
 // @flow
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import type { BoxModel } from 'css-box-model';
+import type { Rect } from 'css-box-model';
 import type { Placeholder as PlaceholderType } from '../../types';
 import { styleContextKey } from '../context-keys';
-import * as attributes from '../data-attributes';
 
 type Props = {|
   placeholder: PlaceholderType,
@@ -19,26 +18,34 @@ export default class Placeholder extends PureComponent<Props> {
 
   render() {
     const placeholder: PlaceholderType = this.props.placeholder;
-    const client: BoxModel = placeholder.client;
-    const display: string = placeholder.display;
-    const tagName: string = placeholder.tagName;
+    const { client, display, tagName, boxSizing } = placeholder;
+
+    const size: Rect = boxSizing === 'border-box' ? client.borderBox : client.contentBox;
 
     const style = {
       display,
-      // These are the computed borderBox width and height properties
-      // at the time of a drag start
-      // borderBox = content + padding + border
-      width: client.borderBox.width,
-      height: client.borderBox.height,
-      // We want to be sure that if any border or padding is applied to the element
-      // then it should not change the width and height of it
-      boxSizing: 'border-box',
-      // We apply the margin separately to maintain margin collapsing
-      // behavior of the original element
+      boxSizing,
+      // ContentBox
+      width: size.width,
+      height: size.height,
+      // PaddingBox
+      paddingTop: client.padding.top,
+      paddingRight: client.padding.right,
+      paddingBottom: client.padding.bottom,
+      paddingLeft: client.padding.left,
+      // BorderBox
+      borderStyle: 'solid',
+      borderColor: 'transparent',
+      borderTopWidth: client.border.top,
+      borderRightWidth: client.border.right,
+      borderBottomWidth: client.border.bottom,
+      borderLeftWidth: client.border.left,
+      // MarginBox
       marginTop: client.margin.top,
-      marginLeft: client.margin.left,
-      marginBottom: client.margin.bottom,
       marginRight: client.margin.right,
+      marginBottom: client.margin.bottom,
+      marginLeft: client.margin.left,
+
       // Avoiding the collapsing or growing of this element when pushed by flex child siblings.
       // We have already taken a snapshot the current dimensions we do not want this element
       // to recalculate its dimensions
@@ -50,9 +57,6 @@ export default class Placeholder extends PureComponent<Props> {
       pointerEvents: 'none',
     };
 
-    return React.createElement(tagName, {
-      style,
-      [attributes.placeholder]: this.context[styleContextKey],
-    });
+    return React.createElement(tagName, { style });
   }
 }

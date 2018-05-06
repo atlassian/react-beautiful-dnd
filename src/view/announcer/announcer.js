@@ -3,10 +3,6 @@ import invariant from 'tiny-invariant';
 import type { Announce } from '../../types';
 import type { Announcer } from './announcer-types';
 
-type State = {|
-  el: ?HTMLElement,
-|}
-
 let count: number = 0;
 
 // https://allyjs.io/tutorials/hiding-elements.html
@@ -26,32 +22,17 @@ const visuallyHidden: Object = {
 
 export default (): Announcer => {
   const id: string = `react-beautiful-dnd-announcement-${count++}`;
-
-  let state: State = {
-    el: null,
-  };
-
-  const setState = (newState: State) => {
-    state = newState;
-  };
+  let el: ?HTMLElement = null;
 
   const announce: Announce = (message: string): void => {
-    const el: ?HTMLElement = state.el;
-    if (!el) {
-      console.error('Cannot announce to unmounted node');
-      return;
-    }
-
+    invariant(el, 'Cannot announce to unmounted node');
     el.textContent = message;
   };
 
   const mount = () => {
-    if (state.el) {
-      console.error('Announcer already mounted');
-      return;
-    }
+    invariant(!el, 'Announcer already mounted');
 
-    const el: HTMLElement = document.createElement('div');
+    el = document.createElement('div');
     // identifier
     el.id = id;
 
@@ -70,22 +51,13 @@ export default (): Announcer => {
 
     // add el tag to body
     document.body.appendChild(el);
-    setState({
-      el,
-    });
   };
 
   const unmount = () => {
-    const node: ?HTMLElement = state.el;
-    invariant(node, 'Will not unmount annoucer as it is already unmounted');
+    invariant(el, 'Will not unmount annoucer as it is already unmounted');
+    invariant(el.parentNode, 'Cannot unmount style marshal as cannot find parent');
 
-    setState({
-      el: null,
-    });
-
-    invariant(node.parentNode, 'Cannot unmount style marshal as cannot find parent');
-
-    node.parentNode.removeChild(node);
+    el.parentNode.removeChild(el);
   };
 
   const announcer: Announcer = {
