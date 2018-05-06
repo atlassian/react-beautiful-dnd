@@ -213,12 +213,31 @@ export default class DragDropContext extends React.Component<Props> {
     throw error;
   }
 
+  onWindowError = (error: Error) => {
+    const state: State = this.store.getState();
+
+    if (state.phase === 'IDLE' || state.phase === 'DROP_COMPLETE') {
+      return;
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(`
+        An error has occurred withing a DragDropContext.
+        Any existing drag will be cancelled
+      `, error);
+    }
+
+    this.store.dispatch(clean());
+  }
+
   componentDidMount() {
+    window.addEventListener('error', this.onWindowError);
     this.styleMarshal.mount();
     this.announcer.mount();
   }
 
   componentWillUnmount() {
+    window.addEventListener('error', this.onWindowError);
     this.unsubscribe();
     this.styleMarshal.unmount();
     this.announcer.unmount();
