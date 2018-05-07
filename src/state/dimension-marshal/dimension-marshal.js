@@ -265,8 +265,7 @@ export default (callbacks: Callbacks) => {
     // Tell all droppables to stop watching scroll
     // all good if they where not already listening
     Object.keys(entries.droppables)
-      .filter((id: DroppableId): boolean =>
-        entries.droppables[id].descriptor.type === home.type)
+      .filter((id: DroppableId): boolean => entries.droppables[id].descriptor.type === home.type)
       .forEach((id: DroppableId) => entries.droppables[id].callbacks.unwatchScroll());
 
     collection = null;
