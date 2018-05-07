@@ -1,10 +1,10 @@
 // @flow
 import { Component, type Node } from 'react';
+import type { Position } from 'css-box-model';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import { calculateBox, withScroll, type BoxModel } from 'css-box-model';
-import getWindowScroll from '../window/get-window-scroll';
 import { dimensionMarshalKey } from '../context-keys';
 import type {
   DraggableDescriptor,
@@ -87,7 +87,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     this.publishedDescriptor = null;
   }
 
-  getDimension = (): DraggableDimension => {
+  getDimension = (windowScroll: Position): DraggableDimension => {
     const targetRef: ?HTMLElement = this.props.getDraggableRef();
     const descriptor: ?DraggableDescriptor = this.publishedDescriptor;
 
@@ -118,8 +118,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     // targetRef.style.left = previous.left;
 
     const client: BoxModel = calculateBox(borderBox, computedStyles);
-
-    const page: BoxModel = withScroll(client, getWindowScroll());
+    const page: BoxModel = withScroll(client, windowScroll);
 
     const placeholder: Placeholder = {
       client,

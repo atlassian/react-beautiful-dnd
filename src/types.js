@@ -156,37 +156,20 @@ export type Viewport = {|
   subject: Rect,
 |}
 
-export type InitialDrag = {|
-  descriptor: DraggableDescriptor,
-  autoScrollMode: AutoScrollMode,
+export type InitialPositions = {|
   // relative to the viewport when the drag started
   client: InitialDragPositions,
   // viewport + window scroll (position relative to 0, 0)
   page: InitialDragPositions,
   // Storing viewport directly to support movement during a window scroll.
   // Value required for comparison with current scroll
-  viewport: Viewport,
+  // windowScroll: Position,
 |}
 
-export type CurrentDragPositions = {|
+export type CurrentPositions = {|
   ...InitialDragPositions,
   // how far the item has moved from its original position
   offset: Position,
-|}
-
-export type CurrentDrag = {|
-  // viewport
-  client: CurrentDragPositions,
-  // viewport + scroll
-  page: CurrentDragPositions,
-  // whether or not draggable movements should be animated
-  shouldAnimate: boolean,
-  // We do not want to calculate drag impacts until we have completed
-  // the first bulk publish. Otherwise the onDragUpdate hook will
-  // be called with incorrect indexes.
-  // Before the first bulk publish the calculations will return incorrect indexes.
-  hasCompletedFirstBulkPublish: boolean,
-  viewport: Viewport
 |}
 
 // published when a drag starts
@@ -208,14 +191,6 @@ export type DropReason = 'DROP' | 'CANCEL';
 export type DropResult = {|
   ...DragUpdate,
   reason: DropReason,
-|}
-
-export type DragState = {|
-  initial: InitialDrag,
-  current: CurrentDrag,
-  impact: DragImpact,
-  // if we need to jump the scroll (keyboard dragging)
-  scrollJumpRequest: ?Position,
 |}
 
 export type PendingDrop = {|
@@ -253,36 +228,93 @@ export type ScrollOptions = {|
   shouldPublishImmediately: boolean,
 |}
 
+// using the draggable id rather than the descriptor as the descriptor
+// may change as a result of the initial flush. This means that the lift
+// descriptor may not be the same as the actual descriptor. To avoid
+// confusion the request is just an id which is looked up
+// in the dimension-marshal post-flush
 export type LiftRequest = {|
   draggableId: DraggableId,
   scrollOptions: ScrollOptions,
 |}
 
-export type DimensionState = {|
-  // using the draggable id rather than the descriptor as the descriptor
-  // may change as a result of the initial flush. This means that the lift
-  // descriptor may not be the same as the actual descriptor. To avoid
-  // confusion the request is just an id which is looked up
-  // in the dimension-marshal post-flush
-  request: ?LiftRequest,
-  draggable: DraggableDimensionMap,
-  droppable: DroppableDimensionMap,
-|};
-
-export type DropState = {|
-  pending: ?PendingDrop,
-  result: ?DropResult,
+export type IdleState = {|
+  phase: 'IDLE',
 |}
 
-export type State = {|
-  phase: Phase,
-  dimension: DimensionState,
-  // null if not dragging
-  drag: ?DragState,
+export type PreparingState = {|
+  phase: 'PREPARING',
+|}
 
-  // available when dropping or cancelling
-  drop: ?DropState,
-|};
+export type InitialCollectionState = {|
+  phase: 'INITIAL_COLLECTION',
+  request: LiftRequest,
+|}
+
+export type Critical = {|
+  draggable: DraggableDescriptor,
+  droppable: DroppableDescriptor,
+|}
+
+type WindowDetails = {|
+  viewport: Viewport,
+  scroll: {|
+    initial: Position,
+    current: Position,
+    diff: {|
+      value: Position,
+      // The actual displacement as a result of a scroll is in the opposite
+      // direction to the scroll itself.
+      displacement: Position,
+    |}
+  |}
+|}
+
+export type DraggingState = {|
+  phase: 'DRAGGING',
+  critical: Critical,
+  autoScrollMode: AutoScrollMode,
+  dimensions: {|
+    draggables: DraggableDimensionMap,
+    droppables: DroppableDimensionMap,
+  |},
+  initial: InitialPositions,
+  current: CurrentPositions,
+  impact: DragImpact,
+  window: WindowDetails,
+  // if we need to jump the scroll (keyboard dragging)
+  scrollJumpRequest: ?Position,
+  // whether or not draggable movements should be animated
+  shouldAnimate: boolean,
+|}
+
+// While dragging we can enter into a bulk collection phase
+// During this phase no drag updates are permitted.
+// If a drop occurs during this phase, it must wait until it is
+// completed before continuing with the drop
+export type BulkCollectionState = {|
+  ...DraggingState,
+  phase: 'BULK_COLLECTION',
+|}
+
+// An optional phase for animating the drop / cancel if it is needed
+export type DropAnimatingState = {|
+  phase: 'DROP_ANIMATING',
+  pending: PendingDrop,
+|}
+
+export type DropCompleteState = {|
+  phase: 'DROP_COMPLETE',
+  result: DropResult,
+|}
+
+export type State = IdleState |
+  PreparingState |
+  InitialCollectionState |
+  DraggingState |
+  BulkCollectionState |
+  DropAnimatingState |
+  DropCompleteState;
 
 export type Action = ActionCreators;
 export type Dispatch = ReduxDispatch<Action>;
@@ -304,4 +336,3 @@ export type Hooks = {|
   // always required
   onDragEnd: OnDragEndHook,
 |}
-

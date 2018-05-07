@@ -2,6 +2,8 @@
 import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import createCollector, { type Collector } from './collector';
+// TODO: state folder reaching into view
+import getViewport from '../../view/window/get-viewport';
 import * as timings from '../../debug/timings';
 import type {
   DraggableId,
@@ -13,6 +15,7 @@ import type {
   State as AppState,
   Phase,
   LiftRequest,
+  Viewport,
 } from '../../types';
 import type {
   DimensionMarshal,
@@ -249,13 +252,16 @@ export default (callbacks: Callbacks) => {
       },
     };
 
+    const viewport: Viewport = getViewport();
+
     // Get the minimum dimensions to start a drag
     timings.start('initial collection and publish');
     const home: DroppableDimension =
-    homeEntry.callbacks.getDimensionAndWatchScroll(request.scrollOptions);
-    const draggable: DraggableDimension = draggableEntry.getDimension();
-    callbacks.publishDroppable(home);
-    callbacks.publishDraggable(draggable);
+    homeEntry.callbacks.getDimensionAndWatchScroll(viewport.scroll, request.scrollOptions);
+    const draggable: DraggableDimension = draggableEntry.getDimension(viewport.scroll);
+    callbacks.initialPublish(home, draggable, viewport);
+    // callbacks.publishDroppable(home);
+    // callbacks.publishDraggable(draggable);
     timings.finish('initial collection and publish');
   };
 

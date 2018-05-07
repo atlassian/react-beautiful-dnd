@@ -85,44 +85,56 @@ export const completeLift = (
   },
 });
 
-export type PublishDraggableDimensionAction = {|
-  type: 'PUBLISH_DRAGGABLE_DIMENSION',
-  payload: DraggableDimension,
-|}
-
-export const publishDraggableDimension =
-  (dimension: DraggableDimension): PublishDraggableDimensionAction => ({
-    type: 'PUBLISH_DRAGGABLE_DIMENSION',
-    payload: dimension,
-  });
-
-export type PublishDroppableDimensionAction = {|
-  type: 'PUBLISH_DROPPABLE_DIMENSION',
-  payload: DroppableDimension,
-|}
-
-export const publishDroppableDimension =
-  (dimension: DroppableDimension): PublishDroppableDimensionAction => ({
-    type: 'PUBLISH_DROPPABLE_DIMENSION',
-    payload: dimension,
-  });
-
-export type BulkPublishDimensionsAction = {|
-  type: 'BULK_DIMENSION_PUBLISH',
+export type InitialPublishAction = {|
+  type: 'INITIAL_PUBLISH',
   payload: {|
-    droppables: DroppableDimension[],
-    draggables: DraggableDimension[],
+    home: DroppableDimension,
+    draggable: DraggableDimension,
+    viewport: Viewport,
   |}
 |}
 
-export const bulkPublishDimensions = (
+export const initialPublish = (
+  home: DroppableDimension,
+  draggable: DraggableDimension,
+  viewport: Viewport,
+): InitialPublishAction => ({
+  type: 'INITIAL_PUBLISH',
+  payload: {
+    home,
+    draggable,
+    viewport,
+  },
+});
+
+export type BulkReplaceAction = {|
+  type: 'BULK_REPLACE',
+  payload: {|
+    droppables: DroppableDimension[],
+    draggables: DraggableDimension[],
+    viewport: Viewport,
+    replaceCritical: boolean,
+  |}
+|}
+
+type BulkReplaceArgs = {|
   droppables: DroppableDimension[],
   draggables: DraggableDimension[],
-): BulkPublishDimensionsAction => ({
-  type: 'BULK_DIMENSION_PUBLISH',
+  viewport: Viewport,
+  replaceCritical: boolean,
+|}
+export const bulkReplace = ({
+  droppables,
+  draggables,
+  viewport,
+  replaceCritical,
+}: BulkReplaceArgs): BulkReplaceAction => ({
+  type: 'BULK_REPLACE',
   payload: {
     droppables,
     draggables,
+    viewport,
+    replaceCritical,
   },
 });
 
@@ -522,9 +534,8 @@ export const lift = (id: DraggableId,
 export type Action =
   CompleteLiftAction |
   RequestDimensionsAction |
-  PublishDraggableDimensionAction |
-  PublishDroppableDimensionAction |
-  BulkPublishDimensionsAction |
+  InitialPublishAction |
+  BulkPublishAction |
   UpdateDroppableDimensionScrollAction |
   UpdateDroppableDimensionIsEnabledAction |
   MoveByWindowScrollAction |

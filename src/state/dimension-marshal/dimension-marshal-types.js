@@ -9,10 +9,11 @@ import type {
   DroppableId,
   State,
   ScrollOptions,
+  Viewport,
 } from '../../types';
 
-export type GetDraggableDimensionFn = () => DraggableDimension;
-export type GetDroppableDimensionFn = (options: ScrollOptions) => DroppableDimension;
+export type GetDraggableDimensionFn = (windowScroll: Position) => DraggableDimension;
+export type GetDroppableDimensionFn = (windowScroll: Position, options: ScrollOptions) => DroppableDimension;
 
 export type DroppableCallbacks = {|
   getDimensionAndWatchScroll: GetDroppableDimensionFn,
@@ -92,9 +93,15 @@ export type Callbacks = {|
   cancel: () => void,
   publishDraggable: (DraggableDimension) => void,
   publishDroppable: (DroppableDimension) => void,
+  initialPublish: (
+    home: DroppableDimension,
+    draggable: DraggableDimension,
+    viewport: Viewport,
+  ) => void,
   bulkPublish: (
     droppables: DroppableDimension[],
     draggables: DraggableDimension[],
+    viewport: Viewport,
   ) => void,
   updateDroppableScroll: (id: DroppableId, newScroll: Position) => void,
   updateDroppableIsEnabled: (id: DroppableId, isEnabled: boolean) => void,

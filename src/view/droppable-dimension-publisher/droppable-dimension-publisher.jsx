@@ -245,7 +245,10 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     this.publishedDescriptor = null;
   }
 
-  getDimensionAndWatchScroll = (options: ScrollOptions): DroppableDimension => {
+  getDimensionAndWatchScroll = (
+    windowScroll: Position,
+    options: ScrollOptions
+  ): DroppableDimension => {
     const {
       direction,
       ignoreContainerClipping,
@@ -315,7 +318,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       });
     })();
 
-    const page: BoxModel = withScroll(client);
+    const page: BoxModel = withScroll(client, windowScroll);
 
     const closest: ?Closest = (() => {
       if (!scrollableRef) {

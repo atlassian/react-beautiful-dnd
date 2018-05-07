@@ -1,6 +1,8 @@
 // @flow
 import invariant from 'tiny-invariant';
+import { type Position } from 'css-box-model';
 import * as timings from '../../debug/timings';
+import getViewport from '../../view/window/get-viewport';
 import type {
   DraggableId,
   DroppableId,
@@ -9,6 +11,7 @@ import type {
   DroppableDescriptor,
   DraggableDescriptor,
   ScrollOptions,
+  Viewport,
 } from '../../types';
 import type {
   Entries,
@@ -34,7 +37,11 @@ type InternalOptions = {|
 
 type Args = {|
   getEntries: () => Entries,
-  publish: (droppables: DroppableDimension[], draggables: DraggableDimension[]) => void,
+  publish: (
+    droppables: DroppableDimension[],
+    draggables: DraggableDimension[],
+    viewport: Viewport,
+  ) => void,
 |}
 
 const defaultOptions: InternalOptions = {
@@ -51,7 +58,7 @@ export default ({
   let isQueued: boolean = false;
   let isRunning: boolean = false;
 
-  const collectFromDOM = (options: InternalOptions): Collected => {
+  const collectFromDOM = (windowScroll: Position, options: InternalOptions): Collected => {
     invariant(isActive, 'Should not collect when not active');
     invariant(collection, 'Need collection options to pull from DOM');
 
@@ -109,10 +116,11 @@ export default ({
 
     const droppableDimensions: DroppableDimension[] =
       droppables.map((entry: DroppableEntry): DroppableDimension =>
-        entry.callbacks.getDimensionAndWatchScroll(scrollOptions));
+        entry.callbacks.getDimensionAndWatchScroll(windowScroll, scrollOptions));
 
     const draggableDimensions: DraggableDimension[] =
-      draggables.map((entry: DraggableEntry): DraggableDimension => entry.getDimension());
+      draggables.map((entry: DraggableEntry): DraggableDimension =>
+        entry.getDimension(windowScroll));
 
     // 4. Tell all the droppables to show their placeholders
     droppables.forEach((entry: DroppableEntry) => entry.callbacks.showPlaceholder());
@@ -131,13 +139,14 @@ export default ({
     // Perform DOM collection in next frame
     frameId = requestAnimationFrame(() => {
       timings.start('DOM collection');
-      const collected: Collected = collectFromDOM(options);
+      const viewport: Viewport = getViewport();
+      const collected: Collected = collectFromDOM(viewport.scroll, options);
       timings.finish('DOM collection');
 
       // Perform publish in next frame
       frameId = requestAnimationFrame(() => {
         timings.start('Bulk dimension publish');
-        publish(collected.droppables, collected.draggables);
+        publish(collected.droppables, collected.draggables, viewport);
         timings.finish('Bulk dimension publish');
 
         // TODO: what if publish caused collection?

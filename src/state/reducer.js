@@ -1,5 +1,6 @@
 // @flow
 import memoizeOne from 'memoize-one';
+import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import type {
   Action,
@@ -41,6 +42,18 @@ const noDimensions: DimensionState = {
 };
 
 const origin: Position = { x: 0, y: 0 };
+
+const toDraggableMap = (draggables: DraggableDimension[]): DraggableDimensionMap =>
+  draggables.reduce((previous: DraggableDimensionMap, current: DraggableDimension) => {
+    previous[current.descriptor.id] = current;
+    return previous;
+  }, {});
+
+const toDroppableMap = (droppables: DroppableDimension[]): DroppableDimensionMap =>
+  droppables.reduce((previous: DroppableDimensionMap, current: DroppableDimension) => {
+    previous[current.descriptor.id] = current;
+    return previous;
+  }, {});
 
 const clean = memoizeOne((phase?: Phase = 'IDLE'): State => ({
   phase,
@@ -111,17 +124,29 @@ const move = ({
     page,
     shouldAnimate,
     viewport,
-    hasCompletedFirstBulkPublish: previous.hasCompletedFirstBulkPublish,
+    isBulkCollecting: previous.isBulkCollecting,
   };
 
-  const newImpact: DragImpact = (impact || getDragImpact({
-    pageBorderBoxCenter: page.borderBoxCenter,
-    draggable: state.dimension.draggable[initial.descriptor.id],
-    draggables: state.dimension.draggable,
-    droppables: state.dimension.droppable,
-    previousImpact: last.impact,
-    viewport,
-  }));
+  const newImpact: DragImpact = (() => {
+    // Force setting of an impact
+    if (impact) {
+      return impact;
+    }
+
+    // If a bulk collection is occurring - block any impact updatess
+    if (current.isBulkCollecting) {
+      return last.impact;
+    }
+
+    return getDragImpact({
+      pageBorderBoxCenter: page.borderBoxCenter,
+      draggable: state.dimension.draggable[initial.descriptor.id],
+      draggables: state.dimension.draggable,
+      droppables: state.dimension.droppable,
+      previousImpact: last.impact,
+      viewport,
+    });
+  })();
 
   const drag: DragState = {
     initial,
@@ -134,6 +159,61 @@ const move = ({
     ...state,
     drag,
   };
+};
+
+type PublishArgs = {|
+  existing: State,
+  draggables: DraggableDimension[],
+  droppables: DroppableDimension[],
+  viewport: Viewport,
+  shouldPurge: boolean,
+|}
+
+const publish = ({
+  existing,
+  draggables,
+  droppables,
+  viewport,
+  shouldPurge,
+}: PublishArgs): State => {
+  // TODO: use throw here?
+  invariant(canPublishDimension(existing.phase), `Dimensions rejected as no longer allowing dimension capture in phase ${existing.phase}`);
+  invariant(existing.drag, 'Cannot add dimensions when there is no drag state');
+
+  if (!existing.drag.current.isBulkCollecting) {
+    console.warn('Bulk collection recieved and was not expecting it');
+  }
+
+  const drag: DragState = {
+    ...existing.drag,
+    current: {
+      ...existing.drag.current,
+      viewport,
+      isBulkCollecting: false,
+    },
+  };
+
+  const draggableMap: DraggableDimensionMap = {
+    ...toDraggableMap(draggables),
+    ...(shouldPurge ? null : existing.dimension.draggable),
+  };
+
+  const droppableMap: DroppableDimensionMap = {
+    ...toDroppableMap(droppables),
+    ...(shouldPurge ? null : existing.dimension.droppable),
+  };
+
+  const newState: State = {
+    ...existing,
+    drag,
+    dimension: {
+      request: existing.dimension.request,
+      draggable: draggableMap,
+      droppable: droppableMap,
+    },
+  };
+
+  return newState;
 };
 
 const updateStateAfterDimensionChange = (newState: State, impact?: ?DragImpact): State => {
@@ -237,9 +317,33 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     return updateStateAfterDimensionChange(newState);
   }
 
-  if (action.type === 'BULK_DIMENSION_PUBLISH') {
+  if (action.type === 'INITIAL_PUBLISH') {
+    const draggable: DraggableDimension = action.payload.draggable;
+    const home: DroppableDimension = action.payload.home;
+    const viewport: Viewport = action.payload.viewport;
+
+    return publish({
+      existing: state,
+      draggables: [draggable],
+      droppables: [home],
+      viewport,
+      shouldPurge: true,
+    });
+  }
+
+  if (action.type === 'BULK_PUBLISH') {
     const draggables: DraggableDimension[] = action.payload.draggables;
     const droppables: DroppableDimension[] = action.payload.droppables;
+    const viewport: Viewport = action.viewport;
+    const replaceCritical: boolean = action.replaceCritical;
+
+    return publish({
+      existing: state,
+      draggables: action.payload.draggables,
+      droppables: action.payload.dropables,
+      viewport: action.viewport,
+      replaceCritical: action.replaceCritical,
+    });
 
     if (!canPublishDimension(state.phase)) {
       console.warn('dimensions rejected as no longer allowing dimension capture in phase', state.phase);
