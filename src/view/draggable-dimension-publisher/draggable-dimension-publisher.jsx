@@ -96,7 +96,29 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
     const computedStyles: CSSStyleDeclaration = window.getComputedStyle(targetRef);
 
-    const client: BoxModel = calculateBox(targetRef.getBoundingClientRect(), computedStyles);
+    // Capturing borderBox without transforms or top / left positioning
+    // Fingers crossed that this does not cause any flashing
+    // TODO: anyway to unwind just the ones we care about?
+    const previous = {
+      transform: computedStyles.transform,
+      // transition: computedStyles.transition,
+      // top: computedStyles.top,
+      // left: computedStyles.left,
+    };
+
+    targetRef.style.transform = 'none';
+    // targetRef.style.transition = 'none';
+    // targetRef.style.top = '0px';
+    // targetRef.style.left = '0px';
+    const borderBox: ClientRect = targetRef.getBoundingClientRect();
+    // targetRef.style.transition = previous.transition;
+    targetRef.style.transform = previous.transform;
+    targetRef.getBoundingClientRect();
+    // targetRef.style.top = previous.top;
+    // targetRef.style.left = previous.left;
+
+    const client: BoxModel = calculateBox(borderBox, computedStyles);
+
     const page: BoxModel = withScroll(client, getWindowScroll());
 
     const placeholder: Placeholder = {

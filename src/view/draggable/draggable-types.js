@@ -52,7 +52,10 @@ export type DraggingStyle = {|
   // the element positioned with the top/left position (which is margin aware).
   // We also clear the margin right / bottom. This has no positioning impact,
   // but it is cleanest to just remove all the margins rather than only the top and left.
-  margin: 0,
+  marginTop: number,
+  marginRight: number,
+  marginBottom: number,
+  marginLeft: number,
 
   // We need to opt out of the shared global style that is being applied to
   // all draggables. The movement of moving draggables is either not animated

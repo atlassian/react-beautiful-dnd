@@ -1,6 +1,6 @@
 // @flow
 import React, { Component, Fragment, type Node } from 'react';
-import { type Position } from 'css-box-model';
+import { type Position, type BoxModel } from 'css-box-model';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
@@ -192,20 +192,30 @@ export default class Draggable extends Component<Props> {
     (dimension: DraggableDimension,
       isDropAnimating: boolean,
       movementStyle: MovementStyle): DraggingStyle => {
-      const { width, height, top, left } = dimension.client.borderBox;
+      const box: BoxModel = dimension.client;
+      // const { width, height, top, left } = dimension.client.borderBox;
       // For an explanation of properties see `draggable-types`.
       const style: DraggingStyle = {
-        position: 'fixed',
+        // ## Sizing
+        // Applying the correct border-box sizing
         boxSizing: 'border-box',
+        width: box.borderBox.width,
+        height: box.borderBox.height,
+        // Apply margin so that dimension recapturing will get the same marginBox
+        marginTop: dimension.client.margin.top,
+        marginRight: dimension.client.margin.right,
+        marginBottom: dimension.client.margin.bottom,
+        marginLeft: dimension.client.margin.left,
+        // ## Placement
+        // As we are applying the margins we need to align to the start of the marginBox
+        top: box.marginBox.top,
+        left: box.marginBox.left,
         zIndex: isDropAnimating ? zIndexOptions.dropAnimating : zIndexOptions.dragging,
-        width,
-        height,
-        top,
-        left,
-        margin: 0,
-        pointerEvents: 'none',
         transition: 'none',
         transform: movementStyle.transform ? `${movementStyle.transform}` : null,
+        position: 'fixed',
+        // ## Performance
+        pointerEvents: 'none',
       };
       return style;
     }
