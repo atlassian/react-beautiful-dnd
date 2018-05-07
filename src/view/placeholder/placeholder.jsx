@@ -1,6 +1,5 @@
 // @flow
 import React, { PureComponent } from 'react';
-import type { Rect } from 'css-box-model';
 import type { Placeholder as PlaceholderType } from '../../types';
 
 type Props = {|

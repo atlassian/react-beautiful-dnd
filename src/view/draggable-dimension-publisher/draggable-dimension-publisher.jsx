@@ -103,7 +103,6 @@ export default class DraggableDimensionPublisher extends Component<Props> {
       client,
       tagName: targetRef.tagName.toLowerCase(),
       display: computedStyles.display,
-      boxSizing: computedStyles.boxSizing,
     };
 
     const dimension: DraggableDimension = {
