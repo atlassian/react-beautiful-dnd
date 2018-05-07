@@ -11,18 +11,19 @@ import type {
   DraggableLocation,
   Dispatch,
   State,
-  CurrentDrag,
-  InitialDrag,
+  DropAnimatingState,
   DraggableDescriptor,
   LiftRequest,
   AutoScrollMode,
   ScrollOptions,
   Viewport,
+  DimensionMap,
 } from '../types';
 import noImpact from './no-impact';
 import withDroppableDisplacement from './with-droppable-displacement';
 import getNewHomeClientBorderBoxCenter from './get-new-home-client-border-box-center';
 import { add, subtract, isEqual } from './position';
+import { type DimensionMarshal } from './dimension-marshal/dimension-marshal-types';
 import * as timings from '../debug/timings';
 
 const origin: Position = { x: 0, y: 0 };
@@ -85,26 +86,21 @@ export const completeLift = (
   },
 });
 
-export type InitialPublishAction = {|
-  type: 'INITIAL_PUBLISH',
-  payload: {|
-    home: DroppableDimension,
-    draggable: DraggableDimension,
-    viewport: Viewport,
-  |}
+type InitialPublishArgs = {|
+  critical: DimensionMap,
+  client: InitialDragPositions,
+  viewport: Viewport,
+  autoScrollMode: AutoScrollMode,
 |}
 
-export const initialPublish = (
-  home: DroppableDimension,
-  draggable: DraggableDimension,
-  viewport: Viewport,
-): InitialPublishAction => ({
+export type InitialPublishAction = {|
   type: 'INITIAL_PUBLISH',
-  payload: {
-    home,
-    draggable,
-    viewport,
-  },
+  payload: InitialPublishArgs
+|}
+
+export const initialPublish = (args: InitialPublishArgs): InitialPublishAction => ({
+  type: 'INITIAL_PUBLISH',
+  payload: args,
 });
 
 export type BulkReplaceAction = {|
@@ -470,26 +466,31 @@ export type LiftAction = {|
   |}
 |}
 
-// lifting with DraggableId rather than descriptor
-// as the descriptor might change after a drop is flushed
-export const lift = (id: DraggableId,
+type LiftArgs = {|
+  // lifting with DraggableId rather than descriptor
+  // as the descriptor might change after a drop is flushed
+  id: DraggableId,
   client: InitialDragPositions,
   viewport: Viewport,
   autoScrollMode: AutoScrollMode,
-) => (dispatch: Dispatch, getState: Function) => {
+  marshal: DimensionMarshal,
+|}
+
+export const lift = ({
+  id,
+  client,
+  autoScrollMode,
+  viewport,
+  marshal,
+}: LiftArgs) => (dispatch: Dispatch, getState: Function) => {
   // Phase 1: Quickly finish any current drop animations
   const initial: State = getState();
 
   // flush dropping animation if needed
   // this can change the descriptor of the dragging item
   if (initial.phase === 'DROP_ANIMATING') {
-    if (!initial.drop || !initial.drop.pending) {
-      console.error('cannot flush drop animation if there is no pending');
-      dispatch(clean());
-    } else {
-      // this can cause descriptor updates in the dimension marshal
-      dispatch(completeDrop(initial.drop.pending.result));
-    }
+    const current: DropAnimatingState = initial;
+    dispatch(completeDrop(current.pending.result));
   }
 
   // https://github.com/chenglou/react-motion/issues/437
@@ -513,21 +514,18 @@ export const lift = (id: DraggableId,
       draggableId: id,
       scrollOptions,
     };
-    dispatch(requestDimensions(request));
+    // Let's get the marshal started!
+    const critical: DimensionMap = marshal.startPublishing(request, viewport.scroll);
+    // Okay, we are good to start dragging now
+    dispatch(initialPublish({
+      critical,
+      client,
+      autoScrollMode,
+      viewport,
+    }));
 
-    // Need to allow an opportunity for the dimensions to be requested.
-    setTimeout(() => {
-      // Phase 3: dimensions are collected: start a lift
-      const newState: State = getState();
-
-      // drag was already cancelled before dimensions all collected
-      if (newState.phase !== 'COLLECTING_INITIAL_DIMENSIONS') {
-        return;
-      }
-
-      dispatch(completeLift(id, client, viewport, autoScrollMode));
-      timings.finish('LIFT');
-    });
+    // Start collecting all the other dimensions
+    marshal.collect({ includeCritical: false });
   });
 };
 

@@ -12,8 +12,8 @@ import type {
   DraggableDescriptor,
   DraggableDimension,
   DroppableDimension,
+  DimensionMap,
   State as AppState,
-  Phase,
   LiftRequest,
   Viewport,
 } from '../../types';
@@ -227,42 +227,26 @@ export default (callbacks: Callbacks) => {
     entry.callbacks.scroll(change);
   };
 
-  const collectCriticalDimensions = (request: LiftRequest) => {
-    invariant(!collection, 'Cannot start capturing critical dimensions as there is already a collection');
+  const getCritical = (windowScroll: Position): DimensionMap => {
+    invariant(collection, 'Cannot get critical dimensions without a collection');
+    timings.start('initial collection and publish');
 
-    const draggables: DraggableEntryMap = entries.draggables;
-    const droppables: DroppableEntryMap = entries.droppables;
-    const draggableId: DraggableId = request.draggableId;
-    const draggableEntry: ?DraggableEntry = draggables[draggableId];
+    const draggable: DraggableDescriptor = collection.critical.draggable;
+    const droppable: DroppableDescriptor = collection.critical.droppable;
 
-    invariant(draggableEntry, `Cannot find Draggable with id ${draggableId} to start collecting dimensions`);
-
-    const homeEntry: ?DroppableEntry = droppables[draggableEntry.descriptor.droppableId];
-
-    invariant(homeEntry, `
-      Cannot find home Droppable [id:${draggableEntry.descriptor.droppableId}]
-      for Draggable [id:${request.draggableId}]
-    `);
-
-    collection = {
-      scrollOptions: request.scrollOptions,
-      critical: {
-        draggable: draggableEntry.descriptor,
-        droppable: homeEntry.descriptor,
+    const map: DimensionMap = {
+      draggables: {
+        [draggable.id]: entries.draggables[draggable.id]
+          .getDimension(windowScroll),
+      },
+      droppables: {
+        [droppable.id]: entries.droppables[droppable.id]
+          .callbacks.getDimensionAndWatchScroll(windowScroll, collection.scrollOptions),
       },
     };
 
-    const viewport: Viewport = getViewport();
-
-    // Get the minimum dimensions to start a drag
-    timings.start('initial collection and publish');
-    const home: DroppableDimension =
-    homeEntry.callbacks.getDimensionAndWatchScroll(viewport.scroll, request.scrollOptions);
-    const draggable: DraggableDimension = draggableEntry.getDimension(viewport.scroll);
-    callbacks.initialPublish(home, draggable, viewport);
-    // callbacks.publishDroppable(home);
-    // callbacks.publishDraggable(draggable);
     timings.finish('initial collection and publish');
+    return map;
   };
 
   const stopCollecting = () => {
@@ -278,38 +262,30 @@ export default (callbacks: Callbacks) => {
     collector.stop();
   };
 
-  const onPhaseChange = (current: AppState) => {
-    const phase: Phase = current.phase;
+  const startPublishing = (request: LiftRequest, windowScroll: Position): DimensionMap => {
+    invariant(!collection, 'Cannot start capturing critical dimensions as there is already a collection');
+    const entry: ?DraggableEntry = entries.draggables[request.draggableId];
+    invariant(entry, 'Cannot find critical draggable entry');
+    const home: ?DroppableEntry = entries.droppables[entry.descriptor.droppableId];
+    invariant(home, 'Cannot find critical droppable entry');
 
-    if (phase === 'COLLECTING_INITIAL_DIMENSIONS') {
-      invariant(current.dimension.request, 'Cannot start collecting dimensions without a request');
-      collectCriticalDimensions(current.dimension.request);
-      return;
-    }
+    collection = {
+      scrollOptions: request.scrollOptions,
+      critical: {
+        draggable: entry.descriptor,
+        droppable: home.descriptor,
+      },
+    };
 
-    if (phase === 'DRAGGING') {
-      invariant(collection, 'Cannot start a drag without a collection');
+    return getCritical(windowScroll);
+  };
 
-      // Sanity checking that our recorded collection matches the request in app state
-      const request: ?LiftRequest = current.dimension.request;
-      invariant(request);
-      invariant(request.draggableId === collection.critical.draggable.id,
-        'Recorded request does not match app state'
-      );
-      invariant(request.scrollOptions === collection.scrollOptions,
-        'Recorded scroll options does not match app state'
-      );
-
-      collector.start(collection);
-      return;
-    }
-
-    if (collection) {
-      stopCollecting();
-    }
+  const collect = ({ includeCritical }: CollectionOptions) => {
+    invariant(collection, 'Cannot collect without a collection occurring');
   };
 
   const marshal: DimensionMarshal = {
+
     registerDraggable,
     updateDraggable,
     unregisterDraggable,
@@ -319,7 +295,12 @@ export default (callbacks: Callbacks) => {
     updateDroppableIsEnabled,
     scrollDroppable,
     updateDroppableScroll,
-    onPhaseChange,
+    // onPhaseChange,
+
+    // Entry
+    startPublishing,
+    collect,
+    stopPublishing: stopCollecting,
   };
 
   return marshal;

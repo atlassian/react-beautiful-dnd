@@ -1,5 +1,4 @@
 // @flow
-import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import type {
@@ -9,22 +8,20 @@ import type {
   DroppableDimension,
   DroppableId,
   DraggableId,
-  DimensionState,
   DraggableDescriptor,
   DraggableDimensionMap,
   DroppableDimensionMap,
-  DragState,
   DropResult,
-  CurrentDrag,
-  DragImpact,
-  InitialDrag,
-  PendingDrop,
-  Phase,
   DraggableLocation,
-  CurrentDragPositions,
-  InitialDragPositions,
   LiftRequest,
   Viewport,
+  IdleState,
+  PreparingState,
+  InitialCollectionState,
+  DraggingState,
+  BulkCollectionState,
+  DropAnimatingState,
+  DropCompleteState,
 } from '../types';
 import { add, subtract, isEqual } from './position';
 import { noMovement } from './no-impact';
@@ -34,12 +31,6 @@ import type { Result as MoveToNextResult } from './move-to-next-index/move-to-ne
 import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';
 import moveCrossAxis from './move-cross-axis/';
 import { scrollDroppable } from './droppable-dimension';
-
-const noDimensions: DimensionState = {
-  request: null,
-  draggable: {},
-  droppable: {},
-};
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -55,12 +46,7 @@ const toDroppableMap = (droppables: DroppableDimension[]): DroppableDimensionMap
     return previous;
   }, {});
 
-const clean = memoizeOne((phase?: Phase = 'IDLE'): State => ({
-  phase,
-  drag: null,
-  drop: null,
-  dimension: noDimensions,
-}));
+const clean = (): IdleState => ({ phase: 'IDLE' });
 
 type MoveArgs = {|
   state: State,
@@ -248,87 +234,57 @@ export default (state: State = clean('IDLE'), action: Action): State => {
   }
 
   if (action.type === 'PREPARE') {
-    return clean('PREPARING');
+    const result: PreparingState = {
+      phase: 'PREPARING',
+    };
+    return result;
   }
 
   if (action.type === 'REQUEST_DIMENSIONS') {
     if (state.phase !== 'PREPARING') {
-      console.error('trying to start a lift while not preparing for a lift');
+      console.error('Trying to start a lift while not preparing for a lift');
       return clean();
     }
 
     const request: LiftRequest = action.payload;
 
-    return {
-      phase: 'COLLECTING_INITIAL_DIMENSIONS',
-      drag: null,
-      drop: null,
-      dimension: {
-        request,
-        draggable: {},
-        droppable: {},
-      },
+    const result: InitialCollectionState = {
+      phase: 'INITIAL_COLLECTION',
+      request,
     };
-  }
-
-  if (action.type === 'PUBLISH_DRAGGABLE_DIMENSION') {
-    const dimension: DraggableDimension = action.payload;
-
-    if (!canPublishDimension(state.phase)) {
-      console.warn('dimensions rejected as no longer allowing dimension capture in phase', state.phase);
-      return state;
-    }
-
-    const newState: State = {
-      ...state,
-      dimension: {
-        request: state.dimension.request,
-        droppable: state.dimension.droppable,
-        draggable: {
-          ...state.dimension.draggable,
-          [dimension.descriptor.id]: dimension,
-        },
-      },
-    };
-
-    return updateStateAfterDimensionChange(newState);
-  }
-
-  if (action.type === 'PUBLISH_DROPPABLE_DIMENSION') {
-    const dimension: DroppableDimension = action.payload;
-
-    if (!canPublishDimension(state.phase)) {
-      console.warn('dimensions rejected as no longer allowing dimension capture in phase', state.phase);
-      return state;
-    }
-
-    const newState: State = {
-      ...state,
-      dimension: {
-        request: state.dimension.request,
-        draggable: state.dimension.draggable,
-        droppable: {
-          ...state.dimension.droppable,
-          [dimension.descriptor.id]: dimension,
-        },
-      },
-    };
-
-    return updateStateAfterDimensionChange(newState);
+    return result;
   }
 
   if (action.type === 'INITIAL_PUBLISH') {
-    const draggable: DraggableDimension = action.payload.draggable;
-    const home: DroppableDimension = action.payload.home;
-    const viewport: Viewport = action.payload.viewport;
+    invariant(state.phase === 'INITIAL_COLLECTION', 'INITITIAL_PUBLISH must come after a INITIAL_COLLECTION');
+    const existing: InitialCollectionState = state;
+    const { draggable, home, viewport, autoScrollMode } = action.payload;
 
-    return publish({
-      existing: state,
-      draggables: [draggable],
-      droppables: [home],
-      viewport,
-      shouldPurge: true,
-    });
+    const result: BulkCollectionState = {
+      phase: 'BULK_COLLECTION',
+      critical: {
+        draggable: draggable.descriptor,
+        droppable: home.descriptor,
+      },
+      autoScrollMode,
+      dimensions: {
+        draggables: {
+          [draggable.descriptor.id]: draggable,
+        },
+        droppables: {
+          [home.descriptor.id]: droppable,
+        },
+      },
+      initial,
+    };
+
+    // return publish({
+    //   existing: state,
+    //   draggables: [draggable],
+    //   droppables: [home],
+    //   viewport,
+    //   shouldPurge: true,
+    // });
   }
 
   if (action.type === 'BULK_PUBLISH') {
@@ -561,6 +517,11 @@ export default (state: State = clean('IDLE'), action: Action): State => {
   }
 
   if (action.type === 'MOVE') {
+    // Still preparing
+    if (state.phase === 'PREPARING') {
+      return state;
+    }
+
     // Otherwise get an incorrect index calculated before the other dimensions are published
     const { client, viewport, shouldAnimate } = action.payload;
     const drag: ?DragState = state.drag;

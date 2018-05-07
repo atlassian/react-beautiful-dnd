@@ -10,6 +10,9 @@ import type {
   State,
   ScrollOptions,
   Viewport,
+  Critical,
+  DimensionMap,
+  LiftRequest,
 } from '../../types';
 
 export type GetDraggableDimensionFn = (windowScroll: Position) => DraggableDimension;
@@ -52,10 +55,11 @@ export type Entries = {|
 
 export type Collection = {|
   scrollOptions: ScrollOptions,
-  critical: {|
-    draggable: DraggableDescriptor,
-    droppable: DroppableDescriptor,
-  |}
+  critical: Critical,
+|}
+
+type CollectionOptions = {|
+  includeCritical: boolean,
 |}
 
 export type DimensionMarshal = {|
@@ -86,7 +90,9 @@ export type DimensionMarshal = {|
   scrollDroppable: (id: DroppableId, change: Position) => void,
   unregisterDroppable: (descriptor: DroppableDescriptor) => void,
   // Entry
-  onPhaseChange: (current: State) => void,
+  startPublishing: (request: LiftRequest, windowScroll: Position) => DimensionMap,
+  stopPublishing: () => void,
+  collect: (options: CollectionOptions) => void,
 |}
 
 export type Callbacks = {|

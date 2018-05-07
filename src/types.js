@@ -199,30 +199,30 @@ export type PendingDrop = {|
   result: DropResult,
 |}
 
-export type Phase =
-  // The application rest state
-  'IDLE' |
+// export type Phase =
+//   // The application rest state
+//   'IDLE' |
 
-  // When a drag starts we need to flush any existing animations
-  // that might be occurring. While this flush is occurring we
-  // are in this phase
-  'PREPARING' |
+//   // When a drag starts we need to flush any existing animations
+//   // that might be occurring. While this flush is occurring we
+//   // are in this phase
+//   'PREPARING' |
 
-  // After the animations have been flushed we need to collect the
-  // dimensions of all of the Draggable and Droppable components.
-  // At this point a drag has not started yet and the onDragStart
-  // hook has not fired.
-  'COLLECTING_INITIAL_DIMENSIONS' |
+//   // After the animations have been flushed we need to collect the
+//   // dimensions of all of the Draggable and Droppable components.
+//   // At this point a drag has not started yet and the onDragStart
+//   // hook has not fired.
+//   'COLLECTING_INITIAL_DIMENSIONS' |
 
-  // A drag is active. The onDragStart hook has been fired
-  'DRAGGING' |
+//   // A drag is active. The onDragStart hook has been fired
+//   'DRAGGING' |
 
-  // An optional phase for animating the drop / cancel if it is needed
-  'DROP_ANIMATING' |
+//   // An optional phase for animating the drop / cancel if it is needed
+//   'DROP_ANIMATING' |
 
-  // The final state of a drop / cancel.
-  // This will result in the onDragEnd hook being fired
-  'DROP_COMPLETE';
+//   // The final state of a drop / cancel.
+//   // This will result in the onDragEnd hook being fired
+//   'DROP_COMPLETE';
 
 export type ScrollOptions = {|
   shouldPublishImmediately: boolean,
@@ -233,6 +233,7 @@ export type ScrollOptions = {|
 // descriptor may not be the same as the actual descriptor. To avoid
 // confusion the request is just an id which is looked up
 // in the dimension-marshal post-flush
+// Not including droppableId as it might change in a drop flush
 export type LiftRequest = {|
   draggableId: DraggableId,
   scrollOptions: ScrollOptions,
@@ -246,17 +247,12 @@ export type PreparingState = {|
   phase: 'PREPARING',
 |}
 
-export type InitialCollectionState = {|
-  phase: 'INITIAL_COLLECTION',
-  request: LiftRequest,
-|}
-
 export type Critical = {|
   draggable: DraggableDescriptor,
   droppable: DroppableDescriptor,
 |}
 
-type WindowDetails = {|
+export type WindowDetails = {|
   viewport: Viewport,
   scroll: {|
     initial: Position,
@@ -270,14 +266,16 @@ type WindowDetails = {|
   |}
 |}
 
+export type DimensionMap = {|
+  draggables: DraggableDimensionMap,
+  droppables: DroppableDimensionMap,
+|}
+
 export type DraggingState = {|
   phase: 'DRAGGING',
   critical: Critical,
   autoScrollMode: AutoScrollMode,
-  dimensions: {|
-    draggables: DraggableDimensionMap,
-    droppables: DroppableDimensionMap,
-  |},
+  dimensions: DimensionMap,
   initial: InitialPositions,
   current: CurrentPositions,
   impact: DragImpact,
@@ -308,9 +306,9 @@ export type DropCompleteState = {|
   result: DropResult,
 |}
 
-export type State = IdleState |
+export type State =
+  IdleState |
   PreparingState |
-  InitialCollectionState |
   DraggingState |
   BulkCollectionState |
   DropAnimatingState |
