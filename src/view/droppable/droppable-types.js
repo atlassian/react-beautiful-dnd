@@ -55,6 +55,6 @@ export type Props = {|
   ...MapProps,
 |}
 
-// Having issues getting the correct reselect type
+// Having issues getting the correct type
 // export type Selector = OutputSelector<State, OwnProps, MapProps>;
 export type Selector = Function;

@@ -12,6 +12,9 @@ import type {
   DraggableDescriptor,
   ScrollOptions,
   Viewport,
+  DroppableDimensionMap,
+  DraggableDimensionMap,
+  DimensionMap,
 } from '../../types';
 import type {
   Entries,
@@ -20,48 +23,35 @@ import type {
   Collection,
 } from './dimension-marshal-types';
 
-export type Collector = {|
-  start: (collection: Collection) => void,
-  stop: () => void,
-  collect: () => void,
-|}
-
-type Collected = {|
-  draggables: DraggableDimension[],
-  droppables: DroppableDimension[],
-|}
-
-type InternalOptions = {|
+type CollectOptions = {|
+  collection: Collection,
   includeCritical: boolean,
+|}
+
+export type Collector = {|
+  stop: () => void,
+  collect: (options: CollectOptions) => void,
+|}
+
+type PublishArgs = {|
+  draggables: DraggableDimensionMap,
+  droppables: DroppableDimensionMap,
+  viewport: Viewport,
 |}
 
 type Args = {|
   getEntries: () => Entries,
-  publish: (
-    droppables: DroppableDimension[],
-    draggables: DraggableDimension[],
-    viewport: Viewport,
-  ) => void,
+  publish: (args: PublishArgs) => void,
 |}
-
-const defaultOptions: InternalOptions = {
-  includeCritical: true,
-};
 
 export default ({
   publish,
   getEntries,
 }: Args): Collector => {
   let frameId: ?AnimationFrameID = null;
-  let isActive: boolean = false;
-  let collection: ?Collection;
-  let isQueued: boolean = false;
-  let isRunning: boolean = false;
 
-  const collectFromDOM = (windowScroll: Position, options: InternalOptions): Collected => {
-    invariant(isActive, 'Should not collect when not active');
-    invariant(collection, 'Need collection options to pull from DOM');
-
+  const collectFromDOM = (windowScroll: Position, options: CollectOptions): Collected => {
+    const { collection, includeCritical } = options;
     const entries: Entries = getEntries();
     const home: DroppableDescriptor = collection.critical.droppable;
     const dragging: DraggableDescriptor = collection.critical.draggable;
@@ -75,7 +65,7 @@ export default ({
       .filter((entry: DroppableEntry): boolean => entry.descriptor.type === home.type)
       // Exclude the critical droppable if needed
       .filter((entry: DroppableEntry): boolean => {
-        if (options.includeCritical) {
+        if (includeCritical) {
           return true;
         }
 
@@ -102,7 +92,7 @@ export default ({
       })
       .filter((entry: DraggableEntry): boolean => {
         // Exclude the critical draggable if needed
-        if (options.includeCritical) {
+        if (includeCritical) {
           return true;
         }
         return entry.descriptor.id !== dragging.id;
@@ -131,77 +121,45 @@ export default ({
     };
   };
 
-  const run = (options?: InternalOptions = defaultOptions) => {
-    invariant(!isRunning, 'Cannot start a new run when a run is already occurring');
+  const abortFrame = () => {
+    if (!frameId) {
+      return;
+    }
+    cancelAnimationFrame(frameId);
+    frameId = null;
+  };
 
-    isRunning = true;
+  const collect = (options: CollectOptions) => {
+    abortFrame();
 
     // Perform DOM collection in next frame
     frameId = requestAnimationFrame(() => {
       timings.start('DOM collection');
       const viewport: Viewport = getViewport();
-      const collected: Collected = collectFromDOM(viewport.scroll, options);
+      const collected: DimensionMap = collectFromDOM(viewport.scroll, options);
       timings.finish('DOM collection');
 
       // Perform publish in next frame
       frameId = requestAnimationFrame(() => {
         timings.start('Bulk dimension publish');
-        publish(collected.droppables, collected.draggables, viewport);
+        publish({
+          draggables: collected.draggables,
+          droppables: collected.droppables,
+          viewport,
+        });
         timings.finish('Bulk dimension publish');
 
-        // TODO: what if publish caused collection?
-
         frameId = null;
-        isRunning = false;
-
-        if (isQueued) {
-          isQueued = false;
-          run();
-        }
       });
     });
   };
 
-  const start = (options: Collection) => {
-    invariant(!isActive, 'Collector has already been started');
-    isActive = true;
-    collection = options;
-
-    // Start a collection - but there is no need to collect the
-    // critical dimensions as they have already been collected
-    run({ includeCritical: false });
-  };
-
-  const collect = () => {
-    invariant(isActive, 'Can only collect when active');
-    // A run is already queued
-    if (isQueued) {
-      return;
-    }
-
-    // We are running and a collection is not queued
-    // Queue another run
-    if (isRunning) {
-      isQueued = true;
-      return;
-    }
-
-    run();
-  };
-
   const stop = () => {
-    if (frameId) {
-      cancelAnimationFrame(frameId);
-    }
-    isRunning = false;
-    isQueued = false;
-    isActive = false;
-    collection = null;
+    abortFrame();
   };
 
   return {
-    start,
-    stop,
     collect,
+    stop,
   };
 };

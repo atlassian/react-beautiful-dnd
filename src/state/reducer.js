@@ -228,7 +228,7 @@ const updateStateAfterDimensionChange = (newState: State, impact?: ?DragImpact):
   });
 };
 
-export default (state: State = clean('IDLE'), action: Action): State => {
+export default (state: State = clean(), action: Action): State => {
   if (action.type === 'CLEAN') {
     return clean();
   }
@@ -240,30 +240,17 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     return result;
   }
 
-  if (action.type === 'REQUEST_DIMENSIONS') {
-    if (state.phase !== 'PREPARING') {
-      console.error('Trying to start a lift while not preparing for a lift');
-      return clean();
-    }
-
-    const request: LiftRequest = action.payload;
-
-    const result: InitialCollectionState = {
-      phase: 'INITIAL_COLLECTION',
-      request,
-    };
-    return result;
-  }
-
   if (action.type === 'INITIAL_PUBLISH') {
-    invariant(state.phase === 'INITIAL_COLLECTION', 'INITITIAL_PUBLISH must come after a INITIAL_COLLECTION');
-    const existing: InitialCollectionState = state;
-    const { draggable, home, viewport, autoScrollMode } = action.payload;
+    invariant(state.phase === 'PREPARING', 'INITIAL_PUBLISH must come after a PREPARING phase');
+    const current: PreparingState = state;
+    const { critical, client, autoScrollMode, viewport } = action.payload;
 
     const result: BulkCollectionState = {
+      // We are now waiting for the first bulk collection
       phase: 'BULK_COLLECTION',
       critical: {
-        draggable: draggable.descriptor,
+        // TODO: populate correctly
+        draggable: critical.draggable,
         droppable: home.descriptor,
       },
       autoScrollMode,
@@ -522,9 +509,21 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
+    // Should not occur
+    if (state.phase !== 'DRAGGING' || state.phase !== 'BULK_COLLECTING') {
+      return state;
+    }
+
     // Otherwise get an incorrect index calculated before the other dimensions are published
     const { client, viewport, shouldAnimate } = action.payload;
-    const drag: ?DragState = state.drag;
+
+    if (state.phase === 'BULK_COLLECTING') {
+      // can update position but not impact
+    }
+
+    if (state.phase === 'DRAGGING') {
+      // can update position and impact (unless it is jump scrolling)
+    }
 
     if (!drag) {
       console.error('Cannot move while there is no drag state');
@@ -721,16 +720,11 @@ export default (state: State = clean('IDLE'), action: Action): State => {
 
   if (action.type === 'DROP_COMPLETE') {
     const result: DropResult = action.payload;
-
-    return {
+    const newState: DropCompleteState = {
       phase: 'DROP_COMPLETE',
-      drag: null,
-      drop: {
-        pending: null,
-        result,
-      },
-      dimension: noDimensions,
+      result,
     };
+    return newState;
   }
 
   return state;

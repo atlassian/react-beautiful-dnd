@@ -3,19 +3,14 @@ import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import createCollector, { type Collector } from './collector';
 // TODO: state folder reaching into view
-import getViewport from '../../view/window/get-viewport';
 import * as timings from '../../debug/timings';
 import type {
   DraggableId,
   DroppableId,
   DroppableDescriptor,
   DraggableDescriptor,
-  DraggableDimension,
-  DroppableDimension,
   DimensionMap,
-  State as AppState,
   LiftRequest,
-  Viewport,
 } from '../../types';
 import type {
   DimensionMarshal,
@@ -25,8 +20,6 @@ import type {
   Entries,
   DroppableEntry,
   DraggableEntry,
-  DroppableEntryMap,
-  DraggableEntryMap,
   Collection,
 } from './dimension-marshal-types';
 
@@ -41,6 +34,14 @@ export default (callbacks: Callbacks) => {
     publish: callbacks.bulkPublish,
     getEntries: () => entries,
   });
+
+  const collect = ({ includeCritical }: {| includeCritical: boolean |}) => {
+    invariant(collection, 'Cannot collect without a collection occurring');
+    collector.collect({
+      collection,
+      includeCritical,
+    });
+  };
 
   const registerDraggable = (
     descriptor: DraggableDescriptor,
@@ -77,7 +78,9 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    collector.collect();
+    invariant(descriptor.id !== collection.critical.draggable.id, 'Cannot unregister dragging item during a drag');
+
+    collect({ includeCritical: false });
   };
 
   const updateDraggable = (
@@ -99,6 +102,8 @@ export default (callbacks: Callbacks) => {
 
     const home: ?DroppableEntry = entries.droppables[descriptor.droppableId];
     invariant(home, 'Cannot update a Draggable that does not have a home');
+
+    collect({ includeCritical: false });
   };
 
   const unregisterDraggable = (descriptor: DraggableDescriptor) => {
@@ -118,7 +123,9 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    console.warn('TODO: batch unpublish draggable');
+    invariant(descriptor.id !== collection.critical.draggable.id, 'Cannot unregister dragging item during a drag');
+
+    collect({ includeCritical: false });
   };
 
   const registerDroppable = (
@@ -147,7 +154,9 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    collector.collect();
+    invariant(descriptor.id !== collection.critical.droppable.id, 'Cannot register home droppable during a drag');
+
+    collect({ includeCritical: false });
   };
 
   const updateDroppable = (
@@ -165,6 +174,8 @@ export default (callbacks: Callbacks) => {
     delete entries.droppables[previous.id];
 
     registerDroppable(descriptor, droppableCallbacks);
+
+    collect({ includeCritical: false });
   };
 
   const unregisterDroppable = (descriptor: DroppableDescriptor) => {
@@ -188,7 +199,9 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    console.warn('TODO: publish droppable unpublish');
+    invariant(descriptor.id !== collection.critical.droppable.id, 'Cannot unregister home droppable during a drag');
+
+    collect({ includeCritical: false });
   };
 
   const updateDroppableIsEnabled = (id: DroppableId, isEnabled: boolean) => {
@@ -278,10 +291,6 @@ export default (callbacks: Callbacks) => {
     };
 
     return getCritical(windowScroll);
-  };
-
-  const collect = ({ includeCritical }: CollectionOptions) => {
-    invariant(collection, 'Cannot collect without a collection occurring');
   };
 
   const marshal: DimensionMarshal = {

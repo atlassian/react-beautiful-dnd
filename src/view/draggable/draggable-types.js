@@ -161,5 +161,5 @@ export type Props = {|
   ...OwnProps
 |}
 
-// Having issues getting the correct reselect type
+// Having issues getting the correct type
 export type Selector = Function;

@@ -239,14 +239,6 @@ export type LiftRequest = {|
   scrollOptions: ScrollOptions,
 |}
 
-export type IdleState = {|
-  phase: 'IDLE',
-|}
-
-export type PreparingState = {|
-  phase: 'PREPARING',
-|}
-
 export type Critical = {|
   draggable: DraggableDescriptor,
   droppable: DroppableDescriptor,
@@ -271,6 +263,14 @@ export type DimensionMap = {|
   droppables: DroppableDimensionMap,
 |}
 
+export type IdleState = {|
+  phase: 'IDLE',
+|}
+
+export type PreparingState = {|
+  phase: 'PREPARING',
+|}
+
 export type DraggingState = {|
   phase: 'DRAGGING',
   critical: Critical,
@@ -292,13 +292,15 @@ export type DraggingState = {|
 // completed before continuing with the drop
 export type BulkCollectionState = {|
   ...DraggingState,
-  phase: 'BULK_COLLECTION',
+  phase: 'BULK_COLLECTING',
 |}
 
 // An optional phase for animating the drop / cancel if it is needed
 export type DropAnimatingState = {|
   phase: 'DROP_ANIMATING',
   pending: PendingDrop,
+  // We still need to render placeholders and fix the dimensions of the dragging item
+  dimensions: DimensionMap,
 |}
 
 export type DropCompleteState = {|
