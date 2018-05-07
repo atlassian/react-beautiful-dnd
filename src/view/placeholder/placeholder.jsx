@@ -1,46 +1,43 @@
 // @flow
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import type { Rect } from 'css-box-model';
 import type { Placeholder as PlaceholderType } from '../../types';
-import { styleContextKey } from '../context-keys';
 
 type Props = {|
   placeholder: PlaceholderType,
 |}
 
 export default class Placeholder extends PureComponent<Props> {
-  // Need to declare contextTypes without flow
-  // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
-  static contextTypes = {
-    [styleContextKey]: PropTypes.string.isRequired,
+  // eslint-disable-next-line react/sort-comp
+  ref: ?HTMLElement = null
+
+  show = () => {
+    if (!this.ref) {
+      return;
+    }
+    this.ref.style.display = this.props.placeholder.display;
+  }
+
+  hide = () => {
+    if (!this.ref) {
+      return;
+    }
+    this.ref.style.display = 'none';
+  }
+
+  setRef = (ref: ?HTMLElement) => {
+    this.ref = ref;
   }
 
   render() {
     const placeholder: PlaceholderType = this.props.placeholder;
-    const { client, display, tagName, boxSizing } = placeholder;
-
-    const size: Rect = boxSizing === 'border-box' ? client.borderBox : client.contentBox;
+    const { client, display, tagName } = placeholder;
 
     const style = {
       display,
-      boxSizing,
-      // ContentBox
-      width: size.width,
-      height: size.height,
-      // PaddingBox
-      paddingTop: client.padding.top,
-      paddingRight: client.padding.right,
-      paddingBottom: client.padding.bottom,
-      paddingLeft: client.padding.left,
-      // BorderBox
-      borderStyle: 'solid',
-      borderColor: 'transparent',
-      borderTopWidth: client.border.top,
-      borderRightWidth: client.border.right,
-      borderBottomWidth: client.border.bottom,
-      borderLeftWidth: client.border.left,
-      // MarginBox
+      boxSizing: 'border-box',
+      width: client.borderBox.width,
+      height: client.borderBox.height,
       marginTop: client.margin.top,
       marginRight: client.margin.right,
       marginBottom: client.margin.bottom,
@@ -57,6 +54,9 @@ export default class Placeholder extends PureComponent<Props> {
       pointerEvents: 'none',
     };
 
-    return React.createElement(tagName, { style });
+    return React.createElement(tagName, {
+      style,
+      ref: this.setRef,
+    });
   }
 }

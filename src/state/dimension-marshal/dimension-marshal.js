@@ -19,18 +19,13 @@ import type {
   Callbacks,
   GetDraggableDimensionFn,
   DroppableCallbacks,
-  ToBeCollected,
+  Entries,
   DroppableEntry,
   DraggableEntry,
   DroppableEntryMap,
   DraggableEntryMap,
   Collection,
 } from './dimension-marshal-types';
-
-type Entries = {|
-  droppables: DroppableEntryMap,
-  draggables: DraggableEntryMap,
-|}
 
 export default (callbacks: Callbacks) => {
   const entries: Entries = {
@@ -39,57 +34,9 @@ export default (callbacks: Callbacks) => {
   };
   let collection: ?Collection = null;
 
-  const getToBeCollected = (): ToBeCollected => {
-    invariant(collection, 'Cannot collect dimensions when no collection is occurring');
-
-    const home: DroppableDescriptor = collection.critical.droppable;
-
-    const draggables: DraggableId[] =
-      Object.keys(entries.draggables)
-        // remove draggables that do not have the same droppable type
-        .filter((id: DraggableId): boolean => {
-          const entry: DraggableEntry = entries.draggables[id];
-          const parent: ?DroppableEntry = entries.droppables[entry.descriptor.droppableId];
-
-          // This should never happen
-          // but it is better to print this information and continue on
-          if (!parent) {
-            console.warn(`
-              Orphan Draggable found [id: ${entry.descriptor.id}] which says
-              it belongs to unknown Droppable ${entry.descriptor.droppableId}
-            `);
-            return false;
-          }
-
-          return parent.descriptor.type === home.type;
-        });
-
-    const droppables: DroppableId[] =
-      Object.keys(entries.droppables)
-        // remove droppables with a different type
-        .filter((id: DroppableId): boolean => entries.droppables[id].descriptor.type === home.type);
-
-    return {
-      draggables,
-      droppables,
-    };
-  };
-
   const collector: Collector = createCollector({
     publish: callbacks.bulkPublish,
-    getDraggable: (id: DraggableId): DraggableDimension => {
-      const entry: ?DraggableEntry = entries.draggables[id];
-      invariant(collection && entry);
-
-      return entry.getDimension();
-    },
-    getDroppable: (id: DroppableId): DroppableDimension => {
-      const entry: ?DroppableEntry = entries.droppables[id];
-      invariant(collection && entry);
-
-      return entry.callbacks.getDimensionAndWatchScroll(collection.scrollOptions);
-    },
-    getToBeCollected,
+    getEntries: () => entries,
   });
 
   const registerDraggable = (
@@ -314,11 +261,12 @@ export default (callbacks: Callbacks) => {
 
   const stopCollecting = () => {
     invariant(collection, 'Cannot stop collecting when there is no collection');
+    const home: DroppableDescriptor = collection.critical.droppable;
     // Tell all droppables to stop watching scroll
     // all good if they where not already listening
     Object.keys(entries.droppables)
       .filter((id: DroppableId): boolean =>
-        entries.droppables[id].descriptor.type === collection.critical.droppable.type)
+        entries.droppables[id].descriptor.type === home.type)
       .forEach((id: DroppableId) => entries.droppables[id].callbacks.unwatchScroll());
 
     collection = null;
@@ -347,12 +295,7 @@ export default (callbacks: Callbacks) => {
         'Recorded scroll options does not match app state'
       );
 
-      collector.start({
-        exclude: {
-          draggableId: collection.critical.draggable.id,
-          droppableId: collection.critical.droppable.id,
-        },
-      });
+      collector.start(collection);
       return;
     }
 

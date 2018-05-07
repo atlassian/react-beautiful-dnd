@@ -8,6 +8,7 @@ import rafSchedule from 'raf-schd';
 import getClosestScrollable from '../get-closest-scrollable';
 import { dimensionMarshalKey } from '../context-keys';
 import { getDroppableDimension, type Closest } from '../../state/droppable-dimension';
+import Placeholder from '../placeholder';
 import type {
   DimensionMarshal,
   DroppableCallbacks,
@@ -29,6 +30,7 @@ type Props = {|
   ignoreContainerClipping: boolean,
   isDropDisabled: boolean,
   getDroppableRef: () => ?HTMLElement,
+  getPlaceholder: () => ?Placeholder,
   children: Node,
 |}
 
@@ -54,6 +56,8 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       getDimensionAndWatchScroll: this.getDimensionAndWatchScroll,
       unwatchScroll: this.unwatchScroll,
       scroll: this.scroll,
+      showPlaceholder: this.showPlaceholder,
+      hidePlaceholder: this.hidePlaceholder,
     };
     this.callbacks = callbacks;
   }
@@ -148,6 +152,24 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     // There was a closest scrollable
     this.closestScrollable.removeEventListener('scroll', this.onClosestScroll);
     this.closestScrollable = null;
+  }
+
+  hidePlaceholder = () => {
+    const placeholder: ?Placeholder = this.props.getPlaceholder();
+    console.log('hide', placeholder);
+
+    if (placeholder) {
+      placeholder.hide();
+    }
+  }
+
+  showPlaceholder = () => {
+    const placeholder: ?Placeholder = this.props.getPlaceholder();
+    console.log('show', placeholder);
+
+    if (placeholder) {
+      placeholder.show();
+    }
   }
 
   componentDidMount() {

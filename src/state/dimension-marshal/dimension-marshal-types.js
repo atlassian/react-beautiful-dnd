@@ -19,7 +19,11 @@ export type DroppableCallbacks = {|
   // scroll a droppable
   scroll: (change: Position) => void,
   // If the Droppable is listening for scroll events - it needs to stop!
+  // Can be called on droppables that have not been asked to watch scroll
   unwatchScroll: () => void,
+  // Used when dynamically changing dimensions to obtain accurate snapshots
+  hidePlaceholder: () => void,
+  showPlaceholder: () => void,
 |}
 
 export type DroppableEntry = {|
@@ -40,9 +44,9 @@ export type DroppableEntryMap = {
   [key: DroppableId]: DroppableEntry,
 }
 
-export type ToBeCollected = {|
-  draggables: DraggableId[],
-  droppables: DroppableId[],
+export type Entries = {|
+  droppables: DroppableEntryMap,
+  draggables: DraggableEntryMap,
 |}
 
 export type Collection = {|

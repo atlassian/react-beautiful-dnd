@@ -6,61 +6,124 @@ import type {
   DroppableId,
   DraggableDimension,
   DroppableDimension,
+  DroppableDescriptor,
+  DraggableDescriptor,
+  ScrollOptions,
 } from '../../types';
-import type { ToBeCollected } from './dimension-marshal-types';
+import type {
+  Entries,
+  DraggableEntry,
+  DroppableEntry,
+  Collection,
+} from './dimension-marshal-types';
+
+export type Collector = {|
+  start: (collection: Collection) => void,
+  stop: () => void,
+  collect: () => void,
+|}
 
 type Collected = {|
   draggables: DraggableDimension[],
   droppables: DroppableDimension[],
 |}
 
-type CollectionOptions = {|
-  exclude: {
-    draggableId: DraggableId,
-    droppableId: DroppableId,
-  },
+type InternalOptions = {|
+  includeCritical: boolean,
 |}
 
 type Args = {|
-  getToBeCollected: () => ToBeCollected,
-  getDraggable: (id: DraggableId) => DraggableDimension,
-  getDroppable: (id: DroppableId) => DroppableDimension,
+  getEntries: () => Entries,
   publish: (droppables: DroppableDimension[], draggables: DraggableDimension[]) => void,
 |}
 
-export type Collector = {|
-  start: (excludingCritical: CollectionOptions) => void,
-  stop: () => void,
-  collect: () => void,
-|}
+const defaultOptions: InternalOptions = {
+  includeCritical: true,
+};
 
 export default ({
   publish,
-  getDraggable,
-  getDroppable,
-  getToBeCollected,
+  getEntries,
 }: Args): Collector => {
-  let isActive: boolean = false;
   let frameId: ?AnimationFrameID = null;
+  let isActive: boolean = false;
+  let collection: ?Collection;
   let isQueued: boolean = false;
   let isRunning: boolean = false;
 
-  const collectFromDOM = (toBeCollected: ToBeCollected, options?: CollectionOptions): Collected => {
+  const collectFromDOM = (options: InternalOptions): Collected => {
     invariant(isActive, 'Should not collect when not active');
-    console.log('excluding', options);
+    invariant(collection, 'Need collection options to pull from DOM');
 
-    const droppables: DroppableDimension[] = toBeCollected.droppables
-      .filter((id: DroppableId): boolean => Boolean(options && options.exclude.droppableId !== id))
-      .map((id: DroppableId): DroppableDimension => getDroppable(id));
+    const entries: Entries = getEntries();
+    const home: DroppableDescriptor = collection.critical.droppable;
+    const dragging: DraggableDescriptor = collection.critical.draggable;
+    const scrollOptions: ScrollOptions = collection.scrollOptions;
 
-    const draggables: DraggableDimension[] = toBeCollected.draggables
-      .filter((id: DraggableId): boolean => Boolean(options && options.exclude.draggableId !== id))
-      .map((id: DraggableId): DraggableDimension => getDraggable(id));
+    // 1. Figure out what we need to collect
 
-    return { draggables, droppables };
+    const droppables: DroppableEntry[] = Object.keys(entries.droppables)
+      .map((id: DroppableId): DroppableEntry => entries.droppables[id])
+      // Exclude things of the wrong type
+      .filter((entry: DroppableEntry): boolean => entry.descriptor.type === home.type)
+      // Exclude the critical droppable if needed
+      .filter((entry: DroppableEntry): boolean => {
+        if (options.includeCritical) {
+          return true;
+        }
+
+        return entry.descriptor.id !== home.id;
+      });
+
+    const draggables: DraggableEntry[] = Object.keys(entries.draggables)
+      .map((id: DraggableId): DraggableEntry => entries.draggables[id])
+      // Exclude things of the wrong type
+      .filter((entry: DraggableEntry): boolean => {
+        const parent: ?DroppableEntry = entries.droppables[entry.descriptor.droppableId];
+
+        // This should never happen
+        // but it is better to print this information and continue on
+        if (!parent) {
+          console.warn(`
+            Orphan Draggable found [id: ${entry.descriptor.id}] which says
+            it belongs to unknown Droppable ${entry.descriptor.droppableId}
+          `);
+          return false;
+        }
+
+        return parent.descriptor.type === home.type;
+      })
+      .filter((entry: DraggableEntry): boolean => {
+        // Exclude the critical draggable if needed
+        if (options.includeCritical) {
+          return true;
+        }
+        return entry.descriptor.id !== dragging.id;
+      });
+
+    // 2. Tell all droppables to show their placeholders
+
+    droppables.forEach((entry: DroppableEntry) => entry.callbacks.hidePlaceholder());
+
+    // 3. Do the collection from the DOM
+
+    const droppableDimensions: DroppableDimension[] =
+      droppables.map((entry: DroppableEntry): DroppableDimension =>
+        entry.callbacks.getDimensionAndWatchScroll(scrollOptions));
+
+    const draggableDimensions: DraggableDimension[] =
+      draggables.map((entry: DraggableEntry): DraggableDimension => entry.getDimension());
+
+    // 4. Tell all the droppables to show their placeholders
+    droppables.forEach((entry: DroppableEntry) => entry.callbacks.showPlaceholder());
+
+    return {
+      droppables: droppableDimensions,
+      draggables: draggableDimensions,
+    };
   };
 
-  const run = (options?: CollectionOptions) => {
+  const run = (options?: InternalOptions = defaultOptions) => {
     invariant(!isRunning, 'Cannot start a new run when a run is already occurring');
 
     isRunning = true;
@@ -68,8 +131,7 @@ export default ({
     // Perform DOM collection in next frame
     frameId = requestAnimationFrame(() => {
       timings.start('DOM collection');
-      const toBeCollected: ToBeCollected = getToBeCollected();
-      const collected: Collected = collectFromDOM(toBeCollected, options);
+      const collected: Collected = collectFromDOM(options);
       timings.finish('DOM collection');
 
       // Perform publish in next frame
@@ -91,13 +153,14 @@ export default ({
     });
   };
 
-  const start = (excludingCritical: CollectionOptions) => {
+  const start = (options: Collection) => {
     invariant(!isActive, 'Collector has already been started');
     isActive = true;
+    collection = options;
 
     // Start a collection - but there is no need to collect the
     // critical dimensions as they have already been collected
-    run(excludingCritical);
+    run({ includeCritical: false });
   };
 
   const collect = () => {
@@ -124,6 +187,7 @@ export default ({
     isRunning = false;
     isQueued = false;
     isActive = false;
+    collection = null;
   };
 
   return {
