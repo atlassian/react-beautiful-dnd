@@ -2,6 +2,7 @@
 import invariant from 'tiny-invariant';
 import {
   prepare,
+  clean,
   completeDrop,
   initialPublish,
 } from '../action-creators';
@@ -40,7 +41,10 @@ export default (getMarshal: () => ?DimensionMarshal) =>
     // this can change the descriptor of the dragging item
     if (initial.phase === 'DROP_ANIMATING') {
       const current: DropAnimatingState = initial;
+      // Will call the onDragEnd hooks
       dispatch(completeDrop(current.pending.result));
+      // Reset the state
+      dispatch(clean());
     }
 
     // Flush required for react-motion

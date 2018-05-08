@@ -49,30 +49,15 @@ export default () => {
     setStyle(styles.resting);
   };
 
-  const onPhaseChange = (current: AppState) => {
-    // delaying mount until first update to play nicely with server side rendering
-    invariant(el, 'cannot update styles until style marshal is mounted');
-
-    if (current.phase === 'DRAGGING' ||
-      current.phase === 'DROP_ANIMATING' ||
-      current.phase === 'BULK_COLLECTING') {
-      setStyle(styles.dragging);
+  const dragging = () => setStyle(styles.dragging);
+  const dropping = (reason: DropReason) => {
+    if (reason === 'DROP') {
+      setStyle(styles.dropAnimating);
       return;
     }
-
-    if (current.phase === 'DROP_ANIMATING') {
-      const reason: DropReason = current.pending.result.reason;
-
-      if (reason === 'DROP') {
-        setStyle(styles.dropAnimating);
-        return;
-      }
-      setStyle(styles.userCancel);
-      return;
-    }
-
-    setStyle(styles.resting);
+    setStyle(styles.userCancel);
   };
+  const resting = () => setStyle(styles.resting);
 
   const unmount = (): void => {
     invariant(el, 'Cannot unmount style marshal as it is already unmounted');
@@ -82,7 +67,9 @@ export default () => {
   };
 
   const marshal: StyleMarshal = {
-    onPhaseChange,
+    dragging,
+    dropping,
+    resting,
     styleContext: context,
     mount,
     unmount,

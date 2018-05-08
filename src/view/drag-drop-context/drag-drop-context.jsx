@@ -82,7 +82,7 @@ export default class DragDropContext extends React.Component<Props> {
 
     // create the dimension marshal
     // Lazy reference to dimension marshal get around circular dependency
-    this.store = createStore(() => this.dimensionMarshal);
+    this.store = createStore(() => this.dimensionMarshal, this.styleMarshal);
     const callbacks: DimensionMarshalCallbacks = bindActionCreators({
       bulkReplace,
       updateDroppableScroll,
@@ -121,9 +121,9 @@ export default class DragDropContext extends React.Component<Props> {
       // post drag animations in firefox. Even though we clear the transition off
       // a Draggable - if it is done after a reorder firefox will still apply the
       // transition.
-      if (isPhaseChanging) {
-        this.styleMarshal.onPhaseChange(current);
-      }
+      // if (isPhaseChanging) {
+      //   this.styleMarshal.onPhaseChange(current);
+      // }
 
       const isDragEnding: boolean = previousInThisExecution.phase === 'DRAGGING' && current.phase !== 'DRAGGING';
 
@@ -141,7 +141,7 @@ export default class DragDropContext extends React.Component<Props> {
         onDragEnd: this.props.onDragEnd,
         onDragUpdate: this.props.onDragUpdate,
       };
-      this.hookCaller.onStateChange(hooks, previousInThisExecution, current);
+      // this.hookCaller.onStateChange(hooks, previousInThisExecution, current);
 
       // The following two functions are dangerous. They can both syncronously
       // create new actions that update the application state. That will cause
