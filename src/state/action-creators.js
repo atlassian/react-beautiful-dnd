@@ -153,7 +153,7 @@ export const move = (args: MoveArgs): MoveAction => ({
 });
 
 type MoveByWindowScrollArgs = {|
-  windowScroll: Position,
+  viewport: Viewport,
 |}
 
 export type MoveByWindowScrollAction = {|

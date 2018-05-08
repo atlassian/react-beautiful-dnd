@@ -29,7 +29,7 @@ import type {
   WindowDetails,
   DimensionMap,
 } from '../types';
-import { add, subtract, isEqual } from './position';
+import { add, subtract, isEqual, negate } from './position';
 import noImpact, { noMovement } from './no-impact';
 import getDragImpact from './get-drag-impact/';
 import moveToNextIndex from './move-to-next-index/';
@@ -60,7 +60,7 @@ type MoveArgs = {|
   shouldAnimate: boolean,
   windowDetails?: WindowDetails,
   // force a custom drag impact
-  impact?: DragImpact,
+  impact?: ?DragImpact,
   // provide a scroll jump request (optionally provided - and can be null)
   scrollJumpRequest?: ?Position
 |}
@@ -356,9 +356,9 @@ export default (state: State = clean(), action: Action): State => {
     invariant(state.phase === 'DRAGGING' || state.phase === 'BULK_COLLECTING',
       `Cannot move by window in phase ${state.phase}`);
 
-    const windowScroll: Position = action.payload.windowScroll;
+    const viewport: Viewport = action.payload.viewport;
 
-    if (isEqual(state.window.scroll.current, windowScroll)) {
+    if (isEqual(state.window.scroll.current, viewport.scroll)) {
       return state;
     }
 
@@ -366,12 +366,27 @@ export default (state: State = clean(), action: Action): State => {
     const isJumpScrolling: boolean = state.autoScrollMode === 'JUMP';
 
     // If we are jump scrolling - any window scrolls should not update the impact
-    const impact: ?DragImpact = isJumpScrolling ? drag.impact : null;
+    const impact: ?DragImpact = isJumpScrolling ? state.impact : null;
+
+    const diff: Position = subtract(viewport.scroll, state.window.scroll.initial);
+    const displacement: Position = negate(diff);
+
+    const windowDetails: WindowDetails = {
+      viewport,
+      scroll: {
+        initial: state.window.scroll.initial,
+        current: viewport.scroll,
+        diff: {
+          value: diff,
+          displacement,
+        },
+      },
+    };
 
     return move({
       state,
-      clientSelection: drag.current.client.selection,
-      viewport,
+      clientSelection: state.current.client.selection,
+      windowDetails,
       shouldAnimate: false,
       impact,
     });

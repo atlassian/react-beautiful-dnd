@@ -165,7 +165,7 @@ export default class Draggable extends Component<Props> {
 
   onWindowScroll = () => {
     this.throwIfCannotDrag();
-    this.props.moveByWindowScroll({ windowScroll: getWindowScroll() });
+    this.props.moveByWindowScroll({ viewport: getViewport() });
   }
 
   onDrop = () => {
