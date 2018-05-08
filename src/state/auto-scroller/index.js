@@ -39,20 +39,16 @@ export default ({
 
   const onStateChange = (previous: State, current: State): void => {
     // now dragging
-    if (current.phase === 'DRAGGING') {
-      if (!current.drag) {
-        console.error('invalid drag state');
-        return;
-      }
 
-      if (current.drag.initial.autoScrollMode === 'FLUID') {
+    if (current.phase === 'DRAGGING' || current.phase === 'BULK_COLLECTING') {
+      if (current.autoScrollMode === 'FLUID') {
         fluidScroll(current);
         return;
       }
 
       // autoScrollMode == 'JUMP'
 
-      if (!current.drag.scrollJumpRequest) {
+      if (!current.scrollJumpRequest) {
         return;
       }
 
@@ -60,8 +56,9 @@ export default ({
       return;
     }
 
-    // cancel any pending scrolls if no longer dragging
-    if (previous.phase === 'DRAGGING' && current.phase !== 'DRAGGING') {
+    // Not currently dragging
+    // Was previously dragging
+    if (previous.phase === 'DRAGGING' || previous.phase === 'BULK_COLLECTING') {
       fluidScroll.cancel();
     }
   };

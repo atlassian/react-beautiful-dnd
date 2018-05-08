@@ -99,7 +99,7 @@ export default ({
       // we are using this event for part of the drag
       event.preventDefault();
       startDragging(() => callbacks.onLift({
-        client: center,
+        clientSelection: center,
         autoScrollMode: 'JUMP',
       }));
       return;

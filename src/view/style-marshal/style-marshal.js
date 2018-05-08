@@ -6,7 +6,6 @@ import { prefix } from '../data-attributes';
 import type { StyleMarshal } from './style-marshal-types';
 import type {
   State as AppState,
-  Phase,
   DropReason,
 } from '../../types';
 
@@ -54,17 +53,15 @@ export default () => {
     // delaying mount until first update to play nicely with server side rendering
     invariant(el, 'cannot update styles until style marshal is mounted');
 
-    const phase: Phase = current.phase;
-
-    if (phase === 'DRAGGING') {
+    if (current.phase === 'DRAGGING' ||
+      current.phase === 'DROP_ANIMATING' ||
+      current.phase === 'BULK_COLLECTING') {
       setStyle(styles.dragging);
       return;
     }
 
-    if (phase === 'DROP_ANIMATING') {
-      invariant(current.drop && current.drop.pending, 'Invalid state found in style-marshal');
-
-      const reason: DropReason = current.drop.pending.result.reason;
+    if (current.phase === 'DROP_ANIMATING') {
+      const reason: DropReason = current.pending.result.reason;
 
       if (reason === 'DROP') {
         setStyle(styles.dropAnimating);

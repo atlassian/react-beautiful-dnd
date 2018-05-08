@@ -7,6 +7,7 @@ import type {
   DraggableDimension,
   Direction,
   ZIndex,
+  State,
 } from '../../types';
 import {
   lift,
@@ -48,6 +49,7 @@ export type DraggingStyle = {|
   top: number,
   left: number,
 
+  // TODO: update comment
   // We clear any top or left margins on the element to ensure it does not push
   // the element positioned with the top/left position (which is margin aware).
   // We also clear the margin right / bottom. This has no positioning impact,
@@ -161,5 +163,4 @@ export type Props = {|
   ...OwnProps
 |}
 
-// Having issues getting the correct type
-export type Selector = Function;
+export type Selector = (state: State, ownProps: OwnProps) => MapProps;

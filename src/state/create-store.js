@@ -3,6 +3,8 @@
 import { applyMiddleware, createStore, compose } from 'redux';
 import thunk from 'redux-thunk';
 import reducer from './reducer';
+import liftMiddleware from './middleware/lift-middleware';
+import type { DimensionMarshal } from './dimension-marshal/dimension-marshal-types';
 import type { Store } from '../types';
 
 // We are checking if window is available before using it.
@@ -12,11 +14,12 @@ const composeEnhancers = typeof window === 'object'
   && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
   ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ : compose;
 
-export default (): Store => createStore(
+export default (getMarshal: () => ?DimensionMarshal): Store => createStore(
   reducer,
   composeEnhancers(
     applyMiddleware(
       thunk,
+      liftMiddleware(getMarshal),
       // debugging logger
       // require('./debug-middleware/log-middleware'),
       // debugging timer

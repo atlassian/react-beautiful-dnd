@@ -1,17 +1,18 @@
 // @flow
+import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import type {
+  Critical,
   DraggableId,
   DroppableId,
   DropResult,
   DragImpact,
   DraggableDimension,
   DroppableDimension,
-  InitialDragPositions,
+  ItemPositions,
   DraggableLocation,
   Dispatch,
   State,
-  DropAnimatingState,
   DraggableDescriptor,
   LiftRequest,
   AutoScrollMode,
@@ -51,44 +52,29 @@ const getScrollDiff = ({
   return withDroppableDisplacement(droppable, windowScrollDiff);
 };
 
-export type RequestDimensionsAction = {|
-  type: 'REQUEST_DIMENSIONS',
-  payload: LiftRequest,
-|}
-
-export const requestDimensions = (request: LiftRequest): RequestDimensionsAction => ({
-  type: 'REQUEST_DIMENSIONS',
-  payload: request,
-});
-
-export type CompleteLiftAction = {|
-  type: 'COMPLETE_LIFT',
-  payload: {|
-    id: DraggableId,
-    client: InitialDragPositions,
-    viewport: Viewport,
-    autoScrollMode: AutoScrollMode,
-  |}
-|}
-
-export const completeLift = (
+type LiftArgs = {|
+  // lifting with DraggableId rather than descriptor
+  // as the descriptor might change after a drop is flushed
   id: DraggableId,
-  client: InitialDragPositions,
+  client: ItemPositions,
   viewport: Viewport,
   autoScrollMode: AutoScrollMode,
-): CompleteLiftAction => ({
-  type: 'COMPLETE_LIFT',
-  payload: {
-    id,
-    client,
-    viewport,
-    autoScrollMode,
-  },
+|}
+
+export type LiftAction = {|
+  type: 'LIFT',
+  payload: LiftArgs
+|}
+
+export const lift = (args: LiftArgs): LiftAction => ({
+  type: 'LIFT',
+  payload: args,
 });
 
 type InitialPublishArgs = {|
-  critical: DimensionMap,
-  client: InitialDragPositions,
+  critical: Critical,
+  dimensions: DimensionMap,
+  client: ItemPositions,
   viewport: Viewport,
   autoScrollMode: AutoScrollMode,
 |}
@@ -103,112 +89,82 @@ export const initialPublish = (args: InitialPublishArgs): InitialPublishAction =
   payload: args,
 });
 
+export type BulkReplaceArgs = {|
+  dimensions: DimensionMap,
+  viewport: Viewport,
+  shouldReplaceCritical: boolean,
+|}
+
 export type BulkReplaceAction = {|
   type: 'BULK_REPLACE',
-  payload: {|
-    droppables: DroppableDimension[],
-    draggables: DraggableDimension[],
-    viewport: Viewport,
-    replaceCritical: boolean,
-  |}
+  payload: BulkReplaceArgs
 |}
 
-type BulkReplaceArgs = {|
-  droppables: DroppableDimension[],
-  draggables: DraggableDimension[],
-  viewport: Viewport,
-  replaceCritical: boolean,
-|}
-export const bulkReplace = ({
-  droppables,
-  draggables,
-  viewport,
-  replaceCritical,
-}: BulkReplaceArgs): BulkReplaceAction => ({
+export const bulkReplace = (args: BulkReplaceArgs): BulkReplaceAction => ({
   type: 'BULK_REPLACE',
-  payload: {
-    droppables,
-    draggables,
-    viewport,
-    replaceCritical,
-  },
+  payload: args,
 });
 
-export type UpdateDroppableDimensionScrollAction = {|
-  type: 'UPDATE_DROPPABLE_DIMENSION_SCROLL',
-  payload: {
-    id: DroppableId,
-    offset: Position,
-  }
+type UpdateDroppableScrollArgs = {
+  id: DroppableId,
+  offset: Position,
+}
+
+export type UpdateDroppableScrollAction = {|
+  type: 'UPDATE_DROPPABLE_SCROLL',
+  payload: UpdateDroppableScrollArgs
 |}
 
-export const updateDroppableDimensionScroll =
-  (id: DroppableId, offset: Position): UpdateDroppableDimensionScrollAction => ({
-    type: 'UPDATE_DROPPABLE_DIMENSION_SCROLL',
-    payload: {
-      id,
-      offset,
-    },
+export const updateDroppableScroll =
+  (args: UpdateDroppableScrollArgs): UpdateDroppableScrollAction => ({
+    type: 'UPDATE_DROPPABLE_SCROLL',
+    payload: args,
   });
 
-export type UpdateDroppableDimensionIsEnabledAction = {|
-  type: 'UPDATE_DROPPABLE_DIMENSION_IS_ENABLED',
-  payload: {
-    id: DroppableId,
-    isEnabled: boolean,
-  }
+type UpdateDroppableIsEnabledArgs = {|
+  id: DroppableId,
+  isEnabled: boolean,
+|};
+
+export type UpdateDroppableIsEnabledAction = {|
+  type: 'UPDATE_DROPPABLE_IS_ENABLED',
+  payload: UpdateDroppableIsEnabledArgs
 |}
 
-export const updateDroppableDimensionIsEnabled =
-  (id: DroppableId, isEnabled: boolean): UpdateDroppableDimensionIsEnabledAction => ({
-    type: 'UPDATE_DROPPABLE_DIMENSION_IS_ENABLED',
-    payload: {
-      id,
-      isEnabled,
-    },
+export const updateDroppableIsEnabled =
+  (args: UpdateDroppableIsEnabledArgs): UpdateDroppableIsEnabledAction => ({
+    type: 'UPDATE_DROPPABLE_IS_ENABLED',
+    payload: args,
   });
+
+type MoveArgs = {|
+  client: Position,
+  shouldAnimate: boolean,
+|}
 
 export type MoveAction = {|
   type: 'MOVE',
-  payload: {|
-    id: DraggableId,
-    client: Position,
-    viewport: Viewport,
-    shouldAnimate: boolean,
-  |}
+  payload: MoveArgs
 |}
 
-export const move = (
-  id: DraggableId,
-  client: Position,
-  viewport: Viewport,
-  shouldAnimate?: boolean = false,
-): MoveAction => ({
+export const move = (args: MoveArgs): MoveAction => ({
   type: 'MOVE',
-  payload: {
-    id,
-    client,
-    viewport,
-    shouldAnimate,
-  },
+  payload: args,
 });
+
+type MoveByWindowScrollArgs = {|
+  windowScroll: Position,
+|}
 
 export type MoveByWindowScrollAction = {|
   type: 'MOVE_BY_WINDOW_SCROLL',
-  payload: {|
-    id: DraggableId,
-    viewport: Viewport,
-  |}
+  payload: MoveByWindowScrollArgs
 |}
 
-export const moveByWindowScroll =
-  (id: DraggableId, viewport: Viewport): MoveByWindowScrollAction => ({
-    type: 'MOVE_BY_WINDOW_SCROLL',
-    payload: {
-      id,
-      viewport,
-    },
-  });
+export const moveByWindowScroll = (args: MoveByWindowScrollArgs): MoveByWindowScrollAction => ({
+  type: 'MOVE_BY_WINDOW_SCROLL',
+  payload: args,
+});
 
 export type MoveBackwardAction = {|
   type: 'MOVE_BACKWARD',
@@ -312,23 +268,39 @@ export const drop = () =>
   (dispatch: Dispatch, getState: () => State): void => {
     const state: State = getState();
 
-    // dropped before a drag officially started - this is fine
-    if (state.phase === 'PREPARING' || state.phase === 'COLLECTING_INITIAL_DIMENSIONS') {
+    throw new Error('TODO: move to middleware');
+
+    // Should not really happen, but oh well
+    if (state.phase === 'IDLE') {
       dispatch(clean());
-      return;
     }
+
+    // dropped before a drag officially started - this is fine
+    if (state.phase === 'PREPARING') {
+      dispatch(clean());
+    }
+
+    // We cannot drop - we need to wait for the collection to finish
+    if (state.phase === 'BULK_COLLECTING') {
+      dispatch(dropAfterCollection());
+    }
+
+    // TODO: blash
+    if (state.phase === 'DRAGGING') {
+      dispatch(startDrop());
+    }
+
+    throw new Error(`Cannot drop in phase ${state.phase}`);
 
     // dropped in another phase except for dragging - this is an error
     if (state.phase !== 'DRAGGING') {
       console.error(`not able to drop in phase: '${state.phase}'`);
       dispatch(clean());
-      return;
     }
 
     if (!state.drag) {
       console.error('not able to drop when there is invalid drag state', state);
       dispatch(clean());
-      return;
     }
 
     const { impact, initial, current } = state.drag;
@@ -377,7 +349,6 @@ export const drop = () =>
 
     if (!isAnimationRequired) {
       dispatch(completeDrop(result));
-      return;
     }
 
     dispatch(animateDrop({
@@ -456,86 +427,12 @@ export const dropAnimationFinished = () =>
     dispatch(completeDrop(state.drop.pending.result));
   };
 
-export type LiftAction = {|
-  type: 'LIFT',
-  payload: {|
-    id: DraggableId,
-    client: InitialDragPositions,
-    viewport: Viewport,
-    autoScrollMode: AutoScrollMode,
-  |}
-|}
-
-type LiftArgs = {|
-  // lifting with DraggableId rather than descriptor
-  // as the descriptor might change after a drop is flushed
-  id: DraggableId,
-  client: InitialDragPositions,
-  viewport: Viewport,
-  autoScrollMode: AutoScrollMode,
-  marshal: DimensionMarshal,
-|}
-
-export const lift = ({
-  id,
-  client,
-  autoScrollMode,
-  viewport,
-  marshal,
-}: LiftArgs) => (dispatch: Dispatch, getState: Function) => {
-  // Phase 1: Quickly finish any current drop animations
-  const initial: State = getState();
-
-  // flush dropping animation if needed
-  // this can change the descriptor of the dragging item
-  if (initial.phase === 'DROP_ANIMATING') {
-    const current: DropAnimatingState = initial;
-    dispatch(completeDrop(current.pending.result));
-  }
-
-  // https://github.com/chenglou/react-motion/issues/437
-  // need to allow a flush of react-motion
-  dispatch(prepare());
-
-  setTimeout(() => {
-    // Phase 2: collect initial dimensions
-    const state: State = getState();
-
-    // drag cancelled before timeout finished
-    if (state.phase !== 'PREPARING') {
-      return;
-    }
-
-    // will communicate with the marshal to start requesting dimensions
-    const scrollOptions: ScrollOptions = {
-      shouldPublishImmediately: autoScrollMode === 'JUMP',
-    };
-    const request: LiftRequest = {
-      draggableId: id,
-      scrollOptions,
-    };
-    // Let's get the marshal started!
-    const critical: DimensionMap = marshal.startPublishing(request, viewport.scroll);
-    // Okay, we are good to start dragging now
-    dispatch(initialPublish({
-      critical,
-      client,
-      autoScrollMode,
-      viewport,
-    }));
-
-    // Start collecting all the other dimensions
-    marshal.collect({ includeCritical: false });
-  });
-};
-
 export type Action =
-  CompleteLiftAction |
-  RequestDimensionsAction |
+  LiftAction |
   InitialPublishAction |
-  BulkPublishAction |
-  UpdateDroppableDimensionScrollAction |
-  UpdateDroppableDimensionIsEnabledAction |
+  BulkReplaceAction |
+  UpdateDroppableScrollAction |
+  UpdateDroppableIsEnabledAction |
   MoveByWindowScrollAction |
   MoveAction |
   MoveBackwardAction |

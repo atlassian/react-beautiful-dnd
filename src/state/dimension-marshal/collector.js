@@ -3,6 +3,7 @@ import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import * as timings from '../../debug/timings';
 import getViewport from '../../view/window/get-viewport';
+import type { BulkReplaceArgs } from '../action-creators';
 import type {
   DraggableId,
   DroppableId,
@@ -33,24 +34,18 @@ export type Collector = {|
   collect: (options: CollectOptions) => void,
 |}
 
-type PublishArgs = {|
-  draggables: DraggableDimensionMap,
-  droppables: DroppableDimensionMap,
-  viewport: Viewport,
-|}
-
 type Args = {|
   getEntries: () => Entries,
-  publish: (args: PublishArgs) => void,
+  bulkReplace: (args: BulkReplaceArgs) => void,
 |}
 
 export default ({
-  publish,
+  bulkReplace,
   getEntries,
 }: Args): Collector => {
   let frameId: ?AnimationFrameID = null;
 
-  const collectFromDOM = (windowScroll: Position, options: CollectOptions): Collected => {
+  const collectFromDOM = (windowScroll: Position, options: CollectOptions): DimensionMap => {
     const { collection, includeCritical } = options;
     const entries: Entries = getEntries();
     const home: DroppableDescriptor = collection.critical.droppable;
@@ -104,13 +99,20 @@ export default ({
 
     // 3. Do the collection from the DOM
 
-    const droppableDimensions: DroppableDimension[] =
-      droppables.map((entry: DroppableEntry): DroppableDimension =>
-        entry.callbacks.getDimensionAndWatchScroll(windowScroll, scrollOptions));
+    const droppableDimensions: DroppableDimensionMap = droppables
+      .map((entry: DroppableEntry): DroppableDimension =>
+        entry.callbacks.getDimensionAndWatchScroll(windowScroll, scrollOptions))
+      .reduce((previous: DroppableDimensionMap, current: DroppableDimension) => {
+        previous[current.descriptor.id] = current;
+        return previous;
+      }, {});
 
-    const draggableDimensions: DraggableDimension[] =
-      draggables.map((entry: DraggableEntry): DraggableDimension =>
-        entry.getDimension(windowScroll));
+    const draggableDimensions: DraggableDimensionMap = draggables
+      .map((entry: DraggableEntry): DraggableDimension => entry.getDimension(windowScroll))
+      .reduce((previous: DraggableDimensionMap, current: DraggableDimension) => {
+        previous[current.descriptor.id] = current;
+        return previous;
+      }, {});
 
     // 4. Tell all the droppables to show their placeholders
     droppables.forEach((entry: DroppableEntry) => entry.callbacks.showPlaceholder());
@@ -136,16 +138,16 @@ export default ({
     frameId = requestAnimationFrame(() => {
       timings.start('DOM collection');
       const viewport: Viewport = getViewport();
-      const collected: DimensionMap = collectFromDOM(viewport.scroll, options);
+      const dimensions: DimensionMap = collectFromDOM(viewport.scroll, options);
       timings.finish('DOM collection');
 
       // Perform publish in next frame
       frameId = requestAnimationFrame(() => {
         timings.start('Bulk dimension publish');
-        publish({
-          draggables: collected.draggables,
-          droppables: collected.droppables,
+        bulkReplace({
+          dimensions,
           viewport,
+          shouldReplaceCritical: options.includeCritical,
         });
         timings.finish('Bulk dimension publish');
 

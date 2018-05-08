@@ -1,6 +1,7 @@
 // @flow
 import React, { type Node } from 'react';
 import { type Position } from 'css-box-model';
+import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
 import createHookCaller from '../../state/hooks/hook-caller';
@@ -39,11 +40,9 @@ import {
 import {
   clean,
   move,
-  publishDraggableDimension,
-  publishDroppableDimension,
-  updateDroppableDimensionScroll,
-  updateDroppableDimensionIsEnabled,
-  bulkPublishDimensions,
+  bulkReplace,
+  updateDroppableScroll,
+  updateDroppableIsEnabled,
 } from '../../state/action-creators';
 
 type Props = {|
@@ -73,8 +72,6 @@ export default class DragDropContext extends React.Component<Props> {
   constructor(props: Props, context: mixed) {
     super(props, context);
 
-    this.store = createStore();
-
     this.announcer = createAnnouncer();
 
     // create the hook caller
@@ -84,27 +81,15 @@ export default class DragDropContext extends React.Component<Props> {
     this.styleMarshal = createStyleMarshal();
 
     // create the dimension marshal
-    const callbacks: DimensionMarshalCallbacks = {
-      cancel: () => {
-        this.store.dispatch(clean());
-      },
-      publishDraggable: (dimension: DraggableDimension) => {
-        this.store.dispatch(publishDraggableDimension(dimension));
-      },
-      publishDroppable: (dimension: DroppableDimension) => {
-        this.store.dispatch(publishDroppableDimension(dimension));
-      },
-      bulkPublish: (droppables: DroppableDimension[], draggables: DraggableDimension[]) => {
-        this.store.dispatch(bulkPublishDimensions(droppables, draggables));
-      },
-      updateDroppableScroll: (id: DroppableId, newScroll: Position) => {
-        this.store.dispatch(updateDroppableDimensionScroll(id, newScroll));
-      },
-      updateDroppableIsEnabled: (id: DroppableId, isEnabled: boolean) => {
-        this.store.dispatch(updateDroppableDimensionIsEnabled(id, isEnabled));
-      },
-    };
+    // Lazy reference to dimension marshal get around circular dependency
+    this.store = createStore(() => this.dimensionMarshal);
+    const callbacks: DimensionMarshalCallbacks = bindActionCreators({
+      bulkReplace,
+      updateDroppableScroll,
+      updateDroppableIsEnabled,
+    }, this.store.dispatch);
     this.dimensionMarshal = createDimensionMarshal(callbacks);
+
     this.autoScroller = createAutoScroller({
       scrollWindow,
       scrollDroppable: this.dimensionMarshal.scrollDroppable,
@@ -145,9 +130,9 @@ export default class DragDropContext extends React.Component<Props> {
       // in the case that a drag is ending we need to instruct the dimension marshal
       // to stop listening to changes. Otherwise it will try to process
       // changes after the reorder in onDragEnd
-      if (isDragEnding) {
-        this.dimensionMarshal.onPhaseChange(current);
-      }
+      // if (isDragEnding) {
+      //   this.dimensionMarshal.onPhaseChange(current);
+      // }
 
       // We recreate the Hook object so that consumers can pass in new
       // hook props at any time (eg if they are using arrow functions)
@@ -163,9 +148,9 @@ export default class DragDropContext extends React.Component<Props> {
       // this subscription function to be called again before the next line is called.
 
       // if isDragEnding we have already called the marshal
-      if (isPhaseChanging && !isDragEnding) {
-        this.dimensionMarshal.onPhaseChange(current);
-      }
+      // if (isPhaseChanging && !isDragEnding) {
+      //   this.dimensionMarshal.onPhaseChange(current);
+      // }
 
       // We could block this action from being called if this function has been reinvoked
       // before completing and dragging and autoScrollMode === 'FLUID'.
@@ -216,17 +201,18 @@ export default class DragDropContext extends React.Component<Props> {
   onWindowError = (error: Error) => {
     const state: State = this.store.getState();
 
-    if (state.phase === 'IDLE' || state.phase === 'DROP_COMPLETE') {
+    if (state.phase === 'IDLE') {
       return;
     }
 
     if (process.env.NODE_ENV !== 'production') {
       console.warn(`
-        An error has occurred withing a DragDropContext.
+        An error has occurred while a drag is occurring.
         Any existing drag will be cancelled
       `, error);
     }
 
+    this.dimensionMarshal.stopPublishing();
     this.store.dispatch(clean());
   }
 

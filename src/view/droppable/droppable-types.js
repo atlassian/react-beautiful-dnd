@@ -6,6 +6,7 @@ import type {
   TypeId,
   Direction,
   Placeholder,
+  State,
 } from '../../types';
 
 export type DroppableProps = {|
@@ -57,4 +58,4 @@ export type Props = {|
 
 // Having issues getting the correct type
 // export type Selector = OutputSelector<State, OwnProps, MapProps>;
-export type Selector = Function;
+export type Selector = (state: State, ownProps: OwnProps) => MapProps;

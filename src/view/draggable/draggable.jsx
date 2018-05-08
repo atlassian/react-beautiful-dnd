@@ -6,7 +6,7 @@ import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import type {
   DraggableDimension,
-  InitialDragPositions,
+  ItemPositions,
   DroppableId,
   AutoScrollMode,
 } from '../../types';
@@ -31,12 +31,15 @@ import type {
   DraggableStyle,
   ZIndexOptions,
 } from './draggable-types';
+import getWindowScroll from '../window/get-window-scroll';
 import type { Speed, Style as MovementStyle } from '../moveable/moveable-types';
 
 export const zIndexOptions: ZIndexOptions = {
   dragging: 5000,
   dropAnimating: 4500,
 };
+
+const origin: Position = { x: 0, y: 0 };
 
 export default class Draggable extends Component<Props> {
   /* eslint-disable react/sort-comp */
@@ -104,34 +107,40 @@ export default class Draggable extends Component<Props> {
     this.props.dropAnimationFinished();
   }
 
-  onLift = (options: {client: Position, autoScrollMode: AutoScrollMode}) => {
+  onLift = (options: {clientSelection: Position, autoScrollMode: AutoScrollMode}) => {
     timings.start('LIFT');
     this.throwIfCannotDrag();
-    const { client, autoScrollMode } = options;
+    const { clientSelection, autoScrollMode } = options;
     const { lift, draggableId } = this.props;
     const ref: ?HTMLElement = this.ref;
 
     invariant(ref, 'Cannot lift at this time as there is no ref');
 
-    const initial: InitialDragPositions = {
-      selection: client,
+    const client: ItemPositions = {
+      selection: clientSelection,
       borderBoxCenter: getBorderBoxCenterPosition(ref),
+      offset: origin,
     };
 
-    lift(draggableId, initial, getViewport(), autoScrollMode);
+    lift({
+      id: draggableId,
+      client,
+      autoScrollMode,
+      viewport: getViewport(),
+    });
   }
 
   onMove = (client: Position) => {
     this.throwIfCannotDrag();
 
-    const { draggableId, dimension, move } = this.props;
+    const { dimension, move } = this.props;
 
     // dimensions not provided yet
     if (!dimension) {
       return;
     }
 
-    move(draggableId, client, getViewport());
+    move({ client, shouldAnimate: false });
   }
 
   onMoveForward = () => {
@@ -156,7 +165,7 @@ export default class Draggable extends Component<Props> {
 
   onWindowScroll = () => {
     this.throwIfCannotDrag();
-    this.props.moveByWindowScroll(this.props.draggableId, getViewport());
+    this.props.moveByWindowScroll({ windowScroll: getWindowScroll() });
   }
 
   onDrop = () => {

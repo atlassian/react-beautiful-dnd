@@ -1,6 +1,9 @@
 // @flow
 import { type Position } from 'css-box-model';
 import type {
+  BulkReplaceArgs,
+} from '../action-creators';
+import type {
   DraggableDescriptor,
   DroppableDescriptor,
   DraggableDimension,
@@ -90,25 +93,14 @@ export type DimensionMarshal = {|
   scrollDroppable: (id: DroppableId, change: Position) => void,
   unregisterDroppable: (descriptor: DroppableDescriptor) => void,
   // Entry
-  startPublishing: (request: LiftRequest, windowScroll: Position) => DimensionMap,
+  startPublishing: (request: LiftRequest, windowScroll: Position) =>
+    {| critical: Critical, dimensions: DimensionMap |},
   stopPublishing: () => void,
   collect: (options: CollectionOptions) => void,
 |}
 
 export type Callbacks = {|
-  cancel: () => void,
-  publishDraggable: (DraggableDimension) => void,
-  publishDroppable: (DroppableDimension) => void,
-  initialPublish: (
-    home: DroppableDimension,
-    draggable: DraggableDimension,
-    viewport: Viewport,
-  ) => void,
-  bulkPublish: (
-    droppables: DroppableDimension[],
-    draggables: DraggableDimension[],
-    viewport: Viewport,
-  ) => void,
+  bulkReplace: (args: BulkReplaceArgs) => void,
   updateDroppableScroll: (id: DroppableId, newScroll: Position) => void,
   updateDroppableIsEnabled: (id: DroppableId, isEnabled: boolean) => void,
 |}

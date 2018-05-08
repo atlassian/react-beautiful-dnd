@@ -11,6 +11,7 @@ import type {
   DraggableDescriptor,
   DimensionMap,
   LiftRequest,
+  Critical,
 } from '../../types';
 import type {
   DimensionMarshal,
@@ -31,7 +32,7 @@ export default (callbacks: Callbacks) => {
   let collection: ?Collection = null;
 
   const collector: Collector = createCollector({
-    publish: callbacks.bulkPublish,
+    bulkReplace: callbacks.bulkReplace,
     getEntries: () => entries,
   });
 
@@ -275,22 +276,29 @@ export default (callbacks: Callbacks) => {
     collector.stop();
   };
 
-  const startPublishing = (request: LiftRequest, windowScroll: Position): DimensionMap => {
+  const startPublishing = (request: LiftRequest, windowScroll: Position) => {
     invariant(!collection, 'Cannot start capturing critical dimensions as there is already a collection');
     const entry: ?DraggableEntry = entries.draggables[request.draggableId];
     invariant(entry, 'Cannot find critical draggable entry');
     const home: ?DroppableEntry = entries.droppables[entry.descriptor.droppableId];
     invariant(home, 'Cannot find critical droppable entry');
 
-    collection = {
-      scrollOptions: request.scrollOptions,
-      critical: {
-        draggable: entry.descriptor,
-        droppable: home.descriptor,
-      },
+    const critical: Critical = {
+      draggable: entry.descriptor,
+      droppable: home.descriptor,
     };
 
-    return getCritical(windowScroll);
+    collection = {
+      scrollOptions: request.scrollOptions,
+      critical,
+    };
+
+    const dimensions: DimensionMap = getCritical(windowScroll);
+
+    return {
+      dimensions,
+      critical,
+    };
   };
 
   const marshal: DimensionMarshal = {

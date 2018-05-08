@@ -128,7 +128,7 @@ export default ({
         // preventing default as we are using this event
         event.preventDefault();
         startDragging(() => callbacks.onLift({
-          client: point,
+          clientSelection: point,
           autoScrollMode: 'FLUID',
         }));
       },

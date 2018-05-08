@@ -5,7 +5,6 @@ import memoizeOne from 'memoize-one';
 import { storeKey } from '../context-keys';
 import Droppable from './droppable';
 import type {
-  PendingDrop,
   State,
   DroppableId,
   DraggableId,
@@ -117,7 +116,7 @@ export const makeSelector = (): Selector => {
 // that `connect` provides.
 // It avoids needing to do it own within `Droppable`
 const connectedDroppable: OwnProps => Node = (connect(
-  (makeSelector: any),
+  makeSelector,
   null,
   null,
   { storeKey },

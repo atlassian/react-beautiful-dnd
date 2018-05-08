@@ -138,11 +138,13 @@ export type DragImpact = {|
   destination: ?DraggableLocation,
 |}
 
-export type InitialDragPositions = {|
+export type ItemPositions = {|
   // where the user initially selected
   selection: Position,
   // the current center of the item
   borderBoxCenter: Position,
+  // how far the item has moved from its original position
+  offset: Position
 |}
 
 // When dragging with a pointer such as a mouse or touch input we want to automatically
@@ -156,20 +158,9 @@ export type Viewport = {|
   subject: Rect,
 |}
 
-export type InitialPositions = {|
-  // relative to the viewport when the drag started
-  client: InitialDragPositions,
-  // viewport + window scroll (position relative to 0, 0)
-  page: InitialDragPositions,
-  // Storing viewport directly to support movement during a window scroll.
-  // Value required for comparison with current scroll
-  // windowScroll: Position,
-|}
-
-export type CurrentPositions = {|
-  ...InitialDragPositions,
-  // how far the item has moved from its original position
-  offset: Position,
+export type DragPositions = {|
+  client: ItemPositions,
+  page: ItemPositions,
 |}
 
 // published when a drag starts
@@ -276,8 +267,8 @@ export type DraggingState = {|
   critical: Critical,
   autoScrollMode: AutoScrollMode,
   dimensions: DimensionMap,
-  initial: InitialPositions,
-  current: CurrentPositions,
+  initial: DragPositions,
+  current: DragPositions,
   impact: DragImpact,
   window: WindowDetails,
   // if we need to jump the scroll (keyboard dragging)
@@ -293,6 +284,15 @@ export type DraggingState = {|
 export type BulkCollectionState = {|
   ...DraggingState,
   phase: 'BULK_COLLECTING',
+|}
+
+// If a drop action occurs during a bulk collection we need to
+// wait for the collection to finish before performing the drop.
+// This is to ensure that everything has the correct index after
+// a drop
+export type DropPendingState = {|
+  ...DraggingState,
+  phase: 'DROP_PENDING',
 |}
 
 // An optional phase for animating the drop / cancel if it is needed
@@ -313,6 +313,7 @@ export type State =
   PreparingState |
   DraggingState |
   BulkCollectionState |
+  DropPendingState |
   DropAnimatingState |
   DropCompleteState;
 

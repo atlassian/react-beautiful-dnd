@@ -8,7 +8,7 @@ import type {
 } from '../../types';
 
 export type Callbacks = {|
-  onLift: ({ client: Position, autoScrollMode: AutoScrollMode }) => void,
+  onLift: ({ clientSelection: Position, autoScrollMode: AutoScrollMode }) => void,
   onMove: (point: Position) => void,
   onWindowScroll: () => void,
   onMoveForward: () => void,

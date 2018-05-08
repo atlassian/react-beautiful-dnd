@@ -202,7 +202,7 @@ export const makeMapStateToProps = (): Selector => {
     return null;
   };
 
-  const selector = (state: State, ownProps: OwnProps): ?MapProps => {
+  const selector = (state: State, ownProps: OwnProps): MapProps => {
     const dragging: ?MapProps = draggingSelector(state, ownProps);
     if (dragging) {
       return dragging;
@@ -234,7 +234,7 @@ const mapDispatchToProps: DispatchProps = {
 // that `connect` provides.
 // It avoids needing to do it own within `Draggable`
 const ConnectedDraggable: OwnProps => Node = (connect(
-  (makeMapStateToProps: any),
+  makeMapStateToProps,
   (mapDispatchToProps: any),
   null,
   { storeKey },

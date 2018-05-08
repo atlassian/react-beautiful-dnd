@@ -131,7 +131,7 @@ export default ({
     });
 
     callbacks.onLift({
-      client: pending,
+      clientSelection: pending,
       autoScrollMode: 'FLUID',
     });
   };

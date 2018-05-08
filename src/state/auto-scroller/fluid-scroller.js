@@ -11,9 +11,9 @@ import {
 import type {
   Axis,
   DroppableId,
-  DragState,
+  DraggingState,
+  BulkCollectionState,
   DroppableDimension,
-  State,
   DraggableDimension,
   Scrollable,
   Viewport,
@@ -234,7 +234,7 @@ type Api = {|
   scrollDroppable: (id: DroppableId, offset: Position) => void,
 |}
 
-type ResultFn = (state: State) => void;
+type ResultFn = (state: DraggingState | BulkCollectionState) => void;
 type ResultCancel = { cancel: () => void };
 
 export type FluidScroller = ResultFn & ResultCancel;
@@ -246,20 +246,14 @@ export default ({
   const scheduleWindowScroll = rafSchd(scrollWindow);
   const scheduleDroppableScroll = rafSchd(scrollDroppable);
 
-  const scroller = (state: State): void => {
-    const drag: ?DragState = state.drag;
-    if (!drag) {
-      console.error('Invalid drag state');
-      return;
-    }
-
-    const center: Position = drag.current.page.borderBoxCenter;
+  const scroller = (state: DraggingState | BulkCollectionState): void => {
+    const center: Position = state.current.page.borderBoxCenter;
 
     // 1. Can we scroll the viewport?
 
-    const draggable: DraggableDimension = state.dimension.draggable[drag.initial.descriptor.id];
+    const draggable: DraggableDimension = state.dimensions.draggables[state.critical.draggable.id];
     const subject: Rect = draggable.page.marginBox;
-    const viewport: Viewport = drag.current.viewport;
+    const viewport: Viewport = state.window.viewport;
     const requiredWindowScroll: ?Position = getRequiredScroll({
       container: viewport.subject,
       subject,
@@ -275,8 +269,8 @@ export default ({
 
     const droppable: ?DroppableDimension = getBestScrollableDroppable({
       center,
-      destination: drag.impact.destination,
-      droppables: state.dimension.droppable,
+      destination: state.impact.destination,
+      droppables: state.dimensions.droppables,
     });
 
     // No scrollable targets
