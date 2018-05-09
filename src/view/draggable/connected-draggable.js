@@ -15,7 +15,6 @@ import {
   crossAxisMoveForward as crossAxisMoveForwardAction,
   crossAxisMoveBackward as crossAxisMoveBackwardAction,
   drop as dropAction,
-  cancel as cancelAction,
   dropAnimationFinished as dropAnimationFinishedAction,
   moveByWindowScroll as moveByWindowScrollAction,
 } from '../../state/action-creators';
@@ -227,7 +226,6 @@ const mapDispatchToProps: DispatchProps = {
   moveByWindowScroll: moveByWindowScrollAction,
   drop: dropAction,
   dropAnimationFinished: dropAnimationFinishedAction,
-  cancel: cancelAction,
 };
 
 // Leaning heavily on the default shallow equality checking

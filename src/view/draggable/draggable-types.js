@@ -18,7 +18,6 @@ import {
   crossAxisMoveForward,
   crossAxisMoveBackward,
   drop,
-  cancel,
   dropAnimationFinished,
 } from '../../state/action-creators';
 import type {
@@ -123,7 +122,6 @@ export type DispatchProps = {|
   crossAxisMoveForward: typeof crossAxisMoveForward,
   crossAxisMoveBackward: typeof crossAxisMoveBackward,
   drop: typeof drop,
-  cancel: typeof cancel,
   dropAnimationFinished: typeof dropAnimationFinished,
 |}
 

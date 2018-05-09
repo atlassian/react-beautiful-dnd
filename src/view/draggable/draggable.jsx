@@ -168,15 +168,15 @@ export default class Draggable extends Component<Props> {
     this.props.moveByWindowScroll({ viewport: getViewport() });
   }
 
-  onDrop = (reason: DropReason) => {
+  onDrop = () => {
     this.throwIfCannotDrag();
-    this.props.drop();
+    this.props.drop({ reason: 'DROP' });
   }
 
   onCancel = () => {
     // Not checking if drag is enabled.
     // Cancel is an escape mechanism
-    this.props.cancel();
+    this.props.drop({ reason: 'CANCEL' });
   }
 
   // React calls ref callback twice for every render
