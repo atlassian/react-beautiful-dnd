@@ -6,7 +6,7 @@ export default (marshal: StyleMarshal) =>
   (store: Store) => (next: (Action) => mixed) => (action: Action): mixed => {
     const state: State = store.getState();
 
-    if (state.phase === ('DRAGGING' || 'BULK_COLLECTING')) {
+    if (state.phase === 'DRAGGING' || state.phase === 'BULK_COLLECTING')) {
       marshal.dragging();
       return next(action);
     }

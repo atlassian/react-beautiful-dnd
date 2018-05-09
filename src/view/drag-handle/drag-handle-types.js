@@ -5,6 +5,7 @@ import type {
   AutoScrollMode,
   Direction,
   DraggableId,
+  DropReason,
 } from '../../types';
 
 export type Callbacks = {|

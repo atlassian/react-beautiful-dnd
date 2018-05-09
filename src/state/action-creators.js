@@ -19,6 +19,8 @@ import type {
   ScrollOptions,
   Viewport,
   DimensionMap,
+  DropReason,
+  PendingDrop,
 } from '../types';
 import noImpact from './no-impact';
 import withDroppableDisplacement from './with-droppable-displacement';
@@ -235,23 +237,9 @@ export type DropAnimateAction = {
   |}
 }
 
-type AnimateDropArgs = {|
-  newHomeOffset: Position,
-  impact: DragImpact,
-  result: DropResult
-|}
-
-const animateDrop = ({
-  newHomeOffset,
-  impact,
-  result,
-}: AnimateDropArgs): DropAnimateAction => ({
+const animateDrop = (pending: PendingDrop): DropAnimateAction => ({
   type: 'DROP_ANIMATE',
-  payload: {
-    newHomeOffset,
-    impact,
-    result,
-  },
+  payload: pending,
 });
 
 export type DropCompleteAction = {
@@ -264,149 +252,29 @@ export const completeDrop = (result: DropResult): DropCompleteAction => ({
   payload: result,
 });
 
-export const drop = () =>
-  (dispatch: Dispatch, getState: () => State): void => {
-    const state: State = getState();
+type DropArgs = {|
+  reason: DropReason,
+|}
 
-    throw new Error('TODO: move to middleware');
+export type DropAction = {|
+  type: 'DROP',
+  payload: DropArgs,
+|}
 
-    // Should not really happen, but oh well
-    if (state.phase === 'IDLE') {
-      dispatch(clean());
-    }
+export const drop = (args: DropArgs) => ({
+  type: 'DROP',
+  payload: args,
+});
 
-    // dropped before a drag officially started - this is fine
-    if (state.phase === 'PREPARING') {
-      dispatch(clean());
-    }
+export type DropPendingAction = {|
+  type: 'DROP_PENDING',
+  payload: null,
+|}
 
-    // We cannot drop - we need to wait for the collection to finish
-    if (state.phase === 'BULK_COLLECTING') {
-      dispatch(dropAfterCollection());
-    }
-
-    // TODO: blash
-    if (state.phase === 'DRAGGING') {
-      dispatch(startDrop());
-    }
-
-    throw new Error(`Cannot drop in phase ${state.phase}`);
-
-    // dropped in another phase except for dragging - this is an error
-    if (state.phase !== 'DRAGGING') {
-      console.error(`not able to drop in phase: '${state.phase}'`);
-      dispatch(clean());
-    }
-
-    if (!state.drag) {
-      console.error('not able to drop when there is invalid drag state', state);
-      dispatch(clean());
-    }
-
-    const { impact, initial, current } = state.drag;
-    const descriptor: DraggableDescriptor = initial.descriptor;
-    const draggable: DraggableDimension = state.dimension.draggable[initial.descriptor.id];
-    const home: DroppableDimension = state.dimension.droppable[draggable.descriptor.droppableId];
-    const destination: ?DroppableDimension = impact.destination ?
-      state.dimension.droppable[impact.destination.droppableId] :
-      null;
-
-    const source: DraggableLocation = {
-      droppableId: descriptor.droppableId,
-      index: descriptor.index,
-    };
-
-    const result: DropResult = {
-      draggableId: descriptor.id,
-      type: home.descriptor.type,
-      source,
-      destination: impact.destination,
-      reason: 'DROP',
-    };
-
-    const newBorderBoxCenter: Position = getNewHomeClientBorderBoxCenter({
-      movement: impact.movement,
-      draggable,
-      draggables: state.dimension.draggable,
-      destination,
-    });
-
-    const clientOffset: Position = subtract(newBorderBoxCenter, draggable.client.borderBox.center);
-    const scrollDiff: Position = getScrollDiff({
-      initial,
-      current,
-      droppable: destination || home,
-    });
-    const newHomeOffset: Position = add(clientOffset, scrollDiff);
-
-    // Do not animate if you do not need to.
-    // This will be the case if either you are dragging with a
-    // keyboard or if you manage to nail it just with a mouse.
-    const isAnimationRequired = !isEqual(
-      current.client.offset,
-      newHomeOffset,
-    );
-
-    if (!isAnimationRequired) {
-      dispatch(completeDrop(result));
-    }
-
-    dispatch(animateDrop({
-      newHomeOffset,
-      impact,
-      result,
-    }));
-  };
-
-export const cancel = () =>
-  (dispatch: Dispatch, getState: () => State): void => {
-    const state: State = getState();
-
-    // only allowing cancelling in the DRAGGING phase
-    if (state.phase !== 'DRAGGING') {
-      dispatch(clean());
-      return;
-    }
-
-    if (!state.drag) {
-      console.error('invalid drag state', state);
-      dispatch(clean());
-      return;
-    }
-
-    const { initial, current } = state.drag;
-    const descriptor = initial.descriptor;
-    const home: DroppableDimension = state.dimension.droppable[descriptor.droppableId];
-
-    const source: DraggableLocation = {
-      index: descriptor.index,
-      droppableId: descriptor.droppableId,
-    };
-
-    const result: DropResult = {
-      draggableId: descriptor.id,
-      type: home.descriptor.type,
-      source,
-      // no destination when cancelling
-      destination: null,
-      reason: 'CANCEL',
-    };
-
-    const isAnimationRequired = !isEqual(current.client.offset, origin);
-
-    if (!isAnimationRequired) {
-      dispatch(completeDrop(result));
-      return;
-    }
-
-    const scrollDiff: Position = getScrollDiff({ initial, current, droppable: home });
-
-    dispatch(animateDrop({
-      newHomeOffset: scrollDiff,
-      impact: noImpact,
-      result,
-    }));
-  };
+export const dropPending = (): DropPendingAction => ({
+  type: 'DROP_PENDING',
+  payload: null,
+});
 
 export const dropAnimationFinished = () =>
   (dispatch: Dispatch, getState: () => State): void => {
@@ -439,6 +307,7 @@ export type Action =
   MoveForwardAction |
   CrossAxisMoveForwardAction |
   CrossAxisMoveBackwardAction |
+  DropAction |
   DropAnimateAction |
   DropCompleteAction |
   PrepareAction |
