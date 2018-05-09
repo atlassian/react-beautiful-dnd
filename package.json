@@ -20,21 +20,22 @@
   "main": "dist/react-beautiful-dnd.cjs.js",
   "module": "dist/react-beautiful-dnd.esm.js",
   "sideEffects": false,
-  "files": ["/dist", "/src"],
+  "files": [
+    "/dist",
+    "/src"
+  ],
   "scripts": {
     "test": "jest --config ./jest.config.js",
-    "validate": "yarn lint && yarn typecheck",
+    "validate": "yarn lint && yarn lint:css && yarn typecheck",
     "lint": "yarn eslint .",
     "lint:css": "stylelint \"stories/**/*.{js,jsx}\"",
     "typecheck": "flow check",
-    "check-bundle-sizes":
-      "cross-env SNAPSHOT=match yarn build:dist && yarn build:clean",
+    "check-bundle-sizes": "cross-env SNAPSHOT=match yarn build:dist && yarn build:clean",
     "update-bundle-sizes": "yarn build:dist && yarn build:clean",
     "build": "yarn build:clean && yarn build:dist && yarn build:flow",
     "build:clean": "rimraf dist",
     "build:dist": "rollup -c",
-    "build:flow":
-      "echo \"// @flow\n\nexport * from '../src';\" > dist/react-beautiful-dnd.cjs.js.flow",
+    "build:flow": "echo \"// @flow\n\nexport * from '../src';\" > dist/react-beautiful-dnd.cjs.js.flow",
     "storybook": "start-storybook -p 9002",
     "build-storybook": "build-storybook -c .storybook -o site",
     "website:start": "cd website && yarn develop",

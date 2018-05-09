@@ -24,6 +24,7 @@ const Wrapper = styled.div`
 
 const DropZone = styled.div`
   display: flex;
+
   /*
     Needed to avoid growth in list due to lifting the first item
     Caused by display: inline-flex strangeness
@@ -32,7 +33,6 @@ const DropZone = styled.div`
 
   /* stop the list collapsing when empty */
   min-width: 600px;
-
 `;
 
 const ScrollContainer = styled.div`
@@ -43,8 +43,10 @@ const Container = styled.div`
   /* flex child */
   flex-grow: 1;
 
-  /* flex parent */
-  /* needed to allow width to grow greater than body */
+  /*
+    flex parent
+    needed to allow width to grow greater than body
+  */
   display: inline-flex;
 `;
 

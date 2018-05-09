@@ -52,12 +52,14 @@ export default class Board extends Component<Props, State> {
   boardRef: ?HTMLElement
 
   componentDidMount() {
+    /* stylelint-disable max-empty-lines */
     // eslint-disable-next-line no-unused-expressions
     injectGlobal`
       body {
         background: ${colors.blue.deep};
       }
     `;
+    /* stylelint-enable */
   }
 
   onDragStart = (initial: DragStart) => {

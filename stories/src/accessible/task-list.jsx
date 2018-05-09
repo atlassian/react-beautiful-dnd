@@ -25,7 +25,7 @@ const Title = styled.h3`
 
 const List = styled.div`
   padding: ${grid}px;
-  padding-bottom: 0px;
+  padding-bottom: 0;
   display: flex;
   flex-direction: column;
 `;
