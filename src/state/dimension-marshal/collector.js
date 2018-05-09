@@ -44,6 +44,8 @@ export default ({
   getEntries,
 }: Args): Collector => {
   let frameId: ?AnimationFrameID = null;
+  // tmep
+  let timerId: ?TimeoutID = null;
 
   const collectFromDOM = (windowScroll: Position, options: CollectOptions): DimensionMap => {
     const { collection, includeCritical } = options;
@@ -133,6 +135,7 @@ export default ({
 
   const collect = (options: CollectOptions) => {
     abortFrame();
+    clearTimeout(timerId);
 
     // Perform DOM collection in next frame
     frameId = requestAnimationFrame(() => {
@@ -143,14 +146,16 @@ export default ({
 
       // Perform publish in next frame
       frameId = requestAnimationFrame(() => {
-        timings.start('Bulk dimension publish');
-        bulkReplace({
-          dimensions,
-          viewport,
-          shouldReplaceCritical: options.includeCritical,
-        });
-        timings.finish('Bulk dimension publish');
-
+        console.log('waiting a really long time for publish');
+        timerId = setTimeout(() => {
+          timings.start('Bulk dimension publish');
+          bulkReplace({
+            dimensions,
+            viewport,
+            shouldReplaceCritical: options.includeCritical,
+          });
+          timings.finish('Bulk dimension publish');
+        }, 2000);
         frameId = null;
       });
     });

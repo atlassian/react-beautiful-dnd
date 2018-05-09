@@ -11,7 +11,7 @@ import type {
   DraggableDescriptor,
   DraggableDimensionMap,
   DroppableDimensionMap,
-  DropResult,
+  DropReason,
   DraggableLocation,
   LiftRequest,
   PendingDrop,
@@ -73,12 +73,23 @@ const move = ({
   windowDetails,
   impact,
   scrollJumpRequest,
-}: MoveArgs): BulkCollectionState | DraggingState => {
+}: MoveArgs): BulkCollectionState | DraggingState | DropPendingState => {
   // BULK_COLLECTING: can update position but cannot update impact
   // DRAGGING: can update position and impact
+  // TODO: DROP_PENDING: no movements should occur
+  invariant(
+    state.phase === 'DRAGGING' ||
+    state.phase === 'BULK_COLLECTING' ||
+    state.phase === 'DROP_PENDING',
+    `Attempting to move in an unsupported phase ${state.phase}`
+  );
 
-  invariant(state.phase === 'BULK_COLLECTING' || state.phase === 'DRAGGING',
-    `Attempting to move in an unsupported phase ${state.phase}`);
+  // No longer accepting any movements
+  // This might happen as we have not told the
+  // drag handles that the drag has ended yet
+  if (state.phase === 'DROP_PENDING') {
+    return state;
+  }
 
   const client: ItemPositions = (() => {
     const offset: Position = subtract(clientSelection, state.initial.client.selection);
@@ -241,18 +252,33 @@ export default (state: State = clean(), action: Action): State => {
       },
     };
 
-    // We are now moving out of the BULK_PUBLISH phase into DRAGGING
-    const newState: State = {
-      phase: 'DRAGGING',
+    // Moving into the DRAGGING phase
+    if (state.phase === 'BULK_COLLECTING') {
+      return {
+        // appeasing flow
+        phase: 'DRAGGING',
+        ...state,
+        // eslint-disable-next-line
+        phase: 'DRAGGING',
+        impact,
+        dimensions,
+        window: windowDetails,
+      };
+    }
+
+    // There was a pending drop
+    return {
+      // appeasing flow
+      phase: 'DROP_PENDING',
       ...state,
       // eslint-disable-next-line
-      phase: 'DRAGGING',
+        phase: 'DROP_PENDING',
       impact,
       dimensions,
       window: windowDetails,
+      // No longer waiting
+      isWaiting: false,
     };
-
-    return newState;
   }
 
   if (action.type === 'MOVE') {
@@ -499,15 +525,30 @@ export default (state: State = clean(), action: Action): State => {
     });
   }
 
+  if (action.type === 'DROP_PENDING') {
+    const reason: DropReason = action.payload;
+    invariant(state.phase === 'BULK_COLLECTING',
+      'Can only move into the DROP_PENDING phase from the BULK_COLLECTING phase');
+
+    const newState: DropPendingState = {
+      // appeasing flow
+      phase: 'DROP_PENDING',
+      ...state,
+      // eslint-disable-next-line
+      phase: 'DROP_PENDING',
+      isWaiting: true,
+      reason,
+    };
+    return newState;
+  }
+
   if (action.type === 'DROP_ANIMATE') {
     const pending: PendingDrop = action.payload;
+    invariant(state.phase === 'DRAGGING' || state.phase === 'DROP_PENDING',
+      `Cannot animate drop from phase ${state.phase}`
+    );
 
-    // TODO: pending drop?
-    if (state.phase !== 'DRAGGING') {
-      console.error('Cannot animate drop while not dragging', action);
-      return clean();
-    }
-
+    // Moving into a new phase
     const result: DropAnimatingState = {
       phase: 'DROP_ANIMATING',
       pending,

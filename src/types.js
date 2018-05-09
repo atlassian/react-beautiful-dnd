@@ -293,6 +293,8 @@ export type BulkCollectionState = {|
 export type DropPendingState = {|
   ...DraggingState,
   phase: 'DROP_PENDING',
+  isWaiting: boolean,
+  reason: DropReason,
 |}
 
 // An optional phase for animating the drop / cancel if it is needed

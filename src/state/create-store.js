@@ -7,6 +7,8 @@ import style from './middleware/style';
 import drop from './middleware/drop';
 import dropAnimationFinish from './middleware/drop-animation-finish';
 import dimensionMarshalStopper from './middleware/dimension-marshal-stopper';
+import autoScroll from './middleware/auto-scroll';
+import pendingDrop from './middleware/pending-drop';
 import type { DimensionMarshal } from './dimension-marshal/dimension-marshal-types';
 import type { StyleMarshal } from '../view/style-marshal/style-marshal-types';
 import type { Store, Hooks } from '../types';
@@ -33,6 +35,14 @@ export default ({
   reducer,
   composeEnhancers(
     applyMiddleware(
+      // ## Debug middleware
+      // > uncomment to use
+      // debugging logger
+      require('./debug-middleware/log-middleware').default,
+      // debugging timer
+      // require('./debug-middleware/timing-middleware').default,
+      // average action timer
+      // require('./debug-middleware/timing-average-middleware').default(20),
       // ## Application middleware
       // Style updates do not cause more actions. It is important to update styles
       // before hooks are called: specifically the onDragEnd hook. We need to clear
@@ -53,18 +63,12 @@ export default ({
       drop,
       // When a drop animation finishes - fire a drop complete
       dropAnimationFinish,
+      pendingDrop,
+      autoScroll,
 
       // TODO: where should this go?
       // hooks(getHooks),
 
-      // ## Debug middleware
-      // > uncomment to use
-      // debugging logger
-      // require('./debug-middleware/log-middleware'),
-      // debugging timer
-      // require('./debug-middleware/timing-middleware').default,
-      // average action timer
-      // require('./debug-middleware/timing-average-middleware').default(20),
     ),
   ),
 );

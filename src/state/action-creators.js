@@ -223,12 +223,12 @@ export const drop = (args: DropArgs) => ({
 
 export type DropPendingAction = {|
   type: 'DROP_PENDING',
-  payload: null,
+  payload: DropReason,
 |}
 
-export const dropPending = (): DropPendingAction => ({
+export const dropPending = (reason: DropReason): DropPendingAction => ({
   type: 'DROP_PENDING',
-  payload: null,
+  payload: reason,
 });
 
 export type DropAnimationFinishedAction = {|
@@ -253,6 +253,7 @@ export type Action =
   MoveForwardAction |
   CrossAxisMoveForwardAction |
   CrossAxisMoveBackwardAction |
+  DropPendingAction |
   DropAction |
   DropAnimateAction |
   DropAnimationFinishedAction |

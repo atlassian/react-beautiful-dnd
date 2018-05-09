@@ -37,34 +37,10 @@ export default ({
     scrollDroppable,
   });
 
-  const onStateChange = (previous: State, current: State): void => {
-    // now dragging
-
-    if (current.phase === 'DRAGGING' || current.phase === 'BULK_COLLECTING') {
-      if (current.autoScrollMode === 'FLUID') {
-        fluidScroll(current);
-        return;
-      }
-
-      // autoScrollMode == 'JUMP'
-
-      if (!current.scrollJumpRequest) {
-        return;
-      }
-
-      jumpScroll(current);
-      return;
-    }
-
-    // Not currently dragging
-    // Was previously dragging
-    if (previous.phase === 'DRAGGING' || previous.phase === 'BULK_COLLECTING') {
-      fluidScroll.cancel();
-    }
-  };
-
   const marshal: AutoScroller = {
-    onStateChange,
+    cancel: fluidScroll.cancel,
+    fluidScroll,
+    jumpScroll,
   };
 
   return marshal;

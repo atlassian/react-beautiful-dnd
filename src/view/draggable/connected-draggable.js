@@ -122,7 +122,9 @@ export const makeMapStateToProps = (): Selector => {
 
   const draggingSelector = (state: State, ownProps: OwnProps): ?MapProps => {
     // Dragging
-    if (state.phase === 'DRAGGING' || state.phase === 'BULK_COLLECTING') {
+    if (state.phase === 'DRAGGING' ||
+      state.phase === 'BULK_COLLECTING' ||
+      state.phase === 'DROP_PENDING') {
       // not the dragging item
       if (state.critical.draggable.id !== ownProps.draggableId) {
         return null;
@@ -178,7 +180,10 @@ export const makeMapStateToProps = (): Selector => {
 
   const movingOutOfTheWaySelector = (state: State, ownProps: OwnProps): ?MapProps => {
     // Dragging
-    if (state.phase === 'DRAGGING' || state.phase === 'BULK_COLLECTING') {
+    if (
+      state.phase === 'DRAGGING' ||
+      state.phase === 'BULK_COLLECTING' ||
+      state.phase === 'DROP_PENDING') {
       // we do not care about the dragging item
       if (state.critical.draggable.id === ownProps.draggableId) {
         return null;

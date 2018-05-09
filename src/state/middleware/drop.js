@@ -39,7 +39,7 @@ const getScrollDisplacement = (
 
 export default ({ getState, dispatch }: Store) =>
   (next: (Action) => mixed) => (action: Action): mixed => {
-  // TODO: pending drop flushing
+    // TODO: pending drop flushing
 
     const state: State = getState();
 
@@ -58,16 +58,29 @@ export default ({ getState, dispatch }: Store) =>
       return;
     }
 
-    invariant(state.phase === 'DRAGGING' || state.phase === 'BULK_COLLECTING',
-      `Cannot drop in phase: ${state.phase}`);
+    invariant(
+      state.phase === 'DRAGGING' ||
+      state.phase === 'BULK_COLLECTING' ||
+      state.phase === 'DROP_PENDING',
+      `Cannot drop in phase: ${state.phase}`
+    );
+
+    const reason: DropReason = action.payload.reason;
 
     // Still waiting for a bulk collection to publish
+    // We are now shifting the application into the 'DROP_PENDING' phase
     if (state.phase === 'BULK_COLLECTING') {
-      dispatch(dropPending());
+      dispatch(dropPending(reason));
       return;
     }
 
-    const reason: DropReason = action.payload.reason;
+    // Still waiting for our drop pending to end
+    if (state.phase === 'DROP_PENDING' && state.isWaiting) {
+      return;
+    }
+
+    // We are now in the DRAGGING or DROP_PENDING phase
+
     const critical: Critical = state.critical;
     const dimensions: DimensionMap = state.dimensions;
     const impact: DragImpact = reason === 'DROP' ? state.impact : noImpact;
