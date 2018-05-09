@@ -264,7 +264,10 @@ export default (callbacks: Callbacks) => {
   };
 
   const stopCollecting = () => {
-    invariant(collection, 'Cannot stop collecting when there is no collection');
+    // This function can be called defensively
+    if (!collection) {
+      return;
+    }
     const home: DroppableDescriptor = collection.critical.droppable;
     // Tell all droppables to stop watching scroll
     // all good if they where not already listening

@@ -303,19 +303,13 @@ export type DropAnimatingState = {|
   dimensions: DimensionMap,
 |}
 
-export type DropCompleteState = {|
-  phase: 'DROP_COMPLETE',
-  result: DropResult,
-|}
-
 export type State =
   IdleState |
   PreparingState |
   DraggingState |
   BulkCollectionState |
   DropPendingState |
-  DropAnimatingState |
-  DropCompleteState;
+  DropAnimatingState
 
 export type Action = ActionCreators;
 export type Dispatch = ReduxDispatch<Action>;

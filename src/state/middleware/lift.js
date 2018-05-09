@@ -2,10 +2,10 @@
 import invariant from 'tiny-invariant';
 import {
   prepare,
-  clean,
   completeDrop,
   initialPublish,
 } from '../action-creators';
+import canStartDrag from '../can-start-drag';
 import type { DimensionMarshal } from '../dimension-marshal/dimension-marshal-types';
 import type {
   Store,
@@ -16,26 +16,18 @@ import type {
   LiftRequest,
 } from '../../types';
 
-export default (getMarshal: () => ?DimensionMarshal) =>
-  (store: Store) => (next: (Action) => mixed) => (action: Action): mixed => {
+export default (getMarshal: () => DimensionMarshal) =>
+  ({ getState, dispatch }: Store) => (next: (Action) => mixed) => (action: Action): mixed => {
     if (action.type !== 'LIFT') {
-      return next(action);
+      next(action);
+      return;
     }
 
-    const marshal: ?DimensionMarshal = getMarshal();
-    invariant(marshal, 'Cannot perform lift without marshal');
-
-    // A lift is happening!
-    const { getState, dispatch } = store;
+    const marshal: DimensionMarshal = getMarshal();
     const { id, client, autoScrollMode, viewport } = action.payload;
-
-    // Phase 1: Quickly finish any current drop animations
     const initial: State = getState();
 
-    invariant(
-      initial.phase === 'IDLE' || initial.phase === 'DROP_ANIMATING',
-      `Cannot lift during phase ${initial.phase}`
-    );
+    invariant(canStartDrag(initial, action.payload.id), 'canStartDrag test not passed');
 
     // flush dropping animation if needed
     // this can change the descriptor of the dragging item
@@ -43,8 +35,6 @@ export default (getMarshal: () => ?DimensionMarshal) =>
       const current: DropAnimatingState = initial;
       // Will call the onDragEnd hooks
       dispatch(completeDrop(current.pending.result));
-      // Reset the state
-      dispatch(clean());
     }
 
     // Flush required for react-motion
@@ -81,7 +71,5 @@ export default (getMarshal: () => ?DimensionMarshal) =>
       // Start collecting all the other dimensions
       marshal.collect({ includeCritical: false });
     });
-
-    return next(action);
   };
 

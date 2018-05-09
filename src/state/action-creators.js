@@ -1,58 +1,17 @@
 // @flow
-import invariant from 'tiny-invariant';
-import { type Position } from 'css-box-model';
+import type { Position } from 'css-box-model';
 import type {
   Critical,
   DraggableId,
   DroppableId,
   DropResult,
-  DragImpact,
-  DraggableDimension,
-  DroppableDimension,
   ItemPositions,
-  DraggableLocation,
-  Dispatch,
-  State,
-  DraggableDescriptor,
-  LiftRequest,
   AutoScrollMode,
-  ScrollOptions,
   Viewport,
   DimensionMap,
   DropReason,
   PendingDrop,
 } from '../types';
-import noImpact from './no-impact';
-import withDroppableDisplacement from './with-droppable-displacement';
-import getNewHomeClientBorderBoxCenter from './get-new-home-client-border-box-center';
-import { add, subtract, isEqual } from './position';
-import { type DimensionMarshal } from './dimension-marshal/dimension-marshal-types';
-import * as timings from '../debug/timings';
-
-const origin: Position = { x: 0, y: 0 };
-
-type ScrollDiffArgs = {|
-  initial: InitialDrag,
-  current: CurrentDrag,
-  droppable: ?DroppableDimension
-|}
-
-const getScrollDiff = ({
-  initial,
-  current,
-  droppable,
-}: ScrollDiffArgs): Position => {
-  const windowScrollDiff: Position = subtract(
-    initial.viewport.scroll,
-    current.viewport.scroll,
-  );
-
-  if (!droppable) {
-    return windowScrollDiff;
-  }
-
-  return withDroppableDisplacement(droppable, windowScrollDiff);
-};
 
 type LiftArgs = {|
   // lifting with DraggableId rather than descriptor
@@ -230,14 +189,10 @@ export const prepare = (): PrepareAction => ({
 
 export type DropAnimateAction = {
   type: 'DROP_ANIMATE',
-  payload: {|
-    newHomeOffset: Position,
-    impact: DragImpact,
-    result: DropResult,
-  |}
+  payload: PendingDrop
 }
 
-const animateDrop = (pending: PendingDrop): DropAnimateAction => ({
+export const animateDrop = (pending: PendingDrop): DropAnimateAction => ({
   type: 'DROP_ANIMATE',
   payload: pending,
 });
@@ -276,24 +231,15 @@ export const dropPending = (): DropPendingAction => ({
   payload: null,
 });
 
-export const dropAnimationFinished = () =>
-  (dispatch: Dispatch, getState: () => State): void => {
-    const state: State = getState();
+export type DropAnimationFinishedAction = {|
+  type: 'DROP_ANIMATION_FINISHED',
+  payload: null,
+|}
 
-    if (state.phase !== 'DROP_ANIMATING') {
-      console.error('cannot end drop that is no longer animating', state);
-      dispatch(clean());
-      return;
-    }
-
-    if (!state.drop || !state.drop.pending) {
-      console.error('cannot end drop that has no pending state', state);
-      dispatch(clean());
-      return;
-    }
-
-    dispatch(completeDrop(state.drop.pending.result));
-  };
+export const dropAnimationFinished = (): DropAnimationFinishedAction => ({
+  type: 'DROP_ANIMATION_FINISHED',
+  payload: null,
+});
 
 export type Action =
   LiftAction |
@@ -309,6 +255,7 @@ export type Action =
   CrossAxisMoveBackwardAction |
   DropAction |
   DropAnimateAction |
+  DropAnimationFinishedAction |
   DropCompleteAction |
   PrepareAction |
   CleanAction;

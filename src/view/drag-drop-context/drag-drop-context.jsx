@@ -80,9 +80,16 @@ export default class DragDropContext extends React.Component<Props> {
     // create the style marshal
     this.styleMarshal = createStyleMarshal();
 
-    // create the dimension marshal
-    // Lazy reference to dimension marshal get around circular dependency
-    this.store = createStore(() => this.dimensionMarshal, this.styleMarshal);
+    this.store = createStore({
+      // Lazy reference to dimension marshal get around circular dependency
+      getDimensionMarshal: (): ?DimensionMarshal => this.dimensionMarshal,
+      styleMarshal: this.styleMarshal,
+      getHooks: (): Hooks => ({
+        onDragStart: this.props.onDragStart,
+        onDragEnd: this.props.onDragEnd,
+        onDragUpdate: this.props.onDragUpdate,
+      }),
+    });
     const callbacks: DimensionMarshalCallbacks = bindActionCreators({
       bulkReplace,
       updateDroppableScroll,
@@ -155,7 +162,7 @@ export default class DragDropContext extends React.Component<Props> {
       // We could block this action from being called if this function has been reinvoked
       // before completing and dragging and autoScrollMode === 'FLUID'.
       // However, it is not needed at this time
-      this.autoScroller.onStateChange(previousInThisExecution, current);
+      // this.autoScroller.onStateChange(previousInThisExecution, current);
     });
   }
   // Need to declare childContextTypes without flow
@@ -212,7 +219,6 @@ export default class DragDropContext extends React.Component<Props> {
       `, error);
     }
 
-    this.dimensionMarshal.stopPublishing();
     this.store.dispatch(clean());
   }
 
@@ -224,7 +230,8 @@ export default class DragDropContext extends React.Component<Props> {
 
   componentWillUnmount() {
     window.addEventListener('error', this.onWindowError);
-    this.unsubscribe();
+    // TODO: is this the right way to cleanup?
+    this.store.dispatch(clean());
     this.styleMarshal.unmount();
     this.announcer.unmount();
   }

@@ -40,12 +40,24 @@ const getScrollDisplacement = (
 export default ({ getState, dispatch }: Store) =>
   (next: (Action) => mixed) => (action: Action): mixed => {
   // TODO: pending drop flushing
+
+    const state: State = getState();
+
+    // Drop animation finish handler
+
+    // Pending drop handler
+
+    // if (action.type === 'BULK_REPLACE' && state.phase === 'PENDING_DROP') {
+    //   // Will move the application into the dragging phase
+    //   next(action);
+    //   // Now we can end the drag
+    // }
+
     if (action.type !== 'DROP') {
       next(action);
       return;
     }
 
-    const state: State = getState();
     invariant(state.phase === 'DRAGGING' || state.phase === 'BULK_COLLECTING',
       `Cannot drop in phase: ${state.phase}`);
 
@@ -55,7 +67,6 @@ export default ({ getState, dispatch }: Store) =>
       return;
     }
 
-    // Was dragging
     const reason: DropReason = action.payload.reason;
     const critical: Critical = state.critical;
     const dimensions: DimensionMap = state.dimensions;

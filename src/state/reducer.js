@@ -14,6 +14,7 @@ import type {
   DropResult,
   DraggableLocation,
   LiftRequest,
+  PendingDrop,
   Viewport,
   IdleState,
   PreparingState,
@@ -499,42 +500,27 @@ export default (state: State = clean(), action: Action): State => {
   }
 
   if (action.type === 'DROP_ANIMATE') {
-    const { newHomeOffset, impact, result } = action.payload;
+    const pending: PendingDrop = action.payload;
 
+    // TODO: pending drop?
     if (state.phase !== 'DRAGGING') {
-      console.error('cannot animate drop while not dragging', action);
-      return state;
-    }
-
-    if (!state.drag) {
-      console.error('cannot animate drop - invalid drag state');
+      console.error('Cannot animate drop while not dragging', action);
       return clean();
     }
 
-    const pending: PendingDrop = {
-      newHomeOffset,
-      result,
-      impact,
+    const result: DropAnimatingState = {
+      phase: 'DROP_ANIMATING',
+      pending,
+      dimensions: state.dimensions,
     };
 
-    return {
-      phase: 'DROP_ANIMATING',
-      drag: null,
-      drop: {
-        pending,
-        result: null,
-      },
-      dimension: state.dimension,
-    };
+    return result;
   }
 
+  // Action will be used by hooks to call consumers
+  // We can simply return to the idle state
   if (action.type === 'DROP_COMPLETE') {
-    const result: DropResult = action.payload;
-    const newState: DropCompleteState = {
-      phase: 'DROP_COMPLETE',
-      result,
-    };
-    return newState;
+    return clean();
   }
 
   return state;
