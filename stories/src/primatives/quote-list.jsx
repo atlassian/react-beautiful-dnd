@@ -29,8 +29,11 @@ const Wrapper = styled.div`
 const DropZone = styled.div`
   /* stop the list collapsing when empty */
   min-height: 250px;
-  /* not relying on the items for a margin-bottom
-  as it will collapse when the list is empty */
+
+  /*
+    not relying on the items for a margin-bottom
+    as it will collapse when the list is empty
+  */
   margin-bottom: ${grid}px;
 `;
 
@@ -40,7 +43,9 @@ const ScrollContainer = styled.div`
   max-height: 300px;
 `;
 
+/* stylelint-disable block-no-empty */
 const Container = styled.div``;
+/* stylelint-enable */
 
 type Props = {|
   listId: string,

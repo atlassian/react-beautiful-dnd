@@ -59,10 +59,9 @@ const Container = styled.div`
   color: ${props => getColor(props)};
   padding: ${grid}px;
   margin-bottom: ${grid}px;
-  border-radius: ${borderRadius}px;4
+  border-radius: ${borderRadius}px;
   font-size: 18px;
   border: 1px solid ${colors.shadow};
-
   ${props => (props.isDragging ? `box-shadow: 2px 2px 1px ${colors.shadow};` : '')}
   ${props => (props.isGhosting ? 'opacity: 0.8;' : '')}
 
@@ -75,10 +74,9 @@ const Container = styled.div`
     border-color: ${colors.blue.deep};
   }
 `;
-
-const Content = styled.div`
-`;
-
+/* stylelint-disable block-no-empty */
+const Content = styled.div``;
+/* stylelint-enable */
 const size: number = 30;
 
 const SelectionCount = styled.div`

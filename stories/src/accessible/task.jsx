@@ -18,7 +18,6 @@ const Container = styled.div`
   margin-bottom: ${grid}px;
   border-radius: ${borderRadius}px;
   font-size: 18px;
-
   ${({ isDragging }) => (isDragging ? 'box-shadow: 1px 1px 1px grey; background: lightblue' : '')}
 `;
 

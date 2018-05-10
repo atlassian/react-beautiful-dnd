@@ -18,7 +18,6 @@ const ScrollContainer = styled.div`
   padding: ${grid * 2}px;
   overflow-y: scroll;
   width: 500px;
-
   height: 100vh;
   position: relative;
 `;
