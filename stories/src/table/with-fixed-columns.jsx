@@ -29,16 +29,20 @@ const THead = styled.thead`
 `;
 
 const Row = styled.tr`
+  /* stylelint-disable comment-empty-line-before */
   ${props => (props.isDragging ? `
     background: ${colors.green};
+
     /* maintain cell width while dragging */
     display: table;
   ` : '')}
+  /* stylelint-enable */
 `;
 
 const Cell = styled.td`
   box-sizing: border-box;
   padding: ${grid}px;
+
   /* locking the width of the cells */
   width: 50%;
 `;
@@ -78,11 +82,11 @@ const Header = styled.header`
   margin-bottom: ${grid * 2}px;
 `;
 
-const LayoutControl = styled.div`
-`;
+/* stylelint-disable block-no-empty */
+const LayoutControl = styled.div``;
 
-const CopyTableButton = styled.button`
-`;
+const CopyTableButton = styled.button``;
+/* stylelint-enable */
 
 type AppProps = {|
   initial: Quote[],
