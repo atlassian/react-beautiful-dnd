@@ -153,11 +153,11 @@ const Header = styled.header`
   margin-bottom: ${grid * 2}px;
 `;
 
-const LayoutControl = styled.div`
-`;
+/* stylelint-disable block-no-empty */
+const LayoutControl = styled.div``;
 
-const CopyTableButton = styled.button`
-`;
+const CopyTableButton = styled.button``;
+/* stylelint-enable */
 
 type AppProps = {|
   initial: Quote[],
