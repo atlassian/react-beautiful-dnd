@@ -1,4 +1,4 @@
-# react-beautiful-dnd
+![react beautiful dnd](https://raw.githubusercontent.com/alexreardon/files/master/resources/react-beautiful-dnd-brand.png)
 
 Beautiful, accessible drag and drop for lists with [`React.js`](https://facebook.github.io/react/)
 
