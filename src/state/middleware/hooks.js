@@ -69,8 +69,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     };
   })();
 
-  const run = (store: Store, action: Action) => {
-    // on drag start
+  return (store: Store) => (next: (Action) => mixed) => (action: Action): mixed => {
     if (action.type === 'INITIAL_PUBLISH') {
       const critical: Critical = action.payload.critical;
       const source: DraggableLocation = {
@@ -83,6 +82,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
         source,
       };
       publisher.start(start);
+      next(action);
       return;
     }
 
@@ -90,6 +90,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     if (action.type === 'DROP_COMPLETE') {
       const result: DropResult = action.payload;
       publisher.end(result);
+      next(action);
       return;
     }
 
@@ -101,6 +102,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
         publisher.cancel();
       }
 
+      next(action);
       return;
     }
 
@@ -108,23 +110,17 @@ export default (getHooks: () => Hooks, announce: Announce) => {
 
     // No drag updates required
     if (!publisher.isDragStartPublished) {
+      next(action);
       return;
     }
 
-    // Drag update required!
-    // TODO: should we call next first in order to get the impact of the action?
-    // otherwise
-    if (state.phase !== 'DRAGGING') {
-      return;
-    }
+    // Calling next() first so that we reduce the impact of the action
+    next(action);
+
+    if()
 
     const state: State = store.getState();
     invariant(state.phase === 'IDLE' || state.phase ===
       `drag start should be published in phase ${state.phase}`);
-  };
-
-  return (store: Store) => (next: (Action) => mixed) => (action: Action): mixed => {
-    run(store, action);
-    next(action);
   };
 };
