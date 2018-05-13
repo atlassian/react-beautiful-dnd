@@ -685,6 +685,19 @@ It is **highly** recommended that while a user is dragging that you block any st
 
 When the user starts dragging we take a snapshot of all of the dimensions of the applicable `Draggable` and `Droppable` nodes. If these change during a drag we will not know about it.
 
+##### How do you block updates?
+
+Update blocking will look different depending on how you manage your data. It is probably best to explain by example:
+
+Let's say you are using React component state to manage the state of your application. Your application state is tied to a REST endpoint that you poll every thirty seconds for data updates. During a drag you should not apply any server updates that could effect what is visible.
+
+This could mean:
+
+- stop your server poll during a drag
+- ignore any results from server calls during a drag (do not call `this.setState` in your component with the new data)
+
+##### No update blocking can lead to bad times
+
 Here are a few poor user experiences that can occur if you change things *during a drag*:
 
 - If you increase the amount of nodes, then the library will not know about them and they will not be moved when the user would expect them to be.
