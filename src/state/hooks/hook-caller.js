@@ -205,9 +205,6 @@ export default (announce: Announce): HookCaller => {
   };
 
   const onStateChange = (hooks: Hooks, previous: AppState, current: AppState): void => {
-    // TODO: fix hooks
-    return;
-
     const { onDragStart, onDragUpdate, onDragEnd } = hooks;
     const currentPhase = current.phase;
     const previousPhase = previous.phase;
@@ -215,7 +212,6 @@ export default (announce: Announce): HookCaller => {
     // Dragging in progress
     if (currentPhase === 'DRAGGING' && previousPhase === 'DRAGGING') {
       onDrag(current, onDragUpdate);
-      
     }
 
     // We are not in the dragging phase so we can clear this state

@@ -41,19 +41,7 @@ import { scrollDroppable } from './droppable-dimension';
 
 const origin: Position = { x: 0, y: 0 };
 
-const toDraggableMap = (draggables: DraggableDimension[]): DraggableDimensionMap =>
-  draggables.reduce((previous: DraggableDimensionMap, current: DraggableDimension) => {
-    previous[current.descriptor.id] = current;
-    return previous;
-  }, {});
-
-const toDroppableMap = (droppables: DroppableDimension[]): DroppableDimensionMap =>
-  droppables.reduce((previous: DroppableDimensionMap, current: DroppableDimension) => {
-    previous[current.descriptor.id] = current;
-    return previous;
-  }, {});
-
-const clean = (): IdleState => ({ phase: 'IDLE' });
+const idle: IdleState = { phase: 'IDLE' };
 
 type MoveArgs = {|
   state: State,
@@ -141,9 +129,9 @@ const move = ({
   return result;
 };
 
-export default (state: State = clean(), action: Action): State => {
+export default (state: State = idle, action: Action): State => {
   if (action.type === 'CLEAN') {
-    return clean();
+    return idle;
   }
 
   if (action.type === 'PREPARE') {
@@ -299,14 +287,14 @@ export default (state: State = clean(), action: Action): State => {
   if (action.type === 'UPDATE_DROPPABLE_SCROLL') {
     if (state.phase !== 'DRAGGING') {
       console.error('cannot update a droppable dimensions scroll when not dragging');
-      return clean();
+      return idle;
     }
 
     const drag: ?DragState = state.drag;
 
     if (drag == null) {
       console.error('invalid store state');
-      return clean();
+      return idle;
     }
 
     const { id, offset } = action.payload;
@@ -422,12 +410,12 @@ export default (state: State = clean(), action: Action): State => {
   if (action.type === 'MOVE_FORWARD' || action.type === 'MOVE_BACKWARD') {
     if (state.phase !== 'DRAGGING') {
       console.error('cannot move while not dragging', action);
-      return clean();
+      return idle;
     }
 
     if (!state.drag) {
       console.error('cannot move if there is no drag information');
-      return clean();
+      return idle;
     }
 
     const existing: DragState = state.drag;
@@ -435,7 +423,7 @@ export default (state: State = clean(), action: Action): State => {
 
     if (!existing.impact.destination) {
       console.error('cannot move if there is no previous destination');
-      return clean();
+      return idle;
     }
 
     const droppable: DroppableDimension = state.dimension.droppable[
@@ -475,17 +463,17 @@ export default (state: State = clean(), action: Action): State => {
   if (action.type === 'CROSS_AXIS_MOVE_FORWARD' || action.type === 'CROSS_AXIS_MOVE_BACKWARD') {
     if (state.phase !== 'DRAGGING') {
       console.error('cannot move cross axis when not dragging');
-      return clean();
+      return idle;
     }
 
     if (!state.drag) {
       console.error('cannot move cross axis if there is no drag information');
-      return clean();
+      return idle;
     }
 
     if (!state.drag.impact.destination) {
       console.error('cannot move cross axis if not in a droppable');
-      return clean();
+      return idle;
     }
 
     const current: CurrentDrag = state.drag.current;
@@ -561,7 +549,7 @@ export default (state: State = clean(), action: Action): State => {
   // Action will be used by hooks to call consumers
   // We can simply return to the idle state
   if (action.type === 'DROP_COMPLETE') {
-    return clean();
+    return idle;
   }
 
   return state;
