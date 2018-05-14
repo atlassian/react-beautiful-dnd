@@ -1,53 +1,144 @@
 // @flow
 import invariant from 'tiny-invariant';
 import messagePreset from './util/message-preset';
+import * as timings from '../../debug/timings';
 import type {
   Store,
   State,
   DropResult,
   Action,
   Hooks,
+  HookProvided,
   Critical,
   DraggableLocation,
   DragStart,
   Announce,
+  DragUpdate,
+  OnDragStartHook,
+  OnDragUpdateHook,
+  OnDragEndHook,
 } from '../../types';
 
-const execute = (
-  hook: ?AnyHookFn,
-  data: AnyHookData,
-  defaultMessage: string,
-) => {
+type AnyHookFn = OnDragStartHook | OnDragUpdateHook | OnDragEndHook;
+type AnyHookData = DragStart | DragUpdate | DropResult;
 
+const withTimings = (key: string, fn: Function) => {
+  timings.start(key);
+  fn();
+  timings.finish(key);
+};
+
+const areLocationsEqual = (current: ?DraggableLocation, next: ?DraggableLocation) => {
+  // if both are null - we are equal
+  if (current == null && next == null) {
+    return true;
+  }
+
+  // if one is null - then they are not equal
+  if (current == null || next == null) {
+    return false;
+  }
+
+  // compare their actual values
+  return current.droppableId === next.droppableId &&
+    current.index === next.index;
+};
+
+const getExpiringAnnounce = (announce: Announce) => {
+  let wasCalled: boolean = false;
+  let isExpired: boolean = false;
+
+  // not allowing async announcements
+  setTimeout(() => {
+    isExpired = true;
+  });
+
+  const result = (message: string): void => {
+    if (wasCalled) {
+      console.warn('Announcement already made. Not making a second announcement');
+      return;
+    }
+
+    if (isExpired) {
+      console.warn(`
+        Announcements cannot be made asynchronously.
+        Default message has already been announced.
+      `);
+      return;
+    }
+
+    wasCalled = true;
+    announce(message);
+  };
+
+  // getter for isExpired
+  // using this technique so that a consumer cannot
+  // set the isExpired or wasCalled flags
+  result.wasCalled = (): boolean => wasCalled;
+
+  return result;
 };
 
 export default (getHooks: () => Hooks, announce: Announce) => {
-  const publisher = (() => {
-    let isDragStartPublished: boolean = false;
-    let publishedStart: ?DragStart = null;
-    let lastDestination: ?DraggableLocation = null;
+  const execute = (
+    hook: ?AnyHookFn,
+    data: AnyHookData,
+    getDefaultMessage: (data: any) => string,
+  ) => {
+    if (!hook) {
+      announce(getDefaultMessage(data));
+      return;
+    }
 
-    const start = (initial: DragStart) => {
-      invariant(!isDragStartPublished, 'Cannot fire onDragStart as a drag start has already been published');
-      isDragStartPublished = true;
-      lastDestination = initial.source;
-      publishedStart = initial;
-      execute(getHooks().onDragStart, initial, messagePreset.onDragStart(initial));
+    const willExpire: Announce = getExpiringAnnounce(announce);
+    const provided: HookProvided = {
+      announce: willExpire,
     };
 
-    const move = () => {
+    // Casting because we are not validating which data type is going into which hook
+    hook((data: any), provided);
 
+    if (!willExpire.wasCalled()) {
+      announce(getDefaultMessage(data));
+    }
+  };
+
+  const publisher = (() => {
+    let publishedStart: ?DragStart = null;
+    let lastLocation: ?DraggableLocation = null;
+    const isDragStartPublished = (): boolean => Boolean(publishedStart);
+
+    const start = (initial: DragStart) => {
+      invariant(!isDragStartPublished(), 'Cannot fire onDragStart as a drag start has already been published');
+      publishedStart = initial;
+      lastLocation = initial.source;
+      withTimings('onDragStart', () => execute(getHooks().onDragStart, initial, messagePreset.onDragStart));
+    };
+
+    const move = (location: ?DraggableLocation) => {
+      invariant(publishedStart, 'Cannot fire onDragMove when onDragStart has not been called');
+      // No change to publish
+      if (areLocationsEqual(lastLocation, location)) {
+        return;
+      }
+
+      const update: DragUpdate = {
+        ...publishedStart,
+        destination: location,
+      };
+
+      withTimings('onDragMove', () => execute(getHooks().onDragEnd, update, messagePreset.onDragUpdate));
     };
 
     const end = (result: DropResult) => {
       invariant(isDragStartPublished, 'Cannot fire onDragEnd when there is no matching onDragStart');
-      isDragStartPublished = false;
-      lastDestination = null;
-      execute(getHooks().onDragEnd, result, messagePreset.onDragEnd(result));
+      publishedStart = null;
+      lastLocation = null;
+      withTimings('onDragEnd', () => execute(getHooks().onDragEnd, result, messagePreset.onDragEnd));
     };
 
     const cancel = () => {
-      invariant(isDragStartPublished && publishedStart, 'Cannot cancel when onDragStart not fired');
+      invariant(publishedStart, 'Cannot cancel when onDragStart not fired');
 
       const result: DropResult = {
         draggableId: publishedStart.draggableId,
@@ -65,7 +156,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
       move,
       end,
       cancel,
-      isDragStartPublished: () => isDragStartPublished,
+      isDragStartPublished,
     };
   })();
 
@@ -117,10 +208,9 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     // Calling next() first so that we reduce the impact of the action
     next(action);
 
-    if()
-
     const state: State = store.getState();
-    invariant(state.phase === 'IDLE' || state.phase ===
-      `drag start should be published in phase ${state.phase}`);
+    if (state.phase === 'DRAGGING') {
+      publisher.move(state.impact.destination);
+    }
   };
 };

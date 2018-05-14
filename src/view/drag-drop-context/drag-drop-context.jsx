@@ -4,7 +4,6 @@ import { type Position } from 'css-box-model';
 import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
-import createHookCaller from '../../state/hooks/hook-caller';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
 import createStyleMarshal, { resetStyleContext } from '../style-marshal/style-marshal';
 import canStartDrag from '../../state/can-start-drag';
@@ -22,15 +21,9 @@ import type {
   DraggableId,
   Store,
   State,
-  DraggableDimension,
-  DroppableDimension,
-  DroppableId,
   Hooks,
   Viewport,
 } from '../../types';
-import type {
-  HookCaller,
-} from '../../state/hooks/hooks-types';
 import {
   storeKey,
   dimensionMarshalKey,
@@ -65,7 +58,6 @@ export default class DragDropContext extends React.Component<Props> {
   dimensionMarshal: DimensionMarshal
   styleMarshal: StyleMarshal
   autoScroller: AutoScroller
-  hookCaller: HookCaller
   announcer: Announcer
   unsubscribe: Function
 
@@ -74,21 +66,19 @@ export default class DragDropContext extends React.Component<Props> {
 
     this.announcer = createAnnouncer();
 
-    // create the hook caller
-    this.hookCaller = createHookCaller(this.announcer.announce);
-
     // create the style marshal
     this.styleMarshal = createStyleMarshal();
 
     this.store = createStore({
       // Lazy reference to dimension marshal get around circular dependency
-      getDimensionMarshal: (): ?DimensionMarshal => this.dimensionMarshal,
+      getDimensionMarshal: (): DimensionMarshal => this.dimensionMarshal,
       styleMarshal: this.styleMarshal,
       getHooks: (): Hooks => ({
         onDragStart: this.props.onDragStart,
         onDragEnd: this.props.onDragEnd,
         onDragUpdate: this.props.onDragUpdate,
       }),
+      announce: this.announcer.announce,
     });
     const callbacks: DimensionMarshalCallbacks = bindActionCreators({
       bulkReplace,
@@ -108,61 +98,6 @@ export default class DragDropContext extends React.Component<Props> {
       ): void => {
         this.store.dispatch(move(id, client, viewport, shouldAnimate));
       },
-    });
-
-    let previous: State = this.store.getState();
-
-    this.unsubscribe = this.store.subscribe(() => {
-      const current = this.store.getState();
-      const previousInThisExecution: State = previous;
-      const isPhaseChanging: boolean = current.phase !== previous.phase;
-      // setting previous now rather than at the end of this function
-      // incase a function is called that syncorously causes a state update
-      // which will re-invoke this function before it has completed a previous
-      // invocation.
-      previous = current;
-
-      // Style updates do not cause more actions. It is important to update styles
-      // before hooks are called: specifically the onDragEnd hook. We need to clear
-      // the transition styles off the elements before a reorder to prevent strange
-      // post drag animations in firefox. Even though we clear the transition off
-      // a Draggable - if it is done after a reorder firefox will still apply the
-      // transition.
-      // if (isPhaseChanging) {
-      //   this.styleMarshal.onPhaseChange(current);
-      // }
-
-      const isDragEnding: boolean = previousInThisExecution.phase === 'DRAGGING' && current.phase !== 'DRAGGING';
-
-      // in the case that a drag is ending we need to instruct the dimension marshal
-      // to stop listening to changes. Otherwise it will try to process
-      // changes after the reorder in onDragEnd
-      // if (isDragEnding) {
-      //   this.dimensionMarshal.onPhaseChange(current);
-      // }
-
-      // We recreate the Hook object so that consumers can pass in new
-      // hook props at any time (eg if they are using arrow functions)
-      const hooks: Hooks = {
-        onDragStart: this.props.onDragStart,
-        onDragEnd: this.props.onDragEnd,
-        onDragUpdate: this.props.onDragUpdate,
-      };
-      // this.hookCaller.onStateChange(hooks, previousInThisExecution, current);
-
-      // The following two functions are dangerous. They can both syncronously
-      // create new actions that update the application state. That will cause
-      // this subscription function to be called again before the next line is called.
-
-      // if isDragEnding we have already called the marshal
-      // if (isPhaseChanging && !isDragEnding) {
-      //   this.dimensionMarshal.onPhaseChange(current);
-      // }
-
-      // We could block this action from being called if this function has been reinvoked
-      // before completing and dragging and autoScrollMode === 'FLUID'.
-      // However, it is not needed at this time
-      // this.autoScroller.onStateChange(previousInThisExecution, current);
     });
   }
   // Need to declare childContextTypes without flow

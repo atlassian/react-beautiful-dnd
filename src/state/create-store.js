@@ -5,13 +5,14 @@ import reducer from './reducer';
 import lift from './middleware/lift';
 import style from './middleware/style';
 import drop from './middleware/drop';
+import hooks from './middleware/hooks';
 import dropAnimationFinish from './middleware/drop-animation-finish';
 import dimensionMarshalStopper from './middleware/dimension-marshal-stopper';
 import autoScroll from './middleware/auto-scroll';
 import pendingDrop from './middleware/pending-drop';
 import type { DimensionMarshal } from './dimension-marshal/dimension-marshal-types';
 import type { StyleMarshal } from '../view/style-marshal/style-marshal-types';
-import type { Store, Hooks } from '../types';
+import type { Store, Hooks, Announce } from '../types';
 
 // We are checking if window is available before using it.
 // This is needed for universal apps that render the component server side.
@@ -24,13 +25,14 @@ type Args = {|
   getDimensionMarshal: () => DimensionMarshal,
   styleMarshal: StyleMarshal,
   getHooks: () => Hooks,
-
+  announce: Announce,
 |}
 
 export default ({
   getDimensionMarshal,
   styleMarshal,
   getHooks,
+  announce,
 }: Args): Store => createStore(
   reducer,
   composeEnhancers(
@@ -67,7 +69,7 @@ export default ({
       autoScroll,
 
       // TODO: where should this go?
-      // hooks(getHooks),
+      hooks(getHooks, announce),
 
     ),
   ),
