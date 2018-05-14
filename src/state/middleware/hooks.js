@@ -79,6 +79,15 @@ const getExpiringAnnounce = (announce: Announce) => {
   return result;
 };
 
+const getDragStart = (critical: Critical): DragStart => ({
+  draggableId: critical.draggable.id,
+  type: critical.droppable.type,
+  source: {
+    droppableId: critical.droppable.id,
+    index: critical.draggable.index,
+  },
+});
+
 export default (getHooks: () => Hooks, announce: Announce) => {
   const execute = (
     hook: ?AnyHookFn,
@@ -104,60 +113,62 @@ export default (getHooks: () => Hooks, announce: Announce) => {
   };
 
   const publisher = (() => {
-    let publishedStart: ?DragStart = null;
     let lastLocation: ?DraggableLocation = null;
-    const isDragStartPublished = (): boolean => Boolean(publishedStart);
+    let lastCritical: ?Critical = null;
+    let isDragStartPublished: boolean = false;
 
-    const start = (initial: DragStart) => {
-      invariant(!isDragStartPublished(), 'Cannot fire onDragStart as a drag start has already been published');
-      publishedStart = initial;
-      lastLocation = initial.source;
-      withTimings('onDragStart', () => execute(getHooks().onDragStart, initial, messagePreset.onDragStart));
+    const start = (critical: Critical) => {
+      invariant(!isDragStartPublished, 'Cannot fire onDragStart as a drag start has already been published');
+      const data: DragStart = getDragStart(critical);
+      isDragStartPublished = true;
+      lastCritical = critical;
+      lastLocation = data.source;
+      withTimings('onDragStart', () => execute(getHooks().onDragStart, data, messagePreset.onDragStart));
     };
 
-    const move = (location: ?DraggableLocation) => {
-      invariant(isDragStartPublished(), 'Cannot fire onDragMove when onDragStart has not been called');
+    // Passing in the critical location again as it can change during a drag
+    const move = (critical: Critical, location: ?DraggableLocation) => {
+      invariant(isDragStartPublished, 'Cannot fire onDragMove when onDragStart has not been called');
 
       // No change to publish
       if (areLocationsEqual(lastLocation, location)) {
         return;
       }
 
-      lastLocation = location;
-      const update: DragUpdate = {
-        ...publishedStart,
+      const data: DragUpdate = {
+        ...getDragStart(critical),
         destination: location,
       };
+      lastLocation = location;
+      lastCritical = critical;
 
-      withTimings('onDragUpdate', () => execute(getHooks().onDragUpdate, update, messagePreset.onDragUpdate));
+      withTimings('onDragUpdate', () => execute(getHooks().onDragUpdate, data, messagePreset.onDragUpdate));
     };
 
-    const end = (result: DropResult) => {
-      invariant(isDragStartPublished(), 'Cannot fire onDragEnd when there is no matching onDragStart');
-      publishedStart = null;
+    const drop = (result: DropResult) => {
+      invariant(isDragStartPublished, 'Cannot fire onDragEnd when there is no matching onDragStart');
       lastLocation = null;
+      lastCritical = null;
       withTimings('onDragEnd', () => execute(getHooks().onDragEnd, result, messagePreset.onDragEnd));
     };
 
-    const cancel = () => {
-      invariant(publishedStart, 'Cannot cancel when onDragStart not fired');
+    // A non user initiated cancel
+    const abort = () => {
+      invariant(isDragStartPublished && lastCritical, 'Cannot cancel when onDragStart not fired');
 
       const result: DropResult = {
-        draggableId: publishedStart.draggableId,
-        type: publishedStart.type,
-        source: publishedStart.source,
+        ...getDragStart(lastCritical),
         destination: null,
         reason: 'CANCEL',
       };
-
-      end(result);
+      drop(result);
     };
 
     return {
       start,
       move,
-      end,
-      cancel,
+      drop,
+      abort,
       isDragStartPublished,
     };
   })();
@@ -165,16 +176,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
   return (store: Store) => (next: (Action) => mixed) => (action: Action): mixed => {
     if (action.type === 'INITIAL_PUBLISH') {
       const critical: Critical = action.payload.critical;
-      const source: DraggableLocation = {
-        index: critical.draggable.index,
-        droppableId: critical.droppable.id,
-      };
-      const start: DragStart = {
-        draggableId: critical.draggable.id,
-        type: critical.droppable.type,
-        source,
-      };
-      publisher.start(start);
+      publisher.start(critical);
       next(action);
       return;
     }
@@ -182,7 +184,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     // Drag end
     if (action.type === 'DROP_COMPLETE') {
       const result: DropResult = action.payload;
-      publisher.end(result);
+      publisher.drop(result);
       next(action);
       return;
     }
@@ -191,8 +193,8 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     // we should fire a onDragEnd hook
     if (action.type === 'CLEAN') {
       // Unmatched drag start call - need to cancel
-      if (publisher.isDragStartPublished()) {
-        publisher.cancel();
+      if (publisher.isDragStartPublished) {
+        publisher.abort();
       }
 
       next(action);
@@ -202,7 +204,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     // ## Perform drag updates
 
     // No drag updates required
-    if (!publisher.isDragStartPublished()) {
+    if (!publisher.isDragStartPublished) {
       next(action);
       return;
     }
@@ -212,7 +214,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
 
     const state: State = store.getState();
     if (state.phase === 'DRAGGING') {
-      publisher.move(state.impact.destination);
+      publisher.move(state.critical, state.impact.destination);
     }
   };
 };
