@@ -24,6 +24,30 @@ import type {
   Collection,
 } from './dimension-marshal-types';
 
+const advancedUsageWarning = () => (() => {
+  let hasAnnounced: boolean = false;
+
+  return () => {
+    if (hasAnnounced) {
+      return;
+    }
+
+    hasAnnounced = true;
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(`
+        Warning: you are triggering a recollection of dimensions during a drag.
+        This is fairly advanced feature used to support interactions such as lazy loading lists.
+        You might not have intended to trigger this collection. A collection will be triggered
+        whenever a Droppable or Draggable is added or removed; or when:
+
+        - Draggable: 'id' or 'index' change
+        - Droppable: 'id' change ('type' change is not permitted during a drag)
+      `.trim());
+    }
+  };
+})();
+
 export default (callbacks: Callbacks) => {
   const entries: Entries = {
     droppables: {},
@@ -38,6 +62,11 @@ export default (callbacks: Callbacks) => {
 
   const collect = ({ includeCritical }: {| includeCritical: boolean |}) => {
     invariant(collection, 'Cannot collect without a collection occurring');
+
+    if (includeCritical) {
+      advancedUsageWarning();
+    }
+
     collector.collect({
       collection,
       includeCritical,
@@ -81,7 +110,7 @@ export default (callbacks: Callbacks) => {
 
     invariant(descriptor.id !== collection.critical.draggable.id, 'Cannot unregister dragging item during a drag');
 
-    collect({ includeCritical: false });
+    collect({ includeCritical: true });
   };
 
   const updateDraggable = (
@@ -104,7 +133,7 @@ export default (callbacks: Callbacks) => {
     const home: ?DroppableEntry = entries.droppables[descriptor.droppableId];
     invariant(home, 'Cannot update a Draggable that does not have a home');
 
-    collect({ includeCritical: false });
+    collect({ includeCritical: true });
   };
 
   const unregisterDraggable = (descriptor: DraggableDescriptor) => {
@@ -126,7 +155,7 @@ export default (callbacks: Callbacks) => {
 
     invariant(descriptor.id !== collection.critical.draggable.id, 'Cannot unregister dragging item during a drag');
 
-    collect({ includeCritical: false });
+    collect({ includeCritical: true });
   };
 
   const registerDroppable = (
@@ -157,7 +186,7 @@ export default (callbacks: Callbacks) => {
 
     invariant(descriptor.id !== collection.critical.droppable.id, 'Cannot register home droppable during a drag');
 
-    collect({ includeCritical: false });
+    collect({ includeCritical: true });
   };
 
   const updateDroppable = (
@@ -176,7 +205,7 @@ export default (callbacks: Callbacks) => {
 
     registerDroppable(descriptor, droppableCallbacks);
 
-    collect({ includeCritical: false });
+    collect({ includeCritical: true });
   };
 
   const unregisterDroppable = (descriptor: DroppableDescriptor) => {
@@ -202,7 +231,7 @@ export default (callbacks: Callbacks) => {
 
     invariant(descriptor.id !== collection.critical.droppable.id, 'Cannot unregister home droppable during a drag');
 
-    collect({ includeCritical: false });
+    collect({ includeCritical: true });
   };
 
   const updateDroppableIsEnabled = (id: DroppableId, isEnabled: boolean) => {
@@ -268,15 +297,18 @@ export default (callbacks: Callbacks) => {
     if (!collection) {
       return;
     }
-    const home: DroppableDescriptor = collection.critical.droppable;
+    // Stop any pending dom collections or publish
+    collector.stop();
+
     // Tell all droppables to stop watching scroll
     // all good if they where not already listening
+    const home: DroppableDescriptor = collection.critical.droppable;
     Object.keys(entries.droppables)
       .filter((id: DroppableId): boolean => entries.droppables[id].descriptor.type === home.type)
       .forEach((id: DroppableId) => entries.droppables[id].callbacks.unwatchScroll());
 
+    // Finally - clear our collection
     collection = null;
-    collector.stop();
   };
 
   const startPublishing = (request: LiftRequest, windowScroll: Position) => {

@@ -10,8 +10,8 @@ const flag: string = '__react-beautiful-dnd-debug-timings-hook__';
 
 const isTimingsEnabled = (): boolean => Boolean(window[flag]);
 
-// TEMP
-window[flag] = true;
+// Debug: uncomment to enable
+// window[flag] = true;
 
 export const start = (key: string) => {
   if (!isTimingsEnabled()) {

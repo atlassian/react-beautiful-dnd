@@ -61,9 +61,6 @@ export default ({
       // We need to stop the marshal before hooks fire as hooks can cause
       // dimension registration changes in response to reordering
       dimensionMarshalStopper(getDimensionMarshal),
-      // Fire application hooks
-      // TODO: where should this be?
-      hooks(getHooks, announce),
       // Fire application hooks in response to drag changes
       lift(getDimensionMarshal),
       // When a drop is pending and a bulk publish occurs, we need
@@ -73,6 +70,8 @@ export default ({
       dropAnimationFinish,
       pendingDrop,
       autoScroll,
+      // Fire hooks for consumers
+      hooks(getHooks, announce),
     ),
   ),
 );

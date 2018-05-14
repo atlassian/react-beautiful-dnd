@@ -116,7 +116,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     };
 
     const move = (location: ?DraggableLocation) => {
-      invariant(publishedStart, 'Cannot fire onDragMove when onDragStart has not been called');
+      invariant(isDragStartPublished(), 'Cannot fire onDragMove when onDragStart has not been called');
 
       // No change to publish
       if (areLocationsEqual(lastLocation, location)) {
@@ -133,7 +133,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     };
 
     const end = (result: DropResult) => {
-      invariant(isDragStartPublished, 'Cannot fire onDragEnd when there is no matching onDragStart');
+      invariant(isDragStartPublished(), 'Cannot fire onDragEnd when there is no matching onDragStart');
       publishedStart = null;
       lastLocation = null;
       withTimings('onDragEnd', () => execute(getHooks().onDragEnd, result, messagePreset.onDragEnd));
@@ -191,7 +191,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     // we should fire a onDragEnd hook
     if (action.type === 'CLEAN') {
       // Unmatched drag start call - need to cancel
-      if (publisher.isDragStartPublished) {
+      if (publisher.isDragStartPublished()) {
         publisher.cancel();
       }
 
@@ -202,7 +202,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     // ## Perform drag updates
 
     // No drag updates required
-    if (!publisher.isDragStartPublished) {
+    if (!publisher.isDragStartPublished()) {
       next(action);
       return;
     }
