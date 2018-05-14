@@ -38,14 +38,17 @@ export default ({
   composeEnhancers(
     applyMiddleware(
       // ## Debug middleware
+
       // > uncomment to use
       // debugging logger
-      require('./debug-middleware/log-middleware').default,
+      // require('./debug-middleware/log-middleware').default,
       // debugging timer
       // require('./debug-middleware/timing-middleware').default,
       // average action timer
       // require('./debug-middleware/timing-average-middleware').default(20),
+
       // ## Application middleware
+
       // Style updates do not cause more actions. It is important to update styles
       // before hooks are called: specifically the onDragEnd hook. We need to clear
       // the transition styles off the elements before a reorder to prevent strange
@@ -58,6 +61,9 @@ export default ({
       // We need to stop the marshal before hooks fire as hooks can cause
       // dimension registration changes in response to reordering
       dimensionMarshalStopper(getDimensionMarshal),
+      // Fire application hooks
+      // TODO: where should this be?
+      hooks(getHooks, announce),
       // Fire application hooks in response to drag changes
       lift(getDimensionMarshal),
       // When a drop is pending and a bulk publish occurs, we need
@@ -67,10 +73,6 @@ export default ({
       dropAnimationFinish,
       pendingDrop,
       autoScroll,
-
-      // TODO: where should this go?
-      hooks(getHooks, announce),
-
     ),
   ),
 );

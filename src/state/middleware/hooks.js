@@ -117,17 +117,19 @@ export default (getHooks: () => Hooks, announce: Announce) => {
 
     const move = (location: ?DraggableLocation) => {
       invariant(publishedStart, 'Cannot fire onDragMove when onDragStart has not been called');
+
       // No change to publish
       if (areLocationsEqual(lastLocation, location)) {
         return;
       }
 
+      lastLocation = location;
       const update: DragUpdate = {
         ...publishedStart,
         destination: location,
       };
 
-      withTimings('onDragMove', () => execute(getHooks().onDragEnd, update, messagePreset.onDragUpdate));
+      withTimings('onDragUpdate', () => execute(getHooks().onDragUpdate, update, messagePreset.onDragUpdate));
     };
 
     const end = (result: DropResult) => {

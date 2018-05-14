@@ -73,6 +73,8 @@ export default class DragDropContext extends React.Component<Props> {
       // Lazy reference to dimension marshal get around circular dependency
       getDimensionMarshal: (): DimensionMarshal => this.dimensionMarshal,
       styleMarshal: this.styleMarshal,
+      // This is a function as users are allowed to change their hook functions
+      // at any time
       getHooks: (): Hooks => ({
         onDragStart: this.props.onDragStart,
         onDragEnd: this.props.onDragEnd,
