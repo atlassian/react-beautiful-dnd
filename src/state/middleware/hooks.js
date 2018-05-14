@@ -147,6 +147,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
 
     const drop = (result: DropResult) => {
       invariant(isDragStartPublished, 'Cannot fire onDragEnd when there is no matching onDragStart');
+      isDragStartPublished = false;
       lastLocation = null;
       lastCritical = null;
       withTimings('onDragEnd', () => execute(getHooks().onDragEnd, result, messagePreset.onDragEnd));
@@ -169,7 +170,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
       move,
       drop,
       abort,
-      isDragStartPublished,
+      isDragStartPublished: (): boolean => isDragStartPublished,
     };
   })();
 
@@ -193,7 +194,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     // we should fire a onDragEnd hook
     if (action.type === 'CLEAN') {
       // Unmatched drag start call - need to cancel
-      if (publisher.isDragStartPublished) {
+      if (publisher.isDragStartPublished()) {
         publisher.abort();
       }
 
@@ -204,7 +205,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     // ## Perform drag updates
 
     // No drag updates required
-    if (!publisher.isDragStartPublished) {
+    if (!publisher.isDragStartPublished()) {
       next(action);
       return;
     }

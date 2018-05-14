@@ -32,7 +32,7 @@ export const lift = (args: LiftArgs): LiftAction => ({
   payload: args,
 });
 
-type InitialPublishArgs = {|
+export type InitialPublishArgs = {|
   critical: Critical,
   dimensions: DimensionMap,
   client: ItemPositions,
@@ -67,7 +67,6 @@ export const bulkReplace = (args: BulkReplaceArgs): BulkReplaceAction => ({
 });
 
 type UpdateDroppableScrollArgs = {
-  id: DroppableId,
   offset: Position,
 }
 
@@ -98,7 +97,7 @@ export const updateDroppableIsEnabled =
     payload: args,
   });
 
-type MoveArgs = {|
+export type MoveArgs = {|
   client: Position,
   shouldAnimate: boolean,
 |}
@@ -129,42 +128,42 @@ export const moveByWindowScroll = (args: MoveByWindowScrollArgs): MoveByWindowSc
 
 export type MoveBackwardAction = {|
   type: 'MOVE_BACKWARD',
-  payload: DraggableId
+  payload: null
 |}
 
-export const moveBackward = (id: DraggableId): MoveBackwardAction => ({
+export const moveBackward = (): MoveBackwardAction => ({
   type: 'MOVE_BACKWARD',
-  payload: id,
+  payload: null,
 });
 
 export type MoveForwardAction = {|
   type: 'MOVE_FORWARD',
-  payload: DraggableId
+  payload: null
 |}
 
-export const moveForward = (id: DraggableId): MoveForwardAction => ({
+export const moveForward = (): MoveForwardAction => ({
   type: 'MOVE_FORWARD',
-  payload: id,
+  payload: null,
 });
 
 export type CrossAxisMoveForwardAction = {|
   type: 'CROSS_AXIS_MOVE_FORWARD',
-  payload: DraggableId
+  payload: null
 |}
 
-export const crossAxisMoveForward = (id: DraggableId): CrossAxisMoveForwardAction => ({
+export const crossAxisMoveForward = (): CrossAxisMoveForwardAction => ({
   type: 'CROSS_AXIS_MOVE_FORWARD',
-  payload: id,
+  payload: null,
 });
 
 export type CrossAxisMoveBackwardAction = {|
   type: 'CROSS_AXIS_MOVE_BACKWARD',
-  payload: DraggableId
+  payload: null
 |}
 
-export const crossAxisMoveBackward = (id: DraggableId): CrossAxisMoveBackwardAction => ({
+export const crossAxisMoveBackward = (): CrossAxisMoveBackwardAction => ({
   type: 'CROSS_AXIS_MOVE_BACKWARD',
-  payload: id,
+  payload: null,
 });
 
 type CleanAction = {

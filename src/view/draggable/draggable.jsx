@@ -128,7 +128,7 @@ export default class Draggable extends Component<Props> {
     });
   }
 
-  onMove = (client: Position) => {
+  onMove = (clientSelection: Position) => {
     this.throwIfCannotDrag();
 
     const { dimension, move } = this.props;
@@ -138,27 +138,27 @@ export default class Draggable extends Component<Props> {
       return;
     }
 
-    move({ client, shouldAnimate: false });
+    move({ client: clientSelection, shouldAnimate: false });
   }
 
   onMoveForward = () => {
     this.throwIfCannotDrag();
-    this.props.moveForward(this.props.draggableId);
+    this.props.moveForward();
   }
 
   onMoveBackward = () => {
     this.throwIfCannotDrag();
-    this.props.moveBackward(this.props.draggableId);
+    this.props.moveBackward();
   }
 
   onCrossAxisMoveForward = () => {
     this.throwIfCannotDrag();
-    this.props.crossAxisMoveForward(this.props.draggableId);
+    this.props.crossAxisMoveForward();
   }
 
   onCrossAxisMoveBackward = () => {
     this.throwIfCannotDrag();
-    this.props.crossAxisMoveBackward(this.props.draggableId);
+    this.props.crossAxisMoveBackward();
   }
 
   onWindowScroll = () => {

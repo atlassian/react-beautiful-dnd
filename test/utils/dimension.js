@@ -24,6 +24,7 @@ import type {
   DraggableDimension,
   DraggableDimensionMap,
   DroppableDimensionMap,
+  DimensionMap,
 } from '../../src/types';
 
 type GetComputedSpacingArgs = {|
@@ -149,10 +150,10 @@ export const withImpact = (state: State, impact: DragImpact) => {
 
 export const addDroppable = (base: State, droppable: DroppableDimension): State => ({
   ...base,
-  dimension: {
-    ...base.dimension,
-    droppable: {
-      ...base.dimension.droppable,
+  dimensions: {
+    ...base.dimensions,
+    droppables: {
+      ...base.dimension.droppables,
       [droppable.descriptor.id]: droppable,
     },
   },
@@ -160,10 +161,10 @@ export const addDroppable = (base: State, droppable: DroppableDimension): State 
 
 export const addDraggable = (base: State, draggable: DraggableDimension): State => ({
   ...base,
-  dimension: {
-    ...base.dimension,
-    draggable: {
-      ...base.dimension.draggable,
+  dimensions: {
+    ...base.dimensions,
+    draggables: {
+      ...base.dimension.draggables,
       [draggable.descriptor.id]: draggable,
     },
   },
@@ -517,6 +518,11 @@ export const getPreset = (axis?: Axis = vertical) => {
     inForeign1, inForeign2, inForeign3, inForeign4,
   ];
 
+  const dimensions: DimensionMap = {
+    draggables,
+    droppables,
+  };
+
   return {
     home,
     inHome1,
@@ -532,6 +538,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     droppables,
     draggables,
     inHomeList,
+    dimensions,
     inForeignList,
     windowScroll,
   };

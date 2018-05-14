@@ -107,6 +107,9 @@ const move = ({
     };
   }
 
+  console.log('calculating new impact');
+  console.log('forced?', impact);
+
   const newImpact: DragImpact = impact || getDragImpact({
     pageBorderBoxCenter: current.page.borderBoxCenter,
     draggable: state.dimensions.draggables[state.critical.draggable.id],
@@ -115,6 +118,8 @@ const move = ({
     previousImpact: state.impact,
     viewport: windowDetails ? windowDetails.viewport : state.window.viewport,
   });
+
+  console.log('new impact', impact);
 
   // dragging!
   const result: DraggingState = {
@@ -165,6 +170,18 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
+    const droppable: DroppableDimension = dimensions.droppables[critical.droppable.id];
+
+    // Calculating initial impact
+    const impact: DragImpact = {
+      movement: noMovement,
+      direction: droppable.axis.direction,
+      destination: {
+        index: critical.draggable.index,
+        droppableId: critical.droppable.id,
+      },
+    };
+
     const result: BulkCollectionState = {
       // We are now waiting for the first bulk collection.
       phase: 'BULK_COLLECTING',
@@ -173,7 +190,7 @@ export default (state: State = idle, action: Action): State => {
       dimensions,
       initial,
       current: initial,
-      impact: noImpact,
+      impact,
       window: windowDetails,
       scrollJumpRequest: null,
       shouldAnimate: false,
@@ -227,6 +244,8 @@ export default (state: State = idle, action: Action): State => {
       previousImpact: state.impact,
       viewport,
     });
+
+    console.log('post bulk collect impact', impact);
 
     const windowDetails: WindowDetails = {
       viewport,
@@ -408,36 +427,28 @@ export default (state: State = idle, action: Action): State => {
   }
 
   if (action.type === 'MOVE_FORWARD' || action.type === 'MOVE_BACKWARD') {
-    if (state.phase !== 'DRAGGING') {
-      console.error('cannot move while not dragging', action);
-      return idle;
+    // Ignoring any requests while bulk collecting
+    if (state.phase === 'BULK_COLLECTING' || state.phase === 'DROP_PENDING') {
+      return state;
     }
 
-    if (!state.drag) {
-      console.error('cannot move if there is no drag information');
-      return idle;
-    }
+    invariant(state.phase === 'DRAGGING', `${action.type} received while not in DRAGGING phase`);
+    invariant(state.impact.destination, 'Cannot move if there is no previous destination');
 
-    const existing: DragState = state.drag;
     const isMovingForward: boolean = action.type === 'MOVE_FORWARD';
 
-    if (!existing.impact.destination) {
-      console.error('cannot move if there is no previous destination');
-      return idle;
-    }
-
-    const droppable: DroppableDimension = state.dimension.droppable[
-      existing.impact.destination.droppableId
+    const droppable: DroppableDimension = state.dimensions.droppables[
+      state.impact.destination.droppableId
     ];
 
     const result: ?MoveToNextResult = moveToNextIndex({
       isMovingForward,
-      draggableId: existing.initial.descriptor.id,
+      draggableId: state.critical.draggable.id,
       droppable,
-      draggables: state.dimension.draggable,
-      previousPageBorderBoxCenter: existing.current.page.borderBoxCenter,
-      previousImpact: existing.impact,
-      viewport: existing.current.viewport,
+      draggables: state.dimensions.draggables,
+      previousPageBorderBoxCenter: state.current.page.borderBoxCenter,
+      previousImpact: state.impact,
+      viewport: state.window.viewport,
     });
 
     // cannot move anyway (at the beginning or end of a list)
@@ -447,8 +458,9 @@ export default (state: State = idle, action: Action): State => {
 
     const impact: DragImpact = result.impact;
     const pageBorderBoxCenter: Position = result.pageBorderBoxCenter;
+    // TODO: not sure if this is correct
     const clientBorderBoxCenter: Position = subtract(
-      pageBorderBoxCenter, existing.current.viewport.scroll
+      pageBorderBoxCenter, state.window.scroll.current,
     );
 
     return move({
