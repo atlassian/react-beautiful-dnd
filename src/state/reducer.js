@@ -216,14 +216,10 @@ export default (state: State = idle, action: Action): State => {
 
   if (action.type === 'BULK_REPLACE') {
     // Unexpected bulk publish
-    invariant(state.phase === 'BULK_COLLECTING' || state.phase === 'DROP_PENDING',
-      `Unexpected bulk publish received in phase ${state.phase}`);
-
-    // A drop is waiting on a bulk publish to finish
-    // The pending drop will be handled by the dropMiddleware
-    // if (state.phase === 'DROP_PENDING') {
-    //   return state;
-    // }
+    invariant(
+      state.phase === 'BULK_COLLECTING' || state.phase === 'DROP_PENDING',
+      `Unexpected bulk publish received in phase ${state.phase}`
+    );
 
     const existing: BulkCollectionState | DropPendingState = state;
 
@@ -291,7 +287,9 @@ export default (state: State = idle, action: Action): State => {
       };
     }
 
-    // There was a pending drop
+    // There was a DROP_PENDING
+    // Staying in the DROP_PENDING phase
+    // setting isWaiting for false
     return {
       // appeasing flow
       phase: 'DROP_PENDING',

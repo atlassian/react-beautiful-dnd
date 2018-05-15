@@ -1,7 +1,10 @@
 // @flow
+import invariant from 'tiny-invariant';
 import middleware from '../../../../../src/state/middleware/hooks';
+import messagePreset from '../../../../../src/state/middleware/util/message-preset';
 import { add } from '../../../../../src/state/position';
 import {
+  clean,
   prepare,
   initialPublish,
   bulkReplace,
@@ -17,14 +20,17 @@ import createStore from '../create-store';
 import { getPreset } from '../../../../utils/dimension';
 import getViewport from '../../../../../src/view/window/get-viewport';
 import type {
+  DraggableLocation,
   Store,
   Hooks,
+  State,
   Announce,
   Critical,
   DragStart,
   DragUpdate,
   DropResult,
   Viewport,
+  HookProvided,
   DraggableDimension,
   DimensionMap,
 } from '../../../../../src/types';
@@ -192,6 +198,22 @@ describe('update', () => {
     );
   });
 
+  it('should not call onDragUpdate if the position has not changed in the first bulk publish', () => {
+    const hooks: Hooks = createHooks();
+    const store: Store = createStore(
+      middleware(() => hooks, getAnnounce())
+    );
+
+    store.dispatch(prepare());
+    store.dispatch(initialPublish(initialPublishArgs));
+    expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+    expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+
+    store.dispatch(bulkReplace(initialBulkReplaceArgs));
+    // not called yet as position has not changed
+    expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+  });
+
   it('should call onDragUpdate if the position has changed due to a bulk publish', () => {
     const hooks: Hooks = createHooks();
     const store: Store = createStore(
@@ -257,7 +279,7 @@ describe('update', () => {
     );
   });
 
-  it('should not call onDragUpdate if the position has not changed from the initial publish', () => {
+  it('should not call onDragUpdate if there is no movement from the last update', () => {
     const hooks: Hooks = createHooks();
     const store: Store = createStore(
       middleware(() => hooks, getAnnounce())
@@ -268,11 +290,7 @@ describe('update', () => {
     expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
     expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
-    store.dispatch(bulkReplace({
-      dimensions: preset.dimensions,
-      viewport,
-      shouldReplaceCritical: false,
-    }));
+    store.dispatch(bulkReplace(initialBulkReplaceArgs));
     // not called yet as position has not changed
     expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
@@ -285,27 +303,304 @@ describe('update', () => {
     store.dispatch(move(moveArgs));
 
     expect(hooks.onDragUpdate).not.toHaveBeenCalled();
-  });
 
-  it('should not call onDragUpdate if there is no movement from the last update', () => {
+    // Triggering an actual movement
+    store.dispatch(moveForward());
+    expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
 
+    const state: State = store.getState();
+    invariant(state.phase === 'DRAGGING', 'Expecting state to be in dragging phase');
+
+    // A small movement that should not trigger any index changes
+    store.dispatch(move({
+      client: add(state.current.client.selection, { x: -1, y: -1 }),
+      shouldAnimate: true,
+    }));
+
+    expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
   });
 });
 
 describe('abort', () => {
-  it('should use the last published critical descriptor', () => {
+  it('should not do anything if a drag had not started', () => {
+    const hooks: Hooks = createHooks();
+    const store: Store = createStore(
+      middleware(() => hooks, getAnnounce())
+    );
 
+    store.dispatch(clean());
+    expect(hooks.onDragStart).not.toHaveBeenCalled();
+
+    // entering preparing phase
+    store.dispatch(prepare());
+    expect(store.getState().phase).toBe('PREPARING');
+
+    // cancelling drag before publish
+    store.dispatch(clean());
+    expect(hooks.onDragStart).not.toHaveBeenCalled();
+    expect(hooks.onDragEnd).not.toHaveBeenCalled();
   });
 
-  it('should publish an on drag end with no destination even if there is a current destination', () => {
+  it('should call onDragEnd with the last published critical descriptor', () => {
+    const hooks: Hooks = createHooks();
+    const store: Store = createStore(
+      middleware(() => hooks, getAnnounce())
+    );
 
+    store.dispatch(clean());
+    store.dispatch(prepare());
+    store.dispatch(initialPublish(initialPublishArgs));
+    expect(hooks.onDragStart).toHaveBeenCalled();
+
+    store.dispatch(clean());
+    const expected: DropResult = {
+      ...getDragStart(initialPublishArgs.critical),
+      destination: null,
+      reason: 'CANCEL',
+    };
+    expect(hooks.onDragEnd).toHaveBeenCalledWith(
+      expected,
+      expect.any(Object),
+    );
   });
 
-  it('should not do anything if a drag start had not been published', () => {
+  it('should publish an onDragEnd with no destination even if there is a current destination', () => {
+    const hooks: Hooks = createHooks();
+    const store: Store = createStore(
+      middleware(() => hooks, getAnnounce())
+    );
 
+    store.dispatch(clean());
+    store.dispatch(prepare());
+    store.dispatch(initialPublish(initialPublishArgs));
+
+    const state: State = store.getState();
+    invariant(state.phase === 'BULK_COLLECTING');
+    // in home location
+    const home: DraggableLocation = {
+      droppableId: initialPublishArgs.critical.droppable.id,
+      index: initialPublishArgs.critical.draggable.index,
+    };
+    expect(state.impact.destination).toEqual(home);
+
+    store.dispatch(clean());
+    const expected: DropResult = {
+      ...getDragStart(initialPublishArgs.critical),
+      // destination has been cleared
+      destination: null,
+      reason: 'CANCEL',
+    };
+    expect(hooks.onDragEnd).toHaveBeenCalledWith(
+      expected,
+      expect.any(Object),
+    );
   });
 });
 
-describe('announcements', () => {
+describe('subsequent drags', () => {
+  it('should behave correctly across multiple drags', () => {
+    const hooks: Hooks = createHooks();
+    const store = createStore(
+      middleware(() => hooks, getAnnounce())
+    );
+    Array.from({ length: 4 }).forEach(() => {
+      // start
+      store.dispatch(prepare());
+      store.dispatch(initialPublish(initialPublishArgs));
+      expect(hooks.onDragStart).toHaveBeenCalledWith(
+        getDragStart(initialPublishArgs.critical),
+        expect.any(Object),
+      );
+      expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
 
+      // update
+      const update: DragUpdate = {
+        ...getDragStart(initialPublishArgs.critical),
+        destination: {
+          droppableId: initialPublishArgs.critical.droppable.id,
+          index: initialPublishArgs.critical.draggable.index + 1,
+        },
+      };
+      store.dispatch(bulkReplace(initialBulkReplaceArgs));
+      store.dispatch(moveForward());
+      expect(hooks.onDragUpdate).toHaveBeenCalledWith(update, expect.any(Object));
+      expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
+
+      // drop
+      const result: DropResult = {
+        ...update,
+        reason: 'DROP',
+      };
+      store.dispatch(completeDrop(result));
+      expect(hooks.onDragEnd).toHaveBeenCalledWith(result, expect.any(Object));
+      expect(hooks.onDragEnd).toHaveBeenCalledTimes(1);
+
+      // cleanup
+      store.dispatch(clean());
+      // $ExpectError - unknown mock reset property
+      hooks.onDragStart.mockReset();
+      // $ExpectError - unknown mock reset property
+      hooks.onDragUpdate.mockReset();
+      // $ExpectError - unknown mock reset property
+      hooks.onDragEnd.mockReset();
+    });
+  });
+});
+
+type Case = {|
+  title: 'onDragStart' | 'onDragUpdate' | 'onDragEnd',
+  execute: (store: Store) => void,
+  defaultMessage: string,
+|}
+
+describe('announcements', () => {
+  const moveForwardUpdate: DragUpdate = {
+    ...getDragStart(initialPublishArgs.critical),
+    destination: {
+      droppableId: initialPublishArgs.critical.droppable.id,
+      index: initialPublishArgs.critical.draggable.index + 1,
+    },
+  };
+
+  const cases: Case[] = [
+    {
+      title: 'onDragStart',
+      execute: (store: Store) => {
+        store.dispatch(prepare());
+        store.dispatch(initialPublish(initialPublishArgs));
+      },
+      defaultMessage: messagePreset.onDragStart(getDragStart(initialPublishArgs.critical)),
+    },
+    {
+      title: 'onDragUpdate',
+      execute: (store: Store) => {
+        store.dispatch(prepare());
+        store.dispatch(initialPublish(initialPublishArgs));
+        store.dispatch(bulkReplace(initialBulkReplaceArgs));
+        store.dispatch(moveForward());
+      },
+      defaultMessage: messagePreset.onDragUpdate(moveForwardUpdate),
+    },
+    {
+      title: 'onDragEnd',
+      execute: (store: Store) => {
+        store.dispatch(prepare());
+        store.dispatch(initialPublish(initialPublishArgs));
+        store.dispatch(bulkReplace(initialBulkReplaceArgs));
+        store.dispatch(moveForward());
+
+        const result: DropResult = {
+          ...moveForwardUpdate,
+          reason: 'DROP',
+        };
+        store.dispatch(completeDrop(result));
+      },
+      defaultMessage: messagePreset.onDragEnd({
+        ...moveForwardUpdate,
+        reason: 'DROP',
+      }),
+    },
+  ];
+
+  cases.forEach((current: Case) => {
+    describe(`for hook: ${current.title}`, () => {
+      let hooks: Hooks;
+      let announce: Announce;
+      let store: Store;
+
+      beforeEach(() => {
+        hooks = createHooks();
+        announce = getAnnounce();
+        store = createStore(
+          middleware(() => hooks, announce)
+        );
+      });
+
+      it('should announce with the default message if no hook is provided', () => {
+        // This test is not relevant for onDragEnd as it must always be provided
+        if (current.title === 'onDragEnd') {
+          return;
+        }
+        // unsetting hook
+        hooks[current.title] = undefined;
+        current.execute(store);
+        expect(announce).toHaveBeenCalledWith(current.defaultMessage);
+      });
+
+      it('should announce with the default message if the hook does not announce', () => {
+        current.execute(store);
+        expect(announce).toHaveBeenCalledWith(current.defaultMessage);
+      });
+
+      it('should not announce twice if the hook makes an announcement', () => {
+        // $ExpectError - property does not exist on hook property
+        hooks[current.title] = jest.fn((data: any, provided: HookProvided) => {
+          announce.mockReset();
+          provided.announce('hello');
+          expect(announce).toHaveBeenCalledWith('hello');
+          // asserting there was no double call
+          expect(announce).toHaveBeenCalledTimes(1);
+        });
+
+        current.execute(store);
+      });
+
+      it('should prevent async announcements', () => {
+        jest.useFakeTimers();
+        jest.spyOn(console, 'warn').mockImplementation(() => { });
+
+        let provided: HookProvided;
+        // $ExpectError - property does not exist on hook property
+        hooks[current.title] = jest.fn((data: any, supplied: HookProvided) => {
+          announce.mockReset();
+          provided = supplied;
+        });
+
+        current.execute(store);
+
+        // We did not announce so it would have been called with the default message
+        expect(announce).toHaveBeenCalledWith(current.defaultMessage);
+        expect(announce).toHaveBeenCalledTimes(1);
+        announce.mockReset();
+
+        // perform an async message
+        setTimeout(() => provided.announce('async message'));
+        jest.runOnlyPendingTimers();
+
+        expect(announce).not.toHaveBeenCalled();
+        expect(console.warn).toHaveBeenCalled();
+
+        // cleanup
+        jest.useRealTimers();
+        console.warn.mockRestore();
+      });
+
+      it('should prevent multiple announcement calls from a consumer', () => {
+        jest.spyOn(console, 'warn').mockImplementation(() => { });
+
+        let provided: HookProvided;
+        // $ExpectError - property does not exist on hook property
+        hooks[current.title] = jest.fn((data: any, supplied: HookProvided) => {
+          announce.mockReset();
+          provided = supplied;
+          provided.announce('hello');
+        });
+
+        current.execute(store);
+
+        expect(announce).toHaveBeenCalledWith('hello');
+        expect(announce).toHaveBeenCalledTimes(1);
+        announce.mockReset();
+
+        // perform another announcement
+        invariant(provided, 'provided is not set');
+        provided.announce('another one');
+
+        expect(announce).not.toHaveBeenCalled();
+        expect(console.warn).toHaveBeenCalled();
+
+        console.warn.mockRestore();
+      });
+    });
+  });
 });
