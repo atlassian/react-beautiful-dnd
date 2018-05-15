@@ -395,6 +395,33 @@ describe('abort', () => {
       expect.any(Object),
     );
   });
+
+  it('should not publish an onDragEnd if aborted after a drop', () => {
+    const hooks: Hooks = createHooks();
+    const store: Store = createStore(
+      middleware(() => hooks, getAnnounce())
+    );
+
+    // lift
+    store.dispatch(clean());
+    store.dispatch(prepare());
+    store.dispatch(initialPublish(initialPublishArgs));
+    expect(hooks.onDragStart).toHaveBeenCalled();
+
+    // drop
+    const result: DropResult = {
+      ...getDragStart(initialPublishArgs.critical),
+      destination: null,
+      reason: 'CANCEL',
+    };
+    store.dispatch(completeDrop(result));
+    expect(hooks.onDragEnd).toHaveBeenCalledTimes(1);
+    hooks.onDragEnd.mockReset();
+
+    // abort
+    store.dispatch(clean());
+    expect(hooks.onDragEnd).not.toHaveBeenCalled();
+  });
 });
 
 describe('subsequent drags', () => {
@@ -561,6 +588,7 @@ describe('announcements', () => {
         // We did not announce so it would have been called with the default message
         expect(announce).toHaveBeenCalledWith(current.defaultMessage);
         expect(announce).toHaveBeenCalledTimes(1);
+        expect(console.warn).not.toHaveBeenCalled();
         announce.mockReset();
 
         // perform an async message
@@ -590,6 +618,7 @@ describe('announcements', () => {
 
         expect(announce).toHaveBeenCalledWith('hello');
         expect(announce).toHaveBeenCalledTimes(1);
+        expect(console.warn).not.toHaveBeenCalled();
         announce.mockReset();
 
         // perform another announcement
