@@ -8,8 +8,10 @@ import {
   completeDrop,
   move,
   moveForward,
+  bulkCollectionStarting,
   type InitialPublishArgs,
   type MoveArgs,
+  type BulkReplaceArgs,
 } from '../../../../../src/state/action-creators';
 import createStore from '../create-store';
 import { getPreset } from '../../../../utils/dimension';
@@ -23,6 +25,8 @@ import type {
   DragUpdate,
   DropResult,
   Viewport,
+  DraggableDimension,
+  DimensionMap,
 } from '../../../../../src/types';
 
 const preset = getPreset();
@@ -54,6 +58,12 @@ const initialPublishArgs: InitialPublishArgs = {
   },
   viewport,
   autoScrollMode: 'FLUID',
+};
+
+const initialBulkReplaceArgs: BulkReplaceArgs = {
+  dimensions: preset.dimensions,
+  viewport,
+  critical: null,
 };
 
 const getDragStart = (critical: Critical): DragStart => ({
@@ -112,11 +122,7 @@ describe('drop', () => {
 
     store.dispatch(prepare());
     store.dispatch(initialPublish(initialPublishArgs));
-    store.dispatch(bulkReplace({
-      dimensions: preset.dimensions,
-      viewport,
-      shouldReplaceCritical: false,
-    }));
+    store.dispatch(bulkReplace(initialBulkReplaceArgs));
     expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
 
     const result: DropResult = {
@@ -156,7 +162,7 @@ describe('drop', () => {
 });
 
 describe('update', () => {
-  it.only('should call onDragUpdate if the position has changed on move', () => {
+  it('should call onDragUpdate if the position has changed on move', () => {
     const hooks: Hooks = createHooks();
     const store: Store = createStore(
       middleware(() => hooks, getAnnounce())
@@ -167,11 +173,7 @@ describe('update', () => {
     expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
     expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
-    store.dispatch(bulkReplace({
-      dimensions: preset.dimensions,
-      viewport,
-      shouldReplaceCritical: false,
-    }));
+    store.dispatch(bulkReplace(initialBulkReplaceArgs));
     // not called yet as position has not changed
     expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
@@ -191,7 +193,68 @@ describe('update', () => {
   });
 
   it('should call onDragUpdate if the position has changed due to a bulk publish', () => {
+    const hooks: Hooks = createHooks();
+    const store: Store = createStore(
+      middleware(() => hooks, getAnnounce())
+    );
 
+    // initial publish and bulk publish
+    store.dispatch(prepare());
+    store.dispatch(initialPublish(initialPublishArgs));
+    expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+    store.dispatch(bulkReplace(initialBulkReplaceArgs));
+    expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+    expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+
+    // another bulk publish is in the works
+    store.dispatch(bulkCollectionStarting());
+
+    const { dimensions, critical } = initialPublishArgs;
+    const withNewIndex: DraggableDimension = {
+      ...dimensions.draggables[critical.draggable.id],
+      descriptor: {
+        ...critical.draggable,
+        index: critical.draggable.index + 100,
+      },
+    };
+
+    const newCritical: Critical = {
+      draggable: withNewIndex.descriptor,
+      droppable: initialPublishArgs.critical.droppable,
+    };
+
+    const customDimensions: DimensionMap = {
+      droppables: dimensions.droppables,
+      // for simplicity just removing the other dimensions
+      draggables: {
+        [initialPublishArgs.critical.draggable.id]: withNewIndex,
+      },
+    };
+
+    store.dispatch(bulkReplace({
+      dimensions: customDimensions,
+      viewport,
+      critical: newCritical,
+    }));
+
+    const update: DragUpdate = {
+      draggableId: critical.draggable.id,
+      type: critical.droppable.type,
+      source: {
+        droppableId: critical.droppable.id,
+        // now states that the new index is the starting index
+        index: withNewIndex.descriptor.index,
+      },
+      // because we removed everything else, it will now be in the first position :D
+      destination: {
+        droppableId: initialPublishArgs.critical.droppable.id,
+        index: 0,
+      },
+    };
+    expect(hooks.onDragUpdate).toHaveBeenCalledWith(
+      update,
+      expect.any(Object),
+    );
   });
 
   it('should not call onDragUpdate if the position has not changed from the initial publish', () => {

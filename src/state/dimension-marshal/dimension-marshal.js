@@ -12,6 +12,7 @@ import type {
   DimensionMap,
   LiftRequest,
   Critical,
+  ScrollOptions,
 } from '../../types';
 import type {
   DimensionMarshal,
@@ -21,8 +22,12 @@ import type {
   Entries,
   DroppableEntry,
   DraggableEntry,
-  Collection,
 } from './dimension-marshal-types';
+
+type Collection = {|
+  scrollOptions: ScrollOptions,
+  critical: Critical,
+|}
 
 const advancedUsageWarning = () => (() => {
   let hasAnnounced: boolean = false;
@@ -58,6 +63,14 @@ export default (callbacks: Callbacks) => {
   const collector: Collector = createCollector({
     bulkReplace: callbacks.bulkReplace,
     getEntries: () => entries,
+    getCritical: (): Critical => {
+      invariant(collection, 'Cannot get critical when there is no collection');
+      return collection.critical;
+    },
+    getScrollOptions: (): ScrollOptions => {
+      invariant(collection, 'Cannot get scroll options when there is no collection');
+      return collection.scrollOptions;
+    },
   });
 
   const collect = ({ includeCritical }: {| includeCritical: boolean |}) => {
@@ -67,10 +80,10 @@ export default (callbacks: Callbacks) => {
       advancedUsageWarning();
     }
 
-    collector.collect({
-      collection,
-      includeCritical,
-    });
+    // Let the application know a bulk collection is starting
+    callbacks.bulkCollectionStarting();
+
+    collector.collect({ includeCritical });
   };
 
   const registerDraggable = (

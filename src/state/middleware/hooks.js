@@ -28,20 +28,37 @@ const withTimings = (key: string, fn: Function) => {
   timings.finish(key);
 };
 
-const areLocationsEqual = (current: ?DraggableLocation, next: ?DraggableLocation) => {
+const areLocationsEqual = (first: ?DraggableLocation, second: ?DraggableLocation): boolean => {
   // if both are null - we are equal
-  if (current == null && next == null) {
+  if (first == null && second == null) {
     return true;
   }
 
   // if one is null - then they are not equal
-  if (current == null || next == null) {
+  if (first == null || second == null) {
     return false;
   }
 
   // compare their actual values
-  return current.droppableId === next.droppableId &&
-    current.index === next.index;
+  return first.droppableId === second.droppableId &&
+    first.index === second.index;
+};
+
+const isCriticalEqual = (first: Critical, second: Critical): boolean => {
+  if (first === second) {
+    return true;
+  }
+
+  const isDraggableEqual: boolean =
+    first.draggable.id === second.draggable.id &&
+    first.draggable.droppableId === second.draggable.droppableId &&
+    first.draggable.index === second.draggable.index;
+
+  const isDroppableEqual: boolean =
+    first.droppable.id === second.droppable.id &&
+    first.droppable.type === second.droppable.type;
+
+  return isDraggableEqual && isDroppableEqual;
 };
 
 const getExpiringAnnounce = (announce: Announce) => {
@@ -128,10 +145,11 @@ export default (getHooks: () => Hooks, announce: Announce) => {
 
     // Passing in the critical location again as it can change during a drag
     const move = (critical: Critical, location: ?DraggableLocation) => {
-      invariant(isDragStartPublished, 'Cannot fire onDragMove when onDragStart has not been called');
+      invariant(isDragStartPublished && lastCritical, 'Cannot fire onDragMove when onDragStart has not been called');
 
       // No change to publish
-      if (areLocationsEqual(lastLocation, location)) {
+      if (isCriticalEqual(critical, lastCritical) &&
+        areLocationsEqual(lastLocation, location)) {
         return;
       }
 

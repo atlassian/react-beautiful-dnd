@@ -18,6 +18,7 @@ import type {
   Viewport,
   IdleState,
   PreparingState,
+  Critical,
   ItemPositions,
   DragPositions,
   InitialCollectionState,
@@ -107,9 +108,6 @@ const move = ({
     };
   }
 
-  console.log('calculating new impact');
-  console.log('forced?', impact);
-
   const newImpact: DragImpact = impact || getDragImpact({
     pageBorderBoxCenter: current.page.borderBoxCenter,
     draggable: state.dimensions.draggables[state.critical.draggable.id],
@@ -118,8 +116,6 @@ const move = ({
     previousImpact: state.impact,
     viewport: windowDetails ? windowDetails.viewport : state.window.viewport,
   });
-
-  console.log('new impact', impact);
 
   // dragging!
   const result: DraggingState = {
@@ -199,6 +195,25 @@ export default (state: State = idle, action: Action): State => {
     return result;
   }
 
+  if (action.type === 'BULK_COLLECTION_STARTING') {
+    // A collection might have restarted. We do not care as we are already in the right phase
+    if (state.phase === 'BULK_COLLECTING' || state.phase === 'DROP_PENDING') {
+      return state;
+    }
+
+    invariant(state.phase === 'DRAGGING', `Bulk collection cannot start from phase ${state.phase}`);
+
+    const result: BulkCollectionState = {
+      // putting phase first to appease flow
+      phase: 'BULK_COLLECTING',
+      ...state,
+      // eslint-disable-next-line no-dupe-keys
+      phase: 'BULK_COLLECTING',
+    };
+
+    return result;
+  }
+
   if (action.type === 'BULK_REPLACE') {
     // Unexpected bulk publish
     invariant(state.phase === 'BULK_COLLECTING' || state.phase === 'DROP_PENDING',
@@ -212,13 +227,14 @@ export default (state: State = idle, action: Action): State => {
 
     const existing: BulkCollectionState | DropPendingState = state;
 
-    const { viewport, shouldReplaceCritical, dimensions: proposed } = action.payload;
+    const { viewport, critical, dimensions: proposed } = action.payload;
     const dimensions: DimensionMap = (() => {
-      if (shouldReplaceCritical) {
+      // new dimensions contain the critical dimensions - we can just use those
+      if (critical) {
         return proposed;
       }
 
-      // need to maintain critical dimensions
+      // need to maintain critical dimensions as they where not collected
       const draggable: DraggableDimension =
         existing.dimensions.draggables[existing.critical.draggable.id];
       const droppable: DroppableDimension =
@@ -245,8 +261,6 @@ export default (state: State = idle, action: Action): State => {
       viewport,
     });
 
-    console.log('post bulk collect impact', impact);
-
     const windowDetails: WindowDetails = {
       viewport,
       scroll: {
@@ -259,6 +273,9 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
+    // The starting index of a draggable can change during a drag
+    const newCritical: Critical = critical || state.critical;
+
     // Moving into the DRAGGING phase
     if (state.phase === 'BULK_COLLECTING') {
       return {
@@ -267,6 +284,7 @@ export default (state: State = idle, action: Action): State => {
         ...state,
         // eslint-disable-next-line
         phase: 'DRAGGING',
+        critical: newCritical,
         impact,
         dimensions,
         window: windowDetails,
@@ -282,6 +300,7 @@ export default (state: State = idle, action: Action): State => {
         phase: 'DROP_PENDING',
       impact,
       dimensions,
+      critical: newCritical,
       window: windowDetails,
       // No longer waiting
       isWaiting: false,

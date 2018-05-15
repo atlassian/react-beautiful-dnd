@@ -53,7 +53,10 @@ export const initialPublish = (args: InitialPublishArgs): InitialPublishAction =
 export type BulkReplaceArgs = {|
   dimensions: DimensionMap,
   viewport: Viewport,
-  shouldReplaceCritical: boolean,
+  // optionally provide new critical dimensions
+  // if published then it is assumed that the dimensions
+  // map includes the new critical dimensions
+  critical: ?Critical,
 |}
 
 export type BulkReplaceAction = {|
@@ -64,6 +67,16 @@ export type BulkReplaceAction = {|
 export const bulkReplace = (args: BulkReplaceArgs): BulkReplaceAction => ({
   type: 'BULK_REPLACE',
   payload: args,
+});
+
+export type BulkCollectionStartingAction = {|
+  type: 'BULK_COLLECTION_STARTING',
+  payload: null
+|}
+
+export const bulkCollectionStarting = (): BulkCollectionStartingAction => ({
+  type: 'BULK_COLLECTION_STARTING',
+  payload: null,
 });
 
 type UpdateDroppableScrollArgs = {
@@ -166,20 +179,20 @@ export const crossAxisMoveBackward = (): CrossAxisMoveBackwardAction => ({
   payload: null,
 });
 
-type CleanAction = {
+type CleanAction = {|
   type: 'CLEAN',
   payload: null,
-}
+|}
 
 export const clean = (): CleanAction => ({
   type: 'CLEAN',
   payload: null,
 });
 
-type PrepareAction = {
+type PrepareAction = {|
   type: 'PREPARE',
   payload: null,
-}
+|}
 
 export const prepare = (): PrepareAction => ({
   type: 'PREPARE',
@@ -243,6 +256,7 @@ export const dropAnimationFinished = (): DropAnimationFinishedAction => ({
 export type Action =
   LiftAction |
   InitialPublishAction |
+  BulkCollectionStartingAction |
   BulkReplaceAction |
   UpdateDroppableScrollAction |
   UpdateDroppableIsEnabledAction |

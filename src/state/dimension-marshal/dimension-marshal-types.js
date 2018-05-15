@@ -1,7 +1,8 @@
 // @flow
 import { type Position } from 'css-box-model';
-import type {
-  BulkReplaceArgs,
+import {
+  bulkCollectionStarting
+  type BulkReplaceArgs,
 } from '../action-creators';
 import type {
   DraggableDescriptor,
@@ -56,16 +57,9 @@ export type Entries = {|
   draggables: DraggableEntryMap,
 |}
 
-export type Collection = {|
-  scrollOptions: ScrollOptions,
-  critical: Critical,
-|}
-
-type CollectionOptions = {|
-  includeCritical: boolean,
-|}
-
 export type DimensionMarshal = {|
+  // to let the system know a bulk collection is starting
+  onBulkCollectionStart: typeof bulkCollectionStarting,
   // Draggable
   registerDraggable: (
     descriptor: DraggableDescriptor,
@@ -96,7 +90,7 @@ export type DimensionMarshal = {|
   startPublishing: (request: LiftRequest, windowScroll: Position) =>
     {| critical: Critical, dimensions: DimensionMap |},
   stopPublishing: () => void,
-  collect: (options: CollectionOptions) => void,
+  collect: ({| includeCritical: boolean |}) => void,
 |}
 
 export type Callbacks = {|

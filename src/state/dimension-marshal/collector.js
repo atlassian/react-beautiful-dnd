@@ -16,43 +16,51 @@ import type {
   DroppableDimensionMap,
   DraggableDimensionMap,
   DimensionMap,
+  Critical,
 } from '../../types';
 import type {
   Entries,
   DraggableEntry,
   DroppableEntry,
-  Collection,
 } from './dimension-marshal-types';
 
-type CollectOptions = {|
-  collection: Collection,
+type CollectArgs = {|
   includeCritical: boolean,
+|}
+
+type CollectFromDOMArgs = {|
+  ...CollectArgs,
+  windowScroll: Position
 |}
 
 export type Collector = {|
   stop: () => void,
-  collect: (options: CollectOptions) => void,
+  collect: (args: CollectArgs) => void,
 |}
 
 type Args = {|
   getEntries: () => Entries,
+  getCritical: () => Critical,
+  getScrollOptions: () => ScrollOptions,
   bulkReplace: (args: BulkReplaceArgs) => void,
 |}
 
 export default ({
   bulkReplace,
   getEntries,
+  getCritical,
+  getScrollOptions,
 }: Args): Collector => {
   let frameId: ?AnimationFrameID = null;
   // tmep
   let timerId: ?TimeoutID = null;
 
-  const collectFromDOM = (windowScroll: Position, options: CollectOptions): DimensionMap => {
-    const { collection, includeCritical } = options;
+  const collectFromDOM = ({ windowScroll, includeCritical }: CollectFromDOMArgs): DimensionMap => {
+    const critical: Critical = getCritical();
+    const scrollOptions: ScrollOptions = getScrollOptions();
     const entries: Entries = getEntries();
-    const home: DroppableDescriptor = collection.critical.droppable;
-    const dragging: DraggableDescriptor = collection.critical.draggable;
-    const scrollOptions: ScrollOptions = collection.scrollOptions;
+    const home: DroppableDescriptor = critical.droppable;
+    const dragging: DraggableDescriptor = critical.draggable;
 
     // 1. Figure out what we need to collect
 
@@ -133,7 +141,7 @@ export default ({
     frameId = null;
   };
 
-  const collect = (options: CollectOptions) => {
+  const collect = ({ includeCritical }: CollectArgs) => {
     abortFrame();
     clearTimeout(timerId);
 
@@ -141,8 +149,14 @@ export default ({
     frameId = requestAnimationFrame(() => {
       timings.start('DOM collection');
       const viewport: Viewport = getViewport();
-      const dimensions: DimensionMap = collectFromDOM(viewport.scroll, options);
+      const critical: Critical = getCritical();
+      const dimensions: DimensionMap = collectFromDOM({
+        windowScroll: viewport.scroll,
+        includeCritical,
+      });
       timings.finish('DOM collection');
+
+      console.log('include critical?', includeCritical);
 
       // Perform publish in next frame
       frameId = requestAnimationFrame(() => {
@@ -152,7 +166,7 @@ export default ({
           bulkReplace({
             dimensions,
             viewport,
-            shouldReplaceCritical: options.includeCritical,
+            critical: includeCritical ? critical : null,
           });
           timings.finish('Bulk dimension publish');
         }, 2000);
