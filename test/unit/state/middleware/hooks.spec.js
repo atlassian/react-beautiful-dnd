@@ -1,8 +1,8 @@
 // @flow
 import invariant from 'tiny-invariant';
-import middleware from '../../../../../src/state/middleware/hooks';
-import messagePreset from '../../../../../src/state/middleware/util/message-preset';
-import { add } from '../../../../../src/state/position';
+import middleware from '../../../../src/state/middleware/hooks';
+import messagePreset from '../../../../src/state/middleware/util/message-preset';
+import { add } from '../../../../src/state/position';
 import {
   clean,
   prepare,
@@ -15,10 +15,10 @@ import {
   type InitialPublishArgs,
   type MoveArgs,
   type BulkReplaceArgs,
-} from '../../../../../src/state/action-creators';
-import createStore from '../create-store';
-import { getPreset } from '../../../../utils/dimension';
-import getViewport from '../../../../../src/view/window/get-viewport';
+} from '../../../../src/state/action-creators';
+import createStore from './util/create-store';
+import { getPreset } from '../../../utils/dimension';
+import getViewport from '../../../../src/view/window/get-viewport';
 import type {
   DraggableLocation,
   Store,
