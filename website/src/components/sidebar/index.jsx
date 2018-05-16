@@ -1,10 +1,10 @@
 // @flow
 import React, { Fragment } from 'react';
 import Link from 'gatsby-link';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { colors as akColors } from '@atlaskit/theme';
 import { grid, sidebarWidth } from '../../constants';
-import type { docsPage, sitePage } from '../types';
+import type { docsPage, sitePage, innerDocsPage } from '../types';
 import { getTitleFromExamplePath } from '../../utils';
 
 const Sidebar = styled.div`
@@ -51,6 +51,15 @@ const StyledLink = styled(Link)`
   color: ${akColors.N600};
   transition: background-color ease 0.2s, color ease 0.2s;
 
+  ${props =>
+    (props.isActiveLink
+      ? css`
+          color: white;
+          background: ${props.hoverColor};
+          text-decoration: none;
+        `
+      : '')}
+
   :hover, :active, :focus {
     color: white;
     background: ${props => props.hoverColor};
@@ -62,42 +71,44 @@ type NavItemProps = {|
   href: string,
   title: string,
   hoverColor: string,
-  // TODO
-  // isActive?: boolean,
-  isTitle?: boolean,
-|}
+  isTitle?: boolean
+|};
 
 const NavItem = ({ isTitle, href, title, hoverColor }: NavItemProps) => {
+  const isActiveLink = window.location.pathname === href;
   const Wrapper = isTitle ? Title : Item;
   return (
-    <StyledLink hoverColor={hoverColor} to={href} href={href}>
-      <Wrapper>
-        {title}
-      </Wrapper>
+    <StyledLink
+      hoverColor={hoverColor}
+      to={href}
+      href={href}
+      isActiveLink={isActiveLink}
+    >
+      <Wrapper>{title}</Wrapper>
     </StyledLink>
   );
 };
 
-type NavFromUrlsProsp = {
+type NavFromUrlsProps = {
   pages: sitePage,
   href: string,
-  title: string,
-}
+  title: string
+};
 
-const NavFromUrls = ({ pages, href, title }: NavFromUrlsProsp) => (
+const NavFromUrls = ({ pages, href, title }: NavFromUrlsProps) => (
   <Fragment>
-    <NavItem hoverColor={akColors.Y300} isTitle href={href} title={title} />
+    <Title>{title}</Title>
     {pages.edges.map((page) => {
-    const { path } = page.node;
-    return (
-      <NavItem
-        key={path}
-        hoverColor={akColors.Y300}
-        href={path}
-        title={getTitleFromExamplePath(path, href)}
-      />
-    );
-  })}
+      const { path } = page.node;
+      return (
+        <NavItem
+          key={path}
+          hoverColor={akColors.Y300}
+          href={path}
+          title={getTitleFromExamplePath(path, href)}
+        />
+      );
+    })}
   </Fragment>
 );
 
@@ -105,22 +116,54 @@ type Props = {
   docs: docsPage,
   examples: sitePage,
   internal: sitePage,
-  showInternal: boolean,
+  showInternal: boolean
+};
+
+type DocsSectionProps = {
+  sectionTitle: string,
+  sectionDir: string,
+  pages: Array<innerDocsPage>,
 }
+
+const DocsSection = ({ sectionTitle, pages, sectionDir }: DocsSectionProps) => (
+  <Fragment>
+    <Title>{sectionTitle}</Title>
+    {pages.map((page) => {
+      const { slug, title, dir } = page.node.fields;
+      if (sectionDir === dir) {
+        return (
+          <NavItem
+            key={slug}
+            href={slug}
+            title={title}
+            hoverColor={akColors.B300}
+          />
+        );
+      }
+        return null;
+    })}
+  </Fragment>
+);
 
 export default ({ docs, examples, internal, showInternal }: Props) => (
   <Sidebar>
     <h2>Header goes here</h2>
     <Section>
-      <NavItem isTitle href="/documentation" title="Documentation" hoverColor={akColors.B300} />
-      {docs.edges.map((page) => {
-        const { slug, title } = page.node.fields;
-        return <NavItem key={slug} href={slug} title={title} hoverColor={akColors.B300} />;
-      })}
+      <DocsSection pages={docs.edges} sectionTitle="Quick Start" sectionDir="quick-start" />
+    </Section>
+    <Section>
+      <DocsSection pages={docs.edges} sectionTitle="Core Concepts" sectionDir="core-concepts" />
+    </Section>
+    <Section>
+      <DocsSection pages={docs.edges} sectionTitle="Guides" sectionDir="guides" />
     </Section>
     <Section>
       <NavFromUrls href="/examples/" title="Examples" pages={examples} />
     </Section>
-    {showInternal ? <Section><NavFromUrls href="/internal/" title="Internal Examples" pages={internal} /></Section> : null}
+    {showInternal ? (
+      <Section>
+        <NavFromUrls href="/internal/" title="Internal Examples" pages={internal} />
+      </Section>
+    ) : null}
   </Sidebar>
 );
