@@ -1,9 +1,7 @@
 // @flow
 import React, { type Node } from 'react';
 import styled from 'styled-components';
-import Link from 'gatsby-link';
 import Media from 'react-media';
-import { colors as akColors } from '@atlaskit/theme';
 import Sidebar from './sidebar';
 import type { sitePage, docsPage } from './types';
 import { smallView } from '../components/media';

@@ -30,16 +30,18 @@ export type sitePage = {
   edges: Array<{ node: { path: string } }>
 };
 
-export type docsPage = {
-  edges: Array<{
-    node: {
-      fields: {
-        slug: string,
-        title: string,
-        dir?: string
-      }
+export type innerDocsPage = {
+  node: {
+    fields: {
+      slug: string,
+      title: string,
+      dir?: string
     }
-  }>
+  }
+}
+
+export type docsPage = {
+  edges: Array<innerDocsPage>
 };
 
 export type SidebarData = {
