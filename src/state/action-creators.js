@@ -235,12 +235,12 @@ export const drop = (args: DropArgs) => ({
 
 export type DropPendingAction = {|
   type: 'DROP_PENDING',
-  payload: DropReason,
+  payload: DropArgs,
 |}
 
-export const dropPending = (reason: DropReason): DropPendingAction => ({
+export const dropPending = (args: DropArgs): DropPendingAction => ({
   type: 'DROP_PENDING',
-  payload: reason,
+  payload: args,
 });
 
 export type DropAnimationFinishedAction = {|

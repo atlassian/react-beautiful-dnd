@@ -12,13 +12,10 @@ import {
   move,
   moveForward,
   bulkCollectionStarting,
-  type InitialPublishArgs,
   type MoveArgs,
-  type BulkReplaceArgs,
 } from '../../../../src/state/action-creators';
 import createStore from './util/create-store';
-import { getPreset } from '../../../utils/dimension';
-import getViewport from '../../../../src/view/window/get-viewport';
+import { viewport, initialPublishArgs, initialBulkReplaceArgs, getDragStart } from './util/preset-action-args';
 import type {
   DraggableLocation,
   Store,
@@ -26,16 +23,12 @@ import type {
   State,
   Announce,
   Critical,
-  DragStart,
   DragUpdate,
   DropResult,
-  Viewport,
   HookProvided,
   DraggableDimension,
   DimensionMap,
-} from '../../../../../src/types';
-
-const preset = getPreset();
+} from '../../../../src/types';
 
 const createHooks = (): Hooks => ({
   onDragStart: jest.fn(),
@@ -44,42 +37,6 @@ const createHooks = (): Hooks => ({
 });
 
 const getAnnounce = (): Announce => jest.fn();
-
-// Using the same scroll as the preset
-const viewport: Viewport = {
-  ...getViewport(),
-  scroll: preset.windowScroll,
-};
-
-const initialPublishArgs: InitialPublishArgs = {
-  critical: {
-    draggable: preset.inHome1.descriptor,
-    droppable: preset.home.descriptor,
-  },
-  dimensions: preset.dimensions,
-  client: {
-    selection: preset.inHome1.client.borderBox.center,
-    borderBoxCenter: preset.inHome1.client.borderBox.center,
-    offset: { x: 0, y: 0 },
-  },
-  viewport,
-  autoScrollMode: 'FLUID',
-};
-
-const initialBulkReplaceArgs: BulkReplaceArgs = {
-  dimensions: preset.dimensions,
-  viewport,
-  critical: null,
-};
-
-const getDragStart = (critical: Critical): DragStart => ({
-  draggableId: critical.draggable.id,
-  type: critical.droppable.type,
-  source: {
-    droppableId: critical.droppable.id,
-    index: critical.draggable.index,
-  },
-});
 
 describe('start', () => {
   it('should call the onDragStart hook when a initial publish occurs', () => {
@@ -134,7 +91,7 @@ describe('drop', () => {
     const result: DropResult = {
       ...getDragStart(initialPublishArgs.critical),
       destination: {
-        droppableId: preset.home.descriptor.id,
+        droppableId: initialPublishArgs.critical.droppable.id,
         index: 2,
       },
       reason: 'DROP',
@@ -152,7 +109,7 @@ describe('drop', () => {
     const result: DropResult = {
       ...getDragStart(initialPublishArgs.critical),
       destination: {
-        droppableId: preset.home.descriptor.id,
+        droppableId: initialPublishArgs.critical.droppable.id,
         index: 2,
       },
       reason: 'DROP',

@@ -25,7 +25,6 @@ export default (store: Store) => (next: (Action) => mixed) => (action: Action): 
   }
 
   if (!postActionState.isWaiting) {
-    console.log('ending a pending drop');
     store.dispatch(drop({
       reason: postActionState.reason,
     }));
