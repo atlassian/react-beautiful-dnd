@@ -56,6 +56,7 @@ export default ({ getState, dispatch }: Store) =>
 
     // Still waiting for our drop pending to end
     if (state.phase === 'DROP_PENDING' && state.isWaiting) {
+      console.error('A drop action occurred while DROP_PENDING and still waiting');
       return;
     }
 
@@ -111,7 +112,7 @@ export default ({ getState, dispatch }: Store) =>
 
     // Do not animate if you do not need to.
     // This will be the case if either you are dragging with a
-    // keyboard or if you manage to nail it just with a mouse.
+    // keyboard or if you manage to nail it with a mouse / touch.
     const isAnimationRequired = !isEqual(
       state.current.client.offset,
       newHomeOffset,

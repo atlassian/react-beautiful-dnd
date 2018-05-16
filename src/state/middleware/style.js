@@ -13,6 +13,7 @@ export default (marshal: StyleMarshal) =>
       marshal.dropping(action.payload.result.reason);
     }
 
+    // this will clear any styles immediately before a reorder
     if (action.type === 'CLEAN' || action.type === 'DROP_COMPLETE') {
       marshal.resting();
     }

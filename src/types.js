@@ -185,6 +185,7 @@ export type DropResult = {|
 |}
 
 export type PendingDrop = {|
+  // TODO: newHomeClientOffset
   newHomeOffset: Position,
   impact: DragImpact,
   result: DropResult,

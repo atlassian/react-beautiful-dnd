@@ -19,6 +19,7 @@ import {
   initialBulkReplaceArgs,
   getDragStart,
 } from './util/preset-action-args';
+import noImpact from '../../../../src/state/no-impact';
 import type {
   Store,
   State,
@@ -115,7 +116,7 @@ it('should not do anything if a drop action is fired and there is DROP_PENDING a
 
   expect(state.isWaiting).toBe(true);
 
-  // Drop action being fired (should not happen)
+  // Drop action being fired (should not happen?)
 
   mock.mockReset();
   store.dispatch(drop({ reason: 'DROP' }));
@@ -175,8 +176,72 @@ describe('no drop animation required', () => {
   });
 });
 
-describe('drop', () => {
+describe('drop animation required', () => {
+  describe('reason: CANCEL', () => {
+    it.only('should animate back to the origin', () => {
+      const mock = jest.fn();
+      const passThrough = () => next => (action) => {
+        mock(action);
+        next(action);
+      };
+      const store: Store = createStore(
+        passThrough,
+        middleware,
+      );
 
+      store.dispatch(clean());
+      store.dispatch(prepare());
+      store.dispatch(initialPublish(initialPublishArgs));
+      store.dispatch(bulkReplace(initialBulkReplaceArgs));
+      expect(store.getState().phase).toBe('DRAGGING');
+
+      // moving a little bit so that a drop animation will be needed
+      store.dispatch(move({
+        client: add(initialPublishArgs.client.selection, { x: 1, y: 1 }),
+        shouldAnimate: true,
+      }));
+
+      mock.mockReset();
+      store.dispatch(drop({ reason: 'CANCEL' }));
+
+      const pending: PendingDrop = {
+        newHomeOffset: { x: 0, y: 0 },
+        impact: noImpact,
+        result: {
+          ...getDragStart(initialPublishArgs.critical),
+          // destination cleared
+          destination: null,
+          reason: 'CANCEL',
+        },
+      };
+      expect(mock).toHaveBeenCalledWith(drop({ reason: 'CANCEL' }));
+      expect(mock).toHaveBeenCalledWith(animateDrop(pending));
+      expect(mock).toHaveBeenCalledTimes(2);
+      expect(store.getState().phase).toBe('DROP_ANIMATING');
+    });
+
+    it('should account for any change in scroll in the home droppable', () => {
+
+    });
+
+    it('should account home droppable scroll changes even if over another scrolled droppable', () => {
+
+    });
+  });
+
+  describe('reason: DROP', () => {
+    it('should account for any change in scroll in the home droppable if not dragging over anything', () => {
+
+    });
+
+    it('should account for any change in scroll in the droppable being dropped into', () => {
+
+    });
+
+    it('should account for any change in scroll in the window', () => {
+
+    });
+  });
 });
 
 it.skip('should fire a animate drop action is a drop is required', () => {
