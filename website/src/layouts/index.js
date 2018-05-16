@@ -44,7 +44,6 @@ export const query = graphql`
       }
     }
     docs: allMarkdownRemark(
-      filter: { fields: { slug: { regex: "/^/documentation//" } } }
       sort: { fields: [fields___dir], order: ASC }
     ) {
       edges {
