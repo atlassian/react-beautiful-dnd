@@ -7,8 +7,8 @@ import {
   getWindowOverlap,
   getDroppableOverlap,
 } from './can-scroll';
+import { move as moveAction } from '../action-creators';
 import type {
-  DraggableId,
   DroppableId,
   DroppableDimension,
   DraggableLocation,
@@ -20,12 +20,7 @@ import type {
 type Args = {|
   scrollDroppable: (id: DroppableId, offset: Position) => void,
   scrollWindow: (offset: Position) => void,
-  move: (
-    id: DraggableId,
-    client: Position,
-    viewport: Viewport,
-    shouldAnimate?: boolean
-  ) => void,
+  move: typeof moveAction,
 |}
 
 export type JumpScroller = (state: DraggingState | BulkCollectionState) => void;
@@ -39,7 +34,7 @@ export default ({
 }: Args): JumpScroller => {
   const moveByOffset = (state: DraggingState | BulkCollectionState, offset: Position) => {
     const client: Position = add(state.current.client.selection, offset);
-    move(state.critical.draggable.id, client, state.window.viewport, true);
+    move({ client, shouldAnimate: true });
   };
 
   const scrollDroppableAsMuchAsItCan = (

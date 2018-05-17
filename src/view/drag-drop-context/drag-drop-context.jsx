@@ -94,14 +94,9 @@ export default class DragDropContext extends React.Component<Props> {
     this.autoScroller = createAutoScroller({
       scrollWindow,
       scrollDroppable: this.dimensionMarshal.scrollDroppable,
-      move: (
-        id: DraggableId,
-        client: Position,
-        viewport: Viewport,
-        shouldAnimate?: boolean
-      ): void => {
-        this.store.dispatch(move(id, client, viewport, shouldAnimate));
-      },
+      ...bindActionCreators({
+        move,
+      }),
     });
   }
   // Need to declare childContextTypes without flow

@@ -80,6 +80,7 @@ export const bulkCollectionStarting = (): BulkCollectionStartingAction => ({
 });
 
 type UpdateDroppableScrollArgs = {
+  id: DroppableId,
   offset: Position,
 }
 

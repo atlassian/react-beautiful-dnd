@@ -3,6 +3,7 @@ import { type Position } from 'css-box-model';
 import createFluidScroller, { type FluidScroller } from './fluid-scroller';
 import createJumpScroller, { type JumpScroller } from './jump-scroller';
 import type { AutoScroller } from './auto-scroller-types';
+import { move as moveAction } from '../action-creators';
 import type {
   DraggableId,
   DroppableId,
@@ -13,12 +14,7 @@ import type {
 type Args = {|
   scrollDroppable: (id: DroppableId, change: Position) => void,
   scrollWindow: (change: Position) => void,
-  move: (
-    id: DraggableId,
-    client: Position,
-    viewport: Viewport,
-    shouldAnimate?: boolean
-  ) => void,
+  move: typeof moveAction,
 |}
 
 export default ({
