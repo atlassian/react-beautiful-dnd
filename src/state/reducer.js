@@ -39,6 +39,7 @@ import type { Result as MoveToNextResult } from './move-to-next-index/move-to-ne
 import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';
 import moveCrossAxis from './move-cross-axis/';
 import { scrollDroppable } from './droppable-dimension';
+import scrollWindowDetails from './scroll-window-details';
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -439,11 +440,9 @@ export default (state: State = idle, action: Action): State => {
 
     invariant(isMovementAllowed(state), `Cannot move by window in phase ${state.phase}`);
 
-    const viewport: Viewport = action.payload.viewport;
+    const newScroll: Position = action.payload.scroll;
 
-    // Nothing to do here!
-    // We could do a more indepth check but I think this is fine
-    if (isEqual(state.window.scroll.current, viewport.scroll)) {
+    if (isEqual(state.window.scroll.current, newScroll)) {
       return state;
     }
 
@@ -452,20 +451,7 @@ export default (state: State = idle, action: Action): State => {
     // If we are jump scrolling - any window scrolls should not update the impact
     const impact: ?DragImpact = isJumpScrolling ? state.impact : null;
 
-    const diff: Position = subtract(viewport.scroll, state.window.scroll.initial);
-    const displacement: Position = negate(diff);
-
-    const windowDetails: WindowDetails = {
-      viewport,
-      scroll: {
-        initial: state.window.scroll.initial,
-        current: viewport.scroll,
-        diff: {
-          value: diff,
-          displacement,
-        },
-      },
-    };
+    const windowDetails: WindowDetails = scrollWindowDetails(state.window, newScroll);
 
     return moveWithPositionUpdates({
       state,

@@ -18,7 +18,7 @@ import {
   updateDroppableScroll,
   type InitialPublishArgs,
   type BulkReplaceArgs,
-  type DropAnimateAction,
+  type DropAnimateAction, moveByWindowScroll,
 } from '../../../../src/state/action-creators';
 import {
   initialPublishArgs,
@@ -471,11 +471,46 @@ describe('drop animation required', () => {
     });
 
     it('should account for any change in scroll in the window', () => {
+      const mock = jest.fn();
+      const store: Store = withPassThrough(middleware, mock);
+
       // getting into a drag
+      store.dispatch(clean());
+      store.dispatch(prepare());
+      store.dispatch(initialPublish(initialPublishArgs));
+      store.dispatch(bulkReplace(initialBulkReplaceArgs));
+      expect(store.getState().phase).toBe('DRAGGING');
 
       // scroll the window
+      store.dispatch(moveByWindowScroll({
+        scroll: add(preset.windowScroll, { x: 1, y: 1 }),
+      }));
 
       // drop
+      mock.mockReset();
+      store.dispatch(drop({ reason: 'DROP' }));
+      expect(mock).toHaveBeenCalledWith(drop({ reason: 'DROP' }));
+      const pending: PendingDrop = {
+        // what we need to do to get back to the origin
+        newHomeOffset: { x: -1, y: -1 },
+        impact: {
+          movement: {
+            displaced: [],
+            amount: patch(axis.line, preset.inHome1.client.marginBox[axis.size]),
+            isBeyondStartPosition: false,
+          },
+          direction: preset.home.axis.direction,
+          destination: getHomeLocation(initialPublishArgs.critical),
+        },
+        result: {
+          ...getDragStart(initialPublishArgs.critical),
+          destination: getHomeLocation(initialPublishArgs.critical),
+          reason: 'DROP',
+        },
+      };
+      expect(mock).toHaveBeenCalledWith(drop({ reason: 'DROP' }));
+      expect(mock).toHaveBeenCalledWith(animateDrop(pending));
+      expect(mock).toHaveBeenCalledTimes(2);
     });
   });
 });

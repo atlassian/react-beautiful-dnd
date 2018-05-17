@@ -128,7 +128,7 @@ export const move = (args: MoveArgs): MoveAction => ({
 });
 
 type MoveByWindowScrollArgs = {|
-  viewport: Viewport,
+  scroll: Position,
 |}
 
 export type MoveByWindowScrollAction = {|
