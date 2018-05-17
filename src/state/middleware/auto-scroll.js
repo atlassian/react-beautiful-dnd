@@ -16,6 +16,8 @@ import type {
 } from '../../types';
 
 export default (store: Store) => {
+  // TODO: an auto scroll action might not be finished before this fires again
+  console.log('creating scroller');
   const scroller: AutoScroller = createAutoScroller({
     ...bindActionCreators({
       scrollDroppable: updateDroppableScroll,

@@ -28,6 +28,7 @@ import type {
   WindowDetails,
   DimensionMap,
   DropReason,
+  Direction,
 } from '../types';
 import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
 import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';
@@ -461,113 +462,69 @@ export default (state: State = idle, action: Action): State => {
 
     invariant(state.phase === 'DRAGGING', `${action.type} received while not in DRAGGING phase`);
 
-    // 1. what droppable are you over?
-    // *. if over no droppable, allow cross axis moves from the home droppable.
-    // * otherwise just ignore the move
-    // 2. what is the axis of the droppable?
-    // 3. is the action a main axis or cross axis move?
-    // 4. is the action forwards or backwards?
+    const { droppable, isMainAxisMovementAllowed } = (() => {
+      // appeasing flow
+      invariant(state.phase === 'DRAGGING');
 
+      if (state.impact.destination) {
+        return {
+          droppable: state.dimensions.droppables[state.impact.destination.droppableId],
+          isMainAxisMovementAllowed: true,
+        };
+      }
+
+      // No destination - this can happen when lifting an a disabled droppable
+      // In this case we want to allow movement out of the list with a keyboard
+      return {
+        droppable: state.dimensions.droppables[state.critical.droppable.id],
+        isMainAxisMovementAllowed: false,
+      };
+    })();
+
+    const direction: Direction = droppable.axis.direction;
+    const isMovingOnMainAxis: boolean =
+      (direction === 'vertical' && (action.type === 'MOVE_UP' || action.type === 'MOVE_DOWN')) ||
+      (direction === 'horizontal' && (action.type === 'MOVE_LEFT' || action.type === 'MOVE_RIGHT'));
+
+    // This movement is not permitted right now
+    if (isMovingOnMainAxis && !isMainAxisMovementAllowed) {
+      return state;
+    }
+
+    const isMovingForward: boolean = action.type === 'MOVE_DOWN' || action.type === 'MOVE_RIGHT';
 
     if (isMovingOnMainAxis) {
+      const result: ?MoveToNextResult = moveToNextIndex({
+        isMovingForward,
+        draggableId: state.critical.draggable.id,
+        droppable,
+        draggables: state.dimensions.draggables,
+        previousPageBorderBoxCenter: state.current.page.borderBoxCenter,
+        previousImpact: state.impact,
+        viewport: state.window.viewport,
+      });
 
-    }
-
-
-
-
-    // It is possible to lift a draggable in a disabled droppable
-    // In which case it will not have a destination
-    if (!state.impact.destination) {
-      return state;
-    }
-
-  }
-
-  if (action.type === 'MOVE_FORWARD' || action.type === 'MOVE_BACKWARD') {
-    if (state.phase === 'BULK_COLLECTING' || state.phase === 'DROP_PENDING') {
-      return state;
-    }
-
-    invariant(state.phase === 'DRAGGING', `${action.type} received while not in DRAGGING phase`);
-
-
-    // Allowing cross axis movement from a disabled droppable
-    if (!state.impact.destination) {
-      const home: DroppableDimension = state.dimensions.droppables[state.critical.droppable.id];
-
-      if (home.axis === vertical) {
-
+      // Cannot move (at the beginning or end of a list)
+      if (!result) {
+        return state;
       }
+      const impact: DragImpact = result.impact;
+      const pageBorderBoxCenter: Position = result.pageBorderBoxCenter;
+      // TODO: not sure if this is correct
+      const clientBorderBoxCenter: Position = subtract(
+        pageBorderBoxCenter, state.window.scroll.current,
+      );
 
-      if (home.axis === horizontal) {
-
-      }
-
-      return state;
+      return moveWithPositionUpdates({
+        state,
+        impact,
+        clientSelection: clientBorderBoxCenter,
+        shouldAnimate: true,
+        scrollJumpRequest: result.scrollJumpRequest,
+      });
     }
 
-
-    // It is possible to lift a draggable in a disabled droppable
-    // In which case it will not have a destination
-    if (!state.impact.destination) {
-      return state;
-    }
-
-    const isOver: DroppableDimension = state.dimensions.droppables[state.impact.destination.droppableId];
-    const direction: Direction = isOver.axis.direction;
-
-    if(direction === 'vertical')
-
-    const isMovingForward: boolean = action.type === 'MOVE_FORWARD';
-
-    const droppable: DroppableDimension = state.dimensions.droppables[
-      state.impact.destination.droppableId
-    ];
-
-    const result: ?MoveToNextResult = moveToNextIndex({
-      isMovingForward,
-      draggableId: state.critical.draggable.id,
-      droppable,
-      draggables: state.dimensions.draggables,
-      previousPageBorderBoxCenter: state.current.page.borderBoxCenter,
-      previousImpact: state.impact,
-      viewport: state.window.viewport,
-    });
-
-    // cannot move anyway (at the beginning or end of a list)
-    if (!result) {
-      return state;
-    }
-
-    const impact: DragImpact = result.impact;
-    const pageBorderBoxCenter: Position = result.pageBorderBoxCenter;
-    // TODO: not sure if this is correct
-    const clientBorderBoxCenter: Position = subtract(
-      pageBorderBoxCenter, state.window.scroll.current,
-    );
-
-    return moveWithPositionUpdates({
-      state,
-      impact,
-      clientSelection: clientBorderBoxCenter,
-      shouldAnimate: true,
-      scrollJumpRequest: result.scrollJumpRequest,
-    });
-  }
-
-  if (action.type === 'CROSS_AXIS_MOVE_FORWARD' || action.type === 'CROSS_AXIS_MOVE_BACKWARD') {
-    if (state.phase === 'BULK_COLLECTING' || state.phase === 'DROP_PENDING') {
-      return state;
-    }
-
-    invariant(state.phase === 'DRAGGING', `${action.type} received while not in DRAGGING phase`);
-
-    // It is possible to lift a draggable in a disabled droppable
-    // In which case it will not have a destination
-    if (!state.impact.destination) {
-      return state;
-    }
+    // moving on cross axis
 
     const home: DraggableLocation = {
       index: state.critical.draggable.index,
@@ -575,10 +532,10 @@ export default (state: State = idle, action: Action): State => {
     };
 
     const result: ?MoveCrossAxisResult = moveCrossAxis({
-      isMovingForward: action.type === 'CROSS_AXIS_MOVE_FORWARD',
+      isMovingForward,
       pageBorderBoxCenter: state.current.page.borderBoxCenter,
       draggableId: state.critical.draggable.id,
-      droppableId: state.impact.destination.droppableId,
+      droppableId: droppable.descriptor.id,
       home,
       draggables: state.dimensions.draggables,
       droppables: state.dimensions.droppables,
@@ -590,12 +547,14 @@ export default (state: State = idle, action: Action): State => {
       return state;
     }
 
-    const page: Position = result.pageBorderBoxCenter;
-    const client: Position = subtract(page, state.window.viewport.scroll);
+    const clientSelection: Position = subtract(
+      result.pageBorderBoxCenter,
+      state.window.viewport.scroll
+    );
 
     return moveWithPositionUpdates({
       state,
-      clientSelection: client,
+      clientSelection,
       impact: result.impact,
       shouldAnimate: true,
     });
