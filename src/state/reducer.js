@@ -1,45 +1,36 @@
 // @flow
+import type { Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import { type Position } from 'css-box-model';
+import { scrollDroppable } from './droppable-dimension';
+import getDragImpact from './get-drag-impact/';
+import moveCrossAxis from './move-cross-axis/';
+import moveToNextIndex from './move-to-next-index/';
+import { noMovement } from './no-impact';
+import { add, isEqual, subtract } from './position';
+import scrollWindowDetails from './scroll-window-details';
 import type {
   Action,
   State,
   DraggableDimension,
   DroppableDimension,
-  DroppableId,
-  DraggableId,
-  DraggableDescriptor,
-  DraggableDimensionMap,
-  DroppableDimensionMap,
-  DropReason,
   DraggableLocation,
-  LiftRequest,
   PendingDrop,
-  Viewport,
   IdleState,
   PreparingState,
+  DraggingState,
   Critical,
   ItemPositions,
   DragPositions,
-  InitialCollectionState,
-  DraggingState,
   BulkCollectionState,
   DropAnimatingState,
   DropPendingState,
-  DropCompleteState,
   DragImpact,
   WindowDetails,
   DimensionMap,
+  DropReason,
 } from '../types';
-import { add, subtract, isEqual, negate } from './position';
-import noImpact, { noMovement } from './no-impact';
-import getDragImpact from './get-drag-impact/';
-import moveToNextIndex from './move-to-next-index/';
 import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
 import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';
-import moveCrossAxis from './move-cross-axis/';
-import { scrollDroppable } from './droppable-dimension';
-import scrollWindowDetails from './scroll-window-details';
 
 const origin: Position = { x: 0, y: 0 };
 
