@@ -94,7 +94,7 @@ export default ({ getState, dispatch }: Store) =>
         return origin;
       }
 
-      const newBorderBoxCenter: Position = getNewHomeClientBorderBoxCenter({
+      const newBorderBoxClientCenter: Position = getNewHomeClientBorderBoxCenter({
         movement: impact.movement,
         draggable,
         draggables: dimensions.draggables,
@@ -102,11 +102,14 @@ export default ({ getState, dispatch }: Store) =>
       });
 
       // What would the offset be from our original center?
-      return subtract(newBorderBoxCenter, draggable.client.borderBox.center);
+      return subtract(newBorderBoxClientCenter, draggable.client.borderBox.center);
     })();
 
     const newHomeOffset: Position = add(
       clientOffset,
+      // If cancelling: consider the home droppable
+      // If dropping over nothing: consider the home droppable
+      // If dropping over a droppable: consider the scroll of the droppable you are over
       getScrollDisplacement(droppable || home, state.window)
     );
 

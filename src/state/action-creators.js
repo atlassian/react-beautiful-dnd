@@ -112,6 +112,7 @@ export const updateDroppableIsEnabled =
   });
 
 export type MoveArgs = {|
+  // TODO: clientSelection
   client: Position,
   shouldAnimate: boolean,
 |}

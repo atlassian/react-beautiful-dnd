@@ -1,9 +1,10 @@
 // @flow
+import type { Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import middleware from '../../../../src/state/middleware/drop';
 import createStore from './util/create-store';
 import { add, patch } from '../../../../src/state/position';
-import { getPreset, makeScrollable } from '../../../utils/dimension';
+import { getPreset, makeScrollable, getInitialImpact } from '../../../utils/dimension';
 import {
   clean,
   drop,
@@ -293,7 +294,6 @@ describe('drop animation required', () => {
       const store: Store = withPassThrough(middleware, mock);
 
       const scrollableForeign: DroppableDimension = makeScrollable(preset.foreign);
-
       const customReplace: BulkReplaceArgs = {
         ...initialBulkReplaceArgs,
         dimensions: {
@@ -343,49 +343,139 @@ describe('drop animation required', () => {
 
   describe('reason: DROP', () => {
     it('should account for any change in scroll in the home droppable if not dragging over anything', () => {
+      const mock = jest.fn();
+      const store: Store = withPassThrough(middleware, mock);
 
+      const scrollableHome: DroppableDimension = makeScrollable(preset.home);
+      const customArgs: InitialPublishArgs = {
+        ...initialPublishArgs,
+        dimensions: {
+          ...initialPublishArgs.dimensions,
+          droppables: {
+            [scrollableHome.descriptor.id]: scrollableHome,
+          },
+        },
+      };
+
+      // getting into a drag
+      store.dispatch(prepare());
+      store.dispatch(initialPublish(customArgs));
+      store.dispatch(bulkReplace(initialBulkReplaceArgs));
+      expect(store.getState().phase).toBe('DRAGGING');
+
+      // move after the end of the home droppable
+      store.dispatch(move({
+        client: {
+          x: preset.home.client.marginBox.center.x,
+          y: preset.home.client.marginBox.bottom + 1,
+        },
+        shouldAnimate: false,
+      }));
+
+      // assert we are not over the home droppable
+      const state: State = store.getState();
+      invariant(state.phase === 'DRAGGING');
+      invariant(!state.impact.destination, 'Should have no destination');
+
+      // scroll the home droppable
+      store.dispatch(updateDroppableScroll({
+        id: customArgs.critical.droppable.id,
+        offset: { x: 1, y: 1 },
+      }));
+
+      // drop
+      mock.mockReset();
+      store.dispatch(drop({ reason: 'DROP' }));
+      const pending: PendingDrop = {
+        // what we need to do to get back to the origin
+        newHomeOffset: { x: -1, y: -1 },
+        impact: {
+          movement: noMovement,
+          direction: null,
+          destination: null,
+        },
+        result: {
+          ...getDragStart(customArgs.critical),
+          destination: null,
+          reason: 'DROP',
+        },
+      };
+      expect(mock).toHaveBeenCalledWith(drop({ reason: 'DROP' }));
+      expect(mock).toHaveBeenCalledWith(animateDrop(pending));
+      expect(mock).toHaveBeenCalledTimes(2);
     });
 
+    // Could also add a test to check this is true for foreign droppables - but it has proven
+    // very difficult to setup that test correctly
     it('should account for any change in scroll in the droppable being dropped into', () => {
+      const mock = jest.fn();
+      const store: Store = withPassThrough(middleware, mock);
 
+      const scrollableHome: DroppableDimension = makeScrollable(preset.home);
+      const customArgs: InitialPublishArgs = {
+        ...initialPublishArgs,
+        dimensions: {
+          ...initialPublishArgs.dimensions,
+          droppables: {
+            [scrollableHome.descriptor.id]: scrollableHome,
+          },
+        },
+      };
+
+      // getting into a drag
+      store.dispatch(prepare());
+      store.dispatch(initialPublish(customArgs));
+      store.dispatch(bulkReplace(initialBulkReplaceArgs));
+      expect(store.getState().phase).toBe('DRAGGING');
+
+      // moving to the top of the foreign droppable
+      store.dispatch(move({
+        client: { x: 1, y: 1 },
+        shouldAnimate: false,
+      }));
+      const state: State = store.getState();
+      invariant(state.phase === 'DRAGGING', 'Invalid phase');
+      invariant(state.impact.destination, 'Expected to be over home droppable');
+      expect(state.impact.destination.droppableId).toBe(scrollableHome.descriptor.id);
+
+      // scroll the foreign droppable
+      store.dispatch(updateDroppableScroll({
+        id: scrollableHome.descriptor.id,
+        offset: { x: 1, y: 1 },
+      }));
+
+      // drop
+      mock.mockReset();
+      store.dispatch(drop({ reason: 'DROP' }));
+      const pending: PendingDrop = {
+        // what we need to do to get back to the origin
+        newHomeOffset: { x: -1, y: -1 },
+        impact: {
+          movement: {
+            displaced: [],
+            amount: patch(axis.line, preset.inHome1.client.marginBox[axis.size]),
+            isBeyondStartPosition: false,
+          },
+          direction: preset.home.axis.direction,
+          destination: getHomeLocation(customArgs.critical),
+        },
+        result: {
+          ...getDragStart(customArgs.critical),
+          destination: getHomeLocation(customArgs.critical),
+          reason: 'DROP',
+        },
+      };
+      expect(mock).toHaveBeenCalledWith(drop({ reason: 'DROP' }));
+      expect(mock).toHaveBeenCalledWith(animateDrop(pending));
+      expect(mock).toHaveBeenCalledTimes(2);
     });
 
     it('should account for any change in scroll in the window', () => {
+      // getting into a drag
 
+      // scroll the window
+
+      // drop
     });
   });
-});
-
-it.skip('should fire a animate drop action is a drop is required', () => {
-  const mock = jest.fn();
-  const passThrough = () => next => (action) => {
-    mock(action);
-    next(action);
-  };
-  const store: Store = createStore(
-    passThrough,
-    middleware,
-  );
-
-  store.dispatch(clean());
-  store.dispatch(prepare());
-  store.dispatch(initialPublish(initialPublishArgs));
-  store.dispatch(bulkReplace(initialBulkReplaceArgs));
-  expect(store.getState().phase).toBe('DRAGGING');
-
-  // moving a little bit so that a drop animation will be needed
-  store.dispatch(move({
-    client: add(initialPublishArgs.client.selection, { x: 1, y: 1 }),
-    shouldAnimate: true,
-  }));
-
-  mock.mockReset();
-  store.dispatch(drop({ reason }));
-
-  expect(mock).toHaveBeenCalledWith(drop({ reason }));
-  // not testing the home offset and so on as a part of this test
-  expect(mock.mock.calls[1][0].type).toBe('DROP_ANIMATE');
-  expect(mock).toHaveBeenCalledTimes(2);
-
-  expect(store.getState().phase).toBe('DROP_ANIMATING');
 });
