@@ -5,7 +5,6 @@ import type {
   DraggableId,
   DroppableId,
   DraggableDimension,
-  Direction,
   ZIndex,
   State,
 } from '../../types';
@@ -13,10 +12,10 @@ import {
   lift,
   move,
   moveByWindowScroll,
-  moveForward,
-  moveBackward,
-  crossAxisMoveForward,
-  crossAxisMoveBackward,
+  moveUp,
+  moveDown,
+  moveRight,
+  moveLeft,
   drop,
   dropAnimationFinished,
 } from '../../state/action-creators';
@@ -117,10 +116,10 @@ export type DispatchProps = {|
   lift: typeof lift,
   move: typeof move,
   moveByWindowScroll: typeof moveByWindowScroll,
-  moveForward: typeof moveForward,
-  moveBackward: typeof moveBackward,
-  crossAxisMoveForward: typeof crossAxisMoveForward,
-  crossAxisMoveBackward: typeof crossAxisMoveBackward,
+  moveUp: typeof moveUp,
+  moveDown: typeof moveDown,
+  moveRight: typeof moveRight,
+  moveLeft: typeof moveLeft,
   drop: typeof drop,
   dropAnimationFinished: typeof dropAnimationFinished,
 |}
@@ -136,8 +135,6 @@ export type MapProps = {|
   isDropAnimating: boolean,
   offset: Position,
   // only provided when dragging
-  // can be null if not over a droppable
-  direction: ?Direction,
   dimension: ?DraggableDimension,
   draggingOver: ?DroppableId,
 |}

@@ -24,7 +24,6 @@ import type {
   DroppableId,
   DragMovement,
   DraggableDimension,
-  Direction,
   Displacement,
   PendingDrop,
 } from '../../types';
@@ -48,7 +47,6 @@ const defaultMapProps: MapProps = {
   shouldAnimateDisplacement: true,
   // these properties are only populated when the item is dragging
   dimension: null,
-  direction: null,
   draggingOver: null,
 };
 
@@ -70,7 +68,6 @@ export const makeMapStateToProps = (): Selector => {
       // not relevant
       shouldAnimateDragMovement: false,
       dimension: null,
-      direction: null,
       draggingOver: null,
     }),
   );
@@ -79,8 +76,6 @@ export const makeMapStateToProps = (): Selector => {
     offset: Position,
     shouldAnimateDragMovement: boolean,
     dimension: DraggableDimension,
-    // direction of the droppable you are over
-    direction: ?Direction,
     // the id of the droppable you are over
     draggingOver: ?DroppableId,
   ): MapProps => ({
@@ -90,7 +85,6 @@ export const makeMapStateToProps = (): Selector => {
     offset,
     shouldAnimateDragMovement,
     dimension,
-    direction,
     draggingOver,
   }));
 
@@ -132,7 +126,6 @@ export const makeMapStateToProps = (): Selector => {
 
       const offset: Position = state.current.client.offset;
       const dimension: DraggableDimension = state.dimensions.draggables[ownProps.draggableId];
-      const direction: ?Direction = state.impact.direction;
       const shouldAnimateDragMovement: boolean = state.shouldAnimate;
       const draggingOver: ?DroppableId = state.impact.destination ?
         state.impact.destination.droppableId :
@@ -142,7 +135,6 @@ export const makeMapStateToProps = (): Selector => {
         memoizedOffset(offset.x, offset.y),
         shouldAnimateDragMovement,
         dimension,
-        direction,
         draggingOver,
       );
     }
@@ -156,8 +148,6 @@ export const makeMapStateToProps = (): Selector => {
 
       const draggingOver: ?DroppableId = pending.result.destination ?
         pending.result.destination.droppableId : null;
-      const direction: ?Direction = pending.impact.direction ?
-        pending.impact.direction : null;
 
       // not memoized as it is the only execution
       return {
@@ -167,7 +157,6 @@ export const makeMapStateToProps = (): Selector => {
         // still need to provide the dimension for the placeholder
         dimension: state.dimensions.draggables[ownProps.draggableId],
         draggingOver,
-        direction,
         // animation will be controlled by the isDropAnimating flag
         shouldAnimateDragMovement: false,
         // not relevant,

@@ -62,10 +62,10 @@ export default class Draggable extends Component<Props> {
       onMove: this.onMove,
       onDrop: this.onDrop,
       onCancel: this.onCancel,
-      onMoveBackward: this.onMoveBackward,
-      onMoveForward: this.onMoveForward,
-      onCrossAxisMoveForward: this.onCrossAxisMoveForward,
-      onCrossAxisMoveBackward: this.onCrossAxisMoveBackward,
+      onMoveUp: this.onMoveUp,
+      onMoveDown: this.onMoveDown,
+      onMoveRight: this.onMoveRight,
+      onMoveLeft: this.onMoveLeft,
       onWindowScroll: this.onWindowScroll,
     };
 
@@ -141,24 +141,24 @@ export default class Draggable extends Component<Props> {
     move({ client: clientSelection, shouldAnimate: false });
   }
 
-  onMoveForward = () => {
+  onMoveUp = () => {
     this.throwIfCannotDrag();
-    this.props.moveForward();
+    this.props.moveUp();
   }
 
-  onMoveBackward = () => {
+  onMoveDown = () => {
     this.throwIfCannotDrag();
-    this.props.moveBackward();
+    this.props.moveDown();
   }
 
-  onCrossAxisMoveForward = () => {
+  onMoveRight = () => {
     this.throwIfCannotDrag();
-    this.props.crossAxisMoveForward();
+    this.props.moveRight();
   }
 
-  onCrossAxisMoveBackward = () => {
+  onMoveLeft = () => {
     this.throwIfCannotDrag();
-    this.props.crossAxisMoveBackward();
+    this.props.moveLeft();
   }
 
   onWindowScroll = () => {
@@ -356,7 +356,6 @@ export default class Draggable extends Component<Props> {
       isDragging,
       isDropAnimating,
       isDragDisabled,
-      direction,
       shouldAnimateDragMovement,
       disableInteractiveElementBlocking,
     } = this.props;
@@ -386,7 +385,6 @@ export default class Draggable extends Component<Props> {
               draggableId={draggableId}
               isDragging={isDragging}
               isDropAnimating={isDropAnimating}
-              direction={direction}
               isEnabled={!isDragDisabled}
               callbacks={this.callbacks}
               getDraggableRef={this.getDraggableRef}

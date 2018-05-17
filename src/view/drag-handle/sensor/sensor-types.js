@@ -27,7 +27,7 @@ export type MouseSensor = {|
 
 export type KeyboardSensor = {|
   ...SensorBase,
-  onKeyDown: (event: KeyboardEvent, props: Props) => void,
+  onKeyDown: (event: KeyboardEvent) => void,
 |}
 
 export type TouchSensor = {|

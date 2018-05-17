@@ -209,7 +209,7 @@ export default class DragHandle extends Component<Props> {
       return;
     }
 
-    this.keyboardSensor.onKeyDown(event, this.props);
+    this.keyboardSensor.onKeyDown(event);
   }
 
   onMouseDown = (event: MouseEvent) => {

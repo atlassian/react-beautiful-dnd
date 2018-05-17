@@ -141,43 +141,43 @@ export const moveByWindowScroll = (args: MoveByWindowScrollArgs): MoveByWindowSc
   payload: args,
 });
 
-export type MoveBackwardAction = {|
-  type: 'MOVE_BACKWARD',
+export type MoveUpAction = {|
+  type: 'MOVE_UP',
   payload: null
 |}
 
-export const moveBackward = (): MoveBackwardAction => ({
-  type: 'MOVE_BACKWARD',
+export const moveUp = (): MoveUpAction => ({
+  type: 'MOVE_UP',
   payload: null,
 });
 
-export type MoveForwardAction = {|
-  type: 'MOVE_FORWARD',
+export type MoveDownAction = {|
+  type: 'MOVE_DOWN',
   payload: null
 |}
 
-export const moveForward = (): MoveForwardAction => ({
-  type: 'MOVE_FORWARD',
+export const moveDown = (): MoveDownAction => ({
+  type: 'MOVE_DOWN',
   payload: null,
 });
 
-export type CrossAxisMoveForwardAction = {|
-  type: 'CROSS_AXIS_MOVE_FORWARD',
+export type MoveRightAction = {|
+  type: 'MOVE_RIGHT',
   payload: null
 |}
 
-export const crossAxisMoveForward = (): CrossAxisMoveForwardAction => ({
-  type: 'CROSS_AXIS_MOVE_FORWARD',
+export const moveRight = (): MoveRightAction => ({
+  type: 'MOVE_RIGHT',
   payload: null,
 });
 
-export type CrossAxisMoveBackwardAction = {|
-  type: 'CROSS_AXIS_MOVE_BACKWARD',
+export type MoveLeftAction = {|
+  type: 'MOVE_LEFT',
   payload: null
 |}
 
-export const crossAxisMoveBackward = (): CrossAxisMoveBackwardAction => ({
-  type: 'CROSS_AXIS_MOVE_BACKWARD',
+export const moveLeft = (): MoveLeftAction => ({
+  type: 'MOVE_LEFT',
   payload: null,
 });
 
@@ -264,10 +264,10 @@ export type Action =
   UpdateDroppableIsEnabledAction |
   MoveByWindowScrollAction |
   MoveAction |
-  MoveBackwardAction |
-  MoveForwardAction |
-  CrossAxisMoveForwardAction |
-  CrossAxisMoveBackwardAction |
+  MoveUpAction |
+  MoveDownAction |
+  MoveRightAction |
+  MoveLeftAction |
   DropPendingAction |
   DropAction |
   DropAnimateAction |

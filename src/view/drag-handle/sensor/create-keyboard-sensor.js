@@ -9,15 +9,9 @@ import { bindEvents, unbindEvents } from '../util/bind-events';
 import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
 import type { EventBinding } from '../util/event-types';
 import type { KeyboardSensor, CreateSensorArgs } from './sensor-types';
-import type { Props } from '../drag-handle-types';
 
 type State = {|
   isDragging: boolean,
-|}
-
-type ExecuteBasedOnDirection = {|
-  vertical: Function,
-  horizontal: Function,
 |}
 
 type KeyMap = {
@@ -65,9 +59,7 @@ export default ({
   const isDragging = (): boolean => state.isDragging;
   const schedule = createScheduler(callbacks);
 
-  const onKeyDown = (event: KeyboardEvent, props: Props) => {
-    const { direction } = props;
-
+  const onKeyDown = (event: KeyboardEvent) => {
     // not yet dragging
     if (!isDragging()) {
       // We may already be lifting on a child draggable.
@@ -122,57 +114,28 @@ export default ({
 
     // Movement
 
-    // already dragging
-    if (!direction) {
-      console.error('Cannot handle keyboard movement event if direction is not provided');
-      // calling prevent default here as the action resulted in the drop
-      // this one is border line
-      event.preventDefault();
-      cancel();
-      return;
-    }
-
-    const executeBasedOnDirection = (fns: ExecuteBasedOnDirection) => {
-      if (direction === 'vertical') {
-        fns.vertical();
-        return;
-      }
-      fns.horizontal();
-    };
-
     if (event.keyCode === keyCodes.arrowDown) {
       event.preventDefault();
-      executeBasedOnDirection({
-        vertical: schedule.moveForward,
-        horizontal: schedule.crossAxisMoveForward,
-      });
+      schedule.moveDown();
       return;
     }
 
     if (event.keyCode === keyCodes.arrowUp) {
       event.preventDefault();
-      executeBasedOnDirection({
-        vertical: schedule.moveBackward,
-        horizontal: schedule.crossAxisMoveBackward,
-      });
+      schedule.moveUp();
       return;
     }
 
     if (event.keyCode === keyCodes.arrowRight) {
       event.preventDefault();
-      executeBasedOnDirection({
-        vertical: schedule.crossAxisMoveForward,
-        horizontal: schedule.moveForward,
-      });
+      schedule.moveRight();
       return;
     }
 
     if (event.keyCode === keyCodes.arrowLeft) {
       event.preventDefault();
-      executeBasedOnDirection({
-        vertical: schedule.crossAxisMoveBackward,
-        horizontal: schedule.moveBackward,
-      });
+      schedule.moveLeft();
+      return;
     }
 
     // preventing scroll jumping at this time

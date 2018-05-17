@@ -459,7 +459,12 @@ export default (state: State = idle, action: Action): State => {
     }
 
     invariant(state.phase === 'DRAGGING', `${action.type} received while not in DRAGGING phase`);
-    invariant(state.impact.destination, `Cannot ${action.type} if there is no previous destination`);
+
+    // It is possible to lift a draggable in a disabled droppable
+    // In which case it will not have a destination
+    if (!state.impact.destination) {
+      return state;
+    }
 
     const isMovingForward: boolean = action.type === 'MOVE_FORWARD';
 
@@ -504,7 +509,12 @@ export default (state: State = idle, action: Action): State => {
     }
 
     invariant(state.phase === 'DRAGGING', `${action.type} received while not in DRAGGING phase`);
-    invariant(state.impact.destination, `Cannot ${action.type} if there is no previous destination`);
+
+    // It is possible to lift a draggable in a disabled droppable
+    // In which case it will not have a destination
+    if (!state.impact.destination) {
+      return state;
+    }
 
     const home: DraggableLocation = {
       index: state.critical.draggable.index,
