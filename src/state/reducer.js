@@ -532,9 +532,9 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     const existing: DragState = state.drag;
     const isMovingForward: boolean = action.type === 'MOVE_FORWARD';
 
+    // This is possible to do when lifting in a disabled list
     if (!existing.impact.destination) {
-      console.error('cannot move if there is no previous destination');
-      return clean();
+      return state;
     }
 
     const droppable: DroppableDimension = state.dimension.droppable[
@@ -577,21 +577,26 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
-    if (!state.drag) {
+    const drag: ?DragState = state.drag;
+    if (!drag) {
       console.error('cannot move cross axis if there is no drag information');
       return clean();
     }
 
-    if (!state.drag.impact.destination) {
-      console.error('cannot move cross axis if not in a droppable');
-      return clean();
-    }
+    // It is possible to lift a draggable in a disabled droppable
+    // In which case - use the home droppable id
+    const droppableId: DroppableId = (() => {
+      if (drag.impact.destination) {
+        return drag.impact.destination.droppableId;
+      }
 
-    const current: CurrentDrag = state.drag.current;
-    const descriptor: DraggableDescriptor = state.drag.initial.descriptor;
+      return drag.initial.descriptor.droppableId;
+    })();
+
+    const current: CurrentDrag = drag.current;
+    const descriptor: DraggableDescriptor = drag.initial.descriptor;
     const draggableId: DraggableId = descriptor.id;
     const pageBorderBoxCenter: Position = current.page.borderBoxCenter;
-    const droppableId: DroppableId = state.drag.impact.destination.droppableId;
     const home: DraggableLocation = {
       index: descriptor.index,
       droppableId: descriptor.droppableId,
@@ -605,7 +610,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       home,
       draggables: state.dimension.draggable,
       droppables: state.dimension.droppable,
-      previousImpact: state.drag.impact,
+      previousImpact: drag.impact,
       viewport: current.viewport,
     });
 

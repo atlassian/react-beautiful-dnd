@@ -48,7 +48,7 @@
     "css-box-model": "^0.0.13",
     "memoize-one": "^3.1.1",
     "prop-types": "^15.6.0",
-    "raf-schd": "^2.1.1",
+    "raf-schd": "^2.1.2",
     "react-motion": "^0.5.2",
     "react-redux": "^5.0.7",
     "redux": "^4.0.0",
