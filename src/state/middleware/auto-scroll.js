@@ -15,18 +15,20 @@ import type {
   Action,
 } from '../../types';
 
-export default (store: Store) => {
+// TODO: this is broken - good times
+export default (store: Store) => (next: (Action) => mixed) => {
   // TODO: an auto scroll action might not be finished before this fires again
   console.log('creating scroller');
   const scroller: AutoScroller = createAutoScroller({
     ...bindActionCreators({
       scrollDroppable: updateDroppableScroll,
       move,
-    }, store.dispatch),
+    // TODO: using next to avoid recursive calls to auto scrolling..
+    }, next),
     scrollWindow,
   });
 
-  return (next: (Action) => mixed) => (action: Action): mixed => {
+  return (action: Action): mixed => {
     // Need to cancel any pending auto scrolling when drag is ending
     if (isDragEnding(action)) {
       scroller.cancel();
