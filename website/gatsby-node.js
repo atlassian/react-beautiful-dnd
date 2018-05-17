@@ -81,7 +81,7 @@ type PageParams = {
 const addMD = ({ getNode, node, createNodeField }) => {
   const fileNode = getNode(node.parent);
   const parsedFilePath = path.parse(fileNode.relativePath);
-  let slug = '/documentation';
+  let slug = '';
   let title = '';
   if (parsedFilePath.dir) {
     slug += `/${parsedFilePath.dir.toLowerCase()}`;

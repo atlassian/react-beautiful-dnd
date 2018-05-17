@@ -33,6 +33,9 @@ const DropZone = styled.div`
 
   /* stop the list collapsing when empty */
   min-width: 600px;
+
+  /* stop the list collapsing when it has no items */
+  min-height: 60px;
 `;
 
 const ScrollContainer = styled.div`
