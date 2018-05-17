@@ -26,9 +26,11 @@ import type {
   DroppableId,
   DragMovement,
   DraggableDimension,
+  DroppableDimension,
   Direction,
   Displacement,
   PendingDrop,
+  DragState,
 } from '../../types';
 import type {
   MapProps,
@@ -100,23 +102,31 @@ export const makeSelector = (): Selector => {
     }
 
     if (state.phase === 'DRAGGING') {
-      if (!state.drag) {
+      const drag: ?DragState = state.drag;
+      if (!drag) {
         console.error('invalid drag state found in selector');
         return null;
       }
 
       // not the dragging item
-      if (state.drag.initial.descriptor.id !== ownProps.draggableId) {
+      if (drag.initial.descriptor.id !== ownProps.draggableId) {
         return null;
       }
 
-      const offset: Position = state.drag.current.client.offset;
+      const offset: Position = drag.current.client.offset;
       const dimension: DraggableDimension = state.dimension.draggable[ownProps.draggableId];
-      const direction: ?Direction = state.drag.impact.direction;
-      const shouldAnimateDragMovement: boolean = state.drag.current.shouldAnimate;
-      const draggingOver: ?DroppableId = state.drag.impact.destination ?
-        state.drag.impact.destination.droppableId :
-        null;
+      const direction: Direction = (() => {
+        if (drag.impact.direction) {
+          return drag.impact.direction;
+        }
+
+        const home: DroppableDimension =
+          state.dimension.droppable[drag.initial.descriptor.droppableId];
+        return home.axis.direction;
+      })();
+      const shouldAnimateDragMovement: boolean = drag.current.shouldAnimate;
+      const draggingOver: ?DroppableId = drag.impact.destination ?
+        drag.impact.destination.droppableId : null;
 
       return getDraggingProps(
         memoizedOffset(offset.x, offset.y),

@@ -106,7 +106,8 @@ describe('Connected Draggable', () => {
           shouldAnimateDragMovement: false,
           shouldAnimateDisplacement: false,
           dimension: preset.inHome1,
-          direction: null,
+          // uses the home direction by default
+          direction: preset.home.axis.direction,
           draggingOver: null,
         });
       });
