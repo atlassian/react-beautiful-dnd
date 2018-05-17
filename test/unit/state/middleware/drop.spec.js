@@ -2,7 +2,8 @@
 import invariant from 'tiny-invariant';
 import middleware from '../../../../src/state/middleware/drop';
 import createStore from './util/create-store';
-import { add } from '../../../../src/state/position';
+import { add, patch } from '../../../../src/state/position';
+import { getPreset, makeScrollable } from '../../../utils/dimension';
 import {
   clean,
   drop,
@@ -13,13 +14,19 @@ import {
   dropPending,
   move,
   completeDrop,
+  updateDroppableScroll,
+  type InitialPublishArgs,
+  type BulkReplaceArgs,
+  type DropAnimateAction,
 } from '../../../../src/state/action-creators';
 import {
   initialPublishArgs,
   initialBulkReplaceArgs,
   getDragStart,
+  getHomeLocation,
 } from './util/preset-action-args';
-import noImpact from '../../../../src/state/no-impact';
+import noImpact, { noMovement } from '../../../../src/state/no-impact';
+import { vertical } from '../../../../src/state/axis';
 import type {
   Store,
   State,
@@ -27,7 +34,12 @@ import type {
   PendingDrop,
   DraggableLocation,
   DropReason,
+  DroppableDimension,
+  Axis,
 } from '../../../../src/types';
+
+const axis: Axis = vertical;
+const preset = getPreset(vertical);
 
 it('should throw an error if a drop action occurs while not in a phase where you can drop', () => {
   const store: Store = createStore(middleware);
@@ -177,17 +189,22 @@ describe('no drop animation required', () => {
 });
 
 describe('drop animation required', () => {
+  const withPassThrough = (myMiddleware: mixed, mock: Function): Store => {
+    const passThrough = () => next => (action) => {
+      mock(action);
+      next(action);
+    };
+    const store: Store = createStore(
+      passThrough,
+      myMiddleware,
+    );
+    return store;
+  };
+
   describe('reason: CANCEL', () => {
-    it.only('should animate back to the origin', () => {
+    it('should animate back to the origin', () => {
       const mock = jest.fn();
-      const passThrough = () => next => (action) => {
-        mock(action);
-        next(action);
-      };
-      const store: Store = createStore(
-        passThrough,
-        middleware,
-      );
+      const store: Store = withPassThrough(middleware, mock);
 
       store.dispatch(clean());
       store.dispatch(prepare());
@@ -221,11 +238,106 @@ describe('drop animation required', () => {
     });
 
     it('should account for any change in scroll in the home droppable', () => {
+      const mock = jest.fn();
+      const store: Store = withPassThrough(middleware, mock);
 
+      const scrollableHome: DroppableDimension = makeScrollable(preset.home);
+
+      const customArgs: InitialPublishArgs = {
+        ...initialPublishArgs,
+        dimensions: {
+          ...initialPublishArgs.dimensions,
+          droppables: {
+            [scrollableHome.descriptor.id]: scrollableHome,
+          },
+        },
+      };
+
+      // getting into a drag
+      store.dispatch(clean());
+      store.dispatch(prepare());
+      store.dispatch(initialPublish(customArgs));
+      store.dispatch(bulkReplace(initialBulkReplaceArgs));
+      expect(store.getState().phase).toBe('DRAGGING');
+
+      // doing a small scroll
+      store.dispatch(updateDroppableScroll({
+        id: customArgs.critical.droppable.id,
+        offset: { x: 1, y: 1 },
+      }));
+
+      // dropping
+      mock.mockReset();
+      store.dispatch(drop({ reason: 'CANCEL' }));
+      const pending: PendingDrop = {
+        // what we need to do to get back to the origin
+        newHomeOffset: { x: -1, y: -1 },
+        impact: {
+          movement: noMovement,
+          direction: null,
+          destination: null,
+        },
+        result: {
+          ...getDragStart(customArgs.critical),
+          destination: null,
+          reason: 'CANCEL',
+        },
+      };
+      expect(mock).toHaveBeenCalledWith(drop({ reason: 'CANCEL' }));
+      expect(mock).toHaveBeenCalledWith(animateDrop(pending));
+      expect(mock).toHaveBeenCalledTimes(2);
     });
 
-    it('should account home droppable scroll changes even if over another scrolled droppable', () => {
+    it('should not account for scrolling in the droppable the draggable is over if it is not the home', () => {
+      const mock = jest.fn();
+      const store: Store = withPassThrough(middleware, mock);
 
+      const scrollableForeign: DroppableDimension = makeScrollable(preset.foreign);
+
+      const customReplace: BulkReplaceArgs = {
+        ...initialBulkReplaceArgs,
+        dimensions: {
+          ...initialBulkReplaceArgs.dimensions,
+          droppables: {
+            ...initialBulkReplaceArgs.dimensions.droppables,
+            [scrollableForeign.descriptor.id]: scrollableForeign,
+          },
+        },
+      };
+
+      // getting into a drag
+      store.dispatch(clean());
+      store.dispatch(prepare());
+      store.dispatch(initialPublish(initialPublishArgs));
+      store.dispatch(bulkReplace(customReplace));
+      expect(store.getState().phase).toBe('DRAGGING');
+
+      // moving over the foreign droppable
+      store.dispatch(move({
+        client: scrollableForeign.client.borderBox.center,
+        shouldAnimate: false,
+      }));
+      const state: State = store.getState();
+      invariant(state.phase === 'DRAGGING', 'Invalid phase');
+      invariant(state.impact.destination, 'Expected to be over foreign droppable');
+      expect(state.impact.destination.droppableId).toBe(scrollableForeign.descriptor.id);
+
+      // doing a small scroll on foreign
+      store.dispatch(updateDroppableScroll({
+        id: scrollableForeign.descriptor.id,
+        offset: { x: 1, y: 1 },
+      }));
+
+      // dropping
+      mock.mockReset();
+      store.dispatch(drop({ reason: 'CANCEL' }));
+      expect(mock).toHaveBeenCalledWith(drop({ reason: 'CANCEL' }));
+      // Just checking the offset rather than the whole shape
+      // Expecting return to origin as the scroll has not changed
+      const action: DropAnimateAction = (mock.mock.calls[1][0] : any);
+      expect(action.type).toEqual('DROP_ANIMATE');
+      expect(action.payload.newHomeOffset).toEqual({ x: 0, y: 0 });
+      expect(mock).toHaveBeenCalledTimes(2);
     });
   });
 

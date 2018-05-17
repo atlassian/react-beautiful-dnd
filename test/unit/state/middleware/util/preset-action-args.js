@@ -5,6 +5,7 @@ import type {
   Critical,
   DragStart,
   Viewport,
+  DraggableLocation,
 } from '../../../../../src/types';
 import type {
   InitialPublishArgs,
@@ -40,11 +41,13 @@ export const initialBulkReplaceArgs: BulkReplaceArgs = {
   critical: null,
 };
 
+export const getHomeLocation = (critical: Critical): DraggableLocation => ({
+  droppableId: critical.droppable.id,
+  index: critical.draggable.index,
+});
+
 export const getDragStart = (critical: Critical): DragStart => ({
   draggableId: critical.draggable.id,
   type: critical.droppable.type,
-  source: {
-    droppableId: critical.droppable.id,
-    index: critical.draggable.index,
-  },
+  source: getHomeLocation(critical),
 });
