@@ -453,6 +453,37 @@ export default (state: State = idle, action: Action): State => {
     });
   }
 
+  if (action.type === 'MOVE_UP' || action.type === 'MOVE_DOWN' || action.type === 'MOVE_LEFT' || action.type === 'MOVE_RIGHT') {
+    // Not doing keyboard movements during these phases
+    if (state.phase === 'BULK_COLLECTING' || state.phase === 'DROP_PENDING') {
+      return state;
+    }
+
+    invariant(state.phase === 'DRAGGING', `${action.type} received while not in DRAGGING phase`);
+
+    // 1. what droppable are you over?
+    // *. if over no droppable, allow cross axis moves from the home droppable.
+    // * otherwise just ignore the move
+    // 2. what is the axis of the droppable?
+    // 3. is the action a main axis or cross axis move?
+    // 4. is the action forwards or backwards?
+
+
+    if (isMovingOnMainAxis) {
+
+    }
+
+
+
+
+    // It is possible to lift a draggable in a disabled droppable
+    // In which case it will not have a destination
+    if (!state.impact.destination) {
+      return state;
+    }
+
+  }
+
   if (action.type === 'MOVE_FORWARD' || action.type === 'MOVE_BACKWARD') {
     if (state.phase === 'BULK_COLLECTING' || state.phase === 'DROP_PENDING') {
       return state;
@@ -460,11 +491,33 @@ export default (state: State = idle, action: Action): State => {
 
     invariant(state.phase === 'DRAGGING', `${action.type} received while not in DRAGGING phase`);
 
+
+    // Allowing cross axis movement from a disabled droppable
+    if (!state.impact.destination) {
+      const home: DroppableDimension = state.dimensions.droppables[state.critical.droppable.id];
+
+      if (home.axis === vertical) {
+
+      }
+
+      if (home.axis === horizontal) {
+
+      }
+
+      return state;
+    }
+
+
     // It is possible to lift a draggable in a disabled droppable
     // In which case it will not have a destination
     if (!state.impact.destination) {
       return state;
     }
+
+    const isOver: DroppableDimension = state.dimensions.droppables[state.impact.destination.droppableId];
+    const direction: Direction = isOver.axis.direction;
+
+    if(direction === 'vertical')
 
     const isMovingForward: boolean = action.type === 'MOVE_FORWARD';
 
