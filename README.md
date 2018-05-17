@@ -1446,8 +1446,8 @@ These translations are maintained by the community and are not reviewed or maint
 
 ## Author
 
-Alex Reardon - [@alexandereardon](https://twitter.com/alexandereardon) - areardon@atlassian.com
+Alex Reardon - [@alexandereardon](https://twitter.com/alexandereardon)
 
 ## Other maintainers
 
-Jared Crowe - [@jaredjcrowe](https://twitter.com/jaredjcrowe) - jcrowe@atlassian.com
+Jared Crowe - [@jaredjcrowe](https://twitter.com/jaredjcrowe)
