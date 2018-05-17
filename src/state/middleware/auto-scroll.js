@@ -23,6 +23,7 @@ export default (store: Store) => {
     }, store.dispatch),
     scrollWindow,
   });
+
   return (next: (Action) => mixed) => (action: Action): mixed => {
     // Need to cancel any pending auto scrolling when drag is ending
     if (isDragEnding(action)) {
