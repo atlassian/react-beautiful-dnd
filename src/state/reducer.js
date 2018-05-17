@@ -584,6 +584,7 @@ export default (state: State = clean('IDLE'), action: Action): State => {
     }
 
     // It is possible to lift a draggable in a disabled droppable
+    // In which case - use the home droppable id
     const droppableId: DroppableId = (() => {
       if (drag.impact.destination) {
         return drag.impact.destination.droppableId;
