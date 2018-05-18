@@ -122,25 +122,31 @@ export const getInitialImpact = (draggable: DraggableDimension, axis?: Axis = ve
   return impact;
 };
 
-export const addDroppable = (base: State, droppable: DroppableDimension): State => ({
+export const addDroppable = (
+  base: DraggingState,
+  droppable: DroppableDimension
+): DraggingState => ({
   ...base,
   dimensions: {
     ...base.dimensions,
     droppables: {
-      ...base.dimension.droppables,
+      ...base.dimensions.droppables,
       [droppable.descriptor.id]: droppable,
     },
   },
 });
 
 export const addDraggable = (
-  dimensions: DimensionMap,
+  state: DraggingState,
   draggable: DraggableDimension
-): DimensionMap => ({
-  ...dimensions,
-  draggables: {
-    ...dimensions.draggables,
-    [draggable.descriptor.id]: draggable,
+): DraggingState => ({
+  ...state,
+  dimensions: {
+    ...state.dimensions,
+    draggables: {
+      ...state.dimensions.draggables,
+      [draggable.descriptor.id]: draggable,
+    },
   },
 });
 
