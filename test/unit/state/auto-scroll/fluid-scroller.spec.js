@@ -8,7 +8,6 @@ import {
 } from 'css-box-model';
 import type {
   Axis,
-  State,
   DraggableDimension,
   DroppableDimension,
   DragImpact,
@@ -26,11 +25,10 @@ import { vertical, horizontal } from '../../../../src/state/axis';
 import fluidScroller, {
   getPixelThresholds,
   config,
-  type FluidScroller
+  type FluidScroller,
 } from '../../../../src/state/auto-scroller/fluid-scroller';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import {
-  getInitialImpact,
   getClosestScrollable,
   getDraggableDimension,
   getDroppableDimension,
@@ -680,7 +678,7 @@ describe('fluid auto scrolling', () => {
             requestAnimationFrame.step();
             expect(mocks.scrollDroppable).toHaveBeenCalled();
             // moving forwards
-            const { id, offset } = mocks.scrollDroppable.mock.calls[0][0];
+            const [id, offset] = mocks.scrollDroppable.mock.calls[0];
 
             expect(id).toBe(scrollable.descriptor.id);
             expect(offset[axis.line]).toBeGreaterThan(0);
@@ -723,7 +721,7 @@ describe('fluid auto scrolling', () => {
             }), scrollable));
             requestAnimationFrame.step();
             expect(mocks.scrollDroppable).toHaveBeenCalledTimes(1);
-            const { offset: scroll1 } = mocks.scrollDroppable.mock.calls[0][0];
+            const scroll1: Position = mocks.scrollDroppable.mock.calls[0][1];
 
             fluidScroll(addDroppable(dragTo({
               selection: target2,
@@ -731,7 +729,7 @@ describe('fluid auto scrolling', () => {
             }), scrollable));
             requestAnimationFrame.step();
             expect(mocks.scrollDroppable).toHaveBeenCalledTimes(2);
-            const { offset: scroll2 } = mocks.scrollDroppable.mock.calls[1][0];
+            const scroll2: Position = mocks.scrollDroppable.mock.calls[1][1];
 
             expect(scroll1[axis.line]).toBeLessThan(scroll2[axis.line]);
 
@@ -749,10 +747,10 @@ describe('fluid auto scrolling', () => {
             }), scrollable));
             requestAnimationFrame.step();
 
-            expect(mocks.scrollDroppable).toHaveBeenCalledWith({
-              id: scrollable.descriptor.id,
-              offset: expected,
-            });
+            expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+              scrollable.descriptor.id,
+              expected,
+            );
           });
 
           it('should have the top speed when moving beyond the max speed point', () => {
@@ -765,10 +763,9 @@ describe('fluid auto scrolling', () => {
             }), scrollable));
             requestAnimationFrame.step();
 
-            expect(mocks.scrollDroppable).toHaveBeenCalledWith({
-              id: scrollable.descriptor.id,
-              offset: expected,
-            });
+            expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+              scrollable.descriptor.id, expected
+            );
           });
 
           it('should allow scrolling to the end of the droppable', () => {
@@ -819,11 +816,11 @@ describe('fluid auto scrolling', () => {
                 fluidScroll(custom);
 
                 requestAnimationFrame.flush();
-                expect(mocks.scrollDroppable).toHaveBeenCalledWith({
-                  id: scrollable.descriptor.id,
+                expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+                  scrollable.descriptor.id,
                   // scroll ocurred on the cross axis, but not on the main axis
-                  offset: patch(axis.crossAxisLine, config.maxScrollSpeed),
-                });
+                  patch(axis.crossAxisLine, config.maxScrollSpeed),
+                );
               });
             });
 
@@ -848,11 +845,11 @@ describe('fluid auto scrolling', () => {
                 fluidScroll(custom);
 
                 requestAnimationFrame.flush();
-                expect(mocks.scrollDroppable).toHaveBeenCalledWith({
-                  id: scrollable.descriptor.id,
+                expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+                  scrollable.descriptor.id,
                   // scroll ocurred on the main axis, but not on the cross axis
-                  offset: patch(axis.line, config.maxScrollSpeed),
-                });
+                  patch(axis.line, config.maxScrollSpeed),
+                );
               });
             });
 
@@ -937,10 +934,10 @@ describe('fluid auto scrolling', () => {
               }), scrolledForeign));
               requestAnimationFrame.step();
 
-              expect(mocks.scrollDroppable).toHaveBeenCalledWith({
-                id: foreign.descriptor.id,
-                offset: expected,
-              });
+              expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+                foreign.descriptor.id,
+                expected,
+              );
             });
 
             it('should not allow scrolling past the placeholder buffer', () => {
@@ -1010,7 +1007,7 @@ describe('fluid auto scrolling', () => {
             // only called after a frame
             requestAnimationFrame.step();
             expect(mocks.scrollDroppable).toHaveBeenCalled();
-            const { id, offset } = mocks.scrollDroppable.mock.calls[0][0];
+            const [id, offset] = mocks.scrollDroppable.mock.calls[0];
 
             // validation
             expect(id).toBe(scrollable.descriptor.id);
@@ -1055,7 +1052,7 @@ describe('fluid auto scrolling', () => {
             }), scrolled));
             requestAnimationFrame.step();
             expect(mocks.scrollDroppable).toHaveBeenCalledTimes(1);
-            const { offset: scroll1 } = mocks.scrollDroppable.mock.calls[0][0];
+            const scroll1: Position = mocks.scrollDroppable.mock.calls[0][1];
 
             fluidScroll(addDroppable(dragTo({
               selection: target2,
@@ -1063,7 +1060,7 @@ describe('fluid auto scrolling', () => {
             }), scrolled));
             requestAnimationFrame.step();
             expect(mocks.scrollDroppable).toHaveBeenCalledTimes(2);
-            const { offset: scroll2 } = mocks.scrollDroppable.mock.calls[1][0];
+            const scroll2: Position = mocks.scrollDroppable.mock.calls[1][1];
 
             // moving backwards
             expect(scroll1[axis.line]).toBeGreaterThan(scroll2[axis.line]);
@@ -1082,10 +1079,9 @@ describe('fluid auto scrolling', () => {
             }), scrolled));
             requestAnimationFrame.step();
 
-            expect(mocks.scrollDroppable).toHaveBeenCalledWith({
-              id: scrollable.descriptor.id,
-              offset: expected,
-            });
+            expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+              scrollable.descriptor.id, expected,
+            );
           });
 
           it('should have the top speed when moving beyond the max speed point', () => {
@@ -1098,10 +1094,9 @@ describe('fluid auto scrolling', () => {
             }), scrolled));
             requestAnimationFrame.step();
 
-            expect(mocks.scrollDroppable).toHaveBeenCalledWith({
-              id: scrollable.descriptor.id,
-              offset: expected,
-            });
+            expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+              scrollable.descriptor.id, expected,
+            );
           });
 
           it('should not scroll if the item is too big', () => {
@@ -1179,7 +1174,7 @@ describe('fluid auto scrolling', () => {
             requestAnimationFrame.step();
             expect(mocks.scrollDroppable).toHaveBeenCalled();
             // moving forwards
-            const { id, offset: scroll } = mocks.scrollDroppable.mock.calls[0][0];
+            const [id, scroll] = mocks.scrollDroppable.mock.calls[0];
 
             expect(id).toBe(scrolled.descriptor.id);
             expect(scroll[axis.crossAxisLine]).toBeGreaterThan(0);
@@ -1222,7 +1217,7 @@ describe('fluid auto scrolling', () => {
             requestAnimationFrame.step();
             expect(mocks.scrollDroppable).toHaveBeenCalled();
             // moving backwards
-            const { offset } = mocks.scrollDroppable.mock.calls[0][0];
+            const [, offset] = mocks.scrollDroppable.mock.calls[0];
             expect(offset[axis.crossAxisLine]).toBeLessThan(0);
           });
         });
@@ -1285,10 +1280,9 @@ describe('fluid auto scrolling', () => {
             fluidScroll(custom);
             requestAnimationFrame.step();
 
-            expect(mocks.scrollDroppable).toHaveBeenCalledWith({
-              id: scrolled.descriptor.id,
-              offset: maxScrollSpeed,
-            });
+            expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+              scrolled.descriptor.id, maxScrollSpeed,
+            );
           });
 
           it('should not scroll the frame if not over the frame', () => {

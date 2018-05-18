@@ -69,7 +69,7 @@ export default ({
       // When a drop animation finishes - fire a drop complete
       dropAnimationFinish,
       pendingDrop,
-      autoScroll,
+      autoScroll(getDimensionMarshal),
       // Fire hooks for consumers
       hooks(getHooks, announce),
     ),

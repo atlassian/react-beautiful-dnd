@@ -4,7 +4,6 @@ import type { Rect, Position, Spacing } from 'css-box-model';
 import { add, apply, isEqual, patch } from '../position';
 import getBestScrollableDroppable from './get-best-scrollable-droppable';
 import { horizontal, vertical } from '../axis';
-import type { UpdateDroppableScrollArgs } from '../action-creators';
 import {
   canScrollWindow,
   canPartiallyScroll,
@@ -16,6 +15,7 @@ import type {
   DraggableDimension,
   Scrollable,
   Viewport,
+  DroppableId,
 } from '../../types';
 
 // Values used to control how the fluid auto scroll feels
@@ -230,7 +230,7 @@ const withPlaceholder = (
 
 type Api = {|
   scrollWindow: (change: Position) => void,
-  scrollDroppable: (args: UpdateDroppableScrollArgs) => mixed,
+  scrollDroppable: (id: DroppableId, change: Position) => void,
 |}
 
 type ResultFn = (state: DraggingState) => void;
@@ -311,10 +311,7 @@ export default ({
     });
 
     if (canScrollDroppable) {
-      scheduleDroppableScroll({
-        id: droppable.descriptor.id,
-        offset: requiredFrameScroll,
-      });
+      scheduleDroppableScroll(droppable.descriptor.id, requiredFrameScroll);
     }
   };
 
