@@ -25,6 +25,8 @@ import type {
   DraggableDimensionMap,
   DroppableDimensionMap,
   DimensionMap,
+  DraggingState,
+  DropAnimatingState,
 } from '../../src/types';
 
 type GetComputedSpacingArgs = {|
@@ -120,34 +122,6 @@ export const getInitialImpact = (draggable: DraggableDimension, axis?: Axis = ve
   return impact;
 };
 
-export const withImpact = (state: State, impact: DragImpact) => {
-  // while dragging
-  if (state.drag) {
-    return {
-      ...state,
-      drag: {
-        ...state.drag,
-        impact,
-      },
-    };
-  }
-  // while drop animating
-  if (state.drop && state.drop.pending) {
-    return {
-      ...state,
-      drop: {
-        ...state.drop,
-        pending: {
-          ...state.drop.pending,
-          impact,
-        },
-      },
-    };
-  }
-
-  throw new Error('unable to apply impact');
-};
-
 export const addDroppable = (base: State, droppable: DroppableDimension): State => ({
   ...base,
   dimensions: {
@@ -159,14 +133,14 @@ export const addDroppable = (base: State, droppable: DroppableDimension): State 
   },
 });
 
-export const addDraggable = (base: State, draggable: DraggableDimension): State => ({
-  ...base,
-  dimensions: {
-    ...base.dimensions,
-    draggables: {
-      ...base.dimension.draggables,
-      [draggable.descriptor.id]: draggable,
-    },
+export const addDraggable = (
+  dimensions: DimensionMap,
+  draggable: DraggableDimension
+): DimensionMap => ({
+  ...dimensions,
+  draggables: {
+    ...dimensions.draggables,
+    [draggable.descriptor.id]: draggable,
   },
 });
 

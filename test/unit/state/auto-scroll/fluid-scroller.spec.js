@@ -12,11 +12,10 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DragImpact,
+  DraggingState,
   Viewport,
 } from '../../../../src/types';
-import type { AutoScroller } from '../../../../src/state/auto-scroller/auto-scroller-types';
 import type { PixelThresholds } from '../../../../src/state/auto-scroller/fluid-scroller';
-import { getPixelThresholds, config } from '../../../../src/state/auto-scroller/fluid-scroller';
 import { add, patch, subtract } from '../../../../src/state/position';
 import {
   createViewport,
@@ -24,7 +23,11 @@ import {
 } from '../../../utils/viewport';
 import noImpact, { noMovement } from '../../../../src/state/no-impact';
 import { vertical, horizontal } from '../../../../src/state/axis';
-import createAutoScroller from '../../../../src/state/auto-scroller/';
+import fluidScroller, {
+  getPixelThresholds,
+  config,
+  type FluidScroller
+} from '../../../../src/state/auto-scroller/fluid-scroller';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import {
   getInitialImpact,
@@ -69,23 +72,22 @@ const unscrollableViewport: Viewport = {
 };
 
 describe('fluid auto scrolling', () => {
-  let autoScroller: AutoScroller;
+  let fluidScroll: FluidScroller;
   let mocks;
 
   beforeEach(() => {
     mocks = {
       scrollWindow: jest.fn(),
       scrollDroppable: jest.fn(),
-      move: jest.fn(),
     };
-    autoScroller = createAutoScroller(mocks);
+    fluidScroll = fluidScroller(mocks);
   });
 
   afterEach(() => {
     requestAnimationFrame.reset();
   });
 
-  [vertical, horizontal].forEach((axis: Axis) => {
+  [vertical /*, horizontal*/].forEach((axis: Axis) => {
     describe(`on the ${axis.direction} axis`, () => {
       const preset = getPreset(axis);
       const state = getStatePreset(axis);
@@ -133,12 +135,22 @@ describe('fluid auto scrolling', () => {
         viewport,
         // seeding that we are over the home droppable
         impact,
-      }: DragToArgs): State => withImpact(
-        state.dragging(preset.inHome1.descriptor.id, selection, viewport),
-        impact || getInitialImpact(preset.inHome1, axis),
-      );
+      }: DragToArgs): DraggingState => {
+        const base: DraggingState = state.dragging(
+          preset.inHome1.descriptor.id,
+          selection,
+          viewport
+        );
+        if (!impact) {
+          return base;
+        }
+        return {
+          ...base,
+          impact,
+        };
+      };
 
-      describe('window scrolling', () => {
+      describe.only('window scrolling', () => {
         const thresholds: PixelThresholds = getPixelThresholds(scrollableViewport.subject, axis);
         const crossAxisThresholds: PixelThresholds = getPixelThresholds(
           scrollableViewport.subject,
@@ -159,7 +171,7 @@ describe('fluid auto scrolling', () => {
           );
 
           it('should not scroll if not past the start threshold', () => {
-            autoScroller.onStateChange(state.idle, dragTo({
+            fluidScroll(dragTo({
               selection: onStartBoundary,
               viewport: scrollableViewport,
             }));
@@ -171,7 +183,7 @@ describe('fluid auto scrolling', () => {
           it('should scroll if moving beyond the start threshold', () => {
             const target: Position = add(onStartBoundary, patch(axis.line, 1));
 
-            autoScroller.onStateChange(state.idle, dragTo({
+            fluidScroll(dragTo({
               selection: target,
               viewport: scrollableViewport,
             }));
@@ -188,22 +200,16 @@ describe('fluid auto scrolling', () => {
 
           it('should throttle multiple scrolls into a single animation frame', () => {
             const target1: Position = add(onStartBoundary, patch(axis.line, 1));
-            const target2: Position = add(onStartBoundary, patch(axis.line, 2));
+            const target2: Position = add(onStartBoundary, patch(axis.line, 3));
 
-            autoScroller.onStateChange(state.idle, dragTo({
+            fluidScroll(dragTo({
               selection: target1,
               viewport: scrollableViewport,
             }));
-            autoScroller.onStateChange(
-              dragTo({
-                selection: target1,
-                viewport: scrollableViewport,
-              }),
-              dragTo({
-                selection: target2,
-                viewport: scrollableViewport,
-              })
-            );
+            fluidScroll(dragTo({
+              selection: target2,
+              viewport: scrollableViewport,
+            }));
 
             expect(mocks.scrollWindow).not.toHaveBeenCalled();
 
@@ -222,7 +228,7 @@ describe('fluid auto scrolling', () => {
             const target1: Position = add(onStartBoundary, patch(axis.line, 1));
             const target2: Position = add(onStartBoundary, patch(axis.line, 2));
 
-            autoScroller.onStateChange(state.idle, dragTo({
+            fluidScroll(dragTo({
               selection: target1,
               viewport: scrollableViewport,
             }));
@@ -230,16 +236,10 @@ describe('fluid auto scrolling', () => {
             expect(mocks.scrollWindow).toHaveBeenCalledTimes(1);
             const scroll1: Position = (mocks.scrollWindow.mock.calls[0][0] : any);
 
-            autoScroller.onStateChange(
-              dragTo({
-                selection: target1,
-                viewport: scrollableViewport,
-              }),
-              dragTo({
-                selection: target2,
-                viewport: scrollableViewport,
-              })
-            );
+            fluidScroll(dragTo({
+              selection: target2,
+              viewport: scrollableViewport,
+            }));
             requestAnimationFrame.step();
             expect(mocks.scrollWindow).toHaveBeenCalledTimes(2);
             const scroll2: Position = (mocks.scrollWindow.mock.calls[1][0] : any);
@@ -254,7 +254,7 @@ describe('fluid auto scrolling', () => {
           it('should have the top speed at the max speed point', () => {
             const expected: Position = patch(axis.line, config.maxScrollSpeed);
 
-            autoScroller.onStateChange(state.idle, dragTo({
+            fluidScroll(dragTo({
               selection: onMaxBoundary,
               viewport: scrollableViewport,
             }));
@@ -267,7 +267,7 @@ describe('fluid auto scrolling', () => {
             const target: Position = add(onMaxBoundary, patch(axis.line, 1));
             const expected: Position = patch(axis.line, config.maxScrollSpeed);
 
-            autoScroller.onStateChange(state.idle, dragTo({
+            fluidScroll(dragTo({
               selection: target,
               viewport: scrollableViewport,
             }));
@@ -279,40 +279,25 @@ describe('fluid auto scrolling', () => {
           it('should not scroll if the item is too big', () => {
             const expanded: Spacing = expandByPosition(scrollableViewport.subject, { x: 1, y: 1 });
             const tooBig: DraggableDimension = getDraggableDimension({
-              descriptor: {
-                id: 'too big',
-                droppableId: preset.home.descriptor.id,
-                // after the last item
-                index: preset.inHomeList.length,
-              },
+              descriptor: preset.inHome1.descriptor,
               borderBox: expanded,
             });
             const selection: Position = onMaxBoundary;
-            const custom: State = (() => {
-              const base: State = state.dragging(
+            const custom: DraggingState = (() => {
+              const base: DraggingState = state.dragging(
                 preset.inHome1.descriptor.id,
                 selection,
               );
 
-              if (!base.drag) {
-                throw new Error('Invalid state');
-              }
-
-              const updated: State = {
+              const updated: DraggingState = {
                 ...base,
-                drag: {
-                  ...base.drag,
-                  initial: {
-                    ...base.drag.initial,
-                    descriptor: tooBig.descriptor,
-                  },
-                },
+                dimensions: addDraggable(base.dimensions, tooBig),
               };
 
-              return addDraggable(updated, tooBig);
+              return updated;
             })();
 
-            autoScroller.onStateChange(state.idle, custom);
+            fluidScroll(custom);
 
             requestAnimationFrame.flush();
             expect(mocks.scrollWindow).not.toHaveBeenCalled();
@@ -321,7 +306,7 @@ describe('fluid auto scrolling', () => {
           it('should not scroll if the window cannot scroll', () => {
             const target: Position = onMaxBoundary;
 
-            autoScroller.onStateChange(state.idle, dragTo({
+            fluidScroll(dragTo({
               selection: target,
               viewport: unscrollableViewport,
             }));
@@ -348,13 +333,10 @@ describe('fluid auto scrolling', () => {
           );
 
           it('should not scroll if not past the start threshold', () => {
-            autoScroller.onStateChange(
-              state.idle,
-              dragTo({
-                selection: onStartBoundary,
-                viewport: scrolledViewport,
-              }),
-            );
+            fluidScroll(dragTo({
+              selection: onStartBoundary,
+              viewport: scrolledViewport,
+            }));
 
             requestAnimationFrame.flush();
             expect(mocks.scrollWindow).not.toHaveBeenCalled();
@@ -363,7 +345,7 @@ describe('fluid auto scrolling', () => {
           it('should scroll if moving beyond the start threshold', () => {
             const target: Position = subtract(onStartBoundary, patch(axis.line, 1));
 
-            autoScroller.onStateChange(state.idle, dragTo({
+            fluidScroll(dragTo({
               selection: target,
               viewport: scrolledViewport,
             }));
@@ -382,20 +364,14 @@ describe('fluid auto scrolling', () => {
             const target1: Position = subtract(onStartBoundary, patch(axis.line, 1));
             const target2: Position = subtract(onStartBoundary, patch(axis.line, 2));
 
-            autoScroller.onStateChange(state.idle, dragTo({
+            fluidScroll(dragTo({
               selection: target1,
               viewport: scrolledViewport,
             }));
-            autoScroller.onStateChange(
-              dragTo({
-                selection: target1,
-                viewport: scrolledViewport,
-              }),
-              dragTo({
-                selection: target2,
-                viewport: scrolledViewport,
-              }),
-            );
+            fluidScroll(dragTo({
+              selection: target2,
+              viewport: scrolledViewport,
+            }) );
 
             expect(mocks.scrollWindow).not.toHaveBeenCalled();
 
@@ -414,27 +390,18 @@ describe('fluid auto scrolling', () => {
             const target1: Position = subtract(onStartBoundary, patch(axis.line, 1));
             const target2: Position = subtract(onStartBoundary, patch(axis.line, 2));
 
-            autoScroller.onStateChange(
-              state.idle,
-              dragTo({
-                selection: target1,
-                viewport: scrolledViewport,
-              })
-            );
+            fluidScroll(dragTo({
+              selection: target1,
+              viewport: scrolledViewport,
+            }));
             requestAnimationFrame.step();
             expect(mocks.scrollWindow).toHaveBeenCalledTimes(1);
             const scroll1: Position = (mocks.scrollWindow.mock.calls[0][0] : any);
 
-            autoScroller.onStateChange(
-              dragTo({
-                selection: target1,
-                viewport: scrolledViewport,
-              }),
-              dragTo({
-                selection: target2,
-                viewport: scrolledViewport,
-              }),
-            );
+            fluidScroll(dragTo({
+              selection: target2,
+              viewport: scrolledViewport,
+            }));
             requestAnimationFrame.step();
             expect(mocks.scrollWindow).toHaveBeenCalledTimes(2);
             const scroll2: Position = (mocks.scrollWindow.mock.calls[1][0] : any);
@@ -453,7 +420,7 @@ describe('fluid auto scrolling', () => {
             const target: Position = onMaxBoundary;
             const expected: Position = patch(axis.line, -config.maxScrollSpeed);
 
-            autoScroller.onStateChange(state.idle, dragTo({
+            fluidScroll(dragTo({
               selection: target,
               viewport: scrolledViewport,
             }));
@@ -466,7 +433,7 @@ describe('fluid auto scrolling', () => {
             const target: Position = subtract(onMaxBoundary, patch(axis.line, 1));
             const expected: Position = patch(axis.line, -config.maxScrollSpeed);
 
-            autoScroller.onStateChange(state.idle, dragTo({
+            fluidScroll(dragTo({
               selection: target,
               viewport: scrolledViewport,
             }));
@@ -478,40 +445,23 @@ describe('fluid auto scrolling', () => {
           it('should not scroll if the item is too big', () => {
             const expanded: Spacing = expandByPosition(scrollableViewport.subject, { x: 1, y: 1 });
             const tooBig: DraggableDimension = getDraggableDimension({
-              descriptor: {
-                id: 'too big',
-                droppableId: preset.home.descriptor.id,
-                // after the last item
-                index: preset.inHomeList.length,
-              },
+              descriptor: preset.inHome1.descriptor,
               borderBox: expanded,
             });
             const selection: Position = onMaxBoundary;
-            const custom: State = (() => {
-              const base: State = state.dragging(
+            const custom: DraggingState = (() => {
+              const base: DraggingState = state.dragging(
                 preset.inHome1.descriptor.id,
                 selection,
               );
 
-              if (!base.drag) {
-                throw new Error('Invalid state');
-              }
-
-              const updated: State = {
+              return {
                 ...base,
-                drag: {
-                  ...base.drag,
-                  initial: {
-                    ...base.drag.initial,
-                    descriptor: tooBig.descriptor,
-                  },
-                },
+                dimensions: addDraggable(base.dimensions, tooBig),
               };
-
-              return addDraggable(updated, tooBig);
             })();
 
-            autoScroller.onStateChange(state.idle, custom);
+            fluidScroll(custom);
 
             requestAnimationFrame.flush();
             expect(mocks.scrollWindow).not.toHaveBeenCalled();
@@ -520,7 +470,7 @@ describe('fluid auto scrolling', () => {
           it('should not scroll if the window cannot scroll', () => {
             const target: Position = onMaxBoundary;
 
-            autoScroller.onStateChange(state.idle, dragTo({
+            fluidScroll(dragTo({
               selection: target,
               viewport: unscrollableViewport,
             }));
@@ -540,7 +490,7 @@ describe('fluid auto scrolling', () => {
           );
 
           it('should not scroll if not past the start threshold', () => {
-            autoScroller.onStateChange(state.idle, dragTo({
+            fluidScroll(dragTo({
               selection: onStartBoundary,
               viewport: scrollableViewport,
             }));
@@ -552,7 +502,7 @@ describe('fluid auto scrolling', () => {
           it('should scroll if moving beyond the start threshold', () => {
             const target: Position = add(onStartBoundary, patch(axis.crossAxisLine, 1));
 
-            autoScroller.onStateChange(state.idle, dragTo({
+            fluidScroll(dragTo({
               selection: target,
               viewport: scrollableViewport,
             }));
@@ -581,7 +531,7 @@ describe('fluid auto scrolling', () => {
           );
 
           it('should not scroll if not past the start threshold', () => {
-            autoScroller.onStateChange(state.idle, dragTo({
+            fluidScroll(dragTo({
               selection: onStartBoundary,
               viewport: scrolled,
             }));
@@ -593,7 +543,7 @@ describe('fluid auto scrolling', () => {
           it('should scroll if moving beyond the start threshold', () => {
             const target: Position = subtract(onStartBoundary, patch(axis.crossAxisLine, 1));
 
-            autoScroller.onStateChange(state.idle, dragTo({
+            fluidScroll(dragTo({
               selection: target,
               viewport: scrolled,
             }));
@@ -622,39 +572,25 @@ describe('fluid auto scrolling', () => {
                 scrollableViewport.subject, patch(axis.line, 1)
               );
               const tooBigOnMainAxis: DraggableDimension = getDraggableDimension({
-                descriptor: {
-                  id: 'too big',
-                  droppableId: preset.home.descriptor.id,
-                  // after the last item
-                  index: preset.inHomeList.length,
-                },
+                descriptor: preset.inHome1.descriptor,
                 borderBox: expanded,
               });
 
               const selection: Position = onMaxBoundaryOfBoth;
-              const custom: State = (() => {
-                const base: State = state.dragging(
+              const custom: DraggingState = (() => {
+                const base: DraggingState = state.dragging(
                   preset.inHome1.descriptor.id,
                   selection,
                   scrollableViewport,
                 );
 
-                const updated: State = {
+                return {
                   ...base,
-                  drag: {
-                    ...base.drag,
-                    initial: {
-                      // $ExpectError
-                      ...base.drag.initial,
-                      descriptor: tooBigOnMainAxis.descriptor,
-                    },
-                  },
+                  dimensions: addDraggable(base.dimensions, tooBigOnMainAxis),
                 };
-
-                return addDraggable(updated, tooBigOnMainAxis);
               })();
 
-              autoScroller.onStateChange(state.idle, custom);
+              fluidScroll(custom);
 
               requestAnimationFrame.step();
               expect(mocks.scrollWindow).toHaveBeenCalledWith(
@@ -671,39 +607,25 @@ describe('fluid auto scrolling', () => {
                 patch(axis.crossAxisLine, 1)
               );
               const tooBigOnCrossAxis: DraggableDimension = getDraggableDimension({
-                descriptor: {
-                  id: 'too big',
-                  droppableId: preset.home.descriptor.id,
-                  // after the last item
-                  index: preset.inHomeList.length,
-                },
+                descriptor: preset.inHome1.descriptor,
                 borderBox: expanded,
               });
 
               const selection: Position = onMaxBoundaryOfBoth;
-              const custom: State = (() => {
-                const base: State = state.dragging(
+              const custom: DraggingState = (() => {
+                const base: DraggingState = state.dragging(
                   preset.inHome1.descriptor.id,
                   selection,
                   scrollableViewport,
                 );
 
-                const updated: State = {
+                return {
                   ...base,
-                  drag: {
-                    ...base.drag,
-                    initial: {
-                      // $ExpectError
-                      ...base.drag.initial,
-                      descriptor: tooBigOnCrossAxis.descriptor,
-                    },
-                  },
+                  dimensions: addDraggable(base.dimensions, tooBigOnCrossAxis),
                 };
-
-                return addDraggable(updated, tooBigOnCrossAxis);
               })();
 
-              autoScroller.onStateChange(state.idle, custom);
+              fluidScroll(custom);
 
               requestAnimationFrame.step();
               expect(mocks.scrollWindow).toHaveBeenCalledWith(
@@ -719,39 +641,25 @@ describe('fluid auto scrolling', () => {
                 scrollableViewport.subject, patch(axis.line, 1, 1)
               );
               const tooBig: DraggableDimension = getDraggableDimension({
-                descriptor: {
-                  id: 'too big',
-                  droppableId: preset.home.descriptor.id,
-                  // after the last item
-                  index: preset.inHomeList.length,
-                },
+                descriptor: preset.inHome1.descriptor,
                 borderBox: expanded,
               });
 
               const selection: Position = onMaxBoundaryOfBoth;
-              const custom: State = (() => {
-                const base: State = state.dragging(
+              const custom: DraggingState = (() => {
+                const base: DraggingState = state.dragging(
                   preset.inHome1.descriptor.id,
                   selection,
                   scrollableViewport,
                 );
 
-                const updated: State = {
+                return {
                   ...base,
-                  drag: {
-                    ...base.drag,
-                    initial: {
-                      // $ExpectError
-                      ...base.drag.initial,
-                      descriptor: tooBig.descriptor,
-                    },
-                  },
+                  dimensions: addDraggable(base.dimensions, tooBig),
                 };
-
-                return addDraggable(updated, tooBig);
               })();
 
-              autoScroller.onStateChange(state.idle, custom);
+              fluidScroll(custom);
 
               requestAnimationFrame.step();
               expect(mocks.scrollWindow).not.toHaveBeenCalled();
@@ -995,7 +903,7 @@ describe('fluid auto scrolling', () => {
                   return addDroppable(addDraggable(updated, tooBigOnMainAxis), scrollable);
                 })();
 
-                autoScroller.onStateChange(state.idle, custom);
+                fluidScroll(custom);
 
                 requestAnimationFrame.flush();
                 expect(mocks.scrollDroppable).toHaveBeenCalledWith(
@@ -1045,7 +953,7 @@ describe('fluid auto scrolling', () => {
                   return addDroppable(addDraggable(updated, tooBigOnCrossAxis), scrollable);
                 })();
 
-                autoScroller.onStateChange(state.idle, custom);
+                fluidScroll(custom);
 
                 requestAnimationFrame.flush();
                 expect(mocks.scrollDroppable).toHaveBeenCalledWith(
@@ -1095,7 +1003,7 @@ describe('fluid auto scrolling', () => {
                   return addDroppable(addDraggable(updated, tooBig), scrollable);
                 })();
 
-                autoScroller.onStateChange(state.idle, custom);
+                fluidScroll(custom);
 
                 requestAnimationFrame.step();
                 expect(mocks.scrollDroppable).not.toHaveBeenCalled();
@@ -1395,7 +1303,7 @@ describe('fluid auto scrolling', () => {
               return addDroppable(addDraggable(updated, tooBig), scrolled);
             })();
 
-            autoScroller.onStateChange(state.idle, custom);
+            fluidScroll(custom);
 
             requestAnimationFrame.flush();
             expect(mocks.scrollDroppable).not.toHaveBeenCalled();
@@ -1435,7 +1343,7 @@ describe('fluid auto scrolling', () => {
           );
 
           it('should not scroll if not past the start threshold', () => {
-            autoScroller.onStateChange(state.idle, dragTo({
+            fluidScroll(dragTo({
               selection: onStartBoundary,
               viewport: unscrollableViewport,
             }));
@@ -1673,7 +1581,7 @@ describe('fluid auto scrolling', () => {
               scrollableViewport.subject.center[axis.crossAxisLine],
             );
 
-            autoScroller.onStateChange(state.idle, dragTo({
+            fluidScroll(dragTo({
               selection: onMaxBoundary,
               viewport: scrollableViewport,
             }));

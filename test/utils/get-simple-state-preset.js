@@ -7,15 +7,12 @@ import getViewport from '../../src/view/window/get-viewport';
 import type {
   Axis,
   State,
+  IdleState,
+  PreparingState,
   DraggableDescriptor,
   DroppableDescriptor,
-  DimensionState,
   DraggableDimension,
   DroppableDimension,
-  CurrentDragPositions,
-  InitialDragPositions,
-  LiftRequest,
-  DragState,
   DropResult,
   PendingDrop,
   DropReason,
@@ -23,6 +20,10 @@ import type {
   DragImpact,
   ScrollOptions,
   Viewport,
+  ItemPositions,
+  DragPositions,
+  DraggingState,
+  WindowDetails,
 } from '../../src/types';
 
 const scheduled: ScrollOptions = {
@@ -32,52 +33,12 @@ const scheduled: ScrollOptions = {
 export default (axis?: Axis = vertical) => {
   const preset = getPreset(axis);
 
-  const getDimensionState = (request: LiftRequest): DimensionState => {
-    const draggable: DraggableDimension = preset.draggables[request.draggableId];
-    const home: DroppableDimension = preset.droppables[draggable.descriptor.droppableId];
-
-    const result: DimensionState = {
-      request,
-      draggable: { [draggable.descriptor.id]: draggable },
-      droppable: { [home.descriptor.id]: home },
-    };
-    return result;
-  };
-
-  const idle: State = {
+  const idle: IdleState = {
     phase: 'IDLE',
-    drag: null,
-    drop: null,
-    dimension: {
-      request: null,
-      draggable: {},
-      droppable: {},
-    },
   };
 
-  const preparing: State = {
-    ...idle,
+  const preparing: PreparingState = {
     phase: 'PREPARING',
-  };
-
-  const defaultLiftRequest: LiftRequest = {
-    draggableId: preset.inHome1.descriptor.id,
-    scrollOptions: {
-      shouldPublishImmediately: false,
-    },
-  };
-  const requesting = (request?: LiftRequest = defaultLiftRequest): State => {
-    const result: State = {
-      phase: 'COLLECTING_INITIAL_DIMENSIONS',
-      drag: null,
-      drop: null,
-      dimension: {
-        request,
-        draggable: {},
-        droppable: {},
-      },
-    };
-    return result;
   };
 
   const origin: Position = { x: 0, y: 0 };
@@ -86,48 +47,49 @@ export default (axis?: Axis = vertical) => {
     id?: DraggableId = preset.inHome1.descriptor.id,
     selection?: Position,
     viewport?: Viewport = getViewport(),
-  ): State => {
+  ): DraggingState => {
     // will populate the dimension state with the initial dimensions
     const draggable: DraggableDimension = preset.draggables[id];
-    // either use the provided selection or use the draggable's center
-    const clientSelection: Position = selection || draggable.client.marginBox.center;
-    const initialPosition: InitialDragPositions = {
-      selection: clientSelection,
-      borderBoxCenter: clientSelection,
-    };
-    const clientPositions: CurrentDragPositions = {
+    const droppable: DroppableDimension = preset.droppables[draggable.descriptor.droppableId];
+
+    const clientSelection: Position = selection || draggable.client.borderBox.center;
+
+    const client: ItemPositions = {
       selection: clientSelection,
       borderBoxCenter: clientSelection,
       offset: origin,
     };
 
-    const drag: DragState = {
-      initial: {
-        descriptor: draggable.descriptor,
-        autoScrollMode: 'FLUID',
-        client: initialPosition,
-        page: initialPosition,
-        viewport,
-      },
-      current: {
-        client: clientPositions,
-        page: clientPositions,
-        viewport,
-        shouldAnimate: false,
-        hasCompletedFirstBulkPublish: true,
-      },
-      impact: noImpact,
-      scrollJumpRequest: null,
+    const initial: DragPositions = {
+      client, page: client,
     };
 
-    const result: State = {
+    const windowDetails: WindowDetails = {
+      viewport,
+      scroll: {
+        initial: viewport.scroll,
+        current: viewport.scroll,
+        diff: {
+          value: origin,
+          displacement: origin,
+        },
+      },
+    };
+
+    const result: DraggingState = {
       phase: 'DRAGGING',
-      drag,
-      drop: null,
-      dimension: getDimensionState({
-        draggableId: id,
-        scrollOptions: scheduled,
-      }),
+      critical: {
+        draggable: draggable.descriptor,
+        droppable: droppable.descriptor,
+      },
+      autoScrollMode: 'FLUID',
+      dimensions: preset.dimensions,
+      initial,
+      current: initial,
+      impact: noImpact,
+      window: windowDetails,
+      scrollJumpRequest: null,
+      shouldAnimate: false,
     };
 
     return result;
@@ -282,7 +244,6 @@ export default (axis?: Axis = vertical) => {
   return {
     idle,
     preparing,
-    requesting,
     dragging,
     scrollJumpRequest,
     dropAnimating,
