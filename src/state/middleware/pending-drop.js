@@ -8,6 +8,7 @@ import type {
 } from '../../types';
 
 export default (store: Store) => (next: (Action) => mixed) => (action: Action): mixed => {
+  // Always let the action go through first
   next(action);
 
   if (action.type !== 'BULK_REPLACE') {
