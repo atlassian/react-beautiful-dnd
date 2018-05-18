@@ -7,23 +7,21 @@ import {
   getWindowOverlap,
   getDroppableOverlap,
 } from './can-scroll';
-import { move as moveAction } from '../action-creators';
+import { move as moveAction, updateDroppableScroll as updateDroppableScrollAction } from '../action-creators';
 import type {
-  DroppableId,
   DroppableDimension,
   DraggableLocation,
   Viewport,
   DraggingState,
-  BulkCollectionState,
 } from '../../types';
 
 type Args = {|
-  scrollDroppable: (id: DroppableId, offset: Position) => void,
+  scrollDroppable: typeof updateDroppableScrollAction,
   scrollWindow: (offset: Position) => void,
   move: typeof moveAction,
 |}
 
-export type JumpScroller = (state: DraggingState | BulkCollectionState) => void;
+export type JumpScroller = (state: DraggingState) => void;
 
 type Remainder = Position;
 
@@ -32,7 +30,7 @@ export default ({
   scrollDroppable,
   scrollWindow,
 }: Args): JumpScroller => {
-  const moveByOffset = (state: DraggingState | BulkCollectionState, offset: Position) => {
+  const moveByOffset = (state: DraggingState, offset: Position) => {
     const client: Position = add(state.current.client.selection, offset);
     move({ client, shouldAnimate: true });
   };
@@ -50,13 +48,19 @@ export default ({
 
     // Droppable can absorb the entire change
     if (!overlap) {
-      scrollDroppable(droppable.descriptor.id, change);
+      scrollDroppable({
+        id: droppable.descriptor.id,
+        offset: change,
+      });
       return null;
     }
 
     // Droppable can only absorb a part of the change
     const whatTheDroppableCanScroll: Position = subtract(change, overlap);
-    scrollDroppable(droppable.descriptor.id, whatTheDroppableCanScroll);
+    scrollDroppable({
+      id: droppable.descriptor.id,
+      offset: whatTheDroppableCanScroll,
+    });
 
     const remainder: Position = subtract(change, whatTheDroppableCanScroll);
     return remainder;
@@ -84,7 +88,7 @@ export default ({
     return remainder;
   };
 
-  const jumpScroller: JumpScroller = (state: DraggingState | BulkCollectionState) => {
+  const jumpScroller: JumpScroller = (state: DraggingState) => {
     const request: ?Position = state.scrollJumpRequest;
 
     if (!request) {

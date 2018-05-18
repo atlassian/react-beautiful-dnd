@@ -10,7 +10,6 @@ import {
   bulkReplace,
   completeDrop,
   move,
-  moveForward,
   bulkCollectionStarting,
   type MoveArgs,
 } from '../../../../src/state/action-creators';

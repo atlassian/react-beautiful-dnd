@@ -18,7 +18,6 @@ import type {
 // TODO: this is broken - good times
 export default (store: Store) => (next: (Action) => mixed) => {
   // TODO: an auto scroll action might not be finished before this fires again
-  console.log('creating scroller');
   const scroller: AutoScroller = createAutoScroller({
     ...bindActionCreators({
       scrollDroppable: updateDroppableScroll,

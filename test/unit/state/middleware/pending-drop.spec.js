@@ -5,7 +5,7 @@ import middleware from '../../../../src/state/middleware/pending-drop';
 import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';
 import dropMiddleware from '../../../../src/state/middleware/drop';
-import { prepare, initialPublish, drop, dropAnimationFinished, bulkReplace, completeDrop, clean } from '../../../../src/state/action-creators';
+import { prepare, initialPublish, drop, bulkReplace, completeDrop, clean } from '../../../../src/state/action-creators';
 import { initialBulkReplaceArgs, initialPublishArgs, getDragStart, getHomeLocation } from './util/preset-action-args';
 
 it('should trigger a drop on a bulk replace if a drop pending is waiting', () => {

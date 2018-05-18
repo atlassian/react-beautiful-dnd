@@ -4,15 +4,14 @@ import type { Rect, Position, Spacing } from 'css-box-model';
 import { add, apply, isEqual, patch } from '../position';
 import getBestScrollableDroppable from './get-best-scrollable-droppable';
 import { horizontal, vertical } from '../axis';
+import type { UpdateDroppableScrollArgs } from '../action-creators';
 import {
   canScrollWindow,
   canPartiallyScroll,
 } from './can-scroll';
 import type {
   Axis,
-  DroppableId,
   DraggingState,
-  BulkCollectionState,
   DroppableDimension,
   DraggableDimension,
   Scrollable,
@@ -230,11 +229,11 @@ const withPlaceholder = (
 };
 
 type Api = {|
-  scrollWindow: (offset: Position) => void,
-  scrollDroppable: (id: DroppableId, offset: Position) => void,
+  scrollWindow: (change: Position) => void,
+  scrollDroppable: (args: UpdateDroppableScrollArgs) => mixed,
 |}
 
-type ResultFn = (state: DraggingState | BulkCollectionState) => void;
+type ResultFn = (state: DraggingState) => void;
 type ResultCancel = { cancel: () => void };
 
 export type FluidScroller = ResultFn & ResultCancel;
@@ -246,7 +245,7 @@ export default ({
   const scheduleWindowScroll = rafSchd(scrollWindow);
   const scheduleDroppableScroll = rafSchd(scrollDroppable);
 
-  const scroller = (state: DraggingState | BulkCollectionState): void => {
+  const scroller = (state: DraggingState): void => {
     const center: Position = state.current.page.borderBoxCenter;
 
     // 1. Can we scroll the viewport?
@@ -312,7 +311,10 @@ export default ({
     });
 
     if (canScrollDroppable) {
-      scheduleDroppableScroll(droppable.descriptor.id, requiredFrameScroll);
+      scheduleDroppableScroll({
+        id: droppable.descriptor.id,
+        offset: requiredFrameScroll,
+      });
     }
   };
 
