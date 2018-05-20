@@ -1,6 +1,6 @@
 // @flow
 import { type Position } from 'css-box-model';
-import { getPreset } from './dimension';
+import { getPreset, getInitialImpact } from './dimension';
 import noImpact from '../../src/state/no-impact';
 import { vertical } from '../../src/state/axis';
 import getViewport from '../../src/view/window/get-viewport';
@@ -86,7 +86,7 @@ export default (axis?: Axis = vertical) => {
       dimensions: preset.dimensions,
       initial,
       current: initial,
-      impact: noImpact,
+      impact: getInitialImpact(draggable, droppable.axis),
       window: windowDetails,
       scrollJumpRequest: null,
       shouldAnimate: false,
@@ -95,64 +95,16 @@ export default (axis?: Axis = vertical) => {
     return result;
   };
 
-  const scrollJumpRequest = (request: Position, viewport?: Viewport = getViewport()): State => {
-    const id: DraggableId = preset.inHome1.descriptor.id;
-    // will populate the dimension state with the initial dimensions
-    const draggable: DraggableDimension = preset.draggables[id];
-    // either use the provided selection or use the draggable's center
-    const initialPosition: InitialDragPositions = {
-      selection: draggable.client.borderBox.center,
-      borderBoxCenter: draggable.client.borderBox.center,
-    };
-    const clientPositions: CurrentDragPositions = {
-      selection: draggable.client.marginBox.center,
-      borderBoxCenter: draggable.client.borderBox.center,
-      offset: origin,
-    };
+  const scrollJumpRequest = (
+    request: Position,
+    viewport?: Viewport = getViewport(),
+  ): DraggingState => {
+    const state: DraggingState = dragging(undefined, undefined, viewport);
 
-    const impact: DragImpact = {
-      movement: {
-        displaced: [],
-        amount: origin,
-        isBeyondStartPosition: false,
-      },
-      direction: preset.home.axis.direction,
-      destination: {
-        index: preset.inHome1.descriptor.index,
-        droppableId: preset.inHome1.descriptor.droppableId,
-      },
-    };
-
-    const drag: DragState = {
-      initial: {
-        descriptor: draggable.descriptor,
-        autoScrollMode: 'JUMP',
-        client: initialPosition,
-        page: initialPosition,
-        viewport,
-      },
-      current: {
-        client: clientPositions,
-        page: clientPositions,
-        shouldAnimate: true,
-        hasCompletedFirstBulkPublish: true,
-        viewport,
-      },
-      impact,
+    return {
+      ...state,
       scrollJumpRequest: request,
     };
-
-    const result: State = {
-      phase: 'DRAGGING',
-      drag,
-      drop: null,
-      dimension: getDimensionState({
-        draggableId: id,
-        scrollOptions: scheduled,
-      }),
-    };
-
-    return result;
   };
 
   const getDropAnimating = (id: DraggableId, reason: DropReason): State => {
@@ -231,10 +183,6 @@ export default (axis?: Axis = vertical) => {
   const allPhases = (id? : DraggableId = preset.inHome1.descriptor.id): State[] => [
     idle,
     preparing,
-    requesting({
-      draggableId: id,
-      scrollOptions: scheduled,
-    }),
     dragging(id),
     dropAnimating(id),
     userCancel(id),

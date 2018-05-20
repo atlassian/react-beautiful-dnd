@@ -7,16 +7,17 @@ import {
   getWindowOverlap,
   getDroppableOverlap,
 } from './can-scroll';
-import { move as moveAction, updateDroppableScroll as updateDroppableScrollAction } from '../action-creators';
+import { move as moveAction } from '../action-creators';
 import type {
   DroppableDimension,
   DraggableLocation,
   Viewport,
   DraggingState,
+  DroppableId,
 } from '../../types';
 
 type Args = {|
-  scrollDroppable: typeof updateDroppableScrollAction,
+  scrollDroppable: (id: DroppableId, change: Position) => void,
   scrollWindow: (offset: Position) => void,
   move: typeof moveAction,
 |}
@@ -48,19 +49,13 @@ export default ({
 
     // Droppable can absorb the entire change
     if (!overlap) {
-      scrollDroppable({
-        id: droppable.descriptor.id,
-        offset: change,
-      });
+      scrollDroppable(droppable.descriptor.id, change);
       return null;
     }
 
     // Droppable can only absorb a part of the change
     const whatTheDroppableCanScroll: Position = subtract(change, overlap);
-    scrollDroppable({
-      id: droppable.descriptor.id,
-      offset: whatTheDroppableCanScroll,
-    });
+    scrollDroppable(droppable.descriptor.id, whatTheDroppableCanScroll);
 
     const remainder: Position = subtract(change, whatTheDroppableCanScroll);
     return remainder;

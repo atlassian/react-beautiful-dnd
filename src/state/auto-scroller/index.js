@@ -3,10 +3,11 @@ import { type Position } from 'css-box-model';
 import createFluidScroller, { type FluidScroller } from './fluid-scroller';
 import createJumpScroller, { type JumpScroller } from './jump-scroller';
 import type { AutoScroller } from './auto-scroller-types';
-import { move as moveAction, updateDroppableScroll } from '../action-creators';
+import type { DroppableId } from '../../types';
+import { move as moveAction } from '../action-creators';
 
 type Args = {|
-  scrollDroppable: typeof updateDroppableScroll,
+  scrollDroppable: (id: DroppableId, change: Position) => void,
   move: typeof moveAction,
   scrollWindow: (offset: Position) => void,
 |}

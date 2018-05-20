@@ -65,4 +65,4 @@ export default (getMarshal: () => DimensionMarshal) =>
 
       scroller.jumpScroll(state);
     };
-};
+  };
