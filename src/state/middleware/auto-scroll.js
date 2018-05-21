@@ -7,7 +7,6 @@ import type { AutoScroller } from '../auto-scroller/auto-scroller-types';
 import type { DimensionMarshal } from '../../state/dimension-marshal/dimension-marshal-types';
 import { move } from '../action-creators';
 import scrollWindow from '../../view/window/scroll-window';
-import isDragEnding from './util/is-drag-ending';
 import type {
   DraggableId,
 
@@ -32,7 +31,8 @@ export default (getMarshal: () => DimensionMarshal) =>
 
     const shouldCancel = (action: Action) =>
       // Need to cancel any pending auto scrolling when drag is ending
-      isDragEnding(action) ||
+      action.type === 'CANCEL' ||
+      action.type === 'DROP' ||
       // A new bulk collection is starting - cancel any pending auto scrolls
       action.type === 'BULK_COLLECTION_STARTING';
 

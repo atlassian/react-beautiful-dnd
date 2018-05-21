@@ -169,7 +169,7 @@ export default ({
             critical: includeCritical ? critical : null,
           });
           timings.finish('Bulk dimension publish');
-        }, 0);
+        }, 200);
         frameId = null;
       });
     });
