@@ -64,18 +64,6 @@ export default (axis?: Axis = vertical) => {
       client, page: client,
     };
 
-    const windowDetails: WindowDetails = {
-      viewport,
-      scroll: {
-        initial: viewport.scroll,
-        current: viewport.scroll,
-        diff: {
-          value: origin,
-          displacement: origin,
-        },
-      },
-    };
-
     const result: DraggingState = {
       phase: 'DRAGGING',
       critical: {
@@ -87,7 +75,7 @@ export default (axis?: Axis = vertical) => {
       initial,
       current: initial,
       impact: getInitialImpact(draggable, droppable.axis),
-      window: windowDetails,
+      viewport,
       scrollJumpRequest: null,
       shouldAnimate: false,
     };

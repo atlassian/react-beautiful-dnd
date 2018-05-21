@@ -10,7 +10,7 @@ export default (store: Store) => (next: (Action) => mixed) => (action: Action): 
 
   const after: State = store.getState();
 
-  console.log({ action, before, after });
+  console.log('state', { before, after });
   console.groupEnd();
 
   return result;

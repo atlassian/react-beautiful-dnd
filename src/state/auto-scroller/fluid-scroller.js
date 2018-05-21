@@ -252,14 +252,15 @@ export default ({
 
     const draggable: DraggableDimension = state.dimensions.draggables[state.critical.draggable.id];
     const subject: Rect = draggable.page.marginBox;
-    const viewport: Viewport = state.window.viewport;
+    const viewport: Viewport = state.viewport;
     const requiredWindowScroll: ?Position = getRequiredScroll({
-      container: viewport.subject,
+      container: viewport.frame,
       subject,
       center,
     });
 
     if (requiredWindowScroll && canScrollWindow(viewport, requiredWindowScroll)) {
+      console.log('required window scroll', requiredWindowScroll);
       scheduleWindowScroll(requiredWindowScroll);
       return;
     }

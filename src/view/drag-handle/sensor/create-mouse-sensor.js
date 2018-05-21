@@ -197,6 +197,7 @@ export default ({
           stopPendingDrag();
           return;
         }
+        // callbacks.onWindowScroll();
         schedule.windowScrollMove();
       },
     },

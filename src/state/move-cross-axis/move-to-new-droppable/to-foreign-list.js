@@ -99,7 +99,7 @@ export default ({
     .map((dimension: DraggableDimension): Displacement => getDisplacement({
       draggable: dimension,
       destination: droppable,
-      viewport: viewport.subject,
+      viewport: viewport.frame,
       previousImpact,
     }));
 

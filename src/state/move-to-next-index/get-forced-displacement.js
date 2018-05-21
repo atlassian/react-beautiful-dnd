@@ -48,7 +48,7 @@ export const withFirstAdded = ({
         draggable: draggables[current.draggableId],
         destination: droppable,
         previousImpact,
-        viewport: viewport.subject,
+        viewport: viewport.frame,
       });
 
       return updated;

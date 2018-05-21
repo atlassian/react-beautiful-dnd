@@ -49,7 +49,7 @@ export default ({
       draggable: dimension,
       destination,
       previousImpact,
-      viewport: viewport.subject,
+      viewport: viewport.frame,
     }));
 
   const newIndex: number = insideDestination.length - displaced.length;

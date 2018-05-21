@@ -12,7 +12,8 @@ import type {
   Viewport,
 } from '../../../../src/types';
 import { add, patch, subtract, negate } from '../../../../src/state/position';
-import { createViewport, withWindowScrollSize, scrollViewport } from '../../../utils/viewport';
+import { createViewport, withWindowScrollSize } from '../../../utils/viewport';
+import scrollViewport from '../../../../src/state/scroll-viewport';
 import { vertical, horizontal } from '../../../../src/state/axis';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import { getPreset, addDroppable, getDroppableDimension } from '../../../utils/dimension';
@@ -27,7 +28,7 @@ const windowScrollSize = {
   scrollWidth: 1600,
 };
 const scrollableViewport: Viewport = createViewport({
-  subject: getRect({
+  frame: getRect({
     top: 0,
     left: 0,
     right: 800,
@@ -38,11 +39,12 @@ const scrollableViewport: Viewport = createViewport({
   scroll: origin,
 });
 
-const unscrollableViewport: Viewport = {
-  subject: scrollableViewport.subject,
+const unscrollableViewport: Viewport = createViewport({
+  frame: scrollableViewport.frame,
+  scrollHeight: scrollableViewport.frame.height,
+  scrollWidth: scrollableViewport.frame.width,
   scroll: origin,
-  maxScroll: origin,
-};
+});
 
 describe('jump auto scrolling', () => {
   let jumpScroll: JumpScroller;
@@ -61,7 +63,7 @@ describe('jump auto scrolling', () => {
     requestAnimationFrame.reset();
   });
 
-  [vertical/*, horizontal*/].forEach((axis: Axis) => {
+  [vertical, horizontal].forEach((axis: Axis) => {
     describe(`on the ${axis.direction} axis`, () => {
       const preset = getPreset(axis);
       const state = getStatePreset(axis);
@@ -98,8 +100,8 @@ describe('jump auto scrolling', () => {
             // only allowing scrolling by 1 px
             const restricted: Viewport = withWindowScrollSize({
               viewport: scrollableViewport,
-              scrollHeight: scrollableViewport.subject.height + 1,
-              scrollWidth: scrollableViewport.subject.width + 1,
+              scrollHeight: scrollableViewport.frame.height + 1,
+              scrollWidth: scrollableViewport.frame.width + 1,
             });
             // more than the 1 pixel allowed
             const request: Position = patch(axis.line, 3);
@@ -317,8 +319,8 @@ describe('jump auto scrolling', () => {
                 const maxWindowScroll: Position = getMaxScroll({
                   scrollHeight: windowScrollSize.scrollHeight,
                   scrollWidth: windowScrollSize.scrollWidth,
-                  height: scrollableViewport.subject.height,
-                  width: scrollableViewport.subject.width,
+                  height: scrollableViewport.frame.height,
+                  width: scrollableViewport.frame.width,
                 });
                 const windowScroll: Position = subtract(maxWindowScroll, availableWindowScroll);
                 // setWindowScroll(windowScroll);

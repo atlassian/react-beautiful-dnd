@@ -84,7 +84,7 @@ export default ({
     draggable,
     destination: droppable,
     newPageBorderBoxCenter,
-    viewport: viewport.subject,
+    viewport: viewport.frame,
   });
 
   const displaced: Displacement[] = (() => {

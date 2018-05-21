@@ -64,7 +64,7 @@ export default ({
         return false;
       }
       // TODO: only need to be totally visible on the cross axis
-      return isPartiallyVisibleThroughFrame(viewport.subject)(clippedPageMarginBox);
+      return isPartiallyVisibleThroughFrame(viewport.frame)(clippedPageMarginBox);
     })
     .filter((droppable: DroppableDimension): boolean => {
       const targetClipped: Rect = getSafeClipped(droppable);

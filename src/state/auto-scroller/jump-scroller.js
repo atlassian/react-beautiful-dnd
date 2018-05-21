@@ -110,7 +110,7 @@ export default ({
       return;
     }
 
-    const viewport: Viewport = state.window.viewport;
+    const viewport: Viewport = state.viewport;
     const windowRemainder: ?Position = scrollWindowAsMuchAsItCan(viewport, droppableRemainder);
 
     // window could absorb all the droppable remainder

@@ -7,7 +7,7 @@ import moveCrossAxis from './move-cross-axis/';
 import moveToNextIndex from './move-to-next-index/';
 import { noMovement } from './no-impact';
 import { add, isEqual, subtract } from './position';
-import scrollWindowDetails from './scroll-window-details';
+import scrollViewport from './scroll-viewport';
 import type {
   Action,
   State,
@@ -25,7 +25,7 @@ import type {
   DropAnimatingState,
   DropPendingState,
   DragImpact,
-  WindowDetails,
+  Viewport,
   DimensionMap,
   DropReason,
   Direction,
@@ -41,7 +41,7 @@ type MoveArgs = {|
   state: State,
   clientSelection: Position,
   shouldAnimate: boolean,
-  windowDetails?: WindowDetails,
+  viewport?: Viewport,
   // force a custom drag impact
   impact?: ?DragImpact,
   // provide a scroll jump request (optionally provided - and can be null)
@@ -57,7 +57,7 @@ const moveWithPositionUpdates = ({
   state,
   clientSelection,
   shouldAnimate,
-  windowDetails,
+  viewport,
   impact,
   scrollJumpRequest,
 }: MoveArgs): BulkCollectionState | DraggingState | DropPendingState => {
@@ -66,20 +66,23 @@ const moveWithPositionUpdates = ({
 
   invariant(isMovementAllowed(state), `Attempting to move in an unsupported phase ${state.phase}`);
 
+  const newViewport: Viewport = viewport || state.viewport;
+  const currentWindowScroll: Position = newViewport.scroll.current;
+
   const client: ItemPositions = (() => {
     const offset: Position = subtract(clientSelection, state.initial.client.selection);
 
     return {
       offset,
       selection: clientSelection,
-      borderBoxCenter: add(offset, state.initial.client.borderBoxCenter),
+      borderBoxCenter: add(state.initial.client.borderBoxCenter, offset),
     };
   })();
 
   const page: ItemPositions = {
-    selection: add(client.selection, state.window.scroll.current),
-    offset: add(client.offset, state.window.scroll.current),
-    borderBoxCenter: add(client.borderBoxCenter, state.window.scroll.current),
+    selection: add(client.selection, currentWindowScroll),
+    offset: add(client.offset, currentWindowScroll),
+    borderBoxCenter: add(client.borderBoxCenter, currentWindowScroll),
   };
   const current: DragPositions = {
     client, page,
@@ -96,12 +99,12 @@ const moveWithPositionUpdates = ({
   }
 
   const newImpact: DragImpact = impact || getDragImpact({
-    pageBorderBoxCenter: current.page.borderBoxCenter,
+    pageBorderBoxCenter: page.borderBoxCenter,
     draggable: state.dimensions.draggables[state.critical.draggable.id],
     draggables: state.dimensions.draggables,
     droppables: state.dimensions.droppables,
     previousImpact: state.impact,
-    viewport: windowDetails ? windowDetails.viewport : state.window.viewport,
+    viewport: newViewport,
   });
 
   // dragging!
@@ -111,7 +114,7 @@ const moveWithPositionUpdates = ({
     shouldAnimate,
     impact: newImpact,
     scrollJumpRequest,
-    window: windowDetails || state.window,
+    viewport: newViewport,
   };
 
   return result;
@@ -132,23 +135,12 @@ export default (state: State = idle, action: Action): State => {
   if (action.type === 'INITIAL_PUBLISH') {
     invariant(state.phase === 'PREPARING', 'INITIAL_PUBLISH must come after a PREPARING phase');
     const { critical, client, viewport, dimensions, autoScrollMode } = action.payload;
-    const windowDetails: WindowDetails = {
-      viewport,
-      scroll: {
-        initial: viewport.scroll,
-        current: viewport.scroll,
-        diff: {
-          value: origin,
-          displacement: origin,
-        },
-      },
-    };
 
     const initial: DragPositions = {
       client,
       page: {
-        selection: add(client.selection, windowDetails.scroll.initial),
-        borderBoxCenter: add(client.selection, windowDetails.scroll.initial),
+        selection: add(client.selection, viewport.scroll.initial),
+        borderBoxCenter: add(client.selection, viewport.scroll.initial),
         offset: client.offset,
       },
     };
@@ -174,7 +166,7 @@ export default (state: State = idle, action: Action): State => {
       initial,
       current: initial,
       impact,
-      window: windowDetails,
+      viewport,
       scrollJumpRequest: null,
       shouldAnimate: false,
     };
@@ -235,6 +227,8 @@ export default (state: State = idle, action: Action): State => {
       };
     })();
 
+    // TODO: ensure viewport is reset after bulk collection
+
     const impact: DragImpact = getDragImpact({
       pageBorderBoxCenter: state.current.page.borderBoxCenter,
       draggable: dimensions.draggables[state.critical.draggable.id],
@@ -243,18 +237,6 @@ export default (state: State = idle, action: Action): State => {
       previousImpact: state.impact,
       viewport,
     });
-
-    const windowDetails: WindowDetails = {
-      viewport,
-      scroll: {
-        initial: viewport.scroll,
-        current: viewport.scroll,
-        diff: {
-          value: origin,
-          displacement: origin,
-        },
-      },
-    };
 
     // The starting index of a draggable can change during a drag
     const newCritical: Critical = critical || state.critical;
@@ -270,7 +252,7 @@ export default (state: State = idle, action: Action): State => {
         critical: newCritical,
         impact,
         dimensions,
-        window: windowDetails,
+        viewport,
       };
     }
 
@@ -286,7 +268,7 @@ export default (state: State = idle, action: Action): State => {
       impact,
       dimensions,
       critical: newCritical,
-      window: windowDetails,
+      viewport,
       // No longer waiting
       isWaiting: false,
     };
@@ -354,7 +336,7 @@ export default (state: State = idle, action: Action): State => {
         draggables: dimensions.draggables,
         droppables: dimensions.droppables,
         previousImpact: state.impact,
-        viewport: state.window.viewport,
+        viewport: state.viewport,
       });
     })();
 
@@ -410,7 +392,7 @@ export default (state: State = idle, action: Action): State => {
       draggables: dimensions.draggables,
       droppables: dimensions.droppables,
       previousImpact: state.impact,
-      viewport: state.window.viewport,
+      viewport: state.viewport,
     });
 
     return {
@@ -434,21 +416,22 @@ export default (state: State = idle, action: Action): State => {
 
     const newScroll: Position = action.payload.scroll;
 
-    if (isEqual(state.window.scroll.current, newScroll)) {
+    if (isEqual(state.viewport.scroll.current, newScroll)) {
+      console.log('bailing early: new scroll is equal');
       return state;
     }
 
-    const isJumpScrolling: boolean = state.autoScrollMode === 'JUMP';
-
     // If we are jump scrolling - any window scrolls should not update the impact
+    const isJumpScrolling: boolean = state.autoScrollMode === 'JUMP';
     const impact: ?DragImpact = isJumpScrolling ? state.impact : null;
 
-    const windowDetails: WindowDetails = scrollWindowDetails(state.window, newScroll);
+    console.log('scrolling viewport in state');
+    const viewport: Viewport = scrollViewport(state.viewport, newScroll);
 
     return moveWithPositionUpdates({
       state,
       clientSelection: state.current.client.selection,
-      windowDetails,
+      viewport,
       shouldAnimate: false,
       impact,
     });
@@ -501,7 +484,7 @@ export default (state: State = idle, action: Action): State => {
         draggables: state.dimensions.draggables,
         previousPageBorderBoxCenter: state.current.page.borderBoxCenter,
         previousImpact: state.impact,
-        viewport: state.window.viewport,
+        viewport: state.viewport,
       });
 
       // Cannot move (at the beginning or end of a list)
@@ -512,7 +495,7 @@ export default (state: State = idle, action: Action): State => {
       const pageBorderBoxCenter: Position = result.pageBorderBoxCenter;
       // TODO: not sure if this is correct
       const clientBorderBoxCenter: Position = subtract(
-        pageBorderBoxCenter, state.window.scroll.current,
+        pageBorderBoxCenter, state.viewport.scroll.current,
       );
 
       return moveWithPositionUpdates({
@@ -540,7 +523,7 @@ export default (state: State = idle, action: Action): State => {
       draggables: state.dimensions.draggables,
       droppables: state.dimensions.droppables,
       previousImpact: state.impact,
-      viewport: state.window.viewport,
+      viewport: state.viewport,
     });
 
     if (!result) {
@@ -549,7 +532,7 @@ export default (state: State = idle, action: Action): State => {
 
     const clientSelection: Position = subtract(
       result.pageBorderBoxCenter,
-      state.window.viewport.scroll
+      state.viewport.scroll.current
     );
 
     return moveWithPositionUpdates({

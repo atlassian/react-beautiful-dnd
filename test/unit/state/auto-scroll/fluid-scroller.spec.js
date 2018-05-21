@@ -16,9 +16,9 @@ import type {
 } from '../../../../src/types';
 import type { PixelThresholds } from '../../../../src/state/auto-scroller/fluid-scroller';
 import { add, patch, subtract } from '../../../../src/state/position';
+import scrollViewport from '../../../../src/state/scroll-viewport';
 import {
   createViewport,
-  scrollViewport,
 } from '../../../utils/viewport';
 import noImpact, { noMovement } from '../../../../src/state/no-impact';
 import { vertical, horizontal } from '../../../../src/state/axis';
@@ -46,7 +46,7 @@ const windowScrollSize = {
   scrollWidth: 1600,
 };
 const scrollableViewport: Viewport = createViewport({
-  subject: getRect({
+  frame: getRect({
     top: 0,
     left: 0,
     right: 800,
@@ -57,16 +57,17 @@ const scrollableViewport: Viewport = createViewport({
   scroll: origin,
 });
 
-const unscrollableViewport: Viewport = {
-  subject: getRect({
+const unscrollableViewport: Viewport = createViewport({
+  frame: getRect({
     top: 0,
     left: 0,
     right: 800,
     bottom: 1000,
   }),
+  scrollHeight: 1000,
+  scrollWidth: 800,
   scroll: origin,
-  maxScroll: origin,
-};
+});
 
 describe('fluid auto scrolling', () => {
   let fluidScroll: FluidScroller;
@@ -148,9 +149,9 @@ describe('fluid auto scrolling', () => {
       };
 
       describe('window scrolling', () => {
-        const thresholds: PixelThresholds = getPixelThresholds(scrollableViewport.subject, axis);
+        const thresholds: PixelThresholds = getPixelThresholds(scrollableViewport.frame, axis);
         const crossAxisThresholds: PixelThresholds = getPixelThresholds(
-          scrollableViewport.subject,
+          scrollableViewport.frame,
           axis === vertical ? horizontal : vertical,
         );
 
@@ -158,13 +159,13 @@ describe('fluid auto scrolling', () => {
           const onStartBoundary: Position = patch(
             axis.line,
             // to the boundary is not enough to start
-            (scrollableViewport.subject[axis.size] - thresholds.startFrom),
-            scrollableViewport.subject.center[axis.crossAxisLine],
+            (scrollableViewport.frame[axis.size] - thresholds.startFrom),
+            scrollableViewport.frame.center[axis.crossAxisLine],
           );
           const onMaxBoundary: Position = patch(
             axis.line,
-            (scrollableViewport.subject[axis.size] - thresholds.maxSpeedAt),
-            scrollableViewport.subject.center[axis.crossAxisLine],
+            (scrollableViewport.frame[axis.size] - thresholds.maxSpeedAt),
+            scrollableViewport.frame.center[axis.crossAxisLine],
           );
 
           it('should not scroll if not past the start threshold', () => {
@@ -274,7 +275,7 @@ describe('fluid auto scrolling', () => {
           });
 
           it('should not scroll if the item is too big', () => {
-            const expanded: Spacing = expandByPosition(scrollableViewport.subject, { x: 1, y: 1 });
+            const expanded: Spacing = expandByPosition(scrollableViewport.frame, { x: 1, y: 1 });
             const tooBig: DraggableDimension = getDraggableDimension({
               descriptor: preset.inHome1.descriptor,
               borderBox: expanded,
@@ -312,12 +313,12 @@ describe('fluid auto scrolling', () => {
             axis.line,
             // at the boundary is not enough to start
             windowScroll[axis.line] + thresholds.startFrom,
-            scrolledViewport.subject.center[axis.crossAxisLine],
+            scrolledViewport.frame.center[axis.crossAxisLine],
           );
           const onMaxBoundary: Position = patch(
             axis.line,
             (windowScroll[axis.line] + thresholds.maxSpeedAt),
-            scrolledViewport.subject.center[axis.crossAxisLine],
+            scrolledViewport.frame.center[axis.crossAxisLine],
           );
 
           it('should not scroll if not past the start threshold', () => {
@@ -431,7 +432,7 @@ describe('fluid auto scrolling', () => {
           });
 
           it('should not scroll if the item is too big', () => {
-            const expanded: Spacing = expandByPosition(scrollableViewport.subject, { x: 1, y: 1 });
+            const expanded: Spacing = expandByPosition(scrollableViewport.frame, { x: 1, y: 1 });
             const tooBig: DraggableDimension = getDraggableDimension({
               descriptor: preset.inHome1.descriptor,
               borderBox: expanded,
@@ -465,9 +466,9 @@ describe('fluid auto scrolling', () => {
         describe('moving forward on the cross axis', () => {
           const onStartBoundary: Position = patch(
             axis.line,
-            scrollableViewport.subject.center[axis.line],
+            scrollableViewport.frame.center[axis.line],
             // to the boundary is not enough to start
-            (scrollableViewport.subject[axis.crossAxisSize] - crossAxisThresholds.startFrom),
+            (scrollableViewport.frame[axis.crossAxisSize] - crossAxisThresholds.startFrom),
           );
 
           it('should not scroll if not past the start threshold', () => {
@@ -506,7 +507,7 @@ describe('fluid auto scrolling', () => {
 
           const onStartBoundary: Position = patch(
             axis.line,
-            scrolled.subject.center[axis.line],
+            scrolled.frame.center[axis.line],
             // to the boundary is not enough to start
             windowScroll[axis.crossAxisLine] + (crossAxisThresholds.startFrom)
           );
@@ -543,14 +544,14 @@ describe('fluid auto scrolling', () => {
         describe('big draggable', () => {
           const onMaxBoundaryOfBoth: Position = patch(
             axis.line,
-            (scrollableViewport.subject[axis.size] - thresholds.maxSpeedAt),
-            (scrollableViewport.subject[axis.crossAxisSize] - crossAxisThresholds.maxSpeedAt),
+            (scrollableViewport.frame[axis.size] - thresholds.maxSpeedAt),
+            (scrollableViewport.frame[axis.crossAxisSize] - crossAxisThresholds.maxSpeedAt),
           );
 
           describe('bigger on the main axis', () => {
             it('should not allow scrolling on the main axis, but allow scrolling on the cross axis', () => {
               const expanded: Spacing = expandByPosition(
-                scrollableViewport.subject, patch(axis.line, 1)
+                scrollableViewport.frame, patch(axis.line, 1)
               );
               const tooBigOnMainAxis: DraggableDimension = getDraggableDimension({
                 descriptor: preset.inHome1.descriptor,
@@ -577,7 +578,7 @@ describe('fluid auto scrolling', () => {
           describe('bigger on the cross axis', () => {
             it('should not allow scrolling on the cross axis, but allow scrolling on the main axis', () => {
               const expanded: Spacing = expandByPosition(
-                scrollableViewport.subject,
+                scrollableViewport.frame,
                 patch(axis.crossAxisLine, 1)
               );
               const tooBigOnCrossAxis: DraggableDimension = getDraggableDimension({
@@ -605,7 +606,7 @@ describe('fluid auto scrolling', () => {
           describe('bigger on both axis', () => {
             it('should not allow scrolling on any axis', () => {
               const expanded: Spacing = expandByPosition(
-                scrollableViewport.subject, patch(axis.line, 1, 1)
+                scrollableViewport.frame, patch(axis.line, 1, 1)
               );
               const tooBig: DraggableDimension = getDraggableDimension({
                 descriptor: preset.inHome1.descriptor,
@@ -1325,20 +1326,20 @@ describe('fluid auto scrolling', () => {
             bottom: windowScrollSize.scrollHeight,
           },
           closest: {
-            borderBox: scrollableViewport.subject,
+            borderBox: scrollableViewport.frame,
             scrollWidth: windowScrollSize.scrollWidth,
             scrollHeight: windowScrollSize.scrollHeight,
             scroll: origin,
             shouldClipSubject: true,
           },
         });
-        const thresholds: PixelThresholds = getPixelThresholds(scrollableViewport.subject, axis);
+        const thresholds: PixelThresholds = getPixelThresholds(scrollableViewport.frame, axis);
 
         it('should scroll the window only if both the window and droppable can be scrolled', () => {
           const onMaxBoundary: Position = patch(
             axis.line,
-            (scrollableViewport.subject[axis.size] - thresholds.maxSpeedAt),
-            scrollableViewport.subject.center[axis.crossAxisLine],
+            (scrollableViewport.frame[axis.size] - thresholds.maxSpeedAt),
+            scrollableViewport.frame.center[axis.crossAxisLine],
           );
 
           fluidScroll(addDroppable(dragTo({
@@ -1355,12 +1356,12 @@ describe('fluid auto scrolling', () => {
       describe('cancel', () => {
         it('should cancel any pending window scroll', () => {
           const thresholds: PixelThresholds = getPixelThresholds(
-            scrollableViewport.subject, axis
+            scrollableViewport.frame, axis
           );
           const onMaxBoundary: Position = patch(
             axis.line,
-            (scrollableViewport.subject[axis.size] - thresholds.maxSpeedAt),
-            scrollableViewport.subject.center[axis.crossAxisLine],
+            (scrollableViewport.frame[axis.size] - thresholds.maxSpeedAt),
+            scrollableViewport.frame.center[axis.crossAxisLine],
           );
 
           fluidScroll(dragTo({

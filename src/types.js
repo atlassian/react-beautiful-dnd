@@ -152,11 +152,11 @@ export type ItemPositions = {|
 // When Dragging with a keyboard we want to jump as required
 export type AutoScrollMode = 'FLUID' | 'JUMP';
 
-export type Viewport = {|
-  scroll: Position,
-  maxScroll: Position,
-  subject: Rect,
-|}
+// export type Viewport = {|
+//   scroll: Position,
+//   maxScroll: Position,
+//   subject: Rect,
+// |}
 
 export type DragPositions = {|
   client: ItemPositions,
@@ -211,10 +211,12 @@ export type Critical = {|
   droppable: DroppableDescriptor,
 |}
 
-export type WindowDetails = {|
-  viewport: Viewport,
+export type Viewport = {|
+  // live updates with the latest values
+  frame: Rect,
   scroll: {|
     initial: Position,
+    max: Position,
     current: Position,
     diff: {|
       value: Position,
@@ -246,7 +248,7 @@ export type DraggingState = {|
   initial: DragPositions,
   current: DragPositions,
   impact: DragImpact,
-  window: WindowDetails,
+  viewport: Viewport,
   // if we need to jump the scroll (keyboard dragging)
   scrollJumpRequest: ?Position,
   // whether or not draggable movements should be animated

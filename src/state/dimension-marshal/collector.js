@@ -151,7 +151,7 @@ export default ({
       const viewport: Viewport = getViewport();
       const critical: Critical = getCritical();
       const dimensions: DimensionMap = collectFromDOM({
-        windowScroll: viewport.scroll,
+        windowScroll: viewport.scroll.current,
         includeCritical,
       });
       timings.finish('DOM collection');
@@ -169,7 +169,7 @@ export default ({
             critical: includeCritical ? critical : null,
           });
           timings.finish('Bulk dimension publish');
-        }, 2000);
+        }, 0);
         frameId = null;
       });
     });

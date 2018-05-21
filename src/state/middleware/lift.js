@@ -58,7 +58,7 @@ export default (getMarshal: () => DimensionMarshal) =>
         scrollOptions,
       };
       // Let's get the marshal started!
-      const { critical, dimensions } = marshal.startPublishing(request, viewport.scroll);
+      const { critical, dimensions } = marshal.startPublishing(request, viewport.scroll.current);
       // Okay, we are good to start dragging now
       dispatch(initialPublish({
         critical,

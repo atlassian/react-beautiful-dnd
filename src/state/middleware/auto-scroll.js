@@ -23,7 +23,7 @@ export default (getMarshal: () => DimensionMarshal) =>
       ...bindActionCreators({
         // TODO: using next to avoid recursive calls to auto scrolling..
         move,
-      }, next),
+      }, store.dispatch),
       scrollDroppable: (id: DraggableId, change: Position): void => {
         getMarshal().scrollDroppable(id, change);
       },
@@ -33,6 +33,13 @@ export default (getMarshal: () => DimensionMarshal) =>
     return (action: Action): mixed => {
       // Need to cancel any pending auto scrolling when drag is ending
       if (isDragEnding(action)) {
+        scroller.cancel();
+        next(action);
+        return;
+      }
+
+      // A new bulk collection is starting - cancel any pending auto scrolls
+      if (action.type === 'BULK_COLLECTION_STARTING') {
         scroller.cancel();
         next(action);
         return;

@@ -79,7 +79,7 @@ export default ({
       draggable: dimension,
       destination: home,
       previousImpact,
-      viewport: viewport.subject,
+      viewport: viewport.frame,
     }));
 
     // Need to ensure that we always order by the closest impacted item

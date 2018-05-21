@@ -17,7 +17,7 @@ import type {
   Action,
   DropReason,
   DroppableDimension,
-  WindowDetails,
+  Viewport,
   Critical,
   DraggableLocation,
   DragImpact,
@@ -31,10 +31,10 @@ const origin: Position = { x: 0, y: 0 };
 
 const getScrollDisplacement = (
   droppable: DroppableDimension,
-  windowDetails: WindowDetails,
+  viewport: Viewport,
 ): Position => withDroppableDisplacement(
   droppable,
-  windowDetails.scroll.diff.displacement
+  viewport.scroll.diff.displacement
 );
 
 export default ({ getState, dispatch }: Store) =>
@@ -110,7 +110,7 @@ export default ({ getState, dispatch }: Store) =>
       // If cancelling: consider the home droppable
       // If dropping over nothing: consider the home droppable
       // If dropping over a droppable: consider the scroll of the droppable you are over
-      getScrollDisplacement(droppable || home, state.window)
+      getScrollDisplacement(droppable || home, state.viewport)
     );
 
     // Do not animate if you do not need to.
