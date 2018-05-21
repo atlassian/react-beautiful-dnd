@@ -9,12 +9,12 @@ export default (viewport: Viewport, newScroll: Position): Viewport => {
   const diff: Position = subtract(newScroll, viewport.scroll.initial);
   const displacement: Position = negate(diff);
 
+  // We need to update the frame so that it is always a live value
+  // The top / left of the frame should always match the newScroll position
+  const change: Position = subtract(diff, viewport.scroll.current);
   const frame: Rect = getRect(
-    offsetByPosition(viewport.frame, diff)
+    offsetByPosition(viewport.frame, change)
   );
-
-  console.log('scroll change recorded:', diff);
-  console.log('window scroll is now', newScroll)
 
   const updated: Viewport = {
     frame,

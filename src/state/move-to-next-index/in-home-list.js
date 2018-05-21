@@ -87,6 +87,9 @@ export default ({
     viewport: viewport.frame,
   });
 
+  console.log('new page center', newPageBorderBoxCenter, 'is visible in frame', viewport.frame, isVisibleInNewLocation);
+
+
   const displaced: Displacement[] = (() => {
     if (isMovingTowardStart) {
       return withFirstRemoved({
@@ -130,6 +133,8 @@ export default ({
   // The full distance required to get from the previous page center to the new page center
   const distance: Position = subtract(newPageBorderBoxCenter, previousPageBorderBoxCenter);
   const distanceWithScroll: Position = withDroppableDisplacement(droppable, distance);
+
+  console.log('request jump scroll', distanceWithScroll);
 
   return {
     pageBorderBoxCenter: previousPageBorderBoxCenter,

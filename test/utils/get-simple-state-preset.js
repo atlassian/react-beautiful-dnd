@@ -23,7 +23,6 @@ import type {
   ItemPositions,
   DragPositions,
   DraggingState,
-  WindowDetails,
 } from '../../src/types';
 
 const scheduled: ScrollOptions = {

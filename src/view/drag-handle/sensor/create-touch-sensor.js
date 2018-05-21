@@ -368,6 +368,7 @@ export default ({
       return;
     }
 
+    // TODO: call prevent default here?
     if (!canStartCapturing(event)) {
       return;
     }

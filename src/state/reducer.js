@@ -285,11 +285,17 @@ export default (state: State = idle, action: Action): State => {
       return state;
     }
 
+    invariant(isMovementAllowed(state), `MOVE not permitted in phase ${state.phase}`);
+
     const { client, shouldAnimate } = action.payload;
+
+    // If we are jump scrolling - manual movements should not update the impact
+    const impact: ?DragImpact = state.autoScrollMode === 'JUMP' ? state.impact : null;
 
     return moveWithPositionUpdates({
       state,
       clientSelection: client,
+      impact,
       shouldAnimate,
     });
   }
@@ -425,8 +431,9 @@ export default (state: State = idle, action: Action): State => {
     const isJumpScrolling: boolean = state.autoScrollMode === 'JUMP';
     const impact: ?DragImpact = isJumpScrolling ? state.impact : null;
 
-    console.log('scrolling viewport in state');
     const viewport: Viewport = scrollViewport(state.viewport, newScroll);
+
+    console.log('MOVE_BY_WINDOW_SCROLL: updating viewport to', viewport.frame);
 
     return moveWithPositionUpdates({
       state,
@@ -442,6 +449,8 @@ export default (state: State = idle, action: Action): State => {
     if (state.phase === 'BULK_COLLECTING' || state.phase === 'DROP_PENDING') {
       return state;
     }
+
+    console.warn(action.type);
 
     invariant(state.phase === 'DRAGGING', `${action.type} received while not in DRAGGING phase`);
 
@@ -491,6 +500,7 @@ export default (state: State = idle, action: Action): State => {
       if (!result) {
         return state;
       }
+
       const impact: DragImpact = result.impact;
       const pageBorderBoxCenter: Position = result.pageBorderBoxCenter;
       // TODO: not sure if this is correct

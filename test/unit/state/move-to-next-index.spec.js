@@ -9,6 +9,7 @@ import noImpact, { noMovement } from '../../../src/state/no-impact';
 import { patch, subtract } from '../../../src/state/position';
 import { vertical, horizontal } from '../../../src/state/axis';
 import { isPartiallyVisible } from '../../../src/state/visibility/is-visible';
+import { createViewport } from '../../utils/viewport';
 import type {
   Viewport,
   Axis,
@@ -21,16 +22,17 @@ import type {
 
 const origin: Position = { x: 0, y: 0 };
 
-const customViewport: Viewport = {
-  subject: getRect({
+const customViewport: Viewport = createViewport({
+  frame: getRect({
     top: 0,
     left: 0,
     bottom: 1000,
     right: 1000,
   }),
   scroll: origin,
-  maxScroll: origin,
-};
+  scrollHeight: 1000,
+  scrollWidth: 1000,
+});
 
 describe('move to next index', () => {
   beforeEach(() => {
@@ -620,28 +622,28 @@ describe('move to next index', () => {
                 expect(isPartiallyVisible({
                   target: inHome6.page.marginBox,
                   destination: scrolled,
-                  viewport: customViewport.subject,
+                  viewport: customViewport.frame,
                 })).toBe(true);
                 expect(isPartiallyVisible({
                   target: inHome5.page.marginBox,
                   destination: scrolled,
-                  viewport: customViewport.subject,
+                  viewport: customViewport.frame,
                 })).toBe(true);
                 expect(isPartiallyVisible({
                   target: inHome4.page.marginBox,
                   destination: scrolled,
-                  viewport: customViewport.subject,
+                  viewport: customViewport.frame,
                 })).toBe(false);
                 expect(isPartiallyVisible({
                   target: inHome3.page.marginBox,
                   destination: scrolled,
-                  viewport: customViewport.subject,
+                  viewport: customViewport.frame,
                 })).toBe(false);
                 // this one will remain invisible
                 expect(isPartiallyVisible({
                   target: inHome2.page.marginBox,
                   destination: scrolled,
-                  viewport: customViewport.subject,
+                  viewport: customViewport.frame,
                 })).toBe(false);
 
                 const expected: DragImpact = {
@@ -1034,7 +1036,7 @@ describe('move to next index', () => {
                   index: 0,
                   droppableId: droppable.descriptor.id,
                 },
-                borderBox: customViewport.subject,
+                borderBox: customViewport.frame,
               });
               const outsideViewport: DraggableDimension = getDraggableDimension({
                 descriptor: {
@@ -1044,10 +1046,10 @@ describe('move to next index', () => {
                 },
                 borderBox: {
                   // is bottom left of the viewport
-                  top: customViewport.subject.bottom + 1,
-                  right: customViewport.subject.right + 100,
-                  left: customViewport.subject.right + 1,
-                  bottom: customViewport.subject.bottom + 100,
+                  top: customViewport.frame.bottom + 1,
+                  right: customViewport.frame.right + 100,
+                  left: customViewport.frame.right + 1,
+                  bottom: customViewport.frame.bottom + 100,
                 },
               });
               // inViewport is in its original position
@@ -1124,8 +1126,8 @@ describe('move to next index', () => {
                 borderBox: {
                   top: 0,
                   left: 0,
-                  right: customViewport.subject.right - 100,
-                  bottom: customViewport.subject.bottom - 100,
+                  right: customViewport.frame.right - 100,
+                  bottom: customViewport.frame.bottom - 100,
                 },
               });
               const invisible: DraggableDimension = getDraggableDimension({
@@ -1135,10 +1137,10 @@ describe('move to next index', () => {
                   droppableId: droppable.descriptor.id,
                 },
                 borderBox: {
-                  top: customViewport.subject.bottom + 1,
-                  left: customViewport.subject.right + 1,
-                  bottom: customViewport.subject.bottom + 100,
-                  right: customViewport.subject.right + 100,
+                  top: customViewport.frame.bottom + 1,
+                  left: customViewport.frame.right + 1,
+                  bottom: customViewport.frame.bottom + 100,
+                  right: customViewport.frame.right + 100,
                 },
               });
               // inViewport is in its original position

@@ -1,4 +1,5 @@
 // @flow
+import type { Position } from 'css-box-model';
 import { getPreset } from '../../../../utils/dimension';
 import getViewport from '../../../../../src/view/window/get-viewport';
 import type {
@@ -14,10 +15,20 @@ import type {
 } from '../../../../../src/state/action-creators';
 
 const preset = getPreset();
+const origin: Position = { x: 0, y: 0 };
 
+const base: Viewport = getViewport();
 export const viewport: Viewport = {
-  ...getViewport(),
-  scroll: preset.windowScroll,
+  frame: base.frame,
+  scroll: {
+    initial: preset.windowScroll,
+    current: preset.windowScroll,
+    max: base.scroll.max,
+    diff: {
+      value: origin,
+      displacement: origin,
+    },
+  },
 };
 
 export const initialPublishArgs: InitialPublishArgs = {

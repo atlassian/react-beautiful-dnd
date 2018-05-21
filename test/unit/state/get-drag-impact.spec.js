@@ -503,7 +503,7 @@ describe('get drag impact', () => {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
-                [axis.end]: viewport.subject[axis.end] + 100,
+                [axis.end]: viewport.frame[axis.end] + 100,
               },
             });
             const visible: DraggableDimension = getDraggableDimension({
@@ -516,7 +516,7 @@ describe('get drag impact', () => {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
-                [axis.end]: viewport.subject[axis.end],
+                [axis.end]: viewport.frame[axis.end],
               },
             });
             const notVisible1: DraggableDimension = getDraggableDimension({
@@ -529,8 +529,8 @@ describe('get drag impact', () => {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // inside the droppable, but not in the visible area
-                [axis.start]: viewport.subject[axis.end] + 10,
-                [axis.end]: viewport.subject[axis.end] + 20,
+                [axis.start]: viewport.frame[axis.end] + 10,
+                [axis.end]: viewport.frame[axis.end] + 20,
               },
             });
             const notVisible2: DraggableDimension = getDraggableDimension({
@@ -543,8 +543,8 @@ describe('get drag impact', () => {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // inside the droppable, but not in the visible area
-                [axis.start]: viewport.subject[axis.end] + 30,
-                [axis.end]: viewport.subject[axis.end] + 40,
+                [axis.start]: viewport.frame[axis.end] + 30,
+                [axis.end]: viewport.frame[axis.end] + 40,
               },
             });
             const customDraggables: DraggableDimensionMap = {
@@ -1070,7 +1070,7 @@ describe('get drag impact', () => {
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 [axis.start]: 0,
-                [axis.end]: viewport.subject[axis.end],
+                [axis.end]: viewport.frame[axis.end],
               },
             });
             const notVisible: DraggableDimension = getDraggableDimension({
@@ -1180,7 +1180,7 @@ describe('get drag impact', () => {
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 [axis.start]: 0,
                 // stretches longer than viewport
-                [axis.end]: viewport.subject[axis.end] + 100,
+                [axis.end]: viewport.frame[axis.end] + 100,
               },
             });
             const visible: DraggableDimension = getDraggableDimension({
@@ -1193,7 +1193,7 @@ describe('get drag impact', () => {
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 [axis.start]: 0,
-                [axis.end]: viewport.subject[axis.end],
+                [axis.end]: viewport.frame[axis.end],
               },
             });
             const notVisible: DraggableDimension = getDraggableDimension({
@@ -1206,8 +1206,8 @@ describe('get drag impact', () => {
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 // inside the droppable, but not in the visible area
-                [axis.start]: viewport.subject[axis.end] + 10,
-                [axis.end]: viewport.subject[axis.end] + 20,
+                [axis.start]: viewport.frame[axis.end] + 10,
+                [axis.end]: viewport.frame[axis.end] + 20,
               },
             });
 
