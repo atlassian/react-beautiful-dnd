@@ -433,8 +433,6 @@ export default (state: State = idle, action: Action): State => {
 
     const viewport: Viewport = scrollViewport(state.viewport, newScroll);
 
-    console.log('MOVE_BY_WINDOW_SCROLL: updating viewport to', viewport.frame);
-
     return moveWithPositionUpdates({
       state,
       clientSelection: state.current.client.selection,

@@ -87,9 +87,6 @@ export default ({
     viewport: viewport.frame,
   });
 
-  console.log('new page center', newPageBorderBoxCenter, 'is visible in frame', viewport.frame, isVisibleInNewLocation);
-
-
   const displaced: Displacement[] = (() => {
     if (isMovingTowardStart) {
       return withFirstRemoved({

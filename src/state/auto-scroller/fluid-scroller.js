@@ -260,7 +260,6 @@ export default ({
     });
 
     if (requiredWindowScroll && canScrollWindow(viewport, requiredWindowScroll)) {
-      console.log('required window scroll', requiredWindowScroll);
       scheduleWindowScroll(requiredWindowScroll);
       return;
     }
