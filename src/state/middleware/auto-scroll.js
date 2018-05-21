@@ -30,16 +30,14 @@ export default (getMarshal: () => DimensionMarshal) =>
       scrollWindow,
     });
 
-    return (action: Action): mixed => {
+    const shouldCancel = (action: Action) =>
       // Need to cancel any pending auto scrolling when drag is ending
-      if (isDragEnding(action)) {
-        scroller.cancel();
-        next(action);
-        return;
-      }
-
+      isDragEnding(action) ||
       // A new bulk collection is starting - cancel any pending auto scrolls
-      if (action.type === 'BULK_COLLECTION_STARTING') {
+      action.type === 'BULK_COLLECTION_STARTING';
+
+    return (action: Action): mixed => {
+      if (shouldCancel(action)) {
         scroller.cancel();
         next(action);
         return;

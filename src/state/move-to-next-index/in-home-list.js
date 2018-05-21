@@ -134,8 +134,6 @@ export default ({
   const distance: Position = subtract(newPageBorderBoxCenter, previousPageBorderBoxCenter);
   const distanceWithScroll: Position = withDroppableDisplacement(droppable, distance);
 
-  console.log('request jump scroll', distanceWithScroll);
-
   return {
     pageBorderBoxCenter: previousPageBorderBoxCenter,
     impact: newImpact,

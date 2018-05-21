@@ -2,7 +2,6 @@
 import { getRect, type Rect } from 'css-box-model';
 import type { Position } from 'css-box-model';
 import { subtract, negate } from './position';
-import { offsetByPosition } from './spacing';
 import type { Viewport } from '../types';
 
 export default (viewport: Viewport, newScroll: Position): Viewport => {
@@ -11,10 +10,12 @@ export default (viewport: Viewport, newScroll: Position): Viewport => {
 
   // We need to update the frame so that it is always a live value
   // The top / left of the frame should always match the newScroll position
-  const change: Position = subtract(diff, viewport.scroll.current);
-  const frame: Rect = getRect(
-    offsetByPosition(viewport.frame, change)
-  );
+  const frame: Rect = getRect({
+    top: newScroll.y,
+    bottom: newScroll.y + viewport.frame.height,
+    left: newScroll.x,
+    right: newScroll.x + viewport.frame.width,
+  });
 
   const updated: Viewport = {
     frame,
