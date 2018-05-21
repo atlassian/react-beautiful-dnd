@@ -44,12 +44,7 @@ export default (getMarshal: () => DimensionMarshal) =>
 
       const state: State = store.getState();
 
-      // Only want to auto scroll in the dragging phase
-      // Not allowing auto scrolling while bulk collecting
-      // This is to avoid a mismatch in scroll between the captured
-      // viewport in one frame and published in the next
-      // Also, jump scrolling would not occur during a BULK_COLLECTION
-      // as no changes to the impact are permitted in that time
+      // Only allowing auto scrolling in the DRAGGING phase
       if (state.phase !== 'DRAGGING') {
         return;
       }

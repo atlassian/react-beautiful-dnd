@@ -103,6 +103,7 @@ export default (axis?: Axis = vertical) => {
 
     return {
       ...state,
+      autoScrollMode: 'JUMP',
       scrollJumpRequest: request,
     };
   };
