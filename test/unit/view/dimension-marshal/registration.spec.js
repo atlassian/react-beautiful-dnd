@@ -1,0 +1,3 @@
+// @flow
+
+it('start')

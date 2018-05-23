@@ -29,31 +29,31 @@ type Collection = {|
   critical: Critical,
 |}
 
-const advancedUsageWarning = () => (() => {
-  let hasAnnounced: boolean = false;
-
-  return () => {
-    if (hasAnnounced) {
-      return;
-    }
-
-    hasAnnounced = true;
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn(`
-        Warning: you are triggering a recollection of dimensions during a drag.
-        This is fairly advanced feature used to support interactions such as lazy loading lists.
-        You might not have intended to trigger this collection. A collection will be triggered
-        whenever a Droppable or Draggable is added or removed; or when:
-
-        - Draggable: 'id' or 'index' change
-        - Droppable: 'id' change ('type' change is not permitted during a drag)
-      `.trim());
-    }
-  };
-})();
-
 export default (callbacks: Callbacks) => {
+  const advancedUsageWarning = (() => {
+    let hasAnnounced: boolean = false;
+
+    return () => {
+      if (hasAnnounced) {
+        return;
+      }
+
+      hasAnnounced = true;
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn(`
+          Advanced usage warning: you are triggering a recollection of dimensions during a drag.
+          This is fairly advanced feature used to support interactions such as lazy loading lists.
+          You might not have intended to trigger this collection. A collection will be triggered
+          whenever a Droppable or Draggable is added or removed; or when:
+
+          - Draggable: 'id' or 'index' change
+          - Droppable: 'id' change ('type' change is not permitted during a drag)
+        `.trim());
+      }
+    };
+  })();
+
   const entries: Entries = {
     droppables: {},
     draggables: {},
@@ -74,7 +74,7 @@ export default (callbacks: Callbacks) => {
   });
 
   const collect = ({ includeCritical }: {| includeCritical: boolean |}) => {
-    invariant(collection, 'Cannot collect without a collection occurring');
+    invariant(collection, 'Cannot collect all dimensions before critical dimensions are collected');
 
     if (includeCritical) {
       advancedUsageWarning();
@@ -350,7 +350,6 @@ export default (callbacks: Callbacks) => {
   };
 
   const marshal: DimensionMarshal = {
-
     registerDraggable,
     updateDraggable,
     unregisterDraggable,
@@ -360,7 +359,6 @@ export default (callbacks: Callbacks) => {
     updateDroppableIsEnabled,
     scrollDroppable,
     updateDroppableScroll,
-    // onPhaseChange,
 
     // Entry
     startPublishing,

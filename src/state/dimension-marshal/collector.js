@@ -53,7 +53,7 @@ export default ({
 }: Args): Collector => {
   let frameId: ?AnimationFrameID = null;
   // tmep
-  let timerId: ?TimeoutID = null;
+  const timerId: ?TimeoutID = null;
 
   const collectFromDOM = ({ windowScroll, includeCritical }: CollectFromDOMArgs): DimensionMap => {
     const critical: Critical = getCritical();
@@ -143,7 +143,7 @@ export default ({
 
   const collect = ({ includeCritical }: CollectArgs) => {
     abortFrame();
-    clearTimeout(timerId);
+    // clearTimeout(timerId);
 
     // Perform DOM collection in next frame
     frameId = requestAnimationFrame(() => {
@@ -156,31 +156,24 @@ export default ({
       });
       timings.finish('DOM collection');
 
-      console.log('include critical?', includeCritical);
-
       // Perform publish in next frame
       frameId = requestAnimationFrame(() => {
-        console.log('waiting a really long time for publish');
-        timerId = setTimeout(() => {
-          timings.start('Bulk dimension publish');
-          bulkReplace({
-            dimensions,
-            viewport,
-            critical: includeCritical ? critical : null,
-          });
-          timings.finish('Bulk dimension publish');
-        }, 200);
+        // timerId = setTimeout(() => {
+        timings.start('Bulk dimension publish');
+        bulkReplace({
+          dimensions,
+          viewport,
+          critical: includeCritical ? critical : null,
+        });
+        timings.finish('Bulk dimension publish');
+        // }, 500);
         frameId = null;
       });
     });
   };
 
-  const stop = () => {
-    abortFrame();
-  };
-
   return {
     collect,
-    stop,
+    stop: abortFrame,
   };
 };

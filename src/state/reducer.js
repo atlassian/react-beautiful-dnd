@@ -414,7 +414,7 @@ export default (state: State = idle, action: Action): State => {
 
   if (action.type === 'MOVE_BY_WINDOW_SCROLL') {
     // No longer accepting changes
-    if (state.phase === 'DROP_PENDING') {
+    if (state.phase === 'DROP_PENDING' || state.phase === 'BULK_COLLECTING') {
       return state;
     }
 

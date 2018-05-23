@@ -57,6 +57,11 @@ export type Entries = {|
   draggables: DraggableEntryMap,
 |}
 
+export type StartPublishingResult = {|
+  critical: Critical,
+  dimensions: DimensionMap
+|};
+
 export type DimensionMarshal = {|
   // Draggable
   registerDraggable: (
@@ -85,8 +90,7 @@ export type DimensionMarshal = {|
   scrollDroppable: (id: DroppableId, change: Position) => void,
   unregisterDroppable: (descriptor: DroppableDescriptor) => void,
   // Entry
-  startPublishing: (request: LiftRequest, windowScroll: Position) =>
-    {| critical: Critical, dimensions: DimensionMap |},
+  startPublishing: (request: LiftRequest, windowScroll: Position) => StartPublishingResult,
   stopPublishing: () => void,
   collect: ({| includeCritical: boolean |}) => void,
 |}
