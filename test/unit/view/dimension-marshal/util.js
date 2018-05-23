@@ -1,8 +1,10 @@
 // @flow
+import { type Position } from 'css-box-model';
 import { getPreset } from '../../../utils/dimension';
 import type {
   DimensionMarshal,
   DroppableCallbacks,
+  Callbacks,
 } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
   DimensionMap,
@@ -59,8 +61,8 @@ export const populateMarshal = (
         watcher.droppable.getDimensionAndWatchScroll(id);
         return droppable;
       },
-      scroll: () => {
-        watcher.droppable.scroll(id);
+      scroll: (change: Position) => {
+        watcher.droppable.scroll(id, change);
       },
       unwatchScroll: () => {
         watcher.droppable.unwatchScroll(id);
@@ -87,3 +89,26 @@ export const populateMarshal = (
 
   return watcher;
 };
+
+export const getDroppableCallbacks = (dimension: DroppableDimension): DroppableCallbacks => ({
+  getDimensionAndWatchScroll: jest.fn().mockReturnValue(dimension),
+  scroll: jest.fn(),
+  unwatchScroll: jest.fn(),
+  hidePlaceholder: jest.fn(),
+  showPlaceholder: jest.fn(),
+});
+
+export const withExpectedAdvancedUsageWarning = (fn: Function) => {
+  jest.spyOn(console, 'warn').mockImplementation(() => { });
+  fn();
+  expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('Advanced usage warning'));
+  console.warn.mockRestore();
+};
+
+export const getCallbacksStub = (): Callbacks => ({
+  bulkReplace: jest.fn(),
+  updateDroppableScroll: jest.fn(),
+  updateDroppableIsEnabled: jest.fn(),
+  bulkCollectionStarting: jest.fn(),
+});
+

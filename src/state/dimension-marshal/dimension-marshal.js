@@ -223,12 +223,12 @@ export default (callbacks: Callbacks) => {
   };
 
   const updateDroppableIsEnabled = (id: DroppableId, isEnabled: boolean) => {
+    invariant(entries.droppables[id], `Cannot update the scroll on Droppable ${id} as it is not registered`);
+
     // no need to update the application state if a collection is not occurring
     if (!collection) {
       return;
     }
-
-    invariant(entries.droppables[id], `Cannot update the scroll on Droppable ${id} as it is not registered`);
 
     // At this point a non primary droppable dimension might not yet be published
     // but may have its enabled state changed. For now we still publish this change
@@ -243,13 +243,14 @@ export default (callbacks: Callbacks) => {
     if (!collection) {
       return;
     }
+
     callbacks.updateDroppableScroll(id, newScroll);
   };
 
   const scrollDroppable = (id: DroppableId, change: Position) => {
     const entry: ?DroppableEntry = entries.droppables[id];
 
-    invariant(entry, 'Cannot scroll Droppable if not in entries');
+    invariant(entry, `Cannot scroll Droppable ${id} as it is not registered`);
 
     if (!collection) {
       return;
@@ -325,12 +326,15 @@ export default (callbacks: Callbacks) => {
   };
 
   const marshal: DimensionMarshal = {
+    // dimension registration
     registerDraggable,
     updateDraggable,
     unregisterDraggable,
     registerDroppable,
     updateDroppable,
     unregisterDroppable,
+
+    // droppable changes
     updateDroppableIsEnabled,
     scrollDroppable,
     updateDroppableScroll,

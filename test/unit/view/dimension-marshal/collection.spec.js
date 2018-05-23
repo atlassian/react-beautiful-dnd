@@ -21,17 +21,11 @@ import type {
 import {
   populateMarshal,
   resetWatcher,
-  type DimensionWatcher,
+  getCallbacksStub,
+  type DimensionWatcher, withExpectedAdvancedUsageWarning,
 } from './util';
 
 const preset = getPreset();
-
-const getCallbacksStub = (): Callbacks => ({
-  bulkReplace: jest.fn(),
-  updateDroppableScroll: jest.fn(),
-  updateDroppableIsEnabled: jest.fn(),
-  bulkCollectionStarting: jest.fn(),
-});
 
 const critical: Critical = {
   droppable: preset.home.descriptor,
@@ -159,7 +153,6 @@ describe('collect', () => {
     });
 
     it('should let the system know a bulk collection is starting', () => {
-      jest.spyOn(console, 'warn').mockImplementation(() => { });
       const callbacks: Callbacks = getCallbacksStub();
       const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
       populateMarshal(marshal);
@@ -221,7 +214,9 @@ describe('collect', () => {
       marshal.startPublishing(defaultRequest, preset.windowScroll);
       // watcher has been called with critical dimensions
       resetWatcher(watcher);
-      marshal.collect({ includeCritical: true });
+      withExpectedAdvancedUsageWarning(() => {
+        marshal.collect({ includeCritical: true });
+      });
 
       // need to wait an animation frame
       expect(callbacks.bulkReplace).not.toHaveBeenCalled();
@@ -408,7 +403,9 @@ describe('collect', () => {
       expect(callbacks.bulkReplace).not.toHaveBeenCalled();
 
       // another collection - returning to first phase
-      marshal.collect({ includeCritical: true });
+      withExpectedAdvancedUsageWarning(() => {
+        marshal.collect({ includeCritical: true });
+      });
       expect(watcher.draggable.getDimension).not.toHaveBeenCalled();
       expect(callbacks.bulkReplace).not.toHaveBeenCalled();
 

@@ -17,33 +17,12 @@ import type {
 } from '../../../../src/types';
 import {
   populateMarshal,
-  resetWatcher,
-  type DimensionWatcher,
+  getDroppableCallbacks,
+  withExpectedAdvancedUsageWarning,
+  getCallbacksStub,
 } from './util';
 
 const preset = getPreset();
-
-const getCallbacksStub = (): Callbacks => ({
-  bulkReplace: jest.fn(),
-  updateDroppableScroll: jest.fn(),
-  updateDroppableIsEnabled: jest.fn(),
-  bulkCollectionStarting: jest.fn(),
-});
-
-const getDroppableCallbacks = (dimension: DroppableDimension): DroppableCallbacks => ({
-  getDimensionAndWatchScroll: jest.fn().mockReturnValue(dimension),
-  scroll: jest.fn(),
-  unwatchScroll: jest.fn(),
-  hidePlaceholder: jest.fn(),
-  showPlaceholder: jest.fn(),
-});
-
-const withExpectedAdvancedUsageWarning = (fn: Function) => {
-  jest.spyOn(console, 'warn').mockImplementation(() => { });
-  fn();
-  expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('Advanced usage warning'));
-  console.warn.mockRestore();
-};
 
 const critical: Critical = {
   draggable: preset.inHome1.descriptor,
@@ -368,8 +347,7 @@ describe('draggable', () => {
       marshal.registerDraggable(preset.inHome3.descriptor, () => preset.inHome3);
       marshal.unregisterDraggable(preset.inHome3.descriptor);
 
-      const droppableCallbacks: DroppableCallbacks = getDroppableCallbacks();
-      droppableCallbacks.getDimensionAndWatchScroll.mockReturnValue(preset.home);
+      const droppableCallbacks: DroppableCallbacks = getDroppableCallbacks(preset.home);
       marshal.registerDroppable(preset.home.descriptor, droppableCallbacks);
 
       const result: StartPublishingResult =
