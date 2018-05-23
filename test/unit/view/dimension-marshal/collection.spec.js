@@ -1,14 +1,14 @@
 // @flow
 import createDimensionMarshal from '../../../../src/state/dimension-marshal/dimension-marshal';
-import { getPreset, getDraggableDimension, getDroppableDimension } from '../../../utils/dimension';
+import { getPreset } from '../../../utils/dimension';
 import type {
   Callbacks,
   DimensionMarshal,
-  DroppableCallbacks,
   StartPublishingResult,
 } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import getViewport from '../../../../src/view/window/get-viewport';
 import type {
+  Critical,
   LiftRequest,
   DimensionMap,
   DraggableId,
@@ -18,6 +18,11 @@ import type {
   DraggableDimensionMap,
   DroppableDimensionMap,
 } from '../../../../src/types';
+import {
+  populateMarshal,
+  resetWatcher,
+  type DimensionWatcher,
+} from './util';
 
 const preset = getPreset();
 
@@ -28,18 +33,20 @@ const getCallbacksStub = (): Callbacks => ({
   bulkCollectionStarting: jest.fn(),
 });
 
+const critical: Critical = {
+  droppable: preset.home.descriptor,
+  draggable: preset.inHome1.descriptor,
+};
+
 const defaultRequest: LiftRequest = {
-  draggableId: preset.inHome1.descriptor.id,
+  draggableId: critical.draggable.id,
   scrollOptions: {
     shouldPublishImmediately: false,
   },
 };
 
 const startResult: StartPublishingResult = {
-  critical: {
-    droppable: preset.home.descriptor,
-    draggable: preset.inHome1.descriptor,
-  },
+  critical,
   dimensions: {
     draggables: {
       [preset.inHome1.descriptor.id]: preset.inHome1,
@@ -60,82 +67,8 @@ const copy = (dimensions: DimensionMap): DimensionMap => ({
 });
 
 const withoutCritical: DimensionMap = copy(preset.dimensions);
-delete withoutCritical.draggables[preset.inHome1.descriptor.id];
-delete withoutCritical.droppables[preset.home.descriptor.id];
-
-type DimensionWatcher = {|
-  draggable: {|
-    getDimension: Function,
-  |},
-  droppable: {|
-    getDimensionAndWatchScroll: Function,
-    scroll: Function,
-    unwatchScroll: Function,
-    hidePlaceholder: Function,
-    showPlaceholder: Function,
-  |}
-|}
-
-const resetWatcher = (watcher: DimensionWatcher) => {
-  watcher.draggable.getDimension.mockReset();
-  Object.keys(watcher.droppable).forEach((key: string) => {
-    watcher.droppable[key].mockReset();
-  });
-};
-
-const populateMarshal = (
-  marshal: DimensionMarshal,
-  dimensions?: DimensionMap = preset.dimensions,
-): DimensionWatcher => {
-  const { draggables, droppables } = dimensions;
-  const watcher: DimensionWatcher = {
-    draggable: {
-      getDimension: jest.fn(),
-    },
-    droppable: {
-      getDimensionAndWatchScroll: jest.fn(),
-      scroll: jest.fn(),
-      unwatchScroll: jest.fn(),
-      hidePlaceholder: jest.fn(),
-      showPlaceholder: jest.fn(),
-    },
-  };
-
-  Object.keys(droppables).forEach((id: DroppableId) => {
-    const droppable: DroppableDimension = droppables[id];
-    const callbacks: DroppableCallbacks = {
-      getDimensionAndWatchScroll: () => {
-        watcher.droppable.getDimensionAndWatchScroll(id);
-        return droppable;
-      },
-      scroll: () => {
-        watcher.droppable.scroll(id);
-      },
-      unwatchScroll: () => {
-        watcher.droppable.unwatchScroll(id);
-      },
-      hidePlaceholder: () => {
-        watcher.droppable.hidePlaceholder(id);
-      },
-      showPlaceholder: () => {
-        watcher.droppable.showPlaceholder(id);
-      },
-    };
-
-    marshal.registerDroppable(droppable.descriptor, callbacks);
-  });
-
-  Object.keys(draggables).forEach((id: DraggableId) => {
-    const draggable: DraggableDimension = draggables[id];
-    const getDimension = (): DraggableDimension => {
-      watcher.draggable.getDimension(id);
-      return draggable;
-    };
-    marshal.registerDraggable(draggable.descriptor, getDimension);
-  });
-
-  return watcher;
-};
+delete withoutCritical.draggables[critical.draggable.id];
+delete withoutCritical.droppables[critical.droppable.id];
 
 describe('start publishing', () => {
   describe('critical collection', () => {
@@ -167,7 +100,7 @@ describe('start publishing', () => {
       const callbacks: Callbacks = getCallbacksStub();
       const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
       const dimensions: DimensionMap = copy(preset.dimensions);
-      delete dimensions.draggables[preset.inHome1.descriptor.id];
+      delete dimensions.draggables[critical.draggable.id];
       populateMarshal(marshal, dimensions);
 
       expect(() => marshal.startPublishing(defaultRequest, preset.windowScroll)).toThrow('Cannot find critical draggable entry');
@@ -263,9 +196,9 @@ describe('collect', () => {
       });
       // critical dimensions not collected
       expect(watcher.draggable.getDimension)
-        .not.toHaveBeenCalledWith(preset.inHome1.descriptor.id);
+        .not.toHaveBeenCalledWith(critical.draggable.id);
       expect(watcher.droppable.getDimensionAndWatchScroll)
-        .not.toHaveBeenCalledWith(preset.home.descriptor.id);
+        .not.toHaveBeenCalledWith(critical.droppable.id);
 
       // dimensions not collected yet
       expect(callbacks.bulkReplace).not.toHaveBeenCalled();
@@ -312,10 +245,7 @@ describe('collect', () => {
       expect(callbacks.bulkReplace).toHaveBeenCalledWith({
         dimensions: preset.dimensions,
         viewport: getViewport(),
-        critical: {
-          draggable: preset.inHome1.descriptor,
-          droppable: preset.home.descriptor,
-        },
+        critical,
       });
     });
 
@@ -369,7 +299,7 @@ describe('collect', () => {
         const draggable: DraggableDimension = dimensions.draggables[id];
         const home: DroppableDimension = dimensions.droppables[draggable.descriptor.droppableId];
 
-        if (draggable.descriptor.id === preset.inHome1.descriptor.id) {
+        if (draggable.descriptor.id === critical.draggable.id) {
           expect(watcher.draggable.getDimension).not.toHaveBeenCalledWith(id);
           return;
         }
@@ -401,7 +331,7 @@ describe('collect', () => {
           .map((id: DraggableId): DraggableDimension => dimensions.draggables[id])
           // stripping out critical
           .filter((draggable: DraggableDimension): boolean =>
-            draggable.descriptor.id !== preset.inHome1.descriptor.id)
+            draggable.descriptor.id !== critical.draggable.id)
           // stripping out dimensions that are not of the same type.
           .filter((draggable: DraggableDimension): boolean => {
             const home: DroppableDimension =
@@ -436,23 +366,22 @@ describe('collect', () => {
 
       marshal.startPublishing(defaultRequest, preset.windowScroll);
       marshal.collect({ includeCritical: false });
+      resetWatcher(watcher);
 
       // nothing has been collected yet
-      expect(watcher.droppable.getDimensionAndWatchScroll)
-        .not.toHaveBeenCalledWith(preset.foreign.descriptor.id);
+      expect(watcher.draggable.getDimension).not.toHaveBeenCalled();
 
       // another collection
       marshal.collect({ includeCritical: false });
       expect(callbacks.bulkReplace).not.toHaveBeenCalled();
 
       // nothing has been collected yet
-      expect(watcher.droppable.getDimensionAndWatchScroll)
-        .not.toHaveBeenCalledWith(preset.foreign.descriptor.id);
+      expect(watcher.draggable.getDimension).not.toHaveBeenCalled();
 
       // called after a frame
       requestAnimationFrame.step();
-      expect(watcher.droppable.getDimensionAndWatchScroll)
-        .toHaveBeenCalledWith(preset.foreign.descriptor.id);
+      expect(watcher.draggable.getDimension).toHaveBeenCalled();
+      expect(callbacks.bulkReplace).not.toHaveBeenCalled();
 
       // finishing
       requestAnimationFrame.flush();
@@ -492,6 +421,24 @@ describe('collect', () => {
 
       // lets release the publish
       requestAnimationFrame.step();
+      expect(callbacks.bulkReplace).toHaveBeenCalledTimes(1);
+    });
+
+    it('should batch multiple collection calls', () => {
+      const callbacks: Callbacks = getCallbacksStub();
+      const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
+      const watcher: DimensionWatcher = populateMarshal(marshal);
+
+      marshal.startPublishing(defaultRequest, preset.windowScroll);
+      resetWatcher(watcher);
+      marshal.collect({ includeCritical: false });
+      marshal.collect({ includeCritical: false });
+      marshal.collect({ includeCritical: false });
+
+      // nothing has been collected yet
+      expect(watcher.draggable.getDimension).not.toHaveBeenCalled();
+
+      requestAnimationFrame.flush();
       expect(callbacks.bulkReplace).toHaveBeenCalledTimes(1);
     });
   });

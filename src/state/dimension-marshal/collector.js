@@ -53,7 +53,7 @@ export default ({
 }: Args): Collector => {
   let frameId: ?AnimationFrameID = null;
   // tmep
-  const timerId: ?TimeoutID = null;
+  // let timerId: ?TimeoutID = null;
 
   const collectFromDOM = ({ windowScroll, includeCritical }: CollectFromDOMArgs): DimensionMap => {
     const critical: Critical = getCritical();

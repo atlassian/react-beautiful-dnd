@@ -43,12 +43,15 @@ export default (callbacks: Callbacks) => {
       if (process.env.NODE_ENV !== 'production') {
         console.warn(`
           Advanced usage warning: you are triggering a recollection of dimensions during a drag.
-          This is fairly advanced feature used to support interactions such as lazy loading lists.
+          This an advanced feature used to support dynamic interactions such as lazy loading lists.
           You might not have intended to trigger this collection. A collection will be triggered
-          whenever a Droppable or Draggable is added or removed; or when:
+          when:
 
+          - A Draggable or Droppable is added or removed
           - Draggable: 'id' or 'index' change
           - Droppable: 'id' change ('type' change is not permitted during a drag)
+
+          (This warning will be stripped in production)
         `.trim());
       }
     };
@@ -107,22 +110,8 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    const home: ?DroppableEntry = entries.droppables[descriptor.droppableId];
-
-    // In React 16 children are mounted before parents are.
-    // This case can happen when a list of Draggables are being
-    // moved using a React.Portal.
-    if (!home) {
-      return;
-    }
-
-    // Adding something of a different type - not relevant to the drag
-    if (home.descriptor.type !== collection.critical.droppable.type) {
-      return;
-    }
-
-    invariant(descriptor.id !== collection.critical.draggable.id, 'Cannot unregister dragging item during a drag');
-
+    // If a collection is occurring we are not sure if any registerations have
+    // changed anything else. Therefore we need to perform another collection
     collect({ includeCritical: true });
   };
 
@@ -133,20 +122,18 @@ export default (callbacks: Callbacks) => {
   ) => {
     invariant(entries.draggables[previous.id], 'Cannot update draggable registration as no previous registration was found');
 
-    if (!collection) {
-      delete entries.draggables[previous.id];
-      registerDraggable(descriptor, getDimension);
-      return;
+    if (collection) {
+      invariant(descriptor.id === previous.id, 'Cannot update a Draggables id during a drag');
+      invariant(descriptor.droppableId === previous.droppableId, 'Cannot update a Draggables Droppable during a drag');
+
+      // critical descriptor is changing
+      if (collection.critical.draggable.id === descriptor.id) {
+        collection.critical.draggable = descriptor;
+      }
     }
 
-    // A collection is occurring
-    invariant(descriptor.id === previous.id, 'Cannot update a Draggables id during a drag');
-    invariant(descriptor.droppableId === previous.droppableId, 'Cannot update a Draggables droppable during a drag');
-
-    const home: ?DroppableEntry = entries.droppables[descriptor.droppableId];
-    invariant(home, 'Cannot update a Draggable that does not have a home');
-
-    collect({ includeCritical: true });
+    delete entries.draggables[previous.id];
+    registerDraggable(descriptor, getDimension);
   };
 
   const unregisterDraggable = (descriptor: DraggableDescriptor) => {
@@ -167,7 +154,6 @@ export default (callbacks: Callbacks) => {
     }
 
     invariant(descriptor.id !== collection.critical.draggable.id, 'Cannot unregister dragging item during a drag');
-
     collect({ includeCritical: true });
   };
 
@@ -192,11 +178,6 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    // Not of the same type - we do not need to publish
-    if (descriptor.type !== collection.critical.droppable.type) {
-      return;
-    }
-
     invariant(descriptor.id !== collection.critical.droppable.id, 'Cannot register home droppable during a drag');
 
     collect({ includeCritical: true });
@@ -208,17 +189,11 @@ export default (callbacks: Callbacks) => {
     droppableCallbacks: DroppableCallbacks,
   ) => {
     invariant(entries.droppables[previous.id], 'Cannot update droppable registration as no previous registration was found');
+    invariant(!collection, 'Cannot update a Droppable id or type during a drag');
 
-    if (collection) {
-      invariant(descriptor.id === previous.id, 'Cannot update a Droppables id during a drag');
-      invariant(descriptor.type === previous.type, 'Cannot update a Droppables type during a drag');
-    }
-
+    // doing this step first so that the entry is updated
     delete entries.droppables[previous.id];
-
     registerDroppable(descriptor, droppableCallbacks);
-
-    collect({ includeCritical: true });
   };
 
   const unregisterDroppable = (descriptor: DroppableDescriptor) => {
