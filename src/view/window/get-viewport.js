@@ -49,7 +49,5 @@ export default (): Viewport => {
     },
   };
 
-  console.log('viewport', viewport);
-
   return viewport;
 };

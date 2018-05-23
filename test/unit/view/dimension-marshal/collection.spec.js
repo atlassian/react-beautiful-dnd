@@ -17,7 +17,6 @@ import type {
   DroppableDimension,
   DraggableDimensionMap,
   DroppableDimensionMap,
-  Viewport,
 } from '../../../../src/types';
 
 const preset = getPreset();
@@ -36,6 +35,34 @@ const defaultRequest: LiftRequest = {
   },
 };
 
+const startResult: StartPublishingResult = {
+  critical: {
+    droppable: preset.home.descriptor,
+    draggable: preset.inHome1.descriptor,
+  },
+  dimensions: {
+    draggables: {
+      [preset.inHome1.descriptor.id]: preset.inHome1,
+    },
+    droppables: {
+      [preset.home.descriptor.id]: preset.home,
+    },
+  },
+};
+
+const copy = (dimensions: DimensionMap): DimensionMap => ({
+  droppables: {
+    ...dimensions.droppables,
+  },
+  draggables: {
+    ...dimensions.draggables,
+  },
+});
+
+const withoutCritical: DimensionMap = copy(preset.dimensions);
+delete withoutCritical.draggables[preset.inHome1.descriptor.id];
+delete withoutCritical.droppables[preset.home.descriptor.id];
+
 type DimensionWatcher = {|
   draggable: {|
     getDimension: Function,
@@ -48,15 +75,6 @@ type DimensionWatcher = {|
     showPlaceholder: Function,
   |}
 |}
-
-const copy = (dimensions: DimensionMap): DimensionMap => ({
-  droppables: {
-    ...dimensions.droppables,
-  },
-  draggables: {
-    ...dimensions.draggables,
-  },
-});
 
 const resetWatcher = (watcher: DimensionWatcher) => {
   watcher.draggable.getDimension.mockReset();
@@ -128,22 +146,8 @@ describe('start publishing', () => {
 
       const result: StartPublishingResult =
         marshal.startPublishing(defaultRequest, preset.windowScroll);
-      const expected: StartPublishingResult = {
-        critical: {
-          droppable: preset.home.descriptor,
-          draggable: preset.inHome1.descriptor,
-        },
-        dimensions: {
-          draggables: {
-            [preset.inHome1.descriptor.id]: preset.inHome1,
-          },
-          droppables: {
-            [preset.home.descriptor.id]: preset.home,
-          },
-        },
-      };
 
-      expect(result).toEqual(expected);
+      expect(result).toEqual(startResult);
     });
   });
 
@@ -239,9 +243,6 @@ describe('collect', () => {
       const callbacks: Callbacks = getCallbacksStub();
       const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
       const watcher: DimensionWatcher = populateMarshal(marshal);
-      const withoutCritical: DimensionMap = copy(preset.dimensions);
-      delete withoutCritical.draggables[preset.inHome1.descriptor.id];
-      delete withoutCritical.droppables[preset.home.descriptor.id];
 
       marshal.startPublishing(defaultRequest, preset.windowScroll);
       // watcher has been called with critical dimensions
@@ -428,32 +429,179 @@ describe('collect', () => {
   });
 
   describe('new collection requests during a request', () => {
-    it('should cancel any pending collection', () => {
+    it('should abort any pending collection', () => {
+      const callbacks: Callbacks = getCallbacksStub();
+      const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
+      const watcher: DimensionWatcher = populateMarshal(marshal);
 
+      marshal.startPublishing(defaultRequest, preset.windowScroll);
+      marshal.collect({ includeCritical: false });
+
+      // nothing has been collected yet
+      expect(watcher.droppable.getDimensionAndWatchScroll)
+        .not.toHaveBeenCalledWith(preset.foreign.descriptor.id);
+
+      // another collection
+      marshal.collect({ includeCritical: false });
+      expect(callbacks.bulkReplace).not.toHaveBeenCalled();
+
+      // nothing has been collected yet
+      expect(watcher.droppable.getDimensionAndWatchScroll)
+        .not.toHaveBeenCalledWith(preset.foreign.descriptor.id);
+
+      // called after a frame
+      requestAnimationFrame.step();
+      expect(watcher.droppable.getDimensionAndWatchScroll)
+        .toHaveBeenCalledWith(preset.foreign.descriptor.id);
+
+      // finishing
+      requestAnimationFrame.flush();
+
+      expect(callbacks.bulkReplace).toHaveBeenCalledTimes(1);
     });
 
-    it('should cancel any pending publish', () => {
+    it('should abort any pending publish', () => {
+      const callbacks: Callbacks = getCallbacksStub();
+      const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
+      const watcher: DimensionWatcher = populateMarshal(marshal);
 
+      marshal.startPublishing(defaultRequest, preset.windowScroll);
+      resetWatcher(watcher);
+      marshal.collect({ includeCritical: false });
+
+      requestAnimationFrame.step();
+
+      // collection has occurred
+      expect(watcher.draggable.getDimension).toHaveBeenCalled();
+      resetWatcher(watcher);
+
+      // no publish has occurred yet
+      expect(callbacks.bulkReplace).not.toHaveBeenCalled();
+
+      // another collection - returning to first phase
+      marshal.collect({ includeCritical: true });
+      expect(watcher.draggable.getDimension).not.toHaveBeenCalled();
+      expect(callbacks.bulkReplace).not.toHaveBeenCalled();
+
+      requestAnimationFrame.step();
+      // collection has now occurred
+      expect(watcher.draggable.getDimension)
+        .toHaveBeenCalledTimes(Object.keys(preset.draggables).length);
+      // publish has still not occurred
+      expect(callbacks.bulkReplace).not.toHaveBeenCalled();
+
+      // lets release the publish
+      requestAnimationFrame.step();
+      expect(callbacks.bulkReplace).toHaveBeenCalledTimes(1);
     });
   });
 });
 
 describe('stopping', () => {
   it('should cancel any pending collection', () => {
+    const callbacks: Callbacks = getCallbacksStub();
+    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
+    const watcher: DimensionWatcher = populateMarshal(marshal);
 
+    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    resetWatcher(watcher);
+    marshal.collect({ includeCritical: false });
+
+    // nothing has been collected yet
+    expect(watcher.droppable.getDimensionAndWatchScroll).not.toHaveBeenCalled();
+
+    // stopping
+    marshal.stopPublishing();
+    // releasing any frames
+    requestAnimationFrame.flush();
+
+    expect(watcher.droppable.getDimensionAndWatchScroll).not.toHaveBeenCalled();
+    expect(callbacks.bulkReplace).not.toHaveBeenCalled();
   });
 
   it('should cancel any pending publish', () => {
+    const callbacks: Callbacks = getCallbacksStub();
+    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
+    const watcher: DimensionWatcher = populateMarshal(marshal);
 
+    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    resetWatcher(watcher);
+    marshal.collect({ includeCritical: false });
+
+    // collecting from dom
+    requestAnimationFrame.step();
+    expect(watcher.droppable.getDimensionAndWatchScroll).toHaveBeenCalled();
+    // not published yet
+    expect(callbacks.bulkReplace).not.toHaveBeenCalled();
+
+    // stopping
+    marshal.stopPublishing();
+    // releasing any frames
+    requestAnimationFrame.flush();
+
+    expect(callbacks.bulkReplace).not.toHaveBeenCalled();
   });
 });
 
 describe('subsequent collections', () => {
   it('should allow subsequent collections during the same drag', () => {
+    const callbacks: Callbacks = getCallbacksStub();
+    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
+    populateMarshal(marshal);
 
+    marshal.startPublishing(defaultRequest, preset.windowScroll);
+
+    const collect = () => {
+      expect(callbacks.bulkReplace).not.toHaveBeenCalled();
+      marshal.collect({ includeCritical: false });
+      requestAnimationFrame.step();
+      requestAnimationFrame.step();
+      expect(callbacks.bulkReplace).toHaveBeenCalledWith({
+        dimensions: withoutCritical,
+        viewport: getViewport(),
+        critical: null,
+      });
+      callbacks.bulkReplace.mockReset();
+    };
+
+    collect();
+    collect();
+    collect();
+    // cleanup
+    marshal.stopPublishing();
   });
 
   it('should allow subsequent collections due to subsequent drags', () => {
+    const callbacks: Callbacks = getCallbacksStub();
+    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
+    populateMarshal(marshal);
 
+    const collect = () => {
+      // initial publish
+      const result = marshal.startPublishing(defaultRequest, preset.windowScroll);
+      expect(result).toEqual(startResult);
+      expect(callbacks.bulkReplace).not.toHaveBeenCalled();
+
+      // start a collection
+      marshal.collect({ includeCritical: false });
+      expect(callbacks.bulkReplace).not.toHaveBeenCalled();
+
+      // let the collection run through
+      requestAnimationFrame.step();
+      requestAnimationFrame.step();
+      expect(callbacks.bulkReplace).toHaveBeenCalledWith({
+        dimensions: withoutCritical,
+        viewport: getViewport(),
+        critical: null,
+      });
+
+      // tell the marshal to stop
+      marshal.stopPublishing();
+      callbacks.bulkReplace.mockReset();
+    };
+
+    collect();
+    collect();
+    collect();
   });
 });
