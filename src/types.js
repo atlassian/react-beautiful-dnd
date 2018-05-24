@@ -216,8 +216,8 @@ export type Viewport = {|
   frame: Rect,
   scroll: {|
     initial: Position,
-    max: Position,
     current: Position,
+    max: Position,
     diff: {|
       value: Position,
       // The actual displacement as a result of a scroll is in the opposite

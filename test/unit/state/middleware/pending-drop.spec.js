@@ -6,7 +6,7 @@ import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';
 import dropMiddleware from '../../../../src/state/middleware/drop';
 import { prepare, initialPublish, drop, bulkReplace, completeDrop, clean } from '../../../../src/state/action-creators';
-import { initialBulkReplaceArgs, initialPublishArgs, getDragStart, getHomeLocation } from './util/preset-action-args';
+import { initialBulkReplaceArgs, initialPublishArgs, getDragStart, getHomeLocation } from '../../../utils/preset-action-args';
 
 it('should trigger a drop on a bulk replace if a drop pending is waiting', () => {
   const mock = jest.fn();
@@ -31,8 +31,8 @@ it('should trigger a drop on a bulk replace if a drop pending is waiting', () =>
 
   expect(mock).toHaveBeenCalledWith(drop({ reason: 'DROP' }));
   const result: DropResult = {
-    ...getDragStart(initialPublishArgs.critical),
-    destination: getHomeLocation(initialPublishArgs.critical),
+    ...getDragStart(),
+    destination: getHomeLocation(),
     reason: 'DROP',
   };
   expect(mock).toHaveBeenCalledWith(completeDrop(result));

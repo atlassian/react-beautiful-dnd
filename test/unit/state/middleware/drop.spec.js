@@ -25,7 +25,7 @@ import {
   initialBulkReplaceArgs,
   getDragStart,
   getHomeLocation,
-} from './util/preset-action-args';
+} from '../../../utils/preset-action-args';
 import noImpact, { noMovement } from '../../../../src/state/no-impact';
 import { vertical } from '../../../../src/state/axis';
 import type {
@@ -169,11 +169,11 @@ describe('no drop animation required', () => {
             return null;
           }
 
-          return getDragStart(initialPublishArgs.critical).source;
+          return getDragStart().source;
         })();
 
         const result: DropResult = {
-          ...getDragStart(initialPublishArgs.critical),
+          ...getDragStart(),
           destination,
           reason,
         };
@@ -207,7 +207,6 @@ describe('drop animation required', () => {
       const mock = jest.fn();
       const store: Store = withPassThrough(middleware, mock);
 
-      store.dispatch(clean());
       store.dispatch(prepare());
       store.dispatch(initialPublish(initialPublishArgs));
       store.dispatch(bulkReplace(initialBulkReplaceArgs));
@@ -226,7 +225,7 @@ describe('drop animation required', () => {
         newHomeOffset: { x: 0, y: 0 },
         impact: noImpact,
         result: {
-          ...getDragStart(initialPublishArgs.critical),
+          ...getDragStart(),
           // destination cleared
           destination: null,
           reason: 'CANCEL',
@@ -503,7 +502,7 @@ describe('drop animation required', () => {
           destination: getHomeLocation(initialPublishArgs.critical),
         },
         result: {
-          ...getDragStart(initialPublishArgs.critical),
+          ...getDragStart(),
           destination: getHomeLocation(initialPublishArgs.critical),
           reason: 'DROP',
         },

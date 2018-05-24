@@ -134,6 +134,5 @@ export default ({ getState, dispatch }: Store) =>
     }
 
     dispatch(completeDrop(result));
-    dispatch(clean());
   };
 

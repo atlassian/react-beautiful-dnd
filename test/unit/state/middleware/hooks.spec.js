@@ -9,12 +9,13 @@ import {
   initialPublish,
   bulkReplace,
   completeDrop,
+  moveDown,
   move,
   bulkCollectionStarting,
   type MoveArgs,
 } from '../../../../src/state/action-creators';
 import createStore from './util/create-store';
-import { viewport, initialPublishArgs, initialBulkReplaceArgs, getDragStart } from './util/preset-action-args';
+import { viewport, initialPublishArgs, initialBulkReplaceArgs, getDragStart } from '../../../utils/preset-action-args';
 import type {
   DraggableLocation,
   Store,
@@ -51,7 +52,7 @@ describe('start', () => {
     // first initial publish
     store.dispatch(initialPublish(initialPublishArgs));
     expect(hooks.onDragStart).toHaveBeenCalledWith(
-      getDragStart(initialPublishArgs.critical),
+      getDragStart(),
       expect.any(Object),
     );
   });
@@ -88,7 +89,7 @@ describe('drop', () => {
     expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
 
     const result: DropResult = {
-      ...getDragStart(initialPublishArgs.critical),
+      ...getDragStart(),
       destination: {
         droppableId: initialPublishArgs.critical.droppable.id,
         index: 2,
@@ -106,7 +107,7 @@ describe('drop', () => {
     );
 
     const result: DropResult = {
-      ...getDragStart(initialPublishArgs.critical),
+      ...getDragStart(),
       destination: {
         droppableId: initialPublishArgs.critical.droppable.id,
         index: 2,
@@ -140,9 +141,9 @@ describe('update', () => {
     expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
     // Okay let's move it
-    store.dispatch(moveForward());
+    store.dispatch(moveDown());
     const update: DragUpdate = {
-      ...getDragStart(initialPublishArgs.critical),
+      ...getDragStart(),
       destination: {
         droppableId: initialPublishArgs.critical.droppable.id,
         index: initialPublishArgs.critical.draggable.index + 1,
@@ -261,7 +262,7 @@ describe('update', () => {
     expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
     // Triggering an actual movement
-    store.dispatch(moveForward());
+    store.dispatch(moveDown());
     expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
 
     const state: State = store.getState();
@@ -310,7 +311,7 @@ describe('abort', () => {
 
     store.dispatch(clean());
     const expected: DropResult = {
-      ...getDragStart(initialPublishArgs.critical),
+      ...getDragStart(),
       destination: null,
       reason: 'CANCEL',
     };
@@ -341,7 +342,7 @@ describe('abort', () => {
 
     store.dispatch(clean());
     const expected: DropResult = {
-      ...getDragStart(initialPublishArgs.critical),
+      ...getDragStart(),
       // destination has been cleared
       destination: null,
       reason: 'CANCEL',
@@ -366,7 +367,7 @@ describe('abort', () => {
 
     // drop
     const result: DropResult = {
-      ...getDragStart(initialPublishArgs.critical),
+      ...getDragStart(),
       destination: null,
       reason: 'CANCEL',
     };
@@ -380,6 +381,10 @@ describe('abort', () => {
   });
 });
 
+describe('drop flushing', () => {
+  throw new Error('TODO');
+});
+
 describe('subsequent drags', () => {
   it('should behave correctly across multiple drags', () => {
     const hooks: Hooks = createHooks();
@@ -391,21 +396,21 @@ describe('subsequent drags', () => {
       store.dispatch(prepare());
       store.dispatch(initialPublish(initialPublishArgs));
       expect(hooks.onDragStart).toHaveBeenCalledWith(
-        getDragStart(initialPublishArgs.critical),
+        getDragStart(),
         expect.any(Object),
       );
       expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
 
       // update
       const update: DragUpdate = {
-        ...getDragStart(initialPublishArgs.critical),
+        ...getDragStart(),
         destination: {
           droppableId: initialPublishArgs.critical.droppable.id,
           index: initialPublishArgs.critical.draggable.index + 1,
         },
       };
       store.dispatch(bulkReplace(initialBulkReplaceArgs));
-      store.dispatch(moveForward());
+      store.dispatch(moveDown());
       expect(hooks.onDragUpdate).toHaveBeenCalledWith(update, expect.any(Object));
       expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
 
@@ -438,7 +443,7 @@ type Case = {|
 
 describe('announcements', () => {
   const moveForwardUpdate: DragUpdate = {
-    ...getDragStart(initialPublishArgs.critical),
+    ...getDragStart(),
     destination: {
       droppableId: initialPublishArgs.critical.droppable.id,
       index: initialPublishArgs.critical.draggable.index + 1,
@@ -452,7 +457,7 @@ describe('announcements', () => {
         store.dispatch(prepare());
         store.dispatch(initialPublish(initialPublishArgs));
       },
-      defaultMessage: messagePreset.onDragStart(getDragStart(initialPublishArgs.critical)),
+      defaultMessage: messagePreset.onDragStart(getDragStart()),
     },
     {
       title: 'onDragUpdate',
@@ -460,7 +465,7 @@ describe('announcements', () => {
         store.dispatch(prepare());
         store.dispatch(initialPublish(initialPublishArgs));
         store.dispatch(bulkReplace(initialBulkReplaceArgs));
-        store.dispatch(moveForward());
+        store.dispatch(moveDown());
       },
       defaultMessage: messagePreset.onDragUpdate(moveForwardUpdate),
     },
@@ -470,7 +475,7 @@ describe('announcements', () => {
         store.dispatch(prepare());
         store.dispatch(initialPublish(initialPublishArgs));
         store.dispatch(bulkReplace(initialBulkReplaceArgs));
-        store.dispatch(moveForward());
+        store.dispatch(moveDown());
 
         const result: DropResult = {
           ...moveForwardUpdate,

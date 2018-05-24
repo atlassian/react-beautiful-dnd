@@ -10,11 +10,14 @@ import type {
 import getViewport from '../../../../src/view/window/get-viewport';
 import type {
   LiftRequest,
-  Critical,
   DraggableDimension,
   DroppableDimension,
   DimensionMap,
 } from '../../../../src/types';
+import {
+  critical,
+  criticalDimensions,
+} from '../../../utils/preset-action-args';
 import {
   populateMarshal,
   getDroppableCallbacks,
@@ -23,20 +26,6 @@ import {
 } from './util';
 
 const preset = getPreset();
-
-const critical: Critical = {
-  draggable: preset.inHome1.descriptor,
-  droppable: preset.home.descriptor,
-};
-
-const criticalDimensions: DimensionMap = {
-  draggables: {
-    [preset.inHome1.descriptor.id]: preset.inHome1,
-  },
-  droppables: {
-    [preset.home.descriptor.id]: preset.home,
-  },
-};
 
 const defaultRequest: LiftRequest = {
   draggableId: critical.draggable.id,

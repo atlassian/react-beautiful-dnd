@@ -147,6 +147,12 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     const move = (critical: Critical, location: ?DraggableLocation) => {
       invariant(isDragStartPublished && lastCritical, 'Cannot fire onDragMove when onDragStart has not been called');
 
+      console.log('potential move fired');
+      console.log('location: ', location);
+      console.log('lastLocation', lastLocation);
+      console.log('is critical equal', isCriticalEqual(critical, lastCritical));
+      console.log('areLocationsEqual', areLocationsEqual(lastLocation, location));
+
       // No change to publish
       if (isCriticalEqual(critical, lastCritical) &&
         areLocationsEqual(lastLocation, location)) {

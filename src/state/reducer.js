@@ -71,7 +71,6 @@ const moveWithPositionUpdates = ({
 
   const client: ItemPositions = (() => {
     const offset: Position = subtract(clientSelection, state.initial.client.selection);
-
     return {
       offset,
       selection: clientSelection,
@@ -228,18 +227,17 @@ export default (state: State = idle, action: Action): State => {
     })();
 
     // TODO: ensure viewport is reset after bulk collection
+    // The starting index of a draggable can change during a drag
+    const newCritical: Critical = critical || state.critical;
 
     const impact: DragImpact = getDragImpact({
       pageBorderBoxCenter: state.current.page.borderBoxCenter,
-      draggable: dimensions.draggables[state.critical.draggable.id],
+      draggable: dimensions.draggables[newCritical.draggable.id],
       draggables: dimensions.draggables,
       droppables: dimensions.droppables,
       previousImpact: state.impact,
       viewport,
     });
-
-    // The starting index of a draggable can change during a drag
-    const newCritical: Critical = critical || state.critical;
 
     // Moving into the DRAGGING phase
     if (state.phase === 'BULK_COLLECTING') {
@@ -423,7 +421,6 @@ export default (state: State = idle, action: Action): State => {
     const newScroll: Position = action.payload.scroll;
 
     if (isEqual(state.viewport.scroll.current, newScroll)) {
-      console.log('bailing early: new scroll is equal');
       return state;
     }
 
@@ -447,8 +444,6 @@ export default (state: State = idle, action: Action): State => {
     if (state.phase === 'BULK_COLLECTING' || state.phase === 'DROP_PENDING') {
       return state;
     }
-
-    console.warn(action.type);
 
     invariant(state.phase === 'DRAGGING', `${action.type} received while not in DRAGGING phase`);
 

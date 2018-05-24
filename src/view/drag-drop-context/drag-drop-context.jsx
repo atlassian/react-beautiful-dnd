@@ -53,6 +53,15 @@ export const resetServerContext = () => {
   resetStyleContext();
 };
 
+const printFatalError = (error: Error) => {
+  if (process.env.NODE_ENV !== 'production') {
+    console.warn(`
+      An error has occurred while a drag is occurring.
+      Any existing drag will be cancelled
+    `, error);
+  }
+};
+
 export default class DragDropContext extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
   store: Store
@@ -131,8 +140,9 @@ export default class DragDropContext extends React.Component<Props> {
   // This is useful when the user
   canLift = (id: DraggableId) => canStartDrag(this.store.getState(), id);
 
+  // TODO: needed?
   componentDidCatch(error: Error) {
-    console.warn('Error caught in DragDropContext. Cancelling any drag', error);
+    printFatalError(error);
     this.store.dispatch(clean());
 
     // Not swallowing the error - letting it pass through
@@ -146,12 +156,7 @@ export default class DragDropContext extends React.Component<Props> {
       return;
     }
 
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn(`
-        An error has occurred while a drag is occurring.
-        Any existing drag will be cancelled
-      `, error);
-    }
+    printFatalError(error);
 
     this.store.dispatch(clean());
   }

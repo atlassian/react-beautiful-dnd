@@ -13,7 +13,7 @@ import type {
   PendingDrop,
 } from '../types';
 
-type LiftArgs = {|
+export type LiftArgs = {|
   // lifting with DraggableId rather than descriptor
   // as the descriptor might change after a drop is flushed
   id: DraggableId,

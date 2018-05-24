@@ -8,7 +8,6 @@ import type {
 } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import getViewport from '../../../../src/view/window/get-viewport';
 import type {
-  Critical,
   LiftRequest,
   DimensionMap,
   DraggableId,
@@ -19,18 +18,20 @@ import type {
   DroppableDimensionMap,
 } from '../../../../src/types';
 import {
+  critical,
+  withoutCritical,
+  criticalDimensions,
+  copy,
+} from '../../../utils/preset-action-args';
+import {
   populateMarshal,
   resetWatcher,
   getCallbacksStub,
-  type DimensionWatcher, withExpectedAdvancedUsageWarning,
+  withExpectedAdvancedUsageWarning,
+  type DimensionWatcher,
 } from './util';
 
 const preset = getPreset();
-
-const critical: Critical = {
-  droppable: preset.home.descriptor,
-  draggable: preset.inHome1.descriptor,
-};
 
 const defaultRequest: LiftRequest = {
   draggableId: critical.draggable.id,
@@ -41,28 +42,8 @@ const defaultRequest: LiftRequest = {
 
 const startResult: StartPublishingResult = {
   critical,
-  dimensions: {
-    draggables: {
-      [preset.inHome1.descriptor.id]: preset.inHome1,
-    },
-    droppables: {
-      [preset.home.descriptor.id]: preset.home,
-    },
-  },
+  dimensions: criticalDimensions,
 };
-
-const copy = (dimensions: DimensionMap): DimensionMap => ({
-  droppables: {
-    ...dimensions.droppables,
-  },
-  draggables: {
-    ...dimensions.draggables,
-  },
-});
-
-const withoutCritical: DimensionMap = copy(preset.dimensions);
-delete withoutCritical.draggables[critical.draggable.id];
-delete withoutCritical.droppables[critical.droppable.id];
 
 describe('start publishing', () => {
   describe('critical collection', () => {
