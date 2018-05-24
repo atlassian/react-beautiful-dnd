@@ -441,7 +441,7 @@ acorn@^4.0.3:
   version "4.0.13"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-4.0.13.tgz#105495ae5361d697bd195c825192e1ad7f253787"
 
-acorn@^5.0.0, acorn@^5.3.0, acorn@^5.5.0:
+acorn@^5.0.0, acorn@^5.3.0, acorn@^5.5.0, acorn@^5.5.3:
   version "5.5.3"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-5.5.3.tgz#f473dd47e0277a08e28e9bec5aeeb04751f0b8c9"
 
@@ -3728,7 +3728,7 @@ extsprintf@^1.2.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/extsprintf/-/extsprintf-1.4.0.tgz#e2689f8f356fad62cca65a3a91c5df5f9551692f"
 
-fast-deep-equal@^1.0.0, fast-deep-equal@^1.1.0:
+fast-deep-equal@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/fast-deep-equal/-/fast-deep-equal-1.1.0.tgz#c053477817c86b51daa853c81e059b733d023614"
 
@@ -5117,7 +5117,7 @@ jest-config@^22.4.3:
     jest-validate "^22.4.3"
     pretty-format "^22.4.3"
 
-jest-diff@^22.4.0, jest-diff@^22.4.3:
+jest-diff@^22.4.3:
   version "22.4.3"
   resolved "https://registry.yarnpkg.com/jest-diff/-/jest-diff-22.4.3.tgz#e18cc3feff0aeef159d02310f2686d4065378030"
   dependencies:
@@ -5125,6 +5125,15 @@ jest-diff@^22.4.0, jest-diff@^22.4.3:
     diff "^3.2.0"
     jest-get-type "^22.4.3"
     pretty-format "^22.4.3"
+
+jest-diff@^23.0.0:
+  version "23.0.0"
+  resolved "https://registry.yarnpkg.com/jest-diff/-/jest-diff-23.0.0.tgz#0a00b2157f518eec338121ccf8879c529269a88e"
+  dependencies:
+    chalk "^2.0.1"
+    diff "^3.2.0"
+    jest-get-type "^22.1.0"
+    pretty-format "^23.0.0"
 
 jest-docblock@^22.4.3:
   version "22.4.3"
@@ -5147,7 +5156,7 @@ jest-environment-node@^22.4.3:
     jest-mock "^22.4.3"
     jest-util "^22.4.3"
 
-jest-get-type@^22.4.3:
+jest-get-type@^22.1.0, jest-get-type@^22.4.3:
   version "22.4.3"
   resolved "https://registry.yarnpkg.com/jest-get-type/-/jest-get-type-22.4.3.tgz#e3a8504d8479342dd4420236b322869f18900ce4"
 
@@ -6948,6 +6957,13 @@ pretty-format@^22.4.3:
     ansi-regex "^3.0.0"
     ansi-styles "^3.2.0"
 
+pretty-format@^23.0.0:
+  version "23.0.0"
+  resolved "https://registry.yarnpkg.com/pretty-format/-/pretty-format-23.0.0.tgz#b66dc584a0907b1969783c4c20e4d1180b18ac75"
+  dependencies:
+    ansi-regex "^3.0.0"
+    ansi-styles "^3.2.0"
+
 private@^0.1.6, private@^0.1.7, private@^0.1.8, private@~0.1.5:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/private/-/private-0.1.8.tgz#2381edb3689f7a53d653190060fcf822d2f368ff"
@@ -7875,18 +7891,18 @@ rollup-plugin-replace@^2.0.0:
     minimatch "^3.0.2"
     rollup-pluginutils "^2.0.1"
 
-rollup-plugin-size-snapshot@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-size-snapshot/-/rollup-plugin-size-snapshot-0.4.0.tgz#59cf69ceaae595d36f5bb60a702a58824a567e03"
+rollup-plugin-size-snapshot@^0.5.1:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-size-snapshot/-/rollup-plugin-size-snapshot-0.5.1.tgz#f7649a4768448f35b5f97d37989e9f2c70165782"
   dependencies:
+    acorn "^5.5.3"
     bytes "^3.0.0"
     chalk "^2.3.2"
-    fast-deep-equal "^1.1.0"
     gzip-size "^4.1.0"
-    jest-diff "^22.4.0"
+    jest-diff "^23.0.0"
     memory-fs "^0.4.1"
     rollup-plugin-replace "^2.0.0"
-    uglify-es "^3.3.9"
+    terser "^3.7.5"
     webpack "^4.5.0"
 
 rollup-plugin-strip@^1.1.1:
@@ -8668,6 +8684,13 @@ tar@^2.2.1:
     fstream "^1.0.2"
     inherits "2"
 
+terser@^3.7.5:
+  version "3.7.5"
+  resolved "https://registry.yarnpkg.com/terser/-/terser-3.7.5.tgz#b18090210794c79a5774bc1f0ebe80fb877a31bd"
+  dependencies:
+    commander "~2.14.1"
+    source-map "~0.6.1"
+
 test-exclude@^4.1.1:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/test-exclude/-/test-exclude-4.2.1.tgz#dfa222f03480bca69207ca728b37d74b45f724fa"
@@ -8831,13 +8854,6 @@ uglify-es@^3.3.4, uglify-es@^3.3.7:
   resolved "https://registry.yarnpkg.com/uglify-es/-/uglify-es-3.3.9.tgz#0c1c4f0700bed8dbc124cdb304d2592ca203e677"
   dependencies:
     commander "~2.13.0"
-    source-map "~0.6.1"
-
-uglify-es@^3.3.9:
-  version "3.3.10"
-  resolved "https://registry.yarnpkg.com/uglify-es/-/uglify-es-3.3.10.tgz#8b0b7992cebe20edc26de1bf325cef797b8f3fa5"
-  dependencies:
-    commander "~2.14.1"
     source-map "~0.6.1"
 
 uglify-js@3.3.x:
