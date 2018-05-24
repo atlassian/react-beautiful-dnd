@@ -102,7 +102,7 @@ it('should dispatch a DROP_PENDING action if BULK_COLLECTING', () => {
   expect(store.getState().phase).toBe('DROP_PENDING');
 });
 
-it('should not do anything if a drop action is fired and there is DROP_PENDING and it is waiting for a publish', () => {
+it.only('should throw if a drop action is fired and there is DROP_PENDING and it is waiting for a publish', () => {
   const mock = jest.fn();
   const passThrough = () => next => (action) => {
     mock(action);
@@ -131,10 +131,8 @@ it('should not do anything if a drop action is fired and there is DROP_PENDING a
 
   // Drop action being fired (should not happen?)
 
-  mock.mockReset();
-  store.dispatch(drop({ reason: 'DROP' }));
-  expect(mock).toHaveBeenCalledTimes(1);
-  expect(mock).toHaveBeenCalledWith(drop({ reason: 'DROP' }));
+  expect(() => store.dispatch(drop({ reason: 'DROP' })))
+    .toThrow('A DROP action occurred while DROP_PENDING and still waiting');
 });
 
 describe('no drop animation required', () => {
@@ -179,8 +177,7 @@ describe('no drop animation required', () => {
         };
         expect(mock).toHaveBeenCalledWith(drop({ reason }));
         expect(mock).toHaveBeenCalledWith(completeDrop(result));
-        expect(mock).toHaveBeenCalledWith(clean());
-        expect(mock).toHaveBeenCalledTimes(3);
+        expect(mock).toHaveBeenCalledTimes(2);
 
         // reset to initial phase
         expect(store.getState().phase).toBe('IDLE');
@@ -496,14 +493,14 @@ describe('drop animation required', () => {
           movement: {
             displaced: [],
             amount: patch(axis.line, preset.inHome1.client.marginBox[axis.size]),
-            isBeyondStartPosition: false,
+            isBeyondStartPosition: true,
           },
           direction: preset.home.axis.direction,
-          destination: getHomeLocation(initialPublishArgs.critical),
+          destination: getHomeLocation(),
         },
         result: {
           ...getDragStart(),
-          destination: getHomeLocation(initialPublishArgs.critical),
+          destination: getHomeLocation(),
           reason: 'DROP',
         },
       };

@@ -60,7 +60,8 @@ export default (getMarshal: () => DimensionMarshal) => {
       dispatch(prepare());
 
       timeoutId = setTimeout(() => {
-      // Phase 2: collect initial dimensions
+        timeoutId = null;
+        // Phase 2: collect initial dimensions
         const state: State = getState();
         invariant(state.phase === 'PREPARING', 'Invalid phase for completing lift');
 

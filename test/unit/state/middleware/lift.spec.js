@@ -5,6 +5,7 @@ import type { DimensionMarshal, Callbacks } from '../../../../src/state/dimensio
 import middleware from '../../../../src/state/middleware/lift';
 import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';
+import { setViewport, resetViewport } from '../../../utils/viewport';
 import {
   prepare,
   lift,
@@ -18,6 +19,7 @@ import {
   updateDroppableIsEnabled,
 } from '../../../../src/state/action-creators';
 import {
+  viewport,
   liftArgs,
   initialPublishArgs,
   initialBulkReplaceArgs,
@@ -41,10 +43,12 @@ const getMarshal = (store: Store): DimensionMarshal => {
 };
 
 beforeEach(() => {
+  setViewport(viewport);
   jest.useFakeTimers();
 });
 
 afterEach(() => {
+  resetViewport();
   jest.clearAllTimers();
   jest.useRealTimers();
 });

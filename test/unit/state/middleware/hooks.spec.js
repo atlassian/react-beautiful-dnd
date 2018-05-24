@@ -12,7 +12,7 @@ import {
   moveDown,
   move,
   bulkCollectionStarting,
-  type MoveArgs,
+  type MoveArgs, animateDrop,
 } from '../../../../src/state/action-creators';
 import createStore from './util/create-store';
 import { viewport, initialPublishArgs, initialBulkReplaceArgs, getDragStart } from '../../../utils/preset-action-args';
@@ -379,10 +379,6 @@ describe('abort', () => {
     store.dispatch(clean());
     expect(hooks.onDragEnd).not.toHaveBeenCalled();
   });
-});
-
-describe('drop flushing', () => {
-  throw new Error('TODO');
 });
 
 describe('subsequent drags', () => {

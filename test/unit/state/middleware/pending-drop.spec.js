@@ -36,8 +36,7 @@ it('should trigger a drop on a bulk replace if a drop pending is waiting', () =>
     reason: 'DROP',
   };
   expect(mock).toHaveBeenCalledWith(completeDrop(result));
-  expect(mock).toHaveBeenCalledWith(clean());
-  expect(mock).toHaveBeenCalledTimes(4);
+  expect(mock).toHaveBeenCalledTimes(3);
   expect(store.getState().phase).toBe('IDLE');
 });
 

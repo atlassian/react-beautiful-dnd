@@ -4,7 +4,6 @@ import type { Position } from 'css-box-model';
 import {
   dropPending,
   completeDrop,
-  clean,
   animateDrop,
 } from '../action-creators';
 import noImpact from '../no-impact';
@@ -55,10 +54,9 @@ export default ({ getState, dispatch }: Store) =>
     }
 
     // Still waiting for our drop pending to end
-    if (state.phase === 'DROP_PENDING' && state.isWaiting) {
-      console.error('A drop action occurred while DROP_PENDING and still waiting');
-      return;
-    }
+    // TODO: should this throw?
+    const isWaitingForDrop: boolean = state.phase === 'DROP_PENDING' && state.isWaiting;
+    invariant(!isWaitingForDrop, 'A DROP action occurred while DROP_PENDING and still waiting');
 
     invariant(
       state.phase === 'DRAGGING' || state.phase === 'DROP_PENDING',
