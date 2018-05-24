@@ -5,13 +5,11 @@ import {
   completeDrop,
   initialPublish,
 } from '../action-creators';
-import canStartDrag from '../can-start-drag';
 import type { DimensionMarshal } from '../dimension-marshal/dimension-marshal-types';
 import type {
   Store,
   Action,
   State,
-  DropAnimatingState,
   ScrollOptions,
   LiftRequest,
 } from '../../types';
