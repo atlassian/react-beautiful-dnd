@@ -248,7 +248,7 @@ describe('hooks integration', () => {
   });
 
   describe('drag end', () => {
-    it.only('should call the onDragEnd hook when a drag ends', () => {
+    it('should call the onDragEnd hook when a drag ends', () => {
       drag.perform();
 
       wasDragCompleted();
