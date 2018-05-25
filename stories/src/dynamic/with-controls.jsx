@@ -57,7 +57,7 @@ const createQuote = (() => {
   };
 })();
 
-export default class QuoteApp extends React.Component<*, State> {
+export default class WithControls extends React.Component<*, State> {
   state: State = {
     quoteMap: intial,
   }

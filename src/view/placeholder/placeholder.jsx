@@ -4,6 +4,7 @@ import type { Placeholder as PlaceholderType } from '../../types';
 
 type Props = {|
   placeholder: PlaceholderType,
+  innerRef: () => ?HTMLElement,
 |}
 
 export default class Placeholder extends PureComponent<Props> {
@@ -26,6 +27,10 @@ export default class Placeholder extends PureComponent<Props> {
 
   setRef = (ref: ?HTMLElement) => {
     this.ref = ref;
+
+    if (this.props.innerRef) {
+      this.props.innerRef(this.ref);
+    }
   }
 
   render() {

@@ -1,9 +1,16 @@
 // @flow
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import QuoteApp from './src/dynamic/quote-app';
+import WithControls from './src/dynamic/with-controls';
+import LazyLoading from './src/dynamic/lazy-loading';
 
-storiesOf('Dynamic', module)
-  .add('Dynamic additions and removals during a drag', () => (
-    <QuoteApp />
+storiesOf('Dynamic changes during a drag', module)
+  .add('With controls', () => (
+    <WithControls />
+  ))
+  .add('Lazy loading', () => (
+    <LazyLoading />
+  ))
+  .add('Changes on drag start (onBeforeDragStart)', () => (
+    <div>TODO</div>
   ));

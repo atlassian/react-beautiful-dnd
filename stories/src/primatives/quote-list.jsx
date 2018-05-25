@@ -116,6 +116,9 @@ class InnerList extends React.Component<InnerListProps> {
 }
 
 export default class QuoteList extends React.Component<Props> {
+  static defaultProps = {
+    listId: 'LIST',
+  }
   render() {
     const {
       ignoreContainerClipping,

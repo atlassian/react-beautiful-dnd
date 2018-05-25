@@ -20,6 +20,7 @@ type Props = {|
   droppableId: DroppableId,
   index: number,
   getDraggableRef: () => ?HTMLElement,
+  getPlaceholderRef: () => ?HTMLElement,
   children: Node,
 |}
 
