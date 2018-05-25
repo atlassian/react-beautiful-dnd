@@ -45,6 +45,10 @@ export default ({
   const isBeyondStartPosition: boolean =
     currentCenter[axis.line] - originalCenter[axis.line] > 0;
 
+  console.log('original center', originalCenter);
+  console.log('current center', currentCenter);
+  console.log('isBeyondStartPosition', isBeyondStartPosition);
+
   // Amount to move needs to include the margins
   const amount: Position = patch(axis.line, draggable.client.marginBox[axis.size]);
 
@@ -86,17 +90,22 @@ export default ({
   const ordered: Displacement[] = isBeyondStartPosition ? displaced.reverse() : displaced;
   const index: number = (() => {
     const startIndex = insideHome.indexOf(draggable);
+    console.log('start index', startIndex);
     const length: number = ordered.length;
     if (!length) {
       return startIndex;
     }
 
     if (isBeyondStartPosition) {
+      console.log('is beyond start position');
       return startIndex + length;
     }
     // is moving backwards
+    console.log('moving backwards yolo');
     return startIndex - length;
   })();
+
+  console.log('calculated index', index);
 
   const movement: DragMovement = {
     amount,

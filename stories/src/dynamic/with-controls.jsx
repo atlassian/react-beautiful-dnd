@@ -9,7 +9,7 @@ import { grid } from '../constants';
 import type { Quote, QuoteMap, Author } from '../types';
 import type { DropResult } from '../../../src/types';
 
-const intial: QuoteMap = generateQuoteMap(20);
+const initial: QuoteMap = generateQuoteMap(4);
 
 const ControlSection = styled.div`
   margin: ${grid * 4}px;
@@ -59,7 +59,7 @@ const createQuote = (() => {
 
 export default class WithControls extends React.Component<*, State> {
   state: State = {
-    quoteMap: intial,
+    quoteMap: initial,
   }
 
   componentDidMount() {

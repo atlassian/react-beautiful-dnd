@@ -230,14 +230,32 @@ export default (state: State = idle, action: Action): State => {
     // The starting index of a draggable can change during a drag
     const newCritical: Critical = critical || state.critical;
 
+    const homeImpact: DragImpact = {
+      movement: noMovement,
+      direction: dimensions.droppables[newCritical.droppable.id].axis.direction,
+      destination: {
+        index: newCritical.draggable.index,
+        droppableId: newCritical.droppable.id,
+      },
+    };
+
+    // this will get the impact
     const impact: DragImpact = getDragImpact({
       pageBorderBoxCenter: state.current.page.borderBoxCenter,
       draggable: dimensions.draggables[newCritical.draggable.id],
       draggables: dimensions.draggables,
       droppables: dimensions.droppables,
-      previousImpact: state.impact,
+      previousImpact: homeImpact,
       viewport,
     });
+
+    if (critical) {
+      console.log('previous impact (home)', homeImpact);
+      console.log('critical', critical);
+      console.log('critical draggable', dimensions.draggables[newCritical.draggable.id]);
+      console.log('new impact', impact);
+      console.log('viewport', viewport);
+    }
 
     // Moving into the DRAGGING phase
     if (state.phase === 'BULK_COLLECTING') {
