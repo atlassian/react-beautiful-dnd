@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import { mount } from 'enzyme';
 import { type Position } from 'css-box-model';
-import Draggable, { makeSelector } from '../../../src/view/draggable/connected-draggable';
+import Draggable, { makeMapStateToProps } from '../../../src/view/draggable/connected-draggable';
 import { getPreset, getInitialImpact, withImpact } from '../../utils/dimension';
 import { negate } from '../../../src/state/position';
 import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
@@ -76,12 +76,12 @@ describe('Connected Draggable', () => {
   describe('is currently dragging', () => {
     const ownProps: OwnProps = getOwnProps(preset.inHome1);
 
-    it('should log an error when there is invalid drag state', () => {
+    it.only('should log an error when there is invalid drag state', () => {
       const invalid: State = {
         ...state.dragging(),
         drag: null,
       };
-      const selector: Selector = makeSelector();
+      const selector: Selector = makeMapStateToProps();
       const defaultMapProps: MapProps = selector(state.idle, ownProps);
 
       const result: MapProps = selector(invalid, ownProps);
@@ -92,7 +92,7 @@ describe('Connected Draggable', () => {
 
     describe('is not over a droppable', () => {
       it('should move the dragging item to the current offset', () => {
-        const selector: Selector = makeSelector();
+        const selector: Selector = makeMapStateToProps();
 
         const result: MapProps = selector(
           move(state.dragging(), { x: 20, y: 30 }),
@@ -113,7 +113,7 @@ describe('Connected Draggable', () => {
       });
 
       it('should control whether drag movement is allowed based the current state', () => {
-        const selector: Selector = makeSelector();
+        const selector: Selector = makeMapStateToProps();
         const previous: State = move(state.dragging(), { x: 20, y: 30 });
 
         // drag animation is allowed
@@ -146,7 +146,7 @@ describe('Connected Draggable', () => {
       });
 
       it('should not break memoization on multiple calls to the same offset', () => {
-        const selector: Selector = makeSelector();
+        const selector: Selector = makeMapStateToProps();
 
         const result1: MapProps = selector(
           move(state.dragging(), { x: 100, y: 200 }),
@@ -162,7 +162,7 @@ describe('Connected Draggable', () => {
       });
 
       it('should break memoization on multiple calls if moving to a new position', () => {
-        const selector: Selector = makeSelector();
+        const selector: Selector = makeMapStateToProps();
 
         const result1: MapProps = selector(
           move(state.dragging(), { x: 100, y: 200 }),
@@ -184,7 +184,7 @@ describe('Connected Draggable', () => {
             ...state.dropAnimating(),
             drop: null,
           };
-          const selector: Selector = makeSelector();
+          const selector: Selector = makeMapStateToProps();
           const defaultMapProps: MapProps = selector(state.idle, ownProps);
 
           const result: MapProps = selector(invalid, ownProps);
@@ -194,7 +194,7 @@ describe('Connected Draggable', () => {
         });
 
         it('should move the draggable to the new offset', () => {
-          const selector: Selector = makeSelector();
+          const selector: Selector = makeMapStateToProps();
           const current: State = state.dropAnimating();
 
           const result: MapProps = selector(
@@ -221,7 +221,7 @@ describe('Connected Draggable', () => {
 
       describe('user cancel', () => {
         it('should move the draggable to the new offset', () => {
-          const selector: Selector = makeSelector();
+          const selector: Selector = makeMapStateToProps();
           const current: State = state.userCancel();
 
           const result: MapProps = selector(
@@ -249,7 +249,7 @@ describe('Connected Draggable', () => {
 
     describe('is over a droppable (test subset)', () => {
       it('should move the dragging item to the current offset', () => {
-        const selector: Selector = makeSelector();
+        const selector: Selector = makeMapStateToProps();
 
         const result: MapProps = selector(
           withImpact(
@@ -272,7 +272,7 @@ describe('Connected Draggable', () => {
       });
 
       it('should not break memoization on multiple calls to the same offset', () => {
-        const selector: Selector = makeSelector();
+        const selector: Selector = makeMapStateToProps();
 
         const result1: MapProps = selector(
           withImpact(
@@ -294,7 +294,7 @@ describe('Connected Draggable', () => {
       });
 
       it('should break memoization on multiple calls if moving to a new position', () => {
-        const selector: Selector = makeSelector();
+        const selector: Selector = makeMapStateToProps();
 
         const result1: MapProps = selector(
           withImpact(
@@ -318,7 +318,7 @@ describe('Connected Draggable', () => {
 
       describe('drop animating', () => {
         it('should move the draggable to the new offset', () => {
-          const selector: Selector = makeSelector();
+          const selector: Selector = makeMapStateToProps();
           const destination: DraggableLocation = {
             index: preset.inHome1.descriptor.index,
             droppableId: preset.inHome1.descriptor.droppableId,
@@ -356,7 +356,7 @@ describe('Connected Draggable', () => {
 
       describe('user cancel', () => {
         it('should move the draggable to the new offset', () => {
-          const selector: Selector = makeSelector();
+          const selector: Selector = makeMapStateToProps();
           const destination: DraggableLocation = {
             index: preset.inHome1.descriptor.index,
             droppableId: preset.inHome1.descriptor.droppableId,
@@ -403,7 +403,7 @@ describe('Connected Draggable', () => {
           ...state.dragging(),
           drag: null,
         };
-        const selector: Selector = makeSelector();
+        const selector: Selector = makeMapStateToProps();
         const defaultMapProps: MapProps = selector(state.idle, ownProps);
 
         const result: MapProps = selector(invalid, ownProps);
@@ -413,7 +413,7 @@ describe('Connected Draggable', () => {
       });
 
       it('should return the default map props', () => {
-        const selector: Selector = makeSelector();
+        const selector: Selector = makeMapStateToProps();
         const defaultMapProps: MapProps = selector(state.idle, ownProps);
 
         const result: MapProps = selector(
@@ -425,7 +425,7 @@ describe('Connected Draggable', () => {
       });
 
       it('should not break memoization on multiple calls', () => {
-        const selector: Selector = makeSelector();
+        const selector: Selector = makeMapStateToProps();
         const defaultMapProps: MapProps = selector(state.idle, ownProps);
 
         const result1: MapProps = selector(
@@ -447,7 +447,7 @@ describe('Connected Draggable', () => {
       it('should return the default props', () => {
         // looking at inHome3
         const ownProps: OwnProps = getOwnProps(preset.inHome3);
-        const selector = makeSelector();
+        const selector = makeMapStateToProps();
         const defaultMapProps: MapProps = selector(state.idle, ownProps);
         // moving inHome1 down beyond inHome2
         const impact: DragImpact = {
@@ -492,7 +492,7 @@ describe('Connected Draggable', () => {
           children: () => null,
         };
 
-        const selector = makeSelector();
+        const selector = makeMapStateToProps();
         const defaultMapProps: MapProps = selector(state.idle, ownProps);
         // moving inHome1 down beyond inHome2
         const impact1: DragImpact = {
@@ -565,7 +565,7 @@ describe('Connected Draggable', () => {
       it('should move in backwards if the dragging item is moving beyond its start position', () => {
         // looking at inHome2
         const ownProps: OwnProps = getOwnProps(preset.inHome2);
-        const selector = makeSelector();
+        const selector = makeMapStateToProps();
         const amount: Position = { y: preset.inHome1.client.marginBox.height, x: 0 };
         // moving inHome1 down beyond inHome2
         const impact: DragImpact = {
@@ -613,7 +613,7 @@ describe('Connected Draggable', () => {
       it('should move forwards if the dragging item is not beyond its start position', () => {
         // looking at inHome1
         const ownProps: OwnProps = getOwnProps(preset.inHome1);
-        const selector = makeSelector();
+        const selector = makeMapStateToProps();
         const amount: Position = { y: preset.inHome2.client.marginBox.height, x: 0 };
         // moving inHome2 up beyond inHome1
         const impact: DragImpact = {
@@ -661,7 +661,7 @@ describe('Connected Draggable', () => {
       it('should not move the item and return the default map props if the displacement is not visible', () => {
         // looking at inHome2
         const ownProps: OwnProps = getOwnProps(preset.inHome2);
-        const selector = makeSelector();
+        const selector = makeMapStateToProps();
         const defaultMapProps: MapProps = selector(state.idle, ownProps);
         const amount: Position = { y: preset.inHome1.client.marginBox.height, x: 0 };
         // moving inHome1 down beyond inHome2
@@ -700,7 +700,7 @@ describe('Connected Draggable', () => {
       it('should indicate whether the displacement should be animated based on the drag impact', () => {
         // looking at inHome2
         const ownProps: OwnProps = getOwnProps(preset.inHome2);
-        const selector = makeSelector();
+        const selector = makeMapStateToProps();
         const amount: Position = { y: preset.inHome1.client.marginBox.height, x: 0 };
         // moving inHome1 down beyond inHome2
         const impact: DragImpact = {
@@ -748,7 +748,7 @@ describe('Connected Draggable', () => {
       it('should not break memoization on multiple calls if displaced and remain displaced', () => {
         // looking at inHome4
         const ownProps: OwnProps = getOwnProps(preset.inHome2);
-        const selector = makeSelector();
+        const selector = makeMapStateToProps();
         const amount: Position = { y: preset.inHome1.client.marginBox.height, x: 0 };
         // moving inHome1 down beyond inHome2
         const impact1: DragImpact = {
@@ -837,7 +837,7 @@ describe('Connected Draggable', () => {
             // invalid
             drop: null,
           };
-          const selector: Selector = makeSelector();
+          const selector: Selector = makeMapStateToProps();
           const ownProps: OwnProps = getOwnProps(preset.inHome2);
           const defaultMapProps: MapProps = selector(state.idle, ownProps);
 
@@ -850,7 +850,7 @@ describe('Connected Draggable', () => {
         it('should not break memoization from the dragging phase', () => {
           // looking at inHome2
           const ownProps: OwnProps = getOwnProps(preset.inHome2);
-          const selector = makeSelector();
+          const selector = makeMapStateToProps();
           const amount: Position = { y: preset.inHome1.client.marginBox.height, x: 0 };
           // moving inHome1 down beyond inHome2
           const impact: DragImpact = {
@@ -924,7 +924,7 @@ describe('Connected Draggable', () => {
             // invalid
             drop: null,
           };
-          const selector: Selector = makeSelector();
+          const selector: Selector = makeMapStateToProps();
           const ownProps: OwnProps = getOwnProps(preset.inHome2);
           const defaultMapProps: MapProps = selector(state.idle, ownProps);
 
@@ -937,7 +937,7 @@ describe('Connected Draggable', () => {
         it('should not break memoization from the dragging phase', () => {
           // looking at inHome2
           const ownProps: OwnProps = getOwnProps(preset.inHome2);
-          const selector = makeSelector();
+          const selector = makeMapStateToProps();
           const amount: Position = { y: preset.inHome1.client.marginBox.height, x: 0 };
           // moving inHome1 down beyond inHome2
           const impact: DragImpact = {
@@ -1013,7 +1013,7 @@ describe('Connected Draggable', () => {
         state.dropComplete(),
       ];
       const ownProps: OwnProps = getOwnProps(preset.inHome1);
-      const selector: Selector = makeSelector();
+      const selector: Selector = makeMapStateToProps();
       const defaultMapProps: MapProps = selector(state.idle, ownProps);
 
       [...resting, ...resting.reverse()].forEach((current: State) => {
@@ -1028,9 +1028,9 @@ describe('Connected Draggable', () => {
 
   describe('selector isolation', () => {
     it('should not break memoization across selectors', () => {
-      const inHome1Selector: Selector = makeSelector();
+      const inHome1Selector: Selector = makeMapStateToProps();
       const inHome1OwnProps: OwnProps = getOwnProps(preset.inHome1);
-      const inHome2Selector: Selector = makeSelector();
+      const inHome2Selector: Selector = makeMapStateToProps();
       const inHome2OwnProps: OwnProps = getOwnProps(preset.inHome2);
       const defaultInHome2MapProps: MapProps = inHome2Selector(state.idle, inHome2OwnProps);
 

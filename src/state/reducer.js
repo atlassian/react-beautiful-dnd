@@ -8,6 +8,7 @@ import moveToNextIndex from './move-to-next-index/';
 import { noMovement } from './no-impact';
 import { add, isEqual, subtract } from './position';
 import scrollViewport from './scroll-viewport';
+import getHomeImpact from './get-home-impact';
 import type {
   Action,
   State,
@@ -144,17 +145,8 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
-    const droppable: DroppableDimension = dimensions.droppables[critical.droppable.id];
-
     // Calculating initial impact
-    const impact: DragImpact = {
-      movement: noMovement,
-      direction: droppable.axis.direction,
-      destination: {
-        index: critical.draggable.index,
-        droppableId: critical.droppable.id,
-      },
-    };
+    const impact: DragImpact = getHomeImpact(critical, dimensions.droppables);
 
     const result: BulkCollectionState = {
       // We are now waiting for the first bulk collection.
@@ -199,28 +191,30 @@ export default (state: State = idle, action: Action): State => {
       `Unexpected bulk publish received in phase ${state.phase}`
     );
 
-    const existing: BulkCollectionState | DropPendingState = state;
+    const { viewport, critical: suppliedCritical, dimensions: suppliedDimensions } = action.payload;
 
-    const { viewport, critical, dimensions: proposed } = action.payload;
     const dimensions: DimensionMap = (() => {
+      // flow is getting confused
+      invariant(state.phase === 'BULK_COLLECTING');
+
       // new dimensions contain the critical dimensions - we can just use those
-      if (critical) {
-        return proposed;
+      if (suppliedCritical) {
+        return suppliedDimensions;
       }
 
       // need to maintain critical dimensions as they where not collected
       const draggable: DraggableDimension =
-        existing.dimensions.draggables[existing.critical.draggable.id];
+        state.dimensions.draggables[state.critical.draggable.id];
       const droppable: DroppableDimension =
-        existing.dimensions.droppables[existing.critical.droppable.id];
+        state.dimensions.droppables[state.critical.droppable.id];
 
       return {
         draggables: {
-          ...proposed.draggables,
+          ...suppliedDimensions.draggables,
           [draggable.descriptor.id]: draggable,
         },
         droppables: {
-          ...proposed.droppables,
+          ...suppliedDimensions.droppables,
           [droppable.descriptor.id]: droppable,
         },
       };
@@ -228,34 +222,85 @@ export default (state: State = idle, action: Action): State => {
 
     // TODO: ensure viewport is reset after bulk collection
     // The starting index of a draggable can change during a drag
-    const newCritical: Critical = critical || state.critical;
-
-    const homeImpact: DragImpact = {
-      movement: noMovement,
-      direction: dimensions.droppables[newCritical.droppable.id].axis.direction,
-      destination: {
-        index: newCritical.draggable.index,
-        droppableId: newCritical.droppable.id,
-      },
-    };
+    const critical: Critical = suppliedCritical || state.critical;
 
     // this will get the impact
     const impact: DragImpact = getDragImpact({
       pageBorderBoxCenter: state.current.page.borderBoxCenter,
-      draggable: dimensions.draggables[newCritical.draggable.id],
+      draggable: dimensions.draggables[critical.draggable.id],
       draggables: dimensions.draggables,
       droppables: dimensions.droppables,
-      previousImpact: homeImpact,
+      previousImpact: getHomeImpact(critical, dimensions.droppables),
       viewport,
     });
 
     if (critical) {
-      console.log('previous impact (home)', homeImpact);
+      console.log('previous impact (home)', getHomeImpact(critical, dimensions.droppables));
       console.log('critical', critical);
-      console.log('critical draggable', dimensions.draggables[newCritical.draggable.id]);
+      console.log('critical draggable', dimensions.draggables[critical.draggable.id]);
       console.log('new impact', impact);
       console.log('viewport', viewport);
     }
+
+    const positions = (() => {
+      invariant(state.phase === 'BULK_COLLECTING');
+
+      if (!suppliedCritical) {
+        return {
+          initial: state.initial,
+          current: state.current,
+        };
+      }
+
+      const draggable: DraggableDimension = dimensions.draggables[critical.draggable.id];
+      const newCenter: Position = draggable.client.borderBox.center;
+      const oldCenter: Position = state.initial.client.borderBoxCenter;
+      const diff: Position = subtract(newCenter, oldCenter);
+      console.log('DIFF', diff);
+
+      const initial: DragPositions = (() => {
+        invariant(state.phase === 'BULK_COLLECTING');
+
+        const oldInitialClient: ItemPositions = state.initial.client;
+        const scroll: Position = viewport.scroll.initial;
+        const client: ItemPositions = {
+          // TODO: add!?
+          selection: add(oldInitialClient.selection, diff),
+          borderBoxCenter: newCenter,
+          offset: origin,
+        };
+        const page: ItemPositions = {
+          selection: add(client.selection, scroll),
+          offset: add(client.offset, scroll),
+          borderBoxCenter: add(client.borderBoxCenter, scroll),
+        };
+        return {
+          client, page,
+        };
+      })();
+
+      const current: DragPositions = (() => {
+        invariant(state.phase === 'BULK_COLLECTING');
+
+        const oldCurrentClient: ItemPositions = state.current.client;
+        const scroll: Position = viewport.scroll.current;
+        const client: ItemPositions = {
+          selection: subtract(oldCurrentClient.selection, diff),
+          borderBoxCenter: subtract(oldCurrentClient.borderBoxCenter, diff),
+          offset: subtract(oldCurrentClient.offset, diff),
+        };
+        const page: ItemPositions = {
+          selection: add(client.selection, scroll),
+          offset: add(client.offset, scroll),
+          borderBoxCenter: add(client.borderBoxCenter, scroll),
+        };
+        return {
+          client, page,
+        };
+      })();
+
+      return { initial, current };
+    })();
 
     // Moving into the DRAGGING phase
     if (state.phase === 'BULK_COLLECTING') {
@@ -265,8 +310,10 @@ export default (state: State = idle, action: Action): State => {
         ...state,
         // eslint-disable-next-line
         phase: 'DRAGGING',
-        critical: newCritical,
+        critical,
         impact,
+        initial: positions.initial,
+        current: positions.current,
         dimensions,
         viewport,
       };
@@ -283,7 +330,7 @@ export default (state: State = idle, action: Action): State => {
         phase: 'DROP_PENDING',
       impact,
       dimensions,
-      critical: newCritical,
+      critical,
       viewport,
       // No longer waiting
       isWaiting: false,

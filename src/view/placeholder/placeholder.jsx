@@ -1,11 +1,47 @@
 // @flow
 import React, { PureComponent } from 'react';
+import type { Spacing } from 'css-box-model';
 import type { Placeholder as PlaceholderType } from '../../types';
 
 type Props = {|
   placeholder: PlaceholderType,
-  innerRef: () => ?HTMLElement,
+  innerRef: (ref: ?HTMLElement) => void,
 |}
+
+type SpacingMap = {|
+  top: string,
+  right: string,
+  bottom: string,
+  left: string,
+|}
+
+const fromSpacing = (map: SpacingMap) => (spacing: Spacing) => ({
+  [map.top]: spacing.top,
+  [map.right]: spacing.right,
+  [map.bottom]: spacing.bottom,
+  [map.left]: spacing.left,
+});
+
+const withMargin = fromSpacing({
+  top: 'marginTop',
+  right: 'marginRight',
+  bottom: 'marginBottom',
+  left: 'marginLeft',
+});
+
+const withPadding = fromSpacing({
+  top: 'paddingTop',
+  right: 'paddingRight',
+  bottom: 'paddingBottom',
+  left: 'paddingLeft',
+});
+
+const withBorder = fromSpacing({
+  top: 'borderTopWidth',
+  right: 'borderRightWidth',
+  bottom: 'borderBottomWidth',
+  left: 'borderLeftWidth',
+});
 
 export default class Placeholder extends PureComponent<Props> {
   // eslint-disable-next-line react/sort-comp
@@ -35,17 +71,21 @@ export default class Placeholder extends PureComponent<Props> {
 
   render() {
     const placeholder: PlaceholderType = this.props.placeholder;
-    const { client, display, tagName } = placeholder;
+    const { client, display, tagName, boxSizing } = placeholder;
+
+    const width: number = boxSizing === 'borderBox' ? client.borderBox.width : client.contentBox.width;
+    const height: number = boxSizing === 'borderBox' ? client.borderBox.height : client.contentBox.height;
 
     const style = {
       display,
-      boxSizing: 'border-box',
-      width: client.borderBox.width,
-      height: client.borderBox.height,
-      marginTop: client.margin.top,
-      marginRight: client.margin.right,
-      marginBottom: client.margin.bottom,
-      marginLeft: client.margin.left,
+      boxSizing,
+      width,
+      height,
+      ...withMargin(client.margin),
+      ...withPadding(client.padding),
+      ...withBorder(client.border),
+      borderStyle: 'solid',
+      borderColor: 'transparent',
 
       // Avoiding the collapsing or growing of this element when pushed by flex child siblings.
       // We have already taken a snapshot the current dimensions we do not want this element

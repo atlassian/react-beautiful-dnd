@@ -9,7 +9,7 @@ import { grid } from '../constants';
 import type { Quote, QuoteMap, Author } from '../types';
 import type { DropResult } from '../../../src/types';
 
-const initial: QuoteMap = generateQuoteMap(4);
+const initial: QuoteMap = generateQuoteMap(0);
 
 const ControlSection = styled.div`
   margin: ${grid * 4}px;

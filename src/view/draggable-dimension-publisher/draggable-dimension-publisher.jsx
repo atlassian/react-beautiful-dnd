@@ -90,41 +90,30 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
   getDimension = (windowScroll: Position): DraggableDimension => {
     const targetRef: ?HTMLElement = this.props.getDraggableRef();
+    const placeholderRef: ?HTMLElement = this.props.getPlaceholderRef();
+    console.log('placeholderRef', placeholderRef);
     const descriptor: ?DraggableDescriptor = this.publishedDescriptor;
 
     invariant(targetRef, 'DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
     invariant(descriptor, 'Cannot get dimension for unpublished draggable');
 
-    const computedStyles: CSSStyleDeclaration = window.getComputedStyle(targetRef);
+    const ref: HTMLElement = placeholderRef || targetRef;
 
-    // Capturing borderBox without transforms or top / left positioning
-    // Fingers crossed that this does not cause any flashing
-    // TODO: anyway to unwind just the ones we care about?
-    const previous = {
-      transform: computedStyles.transform,
-      // transition: computedStyles.transition,
-      // top: computedStyles.top,
-      // left: computedStyles.left,
-    };
+    if (placeholderRef) {
+      // debugger;
+    }
 
-    targetRef.style.transform = 'none';
-    // targetRef.style.transition = 'none';
-    // targetRef.style.top = '0px';
-    // targetRef.style.left = '0px';
-    const borderBox: ClientRect = targetRef.getBoundingClientRect();
-    // targetRef.style.transition = previous.transition;
-    targetRef.style.transform = previous.transform;
-    targetRef.getBoundingClientRect();
-    // targetRef.style.top = previous.top;
-    // targetRef.style.left = previous.left;
+    const computedStyles: CSSStyleDeclaration = window.getComputedStyle(ref);
+    const borderBox: ClientRect = ref.getBoundingClientRect();
 
     const client: BoxModel = calculateBox(borderBox, computedStyles);
     const page: BoxModel = withScroll(client, windowScroll);
 
     const placeholder: Placeholder = {
       client,
-      tagName: targetRef.tagName.toLowerCase(),
+      tagName: ref.tagName.toLowerCase(),
       display: computedStyles.display,
+      boxSizing: computedStyles.boxSizing,
     };
 
     const dimension: DraggableDimension = {

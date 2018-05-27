@@ -52,6 +52,7 @@ export type Placeholder = {|
   client: BoxModel,
   tagName: string,
   display: string,
+  boxSizing: string,
 |}
 
 export type DraggableDimension = {|

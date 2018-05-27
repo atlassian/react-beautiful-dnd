@@ -154,6 +154,7 @@ const getPlaceholder = (client: BoxModel): Placeholder => ({
   client,
   tagName: 'div',
   display: 'block',
+  boxSizing: 'border-box',
 });
 
 export const getClosestScrollable = (droppable: DroppableDimension): Scrollable => {

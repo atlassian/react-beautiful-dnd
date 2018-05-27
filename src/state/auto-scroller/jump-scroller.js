@@ -32,6 +32,7 @@ export default ({
   scrollWindow,
 }: Args): JumpScroller => {
   const moveByOffset = (state: DraggingState, offset: Position) => {
+    // TODO: use center?
     const client: Position = add(state.current.client.selection, offset);
     move({ client, shouldAnimate: true });
   };
