@@ -1961,11 +1961,13 @@ codesandbox@^1.1.14:
     shortid "^2.2.8"
     update-notifier "^2.2.0"
 
-codesandboxer@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/codesandboxer/-/codesandboxer-0.2.1.tgz#83ce9bae3b0fad17e8703f6c705bb4754f18eeb9"
+codesandboxer@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/codesandboxer/-/codesandboxer-0.3.0.tgz#27db0a95276804777ae71dc216e7222c38c46e1c"
   dependencies:
+    babel-runtime "^6.26.0"
     codesandbox "^1.1.14"
+    form-data "^2.3.2"
     isomorphic-unfetch "^2.0.0"
 
 collapse-white-space@^1.0.0, collapse-white-space@^1.0.2:
@@ -3394,20 +3396,20 @@ forever-agent@~0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/forever-agent/-/forever-agent-0.6.1.tgz#fbc71f0c41adeb37f96c577ad1ed42d8fdacca91"
 
+form-data@^2.3.2, form-data@~2.3.1:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/form-data/-/form-data-2.3.2.tgz#4970498be604c20c005d4f5c23aecd21d6b49099"
+  dependencies:
+    asynckit "^0.4.0"
+    combined-stream "1.0.6"
+    mime-types "^2.1.12"
+
 form-data@~2.1.1:
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/form-data/-/form-data-2.1.4.tgz#33c183acf193276ecaa98143a69e94bfee1750d1"
   dependencies:
     asynckit "^0.4.0"
     combined-stream "^1.0.5"
-    mime-types "^2.1.12"
-
-form-data@~2.3.1:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/form-data/-/form-data-2.3.2.tgz#4970498be604c20c005d4f5c23aecd21d6b49099"
-  dependencies:
-    asynckit "^0.4.0"
-    combined-stream "1.0.6"
     mime-types "^2.1.12"
 
 forwarded@~0.1.2:
@@ -7326,11 +7328,11 @@ rc@^1.0.1, rc@^1.1.6, rc@^1.1.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-codesandboxer@^2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/react-codesandboxer/-/react-codesandboxer-2.0.3.tgz#09000747a85fef9618007c0d11ff19938833b887"
+react-codesandboxer@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/react-codesandboxer/-/react-codesandboxer-2.1.2.tgz#9fc98fac0396fc82cd1b12f710eaae4ec2f7af2e"
   dependencies:
-    codesandboxer "^0.2.1"
+    codesandboxer "^0.3.0"
     react-node-resolver "^1.0.1"
 
 react-deep-force-update@^2.1.1:
