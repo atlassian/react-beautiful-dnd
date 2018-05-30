@@ -7,10 +7,9 @@ import pkg from '../../../package.json';
 import { grid } from '../constants';
 
 const gitInfo = {
-  account: 'noviny',
+  account: 'atlassian',
   repository: 'react-beautiful-dnd',
   host: 'github',
-  branch: 'website-layout',
 };
 
 // this needs to handle internal v external
@@ -68,8 +67,8 @@ const Wrapper = styled.div`
 type Props = {
   children: Node,
   path: string,
-  title: string,
-}
+  title: string
+};
 
 const ExampleWrapper = ({ children, path, title }: Props) => (
   <div>
