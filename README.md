@@ -381,7 +381,7 @@ cursor: grab;
 An optimisation to avoid processing `pointer-events` while dragging. Also used to allow scrolling through a drag handle with a track pad or mouse wheel.
 
 ```css
-point-events: none;
+pointer-events: none;
 ```
 
 #### (Phase: dragging): Draggable element
