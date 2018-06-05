@@ -234,14 +234,6 @@ export default (state: State = idle, action: Action): State => {
       viewport,
     });
 
-    if (critical) {
-      console.log('previous impact (home)', getHomeImpact(critical, dimensions.droppables));
-      console.log('critical', critical);
-      console.log('critical draggable', dimensions.draggables[critical.draggable.id]);
-      console.log('new impact', impact);
-      console.log('viewport', viewport);
-    }
-
     const positions = (() => {
       invariant(state.phase === 'BULK_COLLECTING');
 

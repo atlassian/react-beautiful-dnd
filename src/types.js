@@ -141,6 +141,8 @@ export type DragImpact = {|
 
 export type ItemPositions = {|
   // where the user initially selected
+  // This point is not used to calculate the impact of a dragging item
+  // It is used to calculate the offset from the initial selection point
   selection: Position,
   // the current center of the item
   borderBoxCenter: Position,
