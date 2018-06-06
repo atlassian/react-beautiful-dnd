@@ -769,7 +769,7 @@ type DroppableProps = {|
 ```
 
 - `provided.innerRef`: In order for the droppable to function correctly, **you must** bind the `provided.innerRef` to the highest possible DOM node in the `ReactElement`. We do this in order to avoid needing to use `ReactDOM` to look up your DOM node. *This prop is planned to be removed when we move to React 16*
-- `provided.placeholder`: This is used to create space in the `Droppable` as needed during a drag. This space is needed when a user is dragging over a list that is not the home list. Please be sure to put the placeholder inside of the component for which you have provided the ref. We need to increase the size of the `Droppable` itself. This is different from `Draggable` where the `placeholder` needs to be a *sibling* to the draggable node.
+- `provided.placeholder`: This is used to create space in the `Droppable` as needed during a drag. This space is needed when a user is dragging over a list that is not the home list. Please be sure to put the placeholder inside of the component for which you have provided the ref. We need to increase the size of the `Droppable` itself.
 - `provided.droppableProps (DroppableProps)`: This is an Object that contains properties that need to be applied to a Droppable element. It needs to be applied to the same element that you apply `provided.innerRef` to. It currently contains a `data` attribute that we use to control some non-visible css.
 
 ```js
@@ -1242,7 +1242,7 @@ The `children` function is also provided with a small amount of state relating t
 
 ### `Draggable` placeholder
 
-When dragging a `Draggable` we leave behind a *placeholder* `React.Element` to maintain space in the `Droppable` in order to prevent it from collapsing. The placeholder mimics the styling and layout (including `width`, `height`, `margin`, `tagName` and `display`) to ensure the list dimensions remain unaffected while dragging. It will be inserted as a direct sibling to the `React.Node` returned by the `Draggable` children function.
+When dragging a `Draggable` we leave behind a *placeholder* `React.Element` to maintain space in the `Droppable` in order to prevent it from collapsing. The placeholder mimics the styling and layout (including `width`, `height`, `margin`, `tagName` and `display`) to ensure the list dimensions remain unaffected while dragging. It will be inserted by `react-beautiful-dnd` as a direct sibling to the `React.Node` returned by the `Draggable` children function.
 
 ### Adding an `onClick` handler to a `Draggable` or a *drag handle*
 
