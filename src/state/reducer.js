@@ -253,8 +253,6 @@ export default (state: State = idle, action: Action): State => {
       return dropPending;
     }
 
-    console.log('replacing critical dimension');
-
     // replacing the critical dimensions!!
     const oldBorderBoxCenter: Position = state.initial.client.borderBoxCenter;
     const draggable: DraggableDimension = suppliedDimensions.draggables[critical.draggable.id];

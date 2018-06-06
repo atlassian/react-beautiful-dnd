@@ -105,9 +105,10 @@ describe('responding to scroll changes', () => {
     expect(watcher.droppable.scroll).not.toHaveBeenCalled();
 
     marshal.updateDroppableScroll(critical.droppable.id, { x: 10, y: 20 });
-    expect(callbacks.updateDroppableScroll).toHaveBeenCalledWith(
-      critical.droppable.id, { x: 10, y: 20 }
-    );
+    expect(callbacks.updateDroppableScroll).toHaveBeenCalledWith({
+      id: critical.droppable.id,
+      offset: { x: 10, y: 20 },
+    });
   });
 
   it('should throw if the droppable cannot be found', () => {
@@ -150,7 +151,7 @@ describe('is enabled changes', () => {
 
     marshal.updateDroppableIsEnabled(critical.droppable.id, false);
     expect(callbacks.updateDroppableIsEnabled)
-      .toHaveBeenCalledWith(critical.droppable.id, false);
+      .toHaveBeenCalledWith({ id: critical.droppable.id, isEnabled: false });
   });
 
   it('should throw if the droppable cannot be found', () => {
