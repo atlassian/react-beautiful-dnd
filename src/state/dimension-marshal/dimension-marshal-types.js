@@ -1,8 +1,9 @@
 // @flow
 import { type Position } from 'css-box-model';
 import {
-  bulkCollectionStarting,
   type BulkReplaceArgs,
+  type UpdateDroppableScrollArgs,
+  type UpdateDroppableIsEnabledArgs,
 } from '../action-creators';
 import type {
   DraggableDescriptor,
@@ -97,7 +98,7 @@ export type DimensionMarshal = {|
 
 export type Callbacks = {|
   bulkReplace: (args: BulkReplaceArgs) => void,
-  updateDroppableScroll: (id: DroppableId, newScroll: Position) => void,
-  updateDroppableIsEnabled: (id: DroppableId, isEnabled: boolean) => void,
-  bulkCollectionStarting: typeof bulkCollectionStarting,
+  updateDroppableScroll: (args: UpdateDroppableScrollArgs) => void,
+  updateDroppableIsEnabled: (args: UpdateDroppableIsEnabledArgs) => void,
+  bulkCollectionStarting: () => void,
 |}

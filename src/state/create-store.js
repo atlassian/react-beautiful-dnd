@@ -41,7 +41,7 @@ export default ({
 
       // > uncomment to use
       // debugging logger
-      require('./debug-middleware/log-middleware').default,
+      // require('./debug-middleware/log-middleware').default,
       // debugging timer
       // require('./debug-middleware/timing-middleware').default,
       // average action timer

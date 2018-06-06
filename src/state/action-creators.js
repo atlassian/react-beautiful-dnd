@@ -95,7 +95,7 @@ export const updateDroppableScroll =
     payload: args,
   });
 
-type UpdateDroppableIsEnabledArgs = {|
+export type UpdateDroppableIsEnabledArgs = {|
   id: DroppableId,
   isEnabled: boolean,
 |};
