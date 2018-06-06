@@ -1,6 +1,5 @@
 // @flow
 import React, { type Node } from 'react';
-import { type Position } from 'css-box-model';
 import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
@@ -53,7 +52,7 @@ export const resetServerContext = () => {
   resetStyleContext();
 };
 
-const printFatalError = (error: Error) => {
+const printFatalDevError = (error: Error) => {
   if (process.env.NODE_ENV !== 'production') {
     console.warn(`
       An error has occurred while a drag is occurring.
@@ -140,12 +139,23 @@ export default class DragDropContext extends React.Component<Props> {
   // This is useful when the user
   canLift = (id: DraggableId) => canStartDrag(this.store.getState(), id);
 
-  // TODO: needed?
+  componentDidMount() {
+    window.addEventListener('error', this.onWindowError);
+    this.styleMarshal.mount();
+    this.announcer.mount();
+  }
+
   componentDidCatch(error: Error) {
-    printFatalError(error);
+    printFatalDevError(error);
     this.store.dispatch(clean());
 
-    // Not swallowing the error - letting it pass through
+    // If the failure was due to an invariant failure - then we handle the error
+    if (error.message.indexOf('Invariant failed') !== -1) {
+      this.setState({});
+      return;
+    }
+
+    // Error is more serious and we throw it
     throw error;
   }
 
@@ -156,21 +166,18 @@ export default class DragDropContext extends React.Component<Props> {
       return;
     }
 
-    printFatalError(error);
-
+    printFatalDevError(error);
     this.store.dispatch(clean());
-  }
-
-  componentDidMount() {
-    window.addEventListener('error', this.onWindowError);
-    this.styleMarshal.mount();
-    this.announcer.mount();
   }
 
   componentWillUnmount() {
     window.addEventListener('error', this.onWindowError);
-    // TODO: is this the right way to cleanup?
-    this.store.dispatch(clean());
+
+    const state: State = this.store.getState();
+    if (state.phase !== 'IDLE') {
+      this.store.dispatch(clean());
+    }
+
     this.styleMarshal.unmount();
     this.announcer.unmount();
   }

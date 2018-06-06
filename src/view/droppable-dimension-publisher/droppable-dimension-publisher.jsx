@@ -156,7 +156,6 @@ export default class DroppableDimensionPublisher extends Component<Props> {
 
   hidePlaceholder = () => {
     const placeholder: ?Placeholder = this.props.getPlaceholder();
-    console.log('hide', placeholder);
 
     if (placeholder) {
       placeholder.hide();
@@ -165,7 +164,6 @@ export default class DroppableDimensionPublisher extends Component<Props> {
 
   showPlaceholder = () => {
     const placeholder: ?Placeholder = this.props.getPlaceholder();
-    console.log('show', placeholder);
 
     if (placeholder) {
       placeholder.show();

@@ -207,6 +207,7 @@ export default class Draggable extends Component<Props> {
       isDropAnimating: boolean,
       movementStyle: MovementStyle): DraggingStyle => {
       const box: BoxModel = dimension.client;
+
       // const { width, height, top, left } = dimension.client.borderBox;
       // For an explanation of properties see `draggable-types`.
       const style: DraggingStyle = {
@@ -387,6 +388,7 @@ export default class Draggable extends Component<Props> {
           speed={speed}
           destination={offset}
           onMoveEnd={this.onMoveEnd}
+          draggableId={draggableId}
         >
           {(movementStyle: MovementStyle) => (
             <DragHandle

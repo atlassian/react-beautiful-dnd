@@ -278,7 +278,6 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
-    console.log('center diff', centerDiff);
     const newCurrentOffset: Position = subtract(state.current.client.offset, centerDiff);
 
     const current: DragPositions = (() => {

@@ -41,11 +41,11 @@ export default ({
 
       // > uncomment to use
       // debugging logger
-      // require('./debug-middleware/log-middleware').default,
+      require('./debug-middleware/log-middleware').default,
       // debugging timer
       // require('./debug-middleware/timing-middleware').default,
       // average action timer
-      require('./debug-middleware/timing-average-middleware').default(500),
+      // require('./debug-middleware/timing-average-middleware').default(500),
 
       // ## Application middleware
 

@@ -32,7 +32,9 @@ export default (getMarshal: () => DimensionMarshal) =>
     const shouldCancel = (action: Action) =>
       // Need to cancel any pending auto scrolling when drag is ending
       action.type === 'CANCEL' ||
+      action.type === 'DROP_ANIMATE' ||
       action.type === 'DROP' ||
+      action.type === 'DROP_COMPLETE' ||
       // A new bulk collection is starting - cancel any pending auto scrolls
       action.type === 'BULK_COLLECTION_STARTING';
 

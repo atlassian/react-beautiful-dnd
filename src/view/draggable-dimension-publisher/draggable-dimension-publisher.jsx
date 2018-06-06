@@ -91,7 +91,6 @@ export default class DraggableDimensionPublisher extends Component<Props> {
   getDimension = (windowScroll: Position): DraggableDimension => {
     const targetRef: ?HTMLElement = this.props.getDraggableRef();
     const placeholderRef: ?HTMLElement = this.props.getPlaceholderRef();
-    console.log('placeholderRef', placeholderRef);
     const descriptor: ?DraggableDescriptor = this.publishedDescriptor;
 
     invariant(targetRef, 'DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
