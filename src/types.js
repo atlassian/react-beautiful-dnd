@@ -262,6 +262,7 @@ export type DraggingState = {|
 // During this phase no drag updates are permitted.
 // If a drop occurs during this phase, it must wait until it is
 // completed before continuing with the drop
+// TODO: rename to BulkCollectingState
 export type BulkCollectionState = {|
   ...DraggingState,
   phase: 'BULK_COLLECTING',

@@ -6,6 +6,7 @@ import getDragImpact from './get-drag-impact/';
 import moveCrossAxis from './move-cross-axis/';
 import moveToNextIndex from './move-to-next-index/';
 import { noMovement } from './no-impact';
+import bulkReplace from './bulk-replace';
 import { add, isEqual, subtract } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
@@ -146,7 +147,7 @@ export default (state: State = idle, action: Action): State => {
     };
 
     // Calculating initial impact
-    const impact: DragImpact = getHomeImpact(critical, dimensions.droppables);
+    const impact: DragImpact = getHomeImpact(critical, dimensions);
 
     const result: BulkCollectionState = {
       // We are now waiting for the first bulk collection.
@@ -190,287 +191,14 @@ export default (state: State = idle, action: Action): State => {
       state.phase === 'BULK_COLLECTING' || state.phase === 'DROP_PENDING',
       `Unexpected bulk publish received in phase ${state.phase}`
     );
+    const { viewport, critical, dimensions } = action.payload;
 
-    const { viewport, critical, dimensions: suppliedDimensions } = action.payload;
-
-    if (!critical) {
-      // need to maintain critical dimensions as they where not collected
-      const draggable: DraggableDimension =
-        state.dimensions.draggables[state.critical.draggable.id];
-      const droppable: DroppableDimension =
-        state.dimensions.droppables[state.critical.droppable.id];
-
-      const dimensions: DimensionMap = {
-        draggables: {
-          ...suppliedDimensions.draggables,
-          [draggable.descriptor.id]: draggable,
-        },
-        droppables: {
-          ...suppliedDimensions.droppables,
-          [droppable.descriptor.id]: droppable,
-        },
-      };
-
-      const impact: DragImpact = getDragImpact({
-        pageBorderBoxCenter: state.current.page.borderBoxCenter,
-        draggable: dimensions.draggables[state.critical.draggable.id],
-        draggables: dimensions.draggables,
-        droppables: dimensions.droppables,
-        previousImpact: state.impact,
-        viewport,
-      });
-
-      const draggingState: DraggingState = {
-        // appeasing flow
-        phase: 'DRAGGING',
-        ...state,
-        // eslint-disable-next-line
-        phase: 'DRAGGING',
-        impact,
-        viewport,
-        dimensions,
-      };
-
-      if (state.phase === 'BULK_COLLECTING') {
-        return draggingState;
-      }
-
-      // There was a DROP_PENDING
-      // Staying in the DROP_PENDING phase
-      // setting isWaiting for false
-
-      const dropPending: DropPendingState = {
-        // appeasing flow
-        phase: 'DROP_PENDING',
-        ...draggingState,
-        // eslint-disable-next-line
-        phase: 'DROP_PENDING',
-        // No longer waiting
-        reason: state.reason,
-        isWaiting: false,
-      };
-
-      return dropPending;
-    }
-
-    // replacing the critical dimensions!!
-    const oldBorderBoxCenter: Position = state.initial.client.borderBoxCenter;
-    const draggable: DraggableDimension = suppliedDimensions.draggables[critical.draggable.id];
-    const newBorderBoxCenter: Position = draggable.client.borderBox.center;
-    const centerDiff: Position = subtract(newBorderBoxCenter, oldBorderBoxCenter);
-
-    const oldInitialClientSelection: Position = state.initial.client.selection;
-    const newInitialClientSelection: Position = add(oldInitialClientSelection, centerDiff);
-
-    // Need to figure out what the initial and current positions should be
-    const initial: DragPositions = {
-      client: {
-        selection: newInitialClientSelection,
-        borderBoxCenter: newBorderBoxCenter,
-        offset: origin,
-      },
-      page: {
-        selection: add(newInitialClientSelection, viewport.scroll.initial),
-        borderBoxCenter: add(newBorderBoxCenter, viewport.scroll.initial),
-        offset: add(origin, viewport.scroll.initial),
-      },
-    };
-
-    const newCurrentOffset: Position = subtract(state.current.client.offset, centerDiff);
-
-    const current: DragPositions = (() => {
-      const client: ItemPositions = {
-        selection: add(initial.client.selection, newCurrentOffset),
-        borderBoxCenter: add(initial.client.borderBoxCenter, newCurrentOffset),
-        offset: newCurrentOffset,
-      };
-      const page: ItemPositions = {
-        selection: add(client.selection, viewport.scroll.current),
-        borderBoxCenter: add(client.borderBoxCenter, viewport.scroll.current),
-        offset: add(client.offset, viewport.scroll.current),
-      };
-      return { client, page };
-    })();
-
-    const impact: DragImpact = getDragImpact({
-      pageBorderBoxCenter: current.page.borderBoxCenter,
-      draggable: suppliedDimensions.draggables[critical.draggable.id],
-      draggables: suppliedDimensions.draggables,
-      droppables: suppliedDimensions.droppables,
-      previousImpact: state.impact,
+    return bulkReplace({
+      state,
       viewport,
+      critical,
+      dimensions,
     });
-
-    const draggingState: DraggingState = {
-      // appeasing flow
-      phase: 'DRAGGING',
-      ...state,
-      // eslint-disable-next-line
-      phase: 'DRAGGING',
-      impact,
-      viewport,
-      initial,
-      current,
-      dimensions: suppliedDimensions,
-    };
-
-    if (state.phase === 'BULK_COLLECTING') {
-      return draggingState;
-    }
-
-    // There was a DROP_PENDING
-    // Staying in the DROP_PENDING phase
-    // setting isWaiting for false
-
-    const dropPending: DropPendingState = {
-      // appeasing flow
-      phase: 'DROP_PENDING',
-      ...draggingState,
-      // eslint-disable-next-line
-      phase: 'DROP_PENDING',
-      // No longer waiting
-      reason: state.reason,
-      isWaiting: false,
-    };
-
-    return dropPending;
-
-    // critical dimensions are being replaced
-
-    // const dimensions: DimensionMap = (() => {
-    //   // flow is getting confused
-    //   invariant(state.phase === 'BULK_COLLECTING');
-
-    //   // new dimensions contain the critical dimensions - we can just use those
-    //   if (suppliedCritical) {
-    //     return suppliedDimensions;
-    //   }
-
-    //   // need to maintain critical dimensions as they where not collected
-    //   const draggable: DraggableDimension =
-    //     state.dimensions.draggables[state.critical.draggable.id];
-    //   const droppable: DroppableDimension =
-    //     state.dimensions.droppables[state.critical.droppable.id];
-
-    //   return {
-    //     draggables: {
-    //       ...suppliedDimensions.draggables,
-    //       [draggable.descriptor.id]: draggable,
-    //     },
-    //     droppables: {
-    //       ...suppliedDimensions.droppables,
-    //       [droppable.descriptor.id]: droppable,
-    //     },
-    //   };
-    // })();
-
-    // // TODO: ensure viewport is reset after bulk collection
-    // // The starting index of a draggable can change during a drag
-    // const critical: Critical = suppliedCritical || state.critical;
-
-    // // this will get the impact
-    // const impact: DragImpact = getDragImpact({
-    //   pageBorderBoxCenter: state.current.page.borderBoxCenter,
-    //   draggable: dimensions.draggables[critical.draggable.id],
-    //   draggables: dimensions.draggables,
-    //   droppables: dimensions.droppables,
-    //   previousImpact: getHomeImpact(critical, dimensions.droppables),
-    //   viewport,
-    // });
-
-    // const positions = (() => {
-    //   invariant(state.phase === 'BULK_COLLECTING');
-
-    //   if (!suppliedCritical) {
-    //     return {
-    //       initial: state.initial,
-    //       current: state.current,
-    //     };
-    //   }
-
-    //   const draggable: DraggableDimension = dimensions.draggables[critical.draggable.id];
-    //   const newCenter: Position = draggable.client.borderBox.center;
-    //   const oldCenter: Position = state.initial.client.borderBoxCenter;
-    //   const diff: Position = subtract(newCenter, oldCenter);
-    //   console.log('DIFF', diff);
-
-    //   const initial: DragPositions = (() => {
-    //     invariant(state.phase === 'BULK_COLLECTING');
-
-    //     const oldInitialClient: ItemPositions = state.initial.client;
-    //     const scroll: Position = viewport.scroll.initial;
-    //     const client: ItemPositions = {
-    //       // TODO: add!?
-    //       selection: add(oldInitialClient.selection, diff),
-    //       borderBoxCenter: newCenter,
-    //       offset: origin,
-    //     };
-    //     const page: ItemPositions = {
-    //       selection: add(client.selection, scroll),
-    //       offset: add(client.offset, scroll),
-    //       borderBoxCenter: add(client.borderBoxCenter, scroll),
-    //     };
-    //     return {
-    //       client, page,
-    //     };
-    //   })();
-
-    //   const current: DragPositions = (() => {
-    //     invariant(state.phase === 'BULK_COLLECTING');
-
-    //     const oldCurrentClient: ItemPositions = state.current.client;
-    //     const scroll: Position = viewport.scroll.current;
-    //     const client: ItemPositions = {
-    //       selection: subtract(oldCurrentClient.selection, diff),
-    //       borderBoxCenter: subtract(oldCurrentClient.borderBoxCenter, diff),
-    //       offset: subtract(oldCurrentClient.offset, diff),
-    //     };
-    //     const page: ItemPositions = {
-    //       selection: add(client.selection, scroll),
-    //       offset: add(client.offset, scroll),
-    //       borderBoxCenter: add(client.borderBoxCenter, scroll),
-    //     };
-    //     return {
-    //       client, page,
-    //     };
-    //   })();
-
-    //   return { initial, current };
-    // })();
-
-    // // Moving into the DRAGGING phase
-    // if (state.phase === 'BULK_COLLECTING') {
-    //   return {
-    //     // appeasing flow
-    //     phase: 'DRAGGING',
-    //     ...state,
-    //     // eslint-disable-next-line
-    //     phase: 'DRAGGING',
-    //     critical,
-    //     impact,
-    //     initial: positions.initial,
-    //     current: positions.current,
-    //     dimensions,
-    //     viewport,
-    //   };
-    // }
-
-    // // There was a DROP_PENDING
-    // // Staying in the DROP_PENDING phase
-    // // setting isWaiting for false
-    // return {
-    //   // appeasing flow
-    //   phase: 'DROP_PENDING',
-    //   ...state,
-    //   // eslint-disable-next-line
-    //   phase: 'DROP_PENDING',
-    //   impact,
-    //   dimensions,
-    //   critical,
-    //   viewport,
-    //   // No longer waiting
-    //   isWaiting: false,
-    // };
   }
 
   if (action.type === 'MOVE') {

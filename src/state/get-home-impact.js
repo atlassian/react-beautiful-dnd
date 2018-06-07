@@ -1,17 +1,25 @@
 // @flow
+import { patch } from './position';
 import type {
   Critical,
+  DimensionMap,
+  DraggableDimension,
   DroppableDimension,
-  DroppableDimensionMap,
+  Axis,
 } from '../types';
-import { noMovement } from './no-impact';
 
-export default (critical: Critical, droppables: DroppableDimensionMap) => {
-  const home: DroppableDimension = droppables[critical.droppable.id];
+export default (critical: Critical, dimensions: DimensionMap) => {
+  const home: DroppableDimension = dimensions.droppables[critical.droppable.id];
+  const axis: Axis = home.axis;
+  const draggable: DraggableDimension = dimensions.draggables[critical.draggable.id];
 
   return {
-    movement: noMovement,
-    direction: home.axis.direction,
+    movement: {
+      displaced: [],
+      isBeyondStartPosition: false,
+      amount: patch(axis.line, draggable.client.marginBox[axis.size]),
+    },
+    direction: axis.direction,
     destination: {
       index: critical.draggable.index,
       droppableId: critical.droppable.id,

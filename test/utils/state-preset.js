@@ -4,62 +4,84 @@ import type {
   IdleState,
   PreparingState,
   DraggingState,
-  WindowDetails,
   ItemPositions,
+  BulkCollectionState,
   DragPositions,
   Viewport,
+  Critical,
+    DropPendingState,
+    DropReason,
 } from '../../src/types';
 import { getPreset } from './dimension';
-import noImpact from '../../src/state/no-impact';
 import getViewport from '../../src/view/window/get-viewport';
+import getHomeImpact from '../../src/state/get-home-impact';
 
 const preset = getPreset();
-const origin: Position = { x: 0, y: 0 };
 
 export const idle: IdleState = { phase: 'IDLE' };
 export const preparing: PreparingState = { phase: 'PREPARING' };
+export const critical: Critical = {
+  draggable: preset.inHome1.descriptor,
+  droppable: preset.home.descriptor,
+};
 
 export const dragging = (): DraggingState => {
   const viewport: Viewport = getViewport();
-  const windowDetails: WindowDetails = {
-    viewport,
-    scroll: {
-      initial: viewport.scroll,
-      current: viewport.scroll,
-      diff: {
-        value: origin,
-        displacement: origin,
-      },
-    },
-  };
 
   const client: ItemPositions = {
     selection: preset.inHome1.client.borderBox.center,
     borderBoxCenter: preset.inHome1.client.borderBox.center,
     offset: { x: 0, y: 0 },
   };
+  const page: ItemPositions = {
+    selection: preset.inHome1.page.borderBox.center,
+    borderBoxCenter: preset.inHome1.page.borderBox.center,
+    offset: { x: 0, y: 0 },
+  };
 
   const initial: DragPositions = {
     client,
-    page: client,
+    page,
   };
 
   const result: DraggingState = {
     phase: 'DRAGGING',
-    critical: {
-      draggable: preset.inHome1.descriptor,
-      droppable: preset.home.descriptor,
-    },
+    critical,
     autoScrollMode: 'FLUID',
     dimensions: preset.dimensions,
     initial,
     current: initial,
-    impact: noImpact,
-    window: windowDetails,
+    impact: getHomeImpact(critical, preset.dimensions),
+    viewport,
     scrollJumpRequest: null,
     shouldAnimate: true,
   };
 
   return result;
 };
+
+export const bulkCollecting = (): BulkCollectionState => ({
+  phase: 'BULK_COLLECTING',
+  ...dragging(),
+  // eslint-disable-next-line
+  phase: 'BULK_COLLECTING',
+});
+
+type DropPendingArgs = {
+  reason: DropReason,
+  isWaiting: boolean,
+};
+
+const defaultDropPending: DropPendingArgs = {
+  reason: 'DROP',
+  isWaiting: true,
+};
+
+export const dropPending = (args: ?DropPendingArgs = defaultDropPending): DropPendingState => ({
+  phase: 'DROP_PENDING',
+  ...dragging(),
+  // eslint-disable-next-line
+  phase: 'DROP_PENDING',
+  ...args,
+});
 
