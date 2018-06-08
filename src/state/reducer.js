@@ -89,6 +89,8 @@ const moveWithPositionUpdates = ({
     client, page,
   };
 
+  console.warn('moved to page center', page.borderBoxCenter);
+
   // Not updating impact while bulk collecting
   if (state.phase === 'BULK_COLLECTING') {
     return {
@@ -145,6 +147,8 @@ export default (state: State = idle, action: Action): State => {
         offset: origin,
       },
     };
+
+    console.warn('initial page center', initial.page.borderBoxCenter);
 
     // Calculating initial impact
     const impact: DragImpact = getHomeImpact(critical, dimensions);

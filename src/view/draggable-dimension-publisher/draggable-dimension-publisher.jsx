@@ -4,7 +4,7 @@ import type { Position } from 'css-box-model';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
-import { calculateBox, withScroll, type BoxModel } from 'css-box-model';
+import { calculateBox, withScroll, type BoxModel, getBox } from 'css-box-model';
 import { dimensionMarshalKey } from '../context-keys';
 import type {
   DraggableDescriptor,
@@ -23,6 +23,26 @@ type Props = {|
   getPlaceholderRef: () => ?HTMLElement,
   children: Node,
 |}
+
+type PositionStyleToggle = {|
+  capture: () => void,
+  clear: () => void,
+  restore: () => void,
+|}
+
+const style = document.createElement('style');
+style.innerHTML = `
+  .alex-test {
+    /* shifted draggables */
+    transform: none !important;
+    /* dragging item */
+    position: inherit !important;
+    top: inherit !important;
+    left: inherit !important;
+  }
+`;
+const head = document.querySelector('head');
+head.appendChild(style);
 
 export default class DraggableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
@@ -98,15 +118,31 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
     const ref: HTMLElement = placeholderRef || targetRef;
 
-    if (placeholderRef) {
-      // debugger;
+    if (ref === placeholderRef) {
+      console.log('using placeholder ref for', descriptor.id);
     }
+    // TODO: rather than toggling these properties (yuck) - force offset with current offset
+
+    const previous = {
+      transition: ref.style.transition,
+      transform: ref.style.transform,
+    };
+    ref.style.transition = 'none';
+    ref.style.transform = 'none';
 
     const computedStyles: CSSStyleDeclaration = window.getComputedStyle(ref);
     const borderBox: ClientRect = ref.getBoundingClientRect();
 
+    Object.assign(ref.style, previous);
+
     const client: BoxModel = calculateBox(borderBox, computedStyles);
     const page: BoxModel = withScroll(client, windowScroll);
+
+    console.warn(descriptor.id, 'collected pageBorderBoxCenter', page.borderBox.center, 'height', client.borderBox.height);
+    if (placeholderRef) {
+      const box = getBox(targetRef);
+      console.warn(descriptor.id, 'targetRef (not placeholder) pageBorderBoxCenter', box.borderBox.center, 'height', box.borderBox.height);
+    }
 
     const placeholder: Placeholder = {
       client,

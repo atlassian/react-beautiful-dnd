@@ -75,6 +75,13 @@ export default ({
         return false;
       }
 
+      console.group(child.descriptor.id);
+      console.log('original page center', originalCenter[axis.line]);
+      console.log('current page center', currentCenter[axis.line]);
+      console.log('comparing against borderBox', borderBox[axis.end]);
+      console.log('will displace', currentCenter[axis.line] < borderBox[axis.end]);
+      console.groupEnd();
+
       return currentCenter[axis.line] < borderBox[axis.end];
     })
     .map((dimension: DraggableDimension): Displacement => getDisplacement({
@@ -87,7 +94,8 @@ export default ({
     // Need to ensure that we always order by the closest impacted item
   const ordered: Displacement[] = isBeyondStartPosition ? displaced.reverse() : displaced;
   const index: number = (() => {
-    const startIndex = insideHome.indexOf(draggable);
+    // const startIndex = insideHome.indexOf(draggable);
+    const startIndex = draggable.descriptor.index;
     const length: number = ordered.length;
     if (!length) {
       return startIndex;

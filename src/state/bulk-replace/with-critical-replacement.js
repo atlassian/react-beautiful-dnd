@@ -79,6 +79,8 @@ export default ({
   })();
 
   console.log('NEW START INDEX', critical.draggable.index);
+  console.warn('bulk replace initial page center', initial.page.borderBoxCenter);
+  console.warn('bulk replace current page center', current.page.borderBoxCenter);
   console.log('home impact', getHomeImpact(critical, dimensions));
 
   const impact: DragImpact = getDragImpact({
@@ -95,16 +97,16 @@ export default ({
   console.log('displaced', impact.movement.displaced.map(entry => entry.draggableId));
 
   // stripping out any animations
-  // const forcedNoAnimations: DragImpact = {
-  //   ...impact,
-  //   movement: {
-  //     ...impact.movement,
-  //     displaced: impact.movement.displaced.map((entry: Displacement) => ({
-  //       ...entry,
-  //       shouldAnimate: false,
-  //     })),
-  //   },
-  // };
+  const forcedNoAnimations: DragImpact = {
+    ...impact,
+    movement: {
+      ...impact.movement,
+      displaced: impact.movement.displaced.map((entry: Displacement) => ({
+        ...entry,
+        shouldAnimate: false,
+      })),
+    },
+  };
 
   const draggingState: DraggingState = {
     // appeasing flow
@@ -112,7 +114,7 @@ export default ({
     ...state,
     // eslint-disable-next-line
       phase: 'DRAGGING',
-    impact,
+    impact: forcedNoAnimations,
     viewport,
     initial,
     current,
