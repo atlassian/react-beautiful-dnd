@@ -45,6 +45,8 @@ export default ({
     previousDroppableOverId,
   });
 
+  console.log('destination', destinationId);
+
   // not dragging over anything
   if (!destinationId) {
     return noImpact;

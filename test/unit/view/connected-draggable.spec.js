@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { mount } from 'enzyme';
 import { type Position } from 'css-box-model';
 import Draggable, { makeMapStateToProps } from '../../../src/view/draggable/connected-draggable';
-import { getPreset, getInitialImpact, withImpact } from '../../utils/dimension';
+import { getPreset, withImpact } from '../../utils/dimension';
 import { negate } from '../../../src/state/position';
 import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
 import getStatePreset from '../../utils/get-simple-state-preset';

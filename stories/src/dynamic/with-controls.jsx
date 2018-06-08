@@ -7,7 +7,7 @@ import { generateQuoteMap, authors } from '../data';
 import { reorderQuoteMap } from '../reorder';
 import { grid } from '../constants';
 import type { Quote, QuoteMap, Author } from '../types';
-import type { DropResult } from '../../../src/types';
+import type { DropResult, DragUpdate } from '../../../src/types';
 
 const initial: QuoteMap = generateQuoteMap(0);
 
@@ -59,7 +59,10 @@ const createQuote = (() => {
 
 export default class WithControls extends React.Component<*, State> {
   state: State = {
-    quoteMap: initial,
+    quoteMap: {
+      // simpel for now
+      BMO: initial.BMO,
+    },
   }
 
   componentDidMount() {
@@ -85,12 +88,9 @@ export default class WithControls extends React.Component<*, State> {
       const map: QuoteMap = Object.keys(quoteMap)
         .reduce((previous: QuoteMap, key: string): QuoteMap => {
           const quotes: Quote[] = quoteMap[key];
-          console.log('quotes', quotes);
           previous[key] = [createQuote(), ...quotes];
           return previous;
         }, {});
-
-      console.log('map', map);
 
       this.setState({
         quoteMap: map,
@@ -143,6 +143,10 @@ export default class WithControls extends React.Component<*, State> {
     }
   }
 
+  onDragUpdate = (update: DragUpdate) => {
+    console.log('current index:', update.destination ? update.destination.index : null);
+  }
+
   onDragEnd = (result: DropResult) => {
     if (!result.destination) {
       return;
@@ -162,7 +166,7 @@ export default class WithControls extends React.Component<*, State> {
   render() {
     const { quoteMap } = this.state;
     return (
-      <DragDropContext onDragEnd={this.onDragEnd}>
+      <DragDropContext onDragEnd={this.onDragEnd} onDragUpdate={this.onDragUpdate}>
         <Controls />
         <Container>
           {Object.keys(quoteMap).map((key: string) => (

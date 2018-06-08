@@ -8,15 +8,17 @@ import {
   type Spacing,
   type Position,
 } from 'css-box-model';
-import { noMovement } from '../../src/state/no-impact';
 import { vertical } from '../../src/state/axis';
-import { noSpacing } from '../../src/state/spacing';
+import { noSpacing, offsetByPosition } from '../../src/state/spacing';
+import getViewport from '../../src/view/window/get-viewport';
 import { getDroppableDimension as getDroppable, type Closest } from '../../src/state/droppable-dimension';
 import type {
   Axis,
   Placeholder,
   DragImpact,
+  DraggableId,
   State,
+  Viewport,
   Scrollable,
   DraggableDescriptor,
   DroppableDescriptor,
@@ -111,15 +113,7 @@ export const makeScrollable = (droppable: DroppableDimension, amount?: number = 
 };
 
 export const getInitialImpact = (draggable: DraggableDimension, axis?: Axis = vertical) => {
-  const impact: DragImpact = {
-    movement: noMovement,
-    direction: axis.direction,
-    destination: {
-      index: draggable.descriptor.index,
-      droppableId: draggable.descriptor.droppableId,
-    },
-  };
-  return impact;
+  throw new Error('USE getHomeImpact');
 };
 
 export const addDroppable = (
@@ -292,7 +286,6 @@ export const getPreset = (axis?: Axis = vertical) => {
   const foreignCrossAxisEnd: number = 200;
   const emptyForeignCrossAxisStart: number = 200;
   const emptyForeignCrossAxisEnd: number = 300;
-
   const home: DroppableDimension = getDroppableDimension({
     descriptor: {
       id: 'home',
@@ -504,6 +497,22 @@ export const getPreset = (axis?: Axis = vertical) => {
     droppables,
   };
 
+  const viewport: Viewport = (() => {
+    const base: Viewport = getViewport();
+    return {
+      ...base,
+      scroll: {
+        initial: windowScroll,
+        current: windowScroll,
+        max: base.scroll.max,
+        diff: {
+          value: { x: 0, y: 0 },
+          displacement: { x: 0, y: 0 },
+        },
+      },
+    };
+  })();
+
   return {
     home,
     inHome1,
@@ -522,6 +531,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     dimensions,
     inForeignList,
     windowScroll,
+    viewport,
   };
 };
 
@@ -529,3 +539,50 @@ export const disableDroppable = (droppable: DroppableDimension): DroppableDimens
   ...droppable,
   isEnabled: false,
 });
+
+const windowScroll: Position = getPreset().windowScroll;
+
+type ShiftArgs = {|
+  amount: Position,
+  draggables: DraggableDimensionMap,
+  indexChange: number
+|}
+
+// will not expand the droppable to make room
+export const shiftDraggables = ({
+  amount,
+  draggables,
+  indexChange,
+}: ShiftArgs): DraggableDimensionMap =>
+  Object.keys(draggables)
+    .map((id: DraggableId) => draggables[id])
+    .map((dimension: DraggableDimension) => {
+      const borderBox: Spacing = offsetByPosition(dimension.client.borderBox, amount);
+      const client: BoxModel = createBox({
+        borderBox,
+        margin: dimension.client.margin,
+        border: dimension.client.border,
+        padding: dimension.client.padding,
+      });
+      const page: BoxModel = withScroll(client, windowScroll);
+
+      const shifted: DraggableDimension = {
+        descriptor: {
+          id: dimension.descriptor.id,
+          droppableId: dimension.descriptor.droppableId,
+          index: dimension.descriptor.index + indexChange,
+        },
+        client,
+        page,
+        placeholder: {
+          ...dimension.placeholder,
+          client,
+        },
+      };
+
+      return shifted;
+    })
+    .reduce((previous: DraggableDimensionMap, current: DraggableDimension) => {
+      previous[current.descriptor.id] = current;
+      return previous;
+    }, {});

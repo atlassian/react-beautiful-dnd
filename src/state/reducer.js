@@ -82,8 +82,8 @@ const moveWithPositionUpdates = ({
 
   const page: ItemPositions = {
     selection: add(client.selection, currentWindowScroll),
-    offset: add(client.offset, currentWindowScroll),
     borderBoxCenter: add(client.borderBoxCenter, currentWindowScroll),
+    offset: add(client.offset, currentWindowScroll),
   };
   const current: DragPositions = {
     client, page,
@@ -142,7 +142,7 @@ export default (state: State = idle, action: Action): State => {
       page: {
         selection: add(client.selection, viewport.scroll.initial),
         borderBoxCenter: add(client.selection, viewport.scroll.initial),
-        offset: client.offset,
+        offset: origin,
       },
     };
 

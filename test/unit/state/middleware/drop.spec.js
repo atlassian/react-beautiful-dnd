@@ -4,7 +4,7 @@ import invariant from 'tiny-invariant';
 import middleware from '../../../../src/state/middleware/drop';
 import createStore from './util/create-store';
 import { add, patch } from '../../../../src/state/position';
-import { getPreset, makeScrollable, getInitialImpact } from '../../../utils/dimension';
+import { getPreset, makeScrollable } from '../../../utils/dimension';
 import {
   clean,
   drop,

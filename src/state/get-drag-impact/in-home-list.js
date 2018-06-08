@@ -45,6 +45,8 @@ export default ({
   const isBeyondStartPosition: boolean =
     currentCenter[axis.line] - originalCenter[axis.line] > 0;
 
+  // TODO: if currentCenter === originalCenter can just abort
+
   // Amount to move needs to include the margins
   const amount: Position = patch(axis.line, draggable.client.marginBox[axis.size]);
 

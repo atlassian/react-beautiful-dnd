@@ -1,9 +1,11 @@
 // @flow
 import { type Position } from 'css-box-model';
-import { getPreset, getInitialImpact } from './dimension';
+import { getPreset } from './dimension';
 import noImpact from '../../src/state/no-impact';
 import { vertical } from '../../src/state/axis';
 import getViewport from '../../src/view/window/get-viewport';
+import { add } from '../../src/state/position';
+import getHomeImpact from '../../src/state/get-home-impact';
 import type {
   Axis,
   State,
@@ -18,6 +20,8 @@ import type {
   DropReason,
   DraggableId,
   DragImpact,
+  Critical,
+  BulkCollectionState,
   ScrollOptions,
   Viewport,
   ItemPositions,
@@ -31,6 +35,10 @@ const scheduled: ScrollOptions = {
 
 export default (axis?: Axis = vertical) => {
   const preset = getPreset(axis);
+  const critical: Critical = {
+    draggable: preset.inHome1.descriptor,
+    droppable: preset.home.descriptor,
+  };
 
   const idle: IdleState = {
     phase: 'IDLE',
@@ -43,15 +51,18 @@ export default (axis?: Axis = vertical) => {
   const origin: Position = { x: 0, y: 0 };
 
   const dragging = (
-    id?: DraggableId = preset.inHome1.descriptor.id,
+    id?: DraggableId = critical.draggable.id,
     selection?: Position,
-    viewport?: Viewport = getViewport(),
+    viewport?: Viewport = preset.viewport,
   ): DraggingState => {
     // will populate the dimension state with the initial dimensions
     const draggable: DraggableDimension = preset.draggables[id];
     const droppable: DroppableDimension = preset.droppables[draggable.descriptor.droppableId];
-
     const clientSelection: Position = selection || draggable.client.borderBox.center;
+    const ourCritical: Critical = {
+      draggable: draggable.descriptor,
+      droppable: droppable.descriptor,
+    };
 
     const client: ItemPositions = {
       selection: clientSelection,
@@ -59,21 +70,24 @@ export default (axis?: Axis = vertical) => {
       offset: origin,
     };
 
+    const page: ItemPositions = {
+      selection: add(client.selection, viewport.scroll.initial),
+      borderBoxCenter: add(client.borderBoxCenter, viewport.scroll.initial),
+      offset: origin,
+    };
+
     const initial: DragPositions = {
-      client, page: client,
+      client, page,
     };
 
     const result: DraggingState = {
       phase: 'DRAGGING',
-      critical: {
-        draggable: draggable.descriptor,
-        droppable: droppable.descriptor,
-      },
+      critical: ourCritical,
       autoScrollMode: 'FLUID',
       dimensions: preset.dimensions,
       initial,
       current: initial,
-      impact: getInitialImpact(draggable, droppable.axis),
+      impact: getHomeImpact(ourCritical, preset.dimensions),
       viewport,
       scrollJumpRequest: null,
       shouldAnimate: false,
@@ -81,6 +95,31 @@ export default (axis?: Axis = vertical) => {
 
     return result;
   };
+
+  const bulkCollecting = (): BulkCollectionState => ({
+    phase: 'BULK_COLLECTING',
+    ...dragging(),
+    // eslint-disable-next-line
+    phase: 'BULK_COLLECTING',
+  });
+
+  type DropPendingArgs = {
+    reason: DropReason,
+    isWaiting: boolean,
+  };
+
+  const defaultDropPending: DropPendingArgs = {
+    reason: 'DROP',
+    isWaiting: true,
+  };
+
+  const dropPending = (args: ?DropPendingArgs = defaultDropPending): DropPendingState => ({
+    phase: 'DROP_PENDING',
+    ...dragging(),
+    // eslint-disable-next-line
+    phase: 'DROP_PENDING',
+    ...args,
+  });
 
   const scrollJumpRequest = (
     request: Position,
@@ -178,14 +217,17 @@ export default (axis?: Axis = vertical) => {
   ];
 
   return {
+    critical,
     idle,
     preparing,
     dragging,
     scrollJumpRequest,
+    dropPending,
     dropAnimating,
     userCancel,
     dropComplete,
     allPhases,
+    bulkCollecting,
   };
 };
 

@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import type {
   Axis,
   Viewport,
@@ -10,14 +11,14 @@ import type {
 import bulkReplace from '../../../../src/state/bulk-replace';
 import { patch } from '../../../../src/state/position';
 import type { Result } from '../../../../src/state/bulk-replace/bulk-replace-types';
-import getViewport from '../../../../src/view/window/get-viewport';
-import * as state from '../../../utils/state-preset';
+import getStatePreset from '../../../utils/get-simple-state-preset';
 import { getPreset } from '../../../utils/dimension';
 import getHomeImpact from '../../../../src/state/get-home-impact';
 
 const preset = getPreset();
 const axis: Axis = preset.home.axis;
-const viewport: Viewport = getViewport();
+const state = getStatePreset(axis);
+const viewport: Viewport = preset.viewport;
 
 it('should maintain the previous critical dimensions', () => {
   const replacement: DimensionMap = {
@@ -52,7 +53,7 @@ it('should maintain the previous critical dimensions', () => {
   });
 });
 
-it.only('should recalculate the drag impact', () => {
+it('should recalculate the drag impact', () => {
   const base: BulkCollectionState = state.bulkCollecting();
   const movedForward: DragImpact = {
     movement: {
@@ -110,6 +111,7 @@ it('should maintain a DROP_PENDING if there was one - and should indicate that t
     dimensions: preset.dimensions,
   });
 
+  invariant(result.phase === 'DROP_PENDING');
   expect(result.phase).toBe('DROP_PENDING');
   expect(result.isWaiting).toBe(false);
 });
