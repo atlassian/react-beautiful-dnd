@@ -78,9 +78,12 @@ export default ({
     return { client, page };
   })();
 
+  console.group('critical replacement');
   console.log('NEW START INDEX', critical.draggable.index);
-  console.warn('bulk replace initial page center', initial.page.borderBoxCenter);
-  console.warn('bulk replace current page center', current.page.borderBoxCenter);
+  console.log('PRE-UPDATE: initial page center', state.initial.page.borderBoxCenter)
+  console.log('PRE-UPDATE: current page center', state.current.page.borderBoxCenter)
+  console.warn('POST-UPDATE: initial page center', initial.page.borderBoxCenter);
+  console.warn('POST-UPDATE: current page center', current.page.borderBoxCenter);
   console.log('home impact', getHomeImpact(critical, dimensions));
 
   const impact: DragImpact = getDragImpact({
@@ -95,6 +98,8 @@ export default ({
   console.log('NEW IMPACT INDEX', impact.destination ? impact.destination.index : null);
   console.log('isBeyondStartPosition', impact.movement.isBeyondStartPosition);
   console.log('displaced', impact.movement.displaced.map(entry => entry.draggableId));
+  console.groupEnd();
+
 
   // stripping out any animations
   const forcedNoAnimations: DragImpact = {
