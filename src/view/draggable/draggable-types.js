@@ -7,6 +7,8 @@ import type {
   DraggableDimension,
   ZIndex,
   State,
+  BoxSpacing,
+  BoxSizing,
 } from '../../types';
 import {
   lift,
@@ -16,6 +18,7 @@ import {
   moveDown,
   moveRight,
   moveLeft,
+
   drop,
   dropAnimationFinished,
 } from '../../state/action-creators';
@@ -39,7 +42,6 @@ export type DraggingStyle = {|
   // used `box-sizing: content-box` or `box-sizing: border-box`
   // Because we are setting the width and height directly we want to ensure that
   // these are the actual values applied
-  boxSizing: 'border-box',
 
   // We initially position the element in the same *visual spot* as when it started.
   // This means that these values *exclude* the original margins so that element remains
@@ -52,10 +54,8 @@ export type DraggingStyle = {|
   // the element positioned with the top/left position (which is margin aware).
   // We also clear the margin right / bottom. This has no positioning impact,
   // but it is cleanest to just remove all the margins rather than only the top and left.
-  marginTop: number,
-  marginRight: number,
-  marginBottom: number,
-  marginLeft: number,
+  boxSizing: BoxSizing,
+  ...BoxSpacing,
 
   // We need to opt out of the shared global style that is being applied to
   // all draggables. The movement of moving draggables is either not animated

@@ -1,10 +1,10 @@
 // @flow
 import { Component, type Node } from 'react';
-import type { Position } from 'css-box-model';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
-import { calculateBox, withScroll, type BoxModel, getBox } from 'css-box-model';
+import { calculateBox, withScroll, getBox, offset, type BoxModel, type Position } from 'css-box-model';
+import { negate, subtract } from '../../state/position';
 import { dimensionMarshalKey } from '../context-keys';
 import type {
   DraggableDescriptor,
@@ -12,6 +12,7 @@ import type {
   Placeholder,
   DraggableId,
   DroppableId,
+  BoxSizing,
 } from '../../types';
 import type { DimensionMarshal } from '../../state/dimension-marshal/dimension-marshal-types';
 
@@ -19,30 +20,12 @@ type Props = {|
   draggableId: DraggableId,
   droppableId: DroppableId,
   index: number,
+  isDragging: boolean,
+  offset: Position,
   getDraggableRef: () => ?HTMLElement,
   getPlaceholderRef: () => ?HTMLElement,
   children: Node,
 |}
-
-type PositionStyleToggle = {|
-  capture: () => void,
-  clear: () => void,
-  restore: () => void,
-|}
-
-const style = document.createElement('style');
-style.innerHTML = `
-  .alex-test {
-    /* shifted draggables */
-    transform: none !important;
-    /* dragging item */
-    position: inherit !important;
-    top: inherit !important;
-    left: inherit !important;
-  }
-`;
-const head = document.querySelector('head');
-head.appendChild(style);
 
 export default class DraggableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
@@ -110,49 +93,68 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
   getDimension = (windowScroll: Position): DraggableDimension => {
     const targetRef: ?HTMLElement = this.props.getDraggableRef();
-    const placeholderRef: ?HTMLElement = this.props.getPlaceholderRef();
+    // const placeholderRef: ?HTMLElement = this.props.getPlaceholderRef();
     const descriptor: ?DraggableDescriptor = this.publishedDescriptor;
 
     invariant(targetRef, 'DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
     invariant(descriptor, 'Cannot get dimension for unpublished draggable');
 
-    const ref: HTMLElement = placeholderRef || targetRef;
-
-    if (ref === placeholderRef) {
-      console.log('using placeholder ref for', descriptor.id);
+    // We need to fast forward any transforms so that the collection will be correct
+    // given the current offset.
+    // When there is no transition the value will be empty string ("")
+    const previousTransition: ?string = targetRef.style.transition;
+    if (previousTransition) {
+      targetRef.style.transition = 'none';
     }
-    // TODO: rather than toggling these properties (yuck) - force offset with current offset
 
-    const previous = {
-      transition: ref.style.transition,
-      transform: ref.style.transform,
-    };
-    ref.style.transition = 'none';
-    ref.style.transform = 'none';
+    // Record values from the DOM
+    const computedStyles: CSSStyleDeclaration = window.getComputedStyle(targetRef);
+    const borderBox: ClientRect = targetRef.getBoundingClientRect();
 
-    const computedStyles: CSSStyleDeclaration = window.getComputedStyle(ref);
-    const borderBox: ClientRect = ref.getBoundingClientRect();
+    // Reapply inline style transition if there was one
+    if (previousTransition) {
+      targetRef.style.transition = previousTransition;
+    }
 
-    Object.assign(ref.style, previous);
+    const change: Position = (() => {
+      const { isDragging, offset: shift } = this.props;
+      const transform: Position = negate(shift);
+      console.log('transform', transform);
+      if (!isDragging) {
+        return transform;
+      }
 
-    const client: BoxModel = calculateBox(borderBox, computedStyles);
+      // When dragging, position: fixed will avoid any client changes based on scroll.
+      // We are manually undoing that
+      return subtract(transform, windowScroll);
+    })();
+
+    // Object.assign(ref.style, previous);
+
+    const client: BoxModel = offset(calculateBox(borderBox, computedStyles), change);
+
+    console.log(descriptor.id, 'client', client, 'box sizing', computedStyles.boxSizing);
     const page: BoxModel = withScroll(client, windowScroll);
 
     console.warn(descriptor.id, 'collected pageBorderBoxCenter', page.borderBox.center, 'height', client.borderBox.height);
-    if (placeholderRef) {
-      const box = getBox(targetRef);
-      console.warn(descriptor.id, 'targetRef (not placeholder) pageBorderBoxCenter', box.borderBox.center, 'height', box.borderBox.height);
-    }
+    // if (placeholderRef) {
+    // const box = getBox(targetRef);
+    // console.warn(descriptor.id, 'targetRef (not placeholder)
+    // pageBorderBoxCenter', box.borderBox.center, 'height', box.borderBox.height);
+    // }
+
+    const boxSizing: BoxSizing = computedStyles.boxSizing === 'border-box' ? 'border-box' : 'content-box';
 
     const placeholder: Placeholder = {
       client,
-      tagName: ref.tagName.toLowerCase(),
+      tagName: targetRef.tagName.toLowerCase(),
       display: computedStyles.display,
-      boxSizing: computedStyles.boxSizing,
+      boxSizing,
     };
 
     const dimension: DraggableDimension = {
       descriptor,
+      boxSizing,
       placeholder,
       client,
       page,

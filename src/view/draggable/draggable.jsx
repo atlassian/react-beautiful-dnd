@@ -32,6 +32,7 @@ import type {
   ZIndexOptions,
 } from './draggable-types';
 import getWindowScroll from '../window/get-window-scroll';
+import { withBoxSpacing, getBoxSizingHeightAndWidth } from '../../state/box';
 import type { Speed, Style as MovementStyle } from '../moveable/moveable-types';
 
 export const zIndexOptions: ZIndexOptions = {
@@ -210,17 +211,14 @@ export default class Draggable extends Component<Props> {
 
       // const { width, height, top, left } = dimension.client.borderBox;
       // For an explanation of properties see `draggable-types`.
+      const { width, height } = getBoxSizingHeightAndWidth(box, dimension.boxSizing);
+
       const style: DraggingStyle = {
         // ## Sizing
-        // Applying the correct border-box sizing
-        boxSizing: 'border-box',
-        width: box.borderBox.width,
-        height: box.borderBox.height,
-        // Apply margin so that dimension recapturing will get the same marginBox
-        marginTop: dimension.client.margin.top,
-        marginRight: dimension.client.margin.right,
-        marginBottom: dimension.client.margin.bottom,
-        marginLeft: dimension.client.margin.left,
+        boxSizing: dimension.boxSizing,
+        width,
+        height,
+        ...withBoxSpacing(box),
         // ## Placement
         // As we are applying the margins we need to align to the start of the marginBox
         top: box.marginBox.top,
@@ -381,6 +379,7 @@ export default class Draggable extends Component<Props> {
         draggableId={draggableId}
         droppableId={droppableId}
         index={index}
+        offset={offset}
         getDraggableRef={this.getDraggableRef}
         getPlaceholderRef={this.getPlaceholderRef}
       >

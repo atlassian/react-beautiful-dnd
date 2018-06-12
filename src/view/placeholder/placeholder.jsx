@@ -1,47 +1,12 @@
 // @flow
 import React, { PureComponent } from 'react';
-import type { Spacing } from 'css-box-model';
+import { withBoxSpacing, getBoxSizingHeightAndWidth } from '../../state/box';
 import type { Placeholder as PlaceholderType } from '../../types';
 
 type Props = {|
   placeholder: PlaceholderType,
   innerRef: (ref: ?HTMLElement) => void,
 |}
-
-type SpacingMap = {|
-  top: string,
-  right: string,
-  bottom: string,
-  left: string,
-|}
-
-const fromSpacing = (map: SpacingMap) => (spacing: Spacing) => ({
-  [map.top]: spacing.top,
-  [map.right]: spacing.right,
-  [map.bottom]: spacing.bottom,
-  [map.left]: spacing.left,
-});
-
-const withMargin = fromSpacing({
-  top: 'marginTop',
-  right: 'marginRight',
-  bottom: 'marginBottom',
-  left: 'marginLeft',
-});
-
-const withPadding = fromSpacing({
-  top: 'paddingTop',
-  right: 'paddingRight',
-  bottom: 'paddingBottom',
-  left: 'paddingLeft',
-});
-
-const withBorder = fromSpacing({
-  top: 'borderTopWidth',
-  right: 'borderRightWidth',
-  bottom: 'borderBottomWidth',
-  left: 'borderLeftWidth',
-});
 
 export default class Placeholder extends PureComponent<Props> {
   // eslint-disable-next-line react/sort-comp
@@ -73,17 +38,14 @@ export default class Placeholder extends PureComponent<Props> {
     const placeholder: PlaceholderType = this.props.placeholder;
     const { client, display, tagName, boxSizing } = placeholder;
 
-    const width: number = boxSizing === 'borderBox' ? client.borderBox.width : client.contentBox.width;
-    const height: number = boxSizing === 'borderBox' ? client.borderBox.height : client.contentBox.height;
+    const { width, height } = getBoxSizingHeightAndWidth(client, boxSizing);
 
     const style = {
       display,
       boxSizing,
       width,
       height,
-      ...withMargin(client.margin),
-      ...withPadding(client.padding),
-      ...withBorder(client.border),
+      ...withBoxSpacing(client),
       borderStyle: 'solid',
       borderColor: 'transparent',
 
