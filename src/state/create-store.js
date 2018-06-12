@@ -55,6 +55,7 @@ export default ({
       // post drag animations in firefox. Even though we clear the transition off
       // a Draggable - if it is done after a reorder firefox will still apply the
       // transition.
+      // Must be called before dimension marshal for lifting to apply collecting styles
       style(styleMarshal),
       // Stop the dimension marshal collecting anything
       // when moving into a phase where collection is no longer needed.

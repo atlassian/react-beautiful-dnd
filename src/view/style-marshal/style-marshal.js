@@ -49,6 +49,7 @@ export default () => {
     setStyle(styles.resting);
   };
 
+  const collecting = () => setStyle(styles.collecting);
   const dragging = () => setStyle(styles.dragging);
   const dropping = (reason: DropReason) => {
     if (reason === 'DROP') {
@@ -67,6 +68,7 @@ export default () => {
   };
 
   const marshal: StyleMarshal = {
+    collecting,
     dragging,
     dropping,
     resting,

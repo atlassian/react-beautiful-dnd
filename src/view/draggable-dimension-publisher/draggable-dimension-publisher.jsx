@@ -93,27 +93,16 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
   getDimension = (windowScroll: Position): DraggableDimension => {
     const targetRef: ?HTMLElement = this.props.getDraggableRef();
-    // const placeholderRef: ?HTMLElement = this.props.getPlaceholderRef();
     const descriptor: ?DraggableDescriptor = this.publishedDescriptor;
 
     invariant(targetRef, 'DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
     invariant(descriptor, 'Cannot get dimension for unpublished draggable');
 
-    // Record any inline transition delay that a consumer might have applied
-    // We do not apply these - we apply this style using the style marshal
-    const previousInlineTransitionDelay: ?string = targetRef.style.transitionDelay;
-    // Fast forwarding any existing transitions - override style marshal
-    targetRef.style.transitionDelay = '0s';
-
     const computedStyles: CSSStyleDeclaration = window.getComputedStyle(targetRef);
     const borderBox: ClientRect = targetRef.getBoundingClientRect();
 
-    if (previousInlineTransitionDelay) {
-      targetRef.style.transitionDelay = targetRef.style.transitionDelay;
-    } else {
-      targetRef.style.removeProperty('transitionDelay');
-    }
-
+    // We do not need to fast forward any transitions as the style marshal will
+    // do that for us before a collection
     const change: Position = (() => {
       const { isDragging, offset: shift } = this.props;
       const undoTransform: Position = negate(shift);
@@ -130,7 +119,6 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
     const client: BoxModel = offset(calculateBox(borderBox, computedStyles), change);
 
-    console.log(descriptor.id, 'client', client, 'box sizing', computedStyles.boxSizing);
     const page: BoxModel = withScroll(client, windowScroll);
 
     console.warn(descriptor.id, 'collected pageBorderBoxCenter', page.borderBox.center, 'height', client.borderBox.height);
