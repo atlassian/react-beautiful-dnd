@@ -99,34 +99,31 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     invariant(targetRef, 'DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
     invariant(descriptor, 'Cannot get dimension for unpublished draggable');
 
-    // We need to fast forward any transforms so that the collection will be correct
-    // given the current offset.
-    // When there is no transition the value will be empty string ("")
-    const previousTransition: ?string = targetRef.style.transition;
-    if (previousTransition) {
-      targetRef.style.transition = 'none';
-    }
+    // Record any inline transition delay that a consumer might have applied
+    // We do not apply these - we apply this style using the style marshal
+    const previousInlineTransitionDelay: ?string = targetRef.style.transitionDelay;
+    // Fast forwarding any existing transitions - override style marshal
+    targetRef.style.transitionDelay = '0s';
 
-    // Record values from the DOM
     const computedStyles: CSSStyleDeclaration = window.getComputedStyle(targetRef);
     const borderBox: ClientRect = targetRef.getBoundingClientRect();
 
-    // Reapply inline style transition if there was one
-    if (previousTransition) {
-      targetRef.style.transition = previousTransition;
+    if (previousInlineTransitionDelay) {
+      targetRef.style.transitionDelay = targetRef.style.transitionDelay;
+    } else {
+      targetRef.style.removeProperty('transitionDelay');
     }
 
     const change: Position = (() => {
       const { isDragging, offset: shift } = this.props;
-      const transform: Position = negate(shift);
-      console.log('transform', transform);
+      const undoTransform: Position = negate(shift);
       if (!isDragging) {
-        return transform;
+        return undoTransform;
       }
 
       // When dragging, position: fixed will avoid any client changes based on scroll.
       // We are manually undoing that
-      return subtract(transform, windowScroll);
+      return subtract(undoTransform, windowScroll);
     })();
 
     // Object.assign(ref.style, previous);
