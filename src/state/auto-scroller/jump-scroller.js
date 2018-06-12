@@ -119,8 +119,6 @@ export default ({
       return;
     }
 
-    console.warn('manual keyboard move', windowRemainder);
-
     // The entire scroll could not be absorbed by the droppable and window
     // so we manually move whatever is left
     moveByOffset(state, windowRemainder);

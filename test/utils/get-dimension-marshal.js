@@ -22,3 +22,17 @@ export default (dispatch: Function): DimensionMarshal => {
   return marshal;
 };
 
+export const getMarshalStub = (): DimensionMarshal => ({
+  registerDraggable: jest.fn(),
+  updateDraggable: jest.fn(),
+  unregisterDraggable: jest.fn(),
+  registerDroppable: jest.fn(),
+  updateDroppable: jest.fn(),
+  unregisterDroppable: jest.fn(),
+  updateDroppableScroll: jest.fn(),
+  updateDroppableIsEnabled: jest.fn(),
+  scrollDroppable: jest.fn(),
+  startPublishing: jest.fn(),
+  collect: jest.fn(),
+  stopPublishing: jest.fn(),
+});

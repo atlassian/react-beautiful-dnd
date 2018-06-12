@@ -11,6 +11,7 @@ import {
 import { vertical } from '../../src/state/axis';
 import { noSpacing, offsetByPosition } from '../../src/state/spacing';
 import getViewport from '../../src/view/window/get-viewport';
+import scrollViewport from '../../src/state/scroll-viewport';
 import { getDroppableDimension as getDroppable, type Closest } from '../../src/state/droppable-dimension';
 import type {
   Axis,
@@ -35,14 +36,18 @@ type GetComputedSpacingArgs = {|
   margin?: Spacing,
   padding?: Spacing,
   border ?: Spacing,
-  display?: string,
+  display ?: string,
+  boxSizing ?: string,
 |}
+
+const origin: Position = { x: 0, y: 0 };
 
 export const getComputedSpacing = ({
   margin = noSpacing,
   padding = noSpacing,
   border = noSpacing,
   display = 'block',
+  boxSizing = 'border-box',
 }: GetComputedSpacingArgs): Object => ({
   paddingTop: `${padding.top}px`,
   paddingRight: `${padding.right}px`,
@@ -57,6 +62,7 @@ export const getComputedSpacing = ({
   borderBottomWidth: `${border.bottom}px`,
   borderLeftWidth: `${border.left}px`,
   display,
+  boxSizing,
 });
 
 export const makeScrollable = (droppable: DroppableDimension, amount?: number = 20) => {
@@ -106,7 +112,7 @@ export const makeScrollable = (droppable: DroppableDimension, amount?: number = 
       page: droppable.page,
       scrollWidth: scrollSize.width,
       scrollHeight: scrollSize.height,
-      scroll: { x: 0, y: 0 },
+      scroll: origin,
       shouldClipSubject: true,
     },
   });
@@ -185,6 +191,7 @@ export const getDraggableDimension = ({
   const result: DraggableDimension = {
     descriptor,
     client,
+    boxSizing: 'border-box',
     page: withScroll(client, windowScroll),
     placeholder: getPlaceholder(client),
   };
@@ -497,21 +504,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     droppables,
   };
 
-  const viewport: Viewport = (() => {
-    const base: Viewport = getViewport();
-    return {
-      ...base,
-      scroll: {
-        initial: windowScroll,
-        current: windowScroll,
-        max: base.scroll.max,
-        diff: {
-          value: { x: 0, y: 0 },
-          displacement: { x: 0, y: 0 },
-        },
-      },
-    };
-  })();
+  const viewport: Viewport = scrollViewport(getViewport(), windowScroll);
 
   return {
     home,
@@ -572,6 +565,7 @@ export const shiftDraggables = ({
           droppableId: dimension.descriptor.droppableId,
           index: dimension.descriptor.index + indexChange,
         },
+        boxSizing: dimension.boxSizing,
         client,
         page,
         placeholder: {

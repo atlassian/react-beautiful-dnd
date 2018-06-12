@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import { calculateBox, withScroll, getBox, offset, type BoxModel, type Position } from 'css-box-model';
-import { negate, subtract } from '../../state/position';
+import { negate, subtract, add } from '../../state/position';
 import { dimensionMarshalKey } from '../context-keys';
 import type {
   DraggableDescriptor,
@@ -23,7 +23,6 @@ type Props = {|
   isDragging: boolean,
   offset: Position,
   getDraggableRef: () => ?HTMLElement,
-  getPlaceholderRef: () => ?HTMLElement,
   children: Node,
 |}
 
@@ -91,7 +90,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     this.publishedDescriptor = null;
   }
 
-  getDimension = (windowScroll: Position): DraggableDimension => {
+  getDimension = (windowScroll: Position, windowScrollDiff: Position): DraggableDimension => {
     const targetRef: ?HTMLElement = this.props.getDraggableRef();
     const descriptor: ?DraggableDescriptor = this.publishedDescriptor;
 
@@ -111,22 +110,16 @@ export default class DraggableDimensionPublisher extends Component<Props> {
       }
 
       // When dragging, position: fixed will avoid any client changes based on scroll.
-      // We are manually undoing that
-      return subtract(undoTransform, windowScroll);
+      // We are manually applying these client changes based on the change in window scroll
+      // from when the drag started
+      const undoWindowScroll: Position = negate(windowScrollDiff);
+
+      return add(undoTransform, undoWindowScroll);
     })();
 
-    // Object.assign(ref.style, previous);
-
-    const client: BoxModel = offset(calculateBox(borderBox, computedStyles), change);
-
+    const box: BoxModel = calculateBox(borderBox, computedStyles);
+    const client: BoxModel = offset(box, change);
     const page: BoxModel = withScroll(client, windowScroll);
-
-    console.warn(descriptor.id, 'collected pageBorderBoxCenter', page.borderBox.center, 'height', client.borderBox.height);
-    // if (placeholderRef) {
-    // const box = getBox(targetRef);
-    // console.warn(descriptor.id, 'targetRef (not placeholder)
-    // pageBorderBoxCenter', box.borderBox.center, 'height', box.borderBox.height);
-    // }
 
     const boxSizing: BoxSizing = computedStyles.boxSizing === 'border-box' ? 'border-box' : 'content-box';
 

@@ -47,7 +47,6 @@ export default class Draggable extends Component<Props> {
   callbacks: DragHandleCallbacks
   styleContext: string
   ref: ?HTMLElement = null
-  placeholderRef: ?HTMLElement = null
 
   // Need to declare contextTypes without flow
   // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
@@ -197,12 +196,6 @@ export default class Draggable extends Component<Props> {
 
   getDraggableRef = (): ?HTMLElement => this.ref;
 
-  setPlaceholderRef = (ref: ?HTMLElement) => {
-    this.placeholderRef = ref;
-  }
-
-  getPlaceholderRef = (): ?HTMLElement => this.placeholderRef;
-
   getDraggingStyle = memoizeOne(
     (dimension: DraggableDimension,
       isDropAnimating: boolean,
@@ -343,7 +336,7 @@ export default class Draggable extends Component<Props> {
         return null;
       }
 
-      return <Placeholder placeholder={dimension.placeholder} innerRef={this.setPlaceholderRef} />;
+      return <Placeholder placeholder={dimension.placeholder} />;
     })();
 
     return (
@@ -380,8 +373,8 @@ export default class Draggable extends Component<Props> {
         droppableId={droppableId}
         index={index}
         offset={offset}
+        isDragging={isDragging}
         getDraggableRef={this.getDraggableRef}
-        getPlaceholderRef={this.getPlaceholderRef}
       >
         <Moveable
           speed={speed}

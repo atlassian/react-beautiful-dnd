@@ -111,4 +111,3 @@ export const getCallbacksStub = (): Callbacks => ({
   updateDroppableIsEnabled: jest.fn(),
   bulkCollectionStarting: jest.fn(),
 });
-

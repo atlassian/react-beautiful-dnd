@@ -26,6 +26,7 @@ import type {
 
 type CollectArgs = {|
   includeCritical: boolean,
+  initialWindowScroll: Position,
 |}
 
 type CollectFromDOMArgs = {|
@@ -55,7 +56,11 @@ export default ({
   // tmep
   // let timerId: ?TimeoutID = null;
 
-  const collectFromDOM = ({ windowScroll, includeCritical }: CollectFromDOMArgs): DimensionMap => {
+  const collectFromDOM = ({
+    windowScroll,
+    initialWindowScroll,
+    includeCritical,
+  }: CollectFromDOMArgs): DimensionMap => {
     const critical: Critical = getCritical();
     const scrollOptions: ScrollOptions = getScrollOptions();
     const entries: Entries = getEntries();
@@ -118,7 +123,7 @@ export default ({
       }, {});
 
     const draggableDimensions: DraggableDimensionMap = draggables
-      .map((entry: DraggableEntry): DraggableDimension => entry.getDimension(windowScroll))
+      .map((entry: DraggableEntry): DraggableDimension => entry.getDimension(windowScroll, initialWindowScroll))
       .reduce((previous: DraggableDimensionMap, current: DraggableDimension) => {
         previous[current.descriptor.id] = current;
         return previous;
@@ -141,7 +146,7 @@ export default ({
     frameId = null;
   };
 
-  const collect = ({ includeCritical }: CollectArgs) => {
+  const collect = ({ includeCritical, initialWindowScroll }: CollectArgs) => {
     abortFrame();
     // clearTimeout(timerId);
 
@@ -153,6 +158,7 @@ export default ({
       const dimensions: DimensionMap = collectFromDOM({
         windowScroll: viewport.scroll.current,
         includeCritical,
+        initialWindowScroll,
       });
       timings.finish('DOM collection');
 

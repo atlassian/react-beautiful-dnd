@@ -20,8 +20,15 @@ import type {
   LiftRequest,
 } from '../../types';
 
-export type GetDraggableDimensionFn = (windowScroll: Position) => DraggableDimension;
-export type GetDroppableDimensionFn = (windowScroll: Position, options: ScrollOptions) => DroppableDimension;
+export type GetDraggableDimensionFn = (
+  windowScroll: Position,
+  windowScrollDiff: Position
+) => DraggableDimension;
+
+export type GetDroppableDimensionFn = (
+  windowScroll: Position,
+  options: ScrollOptions
+) => DroppableDimension;
 
 export type DroppableCallbacks = {|
   getDimensionAndWatchScroll: GetDroppableDimensionFn,

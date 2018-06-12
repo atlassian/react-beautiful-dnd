@@ -1,16 +1,20 @@
 // @flow
 import React, { Component } from 'react';
-import { type Position, type Spacing } from 'css-box-model';
+import { type Position, type Spacing, type BoxModel, offset, withScroll } from 'css-box-model';
 import { mount } from 'enzyme';
 import DraggableDimensionPublisher from '../../../src/view/draggable-dimension-publisher/draggable-dimension-publisher';
 import setWindowScroll from '../../utils/set-window-scroll';
 import { getPreset, getDraggableDimension, getComputedSpacing } from '../../utils/dimension';
+import { negate, subtract, add } from '../../../src/state/position';
 import type {
   DimensionMarshal,
   GetDraggableDimensionFn,
 } from '../../../src/state/dimension-marshal/dimension-marshal-types';
 import { withDimensionMarshal } from '../../utils/get-context-options';
 import forceUpdate from '../../utils/force-update';
+import { setViewport } from '../../utils/viewport';
+import { getMarshalStub } from '../../utils/get-dimension-marshal';
+import { offsetByPosition } from '../../../src/state/spacing';
 import type {
   DraggableId,
   DraggableDimension,
@@ -18,12 +22,15 @@ import type {
 } from '../../../src/types';
 
 const preset = getPreset();
+const origin: Position = { x: 0, y: 0 };
 
 const noComputedSpacing = getComputedSpacing({});
 
 type Props = {|
   index?: number,
-  draggableId?: DraggableId,
+  draggableId ?: DraggableId,
+  offset ?: Position,
+  isDragging?: boolean,
 |}
 
 class Item extends Component<Props> {
@@ -44,6 +51,8 @@ class Item extends Component<Props> {
         droppableId={preset.inHome1.descriptor.droppableId}
         index={this.props.index || preset.inHome1.descriptor.index}
         getDraggableRef={this.getRef}
+        offset={this.props.offset || origin}
+        isDragging={this.props.isDragging || false}
       >
         <div ref={this.setRef}>hi</div>
       </DraggableDimensionPublisher>
@@ -51,18 +60,11 @@ class Item extends Component<Props> {
   }
 }
 
-const getMarshalStub = (): DimensionMarshal => ({
-  registerDraggable: jest.fn(),
-  unregisterDraggable: jest.fn(),
-  registerDroppable: jest.fn(),
-  unregisterDroppable: jest.fn(),
-  updateDroppableScroll: jest.fn(),
-  updateDroppableIsEnabled: jest.fn(),
-  scrollDroppable: jest.fn(),
-  onPhaseChange: jest.fn(),
-});
-
 describe('DraggableDimensionPublisher', () => {
+  beforeAll(() => {
+    setViewport(preset.viewport);
+  });
+
   beforeEach(() => {
     jest.spyOn(console, 'error').mockImplementation(() => { });
   });
@@ -251,10 +253,10 @@ describe('DraggableDimensionPublisher', () => {
         x: window.pageXOffset,
         y: window.pageYOffset,
       };
-      const windowScroll: Position = {
-        x: 100,
-        y: 200,
-      };
+      // const windowScroll: Position = {
+      //   x: 100,
+      //   y: 200,
+      // };
       const borderBox: Spacing = {
         top: 0,
         right: 100,
@@ -268,11 +270,11 @@ describe('DraggableDimensionPublisher', () => {
           index: 10,
         },
         borderBox,
-        windowScroll,
+        windowScroll: preset.windowScroll,
       });
       jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => borderBox);
       jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noComputedSpacing);
-      setWindowScroll(windowScroll);
+      setWindowScroll(preset.windowScroll);
 
       mount(
         <Item
@@ -301,6 +303,8 @@ describe('DraggableDimensionPublisher', () => {
               droppableId={preset.inHome1.descriptor.droppableId}
               index={preset.inHome1.descriptor.index}
               getDraggableRef={() => undefined}
+              offset={origin}
+              isDragging={false}
             >
               <div>hi</div>
             </DraggableDimensionPublisher>
@@ -316,6 +320,106 @@ describe('DraggableDimensionPublisher', () => {
 
       // when we call the get dimension function without a ref things will explode
       expect(getDimension).toThrow();
+    });
+  });
+});
+
+describe('offset', () => {
+  describe('when not dragging', () => {
+    it.only('should account for any existing offset (caused by a drag)', () => {
+      const original: DraggableDimension = getDraggableDimension({
+        descriptor: {
+          id: 'fake-id',
+          droppableId: preset.home.descriptor.id,
+          index: 0,
+        },
+        borderBox: {
+          top: 0,
+          right: 100,
+          bottom: 100,
+          left: 0,
+        },
+      });
+
+      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => original.client.borderBox);
+      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noComputedSpacing);
+      const marshal: DimensionMarshal = getMarshalStub();
+      const transform: Position = { x: 10, y: 20 };
+      const undo: Position = negate(transform);
+      const shiftedBox: BoxModel = offset(original.client, undo);
+
+      mount(
+        <Item
+          draggableId={original.descriptor.id}
+          index={original.descriptor.index}
+          offset={transform}
+        />,
+        withDimensionMarshal(marshal)
+      );
+
+      // pull the get dimension function out
+      const getDimension: GetDraggableDimensionFn = marshal.registerDraggable.mock.calls[0][1];
+      // execute it to get the dimension
+      const result: DraggableDimension = getDimension(transform, origin);
+
+      const expected: DraggableDimension = getDraggableDimension({
+        descriptor: original.descriptor,
+        borderBox: shiftedBox.borderBox,
+      });
+
+      expect(result.client).toEqual(expected.client);
+    });
+  });
+
+  describe('when dragging', () => {
+    it.only('should account for any change in window scroll', () => {
+      const originalWindowScroll: Position = preset.windowScroll;
+      const currentWindowScroll: Position = add(preset.windowScroll, { x: 10, y: 20 });
+      const windowScrollDiff: Position = subtract(currentWindowScroll, originalWindowScroll);
+      const original: DraggableDimension = getDraggableDimension({
+        descriptor: {
+          id: 'fake-id',
+          droppableId: preset.home.descriptor.id,
+          index: 0,
+        },
+        borderBox: {
+          top: 0,
+          right: 100,
+          bottom: 100,
+          left: 0,
+        },
+        windowScroll: originalWindowScroll,
+      });
+
+      const marshal: DimensionMarshal = getMarshalStub();
+      // client border box is incorrect as it has not taken into account the scroll change
+      const shifted: Spacing = offsetByPosition(original.client.borderBox, windowScrollDiff);
+      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => shifted);
+      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noComputedSpacing);
+
+      mount(
+        <Item
+          draggableId={original.descriptor.id}
+          index={original.descriptor.index}
+          offset={origin}
+          isDragging
+        />,
+        withDimensionMarshal(marshal)
+      );
+
+      // pull the get dimension function out
+      const getDimension: GetDraggableDimensionFn = marshal.registerDraggable.mock.calls[0][1];
+      // execute it to get the dimension
+      const result: DraggableDimension = getDimension(currentWindowScroll, windowScrollDiff);
+
+      const unshifted: DraggableDimension = getDraggableDimension({
+        descriptor: original.descriptor,
+        // undoing shift caused by change in window scroll
+        borderBox: original.client.borderBox,
+        windowScroll: currentWindowScroll,
+      });
+
+      expect(result).toEqual(unshifted);
     });
   });
 });

@@ -27,6 +27,7 @@ import type {
 type Collection = {|
   scrollOptions: ScrollOptions,
   critical: Critical,
+  initialWindowScroll: Position,
 |}
 
 export default (callbacks: Callbacks) => {
@@ -86,7 +87,10 @@ export default (callbacks: Callbacks) => {
     // Let the application know a bulk collection is starting
     callbacks.bulkCollectionStarting();
 
-    collector.collect({ includeCritical });
+    collector.collect({
+      includeCritical,
+      initialWindowScroll: collection.initialWindowScroll,
+    });
   };
 
   const registerDraggable = (
@@ -315,6 +319,7 @@ export default (callbacks: Callbacks) => {
     collection = {
       scrollOptions: request.scrollOptions,
       critical,
+      initialWindowScroll: windowScroll,
     };
 
     const dimensions: DimensionMap = getCritical(windowScroll);
