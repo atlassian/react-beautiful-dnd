@@ -1,6 +1,7 @@
 // @flow
+import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
-import { add, subtract } from '../position';
+import { add, subtract, isEqual } from '../position';
 import getDragImpact from '../get-drag-impact';
 import getHomeImpact from '../get-home-impact';
 import type {
@@ -33,11 +34,23 @@ export default ({
   critical,
   dimensions,
 }: Args): Result => {
-  const oldClientBorderBoxCenter: Position = state.initial.client.borderBoxCenter;
   const draggable: DraggableDimension = dimensions.draggables[critical.draggable.id];
+
+  invariant(isEqual(draggable.client.borderBox.center, state.current.client.borderBoxCenter),
+    `Collected client borderBox center: ${JSON.stringify(draggable.client.borderBox.center)}
+    does not match the previously current client center: ${JSON.stringify(state.current.client.borderBoxCenter)}`
+  );
+
+  invariant(isEqual(draggable.page.borderBox.center, state.current.page.borderBoxCenter),
+    `Collected page borderBox center: ${JSON.stringify(draggable.page.borderBox.center)}
+    does not match the previously current page center: ${JSON.stringify(state.current.page.borderBoxCenter)}`
+  );
+
+  const oldClientBorderBoxCenter: Position = state.initial.client.borderBoxCenter;
   const newClientBorderBoxCenter: Position = draggable.client.borderBox.center;
   // How much the dragging item is shifting
   const centerDiff: Position = subtract(newClientBorderBoxCenter, oldClientBorderBoxCenter);
+  console.warn('CENTER DIFF', centerDiff);
 
   const oldInitialClientSelection: Position = state.initial.client.selection;
   const newInitialClientSelection: Position = add(oldInitialClientSelection, centerDiff);
@@ -80,10 +93,12 @@ export default ({
 
   console.group('critical replacement');
   console.log('NEW START INDEX', critical.draggable.index);
-  console.log('PRE-UPDATE: initial page center', state.initial.page.borderBoxCenter)
-  console.log('PRE-UPDATE: current page center', state.current.page.borderBoxCenter)
+  console.log('PRE-UPDATE: initial page center', state.initial.page.borderBoxCenter);
+  console.log('PRE-UPDATE: current page center', state.current.page.borderBoxCenter);
   console.warn('POST-UPDATE: initial page center', initial.page.borderBoxCenter);
   console.warn('POST-UPDATE: current page center', current.page.borderBoxCenter);
+  // console.log('PRE (generated-1): page center', state.dimensions.draggables['generated-1'].page.borderBox.center)
+  // console.log('POST(generated-1):  page center', dimensions.draggables['generated-1'].page.borderBox.center)
   console.log('home impact', getHomeImpact(critical, dimensions));
 
   const impact: DragImpact = getDragImpact({
@@ -99,7 +114,6 @@ export default ({
   console.log('isBeyondStartPosition', impact.movement.isBeyondStartPosition);
   console.log('displaced', impact.movement.displaced.map(entry => entry.draggableId));
   console.groupEnd();
-
 
   // stripping out any animations
   const forcedNoAnimations: DragImpact = {

@@ -33,13 +33,17 @@ export default ({
   previousImpact,
   viewport,
 }: Args): DragImpact => {
+  console.group('in home list');
   const axis: Axis = home.axis;
   // The starting center position
   const originalCenter: Position = draggable.page.borderBox.center;
+  console.log('original page center', originalCenter);
 
   // Where the element actually is now.
   // Need to take into account the change of scroll in the droppable
   const currentCenter: Position = withDroppableScroll(home, pageBorderBoxCenter);
+
+  console.log('current page center', currentCenter);
 
   // not considering margin so that items move based on visible edges
   const isBeyondStartPosition: boolean =
@@ -49,6 +53,8 @@ export default ({
 
   // Amount to move needs to include the margins
   const amount: Position = patch(axis.line, draggable.client.marginBox[axis.size]);
+
+  console.groupEnd();
 
   const displaced: Displacement[] = insideHome
     .filter((child: DraggableDimension): boolean => {

@@ -114,6 +114,8 @@ export default class DraggableDimensionPublisher extends Component<Props> {
       // from when the drag started
       const undoWindowScroll: Position = negate(windowScrollDiff);
 
+      console.log('offseting dragging item by', add(undoTransform, undoWindowScroll));
+
       return add(undoTransform, undoWindowScroll);
     })();
 
