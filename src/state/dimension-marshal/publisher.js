@@ -83,7 +83,8 @@ export default ({
 
       const draggables: DraggableDimensionMap = Object.keys(additions.draggables)
         .map((id: DraggableId): DraggableDimension =>
-          entries.draggables[id].getDimension(windowScroll)
+          // TODO
+          entries.draggables[id].getDimension(windowScroll, { x: 0, y: 0 })
         )
         .reduce((previous, current) => {
           previous[current.descriptor.id] = current;
