@@ -25,12 +25,6 @@ type Args = {|
   windowScroll: Position,
 |}
 
-type Result = {|
-  dimensions: DimensionMap,
-  initial: DragPositions,
-  current: DragPositions,
-|}
-
 type Partitioned = {|
   inNewDroppable: DraggableDimension[],
   inExistingDroppable: DraggableDimension[],

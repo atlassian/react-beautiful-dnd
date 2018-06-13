@@ -7,10 +7,12 @@ import type {
   CollectingState,
   DropPendingState,
   Publish,
+  DraggableId,
+  DraggableDimension,
 } from '../../types';
 import getDragImpact from '../get-drag-impact';
 import getHomeImpact from '../get-home-impact';
-import getDimensionMap from './get-shifted';
+import getDimensionMap from './get-dimension-map';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -49,6 +51,15 @@ export default ({
     // TODO: fix
     windowScroll: state.viewport.scroll.initial,
   });
+
+  // TODO: need to update initial and current positions to reflect any change in starting
+  const dragging: DraggableId = state.critical.draggable.id;
+  const original: DraggableDimension = state.dimensions.draggables[dragging];
+  const updated: DraggableDimension = dimensions.draggables[dragging];
+  const centerDiff: Position = subtract(
+    updated.client.borderBox.center,
+    original.client.borderBox.center
+  );
 
   const impact: DragImpact = getDragImpact({
     pageBorderBoxCenter: state.current.page.borderBoxCenter,
