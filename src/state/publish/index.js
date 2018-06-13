@@ -23,6 +23,26 @@ export default ({
   const additions: DimensionMap = publish.additions;
   // const removals = publish.removals;
 
+  // ## Adding Draggables to existing lists
+  // Added dimension is already in the correct location
+  // If added to the end of the list then everything else is in the correct spot
+  // If inserted within the list then everything else in the list has been pushed forward
+  // by the size of the addition
+  // If inserted before the critical draggable then everything initial and current DragPositions
+  // need to be updated.
+
+  // ## Removing Draggables from existing lists
+  // Added dimension is already in the correct location
+  // If removed from the end of the list - nothing to do
+  // If removed from within a list then everything else is pulled forward
+  // If removed before critical dimension then DragPositions need to be updated
+
+  // ## Adding a new droppable
+  // Addition already in right spot
+
+  // ## Adding a Draggable to a new Droppable
+  // Addition already in right spot
+
   const dimensions: DimensionMap = {
     draggables: {
       ...state.dimensions.draggables,
