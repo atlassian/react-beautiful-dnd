@@ -81,9 +81,6 @@ export default (getMarshal: () => DimensionMarshal) => {
           autoScrollMode,
           viewport,
         }));
-
-        // Start collecting all the other dimensions
-        marshal.collect({ includeCritical: false });
       });
     };
 };

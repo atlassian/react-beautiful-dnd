@@ -8,7 +8,11 @@ import type {
   DraggableId,
   DroppableId,
   DroppableDescriptor,
+  DroppableDimension,
+  DraggableDimension,
   DraggableDescriptor,
+  DraggableDimensionMap,
+  DroppableDimensionMap,
   DimensionMap,
   LiftRequest,
   Critical,
@@ -22,6 +26,7 @@ import type {
   Entries,
   DroppableEntry,
   DraggableEntry,
+  StartPublishingResult,
 } from './dimension-marshal-types';
 
 type Collection = {|
@@ -79,6 +84,9 @@ export default (callbacks: Callbacks) => {
 
   const collect = ({ includeCritical }: {| includeCritical: boolean |}) => {
     invariant(collection, 'Cannot collect all dimensions before critical dimensions are collected');
+
+    console.error('COLLECTING NOT ENABLED');
+    return;
 
     if (includeCritical) {
       advancedUsageWarning();
@@ -263,27 +271,56 @@ export default (callbacks: Callbacks) => {
     entry.callbacks.scroll(change);
   };
 
-  const getCritical = (windowScroll: Position): DimensionMap => {
-    invariant(collection, 'Cannot get critical dimensions without a collection');
-    const timingKey: string = 'initial collection and publish';
+  const getInitialPublish = (args: Collection): StartPublishingResult => {
+    const { critical, scrollOptions, initialWindowScroll: windowScroll } = args;
+    const timingKey: string = 'Initial collection from DOM';
     timings.start(timingKey);
 
-    const draggable: DraggableDescriptor = collection.critical.draggable;
-    const droppable: DroppableDescriptor = collection.critical.droppable;
+    const home: DroppableDescriptor = critical.droppable;
 
-    const map: DimensionMap = {
-      draggables: {
-        [draggable.id]: entries.draggables[draggable.id]
-          .getDimension(windowScroll),
-      },
-      droppables: {
-        [droppable.id]: entries.droppables[droppable.id]
-          .callbacks.getDimensionAndWatchScroll(windowScroll, collection.scrollOptions),
-      },
-    };
+    const droppables: DroppableDimensionMap = Object.keys(entries.droppables)
+      .map((id: DroppableId): DroppableEntry => entries.droppables[id])
+      // Exclude things of the wrong type
+      .filter((entry: DroppableEntry): boolean => entry.descriptor.type === home.type)
+      .map((entry: DroppableEntry): DroppableDimension =>
+        entry.callbacks.getDimensionAndWatchScroll(windowScroll, scrollOptions))
+      .reduce((previous: DroppableDimensionMap, dimension: DroppableDimension) => {
+        previous[dimension.descriptor.id] = dimension;
+        return previous;
+      }, {});
+
+    const draggables: DraggableDimensionMap = Object.keys(entries.draggables)
+      .map((id: DraggableId): DraggableEntry => entries.draggables[id])
+      .filter((entry: DraggableEntry): boolean => {
+        const parent: ?DroppableEntry = entries.droppables[entry.descriptor.droppableId];
+
+        // This should never happen
+        // but it is better to print this information and continue on
+        if (!parent) {
+          console.warn(`
+            Orphan Draggable found [id: ${entry.descriptor.id}] which says
+            it belongs to unknown Droppable ${entry.descriptor.droppableId}
+          `);
+          return false;
+        }
+        return parent.descriptor.type === home.type;
+      })
+      .map((entry: DraggableEntry) => entry.getDimension(windowScroll))
+      .reduce((previous: DraggableDimensionMap, dimension: DraggableDimension) => {
+        previous[dimension.descriptor.id] = dimension;
+        return previous;
+      }, {});
 
     timings.finish(timingKey);
-    return map;
+
+    const dimensions: DimensionMap = { draggables, droppables };
+
+    const result: StartPublishingResult = {
+      dimensions,
+      critical,
+    };
+
+    return result;
   };
 
   const stopCollecting = () => {
@@ -305,7 +342,7 @@ export default (callbacks: Callbacks) => {
     collection = null;
   };
 
-  const startPublishing = (request: LiftRequest, windowScroll: Position) => {
+  const startPublishing = (request: LiftRequest, windowScroll: Position): StartPublishingResult => {
     invariant(!collection, 'Cannot start capturing critical dimensions as there is already a collection');
     const entry: ?DraggableEntry = entries.draggables[request.draggableId];
     invariant(entry, 'Cannot find critical draggable entry');
@@ -323,12 +360,7 @@ export default (callbacks: Callbacks) => {
       initialWindowScroll: windowScroll,
     };
 
-    const dimensions: DimensionMap = getCritical(windowScroll);
-
-    return {
-      dimensions,
-      critical,
-    };
+    return getInitialPublish(collection);
   };
 
   const marshal: DimensionMarshal = {
