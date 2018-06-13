@@ -186,11 +186,6 @@ export default (state: State = idle, action: Action): State => {
       `Unexpected ${action.type} received in phase ${state.phase}`
     );
 
-    console.log('result', publish({
-      state,
-      publish: action.payload,
-    }));
-
     return publish({
       state,
       publish: action.payload,
