@@ -48,7 +48,7 @@ export default ({ getState, dispatch }: Store) =>
 
     // Still waiting for a bulk collection to publish
     // We are now shifting the application into the 'DROP_PENDING' phase
-    if (state.phase === 'BULK_COLLECTING') {
+    if (state.phase === 'COLLECTING') {
       dispatch(dropPending({ reason }));
       return;
     }

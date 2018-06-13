@@ -6,7 +6,7 @@ import getDragImpact from './get-drag-impact/';
 import moveCrossAxis from './move-cross-axis/';
 import moveToNextIndex from './move-to-next-index/';
 import { noMovement } from './no-impact';
-import bulkReplace from './bulk-replace';
+import publish from './publish';
 import { add, isEqual, subtract } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
@@ -65,7 +65,7 @@ const moveWithPositionUpdates = ({
   scrollJumpRequest,
 }: MoveArgs): CollectingState | DraggingState => {
   // DRAGGING: can update position and impact
-  // BULK_COLLECTING: can update position but cannot update impact
+  // COLLECTING: can update position but cannot update impact
 
   const newViewport: Viewport = viewport || state.viewport;
   const currentWindowScroll: Position = newViewport.scroll.current;
@@ -185,12 +185,15 @@ export default (state: State = idle, action: Action): State => {
       state.phase === 'COLLECTING' || state.phase === 'DROP_PENDING',
       `Unexpected ${action.type} received in phase ${state.phase}`
     );
-    const { additions, removals } = action.payload;
+
+    console.log('result', publish({
+      state,
+      publish: action.payload,
+    }));
 
     return publish({
       state,
-      additions,
-      removals,
+      publish: action.payload,
     });
   }
 
@@ -471,8 +474,8 @@ export default (state: State = idle, action: Action): State => {
 
   if (action.type === 'DROP_PENDING') {
     const reason: DropReason = action.payload.reason;
-    invariant(state.phase === 'BULK_COLLECTING',
-      'Can only move into the DROP_PENDING phase from the BULK_COLLECTING phase');
+    invariant(state.phase === 'COLLECTING',
+      'Can only move into the DROP_PENDING phase from the COLLECTING phase');
 
     const newState: DropPendingState = {
       // appeasing flow

@@ -1,7 +1,6 @@
 // @flow
 import { type Position } from 'css-box-model';
 import {
-  type BulkReplaceArgs,
   type UpdateDroppableScrollArgs,
   type UpdateDroppableIsEnabledArgs,
 } from '../action-creators';
@@ -18,6 +17,7 @@ import type {
   Critical,
   DimensionMap,
   LiftRequest,
+  Publish,
 } from '../../types';
 
 export type GetDraggableDimensionFn = (
@@ -65,6 +65,12 @@ export type Entries = {|
   draggables: DraggableEntryMap,
 |}
 
+export type Collection = {|
+  scrollOptions: ScrollOptions,
+  critical: Critical,
+  initialWindowScroll: Position,
+|}
+
 export type StartPublishingResult = {|
   critical: Critical,
   dimensions: DimensionMap
@@ -100,12 +106,11 @@ export type DimensionMarshal = {|
   // Entry
   startPublishing: (request: LiftRequest, windowScroll: Position) => StartPublishingResult,
   stopPublishing: () => void,
-  collect: ({| includeCritical: boolean |}) => void,
 |}
 
 export type Callbacks = {|
-  bulkReplace: (args: BulkReplaceArgs) => void,
+  publish: (args: Publish) => void,
   updateDroppableScroll: (args: UpdateDroppableScrollArgs) => void,
   updateDroppableIsEnabled: (args: UpdateDroppableIsEnabledArgs) => void,
-  bulkCollectionStarting: () => void,
+  collectionStarting: () => void,
 |}

@@ -78,7 +78,7 @@ export const makeSelector = (): Selector => {
 
     const id: DroppableId = ownProps.droppableId;
 
-    if (state.phase === 'DRAGGING' || state.phase === 'BULK_COLLECTING' || state.phase === 'DROP_PENDING') {
+    if (state.phase === 'DRAGGING' || state.phase === 'COLLECTING' || state.phase === 'DROP_PENDING') {
       const isDraggingOver: boolean = getIsDraggingOver(id, state.impact.destination);
       const draggableId: DraggableId = state.critical.draggable.id;
       const draggingOverWith: ?DraggableId = isDraggingOver ? draggableId : null;

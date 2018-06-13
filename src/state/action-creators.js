@@ -11,6 +11,7 @@ import type {
   DimensionMap,
   DropReason,
   PendingDrop,
+  Publish,
 } from '../types';
 
 export type LiftArgs = {|
@@ -50,21 +51,12 @@ export const initialPublish = (args: InitialPublishArgs): InitialPublishAction =
   payload: args,
 });
 
-export type PublishArgs = {|
-  additions: DimensionMap,
-  removals: {|
-    draggables: DraggableId[],
-    droppables: DroppableId[],
-  |},
-  viewport: Viewport,
-|}
-
 export type PublishAction = {|
   type: 'PUBLISH',
-  payload: PublishArgs
+  payload: Publish
 |}
 
-export const bulkReplace = (args: PublishArgs): PublishAction => ({
+export const publish = (args: Publish): PublishAction => ({
   type: 'PUBLISH',
   payload: args,
 });
@@ -74,7 +66,7 @@ export type CollectionStartingAction = {|
   payload: null
 |}
 
-export const bulkCollectionStarting = (): CollectionStartingAction => ({
+export const collectionStarting = (): CollectionStartingAction => ({
   type: 'COLLECTION_STARTING',
   payload: null,
 });

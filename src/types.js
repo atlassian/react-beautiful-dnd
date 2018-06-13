@@ -253,6 +253,14 @@ export type DimensionMap = {|
   droppables: DroppableDimensionMap,
 |}
 
+export type Publish = {|
+  additions: DimensionMap,
+  removals: {|
+    draggables: DraggableId[],
+    droppables: DroppableId[],
+  |}
+|}
+
 export type IdleState = {|
   phase: 'IDLE',
 |}

@@ -32,10 +32,10 @@ import {
 import {
   clean,
   move,
-  bulkReplace,
+  publish,
   updateDroppableScroll,
   updateDroppableIsEnabled,
-  bulkCollectionStarting,
+  collectionStarting,
 } from '../../state/action-creators';
 
 type Props = {|
@@ -92,8 +92,8 @@ export default class DragDropContext extends React.Component<Props> {
       announce: this.announcer.announce,
     });
     const callbacks: DimensionMarshalCallbacks = bindActionCreators({
-      bulkCollectionStarting,
-      bulkReplace,
+      collectionStarting,
+      publish,
       updateDroppableScroll,
       updateDroppableIsEnabled,
     }, this.store.dispatch);

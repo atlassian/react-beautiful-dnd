@@ -1,7 +1,7 @@
 // @flow
 import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import createCollector, { type Collector } from './collector';
+import createPublisher, { type Publisher, type Provided } from './publisher';
 // TODO: state folder reaching into view
 import * as timings from '../../debug/timings';
 import type {
@@ -27,13 +27,8 @@ import type {
   DroppableEntry,
   DraggableEntry,
   StartPublishingResult,
+  Collection,
 } from './dimension-marshal-types';
-
-type Collection = {|
-  scrollOptions: ScrollOptions,
-  critical: Critical,
-  initialWindowScroll: Position,
-|}
 
 export default (callbacks: Callbacks) => {
   const advancedUsageWarning = (() => {
@@ -69,44 +64,23 @@ export default (callbacks: Callbacks) => {
   };
   let collection: ?Collection = null;
 
-  const collector: Collector = createCollector({
-    bulkReplace: callbacks.bulkReplace,
-    getEntries: () => entries,
-    getCritical: (): Critical => {
-      invariant(collection, 'Cannot get critical when there is no collection');
-      return collection.critical;
+  const publisher: Publisher = createPublisher({
+    callbacks: {
+      publish: callbacks.publish,
+      collectionStarting: callbacks.collectionStarting,
     },
-    getScrollOptions: (): ScrollOptions => {
+    getProvided: (): Provided => {
       invariant(collection, 'Cannot get scroll options when there is no collection');
-      return collection.scrollOptions;
+      return {
+        entries, collection,
+      };
     },
   });
 
-  const collect = ({ includeCritical }: {| includeCritical: boolean |}) => {
-    invariant(collection, 'Cannot collect all dimensions before critical dimensions are collected');
-
-    console.error('COLLECTING NOT ENABLED');
-    return;
-
-    if (includeCritical) {
-      advancedUsageWarning();
-    }
-
-    // Let the application know a bulk collection is starting
-    callbacks.bulkCollectionStarting();
-
-    collector.collect({
-      includeCritical,
-      initialWindowScroll: collection.initialWindowScroll,
-    });
-  };
-
   const registerDraggable = (
     descriptor: DraggableDescriptor,
-    getDimension: GetDraggableDimensionFn
+    getDimension: GetDraggableDimensionFn,
   ) => {
-    const id: DraggableId = descriptor.id;
-
     // Not checking if the draggable already exists.
     // - This allows for overwriting in particular circumstances.
     // Not checking if a parent droppable exists.
@@ -116,15 +90,13 @@ export default (callbacks: Callbacks) => {
       descriptor,
       getDimension,
     };
-    entries.draggables[id] = entry;
+    entries.draggables[descriptor.id] = entry;
 
     if (!collection) {
       return;
     }
-
-    // If a collection is occurring we are not sure if any registerations have
-    // changed anything else. Therefore we need to perform another collection
-    collect({ includeCritical: true });
+    // A Draggable has been added during a collection - need to act!
+    publisher.addDraggable(descriptor.id);
   };
 
   const updateDraggable = (
@@ -134,18 +106,13 @@ export default (callbacks: Callbacks) => {
   ) => {
     invariant(entries.draggables[previous.id], 'Cannot update draggable registration as no previous registration was found');
 
-    if (collection) {
-      invariant(descriptor.id === previous.id, 'Cannot update a Draggables id during a drag');
-      invariant(descriptor.droppableId === previous.droppableId, 'Cannot update a Draggables Droppable during a drag');
-
-      // critical descriptor is changing
-      if (collection.critical.draggable.id === descriptor.id) {
-        collection.critical.draggable = descriptor;
-      }
-    }
-
+    // id might have changed so we are removing the old entry
     delete entries.draggables[previous.id];
-    registerDraggable(descriptor, getDimension);
+    // adding new entry
+    const entry: DraggableEntry = {
+      descriptor, getDimension,
+    };
+    entries.draggables[descriptor.id] = entry;
   };
 
   const unregisterDraggable = (descriptor: DraggableDescriptor) => {
@@ -165,8 +132,7 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    invariant(descriptor.id !== collection.critical.draggable.id, 'Cannot unregister dragging item during a drag');
-    collect({ includeCritical: true });
+    publisher.removeDraggable(descriptor.id);
   };
 
   const registerDroppable = (
@@ -179,20 +145,16 @@ export default (callbacks: Callbacks) => {
     // In some situations a Droppable might be published with the same id as
     // a Droppable that is about to be unmounted - but has not unpublished yet
 
-    const entry: DroppableEntry = {
+    entries.droppables[id] = {
       descriptor,
       callbacks: droppableCallbacks,
     };
-
-    entries.droppables[id] = entry;
 
     if (!collection) {
       return;
     }
 
-    invariant(descriptor.id !== collection.critical.droppable.id, 'Cannot register home droppable during a drag');
-
-    collect({ includeCritical: true });
+    publisher.addDroppable(id);
   };
 
   const updateDroppable = (
@@ -201,11 +163,15 @@ export default (callbacks: Callbacks) => {
     droppableCallbacks: DroppableCallbacks,
   ) => {
     invariant(entries.droppables[previous.id], 'Cannot update droppable registration as no previous registration was found');
-    invariant(!collection, 'Cannot update a Droppable id or type during a drag');
 
-    // doing this step first so that the entry is updated
+    // The id might have changed, so we are removing the old entry
     delete entries.droppables[previous.id];
-    registerDroppable(descriptor, droppableCallbacks);
+
+    const entry: DroppableEntry = {
+      descriptor,
+      callbacks: droppableCallbacks,
+    };
+    entries.droppables[descriptor.id] = entry;
   };
 
   const unregisterDroppable = (descriptor: DroppableDescriptor) => {
@@ -229,9 +195,7 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    invariant(descriptor.id !== collection.critical.droppable.id, 'Cannot unregister home droppable during a drag');
-
-    collect({ includeCritical: true });
+    publisher.removeDroppable(descriptor.id);
   };
 
   const updateDroppableIsEnabled = (id: DroppableId, isEnabled: boolean) => {
@@ -323,13 +287,13 @@ export default (callbacks: Callbacks) => {
     return result;
   };
 
-  const stopCollecting = () => {
+  const stopPublishing = () => {
     // This function can be called defensively
     if (!collection) {
       return;
     }
     // Stop any pending dom collections or publish
-    collector.stop();
+    publisher.stop();
 
     // Tell all droppables to stop watching scroll
     // all good if they where not already listening
@@ -379,8 +343,7 @@ export default (callbacks: Callbacks) => {
 
     // Entry
     startPublishing,
-    collect,
-    stopPublishing: stopCollecting,
+    stopPublishing,
   };
 
   return marshal;
