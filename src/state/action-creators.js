@@ -50,32 +50,32 @@ export const initialPublish = (args: InitialPublishArgs): InitialPublishAction =
   payload: args,
 });
 
-export type BulkReplaceArgs = {|
-  dimensions: DimensionMap,
+export type PublishArgs = {|
+  additions: DimensionMap,
+  removals: {|
+    draggables: DraggableId[],
+    droppables: DroppableId[],
+  |},
   viewport: Viewport,
-  // optionally provide new critical dimensions
-  // if published then it is assumed that the dimensions
-  // map includes the new critical dimensions
-  critical: ?Critical,
 |}
 
-export type BulkReplaceAction = {|
-  type: 'BULK_REPLACE',
-  payload: BulkReplaceArgs
+export type PublishAction = {|
+  type: 'PUBLISH',
+  payload: PublishArgs
 |}
 
-export const bulkReplace = (args: BulkReplaceArgs): BulkReplaceAction => ({
-  type: 'BULK_REPLACE',
+export const bulkReplace = (args: PublishArgs): PublishAction => ({
+  type: 'PUBLISH',
   payload: args,
 });
 
-export type BulkCollectionStartingAction = {|
-  type: 'BULK_COLLECTION_STARTING',
+export type CollectionStartingAction = {|
+  type: 'COLLECTION_STARTING',
   payload: null
 |}
 
-export const bulkCollectionStarting = (): BulkCollectionStartingAction => ({
-  type: 'BULK_COLLECTION_STARTING',
+export const bulkCollectionStarting = (): CollectionStartingAction => ({
+  type: 'COLLECTION_STARTING',
   payload: null,
 });
 
@@ -259,7 +259,7 @@ export type Action =
   LiftAction |
   InitialPublishAction |
   BulkCollectionStartingAction |
-  BulkReplaceAction |
+  PublishAction |
   UpdateDroppableScrollAction |
   UpdateDroppableIsEnabledAction |
   MoveByWindowScrollAction |

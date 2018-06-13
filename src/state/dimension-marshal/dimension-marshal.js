@@ -265,7 +265,8 @@ export default (callbacks: Callbacks) => {
 
   const getCritical = (windowScroll: Position): DimensionMap => {
     invariant(collection, 'Cannot get critical dimensions without a collection');
-    timings.start('initial collection and publish');
+    const timingKey: string = 'initial collection and publish';
+    timings.start(timingKey);
 
     const draggable: DraggableDescriptor = collection.critical.draggable;
     const droppable: DroppableDescriptor = collection.critical.droppable;
@@ -281,7 +282,7 @@ export default (callbacks: Callbacks) => {
       },
     };
 
-    timings.finish('initial collection and publish');
+    timings.finish(timingKey);
     return map;
   };
 

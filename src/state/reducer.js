@@ -23,7 +23,7 @@ import type {
   Critical,
   ItemPositions,
   DragPositions,
-  BulkCollectionState,
+  CollectingState,
   DropAnimatingState,
   DropPendingState,
   DragImpact,
@@ -38,9 +38,10 @@ import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross
 const origin: Position = { x: 0, y: 0 };
 
 const idle: IdleState = { phase: 'IDLE' };
+const preparing: PreparingState = { phase: 'PREPARING' };
 
 type MoveArgs = {|
-  state: State,
+  state: DraggingState | CollectingState,
   clientSelection: Position,
   shouldAnimate: boolean,
   viewport?: Viewport,
@@ -52,7 +53,7 @@ type MoveArgs = {|
 
 // Using function declaration as arrow function does not play well with the %checks syntax
 function isMovementAllowed(state: State): boolean %checks {
-  return state.phase === 'DRAGGING' || state.phase === 'BULK_COLLECTING';
+  return state.phase === 'DRAGGING' || state.phase === 'COLLECTING';
 }
 
 const moveWithPositionUpdates = ({
@@ -62,11 +63,9 @@ const moveWithPositionUpdates = ({
   viewport,
   impact,
   scrollJumpRequest,
-}: MoveArgs): BulkCollectionState | DraggingState | DropPendingState => {
+}: MoveArgs): CollectingState | DraggingState => {
   // DRAGGING: can update position and impact
   // BULK_COLLECTING: can update position but cannot update impact
-
-  invariant(isMovementAllowed(state), `Attempting to move in an unsupported phase ${state.phase}`);
 
   const newViewport: Viewport = viewport || state.viewport;
   const currentWindowScroll: Position = newViewport.scroll.current;
@@ -90,10 +89,10 @@ const moveWithPositionUpdates = ({
   };
 
   // Not updating impact while bulk collecting
-  if (state.phase === 'BULK_COLLECTING') {
+  if (state.phase === 'COLLECTING') {
     return {
       // adding phase to appease flow (even though it will be overwritten by spread)
-      phase: 'BULK_COLLECTING',
+      phase: 'COLLECTING',
       ...state,
       current,
     };
@@ -127,10 +126,7 @@ export default (state: State = idle, action: Action): State => {
   }
 
   if (action.type === 'PREPARE') {
-    const result: PreparingState = {
-      phase: 'PREPARING',
-    };
-    return result;
+    return preparing;
   }
 
   if (action.type === 'INITIAL_PUBLISH') {
@@ -146,18 +142,15 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
-    // Calculating initial impact
-    const impact: DragImpact = getHomeImpact(critical, dimensions);
-
-    const result: BulkCollectionState = {
-      // We are now waiting for the first bulk collection.
-      phase: 'BULK_COLLECTING',
+    const result: DraggingState = {
+      phase: 'DRAGGING',
+      isDragging: true,
       critical,
       autoScrollMode,
       dimensions,
       initial,
       current: initial,
-      impact,
+      impact: getHomeImpact(critical, dimensions),
       viewport,
       scrollJumpRequest: null,
       shouldAnimate: false,
@@ -166,38 +159,38 @@ export default (state: State = idle, action: Action): State => {
     return result;
   }
 
-  if (action.type === 'BULK_COLLECTION_STARTING') {
+  if (action.type === 'COLLECTION_STARTING') {
     // A collection might have restarted. We do not care as we are already in the right phase
-    if (state.phase === 'BULK_COLLECTING' || state.phase === 'DROP_PENDING') {
+    // TODO: remove?
+    if (state.phase === 'COLLECTING' || state.phase === 'DROP_PENDING') {
       return state;
     }
 
-    invariant(state.phase === 'DRAGGING', `Bulk collection cannot start from phase ${state.phase}`);
+    invariant(state.phase === 'DRAGGING', `Collection cannot start from phase ${state.phase}`);
 
-    const result: BulkCollectionState = {
+    const result: CollectingState = {
       // putting phase first to appease flow
-      phase: 'BULK_COLLECTING',
+      phase: 'COLLECTING',
       ...state,
-      // eslint-disable-next-line no-dupe-keys
-      phase: 'BULK_COLLECTING',
+      // eslint-disable-next-line
+      phase: 'COLLECTING',
     };
 
     return result;
   }
 
-  if (action.type === 'BULK_REPLACE') {
+  if (action.type === 'PUBLISH') {
     // Unexpected bulk publish
     invariant(
-      state.phase === 'BULK_COLLECTING' || state.phase === 'DROP_PENDING',
-      `Unexpected bulk publish received in phase ${state.phase}`
+      state.phase === 'COLLECTING' || state.phase === 'DROP_PENDING',
+      `Unexpected ${action.type} received in phase ${state.phase}`
     );
-    const { viewport, critical, dimensions } = action.payload;
+    const { additions, removals } = action.payload;
 
-    return bulkReplace({
+    return publish({
       state,
-      viewport,
-      critical,
-      dimensions,
+      additions,
+      removals,
     });
   }
 
@@ -212,7 +205,7 @@ export default (state: State = idle, action: Action): State => {
       return state;
     }
 
-    invariant(isMovementAllowed(state), `MOVE not permitted in phase ${state.phase}`);
+    invariant(isMovementAllowed(state), `${action.type} not permitted in phase ${state.phase}`);
 
     const { client, shouldAnimate } = action.payload;
 
@@ -233,7 +226,7 @@ export default (state: State = idle, action: Action): State => {
       return state;
     }
 
-    invariant(isMovementAllowed(state), `Attempting to update droppable scroll in an unsupported phase: ${state.phase}`);
+    invariant(isMovementAllowed(state), `${action.type} not permitted in phase ${state.phase}`);
 
     const { id, offset } = action.payload;
     const target: ?DroppableDimension = state.dimensions.droppables[id];
@@ -241,7 +234,7 @@ export default (state: State = idle, action: Action): State => {
     // This is possible if a droppable has been asked to watch scroll but
     // the dimension has not been published yet
     if (!target) {
-      console.log('cannot find target');
+      console.warn('cannot find target');
       return state;
     }
 
@@ -342,7 +335,7 @@ export default (state: State = idle, action: Action): State => {
 
   if (action.type === 'MOVE_BY_WINDOW_SCROLL') {
     // No longer accepting changes
-    if (state.phase === 'DROP_PENDING' || state.phase === 'BULK_COLLECTING') {
+    if (state.phase === 'DROP_PENDING' || state.phase === 'DROP_ANIMATING') {
       return state;
     }
 
@@ -371,7 +364,7 @@ export default (state: State = idle, action: Action): State => {
 
   if (action.type === 'MOVE_UP' || action.type === 'MOVE_DOWN' || action.type === 'MOVE_LEFT' || action.type === 'MOVE_RIGHT') {
     // Not doing keyboard movements during these phases
-    if (state.phase === 'BULK_COLLECTING' || state.phase === 'DROP_PENDING') {
+    if (state.phase === 'COLLECTING' || state.phase === 'DROP_PENDING') {
       return state;
     }
 

@@ -263,6 +263,7 @@ export type PreparingState = {|
 
 export type DraggingState = {|
   phase: 'DRAGGING',
+  isDragging: true,
   critical: Critical,
   autoScrollMode: AutoScrollMode,
   dimensions: DimensionMap,
@@ -281,9 +282,9 @@ export type DraggingState = {|
 // If a drop occurs during this phase, it must wait until it is
 // completed before continuing with the drop
 // TODO: rename to BulkCollectingState
-export type BulkCollectionState = {|
+export type CollectingState = {|
   ...DraggingState,
-  phase: 'BULK_COLLECTING',
+  phase: 'COLLECTING',
 |}
 
 // If a drop action occurs during a bulk collection we need to
@@ -309,7 +310,7 @@ export type State =
   IdleState |
   PreparingState |
   DraggingState |
-  BulkCollectionState |
+  CollectingState |
   DropPendingState |
   DropAnimatingState
 

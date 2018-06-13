@@ -50,7 +50,6 @@ export default ({
   const newClientBorderBoxCenter: Position = draggable.client.borderBox.center;
   // How much the dragging item is shifting
   const centerDiff: Position = subtract(newClientBorderBoxCenter, oldClientBorderBoxCenter);
-  console.warn('CENTER DIFF', centerDiff);
 
   const oldInitialClientSelection: Position = state.initial.client.selection;
   const newInitialClientSelection: Position = add(oldInitialClientSelection, centerDiff);
@@ -91,16 +90,6 @@ export default ({
     return { client, page };
   })();
 
-  console.group('critical replacement');
-  console.log('NEW START INDEX', critical.draggable.index);
-  console.log('PRE-UPDATE: initial page center', state.initial.page.borderBoxCenter);
-  console.log('PRE-UPDATE: current page center', state.current.page.borderBoxCenter);
-  console.warn('POST-UPDATE: initial page center', initial.page.borderBoxCenter);
-  console.warn('POST-UPDATE: current page center', current.page.borderBoxCenter);
-  // console.log('PRE (generated-1): page center', state.dimensions.draggables['generated-1'].page.borderBox.center)
-  // console.log('POST(generated-1):  page center', dimensions.draggables['generated-1'].page.borderBox.center)
-  console.log('home impact', getHomeImpact(critical, dimensions));
-
   const impact: DragImpact = getDragImpact({
     pageBorderBoxCenter: current.page.borderBoxCenter,
     draggable: dimensions.draggables[critical.draggable.id],
@@ -109,11 +98,6 @@ export default ({
     previousImpact: getHomeImpact(critical, dimensions),
     viewport,
   });
-
-  console.log('NEW IMPACT INDEX', impact.destination ? impact.destination.index : null);
-  console.log('isBeyondStartPosition', impact.movement.isBeyondStartPosition);
-  console.log('displaced', impact.movement.displaced.map(entry => entry.draggableId));
-  console.groupEnd();
 
   // stripping out any animations
   const forcedNoAnimations: DragImpact = {
