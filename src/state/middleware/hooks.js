@@ -147,18 +147,22 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     const move = (critical: Critical, location: ?DraggableLocation) => {
       invariant(isDragStartPublished && lastCritical, 'Cannot fire onDragMove when onDragStart has not been called');
 
+      // Our critical has changed - this can happen if the index of the draggable changes
+      // due to a draggable addition or removal
+      if (!isCriticalEqual(critical, lastCritical)) {
+        lastCritical = critical;
+      }
+
       // No change to publish
-      if (isCriticalEqual(critical, lastCritical) &&
-        areLocationsEqual(lastLocation, location)) {
+      if (areLocationsEqual(lastLocation, location)) {
         return;
       }
+      lastLocation = location;
 
       const data: DragUpdate = {
         ...getDragStart(critical),
         destination: location,
       };
-      lastLocation = location;
-      lastCritical = critical;
 
       withTimings('onDragUpdate', () => execute(getHooks().onDragUpdate, data, messagePreset.onDragUpdate));
     };

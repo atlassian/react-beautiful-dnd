@@ -7,12 +7,14 @@ import type {
   CollectingState,
   DropPendingState,
   Publish,
+  Critical,
   DraggableId,
   DraggableDimension,
 } from '../../types';
 import getDragImpact from '../get-drag-impact';
 import getHomeImpact from '../get-home-impact';
 import getDimensionMap from './get-dimension-map';
+import getDragPositions from './get-drag-positions';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -52,17 +54,26 @@ export default ({
     windowScroll: state.viewport.scroll.initial,
   });
 
-  // TODO: need to update initial and current positions to reflect any change in starting
   const dragging: DraggableId = state.critical.draggable.id;
   const original: DraggableDimension = state.dimensions.draggables[dragging];
   const updated: DraggableDimension = dimensions.draggables[dragging];
-  const centerDiff: Position = subtract(
-    updated.client.borderBox.center,
-    original.client.borderBox.center
-  );
+
+  const critical: Critical = {
+    droppable: state.critical.droppable,
+    // draggable index can change during a drag
+    draggable: updated.descriptor,
+  };
+
+  const { initial, current } = getDragPositions({
+    initial: state.initial,
+    current: state.current,
+    oldClientBorderBoxCenter: original.client.borderBox.center,
+    newClientBorderBoxCenter: updated.client.borderBox.center,
+    viewport: state.viewport,
+  });
 
   const impact: DragImpact = getDragImpact({
-    pageBorderBoxCenter: state.current.page.borderBoxCenter,
+    pageBorderBoxCenter: current.page.borderBoxCenter,
     draggable: dimensions.draggables[state.critical.draggable.id],
     draggables: dimensions.draggables,
     droppables: dimensions.droppables,
@@ -75,9 +86,14 @@ export default ({
     phase: 'DRAGGING',
     ...state,
     // eslint-disable-next-line
-      phase: 'DRAGGING',
+    phase: 'DRAGGING',
+    critical,
+    current,
+    initial,
     impact,
     dimensions,
+    // not animating this movement
+    shouldAnimate: false,
   };
 
   if (state.phase === 'COLLECTING') {

@@ -73,7 +73,7 @@ const getRecord = (draggable: DraggableDimension, home: DroppableDimension) => {
   return record;
 };
 
-const timingKey: string = 'Dynamic dimension change processing';
+const timingKey: string = 'Dynamic dimension change processing (just math)';
 
 export default ({
   existing,
@@ -81,7 +81,6 @@ export default ({
   windowScroll,
 }: Args): DimensionMap => {
   timings.start(timingKey);
-  // TODO: everything
   const partitioned: Partitioned = Object.keys(publish.additions.draggables)
     .map((id: DraggableId): DraggableDimension => publish.additions.draggables[id])
     .reduce((previous: Partitioned, draggable: DraggableDimension) => {
@@ -129,7 +128,6 @@ export default ({
   });
 
   // ## Adjust draggables based on changes
-
   const shifted: DraggableDimensionMap = Object.keys(existing.draggables)
     .map((id: DraggableId): DraggableDimension => {
       const draggable: DraggableDimension = existing.draggables[id];
@@ -160,7 +158,7 @@ export default ({
       const additionSize: number = getTotal(additions);
       const removalSize: number = getTotal(removals);
       const deltaShift: number = additionSize - removalSize;
-      console.log('DELTA SHIFT', deltaShift);
+      // console.log('DELTA SHIFT', deltaShift);
 
       const change: Position = patch(droppable.axis.line, deltaShift);
       const client: BoxModel = offset(draggable.client, change);
@@ -168,7 +166,7 @@ export default ({
       const page: BoxModel = withScroll(client, windowScroll);
 
       const indexChange: number = additions.length - removals.length;
-      console.log('INDEX SHIFT', indexChange);
+      // console.log('INDEX SHIFT', indexChange);
       const index: number = startIndex + indexChange;
 
       const moved: DraggableDimension = {

@@ -144,7 +144,7 @@ export default class WithControls extends React.Component<*, State> {
   }
 
   onDragUpdate = (update: DragUpdate) => {
-    console.log('current index:', update.destination ? update.destination.index : null);
+    console.log('Update: current index =>', update.destination ? update.destination.index : null);
   }
 
   onDragEnd = (result: DropResult) => {

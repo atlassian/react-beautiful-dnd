@@ -10,6 +10,7 @@ import publish from './publish';
 import { add, isEqual, subtract } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
+import getPageItemPositions from './get-page-item-positions';
 import type {
   Action,
   State,
@@ -79,11 +80,8 @@ const moveWithPositionUpdates = ({
     };
   })();
 
-  const page: ItemPositions = {
-    selection: add(client.selection, currentWindowScroll),
-    borderBoxCenter: add(client.borderBoxCenter, currentWindowScroll),
-    offset: add(client.offset, currentWindowScroll),
-  };
+  const page: ItemPositions = getPageItemPositions(client, currentWindowScroll);
+
   const current: DragPositions = {
     client, page,
   };
