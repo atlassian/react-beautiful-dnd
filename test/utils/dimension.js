@@ -347,6 +347,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inhome1',
       droppableId: home.descriptor.id,
+      type: home.descriptor.type,
       index: 0,
     },
     borderBox: {
@@ -364,6 +365,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inhome2',
       droppableId: home.descriptor.id,
+      type: home.descriptor.type,
       index: 1,
     },
     // pushed forward by margin of inHome1
@@ -381,6 +383,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inhome3',
       droppableId: home.descriptor.id,
+      type: home.descriptor.type,
       index: 2,
     },
     borderBox: {
@@ -397,6 +400,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inhome4',
       droppableId: home.descriptor.id,
+      type: home.descriptor.type,
       index: 3,
     },
     borderBox: {
@@ -414,6 +418,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inForeign1',
       droppableId: foreign.descriptor.id,
+      type: foreign.descriptor.type,
       index: 0,
     },
     borderBox: {
@@ -430,6 +435,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inForeign2',
       droppableId: foreign.descriptor.id,
+      type: foreign.descriptor.type,
       index: 1,
     },
     borderBox: {
@@ -446,6 +452,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inForeign3',
       droppableId: foreign.descriptor.id,
+      type: foreign.descriptor.type,
       index: 2,
     },
     borderBox: {
@@ -462,6 +469,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inForeign4',
       droppableId: foreign.descriptor.id,
+      type: foreign.descriptor.type,
       index: 3,
     },
     borderBox: {
@@ -561,8 +569,7 @@ export const shiftDraggables = ({
 
       const shifted: DraggableDimension = {
         descriptor: {
-          id: dimension.descriptor.id,
-          droppableId: dimension.descriptor.droppableId,
+          ...dimension.descriptor,
           index: dimension.descriptor.index + indexChange,
         },
         boxSizing: dimension.boxSizing,

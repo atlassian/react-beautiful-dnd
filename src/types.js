@@ -16,8 +16,12 @@ export type DroppableDescriptor = {|
 
 export type DraggableDescriptor = {|
   id: DraggableId,
-  droppableId: DroppableId,
   index: number,
+  // Inherited from Droppable
+  droppableId: DroppableId,
+  // This is technically redundant but it avoids
+  // needing to look up a parent droppable just to get its type
+  type: TypeId,
 |}
 
 export type Direction = 'horizontal' | 'vertical';

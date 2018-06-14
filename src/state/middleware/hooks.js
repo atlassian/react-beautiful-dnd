@@ -52,6 +52,7 @@ const isCriticalEqual = (first: Critical, second: Critical): boolean => {
   const isDraggableEqual: boolean =
     first.draggable.id === second.draggable.id &&
     first.draggable.droppableId === second.draggable.droppableId &&
+    first.draggable.type === second.draggable.type &&
     first.draggable.index === second.draggable.index;
 
   const isDroppableEqual: boolean =

@@ -9,6 +9,7 @@ import type {
   ItemPositions,
   DroppableId,
   AutoScrollMode,
+  TypeId,
 } from '../../types';
 import DraggableDimensionPublisher from '../draggable-dimension-publisher/';
 import Moveable from '../moveable/';
@@ -20,7 +21,7 @@ import type {
 } from '../drag-handle/drag-handle-types';
 import getBorderBoxCenterPosition from '../get-border-box-center-position';
 import Placeholder from '../placeholder';
-import { droppableIdKey, styleContextKey } from '../context-keys';
+import { droppableIdKey, styleContextKey, droppableTypeKey } from '../context-keys';
 import * as timings from '../../debug/timings';
 import type {
   Props,
@@ -52,6 +53,7 @@ export default class Draggable extends Component<Props> {
   // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
   static contextTypes = {
     [droppableIdKey]: PropTypes.string.isRequired,
+    [droppableTypeKey]: PropTypes.string.isRequired,
     [styleContextKey]: PropTypes.string.isRequired,
   }
 
@@ -140,7 +142,6 @@ export default class Draggable extends Component<Props> {
     }
 
     timings.start('move');
-    console.log('move');
     move({ client: clientSelection, shouldAnimate: false });
     timings.finish('move');
   }
@@ -362,6 +363,7 @@ export default class Draggable extends Component<Props> {
       disableInteractiveElementBlocking,
     } = this.props;
     const droppableId: DroppableId = this.context[droppableIdKey];
+    const type: TypeId = this.context[droppableTypeKey];
 
     const speed = this.getSpeed(
       isDragging,
@@ -374,6 +376,7 @@ export default class Draggable extends Component<Props> {
         key={draggableId}
         draggableId={draggableId}
         droppableId={droppableId}
+        type={type}
         index={index}
         offset={offset}
         isDragging={isDragging}
@@ -383,7 +386,6 @@ export default class Draggable extends Component<Props> {
           speed={speed}
           destination={offset}
           onMoveEnd={this.onMoveEnd}
-          draggableId={draggableId}
         >
           {(movementStyle: MovementStyle) => (
             <DragHandle

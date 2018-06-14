@@ -11,7 +11,7 @@ export default (store: Store) => (next: (Action) => mixed) => (action: Action): 
   // Always let the action go through first
   next(action);
 
-  if (action.type !== 'BULK_REPLACE') {
+  if (action.type !== 'PUBLISH') {
     return;
   }
 

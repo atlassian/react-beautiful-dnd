@@ -95,6 +95,12 @@ export default (callbacks: Callbacks) => {
     if (!collection) {
       return;
     }
+
+    // Not relevant to the drag
+    if (collection.critical.draggable.type !== descriptor.type) {
+      return;
+    }
+
     // A Draggable has been added during a collection - need to act!
     publisher.addDraggable(descriptor.id);
   };
@@ -129,6 +135,16 @@ export default (callbacks: Callbacks) => {
     delete entries.draggables[descriptor.id];
 
     if (!collection) {
+      return;
+    }
+
+    invariant(
+      collection.critical.draggable.id !== descriptor.id,
+      'Cannot remove the dragging item during a drag',
+    );
+
+    // Not relevant to the drag
+    if (collection.critical.draggable.type !== descriptor.type) {
       return;
     }
 
@@ -195,6 +211,16 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
+    invariant(
+      collection.critical.droppable.id !== descriptor.id,
+      'Cannot remove the critical Droppable during a drag'
+    );
+
+    // Not relevant to the drag
+    if (collection.critical.droppable.type !== descriptor.type) {
+      return;
+    }
+
     publisher.removeDroppable(descriptor.id);
   };
 
@@ -255,21 +281,8 @@ export default (callbacks: Callbacks) => {
 
     const draggables: DraggableDimensionMap = Object.keys(entries.draggables)
       .map((id: DraggableId): DraggableEntry => entries.draggables[id])
-      .filter((entry: DraggableEntry): boolean => {
-        const parent: ?DroppableEntry = entries.droppables[entry.descriptor.droppableId];
-
-        // This should never happen
-        // but it is better to print this information and continue on
-        if (!parent) {
-          console.warn(`
-            Orphan Draggable found [id: ${entry.descriptor.id}] which says
-            it belongs to unknown Droppable ${entry.descriptor.droppableId}
-          `);
-          return false;
-        }
-        return parent.descriptor.type === home.type;
-      })
-      .map((entry: DraggableEntry) => entry.getDimension(windowScroll))
+      .filter((entry: DraggableEntry): boolean => entry.descriptor.type === critical.draggable.type)
+      .map((entry: DraggableEntry): DraggableDimension => entry.getDimension(windowScroll))
       .reduce((previous: DraggableDimensionMap, dimension: DraggableDimension) => {
         previous[dimension.descriptor.id] = dimension;
         return previous;

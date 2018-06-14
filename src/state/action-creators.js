@@ -250,8 +250,8 @@ export const dropAnimationFinished = (): DropAnimationFinishedAction => ({
 export type Action =
   LiftAction |
   InitialPublishAction |
-  BulkCollectionStartingAction |
   PublishAction |
+  CollectionStartingAction |
   UpdateDroppableScrollAction |
   UpdateDroppableIsEnabledAction |
   MoveByWindowScrollAction |

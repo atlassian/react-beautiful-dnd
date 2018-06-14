@@ -4,11 +4,11 @@ import type { StyleMarshal } from '../../view/style-marshal/style-marshal-types'
 
 export default (marshal: StyleMarshal) =>
   () => (next: (Action) => mixed) => (action: Action): mixed => {
-    if (action.type === 'BULK_COLLECTION_STARTING') {
+    if (action.type === 'COLLECTION_STARTING') {
       marshal.collecting();
     }
 
-    if (action.type === 'INITIAL_PUBLISH' || action.type === 'BULK_REPLACE') {
+    if (action.type === 'INITIAL_PUBLISH' || action.type === 'PUBLISH') {
       marshal.dragging();
     }
 
