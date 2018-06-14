@@ -165,3 +165,13 @@ export const scrollDroppable = (
   };
   return result;
 };
+
+// TODO
+const growSubjectIfNeeded = ({
+  draggables: DraggableDimensionMap,
+  droppable: DroppableDimension,
+  addition: Position,
+}): DroppableDimension => {
+
+};
+
