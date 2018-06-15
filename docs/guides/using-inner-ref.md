@@ -101,9 +101,7 @@ Take a look at this example:
       ref={provided.innerRef}
       {...provided.draggableProps}
       {...provided.dragHandleProps}
-    >
-      <h4>My draggable</h4>
-    </div>
+    />
   )}
 </Draggable>
 ```
@@ -128,6 +126,8 @@ class Person extends React.Component {
 }
 ```
 
+> Note, the name `innerRef` is just a convention. You could call it whatever you want for your component. Something like `domRef` is fine.
+
 You can then correctly supply the DOM node to a `Draggable` or `Droppable`
 
 ```diff
@@ -145,20 +145,64 @@ You can then correctly supply the DOM node to a `Draggable` or `Droppable`
 </Draggable>
 ```
 
+⚠️ This approach will cause a `React` warning as we are spreading all of the props of the component onto the DOM node. `{...this.props}` This includes the `innerRef` prop which `React` does not like you adding to an element. So you can set things up like this:
+
+```diff
+class Person extends React.Component {
+  render() {
+-    return (
+-      <div {...this.props} ref={this.props.innerRef}>
+-        I am a person, I think..
+-      </div>
+-    );
+  }
+}
+class Person extends React.Component {
+  render() {
++    const { provided, innerRef } = this.props;
++    return (
++      <div
++        {...provided.draggableProps}
++        {...provided.dragHandleProps}
++        ref={innerRef}
++      >
++        I am a person, I think..
++      </div>
++    );
+  }
+}
+
+<Draggable draggableId="draggable-1" index={0}>
+  {(provided, snapshot) => (
+    <Person
+      innerRef={provided.innerRef}
+-      {...provided.draggableProps}
+-      {...provided.dragHandleProps}
++      provided={provided}
+    />
+  )}
+</Draggable>
+```
+
 If you also need to use the *DOM node* within your *Component* you can have a more powerful ref setting approach:
 
 ```js
 class Person extends React.Component {
   setRef = ref => {
-    // keep a reference to the ref as an instance property
+    // keep a reference to the dom ref as an instance property
     this.ref = ref;
-    // give the ref to react-beautiful-dnd
+    // give the dom ref to react-beautiful-dnd
     this.props.innerRef(ref);
   };
   render() {
+    const { provided, innerRef } = this.props;
     return (
-      <div {...this.props} ref={this.setRef}>
-        I am a person, I think..
+      <div
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        ref={this.setRef}
+      >
+          I am a person, I think..
       </div>
     );
   }
@@ -168,5 +212,3 @@ class Person extends React.Component {
 ## Putting it all together
 
 Here is an example that shows off the learnings presented in this guide: https://codesandbox.io/s/v3p0q71qn5
-
-> Note, the name `innerRef` is just a convention. You could call it whatever you want for your component. Something like `domRef` is fine.
