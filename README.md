@@ -1461,4 +1461,4 @@ Jared Crowe - [@jaredjcrowe](https://twitter.com/jaredjcrowe)
 
 Bogdan Chadkin - [@IAmTrySound](https://twitter.com/IAmTrySound)  
 Luke Batchelor - [@alukebatchelor](https://twitter.com/alukebatchelor)  
-Many other [@Atlassian](https://twitter.com/Atlassian)'s!
+Many other [@Atlassian](https://twitter.com/Atlassian)'s!  
