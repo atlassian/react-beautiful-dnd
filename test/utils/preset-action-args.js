@@ -13,7 +13,6 @@ import type {
 } from '../../src/types';
 import type{
   InitialPublishArgs,
-  BulkReplaceArgs,
   LiftArgs,
 } from '../../src/state/action-creators';
 

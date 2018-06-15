@@ -3,7 +3,7 @@ import type { Position } from 'css-box-model';
 import type {
   DraggableId,
   DroppableId,
-  PublishChange,
+  Publish,
   DraggableDimension,
   DroppableDimension,
 } from '../../types';
@@ -37,7 +37,7 @@ export type Provided = {|
 |}
 
 type Callbacks = {|
-  publishChange: (args: PublishChange) => void,
+  publish: (args: Publish) => void,
   collectionStarting: () => void,
 |}
 
@@ -127,7 +127,7 @@ export default ({
           )
         );
 
-      const result: PublishChange = {
+      const result: Publish = {
         additions: {
           draggables,
           droppables,
@@ -141,7 +141,7 @@ export default ({
       reset();
 
       timings.finish(timingKey);
-      callbacks.publishChange(result);
+      callbacks.publish(result);
     });
   };
 

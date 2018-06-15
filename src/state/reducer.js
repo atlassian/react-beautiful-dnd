@@ -6,7 +6,7 @@ import getDragImpact from './get-drag-impact/';
 import moveCrossAxis from './move-cross-axis/';
 import moveToNextIndex from './move-to-next-index/';
 import { noMovement } from './no-impact';
-import publishChange from './publish-change';
+import publish from './publish';
 import { add, isEqual, subtract } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
@@ -184,9 +184,9 @@ export default (state: State = idle, action: Action): State => {
       `Unexpected ${action.type} received in phase ${state.phase}`
     );
 
-    return publishChange({
+    return publish({
       state,
-      publishChange: action.payload,
+      publish: action.payload,
     });
   }
 

@@ -9,7 +9,7 @@ import {
 import type {
   Axis,
   DimensionMap,
-  PublishChange,
+  Publish,
   DraggableId,
   DroppableId,
   DraggableDimension,
@@ -23,7 +23,7 @@ import * as timings from '../../debug/timings';
 
 type Args = {|
   existing: DimensionMap,
-  publishChange: PublishChange,
+  publish: Publish,
   windowScroll: Position,
 |}
 
@@ -79,14 +79,14 @@ const timingKey: string = 'Dynamic dimension change processing (just math)';
 
 export default ({
   existing,
-  publishChange,
+  publish,
   windowScroll,
 }: Args): DimensionMap => {
   timings.start(timingKey);
-  const addedDroppables: DroppableDimensionMap = toDroppableMap(publishChange.additions.droppables);
-  const addedDraggables: DraggableDimensionMap = toDraggableMap(publishChange.additions.draggables);
+  const addedDroppables: DroppableDimensionMap = toDroppableMap(publish.additions.droppables);
+  const addedDraggables: DraggableDimensionMap = toDraggableMap(publish.additions.draggables);
 
-  const partitioned: Partitioned = publishChange.additions.draggables
+  const partitioned: Partitioned = publish.additions.draggables
     .reduce((previous: Partitioned, draggable: DraggableDimension) => {
       const droppableId: DroppableId = draggable.descriptor.droppableId;
       const isInNewDroppable: boolean = Boolean(addedDroppables[droppableId]);
@@ -119,7 +119,7 @@ export default ({
   });
 
   // Draggable removals
-  publishChange.removals.draggables.forEach((id: DraggableId) => {
+  publish.removals.draggables.forEach((id: DraggableId) => {
     // Pull draggable dimension from existing dimensions
     const draggable: ?DraggableDimension = existing.draggables[id];
     invariant(draggable, `Cannot find Draggable ${id}`);
@@ -208,11 +208,11 @@ export default ({
 
   // We also need to remove the Draggables and Droppables from this new map
 
-  publishChange.removals.draggables.forEach((id: DraggableId) => {
+  publish.removals.draggables.forEach((id: DraggableId) => {
     delete dimensions.draggables[id];
   });
 
-  publishChange.removals.droppables.forEach((id: DroppableId) => {
+  publish.removals.droppables.forEach((id: DroppableId) => {
     delete dimensions.droppables[id];
   });
 

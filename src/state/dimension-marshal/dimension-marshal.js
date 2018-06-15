@@ -39,7 +39,7 @@ export default (callbacks: Callbacks) => {
 
   const publisher: Publisher = createPublisher({
     callbacks: {
-      publishChange: callbacks.publishChange,
+      publish: callbacks.publish,
       collectionStarting: callbacks.collectionStarting,
     },
     getProvided: (): Provided => {

@@ -17,7 +17,7 @@ import type {
   Critical,
   DimensionMap,
   LiftRequest,
-  PublishChange,
+  Publish,
 } from '../../types';
 
 export type GetDraggableDimensionFn = (
@@ -109,7 +109,7 @@ export type DimensionMarshal = {|
 |}
 
 export type Callbacks = {|
-  publishChange: (args: PublishChange) => void,
+  publish: (args: Publish) => void,
   updateDroppableScroll: (args: UpdateDroppableScrollArgs) => void,
   updateDroppableIsEnabled: (args: UpdateDroppableIsEnabledArgs) => void,
   collectionStarting: () => void,
