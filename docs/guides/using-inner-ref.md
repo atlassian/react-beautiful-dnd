@@ -165,4 +165,8 @@ class Person extends React.Component {
 }
 ```
 
+## Putting it all together
+
+Here is an example that shows off the learnings presented in this guide: https://codesandbox.io/s/v3p0q71qn5
+
 > Note, the name `innerRef` is just a convention. You could call it whatever you want for your component. Something like `domRef` is fine.
