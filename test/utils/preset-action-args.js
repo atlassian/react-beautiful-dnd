@@ -16,7 +16,8 @@ import type{
   LiftArgs,
 } from '../../src/state/action-creators';
 
-const preset = getPreset();
+// In case a consumer needs the references
+export const preset = getPreset();
 const origin: Position = { x: 0, y: 0 };
 
 export const viewport: Viewport = (() => {

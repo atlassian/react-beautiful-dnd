@@ -161,6 +161,10 @@ export default (callbacks: Callbacks) => {
       callbacks: droppableCallbacks,
     };
     entries.droppables[descriptor.id] = entry;
+
+    if (collection) {
+      invariant(false, 'You are not able to update the id or type of a droppable during a drag');
+    }
   };
 
   const unregisterDroppable = (descriptor: DroppableDescriptor) => {
@@ -186,7 +190,7 @@ export default (callbacks: Callbacks) => {
 
     invariant(
       collection.critical.droppable.id !== descriptor.id,
-      'Cannot remove the critical Droppable during a drag'
+      'Cannot remove the home Droppable during a drag'
     );
 
     // Not relevant to the drag

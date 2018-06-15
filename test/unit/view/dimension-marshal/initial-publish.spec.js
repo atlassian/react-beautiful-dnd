@@ -1,6 +1,5 @@
 // @flow
 import createDimensionMarshal from '../../../../src/state/dimension-marshal/dimension-marshal';
-import { getPreset } from '../../../utils/dimension';
 import type {
   Callbacks,
   DimensionMarshal,
@@ -15,15 +14,13 @@ import type {
   DimensionMap,
 } from '../../../../src/types';
 import {
-  critical, copy,
+  critical, copy, preset,
 } from '../../../utils/preset-action-args';
 import {
   populateMarshal,
   getDroppableCallbacks,
   getCallbacksStub,
 } from './util';
-
-const preset = getPreset();
 
 const defaultRequest: LiftRequest = {
   draggableId: critical.draggable.id,
