@@ -106,8 +106,8 @@ export const withExpectedAdvancedUsageWarning = (fn: Function) => {
 };
 
 export const getCallbacksStub = (): Callbacks => ({
-  bulkReplace: jest.fn(),
+  publish: jest.fn(),
   updateDroppableScroll: jest.fn(),
   updateDroppableIsEnabled: jest.fn(),
-  bulkCollectionStarting: jest.fn(),
+  collectionStarting: jest.fn(),
 });

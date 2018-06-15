@@ -3,11 +3,9 @@ import type { Position } from 'css-box-model';
 import type {
   DraggableId,
   DroppableId,
-  Publish,
+  PublishChange,
   DraggableDimension,
   DroppableDimension,
-  DraggableDimensionMap,
-  DroppableDimensionMap,
 } from '../../types';
 import type { Collection, Entries } from './dimension-marshal-types';
 import * as timings from '../../debug/timings';
@@ -39,7 +37,7 @@ export type Provided = {|
 |}
 
 type Callbacks = {|
-  publish: (args: Publish) => void,
+  publishChange: (args: PublishChange) => void,
   collectionStarting: () => void,
 |}
 
@@ -55,6 +53,37 @@ const getEmptyMap = (): Map => ({
 
 const timingKey: string = 'Publish collection from DOM';
 
+const advancedUsageWarning = (() => {
+  // noop for production
+  if (process.env.NODE_ENV === 'production') {
+    return () => { };
+  }
+
+  let hasAnnounced: boolean = false;
+
+  return () => {
+    if (hasAnnounced) {
+      return;
+    }
+
+    hasAnnounced = true;
+
+    console.warn(`
+      Advanced usage warning: you are adding or removing a dimension during a drag
+      This an advanced feature used to support dynamic interactions such as lazy loading lists.
+
+      Keep in mind the following restrictions:
+
+      - Draggable's can only be added to Droppable's that are scroll containers
+      - Adding a Droppable cannot impact the placement of other Droppables
+        (it cannot push a Droppable on the page)
+
+      (This warning will be stripped in production builds)
+    `.trim()
+    );
+  };
+})();
+
 export default ({
   getProvided,
   callbacks,
@@ -69,6 +98,8 @@ export default ({
   };
 
   const collect = () => {
+    advancedUsageWarning();
+
     if (frameId) {
       return;
     }
@@ -81,31 +112,26 @@ export default ({
       const { entries, collection } = getProvided();
       const windowScroll: Position = collection.initialWindowScroll;
 
-      const draggables: DraggableDimensionMap = Object.keys(additions.draggables)
+      const draggables: DraggableDimension[] = Object.keys(additions.draggables)
         .map((id: DraggableId): DraggableDimension =>
           // TODO
           entries.draggables[id].getDimension(windowScroll, { x: 0, y: 0 })
-        )
-        .reduce((previous, current) => {
-          previous[current.descriptor.id] = current;
-          return previous;
-        }, {});
+        );
 
-      const droppables: DroppableDimensionMap = Object.keys(additions.droppables)
+      const droppables: DroppableDimension[] = Object.keys(additions.droppables)
         .map((id: DroppableId): DroppableDimension =>
           entries.droppables[id].callbacks.getDimensionAndWatchScroll(
             // TODO: need to figure out diff from start?
             windowScroll,
             collection.scrollOptions
           )
-        )
-        .reduce((previous, current) => {
-          previous[current.descriptor.id] = current;
-          return previous;
-        }, {});
+        );
 
-      const result: Publish = {
-        additions: { draggables, droppables },
+      const result: PublishChange = {
+        additions: {
+          draggables,
+          droppables,
+        },
         removals: {
           draggables: Object.keys(removals.draggables),
           droppables: Object.keys(removals.droppables),
@@ -115,7 +141,7 @@ export default ({
       reset();
 
       timings.finish(timingKey);
-      callbacks.publish(result);
+      callbacks.publishChange(result);
     });
   };
 

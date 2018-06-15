@@ -11,7 +11,7 @@ import type {
   DimensionMap,
   DropReason,
   PendingDrop,
-  Publish,
+  PublishChange,
 } from '../types';
 
 export type LiftArgs = {|
@@ -51,12 +51,12 @@ export const initialPublish = (args: InitialPublishArgs): InitialPublishAction =
   payload: args,
 });
 
-export type PublishAction = {|
+export type PublishChangeAction = {|
   type: 'PUBLISH',
-  payload: Publish
+  payload: PublishChange
 |}
 
-export const publish = (args: Publish): PublishAction => ({
+export const publishChange = (args: PublishChange): PublishChangeAction => ({
   type: 'PUBLISH',
   payload: args,
 });
@@ -250,7 +250,7 @@ export const dropAnimationFinished = (): DropAnimationFinishedAction => ({
 export type Action =
   LiftAction |
   InitialPublishAction |
-  PublishAction |
+  PublishChangeAction |
   CollectionStartingAction |
   UpdateDroppableScrollAction |
   UpdateDroppableIsEnabledAction |

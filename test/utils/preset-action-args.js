@@ -56,18 +56,9 @@ export const liftArgs: LiftArgs = {
   autoScrollMode: 'FLUID',
 };
 
-export const criticalDimensions: DimensionMap = {
-  draggables: {
-    [critical.draggable.id]: preset.inHome1,
-  },
-  droppables: {
-    [preset.home.descriptor.id]: preset.home,
-  },
-};
-
 export const initialPublishArgs: InitialPublishArgs = {
   critical,
-  dimensions: criticalDimensions,
+  dimensions: preset.dimensions,
   client,
   viewport,
   autoScrollMode: 'FLUID',

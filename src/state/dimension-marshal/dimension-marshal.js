@@ -31,33 +31,6 @@ import type {
 } from './dimension-marshal-types';
 
 export default (callbacks: Callbacks) => {
-  const advancedUsageWarning = (() => {
-    let hasAnnounced: boolean = false;
-
-    return () => {
-      if (hasAnnounced) {
-        return;
-      }
-
-      hasAnnounced = true;
-
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn(`
-          Advanced usage warning: you are triggering a recollection of dimensions during a drag.
-          This an advanced feature used to support dynamic interactions such as lazy loading lists.
-          You might not have intended to trigger this collection. A collection will be triggered
-          when:
-
-          - A Draggable or Droppable is added or removed
-          - Draggable: 'id' or 'index' change
-          - Droppable: 'id' change ('type' change is not permitted during a drag)
-
-          (This warning will be stripped in production)
-        `.trim());
-      }
-    };
-  })();
-
   const entries: Entries = {
     droppables: {},
     draggables: {},
@@ -66,7 +39,7 @@ export default (callbacks: Callbacks) => {
 
   const publisher: Publisher = createPublisher({
     callbacks: {
-      publish: callbacks.publish,
+      publishChange: callbacks.publishChange,
       collectionStarting: callbacks.collectionStarting,
     },
     getProvided: (): Provided => {

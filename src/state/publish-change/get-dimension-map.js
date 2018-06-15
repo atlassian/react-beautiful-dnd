@@ -9,19 +9,21 @@ import {
 import type {
   Axis,
   DimensionMap,
-  Publish,
+  PublishChange,
   DraggableId,
   DroppableId,
   DraggableDimension,
   DroppableDimension,
   DraggableDimensionMap,
+  DroppableDimensionMap,
 } from '../../types';
+import { toDroppableMap, toDraggableMap } from '../to-map';
 import { patch } from '../position';
 import * as timings from '../../debug/timings';
 
 type Args = {|
   existing: DimensionMap,
-  publish: Publish,
+  publishChange: PublishChange,
   windowScroll: Position,
 |}
 
@@ -77,16 +79,17 @@ const timingKey: string = 'Dynamic dimension change processing (just math)';
 
 export default ({
   existing,
-  publish,
+  publishChange,
   windowScroll,
 }: Args): DimensionMap => {
   timings.start(timingKey);
-  const partitioned: Partitioned = Object.keys(publish.additions.draggables)
-    .map((id: DraggableId): DraggableDimension => publish.additions.draggables[id])
+  const addedDroppables: DroppableDimensionMap = toDroppableMap(publishChange.additions.droppables);
+  const addedDraggables: DraggableDimensionMap = toDraggableMap(publishChange.additions.draggables);
+
+  const partitioned: Partitioned = publishChange.additions.draggables
     .reduce((previous: Partitioned, draggable: DraggableDimension) => {
       const droppableId: DroppableId = draggable.descriptor.droppableId;
-      const isInNewDroppable: boolean =
-        Boolean(publish.additions.droppables[droppableId]);
+      const isInNewDroppable: boolean = Boolean(addedDroppables[droppableId]);
 
       if (isInNewDroppable) {
         previous.inNewDroppable.push(draggable);
@@ -116,7 +119,7 @@ export default ({
   });
 
   // Draggable removals
-  publish.removals.draggables.forEach((id: DraggableId) => {
+  publishChange.removals.draggables.forEach((id: DraggableId) => {
     // Pull draggable dimension from existing dimensions
     const draggable: ?DraggableDimension = existing.draggables[id];
     invariant(draggable, `Cannot find Draggable ${id}`);
@@ -195,21 +198,21 @@ export default ({
   const dimensions: DimensionMap = {
     draggables: {
       ...shifted,
-      ...publish.additions.draggables,
+      ...addedDraggables,
     },
     droppables: {
       ...existing.droppables,
-      ...publish.additions.droppables,
+      ...addedDroppables,
     },
   };
 
   // We also need to remove the Draggables and Droppables from this new map
 
-  publish.removals.draggables.forEach((id: DraggableId) => {
+  publishChange.removals.draggables.forEach((id: DraggableId) => {
     delete dimensions.draggables[id];
   });
 
-  publish.removals.droppables.forEach((id: DroppableId) => {
+  publishChange.removals.droppables.forEach((id: DroppableId) => {
     delete dimensions.droppables[id];
   });
 
