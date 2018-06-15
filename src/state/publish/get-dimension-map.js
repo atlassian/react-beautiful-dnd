@@ -131,7 +131,7 @@ export default ({
   });
 
   // ## Adjust draggables based on changes
-  const shifted: DraggableDimensionMap = Object.keys(existing.draggables)
+  const shifted: DraggableDimension[] = Object.keys(existing.draggables)
     .map((id: DraggableId): DraggableDimension => {
       const draggable: DraggableDimension = existing.draggables[id];
       const droppableId: DroppableId = draggable.descriptor.droppableId;
@@ -187,17 +187,13 @@ export default ({
       };
 
       return moved;
-    })
-    .reduce((previous: DraggableDimensionMap, current: DraggableDimension) => {
-      previous[current.descriptor.id] = current;
-      return previous;
-    }, {});
+    });
 
   // Let's add our shifted draggables to our dimension map
 
   const dimensions: DimensionMap = {
     draggables: {
-      ...shifted,
+      ...toDraggableMap(shifted),
       ...addedDraggables,
     },
     droppables: {
