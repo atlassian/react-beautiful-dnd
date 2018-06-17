@@ -279,6 +279,12 @@ describe('subsequent', () => {
     });
     requestAnimationFrame.step();
     expect(callbacks.publish).toHaveBeenCalledTimes(1);
+    callbacks.publish.mockReset();
+
+    marshal.stopPublishing();
+
+    // second drag
+    marshal.startPublishing(defaultRequest, preset.windowScroll);
 
     marshal.registerDraggable(preset.inHome3.descriptor, () => preset.inHome3);
     requestAnimationFrame.step();
