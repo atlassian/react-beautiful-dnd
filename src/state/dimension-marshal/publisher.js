@@ -43,6 +43,7 @@ type Callbacks = {|
 
 type Args = {|
   getProvided: () => Provided,
+  getEntries: () => Entries,
   callbacks: Callbacks
 |}
 
@@ -53,41 +54,41 @@ const getEmptyMap = (): Map => ({
 
 const timingKey: string = 'Publish collection from DOM';
 
-const advancedUsageWarning = (() => {
-  // noop for production
-  if (process.env.NODE_ENV === 'production') {
-    return () => { };
-  }
-
-  let hasAnnounced: boolean = false;
-
-  return () => {
-    if (hasAnnounced) {
-      return;
-    }
-
-    hasAnnounced = true;
-
-    console.warn(`
-      Advanced usage warning: you are adding or removing a dimension during a drag
-      This an advanced feature used to support dynamic interactions such as lazy loading lists.
-
-      Keep in mind the following restrictions:
-
-      - Draggable's can only be added to Droppable's that are scroll containers
-      - Adding a Droppable cannot impact the placement of other Droppables
-        (it cannot push a Droppable on the page)
-
-      (This warning will be stripped in production builds)
-    `.trim()
-    );
-  };
-})();
-
 export default ({
   getProvided,
   callbacks,
 }: Args): Publisher => {
+  const advancedUsageWarning = (() => {
+    // noop for production
+    if (process.env.NODE_ENV === 'production') {
+      return () => { };
+    }
+
+    let hasAnnounced: boolean = false;
+
+    return () => {
+      if (hasAnnounced) {
+        return;
+      }
+
+      hasAnnounced = true;
+
+      console.warn(`
+        Advanced usage warning: you are adding or removing a dimension during a drag
+        This an advanced feature used to support dynamic interactions such as lazy loading lists.
+
+        Keep in mind the following restrictions:
+
+        - Draggable's can only be added to Droppable's that are scroll containers
+        - Adding a Droppable cannot impact the placement of other Droppables
+          (it cannot push a Droppable on the page)
+
+        (This warning will be stripped in production builds)
+      `.trim()
+      );
+    };
+  })();
+
   let additions: Map = getEmptyMap();
   let removals: Map = getEmptyMap();
   let frameId: ?AnimationFrameID = null;

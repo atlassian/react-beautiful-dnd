@@ -117,7 +117,7 @@ export default (callbacks: Callbacks) => {
     );
 
     // Not relevant to the drag
-    if (collection.critical.draggable.type !== descriptor.type) {
+    if (descriptor.type !== collection.critical.draggable.type) {
       return;
     }
 
@@ -140,6 +140,11 @@ export default (callbacks: Callbacks) => {
     };
 
     if (!collection) {
+      return;
+    }
+
+    // Not relevant to this drag
+    if (descriptor.type !== collection.critical.droppable.type) {
       return;
     }
 

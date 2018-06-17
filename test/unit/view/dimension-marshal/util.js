@@ -12,6 +12,7 @@ import type {
   DroppableId,
   DraggableDimension,
   DroppableDimension,
+  LiftRequest,
 } from '../../../../src/types';
 
 const preset = getPreset();
@@ -111,3 +112,10 @@ export const getCallbacksStub = (): Callbacks => ({
   updateDroppableIsEnabled: jest.fn(),
   collectionStarting: jest.fn(),
 });
+
+export const defaultRequest: LiftRequest = {
+  draggableId: preset.inHome1.descriptor.id,
+  scrollOptions: {
+    shouldPublishImmediately: false,
+  },
+};

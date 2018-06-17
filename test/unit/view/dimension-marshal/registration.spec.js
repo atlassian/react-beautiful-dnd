@@ -18,14 +18,8 @@ import {
   populateMarshal,
   getDroppableCallbacks,
   getCallbacksStub,
+  defaultRequest,
 } from './util';
-
-const defaultRequest: LiftRequest = {
-  draggableId: critical.draggable.id,
-  scrollOptions: {
-    shouldPublishImmediately: false,
-  },
-};
 
 describe('draggable', () => {
   describe('update', () => {

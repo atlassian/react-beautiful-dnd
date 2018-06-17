@@ -17,7 +17,7 @@ import type {
   DraggableDimensionMap,
   DroppableDimensionMap,
 } from '../../types';
-import { toDroppableMap, toDraggableMap } from '../to-map';
+import { toDroppableMap, toDraggableMap } from '../dimension-structures';
 import { patch } from '../position';
 import * as timings from '../../debug/timings';
 
