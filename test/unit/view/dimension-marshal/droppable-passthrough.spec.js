@@ -4,49 +4,17 @@ import { getPreset } from '../../../utils/dimension';
 import type {
   Callbacks,
   DimensionMarshal,
-  StartPublishingResult,
 } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
-import getViewport from '../../../../src/view/window/get-viewport';
-import type {
-  Critical,
-  LiftRequest,
-  DimensionMap,
-  DraggableId,
-  DroppableId,
-  DraggableDimension,
-  DroppableDimension,
-  DraggableDimensionMap,
-  DroppableDimensionMap,
-} from '../../../../src/types';
 import {
   populateMarshal,
-  resetWatcher,
   getCallbacksStub,
+  critical,
+  defaultRequest,
+  justCritical,
   type DimensionWatcher,
 } from './util';
 
 const preset = getPreset();
-
-const critical: Critical = {
-  draggable: preset.inHome1.descriptor,
-  droppable: preset.home.descriptor,
-};
-
-const criticalDimensions: DimensionMap = {
-  draggables: {
-    [preset.inHome1.descriptor.id]: preset.inHome1,
-  },
-  droppables: {
-    [preset.home.descriptor.id]: preset.home,
-  },
-};
-
-const defaultRequest: LiftRequest = {
-  draggableId: critical.draggable.id,
-  scrollOptions: {
-    shouldPublishImmediately: false,
-  },
-};
 
 describe('force scrolling a droppable', () => {
   it('should scroll the droppable', () => {
@@ -56,8 +24,6 @@ describe('force scrolling a droppable', () => {
 
     // initial lift
     marshal.startPublishing(defaultRequest, preset.windowScroll);
-    marshal.collect({ includeCritical: false });
-    requestAnimationFrame.flush();
     expect(watcher.droppable.scroll).not.toHaveBeenCalled();
 
     // scroll
@@ -69,12 +35,10 @@ describe('force scrolling a droppable', () => {
   it('should throw if the droppable cannot be found', () => {
     const callbacks: Callbacks = getCallbacksStub();
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, criticalDimensions);
+    populateMarshal(marshal, justCritical);
 
     // initial lift
     marshal.startPublishing(defaultRequest, preset.windowScroll);
-    marshal.collect({ includeCritical: false });
-    requestAnimationFrame.flush();
 
     // scroll
     expect(() => {
@@ -100,8 +64,6 @@ describe('responding to scroll changes', () => {
 
     // initial lift
     marshal.startPublishing(defaultRequest, preset.windowScroll);
-    marshal.collect({ includeCritical: false });
-    requestAnimationFrame.flush();
     expect(watcher.droppable.scroll).not.toHaveBeenCalled();
 
     marshal.updateDroppableScroll(critical.droppable.id, { x: 10, y: 20 });
@@ -114,12 +76,10 @@ describe('responding to scroll changes', () => {
   it('should throw if the droppable cannot be found', () => {
     const callbacks: Callbacks = getCallbacksStub();
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, criticalDimensions);
+    populateMarshal(marshal, justCritical);
 
     // initial lift
     marshal.startPublishing(defaultRequest, preset.windowScroll);
-    marshal.collect({ includeCritical: false });
-    requestAnimationFrame.flush();
     expect(callbacks.updateDroppableScroll).not.toHaveBeenCalled();
 
     expect(() => {
@@ -130,7 +90,7 @@ describe('responding to scroll changes', () => {
   it('should not let consumers know if know drag is occurring', () => {
     const callbacks: Callbacks = getCallbacksStub();
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, criticalDimensions);
+    populateMarshal(marshal, justCritical);
 
     marshal.updateDroppableScroll(critical.droppable.id, { x: 10, y: 20 });
     expect(callbacks.updateDroppableScroll).not.toHaveBeenCalled();
@@ -145,8 +105,6 @@ describe('is enabled changes', () => {
 
     // initial lift
     marshal.startPublishing(defaultRequest, preset.windowScroll);
-    marshal.collect({ includeCritical: false });
-    requestAnimationFrame.flush();
     expect(callbacks.updateDroppableIsEnabled).not.toHaveBeenCalled();
 
     marshal.updateDroppableIsEnabled(critical.droppable.id, false);
@@ -157,12 +115,10 @@ describe('is enabled changes', () => {
   it('should throw if the droppable cannot be found', () => {
     const callbacks: Callbacks = getCallbacksStub();
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, criticalDimensions);
+    populateMarshal(marshal, justCritical);
 
     // initial lift
     marshal.startPublishing(defaultRequest, preset.windowScroll);
-    marshal.collect({ includeCritical: false });
-    requestAnimationFrame.flush();
     expect(callbacks.updateDroppableIsEnabled).not.toHaveBeenCalled();
 
     expect(() => marshal.updateDroppableIsEnabled(preset.foreign.descriptor.id, false))
@@ -172,7 +128,7 @@ describe('is enabled changes', () => {
   it('should not let consumers know if no collection is occurring', () => {
     const callbacks: Callbacks = getCallbacksStub();
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, criticalDimensions);
+    populateMarshal(marshal, justCritical);
 
     marshal.updateDroppableIsEnabled(critical.droppable.id, false);
     expect(callbacks.updateDroppableIsEnabled).not.toHaveBeenCalled();

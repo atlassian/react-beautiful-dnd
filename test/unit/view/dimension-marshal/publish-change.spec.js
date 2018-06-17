@@ -247,9 +247,49 @@ describe('cancelling', () => {
   });
 });
 
+describe('subsequent', () => {
+  it('should allow subsequent publishes in the same drag', () => {
+    const callbacks: Callbacks = getCallbacksStub();
+    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
+    populateMarshal(marshal, justCritical);
+
+    marshal.startPublishing(defaultRequest, preset.windowScroll);
+
+    withExpectedAdvancedUsageWarning(() => {
+      marshal.registerDraggable(preset.inHome2.descriptor, () => preset.inHome1);
+    });
+    requestAnimationFrame.step();
+    expect(callbacks.publish).toHaveBeenCalledTimes(1);
+    callbacks.publish.mockReset();
+
+    marshal.registerDraggable(preset.inHome3.descriptor, () => preset.inHome3);
+    requestAnimationFrame.step();
+    expect(callbacks.publish).toHaveBeenCalledTimes(1);
+  });
+
+  it('should allow subsequent publishes between drags', () => {
+    const callbacks: Callbacks = getCallbacksStub();
+    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
+    populateMarshal(marshal, justCritical);
+
+    marshal.startPublishing(defaultRequest, preset.windowScroll);
+
+    withExpectedAdvancedUsageWarning(() => {
+      marshal.registerDraggable(preset.inHome2.descriptor, () => preset.inHome1);
+    });
+    requestAnimationFrame.step();
+    expect(callbacks.publish).toHaveBeenCalledTimes(1);
+
+    marshal.registerDraggable(preset.inHome3.descriptor, () => preset.inHome3);
+    requestAnimationFrame.step();
+    expect(callbacks.publish).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('advanced usage warning', () => {
   it('should print an advanced usage warning on the first dynamic change', () => {
     jest.spyOn(console, 'warn').mockImplementation(() => { });
+
     const callbacks: Callbacks = getCallbacksStub();
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
     populateMarshal(marshal, justCritical);
@@ -263,5 +303,7 @@ describe('advanced usage warning', () => {
 
     marshal.registerDraggable(preset.inHome2.descriptor, () => preset.inHome2);
     expect(console.warn).not.toHaveBeenCalled();
+
+    console.warn.mockRestore();
   });
 });
