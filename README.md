@@ -1006,11 +1006,11 @@ type DraggingStyle = {|
   left: number,
   margin: 0,
   transition: 'none',
-  transform: ?string,
+  transform?: string,
   zIndex: ZIndex,
 |}
 type NotDraggingStyle = {|
-  transition: ?string,
+  transition?: string,
   transition: null | 'none',
 |}
 ```
@@ -1362,12 +1362,12 @@ type DraggingStyle = {|
   left: number,
   margin: 0,
   transition: 'none',
-  transform: ?string,
+  transform?: string,
   zIndex: ZIndex,
 |}
 type NotDraggingStyle = {|
-  transition: ?string,
-  transition: null | 'none',
+  transition?: string,
+  transition?: 'none',
 |}
 
 type DragHandleProps = {|

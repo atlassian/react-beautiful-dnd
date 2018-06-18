@@ -16,7 +16,7 @@ const origin: Position = {
 };
 
 const noMovement: Style = {
-  transform: null,
+  transform: undefined
 };
 
 const isAtOrigin = (point: PositionLike): boolean =>

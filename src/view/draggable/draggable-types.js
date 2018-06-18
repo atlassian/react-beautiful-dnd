@@ -60,7 +60,7 @@ export type DraggingStyle = {|
   transition: 'none',
 
   // Move the element in response to a user dragging
-  transform: ?string,
+  transform?: string,
 
   // When dragging or dropping we control the z-index to ensure that
   // the layering is correct
@@ -75,10 +75,10 @@ export type DraggingStyle = {|
 |}
 
 export type NotDraggingStyle = {|
-  transform: ?string,
-  // null: use the global animation style
-  // none: skip animation (used in certain displacement situations)
-  transition: null | 'none',
+  transform?: string,
+  // missing: use the global animation style
+  // 'none': skip animation (used in certain displacement situations)
+  transition?: 'none',
 |}
 
 export type DraggableStyle = DraggingStyle | NotDraggingStyle;
@@ -91,7 +91,7 @@ export type ZIndexOptions = {|
 // Props that can be spread onto the element directly
 export type DraggableProps = {|
   // inline style
-  style: ?DraggableStyle,
+  style?: DraggableStyle,
   // used for shared global styles
   'data-react-beautiful-dnd-draggable': string,
 |}
