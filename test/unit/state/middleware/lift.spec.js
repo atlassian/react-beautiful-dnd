@@ -28,7 +28,7 @@ import {
   critical,
 } from '../../../utils/preset-action-args';
 import createDimensionMarshal from '../../../../src/state/dimension-marshal/dimension-marshal';
-import { populateMarshal } from '../../view/dimension-marshal/util';
+import { populateMarshal } from '../../../utils/dimension-marshal';
 
 const getMarshal = (store: Store): DimensionMarshal => {
   const callbacks: Callbacks = bindActionCreators({

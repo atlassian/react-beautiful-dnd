@@ -16,11 +16,7 @@ import type {
 import {
   critical, copy, preset,
 } from '../../../utils/preset-action-args';
-import {
-  populateMarshal,
-  getDroppableCallbacks,
-  getCallbacksStub,
-} from './util';
+import { getDroppableCallbacks, populateMarshal, getCallbacksStub } from '../../../utils/dimension-marshal';
 
 const defaultRequest: LiftRequest = {
   draggableId: critical.draggable.id,

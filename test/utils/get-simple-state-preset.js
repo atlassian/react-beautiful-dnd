@@ -1,11 +1,11 @@
 // @flow
 import { type Position } from 'css-box-model';
 import { getPreset } from './dimension';
-import noImpact from '../../src/state/no-impact';
 import { vertical } from '../../src/state/axis';
 import getViewport from '../../src/view/window/get-viewport';
 import { add } from '../../src/state/position';
 import getHomeImpact from '../../src/state/get-home-impact';
+import getHomeLocation from '../../src/state/get-home-location';
 import type {
   Axis,
   State,
@@ -20,6 +20,7 @@ import type {
   DropReason,
   DraggableId,
   DragImpact,
+  DropAnimatingState,
   Critical,
   CollectingState,
   ScrollOptions,
@@ -136,12 +137,12 @@ export default (axis?: Axis = vertical) => {
     };
   };
 
-  const getDropAnimating = (id: DraggableId, reason: DropReason): State => {
+  const getDropAnimating = (id: DraggableId, reason: DropReason): DropAnimatingState => {
     const descriptor: DraggableDescriptor = preset.draggables[id].descriptor;
     const home: DroppableDescriptor = preset.droppables[descriptor.droppableId].descriptor;
     const pending: PendingDrop = {
-      newHomeOffset: origin,
-      impact: noImpact,
+      newHomeOffset: { x: 10, y: 20 },
+      impact: getHomeImpact(critical, preset.dimensions),
       result: {
         draggableId: descriptor.id,
         type: home.type,
@@ -149,65 +150,26 @@ export default (axis?: Axis = vertical) => {
           droppableId: home.id,
           index: descriptor.index,
         },
-        destination: null,
+        destination: getHomeLocation(critical),
         reason,
       },
     };
 
-    const result: State = {
+    const result: DropAnimatingState = {
       phase: 'DROP_ANIMATING',
-      drag: null,
-      drop: {
-        pending,
-        result: null,
-      },
-      dimension: getDimensionState({
-        draggableId: descriptor.id,
-        scrollOptions: scheduled,
-      }),
+      pending,
+      dimensions: preset.dimensions,
     };
     return result;
   };
 
   const dropAnimating = (
     id?: DraggableId = preset.inHome1.descriptor.id
-  ): State => getDropAnimating(id, 'DROP');
+  ): DropAnimatingState => getDropAnimating(id, 'DROP');
 
   const userCancel = (
     id?: DraggableId = preset.inHome1.descriptor.id
-  ): State => getDropAnimating(id, 'CANCEL');
-
-  const dropComplete = (
-    id?: DraggableId = preset.inHome1.descriptor.id
-  ): State => {
-    const descriptor: DraggableDescriptor = preset.draggables[id].descriptor;
-    const home: DroppableDescriptor = preset.droppables[descriptor.droppableId].descriptor;
-    const result: DropResult = {
-      draggableId: descriptor.id,
-      type: home.type,
-      source: {
-        droppableId: home.id,
-        index: descriptor.index,
-      },
-      destination: null,
-      reason: 'DROP',
-    };
-
-    const value: State = {
-      phase: 'DROP_COMPLETE',
-      drag: null,
-      drop: {
-        pending: null,
-        result,
-      },
-      dimension: {
-        request: null,
-        draggable: {},
-        droppable: {},
-      },
-    };
-    return value;
-  };
+  ): DropAnimatingState => getDropAnimating(id, 'CANCEL');
 
   const allPhases = (id? : DraggableId = preset.inHome1.descriptor.id): State[] => [
     idle,
@@ -215,7 +177,6 @@ export default (axis?: Axis = vertical) => {
     dragging(id),
     dropAnimating(id),
     userCancel(id),
-    dropComplete(id),
   ];
 
   return {
@@ -227,7 +188,6 @@ export default (axis?: Axis = vertical) => {
     dropPending,
     dropAnimating,
     userCancel,
-    dropComplete,
     allPhases,
     collecting,
   };

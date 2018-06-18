@@ -9,7 +9,7 @@ import { negate, add } from '../../../src/state/position';
 import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
 import getStatePreset from '../../utils/get-simple-state-preset';
 import {
-  combine,
+combine,
   withStore,
   withDroppableId,
   withDimensionMarshal,

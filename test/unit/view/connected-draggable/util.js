@@ -14,6 +14,9 @@ import type {
   CollectingState,
   DropPendingState,
   DraggableDimension,
+  DragImpact,
+  DropAnimatingState,
+  PendingDrop,
 } from '../../../../src/types';
 
 export type IsDraggingState = DraggingState | CollectingState | DropPendingState
@@ -54,7 +57,19 @@ export const draggingStates: IsDraggingState[] = [
   state.dropPending(),
 ];
 
-export const withImpact = (current: IsDraggingState, impact: DragImpact): IsDraggingState => (({
+export const withImpact = (
+  current: IsDraggingState,
+  impact: DragImpact
+): IsDraggingState => (({
   ...current,
   impact,
 }: any));
+
+export const withPending = (
+  current: DropAnimatingState,
+  pending: PendingDrop,
+): DropAnimatingState => ({
+  ...current,
+  pending,
+});
+

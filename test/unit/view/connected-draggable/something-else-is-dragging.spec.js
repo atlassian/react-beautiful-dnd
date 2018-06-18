@@ -2,8 +2,6 @@
 import type { Position } from 'css-box-model';
 import { makeMapStateToProps } from '../../../../src/view/draggable/connected-draggable';
 import { getPreset } from '../../../utils/dimension';
-import getHomeImpact from '../../../../src/state/get-home-impact';
-import getHomeLocation from '../../../../src/state/get-home-location';
 import noImpact from '../../../../src/state/no-impact';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import { negate, patch } from '../../../../src/state/position';
@@ -19,7 +17,11 @@ import type {
   OwnProps,
   MapProps,
 } from '../../../../src/view/draggable/draggable-types';
-import type { Axis, DragImpact } from '../../../../src/types';
+import type {
+  Axis,
+  DragImpact,
+  DraggableLocation,
+} from '../../../../src/types';
 
 const preset = getPreset();
 const state = getStatePreset();
@@ -64,7 +66,7 @@ draggingStates.forEach((current: IsDraggingState) => {
     describe('being displaced by drag', () => {
       const inHome2Location: DraggableLocation = {
         index: preset.inHome2.descriptor.index,
-        droppableId: preset.home.descriptor.id
+        droppableId: preset.home.descriptor.id,
       };
       it('should move out backwards of the way', () => {
         const impact: DragImpact = {

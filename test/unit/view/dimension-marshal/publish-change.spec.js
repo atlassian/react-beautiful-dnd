@@ -17,9 +17,11 @@ import {
   preset,
 } from '../../../utils/preset-action-args';
 import {
-  populateMarshal,
   getDroppableCallbacks,
+  populateMarshal,
   getCallbacksStub,
+} from '../../../utils/dimension-marshal';
+import {
   defaultRequest,
   withExpectedAdvancedUsageWarning,
 } from './util';

@@ -8,10 +8,12 @@ import type {
 import {
   populateMarshal,
   getCallbacksStub,
+  type DimensionWatcher,
+} from '../../../utils/dimension-marshal';
+import {
   critical,
   defaultRequest,
   justCritical,
-  type DimensionWatcher,
 } from './util';
 
 const preset = getPreset();
