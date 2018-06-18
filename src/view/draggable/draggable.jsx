@@ -378,8 +378,6 @@ export default class Draggable extends Component<Props> {
         droppableId={droppableId}
         type={type}
         index={index}
-        offset={offset}
-        isDragging={isDragging}
         getDraggableRef={this.getDraggableRef}
       >
         <Moveable

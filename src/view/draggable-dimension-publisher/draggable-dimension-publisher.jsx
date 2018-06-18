@@ -22,8 +22,6 @@ type Props = {|
   droppableId: DroppableId,
   type: TypeId,
   index: number,
-  isDragging: boolean,
-  offset: Position,
   getDraggableRef: () => ?HTMLElement,
   children: Node,
 |}
@@ -95,7 +93,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     this.publishedDescriptor = null;
   }
 
-  getDimension = (windowScroll: Position, windowScrollDiff: Position): DraggableDimension => {
+  getDimension = (windowScroll: Position): DraggableDimension => {
     const targetRef: ?HTMLElement = this.props.getDraggableRef();
     const descriptor: ?DraggableDescriptor = this.publishedDescriptor;
 
@@ -105,27 +103,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     const computedStyles: CSSStyleDeclaration = window.getComputedStyle(targetRef);
     const borderBox: ClientRect = targetRef.getBoundingClientRect();
 
-    // We do not need to fast forward any transitions as the style marshal will
-    // do that for us before a collection
-    const change: Position = (() => {
-      const { isDragging, offset: shift } = this.props;
-      const undoTransform: Position = negate(shift);
-      if (!isDragging) {
-        return undoTransform;
-      }
-
-      // When dragging, position: fixed will avoid any client changes based on scroll.
-      // We are manually applying these client changes based on the change in window scroll
-      // from when the drag started
-      const undoWindowScroll: Position = negate(windowScrollDiff);
-
-      console.log('offseting dragging item by', add(undoTransform, undoWindowScroll));
-
-      return add(undoTransform, undoWindowScroll);
-    })();
-
-    const box: BoxModel = calculateBox(borderBox, computedStyles);
-    const client: BoxModel = offset(box, change);
+    const client: BoxModel = calculateBox(borderBox, computedStyles);
     const page: BoxModel = withScroll(client, windowScroll);
 
     const boxSizing: BoxSizing = computedStyles.boxSizing === 'border-box' ? 'border-box' : 'content-box';

@@ -43,7 +43,6 @@ type Callbacks = {|
 
 type Args = {|
   getProvided: () => Provided,
-  getEntries: () => Entries,
   callbacks: Callbacks
 |}
 

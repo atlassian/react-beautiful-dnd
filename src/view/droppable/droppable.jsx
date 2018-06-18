@@ -19,7 +19,6 @@ export default class Droppable extends Component<Props> {
   /* eslint-disable react/sort-comp */
   styleContext: string
   ref: ?HTMLElement = null
-  placeholderRef: ?Placeholder = null
 
   // Need to declare childContextTypes without flow
   static contextTypes = {
@@ -46,12 +45,6 @@ export default class Droppable extends Component<Props> {
     };
     return value;
   }
-
-  setPlaceholderRef = (placeholder: ?Placeholder) => {
-    this.placeholderRef = placeholder;
-  }
-
-  getPlaceholderRef = (): ?Placeholder => this.placeholderRef;
 
   componentDidMount() {
     if (!this.ref) {
@@ -86,12 +79,7 @@ export default class Droppable extends Component<Props> {
       return null;
     }
 
-    return (
-      <Placeholder
-        ref={this.setPlaceholderRef}
-        placeholder={this.props.placeholder}
-      />
-    );
+    return <Placeholder placeholder={this.props.placeholder} />;
   }
 
   render() {
@@ -122,7 +110,6 @@ export default class Droppable extends Component<Props> {
         droppableId={droppableId}
         type={type}
         direction={direction}
-        getPlaceholder={this.getPlaceholderRef}
         ignoreContainerClipping={ignoreContainerClipping}
         isDropDisabled={isDropDisabled}
         getDroppableRef={this.getDroppableRef}

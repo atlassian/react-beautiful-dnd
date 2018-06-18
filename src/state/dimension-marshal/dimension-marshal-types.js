@@ -22,7 +22,6 @@ import type {
 
 export type GetDraggableDimensionFn = (
   windowScroll: Position,
-  windowScrollDiff: Position
 ) => DraggableDimension;
 
 export type GetDroppableDimensionFn = (
@@ -37,9 +36,6 @@ export type DroppableCallbacks = {|
   // If the Droppable is listening for scroll events - it needs to stop!
   // Can be called on droppables that have not been asked to watch scroll
   unwatchScroll: () => void,
-  // Used when dynamically changing dimensions to obtain accurate snapshots
-  hidePlaceholder: () => void,
-  showPlaceholder: () => void,
 |}
 
 export type DroppableEntry = {|

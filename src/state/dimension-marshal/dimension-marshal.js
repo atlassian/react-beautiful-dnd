@@ -16,7 +16,6 @@ import type {
   DimensionMap,
   LiftRequest,
   Critical,
-  ScrollOptions,
 } from '../../types';
 import type {
   DimensionMarshal,

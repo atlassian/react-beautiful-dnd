@@ -22,15 +22,12 @@ import type {
 } from '../../../src/types';
 
 const preset = getPreset();
-const origin: Position = { x: 0, y: 0 };
 
 const noComputedSpacing = getComputedSpacing({});
 
 type Props = {|
   index?: number,
   draggableId ?: DraggableId,
-  offset ?: Position,
-  isDragging?: boolean,
 |}
 
 class Item extends Component<Props> {
@@ -48,11 +45,10 @@ class Item extends Component<Props> {
     return (
       <DraggableDimensionPublisher
         draggableId={this.props.draggableId || preset.inHome1.descriptor.id}
-        droppableId={preset.inHome1.descriptor.droppableId}
         index={this.props.index || preset.inHome1.descriptor.index}
+        droppableId={preset.inHome1.descriptor.droppableId}
+        type={preset.inHome1.descriptor.type}
         getDraggableRef={this.getRef}
-        offset={this.props.offset || origin}
-        isDragging={this.props.isDragging || false}
       >
         <div ref={this.setRef}>hi</div>
       </DraggableDimensionPublisher>
@@ -98,29 +94,23 @@ describe('DraggableDimensionPublisher', () => {
     it('should update its registration when a descriptor property changes', () => {
       const marshal: DimensionMarshal = getMarshalStub();
 
-      const wrapper = mount(<Item index={3} />, withDimensionMarshal(marshal));
-      const originalDescriptor: DraggableDescriptor = {
-        id: preset.inHome1.descriptor.id,
-        droppableId: preset.inHome1.descriptor.droppableId,
-        index: 3,
-      };
+      const wrapper = mount(<Item />, withDimensionMarshal(marshal));
       // asserting shape of original publish
-      expect(marshal.registerDraggable.mock.calls[0][0]).toEqual(originalDescriptor);
+      expect(marshal.registerDraggable.mock.calls[0][0]).toEqual(preset.inHome1.descriptor);
 
       // updating the index
       wrapper.setProps({
-        index: 4,
+        index: 1000,
       });
       const newDescriptor: DraggableDescriptor = {
-        id: preset.inHome1.descriptor.id,
-        droppableId: preset.inHome1.descriptor.droppableId,
-        index: 4,
+        ...preset.inHome1.descriptor,
+        index: 1000,
       };
-      // old descriptor unpublished
-      expect(marshal.unregisterDraggable).toHaveBeenCalledTimes(1);
-      expect(marshal.unregisterDraggable).toHaveBeenCalledWith(originalDescriptor);
-      // newly published descriptor
-      expect(marshal.registerDraggable.mock.calls[1][0]).toEqual(newDescriptor);
+      expect(marshal.updateDraggable).toHaveBeenCalledWith(
+        preset.inHome1.descriptor,
+        newDescriptor,
+        expect.any(Function),
+      );
     });
 
     it('should not update its registration when a descriptor property does not change on an update', () => {
@@ -128,35 +118,9 @@ describe('DraggableDimensionPublisher', () => {
 
       const wrapper = mount(<Item />, withDimensionMarshal(marshal));
       expect(marshal.registerDraggable).toHaveBeenCalledTimes(1);
-      marshal.registerDraggable.mockReset();
 
       forceUpdate(wrapper);
-      expect(marshal.registerDraggable).not.toHaveBeenCalled();
-    });
-
-    it('should unregister with the previous descriptor when changing', () => {
-      // this is to guard against the case where the id has changed at run time
-      const marshal: DimensionMarshal = getMarshalStub();
-
-      const wrapper = mount(<Item />, withDimensionMarshal(marshal));
-      // asserting shape of original publish
-      expect(marshal.registerDraggable.mock.calls[0][0]).toEqual(preset.inHome1.descriptor);
-
-      // updating the index
-      wrapper.setProps({
-        draggableId: 'my-new-id',
-      });
-      // old descriptor unpublished
-      expect(marshal.unregisterDraggable).toHaveBeenCalledTimes(1);
-      expect(marshal.unregisterDraggable).toHaveBeenCalledWith(
-        // unpublished with old descriptor
-        preset.inHome1.descriptor
-      );
-      // newly published descriptor
-      expect(marshal.registerDraggable.mock.calls[1][0]).toEqual({
-        ...preset.inHome1.descriptor,
-        id: 'my-new-id',
-      });
+      expect(marshal.updateDraggable).not.toHaveBeenCalled();
     });
   });
 
@@ -176,6 +140,7 @@ describe('DraggableDimensionPublisher', () => {
         descriptor: {
           id: 'fake-id',
           droppableId: preset.home.descriptor.id,
+          type: preset.home.descriptor.type,
           index: 10,
         },
         borderBox: {
@@ -201,7 +166,7 @@ describe('DraggableDimensionPublisher', () => {
       // pull the get dimension function out
       const getDimension: GetDraggableDimensionFn = marshal.registerDraggable.mock.calls[0][1];
       // execute it to get the dimension
-      const result: DraggableDimension = getDimension();
+      const result: DraggableDimension = getDimension({ x: 0, y: 0 });
 
       expect(result).toEqual(expected);
     });
@@ -217,6 +182,7 @@ describe('DraggableDimensionPublisher', () => {
         descriptor: {
           id: 'fake-id',
           droppableId: preset.home.descriptor.id,
+          type: preset.home.descriptor.type,
           index: 10,
         },
         borderBox: {
@@ -242,7 +208,7 @@ describe('DraggableDimensionPublisher', () => {
       // pull the get dimension function out
       const getDimension: GetDraggableDimensionFn = marshal.registerDraggable.mock.calls[0][1];
       // execute it to get the dimension
-      const result: DraggableDimension = getDimension();
+      const result: DraggableDimension = getDimension({ x: 0, y: 0 });
 
       expect(result).toEqual(expected);
     });
@@ -267,6 +233,7 @@ describe('DraggableDimensionPublisher', () => {
         descriptor: {
           id: 'fake-id',
           droppableId: preset.home.descriptor.id,
+          type: preset.home.descriptor.type,
           index: 10,
         },
         borderBox,
@@ -287,7 +254,7 @@ describe('DraggableDimensionPublisher', () => {
       // pull the get dimension function out
       const getDimension: GetDraggableDimensionFn = marshal.registerDraggable.mock.calls[0][1];
       // execute it to get the dimension
-      const result: DraggableDimension = getDimension();
+      const result: DraggableDimension = getDimension(preset.windowScroll);
 
       expect(result).toEqual(expected);
 
@@ -301,10 +268,9 @@ describe('DraggableDimensionPublisher', () => {
             <DraggableDimensionPublisher
               draggableId={preset.inHome1.descriptor.id}
               droppableId={preset.inHome1.descriptor.droppableId}
+              type={preset.inHome1.descriptor.type}
               index={preset.inHome1.descriptor.index}
               getDraggableRef={() => undefined}
-              offset={origin}
-              isDragging={false}
             >
               <div>hi</div>
             </DraggableDimensionPublisher>
@@ -320,106 +286,6 @@ describe('DraggableDimensionPublisher', () => {
 
       // when we call the get dimension function without a ref things will explode
       expect(getDimension).toThrow();
-    });
-  });
-});
-
-describe('offset', () => {
-  describe('when not dragging', () => {
-    it.only('should account for any existing offset (caused by a drag)', () => {
-      const original: DraggableDimension = getDraggableDimension({
-        descriptor: {
-          id: 'fake-id',
-          droppableId: preset.home.descriptor.id,
-          index: 0,
-        },
-        borderBox: {
-          top: 0,
-          right: 100,
-          bottom: 100,
-          left: 0,
-        },
-      });
-
-      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => original.client.borderBox);
-      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noComputedSpacing);
-      const marshal: DimensionMarshal = getMarshalStub();
-      const transform: Position = { x: 10, y: 20 };
-      const undo: Position = negate(transform);
-      const shiftedBox: BoxModel = offset(original.client, undo);
-
-      mount(
-        <Item
-          draggableId={original.descriptor.id}
-          index={original.descriptor.index}
-          offset={transform}
-        />,
-        withDimensionMarshal(marshal)
-      );
-
-      // pull the get dimension function out
-      const getDimension: GetDraggableDimensionFn = marshal.registerDraggable.mock.calls[0][1];
-      // execute it to get the dimension
-      const result: DraggableDimension = getDimension(transform, origin);
-
-      const expected: DraggableDimension = getDraggableDimension({
-        descriptor: original.descriptor,
-        borderBox: shiftedBox.borderBox,
-      });
-
-      expect(result.client).toEqual(expected.client);
-    });
-  });
-
-  describe('when dragging', () => {
-    it.only('should account for any change in window scroll', () => {
-      const originalWindowScroll: Position = preset.windowScroll;
-      const currentWindowScroll: Position = add(preset.windowScroll, { x: 10, y: 20 });
-      const windowScrollDiff: Position = subtract(currentWindowScroll, originalWindowScroll);
-      const original: DraggableDimension = getDraggableDimension({
-        descriptor: {
-          id: 'fake-id',
-          droppableId: preset.home.descriptor.id,
-          index: 0,
-        },
-        borderBox: {
-          top: 0,
-          right: 100,
-          bottom: 100,
-          left: 0,
-        },
-        windowScroll: originalWindowScroll,
-      });
-
-      const marshal: DimensionMarshal = getMarshalStub();
-      // client border box is incorrect as it has not taken into account the scroll change
-      const shifted: Spacing = offsetByPosition(original.client.borderBox, windowScrollDiff);
-      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => shifted);
-      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noComputedSpacing);
-
-      mount(
-        <Item
-          draggableId={original.descriptor.id}
-          index={original.descriptor.index}
-          offset={origin}
-          isDragging
-        />,
-        withDimensionMarshal(marshal)
-      );
-
-      // pull the get dimension function out
-      const getDimension: GetDraggableDimensionFn = marshal.registerDraggable.mock.calls[0][1];
-      // execute it to get the dimension
-      const result: DraggableDimension = getDimension(currentWindowScroll, windowScrollDiff);
-
-      const unshifted: DraggableDimension = getDraggableDimension({
-        descriptor: original.descriptor,
-        // undoing shift caused by change in window scroll
-        borderBox: original.client.borderBox,
-        windowScroll: currentWindowScroll,
-      });
-
-      expect(result).toEqual(unshifted);
     });
   });
 });

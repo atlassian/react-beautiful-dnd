@@ -8,7 +8,6 @@ import rafSchedule from 'raf-schd';
 import getClosestScrollable from '../get-closest-scrollable';
 import { dimensionMarshalKey } from '../context-keys';
 import { getDroppableDimension, type Closest } from '../../state/droppable-dimension';
-import Placeholder from '../placeholder';
 import type {
   DimensionMarshal,
   DroppableCallbacks,
@@ -30,7 +29,6 @@ type Props = {|
   ignoreContainerClipping: boolean,
   isDropDisabled: boolean,
   getDroppableRef: () => ?HTMLElement,
-  getPlaceholder: () => ?Placeholder,
   children: Node,
 |}
 
@@ -56,8 +54,6 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       getDimensionAndWatchScroll: this.getDimensionAndWatchScroll,
       unwatchScroll: this.unwatchScroll,
       scroll: this.scroll,
-      showPlaceholder: this.showPlaceholder,
-      hidePlaceholder: this.hidePlaceholder,
     };
     this.callbacks = callbacks;
   }
@@ -75,10 +71,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   }
 
   memoizedUpdateScroll = memoizeOne((x: number, y: number) => {
-    if (!this.publishedDescriptor) {
-      console.error('Cannot update scroll on unpublished droppable');
-      return;
-    }
+    invariant(this.publishedDescriptor, 'Cannot update scroll on unpublished droppable');
 
     const newScroll: Position = { x, y };
     const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
@@ -152,22 +145,6 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     // There was a closest scrollable
     this.closestScrollable.removeEventListener('scroll', this.onClosestScroll);
     this.closestScrollable = null;
-  }
-
-  hidePlaceholder = () => {
-    const placeholder: ?Placeholder = this.props.getPlaceholder();
-
-    if (placeholder) {
-      placeholder.hide();
-    }
-  }
-
-  showPlaceholder = () => {
-    const placeholder: ?Placeholder = this.props.getPlaceholder();
-
-    if (placeholder) {
-      placeholder.show();
-    }
   }
 
   componentDidMount() {

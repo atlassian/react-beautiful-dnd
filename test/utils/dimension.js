@@ -176,7 +176,7 @@ type GetDraggableArgs = {|
 export const getDraggableDimension = ({
   descriptor,
   borderBox,
-  windowScroll,
+  windowScroll = origin,
   margin,
   border,
   padding,
@@ -228,7 +228,7 @@ export const getDroppableDimension = ({
   margin,
   padding,
   border,
-  windowScroll,
+  windowScroll = origin,
   closest,
   isEnabled = true,
   direction = 'vertical',
