@@ -40,13 +40,9 @@ export default ({
   const centerDiff: Position = subtract(newClientBorderBoxCenter, oldClientBorderBoxCenter);
   // const displacement: Position = negate(centerDiff);
 
-  console.log('center offset', centerDiff);
-
   const clientSelection: Position = add(
     oldInitial.client.selection, centerDiff
   );
-  console.log('old client selection', oldInitial.client.selection);
-  console.log('new client selection', clientSelection);
 
   const initial: DragPositions = (() => {
     const client: ItemPositions = {
