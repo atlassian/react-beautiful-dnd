@@ -3,6 +3,7 @@ import type { Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import middleware from '../../../../src/state/middleware/drop';
 import createStore from './util/create-store';
+import getHomeLocation from '../../../../src/state/get-home-location';
 import { add, patch } from '../../../../src/state/position';
 import { getPreset, makeScrollable } from '../../../utils/dimension';
 import {
@@ -22,9 +23,8 @@ import {
 } from '../../../../src/state/action-creators';
 import {
   initialPublishArgs,
-  initialBulkReplaceArgs,
   getDragStart,
-  getHomeLocation,
+  critical,
 } from '../../../utils/preset-action-args';
 import noImpact, { noMovement } from '../../../../src/state/no-impact';
 import { vertical } from '../../../../src/state/axis';
@@ -496,11 +496,11 @@ describe('drop animation required', () => {
             isBeyondStartPosition: true,
           },
           direction: preset.home.axis.direction,
-          destination: getHomeLocation(),
+          destination: getHomeLocation(critical),
         },
         result: {
           ...getDragStart(),
-          destination: getHomeLocation(),
+          destination: getHomeLocation(critical),
           reason: 'DROP',
         },
       };

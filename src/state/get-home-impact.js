@@ -1,5 +1,6 @@
 // @flow
 import { patch } from './position';
+import getHomeLocation from './get-home-location';
 import type {
   Critical,
   DimensionMap,
@@ -20,10 +21,7 @@ export default (critical: Critical, dimensions: DimensionMap) => {
       amount: patch(axis.line, draggable.client.marginBox[axis.size]),
     },
     direction: axis.direction,
-    destination: {
-      index: critical.draggable.index,
-      droppableId: critical.droppable.id,
-    },
+    destination: getHomeLocation(critical),
   };
 };
 

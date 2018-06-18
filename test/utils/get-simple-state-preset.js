@@ -21,12 +21,13 @@ import type {
   DraggableId,
   DragImpact,
   Critical,
-  BulkCollectionState,
+  CollectingState,
   ScrollOptions,
   Viewport,
   ItemPositions,
   DragPositions,
   DraggingState,
+  DropPendingState,
 } from '../../src/types';
 
 const scheduled: ScrollOptions = {
@@ -83,6 +84,7 @@ export default (axis?: Axis = vertical) => {
     const result: DraggingState = {
       phase: 'DRAGGING',
       critical: ourCritical,
+      isDragging: true,
       autoScrollMode: 'FLUID',
       dimensions: preset.dimensions,
       initial,
@@ -96,11 +98,11 @@ export default (axis?: Axis = vertical) => {
     return result;
   };
 
-  const bulkCollecting = (): BulkCollectionState => ({
-    phase: 'BULK_COLLECTING',
+  const collecting = (): CollectingState => ({
+    phase: 'COLLECTING',
     ...dragging(),
     // eslint-disable-next-line
-    phase: 'BULK_COLLECTING',
+    phase: 'COLLECTING',
   });
 
   type DropPendingArgs = {
@@ -227,7 +229,7 @@ export default (axis?: Axis = vertical) => {
     userCancel,
     dropComplete,
     allPhases,
-    bulkCollecting,
+    collecting,
   };
 };
 

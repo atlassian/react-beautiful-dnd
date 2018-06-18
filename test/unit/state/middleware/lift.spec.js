@@ -18,13 +18,14 @@ import {
   updateDroppableScroll,
   updateDroppableIsEnabled,
 } from '../../../../src/state/action-creators';
+import getHomeLocation from '../../../../src/state/get-home-location';
 import {
   viewport,
   liftArgs,
   initialPublishArgs,
   initialBulkReplaceArgs,
   getDragStart,
-  getHomeLocation,
+  critical,
 } from '../../../utils/preset-action-args';
 import createDimensionMarshal from '../../../../src/state/dimension-marshal/dimension-marshal';
 import { populateMarshal } from '../../view/dimension-marshal/util';
@@ -107,11 +108,11 @@ it('should flush any animating drops', () => {
         isBeyondStartPosition: false,
       },
       direction: 'vertical',
-      destination: getHomeLocation(),
+      destination: getHomeLocation(critical),
     },
     result: {
       ...getDragStart(),
-      destination: getHomeLocation(),
+      destination: getHomeLocation(critical),
       reason: 'DROP',
     },
   };

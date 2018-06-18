@@ -54,9 +54,7 @@ const defaultMapProps: MapProps = {
 // Draggable gets its own selector
 export const makeMapStateToProps = (): Selector => {
   const memoizedOffset = memoizeOne(
-    (x: number, y: number): Position => ({
-      x, y,
-    }),
+    (x: number, y: number): Position => ({ x, y }),
   );
 
   const getNotDraggingProps = memoizeOne(
@@ -116,9 +114,7 @@ export const makeMapStateToProps = (): Selector => {
 
   const draggingSelector = (state: State, ownProps: OwnProps): ?MapProps => {
     // Dragging
-    if (state.phase === 'DRAGGING' ||
-      state.phase === 'COLLECTING' ||
-      state.phase === 'DROP_PENDING') {
+    if (state.isDragging) {
       // not the dragging item
       if (state.critical.draggable.id !== ownProps.draggableId) {
         return null;
@@ -169,10 +165,7 @@ export const makeMapStateToProps = (): Selector => {
 
   const movingOutOfTheWaySelector = (state: State, ownProps: OwnProps): ?MapProps => {
     // Dragging
-    if (
-      state.phase === 'DRAGGING' ||
-      state.phase === 'COLLECTING' ||
-      state.phase === 'DROP_PENDING') {
+    if (state.isDragging) {
       // we do not care about the dragging item
       if (state.critical.draggable.id === ownProps.draggableId) {
         return null;

@@ -3,10 +3,10 @@ import { getRect, type Rect, type Position } from 'css-box-model';
 import { getPreset } from './dimension';
 import getViewport from '../../src/view/window/get-viewport';
 import { offsetByPosition } from '../../src/state/spacing';
+import getHomeLocation from '../../src/state/get-home-location';
 import type {
   Critical,
   DragStart,
-  DraggableLocation,
   ItemPositions,
   Viewport,
   DimensionMap,
@@ -80,17 +80,6 @@ export const withoutCritical: DimensionMap = (() => {
 
   return result;
 })();
-
-export const initialBulkReplaceArgs: BulkReplaceArgs = {
-  dimensions: withoutCritical,
-  viewport,
-  critical: null,
-};
-
-export const getHomeLocation = (custom?: Critical = critical): DraggableLocation => ({
-  droppableId: custom.droppable.id,
-  index: custom.draggable.index,
-});
 
 export const getDragStart = (custom?: Critical = critical): DragStart => ({
   draggableId: custom.draggable.id,

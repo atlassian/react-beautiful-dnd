@@ -4,8 +4,8 @@ import React, { Component } from 'react';
 import { mount } from 'enzyme';
 import { type Position } from 'css-box-model';
 import Draggable, { makeMapStateToProps } from '../../../src/view/draggable/connected-draggable';
-import { getPreset, withImpact } from '../../utils/dimension';
-import { negate } from '../../../src/state/position';
+import { getPreset } from '../../utils/dimension';
+import { negate, add } from '../../../src/state/position';
 import createDimensionMarshal from '../../../src/state/dimension-marshal/dimension-marshal';
 import getStatePreset from '../../utils/get-simple-state-preset';
 import {
@@ -17,6 +17,9 @@ import {
   withCanLift,
 } from '../../utils/get-context-options';
 import forceUpdate from '../../utils/force-update';
+import getHomeImpact from '../../../src/state/get-home-impact';
+import noImpact from '../../../src/state/no-impact';
+import getPageItemPositions from '../../../src/state/get-page-item-positions';
 import type { DimensionMarshal } from '../../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
   Selector,
@@ -26,32 +29,36 @@ import type {
 } from '../../../src/view/draggable/draggable-types';
 import type {
   State,
-  CurrentDragPositions,
+  ItemPositions,
   DragImpact,
   DraggableDimension,
   DraggableLocation,
+  DraggingState,
+  CollectingState,
+  DropPendingState,
 } from '../../../src/types';
 
 const preset = getPreset();
 const state = getStatePreset();
-const move = (previous: State, offset: Position): State => {
-  const clientPositions: CurrentDragPositions = {
+
+type IsDraggingState = DraggingState | CollectingState | DropPendingState
+
+const move = (previous: IsDraggingState, offset: Position): IsDraggingState => {
+  const client: ItemPositions = {
     offset,
-    // not calculating for this test
-    selection: { x: 0, y: 0 },
-    borderBoxCenter: { x: 0, y: 0 },
+    selection: add(previous.initial.client.selection, offset),
+    borderBoxCenter: add(previous.initial.client.borderBoxCenter, offset),
   };
+  const page: ItemPositions = getPageItemPositions(client, previous.viewport.scroll.current);
 
   return {
+    // appeasing flow
+    phase: 'DRAGGING',
     ...previous,
-    drag: {
-      ...previous.drag,
-      current: {
-        // $ExpectError - not checking for null
-        ...previous.drag.current,
-        client: clientPositions,
-        page: clientPositions,
-      },
+    // eslint-disable-next-line
+    phase: previous.phase,
+    current: {
+      client, page,
     },
   };
 };
@@ -73,21 +80,120 @@ describe('Connected Draggable', () => {
     console.error.mockRestore();
   });
 
-  describe('is currently dragging', () => {
+  describe.only('is currently dragging', () => {
     const ownProps: OwnProps = getOwnProps(preset.inHome1);
+    const draggingStates: IsDraggingState[] = [
+      state.dragging(),
+      state.collecting(),
+      state.dropPending(),
+    ];
 
-    it.only('should log an error when there is invalid drag state', () => {
-      const invalid: State = {
-        ...state.dragging(),
-        drag: null,
-      };
+    draggingStates.forEach((current: IsDraggingState) => {
+      describe(`in phase: ${current.phase}`, () => {
+        it('should move the dragging item to the current offset', () => {
+          const selector: Selector = makeMapStateToProps();
+
+          const result: MapProps = selector(
+            move(current, { x: 20, y: 30 }),
+            ownProps
+          );
+
+          const expected: MapProps = {
+            isDropAnimating: false,
+            isDragging: true,
+            offset: { x: 20, y: 30 },
+            shouldAnimateDragMovement: false,
+            shouldAnimateDisplacement: false,
+            dimension: preset.inHome1,
+            draggingOver: preset.home.descriptor.id,
+          };
+          expect(result).toEqual(expected);
+        });
+
+        it('should control drag animation', () => {
+          const selector: Selector = makeMapStateToProps();
+          const withAnimation: IsDraggingState = ({
+            ...current,
+            shouldAnimate: true,
+          }: any);
+
+          expect(selector(withAnimation, ownProps).shouldAnimateDragMovement).toBe(true);
+
+          const withoutAnimation: IsDraggingState = ({
+            ...current,
+            shouldAnimate: false,
+          }: any);
+
+          expect(selector(withoutAnimation, ownProps).shouldAnimateDragMovement).toBe(false);
+        });
+
+        it('should not break memoization on multiple calls to the same offset', () => {
+          const selector: Selector = makeMapStateToProps();
+
+          const result1: MapProps = selector(
+            move(current, { x: 100, y: 200 }),
+            ownProps
+          );
+          const result2: MapProps = selector(
+            move(current, { x: 100, y: 200 }),
+            ownProps
+          );
+
+          expect(result1).toBe(result2);
+
+          // also checking with new top level reference
+          const newCurrent: IsDraggingState = ({ ...current }: any);
+          const result3: MapProps = selector(
+            move(newCurrent, { x: 100, y: 200 }),
+            ownProps
+          );
+
+          expect(result1).toBe(result3);
+        });
+
+        it('should break memoization on multiple calls if moving to a new position', () => {
+          const selector: Selector = makeMapStateToProps();
+
+          const result1: MapProps = selector(
+            move(current, { x: 100, y: 200 }),
+            ownProps
+          );
+          const result2: MapProps = selector(
+            move(current, { x: 101, y: 200 }),
+            ownProps
+          );
+
+          expect(result1).not.toBe(result2);
+          expect(result1).not.toEqual(result2);
+        });
+
+        it('should indicate when over a droppable', () => {
+          const selector: Selector = makeMapStateToProps();
+
+          const inHome: IsDraggingState = ({
+            ...current,
+            impact: getHomeImpact(state.critical, preset.dimensions),
+          }: any);
+          const noWhere: IsDraggingState = ({
+            ...current,
+            impact: noImpact,
+          }: any);
+
+          expect(selector(inHome, ownProps).draggingOver).toBe(state.critical.droppable.id),
+          expect(selector(noWhere, ownProps).draggingOver).toBe(null);
+        })
+      });
+    });
+
+    it('should not break memoization when moving between dragging phases', () => {
       const selector: Selector = makeMapStateToProps();
-      const defaultMapProps: MapProps = selector(state.idle, ownProps);
 
-      const result: MapProps = selector(invalid, ownProps);
+      const first: MapProps = selector(state.dragging(), ownProps);
+      const second: MapProps = selector(state.collecting(), ownProps);
+      const third: MapProps = selector(state.dropPending(), ownProps);
 
-      expect(result).toBe(defaultMapProps);
-      expect(console.error).toHaveBeenCalled();
+      expect(first).toBe(second);
+      expect(second).toBe(third);
     });
 
     describe('is not over a droppable', () => {
@@ -99,17 +205,16 @@ describe('Connected Draggable', () => {
           ownProps
         );
 
-        expect(result).toEqual({
+        const expected: MapProps = {
           isDropAnimating: false,
           isDragging: true,
           offset: { x: 20, y: 30 },
           shouldAnimateDragMovement: false,
           shouldAnimateDisplacement: false,
           dimension: preset.inHome1,
-          // uses the home direction by default
-          direction: preset.home.axis.direction,
-          draggingOver: null,
-        });
+          draggingOver: preset.home.descriptor.id,
+        };
+        expect(result).toEqual(expected);
       });
 
       it('should control whether drag movement is allowed based the current state', () => {
@@ -1020,7 +1125,6 @@ describe('Connected Draggable', () => {
         Array.from({ length: 3 }).forEach(() => {
           const result: MapProps = selector(current, ownProps);
           expect(result).toBe(defaultMapProps);
-          expect(selector.recomputations()).toBe(1);
         });
       });
     });
