@@ -5,6 +5,7 @@ import {
   combine,
   withStore,
   withDroppableId,
+  withDroppableType,
   withDimensionMarshal,
   withStyleContext,
   withCanLift,
@@ -12,6 +13,11 @@ import {
 import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import { getMarshalStub, getDroppableCallbacks } from '../../../utils/dimension-marshal';
 import { getPreset } from '../../../utils/dimension';
+import forceUpdate from '../../../utils/force-update';
+import Draggable from '../../../../src/view/draggable/connected-draggable';
+import type {
+  Provided,
+} from '../../../../src/view/draggable/draggable-types';
 
 const preset = getPreset();
 // creating our own marshal so we can publish a droppable
@@ -20,6 +26,7 @@ const marshal: DimensionMarshal = getMarshalStub();
 const options: Object = combine(
   withStore(),
   withDroppableId(preset.home.descriptor.id),
+  withDroppableType(preset.home.descriptor.type),
   withDimensionMarshal(marshal),
   withStyleContext(),
   withCanLift(),

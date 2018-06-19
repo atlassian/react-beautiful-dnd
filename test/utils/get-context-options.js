@@ -1,9 +1,9 @@
 // @flow
 import PropTypes from 'prop-types';
-import { storeKey, droppableIdKey, dimensionMarshalKey, styleContextKey, canLiftContextKey } from '../../src/view/context-keys';
+import { storeKey, droppableIdKey, dimensionMarshalKey, styleContextKey, canLiftContextKey, droppableTypeKey } from '../../src/view/context-keys';
 import createStore from '../../src/state/create-store';
-import createDimensionMarshal from '../../src/state/dimension-marshal/dimension-marshal';
-import type { DroppableId } from '../../src/types';
+import { getMarshalStub } from './dimension-marshal';
+import type { DroppableId, TypeId } from '../../src/types';
 import type { DimensionMarshal } from '../../src/state/dimension-marshal/dimension-marshal-types';
 import type { StyleMarshal } from '../../src/view/style-marshal/style-marshal-types';
 
@@ -12,7 +12,22 @@ import type { StyleMarshal } from '../../src/view/style-marshal/style-marshal-ty
 export const withStore = () => ({
   context: {
     // Each consumer will get their own store
-    [storeKey]: createStore(),
+    [storeKey]: createStore({
+      getDimensionMarshal: () => getMarshalStub(),
+      styleMarshal: {
+        collecting: jest.fn(),
+        dragging: jest.fn(),
+        dropping: jest.fn(),
+        resting: jest.fn(),
+        styleContext: 'fake-style-context',
+        unmount: jest.fn(),
+        mount: jest.fn(),
+      },
+      getHooks: () => ({
+        onDragEnd: () => { },
+      }),
+      announce: () => { },
+    }),
   },
   childContextTypes: {
     [storeKey]: PropTypes.shape({
@@ -29,6 +44,15 @@ export const withDroppableId = (droppableId: DroppableId): Object => ({
   },
   childContextTypes: {
     [droppableIdKey]: PropTypes.string.isRequired,
+  },
+});
+
+export const withDroppableType = (type: TypeId): Object => ({
+  context: {
+    [droppableTypeKey]: type,
+  },
+  childContextTypes: {
+    [droppableTypeKey]: PropTypes.string.isRequired,
   },
 });
 
@@ -52,14 +76,7 @@ export const withCanLift = (): Object => ({
 
 export const withDimensionMarshal = (marshal?: DimensionMarshal): Object => ({
   context: {
-    [dimensionMarshalKey]: marshal || createDimensionMarshal({
-      cancel: () => { },
-      publishDraggable: () => { },
-      publishDroppable: () => { },
-      updateDroppableScroll: () => { },
-      updateDroppableIsEnabled: () => { },
-      bulkPublish: () => { },
-    }),
+    [dimensionMarshalKey]: marshal || getMarshalStub(),
   },
   childContextTypes: {
     [dimensionMarshalKey]: PropTypes.object.isRequired,

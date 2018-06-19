@@ -60,6 +60,17 @@ draggingStates.forEach((current: IsDraggingState) => {
       expect(selector(withoutAnimation, ownProps).shouldAnimateDragMovement).toBe(false);
     });
 
+    it('should indicate when over a droppable', () => {
+      const selector: Selector = makeMapStateToProps();
+
+      const inHome: IsDraggingState =
+        withImpact(current, getHomeImpact(state.critical, preset.dimensions));
+      const noWhere: IsDraggingState = withImpact(current, noImpact);
+
+      expect(selector(inHome, ownProps).draggingOver).toBe(state.critical.droppable.id);
+      expect(selector(noWhere, ownProps).draggingOver).toBe(null);
+    });
+
     it('should not break memoization on multiple calls to the same offset', () => {
       const selector: Selector = makeMapStateToProps();
 
@@ -84,7 +95,7 @@ draggingStates.forEach((current: IsDraggingState) => {
       expect(result1).toBe(result3);
     });
 
-    it('should break memoization on multiple calls if moving to a new position', () => {
+    it('should break memoization on multiple calls if moving to a new offset', () => {
       const selector: Selector = makeMapStateToProps();
 
       const result1: MapProps = selector(
@@ -98,17 +109,6 @@ draggingStates.forEach((current: IsDraggingState) => {
 
       expect(result1).not.toBe(result2);
       expect(result1).not.toEqual(result2);
-    });
-
-    it('should indicate when over a droppable', () => {
-      const selector: Selector = makeMapStateToProps();
-
-      const inHome: IsDraggingState =
-        withImpact(current, getHomeImpact(state.critical, preset.dimensions));
-      const noWhere: IsDraggingState = withImpact(current, noImpact);
-
-      expect(selector(inHome, ownProps).draggingOver).toBe(state.critical.droppable.id);
-      expect(selector(noWhere, ownProps).draggingOver).toBe(null);
     });
   });
 });
