@@ -9,7 +9,7 @@ import type {
 } from '../../../../src/view/droppable/droppable-types';
 import getOwnProps from './get-own-props';
 import { getPreset } from '../../../utils/dimension';
-import { move, type IsDraggingState } from '../../../utils/dragging-state';
+import { move, type IsDraggingState, withImpact } from '../../../utils/dragging-state';
 import noImpact from '../../../../src/state/no-impact';
 
 const preset = getPreset();
@@ -19,10 +19,6 @@ const restingProps: MapProps = {
   isDraggingOver: false,
   draggingOverWith: null,
   placeholder: null,
-};
-
-const execute = (ownProps: OwnProps) => {
-
 };
 
 describe('home list', () => {
@@ -102,5 +98,96 @@ describe('home list', () => {
 });
 
 describe('foreign list', () => {
-  // as above, but also that placeholder is there!
+  const ownProps: OwnProps = getOwnProps(preset.foreign);
+  it('should not break memoization between IDLE and PREPARING phases', () => {
+    const selector: Selector = makeMapStateToProps();
+
+    const defaultProps: MapProps = selector(state.idle, ownProps);
+    // checking value
+    expect(defaultProps).toEqual(restingProps);
+    // checking memoization
+    expect(selector(state.preparing, ownProps)).toBe(defaultProps);
+  });
+
+  describe('is dragging over', () => {
+    const overForeign: DragImpact = {
+      movement: {
+        displaced: [],
+        amount: { x: 0, y: 0 },
+        isBeyondStartPosition: false,
+      },
+      direction: preset.foreign.axis.direction,
+      destination: {
+        index: 0,
+        droppableId: preset.foreign.descriptor.id,
+      },
+    };
+
+    it('should indicate that it is being dragged over', () => {
+      const selector: Selector = makeMapStateToProps();
+      const current: IsDraggingState = withImpact(
+        state.dragging(preset.inHome1.descriptor.id),
+        overForeign,
+      );
+      const props: MapProps = selector(current, ownProps);
+
+      const expected: MapProps = {
+        isDraggingOver: true,
+        draggingOverWith: preset.inHome1.descriptor.id,
+        // using placeholder when in foreign list
+        placeholder: preset.inHome1.placeholder,
+      };
+      expect(props).toEqual(expected);
+    });
+
+    it('should not break memoization between moves', () => {
+      const selector: Selector = makeMapStateToProps();
+      const base: IsDraggingState = withImpact(
+        state.dragging(preset.inHome1.descriptor.id),
+        overForeign,
+      );
+      const first: IsDraggingState = move(base, { x: 1, y: 1 });
+      const second: IsDraggingState = move(first, { x: 0, y: 1 });
+      const third: IsDraggingState = move(second, { x: -1, y: 0 });
+      const props1: MapProps = selector(first, ownProps);
+      const props2: MapProps = selector(second, ownProps);
+      const props3: MapProps = selector(third, ownProps);
+
+      const expected: MapProps = {
+        isDraggingOver: true,
+        draggingOverWith: preset.inHome1.descriptor.id,
+        // using placeholder when in foreign list
+        placeholder: preset.inHome1.placeholder,
+      };
+      expect(props1).toEqual(expected);
+      // memoization check
+      expect(props2).toBe(props1);
+      expect(props3).toBe(props1);
+    });
+  });
+
+  describe('is not dragging over', () => {
+    const getNoWhere = (): DraggingState => ({
+      ...state.dragging(preset.inHome1.descriptor.id),
+      impact: { ...noImpact },
+    });
+
+    it('should indicate that it is not being dragged over', () => {
+      const selector: Selector = makeMapStateToProps();
+
+      const first: MapProps = selector(getNoWhere(), ownProps);
+      expect(first).toEqual(restingProps);
+    });
+
+    it('should not break memoization between moves', () => {
+      const selector: Selector = makeMapStateToProps();
+
+      const first: MapProps = selector(getNoWhere(), ownProps);
+      expect(first).toEqual(restingProps);
+
+      expect(selector(move(getNoWhere(), { x: 1, y: 1 }), ownProps)).toBe(first);
+      expect(selector(move(getNoWhere(), { x: 1, y: 1 }), ownProps)).toBe(first);
+      expect(selector(move(getNoWhere(), { x: 1, y: 1 }), ownProps)).toBe(first);
+    });
+  });
 });
