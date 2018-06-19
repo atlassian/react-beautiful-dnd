@@ -5,8 +5,9 @@ import { getPreset } from '../../../utils/dimension';
 import { patch, negate } from '../../../../src/state/position';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import {
-  getOwnProps, draggingStates, withImpact, withPending, type IsDraggingState,
-} from './util';
+  draggingStates, withImpact, withPending, type IsDraggingState,
+} from '../../../utils/dragging-state';
+import getOwnProps from './get-own-props';
 import type {
   Selector,
   OwnProps,

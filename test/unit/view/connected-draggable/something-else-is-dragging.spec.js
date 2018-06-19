@@ -6,12 +6,9 @@ import noImpact from '../../../../src/state/no-impact';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import { negate, patch } from '../../../../src/state/position';
 import {
-  move,
-  getOwnProps,
-  draggingStates,
-  withImpact,
-  type IsDraggingState,
-} from './util';
+  draggingStates, withImpact, move, type IsDraggingState,
+} from '../../../utils/dragging-state';
+import getOwnProps from './get-own-props';
 import type {
   Selector,
   OwnProps,

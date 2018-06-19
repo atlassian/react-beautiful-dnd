@@ -11,11 +11,11 @@ import type {
 } from '../../../../src/view/draggable/draggable-types';
 import {
   move,
-  getOwnProps,
   draggingStates,
   withImpact,
   type IsDraggingState,
-} from './util';
+} from '../../../utils/dragging-state';
+import getOwnProps from './get-own-props';
 
 const preset = getPreset();
 const state = getStatePreset();

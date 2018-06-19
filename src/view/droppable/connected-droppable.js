@@ -10,6 +10,7 @@ import type {
   DraggableId,
   DraggableLocation,
   DraggableDimension,
+  DraggableDescriptor,
   Placeholder,
 } from '../../types';
 import type {
@@ -21,44 +22,31 @@ import type {
 
 // Returning a function to ensure each
 // Droppable gets its own selector
-export const makeSelector = (): Selector => {
-  const getIsDraggingOver = memoizeOne(
-    (id: DroppableId, destination: ?DraggableLocation): boolean => {
-      if (!destination) {
-        return false;
-      }
-      return destination.droppableId === id;
-    },
-  );
-
-  const getPlaceholder = memoizeOne(
-    (id: DroppableId,
-      destination: ?DraggableLocation,
-      draggable: ?DraggableDimension
-    ): ?Placeholder => {
-      // not dragging anything
-      if (!draggable) {
-        return null;
-      }
-
-      // not dragging over any droppable
-      if (!destination) {
-        return null;
-      }
-
-      // no placeholder needed when dragging over the home droppable
-      if (id === draggable.descriptor.droppableId) {
-        return null;
-      }
-
-      // not over this droppable
-      if (id !== destination.droppableId) {
-        return null;
-      }
-
-      return draggable.placeholder;
+export const makeMapStateToProps = (): Selector => {
+  const getIsDraggingOver = (id: DroppableId, destination: ?DraggableLocation): boolean => {
+    if (!destination) {
+      return false;
     }
-  );
+    return destination.droppableId === id;
+  };
+
+  const shouldUsePlaceholder = (
+    id: DroppableId,
+    descriptor: DraggableDescriptor,
+    destination: ?DraggableLocation,
+  ): boolean => {
+    if (!destination) {
+      return false;
+    }
+
+    // Do not use a placeholder when over the home list
+    if (id === descriptor.droppableId) {
+      return false;
+    }
+
+    // TODO: no placeholder if over foreign list
+    return id === destination.droppableId;
+  };
 
   const getMapProps = memoizeOne(
     (isDraggingOver: boolean,
@@ -78,30 +66,28 @@ export const makeSelector = (): Selector => {
 
     const id: DroppableId = ownProps.droppableId;
 
-    if (state.phase === 'DRAGGING' || state.phase === 'COLLECTING' || state.phase === 'DROP_PENDING') {
-      const isDraggingOver: boolean = getIsDraggingOver(id, state.impact.destination);
+    if (state.isDragging) {
+      const destination: ?DraggableLocation = state.impact.destination;
+      const isDraggingOver: boolean = getIsDraggingOver(id, destination);
       const draggableId: DraggableId = state.critical.draggable.id;
       const draggingOverWith: ?DraggableId = isDraggingOver ? draggableId : null;
+      const draggable: DraggableDimension = state.dimensions.draggables[draggableId];
 
-      const placeholder: ?Placeholder = getPlaceholder(
-        id,
-        state.impact.destination,
-        state.dimensions.draggables[draggableId],
-      );
+      const placeholder: ?Placeholder =
+        shouldUsePlaceholder(id, draggable.descriptor, destination) ? draggable.placeholder : null;
 
       return getMapProps(isDraggingOver, draggingOverWith, placeholder);
     }
 
     if (state.phase === 'DROP_ANIMATING') {
-      const isDraggingOver = getIsDraggingOver(id, state.pending.impact.destination);
+      const destination: ?DraggableLocation = state.pending.impact.destination;
+      const isDraggingOver = getIsDraggingOver(id, destination);
       const draggableId: DraggableId = state.pending.result.draggableId;
       const draggingOverWith: ?DraggableId = isDraggingOver ? draggableId : null;
+      const draggable: DraggableDimension = state.dimensions.draggables[draggableId];
 
-      const placeholder: ?Placeholder = getPlaceholder(
-        id,
-        state.pending.result.destination,
-        state.dimensions.draggables[draggableId],
-      );
+      const placeholder: ?Placeholder =
+        shouldUsePlaceholder(id, draggable.descriptor, destination) ? draggable.placeholder : null;
 
       return getMapProps(isDraggingOver, draggingOverWith, placeholder);
     }
@@ -116,7 +102,7 @@ export const makeSelector = (): Selector => {
 // that `connect` provides.
 // It avoids needing to do it own within `Droppable`
 const connectedDroppable: OwnProps => Node = (connect(
-  makeSelector,
+  makeMapStateToProps,
   null,
   null,
   { storeKey },
