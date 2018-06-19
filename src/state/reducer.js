@@ -529,37 +529,59 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return clean();
     }
 
-    const existing: DragState = state.drag;
+    const drag: DragState = state.drag;
     const isMovingForward: boolean = action.type === 'MOVE_FORWARD';
 
     // This is possible to do when lifting in a disabled list
-    if (!existing.impact.destination) {
+    if (!drag.impact.destination) {
       return state;
     }
 
+    const droppableId: DroppableId = drag.impact.destination.droppableId;
     const droppable: DroppableDimension = state.dimension.droppable[
-      existing.impact.destination.droppableId
+      droppableId
     ];
 
-    const result: ?MoveToNextResult = moveToNextIndex({
+    const current: CurrentDrag = drag.current;
+    const descriptor: DraggableDescriptor = drag.initial.descriptor;
+    const draggableId: DraggableId = descriptor.id;
+    const previousPageBorderBoxCenter: Position = current.page.borderBoxCenter;
+    const home: DraggableLocation = {
+      index: descriptor.index,
+      droppableId: descriptor.droppableId,
+    };
+
+    const params = {
       isMovingForward,
-      draggableId: existing.initial.descriptor.id,
-      droppable,
+      draggableId,
       draggables: state.dimension.draggable,
-      previousPageBorderBoxCenter: existing.current.page.borderBoxCenter,
-      previousImpact: existing.impact,
-      viewport: existing.current.viewport,
+      previousImpact: drag.impact,
+      viewport: current.viewport,
+    };
+
+    // First tries to move through the list.
+    // If failed (because at the beginning or end of a list)
+    // Make attempt to move across opposite axis (vertical if lists are placed horizontally)
+    const result: ?MoveToNextResult = moveToNextIndex({
+      droppable,
+      previousPageBorderBoxCenter,
+      ...params,
+    }) || moveCrossAxis({
+      pageBorderBoxCenter: previousPageBorderBoxCenter,
+      droppableId,
+      home,
+      droppables: state.dimension.droppable,
+      oppositeAxis: true,
+      ...params,
     });
 
-    // cannot move anyway (at the beginning or end of a list)
     if (!result) {
       return state;
     }
 
     const impact: DragImpact = result.impact;
-    const pageBorderBoxCenter: Position = result.pageBorderBoxCenter;
     const clientBorderBoxCenter: Position = subtract(
-      pageBorderBoxCenter, existing.current.viewport.scroll
+      result.pageBorderBoxCenter, drag.current.viewport.scroll
     );
 
     return move({
