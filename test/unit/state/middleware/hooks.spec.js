@@ -12,26 +12,22 @@ import {
   moveUp,
   move,
   publish,
-  animateDrop,
   collectionStarting,
   type MoveArgs,
   type InitialPublishArgs,
 } from '../../../../src/state/action-creators';
 import createStore from './util/create-store';
 import { getPreset } from '../../../utils/dimension';
-import { viewport, initialPublishArgs, getDragStart, publishAdditionArgs } from '../../../utils/preset-action-args';
+import { initialPublishArgs, getDragStart, publishAdditionArgs } from '../../../utils/preset-action-args';
 import type {
   DraggableLocation,
   Store,
   Hooks,
   State,
   Announce,
-  Critical,
   DragUpdate,
   DropResult,
   HookProvided,
-  DraggableDimension,
-  DimensionMap,
   Publish,
   DragStart,
 } from '../../../../src/types';
@@ -158,7 +154,44 @@ describe('update', () => {
     );
   });
 
-  describe('dynamic changes', () => {
+  it('should not call onDragUpdate if there is no movement from the last update', () => {
+    const hooks: Hooks = createHooks();
+    const store: Store = createStore(
+      middleware(() => hooks, getAnnounce())
+    );
+
+    store.dispatch(prepare());
+    store.dispatch(initialPublish(initialPublishArgs));
+    expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+    expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+
+    // A movement to the same index is not causing an update
+    const moveArgs: MoveArgs = {
+      // tiny change
+      client: add(initialPublishArgs.client.selection, { x: 1, y: 1 }),
+      shouldAnimate: true,
+    };
+    store.dispatch(move(moveArgs));
+
+    expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+
+    // Triggering an actual movement
+    store.dispatch(moveDown());
+    expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
+
+    const state: State = store.getState();
+    invariant(state.phase === 'DRAGGING', 'Expecting state to be in dragging phase');
+
+    // A small movement that should not trigger any index changes
+    store.dispatch(move({
+      client: add(state.current.client.selection, { x: -1, y: -1 }),
+      shouldAnimate: true,
+    }));
+
+    expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
+  });
+
+  describe('updates caused by dynamic changes', () => {
     it('should not call onDragUpdate if the destination or source have not changed', () => {
       const hooks: Hooks = createHooks();
       const store: Store = createStore(
@@ -216,6 +249,7 @@ describe('update', () => {
       // first move down
       store.dispatch(moveDown());
       expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
+      // $ExpectError - unknown mock reset property
       hooks.onDragUpdate.mockReset();
 
       // move up into the original position
@@ -237,6 +271,7 @@ describe('update', () => {
       };
       expect(hooks.onDragUpdate).toHaveBeenCalledWith(lastUpdate, expect.any(Object));
       expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
+      // $ExpectError - unknown mock reset property
       hooks.onDragUpdate.mockReset();
 
       // removing inHome1
@@ -268,112 +303,6 @@ describe('update', () => {
       expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
       expect(hooks.onDragUpdate).toHaveBeenCalledWith(postPublishUpdate, expect.any(Object));
     });
-  });
-
-  it('should call onDragUpdate if the position has changed due to a bulk publish', () => {
-    const hooks: Hooks = createHooks();
-    const store: Store = createStore(
-      middleware(() => hooks, getAnnounce())
-    );
-
-    // initial publish and bulk publish
-    store.dispatch(prepare());
-    store.dispatch(initialPublish(initialPublishArgs));
-    expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
-    store.dispatch(bulkReplace(initialBulkReplaceArgs));
-    expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
-    expect(hooks.onDragUpdate).not.toHaveBeenCalled();
-
-    // another bulk publish is in the works
-    store.dispatch(bulkCollectionStarting());
-
-    const { dimensions, critical } = initialPublishArgs;
-    const withNewIndex: DraggableDimension = {
-      ...dimensions.draggables[critical.draggable.id],
-      descriptor: {
-        ...critical.draggable,
-        index: critical.draggable.index + 100,
-      },
-    };
-
-    const newCritical: Critical = {
-      draggable: withNewIndex.descriptor,
-      droppable: initialPublishArgs.critical.droppable,
-    };
-
-    const customDimensions: DimensionMap = {
-      droppables: dimensions.droppables,
-      // for simplicity just removing the other dimensions
-      draggables: {
-        [initialPublishArgs.critical.draggable.id]: withNewIndex,
-      },
-    };
-
-    store.dispatch(bulkReplace({
-      dimensions: customDimensions,
-      viewport,
-      critical: newCritical,
-    }));
-
-    const update: DragUpdate = {
-      draggableId: critical.draggable.id,
-      type: critical.droppable.type,
-      source: {
-        droppableId: critical.droppable.id,
-        // now states that the new index is the starting index
-        index: withNewIndex.descriptor.index,
-      },
-      // because we removed everything else, it will now be in the first position :D
-      destination: {
-        droppableId: initialPublishArgs.critical.droppable.id,
-        index: 0,
-      },
-    };
-    expect(hooks.onDragUpdate).toHaveBeenCalledWith(
-      update,
-      expect.any(Object),
-    );
-  });
-
-  it('should not call onDragUpdate if there is no movement from the last update', () => {
-    const hooks: Hooks = createHooks();
-    const store: Store = createStore(
-      middleware(() => hooks, getAnnounce())
-    );
-
-    store.dispatch(prepare());
-    store.dispatch(initialPublish(initialPublishArgs));
-    expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
-    expect(hooks.onDragUpdate).not.toHaveBeenCalled();
-
-    store.dispatch(bulkReplace(initialBulkReplaceArgs));
-    // not called yet as position has not changed
-    expect(hooks.onDragUpdate).not.toHaveBeenCalled();
-
-    // A movement to the same index is not causing an update
-    const moveArgs: MoveArgs = {
-      // tiny change
-      client: add(initialPublishArgs.client.selection, { x: 1, y: 1 }),
-      shouldAnimate: true,
-    };
-    store.dispatch(move(moveArgs));
-
-    expect(hooks.onDragUpdate).not.toHaveBeenCalled();
-
-    // Triggering an actual movement
-    store.dispatch(moveDown());
-    expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
-
-    const state: State = store.getState();
-    invariant(state.phase === 'DRAGGING', 'Expecting state to be in dragging phase');
-
-    // A small movement that should not trigger any index changes
-    store.dispatch(move({
-      client: add(state.current.client.selection, { x: -1, y: -1 }),
-      shouldAnimate: true,
-    }));
-
-    expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -431,7 +360,7 @@ describe('abort', () => {
     store.dispatch(initialPublish(initialPublishArgs));
 
     const state: State = store.getState();
-    invariant(state.phase === 'BULK_COLLECTING');
+    invariant(state.phase === 'DRAGGING');
     // in home location
     const home: DraggableLocation = {
       droppableId: initialPublishArgs.critical.droppable.id,
@@ -472,6 +401,7 @@ describe('abort', () => {
     };
     store.dispatch(completeDrop(result));
     expect(hooks.onDragEnd).toHaveBeenCalledTimes(1);
+    // $ExpectError - unknown mock reset property
     hooks.onDragEnd.mockReset();
 
     // abort
@@ -504,7 +434,6 @@ describe('subsequent drags', () => {
           index: initialPublishArgs.critical.draggable.index + 1,
         },
       };
-      store.dispatch(bulkReplace(initialBulkReplaceArgs));
       store.dispatch(moveDown());
       expect(hooks.onDragUpdate).toHaveBeenCalledWith(update, expect.any(Object));
       expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
@@ -559,7 +488,6 @@ describe('announcements', () => {
       execute: (store: Store) => {
         store.dispatch(prepare());
         store.dispatch(initialPublish(initialPublishArgs));
-        store.dispatch(bulkReplace(initialBulkReplaceArgs));
         store.dispatch(moveDown());
       },
       defaultMessage: messagePreset.onDragUpdate(moveForwardUpdate),
@@ -569,7 +497,6 @@ describe('announcements', () => {
       execute: (store: Store) => {
         store.dispatch(prepare());
         store.dispatch(initialPublish(initialPublishArgs));
-        store.dispatch(bulkReplace(initialBulkReplaceArgs));
         store.dispatch(moveDown());
 
         const result: DropResult = {

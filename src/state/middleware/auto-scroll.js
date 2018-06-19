@@ -16,19 +16,8 @@ import type {
 } from '../../types';
 
 // TODO: this is broken - good times
-export default (getMarshal: () => DimensionMarshal) =>
+export default (getScroller: () => AutoScroller) =>
   (store: Store) => (next: (Action) => mixed) => {
-    const scroller: AutoScroller = createAutoScroller({
-      ...bindActionCreators({
-        // TODO: using next to avoid recursive calls to auto scrolling..
-        move,
-      }, store.dispatch),
-      scrollDroppable: (id: DraggableId, change: Position): void => {
-        getMarshal().scrollDroppable(id, change);
-      },
-      scrollWindow,
-    });
-
     const shouldCancel = (action: Action) =>
       // Need to cancel any pending auto scrolling when drag is ending
       action.type === 'CANCEL' ||
@@ -40,7 +29,7 @@ export default (getMarshal: () => DimensionMarshal) =>
 
     return (action: Action): mixed => {
       if (shouldCancel(action)) {
-        scroller.cancel();
+        getScroller().cancel();
         next(action);
         return;
       }
@@ -57,7 +46,7 @@ export default (getMarshal: () => DimensionMarshal) =>
       }
 
       if (state.autoScrollMode === 'FLUID') {
-        scroller.fluidScroll(state);
+        getScroller().fluidScroll(state);
         return;
       }
 
@@ -65,6 +54,6 @@ export default (getMarshal: () => DimensionMarshal) =>
         return;
       }
 
-      scroller.jumpScroll(state);
+      getScroller().jumpScroll(state);
     };
   };

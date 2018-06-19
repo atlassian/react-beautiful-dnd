@@ -513,8 +513,11 @@ export const getPreset = (axis?: Axis = vertical) => {
   };
 
   const viewport: Viewport = (() => {
-    const base: Viewport = getViewport();
+    // scroll the viewport so it has the right frame
+    const base: Viewport = scrollViewport(getViewport(), windowScroll);
 
+    // set the initial and current scroll so that it is the same
+    // we are faking a lift from a scrolled window
     const result: Viewport = {
       frame: base.frame,
       scroll: {

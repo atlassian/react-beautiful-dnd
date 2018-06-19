@@ -90,6 +90,7 @@ export default class DragDropContext extends React.Component<Props> {
         onDragUpdate: this.props.onDragUpdate,
       }),
       announce: this.announcer.announce,
+      getScroller: () => this.autoScroller,
     });
     const callbacks: DimensionMarshalCallbacks = bindActionCreators({
       collectionStarting,
@@ -104,7 +105,7 @@ export default class DragDropContext extends React.Component<Props> {
       scrollDroppable: this.dimensionMarshal.scrollDroppable,
       ...bindActionCreators({
         move,
-      }),
+      }, this.store.dispatch),
     });
   }
   // Need to declare childContextTypes without flow

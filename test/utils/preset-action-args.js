@@ -1,17 +1,17 @@
 // @flow
-import { getRect, type Rect, type Position } from 'css-box-model';
 import { getPreset, getDraggableDimension } from './dimension';
-import getViewport from '../../src/view/window/get-viewport';
 import { offsetByPosition } from '../../src/state/spacing';
 import getHomeLocation from '../../src/state/get-home-location';
+import getHomeImpact from '../../src/state/get-home-impact';
 import type {
   Critical,
+  DropResult,
   DragStart,
   ItemPositions,
-  Viewport,
   DimensionMap,
   Publish,
   DraggableDimension,
+  PendingDrop,
 } from '../../src/types';
 import type{
   InitialPublishArgs,
@@ -20,25 +20,6 @@ import type{
 
 // In case a consumer needs the references
 export const preset = getPreset();
-
-// const origin: Position = { x: 0, y: 0 };
-// export const viewport: Viewport = (() => {
-//   const initial: Viewport = getViewport();
-//   const shifted: Rect = getRect(offsetByPosition(initial.frame, preset.windowScroll));
-
-//   return {
-//     frame: shifted,
-//     scroll: {
-//       initial: preset.windowScroll,
-//       current: preset.windowScroll,
-//       max: initial.scroll.max,
-//       diff: {
-//         value: origin,
-//         displacement: origin,
-//       },
-//     },
-//   };
-// })();
 
 export const critical: Critical = {
   draggable: preset.inHome1.descriptor,
@@ -92,6 +73,32 @@ export const publishAdditionArgs: Publish = (() => {
   };
 })();
 
+export const getDragStart = (custom?: Critical = critical): DragStart => ({
+  draggableId: custom.draggable.id,
+  type: custom.droppable.type,
+  source: getHomeLocation(custom),
+});
+
+export const completeDropArgs: DropResult = {
+  ...getDragStart(critical),
+  destination: getHomeLocation(critical),
+  reason: 'DROP',
+};
+
+export const animateDropArgs: PendingDrop = {
+  newHomeOffset: { x: 10, y: 10 },
+  impact: getHomeImpact(critical, preset.dimensions),
+  result: completeDropArgs,
+};
+
+export const userCancelArgs: PendingDrop = {
+  ...animateDropArgs,
+  result: {
+    ...completeDropArgs,
+    reason: 'CANCEL',
+  },
+};
+
 export const copy = (dimensions: DimensionMap): DimensionMap => ({
   droppables: {
     ...dimensions.droppables,
@@ -101,8 +108,3 @@ export const copy = (dimensions: DimensionMap): DimensionMap => ({
   },
 });
 
-export const getDragStart = (custom?: Critical = critical): DragStart => ({
-  draggableId: custom.draggable.id,
-  type: custom.droppable.type,
-  source: getHomeLocation(custom),
-});

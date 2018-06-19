@@ -1,6 +1,6 @@
 // @flow
 import type { Store, PendingDrop } from '../../../../src/types';
-import type { DimensionMarshal, Callbacks } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
+import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import middleware from '../../../../src/state/middleware/lift';
 import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';
@@ -10,17 +10,13 @@ import {
   lift,
   initialPublish,
   clean,
-  publish,
   animateDrop,
   completeDrop,
-  collectionStarting,
-  updateDroppableScroll,
-  updateDroppableIsEnabled,
 } from '../../../../src/state/action-creators';
 import getDimensionMarshal, { populateMarshal } from '../../../utils/dimension-marshal';
 import getHomeLocation from '../../../../src/state/get-home-location';
 import {
-  viewport,
+  preset,
   liftArgs,
   initialPublishArgs,
   getDragStart,
@@ -35,7 +31,7 @@ const getMarshal = (store: Store): DimensionMarshal => {
 };
 
 beforeEach(() => {
-  setViewport(viewport);
+  setViewport(preset.viewport);
   jest.useFakeTimers();
 });
 

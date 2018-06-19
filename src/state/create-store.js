@@ -12,6 +12,7 @@ import autoScroll from './middleware/auto-scroll';
 import pendingDrop from './middleware/pending-drop';
 import type { DimensionMarshal } from './dimension-marshal/dimension-marshal-types';
 import type { StyleMarshal } from '../view/style-marshal/style-marshal-types';
+import type { AutoScroller } from '../state/auto-scroller/auto-scroller-types';
 import type { Store, Hooks, Announce } from '../types';
 
 // We are checking if window is available before using it.
@@ -26,6 +27,7 @@ type Args = {|
   styleMarshal: StyleMarshal,
   getHooks: () => Hooks,
   announce: Announce,
+  getScroller: () => AutoScroller,
 |}
 
 export default ({
@@ -33,6 +35,7 @@ export default ({
   styleMarshal,
   getHooks,
   announce,
+  getScroller,
 }: Args): Store => createStore(
   reducer,
   composeEnhancers(
@@ -70,7 +73,7 @@ export default ({
       // When a drop animation finishes - fire a drop complete
       dropAnimationFinish,
       pendingDrop,
-      autoScroll(getDimensionMarshal),
+      autoScroll(getScroller),
       // Fire hooks for consumers
       hooks(getHooks, announce),
     ),
