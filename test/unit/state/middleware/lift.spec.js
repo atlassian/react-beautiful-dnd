@@ -1,5 +1,4 @@
 // @flow
-import { bindActionCreators } from 'redux';
 import type { Store, PendingDrop } from '../../../../src/types';
 import type { DimensionMarshal, Callbacks } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import middleware from '../../../../src/state/middleware/lift';
@@ -10,34 +9,26 @@ import {
   prepare,
   lift,
   initialPublish,
-  bulkReplace,
   clean,
+  publish,
   animateDrop,
   completeDrop,
-  bulkCollectionStarting,
+  collectionStarting,
   updateDroppableScroll,
   updateDroppableIsEnabled,
 } from '../../../../src/state/action-creators';
+import getDimensionMarshal, { populateMarshal } from '../../../utils/dimension-marshal';
 import getHomeLocation from '../../../../src/state/get-home-location';
 import {
   viewport,
   liftArgs,
   initialPublishArgs,
-  initialBulkReplaceArgs,
   getDragStart,
   critical,
 } from '../../../utils/preset-action-args';
-import createDimensionMarshal from '../../../../src/state/dimension-marshal/dimension-marshal';
-import { populateMarshal } from '../../../utils/dimension-marshal';
 
 const getMarshal = (store: Store): DimensionMarshal => {
-  const callbacks: Callbacks = bindActionCreators({
-    bulkCollectionStarting,
-    bulkReplace,
-    updateDroppableScroll,
-    updateDroppableIsEnabled,
-  }, store.dispatch);
-  const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
+  const marshal: DimensionMarshal = getDimensionMarshal(store.dispatch);
   populateMarshal(marshal);
 
   return marshal;
@@ -95,7 +86,6 @@ it('should flush any animating drops', () => {
   // start a drag
   store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
-  store.dispatch(bulkReplace(initialBulkReplaceArgs));
   expect(store.getState().phase).toBe('DRAGGING');
 
   // start a drop
@@ -104,7 +94,9 @@ it('should flush any animating drops', () => {
     impact: {
       movement: {
         displaced: [],
-        amount: 0,
+        amount: {
+          x: 0, y: 0,
+        },
         isBeyondStartPosition: false,
       },
       direction: 'vertical',
@@ -153,7 +145,7 @@ describe('collection phase', () => {
     expect(mock).not.toHaveBeenCalled();
   });
 
-  it('should publish the critical dimensions and then trigger a non-critical dimension collection', () => {
+  it('should publish the initial dimensions', () => {
     const mock = jest.fn();
     const store: Store = createStore(
       passThrough(mock),
@@ -170,14 +162,6 @@ describe('collection phase', () => {
     mock.mockReset();
     jest.runOnlyPendingTimers();
     expect(mock).toHaveBeenCalledWith(initialPublish(initialPublishArgs));
-    expect(mock).toHaveBeenCalledWith(bulkCollectionStarting());
-    expect(mock).toHaveBeenCalledTimes(2);
-    expect(store.getState().phase).toBe('BULK_COLLECTING');
-
-    // then there is a dimension marshal collection
-    mock.mockReset();
-    requestAnimationFrame.flush();
-    expect(mock).toHaveBeenCalledWith(bulkReplace(initialBulkReplaceArgs));
     expect(mock).toHaveBeenCalledTimes(1);
     expect(store.getState().phase).toBe('DRAGGING');
   });

@@ -102,11 +102,11 @@ export default class Draggable extends Component<Props> {
     );
   }
 
-  onMoveEnd = () => {
-    if (this.props.isDropAnimating) {
-      this.props.dropAnimationFinished();
+    onMoveEnd = () => {
+      if (this.props.isDropAnimating) {
+        this.props.dropAnimationFinished();
+      }
     }
-  }
 
   onLift = (options: {clientSelection: Position, autoScrollMode: AutoScrollMode}) => {
     timings.start('LIFT');

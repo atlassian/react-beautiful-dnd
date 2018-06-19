@@ -1,11 +1,12 @@
 // @flow
 import { type Position } from 'css-box-model';
-import bindActionCreators from 'redux';
+import { bindActionCreators } from 'redux';
 import createDimensionMarshal from '../../src/state/dimension-marshal/dimension-marshal';
 import {
   publish,
   updateDroppableScroll,
   updateDroppableIsEnabled,
+  collectionStarting,
 } from '../../src/state/action-creators';
 import { getPreset } from './dimension';
 import type { DimensionMarshal, Callbacks, DroppableCallbacks } from '../../src/state/dimension-marshal/dimension-marshal-types';
@@ -20,6 +21,7 @@ import type {
 export default (dispatch: Function): DimensionMarshal => {
   const callbacks: Callbacks = bindActionCreators({
     publish,
+    collectionStarting,
     updateDroppableScroll,
     updateDroppableIsEnabled,
   }, dispatch);

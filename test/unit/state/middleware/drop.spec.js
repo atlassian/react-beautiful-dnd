@@ -1,25 +1,24 @@
 // @flow
-import type { Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import middleware from '../../../../src/state/middleware/drop';
 import createStore from './util/create-store';
 import getHomeLocation from '../../../../src/state/get-home-location';
 import { add, patch } from '../../../../src/state/position';
 import { getPreset, makeScrollable } from '../../../utils/dimension';
+import passThrough from './util/pass-through-middleware';
 import {
   clean,
   drop,
   prepare,
   initialPublish,
-  bulkReplace,
   animateDrop,
   dropPending,
   move,
   completeDrop,
   updateDroppableScroll,
+  moveByWindowScroll,
   type InitialPublishArgs,
-  type BulkReplaceArgs,
-  type DropAnimateAction, moveByWindowScroll,
+  type DropAnimateAction, collectionStarting,
 } from '../../../../src/state/action-creators';
 import {
   initialPublishArgs,
@@ -60,7 +59,6 @@ it('should throw an error if a drop action occurs while not in a phase where you
   store.dispatch(clean());
   store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
-  store.dispatch(bulkReplace(initialBulkReplaceArgs));
   expect(store.getState().phase).toBe('DRAGGING');
 
   // moving a little bit so that a drop animation will be needed
@@ -75,22 +73,20 @@ it('should throw an error if a drop action occurs while not in a phase where you
   expect(() => store.dispatch(drop({ reason: 'DROP' }))).toThrow();
 });
 
-it('should dispatch a DROP_PENDING action if BULK_COLLECTING', () => {
+it('should dispatch a DROP_PENDING action if COLLECTING', () => {
   const mock = jest.fn();
-  const passThrough = () => next => (action) => {
-    mock(action);
-    next(action);
-  };
   const store: Store = createStore(
-    passThrough,
+    passThrough(mock),
     middleware,
   );
 
   store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
+  expect(store.getState().phase).toBe('DRAGGING');
+  store.dispatch(collectionStarting());
 
   // now in the bulk collecting phase
-  expect(store.getState().phase).toBe('BULK_COLLECTING');
+  expect(store.getState().phase).toBe('COLLECTING');
   mock.mockReset();
 
   // drop
@@ -102,22 +98,19 @@ it('should dispatch a DROP_PENDING action if BULK_COLLECTING', () => {
   expect(store.getState().phase).toBe('DROP_PENDING');
 });
 
-it.only('should throw if a drop action is fired and there is DROP_PENDING and it is waiting for a publish', () => {
+it('should throw if a drop action is fired and there is DROP_PENDING and it is waiting for a publish', () => {
   const mock = jest.fn();
-  const passThrough = () => next => (action) => {
-    mock(action);
-    next(action);
-  };
   const store: Store = createStore(
-    passThrough,
+    passThrough(mock),
     middleware,
   );
 
   store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
+  store.dispatch(collectionStarting());
 
   // now in the bulk collecting phase
-  expect(store.getState().phase).toBe('BULK_COLLECTING');
+  expect(store.getState().phase).toBe('COLLECTING');
   mock.mockReset();
 
   // drop moving to drop pending
@@ -142,19 +135,14 @@ describe('no drop animation required', () => {
     describe(`with drop reason: ${reason}`, () => {
       it('should fire a complete drop action is no drop animation is required', () => {
         const mock = jest.fn();
-        const passThrough = () => next => (action) => {
-          mock(action);
-          next(action);
-        };
         const store: Store = createStore(
-          passThrough,
+          passThrough(mock),
           middleware,
         );
 
         store.dispatch(clean());
         store.dispatch(prepare());
         store.dispatch(initialPublish(initialPublishArgs));
-        store.dispatch(bulkReplace(initialBulkReplaceArgs));
         expect(store.getState().phase).toBe('DRAGGING');
 
         // no movement yet
@@ -188,12 +176,8 @@ describe('no drop animation required', () => {
 
 describe('drop animation required', () => {
   const withPassThrough = (myMiddleware: mixed, mock: Function): Store => {
-    const passThrough = () => next => (action) => {
-      mock(action);
-      next(action);
-    };
     const store: Store = createStore(
-      passThrough,
+      passThrough(mock),
       myMiddleware,
     );
     return store;
@@ -206,7 +190,6 @@ describe('drop animation required', () => {
 
       store.dispatch(prepare());
       store.dispatch(initialPublish(initialPublishArgs));
-      store.dispatch(bulkReplace(initialBulkReplaceArgs));
       expect(store.getState().phase).toBe('DRAGGING');
 
       // moving a little bit so that a drop animation will be needed
@@ -254,7 +237,6 @@ describe('drop animation required', () => {
       store.dispatch(clean());
       store.dispatch(prepare());
       store.dispatch(initialPublish(customArgs));
-      store.dispatch(bulkReplace(initialBulkReplaceArgs));
       expect(store.getState().phase).toBe('DRAGGING');
 
       // doing a small scroll
@@ -290,12 +272,12 @@ describe('drop animation required', () => {
       const store: Store = withPassThrough(middleware, mock);
 
       const scrollableForeign: DroppableDimension = makeScrollable(preset.foreign);
-      const customReplace: BulkReplaceArgs = {
-        ...initialBulkReplaceArgs,
+      const customInitial: InitialPublishArgs = {
+        ...initialPublishArgs,
         dimensions: {
-          ...initialBulkReplaceArgs.dimensions,
+          ...initialPublishArgs.dimensions,
           droppables: {
-            ...initialBulkReplaceArgs.dimensions.droppables,
+            ...initialPublishArgs.dimensions.droppables,
             [scrollableForeign.descriptor.id]: scrollableForeign,
           },
         },
@@ -304,8 +286,7 @@ describe('drop animation required', () => {
       // getting into a drag
       store.dispatch(clean());
       store.dispatch(prepare());
-      store.dispatch(initialPublish(initialPublishArgs));
-      store.dispatch(bulkReplace(customReplace));
+      store.dispatch(initialPublish(customInitial));
       expect(store.getState().phase).toBe('DRAGGING');
 
       // moving over the foreign droppable
@@ -356,7 +337,6 @@ describe('drop animation required', () => {
       // getting into a drag
       store.dispatch(prepare());
       store.dispatch(initialPublish(customArgs));
-      store.dispatch(bulkReplace(initialBulkReplaceArgs));
       expect(store.getState().phase).toBe('DRAGGING');
 
       // move after the end of the home droppable
@@ -421,7 +401,6 @@ describe('drop animation required', () => {
       // getting into a drag
       store.dispatch(prepare());
       store.dispatch(initialPublish(customArgs));
-      store.dispatch(bulkReplace(initialBulkReplaceArgs));
       expect(store.getState().phase).toBe('DRAGGING');
 
       // moving to the top of the foreign droppable
@@ -474,7 +453,6 @@ describe('drop animation required', () => {
       store.dispatch(clean());
       store.dispatch(prepare());
       store.dispatch(initialPublish(initialPublishArgs));
-      store.dispatch(bulkReplace(initialBulkReplaceArgs));
       expect(store.getState().phase).toBe('DRAGGING');
 
       // scroll the window
