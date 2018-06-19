@@ -512,7 +512,23 @@ export const getPreset = (axis?: Axis = vertical) => {
     droppables,
   };
 
-  const viewport: Viewport = scrollViewport(getViewport(), windowScroll);
+  const viewport: Viewport = (() => {
+    const base: Viewport = getViewport();
+
+    const result: Viewport = {
+      frame: base.frame,
+      scroll: {
+        initial: windowScroll,
+        current: windowScroll,
+        max: base.scroll.max,
+        diff: {
+          value: origin,
+          displacement: origin,
+        },
+      },
+    };
+    return result;
+  })();
 
   return {
     home,

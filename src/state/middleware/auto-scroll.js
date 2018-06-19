@@ -35,8 +35,8 @@ export default (getMarshal: () => DimensionMarshal) =>
       action.type === 'DROP_ANIMATE' ||
       action.type === 'DROP' ||
       action.type === 'DROP_COMPLETE' ||
-      // A new bulk collection is starting - cancel any pending auto scrolls
-      action.type === 'BULK_COLLECTION_STARTING';
+      // A new collection is starting - cancel any pending auto scrolls
+      action.type === 'COLLECTION_STARTING';
 
     return (action: Action): mixed => {
       if (shouldCancel(action)) {

@@ -7,15 +7,19 @@ import {
   clean,
   prepare,
   initialPublish,
-  bulkReplace,
   completeDrop,
   moveDown,
+  moveUp,
   move,
-  bulkCollectionStarting,
-  type MoveArgs, animateDrop,
+  publish,
+  animateDrop,
+  collectionStarting,
+  type MoveArgs,
+  type InitialPublishArgs,
 } from '../../../../src/state/action-creators';
 import createStore from './util/create-store';
-import { viewport, initialPublishArgs, initialBulkReplaceArgs, getDragStart } from '../../../utils/preset-action-args';
+import { getPreset } from '../../../utils/dimension';
+import { viewport, initialPublishArgs, getDragStart, publishAdditionArgs } from '../../../utils/preset-action-args';
 import type {
   DraggableLocation,
   Store,
@@ -28,7 +32,11 @@ import type {
   HookProvided,
   DraggableDimension,
   DimensionMap,
+  Publish,
+  DragStart,
 } from '../../../../src/types';
+
+const preset = getPreset();
 
 const createHooks = (): Hooks => ({
   onDragStart: jest.fn(),
@@ -85,7 +93,6 @@ describe('drop', () => {
 
     store.dispatch(prepare());
     store.dispatch(initialPublish(initialPublishArgs));
-    store.dispatch(bulkReplace(initialBulkReplaceArgs));
     expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
 
     const result: DropResult = {
@@ -136,10 +143,6 @@ describe('update', () => {
     expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
     expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
-    store.dispatch(bulkReplace(initialBulkReplaceArgs));
-    // not called yet as position has not changed
-    expect(hooks.onDragUpdate).not.toHaveBeenCalled();
-
     // Okay let's move it
     store.dispatch(moveDown());
     const update: DragUpdate = {
@@ -155,20 +158,116 @@ describe('update', () => {
     );
   });
 
-  it('should not call onDragUpdate if the position has not changed in the first bulk publish', () => {
-    const hooks: Hooks = createHooks();
-    const store: Store = createStore(
-      middleware(() => hooks, getAnnounce())
-    );
+  describe('dynamic changes', () => {
+    it('should not call onDragUpdate if the destination or source have not changed', () => {
+      const hooks: Hooks = createHooks();
+      const store: Store = createStore(
+        middleware(() => hooks, getAnnounce())
+      );
 
-    store.dispatch(prepare());
-    store.dispatch(initialPublish(initialPublishArgs));
-    expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
-    expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+      store.dispatch(prepare());
+      store.dispatch(initialPublish(initialPublishArgs));
+      expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+      expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
-    store.dispatch(bulkReplace(initialBulkReplaceArgs));
-    // not called yet as position has not changed
-    expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+      store.dispatch(collectionStarting());
+      store.dispatch(publish(publishAdditionArgs));
+      // not called yet as position has not changed
+      expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should call onDragUpdate if the source has changed - even if the destination has not changed', () => {
+      // - dragging inHome2 with no impact
+      // - inHome1 is removed
+      const hooks: Hooks = createHooks();
+      const store: Store = createStore(
+        middleware(() => hooks, getAnnounce())
+      );
+      // dragging inHome2 with no impact
+      const customInitial: InitialPublishArgs = {
+        critical: {
+          draggable: preset.inHome2.descriptor,
+          droppable: preset.home.descriptor,
+        },
+        dimensions: preset.dimensions,
+        client: {
+          selection: preset.inHome2.client.borderBox.center,
+          borderBoxCenter: preset.inHome2.client.borderBox.center,
+          offset: { x: 0, y: 0 },
+        },
+        viewport: preset.viewport,
+        autoScrollMode: 'FLUID',
+      };
+
+      store.dispatch(prepare());
+      store.dispatch(initialPublish(customInitial));
+      const start: DragStart = {
+        draggableId: preset.inHome2.descriptor.id,
+        type: preset.home.descriptor.type,
+        source: {
+          droppableId: preset.home.descriptor.id,
+          index: 1,
+        },
+      };
+      expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+      expect(hooks.onDragStart).toHaveBeenCalledWith(start, expect.any(Object));
+      expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+
+      // first move down
+      store.dispatch(moveDown());
+      expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
+      hooks.onDragUpdate.mockReset();
+
+      // move up into the original position
+      store.dispatch(moveUp());
+      // no current displacement
+      expect(store.getState().impact.movement.displaced).toEqual([]);
+      const lastUpdate: DragUpdate = {
+        draggableId: preset.inHome2.descriptor.id,
+        type: preset.home.descriptor.type,
+        source: {
+          droppableId: preset.home.descriptor.id,
+          index: 1,
+        },
+        // back in the home location
+        destination: {
+          droppableId: preset.home.descriptor.id,
+          index: 1,
+        },
+      };
+      expect(hooks.onDragUpdate).toHaveBeenCalledWith(lastUpdate, expect.any(Object));
+      expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
+      hooks.onDragUpdate.mockReset();
+
+      // removing inHome1
+      const customPublish: Publish = {
+        removals: {
+          draggables: [preset.inHome1.descriptor.id],
+          droppables: [],
+        },
+        additions: {
+          draggables: [],
+          droppables: [],
+        },
+      };
+
+      store.dispatch(collectionStarting());
+      store.dispatch(publish(customPublish));
+
+      const postPublishUpdate: DragUpdate = {
+        draggableId: preset.inHome2.descriptor.id,
+        type: preset.home.descriptor.type,
+        // new source as inHome1 was removed
+        source: {
+          droppableId: preset.home.descriptor.id,
+          index: 0,
+        },
+        // destination has not changed from last update
+        destination: lastUpdate.destination,
+      };
+      expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
+      expect(hooks.onDragUpdate).toHaveBeenCalledWith(postPublishUpdate, expect.any(Object));
+    });
   });
 
   it('should call onDragUpdate if the position has changed due to a bulk publish', () => {

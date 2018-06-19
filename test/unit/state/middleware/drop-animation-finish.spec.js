@@ -10,12 +10,11 @@ import {
   prepare,
   initialPublish,
   completeDrop,
-  bulkReplace,
   move,
   dropAnimationFinished,
   drop,
 } from '../../../../src/state/action-creators';
-import { initialPublishArgs, initialBulkReplaceArgs } from '../../../utils/preset-action-args';
+import { initialPublishArgs } from '../../../utils/preset-action-args';
 
 it('should fire a complete drop action when a drop animation finish action is fired', () => {
   const mock = jest.fn();
@@ -29,7 +28,6 @@ it('should fire a complete drop action when a drop animation finish action is fi
 
   store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
-  store.dispatch(bulkReplace(initialBulkReplaceArgs));
 
   expect(store.getState().phase).toBe('DRAGGING');
 

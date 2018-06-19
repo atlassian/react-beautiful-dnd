@@ -1,6 +1,6 @@
 // @flow
 import { getRect, type Rect, type Position } from 'css-box-model';
-import { getPreset } from './dimension';
+import { getPreset, getDraggableDimension } from './dimension';
 import getViewport from '../../src/view/window/get-viewport';
 import { offsetByPosition } from '../../src/state/spacing';
 import getHomeLocation from '../../src/state/get-home-location';
@@ -10,6 +10,8 @@ import type {
   ItemPositions,
   Viewport,
   DimensionMap,
+  Publish,
+  DraggableDimension,
 } from '../../src/types';
 import type{
   InitialPublishArgs,
@@ -18,25 +20,25 @@ import type{
 
 // In case a consumer needs the references
 export const preset = getPreset();
-const origin: Position = { x: 0, y: 0 };
 
-export const viewport: Viewport = (() => {
-  const initial: Viewport = getViewport();
-  const shifted: Rect = getRect(offsetByPosition(initial.frame, preset.windowScroll));
+// const origin: Position = { x: 0, y: 0 };
+// export const viewport: Viewport = (() => {
+//   const initial: Viewport = getViewport();
+//   const shifted: Rect = getRect(offsetByPosition(initial.frame, preset.windowScroll));
 
-  return {
-    frame: shifted,
-    scroll: {
-      initial: preset.windowScroll,
-      current: preset.windowScroll,
-      max: initial.scroll.max,
-      diff: {
-        value: origin,
-        displacement: origin,
-      },
-    },
-  };
-})();
+//   return {
+//     frame: shifted,
+//     scroll: {
+//       initial: preset.windowScroll,
+//       current: preset.windowScroll,
+//       max: initial.scroll.max,
+//       diff: {
+//         value: origin,
+//         displacement: origin,
+//       },
+//     },
+//   };
+// })();
 
 export const critical: Critical = {
   draggable: preset.inHome1.descriptor,
@@ -52,7 +54,7 @@ const client: ItemPositions = {
 export const liftArgs: LiftArgs = {
   id: critical.draggable.id,
   client,
-  viewport,
+  viewport: preset.viewport,
   autoScrollMode: 'FLUID',
 };
 
@@ -60,9 +62,35 @@ export const initialPublishArgs: InitialPublishArgs = {
   critical,
   dimensions: preset.dimensions,
   client,
-  viewport,
+  viewport: preset.viewport,
   autoScrollMode: 'FLUID',
 };
+
+export const publishAdditionArgs: Publish = (() => {
+  const addition: DraggableDimension = getDraggableDimension({
+    descriptor: {
+      ...preset.inHome4.descriptor,
+      // adding to the end of the list
+      index: preset.inHomeList.length,
+      id: 'addition',
+    },
+    borderBox: offsetByPosition(
+      preset.inHome4.client.borderBox,
+      { x: 0, y: preset.inHome4.client.borderBox.height }
+    ),
+    windowScroll: preset.windowScroll,
+  });
+  return {
+    removals: {
+      draggables: [],
+      droppables: [],
+    },
+    additions: {
+      draggables: [addition],
+      droppables: [],
+    },
+  };
+})();
 
 export const copy = (dimensions: DimensionMap): DimensionMap => ({
   droppables: {
@@ -72,14 +100,6 @@ export const copy = (dimensions: DimensionMap): DimensionMap => ({
     ...dimensions.draggables,
   },
 });
-
-export const withoutCritical: DimensionMap = (() => {
-  const result: DimensionMap = copy(preset.dimensions);
-  delete result.draggables[critical.draggable.id];
-  delete result.droppables[critical.droppable.id];
-
-  return result;
-})();
 
 export const getDragStart = (custom?: Critical = critical): DragStart => ({
   draggableId: custom.draggable.id,
