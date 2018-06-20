@@ -566,14 +566,17 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       droppable,
       previousPageBorderBoxCenter,
       ...params,
-    }) || moveCrossAxis({
-      pageBorderBoxCenter: previousPageBorderBoxCenter,
-      droppableId,
-      home,
-      droppables: state.dimension.droppable,
-      oppositeAxis: true,
-      ...params,
-    });
+    }) || {
+      scrollJumpRequest: null,
+      ...moveCrossAxis({
+        pageBorderBoxCenter: previousPageBorderBoxCenter,
+        droppableId,
+        home,
+        droppables: state.dimension.droppable,
+        oppositeAxis: true,
+        ...params,
+      }),
+    };
 
     if (!result) {
       return state;

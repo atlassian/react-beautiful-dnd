@@ -37,7 +37,7 @@ type Args = {|
   previousImpact: ?DragImpact,
   // the current viewport
   viewport: Viewport,
-  oppositeAxis: boolean,
+  oppositeAxis?: boolean,
 |}
 
 export default ({
@@ -50,7 +50,7 @@ export default ({
   droppables,
   previousImpact,
   viewport,
-  oppositeAxis = false,
+  oppositeAxis,
 }: Args): ?Result => {
   const draggable: DraggableDimension = draggables[draggableId];
   const source: DroppableDimension = droppables[droppableId];
@@ -63,7 +63,7 @@ export default ({
     source,
     droppables,
     viewport,
-    axis,
+    customAxis: axis,
   });
 
   // nothing available to move to
