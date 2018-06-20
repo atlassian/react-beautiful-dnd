@@ -20,6 +20,11 @@ const visuallyHidden: Object = {
   'clip-path': 'inset(100%)',
 };
 
+const getBody = (): HTMLBodyElement => {
+  invariant(document.body, 'Announcer cannot find document.body');
+  return document.body;
+};
+
 export default (): Announcer => {
   const id: string = `react-beautiful-dnd-announcement-${count++}`;
   let el: ?HTMLElement = null;
@@ -47,17 +52,17 @@ export default (): Announcer => {
     // hide the element visually
     Object.assign(el.style, visuallyHidden);
 
-    invariant(document.body, 'Cannot find the head to append a style to');
-
-    // add el tag to body
-    document.body.appendChild(el);
+    // Add to body
+    getBody().appendChild(el);
   };
 
   const unmount = () => {
     invariant(el, 'Will not unmount annoucer as it is already unmounted');
-    invariant(el.parentNode, 'Cannot unmount style marshal as cannot find parent');
 
-    el.parentNode.removeChild(el);
+    // Remove from body
+    getBody().removeChild(el);
+    // Unset
+    el = null;
   };
 
   const announcer: Announcer = {

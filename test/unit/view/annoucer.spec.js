@@ -20,7 +20,7 @@ describe('mounting', () => {
     expect(el).toBeInstanceOf(HTMLElement);
   });
 
-  it('should error if attempting to double mount', () => {
+  it('should throw if attempting to double mount', () => {
     const announcer: Announcer = createAnnouncer();
 
     announcer.mount();
@@ -54,13 +54,13 @@ describe('unmounting', () => {
     expect(el).not.toBeTruthy();
   });
 
-  it('should error if attempting to unmount before mounting', () => {
+  it('should throw if attempting to unmount before mounting', () => {
     const announcer: Announcer = createAnnouncer();
 
     expect(() => announcer.unmount()).toThrow();
   });
 
-  it('should error if unmounting after an unmount', () => {
+  it('should throw if unmounting after an unmount', () => {
     const announcer: Announcer = createAnnouncer();
 
     announcer.mount();
@@ -71,7 +71,7 @@ describe('unmounting', () => {
 });
 
 describe('announcing', () => {
-  it('should error if not mounted', () => {
+  it('should throw if not mounted', () => {
     const announcer: Announcer = createAnnouncer();
 
     expect(() => announcer.announce('test')).toThrow();

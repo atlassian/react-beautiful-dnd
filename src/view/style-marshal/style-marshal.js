@@ -4,16 +4,19 @@ import invariant from 'tiny-invariant';
 import getStyles, { type Styles } from './get-styles';
 import { prefix } from '../data-attributes';
 import type { StyleMarshal } from './style-marshal-types';
-import type {
-  State as AppState,
-  DropReason,
-} from '../../types';
+import type { DropReason } from '../../types';
 
 let count: number = 0;
 
 // Required for server side rendering as count is persisted across requests
 export const resetStyleContext = () => {
   count = 0;
+};
+
+const getHead = (): HTMLHeadElement => {
+  const head: ?HTMLHeadElement = document.querySelector('head');
+  invariant(head, 'Cannot find the head to append a style to');
+  return head;
 };
 
 export default () => {
@@ -41,9 +44,8 @@ export default () => {
     el.setAttribute(prefix, context);
 
     // add style tag to head
-    const head: ?HTMLElement = document.querySelector('head');
-    invariant(head, 'Cannot find the head to append a style to');
-    head.appendChild(el);
+
+    getHead().appendChild(el);
 
     // set initial style
     setStyle(styles.resting);
@@ -62,9 +64,11 @@ export default () => {
 
   const unmount = (): void => {
     invariant(el, 'Cannot unmount style marshal as it is already unmounted');
-    invariant(el.parentNode, 'Cannot unmount style marshal as cannot find parent');
 
-    el.parentNode.removeChild(el);
+    // Remove from head
+    getHead().removeChild(el);
+    // Unset
+    el = null;
   };
 
   const marshal: StyleMarshal = {
