@@ -10,7 +10,6 @@ import type {
   Axis,
   DroppableDimension,
   DroppableDimensionMap,
-  DroppableId,
   Viewport,
 } from '../../types';
 

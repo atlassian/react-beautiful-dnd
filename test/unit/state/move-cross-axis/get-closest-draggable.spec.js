@@ -45,6 +45,7 @@ describe('get closest draggable', () => {
         descriptor: {
           id: 'hiddenBackwards',
           droppableId: droppable.descriptor.id,
+          type: droppable.descriptor.type,
           index: 0,
         },
         borderBox: {
@@ -61,6 +62,7 @@ describe('get closest draggable', () => {
         descriptor: {
           id: 'partialHiddenBackwards',
           droppableId: droppable.descriptor.id,
+          type: droppable.descriptor.type,
           index: 1,
         },
         borderBox: {
@@ -76,6 +78,7 @@ describe('get closest draggable', () => {
         descriptor: {
           id: 'visible1',
           droppableId: droppable.descriptor.id,
+          type: droppable.descriptor.type,
           index: 2,
         },
         borderBox: {
@@ -91,6 +94,7 @@ describe('get closest draggable', () => {
         descriptor: {
           id: 'visible2',
           droppableId: droppable.descriptor.id,
+          type: droppable.descriptor.type,
           index: 3,
         },
         borderBox: {
@@ -107,6 +111,7 @@ describe('get closest draggable', () => {
         descriptor: {
           id: 'partiallyHiddenForwards',
           droppableId: droppable.descriptor.id,
+          type: droppable.descriptor.type,
           index: 4,
         },
         borderBox: {
@@ -123,6 +128,7 @@ describe('get closest draggable', () => {
         descriptor: {
           id: 'hiddenForwards',
           droppableId: droppable.descriptor.id,
+          type: droppable.descriptor.type,
           index: 5,
         },
         borderBox: {
@@ -138,13 +144,14 @@ describe('get closest draggable', () => {
         descriptor: {
           id: 'hidden',
           droppableId: droppable.descriptor.id,
+          type: droppable.descriptor.type,
           index: 6,
         },
         borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
-          [axis.start]: viewport.subject[axis.end] + 1,
-          [axis.end]: viewport.subject[axis.end] + 10,
+          [axis.start]: viewport.frame[axis.end] + 1,
+          [axis.end]: viewport.frame[axis.end] + 10,
         },
         ...withAssortedSpacing(),
       });

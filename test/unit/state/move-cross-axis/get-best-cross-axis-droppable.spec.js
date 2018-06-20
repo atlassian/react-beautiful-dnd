@@ -224,8 +224,8 @@ describe('get best cross axis droppable', () => {
         borderBox: {
           left: 30,
           right: 40,
-          top: viewport.subject.bottom + 1,
-          bottom: viewport.subject.bottom + 10,
+          top: viewport.frame.bottom + 1,
+          bottom: viewport.frame.bottom + 10,
         },
       });
       const droppables: DroppableDimensionMap = {
@@ -712,8 +712,8 @@ describe('get best cross axis droppable', () => {
         borderBox: {
           top: 0,
           bottom: 10,
-          left: viewport.subject.right + 1,
-          right: viewport.subject.right + 10,
+          left: viewport.frame.right + 1,
+          right: viewport.frame.right + 10,
         },
       });
       const droppables: DroppableDimensionMap = {

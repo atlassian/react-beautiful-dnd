@@ -2,106 +2,88 @@
 import createAnnouncer from '../../../src/view/announcer/announcer';
 import type { Announcer } from '../../../src/view/announcer/announcer-types';
 
-describe('announcer', () => {
-  beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => { });
+describe('mounting', () => {
+  it('should not create a dom node before mount is called', () => {
+    const announcer: Announcer = createAnnouncer();
+
+    const el: ?HTMLElement = document.getElementById(announcer.id);
+
+    expect(el).not.toBeTruthy();
   });
 
-  afterEach(() => {
-    console.error.mockRestore();
+  it('should create a new element when mounting', () => {
+    const announcer: Announcer = createAnnouncer();
+
+    announcer.mount();
+    const el: ?HTMLElement = document.getElementById(announcer.id);
+
+    expect(el).toBeInstanceOf(HTMLElement);
   });
 
-  describe('mounting', () => {
-    it('should not create a dom node before mount is called', () => {
-      const announcer: Announcer = createAnnouncer();
+  it('should error if attempting to double mount', () => {
+    const announcer: Announcer = createAnnouncer();
 
-      const el: ?HTMLElement = document.getElementById(announcer.id);
+    announcer.mount();
 
-      expect(el).not.toBeTruthy();
-    });
-
-    it('should create a new element when mounting', () => {
-      const announcer: Announcer = createAnnouncer();
-
-      announcer.mount();
-      const el: ?HTMLElement = document.getElementById(announcer.id);
-
-      expect(el).toBeInstanceOf(HTMLElement);
-    });
-
-    it('should error if attempting to double mount', () => {
-      const announcer: Announcer = createAnnouncer();
-
-      announcer.mount();
-      expect(console.error).not.toHaveBeenCalled();
-
-      announcer.mount();
-      expect(console.error).toHaveBeenCalled();
-    });
-
-    it('should apply the appropriate aria attributes and non visibility styles', () => {
-      const announcer: Announcer = createAnnouncer();
-
-      announcer.mount();
-      const el: HTMLElement = (document.getElementById(announcer.id) : any);
-
-      expect(el.getAttribute('aria-live')).toBe('assertive');
-      expect(el.getAttribute('role')).toBe('log');
-      expect(el.getAttribute('aria-atomic')).toBe('true');
-
-      // not checking all the styles - just enough to know we are doing something
-      expect(el.style.overflow).toBe('hidden');
-    });
+    expect(() => announcer.mount()).toThrow();
   });
 
-  describe('unmounting', () => {
-    it('should remove the element when unmounting', () => {
-      const announcer: Announcer = createAnnouncer();
+  it('should apply the appropriate aria attributes and non visibility styles', () => {
+    const announcer: Announcer = createAnnouncer();
 
-      announcer.mount();
-      announcer.unmount();
-      const el: ?HTMLElement = document.getElementById(announcer.id);
+    announcer.mount();
+    const el: HTMLElement = (document.getElementById(announcer.id) : any);
 
-      expect(el).not.toBeTruthy();
-    });
+    expect(el.getAttribute('aria-live')).toBe('assertive');
+    expect(el.getAttribute('role')).toBe('log');
+    expect(el.getAttribute('aria-atomic')).toBe('true');
 
-    it('should error if attempting to unmount before mounting', () => {
-      const announcer: Announcer = createAnnouncer();
+    // not checking all the styles - just enough to know we are doing something
+    expect(el.style.overflow).toBe('hidden');
+  });
+});
 
-      announcer.unmount();
+describe('unmounting', () => {
+  it('should remove the element when unmounting', () => {
+    const announcer: Announcer = createAnnouncer();
 
-      expect(console.error).toHaveBeenCalled();
-    });
+    announcer.mount();
+    announcer.unmount();
+    const el: ?HTMLElement = document.getElementById(announcer.id);
 
-    it('should error if unmounting after an unmount', () => {
-      const announcer: Announcer = createAnnouncer();
-
-      announcer.mount();
-      announcer.unmount();
-      expect(console.error).not.toHaveBeenCalled();
-
-      announcer.unmount();
-      expect(console.error).toHaveBeenCalled();
-    });
+    expect(el).not.toBeTruthy();
   });
 
-  describe('announcing', () => {
-    it('should error if not mounted', () => {
-      const announcer: Announcer = createAnnouncer();
+  it('should error if attempting to unmount before mounting', () => {
+    const announcer: Announcer = createAnnouncer();
 
-      announcer.announce('test');
+    expect(() => announcer.unmount()).toThrow();
+  });
 
-      expect(console.error).toHaveBeenCalled();
-    });
+  it('should error if unmounting after an unmount', () => {
+    const announcer: Announcer = createAnnouncer();
 
-    it('should set the text content of the announcement element', () => {
-      const announcer: Announcer = createAnnouncer();
-      announcer.mount();
-      const el: HTMLElement = (document.getElementById(announcer.id) : any);
+    announcer.mount();
+    announcer.unmount();
 
-      announcer.announce('test');
+    expect(() => announcer.unmount()).toThrow();
+  });
+});
 
-      expect(el.textContent).toBe('test');
-    });
+describe('announcing', () => {
+  it('should error if not mounted', () => {
+    const announcer: Announcer = createAnnouncer();
+
+    expect(() => announcer.announce('test')).toThrow();
+  });
+
+  it('should set the text content of the announcement element', () => {
+    const announcer: Announcer = createAnnouncer();
+    announcer.mount();
+    const el: HTMLElement = (document.getElementById(announcer.id) : any);
+
+    announcer.announce('test');
+
+    expect(el.textContent).toBe('test');
   });
 });

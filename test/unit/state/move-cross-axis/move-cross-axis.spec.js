@@ -29,21 +29,22 @@ describe('move cross axis', () => {
         left: preset.home.client.borderBox.left + 1,
         right: preset.home.client.borderBox.left + 10,
         top: 0,
-        bottom: viewport.subject.bottom + 200,
+        bottom: viewport.frame.bottom + 200,
       },
     });
     const notVisible: DraggableDimension = getDraggableDimension({
       descriptor: {
         id: 'not-visible',
         droppableId: custom.descriptor.id,
+        type: custom.descriptor.type,
         index: 0,
       },
       borderBox: {
         left: preset.home.client.borderBox.left + 1,
         right: preset.home.client.borderBox.left + 10,
         // outside of the viewport
-        top: viewport.subject.bottom + 1,
-        bottom: viewport.subject.bottom + 10,
+        top: viewport.frame.bottom + 1,
+        bottom: viewport.frame.bottom + 10,
       },
     });
     const draggables: DraggableDimensionMap = {
