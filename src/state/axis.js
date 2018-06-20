@@ -1,5 +1,5 @@
 // @flow
-import type { HorizontalAxis, VerticalAxis } from '../types';
+import type { Axis, HorizontalAxis, VerticalAxis } from '../types';
 
 export const vertical: VerticalAxis = {
   direction: 'vertical',
@@ -24,3 +24,10 @@ export const horizontal: HorizontalAxis = {
   crossAxisEnd: 'bottom',
   crossAxisSize: 'height',
 };
+
+export function oppositeAxis(axis: Axis) {
+  if (axis.direction === 'horizontal') {
+    return vertical;
+  }
+  return horizontal;
+}

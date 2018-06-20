@@ -16,7 +16,9 @@ import type {
   DraggableLocation,
   DragImpact,
   Viewport,
+  Axis,
 } from '../../types';
+import { oppositeAxis as makeOppositeAxis } from '../axis';
 
 type Args = {|
   isMovingForward: boolean,
@@ -35,6 +37,7 @@ type Args = {|
   previousImpact: ?DragImpact,
   // the current viewport
   viewport: Viewport,
+  oppositeAxis?: boolean,
 |}
 
 export default ({
@@ -47,18 +50,20 @@ export default ({
   droppables,
   previousImpact,
   viewport,
+  oppositeAxis,
 }: Args): ?Result => {
   const draggable: DraggableDimension = draggables[draggableId];
   const source: DroppableDimension = droppables[droppableId];
 
+  const axis: Axis = oppositeAxis ? makeOppositeAxis(source.axis) : source.axis;
   // not considering the container scroll changes as container scrolling cancels a keyboard drag
-
   const destination: ?DroppableDimension = getBestCrossAxisDroppable({
     isMovingForward,
     pageBorderBoxCenter,
     source,
     droppables,
     viewport,
+    customAxis: axis,
   });
 
   // nothing available to move to
@@ -71,7 +76,7 @@ export default ({
   );
 
   const target: ?DraggableDimension = getClosestDraggable({
-    axis: destination.axis,
+    axis,
     pageBorderBoxCenter,
     destination,
     insideDestination,
