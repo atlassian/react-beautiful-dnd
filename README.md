@@ -1010,7 +1010,7 @@ type DraggingStyle = {|
   zIndex: ZIndex,
 |}
 type NotDraggingStyle = {|
-  transition: ?string,
+  transform: ?string,
   transition: null | 'none',
 |}
 ```
