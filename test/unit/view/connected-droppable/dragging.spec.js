@@ -1,7 +1,7 @@
 // @flow
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import { makeMapStateToProps } from '../../../../src/view/droppable/connected-droppable';
-import type { State, DroppableDimension, DraggingState } from '../../../../src/types';
+import type { DraggingState, DragImpact } from '../../../../src/types';
 import type {
   OwnProps,
   Selector,
