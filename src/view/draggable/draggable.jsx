@@ -33,7 +33,6 @@ import type {
   ZIndexOptions,
 } from './draggable-types';
 import getWindowScroll from '../window/get-window-scroll';
-import { withBoxSpacing, getBoxSizingHeightAndWidth } from '../../state/box';
 import type { Speed, Style as MovementStyle } from '../moveable/moveable-types';
 
 export const zIndexOptions: ZIndexOptions = {
@@ -129,6 +128,7 @@ export default class Draggable extends Component<Props> {
       autoScrollMode,
       viewport: getViewport(),
     });
+    timings.finish('LIFT');
   }
 
   onMove = (clientSelection: Position) => {
@@ -206,24 +206,27 @@ export default class Draggable extends Component<Props> {
       movementStyle: MovementStyle): DraggingStyle => {
       const box: BoxModel = dimension.client;
 
-      // const { width, height, top, left } = dimension.client.borderBox;
-      // For an explanation of properties see `draggable-types`.
-      const { width, height } = getBoxSizingHeightAndWidth(box, dimension.boxSizing);
-
       const style: DraggingStyle = {
-        // ## Sizing
-        boxSizing: dimension.boxSizing,
-        width,
-        height,
-        ...withBoxSpacing(box),
         // ## Placement
+        position: 'fixed',
         // As we are applying the margins we need to align to the start of the marginBox
         top: box.marginBox.top,
         left: box.marginBox.left,
-        zIndex: isDropAnimating ? zIndexOptions.dropAnimating : zIndexOptions.dragging,
+
+        // ## Sizing
+        // Locking these down as pulling the node out of the DOM could cause it to change size
+        boxSizing: 'border-box',
+        width: box.borderBox.width,
+        height: box.borderBox.height,
+
+        // ## Movement
+        // Opting out of the standard css transition for the dragging item
         transition: 'none',
+        // Layering
+        zIndex: isDropAnimating ? zIndexOptions.dropAnimating : zIndexOptions.dragging,
+        // Moving in response to user input
         transform: movementStyle.transform ? `${movementStyle.transform}` : null,
-        position: 'fixed',
+
         // ## Performance
         pointerEvents: 'none',
       };

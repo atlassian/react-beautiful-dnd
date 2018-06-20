@@ -52,33 +52,14 @@ export type HorizontalAxis = {|
 
 export type Axis = VerticalAxis | HorizontalAxis
 
-export type BoxSpacing = {|
-  marginTop: number,
-  marginRight: number,
-  marginBottom: number,
-  marginLeft: number,
-  paddingTop: number,
-  paddingRight: number,
-  paddingBottom: number,
-  paddingLeft: number,
-  borderTopWidth: number,
-  borderRightWidth: number,
-  borderBottomWidth: number,
-  borderLeftWidth: number,
-|}
-
-export type BoxSizing = 'border-box' | 'content-box';
-
 export type Placeholder = {|
   client: BoxModel,
   tagName: string,
   display: string,
-  boxSizing: BoxSizing,
 |}
 
 export type DraggableDimension = {|
   descriptor: DraggableDescriptor,
-  boxSizing: BoxSizing,
   // the placeholder for the draggable
   placeholder: Placeholder,
   // relative to the viewport when the drag started

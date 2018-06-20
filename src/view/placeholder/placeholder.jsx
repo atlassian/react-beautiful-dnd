@@ -1,6 +1,5 @@
 // @flow
 import React, { PureComponent } from 'react';
-import { withBoxSpacing, getBoxSizingHeightAndWidth } from '../../state/box';
 import type { Placeholder as PlaceholderType } from '../../types';
 
 type Props = {|
@@ -31,18 +30,17 @@ export default class Placeholder extends PureComponent<Props> {
 
   render() {
     const placeholder: PlaceholderType = this.props.placeholder;
-    const { client, display, tagName, boxSizing } = placeholder;
-
-    const { width, height } = getBoxSizingHeightAndWidth(client, boxSizing);
+    const { client, display, tagName } = placeholder;
 
     const style = {
       display,
-      boxSizing,
-      width,
-      height,
-      ...withBoxSpacing(client),
-      borderStyle: 'solid',
-      borderColor: 'transparent',
+      boxSizing: 'border-box',
+      width: client.borderBox.width,
+      height: client.borderBox.height,
+      marginTop: client.margin.top,
+      marginRight: client.margin.right,
+      marginBottom: client.margin.bottom,
+      marginLeft: client.margin.left,
 
       // Avoiding the collapsing or growing of this element when pushed by flex child siblings.
       // We have already taken a snapshot the current dimensions we do not want this element
