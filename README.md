@@ -1216,6 +1216,7 @@ const myOnMouseDown = event => console.log('mouse down on', event.target);
 ```js
 type DraggableStateSnapshot = {|
   isDragging: boolean,
+  isDropAnimating: boolean,
   // What Droppable (if any) the Draggable is currently over
   draggingOver: ?DroppableId,
 |};
@@ -1344,6 +1345,7 @@ type DraggableProvided = {|
 
 type DraggableStateSnapshot = {|
   isDragging: boolean,
+  isDropAnimating: boolean,
   draggingOver: ?DroppableId,
 |}
 
