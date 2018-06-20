@@ -1,6 +1,7 @@
 // @flow
 import React, { PureComponent } from 'react';
 import type { Placeholder as PlaceholderType } from '../../types';
+import type { PlaceholderStyle } from './placeholder-types';
 
 type Props = {|
   placeholder: PlaceholderType,
@@ -32,16 +33,25 @@ export default class Placeholder extends PureComponent<Props> {
     const placeholder: PlaceholderType = this.props.placeholder;
     const { client, display, tagName } = placeholder;
 
-    const style = {
+    // The goal of the placeholder is to take up the same amount of space
+    // as the original draggable
+    const style: PlaceholderStyle = {
       display,
+      // ## Recreating the box model
+      // We created the borderBox and then apply the margins directly
+      // this is to maintain any margin collapsing behaviour
+
+      // creating borderBox
       boxSizing: 'border-box',
       width: client.borderBox.width,
       height: client.borderBox.height,
+      // creating marginBox
       marginTop: client.margin.top,
       marginRight: client.margin.right,
       marginBottom: client.margin.bottom,
       marginLeft: client.margin.left,
 
+      // ## Avoiding collapsing
       // Avoiding the collapsing or growing of this element when pushed by flex child siblings.
       // We have already taken a snapshot the current dimensions we do not want this element
       // to recalculate its dimensions

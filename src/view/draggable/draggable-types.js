@@ -7,8 +7,6 @@ import type {
   DraggableDimension,
   ZIndex,
   State,
-  BoxSpacing,
-  BoxSizing,
 } from '../../types';
 import {
   lift,

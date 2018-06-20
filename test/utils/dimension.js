@@ -37,7 +37,6 @@ type GetComputedSpacingArgs = {|
   padding?: Spacing,
   border ?: Spacing,
   display ?: string,
-  boxSizing ?: string,
 |}
 
 const origin: Position = { x: 0, y: 0 };
@@ -47,7 +46,6 @@ export const getComputedSpacing = ({
   padding = noSpacing,
   border = noSpacing,
   display = 'block',
-  boxSizing = 'border-box',
 }: GetComputedSpacingArgs): Object => ({
   paddingTop: `${padding.top}px`,
   paddingRight: `${padding.right}px`,
@@ -62,7 +60,6 @@ export const getComputedSpacing = ({
   borderBottomWidth: `${border.bottom}px`,
   borderLeftWidth: `${border.left}px`,
   display,
-  boxSizing,
 });
 
 export const makeScrollable = (droppable: DroppableDimension, amount?: number = 20) => {
@@ -154,7 +151,6 @@ const getPlaceholder = (client: BoxModel): Placeholder => ({
   client,
   tagName: 'div',
   display: 'block',
-  boxSizing: 'border-box',
 });
 
 export const getClosestScrollable = (droppable: DroppableDimension): Scrollable => {
@@ -191,7 +187,6 @@ export const getDraggableDimension = ({
   const result: DraggableDimension = {
     descriptor,
     client,
-    boxSizing: 'border-box',
     page: withScroll(client, windowScroll),
     placeholder: getPlaceholder(client),
   };
@@ -591,7 +586,6 @@ export const shiftDraggables = ({
           ...dimension.descriptor,
           index: dimension.descriptor.index + indexChange,
         },
-        boxSizing: dimension.boxSizing,
         client,
         page,
         placeholder: {

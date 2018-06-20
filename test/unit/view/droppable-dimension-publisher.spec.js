@@ -14,7 +14,7 @@ import { negate } from '../../../src/state/position';
 import setWindowScroll from '../../utils/set-window-scroll';
 
 import forceUpdate from '../../utils/force-update';
-import { getMarshalStub } from '../../utils/get-dimension-marshal';
+import { getMarshalStub } from '../../utils/dimension-marshal';
 import { withDimensionMarshal } from '../../utils/get-context-options';
 import getWindowScroll from '../../../src/view/window/get-window-scroll';
 import { setViewport, resetViewport } from '../../utils/viewport';
@@ -390,7 +390,8 @@ describe('DraggableDimensionPublisher', () => {
           // pull the get dimension function out
           const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
           // execute it to get the dimension
-          const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
+          const result: DroppableDimension =
+            callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
 
           expect(result).toEqual(expected);
         });
@@ -444,7 +445,8 @@ describe('DraggableDimensionPublisher', () => {
           // pull the get dimension function out
           const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
           // execute it to get the dimension
-          const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
+          const result: DroppableDimension =
+            callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
 
           expect(result).toEqual(expected);
         });
@@ -501,7 +503,8 @@ describe('DraggableDimensionPublisher', () => {
           // pull the get dimension function out
           const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
           // execute it to get the dimension
-          const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
+          const result: DroppableDimension =
+            callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
 
           expect(result).toEqual(expected);
         });
@@ -544,7 +547,8 @@ describe('DraggableDimensionPublisher', () => {
           // pull the get dimension function out
           const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
           // execute it to get the dimension
-          const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
+          const result: DroppableDimension =
+            callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
 
           expect(result).toEqual(expected);
         });
@@ -595,7 +599,8 @@ describe('DraggableDimensionPublisher', () => {
           // pull the get dimension function out
           const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
           // execute it to get the dimension
-          const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
+          const result: DroppableDimension =
+            callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
 
           expect(result).toEqual(expected);
         });
@@ -641,7 +646,8 @@ describe('DraggableDimensionPublisher', () => {
           // pull the get dimension function out
         const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
         // execute it to get the dimension
-        const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
+        const result: DroppableDimension =
+          callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
 
         expect(result).toEqual(expected);
       });
@@ -683,7 +689,8 @@ describe('DraggableDimensionPublisher', () => {
           // pull the get dimension function out
         const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
         // execute it to get the dimension
-        const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
+        const result: DroppableDimension =
+          callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
 
         expect(result).toEqual(expected);
       });

@@ -13,7 +13,6 @@ import type {
   DraggableId,
   DroppableId,
   TypeId,
-  BoxSizing,
 } from '../../types';
 import type { DimensionMarshal } from '../../state/dimension-marshal/dimension-marshal-types';
 
@@ -106,18 +105,14 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     const client: BoxModel = calculateBox(borderBox, computedStyles);
     const page: BoxModel = withScroll(client, windowScroll);
 
-    const boxSizing: BoxSizing = computedStyles.boxSizing === 'border-box' ? 'border-box' : 'content-box';
-
     const placeholder: Placeholder = {
       client,
       tagName: targetRef.tagName.toLowerCase(),
       display: computedStyles.display,
-      boxSizing,
     };
 
     const dimension: DraggableDimension = {
       descriptor,
-      boxSizing,
       placeholder,
       client,
       page,

@@ -8,6 +8,7 @@ import DragHandle from '../../../src/view/drag-handle/drag-handle';
 import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
 import Moveable from '../../../src/view/moveable/';
 import Placeholder from '../../../src/view/placeholder';
+import type { PlaceholderStyle } from '../../../src/view/placeholder/placeholder-types';
 import { subtract } from '../../../src/state/position';
 import createStyleMarshal from '../../../src/view/style-marshal/style-marshal';
 import type { StyleMarshal } from '../../../src/view/style-marshal/style-marshal-types';
@@ -22,14 +23,13 @@ import type {
 } from '../../../src/view/draggable/draggable-types';
 import type {
   DraggableDimension,
-  DroppableDimension,
   DraggableId,
   DroppableId,
   TypeId,
   ItemPositions,
   Viewport,
 } from '../../../src/types';
-import { getDraggableDimension, getDroppableDimension, getPreset } from '../../utils/dimension';
+import { getPreset } from '../../utils/dimension';
 import { combine, withStore, withDroppableId, withStyleContext, withDimensionMarshal, withCanLift, withDroppableType } from '../../utils/get-context-options';
 import { dispatchWindowMouseEvent, mouseEvent } from '../../utils/user-input-util';
 import { setViewport, resetViewport } from '../../utils/viewport';
@@ -52,40 +52,12 @@ class Item extends Component<{ provided: Provided }> {
   }
 }
 
-const draggableId: DraggableId = 'draggable1';
-const droppableId: DroppableId = 'droppable1';
-const type: TypeId = 'ITEM';
-const origin: Position = { x: 0, y: 0 };
 const preset = getPreset();
-
-const droppable: DroppableDimension = getDroppableDimension({
-  descriptor: {
-    id: droppableId,
-    type,
-  },
-  borderBox: {
-    top: 0,
-    right: 100,
-    bottom: 200,
-    left: 0,
-  },
-});
-
-const dimension: DraggableDimension = getDraggableDimension({
-  descriptor: {
-    id: draggableId,
-    droppableId,
-    type,
-    index: 0,
-  },
-  borderBox: {
-    top: 0,
-    right: 100,
-    bottom: 100,
-    left: 0,
-  },
-  // TODO: margin
-});
+const dimension: DraggableDimension = preset.inHome1;
+const draggableId: DraggableId = dimension.descriptor.id;
+const droppableId: DroppableId = dimension.descriptor.droppableId;
+const type: TypeId = dimension.descriptor.type;
+const origin: Position = { x: 0, y: 0 };
 
 const getDispatchPropsStub = (): DispatchProps => ({
   lift: jest.fn(),
@@ -382,15 +354,6 @@ describe('Draggable - unconnected', () => {
 
     describe('handling events', () => {
       describe('onLift', () => {
-        let dispatchProps;
-
-        beforeEach(() => {
-          dispatchProps = getDispatchPropsStub();
-          managedWrapper = mountDraggable({
-            dispatchProps,
-          });
-        });
-
         it('should throw if lifted when dragging is not enabled', () => {
           const customWrapper = mountDraggable({
             ownProps: disabledOwnProps,
@@ -408,6 +371,11 @@ describe('Draggable - unconnected', () => {
         });
 
         it('should lift if permitted', () => {
+          const dispatchProps = getDispatchPropsStub();
+          const wrapper = mountDraggable({
+            dispatchProps,
+          });
+
           // made up values
           const selection: Position = {
             x: 100,
@@ -423,7 +391,7 @@ describe('Draggable - unconnected', () => {
             offset: origin,
           };
 
-          executeOnLift(managedWrapper)({ selection, borderBoxCenter, viewport: preset.viewport });
+          executeOnLift(wrapper)({ selection, borderBoxCenter, viewport: preset.viewport });
 
           // $ExpectError - mock property on lift function
           expect(dispatchProps.lift).toHaveBeenCalledWith({
@@ -801,7 +769,7 @@ describe('Draggable - unconnected', () => {
 
         const props: Object = child.props();
 
-        expect(props.style).toEqual({
+        const expected: PlaceholderStyle = {
           width: dimension.placeholder.client.borderBox.width,
           height: dimension.placeholder.client.borderBox.height,
           marginTop: dimension.placeholder.client.margin.top,
@@ -813,7 +781,8 @@ describe('Draggable - unconnected', () => {
           flexGrow: '0',
           boxSizing: 'border-box',
           pointerEvents: 'none',
-        });
+        };
+        expect(props.style).toEqual(expected);
         expect(child.type()).toBe(dimension.placeholder.tagName);
       });
 

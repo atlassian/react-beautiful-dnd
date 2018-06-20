@@ -13,7 +13,7 @@ import type {
 import { withDimensionMarshal } from '../../utils/get-context-options';
 import forceUpdate from '../../utils/force-update';
 import { setViewport } from '../../utils/viewport';
-import { getMarshalStub } from '../../utils/get-dimension-marshal';
+import { getMarshalStub } from '../../utils/dimension-marshal';
 import { offsetByPosition } from '../../../src/state/spacing';
 import type {
   DraggableId,
@@ -219,10 +219,6 @@ describe('DraggableDimensionPublisher', () => {
         x: window.pageXOffset,
         y: window.pageYOffset,
       };
-      // const windowScroll: Position = {
-      //   x: 100,
-      //   y: 200,
-      // };
       const borderBox: Spacing = {
         top: 0,
         right: 100,
