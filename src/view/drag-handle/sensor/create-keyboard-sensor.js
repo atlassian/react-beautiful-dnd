@@ -1,5 +1,6 @@
 // @flow
 /* eslint-disable no-use-before-define */
+import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import createScheduler from '../util/create-scheduler';
 import preventStandardKeyEvents from '../util/prevent-standard-key-events';
@@ -82,10 +83,7 @@ export default ({
 
       const ref: ?HTMLElement = getDraggableRef();
 
-      if (!ref) {
-        console.error('cannot start a keyboard drag without a draggable ref');
-        return;
-      }
+      invariant(ref, 'Cannot start a keyboard drag without a draggable ref');
 
       // using center position as selection
       const center: Position = getBorderBoxCenterPosition(ref);

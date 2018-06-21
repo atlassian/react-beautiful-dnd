@@ -1,5 +1,6 @@
 // @flow
 /* eslint-disable no-use-before-define */
+import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import createScheduler from '../util/create-scheduler';
 import createPostDragEventPreventer, { type EventPreventer } from '../util/create-post-drag-event-preventer';
@@ -368,14 +369,9 @@ export default ({
       return;
     }
 
-    // TODO: call prevent default here?
-    if (!canStartCapturing(event)) {
-      return;
-    }
+    invariant(!isCapturing(), 'Should not be able to perform a touch start while a drag or pending drag is occurring');
 
-    if (isCapturing()) {
-      console.error('should not be able to perform a touch start while a drag or pending drag is occurring');
-      cancel();
+    if (!canStartCapturing(event)) {
       return;
     }
 

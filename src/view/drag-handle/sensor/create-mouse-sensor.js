@@ -1,5 +1,6 @@
 // @flow
 /* eslint-disable no-use-before-define */
+import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import createScheduler from '../util/create-scheduler';
 import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
@@ -247,13 +248,13 @@ export default ({
       return;
     }
 
-    if (!canStartCapturing(event)) {
-      return;
-    }
+    invariant(!isCapturing(), 'Should not be able to perform a mouse down while a drag or pending drag is occurring');
 
-    if (isCapturing()) {
-      console.error('should not be able to perform a mouse down while a drag or pending drag is occurring');
-      cancel();
+    if (!canStartCapturing(event)) {
+      // blocking the event as we want to opt out of the standard browser behaviour
+      // this *could* occur during a drop - although it should not thanks to pointer-events: none
+      // this is just being really safe
+      event.preventDefault();
       return;
     }
 
