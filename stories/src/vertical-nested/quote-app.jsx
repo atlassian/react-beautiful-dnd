@@ -74,11 +74,9 @@ export default class QuoteApp extends Component<*, State> {
 
     const setList = (newList) => {
       if (newList.id === 'first-level') {
-        debugger
         this.setState({ list: newList });
       } else {
         this.setState((prevState) => {
-          debugger
           const prevList: NestedQuoteList = prevState.list;
           const prevNestedList: NestedQuoteList = prevList.children.find(item => item.children);
           const children = prevList.children.slice();
@@ -100,7 +98,6 @@ export default class QuoteApp extends Component<*, State> {
       destList = { ...destList, children };
       setList(destList);
     } else {
-      debugger
       const srcChildren = srcList.children.slice();
       const [child] = srcChildren.splice(result.source.index, 1);
       srcList = { ...srcList, children: srcChildren };
