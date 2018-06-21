@@ -6,6 +6,7 @@ import { getMarshalStub } from './dimension-marshal';
 import type { DroppableId, TypeId } from '../../src/types';
 import type { DimensionMarshal } from '../../src/state/dimension-marshal/dimension-marshal-types';
 import type { StyleMarshal } from '../../src/view/style-marshal/style-marshal-types';
+import type { AutoScroller } from '../../src/state/auto-scroller/auto-scroller-types';
 
 // Not using this store - just putting it on the context
 // For any connected components that need it (eg DimensionPublisher)
@@ -27,6 +28,11 @@ export const withStore = () => ({
         onDragEnd: () => { },
       }),
       announce: () => { },
+      getScroller: (): AutoScroller => ({
+        cancel: jest.fn(),
+        jumpScroll: jest.fn(),
+        fluidScroll: jest.fn(),
+      }),
     }),
   },
   childContextTypes: {

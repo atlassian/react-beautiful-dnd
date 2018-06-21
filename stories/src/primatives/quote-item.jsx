@@ -1,5 +1,4 @@
 // @flow
-import { getBox } from 'css-box-model';
 import React from 'react';
 import styled from 'styled-components';
 import { borderRadius, colors, grid } from '../constants';
@@ -100,9 +99,6 @@ const Attribution = styled.small`
 // things we should be doing in the selector as we do not know if consumers
 // will be using PureComponent
 export default class QuoteItem extends React.PureComponent<Props> {
-  componentDidMount() {
-    console.log(`mounting center: ${this.props.quote.id}`, getBox(this.ref).borderBox.center);
-  }
   render() {
     const { quote, isDragging, provided } = this.props;
 
@@ -110,10 +106,7 @@ export default class QuoteItem extends React.PureComponent<Props> {
       <Container
         href={quote.author.url}
         isDragging={isDragging}
-        innerRef={(ref) => {
-          this.ref = ref;
-          provided.innerRef(ref);
-        }}
+        innerRef={provided.innerRef}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
       >

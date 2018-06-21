@@ -406,6 +406,7 @@ describe('get drag impact', () => {
               descriptor: {
                 id: 'visible',
                 droppableId: droppable.descriptor.id,
+                type: droppable.descriptor.type,
                 index: 0,
               },
               borderBox: {
@@ -419,6 +420,7 @@ describe('get drag impact', () => {
               descriptor: {
                 id: 'not-visible-1',
                 droppableId: droppable.descriptor.id,
+                type: droppable.descriptor.type,
                 index: 1,
               },
               borderBox: {
@@ -433,6 +435,7 @@ describe('get drag impact', () => {
               descriptor: {
                 id: 'not-visible-2',
                 droppableId: droppable.descriptor.id,
+                type: droppable.descriptor.type,
                 index: 2,
               },
               borderBox: {
@@ -510,6 +513,7 @@ describe('get drag impact', () => {
               descriptor: {
                 id: 'visible',
                 droppableId: droppable.descriptor.id,
+                type: droppable.descriptor.type,
                 index: 0,
               },
               borderBox: {
@@ -523,6 +527,7 @@ describe('get drag impact', () => {
               descriptor: {
                 id: 'not-visible-1',
                 droppableId: droppable.descriptor.id,
+                type: droppable.descriptor.type,
                 index: 1,
               },
               borderBox: {
@@ -537,6 +542,7 @@ describe('get drag impact', () => {
               descriptor: {
                 id: 'not-visible-2',
                 droppableId: droppable.descriptor.id,
+                type: droppable.descriptor.type,
                 index: 2,
               },
               borderBox: {
@@ -1020,6 +1026,7 @@ describe('get drag impact', () => {
               descriptor: {
                 id: 'inSource1',
                 droppableId: source.descriptor.id,
+                type: source.descriptor.type,
                 index: 0,
               },
               borderBox: {
@@ -1064,6 +1071,7 @@ describe('get drag impact', () => {
               descriptor: {
                 id: 'visible',
                 droppableId: destination.descriptor.id,
+                type: destination.descriptor.type,
                 index: 0,
               },
               borderBox: {
@@ -1077,6 +1085,7 @@ describe('get drag impact', () => {
               descriptor: {
                 id: 'not-visible-1',
                 droppableId: destination.descriptor.id,
+                type: destination.descriptor.type,
                 index: 1,
               },
               borderBox: {
@@ -1158,6 +1167,7 @@ describe('get drag impact', () => {
               descriptor: {
                 id: 'inSource1',
                 droppableId: source.descriptor.id,
+                type: source.descriptor.type,
                 index: 0,
               },
               borderBox: {
@@ -1187,6 +1197,7 @@ describe('get drag impact', () => {
               descriptor: {
                 id: 'visible',
                 droppableId: destination.descriptor.id,
+                type: destination.descriptor.type,
                 index: 0,
               },
               borderBox: {
@@ -1200,6 +1211,7 @@ describe('get drag impact', () => {
               descriptor: {
                 id: 'not-visible-1',
                 droppableId: destination.descriptor.id,
+                type: destination.descriptor.type,
                 index: 1,
               },
               borderBox: {

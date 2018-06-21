@@ -115,7 +115,7 @@ export default ({
       const draggables: DraggableDimension[] = Object.keys(additions.draggables)
         .map((id: DraggableId): DraggableDimension =>
           // TODO
-          entries.draggables[id].getDimension(windowScroll, { x: 0, y: 0 })
+          entries.draggables[id].getDimension(windowScroll)
         );
 
       const droppables: DroppableDimension[] = Object.keys(additions.droppables)

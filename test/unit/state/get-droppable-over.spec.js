@@ -98,7 +98,8 @@ describe('get droppable over', () => {
     const draggable: DraggableDimension = getDraggableDimension({
       descriptor: {
         id: 'draggable',
-        droppableId: droppable.descriptor.type,
+        droppableId: droppable.descriptor.id,
+        type: droppable.descriptor.type,
         index: 0,
       },
       borderBox: {
@@ -142,7 +143,8 @@ describe('get droppable over', () => {
     const draggable: DraggableDimension = getDraggableDimension({
       descriptor: {
         id: 'draggable',
-        droppableId: droppable.descriptor.type,
+        droppableId: droppable.descriptor.id,
+        type: droppable.descriptor.type,
         index: 0,
       },
       borderBox: {
@@ -183,6 +185,7 @@ describe('get droppable over', () => {
       descriptor: {
         id: 'in-home-1',
         droppableId: home.descriptor.id,
+        type: home.descriptor.type,
         index: 0,
       },
       borderBox: {
@@ -198,6 +201,7 @@ describe('get droppable over', () => {
       descriptor: {
         id: 'in-foreign-1',
         droppableId: 'foreign',
+        type: home.descriptor.type,
         index: 0,
       },
       borderBox: {

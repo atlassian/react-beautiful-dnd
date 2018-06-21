@@ -2,7 +2,7 @@
 import React from 'react';
 import QuoteList from '../primatives/quote-list';
 import { DragDropContext } from '../../../src/';
-import type { DropResult, DragUpdate, DragStart, DraggableLocation } from '../../../src/types';
+import type { DropResult, DragUpdate, DraggableLocation } from '../../../src/types';
 import type { Quote } from '../types';
 import { quotes as initial, getQuotes } from '../data';
 import reorder from '../reorder';
@@ -13,13 +13,11 @@ type State = {|
 |}
 
 export default class LazyLoading extends React.Component<*, State> {
+  // eslint-disable-next-line react/sort-comp
+  timerId: ?TimeoutID = null;
   state: State = {
     quotes: initial,
     isLoading: false,
-  }
-
-  onDragStart = (start: DragStart) => {
-
   }
 
   onDragUpdate = (update: DragUpdate) => {
@@ -32,9 +30,6 @@ export default class LazyLoading extends React.Component<*, State> {
     const startLoadingFrom: number = lastIndex - 2;
 
     if (destination.index < startLoadingFrom) {
-      console.log('not far enough along');
-      console.log('destination', destination.index);
-      console.log('startLoading from', startLoadingFrom);
       return;
     }
 
@@ -72,7 +67,6 @@ export default class LazyLoading extends React.Component<*, State> {
   }
 
   startLazyLoading = () => {
-    console.log('starting lazy load');
     if (this.state.isLoading) {
       return;
     }
@@ -96,7 +90,6 @@ export default class LazyLoading extends React.Component<*, State> {
   render() {
     return (
       <DragDropContext
-        onDragStart={this.onDragStart}
         onDragUpdate={this.onDragUpdate}
         onDragEnd={this.onDragEnd}
       >

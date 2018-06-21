@@ -482,6 +482,7 @@ describe('move to next index', () => {
                 descriptor: {
                   id: 'inHome1',
                   droppableId: home.descriptor.id,
+                  type: home.descriptor.type,
                   index: 0,
                 },
                 borderBox: {
@@ -496,6 +497,7 @@ describe('move to next index', () => {
                 descriptor: {
                   id: 'inHome2',
                   droppableId: home.descriptor.id,
+                  type: home.descriptor.type,
                   index: 1,
                 },
                 borderBox: {
@@ -510,6 +512,7 @@ describe('move to next index', () => {
                 descriptor: {
                   id: 'inHome3',
                   droppableId: home.descriptor.id,
+                  type: home.descriptor.type,
                   index: 2,
                 },
                 borderBox: {
@@ -524,6 +527,7 @@ describe('move to next index', () => {
                 descriptor: {
                   id: 'inHome4',
                   droppableId: home.descriptor.id,
+                  type: home.descriptor.type,
                   index: 3,
                 },
                 borderBox: {
@@ -538,6 +542,7 @@ describe('move to next index', () => {
                 descriptor: {
                   id: 'inHome5',
                   droppableId: home.descriptor.id,
+                  type: home.descriptor.type,
                   index: 4,
                 },
                 borderBox: {
@@ -552,6 +557,7 @@ describe('move to next index', () => {
                 descriptor: {
                   id: 'inHome5',
                   droppableId: home.descriptor.id,
+                  type: home.descriptor.type,
                   index: 5,
                 },
                 borderBox: {
@@ -1035,6 +1041,7 @@ describe('move to next index', () => {
                   id: 'inside',
                   index: 0,
                   droppableId: droppable.descriptor.id,
+                  type: droppable.descriptor.type,
                 },
                 borderBox: customViewport.frame,
               });
@@ -1043,6 +1050,7 @@ describe('move to next index', () => {
                   id: 'outside',
                   index: 1,
                   droppableId: droppable.descriptor.id,
+                  type: droppable.descriptor.type,
                 },
                 borderBox: {
                   // is bottom left of the viewport
@@ -1122,6 +1130,7 @@ describe('move to next index', () => {
                   id: 'inside',
                   index: 0,
                   droppableId: droppable.descriptor.id,
+                  type: droppable.descriptor.type,
                 },
                 borderBox: {
                   top: 0,
@@ -1135,6 +1144,7 @@ describe('move to next index', () => {
                   id: 'partial',
                   index: 1,
                   droppableId: droppable.descriptor.id,
+                  type: droppable.descriptor.type,
                 },
                 borderBox: {
                   top: customViewport.frame.bottom + 1,
@@ -1227,6 +1237,7 @@ describe('move to next index', () => {
                   id: 'inside',
                   index: 0,
                   droppableId: droppable.descriptor.id,
+                  type: droppable.descriptor.type,
                 },
                 borderBox: {
                   top: 0,
@@ -1241,6 +1252,7 @@ describe('move to next index', () => {
                   id: 'outside',
                   index: 1,
                   droppableId: droppable.descriptor.id,
+                  type: droppable.descriptor.type,
                 },
                 borderBox: {
                   // in the droppable, but outside the frame
