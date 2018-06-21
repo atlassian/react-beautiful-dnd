@@ -141,9 +141,7 @@ export default class Draggable extends Component<Props> {
       return;
     }
 
-    timings.start('move');
     move({ client: clientSelection, shouldAnimate: false });
-    timings.finish('move');
   }
 
   onMoveUp = () => {

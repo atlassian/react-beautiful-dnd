@@ -5,6 +5,7 @@ import {
   dropPending,
   completeDrop,
   animateDrop,
+  clean,
 } from '../action-creators';
 import noImpact from '../no-impact';
 import getNewHomeClientBorderBoxCenter from '../get-new-home-client-border-box-center';
@@ -50,6 +51,13 @@ export default ({ getState, dispatch }: Store) =>
     // We are now shifting the application into the 'DROP_PENDING' phase
     if (state.phase === 'COLLECTING') {
       dispatch(dropPending({ reason }));
+      return;
+    }
+
+    // Drag ended before preparing phase had finished
+    // No hooks have been called at this point
+    if (state.phase === 'PREPARING') {
+      dispatch(clean());
       return;
     }
 

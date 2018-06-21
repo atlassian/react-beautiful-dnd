@@ -49,12 +49,6 @@ it('should throw an error if a drop action occurs while not in a phase where you
     store.dispatch(drop({ reason: 'DROP' }));
   }).toThrow();
 
-  // prepare
-  expect(() => {
-    store.dispatch(prepare());
-    store.dispatch(drop({ reason: 'DROP' }));
-  }).toThrow();
-
   // drop animating
   store.dispatch(clean());
   store.dispatch(prepare());
@@ -96,6 +90,22 @@ it('should dispatch a DROP_PENDING action if COLLECTING', () => {
   expect(mock).toHaveBeenCalledWith(dropPending({ reason: 'DROP' }));
   expect(mock).toHaveBeenCalledTimes(2);
   expect(store.getState().phase).toBe('DROP_PENDING');
+});
+
+it('should reset the state if a drop occurs while the application is preparing', () => {
+  const mock = jest.fn();
+  const store: Store = createStore(
+    passThrough(mock),
+    middleware,
+  );
+
+  store.dispatch(prepare());
+  expect(store.getState().phase).toBe('PREPARING');
+
+  store.dispatch(drop({ reason: 'DROP' }));
+  expect(store.getState().phase).toBe('IDLE');
+  expect(mock).toHaveBeenCalledWith(drop({ reason: 'DROP' }));
+  expect(mock).toHaveBeenCalledWith(clean());
 });
 
 it('should throw if a drop action is fired and there is DROP_PENDING and it is waiting for a publish', () => {
@@ -175,18 +185,13 @@ describe('no drop animation required', () => {
 });
 
 describe('drop animation required', () => {
-  const withPassThrough = (myMiddleware: mixed, mock: Function): Store => {
-    const store: Store = createStore(
-      passThrough(mock),
-      myMiddleware,
-    );
-    return store;
-  };
-
   describe('reason: CANCEL', () => {
     it('should animate back to the origin', () => {
       const mock = jest.fn();
-      const store: Store = withPassThrough(middleware, mock);
+      const store: Store = createStore(
+        passThrough(mock),
+        middleware,
+      );
 
       store.dispatch(prepare());
       store.dispatch(initialPublish(initialPublishArgs));
@@ -219,7 +224,10 @@ describe('drop animation required', () => {
 
     it('should account for any change in scroll in the home droppable', () => {
       const mock = jest.fn();
-      const store: Store = withPassThrough(middleware, mock);
+      const store: Store = createStore(
+        passThrough(mock),
+        middleware,
+      );
 
       const scrollableHome: DroppableDimension = makeScrollable(preset.home);
 
@@ -269,7 +277,10 @@ describe('drop animation required', () => {
 
     it('should not account for scrolling in the droppable the draggable is over if it is not the home', () => {
       const mock = jest.fn();
-      const store: Store = withPassThrough(middleware, mock);
+      const store: Store = createStore(
+        passThrough(mock),
+        middleware,
+      );
 
       const scrollableForeign: DroppableDimension = makeScrollable(preset.foreign);
       const customInitial: InitialPublishArgs = {
@@ -321,7 +332,10 @@ describe('drop animation required', () => {
   describe('reason: DROP', () => {
     it('should account for any change in scroll in the home droppable if not dragging over anything', () => {
       const mock = jest.fn();
-      const store: Store = withPassThrough(middleware, mock);
+      const store: Store = createStore(
+        passThrough(mock),
+        middleware,
+      );
 
       const scrollableHome: DroppableDimension = makeScrollable(preset.home);
       const customArgs: InitialPublishArgs = {
@@ -385,7 +399,10 @@ describe('drop animation required', () => {
     // very difficult to setup that test correctly
     it('should account for any change in scroll in the droppable being dropped into', () => {
       const mock = jest.fn();
-      const store: Store = withPassThrough(middleware, mock);
+      const store: Store = createStore(
+        passThrough(mock),
+        middleware,
+      );
 
       const scrollableHome: DroppableDimension = makeScrollable(preset.home);
       const customArgs: InitialPublishArgs = {
@@ -447,7 +464,10 @@ describe('drop animation required', () => {
 
     it('should account for any change in scroll in the window', () => {
       const mock = jest.fn();
-      const store: Store = withPassThrough(middleware, mock);
+      const store: Store = createStore(
+        passThrough(mock),
+        middleware,
+      );
 
       // getting into a drag
       store.dispatch(clean());
