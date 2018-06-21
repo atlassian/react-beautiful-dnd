@@ -61,57 +61,67 @@ export default class QuoteApp extends Component<*, State> {
     publishOnDragEnd(result);
 
     // dropped outside the list
-    if (!result.destination) {
-      return;
-    }
+    if (result.destination) {
+      const destId: string = result.destination.droppableId;
+      const srcId: string = result.source.droppableId;
+      const list: NestedQuoteList = this.state.list;
+      const nestedList: ?NestedQuoteList = list.children.find(item => item.children);
 
-    const destId: String = result.destination.droppableId;
-    const srcId: String = result.source.droppableId;
-    const list: NestedQuoteList = this.state.list;
-    const nestedList: NestedQuoteList = list.children.find(item => item.children);
-    let destList: NestedQuoteList = destId === 'first-level' ? list : nestedList;
-    let srcList: NestedQuoteList = srcId === 'first-level' ? list : nestedList;
-
-    const setList = (newList) => {
-      if (newList.id === 'first-level') {
-        this.setState({ list: newList });
-      } else {
-        this.setState((prevState) => {
-          const prevList: NestedQuoteList = prevState.list;
-          const prevNestedList: NestedQuoteList = prevList.children.find(item => item.children);
-          const children = prevList.children.slice();
-          const index = children.indexOf(prevNestedList);
-          children[index] = newList;
-          return { list: { ...prevList, children } };
-        });
+      if (!nestedList) {
+        throw new Error('No nested list found!');
       }
-    };
 
-    if (destId === srcId) {
-      const children = reorder(
-        destList.children,
-        result.source.index,
-        result.destination.index,
-      );
+      let destList: NestedQuoteList = destId === 'first-level' ? list : nestedList;
+      let srcList: NestedQuoteList = srcId === 'first-level' ? list : nestedList;
 
-      // $ExpectError - using spread
-      destList = { ...destList, children };
-      setList(destList);
-    } else {
-      const srcChildren = srcList.children.slice();
-      const [child] = srcChildren.splice(result.source.index, 1);
-      srcList = { ...srcList, children: srcChildren };
+      const setList = (newList) => {
+        if (newList.id === 'first-level') {
+          this.setState({ list: newList });
+        } else {
+          this.setState((prevState) => {
+            const prevList: NestedQuoteList = prevState.list;
+            const prevNestedList: ?NestedQuoteList = prevList.children.find(item => item.children);
 
-      const destChildren = destList.children.slice();
-      destChildren.splice(result.destination.index, 0, child);
-      destList = { ...destList, children: destChildren };
+            if (!prevNestedList) {
+              throw new Error('No nested list found!');
+            }
 
-      if (destId !== 'first-level') {
-        setList(srcList);
+            const children = prevList.children.slice();
+            const index = children.indexOf(prevNestedList);
+            children[index] = newList;
+            return { list: { ...prevList, children } };
+          });
+        }
+      };
+
+      if (destId === srcId) {
+        const children = reorder(
+          destList.children,
+          result.source.index,
+          // $FlowFixMe
+          result.destination && result.destination.index,
+        );
+
+        // $ExpectError - using spread
+        destList = { ...destList, children };
         setList(destList);
       } else {
-        setList(destList);
-        setList(srcList);
+        const srcChildren = srcList.children.slice();
+        const [child] = srcChildren.splice(result.source.index, 1);
+        srcList = { ...srcList, children: srcChildren };
+
+        const destChildren = destList.children.slice();
+        // $FlowFixMe
+        destChildren.splice(result.destination && result.destination.index, 0, child);
+        destList = { ...destList, children: destChildren };
+
+        if (destId !== 'first-level') {
+          setList(srcList);
+          setList(destList);
+        } else {
+          setList(destList);
+          setList(srcList);
+        }
       }
     }
   }
