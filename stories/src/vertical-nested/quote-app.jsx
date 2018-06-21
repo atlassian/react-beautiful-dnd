@@ -65,59 +65,57 @@ export default class QuoteApp extends Component<*, State> {
       return;
     }
 
-    if (result.type === 'first-level') {
+    const destId: String = result.destination.droppableId;
+    const srcId: String = result.source.droppableId;
+    const list: NestedQuoteList = this.state.list;
+    const nestedList: NestedQuoteList = list.children.find(item => item.children);
+    let destList: NestedQuoteList = destId === 'first-level' ? list : nestedList;
+    let srcList: NestedQuoteList = srcId === 'first-level' ? list : nestedList;
+
+    const setList = (newList) => {
+      if (newList.id === 'first-level') {
+        debugger
+        this.setState({ list: newList });
+      } else {
+        this.setState((prevState) => {
+          debugger
+          const prevList: NestedQuoteList = prevState.list;
+          const prevNestedList: NestedQuoteList = prevList.children.find(item => item.children);
+          const children = prevList.children.slice();
+          const index = children.indexOf(prevNestedList);
+          children[index] = newList;
+          return { list: { ...prevList, children } };
+        });
+      }
+    };
+
+    if (destId === srcId) {
       const children = reorder(
-        this.state.list.children,
+        destList.children,
         result.source.index,
         result.destination.index,
       );
 
       // $ExpectError - using spread
-      const list: NestedQuoteList = {
-        ...this.state.list,
-        children,
-      };
+      destList = { ...destList, children };
+      setList(destList);
+    } else {
+      debugger
+      const srcChildren = srcList.children.slice();
+      const [child] = srcChildren.splice(result.source.index, 1);
+      srcList = { ...srcList, children: srcChildren };
 
-      this.setState({
-        list,
-      });
-      return;
-    }
+      const destChildren = destList.children.slice();
+      destChildren.splice(result.destination.index, 0, child);
+      destList = { ...destList, children: destChildren };
 
-    if (result.type === 'second-level') {
-      const nested: ?NestedQuoteList = (this.state.list.children.filter(
-        (item: mixed): boolean => Object.prototype.hasOwnProperty.call(item, 'children')
-      )[0] : any);
-
-      if (!nested) {
-        console.error('could not find nested list');
-        return;
+      if (destId !== 'first-level') {
+        setList(srcList);
+        setList(destList);
+      } else {
+        setList(destList);
+        setList(srcList);
       }
-
-      // $ExpectError - using spread
-      const updated: NestedQuoteList = {
-        ...nested,
-        children: reorder(
-          nested.children,
-          result.source.index,
-          // $ExpectError - already checked for null
-          result.destination.index,
-        ),
-      };
-
-      const nestedIndex = this.state.list.children.indexOf(nested);
-      const children = Array.from(this.state.list.children);
-      children[nestedIndex] = updated;
-
-      // $ExpectError - using spread
-      const list: NestedQuoteList = {
-        ...this.state.list,
-        children,
-      };
-
-      this.setState({
-        list,
-      });
     }
   }
 
