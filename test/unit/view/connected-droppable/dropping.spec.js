@@ -1,17 +1,14 @@
 // @flow
-import getStatePreset from '../../../utils/get-simple-state-preset';
 import { makeMapStateToProps } from '../../../../src/view/droppable/connected-droppable';
-import type { State, DroppableDimension, DraggingState } from '../../../../src/types';
+import { getPreset } from '../../../utils/dimension';
+import getStatePreset from '../../../utils/get-simple-state-preset';
+import getOwnProps from './get-own-props';
+import type { State } from '../../../../src/types';
 import type {
   OwnProps,
   Selector,
   MapProps,
 } from '../../../../src/view/droppable/droppable-types';
-import getOwnProps from './get-own-props';
-import { getPreset } from '../../../utils/dimension';
-import { move, type IsDraggingState, withImpact } from '../../../utils/dragging-state';
-import noImpact from '../../../../src/state/no-impact';
-import getHomeImpact from '../../../../src/state/get-home-impact';
 
 const preset = getPreset();
 const state = getStatePreset();

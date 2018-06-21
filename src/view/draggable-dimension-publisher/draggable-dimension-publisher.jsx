@@ -1,10 +1,9 @@
 // @flow
-import { Component, type Node } from 'react';
-import PropTypes from 'prop-types';
+import { calculateBox, withScroll, type BoxModel, type Position } from 'css-box-model';
 import memoizeOne from 'memoize-one';
+import PropTypes from 'prop-types';
+import { Component, type Node } from 'react';
 import invariant from 'tiny-invariant';
-import { calculateBox, withScroll, getBox, offset, type BoxModel, type Position } from 'css-box-model';
-import { negate, subtract, add } from '../../state/position';
 import { dimensionMarshalKey } from '../context-keys';
 import type {
   DraggableDescriptor,

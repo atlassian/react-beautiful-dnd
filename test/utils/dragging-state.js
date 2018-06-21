@@ -8,7 +8,6 @@ import type {
   DraggingState,
   CollectingState,
   DropPendingState,
-  DraggableDimension,
   DragImpact,
   DropAnimatingState,
   PendingDrop,

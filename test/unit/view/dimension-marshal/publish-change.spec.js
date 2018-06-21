@@ -6,7 +6,6 @@ import type {
   StartPublishingResult,
 } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
-  LiftRequest,
   DraggableDimension,
   DroppableDimension,
   DimensionMap,

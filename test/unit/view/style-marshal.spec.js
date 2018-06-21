@@ -1,12 +1,8 @@
 // @flow
 import createStyleMarshal, { resetStyleContext } from '../../../src/view/style-marshal/style-marshal';
 import getStyles, { type Styles } from '../../../src/view/style-marshal/get-styles';
-import getStatePreset from '../../utils/get-simple-state-preset';
 import { prefix } from '../../../src/view/data-attributes';
 import type { StyleMarshal } from '../../../src/view/style-marshal/style-marshal-types';
-import type { State } from '../../../src/types';
-
-const state = getStatePreset();
 
 const getStyleTagSelector = (context: string) =>
   `style[${prefix}="${context}"]`;
@@ -104,7 +100,6 @@ describe('style marshal', () => {
   });
 
   it('should remove the style tag from the head when unmounting', () => {
-    console.log('mounting');
     marshal.mount();
     const selector: string = getStyleTagSelector(marshal.styleContext);
 

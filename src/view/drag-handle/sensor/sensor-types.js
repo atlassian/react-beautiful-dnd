@@ -1,5 +1,5 @@
 // @flow
-import type { Props, Callbacks } from '../drag-handle-types';
+import type { Callbacks } from '../drag-handle-types';
 
 type SensorBase = {|
   // force stop and do not fire any events

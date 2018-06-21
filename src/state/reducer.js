@@ -5,7 +5,6 @@ import { scrollDroppable } from './droppable-dimension';
 import getDragImpact from './get-drag-impact/';
 import moveCrossAxis from './move-cross-axis/';
 import moveToNextIndex from './move-to-next-index/';
-import { noMovement } from './no-impact';
 import publish from './publish';
 import { add, isEqual, subtract } from './position';
 import scrollViewport from './scroll-viewport';
@@ -14,14 +13,12 @@ import getPageItemPositions from './get-page-item-positions';
 import type {
   Action,
   State,
-  DraggableDimension,
   DroppableDimension,
   DraggableLocation,
   PendingDrop,
   IdleState,
   PreparingState,
   DraggingState,
-  Critical,
   ItemPositions,
   DragPositions,
   CollectingState,

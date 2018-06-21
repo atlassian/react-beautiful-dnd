@@ -1,22 +1,18 @@
 // @flow
 import createDimensionMarshal from '../../../../src/state/dimension-marshal/dimension-marshal';
+import { getCallbacksStub, getDroppableCallbacks, populateMarshal } from '../../../utils/dimension-marshal';
+import { copy, critical, preset } from '../../../utils/preset-action-args';
 import type {
-  Callbacks,
   DimensionMarshal,
   DroppableCallbacks,
   StartPublishingResult,
 } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
-// import getViewport from '../../../../src/view/window/get-viewport';
 import type {
   LiftRequest,
   DraggableDimension,
   DroppableDimension,
   DimensionMap,
 } from '../../../../src/types';
-import {
-  critical, copy, preset,
-} from '../../../utils/preset-action-args';
-import { getDroppableCallbacks, populateMarshal, getCallbacksStub } from '../../../utils/dimension-marshal';
 
 const defaultRequest: LiftRequest = {
   draggableId: critical.draggable.id,
@@ -215,7 +211,8 @@ it('should publish droppables that have been updated (id change)', () => {
 });
 
 describe('subsequent calls', () => {
-  const start = (marshal: DimensionMarshal) => marshal.startPublishing(defaultRequest, preset.windowScroll);
+  const start = (marshal: DimensionMarshal) =>
+    marshal.startPublishing(defaultRequest, preset.windowScroll);
   const stop = (marshal: DimensionMarshal) => marshal.stopPublishing();
 
   it('should return dimensions a subsequent call', () => {

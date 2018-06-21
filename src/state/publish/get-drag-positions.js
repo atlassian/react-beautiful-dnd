@@ -1,7 +1,7 @@
 // @flow
 import invariant from 'invariant';
 import type { Position } from 'css-box-model';
-import { isEqual, subtract, add, negate } from '../position';
+import { isEqual, subtract, add } from '../position';
 import getPageItemPositions from '../get-page-item-positions';
 import type {
   DragPositions,

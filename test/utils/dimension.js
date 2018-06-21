@@ -16,9 +16,7 @@ import { getDroppableDimension as getDroppable, type Closest } from '../../src/s
 import type {
   Axis,
   Placeholder,
-  DragImpact,
   DraggableId,
-  State,
   Viewport,
   Scrollable,
   DraggableDescriptor,
@@ -29,7 +27,6 @@ import type {
   DroppableDimensionMap,
   DimensionMap,
   DraggingState,
-  DropAnimatingState,
 } from '../../src/types';
 
 type GetComputedSpacingArgs = {|
@@ -113,10 +110,6 @@ export const makeScrollable = (droppable: DroppableDimension, amount?: number = 
       shouldClipSubject: true,
     },
   });
-};
-
-export const getInitialImpact = (draggable: DraggableDimension, axis?: Axis = vertical) => {
-  throw new Error('USE getHomeImpact');
 };
 
 export const addDroppable = (

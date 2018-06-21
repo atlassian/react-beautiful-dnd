@@ -15,25 +15,18 @@ import type {
   DroppableDescriptor,
   DraggableDimension,
   DroppableDimension,
-  DropResult,
   PendingDrop,
   DropReason,
   DraggableId,
-  DragImpact,
   DropAnimatingState,
   Critical,
   CollectingState,
-  ScrollOptions,
   Viewport,
   ItemPositions,
   DragPositions,
   DraggingState,
   DropPendingState,
 } from '../../src/types';
-
-const scheduled: ScrollOptions = {
-  shouldPublishImmediately: false,
-};
 
 export default (axis?: Axis = vertical) => {
   const preset = getPreset(axis);

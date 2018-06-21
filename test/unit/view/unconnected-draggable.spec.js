@@ -1387,7 +1387,8 @@ describe('Draggable - unconnected', () => {
         // non portaled element should now have focus passed back to it
         const latest: HTMLElement = wrapper.getDOMNode();
         expect(latest).toBe(document.activeElement);
-        // latest will not be the same as the original ref as it is remounted after leaving the portal
+        // latest will not be the same as the original
+        // ref as it is remounted after leaving the portal
         expect(latest).not.toBe(original);
         // no longer in a portal
         expect(latest).not.toBe(wrapper.find(WithPortal).instance().portal);

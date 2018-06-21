@@ -100,7 +100,7 @@ it('should correctly update scroll across multiple movements (forwards)', () => 
     lastScroll = newScroll;
     lastViewport = updated;
     runCount++;
-  };
+  }
 
   // Simply asserting our loop ran a few times
   expect(runCount).toBeGreaterThan(2);

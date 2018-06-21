@@ -1,11 +1,10 @@
 // @flow
 import React, { Component } from 'react';
-import { type Position, type Spacing, type BoxModel, offset, withScroll } from 'css-box-model';
+import { type Position, type Spacing } from 'css-box-model';
 import { mount } from 'enzyme';
 import DraggableDimensionPublisher from '../../../src/view/draggable-dimension-publisher/draggable-dimension-publisher';
 import setWindowScroll from '../../utils/set-window-scroll';
 import { getPreset, getDraggableDimension, getComputedSpacing } from '../../utils/dimension';
-import { negate, subtract, add } from '../../../src/state/position';
 import type {
   DimensionMarshal,
   GetDraggableDimensionFn,
@@ -14,7 +13,6 @@ import { withDimensionMarshal } from '../../utils/get-context-options';
 import forceUpdate from '../../utils/force-update';
 import { setViewport } from '../../utils/viewport';
 import { getMarshalStub } from '../../utils/dimension-marshal';
-import { offsetByPosition } from '../../../src/state/spacing';
 import type {
   DraggableId,
   DraggableDimension,

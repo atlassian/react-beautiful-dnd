@@ -1,21 +1,8 @@
 
 // @flow
-import type { Position } from 'css-box-model';
-import { bindActionCreators } from 'redux';
-import createAutoScroller from '../auto-scroller';
 import type { AutoScroller } from '../auto-scroller/auto-scroller-types';
-import type { DimensionMarshal } from '../../state/dimension-marshal/dimension-marshal-types';
-import { move } from '../action-creators';
-import scrollWindow from '../../view/window/scroll-window';
-import type {
-  DraggableId,
+import type { Store, State, Action } from '../../types';
 
-  Store,
-  State,
-  Action,
-} from '../../types';
-
-// TODO: this is broken - good times
 export default (getScroller: () => AutoScroller) =>
   (store: Store) => (next: (Action) => mixed) => {
     const shouldCancel = (action: Action) =>

@@ -2,7 +2,6 @@
 import canStartDrag from '../../../src/state/can-start-drag';
 import getStatePreset from '../../utils/get-simple-state-preset';
 import { getPreset } from '../../utils/dimension';
-import type { State } from '../../../src/types';
 
 const preset = getPreset();
 const state = getStatePreset();

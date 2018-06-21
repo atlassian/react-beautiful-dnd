@@ -1,9 +1,6 @@
 // @flow
 import { getPreset } from '../../../utils/dimension';
 import type {
-  Callbacks,
-} from '../../../../src/state/dimension-marshal/dimension-marshal-types';
-import type {
   DimensionMap,
   LiftRequest,
   Critical,

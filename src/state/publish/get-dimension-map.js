@@ -104,7 +104,7 @@ export default ({
 
   // TODO: can just exit early here
   if (!partitioned.inExistingDroppable.length) {
-    console.log('no updates to existing droppables, can just move on');
+    // console.log('no updates to existing droppables, can just move on');
   }
 
   const set: ChangeSet = {};
