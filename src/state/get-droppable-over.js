@@ -154,7 +154,7 @@ export default ({
   const maybe: ?DroppableDimension = toDroppableList(droppables)
     // only want enabled droppables
     .filter((droppable: DroppableDimension) => droppable.isEnabled)
-    .find(
+    .filter(
       (droppable: DroppableDimension): boolean => {
         // If previously dragging over a droppable we give it a
         // bit of room on the subsequent drags so that user and move
@@ -176,7 +176,25 @@ export default ({
         // if it is over the droppable - not its internal impact
         return isPositionInFrame(withPlaceholder)(target);
       },
-    );
+    )
+    .sort(
+      (a, b): number => {
+        if (
+          a.client.contentBox[a.axis.size] < b.client.contentBox[b.axis.size]
+        ) {
+          return -1;
+        }
+
+        if (
+          a.client.contentBox[a.axis.size] > b.client.contentBox[b.axis.size]
+        ) {
+          return 1;
+        }
+
+        return 0;
+      },
+    )
+    .find((droppable: DroppableDimension): boolean => !!droppable);
 
   return maybe ? maybe.descriptor.id : null;
 };
