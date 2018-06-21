@@ -1974,7 +1974,7 @@ describe('drag handle', () => {
         const customWrapper = getWrapper(customCallbacks, customContext);
         const mock: MockEvent = createMockEvent();
 
-        touchStart(wrapper, origin, 0, mock);
+        touchStart(customWrapper, origin, 0, mock);
         jest.runTimersToTime(timeForLongPress);
 
         expect(mock.preventDefault).not.toHaveBeenCalled();

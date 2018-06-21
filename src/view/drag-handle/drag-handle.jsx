@@ -224,7 +224,6 @@ export default class DragHandle extends Component<Props> {
   onTouchStart = (event: TouchEvent) => {
     // let the keyboard sensor deal with it
     if (this.mouseSensor.isCapturing() || this.keyboardSensor.isCapturing()) {
-      console.error('mouse or keyboard already listening when attempting to touch drag');
       return;
     }
 
