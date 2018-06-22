@@ -4,6 +4,7 @@ import { type Position, type BoxModel } from 'css-box-model';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
+import { isEqual } from '../../state/position';
 import type {
   DraggableDimension,
   ItemPositions,
@@ -33,7 +34,8 @@ import type {
   ZIndexOptions,
 } from './draggable-types';
 import getWindowScroll from '../window/get-window-scroll';
-import type { Speed, Style as MovementStyle } from '../moveable/moveable-types';
+import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
+import type { Speed } from '../moveable/moveable-types';
 
 export const zIndexOptions: ZIndexOptions = {
   dragging: 5000,
@@ -41,6 +43,13 @@ export const zIndexOptions: ZIndexOptions = {
 };
 
 const origin: Position = { x: 0, y: 0 };
+
+const getTranslate = (offset: Position): ?string => {
+  if (isEqual(offset, origin)) {
+    return null;
+  }
+  return `translate(${offset.x}px, ${offset.y}px)`;
+};
 
 export default class Draggable extends Component<Props> {
   /* eslint-disable react/sort-comp */
@@ -76,12 +85,7 @@ export default class Draggable extends Component<Props> {
   }
 
   componentDidMount() {
-    if (!this.ref) {
-      console.error(`
-        Draggable has not been provided with a ref.
-        Please use the DraggableProvided > innerRef function
-      `);
-    }
+    throwIfRefIsInvalid(this.ref);
   }
 
   componentWillUnmount() {
@@ -92,10 +96,6 @@ export default class Draggable extends Component<Props> {
   // This should already be handled gracefully in DragHandle.
   // Just being extra clear here
   throwIfCannotDrag() {
-    invariant(this.ref, `
-      Draggable: cannot drag as no DOM node has been provided
-      Please ensure you provide a DOM node using the DraggableProvided > innerRef function
-    `);
     invariant(!this.props.isDragDisabled,
       'Draggable: cannot drag as dragging is not enabled'
     );
@@ -113,8 +113,8 @@ export default class Draggable extends Component<Props> {
     const { clientSelection, autoScrollMode } = options;
     const { lift, draggableId } = this.props;
     const ref: ?HTMLElement = this.ref;
-
-    invariant(ref, 'Cannot lift at this time as there is no ref');
+    throwIfRefIsInvalid(ref);
+    invariant(ref);
 
     const client: ItemPositions = {
       selection: clientSelection,
@@ -194,16 +194,18 @@ export default class Draggable extends Component<Props> {
     // At this point the ref has been changed or initially populated
 
     this.ref = ref;
+    throwIfRefIsInvalid(ref);
   })
 
   getDraggableRef = (): ?HTMLElement => this.ref;
 
   getDraggingStyle = memoizeOne(
-    (dimension: DraggableDimension,
+    (
+      change: Position,
+      dimension: DraggableDimension,
       isDropAnimating: boolean,
-      movementStyle: MovementStyle): DraggingStyle => {
+    ): DraggingStyle => {
       const box: BoxModel = dimension.client;
-
       const style: DraggingStyle = {
         // ## Placement
         position: 'fixed',
@@ -223,7 +225,7 @@ export default class Draggable extends Component<Props> {
         // Layering
         zIndex: isDropAnimating ? zIndexOptions.dropAnimating : zIndexOptions.dragging,
         // Moving in response to user input
-        transform: movementStyle.transform ? `${movementStyle.transform}` : null,
+        transform: getTranslate(change),
 
         // ## Performance
         pointerEvents: 'none',
@@ -233,9 +235,9 @@ export default class Draggable extends Component<Props> {
   )
 
   getNotDraggingStyle = memoizeOne(
-    (movementStyle: MovementStyle, shouldAnimateDisplacement: boolean): NotDraggingStyle => {
+    (current: Position, shouldAnimateDisplacement: boolean): NotDraggingStyle => {
       const style: NotDraggingStyle = {
-        transform: movementStyle.transform,
+        transform: getTranslate(current),
         // use the global animation for animation - or opt out of it
         transition: shouldAnimateDisplacement ? null : 'none',
         // transition: css.outOfTheWay,
@@ -246,25 +248,25 @@ export default class Draggable extends Component<Props> {
 
   getProvided = memoizeOne(
     (
+      change: Position,
       isDragging: boolean,
       isDropAnimating: boolean,
       shouldAnimateDisplacement: boolean,
       dimension: ?DraggableDimension,
       dragHandleProps: ?DragHandleProps,
-      movementStyle: MovementStyle,
     ): Provided => {
       const useDraggingStyle: boolean = isDragging || isDropAnimating;
 
       const draggableStyle: DraggableStyle = (() => {
         if (!useDraggingStyle) {
-          return this.getNotDraggingStyle(movementStyle, shouldAnimateDisplacement);
+          return this.getNotDraggingStyle(change, shouldAnimateDisplacement);
         }
 
         invariant(dimension, 'draggable dimension required for dragging');
 
         // Need to position element in original visual position. To do this
         // we position it without
-        return this.getDraggingStyle(dimension, isDropAnimating, movementStyle);
+        return this.getDraggingStyle(change, dimension, isDropAnimating);
       })();
 
       const provided: Provided = {
@@ -288,22 +290,25 @@ export default class Draggable extends Component<Props> {
     draggingOver,
   }))
 
-  getSpeed = memoizeOne(
-    (isDragging: boolean, shouldAnimateDragMovement: boolean, isDropAnimating: boolean): Speed => {
-      if (isDropAnimating) {
-        return 'STANDARD';
-      }
+  getSpeed = (
+    isDragging: boolean,
+    shouldAnimateDragMovement: boolean,
+    isDropAnimating: boolean
+  ): Speed => {
+    if (isDropAnimating) {
+      return 'STANDARD';
+    }
 
-      // if dragging and can animate - then move quickly
-      if (isDragging && shouldAnimateDragMovement) {
-        return 'FAST';
-      }
+    if (isDragging && shouldAnimateDragMovement) {
+      return 'FAST';
+    }
 
-      // Animation taken care of by css
-      return 'INSTANT';
-    })
+    // if dragging: no animation
+    // if not dragging: animation done with CSS
+    return 'INSTANT';
+  }
 
-  renderChildren = (movementStyle: MovementStyle, dragHandleProps: ?DragHandleProps): ?Node => {
+  renderChildren = (change: Position, dragHandleProps: ?DragHandleProps): ?Node => {
     const {
       isDragging,
       isDropAnimating,
@@ -315,12 +320,12 @@ export default class Draggable extends Component<Props> {
 
     const child: ?Node = children(
       this.getProvided(
+        change,
         isDragging,
         isDropAnimating,
         shouldAnimateDisplacement,
         dimension,
         dragHandleProps,
-        movementStyle,
       ),
       this.getSnapshot(
         isDragging,
@@ -336,10 +341,7 @@ export default class Draggable extends Component<Props> {
         return null;
       }
 
-      if (!dimension) {
-        console.error('Draggable: Dimension is required for dragging');
-        return null;
-      }
+      invariant(dimension, 'Draggable: Dimension is required for dragging');
 
       return <Placeholder placeholder={dimension.placeholder} />;
     })();
@@ -386,7 +388,7 @@ export default class Draggable extends Component<Props> {
           destination={offset}
           onMoveEnd={this.onMoveEnd}
         >
-          {(movementStyle: MovementStyle) => (
+          {(change: Position) => (
             <DragHandle
               draggableId={draggableId}
               isDragging={isDragging}
@@ -398,7 +400,7 @@ export default class Draggable extends Component<Props> {
               canDragInteractiveElements={disableInteractiveElementBlocking}
             >
               {(dragHandleProps: ?DragHandleProps) =>
-                this.renderChildren(movementStyle, dragHandleProps)
+                this.renderChildren(change, dragHandleProps)
               }
             </DragHandle>
           )}

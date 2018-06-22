@@ -3,127 +3,113 @@ import React from 'react';
 import { type Position } from 'css-box-model';
 import { mount } from 'enzyme';
 import Moveable from '../../../src/view/moveable/';
-import type { Speed, Style } from '../../../src/view/moveable/moveable-types';
+import type { Speed } from '../../../src/view/moveable/moveable-types';
 
-describe('Moveable', () => {
-  let wrapper;
-  let childFn;
+let wrapper;
+let childFn;
 
-  beforeAll(() => { // eslint-disable-line no-undef
-    requestAnimationFrame.reset();
-    childFn = jest.fn(() => <div>hi there</div>);
+beforeAll(() => { // eslint-disable-line no-undef
+  requestAnimationFrame.reset();
+  childFn = jest.fn(() => <div>hi there</div>);
+});
+
+beforeEach(() => {
+  jest.useFakeTimers();
+  wrapper = mount(
+    <Moveable
+      speed="STANDARD"
+      onMoveEnd={() => { }}
+    >
+      {childFn}
+    </Moveable>,
+  );
+});
+
+afterEach(() => {
+  jest.useRealTimers();
+  requestAnimationFrame.reset();
+});
+
+const moveTo = (point: Position, speed?: Speed = 'STANDARD', onMoveEnd?: () => void) => {
+  wrapper.setProps({
+    destination: point,
+    onMoveEnd,
+    speed,
   });
 
-  beforeEach(() => {
-    jest.useFakeTimers();
-    wrapper = mount(
-      <Moveable
-        speed="STANDARD"
-        onMoveEnd={() => { }}
-      >
-        {childFn}
-      </Moveable>,
-    );
-  });
+  // flush the animation
+  requestAnimationFrame.flush();
 
-  afterEach(() => {
-    jest.useRealTimers();
-    requestAnimationFrame.reset();
-  });
+  // callback is called on the next tick after
+  // the animation is finished.
+  jest.runOnlyPendingTimers();
+};
 
-  const moveTo = (point: Position, speed?: Speed = 'STANDARD', onMoveEnd?: () => void) => {
-    wrapper.setProps({
-      destination: point,
-      onMoveEnd,
-      speed,
-    });
-
-    // flush the animation
-    requestAnimationFrame.flush();
-
-    // callback is called on the next tick after
-    // the animation is finished.
-    jest.runOnlyPendingTimers();
+it('should move to the provided destination', () => {
+  const destination: Position = {
+    x: 100,
+    y: 200,
   };
 
-  const getStyle = (point: Position) => {
-    const style: Style = {
-      transform: `translate(${point.x}px, ${point.y}px)`,
-    };
-    return style;
+  moveTo(destination);
+
+  expect(childFn).toHaveBeenCalledWith(destination);
+});
+
+it('should call onMoveEnd when the movement is finished', () => {
+  const myMock = jest.fn();
+  const destination: Position = {
+    x: 100,
+    y: 200,
   };
 
-  it('should move to the provided destination', () => {
-    const destination: Position = {
-      x: 100,
-      y: 200,
-    };
+  moveTo(destination, 'STANDARD', myMock);
 
-    moveTo(destination);
+  expect(myMock).toHaveBeenCalled();
+});
 
-    expect(childFn).toHaveBeenCalledWith(getStyle(destination));
+it('should move instantly if required', () => {
+  const myMock = jest.fn();
+  const destination: Position = {
+    x: 100,
+    y: 200,
+  };
+
+  childFn.mockClear();
+  wrapper.setProps({
+    speed: 'INSTANT',
+    destination,
+    onMoveEnd: myMock,
   });
 
-  it('should call onMoveEnd when the movement is finished', () => {
-    const myMock = jest.fn();
-    const destination: Position = {
-      x: 100,
-      y: 200,
-    };
+  expect(childFn).toHaveBeenCalledTimes(1);
+  expect(childFn).toHaveBeenCalledWith(destination);
 
-    moveTo(destination, 'STANDARD', myMock);
+  // React motion is lame
+  requestAnimationFrame.flush();
+  expect(childFn).toHaveBeenCalledTimes(2);
+  expect(childFn).toHaveBeenCalledWith(destination);
 
-    expect(myMock).toHaveBeenCalled();
+  // but at least the result should be memoized
+  expect(childFn.mock.calls[0][0]).toBe(childFn.mock.calls[1][0]);
+});
+
+it('should allow multiple movements', () => {
+  const positions: Array<Position> = [
+    { x: 100, y: 100 },
+    { x: 400, y: 200 },
+    { x: 10, y: -20 },
+  ];
+
+  positions.forEach((position: Position) => {
+    moveTo(position);
+
+    expect(childFn).toBeCalledWith(position);
   });
+});
 
-  it('should move instantly if required', () => {
-    const myMock = jest.fn();
-    const destination: Position = {
-      x: 100,
-      y: 200,
-    };
+it('should return no movement if the item is at the origin', () => {
+  moveTo({ x: 0, y: 0 });
 
-    // Only releasing one frame
-    // ReactMotion uses this to trigger the initial animation
-    requestAnimationFrame.step();
-
-    wrapper.setProps({
-      speed: 'INSTANT',
-      destination,
-      onMoveEnd: myMock,
-    });
-
-    // Only releasing one frame
-    requestAnimationFrame.flush();
-
-    // onMoveEnd fired after a tick
-    jest.runOnlyPendingTimers();
-
-    expect(childFn).toHaveBeenCalledWith(getStyle(destination));
-    expect(myMock).toHaveBeenCalled();
-  });
-
-  it('should allow multiple movements', () => {
-    const positions: Array<Position> = [
-      { x: 100, y: 100 },
-      { x: 400, y: 200 },
-      { x: 10, y: -20 },
-    ];
-
-    positions.forEach((position: Position) => {
-      moveTo(position);
-
-      expect(childFn).toBeCalledWith(getStyle(position));
-    });
-  });
-
-  it('should return no movement if the item is at the origin', () => {
-    const expected: Style = {
-      transform: null,
-    };
-
-    moveTo({ x: 0, y: 0 });
-
-    expect(childFn).toHaveBeenCalledWith(expected);
-  });
+  expect(childFn).toHaveBeenCalledWith({ x: 0, y: 0 });
 });

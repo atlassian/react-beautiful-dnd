@@ -1,53 +1,35 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, type Element } from 'react';
 import memoizeOne from 'memoize-one';
+import type { SpringHelperConfig } from 'react-motion/lib/Types';
 import { type Position } from 'css-box-model';
 import { Motion, spring } from 'react-motion';
 import { physics } from '../animation';
-import type { Props, DefaultProps, Style } from './moveable-types';
+import type { Props, DefaultProps } from './moveable-types';
 
 type PositionLike = {|
   x: any,
   y: any,
 |};
 
-const origin: Position = {
-  x: 0,
-  y: 0,
-};
+const origin: Position = { x: 0, y: 0 };
 
-const noTransition: Style = {
-  transform: null,
-};
-
-const getTranslate = memoizeOne((x: number, y: number): Style => ({
-  transform: `translate(${x}px, ${y}px)`,
-}));
-
-const isAtOrigin = (point: { [string]: number }): boolean =>
-  point.x === origin.x && point.y === origin.y;
-
-export default class Movable extends Component<Props> {
+export default class Moveable extends Component<Props> {
   /* eslint-disable react/sort-comp */
-
   static defaultProps: DefaultProps = {
     destination: origin,
   }
   /* eslint-enable */
 
   onRest = () => {
-    const { onMoveEnd } = this.props;
-
-    if (!onMoveEnd) {
-      return;
-    }
-
     // This needs to be async otherwise Motion will not re-execute if
     // offset or start change
 
     // Could check to see if another move has started
     // and abort the previous onMoveEnd
-    setTimeout(() => onMoveEnd());
+    if (this.props.onMoveEnd) {
+      setTimeout(this.props.onMoveEnd);
+    }
   }
 
   getFinal = (): PositionLike => {
@@ -58,47 +40,36 @@ export default class Movable extends Component<Props> {
       return destination;
     }
 
-    const selected = speed === 'FAST' ? physics.fast : physics.standard;
+    const config: SpringHelperConfig = speed === 'FAST' ? physics.fast : physics.standard;
 
     return {
-      x: spring(destination.x, selected),
-      y: spring(destination.y, selected),
+      x: spring(destination.x, config),
+      y: spring(destination.y, config),
     };
   }
 
+  getMemoizedPosition = memoizeOne(
+    (x: number, y: number): Position => ({ x, y })
+  )
+
   render() {
     const final = this.getFinal();
+    // console.log('final', final);
 
     // bug with react-motion: https://github.com/chenglou/react-motion/issues/437
     // even if both defaultStyle and style are {x: 0, y: 0 } if there was
     // a previous animation it uses the last value rather than the final value
-    const isMovingToOrigin: boolean = isAtOrigin(final);
+    // const isMovingToOrigin: boolean = isAtOrigin(final);
+    // const shouldInstantMove: boolean =
 
     return (
-      // Expecting a flow error
-      // React Motion type: children: (interpolatedStyle: PlainStyle) => ReactElement
-      // Our type: children: (Position) => (Style) => React.Node
       <Motion defaultStyle={origin} style={final} onRest={this.onRest}>
-        {(current: { [string]: number }): any => {
-          // If moving to the origin we can just clear the transition
-          if (isMovingToOrigin) {
-            return this.props.children(noTransition);
-          }
+        {(current: { [string]: number }): Element<*> => {
+          const { speed, destination, children } = this.props;
 
-          // Rather than having a translate of 0px, 0px we just clear the transition
-          if (isAtOrigin(current)) {
-            return this.props.children(noTransition);
-          }
+          const target: Position = speed === 'INSTANT' ? destination : (current: any);
 
-          // If moving instantly then we can just move straight to the destination
-          // Sadly react-motion does a double call in this case so we need to explictly control this
-          if (this.props.speed === 'INSTANT') {
-            return this.props.children(
-              getTranslate(this.props.destination.x, this.props.destination.y)
-            );
-          }
-
-          return this.props.children(getTranslate(current.x, current.y));
+          return children(this.getMemoizedPosition(target.x, target.y));
         }}
       </Motion>
     );

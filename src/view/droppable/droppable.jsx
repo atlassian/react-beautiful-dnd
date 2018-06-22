@@ -5,6 +5,7 @@ import type { Props, Provided, StateSnapshot } from './droppable-types';
 import type { DroppableId, TypeId } from '../../types';
 import DroppableDimensionPublisher from '../droppable-dimension-publisher/';
 import Placeholder from '../placeholder/';
+import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 import {
   droppableIdKey,
   droppableTypeKey,
@@ -47,12 +48,7 @@ export default class Droppable extends Component<Props> {
   }
 
   componentDidMount() {
-    if (!this.ref) {
-      console.error(`
-        Droppable has not been provided with a ref.
-        Please use the DroppableProvided > innerRef function
-      `);
-    }
+    throwIfRefIsInvalid(this.ref);
   }
 
   /* eslint-enable */
@@ -70,6 +66,7 @@ export default class Droppable extends Component<Props> {
     }
 
     this.ref = ref;
+    throwIfRefIsInvalid(ref);
   }
 
   getDroppableRef = (): ?HTMLElement => this.ref;

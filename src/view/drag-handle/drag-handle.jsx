@@ -86,10 +86,7 @@ export default class DragHandle extends Component<Props> {
     // storing a reference for later
     this.lastDraggableRef = draggableRef;
 
-    if (!draggableRef) {
-      console.error('Cannot get draggable ref from drag handle');
-      return;
-    }
+    invariant(draggableRef, 'Cannot get draggable ref from drag handle');
 
     // drag handle ref will not be available when not enabled
     if (!this.props.isEnabled) {

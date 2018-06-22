@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 
 export type EventMarshal = {|
   handle: () => void,
@@ -10,10 +11,7 @@ export default (): EventMarshal => {
   let isMouseDownHandled: boolean = false;
 
   const handle = (): void => {
-    if (isMouseDownHandled) {
-      console.error('Cannot handle mouse down as it is already handled');
-      return;
-    }
+    invariant(!isMouseDownHandled, 'Cannot handle mouse down as it is already handled');
     isMouseDownHandled = true;
   };
 
