@@ -136,7 +136,7 @@ export default ({
       .map((id: DroppableId): DroppableDimension => droppables[id])
       // only want enabled droppables
       .filter((droppable: DroppableDimension) => droppable.isEnabled)
-      .find((droppable: DroppableDimension): boolean => {
+      .filter((droppable: DroppableDimension): boolean => {
         // If previously dragging over a droppable we give it a
         // bit of room on the subsequent drags so that user and move
         // items in the space that the placeholder takes up
@@ -153,7 +153,19 @@ export default ({
         // Not adjusting target for droppable scroll as we are just checking
         // if it is over the droppable - not its internal impact
         return isPositionInFrame(withPlaceholder)(target);
-      });
+      })
+      .sort((a, b): number => {
+        if (a.client.contentBox[a.axis.size] < b.client.contentBox[b.axis.size]) {
+          return -1;
+        }
+
+        if (a.client.contentBox[a.axis.size] > b.client.contentBox[b.axis.size]) {
+          return 1;
+        }
+
+        return 0;
+      })
+      .find((droppable: DroppableDimension): boolean => !!droppable);
 
   return maybe ? maybe.descriptor.id : null;
 };

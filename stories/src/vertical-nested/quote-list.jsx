@@ -59,7 +59,6 @@ export default class QuoteList extends Component<{ list: NestedQuoteList }> {
   renderList = (list: NestedQuoteList, level?: number = 0) => (
     <Droppable
       droppableId={list.id}
-      type={list.id}
       key={list.id}
     >
       {(dropProvided: DroppableProvided, dropSnapshot: DroppableStateSnapshot) => (
@@ -75,7 +74,6 @@ export default class QuoteList extends Component<{ list: NestedQuoteList }> {
               (
                 <Draggable
                   draggableId={item.id}
-                  type={list.id}
                   key={item.id}
                   index={index}
                 >
@@ -92,6 +90,7 @@ export default class QuoteList extends Component<{ list: NestedQuoteList }> {
                 </Draggable>
               )
             ))}
+          {dropProvided.placeholder}
         </Container>
       )}
     </Droppable>

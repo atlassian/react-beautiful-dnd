@@ -61,63 +61,68 @@ export default class QuoteApp extends Component<*, State> {
     publishOnDragEnd(result);
 
     // dropped outside the list
-    if (!result.destination) {
-      return;
-    }
+    if (result.destination) {
+      const destId: string = result.destination.droppableId;
+      const srcId: string = result.source.droppableId;
+      const list: NestedQuoteList = this.state.list;
+      const nestedList: ?NestedQuoteList = list.children.find(item => item.children);
 
-    if (result.type === 'first-level') {
-      const children = reorder(
-        this.state.list.children,
-        result.source.index,
-        result.destination.index,
-      );
-
-      // $ExpectError - using spread
-      const list: NestedQuoteList = {
-        ...this.state.list,
-        children,
-      };
-
-      this.setState({
-        list,
-      });
-      return;
-    }
-
-    if (result.type === 'second-level') {
-      const nested: ?NestedQuoteList = (this.state.list.children.filter(
-        (item: mixed): boolean => Object.prototype.hasOwnProperty.call(item, 'children')
-      )[0] : any);
-
-      if (!nested) {
-        console.error('could not find nested list');
-        return;
+      if (!nestedList) {
+        throw new Error('No nested list found!');
       }
 
-      // $ExpectError - using spread
-      const updated: NestedQuoteList = {
-        ...nested,
-        children: reorder(
-          nested.children,
+      let destList: NestedQuoteList = destId === 'first-level' ? list : nestedList;
+      let srcList: NestedQuoteList = srcId === 'first-level' ? list : nestedList;
+
+      const setList = (newList) => {
+        if (newList.id === 'first-level') {
+          this.setState({ list: newList });
+        } else {
+          this.setState((prevState) => {
+            const prevList: NestedQuoteList = prevState.list;
+            const prevNestedList: ?NestedQuoteList = prevList.children.find(item => item.children);
+
+            if (!prevNestedList) {
+              throw new Error('No nested list found!');
+            }
+
+            const children = prevList.children.slice();
+            const index = children.indexOf(prevNestedList);
+            children[index] = newList;
+            return { list: { ...prevList, children } };
+          });
+        }
+      };
+
+      if (destId === srcId) {
+        const children = reorder(
+          destList.children,
           result.source.index,
-          // $ExpectError - already checked for null
-          result.destination.index,
-        ),
-      };
+          // $FlowFixMe
+          result.destination && result.destination.index,
+        );
 
-      const nestedIndex = this.state.list.children.indexOf(nested);
-      const children = Array.from(this.state.list.children);
-      children[nestedIndex] = updated;
+        // $ExpectError - using spread
+        destList = { ...destList, children };
+        setList(destList);
+      } else {
+        const srcChildren = srcList.children.slice();
+        const [child] = srcChildren.splice(result.source.index, 1);
+        srcList = { ...srcList, children: srcChildren };
 
-      // $ExpectError - using spread
-      const list: NestedQuoteList = {
-        ...this.state.list,
-        children,
-      };
+        const destChildren = destList.children.slice();
+        // $FlowFixMe
+        destChildren.splice(result.destination && result.destination.index, 0, child);
+        destList = { ...destList, children: destChildren };
 
-      this.setState({
-        list,
-      });
+        if (destId !== 'first-level') {
+          setList(srcList);
+          setList(destList);
+        } else {
+          setList(destList);
+          setList(srcList);
+        }
+      }
     }
   }
 
