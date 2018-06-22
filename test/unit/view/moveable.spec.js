@@ -68,7 +68,7 @@ it('should call onMoveEnd when the movement is finished', () => {
   expect(myMock).toHaveBeenCalled();
 });
 
-it('should move instantly if required', () => {
+it('should move instantly to location if required', () => {
   const myMock = jest.fn();
   const destination: Position = {
     x: 100,
@@ -84,14 +84,12 @@ it('should move instantly if required', () => {
 
   expect(childFn).toHaveBeenCalledTimes(1);
   expect(childFn).toHaveBeenCalledWith(destination);
+  childFn.mockClear();
 
-  // React motion is lame
+  // react-motion work around: no double render
   requestAnimationFrame.flush();
-  expect(childFn).toHaveBeenCalledTimes(2);
-  expect(childFn).toHaveBeenCalledWith(destination);
-
-  // but at least the result should be memoized
-  expect(childFn.mock.calls[0][0]).toBe(childFn.mock.calls[1][0]);
+  jest.runAllTimers();
+  expect(childFn).not.toHaveBeenCalled();
 });
 
 it('should allow multiple movements', () => {

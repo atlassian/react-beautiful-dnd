@@ -1,12 +1,11 @@
 // @flow
 import React, { Component, type Element } from 'react';
-import memoizeOne from 'memoize-one';
 import type { SpringHelperConfig } from 'react-motion/lib/Types';
 import { type Position } from 'css-box-model';
 import { Motion, spring } from 'react-motion';
 import { isEqual } from '../../state/position';
 import { physics } from '../animation';
-import type { Props, DefaultProps } from './moveable-types';
+import type { Props, Speed, DefaultProps } from './moveable-types';
 
 type PositionLike = {|
   x: any,
@@ -20,6 +19,7 @@ type BlockerProps = {|
   children: (Position) => Element<*>,
 |}
 
+// Working around react-motion double render issue
 class DoubleRenderBlocker extends React.Component<BlockerProps> {
   shouldComponentUpdate(nextProps: BlockerProps): boolean {
     // let a render go through if not moving anywhere
@@ -27,8 +27,8 @@ class DoubleRenderBlocker extends React.Component<BlockerProps> {
       return true;
     }
 
-    // blocking a duplicate change
-    if (nextProps.change === this.props.change) {
+    // blocking a duplicate change (workaround for react-motion)
+    if (isEqual(this.props.change, nextProps.change)) {
       return false;
     }
 
@@ -45,22 +45,10 @@ export default class Moveable extends Component<Props> {
   static defaultProps: DefaultProps = {
     destination: origin,
   }
-  /* eslint-enable */
 
-  onRest = () => {
-    // This needs to be async otherwise Motion will not re-execute if
-    // offset or start change
-
-    // Could check to see if another move has started
-    // and abort the previous onMoveEnd
-    if (this.props.onMoveEnd) {
-      setTimeout(this.props.onMoveEnd);
-    }
-  }
-
-  getFinal = (): PositionLike => {
+  getFinal(): PositionLike {
     const destination: Position = this.props.destination;
-    const speed = this.props.speed;
+    const speed: Speed = this.props.speed;
 
     if (speed === 'INSTANT') {
       return destination;
@@ -74,8 +62,6 @@ export default class Moveable extends Component<Props> {
     };
   }
 
-  getMemoizedPosition = memoizeOne((x: number, y: number): Position => ({ x, y }));
-
   render() {
     const final = this.getFinal();
 
@@ -84,15 +70,14 @@ export default class Moveable extends Component<Props> {
     // a previous animation it uses the last value rather than the final value
 
     return (
-      <Motion defaultStyle={origin} style={final} onRest={this.onRest}>
+      <Motion defaultStyle={origin} style={final} onRest={this.props.onMoveEnd}>
         {(current: { [string]: number }): Element<*> => {
           const { speed, destination, children } = this.props;
 
           const target: Position = speed === 'INSTANT' ? destination : (current: any);
-          const cached: Position = this.getMemoizedPosition(target.x, target.y);
 
           return (
-            <DoubleRenderBlocker change={cached}>{children}</DoubleRenderBlocker>
+            <DoubleRenderBlocker change={target}>{children}</DoubleRenderBlocker>
           );
         }}
       </Motion>
