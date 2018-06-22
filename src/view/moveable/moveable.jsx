@@ -4,6 +4,7 @@ import memoizeOne from 'memoize-one';
 import type { SpringHelperConfig } from 'react-motion/lib/Types';
 import { type Position } from 'css-box-model';
 import { Motion, spring } from 'react-motion';
+import { isEqual } from '../../state/position';
 import { physics } from '../animation';
 import type { Props, DefaultProps } from './moveable-types';
 
@@ -13,6 +14,31 @@ type PositionLike = {|
 |};
 
 const origin: Position = { x: 0, y: 0 };
+
+type BlockerProps = {|
+  change: Position,
+  children: (Position) => Element<*>,
+|}
+
+class DoubleRenderBlocker extends React.Component<BlockerProps> {
+  shouldComponentUpdate(nextProps: BlockerProps): boolean {
+    // let a render go through if not moving anywhere
+    if (isEqual(origin, nextProps.change)) {
+      return true;
+    }
+
+    // blocking a duplicate change
+    if (nextProps.change === this.props.change) {
+      return false;
+    }
+
+    // let everything else through
+    return true;
+  }
+  render() {
+    return this.props.children(this.props.change);
+  }
+}
 
 export default class Moveable extends Component<Props> {
   /* eslint-disable react/sort-comp */
@@ -48,11 +74,7 @@ export default class Moveable extends Component<Props> {
     };
   }
 
-  // when instantly moving to a point react-motion does a double call
-  // by memoizing the result we can let consumers avoid the render
-  getMemoizedPosition = memoizeOne(
-    (x: number, y: number): Position => ({ x, y })
-  )
+  getMemoizedPosition = memoizeOne((x: number, y: number): Position => ({ x, y }));
 
   render() {
     const final = this.getFinal();
@@ -67,8 +89,11 @@ export default class Moveable extends Component<Props> {
           const { speed, destination, children } = this.props;
 
           const target: Position = speed === 'INSTANT' ? destination : (current: any);
+          const cached: Position = this.getMemoizedPosition(target.x, target.y);
 
-          return children(this.getMemoizedPosition(target.x, target.y));
+          return (
+            <DoubleRenderBlocker change={cached}>{children}</DoubleRenderBlocker>
+          );
         }}
       </Motion>
     );
