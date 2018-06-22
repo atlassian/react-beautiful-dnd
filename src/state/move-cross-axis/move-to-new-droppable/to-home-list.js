@@ -112,7 +112,7 @@ export default ({
       draggable: dimension,
       destination: droppable,
       previousImpact,
-      viewport: viewport.subject,
+      viewport: viewport.frame,
     }));
 
   const newImpact: DragImpact = {

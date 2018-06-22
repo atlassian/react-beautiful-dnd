@@ -2,17 +2,18 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import type { Props, Provided, StateSnapshot } from './droppable-types';
-import type { DroppableId } from '../../types';
+import type { DroppableId, TypeId } from '../../types';
 import DroppableDimensionPublisher from '../droppable-dimension-publisher/';
 import Placeholder from '../placeholder/';
 import {
   droppableIdKey,
+  droppableTypeKey,
   styleContextKey,
 } from '../context-keys';
 
-type Context = {|
-  [typeof droppableIdKey]: DroppableId
-|}
+type Context = {
+  [string]: DroppableId | TypeId,
+}
 
 export default class Droppable extends Component<Props> {
   /* eslint-disable react/sort-comp */
@@ -34,11 +35,13 @@ export default class Droppable extends Component<Props> {
   // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
   static childContextTypes = {
     [droppableIdKey]: PropTypes.string.isRequired,
+    [droppableTypeKey]: PropTypes.string.isRequired,
   }
 
   getChildContext(): Context {
     const value: Context = {
       [droppableIdKey]: this.props.droppableId,
+      [droppableTypeKey]: this.props.type,
     };
     return value;
   }
@@ -76,9 +79,7 @@ export default class Droppable extends Component<Props> {
       return null;
     }
 
-    return (
-      <Placeholder placeholder={this.props.placeholder} />
-    );
+    return <Placeholder placeholder={this.props.placeholder} />;
   }
 
   render() {

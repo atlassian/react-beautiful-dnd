@@ -426,6 +426,7 @@ describe('move to new droppable', () => {
               descriptor: {
                 id: 'inside',
                 droppableId: droppable.descriptor.id,
+                type: droppable.descriptor.type,
                 index: 0,
               },
               borderBox: {
@@ -439,6 +440,7 @@ describe('move to new droppable', () => {
               descriptor: {
                 id: 'outside',
                 droppableId: droppable.descriptor.id,
+                type: droppable.descriptor.type,
                 index: 1,
               },
               borderBox: {
@@ -504,34 +506,36 @@ describe('move to new droppable', () => {
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 // extends beyond the viewport
-                [axis.end]: viewport.subject[axis.end] + 100,
+                [axis.end]: viewport.frame[axis.end] + 100,
               },
             });
             const inside: DraggableDimension = getDraggableDimension({
               descriptor: {
                 id: 'inside',
                 droppableId: droppable.descriptor.id,
+                type: droppable.descriptor.type,
                 index: 0,
               },
               borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
-                [axis.end]: viewport.subject[axis.end],
+                [axis.end]: viewport.frame[axis.end],
               },
             });
             const outside: DraggableDimension = getDraggableDimension({
               descriptor: {
                 id: 'outside',
                 droppableId: droppable.descriptor.id,
+                type: droppable.descriptor.type,
                 index: 1,
               },
               borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the viewport but inside the droppable
-                [axis.start]: viewport.subject[axis.end] + 1,
-                [axis.end]: viewport.subject[axis.end] + 10,
+                [axis.start]: viewport.frame[axis.end] + 1,
+                [axis.end]: viewport.frame[axis.end] + 10,
               },
             });
             const customDraggables: DraggableDimension[] = [
@@ -923,6 +927,7 @@ describe('move to new droppable', () => {
               descriptor: {
                 id: 'in-home',
                 droppableId: customHome.descriptor.id,
+                type: customHome.descriptor.type,
                 index: 0,
               },
               borderBox: {
@@ -963,6 +968,7 @@ describe('move to new droppable', () => {
               descriptor: {
                 id: 'foreign-outside-frame',
                 droppableId: customForeign.descriptor.id,
+                type: customForeign.descriptor.type,
                 index: 0,
               },
               borderBox: {
@@ -1036,6 +1042,7 @@ describe('move to new droppable', () => {
               descriptor: {
                 id: 'in-home',
                 droppableId: customHome.descriptor.id,
+                type: customHome.descriptor.type,
                 index: 0,
               },
               borderBox: {
@@ -1052,26 +1059,27 @@ describe('move to new droppable', () => {
               },
               direction: axis.direction,
               borderBox: {
-                bottom: viewport.subject.bottom + 100,
+                bottom: viewport.frame.bottom + 100,
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
                 // exteding beyond the viewport
-                [axis.end]: viewport.subject[axis.end] + 100,
+                [axis.end]: viewport.frame[axis.end] + 100,
               },
             });
             const customInForeign: DraggableDimension = getDraggableDimension({
               descriptor: {
                 id: 'foreign',
                 droppableId: customForeign.descriptor.id,
+                type: customForeign.descriptor.type,
                 index: 0,
               },
               borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // outside of the viewport but inside the droppable
-                [axis.start]: viewport.subject[axis.end] + 1,
-                [axis.end]: viewport.subject[axis.end] + 10,
+                [axis.start]: viewport.frame[axis.end] + 1,
+                [axis.end]: viewport.frame[axis.end] + 10,
               },
             });
 

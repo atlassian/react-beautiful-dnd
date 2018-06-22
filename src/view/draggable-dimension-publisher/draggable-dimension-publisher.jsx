@@ -1,10 +1,9 @@
 // @flow
-import { Component, type Node } from 'react';
-import PropTypes from 'prop-types';
+import { calculateBox, withScroll, type BoxModel, type Position } from 'css-box-model';
 import memoizeOne from 'memoize-one';
+import PropTypes from 'prop-types';
+import { Component, type Node } from 'react';
 import invariant from 'tiny-invariant';
-import { calculateBox, withScroll, type BoxModel } from 'css-box-model';
-import getWindowScroll from '../window/get-window-scroll';
 import { dimensionMarshalKey } from '../context-keys';
 import type {
   DraggableDescriptor,
@@ -12,12 +11,14 @@ import type {
   Placeholder,
   DraggableId,
   DroppableId,
+  TypeId,
 } from '../../types';
 import type { DimensionMarshal } from '../../state/dimension-marshal/dimension-marshal-types';
 
 type Props = {|
   draggableId: DraggableId,
   droppableId: DroppableId,
+  type: TypeId,
   index: number,
   getDraggableRef: () => ?HTMLElement,
   children: Node,
@@ -43,31 +44,36 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     this.unpublish();
   }
 
-  getMemoizedDescriptor = memoizeOne(
-    (id: DraggableId, droppableId: DroppableId, index: number): DraggableDescriptor => ({
-      id,
-      droppableId,
-      index,
-    }));
+  getMemoizedDescriptor = memoizeOne((
+    id: DraggableId,
+    index: number,
+    droppableId: DroppableId,
+    type: TypeId
+  ): DraggableDescriptor => ({
+    id, index, droppableId, type,
+  }));
 
   publish = () => {
+    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
     const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
       this.props.draggableId,
+      this.props.index,
       this.props.droppableId,
-      this.props.index
+      this.props.type,
     );
+
+    if (!this.publishedDescriptor) {
+      marshal.registerDraggable(descriptor, this.getDimension);
+      this.publishedDescriptor = descriptor;
+      return;
+    }
 
     // No changes to the descriptor
     if (descriptor === this.publishedDescriptor) {
       return;
     }
 
-    if (this.publishedDescriptor) {
-      this.unpublish();
-    }
-
-    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.registerDraggable(descriptor, this.getDimension);
+    marshal.updateDraggable(this.publishedDescriptor, descriptor, this.getDimension);
     this.publishedDescriptor = descriptor;
   }
 
@@ -85,22 +91,23 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     this.publishedDescriptor = null;
   }
 
-  getDimension = (): DraggableDimension => {
+  getDimension = (windowScroll: Position): DraggableDimension => {
     const targetRef: ?HTMLElement = this.props.getDraggableRef();
     const descriptor: ?DraggableDescriptor = this.publishedDescriptor;
 
     invariant(targetRef, 'DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
     invariant(descriptor, 'Cannot get dimension for unpublished draggable');
 
-    const style: CSSStyleDeclaration = window.getComputedStyle(targetRef);
+    const computedStyles: CSSStyleDeclaration = window.getComputedStyle(targetRef);
+    const borderBox: ClientRect = targetRef.getBoundingClientRect();
 
-    const client: BoxModel = calculateBox(targetRef.getBoundingClientRect(), style);
-    const page: BoxModel = withScroll(client, getWindowScroll());
+    const client: BoxModel = calculateBox(borderBox, computedStyles);
+    const page: BoxModel = withScroll(client, windowScroll);
 
     const placeholder: Placeholder = {
       client,
       tagName: targetRef.tagName.toLowerCase(),
-      display: style.display,
+      display: computedStyles.display,
     };
 
     const dimension: DraggableDimension = {

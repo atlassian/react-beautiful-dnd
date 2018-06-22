@@ -1,12 +1,8 @@
 // @flow
 import createStyleMarshal, { resetStyleContext } from '../../../src/view/style-marshal/style-marshal';
 import getStyles, { type Styles } from '../../../src/view/style-marshal/get-styles';
-import getStatePreset from '../../utils/get-simple-state-preset';
 import { prefix } from '../../../src/view/data-attributes';
 import type { StyleMarshal } from '../../../src/view/style-marshal/style-marshal-types';
-import type { State } from '../../../src/types';
-
-const state = getStatePreset();
 
 const getStyleTagSelector = (context: string) =>
   `style[${prefix}="${context}"]`;
@@ -19,181 +15,151 @@ const getStyleFromTag = (context: string): string => {
 
 describe('style marshal', () => {
   let marshal: StyleMarshal;
-
+  let styles: Styles;
   beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => { });
     resetStyleContext();
     marshal = createStyleMarshal();
+    styles = getStyles(marshal.styleContext);
   });
 
   afterEach(() => {
+    try {
+      marshal.unmount();
+    } catch (e) {
+      // already unmounted
+    }
+  });
+
+  it('should not mount a style tag until mounted', () => {
+    const selector: string = getStyleTagSelector(marshal.styleContext);
+
+    // initially there is no style tag
+    expect(document.querySelector(selector)).toBeFalsy();
+
+    // now mounting
+    marshal.mount();
+    expect(document.querySelector(selector)).toBeInstanceOf(HTMLStyleElement);
+  });
+
+  it('should throw if mounting after already mounting', () => {
+    marshal.mount();
+
+    expect(() => marshal.mount()).toThrow();
+  });
+
+  it('should apply the resting styles by default', () => {
+    marshal.mount();
+    const active: string = getStyleFromTag(marshal.styleContext);
+
+    expect(active).toEqual(styles.resting);
+  });
+
+  it('should apply the resting styles when asked', () => {
+    marshal.mount();
+
+    marshal.resting();
+    const active: string = getStyleFromTag(marshal.styleContext);
+
+    expect(active).toEqual(styles.resting);
+  });
+
+  it('should apply the collecting styles when asked', () => {
+    marshal.mount();
+
+    marshal.collecting();
+    const active: string = getStyleFromTag(marshal.styleContext);
+
+    expect(active).toEqual(styles.collecting);
+  });
+
+  it('should apply the dragging styles when asked', () => {
+    marshal.mount();
+
+    marshal.dragging();
+    const active: string = getStyleFromTag(marshal.styleContext);
+
+    expect(active).toEqual(styles.dragging);
+  });
+
+  it('should apply the drop animating styles when asked', () => {
+    marshal.mount();
+
+    marshal.dropping('DROP');
+    const active: string = getStyleFromTag(marshal.styleContext);
+
+    expect(active).toEqual(styles.dropAnimating);
+  });
+
+  it('should apply the user cancel styles when asked', () => {
+    marshal.mount();
+
+    marshal.dropping('CANCEL');
+    const active: string = getStyleFromTag(marshal.styleContext);
+
+    expect(active).toEqual(styles.userCancel);
+  });
+
+  it('should remove the style tag from the head when unmounting', () => {
+    marshal.mount();
+    const selector: string = getStyleTagSelector(marshal.styleContext);
+
+    // the style tag exists
+    expect(document.querySelector(selector)).toBeTruthy();
+
+    // now unmounted
     marshal.unmount();
-    console.error.mockRestore();
+
+    expect(document.querySelector(selector)).not.toBeTruthy();
   });
 
-  describe('not dragging', () => {
-    it('should not mount a style tag until mounted', () => {
-      const selector: string = getStyleTagSelector(marshal.styleContext);
+  it('should log an error if attempting to apply styles after unmounted', () => {
+    marshal.mount();
+    const selector: string = getStyleTagSelector(marshal.styleContext);
+    // grabbing the element before unmount
+    const el: HTMLElement = (document.querySelector(selector): any);
 
-      // initially there is no style tag
-      expect(document.querySelector(selector)).toBeFalsy();
+    // asserting it has the base styles
+    expect(el.innerHTML).toEqual(styles.resting);
 
-      // now mounting
-      marshal.mount();
-      expect(document.querySelector(selector)).toBeInstanceOf(HTMLStyleElement);
-    });
+    marshal.unmount();
 
-    it('should log an error if mounting after already mounting', () => {
-      marshal.mount();
-      expect(console.error).not.toHaveBeenCalled();
-
-      marshal.mount();
-      expect(console.error).toHaveBeenCalled();
-    });
-
-    it('should apply the resting styles by default', () => {
-      const styles: Styles = getStyles(marshal.styleContext);
-      marshal.mount();
-      const active: string = getStyleFromTag(marshal.styleContext);
-
-      expect(active).toEqual(styles.resting);
-    });
-
-    it('should apply the resting styles while not dragging', () => {
-      [state.idle, state.dropComplete()].forEach((current: State) => {
-        marshal.mount();
-        const styles: Styles = getStyles(marshal.styleContext);
-
-        marshal.onPhaseChange(current);
-        const active: string = getStyleFromTag(marshal.styleContext);
-
-        expect(active).toEqual(styles.resting);
-      });
-    });
+    expect(() => marshal.dragging()).toThrow();
   });
 
-  describe('drag preparing', () => {
-    it('should apply the resting styles', () => {
-      [state.preparing, state.requesting()].forEach((current: State) => {
-        marshal.mount();
-        const styles: Styles = getStyles(marshal.styleContext);
+  it('should allow subsequent updates', () => {
+    marshal.mount();
 
-        marshal.onPhaseChange(current);
-        const active: string = getStyleFromTag(marshal.styleContext);
+    Array.from({ length: 4 }).forEach(() => {
+      marshal.resting();
+      expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.resting);
 
-        expect(active).toEqual(styles.resting);
-      });
-    });
-  });
+      marshal.dragging();
+      expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.dragging);
 
-  describe('dragging', () => {
-    it('should apply the dragging styles', () => {
-      marshal.mount();
-      const styles: Styles = getStyles(marshal.styleContext);
+      marshal.collecting();
+      expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.collecting);
 
-      marshal.onPhaseChange(state.dragging());
-      const active: string = getStyleFromTag(marshal.styleContext);
-
-      expect(active).toEqual(styles.dragging);
-    });
-  });
-
-  describe('dropping', () => {
-    it('should apply the dropping styles if dropping', () => {
-      marshal.mount();
-      const styles: Styles = getStyles(marshal.styleContext);
-
-      marshal.onPhaseChange(state.dropAnimating());
+      marshal.dropping('DROP');
       expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.dropAnimating);
-    });
-
-    it('should apply the user cancel styles if performing a user directed cancel', () => {
-      marshal.mount();
-      const styles: Styles = getStyles(marshal.styleContext);
-
-      marshal.onPhaseChange(state.userCancel());
-      expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.userCancel);
-    });
-  });
-
-  describe('unmounting', () => {
-    it('should remove the style tag from the head when unmounting', () => {
-      marshal.mount();
-      const selector: string = getStyleTagSelector(marshal.styleContext);
-
-      // the style tag exists
-      expect(document.querySelector(selector)).toBeTruthy();
-
-      // now unmounted
-      marshal.unmount();
-
-      expect(document.querySelector(selector)).not.toBeTruthy();
-    });
-
-    it('should log an error if attempting to apply styles after unmounted', () => {
-      marshal.mount();
-      const styles: Styles = getStyles(marshal.styleContext);
-      const selector: string = getStyleTagSelector(marshal.styleContext);
-      // grabbing the element before unmount
-      const el: HTMLElement = (document.querySelector(selector): any);
-
-      // asserting it has the base styles
-      expect(el.innerHTML).toEqual(styles.resting);
-
-      marshal.unmount();
-      marshal.onPhaseChange(state.dragging());
-
-      // asserting it has the base styles (not updated)
-      expect(el.innerHTML).toEqual(styles.resting);
-      // an error is logged
-      expect(console.error).toHaveBeenCalled();
-    });
-  });
-
-  describe('subsequent updates', () => {
-    it('should allow multiple updates', () => {
-      marshal.mount();
-      const styles: Styles = getStyles(marshal.styleContext);
-
-      Array.from({ length: 4 }).forEach(() => {
-        // idle
-        marshal.onPhaseChange(state.idle);
-        expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.resting);
-
-        // preparing
-        marshal.onPhaseChange(state.preparing);
-        expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.resting);
-
-        // initial dimension request
-        marshal.onPhaseChange(state.requesting());
-        expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.resting);
-
-        // dragging
-        marshal.onPhaseChange(state.dragging());
-        expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.dragging);
-
-        // dropping
-        marshal.onPhaseChange(state.dropAnimating());
-        expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.dropAnimating);
-
-        // complete
-        marshal.onPhaseChange(state.dropComplete());
-        expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.resting);
-      });
     });
   });
 
   describe('resetStyleContext', () => {
     it('should reset the style context counter for subsequent marshals', () => {
+      // initial marshal
+      marshal.mount();
+      // initial style context
       expect(marshal.styleContext).toBe('0');
+
+      // creating second marshal
       const marshalBeforeReset = createStyleMarshal();
       expect(marshalBeforeReset.styleContext).toBe('1');
+
       resetStyleContext();
+
+      // creating third marshal after reset
       const marshalAfterReset = createStyleMarshal();
       expect(marshalAfterReset.styleContext).toBe('0');
-
-      marshalBeforeReset.unmount();
-      marshalAfterReset.unmount();
     });
   });
 });

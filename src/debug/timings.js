@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 
 type Records = {
   [key: string]: number,
@@ -10,7 +11,7 @@ const flag: string = '__react-beautiful-dnd-debug-timings-hook__';
 
 const isTimingsEnabled = (): boolean => Boolean(window[flag]);
 
-// TEMP
+// Debug: uncomment to enable
 // window[flag] = true;
 
 export const start = (key: string) => {
@@ -35,10 +36,7 @@ export const finish = (key: string) => {
 
   const previous: ?number = records[key];
 
-  if (previous == null) {
-    console.error('cannot finish timing as no previous time found');
-    return;
-  }
+  invariant(previous, 'cannot finish timing as no previous time found');
 
   const result: number = now - previous;
   const rounded: string = result.toFixed(2);

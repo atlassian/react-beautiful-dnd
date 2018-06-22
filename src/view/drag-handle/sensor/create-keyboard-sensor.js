@@ -1,5 +1,6 @@
 // @flow
 /* eslint-disable no-use-before-define */
+import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import createScheduler from '../util/create-scheduler';
 import preventStandardKeyEvents from '../util/prevent-standard-key-events';
@@ -9,15 +10,9 @@ import { bindEvents, unbindEvents } from '../util/bind-events';
 import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
 import type { EventBinding } from '../util/event-types';
 import type { KeyboardSensor, CreateSensorArgs } from './sensor-types';
-import type { Props } from '../drag-handle-types';
 
 type State = {|
   isDragging: boolean,
-|}
-
-type ExecuteBasedOnDirection = {|
-  vertical: Function,
-  horizontal: Function,
 |}
 
 type KeyMap = {
@@ -65,9 +60,7 @@ export default ({
   const isDragging = (): boolean => state.isDragging;
   const schedule = createScheduler(callbacks);
 
-  const onKeyDown = (event: KeyboardEvent, props: Props) => {
-    const { direction } = props;
-
+  const onKeyDown = (event: KeyboardEvent) => {
     // not yet dragging
     if (!isDragging()) {
       // We may already be lifting on a child draggable.
@@ -79,6 +72,8 @@ export default ({
 
       // cannot lift at this time
       if (!canStartCapturing(event)) {
+        // need to block to prevent default browser behaviour
+        event.preventDefault();
         return;
       }
 
@@ -88,10 +83,7 @@ export default ({
 
       const ref: ?HTMLElement = getDraggableRef();
 
-      if (!ref) {
-        console.error('cannot start a keyboard drag without a draggable ref');
-        return;
-      }
+      invariant(ref, 'Cannot start a keyboard drag without a draggable ref');
 
       // using center position as selection
       const center: Position = getBorderBoxCenterPosition(ref);
@@ -99,7 +91,7 @@ export default ({
       // we are using this event for part of the drag
       event.preventDefault();
       startDragging(() => callbacks.onLift({
-        client: center,
+        clientSelection: center,
         autoScrollMode: 'JUMP',
       }));
       return;
@@ -122,57 +114,28 @@ export default ({
 
     // Movement
 
-    // already dragging
-    if (!direction) {
-      console.error('Cannot handle keyboard movement event if direction is not provided');
-      // calling prevent default here as the action resulted in the drop
-      // this one is border line
-      event.preventDefault();
-      cancel();
-      return;
-    }
-
-    const executeBasedOnDirection = (fns: ExecuteBasedOnDirection) => {
-      if (direction === 'vertical') {
-        fns.vertical();
-        return;
-      }
-      fns.horizontal();
-    };
-
     if (event.keyCode === keyCodes.arrowDown) {
       event.preventDefault();
-      executeBasedOnDirection({
-        vertical: schedule.moveForward,
-        horizontal: schedule.crossAxisMoveForward,
-      });
+      schedule.moveDown();
       return;
     }
 
     if (event.keyCode === keyCodes.arrowUp) {
       event.preventDefault();
-      executeBasedOnDirection({
-        vertical: schedule.moveBackward,
-        horizontal: schedule.crossAxisMoveBackward,
-      });
+      schedule.moveUp();
       return;
     }
 
     if (event.keyCode === keyCodes.arrowRight) {
       event.preventDefault();
-      executeBasedOnDirection({
-        vertical: schedule.crossAxisMoveForward,
-        horizontal: schedule.moveForward,
-      });
+      schedule.moveRight();
       return;
     }
 
     if (event.keyCode === keyCodes.arrowLeft) {
       event.preventDefault();
-      executeBasedOnDirection({
-        vertical: schedule.crossAxisMoveBackward,
-        horizontal: schedule.moveBackward,
-      });
+      schedule.moveLeft();
+      return;
     }
 
     // preventing scroll jumping at this time

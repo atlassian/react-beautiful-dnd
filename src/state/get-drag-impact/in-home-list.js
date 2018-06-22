@@ -45,6 +45,8 @@ export default ({
   const isBeyondStartPosition: boolean =
     currentCenter[axis.line] - originalCenter[axis.line] > 0;
 
+  // TODO: if currentCenter === originalCenter can just abort
+
   // Amount to move needs to include the margins
   const amount: Position = patch(axis.line, draggable.client.marginBox[axis.size]);
 
@@ -79,13 +81,14 @@ export default ({
       draggable: dimension,
       destination: home,
       previousImpact,
-      viewport: viewport.subject,
+      viewport: viewport.frame,
     }));
 
     // Need to ensure that we always order by the closest impacted item
   const ordered: Displacement[] = isBeyondStartPosition ? displaced.reverse() : displaced;
   const index: number = (() => {
-    const startIndex = insideHome.indexOf(draggable);
+    // const startIndex = insideHome.indexOf(draggable);
+    const startIndex = draggable.descriptor.index;
     const length: number = ordered.length;
     if (!length) {
       return startIndex;

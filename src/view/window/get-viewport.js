@@ -5,6 +5,8 @@ import type { Viewport } from '../../types';
 import getWindowScroll from './get-window-scroll';
 import getMaxScroll from '../../state/get-max-scroll';
 
+const origin: Position = { x: 0, y: 0 };
+
 export default (): Viewport => {
   const scroll: Position = getWindowScroll();
 
@@ -23,21 +25,28 @@ export default (): Viewport => {
   const right: number = left + width;
   const bottom: number = top + height;
 
-  const subject: Rect = getRect({
+  const frame: Rect = getRect({
     top, left, right, bottom,
   });
 
   const maxScroll: Position = getMaxScroll({
     scrollHeight: doc.scrollHeight,
     scrollWidth: doc.scrollWidth,
-    width: subject.width,
-    height: subject.height,
+    width: frame.width,
+    height: frame.height,
   });
 
   const viewport: Viewport = {
-    subject,
-    maxScroll,
-    scroll,
+    frame,
+    scroll: {
+      initial: scroll,
+      current: scroll,
+      max: maxScroll,
+      diff: {
+        value: origin,
+        displacement: origin,
+      },
+    },
   };
 
   return viewport;

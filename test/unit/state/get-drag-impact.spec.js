@@ -406,6 +406,7 @@ describe('get drag impact', () => {
               descriptor: {
                 id: 'visible',
                 droppableId: droppable.descriptor.id,
+                type: droppable.descriptor.type,
                 index: 0,
               },
               borderBox: {
@@ -419,6 +420,7 @@ describe('get drag impact', () => {
               descriptor: {
                 id: 'not-visible-1',
                 droppableId: droppable.descriptor.id,
+                type: droppable.descriptor.type,
                 index: 1,
               },
               borderBox: {
@@ -433,6 +435,7 @@ describe('get drag impact', () => {
               descriptor: {
                 id: 'not-visible-2',
                 droppableId: droppable.descriptor.id,
+                type: droppable.descriptor.type,
                 index: 2,
               },
               borderBox: {
@@ -503,48 +506,51 @@ describe('get drag impact', () => {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
-                [axis.end]: viewport.subject[axis.end] + 100,
+                [axis.end]: viewport.frame[axis.end] + 100,
               },
             });
             const visible: DraggableDimension = getDraggableDimension({
               descriptor: {
                 id: 'visible',
                 droppableId: droppable.descriptor.id,
+                type: droppable.descriptor.type,
                 index: 0,
               },
               borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 [axis.start]: 0,
-                [axis.end]: viewport.subject[axis.end],
+                [axis.end]: viewport.frame[axis.end],
               },
             });
             const notVisible1: DraggableDimension = getDraggableDimension({
               descriptor: {
                 id: 'not-visible-1',
                 droppableId: droppable.descriptor.id,
+                type: droppable.descriptor.type,
                 index: 1,
               },
               borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // inside the droppable, but not in the visible area
-                [axis.start]: viewport.subject[axis.end] + 10,
-                [axis.end]: viewport.subject[axis.end] + 20,
+                [axis.start]: viewport.frame[axis.end] + 10,
+                [axis.end]: viewport.frame[axis.end] + 20,
               },
             });
             const notVisible2: DraggableDimension = getDraggableDimension({
               descriptor: {
                 id: 'not-visible-2',
                 droppableId: droppable.descriptor.id,
+                type: droppable.descriptor.type,
                 index: 2,
               },
               borderBox: {
                 [axis.crossAxisStart]: 0,
                 [axis.crossAxisEnd]: 100,
                 // inside the droppable, but not in the visible area
-                [axis.start]: viewport.subject[axis.end] + 30,
-                [axis.end]: viewport.subject[axis.end] + 40,
+                [axis.start]: viewport.frame[axis.end] + 30,
+                [axis.end]: viewport.frame[axis.end] + 40,
               },
             });
             const customDraggables: DraggableDimensionMap = {
@@ -1020,6 +1026,7 @@ describe('get drag impact', () => {
               descriptor: {
                 id: 'inSource1',
                 droppableId: source.descriptor.id,
+                type: source.descriptor.type,
                 index: 0,
               },
               borderBox: {
@@ -1064,19 +1071,21 @@ describe('get drag impact', () => {
               descriptor: {
                 id: 'visible',
                 droppableId: destination.descriptor.id,
+                type: destination.descriptor.type,
                 index: 0,
               },
               borderBox: {
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 [axis.start]: 0,
-                [axis.end]: viewport.subject[axis.end],
+                [axis.end]: viewport.frame[axis.end],
               },
             });
             const notVisible: DraggableDimension = getDraggableDimension({
               descriptor: {
                 id: 'not-visible-1',
                 droppableId: destination.descriptor.id,
+                type: destination.descriptor.type,
                 index: 1,
               },
               borderBox: {
@@ -1158,6 +1167,7 @@ describe('get drag impact', () => {
               descriptor: {
                 id: 'inSource1',
                 droppableId: source.descriptor.id,
+                type: source.descriptor.type,
                 index: 0,
               },
               borderBox: {
@@ -1180,34 +1190,36 @@ describe('get drag impact', () => {
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 [axis.start]: 0,
                 // stretches longer than viewport
-                [axis.end]: viewport.subject[axis.end] + 100,
+                [axis.end]: viewport.frame[axis.end] + 100,
               },
             });
             const visible: DraggableDimension = getDraggableDimension({
               descriptor: {
                 id: 'visible',
                 droppableId: destination.descriptor.id,
+                type: destination.descriptor.type,
                 index: 0,
               },
               borderBox: {
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 [axis.start]: 0,
-                [axis.end]: viewport.subject[axis.end],
+                [axis.end]: viewport.frame[axis.end],
               },
             });
             const notVisible: DraggableDimension = getDraggableDimension({
               descriptor: {
                 id: 'not-visible-1',
                 droppableId: destination.descriptor.id,
+                type: destination.descriptor.type,
                 index: 1,
               },
               borderBox: {
                 [axis.crossAxisStart]: foreignCrossAxisStart,
                 [axis.crossAxisEnd]: foreignCrossAxisEnd,
                 // inside the droppable, but not in the visible area
-                [axis.start]: viewport.subject[axis.end] + 10,
-                [axis.end]: viewport.subject[axis.end] + 20,
+                [axis.start]: viewport.frame[axis.end] + 10,
+                [axis.end]: viewport.frame[axis.end] + 20,
               },
             });
 

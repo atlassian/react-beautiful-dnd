@@ -23,70 +23,15 @@ import type { DraggableId } from '../../../../src/types';
 import type { TagNameMap } from '../../../../src/view/drag-handle/util/should-allow-dragging-from-target';
 import { styleContextKey, canLiftContextKey } from '../../../../src/view/context-keys';
 import * as attributes from '../../../../src/view/data-attributes';
+import {
+  getStubCallbacks,
+  resetCallbacks,
+  callbacksCalled,
+  whereAnyCallbacksCalled,
+} from './util';
 
 const primaryButton: number = 0;
 const auxiliaryButton: number = 1;
-
-const getStubCallbacks = (): Callbacks => ({
-  onLift: jest.fn(),
-  onMove: jest.fn(),
-  onMoveForward: jest.fn(),
-  onMoveBackward: jest.fn(),
-  onCrossAxisMoveForward: jest.fn(),
-  onCrossAxisMoveBackward: jest.fn(),
-  onDrop: jest.fn(),
-  onCancel: jest.fn(),
-  onWindowScroll: jest.fn(),
-});
-
-const resetCallbacks = (callbacks: Callbacks) => {
-  Object.keys(callbacks).forEach((key: string) => {
-    callbacks[key].mockReset();
-  });
-};
-
-type CallBacksCalledFn = {|
-  onLift?: number,
-  onMove?: number,
-  onMoveForward?: number,
-  onMoveBackward?: number,
-  onCrossAxisMoveForward ?: number,
-  onCrossAxisMoveBackward?: number,
-  onDrop?: number,
-  onCancel ?: number,
-  onWindowScroll ?: number,
-|}
-
-const callbacksCalled = (callbacks: Callbacks) => ({
-  onLift = 0,
-  onMove = 0,
-  onMoveForward = 0,
-  onMoveBackward = 0,
-  onCrossAxisMoveForward = 0,
-  onCrossAxisMoveBackward = 0,
-  onDrop = 0,
-  onCancel = 0,
-}: CallBacksCalledFn = {}) =>
-  callbacks.onLift.mock.calls.length === onLift &&
-  callbacks.onMove.mock.calls.length === onMove &&
-  callbacks.onMoveForward.mock.calls.length === onMoveForward &&
-  callbacks.onMoveBackward.mock.calls.length === onMoveBackward &&
-  callbacks.onDrop.mock.calls.length === onDrop &&
-  callbacks.onCancel.mock.calls.length === onCancel &&
-  callbacks.onCrossAxisMoveForward.mock.calls.length === onCrossAxisMoveForward &&
-  callbacks.onCrossAxisMoveBackward.mock.calls.length === onCrossAxisMoveBackward;
-
-const whereAnyCallbacksCalled = (callbacks: Callbacks) =>
-  !callbacksCalled(callbacks)();
-
-// useful debug function
-// eslint-disable-next-line no-unused-vars
-const getCallbackCalls = (callbacks: Callbacks) =>
-  // $ExpectError - hacking things big time
-  Object.keys(callbacks).reduce((previous: Object, key: string) => ({
-    ...previous,
-    [key]: callbacks[key].mock.calls.length,
-  }), {});
 
 type ChildProps = {|
   dragHandleProps: ?DragHandleProps,
@@ -178,7 +123,6 @@ const getNestedWrapper = (parentCallbacks: Callbacks, childCallbacks: Callbacks)
     <DragHandle
       draggableId="parent"
       callbacks={parentCallbacks}
-      direction="vertical"
       isDragging={false}
       isDropAnimating={false}
       isEnabled
@@ -190,7 +134,6 @@ const getNestedWrapper = (parentCallbacks: Callbacks, childCallbacks: Callbacks)
           <DragHandle
             draggableId="child"
             callbacks={childCallbacks}
-            direction="vertical"
             isDragging={false}
             isDropAnimating={false}
             isEnabled
@@ -209,12 +152,11 @@ const getNestedWrapper = (parentCallbacks: Callbacks, childCallbacks: Callbacks)
     { context: basicContext }
   );
 
-const getWrapper = (callbacks: Callbacks): ReactWrapper =>
+const getWrapper = (callbacks: Callbacks, context?: Object = basicContext): ReactWrapper =>
   mount(
     <DragHandle
       draggableId={draggableId}
       callbacks={callbacks}
-      direction="vertical"
       isDragging={false}
       isDropAnimating={false}
       isEnabled
@@ -225,7 +167,7 @@ const getWrapper = (callbacks: Callbacks): ReactWrapper =>
         <Child dragHandleProps={dragHandleProps} />
       )}
     </DragHandle>,
-    { context: basicContext }
+    { context }
   );
 
 describe('drag handle', () => {
@@ -268,7 +210,6 @@ describe('drag handle', () => {
         isEnabled
         isDragging={false}
         isDropAnimating={false}
-        direction={null}
         getDraggableRef={() => singleRef}
         canDragInteractiveElements={false}
       >
@@ -294,7 +235,6 @@ describe('drag handle', () => {
         isEnabled
         isDragging={false}
         isDropAnimating={false}
-        direction={null}
         getDraggableRef={() => singleRef}
         canDragInteractiveElements={false}
       >
@@ -329,7 +269,6 @@ describe('drag handle', () => {
               isDragging={false}
               isDropAnimating={false}
               isEnabled
-              direction={null}
               getDraggableRef={() => singleRef}
               canDragInteractiveElements={false}
             >
@@ -344,7 +283,7 @@ describe('drag handle', () => {
           windowMouseMove(point);
 
           expect(customCallbacks.onLift)
-            .toHaveBeenCalledWith({ client: point, autoScrollMode: 'FLUID' });
+            .toHaveBeenCalledWith({ clientSelection: point, autoScrollMode: 'FLUID' });
 
           customWrapper.unmount();
         });
@@ -438,6 +377,26 @@ describe('drag handle', () => {
         mouseDown(wrapper);
         windowMouseMove({ x: 0, y: sloppyClickThreshold });
 
+        expect(callbacksCalled(callbacks)({
+          onLift: 0,
+        })).toBe(true);
+      });
+
+      it('should not start a drag if the state says that a drag cannot start', () => {
+        const customCallbacks: Callbacks = getStubCallbacks();
+        const customContext = {
+          [styleContextKey]: 'hello',
+          [canLiftContextKey]: () => false,
+        };
+        const customWrapper = getWrapper(customCallbacks, customContext);
+        const mock: MockEvent = createMockEvent();
+
+        // prevent default called on mousedown
+        mouseDown(customWrapper, origin, primaryButton, mock);
+        expect(mock.preventDefault).toHaveBeenCalled();
+
+        // a normal lift will not occur
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
         expect(callbacksCalled(callbacks)({
           onLift: 0,
         })).toBe(true);
@@ -633,8 +592,6 @@ describe('drag handle', () => {
 
         expect(callbacksCalled(callbacks)({
           onLift: 1,
-          onMoveForward: 0,
-          onMoveBackward: 0,
         })).toBe(true);
       });
 
@@ -1413,7 +1370,7 @@ describe('drag handle', () => {
         pressSpacebar(wrapper, event);
 
         expect(callbacks.onLift).toHaveBeenCalledWith({
-          client: fakeCenter,
+          clientSelection: fakeCenter,
           autoScrollMode: 'JUMP',
         });
         // default action is prevented
@@ -1457,6 +1414,24 @@ describe('drag handle', () => {
         })).toBe(true);
         expect(mock.preventDefault).not.toHaveBeenCalled();
       });
+
+      it('should not lift and prevent the default action if the state does not currently allow lifting', () => {
+        const customCallbacks: Callbacks = getStubCallbacks();
+        const customContext = {
+          [styleContextKey]: 'hello',
+          [canLiftContextKey]: () => false,
+        };
+        const customWrapper = getWrapper(customCallbacks, customContext);
+        const mock: MockEvent = createMockEvent();
+
+        pressSpacebar(customWrapper, mock);
+
+        expect(callbacksCalled(callbacks)({
+          onLift: 0,
+        })).toBe(true);
+        // preventing the event to stop the default browser action
+        expect(mock.preventDefault).toHaveBeenCalled();
+      });
     });
 
     describe('progress', () => {
@@ -1488,37 +1463,8 @@ describe('drag handle', () => {
         expect(callbacksCalled(callbacks)({
           onLift: 1,
           onMove: 0,
-          onMoveForward: 0,
-          onMoveBackward: 0,
         })).toBe(true);
         expect(event.defaultPrevented).toBe(false);
-      });
-
-      it('should be able to lift without a direction provided', () => {
-        const customCallbacks = getStubCallbacks();
-        const customWrapper = mount(
-          <DragHandle
-            draggableId={draggableId}
-            callbacks={customCallbacks}
-            isDragging={false}
-            isDropAnimating={false}
-            isEnabled
-            direction="vertical"
-            getDraggableRef={() => singleRef}
-            canDragInteractiveElements={false}
-          >
-            {(dragHandleProps: ?DragHandleProps) => (
-              <Child dragHandleProps={dragHandleProps} />
-            )}
-          </DragHandle>,
-          { context: basicContext }
-        );
-
-        pressSpacebar(customWrapper);
-
-        expect(callbacksCalled(customCallbacks)({
-          onLift: 1,
-        })).toBe(true);
       });
 
       it('should instantly fire a scroll action when the window scrolls', () => {
@@ -1557,43 +1503,7 @@ describe('drag handle', () => {
         });
       });
 
-      it('should stop dragging if the keyboard is used after a lift and a direction is not provided', () => {
-        const customCallbacks = getStubCallbacks();
-        const mockEvent: MockEvent = createMockEvent();
-        const customWrapper = mount(
-          <DragHandle
-            draggableId={draggableId}
-            callbacks={customCallbacks}
-            isDragging={false}
-            isDropAnimating={false}
-            isEnabled
-            direction={null}
-            getDraggableRef={() => singleRef}
-            canDragInteractiveElements={false}
-          >
-            {(dragHandleProps: ?DragHandleProps) => (
-              <Child dragHandleProps={dragHandleProps} />
-            )}
-          </DragHandle>,
-          { context: basicContext }
-        );
-
-        // lift - all good
-        pressSpacebar(customWrapper);
-
-        // boom
-        pressArrowDown(customWrapper, mockEvent);
-
-        expect(console.error).toHaveBeenCalled();
-        expect(callbacksCalled(customCallbacks)({
-          onLift: 1,
-          onCancel: 1,
-          onMoveForward: 0,
-        })).toBe(true);
-        expect(mockEvent.preventDefault).toHaveBeenCalled();
-      });
-
-      describe('dragging in a vertical list', () => {
+      describe('directional movement', () => {
         it('should move backward when the user presses ArrowUp', () => {
           const mockEvent: MockEvent = createMockEvent();
 
@@ -1604,7 +1514,7 @@ describe('drag handle', () => {
 
           expect(callbacksCalled(callbacks)({
             onLift: 1,
-            onMoveBackward: 1,
+            onMoveUp: 1,
           })).toBe(true);
           // we are using the event as a part of the drag
           expect(mockEvent.preventDefault).toHaveBeenCalled();
@@ -1620,7 +1530,7 @@ describe('drag handle', () => {
 
           expect(callbacksCalled(callbacks)({
             onLift: 1,
-            onMoveForward: 1,
+            onMoveDown: 1,
           })).toBe(true);
           // we are using the event as a part of the drag
           expect(mockEvent.preventDefault).toHaveBeenCalled();
@@ -1635,7 +1545,7 @@ describe('drag handle', () => {
 
           expect(callbacksCalled(callbacks)({
             onLift: 1,
-            onCrossAxisMoveBackward: 1,
+            onMoveLeft: 1,
           })).toBe(true);
           // we are using the event as a part of the drag
           expect(mockEvent.preventDefault).toHaveBeenCalled();
@@ -1650,97 +1560,7 @@ describe('drag handle', () => {
 
           expect(callbacksCalled(callbacks)({
             onLift: 1,
-            onCrossAxisMoveForward: 1,
-          })).toBe(true);
-          // we are using the event as a part of the drag
-          expect(mockEvent.preventDefault).toHaveBeenCalled();
-        });
-      });
-
-      describe('dragging in a horizontal list', () => {
-        let customWrapper: ReactWrapper;
-        let customCallbacks: Callbacks;
-
-        beforeEach(() => {
-          customCallbacks = getStubCallbacks();
-          customWrapper = mount(
-            <DragHandle
-              draggableId={draggableId}
-              callbacks={customCallbacks}
-              direction="horizontal"
-              isDragging={false}
-              isDropAnimating={false}
-              isEnabled
-              getDraggableRef={() => singleRef}
-              canDragInteractiveElements={false}
-            >
-              {(dragHandleProps: ?DragHandleProps) => (
-                <Child dragHandleProps={dragHandleProps} />
-              )}
-            </DragHandle>,
-            { context: basicContext }
-          );
-        });
-
-        afterEach(() => {
-          customWrapper.unmount();
-        });
-
-        it('should move backward when the user presses LeftArrow', () => {
-          const mockEvent: MockEvent = createMockEvent();
-
-          pressSpacebar(customWrapper);
-          pressArrowLeft(customWrapper, mockEvent);
-          requestAnimationFrame.step();
-
-          expect(callbacksCalled(customCallbacks)({
-            onLift: 1,
-            onMoveBackward: 1,
-          })).toBe(true);
-          // we are using the event as a part of the drag
-          expect(mockEvent.preventDefault).toHaveBeenCalled();
-        });
-
-        it('should move forward when the user presses RightArrow', () => {
-          const mockEvent: MockEvent = createMockEvent();
-
-          pressSpacebar(customWrapper);
-          pressArrowRight(customWrapper, mockEvent);
-          requestAnimationFrame.step();
-
-          expect(callbacksCalled(customCallbacks)({
-            onLift: 1,
-            onMoveForward: 1,
-          })).toBe(true);
-          // we are using the event as a part of the drag
-          expect(mockEvent.preventDefault).toHaveBeenCalled();
-        });
-
-        it('should request a backward cross axis move when the user presses ArrowUp', () => {
-          const mockEvent: MockEvent = createMockEvent();
-
-          pressSpacebar(customWrapper);
-          pressArrowUp(customWrapper, mockEvent);
-          requestAnimationFrame.step();
-
-          expect(callbacksCalled(customCallbacks)({
-            onLift: 1,
-            onCrossAxisMoveBackward: 1,
-          })).toBe(true);
-          // we are using the event as a part of the drag
-          expect(mockEvent.preventDefault).toHaveBeenCalled();
-        });
-
-        it('should request a forward cross axis move when the user presses ArrowDown', () => {
-          const mockEvent: MockEvent = createMockEvent();
-
-          pressSpacebar(customWrapper);
-          pressArrowDown(customWrapper, mockEvent);
-          requestAnimationFrame.step();
-
-          expect(callbacksCalled(customCallbacks)({
-            onLift: 1,
-            onCrossAxisMoveForward: 1,
+            onMoveRight: 1,
           })).toBe(true);
           // we are using the event as a part of the drag
           expect(mockEvent.preventDefault).toHaveBeenCalled();
@@ -1759,8 +1579,7 @@ describe('drag handle', () => {
           expect(callbacksCalled(callbacks)({
             onLift: 1,
             onMove: 0,
-            onMoveForward: 1,
-            onMoveBackward: 0,
+            onMoveDown: 1,
           })).toBe(true);
 
           // being super safe and ensuring nothing firers later
@@ -1769,8 +1588,7 @@ describe('drag handle', () => {
           expect(callbacksCalled(callbacks)({
             onLift: 1,
             onMove: 0,
-            onMoveForward: 1,
-            onMoveBackward: 0,
+            onMoveDown: 1,
           })).toBe(true);
         });
 
@@ -1785,8 +1603,8 @@ describe('drag handle', () => {
           expect(callbacksCalled(callbacks)({
             onLift: 1,
             onMove: 0,
-            onMoveForward: 0,
-            onMoveBackward: 1,
+            onMoveDown: 0,
+            onMoveUp: 1,
           })).toBe(true);
 
           // being super safe and ensuring nothing firers later
@@ -1795,8 +1613,8 @@ describe('drag handle', () => {
           expect(callbacksCalled(callbacks)({
             onLift: 1,
             onMove: 0,
-            onMoveForward: 0,
-            onMoveBackward: 1,
+            onMoveDown: 0,
+            onMoveUp: 1,
           })).toBe(true);
         });
 
@@ -1810,7 +1628,7 @@ describe('drag handle', () => {
           requestAnimationFrame.flush();
 
           expect(callbacksCalled(callbacks)({
-            onMoveForward: 0,
+            onMoveDown: 0,
             onLift: 1,
             onDrop: 1,
           })).toBe(true);
@@ -1826,7 +1644,7 @@ describe('drag handle', () => {
           requestAnimationFrame.flush();
 
           expect(callbacksCalled(callbacks)({
-            onMoveBackward: 0,
+            onMoveUp: 0,
             onLift: 1,
             onDrop: 1,
           })).toBe(true);
@@ -1903,7 +1721,7 @@ describe('drag handle', () => {
         expect(event.defaultPrevented).toBe(false);
       });
 
-      it('should not prevent any subsequent click actions', () => {
+      it('should not prevent any subsequent window click actions', () => {
         // lift
         pressSpacebar(wrapper);
         // drop
@@ -1916,13 +1734,10 @@ describe('drag handle', () => {
 
         expect(isAWindowClickPrevented()).toBe(false);
       });
-    });
 
-    describe('post drag click', () => {
-      it('should not prevent any clicks after a drag', () => {
+      it('should not prevent any subsequent on element click actions', () => {
         const mockEvent: MockEvent = createMockEvent();
         pressSpacebar(wrapper);
-        pressArrowDown(wrapper);
         pressSpacebar(wrapper);
 
         mouseClick(wrapper, origin, primaryButton, mockEvent);
@@ -2007,18 +1822,15 @@ describe('drag handle', () => {
       });
     });
 
-    describe('unmounted mid drag', () => {
-      beforeEach(() => {
-        pressSpacebar(wrapper);
-        wrapper.unmount();
-      });
+    it('should call the onCancel prop if unmounted mid drag', () => {
+      pressSpacebar(wrapper);
 
-      it('should call the onCancel prop', () => {
-        expect(callbacksCalled(callbacks)({
-          onLift: 1,
-          onCancel: 1,
-        })).toBe(true);
-      });
+      wrapper.unmount();
+
+      expect(callbacksCalled(callbacks)({
+        onLift: 1,
+        onCancel: 1,
+      })).toBe(true);
     });
 
     describe('subsequent drags', () => {
@@ -2034,7 +1846,7 @@ describe('drag handle', () => {
 
           expect(callbacksCalled(callbacks)({
             onLift: val + 1,
-            onMoveForward: val + 1,
+            onMoveDown: val + 1,
             onDrop: val + 1,
           })).toBe(true);
         });
@@ -2076,16 +1888,16 @@ describe('drag handle', () => {
 
     describe('initiation', () => {
       it('should start a drag on long press', () => {
-        const client: Position = {
+        const clientSelection: Position = {
           x: 50,
           y: 100,
         };
 
-        touchStart(wrapper, client);
+        touchStart(wrapper, clientSelection);
         jest.runTimersToTime(timeForLongPress);
 
         expect(callbacks.onLift).toHaveBeenCalledWith({
-          client,
+          clientSelection,
           autoScrollMode: 'FLUID',
         });
       });
@@ -2096,6 +1908,22 @@ describe('drag handle', () => {
         touchStart(wrapper, origin, 0, mockEvent);
 
         expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+      });
+
+      it('should not start a drag if the application state does not allow it', () => {
+        const customCallbacks: Callbacks = getStubCallbacks();
+        const customContext = {
+          [styleContextKey]: 'hello',
+          [canLiftContextKey]: () => false,
+        };
+        const customWrapper = getWrapper(customCallbacks, customContext);
+        const mock: MockEvent = createMockEvent();
+
+        touchStart(customWrapper, origin, 0, mock);
+        jest.runTimersToTime(timeForLongPress);
+
+        expect(mock.preventDefault).not.toHaveBeenCalled();
+        expect(callbacks.onLift).not.toHaveBeenCalled();
       });
     });
 
@@ -2690,7 +2518,6 @@ describe('drag handle', () => {
           isEnabled={false}
           isDragging={false}
           isDropAnimating={false}
-          direction={null}
           getDraggableRef={() => singleRef}
           canDragInteractiveElements={false}
         >
@@ -3075,7 +2902,6 @@ describe('drag handle', () => {
                   isDragging={false}
                   isDropAnimating={false}
                   isEnabled
-                  direction={null}
                   getDraggableRef={() => singleRef}
                   canDragInteractiveElements={false}
                 >
@@ -3111,7 +2937,6 @@ describe('drag handle', () => {
                   isDragging={false}
                   isDropAnimating={false}
                   isEnabled
-                  direction={null}
                   getDraggableRef={() => singleRef}
                   canDragInteractiveElements={false}
                 >
@@ -3150,7 +2975,6 @@ describe('drag handle', () => {
                   isDragging={false}
                   isDropAnimating={false}
                   isEnabled
-                  direction={null}
                   getDraggableRef={() => singleRef}
                   canDragInteractiveElements={false}
                 >
@@ -3194,7 +3018,6 @@ describe('drag handle', () => {
                   isDragging={false}
                   isDropAnimating={false}
                   isEnabled
-                  direction={null}
                   getDraggableRef={() => singleRef}
                   canDragInteractiveElements={false}
                 >
@@ -3241,7 +3064,6 @@ describe('drag handle', () => {
                   isDragging={false}
                   isDropAnimating={false}
                   isEnabled
-                  direction={null}
                   getDraggableRef={() => singleRef}
                   // stating that we can drag
                   canDragInteractiveElements
@@ -3284,7 +3106,6 @@ describe('drag handle', () => {
                   isDragging={false}
                   isDropAnimating={false}
                   isEnabled
-                  direction={null}
                   getDraggableRef={() => singleRef}
                   // stating that we can drag
                   canDragInteractiveElements
@@ -3339,7 +3160,6 @@ describe('drag handle', () => {
                 isDragging={false}
                 isDropAnimating={false}
                 isEnabled
-                direction={null}
                 getDraggableRef={() => singleRef}
                 canDragInteractiveElements={false}
               >

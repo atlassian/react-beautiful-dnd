@@ -1,7 +1,7 @@
 // @flow
 import memoizeOne from 'memoize-one';
+import { toDraggableList } from './dimension-structures';
 import type {
-  DraggableId,
   DraggableDimension,
   DroppableDimension,
   DraggableDimensionMap,
@@ -11,8 +11,7 @@ export default memoizeOne(
   (droppable: DroppableDimension,
     draggables: DraggableDimensionMap,
   ): DraggableDimension[] =>
-    Object.keys(draggables)
-      .map((id: DraggableId): DraggableDimension => draggables[id])
+    toDraggableList(draggables)
       .filter((draggable: DraggableDimension): boolean => (
         droppable.descriptor.id === draggable.descriptor.droppableId
       ))

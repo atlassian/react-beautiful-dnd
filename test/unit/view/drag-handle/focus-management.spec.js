@@ -6,19 +6,8 @@ import { mount } from 'enzyme';
 import type { ReactWrapper } from 'enzyme';
 import DragHandle from '../../../../src/view/drag-handle';
 import { styleContextKey, canLiftContextKey } from '../../../../src/view/context-keys';
-import type { Callbacks, DragHandleProps } from '../../../../src/view/drag-handle/drag-handle-types';
-
-const getStubCallbacks = (): Callbacks => ({
-  onLift: jest.fn(),
-  onMove: jest.fn(),
-  onMoveForward: jest.fn(),
-  onMoveBackward: jest.fn(),
-  onCrossAxisMoveForward: jest.fn(),
-  onCrossAxisMoveBackward: jest.fn(),
-  onDrop: jest.fn(),
-  onCancel: jest.fn(),
-  onWindowScroll: jest.fn(),
-});
+import type { DragHandleProps } from '../../../../src/view/drag-handle/drag-handle-types';
+import { getStubCallbacks } from './util';
 
 const options = {
   context: {
@@ -87,7 +76,6 @@ describe('Portal usage (ref changing while mounted)', () => {
         <DragHandle
           draggableId="child"
           callbacks={getStubCallbacks()}
-          direction="vertical"
           isDragging={false}
           isDropAnimating={false}
           isEnabled
@@ -171,7 +159,6 @@ describe('Focus retention moving between lists (focus retention between mounts)'
         <DragHandle
           draggableId={this.props.draggableId}
           callbacks={getStubCallbacks()}
-          direction="vertical"
           isDragging={this.props.isDragging}
           isDropAnimating={this.props.isDropAnimating}
           isEnabled

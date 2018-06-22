@@ -3,6 +3,7 @@ import { css } from '../animation';
 import * as attributes from '../data-attributes';
 
 export type Styles = {|
+  collecting: string,
   dragging: string,
   resting: string,
   dropAnimating: string,
@@ -136,31 +137,43 @@ export default (styleContext: string): Styles => {
     droppableStyles.base,
   ];
 
-  const resting: string = [
+  const resting: string[] = [
     ...base,
     dragHandleStyles.grabCursor,
-  ].join('');
+  ];
 
-  const dragging: string = [
+  // while collecting we do not animate movements
+  const collecting: string[] = [
     ...base,
     dragHandleStyles.blockPointerEvents,
-    draggableStyles.animateMovement,
     bodyStyles.whileActiveDragging,
-  ].join('');
+  ];
 
-  const dropAnimating: string = [
+  // while dragging we animate movements
+  const dragging: string[] = [
+    ...collecting,
+    draggableStyles.animateMovement,
+  ];
+
+  const dropAnimating: string[] = [
     ...base,
     dragHandleStyles.grabCursor,
     draggableStyles.animateMovement,
-  ].join('');
+  ];
 
   // Not applying grab cursor during a cancel as it is not possible for users to reorder
   // items during a cancel
-  const userCancel: string = [
+  const userCancel: string[] = [
     ...base,
     draggableStyles.animateMovement,
-  ].join('');
+  ];
 
-  return { resting, dragging, dropAnimating, userCancel };
+  return {
+    resting: resting.join(''),
+    dragging: dragging.join(''),
+    dropAnimating: dropAnimating.join(''),
+    collecting: collecting.join(''),
+    userCancel: userCancel.join(''),
+  };
 };
 

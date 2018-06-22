@@ -3,8 +3,8 @@ import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import isPositionInFrame from '../visibility/is-position-in-frame';
+import { toDroppableList } from '../dimension-structures';
 import type {
-  DroppableId,
   DroppableDimension,
   DroppableDimensionMap,
   DraggableLocation,
@@ -12,8 +12,7 @@ import type {
 
 const getScrollableDroppables = memoizeOne(
   (droppables: DroppableDimensionMap): DroppableDimension[] => (
-    Object.keys(droppables)
-      .map((id: DroppableId): DroppableDimension => droppables[id])
+    toDroppableList(droppables)
       .filter((droppable: DroppableDimension): boolean => {
         // exclude disabled droppables
         if (!droppable.isEnabled) {

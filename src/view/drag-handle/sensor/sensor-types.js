@@ -1,5 +1,5 @@
 // @flow
-import type { Props, Callbacks } from '../drag-handle-types';
+import type { Callbacks } from '../drag-handle-types';
 
 type SensorBase = {|
   // force stop and do not fire any events
@@ -27,7 +27,7 @@ export type MouseSensor = {|
 
 export type KeyboardSensor = {|
   ...SensorBase,
-  onKeyDown: (event: KeyboardEvent, props: Props) => void,
+  onKeyDown: (event: KeyboardEvent) => void,
 |}
 
 export type TouchSensor = {|

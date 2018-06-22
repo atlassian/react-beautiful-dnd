@@ -5,11 +5,11 @@ import { closest } from '../position';
 import isWithin from '../is-within';
 import { getCorners } from '../spacing';
 import isPartiallyVisibleThroughFrame from '../visibility/is-partially-visible-through-frame';
+import { toDroppableList } from '../dimension-structures';
 import type {
   Axis,
   DroppableDimension,
   DroppableDimensionMap,
-  DroppableId,
   Viewport,
 } from '../../types';
 
@@ -50,8 +50,7 @@ export default ({
     sourceClipped[axis.start],
     sourceClipped[axis.end]
   );
-  const candidates: DroppableDimension[] = Object.keys(droppables)
-    .map((id: DroppableId): DroppableDimension => droppables[id])
+  const candidates: DroppableDimension[] = toDroppableList(droppables)
     // Remove the source droppable from the list
     .filter((droppable: DroppableDimension): boolean => droppable !== source)
     // Remove any options that are not enabled
@@ -64,7 +63,7 @@ export default ({
         return false;
       }
       // TODO: only need to be totally visible on the cross axis
-      return isPartiallyVisibleThroughFrame(viewport.subject)(clippedPageMarginBox);
+      return isPartiallyVisibleThroughFrame(viewport.frame)(clippedPageMarginBox);
     })
     .filter((droppable: DroppableDimension): boolean => {
       const targetClipped: Rect = getSafeClipped(droppable);

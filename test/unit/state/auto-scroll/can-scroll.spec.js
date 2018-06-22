@@ -53,7 +53,7 @@ const scrollable: DroppableDimension = getDroppableDimension({
 });
 
 const customViewport: Viewport = createViewport({
-  subject: getRect({
+  frame: getRect({
     top: 0,
     left: 0,
     right: 100,
@@ -414,7 +414,7 @@ describe('can scroll', () => {
   describe('can scroll window', () => {
     it('should return true if the window is able to be scrolled', () => {
       const viewport: Viewport = createViewport({
-        subject: customViewport.subject,
+        frame: customViewport.frame,
         scrollHeight: 200,
         scrollWidth: 100,
         scroll: origin,
@@ -427,7 +427,7 @@ describe('can scroll', () => {
 
     it('should return false if the window is not able to be scrolled', () => {
       const viewport: Viewport = createViewport({
-        subject: customViewport.subject,
+        frame: customViewport.frame,
         scrollHeight: 200,
         scrollWidth: 100,
         // already at the max scroll
@@ -500,7 +500,7 @@ describe('can scroll', () => {
   describe('get window overlap', () => {
     it('should return null if the window cannot be scrolled', () => {
       const viewport: Viewport = createViewport({
-        subject: customViewport.subject,
+        frame: customViewport.frame,
         scrollHeight: 200,
         scrollWidth: 100,
         // already at the max scroll
@@ -518,7 +518,7 @@ describe('can scroll', () => {
     // tested in get remainder
     it('should return the overlap', () => {
       const viewport: Viewport = createViewport({
-        subject: customViewport.subject,
+        frame: customViewport.frame,
         scrollHeight: 200,
         scrollWidth: 200,
         scroll: {
@@ -531,8 +531,8 @@ describe('can scroll', () => {
       const maxScroll: Position = getMaxScroll({
         scrollHeight: 200,
         scrollWidth: 200,
-        height: viewport.subject.height,
-        width: viewport.subject.width,
+        height: viewport.frame.height,
+        width: viewport.frame.width,
       });
       expect(maxScroll).toEqual({ x: 100, y: 100 });
 
@@ -551,7 +551,7 @@ describe('can scroll', () => {
 
     it('should return null if there is no overlap', () => {
       const viewport: Viewport = createViewport({
-        subject: customViewport.subject,
+        frame: customViewport.frame,
         scrollHeight: 200,
         scrollWidth: 200,
         scroll: origin,

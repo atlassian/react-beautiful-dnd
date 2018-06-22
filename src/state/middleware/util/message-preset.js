@@ -3,7 +3,7 @@ import type {
   DragStart,
   DragUpdate,
   DropResult,
-} from '../../types';
+} from '../../../types';
 
 export type MessagePreset = {|
   onDragStart: (start: DragStart) => string,

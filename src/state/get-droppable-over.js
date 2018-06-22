@@ -6,6 +6,7 @@ import isPositionInFrame from './visibility/is-position-in-frame';
 import { patch } from './position';
 import { expandByPosition } from './spacing';
 import { clip } from './droppable-dimension';
+import { toDroppableList } from './dimension-structures';
 import type {
   Scrollable,
   DraggableDimension,
@@ -132,28 +133,27 @@ export default ({
   previousDroppableOverId,
 }: Args): ?DroppableId => {
   const maybe: ?DroppableDimension =
-    Object.keys(droppables)
-      .map((id: DroppableId): DroppableDimension => droppables[id])
+      toDroppableList(droppables)
       // only want enabled droppables
-      .filter((droppable: DroppableDimension) => droppable.isEnabled)
-      .find((droppable: DroppableDimension): boolean => {
-        // If previously dragging over a droppable we give it a
-        // bit of room on the subsequent drags so that user and move
-        // items in the space that the placeholder takes up
-        const withPlaceholder: ?Rect = getClippedRectWithPlaceholder({
-          draggable, draggables, droppable, previousDroppableOverId,
+        .filter((droppable: DroppableDimension) => droppable.isEnabled)
+        .find((droppable: DroppableDimension): boolean => {
+          // If previously dragging over a droppable we give it a
+          // bit of room on the subsequent drags so that user and move
+          // items in the space that the placeholder takes up
+          const withPlaceholder: ?Rect = getClippedRectWithPlaceholder({
+            draggable, draggables, droppable, previousDroppableOverId,
+          });
+
+          if (!withPlaceholder) {
+            return false;
+          }
+
+          // Not checking to see if visible in viewport
+          // as the target might be off screen if dragging a large draggable
+          // Not adjusting target for droppable scroll as we are just checking
+          // if it is over the droppable - not its internal impact
+          return isPositionInFrame(withPlaceholder)(target);
         });
-
-        if (!withPlaceholder) {
-          return false;
-        }
-
-        // Not checking to see if visible in viewport
-        // as the target might be off screen if dragging a large draggable
-        // Not adjusting target for droppable scroll as we are just checking
-        // if it is over the droppable - not its internal impact
-        return isPositionInFrame(withPlaceholder)(target);
-      });
 
   return maybe ? maybe.descriptor.id : null;
 };

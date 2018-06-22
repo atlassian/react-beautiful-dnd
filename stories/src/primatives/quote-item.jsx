@@ -114,8 +114,8 @@ export default class QuoteItem extends React.PureComponent<Props> {
         <Content>
           <BlockQuote>{quote.content}</BlockQuote>
           <Footer>
-            <QuoteId>(id: {quote.id})</QuoteId>
-            <Attribution>{quote.author.name}</Attribution>
+            <QuoteId>({quote.id})</QuoteId>
+            <Attribution>TEMP</Attribution>
           </Footer>
         </Content>
       </Container>

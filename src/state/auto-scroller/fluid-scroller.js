@@ -10,13 +10,12 @@ import {
 } from './can-scroll';
 import type {
   Axis,
-  DroppableId,
-  DragState,
+  DraggingState,
   DroppableDimension,
-  State,
   DraggableDimension,
   Scrollable,
   Viewport,
+  DroppableId,
 } from '../../types';
 
 // Values used to control how the fluid auto scroll feels
@@ -230,11 +229,11 @@ const withPlaceholder = (
 };
 
 type Api = {|
-  scrollWindow: (offset: Position) => void,
-  scrollDroppable: (id: DroppableId, offset: Position) => void,
+  scrollWindow: (change: Position) => void,
+  scrollDroppable: (id: DroppableId, change: Position) => void,
 |}
 
-type ResultFn = (state: State) => void;
+type ResultFn = (state: DraggingState) => void;
 type ResultCancel = { cancel: () => void };
 
 export type FluidScroller = ResultFn & ResultCancel;
@@ -246,22 +245,16 @@ export default ({
   const scheduleWindowScroll = rafSchd(scrollWindow);
   const scheduleDroppableScroll = rafSchd(scrollDroppable);
 
-  const scroller = (state: State): void => {
-    const drag: ?DragState = state.drag;
-    if (!drag) {
-      console.error('Invalid drag state');
-      return;
-    }
-
-    const center: Position = drag.current.page.borderBoxCenter;
+  const scroller = (state: DraggingState): void => {
+    const center: Position = state.current.page.borderBoxCenter;
 
     // 1. Can we scroll the viewport?
 
-    const draggable: DraggableDimension = state.dimension.draggable[drag.initial.descriptor.id];
+    const draggable: DraggableDimension = state.dimensions.draggables[state.critical.draggable.id];
     const subject: Rect = draggable.page.marginBox;
-    const viewport: Viewport = drag.current.viewport;
+    const viewport: Viewport = state.viewport;
     const requiredWindowScroll: ?Position = getRequiredScroll({
-      container: viewport.subject,
+      container: viewport.frame,
       subject,
       center,
     });
@@ -275,8 +268,8 @@ export default ({
 
     const droppable: ?DroppableDimension = getBestScrollableDroppable({
       center,
-      destination: drag.impact.destination,
-      droppables: state.dimension.droppable,
+      destination: state.impact.destination,
+      droppables: state.dimensions.droppables,
     });
 
     // No scrollable targets

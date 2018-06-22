@@ -1,5 +1,9 @@
 // @flow
 import { type Position } from 'css-box-model';
+import {
+  type UpdateDroppableScrollArgs,
+  type UpdateDroppableIsEnabledArgs,
+} from '../action-creators';
 import type {
   DraggableDescriptor,
   DroppableDescriptor,
@@ -7,23 +11,28 @@ import type {
   DroppableDimension,
   DraggableId,
   DroppableId,
-  State,
   ScrollOptions,
+  Critical,
+  DimensionMap,
+  LiftRequest,
+  Publish,
 } from '../../types';
 
-export type GetDraggableDimensionFn = () => DraggableDimension;
-export type GetDroppableDimensionFn = () => DroppableDimension;
+export type GetDraggableDimensionFn = (
+  windowScroll: Position,
+) => DraggableDimension;
+
+export type GetDroppableDimensionFn = (
+  windowScroll: Position,
+  options: ScrollOptions
+) => DroppableDimension;
 
 export type DroppableCallbacks = {|
-  getDimension: GetDroppableDimensionFn,
+  getDimensionAndWatchScroll: GetDroppableDimensionFn,
   // scroll a droppable
   scroll: (change: Position) => void,
-  // Droppable must listen to scroll events and publish them using the
-  // onChange callback. If the Droppable is not in a scroll container then
-  // it does not need to do anything
-  watchScroll: (options: ScrollOptions) => void,
-  // If the Droppable is listening for scrol events - it needs to stop!
-  // This may be called even if watchScroll was not previously called
+  // If the Droppable is listening for scroll events - it needs to stop!
+  // Can be called on droppables that have not been asked to watch scroll
   unwatchScroll: () => void,
 |}
 
@@ -45,34 +54,57 @@ export type DroppableEntryMap = {
   [key: DroppableId]: DroppableEntry,
 }
 
-export type UnknownDescriptorType = DraggableDescriptor | DroppableDescriptor;
-export type UnknownDimensionType = DraggableDimension | DroppableDimension;
+export type Entries = {|
+  droppables: DroppableEntryMap,
+  draggables: DraggableEntryMap,
+|}
+
+export type Collection = {|
+  scrollOptions: ScrollOptions,
+  critical: Critical,
+  initialWindowScroll: Position,
+|}
+
+export type StartPublishingResult = {|
+  critical: Critical,
+  dimensions: DimensionMap
+|};
 
 export type DimensionMarshal = {|
   // Draggable
-  registerDraggable: (descriptor: DraggableDescriptor,
-    getDimension: GetDraggableDimensionFn) => void,
+  registerDraggable: (
+    descriptor: DraggableDescriptor,
+    getDimension: GetDraggableDimensionFn
+  ) => void,
+  updateDraggable: (
+    previous: DraggableDescriptor,
+    descriptor: DraggableDescriptor,
+    getDimension: GetDraggableDimensionFn
+  ) => void,
   unregisterDraggable: (descriptor: DraggableDescriptor) => void,
   // Droppable
-  registerDroppable: (descriptor: DroppableDescriptor,
-    callbacks: DroppableCallbacks) => void,
+  registerDroppable: (
+    descriptor: DroppableDescriptor,
+    callbacks: DroppableCallbacks
+  ) => void,
+  updateDroppable: (
+    previous: DroppableDescriptor,
+    descriptor: DroppableDescriptor,
+    callbacks: DroppableCallbacks,
+  ) => void,
   // it is possible for a droppable to change whether it is enabled during a drag
   updateDroppableIsEnabled: (id: DroppableId, isEnabled: boolean) => void,
   updateDroppableScroll: (id: DroppableId, newScroll: Position) => void,
   scrollDroppable: (id: DroppableId, change: Position) => void,
   unregisterDroppable: (descriptor: DroppableDescriptor) => void,
   // Entry
-  onPhaseChange: (current: State) => void,
+  startPublishing: (request: LiftRequest, windowScroll: Position) => StartPublishingResult,
+  stopPublishing: () => void,
 |}
 
 export type Callbacks = {|
-  cancel: () => void,
-  publishDraggable: (DraggableDimension) => void,
-  publishDroppable: (DroppableDimension) => void,
-  bulkPublish: (
-    droppables: DroppableDimension[],
-    draggables: DraggableDimension[],
-  ) => void,
-  updateDroppableScroll: (id: DroppableId, newScroll: Position) => void,
-  updateDroppableIsEnabled: (id: DroppableId, isEnabled: boolean) => void,
+  publish: (args: Publish) => void,
+  updateDroppableScroll: (args: UpdateDroppableScrollArgs) => void,
+  updateDroppableIsEnabled: (args: UpdateDroppableIsEnabledArgs) => void,
+  collectionStarting: () => void,
 |}

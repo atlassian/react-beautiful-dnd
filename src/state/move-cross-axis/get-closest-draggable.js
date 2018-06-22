@@ -39,7 +39,7 @@ export default ({
       isTotallyVisible({
         target: draggable.page.borderBox,
         destination,
-        viewport: viewport.subject,
+        viewport: viewport.frame,
       }))
     .sort((a: DraggableDimension, b: DraggableDimension): number => {
       // Need to consider the change in scroll in the destination

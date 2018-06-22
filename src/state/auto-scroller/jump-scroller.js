@@ -7,28 +7,22 @@ import {
   getWindowOverlap,
   getDroppableOverlap,
 } from './can-scroll';
+import { move as moveAction } from '../action-creators';
 import type {
-  DraggableId,
-  DroppableId,
-  DragState,
   DroppableDimension,
-  State,
   DraggableLocation,
   Viewport,
+  DraggingState,
+  DroppableId,
 } from '../../types';
 
 type Args = {|
-  scrollDroppable: (id: DroppableId, offset: Position) => void,
+  scrollDroppable: (id: DroppableId, change: Position) => void,
   scrollWindow: (offset: Position) => void,
-  move: (
-    id: DraggableId,
-    client: Position,
-    viewport: Viewport,
-    shouldAnimate?: boolean
-  ) => void,
+  move: typeof moveAction,
 |}
 
-export type JumpScroller = (state: State) => void;
+export type JumpScroller = (state: DraggingState) => void;
 
 type Remainder = Position;
 
@@ -37,15 +31,10 @@ export default ({
   scrollDroppable,
   scrollWindow,
 }: Args): JumpScroller => {
-  const moveByOffset = (state: State, offset: Position) => {
-    const drag: ?DragState = state.drag;
-    if (!drag) {
-      console.error('Cannot move by offset when not dragging');
-      return;
-    }
-
-    const client: Position = add(drag.current.client.selection, offset);
-    move(drag.initial.descriptor.id, client, drag.current.viewport, true);
+  const moveByOffset = (state: DraggingState, offset: Position) => {
+    // TODO: use center?
+    const client: Position = add(state.current.client.selection, offset);
+    move({ client, shouldAnimate: true });
   };
 
   const scrollDroppableAsMuchAsItCan = (
@@ -95,20 +84,14 @@ export default ({
     return remainder;
   };
 
-  const jumpScroller: JumpScroller = (state: State) => {
-    const drag: ?DragState = state.drag;
-
-    if (!drag) {
-      return;
-    }
-
-    const request: ?Position = drag.scrollJumpRequest;
+  const jumpScroller: JumpScroller = (state: DraggingState) => {
+    const request: ?Position = state.scrollJumpRequest;
 
     if (!request) {
       return;
     }
 
-    const destination: ?DraggableLocation = drag.impact.destination;
+    const destination: ?DraggableLocation = state.impact.destination;
 
     if (!destination) {
       console.error('Cannot perform a jump scroll when there is no destination');
@@ -119,7 +102,7 @@ export default ({
     // leaving the list
 
     const droppableRemainder: ?Position = scrollDroppableAsMuchAsItCan(
-      state.dimension.droppable[destination.droppableId],
+      state.dimensions.droppables[destination.droppableId],
       request,
     );
 
@@ -128,7 +111,7 @@ export default ({
       return;
     }
 
-    const viewport: Viewport = drag.current.viewport;
+    const viewport: Viewport = state.viewport;
     const windowRemainder: ?Position = scrollWindowAsMuchAsItCan(viewport, droppableRemainder);
 
     // window could absorb all the droppable remainder

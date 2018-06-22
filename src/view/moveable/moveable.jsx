@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import memoizeOne from 'memoize-one';
 import { type Position } from 'css-box-model';
 import { Motion, spring } from 'react-motion';
 import { physics } from '../animation';
@@ -15,28 +16,16 @@ const origin: Position = {
   y: 0,
 };
 
-const noMovement: Style = {
+const noTransition: Style = {
   transform: null,
 };
 
-const isAtOrigin = (point: PositionLike): boolean =>
+const getTranslate = memoizeOne((x: number, y: number): Style => ({
+  transform: `translate(${x}px, ${y}px)`,
+}));
+
+const isAtOrigin = (point: { [string]: number }): boolean =>
   point.x === origin.x && point.y === origin.y;
-
-const getStyle = (isNotMoving: boolean, x: number, y: number): Style => {
-  if (isNotMoving) {
-    return noMovement;
-  }
-
-  const point: Position = { x, y };
-  // not applying any transforms when not moving
-  if (isAtOrigin(point)) {
-    return noMovement;
-  }
-  const style: Style = {
-    transform: `translate(${point.x}px, ${point.y}px)`,
-  };
-  return style;
-};
 
 export default class Movable extends Component<Props> {
   /* eslint-disable react/sort-comp */
@@ -83,17 +72,34 @@ export default class Movable extends Component<Props> {
     // bug with react-motion: https://github.com/chenglou/react-motion/issues/437
     // even if both defaultStyle and style are {x: 0, y: 0 } if there was
     // a previous animation it uses the last value rather than the final value
-    const isNotMoving: boolean = isAtOrigin(final);
+    const isMovingToOrigin: boolean = isAtOrigin(final);
 
     return (
       // Expecting a flow error
       // React Motion type: children: (interpolatedStyle: PlainStyle) => ReactElement
       // Our type: children: (Position) => (Style) => React.Node
       <Motion defaultStyle={origin} style={final} onRest={this.onRest}>
-        {(current: { [string]: number }): any =>
-          this.props.children(
-            getStyle(isNotMoving, current.x, current.y)
-          )}
+        {(current: { [string]: number }): any => {
+          // If moving to the origin we can just clear the transition
+          if (isMovingToOrigin) {
+            return this.props.children(noTransition);
+          }
+
+          // Rather than having a translate of 0px, 0px we just clear the transition
+          if (isAtOrigin(current)) {
+            return this.props.children(noTransition);
+          }
+
+          // If moving instantly then we can just move straight to the destination
+          // Sadly react-motion does a double call in this case so we need to explictly control this
+          if (this.props.speed === 'INSTANT') {
+            return this.props.children(
+              getTranslate(this.props.destination.x, this.props.destination.y)
+            );
+          }
+
+          return this.props.children(getTranslate(current.x, current.y));
+        }}
       </Motion>
     );
   }

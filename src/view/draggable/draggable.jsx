@@ -1,14 +1,15 @@
 // @flow
 import React, { Component, Fragment, type Node } from 'react';
-import { type Position } from 'css-box-model';
+import { type Position, type BoxModel } from 'css-box-model';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import type {
   DraggableDimension,
-  InitialDragPositions,
+  ItemPositions,
   DroppableId,
   AutoScrollMode,
+  TypeId,
 } from '../../types';
 import DraggableDimensionPublisher from '../draggable-dimension-publisher/';
 import Moveable from '../moveable/';
@@ -20,7 +21,7 @@ import type {
 } from '../drag-handle/drag-handle-types';
 import getBorderBoxCenterPosition from '../get-border-box-center-position';
 import Placeholder from '../placeholder';
-import { droppableIdKey, styleContextKey } from '../context-keys';
+import { droppableIdKey, styleContextKey, droppableTypeKey } from '../context-keys';
 import * as timings from '../../debug/timings';
 import type {
   Props,
@@ -31,12 +32,15 @@ import type {
   DraggableStyle,
   ZIndexOptions,
 } from './draggable-types';
+import getWindowScroll from '../window/get-window-scroll';
 import type { Speed, Style as MovementStyle } from '../moveable/moveable-types';
 
 export const zIndexOptions: ZIndexOptions = {
   dragging: 5000,
   dropAnimating: 4500,
 };
+
+const origin: Position = { x: 0, y: 0 };
 
 export default class Draggable extends Component<Props> {
   /* eslint-disable react/sort-comp */
@@ -48,6 +52,7 @@ export default class Draggable extends Component<Props> {
   // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
   static contextTypes = {
     [droppableIdKey]: PropTypes.string.isRequired,
+    [droppableTypeKey]: PropTypes.string.isRequired,
     [styleContextKey]: PropTypes.string.isRequired,
   }
 
@@ -59,10 +64,10 @@ export default class Draggable extends Component<Props> {
       onMove: this.onMove,
       onDrop: this.onDrop,
       onCancel: this.onCancel,
-      onMoveBackward: this.onMoveBackward,
-      onMoveForward: this.onMoveForward,
-      onCrossAxisMoveForward: this.onCrossAxisMoveForward,
-      onCrossAxisMoveBackward: this.onCrossAxisMoveBackward,
+      onMoveUp: this.onMoveUp,
+      onMoveDown: this.onMoveDown,
+      onMoveRight: this.onMoveRight,
+      onMoveLeft: this.onMoveLeft,
       onWindowScroll: this.onWindowScroll,
     };
 
@@ -96,78 +101,83 @@ export default class Draggable extends Component<Props> {
     );
   }
 
-  onMoveEnd = () => {
-    if (!this.props.isDropAnimating) {
-      return;
+    onMoveEnd = () => {
+      if (this.props.isDropAnimating) {
+        this.props.dropAnimationFinished();
+      }
     }
 
-    this.props.dropAnimationFinished();
-  }
-
-  onLift = (options: {client: Position, autoScrollMode: AutoScrollMode}) => {
+  onLift = (options: {clientSelection: Position, autoScrollMode: AutoScrollMode}) => {
     timings.start('LIFT');
     this.throwIfCannotDrag();
-    const { client, autoScrollMode } = options;
+    const { clientSelection, autoScrollMode } = options;
     const { lift, draggableId } = this.props;
     const ref: ?HTMLElement = this.ref;
 
     invariant(ref, 'Cannot lift at this time as there is no ref');
 
-    const initial: InitialDragPositions = {
-      selection: client,
+    const client: ItemPositions = {
+      selection: clientSelection,
       borderBoxCenter: getBorderBoxCenterPosition(ref),
+      offset: origin,
     };
 
-    lift(draggableId, initial, getViewport(), autoScrollMode);
+    lift({
+      id: draggableId,
+      client,
+      autoScrollMode,
+      viewport: getViewport(),
+    });
+    timings.finish('LIFT');
   }
 
-  onMove = (client: Position) => {
+  onMove = (clientSelection: Position) => {
     this.throwIfCannotDrag();
 
-    const { draggableId, dimension, move } = this.props;
+    const { dimension, move } = this.props;
 
     // dimensions not provided yet
     if (!dimension) {
       return;
     }
 
-    move(draggableId, client, getViewport());
+    move({ client: clientSelection, shouldAnimate: false });
   }
 
-  onMoveForward = () => {
+  onMoveUp = () => {
     this.throwIfCannotDrag();
-    this.props.moveForward(this.props.draggableId);
+    this.props.moveUp();
   }
 
-  onMoveBackward = () => {
+  onMoveDown = () => {
     this.throwIfCannotDrag();
-    this.props.moveBackward(this.props.draggableId);
+    this.props.moveDown();
   }
 
-  onCrossAxisMoveForward = () => {
+  onMoveRight = () => {
     this.throwIfCannotDrag();
-    this.props.crossAxisMoveForward(this.props.draggableId);
+    this.props.moveRight();
   }
 
-  onCrossAxisMoveBackward = () => {
+  onMoveLeft = () => {
     this.throwIfCannotDrag();
-    this.props.crossAxisMoveBackward(this.props.draggableId);
+    this.props.moveLeft();
   }
 
   onWindowScroll = () => {
     this.throwIfCannotDrag();
-    this.props.moveByWindowScroll(this.props.draggableId, getViewport());
+    this.props.moveByWindowScroll({ scroll: getWindowScroll() });
   }
 
   onDrop = () => {
     this.throwIfCannotDrag();
-    this.props.drop();
+    this.props.drop({ reason: 'DROP' });
   }
 
   onCancel = () => {
     // Not checking if drag is enabled.
     // Cancel is an escape mechanism
-    this.props.cancel();
+    this.props.drop({ reason: 'CANCEL' });
   }
 
   // React calls ref callback twice for every render
@@ -192,20 +202,31 @@ export default class Draggable extends Component<Props> {
     (dimension: DraggableDimension,
       isDropAnimating: boolean,
       movementStyle: MovementStyle): DraggingStyle => {
-      const { width, height, top, left } = dimension.client.borderBox;
-      // For an explanation of properties see `draggable-types`.
+      const box: BoxModel = dimension.client;
+
       const style: DraggingStyle = {
+        // ## Placement
         position: 'fixed',
+        // As we are applying the margins we need to align to the start of the marginBox
+        top: box.marginBox.top,
+        left: box.marginBox.left,
+
+        // ## Sizing
+        // Locking these down as pulling the node out of the DOM could cause it to change size
         boxSizing: 'border-box',
-        zIndex: isDropAnimating ? zIndexOptions.dropAnimating : zIndexOptions.dragging,
-        width,
-        height,
-        top,
-        left,
-        margin: 0,
-        pointerEvents: 'none',
+        width: box.borderBox.width,
+        height: box.borderBox.height,
+
+        // ## Movement
+        // Opting out of the standard css transition for the dragging item
         transition: 'none',
+        // Layering
+        zIndex: isDropAnimating ? zIndexOptions.dropAnimating : zIndexOptions.dragging,
+        // Moving in response to user input
         transform: movementStyle.transform ? `${movementStyle.transform}` : null,
+
+        // ## Performance
+        pointerEvents: 'none',
       };
       return style;
     }
@@ -339,11 +360,11 @@ export default class Draggable extends Component<Props> {
       isDragging,
       isDropAnimating,
       isDragDisabled,
-      direction,
       shouldAnimateDragMovement,
       disableInteractiveElementBlocking,
     } = this.props;
     const droppableId: DroppableId = this.context[droppableIdKey];
+    const type: TypeId = this.context[droppableTypeKey];
 
     const speed = this.getSpeed(
       isDragging,
@@ -356,6 +377,7 @@ export default class Draggable extends Component<Props> {
         key={draggableId}
         draggableId={draggableId}
         droppableId={droppableId}
+        type={type}
         index={index}
         getDraggableRef={this.getDraggableRef}
       >
@@ -369,7 +391,6 @@ export default class Draggable extends Component<Props> {
               draggableId={draggableId}
               isDragging={isDragging}
               isDropAnimating={isDropAnimating}
-              direction={direction}
               isEnabled={!isDragDisabled}
               callbacks={this.callbacks}
               getDraggableRef={this.getDraggableRef}
