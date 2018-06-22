@@ -48,19 +48,18 @@ export default class Moveable extends Component<Props> {
     };
   }
 
+  // when instantly moving to a point react-motion does a double call
+  // by memoizing the result we can let consumers avoid the render
   getMemoizedPosition = memoizeOne(
     (x: number, y: number): Position => ({ x, y })
   )
 
   render() {
     const final = this.getFinal();
-    // console.log('final', final);
 
     // bug with react-motion: https://github.com/chenglou/react-motion/issues/437
     // even if both defaultStyle and style are {x: 0, y: 0 } if there was
     // a previous animation it uses the last value rather than the final value
-    // const isMovingToOrigin: boolean = isAtOrigin(final);
-    // const shouldInstantMove: boolean =
 
     return (
       <Motion defaultStyle={origin} style={final} onRest={this.onRest}>

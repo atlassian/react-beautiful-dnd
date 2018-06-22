@@ -45,6 +45,8 @@ export const zIndexOptions: ZIndexOptions = {
 const origin: Position = { x: 0, y: 0 };
 
 const getTranslate = (offset: Position): ?string => {
+  // we do not translate to origin
+  // we simply clear the translate
   if (isEqual(offset, origin)) {
     return null;
   }
