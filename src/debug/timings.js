@@ -9,12 +9,19 @@ const records: Records = {};
 
 const flag: string = '__react-beautiful-dnd-debug-timings-hook__';
 
+// we want to strip all the code out for production builds
+// draw back: can only do timings in dev env (which seems to be fine for now)
+const isProduction: boolean = process.env.NODE_ENV === 'production';
+
 const isTimingsEnabled = (): boolean => Boolean(window[flag]);
 
 // Debug: uncomment to enable
 // window[flag] = true;
 
 export const start = (key: string) => {
+  if (isProduction) {
+    return;
+  }
   if (!isTimingsEnabled()) {
     return;
   }
@@ -29,6 +36,9 @@ type Style = {|
 |}
 
 export const finish = (key: string) => {
+  if (isProduction) {
+    return;
+  }
   if (!isTimingsEnabled()) {
     return;
   }
