@@ -10,6 +10,9 @@ const urlSingleList: string = 'http://localhost:9002/iframe.html?selectedKind=si
 
 const timeout: number = 60000;
 
+/* To avoid async callback from jest.setTimeout */
+jest.setTimeout(timeout);
+
 type Selector = string;
 
 const returnPositionAndText = async (page: Object, selector: Selector) =>
