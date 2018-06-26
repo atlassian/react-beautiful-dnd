@@ -1,16 +1,15 @@
 module.exports = {
   extends: [
-    'airbnb',
     'prettier',
-    'eslint:recommended',
+    'airbnb',
     'plugin:flowtype/recommended',
-    'plugin:jest/recommended',
-    'prettier/flowtype',
     'prettier/react',
+    'prettier/flowtype',
+    'plugin:jest/recommended',
     'plugin:prettier/recommended',
   ],
   parser: 'babel-eslint',
-  plugins: ['react', 'import', 'jest', 'flowtype', 'prettier'],
+  plugins: ['prettier', 'flowtype', 'react', 'import', 'jest'],
   env: {
     es6: true,
     browser: true,
@@ -24,6 +23,14 @@ module.exports = {
     AnimationFrameID: true,
   },
   rules: {
+    // Error on prettier violations
+    'prettier/prettier': 'error',
+
+    // New eslint style rules that is not disabled by prettier:
+    'lines-between-class-members': 'off',
+    'declaration-colon-newline-after': 'off',
+    'no-extra-semicolons': 'off', // often needed in styled-components
+
     // Allowing warning and error console logging
     'no-console': ['error', { allow: ['warn', 'error'] }],
 
@@ -34,6 +41,21 @@ module.exports = {
     // Allowed: `this._secret = Symbol()`
     // Not allowed: `const _secret = Symbol()`
     'no-underscore-dangle': ['error', { allowAfterThis: true }],
+
+    // Cannot reassign function parameters but allowing modification
+    'no-param-reassign': ['error', { props: false }],
+
+    // Allowing ++ on numbers
+    'no-plusplus': 'off',
+
+    // Allowing Math.pow rather than forcing `**`
+    'no-restricted-properties': [
+      'off',
+      {
+        object: 'Math',
+        property: 'pow',
+      },
+    ],
 
     // Allowing jsx in files with any file extension (old components have jsx but not the extension)
     'react/jsx-filename-extension': 'off',
@@ -49,6 +71,9 @@ module.exports = {
 
     // Sometimes we use the PropTypes.object PropType for simplicity
     'react/forbid-prop-types': 'off',
+
+    // Allowing the non function setState approach
+    'react/no-access-state-in-setstate': 'off',
 
     // Opting out of this
     'react/destructuring-assignment': 'off',
