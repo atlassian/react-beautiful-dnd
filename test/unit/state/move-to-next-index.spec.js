@@ -3,7 +3,13 @@ import { getRect, type Position } from 'css-box-model';
 import moveToNextIndex from '../../../src/state/move-to-next-index/';
 import type { Result } from '../../../src/state/move-to-next-index/move-to-next-index-types';
 import { scrollDroppable } from '../../../src/state/droppable-dimension';
-import { getPreset, disableDroppable, getClosestScrollable, getDroppableDimension, getDraggableDimension } from '../../utils/dimension';
+import {
+  getPreset,
+  disableDroppable,
+  getClosestScrollable,
+  getDroppableDimension,
+  getDraggableDimension,
+} from '../../utils/dimension';
 import moveToEdge from '../../../src/state/move-to-edge';
 import noImpact, { noMovement } from '../../../src/state/no-impact';
 import { patch, subtract } from '../../../src/state/position';
@@ -36,7 +42,7 @@ const customViewport: Viewport = createViewport({
 
 describe('move to next index', () => {
   beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => { });
+    jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -106,7 +112,8 @@ describe('move to next index', () => {
                 isMovingForward: true,
                 draggableId: preset.inHome1.descriptor.id,
                 previousImpact,
-                previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
+                previousPageBorderBoxCenter:
+                  preset.inHome1.page.borderBox.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
                 viewport: customViewport,
@@ -131,12 +138,17 @@ describe('move to next index', () => {
               it('should move the item into the second spot and move the second item out of the way', () => {
                 const expected: DragImpact = {
                   movement: {
-                    displaced: [{
-                      draggableId: preset.inHome2.descriptor.id,
-                      isVisible: true,
-                      shouldAnimate: true,
-                    }],
-                    amount: patch(axis.line, preset.inHome1.page.marginBox[axis.size]),
+                    displaced: [
+                      {
+                        draggableId: preset.inHome2.descriptor.id,
+                        isVisible: true,
+                        shouldAnimate: true,
+                      },
+                    ],
+                    amount: patch(
+                      axis.line,
+                      preset.inHome1.page.marginBox[axis.size],
+                    ),
                     isBeyondStartPosition: true,
                   },
                   direction: axis.direction,
@@ -165,7 +177,8 @@ describe('move to next index', () => {
                 isMovingForward: true,
                 draggableId: preset.inHome2.descriptor.id,
                 previousImpact,
-                previousPageBorderBoxCenter: preset.inHome2.page.borderBox.center,
+                previousPageBorderBoxCenter:
+                  preset.inHome2.page.borderBox.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
                 viewport: customViewport,
@@ -190,12 +203,17 @@ describe('move to next index', () => {
               it('should move the dragging item into the third spot and move the third item out of the way', () => {
                 const expected: DragImpact = {
                   movement: {
-                    displaced: [{
-                      draggableId: preset.inHome3.descriptor.id,
-                      isVisible: true,
-                      shouldAnimate: true,
-                    }],
-                    amount: patch(axis.line, preset.inHome2.page.marginBox[axis.size]),
+                    displaced: [
+                      {
+                        draggableId: preset.inHome3.descriptor.id,
+                        isVisible: true,
+                        shouldAnimate: true,
+                      },
+                    ],
+                    amount: patch(
+                      axis.line,
+                      preset.inHome2.page.marginBox[axis.size],
+                    ),
                     isBeyondStartPosition: true,
                   },
                   direction: axis.direction,
@@ -214,12 +232,17 @@ describe('move to next index', () => {
               const previousImpact: DragImpact = {
                 movement: {
                   // second item has already moved
-                  displaced: [{
-                    draggableId: preset.inHome2.descriptor.id,
-                    isVisible: true,
-                    shouldAnimate: true,
-                  }],
-                  amount: patch(axis.line, preset.inHome1.page.marginBox[axis.size]),
+                  displaced: [
+                    {
+                      draggableId: preset.inHome2.descriptor.id,
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                  ],
+                  amount: patch(
+                    axis.line,
+                    preset.inHome1.page.marginBox[axis.size],
+                  ),
                   isBeyondStartPosition: true,
                 },
                 direction: axis.direction,
@@ -236,7 +259,8 @@ describe('move to next index', () => {
                 previousImpact,
                 // roughly correct previous page center
                 // not calculating the exact point as it is not required for this test
-                previousPageBorderBoxCenter: preset.inHome2.page.borderBox.center,
+                previousPageBorderBoxCenter:
+                  preset.inHome2.page.borderBox.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
                 viewport: customViewport,
@@ -276,7 +300,10 @@ describe('move to next index', () => {
                         shouldAnimate: true,
                       },
                     ],
-                    amount: patch(axis.line, preset.inHome1.page.marginBox[axis.size]),
+                    amount: patch(
+                      axis.line,
+                      preset.inHome1.page.marginBox[axis.size],
+                    ),
                     isBeyondStartPosition: true,
                   },
                   direction: axis.direction,
@@ -298,12 +325,17 @@ describe('move to next index', () => {
               // been moved backwards and is now in the first position
               const previousImpact: DragImpact = {
                 movement: {
-                  displaced: [{
-                    draggableId: preset.inHome1.descriptor.id,
-                    isVisible: true,
-                    shouldAnimate: true,
-                  }],
-                  amount: patch(axis.line, preset.inHome2.page.marginBox[axis.size]),
+                  displaced: [
+                    {
+                      draggableId: preset.inHome1.descriptor.id,
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                  ],
+                  amount: patch(
+                    axis.line,
+                    preset.inHome2.page.marginBox[axis.size],
+                  ),
                   isBeyondStartPosition: false,
                 },
                 direction: axis.direction,
@@ -317,7 +349,8 @@ describe('move to next index', () => {
                 draggableId: preset.inHome2.descriptor.id,
                 previousImpact,
                 // roughly correct:
-                previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
+                previousPageBorderBoxCenter:
+                  preset.inHome1.page.borderBox.center,
                 draggables: preset.draggables,
                 viewport: customViewport,
                 droppable: preset.home,
@@ -338,14 +371,19 @@ describe('move to next index', () => {
 
                 expect(result.pageBorderBoxCenter).toEqual(expected);
                 // is now back at its original position
-                expect(result.pageBorderBoxCenter).toEqual(preset.inHome2.page.borderBox.center);
+                expect(result.pageBorderBoxCenter).toEqual(
+                  preset.inHome2.page.borderBox.center,
+                );
               });
 
               it('should return an empty impact', () => {
                 const expected: DragImpact = {
                   movement: {
                     displaced: [],
-                    amount: patch(axis.line, preset.inHome2.page.marginBox[axis.size]),
+                    amount: patch(
+                      axis.line,
+                      preset.inHome2.page.marginBox[axis.size],
+                    ),
                     isBeyondStartPosition: false,
                   },
                   destination: {
@@ -377,7 +415,10 @@ describe('move to next index', () => {
                       shouldAnimate: true,
                     },
                   ],
-                  amount: patch(axis.line, preset.inHome3.page.marginBox[axis.size]),
+                  amount: patch(
+                    axis.line,
+                    preset.inHome3.page.marginBox[axis.size],
+                  ),
                   isBeyondStartPosition: true,
                 },
                 direction: axis.direction,
@@ -393,7 +434,8 @@ describe('move to next index', () => {
                 draggableId: preset.inHome3.descriptor.id,
                 previousImpact,
                 // this is roughly correct
-                previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
+                previousPageBorderBoxCenter:
+                  preset.inHome1.page.borderBox.center,
                 draggables: preset.draggables,
                 viewport: customViewport,
                 droppable: preset.home,
@@ -418,12 +460,17 @@ describe('move to next index', () => {
               it('should remove the first dimension from the impact', () => {
                 const expected: DragImpact = {
                   movement: {
-                    displaced: [{
-                      draggableId: preset.inHome2.descriptor.id,
-                      isVisible: true,
-                      shouldAnimate: true,
-                    }],
-                    amount: patch(axis.line, preset.inHome3.page.marginBox[axis.size]),
+                    displaced: [
+                      {
+                        draggableId: preset.inHome2.descriptor.id,
+                        isVisible: true,
+                        shouldAnimate: true,
+                      },
+                    ],
+                    amount: patch(
+                      axis.line,
+                      preset.inHome3.page.marginBox[axis.size],
+                    ),
                     // is still behind where it started
                     isBeyondStartPosition: false,
                   },
@@ -622,35 +669,48 @@ describe('move to next index', () => {
                   },
                 };
                 // home has now scrolled to the bottom
-                const scrolled: DroppableDimension = scrollDroppable(home, maxScroll);
+                const scrolled: DroppableDimension = scrollDroppable(
+                  home,
+                  maxScroll,
+                );
 
                 // validation of previous impact
-                expect(isPartiallyVisible({
-                  target: inHome6.page.marginBox,
-                  destination: scrolled,
-                  viewport: customViewport.frame,
-                })).toBe(true);
-                expect(isPartiallyVisible({
-                  target: inHome5.page.marginBox,
-                  destination: scrolled,
-                  viewport: customViewport.frame,
-                })).toBe(true);
-                expect(isPartiallyVisible({
-                  target: inHome4.page.marginBox,
-                  destination: scrolled,
-                  viewport: customViewport.frame,
-                })).toBe(false);
-                expect(isPartiallyVisible({
-                  target: inHome3.page.marginBox,
-                  destination: scrolled,
-                  viewport: customViewport.frame,
-                })).toBe(false);
+                expect(
+                  isPartiallyVisible({
+                    target: inHome6.page.marginBox,
+                    destination: scrolled,
+                    viewport: customViewport.frame,
+                  }),
+                ).toBe(true);
+                expect(
+                  isPartiallyVisible({
+                    target: inHome5.page.marginBox,
+                    destination: scrolled,
+                    viewport: customViewport.frame,
+                  }),
+                ).toBe(true);
+                expect(
+                  isPartiallyVisible({
+                    target: inHome4.page.marginBox,
+                    destination: scrolled,
+                    viewport: customViewport.frame,
+                  }),
+                ).toBe(false);
+                expect(
+                  isPartiallyVisible({
+                    target: inHome3.page.marginBox,
+                    destination: scrolled,
+                    viewport: customViewport.frame,
+                  }),
+                ).toBe(false);
                 // this one will remain invisible
-                expect(isPartiallyVisible({
-                  target: inHome2.page.marginBox,
-                  destination: scrolled,
-                  viewport: customViewport.frame,
-                })).toBe(false);
+                expect(
+                  isPartiallyVisible({
+                    target: inHome2.page.marginBox,
+                    destination: scrolled,
+                    viewport: customViewport.frame,
+                  }),
+                ).toBe(false);
 
                 const expected: DragImpact = {
                   movement: {
@@ -721,7 +781,10 @@ describe('move to next index', () => {
             const previousImpact: DragImpact = {
               movement: {
                 displaced: [],
-                amount: patch(axis.line, preset.inHome1.page.marginBox[axis.size]),
+                amount: patch(
+                  axis.line,
+                  preset.inHome1.page.marginBox[axis.size],
+                ),
                 isBeyondStartPosition: false,
               },
               direction: axis.direction,
@@ -750,7 +813,10 @@ describe('move to next index', () => {
               const previousImpact: DragImpact = {
                 movement: {
                   displaced: [],
-                  amount: patch(axis.line, preset.inHome2.page.marginBox[axis.size]),
+                  amount: patch(
+                    axis.line,
+                    preset.inHome2.page.marginBox[axis.size],
+                  ),
                   isBeyondStartPosition: false,
                 },
                 destination: {
@@ -763,7 +829,8 @@ describe('move to next index', () => {
                 isMovingForward: false,
                 draggableId: preset.inHome2.descriptor.id,
                 previousImpact,
-                previousPageBorderBoxCenter: preset.inHome2.page.borderBox.center,
+                previousPageBorderBoxCenter:
+                  preset.inHome2.page.borderBox.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
                 viewport: customViewport,
@@ -788,12 +855,17 @@ describe('move to next index', () => {
               it('should add the first draggable to the drag impact', () => {
                 const expected: DragImpact = {
                   movement: {
-                    displaced: [{
-                      draggableId: preset.inHome1.descriptor.id,
-                      isVisible: true,
-                      shouldAnimate: true,
-                    }],
-                    amount: patch(axis.line, preset.inHome2.page.marginBox[axis.size]),
+                    displaced: [
+                      {
+                        draggableId: preset.inHome1.descriptor.id,
+                        isVisible: true,
+                        shouldAnimate: true,
+                      },
+                    ],
+                    amount: patch(
+                      axis.line,
+                      preset.inHome2.page.marginBox[axis.size],
+                    ),
                     isBeyondStartPosition: false,
                   },
                   destination: {
@@ -812,7 +884,10 @@ describe('move to next index', () => {
               const previousImpact: DragImpact = {
                 movement: {
                   displaced: [],
-                  amount: patch(axis.line, preset.inHome3.page.marginBox[axis.size]),
+                  amount: patch(
+                    axis.line,
+                    preset.inHome3.page.marginBox[axis.size],
+                  ),
                   isBeyondStartPosition: false,
                 },
                 destination: {
@@ -825,7 +900,8 @@ describe('move to next index', () => {
                 isMovingForward: false,
                 draggableId: preset.inHome3.descriptor.id,
                 previousImpact,
-                previousPageBorderBoxCenter: preset.inHome3.page.borderBox.center,
+                previousPageBorderBoxCenter:
+                  preset.inHome3.page.borderBox.center,
                 draggables: preset.draggables,
                 droppable: preset.home,
                 viewport: customViewport,
@@ -850,12 +926,17 @@ describe('move to next index', () => {
               it('should add the second draggable to the drag impact', () => {
                 const expected: DragImpact = {
                   movement: {
-                    displaced: [{
-                      draggableId: preset.inHome2.descriptor.id,
-                      isVisible: true,
-                      shouldAnimate: true,
-                    }],
-                    amount: patch(axis.line, preset.inHome3.page.marginBox[axis.size]),
+                    displaced: [
+                      {
+                        draggableId: preset.inHome2.descriptor.id,
+                        isVisible: true,
+                        shouldAnimate: true,
+                      },
+                    ],
+                    amount: patch(
+                      axis.line,
+                      preset.inHome3.page.marginBox[axis.size],
+                    ),
                     isBeyondStartPosition: false,
                   },
                   destination: {
@@ -877,12 +958,17 @@ describe('move to next index', () => {
               // moving backwards towards the start again
               const previousImpact: DragImpact = {
                 movement: {
-                  displaced: [{
-                    draggableId: preset.inHome3.descriptor.id,
-                    isVisible: true,
-                    shouldAnimate: true,
-                  }],
-                  amount: patch(axis.line, preset.inHome2.page.marginBox[axis.size]),
+                  displaced: [
+                    {
+                      draggableId: preset.inHome3.descriptor.id,
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                  ],
+                  amount: patch(
+                    axis.line,
+                    preset.inHome2.page.marginBox[axis.size],
+                  ),
                   isBeyondStartPosition: true,
                 },
                 direction: axis.direction,
@@ -896,7 +982,8 @@ describe('move to next index', () => {
                 draggableId: preset.inHome2.descriptor.id,
                 previousImpact,
                 // roughly correct
-                previousPageBorderBoxCenter: preset.inHome3.page.borderBox.center,
+                previousPageBorderBoxCenter:
+                  preset.inHome3.page.borderBox.center,
                 draggables: preset.draggables,
                 viewport: customViewport,
                 droppable: preset.home,
@@ -918,14 +1005,19 @@ describe('move to next index', () => {
 
                 expect(result.pageBorderBoxCenter).toEqual(expected);
                 // moved back to its original position
-                expect(result.pageBorderBoxCenter).toEqual(preset.inHome2.page.borderBox.center);
+                expect(result.pageBorderBoxCenter).toEqual(
+                  preset.inHome2.page.borderBox.center,
+                );
               });
 
               it('should return an empty impact', () => {
                 const expected: DragImpact = {
                   movement: {
                     displaced: [],
-                    amount: patch(axis.line, preset.inHome2.page.marginBox[axis.size]),
+                    amount: patch(
+                      axis.line,
+                      preset.inHome2.page.marginBox[axis.size],
+                    ),
                     isBeyondStartPosition: false,
                   },
                   destination: {
@@ -958,7 +1050,10 @@ describe('move to next index', () => {
                       shouldAnimate: true,
                     },
                   ],
-                  amount: patch(axis.line, preset.inHome1.page.marginBox[axis.size]),
+                  amount: patch(
+                    axis.line,
+                    preset.inHome1.page.marginBox[axis.size],
+                  ),
                   isBeyondStartPosition: true,
                 },
                 direction: axis.direction,
@@ -972,7 +1067,8 @@ describe('move to next index', () => {
                 draggableId: preset.inHome1.descriptor.id,
                 previousImpact,
                 // roughly correct
-                previousPageBorderBoxCenter: preset.inHome3.page.borderBox.center,
+                previousPageBorderBoxCenter:
+                  preset.inHome3.page.borderBox.center,
                 draggables: preset.draggables,
                 viewport: customViewport,
                 droppable: preset.home,
@@ -998,12 +1094,17 @@ describe('move to next index', () => {
                 const expected: DragImpact = {
                   movement: {
                     // draggable3 has been removed
-                    displaced: [{
-                      draggableId: preset.inHome2.descriptor.id,
-                      isVisible: true,
-                      shouldAnimate: true,
-                    }],
-                    amount: patch(axis.line, preset.inHome1.page.marginBox[axis.size]),
+                    displaced: [
+                      {
+                        draggableId: preset.inHome2.descriptor.id,
+                        isVisible: true,
+                        shouldAnimate: true,
+                      },
+                    ],
+                    amount: patch(
+                      axis.line,
+                      preset.inHome1.page.marginBox[axis.size],
+                    ),
                     isBeyondStartPosition: true,
                   },
                   destination: {
@@ -1036,30 +1137,34 @@ describe('move to next index', () => {
             });
 
             it('should request a jump scroll for movement that is outside of the viewport', () => {
-              const asBigAsViewport: DraggableDimension = getDraggableDimension({
-                descriptor: {
-                  id: 'inside',
-                  index: 0,
-                  droppableId: droppable.descriptor.id,
-                  type: droppable.descriptor.type,
+              const asBigAsViewport: DraggableDimension = getDraggableDimension(
+                {
+                  descriptor: {
+                    id: 'inside',
+                    index: 0,
+                    droppableId: droppable.descriptor.id,
+                    type: droppable.descriptor.type,
+                  },
+                  borderBox: customViewport.frame,
                 },
-                borderBox: customViewport.frame,
-              });
-              const outsideViewport: DraggableDimension = getDraggableDimension({
-                descriptor: {
-                  id: 'outside',
-                  index: 1,
-                  droppableId: droppable.descriptor.id,
-                  type: droppable.descriptor.type,
+              );
+              const outsideViewport: DraggableDimension = getDraggableDimension(
+                {
+                  descriptor: {
+                    id: 'outside',
+                    index: 1,
+                    droppableId: droppable.descriptor.id,
+                    type: droppable.descriptor.type,
+                  },
+                  borderBox: {
+                    // is bottom left of the viewport
+                    top: customViewport.frame.bottom + 1,
+                    right: customViewport.frame.right + 100,
+                    left: customViewport.frame.right + 1,
+                    bottom: customViewport.frame.bottom + 100,
+                  },
                 },
-                borderBox: {
-                  // is bottom left of the viewport
-                  top: customViewport.frame.bottom + 1,
-                  right: customViewport.frame.right + 100,
-                  left: customViewport.frame.right + 1,
-                  bottom: customViewport.frame.bottom + 100,
-                },
-              });
+              );
               // inViewport is in its original position
               const previousImpact: DragImpact = {
                 movement: noMovement,
@@ -1080,21 +1185,27 @@ describe('move to next index', () => {
                 destinationEdge: 'end',
                 destinationAxis: axis,
               });
-              const previousPageBorderBoxCenter: Position = asBigAsViewport.page.borderBox.center;
+              const previousPageBorderBoxCenter: Position =
+                asBigAsViewport.page.borderBox.center;
               const expectedScrollJump: Position = subtract(
                 expectedCenter,
-                previousPageBorderBoxCenter
+                previousPageBorderBoxCenter,
               );
               const expectedImpact: DragImpact = {
                 movement: {
-                  displaced: [{
-                    draggableId: outsideViewport.descriptor.id,
-                    // Even though the item started in an invisible place we force
-                    // the displacement to be visible.
-                    isVisible: true,
-                    shouldAnimate: true,
-                  }],
-                  amount: patch(axis.line, asBigAsViewport.page.marginBox[axis.size]),
+                  displaced: [
+                    {
+                      draggableId: outsideViewport.descriptor.id,
+                      // Even though the item started in an invisible place we force
+                      // the displacement to be visible.
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                  ],
+                  amount: patch(
+                    axis.line,
+                    asBigAsViewport.page.marginBox[axis.size],
+                  ),
                   isBeyondStartPosition: true,
                 },
                 destination: {
@@ -1119,7 +1230,9 @@ describe('move to next index', () => {
               }
 
               // not updating the page center (visually the item will not move)
-              expect(result.pageBorderBoxCenter).toEqual(previousPageBorderBoxCenter);
+              expect(result.pageBorderBoxCenter).toEqual(
+                previousPageBorderBoxCenter,
+              );
               expect(result.scrollJumpRequest).toEqual(expectedScrollJump);
               expect(result.impact).toEqual(expectedImpact);
             });
@@ -1166,16 +1279,19 @@ describe('move to next index', () => {
                 [visible.descriptor.id]: visible,
                 [invisible.descriptor.id]: invisible,
               };
-              const previousPageBorderBoxCenter: Position = visible.page.borderBox.center;
+              const previousPageBorderBoxCenter: Position =
+                visible.page.borderBox.center;
               const expectedImpact: DragImpact = {
                 movement: {
-                  displaced: [{
-                    draggableId: invisible.descriptor.id,
-                    // Even though the item started in an invisible place we force
-                    // the displacement to be visible.
-                    isVisible: true,
-                    shouldAnimate: true,
-                  }],
+                  displaced: [
+                    {
+                      draggableId: invisible.descriptor.id,
+                      // Even though the item started in an invisible place we force
+                      // the displacement to be visible.
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                  ],
                   amount: patch(axis.line, visible.page.marginBox[axis.size]),
                   isBeyondStartPosition: true,
                 },
@@ -1274,7 +1390,8 @@ describe('move to next index', () => {
                 [inside.descriptor.id]: inside,
                 [outside.descriptor.id]: outside,
               };
-              const previousPageBorderBoxCenter: Position = inside.page.borderBox.center;
+              const previousPageBorderBoxCenter: Position =
+                inside.page.borderBox.center;
               const expectedCenter = moveToEdge({
                 source: inside.page.borderBox,
                 sourceEdge: 'end',
@@ -1284,17 +1401,19 @@ describe('move to next index', () => {
               });
               const expectedScrollJump: Position = subtract(
                 expectedCenter,
-                previousPageBorderBoxCenter
+                previousPageBorderBoxCenter,
               );
               const expectedImpact: DragImpact = {
                 movement: {
-                  displaced: [{
-                    draggableId: outside.descriptor.id,
-                    // Even though the item started in an invisible place we force
-                    // the displacement to be visible.
-                    isVisible: true,
-                    shouldAnimate: true,
-                  }],
+                  displaced: [
+                    {
+                      draggableId: outside.descriptor.id,
+                      // Even though the item started in an invisible place we force
+                      // the displacement to be visible.
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                  ],
                   amount: patch(axis.line, inside.page.marginBox[axis.size]),
                   isBeyondStartPosition: true,
                 },
@@ -1319,7 +1438,9 @@ describe('move to next index', () => {
                 throw new Error('Invalid test setup');
               }
 
-              expect(result.pageBorderBoxCenter).toEqual(previousPageBorderBoxCenter);
+              expect(result.pageBorderBoxCenter).toEqual(
+                previousPageBorderBoxCenter,
+              );
               expect(result.impact).toEqual(expectedImpact);
               expect(result.scrollJumpRequest).toEqual(expectedScrollJump);
             });
@@ -1352,7 +1473,10 @@ describe('move to next index', () => {
                     shouldAnimate: true,
                   },
                 ],
-                amount: patch(axis.line, preset.inHome1.page.marginBox[axis.size]),
+                amount: patch(
+                  axis.line,
+                  preset.inHome1.page.marginBox[axis.size],
+                ),
                 // Always false when in another list
                 isBeyondStartPosition: false,
               },
@@ -1405,7 +1529,10 @@ describe('move to next index', () => {
                       shouldAnimate: true,
                     },
                   ],
-                  amount: patch(axis.line, preset.inHome1.page.marginBox[axis.size]),
+                  amount: patch(
+                    axis.line,
+                    preset.inHome1.page.marginBox[axis.size],
+                  ),
                   isBeyondStartPosition: false,
                 },
                 direction: axis.direction,
@@ -1424,12 +1551,17 @@ describe('move to next index', () => {
             const previousImpact: DragImpact = {
               movement: {
                 // Ordered by the closest impacted.
-                displaced: [{
-                  draggableId: preset.inForeign4.descriptor.id,
-                  isVisible: true,
-                  shouldAnimate: true,
-                }],
-                amount: patch(axis.line, preset.inHome1.page.marginBox[axis.size]),
+                displaced: [
+                  {
+                    draggableId: preset.inForeign4.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                ],
+                amount: patch(
+                  axis.line,
+                  preset.inHome1.page.marginBox[axis.size],
+                ),
                 // Always false when in another list
                 isBeyondStartPosition: false,
               },
@@ -1471,7 +1603,10 @@ describe('move to next index', () => {
               const expected: DragImpact = {
                 movement: {
                   displaced: [],
-                  amount: patch(axis.line, preset.inHome1.page.marginBox[axis.size]),
+                  amount: patch(
+                    axis.line,
+                    preset.inHome1.page.marginBox[axis.size],
+                  ),
                   isBeyondStartPosition: false,
                 },
                 direction: axis.direction,
@@ -1491,7 +1626,10 @@ describe('move to next index', () => {
             const previousImpact: DragImpact = {
               movement: {
                 displaced: [],
-                amount: patch(axis.line, preset.inHome1.page.marginBox[axis.size]),
+                amount: patch(
+                  axis.line,
+                  preset.inHome1.page.marginBox[axis.size],
+                ),
                 isBeyondStartPosition: false,
               },
               direction: axis.direction,
@@ -1546,7 +1684,10 @@ describe('move to next index', () => {
                     shouldAnimate: true,
                   },
                 ],
-                amount: patch(axis.line, preset.inHome1.page.marginBox[axis.size]),
+                amount: patch(
+                  axis.line,
+                  preset.inHome1.page.marginBox[axis.size],
+                ),
                 // Always false when in another list
                 isBeyondStartPosition: false,
               },
@@ -1563,7 +1704,8 @@ describe('move to next index', () => {
               draggableId: preset.inHome1.descriptor.id,
               previousImpact,
               // roughly correct
-              previousPageBorderBoxCenter: preset.inForeign1.page.borderBox.center,
+              previousPageBorderBoxCenter:
+                preset.inForeign1.page.borderBox.center,
               droppable: preset.foreign,
               viewport: customViewport,
               draggables: preset.draggables,
@@ -1577,12 +1719,17 @@ describe('move to next index', () => {
             const previousImpact: DragImpact = {
               movement: {
                 // Ordered by the closest impacted.
-                displaced: [{
-                  draggableId: preset.inForeign4.descriptor.id,
-                  isVisible: true,
-                  shouldAnimate: true,
-                }],
-                amount: patch(axis.line, preset.inHome1.page.marginBox[axis.size]),
+                displaced: [
+                  {
+                    draggableId: preset.inForeign4.descriptor.id,
+                    isVisible: true,
+                    shouldAnimate: true,
+                  },
+                ],
+                amount: patch(
+                  axis.line,
+                  preset.inHome1.page.marginBox[axis.size],
+                ),
                 isBeyondStartPosition: false,
               },
               direction: axis.direction,
@@ -1597,7 +1744,8 @@ describe('move to next index', () => {
               draggableId: preset.inHome1.descriptor.id,
               previousImpact,
               // roughly correct
-              previousPageBorderBoxCenter: preset.inForeign4.page.borderBox.center,
+              previousPageBorderBoxCenter:
+                preset.inForeign4.page.borderBox.center,
               droppable: preset.foreign,
               viewport: customViewport,
               draggables: preset.draggables,
@@ -1635,7 +1783,10 @@ describe('move to next index', () => {
                       shouldAnimate: true,
                     },
                   ],
-                  amount: patch(axis.line, preset.inHome1.page.marginBox[axis.size]),
+                  amount: patch(
+                    axis.line,
+                    preset.inHome1.page.marginBox[axis.size],
+                  ),
                   isBeyondStartPosition: false,
                 },
                 direction: axis.direction,
@@ -1672,7 +1823,10 @@ describe('move to next index', () => {
                     shouldAnimate: true,
                   },
                 ],
-                amount: patch(axis.line, preset.inHome1.page.marginBox[axis.size]),
+                amount: patch(
+                  axis.line,
+                  preset.inHome1.page.marginBox[axis.size],
+                ),
                 isBeyondStartPosition: false,
               },
               direction: axis.direction,
@@ -1687,7 +1841,8 @@ describe('move to next index', () => {
               draggableId: preset.inHome1.descriptor.id,
               previousImpact,
               // roughly correct
-              previousPageBorderBoxCenter: preset.inForeign2.page.borderBox.center,
+              previousPageBorderBoxCenter:
+                preset.inForeign2.page.borderBox.center,
               droppable: preset.foreign,
               viewport: customViewport,
               draggables: preset.draggables,
@@ -1734,7 +1889,10 @@ describe('move to next index', () => {
                       shouldAnimate: true,
                     },
                   ],
-                  amount: patch(axis.line, preset.inHome1.page.marginBox[axis.size]),
+                  amount: patch(
+                    axis.line,
+                    preset.inHome1.page.marginBox[axis.size],
+                  ),
                   isBeyondStartPosition: false,
                 },
                 direction: axis.direction,

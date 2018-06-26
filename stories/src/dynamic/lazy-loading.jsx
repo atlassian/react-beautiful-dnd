@@ -2,7 +2,11 @@
 import React from 'react';
 import QuoteList from '../primatives/quote-list';
 import { DragDropContext } from '../../../src/';
-import type { DropResult, DragUpdate, DraggableLocation } from '../../../src/types';
+import type {
+  DropResult,
+  DragUpdate,
+  DraggableLocation,
+} from '../../../src/types';
 import type { Quote } from '../types';
 import { quotes as initial, getQuotes } from '../data';
 import reorder from '../reorder';
@@ -10,7 +14,7 @@ import reorder from '../reorder';
 type State = {|
   quotes: Quote[],
   isLoading: boolean,
-|}
+|};
 
 export default class LazyLoading extends React.Component<*, State> {
   // eslint-disable-next-line react/sort-comp
@@ -18,7 +22,7 @@ export default class LazyLoading extends React.Component<*, State> {
   state: State = {
     quotes: initial,
     isLoading: false,
-  }
+  };
 
   onDragUpdate = (update: DragUpdate) => {
     const destination: ?DraggableLocation = update.destination;
@@ -34,7 +38,7 @@ export default class LazyLoading extends React.Component<*, State> {
     }
 
     this.startLazyLoading();
-  }
+  };
 
   onDragEnd = (result: DropResult) => {
     // Stop any pending lazy loads
@@ -58,13 +62,13 @@ export default class LazyLoading extends React.Component<*, State> {
     const quotes = reorder(
       this.state.quotes,
       result.source.index,
-      result.destination.index
+      result.destination.index,
     );
 
     this.setState({
       quotes,
     });
-  }
+  };
 
   startLazyLoading = () => {
     if (this.state.isLoading) {
@@ -85,7 +89,7 @@ export default class LazyLoading extends React.Component<*, State> {
     this.setState({
       isLoading: true,
     });
-  }
+  };
 
   render() {
     return (

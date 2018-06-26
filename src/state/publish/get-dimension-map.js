@@ -25,18 +25,18 @@ type Args = {|
   existing: DimensionMap,
   publish: Publish,
   windowScroll: Position,
-|}
+|};
 
 type Partitioned = {|
   inNewDroppable: DraggableDimension[],
   inExistingDroppable: DraggableDimension[],
-|}
+|};
 
 type Record = {|
   index: number,
   // the size of the dimension on the main axis
   size: number,
-|}
+|};
 
 // type RecordMap = {
 //   [id: DraggableId]: Record
@@ -45,14 +45,14 @@ type Record = {|
 type Entry = {|
   additions: Record[],
   removals: Record[],
-|}
+|};
 
 type ChangeSet = {
-  [id: DroppableId]: Entry
-}
+  [id: DroppableId]: Entry,
+};
 
-const getTotal = (records: Record[]): number => records
-  .reduce((total: number, record: Record) => total + record.size, 0);
+const getTotal = (records: Record[]): number =>
+  records.reduce((total: number, record: Record) => total + record.size, 0);
 
 const withEntry = (set: ChangeSet, droppableId: DroppableId): Entry => {
   if (!set[droppableId]) {
@@ -77,17 +77,17 @@ const getRecord = (draggable: DraggableDimension, home: DroppableDimension) => {
 
 const timingKey: string = 'Dynamic dimension change processing (just math)';
 
-export default ({
-  existing,
-  publish,
-  windowScroll,
-}: Args): DimensionMap => {
+export default ({ existing, publish, windowScroll }: Args): DimensionMap => {
   timings.start(timingKey);
-  const addedDroppables: DroppableDimensionMap = toDroppableMap(publish.additions.droppables);
-  const addedDraggables: DraggableDimensionMap = toDraggableMap(publish.additions.draggables);
+  const addedDroppables: DroppableDimensionMap = toDroppableMap(
+    publish.additions.droppables,
+  );
+  const addedDraggables: DraggableDimensionMap = toDraggableMap(
+    publish.additions.draggables,
+  );
 
-  const partitioned: Partitioned = publish.additions.draggables
-    .reduce((previous: Partitioned, draggable: DraggableDimension) => {
+  const partitioned: Partitioned = publish.additions.draggables.reduce(
+    (previous: Partitioned, draggable: DraggableDimension) => {
       const droppableId: DroppableId = draggable.descriptor.droppableId;
       const isInNewDroppable: boolean = Boolean(addedDroppables[droppableId]);
 
@@ -97,10 +97,12 @@ export default ({
         previous.inExistingDroppable.push(draggable);
       }
       return previous;
-    }, {
+    },
+    {
       inNewDroppable: [],
       inExistingDroppable: [],
-    });
+    },
+  );
 
   // TODO: can just exit early here
   if (!partitioned.inExistingDroppable.length) {
@@ -113,7 +115,12 @@ export default ({
   partitioned.inExistingDroppable.forEach((draggable: DraggableDimension) => {
     const droppableId: DroppableId = draggable.descriptor.droppableId;
     const home: ?DroppableDimension = existing.droppables[droppableId];
-    invariant(home, `Cannot find home Droppable for added Draggable ${draggable.descriptor.id}`);
+    invariant(
+      home,
+      `Cannot find home Droppable for added Draggable ${
+        draggable.descriptor.id
+      }`,
+    );
 
     withEntry(set, droppableId).additions.push(getRecord(draggable, home));
   });
@@ -131,8 +138,8 @@ export default ({
   });
 
   // ## Adjust draggables based on changes
-  const shifted: DraggableDimension[] = Object.keys(existing.draggables)
-    .map((id: DraggableId): DraggableDimension => {
+  const shifted: DraggableDimension[] = Object.keys(existing.draggables).map(
+    (id: DraggableId): DraggableDimension => {
       const draggable: DraggableDimension = existing.draggables[id];
       const droppableId: DroppableId = draggable.descriptor.droppableId;
       const entry: ?Entry = set[droppableId];
@@ -145,12 +152,14 @@ export default ({
       const startIndex: number = draggable.descriptor.index;
 
       // Were there any additions before the draggable?
-      const additions: Record[] = entry.additions
-        .filter((record: Record) => record.index <= startIndex);
+      const additions: Record[] = entry.additions.filter(
+        (record: Record) => record.index <= startIndex,
+      );
 
       // Were there any removals before the droppable?
-      const removals: Record[] = entry.removals
-        .filter((record: Record) => record.index <= startIndex);
+      const removals: Record[] = entry.removals.filter(
+        (record: Record) => record.index <= startIndex,
+      );
 
       // No changes before the draggable - no shifting required
       if (!additions.length && !removals.length) {
@@ -187,7 +196,8 @@ export default ({
       };
 
       return moved;
-    });
+    },
+  );
 
   // Let's add our shifted draggables to our dimension map
 

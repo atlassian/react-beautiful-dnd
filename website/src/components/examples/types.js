@@ -8,24 +8,24 @@ export type Author = {|
   name: string,
   avatarUrl: string,
   url: string,
-|}
+|};
 
 export type Quote = {|
   id: Id,
   content: string,
-  author: Author
-|}
+  author: Author,
+|};
 
 export type Dragging = {|
   id: DraggableId,
   location: DraggableLocation,
-|}
+|};
 
 export type QuoteMap = {
-  [key: string]: Quote[]
-}
+  [key: string]: Quote[],
+};
 
 export type Task = {|
   id: Id,
   content: string,
-|}
+|};

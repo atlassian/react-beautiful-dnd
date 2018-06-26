@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 
 type Records = {
   [key: string]: number,
-}
+};
 
 const records: Records = {};
 
@@ -33,7 +33,7 @@ export const start = (key: string) => {
 type Style = {|
   textColor: string,
   symbol: string,
-|}
+|};
 
 export const finish = (key: string) => {
   if (isProduction) {
@@ -71,7 +71,8 @@ export const finish = (key: string) => {
   })();
 
   // eslint-disable-next-line no-console
-  console.log(`${style.symbol} %cTiming %c${rounded} %cms %c${key}`,
+  console.log(
+    `${style.symbol} %cTiming %c${rounded} %cms %c${key}`,
     // title
     'color: blue; font-weight: bold; ',
     // result
@@ -82,4 +83,3 @@ export const finish = (key: string) => {
     'color: purple; font-weight: bold;',
   );
 };
-

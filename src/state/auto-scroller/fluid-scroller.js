@@ -4,10 +4,7 @@ import type { Rect, Position, Spacing } from 'css-box-model';
 import { add, apply, isEqual, patch } from '../position';
 import getBestScrollableDroppable from './get-best-scrollable-droppable';
 import { horizontal, vertical } from '../axis';
-import {
-  canScrollWindow,
-  canPartiallyScroll,
-} from './can-scroll';
+import { canScrollWindow, canPartiallyScroll } from './can-scroll';
 import type {
   Axis,
   DraggingState,
@@ -41,10 +38,13 @@ export type PixelThresholds = {|
   startFrom: number,
   maxSpeedAt: number,
   accelerationPlane: number,
-|}
+|};
 
 // converts the percentages in the config into actual pixel values
-export const getPixelThresholds = (container: Rect, axis: Axis): PixelThresholds => {
+export const getPixelThresholds = (
+  container: Rect,
+  axis: Axis,
+): PixelThresholds => {
   const startFrom: number = container[axis.size] * config.startFrom;
   const maxSpeedAt: number = container[axis.size] * config.maxSpeedAt;
   const accelerationPlane: number = startFrom - maxSpeedAt;
@@ -85,7 +85,7 @@ type AdjustForSizeLimitsArgs = {|
   container: Rect,
   subject: Rect,
   proposedScroll: Position,
-|}
+|};
 
 const adjustForSizeLimits = ({
   container,
@@ -117,10 +117,14 @@ type GetRequiredScrollArgs = {|
   container: Rect,
   subject: Rect,
   center: Position,
-|}
+|};
 
 // returns null if no scroll is required
-const getRequiredScroll = ({ container, subject, center }: GetRequiredScrollArgs): ?Position => {
+const getRequiredScroll = ({
+  container,
+  subject,
+  center,
+}: GetRequiredScrollArgs): ?Position => {
   // get distance to each edge
   const distance: Spacing = {
     top: center.y - container.top,
@@ -151,7 +155,10 @@ const getRequiredScroll = ({ container, subject, center }: GetRequiredScrollArgs
   })();
 
   const x: number = (() => {
-    const thresholds: PixelThresholds = getPixelThresholds(container, horizontal);
+    const thresholds: PixelThresholds = getPixelThresholds(
+      container,
+      horizontal,
+    );
     const isCloserToRight: boolean = distance.right < distance.left;
 
     if (isCloserToRight) {
@@ -186,7 +193,7 @@ const getRequiredScroll = ({ container, subject, center }: GetRequiredScrollArgs
 type WithPlaceholderResult = {|
   current: Position,
   max: Position,
-|}
+|};
 
 const withPlaceholder = (
   droppable: DroppableDimension,
@@ -198,7 +205,8 @@ const withPlaceholder = (
     return null;
   }
 
-  const isOverHome: boolean = droppable.descriptor.id === draggable.descriptor.droppableId;
+  const isOverHome: boolean =
+    droppable.descriptor.id === draggable.descriptor.droppableId;
   const max: Position = closest.scroll.max;
   const current: Position = closest.scroll.current;
 
@@ -209,7 +217,7 @@ const withPlaceholder = (
 
   const spaceForPlaceholder: Position = patch(
     droppable.axis.line,
-    draggable.placeholder.client.borderBox[droppable.axis.size]
+    draggable.placeholder.client.borderBox[droppable.axis.size],
   );
 
   const newMax: Position = add(max, spaceForPlaceholder);
@@ -231,17 +239,14 @@ const withPlaceholder = (
 type Api = {|
   scrollWindow: (change: Position) => void,
   scrollDroppable: (id: DroppableId, change: Position) => void,
-|}
+|};
 
 type ResultFn = (state: DraggingState) => void;
 type ResultCancel = { cancel: () => void };
 
 export type FluidScroller = ResultFn & ResultCancel;
 
-export default ({
-  scrollWindow,
-  scrollDroppable,
-}: Api): FluidScroller => {
+export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
   const scheduleWindowScroll = rafSchd(scrollWindow);
   const scheduleDroppableScroll = rafSchd(scrollDroppable);
 
@@ -250,7 +255,8 @@ export default ({
 
     // 1. Can we scroll the viewport?
 
-    const draggable: DraggableDimension = state.dimensions.draggables[state.critical.draggable.id];
+    const draggable: DraggableDimension =
+      state.dimensions.draggables[state.critical.draggable.id];
     const subject: Rect = draggable.page.marginBox;
     const viewport: Viewport = state.viewport;
     const requiredWindowScroll: ?Position = getRequiredScroll({
@@ -259,7 +265,10 @@ export default ({
       center,
     });
 
-    if (requiredWindowScroll && canScrollWindow(viewport, requiredWindowScroll)) {
+    if (
+      requiredWindowScroll &&
+      canScrollWindow(viewport, requiredWindowScroll)
+    ) {
       scheduleWindowScroll(requiredWindowScroll);
       return;
     }
@@ -296,7 +305,10 @@ export default ({
     }
 
     // need to adjust the current and max scroll positions to account for placeholders
-    const result: ?WithPlaceholderResult = withPlaceholder(droppable, draggable);
+    const result: ?WithPlaceholderResult = withPlaceholder(
+      droppable,
+      draggable,
+    );
 
     if (!result) {
       return;
@@ -322,4 +334,3 @@ export default ({
 
   return scroller;
 };
-

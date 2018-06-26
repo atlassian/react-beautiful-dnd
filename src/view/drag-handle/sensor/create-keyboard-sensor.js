@@ -13,11 +13,11 @@ import type { KeyboardSensor, CreateSensorArgs } from './sensor-types';
 
 type State = {|
   isDragging: boolean,
-|}
+|};
 
 type KeyMap = {
-  [key: number]: true
-}
+  [key: number]: true,
+};
 
 const scrollJumpKeys: KeyMap = {
   [keyCodes.pageDown]: true,
@@ -26,7 +26,7 @@ const scrollJumpKeys: KeyMap = {
   [keyCodes.end]: true,
 };
 
-const noop = () => { };
+const noop = () => {};
 
 export default ({
   callbacks,
@@ -90,10 +90,12 @@ export default ({
 
       // we are using this event for part of the drag
       event.preventDefault();
-      startDragging(() => callbacks.onLift({
-        clientSelection: center,
-        autoScrollMode: 'JUMP',
-      }));
+      startDragging(() =>
+        callbacks.onLift({
+          clientSelection: center,
+          autoScrollMode: 'JUMP',
+        }),
+      );
       return;
     }
 
@@ -213,4 +215,3 @@ export default ({
 
   return sensor;
 };
-

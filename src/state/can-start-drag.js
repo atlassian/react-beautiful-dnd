@@ -1,7 +1,5 @@
 // @flow
-import type {
-  State, DraggableId,
-} from '../types';
+import type { State, DraggableId } from '../types';
 
 export default (state: State, id: DraggableId): boolean => {
   // Ready to go!

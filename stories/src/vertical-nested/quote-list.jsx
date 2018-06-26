@@ -19,7 +19,8 @@ const Root = styled.div`
 `;
 
 const Container = styled.div`
-  background-color: ${({ isDraggingOver }) => (isDraggingOver ? colors.blue.lighter : colors.blue.light)};
+  background-color: ${({ isDraggingOver }) =>
+    isDraggingOver ? colors.blue.lighter : colors.blue.light};
   display: flex;
   flex-direction: column;
   padding: ${grid}px;
@@ -40,12 +41,7 @@ const NestedContainer = Container.extend`
 
 export default class QuoteList extends Component<{ list: NestedQuoteList }> {
   renderQuote = (quote: Quote, type: string, index: number) => (
-    <Draggable
-      key={quote.id}
-      draggableId={quote.id}
-      type={type}
-      index={index}
-    >
+    <Draggable key={quote.id} draggableId={quote.id} type={type} index={index}>
       {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
         <QuoteItem
           quote={quote}
@@ -54,54 +50,53 @@ export default class QuoteList extends Component<{ list: NestedQuoteList }> {
         />
       )}
     </Draggable>
-  )
+  );
 
   renderList = (list: NestedQuoteList, level?: number = 0) => (
-    <Droppable
-      droppableId={list.id}
-      type={list.id}
-      key={list.id}
-    >
-      {(dropProvided: DroppableProvided, dropSnapshot: DroppableStateSnapshot) => (
+    <Droppable droppableId={list.id} type={list.id} key={list.id}>
+      {(
+        dropProvided: DroppableProvided,
+        dropSnapshot: DroppableStateSnapshot,
+      ) => (
         <Container
           innerRef={dropProvided.innerRef}
           isDraggingOver={dropSnapshot.isDraggingOver}
           {...dropProvided.droppableProps}
         >
           <Title>{list.title}</Title>
-          {list.children.map((item: Quote | NestedQuoteList, index: number) => (
-            !item.children ?
-              this.renderQuote((item: any), list.id, index) :
-              (
+          {list.children.map(
+            (item: Quote | NestedQuoteList, index: number) =>
+              !item.children ? (
+                this.renderQuote((item: any), list.id, index)
+              ) : (
                 <Draggable
                   draggableId={item.id}
                   type={list.id}
                   key={item.id}
                   index={index}
                 >
-                  {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
+                  {(
+                    dragProvided: DraggableProvided,
+                    dragSnapshot: DraggableStateSnapshot,
+                  ) => (
                     <NestedContainer
                       innerRef={dragProvided.innerRef}
                       isDragging={dragSnapshot.isDragging}
                       {...dragProvided.draggableProps}
                       {...dragProvided.dragHandleProps}
                     >
-                      {this.renderList((item : any), level + 1)}
+                      {this.renderList((item: any), level + 1)}
                     </NestedContainer>
                   )}
                 </Draggable>
-              )
-            ))}
+              ),
+          )}
         </Container>
       )}
     </Droppable>
-  )
+  );
 
   render() {
-    return (
-      <Root>
-        {this.renderList(this.props.list)}
-      </Root>
-    );
+    return <Root>{this.renderList(this.props.list)}</Root>;
   }
 }

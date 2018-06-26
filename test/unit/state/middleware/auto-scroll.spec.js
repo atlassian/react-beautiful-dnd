@@ -1,11 +1,24 @@
-
 // @flow
 import type { Action, Store } from '../../../../src/types';
 import type { AutoScroller } from '../../../../src/state/auto-scroller/auto-scroller-types';
 import createStore from './util/create-store';
 import middleware from '../../../../src/state/middleware/auto-scroll';
-import { animateDropArgs, userCancelArgs, completeDropArgs, initialPublishArgs } from '../../../utils/preset-action-args';
-import { animateDrop, drop, completeDrop, collectionStarting, prepare, initialPublish, moveDown, type InitialPublishArgs } from '../../../../src/state/action-creators';
+import {
+  animateDropArgs,
+  userCancelArgs,
+  completeDropArgs,
+  initialPublishArgs,
+} from '../../../utils/preset-action-args';
+import {
+  animateDrop,
+  drop,
+  completeDrop,
+  collectionStarting,
+  prepare,
+  initialPublish,
+  moveDown,
+  type InitialPublishArgs,
+} from '../../../../src/state/action-creators';
 
 const shouldCancel: Action[] = [
   animateDrop(animateDropArgs),
@@ -71,4 +84,3 @@ it('should fire a jump scroll when in the JUMP auto scrolling mode and there is 
   // Currently no way to poke the state through an action to create a scrollJumpRequest
   // TODO: investigate mechanism
 });
-

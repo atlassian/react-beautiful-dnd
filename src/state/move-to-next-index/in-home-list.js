@@ -28,7 +28,9 @@ export default ({
   const location: ?DraggableLocation = previousImpact.destination;
 
   if (!location) {
-    console.error('cannot move to next index when there is not previous destination');
+    console.error(
+      'cannot move to next index when there is not previous destination',
+    );
     return null;
   }
 
@@ -60,7 +62,8 @@ export default ({
   }
 
   const destination: DraggableDimension = insideDroppable[proposedIndex];
-  const isMovingTowardStart = (isMovingForward && proposedIndex <= startIndex) ||
+  const isMovingTowardStart =
+    (isMovingForward && proposedIndex <= startIndex) ||
     (!isMovingForward && proposedIndex >= startIndex);
 
   const edge: Edge = (() => {
@@ -121,15 +124,24 @@ export default ({
 
   if (isVisibleInNewLocation) {
     return {
-      pageBorderBoxCenter: withDroppableDisplacement(droppable, newPageBorderBoxCenter),
+      pageBorderBoxCenter: withDroppableDisplacement(
+        droppable,
+        newPageBorderBoxCenter,
+      ),
       impact: newImpact,
       scrollJumpRequest: null,
     };
   }
 
   // The full distance required to get from the previous page center to the new page center
-  const distance: Position = subtract(newPageBorderBoxCenter, previousPageBorderBoxCenter);
-  const distanceWithScroll: Position = withDroppableDisplacement(droppable, distance);
+  const distance: Position = subtract(
+    newPageBorderBoxCenter,
+    previousPageBorderBoxCenter,
+  );
+  const distanceWithScroll: Position = withDroppableDisplacement(
+    droppable,
+    distance,
+  );
 
   return {
     pageBorderBoxCenter: previousPageBorderBoxCenter,

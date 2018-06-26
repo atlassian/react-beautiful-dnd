@@ -9,7 +9,7 @@ import { colors, grid, borderRadius } from '../constants';
 type Props = {|
   task: TaskType,
   index: number,
-|}
+|};
 
 const Container = styled.div`
   border-bottom: 1px solid #ccc;
@@ -18,7 +18,8 @@ const Container = styled.div`
   margin-bottom: ${grid}px;
   border-radius: ${borderRadius}px;
   font-size: 18px;
-  ${({ isDragging }) => (isDragging ? 'box-shadow: 1px 1px 1px grey; background: lightblue' : '')}
+  ${({ isDragging }) =>
+    isDragging ? 'box-shadow: 1px 1px 1px grey; background: lightblue' : ''};
 `;
 
 export default class Task extends Component<Props> {

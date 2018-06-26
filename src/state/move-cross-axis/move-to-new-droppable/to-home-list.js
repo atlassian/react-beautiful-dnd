@@ -23,7 +23,7 @@ type Args = {|
   droppable: DroppableDimension,
   previousImpact: DragImpact,
   viewport: Viewport,
-|}
+|};
 
 export default ({
   amount,
@@ -85,7 +85,9 @@ export default ({
   const newCenter: Position = moveToEdge({
     source: draggable.page.borderBox,
     sourceEdge: edge,
-    destination: isMovingPastOriginalIndex ? target.page.borderBox : target.page.marginBox,
+    destination: isMovingPastOriginalIndex
+      ? target.page.borderBox
+      : target.page.marginBox,
     destinationEdge: edge,
     destinationAxis: axis,
   });
@@ -107,13 +109,15 @@ export default ({
     return insideDroppable.slice(from, to).reverse();
   })();
 
-  const displaced: Displacement[] = modified
-    .map((dimension: DraggableDimension): Displacement => getDisplacement({
-      draggable: dimension,
-      destination: droppable,
-      previousImpact,
-      viewport: viewport.frame,
-    }));
+  const displaced: Displacement[] = modified.map(
+    (dimension: DraggableDimension): Displacement =>
+      getDisplacement({
+        draggable: dimension,
+        destination: droppable,
+        previousImpact,
+        viewport: viewport.frame,
+      }),
+  );
 
   const newImpact: DragImpact = {
     movement: {

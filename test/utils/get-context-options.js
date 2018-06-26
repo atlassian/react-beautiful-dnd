@@ -1,6 +1,13 @@
 // @flow
 import PropTypes from 'prop-types';
-import { storeKey, droppableIdKey, dimensionMarshalKey, styleContextKey, canLiftContextKey, droppableTypeKey } from '../../src/view/context-keys';
+import {
+  storeKey,
+  droppableIdKey,
+  dimensionMarshalKey,
+  styleContextKey,
+  canLiftContextKey,
+  droppableTypeKey,
+} from '../../src/view/context-keys';
 import createStore from '../../src/state/create-store';
 import { getMarshalStub } from './dimension-marshal';
 import type { DroppableId, TypeId } from '../../src/types';
@@ -25,9 +32,9 @@ export const withStore = () => ({
         mount: jest.fn(),
       },
       getHooks: () => ({
-        onDragEnd: () => { },
+        onDragEnd: () => {},
       }),
-      announce: () => { },
+      announce: () => {},
       getScroller: (): AutoScroller => ({
         cancel: jest.fn(),
         jumpScroll: jest.fn(),
@@ -96,13 +103,16 @@ const base: Object = {
 
 // returning type Object because that is what enzyme wants
 export const combine = (...args: Object[]): Object =>
-  args.reduce((previous: Object, current: Object): Object => ({
-    context: {
-      ...previous.context,
-      ...current.context,
-    },
-    childContextTypes: {
-      ...previous.childContextTypes,
-      ...current.childContextTypes,
-    },
-  }), base);
+  args.reduce(
+    (previous: Object, current: Object): Object => ({
+      context: {
+        ...previous.context,
+        ...current.context,
+      },
+      childContextTypes: {
+        ...previous.childContextTypes,
+        ...current.childContextTypes,
+      },
+    }),
+    base,
+  );

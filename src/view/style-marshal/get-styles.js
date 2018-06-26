@@ -8,12 +8,18 @@ export type Styles = {|
   resting: string,
   dropAnimating: string,
   userCancel: string,
-|}
+|};
 
 export default (styleContext: string): Styles => {
-  const dragHandleSelector: string = `[${attributes.dragHandle}="${styleContext}"]`;
-  const draggableSelector: string = `[${attributes.draggable}="${styleContext}"]`;
-  const droppableSelector: string = `[${attributes.droppable}="${styleContext}"]`;
+  const dragHandleSelector: string = `[${
+    attributes.dragHandle
+  }="${styleContext}"]`;
+  const draggableSelector: string = `[${
+    attributes.draggable
+  }="${styleContext}"]`;
+  const droppableSelector: string = `[${
+    attributes.droppable
+  }="${styleContext}"]`;
 
   // ## Drag handle styles
 
@@ -132,15 +138,9 @@ export default (styleContext: string): Styles => {
     `,
   };
 
-  const base: string[] = [
-    dragHandleStyles.base,
-    droppableStyles.base,
-  ];
+  const base: string[] = [dragHandleStyles.base, droppableStyles.base];
 
-  const resting: string[] = [
-    ...base,
-    dragHandleStyles.grabCursor,
-  ];
+  const resting: string[] = [...base, dragHandleStyles.grabCursor];
 
   // while collecting we do not animate movements
   const collecting: string[] = [
@@ -150,10 +150,7 @@ export default (styleContext: string): Styles => {
   ];
 
   // while dragging we animate movements
-  const dragging: string[] = [
-    ...collecting,
-    draggableStyles.animateMovement,
-  ];
+  const dragging: string[] = [...collecting, draggableStyles.animateMovement];
 
   const dropAnimating: string[] = [
     ...base,
@@ -163,10 +160,7 @@ export default (styleContext: string): Styles => {
 
   // Not applying grab cursor during a cancel as it is not possible for users to reorder
   // items during a cancel
-  const userCancel: string[] = [
-    ...base,
-    draggableStyles.animateMovement,
-  ];
+  const userCancel: string[] = [...base, draggableStyles.animateMovement];
 
   return {
     resting: resting.join(''),
@@ -176,4 +170,3 @@ export default (styleContext: string): Styles => {
     userCancel: userCancel.join(''),
   };
 };
-

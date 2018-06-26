@@ -1,13 +1,13 @@
 // @flow
 import { type Position } from 'css-box-model';
 import { type Node } from 'react';
-import type {
-  AutoScrollMode,
-  DraggableId,
-} from '../../types';
+import type { AutoScrollMode, DraggableId } from '../../types';
 
 export type Callbacks = {|
-  onLift: ({ clientSelection: Position, autoScrollMode: AutoScrollMode }) => void,
+  onLift: ({
+    clientSelection: Position,
+    autoScrollMode: AutoScrollMode,
+  }) => void,
   onMove: (point: Position) => void,
   onWindowScroll: () => void,
   onMoveUp: () => void,
@@ -16,7 +16,7 @@ export type Callbacks = {|
   onMoveLeft: () => void,
   onDrop: () => void,
   onCancel: () => void,
-|}
+|};
 
 export type DragHandleProps = {|
   // If a consumer is using a portal then the item will loose focus
@@ -42,7 +42,7 @@ export type DragHandleProps = {|
   // Stop html5 drag and drop
   draggable: boolean,
   onDragStart: (event: DragEvent) => void,
-|}
+|};
 
 export type Props = {|
   draggableId: DraggableId,
@@ -58,4 +58,4 @@ export type Props = {|
   // whether interactive elements should be permitted to start a drag
   canDragInteractiveElements: boolean,
   children: (?DragHandleProps) => Node,
-|}
+|};

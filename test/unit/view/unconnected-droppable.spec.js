@@ -5,7 +5,12 @@ import { mount } from 'enzyme';
 import type { ReactWrapper } from 'enzyme';
 import Droppable from '../../../src/view/droppable/droppable';
 import Placeholder from '../../../src/view/placeholder/';
-import { withStore, combine, withDimensionMarshal, withStyleContext } from '../../utils/get-context-options';
+import {
+  withStore,
+  combine,
+  withDimensionMarshal,
+  withStyleContext,
+} from '../../utils/get-context-options';
 import { getPreset } from '../../utils/dimension';
 import type {
   DraggableId,
@@ -20,7 +25,10 @@ import type {
 } from '../../../src/view/droppable/droppable-types';
 
 const getStubber = (mock: Function) =>
-  class Stubber extends Component<{provided: Provided, snapshot: StateSnapshot}> {
+  class Stubber extends Component<{
+    provided: Provided,
+    snapshot: StateSnapshot,
+  }> {
     render() {
       const { provided, snapshot } = this.props;
       mock({
@@ -28,10 +36,7 @@ const getStubber = (mock: Function) =>
         snapshot,
       });
       return (
-        <div
-          ref={provided.innerRef}
-          {...provided.droppableProps}
-        >
+        <div ref={provided.innerRef} {...provided.droppableProps}>
           Hey there
           {provided.placeholder}
         </div>
@@ -73,28 +78,22 @@ type MountArgs = {|
   WrappedComponent: any,
   ownProps?: OwnProps,
   mapProps?: MapProps,
-|}
+|};
 
 const mountDroppable = ({
   WrappedComponent,
   ownProps = defaultOwnProps,
   mapProps = notDraggingOverMapProps,
-}: MountArgs = {}): ReactWrapper => mount(
-  // $ExpectError - using spread
-  <Droppable
-    {...ownProps}
-    {...mapProps}
-  >
-    {(provided: Provided, snapshot: StateSnapshot) => (
-      <WrappedComponent provided={provided} snapshot={snapshot} />
-    )}
-  </Droppable>,
-  combine(
-    withStore(),
-    withDimensionMarshal(),
-    withStyleContext(),
-  )
-);
+}: MountArgs = {}): ReactWrapper =>
+  mount(
+    // $ExpectError - using spread
+    <Droppable {...ownProps} {...mapProps}>
+      {(provided: Provided, snapshot: StateSnapshot) => (
+        <WrappedComponent provided={provided} snapshot={snapshot} />
+      )}
+    </Droppable>,
+    combine(withStore(), withDimensionMarshal(), withStyleContext()),
+  );
 
 describe('Droppable - unconnected', () => {
   describe('dragging over home droppable', () => {
@@ -130,8 +129,9 @@ describe('Droppable - unconnected', () => {
       // $ExpectError - type property of placeholder
       expect(provided.placeholder.type).toBe(Placeholder);
       // $ExpectError - props property of placeholder
-      expect(provided.placeholder.props.placeholder)
-        .toEqual(isDraggingOverForeignMapProps.placeholder);
+      expect(provided.placeholder.props.placeholder).toEqual(
+        isDraggingOverForeignMapProps.placeholder,
+      );
     });
 
     describe('not dragging over droppable', () => {
@@ -167,7 +167,7 @@ describe('Droppable - unconnected', () => {
 
   describe('should log a warning if a placeholder is not mounted by a consumer', () => {
     beforeEach(() => {
-      jest.spyOn(console, 'warn').mockImplementation(() => { });
+      jest.spyOn(console, 'warn').mockImplementation(() => {});
     });
     afterEach(() => {
       console.warn.mockRestore();
@@ -180,7 +180,9 @@ describe('Droppable - unconnected', () => {
       });
 
       expect(console.warn).toHaveBeenCalledWith(
-        expect.stringContaining('Droppable setup issue: DroppableProvided > placeholder could not be found.')
+        expect.stringContaining(
+          'Droppable setup issue: DroppableProvided > placeholder could not be found.',
+        ),
       );
     });
 
@@ -193,9 +195,10 @@ describe('Droppable - unconnected', () => {
       wrapper.setProps(isDraggingOverForeignMapProps);
 
       expect(console.warn).toHaveBeenCalledWith(
-        expect.stringContaining('Droppable setup issue: DroppableProvided > placeholder could not be found.')
+        expect.stringContaining(
+          'Droppable setup issue: DroppableProvided > placeholder could not be found.',
+        ),
       );
     });
   });
 });
-

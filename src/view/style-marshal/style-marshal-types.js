@@ -1,7 +1,5 @@
 // @flow
-import type {
-  DropReason,
-} from '../../types';
+import type { DropReason } from '../../types';
 
 export type StyleMarshal = {|
   collecting: () => void,
@@ -11,4 +9,4 @@ export type StyleMarshal = {|
   styleContext: string,
   unmount: () => void,
   mount: () => void,
-|}
+|};

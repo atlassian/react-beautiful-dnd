@@ -16,35 +16,35 @@ export type Publisher = {|
   removeDraggable: (id: DraggableId) => void,
   removeDroppable: (id: DroppableId) => void,
   stop: () => void,
-|}
+|};
 
 type DraggableMap = {
   [id: DraggableId]: true,
-}
+};
 
 type DroppableMap = {
   [id: DroppableId]: true,
-}
+};
 
 type Map = {|
   draggables: DraggableMap,
   droppables: DroppableMap,
-|}
+|};
 
 export type Provided = {|
   entries: Entries,
-  collection: Collection
-|}
+  collection: Collection,
+|};
 
 type Callbacks = {|
   publish: (args: Publish) => void,
   collectionStarting: () => void,
-|}
+|};
 
 type Args = {|
   getProvided: () => Provided,
-  callbacks: Callbacks
-|}
+  callbacks: Callbacks,
+|};
 
 const getEmptyMap = (): Map => ({
   draggables: {},
@@ -53,14 +53,11 @@ const getEmptyMap = (): Map => ({
 
 const timingKey: string = 'Publish collection from DOM';
 
-export default ({
-  getProvided,
-  callbacks,
-}: Args): Publisher => {
+export default ({ getProvided, callbacks }: Args): Publisher => {
   const advancedUsageWarning = (() => {
     // noop for production
     if (process.env.NODE_ENV === 'production') {
-      return () => { };
+      return () => {};
     }
 
     let hasAnnounced: boolean = false;
@@ -72,7 +69,8 @@ export default ({
 
       hasAnnounced = true;
 
-      console.warn(`
+      console.warn(
+        `
         Advanced usage warning: you are adding or removing a dimension during a drag
         This an advanced feature used to support dynamic interactions such as lazy loading lists.
 
@@ -83,7 +81,7 @@ export default ({
           (it cannot push a Droppable on the page)
 
         (This warning will be stripped in production builds)
-      `.trim()
+      `.trim(),
       );
     };
   })();
@@ -112,20 +110,24 @@ export default ({
       const { entries, collection } = getProvided();
       const windowScroll: Position = collection.initialWindowScroll;
 
-      const draggables: DraggableDimension[] = Object.keys(additions.draggables)
-        .map((id: DraggableId): DraggableDimension =>
+      const draggables: DraggableDimension[] = Object.keys(
+        additions.draggables,
+      ).map(
+        (id: DraggableId): DraggableDimension =>
           // TODO
-          entries.draggables[id].getDimension(windowScroll)
-        );
+          entries.draggables[id].getDimension(windowScroll),
+      );
 
-      const droppables: DroppableDimension[] = Object.keys(additions.droppables)
-        .map((id: DroppableId): DroppableDimension =>
+      const droppables: DroppableDimension[] = Object.keys(
+        additions.droppables,
+      ).map(
+        (id: DroppableId): DroppableDimension =>
           entries.droppables[id].callbacks.getDimensionAndWatchScroll(
             // TODO: need to figure out diff from start?
             windowScroll,
-            collection.scrollOptions
-          )
-        );
+            collection.scrollOptions,
+          ),
+      );
 
       const result: Publish = {
         additions: {

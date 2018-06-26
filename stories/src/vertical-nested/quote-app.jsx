@@ -44,7 +44,7 @@ const Root = styled.div`
 
 type State = {|
   list: NestedQuoteList,
-|}
+|};
 
 export default class QuoteApp extends Component<*, State> {
   /* eslint-disable react/sort-comp */
@@ -55,7 +55,7 @@ export default class QuoteApp extends Component<*, State> {
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
-  }
+  };
 
   onDragEnd = (result: DropResult) => {
     publishOnDragEnd(result);
@@ -86,8 +86,9 @@ export default class QuoteApp extends Component<*, State> {
 
     if (result.type === 'second-level') {
       const nested: ?NestedQuoteList = (this.state.list.children.filter(
-        (item: mixed): boolean => Object.prototype.hasOwnProperty.call(item, 'children')
-      )[0] : any);
+        (item: mixed): boolean =>
+          Object.prototype.hasOwnProperty.call(item, 'children'),
+      )[0]: any);
 
       if (!nested) {
         console.error('could not find nested list');
@@ -119,7 +120,7 @@ export default class QuoteApp extends Component<*, State> {
         list,
       });
     }
-  }
+  };
 
   render() {
     const { list } = this.state;

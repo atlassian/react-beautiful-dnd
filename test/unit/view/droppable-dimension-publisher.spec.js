@@ -2,7 +2,12 @@
 /* eslint-disable react/no-multi-comp */
 import React, { Component } from 'react';
 import { mount } from 'enzyme';
-import { createBox, type BoxModel, type Spacing, type Position } from 'css-box-model';
+import {
+  createBox,
+  type BoxModel,
+  type Spacing,
+  type Position,
+} from 'css-box-model';
 import DroppableDimensionPublisher from '../../../src/view/droppable-dimension-publisher/droppable-dimension-publisher';
 import {
   getPreset,
@@ -38,16 +43,25 @@ type ScrollableItemProps = {|
   isDropDisabled: boolean,
   droppableId: DroppableId,
   type: TypeId,
-|}
+|};
 
 const margin: Spacing = {
-  top: 1, right: 2, bottom: 3, left: 4,
+  top: 1,
+  right: 2,
+  bottom: 3,
+  left: 4,
 };
 const padding: Spacing = {
-  top: 5, right: 6, bottom: 7, left: 8,
+  top: 5,
+  right: 6,
+  bottom: 7,
+  left: 8,
 };
 const border: Spacing = {
-  top: 9, right: 10, bottom: 11, left: 12,
+  top: 9,
+  right: 10,
+  bottom: 11,
+  left: 12,
 };
 const smallFrameClient: BoxModel = createBox({
   borderBox: {
@@ -81,13 +95,13 @@ class ScrollableItem extends Component<ScrollableItemProps> {
     type: preset.home.descriptor.type,
     droppableId: preset.home.descriptor.id,
     isDropDisabled: false,
-  }
+  };
   /* eslint-disable react/sort-comp */
   ref: ?HTMLElement;
 
   setRef = (ref: ?HTMLElement) => {
     this.ref = ref;
-  }
+  };
 
   getRef = (): ?HTMLElement => this.ref;
 
@@ -131,7 +145,7 @@ type AppProps = {|
 |};
 
 class App extends Component<AppProps> {
-  ref: ?HTMLElement
+  ref: ?HTMLElement;
   static defaultProps = {
     ignoreContainerClipping: false,
     droppableIsScrollable: false,
@@ -140,7 +154,7 @@ class App extends Component<AppProps> {
 
   setRef = (ref: ?HTMLElement) => {
     this.ref = ref;
-  }
+  };
   getRef = (): ?HTMLElement => this.ref;
 
   render() {
@@ -203,7 +217,7 @@ describe('DraggableDimensionPublisher', () => {
   };
 
   beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => { });
+    jest.spyOn(console, 'error').mockImplementation(() => {});
     setViewport(preset.viewport);
   });
 
@@ -230,7 +244,9 @@ describe('DraggableDimensionPublisher', () => {
       mount(<ScrollableItem />, withDimensionMarshal(marshal));
 
       expect(marshal.registerDroppable).toHaveBeenCalledTimes(1);
-      expect(marshal.registerDroppable.mock.calls[0][0]).toEqual(preset.home.descriptor);
+      expect(marshal.registerDroppable.mock.calls[0][0]).toEqual(
+        preset.home.descriptor,
+      );
     });
 
     it('should unregister itself when unmounting', () => {
@@ -242,7 +258,9 @@ describe('DraggableDimensionPublisher', () => {
 
       wrapper.unmount();
       expect(marshal.unregisterDroppable).toHaveBeenCalledTimes(1);
-      expect(marshal.unregisterDroppable).toHaveBeenCalledWith(preset.home.descriptor);
+      expect(marshal.unregisterDroppable).toHaveBeenCalledWith(
+        preset.home.descriptor,
+      );
     });
 
     it('should update its registration when a descriptor property changes', () => {
@@ -250,9 +268,13 @@ describe('DraggableDimensionPublisher', () => {
 
       const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
       // asserting shape of original publish
-      expect(marshal.registerDroppable.mock.calls[0][0]).toEqual(preset.home.descriptor);
-      const original: DroppableDimension = marshal.registerDroppable.mock.calls[0][1]
-        .getDimensionAndWatchScroll(getWindowScroll(), scheduled);
+      expect(marshal.registerDroppable.mock.calls[0][0]).toEqual(
+        preset.home.descriptor,
+      );
+      const original: DroppableDimension = marshal.registerDroppable.mock.calls[0][1].getDimensionAndWatchScroll(
+        getWindowScroll(),
+        scheduled,
+      );
 
       // updating the index
       wrapper.setProps({
@@ -273,10 +295,12 @@ describe('DraggableDimensionPublisher', () => {
         expect.any(Object),
       );
       // should now return a dimension with the correct descriptor
-      const callbacks: DroppableCallbacks = marshal.updateDroppable.mock.calls[0][2];
+      const callbacks: DroppableCallbacks =
+        marshal.updateDroppable.mock.calls[0][2];
       callbacks.unwatchScroll();
-      expect(callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled))
-        .toEqual(updated);
+      expect(
+        callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled),
+      ).toEqual(updated);
     });
 
     it('should not update its registration when a descriptor property does not change on an update', () => {
@@ -305,7 +329,9 @@ describe('DraggableDimensionPublisher', () => {
         windowScroll: { x: 0, y: 0 },
       });
 
-      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => expected.client.borderBox);
+      jest
+        .spyOn(Element.prototype, 'getBoundingClientRect')
+        .mockImplementation(() => expected.client.borderBox);
 
       mount(
         <ScrollableItem
@@ -317,10 +343,13 @@ describe('DraggableDimensionPublisher', () => {
       );
 
       // pull the get dimension function out
-      const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+      const callbacks: DroppableCallbacks =
+        marshal.registerDroppable.mock.calls[0][1];
       // execute it to get the dimension
-      const result: DroppableDimension =
-        callbacks.getDimensionAndWatchScroll({ x: 0, y: 0 }, scheduled);
+      const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(
+        { x: 0, y: 0 },
+        scheduled,
+      );
 
       expect(result).toEqual(expected);
       // Goes without saying, but just being really clear here
@@ -347,7 +376,9 @@ describe('DraggableDimensionPublisher', () => {
         border,
         windowScroll,
       });
-      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => bigClient.borderBox);
+      jest
+        .spyOn(Element.prototype, 'getBoundingClientRect')
+        .mockImplementation(() => bigClient.borderBox);
 
       mount(
         <ScrollableItem
@@ -359,10 +390,13 @@ describe('DraggableDimensionPublisher', () => {
       );
 
       // pull the get dimension function out
-      const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+      const callbacks: DroppableCallbacks =
+        marshal.registerDroppable.mock.calls[0][1];
       // execute it to get the dimension
-      const result: DroppableDimension =
-        callbacks.getDimensionAndWatchScroll(windowScroll, scheduled);
+      const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(
+        windowScroll,
+        scheduled,
+      );
 
       expect(result).toEqual(expected);
     });
@@ -380,19 +414,22 @@ describe('DraggableDimensionPublisher', () => {
           });
           const marshal: DimensionMarshal = getMarshalStub();
           const wrapper = mount(
-            <App
-              parentIsScrollable={false}
-            />,
+            <App parentIsScrollable={false} />,
             withDimensionMarshal(marshal),
           );
           const el: HTMLElement = wrapper.instance().getRef();
-          jest.spyOn(el, 'getBoundingClientRect').mockImplementation(() => bigClient.borderBox);
+          jest
+            .spyOn(el, 'getBoundingClientRect')
+            .mockImplementation(() => bigClient.borderBox);
 
           // pull the get dimension function out
-          const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+          const callbacks: DroppableCallbacks =
+            marshal.registerDroppable.mock.calls[0][1];
           // execute it to get the dimension
-          const result: DroppableDimension =
-            callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
+          const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(
+            preset.windowScroll,
+            immediate,
+          );
 
           expect(result).toEqual(expected);
         });
@@ -434,7 +471,9 @@ describe('DraggableDimensionPublisher', () => {
           );
           const el: HTMLElement = wrapper.instance().getRef();
           // returning smaller border box as this is what occurs when the element is scrollable
-          jest.spyOn(el, 'getBoundingClientRect').mockImplementation(() => smallFrameClient.borderBox);
+          jest
+            .spyOn(el, 'getBoundingClientRect')
+            .mockImplementation(() => smallFrameClient.borderBox);
           // scrollWidth / scrollHeight are based on the paddingBox of an element
           Object.defineProperty(el, 'scrollWidth', {
             value: bigClient.paddingBox.width,
@@ -444,10 +483,13 @@ describe('DraggableDimensionPublisher', () => {
           });
 
           // pull the get dimension function out
-          const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+          const callbacks: DroppableCallbacks =
+            marshal.registerDroppable.mock.calls[0][1];
           // execute it to get the dimension
-          const result: DroppableDimension =
-            callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
+          const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(
+            preset.windowScroll,
+            immediate,
+          );
 
           expect(result).toEqual(expected);
         });
@@ -489,7 +531,8 @@ describe('DraggableDimensionPublisher', () => {
           );
           const el: HTMLElement = wrapper.instance().getRef();
           // returning smaller border box as this is what occurs when the element is scrollable
-          jest.spyOn(el, 'getBoundingClientRect')
+          jest
+            .spyOn(el, 'getBoundingClientRect')
             .mockImplementation(() => smallFrameClient.borderBox);
           // scrollWidth / scrollHeight are based on the paddingBox of an element
           Object.defineProperty(el, 'scrollWidth', {
@@ -502,10 +545,13 @@ describe('DraggableDimensionPublisher', () => {
           el.scrollLeft = scroll.x;
 
           // pull the get dimension function out
-          const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+          const callbacks: DroppableCallbacks =
+            marshal.registerDroppable.mock.calls[0][1];
           // execute it to get the dimension
-          const result: DroppableDimension =
-            callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
+          const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(
+            preset.windowScroll,
+            immediate,
+          );
 
           expect(result).toEqual(expected);
         });
@@ -530,26 +576,29 @@ describe('DraggableDimensionPublisher', () => {
               shouldClipSubject: true,
             },
             windowScroll: preset.windowScroll,
-
           });
           const marshal: DimensionMarshal = getMarshalStub();
           const wrapper = mount(
-            <App
-              parentIsScrollable
-              droppableIsScrollable={false}
-            />,
+            <App parentIsScrollable droppableIsScrollable={false} />,
             withDimensionMarshal(marshal),
           );
           const droppable: HTMLElement = wrapper.instance().getRef();
-          jest.spyOn(droppable, 'getBoundingClientRect').mockImplementation(() => bigClient.borderBox);
+          jest
+            .spyOn(droppable, 'getBoundingClientRect')
+            .mockImplementation(() => bigClient.borderBox);
           const parent: HTMLElement = wrapper.getDOMNode();
-          jest.spyOn(parent, 'getBoundingClientRect').mockImplementation(() => smallFrameClient.borderBox);
+          jest
+            .spyOn(parent, 'getBoundingClientRect')
+            .mockImplementation(() => smallFrameClient.borderBox);
 
           // pull the get dimension function out
-          const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+          const callbacks: DroppableCallbacks =
+            marshal.registerDroppable.mock.calls[0][1];
           // execute it to get the dimension
-          const result: DroppableDimension =
-            callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
+          const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(
+            preset.windowScroll,
+            immediate,
+          );
 
           expect(result).toEqual(expected);
         });
@@ -557,7 +606,7 @@ describe('DraggableDimensionPublisher', () => {
 
       describe('both droppable and parent is scrollable', () => {
         it('should log a warning as the use case is not supported', () => {
-          jest.spyOn(console, 'warn').mockImplementation(() => { });
+          jest.spyOn(console, 'warn').mockImplementation(() => {});
           const expected: DroppableDimension = getDroppableDimension({
             descriptor,
             borderBox: bigClient.borderBox,
@@ -578,15 +627,14 @@ describe('DraggableDimensionPublisher', () => {
           });
           const marshal: DimensionMarshal = getMarshalStub();
           const wrapper = mount(
-            <App
-              parentIsScrollable
-              droppableIsScrollable
-            />,
+            <App parentIsScrollable droppableIsScrollable />,
             withDimensionMarshal(marshal),
           );
           const droppable: HTMLElement = wrapper.instance().getRef();
           const parent: HTMLElement = wrapper.getDOMNode();
-          jest.spyOn(droppable, 'getBoundingClientRect').mockImplementation(() => smallFrameClient.borderBox);
+          jest
+            .spyOn(droppable, 'getBoundingClientRect')
+            .mockImplementation(() => smallFrameClient.borderBox);
           Object.defineProperty(droppable, 'scrollWidth', {
             value: bigClient.paddingBox.width,
           });
@@ -595,18 +643,25 @@ describe('DraggableDimensionPublisher', () => {
           });
           // should never be called!
           jest.spyOn(parent, 'getBoundingClientRect').mockImplementation(() => {
-            throw new Error('Should not be getting the boundingClientRect on the parent');
+            throw new Error(
+              'Should not be getting the boundingClientRect on the parent',
+            );
           });
 
           // pull the get dimension function out
-          const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+          const callbacks: DroppableCallbacks =
+            marshal.registerDroppable.mock.calls[0][1];
           // execute it to get the dimension
           expect(console.warn).not.toHaveBeenCalled();
-          const result: DroppableDimension =
-            callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
+          const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(
+            preset.windowScroll,
+            immediate,
+          );
           expect(console.warn).toHaveBeenCalled();
           expect(console.warn).toHaveBeenCalledWith(
-            expect.stringContaining('Droppable: unsupported nested scroll container detected')
+            expect.stringContaining(
+              'Droppable: unsupported nested scroll container detected',
+            ),
           );
 
           expect(result).toEqual(expected);
@@ -619,10 +674,7 @@ describe('DraggableDimensionPublisher', () => {
         const frameScroll: Position = { x: 10, y: 20 };
         const marshal: DimensionMarshal = getMarshalStub();
         const wrapper = mount(
-          <App
-            parentIsScrollable
-            droppableIsScrollable={false}
-          />,
+          <App parentIsScrollable droppableIsScrollable={false} />,
           withDimensionMarshal(marshal),
         );
         const droppable: HTMLElement = wrapper.instance().getRef();
@@ -630,8 +682,12 @@ describe('DraggableDimensionPublisher', () => {
         // manually setting the scroll of the parent node
         parent.scrollTop = frameScroll.y;
         parent.scrollLeft = frameScroll.x;
-        jest.spyOn(droppable, 'getBoundingClientRect').mockImplementation(() => bigClient.borderBox);
-        jest.spyOn(parent, 'getBoundingClientRect').mockImplementation(() => smallFrameClient.borderBox);
+        jest
+          .spyOn(droppable, 'getBoundingClientRect')
+          .mockImplementation(() => bigClient.borderBox);
+        jest
+          .spyOn(parent, 'getBoundingClientRect')
+          .mockImplementation(() => smallFrameClient.borderBox);
         const expected: DroppableDimension = getDroppableDimension({
           descriptor,
           borderBox: bigClient.borderBox,
@@ -651,11 +707,14 @@ describe('DraggableDimensionPublisher', () => {
           windowScroll: preset.windowScroll,
         });
 
-          // pull the get dimension function out
-        const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+        // pull the get dimension function out
+        const callbacks: DroppableCallbacks =
+          marshal.registerDroppable.mock.calls[0][1];
         // execute it to get the dimension
-        const result: DroppableDimension =
-          callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
+        const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(
+          preset.windowScroll,
+          immediate,
+        );
 
         expect(result).toEqual(expected);
       });
@@ -673,8 +732,12 @@ describe('DraggableDimensionPublisher', () => {
         );
         const droppable: HTMLElement = wrapper.instance().getRef();
         const parent: HTMLElement = wrapper.getDOMNode();
-        jest.spyOn(droppable, 'getBoundingClientRect').mockImplementation(() => bigClient.borderBox);
-        jest.spyOn(parent, 'getBoundingClientRect').mockImplementation(() => smallFrameClient.borderBox);
+        jest
+          .spyOn(droppable, 'getBoundingClientRect')
+          .mockImplementation(() => bigClient.borderBox);
+        jest
+          .spyOn(parent, 'getBoundingClientRect')
+          .mockImplementation(() => smallFrameClient.borderBox);
         const expected: DroppableDimension = getDroppableDimension({
           descriptor,
           borderBox: bigClient.borderBox,
@@ -694,11 +757,14 @@ describe('DraggableDimensionPublisher', () => {
           windowScroll: preset.windowScroll,
         });
 
-          // pull the get dimension function out
-        const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+        // pull the get dimension function out
+        const callbacks: DroppableCallbacks =
+          marshal.registerDroppable.mock.calls[0][1];
         // execute it to get the dimension
-        const result: DroppableDimension =
-          callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
+        const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(
+          preset.windowScroll,
+          immediate,
+        );
 
         expect(result).toEqual(expected);
       });
@@ -726,14 +792,16 @@ describe('DraggableDimensionPublisher', () => {
         }
 
         // tell the droppable to watch for scrolling
-        const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+        const callbacks: DroppableCallbacks =
+          marshal.registerDroppable.mock.calls[0][1];
         // watch scroll will only be called after the dimension is requested
         callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
 
         scroll(container, { x: 500, y: 1000 });
 
         expect(marshal.updateDroppableScroll).toHaveBeenCalledWith(
-          preset.home.descriptor.id, { x: 500, y: 1000 },
+          preset.home.descriptor.id,
+          { x: 500, y: 1000 },
         );
       });
 
@@ -746,7 +814,8 @@ describe('DraggableDimensionPublisher', () => {
         );
         const container: HTMLElement = wrapper.getDOMNode();
         // tell the droppable to watch for scrolling
-        const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+        const callbacks: DroppableCallbacks =
+          marshal.registerDroppable.mock.calls[0][1];
 
         // watch scroll will only be called after the dimension is requested
         callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
@@ -755,7 +824,8 @@ describe('DraggableDimensionPublisher', () => {
         scroll(container, { x: 500, y: 1000 });
         expect(marshal.updateDroppableScroll).toHaveBeenCalledTimes(1);
         expect(marshal.updateDroppableScroll).toHaveBeenCalledWith(
-          preset.home.descriptor.id, { x: 500, y: 1000 }
+          preset.home.descriptor.id,
+          { x: 500, y: 1000 },
         );
         marshal.updateDroppableScroll.mockReset();
 
@@ -766,7 +836,8 @@ describe('DraggableDimensionPublisher', () => {
         // third event - new value
         scroll(container, { x: 500, y: 1001 });
         expect(marshal.updateDroppableScroll).toHaveBeenCalledWith(
-          preset.home.descriptor.id, { x: 500, y: 1001 }
+          preset.home.descriptor.id,
+          { x: 500, y: 1001 },
         );
       });
     });
@@ -785,7 +856,8 @@ describe('DraggableDimensionPublisher', () => {
         }
 
         // tell the droppable to watch for scrolling
-        const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+        const callbacks: DroppableCallbacks =
+          marshal.registerDroppable.mock.calls[0][1];
         // watch scroll will only be called after the dimension is requested
         callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled);
 
@@ -794,7 +866,8 @@ describe('DraggableDimensionPublisher', () => {
         requestAnimationFrame.step();
 
         expect(marshal.updateDroppableScroll).toHaveBeenCalledWith(
-          preset.home.descriptor.id, { x: 500, y: 1000 },
+          preset.home.descriptor.id,
+          { x: 500, y: 1000 },
         );
       });
 
@@ -806,7 +879,8 @@ describe('DraggableDimensionPublisher', () => {
         );
         const container: HTMLElement = wrapper.getDOMNode();
         // tell the droppable to watch for scrolling
-        const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+        const callbacks: DroppableCallbacks =
+          marshal.registerDroppable.mock.calls[0][1];
 
         // watch scroll will only be called after the dimension is requested
         callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled);
@@ -821,7 +895,8 @@ describe('DraggableDimensionPublisher', () => {
 
         expect(marshal.updateDroppableScroll).toHaveBeenCalledTimes(1);
         expect(marshal.updateDroppableScroll).toHaveBeenCalledWith(
-          preset.home.descriptor.id, { x: 200, y: 800 },
+          preset.home.descriptor.id,
+          { x: 200, y: 800 },
         );
 
         // also checking that no loose frames are stored up
@@ -838,7 +913,8 @@ describe('DraggableDimensionPublisher', () => {
         );
         const container: HTMLElement = wrapper.getDOMNode();
         // tell the droppable to watch for scrolling
-        const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+        const callbacks: DroppableCallbacks =
+          marshal.registerDroppable.mock.calls[0][1];
 
         // watch scroll will only be called after the dimension is requested
         callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled);
@@ -849,7 +925,8 @@ describe('DraggableDimensionPublisher', () => {
         requestAnimationFrame.step();
         expect(marshal.updateDroppableScroll).toHaveBeenCalledTimes(1);
         expect(marshal.updateDroppableScroll).toHaveBeenCalledWith(
-          preset.home.descriptor.id, { x: 500, y: 1000 }
+          preset.home.descriptor.id,
+          { x: 500, y: 1000 },
         );
         marshal.updateDroppableScroll.mockReset();
 
@@ -872,7 +949,8 @@ describe('DraggableDimensionPublisher', () => {
         );
         const container: HTMLElement = wrapper.getDOMNode();
         // tell the droppable to watch for scrolling
-        const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+        const callbacks: DroppableCallbacks =
+          marshal.registerDroppable.mock.calls[0][1];
 
         // watch scroll will only be called after the dimension is requested
         callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled);
@@ -899,13 +977,11 @@ describe('DraggableDimensionPublisher', () => {
     it('should stop watching scroll when no longer required to publish', () => {
       // this can happen if you scroll backward and forward super quick
       const marshal: DimensionMarshal = getMarshalStub();
-      const wrapper = mount(
-        <ScrollableItem />,
-        withDimensionMarshal(marshal),
-      );
+      const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
       const container: HTMLElement = wrapper.getDOMNode();
       // tell the droppable to watch for scrolling
-      const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+      const callbacks: DroppableCallbacks =
+        marshal.registerDroppable.mock.calls[0][1];
 
       // watch scroll will only be called after the dimension is requested
       callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
@@ -923,15 +999,13 @@ describe('DraggableDimensionPublisher', () => {
     });
 
     it('should stop watching for scroll events when the component is unmounted', () => {
-      jest.spyOn(console, 'warn').mockImplementation(() => { });
+      jest.spyOn(console, 'warn').mockImplementation(() => {});
       const marshal: DimensionMarshal = getMarshalStub();
-      const wrapper = mount(
-        <ScrollableItem />,
-        withDimensionMarshal(marshal),
-      );
+      const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
       const container: HTMLElement = wrapper.getDOMNode();
       // tell the droppable to watch for scrolling
-      const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+      const callbacks: DroppableCallbacks =
+        marshal.registerDroppable.mock.calls[0][1];
 
       // watch scroll will only be called after the dimension is requested
       callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
@@ -950,15 +1024,14 @@ describe('DraggableDimensionPublisher', () => {
 
     it('should throw an error if asked to watch a scroll when already listening for scroll changes', () => {
       const marshal: DimensionMarshal = getMarshalStub();
-      const wrapper = mount(
-        <ScrollableItem />,
-        withDimensionMarshal(marshal),
-      );
+      const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
       // tell the droppable to watch for scrolling
-      const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+      const callbacks: DroppableCallbacks =
+        marshal.registerDroppable.mock.calls[0][1];
 
       // watch scroll will only be called after the dimension is requested
-      const request = () => callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
+      const request = () =>
+        callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
       request();
       expect(request).toThrow();
 
@@ -973,16 +1046,17 @@ describe('DraggableDimensionPublisher', () => {
       const marshal: DimensionMarshal = getMarshalStub();
       // no scroll parent
       const wrapper = mount(
-        <App
-          parentIsScrollable={false}
-          droppableIsScrollable={false}
-        />,
+        <App parentIsScrollable={false} droppableIsScrollable={false} />,
         withDimensionMarshal(marshal),
       );
       const droppable: HTMLElement = wrapper.instance().getRef();
       const parent: HTMLElement = wrapper.getDOMNode();
-      jest.spyOn(droppable, 'getBoundingClientRect').mockImplementation(() => smallFrameClient.borderBox);
-      jest.spyOn(parent, 'getBoundingClientRect').mockImplementation(() => bigClient.borderBox);
+      jest
+        .spyOn(droppable, 'getBoundingClientRect')
+        .mockImplementation(() => smallFrameClient.borderBox);
+      jest
+        .spyOn(parent, 'getBoundingClientRect')
+        .mockImplementation(() => bigClient.borderBox);
 
       // validating no initial scroll
       expect(parent.scrollTop).toBe(0);
@@ -990,7 +1064,8 @@ describe('DraggableDimensionPublisher', () => {
       expect(droppable.scrollTop).toBe(0);
       expect(droppable.scrollLeft).toBe(0);
 
-      const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+      const callbacks: DroppableCallbacks =
+        marshal.registerDroppable.mock.calls[0][1];
       // request the droppable start listening for scrolling
       callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled);
 
@@ -1021,7 +1096,8 @@ describe('DraggableDimensionPublisher', () => {
         expect(container.scrollLeft).toBe(0);
 
         // tell the droppable to watch for scrolling
-        const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+        const callbacks: DroppableCallbacks =
+          marshal.registerDroppable.mock.calls[0][1];
         // watch scroll will only be called after the dimension is requested
         callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled);
 
@@ -1048,7 +1124,8 @@ describe('DraggableDimensionPublisher', () => {
         expect(container.scrollLeft).toBe(0);
 
         // dimension not returned yet
-        const callbacks: DroppableCallbacks = marshal.registerDroppable.mock.calls[0][1];
+        const callbacks: DroppableCallbacks =
+          marshal.registerDroppable.mock.calls[0][1];
         expect(() => callbacks.scroll({ x: 500, y: 1000 })).toThrow();
 
         // now watching scroll
@@ -1064,10 +1141,7 @@ describe('DraggableDimensionPublisher', () => {
   describe('is enabled changes', () => {
     it('should publish updates to the enabled state', () => {
       const marshal: DimensionMarshal = getMarshalStub();
-      const wrapper = mount(
-        <ScrollableItem />,
-        withDimensionMarshal(marshal),
-      );
+      const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
 
       // not called yet
       expect(marshal.updateDroppableIsEnabled).not.toHaveBeenCalled();
@@ -1076,18 +1150,16 @@ describe('DraggableDimensionPublisher', () => {
         isDropDisabled: true,
       });
 
-      expect(marshal.updateDroppableIsEnabled)
-        .toHaveBeenCalledTimes(1);
-      expect(marshal.updateDroppableIsEnabled)
-        .toHaveBeenCalledWith(preset.home.descriptor.id, false);
+      expect(marshal.updateDroppableIsEnabled).toHaveBeenCalledTimes(1);
+      expect(marshal.updateDroppableIsEnabled).toHaveBeenCalledWith(
+        preset.home.descriptor.id,
+        false,
+      );
     });
 
     it('should not publish updates when there is no change', () => {
       const marshal: DimensionMarshal = getMarshalStub();
-      const wrapper = mount(
-        <ScrollableItem />,
-        withDimensionMarshal(marshal),
-      );
+      const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
 
       // not called yet
       expect(marshal.updateDroppableIsEnabled).not.toHaveBeenCalled();

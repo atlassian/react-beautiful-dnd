@@ -13,7 +13,7 @@ import type {
   DraggableDimension,
   PendingDrop,
 } from '../../src/types';
-import type{
+import type {
   InitialPublishArgs,
   LiftArgs,
 } from '../../src/state/action-creators';
@@ -55,10 +55,10 @@ export const publishAdditionArgs: Publish = (() => {
       index: preset.inHomeList.length,
       id: 'addition',
     },
-    borderBox: offsetByPosition(
-      preset.inHome4.client.borderBox,
-      { x: 0, y: preset.inHome4.client.borderBox.height }
-    ),
+    borderBox: offsetByPosition(preset.inHome4.client.borderBox, {
+      x: 0,
+      y: preset.inHome4.client.borderBox.height,
+    }),
     windowScroll: preset.windowScroll,
   });
   return {
@@ -107,4 +107,3 @@ export const copy = (dimensions: DimensionMap): DimensionMap => ({
     ...dimensions.draggables,
   },
 });
-

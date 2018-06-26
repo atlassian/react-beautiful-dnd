@@ -28,14 +28,8 @@ const Title = styled.h4`
 `;
 
 storiesOf('single vertical list', module)
-  .add('basic', () => (
-    <QuoteApp initial={data.small} />
-  ))
-  .add('large data set', () => (
-    <QuoteApp
-      initial={data.large}
-    />
-  ))
+  .add('basic', () => <QuoteApp initial={data.small} />)
+  .add('large data set', () => <QuoteApp initial={data.large} />)
   .add('Droppable is a scroll container', () => (
     <QuoteApp
       initial={data.medium}
@@ -59,8 +53,6 @@ storiesOf('single vertical list', module)
   .add('within a larger scroll container', () => (
     <ScrollContainer>
       <Title>List is within a larger scroll container</Title>
-      <QuoteApp
-        initial={data.medium}
-      />
+      <QuoteApp initial={data.medium} />
     </ScrollContainer>
   ));

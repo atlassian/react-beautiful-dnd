@@ -37,8 +37,10 @@ export default (frame: Spacing) => {
       return true;
     }
 
-    const isBiggerVertically: boolean = subject.top < frame.top && subject.bottom > frame.bottom;
-    const isBiggerHorizontally: boolean = subject.left < frame.left && subject.right > frame.right;
+    const isBiggerVertically: boolean =
+      subject.top < frame.top && subject.bottom > frame.bottom;
+    const isBiggerHorizontally: boolean =
+      subject.left < frame.left && subject.right > frame.right;
 
     // is bigger than frame on both axis
     const isTargetBiggerThanFrame: boolean =

@@ -32,14 +32,19 @@ it('should fire a complete drop action when a drop animation finish action is fi
   expect(store.getState().phase).toBe('DRAGGING');
 
   // A small movement so a drop animation will be needed
-  store.dispatch(move({
-    client: add(initialPublishArgs.client.selection, { x: 1, y: 1 }),
-    shouldAnimate: true,
-  }));
+  store.dispatch(
+    move({
+      client: add(initialPublishArgs.client.selection, { x: 1, y: 1 }),
+      shouldAnimate: true,
+    }),
+  );
   store.dispatch(drop({ reason: 'DROP' }));
 
   const state: State = store.getState();
-  invariant(state.phase === 'DROP_ANIMATING', `Incorrect phase: ${state.phase}`);
+  invariant(
+    state.phase === 'DROP_ANIMATING',
+    `Incorrect phase: ${state.phase}`,
+  );
   const result: DropResult = state.pending.result;
 
   mock.mockReset();
@@ -51,9 +56,7 @@ it('should fire a complete drop action when a drop animation finish action is fi
 });
 
 it('should throw if a drop animation finished action occurs while not in the drop animating phase', () => {
-  const store: Store = createStore(
-    middleware,
-  );
+  const store: Store = createStore(middleware);
 
   expect(() => store.dispatch(dropAnimationFinished())).toThrow();
 });

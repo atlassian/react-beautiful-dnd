@@ -6,4 +6,4 @@ export type Announcer = {|
   id: string,
   mount: () => void,
   unmount: () => void,
-|}
+|};

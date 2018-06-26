@@ -32,7 +32,7 @@ export const absolute = (point: Position): Position => ({
 export const patch = (
   line: 'x' | 'y',
   value: number,
-  otherValue?: number = 0
+  otherValue?: number = 0,
 ): Position => ({
   // set the value of 'x', or 'y'
   [line]: value,
@@ -44,8 +44,7 @@ export const patch = (
 // https://www.mathsisfun.com/algebra/distance-2-points.html
 export const distance = (point1: Position, point2: Position): number =>
   Math.sqrt(
-    Math.pow((point2.x - point1.x), 2) +
-    Math.pow((point2.y - point1.y), 2)
+    Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2),
   );
 
 // When given a list of points, it finds the smallest distance to any point
@@ -54,7 +53,9 @@ export const closest = (target: Position, points: Position[]): number =>
 
 // used to apply any function to both values of a point
 // eg: const floor = apply(Math.floor)(point);
-export const apply = (fn: (value: number) => number) => (point: Position): Position => ({
+export const apply = (fn: (value: number) => number) => (
+  point: Position,
+): Position => ({
   x: fn(point.x),
   y: fn(point.y),
 });

@@ -9,9 +9,11 @@ import type {
 const preset = getPreset();
 
 export const withExpectedAdvancedUsageWarning = (fn: Function) => {
-  jest.spyOn(console, 'warn').mockImplementation(() => { });
+  jest.spyOn(console, 'warn').mockImplementation(() => {});
   fn();
-  expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('Advanced usage warning'));
+  expect(console.warn).toHaveBeenCalledWith(
+    expect.stringContaining('Advanced usage warning'),
+  );
   console.warn.mockRestore();
 };
 

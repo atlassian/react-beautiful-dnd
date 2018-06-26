@@ -15,7 +15,10 @@ import type {
 
 const state = getStatePreset();
 
-export type IsDraggingState = DraggingState | CollectingState | DropPendingState
+export type IsDraggingState =
+  | DraggingState
+  | CollectingState
+  | DropPendingState;
 
 export const draggingStates: IsDraggingState[] = [
   state.dragging(),
@@ -25,11 +28,12 @@ export const draggingStates: IsDraggingState[] = [
 
 export const withImpact = (
   current: IsDraggingState,
-  impact: DragImpact
-): IsDraggingState => (({
-  ...current,
-  impact,
-}: any));
+  impact: DragImpact,
+): IsDraggingState =>
+  ({
+    ...current,
+    impact,
+  }: any);
 
 export const withPending = (
   current: DropAnimatingState,
@@ -39,13 +43,19 @@ export const withPending = (
   pending,
 });
 
-export const move = (previous: IsDraggingState, offset: Position): IsDraggingState => {
+export const move = (
+  previous: IsDraggingState,
+  offset: Position,
+): IsDraggingState => {
   const client: ItemPositions = {
     offset,
     selection: add(previous.initial.client.selection, offset),
     borderBoxCenter: add(previous.initial.client.borderBoxCenter, offset),
   };
-  const page: ItemPositions = getPageItemPositions(client, previous.viewport.scroll.current);
+  const page: ItemPositions = getPageItemPositions(
+    client,
+    previous.viewport.scroll.current,
+  );
 
   return {
     // appeasing flow
@@ -54,7 +64,8 @@ export const move = (previous: IsDraggingState, offset: Position): IsDraggingSta
     // eslint-disable-next-line
     phase: previous.phase,
     current: {
-      client, page,
+      client,
+      page,
     },
   };
 };

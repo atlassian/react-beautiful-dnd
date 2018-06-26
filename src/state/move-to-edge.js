@@ -1,9 +1,7 @@
 // @flow
 import { type Position, type Rect } from 'css-box-model';
 import { absolute, add, patch, subtract } from './position';
-import type {
-  Axis,
-} from '../types';
+import type { Axis } from '../types';
 
 export type Edge = 'start' | 'end';
 
@@ -13,7 +11,7 @@ type Args = {|
   destination: Rect,
   destinationEdge: Edge,
   destinationAxis: Axis,
-|}
+|};
 
 // Being clear that this function returns the new center position
 type CenterPosition = Position;
@@ -32,23 +30,21 @@ export default ({
   destinationEdge,
   destinationAxis,
 }: Args): CenterPosition => {
-  const getCorner = (area: Rect): Position => patch(
-    destinationAxis.line,
-    // it does not really matter what edge we use here
-    // as the difference to the center from edges will be the same
-    area[destinationAxis[destinationEdge]],
-    area[destinationAxis.crossAxisStart]
-  );
+  const getCorner = (area: Rect): Position =>
+    patch(
+      destinationAxis.line,
+      // it does not really matter what edge we use here
+      // as the difference to the center from edges will be the same
+      area[destinationAxis[destinationEdge]],
+      area[destinationAxis.crossAxisStart],
+    );
 
   // 1. Find the intersection corner point
   // 2. add the difference between that point and the center of the dimension
   const corner: Position = getCorner(destination);
 
   // the difference between the center of the draggable and its corner
-  const centerDiff = absolute(subtract(
-    source.center,
-    getCorner(source)
-  ));
+  const centerDiff = absolute(subtract(source.center, getCorner(source)));
 
   const signed: Position = patch(
     destinationAxis.line,

@@ -12,7 +12,8 @@ import type {
 export default (critical: Critical, dimensions: DimensionMap) => {
   const home: DroppableDimension = dimensions.droppables[critical.droppable.id];
   const axis: Axis = home.axis;
-  const draggable: DraggableDimension = dimensions.draggables[critical.draggable.id];
+  const draggable: DraggableDimension =
+    dimensions.draggables[critical.draggable.id];
 
   return {
     movement: {
@@ -24,4 +25,3 @@ export default (critical: Critical, dimensions: DimensionMap) => {
     destination: getHomeLocation(critical),
   };
 };
-

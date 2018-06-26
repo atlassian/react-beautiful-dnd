@@ -11,13 +11,14 @@ import {
   withCanLift,
 } from '../../../utils/get-context-options';
 import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
-import { getMarshalStub, getDroppableCallbacks } from '../../../utils/dimension-marshal';
+import {
+  getMarshalStub,
+  getDroppableCallbacks,
+} from '../../../utils/dimension-marshal';
 import { getPreset } from '../../../utils/dimension';
 import forceUpdate from '../../../utils/force-update';
 import Draggable from '../../../../src/view/draggable/connected-draggable';
-import type {
-  Provided,
-} from '../../../../src/view/draggable/draggable-types';
+import type { Provided } from '../../../../src/view/draggable/draggable-types';
 
 const preset = getPreset();
 // creating our own marshal so we can publish a droppable
@@ -34,9 +35,12 @@ const options: Object = combine(
 
 // registering a fake droppable so that when a draggable
 // registers itself the marshal can find its parent
-marshal.registerDroppable(preset.home.descriptor, getDroppableCallbacks(preset.home));
+marshal.registerDroppable(
+  preset.home.descriptor,
+  getDroppableCallbacks(preset.home),
+);
 
-class Person extends Component<{ name: string, provided: Provided}> {
+class Person extends Component<{ name: string, provided: Provided }> {
   render() {
     const { provided, name } = this.props;
     return (
@@ -56,10 +60,7 @@ class App extends Component<{ currentUser: string }> {
     return (
       <Draggable draggableId="drag-1">
         {(dragProvided: Provided) => (
-          <Person
-            name={this.props.currentUser}
-            provided={dragProvided}
-          />
+          <Person name={this.props.currentUser} provided={dragProvided} />
         )}
       </Draggable>
     );

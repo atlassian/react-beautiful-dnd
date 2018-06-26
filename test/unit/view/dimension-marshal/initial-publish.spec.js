@@ -1,6 +1,10 @@
 // @flow
 import createDimensionMarshal from '../../../../src/state/dimension-marshal/dimension-marshal';
-import { getCallbacksStub, getDroppableCallbacks, populateMarshal } from '../../../utils/dimension-marshal';
+import {
+  getCallbacksStub,
+  getDroppableCallbacks,
+  populateMarshal,
+} from '../../../utils/dimension-marshal';
 import { copy, critical, preset } from '../../../utils/preset-action-args';
 import type {
   DimensionMarshal,
@@ -56,11 +60,15 @@ it('should publish the registered dimensions (simple)', () => {
   marshal.registerDraggable(preset.inHome1.descriptor, () => preset.inHome1);
   marshal.registerDraggable(preset.inHome2.descriptor, () => preset.inHome2);
 
-  const droppableCallbacks: DroppableCallbacks = getDroppableCallbacks(preset.home);
+  const droppableCallbacks: DroppableCallbacks = getDroppableCallbacks(
+    preset.home,
+  );
   marshal.registerDroppable(preset.home.descriptor, droppableCallbacks);
 
-  const result: StartPublishingResult =
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+  const result: StartPublishingResult = marshal.startPublishing(
+    defaultRequest,
+    preset.windowScroll,
+  );
   const expected: StartPublishingResult = {
     critical,
     dimensions: {
@@ -81,8 +89,10 @@ it('should publish the registered dimensions (preset)', () => {
   const marshal: DimensionMarshal = createDimensionMarshal(getCallbacksStub());
   populateMarshal(marshal);
 
-  const result: StartPublishingResult =
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+  const result: StartPublishingResult = marshal.startPublishing(
+    defaultRequest,
+    preset.windowScroll,
+  );
 
   expect(result).toEqual({
     critical,
@@ -94,8 +104,10 @@ it('should not publish dimensions that do not have the same type as the critical
   const marshal: DimensionMarshal = createDimensionMarshal(getCallbacksStub());
   populateMarshal(marshal, withNewType);
 
-  const result: StartPublishingResult =
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+  const result: StartPublishingResult = marshal.startPublishing(
+    defaultRequest,
+    preset.windowScroll,
+  );
 
   expect(result).toEqual({
     critical,
@@ -121,8 +133,10 @@ it('should not publish dimensions that have been unregistered', () => {
     delete expectedMap.draggables[draggable.descriptor.id];
   });
 
-  const result: StartPublishingResult =
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+  const result: StartPublishingResult = marshal.startPublishing(
+    defaultRequest,
+    preset.windowScroll,
+  );
 
   expect(result).toEqual({
     critical,
@@ -148,11 +162,13 @@ it('should publish draggables that have been updated (index change)', () => {
   marshal.updateDraggable(
     preset.inHome2.descriptor,
     updatedInHome2.descriptor,
-    () => updatedInHome2
+    () => updatedInHome2,
   );
 
-  const result: StartPublishingResult =
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+  const result: StartPublishingResult = marshal.startPublishing(
+    defaultRequest,
+    preset.windowScroll,
+  );
   const expected: DimensionMap = copy(preset.dimensions);
   expected.draggables[preset.inHome2.descriptor.id] = updatedInHome2;
   expect(result).toEqual({
@@ -191,12 +207,18 @@ it('should publish droppables that have been updated (id change)', () => {
         droppableId: updatedHome.descriptor.id,
       },
     };
-    marshal.updateDraggable(draggable.descriptor, updated.descriptor, () => updated);
+    marshal.updateDraggable(
+      draggable.descriptor,
+      updated.descriptor,
+      () => updated,
+    );
     expected.draggables[draggable.descriptor.id] = updated;
   });
 
-  const result: StartPublishingResult =
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+  const result: StartPublishingResult = marshal.startPublishing(
+    defaultRequest,
+    preset.windowScroll,
+  );
 
   expect(result).toEqual({
     critical: {
@@ -216,7 +238,9 @@ describe('subsequent calls', () => {
   const stop = (marshal: DimensionMarshal) => marshal.stopPublishing();
 
   it('should return dimensions a subsequent call', () => {
-    const marshal: DimensionMarshal = createDimensionMarshal(getCallbacksStub());
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      getCallbacksStub(),
+    );
     populateMarshal(marshal, preset.dimensions);
     const expected: StartPublishingResult = {
       critical,
@@ -232,7 +256,9 @@ describe('subsequent calls', () => {
   });
 
   it('should throw if starting asked to start before stopping', () => {
-    const marshal: DimensionMarshal = createDimensionMarshal(getCallbacksStub());
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      getCallbacksStub(),
+    );
     populateMarshal(marshal, preset.dimensions);
 
     start(marshal);
@@ -240,7 +266,9 @@ describe('subsequent calls', () => {
   });
 
   it('should account for changes after the last call', () => {
-    const marshal: DimensionMarshal = createDimensionMarshal(getCallbacksStub());
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      getCallbacksStub(),
+    );
     populateMarshal(marshal, preset.dimensions);
 
     // Start first publish
@@ -262,7 +290,7 @@ describe('subsequent calls', () => {
     marshal.updateDraggable(
       preset.inHome2.descriptor,
       updatedInHome2.descriptor,
-      () => updatedInHome2
+      () => updatedInHome2,
     );
     const expected: DimensionMap = copy(preset.dimensions);
     expected.draggables[updatedInHome2.descriptor.id] = updatedInHome2;

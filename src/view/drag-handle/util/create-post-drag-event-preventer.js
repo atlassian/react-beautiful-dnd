@@ -3,12 +3,12 @@
 import type { EventBinding } from './event-types';
 import { bindEvents, unbindEvents } from './bind-events';
 
-type GetWindowFn = () => HTMLElement
+type GetWindowFn = () => HTMLElement;
 
 export type EventPreventer = {|
   preventNext: () => void,
   abort: () => void,
-|}
+|};
 
 export default (getWindow: GetWindowFn): EventPreventer => {
   let isBound: boolean = false;

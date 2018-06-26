@@ -7,7 +7,7 @@ import type { SidebarData } from '../components/types';
 
 type Props = {
   children: () => Node,
-  data: SidebarData
+  data: SidebarData,
 };
 
 const PageTemplate = ({ children, data }: Props) => (
@@ -43,9 +43,7 @@ export const query = graphql`
         }
       }
     }
-    docs: allMarkdownRemark(
-      sort: { fields: [fields___dir], order: ASC }
-    ) {
+    docs: allMarkdownRemark(sort: { fields: [fields___dir], order: ASC }) {
       edges {
         node {
           fields {

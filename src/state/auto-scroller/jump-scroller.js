@@ -21,7 +21,7 @@ type Args = {|
   scrollDroppable: (id: DroppableId, change: Position) => void,
   scrollWindow: (offset: Position) => void,
   move: typeof moveAction,
-|}
+|};
 
 export type JumpScroller = (state: DraggingState) => void;
 
@@ -40,7 +40,7 @@ export default ({
 
   const scrollDroppableAsMuchAsItCan = (
     droppable: DroppableDimension,
-    change: Position
+    change: Position,
   ): ?Remainder => {
     // Droppable cannot absorb any of the scroll
     if (!canScrollDroppable(droppable, change)) {
@@ -63,7 +63,10 @@ export default ({
     return remainder;
   };
 
-  const scrollWindowAsMuchAsItCan = (viewport: Viewport, change: Position): ?Position => {
+  const scrollWindowAsMuchAsItCan = (
+    viewport: Viewport,
+    change: Position,
+  ): ?Position => {
     // window cannot absorb any of the scroll
     if (!canScrollWindow(viewport, change)) {
       return change;
@@ -94,7 +97,10 @@ export default ({
 
     const destination: ?DraggableLocation = state.impact.destination;
 
-    invariant(destination, 'Cannot perform a jump scroll when there is no destination');
+    invariant(
+      destination,
+      'Cannot perform a jump scroll when there is no destination',
+    );
 
     // 1. We scroll the droppable first if we can to avoid the draggable
     // leaving the list
@@ -110,7 +116,10 @@ export default ({
     }
 
     const viewport: Viewport = state.viewport;
-    const windowRemainder: ?Position = scrollWindowAsMuchAsItCan(viewport, droppableRemainder);
+    const windowRemainder: ?Position = scrollWindowAsMuchAsItCan(
+      viewport,
+      droppableRemainder,
+    );
 
     // window could absorb all the droppable remainder
     if (!windowRemainder) {

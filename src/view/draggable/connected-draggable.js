@@ -7,7 +7,9 @@ import Draggable from './draggable';
 import { storeKey } from '../context-keys';
 import { negate } from '../../state/position';
 import isStrictEqual from '../is-strict-equal';
-import getDisplacementMap, { type DisplacementMap } from '../../state/get-displacement-map';
+import getDisplacementMap, {
+  type DisplacementMap,
+} from '../../state/get-displacement-map';
 import {
   lift as liftAction,
   move as moveAction,
@@ -71,23 +73,28 @@ export const makeMapStateToProps = (): Selector => {
     }),
   );
 
-  const getDraggingProps = memoizeOne((
-    offset: Position,
-    shouldAnimateDragMovement: boolean,
-    dimension: DraggableDimension,
-    // the id of the droppable you are over
-    draggingOver: ?DroppableId,
-  ): MapProps => ({
-    isDragging: true,
-    isDropAnimating: false,
-    shouldAnimateDisplacement: false,
-    offset,
-    shouldAnimateDragMovement,
-    dimension,
-    draggingOver,
-  }));
+  const getDraggingProps = memoizeOne(
+    (
+      offset: Position,
+      shouldAnimateDragMovement: boolean,
+      dimension: DraggableDimension,
+      // the id of the droppable you are over
+      draggingOver: ?DroppableId,
+    ): MapProps => ({
+      isDragging: true,
+      isDropAnimating: false,
+      shouldAnimateDisplacement: false,
+      offset,
+      shouldAnimateDragMovement,
+      dimension,
+      draggingOver,
+    }),
+  );
 
-  const getOutOfTheWayMovement = (id: DraggableId, movement: DragMovement): ?MapProps => {
+  const getOutOfTheWayMovement = (
+    id: DraggableId,
+    movement: DragMovement,
+  ): ?MapProps => {
     // Doing this cuts 50% of the time to move
     // Otherwise need to loop over every item in every selector (yuck!)
     const map: DisplacementMap = getDisplacementMap(movement.displaced);
@@ -103,13 +110,13 @@ export const makeMapStateToProps = (): Selector => {
       return null;
     }
 
-    const amount: Position = movement.isBeyondStartPosition ?
-      negate(movement.amount) :
-      movement.amount;
+    const amount: Position = movement.isBeyondStartPosition
+      ? negate(movement.amount)
+      : movement.amount;
 
     return getNotDraggingProps(
       memoizedOffset(amount.x, amount.y),
-      displacement.shouldAnimate
+      displacement.shouldAnimate,
     );
   };
 
@@ -122,11 +129,12 @@ export const makeMapStateToProps = (): Selector => {
       }
 
       const offset: Position = state.current.client.offset;
-      const dimension: DraggableDimension = state.dimensions.draggables[ownProps.draggableId];
+      const dimension: DraggableDimension =
+        state.dimensions.draggables[ownProps.draggableId];
       const shouldAnimateDragMovement: boolean = state.shouldAnimate;
-      const draggingOver: ?DroppableId = state.impact.destination ?
-        state.impact.destination.droppableId :
-        null;
+      const draggingOver: ?DroppableId = state.impact.destination
+        ? state.impact.destination.droppableId
+        : null;
 
       return getDraggingProps(
         memoizedOffset(offset.x, offset.y),
@@ -143,8 +151,9 @@ export const makeMapStateToProps = (): Selector => {
         return null;
       }
 
-      const draggingOver: ?DroppableId = pending.result.destination ?
-        pending.result.destination.droppableId : null;
+      const draggingOver: ?DroppableId = pending.result.destination
+        ? pending.result.destination.droppableId
+        : null;
 
       // not memoized as it is the only execution
       return {
@@ -164,7 +173,10 @@ export const makeMapStateToProps = (): Selector => {
     return null;
   };
 
-  const movingOutOfTheWaySelector = (state: State, ownProps: OwnProps): ?MapProps => {
+  const movingOutOfTheWaySelector = (
+    state: State,
+    ownProps: OwnProps,
+  ): ?MapProps => {
     // Dragging
     if (state.isDragging) {
       // we do not care about the dragging item
@@ -172,7 +184,10 @@ export const makeMapStateToProps = (): Selector => {
         return null;
       }
 
-      return getOutOfTheWayMovement(ownProps.draggableId, state.impact.movement);
+      return getOutOfTheWayMovement(
+        ownProps.draggableId,
+        state.impact.movement,
+      );
     }
 
     // Dropping
@@ -182,7 +197,10 @@ export const makeMapStateToProps = (): Selector => {
         return null;
       }
 
-      return getOutOfTheWayMovement(ownProps.draggableId, state.pending.impact.movement);
+      return getOutOfTheWayMovement(
+        ownProps.draggableId,
+        state.pending.impact.movement,
+      );
     }
 
     // Otherwise
@@ -194,7 +212,10 @@ export const makeMapStateToProps = (): Selector => {
     if (dragging) {
       return dragging;
     }
-    const movingOutOfTheWay: ?MapProps = movingOutOfTheWaySelector(state, ownProps);
+    const movingOutOfTheWay: ?MapProps = movingOutOfTheWaySelector(
+      state,
+      ownProps,
+    );
     if (movingOutOfTheWay) {
       return movingOutOfTheWay;
     }

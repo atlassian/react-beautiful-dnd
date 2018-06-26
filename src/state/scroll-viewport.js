@@ -32,4 +32,3 @@ export default (viewport: Viewport, newScroll: Position): Viewport => {
 
   return updated;
 };
-

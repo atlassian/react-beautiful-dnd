@@ -3,7 +3,11 @@ import { getRect, type Rect, type Position } from 'css-box-model';
 import getClosestDraggable from '../../../../src/state/move-cross-axis/get-closest-draggable';
 import { scrollDroppable } from '../../../../src/state/droppable-dimension';
 import { add, distance, patch } from '../../../../src/state/position';
-import { getDroppableDimension, getDraggableDimension, withAssortedSpacing } from '../../../utils/dimension';
+import {
+  getDroppableDimension,
+  getDraggableDimension,
+  withAssortedSpacing,
+} from '../../../utils/dimension';
 import { expandByPosition } from '../../../../src/state/spacing';
 import { horizontal, vertical } from '../../../../src/state/axis';
 import getViewport from '../../../../src/view/window/get-viewport';
@@ -58,21 +62,23 @@ describe('get closest draggable', () => {
       });
 
       // item bleeds backwards past the start of the droppable
-      const partiallyHiddenBackwards: DraggableDimension = getDraggableDimension({
-        descriptor: {
-          id: 'partialHiddenBackwards',
-          droppableId: droppable.descriptor.id,
-          type: droppable.descriptor.type,
-          index: 1,
+      const partiallyHiddenBackwards: DraggableDimension = getDraggableDimension(
+        {
+          descriptor: {
+            id: 'partialHiddenBackwards',
+            droppableId: droppable.descriptor.id,
+            type: droppable.descriptor.type,
+            index: 1,
+          },
+          borderBox: {
+            [axis.crossAxisStart]: crossAxisStart,
+            [axis.crossAxisEnd]: crossAxisEnd,
+            [axis.start]: -10, // -10
+            [axis.end]: 20,
+          },
+          ...withAssortedSpacing(),
         },
-        borderBox: {
-          [axis.crossAxisStart]: crossAxisStart,
-          [axis.crossAxisEnd]: crossAxisEnd,
-          [axis.start]: -10, // -10
-          [axis.end]: 20,
-        },
-        ...withAssortedSpacing(),
-      });
+      );
 
       const visible1: DraggableDimension = getDraggableDimension({
         descriptor: {
@@ -107,21 +113,23 @@ describe('get closest draggable', () => {
       });
 
       // bleeds over the end of the visible boundary
-      const partiallyHiddenForwards: DraggableDimension = getDraggableDimension({
-        descriptor: {
-          id: 'partiallyHiddenForwards',
-          droppableId: droppable.descriptor.id,
-          type: droppable.descriptor.type,
-          index: 4,
+      const partiallyHiddenForwards: DraggableDimension = getDraggableDimension(
+        {
+          descriptor: {
+            id: 'partiallyHiddenForwards',
+            droppableId: droppable.descriptor.id,
+            type: droppable.descriptor.type,
+            index: 4,
+          },
+          borderBox: {
+            [axis.crossAxisStart]: crossAxisStart,
+            [axis.crossAxisEnd]: crossAxisEnd,
+            [axis.start]: 60,
+            [axis.end]: 120,
+          },
+          ...withAssortedSpacing(),
         },
-        borderBox: {
-          [axis.crossAxisStart]: crossAxisStart,
-          [axis.crossAxisEnd]: crossAxisEnd,
-          [axis.start]: 60,
-          [axis.end]: 120,
-        },
-        ...withAssortedSpacing(),
-      });
+      );
 
       // totally invisible
       const hiddenForwards: DraggableDimension = getDraggableDimension({
@@ -169,7 +177,9 @@ describe('get closest draggable', () => {
       it('should return the closest draggable', () => {
         // closet to visible1
         const center1: Position = patch(
-          axis.line, visible1.page.borderBox.center[axis.line], 100
+          axis.line,
+          visible1.page.borderBox.center[axis.line],
+          100,
         );
         const result1: ?DraggableDimension = getClosestDraggable({
           axis,
@@ -182,7 +192,9 @@ describe('get closest draggable', () => {
 
         // closest to visible2
         const center2: Position = patch(
-          axis.line, visible2.page.borderBox.center[axis.line], 100
+          axis.line,
+          visible2.page.borderBox.center[axis.line],
+          100,
         );
         const result2: ?DraggableDimension = getClosestDraggable({
           axis,
@@ -226,12 +238,12 @@ describe('get closest draggable', () => {
         });
         const scrolled: DroppableDimension = scrollDroppable(
           scrollable,
-          patch(axis.line, 20)
+          patch(axis.line, 20),
         );
         const center: Position = patch(
           axis.line,
           visible1.page.borderBox.center[axis.line],
-          100
+          100,
         );
 
         const result: ?DraggableDimension = getClosestDraggable({
@@ -294,7 +306,9 @@ describe('get closest draggable', () => {
 
         it('should ignore draggables that have forward partial visiblility', () => {
           const center: Position = patch(
-            axis.line, partiallyHiddenForwards.page.borderBox.center[axis.line], 100
+            axis.line,
+            partiallyHiddenForwards.page.borderBox.center[axis.line],
+            100,
           );
 
           const result: ?DraggableDimension = getClosestDraggable({
@@ -310,7 +324,9 @@ describe('get closest draggable', () => {
 
         it('should ignore draggables forward that have no visiblity', () => {
           const center: Position = patch(
-            axis.line, hiddenForwards.page.borderBox.center[axis.line], 100
+            axis.line,
+            hiddenForwards.page.borderBox.center[axis.line],
+            100,
           );
 
           const result: ?DraggableDimension = getClosestDraggable({
@@ -326,7 +342,9 @@ describe('get closest draggable', () => {
 
         it('should ignore draggables that are outside of the viewport', () => {
           const center: Position = patch(
-            axis.line, outOfViewport.page.borderBox.center[axis.line], 100
+            axis.line,
+            outOfViewport.page.borderBox.center[axis.line],
+            100,
           );
 
           const result: ?DraggableDimension = getClosestDraggable({
@@ -369,7 +387,7 @@ describe('get closest draggable', () => {
           axis.line,
           // this is shared edge
           visible2.page.borderBox[axis.start],
-          100
+          100,
         );
 
         const result: ?DraggableDimension = getClosestDraggable({
@@ -385,8 +403,9 @@ describe('get closest draggable', () => {
         // validating test assumptions
 
         // 1. that they have equal distances
-        expect(distance(center, visible1.page.borderBox.center))
-          .toEqual(distance(center, visible2.page.borderBox.center));
+        expect(distance(center, visible1.page.borderBox.center)).toEqual(
+          distance(center, visible2.page.borderBox.center),
+        );
 
         // 2. if we move beyond the edge visible2 will be selected
         const result2: ?DraggableDimension = getClosestDraggable({

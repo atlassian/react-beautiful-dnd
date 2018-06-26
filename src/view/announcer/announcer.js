@@ -74,4 +74,3 @@ export default (): Announcer => {
 
   return announcer;
 };
-

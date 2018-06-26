@@ -48,7 +48,7 @@ type CreateViewportArgs = {|
   scroll: Position,
   scrollHeight: number,
   scrollWidth: number,
-|}
+|};
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -82,7 +82,7 @@ type WithWindowScrollSizeArgs = {|
   viewport: Viewport,
   scrollWidth: number,
   scrollHeight: number,
-|}
+|};
 
 export const withWindowScrollSize = ({
   viewport,
