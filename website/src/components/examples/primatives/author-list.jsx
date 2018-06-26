@@ -13,7 +13,8 @@ import type {
 } from '../../../../../src/';
 
 const Wrapper = styled.div`
-  background-color: ${({ isDraggingOver }) => (isDraggingOver ? colors.blue.lighter : colors.blue.light)};
+  background-color: ${({ isDraggingOver }) =>
+    isDraggingOver ? colors.blue.lighter : colors.blue.light};
   display: flex;
   flex-direction: column;
   padding: ${grid}px;
@@ -32,7 +33,6 @@ const DropZone = styled.div`
 
   /* stop the list collapsing when empty */
   min-width: 600px;
-
 `;
 
 const ScrollContainer = styled.div`
@@ -53,7 +53,7 @@ type Props = {|
   listId: string,
   listType?: string,
   internalScroll?: boolean,
-|}
+|};
 
 export default class AuthorList extends Component<Props> {
   renderBoard = (dropProvided: DroppableProvided) => {
@@ -69,28 +69,37 @@ export default class AuthorList extends Component<Props> {
               type={listType}
               index={index}
             >
-              {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
+              {(
+                dragProvided: DraggableProvided,
+                dragSnapshot: DraggableStateSnapshot,
+              ) => (
                 <Author
                   author={quote.author}
                   provided={dragProvided}
                   snapshot={dragSnapshot}
                 />
-            )}
+              )}
             </Draggable>
           ))}
           {dropProvided.placeholder}
         </DropZone>
       </Container>
     );
-  }
+  };
 
   render() {
     const { listId, listType, internalScroll } = this.props;
 
     return (
       <Droppable droppableId={listId} type={listType} direction="horizontal">
-        {(dropProvided: DroppableProvided, dropSnapshot: DroppableStateSnapshot) => (
-          <Wrapper isDraggingOver={dropSnapshot.isDraggingOver} {...dropProvided.droppableProps}>
+        {(
+          dropProvided: DroppableProvided,
+          dropSnapshot: DroppableStateSnapshot,
+        ) => (
+          <Wrapper
+            isDraggingOver={dropSnapshot.isDraggingOver}
+            {...dropProvided.droppableProps}
+          >
             {internalScroll ? (
               <ScrollContainer>
                 {this.renderBoard(dropProvided)}

@@ -42,15 +42,15 @@ const princess: Author = {
   },
 };
 
-export const authors: Author[] = [
-  jake, BMO, finn, princess,
-];
+export const authors: Author[] = [jake, BMO, finn, princess];
 
 export const authorMap: AuthorMap = authors.reduce(
   (previous: AuthorMap, current: Author): AuthorMap => {
     previous[current.id] = current;
     return previous;
-  }, {});
+  },
+  {},
+);
 
 export const quotes: Quote[] = [
   {
@@ -60,12 +60,13 @@ export const quotes: Quote[] = [
   },
   {
     id: '2',
-    content: 'Sucking at something is the first step towards being sorta good at something.',
+    content:
+      'Sucking at something is the first step towards being sorta good at something.',
     author: jake,
   },
   {
     id: '3',
-    content: 'You got to focus on what\'s real, man',
+    content: "You got to focus on what's real, man",
     author: jake,
   },
   {
@@ -85,7 +86,7 @@ export const quotes: Quote[] = [
   },
   {
     id: '7',
-    content: 'That\'s it! The answer was so simple, I was too smart to see it!',
+    content: "That's it! The answer was so simple, I was too smart to see it!",
     author: princess,
   },
   {
@@ -95,7 +96,7 @@ export const quotes: Quote[] = [
   },
   {
     id: '9',
-    content: 'Don\'t you always call sweatpants \'give up on life pants,\' Jake?',
+    content: "Don't you always call sweatpants 'give up on life pants,' Jake?",
     author: finn,
   },
   {
@@ -110,7 +111,7 @@ export const quotes: Quote[] = [
   },
   {
     id: '12',
-    content: 'Haven\'t slept for a solid 83 hours, but, yeah, I\'m good.',
+    content: "Haven't slept for a solid 83 hours, but, yeah, I'm good.",
     author: princess,
   },
 ];
@@ -119,7 +120,9 @@ export const quoteMap: QuoteMap = quotes.reduce(
   (previous: QuoteMap, current: Quote): QuoteMap => {
     previous[current.id] = current;
     return previous;
-  }, {});
+  },
+  {},
+);
 
 export const getByAuthor = (author: Author, items: Quote[]): Quote[] =>
   items.filter((quote: Quote) => quote.author === author);

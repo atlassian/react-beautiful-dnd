@@ -6,7 +6,11 @@ import initial from './data';
 import Column from './column';
 import type { Result as ReorderResult } from './utils';
 import { mutliDragAwareReorder, multiSelectTo as multiSelect } from './utils';
-import type { DragStart, DropResult, DraggableLocation } from '../../../../../src/';
+import type {
+  DragStart,
+  DropResult,
+  DraggableLocation,
+} from '../../../../../src/';
 import type { Task, Id } from '../types';
 import type { Entities } from './types';
 
@@ -20,18 +24,18 @@ type State = {|
   selectedTaskIds: Id[],
   // sad times
   draggingTaskId: ?Id,
-|}
+|};
 
 const getTasks = (entities: Entities, columnId: Id): Task[] =>
   entities.columns[columnId].taskIds.map(
-    (taskId: Id): Task => entities.tasks[taskId]
+    (taskId: Id): Task => entities.tasks[taskId],
   );
 export default class TaskApp extends Component<*, State> {
   state: State = {
     entities: initial,
     selectedTaskIds: [],
     draggingTaskId: null,
-  }
+  };
 
   componentDidMount() {
     window.addEventListener('click', this.onWindowClick);
@@ -47,7 +51,9 @@ export default class TaskApp extends Component<*, State> {
 
   onDragStart = (start: DragStart) => {
     const id: string = start.draggableId;
-    const selected: ?Id = this.state.selectedTaskIds.find((taskId: Id): boolean => taskId === id);
+    const selected: ?Id = this.state.selectedTaskIds.find(
+      (taskId: Id): boolean => taskId === id,
+    );
 
     // if dragging an item that is not selected - unselect all items
     if (!selected) {
@@ -56,7 +62,7 @@ export default class TaskApp extends Component<*, State> {
     this.setState({
       draggingTaskId: start.draggableId,
     });
-  }
+  };
 
   onDragEnd = (result: DropResult) => {
     const destination: ?DraggableLocation = result.destination;
@@ -81,7 +87,7 @@ export default class TaskApp extends Component<*, State> {
       ...processed,
       draggingTaskId: null,
     });
-  }
+  };
 
   onWindowKeyDown = (event: KeyboardEvent) => {
     if (event.defaultPrevented) {
@@ -91,21 +97,21 @@ export default class TaskApp extends Component<*, State> {
     if (event.key === 'Escape') {
       this.unselectAll();
     }
-  }
+  };
 
   onWindowClick = (event: KeyboardEvent) => {
     if (event.defaultPrevented) {
       return;
     }
     this.unselectAll();
-  }
+  };
 
   onWindowTouchEnd = (event: TouchEvent) => {
     if (event.defaultPrevented) {
       return;
     }
     this.unselectAll();
-  }
+  };
 
   toggleSelection = (taskId: Id) => {
     const selectedTaskIds: Id[] = this.state.selectedTaskIds;
@@ -132,7 +138,7 @@ export default class TaskApp extends Component<*, State> {
     this.setState({
       selectedTaskIds: newTaskIds,
     });
-  }
+  };
 
   toggleSelectionInGroup = (taskId: Id) => {
     const selectedTaskIds: Id[] = this.state.selectedTaskIds;
@@ -152,14 +158,14 @@ export default class TaskApp extends Component<*, State> {
     this.setState({
       selectedTaskIds: shallow,
     });
-  }
+  };
 
   // This behaviour matches the MacOSX finder selection
   multiSelectTo = (newTaskId: Id) => {
-    const updated: ?Id[] = multiSelect(
+    const updated: ?(Id[]) = multiSelect(
       this.state.entities,
       this.state.selectedTaskIds,
-      newTaskId
+      newTaskId,
     );
 
     if (updated == null) {
@@ -169,7 +175,7 @@ export default class TaskApp extends Component<*, State> {
     this.setState({
       selectedTaskIds: updated,
     });
-  }
+  };
 
   unselect = () => {
     this.unselectAll();
@@ -179,7 +185,7 @@ export default class TaskApp extends Component<*, State> {
     this.setState({
       selectedTaskIds: [],
     });
-  }
+  };
 
   render() {
     const entities: Entities = this.state.entities;

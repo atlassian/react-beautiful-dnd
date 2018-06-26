@@ -14,7 +14,8 @@ import type {
 } from '../../../../../src/';
 
 const Wrapper = styled.div`
-  background-color: ${({ isDraggingOver }) => (isDraggingOver ? colors.blue.lighter : colors.blue.light)};
+  background-color: ${({ isDraggingOver }) =>
+    isDraggingOver ? colors.blue.lighter : colors.blue.light};
   display: flex;
   flex-direction: column;
   opacity: ${({ isDropDisabled }) => (isDropDisabled ? 0.5 : 'inherit')};
@@ -47,15 +48,15 @@ type Props = {|
   quotes: Quote[],
   title?: string,
   internalScroll?: boolean,
-  isDropDisabled ?: boolean,
+  isDropDisabled?: boolean,
   style?: Object,
   // may not be provided - and might be null
   ignoreContainerClipping?: boolean,
-|}
+|};
 
 type QuoteListProps = {|
   quotes: Quote[],
-|}
+|};
 
 class InnerQuoteList extends Component<QuoteListProps> {
   shouldComponentUpdate(nextProps: QuoteListProps) {
@@ -71,14 +72,17 @@ class InnerQuoteList extends Component<QuoteListProps> {
       <div>
         {this.props.quotes.map((quote: Quote, index: number) => (
           <Draggable key={quote.id} draggableId={quote.id} index={index}>
-            {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
+            {(
+              dragProvided: DraggableProvided,
+              dragSnapshot: DraggableStateSnapshot,
+            ) => (
               <QuoteItem
                 key={quote.id}
                 quote={quote}
                 isDragging={dragSnapshot.isDragging}
                 provided={dragProvided}
               />
-          )}
+            )}
           </Draggable>
         ))}
       </div>
@@ -90,22 +94,18 @@ type InnerListProps = {|
   dropProvided: DroppableProvided,
   quotes: Quote[],
   title: ?string,
-|}
+|};
 
 class InnerList extends Component<InnerListProps> {
   render() {
     const { quotes, dropProvided } = this.props;
-    const title = this.props.title ? (
-      <Title>{this.props.title}</Title>
-    ) : null;
+    const title = this.props.title ? <Title>{this.props.title}</Title> : null;
 
     return (
       <Container>
         {title}
         <DropZone innerRef={dropProvided.innerRef}>
-          <InnerQuoteList
-            quotes={quotes}
-          />
+          <InnerQuoteList quotes={quotes} />
           {dropProvided.placeholder}
         </DropZone>
       </Container>
@@ -133,7 +133,10 @@ export default class QuoteList extends Component<Props> {
         ignoreContainerClipping={ignoreContainerClipping}
         isDropDisabled={isDropDisabled}
       >
-        {(dropProvided: DroppableProvided, dropSnapshot: DroppableStateSnapshot) => (
+        {(
+          dropProvided: DroppableProvided,
+          dropSnapshot: DroppableStateSnapshot,
+        ) => (
           <Wrapper
             style={style}
             isDraggingOver={dropSnapshot.isDraggingOver}

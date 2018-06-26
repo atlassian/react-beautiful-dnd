@@ -15,11 +15,11 @@ import type { Id, Quote } from '../../types';
 
 type State = {|
   entities: Entities,
-|}
+|};
 
 type Props = {|
   numberOfColumns: 1 | 2,
-|}
+|};
 
 const Container = styled.div`
   display: flex;
@@ -39,7 +39,7 @@ const withQuotes = (column: ColumnType, quoteIds: Id[]): ColumnType => {
 export default class Board extends React.Component<Props, State> {
   static defaultProps = {
     numberOfColumns: 2,
-  }
+  };
 
   state: State = {
     entities: initial,
@@ -55,8 +55,10 @@ export default class Board extends React.Component<Props, State> {
     const destination: DraggableLocation = result.destination;
 
     // did not move anywhere - can bail early
-    if (source.droppableId === destination.droppableId &&
-      source.index === destination.index) {
+    if (
+      source.droppableId === destination.droppableId &&
+      source.index === destination.index
+    ) {
       return;
     }
 
@@ -123,7 +125,7 @@ export default class Board extends React.Component<Props, State> {
       columns: newColumnMap,
     };
     this.setState({ entities: updated });
-  }
+  };
 
   render() {
     const entities: Entities = this.state.entities;
@@ -131,31 +133,29 @@ export default class Board extends React.Component<Props, State> {
 
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
-        <Droppable
-          droppableId="board"
-          type="column"
-          direction="horizontal"
-        >
+        <Droppable droppableId="board" type="column" direction="horizontal">
           {(provided: DroppableProvided) => (
             <Container
               innerRef={provided.innerRef}
               {...provided.droppableProps}
             >
-              {entities.columnOrder.slice(0, numberOfColumns).map((columnId: Id, index: number) => {
-                const column: ColumnType = entities.columns[columnId];
-                // Get the items for this column
-                const quotes: Quote[] = column.quoteIds.map(
-                  (quoteId: Id): Quote => entities.quotes[quoteId]
-                );
-                return (
-                  <Column
-                    key={column.id}
-                    column={entities.columns[columnId]}
-                    quotes={quotes}
-                    index={index}
-                  />
-                );
-              })}
+              {entities.columnOrder
+                .slice(0, numberOfColumns)
+                .map((columnId: Id, index: number) => {
+                  const column: ColumnType = entities.columns[columnId];
+                  // Get the items for this column
+                  const quotes: Quote[] = column.quoteIds.map(
+                    (quoteId: Id): Quote => entities.quotes[quoteId],
+                  );
+                  return (
+                    <Column
+                      key={column.id}
+                      column={entities.columns[columnId]}
+                      quotes={quotes}
+                      index={index}
+                    />
+                  );
+                })}
               {provided.placeholder}
             </Container>
           )}
