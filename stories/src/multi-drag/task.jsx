@@ -1,9 +1,9 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Draggable } from '../../../src/';
+import { Draggable } from '../../../src';
 import { grid, colors, borderRadius } from '../constants';
-import type { DraggableProvided, DraggableStateSnapshot } from '../../../src/';
+import type { DraggableProvided, DraggableStateSnapshot } from '../../../src';
 import type { Id, Task as TaskType } from '../types';
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button

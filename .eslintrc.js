@@ -28,8 +28,6 @@ module.exports = {
 
     // New eslint style rules that is not disabled by prettier:
     'lines-between-class-members': 'off',
-    'declaration-colon-newline-after': 'off',
-    'no-extra-semicolons': 'off', // often needed in styled-components
 
     // Allowing warning and error console logging
     'no-console': ['error', { allow: ['warn', 'error'] }],

@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { borderRadius, colors, grid } from '../constants';
 import type { Quote } from '../types';
-import type { DraggableProvided } from '../../../src/';
+import type { DraggableProvided } from '../../../src';
 
 type Props = {
   quote: Quote,
