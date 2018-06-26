@@ -20,6 +20,7 @@ export default class Droppable extends Component<Props> {
   /* eslint-disable react/sort-comp */
   styleContext: string
   ref: ?HTMLElement = null
+  isPlaceholderMounted: boolean = false;
 
   // Need to declare childContextTypes without flow
   static contextTypes = {
@@ -49,9 +50,43 @@ export default class Droppable extends Component<Props> {
 
   componentDidMount() {
     throwIfRefIsInvalid(this.ref);
+    this.warnIfPlaceholderNotMounted();
+  }
+
+  componentDidUpdate() {
+    this.warnIfPlaceholderNotMounted();
+  }
+
+  warnIfPlaceholderNotMounted() {
+    if (process.env.NODE_ENV === 'production') {
+      return;
+    }
+
+    if (!this.props.placeholder) {
+      return;
+    }
+
+    if (this.isPlaceholderMounted) {
+      return;
+    }
+
+    console.warn(`
+      Droppable setup issue: DroppableProvided > placeholder could not be found.
+      Please be sure to add the {provided.placeholder} Node as a child of your Droppable
+
+      More information: https://github.com/atlassian/react-beautiful-dnd#1-provided-droppableprovided
+    `);
   }
 
   /* eslint-enable */
+
+  onPlaceholderMount = () => {
+    this.isPlaceholderMounted = true;
+  }
+
+  onPlaceholderUnmount = () => {
+    this.isPlaceholderMounted = false;
+  }
 
   // React calls ref callback twice for every render
   // https://github.com/facebook/react/pull/8333/files
@@ -76,7 +111,13 @@ export default class Droppable extends Component<Props> {
       return null;
     }
 
-    return <Placeholder placeholder={this.props.placeholder} />;
+    return (
+      <Placeholder
+        placeholder={this.props.placeholder}
+        onMount={this.onPlaceholderMount}
+        onUnmount={this.onPlaceholderUnmount}
+      />
+    );
   }
 
   render() {

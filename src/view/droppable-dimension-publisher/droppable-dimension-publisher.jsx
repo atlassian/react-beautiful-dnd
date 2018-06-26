@@ -39,12 +39,40 @@ const getScroll = (el: Element): Position => ({
   y: el.scrollTop,
 });
 
+// We currently do not support nested scroll containers
+// But will hopefully support this soon!
+const checkForNestedScrollContainers = (scrollable: ?Element) => {
+  if (process.env.NODE_ENV === 'production') {
+    return;
+  }
+
+  if (!scrollable) {
+    return;
+  }
+
+  const anotherScrollParent: ?Element = getClosestScrollable(scrollable.parentElement);
+
+  if (!anotherScrollParent) {
+    return;
+  }
+
+  console.warn(`
+    Droppable: unsupported nested scroll container detected.
+    A Droppable can only have one scroll parent (which can be itself)
+    Nested scroll containers are currently not supported.
+
+    We hope to support nested scroll containers soon: https://github.com/atlassian/react-beautiful-dnd/issues/131
+  `);
+};
+
+type WatchingScroll = {|
+  closestScrollable: Element,
+  options: ScrollOptions,
+|}
+
 export default class DroppableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
-  closestScrollable: ?Element = null;
-  isWatchingScroll: boolean = false;
-  isDragOccurring: boolean = false;
-  scrollOptions: ?ScrollOptions = null;
+  watchingScroll: ?WatchingScroll = null;
   callbacks: DroppableCallbacks;
   publishedDescriptor: ?DroppableDescriptor = null;
 
@@ -63,11 +91,11 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   };
 
   getClosestScroll = (): Position => {
-    if (!this.closestScrollable) {
+    if (!this.watchingScroll) {
       return origin;
     }
 
-    return getScroll(this.closestScrollable);
+    return getScroll(this.watchingScroll.closestScrollable);
   }
 
   memoizedUpdateScroll = memoizeOne((x: number, y: number) => {
@@ -86,8 +114,9 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   scheduleScrollUpdate = rafSchedule(this.updateScroll);
 
   onClosestScroll = () => {
-    invariant(this.scrollOptions, 'Could not find scroll options while scrolling');
-    if (this.scrollOptions.shouldPublishImmediately) {
+    invariant(this.watchingScroll, 'Could not find scroll options while scrolling');
+    const options: ScrollOptions = this.watchingScroll.options;
+    if (options.shouldPublishImmediately) {
       this.updateScroll();
       return;
     }
@@ -95,56 +124,40 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   }
 
   scroll = (change: Position) => {
-    invariant(this.closestScrollable, 'Cannot scroll a droppable with no closest scrollable');
-    invariant(this.isWatchingScroll, 'Updating Droppable scroll while not watching for updates');
-
-    this.closestScrollable.scrollTop += change.y;
-    this.closestScrollable.scrollLeft += change.x;
+    invariant(this.watchingScroll, 'Cannot scroll a droppable with no closest scrollable');
+    const { closestScrollable } = this.watchingScroll;
+    closestScrollable.scrollTop += change.y;
+    closestScrollable.scrollLeft += change.x;
   }
 
-  watchScroll = (scrollableRef: ?Element, options: ScrollOptions) => {
-    // Not watching the scroll yet
-    if (!this.isWatchingScroll) {
-      this.isWatchingScroll = true;
-      this.scrollOptions = options;
-      this.closestScrollable = scrollableRef;
+  watchScroll = (closestScrollable: ?Element, options: ScrollOptions) => {
+    invariant(!this.watchingScroll, 'Droppable cannot watch scroll as it is already watching scroll');
 
-      // No scrollable ref - no need to bind an event
-      if (!this.closestScrollable) {
-        return;
-      }
-
-      this.closestScrollable.addEventListener('scroll', this.onClosestScroll, { passive: true });
+    if (!closestScrollable) {
       return;
     }
 
-    // Already watching the scroll
-    invariant(scrollableRef === this.closestScrollable,
-      'Cannot change a Droppables closest scrollable during a drag');
+    this.watchingScroll = {
+      options,
+      closestScrollable,
+    };
 
-    invariant(options === this.scrollOptions,
-      'Cannot change a Droppables scroll options during a drag');
-  };
+    closestScrollable.addEventListener('scroll', this.onClosestScroll, { passive: true });
+  }
 
   unwatchScroll = () => {
+    // Was not previously watching scroll.
     // It is possible for a Droppable to be asked to unwatch a scroll
     // (Eg it has not been collected yet, and the drag ends)
-    if (!this.isWatchingScroll) {
+    const watching: ?WatchingScroll = this.watchingScroll;
+
+    if (!watching) {
       return;
     }
 
-    this.isWatchingScroll = false;
-    this.scrollOptions = null;
     this.scheduleScrollUpdate.cancel();
-
-    // There was no closest scrollable
-    if (!this.closestScrollable) {
-      return;
-    }
-
-    // There was a closest scrollable
-    this.closestScrollable.removeEventListener('scroll', this.onClosestScroll);
-    this.closestScrollable = null;
+    watching.closestScrollable.removeEventListener('scroll', this.onClosestScroll);
+    this.watchingScroll = null;
   }
 
   componentDidMount() {
@@ -172,8 +185,10 @@ export default class DroppableDimensionPublisher extends Component<Props> {
   }
 
   componentWillUnmount() {
-    if (this.isWatchingScroll) {
-      console.warn('Unmounting droppable while it was watching scroll');
+    if (this.watchingScroll) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('Unmounting droppable while it was watching scroll');
+      }
       this.unwatchScroll();
     }
 
@@ -238,6 +253,9 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     invariant(descriptor, 'Cannot get dimension for unpublished droppable');
 
     const scrollableRef: ?Element = getClosestScrollable(targetRef);
+
+    // print a debug warning if using an unsupported nested scroll container setup
+    checkForNestedScrollContainers(scrollableRef);
 
     // Side effect: watch scroll
     // TODO: check that reducer can handle a scroll update before an initial publish
