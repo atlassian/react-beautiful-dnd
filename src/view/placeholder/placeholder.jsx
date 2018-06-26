@@ -56,9 +56,6 @@ export default class Placeholder extends PureComponent<Props> {
       pointerEvents: 'none',
     };
 
-    return React.createElement(tagName, {
-      style,
-      ref: this.setRef,
-    });
+    return React.createElement(tagName, { style });
   }
 }
