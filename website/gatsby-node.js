@@ -113,7 +113,7 @@ const addRaw = (node, createNodeField) => {
 };
 
 exports.onCreateNode = (
-  { node, boundActionCreators, getNode } /* : NodeParams */
+  { node, boundActionCreators, getNode } /* : NodeParams */,
 ) => {
   const { createNodeField } = boundActionCreators;
   if (node.internal.type === 'MarkdownRemark') {
@@ -142,15 +142,15 @@ exports.createPages = ({ graphql, boundActionCreators } /* : NodeParams */) => {
               }
             }
           }
-        `
-      ).then((result) => {
+        `,
+      ).then(result => {
         if (result.errors) {
           /* eslint-disable-next-line no-console */
           console.log(result.errors);
           reject(result.errors);
         }
 
-        result.data.allMarkdownRemark.edges.forEach((edge) => {
+        result.data.allMarkdownRemark.edges.forEach(edge => {
           createPage({
             path: edge.node.fields.slug,
             component: markdownPage,
@@ -161,17 +161,17 @@ exports.createPages = ({ graphql, boundActionCreators } /* : NodeParams */) => {
             },
           });
         });
-      })
+      }),
     );
   });
 };
 
 exports.onCreatePage = async (
-  { page, boundActionCreators } /* : PageParams  */
+  { page, boundActionCreators } /* : PageParams  */,
 ) => {
   const { createPage } = boundActionCreators;
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     if (page.path === '/') {
       page.layout = 'landing';
       // Update the page.
