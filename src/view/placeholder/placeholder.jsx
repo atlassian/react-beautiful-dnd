@@ -5,28 +5,21 @@ import type { PlaceholderStyle } from './placeholder-types';
 
 type Props = {|
   placeholder: PlaceholderType,
+  onMount?: () => void,
+  onUnmount?: () => void,
 |}
 
 export default class Placeholder extends PureComponent<Props> {
-  // eslint-disable-next-line react/sort-comp
-  ref: ?HTMLElement = null
-
-  show = () => {
-    if (!this.ref) {
-      return;
+  componentDidMount() {
+    if (this.props.onMount) {
+      this.props.onMount();
     }
-    this.ref.style.display = this.props.placeholder.display;
   }
 
-  hide = () => {
-    if (!this.ref) {
-      return;
+  componentWillUnmount() {
+    if (this.props.onUnmount) {
+      this.props.onUnmount();
     }
-    this.ref.style.display = 'none';
-  }
-
-  setRef = (ref: ?HTMLElement) => {
-    this.ref = ref;
   }
 
   render() {
@@ -63,9 +56,6 @@ export default class Placeholder extends PureComponent<Props> {
       pointerEvents: 'none',
     };
 
-    return React.createElement(tagName, {
-      style,
-      ref: this.setRef,
-    });
+    return React.createElement(tagName, { style });
   }
 }
