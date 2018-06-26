@@ -848,7 +848,7 @@ describe('Draggable - unconnected', () => {
           left: dimension.client.marginBox.left,
           pointerEvents: 'none',
           transition: 'none',
-          transform: null,
+          transform: `translate(${draggingMapProps.offset.x}px, ${draggingMapProps.offset.y}px)`,
           zIndex: zIndexOptions.dragging,
         };
 

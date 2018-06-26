@@ -117,9 +117,8 @@ export default ({
     const pending: ?Position = state.pending;
 
     if (!pending) {
-      console.error('cannot start a touch drag without a pending position');
       kill();
-      return;
+      invariant(false, 'cannot start a touch drag without a pending position');
     }
 
     setState({

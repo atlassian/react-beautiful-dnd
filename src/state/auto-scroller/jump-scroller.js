@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import { add, subtract } from '../position';
 import {
@@ -93,10 +94,7 @@ export default ({
 
     const destination: ?DraggableLocation = state.impact.destination;
 
-    if (!destination) {
-      console.error('Cannot perform a jump scroll when there is no destination');
-      return;
-    }
+    invariant(destination, 'Cannot perform a jump scroll when there is no destination');
 
     // 1. We scroll the droppable first if we can to avoid the draggable
     // leaving the list

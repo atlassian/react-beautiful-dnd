@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import memoizeOne from 'memoize-one';
 import { storeKey } from '../context-keys';
 import Droppable from './droppable';
+import isStrictEqual from '../is-strict-equal';
 import type {
   State,
   DroppableId,
@@ -102,10 +103,24 @@ export const makeMapStateToProps = (): Selector => {
 // that `connect` provides.
 // It avoids needing to do it own within `Droppable`
 const connectedDroppable: OwnProps => Node = (connect(
+  // returning a function so each component can do its own memoization
   makeMapStateToProps,
+  // mapDispatchToProps - not using
   null,
+  // mergeProps - using default
   null,
-  { storeKey },
+  {
+    // Using our own store key.
+    // This allows consumers to also use redux
+    // Note: the default store key is 'store'
+    storeKey,
+    // Default value, but being really clear
+    pure: true,
+    // When pure, compares the result of mapStateToProps to its previous value.
+    // Default value: shallowEqual
+    // Switching to a strictEqual as we return a memoized object on changes
+    areStatePropsEqual: isStrictEqual,
+  },
 ): any)(Droppable);
 
 connectedDroppable.defaultProps = ({

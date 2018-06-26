@@ -78,10 +78,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
   }
 
   unpublish = () => {
-    if (!this.publishedDescriptor) {
-      console.error('cannot unpublish descriptor when none is published');
-      return;
-    }
+    invariant(this.publishedDescriptor, 'Cannot unpublish descriptor when none is published')
 
     // Using the previously published id to unpublish. This is to guard
     // against the case where the id dynamically changes. This is not
