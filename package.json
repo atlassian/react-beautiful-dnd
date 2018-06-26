@@ -26,8 +26,9 @@
   ],
   "scripts": {
     "test": "jest --config ./jest.config.js",
-    "validate": "yarn lint:prettier lint:eslint && yarn lint:css && yarn typecheck",
-    "lint:prettier": "yarn prettier --debug-check src/**/*.{js,jsx} test/**/*.{js,jsx} stories/**/*.{js,jsx} website/src/**/*.{js,jsx}",
+    "validate": "yarn prettier:check lint:eslint && yarn lint:css && yarn typecheck",
+    "prettier:check": "yarn prettier --debug-check src/**/*.{js,jsx} test/**/*.{js,jsx} stories/**/*.{js,jsx} website/src/**/*.{js,jsx}",
+    "prettier:write": "yarn prettier --write src/**/*.{js,jsx} test/**/*.{js,jsx} stories/**/*.{js,jsx} website/src/**/*.{js,jsx}",
     "lint:eslint": "yarn eslint .",
     "lint:css": "stylelint \"stories/**/*.{js,jsx}\"",
     "typecheck": "flow check",
