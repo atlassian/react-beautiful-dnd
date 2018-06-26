@@ -1,6 +1,6 @@
 // @flow
 import { type Position } from 'css-box-model';
-import getDragImpact from '../../../src/state/get-drag-impact/';
+import getDragImpact from '../../../src/state/get-drag-impact';
 import noImpact from '../../../src/state/no-impact';
 import { add, patch, subtract } from '../../../src/state/position';
 import { vertical, horizontal } from '../../../src/state/axis';

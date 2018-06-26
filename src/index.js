@@ -2,13 +2,13 @@
 
 // Components
 
-export { default as DragDropContext } from './view/drag-drop-context/';
-export { default as Droppable } from './view/droppable/';
-export { default as Draggable } from './view/draggable/';
+export { default as DragDropContext } from './view/drag-drop-context';
+export { default as Droppable } from './view/droppable';
+export { default as Draggable } from './view/draggable';
 
 // Utils
 
-export { resetServerContext } from './view/drag-drop-context/';
+export { resetServerContext } from './view/drag-drop-context';
 
 // Public flow types
 

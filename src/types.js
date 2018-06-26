@@ -1,7 +1,5 @@
 // @flow
-import type { Store as ReduxStore, Dispatch as ReduxDispatch } from 'redux';
 import type { BoxModel, Rect, Position } from 'css-box-model';
-import type { Action as ActionCreators } from './state/action-creators';
 
 export type Id = string;
 export type DraggableId = Id;
@@ -310,10 +308,6 @@ export type State =
   | CollectingState
   | DropPendingState
   | DropAnimatingState;
-
-export type Action = ActionCreators;
-export type Dispatch = ReduxDispatch<Action>;
-export type Store = ReduxStore<State, Action, Dispatch>;
 
 export type Announce = (message: string) => void;
 

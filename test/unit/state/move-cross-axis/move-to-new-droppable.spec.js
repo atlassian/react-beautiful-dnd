@@ -1,6 +1,6 @@
 // @flow
 import { type Position } from 'css-box-model';
-import moveToNewDroppable from '../../../../src/state/move-cross-axis/move-to-new-droppable/';
+import moveToNewDroppable from '../../../../src/state/move-cross-axis/move-to-new-droppable';
 import type { Result } from '../../../../src/state/move-cross-axis/move-cross-axis-types';
 import { scrollDroppable } from '../../../../src/state/droppable-dimension';
 import moveToEdge from '../../../../src/state/move-to-edge';

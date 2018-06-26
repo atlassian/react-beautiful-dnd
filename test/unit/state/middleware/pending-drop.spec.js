@@ -1,6 +1,7 @@
 // @flow
 import invariant from 'tiny-invariant';
-import type { Store, State, DropResult } from '../../../../src/types';
+import type { State, DropResult } from '../../../../src/types';
+import type { Store } from '../../../../src/state/store-types';
 import middleware from '../../../../src/state/middleware/pending-drop';
 import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';

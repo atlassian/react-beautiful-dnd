@@ -1,7 +1,8 @@
 // @flow
 import invariant from 'tiny-invariant';
 import { completeDrop } from '../action-creators';
-import type { Store, State, Action } from '../../types';
+import type { State } from '../../types';
+import type { Store, Action } from '../store-types';
 
 export default (store: Store) => (next: Action => mixed) => (
   action: Action,

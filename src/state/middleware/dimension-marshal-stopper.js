@@ -1,5 +1,5 @@
 // @flow
-import type { Action } from '../../types';
+import type { Action } from '../store-types';
 import type { DimensionMarshal } from '../dimension-marshal/dimension-marshal-types';
 
 export default (getMarshal: () => DimensionMarshal) => () => (

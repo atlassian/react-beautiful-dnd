@@ -8,7 +8,7 @@ import Draggable, {
 } from '../../../src/view/draggable/draggable';
 import DragHandle from '../../../src/view/drag-handle/drag-handle';
 import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
-import Moveable from '../../../src/view/moveable/';
+import Moveable from '../../../src/view/moveable';
 import Placeholder from '../../../src/view/placeholder';
 import type { PlaceholderStyle } from '../../../src/view/placeholder/placeholder-types';
 import { subtract } from '../../../src/state/position';

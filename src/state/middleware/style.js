@@ -1,5 +1,5 @@
 // @flow
-import type { Action } from '../../types';
+import type { Action } from '../store-types';
 import type { StyleMarshal } from '../../view/style-marshal/style-marshal-types';
 
 export default (marshal: StyleMarshal) => () => (next: Action => mixed) => (

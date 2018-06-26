@@ -1,6 +1,6 @@
 // @flow
 import { getRect, type Position } from 'css-box-model';
-import moveToNextIndex from '../../../src/state/move-to-next-index/';
+import moveToNextIndex from '../../../src/state/move-to-next-index';
 import type { Result } from '../../../src/state/move-to-next-index/move-to-next-index-types';
 import { scrollDroppable } from '../../../src/state/droppable-dimension';
 import {

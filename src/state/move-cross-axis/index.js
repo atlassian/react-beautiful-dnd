@@ -2,7 +2,7 @@
 import { type Position } from 'css-box-model';
 import getBestCrossAxisDroppable from './get-best-cross-axis-droppable';
 import getClosestDraggable from './get-closest-draggable';
-import moveToNewDroppable from './move-to-new-droppable/';
+import moveToNewDroppable from './move-to-new-droppable';
 import noImpact from '../no-impact';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import type { Result } from './move-cross-axis-types';

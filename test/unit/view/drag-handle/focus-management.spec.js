@@ -147,9 +147,9 @@ describe('Portal usage (ref changing while mounted)', () => {
 
 describe('Focus retention moving between lists (focus retention between mounts)', () => {
   type WithParentRefProps = {|
-    draggableId: string,
-    isDragging: boolean,
-    isDropAnimating: boolean,
+    draggableId?: string,
+    isDragging?: boolean,
+    isDropAnimating?: boolean,
   |};
   class WithParentRef extends React.Component<WithParentRefProps> {
     // eslint-disable-next-line react/sort-comp
@@ -168,10 +168,10 @@ describe('Focus retention moving between lists (focus retention between mounts)'
     render() {
       return (
         <DragHandle
-          draggableId={this.props.draggableId}
+          draggableId={this.props.draggableId || 'draggable'}
           callbacks={getStubCallbacks()}
-          isDragging={this.props.isDragging}
-          isDropAnimating={this.props.isDropAnimating}
+          isDragging={this.props.isDragging || false}
+          isDropAnimating={this.props.isDropAnimating || false}
           isEnabled
           getDraggableRef={() => this.ref}
           canDragInteractiveElements={false}
@@ -349,6 +349,7 @@ describe('Focus retention moving between lists (focus retention between mounts)'
   });
 
   it('should not give focus if something else on the page has been focused on after unmount', () => {
+    // eslint-disable-next-line react/button-has-type
     const button: HTMLElement = document.createElement('button');
     body.appendChild(button);
     const first: ReactWrapper = mount(

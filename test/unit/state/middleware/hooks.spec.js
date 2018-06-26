@@ -25,7 +25,6 @@ import {
 } from '../../../utils/preset-action-args';
 import type {
   DraggableLocation,
-  Store,
   Hooks,
   State,
   Announce,
@@ -35,6 +34,7 @@ import type {
   Publish,
   DragStart,
 } from '../../../../src/types';
+import type { Store } from '../../../../src/state/store-types';
 
 const preset = getPreset();
 

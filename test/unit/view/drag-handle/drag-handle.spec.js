@@ -49,6 +49,10 @@ type ChildProps = {|
 |};
 
 class Child extends Component<ChildProps> {
+  static defaultProps = {
+    className: 'unused-child-class-name',
+    children: null,
+  };
   render() {
     return (
       <div {...this.props.dragHandleProps} className={this.props.className}>
@@ -235,8 +239,8 @@ describe('drag handle', () => {
       { context: basicContext },
     );
 
-    // $ExpectError - using lots of accessors
     expect(
+      // $ExpectError - using lots of accessors
       myMock.mock.calls[0][0]['data-react-beautiful-dnd-drag-handle'],
     ).toEqual(basicContext[styleContextKey]);
   });

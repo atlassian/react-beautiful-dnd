@@ -1,6 +1,6 @@
 // @flow
 /* eslint-disable no-console */
-import type { Store, Action } from '../../types';
+import type { Store, Action } from '../store-types';
 
 export default (store: Store) => (next: Action => mixed) => (
   action: Action,

@@ -11,8 +11,8 @@ import {
   Draggable,
   DragDropContext,
   resetServerContext,
-} from '../../../src/';
-import type { DraggableProvided, DroppableProvided } from '../../../src/';
+} from '../../../src';
+import type { DraggableProvided, DroppableProvided } from '../../../src';
 import { storeKey, canLiftContextKey } from '../../../src/view/context-keys';
 // Imported as wildcard so we can mock `resetStyleContext` using spyOn
 import * as StyleMarshal from '../../../src/view/style-marshal/style-marshal';

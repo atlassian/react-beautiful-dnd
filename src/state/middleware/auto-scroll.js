@@ -1,6 +1,7 @@
 // @flow
 import type { AutoScroller } from '../auto-scroller/auto-scroller-types';
-import type { Store, State, Action } from '../../types';
+import type { State } from '../../types';
+import type { Store, Action } from '../store-types';
 
 export default (getScroller: () => AutoScroller) => (store: Store) => (
   next: Action => mixed,

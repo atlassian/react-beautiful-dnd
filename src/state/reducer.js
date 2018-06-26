@@ -2,16 +2,15 @@
 import type { Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import { scrollDroppable } from './droppable-dimension';
-import getDragImpact from './get-drag-impact/';
-import moveCrossAxis from './move-cross-axis/';
-import moveToNextIndex from './move-to-next-index/';
+import getDragImpact from './get-drag-impact';
+import moveCrossAxis from './move-cross-axis';
+import moveToNextIndex from './move-to-next-index';
 import publish from './publish';
 import { add, isEqual, subtract } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
 import getPageItemPositions from './get-page-item-positions';
 import type {
-  Action,
   State,
   DroppableDimension,
   DraggableLocation,
@@ -30,6 +29,7 @@ import type {
   DropReason,
   Direction,
 } from '../types';
+import type { Action } from './store-types';
 import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
 import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';
 

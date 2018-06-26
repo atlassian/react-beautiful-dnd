@@ -3,10 +3,8 @@ import invariant from 'tiny-invariant';
 import messagePreset from './util/message-preset';
 import * as timings from '../../debug/timings';
 import type {
-  Store,
   State,
   DropResult,
-  Action,
   Hooks,
   HookProvided,
   Critical,
@@ -18,6 +16,7 @@ import type {
   OnDragUpdateHook,
   OnDragEndHook,
 } from '../../types';
+import type { Store, Action } from '../store-types';
 
 type AnyHookFn = OnDragStartHook | OnDragUpdateHook | OnDragEndHook;
 type AnyHookData = DragStart | DragUpdate | DropResult;

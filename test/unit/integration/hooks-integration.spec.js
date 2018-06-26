@@ -2,7 +2,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import { getRect, type Rect, type Position } from 'css-box-model';
-import { DragDropContext, Draggable, Droppable } from '../../../src/';
+import { DragDropContext, Draggable, Droppable } from '../../../src';
 import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
 import {
   dispatchWindowMouseEvent,

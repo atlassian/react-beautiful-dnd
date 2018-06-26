@@ -1,6 +1,6 @@
 // @flow
 /* eslint-disable no-console */
-import type { Action } from '../../types';
+import type { Action } from '../store-types';
 
 type Bucket = {
   [key: string]: number[],

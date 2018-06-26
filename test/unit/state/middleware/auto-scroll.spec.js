@@ -1,5 +1,5 @@
 // @flow
-import type { Action, Store } from '../../../../src/types';
+import type { Action, Store } from '../../../../src/state/store-types';
 import type { AutoScroller } from '../../../../src/state/auto-scroller/auto-scroller-types';
 import createStore from './util/create-store';
 import middleware from '../../../../src/state/middleware/auto-scroll';

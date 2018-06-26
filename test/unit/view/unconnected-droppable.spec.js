@@ -4,7 +4,7 @@ import { mount } from 'enzyme';
 // eslint-disable-next-line no-duplicate-imports
 import type { ReactWrapper } from 'enzyme';
 import Droppable from '../../../src/view/droppable/droppable';
-import Placeholder from '../../../src/view/placeholder/';
+import Placeholder from '../../../src/view/placeholder';
 import {
   withStore,
   combine,

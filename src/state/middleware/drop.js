@@ -12,9 +12,7 @@ import getNewHomeClientBorderBoxCenter from '../get-new-home-client-border-box-c
 import { add, subtract, isEqual } from '../position';
 import withDroppableDisplacement from '../with-droppable-displacement';
 import type {
-  Store,
   State,
-  Action,
   DropReason,
   DroppableDimension,
   Viewport,
@@ -26,6 +24,7 @@ import type {
   DimensionMap,
   DraggableDimension,
 } from '../../types';
+import type { Store, Action } from '../store-types';
 
 const origin: Position = { x: 0, y: 0 };
 

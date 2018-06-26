@@ -18,7 +18,8 @@ import type {
   DimensionMarshal,
   Callbacks as DimensionMarshalCallbacks,
 } from '../../state/dimension-marshal/dimension-marshal-types';
-import type { DraggableId, Store, State, Hooks } from '../../types';
+import type { DraggableId, State, Hooks } from '../../types';
+import type { Store } from '../../state/store-types';
 import {
   storeKey,
   dimensionMarshalKey,
@@ -165,17 +166,6 @@ export default class DragDropContext extends React.Component<Props> {
     throw error;
   }
 
-  onWindowError = (error: Error) => {
-    const state: State = this.store.getState();
-
-    if (state.phase === 'IDLE') {
-      return;
-    }
-
-    printFatalDevError(error);
-    this.store.dispatch(clean());
-  };
-
   componentWillUnmount() {
     window.addEventListener('error', this.onWindowError);
 
@@ -187,6 +177,17 @@ export default class DragDropContext extends React.Component<Props> {
     this.styleMarshal.unmount();
     this.announcer.unmount();
   }
+
+  onWindowError = (error: Error) => {
+    const state: State = this.store.getState();
+
+    if (state.phase === 'IDLE') {
+      return;
+    }
+
+    printFatalDevError(error);
+    this.store.dispatch(clean());
+  };
 
   render() {
     return this.props.children;

@@ -1,6 +1,7 @@
 // @flow
 import { drop } from '../action-creators';
-import type { Store, State, Action } from '../../types';
+import type { State } from '../../types';
+import type { Store, Action } from '../store-types';
 
 export default (store: Store) => (next: Action => mixed) => (
   action: Action,

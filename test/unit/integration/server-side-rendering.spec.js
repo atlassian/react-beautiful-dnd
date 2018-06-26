@@ -9,7 +9,7 @@ import {
   Droppable,
   Draggable,
   resetServerContext,
-} from '../../../src/';
+} from '../../../src';
 import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';
 import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';
 

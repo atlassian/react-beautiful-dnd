@@ -1,7 +1,7 @@
 // @flow
 import middleware from '../../../../src/state/middleware/style';
 import type { StyleMarshal } from '../../../../src/view/style-marshal/style-marshal-types';
-import type { Store } from '../../../../src/types';
+import type { Store } from '../../../../src/state/store-types';
 import createStore from './util/create-store';
 import {
   initialPublish,

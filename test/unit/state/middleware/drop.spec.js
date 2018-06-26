@@ -29,7 +29,6 @@ import {
 import noImpact, { noMovement } from '../../../../src/state/no-impact';
 import { vertical } from '../../../../src/state/axis';
 import type {
-  Store,
   State,
   DropResult,
   PendingDrop,
@@ -38,6 +37,7 @@ import type {
   DroppableDimension,
   Axis,
 } from '../../../../src/types';
+import type { Store } from '../../../../src/state/store-types';
 
 const axis: Axis = vertical;
 const preset = getPreset(vertical);

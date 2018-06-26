@@ -2,13 +2,8 @@
 import invariant from 'tiny-invariant';
 import { prepare, completeDrop, initialPublish } from '../action-creators';
 import type { DimensionMarshal } from '../dimension-marshal/dimension-marshal-types';
-import type {
-  Store,
-  Action,
-  State,
-  ScrollOptions,
-  LiftRequest,
-} from '../../types';
+import type { State, ScrollOptions, LiftRequest } from '../../types';
+import type { Store, Action } from '../store-types';
 
 export default (getMarshal: () => DimensionMarshal) => {
   let timeoutId: ?TimeoutID = null;

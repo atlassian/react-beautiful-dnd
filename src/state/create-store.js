@@ -12,8 +12,9 @@ import autoScroll from './middleware/auto-scroll';
 import pendingDrop from './middleware/pending-drop';
 import type { DimensionMarshal } from './dimension-marshal/dimension-marshal-types';
 import type { StyleMarshal } from '../view/style-marshal/style-marshal-types';
-import type { AutoScroller } from '../state/auto-scroller/auto-scroller-types';
-import type { Store, Hooks, Announce } from '../types';
+import type { AutoScroller } from './auto-scroller/auto-scroller-types';
+import type { Hooks, Announce } from '../types';
+import type { Store } from './store-types';
 
 // We are checking if window is available before using it.
 // This is needed for universal apps that render the component server side.

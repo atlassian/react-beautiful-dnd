@@ -2,7 +2,7 @@
 import React from 'react';
 import { type Position } from 'css-box-model';
 import { mount } from 'enzyme';
-import Moveable from '../../../src/view/moveable/';
+import Moveable from '../../../src/view/moveable';
 import type { Speed } from '../../../src/view/moveable/moveable-types';
 
 let wrapper;
