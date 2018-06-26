@@ -12,6 +12,13 @@ Beautiful, accessible drag and drop for lists with [`React.js`](https://facebook
 
 See how beautiful it is for yourself!
 
+## Read this in other languages
+
+- [![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **한글/Korean**](https://github.com/LeeHyungGeun/react-beautiful-dnd-kr)
+
+- [![china](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/China.png) **中文/Chinese**](https://github.com/chinanf-boy/react-beautiful-dnd-zh)
+
+
 ### Viewing on a desktop
 
 [All the examples!](https://react-beautiful-dnd.netlify.com)
@@ -1440,14 +1447,6 @@ This library supports the standard [Atlassian supported browsers](https://conflu
 | Chrome (Android and iOS)            | Latest stable version supported                      |
 | Mobile Safari (iOS)                 | Latest stable version supported                      |
 | Android (Android)                   | The default browser on Android 4.0.3 (Ice Cream Sandwich) |
-
-## Translations
-
-The documentation for this library is also available in other languages:
-
-- ![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **Korean**: [leehyunggeun/react-beautiful-dnd](https://github.com/LeeHyungGeun/react-beautiful-dnd-kr)
-
-These translations are maintained by the community and are not reviewed or maintained by the maintainers of this library. Please raise issues on the respective translations if you would like to have them updated.
 
 ## Author
 
