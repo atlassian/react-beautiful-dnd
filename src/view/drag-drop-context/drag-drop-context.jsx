@@ -18,7 +18,7 @@ import type {
   DimensionMarshal,
   Callbacks as DimensionMarshalCallbacks,
 } from '../../state/dimension-marshal/dimension-marshal-types';
-import type { DraggableId, Store, State, Hooks, Viewport } from '../../types';
+import type { DraggableId, Store, State, Hooks } from '../../types';
 import {
   storeKey,
   dimensionMarshalKey,
