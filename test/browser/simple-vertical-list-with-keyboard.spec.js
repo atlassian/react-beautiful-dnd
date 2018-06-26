@@ -11,6 +11,7 @@ const urlSingleList: string = 'http://localhost:9002/iframe.html?selectedKind=si
 const timeout: number = 60000;
 
 /* To avoid async callback from jest.setTimeout */
+/* Background: https://stackoverflow.com/questions/49603939/jest-async-callback-was-not-invoked-within-the-5000ms-timeout-specified-by-jest */
 jest.setTimeout(timeout);
 
 type Selector = string;
