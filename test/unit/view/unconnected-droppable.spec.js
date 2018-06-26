@@ -22,16 +22,18 @@ import type {
 const getStubber = (mock: Function) =>
   class Stubber extends Component<{provided: Provided, snapshot: StateSnapshot}> {
     render() {
+      const { provided, snapshot } = this.props;
       mock({
-        provided: this.props.provided,
-        snapshot: this.props.snapshot,
+        provided,
+        snapshot,
       });
       return (
         <div
-          ref={this.props.provided.innerRef}
-          {...this.props.provided.droppableProps}
+          ref={provided.innerRef}
+          {...provided.droppableProps}
         >
           Hey there
+          {provided.placeholder}
         </div>
       );
     }
@@ -147,6 +149,52 @@ describe('Droppable - unconnected', () => {
         expect(snapshot.draggingOverWith).toBe(null);
         expect(provided.placeholder).toBe(null);
       });
+    });
+  });
+
+  class WithConditionalPlaceholder extends Component<{| provided: Provided |}> {
+    render() {
+      return (
+        <div
+          ref={this.props.provided.innerRef}
+          {...this.props.provided.droppableProps}
+        >
+          Not rendering placeholder
+        </div>
+      );
+    }
+  }
+
+  describe('should log a warning if a placeholder is not mounted by a consumer', () => {
+    beforeEach(() => {
+      jest.spyOn(console, 'warn').mockImplementation(() => { });
+    });
+    afterEach(() => {
+      console.warn.mockRestore();
+    });
+
+    it('should log a warning when mounting', () => {
+      mountDroppable({
+        mapProps: isDraggingOverForeignMapProps,
+        WrappedComponent: WithConditionalPlaceholder,
+      });
+
+      expect(console.warn).toHaveBeenCalledWith(
+        expect.stringContaining('Droppable setup issue: DroppableProvided > placeholder could not be found.')
+      );
+    });
+
+    it('should log a warning when updating', () => {
+      const wrapper = mountDroppable({
+        mapProps: notDraggingOverMapProps,
+        WrappedComponent: WithConditionalPlaceholder,
+      });
+
+      wrapper.setProps(isDraggingOverForeignMapProps);
+
+      expect(console.warn).toHaveBeenCalledWith(
+        expect.stringContaining('Droppable setup issue: DroppableProvided > placeholder could not be found.')
+      );
     });
   });
 });
