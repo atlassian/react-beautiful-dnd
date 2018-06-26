@@ -10,10 +10,22 @@ if (typeof window !== 'undefined') {
   // overriding these properties in jsdom to allow them to be controlled
 
   Object.defineProperties(document.documentElement, {
-    clientWidth: { writable: true, value: document.documentElement.clientWidth },
-    clientHeight: { writable: true, value: document.documentElement.clientHeight },
-    scrollWidth: { writable: true, value: document.documentElement.scrollWidth },
-    scrollHeight: { writable: true, value: document.documentElement.scrollHeight },
+    clientWidth: {
+      writable: true,
+      value: document.documentElement.clientWidth,
+    },
+    clientHeight: {
+      writable: true,
+      value: document.documentElement.clientHeight,
+    },
+    scrollWidth: {
+      writable: true,
+      value: document.documentElement.scrollWidth,
+    },
+    scrollHeight: {
+      writable: true,
+      value: document.documentElement.scrollHeight,
+    },
   });
 }
 
@@ -29,4 +41,3 @@ const Enzyme = require('enzyme');
 const Adapter = require('enzyme-adapter-react-16');
 
 Enzyme.configure({ adapter: new Adapter() });
-

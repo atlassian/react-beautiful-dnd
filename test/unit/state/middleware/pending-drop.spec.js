@@ -6,8 +6,20 @@ import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';
 import dropMiddleware from '../../../../src/state/middleware/drop';
 import getHomeLocation from '../../../../src/state/get-home-location';
-import { prepare, initialPublish, drop, completeDrop, publish, collectionStarting } from '../../../../src/state/action-creators';
-import { initialPublishArgs, getDragStart, critical, publishAdditionArgs } from '../../../utils/preset-action-args';
+import {
+  prepare,
+  initialPublish,
+  drop,
+  completeDrop,
+  publish,
+  collectionStarting,
+} from '../../../../src/state/action-creators';
+import {
+  initialPublishArgs,
+  getDragStart,
+  critical,
+  publishAdditionArgs,
+} from '../../../utils/preset-action-args';
 
 it('should trigger a drop on a bulk replace if a drop pending is waiting', () => {
   const mock = jest.fn();
@@ -24,7 +36,10 @@ it('should trigger a drop on a bulk replace if a drop pending is waiting', () =>
   store.dispatch(drop({ reason: 'DROP' }));
 
   const postDrop: State = store.getState();
-  invariant(postDrop.phase === 'DROP_PENDING', `Incorrect phase : ${postDrop.phase}`);
+  invariant(
+    postDrop.phase === 'DROP_PENDING',
+    `Incorrect phase : ${postDrop.phase}`,
+  );
   expect(postDrop.isWaiting).toBe(true);
 
   // This will finish the drag

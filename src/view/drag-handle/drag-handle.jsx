@@ -5,19 +5,14 @@ import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import getWindowFromRef from '../get-window-from-ref';
 import getDragHandleRef from './util/get-drag-handle-ref';
-import type {
-  Props,
-  DragHandleProps,
-} from './drag-handle-types';
+import type { Props, DragHandleProps } from './drag-handle-types';
 import type {
   MouseSensor,
   KeyboardSensor,
   TouchSensor,
   CreateSensorArgs,
 } from './sensor/sensor-types';
-import type {
-  DraggableId,
-} from '../../types';
+import type { DraggableId } from '../../types';
 import { styleContextKey, canLiftContextKey } from '../context-keys';
 import focusRetainer from './util/focus-retainer';
 import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-target';
@@ -47,12 +42,13 @@ export default class DragHandle extends Component<Props> {
   static contextTypes = {
     [styleContextKey]: PropTypes.string.isRequired,
     [canLiftContextKey]: PropTypes.func.isRequired,
-  }
+  };
 
   constructor(props: Props, context: Object) {
     super(props, context);
 
-    const getWindow = (): HTMLElement => getWindowFromRef(this.props.getDraggableRef());
+    const getWindow = (): HTMLElement =>
+      getWindowFromRef(this.props.getDraggableRef());
 
     const args: CreateSensorArgs = {
       callbacks: this.props.callbacks,
@@ -64,11 +60,7 @@ export default class DragHandle extends Component<Props> {
     this.mouseSensor = createMouseSensor(args);
     this.keyboardSensor = createKeyboardSensor(args);
     this.touchSensor = createTouchSensor(args);
-    this.sensors = [
-      this.mouseSensor,
-      this.keyboardSensor,
-      this.touchSensor,
-    ];
+    this.sensors = [this.mouseSensor, this.keyboardSensor, this.touchSensor];
     this.styleContext = context[styleContextKey];
 
     // The canLift function is read directly off the context
@@ -130,7 +122,8 @@ export default class DragHandle extends Component<Props> {
       return;
     }
 
-    const isDragStopping: boolean = (prevProps.isDragging && !this.props.isDragging);
+    const isDragStopping: boolean =
+      prevProps.isDragging && !this.props.isDragging;
 
     // if the application cancels a drag we need to unbind the handlers
     if (isDragStopping) {
@@ -184,7 +177,7 @@ export default class DragHandle extends Component<Props> {
       }
 
       // a drag is finishing
-      return (this.props.isDragging || this.props.isDropAnimating);
+      return this.props.isDragging || this.props.isDropAnimating;
     })();
 
     if (shouldRetainFocus) {
@@ -194,11 +187,11 @@ export default class DragHandle extends Component<Props> {
 
   onFocus = () => {
     this.isFocused = true;
-  }
+  };
 
   onBlur = () => {
     this.isFocused = false;
-  }
+  };
 
   onKeyDown = (event: KeyboardEvent) => {
     // let the other sensors deal with it
@@ -207,7 +200,7 @@ export default class DragHandle extends Component<Props> {
     }
 
     this.keyboardSensor.onKeyDown(event);
-  }
+  };
 
   onMouseDown = (event: MouseEvent) => {
     // let the other sensors deal with it
@@ -216,7 +209,7 @@ export default class DragHandle extends Component<Props> {
     }
 
     this.mouseSensor.onMouseDown(event);
-  }
+  };
 
   onTouchStart = (event: TouchEvent) => {
     // let the keyboard sensor deal with it
@@ -225,7 +218,7 @@ export default class DragHandle extends Component<Props> {
     }
 
     this.touchSensor.onTouchStart(event);
-  }
+  };
 
   canStartCapturing = (event: Event) => {
     // this might be before a drag has started - isolated to this element
@@ -240,32 +233,34 @@ export default class DragHandle extends Component<Props> {
 
     // check if we are dragging an interactive element
     return shouldAllowDraggingFromTarget(event, this.props);
-  }
+  };
 
   isAnySensorCapturing = (): boolean =>
-    this.sensors.some((sensor: Sensor) => sensor.isCapturing())
+    this.sensors.some((sensor: Sensor) => sensor.isCapturing());
 
-  getProvided = memoizeOne((isEnabled: boolean): ?DragHandleProps => {
-    if (!isEnabled) {
-      return null;
-    }
+  getProvided = memoizeOne(
+    (isEnabled: boolean): ?DragHandleProps => {
+      if (!isEnabled) {
+        return null;
+      }
 
-    const provided: DragHandleProps = {
-      onMouseDown: this.onMouseDown,
-      onKeyDown: this.onKeyDown,
-      onTouchStart: this.onTouchStart,
-      onFocus: this.onFocus,
-      onBlur: this.onBlur,
-      tabIndex: 0,
-      'data-react-beautiful-dnd-drag-handle': this.styleContext,
-      // English default. Consumers are welcome to add their own start instruction
-      'aria-roledescription': 'Draggable item. Press space bar to lift',
-      draggable: false,
-      onDragStart: preventHtml5Dnd,
-    };
+      const provided: DragHandleProps = {
+        onMouseDown: this.onMouseDown,
+        onKeyDown: this.onKeyDown,
+        onTouchStart: this.onTouchStart,
+        onFocus: this.onFocus,
+        onBlur: this.onBlur,
+        tabIndex: 0,
+        'data-react-beautiful-dnd-drag-handle': this.styleContext,
+        // English default. Consumers are welcome to add their own start instruction
+        'aria-roledescription': 'Draggable item. Press space bar to lift',
+        draggable: false,
+        onDragStart: preventHtml5Dnd,
+      };
 
-    return provided;
-  })
+      return provided;
+    },
+  );
 
   render() {
     const { children, isEnabled } = this.props;

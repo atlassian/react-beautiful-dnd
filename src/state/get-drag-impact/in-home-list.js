@@ -23,7 +23,7 @@ type Args = {|
   insideHome: DraggableDimension[],
   previousImpact: DragImpact,
   viewport: Viewport,
-|}
+|};
 
 export default ({
   pageBorderBoxCenter,
@@ -39,7 +39,10 @@ export default ({
 
   // Where the element actually is now.
   // Need to take into account the change of scroll in the droppable
-  const currentCenter: Position = withDroppableScroll(home, pageBorderBoxCenter);
+  const currentCenter: Position = withDroppableScroll(
+    home,
+    pageBorderBoxCenter,
+  );
 
   // not considering margin so that items move based on visible edges
   const isBeyondStartPosition: boolean =
@@ -48,44 +51,54 @@ export default ({
   // TODO: if currentCenter === originalCenter can just abort
 
   // Amount to move needs to include the margins
-  const amount: Position = patch(axis.line, draggable.client.marginBox[axis.size]);
+  const amount: Position = patch(
+    axis.line,
+    draggable.client.marginBox[axis.size],
+  );
 
   const displaced: Displacement[] = insideHome
-    .filter((child: DraggableDimension): boolean => {
-      // do not want to move the item that is dragging
-      if (child === draggable) {
-        return false;
-      }
-
-      const borderBox: Rect = child.page.borderBox;
-
-      if (isBeyondStartPosition) {
-        // 1. item needs to start ahead of the moving item
-        // 2. the dragging item has moved over it
-        if (borderBox.center[axis.line] < originalCenter[axis.line]) {
+    .filter(
+      (child: DraggableDimension): boolean => {
+        // do not want to move the item that is dragging
+        if (child === draggable) {
           return false;
         }
 
-        return currentCenter[axis.line] > borderBox[axis.start];
-      }
-      // moving backwards
-      // 1. item needs to start behind the moving item
-      // 2. the dragging item has moved over it
-      if (originalCenter[axis.line] < borderBox.center[axis.line]) {
-        return false;
-      }
+        const borderBox: Rect = child.page.borderBox;
 
-      return currentCenter[axis.line] < borderBox[axis.end];
-    })
-    .map((dimension: DraggableDimension): Displacement => getDisplacement({
-      draggable: dimension,
-      destination: home,
-      previousImpact,
-      viewport: viewport.frame,
-    }));
+        if (isBeyondStartPosition) {
+          // 1. item needs to start ahead of the moving item
+          // 2. the dragging item has moved over it
+          if (borderBox.center[axis.line] < originalCenter[axis.line]) {
+            return false;
+          }
 
-    // Need to ensure that we always order by the closest impacted item
-  const ordered: Displacement[] = isBeyondStartPosition ? displaced.reverse() : displaced;
+          return currentCenter[axis.line] > borderBox[axis.start];
+        }
+        // moving backwards
+        // 1. item needs to start behind the moving item
+        // 2. the dragging item has moved over it
+        if (originalCenter[axis.line] < borderBox.center[axis.line]) {
+          return false;
+        }
+
+        return currentCenter[axis.line] < borderBox[axis.end];
+      },
+    )
+    .map(
+      (dimension: DraggableDimension): Displacement =>
+        getDisplacement({
+          draggable: dimension,
+          destination: home,
+          previousImpact,
+          viewport: viewport.frame,
+        }),
+    );
+
+  // Need to ensure that we always order by the closest impacted item
+  const ordered: Displacement[] = isBeyondStartPosition
+    ? displaced.reverse()
+    : displaced;
   const index: number = (() => {
     // const startIndex = insideHome.indexOf(draggable);
     const startIndex = draggable.descriptor.index;

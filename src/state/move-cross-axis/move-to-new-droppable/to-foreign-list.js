@@ -22,7 +22,7 @@ type Args = {|
   droppable: DroppableDimension,
   previousImpact: DragImpact,
   viewport: Viewport,
-|}
+|};
 
 export default ({
   amount,
@@ -35,8 +35,11 @@ export default ({
   viewport,
 }: Args): ?Result => {
   const axis: Axis = droppable.axis;
-  const isGoingBeforeTarget: boolean = Boolean(target &&
-    pageBorderBoxCenter[droppable.axis.line] < target.page.borderBox.center[droppable.axis.line]);
+  const isGoingBeforeTarget: boolean = Boolean(
+    target &&
+      pageBorderBoxCenter[droppable.axis.line] <
+        target.page.borderBox.center[droppable.axis.line],
+  );
 
   // Moving to an empty list
 
@@ -74,7 +77,9 @@ export default ({
   // Moving to a populated list
 
   const targetIndex: number = insideDroppable.indexOf(target);
-  const proposedIndex: number = isGoingBeforeTarget ? targetIndex : targetIndex + 1;
+  const proposedIndex: number = isGoingBeforeTarget
+    ? targetIndex
+    : targetIndex + 1;
 
   if (targetIndex === -1) {
     console.error('could not find target inside destination');
@@ -96,12 +101,15 @@ export default ({
 
   const displaced: Displacement[] = insideDroppable
     .slice(proposedIndex, insideDroppable.length)
-    .map((dimension: DraggableDimension): Displacement => getDisplacement({
-      draggable: dimension,
-      destination: droppable,
-      viewport: viewport.frame,
-      previousImpact,
-    }));
+    .map(
+      (dimension: DraggableDimension): Displacement =>
+        getDisplacement({
+          draggable: dimension,
+          destination: droppable,
+          viewport: viewport.frame,
+          previousImpact,
+        }),
+    );
 
   const newImpact: DragImpact = {
     movement: {

@@ -5,13 +5,16 @@ export type EventMarshal = {|
   handle: () => void,
   isHandled: () => boolean,
   reset: () => void,
-|}
+|};
 
 export default (): EventMarshal => {
   let isMouseDownHandled: boolean = false;
 
   const handle = (): void => {
-    invariant(!isMouseDownHandled, 'Cannot handle mouse down as it is already handled');
+    invariant(
+      !isMouseDownHandled,
+      'Cannot handle mouse down as it is already handled',
+    );
     isMouseDownHandled = true;
   };
 

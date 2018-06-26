@@ -23,7 +23,7 @@ type Args = {|
   droppables: DroppableDimensionMap,
   previousImpact: DragImpact,
   viewport: Viewport,
-|}
+|};
 
 export default ({
   pageBorderBoxCenter,
@@ -34,8 +34,7 @@ export default ({
   viewport,
 }: Args): DragImpact => {
   const previousDroppableOverId: ?DroppableId =
-    previousImpact.destination &&
-    previousImpact.destination.droppableId;
+    previousImpact.destination && previousImpact.destination.droppableId;
 
   const destinationId: ?DroppableId = getDroppableOver({
     target: pageBorderBoxCenter,

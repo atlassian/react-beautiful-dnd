@@ -3,7 +3,9 @@ import React, { Component, type Node } from 'react';
 import ReactDOM from 'react-dom';
 import { mount, type ReactWrapper } from 'enzyme';
 import { getRect, type Position } from 'css-box-model';
-import Draggable, { zIndexOptions } from '../../../src/view/draggable/draggable';
+import Draggable, {
+  zIndexOptions,
+} from '../../../src/view/draggable/draggable';
 import DragHandle from '../../../src/view/drag-handle/drag-handle';
 import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
 import Moveable from '../../../src/view/moveable/';
@@ -30,8 +32,19 @@ import type {
   Viewport,
 } from '../../../src/types';
 import { getPreset } from '../../utils/dimension';
-import { combine, withStore, withDroppableId, withStyleContext, withDimensionMarshal, withCanLift, withDroppableType } from '../../utils/get-context-options';
-import { dispatchWindowMouseEvent, mouseEvent } from '../../utils/user-input-util';
+import {
+  combine,
+  withStore,
+  withDroppableId,
+  withStyleContext,
+  withDimensionMarshal,
+  withCanLift,
+  withDroppableType,
+} from '../../utils/get-context-options';
+import {
+  dispatchWindowMouseEvent,
+  mouseEvent,
+} from '../../utils/user-input-util';
 import { setViewport, resetViewport } from '../../utils/viewport';
 import * as attributes from '../../../src/view/data-attributes';
 
@@ -123,7 +136,7 @@ type MountConnected = {|
   ownProps?: OwnProps,
   mapProps?: MapProps,
   dispatchProps?: DispatchProps,
-  WrappedComponent ?: any,
+  WrappedComponent?: any,
   styleMarshal?: StyleMarshal,
 |};
 
@@ -135,23 +148,20 @@ const mountDraggable = ({
   styleMarshal,
 }: MountConnected = {}): ReactWrapper => {
   const wrapper: ReactWrapper = mount(
-    <Draggable
-      {...ownProps}
-      {...mapProps}
-      {...dispatchProps}
-    >
+    <Draggable {...ownProps} {...mapProps} {...dispatchProps}>
       {(provided: Provided, snapshot: StateSnapshot) => (
         <WrappedComponent provided={provided} snapshot={snapshot} />
       )}
-    </Draggable>
-    , combine(
+    </Draggable>,
+    combine(
       withStore(),
       withDroppableId(droppableId),
       withDroppableType(type),
       withStyleContext(styleMarshal),
       withDimensionMarshal(),
       withCanLift(),
-    ));
+    ),
+  );
 
   return wrapper;
 };
@@ -161,19 +171,23 @@ const windowMouseMove = dispatchWindowMouseEvent.bind(null, 'mousemove');
 
 type StartDrag = {|
   selection?: Position,
-  borderBoxCenter ?: Position,
+  borderBoxCenter?: Position,
   viewport?: Viewport,
   isScrollAllowed?: boolean,
-|}
+|};
 
 const stubArea = (borderBoxCenter?: Position = origin): void =>
   // $ExpectError
-  jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => getRect({
-    left: 0,
-    top: 0,
-    right: borderBoxCenter.x * 2,
-    bottom: borderBoxCenter.y * 2,
-  }));
+  jest
+    .spyOn(Element.prototype, 'getBoundingClientRect')
+    .mockImplementation(() =>
+      getRect({
+        left: 0,
+        top: 0,
+        right: borderBoxCenter.x * 2,
+        bottom: borderBoxCenter.y * 2,
+      }),
+    );
 
 const executeOnLift = (wrapper: ReactWrapper) => ({
   selection = origin,
@@ -183,10 +197,13 @@ const executeOnLift = (wrapper: ReactWrapper) => ({
   stubArea(borderBoxCenter);
   setViewport(viewport);
 
-  wrapper.find(DragHandle).props().callbacks.onLift({
-    clientSelection: selection,
-    autoScrollMode: 'FLUID',
-  });
+  wrapper
+    .find(DragHandle)
+    .props()
+    .callbacks.onLift({
+      clientSelection: selection,
+      autoScrollMode: 'FLUID',
+    });
 
   resetViewport();
 };
@@ -195,7 +212,10 @@ const executeOnLift = (wrapper: ReactWrapper) => ({
 const getLastCall = myMock => myMock.mock.calls[myMock.mock.calls.length - 1];
 
 const getStubber = stub =>
-  class Stubber extends Component<{provided: Provided, snapshot: StateSnapshot}> {
+  class Stubber extends Component<{
+    provided: Provided,
+    snapshot: StateSnapshot,
+  }> {
     render() {
       const provided: Provided = this.props.provided;
       const snapshot: StateSnapshot = this.props.snapshot;
@@ -224,13 +244,8 @@ class WithNestedHandle extends Component<{ provided: Provided }> {
   render() {
     const provided: Provided = this.props.provided;
     return (
-      <div
-        ref={provided.innerRef}
-        {...provided.draggableProps}
-      >
-        <div className="cannot-drag">
-          Cannot drag by me
-        </div>
+      <div ref={provided.innerRef} {...provided.draggableProps}>
+        <div className="cannot-drag">Cannot drag by me</div>
         <div className="can-drag" {...provided.dragHandleProps}>
           Can drag by me
         </div>
@@ -277,7 +292,9 @@ describe('Draggable - unconnected', () => {
     });
     const provided: Provided = getLastCall(myMock)[0].provided;
 
-    expect(provided.draggableProps[attributes.draggable]).toEqual(styleMarshal.styleContext);
+    expect(provided.draggableProps[attributes.draggable]).toEqual(
+      styleMarshal.styleContext,
+    );
   });
 
   describe('drag handle', () => {
@@ -292,7 +309,10 @@ describe('Draggable - unconnected', () => {
       // fake some position to get the center we want
       stubArea(borderBoxCenter);
 
-      mouseDown(wrapper, subtract(selection, { x: 0, y: sloppyClickThreshold }));
+      mouseDown(
+        wrapper,
+        subtract(selection, { x: 0, y: sloppyClickThreshold }),
+      );
       windowMouseMove(selection);
     };
 
@@ -322,7 +342,9 @@ describe('Draggable - unconnected', () => {
           WrappedComponent: WithNestedHandle,
         });
 
-        startDragWithHandle(managedWrapper.find(WithNestedHandle).find('.can-drag'))();
+        startDragWithHandle(
+          managedWrapper.find(WithNestedHandle).find('.can-drag'),
+        )();
 
         expect(dispatchProps.lift).toHaveBeenCalled();
       });
@@ -346,7 +368,9 @@ describe('Draggable - unconnected', () => {
           WrappedComponent: WithNestedHandle,
         });
 
-        startDragWithHandle(managedWrapper.find(WithNestedHandle).find('.cannot-drag'))();
+        startDragWithHandle(
+          managedWrapper.find(WithNestedHandle).find('.cannot-drag'),
+        )();
 
         expect(dispatchProps.lift).not.toHaveBeenCalled();
       });
@@ -391,7 +415,11 @@ describe('Draggable - unconnected', () => {
             offset: origin,
           };
 
-          executeOnLift(wrapper)({ selection, borderBoxCenter, viewport: preset.viewport });
+          executeOnLift(wrapper)({
+            selection,
+            borderBoxCenter,
+            viewport: preset.viewport,
+          });
 
           // $ExpectError - mock property on lift function
           expect(dispatchProps.lift).toHaveBeenCalledWith({
@@ -410,7 +438,10 @@ describe('Draggable - unconnected', () => {
             });
 
             const move = () =>
-              wrapper.find(DragHandle).props().callbacks.onMove({ x: 100, y: 200 });
+              wrapper
+                .find(DragHandle)
+                .props()
+                .callbacks.onMove({ x: 100, y: 200 });
 
             expect(move).toThrow();
           });
@@ -418,8 +449,11 @@ describe('Draggable - unconnected', () => {
           it('should throw if not attached to the DOM', () => {
             const wrapper = mountDraggable();
             const move = () => {
-            // Calling the prop directly as this is not able to be done otherwise
-              wrapper.find(DragHandle).props().callbacks.onMove({ x: 100, y: 200 });
+              // Calling the prop directly as this is not able to be done otherwise
+              wrapper
+                .find(DragHandle)
+                .props()
+                .callbacks.onMove({ x: 100, y: 200 });
             };
 
             wrapper.unmount();
@@ -434,7 +468,10 @@ describe('Draggable - unconnected', () => {
             });
 
             // should not do anything yet as mapProps has not yet updated
-            wrapper.find(DragHandle).props().callbacks.onMove({ x: 100, y: 200 });
+            wrapper
+              .find(DragHandle)
+              .props()
+              .callbacks.onMove({ x: 100, y: 200 });
 
             expect(dispatchProps.move).not.toHaveBeenCalled();
           });
@@ -451,10 +488,14 @@ describe('Draggable - unconnected', () => {
               dispatchProps,
             });
 
-            wrapper.find(DragHandle).props().callbacks.onMove(selection);
+            wrapper
+              .find(DragHandle)
+              .props()
+              .callbacks.onMove(selection);
 
             expect(dispatchProps.move).toHaveBeenCalledWith({
-              client: selection, shouldAnimate: false,
+              client: selection,
+              shouldAnimate: false,
             });
           });
         });
@@ -466,7 +507,11 @@ describe('Draggable - unconnected', () => {
               mapProps: draggingMapProps,
             });
 
-            const drop = () => wrapper.find(DragHandle).props().callbacks.onDrop();
+            const drop = () =>
+              wrapper
+                .find(DragHandle)
+                .props()
+                .callbacks.onDrop();
 
             expect(drop).toThrow();
           });
@@ -474,7 +519,10 @@ describe('Draggable - unconnected', () => {
           it('should throw if not attached to the DOM', () => {
             const wrapper = mountDraggable();
             const drop = () => {
-              wrapper.find(DragHandle).props().callbacks.onDrop();
+              wrapper
+                .find(DragHandle)
+                .props()
+                .callbacks.onDrop();
             };
 
             wrapper.unmount();
@@ -488,7 +536,10 @@ describe('Draggable - unconnected', () => {
               dispatchProps,
             });
 
-            wrapper.find(DragHandle).props().callbacks.onDrop();
+            wrapper
+              .find(DragHandle)
+              .props()
+              .callbacks.onDrop();
 
             expect(dispatchProps.drop).toBeCalled();
           });
@@ -501,7 +552,10 @@ describe('Draggable - unconnected', () => {
             });
 
             const tryMove = () =>
-              wrapper.find(DragHandle).props().callbacks.onMoveUp();
+              wrapper
+                .find(DragHandle)
+                .props()
+                .callbacks.onMoveUp();
 
             expect(tryMove).toThrow();
           });
@@ -511,7 +565,10 @@ describe('Draggable - unconnected', () => {
               mapProps: draggingMapProps,
             });
             const tryMove = () =>
-              wrapper.find(DragHandle).props().callbacks.onMoveUp();
+              wrapper
+                .find(DragHandle)
+                .props()
+                .callbacks.onMoveUp();
 
             wrapper.unmount();
 
@@ -525,7 +582,10 @@ describe('Draggable - unconnected', () => {
               dispatchProps,
             });
 
-            wrapper.find(DragHandle).props().callbacks.onMoveUp();
+            wrapper
+              .find(DragHandle)
+              .props()
+              .callbacks.onMoveUp();
 
             expect(dispatchProps.moveUp).toHaveBeenCalled();
           });
@@ -539,7 +599,10 @@ describe('Draggable - unconnected', () => {
             });
 
             const tryMove = () =>
-              wrapper.find(DragHandle).props().callbacks.onMoveDown();
+              wrapper
+                .find(DragHandle)
+                .props()
+                .callbacks.onMoveDown();
 
             expect(tryMove).toThrow();
           });
@@ -552,7 +615,10 @@ describe('Draggable - unconnected', () => {
             wrapper.unmount();
 
             const tryMove = () =>
-              wrapper.find(DragHandle).props().callbacks.onMoveDown();
+              wrapper
+                .find(DragHandle)
+                .props()
+                .callbacks.onMoveDown();
 
             expect(tryMove).toThrow();
           });
@@ -564,7 +630,10 @@ describe('Draggable - unconnected', () => {
               dispatchProps,
             });
 
-            wrapper.find(DragHandle).props().callbacks.onMoveDown();
+            wrapper
+              .find(DragHandle)
+              .props()
+              .callbacks.onMoveDown();
 
             expect(dispatchProps.moveDown).toHaveBeenCalled();
           });
@@ -578,7 +647,10 @@ describe('Draggable - unconnected', () => {
             });
 
             const tryMove = () =>
-              wrapper.find(DragHandle).props().callbacks.onMoveLeft();
+              wrapper
+                .find(DragHandle)
+                .props()
+                .callbacks.onMoveLeft();
 
             expect(tryMove).toThrow();
           });
@@ -591,7 +663,10 @@ describe('Draggable - unconnected', () => {
             wrapper.unmount();
 
             const tryMove = () =>
-              wrapper.find(DragHandle).props().callbacks.onMoveLeft();
+              wrapper
+                .find(DragHandle)
+                .props()
+                .callbacks.onMoveLeft();
 
             expect(tryMove).toThrow();
           });
@@ -603,7 +678,10 @@ describe('Draggable - unconnected', () => {
               dispatchProps,
             });
 
-            wrapper.find(DragHandle).props().callbacks.onMoveLeft();
+            wrapper
+              .find(DragHandle)
+              .props()
+              .callbacks.onMoveLeft();
 
             expect(dispatchProps.moveLeft).toHaveBeenCalled();
           });
@@ -617,7 +695,10 @@ describe('Draggable - unconnected', () => {
             });
 
             const tryMove = () =>
-              wrapper.find(DragHandle).props().callbacks.onMoveRight();
+              wrapper
+                .find(DragHandle)
+                .props()
+                .callbacks.onMoveRight();
 
             expect(tryMove).toThrow();
           });
@@ -630,7 +711,10 @@ describe('Draggable - unconnected', () => {
             wrapper.unmount();
 
             const tryMove = () =>
-              wrapper.find(DragHandle).props().callbacks.onMoveRight();
+              wrapper
+                .find(DragHandle)
+                .props()
+                .callbacks.onMoveRight();
 
             expect(tryMove).toThrow();
           });
@@ -642,7 +726,10 @@ describe('Draggable - unconnected', () => {
               dispatchProps,
             });
 
-            wrapper.find(DragHandle).props().callbacks.onMoveRight();
+            wrapper
+              .find(DragHandle)
+              .props()
+              .callbacks.onMoveRight();
 
             expect(dispatchProps.moveRight).toHaveBeenCalled();
           });
@@ -656,9 +743,14 @@ describe('Draggable - unconnected', () => {
               dispatchProps,
             });
 
-            wrapper.find(DragHandle).props().callbacks.onCancel();
+            wrapper
+              .find(DragHandle)
+              .props()
+              .callbacks.onCancel();
 
-            expect(dispatchProps.drop).toHaveBeenCalledWith({ reason: 'CANCEL' });
+            expect(dispatchProps.drop).toHaveBeenCalledWith({
+              reason: 'CANCEL',
+            });
           });
 
           it('should allow the action even if dragging is disabled', () => {
@@ -669,7 +761,10 @@ describe('Draggable - unconnected', () => {
               dispatchProps,
             });
 
-            wrapper.find(DragHandle).props().callbacks.onCancel();
+            wrapper
+              .find(DragHandle)
+              .props()
+              .callbacks.onCancel();
 
             expect(dispatchProps.drop).toBeCalled();
           });
@@ -681,7 +776,10 @@ describe('Draggable - unconnected', () => {
               dispatchProps,
             });
 
-            wrapper.find(DragHandle).props().callbacks.onCancel();
+            wrapper
+              .find(DragHandle)
+              .props()
+              .callbacks.onCancel();
 
             expect(dispatchProps.drop).toBeCalled();
           });
@@ -695,7 +793,10 @@ describe('Draggable - unconnected', () => {
             });
 
             const tryUpdateWindowScroll = () =>
-              wrapper.find(DragHandle).props().callbacks.onWindowScroll();
+              wrapper
+                .find(DragHandle)
+                .props()
+                .callbacks.onWindowScroll();
 
             expect(tryUpdateWindowScroll).toThrow();
           });
@@ -708,7 +809,10 @@ describe('Draggable - unconnected', () => {
             wrapper.unmount();
 
             const tryUpdateWindowScroll = () =>
-              wrapper.find(DragHandle).props().callbacks.onWindowScroll();
+              wrapper
+                .find(DragHandle)
+                .props()
+                .callbacks.onWindowScroll();
 
             expect(tryUpdateWindowScroll).toThrow();
           });
@@ -720,7 +824,10 @@ describe('Draggable - unconnected', () => {
               dispatchProps,
             });
 
-            wrapper.find(DragHandle).props().callbacks.onWindowScroll();
+            wrapper
+              .find(DragHandle)
+              .props()
+              .callbacks.onWindowScroll();
 
             expect(dispatchProps.moveByWindowScroll).toBeCalledWith({
               scroll: preset.viewport.scroll.current,
@@ -787,14 +894,16 @@ describe('Draggable - unconnected', () => {
       });
 
       it('should be above Draggables that are not dragging', () => {
-      // dragging item
+        // dragging item
         const draggingMock = jest.fn();
         mountDraggable({
           mapProps: draggingMapProps,
           WrappedComponent: getStubber(draggingMock),
         });
-        const draggingProvided: Provided = getLastCall(draggingMock)[0].provided;
-        const draggingStyle: DraggingStyle = (draggingProvided.draggableProps.style : any);
+        const draggingProvided: Provided = getLastCall(draggingMock)[0]
+          .provided;
+        const draggingStyle: DraggingStyle = (draggingProvided.draggableProps
+          .style: any);
 
         // not dragging item
         const notDraggingMock = jest.fn();
@@ -802,8 +911,10 @@ describe('Draggable - unconnected', () => {
           mapProps: somethingElseDraggingMapProps,
           WrappedComponent: getStubber(notDraggingMock),
         });
-        const notDraggingProvided: Provided = getLastCall(notDraggingMock)[0].provided;
-        const notDraggingStyle: NotDraggingStyle = (notDraggingProvided.draggableProps.style : any);
+        const notDraggingProvided: Provided = getLastCall(notDraggingMock)[0]
+          .provided;
+        const notDraggingStyle: NotDraggingStyle = (notDraggingProvided
+          .draggableProps.style: any);
         const notDraggingExpected: NotDraggingStyle = {
           transform: null,
           transition: null,
@@ -819,17 +930,20 @@ describe('Draggable - unconnected', () => {
           mapProps: draggingMapProps,
           WrappedComponent: getStubber(draggingMock),
         });
-        const draggingProvided: Provided = getLastCall(draggingMock)[0].provided;
+        const draggingProvided: Provided = getLastCall(draggingMock)[0]
+          .provided;
         const returningHomeMock = jest.fn();
         mountDraggable({
           mapProps: dropAnimatingMapProps,
           WrappedComponent: getStubber(returningHomeMock),
         });
-        const returningHomeProvided: Provided = getLastCall(returningHomeMock)[0].provided;
+        const returningHomeProvided: Provided = getLastCall(
+          returningHomeMock,
+        )[0].provided;
 
         // $ExpectError - not type checking draggableProps.style
         expect(draggingProvided.draggableProps.style.zIndex)
-        // $ExpectError - not type checking draggableProps.style
+          // $ExpectError - not type checking draggableProps.style
           .toBeGreaterThan(returningHomeProvided.draggableProps.style.zIndex);
       });
 
@@ -848,7 +962,9 @@ describe('Draggable - unconnected', () => {
           left: dimension.client.marginBox.left,
           pointerEvents: 'none',
           transition: 'none',
-          transform: `translate(${draggingMapProps.offset.x}px, ${draggingMapProps.offset.y}px)`,
+          transform: `translate(${draggingMapProps.offset.x}px, ${
+            draggingMapProps.offset.y
+          }px)`,
           zIndex: zIndexOptions.dragging,
         };
 
@@ -889,7 +1005,7 @@ describe('Draggable - unconnected', () => {
       });
 
       it('should not move instantly if drag animation is enabled', () => {
-      // $ExpectError - spread operator on exact type
+        // $ExpectError - spread operator on exact type
         const mapProps: MapProps = {
           ...draggingMapProps,
           shouldAnimateDragMovement: true,
@@ -905,8 +1021,10 @@ describe('Draggable - unconnected', () => {
       it('should move by the provided offset on mount', () => {
         const myMock = jest.fn();
         const expected: DraggingStyle = {
-        // property under test:
-          transform: `translate(${draggingMapProps.offset.x}px, ${draggingMapProps.offset.y}px)`,
+          // property under test:
+          transform: `translate(${draggingMapProps.offset.x}px, ${
+            draggingMapProps.offset.y
+          }px)`,
           // other properties
           transition: 'none',
           position: 'fixed',
@@ -965,7 +1083,8 @@ describe('Draggable - unconnected', () => {
           // flush any movement required
           requestAnimationFrame.flush();
 
-          const provided: Provided = myMock.mock.calls[myMock.mock.calls.length - 1][0].provided;
+          const provided: Provided =
+            myMock.mock.calls[myMock.mock.calls.length - 1][0].provided;
           const style: DraggingStyle = (provided.draggableProps.style: any);
           expect(style.transform).toBe(expected);
         });
@@ -1036,22 +1155,26 @@ describe('Draggable - unconnected', () => {
       });
 
       it('should be on top of draggables that are not being dragged', () => {
-      // not dragging
+        // not dragging
         const notDraggingMock = jest.fn();
         mountDraggable({
           mapProps: somethingElseDraggingMapProps,
           WrappedComponent: getStubber(notDraggingMock),
         });
-        const notDraggingProvided: Provided = getLastCall(notDraggingMock)[0].provided;
-        const notDraggingStyle: NotDraggingStyle = (notDraggingProvided.draggableProps.style : any);
+        const notDraggingProvided: Provided = getLastCall(notDraggingMock)[0]
+          .provided;
+        const notDraggingStyle: NotDraggingStyle = (notDraggingProvided
+          .draggableProps.style: any);
         // returning home
         const dropAnimatingMock = jest.fn();
         mountDraggable({
           mapProps: dropAnimatingMapProps,
           WrappedComponent: getStubber(dropAnimatingMock),
         });
-        const droppingProvided: Provided = getLastCall(dropAnimatingMock)[0].provided;
-        const droppingStyle: DraggingStyle = (droppingProvided.draggableProps.style : any);
+        const droppingProvided: Provided = getLastCall(dropAnimatingMock)[0]
+          .provided;
+        const droppingStyle: DraggingStyle = (droppingProvided.draggableProps
+          .style: any);
         const expectedNotDraggingStyle: NotDraggingStyle = {
           transition: null,
           transform: null,
@@ -1184,7 +1307,7 @@ describe('Draggable - unconnected', () => {
 
           it('should return animate out of the way with css', () => {
             const expected: NotDraggingStyle = {
-            // relying on the style marshal
+              // relying on the style marshal
               transition: null,
               transform: null,
             };
@@ -1255,7 +1378,7 @@ describe('Draggable - unconnected', () => {
 
           it('should animate out of the way with css', () => {
             const expected: NotDraggingStyle = {
-            // use the style marshal global style
+              // use the style marshal global style
               transition: null,
               transform: `translate(${offset.x}px, ${offset.y}px)`,
             };
@@ -1308,46 +1431,49 @@ describe('Draggable - unconnected', () => {
         throw new Error('Portal test requires document.body to be present');
       }
 
-      class WithPortal extends Component<{ provided: Provided, snapshot: StateSnapshot }> {
-      // eslint-disable-next-line react/sort-comp
-      portal: ?HTMLElement;
+      class WithPortal extends Component<{
+        provided: Provided,
+        snapshot: StateSnapshot,
+      }> {
+        // eslint-disable-next-line react/sort-comp
+        portal: ?HTMLElement;
 
-      componentDidMount() {
-        this.portal = document.createElement('div');
-        body.appendChild(this.portal);
-      }
-      componentWillUnmount() {
-        if (!this.portal) {
-          return;
+        componentDidMount() {
+          this.portal = document.createElement('div');
+          body.appendChild(this.portal);
         }
-        body.removeChild(this.portal);
-        this.portal = null;
-      }
-      render() {
-        const provided: Provided = this.props.provided;
-        const snapshot: StateSnapshot = this.props.snapshot;
-
-        const child: Node = (
-          <div
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-          >
-            Drag me!
-          </div>
-        );
-
-        if (!snapshot.isDragging) {
-          return child;
+        componentWillUnmount() {
+          if (!this.portal) {
+            return;
+          }
+          body.removeChild(this.portal);
+          this.portal = null;
         }
+        render() {
+          const provided: Provided = this.props.provided;
+          const snapshot: StateSnapshot = this.props.snapshot;
 
-        // if dragging - put the item in a portal
-        if (!this.portal) {
-          throw new Error('could not find portal');
+          const child: Node = (
+            <div
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+            >
+              Drag me!
+            </div>
+          );
+
+          if (!snapshot.isDragging) {
+            return child;
+          }
+
+          // if dragging - put the item in a portal
+          if (!this.portal) {
+            throw new Error('could not find portal');
+          }
+
+          return ReactDOM.createPortal(child, this.portal);
         }
-
-        return ReactDOM.createPortal(child, this.portal);
-      }
       }
 
       it('should keep focus if moving to a portal', () => {
@@ -1373,7 +1499,9 @@ describe('Draggable - unconnected', () => {
         // now moved to portal
         const inPortal: HTMLElement = wrapper.getDOMNode();
         expect(inPortal).not.toBe(original);
-        expect(inPortal.parentElement).toBe(wrapper.find(WithPortal).instance().portal);
+        expect(inPortal.parentElement).toBe(
+          wrapper.find(WithPortal).instance().portal,
+        );
 
         // assert that focus was transferred to new element
         expect(inPortal).toBe(document.activeElement);
@@ -1414,7 +1542,9 @@ describe('Draggable - unconnected', () => {
         // now moved to portal
         const inPortal: HTMLElement = wrapper.getDOMNode();
         expect(inPortal).not.toBe(original);
-        expect(inPortal.parentElement).toBe(wrapper.find(WithPortal).instance().portal);
+        expect(inPortal.parentElement).toBe(
+          wrapper.find(WithPortal).instance().portal,
+        );
 
         // assert that focus was not transferred to new element
         expect(inPortal).not.toBe(document.activeElement);

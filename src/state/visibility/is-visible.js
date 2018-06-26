@@ -9,12 +9,12 @@ type Args = {|
   target: Spacing,
   destination: DroppableDimension,
   viewport: Rect,
-|}
+|};
 
 type HelperArgs = {|
   ...Args,
-  isVisibleThroughFrameFn: (frame: Spacing) => (subject: Spacing) => boolean
-|}
+  isVisibleThroughFrameFn: (frame: Spacing) => (subject: Spacing) => boolean,
+|};
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -24,9 +24,9 @@ const isVisible = ({
   viewport,
   isVisibleThroughFrameFn,
 }: HelperArgs): boolean => {
-  const displacement: Position = destination.viewport.closestScrollable ?
-    destination.viewport.closestScrollable.scroll.diff.displacement :
-    origin;
+  const displacement: Position = destination.viewport.closestScrollable
+    ? destination.viewport.closestScrollable.scroll.diff.displacement
+    : origin;
   const withDisplacement: Spacing = offsetByPosition(target, displacement);
 
   // destination subject is totally hidden by frame
@@ -39,13 +39,15 @@ const isVisible = ({
   // to consider the change in scroll of the droppable. We need to
   // adjust for the scroll as the clipped viewport takes into account
   // the scroll of the droppable.
-  const isVisibleInDroppable: boolean =
-    isVisibleThroughFrameFn(destination.viewport.clippedPageMarginBox)(withDisplacement);
+  const isVisibleInDroppable: boolean = isVisibleThroughFrameFn(
+    destination.viewport.clippedPageMarginBox,
+  )(withDisplacement);
 
   // We also need to consider whether the destination scroll when detecting
   // if we are visible in the viewport.
-  const isVisibleInViewport: boolean =
-    isVisibleThroughFrameFn(viewport)(withDisplacement);
+  const isVisibleInViewport: boolean = isVisibleThroughFrameFn(viewport)(
+    withDisplacement,
+  );
 
   return isVisibleInDroppable && isVisibleInViewport;
 };
@@ -54,20 +56,22 @@ export const isPartiallyVisible = ({
   target,
   destination,
   viewport,
-}: Args): boolean => isVisible({
-  target,
-  destination,
-  viewport,
-  isVisibleThroughFrameFn: isPartiallyVisibleThroughFrame,
-});
+}: Args): boolean =>
+  isVisible({
+    target,
+    destination,
+    viewport,
+    isVisibleThroughFrameFn: isPartiallyVisibleThroughFrame,
+  });
 
 export const isTotallyVisible = ({
   target,
   destination,
   viewport,
-}: Args): boolean => isVisible({
-  target,
-  destination,
-  viewport,
-  isVisibleThroughFrameFn: isTotallyVisibleThroughFrame,
-});
+}: Args): boolean =>
+  isVisible({
+    target,
+    destination,
+    viewport,
+    isVisibleThroughFrameFn: isTotallyVisibleThroughFrame,
+  });

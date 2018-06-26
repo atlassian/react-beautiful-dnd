@@ -26,7 +26,7 @@ const Root = styled.div`
 
 type Props = {|
   initial: QuoteMap,
-|}
+|};
 
 type State = ReorderQuoteMapResult;
 
@@ -39,7 +39,7 @@ export default class QuoteApp extends Component<Props, State> {
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
-  }
+  };
 
   onDragEnd = (result: DropResult) => {
     publishOnDragEnd(result);
@@ -49,12 +49,14 @@ export default class QuoteApp extends Component<Props, State> {
       return;
     }
 
-    this.setState(reorderQuoteMap({
-      quoteMap: this.state.quoteMap,
-      source: result.source,
-      destination: result.destination,
-    }));
-  }
+    this.setState(
+      reorderQuoteMap({
+        quoteMap: this.state.quoteMap,
+        source: result.source,
+        destination: result.destination,
+      }),
+    );
+  };
 
   render() {
     const { quoteMap } = this.state;

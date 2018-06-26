@@ -30,13 +30,15 @@ const THead = styled.thead`
 
 const Row = styled.tr`
   /* stylelint-disable comment-empty-line-before */
-  ${props => (props.isDragging ? `
+  ${props =>
+    props.isDragging
+      ? `
     background: ${colors.green};
 
     /* maintain cell width while dragging */
     display: table;
-  ` : '')}
-  /* stylelint-enable */
+  `
+      : ''} /* stylelint-enable */;
 `;
 
 const Cell = styled.td`
@@ -51,7 +53,7 @@ type TableRowProps = {|
   quote: Quote,
   provided: DraggableProvided,
   snapshot: DraggableStateSnapshot,
-|}
+|};
 
 class TableRow extends Component<TableRowProps> {
   render() {
@@ -63,12 +65,8 @@ class TableRow extends Component<TableRowProps> {
         {...provided.draggableProps}
         {...provided.dragHandleProps}
       >
-        <Cell>
-          {quote.author.name}
-        </Cell>
-        <Cell>
-          {quote.content}
-        </Cell>
+        <Cell>{quote.author.name}</Cell>
+        <Cell>{quote.content}</Cell>
       </Row>
     );
   }
@@ -90,15 +88,15 @@ const CopyTableButton = styled.button``;
 
 type AppProps = {|
   initial: Quote[],
-|}
+|};
 
 type AppState = {|
   quotes: Quote[],
   layout: 'fixed' | 'auto',
-|}
+|};
 export default class TableApp extends Component<AppProps, AppState> {
   // eslint-disable-next-line react/sort-comp
-  tableRef: ?HTMLElement
+  tableRef: ?HTMLElement;
 
   state: AppState = {
     quotes: this.props.initial,
@@ -107,7 +105,10 @@ export default class TableApp extends Component<AppProps, AppState> {
 
   onDragEnd = (result: DropResult) => {
     // dropped outside the list
-    if (!result.destination || result.destination.index === result.source.index) {
+    if (
+      !result.destination ||
+      result.destination.index === result.source.index
+    ) {
       return;
     }
 
@@ -119,19 +120,19 @@ export default class TableApp extends Component<AppProps, AppState> {
     const quotes = reorder(
       this.state.quotes,
       result.source.index,
-      result.destination.index
+      result.destination.index,
     );
 
     this.setState({
       quotes,
     });
-  }
+  };
 
   toggleTableLayout = () => {
     this.setState({
       layout: this.state.layout === 'auto' ? 'fixed' : 'auto',
     });
-  }
+  };
 
   copyTableToClipboard = () => {
     const tableRef: ?HTMLElement = this.tableRef;
@@ -157,7 +158,7 @@ export default class TableApp extends Component<AppProps, AppState> {
 
     // clear selection
     window.getSelection().removeAllRanges();
-  }
+  };
 
   render() {
     return (
@@ -166,15 +167,11 @@ export default class TableApp extends Component<AppProps, AppState> {
           <Header>
             <LayoutControl>
               Current layout: <code>{this.state.layout}</code>
-              <button onClick={this.toggleTableLayout}>
-                Toggle
-              </button>
+              <button onClick={this.toggleTableLayout}>Toggle</button>
             </LayoutControl>
             <div>
               Copy table to clipboard:
-              <CopyTableButton
-                onClick={this.copyTableToClipboard}
-              >
+              <CopyTableButton onClick={this.copyTableToClipboard}>
                 Copy
               </CopyTableButton>
             </div>
@@ -196,18 +193,25 @@ export default class TableApp extends Component<AppProps, AppState> {
                   {...droppableProvided.droppableProps}
                 >
                   {this.state.quotes.map((quote: Quote, index: number) => (
-                    <Draggable draggableId={quote.id} index={index} key={quote.id}>
-                      {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
+                    <Draggable
+                      draggableId={quote.id}
+                      index={index}
+                      key={quote.id}
+                    >
+                      {(
+                        provided: DraggableProvided,
+                        snapshot: DraggableStateSnapshot,
+                      ) => (
                         <TableRow
                           provided={provided}
                           snapshot={snapshot}
                           quote={quote}
                         />
-                    )}
+                      )}
                     </Draggable>
                   ))}
                 </TBody>
-                )}
+              )}
             </Droppable>
           </Table>
         </Fragment>

@@ -11,9 +11,9 @@ import type {
 } from '../../types';
 
 const getScrollableDroppables = memoizeOne(
-  (droppables: DroppableDimensionMap): DroppableDimension[] => (
-    toDroppableList(droppables)
-      .filter((droppable: DroppableDimension): boolean => {
+  (droppables: DroppableDimensionMap): DroppableDimension[] =>
+    toDroppableList(droppables).filter(
+      (droppable: DroppableDimension): boolean => {
         // exclude disabled droppables
         if (!droppable.isEnabled) {
           return false;
@@ -25,20 +25,22 @@ const getScrollableDroppables = memoizeOne(
         }
 
         return true;
-      })
-  )
+      },
+    ),
 );
 
 const getScrollableDroppableOver = (
   target: Position,
-  droppables: DroppableDimensionMap
+  droppables: DroppableDimensionMap,
 ): ?DroppableDimension => {
-  const maybe: ?DroppableDimension =
-    getScrollableDroppables(droppables)
-      .find((droppable: DroppableDimension): boolean => {
-        invariant(droppable.viewport.closestScrollable, 'Invalid result');
-        return isPositionInFrame(droppable.viewport.closestScrollable.framePageMarginBox)(target);
-      });
+  const maybe: ?DroppableDimension = getScrollableDroppables(droppables).find(
+    (droppable: DroppableDimension): boolean => {
+      invariant(droppable.viewport.closestScrollable, 'Invalid result');
+      return isPositionInFrame(
+        droppable.viewport.closestScrollable.framePageMarginBox,
+      )(target);
+    },
+  );
 
   return maybe;
 };
@@ -47,7 +49,7 @@ type Api = {|
   center: Position,
   destination: ?DraggableLocation,
   droppables: DroppableDimensionMap,
-|}
+|};
 
 export default ({
   center,

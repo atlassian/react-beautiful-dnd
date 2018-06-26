@@ -18,13 +18,18 @@ it('should not break memoization across selectors', () => {
   const homeOwnProps: OwnProps = getOwnProps(preset.home);
   const foreignSelector: Selector = makeMapStateToProps();
   const foreignOwnProps: OwnProps = getOwnProps(preset.foreign);
-  const defaultForeignMapProps: MapProps = foreignSelector(state.idle, foreignOwnProps);
+  const defaultForeignMapProps: MapProps = foreignSelector(
+    state.idle,
+    foreignOwnProps,
+  );
 
   state.allPhases(preset.inHome1.descriptor.id).forEach((current: State) => {
     const initial: MapProps = homeSelector(current, homeOwnProps);
 
     // home should not break memoization of foreign
-    expect(foreignSelector(current, foreignOwnProps)).toBe(defaultForeignMapProps);
+    expect(foreignSelector(current, foreignOwnProps)).toBe(
+      defaultForeignMapProps,
+    );
 
     // foreign should not break memoization of home
     expect(homeSelector(current, homeOwnProps)).toBe(initial);

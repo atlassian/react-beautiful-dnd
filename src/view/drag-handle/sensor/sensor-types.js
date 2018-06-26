@@ -11,26 +11,26 @@ type SensorBase = {|
   isCapturing: () => boolean,
   // perform any cleanup tasks required when unmounting
   unmount: () => void,
-|}
+|};
 
 export type CreateSensorArgs = {|
   callbacks: Callbacks,
   getDraggableRef: () => ?HTMLElement,
   getWindow: () => HTMLElement,
   canStartCapturing: (event: Event) => boolean,
-|}
+|};
 
 export type MouseSensor = {|
   ...SensorBase,
   onMouseDown: (event: MouseEvent) => void,
-|}
+|};
 
 export type KeyboardSensor = {|
   ...SensorBase,
   onKeyDown: (event: KeyboardEvent) => void,
-|}
+|};
 
 export type TouchSensor = {|
   ...SensorBase,
   onTouchStart: (event: TouchEvent) => void,
-|}
+|};

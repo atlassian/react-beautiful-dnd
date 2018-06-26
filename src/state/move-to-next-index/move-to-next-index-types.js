@@ -16,7 +16,7 @@ export type Args = {|
   droppable: DroppableDimension,
   draggables: DraggableDimensionMap,
   viewport: Viewport,
-|}
+|};
 
 export type Result = {|
   // the new page center position of the element
@@ -27,4 +27,4 @@ export type Result = {|
   // If this is present then the pageBorderBoxCenter and impact
   // will just be the same as the previous drag
   scrollJumpRequest: ?Position,
-|}
+|};

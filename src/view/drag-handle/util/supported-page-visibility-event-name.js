@@ -16,8 +16,8 @@ const supportedEventName: string = ((): string => {
     `o${base}`,
   ];
 
-  const supported: ?string = candidates.find((eventName: string): boolean =>
-    `on${eventName}` in document
+  const supported: ?string = candidates.find(
+    (eventName: string): boolean => `on${eventName}` in document,
   );
 
   return supported || base;

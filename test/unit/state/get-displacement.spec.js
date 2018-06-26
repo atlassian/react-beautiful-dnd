@@ -2,7 +2,10 @@
 import { getRect, type Rect } from 'css-box-model';
 import getDisplacement from '../../../src/state/get-displacement';
 import noImpact from '../../../src/state/no-impact';
-import { getDroppableDimension, getDraggableDimension } from '../../utils/dimension';
+import {
+  getDroppableDimension,
+  getDraggableDimension,
+} from '../../utils/dimension';
 import type {
   Displacement,
   DraggableDimension,
@@ -103,12 +106,14 @@ describe('get displacement', () => {
         const previousImpact: DragImpact = {
           direction: droppable.axis.direction,
           movement: {
-          // faking a previous displacement
-            displaced: [{
-              draggableId: inViewport.descriptor.id,
-              isVisible: true,
-              shouldAnimate: true,
-            }],
+            // faking a previous displacement
+            displaced: [
+              {
+                draggableId: inViewport.descriptor.id,
+                isVisible: true,
+                shouldAnimate: true,
+              },
+            ],
             // not populating correctly
             amount: { x: 0, y: 0 },
             isBeyondStartPosition: false,
@@ -141,11 +146,13 @@ describe('get displacement', () => {
           direction: droppable.axis.direction,
           movement: {
             // faking a previous displacement
-            displaced: [{
-              draggableId: notInViewport.descriptor.id,
-              isVisible: false,
-              shouldAnimate: false,
-            }],
+            displaced: [
+              {
+                draggableId: notInViewport.descriptor.id,
+                isVisible: false,
+                shouldAnimate: false,
+              },
+            ],
             // not populating correctly
             amount: { x: 0, y: 0 },
             isBeyondStartPosition: false,
@@ -178,11 +185,13 @@ describe('get displacement', () => {
           direction: droppable.axis.direction,
           movement: {
             // faking a previous displacement
-            displaced: [{
-              draggableId: notInViewport.descriptor.id,
-              isVisible: false,
-              shouldAnimate: false,
-            }],
+            displaced: [
+              {
+                draggableId: notInViewport.descriptor.id,
+                isVisible: false,
+                shouldAnimate: false,
+              },
+            ],
             // not populating correctly
             amount: { x: 0, y: 0 },
             isBeyondStartPosition: false,
@@ -222,11 +231,13 @@ describe('get displacement', () => {
           direction: droppable.axis.direction,
           movement: {
             // faking a previous displacement
-            displaced: [{
-              draggableId: inViewport.descriptor.id,
-              isVisible: true,
-              shouldAnimate: true,
-            }],
+            displaced: [
+              {
+                draggableId: inViewport.descriptor.id,
+                isVisible: true,
+                shouldAnimate: true,
+              },
+            ],
             // not populating correctly
             amount: { x: 0, y: 0 },
             isBeyondStartPosition: false,

@@ -26,7 +26,9 @@ export default ({
   viewport,
 }: Args): ?Result => {
   if (!previousImpact.destination) {
-    console.error('cannot move to next index when there is not previous destination');
+    console.error(
+      'cannot move to next index when there is not previous destination',
+    );
     return null;
   }
 
@@ -40,7 +42,9 @@ export default ({
   );
 
   const currentIndex: number = location.index;
-  const proposedIndex: number = isMovingForward ? currentIndex + 1 : currentIndex - 1;
+  const proposedIndex: number = isMovingForward
+    ? currentIndex + 1
+    : currentIndex - 1;
   const lastIndex: number = insideForeignDroppable.length - 1;
 
   // draggable is allowed to exceed the foreign droppables count by 1
@@ -54,11 +58,12 @@ export default ({
   }
 
   // Always moving relative to the draggable at the current index
-  const movingRelativeTo: DraggableDimension = insideForeignDroppable[
-    // We want to move relative to the proposed index
-    // or if we are going beyond to the end of the list - use that index
-    Math.min(proposedIndex, lastIndex)
-  ];
+  const movingRelativeTo: DraggableDimension =
+    insideForeignDroppable[
+      // We want to move relative to the proposed index
+      // or if we are going beyond to the end of the list - use that index
+      Math.min(proposedIndex, lastIndex)
+    ];
 
   const isMovingPastLastIndex: boolean = proposedIndex > lastIndex;
   const sourceEdge: Edge = 'start';
@@ -123,15 +128,24 @@ export default ({
 
   if (isVisibleInNewLocation) {
     return {
-      pageBorderBoxCenter: withDroppableDisplacement(droppable, newPageBorderBoxCenter),
+      pageBorderBoxCenter: withDroppableDisplacement(
+        droppable,
+        newPageBorderBoxCenter,
+      ),
       impact: newImpact,
       scrollJumpRequest: null,
     };
   }
 
   // The full distance required to get from the previous page center to the new page center
-  const distanceMoving: Position = subtract(newPageBorderBoxCenter, previousPageBorderBoxCenter);
-  const distanceWithScroll: Position = withDroppableDisplacement(droppable, distanceMoving);
+  const distanceMoving: Position = subtract(
+    newPageBorderBoxCenter,
+    previousPageBorderBoxCenter,
+  );
+  const distanceWithScroll: Position = withDroppableDisplacement(
+    droppable,
+    distanceMoving,
+  );
 
   return {
     pageBorderBoxCenter: previousPageBorderBoxCenter,

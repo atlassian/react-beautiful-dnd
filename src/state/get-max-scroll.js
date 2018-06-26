@@ -7,7 +7,7 @@ type Args = {|
   scrollWidth: number,
   height: number,
   width: number,
-|}
+|};
 export default ({
   scrollHeight,
   scrollWidth,
@@ -18,7 +18,7 @@ export default ({
     // full size
     { x: scrollWidth, y: scrollHeight },
     // viewport size
-    { x: width, y: height }
+    { x: width, y: height },
   );
 
   const adjustedMaxScroll: Position = {
@@ -28,4 +28,3 @@ export default ({
 
   return adjustedMaxScroll;
 };
-

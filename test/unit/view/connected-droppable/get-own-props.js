@@ -10,4 +10,3 @@ export default (dimension: DroppableDimension): OwnProps => ({
   ignoreContainerClipping: false,
   children: () => null,
 });
-

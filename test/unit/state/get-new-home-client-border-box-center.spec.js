@@ -6,10 +6,7 @@ import { patch } from '../../../src/state/position';
 import { vertical, horizontal } from '../../../src/state/axis';
 import moveToEdge from '../../../src/state/move-to-edge';
 import { getPreset } from '../../utils/dimension';
-import type {
-  Axis,
-  DragMovement,
-} from '../../../src/types';
+import type { Axis, DragMovement } from '../../../src/types';
 
 describe('get new home client center', () => {
   [vertical, horizontal].forEach((axis: Axis) => {
@@ -28,7 +25,10 @@ describe('get new home client center', () => {
         draggables,
       } = getPreset(axis);
 
-      const inHome1Size: Position = patch(axis.line, inHome1.page.borderBox[axis.size]);
+      const inHome1Size: Position = patch(
+        axis.line,
+        inHome1.page.borderBox[axis.size],
+      );
 
       it('should return the original center dropped on no destination', () => {
         const result: Position = getNewHomeClientBorderBoxCenter({

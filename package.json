@@ -27,6 +27,7 @@
   "scripts": {
     "test": "jest --config ./jest.config.js",
     "validate": "yarn lint && yarn lint:css && yarn typecheck",
+    "stylecheck": "yarn prettier --debug-check src/**/*.{js,jsx} test/**/*.{js,jsx} stories/**/*.{js,jsx}",
     "lint": "yarn eslint .",
     "lint:css": "stylelint \"stories/**/*.{js,jsx}\"",
     "typecheck": "flow check",
@@ -83,6 +84,7 @@
     "flow-bin": "0.73.0",
     "jest": "^23.1.0",
     "jest-watch-typeahead": "^0.1.0",
+    "prettier": "^1.13.6",
     "puppeteer": "^1.4.0",
     "raf-stub": "^2.0.2",
     "react": "^16.3.1",

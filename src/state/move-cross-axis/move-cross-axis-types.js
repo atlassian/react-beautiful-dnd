@@ -7,4 +7,4 @@ export type Result = {|
   pageBorderBoxCenter: Position,
   // The impact of the movement
   impact: DragImpact,
-|}
+|};

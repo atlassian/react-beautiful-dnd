@@ -6,9 +6,13 @@ import createScheduler from '../util/create-scheduler';
 import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
 import * as keyCodes from '../../key-codes';
 import preventStandardKeyEvents from '../util/prevent-standard-key-events';
-import createPostDragEventPreventer, { type EventPreventer } from '../util/create-post-drag-event-preventer';
+import createPostDragEventPreventer, {
+  type EventPreventer,
+} from '../util/create-post-drag-event-preventer';
 import { bindEvents, unbindEvents } from '../util/bind-events';
-import createEventMarshal, { type EventMarshal } from '../util/create-event-marshal';
+import createEventMarshal, {
+  type EventMarshal,
+} from '../util/create-event-marshal';
 import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
 import type { EventBinding } from '../util/event-types';
 import type { MouseSensor, CreateSensorArgs } from './sensor-types';
@@ -16,16 +20,16 @@ import type { MouseSensor, CreateSensorArgs } from './sensor-types';
 // Custom event format for force press inputs
 type MouseForceChangedEvent = MouseEvent & {
   webkitForce?: number,
-}
+};
 
 type State = {|
   isDragging: boolean,
   pending: ?Position,
-|}
+|};
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 const primaryButton: number = 0;
-const noop = () => { };
+const noop = () => {};
 
 // shared management of mousedown without needing to call preventDefault()
 const mouseDownMarshal: EventMarshal = createEventMarshal();
@@ -45,7 +49,9 @@ export default ({
   const isDragging = (): boolean => state.isDragging;
   const isCapturing = (): boolean => Boolean(state.pending || state.isDragging);
   const schedule = createScheduler(callbacks);
-  const postDragEventPreventer: EventPreventer = createPostDragEventPreventer(getWindow);
+  const postDragEventPreventer: EventPreventer = createPostDragEventPreventer(
+    getWindow,
+  );
 
   const startDragging = (fn?: Function = noop) => {
     setState({
@@ -54,7 +60,10 @@ export default ({
     });
     fn();
   };
-  const stopDragging = (fn?: Function = noop, shouldBlockClick?: boolean = true) => {
+  const stopDragging = (
+    fn?: Function = noop,
+    shouldBlockClick?: boolean = true,
+  ) => {
     schedule.cancel();
     unbindWindowEvents();
     mouseDownMarshal.reset();
@@ -127,10 +136,12 @@ export default ({
 
         // preventing default as we are using this event
         event.preventDefault();
-        startDragging(() => callbacks.onLift({
-          clientSelection: point,
-          autoScrollMode: 'FLUID',
-        }));
+        startDragging(() =>
+          callbacks.onLift({
+            clientSelection: point,
+            autoScrollMode: 'FLUID',
+          }),
+        );
       },
     },
     {
@@ -211,12 +222,16 @@ export default ({
           event.webkitForce == null ||
           (MouseEvent: any).WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null
         ) {
-          console.error('handling a mouse force changed event when it is not supported');
+          console.error(
+            'handling a mouse force changed event when it is not supported',
+          );
           return;
         }
 
-        const forcePressThreshold: number = (MouseEvent: any).WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN;
-        const isForcePressing: boolean = event.webkitForce >= forcePressThreshold;
+        const forcePressThreshold: number = (MouseEvent: any)
+          .WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN;
+        const isForcePressing: boolean =
+          event.webkitForce >= forcePressThreshold;
 
         if (isForcePressing) {
           // it is considered a indirect cancel so we do not
@@ -247,7 +262,10 @@ export default ({
       return;
     }
 
-    invariant(!isCapturing(), 'Should not be able to perform a mouse down while a drag or pending drag is occurring');
+    invariant(
+      !isCapturing(),
+      'Should not be able to perform a mouse down while a drag or pending drag is occurring',
+    );
 
     if (!canStartCapturing(event)) {
       // blocking the event as we want to opt out of the standard browser behaviour

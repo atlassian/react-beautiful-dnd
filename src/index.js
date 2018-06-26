@@ -17,7 +17,6 @@ export type {
   TypeId,
   DraggableId,
   DroppableId,
-
   // Hooks
   DragStart,
   DragUpdate,
@@ -48,6 +47,4 @@ export type {
 } from './view/draggable/draggable-types';
 
 // DragHandle
-export type {
-  DragHandleProps,
-} from './view/drag-handle/drag-handle-types';
+export type { DragHandleProps } from './view/drag-handle/drag-handle-types';

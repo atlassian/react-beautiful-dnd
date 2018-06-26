@@ -21,12 +21,12 @@ export type LiftArgs = {|
   client: ItemPositions,
   viewport: Viewport,
   autoScrollMode: AutoScrollMode,
-|}
+|};
 
 export type LiftAction = {|
   type: 'LIFT',
-  payload: LiftArgs
-|}
+  payload: LiftArgs,
+|};
 
 export const lift = (args: LiftArgs): LiftAction => ({
   type: 'LIFT',
@@ -39,22 +39,24 @@ export type InitialPublishArgs = {|
   client: ItemPositions,
   viewport: Viewport,
   autoScrollMode: AutoScrollMode,
-|}
+|};
 
 export type InitialPublishAction = {|
   type: 'INITIAL_PUBLISH',
-  payload: InitialPublishArgs
-|}
+  payload: InitialPublishArgs,
+|};
 
-export const initialPublish = (args: InitialPublishArgs): InitialPublishAction => ({
+export const initialPublish = (
+  args: InitialPublishArgs,
+): InitialPublishAction => ({
   type: 'INITIAL_PUBLISH',
   payload: args,
 });
 
 export type PublishAction = {|
   type: 'PUBLISH',
-  payload: Publish
-|}
+  payload: Publish,
+|};
 
 export const publish = (args: Publish): PublishAction => ({
   type: 'PUBLISH',
@@ -63,8 +65,8 @@ export const publish = (args: Publish): PublishAction => ({
 
 export type CollectionStartingAction = {|
   type: 'COLLECTION_STARTING',
-  payload: null
-|}
+  payload: null,
+|};
 
 export const collectionStarting = (): CollectionStartingAction => ({
   type: 'COLLECTION_STARTING',
@@ -74,18 +76,19 @@ export const collectionStarting = (): CollectionStartingAction => ({
 export type UpdateDroppableScrollArgs = {
   id: DroppableId,
   offset: Position,
-}
+};
 
 export type UpdateDroppableScrollAction = {|
   type: 'UPDATE_DROPPABLE_SCROLL',
-  payload: UpdateDroppableScrollArgs
-|}
+  payload: UpdateDroppableScrollArgs,
+|};
 
-export const updateDroppableScroll =
-  (args: UpdateDroppableScrollArgs): UpdateDroppableScrollAction => ({
-    type: 'UPDATE_DROPPABLE_SCROLL',
-    payload: args,
-  });
+export const updateDroppableScroll = (
+  args: UpdateDroppableScrollArgs,
+): UpdateDroppableScrollAction => ({
+  type: 'UPDATE_DROPPABLE_SCROLL',
+  payload: args,
+});
 
 export type UpdateDroppableIsEnabledArgs = {|
   id: DroppableId,
@@ -94,25 +97,26 @@ export type UpdateDroppableIsEnabledArgs = {|
 
 export type UpdateDroppableIsEnabledAction = {|
   type: 'UPDATE_DROPPABLE_IS_ENABLED',
-  payload: UpdateDroppableIsEnabledArgs
-|}
+  payload: UpdateDroppableIsEnabledArgs,
+|};
 
-export const updateDroppableIsEnabled =
-  (args: UpdateDroppableIsEnabledArgs): UpdateDroppableIsEnabledAction => ({
-    type: 'UPDATE_DROPPABLE_IS_ENABLED',
-    payload: args,
-  });
+export const updateDroppableIsEnabled = (
+  args: UpdateDroppableIsEnabledArgs,
+): UpdateDroppableIsEnabledAction => ({
+  type: 'UPDATE_DROPPABLE_IS_ENABLED',
+  payload: args,
+});
 
 export type MoveArgs = {|
   // TODO: clientSelection
   client: Position,
   shouldAnimate: boolean,
-|}
+|};
 
 export type MoveAction = {|
   type: 'MOVE',
-  payload: MoveArgs
-|}
+  payload: MoveArgs,
+|};
 
 export const move = (args: MoveArgs): MoveAction => ({
   type: 'MOVE',
@@ -121,22 +125,24 @@ export const move = (args: MoveArgs): MoveAction => ({
 
 type MoveByWindowScrollArgs = {|
   scroll: Position,
-|}
+|};
 
 export type MoveByWindowScrollAction = {|
   type: 'MOVE_BY_WINDOW_SCROLL',
-  payload: MoveByWindowScrollArgs
-|}
+  payload: MoveByWindowScrollArgs,
+|};
 
-export const moveByWindowScroll = (args: MoveByWindowScrollArgs): MoveByWindowScrollAction => ({
+export const moveByWindowScroll = (
+  args: MoveByWindowScrollArgs,
+): MoveByWindowScrollAction => ({
   type: 'MOVE_BY_WINDOW_SCROLL',
   payload: args,
 });
 
 export type MoveUpAction = {|
   type: 'MOVE_UP',
-  payload: null
-|}
+  payload: null,
+|};
 
 export const moveUp = (): MoveUpAction => ({
   type: 'MOVE_UP',
@@ -145,8 +151,8 @@ export const moveUp = (): MoveUpAction => ({
 
 export type MoveDownAction = {|
   type: 'MOVE_DOWN',
-  payload: null
-|}
+  payload: null,
+|};
 
 export const moveDown = (): MoveDownAction => ({
   type: 'MOVE_DOWN',
@@ -155,8 +161,8 @@ export const moveDown = (): MoveDownAction => ({
 
 export type MoveRightAction = {|
   type: 'MOVE_RIGHT',
-  payload: null
-|}
+  payload: null,
+|};
 
 export const moveRight = (): MoveRightAction => ({
   type: 'MOVE_RIGHT',
@@ -165,8 +171,8 @@ export const moveRight = (): MoveRightAction => ({
 
 export type MoveLeftAction = {|
   type: 'MOVE_LEFT',
-  payload: null
-|}
+  payload: null,
+|};
 
 export const moveLeft = (): MoveLeftAction => ({
   type: 'MOVE_LEFT',
@@ -176,7 +182,7 @@ export const moveLeft = (): MoveLeftAction => ({
 type CleanAction = {|
   type: 'CLEAN',
   payload: null,
-|}
+|};
 
 export const clean = (): CleanAction => ({
   type: 'CLEAN',
@@ -186,7 +192,7 @@ export const clean = (): CleanAction => ({
 type PrepareAction = {|
   type: 'PREPARE',
   payload: null,
-|}
+|};
 
 export const prepare = (): PrepareAction => ({
   type: 'PREPARE',
@@ -195,8 +201,8 @@ export const prepare = (): PrepareAction => ({
 
 export type DropAnimateAction = {
   type: 'DROP_ANIMATE',
-  payload: PendingDrop
-}
+  payload: PendingDrop,
+};
 
 export const animateDrop = (pending: PendingDrop): DropAnimateAction => ({
   type: 'DROP_ANIMATE',
@@ -206,7 +212,7 @@ export const animateDrop = (pending: PendingDrop): DropAnimateAction => ({
 export type DropCompleteAction = {
   type: 'DROP_COMPLETE',
   payload: DropResult,
-}
+};
 
 export const completeDrop = (result: DropResult): DropCompleteAction => ({
   type: 'DROP_COMPLETE',
@@ -215,12 +221,12 @@ export const completeDrop = (result: DropResult): DropCompleteAction => ({
 
 type DropArgs = {|
   reason: DropReason,
-|}
+|};
 
 export type DropAction = {|
   type: 'DROP',
   payload: DropArgs,
-|}
+|};
 
 export const drop = (args: DropArgs) => ({
   type: 'DROP',
@@ -230,7 +236,7 @@ export const drop = (args: DropArgs) => ({
 export type DropPendingAction = {|
   type: 'DROP_PENDING',
   payload: DropArgs,
-|}
+|};
 
 export const dropPending = (args: DropArgs): DropPendingAction => ({
   type: 'DROP_PENDING',
@@ -240,7 +246,7 @@ export const dropPending = (args: DropArgs): DropPendingAction => ({
 export type DropAnimationFinishedAction = {|
   type: 'DROP_ANIMATION_FINISHED',
   payload: null,
-|}
+|};
 
 export const dropAnimationFinished = (): DropAnimationFinishedAction => ({
   type: 'DROP_ANIMATION_FINISHED',
@@ -248,22 +254,22 @@ export const dropAnimationFinished = (): DropAnimationFinishedAction => ({
 });
 
 export type Action =
-  LiftAction |
-  InitialPublishAction |
-  PublishAction |
-  CollectionStartingAction |
-  UpdateDroppableScrollAction |
-  UpdateDroppableIsEnabledAction |
-  MoveByWindowScrollAction |
-  MoveAction |
-  MoveUpAction |
-  MoveDownAction |
-  MoveRightAction |
-  MoveLeftAction |
-  DropPendingAction |
-  DropAction |
-  DropAnimateAction |
-  DropAnimationFinishedAction |
-  DropCompleteAction |
-  PrepareAction |
-  CleanAction;
+  | LiftAction
+  | InitialPublishAction
+  | PublishAction
+  | CollectionStartingAction
+  | UpdateDroppableScrollAction
+  | UpdateDroppableIsEnabledAction
+  | MoveByWindowScrollAction
+  | MoveAction
+  | MoveUpAction
+  | MoveDownAction
+  | MoveRightAction
+  | MoveLeftAction
+  | DropPendingAction
+  | DropAction
+  | DropAnimateAction
+  | DropAnimationFinishedAction
+  | DropCompleteAction
+  | PrepareAction
+  | CleanAction;

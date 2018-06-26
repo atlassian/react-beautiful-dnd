@@ -8,9 +8,9 @@ export type Props = {|
   speed: Speed,
   destination: Position,
   onMoveEnd: () => void,
-  children: (Position) => Element<*>,
-|}
+  children: Position => Element<*>,
+|};
 
 export type DefaultProps = {|
   destination: Position,
-|}
+|};

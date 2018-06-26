@@ -7,7 +7,7 @@ type Props = {|
   placeholder: PlaceholderType,
   onMount?: () => void,
   onUnmount?: () => void,
-|}
+|};
 
 export default class Placeholder extends PureComponent<Props> {
   componentDidMount() {

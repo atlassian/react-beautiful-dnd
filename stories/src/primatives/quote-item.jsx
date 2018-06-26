@@ -9,13 +9,15 @@ type Props = {
   quote: Quote,
   isDragging: boolean,
   provided: DraggableProvided,
-}
+};
 
 const Container = styled.a`
   border-radius: ${borderRadius}px;
   border: 1px solid grey;
-  background-color: ${({ isDragging }) => (isDragging ? colors.green : colors.white)};
-  box-shadow: ${({ isDragging }) => (isDragging ? `2px 2px 1px ${colors.shadow}` : 'none')};
+  background-color: ${({ isDragging }) =>
+    isDragging ? colors.green : colors.white};
+  box-shadow: ${({ isDragging }) =>
+    isDragging ? `2px 2px 1px ${colors.shadow}` : 'none'};
   padding: ${grid}px;
   min-height: 40px;
   margin-bottom: ${grid}px;
@@ -122,4 +124,3 @@ export default class QuoteItem extends React.PureComponent<Props> {
     );
   }
 }
-

@@ -28,4 +28,3 @@ export default (): Position => ({
   x: window.pageXOffset,
   y: window.pageYOffset,
 });
-

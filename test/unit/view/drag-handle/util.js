@@ -24,12 +24,12 @@ type CallBacksCalledFn = {|
   onMove?: number,
   onMoveUp?: number,
   onMoveDown?: number,
-  onMoveRight ?: number,
+  onMoveRight?: number,
   onMoveLeft?: number,
   onDrop?: number,
-  onCancel ?: number,
-  onWindowScroll ?: number,
-|}
+  onCancel?: number,
+  onWindowScroll?: number,
+|};
 
 export const callbacksCalled = (callbacks: Callbacks) => ({
   onLift = 0,
@@ -57,7 +57,10 @@ export const whereAnyCallbacksCalled = (callbacks: Callbacks) =>
 // eslint-disable-next-line no-unused-vars
 export const getCallbackCalls = (callbacks: Callbacks) =>
   // $ExpectError - hacking things big time
-  Object.keys(callbacks).reduce((previous: Object, key: string) => ({
-    ...previous,
-    [key]: callbacks[key].mock.calls.length,
-  }), {});
+  Object.keys(callbacks).reduce(
+    (previous: Object, key: string) => ({
+      ...previous,
+      [key]: callbacks[key].mock.calls.length,
+    }),
+    {},
+  );

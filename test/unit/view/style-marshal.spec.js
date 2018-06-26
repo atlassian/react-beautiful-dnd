@@ -1,6 +1,10 @@
 // @flow
-import createStyleMarshal, { resetStyleContext } from '../../../src/view/style-marshal/style-marshal';
-import getStyles, { type Styles } from '../../../src/view/style-marshal/get-styles';
+import createStyleMarshal, {
+  resetStyleContext,
+} from '../../../src/view/style-marshal/style-marshal';
+import getStyles, {
+  type Styles,
+} from '../../../src/view/style-marshal/get-styles';
 import { prefix } from '../../../src/view/data-attributes';
 import type { StyleMarshal } from '../../../src/view/style-marshal/style-marshal-types';
 
@@ -140,7 +144,9 @@ describe('style marshal', () => {
       expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.collecting);
 
       marshal.dropping('DROP');
-      expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.dropAnimating);
+      expect(getStyleFromTag(marshal.styleContext)).toEqual(
+        styles.dropAnimating,
+      );
     });
   });
 

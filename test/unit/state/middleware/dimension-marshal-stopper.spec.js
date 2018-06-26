@@ -4,8 +4,19 @@ import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/d
 import middleware from '../../../../src/state/middleware/dimension-marshal-stopper';
 import dropMiddleware from '../../../../src/state/middleware/drop';
 import createStore from './util/create-store';
-import { clean, prepare, initialPublish, drop, completeDrop, animateDrop, collectionStarting } from '../../../../src/state/action-creators';
-import { initialPublishArgs, getDragStart } from '../../../utils/preset-action-args';
+import {
+  clean,
+  prepare,
+  initialPublish,
+  drop,
+  completeDrop,
+  animateDrop,
+  collectionStarting,
+} from '../../../../src/state/action-creators';
+import {
+  initialPublishArgs,
+  getDragStart,
+} from '../../../utils/preset-action-args';
 import noImpact from '../../../../src/state/no-impact';
 
 const getMarshal = (stopPublishing: Function): DimensionMarshal => {

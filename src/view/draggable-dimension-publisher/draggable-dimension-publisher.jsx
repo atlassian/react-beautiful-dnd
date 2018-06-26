@@ -1,5 +1,10 @@
 // @flow
-import { calculateBox, withScroll, type BoxModel, type Position } from 'css-box-model';
+import {
+  calculateBox,
+  withScroll,
+  type BoxModel,
+  type Position,
+} from 'css-box-model';
 import memoizeOne from 'memoize-one';
 import PropTypes from 'prop-types';
 import { Component, type Node } from 'react';
@@ -22,7 +27,7 @@ type Props = {|
   index: number,
   getDraggableRef: () => ?HTMLElement,
   children: Node,
-|}
+|};
 
 export default class DraggableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
@@ -30,7 +35,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
   };
 
-  publishedDescriptor: ?DraggableDescriptor = null
+  publishedDescriptor: ?DraggableDescriptor = null;
 
   componentDidMount() {
     this.publish();
@@ -44,14 +49,19 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     this.unpublish();
   }
 
-  getMemoizedDescriptor = memoizeOne((
-    id: DraggableId,
-    index: number,
-    droppableId: DroppableId,
-    type: TypeId
-  ): DraggableDescriptor => ({
-    id, index, droppableId, type,
-  }));
+  getMemoizedDescriptor = memoizeOne(
+    (
+      id: DraggableId,
+      index: number,
+      droppableId: DroppableId,
+      type: TypeId,
+    ): DraggableDescriptor => ({
+      id,
+      index,
+      droppableId,
+      type,
+    }),
+  );
 
   publish = () => {
     const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
@@ -73,12 +83,19 @@ export default class DraggableDimensionPublisher extends Component<Props> {
       return;
     }
 
-    marshal.updateDraggable(this.publishedDescriptor, descriptor, this.getDimension);
+    marshal.updateDraggable(
+      this.publishedDescriptor,
+      descriptor,
+      this.getDimension,
+    );
     this.publishedDescriptor = descriptor;
-  }
+  };
 
   unpublish = () => {
-    invariant(this.publishedDescriptor, 'Cannot unpublish descriptor when none is published')
+    invariant(
+      this.publishedDescriptor,
+      'Cannot unpublish descriptor when none is published',
+    );
 
     // Using the previously published id to unpublish. This is to guard
     // against the case where the id dynamically changes. This is not
@@ -86,16 +103,21 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
     marshal.unregisterDraggable(this.publishedDescriptor);
     this.publishedDescriptor = null;
-  }
+  };
 
   getDimension = (windowScroll: Position): DraggableDimension => {
     const targetRef: ?HTMLElement = this.props.getDraggableRef();
     const descriptor: ?DraggableDescriptor = this.publishedDescriptor;
 
-    invariant(targetRef, 'DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM');
+    invariant(
+      targetRef,
+      'DraggableDimensionPublisher cannot calculate a dimension when not attached to the DOM',
+    );
     invariant(descriptor, 'Cannot get dimension for unpublished draggable');
 
-    const computedStyles: CSSStyleDeclaration = window.getComputedStyle(targetRef);
+    const computedStyles: CSSStyleDeclaration = window.getComputedStyle(
+      targetRef,
+    );
     const borderBox: ClientRect = targetRef.getBoundingClientRect();
 
     const client: BoxModel = calculateBox(borderBox, computedStyles);
@@ -115,10 +137,9 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     };
 
     return dimension;
-  }
+  };
 
   render() {
     return this.props.children;
   }
 }
-

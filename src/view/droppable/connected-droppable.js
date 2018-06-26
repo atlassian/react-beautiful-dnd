@@ -24,7 +24,10 @@ import type {
 // Returning a function to ensure each
 // Droppable gets its own selector
 export const makeMapStateToProps = (): Selector => {
-  const getIsDraggingOver = (id: DroppableId, destination: ?DraggableLocation): boolean => {
+  const getIsDraggingOver = (
+    id: DroppableId,
+    destination: ?DraggableLocation,
+  ): boolean => {
     if (!destination) {
       return false;
     }
@@ -50,14 +53,15 @@ export const makeMapStateToProps = (): Selector => {
   };
 
   const getMapProps = memoizeOne(
-    (isDraggingOver: boolean,
+    (
+      isDraggingOver: boolean,
       draggingOverWith: ?DraggableId,
       placeholder: ?Placeholder,
     ): MapProps => ({
       isDraggingOver,
       draggingOverWith,
       placeholder,
-    })
+    }),
   );
 
   const selector = (state: State, ownProps: OwnProps): MapProps => {
@@ -71,11 +75,19 @@ export const makeMapStateToProps = (): Selector => {
       const destination: ?DraggableLocation = state.impact.destination;
       const isDraggingOver: boolean = getIsDraggingOver(id, destination);
       const draggableId: DraggableId = state.critical.draggable.id;
-      const draggingOverWith: ?DraggableId = isDraggingOver ? draggableId : null;
-      const draggable: DraggableDimension = state.dimensions.draggables[draggableId];
+      const draggingOverWith: ?DraggableId = isDraggingOver
+        ? draggableId
+        : null;
+      const draggable: DraggableDimension =
+        state.dimensions.draggables[draggableId];
 
-      const placeholder: ?Placeholder =
-        shouldUsePlaceholder(id, draggable.descriptor, destination) ? draggable.placeholder : null;
+      const placeholder: ?Placeholder = shouldUsePlaceholder(
+        id,
+        draggable.descriptor,
+        destination,
+      )
+        ? draggable.placeholder
+        : null;
 
       return getMapProps(isDraggingOver, draggingOverWith, placeholder);
     }
@@ -84,11 +96,19 @@ export const makeMapStateToProps = (): Selector => {
       const destination: ?DraggableLocation = state.pending.impact.destination;
       const isDraggingOver = getIsDraggingOver(id, destination);
       const draggableId: DraggableId = state.pending.result.draggableId;
-      const draggingOverWith: ?DraggableId = isDraggingOver ? draggableId : null;
-      const draggable: DraggableDimension = state.dimensions.draggables[draggableId];
+      const draggingOverWith: ?DraggableId = isDraggingOver
+        ? draggableId
+        : null;
+      const draggable: DraggableDimension =
+        state.dimensions.draggables[draggableId];
 
-      const placeholder: ?Placeholder =
-        shouldUsePlaceholder(id, draggable.descriptor, destination) ? draggable.placeholder : null;
+      const placeholder: ?Placeholder = shouldUsePlaceholder(
+        id,
+        draggable.descriptor,
+        destination,
+      )
+        ? draggable.placeholder
+        : null;
 
       return getMapProps(isDraggingOver, draggingOverWith, placeholder);
     }

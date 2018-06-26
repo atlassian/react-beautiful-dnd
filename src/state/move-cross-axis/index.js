@@ -35,7 +35,7 @@ type Args = {|
   previousImpact: ?DragImpact,
   // the current viewport
   viewport: Viewport,
-|}
+|};
 
 export default ({
   isMovingForward,
@@ -67,7 +67,8 @@ export default ({
   }
 
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
-    destination, draggables
+    destination,
+    draggables,
   );
 
   const target: ?DraggableDimension = getClosestDraggable({

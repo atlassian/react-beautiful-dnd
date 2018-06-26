@@ -39,17 +39,16 @@ const destination: Rect = getRect({
 
 // All results are aligned on the crossAxisStart
 
-const pullBackwardsOnMainAxis = (axis: Axis) => (point: Position) => patch(
-  axis.line,
-  -point[axis.line],
-  point[axis.crossAxisLine]
-);
+const pullBackwardsOnMainAxis = (axis: Axis) => (point: Position) =>
+  patch(axis.line, -point[axis.line], point[axis.crossAxisLine]);
 
 // returns the absolute difference of the center position
 // to one of the corners on the axis.end. Choosing axis.end is arbitrary
 const getCenterDiff = (axis: Axis) => (source: Rect): Position => {
   const corner = patch(
-    axis.line, source[axis.end], source[axis.crossAxisStart]
+    axis.line,
+    source[axis.end],
+    source[axis.crossAxisStart],
   );
 
   const diff = absolute(subtract(source.center, corner));
@@ -58,7 +57,9 @@ const getCenterDiff = (axis: Axis) => (source: Rect): Position => {
     // a little check to ensure that our assumption that the distance between the edges
     // and the axis.end is the same
     const otherCorner = patch(
-      axis.line, source[axis.end], source[axis.crossAxisEnd]
+      axis.line,
+      source[axis.end],
+      source[axis.crossAxisEnd],
     );
     const otherDiff = absolute(subtract(source.center, otherCorner));
 
@@ -72,7 +73,9 @@ const getCenterDiff = (axis: Axis) => (source: Rect): Position => {
 
 describe('move to edge', () => {
   [behind, infront].forEach((source: Rect) => {
-    describe(`source is ${source === behind ? 'behind' : 'infront of'} destination`, () => {
+    describe(`source is ${
+      source === behind ? 'behind' : 'infront of'
+    } destination`, () => {
       describe('moving to a vertical list', () => {
         const pullUpwards = pullBackwardsOnMainAxis(vertical);
         const centerDiff = getCenterDiff(vertical)(source);
@@ -87,7 +90,7 @@ describe('move to edge', () => {
             it('should move the source above the destination', () => {
               const newCenter: Position = add(
                 pullUpwards(centerDiff),
-                destinationTopCorner
+                destinationTopCorner,
               );
 
               const result: Position = moveToEdge({
@@ -104,10 +107,7 @@ describe('move to edge', () => {
 
           describe('to source start edge', () => {
             it('should move below the top of the destination', () => {
-              const newCenter: Position = add(
-                centerDiff,
-                destinationTopCorner,
-              );
+              const newCenter: Position = add(centerDiff, destinationTopCorner);
 
               const result: Position = moveToEdge({
                 source,
@@ -182,7 +182,7 @@ describe('move to edge', () => {
             it('should move the source to the left of destination start edge', () => {
               const newCenter: Position = add(
                 pullLeft(centerDiff),
-                destinationTopCorner
+                destinationTopCorner,
               );
 
               const result: Position = moveToEdge({
@@ -199,10 +199,7 @@ describe('move to edge', () => {
 
           describe('to source start edge', () => {
             it('should move to the right of the destination start edge', () => {
-              const newCenter: Position = add(
-                centerDiff,
-                destinationTopCorner,
-              );
+              const newCenter: Position = add(centerDiff, destinationTopCorner);
 
               const result: Position = moveToEdge({
                 source,

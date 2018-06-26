@@ -2,8 +2,8 @@
 import type { Props } from '../drag-handle-types';
 
 export type TagNameMap = {
-  [tagName: string]: true
-}
+  [tagName: string]: true,
+};
 
 export const interactiveTagNames: TagNameMap = {
   input: true,
@@ -16,7 +16,10 @@ export const interactiveTagNames: TagNameMap = {
   audio: true,
 };
 
-const isAnInteractiveElement = (parent: Element, current: ?Element): boolean => {
+const isAnInteractiveElement = (
+  parent: Element,
+  current: ?Element,
+): boolean => {
   if (current == null) {
     return false;
   }
@@ -27,7 +30,9 @@ const isAnInteractiveElement = (parent: Element, current: ?Element): boolean => 
   // function to keep things simple.
   // There is no harm checking if the parent has an interactive tag name even if it cannot have
   // any children. We need to perform this loop anyway to check for the contenteditable attribute
-  const hasAnInteractiveTag: boolean = Boolean(interactiveTagNames[current.tagName.toLowerCase()]);
+  const hasAnInteractiveTag: boolean = Boolean(
+    interactiveTagNames[current.tagName.toLowerCase()],
+  );
 
   if (hasAnInteractiveTag) {
     return true;
@@ -65,4 +70,3 @@ export default (event: Event, props: Props): boolean => {
 
   return !isAnInteractiveElement(currentTarget, target);
 };
-
