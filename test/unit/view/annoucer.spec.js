@@ -32,7 +32,7 @@ describe('mounting', () => {
     const announcer: Announcer = createAnnouncer();
 
     announcer.mount();
-    const el: HTMLElement = (document.getElementById(announcer.id) : any);
+    const el: HTMLElement = (document.getElementById(announcer.id): any);
 
     expect(el.getAttribute('aria-live')).toBe('assertive');
     expect(el.getAttribute('role')).toBe('log');
@@ -80,7 +80,7 @@ describe('announcing', () => {
   it('should set the text content of the announcement element', () => {
     const announcer: Announcer = createAnnouncer();
     announcer.mount();
-    const el: HTMLElement = (document.getElementById(announcer.id) : any);
+    const el: HTMLElement = (document.getElementById(announcer.id): any);
 
     announcer.announce('test');
 

@@ -3,11 +3,7 @@ import invariant from 'invariant';
 import type { Position } from 'css-box-model';
 import { isEqual, subtract, add } from '../position';
 import getPageItemPositions from '../get-page-item-positions';
-import type {
-  DragPositions,
-  Viewport,
-  ItemPositions,
-} from '../../types';
+import type { DragPositions, Viewport, ItemPositions } from '../../types';
 
 type Args = {|
   initial: DragPositions,
@@ -15,12 +11,12 @@ type Args = {|
   oldClientBorderBoxCenter: Position,
   newClientBorderBoxCenter: Position,
   viewport: Viewport,
-|}
+|};
 
 type Result = {|
   initial: DragPositions,
   current: DragPositions,
-|}
+|};
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -37,11 +33,15 @@ export default ({
   }
 
   // how much the dragging item has shifted
-  const centerDiff: Position = subtract(newClientBorderBoxCenter, oldClientBorderBoxCenter);
+  const centerDiff: Position = subtract(
+    newClientBorderBoxCenter,
+    oldClientBorderBoxCenter,
+  );
   // const displacement: Position = negate(centerDiff);
 
   const clientSelection: Position = add(
-    oldInitial.client.selection, centerDiff
+    oldInitial.client.selection,
+    centerDiff,
   );
 
   const initial: DragPositions = (() => {
@@ -78,7 +78,7 @@ export default ({
         Incorrect new client center position.
         Expected ${JSON.stringify(oldCurrent.client.borderBoxCenter)}
         to equal ${JSON.stringify(client.borderBoxCenter)}
-      `
+      `,
     );
 
     return {
@@ -89,4 +89,3 @@ export default ({
 
   return { current, initial };
 };
-

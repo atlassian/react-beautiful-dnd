@@ -127,7 +127,9 @@ describe('position', () => {
       const option1 = { x: 1, y: 1 };
       const option2 = { x: 2, y: 2 };
 
-      expect(closest(origin, [option1, option2])).toEqual(distance(origin, option1));
+      expect(closest(origin, [option1, option2])).toEqual(
+        distance(origin, option1),
+      );
     });
   });
 

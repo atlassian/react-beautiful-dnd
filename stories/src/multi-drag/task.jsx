@@ -1,9 +1,9 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Draggable } from '../../../src/';
+import { Draggable } from '../../../src';
 import { grid, colors, borderRadius } from '../constants';
-import type { DraggableProvided, DraggableStateSnapshot } from '../../../src/';
+import type { DraggableProvided, DraggableStateSnapshot } from '../../../src';
 import type { Id, Task as TaskType } from '../types';
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
@@ -18,13 +18,13 @@ type Props = {|
   toggleSelection: (taskId: Id) => void,
   toggleSelectionInGroup: (taskId: Id) => void,
   multiSelectTo: (taskId: Id) => void,
-|}
+|};
 
-type GetBackgroundColorArgs= {|
+type GetBackgroundColorArgs = {|
   isSelected: boolean,
   isDragging: boolean,
   isGhosting: boolean,
-|}
+|};
 
 const getBackgroundColor = ({
   isSelected,
@@ -41,10 +41,7 @@ const getBackgroundColor = ({
   return colors.grey.light;
 };
 
-const getColor = ({
-  isSelected,
-  isGhosting,
-}): string => {
+const getColor = ({ isSelected, isGhosting }): string => {
   if (isGhosting) {
     return 'darkgrey';
   }
@@ -62,8 +59,13 @@ const Container = styled.div`
   border-radius: ${borderRadius}px;
   font-size: 18px;
   border: 1px solid ${colors.shadow};
-  ${props => (props.isDragging ? `box-shadow: 2px 2px 1px ${colors.shadow};` : '')}
-  ${props => (props.isGhosting ? 'opacity: 0.8;' : '')}
+  ${props =>
+    props.isDragging
+      ? `box-shadow: 2px 2px 1px ${colors.shadow};`
+      : ''} ${props =>
+    props.isGhosting
+      ? 'opacity: 0.8;'
+      : ''}
 
   /* needed for SelectionCount */
   position: relative;
@@ -105,7 +107,7 @@ export default class Task extends Component<Props> {
   onKeyDown = (
     event: KeyboardEvent,
     provided: DraggableProvided,
-    snapshot: DraggableStateSnapshot
+    snapshot: DraggableStateSnapshot,
   ) => {
     if (provided.dragHandleProps) {
       provided.dragHandleProps.onKeyDown(event);
@@ -130,7 +132,7 @@ export default class Task extends Component<Props> {
     const wasShiftKeyUsed: boolean = event.shiftKey;
 
     this.performAction(wasMetaKeyUsed, wasShiftKeyUsed);
-  }
+  };
 
   // Using onClick as it will be correctly
   // preventing if there was a drag
@@ -162,7 +164,7 @@ export default class Task extends Component<Props> {
     // if this element was an anchor
     event.preventDefault();
     this.props.toggleSelectionInGroup(this.props.task.id);
-  }
+  };
 
   performAction = (wasMetaKeyUsed: boolean, wasShiftKeyUsed: boolean) => {
     const {
@@ -183,7 +185,7 @@ export default class Task extends Component<Props> {
     }
 
     toggleSelection(task.id);
-  }
+  };
 
   render() {
     const task: TaskType = this.props.task;
@@ -194,7 +196,8 @@ export default class Task extends Component<Props> {
     return (
       <Draggable draggableId={task.id} index={index}>
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => {
-          const shouldShowSelection: boolean = snapshot.isDragging && selectionCount > 1;
+          const shouldShowSelection: boolean =
+            snapshot.isDragging && selectionCount > 1;
 
           return (
             <Container
@@ -203,13 +206,17 @@ export default class Task extends Component<Props> {
               {...provided.dragHandleProps}
               onClick={this.onClick}
               onTouchEnd={this.onTouchEnd}
-              onKeyDown={(event: KeyboardEvent) => this.onKeyDown(event, provided, snapshot)}
+              onKeyDown={(event: KeyboardEvent) =>
+                this.onKeyDown(event, provided, snapshot)
+              }
               isDragging={snapshot.isDragging}
               isSelected={isSelected}
               isGhosting={isGhosting}
             >
               <Content>{task.content}</Content>
-              {shouldShowSelection ? <SelectionCount>{selectionCount}</SelectionCount> : null}
+              {shouldShowSelection ? (
+                <SelectionCount>{selectionCount}</SelectionCount>
+              ) : null}
             </Container>
           );
         }}

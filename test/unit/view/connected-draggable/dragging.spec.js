@@ -28,7 +28,7 @@ draggingStates.forEach((current: IsDraggingState) => {
 
       const result: MapProps = selector(
         move(current, { x: 20, y: 30 }),
-        ownProps
+        ownProps,
       );
 
       const expected: MapProps = {
@@ -50,24 +50,32 @@ draggingStates.forEach((current: IsDraggingState) => {
         shouldAnimate: true,
       }: any);
 
-      expect(selector(withAnimation, ownProps).shouldAnimateDragMovement).toBe(true);
+      expect(selector(withAnimation, ownProps).shouldAnimateDragMovement).toBe(
+        true,
+      );
 
       const withoutAnimation: IsDraggingState = ({
         ...current,
         shouldAnimate: false,
       }: any);
 
-      expect(selector(withoutAnimation, ownProps).shouldAnimateDragMovement).toBe(false);
+      expect(
+        selector(withoutAnimation, ownProps).shouldAnimateDragMovement,
+      ).toBe(false);
     });
 
     it('should indicate when over a droppable', () => {
       const selector: Selector = makeMapStateToProps();
 
-      const inHome: IsDraggingState =
-        withImpact(current, getHomeImpact(state.critical, preset.dimensions));
+      const inHome: IsDraggingState = withImpact(
+        current,
+        getHomeImpact(state.critical, preset.dimensions),
+      );
       const noWhere: IsDraggingState = withImpact(current, noImpact);
 
-      expect(selector(inHome, ownProps).draggingOver).toBe(state.critical.droppable.id);
+      expect(selector(inHome, ownProps).draggingOver).toBe(
+        state.critical.droppable.id,
+      );
       expect(selector(noWhere, ownProps).draggingOver).toBe(null);
     });
 
@@ -76,11 +84,11 @@ draggingStates.forEach((current: IsDraggingState) => {
 
       const result1: MapProps = selector(
         move(current, { x: 100, y: 200 }),
-        ownProps
+        ownProps,
       );
       const result2: MapProps = selector(
         move(current, { x: 100, y: 200 }),
-        ownProps
+        ownProps,
       );
 
       expect(result1).toBe(result2);
@@ -89,7 +97,7 @@ draggingStates.forEach((current: IsDraggingState) => {
       const newCurrent: IsDraggingState = ({ ...current }: any);
       const result3: MapProps = selector(
         move(newCurrent, { x: 100, y: 200 }),
-        ownProps
+        ownProps,
       );
 
       expect(result1).toBe(result3);
@@ -100,11 +108,11 @@ draggingStates.forEach((current: IsDraggingState) => {
 
       const result1: MapProps = selector(
         move(current, { x: 100, y: 200 }),
-        ownProps
+        ownProps,
       );
       const result2: MapProps = selector(
         move(current, { x: 101, y: 200 }),
-        ownProps
+        ownProps,
       );
 
       expect(result1).not.toBe(result2);

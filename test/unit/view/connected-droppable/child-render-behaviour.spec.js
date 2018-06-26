@@ -1,7 +1,12 @@
 // @flow
 import React, { Component } from 'react';
 import { mount } from 'enzyme';
-import { withStore, combine, withDimensionMarshal, withStyleContext } from '../../../utils/get-context-options';
+import {
+  withStore,
+  combine,
+  withDimensionMarshal,
+  withStyleContext,
+} from '../../../utils/get-context-options';
 import Droppable from '../../../../src/view/droppable/connected-droppable';
 import forceUpdate from '../../../utils/force-update';
 import type { Provided } from '../../../../src/view/droppable/droppable-types';
@@ -22,10 +27,7 @@ class App extends Component<{ currentUser: string }> {
     return (
       <Droppable droppableId="drop-1">
         {(provided: Provided) => (
-          <Person
-            name={this.props.currentUser}
-            provided={provided}
-          />
+          <Person name={this.props.currentUser} provided={provided} />
         )}
       </Droppable>
     );

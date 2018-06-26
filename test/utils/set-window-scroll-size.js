@@ -3,7 +3,7 @@
 type Args = {|
   scrollHeight: number,
   scrollWidth: number,
-|}
+|};
 
 const setWindowScrollSize = ({ scrollHeight, scrollWidth }: Args): void => {
   const el: ?HTMLElement = document.documentElement;

@@ -52,8 +52,10 @@ export default (axis?: Axis = vertical) => {
   ): DraggingState => {
     // will populate the dimension state with the initial dimensions
     const draggable: DraggableDimension = preset.draggables[id];
-    const droppable: DroppableDimension = preset.droppables[draggable.descriptor.droppableId];
-    const clientSelection: Position = selection || draggable.client.borderBox.center;
+    const droppable: DroppableDimension =
+      preset.droppables[draggable.descriptor.droppableId];
+    const clientSelection: Position =
+      selection || draggable.client.borderBox.center;
     const ourCritical: Critical = {
       draggable: draggable.descriptor,
       droppable: droppable.descriptor,
@@ -72,7 +74,8 @@ export default (axis?: Axis = vertical) => {
     };
 
     const initial: DragPositions = {
-      client, page,
+      client,
+      page,
     };
 
     const result: DraggingState = {
@@ -109,7 +112,9 @@ export default (axis?: Axis = vertical) => {
     isWaiting: true,
   };
 
-  const dropPending = (args: ?DropPendingArgs = defaultDropPending): DropPendingState => ({
+  const dropPending = (
+    args: ?DropPendingArgs = defaultDropPending,
+  ): DropPendingState => ({
     phase: 'DROP_PENDING',
     ...dragging(),
     // eslint-disable-next-line
@@ -130,9 +135,13 @@ export default (axis?: Axis = vertical) => {
     };
   };
 
-  const getDropAnimating = (id: DraggableId, reason: DropReason): DropAnimatingState => {
+  const getDropAnimating = (
+    id: DraggableId,
+    reason: DropReason,
+  ): DropAnimatingState => {
     const descriptor: DraggableDescriptor = preset.draggables[id].descriptor;
-    const home: DroppableDescriptor = preset.droppables[descriptor.droppableId].descriptor;
+    const home: DroppableDescriptor =
+      preset.droppables[descriptor.droppableId].descriptor;
     const pending: PendingDrop = {
       newHomeOffset: { x: 10, y: 20 },
       impact: getHomeImpact(critical, preset.dimensions),
@@ -157,14 +166,16 @@ export default (axis?: Axis = vertical) => {
   };
 
   const dropAnimating = (
-    id?: DraggableId = preset.inHome1.descriptor.id
+    id?: DraggableId = preset.inHome1.descriptor.id,
   ): DropAnimatingState => getDropAnimating(id, 'DROP');
 
   const userCancel = (
-    id?: DraggableId = preset.inHome1.descriptor.id
+    id?: DraggableId = preset.inHome1.descriptor.id,
   ): DropAnimatingState => getDropAnimating(id, 'CANCEL');
 
-  const allPhases = (id? : DraggableId = preset.inHome1.descriptor.id): State[] => [
+  const allPhases = (
+    id?: DraggableId = preset.inHome1.descriptor.id,
+  ): State[] => [
     idle,
     preparing,
     dragging(id),
@@ -185,4 +196,3 @@ export default (axis?: Axis = vertical) => {
     collecting,
   };
 };
-

@@ -1,12 +1,10 @@
 // @flow
 import { type Position } from 'css-box-model';
-import getDragImpact from '../../../src/state/get-drag-impact/';
+import getDragImpact from '../../../src/state/get-drag-impact';
 import noImpact from '../../../src/state/no-impact';
 import { add, patch, subtract } from '../../../src/state/position';
 import { vertical, horizontal } from '../../../src/state/axis';
-import {
-  scrollDroppable,
-} from '../../../src/state/droppable-dimension';
+import { scrollDroppable } from '../../../src/state/droppable-dimension';
 import {
   getPreset,
   disableDroppable,
@@ -270,23 +268,27 @@ describe('get drag impact', () => {
                 patch(axis.line, 1),
               );
               const scrolledHome: DroppableDimension = scrollDroppable(
-                scrollableHome, distanceNeeded
+                scrollableHome,
+                distanceNeeded,
               );
               const updatedDroppables: DroppableDimensionMap = {
                 ...withScrollableHome,
                 [home.descriptor.id]: scrolledHome,
               };
               // no changes in current page center from original
-              const pageBorderBoxCenter: Position = inHome1.page.borderBox.center;
+              const pageBorderBoxCenter: Position =
+                inHome1.page.borderBox.center;
               const expected: DragImpact = {
                 movement: {
                   amount: patch(axis.line, inHome1.page.marginBox[axis.size]),
                   // ordered by closest to current location
-                  displaced: [{
-                    draggableId: inHome2.descriptor.id,
-                    isVisible: true,
-                    shouldAnimate: true,
-                  }],
+                  displaced: [
+                    {
+                      draggableId: inHome2.descriptor.id,
+                      isVisible: true,
+                      shouldAnimate: true,
+                    },
+                  ],
                   isBeyondStartPosition: true,
                 },
                 direction: axis.direction,
@@ -325,14 +327,16 @@ describe('get drag impact', () => {
                 patch(axis.line, -1),
               );
               const scrolledHome: DroppableDimension = scrollDroppable(
-                scrollableHome, distanceNeeded
+                scrollableHome,
+                distanceNeeded,
               );
               const updatedDroppables: DroppableDimensionMap = {
                 ...withScrollableHome,
                 [home.descriptor.id]: scrolledHome,
               };
               // no changes in current page center from original
-              const pageBorderBoxCenter: Position = inHome4.page.borderBox.center;
+              const pageBorderBoxCenter: Position =
+                inHome4.page.borderBox.center;
               const expected: DragImpact = {
                 movement: {
                   amount: patch(axis.line, inHome4.page.marginBox[axis.size]),
@@ -612,7 +616,8 @@ describe('get drag impact', () => {
             [foreign.descriptor.id]: disabled,
           };
           // choosing the center of inForeign1 which should have an impact
-          const pageBorderBoxCenter: Position = inForeign1.page.borderBox.center;
+          const pageBorderBoxCenter: Position =
+            inForeign1.page.borderBox.center;
 
           const impact: DragImpact = getDragImpact({
             pageBorderBoxCenter,
@@ -778,7 +783,8 @@ describe('get drag impact', () => {
         describe('moving to an empty droppable', () => {
           it('should not displace anything an move into the first position', () => {
             // over the center of the empty droppable
-            const pageBorderBoxCenter: Position = emptyForeign.page.borderBox.center;
+            const pageBorderBoxCenter: Position =
+              emptyForeign.page.borderBox.center;
             const expected: DragImpact = {
               movement: {
                 amount: patch(axis.line, inHome1.page.marginBox[axis.size]),
@@ -817,7 +823,10 @@ describe('get drag impact', () => {
           it('should have no impact impact the destination (actual)', () => {
             // will go over the threshold of inForeign2 so that it will not be displaced forward
             const scroll: Position = patch(axis.line, 1000);
-            const scrollableHome: DroppableDimension = makeScrollable(home, 1000);
+            const scrollableHome: DroppableDimension = makeScrollable(
+              home,
+              1000,
+            );
             const map: DroppableDimensionMap = {
               ...droppables,
               [home.descriptor.id]: scrollDroppable(scrollableHome, scroll),
@@ -925,7 +934,10 @@ describe('get drag impact', () => {
             const scroll: Position = patch(axis.line, 1);
             const map: DroppableDimensionMap = {
               ...withScrollableForeign,
-              [foreign.descriptor.id]: scrollDroppable(scrollableForeign, scroll),
+              [foreign.descriptor.id]: scrollDroppable(
+                scrollableForeign,
+                scroll,
+              ),
             };
 
             const expected: DragImpact = {
@@ -1107,7 +1119,7 @@ describe('get drag impact', () => {
             };
             const expected: DragImpact = {
               movement: {
-              // ordered by closest to current position
+                // ordered by closest to current position
                 displaced: [
                   {
                     draggableId: visible.descriptor.id,
@@ -1136,7 +1148,7 @@ describe('get drag impact', () => {
               pageBorderBoxCenter: patch(
                 axis.line,
                 destination.page.borderBox[axis.start],
-                destination.page.borderBox[axis.crossAxisStart]
+                destination.page.borderBox[axis.crossAxisStart],
               ),
               // dragging inSource1 over destination
               draggable: inSource1,
@@ -1234,7 +1246,7 @@ describe('get drag impact', () => {
             };
             const expected: DragImpact = {
               movement: {
-              // ordered by closest to current position
+                // ordered by closest to current position
                 displaced: [
                   {
                     draggableId: visible.descriptor.id,
@@ -1264,7 +1276,7 @@ describe('get drag impact', () => {
               pageBorderBoxCenter: patch(
                 axis.line,
                 destination.page.borderBox[axis.start],
-                destination.page.borderBox[axis.crossAxisStart]
+                destination.page.borderBox[axis.crossAxisStart],
               ),
               // dragging inSource1 over destination
               draggable: inSource1,

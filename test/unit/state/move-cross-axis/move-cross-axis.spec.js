@@ -1,8 +1,12 @@
 // @flow
-import moveCrossAxis from '../../../../src/state/move-cross-axis/';
+import moveCrossAxis from '../../../../src/state/move-cross-axis';
 import noImpact from '../../../../src/state/no-impact';
 import getViewport from '../../../../src/view/window/get-viewport';
-import { getPreset, getDroppableDimension, getDraggableDimension } from '../../../utils/dimension';
+import {
+  getPreset,
+  getDroppableDimension,
+  getDraggableDimension,
+} from '../../../utils/dimension';
 import type { Result } from '../../../../src/state/move-cross-axis/move-cross-axis-types';
 import type {
   Viewport,

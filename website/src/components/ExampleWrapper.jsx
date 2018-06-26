@@ -67,7 +67,7 @@ const Wrapper = styled.div`
 type Props = {
   children: Node,
   path: string,
-  title: string
+  title: string,
 };
 
 const ExampleWrapper = ({ children, path, title }: Props) => (

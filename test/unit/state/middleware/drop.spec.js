@@ -18,7 +18,8 @@ import {
   updateDroppableScroll,
   moveByWindowScroll,
   type InitialPublishArgs,
-  type DropAnimateAction, collectionStarting,
+  type DropAnimateAction,
+  collectionStarting,
 } from '../../../../src/state/action-creators';
 import {
   initialPublishArgs,
@@ -28,7 +29,6 @@ import {
 import noImpact, { noMovement } from '../../../../src/state/no-impact';
 import { vertical } from '../../../../src/state/axis';
 import type {
-  Store,
   State,
   DropResult,
   PendingDrop,
@@ -37,6 +37,7 @@ import type {
   DroppableDimension,
   Axis,
 } from '../../../../src/types';
+import type { Store } from '../../../../src/state/store-types';
 
 const axis: Axis = vertical;
 const preset = getPreset(vertical);
@@ -56,10 +57,12 @@ it('should throw an error if a drop action occurs while not in a phase where you
   expect(store.getState().phase).toBe('DRAGGING');
 
   // moving a little bit so that a drop animation will be needed
-  store.dispatch(move({
-    client: add(initialPublishArgs.client.selection, { x: 1, y: 1 }),
-    shouldAnimate: true,
-  }));
+  store.dispatch(
+    move({
+      client: add(initialPublishArgs.client.selection, { x: 1, y: 1 }),
+      shouldAnimate: true,
+    }),
+  );
 
   store.dispatch(drop({ reason: 'DROP' }));
   expect(store.getState().phase).toBe('DROP_ANIMATING');
@@ -69,10 +72,7 @@ it('should throw an error if a drop action occurs while not in a phase where you
 
 it('should dispatch a DROP_PENDING action if COLLECTING', () => {
   const mock = jest.fn();
-  const store: Store = createStore(
-    passThrough(mock),
-    middleware,
-  );
+  const store: Store = createStore(passThrough(mock), middleware);
 
   store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
@@ -94,10 +94,7 @@ it('should dispatch a DROP_PENDING action if COLLECTING', () => {
 
 it('should reset the state if a drop occurs while the application is preparing', () => {
   const mock = jest.fn();
-  const store: Store = createStore(
-    passThrough(mock),
-    middleware,
-  );
+  const store: Store = createStore(passThrough(mock), middleware);
 
   store.dispatch(prepare());
   expect(store.getState().phase).toBe('PREPARING');
@@ -110,10 +107,7 @@ it('should reset the state if a drop occurs while the application is preparing',
 
 it('should throw if a drop action is fired and there is DROP_PENDING and it is waiting for a publish', () => {
   const mock = jest.fn();
-  const store: Store = createStore(
-    passThrough(mock),
-    middleware,
-  );
+  const store: Store = createStore(passThrough(mock), middleware);
 
   store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
@@ -134,8 +128,9 @@ it('should throw if a drop action is fired and there is DROP_PENDING and it is w
 
   // Drop action being fired (should not happen?)
 
-  expect(() => store.dispatch(drop({ reason: 'DROP' })))
-    .toThrow('A DROP action occurred while DROP_PENDING and still waiting');
+  expect(() => store.dispatch(drop({ reason: 'DROP' }))).toThrow(
+    'A DROP action occurred while DROP_PENDING and still waiting',
+  );
 });
 
 describe('no drop animation required', () => {
@@ -145,10 +140,7 @@ describe('no drop animation required', () => {
     describe(`with drop reason: ${reason}`, () => {
       it('should fire a complete drop action is no drop animation is required', () => {
         const mock = jest.fn();
-        const store: Store = createStore(
-          passThrough(mock),
-          middleware,
-        );
+        const store: Store = createStore(passThrough(mock), middleware);
 
         store.dispatch(clean());
         store.dispatch(prepare());
@@ -160,7 +152,7 @@ describe('no drop animation required', () => {
         store.dispatch(drop({ reason }));
 
         const destination: ?DraggableLocation = (() => {
-        // destination is cleared when cancelling
+          // destination is cleared when cancelling
           if (reason === 'CANCEL') {
             return null;
           }
@@ -188,20 +180,19 @@ describe('drop animation required', () => {
   describe('reason: CANCEL', () => {
     it('should animate back to the origin', () => {
       const mock = jest.fn();
-      const store: Store = createStore(
-        passThrough(mock),
-        middleware,
-      );
+      const store: Store = createStore(passThrough(mock), middleware);
 
       store.dispatch(prepare());
       store.dispatch(initialPublish(initialPublishArgs));
       expect(store.getState().phase).toBe('DRAGGING');
 
       // moving a little bit so that a drop animation will be needed
-      store.dispatch(move({
-        client: add(initialPublishArgs.client.selection, { x: 1, y: 1 }),
-        shouldAnimate: true,
-      }));
+      store.dispatch(
+        move({
+          client: add(initialPublishArgs.client.selection, { x: 1, y: 1 }),
+          shouldAnimate: true,
+        }),
+      );
 
       mock.mockReset();
       store.dispatch(drop({ reason: 'CANCEL' }));
@@ -224,10 +215,7 @@ describe('drop animation required', () => {
 
     it('should account for any change in scroll in the home droppable', () => {
       const mock = jest.fn();
-      const store: Store = createStore(
-        passThrough(mock),
-        middleware,
-      );
+      const store: Store = createStore(passThrough(mock), middleware);
 
       const scrollableHome: DroppableDimension = makeScrollable(preset.home);
 
@@ -248,10 +236,12 @@ describe('drop animation required', () => {
       expect(store.getState().phase).toBe('DRAGGING');
 
       // doing a small scroll
-      store.dispatch(updateDroppableScroll({
-        id: customArgs.critical.droppable.id,
-        offset: { x: 1, y: 1 },
-      }));
+      store.dispatch(
+        updateDroppableScroll({
+          id: customArgs.critical.droppable.id,
+          offset: { x: 1, y: 1 },
+        }),
+      );
 
       // dropping
       mock.mockReset();
@@ -277,12 +267,11 @@ describe('drop animation required', () => {
 
     it('should not account for scrolling in the droppable the draggable is over if it is not the home', () => {
       const mock = jest.fn();
-      const store: Store = createStore(
-        passThrough(mock),
-        middleware,
-      );
+      const store: Store = createStore(passThrough(mock), middleware);
 
-      const scrollableForeign: DroppableDimension = makeScrollable(preset.foreign);
+      const scrollableForeign: DroppableDimension = makeScrollable(
+        preset.foreign,
+      );
       const customInitial: InitialPublishArgs = {
         ...initialPublishArgs,
         dimensions: {
@@ -301,20 +290,29 @@ describe('drop animation required', () => {
       expect(store.getState().phase).toBe('DRAGGING');
 
       // moving over the foreign droppable
-      store.dispatch(move({
-        client: scrollableForeign.client.borderBox.center,
-        shouldAnimate: false,
-      }));
+      store.dispatch(
+        move({
+          client: scrollableForeign.client.borderBox.center,
+          shouldAnimate: false,
+        }),
+      );
       const state: State = store.getState();
       invariant(state.phase === 'DRAGGING', 'Invalid phase');
-      invariant(state.impact.destination, 'Expected to be over foreign droppable');
-      expect(state.impact.destination.droppableId).toBe(scrollableForeign.descriptor.id);
+      invariant(
+        state.impact.destination,
+        'Expected to be over foreign droppable',
+      );
+      expect(state.impact.destination.droppableId).toBe(
+        scrollableForeign.descriptor.id,
+      );
 
       // doing a small scroll on foreign
-      store.dispatch(updateDroppableScroll({
-        id: scrollableForeign.descriptor.id,
-        offset: { x: 1, y: 1 },
-      }));
+      store.dispatch(
+        updateDroppableScroll({
+          id: scrollableForeign.descriptor.id,
+          offset: { x: 1, y: 1 },
+        }),
+      );
 
       // dropping
       mock.mockReset();
@@ -322,7 +320,7 @@ describe('drop animation required', () => {
       expect(mock).toHaveBeenCalledWith(drop({ reason: 'CANCEL' }));
       // Just checking the offset rather than the whole shape
       // Expecting return to origin as the scroll has not changed
-      const action: DropAnimateAction = (mock.mock.calls[1][0] : any);
+      const action: DropAnimateAction = (mock.mock.calls[1][0]: any);
       expect(action.type).toEqual('DROP_ANIMATE');
       expect(action.payload.newHomeOffset).toEqual({ x: 0, y: 0 });
       expect(mock).toHaveBeenCalledTimes(2);
@@ -332,10 +330,7 @@ describe('drop animation required', () => {
   describe('reason: DROP', () => {
     it('should account for any change in scroll in the home droppable if not dragging over anything', () => {
       const mock = jest.fn();
-      const store: Store = createStore(
-        passThrough(mock),
-        middleware,
-      );
+      const store: Store = createStore(passThrough(mock), middleware);
 
       const scrollableHome: DroppableDimension = makeScrollable(preset.home);
       const customArgs: InitialPublishArgs = {
@@ -354,13 +349,15 @@ describe('drop animation required', () => {
       expect(store.getState().phase).toBe('DRAGGING');
 
       // move after the end of the home droppable
-      store.dispatch(move({
-        client: {
-          x: preset.home.client.marginBox.center.x,
-          y: preset.home.client.marginBox.bottom + 1,
-        },
-        shouldAnimate: false,
-      }));
+      store.dispatch(
+        move({
+          client: {
+            x: preset.home.client.marginBox.center.x,
+            y: preset.home.client.marginBox.bottom + 1,
+          },
+          shouldAnimate: false,
+        }),
+      );
 
       // assert we are not over the home droppable
       const state: State = store.getState();
@@ -368,10 +365,12 @@ describe('drop animation required', () => {
       invariant(!state.impact.destination, 'Should have no destination');
 
       // scroll the home droppable
-      store.dispatch(updateDroppableScroll({
-        id: customArgs.critical.droppable.id,
-        offset: { x: 1, y: 1 },
-      }));
+      store.dispatch(
+        updateDroppableScroll({
+          id: customArgs.critical.droppable.id,
+          offset: { x: 1, y: 1 },
+        }),
+      );
 
       // drop
       mock.mockReset();
@@ -399,10 +398,7 @@ describe('drop animation required', () => {
     // very difficult to setup that test correctly
     it('should account for any change in scroll in the droppable being dropped into', () => {
       const mock = jest.fn();
-      const store: Store = createStore(
-        passThrough(mock),
-        middleware,
-      );
+      const store: Store = createStore(passThrough(mock), middleware);
 
       const scrollableHome: DroppableDimension = makeScrollable(preset.home);
       const customArgs: InitialPublishArgs = {
@@ -421,20 +417,26 @@ describe('drop animation required', () => {
       expect(store.getState().phase).toBe('DRAGGING');
 
       // moving to the top of the foreign droppable
-      store.dispatch(move({
-        client: { x: 1, y: 1 },
-        shouldAnimate: false,
-      }));
+      store.dispatch(
+        move({
+          client: { x: 1, y: 1 },
+          shouldAnimate: false,
+        }),
+      );
       const state: State = store.getState();
       invariant(state.phase === 'DRAGGING', 'Invalid phase');
       invariant(state.impact.destination, 'Expected to be over home droppable');
-      expect(state.impact.destination.droppableId).toBe(scrollableHome.descriptor.id);
+      expect(state.impact.destination.droppableId).toBe(
+        scrollableHome.descriptor.id,
+      );
 
       // scroll the foreign droppable
-      store.dispatch(updateDroppableScroll({
-        id: scrollableHome.descriptor.id,
-        offset: { x: 1, y: 1 },
-      }));
+      store.dispatch(
+        updateDroppableScroll({
+          id: scrollableHome.descriptor.id,
+          offset: { x: 1, y: 1 },
+        }),
+      );
 
       // drop
       mock.mockReset();
@@ -445,7 +447,10 @@ describe('drop animation required', () => {
         impact: {
           movement: {
             displaced: [],
-            amount: patch(axis.line, preset.inHome1.client.marginBox[axis.size]),
+            amount: patch(
+              axis.line,
+              preset.inHome1.client.marginBox[axis.size],
+            ),
             isBeyondStartPosition: false,
           },
           direction: preset.home.axis.direction,
@@ -464,10 +469,7 @@ describe('drop animation required', () => {
 
     it('should account for any change in scroll in the window', () => {
       const mock = jest.fn();
-      const store: Store = createStore(
-        passThrough(mock),
-        middleware,
-      );
+      const store: Store = createStore(passThrough(mock), middleware);
 
       // getting into a drag
       store.dispatch(clean());
@@ -476,9 +478,11 @@ describe('drop animation required', () => {
       expect(store.getState().phase).toBe('DRAGGING');
 
       // scroll the window
-      store.dispatch(moveByWindowScroll({
-        scroll: add(preset.windowScroll, { x: 1, y: 1 }),
-      }));
+      store.dispatch(
+        moveByWindowScroll({
+          scroll: add(preset.windowScroll, { x: 1, y: 1 }),
+        }),
+      );
 
       // drop
       mock.mockReset();
@@ -490,7 +494,10 @@ describe('drop animation required', () => {
         impact: {
           movement: {
             displaced: [],
-            amount: patch(axis.line, preset.inHome1.client.marginBox[axis.size]),
+            amount: patch(
+              axis.line,
+              preset.inHome1.client.marginBox[axis.size],
+            ),
             isBeyondStartPosition: true,
           },
           direction: preset.home.axis.direction,

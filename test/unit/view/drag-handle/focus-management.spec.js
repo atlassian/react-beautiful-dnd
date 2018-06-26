@@ -5,7 +5,10 @@ import PropTypes from 'prop-types';
 import { mount } from 'enzyme';
 import type { ReactWrapper } from 'enzyme';
 import DragHandle from '../../../../src/view/drag-handle';
-import { styleContextKey, canLiftContextKey } from '../../../../src/view/context-keys';
+import {
+  styleContextKey,
+  canLiftContextKey,
+} from '../../../../src/view/context-keys';
 import type { DragHandleProps } from '../../../../src/view/drag-handle/drag-handle-types';
 import { getStubCallbacks } from './util';
 
@@ -31,7 +34,7 @@ describe('Portal usage (ref changing while mounted)', () => {
     dragHandleProps: ?DragHandleProps,
     usePortal: boolean,
     setRef: (ref: ?HTMLElement) => void,
-  |}
+  |};
   class Child extends React.Component<ChildProps> {
     // eslint-disable-next-line react/sort-comp
     portal: ?HTMLElement;
@@ -63,13 +66,15 @@ describe('Portal usage (ref changing while mounted)', () => {
       return child;
     }
   }
-  class WithParentRefAndPortalChild extends React.Component<{ usePortal: boolean }> {
+  class WithParentRefAndPortalChild extends React.Component<{
+    usePortal: boolean,
+  }> {
     // eslint-disable-next-line react/sort-comp
     ref: ?HTMLElement;
 
     setRef = (ref: ?HTMLElement) => {
       this.ref = ref;
-    }
+    };
 
     render() {
       return (
@@ -95,7 +100,10 @@ describe('Portal usage (ref changing while mounted)', () => {
   }
 
   it('should retain focus if draggable ref is changing and had focus', () => {
-    const wrapper = mount(<WithParentRefAndPortalChild usePortal={false} />, options);
+    const wrapper = mount(
+      <WithParentRefAndPortalChild usePortal={false} />,
+      options,
+    );
 
     const original: HTMLElement = wrapper.getDOMNode();
     expect(original).not.toBe(document.activeElement);
@@ -117,7 +125,10 @@ describe('Portal usage (ref changing while mounted)', () => {
   });
 
   it('should not retain focus if draggable ref is changing and did not have focus', () => {
-    const wrapper = mount(<WithParentRefAndPortalChild usePortal={false} />, options);
+    const wrapper = mount(
+      <WithParentRefAndPortalChild usePortal={false} />,
+      options,
+    );
 
     const original: HTMLElement = wrapper.getDOMNode();
     expect(original).not.toBe(document.activeElement);
@@ -136,10 +147,10 @@ describe('Portal usage (ref changing while mounted)', () => {
 
 describe('Focus retention moving between lists (focus retention between mounts)', () => {
   type WithParentRefProps = {|
-    draggableId: string,
-    isDragging: boolean,
-    isDropAnimating: boolean
-  |}
+    draggableId?: string,
+    isDragging?: boolean,
+    isDropAnimating?: boolean,
+  |};
   class WithParentRef extends React.Component<WithParentRefProps> {
     // eslint-disable-next-line react/sort-comp
     ref: ?HTMLElement;
@@ -148,25 +159,27 @@ describe('Focus retention moving between lists (focus retention between mounts)'
       draggableId: 'draggable',
       isDragging: false,
       isDropAnimating: false,
-    }
+    };
 
     setRef = (ref: ?HTMLElement) => {
       this.ref = ref;
-    }
+    };
 
     render() {
       return (
         <DragHandle
-          draggableId={this.props.draggableId}
+          draggableId={this.props.draggableId || 'draggable'}
           callbacks={getStubCallbacks()}
-          isDragging={this.props.isDragging}
-          isDropAnimating={this.props.isDropAnimating}
+          isDragging={this.props.isDragging || false}
+          isDropAnimating={this.props.isDropAnimating || false}
           isEnabled
           getDraggableRef={() => this.ref}
           canDragInteractiveElements={false}
         >
           {(dragHandleProps: ?DragHandleProps) => (
-            <div ref={this.setRef} {...dragHandleProps}>Drag me!</div>
+            <div ref={this.setRef} {...dragHandleProps}>
+              Drag me!
+            </div>
           )}
         </DragHandle>
       );
@@ -197,7 +210,10 @@ describe('Focus retention moving between lists (focus retention between mounts)'
   });
 
   it('should maintain focus if unmounting while drop animating', () => {
-    const first: ReactWrapper = mount(<WithParentRef isDropAnimating />, options);
+    const first: ReactWrapper = mount(
+      <WithParentRef isDropAnimating />,
+      options,
+    );
     const original: HTMLElement = first.getDOMNode();
     expect(original).not.toBe(document.activeElement);
 
@@ -222,7 +238,8 @@ describe('Focus retention moving between lists (focus retention between mounts)'
   // This interaction has nothing to do with us!
   it('should not maintain focus if the item was not dragging or drop animating', () => {
     const first: ReactWrapper = mount(
-      <WithParentRef isDragging={false} isDropAnimating={false} />, options
+      <WithParentRef isDragging={false} isDropAnimating={false} />,
+      options,
     );
     const original: HTMLElement = first.getDOMNode();
     expect(original).not.toBe(document.activeElement);
@@ -263,7 +280,8 @@ describe('Focus retention moving between lists (focus retention between mounts)'
 
   it('should maintain focus if another component is mounted before the focused component', () => {
     const first: ReactWrapper = mount(
-      <WithParentRef draggableId="first" isDragging />, options
+      <WithParentRef draggableId="first" isDragging />,
+      options,
     );
     const original: HTMLElement = first.getDOMNode();
     expect(original).not.toBe(document.activeElement);
@@ -278,13 +296,15 @@ describe('Focus retention moving between lists (focus retention between mounts)'
 
     // mounting something with a different id
     const other: ReactWrapper = mount(
-      <WithParentRef draggableId="other" />, options
+      <WithParentRef draggableId="other" />,
+      options,
     );
     expect(other.getDOMNode()).not.toBe(document.activeElement);
 
     // mounting something with the same id as the first
     const second: ReactWrapper = mount(
-      <WithParentRef draggableId="first" />, options
+      <WithParentRef draggableId="first" />,
+      options,
     );
     const latest: HTMLElement = second.getDOMNode();
     expect(latest).toBe(document.activeElement);
@@ -295,7 +315,10 @@ describe('Focus retention moving between lists (focus retention between mounts)'
   });
 
   it('should only maintain focus once', () => {
-    const first: ReactWrapper = mount(<WithParentRef isDropAnimating />, options);
+    const first: ReactWrapper = mount(
+      <WithParentRef isDropAnimating />,
+      options,
+    );
     const original: HTMLElement = first.getDOMNode();
     expect(original).not.toBe(document.activeElement);
 
@@ -326,9 +349,13 @@ describe('Focus retention moving between lists (focus retention between mounts)'
   });
 
   it('should not give focus if something else on the page has been focused on after unmount', () => {
+    // eslint-disable-next-line react/button-has-type
     const button: HTMLElement = document.createElement('button');
     body.appendChild(button);
-    const first: ReactWrapper = mount(<WithParentRef isDropAnimating />, options);
+    const first: ReactWrapper = mount(
+      <WithParentRef isDropAnimating />,
+      options,
+    );
     const original: HTMLElement = first.getDOMNode();
     expect(original).not.toBe(document.activeElement);
 

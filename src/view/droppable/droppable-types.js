@@ -12,18 +12,18 @@ import type {
 export type DroppableProps = {|
   // used for shared global styles
   'data-react-beautiful-dnd-droppable': string,
-|}
+|};
 
 export type Provided = {|
   innerRef: (?HTMLElement) => void,
   placeholder: ?Node,
   droppableProps: DroppableProps,
-|}
+|};
 
 export type StateSnapshot = {|
   isDraggingOver: boolean,
   draggingOverWith: ?DraggableId,
-|}
+|};
 
 export type MapProps = {|
   isDraggingOver: boolean,
@@ -33,7 +33,7 @@ export type MapProps = {|
   // not the user is dragging over a list that
   // is not the source list
   placeholder: ?Placeholder,
-|}
+|};
 
 export type OwnProps = {|
   children: (Provided, StateSnapshot) => ?Node,
@@ -49,12 +49,12 @@ export type DefaultProps = {|
   isDropDisabled: boolean,
   direction: Direction,
   ignoreContainerClipping: boolean,
-|}
+|};
 
 export type Props = {|
   ...OwnProps,
   ...MapProps,
-|}
+|};
 
 // Having issues getting the correct type
 // export type Selector = OutputSelector<State, OwnProps, MapProps>;

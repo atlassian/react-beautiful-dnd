@@ -4,7 +4,9 @@ import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
-import createStyleMarshal, { resetStyleContext } from '../style-marshal/style-marshal';
+import createStyleMarshal, {
+  resetStyleContext,
+} from '../style-marshal/style-marshal';
 import canStartDrag from '../../state/can-start-drag';
 import scrollWindow from '../window/scroll-window';
 import createAnnouncer from '../announcer/announcer';
@@ -16,13 +18,8 @@ import type {
   DimensionMarshal,
   Callbacks as DimensionMarshalCallbacks,
 } from '../../state/dimension-marshal/dimension-marshal-types';
-import type {
-  DraggableId,
-  Store,
-  State,
-  Hooks,
-  Viewport,
-} from '../../types';
+import type { DraggableId, State, Hooks } from '../../types';
+import type { Store } from '../../state/store-types';
 import {
   storeKey,
   dimensionMarshalKey,
@@ -41,11 +38,11 @@ import {
 type Props = {|
   ...Hooks,
   children: ?Node,
-|}
+|};
 
 type Context = {
-  [string]: Store
-}
+  [string]: Store,
+};
 
 // Reset any context that gets persisted across server side renders
 export const resetServerContext = () => {
@@ -54,21 +51,24 @@ export const resetServerContext = () => {
 
 const printFatalDevError = (error: Error) => {
   if (process.env.NODE_ENV !== 'production') {
-    console.warn(`
+    console.warn(
+      `
       An error has occurred while a drag is occurring.
       Any existing drag will be cancelled
-    `, error);
+    `,
+      error,
+    );
   }
 };
 
 export default class DragDropContext extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
-  store: Store
-  dimensionMarshal: DimensionMarshal
-  styleMarshal: StyleMarshal
-  autoScroller: AutoScroller
-  announcer: Announcer
-  unsubscribe: Function
+  store: Store;
+  dimensionMarshal: DimensionMarshal;
+  styleMarshal: StyleMarshal;
+  autoScroller: AutoScroller;
+  announcer: Announcer;
+  unsubscribe: Function;
 
   constructor(props: Props, context: mixed) {
     super(props, context);
@@ -92,20 +92,26 @@ export default class DragDropContext extends React.Component<Props> {
       announce: this.announcer.announce,
       getScroller: () => this.autoScroller,
     });
-    const callbacks: DimensionMarshalCallbacks = bindActionCreators({
-      collectionStarting,
-      publish,
-      updateDroppableScroll,
-      updateDroppableIsEnabled,
-    }, this.store.dispatch);
+    const callbacks: DimensionMarshalCallbacks = bindActionCreators(
+      {
+        collectionStarting,
+        publish,
+        updateDroppableScroll,
+        updateDroppableIsEnabled,
+      },
+      this.store.dispatch,
+    );
     this.dimensionMarshal = createDimensionMarshal(callbacks);
 
     this.autoScroller = createAutoScroller({
       scrollWindow,
       scrollDroppable: this.dimensionMarshal.scrollDroppable,
-      ...bindActionCreators({
-        move,
-      }, this.store.dispatch),
+      ...bindActionCreators(
+        {
+          move,
+        },
+        this.store.dispatch,
+      ),
     });
   }
   // Need to declare childContextTypes without flow
@@ -119,7 +125,7 @@ export default class DragDropContext extends React.Component<Props> {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
     [styleContextKey]: PropTypes.string.isRequired,
     [canLiftContextKey]: PropTypes.func.isRequired,
-  }
+  };
   /* eslint-enable */
 
   getChildContext(): Context {
@@ -160,17 +166,6 @@ export default class DragDropContext extends React.Component<Props> {
     throw error;
   }
 
-  onWindowError = (error: Error) => {
-    const state: State = this.store.getState();
-
-    if (state.phase === 'IDLE') {
-      return;
-    }
-
-    printFatalDevError(error);
-    this.store.dispatch(clean());
-  }
-
   componentWillUnmount() {
     window.addEventListener('error', this.onWindowError);
 
@@ -182,6 +177,17 @@ export default class DragDropContext extends React.Component<Props> {
     this.styleMarshal.unmount();
     this.announcer.unmount();
   }
+
+  onWindowError = (error: Error) => {
+    const state: State = this.store.getState();
+
+    if (state.phase === 'IDLE') {
+      return;
+    }
+
+    printFatalDevError(error);
+    this.store.dispatch(clean());
+  };
 
   render() {
     return this.props.children;

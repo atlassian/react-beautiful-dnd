@@ -24,7 +24,7 @@ export type GetDraggableDimensionFn = (
 
 export type GetDroppableDimensionFn = (
   windowScroll: Position,
-  options: ScrollOptions
+  options: ScrollOptions,
 ) => DroppableDimension;
 
 export type DroppableCallbacks = {|
@@ -34,58 +34,58 @@ export type DroppableCallbacks = {|
   // If the Droppable is listening for scroll events - it needs to stop!
   // Can be called on droppables that have not been asked to watch scroll
   unwatchScroll: () => void,
-|}
+|};
 
 export type DroppableEntry = {|
   descriptor: DroppableDescriptor,
-  callbacks: DroppableCallbacks
-|}
+  callbacks: DroppableCallbacks,
+|};
 
 export type DraggableEntry = {|
   descriptor: DraggableDescriptor,
   getDimension: GetDraggableDimensionFn,
-|}
+|};
 
 export type DraggableEntryMap = {
   [key: DraggableId]: DraggableEntry,
-}
+};
 
 export type DroppableEntryMap = {
   [key: DroppableId]: DroppableEntry,
-}
+};
 
 export type Entries = {|
   droppables: DroppableEntryMap,
   draggables: DraggableEntryMap,
-|}
+|};
 
 export type Collection = {|
   scrollOptions: ScrollOptions,
   critical: Critical,
   initialWindowScroll: Position,
-|}
+|};
 
 export type StartPublishingResult = {|
   critical: Critical,
-  dimensions: DimensionMap
+  dimensions: DimensionMap,
 |};
 
 export type DimensionMarshal = {|
   // Draggable
   registerDraggable: (
     descriptor: DraggableDescriptor,
-    getDimension: GetDraggableDimensionFn
+    getDimension: GetDraggableDimensionFn,
   ) => void,
   updateDraggable: (
     previous: DraggableDescriptor,
     descriptor: DraggableDescriptor,
-    getDimension: GetDraggableDimensionFn
+    getDimension: GetDraggableDimensionFn,
   ) => void,
   unregisterDraggable: (descriptor: DraggableDescriptor) => void,
   // Droppable
   registerDroppable: (
     descriptor: DroppableDescriptor,
-    callbacks: DroppableCallbacks
+    callbacks: DroppableCallbacks,
   ) => void,
   updateDroppable: (
     previous: DroppableDescriptor,
@@ -98,13 +98,16 @@ export type DimensionMarshal = {|
   scrollDroppable: (id: DroppableId, change: Position) => void,
   unregisterDroppable: (descriptor: DroppableDescriptor) => void,
   // Entry
-  startPublishing: (request: LiftRequest, windowScroll: Position) => StartPublishingResult,
+  startPublishing: (
+    request: LiftRequest,
+    windowScroll: Position,
+  ) => StartPublishingResult,
   stopPublishing: () => void,
-|}
+|};
 
 export type Callbacks = {|
   publish: (args: Publish) => void,
   updateDroppableScroll: (args: UpdateDroppableScrollArgs) => void,
   updateDroppableIsEnabled: (args: UpdateDroppableIsEnabledArgs) => void,
   collectionStarting: () => void,
-|}
+|};

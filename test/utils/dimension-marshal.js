@@ -9,7 +9,11 @@ import {
   collectionStarting,
 } from '../../src/state/action-creators';
 import { getPreset } from './dimension';
-import type { DimensionMarshal, Callbacks, DroppableCallbacks } from '../../src/state/dimension-marshal/dimension-marshal-types';
+import type {
+  DimensionMarshal,
+  Callbacks,
+  DroppableCallbacks,
+} from '../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
   DroppableDimension,
   DraggableId,
@@ -19,12 +23,15 @@ import type {
 } from '../../src/types';
 
 export default (dispatch: Function): DimensionMarshal => {
-  const callbacks: Callbacks = bindActionCreators({
-    publish,
-    collectionStarting,
-    updateDroppableScroll,
-    updateDroppableIsEnabled,
-  }, dispatch);
+  const callbacks: Callbacks = bindActionCreators(
+    {
+      publish,
+      collectionStarting,
+      updateDroppableScroll,
+      updateDroppableIsEnabled,
+    },
+    dispatch,
+  );
 
   const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
 
@@ -47,7 +54,9 @@ export const getMarshalStub = (): DimensionMarshal => ({
   stopPublishing: jest.fn(),
 });
 
-export const getDroppableCallbacks = (dimension: DroppableDimension): DroppableCallbacks => ({
+export const getDroppableCallbacks = (
+  dimension: DroppableDimension,
+): DroppableCallbacks => ({
   getDimensionAndWatchScroll: jest.fn().mockReturnValue(dimension),
   scroll: jest.fn(),
   unwatchScroll: jest.fn(),
@@ -63,8 +72,8 @@ export type DimensionWatcher = {|
     unwatchScroll: Function,
     hidePlaceholder: Function,
     showPlaceholder: Function,
-  |}
-|}
+  |},
+|};
 
 export const resetWatcher = (watcher: DimensionWatcher) => {
   watcher.draggable.getDimension.mockReset();

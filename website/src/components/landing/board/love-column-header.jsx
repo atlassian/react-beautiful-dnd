@@ -14,4 +14,8 @@ const Love = styled(HeartIcon)`
   margin-left: ${grid}px;
 `;
 
-export default () => <LoveContainer>Quotes that I <Love title="love" role="img" /></LoveContainer>;
+export default () => (
+  <LoveContainer>
+    Quotes that I <Love title="love" role="img" />
+  </LoveContainer>
+);

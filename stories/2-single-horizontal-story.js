@@ -13,9 +13,7 @@ const WideWindow = styled.div`
 `;
 
 storiesOf('single horizontal list', module)
-  .add('simple example', () => (
-    <AuthorApp initial={quotes} />
-  ))
+  .add('simple example', () => <AuthorApp initial={quotes} />)
   .add('with overflow scroll', () => (
     <AuthorApp initial={bigData} internalScroll />
   ))

@@ -7,7 +7,7 @@ type MediaRule = {|
   query: string,
   negatedQuery: string,
   fn: WhenRuleFn,
-|}
+|};
 
 // eslint-disable-next-line import/prefer-default-export
 export const smallView: MediaRule = (() => {
@@ -18,6 +18,8 @@ export const smallView: MediaRule = (() => {
   const fn: WhenRuleFn = (...args) => `@media ${query} { ${css(...args)} }`;
 
   return {
-    query, fn, negatedQuery,
+    query,
+    fn,
+    negatedQuery,
   };
 })();

@@ -12,9 +12,9 @@ type Props = {
   data: SidebarData,
   children: () => Node,
   location: {
-    pathname: string
-  }
-}
+    pathname: string,
+  },
+};
 
 const ExamplePage = ({ children, data, location }: Props) => (
   <CommonPage>
@@ -54,9 +54,7 @@ export const query = graphql`
         }
       }
     }
-    docs: allMarkdownRemark(
-      sort: { fields: [fields___dir], order: ASC }
-    ) {
+    docs: allMarkdownRemark(sort: { fields: [fields___dir], order: ASC }) {
       edges {
         node {
           fields {

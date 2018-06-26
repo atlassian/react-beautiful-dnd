@@ -6,8 +6,13 @@ import TestUtils from 'react-dom/test-utils';
 import { mount } from 'enzyme';
 import { Provider, connect } from 'react-redux';
 import { createStore } from 'redux';
-import { Droppable, Draggable, DragDropContext, resetServerContext } from '../../../src/';
-import type { DraggableProvided, DroppableProvided } from '../../../src/';
+import {
+  Droppable,
+  Draggable,
+  DragDropContext,
+  resetServerContext,
+} from '../../../src';
+import type { DraggableProvided, DroppableProvided } from '../../../src';
 import { storeKey, canLiftContextKey } from '../../../src/view/context-keys';
 // Imported as wildcard so we can mock `resetStyleContext` using spyOn
 import * as StyleMarshal from '../../../src/view/style-marshal/style-marshal';
@@ -33,9 +38,7 @@ describe('DragDropContext', () => {
   it('should put a store on the context', () => {
     // using react test utils to allow access to nested contexts
     const tree = TestUtils.renderIntoDocument(
-      <DragDropContext
-        onDragEnd={() => { }}
-      >
+      <DragDropContext onDragEnd={() => {}}>
         <App />
       </DragDropContext>,
     );
@@ -56,9 +59,7 @@ describe('DragDropContext', () => {
 
   it('should not throw when unmounting', () => {
     const wrapper = mount(
-      <DragDropContext
-        onDragEnd={() => { }}
-      >
+      <DragDropContext onDragEnd={() => {}}>
         <App />
       </DragDropContext>,
     );
@@ -71,9 +72,7 @@ describe('DragDropContext', () => {
     it('should put a can lift function on the context', () => {
       // using react test utils to allow access to nested contexts
       const tree = TestUtils.renderIntoDocument(
-        <DragDropContext
-          onDragEnd={() => { }}
-        >
+        <DragDropContext onDragEnd={() => {}}>
           <App />
         </DragDropContext>,
       );
@@ -91,7 +90,7 @@ describe('DragDropContext', () => {
   describe('Playing with other redux apps', () => {
     type ExternalState = {|
       foo: string,
-    |}
+    |};
     const original: ExternalState = {
       foo: 'bar',
     };
@@ -105,17 +104,22 @@ describe('DragDropContext', () => {
       }
     }
 
-    const Connected = connect((state: ExternalState): ExternalState => state)(Unconnected);
+    const Connected = connect((state: ExternalState): ExternalState => state)(
+      Unconnected,
+    );
 
     it('should avoid clashes with parent redux applications', () => {
       class Container extends Component<*> {
         render() {
           return (
             <Provider store={store}>
-              <DragDropContext onDragEnd={() => { }}>
+              <DragDropContext onDragEnd={() => {}}>
                 <Droppable droppableId="droppable">
                   {(droppableProvided: DroppableProvided) => (
-                    <div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
+                    <div
+                      ref={droppableProvided.innerRef}
+                      {...droppableProvided.droppableProps}
+                    >
                       <Draggable draggableId="draggableId">
                         {(draggableProvided: DraggableProvided) => (
                           <div
@@ -145,10 +149,13 @@ describe('DragDropContext', () => {
       class Container extends Component<*> {
         render() {
           return (
-            <DragDropContext onDragEnd={() => { }}>
+            <DragDropContext onDragEnd={() => {}}>
               <Droppable droppableId="droppable">
                 {(droppableProvided: DroppableProvided) => (
-                  <div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
+                  <div
+                    ref={droppableProvided.innerRef}
+                    {...droppableProvided.droppableProps}
+                  >
                     <Draggable draggableId="draggableId">
                       {(draggableProvided: DraggableProvided) => (
                         <div

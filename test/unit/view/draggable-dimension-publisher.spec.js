@@ -4,7 +4,11 @@ import { type Position, type Spacing } from 'css-box-model';
 import { mount } from 'enzyme';
 import DraggableDimensionPublisher from '../../../src/view/draggable-dimension-publisher/draggable-dimension-publisher';
 import setWindowScroll from '../../utils/set-window-scroll';
-import { getPreset, getDraggableDimension, getComputedSpacing } from '../../utils/dimension';
+import {
+  getPreset,
+  getDraggableDimension,
+  getComputedSpacing,
+} from '../../utils/dimension';
 import type {
   DimensionMarshal,
   GetDraggableDimensionFn,
@@ -25,17 +29,17 @@ const noComputedSpacing = getComputedSpacing({});
 
 type Props = {|
   index?: number,
-  draggableId ?: DraggableId,
-|}
+  draggableId?: DraggableId,
+|};
 
 class Item extends Component<Props> {
   /* eslint-disable react/sort-comp */
 
-  ref: ?HTMLElement
+  ref: ?HTMLElement;
 
   setRef = (ref: ?HTMLElement) => {
     this.ref = ref;
-  }
+  };
 
   getRef = (): ?HTMLElement => this.ref;
 
@@ -60,7 +64,7 @@ describe('DraggableDimensionPublisher', () => {
   });
 
   beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => { });
+    jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -74,7 +78,9 @@ describe('DraggableDimensionPublisher', () => {
       mount(<Item />, withDimensionMarshal(marshal));
 
       expect(marshal.registerDraggable).toHaveBeenCalledTimes(1);
-      expect(marshal.registerDraggable.mock.calls[0][0]).toEqual(preset.inHome1.descriptor);
+      expect(marshal.registerDraggable.mock.calls[0][0]).toEqual(
+        preset.inHome1.descriptor,
+      );
     });
 
     it('should unregister itself when unmounting', () => {
@@ -86,7 +92,9 @@ describe('DraggableDimensionPublisher', () => {
 
       wrapper.unmount();
       expect(marshal.unregisterDraggable).toHaveBeenCalledTimes(1);
-      expect(marshal.unregisterDraggable).toHaveBeenCalledWith(preset.inHome1.descriptor);
+      expect(marshal.unregisterDraggable).toHaveBeenCalledWith(
+        preset.inHome1.descriptor,
+      );
     });
 
     it('should update its registration when a descriptor property changes', () => {
@@ -94,7 +102,9 @@ describe('DraggableDimensionPublisher', () => {
 
       const wrapper = mount(<Item />, withDimensionMarshal(marshal));
       // asserting shape of original publish
-      expect(marshal.registerDraggable.mock.calls[0][0]).toEqual(preset.inHome1.descriptor);
+      expect(marshal.registerDraggable.mock.calls[0][0]).toEqual(
+        preset.inHome1.descriptor,
+      );
 
       // updating the index
       wrapper.setProps({
@@ -149,8 +159,12 @@ describe('DraggableDimensionPublisher', () => {
         },
       });
 
-      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => expected.client.borderBox);
-      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noComputedSpacing);
+      jest
+        .spyOn(Element.prototype, 'getBoundingClientRect')
+        .mockImplementation(() => expected.client.borderBox);
+      jest
+        .spyOn(window, 'getComputedStyle')
+        .mockImplementation(() => noComputedSpacing);
       const marshal: DimensionMarshal = getMarshalStub();
 
       mount(
@@ -158,11 +172,12 @@ describe('DraggableDimensionPublisher', () => {
           draggableId={expected.descriptor.id}
           index={expected.descriptor.index}
         />,
-        withDimensionMarshal(marshal)
+        withDimensionMarshal(marshal),
       );
 
       // pull the get dimension function out
-      const getDimension: GetDraggableDimensionFn = marshal.registerDraggable.mock.calls[0][1];
+      const getDimension: GetDraggableDimensionFn =
+        marshal.registerDraggable.mock.calls[0][1];
       // execute it to get the dimension
       const result: DraggableDimension = getDimension({ x: 0, y: 0 });
 
@@ -191,8 +206,12 @@ describe('DraggableDimensionPublisher', () => {
         },
         margin,
       });
-      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => expected.client.borderBox);
-      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => getComputedSpacing({ margin }));
+      jest
+        .spyOn(Element.prototype, 'getBoundingClientRect')
+        .mockImplementation(() => expected.client.borderBox);
+      jest
+        .spyOn(window, 'getComputedStyle')
+        .mockImplementation(() => getComputedSpacing({ margin }));
       const marshal: DimensionMarshal = getMarshalStub();
 
       mount(
@@ -200,11 +219,12 @@ describe('DraggableDimensionPublisher', () => {
           draggableId={expected.descriptor.id}
           index={expected.descriptor.index}
         />,
-        withDimensionMarshal(marshal)
+        withDimensionMarshal(marshal),
       );
 
       // pull the get dimension function out
-      const getDimension: GetDraggableDimensionFn = marshal.registerDraggable.mock.calls[0][1];
+      const getDimension: GetDraggableDimensionFn =
+        marshal.registerDraggable.mock.calls[0][1];
       // execute it to get the dimension
       const result: DraggableDimension = getDimension({ x: 0, y: 0 });
 
@@ -233,8 +253,12 @@ describe('DraggableDimensionPublisher', () => {
         borderBox,
         windowScroll: preset.windowScroll,
       });
-      jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => borderBox);
-      jest.spyOn(window, 'getComputedStyle').mockImplementation(() => noComputedSpacing);
+      jest
+        .spyOn(Element.prototype, 'getBoundingClientRect')
+        .mockImplementation(() => borderBox);
+      jest
+        .spyOn(window, 'getComputedStyle')
+        .mockImplementation(() => noComputedSpacing);
       setWindowScroll(preset.windowScroll);
 
       mount(
@@ -242,11 +266,12 @@ describe('DraggableDimensionPublisher', () => {
           draggableId={expected.descriptor.id}
           index={expected.descriptor.index}
         />,
-        withDimensionMarshal(marshal)
+        withDimensionMarshal(marshal),
       );
 
       // pull the get dimension function out
-      const getDimension: GetDraggableDimensionFn = marshal.registerDraggable.mock.calls[0][1];
+      const getDimension: GetDraggableDimensionFn =
+        marshal.registerDraggable.mock.calls[0][1];
       // execute it to get the dimension
       const result: DraggableDimension = getDimension(preset.windowScroll);
 
@@ -276,7 +301,8 @@ describe('DraggableDimensionPublisher', () => {
       mount(<NoRefItem />, withDimensionMarshal(marshal));
 
       // pull the get dimension function out
-      const getDimension: GetDraggableDimensionFn = marshal.registerDraggable.mock.calls[0][1];
+      const getDimension: GetDraggableDimensionFn =
+        marshal.registerDraggable.mock.calls[0][1];
 
       // when we call the get dimension function without a ref things will explode
       expect(getDimension).toThrow();

@@ -39,11 +39,11 @@ const Title = styled.h4`
 
 type Props = {|
   initial: QuoteMap,
-|}
+|};
 
 type State = {|
   quoteMap: QuoteMap,
-|}
+|};
 
 export default class QuoteApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
@@ -54,7 +54,7 @@ export default class QuoteApp extends Component<Props, State> {
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
-  }
+  };
 
   onDragEnd = (result: DropResult) => {
     publishOnDragEnd(result);
@@ -70,7 +70,7 @@ export default class QuoteApp extends Component<Props, State> {
     });
 
     this.setState({ quoteMap });
-  }
+  };
 
   render() {
     const { quoteMap } = this.state;
@@ -85,11 +85,7 @@ export default class QuoteApp extends Component<Props, State> {
             {Object.keys(quoteMap).map((key: string) => (
               <Group key={key}>
                 <Title>{key}</Title>
-                <QuoteList
-                  quotes={quoteMap[key]}
-                  listId={key}
-                  listType={key}
-                />
+                <QuoteList quotes={quoteMap[key]} listId={key} listType={key} />
               </Group>
             ))}
           </Column>

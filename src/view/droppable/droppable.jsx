@@ -14,18 +14,18 @@ import {
 
 type Context = {
   [string]: DroppableId | TypeId,
-}
+};
 
 export default class Droppable extends Component<Props> {
   /* eslint-disable react/sort-comp */
-  styleContext: string
-  ref: ?HTMLElement = null
+  styleContext: string;
+  ref: ?HTMLElement = null;
   isPlaceholderMounted: boolean = false;
 
   // Need to declare childContextTypes without flow
   static contextTypes = {
     [styleContextKey]: PropTypes.string.isRequired,
-  }
+  };
 
   constructor(props: Props, context: Object) {
     super(props, context);
@@ -38,7 +38,7 @@ export default class Droppable extends Component<Props> {
   static childContextTypes = {
     [droppableIdKey]: PropTypes.string.isRequired,
     [droppableTypeKey]: PropTypes.string.isRequired,
-  }
+  };
 
   getChildContext(): Context {
     const value: Context = {
@@ -82,11 +82,11 @@ export default class Droppable extends Component<Props> {
 
   onPlaceholderMount = () => {
     this.isPlaceholderMounted = true;
-  }
+  };
 
   onPlaceholderUnmount = () => {
     this.isPlaceholderMounted = false;
-  }
+  };
 
   // React calls ref callback twice for every render
   // https://github.com/facebook/react/pull/8333/files
@@ -102,7 +102,7 @@ export default class Droppable extends Component<Props> {
 
     this.ref = ref;
     throwIfRefIsInvalid(ref);
-  }
+  };
 
   getDroppableRef = (): ?HTMLElement => this.ref;
 

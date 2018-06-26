@@ -1,12 +1,13 @@
 /**
-* @jest-environment node
-*/
+ * @jest-environment node
+ */
 // @flow
 import * as attributes from '../../src/view/data-attributes';
 
 const puppeteer = require('puppeteer');
 
-const urlSingleList: string = 'http://localhost:9002/iframe.html?selectedKind=single%20vertical%20list&selectedStory=basic';
+const urlSingleList: string =
+  'http://localhost:9002/iframe.html?selectedKind=single%20vertical%20list&selectedStory=basic';
 
 const timeout: number = 60000;
 
@@ -45,7 +46,11 @@ describe('Browser test: single vertical list with keyboard', () => {
   beforeAll(async () => {
     /* args are supplied to avoid issues in Travis CI to launch chromium:
      https://github.com/GoogleChrome/puppeteer/issues/807 */
-    browser = await puppeteer.launch({ headless: true, slowMo: 100, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+    browser = await puppeteer.launch({
+      headless: true,
+      slowMo: 100,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
     page = await browser.newPage();
     await page.goto(urlSingleList);
     await page.waitForSelector(singleListContainer);

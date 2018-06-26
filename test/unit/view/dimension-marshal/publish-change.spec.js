@@ -11,19 +11,13 @@ import type {
   DimensionMap,
   Publish,
 } from '../../../../src/types';
-import {
-  critical,
-  preset,
-} from '../../../utils/preset-action-args';
+import { critical, preset } from '../../../utils/preset-action-args';
 import {
   getDroppableCallbacks,
   populateMarshal,
   getCallbacksStub,
 } from '../../../utils/dimension-marshal';
-import {
-  defaultRequest,
-  withExpectedAdvancedUsageWarning,
-} from './util';
+import { defaultRequest, withExpectedAdvancedUsageWarning } from './util';
 
 const empty: Publish = {
   removals: {
@@ -96,7 +90,10 @@ describe('additions', () => {
       marshal.registerDraggable(beforeInHome1.descriptor, () => beforeInHome1);
     });
     // Registering a new droppable
-    marshal.registerDroppable(anotherDroppable.descriptor, getDroppableCallbacks(anotherDroppable));
+    marshal.registerDroppable(
+      anotherDroppable.descriptor,
+      getDroppableCallbacks(anotherDroppable),
+    );
     expect(callbacks.publish).not.toHaveBeenCalled();
 
     // Fire the collection / publish step
@@ -123,7 +120,10 @@ describe('additions', () => {
     // Registering a new draggable (inserted before inHome1)
     marshal.registerDraggable(inAnotherType.descriptor, () => inAnotherType);
     // Registering a new droppable
-    marshal.registerDroppable(ofAnotherType.descriptor, getDroppableCallbacks(ofAnotherType));
+    marshal.registerDroppable(
+      ofAnotherType.descriptor,
+      getDroppableCallbacks(ofAnotherType),
+    );
     expect(callbacks.publish).not.toHaveBeenCalled();
 
     // Fire the collection / publish step
@@ -225,17 +225,25 @@ describe('cancelling', () => {
 
     populateMarshal(marshal, justCritical);
 
-    const result: StartPublishingResult =
-      marshal.startPublishing(defaultRequest, preset.windowScroll);
+    const result: StartPublishingResult = marshal.startPublishing(
+      defaultRequest,
+      preset.windowScroll,
+    );
     expect(result).toEqual({
       critical,
       dimensions: justCritical,
     });
 
     withExpectedAdvancedUsageWarning(() => {
-      marshal.registerDraggable(preset.inHome2.descriptor, () => preset.inHome2);
+      marshal.registerDraggable(
+        preset.inHome2.descriptor,
+        () => preset.inHome2,
+      );
     });
-    marshal.registerDroppable(preset.foreign.descriptor, getDroppableCallbacks(preset.foreign));
+    marshal.registerDroppable(
+      preset.foreign.descriptor,
+      getDroppableCallbacks(preset.foreign),
+    );
     // no request animation fired yet
     expect(callbacks.publish).not.toHaveBeenCalled();
 
@@ -257,7 +265,10 @@ describe('subsequent', () => {
     marshal.startPublishing(defaultRequest, preset.windowScroll);
 
     withExpectedAdvancedUsageWarning(() => {
-      marshal.registerDraggable(preset.inHome2.descriptor, () => preset.inHome1);
+      marshal.registerDraggable(
+        preset.inHome2.descriptor,
+        () => preset.inHome1,
+      );
     });
     requestAnimationFrame.step();
     expect(callbacks.publish).toHaveBeenCalledTimes(1);
@@ -276,7 +287,10 @@ describe('subsequent', () => {
     marshal.startPublishing(defaultRequest, preset.windowScroll);
 
     withExpectedAdvancedUsageWarning(() => {
-      marshal.registerDraggable(preset.inHome2.descriptor, () => preset.inHome1);
+      marshal.registerDraggable(
+        preset.inHome2.descriptor,
+        () => preset.inHome1,
+      );
     });
     requestAnimationFrame.step();
     expect(callbacks.publish).toHaveBeenCalledTimes(1);
@@ -295,7 +309,7 @@ describe('subsequent', () => {
 
 describe('advanced usage warning', () => {
   it('should print an advanced usage warning on the first dynamic change', () => {
-    jest.spyOn(console, 'warn').mockImplementation(() => { });
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
 
     const callbacks: Callbacks = getCallbacksStub();
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);

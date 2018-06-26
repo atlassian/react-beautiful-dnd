@@ -9,7 +9,11 @@ import type {
 } from '../../../../src/view/droppable/droppable-types';
 import getOwnProps from './get-own-props';
 import { getPreset } from '../../../utils/dimension';
-import { move, type IsDraggingState, withImpact } from '../../../utils/dragging-state';
+import {
+  move,
+  type IsDraggingState,
+  withImpact,
+} from '../../../utils/dragging-state';
 import noImpact from '../../../../src/state/no-impact';
 
 const preset = getPreset();
@@ -36,7 +40,10 @@ describe('home list', () => {
   describe('is dragging over', () => {
     it('should indicate that it is being dragged over', () => {
       const selector: Selector = makeMapStateToProps();
-      const props: MapProps = selector(state.dragging(preset.inHome1.descriptor.id), ownProps);
+      const props: MapProps = selector(
+        state.dragging(preset.inHome1.descriptor.id),
+        ownProps,
+      );
 
       const expected: MapProps = {
         isDraggingOver: true,
@@ -90,9 +97,15 @@ describe('home list', () => {
       const first: MapProps = selector(getNoWhere(), ownProps);
       expect(first).toEqual(restingProps);
 
-      expect(selector(move(getNoWhere(), { x: 1, y: 1 }), ownProps)).toBe(first);
-      expect(selector(move(getNoWhere(), { x: 1, y: 1 }), ownProps)).toBe(first);
-      expect(selector(move(getNoWhere(), { x: 1, y: 1 }), ownProps)).toBe(first);
+      expect(selector(move(getNoWhere(), { x: 1, y: 1 }), ownProps)).toBe(
+        first,
+      );
+      expect(selector(move(getNoWhere(), { x: 1, y: 1 }), ownProps)).toBe(
+        first,
+      );
+      expect(selector(move(getNoWhere(), { x: 1, y: 1 }), ownProps)).toBe(
+        first,
+      );
     });
   });
 });
@@ -185,9 +198,15 @@ describe('foreign list', () => {
       const first: MapProps = selector(getNoWhere(), ownProps);
       expect(first).toEqual(restingProps);
 
-      expect(selector(move(getNoWhere(), { x: 1, y: 1 }), ownProps)).toBe(first);
-      expect(selector(move(getNoWhere(), { x: 1, y: 1 }), ownProps)).toBe(first);
-      expect(selector(move(getNoWhere(), { x: 1, y: 1 }), ownProps)).toBe(first);
+      expect(selector(move(getNoWhere(), { x: 1, y: 1 }), ownProps)).toBe(
+        first,
+      );
+      expect(selector(move(getNoWhere(), { x: 1, y: 1 }), ownProps)).toBe(
+        first,
+      );
+      expect(selector(move(getNoWhere(), { x: 1, y: 1 }), ownProps)).toBe(
+        first,
+      );
     });
   });
 });

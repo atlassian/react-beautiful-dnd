@@ -675,7 +675,8 @@ describe('get best cross axis droppable', () => {
       });
       const droppables: DroppableDimensionMap = {
         [source.descriptor.id]: source,
-        [subjectNotVisibleThroughFrame.descriptor.id]: subjectNotVisibleThroughFrame,
+        [subjectNotVisibleThroughFrame.descriptor
+          .id]: subjectNotVisibleThroughFrame,
       };
 
       const result: ?DroppableDimension = getBestCrossAxisDroppable({

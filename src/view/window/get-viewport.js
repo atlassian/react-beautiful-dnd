@@ -26,7 +26,10 @@ export default (): Viewport => {
   const bottom: number = top + height;
 
   const frame: Rect = getRect({
-    top, left, right, bottom,
+    top,
+    left,
+    right,
+    bottom,
   });
 
   const maxScroll: Position = getMaxScroll({

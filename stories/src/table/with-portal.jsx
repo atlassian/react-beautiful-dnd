@@ -30,7 +30,7 @@ const THead = styled.thead`
 `;
 
 const Row = styled.tr`
-  ${props => (props.isDragging ? `background: ${colors.green};` : '')}
+  ${props => (props.isDragging ? `background: ${colors.green};` : '')};
 `;
 
 const Cell = styled.td`
@@ -43,22 +43,22 @@ type TableCellProps = {|
   isDragOccurring: boolean,
   isDragging: boolean,
   cellId: string,
-|}
+|};
 
 type TableCellSnapshot = {|
   width: number,
   height: number,
-|}
+|};
 
 type SnapshotMap = {
-  [cellId: string]: TableCellSnapshot
-}
+  [cellId: string]: TableCellSnapshot,
+};
 
 const snapshotMap: SnapshotMap = {};
 
 class TableCell extends React.Component<TableCellProps> {
   // eslint-disable-next-line react/sort-comp
-  ref: ?HTMLElement
+  ref: ?HTMLElement;
 
   componentDidMount() {
     const cellId: string = this.props.cellId;
@@ -81,7 +81,8 @@ class TableCell extends React.Component<TableCellProps> {
       return null;
     }
 
-    const isDragStarting: boolean = this.props.isDragOccurring && !prevProps.isDragOccurring;
+    const isDragStarting: boolean =
+      this.props.isDragOccurring && !prevProps.isDragOccurring;
 
     if (!isDragStarting) {
       return null;
@@ -93,7 +94,7 @@ class TableCell extends React.Component<TableCellProps> {
   componentDidUpdate(
     prevProps: TableCellProps,
     prevState: mixed,
-    snapshot: ?TableCellSnapshot
+    snapshot: ?TableCellSnapshot,
   ) {
     const ref: ?HTMLElement = this.ref;
     if (!ref) {
@@ -135,11 +136,12 @@ class TableCell extends React.Component<TableCellProps> {
     const { width, height } = this.ref.getBoundingClientRect();
 
     const snapshot: TableCellSnapshot = {
-      width, height,
+      width,
+      height,
     };
 
     return snapshot;
-  }
+  };
 
   applySnapshot = (snapshot: TableCellSnapshot) => {
     const ref: ?HTMLElement = this.ref;
@@ -154,18 +156,14 @@ class TableCell extends React.Component<TableCellProps> {
 
     ref.style.width = `${snapshot.width}px`;
     ref.style.height = `${snapshot.height}px`;
-  }
+  };
 
   setRef = (ref: ?HTMLElement) => {
     this.ref = ref;
-  }
+  };
 
   render() {
-    return (
-      <Cell innerRef={this.setRef}>
-        {this.props.children}
-      </Cell>
-    );
+    return <Cell innerRef={this.setRef}>{this.props.children}</Cell>;
   }
 }
 
@@ -174,14 +172,16 @@ type TableRowProps = {|
   provided: DraggableProvided,
   snapshot: DraggableStateSnapshot,
   isDragOccurring: boolean,
-|}
+|};
 
 // Using a table as the portal so that we do not get react
 // warnings when mounting a tr element
 const table: HTMLElement = document.createElement('table');
 table.classList.add('my-super-cool-table-portal');
 Object.assign(table.style, {
-  margin: '0', padding: '0', border: '0',
+  margin: '0',
+  padding: '0',
+  border: '0',
 });
 const tbody: HTMLElement = document.createElement('tbody');
 table.appendChild(tbody);
@@ -243,15 +243,15 @@ const CopyTableButton = styled.button``;
 
 type AppProps = {|
   initial: Quote[],
-|}
+|};
 
 type AppState = {|
   quotes: Quote[],
   layout: 'fixed' | 'auto',
   isDragging: boolean,
-|}
+|};
 export default class TableApp extends Component<AppProps, AppState> {
-  tableRef: ?HTMLElement
+  tableRef: ?HTMLElement;
 
   state: AppState = {
     quotes: this.props.initial,
@@ -263,7 +263,7 @@ export default class TableApp extends Component<AppProps, AppState> {
     this.setState({
       isDragging: true,
     });
-  }
+  };
 
   onDragEnd = (result: DropResult) => {
     this.setState({
@@ -271,7 +271,10 @@ export default class TableApp extends Component<AppProps, AppState> {
     });
 
     // dropped outside the list
-    if (!result.destination || result.destination.index === result.source.index) {
+    if (
+      !result.destination ||
+      result.destination.index === result.source.index
+    ) {
       return;
     }
 
@@ -283,19 +286,19 @@ export default class TableApp extends Component<AppProps, AppState> {
     const quotes = reorder(
       this.state.quotes,
       result.source.index,
-      result.destination.index
+      result.destination.index,
     );
 
     this.setState({
       quotes,
     });
-  }
+  };
 
   toggleTableLayout = () => {
     this.setState({
       layout: this.state.layout === 'auto' ? 'fixed' : 'auto',
     });
-  }
+  };
 
   copyTableToClipboard = () => {
     const tableRef: ?HTMLElement = this.tableRef;
@@ -320,24 +323,23 @@ export default class TableApp extends Component<AppProps, AppState> {
 
     // clear selection
     window.getSelection().removeAllRanges();
-  }
+  };
 
   render() {
     return (
-      <DragDropContext onDragStart={this.onDragStart} onDragEnd={this.onDragEnd}>
+      <DragDropContext
+        onDragStart={this.onDragStart}
+        onDragEnd={this.onDragEnd}
+      >
         <Fragment>
           <Header>
             <LayoutControl>
               Current layout: <code>{this.state.layout}</code>
-              <button onClick={this.toggleTableLayout}>
-                Toggle
-              </button>
+              <button onClick={this.toggleTableLayout}>Toggle</button>
             </LayoutControl>
             <div>
               Copy table to clipboard:
-              <CopyTableButton
-                onClick={this.copyTableToClipboard}
-              >
+              <CopyTableButton onClick={this.copyTableToClipboard}>
                 Copy
               </CopyTableButton>
             </div>
@@ -359,19 +361,26 @@ export default class TableApp extends Component<AppProps, AppState> {
                   {...droppableProvided.droppableProps}
                 >
                   {this.state.quotes.map((quote: Quote, index: number) => (
-                    <Draggable draggableId={quote.id} index={index} key={quote.id}>
-                      {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
+                    <Draggable
+                      draggableId={quote.id}
+                      index={index}
+                      key={quote.id}
+                    >
+                      {(
+                        provided: DraggableProvided,
+                        snapshot: DraggableStateSnapshot,
+                      ) => (
                         <TableRow
                           provided={provided}
                           snapshot={snapshot}
                           quote={quote}
                           isDragOccurring={this.state.isDragging}
                         />
-                    )}
+                      )}
                     </Draggable>
                   ))}
                 </TBody>
-                )}
+              )}
             </Droppable>
           </Table>
         </Fragment>

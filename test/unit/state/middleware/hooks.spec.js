@@ -18,10 +18,13 @@ import {
 } from '../../../../src/state/action-creators';
 import createStore from './util/create-store';
 import { getPreset } from '../../../utils/dimension';
-import { initialPublishArgs, getDragStart, publishAdditionArgs } from '../../../utils/preset-action-args';
+import {
+  initialPublishArgs,
+  getDragStart,
+  publishAdditionArgs,
+} from '../../../utils/preset-action-args';
 import type {
   DraggableLocation,
-  Store,
   Hooks,
   State,
   Announce,
@@ -31,6 +34,7 @@ import type {
   Publish,
   DragStart,
 } from '../../../../src/types';
+import type { Store } from '../../../../src/state/store-types';
 
 const preset = getPreset();
 
@@ -45,9 +49,7 @@ const getAnnounce = (): Announce => jest.fn();
 describe('start', () => {
   it('should call the onDragStart hook when a initial publish occurs', () => {
     const hooks: Hooks = createHooks();
-    const store: Store = createStore(
-      middleware(() => hooks, getAnnounce())
-    );
+    const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
     // prepare step should not trigger hook
     store.dispatch(prepare());
@@ -63,9 +65,7 @@ describe('start', () => {
 
   it('should throw an exception if an initial publish is called before a drag ends', () => {
     const hooks: Hooks = createHooks();
-    const store: Store = createStore(
-      middleware(() => hooks, getAnnounce())
-    );
+    const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
     store.dispatch(prepare());
     const execute = () => {
@@ -83,9 +83,7 @@ describe('start', () => {
 describe('drop', () => {
   it('should call the onDragEnd hook when a DROP_COMPLETE action occurs', () => {
     const hooks: Hooks = createHooks();
-    const store: Store = createStore(
-      middleware(() => hooks, getAnnounce())
-    );
+    const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
     store.dispatch(prepare());
     store.dispatch(initialPublish(initialPublishArgs));
@@ -105,9 +103,7 @@ describe('drop', () => {
 
   it('should throw an exception if there was no drag start published', () => {
     const hooks: Hooks = createHooks();
-    const store: Store = createStore(
-      middleware(() => hooks, getAnnounce())
-    );
+    const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
     const result: DropResult = {
       ...getDragStart(),
@@ -130,9 +126,7 @@ describe('drop', () => {
 describe('update', () => {
   it('should call onDragUpdate if the position has changed on move', () => {
     const hooks: Hooks = createHooks();
-    const store: Store = createStore(
-      middleware(() => hooks, getAnnounce())
-    );
+    const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
     store.dispatch(prepare());
     store.dispatch(initialPublish(initialPublishArgs));
@@ -148,17 +142,12 @@ describe('update', () => {
         index: initialPublishArgs.critical.draggable.index + 1,
       },
     };
-    expect(hooks.onDragUpdate).toHaveBeenCalledWith(
-      update,
-      expect.any(Object),
-    );
+    expect(hooks.onDragUpdate).toHaveBeenCalledWith(update, expect.any(Object));
   });
 
   it('should not call onDragUpdate if there is no movement from the last update', () => {
     const hooks: Hooks = createHooks();
-    const store: Store = createStore(
-      middleware(() => hooks, getAnnounce())
-    );
+    const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
     store.dispatch(prepare());
     store.dispatch(initialPublish(initialPublishArgs));
@@ -180,13 +169,18 @@ describe('update', () => {
     expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
 
     const state: State = store.getState();
-    invariant(state.phase === 'DRAGGING', 'Expecting state to be in dragging phase');
+    invariant(
+      state.phase === 'DRAGGING',
+      'Expecting state to be in dragging phase',
+    );
 
     // A small movement that should not trigger any index changes
-    store.dispatch(move({
-      client: add(state.current.client.selection, { x: -1, y: -1 }),
-      shouldAnimate: true,
-    }));
+    store.dispatch(
+      move({
+        client: add(state.current.client.selection, { x: -1, y: -1 }),
+        shouldAnimate: true,
+      }),
+    );
 
     expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
   });
@@ -194,9 +188,7 @@ describe('update', () => {
   describe('updates caused by dynamic changes', () => {
     it('should not call onDragUpdate if the destination or source have not changed', () => {
       const hooks: Hooks = createHooks();
-      const store: Store = createStore(
-        middleware(() => hooks, getAnnounce())
-      );
+      const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
       store.dispatch(prepare());
       store.dispatch(initialPublish(initialPublishArgs));
@@ -213,9 +205,7 @@ describe('update', () => {
       // - dragging inHome2 with no impact
       // - inHome1 is removed
       const hooks: Hooks = createHooks();
-      const store: Store = createStore(
-        middleware(() => hooks, getAnnounce())
-      );
+      const store: Store = createStore(middleware(() => hooks, getAnnounce()));
       // dragging inHome2 with no impact
       const customInitial: InitialPublishArgs = {
         critical: {
@@ -269,7 +259,10 @@ describe('update', () => {
           index: 1,
         },
       };
-      expect(hooks.onDragUpdate).toHaveBeenCalledWith(lastUpdate, expect.any(Object));
+      expect(hooks.onDragUpdate).toHaveBeenCalledWith(
+        lastUpdate,
+        expect.any(Object),
+      );
       expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
       // $ExpectError - unknown mock reset property
       hooks.onDragUpdate.mockReset();
@@ -301,7 +294,10 @@ describe('update', () => {
         destination: lastUpdate.destination,
       };
       expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
-      expect(hooks.onDragUpdate).toHaveBeenCalledWith(postPublishUpdate, expect.any(Object));
+      expect(hooks.onDragUpdate).toHaveBeenCalledWith(
+        postPublishUpdate,
+        expect.any(Object),
+      );
     });
   });
 });
@@ -309,9 +305,7 @@ describe('update', () => {
 describe('abort', () => {
   it('should not do anything if a drag had not started', () => {
     const hooks: Hooks = createHooks();
-    const store: Store = createStore(
-      middleware(() => hooks, getAnnounce())
-    );
+    const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
     store.dispatch(clean());
     expect(hooks.onDragStart).not.toHaveBeenCalled();
@@ -328,9 +322,7 @@ describe('abort', () => {
 
   it('should call onDragEnd with the last published critical descriptor', () => {
     const hooks: Hooks = createHooks();
-    const store: Store = createStore(
-      middleware(() => hooks, getAnnounce())
-    );
+    const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
     store.dispatch(clean());
     store.dispatch(prepare());
@@ -343,17 +335,12 @@ describe('abort', () => {
       destination: null,
       reason: 'CANCEL',
     };
-    expect(hooks.onDragEnd).toHaveBeenCalledWith(
-      expected,
-      expect.any(Object),
-    );
+    expect(hooks.onDragEnd).toHaveBeenCalledWith(expected, expect.any(Object));
   });
 
   it('should publish an onDragEnd with no destination even if there is a current destination', () => {
     const hooks: Hooks = createHooks();
-    const store: Store = createStore(
-      middleware(() => hooks, getAnnounce())
-    );
+    const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
     store.dispatch(clean());
     store.dispatch(prepare());
@@ -375,17 +362,12 @@ describe('abort', () => {
       destination: null,
       reason: 'CANCEL',
     };
-    expect(hooks.onDragEnd).toHaveBeenCalledWith(
-      expected,
-      expect.any(Object),
-    );
+    expect(hooks.onDragEnd).toHaveBeenCalledWith(expected, expect.any(Object));
   });
 
   it('should not publish an onDragEnd if aborted after a drop', () => {
     const hooks: Hooks = createHooks();
-    const store: Store = createStore(
-      middleware(() => hooks, getAnnounce())
-    );
+    const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
     // lift
     store.dispatch(clean());
@@ -413,9 +395,7 @@ describe('abort', () => {
 describe('subsequent drags', () => {
   it('should behave correctly across multiple drags', () => {
     const hooks: Hooks = createHooks();
-    const store = createStore(
-      middleware(() => hooks, getAnnounce())
-    );
+    const store = createStore(middleware(() => hooks, getAnnounce()));
     Array.from({ length: 4 }).forEach(() => {
       // start
       store.dispatch(prepare());
@@ -435,7 +415,10 @@ describe('subsequent drags', () => {
         },
       };
       store.dispatch(moveDown());
-      expect(hooks.onDragUpdate).toHaveBeenCalledWith(update, expect.any(Object));
+      expect(hooks.onDragUpdate).toHaveBeenCalledWith(
+        update,
+        expect.any(Object),
+      );
       expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
 
       // drop
@@ -463,7 +446,7 @@ type Case = {|
   title: 'onDragStart' | 'onDragUpdate' | 'onDragEnd',
   execute: (store: Store) => void,
   defaultMessage: string,
-|}
+|};
 
 describe('announcements', () => {
   const moveForwardUpdate: DragUpdate = {
@@ -521,9 +504,7 @@ describe('announcements', () => {
       beforeEach(() => {
         hooks = createHooks();
         announce = getAnnounce();
-        store = createStore(
-          middleware(() => hooks, announce)
-        );
+        store = createStore(middleware(() => hooks, announce));
       });
 
       it('should announce with the default message if no hook is provided', () => {
@@ -557,7 +538,7 @@ describe('announcements', () => {
 
       it('should prevent async announcements', () => {
         jest.useFakeTimers();
-        jest.spyOn(console, 'warn').mockImplementation(() => { });
+        jest.spyOn(console, 'warn').mockImplementation(() => {});
 
         let provided: HookProvided;
         // $ExpectError - property does not exist on hook property
@@ -587,7 +568,7 @@ describe('announcements', () => {
       });
 
       it('should prevent multiple announcement calls from a consumer', () => {
-        jest.spyOn(console, 'warn').mockImplementation(() => { });
+        jest.spyOn(console, 'warn').mockImplementation(() => {});
 
         let provided: HookProvided;
         // $ExpectError - property does not exist on hook property

@@ -54,9 +54,10 @@ describe('was not being dragged over', () => {
     const selector: Selector = makeMapStateToProps();
     const defaultProps: MapProps = selector(state.idle, ownProps);
 
-    [...state.allPhases(), ...state.allPhases().reverse()]
-      .forEach((current: State) => {
+    [...state.allPhases(), ...state.allPhases().reverse()].forEach(
+      (current: State) => {
         expect(selector(current, ownProps)).toBe(defaultProps);
-      });
+      },
+    );
   });
 });

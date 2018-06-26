@@ -2,9 +2,13 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import { getRect, type Rect, type Position } from 'css-box-model';
-import { DragDropContext, Draggable, Droppable } from '../../../src/';
+import { DragDropContext, Draggable, Droppable } from '../../../src';
 import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
-import { dispatchWindowMouseEvent, dispatchWindowKeyDownEvent, mouseEvent } from '../../utils/user-input-util';
+import {
+  dispatchWindowMouseEvent,
+  dispatchWindowKeyDownEvent,
+  mouseEvent,
+} from '../../utils/user-input-util';
 import type {
   Hooks,
   DraggableLocation,
@@ -21,7 +25,10 @@ import { getComputedSpacing } from '../../utils/dimension';
 const windowMouseMove = dispatchWindowMouseEvent.bind(null, 'mousemove');
 const windowMouseUp = dispatchWindowMouseEvent.bind(null, 'mouseup');
 const mouseDown = mouseEvent.bind(null, 'mousedown');
-const cancelWithKeyboard = dispatchWindowKeyDownEvent.bind(null, keyCodes.escape);
+const cancelWithKeyboard = dispatchWindowKeyDownEvent.bind(
+  null,
+  keyCodes.escape,
+);
 
 describe('hooks integration', () => {
   let hooks: Hooks;
@@ -40,10 +47,14 @@ describe('hooks integration', () => {
 
   const getMountedApp = () => {
     // Both list and item will have the same dimensions
-    jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => borderBox);
+    jest
+      .spyOn(Element.prototype, 'getBoundingClientRect')
+      .mockImplementation(() => borderBox);
 
     // Stubbing out totally - not including margins in this
-    jest.spyOn(window, 'getComputedStyle').mockImplementation(() => getComputedSpacing({}));
+    jest
+      .spyOn(window, 'getComputedStyle')
+      .mockImplementation(() => getComputedSpacing({}));
 
     return mount(
       <DragDropContext
@@ -53,7 +64,10 @@ describe('hooks integration', () => {
       >
         <Droppable droppableId={droppableId}>
           {(droppableProvided: DroppableProvided) => (
-            <div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
+            <div
+              ref={droppableProvided.innerRef}
+              {...droppableProvided.droppableProps}
+            >
               <h2>Droppable</h2>
               <Draggable draggableId={draggableId} index={0}>
                 {(draggableProvided: DraggableProvided) => (
@@ -84,7 +98,7 @@ describe('hooks integration', () => {
     };
     wrapper = getMountedApp();
     // unmounting during a drag can cause a warning
-    jest.spyOn(console, 'warn').mockImplementation(() => { });
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -120,10 +134,7 @@ describe('hooks integration', () => {
     };
 
     const start = () => {
-      mouseDown(
-        wrapper.find('.drag-handle'),
-        initial,
-      );
+      mouseDown(wrapper.find('.drag-handle'), initial);
 
       // Drag does not start until mouse has moved past a certain threshold
       windowMouseMove(dragStart);
@@ -134,7 +145,10 @@ describe('hooks integration', () => {
     };
 
     const move = () => {
-      windowMouseMove({ x: dragMove.x, y: dragMove.y + sloppyClickThreshold + 1 });
+      windowMouseMove({
+        x: dragMove.x,
+        y: dragMove.y + sloppyClickThreshold + 1,
+      });
       // movements are scheduled with requestAnimationFrame
       requestAnimationFrame.step();
     };
@@ -201,26 +215,37 @@ describe('hooks integration', () => {
     return { start, completed, cancelled };
   })();
 
-  const wasDragStarted = (amountOfDrags?: number = 1, provided?: Hooks = hooks) => {
+  const wasDragStarted = (
+    amountOfDrags?: number = 1,
+    provided?: Hooks = hooks,
+  ) => {
     expect(provided.onDragStart).toHaveBeenCalledTimes(amountOfDrags);
     if (!hooks.onDragStart) {
-      throw new Error('cannot validate if drag was started without onDragStart hook');
+      throw new Error(
+        'cannot validate if drag was started without onDragStart hook',
+      );
     }
     // $ExpectError - mock property
-    expect(provided.onDragStart.mock.calls[amountOfDrags - 1][0])
-      .toEqual(expected.start);
+    expect(provided.onDragStart.mock.calls[amountOfDrags - 1][0]).toEqual(
+      expected.start,
+    );
   };
 
-  const wasDragCompleted = (amountOfDrags?: number = 1, provided?: Hooks = hooks) => {
+  const wasDragCompleted = (
+    amountOfDrags?: number = 1,
+    provided?: Hooks = hooks,
+  ) => {
     expect(provided.onDragEnd).toHaveBeenCalledTimes(amountOfDrags);
-    expect(provided.onDragEnd.mock.calls[amountOfDrags - 1][0])
-      .toEqual(expected.completed);
+    expect(provided.onDragEnd.mock.calls[amountOfDrags - 1][0]).toEqual(
+      expected.completed,
+    );
   };
 
   const wasDragCancelled = (amountOfDrags?: number = 1) => {
     expect(hooks.onDragEnd).toHaveBeenCalledTimes(amountOfDrags);
-    expect(hooks.onDragEnd.mock.calls[amountOfDrags - 1][0])
-      .toEqual(expected.cancelled);
+    expect(hooks.onDragEnd.mock.calls[amountOfDrags - 1][0]).toEqual(
+      expected.cancelled,
+    );
   };
 
   describe('drag start', () => {

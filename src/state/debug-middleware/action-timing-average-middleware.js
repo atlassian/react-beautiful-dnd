@@ -1,13 +1,16 @@
 // @flow
 /* eslint-disable no-console */
-import type { Action } from '../../types';
+import type { Action } from '../store-types';
 
 type Bucket = {
   [key: string]: number[],
-}
+};
 
 const average = (values: number[]): number => {
-  const sum: number = values.reduce((previous: number, current: number) => previous + current, 0);
+  const sum: number = values.reduce(
+    (previous: number, current: number) => previous + current,
+    0,
+  );
   return sum / values.length;
 };
 
@@ -16,7 +19,7 @@ export default (groupSize: number) => {
   console.log(`Will take an average every ${groupSize} actions`);
   const bucket: Bucket = {};
 
-  return () => (next: (Action) => mixed) => (action: Action): mixed => {
+  return () => (next: Action => mixed) => (action: Action): mixed => {
     const start: number = performance.now();
 
     const result: mixed = next(action);
@@ -36,7 +39,10 @@ export default (groupSize: number) => {
       return result;
     }
 
-    console.warn(`Average time for ${action.type}`, average(bucket[action.type]));
+    console.warn(
+      `Average time for ${action.type}`,
+      average(bucket[action.type]),
+    );
 
     // reset
     bucket[action.type] = [];

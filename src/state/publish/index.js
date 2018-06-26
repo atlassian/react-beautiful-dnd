@@ -18,13 +18,10 @@ import getDragPositions from './get-drag-positions';
 
 type Args = {|
   state: CollectingState | DropPendingState,
-  publish: Publish
-|}
+  publish: Publish,
+|};
 
-export default ({
-  state,
-  publish,
-}: Args): DraggingState | DropPendingState => {
+export default ({ state, publish }: Args): DraggingState | DropPendingState => {
   // TODO: write validate that every removed draggable must have a removed droppable
 
   // ## Adding Draggables to existing lists
@@ -117,4 +114,3 @@ export default ({
 
   return dropPending;
 };
-

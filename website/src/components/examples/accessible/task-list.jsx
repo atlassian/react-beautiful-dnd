@@ -10,7 +10,7 @@ import { colors, grid, borderRadius } from '../constants';
 type Props = {|
   tasks: TaskType[],
   title: string,
-|}
+|};
 
 const Container = styled.div`
   width: 300px;
@@ -35,18 +35,11 @@ export default class TaskList extends Component<Props> {
     return (
       <Droppable droppableId="list">
         {(provided: DroppableProvided) => (
-          <Container
-            innerRef={provided.innerRef}
-            {...provided.droppableProps}
-          >
+          <Container innerRef={provided.innerRef} {...provided.droppableProps}>
             <Title>{this.props.title}</Title>
             <List>
               {this.props.tasks.map((task: TaskType, index: number) => (
-                <Task
-                  key={task.id}
-                  task={task}
-                  index={index}
-                />
+                <Task key={task.id} task={task} index={index} />
               ))}
             </List>
             {provided.placeholder}

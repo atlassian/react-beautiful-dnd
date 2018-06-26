@@ -18,7 +18,7 @@ type Props = {|
   toggleSelection: (taskId: Id) => void,
   toggleSelectionInGroup: (taskId: Id) => void,
   multiSelectTo: (taskId: Id) => void,
-|}
+|};
 
 const Container = styled.div`
   width: 300px;
@@ -42,18 +42,20 @@ const TaskList = styled.div`
   min-height: 200px;
   flex-grow: 1;
   transition: background-color 0.2s ease;
-  ${props => (props.isDraggingOver ? `background-color: ${colors.grey.darker}` : '')};
+  ${props =>
+    props.isDraggingOver ? `background-color: ${colors.grey.darker}` : ''};
 `;
 
 type TaskIdMap = {
   [taskId: Id]: true,
-}
+};
 
 const getSelectedMap = memoizeOne((selectedTaskIds: Id[]) =>
   selectedTaskIds.reduce((previous: TaskIdMap, current: Id): TaskIdMap => {
     previous[current] = true;
     return previous;
-  }, {}));
+  }, {}),
+);
 
 export default class Column extends Component<Props> {
   render() {
@@ -72,9 +74,13 @@ export default class Column extends Component<Props> {
               {...provided.droppableProps}
             >
               {tasks.map((task: TaskType, index: number) => {
-                const isSelected: boolean = Boolean(getSelectedMap(selectedTaskIds)[task.id]);
+                const isSelected: boolean = Boolean(
+                  getSelectedMap(selectedTaskIds)[task.id],
+                );
                 const isGhosting: boolean =
-                  isSelected && Boolean(draggingTaskId) && draggingTaskId !== task.id;
+                  isSelected &&
+                  Boolean(draggingTaskId) &&
+                  draggingTaskId !== task.id;
                 return (
                   <Task
                     task={task}

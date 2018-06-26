@@ -16,16 +16,12 @@ import {
   moveDown,
   moveRight,
   moveLeft,
-
   drop,
   dropAnimationFinished,
 } from '../../state/action-creators';
-import type {
-  DragHandleProps,
-} from '../drag-handle/drag-handle-types';
+import type { DragHandleProps } from '../drag-handle/drag-handle-types';
 
 export type DraggingStyle = {|
-
   position: 'fixed',
   top: number,
   left: number,
@@ -42,21 +38,21 @@ export type DraggingStyle = {|
   // by canStartDrag() on the context. But this a little safeguard.
   // It is also a minor performance optimisation
   pointerEvents: 'none',
-|}
+|};
 
 export type NotDraggingStyle = {|
   transform: ?string,
   // null: use the global animation style
   // none: skip animation (used in certain displacement situations)
   transition: null | 'none',
-|}
+|};
 
 export type DraggableStyle = DraggingStyle | NotDraggingStyle;
 
 export type ZIndexOptions = {|
   dragging: number,
   dropAnimating: number,
-|}
+|};
 
 // Props that can be spread onto the element directly
 export type DraggableProps = {|
@@ -64,7 +60,7 @@ export type DraggableProps = {|
   style: ?DraggableStyle,
   // used for shared global styles
   'data-react-beautiful-dnd-draggable': string,
-|}
+|};
 
 export type Provided = {|
   draggableProps: DraggableProps,
@@ -72,12 +68,12 @@ export type Provided = {|
   dragHandleProps: ?DragHandleProps,
   // The following props will be removed once we move to react 16
   innerRef: (?HTMLElement) => void,
-|}
+|};
 
 export type StateSnapshot = {|
   isDragging: boolean,
   draggingOver: ?DroppableId,
-|}
+|};
 
 export type DispatchProps = {|
   lift: typeof lift,
@@ -89,7 +85,7 @@ export type DispatchProps = {|
   moveLeft: typeof moveLeft,
   drop: typeof drop,
   dropAnimationFinished: typeof dropAnimationFinished,
-|}
+|};
 
 export type MapProps = {|
   isDragging: boolean,
@@ -104,7 +100,7 @@ export type MapProps = {|
   // only provided when dragging
   dimension: ?DraggableDimension,
   draggingOver: ?DroppableId,
-|}
+|};
 
 export type OwnProps = {|
   draggableId: DraggableId,
@@ -112,17 +108,17 @@ export type OwnProps = {|
   index: number,
   isDragDisabled: boolean,
   disableInteractiveElementBlocking: boolean,
-|}
+|};
 
 export type DefaultProps = {|
   isDragDisabled: boolean,
   disableInteractiveElementBlocking: boolean,
-|}
+|};
 
 export type Props = {|
   ...MapProps,
   ...DispatchProps,
-  ...OwnProps
-|}
+  ...OwnProps,
+|};
 
 export type Selector = (state: State, ownProps: OwnProps) => MapProps;

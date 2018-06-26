@@ -75,10 +75,7 @@ export default [
     input,
     output: { file: pkg.main, format: 'cjs' },
     external: excludeAllExternals,
-    plugins: [
-      resolve({ extensions }),
-      babel(getBabelOptions()),
-    ],
+    plugins: [resolve({ extensions }), babel(getBabelOptions())],
   },
   // EcmaScript Module (esm) build
   // - Keeping console.log statements

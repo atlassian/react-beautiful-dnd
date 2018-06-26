@@ -16,8 +16,8 @@ const origin: Position = { x: 0, y: 0 };
 
 type BlockerProps = {|
   change: Position,
-  children: (Position) => Element<*>,
-|}
+  children: Position => Element<*>,
+|};
 
 // Working around react-motion double render issue
 class DoubleRenderBlocker extends React.Component<BlockerProps> {
@@ -44,7 +44,7 @@ export default class Moveable extends Component<Props> {
   /* eslint-disable react/sort-comp */
   static defaultProps: DefaultProps = {
     destination: origin,
-  }
+  };
 
   getFinal(): PositionLike {
     const destination: Position = this.props.destination;
@@ -54,7 +54,8 @@ export default class Moveable extends Component<Props> {
       return destination;
     }
 
-    const config: SpringHelperConfig = speed === 'FAST' ? physics.fast : physics.standard;
+    const config: SpringHelperConfig =
+      speed === 'FAST' ? physics.fast : physics.standard;
 
     return {
       x: spring(destination.x, config),
@@ -74,10 +75,13 @@ export default class Moveable extends Component<Props> {
         {(current: { [string]: number }): Element<*> => {
           const { speed, destination, children } = this.props;
 
-          const target: Position = speed === 'INSTANT' ? destination : (current: any);
+          const target: Position =
+            speed === 'INSTANT' ? destination : (current: any);
 
           return (
-            <DoubleRenderBlocker change={target}>{children}</DoubleRenderBlocker>
+            <DoubleRenderBlocker change={target}>
+              {children}
+            </DoubleRenderBlocker>
           );
         }}
       </Motion>

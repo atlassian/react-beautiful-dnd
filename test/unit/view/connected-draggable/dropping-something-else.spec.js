@@ -5,7 +5,10 @@ import { getPreset } from '../../../utils/dimension';
 import { patch, negate } from '../../../../src/state/position';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import {
-  draggingStates, withImpact, withPending, type IsDraggingState,
+  draggingStates,
+  withImpact,
+  withPending,
+  type IsDraggingState,
 } from '../../../utils/dragging-state';
 import getOwnProps from './get-own-props';
 import type {
@@ -26,8 +29,10 @@ const state = getStatePreset();
 const ownProps: OwnProps = getOwnProps(preset.inHome2);
 const axis: Axis = preset.home.axis;
 
-const inHome1Amount: Position =
-  patch(axis.line, preset.inHome1.client.marginBox[axis.size]);
+const inHome1Amount: Position = patch(
+  axis.line,
+  preset.inHome1.client.marginBox[axis.size],
+);
 
 draggingStates.forEach((current: IsDraggingState) => {
   describe(`in phase ${current.phase}`, () => {
@@ -36,11 +41,13 @@ draggingStates.forEach((current: IsDraggingState) => {
         const selector: Selector = makeMapStateToProps();
         const impact: DragImpact = {
           movement: {
-            displaced: [{
-              draggableId: ownProps.draggableId,
-              isVisible: true,
-              shouldAnimate: true,
-            }],
+            displaced: [
+              {
+                draggableId: ownProps.draggableId,
+                isVisible: true,
+                shouldAnimate: true,
+              },
+            ],
             amount: inHome1Amount,
             isBeyondStartPosition: true,
           },
@@ -71,11 +78,13 @@ draggingStates.forEach((current: IsDraggingState) => {
         const selector: Selector = makeMapStateToProps();
         const impact: DragImpact = {
           movement: {
-            displaced: [{
-              draggableId: ownProps.draggableId,
-              isVisible: true,
-              shouldAnimate: true,
-            }],
+            displaced: [
+              {
+                draggableId: ownProps.draggableId,
+                isVisible: true,
+                shouldAnimate: true,
+              },
+            ],
             amount: inHome1Amount,
             isBeyondStartPosition: true,
           },
@@ -97,7 +106,10 @@ draggingStates.forEach((current: IsDraggingState) => {
           result: state.dropAnimating().pending.result,
         };
 
-        const dropping: DropAnimatingState = withPending(state.dropAnimating(), pending);
+        const dropping: DropAnimatingState = withPending(
+          state.dropAnimating(),
+          pending,
+        );
         const whileDropping: MapProps = selector(dropping, ownProps);
         expect(whileDropping).toBe(whileDragging);
       });

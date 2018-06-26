@@ -3,10 +3,8 @@ import invariant from 'tiny-invariant';
 import messagePreset from './util/message-preset';
 import * as timings from '../../debug/timings';
 import type {
-  Store,
   State,
   DropResult,
-  Action,
   Hooks,
   HookProvided,
   Critical,
@@ -18,6 +16,7 @@ import type {
   OnDragUpdateHook,
   OnDragEndHook,
 } from '../../types';
+import type { Store, Action } from '../store-types';
 
 type AnyHookFn = OnDragStartHook | OnDragUpdateHook | OnDragEndHook;
 type AnyHookData = DragStart | DragUpdate | DropResult;
@@ -28,7 +27,10 @@ const withTimings = (key: string, fn: Function) => {
   timings.finish(key);
 };
 
-const areLocationsEqual = (first: ?DraggableLocation, second: ?DraggableLocation): boolean => {
+const areLocationsEqual = (
+  first: ?DraggableLocation,
+  second: ?DraggableLocation,
+): boolean => {
   // if both are null - we are equal
   if (first == null && second == null) {
     return true;
@@ -40,8 +42,9 @@ const areLocationsEqual = (first: ?DraggableLocation, second: ?DraggableLocation
   }
 
   // compare their actual values
-  return first.droppableId === second.droppableId &&
-    first.index === second.index;
+  return (
+    first.droppableId === second.droppableId && first.index === second.index
+  );
 };
 
 const isCriticalEqual = (first: Critical, second: Critical): boolean => {
@@ -73,7 +76,9 @@ const getExpiringAnnounce = (announce: Announce) => {
 
   const result = (message: string): void => {
     if (wasCalled) {
-      console.warn('Announcement already made. Not making a second announcement');
+      console.warn(
+        'Announcement already made. Not making a second announcement',
+      );
       return;
     }
 
@@ -136,26 +141,40 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     let isDragStartPublished: boolean = false;
 
     const start = (critical: Critical) => {
-      invariant(!isDragStartPublished, 'Cannot fire onDragStart as a drag start has already been published');
+      invariant(
+        !isDragStartPublished,
+        'Cannot fire onDragStart as a drag start has already been published',
+      );
       const data: DragStart = getDragStart(critical);
       isDragStartPublished = true;
       lastCritical = critical;
       lastLocation = data.source;
-      withTimings('onDragStart', () => execute(getHooks().onDragStart, data, messagePreset.onDragStart));
+      withTimings('onDragStart', () =>
+        execute(getHooks().onDragStart, data, messagePreset.onDragStart),
+      );
     };
 
     // Passing in the critical location again as it can change during a drag
     const move = (critical: Critical, location: ?DraggableLocation) => {
-      invariant(isDragStartPublished && lastCritical, 'Cannot fire onDragMove when onDragStart has not been called');
+      invariant(
+        isDragStartPublished && lastCritical,
+        'Cannot fire onDragMove when onDragStart has not been called',
+      );
 
       // Has the critical changed? Will result in a source change
-      const hasCriticalChanged: boolean = !isCriticalEqual(critical, lastCritical);
+      const hasCriticalChanged: boolean = !isCriticalEqual(
+        critical,
+        lastCritical,
+      );
       if (hasCriticalChanged) {
         lastCritical = critical;
       }
 
       // Has the location changed? Will result in a destination change
-      const hasLocationChanged: boolean = !areLocationsEqual(lastLocation, location);
+      const hasLocationChanged: boolean = !areLocationsEqual(
+        lastLocation,
+        location,
+      );
       if (hasLocationChanged) {
         lastLocation = location;
       }
@@ -170,20 +189,30 @@ export default (getHooks: () => Hooks, announce: Announce) => {
         destination: location,
       };
 
-      withTimings('onDragUpdate', () => execute(getHooks().onDragUpdate, data, messagePreset.onDragUpdate));
+      withTimings('onDragUpdate', () =>
+        execute(getHooks().onDragUpdate, data, messagePreset.onDragUpdate),
+      );
     };
 
     const drop = (result: DropResult) => {
-      invariant(isDragStartPublished, 'Cannot fire onDragEnd when there is no matching onDragStart');
+      invariant(
+        isDragStartPublished,
+        'Cannot fire onDragEnd when there is no matching onDragStart',
+      );
       isDragStartPublished = false;
       lastLocation = null;
       lastCritical = null;
-      withTimings('onDragEnd', () => execute(getHooks().onDragEnd, result, messagePreset.onDragEnd));
+      withTimings('onDragEnd', () =>
+        execute(getHooks().onDragEnd, result, messagePreset.onDragEnd),
+      );
     };
 
     // A non user initiated cancel
     const abort = () => {
-      invariant(isDragStartPublished && lastCritical, 'Cannot cancel when onDragStart not fired');
+      invariant(
+        isDragStartPublished && lastCritical,
+        'Cannot cancel when onDragStart not fired',
+      );
 
       const result: DropResult = {
         ...getDragStart(lastCritical),
@@ -202,7 +231,9 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     };
   })();
 
-  return (store: Store) => (next: (Action) => mixed) => (action: Action): mixed => {
+  return (store: Store) => (next: Action => mixed) => (
+    action: Action,
+  ): mixed => {
     if (action.type === 'INITIAL_PUBLISH') {
       const critical: Critical = action.payload.critical;
       publisher.start(critical);

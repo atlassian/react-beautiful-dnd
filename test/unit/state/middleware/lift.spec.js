@@ -1,5 +1,6 @@
 // @flow
-import type { Store, PendingDrop } from '../../../../src/types';
+import type { PendingDrop } from '../../../../src/types';
+import type { Store } from '../../../../src/state/store-types';
 import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import middleware from '../../../../src/state/middleware/lift';
 import createStore from './util/create-store';
@@ -13,7 +14,9 @@ import {
   animateDrop,
   completeDrop,
 } from '../../../../src/state/action-creators';
-import getDimensionMarshal, { populateMarshal } from '../../../utils/dimension-marshal';
+import getDimensionMarshal, {
+  populateMarshal,
+} from '../../../utils/dimension-marshal';
 import getHomeLocation from '../../../../src/state/get-home-location';
 import {
   preset,
@@ -91,7 +94,8 @@ it('should flush any animating drops', () => {
       movement: {
         displaced: [],
         amount: {
-          x: 0, y: 0,
+          x: 0,
+          y: 0,
         },
         isBeyondStartPosition: false,
       },

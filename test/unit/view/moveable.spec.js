@@ -2,13 +2,14 @@
 import React from 'react';
 import { type Position } from 'css-box-model';
 import { mount } from 'enzyme';
-import Moveable from '../../../src/view/moveable/';
+import Moveable from '../../../src/view/moveable';
 import type { Speed } from '../../../src/view/moveable/moveable-types';
 
 let wrapper;
 let childFn;
 
-beforeAll(() => { // eslint-disable-line no-undef
+beforeAll(() => {
+  // eslint-disable-line no-undef
   requestAnimationFrame.reset();
   childFn = jest.fn(() => <div>hi there</div>);
 });
@@ -16,10 +17,7 @@ beforeAll(() => { // eslint-disable-line no-undef
 beforeEach(() => {
   jest.useFakeTimers();
   wrapper = mount(
-    <Moveable
-      speed="STANDARD"
-      onMoveEnd={() => { }}
-    >
+    <Moveable speed="STANDARD" onMoveEnd={() => {}}>
       {childFn}
     </Moveable>,
   );
@@ -30,7 +28,11 @@ afterEach(() => {
   requestAnimationFrame.reset();
 });
 
-const moveTo = (point: Position, speed?: Speed = 'STANDARD', onMoveEnd?: () => void) => {
+const moveTo = (
+  point: Position,
+  speed?: Speed = 'STANDARD',
+  onMoveEnd?: () => void,
+) => {
   wrapper.setProps({
     destination: point,
     onMoveEnd,

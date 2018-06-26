@@ -20,7 +20,7 @@ type Args = {|
   insideDestination: DraggableDimension[],
   previousImpact: DragImpact,
   viewport: Viewport,
-|}
+|};
 
 export default ({
   pageBorderBoxCenter,
@@ -37,20 +37,28 @@ export default ({
   // To do this we need to consider any displacement caused by
   // a change in scroll in the droppable we are currently over.
 
-  const currentCenter: Position = withDroppableScroll(destination, pageBorderBoxCenter);
+  const currentCenter: Position = withDroppableScroll(
+    destination,
+    pageBorderBoxCenter,
+  );
 
   const displaced: Displacement[] = insideDestination
-    .filter((child: DraggableDimension): boolean => {
-      // Items will be displaced forward if they sit ahead of the dragging item
-      const threshold: number = child.page.borderBox[axis.end];
-      return threshold > currentCenter[axis.line];
-    })
-    .map((dimension: DraggableDimension): Displacement => getDisplacement({
-      draggable: dimension,
-      destination,
-      previousImpact,
-      viewport: viewport.frame,
-    }));
+    .filter(
+      (child: DraggableDimension): boolean => {
+        // Items will be displaced forward if they sit ahead of the dragging item
+        const threshold: number = child.page.borderBox[axis.end];
+        return threshold > currentCenter[axis.line];
+      },
+    )
+    .map(
+      (dimension: DraggableDimension): Displacement =>
+        getDisplacement({
+          draggable: dimension,
+          destination,
+          previousImpact,
+          viewport: viewport.frame,
+        }),
+    );
 
   const newIndex: number = insideDestination.length - displaced.length;
 

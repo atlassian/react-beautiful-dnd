@@ -6,7 +6,10 @@ import noImpact from '../../../../src/state/no-impact';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import { negate, patch } from '../../../../src/state/position';
 import {
-  draggingStates, withImpact, move, type IsDraggingState,
+  draggingStates,
+  withImpact,
+  move,
+  type IsDraggingState,
 } from '../../../utils/dragging-state';
 import getOwnProps from './get-own-props';
 import type {
@@ -25,8 +28,10 @@ const state = getStatePreset();
 const ownProps: OwnProps = getOwnProps(preset.inHome2);
 const axis: Axis = preset.home.axis;
 
-const inHome1Amount: Position =
-  patch(axis.line, preset.inHome1.client.marginBox[axis.size]);
+const inHome1Amount: Position = patch(
+  axis.line,
+  preset.inHome1.client.marginBox[axis.size],
+);
 
 draggingStates.forEach((current: IsDraggingState) => {
   describe(`in phase: ${current.phase}`, () => {
@@ -35,28 +40,48 @@ draggingStates.forEach((current: IsDraggingState) => {
         const selector: Selector = makeMapStateToProps();
         const defaultMapProps: MapProps = selector(state.idle, ownProps);
 
-        expect(selector(withImpact(state.dragging(), noImpact), ownProps)).toBe(defaultMapProps);
+        expect(selector(withImpact(state.dragging(), noImpact), ownProps)).toBe(
+          defaultMapProps,
+        );
       });
 
       it('should not break memoization on mulitple calls', () => {
         const selector: Selector = makeMapStateToProps();
         const defaultMapProps: MapProps = selector(state.idle, ownProps);
 
-        expect(selector(withImpact(move(state.dragging(), { x: 1, y: 2 }), noImpact), ownProps))
-          .toBe(defaultMapProps);
-        expect(selector(withImpact(move(state.dragging(), { x: 1, y: 3 }), noImpact), ownProps))
-          .toBe(defaultMapProps);
-        expect(selector(withImpact(move(state.dragging(), { x: 1, y: 4 }), noImpact), ownProps))
-          .toBe(defaultMapProps);
+        expect(
+          selector(
+            withImpact(move(state.dragging(), { x: 1, y: 2 }), noImpact),
+            ownProps,
+          ),
+        ).toBe(defaultMapProps);
+        expect(
+          selector(
+            withImpact(move(state.dragging(), { x: 1, y: 3 }), noImpact),
+            ownProps,
+          ),
+        ).toBe(defaultMapProps);
+        expect(
+          selector(
+            withImpact(move(state.dragging(), { x: 1, y: 4 }), noImpact),
+            ownProps,
+          ),
+        ).toBe(defaultMapProps);
       });
 
       it('should not break memoization moving between different dragging phases', () => {
         const selector: Selector = makeMapStateToProps();
         const defaultMapProps: MapProps = selector(state.idle, ownProps);
 
-        expect(selector(withImpact(state.dragging(), noImpact), ownProps)).toBe(defaultMapProps);
-        expect(selector(withImpact(state.collecting(), noImpact), ownProps)).toBe(defaultMapProps);
-        expect(selector(withImpact(state.dropPending(), noImpact), ownProps)).toBe(defaultMapProps);
+        expect(selector(withImpact(state.dragging(), noImpact), ownProps)).toBe(
+          defaultMapProps,
+        );
+        expect(
+          selector(withImpact(state.collecting(), noImpact), ownProps),
+        ).toBe(defaultMapProps);
+        expect(
+          selector(withImpact(state.dropPending(), noImpact), ownProps),
+        ).toBe(defaultMapProps);
       });
     });
 
@@ -68,11 +93,13 @@ draggingStates.forEach((current: IsDraggingState) => {
       it('should move out backwards of the way', () => {
         const impact: DragImpact = {
           movement: {
-            displaced: [{
-              draggableId: ownProps.draggableId,
-              isVisible: true,
-              shouldAnimate: true,
-            }],
+            displaced: [
+              {
+                draggableId: ownProps.draggableId,
+                isVisible: true,
+                shouldAnimate: true,
+              },
+            ],
             amount: inHome1Amount,
             isBeyondStartPosition: true,
           },
@@ -101,11 +128,13 @@ draggingStates.forEach((current: IsDraggingState) => {
         const selector: Selector = makeMapStateToProps();
         const impact: DragImpact = {
           movement: {
-            displaced: [{
-              draggableId: ownProps.draggableId,
-              isVisible: true,
-              shouldAnimate: true,
-            }],
+            displaced: [
+              {
+                draggableId: ownProps.draggableId,
+                isVisible: true,
+                shouldAnimate: true,
+              },
+            ],
             amount: inHome1Amount,
             // does not make a lot of sense in this case, but this is fine
             isBeyondStartPosition: false,
@@ -133,11 +162,13 @@ draggingStates.forEach((current: IsDraggingState) => {
         const selector: Selector = makeMapStateToProps();
         const withAnimation: DragImpact = {
           movement: {
-            displaced: [{
-              draggableId: ownProps.draggableId,
-              isVisible: true,
-              shouldAnimate: true,
-            }],
+            displaced: [
+              {
+                draggableId: ownProps.draggableId,
+                isVisible: true,
+                shouldAnimate: true,
+              },
+            ],
             amount: inHome1Amount,
             isBeyondStartPosition: true,
           },
@@ -148,16 +179,24 @@ draggingStates.forEach((current: IsDraggingState) => {
           ...withAnimation,
           movement: {
             ...withAnimation.movement,
-            displaced: [{
-              draggableId: ownProps.draggableId,
-              isVisible: true,
-              shouldAnimate: false,
-            }],
+            displaced: [
+              {
+                draggableId: ownProps.draggableId,
+                isVisible: true,
+                shouldAnimate: false,
+              },
+            ],
           },
         };
 
-        const first: MapProps = selector(withImpact(current, withAnimation), ownProps);
-        const second: MapProps = selector(withImpact(current, withoutAnimation), ownProps);
+        const first: MapProps = selector(
+          withImpact(current, withAnimation),
+          ownProps,
+        );
+        const second: MapProps = selector(
+          withImpact(current, withoutAnimation),
+          ownProps,
+        );
 
         expect(first.shouldAnimateDisplacement).toBe(true);
         expect(second.shouldAnimateDisplacement).toBe(false);
@@ -169,11 +208,13 @@ draggingStates.forEach((current: IsDraggingState) => {
 
         const impact: DragImpact = {
           movement: {
-            displaced: [{
-              draggableId: ownProps.draggableId,
-              isVisible: false,
-              shouldAnimate: false,
-            }],
+            displaced: [
+              {
+                draggableId: ownProps.draggableId,
+                isVisible: false,
+                shouldAnimate: false,
+              },
+            ],
             amount: inHome1Amount,
             isBeyondStartPosition: true,
           },
@@ -190,11 +231,13 @@ draggingStates.forEach((current: IsDraggingState) => {
         const selector: Selector = makeMapStateToProps();
         const impact: DragImpact = {
           movement: {
-            displaced: [{
-              draggableId: ownProps.draggableId,
-              isVisible: true,
-              shouldAnimate: true,
-            }],
+            displaced: [
+              {
+                draggableId: ownProps.draggableId,
+                isVisible: true,
+                shouldAnimate: true,
+              },
+            ],
             amount: inHome1Amount,
             isBeyondStartPosition: true,
           },
@@ -244,18 +287,22 @@ draggingStates.forEach((current: IsDraggingState) => {
           },
         };
 
-        expect(selector(withImpact(current, secondImpact), ownProps)).toBe(first);
+        expect(selector(withImpact(current, secondImpact), ownProps)).toBe(
+          first,
+        );
       });
 
       it('should not break memoization moving between different dragging phases', () => {
         const selector: Selector = makeMapStateToProps();
         const impact: DragImpact = {
           movement: {
-            displaced: [{
-              draggableId: ownProps.draggableId,
-              isVisible: true,
-              shouldAnimate: true,
-            }],
+            displaced: [
+              {
+                draggableId: ownProps.draggableId,
+                isVisible: true,
+                shouldAnimate: true,
+              },
+            ],
             amount: inHome1Amount,
             isBeyondStartPosition: true,
           },
@@ -263,9 +310,18 @@ draggingStates.forEach((current: IsDraggingState) => {
           destination: inHome2Location,
         };
 
-        const first: MapProps = selector(withImpact(state.dragging(), impact), ownProps);
-        const second: MapProps = selector(withImpact(state.collecting(), impact), ownProps);
-        const third: MapProps = selector(withImpact(state.dropPending(), impact), ownProps);
+        const first: MapProps = selector(
+          withImpact(state.dragging(), impact),
+          ownProps,
+        );
+        const second: MapProps = selector(
+          withImpact(state.collecting(), impact),
+          ownProps,
+        );
+        const third: MapProps = selector(
+          withImpact(state.dropPending(), impact),
+          ownProps,
+        );
 
         expect(first).toBe(second);
         expect(second).toBe(third);
@@ -281,11 +337,13 @@ describe('something else impacted by drag (testing for memoization leaks)', () =
     const impact: DragImpact = {
       movement: {
         // moving inHome2 - no impact on inHome3
-        displaced: [{
-          draggableId: preset.inHome2.descriptor.id,
-          isVisible: true,
-          shouldAnimate: true,
-        }],
+        displaced: [
+          {
+            draggableId: preset.inHome2.descriptor.id,
+            isVisible: true,
+            shouldAnimate: true,
+          },
+        ],
         amount: inHome1Amount,
         isBeyondStartPosition: true,
       },
@@ -297,9 +355,18 @@ describe('something else impacted by drag (testing for memoization leaks)', () =
     };
     const defaultMapProps: MapProps = selector(state.idle, inHome3OwnProps);
 
-    const first: MapProps = selector(withImpact(state.dragging(), impact), inHome3OwnProps);
-    const second: MapProps = selector(withImpact(state.collecting(), impact), inHome3OwnProps);
-    const third: MapProps = selector(withImpact(state.dropPending(), impact), inHome3OwnProps);
+    const first: MapProps = selector(
+      withImpact(state.dragging(), impact),
+      inHome3OwnProps,
+    );
+    const second: MapProps = selector(
+      withImpact(state.collecting(), impact),
+      inHome3OwnProps,
+    );
+    const third: MapProps = selector(
+      withImpact(state.dropPending(), impact),
+      inHome3OwnProps,
+    );
 
     expect(first).toBe(defaultMapProps);
     expect(second).toBe(defaultMapProps);

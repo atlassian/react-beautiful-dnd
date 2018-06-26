@@ -1,13 +1,11 @@
-
 // @flow
 import { drop } from '../action-creators';
-import type {
-  Store,
-  State,
-  Action,
-} from '../../types';
+import type { State } from '../../types';
+import type { Store, Action } from '../store-types';
 
-export default (store: Store) => (next: (Action) => mixed) => (action: Action): mixed => {
+export default (store: Store) => (next: Action => mixed) => (
+  action: Action,
+): mixed => {
   // Always let the action go through first
   next(action);
 
@@ -26,8 +24,10 @@ export default (store: Store) => (next: (Action) => mixed) => (action: Action): 
   }
 
   if (!postActionState.isWaiting) {
-    store.dispatch(drop({
-      reason: postActionState.reason,
-    }));
+    store.dispatch(
+      drop({
+        reason: postActionState.reason,
+      }),
+    );
   }
 };

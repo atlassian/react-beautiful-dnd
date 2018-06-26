@@ -10,11 +10,7 @@ import {
   getCallbacksStub,
   type DimensionWatcher,
 } from '../../../utils/dimension-marshal';
-import {
-  critical,
-  defaultRequest,
-  justCritical,
-} from './util';
+import { critical, defaultRequest, justCritical } from './util';
 
 const preset = getPreset();
 
@@ -30,8 +26,10 @@ describe('force scrolling a droppable', () => {
 
     // scroll
     marshal.scrollDroppable(critical.droppable.id, { x: 10, y: 20 });
-    expect(watcher.droppable.scroll)
-      .toHaveBeenCalledWith(critical.droppable.id, { x: 10, y: 20 });
+    expect(watcher.droppable.scroll).toHaveBeenCalledWith(
+      critical.droppable.id,
+      { x: 10, y: 20 },
+    );
   });
 
   it('should throw if the droppable cannot be found', () => {
@@ -45,7 +43,11 @@ describe('force scrolling a droppable', () => {
     // scroll
     expect(() => {
       marshal.scrollDroppable(preset.foreign.descriptor.id, { x: 10, y: 20 });
-    }).toThrow(`Cannot scroll Droppable ${preset.foreign.descriptor.id} as it is not registered`);
+    }).toThrow(
+      `Cannot scroll Droppable ${
+        preset.foreign.descriptor.id
+      } as it is not registered`,
+    );
   });
 
   it('should not scroll the droppable if no collection is occurring', () => {
@@ -85,8 +87,15 @@ describe('responding to scroll changes', () => {
     expect(callbacks.updateDroppableScroll).not.toHaveBeenCalled();
 
     expect(() => {
-      marshal.updateDroppableScroll(preset.foreign.descriptor.id, { x: 10, y: 20 });
-    }).toThrow(`Cannot update the scroll on Droppable ${preset.foreign.descriptor.id} as it is not registered`);
+      marshal.updateDroppableScroll(preset.foreign.descriptor.id, {
+        x: 10,
+        y: 20,
+      });
+    }).toThrow(
+      `Cannot update the scroll on Droppable ${
+        preset.foreign.descriptor.id
+      } as it is not registered`,
+    );
   });
 
   it('should not let consumers know if know drag is occurring', () => {
@@ -110,8 +119,10 @@ describe('is enabled changes', () => {
     expect(callbacks.updateDroppableIsEnabled).not.toHaveBeenCalled();
 
     marshal.updateDroppableIsEnabled(critical.droppable.id, false);
-    expect(callbacks.updateDroppableIsEnabled)
-      .toHaveBeenCalledWith({ id: critical.droppable.id, isEnabled: false });
+    expect(callbacks.updateDroppableIsEnabled).toHaveBeenCalledWith({
+      id: critical.droppable.id,
+      isEnabled: false,
+    });
   });
 
   it('should throw if the droppable cannot be found', () => {
@@ -123,8 +134,13 @@ describe('is enabled changes', () => {
     marshal.startPublishing(defaultRequest, preset.windowScroll);
     expect(callbacks.updateDroppableIsEnabled).not.toHaveBeenCalled();
 
-    expect(() => marshal.updateDroppableIsEnabled(preset.foreign.descriptor.id, false))
-      .toThrow(`Cannot update the scroll on Droppable ${preset.foreign.descriptor.id} as it is not registered`);
+    expect(() =>
+      marshal.updateDroppableIsEnabled(preset.foreign.descriptor.id, false),
+    ).toThrow(
+      `Cannot update the scroll on Droppable ${
+        preset.foreign.descriptor.id
+      } as it is not registered`,
+    );
   });
 
   it('should not let consumers know if no collection is occurring', () => {

@@ -10,7 +10,7 @@ type Args = {|
   scrollDroppable: (id: DroppableId, change: Position) => void,
   move: typeof moveAction,
   scrollWindow: (offset: Position) => void,
-|}
+|};
 
 export default ({
   scrollDroppable,
@@ -36,4 +36,3 @@ export default ({
 
   return marshal;
 };
-
