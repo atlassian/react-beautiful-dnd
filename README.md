@@ -12,13 +12,6 @@ Beautiful, accessible drag and drop for lists with [`React.js`](https://facebook
 
 See how beautiful it is for yourself!
 
-## Read this in other languages
-
-- [![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **한글/Korean**](https://github.com/LeeHyungGeun/react-beautiful-dnd-kr)
-
-- [![china](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/China.png) **中文/Chinese**](https://github.com/chinanf-boy/react-beautiful-dnd-zh)
-
-
 ### Viewing on a desktop
 
 [All the examples!](https://react-beautiful-dnd.netlify.com)
@@ -39,6 +32,13 @@ We have created some basic examples on `codesandbox` for you to play with direct
 - [Simple DnD between two lists](https://codesandbox.io/s/l7ro2231o7)
 
 > Coming soon: a getting starting guide!
+
+## Read this in other languages
+
+- [![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **한글/Korean**](https://github.com/LeeHyungGeun/react-beautiful-dnd-kr)
+
+- [![china](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/China.png) **中文/Chinese**](https://github.com/chinanf-boy/react-beautiful-dnd-zh)
+
 
 ## Upgrading
 
