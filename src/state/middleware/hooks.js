@@ -76,17 +76,22 @@ const getExpiringAnnounce = (announce: Announce) => {
 
   const result = (message: string): void => {
     if (wasCalled) {
-      console.warn(
-        'Announcement already made. Not making a second announcement',
-      );
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn(
+          'Announcement already made. Not making a second announcement',
+        );
+      }
+
       return;
     }
 
     if (isExpired) {
-      console.warn(`
-        Announcements cannot be made asynchronously.
-        Default message has already been announced.
-      `);
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn(`
+          Announcements cannot be made asynchronously.
+          Default message has already been announced.
+        `);
+      }
       return;
     }
 

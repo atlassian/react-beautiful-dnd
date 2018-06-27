@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import { patch, subtract } from '../position';
@@ -25,12 +26,10 @@ export default ({
   draggables,
   viewport,
 }: Args): ?Result => {
-  if (!previousImpact.destination) {
-    console.error(
-      'cannot move to next index when there is not previous destination',
-    );
-    return null;
-  }
+  invariant(
+    previousImpact.destination,
+    'Cannot move to next index where there is no previous destination',
+  );
 
   const location: DraggableLocation = previousImpact.destination;
   const draggable: DraggableDimension = draggables[draggableId];

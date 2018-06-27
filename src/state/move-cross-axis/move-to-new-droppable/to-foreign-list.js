@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import moveToEdge from '../../move-to-edge';
 import type { Result } from '../move-cross-axis-types';
@@ -16,10 +17,10 @@ import type {
 type Args = {|
   amount: Position,
   pageBorderBoxCenter: Position,
-  target: ?DraggableDimension,
-  insideDroppable: DraggableDimension[],
+  movingRelativeTo: ?DraggableDimension,
+  insideDestination: DraggableDimension[],
   draggable: DraggableDimension,
-  droppable: DroppableDimension,
+  destination: DroppableDimension,
   previousImpact: DragImpact,
   viewport: Viewport,
 |};
@@ -27,30 +28,30 @@ type Args = {|
 export default ({
   amount,
   pageBorderBoxCenter,
-  target,
-  insideDroppable,
+  movingRelativeTo,
+  insideDestination,
   draggable,
-  droppable,
+  destination,
   previousImpact,
   viewport,
-}: Args): ?Result => {
-  const axis: Axis = droppable.axis;
+}: Args): Result => {
+  const axis: Axis = destination.axis;
   const isGoingBeforeTarget: boolean = Boolean(
-    target &&
-      pageBorderBoxCenter[droppable.axis.line] <
-        target.page.borderBox.center[droppable.axis.line],
+    movingRelativeTo &&
+      pageBorderBoxCenter[destination.axis.line] <
+        movingRelativeTo.page.borderBox.center[destination.axis.line],
   );
 
   // Moving to an empty list
 
-  if (!target) {
+  if (!movingRelativeTo) {
     // Move to start edge of the destination
     // based on the axis of the destination
 
     const newCenter: Position = moveToEdge({
       source: draggable.page.borderBox,
       sourceEdge: 'start',
-      destination: droppable.page.contentBox,
+      destination: destination.page.contentBox,
       destinationEdge: 'start',
       destinationAxis: axis,
     });
@@ -63,34 +64,34 @@ export default ({
       },
       direction: axis.direction,
       destination: {
-        droppableId: droppable.descriptor.id,
+        droppableId: destination.descriptor.id,
         index: 0,
       },
     };
 
     return {
-      pageBorderBoxCenter: withDroppableDisplacement(droppable, newCenter),
+      pageBorderBoxCenter: withDroppableDisplacement(destination, newCenter),
       impact: newImpact,
     };
   }
 
   // Moving to a populated list
 
-  const targetIndex: number = insideDroppable.indexOf(target);
+  const targetIndex: number = insideDestination.indexOf(movingRelativeTo);
+  invariant(
+    targetIndex !== -1,
+    'The target was not found within its droppable',
+  );
+
   const proposedIndex: number = isGoingBeforeTarget
     ? targetIndex
     : targetIndex + 1;
-
-  if (targetIndex === -1) {
-    console.error('could not find target inside destination');
-    return null;
-  }
 
   const newCenter: Position = moveToEdge({
     // Aligning to visible top of draggable
     source: draggable.page.borderBox,
     sourceEdge: 'start',
-    destination: target.page.marginBox,
+    destination: movingRelativeTo.page.marginBox,
     destinationEdge: isGoingBeforeTarget ? 'start' : 'end',
     destinationAxis: axis,
   });
@@ -99,13 +100,13 @@ export default ({
   // if going before: move everything down including the target
   // if going after: move everything down excluding the target
 
-  const displaced: Displacement[] = insideDroppable
-    .slice(proposedIndex, insideDroppable.length)
+  const displaced: Displacement[] = insideDestination
+    .slice(proposedIndex, insideDestination.length)
     .map(
       (dimension: DraggableDimension): Displacement =>
         getDisplacement({
           draggable: dimension,
-          destination: droppable,
+          destination,
           viewport: viewport.frame,
           previousImpact,
         }),
@@ -119,13 +120,13 @@ export default ({
     },
     direction: axis.direction,
     destination: {
-      droppableId: droppable.descriptor.id,
+      droppableId: destination.descriptor.id,
       index: proposedIndex,
     },
   };
 
   return {
-    pageBorderBoxCenter: withDroppableDisplacement(droppable, newCenter),
+    pageBorderBoxCenter: withDroppableDisplacement(destination, newCenter),
     impact: newImpact,
   };
 };

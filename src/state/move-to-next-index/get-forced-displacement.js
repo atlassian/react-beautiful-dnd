@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import getDisplacement from '../get-displacement';
 import type {
   Viewport,
@@ -88,10 +89,7 @@ export const withFirstRemoved = ({
   draggables,
 }: WithLastRemoved): Displacement[] => {
   const last: Displacement[] = previousImpact.movement.displaced;
-  if (!last.length) {
-    console.error('cannot remove displacement from empty list');
-    return [];
-  }
+  invariant(last.length, 'Cannot remove displacement from empty list');
 
   const withFirstRestored: Displacement[] = last.slice(1, last.length);
 

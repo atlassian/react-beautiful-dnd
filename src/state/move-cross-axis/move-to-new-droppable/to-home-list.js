@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import moveToEdge from '../../move-to-edge';
 import getDisplacement from '../../get-displacement';
@@ -16,41 +17,36 @@ import type {
 
 type Args = {|
   amount: Position,
-  originalIndex: number,
-  target: ?DraggableDimension,
-  insideDroppable: DraggableDimension[],
+  homeIndex: number,
+  movingRelativeTo: DraggableDimension,
+  insideDestination: DraggableDimension[],
   draggable: DraggableDimension,
-  droppable: DroppableDimension,
+  destination: DroppableDimension,
   previousImpact: DragImpact,
   viewport: Viewport,
 |};
 
 export default ({
   amount,
-  originalIndex,
-  target,
-  insideDroppable,
+  homeIndex,
+  movingRelativeTo,
+  insideDestination,
   draggable,
-  droppable,
+  destination,
   previousImpact,
   viewport,
-}: Args): ?Result => {
-  if (!target) {
-    console.error('there will always be a target in the original list');
-    return null;
-  }
+}: Args): Result => {
+  const axis: Axis = destination.axis;
+  const targetIndex: number = insideDestination.indexOf(movingRelativeTo);
 
-  const axis: Axis = droppable.axis;
-  const targetIndex: number = insideDroppable.indexOf(target);
-
-  if (targetIndex === -1) {
-    console.error('unable to find target in destination droppable');
-    return null;
-  }
+  invariant(
+    targetIndex !== -1,
+    'Unable to find target in destination droppable',
+  );
 
   // Moving back to original index
   // Super simple - just move it back to the original center with no impact
-  if (targetIndex === originalIndex) {
+  if (targetIndex === homeIndex) {
     const newCenter: Position = draggable.page.borderBox.center;
     const newImpact: DragImpact = {
       movement: {
@@ -58,15 +54,15 @@ export default ({
         amount,
         isBeyondStartPosition: false,
       },
-      direction: droppable.axis.direction,
+      direction: destination.axis.direction,
       destination: {
-        droppableId: droppable.descriptor.id,
-        index: originalIndex,
+        droppableId: destination.descriptor.id,
+        index: homeIndex,
       },
     };
 
     return {
-      pageBorderBoxCenter: withDroppableDisplacement(droppable, newCenter),
+      pageBorderBoxCenter: withDroppableDisplacement(destination, newCenter),
       impact: newImpact,
     };
   }
@@ -79,41 +75,41 @@ export default ({
   // We align the dragging item to the end of the target
   // and move everything from the target to the original position backwards
 
-  const isMovingPastOriginalIndex = targetIndex > originalIndex;
+  const isMovingPastOriginalIndex = targetIndex > homeIndex;
   const edge: Edge = isMovingPastOriginalIndex ? 'end' : 'start';
 
   const newCenter: Position = moveToEdge({
     source: draggable.page.borderBox,
     sourceEdge: edge,
     destination: isMovingPastOriginalIndex
-      ? target.page.borderBox
-      : target.page.marginBox,
+      ? movingRelativeTo.page.borderBox
+      : movingRelativeTo.page.marginBox,
     destinationEdge: edge,
     destinationAxis: axis,
   });
 
   const modified: DraggableDimension[] = (() => {
     if (!isMovingPastOriginalIndex) {
-      return insideDroppable.slice(targetIndex, originalIndex);
+      return insideDestination.slice(targetIndex, homeIndex);
     }
 
     // We are aligning to the bottom of the target and moving everything
     // back to the original index backwards
 
     // We want everything after the original index to move
-    const from: number = originalIndex + 1;
+    const from: number = homeIndex + 1;
     // We need the target to move backwards
     const to: number = targetIndex + 1;
 
     // Need to ensure that the list is sorted with the closest item being first
-    return insideDroppable.slice(from, to).reverse();
+    return insideDestination.slice(from, to).reverse();
   })();
 
   const displaced: Displacement[] = modified.map(
     (dimension: DraggableDimension): Displacement =>
       getDisplacement({
         draggable: dimension,
-        destination: droppable,
+        destination,
         previousImpact,
         viewport: viewport.frame,
       }),
@@ -127,13 +123,13 @@ export default ({
     },
     direction: axis.direction,
     destination: {
-      droppableId: droppable.descriptor.id,
+      droppableId: destination.descriptor.id,
       index: targetIndex,
     },
   };
 
   return {
-    pageBorderBoxCenter: withDroppableDisplacement(droppable, newCenter),
+    pageBorderBoxCenter: withDroppableDisplacement(destination, newCenter),
     impact: newImpact,
   };
 };
