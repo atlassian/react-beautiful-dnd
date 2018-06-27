@@ -83,24 +83,21 @@ export default ({
     viewport: viewport.frame,
   });
 
-  const displaced: Displacement[] = (() => {
-    if (isMovingTowardStart) {
-      return withFirstRemoved({
+  const displaced: Displacement[] = isMovingTowardStart
+    ? withFirstRemoved({
         dragging: draggableId,
         isVisibleInNewLocation,
         previousImpact,
         droppable,
         draggables,
+      })
+    : withFirstAdded({
+        add: destination.descriptor.id,
+        previousImpact,
+        droppable,
+        draggables,
+        viewport,
       });
-    }
-    return withFirstAdded({
-      add: destination.descriptor.id,
-      previousImpact,
-      droppable,
-      draggables,
-      viewport,
-    });
-  })();
 
   const newImpact: DragImpact = {
     movement: {
