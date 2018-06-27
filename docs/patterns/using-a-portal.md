@@ -2,6 +2,8 @@
 
 > This guide will go through how you can move your `Draggable` into a [`React.Portal`](https://reactjs.org/docs/portals.html) while dragging.
 
+> ⚠️ Moving items into a React Portal after a `touchstart` is currently not working 😞. React issue: [#13113](https://github.com/facebook/react/issues/13113). We are tracking it here: [#582](https://github.com/atlassian/react-beautiful-dnd/issues/582). Due to this issue with React Portals drag and drop will not work on touch devices if using a React Portal
+
 ## Background
 
 We leave elements in place when dragging. We apply `position: fixed` on elements when we are moving them around. This is quite robust and allows for you to have `position: relative | absolute | fixed` parents. However, unfortunately `position:fixed` is [impacted by `transform`](http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/) (such as `transform: rotate(10deg);`). This means that if you have a `transform: *` on one of the parents of a `Draggable` then the positioning logic will be incorrect while dragging. Lame! For most consumers this will not be an issue.
