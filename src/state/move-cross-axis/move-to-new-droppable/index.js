@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import toHomeList from './to-home-list';
 import toForeignList from './to-foreign-list';
@@ -19,7 +20,7 @@ type Args = {|
   draggable: DraggableDimension,
   // what the draggable is moving towards
   // can be null if the destination is empty
-  target: ?DraggableDimension,
+  movingRelativeTo: ?DraggableDimension,
   // the droppable the draggable is moving to
   destination: DroppableDimension,
   // all the draggables inside the destination
@@ -35,13 +36,13 @@ type Args = {|
 export default ({
   pageBorderBoxCenter,
   destination,
-  draggable,
-  target,
-  home,
   insideDestination,
+  draggable,
+  movingRelativeTo,
+  home,
   previousImpact,
   viewport,
-}: Args): ?Result => {
+}: Args): Result => {
   const amount: Position = patch(
     destination.axis.line,
     draggable.client.marginBox[destination.axis.size],
@@ -49,13 +50,18 @@ export default ({
 
   // moving back to the home list
   if (destination.descriptor.id === draggable.descriptor.droppableId) {
+    invariant(
+      movingRelativeTo,
+      'There will always be a target in the original list',
+    );
+
     return toHomeList({
       amount,
-      originalIndex: home.index,
-      target,
-      insideDroppable: insideDestination,
+      homeIndex: home.index,
+      movingRelativeTo,
+      insideDestination,
       draggable,
-      droppable: destination,
+      destination,
       previousImpact,
       viewport,
     });
@@ -65,10 +71,10 @@ export default ({
   return toForeignList({
     amount,
     pageBorderBoxCenter,
-    target,
-    insideDroppable: insideDestination,
+    movingRelativeTo,
+    insideDestination,
     draggable,
-    droppable: destination,
+    destination,
     previousImpact,
     viewport,
   });

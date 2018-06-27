@@ -71,7 +71,7 @@ export default ({
     draggables,
   );
 
-  const target: ?DraggableDimension = getClosestDraggable({
+  const movingRelativeTo: ?DraggableDimension = getClosestDraggable({
     axis: destination.axis,
     pageBorderBoxCenter,
     destination,
@@ -81,7 +81,7 @@ export default ({
 
   // Draggables available, but none are candidates for movement (eg none are visible)
   // Cannot move into the list
-  if (insideDestination.length && !target) {
+  if (insideDestination.length && !movingRelativeTo) {
     return null;
   }
 
@@ -89,7 +89,7 @@ export default ({
     pageBorderBoxCenter,
     destination,
     draggable,
-    target,
+    movingRelativeTo,
     insideDestination,
     home,
     previousImpact: previousImpact || noImpact,

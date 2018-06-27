@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import { patch, subtract } from '../position';
@@ -26,13 +27,10 @@ export default ({
   viewport,
 }: Args): ?Result => {
   const location: ?DraggableLocation = previousImpact.destination;
-
-  if (!location) {
-    console.error(
-      'cannot move to next index when there is not previous destination',
-    );
-    return null;
-  }
+  invariant(
+    location,
+    'Cannot move to next index in home list when there is no previous destination',
+  );
 
   const draggable: DraggableDimension = draggables[draggableId];
   const axis: Axis = droppable.axis;
@@ -45,11 +43,6 @@ export default ({
   const startIndex: number = draggable.descriptor.index;
   const currentIndex: number = location.index;
   const proposedIndex = isMovingForward ? currentIndex + 1 : currentIndex - 1;
-
-  if (startIndex === -1) {
-    console.error('could not find draggable inside current droppable');
-    return null;
-  }
 
   // cannot move forward beyond the last item
   if (proposedIndex > insideDroppable.length - 1) {
@@ -90,24 +83,21 @@ export default ({
     viewport: viewport.frame,
   });
 
-  const displaced: Displacement[] = (() => {
-    if (isMovingTowardStart) {
-      return withFirstRemoved({
+  const displaced: Displacement[] = isMovingTowardStart
+    ? withFirstRemoved({
         dragging: draggableId,
         isVisibleInNewLocation,
         previousImpact,
         droppable,
         draggables,
+      })
+    : withFirstAdded({
+        add: destination.descriptor.id,
+        previousImpact,
+        droppable,
+        draggables,
+        viewport,
       });
-    }
-    return withFirstAdded({
-      add: destination.descriptor.id,
-      previousImpact,
-      droppable,
-      draggables,
-      viewport,
-    });
-  })();
 
   const newImpact: DragImpact = {
     movement: {

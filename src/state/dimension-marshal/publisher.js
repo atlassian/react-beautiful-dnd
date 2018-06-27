@@ -69,6 +69,10 @@ export default ({ getProvided, callbacks }: Args): Publisher => {
 
       hasAnnounced = true;
 
+      if (process.env.NODE_ENV === 'production') {
+        return;
+      }
+
       console.warn(
         `
         Advanced usage warning: you are adding or removing a dimension during a drag

@@ -252,7 +252,6 @@ export default (state: State = idle, action: Action): State => {
     // This is possible if a droppable has been asked to watch scroll but
     // the dimension has not been published yet
     if (!target) {
-      console.warn('cannot find target');
       return state;
     }
 

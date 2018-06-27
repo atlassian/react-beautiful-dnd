@@ -222,9 +222,11 @@ export default ({
           event.webkitForce == null ||
           (MouseEvent: any).WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null
         ) {
-          console.error(
-            'handling a mouse force changed event when it is not supported',
-          );
+          if (process.env.NODE_ENV !== 'production') {
+            console.warn(
+              'handling a mouse force changed event when it is not supported',
+            );
+          }
           return;
         }
 

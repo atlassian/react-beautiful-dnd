@@ -201,6 +201,7 @@ describe('drag handle', () => {
   });
 
   beforeEach(() => {
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
     jest.spyOn(console, 'error').mockImplementation(() => {});
     callbacks = getStubCallbacks();
     wrapper = getWrapper(callbacks);
@@ -208,6 +209,7 @@ describe('drag handle', () => {
 
   afterEach(() => {
     wrapper.unmount();
+    console.warn.mockRestore();
     console.error.mockRestore();
 
     // we need to run all timers rather than clear them as the
@@ -1422,7 +1424,7 @@ describe('drag handle', () => {
         // not providing any force value
         windowMouseForceChange();
 
-        expect(console.error).toHaveBeenCalled();
+        expect(console.warn).toHaveBeenCalled();
       });
 
       it('should log a warning if a mouse force changed event is fired when there is no MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN global', () => {
@@ -1432,7 +1434,7 @@ describe('drag handle', () => {
         mouseDown(wrapper);
         windowMouseForceChange(standardForce);
 
-        expect(console.error).toHaveBeenCalled();
+        expect(console.warn).toHaveBeenCalled();
       });
 
       describe('non error scenarios', () => {
