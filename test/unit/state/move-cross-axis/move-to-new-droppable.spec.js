@@ -57,52 +57,49 @@ describe('move to new droppable', () => {
           inHome4,
         ];
 
-        it('should return null and log an error if no target is found', () => {
-          // this should never happen but just being safe
-          const result: ?Result = moveToNewDroppable({
-            pageBorderBoxCenter: dontCare,
-            draggable: inHome1,
-            target: null,
-            destination: home,
-            insideDestination: draggables,
-            home: {
-              index: 0,
-              droppableId: home.descriptor.id,
-            },
-            previousImpact: noImpact,
-            viewport,
-          });
-
-          expect(result).toBe(null);
-          expect(console.error).toHaveBeenCalled();
+        it('should throw an error if no target is found', () => {
+          expect(() =>
+            moveToNewDroppable({
+              pageBorderBoxCenter: dontCare,
+              draggable: inHome1,
+              movingRelativeTo: null,
+              destination: home,
+              insideDestination: draggables,
+              home: {
+                index: 0,
+                droppableId: home.descriptor.id,
+              },
+              previousImpact: noImpact,
+              viewport,
+            }),
+          ).toThrow();
         });
 
-        it('should return null and log an error if the target is not inside the droppable', () => {
-          const result: ?Result = moveToNewDroppable({
-            pageBorderBoxCenter: dontCare,
-            draggable: draggables[0],
-            target: inForeign1,
-            destination: home,
-            insideDestination: draggables,
-            home: {
-              index: 0,
-              droppableId: home.descriptor.id,
-            },
-            previousImpact: noImpact,
-            viewport,
-          });
-
-          expect(result).toBe(null);
-          expect(console.error).toHaveBeenCalled();
+        it('should throw if the target is not inside the droppable', () => {
+          expect(() =>
+            moveToNewDroppable({
+              pageBorderBoxCenter: dontCare,
+              draggable: draggables[0],
+              movingRelativeTo: inForeign1,
+              destination: home,
+              insideDestination: draggables,
+              home: {
+                index: 0,
+                droppableId: home.descriptor.id,
+              },
+              previousImpact: noImpact,
+              viewport,
+            }),
+          ).toThrow();
         });
 
         describe('moving back into original index', () => {
           describe('without droppable scroll', () => {
             // the second draggable is moving back into its home
-            const result: ?Result = moveToNewDroppable({
+            const result: Result = moveToNewDroppable({
               pageBorderBoxCenter: dontCare,
               draggable: inHome2,
-              target: inHome2,
+              movingRelativeTo: inHome2,
               destination: home,
               insideDestination: draggables,
               home: {
@@ -153,10 +150,10 @@ describe('move to new droppable', () => {
               patch(axis.line, 10),
             );
 
-            const result: ?Result = moveToNewDroppable({
+            const result: Result = moveToNewDroppable({
               pageBorderBoxCenter: dontCare,
               draggable: inHome2,
-              target: inHome2,
+              movingRelativeTo: inHome2,
               destination: scrolled,
               insideDestination: draggables,
               home: {
@@ -202,10 +199,10 @@ describe('move to new droppable', () => {
         describe('moving before the original index', () => {
           describe('without droppable scroll', () => {
             // moving inHome4 into the inHome2 position
-            const result: ?Result = moveToNewDroppable({
+            const result: Result = moveToNewDroppable({
               pageBorderBoxCenter: dontCare,
               draggable: inHome4,
-              target: inHome2,
+              movingRelativeTo: inHome2,
               destination: home,
               insideDestination: draggables,
               home: {
@@ -272,10 +269,10 @@ describe('move to new droppable', () => {
               patch(axis.line, 10),
             );
 
-            const result: ?Result = moveToNewDroppable({
+            const result: Result = moveToNewDroppable({
               pageBorderBoxCenter: dontCare,
               draggable: inHome4,
-              target: inHome2,
+              movingRelativeTo: inHome2,
               destination: scrolled,
               insideDestination: draggables,
               home: {
@@ -308,10 +305,10 @@ describe('move to new droppable', () => {
         describe('moving after the original index', () => {
           describe('without droppable scroll', () => {
             // moving inHome1 into the inHome4 position
-            const result: ?Result = moveToNewDroppable({
+            const result: Result = moveToNewDroppable({
               pageBorderBoxCenter: dontCare,
               draggable: inHome1,
-              target: inHome4,
+              movingRelativeTo: inHome4,
               destination: home,
               insideDestination: draggables,
               home: {
@@ -384,10 +381,10 @@ describe('move to new droppable', () => {
               patch(axis.line, 10),
             );
 
-            const result: ?Result = moveToNewDroppable({
+            const result: Result = moveToNewDroppable({
               pageBorderBoxCenter: dontCare,
               draggable: inHome1,
-              target: inHome4,
+              movingRelativeTo: inHome4,
               destination: scrolled,
               insideDestination: draggables,
               home: {
@@ -497,10 +494,10 @@ describe('move to new droppable', () => {
               },
             };
 
-            const result: ?Result = moveToNewDroppable({
+            const result: Result = moveToNewDroppable({
               pageBorderBoxCenter: dontCare,
               draggable: inside,
-              target: outside,
+              movingRelativeTo: outside,
               destination: droppable,
               insideDestination: customDraggables,
               home: {
@@ -584,10 +581,10 @@ describe('move to new droppable', () => {
               },
             };
 
-            const result: ?Result = moveToNewDroppable({
+            const result: Result = moveToNewDroppable({
               pageBorderBoxCenter: dontCare,
               draggable: inside,
-              target: outside,
+              movingRelativeTo: outside,
               destination: droppable,
               insideDestination: customDraggables,
               home: {
@@ -615,30 +612,31 @@ describe('move to new droppable', () => {
           inForeign4,
         ];
 
-        it('should return null when the target is not within the list - cannot really happen', () => {
-          const result: ?Result = moveToNewDroppable({
-            pageBorderBoxCenter: inHome1.page.borderBox.center,
-            draggable: inHome1,
-            target: inHome2,
-            destination: foreign,
-            insideDestination: draggables,
-            home: {
-              index: 0,
-              droppableId: home.descriptor.id,
-            },
-            previousImpact: noImpact,
-            viewport,
-          });
+        it('should throw when moving relative to something not in the destination', () => {
+          const execute = () =>
+            moveToNewDroppable({
+              pageBorderBoxCenter: inHome1.page.borderBox.center,
+              draggable: inHome1,
+              movingRelativeTo: inHome2,
+              destination: foreign,
+              insideDestination: draggables,
+              home: {
+                index: 0,
+                droppableId: home.descriptor.id,
+              },
+              previousImpact: noImpact,
+              viewport,
+            });
 
-          expect(result).toBe(null);
+          expect(execute).toThrow();
         });
 
         describe('moving into an unpopulated list', () => {
           describe('without droppable scroll', () => {
-            const result: ?Result = moveToNewDroppable({
+            const result: Result = moveToNewDroppable({
               pageBorderBoxCenter: inHome1.page.borderBox.center,
               draggable: inHome1,
-              target: null,
+              movingRelativeTo: null,
               destination: foreign,
               insideDestination: [],
               home: {
@@ -695,10 +693,10 @@ describe('move to new droppable', () => {
               patch(axis.line, 10),
             );
 
-            const result: ?Result = moveToNewDroppable({
+            const result: Result = moveToNewDroppable({
               pageBorderBoxCenter: inHome1.page.borderBox.center,
               draggable: inHome1,
-              target: null,
+              movingRelativeTo: null,
               destination: scrolled,
               insideDestination: [],
               home: {
@@ -731,10 +729,10 @@ describe('move to new droppable', () => {
         describe('is moving before the target', () => {
           describe('without droppable scroll', () => {
             // moving home1 into the second position of the list
-            const result: ?Result = moveToNewDroppable({
+            const result: Result = moveToNewDroppable({
               pageBorderBoxCenter: inHome1.page.borderBox.center,
               draggable: inHome1,
-              target: inForeign2,
+              movingRelativeTo: inForeign2,
               destination: foreign,
               insideDestination: draggables,
               home: {
@@ -809,10 +807,10 @@ describe('move to new droppable', () => {
               patch(axis.line, 10),
             );
 
-            const result: ?Result = moveToNewDroppable({
+            const result: Result = moveToNewDroppable({
               pageBorderBoxCenter: inHome1.page.borderBox.center,
               draggable: inHome1,
-              target: inForeign2,
+              movingRelativeTo: inForeign2,
               destination: scrolled,
               insideDestination: draggables,
               home: {
@@ -845,10 +843,10 @@ describe('move to new droppable', () => {
         describe('is moving after the target', () => {
           describe('without droppable scroll', () => {
             // moving home4 into the second position of the foreign list
-            const result: ?Result = moveToNewDroppable({
+            const result: Result = moveToNewDroppable({
               pageBorderBoxCenter: inHome4.page.borderBox.center,
               draggable: inHome4,
-              target: inForeign2,
+              movingRelativeTo: inForeign2,
               destination: foreign,
               insideDestination: draggables,
               home: {
@@ -919,10 +917,10 @@ describe('move to new droppable', () => {
               patch(axis.line, 10),
             );
 
-            const result: ?Result = moveToNewDroppable({
+            const result: Result = moveToNewDroppable({
               pageBorderBoxCenter: inHome4.page.borderBox.center,
               draggable: inHome4,
-              target: inForeign2,
+              movingRelativeTo: inForeign2,
               destination: scrolled,
               insideDestination: draggables,
               home: {
@@ -1051,10 +1049,10 @@ describe('move to new droppable', () => {
               },
             };
 
-            const result: ?Result = moveToNewDroppable({
+            const result: Result = moveToNewDroppable({
               pageBorderBoxCenter: dontCare,
               draggable: customInHome,
-              target: customInForeign,
+              movingRelativeTo: customInForeign,
               destination: customForeign,
               insideDestination: customInsideForeign,
               home: {
@@ -1157,10 +1155,10 @@ describe('move to new droppable', () => {
               },
             };
 
-            const result: ?Result = moveToNewDroppable({
+            const result: Result = moveToNewDroppable({
               pageBorderBoxCenter: dontCare,
               draggable: customInHome,
-              target: customInForeign,
+              movingRelativeTo: customInForeign,
               destination: customForeign,
               insideDestination: customInsideForeign,
               home: {
