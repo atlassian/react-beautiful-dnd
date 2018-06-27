@@ -1,14 +1,14 @@
 // @flow
 import { type Position } from 'css-box-model';
-import { distance } from '../position';
-import { isTotallyVisible } from '../visibility/is-visible';
-import withDroppableDisplacement from '../with-droppable-displacement';
+import { distance } from '../../position';
+import { isTotallyVisible } from '../../visibility/is-visible';
+import withDroppableDisplacement from '../../with-droppable-displacement';
 import type {
   Viewport,
   Axis,
   DraggableDimension,
   DroppableDimension,
-} from '../../types';
+} from '../../../types';
 
 type Args = {|
   axis: Axis,

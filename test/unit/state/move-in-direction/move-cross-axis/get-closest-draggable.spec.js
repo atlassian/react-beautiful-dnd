@@ -1,22 +1,22 @@
 // @flow
 import { getRect, type Rect, type Position } from 'css-box-model';
-import getClosestDraggable from '../../../../src/state/move-cross-axis/get-closest-draggable';
-import { scrollDroppable } from '../../../../src/state/droppable-dimension';
-import { add, distance, patch } from '../../../../src/state/position';
+import getClosestDraggable from '../../../../../src/state/move-in-direction/move-cross-axis/get-closest-draggable';
+import { scrollDroppable } from '../../../../../src/state/droppable-dimension';
+import { add, distance, patch } from '../../../../../src/state/position';
 import {
   getDroppableDimension,
   getDraggableDimension,
   withAssortedSpacing,
-} from '../../../utils/dimension';
-import { expandByPosition } from '../../../../src/state/spacing';
-import { horizontal, vertical } from '../../../../src/state/axis';
-import getViewport from '../../../../src/view/window/get-viewport';
+} from '../../../../utils/dimension';
+import { expandByPosition } from '../../../../../src/state/spacing';
+import { horizontal, vertical } from '../../../../../src/state/axis';
+import getViewport from '../../../../../src/view/window/get-viewport';
 import type {
   Axis,
   DraggableDimension,
   DroppableDimension,
   Viewport,
-} from '../../../../src/types';
+} from '../../../../../src/types';
 
 const viewport: Viewport = getViewport();
 

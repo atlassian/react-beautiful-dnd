@@ -1,13 +1,13 @@
 // @flow
 import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
-import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import { patch, subtract } from '../position';
-import withDroppableDisplacement from '../with-droppable-displacement';
+import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
+import { patch, subtract } from '../../position';
+import withDroppableDisplacement from '../../with-droppable-displacement';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
-import moveToEdge from '../move-to-edge';
+import moveToEdge from '../../move-to-edge';
 import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
-import type { Edge } from '../move-to-edge';
+import type { Edge } from '../../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import type {
   DraggableLocation,
@@ -15,7 +15,7 @@ import type {
   Displacement,
   Axis,
   DragImpact,
-} from '../../types';
+} from '../../../types';
 
 export default ({
   isMovingForward,

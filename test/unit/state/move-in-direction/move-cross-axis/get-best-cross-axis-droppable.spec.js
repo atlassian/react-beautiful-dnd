@@ -1,16 +1,16 @@
 // @flow
 import { type Position } from 'css-box-model';
-import getBestCrossAxisDroppable from '../../../../src/state/move-cross-axis/get-best-cross-axis-droppable';
-import { getDroppableDimension } from '../../../utils/dimension';
-import { add } from '../../../../src/state/position';
-import { horizontal, vertical } from '../../../../src/state/axis';
-import getViewport from '../../../../src/view/window/get-viewport';
+import getBestCrossAxisDroppable from '../../../../../src/state/move-in-direction/move-cross-axis/get-best-cross-axis-droppable';
+import { getDroppableDimension } from '../../../../utils/dimension';
+import { add } from '../../../../../src/state/position';
+import { horizontal, vertical } from '../../../../../src/state/axis';
+import getViewport from '../../../../../src/view/window/get-viewport';
 import type {
   Viewport,
   Axis,
   DroppableDimension,
   DroppableDimensionMap,
-} from '../../../../src/types';
+} from '../../../../../src/types';
 
 const viewport: Viewport = getViewport();
 

@@ -1,20 +1,20 @@
 // @flow
-import moveCrossAxis from '../../../../src/state/move-cross-axis';
-import noImpact from '../../../../src/state/no-impact';
-import getViewport from '../../../../src/view/window/get-viewport';
+import moveCrossAxis from '../../../../../src/state/move-in-direction/move-cross-axis';
+import noImpact from '../../../../../src/state/no-impact';
+import getViewport from '../../../../../src/view/window/get-viewport';
 import {
   getPreset,
   getDroppableDimension,
   getDraggableDimension,
-} from '../../../utils/dimension';
-import type { Result } from '../../../../src/state/move-cross-axis/move-cross-axis-types';
+} from '../../../../utils/dimension';
+import type { Result } from '../../../../../src/state/move-in-direction/move-cross-axis/move-cross-axis-types';
 import type {
   Viewport,
   DraggableDimension,
   DroppableDimension,
   DraggableDimensionMap,
   DroppableDimensionMap,
-} from '../../../../src/types';
+} from '../../../../../src/types';
 
 const preset = getPreset();
 const viewport: Viewport = getViewport();

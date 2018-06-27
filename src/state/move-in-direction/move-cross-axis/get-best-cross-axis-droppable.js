@@ -1,17 +1,17 @@
 // @flow
 import invariant from 'tiny-invariant';
 import { type Position, type Rect } from 'css-box-model';
-import { closest } from '../position';
-import isWithin from '../is-within';
-import { getCorners } from '../spacing';
-import isPartiallyVisibleThroughFrame from '../visibility/is-partially-visible-through-frame';
-import { toDroppableList } from '../dimension-structures';
+import { closest } from '../../position';
+import isWithin from '../../is-within';
+import { getCorners } from '../../spacing';
+import isPartiallyVisibleThroughFrame from '../../visibility/is-partially-visible-through-frame';
+import { toDroppableList } from '../../dimension-structures';
 import type {
   Axis,
   DroppableDimension,
   DroppableDimensionMap,
   Viewport,
-} from '../../types';
+} from '../../../types';
 
 type GetBestDroppableArgs = {|
   isMovingForward: boolean,

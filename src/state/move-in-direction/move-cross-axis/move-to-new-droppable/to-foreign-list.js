@@ -1,10 +1,10 @@
 // @flow
 import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
-import moveToEdge from '../../move-to-edge';
+import moveToEdge from '../../../move-to-edge';
 import type { Result } from '../move-cross-axis-types';
-import getDisplacement from '../../get-displacement';
-import withDroppableDisplacement from '../../with-droppable-displacement';
+import getDisplacement from '../../../get-displacement';
+import withDroppableDisplacement from '../../../with-droppable-displacement';
 import type {
   Axis,
   DragImpact,
@@ -12,7 +12,7 @@ import type {
   DroppableDimension,
   Displacement,
   Viewport,
-} from '../../../types';
+} from '../../../../types';
 
 type Args = {|
   amount: Position,
