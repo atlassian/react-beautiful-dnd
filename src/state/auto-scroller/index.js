@@ -4,11 +4,11 @@ import createFluidScroller, { type FluidScroller } from './fluid-scroller';
 import createJumpScroller, { type JumpScroller } from './jump-scroller';
 import type { AutoScroller } from './auto-scroller-types';
 import type { DroppableId } from '../../types';
-import { move as moveAction } from '../action-creators';
+import type { MoveArgs } from '../action-creators';
 
 type Args = {|
   scrollDroppable: (id: DroppableId, change: Position) => void,
-  move: typeof moveAction,
+  move: (args: MoveArgs) => mixed,
   scrollWindow: (offset: Position) => void,
 |};
 
