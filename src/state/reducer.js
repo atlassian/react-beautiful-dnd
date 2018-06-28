@@ -220,6 +220,14 @@ export default (state: State = idle, action: Action): State => {
 
     const { client, shouldAnimate } = action.payload;
 
+    // nothing needs to be done
+    if (
+      state.shouldAnimate === shouldAnimate &&
+      isEqual(client, state.current.client.selection)
+    ) {
+      return state;
+    }
+
     // If we are jump scrolling - manual movements should not update the impact
     const impact: ?DragImpact =
       state.autoScrollMode === 'JUMP' ? state.impact : null;
@@ -367,6 +375,7 @@ export default (state: State = idle, action: Action): State => {
 
     const newScroll: Position = action.payload.scroll;
 
+    // nothing needs to be done
     if (isEqual(state.viewport.scroll.current, newScroll)) {
       return state;
     }

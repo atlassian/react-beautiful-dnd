@@ -74,16 +74,17 @@ export default ({
       (droppable: DroppableDimension): boolean => {
         const targetClipped: Rect = getSafeClipped(droppable);
 
+        // is the target in front of the source on the cross axis?
         if (isMovingForward) {
-          // is the droppable in front of the source on the cross axis?
           return (
-            sourceClipped[axis.crossAxisEnd] <=
-            targetClipped[axis.crossAxisStart]
+            targetClipped.center[axis.crossAxisLine] >=
+            sourceClipped.center[axis.crossAxisLine]
           );
         }
-        // is the droppable behind the source on the cross axis?
+        // is the target behind the source on the cross axis?
         return (
-          targetClipped[axis.crossAxisEnd] <= sourceClipped[axis.crossAxisStart]
+          targetClipped.center[axis.crossAxisLine] <=
+          sourceClipped.center[axis.crossAxisLine]
         );
       },
     )
