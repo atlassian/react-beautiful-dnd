@@ -7,8 +7,7 @@ import replace from 'rollup-plugin-replace';
 import strip from 'rollup-plugin-strip';
 import { uglify } from 'rollup-plugin-uglify';
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
-
-const pkg = require('./package.json');
+import pkg from './package.json';
 
 const input = './src/index.js';
 const extensions = ['.js', '.jsx'];
