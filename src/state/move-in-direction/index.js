@@ -24,6 +24,11 @@ export type Result = {|
   scrollJumpRequest: ?Position,
 |};
 
+const getClientSelection = (
+  pageBorderBoxCenter: Position,
+  currentScroll: Position,
+): Position => subtract(pageBorderBoxCenter, currentScroll);
+
 export default ({ state, action }: Args): ?Result => {
   const { droppable, isMainAxisMovementAllowed } = (() => {
     if (state.impact.destination) {
@@ -74,17 +79,12 @@ export default ({ state, action }: Args): ?Result => {
       return null;
     }
 
-    const impact: DragImpact = result.impact;
-    const pageBorderBoxCenter: Position = result.pageBorderBoxCenter;
-    // TODO: not sure if this is correct
-    const clientBorderBoxCenter: Position = subtract(
-      pageBorderBoxCenter,
-      state.viewport.scroll.current,
-    );
-
     return {
-      impact,
-      clientSelection: clientBorderBoxCenter,
+      impact: result.impact,
+      clientSelection: getClientSelection(
+        result.pageBorderBoxCenter,
+        state.viewport.scroll.current,
+      ),
       scrollJumpRequest: result.scrollJumpRequest,
     };
   }
@@ -108,13 +108,11 @@ export default ({ state, action }: Args): ?Result => {
     return null;
   }
 
-  const clientSelection: Position = subtract(
-    result.pageBorderBoxCenter,
-    state.viewport.scroll.current,
-  );
-
   return {
-    clientSelection,
+    clientSelection: getClientSelection(
+      result.pageBorderBoxCenter,
+      state.viewport.scroll.current,
+    ),
     impact: result.impact,
     scrollJumpRequest: null,
   };
