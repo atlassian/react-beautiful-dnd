@@ -77,14 +77,13 @@ export default ({
         // is the target in front of the source on the cross axis?
         if (isMovingForward) {
           return (
-            targetClipped.center[axis.crossAxisLine] >=
-            sourceClipped.center[axis.crossAxisLine]
+            sourceClipped[axis.crossAxisEnd] < targetClipped[axis.crossAxisEnd]
           );
         }
         // is the target behind the source on the cross axis?
         return (
-          targetClipped.center[axis.crossAxisLine] <=
-          sourceClipped.center[axis.crossAxisLine]
+          targetClipped[axis.crossAxisStart] <
+          sourceClipped[axis.crossAxisStart]
         );
       },
     )
