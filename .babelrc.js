@@ -5,7 +5,6 @@ module.exports = {
     ['@babel/env', { modules: false, loose: true }],
   ],
   plugins: [
-    '@babel/transform-runtime',
     ['@babel/proposal-class-properties', { loose: true }],
     ['@babel/proposal-object-rest-spread', { loose: true }],
   ],
