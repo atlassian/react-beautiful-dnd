@@ -1,17 +1,17 @@
 // @flow
 import invariant from 'tiny-invariant';
 import { type Position, type Rect } from 'css-box-model';
-import { closest } from '../position';
-import isWithin from '../is-within';
-import { getCorners } from '../spacing';
-import isPartiallyVisibleThroughFrame from '../visibility/is-partially-visible-through-frame';
-import { toDroppableList } from '../dimension-structures';
+import { closest } from '../../position';
+import isWithin from '../../is-within';
+import { getCorners } from '../../spacing';
+import isPartiallyVisibleThroughFrame from '../../visibility/is-partially-visible-through-frame';
+import { toDroppableList } from '../../dimension-structures';
 import type {
   Axis,
   DroppableDimension,
   DroppableDimensionMap,
   Viewport,
-} from '../../types';
+} from '../../../types';
 
 type GetBestDroppableArgs = {|
   isMovingForward: boolean,
@@ -74,16 +74,16 @@ export default ({
       (droppable: DroppableDimension): boolean => {
         const targetClipped: Rect = getSafeClipped(droppable);
 
+        // is the target in front of the source on the cross axis?
         if (isMovingForward) {
-          // is the droppable in front of the source on the cross axis?
           return (
-            sourceClipped[axis.crossAxisEnd] <=
-            targetClipped[axis.crossAxisStart]
+            sourceClipped[axis.crossAxisEnd] < targetClipped[axis.crossAxisEnd]
           );
         }
-        // is the droppable behind the source on the cross axis?
+        // is the target behind the source on the cross axis?
         return (
-          targetClipped[axis.crossAxisEnd] <= sourceClipped[axis.crossAxisStart]
+          targetClipped[axis.crossAxisStart] <
+          sourceClipped[axis.crossAxisStart]
         );
       },
     )

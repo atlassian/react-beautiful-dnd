@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import toHomeList from './to-home-list';
 import toForeignList from './to-foreign-list';
-import { patch } from '../../position';
+import { patch } from '../../../position';
 import type { Result } from '../move-cross-axis-types';
 import type {
   DraggableDimension,
@@ -11,7 +11,7 @@ import type {
   DraggableLocation,
   DragImpact,
   Viewport,
-} from '../../../types';
+} from '../../../../types';
 
 type Args = {|
   // the current center position of the draggable

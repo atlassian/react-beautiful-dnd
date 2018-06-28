@@ -3,9 +3,10 @@ import type { Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import { scrollDroppable } from './droppable-dimension';
 import getDragImpact from './get-drag-impact';
-import moveCrossAxis from './move-cross-axis';
-import moveToNextIndex from './move-to-next-index';
 import publish from './publish';
+import moveInDirection, {
+  type Result as MoveInDirectionResult,
+} from './move-in-direction';
 import { add, isEqual, subtract } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
@@ -13,7 +14,6 @@ import getPageItemPositions from './get-page-item-positions';
 import type {
   State,
   DroppableDimension,
-  DraggableLocation,
   PendingDrop,
   IdleState,
   PreparingState,
@@ -27,11 +27,8 @@ import type {
   Viewport,
   DimensionMap,
   DropReason,
-  Direction,
 } from '../types';
 import type { Action } from './store-types';
-import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
-import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -223,6 +220,14 @@ export default (state: State = idle, action: Action): State => {
 
     const { client, shouldAnimate } = action.payload;
 
+    // nothing needs to be done
+    if (
+      state.shouldAnimate === shouldAnimate &&
+      isEqual(client, state.current.client.selection)
+    ) {
+      return state;
+    }
+
     // If we are jump scrolling - manual movements should not update the impact
     const impact: ?DragImpact =
       state.autoScrollMode === 'JUMP' ? state.impact : null;
@@ -370,6 +375,7 @@ export default (state: State = idle, action: Action): State => {
 
     const newScroll: Position = action.payload.scroll;
 
+    // nothing needs to be done
     if (isEqual(state.viewport.scroll.current, newScroll)) {
       return state;
     }
@@ -405,107 +411,22 @@ export default (state: State = idle, action: Action): State => {
       `${action.type} received while not in DRAGGING phase`,
     );
 
-    const { droppable, isMainAxisMovementAllowed } = (() => {
-      // appeasing flow
-      invariant(state.phase === 'DRAGGING');
-
-      if (state.impact.destination) {
-        return {
-          droppable:
-            state.dimensions.droppables[state.impact.destination.droppableId],
-          isMainAxisMovementAllowed: true,
-        };
-      }
-
-      // No destination - this can happen when lifting an a disabled droppable
-      // In this case we want to allow movement out of the list with a keyboard
-      return {
-        droppable: state.dimensions.droppables[state.critical.droppable.id],
-        isMainAxisMovementAllowed: false,
-      };
-    })();
-
-    const direction: Direction = droppable.axis.direction;
-    const isMovingOnMainAxis: boolean =
-      (direction === 'vertical' &&
-        (action.type === 'MOVE_UP' || action.type === 'MOVE_DOWN')) ||
-      (direction === 'horizontal' &&
-        (action.type === 'MOVE_LEFT' || action.type === 'MOVE_RIGHT'));
-
-    // This movement is not permitted right now
-    if (isMovingOnMainAxis && !isMainAxisMovementAllowed) {
-      return state;
-    }
-
-    const isMovingForward: boolean =
-      action.type === 'MOVE_DOWN' || action.type === 'MOVE_RIGHT';
-
-    if (isMovingOnMainAxis) {
-      const result: ?MoveToNextResult = moveToNextIndex({
-        isMovingForward,
-        draggableId: state.critical.draggable.id,
-        droppable,
-        draggables: state.dimensions.draggables,
-        previousPageBorderBoxCenter: state.current.page.borderBoxCenter,
-        previousImpact: state.impact,
-        viewport: state.viewport,
-      });
-
-      // Cannot move (at the beginning or end of a list)
-      if (!result) {
-        return state;
-      }
-
-      const impact: DragImpact = result.impact;
-      const pageBorderBoxCenter: Position = result.pageBorderBoxCenter;
-      // TODO: not sure if this is correct
-      const clientBorderBoxCenter: Position = subtract(
-        pageBorderBoxCenter,
-        state.viewport.scroll.current,
-      );
-
-      return moveWithPositionUpdates({
-        state,
-        impact,
-        clientSelection: clientBorderBoxCenter,
-        shouldAnimate: true,
-        scrollJumpRequest: result.scrollJumpRequest,
-      });
-    }
-
-    // moving on cross axis
-
-    const home: DraggableLocation = {
-      index: state.critical.draggable.index,
-      droppableId: state.critical.droppable.id,
-    };
-
-    const result: ?MoveCrossAxisResult = moveCrossAxis({
-      isMovingForward,
-      pageBorderBoxCenter: state.current.page.borderBoxCenter,
-      draggableId: state.critical.draggable.id,
-      droppableId: droppable.descriptor.id,
-      home,
-      draggables: state.dimensions.draggables,
-      droppables: state.dimensions.droppables,
-      previousImpact: state.impact,
-      viewport: state.viewport,
+    const result: ?MoveInDirectionResult = moveInDirection({
+      state,
+      action: action.type,
     });
 
+    // cannot mov in that direction
     if (!result) {
       return state;
     }
 
-    const clientSelection: Position = subtract(
-      result.pageBorderBoxCenter,
-      state.viewport.scroll.current,
-    );
-
     return moveWithPositionUpdates({
       state,
-      clientSelection,
       impact: result.impact,
+      clientSelection: result.clientSelection,
       shouldAnimate: true,
+      scrollJumpRequest: result.scrollJumpRequest,
     });
   }
 

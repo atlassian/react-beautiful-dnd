@@ -1,21 +1,21 @@
 // @flow
 import { getRect, type Position } from 'css-box-model';
-import moveToNextIndex from '../../../src/state/move-to-next-index';
-import type { Result } from '../../../src/state/move-to-next-index/move-to-next-index-types';
-import { scrollDroppable } from '../../../src/state/droppable-dimension';
+import moveToNextIndex from '../../../../src/state/move-in-direction/move-to-next-index';
+import type { Result } from '../../../../src/state/move-in-direction/move-to-next-index/move-to-next-index-types';
+import { scrollDroppable } from '../../../../src/state/droppable-dimension';
 import {
   getPreset,
   disableDroppable,
   getClosestScrollable,
   getDroppableDimension,
   getDraggableDimension,
-} from '../../utils/dimension';
-import moveToEdge from '../../../src/state/move-to-edge';
-import noImpact, { noMovement } from '../../../src/state/no-impact';
-import { patch, subtract } from '../../../src/state/position';
-import { vertical, horizontal } from '../../../src/state/axis';
-import { isPartiallyVisible } from '../../../src/state/visibility/is-visible';
-import { createViewport } from '../../utils/viewport';
+} from '../../../utils/dimension';
+import moveToEdge from '../../../../src/state/move-to-edge';
+import noImpact, { noMovement } from '../../../../src/state/no-impact';
+import { patch, subtract } from '../../../../src/state/position';
+import { vertical, horizontal } from '../../../../src/state/axis';
+import { isPartiallyVisible } from '../../../../src/state/visibility/is-visible';
+import { createViewport } from '../../../utils/viewport';
 import type {
   Viewport,
   Axis,
@@ -24,7 +24,7 @@ import type {
   DraggableDimensionMap,
   DroppableDimension,
   DraggableLocation,
-} from '../../../src/types';
+} from '../../../../src/types';
 
 const origin: Position = { x: 0, y: 0 };
 

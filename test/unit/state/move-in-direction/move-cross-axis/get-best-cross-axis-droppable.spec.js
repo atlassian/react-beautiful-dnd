@@ -1,16 +1,16 @@
 // @flow
-import { type Position } from 'css-box-model';
-import getBestCrossAxisDroppable from '../../../../src/state/move-cross-axis/get-best-cross-axis-droppable';
-import { getDroppableDimension } from '../../../utils/dimension';
-import { add } from '../../../../src/state/position';
-import { horizontal, vertical } from '../../../../src/state/axis';
-import getViewport from '../../../../src/view/window/get-viewport';
+import { type Position, type Spacing } from 'css-box-model';
+import getBestCrossAxisDroppable from '../../../../../src/state/move-in-direction/move-cross-axis/get-best-cross-axis-droppable';
+import { getDroppableDimension } from '../../../../utils/dimension';
+import { add } from '../../../../../src/state/position';
+import { horizontal, vertical } from '../../../../../src/state/axis';
+import getViewport from '../../../../../src/view/window/get-viewport';
 import type {
   Viewport,
   Axis,
   DroppableDimension,
   DroppableDimensionMap,
-} from '../../../../src/types';
+} from '../../../../../src/types';
 
 const viewport: Viewport = getViewport();
 
@@ -900,6 +900,266 @@ describe('get best cross axis droppable', () => {
 
           expect(result2).toBe(sibling2);
         });
+      });
+    });
+  });
+
+  describe('overlap', () => {
+    const axis: Axis = vertical;
+
+    describe('moving forward', () => {
+      it('allow overlap as long as the end of the target is after the end of the source', () => {
+        const box: Spacing = {
+          top: 0,
+          left: 20,
+          right: 30,
+          bottom: 10,
+        };
+        const source = getDroppableDimension({
+          descriptor: {
+            id: 'source',
+            type: 'TYPE',
+          },
+          direction: axis.direction,
+          borderBox: box,
+        });
+        const forward = getDroppableDimension({
+          descriptor: {
+            id: 'forward',
+            type: 'TYPE',
+          },
+          direction: axis.direction,
+          borderBox: {
+            ...box,
+            right: box.right + 1,
+          },
+        });
+        const droppables: DroppableDimensionMap = {
+          [source.descriptor.id]: source,
+          [forward.descriptor.id]: forward,
+        };
+
+        const result: ?DroppableDimension = getBestCrossAxisDroppable({
+          isMovingForward: true,
+          pageBorderBoxCenter: source.page.borderBox.center,
+          source,
+          droppables,
+          viewport,
+        });
+
+        expect(result).toBe(forward);
+      });
+
+      it('should not allow movement when the droppables are on top of each other', () => {
+        const box: Spacing = {
+          top: 0,
+          left: 20,
+          right: 30,
+          bottom: 10,
+        };
+        const source = getDroppableDimension({
+          descriptor: {
+            id: 'source',
+            type: 'TYPE',
+          },
+          direction: axis.direction,
+          borderBox: box,
+        });
+        const forward = getDroppableDimension({
+          descriptor: {
+            id: 'forward',
+            type: 'TYPE',
+          },
+          direction: axis.direction,
+          borderBox: box,
+        });
+        const droppables: DroppableDimensionMap = {
+          [source.descriptor.id]: source,
+          [forward.descriptor.id]: forward,
+        };
+
+        const result: ?DroppableDimension = getBestCrossAxisDroppable({
+          isMovingForward: true,
+          pageBorderBoxCenter: source.page.borderBox.center,
+          source,
+          droppables,
+          viewport,
+        });
+
+        expect(result).toBe(null);
+      });
+
+      it('should not allow movement the right edge of the source is not greater than the right edge of the target', () => {
+        const box: Spacing = {
+          top: 0,
+          left: 20,
+          right: 30,
+          bottom: 10,
+        };
+        const source = getDroppableDimension({
+          descriptor: {
+            id: 'source',
+            type: 'TYPE',
+          },
+          direction: axis.direction,
+          borderBox: box,
+        });
+        const forward = getDroppableDimension({
+          descriptor: {
+            id: 'forward',
+            type: 'TYPE',
+          },
+          direction: axis.direction,
+          borderBox: {
+            ...box,
+            // forward a little bit
+            left: box.left + 1,
+            // not far enough
+            right: box.right - 1,
+          },
+        });
+        const droppables: DroppableDimensionMap = {
+          [source.descriptor.id]: source,
+          [forward.descriptor.id]: forward,
+        };
+
+        const result: ?DroppableDimension = getBestCrossAxisDroppable({
+          isMovingForward: true,
+          pageBorderBoxCenter: source.page.borderBox.center,
+          source,
+          droppables,
+          viewport,
+        });
+
+        expect(result).toBe(null);
+      });
+    });
+
+    describe('moving backwards', () => {
+      it('should allow overlap as long as the start of the target is before the start of the source', () => {
+        const box: Spacing = {
+          top: 0,
+          left: 20,
+          right: 30,
+          bottom: 10,
+        };
+        const source = getDroppableDimension({
+          descriptor: {
+            id: 'source',
+            type: 'TYPE',
+          },
+          direction: axis.direction,
+          borderBox: box,
+        });
+        const backwards = getDroppableDimension({
+          descriptor: {
+            id: 'forward',
+            type: 'TYPE',
+          },
+          direction: axis.direction,
+          borderBox: {
+            ...box,
+            left: box.left - 1,
+          },
+        });
+        const droppables: DroppableDimensionMap = {
+          [source.descriptor.id]: source,
+          [backwards.descriptor.id]: backwards,
+        };
+
+        const result: ?DroppableDimension = getBestCrossAxisDroppable({
+          isMovingForward: false,
+          pageBorderBoxCenter: source.page.borderBox.center,
+          source,
+          droppables,
+          viewport,
+        });
+
+        expect(result).toBe(backwards);
+      });
+
+      it('should not allow movement when the droppables are on top of each other', () => {
+        const box: Spacing = {
+          top: 0,
+          left: 20,
+          right: 30,
+          bottom: 10,
+        };
+        const source = getDroppableDimension({
+          descriptor: {
+            id: 'source',
+            type: 'TYPE',
+          },
+          direction: axis.direction,
+          borderBox: box,
+        });
+        const backward = getDroppableDimension({
+          descriptor: {
+            id: 'forward',
+            type: 'TYPE',
+          },
+          direction: axis.direction,
+          borderBox: box,
+        });
+        const droppables: DroppableDimensionMap = {
+          [source.descriptor.id]: source,
+          [backward.descriptor.id]: backward,
+        };
+
+        const result: ?DroppableDimension = getBestCrossAxisDroppable({
+          isMovingForward: false,
+          pageBorderBoxCenter: source.page.borderBox.center,
+          source,
+          droppables,
+          viewport,
+        });
+
+        expect(result).toBe(null);
+      });
+
+      it('should not allow movement left edge of the source is not greater than the left edge of the target', () => {
+        const box: Spacing = {
+          top: 0,
+          left: 20,
+          right: 30,
+          bottom: 10,
+        };
+        const source = getDroppableDimension({
+          descriptor: {
+            id: 'source',
+            type: 'TYPE',
+          },
+          direction: axis.direction,
+          borderBox: box,
+        });
+        const backward = getDroppableDimension({
+          descriptor: {
+            id: 'forward',
+            type: 'TYPE',
+          },
+          direction: axis.direction,
+          borderBox: {
+            ...box,
+            // backward a little bit
+            right: box.right - 1,
+            // not far enough
+            left: box.left,
+          },
+        });
+        const droppables: DroppableDimensionMap = {
+          [source.descriptor.id]: source,
+          [backward.descriptor.id]: backward,
+        };
+
+        const result: ?DroppableDimension = getBestCrossAxisDroppable({
+          isMovingForward: true,
+          pageBorderBoxCenter: source.page.borderBox.center,
+          source,
+          droppables,
+          viewport,
+        });
+
+        expect(result).toBe(null);
       });
     });
   });
