@@ -15,7 +15,7 @@ import type {
 
 type Args = {|
   state: DraggingState,
-  action: 'MOVE_UP' | 'MOVE_RIGHT' | 'MOVE_DOWN' | 'MOVE_LEFT',
+  type: 'MOVE_UP' | 'MOVE_RIGHT' | 'MOVE_DOWN' | 'MOVE_LEFT',
 |};
 
 export type Result = {|
@@ -29,7 +29,7 @@ const getClientSelection = (
   currentScroll: Position,
 ): Position => subtract(pageBorderBoxCenter, currentScroll);
 
-export default ({ state, action }: Args): ?Result => {
+export default ({ state, type }: Args): ?Result => {
   const { droppable, isMainAxisMovementAllowed } = (() => {
     if (state.impact.destination) {
       return {
@@ -51,9 +51,9 @@ export default ({ state, action }: Args): ?Result => {
   const direction: Direction = droppable.axis.direction;
   const isMovingOnMainAxis: boolean =
     (direction === 'vertical' &&
-      (action === 'MOVE_UP' || action === 'MOVE_DOWN')) ||
+      (type === 'MOVE_UP' || type === 'MOVE_DOWN')) ||
     (direction === 'horizontal' &&
-      (action === 'MOVE_LEFT' || action === 'MOVE_RIGHT'));
+      (type === 'MOVE_LEFT' || type === 'MOVE_RIGHT'));
 
   // This movement is not permitted right now
   if (isMovingOnMainAxis && !isMainAxisMovementAllowed) {
@@ -61,7 +61,7 @@ export default ({ state, action }: Args): ?Result => {
   }
 
   const isMovingForward: boolean =
-    action === 'MOVE_DOWN' || action === 'MOVE_RIGHT';
+    type === 'MOVE_DOWN' || type === 'MOVE_RIGHT';
 
   if (isMovingOnMainAxis) {
     const result: ?MoveToNextIndexResult = moveToNextIndex({
