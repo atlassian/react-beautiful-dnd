@@ -3,45 +3,41 @@ import type { AutoScroller } from '../auto-scroller/auto-scroller-types';
 import type { State } from '../../types';
 import type { Store, Action } from '../store-types';
 
+const shouldCancel = (action: Action) =>
+  action.type === 'CANCEL' ||
+  action.type === 'DROP_ANIMATE' ||
+  action.type === 'DROP' ||
+  action.type === 'DROP_COMPLETE' ||
+  action.type === 'COLLECTION_STARTING';
+
 export default (getScroller: () => AutoScroller) => (store: Store) => (
   next: Action => mixed,
-) => {
-  const shouldCancel = (action: Action) =>
-    // Need to cancel any pending auto scrolling when drag is ending
-    action.type === 'CANCEL' ||
-    action.type === 'DROP_ANIMATE' ||
-    action.type === 'DROP' ||
-    action.type === 'DROP_COMPLETE' ||
-    // A new collection is starting - cancel any pending auto scrolls
-    action.type === 'COLLECTION_STARTING';
-
-  return (action: Action): mixed => {
-    if (shouldCancel(action)) {
-      getScroller().cancel();
-      next(action);
-      return;
-    }
-
-    // auto scroll happens in response to state changes
-    // releasing all actions to the reducer first
+) => (action: Action): mixed => {
+  if (shouldCancel(action)) {
+    getScroller().cancel();
     next(action);
+    return;
+  }
 
-    const state: State = store.getState();
+  // auto scroll happens in response to state changes
+  // releasing all actions to the reducer first
+  next(action);
 
-    // Only allowing auto scrolling in the DRAGGING phase
-    if (state.phase !== 'DRAGGING') {
-      return;
-    }
+  const state: State = store.getState();
 
-    if (state.autoScrollMode === 'FLUID') {
-      getScroller().fluidScroll(state);
-      return;
-    }
+  // Only allowing auto scrolling in the DRAGGING phase
+  if (state.phase !== 'DRAGGING') {
+    return;
+  }
 
-    if (!state.scrollJumpRequest) {
-      return;
-    }
+  if (state.autoScrollMode === 'FLUID') {
+    getScroller().fluidScroll(state);
+    return;
+  }
 
-    getScroller().jumpScroll(state);
-  };
+  if (!state.scrollJumpRequest) {
+    return;
+  }
+
+  getScroller().jumpScroll(state);
 };

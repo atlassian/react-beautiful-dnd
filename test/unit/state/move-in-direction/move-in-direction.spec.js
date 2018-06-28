@@ -1,8 +1,13 @@
 // @flow
 import invariant from 'tiny-invariant';
-import type { DraggableLocation } from '../../../../src/types';
+import type {
+  DraggableLocation,
+  DraggingState,
+  DroppableDimension,
+  Axis,
+} from '../../../../src/types';
 import { vertical, horizontal } from '../../../../src/state/axis';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset, disableDroppable } from '../../../utils/dimension';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import moveInDirection, {
   type Result,
@@ -15,7 +20,7 @@ describe('on the vertical axis', () => {
   it('should move forward on a MOVE_DOWN', () => {
     const result: ?Result = moveInDirection({
       state: state.dragging(),
-      action: 'MOVE_DOWN',
+      type: 'MOVE_DOWN',
     });
 
     invariant(result, 'expected a result');
@@ -29,7 +34,7 @@ describe('on the vertical axis', () => {
   it('should move backwards on a MOVE_UP', () => {
     const result: ?Result = moveInDirection({
       state: state.dragging(preset.inHome2.descriptor.id),
-      action: 'MOVE_UP',
+      type: 'MOVE_UP',
     });
 
     invariant(result, 'expected a result');
@@ -43,7 +48,7 @@ describe('on the vertical axis', () => {
   it('should move cross axis forwards on a MOVE_RIGHT', () => {
     const result: ?Result = moveInDirection({
       state: state.dragging(),
-      action: 'MOVE_RIGHT',
+      type: 'MOVE_RIGHT',
     });
 
     invariant(result, 'expected a result');
@@ -57,7 +62,7 @@ describe('on the vertical axis', () => {
   it('should move cross axis backwards on a MOVE_LEFT', () => {
     const result: ?Result = moveInDirection({
       state: state.dragging(preset.inForeign1.descriptor.id),
-      action: 'MOVE_LEFT',
+      type: 'MOVE_LEFT',
     });
 
     invariant(result, 'expected a result');
@@ -76,7 +81,7 @@ describe('on the horizontal axis', () => {
   it('should move forward on a MOVE_RIGHT', () => {
     const result: ?Result = moveInDirection({
       state: state.dragging(),
-      action: 'MOVE_RIGHT',
+      type: 'MOVE_RIGHT',
     });
 
     invariant(result, 'expected a result');
@@ -90,7 +95,7 @@ describe('on the horizontal axis', () => {
   it('should move backwards on a MOVE_LEFT', () => {
     const result: ?Result = moveInDirection({
       state: state.dragging(preset.inHome2.descriptor.id),
-      action: 'MOVE_LEFT',
+      type: 'MOVE_LEFT',
     });
 
     invariant(result, 'expected a result');
@@ -104,7 +109,7 @@ describe('on the horizontal axis', () => {
   it('should move cross axis forwards on a MOVE_DOWN', () => {
     const result: ?Result = moveInDirection({
       state: state.dragging(),
-      action: 'MOVE_DOWN',
+      type: 'MOVE_DOWN',
     });
 
     invariant(result, 'expected a result');
@@ -118,7 +123,7 @@ describe('on the horizontal axis', () => {
   it('should move cross axis backwards on a MOVE_UP', () => {
     const result: ?Result = moveInDirection({
       state: state.dragging(preset.inForeign1.descriptor.id),
-      action: 'MOVE_UP',
+      type: 'MOVE_UP',
     });
 
     invariant(result, 'expected a result');
@@ -127,5 +132,57 @@ describe('on the horizontal axis', () => {
       index: 1,
     };
     expect(result.impact.destination).toEqual(expected);
+  });
+});
+
+[vertical, horizontal].forEach((axis: Axis) => {
+  const state = getStatePreset(axis);
+  const preset = getPreset(axis);
+
+  describe(`main axis blocking in the ${axis.direction} direction`, () => {
+    it('should not allow movement on the main axis if lifting in a disabled droppable', () => {
+      const custom: DraggingState = state.dragging();
+
+      // no destination when lifting in disabled droppable
+      custom.impact.destination = null;
+      // disabling the droppable for good measure
+      const critical: DroppableDimension =
+        custom.dimensions.droppables[custom.critical.droppable.id];
+      custom.dimensions.droppables[
+        custom.critical.droppable.id
+      ] = disableDroppable(critical);
+
+      // Main axis movement not allowed
+      const forward = axis.direction === 'vertical' ? 'MOVE_DOWN' : 'MOVE_LEFT';
+      const backward = axis.direction === 'vertical' ? 'MOVE_UP' : 'MOVE_RIGHT';
+      expect(
+        moveInDirection({
+          state: custom,
+          type: forward,
+        }),
+      ).toBe(null);
+      expect(
+        moveInDirection({
+          state: custom,
+          type: backward,
+        }),
+      ).toBe(null);
+
+      // cross axis movement allowed
+      const crossAxisForward =
+        axis.direction === 'vertical' ? 'MOVE_RIGHT' : 'MOVE_DOWN';
+
+      const result: ?Result = moveInDirection({
+        state: state.dragging(),
+        type: crossAxisForward,
+      });
+
+      invariant(result, 'expected a result');
+      const expected: DraggableLocation = {
+        droppableId: preset.foreign.descriptor.id,
+        index: 1,
+      };
+      expect(result.impact.destination).toEqual(expected);
+    });
   });
 });

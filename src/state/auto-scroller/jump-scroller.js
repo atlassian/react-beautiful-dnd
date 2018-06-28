@@ -8,7 +8,7 @@ import {
   getWindowOverlap,
   getDroppableOverlap,
 } from './can-scroll';
-import { move as moveAction } from '../action-creators';
+import { type MoveArgs } from '../action-creators';
 import type {
   DroppableDimension,
   DraggableLocation,
@@ -20,7 +20,7 @@ import type {
 type Args = {|
   scrollDroppable: (id: DroppableId, change: Position) => void,
   scrollWindow: (offset: Position) => void,
-  move: typeof moveAction,
+  move: (args: MoveArgs) => mixed,
 |};
 
 export type JumpScroller = (state: DraggingState) => void;

@@ -111,7 +111,7 @@ const moveWithPositionUpdates = ({
     current,
     shouldAnimate,
     impact: newImpact,
-    scrollJumpRequest,
+    scrollJumpRequest: scrollJumpRequest || null,
     viewport: newViewport,
   };
 
@@ -297,6 +297,8 @@ export default (state: State = idle, action: Action): State => {
       phase: state.phase,
       impact,
       dimensions,
+      // At this point any scroll jump request would need to be cleared
+      scrollJumpRequest: null,
     };
   }
 
@@ -413,7 +415,7 @@ export default (state: State = idle, action: Action): State => {
 
     const result: ?MoveInDirectionResult = moveInDirection({
       state,
-      action: action.type,
+      type: action.type,
     });
 
     // cannot mov in that direction
