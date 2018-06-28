@@ -6,7 +6,7 @@ module.exports = {
   ],
   plugins: [
     '@babel/transform-runtime',
-    '@babel/proposal-class-properties',
+    ['@babel/proposal-class-properties', { loose: true }],
     '@babel/proposal-object-rest-spread',
   ],
   comments: false,
