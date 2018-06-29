@@ -15,13 +15,13 @@ import type {
 type Props = {|
   provided: DraggableProvided,
   snapshot: DraggableStateSnapshot,
-  throw: () => void,
+  throwFn: () => void,
 |};
 
 class WillThrow extends React.Component<Props> {
   componentDidUpdate(previous: Props) {
     if (!previous.snapshot.isDragging && this.props.snapshot.isDragging) {
-      this.props.throw();
+      this.props.throwFn();
     }
   }
   render() {
@@ -37,12 +37,9 @@ class WillThrow extends React.Component<Props> {
     );
   }
 }
-it('should reset the application state if an invariant exception occurs', () => {
-  jest.useFakeTimers();
-  jest.spyOn(console, 'warn').mockImplementation(() => {});
-  jest.spyOn(console, 'error').mockImplementation(() => {});
 
-  const wrapper: ReactWrapper = mount(
+const withThrow = (throwFn: Function): ReactWrapper =>
+  mount(
     <DragDropContext onDragEnd={() => {}}>
       <Droppable droppableId="droppable">
         {(droppableProvided: DroppableProvided) => (
@@ -58,7 +55,7 @@ it('should reset the application state if an invariant exception occurs', () => 
                 <WillThrow
                   provided={draggableProvided}
                   snapshot={snapshot}
-                  throw={() => invariant(false)}
+                  throwFn={throwFn}
                 />
               )}
             </Draggable>
@@ -69,9 +66,21 @@ it('should reset the application state if an invariant exception occurs', () => 
     </DragDropContext>,
   );
 
-  // nothing bad has happened yet
-  expect(console.warn).not.toHaveBeenCalled();
-  expect(console.error).not.toHaveBeenCalled();
+beforeEach(() => {
+  jest.useFakeTimers();
+  jest.spyOn(console, 'warn').mockImplementation(() => {});
+  jest.spyOn(console, 'error').mockImplementation(() => {});
+});
+
+afterEach(() => {
+  // cleanup
+  console.error.mockRestore();
+  console.warn.mockRestore();
+  jest.useRealTimers();
+});
+
+it('should reset the application state and swallow the exception if an invariant exception occurs', () => {
+  const wrapper: ReactWrapper = withThrow(() => invariant(false));
 
   // Execute a lift which will throw an error
   wrapper.find(WillThrow).simulate('keydown', { keyCode: keyCodes.space });
@@ -92,9 +101,29 @@ it('should reset the application state if an invariant exception occurs', () => 
   };
   // no longer dragging
   expect(willThrough.props().snapshot).toEqual(expected);
+});
 
-  // cleanup
-  console.error.mockRestore();
-  console.warn.mockRestore();
-  jest.useRealTimers();
+it('should not reset the application state an exception occurs and throw it', () => {
+  const wrapper: ReactWrapper = withThrow(() => {
+    throw new Error('YOLO');
+  });
+
+  // Execute a lift which will throw an error
+  wrapper.find(WillThrow).simulate('keydown', { keyCode: keyCodes.space });
+  // throw is NOT swallowed
+  expect(() => jest.runOnlyPendingTimers()).toThrow();
+  // Messages printed
+  expect(console.warn).toHaveBeenCalledWith(
+    expect.stringContaining('Any existing drag will be cancelled'),
+  );
+  expect(console.error).toHaveBeenCalled();
+
+  const willThrough: ReactWrapper = wrapper.find(WillThrow);
+  expect(willThrough.length).toBeTruthy();
+  const expected: DraggableStateSnapshot = {
+    draggingOver: null,
+    isDragging: false,
+  };
+  // no longer dragging
+  expect(willThrough.props().snapshot).toEqual(expected);
 });
