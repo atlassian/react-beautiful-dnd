@@ -45,10 +45,11 @@ const preset = getPreset(vertical);
 it('should throw an error if a drop action occurs while not in a phase where you can drop', () => {
   const store: Store = createStore(middleware);
 
-  // idle
+  // idle (it is okay to perform a defensive drop here)
+  // this can happen during an exception flow
   expect(() => {
     store.dispatch(drop({ reason: 'DROP' }));
-  }).toThrow();
+  }).not.toThrow();
 
   // drop animating
   store.dispatch(clean());
