@@ -50,15 +50,16 @@ export const resetServerContext = () => {
 };
 
 const printFatalDevError = (error: Error) => {
-  if (process.env.NODE_ENV !== 'production') {
-    console.warn(
-      `
-      An error has occurred while a drag is occurring.
-      Any existing drag will be cancelled
-    `,
-      error,
-    );
+  if (process.env.NODE_ENV === 'production') {
+    return;
   }
+  console.warn(`
+    An error has occurred while a drag is occurring.
+    Any existing drag will be cancelled.
+
+    Raw error:
+  `);
+  console.error(error);
 };
 
 export default class DragDropContext extends React.Component<Props> {
@@ -126,7 +127,6 @@ export default class DragDropContext extends React.Component<Props> {
     [styleContextKey]: PropTypes.string.isRequired,
     [canLiftContextKey]: PropTypes.func.isRequired,
   };
-  /* eslint-enable */
 
   getChildContext(): Context {
     return {
@@ -153,8 +153,7 @@ export default class DragDropContext extends React.Component<Props> {
   }
 
   componentDidCatch(error: Error) {
-    printFatalDevError(error);
-    this.store.dispatch(clean());
+    this.onFatalError(error);
 
     // If the failure was due to an invariant failure - then we handle the error
     if (error.message.indexOf('Invariant failed') !== -1) {
@@ -178,16 +177,16 @@ export default class DragDropContext extends React.Component<Props> {
     this.announcer.unmount();
   }
 
-  onWindowError = (error: Error) => {
-    const state: State = this.store.getState();
-
-    if (state.phase === 'IDLE') {
-      return;
-    }
-
+  onFatalError = (error: Error) => {
     printFatalDevError(error);
-    this.store.dispatch(clean());
+
+    const state: State = this.store.getState();
+    if (state.phase !== 'IDLE') {
+      this.store.dispatch(clean());
+    }
   };
+
+  onWindowError = (error: Error) => this.onFatalError(error);
 
   render() {
     return this.props.children;

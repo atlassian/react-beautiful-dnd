@@ -59,6 +59,11 @@ export default ({ getState, dispatch }: Store) => (next: Action => mixed) => (
     return;
   }
 
+  // Could have occurred in response to an error
+  if (state.phase === 'IDLE') {
+    return;
+  }
+
   // Still waiting for our drop pending to end
   // TODO: should this throw?
   const isWaitingForDrop: boolean =
