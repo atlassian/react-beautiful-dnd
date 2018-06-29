@@ -7,6 +7,7 @@ module.exports = {
   plugins: [
     ['@babel/proposal-class-properties', { loose: true }],
     ['@babel/proposal-object-rest-spread', { loose: true }],
+    'dev-expression'
   ],
   comments: false,
 };
