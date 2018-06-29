@@ -12,8 +12,8 @@ import type {
   AutoScrollMode,
   TypeId,
 } from '../../types';
-import DraggableDimensionPublisher from '../draggable-dimension-publisher/';
-import Moveable from '../moveable/';
+import DraggableDimensionPublisher from '../draggable-dimension-publisher';
+import Moveable from '../moveable';
 import DragHandle from '../drag-handle';
 import getViewport from '../window/get-viewport';
 import type {
