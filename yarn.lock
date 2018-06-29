@@ -699,7 +699,7 @@
     "@babel/plugin-transform-react-jsx-self" "7.0.0-beta.51"
     "@babel/plugin-transform-react-jsx-source" "7.0.0-beta.51"
 
-"@babel/runtime@^7.0.0-beta.51":
+"@babel/runtime@7.0.0-beta.51":
   version "7.0.0-beta.51"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.0.0-beta.51.tgz#48b8ed18307034c6620f643514650ca2ccc0165a"
   dependencies:
