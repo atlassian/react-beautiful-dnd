@@ -58,12 +58,11 @@ export default [
     // Only deep dependency required is React
     external: ['react'],
     plugins: [
-      // Setting production env before running babel etc
-      replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       babel(getBabelOptions({ useESModules: true })),
       resolve({ extensions }),
       commonjs({ include: 'node_modules/**' }),
       strip({ debugger: true }),
+      replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       sizeSnapshot({ matchSnapshot }),
       uglify(),
     ],

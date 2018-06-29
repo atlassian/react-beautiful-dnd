@@ -70,6 +70,7 @@
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^8.2.5",
     "babel-jest": "^23.2.0",
+    "babel-plugin-dev-expression": "^0.2.1",
     "babel-plugin-styled-components": "^1.5.1",
     "cross-env": "^5.2.0",
     "enzyme": "^3.3.0",
