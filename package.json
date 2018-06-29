@@ -47,10 +47,10 @@
   },
   "dependencies": {
     "babel-runtime": "^6.26.0",
-    "css-box-model": "^0.0.14",
-    "memoize-one": "^3.1.1",
+    "css-box-model": "^1.0.0",
+    "memoize-one": "^4.0.0",
     "prop-types": "^15.6.1",
-    "raf-schd": "^2.1.2",
+    "raf-schd": "^3.0.1",
     "react-motion": "^0.5.2",
     "react-redux": "^5.0.7",
     "redux": "^4.0.0",
