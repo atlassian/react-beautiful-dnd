@@ -2763,9 +2763,9 @@ crypto-browserify@^3.11.0:
     randombytes "^2.0.0"
     randomfill "^1.0.3"
 
-css-box-model@^0.0.14:
-  version "0.0.14"
-  resolved "https://registry.yarnpkg.com/css-box-model/-/css-box-model-0.0.14.tgz#bb10ba311bd07d72c7ed4ce260d3035ecb5b5c57"
+css-box-model@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/css-box-model/-/css-box-model-1.0.0.tgz#60142814f2b25be00c4aac65ea1a55a531b18922"
 
 css-color-keywords@^1.0.0:
   version "1.0.0"
@@ -5977,9 +5977,9 @@ mem@^1.1.0:
   dependencies:
     mimic-fn "^1.0.0"
 
-memoize-one@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/memoize-one/-/memoize-one-3.1.1.tgz#ef609811e3bc28970eac2884eece64d167830d17"
+memoize-one@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/memoize-one/-/memoize-one-4.0.0.tgz#fc5e2f1427a216676a62ec652cf7398cfad123db"
 
 memory-fs@^0.4.0, memory-fs@^0.4.1, memory-fs@~0.4.1:
   version "0.4.1"
@@ -7352,9 +7352,9 @@ radium@^0.19.0:
     inline-style-prefixer "^2.0.5"
     prop-types "^15.5.8"
 
-raf-schd@^2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/raf-schd/-/raf-schd-2.1.2.tgz#ec622b5167f2912089f054dc03ebd5bcf33c8f62"
+raf-schd@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/raf-schd/-/raf-schd-3.0.1.tgz#ec78eb6078b067748ec77f30b45a19957955f334"
 
 raf-stub@^2.0.2:
   version "2.0.2"
