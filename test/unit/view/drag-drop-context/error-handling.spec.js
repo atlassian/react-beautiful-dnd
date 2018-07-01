@@ -98,6 +98,7 @@ it('should reset the application state and swallow the exception if an invariant
   const expected: DraggableStateSnapshot = {
     draggingOver: null,
     isDragging: false,
+    isDropAnimating: false,
   };
   // no longer dragging
   expect(willThrough.props().snapshot).toEqual(expected);
@@ -123,6 +124,7 @@ it('should not reset the application state an exception occurs and throw it', ()
   const expected: DraggableStateSnapshot = {
     draggingOver: null,
     isDragging: false,
+    isDropAnimating: false,
   };
   // no longer dragging
   expect(willThrough.props().snapshot).toEqual(expected);
