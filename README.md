@@ -1222,7 +1222,11 @@ const myOnMouseDown = event => console.log('mouse down on', event.target);
 
 ```js
 type DraggableStateSnapshot = {|
+  // True, if Draggable is being dragged 
   isDragging: boolean,
+  // True, if Draggable is dropped and animated to its final position.
+  // Not always flipped to `true` when dropped, for example keyboard interaction or perfectly positioned drop 
+  // does not initiate animation
   isDropAnimating: boolean,
   // What Droppable (if any) the Draggable is currently over
   draggingOver: ?DroppableId,
