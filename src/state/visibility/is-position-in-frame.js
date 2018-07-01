@@ -12,4 +12,3 @@ export default (frame: Spacing) => {
     isWithinHorizontal(point.x) &&
     isWithinHorizontal(point.x);
 };
-

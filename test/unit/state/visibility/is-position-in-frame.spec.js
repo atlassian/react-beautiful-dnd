@@ -4,7 +4,10 @@ import isPositionInFrame from '../../../../src/state/visibility/is-position-in-f
 
 describe('is position in frame', () => {
   const frame: Rect = getRect({
-    top: 0, left: 0, right: 100, bottom: 100,
+    top: 0,
+    left: 0,
+    right: 100,
+    bottom: 100,
   });
 
   it('should return true if inside the frame', () => {

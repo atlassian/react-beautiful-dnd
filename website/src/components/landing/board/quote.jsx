@@ -4,26 +4,26 @@ import styled from 'styled-components';
 import { colors } from '@atlaskit/theme';
 import { Draggable } from '../../../../../src';
 import { grid } from '../../constants';
-import type { DraggableProvided, DraggableStateSnapshot } from '../../../../../src';
+import type {
+  DraggableProvided,
+  DraggableStateSnapshot,
+} from '../../../../../src';
 import type { Quote as QuoteType, Author as AuthorType } from '../../types';
 
 type Props = {|
   quote: QuoteType,
   index: number,
-|}
+|};
 
 const Container = styled.div`
-  background-color: ${props => (
-    props.isDragging ? props.author.colors.soft : colors.N0
-  )};
-  box-shadow: ${props => (
-    props.isDragging ? `1px 1px 1px ${colors.N50}` : 'none'
-  )};
+  background-color: ${props =>
+    props.isDragging ? props.author.colors.soft : colors.N0};
+  box-shadow: ${props =>
+    props.isDragging ? `1px 1px 1px ${colors.N50}` : 'none'};
   border-width: 1px;
   border-style: solid;
-  border-color: ${props => (
-    props.isDragging ? props.author.colors.medium : 'transparent'
-  )};
+  border-color: ${props =>
+    props.isDragging ? props.author.colors.medium : 'transparent'};
   margin-bottom: ${grid}px;
   padding: ${grid}px;
   border-radius: 2px;
@@ -66,7 +66,7 @@ const Attribution = styled.small`
   margin-top: ${grid}px;
   text-align: right;
   flex-grow: 1;
-  background-color: ${(props) => {
+  background-color: ${props => {
     const author: AuthorType = props.author;
     return author.colors.soft;
   }};
@@ -96,11 +96,8 @@ export default class Item extends React.Component<Props> {
             />
             <Content>
               <BlockQuote>{quote.content}</BlockQuote>
-              <Attribution
-                author={author}
-                isDragging={snapshot.isDragging}
-              >
-                -{' '}{author.name}
+              <Attribution author={author} isDragging={snapshot.isDragging}>
+                - {author.name}
               </Attribution>
             </Content>
           </Container>

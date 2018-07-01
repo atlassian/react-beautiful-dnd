@@ -1,17 +1,13 @@
 // @flow
 import { type Position } from 'css-box-model';
 import { add, apply, isEqual } from '../position';
-import type {
-  Scrollable,
-  DroppableDimension,
-  Viewport,
-} from '../../types';
+import type { Scrollable, DroppableDimension, Viewport } from '../../types';
 
 type CanScrollArgs = {|
   max: Position,
   current: Position,
   change: Position,
-|}
+|};
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -26,7 +22,7 @@ type GetRemainderArgs = {|
   current: Position,
   max: Position,
   change: Position,
-|}
+|};
 
 // We need to figure out how much of the movement
 // cannot be done with a scroll
@@ -41,11 +37,7 @@ export const getOverlap = (() => {
     return 0;
   };
 
-  return ({
-    current,
-    max,
-    change,
-  }: GetRemainderArgs): ?Position => {
+  return ({ current, max, change }: GetRemainderArgs): ?Position => {
     const targetScroll: Position = add(current, change);
 
     const overlap: Position = {
@@ -70,7 +62,9 @@ export const canPartiallyScroll = ({
   const smallestChange: Position = smallestSigned(change);
 
   const overlap: ?Position = getOverlap({
-    max, current, change: smallestChange,
+    max,
+    current,
+    change: smallestChange,
   });
 
   // no overlap at all - we can move there!
@@ -91,10 +85,13 @@ export const canPartiallyScroll = ({
   return false;
 };
 
-export const canScrollWindow = (viewport: Viewport, change: Position): boolean =>
+export const canScrollWindow = (
+  viewport: Viewport,
+  change: Position,
+): boolean =>
   canPartiallyScroll({
-    current: viewport.scroll,
-    max: viewport.maxScroll,
+    current: viewport.scroll.current,
+    max: viewport.scroll.max,
     change,
   });
 
@@ -115,13 +112,16 @@ export const canScrollDroppable = (
   });
 };
 
-export const getWindowOverlap = (viewport: Viewport, change: Position): ?Position => {
+export const getWindowOverlap = (
+  viewport: Viewport,
+  change: Position,
+): ?Position => {
   if (!canScrollWindow(viewport, change)) {
     return null;
   }
 
-  const max: Position = viewport.maxScroll;
-  const current: Position = viewport.scroll;
+  const max: Position = viewport.scroll.max;
+  const current: Position = viewport.scroll.current;
 
   return getOverlap({
     current,
@@ -130,7 +130,10 @@ export const getWindowOverlap = (viewport: Viewport, change: Position): ?Positio
   });
 };
 
-export const getDroppableOverlap = (droppable: DroppableDimension, change: Position): ?Position => {
+export const getDroppableOverlap = (
+  droppable: DroppableDimension,
+  change: Position,
+): ?Position => {
   if (!canScrollDroppable(droppable, change)) {
     return null;
   }

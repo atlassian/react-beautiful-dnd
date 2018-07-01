@@ -1,19 +1,27 @@
 // @flow
+import invariant from 'tiny-invariant';
 
 type Records = {
   [key: string]: number,
-}
+};
 
 const records: Records = {};
 
 const flag: string = '__react-beautiful-dnd-debug-timings-hook__';
 
+// we want to strip all the code out for production builds
+// draw back: can only do timings in dev env (which seems to be fine for now)
+const isProduction: boolean = process.env.NODE_ENV === 'production';
+
 const isTimingsEnabled = (): boolean => Boolean(window[flag]);
 
-// TEMP
+// Debug: uncomment to enable
 // window[flag] = true;
 
 export const start = (key: string) => {
+  if (isProduction) {
+    return;
+  }
   if (!isTimingsEnabled()) {
     return;
   }
@@ -25,9 +33,12 @@ export const start = (key: string) => {
 type Style = {|
   textColor: string,
   symbol: string,
-|}
+|};
 
 export const finish = (key: string) => {
+  if (isProduction) {
+    return;
+  }
   if (!isTimingsEnabled()) {
     return;
   }
@@ -35,10 +46,7 @@ export const finish = (key: string) => {
 
   const previous: ?number = records[key];
 
-  if (previous == null) {
-    console.error('cannot finish timing as no previous time found');
-    return;
-  }
+  invariant(previous, 'cannot finish timing as no previous time found');
 
   const result: number = now - previous;
   const rounded: string = result.toFixed(2);
@@ -63,7 +71,8 @@ export const finish = (key: string) => {
   })();
 
   // eslint-disable-next-line no-console
-  console.log(`${style.symbol} %cTiming %c${rounded} %cms %c${key}`,
+  console.log(
+    `${style.symbol} %cTiming %c${rounded} %cms %c${key}`,
     // title
     'color: blue; font-weight: bold; ',
     // result
@@ -74,4 +83,3 @@ export const finish = (key: string) => {
     'color: purple; font-weight: bold;',
   );
 };
-

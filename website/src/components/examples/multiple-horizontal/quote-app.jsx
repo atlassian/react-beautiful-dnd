@@ -27,20 +27,20 @@ const Root = styled.div`
 
 type Props = {|
   initial: QuoteMap,
-|}
+|};
 
-type State = ReorderQuoteMapResult
+type State = ReorderQuoteMapResult;
 
 export default class QuoteApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
 
   state: State = {
     quoteMap: this.props.initial,
-  }
+  };
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
-  }
+  };
 
   onDragEnd = (result: DropResult) => {
     publishOnDragEnd(result);
@@ -55,9 +55,9 @@ export default class QuoteApp extends Component<Props, State> {
         quoteMap: this.state.quoteMap,
         source: result.source,
         destination: result.destination,
-      })
+      }),
     );
-  }
+  };
 
   render() {
     const { quoteMap } = this.state;

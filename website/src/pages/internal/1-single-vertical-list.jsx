@@ -33,9 +33,7 @@ export default () => (
     <div>basic</div>
     <QuoteApp initial={data.small} />
     <div>large data set</div>
-    <QuoteApp
-      initial={data.large}
-    />
+    <QuoteApp initial={data.large} />
     <div>Droppable is a scroll container</div>
     <QuoteApp
       initial={data.medium}
@@ -57,9 +55,7 @@ export default () => (
     <div>within a larger scroll container</div>
     <ScrollContainer>
       <Title>List is within a larger scroll container</Title>
-      <QuoteApp
-        initial={data.medium}
-      />
+      <QuoteApp initial={data.medium} />
     </ScrollContainer>
   </div>
 );

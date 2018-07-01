@@ -1,79 +1,65 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, type Element } from 'react';
+import type { SpringHelperConfig } from 'react-motion/lib/Types';
 import { type Position } from 'css-box-model';
 import { Motion, spring } from 'react-motion';
+import { isEqual } from '../../state/position';
 import { physics } from '../animation';
-import type { Props, DefaultProps, Style } from './moveable-types';
+import type { Props, Speed, DefaultProps } from './moveable-types';
 
 type PositionLike = {|
   x: any,
   y: any,
 |};
 
-const origin: Position = {
-  x: 0,
-  y: 0,
-};
+const origin: Position = { x: 0, y: 0 };
 
-const noMovement: Style = {
-  transform: null,
-};
+type BlockerProps = {|
+  change: Position,
+  children: Position => Element<*>,
+|};
 
-const isAtOrigin = (point: PositionLike): boolean =>
-  point.x === origin.x && point.y === origin.y;
-
-const getStyle = (isNotMoving: boolean, x: number, y: number): Style => {
-  if (isNotMoving) {
-    return noMovement;
-  }
-
-  const point: Position = { x, y };
-  // not applying any transforms when not moving
-  if (isAtOrigin(point)) {
-    return noMovement;
-  }
-  const style: Style = {
-    transform: `translate(${point.x}px, ${point.y}px)`,
-  };
-  return style;
-};
-
-export default class Movable extends Component<Props> {
-  /* eslint-disable react/sort-comp */
-
-  static defaultProps: DefaultProps = {
-    destination: origin,
-  }
-  /* eslint-enable */
-
-  onRest = () => {
-    const { onMoveEnd } = this.props;
-
-    if (!onMoveEnd) {
-      return;
+// Working around react-motion double render issue
+class DoubleRenderBlocker extends React.Component<BlockerProps> {
+  shouldComponentUpdate(nextProps: BlockerProps): boolean {
+    // let a render go through if not moving anywhere
+    if (isEqual(origin, nextProps.change)) {
+      return true;
     }
 
-    // This needs to be async otherwise Motion will not re-execute if
-    // offset or start change
+    // blocking a duplicate change (workaround for react-motion)
+    if (isEqual(this.props.change, nextProps.change)) {
+      return false;
+    }
 
-    // Could check to see if another move has started
-    // and abort the previous onMoveEnd
-    setTimeout(() => onMoveEnd());
+    // let everything else through
+    return true;
   }
+  render() {
+    return this.props.children(this.props.change);
+  }
+}
 
-  getFinal = (): PositionLike => {
+export default class Moveable extends Component<Props> {
+  /* eslint-disable react/sort-comp */
+  static defaultProps: DefaultProps = {
+    destination: origin,
+  };
+
+  getFinal(): PositionLike {
     const destination: Position = this.props.destination;
-    const speed = this.props.speed;
+    const speed: Speed = this.props.speed;
 
     if (speed === 'INSTANT') {
       return destination;
     }
 
-    const selected = speed === 'FAST' ? physics.fast : physics.standard;
+    const config: SpringHelperConfig =
+      speed === 'FAST' ? physics.fast : physics.standard;
 
     return {
-      x: spring(destination.x, selected),
-      y: spring(destination.y, selected),
+      x: spring(destination.x, config),
+      y: spring(destination.y, config),
     };
   }
 
@@ -83,17 +69,21 @@ export default class Movable extends Component<Props> {
     // bug with react-motion: https://github.com/chenglou/react-motion/issues/437
     // even if both defaultStyle and style are {x: 0, y: 0 } if there was
     // a previous animation it uses the last value rather than the final value
-    const isNotMoving: boolean = isAtOrigin(final);
 
     return (
-      // Expecting a flow error
-      // React Motion type: children: (interpolatedStyle: PlainStyle) => ReactElement
-      // Our type: children: (Position) => (Style) => React.Node
-      <Motion defaultStyle={origin} style={final} onRest={this.onRest}>
-        {(current: { [string]: number }): any =>
-          this.props.children(
-            getStyle(isNotMoving, current.x, current.y)
-          )}
+      <Motion defaultStyle={origin} style={final} onRest={this.props.onMoveEnd}>
+        {(current: { [string]: number }): Element<*> => {
+          const { speed, destination, children } = this.props;
+
+          const target: Position =
+            speed === 'INSTANT' ? destination : (current: any);
+
+          return (
+            <DoubleRenderBlocker change={target}>
+              {children}
+            </DoubleRenderBlocker>
+          );
+        }}
       </Motion>
     );
   }

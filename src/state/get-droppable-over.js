@@ -6,6 +6,7 @@ import isPositionInFrame from './visibility/is-position-in-frame';
 import { patch } from './position';
 import { expandByPosition } from './spacing';
 import { clip } from './droppable-dimension';
+import { toDroppableList } from './dimension-structures';
 import type {
   Scrollable,
   DraggableDimension,
@@ -15,46 +16,56 @@ import type {
   DroppableId,
 } from '../types';
 
-const getRequiredGrowth = memoizeOne((
-  draggable: DraggableDimension,
-  draggables: DraggableDimensionMap,
-  droppable: DroppableDimension,
-): ?Position => {
-  // We can't always simply add the placeholder size to the droppable size.
-  // If a droppable has a min-height there will be scenarios where it has
-  // some items in it, but not enough to completely fill its size.
-  // In this case - when the droppable already contains excess space - we
-  // don't need to add the full placeholder size.
+const getRequiredGrowth = memoizeOne(
+  (
+    draggable: DraggableDimension,
+    draggables: DraggableDimensionMap,
+    droppable: DroppableDimension,
+  ): ?Position => {
+    // We can't always simply add the placeholder size to the droppable size.
+    // If a droppable has a min-height there will be scenarios where it has
+    // some items in it, but not enough to completely fill its size.
+    // In this case - when the droppable already contains excess space - we
+    // don't need to add the full placeholder size.
 
-  const getResult = (existingSpace: number): ?Position => {
-    // this is the space required for a placeholder
-    const requiredSpace: number = draggable.page.marginBox[droppable.axis.size];
+    const getResult = (existingSpace: number): ?Position => {
+      // this is the space required for a placeholder
+      const requiredSpace: number =
+        draggable.page.marginBox[droppable.axis.size];
 
-    if (requiredSpace <= existingSpace) {
-      return null;
+      if (requiredSpace <= existingSpace) {
+        return null;
+      }
+      const requiredGrowth: Position = patch(
+        droppable.axis.line,
+        requiredSpace - existingSpace,
+      );
+
+      return requiredGrowth;
+    };
+
+    const dimensions: DraggableDimension[] = getDraggablesInsideDroppable(
+      droppable,
+      draggables,
+    );
+
+    // Droppable is empty
+    if (!dimensions.length) {
+      const existingSpace: number =
+        droppable.page.marginBox[droppable.axis.size];
+      return getResult(existingSpace);
     }
-    const requiredGrowth: Position = patch(droppable.axis.line, requiredSpace - existingSpace);
 
-    return requiredGrowth;
-  };
+    // Droppable has items in it
 
-  const dimensions: DraggableDimension[] = getDraggablesInsideDroppable(droppable, draggables);
+    const endOfDraggables: number =
+      dimensions[dimensions.length - 1].page.marginBox[droppable.axis.end];
+    const endOfDroppable: number = droppable.page.marginBox[droppable.axis.end];
+    const existingSpace: number = endOfDroppable - endOfDraggables;
 
-  // Droppable is empty
-  if (!dimensions.length) {
-    const existingSpace: number = droppable.page.marginBox[droppable.axis.size];
     return getResult(existingSpace);
-  }
-
-  // Droppable has items in it
-
-  const endOfDraggables: number =
-    dimensions[dimensions.length - 1].page.marginBox[droppable.axis.end];
-  const endOfDroppable: number = droppable.page.marginBox[droppable.axis.end];
-  const existingSpace: number = endOfDroppable - endOfDraggables;
-
-  return getResult(existingSpace);
-});
+  },
+);
 
 type GetBufferedDroppableArgs = {
   draggable: DraggableDimension,
@@ -65,7 +76,8 @@ type GetBufferedDroppableArgs = {
 
 // TODO: should only expand on the main axis
 const getWithGrowth = memoizeOne(
-  (area: Rect, growth: Position): Rect => getRect(expandByPosition(area, growth))
+  (area: Rect, growth: Position): Rect =>
+    getRect(expandByPosition(area, growth)),
 );
 
 const getClippedRectWithPlaceholder = ({
@@ -74,10 +86,11 @@ const getClippedRectWithPlaceholder = ({
   droppable,
   previousDroppableOverId,
 }: GetBufferedDroppableArgs): ?Rect => {
-  const isHome: boolean = draggable.descriptor.droppableId === droppable.descriptor.id;
+  const isHome: boolean =
+    draggable.descriptor.droppableId === droppable.descriptor.id;
   const wasOver: boolean = Boolean(
     previousDroppableOverId &&
-    previousDroppableOverId === droppable.descriptor.id
+      previousDroppableOverId === droppable.descriptor.id,
   );
   const clippedPageMarginBox: ?Rect = droppable.viewport.clippedPageMarginBox;
 
@@ -92,13 +105,20 @@ const getClippedRectWithPlaceholder = ({
     return clippedPageMarginBox;
   }
 
-  const requiredGrowth: ?Position = getRequiredGrowth(draggable, draggables, droppable);
+  const requiredGrowth: ?Position = getRequiredGrowth(
+    draggable,
+    draggables,
+    droppable,
+  );
 
   if (!requiredGrowth) {
     return clippedPageMarginBox;
   }
 
-  const subjectWithGrowth: Rect = getWithGrowth(clippedPageMarginBox, requiredGrowth);
+  const subjectWithGrowth: Rect = getWithGrowth(
+    clippedPageMarginBox,
+    requiredGrowth,
+  );
   const closestScrollable: ?Scrollable = droppable.viewport.closestScrollable;
 
   // The droppable has no scroll container
@@ -131,17 +151,19 @@ export default ({
   droppables,
   previousDroppableOverId,
 }: Args): ?DroppableId => {
-  const maybe: ?DroppableDimension =
-    Object.keys(droppables)
-      .map((id: DroppableId): DroppableDimension => droppables[id])
-      // only want enabled droppables
-      .filter((droppable: DroppableDimension) => droppable.isEnabled)
-      .find((droppable: DroppableDimension): boolean => {
+  const maybe: ?DroppableDimension = toDroppableList(droppables)
+    // only want enabled droppables
+    .filter((droppable: DroppableDimension) => droppable.isEnabled)
+    .find(
+      (droppable: DroppableDimension): boolean => {
         // If previously dragging over a droppable we give it a
         // bit of room on the subsequent drags so that user and move
         // items in the space that the placeholder takes up
         const withPlaceholder: ?Rect = getClippedRectWithPlaceholder({
-          draggable, draggables, droppable, previousDroppableOverId,
+          draggable,
+          draggables,
+          droppable,
+          previousDroppableOverId,
         });
 
         if (!withPlaceholder) {
@@ -153,7 +175,8 @@ export default ({
         // Not adjusting target for droppable scroll as we are just checking
         // if it is over the droppable - not its internal impact
         return isPositionInFrame(withPlaceholder)(target);
-      });
+      },
+    );
 
   return maybe ? maybe.descriptor.id : null;
 };

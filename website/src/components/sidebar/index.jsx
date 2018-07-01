@@ -52,15 +52,13 @@ const StyledLink = styled(Link)`
   transition: background-color ease 0.2s, color ease 0.2s;
 
   ${props =>
-    (props.isActiveLink
+    props.isActiveLink
       ? css`
           color: white;
           background: ${props.hoverColor};
           text-decoration: none;
         `
-      : '')}
-
-  :hover, :active, :focus {
+      : ''} :hover, :active, :focus {
     color: white;
     background: ${props => props.hoverColor};
     text-decoration: none;
@@ -71,7 +69,7 @@ type NavItemProps = {|
   href: string,
   title: string,
   hoverColor: string,
-  isTitle?: boolean
+  isTitle?: boolean,
 |};
 
 const NavItem = ({ isTitle, href, title, hoverColor }: NavItemProps) => {
@@ -92,13 +90,13 @@ const NavItem = ({ isTitle, href, title, hoverColor }: NavItemProps) => {
 type NavFromUrlsProps = {
   pages: sitePage,
   href: string,
-  title: string
+  title: string,
 };
 
 const NavFromUrls = ({ pages, href, title }: NavFromUrlsProps) => (
   <Fragment>
     <Title>{title}</Title>
-    {pages.edges.map((page) => {
+    {pages.edges.map(page => {
       const { path } = page.node;
       return (
         <NavItem
@@ -116,19 +114,19 @@ type Props = {
   docs: docsPage,
   examples: sitePage,
   internal: sitePage,
-  showInternal: boolean
+  showInternal: boolean,
 };
 
 type DocsSectionProps = {
   sectionTitle: string,
   sectionDir: string,
   pages: Array<innerDocsPage>,
-}
+};
 
 const DocsSection = ({ sectionTitle, pages, sectionDir }: DocsSectionProps) => (
   <Fragment>
     <Title>{sectionTitle}</Title>
-    {pages.map((page) => {
+    {pages.map(page => {
       const { slug, title, dir } = page.node.fields;
       if (sectionDir === dir) {
         return (
@@ -140,7 +138,7 @@ const DocsSection = ({ sectionTitle, pages, sectionDir }: DocsSectionProps) => (
           />
         );
       }
-        return null;
+      return null;
     })}
   </Fragment>
 );
@@ -149,20 +147,36 @@ export default ({ docs, examples, internal, showInternal }: Props) => (
   <Sidebar>
     <h2>Header goes here</h2>
     <Section>
-      <DocsSection pages={docs.edges} sectionTitle="Quick Start" sectionDir="quick-start" />
+      <DocsSection
+        pages={docs.edges}
+        sectionTitle="Quick Start"
+        sectionDir="quick-start"
+      />
     </Section>
     <Section>
-      <DocsSection pages={docs.edges} sectionTitle="Core Concepts" sectionDir="core-concepts" />
+      <DocsSection
+        pages={docs.edges}
+        sectionTitle="Core Concepts"
+        sectionDir="core-concepts"
+      />
     </Section>
     <Section>
-      <DocsSection pages={docs.edges} sectionTitle="Guides" sectionDir="guides" />
+      <DocsSection
+        pages={docs.edges}
+        sectionTitle="Guides"
+        sectionDir="guides"
+      />
     </Section>
     <Section>
       <NavFromUrls href="/examples/" title="Examples" pages={examples} />
     </Section>
     {showInternal ? (
       <Section>
-        <NavFromUrls href="/internal/" title="Internal Examples" pages={internal} />
+        <NavFromUrls
+          href="/internal/"
+          title="Internal Examples"
+          pages={internal}
+        />
       </Section>
     ) : null}
   </Sidebar>

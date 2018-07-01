@@ -4,8 +4,11 @@ import type { DraggableId } from '../../../types';
 
 type FocusRetainer = {|
   retain: (draggableId: DraggableId) => void,
-  tryRestoreFocus: (draggableId: DraggableId, draggableRef: HTMLElement) => void,
-|}
+  tryRestoreFocus: (
+    draggableId: DraggableId,
+    draggableRef: HTMLElement,
+  ) => void,
+|};
 
 // our shared state
 let retainingFocusFor: ?DraggableId = null;

@@ -1,7 +1,8 @@
 // @flow
 const isScrollable = (...values: string[]): boolean =>
-  values.some((value: string): boolean =>
-    (value === 'auto' || value === 'scroll'));
+  values.some(
+    (value: string): boolean => value === 'auto' || value === 'scroll',
+  );
 
 const isElementScrollable = (el: Element) => {
   const style = window.getComputedStyle(el);

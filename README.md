@@ -33,6 +33,13 @@ We have created some basic examples on `codesandbox` for you to play with direct
 
 > Coming soon: a getting starting guide!
 
+## Read this in other languages
+
+- [![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **한글/Korean**](https://github.com/LeeHyungGeun/react-beautiful-dnd-kr)
+
+- [![china](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/China.png) **中文/Chinese**](https://github.com/chinanf-boy/react-beautiful-dnd-zh)
+
+
 ## Upgrading
 
 We have created upgrade instructions in our release notes to help you upgrade to the latest version!
@@ -770,7 +777,7 @@ type DroppableProps = {|
 
 - `provided.innerRef`: In order for the droppable to function correctly, **you must** bind the `provided.innerRef` to the highest possible DOM node in the `ReactElement`. We do this in order to avoid needing to use `ReactDOM` to look up your DOM node.
 
-> For more information on using `innerRef` see our [using `innerRef` guide](/docs/patterns/using-inner-ref.md)
+> For more information on using `innerRef` see our [using `innerRef` guide](/docs/guides/using-inner-ref.md)
 
 - `provided.placeholder`: This is used to create space in the `Droppable` as needed during a drag. This space is needed when a user is dragging over a list that is not the home list. Please be sure to put the placeholder inside of the component for which you have provided the ref. We need to increase the size of the `Droppable` itself.
 - `provided.droppableProps (DroppableProps)`: This is an Object that contains properties that need to be applied to a Droppable element. It needs to be applied to the same element that you apply `provided.innerRef` to. It currently contains a `data` attribute that we use to control some non-visible css.
@@ -972,7 +979,7 @@ Everything within the *provided* object must be applied for the `Draggable` to f
 
 - `provided.innerRef (innerRef: (HTMLElement) => void)`: In order for the `Droppable` to function correctly, **you must** bind the `innerRef` function to the `ReactElement` that you want to be considered the `Draggable` node. We do this in order to avoid needing to use `ReactDOM` to look up your DOM node.
 
-> For more information on using `innerRef` see our [using `innerRef` guide](/docs/patterns/using-inner-ref.md)
+> For more information on using `innerRef` see our [using `innerRef` guide](/docs/guides/using-inner-ref.md)
 
 ##### `innerRef` Example
 
@@ -1010,7 +1017,7 @@ type DraggingStyle = {|
   zIndex: ZIndex,
 |}
 type NotDraggingStyle = {|
-  transition: ?string,
+  transform: ?string,
   transition: null | 'none',
 |}
 ```
@@ -1443,14 +1450,6 @@ This library supports the standard [Atlassian supported browsers](https://conflu
 | Mobile Safari (iOS)                 | Latest stable version supported                      |
 | Android (Android)                   | The default browser on Android 4.0.3 (Ice Cream Sandwich) |
 
-## Translations
-
-The documentation for this library is also available in other languages:
-
-- ![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **Korean**: [leehyunggeun/react-beautiful-dnd](https://github.com/LeeHyungGeun/react-beautiful-dnd-kr)
-
-These translations are maintained by the community and are not reviewed or maintained by the maintainers of this library. Please raise issues on the respective translations if you would like to have them updated.
-
 ## Author
 
 Alex Reardon - [@alexandereardon](https://twitter.com/alexandereardon)
@@ -1461,6 +1460,6 @@ Jared Crowe - [@jaredjcrowe](https://twitter.com/jaredjcrowe)
 
 ## Collaborators
 
-Bogdan Chadkin - [@IAmTrySound](https://twitter.com/IAmTrySound)  
-Luke Batchelor - [@alukebatchelor](https://twitter.com/alukebatchelor)  
-Many other [@Atlassian](https://twitter.com/Atlassian)'s!  
+Bogdan Chadkin - [@IAmTrySound](https://twitter.com/IAmTrySound)
+Luke Batchelor - [@alukebatchelor](https://twitter.com/alukebatchelor)
+Many other [@Atlassian](https://twitter.com/Atlassian)'s!

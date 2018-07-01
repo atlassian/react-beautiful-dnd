@@ -2,13 +2,12 @@
 
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
-import uglify from 'rollup-plugin-uglify';
 import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
 import strip from 'rollup-plugin-strip';
+import { uglify } from 'rollup-plugin-uglify';
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
-
-const pkg = require('./package.json');
+import pkg from './package.json';
 
 const input = './src/index.js';
 const extensions = ['.js', '.jsx'];
@@ -17,9 +16,10 @@ const extensions = ['.js', '.jsx'];
 // e.g. 'react'
 const excludeAllExternals = id => !id.startsWith('.') && !id.startsWith('/');
 
-const getBabelOptions = () => ({
+const getBabelOptions = ({ useESModules }) => ({
   exclude: 'node_modules/**',
   runtimeHelpers: true,
+  plugins: [['@babel/transform-runtime', { useESModules }]],
 });
 
 const matchSnapshot = process.env.SNAPSHOT === 'match';
@@ -39,7 +39,7 @@ export default [
     // Only deep dependency required is React
     external: ['react'],
     plugins: [
-      babel(getBabelOptions()),
+      babel(getBabelOptions({ useESModules: true })),
       resolve({ extensions }),
       commonjs({ include: 'node_modules/**' }),
       replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
@@ -58,12 +58,11 @@ export default [
     // Only deep dependency required is React
     external: ['react'],
     plugins: [
-      // Setting production env before running babel etc
-      replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
-      babel(getBabelOptions()),
+      babel(getBabelOptions({ useESModules: true })),
       resolve({ extensions }),
       commonjs({ include: 'node_modules/**' }),
       strip({ debugger: true }),
+      replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       sizeSnapshot({ matchSnapshot }),
       uglify(),
     ],
@@ -77,7 +76,7 @@ export default [
     external: excludeAllExternals,
     plugins: [
       resolve({ extensions }),
-      babel(getBabelOptions()),
+      babel(getBabelOptions({ useESModules: false })),
     ],
   },
   // EcmaScript Module (esm) build
@@ -85,11 +84,11 @@ export default [
   // - All external packages are not bundled
   {
     input,
-    output: { file: pkg.module, format: 'es' },
+    output: { file: pkg.module, format: 'esm' },
     external: excludeAllExternals,
     plugins: [
       resolve({ extensions }),
-      babel(getBabelOptions()),
+      babel(getBabelOptions({ useESModules: true })),
       sizeSnapshot({ matchSnapshot }),
     ],
   },

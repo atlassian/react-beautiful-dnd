@@ -3,5 +3,5 @@
 export type NestedQuoteList = {|
   id: string,
   title: string,
-  children: Array<any>
-|}
+  children: Array<any>,
+|};

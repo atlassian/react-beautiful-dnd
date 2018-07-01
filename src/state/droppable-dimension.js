@@ -40,7 +40,7 @@ export type Closest = {|
   scrollWidth: number,
   scroll: Position,
   shouldClipSubject: boolean,
-|}
+|};
 
 type GetDroppableArgs = {|
   descriptor: DroppableDescriptor,
@@ -49,7 +49,7 @@ type GetDroppableArgs = {|
   client: BoxModel,
   page: BoxModel,
   closest?: ?Closest,
-|}
+|};
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -92,9 +92,10 @@ export const getDroppableDimension = ({
 
   const subjectPageMarginBox: Rect = page.marginBox;
 
-  const clippedPageMarginBox: ?Rect = (scrollable && scrollable.shouldClipSubject) ?
-    clip(scrollable.framePageMarginBox, subjectPageMarginBox) :
-    subjectPageMarginBox;
+  const clippedPageMarginBox: ?Rect =
+    scrollable && scrollable.shouldClipSubject
+      ? clip(scrollable.framePageMarginBox, subjectPageMarginBox)
+      : subjectPageMarginBox;
 
   const viewport: DroppableDimensionViewport = {
     closestScrollable: scrollable,
@@ -146,12 +147,14 @@ export const scrollDroppable = (
     },
   };
 
-  const displacedSubject: Spacing =
-    offsetByPosition(droppable.viewport.subjectPageMarginBox, scrollDisplacement);
+  const displacedSubject: Spacing = offsetByPosition(
+    droppable.viewport.subjectPageMarginBox,
+    scrollDisplacement,
+  );
 
-  const clippedPageMarginBox: ?Rect = closestScrollable.shouldClipSubject ?
-    clip(framePageMarginBox, displacedSubject) :
-    getRect(displacedSubject);
+  const clippedPageMarginBox: ?Rect = closestScrollable.shouldClipSubject
+    ? clip(framePageMarginBox, displacedSubject)
+    : getRect(displacedSubject);
 
   const viewport: DroppableDimensionViewport = {
     closestScrollable,
@@ -165,3 +168,12 @@ export const scrollDroppable = (
   };
   return result;
 };
+
+// TODO: make this work
+// const growSubjectIfNeeded = ({
+//   draggables: DraggableDimensionMap,
+//   droppable: DroppableDimension,
+//   addition: Position,
+// }): DroppableDimension => {
+
+// };

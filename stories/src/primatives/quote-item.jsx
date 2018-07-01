@@ -3,19 +3,21 @@ import React from 'react';
 import styled from 'styled-components';
 import { borderRadius, colors, grid } from '../constants';
 import type { Quote } from '../types';
-import type { DraggableProvided } from '../../../src/';
+import type { DraggableProvided } from '../../../src';
 
 type Props = {
   quote: Quote,
   isDragging: boolean,
   provided: DraggableProvided,
-}
+};
 
 const Container = styled.a`
   border-radius: ${borderRadius}px;
   border: 1px solid grey;
-  background-color: ${({ isDragging }) => (isDragging ? colors.green : colors.white)};
-  box-shadow: ${({ isDragging }) => (isDragging ? `2px 2px 1px ${colors.shadow}` : 'none')};
+  background-color: ${({ isDragging }) =>
+    isDragging ? colors.green : colors.white};
+  box-shadow: ${({ isDragging }) =>
+    isDragging ? `2px 2px 1px ${colors.shadow}` : 'none'};
   padding: ${grid}px;
   min-height: 40px;
   margin-bottom: ${grid}px;
@@ -114,12 +116,11 @@ export default class QuoteItem extends React.PureComponent<Props> {
         <Content>
           <BlockQuote>{quote.content}</BlockQuote>
           <Footer>
-            <QuoteId>(id: {quote.id})</QuoteId>
-            <Attribution>{quote.author.name}</Attribution>
+            <QuoteId>({quote.id})</QuoteId>
+            <Attribution>TEMP</Attribution>
           </Footer>
         </Content>
       </Container>
     );
   }
 }
-

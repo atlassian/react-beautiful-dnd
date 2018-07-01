@@ -5,7 +5,8 @@ import { colors } from '@atlaskit/theme';
 import FeedbackIcon from '@atlaskit/icon/glyph/feedback';
 import { grid } from '../constants';
 
-const isMutationObserverSupported: boolean = typeof MutationObserver !== 'undefined';
+const isMutationObserverSupported: boolean =
+  typeof MutationObserver !== 'undefined';
 
 const Container = styled.div`
   background-color: ${colors.T300};
@@ -41,8 +42,7 @@ const TitleIcon = styled.span`
   margin-left: ${grid}px;
 `;
 
-const Speech = styled.div`
-`;
+const Speech = styled.div``;
 
 const defaultMessage: string = `
   (This is what the screen reader will announce)
@@ -50,18 +50,20 @@ const defaultMessage: string = `
 
 type State = {|
   message: ?string,
-|}
+|};
 
 export default class ScreenReaderWatcher extends React.Component<*, State> {
   // eslint-disable-next-line react/sort-comp
-  observer: ?MutationObserver
+  observer: ?MutationObserver;
 
   state: State = {
     message: null,
-  }
+  };
   componentDidMount() {
     // finding the first announcement
-    const target: ?HTMLElement = document.querySelector('[id^=react-beautiful-dnd-announcement]');
+    const target: ?HTMLElement = document.querySelector(
+      '[id^=react-beautiful-dnd-announcement]',
+    );
 
     if (!target) {
       console.error('Could not find screen reader target');
@@ -79,7 +81,9 @@ export default class ScreenReaderWatcher extends React.Component<*, State> {
       this.observer.disconnect();
     }
 
-    window.removeEventListener('focusin', this.onWindowFocus, { passive: true });
+    window.removeEventListener('focusin', this.onWindowFocus, {
+      passive: true,
+    });
   }
 
   onMutation = (records: MutationRecord[]) => {
@@ -92,7 +96,7 @@ export default class ScreenReaderWatcher extends React.Component<*, State> {
     this.setState({
       message: last.innerText,
     });
-  }
+  };
 
   onWindowFocus = (event: FocusEvent) => {
     const target: EventTarget = event.target;
@@ -102,7 +106,9 @@ export default class ScreenReaderWatcher extends React.Component<*, State> {
       return;
     }
 
-    const isDragHandle: boolean = target.hasAttribute('data-react-beautiful-dnd-drag-handle');
+    const isDragHandle: boolean = target.hasAttribute(
+      'data-react-beautiful-dnd-drag-handle',
+    );
 
     if (!isDragHandle) {
       this.setState({ message: null });
@@ -110,14 +116,16 @@ export default class ScreenReaderWatcher extends React.Component<*, State> {
     }
 
     const content: string = (target.innerText || '').trim();
-    const description: string = (target.getAttribute('aria-roledescription') || '').trim();
+    const description: string = (
+      target.getAttribute('aria-roledescription') || ''
+    ).trim();
 
     const message: string = `${content}, ${description}`;
 
     this.setState({
       message,
     });
-  }
+  };
 
   render() {
     if (!isMutationObserverSupported) {
@@ -129,10 +137,7 @@ export default class ScreenReaderWatcher extends React.Component<*, State> {
         <Title>
           <span>Screen reader announcement</span>
           <TitleIcon>
-            <FeedbackIcon
-              label="speaker icon"
-              size="large"
-            />
+            <FeedbackIcon label="speaker icon" size="large" />
           </TitleIcon>
         </Title>
         <Speech>{this.state.message || defaultMessage}</Speech>

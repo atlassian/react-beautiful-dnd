@@ -2,27 +2,30 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import type { Props, Provided, StateSnapshot } from './droppable-types';
-import type { DroppableId } from '../../types';
+import type { DroppableId, TypeId } from '../../types';
 import DroppableDimensionPublisher from '../droppable-dimension-publisher/';
 import Placeholder from '../placeholder/';
+import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 import {
   droppableIdKey,
+  droppableTypeKey,
   styleContextKey,
 } from '../context-keys';
 
-type Context = {|
-  [typeof droppableIdKey]: DroppableId
-|}
+type Context = {
+  [string]: DroppableId | TypeId,
+};
 
 export default class Droppable extends Component<Props> {
   /* eslint-disable react/sort-comp */
-  styleContext: string
-  ref: ?HTMLElement = null
+  styleContext: string;
+  ref: ?HTMLElement = null;
+  isPlaceholderMounted: boolean = false;
 
   // Need to declare childContextTypes without flow
   static contextTypes = {
     [styleContextKey]: PropTypes.string.isRequired,
-  }
+  };
 
   constructor(props: Props, context: Object) {
     super(props, context);
@@ -34,25 +37,56 @@ export default class Droppable extends Component<Props> {
   // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
   static childContextTypes = {
     [droppableIdKey]: PropTypes.string.isRequired,
-  }
+    [droppableTypeKey]: PropTypes.string.isRequired,
+  };
 
   getChildContext(): Context {
     const value: Context = {
       [droppableIdKey]: this.props.droppableId,
+      [droppableTypeKey]: this.props.type,
     };
     return value;
   }
 
   componentDidMount() {
-    if (!this.ref) {
-      console.error(`
-        Droppable has not been provided with a ref.
-        Please use the DroppableProvided > innerRef function
-      `);
+    throwIfRefIsInvalid(this.ref);
+    this.warnIfPlaceholderNotMounted();
+  }
+
+  componentDidUpdate() {
+    this.warnIfPlaceholderNotMounted();
+  }
+
+  warnIfPlaceholderNotMounted() {
+    if (process.env.NODE_ENV === 'production') {
+      return;
     }
+
+    if (!this.props.placeholder) {
+      return;
+    }
+
+    if (this.isPlaceholderMounted) {
+      return;
+    }
+
+    console.warn(`
+      Droppable setup issue: DroppableProvided > placeholder could not be found.
+      Please be sure to add the {provided.placeholder} Node as a child of your Droppable
+
+      More information: https://github.com/atlassian/react-beautiful-dnd#1-provided-droppableprovided
+    `);
   }
 
   /* eslint-enable */
+
+  onPlaceholderMount = () => {
+    this.isPlaceholderMounted = true;
+  };
+
+  onPlaceholderUnmount = () => {
+    this.isPlaceholderMounted = false;
+  };
 
   // React calls ref callback twice for every render
   // https://github.com/facebook/react/pull/8333/files
@@ -67,7 +101,8 @@ export default class Droppable extends Component<Props> {
     }
 
     this.ref = ref;
-  }
+    throwIfRefIsInvalid(ref);
+  };
 
   getDroppableRef = (): ?HTMLElement => this.ref;
 
@@ -77,7 +112,11 @@ export default class Droppable extends Component<Props> {
     }
 
     return (
-      <Placeholder placeholder={this.props.placeholder} />
+      <Placeholder
+        placeholder={this.props.placeholder}
+        onMount={this.onPlaceholderMount}
+        onUnmount={this.onPlaceholderUnmount}
+      />
     );
   }
 

@@ -8,15 +8,19 @@ import {
   type Spacing,
   type Position,
 } from 'css-box-model';
-import { noMovement } from '../../src/state/no-impact';
 import { vertical } from '../../src/state/axis';
-import { noSpacing } from '../../src/state/spacing';
-import { getDroppableDimension as getDroppable, type Closest } from '../../src/state/droppable-dimension';
+import { noSpacing, offsetByPosition } from '../../src/state/spacing';
+import getViewport from '../../src/view/window/get-viewport';
+import scrollViewport from '../../src/state/scroll-viewport';
+import {
+  getDroppableDimension as getDroppable,
+  type Closest,
+} from '../../src/state/droppable-dimension';
 import type {
   Axis,
   Placeholder,
-  DragImpact,
-  State,
+  DraggableId,
+  Viewport,
   Scrollable,
   DraggableDescriptor,
   DroppableDescriptor,
@@ -24,14 +28,18 @@ import type {
   DraggableDimension,
   DraggableDimensionMap,
   DroppableDimensionMap,
+  DimensionMap,
+  DraggingState,
 } from '../../src/types';
 
 type GetComputedSpacingArgs = {|
   margin?: Spacing,
   padding?: Spacing,
-  border ?: Spacing,
+  border?: Spacing,
   display?: string,
-|}
+|};
+
+const origin: Position = { x: 0, y: 0 };
 
 export const getComputedSpacing = ({
   margin = noSpacing,
@@ -54,7 +62,10 @@ export const getComputedSpacing = ({
   display,
 });
 
-export const makeScrollable = (droppable: DroppableDimension, amount?: number = 20) => {
+export const makeScrollable = (
+  droppable: DroppableDimension,
+  amount?: number = 20,
+) => {
   const axis: Axis = droppable.axis;
   const borderBox: Rect = droppable.client.borderBox;
 
@@ -101,69 +112,35 @@ export const makeScrollable = (droppable: DroppableDimension, amount?: number = 
       page: droppable.page,
       scrollWidth: scrollSize.width,
       scrollHeight: scrollSize.height,
-      scroll: { x: 0, y: 0 },
+      scroll: origin,
       shouldClipSubject: true,
     },
   });
 };
 
-export const getInitialImpact = (draggable: DraggableDimension, axis?: Axis = vertical) => {
-  const impact: DragImpact = {
-    movement: noMovement,
-    direction: axis.direction,
-    destination: {
-      index: draggable.descriptor.index,
-      droppableId: draggable.descriptor.droppableId,
-    },
-  };
-  return impact;
-};
-
-export const withImpact = (state: State, impact: DragImpact) => {
-  // while dragging
-  if (state.drag) {
-    return {
-      ...state,
-      drag: {
-        ...state.drag,
-        impact,
-      },
-    };
-  }
-  // while drop animating
-  if (state.drop && state.drop.pending) {
-    return {
-      ...state,
-      drop: {
-        ...state.drop,
-        pending: {
-          ...state.drop.pending,
-          impact,
-        },
-      },
-    };
-  }
-
-  throw new Error('unable to apply impact');
-};
-
-export const addDroppable = (base: State, droppable: DroppableDimension): State => ({
+export const addDroppable = (
+  base: DraggingState,
+  droppable: DroppableDimension,
+): DraggingState => ({
   ...base,
-  dimension: {
-    ...base.dimension,
-    droppable: {
-      ...base.dimension.droppable,
+  dimensions: {
+    ...base.dimensions,
+    droppables: {
+      ...base.dimensions.droppables,
       [droppable.descriptor.id]: droppable,
     },
   },
 });
 
-export const addDraggable = (base: State, draggable: DraggableDimension): State => ({
-  ...base,
-  dimension: {
-    ...base.dimension,
-    draggable: {
-      ...base.dimension.draggable,
+export const addDraggable = (
+  state: DraggingState,
+  draggable: DraggableDimension,
+): DraggingState => ({
+  ...state,
+  dimensions: {
+    ...state.dimensions,
+    draggables: {
+      ...state.dimensions.draggables,
       [draggable.descriptor.id]: draggable,
     },
   },
@@ -175,7 +152,9 @@ const getPlaceholder = (client: BoxModel): Placeholder => ({
   display: 'block',
 });
 
-export const getClosestScrollable = (droppable: DroppableDimension): Scrollable => {
+export const getClosestScrollable = (
+  droppable: DroppableDimension,
+): Scrollable => {
   if (!droppable.viewport.closestScrollable) {
     throw new Error('Cannot get closest scrollable');
   }
@@ -186,15 +165,15 @@ type GetDraggableArgs = {|
   descriptor: DraggableDescriptor,
   borderBox: Spacing,
   windowScroll?: Position,
-  margin ?: Spacing,
-  padding ?: Spacing,
+  margin?: Spacing,
+  padding?: Spacing,
   border?: Spacing,
-|}
+|};
 
 export const getDraggableDimension = ({
   descriptor,
   borderBox,
-  windowScroll,
+  windowScroll = origin,
   margin,
   border,
   padding,
@@ -225,19 +204,19 @@ type ClosestSubset = {|
   scrollWidth: number,
   scroll: Position,
   shouldClipSubject: boolean,
-|}
+|};
 
 type GetDroppableArgs = {|
   descriptor: DroppableDescriptor,
   borderBox: Spacing,
   direction?: 'vertical' | 'horizontal',
-  margin ?: Spacing,
+  margin?: Spacing,
   border?: Spacing,
   padding?: Spacing,
   windowScroll?: Position,
   closest?: ?ClosestSubset,
   isEnabled?: boolean,
-|}
+|};
 
 export const getDroppableDimension = ({
   descriptor,
@@ -245,7 +224,7 @@ export const getDroppableDimension = ({
   margin,
   padding,
   border,
-  windowScroll,
+  windowScroll = origin,
   closest,
   isEnabled = true,
   direction = 'vertical',
@@ -310,7 +289,6 @@ export const getPreset = (axis?: Axis = vertical) => {
   const foreignCrossAxisEnd: number = 200;
   const emptyForeignCrossAxisStart: number = 200;
   const emptyForeignCrossAxisEnd: number = 300;
-
   const home: DroppableDimension = getDroppableDimension({
     descriptor: {
       id: 'home',
@@ -365,6 +343,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inhome1',
       droppableId: home.descriptor.id,
+      type: home.descriptor.type,
       index: 0,
     },
     borderBox: {
@@ -377,11 +356,12 @@ export const getPreset = (axis?: Axis = vertical) => {
     windowScroll,
     ...withAssortedSpacing(),
   });
-    // size: 20
+  // size: 20
   const inHome2: DraggableDimension = getDraggableDimension({
     descriptor: {
       id: 'inhome2',
       droppableId: home.descriptor.id,
+      type: home.descriptor.type,
       index: 1,
     },
     // pushed forward by margin of inHome1
@@ -399,6 +379,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inhome3',
       droppableId: home.descriptor.id,
+      type: home.descriptor.type,
       index: 2,
     },
     borderBox: {
@@ -410,11 +391,12 @@ export const getPreset = (axis?: Axis = vertical) => {
     ...withAssortedSpacing(),
     windowScroll,
   });
-    // size: 40
+  // size: 40
   const inHome4: DraggableDimension = getDraggableDimension({
     descriptor: {
       id: 'inhome4',
       droppableId: home.descriptor.id,
+      type: home.descriptor.type,
       index: 3,
     },
     borderBox: {
@@ -427,11 +409,12 @@ export const getPreset = (axis?: Axis = vertical) => {
     windowScroll,
   });
 
-    // size: 10
+  // size: 10
   const inForeign1: DraggableDimension = getDraggableDimension({
     descriptor: {
       id: 'inForeign1',
       droppableId: foreign.descriptor.id,
+      type: foreign.descriptor.type,
       index: 0,
     },
     borderBox: {
@@ -448,6 +431,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inForeign2',
       droppableId: foreign.descriptor.id,
+      type: foreign.descriptor.type,
       index: 1,
     },
     borderBox: {
@@ -464,6 +448,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inForeign3',
       droppableId: foreign.descriptor.id,
+      type: foreign.descriptor.type,
       index: 2,
     },
     borderBox: {
@@ -480,6 +465,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'inForeign4',
       droppableId: foreign.descriptor.id,
+      type: foreign.descriptor.type,
       index: 3,
     },
     borderBox: {
@@ -509,13 +495,40 @@ export const getPreset = (axis?: Axis = vertical) => {
     [inForeign4.descriptor.id]: inForeign4,
   };
 
-  const inHomeList: DraggableDimension[] = [
-    inHome1, inHome2, inHome3, inHome4,
-  ];
+  const inHomeList: DraggableDimension[] = [inHome1, inHome2, inHome3, inHome4];
 
   const inForeignList: DraggableDimension[] = [
-    inForeign1, inForeign2, inForeign3, inForeign4,
+    inForeign1,
+    inForeign2,
+    inForeign3,
+    inForeign4,
   ];
+
+  const dimensions: DimensionMap = {
+    draggables,
+    droppables,
+  };
+
+  const viewport: Viewport = (() => {
+    // scroll the viewport so it has the right frame
+    const base: Viewport = scrollViewport(getViewport(), windowScroll);
+
+    // set the initial and current scroll so that it is the same
+    // we are faking a lift from a scrolled window
+    const result: Viewport = {
+      frame: base.frame,
+      scroll: {
+        initial: windowScroll,
+        current: windowScroll,
+        max: base.scroll.max,
+        diff: {
+          value: origin,
+          displacement: origin,
+        },
+      },
+    };
+    return result;
+  })();
 
   return {
     home,
@@ -532,12 +545,65 @@ export const getPreset = (axis?: Axis = vertical) => {
     droppables,
     draggables,
     inHomeList,
+    dimensions,
     inForeignList,
     windowScroll,
+    viewport,
   };
 };
 
-export const disableDroppable = (droppable: DroppableDimension): DroppableDimension => ({
+export const disableDroppable = (
+  droppable: DroppableDimension,
+): DroppableDimension => ({
   ...droppable,
   isEnabled: false,
 });
+
+const windowScroll: Position = getPreset().windowScroll;
+
+type ShiftArgs = {|
+  amount: Position,
+  draggables: DraggableDimensionMap,
+  indexChange: number,
+|};
+
+// will not expand the droppable to make room
+export const shiftDraggables = ({
+  amount,
+  draggables,
+  indexChange,
+}: ShiftArgs): DraggableDimensionMap =>
+  Object.keys(draggables)
+    .map((id: DraggableId) => draggables[id])
+    .map((dimension: DraggableDimension) => {
+      const borderBox: Spacing = offsetByPosition(
+        dimension.client.borderBox,
+        amount,
+      );
+      const client: BoxModel = createBox({
+        borderBox,
+        margin: dimension.client.margin,
+        border: dimension.client.border,
+        padding: dimension.client.padding,
+      });
+      const page: BoxModel = withScroll(client, windowScroll);
+
+      const shifted: DraggableDimension = {
+        descriptor: {
+          ...dimension.descriptor,
+          index: dimension.descriptor.index + indexChange,
+        },
+        client,
+        page,
+        placeholder: {
+          ...dimension.placeholder,
+          client,
+        },
+      };
+
+      return shifted;
+    })
+    .reduce((previous: DraggableDimensionMap, current: DraggableDimension) => {
+      previous[current.descriptor.id] = current;
+      return previous;
+    }, {});

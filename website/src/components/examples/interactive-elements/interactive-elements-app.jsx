@@ -13,7 +13,7 @@ import type {
 type ItemType = {|
   id: string,
   component: Node,
-|}
+|};
 
 const initial: ItemType[] = [
   {
@@ -21,18 +21,26 @@ const initial: ItemType[] = [
     component: (
       <div>
         <p>Standard</p>
-        <button>hello world</button><br />
-        <p>With child{' '}
+        <button>hello world</button>
+        <br />
+        <p>
+          With child{' '}
           <a
             href="https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content"
             target="_blank"
             rel="noopener noreferrer"
           >
-              phrasing content
+            phrasing content
           </a>
         </p>
-        <button>why <strong>hello <em>there!</em></strong></button>
-        <p>With child{' '}
+        <button>
+          why{' '}
+          <strong>
+            hello <em>there!</em>
+          </strong>
+        </button>
+        <p>
+          With child{' '}
           <a
             href="https://developer.mozilla.org/en-US/docs/Web/API/SVGElement"
             target="_blank"
@@ -62,9 +70,7 @@ const initial: ItemType[] = [
   },
   {
     id: 'textarea',
-    component: (
-      <textarea placeholder="type some text here" />
-    ),
+    component: <textarea placeholder="type some text here" />,
   },
   {
     id: 'input',
@@ -108,9 +114,7 @@ const initial: ItemType[] = [
   },
   {
     id: 'range',
-    component: (
-      <input type="range" min="1" max="100" />
-    ),
+    component: <input type="range" min="1" max="100" />,
   },
   {
     id: 'content editable',
@@ -159,13 +163,13 @@ const Status = styled.strong`
 type State = {|
   canDragInteractiveElements: boolean,
   items: ItemType[],
-|}
+|};
 
 export default class InteractiveElementsApp extends React.Component<*, State> {
   state: State = {
     items: initial,
     canDragInteractiveElements: false,
-  }
+  };
 
   onDragEnd = (result: DropResult) => {
     if (!result.destination) {
@@ -179,19 +183,19 @@ export default class InteractiveElementsApp extends React.Component<*, State> {
     const items = reorder(
       this.state.items,
       result.source.index,
-      result.destination.index
+      result.destination.index,
     );
 
     this.setState({
       items,
     });
-  }
+  };
 
   toggleBlocking = () => {
     this.setState({
       canDragInteractiveElements: !this.state.canDragInteractiveElements,
     });
-  }
+  };
 
   render() {
     const { canDragInteractiveElements } = this.state;
@@ -209,7 +213,9 @@ export default class InteractiveElementsApp extends React.Component<*, State> {
                   <Draggable
                     key={item.id}
                     draggableId={item.id}
-                    disableInteractiveElementBlocking={canDragInteractiveElements}
+                    disableInteractiveElementBlocking={
+                      canDragInteractiveElements
+                    }
                     index={index}
                   >
                     {(draggableProvided: DraggableProvided) => (
@@ -220,16 +226,16 @@ export default class InteractiveElementsApp extends React.Component<*, State> {
                       >
                         {item.component}
                       </Item>
-                  )}
+                    )}
                   </Draggable>
                 ))}
                 {droppableProvided.placeholder}
               </List>
-          )}
+            )}
           </Droppable>
           <Controls>
             <p>
-              Dragging from interactive elements is {' '}
+              Dragging from interactive elements is{' '}
               <Status isEnabled={canDragInteractiveElements}>
                 {canDragInteractiveElements ? 'enabled' : 'disabled'}
               </Status>
