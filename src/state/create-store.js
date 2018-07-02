@@ -74,7 +74,7 @@ export default ({
         drop,
         // When a drop animation finishes - fire a drop complete
         dropAnimationFinish,
-        // When a drop is pending and a bulk publish occurs, we need
+        // TODO: enable for dynamic dimensions
         // pendingDrop,
         maxScrollUpdater,
         autoScroll(getScroller),
