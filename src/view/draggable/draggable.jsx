@@ -4,7 +4,7 @@ import { type Position, type BoxModel } from 'css-box-model';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
-import { isEqual } from '../../state/position';
+import { isEqual, origin } from '../../state/position';
 import type {
   DraggableDimension,
   ItemPositions,
@@ -45,8 +45,6 @@ export const zIndexOptions: ZIndexOptions = {
   dragging: 5000,
   dropAnimating: 4500,
 };
-
-const origin: Position = { x: 0, y: 0 };
 
 const getTranslate = (offset: Position): ?string => {
   // we do not translate to origin

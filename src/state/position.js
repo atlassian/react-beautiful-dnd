@@ -1,6 +1,8 @@
 // @flow
 import { type Position } from 'css-box-model';
 
+export const origin: Position = { x: 0, y: 0 };
+
 export const add = (point1: Position, point2: Position): Position => ({
   x: point1.x + point2.x,
   y: point1.y + point2.y,

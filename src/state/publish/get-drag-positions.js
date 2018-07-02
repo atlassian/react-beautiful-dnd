@@ -1,7 +1,7 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
-import { isEqual, subtract, add } from '../position';
+import { isEqual, subtract, add, origin } from '../position';
 import getPageItemPositions from '../get-page-item-positions';
 import type { DragPositions, Viewport, ItemPositions } from '../../types';
 
@@ -17,8 +17,6 @@ type Result = {|
   initial: DragPositions,
   current: DragPositions,
 |};
-
-const origin: Position = { x: 0, y: 0 };
 
 export default ({
   initial: oldInitial,

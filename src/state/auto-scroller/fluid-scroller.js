@@ -1,7 +1,7 @@
 // @flow
 import rafSchd from 'raf-schd';
 import type { Rect, Position, Spacing } from 'css-box-model';
-import { add, apply, isEqual, patch } from '../position';
+import { add, apply, isEqual, patch, origin } from '../position';
 import getBestScrollableDroppable from './get-best-scrollable-droppable';
 import { horizontal, vertical } from '../axis';
 import { canScrollWindow, canPartiallyScroll } from './can-scroll';
@@ -28,8 +28,6 @@ export const config = {
   // result must be between 0 and 1
   ease: (percentage: number) => Math.pow(percentage, 2),
 };
-
-const origin: Position = { x: 0, y: 0 };
 
 // will replace -0 and replace with +0
 const clean = apply((value: number) => (value === 0 ? 0 : value));

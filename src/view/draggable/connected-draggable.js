@@ -5,7 +5,7 @@ import memoizeOne from 'memoize-one';
 import { connect } from 'react-redux';
 import Draggable from './draggable';
 import { storeKey } from '../context-keys';
-import { negate } from '../../state/position';
+import { negate, origin } from '../../state/position';
 import isStrictEqual from '../is-strict-equal';
 import getDisplacementMap, {
   type DisplacementMap,
@@ -37,8 +37,6 @@ import type {
   DispatchProps,
   Selector,
 } from './draggable-types';
-
-const origin: Position = { x: 0, y: 0 };
 
 const defaultMapProps: MapProps = {
   isDropAnimating: false,

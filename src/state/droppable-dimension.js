@@ -8,7 +8,7 @@ import {
   type Spacing,
 } from 'css-box-model';
 import { vertical, horizontal } from './axis';
-import { subtract, negate } from './position';
+import { subtract, negate, origin } from './position';
 import { offsetByPosition } from './spacing';
 import getMaxScroll from './get-max-scroll';
 import type {
@@ -50,8 +50,6 @@ type GetDroppableArgs = {|
   page: BoxModel,
   closest?: ?Closest,
 |};
-
-const origin: Position = { x: 0, y: 0 };
 
 export const getDroppableDimension = ({
   descriptor,

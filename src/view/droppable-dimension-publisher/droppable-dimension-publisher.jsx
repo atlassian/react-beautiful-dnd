@@ -14,6 +14,7 @@ import {
 import rafSchedule from 'raf-schd';
 import getClosestScrollable from '../get-closest-scrollable';
 import { dimensionMarshalKey } from '../context-keys';
+import { origin } from '../../state/position';
 import {
   getDroppableDimension,
   type Closest,
@@ -41,8 +42,6 @@ type Props = {|
   getDroppableRef: () => ?HTMLElement,
   children: Node,
 |};
-
-const origin: Position = { x: 0, y: 0 };
 
 const getScroll = (el: Element): Position => ({
   x: el.scrollLeft,

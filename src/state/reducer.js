@@ -7,7 +7,7 @@ import getDragImpact from './get-drag-impact';
 import moveInDirection, {
   type Result as MoveInDirectionResult,
 } from './move-in-direction';
-import { add, isEqual, subtract } from './position';
+import { add, isEqual, subtract, origin } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
 import getPageItemPositions from './get-page-item-positions';
@@ -30,8 +30,6 @@ import type {
   DropReason,
 } from '../types';
 import type { Action } from './store-types';
-
-const origin: Position = { x: 0, y: 0 };
 
 const idle: IdleState = { phase: 'IDLE' };
 const preparing: PreparingState = { phase: 'PREPARING' };

@@ -1,6 +1,6 @@
 // @flow
 import { type Position } from 'css-box-model';
-import { add, apply, isEqual } from '../position';
+import { add, apply, isEqual, origin } from '../position';
 import type { Scrollable, DroppableDimension, Viewport } from '../../types';
 
 type CanScrollArgs = {|
@@ -8,8 +8,6 @@ type CanScrollArgs = {|
   current: Position,
   change: Position,
 |};
-
-const origin: Position = { x: 0, y: 0 };
 
 const smallestSigned = apply((value: number) => {
   if (value === 0) {
