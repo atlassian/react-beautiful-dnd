@@ -238,7 +238,9 @@ export default (state: State = idle, action: Action): State => {
 
   if (action.type === 'UPDATE_DROPPABLE_SCROLL') {
     // Not allowing changes while a drop is pending
-    if (state.phase === 'DROP_PENDING' || state.phase === 'DROP_ANIMATING') {
+    // Cannot get this during a DROP_ANIMATING as the dimension
+    // marshal will cancel any pending scroll updates
+    if (state.phase === 'DROP_PENDING') {
       return state;
     }
 
