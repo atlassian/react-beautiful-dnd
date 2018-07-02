@@ -5,7 +5,7 @@ import TaskList from './task-list';
 import initial from './data';
 import reorder from '../reorder';
 import { grid } from '../constants';
-import { DragDropContext } from '../../../src/';
+import { DragDropContext } from "../../../src";
 import type {
   Announce,
   DragStart,
@@ -13,7 +13,7 @@ import type {
   DropResult,
   DraggableLocation,
   HookProvided,
-} from '../../../src/';
+} from "../../../src";
 import type { Task } from '../types';
 
 type State = {|

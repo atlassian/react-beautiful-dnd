@@ -12,7 +12,7 @@ import type {
   DroppableStateSnapshot,
   DraggableProvided,
   DraggableStateSnapshot,
-} from '../../../../../src/';
+} from '../../../../../src';
 
 const Root = styled.div`
   width: 250px;

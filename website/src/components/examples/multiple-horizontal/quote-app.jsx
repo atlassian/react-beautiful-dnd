@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { DragDropContext } from '../../../../../src/';
+import { DragDropContext } from '../../../../../src';
 import AuthorList from '../primatives/author-list';
 import { colors, grid } from '../constants';
 import { reorderQuoteMap } from '../reorder';

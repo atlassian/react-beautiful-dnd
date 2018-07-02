@@ -5,13 +5,13 @@ import { action } from '@storybook/addon-actions';
 import Column from './column';
 import { colors } from '../constants';
 import reorder, { reorderQuoteMap } from '../reorder';
-import { DragDropContext, Droppable } from '../../../src/';
+import { DragDropContext, Droppable } from '../../../src';
 import type {
   DropResult,
   DragStart,
   DraggableLocation,
   DroppableProvided,
-} from '../../../src/';
+} from '../../../src';
 import type { QuoteMap } from '../types';
 
 const publishOnDragStart = action('onDragStart');

@@ -2,13 +2,13 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import memoizeOne from 'memoize-one';
-import { Droppable } from '../../../../../src/';
+import { Droppable } from '../../../../../src';
 import { grid, colors, borderRadius } from '../constants';
 import Task from './task';
 import type {
   DroppableProvided,
   DroppableStateSnapshot,
-} from '../../../../../src/';
+} from '../../../../../src';
 import type { Column as ColumnType } from './types';
 import type { Task as TaskType, Id } from '../types';
 

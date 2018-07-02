@@ -1,14 +1,14 @@
 // @flow
 import React, { type Node } from 'react';
 import styled from 'styled-components';
-import { DragDropContext, Droppable, Draggable } from '../../../../../src/';
+import { DragDropContext, Droppable, Draggable } from '../../../../../src';
 import { grid, colors } from '../constants';
 import reorder from '../reorder';
 import type {
   DropResult,
   DroppableProvided,
   DraggableProvided,
-} from '../../../../../src/';
+} from '../../../../../src';
 
 type ItemType = {|
   id: string,
