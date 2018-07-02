@@ -79,19 +79,16 @@ const getNewMaxScroll = (
   return maxScroll;
 };
 
-export default (store: Store) => {
-  let previous: State = store.getState();
+export default (store: Store) => (next: Action => mixed) => (
+  action: Action,
+): mixed => {
+  const previous: State = store.getState();
+  next(action);
+  const current: State = store.getState();
+  const maxScroll: ?Position = getNewMaxScroll(previous, current, action);
 
-  return (next: Action => mixed) => (action: Action): mixed => {
-    const current: State = store.getState();
-    const maxScroll: ?Position = getNewMaxScroll(previous, current, action);
-    previous = current;
-
-    // max scroll has changed - updating before action
-    if (maxScroll) {
-      next(updateViewportMaxScroll(maxScroll));
-    }
-
-    next(action);
-  };
+  // max scroll has changed - updating before action
+  if (maxScroll) {
+    next(updateViewportMaxScroll(maxScroll));
+  }
 };
