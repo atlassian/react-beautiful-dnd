@@ -3,7 +3,7 @@ import React, { Component, type Element } from 'react';
 import type { SpringHelperConfig } from 'react-motion/lib/Types';
 import { type Position } from 'css-box-model';
 import { Motion, spring } from 'react-motion';
-import { isEqual } from '../../state/position';
+import { isEqual, origin } from '../../state/position';
 import { physics } from '../animation';
 import type { Props, Speed, DefaultProps } from './moveable-types';
 
@@ -11,8 +11,6 @@ type PositionLike = {|
   x: any,
   y: any,
 |};
-
-const origin: Position = { x: 0, y: 0 };
 
 type BlockerProps = {|
   change: Position,

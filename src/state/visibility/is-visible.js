@@ -3,6 +3,7 @@ import { type Position, type Spacing, type Rect } from 'css-box-model';
 import isPartiallyVisibleThroughFrame from './is-partially-visible-through-frame';
 import isTotallyVisibleThroughFrame from './is-totally-visible-through-frame';
 import { offsetByPosition } from '../spacing';
+import { origin } from '../position';
 import type { DroppableDimension } from '../../types';
 
 type Args = {|
@@ -15,8 +16,6 @@ type HelperArgs = {|
   ...Args,
   isVisibleThroughFrameFn: (frame: Spacing) => (subject: Spacing) => boolean,
 |};
-
-const origin: Position = { x: 0, y: 0 };
 
 const isVisible = ({
   target,

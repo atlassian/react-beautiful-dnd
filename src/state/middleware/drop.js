@@ -9,7 +9,7 @@ import {
 } from '../action-creators';
 import noImpact from '../no-impact';
 import getNewHomeClientBorderBoxCenter from '../get-new-home-client-border-box-center';
-import { add, subtract, isEqual } from '../position';
+import { add, subtract, isEqual, origin } from '../position';
 import withDroppableDisplacement from '../with-droppable-displacement';
 import type {
   State,
@@ -25,8 +25,6 @@ import type {
   DraggableDimension,
 } from '../../types';
 import type { Store, Action } from '../store-types';
-
-const origin: Position = { x: 0, y: 0 };
 
 const getScrollDisplacement = (
   droppable: DroppableDimension,

@@ -2,10 +2,9 @@
 import invariant from 'tiny-invariant';
 import { getRect, type Rect, type Position } from 'css-box-model';
 import type { Viewport } from '../../types';
+import { origin } from '../../state/position';
 import getWindowScroll from './get-window-scroll';
 import getMaxScroll from '../../state/get-max-scroll';
-
-const origin: Position = { x: 0, y: 0 };
 
 export default (): Viewport => {
   const scroll: Position = getWindowScroll();
