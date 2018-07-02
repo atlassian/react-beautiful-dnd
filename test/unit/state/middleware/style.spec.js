@@ -50,7 +50,9 @@ it('should use the dragging styles when a dynamic collection is starting', () =>
   expect(marshal.collecting).toHaveBeenCalled();
 });
 
-it('should use the dragging styles after a dynamic publish', () => {
+// TODO: enable when we support dynamic changes
+// eslint-disable-next-line jest/no-disabled-tests
+it.skip('should use the dragging styles after a dynamic publish', () => {
   const marshal: StyleMarshal = getMarshalStub();
   const store: Store = createStore(middleware(marshal));
 

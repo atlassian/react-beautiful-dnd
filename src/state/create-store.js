@@ -9,7 +9,7 @@ import hooks from './middleware/hooks';
 import dropAnimationFinish from './middleware/drop-animation-finish';
 import dimensionMarshalStopper from './middleware/dimension-marshal-stopper';
 import autoScroll from './middleware/auto-scroll';
-import pendingDrop from './middleware/pending-drop';
+// import pendingDrop from './middleware/pending-drop';
 import maxScrollUpdater from './middleware/max-scroll-updater';
 import type { DimensionMarshal } from './dimension-marshal/dimension-marshal-types';
 import type { StyleMarshal } from '../view/style-marshal/style-marshal-types';
@@ -71,12 +71,11 @@ export default ({
         dimensionMarshalStopper(getDimensionMarshal),
         // Fire application hooks in response to drag changes
         lift(getDimensionMarshal),
-        // When a drop is pending and a bulk publish occurs, we need
-        // pendingDrop,
         drop,
         // When a drop animation finishes - fire a drop complete
         dropAnimationFinish,
-        pendingDrop,
+        // TODO: enable for dynamic dimensions
+        // pendingDrop,
         maxScrollUpdater,
         autoScroll(getScroller),
         // Fire hooks for consumers
