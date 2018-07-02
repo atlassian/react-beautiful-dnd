@@ -3,7 +3,7 @@
 /* eslint-disable flowtype/require-valid-file-annotation */
 
 import React, { Component } from 'react';
-import { DragDropContext, Droppable, Draggable } from '../../../src/';
+import { DragDropContext, Droppable, Draggable } from '../../../src';
 
 // fake data generator
 const getItems = count =>

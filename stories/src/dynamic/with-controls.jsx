@@ -2,7 +2,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import QuoteList from '../primatives/quote-list';
-import { DragDropContext } from '../../../src/';
+import { DragDropContext } from '../../../src';
 import { generateQuoteMap, authors } from '../data';
 import { reorderQuoteMap } from '../reorder';
 import { grid } from '../constants';

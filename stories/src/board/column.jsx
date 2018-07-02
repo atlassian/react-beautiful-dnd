@@ -2,8 +2,8 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { grid, colors, borderRadius } from '../constants';
-import { Draggable } from '../../../src/';
-import type { DraggableProvided, DraggableStateSnapshot } from '../../../src/';
+import { Draggable } from '../../../src';
+import type { DraggableProvided, DraggableStateSnapshot } from '../../../src';
 import QuoteList from '../primatives/quote-list';
 import Title from '../primatives/title';
 import type { Quote } from '../types';

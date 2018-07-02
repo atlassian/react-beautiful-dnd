@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Droppable, Draggable } from '../../../../../src';
-import Author from '../primatives/author-item';
+import Author from './author-item';
 import { grid, colors } from '../constants';
 import type { Quote } from '../types';
 import type {
@@ -10,7 +10,7 @@ import type {
   DroppableStateSnapshot,
   DraggableProvided,
   DraggableStateSnapshot,
-} from '../../../../../src/';
+} from '../../../../../src';
 
 const Wrapper = styled.div`
   background-color: ${({ isDraggingOver }) =>

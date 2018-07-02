@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { action } from '@storybook/addon-actions';
-import { DragDropContext } from '../../../src/';
+import { DragDropContext } from '../../../src';
 import AuthorList from '../primatives/author-list';
 import { colors, grid } from '../constants';
 import { reorderQuoteMap } from '../reorder';
