@@ -71,12 +71,11 @@ export default ({
         dimensionMarshalStopper(getDimensionMarshal),
         // Fire application hooks in response to drag changes
         lift(getDimensionMarshal),
-        // When a drop is pending and a bulk publish occurs, we need
-        // pendingDrop,
         drop,
         // When a drop animation finishes - fire a drop complete
         dropAnimationFinish,
-        pendingDrop,
+        // When a drop is pending and a bulk publish occurs, we need
+        // pendingDrop,
         maxScrollUpdater,
         autoScroll(getScroller),
         // Fire hooks for consumers

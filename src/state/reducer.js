@@ -3,7 +3,7 @@ import type { Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import { scrollDroppable } from './droppable-dimension';
 import getDragImpact from './get-drag-impact';
-import publish from './publish';
+// import publish from './publish';
 import moveInDirection, {
   type Result as MoveInDirectionResult,
 } from './move-in-direction';
@@ -192,10 +192,16 @@ export default (state: State = idle, action: Action): State => {
       `Unexpected ${action.type} received in phase ${state.phase}`,
     );
 
-    return publish({
-      state,
-      publish: action.payload,
-    });
+    invariant(
+      false,
+      `Dynamic additions and removals of Draggable and Droppable components
+      is currently not supported. But will be soon!`,
+    );
+
+    // return publish({
+    //   state,
+    //   publish: action.payload,
+    // });
   }
 
   if (action.type === 'MOVE') {
