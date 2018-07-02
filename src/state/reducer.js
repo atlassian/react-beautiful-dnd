@@ -397,6 +397,30 @@ export default (state: State = idle, action: Action): State => {
     });
   }
 
+  if (action.type === 'UPDATE_VIEWPORT_MAX_SCROLL') {
+    invariant(
+      state.isDragging,
+      'Cannot update the max viewport scroll if not dragging',
+    );
+    const existing: Viewport = state.viewport;
+    const viewport: Viewport = {
+      ...existing,
+      scroll: {
+        ...existing.scroll,
+        max: action.payload,
+      },
+    };
+
+    return {
+      // appeasing flow
+      phase: 'DRAGGING',
+      ...state,
+      // eslint-disable-next-line
+      phase: state.phase,
+      viewport,
+    };
+  }
+
   if (
     action.type === 'MOVE_UP' ||
     action.type === 'MOVE_DOWN' ||

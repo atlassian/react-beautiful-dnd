@@ -139,6 +139,18 @@ export const moveByWindowScroll = (
   payload: args,
 });
 
+type UpdateViewportMaxScrollAction = {|
+  type: 'UPDATE_VIEWPORT_MAX_SCROLL',
+  payload: Position,
+|};
+
+export const updateViewportMaxScroll = (
+  max: Position,
+): UpdateViewportMaxScrollAction => ({
+  type: 'UPDATE_VIEWPORT_MAX_SCROLL',
+  payload: max,
+});
+
 export type MoveUpAction = {|
   type: 'MOVE_UP',
   payload: null,
@@ -261,6 +273,7 @@ export type Action =
   | UpdateDroppableScrollAction
   | UpdateDroppableIsEnabledAction
   | MoveByWindowScrollAction
+  | UpdateViewportMaxScrollAction
   | MoveAction
   | MoveUpAction
   | MoveDownAction

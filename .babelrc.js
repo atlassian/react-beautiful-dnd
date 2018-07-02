@@ -7,7 +7,8 @@ module.exports = {
   plugins: [
     ['@babel/proposal-class-properties', { loose: true }],
     ['@babel/proposal-object-rest-spread', { loose: true }],
-    'dev-expression'
+    // used for stripping out the `invariant` messages in production builds
+    'dev-expression',
   ],
   comments: false,
 };
