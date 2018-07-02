@@ -6,6 +6,7 @@ import type { Action, Store } from '../store-types';
 import getMaxScroll from '../get-max-scroll';
 import { isEqual } from '../position';
 import { updateViewportMaxScroll } from '../action-creators';
+import isMovementAllowed from '../is-movement-allowed';
 
 const shouldCheckMaxScroll = (action: Action): boolean =>
   action.type === 'MOVE' ||
@@ -16,7 +17,7 @@ const shouldCheckMaxScroll = (action: Action): boolean =>
   action.type === 'MOVE_BY_WINDOW_SCROLL';
 
 const getNewMaxScroll = (state: State, action: Action): ?Position => {
-  if (!state.isDragging) {
+  if (!isMovementAllowed(state)) {
     return null;
   }
 

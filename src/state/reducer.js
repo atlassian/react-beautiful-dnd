@@ -11,6 +11,7 @@ import { add, isEqual, subtract } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
 import getPageItemPositions from './get-page-item-positions';
+import isMovementAllowed from './is-movement-allowed';
 import type {
   State,
   DroppableDimension,
@@ -45,11 +46,6 @@ type MoveArgs = {|
   // provide a scroll jump request (optionally provided - and can be null)
   scrollJumpRequest?: ?Position,
 |};
-
-// Using function declaration as arrow function does not play well with the %checks syntax
-function isMovementAllowed(state: State): boolean %checks {
-  return state.phase === 'DRAGGING' || state.phase === 'COLLECTING';
-}
 
 const moveWithPositionUpdates = ({
   state,
@@ -242,7 +238,7 @@ export default (state: State = idle, action: Action): State => {
 
   if (action.type === 'UPDATE_DROPPABLE_SCROLL') {
     // Not allowing changes while a drop is pending
-    if (state.phase === 'DROP_PENDING') {
+    if (state.phase === 'DROP_PENDING' || state.phase === 'DROP_ANIMATING') {
       return state;
     }
 
