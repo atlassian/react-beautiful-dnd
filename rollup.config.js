@@ -22,7 +22,18 @@ const getBabelOptions = ({ useESModules }) => ({
   plugins: [['@babel/transform-runtime', { useESModules }]],
 });
 
-const matchSnapshot = process.env.SNAPSHOT === 'match';
+const snapshotArgs = (() => {
+  const shouldMatch = process.env.SNAPSHOT === 'match';
+
+  if (!shouldMatch) {
+    return {};
+  }
+
+  return {
+    matchSnapshot: true,
+    threshold: 1000,
+  };
+})();
 
 export default [
   // Universal module definition (UMD) build
@@ -43,7 +54,7 @@ export default [
       resolve({ extensions }),
       commonjs({ include: 'node_modules/**' }),
       replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
-      sizeSnapshot({ matchSnapshot }),
+      sizeSnapshot(snapshotArgs),
     ],
   },
   // Minified UMD build
@@ -63,7 +74,7 @@ export default [
       commonjs({ include: 'node_modules/**' }),
       strip({ debugger: true }),
       replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
-      sizeSnapshot({ matchSnapshot }),
+      sizeSnapshot(snapshotArgs),
       uglify(),
     ],
   },
@@ -89,7 +100,7 @@ export default [
     plugins: [
       resolve({ extensions }),
       babel(getBabelOptions({ useESModules: true })),
-      sizeSnapshot({ matchSnapshot }),
+      sizeSnapshot(snapshotArgs),
     ],
   },
 ];
