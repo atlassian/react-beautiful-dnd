@@ -15,9 +15,7 @@ const shouldCheckMaxScroll = (action: Action): boolean =>
   action.type === 'MOVE_LEFT' ||
   action.type === 'MOVE_BY_WINDOW_SCROLL';
 
-const getNewMaxScroll = (store: Store, action: Action): ?Position => {
-  const state: State = store.getState();
-
+const getNewMaxScroll = (state: State, action: Action): ?Position => {
   if (!state.isDragging) {
     return null;
   }
@@ -41,27 +39,18 @@ const getNewMaxScroll = (store: Store, action: Action): ?Position => {
     height: viewport.frame.height,
   });
 
+  // No change from current max scroll
   if (isEqual(maxScroll, viewport.scroll.max)) {
     return null;
   }
 
-  // max scroll has changed - updating before action
   return maxScroll;
-  // next(updateViewportMaxScroll(maxScroll));
-  // next(action);
 };
 
 export default (store: Store) => (next: Action => mixed) => (
   action: Action,
 ): mixed => {
-  const initial: State = store.getState();
-  if (!initial.isDragging) {
-    next(action);
-    return;
-  }
-
-  const maxScroll: ?Position = getNewMaxScroll(store, action);
-
+  const maxScroll: ?Position = getNewMaxScroll(store.getState(), action);
   // max scroll has changed - updating before action
   if (maxScroll) {
     next(updateViewportMaxScroll(maxScroll));
