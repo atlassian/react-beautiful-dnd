@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { colors, grid } from '../constants';
-import type { DraggableProvided, DraggableStateSnapshot } from '../../../src/';
+import type { DraggableProvided, DraggableStateSnapshot } from '../../../src';
 import type { Author } from '../types';
 
 const Avatar = styled.img`

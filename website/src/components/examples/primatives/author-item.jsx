@@ -1,15 +1,12 @@
 // @flow
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { colors, grid } from '../constants';
 import type {
   DraggableProvided,
   DraggableStateSnapshot,
-} from '../../../../../src/';
+} from '../../../../../src';
 import type { Author } from '../types';
-
-type HTMLElement = any;
 
 const Avatar = styled.img`
   width: 60px;

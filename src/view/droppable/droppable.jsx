@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import type { Props, Provided, StateSnapshot } from './droppable-types';
 import type { DroppableId, TypeId } from '../../types';
-import DroppableDimensionPublisher from '../droppable-dimension-publisher/';
-import Placeholder from '../placeholder/';
+import DroppableDimensionPublisher from '../droppable-dimension-publisher';
+import Placeholder from '../placeholder';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 import {
   droppableIdKey,

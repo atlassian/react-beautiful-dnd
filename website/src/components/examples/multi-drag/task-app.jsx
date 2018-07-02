@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { DragDropContext } from '../../../../../src/';
+import { DragDropContext } from '../../../../../src';
 import initial from './data';
 import Column from './column';
 import type { Result as ReorderResult } from './utils';
@@ -10,7 +10,7 @@ import type {
   DragStart,
   DropResult,
   DraggableLocation,
-} from '../../../../../src/';
+} from '../../../../../src';
 import type { Task, Id } from '../types';
 import type { Entities } from './types';
 

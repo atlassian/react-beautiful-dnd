@@ -2,16 +2,16 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Droppable, Draggable } from '../../../../../src';
-import QuoteItem from '../primatives/quote-item';
+import QuoteItem from './quote-item';
 import { grid, colors } from '../constants';
-import Title from '../primatives/title';
+import Title from './title';
 import type { Quote } from '../types';
 import type {
   DroppableProvided,
   DroppableStateSnapshot,
   DraggableProvided,
   DraggableStateSnapshot,
-} from '../../../../../src/';
+} from '../../../../../src';
 
 const Wrapper = styled.div`
   background-color: ${({ isDraggingOver }) =>

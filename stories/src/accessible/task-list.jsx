@@ -1,9 +1,9 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Droppable } from '../../../src/';
+import { Droppable } from '../../../src';
 import Task from './task';
-import type { DroppableProvided } from '../../../src/';
+import type { DroppableProvided } from '../../../src';
 import type { Task as TaskType } from '../types';
 import { colors, grid, borderRadius } from '../constants';
 
