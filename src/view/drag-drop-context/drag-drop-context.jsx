@@ -1,11 +1,12 @@
 // @flow
 import React, { type Node } from 'react';
-import { type Position } from 'css-box-model';
+import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
-import createHookCaller from '../../state/hooks/hook-caller';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
-import createStyleMarshal, { resetStyleContext } from '../style-marshal/style-marshal';
+import createStyleMarshal, {
+  resetStyleContext,
+} from '../style-marshal/style-marshal';
 import canStartDrag from '../../state/can-start-drag';
 import scrollWindow from '../window/scroll-window';
 import createAnnouncer from '../announcer/announcer';
@@ -17,19 +18,8 @@ import type {
   DimensionMarshal,
   Callbacks as DimensionMarshalCallbacks,
 } from '../../state/dimension-marshal/dimension-marshal-types';
-import type {
-  DraggableId,
-  Store,
-  State,
-  DraggableDimension,
-  DroppableDimension,
-  DroppableId,
-  Hooks,
-  Viewport,
-} from '../../types';
-import type {
-  HookCaller,
-} from '../../state/hooks/hooks-types';
+import type { DraggableId, State, Hooks } from '../../types';
+import type { Store } from '../../state/store-types';
 import {
   storeKey,
   dimensionMarshalKey,
@@ -39,138 +29,90 @@ import {
 import {
   clean,
   move,
-  publishDraggableDimension,
-  publishDroppableDimension,
-  updateDroppableDimensionScroll,
-  updateDroppableDimensionIsEnabled,
-  bulkPublishDimensions,
+  publish,
+  updateDroppableScroll,
+  updateDroppableIsEnabled,
+  collectionStarting,
 } from '../../state/action-creators';
 
 type Props = {|
   ...Hooks,
   children: ?Node,
-|}
+|};
 
 type Context = {
-  [string]: Store
-}
+  [string]: Store,
+};
 
 // Reset any context that gets persisted across server side renders
 export const resetServerContext = () => {
   resetStyleContext();
 };
 
+const printFatalDevError = (error: Error) => {
+  if (process.env.NODE_ENV === 'production') {
+    return;
+  }
+  console.warn(`
+    An error has occurred while a drag is occurring.
+    Any existing drag will be cancelled.
+
+    Raw error:
+  `);
+  console.error(error);
+};
+
 export default class DragDropContext extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
-  store: Store
-  dimensionMarshal: DimensionMarshal
-  styleMarshal: StyleMarshal
-  autoScroller: AutoScroller
-  hookCaller: HookCaller
-  announcer: Announcer
-  unsubscribe: Function
+  store: Store;
+  dimensionMarshal: DimensionMarshal;
+  styleMarshal: StyleMarshal;
+  autoScroller: AutoScroller;
+  announcer: Announcer;
+  unsubscribe: Function;
 
   constructor(props: Props, context: mixed) {
     super(props, context);
 
-    this.store = createStore();
-
     this.announcer = createAnnouncer();
-
-    // create the hook caller
-    this.hookCaller = createHookCaller(this.announcer.announce);
 
     // create the style marshal
     this.styleMarshal = createStyleMarshal();
 
-    // create the dimension marshal
-    const callbacks: DimensionMarshalCallbacks = {
-      cancel: () => {
-        this.store.dispatch(clean());
-      },
-      publishDraggable: (dimension: DraggableDimension) => {
-        this.store.dispatch(publishDraggableDimension(dimension));
-      },
-      publishDroppable: (dimension: DroppableDimension) => {
-        this.store.dispatch(publishDroppableDimension(dimension));
-      },
-      bulkPublish: (droppables: DroppableDimension[], draggables: DraggableDimension[]) => {
-        this.store.dispatch(bulkPublishDimensions(droppables, draggables));
-      },
-      updateDroppableScroll: (id: DroppableId, newScroll: Position) => {
-        this.store.dispatch(updateDroppableDimensionScroll(id, newScroll));
-      },
-      updateDroppableIsEnabled: (id: DroppableId, isEnabled: boolean) => {
-        this.store.dispatch(updateDroppableDimensionIsEnabled(id, isEnabled));
-      },
-    };
-    this.dimensionMarshal = createDimensionMarshal(callbacks);
-    this.autoScroller = createAutoScroller({
-      scrollWindow,
-      scrollDroppable: this.dimensionMarshal.scrollDroppable,
-      move: (
-        id: DraggableId,
-        client: Position,
-        viewport: Viewport,
-        shouldAnimate?: boolean
-      ): void => {
-        this.store.dispatch(move(id, client, viewport, shouldAnimate));
-      },
-    });
-
-    let previous: State = this.store.getState();
-
-    this.unsubscribe = this.store.subscribe(() => {
-      const current = this.store.getState();
-      const previousInThisExecution: State = previous;
-      const isPhaseChanging: boolean = current.phase !== previous.phase;
-      // setting previous now rather than at the end of this function
-      // incase a function is called that syncorously causes a state update
-      // which will re-invoke this function before it has completed a previous
-      // invocation.
-      previous = current;
-
-      // Style updates do not cause more actions. It is important to update styles
-      // before hooks are called: specifically the onDragEnd hook. We need to clear
-      // the transition styles off the elements before a reorder to prevent strange
-      // post drag animations in firefox. Even though we clear the transition off
-      // a Draggable - if it is done after a reorder firefox will still apply the
-      // transition.
-      if (isPhaseChanging) {
-        this.styleMarshal.onPhaseChange(current);
-      }
-
-      const isDragEnding: boolean = previousInThisExecution.phase === 'DRAGGING' && current.phase !== 'DRAGGING';
-
-      // in the case that a drag is ending we need to instruct the dimension marshal
-      // to stop listening to changes. Otherwise it will try to process
-      // changes after the reorder in onDragEnd
-      if (isDragEnding) {
-        this.dimensionMarshal.onPhaseChange(current);
-      }
-
-      // We recreate the Hook object so that consumers can pass in new
-      // hook props at any time (eg if they are using arrow functions)
-      const hooks: Hooks = {
+    this.store = createStore({
+      // Lazy reference to dimension marshal get around circular dependency
+      getDimensionMarshal: (): DimensionMarshal => this.dimensionMarshal,
+      styleMarshal: this.styleMarshal,
+      // This is a function as users are allowed to change their hook functions
+      // at any time
+      getHooks: (): Hooks => ({
         onDragStart: this.props.onDragStart,
         onDragEnd: this.props.onDragEnd,
         onDragUpdate: this.props.onDragUpdate,
-      };
-      this.hookCaller.onStateChange(hooks, previousInThisExecution, current);
+      }),
+      announce: this.announcer.announce,
+      getScroller: () => this.autoScroller,
+    });
+    const callbacks: DimensionMarshalCallbacks = bindActionCreators(
+      {
+        collectionStarting,
+        publish,
+        updateDroppableScroll,
+        updateDroppableIsEnabled,
+      },
+      this.store.dispatch,
+    );
+    this.dimensionMarshal = createDimensionMarshal(callbacks);
 
-      // The following two functions are dangerous. They can both syncronously
-      // create new actions that update the application state. That will cause
-      // this subscription function to be called again before the next line is called.
-
-      // if isDragEnding we have already called the marshal
-      if (isPhaseChanging && !isDragEnding) {
-        this.dimensionMarshal.onPhaseChange(current);
-      }
-
-      // We could block this action from being called if this function has been reinvoked
-      // before completing and dragging and autoScrollMode === 'FLUID'.
-      // However, it is not needed at this time
-      this.autoScroller.onStateChange(previousInThisExecution, current);
+    this.autoScroller = createAutoScroller({
+      scrollWindow,
+      scrollDroppable: this.dimensionMarshal.scrollDroppable,
+      ...bindActionCreators(
+        {
+          move,
+        },
+        this.store.dispatch,
+      ),
     });
   }
   // Need to declare childContextTypes without flow
@@ -184,8 +126,7 @@ export default class DragDropContext extends React.Component<Props> {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
     [styleContextKey]: PropTypes.string.isRequired,
     [canLiftContextKey]: PropTypes.func.isRequired,
-  }
-  /* eslint-enable */
+  };
 
   getChildContext(): Context {
     return {
@@ -206,15 +147,46 @@ export default class DragDropContext extends React.Component<Props> {
   canLift = (id: DraggableId) => canStartDrag(this.store.getState(), id);
 
   componentDidMount() {
+    window.addEventListener('error', this.onWindowError);
     this.styleMarshal.mount();
     this.announcer.mount();
   }
 
+  componentDidCatch(error: Error) {
+    this.onFatalError(error);
+
+    // If the failure was due to an invariant failure - then we handle the error
+    if (error.message.indexOf('Invariant failed') !== -1) {
+      this.setState({});
+      return;
+    }
+
+    // Error is more serious and we throw it
+    throw error;
+  }
+
   componentWillUnmount() {
-    this.unsubscribe();
+    window.addEventListener('error', this.onWindowError);
+
+    const state: State = this.store.getState();
+    if (state.phase !== 'IDLE') {
+      this.store.dispatch(clean());
+    }
+
     this.styleMarshal.unmount();
     this.announcer.unmount();
   }
+
+  onFatalError = (error: Error) => {
+    printFatalDevError(error);
+
+    const state: State = this.store.getState();
+    if (state.phase !== 'IDLE') {
+      this.store.dispatch(clean());
+    }
+  };
+
+  onWindowError = (error: Error) => this.onFatalError(error);
 
   render() {
     return this.props.children;

@@ -3,7 +3,7 @@
 /* eslint-disable flowtype/require-valid-file-annotation */
 
 import React, { Component } from 'react';
-import { DragDropContext, Droppable, Draggable } from '../../../src/';
+import { DragDropContext, Droppable, Draggable } from '../../../src';
 
 // fake data generator
 const getItems = count =>
@@ -60,7 +60,7 @@ export default class App extends Component {
     const items = reorder(
       this.state.items,
       result.source.index,
-      result.destination.index
+      result.destination.index,
     );
 
     this.setState({
@@ -88,7 +88,7 @@ export default class App extends Component {
                       {...draggableProvided.dragHandleProps}
                       style={getItemStyle(
                         draggableSnapshot.isDragging,
-                        draggableProvided.draggableProps.style
+                        draggableProvided.draggableProps.style,
                       )}
                     >
                       {item.content}

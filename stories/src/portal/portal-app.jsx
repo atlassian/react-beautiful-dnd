@@ -17,7 +17,7 @@ type ItemProps = {|
   provided: DraggableProvided,
   snapshot: DraggableStateSnapshot,
   quote: Quote,
-|}
+|};
 
 const portal: HTMLElement = document.createElement('div');
 portal.classList.add('my-super-cool-portal');
@@ -39,7 +39,9 @@ const SimpleQuote = styled.div`
 
   /* stylelint-disable  comment-empty-line-before */
   /* add little portal indicator when in a portal */
-  ${props => (props.inPortal ? (`
+  ${props =>
+    props.inPortal
+      ? `
     ::after {
       position: absolute;
       background: lightgreen;
@@ -48,8 +50,8 @@ const SimpleQuote = styled.div`
       right: 0;
       content: "in portal";
     }
-  `) : '')}
-  /* stylelint-enable */
+  `
+      : ''} /* stylelint-enable */;
 `;
 
 class PortalAwareItem extends Component<ItemProps> {
@@ -82,11 +84,11 @@ class PortalAwareItem extends Component<ItemProps> {
 
 type AppProps = {|
   initial: Quote[],
-|}
+|};
 
 type AppState = {|
   quotes: Quote[],
-|}
+|};
 
 const Container = styled.div`
   margin: 0 auto;
@@ -96,11 +98,14 @@ const Container = styled.div`
 export default class PortalApp extends Component<AppProps, AppState> {
   state: AppState = {
     quotes: this.props.initial,
-  }
+  };
 
   onDragEnd = (result: DropResult) => {
     // dropped outside the list
-    if (!result.destination || result.destination.index === result.source.index) {
+    if (
+      !result.destination ||
+      result.destination.index === result.source.index
+    ) {
       return;
     }
 
@@ -112,29 +117,34 @@ export default class PortalApp extends Component<AppProps, AppState> {
     const quotes = reorder(
       this.state.quotes,
       result.source.index,
-      result.destination.index
+      result.destination.index,
     );
 
     this.setState({
       quotes,
     });
-  }
+  };
 
   render() {
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
         <Droppable droppableId="droppable">
           {(droppableProvided: DroppableProvided) => (
-            <Container innerRef={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
+            <Container
+              innerRef={droppableProvided.innerRef}
+              {...droppableProvided.droppableProps}
+            >
               {this.state.quotes.map((quote: Quote, index: number) => (
                 <Draggable draggableId={quote.id} index={index} key={quote.id}>
-                  {(draggableProvided: DraggableProvided,
-                    draggableSnapshot: DraggableStateSnapshot) => (
-                      <PortalAwareItem
-                        quote={quote}
-                        provided={draggableProvided}
-                        snapshot={draggableSnapshot}
-                      />
+                  {(
+                    draggableProvided: DraggableProvided,
+                    draggableSnapshot: DraggableStateSnapshot,
+                  ) => (
+                    <PortalAwareItem
+                      quote={quote}
+                      provided={draggableProvided}
+                      snapshot={draggableSnapshot}
+                    />
                   )}
                 </Draggable>
               ))}

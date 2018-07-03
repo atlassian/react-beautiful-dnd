@@ -18,7 +18,7 @@ const ActionBox = styled.div`
     flex-direction: column;
     align-items: stretch;
     min-width: 60vw;
-  `}
+  `};
 `;
 
 const ActionLink = styled(Link)`
@@ -52,14 +52,15 @@ const ActionLink = styled(Link)`
     margin-left: 0;
     margin-right: 0;
     margin-bottom: 8px;
-  `}
+  `};
 `;
 
 const ButtonIcon = styled.span`
   display: flex;
   margin-left: ${grid / 2}px;
 
-  ${ActionLink}:hover &, ${ActionLink}:active & {
+  ${ActionLink}:hover &,
+  ${ActionLink}:active & {
     animation: ${shake};
   }
 `;
@@ -69,7 +70,8 @@ const GetStartedLink = ActionLink.extend`
   border-color: ${colors.G100};
   margin-left: 0;
 
-  :hover, :active {
+  :hover,
+  :active {
     background-color: ${colors.G200};
   }
 `;
@@ -78,7 +80,8 @@ const ExampleLink = ActionLink.extend`
   background-color: ${colors.Y300};
   border-color: ${colors.Y100};
 
-  :hover, :active {
+  :hover,
+  :active {
     background-color: ${colors.Y200};
   }
 `;
@@ -118,4 +121,3 @@ export default () => (
     </DocumentationLink>
   </ActionBox>
 );
-

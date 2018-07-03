@@ -29,9 +29,7 @@ const princess: Author = {
   avatarUrl: 'https://68.media.tumblr.com/avatar_ec98529441c4_128.png',
 };
 
-export const authors: Author[] = [
-  jake, BMO, finn, princess,
-];
+export const authors: Author[] = [jake, BMO, finn, princess];
 
 export const quotes: Quote[] = [
   {
@@ -41,12 +39,13 @@ export const quotes: Quote[] = [
   },
   {
     id: '2',
-    content: 'Sucking at something is the first step towards being sorta good at something.',
+    content:
+      'Sucking at something is the first step towards being sorta good at something.',
     author: jake,
   },
   {
     id: '3',
-    content: 'You got to focus on what\'s real, man',
+    content: "You got to focus on what's real, man",
     author: jake,
   },
   {
@@ -66,7 +65,8 @@ export const quotes: Quote[] = [
   },
   {
     id: '7',
-    content: 'That\'s it! The answer was so simple, I was too smart to see it!, That\'s it! The answer was so simple, I was too smart to see it!, That\'s it! The answer was so simple, I was too smart to see it!, That\'s it! The answer was so simple, I was too smart to see it!',
+    content:
+      "That's it! The answer was so simple, I was too smart to see it!, That's it! The answer was so simple, I was too smart to see it!, That's it! The answer was so simple, I was too smart to see it!, That's it! The answer was so simple, I was too smart to see it!",
     author: princess,
   },
   {
@@ -76,7 +76,7 @@ export const quotes: Quote[] = [
   },
   {
     id: '9',
-    content: 'Don\'t you always call sweatpants \'give up on life pants,\' Jake?',
+    content: "Don't you always call sweatpants 'give up on life pants,' Jake?",
     author: finn,
   },
   {
@@ -91,7 +91,7 @@ export const quotes: Quote[] = [
   },
   {
     id: '12',
-    content: 'Haven\'t slept for a solid 83 hours, but, yeah, I\'m good.',
+    content: "Haven't slept for a solid 83 hours, but, yeah, I'm good.",
     author: princess,
   },
 ];
@@ -128,16 +128,19 @@ export const getAuthors = (count: number): Author[] =>
 const getByAuthor = (author: Author, items: Quote[]): Quote[] =>
   items.filter((quote: Quote) => quote.author === author);
 
-export const authorQuoteMap: QuoteMap =
-  authors.reduce((previous: QuoteMap, author: Author) => ({
-    ...previous,
-    [author.name]: getByAuthor(author, quotes),
-  }), {});
-
-export const generateQuoteMap = (total: number): QuoteMap => authors.reduce(
+export const authorQuoteMap: QuoteMap = authors.reduce(
   (previous: QuoteMap, author: Author) => ({
     ...previous,
-    [author.name]: getQuotes(total / authors.length),
+    [author.name]: getByAuthor(author, quotes),
   }),
-  {}
+  {},
 );
+
+export const generateQuoteMap = (total: number): QuoteMap =>
+  authors.reduce(
+    (previous: QuoteMap, author: Author) => ({
+      ...previous,
+      [author.name]: getQuotes(total / authors.length),
+    }),
+    {},
+  );

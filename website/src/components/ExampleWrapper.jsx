@@ -26,7 +26,6 @@ const ActionLink = styled.button`
   margin: 0 ${grid}px;
   padding: ${grid * 1}px ${grid * 2}px;
   border-radius: 2px;
-  border-radius: 2px;
   color: ${colors.N10};
   font-size: 1.1rem;
   font-weight: bold;
@@ -67,7 +66,7 @@ const Wrapper = styled.div`
 type Props = {
   children: Node,
   path: string,
-  title: string
+  title: string,
 };
 
 const ExampleWrapper = ({ children, path, title }: Props) => (

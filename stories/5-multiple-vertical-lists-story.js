@@ -29,7 +29,6 @@ const quoteMap: QuoteMap = {
   [kappa]: getQuotes(5),
 };
 
-storiesOf('multiple vertical lists', module)
-  .add('stress test', () => (
-    <QuoteApp initial={quoteMap} />
-  ));
+storiesOf('multiple vertical lists', module).add('stress test', () => (
+  <QuoteApp initial={quoteMap} />
+));

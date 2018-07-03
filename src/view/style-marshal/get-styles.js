@@ -3,16 +3,23 @@ import { css } from '../animation';
 import * as attributes from '../data-attributes';
 
 export type Styles = {|
+  collecting: string,
   dragging: string,
   resting: string,
   dropAnimating: string,
   userCancel: string,
-|}
+|};
 
 export default (styleContext: string): Styles => {
-  const dragHandleSelector: string = `[${attributes.dragHandle}="${styleContext}"]`;
-  const draggableSelector: string = `[${attributes.draggable}="${styleContext}"]`;
-  const droppableSelector: string = `[${attributes.droppable}="${styleContext}"]`;
+  const dragHandleSelector: string = `[${
+    attributes.dragHandle
+  }="${styleContext}"]`;
+  const draggableSelector: string = `[${
+    attributes.draggable
+  }="${styleContext}"]`;
+  const droppableSelector: string = `[${
+    attributes.droppable
+  }="${styleContext}"]`;
 
   // ## Drag handle styles
 
@@ -131,36 +138,35 @@ export default (styleContext: string): Styles => {
     `,
   };
 
-  const base: string[] = [
-    dragHandleStyles.base,
-    droppableStyles.base,
-  ];
+  const base: string[] = [dragHandleStyles.base, droppableStyles.base];
 
-  const resting: string = [
-    ...base,
-    dragHandleStyles.grabCursor,
-  ].join('');
+  const resting: string[] = [...base, dragHandleStyles.grabCursor];
 
-  const dragging: string = [
+  // while collecting we do not animate movements
+  const collecting: string[] = [
     ...base,
     dragHandleStyles.blockPointerEvents,
-    draggableStyles.animateMovement,
     bodyStyles.whileActiveDragging,
-  ].join('');
+  ];
 
-  const dropAnimating: string = [
+  // while dragging we animate movements
+  const dragging: string[] = [...collecting, draggableStyles.animateMovement];
+
+  const dropAnimating: string[] = [
     ...base,
     dragHandleStyles.grabCursor,
     draggableStyles.animateMovement,
-  ].join('');
+  ];
 
   // Not applying grab cursor during a cancel as it is not possible for users to reorder
   // items during a cancel
-  const userCancel: string = [
-    ...base,
-    draggableStyles.animateMovement,
-  ].join('');
+  const userCancel: string[] = [...base, draggableStyles.animateMovement];
 
-  return { resting, dragging, dropAnimating, userCancel };
+  return {
+    resting: resting.join(''),
+    dragging: dragging.join(''),
+    dropAnimating: dropAnimating.join(''),
+    collecting: collecting.join(''),
+    userCancel: userCancel.join(''),
+  };
 };
-

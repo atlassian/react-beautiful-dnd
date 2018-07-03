@@ -2,8 +2,8 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { grid, colors, borderRadius } from '../constants';
-import { Draggable } from '../../../src/';
-import type { DraggableProvided, DraggableStateSnapshot } from '../../../src/';
+import { Draggable } from '../../../src';
+import type { DraggableProvided, DraggableStateSnapshot } from '../../../src';
 import QuoteList from '../primatives/quote-list';
 import Title from '../primatives/title';
 import type { Quote } from '../types';
@@ -20,7 +20,8 @@ const Header = styled.div`
   justify-content: center;
   border-top-left-radius: ${borderRadius}px;
   border-top-right-radius: ${borderRadius}px;
-  background-color: ${({ isDragging }) => (isDragging ? colors.blue.lighter : colors.blue.light)};
+  background-color: ${({ isDragging }) =>
+    isDragging ? colors.blue.lighter : colors.blue.light};
   transition: background-color 0.1s ease;
 
   &:hover {
@@ -32,7 +33,7 @@ type Props = {|
   title: string,
   quotes: Quote[],
   index: number,
-|}
+|};
 
 export default class Column extends Component<Props> {
   render() {
@@ -42,10 +43,7 @@ export default class Column extends Component<Props> {
     return (
       <Draggable draggableId={title} index={index}>
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
-          <Container
-            innerRef={provided.innerRef}
-            {...provided.draggableProps}
-          >
+          <Container innerRef={provided.innerRef} {...provided.draggableProps}>
             <Header isDragging={snapshot.isDragging}>
               <Title
                 isDragging={snapshot.isDragging}
@@ -54,14 +52,9 @@ export default class Column extends Component<Props> {
                 {title}
               </Title>
             </Header>
-            <QuoteList
-              listId={title}
-              listType="QUOTE"
-              quotes={quotes}
-            />
+            <QuoteList listId={title} listType="QUOTE" quotes={quotes} />
           </Container>
         )}
-
       </Draggable>
     );
   }

@@ -3,18 +3,17 @@ import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import isPositionInFrame from '../visibility/is-position-in-frame';
+import { toDroppableList } from '../dimension-structures';
 import type {
-  DroppableId,
   DroppableDimension,
   DroppableDimensionMap,
   DraggableLocation,
 } from '../../types';
 
 const getScrollableDroppables = memoizeOne(
-  (droppables: DroppableDimensionMap): DroppableDimension[] => (
-    Object.keys(droppables)
-      .map((id: DroppableId): DroppableDimension => droppables[id])
-      .filter((droppable: DroppableDimension): boolean => {
+  (droppables: DroppableDimensionMap): DroppableDimension[] =>
+    toDroppableList(droppables).filter(
+      (droppable: DroppableDimension): boolean => {
         // exclude disabled droppables
         if (!droppable.isEnabled) {
           return false;
@@ -26,20 +25,22 @@ const getScrollableDroppables = memoizeOne(
         }
 
         return true;
-      })
-  )
+      },
+    ),
 );
 
 const getScrollableDroppableOver = (
   target: Position,
-  droppables: DroppableDimensionMap
+  droppables: DroppableDimensionMap,
 ): ?DroppableDimension => {
-  const maybe: ?DroppableDimension =
-    getScrollableDroppables(droppables)
-      .find((droppable: DroppableDimension): boolean => {
-        invariant(droppable.viewport.closestScrollable, 'Invalid result');
-        return isPositionInFrame(droppable.viewport.closestScrollable.framePageMarginBox)(target);
-      });
+  const maybe: ?DroppableDimension = getScrollableDroppables(droppables).find(
+    (droppable: DroppableDimension): boolean => {
+      invariant(droppable.viewport.closestScrollable, 'Invalid result');
+      return isPositionInFrame(
+        droppable.viewport.closestScrollable.framePageMarginBox,
+      )(target);
+    },
+  );
 
   return maybe;
 };
@@ -48,7 +49,7 @@ type Api = {|
   center: Position,
   destination: ?DraggableLocation,
   droppables: DroppableDimensionMap,
-|}
+|};
 
 export default ({
   center,

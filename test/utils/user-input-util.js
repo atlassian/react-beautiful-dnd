@@ -47,9 +47,7 @@ export const dispatchWindowMouseEvent = (
   return event;
 };
 
-export const dispatchWindowKeyDownEvent = (
-  keyCode: number,
-): KeyboardEvent => {
+export const dispatchWindowKeyDownEvent = (keyCode: number): KeyboardEvent => {
   const event = new window.KeyboardEvent('keydown', {
     bubbles: true,
     cancelable: true,
@@ -59,7 +57,10 @@ export const dispatchWindowKeyDownEvent = (
   return event;
 };
 
-export const dispatchWindowEvent = (eventName: string, options?: Object = {}): Event => {
+export const dispatchWindowEvent = (
+  eventName: string,
+  options?: Object = {},
+): Event => {
   const event: Event = document.createEvent('Event');
   event.initEvent(eventName, true, true);
 
@@ -109,10 +110,12 @@ export const mouseEvent = (
   });
 };
 
-export const withKeyboard = (keyCode: number): Function =>
-  (wrapper: ReactWrapper, options?: Object = {}): void => {
-    wrapper.simulate('keydown', { keyCode, ...options });
-  };
+export const withKeyboard = (keyCode: number): Function => (
+  wrapper: ReactWrapper,
+  options?: Object = {},
+): void => {
+  wrapper.simulate('keydown', { keyCode, ...options });
+};
 
 export const touchEvent = (
   eventName: string,
@@ -121,10 +124,7 @@ export const touchEvent = (
   force?: number = 0,
   options?: Object = {},
 ): void => {
-  const touches: Object[] = [
-    getTouch(client, force),
-  ];
+  const touches: Object[] = [getTouch(client, force)];
 
   wrapper.simulate(eventName, { touches, ...options });
 };
-

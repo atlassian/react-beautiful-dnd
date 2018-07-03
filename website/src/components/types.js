@@ -7,27 +7,27 @@ export type Author = {|
   avatarUrl: string,
   colors: {|
     soft: string,
-    medium: string
+    medium: string,
     // strong: string,
-  |}
+  |},
 |};
 
 export type AuthorMap = {
-  [authorId: Id]: Author
+  [authorId: Id]: Author,
 };
 
 export type Quote = {|
   id: Id,
   content: string,
-  author: Author
+  author: Author,
 |};
 
 export type QuoteMap = {
-  [quoteId: Id]: Quote
+  [quoteId: Id]: Quote,
 };
 
 export type sitePage = {
-  edges: Array<{ node: { path: string } }>
+  edges: Array<{ node: { path: string } }>,
 };
 
 export type innerDocsPage = {
@@ -35,13 +35,13 @@ export type innerDocsPage = {
     fields: {
       slug: string,
       title: string,
-      dir?: string
-    }
-  }
-}
+      dir?: string,
+    },
+  },
+};
 
 export type docsPage = {
-  edges: Array<innerDocsPage>
+  edges: Array<innerDocsPage>,
 };
 
 export type SidebarData = {
@@ -50,7 +50,7 @@ export type SidebarData = {
   docs: docsPage,
   site: {
     siteMetadata: {
-      isDevelopment: boolean
-    }
-  }
+      isDevelopment: boolean,
+    },
+  },
 };

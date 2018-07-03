@@ -1,10 +1,8 @@
 // @flow
-import { getRect, type Rect, type Position } from 'css-box-model';
+import { type Rect, type Position } from 'css-box-model';
 import type { Viewport } from '../../src/types';
 import getViewport from '../../src/view/window/get-viewport';
 import getMaxScroll from '../../src/state/get-max-scroll';
-import { offsetByPosition } from '../../src/state/spacing';
-import { subtract, negate } from '../../src/state/position';
 
 const getDoc = (): HTMLElement => {
   const el: ?HTMLElement = document.documentElement;
@@ -16,24 +14,24 @@ const getDoc = (): HTMLElement => {
   return el;
 };
 
-export const setViewport = (custom: Viewport) => {
-  if (custom.scroll.x !== custom.subject.left) {
+export const setViewport = (viewport: Viewport) => {
+  if (viewport.scroll.current.x !== viewport.frame.left) {
     throw new Error('scroll x must match left of subject');
   }
-  if (custom.scroll.y !== custom.subject.top) {
+  if (viewport.scroll.current.y !== viewport.frame.top) {
     throw new Error('scroll y must match top of subject');
   }
 
-  window.pageYOffset = custom.scroll.y;
-  window.pageXOffset = custom.scroll.x;
+  window.pageYOffset = viewport.scroll.current.y;
+  window.pageXOffset = viewport.scroll.current.x;
 
   const doc: HTMLElement = getDoc();
-  doc.clientWidth = custom.subject.width;
-  doc.clientHeight = custom.subject.height;
+  doc.clientWidth = viewport.frame.width;
+  doc.clientHeight = viewport.frame.height;
 
   // reverse engineering these values
-  const scrollHeight: number = custom.maxScroll.y + custom.subject.height;
-  const scrollWidth: number = custom.maxScroll.x + custom.subject.width;
+  const scrollHeight: number = viewport.scroll.max.y + viewport.frame.height;
+  const scrollWidth: number = viewport.scroll.max.x + viewport.frame.width;
 
   doc.scrollHeight = scrollHeight;
   doc.scrollWidth = scrollWidth;
@@ -46,27 +44,36 @@ const original: Viewport = getCurrent();
 export const resetViewport = () => setViewport(original);
 
 type CreateViewportArgs = {|
-  subject: Rect,
+  frame: Rect,
   scroll: Position,
   scrollHeight: number,
   scrollWidth: number,
-|}
+|};
+
+const origin: Position = { x: 0, y: 0 };
 
 export const createViewport = ({
-  subject,
+  frame,
   scroll,
   scrollHeight,
   scrollWidth,
 }: CreateViewportArgs): Viewport => {
   const viewport: Viewport = {
-    subject,
-    scroll,
-    maxScroll: getMaxScroll({
-      scrollHeight,
-      scrollWidth,
-      width: subject.width,
-      height: subject.height,
-    }),
+    frame,
+    scroll: {
+      initial: scroll,
+      current: scroll,
+      max: getMaxScroll({
+        scrollHeight,
+        scrollWidth,
+        width: frame.width,
+        height: frame.height,
+      }),
+      diff: {
+        value: origin,
+        displacement: origin,
+      },
+    },
   };
   return viewport;
 };
@@ -75,7 +82,7 @@ type WithWindowScrollSizeArgs = {|
   viewport: Viewport,
   scrollWidth: number,
   scrollHeight: number,
-|}
+|};
 
 export const withWindowScrollSize = ({
   viewport,
@@ -83,24 +90,8 @@ export const withWindowScrollSize = ({
   scrollHeight,
 }: WithWindowScrollSizeArgs): Viewport =>
   createViewport({
-    subject: viewport.subject,
-    scroll: viewport.scroll,
+    frame: viewport.frame,
+    scroll: viewport.scroll.current,
     scrollHeight,
     scrollWidth,
   });
-
-export const scrollViewport = (viewport: Viewport, newScroll: Position) => {
-  const diff: Position = subtract(viewport.scroll, newScroll);
-  const displacement: Position = negate(diff);
-
-  // reverse engineering these values
-  const scrollHeight: number = viewport.maxScroll.y + viewport.subject.height;
-  const scrollWidth: number = viewport.maxScroll.x + viewport.subject.width;
-
-  return createViewport({
-    subject: getRect(offsetByPosition(viewport.subject, displacement)),
-    scroll: newScroll,
-    scrollHeight,
-    scrollWidth,
-  });
-};

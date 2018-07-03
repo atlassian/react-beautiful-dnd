@@ -5,7 +5,7 @@ import TaskList from './task-list';
 import initial from './data';
 import reorder from '../reorder';
 import { grid } from '../constants';
-import { DragDropContext } from '../../../src/';
+import { DragDropContext } from '../../../src';
 import type {
   Announce,
   DragStart,
@@ -13,13 +13,13 @@ import type {
   DropResult,
   DraggableLocation,
   HookProvided,
-} from '../../../src/';
+} from '../../../src';
 import type { Task } from '../types';
 
 type State = {|
   tasks: Task[],
   blur: number,
-|}
+|};
 
 const Container = styled.div`
   padding-top: 20vh;
@@ -55,14 +55,17 @@ export default class TaskApp extends Component<*, State> {
   state: State = {
     tasks: initial,
     blur: 0,
-  }
+  };
 
   // in?
-  onDragStart = (start: DragStart, provided: HookProvided): void => provided.announce(`
+  onDragStart = (start: DragStart, provided: HookProvided): void =>
+    provided.announce(`
     You have lifted a task.
-    It is in position ${start.source.index + 1} of ${this.state.tasks.length} in the list.
+    It is in position ${start.source.index + 1} of ${
+      this.state.tasks.length
+    } in the list.
     Use the arrow keys to move, space bar to drop, and escape to cancel.
-  `)
+  `);
 
   onDragUpdate = (update: DragUpdate, provided: HookProvided): void => {
     const announce: Announce = provided.announce;
@@ -70,8 +73,10 @@ export default class TaskApp extends Component<*, State> {
       announce('You are currently not dragging over any droppable area');
       return;
     }
-    announce(`You have moved the task to position ${update.destination.index + 1}`);
-  }
+    announce(
+      `You have moved the task to position ${update.destination.index + 1}`,
+    );
+  };
 
   onDragEnd = (result: DropResult, provided: HookProvided): void => {
     const announce: Announce = provided.announce;
@@ -79,7 +84,8 @@ export default class TaskApp extends Component<*, State> {
     if (result.reason === 'CANCEL') {
       announce(`
         Movement cancelled.
-        The task has returned to its starting position of ${result.source.index + 1}
+        The task has returned to its starting position of ${result.source
+          .index + 1}
       `);
       return;
     }
@@ -89,7 +95,8 @@ export default class TaskApp extends Component<*, State> {
     if (!destination) {
       announce(`
         The task has been dropped while not over a location.
-        The task has returned to its starting position of ${result.source.index + 1}
+        The task has returned to its starting position of ${result.source
+          .index + 1}
       `);
       return;
     }
@@ -106,9 +113,10 @@ export default class TaskApp extends Component<*, State> {
 
     announce(`
       You have dropped the task.
-      It has moved from position ${result.source.index + 1} to ${destination.index + 1}
+      It has moved from position ${result.source.index +
+        1} to ${destination.index + 1}
     `);
-  }
+  };
 
   render() {
     return (
@@ -119,22 +127,23 @@ export default class TaskApp extends Component<*, State> {
       >
         <Container>
           <Blur amount={this.state.blur}>
-            <TaskList
-              title="Todo"
-              tasks={this.state.tasks}
-            />
+            <TaskList title="Todo" tasks={this.state.tasks} />
           </Blur>
           <BlurControls>
             <Button
               aria-label="remove blur"
-              onClick={() => this.setState({ blur: Math.max(0, this.state.blur - 1) })}
+              onClick={() =>
+                this.setState({ blur: Math.max(0, this.state.blur - 1) })
+              }
             >
               -
             </Button>
             <BlurTitle>Blur</BlurTitle>
             <Button
               aria-label="add blur"
-              onClick={() => this.setState({ blur: Math.min(this.state.blur + 1, 10) })}
+              onClick={() =>
+                this.setState({ blur: Math.min(this.state.blur + 1, 10) })
+              }
             >
               +
             </Button>

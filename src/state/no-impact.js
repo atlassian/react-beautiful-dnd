@@ -1,8 +1,6 @@
 // @flow
-import { type Position } from 'css-box-model';
 import type { DragMovement, DragImpact } from '../types';
-
-const origin: Position = { x: 0, y: 0 };
+import { origin } from './position';
 
 export const noMovement: DragMovement = {
   displaced: [],

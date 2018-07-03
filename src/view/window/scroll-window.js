@@ -5,4 +5,3 @@ import { type Position } from 'css-box-model';
 export default (change: Position): void => {
   window.scrollBy(change.x, change.y);
 };
-

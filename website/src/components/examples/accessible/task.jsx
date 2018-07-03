@@ -1,15 +1,18 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Draggable } from '../../../../../src/';
-import type { DraggableProvided, DraggableStateSnapshot } from '../../../../../src/';
+import { Draggable } from '../../../../../src';
+import type {
+  DraggableProvided,
+  DraggableStateSnapshot,
+} from '../../../../../src';
 import type { Task as TaskType } from '../types';
 import { colors, grid, borderRadius } from '../constants';
 
 type Props = {|
   task: TaskType,
   index: number,
-|}
+|};
 
 const Container = styled.div`
   border-bottom: 1px solid #ccc;
@@ -19,7 +22,8 @@ const Container = styled.div`
   border-radius: ${borderRadius}px;
   font-size: 18px;
 
-  ${({ isDragging }) => (isDragging ? 'box-shadow: 1px 1px 1px grey; background: lightblue' : '')}
+  ${({ isDragging }) =>
+    isDragging ? 'box-shadow: 1px 1px 1px grey; background: lightblue' : ''};
 `;
 
 export default class Task extends Component<Props> {

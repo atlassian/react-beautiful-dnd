@@ -16,9 +16,9 @@ If you spot a bug you are welcome to raise it on our issue page. You are also we
 
 If you would like to see a feature added to the library, here is what you do:
 
-1. Have a read of `README.md` to understand the motivations of this library. It is fairly opinionated and is not intended to be a universal drag and drop library. As such, it will not support every drag and drop interaction.
-2. Have a search through the [open and closed issues](https://github.com/atlassian/react-beautiful-dnd/issues?utf8=%E2%9C%93&q=is%3Aissue) to see if the feature you are requesting as already been requested.
-3. Please [create an issue](https://github.com/atlassian/react-beautiful-dnd/issues/new) to discuss it.
+1.  Have a read of `README.md` to understand the motivations of this library. It is fairly opinionated and is not intended to be a universal drag and drop library. As such, it will not support every drag and drop interaction.
+2.  Have a search through the [open and closed issues](https://github.com/atlassian/react-beautiful-dnd/issues?utf8=%E2%9C%93&q=is%3Aissue) to see if the feature you are requesting as already been requested.
+3.  Please [create an issue](https://github.com/atlassian/react-beautiful-dnd/issues/new) to discuss it.
 
 **Please do not raise a pull request directly**. There may be reasons why we will not add every feature to this library.
 

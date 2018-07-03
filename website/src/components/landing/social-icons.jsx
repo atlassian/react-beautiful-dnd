@@ -18,13 +18,15 @@ const ExternalLink = styled.a`
 const TwitterLink = ExternalLink.extend`
   margin-left: ${grid}px;
 
-  :hover, :active {
+  :hover,
+  :active {
     color: ${colors.T75};
   }
 `;
 
 const GithubLink = ExternalLink.extend`
-  :hover, :active {
+  :hover,
+  :active {
     color: ${colors.N70};
   }
 `;
@@ -34,13 +36,17 @@ const iconProps: Object = {
   height: 40,
 };
 
-export default class SocialIcons extends React.Component <*> {
+export default class SocialIcons extends React.Component<*> {
   render() {
     return (
       <Container>
-        <GithubLink href="https://github.com/atlassian/react-beautiful-dnd"><GithubIcon {...iconProps} /></GithubLink>
-        <TwitterLink href="https://twitter.com/alexandereardon"><TwitterIcon {...iconProps} /></TwitterLink>
+        <GithubLink href="https://github.com/atlassian/react-beautiful-dnd">
+          <GithubIcon {...iconProps} />
+        </GithubLink>
+        <TwitterLink href="https://twitter.com/alexandereardon">
+          <TwitterIcon {...iconProps} />
+        </TwitterLink>
       </Container>
     );
   }
-};
+}

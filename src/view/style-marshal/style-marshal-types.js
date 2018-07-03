@@ -1,11 +1,12 @@
 // @flow
-import type {
-  State,
-} from '../../types';
+import type { DropReason } from '../../types';
 
 export type StyleMarshal = {|
-  onPhaseChange: (current: State) => void,
+  collecting: () => void,
+  dragging: () => void,
+  dropping: (reason: DropReason) => void,
+  resting: () => void,
   styleContext: string,
   unmount: () => void,
   mount: () => void,
-|}
+|};

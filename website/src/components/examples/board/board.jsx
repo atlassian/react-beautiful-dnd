@@ -4,13 +4,13 @@ import styled, { injectGlobal } from 'styled-components';
 import Column from './column';
 import { colors } from '../constants';
 import reorder, { reorderQuoteMap } from '../reorder';
-import { DragDropContext, Droppable } from '../../../../../src/';
+import { DragDropContext, Droppable } from '../../../../../src';
 import type {
   DropResult,
   DragStart,
   DraggableLocation,
   DroppableProvided,
-} from '../../../../../src/';
+} from '../../../../../src';
 import type { QuoteMap } from '../types';
 
 /* eslint-disable no-console */
@@ -35,12 +35,12 @@ const Container = styled.div`
 type Props = {|
   initial: QuoteMap,
   containerHeight?: string,
-|}
+|};
 
 type State = {|
   columns: QuoteMap,
   ordered: string[],
-|}
+|};
 
 export default class Board extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
@@ -48,9 +48,9 @@ export default class Board extends Component<Props, State> {
   state: State = {
     columns: this.props.initial,
     ordered: Object.keys(this.props.initial),
-  }
+  };
 
-  boardRef: ?HTMLElement
+  boardRef: ?HTMLElement;
 
   componentDidMount() {
     // eslint-disable-next-line no-unused-expressions
@@ -63,7 +63,7 @@ export default class Board extends Component<Props, State> {
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
-  }
+  };
 
   onDragEnd = (result: DropResult) => {
     publishOnDragEnd(result);
@@ -89,7 +89,7 @@ export default class Board extends Component<Props, State> {
       const ordered: string[] = reorder(
         this.state.ordered,
         source.index,
-        destination.index
+        destination.index,
       );
 
       this.setState({
@@ -108,7 +108,7 @@ export default class Board extends Component<Props, State> {
     this.setState({
       columns: data.quoteMap,
     });
-  }
+  };
 
   render() {
     const columns: QuoteMap = this.state.columns;

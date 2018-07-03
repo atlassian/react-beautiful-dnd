@@ -1,12 +1,11 @@
 language: node_js
 cache: yarn
 node_js:
-- '8.4'
+- '8.11.3'
 script:
 - yarn run validate
 - yarn run test
-# Disabling bundle size check until we can get fuzzy thresholds
-# - yarn run check-bundle-sizes
+- yarn run bundle-size:check
 # Currently disabled travis deploys
 # deploy:
 #   provider: npm

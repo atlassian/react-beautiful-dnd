@@ -1,8 +1,8 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { DragDropContext } from '../../../../../src/';
-import type { DropResult, DragStart } from '../../../../../src/';
+import { DragDropContext } from '../../../../../src';
+import type { DropResult, DragStart } from '../../../../../src';
 import type { Quote } from '../types';
 import AuthorList from '../primatives/author-list';
 import reorder from '../reorder';
@@ -16,11 +16,11 @@ const publishOnDragEnd = (v?: any) => console.log('onDragEnd', v);
 type Props = {|
   initial: Quote[],
   internalScroll?: boolean,
-|}
+|};
 
 type State = {|
   quotes: Quote[],
-|}
+|};
 
 const Root = styled.div`
   padding: ${grid}px;
@@ -32,12 +32,12 @@ export default class AuthorApp extends Component<Props, State> {
 
   state: State = {
     quotes: this.props.initial,
-  }
+  };
   /* eslint-enable react/sort-comp */
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
-  }
+  };
 
   onDragEnd = (result: DropResult) => {
     publishOnDragEnd(result);
@@ -54,13 +54,13 @@ export default class AuthorApp extends Component<Props, State> {
     const quotes = reorder(
       this.state.quotes,
       result.source.index,
-      result.destination.index
+      result.destination.index,
     );
 
     this.setState({
       quotes,
     });
-  }
+  };
 
   render() {
     return (

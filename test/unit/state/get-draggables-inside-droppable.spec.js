@@ -8,7 +8,8 @@ const preset = getPreset();
 describe('get draggables inside a droppable', () => {
   it('should only return dimensions that are inside a droppable', () => {
     const result: DraggableDimension[] = getDraggablesInsideDroppable(
-      preset.home, preset.draggables,
+      preset.home,
+      preset.draggables,
     );
 
     expect(result).toEqual(preset.inHomeList);
@@ -16,7 +17,8 @@ describe('get draggables inside a droppable', () => {
 
   it('should order the dimensions by index', () => {
     const result: DraggableDimension[] = getDraggablesInsideDroppable(
-      preset.home, preset.draggables,
+      preset.home,
+      preset.draggables,
     );
 
     expect(result).toEqual([

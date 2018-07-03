@@ -1,5 +1,5 @@
 // @flow
-import type { Props, Callbacks } from '../drag-handle-types';
+import type { Callbacks } from '../drag-handle-types';
 
 type SensorBase = {|
   // force stop and do not fire any events
@@ -11,26 +11,26 @@ type SensorBase = {|
   isCapturing: () => boolean,
   // perform any cleanup tasks required when unmounting
   unmount: () => void,
-|}
+|};
 
 export type CreateSensorArgs = {|
   callbacks: Callbacks,
   getDraggableRef: () => ?HTMLElement,
   getWindow: () => HTMLElement,
   canStartCapturing: (event: Event) => boolean,
-|}
+|};
 
 export type MouseSensor = {|
   ...SensorBase,
   onMouseDown: (event: MouseEvent) => void,
-|}
+|};
 
 export type KeyboardSensor = {|
   ...SensorBase,
-  onKeyDown: (event: KeyboardEvent, props: Props) => void,
-|}
+  onKeyDown: (event: KeyboardEvent) => void,
+|};
 
 export type TouchSensor = {|
   ...SensorBase,
   onTouchStart: (event: TouchEvent) => void,
-|}
+|};

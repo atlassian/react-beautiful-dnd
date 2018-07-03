@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { DragDropContext } from '../../../../../src/';
+import { DragDropContext } from '../../../../../src';
 import { colors, grid } from '../constants';
 import QuoteList from './quote-list';
 import reorder from '../reorder';
@@ -45,18 +45,18 @@ const Root = styled.div`
 
 type State = {|
   list: NestedQuoteList,
-|}
+|};
 
 export default class QuoteApp extends Component<*, State> {
   /* eslint-disable react/sort-comp */
   state: State = {
     list: initialList,
-  }
+  };
   /* eslint-enable */
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
-  }
+  };
 
   onDragEnd = (result: DropResult) => {
     publishOnDragEnd(result);
@@ -70,7 +70,7 @@ export default class QuoteApp extends Component<*, State> {
       const children = reorder(
         this.state.list.children,
         result.source.index,
-        result.destination.index
+        result.destination.index,
       );
 
       const list: NestedQuoteList = {
@@ -87,7 +87,7 @@ export default class QuoteApp extends Component<*, State> {
     if (result.type === 'second-level') {
       const nested: ?NestedQuoteList = (this.state.list.children.filter(
         (item: mixed): boolean =>
-          Object.prototype.hasOwnProperty.call(item, 'children')
+          Object.prototype.hasOwnProperty.call(item, 'children'),
       )[0]: any);
 
       if (!nested) {
@@ -101,7 +101,7 @@ export default class QuoteApp extends Component<*, State> {
           nested.children,
           result.source.index,
           // $ExpectError - already checked for null
-          result.destination.index
+          result.destination.index,
         ),
       };
 
@@ -118,7 +118,7 @@ export default class QuoteApp extends Component<*, State> {
         list,
       });
     }
-  }
+  };
 
   render() {
     const { list } = this.state;

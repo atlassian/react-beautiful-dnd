@@ -1,25 +1,17 @@
 // @flow
 import { type Node } from 'react';
 import { connect } from 'react-redux';
-import { createSelector } from 'reselect';
 import memoizeOne from 'memoize-one';
 import { storeKey } from '../context-keys';
-import {
-  dragSelector,
-  pendingDropSelector,
-  phaseSelector,
-  draggingDraggableSelector,
-} from '../../state/selectors';
 import Droppable from './droppable';
+import isStrictEqual from '../is-strict-equal';
 import type {
-  Phase,
-  PendingDrop,
-  DragState,
   State,
   DroppableId,
   DraggableId,
   DraggableLocation,
   DraggableDimension,
+  DraggableDescriptor,
   Placeholder,
 } from '../../types';
 import type {
@@ -29,137 +21,126 @@ import type {
   Selector,
 } from './droppable-types';
 
-export const makeSelector = (): Selector => {
-  const idSelector = (state: State, ownProps: OwnProps) =>
-    ownProps.droppableId;
-  const isDropDisabledSelector = (state: State, ownProps: OwnProps) =>
-    ownProps.isDropDisabled || false;
-
-  const getIsDraggingOver = memoizeOne(
-    (id: DroppableId, destination: ?DraggableLocation): boolean => {
-      if (!destination) {
-        return false;
-      }
-      return destination.droppableId === id;
-    },
-  );
-
-  const getPlaceholder = memoizeOne(
-    (id: DroppableId,
-      destination: ?DraggableLocation,
-      draggable: ?DraggableDimension
-    ): ?Placeholder => {
-      // not dragging anything
-      if (!draggable) {
-        return null;
-      }
-
-      // not dragging over any droppable
-      if (!destination) {
-        return null;
-      }
-
-      // no placeholder needed when dragging over the home droppable
-      if (id === draggable.descriptor.droppableId) {
-        return null;
-      }
-
-      // not over this droppable
-      if (id !== destination.droppableId) {
-        return null;
-      }
-
-      return draggable.placeholder;
+// Returning a function to ensure each
+// Droppable gets its own selector
+export const makeMapStateToProps = (): Selector => {
+  const getIsDraggingOver = (
+    id: DroppableId,
+    destination: ?DraggableLocation,
+  ): boolean => {
+    if (!destination) {
+      return false;
     }
-  );
+    return destination.droppableId === id;
+  };
+
+  const shouldUsePlaceholder = (
+    id: DroppableId,
+    descriptor: DraggableDescriptor,
+    destination: ?DraggableLocation,
+  ): boolean => {
+    if (!destination) {
+      return false;
+    }
+
+    // Do not use a placeholder when over the home list
+    if (id === descriptor.droppableId) {
+      return false;
+    }
+
+    // TODO: no placeholder if over foreign list
+    return id === destination.droppableId;
+  };
 
   const getMapProps = memoizeOne(
-    (isDraggingOver: boolean,
+    (
+      isDraggingOver: boolean,
       draggingOverWith: ?DraggableId,
       placeholder: ?Placeholder,
     ): MapProps => ({
       isDraggingOver,
       draggingOverWith,
       placeholder,
-    })
+    }),
   );
 
-  return createSelector(
-    [phaseSelector,
-      dragSelector,
-      draggingDraggableSelector,
-      pendingDropSelector,
-      idSelector,
-      isDropDisabledSelector,
-    ],
-    (phase: Phase,
-      drag: ?DragState,
-      draggable: ?DraggableDimension,
-      pending: ?PendingDrop,
-      id: DroppableId,
-      isDropDisabled: boolean,
-    ): MapProps => {
-      if (isDropDisabled) {
-        return getMapProps(false, null, null);
-      }
-
-      if (phase === 'DRAGGING') {
-        if (!drag) {
-          console.error('cannot determine dragging over as there is not drag');
-          return getMapProps(false, null, null);
-        }
-
-        const isDraggingOver = getIsDraggingOver(id, drag.impact.destination);
-        const draggingOverWith: ?DraggableId = isDraggingOver ?
-          drag.initial.descriptor.id : null;
-
-        const placeholder: ?Placeholder = getPlaceholder(
-          id,
-          drag.impact.destination,
-          draggable,
-        );
-
-        return getMapProps(isDraggingOver, draggingOverWith, placeholder);
-      }
-
-      if (phase === 'DROP_ANIMATING') {
-        if (!pending) {
-          console.error('cannot determine dragging over as there is no pending result');
-          return getMapProps(false, null, null);
-        }
-
-        const isDraggingOver = getIsDraggingOver(id, pending.impact.destination);
-        const draggingOverWith: ?DraggableId = isDraggingOver ?
-          pending.result.draggableId : null;
-
-        const placeholder: ?Placeholder = getPlaceholder(
-          id,
-          pending.result.destination,
-          draggable,
-        );
-        return getMapProps(isDraggingOver, draggingOverWith, placeholder);
-      }
-
+  const selector = (state: State, ownProps: OwnProps): MapProps => {
+    if (ownProps.isDropDisabled) {
       return getMapProps(false, null, null);
-    },
-  );
-};
+    }
 
-const makeMapStateToProps = () => {
-  const selector = makeSelector();
-  return (state: State, props: OwnProps) => selector(state, props);
+    const id: DroppableId = ownProps.droppableId;
+
+    if (state.isDragging) {
+      const destination: ?DraggableLocation = state.impact.destination;
+      const isDraggingOver: boolean = getIsDraggingOver(id, destination);
+      const draggableId: DraggableId = state.critical.draggable.id;
+      const draggingOverWith: ?DraggableId = isDraggingOver
+        ? draggableId
+        : null;
+      const draggable: DraggableDimension =
+        state.dimensions.draggables[draggableId];
+
+      const placeholder: ?Placeholder = shouldUsePlaceholder(
+        id,
+        draggable.descriptor,
+        destination,
+      )
+        ? draggable.placeholder
+        : null;
+
+      return getMapProps(isDraggingOver, draggingOverWith, placeholder);
+    }
+
+    if (state.phase === 'DROP_ANIMATING') {
+      const destination: ?DraggableLocation = state.pending.impact.destination;
+      const isDraggingOver = getIsDraggingOver(id, destination);
+      const draggableId: DraggableId = state.pending.result.draggableId;
+      const draggingOverWith: ?DraggableId = isDraggingOver
+        ? draggableId
+        : null;
+      const draggable: DraggableDimension =
+        state.dimensions.draggables[draggableId];
+
+      const placeholder: ?Placeholder = shouldUsePlaceholder(
+        id,
+        draggable.descriptor,
+        destination,
+      )
+        ? draggable.placeholder
+        : null;
+
+      return getMapProps(isDraggingOver, draggingOverWith, placeholder);
+    }
+
+    return getMapProps(false, null, null);
+  };
+
+  return selector;
 };
 
 // Leaning heavily on the default shallow equality checking
 // that `connect` provides.
 // It avoids needing to do it own within `Droppable`
 const connectedDroppable: OwnProps => Node = (connect(
-  // returning a function to ensure each
-  // Droppable gets its own selector
-  (makeMapStateToProps: any),
+  // returning a function so each component can do its own memoization
+  makeMapStateToProps,
+  // mapDispatchToProps - not using
   null,
+  // mergeProps - using default
   null,
-  { storeKey },
+  {
+    // Using our own store key.
+    // This allows consumers to also use redux
+    // Note: the default store key is 'store'
+    storeKey,
+    // Default value, but being really clear
+    pure: true,
+    // When pure, compares the result of mapStateToProps to its previous value.
+    // Default value: shallowEqual
+    // Switching to a strictEqual as we return a memoized object on changes
+    areStatePropsEqual: isStrictEqual,
+  },
 ): any)(Droppable);
 
 connectedDroppable.defaultProps = ({
