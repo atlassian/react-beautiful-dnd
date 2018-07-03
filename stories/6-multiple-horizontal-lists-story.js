@@ -15,7 +15,6 @@ const quoteMap: QuoteMap = {
   [gamma]: getQuotes(22),
 };
 
-storiesOf('multiple horizontal lists', module)
-  .add('stress test', () => (
-    <QuoteApp initial={quoteMap} />
-  ));
+storiesOf('multiple horizontal lists', module).add('stress test', () => (
+  <QuoteApp initial={quoteMap} />
+));

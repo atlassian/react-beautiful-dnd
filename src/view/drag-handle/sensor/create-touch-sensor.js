@@ -1,9 +1,14 @@
 // @flow
 /* eslint-disable no-use-before-define */
+import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import createScheduler from '../util/create-scheduler';
-import createPostDragEventPreventer, { type EventPreventer } from '../util/create-post-drag-event-preventer';
-import createEventMarshal, { type EventMarshal } from '../util/create-event-marshal';
+import createPostDragEventPreventer, {
+  type EventPreventer,
+} from '../util/create-post-drag-event-preventer';
+import createEventMarshal, {
+  type EventMarshal,
+} from '../util/create-event-marshal';
 import { bindEvents, unbindEvents } from '../util/bind-events';
 import * as keyCodes from '../../key-codes';
 import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
@@ -15,21 +20,21 @@ type State = {
   hasMoved: boolean,
   longPressTimerId: ?TimeoutID,
   pending: ?Position,
-}
+};
 
 type TouchWithForce = Touch & {
-  force: number
-}
+  force: number,
+};
 
 type WebkitHack = {|
   preventTouchMove: () => void,
   releaseTouchMove: () => void,
-|}
+|};
 
 export const timeForLongPress: number = 150;
 export const forcePressThreshold: number = 0.15;
 const touchStartMarshal: EventMarshal = createEventMarshal();
-const noop = (): void => { };
+const noop = (): void => {};
 
 // Webkit does not allow event.preventDefault() in dynamically added handlers
 // So we add an always listening event handler to get around this :(
@@ -55,26 +60,30 @@ const webkitHack: WebkitHack = (() => {
   let isBlocking: boolean = false;
 
   // Adding a persistent event handler
-  window.addEventListener('touchmove', (event: TouchEvent) => {
-    // We let the event go through as normal as nothing
-    // is blocking the touchmove
-    if (!isBlocking) {
-      return;
-    }
+  window.addEventListener(
+    'touchmove',
+    (event: TouchEvent) => {
+      // We let the event go through as normal as nothing
+      // is blocking the touchmove
+      if (!isBlocking) {
+        return;
+      }
 
-    // Our event handler would have worked correctly if the browser
-    // was not webkit based, or an older version of webkit.
-    if (event.defaultPrevented) {
-      return;
-    }
+      // Our event handler would have worked correctly if the browser
+      // was not webkit based, or an older version of webkit.
+      if (event.defaultPrevented) {
+        return;
+      }
 
-    // Okay, now we need to step in and fix things
-    event.preventDefault();
+      // Okay, now we need to step in and fix things
+      event.preventDefault();
 
-    // Forcing this to be non-passive so we can get every touchmove
-    // Not activating in the capture phase like the dynamic touchmove we add.
-    // Technically it would not matter if we did this in the capture phase
-  }, { passive: false, capture: false });
+      // Forcing this to be non-passive so we can get every touchmove
+      // Not activating in the capture phase like the dynamic touchmove we add.
+      // Technically it would not matter if we did this in the capture phase
+    },
+    { passive: false, capture: false },
+  );
 
   const preventTouchMove = () => {
     isBlocking = true;
@@ -110,15 +119,16 @@ export default ({
   const isCapturing = (): boolean =>
     Boolean(state.pending || state.isDragging || state.longPressTimerId);
   const schedule = createScheduler(callbacks);
-  const postDragEventPreventer: EventPreventer = createPostDragEventPreventer(getWindow);
+  const postDragEventPreventer: EventPreventer = createPostDragEventPreventer(
+    getWindow,
+  );
 
   const startDragging = () => {
     const pending: ?Position = state.pending;
 
     if (!pending) {
-      console.error('cannot start a touch drag without a pending position');
       kill();
-      return;
+      invariant(false, 'cannot start a touch drag without a pending position');
     }
 
     setState({
@@ -131,7 +141,7 @@ export default ({
     });
 
     callbacks.onLift({
-      client: pending,
+      clientSelection: pending,
       autoScrollMode: 'FLUID',
     });
   };
@@ -153,7 +163,10 @@ export default ({
       y: clientY,
     };
 
-    const longPressTimerId: TimeoutID = setTimeout(startDragging, timeForLongPress);
+    const longPressTimerId: TimeoutID = setTimeout(
+      startDragging,
+      timeForLongPress,
+    );
 
     setState({
       longPressTimerId,
@@ -338,7 +351,7 @@ export default ({
 
         // A drag could be pending or has already started but no movement has occurred
 
-        const touch: TouchWithForce = (event.touches[0] : any);
+        const touch: TouchWithForce = (event.touches[0]: any);
 
         if (touch.force >= forcePressThreshold) {
           // this is an indirect cancel so we do not preventDefault
@@ -368,13 +381,12 @@ export default ({
       return;
     }
 
-    if (!canStartCapturing(event)) {
-      return;
-    }
+    invariant(
+      !isCapturing(),
+      'Should not be able to perform a touch start while a drag or pending drag is occurring',
+    );
 
-    if (isCapturing()) {
-      console.error('should not be able to perform a touch start while a drag or pending drag is occurring');
-      cancel();
+    if (!canStartCapturing(event)) {
       return;
     }
 

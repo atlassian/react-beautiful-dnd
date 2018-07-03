@@ -1,8 +1,5 @@
 // @flow
-import type {
-  EventBinding,
-  EventOptions,
-} from './event-types';
+import type { EventBinding, EventOptions } from './event-types';
 
 export const bindEvents = (
   el: HTMLElement,

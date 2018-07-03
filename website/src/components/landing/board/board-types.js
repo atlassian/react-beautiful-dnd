@@ -6,14 +6,14 @@ export type Column = {|
   id: Id,
   title: () => Node,
   quoteIds: Id[],
-|}
+|};
 
 export type ColumnMap = {
-  [columnId: Id]: Column
-}
+  [columnId: Id]: Column,
+};
 
 export type Entities = {|
   columnOrder: Id[],
   columns: ColumnMap,
   quotes: QuoteMap,
-|}
+|};

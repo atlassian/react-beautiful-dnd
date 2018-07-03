@@ -1,14 +1,20 @@
 // @flow
 import type { Spacing, Position } from 'css-box-model';
 
-export const offsetByPosition = (spacing: Spacing, point: Position): Spacing => ({
+export const offsetByPosition = (
+  spacing: Spacing,
+  point: Position,
+): Spacing => ({
   top: spacing.top + point.y,
   left: spacing.left + point.x,
   bottom: spacing.bottom + point.y,
   right: spacing.right + point.x,
 });
 
-export const expandByPosition = (spacing: Spacing, position: Position): Spacing => ({
+export const expandByPosition = (
+  spacing: Spacing,
+  position: Position,
+): Spacing => ({
   // pulling back to increase size
   top: spacing.top - position.y,
   left: spacing.left - position.x,
@@ -25,5 +31,8 @@ export const getCorners = (spacing: Spacing): Position[] => [
 ];
 
 export const noSpacing: Spacing = {
-  top: 0, right: 0, bottom: 0, left: 0,
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0,
 };

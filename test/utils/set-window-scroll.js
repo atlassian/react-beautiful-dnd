@@ -9,7 +9,10 @@ const defaultOptions: Options = {
   shouldPublish: true,
 };
 
-const setWindowScroll = (point: Position, options?: Options = defaultOptions) => {
+const setWindowScroll = (
+  point: Position,
+  options?: Options = defaultOptions,
+) => {
   window.pageXOffset = point.x;
   window.pageYOffset = point.y;
 

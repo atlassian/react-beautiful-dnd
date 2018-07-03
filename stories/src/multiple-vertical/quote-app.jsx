@@ -2,13 +2,17 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { action } from '@storybook/addon-actions';
-import { DragDropContext } from '../../../src/';
+import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
 import { reorderQuoteMap } from '../reorder';
 import type { ReorderQuoteMapResult } from '../reorder';
 import type { QuoteMap } from '../types';
-import type { DropResult, DragStart, DraggableLocation } from '../../../src/types';
+import type {
+  DropResult,
+  DragStart,
+  DraggableLocation,
+} from '../../../src/types';
 
 const publishOnDragStart = action('onDragStart');
 const publishOnDragEnd = action('onDragEnd');
@@ -56,9 +60,9 @@ const PushDown = styled.div`
 
 type Props = {|
   initial: QuoteMap,
-|}
+|};
 
-type State = ReorderQuoteMapResult
+type State = ReorderQuoteMapResult;
 
 export default class QuoteApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
@@ -72,7 +76,7 @@ export default class QuoteApp extends Component<Props, State> {
     // this.setState({
     //   disabledDroppable: this.getDisabledDroppable(initial.source.droppableId),
     // });
-  }
+  };
 
   onDragEnd = (result: DropResult) => {
     publishOnDragEnd(result);
@@ -85,12 +89,14 @@ export default class QuoteApp extends Component<Props, State> {
     const source: DraggableLocation = result.source;
     const destination: DraggableLocation = result.destination;
 
-    this.setState(reorderQuoteMap({
-      quoteMap: this.state.quoteMap,
-      source,
-      destination,
-    }));
-  }
+    this.setState(
+      reorderQuoteMap({
+        quoteMap: this.state.quoteMap,
+        source,
+        destination,
+      }),
+    );
+  };
 
   // TODO
   getDisabledDroppable = (sourceDroppable: ?string) => {
@@ -103,7 +109,7 @@ export default class QuoteApp extends Component<Props, State> {
     const disabledDroppableIndex = (sourceIndex + 1) % droppables.length;
 
     return droppables[disabledDroppableIndex];
-  }
+  };
 
   render() {
     const { quoteMap } = this.state;

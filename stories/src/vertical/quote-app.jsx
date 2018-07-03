@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { action } from '@storybook/addon-actions';
-import { DragDropContext } from '../../../src/';
+import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
 import reorder from '../reorder';
@@ -27,11 +27,11 @@ const Root = styled.div`
 type Props = {|
   initial: Quote[],
   listStyle?: Object,
-|}
+|};
 
 type State = {|
   quotes: Quote[],
-|}
+|};
 
 export default class QuoteApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
@@ -47,7 +47,7 @@ export default class QuoteApp extends Component<Props, State> {
     if (window.navigator.vibrate) {
       window.navigator.vibrate(100);
     }
-  }
+  };
 
   onDragEnd = (result: DropResult) => {
     publishOnDragEnd(result);
@@ -64,13 +64,13 @@ export default class QuoteApp extends Component<Props, State> {
     const quotes = reorder(
       this.state.quotes,
       result.source.index,
-      result.destination.index
+      result.destination.index,
     );
 
     this.setState({
       quotes,
     });
-  }
+  };
 
   render() {
     const { quotes } = this.state;

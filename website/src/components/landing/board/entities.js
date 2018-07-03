@@ -2,11 +2,7 @@
 import loveColumnHeader from './love-column-header';
 import { quotes, quoteMap } from '../../quotes';
 import type { Quote, Id } from '../../types';
-import type {
-  Column,
-  ColumnMap,
-  Entities,
-} from './board-types';
+import type { Column, ColumnMap, Entities } from './board-types';
 
 const half: number = quotes.length / 2;
 
@@ -19,15 +15,20 @@ const first: Column = {
 const second: Column = {
   id: 'column-2',
   title: () => 'Awesome quotes',
-  quoteIds: quotes.slice(half, quotes.length - 1).map((quote: Quote): Id => quote.id),
+  quoteIds: quotes
+    .slice(half, quotes.length - 1)
+    .map((quote: Quote): Id => quote.id),
 };
 
 const columns: Column[] = [first, second];
 
-const columnMap: ColumnMap = columns.reduce((previous: ColumnMap, current: Column) => {
-  previous[current.id] = current;
-  return previous;
-}, {});
+const columnMap: ColumnMap = columns.reduce(
+  (previous: ColumnMap, current: Column) => {
+    previous[current.id] = current;
+    return previous;
+  },
+  {},
+);
 
 const entities: Entities = {
   columns: columnMap,

@@ -4,15 +4,15 @@ import Link from 'gatsby-link';
 
 type ExampleEdge = {
   node: {
-    path: string
-  }
-}
+    path: string,
+  },
+};
 
 type ExampleData = {
   allSitePage: {
-    edges: [ExampleEdge]
-  }
-}
+    edges: [ExampleEdge],
+  },
+};
 
 const PrivateExamplesList = ({ data }: { data: ExampleData }) => (
   <div>

@@ -1,428 +1,322 @@
 // @flow
-import memoizeOne from 'memoize-one';
-import { type Position } from 'css-box-model';
-import type {
-  Action,
-  State,
-  DraggableDimension,
-  DroppableDimension,
-  DroppableId,
-  DraggableId,
-  DimensionState,
-  DraggableDescriptor,
-  DraggableDimensionMap,
-  DroppableDimensionMap,
-  DragState,
-  DropResult,
-  CurrentDrag,
-  DragImpact,
-  InitialDrag,
-  PendingDrop,
-  Phase,
-  DraggableLocation,
-  CurrentDragPositions,
-  InitialDragPositions,
-  LiftRequest,
-  Viewport,
-} from '../types';
-import { add, subtract, isEqual } from './position';
-import { noMovement } from './no-impact';
-import getDragImpact from './get-drag-impact/';
-import moveToNextIndex from './move-to-next-index/';
-import type { Result as MoveToNextResult } from './move-to-next-index/move-to-next-index-types';
-import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';
-import moveCrossAxis from './move-cross-axis/';
+import type { Position } from 'css-box-model';
+import invariant from 'tiny-invariant';
 import { scrollDroppable } from './droppable-dimension';
+import getDragImpact from './get-drag-impact';
+// import publish from './publish';
+import moveInDirection, {
+  type Result as MoveInDirectionResult,
+} from './move-in-direction';
+import { add, isEqual, subtract, origin } from './position';
+import scrollViewport from './scroll-viewport';
+import getHomeImpact from './get-home-impact';
+import getPageItemPositions from './get-page-item-positions';
+import isMovementAllowed from './is-movement-allowed';
+import type {
+  State,
+  DroppableDimension,
+  PendingDrop,
+  IdleState,
+  PreparingState,
+  DraggingState,
+  ItemPositions,
+  DragPositions,
+  CollectingState,
+  DropAnimatingState,
+  DropPendingState,
+  DragImpact,
+  Viewport,
+  DimensionMap,
+  DropReason,
+} from '../types';
+import type { Action } from './store-types';
 
-const noDimensions: DimensionState = {
-  request: null,
-  draggable: {},
-  droppable: {},
-};
-
-const origin: Position = { x: 0, y: 0 };
-
-const clean = memoizeOne((phase?: Phase = 'IDLE'): State => ({
-  phase,
-  drag: null,
-  drop: null,
-  dimension: noDimensions,
-}));
+const idle: IdleState = { phase: 'IDLE' };
+const preparing: PreparingState = { phase: 'PREPARING' };
 
 type MoveArgs = {|
-  state: State,
+  state: DraggingState | CollectingState,
   clientSelection: Position,
   shouldAnimate: boolean,
   viewport?: Viewport,
-  // force a custom drag impact (optionally provided)
+  // force a custom drag impact
   impact?: ?DragImpact,
   // provide a scroll jump request (optionally provided - and can be null)
   scrollJumpRequest?: ?Position,
-|}
+|};
 
-const canPublishDimension = (phase: Phase): boolean =>
-  ['IDLE', 'DROP_ANIMATING', 'DROP_COMPLETE'].indexOf(phase) === -1;
-
-// TODO: move into own file and write tests
-const move = ({
+const moveWithPositionUpdates = ({
   state,
   clientSelection,
   shouldAnimate,
-  viewport: proposedViewport,
+  viewport,
   impact,
   scrollJumpRequest,
-}: MoveArgs): State => {
-  if (state.phase !== 'DRAGGING') {
-    console.error('cannot move while not dragging');
-    return clean();
-  }
+}: MoveArgs): CollectingState | DraggingState => {
+  // DRAGGING: can update position and impact
+  // COLLECTING: can update position but cannot update impact
 
-  const last: ?DragState = state.drag;
+  const newViewport: Viewport = viewport || state.viewport;
+  const currentWindowScroll: Position = newViewport.scroll.current;
 
-  if (last == null) {
-    console.error('cannot move if there is no drag information');
-    return clean();
-  }
-
-  const previous: CurrentDrag = last.current;
-  const initial: InitialDrag = last.initial;
-  const viewport: Viewport = proposedViewport || previous.viewport;
-  const currentWindowScroll: Position = viewport.scroll;
-
-  const client: CurrentDragPositions = (() => {
-    const offset: Position = subtract(clientSelection, initial.client.selection);
-
-    const result: CurrentDragPositions = {
+  const client: ItemPositions = (() => {
+    const offset: Position = subtract(
+      clientSelection,
+      state.initial.client.selection,
+    );
+    return {
       offset,
       selection: clientSelection,
-      borderBoxCenter: add(offset, initial.client.borderBoxCenter),
+      borderBoxCenter: add(state.initial.client.borderBoxCenter, offset),
     };
-    return result;
   })();
 
-  const page: CurrentDragPositions = {
-    selection: add(client.selection, currentWindowScroll),
-    offset: add(client.offset, currentWindowScroll),
-    borderBoxCenter: add(client.borderBoxCenter, currentWindowScroll),
-  };
+  const page: ItemPositions = getPageItemPositions(client, currentWindowScroll);
 
-  const current: CurrentDrag = {
+  const current: DragPositions = {
     client,
     page,
-    shouldAnimate,
-    viewport,
-    hasCompletedFirstBulkPublish: previous.hasCompletedFirstBulkPublish,
   };
 
-  const newImpact: DragImpact = (impact || getDragImpact({
-    pageBorderBoxCenter: page.borderBoxCenter,
-    draggable: state.dimension.draggable[initial.descriptor.id],
-    draggables: state.dimension.draggable,
-    droppables: state.dimension.droppable,
-    previousImpact: last.impact,
-    viewport,
-  }));
+  // Not updating impact while bulk collecting
+  if (state.phase === 'COLLECTING') {
+    return {
+      // adding phase to appease flow (even though it will be overwritten by spread)
+      phase: 'COLLECTING',
+      ...state,
+      current,
+    };
+  }
 
-  const drag: DragState = {
-    initial,
-    impact: newImpact,
-    current,
-    scrollJumpRequest,
-  };
+  const newImpact: DragImpact =
+    impact ||
+    getDragImpact({
+      pageBorderBoxCenter: page.borderBoxCenter,
+      draggable: state.dimensions.draggables[state.critical.draggable.id],
+      draggables: state.dimensions.draggables,
+      droppables: state.dimensions.droppables,
+      previousImpact: state.impact,
+      viewport: newViewport,
+    });
 
-  return {
+  // dragging!
+  const result: DraggingState = {
     ...state,
-    drag,
+    current,
+    shouldAnimate,
+    impact: newImpact,
+    scrollJumpRequest: scrollJumpRequest || null,
+    viewport: newViewport,
   };
+
+  return result;
 };
 
-const updateStateAfterDimensionChange = (newState: State, impact?: ?DragImpact): State => {
-  // not dragging yet
-  if (newState.phase === 'COLLECTING_INITIAL_DIMENSIONS') {
-    return newState;
-  }
-
-  // not calculating movement if not in the DRAGGING phase
-  if (newState.phase !== 'DRAGGING') {
-    return newState;
-  }
-
-  // already dragging - need to recalculate impact
-  if (!newState.drag) {
-    console.error('cannot update a draggable dimension in an existing drag as there is invalid drag state');
-    return clean();
-  }
-
-  return move({
-    state: newState,
-    // use the existing values
-    clientSelection: newState.drag.current.client.selection,
-    shouldAnimate: newState.drag.current.shouldAnimate,
-    impact,
-  });
-};
-
-export default (state: State = clean('IDLE'), action: Action): State => {
+export default (state: State = idle, action: Action): State => {
   if (action.type === 'CLEAN') {
-    return clean();
+    return idle;
   }
 
   if (action.type === 'PREPARE') {
-    return clean('PREPARING');
+    return preparing;
   }
 
-  if (action.type === 'REQUEST_DIMENSIONS') {
-    if (state.phase !== 'PREPARING') {
-      console.error('trying to start a lift while not preparing for a lift');
-      return clean();
-    }
-
-    const request: LiftRequest = action.payload;
-
-    return {
-      phase: 'COLLECTING_INITIAL_DIMENSIONS',
-      drag: null,
-      drop: null,
-      dimension: {
-        request,
-        draggable: {},
-        droppable: {},
-      },
-    };
-  }
-
-  if (action.type === 'PUBLISH_DRAGGABLE_DIMENSION') {
-    const dimension: DraggableDimension = action.payload;
-
-    if (!canPublishDimension(state.phase)) {
-      console.warn('dimensions rejected as no longer allowing dimension capture in phase', state.phase);
-      return state;
-    }
-
-    const newState: State = {
-      ...state,
-      dimension: {
-        request: state.dimension.request,
-        droppable: state.dimension.droppable,
-        draggable: {
-          ...state.dimension.draggable,
-          [dimension.descriptor.id]: dimension,
-        },
-      },
-    };
-
-    return updateStateAfterDimensionChange(newState);
-  }
-
-  if (action.type === 'PUBLISH_DROPPABLE_DIMENSION') {
-    const dimension: DroppableDimension = action.payload;
-
-    if (!canPublishDimension(state.phase)) {
-      console.warn('dimensions rejected as no longer allowing dimension capture in phase', state.phase);
-      return state;
-    }
-
-    const newState: State = {
-      ...state,
-      dimension: {
-        request: state.dimension.request,
-        draggable: state.dimension.draggable,
-        droppable: {
-          ...state.dimension.droppable,
-          [dimension.descriptor.id]: dimension,
-        },
-      },
-    };
-
-    return updateStateAfterDimensionChange(newState);
-  }
-
-  if (action.type === 'BULK_DIMENSION_PUBLISH') {
-    const draggables: DraggableDimension[] = action.payload.draggables;
-    const droppables: DroppableDimension[] = action.payload.droppables;
-
-    if (!canPublishDimension(state.phase)) {
-      console.warn('dimensions rejected as no longer allowing dimension capture in phase', state.phase);
-      return state;
-    }
-
-    const newDraggables: DraggableDimensionMap = draggables.reduce((previous, current) => {
-      previous[current.descriptor.id] = current;
-      return previous;
-    }, {});
-
-    const newDroppables: DroppableDimensionMap = droppables.reduce((previous, current) => {
-      previous[current.descriptor.id] = current;
-      return previous;
-    }, {});
-
-    const drag: ?DragState = (() => {
-      const existing: ?DragState = state.drag;
-      if (!existing) {
-        return null;
-      }
-
-      if (existing.current.hasCompletedFirstBulkPublish) {
-        return existing;
-      }
-
-      const newDrag: DragState = {
-        ...existing,
-        current: {
-          ...existing.current,
-          hasCompletedFirstBulkPublish: true,
-        },
-      };
-
-      return newDrag;
-    })();
-
-    const newState: State = {
-      ...state,
-      drag,
-      dimension: {
-        request: state.dimension.request,
-        draggable: {
-          ...state.dimension.draggable,
-          ...newDraggables,
-        },
-        droppable: {
-          ...state.dimension.droppable,
-          ...newDroppables,
-        },
-      },
-    };
-
-    return updateStateAfterDimensionChange(newState);
-  }
-
-  if (action.type === 'COMPLETE_LIFT') {
-    if (state.phase !== 'COLLECTING_INITIAL_DIMENSIONS') {
-      console.error('trying complete lift without collecting dimensions');
-      return state;
-    }
-
-    const { id, client, viewport, autoScrollMode } = action.payload;
-    const page: InitialDragPositions = {
-      selection: add(client.selection, viewport.scroll),
-      borderBoxCenter: add(client.borderBoxCenter, viewport.scroll),
-    };
-
-    const draggable: ?DraggableDimension = state.dimension.draggable[id];
-
-    if (!draggable) {
-      console.error('could not find draggable in store after lift');
-      return clean();
-    }
-
-    const descriptor: DraggableDescriptor = draggable.descriptor;
-
-    const initial: InitialDrag = {
-      descriptor,
-      autoScrollMode,
+  if (action.type === 'INITIAL_PUBLISH') {
+    invariant(
+      state.phase === 'PREPARING',
+      'INITIAL_PUBLISH must come after a PREPARING phase',
+    );
+    const {
+      critical,
       client,
-      page,
       viewport,
+      dimensions,
+      autoScrollMode,
+    } = action.payload;
+
+    const initial: DragPositions = {
+      client,
+      page: {
+        selection: add(client.selection, viewport.scroll.initial),
+        borderBoxCenter: add(client.selection, viewport.scroll.initial),
+        offset: origin,
+      },
     };
 
-    const current: CurrentDrag = {
-      client: {
-        selection: client.selection,
-        borderBoxCenter: client.borderBoxCenter,
-        offset: origin,
-      },
-      page: {
-        selection: page.selection,
-        borderBoxCenter: page.borderBoxCenter,
-        offset: origin,
-      },
+    const result: DraggingState = {
+      phase: 'DRAGGING',
+      isDragging: true,
+      critical,
+      autoScrollMode,
+      dimensions,
+      initial,
+      current: initial,
+      impact: getHomeImpact(critical, dimensions),
       viewport,
-      hasCompletedFirstBulkPublish: false,
+      scrollJumpRequest: null,
       shouldAnimate: false,
     };
 
-    // Calculate initial impact
-
-    const home: ?DroppableDimension = state.dimension.droppable[descriptor.droppableId];
-
-    if (!home) {
-      console.error('Cannot find home dimension for initial lift');
-      return clean();
-    }
-
-    const destination: DraggableLocation = {
-      index: descriptor.index,
-      droppableId: descriptor.droppableId,
-    };
-
-    const impact: DragImpact = {
-      movement: noMovement,
-      direction: home.axis.direction,
-      destination,
-    };
-
-    return {
-      ...state,
-      phase: 'DRAGGING',
-      drag: {
-        initial,
-        current,
-        impact,
-        scrollJumpRequest: null,
-      },
-    };
+    return result;
   }
 
-  if (action.type === 'UPDATE_DROPPABLE_DIMENSION_SCROLL') {
-    if (state.phase !== 'DRAGGING') {
-      console.error('cannot update a droppable dimensions scroll when not dragging');
-      return clean();
+  if (action.type === 'COLLECTION_STARTING') {
+    // A collection might have restarted. We do not care as we are already in the right phase
+    // TODO: remove?
+    if (state.phase === 'COLLECTING' || state.phase === 'DROP_PENDING') {
+      return state;
     }
 
-    const drag: ?DragState = state.drag;
+    invariant(
+      state.phase === 'DRAGGING',
+      `Collection cannot start from phase ${state.phase}`,
+    );
 
-    if (drag == null) {
-      console.error('invalid store state');
-      return clean();
+    const result: CollectingState = {
+      // putting phase first to appease flow
+      phase: 'COLLECTING',
+      ...state,
+      // eslint-disable-next-line
+      phase: 'COLLECTING',
+    };
+
+    return result;
+  }
+
+  if (action.type === 'PUBLISH') {
+    // Unexpected bulk publish
+    invariant(
+      state.phase === 'COLLECTING' || state.phase === 'DROP_PENDING',
+      `Unexpected ${action.type} received in phase ${state.phase}`,
+    );
+
+    invariant(
+      false,
+      `Dynamic additions and removals of Draggable and Droppable components
+      is currently not supported. But will be soon!`,
+    );
+
+    // return publish({
+    //   state,
+    //   publish: action.payload,
+    // });
+  }
+
+  if (action.type === 'MOVE') {
+    // Still preparing - ignore for now
+    if (state.phase === 'PREPARING') {
+      return state;
     }
+
+    // Not allowing any more movements
+    if (state.phase === 'DROP_PENDING') {
+      return state;
+    }
+
+    invariant(
+      isMovementAllowed(state),
+      `${action.type} not permitted in phase ${state.phase}`,
+    );
+
+    const { client, shouldAnimate } = action.payload;
+
+    // nothing needs to be done
+    if (
+      state.shouldAnimate === shouldAnimate &&
+      isEqual(client, state.current.client.selection)
+    ) {
+      return state;
+    }
+
+    // If we are jump scrolling - manual movements should not update the impact
+    const impact: ?DragImpact =
+      state.autoScrollMode === 'JUMP' ? state.impact : null;
+
+    return moveWithPositionUpdates({
+      state,
+      clientSelection: client,
+      impact,
+      shouldAnimate,
+    });
+  }
+
+  if (action.type === 'UPDATE_DROPPABLE_SCROLL') {
+    // Not allowing changes while a drop is pending
+    // Cannot get this during a DROP_ANIMATING as the dimension
+    // marshal will cancel any pending scroll updates
+    if (state.phase === 'DROP_PENDING') {
+      return state;
+    }
+
+    invariant(
+      isMovementAllowed(state),
+      `${action.type} not permitted in phase ${state.phase}`,
+    );
 
     const { id, offset } = action.payload;
+    const target: ?DroppableDimension = state.dimensions.droppables[id];
 
-    const target: ?DroppableDimension = state.dimension.droppable[id];
-
+    // This is possible if a droppable has been asked to watch scroll but
+    // the dimension has not been published yet
     if (!target) {
-      console.warn('cannot update scroll for droppable as it has not yet been collected');
       return state;
     }
 
-    const dimension: DroppableDimension = scrollDroppable(target, offset);
+    const updated: DroppableDimension = scrollDroppable(target, offset);
 
-    // If we are jump scrolling - dimension changes should not update the impact
-    const impact: ?DragImpact = drag.initial.autoScrollMode === 'JUMP' ?
-      drag.impact : null;
-
-    const newState: State = {
-      ...state,
-      dimension: {
-        request: state.dimension.request,
-        draggable: state.dimension.draggable,
-        droppable: {
-          ...state.dimension.droppable,
-          [id]: dimension,
-        },
+    const dimensions: DimensionMap = {
+      ...state.dimensions,
+      droppables: {
+        ...state.dimensions.droppables,
+        [id]: updated,
       },
     };
 
-    return updateStateAfterDimensionChange(newState, impact);
+    const impact: DragImpact = (() => {
+      // flow is getting confused - so running this check again
+      invariant(isMovementAllowed(state));
+
+      // If we are jump scrolling - dimension changes should not update the impact
+      if (state.autoScrollMode === 'JUMP') {
+        return state.impact;
+      }
+
+      return getDragImpact({
+        pageBorderBoxCenter: state.current.page.borderBoxCenter,
+        draggable: dimensions.draggables[state.critical.draggable.id],
+        draggables: dimensions.draggables,
+        droppables: dimensions.droppables,
+        previousImpact: state.impact,
+        viewport: state.viewport,
+      });
+    })();
+
+    return {
+      // appeasing flow
+      phase: 'DRAGGING',
+      ...state,
+      // eslint-disable-next-line
+      phase: state.phase,
+      impact,
+      dimensions,
+      // At this point any scroll jump request would need to be cleared
+      scrollJumpRequest: null,
+    };
   }
 
-  if (action.type === 'UPDATE_DROPPABLE_DIMENSION_IS_ENABLED') {
-    if (!Object.keys(state.dimension.droppable).length) {
+  if (action.type === 'UPDATE_DROPPABLE_IS_ENABLED') {
+    // Things are locked at this point
+    if (state.phase === 'DROP_PENDING') {
       return state;
     }
 
+    invariant(
+      isMovementAllowed(state),
+      `Attempting to move in an unsupported phase ${state.phase}`,
+    );
+
     const { id, isEnabled } = action.payload;
-    const target = state.dimension.droppable[id];
+    const target: ?DroppableDimension = state.dimensions.droppables[id];
 
     // This can happen if the enabled state changes on the droppable between
     // a onDragStart and the initial publishing of the Droppable.
@@ -432,245 +326,178 @@ export default (state: State = clean('IDLE'), action: Action): State => {
       return state;
     }
 
-    if (target.isEnabled === isEnabled) {
-      console.warn(`Trying to set droppable isEnabled to ${String(isEnabled)} but it is already ${String(isEnabled)}`);
-      return state;
-    }
+    invariant(
+      target.isEnabled === isEnabled,
+      `Trying to set droppable isEnabled to ${String(
+        isEnabled,
+      )} but it is already ${String(isEnabled)}`,
+    );
 
-    const updatedDroppableDimension = {
+    const updated: DroppableDimension = {
       ...target,
       isEnabled,
     };
 
-    const result: State = {
-      ...state,
-      dimension: {
-        ...state.dimension,
-        droppable: {
-          ...state.dimension.droppable,
-          [id]: updatedDroppableDimension,
-        },
+    const dimensions: DimensionMap = {
+      ...state.dimensions,
+      droppables: {
+        ...state.dimensions.droppables,
+        [id]: updated,
       },
     };
 
-    return updateStateAfterDimensionChange(result);
-  }
-
-  if (action.type === 'MOVE') {
-    // Otherwise get an incorrect index calculated before the other dimensions are published
-    const { client, viewport, shouldAnimate } = action.payload;
-    const drag: ?DragState = state.drag;
-
-    if (!drag) {
-      console.error('Cannot move while there is no drag state');
-      return state;
-    }
-
-    const impact: ?DragImpact = (() => {
-      // we do not want to recalculate the initial impact until the first bulk publish is finished
-      if (!drag.current.hasCompletedFirstBulkPublish) {
-        return drag.impact;
-      }
-
-      // If we are jump scrolling - manual movements should not update the impact
-      if (drag.initial.autoScrollMode === 'JUMP') {
-        return drag.impact;
-      }
-
-      return null;
-    })();
-
-    return move({
-      state,
-      clientSelection: client,
-      viewport,
-      shouldAnimate,
-      impact,
+    const impact: DragImpact = getDragImpact({
+      pageBorderBoxCenter: state.current.page.borderBoxCenter,
+      draggable: dimensions.draggables[state.critical.draggable.id],
+      draggables: dimensions.draggables,
+      droppables: dimensions.droppables,
+      previousImpact: state.impact,
+      viewport: state.viewport,
     });
+
+    return {
+      // appeasing flow - this placeholder phase will be overwritten by spread
+      phase: 'DRAGGING',
+      ...state,
+      // eslint-disable-next-line
+      phase: state.phase,
+      impact,
+      dimensions,
+    };
   }
 
   if (action.type === 'MOVE_BY_WINDOW_SCROLL') {
-    const { viewport } = action.payload;
-    const drag: ?DragState = state.drag;
-
-    if (!drag) {
-      console.error('cannot move with window scrolling if no current drag');
-      return clean();
-    }
-
-    // TODO: need to improve this so that it compares the whole viewport
-    if (isEqual(viewport.scroll, drag.current.viewport.scroll)) {
+    // No longer accepting changes
+    if (state.phase === 'DROP_PENDING' || state.phase === 'DROP_ANIMATING') {
       return state;
     }
 
-    // return state;
-    const isJumpScrolling: boolean = drag.initial.autoScrollMode === 'JUMP';
+    invariant(
+      isMovementAllowed(state),
+      `Cannot move by window in phase ${state.phase}`,
+    );
+
+    const newScroll: Position = action.payload.scroll;
+
+    // nothing needs to be done
+    if (isEqual(state.viewport.scroll.current, newScroll)) {
+      return state;
+    }
 
     // If we are jump scrolling - any window scrolls should not update the impact
-    const impact: ?DragImpact = isJumpScrolling ? drag.impact : null;
+    const isJumpScrolling: boolean = state.autoScrollMode === 'JUMP';
+    const impact: ?DragImpact = isJumpScrolling ? state.impact : null;
 
-    return move({
+    const viewport: Viewport = scrollViewport(state.viewport, newScroll);
+
+    return moveWithPositionUpdates({
       state,
-      clientSelection: drag.current.client.selection,
+      clientSelection: state.current.client.selection,
       viewport,
       shouldAnimate: false,
       impact,
     });
   }
 
-  if (action.type === 'MOVE_FORWARD' || action.type === 'MOVE_BACKWARD') {
-    if (state.phase !== 'DRAGGING') {
-      console.error('cannot move while not dragging', action);
-      return clean();
-    }
+  if (action.type === 'UPDATE_VIEWPORT_MAX_SCROLL') {
+    invariant(
+      state.isDragging,
+      'Cannot update the max viewport scroll if not dragging',
+    );
+    const existing: Viewport = state.viewport;
+    const viewport: Viewport = {
+      ...existing,
+      scroll: {
+        ...existing.scroll,
+        max: action.payload,
+      },
+    };
 
-    if (!state.drag) {
-      console.error('cannot move if there is no drag information');
-      return clean();
-    }
+    return {
+      // appeasing flow
+      phase: 'DRAGGING',
+      ...state,
+      // eslint-disable-next-line
+      phase: state.phase,
+      viewport,
+    };
+  }
 
-    const existing: DragState = state.drag;
-    const isMovingForward: boolean = action.type === 'MOVE_FORWARD';
-
-    // This is possible to do when lifting in a disabled list
-    if (!existing.impact.destination) {
+  if (
+    action.type === 'MOVE_UP' ||
+    action.type === 'MOVE_DOWN' ||
+    action.type === 'MOVE_LEFT' ||
+    action.type === 'MOVE_RIGHT'
+  ) {
+    // Not doing keyboard movements during these phases
+    if (state.phase === 'COLLECTING' || state.phase === 'DROP_PENDING') {
       return state;
     }
 
-    const droppable: DroppableDimension = state.dimension.droppable[
-      existing.impact.destination.droppableId
-    ];
+    invariant(
+      state.phase === 'DRAGGING',
+      `${action.type} received while not in DRAGGING phase`,
+    );
 
-    const result: ?MoveToNextResult = moveToNextIndex({
-      isMovingForward,
-      draggableId: existing.initial.descriptor.id,
-      droppable,
-      draggables: state.dimension.draggable,
-      previousPageBorderBoxCenter: existing.current.page.borderBoxCenter,
-      previousImpact: existing.impact,
-      viewport: existing.current.viewport,
+    const result: ?MoveInDirectionResult = moveInDirection({
+      state,
+      type: action.type,
     });
 
-    // cannot move anyway (at the beginning or end of a list)
+    // cannot mov in that direction
     if (!result) {
       return state;
     }
 
-    const impact: DragImpact = result.impact;
-    const pageBorderBoxCenter: Position = result.pageBorderBoxCenter;
-    const clientBorderBoxCenter: Position = subtract(
-      pageBorderBoxCenter, existing.current.viewport.scroll
-    );
-
-    return move({
+    return moveWithPositionUpdates({
       state,
-      impact,
-      clientSelection: clientBorderBoxCenter,
+      impact: result.impact,
+      clientSelection: result.clientSelection,
       shouldAnimate: true,
       scrollJumpRequest: result.scrollJumpRequest,
     });
   }
 
-  if (action.type === 'CROSS_AXIS_MOVE_FORWARD' || action.type === 'CROSS_AXIS_MOVE_BACKWARD') {
-    if (state.phase !== 'DRAGGING') {
-      console.error('cannot move cross axis when not dragging');
-      return clean();
-    }
+  if (action.type === 'DROP_PENDING') {
+    const reason: DropReason = action.payload.reason;
+    invariant(
+      state.phase === 'COLLECTING',
+      'Can only move into the DROP_PENDING phase from the COLLECTING phase',
+    );
 
-    const drag: ?DragState = state.drag;
-    if (!drag) {
-      console.error('cannot move cross axis if there is no drag information');
-      return clean();
-    }
-
-    // It is possible to lift a draggable in a disabled droppable
-    // In which case - use the home droppable id
-    const droppableId: DroppableId = (() => {
-      if (drag.impact.destination) {
-        return drag.impact.destination.droppableId;
-      }
-
-      return drag.initial.descriptor.droppableId;
-    })();
-
-    const current: CurrentDrag = drag.current;
-    const descriptor: DraggableDescriptor = drag.initial.descriptor;
-    const draggableId: DraggableId = descriptor.id;
-    const pageBorderBoxCenter: Position = current.page.borderBoxCenter;
-    const home: DraggableLocation = {
-      index: descriptor.index,
-      droppableId: descriptor.droppableId,
+    const newState: DropPendingState = {
+      // appeasing flow
+      phase: 'DROP_PENDING',
+      ...state,
+      // eslint-disable-next-line
+      phase: 'DROP_PENDING',
+      isWaiting: true,
+      reason,
     };
-
-    const result: ?MoveCrossAxisResult = moveCrossAxis({
-      isMovingForward: action.type === 'CROSS_AXIS_MOVE_FORWARD',
-      pageBorderBoxCenter,
-      draggableId,
-      droppableId,
-      home,
-      draggables: state.dimension.draggable,
-      droppables: state.dimension.droppable,
-      previousImpact: drag.impact,
-      viewport: current.viewport,
-    });
-
-    if (!result) {
-      return state;
-    }
-
-    const page: Position = result.pageBorderBoxCenter;
-    const client: Position = subtract(page, current.viewport.scroll);
-
-    return move({
-      state,
-      clientSelection: client,
-      impact: result.impact,
-      shouldAnimate: true,
-    });
+    return newState;
   }
 
   if (action.type === 'DROP_ANIMATE') {
-    const { newHomeOffset, impact, result } = action.payload;
+    const pending: PendingDrop = action.payload;
+    invariant(
+      state.phase === 'DRAGGING' || state.phase === 'DROP_PENDING',
+      `Cannot animate drop from phase ${state.phase}`,
+    );
 
-    if (state.phase !== 'DRAGGING') {
-      console.error('cannot animate drop while not dragging', action);
-      return state;
-    }
-
-    if (!state.drag) {
-      console.error('cannot animate drop - invalid drag state');
-      return clean();
-    }
-
-    const pending: PendingDrop = {
-      newHomeOffset,
-      result,
-      impact,
-    };
-
-    return {
+    // Moving into a new phase
+    const result: DropAnimatingState = {
       phase: 'DROP_ANIMATING',
-      drag: null,
-      drop: {
-        pending,
-        result: null,
-      },
-      dimension: state.dimension,
+      pending,
+      dimensions: state.dimensions,
     };
+
+    return result;
   }
 
+  // Action will be used by hooks to call consumers
+  // We can simply return to the idle state
   if (action.type === 'DROP_COMPLETE') {
-    const result: DropResult = action.payload;
-
-    return {
-      phase: 'DROP_COMPLETE',
-      drag: null,
-      drop: {
-        pending: null,
-        result,
-      },
-      dimension: noDimensions,
-    };
+    return idle;
   }
 
   return state;

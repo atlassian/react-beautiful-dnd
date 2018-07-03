@@ -11,29 +11,29 @@ export default (callbacks: Callbacks) => {
   });
 
   const move = rafSchd((point: Position) => memoizedMove(point.x, point.y));
-  const moveForward = rafSchd(callbacks.onMoveForward);
-  const moveBackward = rafSchd(callbacks.onMoveBackward);
-  const crossAxisMoveForward = rafSchd(callbacks.onCrossAxisMoveForward);
-  const crossAxisMoveBackward = rafSchd(callbacks.onCrossAxisMoveBackward);
+  const moveUp = rafSchd(callbacks.onMoveUp);
+  const moveDown = rafSchd(callbacks.onMoveDown);
+  const moveRight = rafSchd(callbacks.onMoveRight);
+  const moveLeft = rafSchd(callbacks.onMoveLeft);
   const windowScrollMove = rafSchd(callbacks.onWindowScroll);
 
   const cancel = () => {
     // cancel all of the next animation frames
 
     move.cancel();
-    moveForward.cancel();
-    moveBackward.cancel();
-    crossAxisMoveForward.cancel();
-    crossAxisMoveBackward.cancel();
+    moveUp.cancel();
+    moveDown.cancel();
+    moveRight.cancel();
+    moveLeft.cancel();
     windowScrollMove.cancel();
   };
 
   return {
     move,
-    moveForward,
-    moveBackward,
-    crossAxisMoveForward,
-    crossAxisMoveBackward,
+    moveUp,
+    moveDown,
+    moveRight,
+    moveLeft,
     windowScrollMove,
     cancel,
   };

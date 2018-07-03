@@ -16,7 +16,7 @@ import type { Quote as QuoteType } from '../../types';
 
 type InnerListProps = {|
   quotes: QuoteType[],
-|}
+|};
 
 // A performance optimisation to avoid rendering all the children
 // when dragging over a list
@@ -70,16 +70,19 @@ const List = styled.div`
   xpadding-bottom: 0;
   transition: background-color 0.2s ease;
 
-  ${props => (props.isDraggingOver ? `
+  ${props =>
+    props.isDraggingOver
+      ? `
     background-color: ${colors.R50};
-  ` : '')}
+  `
+      : ''};
 `;
 
 type Props = {|
   column: ColumnType,
   quotes: QuoteType[],
   index: number,
-|}
+|};
 
 export default class Column extends React.Component<Props> {
   render() {
@@ -89,7 +92,10 @@ export default class Column extends React.Component<Props> {
 
     return (
       <Draggable draggableId={column.id} index={index}>
-        {(draggableProvided: DraggableProvided, draggableSnapshot: DraggableStateSnapshot) => (
+        {(
+          draggableProvided: DraggableProvided,
+          draggableSnapshot: DraggableStateSnapshot,
+        ) => (
           <Container
             innerRef={draggableProvided.innerRef}
             {...draggableProvided.draggableProps}
@@ -100,7 +106,10 @@ export default class Column extends React.Component<Props> {
               {column.title()}
             </Header>
             <Droppable droppableId={column.id} type="quote">
-              {(droppableProvided: DroppableProvided, droppableSnapshot: DroppableStateSnapshot) => (
+              {(
+                droppableProvided: DroppableProvided,
+                droppableSnapshot: DroppableStateSnapshot,
+              ) => (
                 <List
                   innerRef={droppableProvided.innerRef}
                   {...droppableProvided.droppableProps}
@@ -112,7 +121,7 @@ export default class Column extends React.Component<Props> {
               )}
             </Droppable>
           </Container>
-          )}
+        )}
       </Draggable>
     );
   }

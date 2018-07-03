@@ -46,7 +46,8 @@ export default ({
 
   // All the draggables in the destination (even the ones that haven't moved)
   const draggablesInDestination: DraggableDimension[] = getDraggablesInsideDroppable(
-    destination, draggables
+    destination,
+    draggables,
   );
 
   // Find the dimension we need to compare the dragged item with
@@ -64,9 +65,8 @@ export default ({
     // If we're dragging to the last place in a new droppable
     // which has items in it (but which haven't moved)
     if (draggablesInDestination.length) {
-      return draggablesInDestination[
-        draggablesInDestination.length - 1
-      ].client.marginBox;
+      return draggablesInDestination[draggablesInDestination.length - 1].client
+        .marginBox;
     }
 
     // Otherwise, return the dimension of the empty foreign droppable

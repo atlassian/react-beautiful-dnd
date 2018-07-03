@@ -17,17 +17,17 @@ const Title = styled.h1`
     text-align: center;
     font-size: 10vw;
     white-space: nowrap;
-  `}
+  `};
 `;
 
 const Tagline = styled.p`
   font-size: 20px;
-  ${smallView.fn`text-align: center`}
+  ${smallView.fn`text-align: center`};
 `;
 
 const Landing = styled.div`
   /* Trello blue 500 https://design.trello.com/style/color */
-  background: #0079BF;
+  background: #0079bf;
 
   color: white;
   min-height: 100vh;
@@ -47,13 +47,13 @@ const SideBySide = styled.div`
   ${smallView.fn`
     flex-direction: column;
     align-items: center;
-  `}
+  `};
 `;
 
 const verticalSpacing = `margin-top: ${grid * 4}px;`;
 
 const VerticalRhythm = styled.div`
-  ${verticalSpacing}
+  ${verticalSpacing};
 `;
 
 const Content = styled.div`
@@ -65,13 +65,13 @@ const Content = styled.div`
 
   ${smallView.fn`
     align-items: center;
-  `}
+  `};
 `;
 
 const Example = styled.div`
   flex-grow: 0;
 
-  ${smallView.fn`${verticalSpacing}`}
+  ${smallView.fn`${verticalSpacing}`};
 `;
 
 const IndexPage = () => (
@@ -79,7 +79,9 @@ const IndexPage = () => (
     <SideBySide>
       <Content>
         <Title>React-Beautiful-Dnd</Title>
-        <Tagline>Beautiful, accessible drag and drop for lists with React.js </Tagline>
+        <Tagline>
+          Beautiful, accessible drag and drop for lists with React.js{' '}
+        </Tagline>
         <VerticalRhythm>
           <CallToAction />
         </VerticalRhythm>

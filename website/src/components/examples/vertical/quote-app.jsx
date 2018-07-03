@@ -27,11 +27,11 @@ const Root = styled.div`
 
 type Props = {|
   initial: Quote[],
-  listStyle?: Object
+  listStyle?: Object,
 |};
 
 type State = {|
-  quotes: Quote[]
+  quotes: Quote[],
 |};
 
 export default class QuoteApp extends Component<Props, State> {
@@ -65,7 +65,7 @@ export default class QuoteApp extends Component<Props, State> {
     const quotes = reorder(
       this.state.quotes,
       result.source.index,
-      result.destination.index
+      result.destination.index,
     );
 
     this.setState({

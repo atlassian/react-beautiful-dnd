@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { DragDropContext } from '../../../../../src/';
+import { DragDropContext } from '../../../../../src';
 import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
 import { reorderQuoteMap } from '../reorder';
@@ -61,23 +61,23 @@ const PushDown = styled.div`
 
 type Props = {|
   initial: QuoteMap,
-|}
+|};
 
-type State = ReorderQuoteMapResult
+type State = ReorderQuoteMapResult;
 
 export default class QuoteApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
 
   state: State = {
     quoteMap: this.props.initial,
-  }
+  };
 
   onDragStart = (initial: DragStart) => {
     publishOnDragStart(initial);
     // this.setState({
     //   disabledDroppable: this.getDisabledDroppable(initial.source.droppableId),
     // });
-  }
+  };
 
   onDragEnd = (result: DropResult) => {
     publishOnDragEnd(result);
@@ -95,9 +95,9 @@ export default class QuoteApp extends Component<Props, State> {
         quoteMap: this.state.quoteMap,
         source,
         destination,
-      })
+      }),
     );
-  }
+  };
 
   // TODO
   getDisabledDroppable = (sourceDroppable: ?string) => {
@@ -110,7 +110,7 @@ export default class QuoteApp extends Component<Props, State> {
     const disabledDroppableIndex = (sourceIndex + 1) % droppables.length;
 
     return droppables[disabledDroppableIndex];
-  }
+  };
 
   render() {
     const { quoteMap } = this.state;

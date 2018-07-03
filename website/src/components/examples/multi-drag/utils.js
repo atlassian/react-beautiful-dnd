@@ -9,13 +9,13 @@ type Args = {|
   selectedTaskIds: Id[],
   source: DraggableLocation,
   destination: DraggableLocation,
-|}
+|};
 
 export type Result = {|
   entities: Entities,
   // a drop operations can change the order of the selected task array
   selectedTaskIds: Id[],
-|}
+|};
 
 const withNewTaskIds = (column: Column, taskIds: Id[]): Column => ({
   id: column.id,
@@ -130,7 +130,9 @@ const reorderMultiDrag = ({
         // the selected item is before the destination index
         // we need to account for this when inserting into the new location
         return previous + 1;
-      }, 0);
+      },
+      0,
+    );
 
     const result: number = destination.index - destinationIndexOffset;
     return result;
@@ -139,28 +141,30 @@ const reorderMultiDrag = ({
   // doing the ordering now as we are required to look up columns
   // and know original ordering
   const orderedSelectedTaskIds: TaskId[] = [...selectedTaskIds];
-  orderedSelectedTaskIds.sort((a: TaskId, b: TaskId): number => {
-    // moving the dragged item to the top of the list
-    if (a === dragged) {
+  orderedSelectedTaskIds.sort(
+    (a: TaskId, b: TaskId): number => {
+      // moving the dragged item to the top of the list
+      if (a === dragged) {
+        return -1;
+      }
+      if (b === dragged) {
+        return 1;
+      }
+
+      // sorting by their natural indexes
+      const columnForA: Column = getHomeColumn(entities, a);
+      const indexOfA: number = columnForA.taskIds.indexOf(a);
+      const columnForB: Column = getHomeColumn(entities, b);
+      const indexOfB: number = columnForB.taskIds.indexOf(b);
+
+      if (indexOfA !== indexOfB) {
+        return indexOfA - indexOfB;
+      }
+
+      // sorting by their order in the selectedTaskIds list
       return -1;
-    }
-    if (b === dragged) {
-      return 1;
-    }
-
-    // sorting by their natural indexes
-    const columnForA: Column = getHomeColumn(entities, a);
-    const indexOfA: number = columnForA.taskIds.indexOf(a);
-    const columnForB: Column = getHomeColumn(entities, b);
-    const indexOfB: number = columnForB.taskIds.indexOf(b);
-
-    if (indexOfA !== indexOfB) {
-      return indexOfA - indexOfB;
-    }
-
-    // sorting by their order in the selectedTaskIds list
-    return -1;
-  });
+    },
+  );
 
   // we need to remove all of the selected tasks from their columns
   const withRemovedTasks: ColumnMap = entities.columnOrder.reduce(
@@ -169,12 +173,14 @@ const reorderMultiDrag = ({
 
       // remove the id's of the items that are selected
       const remainingTaskIds: TaskId[] = column.taskIds.filter(
-        (id: TaskId): boolean => !selectedTaskIds.includes(id)
+        (id: TaskId): boolean => !selectedTaskIds.includes(id),
       );
 
       previous[column.id] = withNewTaskIds(column, remainingTaskIds);
       return previous;
-    }, entities.columns);
+    },
+    entities.columns,
+  );
 
   const final: Column = withRemovedTasks[destination.droppableId];
   const withInserted: TaskId[] = (() => {
@@ -211,7 +217,7 @@ export const multiSelectTo = (
   entities: Entities,
   selectedTaskIds: Id[],
   newTaskId: TaskId,
-): ?Id[] => {
+): ?(Id[]) => {
   // Nothing already selected
   if (!selectedTaskIds.length) {
     return [newTaskId];
@@ -247,14 +253,15 @@ export const multiSelectTo = (
   // everything inbetween needs to have it's selection toggled.
   // with the exception of the start and end values which will always be selected
 
-  const toAdd: Id[] = inBetween
-    .filter((taskId: Id): boolean => {
+  const toAdd: Id[] = inBetween.filter(
+    (taskId: Id): boolean => {
       // if already selected: then no need to select it again
       if (selectedTaskIds.includes(taskId)) {
         return false;
       }
       return true;
-    });
+    },
+  );
 
   const sorted: Id[] = isSelectingForwards ? toAdd : [...toAdd].reverse();
   const combined: Id[] = [...selectedTaskIds, ...sorted];
