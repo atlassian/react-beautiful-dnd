@@ -301,6 +301,7 @@ export default class Draggable extends Component<Props> {
       draggingOver: ?DroppableId,
     ): StateSnapshot => ({
       isDragging: isDragging || isDropAnimating,
+      isDropAnimating: isDropAnimating,
       draggingOver,
     }),
   );

@@ -1135,6 +1135,23 @@ describe('Draggable - unconnected', () => {
         const snapshot: StateSnapshot = getLastCall(myMock)[0].snapshot;
         expect(snapshot.draggingOver).toBe(null);
       });
+
+      it('should let consumers know if drop animation is in progress', () => {
+        const mapProps: MapProps = {
+          ...draggingMapProps,
+          isDropAnimating: true,
+        };
+
+        const myMock = jest.fn();
+
+        mountDraggable({
+          mapProps,
+          WrappedComponent: getStubber(myMock),
+        });
+
+        const snapshot: StateSnapshot = getLastCall(myMock)[0].snapshot;
+        expect(snapshot.isDropAnimating).toBe(true);
+      });
     });
 
     describe('drop animating', () => {
