@@ -55,6 +55,24 @@ const getTranslate = (offset: Position): ?string => {
   return `translate(${offset.x}px, ${offset.y}px)`;
 };
 
+const getSpeed = (
+  isDragging: boolean,
+  shouldAnimateDragMovement: boolean,
+  isDropAnimating: boolean,
+): Speed => {
+  if (isDropAnimating) {
+    return 'STANDARD';
+  }
+
+  if (isDragging && shouldAnimateDragMovement) {
+    return 'FAST';
+  }
+
+  // if dragging: no animation
+  // if not dragging: animation done with CSS
+  return 'INSTANT';
+};
+
 export default class Draggable extends Component<Props> {
   /* eslint-disable react/sort-comp */
   callbacks: DragHandleCallbacks;
@@ -306,24 +324,6 @@ export default class Draggable extends Component<Props> {
     }),
   );
 
-  getSpeed = (
-    isDragging: boolean,
-    shouldAnimateDragMovement: boolean,
-    isDropAnimating: boolean,
-  ): Speed => {
-    if (isDropAnimating) {
-      return 'STANDARD';
-    }
-
-    if (isDragging && shouldAnimateDragMovement) {
-      return 'FAST';
-    }
-
-    // if dragging: no animation
-    // if not dragging: animation done with CSS
-    return 'INSTANT';
-  };
-
   renderChildren = (
     change: Position,
     dragHandleProps: ?DragHandleProps,
@@ -383,7 +383,7 @@ export default class Draggable extends Component<Props> {
     const droppableId: DroppableId = this.context[droppableIdKey];
     const type: TypeId = this.context[droppableTypeKey];
 
-    const speed = this.getSpeed(
+    const speed: Speed = getSpeed(
       isDragging,
       shouldAnimateDragMovement,
       isDropAnimating,
