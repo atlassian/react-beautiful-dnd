@@ -386,6 +386,9 @@ export default ({
       'Should not be able to perform a touch start while a drag or pending drag is occurring',
     );
 
+    // We do not need to prevent the event on a dropping draggable as
+    // the touchstart event will not fire due to pointer-events: none
+    // https://codesandbox.io/s/oxo0o775rz
     if (!canStartCapturing(event)) {
       return;
     }

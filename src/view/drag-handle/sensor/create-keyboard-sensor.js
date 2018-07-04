@@ -70,10 +70,8 @@ export default ({
         return;
       }
 
-      // cannot lift at this time
+      // Cannot lift at this time
       if (!canStartCapturing(event)) {
-        // need to block to prevent default browser behaviour
-        event.preventDefault();
         return;
       }
 

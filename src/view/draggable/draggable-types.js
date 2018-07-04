@@ -33,9 +33,9 @@ export type DraggingStyle = {|
   zIndex: ZIndex,
 
   // Avoiding any processing of mouse events.
-  // This is already applied by the shared styles. However, doing it here also prevents
-  // the pointer-events during a drop. The actual drag start blocking is taken care of
-  // by canStartDrag() on the context. But this a little safeguard.
+  // This is already applied by the shared styles during a drag.
+  // During a drop it prevents a draggable from being dragged.
+  // canStartDrag() will prevent drags in some cases for non primary draggable.
   // It is also a minor performance optimisation
   pointerEvents: 'none',
 |};
