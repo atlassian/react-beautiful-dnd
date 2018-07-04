@@ -239,10 +239,12 @@ export default (getHooks: () => Hooks, announce: Announce) => {
   return (store: Store) => (next: Action => mixed) => (
     action: Action,
   ): mixed => {
+    // letting the reducer update first
+    next(action);
+
     if (action.type === 'INITIAL_PUBLISH') {
       const critical: Critical = action.payload.critical;
       publisher.start(critical);
-      next(action);
       return;
     }
 
@@ -250,7 +252,6 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     if (action.type === 'DROP_COMPLETE') {
       const result: DropResult = action.payload;
       publisher.drop(result);
-      next(action);
       return;
     }
 
@@ -262,7 +263,6 @@ export default (getHooks: () => Hooks, announce: Announce) => {
         publisher.abort();
       }
 
-      next(action);
       return;
     }
 
@@ -270,12 +270,10 @@ export default (getHooks: () => Hooks, announce: Announce) => {
 
     // No drag updates required
     if (!publisher.isDragStartPublished()) {
-      next(action);
       return;
     }
 
-    // Calling next() first so that we reduce the impact of the action
-    next(action);
+    // impact of action has already been reduced
 
     const state: State = store.getState();
     if (state.phase === 'DRAGGING') {
