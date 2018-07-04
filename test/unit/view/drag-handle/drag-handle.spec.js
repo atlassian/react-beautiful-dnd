@@ -432,9 +432,9 @@ describe('drag handle', () => {
         const customWrapper = getWrapper(customCallbacks, customContext);
         const mock: MockEvent = createMockEvent();
 
-        // prevent default called on mousedown
+        // prevent default not called on mousedown
         mouseDown(customWrapper, origin, primaryButton, mock);
-        expect(mock.preventDefault).toHaveBeenCalled();
+        expect(mock.preventDefault).not.toHaveBeenCalled();
 
         // a normal lift will not occur
         windowMouseMove({ x: 0, y: sloppyClickThreshold });
@@ -1591,7 +1591,7 @@ describe('drag handle', () => {
         expect(mock.preventDefault).not.toHaveBeenCalled();
       });
 
-      it('should not lift and prevent the default action if the state does not currently allow lifting', () => {
+      it('should not lift if the state does not currently allow lifting', () => {
         const customCallbacks: Callbacks = getStubCallbacks();
         const customContext = {
           [styleContextKey]: 'hello',
@@ -1607,8 +1607,8 @@ describe('drag handle', () => {
             onLift: 0,
           }),
         ).toBe(true);
-        // preventing the event to stop the default browser action
-        expect(mock.preventDefault).toHaveBeenCalled();
+        // not preventing browser event
+        expect(mock.preventDefault).not.toHaveBeenCalled();
       });
     });
 

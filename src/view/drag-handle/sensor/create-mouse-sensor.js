@@ -269,11 +269,10 @@ export default ({
       'Should not be able to perform a mouse down while a drag or pending drag is occurring',
     );
 
+    // We do not need to prevent the event on a dropping draggable as
+    // the mouse down event will not fire due to pointer-events: none
+    // https://codesandbox.io/s/oxo0o775rz
     if (!canStartCapturing(event)) {
-      // blocking the event as we want to opt out of the standard browser behaviour
-      // this *could* occur during a drop - although it should not thanks to pointer-events: none
-      // this is just being really safe
-      event.preventDefault();
       return;
     }
 
