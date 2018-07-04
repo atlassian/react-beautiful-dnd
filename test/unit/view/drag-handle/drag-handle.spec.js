@@ -1607,7 +1607,7 @@ describe('drag handle', () => {
             onLift: 0,
           }),
         ).toBe(true);
-        // not preventing the event to stop the default browser action
+        // not preventing browser event
         expect(mock.preventDefault).not.toHaveBeenCalled();
       });
     });
