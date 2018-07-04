@@ -270,10 +270,6 @@ export default ({
     );
 
     if (!canStartCapturing(event)) {
-      // blocking the event as we want to opt out of the standard browser behaviour
-      // this *could* occur during a drop - although it should not thanks to pointer-events: none
-      // this is just being really safe
-      event.preventDefault();
       return;
     }
 
