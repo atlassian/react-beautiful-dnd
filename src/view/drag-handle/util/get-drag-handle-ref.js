@@ -27,17 +27,18 @@ const getDragHandleRef = (draggableRef: HTMLElement): HTMLElement => {
     `,
   );
 
-  // $FlowFixMe - no support for SVGElement
-  if (el instanceof SVGElement) {
-    invariant(
-      false,
-      `
-      Your drag handle cannot be a SVGElement for accessibility and cross browser support.
-
-      More information: https://github.com/atlassian/react-beautiful-dnd/tree/master/docs/guides/using-svgs.md
-    `,
-    );
+  if (process.env.NODE_ENV !== 'production') {
+    // $FlowFixMe - flow does not know about SVGElement
+    if (el instanceof SVGElement) {
+      invariant(
+        false,
+        `A drag handle cannot be an SVGElement.
+        More information: https://github.com/atlassian/react-beautiful-dnd/tree/master/docs/guides/using-svgs.md`,
+      );
+    }
   }
+
+  invariant(el instanceof HTMLElement, 'A drag handle must be a HTMLElement');
 
   return el;
 };

@@ -2,7 +2,7 @@
 
 > If you have not used `ref`'s before, please take a look at the [`React`: Refs and the DOM guide](https://reactjs.org/docs/refs-and-the-dom.html) on their documentation website.
 
-Our `Draggable` and `Droppable` components both require a _DOM node_ to be provided to them. This is done using the `innerRef` property on the `DraggableProvided` and `DroppableProvided` objects.
+Our `Draggable` and `Droppable` components both require a [`HTMLElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) to be provided to them. This is done using the `innerRef` property on the `DraggableProvided` and `DroppableProvided` objects.
 
 ```diff
 <Draggable draggableId="draggable-1" index={0}>
@@ -38,7 +38,7 @@ Confusion can arise because of how the `ref` callback works in `React`.
 
 On a _Component_ such as `<Person />` the `ref` callback will return the _instance_ of the `Person` component.
 
-On a _Element_ such as `<div />` the `ref` callback will return the _DOM node_ that the _Element_ is tied to.
+On a _ReactElement_ such as `<div />` the `ref` callback will return the _HTMLElement_ that the _ReactElement_ is tied to.
 
 [See on `codesandbox.io`](https://codesandbox.io/s/xok96ovo8p)
 
@@ -184,7 +184,7 @@ class Person extends React.Component {
 </Draggable>
 ```
 
-If you also need to use the _DOM node_ within your _Component_ you can have a more powerful ref setting approach:
+If you also need to use the _HTMLElement_ within your _Component_ you can have a more powerful ref setting approach:
 
 ```js
 class Person extends React.Component {
@@ -215,4 +215,4 @@ Here is an example that shows off the learnings presented in this guide: https:/
 
 ## A note on SVG's
 
-We do not support the dragging Draggables that are SVGElements, or drag handles.
+`react-beautiful-dnd` does not support the dragging of `<svg>` elements. Wrap your `<svg>` in a `HTMLElement` such as `<span>` or `<div>` for great accessibility and cross browser support. See our [using SVGs guide](TODO) for more information.
