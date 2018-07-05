@@ -22,8 +22,9 @@ const getDragHandleRef = (draggableRef: HTMLElement): HTMLElement => {
     if (el instanceof SVGElement) {
       invariant(
         false,
-        `A drag handle cannot be an SVGElement.
-        More information: https://github.com/atlassian/react-beautiful-dnd/tree/master/docs/guides/using-svgs.md`,
+        `A drag handle cannot be an SVGElement: it has inconsistent focus support
+
+        More information: https://github.com/atlassian/react-beautiful-dnd/tree/master/docs/guides/dragging-svgs.md`,
       );
     }
   }
