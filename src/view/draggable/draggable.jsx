@@ -106,10 +106,6 @@ export default class Draggable extends Component<Props> {
     this.styleContext = context[styleContextKey];
   }
 
-  componentDidMount() {
-    throwIfRefIsInvalid(this.ref);
-  }
-
   componentWillUnmount() {
     // releasing reference to ref for cleanup
     this.ref = null;
