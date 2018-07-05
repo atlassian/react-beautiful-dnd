@@ -241,6 +241,11 @@ export default (state: State = idle, action: Action): State => {
   }
 
   if (action.type === 'UPDATE_DROPPABLE_SCROLL') {
+    // Still preparing - ignore for now
+    if (state.phase === 'PREPARING') {
+      return state;
+    }
+
     // Not allowing changes while a drop is pending
     // Cannot get this during a DROP_ANIMATING as the dimension
     // marshal will cancel any pending scroll updates
@@ -367,6 +372,12 @@ export default (state: State = idle, action: Action): State => {
   }
 
   if (action.type === 'MOVE_BY_WINDOW_SCROLL') {
+    // Still preparing - ignore for now
+    // will be corrected in next window scroll
+    if (state.phase === 'PREPARING') {
+      return state;
+    }
+
     // No longer accepting changes
     if (state.phase === 'DROP_PENDING' || state.phase === 'DROP_ANIMATING') {
       return state;
@@ -429,6 +440,11 @@ export default (state: State = idle, action: Action): State => {
     action.type === 'MOVE_LEFT' ||
     action.type === 'MOVE_RIGHT'
   ) {
+    // Still preparing - ignore for now
+    if (state.phase === 'PREPARING') {
+      return state;
+    }
+
     // Not doing keyboard movements during these phases
     if (state.phase === 'COLLECTING' || state.phase === 'DROP_PENDING') {
       return state;
