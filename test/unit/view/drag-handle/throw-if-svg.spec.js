@@ -50,7 +50,5 @@ it('should throw if a help SVG message if the drag handle is a SVG', () => {
       { context: basicContext },
     );
 
-  expect(execute).toThrow(
-    'Your drag handle cannot be a SVGElement for accessibility and cross browser support',
-  );
+  expect(execute).toThrow('A drag handle cannot be an SVGElement');
 });

@@ -17,16 +17,6 @@ const getDragHandleRef = (draggableRef: HTMLElement): HTMLElement => {
   // https://codepen.io/alexreardon/pen/erOqyZ
   const el: ?HTMLElement = draggableRef.querySelector(selector);
 
-  invariant(
-    el,
-    `
-      Cannot find drag handle element inside of Draggable.
-      Please be sure to apply the {...provided.dragHandleProps} to your Draggable
-
-      More information: https://github.com/atlassian/react-beautiful-dnd#draggable
-    `,
-  );
-
   if (process.env.NODE_ENV !== 'production') {
     // $FlowFixMe - flow does not know about SVGElement
     if (el instanceof SVGElement) {
@@ -37,6 +27,16 @@ const getDragHandleRef = (draggableRef: HTMLElement): HTMLElement => {
       );
     }
   }
+
+  invariant(
+    el,
+    `
+      Cannot find drag handle element inside of Draggable.
+      Please be sure to apply the {...provided.dragHandleProps} to your Draggable
+
+      More information: https://github.com/atlassian/react-beautiful-dnd#draggable
+    `,
+  );
 
   invariant(el instanceof HTMLElement, 'A drag handle must be a HTMLElement');
 
