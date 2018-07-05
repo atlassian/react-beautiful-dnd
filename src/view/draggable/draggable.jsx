@@ -135,7 +135,6 @@ export default class Draggable extends Component<Props> {
     const { clientSelection, autoScrollMode } = options;
     const { lift, draggableId } = this.props;
     const ref: ?HTMLElement = this.ref;
-    throwIfRefIsInvalid(ref);
     invariant(ref);
 
     const client: ItemPositions = {
