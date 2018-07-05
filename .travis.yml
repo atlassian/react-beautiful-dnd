@@ -29,4 +29,8 @@ before_script:
   - greenkeeper-lockfile-update
   - yarn global add wait-port@0.2.2
   - yarn storybook & wait-port -t 10000 localhost:9002
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  # give xvfb some time to start
+  - sleep 3
 after_script: greenkeeper-lockfile-upload

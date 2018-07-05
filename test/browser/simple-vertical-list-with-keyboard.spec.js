@@ -47,7 +47,7 @@ describe('Browser test: single vertical list with keyboard', () => {
     /* args are supplied to avoid issues in Travis CI to launch chromium:
      https://github.com/GoogleChrome/puppeteer/issues/807 */
     browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       slowMo: 100,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
