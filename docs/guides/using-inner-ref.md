@@ -112,7 +112,7 @@ This is because `react-beautiful-dnd` expects the `provided.innerRef` function f
 
 ## Exposing a DOM ref from your Component 🤩
 
-A simple way to expose the _DOM node_ of your component is to **create your own `innerRef` prop**:
+A simple way to expose the _HTMLElement_ of your component is to **create your own `innerRef` prop**:
 
 ```js
 class Person extends React.Component {
@@ -215,4 +215,4 @@ Here is an example that shows off the learnings presented in this guide: https:/
 
 ## A note on SVG's
 
-`react-beautiful-dnd` does not support the dragging of `<svg>` elements. Wrap your `<svg>` in a `HTMLElement` such as `<span>` or `<div>` for great accessibility and cross browser support. See our [using SVGs guide](TODO) for more information.
+`react-beautiful-dnd` does not support the dragging of `<svg>` elements. Wrap your `<svg>` in a `HTMLElement` such as `<span>` or `<div>` for great accessibility and cross browser support. See our [using SVGs guide](https://github.com/atlassian/react-beautiful-dnd/tree/master/docs/guides/using-svgs.md) for more information.
