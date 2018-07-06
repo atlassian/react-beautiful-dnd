@@ -1,6 +1,6 @@
 # Dragging `<svg>`s
 
-> Summary: `react-beautiful-dnd` does not support the usage of `<svg>` for a `Draggable` or it's _drag handle_. Wrap your `<svg>` in a `HTMLElement` such as `<span>` or `<div>` for great accessibility and cross browser support. Alternatively you could [use an `<img>` element](https://css-tricks.com/using-svg) and use the `src` attribute or `background-image` css property to render your SVG.
+> Summary: `react-beautiful-dnd` does not support the usage of `<svg>` (`SVGElement`) for a `Draggable` or it's _drag handle_. You are still able to drag SVG's around using a number of different strategies listed below
 
 ## Background: [`HTMLElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement)
 
