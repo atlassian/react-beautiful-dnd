@@ -117,7 +117,10 @@ export default class Draggable extends Component<Props> {
     resultFn: ResultFn,
   ): ResultFn => {
     const result = (...args: mixed[]) => {
-      invariant(!this.props.isDragDisabled, 'BOOM');
+      invariant(
+        !this.props.isDragDisabled,
+        'Cannot perform operation while draggable is disabled',
+      );
       return resultFn(...args);
     };
     return (result: any);
