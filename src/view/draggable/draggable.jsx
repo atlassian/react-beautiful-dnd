@@ -91,20 +91,18 @@ export default class Draggable extends Component<Props> {
     super(props, context);
 
     const callbacks: DragHandleCallbacks = {
-      onLift: this.throwIfDisabled(this.onLift),
-      onMove: this.throwIfDisabled((clientSelection: Position) =>
+      onLift: this.onLift,
+      onMove: (clientSelection: Position) =>
         props.move({ client: clientSelection, shouldAnimate: false }),
-      ),
-      onDrop: this.throwIfDisabled(() => props.drop({ reason: 'DROP' })),
+      onDrop: () => props.drop({ reason: 'DROP' }),
       // not throwing if disabled - an escape hatch
       onCancel: () => props.drop({ reason: 'CANCEL' }),
-      onMoveUp: this.throwIfDisabled(props.moveUp),
-      onMoveDown: this.throwIfDisabled(props.moveDown),
-      onMoveRight: this.throwIfDisabled(props.moveRight),
-      onMoveLeft: this.throwIfDisabled(props.moveLeft),
-      onWindowScroll: this.throwIfDisabled(() =>
+      onMoveUp: props.moveUp,
+      onMoveDown: props.moveDown,
+      onMoveRight: props.moveRight,
+      onMoveLeft: props.moveLeft,
+      onWindowScroll: () =>
         props.moveByWindowScroll({ scroll: getWindowScroll() }),
-      ),
     };
 
     this.callbacks = callbacks;
@@ -144,6 +142,10 @@ export default class Draggable extends Component<Props> {
     timings.start('LIFT');
     const ref: ?HTMLElement = this.ref;
     invariant(ref);
+    invariant(
+      !this.props.isDragDisabled,
+      'Cannot lift a Draggable when it is disabled',
+    );
     const { clientSelection, autoScrollMode } = options;
     const { lift, draggableId } = this.props;
 
