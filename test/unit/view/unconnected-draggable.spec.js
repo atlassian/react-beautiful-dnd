@@ -461,21 +461,6 @@ describe('Draggable - unconnected', () => {
             expect(move).toThrow();
           });
 
-          it('should not do anything if the dimensions have not all been published yet', () => {
-            const dispatchProps = getDispatchPropsStub();
-            const wrapper = mountDraggable({
-              dispatchProps,
-            });
-
-            // should not do anything yet as mapProps has not yet updated
-            wrapper
-              .find(DragHandle)
-              .props()
-              .callbacks.onMove({ x: 100, y: 200 });
-
-            expect(dispatchProps.move).not.toHaveBeenCalled();
-          });
-
           it('should consider any mouse movement for the client coordinates', () => {
             const selection: Position = {
               x: 10,

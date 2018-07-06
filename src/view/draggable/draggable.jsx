@@ -91,37 +91,41 @@ export default class Draggable extends Component<Props> {
     super(props, context);
 
     const callbacks: DragHandleCallbacks = {
-      onLift: this.onLift,
-      onMove: this.onMove,
-      onDrop: this.onDrop,
-      onCancel: this.onCancel,
-      onMoveUp: this.onMoveUp,
-      onMoveDown: this.onMoveDown,
-      onMoveRight: this.onMoveRight,
-      onMoveLeft: this.onMoveLeft,
-      onWindowScroll: this.onWindowScroll,
+      onLift: this.throwIfDisabled(this.onLift),
+      onMove: this.throwIfDisabled((clientSelection: Position) =>
+        props.move({ client: clientSelection, shouldAnimate: false }),
+      ),
+      onDrop: this.throwIfDisabled(() => props.drop({ reason: 'DROP' })),
+      // not throwing if disabled - an escape hatch
+      onCancel: () => props.drop({ reason: 'CANCEL' }),
+      onMoveUp: this.throwIfDisabled(props.moveUp),
+      onMoveDown: this.throwIfDisabled(props.moveDown),
+      onMoveRight: this.throwIfDisabled(props.moveRight),
+      onMoveLeft: this.throwIfDisabled(props.moveLeft),
+      onWindowScroll: this.throwIfDisabled(() =>
+        props.moveByWindowScroll({ scroll: getWindowScroll() }),
+      ),
     };
 
     this.callbacks = callbacks;
     this.styleContext = context[styleContextKey];
   }
 
-  componentDidMount() {
-    throwIfRefIsInvalid(this.ref);
-  }
+  // This should already be handled gracefully in DragHandle.
+  // Just being extra clear here
+  throwIfDisabled = <ResultFn: (...any[]) => mixed>(
+    resultFn: ResultFn,
+  ): ResultFn => {
+    const result = (...args: mixed[]) => {
+      invariant(!this.props.isDragDisabled, 'BOOM');
+      return resultFn(...args);
+    };
+    return (result: any);
+  };
 
   componentWillUnmount() {
     // releasing reference to ref for cleanup
     this.ref = null;
-  }
-
-  // This should already be handled gracefully in DragHandle.
-  // Just being extra clear here
-  throwIfCannotDrag() {
-    invariant(
-      !this.props.isDragDisabled,
-      'Draggable: cannot drag as dragging is not enabled',
-    );
   }
 
   onMoveEnd = () => {
@@ -135,12 +139,11 @@ export default class Draggable extends Component<Props> {
     autoScrollMode: AutoScrollMode,
   }) => {
     timings.start('LIFT');
-    this.throwIfCannotDrag();
-    const { clientSelection, autoScrollMode } = options;
-    const { lift, draggableId } = this.props;
     const ref: ?HTMLElement = this.ref;
     throwIfRefIsInvalid(ref);
     invariant(ref);
+    const { clientSelection, autoScrollMode } = options;
+    const { lift, draggableId } = this.props;
 
     const client: ItemPositions = {
       selection: clientSelection,
@@ -155,55 +158,6 @@ export default class Draggable extends Component<Props> {
       viewport: getViewport(),
     });
     timings.finish('LIFT');
-  };
-
-  onMove = (clientSelection: Position) => {
-    this.throwIfCannotDrag();
-
-    const { dimension, move } = this.props;
-
-    // dimensions not provided yet
-    if (!dimension) {
-      return;
-    }
-
-    move({ client: clientSelection, shouldAnimate: false });
-  };
-
-  onMoveUp = () => {
-    this.throwIfCannotDrag();
-    this.props.moveUp();
-  };
-
-  onMoveDown = () => {
-    this.throwIfCannotDrag();
-    this.props.moveDown();
-  };
-
-  onMoveRight = () => {
-    this.throwIfCannotDrag();
-    this.props.moveRight();
-  };
-
-  onMoveLeft = () => {
-    this.throwIfCannotDrag();
-    this.props.moveLeft();
-  };
-
-  onWindowScroll = () => {
-    this.throwIfCannotDrag();
-    this.props.moveByWindowScroll({ scroll: getWindowScroll() });
-  };
-
-  onDrop = () => {
-    this.throwIfCannotDrag();
-    this.props.drop({ reason: 'DROP' });
-  };
-
-  onCancel = () => {
-    // Not checking if drag is enabled.
-    // Cancel is an escape mechanism
-    this.props.drop({ reason: 'CANCEL' });
   };
 
   // React calls ref callback twice for every render
