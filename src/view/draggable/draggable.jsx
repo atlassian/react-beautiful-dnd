@@ -140,7 +140,6 @@ export default class Draggable extends Component<Props> {
   }) => {
     timings.start('LIFT');
     const ref: ?HTMLElement = this.ref;
-    throwIfRefIsInvalid(ref);
     invariant(ref);
     const { clientSelection, autoScrollMode } = options;
     const { lift, draggableId } = this.props;
