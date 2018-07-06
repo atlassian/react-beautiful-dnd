@@ -29,7 +29,11 @@ One of the core values of `react-beautiful-dnd` is accessibility
 
 > Beautiful, **accessible** drag and drop for lists with React.js
 
-So in order to provide the best accessibility and cross browser experience for consumers we enforce that `SVGElement`s need to be wrapped in a `HTMLElement` such as `<span>` or `<div>` if you want to have them as your `Draggable` or _drag handle_.
+## But I want to drag using a `<svg>`!
+
+### Option 1: Wrap in an `HTMLElement`
+
+In order to provide the best accessibility and cross browser experience for consumers we enforce that `SVGElement`s need to be wrapped in a `HTMLElement` such as `<span>` or `<div>` if you want to have them as your `Draggable` or _drag handle_.
 
 ```js
 // ❌ not supported
@@ -59,3 +63,49 @@ So in order to provide the best accessibility and cross browser experience for c
 )}
 </Draggable>
 ```
+
+### Option 2: use an `<img>` tag
+
+You can use the `src` of an `<img>` tag (which is a `HTMLElement`) to have a draggable SVG.
+
+```js
+// ✅ supported
+<Draggable draggableId="supported" index={0}>
+  {provided => (
+    <img
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+      ref={provided.innerRef}
+      src="my-cool-image.svg"
+    />
+  )}
+</Draggable>
+```
+
+> You can read more about this approach on [CSS-Tricks](https://css-tricks.com/using-svg/)
+
+### Option 3: use `background-image`
+
+Alternatively you could also apply the SVG as a `background-image` to another `HTMLElement`.
+
+```css
+.item {
+  background-image: url(my-cool-image.svg);
+}
+```
+
+```js
+// ✅ supported
+<Draggable draggableId="supported" index={0}>
+  {provided => (
+    <div
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+      ref={provided.innerRef}
+      className="item"
+    />
+  )}
+</Draggable>
+```
+
+> You can read more about this approach on [CSS-Tricks](https://css-tricks.com/using-svg/)
