@@ -85,8 +85,7 @@ export default class DragHandle extends Component<Props> {
       return;
     }
 
-    const dragHandleRef: ?HTMLElement = getDragHandleRef(draggableRef);
-    invariant(dragHandleRef, 'DragHandle could not find drag handle element');
+    const dragHandleRef: HTMLElement = getDragHandleRef(draggableRef);
 
     focusRetainer.tryRestoreFocus(this.props.draggableId, dragHandleRef);
   }
@@ -110,10 +109,7 @@ export default class DragHandle extends Component<Props> {
         return;
       }
 
-      const dragHandleRef: ?HTMLElement = getDragHandleRef(ref);
-      invariant(dragHandleRef, 'DragHandle could not find drag handle element');
-
-      dragHandleRef.focus();
+      getDragHandleRef(ref).focus();
     }
 
     const isCapturing: boolean = this.isAnySensorCapturing();
