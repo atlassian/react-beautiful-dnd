@@ -431,36 +431,6 @@ describe('Draggable - unconnected', () => {
         });
 
         describe('onMove', () => {
-          it('should throw if dragging is not enabled', () => {
-            const wrapper = mountDraggable({
-              ownProps: disabledOwnProps,
-              mapProps: draggingMapProps,
-            });
-
-            const move = () =>
-              wrapper
-                .find(DragHandle)
-                .props()
-                .callbacks.onMove({ x: 100, y: 200 });
-
-            expect(move).toThrow();
-          });
-
-          it('should throw if not attached to the DOM', () => {
-            const wrapper = mountDraggable();
-            const move = () => {
-              // Calling the prop directly as this is not able to be done otherwise
-              wrapper
-                .find(DragHandle)
-                .props()
-                .callbacks.onMove({ x: 100, y: 200 });
-            };
-
-            wrapper.unmount();
-
-            expect(move).toThrow();
-          });
-
           it('should consider any mouse movement for the client coordinates', () => {
             const selection: Position = {
               x: 10,
@@ -486,35 +456,6 @@ describe('Draggable - unconnected', () => {
         });
 
         describe('onDrop', () => {
-          it('should throw if dragging is disabled', () => {
-            const wrapper = mountDraggable({
-              ownProps: disabledOwnProps,
-              mapProps: draggingMapProps,
-            });
-
-            const drop = () =>
-              wrapper
-                .find(DragHandle)
-                .props()
-                .callbacks.onDrop();
-
-            expect(drop).toThrow();
-          });
-
-          it('should throw if not attached to the DOM', () => {
-            const wrapper = mountDraggable();
-            const drop = () => {
-              wrapper
-                .find(DragHandle)
-                .props()
-                .callbacks.onDrop();
-            };
-
-            wrapper.unmount();
-
-            expect(drop).toThrow();
-          });
-
           it('should trigger drop', () => {
             const dispatchProps = getDispatchPropsStub();
             const wrapper = mountDraggable({
@@ -531,35 +472,6 @@ describe('Draggable - unconnected', () => {
         });
 
         describe('onMoveUp', () => {
-          it('should throw if dragging is disabled', () => {
-            const wrapper = mountDraggable({
-              ownProps: disabledOwnProps,
-            });
-
-            const tryMove = () =>
-              wrapper
-                .find(DragHandle)
-                .props()
-                .callbacks.onMoveUp();
-
-            expect(tryMove).toThrow();
-          });
-
-          it('should throw if not attached to the DOM', () => {
-            const wrapper = mountDraggable({
-              mapProps: draggingMapProps,
-            });
-            const tryMove = () =>
-              wrapper
-                .find(DragHandle)
-                .props()
-                .callbacks.onMoveUp();
-
-            wrapper.unmount();
-
-            expect(tryMove).toThrow();
-          });
-
           it('should call the move up action', () => {
             const dispatchProps = getDispatchPropsStub();
             const wrapper = mountDraggable({
@@ -577,37 +489,6 @@ describe('Draggable - unconnected', () => {
         });
 
         describe('onMoveDown', () => {
-          it('should throw if dragging is disabled', () => {
-            const wrapper = mountDraggable({
-              ownProps: disabledOwnProps,
-              mapProps: draggingMapProps,
-            });
-
-            const tryMove = () =>
-              wrapper
-                .find(DragHandle)
-                .props()
-                .callbacks.onMoveDown();
-
-            expect(tryMove).toThrow();
-          });
-
-          it('should throw if not attached to the DOM', () => {
-            const wrapper = mountDraggable({
-              mapProps: draggingMapProps,
-            });
-
-            wrapper.unmount();
-
-            const tryMove = () =>
-              wrapper
-                .find(DragHandle)
-                .props()
-                .callbacks.onMoveDown();
-
-            expect(tryMove).toThrow();
-          });
-
           it('should call the move down action', () => {
             const dispatchProps = getDispatchPropsStub();
             const wrapper = mountDraggable({
@@ -625,37 +506,6 @@ describe('Draggable - unconnected', () => {
         });
 
         describe('onMoveLeft', () => {
-          it('should throw if dragging is disabled', () => {
-            const wrapper = mountDraggable({
-              ownProps: disabledOwnProps,
-              mapProps: draggingMapProps,
-            });
-
-            const tryMove = () =>
-              wrapper
-                .find(DragHandle)
-                .props()
-                .callbacks.onMoveLeft();
-
-            expect(tryMove).toThrow();
-          });
-
-          it('should throw if not attached to the DOM', () => {
-            const wrapper = mountDraggable({
-              mapProps: draggingMapProps,
-            });
-
-            wrapper.unmount();
-
-            const tryMove = () =>
-              wrapper
-                .find(DragHandle)
-                .props()
-                .callbacks.onMoveLeft();
-
-            expect(tryMove).toThrow();
-          });
-
           it('should call the cross axis move forward action', () => {
             const dispatchProps = getDispatchPropsStub();
             const wrapper = mountDraggable({
@@ -673,37 +523,6 @@ describe('Draggable - unconnected', () => {
         });
 
         describe('onMoveRight', () => {
-          it('should throw if dragging is disabled', () => {
-            const wrapper = mountDraggable({
-              ownProps: disabledOwnProps,
-              mapProps: draggingMapProps,
-            });
-
-            const tryMove = () =>
-              wrapper
-                .find(DragHandle)
-                .props()
-                .callbacks.onMoveRight();
-
-            expect(tryMove).toThrow();
-          });
-
-          it('should throw if not attached to the DOM', () => {
-            const wrapper = mountDraggable({
-              mapProps: draggingMapProps,
-            });
-
-            wrapper.unmount();
-
-            const tryMove = () =>
-              wrapper
-                .find(DragHandle)
-                .props()
-                .callbacks.onMoveRight();
-
-            expect(tryMove).toThrow();
-          });
-
           it('should call the move cross axis backwards action', () => {
             const dispatchProps = getDispatchPropsStub();
             const wrapper = mountDraggable({
@@ -753,55 +572,9 @@ describe('Draggable - unconnected', () => {
 
             expect(dispatchProps.drop).toBeCalled();
           });
-
-          it('should allow the action even when not attached to the dom', () => {
-            const dispatchProps = getDispatchPropsStub();
-            const wrapper = mountDraggable({
-              mapProps: draggingMapProps,
-              dispatchProps,
-            });
-
-            wrapper
-              .find(DragHandle)
-              .props()
-              .callbacks.onCancel();
-
-            expect(dispatchProps.drop).toBeCalled();
-          });
         });
 
         describe('onWindowScroll', () => {
-          it('should throw if dragging is disabled', () => {
-            const wrapper = mountDraggable({
-              ownProps: disabledOwnProps,
-              mapProps: draggingMapProps,
-            });
-
-            const tryUpdateWindowScroll = () =>
-              wrapper
-                .find(DragHandle)
-                .props()
-                .callbacks.onWindowScroll();
-
-            expect(tryUpdateWindowScroll).toThrow();
-          });
-
-          it('should throw if not attached to the DOM', () => {
-            const wrapper = mountDraggable({
-              mapProps: draggingMapProps,
-            });
-
-            wrapper.unmount();
-
-            const tryUpdateWindowScroll = () =>
-              wrapper
-                .find(DragHandle)
-                .props()
-                .callbacks.onWindowScroll();
-
-            expect(tryUpdateWindowScroll).toThrow();
-          });
-
           it('should call the moveByWindowScroll action', () => {
             const dispatchProps = getDispatchPropsStub();
             const wrapper = mountDraggable({
