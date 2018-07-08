@@ -1192,6 +1192,26 @@ describe('drag handle', () => {
         ).toBe(true);
       });
 
+      it('should cancel any pending window scroll movements', () => {
+        // lift
+        mouseDown(wrapper);
+        windowMouseMove({ x: 0, y: sloppyClickThreshold });
+
+        expect(callbacksCalled(callbacks)({ onLift: 1 })).toBe(true);
+
+        // scroll is queued
+        dispatchWindowEvent('scroll');
+        expect(callbacks.onWindowScroll).not.toHaveBeenCalled();
+
+        // disable drag handle
+        wrapper.setProps({ isEnabled: false });
+
+        // flushing the animation would normally trigger a window scroll movement
+        requestAnimationFrame.flush();
+        expect(callbacks.onWindowScroll).not.toHaveBeenCalled();
+        expect(callbacks.onCancel).toHaveBeenCalled();
+      });
+
       it('should cancel an existing drag', () => {
         // lift
         mouseDown(wrapper);
@@ -1976,6 +1996,39 @@ describe('drag handle', () => {
         ).toBe(true);
       });
 
+      it('should drop any pending movements', () => {
+        // lift
+        pressSpacebar(wrapper);
+        expect(callbacks.onLift).toHaveBeenCalledTimes(1);
+
+        pressArrowUp(wrapper);
+        pressArrowRight(wrapper);
+        pressArrowDown(wrapper);
+        pressArrowLeft(wrapper);
+        // movement still scheduled
+        expect(callbacks.onMoveUp).not.toHaveBeenCalled();
+
+        // disabling
+        wrapper.setProps({ isEnabled: false });
+        expect(callbacksCalled(callbacks)({ onLift: 1, onCancel: 1 })).toBe(
+          true,
+        );
+
+        // flushing animation queue - would normally trigger movement
+        requestAnimationFrame.flush();
+
+        expect(
+          callbacksCalled(callbacks)({
+            onLift: 1,
+            onCancel: 1,
+            onMoveUp: 0,
+            onMoveRight: 0,
+            onMoveDown: 0,
+            onMoveLeft: 0,
+          }),
+        ).toBe(true);
+      });
+
       it('should stop preventing default action on events', () => {
         // setup
         pressSpacebar(wrapper);
@@ -2408,7 +2461,7 @@ describe('drag handle', () => {
       });
     });
 
-    describe('cancelling a drag that has started', () => {
+    describe('disabling a draggable during a drag', () => {
       beforeEach(start);
 
       it('should cancel a drag if it is disabled mid drag', () => {
@@ -2422,6 +2475,60 @@ describe('drag handle', () => {
             onCancel: 1,
           }),
         ).toBe(true);
+      });
+
+      it('should drop any pending movements', () => {
+        expect(callbacks.onMove).not.toHaveBeenCalled();
+
+        wrapper.setProps({ isEnabled: false });
+        expect(
+          callbacksCalled(callbacks)({
+            onLift: 1,
+            onCancel: 1,
+          }),
+        ).toBe(true);
+
+        // would normally flush the movement
+        requestAnimationFrame.flush();
+        expect(
+          callbacksCalled(callbacks)({
+            onLift: 1,
+            onCancel: 1,
+          }),
+        ).toBe(true);
+      });
+
+      // TODO: fix
+      it('should drop any pending window scrolls', () => {
+        const original: Postiion = getWindowScroll();
+        setWindowScroll(
+          {
+            x: 100,
+            y: 200,
+          },
+          { shouldPublish: true },
+        );
+        expect(callbacks.onWindowScroll).not.toHaveBeenCalled();
+
+        wrapper.setProps({ isEnabled: false });
+        expect(
+          callbacksCalled(callbacks)({
+            onLift: 1,
+            onCancel: 1,
+          }),
+        ).toBe(true);
+
+        // would normally flush the windowScroll
+        requestAnimationFrame.flush();
+        expect(
+          callbacksCalled(callbacks)({
+            onLift: 1,
+            onCancel: 1,
+            onWindowScroll: 0,
+          }),
+        ).toBe(true);
+
+        setWindowScroll(original, {shouldPublish: false});
       });
 
       it('should prevent the next click event', () => {

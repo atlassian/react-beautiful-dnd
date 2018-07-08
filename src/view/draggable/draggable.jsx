@@ -109,21 +109,6 @@ export default class Draggable extends Component<Props> {
     this.styleContext = context[styleContextKey];
   }
 
-  // This should already be handled gracefully in DragHandle.
-  // Just being extra clear here
-  throwIfDisabled = <ResultFn: (...any[]) => mixed>(
-    resultFn: ResultFn,
-  ): ResultFn => {
-    const result = (...args: mixed[]) => {
-      invariant(
-        !this.props.isDragDisabled,
-        'Cannot perform operation while draggable is disabled',
-      );
-      return resultFn(...args);
-    };
-    return (result: any);
-  };
-
   componentWillUnmount() {
     // releasing reference to ref for cleanup
     this.ref = null;
