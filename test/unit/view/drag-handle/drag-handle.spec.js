@@ -2528,7 +2528,7 @@ describe('drag handle', () => {
           }),
         ).toBe(true);
 
-        setWindowScroll(original, {shouldPublish: false});
+        setWindowScroll(original, { shouldPublish: false });
       });
 
       it('should prevent the next click event', () => {
