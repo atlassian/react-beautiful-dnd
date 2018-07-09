@@ -24,11 +24,14 @@
     "/dist",
     "/src"
   ],
+  "config": {
+    "prettier_target": "*.{js,jsx,md,json} src/**/*.{js,jsx,md,json} test/**/*.{js,jsx,md,json} docs/**/*.{js,jsx,md,json} stories/**/*.{js,jsx,md,json} website/src/**/*.{js,jsx,md,json}"
+  },
   "scripts": {
     "test": "jest --config ./jest.config.js",
     "validate": "yarn prettier:check && yarn lint:eslint && yarn lint:css && yarn typecheck",
-    "prettier:check": "yarn prettier --debug-check *.md src/**/*.{js,jsx} test/**/*.{js,jsx} stories/**/*.{js,jsx} website/src/**/*.{js,jsx}",
-    "prettier:write": "yarn prettier --write *.md src/**/*.{js,jsx} test/**/*.{js,jsx} stories/**/*.{js,jsx} website/src/**/*.{js,jsx}",
+    "prettier:check": "yarn prettier --debug-check $npm_package_config_prettier_target",
+    "prettier:write": "yarn prettier --write $npm_package_config_prettier_target",
     "lint:eslint": "yarn eslint .",
     "lint:css": "stylelint \"stories/**/*.{js,jsx}\"",
     "typecheck": "flow check",
