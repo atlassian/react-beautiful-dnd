@@ -1,199 +1,80 @@
 // @flow
-import React, { Component, type Node } from 'react';
-import { getRect, type Position } from 'css-box-model';
 import { mount, type ReactWrapper } from 'enzyme';
-import DragHandle from '../../../../src/view/drag-handle/drag-handle';
-import { sloppyClickThreshold } from '../../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
+import React from 'react';
+import {getRect, type Position} from 'css-box-model';
 import {
-  dispatchWindowMouseEvent,
-  dispatchWindowKeyDownEvent,
-  dispatchWindowTouchEvent,
-  mouseEvent,
-  touchEvent,
-  withKeyboard,
-  dispatchWindowEvent,
-} from '../../../utils/user-input-util';
+  canLiftContextKey,
+  styleContextKey,
+} from '../../../../src/view/context-keys';
+import DragHandle from '../../../../src/view/drag-handle/drag-handle';
+import {
+  forcePressThreshold,
+  timeForLongPress,
+} from '../../../../src/view/drag-handle/sensor/create-touch-sensor';
+import { sloppyClickThreshold } from '../../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
 import * as keyCodes from '../../../../src/view/key-codes';
 import getWindowScroll from '../../../../src/view/window/get-window-scroll';
 import setWindowScroll from '../../../utils/set-window-scroll';
 import {
-  timeForLongPress,
-  forcePressThreshold,
-} from '../../../../src/view/drag-handle/sensor/create-touch-sensor';
-import { interactiveTagNames } from '../../../../src/view/drag-handle/util/should-allow-dragging-from-target';
+  dispatchWindowEvent,
+  dispatchWindowKeyDownEvent,
+  dispatchWindowMouseEvent,
+  withKeyboard,
+} from '../../../utils/user-input-util';
+import basicContext from './util/basic-context';
+import {
+  callbacksCalled,
+  getStubCallbacks,
+  whereAnyCallbacksCalled,
+} from './util/callbacks';
+import {
+  auxiliaryButton,
+  mouseClick,
+  mouseDown,
+  pressArrowDown,
+  pressArrowLeft,
+  pressArrowRight,
+  pressArrowUp,
+  pressEnter,
+  pressEscape,
+  // keyboard events
+  pressSpacebar,
+  pressTab,
+  primaryButton,
+  // touch events
+  touchStart,
+  windowEnter,
+  windowEscape,
+  windowMouseClick,
+  windowMouseDown,
+  windowMouseMove,
+  // mouse events
+  windowMouseUp,
+  windowSpacebar,
+  windowTab,
+  windowTouchCancel,
+  windowTouchEnd,
+  windowTouchMove,
+  windowTouchStart,
+  // other
+  isAWindowClickPrevented,
+  createMockEvent,
+  type MockEvent,
+} from './util/events';
+import { getWrapper, Child, createRef } from './util/wrappers';
 import type {
   Callbacks,
   DragHandleProps,
 } from '../../../../src/view/drag-handle/drag-handle-types';
 import type { DraggableId } from '../../../../src/types';
-import type { TagNameMap } from '../../../../src/view/drag-handle/util/should-allow-dragging-from-target';
-import {
-  styleContextKey,
-  canLiftContextKey,
-} from '../../../../src/view/context-keys';
-import * as attributes from '../../../../src/view/data-attributes';
-import {
-  getStubCallbacks,
-  resetCallbacks,
-  callbacksCalled,
-  whereAnyCallbacksCalled,
-} from './util';
-
-const primaryButton: number = 0;
-const auxiliaryButton: number = 1;
-
-type ChildProps = {|
-  dragHandleProps: ?DragHandleProps,
-  className?: string,
-  children?: Node,
-|};
-
-class Child extends Component<ChildProps> {
-  static defaultProps = {
-    className: 'unused-child-class-name',
-    children: null,
-  };
-  render() {
-    return (
-      <div {...this.props.dragHandleProps} className={this.props.className}>
-        Drag me!
-        {this.props.children}
-      </div>
-    );
-  }
-}
-
-// mouse events
-const windowMouseUp = dispatchWindowMouseEvent.bind(null, 'mouseup');
-const windowMouseDown = dispatchWindowMouseEvent.bind(null, 'mousedown');
-const windowMouseMove = dispatchWindowMouseEvent.bind(null, 'mousemove');
-const windowMouseClick = dispatchWindowMouseEvent.bind(null, 'click');
-const mouseDown = mouseEvent.bind(null, 'mousedown');
-const mouseClick = mouseEvent.bind(null, 'click');
-// keyboard events
-const pressSpacebar = withKeyboard(keyCodes.space);
-const windowSpacebar = dispatchWindowKeyDownEvent.bind(null, keyCodes.space);
-const pressArrowDown = withKeyboard(keyCodes.arrowDown);
-const pressArrowUp = withKeyboard(keyCodes.arrowUp);
-const pressArrowRight = withKeyboard(keyCodes.arrowRight);
-const pressArrowLeft = withKeyboard(keyCodes.arrowLeft);
-const pressEscape = withKeyboard(keyCodes.escape);
-const windowEscape = dispatchWindowKeyDownEvent.bind(null, keyCodes.escape);
-const pressTab = withKeyboard(keyCodes.tab);
-const windowTab = dispatchWindowKeyDownEvent.bind(null, keyCodes.tab);
-const pressEnter = withKeyboard(keyCodes.enter);
-const windowEnter = dispatchWindowKeyDownEvent.bind(null, keyCodes.enter);
-// touch events
-const touchStart = touchEvent.bind(null, 'touchstart');
-const windowTouchStart = dispatchWindowTouchEvent.bind(null, 'touchstart');
-const windowTouchMove = dispatchWindowTouchEvent.bind(null, 'touchmove');
-const windowTouchEnd = dispatchWindowTouchEvent.bind(null, 'touchend');
-const windowTouchCancel = dispatchWindowTouchEvent.bind(null, 'touchcancel');
 
 const origin: Position = { x: 0, y: 0 };
 const draggableId: DraggableId = 'draggable';
 
-type MockEvent = {|
-  preventDefault: Function,
-|};
-
-const createMockEvent = (): MockEvent => ({
-  preventDefault: jest.fn(),
-});
-
-const isAWindowClickPrevented = (): boolean => {
-  const event: Event = windowMouseClick();
-  return event.defaultPrevented;
-};
-
-const basicContext = {
-  [styleContextKey]: 'hello',
-  [canLiftContextKey]: () => true,
-};
-
-const fakeCenter: Position = {
-  x: 50,
-  y: 80,
-};
-const parentRef: HTMLElement = document.createElement('div');
-const childRef: HTMLElement = document.createElement('div');
-const singleRef: HTMLElement = document.createElement('div');
-
-[parentRef, childRef, singleRef].forEach((ref: HTMLElement) => {
-  // faking that they are drag handles
-  ref.setAttribute(attributes.dragHandle, 'yolo');
-
-  jest.spyOn(ref, 'getBoundingClientRect').mockImplementation(() =>
-    getRect({
-      left: 0,
-      top: 0,
-      right: fakeCenter.x * 2,
-      bottom: fakeCenter.y * 2,
-    }),
-  );
-});
-
-const getNestedWrapper = (
-  parentCallbacks: Callbacks,
-  childCallbacks: Callbacks,
-): ReactWrapper =>
-  mount(
-    <DragHandle
-      draggableId="parent"
-      callbacks={parentCallbacks}
-      isDragging={false}
-      isDropAnimating={false}
-      isEnabled
-      getDraggableRef={() => parentRef}
-      canDragInteractiveElements={false}
-    >
-      {(parentProps: ?DragHandleProps) => (
-        <Child dragHandleProps={parentProps} className="parent">
-          <DragHandle
-            draggableId="child"
-            callbacks={childCallbacks}
-            isDragging={false}
-            isDropAnimating={false}
-            isEnabled
-            getDraggableRef={() => childRef}
-            canDragInteractiveElements={false}
-          >
-            {(childProps: ?DragHandleProps) => (
-              <Child dragHandleProps={childProps} className="child">
-                Child!
-              </Child>
-            )}
-          </DragHandle>
-        </Child>
-      )}
-    </DragHandle>,
-    { context: basicContext },
-  );
-
-const getWrapper = (
-  callbacks: Callbacks,
-  context?: Object = basicContext,
-): ReactWrapper =>
-  mount(
-    <DragHandle
-      draggableId={draggableId}
-      callbacks={callbacks}
-      isDragging={false}
-      isDropAnimating={false}
-      isEnabled
-      getDraggableRef={() => singleRef}
-      canDragInteractiveElements={false}
-    >
-      {(dragHandleProps: ?DragHandleProps) => (
-        <Child dragHandleProps={dragHandleProps} />
-      )}
-    </DragHandle>,
-    { context },
-  );
-
 describe('drag handle', () => {
   let callbacks: Callbacks;
   let wrapper: ReactWrapper;
+  let draggableRef;
 
   beforeAll(() => {
     requestAnimationFrame.reset();
@@ -205,10 +86,15 @@ describe('drag handle', () => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
     callbacks = getStubCallbacks();
     wrapper = getWrapper(callbacks);
+    draggableRef = createRef();
   });
 
   afterEach(() => {
-    wrapper.unmount();
+    try {
+      wrapper.unmount();
+    } catch (e) {
+      // we can get exceptions here as we are faking refs
+    }
     console.warn.mockRestore();
     console.error.mockRestore();
 
@@ -219,57 +105,24 @@ describe('drag handle', () => {
 
   afterAll(() => {
     requestAnimationFrame.reset();
-    singleRef.getBoundingClientRect.mockRestore();
   });
 
   it('should apply the style context to a data-attribute', () => {
-    const myMock = jest.fn();
-    myMock.mockReturnValue(<div>hello world</div>);
-
-    mount(
-      <DragHandle
-        draggableId={draggableId}
-        callbacks={callbacks}
-        isEnabled
-        isDragging={false}
-        isDropAnimating={false}
-        getDraggableRef={() => singleRef}
-        canDragInteractiveElements={false}
-      >
-        {(dragHandleProps: ?DragHandleProps) => myMock(dragHandleProps)}
-      </DragHandle>,
-      { context: basicContext },
-    );
-
     expect(
-      // $ExpectError - using lots of accessors
-      myMock.mock.calls[0][0]['data-react-beautiful-dnd-drag-handle'],
+      wrapper
+        .find(Child)
+        .getDOMNode()
+        .getAttribute('data-react-beautiful-dnd-drag-handle'),
     ).toEqual(basicContext[styleContextKey]);
   });
 
   it('should apply a default aria roledescription containing lift instructions', () => {
-    const myMock = jest.fn();
-    myMock.mockReturnValue(<div>hello world</div>);
-
-    mount(
-      <DragHandle
-        draggableId={draggableId}
-        callbacks={callbacks}
-        isEnabled
-        isDragging={false}
-        isDropAnimating={false}
-        getDraggableRef={() => singleRef}
-        canDragInteractiveElements={false}
-      >
-        {(dragHandleProps: ?DragHandleProps) => myMock(dragHandleProps)}
-      </DragHandle>,
-      { context: basicContext },
-    );
-
-    // $ExpectError - using lots of accessors
-    expect(myMock.mock.calls[0][0]['aria-roledescription']).toBe(
-      'Draggable item. Press space bar to lift',
-    );
+    expect(
+      wrapper
+        .find(Child)
+        .getDOMNode()
+        .getAttribute('aria-roledescription'),
+    ).toEqual('Draggable item. Press space bar to lift');
   });
 
   describe('mouse dragging', () => {
@@ -285,22 +138,7 @@ describe('drag handle', () => {
         valid.forEach(
           (point: Position): void => {
             const customCallbacks = getStubCallbacks();
-            const customWrapper = mount(
-              <DragHandle
-                draggableId={draggableId}
-                callbacks={customCallbacks}
-                isDragging={false}
-                isDropAnimating={false}
-                isEnabled
-                getDraggableRef={() => singleRef}
-                canDragInteractiveElements={false}
-              >
-                {(dragHandleProps: ?DragHandleProps) => (
-                  <Child dragHandleProps={dragHandleProps} />
-                )}
-              </DragHandle>,
-              { context: basicContext },
-            );
+            const customWrapper = getWrapper(customCallbacks);
 
             mouseDown(customWrapper, origin);
             windowMouseMove(point);
@@ -1557,8 +1395,18 @@ describe('drag handle', () => {
   describe('keyboard dragging', () => {
     describe('initiation', () => {
       it('should lift when a user presses the space bar and use the center as the selection point', () => {
-        const event: MockEvent = createMockEvent();
+        const fakeCenter: Position = {
+          x: 50,
+          y: 80,
+        };
+        jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(() => getRect({
+          left: 0,
+          top: 0,
+          right: fakeCenter.x * 2,
+          bottom: fakeCenter.y * 2,
+        }));
 
+        const event: MockEvent = createMockEvent();
         pressSpacebar(wrapper, event);
 
         expect(callbacks.onLift).toHaveBeenCalledWith({
@@ -1567,6 +1415,8 @@ describe('drag handle', () => {
         });
         // default action is prevented
         expect(event.preventDefault).toHaveBeenCalled();
+
+        HTMLElement.prototype.getBoundingClientRect.mockRestore();
       });
 
       it('should stop the event before it can be listened to', () => {
@@ -2917,765 +2767,23 @@ describe('drag handle', () => {
 
   describe('drag disabled', () => {
     it('should not pass any handleProps to the child', () => {
-      const mock = jest.fn();
-      mock.mockReturnValue(<div>hello world</div>);
-
-      mount(
+      const custom = mount(
         <DragHandle
           draggableId={draggableId}
           callbacks={callbacks}
           isEnabled={false}
           isDragging={false}
           isDropAnimating={false}
-          getDraggableRef={() => singleRef}
+          getDraggableRef={draggableRef.getRef}
           canDragInteractiveElements={false}
         >
-          {(dragHandleProps: ?DragHandleProps) => mock(dragHandleProps)}
+          {(dragHandleProps: ?DragHandleProps) =>
+            <Child dragHandleProps={dragHandleProps} innerRef={draggableRef.setRef} />}
         </DragHandle>,
         { context: basicContext },
       );
 
-      expect(mock).toHaveBeenCalledWith(null);
-    });
-  });
-
-  describe('generic', () => {
-    type Control = {|
-      name: string,
-      hasPostDragClickBlocking: boolean,
-      preLift: (wrap?: ReactWrapper, options?: Object) => void,
-      lift: (wrap?: ReactWrapper, options?: Object) => void,
-      drop: (wrap?: ReactWrapper) => void,
-      cleanup: () => void,
-    |};
-
-    const trySetIsDragging = (wrap: ReactWrapper) => {
-      // potentially not looking at the root wrapper
-      if (!wrap.props().callbacks) {
-        return;
-      }
-
-      // lift was not successful
-      if (!wrap.props().callbacks.onLift.mock.calls.length) {
-        return;
-      }
-      // would be set during a drag
-      wrap.setProps({ direction: 'vertical' });
-      wrap.setProps({ isDragging: true });
-    };
-
-    const touch: Control = {
-      name: 'touch',
-      hasPostDragClickBlocking: true,
-      preLift: (wrap?: ReactWrapper = wrapper, options?: Object = {}) =>
-        touchStart(wrap, origin, 0, options),
-      lift: (wrap?: ReactWrapper = wrapper) => {
-        jest.runTimersToTime(timeForLongPress);
-        trySetIsDragging(wrap);
-      },
-      drop: () => {
-        windowTouchEnd();
-      },
-      cleanup: () => {
-        windowMouseClick();
-      },
-    };
-
-    const keyboard: Control = {
-      name: 'keyboard',
-      hasPostDragClickBlocking: false,
-      // no pre lift required
-      preLift: () => {},
-      lift: (wrap?: ReactWrapper = wrapper, options?: Object = {}) => {
-        pressSpacebar(wrap, options);
-        trySetIsDragging(wrap);
-      },
-      drop: (wrap?: ReactWrapper = wrapper) => {
-        // only want to fire the event if dragging - otherwise it might start a drag
-        if (wrap.props().isDragging) {
-          pressSpacebar(wrap);
-        }
-      },
-      // no cleanup required
-      cleanup: () => {},
-    };
-
-    const mouse: Control = {
-      name: 'mouse',
-      hasPostDragClickBlocking: true,
-      preLift: (wrap?: ReactWrapper = wrapper, options?: Object = {}) =>
-        mouseDown(wrap, origin, primaryButton, options),
-      lift: (wrap?: ReactWrapper = wrapper) => {
-        windowMouseMove({ x: 0, y: sloppyClickThreshold });
-        trySetIsDragging(wrap);
-      },
-      drop: () => {
-        windowMouseUp();
-      },
-      cleanup: () => {
-        windowMouseClick();
-      },
-    };
-
-    const controls: Control[] = [mouse, keyboard, touch];
-
-    controls.forEach((control: Control) => {
-      describe(`control: ${control.name}`, () => {
-        afterEach(() => {
-          control.cleanup();
-        });
-
-        describe('window bindings', () => {
-          it('should unbind all window listeners when drag ends', () => {
-            jest.spyOn(window, 'addEventListener');
-            jest.spyOn(window, 'removeEventListener');
-            // We need to exclude event listener bindings for error events
-            // Enzyme adds them to support componentDidCatch testing
-            const countWithErrorsExcluded = (stub): number =>
-              stub.mock.calls.filter((args: mixed[]) => args[0] !== 'error')
-                .length;
-            const getAddCount = (): number =>
-              countWithErrorsExcluded(window.addEventListener);
-            const getRemoveCount = (): number =>
-              countWithErrorsExcluded(window.removeEventListener);
-
-            // initial validation
-            expect(getAddCount()).toBe(0);
-            expect(getRemoveCount()).toBe(0);
-
-            control.preLift();
-            control.lift();
-
-            // window events bound
-            expect(getAddCount()).toBeGreaterThan(0);
-            // nothing unbound yet
-            expect(getRemoveCount()).toBe(0);
-
-            // ending the drag
-            control.drop();
-
-            if (!control.hasPostDragClickBlocking) {
-              expect(getAddCount()).toBe(getRemoveCount());
-            } else {
-              // we have added post drag listeners
-              expect(getAddCount()).toBeGreaterThan(getRemoveCount());
-
-              // finish the post drag blocking
-              windowMouseClick();
-
-              // everything is now unbound
-              expect(getAddCount()).toBe(getRemoveCount());
-            }
-
-            // cleanup
-            window.addEventListener.mockRestore();
-            window.removeEventListener.mockRestore();
-          });
-
-          it('should bind window scroll listeners as non-capture to avoid picking up droppable scroll events', () => {
-            // Scroll events on elements do not bubble, but they go through the capture phase
-            // https://twitter.com/alexandereardon/status/985994224867819520
-            jest.spyOn(window, 'addEventListener');
-            jest.spyOn(window, 'removeEventListener');
-
-            control.preLift();
-            control.lift();
-
-            const binding = window.addEventListener.mock.calls.find(
-              call => call[0] === 'scroll',
-            );
-
-            if (!binding) {
-              throw new Error('Count not find scroll binding');
-            }
-
-            // 0: function name
-            // 1: function
-            // 2: options
-            const options: Object = binding[2];
-            expect(options.capture).toBe(false);
-
-            // cleanup
-            window.addEventListener.mockRestore();
-            window.removeEventListener.mockRestore();
-            control.drop();
-          });
-        });
-
-        describe('interactive element interactions', () => {
-          const mixedCase = (map: TagNameMap): string[] => [
-            ...Object.keys(map).map((tagName: string) => tagName.toLowerCase()),
-            ...Object.keys(map).map((tagName: string) => tagName.toUpperCase()),
-          ];
-
-          describe('interactive elements', () => {
-            it('should not start a drag if the target is an interactive element', () => {
-              mixedCase(interactiveTagNames).forEach((tagName: string) => {
-                const element: HTMLElement = document.createElement(tagName);
-                const options = {
-                  target: element,
-                };
-
-                control.preLift(wrapper, options);
-                control.lift(wrapper, options);
-
-                expect(
-                  callbacksCalled(callbacks)({
-                    onLift: 0,
-                  }),
-                ).toBe(true);
-              });
-            });
-
-            it('should start a drag on an interactive element if asked to by user', () => {
-              // allowing dragging from interactive elements
-              wrapper.setProps({ canDragInteractiveElements: true });
-
-              mixedCase(interactiveTagNames).forEach(
-                (tagName: string, index: number) => {
-                  const element: HTMLElement = document.createElement(tagName);
-                  const options = {
-                    target: element,
-                  };
-
-                  control.preLift(wrapper, options);
-                  control.lift(wrapper, options);
-                  control.drop(wrapper);
-
-                  expect(
-                    callbacksCalled(callbacks)({
-                      onLift: index + 1,
-                      onDrop: index + 1,
-                    }),
-                  ).toBe(true);
-                },
-              );
-            });
-
-            it('should start a drag if the target is not an interactive element', () => {
-              const nonInteractiveTagNames: TagNameMap = {
-                a: true,
-                div: true,
-                span: true,
-                header: true,
-              };
-
-              // counting call count between loops
-              let count: number = 0;
-
-              [true, false].forEach((bool: boolean) => {
-                // doesn't matter if this is set or not
-                wrapper.setProps({ canDragInteractiveElements: bool });
-
-                mixedCase(nonInteractiveTagNames).forEach((tagName: string) => {
-                  count++;
-                  const element: HTMLElement = document.createElement(tagName);
-                  const options = {
-                    target: element,
-                  };
-
-                  control.preLift(wrapper, options);
-                  control.lift(wrapper, options);
-                  control.drop(wrapper);
-
-                  expect(
-                    callbacksCalled(callbacks)({
-                      onLift: count,
-                      onDrop: count,
-                    }),
-                  ).toBe(true);
-                });
-              });
-            });
-          });
-
-          describe('interactive parents', () => {
-            it('should not start a drag if the parent is an interactive element', () => {
-              mixedCase(interactiveTagNames).forEach((tagName: string) => {
-                const parent: HTMLElement = document.createElement(tagName);
-                const child: HTMLElement = document.createElement('span');
-                parent.appendChild(child);
-                const options = {
-                  target: child,
-                };
-
-                control.preLift(wrapper, options);
-                control.lift(wrapper, options);
-                control.drop(wrapper);
-
-                expect(
-                  callbacksCalled(callbacks)({
-                    onLift: 0,
-                  }),
-                ).toBe(true);
-              });
-            });
-
-            it('should not start a drag if the parent is interactive and the child is an SVG', () => {
-              // $ExpectError - flow does not know about SVGElement yet
-              const svg: SVGElement = document.createElementNS(
-                'http://www.w3.org/2000/svg',
-                'svg',
-              );
-              expect(svg instanceof SVGElement).toBe(true);
-
-              mixedCase(interactiveTagNames).forEach((tagName: string) => {
-                const parent: HTMLElement = document.createElement(tagName);
-                parent.appendChild(svg);
-                const options = {
-                  target: svg,
-                };
-
-                control.preLift(wrapper, options);
-                control.lift(wrapper, options);
-                control.drop(wrapper);
-
-                expect(
-                  callbacksCalled(callbacks)({
-                    onLift: 0,
-                  }),
-                ).toBe(true);
-              });
-            });
-
-            it('should start a drag on a Element with an interactive parent if asked to by user', () => {
-              // allowing dragging from interactive elements
-              wrapper.setProps({ canDragInteractiveElements: true });
-
-              // $ExpectError - flow does not know about SVGElement yet
-              const svg: SVGElement = document.createElementNS(
-                'http://www.w3.org/2000/svg',
-                'svg',
-              );
-              expect(svg instanceof SVGElement).toBe(true);
-
-              const div: HTMLElement = document.createElement('div');
-              expect(div instanceof HTMLElement).toBe(true);
-
-              [div, svg].forEach((child: Element) => {
-                mixedCase(interactiveTagNames).forEach((tagName: string) => {
-                  const parent: HTMLElement = document.createElement(tagName);
-                  parent.appendChild(child);
-                  const options = {
-                    target: child,
-                  };
-
-                  expect(
-                    callbacksCalled(callbacks)({
-                      onLift: 0,
-                      onDrop: 0,
-                    }),
-                  ).toBe(true);
-
-                  control.preLift(wrapper, options);
-                  control.lift(wrapper, options);
-                  control.drop(wrapper);
-
-                  expect(
-                    callbacksCalled(callbacks)({
-                      onLift: 1,
-                      onDrop: 1,
-                    }),
-                  ).toBe(true);
-
-                  // cleanup
-                  resetCallbacks(callbacks);
-                  parent.removeChild(child);
-                });
-              });
-            });
-
-            it('should start a drag if the target has no interactive parents', () => {
-              const nonInteractiveTagNames: TagNameMap = {
-                a: true,
-                div: true,
-                span: true,
-                header: true,
-              };
-
-              // counting call count between loops
-              let count: number = 0;
-
-              [true, false].forEach((bool: boolean) => {
-                // doesn't matter if this is set or not
-                wrapper.setProps({ canDragInteractiveElements: bool });
-
-                mixedCase(nonInteractiveTagNames).forEach((tagName: string) => {
-                  count++;
-                  const parent: HTMLElement = document.createElement(tagName);
-                  const child: HTMLElement = document.createElement('span');
-                  parent.appendChild(child);
-                  const options = {
-                    target: child,
-                  };
-
-                  control.preLift(wrapper, options);
-                  control.lift(wrapper, options);
-                  control.drop(wrapper);
-
-                  expect(
-                    callbacksCalled(callbacks)({
-                      onLift: count,
-                      onDrop: count,
-                    }),
-                  ).toBe(true);
-                });
-              });
-            });
-          });
-        });
-
-        describe('contenteditable interactions', () => {
-          describe('interactive interactions are blocked', () => {
-            it('should block the drag if the drag handle is itself contenteditable', () => {
-              const customCallbacks = getStubCallbacks();
-              const customWrapper = mount(
-                <DragHandle
-                  draggableId={draggableId}
-                  callbacks={customCallbacks}
-                  isDragging={false}
-                  isDropAnimating={false}
-                  isEnabled
-                  getDraggableRef={() => singleRef}
-                  canDragInteractiveElements={false}
-                >
-                  {(dragHandleProps: ?DragHandleProps) => (
-                    <div {...dragHandleProps} contentEditable />
-                  )}
-                </DragHandle>,
-                { context: basicContext },
-              );
-              const target = customWrapper.getDOMNode();
-              const options = {
-                target,
-              };
-
-              control.preLift(customWrapper, options);
-              control.lift(customWrapper, options);
-              control.drop(customWrapper);
-
-              expect(
-                callbacksCalled(customCallbacks)({
-                  onLift: 0,
-                }),
-              ).toBe(true);
-            });
-
-            it('should block the drag if originated from a child contenteditable', () => {
-              const customCallbacks = getStubCallbacks();
-              const customWrapper = mount(
-                <DragHandle
-                  draggableId={draggableId}
-                  callbacks={customCallbacks}
-                  isDragging={false}
-                  isDropAnimating={false}
-                  isEnabled
-                  getDraggableRef={() => singleRef}
-                  canDragInteractiveElements={false}
-                >
-                  {(dragHandleProps: ?DragHandleProps) => (
-                    <div {...dragHandleProps}>
-                      <div className="editable" contentEditable />
-                    </div>
-                  )}
-                </DragHandle>,
-                { context: basicContext },
-              );
-              const target = customWrapper
-                .getDOMNode()
-                .querySelector('.editable');
-              if (!target) {
-                throw new Error('could not find editable element');
-              }
-              const options = {
-                target,
-              };
-
-              control.preLift(customWrapper, options);
-              control.lift(customWrapper, options);
-              control.drop(customWrapper);
-
-              expect(whereAnyCallbacksCalled(customCallbacks)).toBe(false);
-            });
-
-            it('should block the drag if originated from a child of a child contenteditable', () => {
-              const customCallbacks = getStubCallbacks();
-              const customWrapper = mount(
-                <DragHandle
-                  draggableId={draggableId}
-                  callbacks={customCallbacks}
-                  isDragging={false}
-                  isDropAnimating={false}
-                  isEnabled
-                  getDraggableRef={() => singleRef}
-                  canDragInteractiveElements={false}
-                >
-                  {(dragHandleProps: ?DragHandleProps) => (
-                    <div {...dragHandleProps}>
-                      <div className="editable" contentEditable>
-                        <p>hello there</p>
-                        <span className="target">Edit me!</span>
-                      </div>
-                    </div>
-                  )}
-                </DragHandle>,
-                { context: basicContext },
-              );
-              const target = customWrapper
-                .getDOMNode()
-                .querySelector('.target');
-              if (!target) {
-                throw new Error('could not find the target');
-              }
-              const options = {
-                target,
-              };
-
-              control.preLift(customWrapper, options);
-              control.lift(customWrapper, options);
-              control.drop(customWrapper);
-
-              expect(
-                callbacksCalled(customCallbacks)({
-                  onLift: 0,
-                }),
-              ).toBe(true);
-            });
-
-            it('should not block if contenteditable is set to false', () => {
-              const customCallbacks = getStubCallbacks();
-              const customWrapper = mount(
-                <DragHandle
-                  draggableId={draggableId}
-                  callbacks={customCallbacks}
-                  isDragging={false}
-                  isDropAnimating={false}
-                  isEnabled
-                  getDraggableRef={() => singleRef}
-                  canDragInteractiveElements={false}
-                >
-                  {(dragHandleProps: ?DragHandleProps) => (
-                    <div {...dragHandleProps}>
-                      <div className="editable" contentEditable={false}>
-                        <p>hello there</p>
-                        <span className="target">Edit me!</span>
-                      </div>
-                    </div>
-                  )}
-                </DragHandle>,
-                { context: basicContext },
-              );
-              const target = customWrapper
-                .getDOMNode()
-                .querySelector('.target');
-              if (!target) {
-                throw new Error('could not find the target');
-              }
-              const options = {
-                target,
-              };
-
-              control.preLift(customWrapper, options);
-              control.lift(customWrapper, options);
-              control.drop(customWrapper);
-
-              expect(
-                callbacksCalled(customCallbacks)({
-                  onLift: 1,
-                  onDrop: 1,
-                }),
-              ).toBe(true);
-            });
-          });
-
-          describe('interactive interactions are not blocked', () => {
-            it('should not block the drag if the drag handle is contenteditable', () => {
-              const customCallbacks = getStubCallbacks();
-              const customWrapper = mount(
-                <DragHandle
-                  draggableId={draggableId}
-                  callbacks={customCallbacks}
-                  isDragging={false}
-                  isDropAnimating={false}
-                  isEnabled
-                  getDraggableRef={() => singleRef}
-                  // stating that we can drag
-                  canDragInteractiveElements
-                >
-                  {(dragHandleProps: ?DragHandleProps) => (
-                    <div {...dragHandleProps}>
-                      <div className="editable" contentEditable />
-                    </div>
-                  )}
-                </DragHandle>,
-                { context: basicContext },
-              );
-              const target = customWrapper
-                .getDOMNode()
-                .querySelector('.editable');
-              if (!target) {
-                throw new Error('could not find editable element');
-              }
-              const options = {
-                target,
-              };
-
-              control.preLift(customWrapper, options);
-              control.lift(customWrapper, options);
-              control.drop(customWrapper);
-
-              expect(
-                callbacksCalled(customCallbacks)({
-                  onLift: 1,
-                  onDrop: 1,
-                }),
-              ).toBe(true);
-            });
-
-            it('should not block the drag if originated from a child contenteditable', () => {
-              const customCallbacks = getStubCallbacks();
-              const customWrapper = mount(
-                <DragHandle
-                  draggableId={draggableId}
-                  callbacks={customCallbacks}
-                  isDragging={false}
-                  isDropAnimating={false}
-                  isEnabled
-                  getDraggableRef={() => singleRef}
-                  // stating that we can drag
-                  canDragInteractiveElements
-                >
-                  {(dragHandleProps: ?DragHandleProps) => (
-                    <div {...dragHandleProps}>
-                      <div className="editable" contentEditable>
-                        <p>hello there</p>
-                        <span className="target">Edit me!</span>
-                      </div>
-                    </div>
-                  )}
-                </DragHandle>,
-                { context: basicContext },
-              );
-              const target = customWrapper
-                .getDOMNode()
-                .querySelector('.target');
-              if (!target) {
-                throw new Error('could not find the target');
-              }
-              const options = {
-                target,
-              };
-
-              control.preLift(customWrapper, options);
-              control.lift(customWrapper, options);
-              control.drop(customWrapper);
-
-              expect(
-                callbacksCalled(customCallbacks)({
-                  onLift: 1,
-                  onDrop: 1,
-                }),
-              ).toBe(true);
-            });
-          });
-        });
-
-        describe('something else already dragging', () => {
-          it('should not start a drag if something else is already dragging in the system', () => {
-            // faking a 'false' response
-            const canLift = jest.fn().mockImplementation(() => false);
-            const customContext = {
-              ...basicContext,
-              [canLiftContextKey]: canLift,
-            };
-            const customCallbacks = getStubCallbacks();
-            const customWrapper = mount(
-              <DragHandle
-                draggableId={draggableId}
-                callbacks={customCallbacks}
-                isDragging={false}
-                isDropAnimating={false}
-                isEnabled
-                getDraggableRef={() => singleRef}
-                canDragInteractiveElements={false}
-              >
-                {(dragHandleProps: ?DragHandleProps) => (
-                  <Child dragHandleProps={dragHandleProps} />
-                )}
-              </DragHandle>,
-              { context: customContext },
-            );
-
-            control.preLift(customWrapper);
-            control.lift(customWrapper);
-            control.drop(customWrapper);
-
-            expect(
-              callbacksCalled(customCallbacks)({
-                onLift: 0,
-              }),
-            ).toBe(true);
-            expect(canLift).toHaveBeenCalledWith(draggableId);
-          });
-        });
-
-        describe('lifting with nested drag handles', () => {
-          it('should not start a drag on a parent if a child drag handle has already received the event', () => {
-            const parentCallbacks = getStubCallbacks();
-            const childCallbacks = getStubCallbacks();
-            const nested: ReactWrapper = getNestedWrapper(
-              parentCallbacks,
-              childCallbacks,
-            );
-            const child: ReactWrapper = nested.find('.child').first();
-
-            // React enzyme will bubble events within a wrapper
-            control.preLift(child);
-            control.lift(child);
-
-            expect(childCallbacks.onLift).toHaveBeenCalled();
-            expect(parentCallbacks.onLift).not.toHaveBeenCalled();
-
-            nested.unmount();
-          });
-
-          it('should start a drag on a parent the event is trigged on the parent', () => {
-            const parentCallbacks = getStubCallbacks();
-            const childCallbacks = getStubCallbacks();
-            const nested: ReactWrapper = getNestedWrapper(
-              parentCallbacks,
-              childCallbacks,
-            );
-            const parent: ReactWrapper = nested.find('.parent').first();
-
-            control.preLift(parent);
-            control.lift(parent);
-
-            expect(childCallbacks.onLift).not.toHaveBeenCalled();
-            expect(parentCallbacks.onLift).toHaveBeenCalled();
-
-            nested.unmount();
-          });
-        });
-
-        describe('page visibility changes', () => {
-          it('should cancel the drag on page visibility changes', () => {
-            control.preLift();
-            control.lift();
-
-            dispatchWindowEvent('visibilitychange');
-
-            expect(
-              callbacksCalled(callbacks)({
-                onLift: 1,
-                onCancel: 1,
-              }),
-            ).toBe(true);
-
-            control.drop();
-          });
-        });
-      });
+      expect(custom.find(Child).props().dragHandleProps).toBe(null);
     });
   });
 });

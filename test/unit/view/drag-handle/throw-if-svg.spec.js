@@ -7,20 +7,12 @@ import {
   styleContextKey,
   canLiftContextKey,
 } from '../../../../src/view/context-keys';
-import { getStubCallbacks } from './util';
+import { getStubCallbacks } from './util/callbacks';
+import { createRef } from './util/wrappers';
 
 const basicContext = {
   [styleContextKey]: 'hello',
   [canLiftContextKey]: () => true,
-};
-
-const draggableRef: HTMLElement = document.createElement('div');
-
-const setChildRef = (ref: ?Element) => {
-  if (!ref) {
-    return;
-  }
-  draggableRef.appendChild(ref);
 };
 
 beforeEach(() => {
@@ -32,23 +24,26 @@ afterEach(() => {
 });
 
 it('should throw if a help SVG message if the drag handle is a SVG', () => {
-  const execute = () =>
-    mount(
+  const execute = () => {
+    const ref = createRef();
+
+    return mount(
       <DragHandle
         draggableId="parent"
         callbacks={getStubCallbacks()}
         isDragging={false}
         isDropAnimating={false}
         isEnabled
-        getDraggableRef={() => draggableRef}
+        getDraggableRef={ref.getRef}
         canDragInteractiveElements={false}
       >
         {(dragHandleProps: ?DragHandleProps) => (
-          <svg ref={setChildRef} {...dragHandleProps} />
+          <svg {...dragHandleProps} ref={ref.setRef} />
         )}
       </DragHandle>,
       { context: basicContext },
     );
+  };
 
   expect(execute).toThrow('A drag handle cannot be an SVGElement');
 });
