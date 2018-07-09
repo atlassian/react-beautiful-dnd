@@ -10,7 +10,7 @@ import {
   canLiftContextKey,
 } from '../../../../src/view/context-keys';
 import type { DragHandleProps } from '../../../../src/view/drag-handle/drag-handle-types';
-import { getStubCallbacks } from './util';
+import { getStubCallbacks } from './util/callbacks';
 
 const options = {
   context: {
