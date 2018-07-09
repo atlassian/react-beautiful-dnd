@@ -1,6 +1,6 @@
 # How we use DOM events
 
-> This page details how we use DOM input events, what we do with them, and how you can build things on top of our usage. **Generally you will not need to know this information** but it can be helpful if you are also binding your own event handlers to the window or to a *drag handle*.
+> This page details how we use DOM input events, what we do with them, and how you can build things on top of our usage. **Generally you will not need to know this information** but it can be helpful if you are also binding your own event handlers to the window or to a _drag handle_.
 > ⚠️ Note: due to a [bug in webkit](https://bugs.webkit.org/show_bug.cgi?id=184250), particular events such as `mousemove` will not correctly set `event.defaultPrevented` to `true` when `event.preventDefault()` is called. You can follow progress on this issue [here](https://github.com/atlassian/react-beautiful-dnd/issues/413).
 
 ## Prior knowledge
@@ -14,10 +14,10 @@ This page assumes a working knowledge of DOM events. For a good introduction to 
 
 Without needing going into all the details below, here are the safest event handlers to build on top of `react-beautiful-dnd`:
 
-> These can be added on the *drag handle*, anywhere else higher on the tree or to the window directly.
+> These can be added on the _drag handle_, anywhere else higher on the tree or to the window directly.
 
 - `onClick`: the `event.defaultPrevented` property will be set to `true` if occurred as a part of the drag interaction. This is true even if the drag was not finished with a pre-click action such as `mouseup` or `touchend`. See [sloppy clicks and click prevention](https://github.com/atlassian/react-beautiful-dnd#sloppy-clicks-and-click-prevention-).
-- `onKeyDown`: the `event.defaultPrevented` property will be set to `true` if it was used as a part of a drag. If you add `onKeyDown` to the *drag handle* you will need to monkey patch the [`DragHandleProps`](https://github.com/atlassian/react-beautiful-dnd#draghandleprops-type-information) `onKeyDown` event handler.
+- `onKeyDown`: the `event.defaultPrevented` property will be set to `true` if it was used as a part of a drag. If you add `onKeyDown` to the _drag handle_ you will need to monkey patch the [`DragHandleProps`](https://github.com/atlassian/react-beautiful-dnd#draghandleprops-type-information) `onKeyDown` event handler.
 
 You may need to enchance the logic of your event handlers with information from [`onDragStart`](https://github.com/atlassian/react-beautiful-dnd#ondragstart-optional) and [`onDragEnd`](https://github.com/atlassian/react-beautiful-dnd#ondragend-required) to know about whether a drag is occuring while those events fire.
 
@@ -32,7 +32,7 @@ When we use an input event as part of a drag and drop interaction we generally c
 - we use: `event.preventDefault()`
 - we do not use: `event.stopPropagation()`
 
-Some event handlers we add on the *drag handle* itself (see [`DragHandleProps`](https://github.com/atlassian/react-beautiful-dnd#draghandleprops-type-information)) and others we add to the `window` in the [capture phase](https://javascript.info/bubbling-and-capturing#capturing). What this means is as long as you are applying your events handlers in the [bubbling phase](https://javascript.info/bubbling-and-capturing#bubbling) (which is the default for event handlers) then behaviour of events will be as described on this page.
+Some event handlers we add on the _drag handle_ itself (see [`DragHandleProps`](https://github.com/atlassian/react-beautiful-dnd#draghandleprops-type-information)) and others we add to the `window` in the [capture phase](https://javascript.info/bubbling-and-capturing#capturing). What this means is as long as you are applying your events handlers in the [bubbling phase](https://javascript.info/bubbling-and-capturing#bubbling) (which is the default for event handlers) then behaviour of events will be as described on this page.
 
 In order to know if we have already used the event for the purpose of drag and drop you need to check the [`event.defaultPrevented`](https://developer.mozilla.org/en-US/docs/Web/API/Event/defaultPrevented) property.
 
@@ -61,7 +61,7 @@ Some user events have a direct impact on a drag: such as a `mousemove` when drag
 
 > This is the only known exception to our rule set. It is unfortunate that it is the first one to appear in this guide!
 
-When the user first performs a `mousedown` on a *drag handle* we are not sure if they are intending to click or drag. Ideally we would not call `preventDefault()` on this event as we are not sure if it is a part of a drag. However, we need to call `preventDefault()` in order to avoid the item obtaining focus as it has a `tabIndex`.
+When the user first performs a `mousedown` on a _drag handle_ we are not sure if they are intending to click or drag. Ideally we would not call `preventDefault()` on this event as we are not sure if it is a part of a drag. However, we need to call `preventDefault()` in order to avoid the item obtaining focus as it has a `tabIndex`.
 
 ### We are not sure yet if a drag will start
 
@@ -96,7 +96,7 @@ The user needs to move a small threshold before we consider the movement to be a
 
 - `preventDefault()` is not called on `touchstart`.
 
-When a user presses their finger (or other input) on a `Draggable` we are not sure if they where intending to *tap*, *force press*, *scroll the container* or *drag*. Because we do not know what the user is trying to do yet we do not call `preventDefault()` on the event.
+When a user presses their finger (or other input) on a `Draggable` we are not sure if they where intending to _tap_, _force press_, _scroll the container_ or _drag_. Because we do not know what the user is trying to do yet we do not call `preventDefault()` on the event.
 
 ### The user has indicated that they are not touch dragging
 

@@ -10,15 +10,15 @@ We have created a [reference application](react-beautiful-dnd.netlify.com/iframe
 
 ## Experience
 
-We have decided on a simple, but very flexible and scalable multi drag pattern to start with. It is not as *beautiful* as our standard drag interactions - but it is a great base to build from and will scale across many problem spaces.
+We have decided on a simple, but very flexible and scalable multi drag pattern to start with. It is not as _beautiful_ as our standard drag interactions - but it is a great base to build from and will scale across many problem spaces.
 
 ## User experience
 
 We can break the user experience down in three phases.
 
-1. [**Selection**](#selection): The user selects one or more items.
-2. [**Dragging**](#dragging): The user drags one item as a representation of the whole group.
-3. [**Dropping**](#dropping): The user drops an item into a new location. We move all of the selected items into the new location
+1.  [**Selection**](#selection): The user selects one or more items.
+2.  [**Dragging**](#dragging): The user drags one item as a representation of the whole group.
+3.  [**Dropping**](#dropping): The user drops an item into a new location. We move all of the selected items into the new location
 
 ## Announcements
 
@@ -26,11 +26,11 @@ Keep in mind that internally `react-beautiful-dnd` is not aware of multi drag. T
 
 ## Selection
 
-Before a drag starts we need to allow the user to *optionally* select a number of `Draggable`s to drag. We an item is selected you should apply a style update to the `Draggable` such as a background color change to indicate that the item is selected.
+Before a drag starts we need to allow the user to _optionally_ select a number of `Draggable`s to drag. We an item is selected you should apply a style update to the `Draggable` such as a background color change to indicate that the item is selected.
 
 ### Selection interaction recommendations
 
-> These interactions are based on the Mac OSX [*Finder*](https://support.apple.com/en-au/HT201732) (file browser) application.
+> These interactions are based on the Mac OSX [_Finder_](https://support.apple.com/en-au/HT201732) (file browser) application.
 
 ### Action: toggle section
 
@@ -40,15 +40,15 @@ If a user clicks on an item the selected state of the item should be toggled. Ad
 
 #### `onClick` event handler
 
-- Attach an `onClick` handler to your *drag handle* or `Draggable`
+- Attach an `onClick` handler to your _drag handle_ or `Draggable`
 - Only toggle selection if the user is using the [`primaryButton`](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button) (`event.button === 0`)
-- Prevent the default action on the `click` as you are using it for selection (it is only useful to call `event.preventDefault()` to avoid *selection clearing*)
+- Prevent the default action on the `click` as you are using it for selection (it is only useful to call `event.preventDefault()` to avoid _selection clearing_)
 
 #### Keyboard event handler
 
 - When the user presses **enter** <kbd>⏎</kbd> toggle the selection of the item
-- **Option 1**: Attach an `onKeyDown` handler to your *drag handle* or `Draggable`. You will need to monkey patch the `DragHandleProvided > onKeyDown` keyboard handler.
-- **Option 2**: Attach an `onKeyUp` handler to your *drag handle*. Then you will not need to monkey patch the `onKeyDown` handler. However, `keyup` events will not have their default action prevented so you will not be able to check `event.defaultPrevented` to see if the keypress was used for a drag. If you are only using the **enter** <kbd>⏎</kbd> key in your event handler then you should be fine as that is not used as a part of dragging.
+- **Option 1**: Attach an `onKeyDown` handler to your _drag handle_ or `Draggable`. You will need to monkey patch the `DragHandleProvided > onKeyDown` keyboard handler.
+- **Option 2**: Attach an `onKeyUp` handler to your _drag handle_. Then you will not need to monkey patch the `onKeyDown` handler. However, `keyup` events will not have their default action prevented so you will not be able to check `event.defaultPrevented` to see if the keypress was used for a drag. If you are only using the **enter** <kbd>⏎</kbd> key in your event handler then you should be fine as that is not used as a part of dragging.
 - Prevent the default action on the `keydown` / `keyup` event if you are toggling selection as you are using it for selection as you want to opt out of the standard browser behaviour and also provide a clue that this event has been used.
 
 #### Toggle selection behaviour
@@ -61,7 +61,7 @@ If a user clicks on an item the selected state of the item should be toggled. Ad
 
 This is providing the ability for a user to add or remove items to a selection group.
 
- ![toggle-selection-in-a-group](https://user-images.githubusercontent.com/2182637/37323084-73c31eec-26d5-11e8-8c5c-7a1fc82f098b.gif)
+![toggle-selection-in-a-group](https://user-images.githubusercontent.com/2182637/37323084-73c31eec-26d5-11e8-8c5c-7a1fc82f098b.gif)
 
 #### Event handlers
 
@@ -114,7 +114,7 @@ class Task extends Component<Props> {
     event: KeyboardEvent,
     // we will be monkey patching this
     provided: DraggableProvided,
-    snapshot: DraggableStateSnapshot
+    snapshot: DraggableStateSnapshot,
   ) => {
     if (provided.dragHandleProps) {
       provided.dragHandleProps.onKeyDown(event);
@@ -139,7 +139,7 @@ class Task extends Component<Props> {
     const wasShiftKeyUsed: boolean = event.shiftKey;
 
     this.performAction(wasMetaKeyUsed, wasShiftKeyUsed);
-  }
+  };
 
   // Using onClick as it will be correctly
   // preventing if there was a drag
@@ -180,7 +180,7 @@ class Task extends Component<Props> {
     }
 
     toggleSelection(task.id);
-  }
+  };
 
   render() {
     return (
@@ -191,7 +191,9 @@ class Task extends Component<Props> {
             {...provided.draggableProps}
             {...provided.dragHandleProps}
             onClick={this.onClick}
-            onKeyDown={(event: KeyboardEvent) => this.onKeyDown(event, provided, snapshot)}
+            onKeyDown={(event: KeyboardEvent) =>
+              this.onKeyDown(event, provided, snapshot)
+            }
           >
             {task.content}
           </Container>
@@ -210,7 +212,7 @@ We add a `click` handler to the `window` to detect for a click that is not on a 
 
 #### `window` `keydown` handler
 
-This event handler operates in a similar way to the *`window` `click` handler* described above. If a `keydown` event that is not prevented and is the **escape** key then we clear the current selection. The **escape** `keydown` event will be prevented if it is used to cancel a drag.
+This event handler operates in a similar way to the _`window` `click` handler_ described above. If a `keydown` event that is not prevented and is the **escape** key then we clear the current selection. The **escape** `keydown` event will be prevented if it is used to cancel a drag.
 
 ### Mobile selection
 
@@ -240,8 +242,8 @@ We need to do one check in `onDragStart`. If the user is starting to drag someth
 
 As the drag starts we need to add a few visual affordances:
 
-1. Add a count to the dragging item to indicate how many items this drag is representative of. If only a single item is dragging then do not show a count.
-2. Change the appearance of the selected items that are not dragging to a greyed out / disabled state. This can be a [performance](#performance) issue at scale.
+1.  Add a count to the dragging item to indicate how many items this drag is representative of. If only a single item is dragging then do not show a count.
+2.  Change the appearance of the selected items that are not dragging to a greyed out / disabled state. This can be a [performance](#performance) issue at scale.
 
 We do not remove the selected items from the list. If we remove the items completely that can change the dimensions of the list which can lead to list collapsing and scroll jumps. If we leave them in the list and make them invisible then there are big blank sections in a list that have no meaning and can be confusing to interact with. Therefore we recommend leaving the items in the list and giving them a visual change.
 
@@ -257,15 +259,15 @@ This occurs when you cancel the drag, drop nowhere or drop in the same location.
 
 When moving the items to the new list they should be inserted into the new list at the index in which the dragging item was dropped. We suggest the moved items be placed in the following order:
 
-1. Move the selected item to the first position
+1.  Move the selected item to the first position
 
 This is done to ensure that the item the user is dragging does not disappear suddenly on drop.
 
-2. Order by the items natural indexes regardless of list. For example if 'item alpha' started in column 1 of index 2 and 'item beta' started in column 2 of index 2 then 'item beta' should be placed before 'item alpha'
+2.  Order by the items natural indexes regardless of list. For example if 'item alpha' started in column 1 of index 2 and 'item beta' started in column 2 of index 2 then 'item beta' should be placed before 'item alpha'
 
 This gives priority to original index. However, you might want to give priority to list. So that items selected in previous lists go before items selected in subsequent lists.
 
-3. In the event of a tie then sort by the order in which the item was selected.
+3.  In the event of a tie then sort by the order in which the item was selected.
 
 This strategy does change the order of items semantically: specifically step 1 which always moves the selected item to the top. If you do not want this you do not have to do it - however it is much nicer visually and helps to keep the user grounded on a drop.
 
@@ -273,8 +275,8 @@ This strategy does change the order of items semantically: specifically step 1 w
 
 The goal is to move the selected items to their new location. We want to insert all the items in at the index at which the dragging item was dropped. As with the strategy above we suggest the following order for the dropped items:
 
-1. Move the selected item to the first position
-2. Order the rest by their natural index
+1.  Move the selected item to the first position
+2.  Order the rest by their natural index
 
 ## Performance
 
@@ -291,7 +293,7 @@ In response to a selection change you want to call `render` on the minimum amoun
 In the event of a 'unselect all' action you might need to render a lot of components at once to clear their selected styles. For most usages this will be fine. If you want to go further you will need to avoid calling `render` for selection style changes.
 
 - You could look into using the [dynamic shared styles pattern](https://medium.com/@alexandereardon/dragging-react-performance-forward-688b30d40a33).
-- You could apply a **unique** data attribute to each item and then apply the *selected* style to it using selectors dynamically in a parent component.
+- You could apply a **unique** data attribute to each item and then apply the _selected_ style to it using selectors dynamically in a parent component.
 
 Additionally, when a drag starts we can also update the appearance of a lot of `Draggables` at once. Therefore you will need to solve this problem in the same was as the 'unselect all' action.
 
