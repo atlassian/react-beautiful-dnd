@@ -31,30 +31,6 @@ export class Child extends React.Component<ChildProps> {
   }
 }
 
-// export const createDraggableRef = () => {
-//   const ref: HTMLElement = document.createElement('div');
-//   const setChildRef = (() => {
-//     let applied: ?HTMLElement = null;
-
-//     return (child: ?HTMLElement) => {
-//       if (!child) {
-//         return;
-//       }
-
-//       if (applied && child !== applied) {
-//         invariant(false, 'Trying to change ref of drag handle');
-//       }
-
-//       applied = child;
-//       ref.appendChild(applied);
-//     };
-//   })();
-
-//   const getRef = () => ref;
-
-//   return { ref, getRef, setChildRef };
-// };
-
 export const createRef = () => {
   let ref: ?HTMLElement = null;
 
@@ -66,37 +42,6 @@ export const createRef = () => {
 
   return { ref, setRef, getRef };
 };
-
-// class App extends React.Component<*> {
-//   ref: ?HTMLElement = null;
-
-//   setRef = (ref: ?HTMLElement) => {
-//     if (ref == null) {
-//       return;
-//     }
-//     console.log('setting ref', ref);
-//     this.ref = ref;
-//   };
-//   getRef = (): ?HTMLElement => this.ref;
-
-//   render() {
-//     return (
-//         <DragHandle
-//           draggableId="draggable"
-//           callbacks={this.props.callbacks}
-//           isDragging={false}
-//           isDropAnimating={false}
-//           getDraggableRef={this.getRef}
-//           isEnabled
-//           canDragInteractiveElements={false}
-//         >
-//         {(dragHandleProps: ?DragHandleProps) => (
-//           <Child dragHandleProps={dragHandleProps} />
-//         )}
-//       </div>
-//     );
-//   }
-// }
 
 export const getWrapper = (
   callbacks: Callbacks,

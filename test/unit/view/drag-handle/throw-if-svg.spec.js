@@ -38,6 +38,7 @@ it('should throw if a help SVG message if the drag handle is a SVG', () => {
         canDragInteractiveElements={false}
       >
         {(dragHandleProps: ?DragHandleProps) => (
+          // $FlowFixMe - this fails the flow check! Success!
           <svg {...dragHandleProps} ref={ref.setRef} />
         )}
       </DragHandle>,
