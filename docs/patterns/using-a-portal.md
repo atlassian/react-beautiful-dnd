@@ -18,7 +18,7 @@ Wait, what is a `portal`? A `portal` is a simply another DOM node outside of the
 
 React provides a first class api for using `portals`: [`React.Portal`](https://reactjs.org/docs/portals.html). Originally we wanted to use it for all `Draggable`s while dragging. Unfortunately it has a big performance penalty - especially when dragging nodes with a lot of children ([React issue](https://github.com/facebook/react/issues/12247)). The reason for this is because components moving to a `React.Portal` are mounted and remounted which is quite expensive. Therefore we are currently not supporting it out of the box.
 
-If your `Draggable` does not have many children nodes then you are welcome to use `React.Portal` on top of `react-beautiful-dnd`. If you are simply dragging cards in a list then you *should* be fine using `React.Portal`. However, if you are dragging a column full of cards then you will get significant jank when a drag is starting.
+If your `Draggable` does not have many children nodes then you are welcome to use `React.Portal` on top of `react-beautiful-dnd`. If you are simply dragging cards in a list then you _should_ be fine using `React.Portal`. However, if you are dragging a column full of cards then you will get significant jank when a drag is starting.
 
 ## Example
 

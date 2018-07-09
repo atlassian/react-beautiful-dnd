@@ -4,10 +4,23 @@ import { dragHandle } from '../../data-attributes';
 
 const selector: string = `[${dragHandle}]`;
 
+const throwIfSVG = (el: mixed) => {
+  // $FlowFixMe - flow does not know about SVGElement
+  const isSVG: boolean = el instanceof SVGElement;
+
+  invariant(
+    !isSVG,
+    `A drag handle cannot be an SVGElement: it has inconsistent focus support.
+
+    More information: https://github.com/atlassian/react-beautiful-dnd/tree/master/docs/guides/dragging-svgs.md`,
+  );
+};
+
 // If called when the component is disabled then the data
 // attribute will not be present
 const getDragHandleRef = (draggableRef: HTMLElement): HTMLElement => {
   if (draggableRef.hasAttribute(dragHandle)) {
+    throwIfSVG(draggableRef);
     return draggableRef;
   }
 
@@ -17,17 +30,7 @@ const getDragHandleRef = (draggableRef: HTMLElement): HTMLElement => {
   // https://codepen.io/alexreardon/pen/erOqyZ
   const el: ?HTMLElement = draggableRef.querySelector(selector);
 
-  if (process.env.NODE_ENV !== 'production') {
-    // $FlowFixMe - flow does not know about SVGElement
-    if (el instanceof SVGElement) {
-      invariant(
-        false,
-        `A drag handle cannot be an SVGElement: it has inconsistent focus support
-
-        More information: https://github.com/atlassian/react-beautiful-dnd/tree/master/docs/guides/dragging-svgs.md`,
-      );
-    }
-  }
+  throwIfSVG(draggableRef);
 
   invariant(
     el,
