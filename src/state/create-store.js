@@ -78,7 +78,7 @@ export default ({
         // pendingDrop,
         maxScrollUpdater,
         autoScroll(getScroller),
-        // Fire hooks for consumers
+        // Fire hooks for consumers (after update to store)
         hooks(getHooks, announce),
       ),
     ),
