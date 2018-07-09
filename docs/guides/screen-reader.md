@@ -22,7 +22,7 @@ If you attempt to hold onto the `announce` function and call it later, it won't 
 
 ### Step 1: Introduce draggable item
 
-When a user `tabs` to a `Draggable`, we need to tell them how to start a drag. We do this by using the `aria-roledescription` property on a *drag handle*.
+When a user `tabs` to a `Draggable`, we need to tell them how to start a drag. We do this by using the `aria-roledescription` property on a _drag handle_.
 
 **Default message**: "Draggable item. Press space bar to lift"
 
@@ -56,7 +56,7 @@ You control the message printed to the user through the `DragDropContext` > `onD
 ```js
 onDragStart = (start: DragStart, provided: HookProvided) => {
   provided.announce('My super cool message');
-}
+};
 ```
 
 ### Step 3: Drag movement
@@ -68,7 +68,7 @@ We can control the announcement through the `DragDropContext` > `onDragUpdate` h
 ```js
 onDragUpdate = (update: DragUpdate, provided: HookProvided) => {
   provided.announce('Update message');
-}
+};
 ```
 
 #### Scenario 1. Moved in the same list
@@ -114,11 +114,11 @@ A `DropResult` object has a `reason` property which can either be `DROP` or `CAN
 
 ```js
 onDragEnd = (result: DropResult, provided: HookProvided) => {
-  if(result.reason === 'CANCEL') {
+  if (result.reason === 'CANCEL') {
     provided.announce('Your cancel message');
     return;
   }
-}
+};
 ```
 
 **Default message**: "Movement cancelled. The item has returned to its starting position of ${result.source.index + 1}"
@@ -130,7 +130,7 @@ We tell the user the following:
 
 Think about adding information about the length of the list, and the name of the list you have dropped into.
 
-**Message with more info**: "Movement cancelled. The item has returned to list `${listName}` to its starting position of `${startPosition}` of` ${listLength}`".
+**Message with more info**: "Movement cancelled. The item has returned to list `${listName}` to its starting position of `${startPosition}` of`${listLength}`".
 
 #### Scenario 2. Dropped in the home list (in new position)
 
