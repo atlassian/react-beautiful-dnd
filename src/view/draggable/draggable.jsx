@@ -95,7 +95,6 @@ export default class Draggable extends Component<Props> {
       onMove: (clientSelection: Position) =>
         props.move({ client: clientSelection, shouldAnimate: false }),
       onDrop: () => props.drop({ reason: 'DROP' }),
-      // not throwing if disabled - an escape hatch
       onCancel: () => props.drop({ reason: 'CANCEL' }),
       onMoveUp: props.moveUp,
       onMoveDown: props.moveDown,
