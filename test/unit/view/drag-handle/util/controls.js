@@ -11,13 +11,17 @@ import {
   mouseDown,
   windowMouseMove,
   windowMouseUp,
+  pressArrowDown,
+  windowTouchMove,
 } from './events';
 
 export type Control = {|
   name: string,
   hasPostDragClickBlocking: boolean,
+  hasPreLift: boolean,
   preLift: (wrap: ReactWrapper, options?: Object) => void,
   lift: (wrap: ReactWrapper, options?: Object) => void,
+  move: (wrap: ReactWrapper) => void,
   drop: (wrap: ReactWrapper) => void,
   cleanup: () => void,
 |};
@@ -39,11 +43,15 @@ const trySetIsDragging = (wrapper: ReactWrapper) => {
 export const touch: Control = {
   name: 'touch',
   hasPostDragClickBlocking: true,
+  hasPreLift: true,
   preLift: (wrapper: ReactWrapper, options?: Object = {}) =>
     touchStart(wrapper, { x: 0, y: 0 }, 0, options),
   lift: (wrapper: ReactWrapper) => {
     jest.runTimersToTime(timeForLongPress);
     trySetIsDragging(wrapper);
+  },
+  move: () => {
+    windowTouchMove({ x: 100, y: 200 });
   },
   drop: () => {
     windowTouchEnd();
@@ -56,11 +64,15 @@ export const touch: Control = {
 export const keyboard: Control = {
   name: 'keyboard',
   hasPostDragClickBlocking: false,
+  hasPreLift: false,
   // no pre lift required
   preLift: () => {},
   lift: (wrap: ReactWrapper, options?: Object = {}) => {
     pressSpacebar(wrap, options);
     trySetIsDragging(wrap);
+  },
+  move: (wrap: ReactWrapper) => {
+    pressArrowDown(wrap);
   },
   drop: (wrap: ReactWrapper) => {
     // only want to fire the event if dragging - otherwise it might start a drag
@@ -75,11 +87,15 @@ export const keyboard: Control = {
 export const mouse: Control = {
   name: 'mouse',
   hasPostDragClickBlocking: true,
+  hasPreLift: true,
   preLift: (wrap: ReactWrapper, options?: Object = {}) =>
     mouseDown(wrap, { x: 0, y: 0 }, primaryButton, options),
   lift: (wrap: ReactWrapper) => {
     windowMouseMove({ x: 0, y: sloppyClickThreshold });
     trySetIsDragging(wrap);
+  },
+  move: () => {
+    windowMouseMove({ x: 100, y: 200 });
   },
   drop: () => {
     windowMouseUp();

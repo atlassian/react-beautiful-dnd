@@ -149,7 +149,7 @@ export default class DragHandle extends Component<Props> {
       if (wasDragging) {
         if (process.env.NODE_ENV !== 'production') {
           console.warn(
-            'You have disabled dragging on the dragging item. The drag has been cancelled',
+            'You have disabled dragging on a Draggable while it was dragging. The drag has been cancelled',
           );
         }
         this.props.callbacks.onCancel();

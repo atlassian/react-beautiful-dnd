@@ -1,6 +1,5 @@
 // @flow
 import React, { type Node } from 'react';
-import invariant from 'tiny-invariant';
 import { mount, type ReactWrapper } from 'enzyme';
 import DragHandle from '../../../../../src/view/drag-handle/drag-handle';
 import type {
