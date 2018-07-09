@@ -120,11 +120,10 @@ export default class DragHandle extends Component<Props> {
 
     const isDragStopping: boolean =
       prevProps.isDragging && !this.props.isDragging;
-    const isEnabled: boolean = this.props.isEnabled;
 
-    // potentially the drag
+    // Drag has stopped due to somewhere else in the system
     if (isDragStopping) {
-      // if the application cancels a drag we need to unbind the handlers
+      // We need to unbind the handlers
       this.sensors.forEach((sensor: Sensor) => {
         if (sensor.isCapturing()) {
           sensor.kill();
@@ -133,7 +132,7 @@ export default class DragHandle extends Component<Props> {
       });
     }
 
-    if (isEnabled) {
+    if (this.props.isEnabled) {
       return;
     }
 
