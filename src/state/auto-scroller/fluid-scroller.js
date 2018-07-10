@@ -312,11 +312,19 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
       return;
     }
 
-    // using the can partially scroll function directly as we want to control
-    // the current and max values without modifying the droppable
+    // Cannot use the standard canScrollDroppable function as we have
+    // modified the max and current values
+
+    // Cannot scroll if there is no scrollable
+    const closest: ?Scrollable = droppable.viewport.closestScrollable;
+
+    if (!closest) {
+      return;
+    }
+
     const canScrollDroppable: boolean = canPartiallyScroll({
-      max: result.max,
       current: result.current,
+      max: result.max,
       change: requiredFrameScroll,
     });
 
