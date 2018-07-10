@@ -59,6 +59,7 @@ export const canPartiallyScroll = ({
   // It is possible for the max scroll to be greater than the current scroll
   // when there are scrollbars on the cross axis. We adjust for this by
   // increasing the max scroll point if needed
+  // This will allow movements backwards even if the current scroll is greater than the max scroll
   const max: Position = {
     x: Math.max(current.x, rawMax.x),
     y: Math.max(current.y, rawMax.y),
