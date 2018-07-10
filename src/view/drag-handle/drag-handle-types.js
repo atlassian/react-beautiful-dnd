@@ -8,14 +8,14 @@ export type Callbacks = {|
     clientSelection: Position,
     autoScrollMode: AutoScrollMode,
   }) => void,
-  onMove: (point: Position) => void,
-  onWindowScroll: () => void,
-  onMoveUp: () => void,
-  onMoveDown: () => void,
-  onMoveRight: () => void,
-  onMoveLeft: () => void,
-  onDrop: () => void,
-  onCancel: () => void,
+  onMove: (point: Position) => mixed,
+  onWindowScroll: () => mixed,
+  onMoveUp: () => mixed,
+  onMoveDown: () => mixed,
+  onMoveRight: () => mixed,
+  onMoveLeft: () => mixed,
+  onDrop: () => mixed,
+  onCancel: () => mixed,
 |};
 
 export type DragHandleProps = {|
