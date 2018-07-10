@@ -1629,6 +1629,62 @@ describe('fluid auto scrolling', () => {
             expect(mocks.scrollDroppable).not.toHaveBeenCalled();
           });
         });
+
+        // This can happen when there is a scrollbar on the cross axis
+        describe('moving backwards when current scroll is greater than max', () => {
+          const droppableScroll: Position = add(
+            getClosestScrollable(scrollable).scroll.max,
+            patch(axis.line, 10),
+          );
+          const scrolled: DroppableDimension = scrollDroppable(
+            scrollable,
+            droppableScroll,
+          );
+          const onStartBoundary: Position = patch(
+            axis.line,
+            // to the boundary is not enough to start
+            frameClient.borderBox[axis.start] + thresholds.startFrom,
+            frameClient.borderBox.center[axis.crossAxisLine],
+          );
+
+          it('should have a current scroll greater than the current scroll (validation)', () => {
+            expect(
+              getClosestScrollable(scrolled).scroll.max[axis.line],
+            ).toBeLessThan(
+              getClosestScrollable(scrolled).scroll.current[axis.line],
+            );
+          });
+
+          it('should allow scrolling backwards - even if still above the max scroll', () => {
+            // going backwards
+            const target: Position = subtract(
+              onStartBoundary,
+              // scrolling less than the excess so it is still above the max
+              patch(axis.line, 1),
+            );
+
+            fluidScroll(
+              addDroppable(
+                dragTo({
+                  selection: target,
+                  viewport: unscrollableViewport,
+                }),
+                scrolled,
+              ),
+            );
+
+            expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+            // only called after a frame
+            requestAnimationFrame.step();
+            expect(mocks.scrollDroppable).toHaveBeenCalled();
+            const [id, offset] = mocks.scrollDroppable.mock.calls[0];
+
+            expect(id).toBe(scrollable.descriptor.id);
+            // moving backwards
+            expect(offset[axis.line]).toBeLessThan(0);
+            expect(offset[axis.crossAxisLine]).toBe(0);
+          });
+        });
       });
 
       describe('window scrolling before droppable scrolling', () => {

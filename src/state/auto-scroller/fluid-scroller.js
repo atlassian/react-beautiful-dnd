@@ -312,10 +312,18 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
       return;
     }
 
-    // using the can partially scroll function directly as we want to control
+    // It is possible for the max scroll to be greater than the current scroll
+    // when there are scrollbars on the cross axis. We adjust for this by
+    // increasing the max scroll point if needed
+    const adjustedMax: Position = {
+      x: Math.max(result.current.x, result.max.x),
+      y: Math.max(result.current.y, result.max.y),
+    };
+
+    // Using the can partially scroll function directly as we want to control
     // the current and max values without modifying the droppable
     const canScrollDroppable: boolean = canPartiallyScroll({
-      max: result.max,
+      max: adjustedMax,
       current: result.current,
       change: requiredFrameScroll,
     });
