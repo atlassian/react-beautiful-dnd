@@ -137,12 +137,10 @@ describe('fluid auto scrolling', () => {
           selection,
           viewport,
         );
-        if (!impact) {
-          return base;
-        }
+
         return {
           ...base,
-          impact,
+          impact: impact || base.impact,
         };
       };
 
@@ -304,7 +302,11 @@ describe('fluid auto scrolling', () => {
             });
             const selection: Position = onMaxBoundary;
             const custom: DraggingState = addDraggable(
-              state.dragging(preset.inHome1.descriptor.id, selection),
+              state.dragging(
+                preset.inHome1.descriptor.id,
+                selection,
+                scrollableViewport,
+              ),
               tooBig,
             );
 
@@ -507,7 +509,11 @@ describe('fluid auto scrolling', () => {
             });
             const selection: Position = onMaxBoundary;
             const custom: DraggingState = addDraggable(
-              state.dragging(preset.inHome1.descriptor.id, selection),
+              state.dragging(
+                preset.inHome1.descriptor.id,
+                selection,
+                scrollableViewport,
+              ),
               tooBig,
             );
 

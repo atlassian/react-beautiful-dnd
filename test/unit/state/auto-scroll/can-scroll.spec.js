@@ -7,7 +7,7 @@ import {
   getWindowOverlap,
   getDroppableOverlap,
   canScrollWindow,
-  getDroppableAdjustedMax,
+  canScrollDroppable,
 } from '../../../../src/state/auto-scroller/can-scroll';
 import { add, subtract } from '../../../../src/state/position';
 import {
@@ -229,6 +229,41 @@ describe('can scroll', () => {
           max,
           current,
           change: point,
+        });
+
+        expect(result).toBe(false);
+      });
+    });
+
+    // It is possible in certain situations for the max scroll to exceed the current scroll.
+    // In this case we allow the movement backwards even though it is still above the max scroll point
+    it('should return true if moving backwards and the current scroll is greater than the max scroll', () => {
+      const max: Position = { x: 100, y: 200 };
+      const current: Position = { x: 110, y: 220 };
+      // Small changes that would still result in a current scroll greater than the max scroll
+      const backwards: Position[] = [{ x: -1, y: 0 }, { x: 0, y: -1 }];
+
+      backwards.forEach((change: Position) => {
+        const result: boolean = canPartiallyScroll({
+          current,
+          max,
+          change,
+        });
+
+        expect(result).toBe(true);
+      });
+    });
+
+    it('should return false if moving forwards and the current scroll is greater than the max scroll', () => {
+      const max: Position = { x: 100, y: 200 };
+      const current: Position = { x: 110, y: 220 };
+      const forwards: Position[] = [{ x: 1, y: 0 }, { x: 0, y: 1 }];
+
+      forwards.forEach((change: Position) => {
+        const result: boolean = canPartiallyScroll({
+          current,
+          max,
+          change,
         });
 
         expect(result).toBe(false);
@@ -473,17 +508,7 @@ describe('can scroll', () => {
       expect(result).toEqual(null);
 
       // verifying correctness of test
-      const closest: ClosestScrollable = getClosestScrollable(scrollable);
-      expect(
-        canPartiallyScroll({
-          current: closest.scroll.current,
-          max: getDroppableAdjustedMax(
-            closest.scroll.current,
-            closest.scroll.max,
-          ),
-          change,
-        }),
-      ).toBe(true);
+      expect(canScrollDroppable(scrollable, change)).toBe(true);
     });
   });
 

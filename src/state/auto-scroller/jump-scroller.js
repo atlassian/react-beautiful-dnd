@@ -3,11 +3,10 @@ import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import { add, subtract } from '../position';
 import {
-  getDroppableAdjustedMax,
   canScrollWindow,
+  canScrollDroppable,
   getWindowOverlap,
   getDroppableOverlap,
-  canPartiallyScroll,
 } from './can-scroll';
 import { type MoveArgs } from '../action-creators';
 import type {
@@ -16,7 +15,6 @@ import type {
   Viewport,
   DraggingState,
   DroppableId,
-  ClosestScrollable,
 } from '../../types';
 
 type Args = {|
@@ -44,19 +42,8 @@ export default ({
     droppable: DroppableDimension,
     change: Position,
   ): ?Remainder => {
-    const closest: ?ClosestScrollable = droppable.viewport.closestScrollable;
-    // Droppable is not scrollable
-    if (!closest) {
-      return change;
-    }
-
-    const canScrollDroppable: boolean = canPartiallyScroll({
-      current: closest.scroll.current,
-      max: getDroppableAdjustedMax(closest.scroll.current, closest.scroll.max),
-      change,
-    });
     // Droppable cannot absorb any of the scroll
-    if (!canScrollDroppable) {
+    if (!canScrollDroppable(droppable, change)) {
       return change;
     }
 
