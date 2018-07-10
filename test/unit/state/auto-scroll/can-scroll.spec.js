@@ -6,11 +6,15 @@ import {
   getOverlap,
   getWindowOverlap,
   getDroppableOverlap,
-  canScrollDroppable,
   canScrollWindow,
+  getDroppableAdjustedMax,
 } from '../../../../src/state/auto-scroller/can-scroll';
 import { add, subtract } from '../../../../src/state/position';
-import { getPreset, getDroppableDimension } from '../../../utils/dimension';
+import {
+  getPreset,
+  getDroppableDimension,
+  getClosestScrollable,
+} from '../../../utils/dimension';
 import { scrollDroppable } from '../../../../src/state/droppable-dimension';
 import { createViewport } from '../../../utils/viewport';
 import getMaxScroll from '../../../../src/state/get-max-scroll';
@@ -384,26 +388,6 @@ describe('can scroll', () => {
     });
   });
 
-  describe('can scroll droppable', () => {
-    it('should return false if the droppable is not scrollable', () => {
-      const result: boolean = canScrollDroppable(preset.home, { x: 1, y: 1 });
-
-      expect(result).toBe(false);
-    });
-
-    it('should return true if the droppable is able to be scrolled', () => {
-      const result: boolean = canScrollDroppable(scrollable, { x: 0, y: 20 });
-
-      expect(result).toBe(true);
-    });
-
-    it('should return false if the droppable is not able to be scrolled', () => {
-      const result: boolean = canScrollDroppable(scrollable, { x: -1, y: 0 });
-
-      expect(result).toBe(false);
-    });
-  });
-
   describe('can scroll window', () => {
     it('should return true if the window is able to be scrolled', () => {
       const viewport: Viewport = createViewport({
@@ -489,8 +473,17 @@ describe('can scroll', () => {
       expect(result).toEqual(null);
 
       // verifying correctness of test
-
-      expect(canScrollDroppable(scrollable, change)).toBe(true);
+      const closest: ClosestScrollable = getClosestScrollable(scrollable);
+      expect(
+        canPartiallyScroll({
+          current: closest.scroll.current,
+          max: getDroppableAdjustedMax(
+            closest.scroll.current,
+            closest.scroll.max,
+          ),
+          change,
+        }),
+      ).toBe(true);
     });
   });
 

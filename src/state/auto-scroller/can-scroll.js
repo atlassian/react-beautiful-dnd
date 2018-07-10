@@ -1,9 +1,13 @@
 // @flow
 import { type Position } from 'css-box-model';
 import { add, apply, isEqual, origin } from '../position';
-import type { Scrollable, DroppableDimension, Viewport } from '../../types';
+import type {
+  DroppableDimension,
+  Viewport,
+  ClosestScrollable,
+} from '../../types';
 
-type CanScrollArgs = {|
+type CanPartiallyScrollArgs = {|
   max: Position,
   current: Position,
   change: Position,
@@ -14,6 +18,17 @@ const smallestSigned = apply((value: number) => {
     return 0;
   }
   return value > 0 ? 1 : -1;
+});
+
+// It is possible for the max scroll to be greater than the current scroll
+// when there are scrollbars on the cross axis. We adjust for this by
+// increasing the max scroll point if needed
+export const getDroppableAdjustedMax = (
+  current: Position,
+  max: Position,
+): Position => ({
+  x: Math.max(current.x, max.x),
+  y: Math.max(current.y, max.y),
 });
 
 type GetRemainderArgs = {|
@@ -55,7 +70,7 @@ export const canPartiallyScroll = ({
   max,
   current,
   change,
-}: CanScrollArgs): boolean => {
+}: CanPartiallyScrollArgs): boolean => {
   // Only need to be able to move the smallest amount in the desired direction
   const smallestChange: Position = smallestSigned(change);
 
@@ -93,23 +108,6 @@ export const canScrollWindow = (
     change,
   });
 
-export const canScrollDroppable = (
-  droppable: DroppableDimension,
-  change: Position,
-): boolean => {
-  const closestScrollable: ?Scrollable = droppable.viewport.closestScrollable;
-  // Cannot scroll when there is no scroll container!
-  if (!closestScrollable) {
-    return false;
-  }
-
-  return canPartiallyScroll({
-    current: closestScrollable.scroll.current,
-    max: closestScrollable.scroll.max,
-    change,
-  });
-};
-
 export const getWindowOverlap = (
   viewport: Viewport,
   change: Position,
@@ -132,19 +130,30 @@ export const getDroppableOverlap = (
   droppable: DroppableDimension,
   change: Position,
 ): ?Position => {
-  if (!canScrollDroppable(droppable, change)) {
+  const closest: ?ClosestScrollable = droppable.viewport.closestScrollable;
+
+  if (!closest) {
     return null;
   }
 
-  const closestScrollable: ?Scrollable = droppable.viewport.closestScrollable;
-  // Cannot scroll when there is no scroll container!
-  if (!closestScrollable) {
+  const max: Position = getDroppableAdjustedMax(
+    closest.scroll.current,
+    closest.scroll.max,
+  );
+
+  const canScrollDroppable: boolean = canPartiallyScroll({
+    current: closest.scroll.current,
+    max,
+    change,
+  });
+
+  if (!canScrollDroppable) {
     return null;
   }
 
   return getOverlap({
-    current: closestScrollable.scroll.current,
-    max: closestScrollable.scroll.max,
+    current: closest.scroll.current,
+    max,
     change,
   });
 };

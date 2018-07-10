@@ -4,7 +4,11 @@ import type { Rect, Position, Spacing } from 'css-box-model';
 import { add, apply, isEqual, patch, origin } from '../position';
 import getBestScrollableDroppable from './get-best-scrollable-droppable';
 import { horizontal, vertical } from '../axis';
-import { canScrollWindow, canPartiallyScroll } from './can-scroll';
+import {
+  canScrollWindow,
+  canPartiallyScroll,
+  getDroppableAdjustedMax,
+} from './can-scroll';
 import type {
   Axis,
   DraggingState,
@@ -311,24 +315,17 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
     if (!result) {
       return;
     }
-
-    // It is possible for the max scroll to be greater than the current scroll
-    // when there are scrollbars on the cross axis. We adjust for this by
-    // increasing the max scroll point if needed
-    const adjustedMax: Position = {
-      x: Math.max(result.current.x, result.max.x),
-      y: Math.max(result.current.y, result.max.y),
-    };
+    const { current, max } = result;
 
     // Using the can partially scroll function directly as we want to control
     // the current and max values without modifying the droppable
-    const canScrollDroppable: boolean = canPartiallyScroll({
-      max: adjustedMax,
-      current: result.current,
+    const canScroll: boolean = canPartiallyScroll({
+      max: getDroppableAdjustedMax(current, max),
+      current,
       change: requiredFrameScroll,
     });
 
-    if (canScrollDroppable) {
+    if (canScroll) {
       scheduleDroppableScroll(droppable.descriptor.id, requiredFrameScroll);
     }
   };
