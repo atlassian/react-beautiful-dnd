@@ -332,10 +332,9 @@ export default (state: State = idle, action: Action): State => {
     }
 
     invariant(
-      target.isEnabled === isEnabled,
-      `Trying to set droppable isEnabled to ${String(
-        isEnabled,
-      )} but it is already ${String(isEnabled)}`,
+      target.isEnabled !== isEnabled,
+      `Trying to set droppable isEnabled to ${String(isEnabled)}
+      but it is already ${String(target.isEnabled)}`,
     );
 
     const updated: DroppableDimension = {
