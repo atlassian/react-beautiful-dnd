@@ -22,8 +22,7 @@ import {
   publishAdditionArgs,
 } from '../../../utils/preset-action-args';
 
-// eslint-disable-next-line jest/no-disabled-tests
-describe.skip('skipping pending drop', () => {
+describe('skipping pending drop', () => {
   it('should trigger a drop on a dynamic publish if a drop pending is waiting', () => {
     const mock = jest.fn();
     const store: Store = createStore(

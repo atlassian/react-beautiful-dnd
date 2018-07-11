@@ -185,9 +185,7 @@ describe('update', () => {
     expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
   });
 
-  // TODO: enable when we use dynamic dimensions
-  // eslint-disable-next-line jest/no-disabled-tests
-  describe.skip('updates caused by dynamic changes', () => {
+  describe('updates caused by dynamic changes', () => {
     it('should not call onDragUpdate if the destination or source have not changed', () => {
       const hooks: Hooks = createHooks();
       const store: Store = createStore(middleware(() => hooks, getAnnounce()));
