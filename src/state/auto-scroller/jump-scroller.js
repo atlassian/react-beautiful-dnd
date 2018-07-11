@@ -3,8 +3,8 @@ import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import { add, subtract } from '../position';
 import {
-  canScrollDroppable,
   canScrollWindow,
+  canScrollDroppable,
   getWindowOverlap,
   getDroppableOverlap,
 } from './can-scroll';

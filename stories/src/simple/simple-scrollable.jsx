@@ -3,6 +3,7 @@
 /* eslint-disable flowtype/require-valid-file-annotation */
 
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 
 // fake data generator
@@ -37,17 +38,24 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   ...draggableStyle,
 });
 
-const getListStyle = isDraggingOver => ({
+const getListStyle = (isDraggingOver, overflow) => ({
   background: isDraggingOver ? 'lightblue' : 'grey',
   padding: grid,
   margin: grid,
   border: '5px solid pink',
   width: 250,
   maxHeight: '50vh',
-  overflow: 'auto',
+  overflow,
 });
 
 export default class App extends Component {
+  static propTypes = {
+    overflow: PropTypes.string,
+  };
+  static defaultProps = {
+    overflow: 'auto',
+  };
+
   constructor(props, context) {
     super(props, context);
     this.state = {
@@ -82,7 +90,10 @@ export default class App extends Component {
           {(droppableProvided, droppableSnapshot) => (
             <div
               ref={droppableProvided.innerRef}
-              style={getListStyle(droppableSnapshot.isDraggingOver)}
+              style={getListStyle(
+                droppableSnapshot.isDraggingOver,
+                this.props.overflow,
+              )}
             >
               {this.state.items.map((item, index) => (
                 <Draggable key={item.id} draggableId={item.id} index={index}>

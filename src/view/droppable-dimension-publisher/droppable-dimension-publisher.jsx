@@ -348,6 +348,12 @@ export default class DroppableDimensionPublisher extends Component<Props> {
         left: paddingBox.left - base.border.left,
       };
 
+      // We are not accounting for scrollbars
+      // Adjusting for scrollbars is hard because:
+      // - they are different between browsers
+      // - scrollbars can be activated and removed during a drag
+      // We instead account for this slightly in our auto scroller
+
       return createBox({
         borderBox,
         margin: base.margin,
