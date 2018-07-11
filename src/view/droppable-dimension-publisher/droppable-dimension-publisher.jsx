@@ -201,7 +201,6 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     this.publish();
 
     // We now need to check if the disabled flag has changed
-
     if (this.props.isDropDisabled === prevProps.isDropDisabled) {
       return;
     }
