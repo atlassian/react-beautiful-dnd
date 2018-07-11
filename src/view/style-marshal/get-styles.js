@@ -3,7 +3,6 @@ import { css } from '../animation';
 import * as attributes from '../data-attributes';
 
 export type Styles = {|
-  collecting: string,
   dragging: string,
   resting: string,
   dropAnimating: string,
@@ -142,15 +141,13 @@ export default (styleContext: string): Styles => {
 
   const resting: string[] = [...base, dragHandleStyles.grabCursor];
 
-  // while collecting we do not animate movements
-  const collecting: string[] = [
+  // while dragging we animate movements
+  const dragging: string[] = [
     ...base,
     dragHandleStyles.blockPointerEvents,
     bodyStyles.whileActiveDragging,
+    draggableStyles.animateMovement,
   ];
-
-  // while dragging we animate movements
-  const dragging: string[] = [...collecting, draggableStyles.animateMovement];
 
   const dropAnimating: string[] = [
     ...base,
@@ -166,7 +163,6 @@ export default (styleContext: string): Styles => {
     resting: resting.join(''),
     dragging: dragging.join(''),
     dropAnimating: dropAnimating.join(''),
-    collecting: collecting.join(''),
     userCancel: userCancel.join(''),
   };
 };

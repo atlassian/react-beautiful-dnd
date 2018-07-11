@@ -9,10 +9,6 @@ export default (marshal: StyleMarshal) => () => (next: Action => mixed) => (
     marshal.dragging();
   }
 
-  if (action.type === 'COLLECTION_STARTING') {
-    marshal.collecting();
-  }
-
   if (action.type === 'DROP_ANIMATE') {
     marshal.dropping(action.payload.result.reason);
   }

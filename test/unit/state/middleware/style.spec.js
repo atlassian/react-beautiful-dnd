@@ -21,7 +21,6 @@ import {
 
 const getMarshalStub = (): StyleMarshal => ({
   dragging: jest.fn(),
-  collecting: jest.fn(),
   dropping: jest.fn(),
   resting: jest.fn(),
   mount: jest.fn(),
@@ -37,17 +36,6 @@ it('should use the dragging styles on an initial publish', () => {
   store.dispatch(initialPublish(initialPublishArgs));
 
   expect(marshal.dragging).toHaveBeenCalled();
-});
-
-it('should use the dragging styles when a dynamic collection is starting', () => {
-  const marshal: StyleMarshal = getMarshalStub();
-  const store: Store = createStore(middleware(marshal));
-
-  store.dispatch(prepare());
-  store.dispatch(initialPublish(initialPublishArgs));
-  store.dispatch(collectionStarting());
-
-  expect(marshal.collecting).toHaveBeenCalled();
 });
 
 it('should use the dragging styles after a dynamic publish', () => {
