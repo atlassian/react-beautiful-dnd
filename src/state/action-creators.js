@@ -11,7 +11,7 @@ import type {
   DimensionMap,
   DropReason,
   PendingDrop,
-  Publish,
+  Published,
 } from '../types';
 
 export type LiftArgs = {|
@@ -55,10 +55,10 @@ export const initialPublish = (
 
 export type PublishAction = {|
   type: 'PUBLISH',
-  payload: Publish,
+  payload: Published,
 |};
 
-export const publish = (args: Publish): PublishAction => ({
+export const publish = (args: Published): PublishAction => ({
   type: 'PUBLISH',
   payload: args,
 });

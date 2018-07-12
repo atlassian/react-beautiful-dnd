@@ -95,9 +95,9 @@ export default (axis?: Axis = vertical) => {
     return result;
   };
 
-  const collecting = (): CollectingState => ({
+  const collecting = (id?: DraggableId): CollectingState => ({
     phase: 'COLLECTING',
-    ...dragging(),
+    ...dragging(id),
     // eslint-disable-next-line
     phase: 'COLLECTING',
   });

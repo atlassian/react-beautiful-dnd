@@ -192,7 +192,7 @@ export default (state: State = idle, action: Action): State => {
 
     return publish({
       state,
-      publish: action.payload,
+      published: action.payload,
     });
   }
 

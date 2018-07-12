@@ -9,7 +9,7 @@ import {
 import type {
   Axis,
   DimensionMap,
-  Publish,
+  Published,
   DraggableId,
   DroppableId,
   DraggableDimension,
@@ -23,7 +23,7 @@ import * as timings from '../../debug/timings';
 
 type Args = {|
   existing: DimensionMap,
-  publish: Publish,
+  published: Published,
   windowScroll: Position,
 |};
 
@@ -77,16 +77,16 @@ const getRecord = (draggable: DraggableDimension, home: DroppableDimension) => {
 
 const timingKey: string = 'Dynamic dimension change processing (just math)';
 
-export default ({ existing, publish, windowScroll }: Args): DimensionMap => {
+export default ({ existing, published, windowScroll }: Args): DimensionMap => {
   timings.start(timingKey);
   const addedDroppables: DroppableDimensionMap = toDroppableMap(
-    publish.additions.droppables,
+    published.additions.droppables,
   );
   const addedDraggables: DraggableDimensionMap = toDraggableMap(
-    publish.additions.draggables,
+    published.additions.draggables,
   );
 
-  const partitioned: Partitioned = publish.additions.draggables.reduce(
+  const partitioned: Partitioned = published.additions.draggables.reduce(
     (previous: Partitioned, draggable: DraggableDimension) => {
       const droppableId: DroppableId = draggable.descriptor.droppableId;
       const isInNewDroppable: boolean = Boolean(addedDroppables[droppableId]);
@@ -126,7 +126,7 @@ export default ({ existing, publish, windowScroll }: Args): DimensionMap => {
   });
 
   // Draggable removals
-  publish.removals.draggables.forEach((id: DraggableId) => {
+  published.removals.draggables.forEach((id: DraggableId) => {
     // Pull draggable dimension from existing dimensions
     const draggable: ?DraggableDimension = existing.draggables[id];
     invariant(draggable, `Cannot find Draggable ${id}`);
@@ -170,7 +170,6 @@ export default ({ existing, publish, windowScroll }: Args): DimensionMap => {
       const additionSize: number = getTotal(additions);
       const removalSize: number = getTotal(removals);
       const deltaShift: number = additionSize - removalSize;
-      // console.log('DELTA SHIFT', deltaShift);
 
       const change: Position = patch(droppable.axis.line, deltaShift);
       const client: BoxModel = offset(draggable.client, change);
@@ -214,11 +213,11 @@ export default ({ existing, publish, windowScroll }: Args): DimensionMap => {
 
   // We also need to remove the Draggables and Droppables from this new map
 
-  publish.removals.draggables.forEach((id: DraggableId) => {
+  published.removals.draggables.forEach((id: DraggableId) => {
     delete dimensions.draggables[id];
   });
 
-  publish.removals.droppables.forEach((id: DroppableId) => {
+  published.removals.droppables.forEach((id: DroppableId) => {
     delete dimensions.droppables[id];
   });
 

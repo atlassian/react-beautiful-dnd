@@ -236,7 +236,7 @@ export type DimensionMap = {|
   droppables: DroppableDimensionMap,
 |};
 
-export type Publish = {|
+export type Published = {|
   additions: {|
     draggables: DraggableDimension[],
     droppables: DroppableDimension[],

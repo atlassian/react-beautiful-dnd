@@ -6,7 +6,7 @@ import type {
   DraggingState,
   CollectingState,
   DropPendingState,
-  Publish,
+  Published,
   Critical,
   DraggableId,
   DraggableDimension,
@@ -18,10 +18,13 @@ import getDragPositions from './get-drag-positions';
 
 type Args = {|
   state: CollectingState | DropPendingState,
-  publish: Publish,
+  published: Published,
 |};
 
-export default ({ state, publish }: Args): DraggingState | DropPendingState => {
+export default ({
+  state,
+  published,
+}: Args): DraggingState | DropPendingState => {
   // TODO: write validate that every removed draggable must have a removed droppable
 
   // ## Adding Draggables to existing lists
@@ -46,7 +49,7 @@ export default ({ state, publish }: Args): DraggingState | DropPendingState => {
 
   const dimensions: DimensionMap = getDimensionMap({
     existing: state.dimensions,
-    publish,
+    published,
     // TODO: fix
     windowScroll: state.viewport.scroll.initial,
   });
