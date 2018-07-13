@@ -14,10 +14,12 @@ import type {
   DraggingState,
   DraggableDimensionMap,
   CollectingState,
+  DraggableId,
 } from '../../../../src/types';
 import publish from '../../../../src/state/publish';
 import { getPreset } from '../../../utils/dimension';
 import { patch, negate } from '../../../../src/state/position';
+import getDraggablesInsideDroppable from '../../../../src/state/get-draggables-inside-droppable';
 
 const state = getStatePreset();
 const preset = getPreset();
@@ -271,4 +273,103 @@ it('should shift draggables after a removed draggable', () => {
   // inHome2 and inHome3 are gone
   expect(draggables).not.toHaveProperty(preset.inHome2.descriptor.id);
   expect(draggables).not.toHaveProperty(preset.inHome3.descriptor.id);
+});
+
+it('should shift draggables after multiple changes', () => {
+  // dragging inHome3
+  // inHome2 is removed
+  // two items are inserted where inHome2 was
+  const added1: DraggableDimension = {
+    ...preset.inHome2,
+    descriptor: {
+      index: 1,
+      id: 'added1',
+      droppableId: preset.home.descriptor.id,
+      type: preset.home.descriptor.type,
+    },
+  };
+  const added2: DraggableDimension = {
+    ...preset.inHome3,
+    descriptor: {
+      index: 2,
+      id: 'added2',
+      droppableId: preset.home.descriptor.id,
+      type: preset.home.descriptor.type,
+    },
+  };
+  const published: Published = {
+    removals: {
+      draggables: [preset.inHome2.descriptor.id],
+      droppables: [],
+    },
+    additions: {
+      draggables: [added1, added2],
+      droppables: [],
+    },
+  };
+  const original: CollectingState = state.collecting(
+    preset.inHome3.descriptor.id,
+  );
+
+  const result: DraggingState | DropPendingState = publish({
+    state: original,
+    published,
+  });
+
+  // validation
+  invariant(result.phase === 'DRAGGING');
+
+  const draggables: DraggableDimensionMap = result.dimensions.draggables;
+
+  // inHome1 has not changed as it was before the insertion
+  expect(draggables[preset.inHome1.descriptor.id]).toEqual(preset.inHome1);
+
+  // Everything else below it has been shifted
+  const change: Position = patch(
+    preset.home.axis.line,
+    // two added items
+    added1.client.marginBox.height +
+      added2.client.marginBox.height -
+      // one removed item
+      preset.inHome2.client.marginBox.height,
+  );
+
+  const complexShift = (draggable: DraggableDimension) =>
+    shift({
+      draggable,
+      change,
+      // 2 inserted, 1 removed
+      newIndex: draggable.descriptor.index + 1,
+    });
+
+  expect(draggables[preset.inHome3.descriptor.id]).toEqual(
+    complexShift(preset.inHome3),
+  );
+
+  expect(draggables[preset.inHome4.descriptor.id]).toEqual(
+    complexShift(preset.inHome4),
+  );
+
+  // the added items have not been shifted
+  expect(draggables[added1.descriptor.id]).toEqual(added1);
+  expect(draggables[added2.descriptor.id]).toEqual(added2);
+  // inHome2 has been removed
+  expect(draggables).not.toHaveProperty(preset.inHome2.descriptor.id);
+
+  // Validation: being totally over the top
+  const getId = (draggable: DraggableDimension): DraggableId =>
+    draggable.descriptor.id;
+
+  const expected: DraggableId[] = [
+    getId(preset.inHome1),
+    getId(added1),
+    getId(added2),
+    getId(preset.inHome3),
+    getId(preset.inHome4),
+  ];
+  const ordered: DraggableId[] = getDraggablesInsideDroppable(
+    preset.home,
+    draggables,
+  ).map((draggable: DraggableDimension) => draggable.descriptor.id);
+  expect(ordered).toEqual(expected);
 });

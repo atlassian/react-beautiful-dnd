@@ -27,26 +27,9 @@ export default ({
 }: Args): DraggingState | DropPendingState => {
   // TODO: write validate that every removed draggable must have a removed droppable
 
-  // ## Adding Draggables to existing lists
-  // Added dimension is already in the correct location
-  // If added to the end of the list then everything else is in the correct spot
-  // If inserted within the list then everything else in the list has been pushed forward
-  // by the size of the addition
-  // If inserted before the critical draggable then everything initial and current DragPositions
-  // need to be updated.
+  // TODO: Shift collected dimensions to account for change in window / droppable scroll
 
-  // ## Removing Draggables from existing lists
-  // Added dimension is already in the correct location
-  // If removed from the end of the list - nothing to do
-  // If removed from within a list then everything else is pulled forward
-  // If removed before critical dimension then DragPositions need to be updated
-
-  // ## Adding a new droppable
-  // Addition already in right spot
-
-  // ## Adding a Draggable to a new Droppable
-  // Addition already in right spot
-
+  // Add, remove and shift dimensions
   const dimensions: DimensionMap = getDimensionMap({
     existing: state.dimensions,
     published,
@@ -59,11 +42,14 @@ export default ({
   const updated: DraggableDimension = dimensions.draggables[dragging];
 
   const critical: Critical = {
+    // droppable cannot change during a drag
     droppable: state.critical.droppable,
     // draggable index can change during a drag
     draggable: updated.descriptor,
   };
 
+  // Get the updated drag positions to account for any
+  // shift to the critical draggable
   const { initial, current } = getDragPositions({
     initial: state.initial,
     current: state.current,
@@ -72,6 +58,7 @@ export default ({
     viewport: state.viewport,
   });
 
+  // Get the impact of all of our changes
   const impact: DragImpact = getDragImpact({
     pageBorderBoxCenter: current.page.borderBoxCenter,
     draggable: dimensions.draggables[state.critical.draggable.id],
