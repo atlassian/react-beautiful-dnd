@@ -356,20 +356,19 @@ it('should shift draggables after multiple changes', () => {
   // inHome2 has been removed
   expect(draggables).not.toHaveProperty(preset.inHome2.descriptor.id);
 
-  // Validation: being totally over the top
+  // Order validation: being totally over the top
   const getId = (draggable: DraggableDimension): DraggableId =>
     draggable.descriptor.id;
-
   const expected: DraggableId[] = [
-    getId(preset.inHome1),
-    getId(added1),
-    getId(added2),
-    getId(preset.inHome3),
-    getId(preset.inHome4),
-  ];
+    preset.inHome1,
+    added1,
+    added2,
+    preset.inHome3,
+    preset.inHome4,
+  ].map(getId);
   const ordered: DraggableId[] = getDraggablesInsideDroppable(
     preset.home,
     draggables,
-  ).map((draggable: DraggableDimension) => draggable.descriptor.id);
+  ).map(getId);
   expect(ordered).toEqual(expected);
 });
