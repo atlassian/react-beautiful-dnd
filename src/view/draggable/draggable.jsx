@@ -7,7 +7,7 @@ import invariant from 'tiny-invariant';
 import { isEqual, origin } from '../../state/position';
 import type {
   DraggableDimension,
-  ItemPositions,
+  ClientPositions,
   DroppableId,
   AutoScrollMode,
   TypeId,
@@ -133,7 +133,7 @@ export default class Draggable extends Component<Props> {
     const { clientSelection, autoScrollMode } = options;
     const { lift, draggableId } = this.props;
 
-    const client: ItemPositions = {
+    const client: ClientPositions = {
       selection: clientSelection,
       borderBoxCenter: getBorderBoxCenterPosition(ref),
       offset: origin,

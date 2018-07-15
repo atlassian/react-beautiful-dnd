@@ -10,7 +10,6 @@ import moveInDirection, {
 import { add, isEqual, subtract, origin } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
-import getPageItemPositions from './get-page-item-positions';
 import isMovementAllowed from './is-movement-allowed';
 import type {
   State,
@@ -19,8 +18,9 @@ import type {
   IdleState,
   PreparingState,
   DraggingState,
-  ItemPositions,
   DragPositions,
+  ClientPositions,
+  PagePositions,
   CollectingState,
   DropAnimatingState,
   DropPendingState,
@@ -59,19 +59,21 @@ const moveWithPositionUpdates = ({
   const newViewport: Viewport = viewport || state.viewport;
   const currentWindowScroll: Position = newViewport.scroll.current;
 
-  const client: ItemPositions = (() => {
-    const offset: Position = subtract(
-      clientSelection,
-      state.initial.client.selection,
-    );
-    return {
-      offset,
-      selection: clientSelection,
-      borderBoxCenter: add(state.initial.client.borderBoxCenter, offset),
-    };
-  })();
+  const offset: Position = subtract(
+    clientSelection,
+    state.initial.client.selection,
+  );
 
-  const page: ItemPositions = getPageItemPositions(client, currentWindowScroll);
+  const client: ClientPositions = {
+    offset,
+    selection: clientSelection,
+    borderBoxCenter: add(state.initial.client.borderBoxCenter, offset),
+  };
+
+  const page: PagePositions = {
+    selection: add(client.selection, currentWindowScroll),
+    borderBoxCenter: add(client.borderBoxCenter, currentWindowScroll),
+  };
 
   const current: DragPositions = {
     client,
@@ -139,7 +141,6 @@ export default (state: State = idle, action: Action): State => {
       page: {
         selection: add(client.selection, viewport.scroll.initial),
         borderBoxCenter: add(client.selection, viewport.scroll.initial),
-        offset: origin,
       },
     };
 

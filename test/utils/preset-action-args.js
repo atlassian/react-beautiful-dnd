@@ -7,9 +7,8 @@ import type {
   Critical,
   DropResult,
   DragStart,
-  ItemPositions,
+  ClientPositions,
   DimensionMap,
-  Publish,
   DraggableDimension,
   PendingDrop,
 } from '../../src/types';
@@ -26,7 +25,7 @@ export const critical: Critical = {
   droppable: preset.home.descriptor,
 };
 
-const client: ItemPositions = {
+const client: ClientPositions = {
   selection: preset.inHome1.client.borderBox.center,
   borderBoxCenter: preset.inHome1.client.borderBox.center,
   offset: { x: 0, y: 0 },

@@ -20,51 +20,10 @@ import publish from '../../../../src/state/publish';
 import { getPreset } from '../../../utils/dimension';
 import { patch, negate } from '../../../../src/state/position';
 import getDraggablesInsideDroppable from '../../../../src/state/get-draggables-inside-droppable';
+import { empty, shift } from './util';
 
 const state = getStatePreset();
 const preset = getPreset();
-
-const empty: Published = {
-  additions: {
-    draggables: [],
-    droppables: [],
-  },
-  removals: {
-    draggables: [],
-    droppables: [],
-  },
-};
-
-type ShiftArgs = {|
-  draggable: DraggableDimension,
-  change: Position,
-  newIndex: number,
-|};
-
-const shift = ({
-  draggable,
-  change,
-  newIndex,
-}: ShiftArgs): DraggableDimension => {
-  const client: BoxModel = offset(draggable.client, change);
-  const page: BoxModel = withScroll(client, preset.windowScroll);
-
-  const moved: DraggableDimension = {
-    ...draggable,
-    descriptor: {
-      ...draggable.descriptor,
-      index: newIndex,
-    },
-    placeholder: {
-      ...draggable.placeholder,
-      client,
-    },
-    client,
-    page,
-  };
-
-  return moved;
-};
 
 it('should do not modify the dimensions when nothing has changed', () => {
   const original: CollectingState = state.collecting();

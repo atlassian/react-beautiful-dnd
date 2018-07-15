@@ -20,20 +20,10 @@ import publish from '../../../../src/state/publish';
 import { getPreset } from '../../../utils/dimension';
 import { patch, negate } from '../../../../src/state/position';
 import { copy } from '../../../utils/preset-action-args';
+import { empty } from './util';
 
 const state = getStatePreset();
 const preset = getPreset();
-
-const empty: Published = {
-  additions: {
-    draggables: [],
-    droppables: [],
-  },
-  removals: {
-    draggables: [],
-    droppables: [],
-  },
-};
 
 const original: CollectingState = state.collecting();
 const published: Published = {

@@ -140,7 +140,7 @@ export type DragImpact = {|
   destination: ?DraggableLocation,
 |};
 
-export type ItemPositions = {|
+export type ClientPositions = {|
   // where the user initially selected
   // This point is not used to calculate the impact of a dragging item
   // It is used to calculate the offset from the initial selection point
@@ -149,6 +149,11 @@ export type ItemPositions = {|
   borderBoxCenter: Position,
   // how far the item has moved from its original position
   offset: Position,
+|};
+
+export type PagePositions = {|
+  selection: Position,
+  borderBoxCenter: Position,
 |};
 
 // When dragging with a pointer such as a mouse or touch input we want to automatically
@@ -163,8 +168,8 @@ export type AutoScrollMode = 'FLUID' | 'JUMP';
 // |}
 
 export type DragPositions = {|
-  client: ItemPositions,
-  page: ItemPositions,
+  client: ClientPositions,
+  page: PagePositions,
 |};
 
 // published when a drag starts
