@@ -1,4 +1,5 @@
 // @flow
+import type { Position } from 'css-box-model';
 import createDimensionMarshal from '../../../../src/state/dimension-marshal/dimension-marshal';
 import type {
   Callbacks,
@@ -9,7 +10,8 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DimensionMap,
-  Publish,
+  Published,
+  Viewport,
 } from '../../../../src/types';
 import { critical, preset } from '../../../utils/preset-action-args';
 import {
@@ -18,8 +20,9 @@ import {
   getCallbacksStub,
 } from '../../../utils/dimension-marshal';
 import { defaultRequest, withExpectedAdvancedUsageWarning } from './util';
+import scrollViewport from '../../../../src/state/scroll-viewport';
 
-const empty: Publish = {
+const empty: Published = {
   removals: {
     draggables: [],
     droppables: [],
@@ -98,7 +101,7 @@ describe('additions', () => {
 
     // Fire the collection / publish step
     requestAnimationFrame.step();
-    const expected: Publish = {
+    const expected: Published = {
       ...empty,
       additions: {
         droppables: [anotherDroppable],
@@ -164,7 +167,7 @@ describe('removals', () => {
 
     // Fire the collection / publish step
     requestAnimationFrame.flush();
-    const expected: Publish = {
+    const expected: Published = {
       additions: {
         droppables: [],
         draggables: [],

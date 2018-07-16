@@ -15,6 +15,7 @@ import getDragImpact from '../get-drag-impact';
 import getHomeImpact from '../get-home-impact';
 import getDimensionMap from './get-dimension-map';
 import getDragPositions from './get-drag-positions';
+import adjustAdditionsForScrollChanges from './adjust-additions-for-scroll-changes';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -26,15 +27,19 @@ export default ({
   published,
 }: Args): DraggingState | DropPendingState => {
   // TODO: write validate that every removed draggable must have a removed droppable
+  const withShifted: Published = adjustAdditionsForScrollChanges({
+    published,
+    droppables: state.dimensions.droppables,
+    viewport: state.viewport,
+  });
 
   // TODO: Shift collected dimensions to account for change in window / droppable scroll
 
   // Add, remove and shift dimensions
   const dimensions: DimensionMap = getDimensionMap({
     existing: state.dimensions,
-    published,
-    // TODO: fix
-    windowScroll: state.viewport.scroll.initial,
+    published: withShifted,
+    initialWindowScroll: state.viewport.scroll.initial,
   });
 
   const dragging: DraggableId = state.critical.draggable.id;

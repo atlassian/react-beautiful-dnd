@@ -6,9 +6,11 @@ import type {
   Published,
   DraggableDimension,
   DroppableDimension,
+  Viewport,
 } from '../../types';
 import type { Collection, Entries } from './dimension-marshal-types';
 import * as timings from '../../debug/timings';
+import { origin } from '../position';
 
 export type Publisher = {|
   addDraggable: (id: DraggableId) => void,
@@ -112,7 +114,8 @@ export default ({ getProvided, callbacks }: Args): Publisher => {
       timings.start(timingKey);
 
       const { entries, collection } = getProvided();
-      const windowScroll: Position = collection.initialWindowScroll;
+      // Using the origin as the window scroll. This will be adjusted when processing the published values
+      const windowScroll: Position = origin;
 
       const draggables: DraggableDimension[] = Object.keys(
         additions.draggables,
@@ -127,7 +130,6 @@ export default ({ getProvided, callbacks }: Args): Publisher => {
       ).map(
         (id: DroppableId): DroppableDimension =>
           entries.droppables[id].callbacks.getDimensionAndWatchScroll(
-            // TODO: need to figure out diff from start?
             windowScroll,
             collection.scrollOptions,
           ),

@@ -11,6 +11,7 @@ import type {
   DimensionMap,
   DraggableDimension,
   PendingDrop,
+  Published,
 } from '../../src/types';
 import type {
   InitialPublishArgs,
@@ -46,7 +47,7 @@ export const initialPublishArgs: InitialPublishArgs = {
   autoScrollMode: 'FLUID',
 };
 
-export const publishAdditionArgs: Publish = (() => {
+export const publishAdditionArgs: Published = (() => {
   const addition: DraggableDimension = getDraggableDimension({
     descriptor: {
       ...preset.inHome4.descriptor,

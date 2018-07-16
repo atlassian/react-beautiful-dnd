@@ -119,7 +119,6 @@ export default class DraggableDimensionPublisher extends Component<Props> {
       targetRef,
     );
     const borderBox: ClientRect = targetRef.getBoundingClientRect();
-
     const client: BoxModel = calculateBox(borderBox, computedStyles);
     const page: BoxModel = withScroll(client, windowScroll);
 

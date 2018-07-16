@@ -1,6 +1,7 @@
 // @flow
 import React, { type Node } from 'react';
 import { bindActionCreators } from 'redux';
+import invariant from 'tiny-invariant';
 import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
@@ -95,10 +96,10 @@ export default class DragDropContext extends React.Component<Props> {
     });
     const callbacks: DimensionMarshalCallbacks = bindActionCreators(
       {
-        collectionStarting,
         publish,
         updateDroppableScroll,
         updateDroppableIsEnabled,
+        collectionStarting,
       },
       this.store.dispatch,
     );

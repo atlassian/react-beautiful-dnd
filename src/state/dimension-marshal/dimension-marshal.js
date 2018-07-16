@@ -272,8 +272,11 @@ export default (callbacks: Callbacks) => {
     entry.callbacks.scroll(change);
   };
 
-  const getInitialPublish = (args: Collection): StartPublishingResult => {
-    const { critical, scrollOptions, initialWindowScroll: windowScroll } = args;
+  const getInitialPublish = (
+    args: Collection,
+    windowScroll: Position,
+  ): StartPublishingResult => {
+    const { critical, scrollOptions } = args;
     const timingKey: string = 'Initial collection from DOM';
     timings.start(timingKey);
 
@@ -376,10 +379,9 @@ export default (callbacks: Callbacks) => {
     collection = {
       scrollOptions: request.scrollOptions,
       critical,
-      initialWindowScroll: windowScroll,
     };
 
-    return getInitialPublish(collection);
+    return getInitialPublish(collection, windowScroll);
   };
 
   const marshal: DimensionMarshal = {

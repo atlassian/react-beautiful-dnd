@@ -29,22 +29,13 @@ export default ({
   newClientBorderBoxCenter,
   viewport,
 }: Args): Result => {
-  // Nothing needs to be changed
   // TODO: what about page shifts?
-  console.log('oldCurrent.client.offset', oldCurrent.client.offset);
-  if (isEqual(oldClientBorderBoxCenter, newClientBorderBoxCenter)) {
-    console.log('no impact');
-
-    return { initial: oldInitial, current: oldCurrent };
-  }
 
   // how much the dragging item has shifted in the DOM
   const shift: Position = subtract(
     newClientBorderBoxCenter,
     oldClientBorderBoxCenter,
   );
-
-  console.log('shift', shift);
 
   // Correcting its new original position
   const initial: DragPositions = (() => {

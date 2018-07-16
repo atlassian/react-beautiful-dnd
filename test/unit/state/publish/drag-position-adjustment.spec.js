@@ -240,7 +240,7 @@ it('should account for removals before the critical', () => {
   );
 });
 
-it('should account for multiple changes before the critical', () => {
+it('should account for changes that result in no net movement before the critical', () => {
   // adding 1, removing inHome1
   const added1: DraggableDimension = {
     ...preset.inHome1,

@@ -251,6 +251,7 @@ export type Published = {|
     draggables: DraggableId[],
     droppables: DroppableId[],
   |},
+  // viewport: Viewport,
 |};
 
 export type IdleState = {|

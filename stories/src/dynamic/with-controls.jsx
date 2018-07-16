@@ -196,7 +196,12 @@ export default class WithControls extends React.Component<*, State> {
         <Controls />
         <Container>
           {Object.keys(quoteMap).map((key: string) => (
-            <QuoteList key={key} listId={key} quotes={quoteMap[key]} />
+            <QuoteList
+              key={key}
+              listId={key}
+              quotes={quoteMap[key]}
+              internalScroll
+            />
           ))}
         </Container>
       </DragDropContext>

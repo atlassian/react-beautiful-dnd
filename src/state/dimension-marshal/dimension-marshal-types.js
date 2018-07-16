@@ -16,6 +16,7 @@ import type {
   DimensionMap,
   LiftRequest,
   Published,
+  Viewport,
 } from '../../types';
 
 export type GetDraggableDimensionFn = (
@@ -62,7 +63,6 @@ export type Entries = {|
 export type Collection = {|
   scrollOptions: ScrollOptions,
   critical: Critical,
-  initialWindowScroll: Position,
 |};
 
 export type StartPublishingResult = {|

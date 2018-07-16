@@ -29,7 +29,7 @@ import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 type Args = {|
   existing: DimensionMap,
   published: Published,
-  windowScroll: Position,
+  initialWindowScroll: Position,
 |};
 
 type Shift = {|
@@ -41,7 +41,11 @@ type ShiftMap = {
   [id: DraggableId]: Shift,
 };
 
-export default ({ existing, published, windowScroll }: Args): DimensionMap => {
+export default ({
+  existing,
+  published,
+  initialWindowScroll,
+}: Args): DimensionMap => {
   const droppables: DroppableDimension[] = toDroppableList(existing.droppables);
 
   const shifted: DraggableDimensionMap = {};
@@ -173,7 +177,7 @@ export default ({ existing, published, windowScroll }: Args): DimensionMap => {
       }
 
       const client: BoxModel = offsetBox(item.client, shift.offset);
-      const page: BoxModel = withScroll(client, windowScroll);
+      const page: BoxModel = withScroll(client, initialWindowScroll);
       const index: number = item.descriptor.index + shift.indexChange;
 
       const moved: DraggableDimension = {

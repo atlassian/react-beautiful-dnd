@@ -149,7 +149,9 @@ export default class QuoteList extends React.Component<Props> {
             {...dropProvided.droppableProps}
           >
             {internalScroll ? (
-              <ScrollContainer>
+              <ScrollContainer
+                onScroll={e => console.log('scroll', e.target.scrollTop)}
+              >
                 <InnerList
                   quotes={quotes}
                   title={title}
