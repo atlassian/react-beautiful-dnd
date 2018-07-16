@@ -81,6 +81,11 @@ type WatchingScroll = {|
   options: ScrollOptions,
 |};
 
+type GetDimensionResult = {|
+  dimension: DroppableDimension,
+  closestScrollable: ?Element,
+|};
+
 export default class DroppableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
   watchingScroll: ?WatchingScroll = null;
@@ -91,6 +96,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     super(props, context);
     const callbacks: DroppableCallbacks = {
       getDimensionAndWatchScroll: this.getDimensionAndWatchScroll,
+      recollect: this.recollect,
       unwatchScroll: this.unwatchScroll,
       scroll: this.scroll,
     };
@@ -150,7 +156,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     closestScrollable.scrollLeft += change.x;
   };
 
-  watchScroll = (closestScrollable: ?Element, options: ScrollOptions) => {
+  watchScroll = (closestScrollable: Element, options: ScrollOptions) => {
     invariant(
       !this.watchingScroll,
       'Droppable cannot watch scroll as it is already watching scroll',
@@ -273,10 +279,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     this.publishedDescriptor = null;
   };
 
-  getDimensionAndWatchScroll = (
-    windowScroll: Position,
-    options: ScrollOptions,
-  ): DroppableDimension => {
+  getDimension = (windowScroll: Position): GetDimensionResult => {
     const {
       direction,
       ignoreContainerClipping,
@@ -293,25 +296,21 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     );
     invariant(descriptor, 'Cannot get dimension for unpublished droppable');
 
-    const scrollableRef: ?Element = getClosestScrollable(targetRef);
+    const closestScrollable: ?Element = getClosestScrollable(targetRef);
 
     // print a debug warning if using an unsupported nested scroll container setup
-    checkForNestedScrollContainers(scrollableRef);
-
-    // Side effect: watch scroll
-    // TODO: check that reducer can handle a scroll update before an initial publish
-    this.watchScroll(scrollableRef, options);
+    checkForNestedScrollContainers(closestScrollable);
 
     const client: BoxModel = (() => {
       const base: BoxModel = getBox(targetRef);
 
       // Droppable has no scroll parent
-      if (!scrollableRef) {
+      if (!closestScrollable) {
         return base;
       }
 
       // Droppable is not the same as the closest scrollable
-      if (targetRef !== scrollableRef) {
+      if (targetRef !== closestScrollable) {
         return base;
       }
 
@@ -327,10 +326,10 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       // Creating the paddingBox based on scrollWidth / scrollTop
       // scrollWidth / scrollHeight are based on the paddingBox of an element
       // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight
-      const top: number = base.paddingBox.top - scrollableRef.scrollTop;
-      const left: number = base.paddingBox.left - scrollableRef.scrollLeft;
-      const bottom: number = top + scrollableRef.scrollHeight;
-      const right: number = left + scrollableRef.scrollWidth;
+      const top: number = base.paddingBox.top - closestScrollable.scrollTop;
+      const left: number = base.paddingBox.left - closestScrollable.scrollLeft;
+      const bottom: number = top + closestScrollable.scrollHeight;
+      const right: number = left + closestScrollable.scrollWidth;
 
       const paddingBox: Spacing = {
         top,
@@ -364,23 +363,23 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     const page: BoxModel = withScroll(client, windowScroll);
 
     const closest: ?Closest = (() => {
-      if (!scrollableRef) {
+      if (!closestScrollable) {
         return null;
       }
 
-      const frameClient: BoxModel = getBox(scrollableRef);
+      const frameClient: BoxModel = getBox(closestScrollable);
 
       return {
         client: frameClient,
         page: withScroll(frameClient),
-        scrollHeight: scrollableRef.scrollHeight,
-        scrollWidth: scrollableRef.scrollWidth,
-        scroll: getScroll(scrollableRef),
+        scrollHeight: closestScrollable.scrollHeight,
+        scrollWidth: closestScrollable.scrollWidth,
+        scroll: getScroll(closestScrollable),
         shouldClipSubject: !ignoreContainerClipping,
       };
     })();
 
-    return getDroppableDimension({
+    const dimension: DroppableDimension = getDroppableDimension({
       descriptor,
       isEnabled: !isDropDisabled,
       direction,
@@ -388,6 +387,23 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       page,
       closest,
     });
+
+    return { dimension, closestScrollable };
+  };
+
+  // Using the origin for the window scroll as the dimension will need to be
+  // adjusted anyway
+  recollect = (): DroppableDimension => this.getDimension(origin).dimension;
+
+  getDimensionAndWatchScroll = (
+    windowScroll: Position,
+    options: ScrollOptions,
+  ): DroppableDimension => {
+    const { dimension, closestScrollable } = this.getDimension(windowScroll);
+    if (closestScrollable) {
+      this.watchScroll(closestScrollable, options);
+    }
+    return dimension;
   };
 
   render() {

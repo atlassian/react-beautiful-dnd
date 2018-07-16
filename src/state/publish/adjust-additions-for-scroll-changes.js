@@ -39,6 +39,10 @@ const getDroppableScrollChange = (
     return origin;
   }
 
+  // TODO: the shift is wrong as it does not account for the additional shift
+  // caused by the bulk add of additions!
+  // Going to try to recapture the droppable
+
   // if (isEqual(scrollable.scroll.diff.value, origin)) {
   //   return origin;
   // }

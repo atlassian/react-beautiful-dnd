@@ -30,6 +30,7 @@ export type GetDroppableDimensionFn = (
 
 export type DroppableCallbacks = {|
   getDimensionAndWatchScroll: GetDroppableDimensionFn,
+  recollect: () => DroppableDimension,
   // scroll a droppable
   scroll: (change: Position) => void,
   // If the Droppable is listening for scroll events - it needs to stop!
