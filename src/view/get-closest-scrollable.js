@@ -9,10 +9,14 @@ const isElementScrollable = (el: Element) => {
   return isScrollable(style.overflow, style.overflowY, style.overflowX);
 };
 
-const getClosestScrollable = (el: ?Element): ?Element => {
+const getClosestScrollable = (el: ?Element): ?HTMLElement => {
   // cannot do anything else!
   if (el == null) {
     return null;
+  }
+
+  if (!(el instanceof HTMLElement)) {
+    return getClosestScrollable(el.parentElement);
   }
 
   if (!isElementScrollable(el)) {

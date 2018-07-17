@@ -1,5 +1,5 @@
 // @flow
-import { Component, type Node } from 'react';
+import React, { type Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
@@ -77,16 +77,17 @@ const checkForNestedScrollContainers = (scrollable: ?Element) => {
 };
 
 type WatchingScroll = {|
-  closestScrollable: Element,
+  closestScrollable: HTMLElement,
   options: ScrollOptions,
 |};
 
-// EventListenerOptions
-const listenerOptions: Object = {
+const listenerOptions = {
   passive: true,
 };
 
-export default class DroppableDimensionPublisher extends Component<Props> {
+export default class DroppableDimensionPublisher extends React.Component<
+  Props,
+> {
   /* eslint-disable react/sort-comp */
   watchingScroll: ?WatchingScroll = null;
   callbacks: DroppableCallbacks;
@@ -155,7 +156,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     closestScrollable.scrollLeft += change.x;
   };
 
-  watchScroll = (closestScrollable: ?Element, options: ScrollOptions) => {
+  watchScroll = (closestScrollable: ?HTMLElement, options: ScrollOptions) => {
     invariant(
       !this.watchingScroll,
       'Droppable cannot watch scroll as it is already watching scroll',
@@ -301,7 +302,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     );
     invariant(descriptor, 'Cannot get dimension for unpublished droppable');
 
-    const scrollableRef: ?Element = getClosestScrollable(targetRef);
+    const scrollableRef: ?HTMLElement = getClosestScrollable(targetRef);
 
     // print a debug warning if using an unsupported nested scroll container setup
     checkForNestedScrollContainers(scrollableRef);
