@@ -81,6 +81,11 @@ type WatchingScroll = {|
   options: ScrollOptions,
 |};
 
+// EventListenerOptions
+const listenerOptions: Object = {
+  passive: true,
+};
+
 export default class DroppableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
   watchingScroll: ?WatchingScroll = null;
@@ -165,9 +170,11 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       closestScrollable,
     };
 
-    closestScrollable.addEventListener('scroll', this.onClosestScroll, {
-      passive: true,
-    });
+    closestScrollable.addEventListener(
+      'scroll',
+      this.onClosestScroll,
+      listenerOptions,
+    );
   };
 
   unwatchScroll = () => {
@@ -184,6 +191,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     watching.closestScrollable.removeEventListener(
       'scroll',
       this.onClosestScroll,
+      listenerOptions,
     );
     this.watchingScroll = null;
   };
