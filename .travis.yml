@@ -26,6 +26,7 @@ env:
 # https://github.com/greenkeeperio/greenkeeper-lockfile
 before_install: yarn global add greenkeeper-lockfile@1
 before_script:
+  - export PATH=$(yarn global bin):$PATH
   - greenkeeper-lockfile-update
   - yarn global add wait-port@0.2.2
   - yarn storybook & wait-port -t 10000 localhost:9002
