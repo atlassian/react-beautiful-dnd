@@ -77,7 +77,7 @@ const checkForNestedScrollContainers = (scrollable: ?Element) => {
 };
 
 type WatchingScroll = {|
-  closestScrollable: HTMLElement,
+  closestScrollable: Element,
   options: ScrollOptions,
 |};
 
@@ -156,7 +156,7 @@ export default class DroppableDimensionPublisher extends React.Component<
     closestScrollable.scrollLeft += change.x;
   };
 
-  watchScroll = (closestScrollable: ?HTMLElement, options: ScrollOptions) => {
+  watchScroll = (closestScrollable: ?Element, options: ScrollOptions) => {
     invariant(
       !this.watchingScroll,
       'Droppable cannot watch scroll as it is already watching scroll',
@@ -302,7 +302,7 @@ export default class DroppableDimensionPublisher extends React.Component<
     );
     invariant(descriptor, 'Cannot get dimension for unpublished droppable');
 
-    const scrollableRef: ?HTMLElement = getClosestScrollable(targetRef);
+    const scrollableRef: ?Element = getClosestScrollable(targetRef);
 
     // print a debug warning if using an unsupported nested scroll container setup
     checkForNestedScrollContainers(scrollableRef);
