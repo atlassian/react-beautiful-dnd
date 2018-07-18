@@ -1,5 +1,5 @@
 // @flow
-import { Component, type Node } from 'react';
+import React, { type Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
@@ -81,7 +81,13 @@ type WatchingScroll = {|
   options: ScrollOptions,
 |};
 
-export default class DroppableDimensionPublisher extends Component<Props> {
+const listenerOptions = {
+  passive: true,
+};
+
+export default class DroppableDimensionPublisher extends React.Component<
+  Props,
+> {
   /* eslint-disable react/sort-comp */
   watchingScroll: ?WatchingScroll = null;
   callbacks: DroppableCallbacks;
@@ -165,9 +171,11 @@ export default class DroppableDimensionPublisher extends Component<Props> {
       closestScrollable,
     };
 
-    closestScrollable.addEventListener('scroll', this.onClosestScroll, {
-      passive: true,
-    });
+    closestScrollable.addEventListener(
+      'scroll',
+      this.onClosestScroll,
+      listenerOptions,
+    );
   };
 
   unwatchScroll = () => {
@@ -184,6 +192,7 @@ export default class DroppableDimensionPublisher extends Component<Props> {
     watching.closestScrollable.removeEventListener(
       'scroll',
       this.onClosestScroll,
+      listenerOptions,
     );
     this.watchingScroll = null;
   };
