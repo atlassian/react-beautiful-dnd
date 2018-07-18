@@ -13,6 +13,11 @@ type FocusRetainer = {|
 // our shared state
 let retainingFocusFor: ?DraggableId = null;
 
+// Using capture: true as focus events do not bubble
+// Additionally doing this prevents us from intercepting the initial
+// focus event as it does not bubble up to this listener
+const listenerOptions = { capture: true };
+
 // If we focus on
 const clearRetentionOnFocusChange = (() => {
   let isBound: boolean = false;
@@ -23,11 +28,9 @@ const clearRetentionOnFocusChange = (() => {
     }
 
     isBound = true;
-    // Using capture: true as focus events do not bubble
-    // Additionally doing this prevents us from intercepting the initial
-    // focus event as it does not bubble up to this listener
+
     // eslint-disable-next-line no-use-before-define
-    window.addEventListener('focus', onWindowFocusChange, { capture: true });
+    window.addEventListener('focus', onWindowFocusChange, listenerOptions);
   };
 
   const unbind = () => {
@@ -37,7 +40,7 @@ const clearRetentionOnFocusChange = (() => {
 
     isBound = false;
     // eslint-disable-next-line no-use-before-define
-    window.removeEventListener('focus', onWindowFocusChange, { capture: true });
+    window.removeEventListener('focus', onWindowFocusChange, listenerOptions);
   };
 
   // focusin will fire after the focus event fires on the element
