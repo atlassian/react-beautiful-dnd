@@ -1039,6 +1039,50 @@ describe('DraggableDimensionPublisher', () => {
       callbacks.unwatchScroll();
       wrapper.unmount();
     });
+
+    // if this is not the case then it will break in IE11
+    it('should add and remove events with the same event options', () => {
+      const marshal: DimensionMarshal = getMarshalStub();
+      const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
+      const container: HTMLElement = wrapper.getDOMNode();
+      jest.spyOn(container, 'addEventListener');
+      jest.spyOn(container, 'removeEventListener');
+
+      // tell the droppable to watch for scrolling
+      const callbacks: DroppableCallbacks =
+        marshal.registerDroppable.mock.calls[0][1];
+
+      // watch scroll will only be called after the dimension is requested
+      callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled);
+
+      // assertion
+      const expectedOptions = {
+        passive: true,
+      };
+      expect(container.addEventListener).toHaveBeenCalledWith(
+        'scroll',
+        expect.any(Function),
+        expectedOptions,
+      );
+      expect(container.removeEventListener).not.toHaveBeenCalled();
+      container.addEventListener.mockReset();
+
+      // unwatching scroll
+      callbacks.unwatchScroll();
+
+      // assertion
+      expect(container.removeEventListener).toHaveBeenCalledWith(
+        'scroll',
+        expect.any(Function),
+        expectedOptions,
+      );
+      expect(container.removeEventListener).toHaveBeenCalledTimes(1);
+      expect(container.addEventListener).not.toHaveBeenCalled();
+
+      // cleanup
+      container.addEventListener.mockRestore();
+      container.removeEventListener.mockRestore();
+    });
   });
 
   describe('forced scroll', () => {
