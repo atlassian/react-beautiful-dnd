@@ -40,8 +40,8 @@ const NestedContainer = Container.extend`
 `;
 
 export default class QuoteList extends Component<{ list: NestedQuoteList }> {
-  renderQuote = (quote: Quote, type: string, index: number) => (
-    <Draggable key={quote.id} draggableId={quote.id} type={type} index={index}>
+  renderQuote = (quote: Quote, index: number) => (
+    <Draggable key={quote.id} draggableId={quote.id} index={index}>
       {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
         <QuoteItem
           quote={quote}
@@ -53,7 +53,7 @@ export default class QuoteList extends Component<{ list: NestedQuoteList }> {
   );
 
   renderList = (list: NestedQuoteList, level?: number = 0) => (
-    <Droppable droppableId={list.id} type={list.id} key={list.id}>
+    <Droppable droppableId={list.id} key={list.id}>
       {(
         dropProvided: DroppableProvided,
         dropSnapshot: DroppableStateSnapshot,
@@ -67,14 +67,9 @@ export default class QuoteList extends Component<{ list: NestedQuoteList }> {
           {list.children.map(
             (item: Quote | NestedQuoteList, index: number) =>
               !item.children ? (
-                this.renderQuote((item: any), list.id, index)
+                this.renderQuote((item: any), index)
               ) : (
-                <Draggable
-                  draggableId={item.id}
-                  type={list.id}
-                  key={item.id}
-                  index={index}
-                >
+                <Draggable draggableId={item.id} key={item.id} index={index}>
                   {(
                     dragProvided: DraggableProvided,
                     dragSnapshot: DraggableStateSnapshot,
@@ -91,6 +86,7 @@ export default class QuoteList extends Component<{ list: NestedQuoteList }> {
                 </Draggable>
               ),
           )}
+          {dropProvided.placeholder}
         </Container>
       )}
     </Droppable>
