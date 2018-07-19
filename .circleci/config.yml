@@ -1,0 +1,39 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:8.11.3-browsers
+
+    working_directory: ~/repo
+
+    steps:
+      # Fetch Code
+      - checkout
+
+      - restore_cache:
+          keys:
+          # Restore cached node_modules
+          - v1-dependencies-{{ checksum "yarn.lock" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      # Add modules required for CI
+      - run: yarn global add greenkeeper-lockfile@1 wait-port@0.2.2
+
+      # Install all dependencies
+      - run: yarn
+
+      # Save the node_modules cache
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "yarn.lock" }}
+
+      # Update the lockfile
+      - run: greenkeeper-lockfile-update
+        
+      # Run Tests
+      - run: yarn test
+
+      # Persist changes to the lock file
+      - run: greenkeeper-lockfile-upload
