@@ -29,6 +29,8 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "yarn.lock" }}
 
+      - run: export PATH=$(yarn global bin):$PATH
+
       # Update the lockfile
       - run: greenkeeper-lockfile-update
         
