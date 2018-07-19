@@ -2,6 +2,7 @@
  * @jest-environment node
  */
 // @flow
+import waitPort from 'wait-port';
 import * as attributes from '../../src/view/data-attributes';
 
 const puppeteer = require('puppeteer');
@@ -43,11 +44,19 @@ const secondCard: string = `[${attributes.dragHandle}]:nth-child(2)`;
 describe('Browser test: single vertical list with keyboard', () => {
   let browser;
   let page;
+
+  beforeAll(() =>
+    waitPort({
+      host: 'localhost',
+      port: 9002,
+      timeout,
+    }));
+
   beforeAll(async () => {
     /* args are supplied to avoid issues in Travis CI to launch chromium:
      https://github.com/GoogleChrome/puppeteer/issues/807 */
     browser = await puppeteer.launch({
-      headless: true,
+      headless: !process.env.CI,
       slowMo: 100,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });

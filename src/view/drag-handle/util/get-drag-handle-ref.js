@@ -4,12 +4,21 @@ import { dragHandle } from '../../data-attributes';
 
 const selector: string = `[${dragHandle}]`;
 
-const throwIfSVG = (el: mixed) => {
+const isSVG = (el: mixed) => {
+  // Some test runners are not aware of the SVGElement constructor
+  // We opt out of this check for those environments
   // $FlowFixMe - flow does not know about SVGElement
-  const isSVG: boolean = el instanceof SVGElement;
+  if (typeof SVGElement === 'undefined') {
+    return false;
+  }
 
+  // $FlowFixMe - flow does not know about SVGElement
+  return el instanceof SVGElement;
+};
+
+const throwIfSVG = (el: mixed) => {
   invariant(
-    !isSVG,
+    !isSVG(el),
     `A drag handle cannot be an SVGElement: it has inconsistent focus support.
 
     More information: https://github.com/atlassian/react-beautiful-dnd/tree/master/docs/guides/dragging-svgs.md`,

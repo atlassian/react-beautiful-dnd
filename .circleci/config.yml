@@ -1,0 +1,128 @@
+version: 2
+jobs:
+  install:
+    docker:
+      - image: circleci/node:8.11.3-browsers
+    working_directory: ~/repo
+    steps:
+      # Fetch Code
+      - checkout
+
+      - restore_cache:
+          keys:
+          # Restore cached node_modules
+          - v1-dependencies-{{ checksum "yarn.lock" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - restore_cache:
+          keys:
+          # Restore cached website node_modules
+          - v1-website-dependencies-{{ checksum "website/yarn.lock" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-website-dependencies-
+
+      - run:
+          name: Add CI global modules
+          command: yarn global add greenkeeper-lockfile@1
+
+      - run:
+          name: Install Dependencies
+          command: yarn
+
+      # Save the node_modules cache
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "yarn.lock" }}
+
+      - save_cache:
+          paths:
+            - website/node_modules
+          key: v1-website-dependencies-{{ checksum "website/yarn.lock" }}
+
+      - run: 
+          name: Update Lockfile
+          command: $(yarn global bin)/greenkeeper-lockfile-update
+
+      - run:
+          name: Upload Lockfile
+          command: $(yarn global bin)/greenkeeper-lockfile-upload
+  validate:
+    docker:
+      - image: circleci/node:8.11.3-browsers
+    working_directory: ~/repo
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "yarn.lock" }}
+
+      - restore_cache:
+          keys:
+          - v1-website-dependencies-{{ checksum "website/yarn.lock" }}
+
+      - run:
+            name: Lint + Typecheck
+            command: yarn validate
+  test:
+    docker:
+      - image: circleci/node:8.11.3-browsers
+    working_directory: ~/repo
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "yarn.lock" }}
+
+      - restore_cache:
+          keys:
+          - v1-website-dependencies-{{ checksum "website/yarn.lock" }}
+
+      - run:
+          name: Jest Suite
+          command: yarn storybook > .storybook-out & yarn test --testResultsProcessor="jest-junit"
+          environment:
+            JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
+
+      - store_test_results:
+          path: reports/junit
+
+      - store_artifacts:
+          path: .storybook-out
+          destination: storybook-out
+  bundle-test:
+    docker:
+      - image: circleci/node:8.11.3-browsers
+    working_directory: ~/repo
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "yarn.lock" }}
+
+      - restore_cache:
+          keys:
+          - v1-website-dependencies-{{ checksum "website/yarn.lock" }}
+
+      - run:
+          name: Check Bundle Size
+          command: yarn run bundle-size:check
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - install
+      - validate:
+          requires:
+            - install
+      - test:
+          requires:
+            - install
+      - bundle-test:
+          requires:
+            - install
