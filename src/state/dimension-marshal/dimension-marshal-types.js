@@ -16,7 +16,6 @@ import type {
   DimensionMap,
   LiftRequest,
   Published,
-  Viewport,
 } from '../../types';
 
 export type GetDraggableDimensionFn = (
@@ -111,4 +110,6 @@ export type Callbacks = {|
   updateDroppableScroll: (args: UpdateDroppableScrollArgs) => void,
   updateDroppableIsEnabled: (args: UpdateDroppableIsEnabledArgs) => void,
   collectionStarting: () => void,
+  // can a droppable have draggables added or removed from it during a drag
+  canAddOrRemoveDuringDrag: (id: DroppableId) => boolean,
 |};
