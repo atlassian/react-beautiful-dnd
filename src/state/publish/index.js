@@ -17,7 +17,7 @@ import getDragImpact from '../get-drag-impact';
 import getHomeImpact from '../get-home-impact';
 import getDimensionMap from './get-dimension-map';
 import getDragPositions from './get-drag-positions';
-import updateModifiedDroppables from './update-modified-droppables';
+import changeDroppableSubjectSize from './change-droppable-subject-size';
 import adjustAdditionsForScrollChanges from './adjust-additions-for-scroll-changes';
 
 type Args = {|
@@ -40,7 +40,7 @@ export default ({
   });
 
   // Change the client size of modified droppables
-  const droppables: DroppableDimensionMap = updateModifiedDroppables({
+  const droppables: DroppableDimensionMap = changeDroppableSubjectSize({
     droppables: state.dimensions.droppables,
     modified: published.modified,
     initialWindowScroll: state.viewport.scroll.initial,

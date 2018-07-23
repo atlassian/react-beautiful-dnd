@@ -52,7 +52,7 @@ const getDroppableScrollChange = (
   //   draggable.client.marginBox[droppable.axis.size],
   // );
 
-  // the scroll of the droppable has been impacted by the addition
+  // // the scroll of the droppable has been impacted by the addition
   // return add(scrollable.scroll.diff.value, size);
 
   return scrollable.scroll.diff.value;

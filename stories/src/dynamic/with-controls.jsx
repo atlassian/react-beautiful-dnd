@@ -15,25 +15,47 @@ const ControlSection = styled.div`
   margin: ${grid * 4}px;
 `;
 
-class Controls extends React.Component<*> {
+class Controls extends React.Component<{|
+  changeBy: number,
+  onChange: (changeBy: number) => void,
+|}> {
   render() {
     return (
       <ControlSection>
         <h2>Controls</h2>
         <ul>
           <li>
-            <kbd>b</kbd>: add Draggable to <strong>start</strong> of list
+            <strong>
+              <kbd>b</kbd>
+            </strong>: add to <strong>start</strong> of list
           </li>
           <li>
-            <kbd>a</kbd>: add Draggable to <strong>end</strong> of list
+            <strong>
+              <kbd>a</kbd>
+            </strong>: add to <strong>end</strong> of list
           </li>
           <li>
-            <kbd>s</kbd>: remove Draggable from <strong>start</strong> of list
+            <strong>
+              <kbd>s</kbd>
+            </strong>: remove from <strong>start</strong> of list
           </li>
           <li>
-            <kbd>d</kbd>: remove Draggable from <strong>end</strong> of list
+            <strong>
+              <kbd>d</kbd>
+            </strong>: remove from <strong>end</strong> of list
           </li>
         </ul>
+        <br />
+        Change by:{' '}
+        <input
+          type="number"
+          min="1"
+          max="10"
+          value={this.props.changeBy}
+          onChange={(event: SyntheticInputEvent<HTMLInputElement>) =>
+            this.props.onChange(Number(event.target.value))
+          }
+        />
       </ControlSection>
     );
   }
@@ -41,6 +63,7 @@ class Controls extends React.Component<*> {
 
 type State = {|
   quoteMap: QuoteMap,
+  changeBy: number,
 |};
 
 const Container = styled.div`
@@ -68,9 +91,10 @@ const createQuote = (() => {
 export default class WithControls extends React.Component<*, State> {
   state: State = {
     quoteMap: {
-      // simpel for now
+      // simple for now
       BMO: initial.BMO,
     },
+    changeBy: 2,
   };
 
   componentDidMount() {
@@ -89,14 +113,17 @@ export default class WithControls extends React.Component<*, State> {
 
     const quoteMap: QuoteMap = this.state.quoteMap;
 
-    console.log('event.key', event.key);
-
     // Add quote to start of list ('before')
     if (event.key === 'b') {
+      console.log(`Adding ${this.state.changeBy} to start`);
       const map: QuoteMap = Object.keys(quoteMap).reduce(
         (previous: QuoteMap, key: string): QuoteMap => {
           const quotes: Quote[] = quoteMap[key];
-          previous[key] = [createQuote(), ...quotes];
+          const additions: Quote[] = Array.from(
+            { length: this.state.changeBy },
+            () => createQuote(),
+          );
+          previous[key] = [...additions, ...quotes];
           return previous;
         },
         {},
@@ -110,10 +137,15 @@ export default class WithControls extends React.Component<*, State> {
 
     // Add quote to end of list ('after')
     if (event.key === 'a') {
+      console.log(`Adding ${this.state.changeBy} to end`);
       const map: QuoteMap = Object.keys(quoteMap).reduce(
         (previous: QuoteMap, key: string): QuoteMap => {
           const quotes: Quote[] = quoteMap[key];
-          previous[key] = [...quotes, createQuote()];
+          const additions: Quote[] = Array.from(
+            { length: this.state.changeBy },
+            () => createQuote(),
+          );
+          previous[key] = [...quotes, ...additions];
           return previous;
         },
         {},
@@ -127,11 +159,12 @@ export default class WithControls extends React.Component<*, State> {
 
     // Remove quote from end of list
     if (event.key === 'd') {
+      console.log(`Removing ${this.state.changeBy} from end`);
       const map: QuoteMap = Object.keys(quoteMap).reduce(
         (previous: QuoteMap, key: string): QuoteMap => {
           const quotes: Quote[] = quoteMap[key];
           previous[key] = quotes.length
-            ? quotes.slice(0, quotes.length - 1)
+            ? quotes.slice(0, quotes.length - this.state.changeBy)
             : [];
           return previous;
         },
@@ -146,10 +179,13 @@ export default class WithControls extends React.Component<*, State> {
 
     // Remove quote from start of list
     if (event.key === 's') {
+      console.log(`Removing ${this.state.changeBy} from start`);
       const map: QuoteMap = Object.keys(quoteMap).reduce(
         (previous: QuoteMap, key: string): QuoteMap => {
           const quotes: Quote[] = quoteMap[key];
-          previous[key] = quotes.length ? quotes.slice(1, quotes.length) : [];
+          previous[key] = quotes.length
+            ? quotes.slice(this.state.changeBy, quotes.length)
+            : [];
           return previous;
         },
         {},
@@ -193,7 +229,10 @@ export default class WithControls extends React.Component<*, State> {
         onDragEnd={this.onDragEnd}
         onDragUpdate={this.onDragUpdate}
       >
-        <Controls />
+        <Controls
+          changeBy={this.state.changeBy}
+          onChange={(changeBy: number) => this.setState({ changeBy })}
+        />
         <Container>
           {Object.keys(quoteMap).map((key: string) => (
             <QuoteList
