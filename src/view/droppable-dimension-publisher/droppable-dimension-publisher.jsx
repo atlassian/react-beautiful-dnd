@@ -43,6 +43,34 @@ type Props = {|
   children: Node,
 |};
 
+// We currently do not support nested scroll containers
+// But will hopefully support this soon!
+const checkForNestedScrollContainers = (scrollable: ?Element) => {
+  if (process.env.NODE_ENV === 'production') {
+    return;
+  }
+
+  if (!scrollable) {
+    return;
+  }
+
+  const anotherScrollParent: ?Element = getClosestScrollable(
+    scrollable.parentElement,
+  );
+
+  if (!anotherScrollParent) {
+    return;
+  }
+
+  console.warn(`
+    Droppable: unsupported nested scroll container detected.
+    A Droppable can only have one scroll parent (which can be itself)
+    Nested scroll containers are currently not supported.
+
+    We hope to support nested scroll containers soon: https://github.com/atlassian/react-beautiful-dnd/issues/131
+  `);
+};
+
 const getScroll = (el: Element): Position => ({
   x: el.scrollLeft,
   y: el.scrollTop,
@@ -109,34 +137,6 @@ const getClient = (
     padding: base.padding,
   });
   return client;
-};
-
-// We currently do not support nested scroll containers
-// But will hopefully support this soon!
-const checkForNestedScrollContainers = (scrollable: ?Element) => {
-  if (process.env.NODE_ENV === 'production') {
-    return;
-  }
-
-  if (!scrollable) {
-    return;
-  }
-
-  const anotherScrollParent: ?Element = getClosestScrollable(
-    scrollable.parentElement,
-  );
-
-  if (!anotherScrollParent) {
-    return;
-  }
-
-  console.warn(`
-    Droppable: unsupported nested scroll container detected.
-    A Droppable can only have one scroll parent (which can be itself)
-    Nested scroll containers are currently not supported.
-
-    We hope to support nested scroll containers soon: https://github.com/atlassian/react-beautiful-dnd/issues/131
-  `);
 };
 
 type WatchingScroll = {|
@@ -352,23 +352,21 @@ export default class DroppableDimensionPublisher extends React.Component<
   };
 
   // Used when Draggables are added or removed from a Droppable during a drag
-  recollectClient = (): BoxModel => {
+  recollect = (): DroppableDimension => {
+    const watching: ?WatchingScroll = this.watchingScroll;
     invariant(
-      this.watchingScroll,
+      watching,
       'Can only recollect Droppable client for Droppables that have a scroll container',
     );
 
-    const targetRef: ?HTMLElement = this.getDroppableRef();
+    const targetRef: ?HTMLElement = this.props.getDroppableRef();
     invariant(targetRef, 'Cannot recollect without a droppable ref');
 
     // TODO: needs to disable the placeholder for the collection
     // this.props.placeholder.hide();
-    const client: BoxModel = this.getClient(
-      targetRef,
-      this.watchingScroll.closestScrollable,
-    );
+    const { dimension } = this.getDimension(origin);
     // this.props.placeholder.show();
-    return client;
+    return dimension;
   };
 
   getDimension = (windowScroll: Position): GetDimensionResult => {
@@ -406,8 +404,6 @@ export default class DroppableDimensionPublisher extends React.Component<
       return {
         client: frameClient,
         page: withScroll(frameClient),
-        scrollHeight: closestScrollable.scrollHeight,
-        scrollWidth: closestScrollable.scrollWidth,
         scroll: getScroll(closestScrollable),
         shouldClipSubject: !ignoreContainerClipping,
       };

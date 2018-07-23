@@ -10,11 +10,14 @@ import type {
   Critical,
   DraggableId,
   DraggableDimension,
+  DroppableDimensionMap,
 } from '../../types';
+import * as timings from '../../debug/timings';
 import getDragImpact from '../get-drag-impact';
 import getHomeImpact from '../get-home-impact';
 import getDimensionMap from './get-dimension-map';
 import getDragPositions from './get-drag-positions';
+import updateModifiedDroppables from './update-modified-droppables';
 import adjustAdditionsForScrollChanges from './adjust-additions-for-scroll-changes';
 
 type Args = {|
@@ -22,10 +25,13 @@ type Args = {|
   published: Published,
 |};
 
+const timingsKey: string = 'Massaging dynamic changes';
+
 export default ({
   state,
   published,
 }: Args): DraggingState | DropPendingState => {
+  timings.start(timingsKey);
   // TODO: write validate that every removed draggable must have a removed droppable
   const withShifted: Published = adjustAdditionsForScrollChanges({
     published,
@@ -33,11 +39,21 @@ export default ({
     viewport: state.viewport,
   });
 
-  // TODO: Shift collected dimensions to account for change in window / droppable scroll
+  // Change the client size of modified droppables
+  const droppables: DroppableDimensionMap = updateModifiedDroppables({
+    droppables: state.dimensions.droppables,
+    modified: published.modified,
+    initialWindowScroll: state.viewport.scroll.initial,
+  });
+
+  const patched: DimensionMap = {
+    draggables: state.dimensions.draggables,
+    droppables,
+  };
 
   // Add, remove and shift dimensions
   const dimensions: DimensionMap = getDimensionMap({
-    existing: state.dimensions,
+    existing: patched,
     published: withShifted,
     initialWindowScroll: state.viewport.scroll.initial,
   });
@@ -72,6 +88,8 @@ export default ({
     previousImpact: getHomeImpact(state.critical, dimensions),
     viewport: state.viewport,
   });
+
+  timings.finish(timingsKey);
 
   const draggingState: DraggingState = {
     // appeasing flow

@@ -1,6 +1,13 @@
 // @flow
 import type { Spacing, Position } from 'css-box-model';
 
+// TODO add test
+export const isEqual = (first: Spacing, second: Spacing): boolean =>
+  first.top === second.top &&
+  first.right === second.right &&
+  first.bottom === second.bottom &&
+  first.left === second.left;
+
 export const offsetByPosition = (
   spacing: Spacing,
   point: Position,

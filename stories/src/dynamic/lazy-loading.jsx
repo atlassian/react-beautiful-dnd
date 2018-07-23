@@ -31,7 +31,7 @@ export default class LazyLoading extends React.Component<*, State> {
     }
 
     const lastIndex: number = this.state.quotes.length - 1;
-    const startLoadingFrom: number = lastIndex - 2;
+    const startLoadingFrom: number = lastIndex - 5;
 
     if (destination.index < startLoadingFrom) {
       return;
@@ -84,7 +84,7 @@ export default class LazyLoading extends React.Component<*, State> {
         quotes,
         isLoading: false,
       });
-    }, 500);
+    }, 10);
 
     this.setState({
       isLoading: true,
@@ -97,7 +97,7 @@ export default class LazyLoading extends React.Component<*, State> {
         onDragUpdate={this.onDragUpdate}
         onDragEnd={this.onDragEnd}
       >
-        <QuoteList quotes={this.state.quotes} />
+        <QuoteList quotes={this.state.quotes} internalScroll />
       </DragDropContext>
     );
   }

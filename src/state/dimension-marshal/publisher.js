@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
 import type {
   DraggableId,
@@ -6,9 +7,13 @@ import type {
   Published,
   DraggableDimension,
   DroppableDimension,
-  Viewport,
+  DroppableDimensionMap,
 } from '../../types';
-import type { Collection, Entries } from './dimension-marshal-types';
+import type {
+  Collection,
+  Entries,
+  DroppableEntry,
+} from './dimension-marshal-types';
 import * as timings from '../../debug/timings';
 import { origin } from '../position';
 
@@ -135,6 +140,38 @@ export default ({ getProvided, callbacks }: Args): Publisher => {
           ),
       );
 
+      type UniqueMap = {
+        [id: DroppableId]: DroppableEntry,
+      };
+
+      const existing: UniqueMap = draggables
+        .map(
+          (draggable: DraggableDimension): DroppableId =>
+            draggable.descriptor.droppableId,
+        )
+        .reduce((map: UniqueMap, id: DroppableId) => {
+          // was only newly added
+          if (additions.droppables[id]) {
+            return map;
+          }
+
+          // already collected
+          if (map[id]) {
+            return map;
+          }
+
+          const entry: ?DroppableEntry = entries.droppables[id];
+          invariant(entry, 'Cannot find Droppable entry');
+
+          map[id] = entry;
+          return map;
+        }, {});
+
+      const modified: DroppableDimension[] = Object.keys(existing).map(
+        (id: DroppableId): DroppableDimension =>
+          existing[id].callbacks.recollect(),
+      );
+
       const result: Published = {
         additions: {
           draggables,
@@ -144,6 +181,7 @@ export default ({ getProvided, callbacks }: Args): Publisher => {
           draggables: Object.keys(removals.draggables),
           droppables: Object.keys(removals.droppables),
         },
+        modified,
       };
 
       reset();

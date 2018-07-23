@@ -50,6 +50,20 @@ export type HorizontalAxis = {|
 
 export type Axis = VerticalAxis | HorizontalAxis;
 
+export type ScrollDetails = {|
+  initial: Position,
+  current: Position,
+  // the maximum allowable scroll for the frame
+  max: Position,
+  diff: {|
+    value: Position,
+    // The actual displacement as a result of a scroll is in the opposite
+    // direction to the scroll itself. When scrolling down items are displaced
+    // upwards. This value is the negated version of the 'value'
+    displacement: Position,
+  |},
+|};
+
 export type Placeholder = {|
   client: BoxModel,
   tagName: string,
@@ -67,25 +81,15 @@ export type DraggableDimension = {|
 |};
 
 export type Scrollable = {|
+  // Used for comparision with dynamic recollecting
+  frameClient: BoxModel,
   // This is the window through which the droppable is observed
   // It does not change during a drag
   framePageMarginBox: Rect,
   // Whether or not we should clip the subject by the frame
   // Is controlled by the ignoreContainerClipping prop
   shouldClipSubject: boolean,
-  scroll: {|
-    initial: Position,
-    current: Position,
-    // the maximum allowable scroll for the frame
-    max: Position,
-    diff: {|
-      value: Position,
-      // The actual displacement as a result of a scroll is in the opposite
-      // direction to the scroll itself. When scrolling down items are displaced
-      // upwards. This value is the negated version of the 'value'
-      displacement: Position,
-    |},
-  |},
+  scroll: ScrollDetails,
 |};
 
 export type DroppableDimensionViewport = {|
@@ -223,23 +227,18 @@ export type Critical = {|
 export type Viewport = {|
   // live updates with the latest values
   frame: Rect,
-  scroll: {|
-    initial: Position,
-    current: Position,
-    max: Position,
-    diff: {|
-      value: Position,
-      // The actual displacement as a result of a scroll is in the opposite
-      // direction to the scroll itself.
-      displacement: Position,
-    |},
-  |},
+  scroll: ScrollDetails,
 |};
 
 export type DimensionMap = {|
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
 |};
+
+// export type ModifiedDroppable = {|
+//   id: DroppableId,
+//   droppable: DroppableDimension,
+// |};
 
 export type Published = {|
   additions: {|
@@ -251,7 +250,9 @@ export type Published = {|
     draggables: DraggableId[],
     droppables: DroppableId[],
   |},
-  // viewport: Viewport,
+  // when adding or removing a draggable from a droppable
+  // it can change the size of the droppable subject
+  modified: DroppableDimension[],
 |};
 
 export type IdleState = {|

@@ -1,8 +1,8 @@
 // @flow
-import { type Position } from 'css-box-model';
-import {
-  type UpdateDroppableScrollArgs,
-  type UpdateDroppableIsEnabledArgs,
+import type { Position, BoxModel } from 'css-box-model';
+import type {
+  UpdateDroppableScrollArgs,
+  UpdateDroppableIsEnabledArgs,
 } from '../action-creators';
 import type {
   DraggableDescriptor,
@@ -110,6 +110,6 @@ export type Callbacks = {|
   updateDroppableScroll: (args: UpdateDroppableScrollArgs) => void,
   updateDroppableIsEnabled: (args: UpdateDroppableIsEnabledArgs) => void,
   collectionStarting: () => void,
-  // can a droppable have draggables added or removed from it during a drag
+  // can a droppable have Draggables added or removed from it during a drag
   canAddOrRemoveDuringDrag: (id: DroppableId) => boolean,
 |};

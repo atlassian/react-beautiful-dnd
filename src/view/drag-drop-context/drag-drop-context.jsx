@@ -54,13 +54,15 @@ const printFatalDevError = (error: Error) => {
   if (process.env.NODE_ENV === 'production') {
     return;
   }
-  console.warn(`
+  console.error(
+    `
     An error has occurred while a drag is occurring.
     Any existing drag will be cancelled.
 
-    Raw error:
-  `);
-  console.error(error);
+    > ${error.message}
+  `,
+    error,
+  );
 };
 
 export default class DragDropContext extends React.Component<Props> {
