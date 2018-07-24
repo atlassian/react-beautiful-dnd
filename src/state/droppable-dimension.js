@@ -16,6 +16,7 @@ import type {
   DroppableDescriptor,
   Scrollable,
   DroppableDimensionViewport,
+  ScrollSize,
 } from '../types';
 
 export const clip = (frame: Spacing, subject: Spacing): ?Rect => {
@@ -37,6 +38,7 @@ export type Closest = {|
   client: BoxModel,
   page: BoxModel,
   scroll: Position,
+  scrollSize: ScrollSize,
   shouldClipSubject: boolean,
 |};
 
@@ -62,17 +64,22 @@ export const getDroppableDimension = ({
       return null;
     }
 
+    const { scrollSize, client: frameClient } = closest;
+
     // scrollHeight and scrollWidth are based on the padding box
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight
     const maxScroll: Position = getMaxScroll({
-      scrollHeight: client.paddingBox.height,
-      scrollWidth: client.paddingBox.width,
-      height: closest.client.paddingBox.height,
-      width: closest.client.paddingBox.width,
+      // size of the content
+      scrollHeight: scrollSize.scrollHeight,
+      scrollWidth: scrollSize.scrollWidth,
+      // actual dimensions of the frame
+      height: frameClient.paddingBox.height,
+      width: frameClient.paddingBox.width,
     });
 
     return {
-      frameClient: closest.client,
+      frameClient,
+      scrollSize,
       framePageMarginBox: closest.page.marginBox,
       shouldClipSubject: closest.shouldClipSubject,
       scroll: {

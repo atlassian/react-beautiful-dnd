@@ -50,6 +50,11 @@ export type HorizontalAxis = {|
 
 export type Axis = VerticalAxis | HorizontalAxis;
 
+export type ScrollSize = {|
+  scrollHeight: number,
+  scrollWidth: number,
+|};
+
 export type ScrollDetails = {|
   initial: Position,
   current: Position,
@@ -83,6 +88,7 @@ export type DraggableDimension = {|
 export type Scrollable = {|
   // Used for comparision with dynamic recollecting
   frameClient: BoxModel,
+  scrollSize: ScrollSize,
   // This is the window through which the droppable is observed
   // It does not change during a drag
   framePageMarginBox: Rect,

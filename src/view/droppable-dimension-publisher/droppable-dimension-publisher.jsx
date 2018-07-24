@@ -30,6 +30,7 @@ import type {
   DroppableDescriptor,
   Direction,
   ScrollOptions,
+  ScrollSize,
 } from '../../types';
 
 type Props = {|
@@ -400,11 +401,16 @@ export default class DroppableDimensionPublisher extends React.Component<
       }
 
       const frameClient: BoxModel = getBox(closestScrollable);
+      const scrollSize: ScrollSize = {
+        scrollHeight: closestScrollable.scrollHeight,
+        scrollWidth: closestScrollable.scrollWidth,
+      };
 
       return {
         client: frameClient,
         page: withScroll(frameClient),
         scroll: getScroll(closestScrollable),
+        scrollSize,
         shouldClipSubject: !ignoreContainerClipping,
       };
     })();

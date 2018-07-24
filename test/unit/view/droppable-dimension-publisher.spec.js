@@ -449,6 +449,7 @@ describe('DraggableDimensionPublisher', () => {
             margin,
             padding,
             border,
+            windowScroll: preset.windowScroll,
             closest: {
               // we are using the smallFrameClient as a stand in for the elements
               // actual borderBox which is cut off when it is a scroll container
@@ -457,12 +458,13 @@ describe('DraggableDimensionPublisher', () => {
               padding,
               border,
               // scroll width and height are based on the padding box
-              scrollWidth: bigClient.paddingBox.width,
-              scrollHeight: bigClient.paddingBox.height,
+              scrollSize: {
+                scrollWidth: bigClient.paddingBox.width,
+                scrollHeight: bigClient.paddingBox.height,
+              },
               scroll: { x: 0, y: 0 },
               shouldClipSubject: true,
             },
-            windowScroll: preset.windowScroll,
           });
           const marshal: DimensionMarshal = getMarshalStub();
           // both the droppable and the parent are scrollable

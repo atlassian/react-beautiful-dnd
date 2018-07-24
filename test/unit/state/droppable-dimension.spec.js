@@ -22,6 +22,7 @@ import type {
   DroppableDimension,
   Scrollable,
   DroppableDimensionViewport,
+  ScrollSize,
 } from '../../../src/types';
 
 const descriptor: DroppableDescriptor = {
@@ -105,6 +106,10 @@ describe('creating a droppable dimension', () => {
         closest: {
           client,
           page,
+          scrollSize: {
+            scrollHeight: client.paddingBox.height,
+            scrollWidth: client.paddingBox.width,
+          },
           scroll: { x: 10, y: 10 },
           shouldClipSubject: true,
         },
@@ -117,16 +122,21 @@ describe('creating a droppable dimension', () => {
       });
 
       it('should capture the viewport information', () => {
-        const maxScroll: Position = getMaxScroll({
-          // scrollHeight and scrollWidth are based on the padding box
+        const scrollSize: ScrollSize = {
           scrollHeight: client.paddingBox.height,
           scrollWidth: client.paddingBox.width,
+        };
+        const maxScroll: Position = getMaxScroll({
+          // scrollHeight and scrollWidth are based on the padding box
+          scrollHeight: scrollSize.scrollHeight,
+          scrollWidth: scrollSize.scrollWidth,
           height: client.paddingBox.height,
           width: client.paddingBox.width,
         });
         const expected: DroppableDimensionViewport = {
           closestScrollable: {
             frameClient: client,
+            scrollSize,
             framePageMarginBox: page.marginBox,
             shouldClipSubject: true,
             scroll: {
@@ -176,6 +186,10 @@ describe('creating a droppable dimension', () => {
           closest: {
             client: frameClient,
             page: framePage,
+            scrollSize: {
+              scrollHeight: client.paddingBox.height,
+              scrollWidth: client.paddingBox.width,
+            },
             scroll: origin,
             shouldClipSubject: options.shouldClipSubject,
           },
@@ -281,7 +295,7 @@ describe('creating a droppable dimension', () => {
 
 describe('scrolling a droppable', () => {
   it('should update the frame scroll and the clipping', () => {
-    const scrollSize = {
+    const scrollSize: ScrollSize = {
       scrollHeight: 500,
       scrollWidth: 100,
     };
@@ -316,6 +330,7 @@ describe('scrolling a droppable', () => {
       closest: {
         client: frameClient,
         page: framePage,
+        scrollSize,
         scroll: originalFrameScroll,
         shouldClipSubject: true,
       },
@@ -394,6 +409,10 @@ describe('scrolling a droppable', () => {
       closest: {
         client: frameClient,
         page: frameClient,
+        scrollSize: {
+          scrollWidth: 200,
+          scrollHeight: 200,
+        },
         scroll: { x: 0, y: 0 },
         shouldClipSubject: true,
       },
