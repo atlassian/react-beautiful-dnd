@@ -1,5 +1,5 @@
 // @flow
-import { getPreset, getDraggableDimension } from './dimension';
+import { getPreset, getDraggableDimension, makeScrollable } from './dimension';
 import { offsetByPosition } from '../../src/state/spacing';
 import getHomeLocation from '../../src/state/get-home-location';
 import getHomeImpact from '../../src/state/get-home-impact';
@@ -10,6 +10,7 @@ import type {
   ClientPositions,
   DimensionMap,
   DraggableDimension,
+  DroppableDimension,
   PendingDrop,
   Published,
 } from '../../src/types';
@@ -20,6 +21,7 @@ import type {
 
 // In case a consumer needs the references
 export const preset = getPreset();
+const scrollableHome: DroppableDimension = makeScrollable(preset.home);
 
 export const critical: Critical = {
   draggable: preset.inHome1.descriptor,
@@ -47,7 +49,19 @@ export const initialPublishArgs: InitialPublishArgs = {
   autoScrollMode: 'FLUID',
 };
 
+export const initialPublishWithScrollableHome: InitialPublishArgs = {
+  ...initialPublishArgs,
+  dimensions: {
+    draggables: preset.dimensions.draggables,
+    droppables: {
+      ...preset.dimensions.droppables,
+      [scrollableHome.descriptor.id]: scrollableHome,
+    },
+  },
+};
+
 export const publishAdditionArgs: Published = (() => {
+  // home must be scrollable to publish changes to it
   const addition: DraggableDimension = getDraggableDimension({
     descriptor: {
       ...preset.inHome4.descriptor,
@@ -70,6 +84,7 @@ export const publishAdditionArgs: Published = (() => {
       draggables: [addition],
       droppables: [],
     },
+    modified: [scrollableHome],
   };
 })();
 

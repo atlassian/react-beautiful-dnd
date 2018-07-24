@@ -84,10 +84,10 @@ export const makeScrollable = (
   });
 
   // add scroll space on the main axis
-  const scrollSize = {
-    width: borderBox.width + horizontalGrowth,
-    height: borderBox.height + verticalGrowth,
-  };
+  // const scrollSize = {
+  //   width: borderBox.width + horizontalGrowth,
+  //   height: borderBox.height + verticalGrowth,
+  // };
 
   const newClient: BoxModel = createBox({
     borderBox: newBorderBox,
@@ -110,8 +110,6 @@ export const makeScrollable = (
       // using old dimensions for frame
       client: droppable.client,
       page: droppable.page,
-      scrollWidth: scrollSize.width,
-      scrollHeight: scrollSize.height,
       scroll: origin,
       shouldClipSubject: true,
     },
@@ -254,8 +252,8 @@ export const getDroppableDimension = ({
     const result: Closest = {
       client: frameClient,
       page: framePage,
-      scrollHeight: closest.scrollHeight,
-      scrollWidth: closest.scrollWidth,
+      // scrollHeight: closest.scrollHeight,
+      // scrollWidth: closest.scrollWidth,
       scroll: closest.scroll,
       shouldClipSubject: closest.shouldClipSubject,
     };

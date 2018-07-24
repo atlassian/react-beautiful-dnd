@@ -456,6 +456,7 @@ describe('DraggableDimensionPublisher', () => {
               margin,
               padding,
               border,
+              // scroll width and height are based on the padding box
               scrollWidth: bigClient.paddingBox.width,
               scrollHeight: bigClient.paddingBox.height,
               scroll: { x: 0, y: 0 },

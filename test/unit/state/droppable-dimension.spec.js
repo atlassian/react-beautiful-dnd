@@ -105,8 +105,6 @@ describe('creating a droppable dimension', () => {
         closest: {
           client,
           page,
-          scrollHeight: client.paddingBox.height,
-          scrollWidth: client.paddingBox.width,
           scroll: { x: 10, y: 10 },
           shouldClipSubject: true,
         },
@@ -128,6 +126,7 @@ describe('creating a droppable dimension', () => {
         });
         const expected: DroppableDimensionViewport = {
           closestScrollable: {
+            frameClient: client,
             framePageMarginBox: page.marginBox,
             shouldClipSubject: true,
             scroll: {
@@ -177,8 +176,6 @@ describe('creating a droppable dimension', () => {
           closest: {
             client: frameClient,
             page: framePage,
-            scrollHeight: client.paddingBox.height,
-            scrollWidth: client.paddingBox.width,
             scroll: origin,
             shouldClipSubject: options.shouldClipSubject,
           },
@@ -320,8 +317,6 @@ describe('scrolling a droppable', () => {
         client: frameClient,
         page: framePage,
         scroll: originalFrameScroll,
-        scrollWidth: scrollSize.scrollWidth,
-        scrollHeight: scrollSize.scrollHeight,
         shouldClipSubject: true,
       },
     });
@@ -400,8 +395,6 @@ describe('scrolling a droppable', () => {
         client: frameClient,
         page: frameClient,
         scroll: { x: 0, y: 0 },
-        scrollWidth: 200,
-        scrollHeight: 200,
         shouldClipSubject: true,
       },
     });

@@ -17,9 +17,10 @@ import {
   type InitialPublishArgs,
 } from '../../../../src/state/action-creators';
 import createStore from './util/create-store';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset, makeScrollable } from '../../../utils/dimension';
 import {
   initialPublishArgs,
+  initialPublishWithScrollableHome,
   getDragStart,
   publishAdditionArgs,
 } from '../../../utils/preset-action-args';
@@ -31,8 +32,9 @@ import type {
   DragUpdate,
   DropResult,
   HookProvided,
-  Publish,
+  Published,
   DragStart,
+  DroppableDimension,
 } from '../../../../src/types';
 import type { Store } from '../../../../src/state/store-types';
 
@@ -191,7 +193,7 @@ describe('update', () => {
       const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
       store.dispatch(prepare());
-      store.dispatch(initialPublish(initialPublishArgs));
+      store.dispatch(initialPublish(initialPublishWithScrollableHome));
       expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
       expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
@@ -207,12 +209,20 @@ describe('update', () => {
       const hooks: Hooks = createHooks();
       const store: Store = createStore(middleware(() => hooks, getAnnounce()));
       // dragging inHome2 with no impact
+      const scrollableHome: DroppableDimension = makeScrollable(preset.home);
       const customInitial: InitialPublishArgs = {
         critical: {
           draggable: preset.inHome2.descriptor,
           droppable: preset.home.descriptor,
         },
-        dimensions: preset.dimensions,
+        dimensions: {
+          ...preset.dimensions,
+          droppables: {
+            ...preset.dimensions.droppables,
+            // needs to be scrollable to allow dynamic changes
+            [preset.home.descriptor.id]: scrollableHome,
+          },
+        },
         client: {
           selection: preset.inHome2.client.borderBox.center,
           borderBoxCenter: preset.inHome2.client.borderBox.center,
@@ -268,7 +278,7 @@ describe('update', () => {
       hooks.onDragUpdate.mockReset();
 
       // removing inHome1
-      const customPublish: Publish = {
+      const customPublish: Published = {
         removals: {
           draggables: [preset.inHome1.descriptor.id],
           droppables: [],
@@ -277,6 +287,7 @@ describe('update', () => {
           draggables: [],
           droppables: [],
         },
+        modified: [scrollableHome],
       };
 
       store.dispatch(collectionStarting());
