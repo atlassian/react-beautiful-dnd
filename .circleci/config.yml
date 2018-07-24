@@ -83,13 +83,20 @@ jobs:
 
       - run:
           name: Jest Suite
-          command: yarn storybook > .storybook-out & yarn test --testResultsProcessor="jest-junit"
+          command: yarn test --testResultsProcessor="jest-junit"
           environment:
             JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
 
       - store_test_results:
           path: reports/junit
 
+      - run:
+          name: E2E Suite
+          command: yarn storybook > .storybook-out & yarn test:e2e"
+
+      - store_test_results:
+          path: reports/browser
+      
       - store_artifacts:
           path: .storybook-out
           destination: storybook-out
