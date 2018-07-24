@@ -94,7 +94,6 @@
     "jest-watch-typeahead": "^0.1.0",
     "opn-cli": "^3.1.0",
     "prettier": "^1.13.7",
-    "puppeteer": "^1.5.0",
     "raf-stub": "^2.0.2",
     "react": "^16.3.1",
     "react-dom": "^16.3.1",
