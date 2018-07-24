@@ -12,8 +12,9 @@ const firstCard: string = `[${attributes.dragHandle}]:nth-child(1)`;
 const secondCard: string = `[${attributes.dragHandle}]:nth-child(2)`;
 const fourthCard: string = `[${attributes.dragHandle}]:nth-child(5)`;
 
-type fixture =  FixtureFn;
+type fixture = any;
 
+// $FlowFixMe - to be removed when importing / exporting the correct types
 fixture`Simple List Test Case`.page`${urlSimpleList}`.beforeEach(async t => {
   await t
     .navigateTo(urlSimpleList)
