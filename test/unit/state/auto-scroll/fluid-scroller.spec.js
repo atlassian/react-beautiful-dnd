@@ -113,8 +113,10 @@ describe('fluid auto scrolling', () => {
         },
         closest: {
           borderBox: frameClient.borderBox,
-          scrollWidth: scrollableScrollSize.scrollWidth,
-          scrollHeight: scrollableScrollSize.scrollHeight,
+          scrollSize: {
+            scrollWidth: scrollableScrollSize.scrollWidth,
+            scrollHeight: scrollableScrollSize.scrollHeight,
+          },
           scroll: origin,
           shouldClipSubject: true,
         },
@@ -1563,8 +1565,10 @@ describe('fluid auto scrolling', () => {
             },
             closest: {
               borderBox: customFrameClient.borderBox,
-              scrollWidth: 10000,
-              scrollHeight: 10000,
+              scrollSize: {
+                scrollWidth: 10000,
+                scrollHeight: 10000,
+              },
               scroll: origin,
               shouldClipSubject: true,
             },
@@ -1708,8 +1712,10 @@ describe('fluid auto scrolling', () => {
           },
           closest: {
             borderBox: scrollableViewport.frame,
-            scrollWidth: windowScrollSize.scrollWidth,
-            scrollHeight: windowScrollSize.scrollHeight,
+            scrollSize: {
+              scrollWidth: windowScrollSize.scrollWidth,
+              scrollHeight: windowScrollSize.scrollHeight,
+            },
             scroll: origin,
             shouldClipSubject: true,
           },

@@ -401,6 +401,7 @@ export default class DroppableDimensionPublisher extends React.Component<
       }
 
       const frameClient: BoxModel = getBox(closestScrollable);
+      console.log('scrollHeight', closestScrollable.scrollHeight);
       const scrollSize: ScrollSize = {
         scrollHeight: closestScrollable.scrollHeight,
         scrollWidth: closestScrollable.scrollWidth,

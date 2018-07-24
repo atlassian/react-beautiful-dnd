@@ -437,8 +437,10 @@ describe('move to new droppable', () => {
                   // will cut the subject
                   [axis.end]: 100,
                 },
-                scrollWidth: 200,
-                scrollHeight: 200,
+                scrollSize: {
+                  scrollWidth: 200,
+                  scrollHeight: 200,
+                },
                 scroll: { x: 0, y: 0 },
                 shouldClipSubject: true,
               },
@@ -1000,8 +1002,10 @@ describe('move to new droppable', () => {
                   right: 100,
                   bottom: 100,
                 },
-                scrollWidth: 200,
-                scrollHeight: 200,
+                scrollSize: {
+                  scrollWidth: 200,
+                  scrollHeight: 200,
+                },
                 scroll: { x: 0, y: 0 },
                 shouldClipSubject: true,
               },

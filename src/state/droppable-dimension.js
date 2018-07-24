@@ -69,13 +69,13 @@ export const getDroppableDimension = ({
     // scrollHeight and scrollWidth are based on the padding box
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight
     const maxScroll: Position = getMaxScroll({
-      // size of the content
       scrollHeight: scrollSize.scrollHeight,
       scrollWidth: scrollSize.scrollWidth,
-      // actual dimensions of the frame
       height: frameClient.paddingBox.height,
       width: frameClient.paddingBox.width,
     });
+
+    console.log('max scroll', maxScroll);
 
     return {
       frameClient,
