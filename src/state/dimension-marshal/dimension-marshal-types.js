@@ -60,11 +60,6 @@ export type Entries = {|
   draggables: DraggableEntryMap,
 |};
 
-export type Collection = {|
-  scrollOptions: ScrollOptions,
-  critical: Critical,
-|};
-
 export type StartPublishingResult = {|
   critical: Critical,
   dimensions: DimensionMap,

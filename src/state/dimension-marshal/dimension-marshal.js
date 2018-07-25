@@ -1,7 +1,7 @@
 // @flow
 import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import createPublisher, { type Publisher, type Provided } from './publisher';
+import createPublisher, { type Publisher } from './publisher';
 // TODO: state folder reaching into view
 import * as timings from '../../debug/timings';
 import type {
@@ -15,6 +15,7 @@ import type {
   DroppableDimensionMap,
   DimensionMap,
   LiftRequest,
+  ScrollOptions,
   Critical,
 } from '../../types';
 import type {
@@ -26,8 +27,28 @@ import type {
   DroppableEntry,
   DraggableEntry,
   StartPublishingResult,
-  Collection,
 } from './dimension-marshal-types';
+
+type Collection = {|
+  critical: Critical,
+|};
+
+const throwIfAddOrRemoveOfWrongType = (
+  collection: Collection,
+  descriptor: DraggableDescriptor,
+) => {
+  invariant(
+    collection.critical.draggable.type === descriptor.type,
+    `We have detected that you have added a Draggable during a drag.
+      This is not of the same type as the dragging item
+
+      Dragging type: ${collection.critical.draggable.type}.
+      Added type: ${descriptor.type}
+
+      We are not allowing this as you can run into problems if your change
+      has shifted the positioning of other Droppables, or has changed the size of the page`,
+  );
+};
 
 export default (callbacks: Callbacks) => {
   const entries: Entries = {
@@ -41,16 +62,7 @@ export default (callbacks: Callbacks) => {
       publish: callbacks.publish,
       collectionStarting: callbacks.collectionStarting,
     },
-    getProvided: (): Provided => {
-      invariant(
-        collection,
-        'Cannot get scroll options when there is no collection',
-      );
-      return {
-        entries,
-        collection,
-      };
-    },
+    getEntries: (): Entries => entries,
   });
 
   const registerDraggable = (
@@ -72,13 +84,10 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    // Not relevant to the drag
-    if (collection.critical.draggable.type !== descriptor.type) {
-      return;
-    }
+    throwIfAddOrRemoveOfWrongType(collection, descriptor);
 
     // A Draggable has been added during a collection - need to act!
-    publisher.addDraggable(descriptor.id);
+    publisher.add(descriptor);
   };
 
   const updateDraggable = (
@@ -99,15 +108,17 @@ export default (callbacks: Callbacks) => {
       getDimension,
     };
     entries.draggables[descriptor.id] = entry;
+
+    // it is fine if these are updated during a drag
+    // this can happen as the index changes
   };
 
   const unregisterDraggable = (descriptor: DraggableDescriptor) => {
     const entry: ?DraggableEntry = entries.draggables[descriptor.id];
     invariant(
       entry,
-      `Cannot unregister Draggable with id ${
-        descriptor.id
-      } as it is not registered`,
+      `Cannot unregister Draggable with id:
+      ${descriptor.id} as it is not registered`,
     );
 
     // Entry has already been overwritten.
@@ -128,12 +139,9 @@ export default (callbacks: Callbacks) => {
       'Cannot remove the dragging item during a drag',
     );
 
-    // Not relevant to the drag
-    if (descriptor.type !== collection.critical.draggable.type) {
-      return;
-    }
+    throwIfAddOrRemoveOfWrongType(collection, descriptor);
 
-    publisher.removeDraggable(descriptor.id);
+    publisher.remove(descriptor);
   };
 
   const registerDroppable = (
@@ -151,16 +159,7 @@ export default (callbacks: Callbacks) => {
       callbacks: droppableCallbacks,
     };
 
-    if (!collection) {
-      return;
-    }
-
-    // Not relevant to this drag
-    if (descriptor.type !== collection.critical.droppable.type) {
-      return;
-    }
-
-    publisher.addDroppable(id);
+    invariant(!collection, 'Cannot add a Droppable during a drag');
   };
 
   const updateDroppable = (
@@ -182,12 +181,10 @@ export default (callbacks: Callbacks) => {
     };
     entries.droppables[descriptor.id] = entry;
 
-    if (collection) {
-      invariant(
-        false,
-        'You are not able to update the id or type of a droppable during a drag',
-      );
-    }
+    invariant(
+      !collection,
+      'You are not able to update the id or type of a droppable during a drag',
+    );
   };
 
   const unregisterDroppable = (descriptor: DroppableDescriptor) => {
@@ -212,21 +209,7 @@ export default (callbacks: Callbacks) => {
 
     delete entries.droppables[descriptor.id];
 
-    if (!collection) {
-      return;
-    }
-
-    invariant(
-      collection.critical.droppable.id !== descriptor.id,
-      'Cannot remove the home Droppable during a drag',
-    );
-
-    // Not relevant to the drag
-    if (collection.critical.droppable.type !== descriptor.type) {
-      return;
-    }
-
-    publisher.removeDroppable(descriptor.id);
+    invariant(!collection, 'Cannot add a Droppable during a drag');
   };
 
   const updateDroppableIsEnabled = (id: DroppableId, isEnabled: boolean) => {
@@ -273,10 +256,10 @@ export default (callbacks: Callbacks) => {
   };
 
   const getInitialPublish = (
-    args: Collection,
+    critical: Critical,
+    scrollOptions: ScrollOptions,
     windowScroll: Position,
   ): StartPublishingResult => {
-    const { critical, scrollOptions } = args;
     const timingKey: string = 'Initial collection from DOM';
     timings.start(timingKey);
 
@@ -377,11 +360,10 @@ export default (callbacks: Callbacks) => {
     };
 
     collection = {
-      scrollOptions: request.scrollOptions,
       critical,
     };
 
-    return getInitialPublish(collection, windowScroll);
+    return getInitialPublish(critical, request.scrollOptions, windowScroll);
   };
 
   const marshal: DimensionMarshal = {
