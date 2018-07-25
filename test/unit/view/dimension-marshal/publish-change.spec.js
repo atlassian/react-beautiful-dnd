@@ -1,5 +1,4 @@
 // @flow
-import type { Position } from 'css-box-model';
 import createDimensionMarshal from '../../../../src/state/dimension-marshal/dimension-marshal';
 import type {
   Callbacks,
@@ -11,7 +10,6 @@ import type {
   DroppableDimension,
   DimensionMap,
   Published,
-  Viewport,
 } from '../../../../src/types';
 import { critical, preset } from '../../../utils/preset-action-args';
 import {
@@ -20,7 +18,6 @@ import {
   getCallbacksStub,
 } from '../../../utils/dimension-marshal';
 import { defaultRequest, withExpectedAdvancedUsageWarning } from './util';
-import scrollViewport from '../../../../src/state/scroll-viewport';
 import { makeScrollable } from '../../../utils/dimension';
 
 const empty: Published = {
