@@ -82,7 +82,6 @@ export default ({ published, droppables, viewport }: Args): Published => {
         windowScrollChange,
         droppableScrollChange,
       );
-      console.log('shifting dimension by', totalChange);
       const client: BoxModel = offset(draggable.client, totalChange);
       const page: BoxModel = withScroll(client, viewport.scroll.initial);
 

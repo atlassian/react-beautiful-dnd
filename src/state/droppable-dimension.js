@@ -75,8 +75,6 @@ export const getDroppableDimension = ({
       width: frameClient.paddingBox.width,
     });
 
-    console.log('max scroll', maxScroll);
-
     return {
       frameClient,
       scrollSize,

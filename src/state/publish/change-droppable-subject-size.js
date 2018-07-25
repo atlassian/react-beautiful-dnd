@@ -104,6 +104,7 @@ export default ({
       const closest: Closest = {
         client: frameClient,
         page: withScroll(frameClient, initialWindowScroll),
+        scrollSize: newScrollable.scrollSize,
         scroll: oldScrollable.scroll.initial,
         shouldClipSubject: oldScrollable.shouldClipSubject,
       };

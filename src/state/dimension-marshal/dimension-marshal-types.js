@@ -111,5 +111,6 @@ export type Callbacks = {|
   updateDroppableIsEnabled: (args: UpdateDroppableIsEnabledArgs) => void,
   collectionStarting: () => void,
   // can a droppable have Draggables added or removed from it during a drag
-  canAddOrRemoveDuringDrag: (id: DroppableId) => boolean,
+  // TODO: get this working
+  // canAddOrRemoveDuringDrag: (id: DroppableId) => boolean,
 |};

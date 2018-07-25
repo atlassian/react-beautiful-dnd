@@ -21,6 +21,7 @@ import {
 } from '../../../utils/dimension-marshal';
 import { defaultRequest, withExpectedAdvancedUsageWarning } from './util';
 import scrollViewport from '../../../../src/state/scroll-viewport';
+import { makeScrollable } from '../../../utils/dimension';
 
 const empty: Published = {
   removals: {
@@ -30,6 +31,16 @@ const empty: Published = {
   additions: {
     draggables: [],
     droppables: [],
+  },
+  modified: [],
+};
+
+const scrollableHome: DroppableDimension = makeScrollable(preset.home);
+const withScrollableHome: DimensionMap = {
+  draggables: preset.dimensions.draggables,
+  droppables: {
+    ...preset.dimensions.droppables,
+    [scrollableHome.descriptor.id]: scrollableHome,
   },
 };
 
@@ -82,7 +93,7 @@ describe('additions', () => {
     };
     const callbacks: Callbacks = getCallbacksStub();
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, preset.dimensions);
+    populateMarshal(marshal, withScrollableHome);
 
     // A publish has started
     marshal.startPublishing(defaultRequest, preset.windowScroll);
@@ -107,6 +118,7 @@ describe('additions', () => {
         droppables: [anotherDroppable],
         draggables: [beforeInHome1],
       },
+      modified: [scrollableHome],
     };
     expect(callbacks.publish).toHaveBeenCalledWith(expected);
   });
@@ -176,6 +188,7 @@ describe('removals', () => {
         draggables: [preset.inHome2.descriptor.id],
         droppables: [anotherDroppable.descriptor.id],
       },
+      modified: [scrollableHome],
     };
     expect(callbacks.publish).toHaveBeenCalledWith(expected);
   });

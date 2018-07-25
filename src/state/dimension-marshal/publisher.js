@@ -166,6 +166,7 @@ export default ({ getProvided, callbacks }: Args): Publisher => {
           map[id] = entry;
           return map;
         }, {});
+      console.log('existing', existing);
 
       const modified: DroppableDimension[] = Object.keys(existing).map(
         (id: DroppableId): DroppableDimension =>

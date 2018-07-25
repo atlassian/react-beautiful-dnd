@@ -199,7 +199,7 @@ describe('update', () => {
 
       store.dispatch(collectionStarting());
       store.dispatch(publish(publishAdditionArgs));
-      // not called yet as position has not changed
+      // // not called yet as position has not changed
       expect(hooks.onDragUpdate).not.toHaveBeenCalled();
     });
 
