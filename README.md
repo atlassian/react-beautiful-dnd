@@ -901,9 +901,9 @@ class Students extends Component {
 
 By using the approach you are able to make style changes to a `Droppable` when it is being dragged over, but you avoid re-rendering all of the children unnecessarily. Keep in mind that if you are using `React.PureComponent` that your component will [not respond to changes in the context](https://github.com/facebook/react/issues/2517).
 
-When moving into a new list, the visible `Draggables` will have their `render` function called directly even with this optimisation. This is because we need to move those `Draggables` out of the way. The `InnerList` optimisation will prevent the `Droppable` from calling `render` on the whole list from the top down - but we will be calling `render` on the visible `Draggables` directly to move them out of the way.
+When moving into a new list, the visible `Draggables` will have their `render` function called directly even with this optimisation. This is because we need to move those `Draggables` out of the way. The `InnerList` optimisation will prevent the `Droppable` from calling `render` on the whole list from the top down. This optimisation will prevent the non-visible `Draggables` from having their render function called.
 
-Unfortunately we are [unable to apply this optimisation for you](https://medium.com/merrickchristensen/function-as-child-components-5f3920a9ace9). It is a byproduct of using the function-as-child pattern.
+Unfortunately we are [unable to apply this optimisation for you](https://medium.com/merrickchristensen/function-as-child-components-5f3920a9ace9). It is a byproduct of using the render-props pattern.
 
 ## `Draggable`
 
@@ -926,8 +926,6 @@ import { Draggable } from 'react-beautiful-dnd';
   )}
 </Draggable>;
 ```
-
-> Note: when the library moves to React 16 this will be cleaned up a little bit as we will be able to return the placeholder as a sibling to your child function without you needing to create a wrapping element
 
 ### Draggable Props
 
