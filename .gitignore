@@ -16,7 +16,8 @@ site/
 
 # coverage reports
 coverage/
-
+# test reports
+test-reports/
 # logs
 yarn-error.log
 npm-debug.log

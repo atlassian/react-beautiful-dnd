@@ -29,7 +29,7 @@
   },
   "scripts": {
     "test": "jest --config ./jest.config.js",
-    "test:e2e": "testcafe 'chrome:headless,firefox:headless' ./test/browser/*  -r xunit:/reports/browser/test-results.xml",
+    "test:e2e": "testcafe 'chrome:headless,firefox:headless' ./test/browser/*  -r xunit:./test-reports/browser/test-results.xml",
     "validate": "yarn prettier:check && yarn lint:eslint && yarn lint:css && yarn typecheck",
     "prettier:check": "yarn prettier --debug-check $npm_package_config_prettier_target",
     "prettier:write": "yarn prettier --write $npm_package_config_prettier_target",
@@ -124,5 +124,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/atlassian/react-beautiful-dnd.git"
+  },
+  "jest-junit": {
+    "output": "test-reports/junit/js-test-results.xml"
   }
 }
