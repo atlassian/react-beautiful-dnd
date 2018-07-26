@@ -23,7 +23,7 @@ fixture`Simple List Test Case`.page`${urlSimpleList}`.beforeEach(async t => {
 
 test('Drag and drop using click / drag', async t => {
   const textBefore = await Selector(secondCard).innerText;
-  await t.dragToElement(secondCard, fourthCard).wait(500);
+  await t.dragToElement(secondCard, fourthCard, { speed: 0.5 }).wait(500);
   const textAfter = await Selector(secondCard).innerText;
   await t.expect(textBefore).notEql(textAfter, errorMessage);
 });

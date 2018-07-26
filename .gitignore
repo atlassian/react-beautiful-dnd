@@ -16,8 +16,13 @@ site/
 
 # coverage reports
 coverage/
+
 # test reports
 test-reports/
+
+# storybook
+.storybook.out
+
 # logs
 yarn-error.log
 npm-debug.log

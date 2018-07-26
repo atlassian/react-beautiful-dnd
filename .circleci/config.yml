@@ -92,7 +92,7 @@ jobs:
 
       - run:
           name: E2E Suite
-          command: yarn storybook > .storybook-out & yarn test:e2e
+          command: node tools/testHarness.js yarn test:e2e
 
       - store_test_results:
           path: test-reports/browser
