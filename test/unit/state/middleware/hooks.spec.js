@@ -20,7 +20,7 @@ import createStore from './util/create-store';
 import { getPreset, makeScrollable } from '../../../utils/dimension';
 import {
   initialPublishArgs,
-  initialPublishWithScrollableHome,
+  initialPublishWithScrollables,
   getDragStart,
   publishAdditionArgs,
 } from '../../../utils/preset-action-args';
@@ -193,7 +193,7 @@ describe('update', () => {
       const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
       store.dispatch(prepare());
-      store.dispatch(initialPublish(initialPublishWithScrollableHome));
+      store.dispatch(initialPublish(initialPublishWithScrollables));
       expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
       expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
@@ -279,14 +279,8 @@ describe('update', () => {
 
       // removing inHome1
       const customPublish: Published = {
-        removals: {
-          draggables: [preset.inHome1.descriptor.id],
-          droppables: [],
-        },
-        additions: {
-          draggables: [],
-          droppables: [],
-        },
+        additions: [],
+        removals: [preset.inHome1.descriptor.id],
         modified: [scrollableHome],
       };
 

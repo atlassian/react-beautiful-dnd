@@ -23,7 +23,6 @@ export const withStore = () => ({
     [storeKey]: createStore({
       getDimensionMarshal: () => getMarshalStub(),
       styleMarshal: {
-        collecting: jest.fn(),
         dragging: jest.fn(),
         dropping: jest.fn(),
         resting: jest.fn(),

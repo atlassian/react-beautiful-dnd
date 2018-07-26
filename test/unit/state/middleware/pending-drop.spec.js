@@ -16,10 +16,10 @@ import {
   collectionStarting,
 } from '../../../../src/state/action-creators';
 import {
-  initialPublishArgs,
   getDragStart,
   critical,
   publishAdditionArgs,
+  initialPublishWithScrollables,
 } from '../../../utils/preset-action-args';
 
 describe('skipping pending drop', () => {
@@ -33,7 +33,7 @@ describe('skipping pending drop', () => {
     );
 
     store.dispatch(prepare());
-    store.dispatch(initialPublish(initialPublishArgs));
+    store.dispatch(initialPublish(initialPublishWithScrollables));
     store.dispatch(collectionStarting());
     store.dispatch(drop({ reason: 'DROP' }));
 
@@ -69,7 +69,7 @@ describe('skipping pending drop', () => {
     );
 
     store.dispatch(prepare());
-    store.dispatch(initialPublish(initialPublishArgs));
+    store.dispatch(initialPublish(initialPublishWithScrollables));
     store.dispatch(collectionStarting());
 
     mock.mockReset();

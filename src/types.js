@@ -241,18 +241,6 @@ export type DimensionMap = {|
   droppables: DroppableDimensionMap,
 |};
 
-// export type ModifiedDroppable = {|
-//   id: DroppableId,
-//   droppable: DroppableDimension,
-// |};
-
-// export type DroppableUpdate = {|
-//   droppableId: DroppableId,
-//   modified: DroppableDimension,
-//   additions: DraggableDimension[],
-//   removals: DroppableDimension[],
-// |};
-
 export type Published = {|
   additions: DraggableDimension[],
   removals: DraggableId[],

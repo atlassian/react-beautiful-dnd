@@ -22,6 +22,7 @@ import type {
 // In case a consumer needs the references
 export const preset = getPreset();
 const scrollableHome: DroppableDimension = makeScrollable(preset.home);
+const scrollableForeign: DroppableDimension = makeScrollable(preset.foreign);
 
 export const critical: Critical = {
   draggable: preset.inHome1.descriptor,
@@ -49,13 +50,14 @@ export const initialPublishArgs: InitialPublishArgs = {
   autoScrollMode: 'FLUID',
 };
 
-export const initialPublishWithScrollableHome: InitialPublishArgs = {
+export const initialPublishWithScrollables: InitialPublishArgs = {
   ...initialPublishArgs,
   dimensions: {
     draggables: preset.dimensions.draggables,
     droppables: {
       ...preset.dimensions.droppables,
       [scrollableHome.descriptor.id]: scrollableHome,
+      [scrollableForeign.descriptor.id]: scrollableForeign,
     },
   },
 };
@@ -76,14 +78,8 @@ export const publishAdditionArgs: Published = (() => {
     windowScroll: preset.windowScroll,
   });
   return {
-    removals: {
-      draggables: [],
-      droppables: [],
-    },
-    additions: {
-      draggables: [addition],
-      droppables: [],
-    },
+    removals: [],
+    additions: [addition],
     modified: [scrollableHome],
   };
 })();

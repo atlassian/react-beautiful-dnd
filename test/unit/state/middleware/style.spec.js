@@ -17,7 +17,7 @@ import {
   publishAdditionArgs,
   animateDropArgs,
   completeDropArgs,
-  initialPublishWithScrollableHome,
+  initialPublishWithScrollables,
 } from '../../../utils/preset-action-args';
 
 const getMarshalStub = (): StyleMarshal => ({
@@ -44,7 +44,7 @@ it('should use the dragging styles after a dynamic publish', () => {
   const store: Store = createStore(middleware(marshal));
 
   store.dispatch(prepare());
-  store.dispatch(initialPublish(initialPublishWithScrollableHome));
+  store.dispatch(initialPublish(initialPublishWithScrollables));
   marshal.dragging.mockReset();
 
   store.dispatch(collectionStarting());

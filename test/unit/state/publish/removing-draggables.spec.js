@@ -32,7 +32,7 @@ published.removals.forEach((id: DraggableId) => {
   delete expected.draggables[id];
 });
 
-it('should remove any removed draggables and droppables', () => {
+it('should remove any removed draggables', () => {
   const result: DraggingState | DropPendingState = publish({
     state: original,
     published,
