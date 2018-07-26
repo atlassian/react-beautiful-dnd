@@ -26,9 +26,7 @@ const state = getStatePreset();
 const preset = getPreset();
 
 it('should do not modify the dimensions when nothing has changed', () => {
-  const original: CollectingState | DropPendingState = withScrollables(
-    state.collecting(),
-  );
+  const original: CollectingState = withScrollables(state.collecting());
 
   const result: DraggingState | DropPendingState = publish({
     state: original,
@@ -128,7 +126,7 @@ it('should shift draggables after an added draggable', () => {
     additions: [added1, added2],
     modified: [scrollableHome],
   };
-  const original: CollectingState | DropPendingState = withScrollables(
+  const original: CollectingState = withScrollables(
     state.collecting(preset.inHome3.descriptor.id),
   );
 
@@ -184,7 +182,7 @@ it('should shift draggables after a removed draggable', () => {
     removals: [preset.inHome2.descriptor.id, preset.inHome3.descriptor.id],
     modified: [scrollableHome],
   };
-  const original: CollectingState | DropPendingState = withScrollables(
+  const original: CollectingState = withScrollables(
     state.collecting(preset.inHome4.descriptor.id),
   );
 
@@ -254,7 +252,7 @@ it('should shift draggables after multiple changes', () => {
     additions: [added1, added2],
     modified: [scrollableHome],
   };
-  const original: CollectingState | DropPendingState = withScrollables(
+  const original: CollectingState = withScrollables(
     state.collecting(preset.inHome3.descriptor.id),
   );
 

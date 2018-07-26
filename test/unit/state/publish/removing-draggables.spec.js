@@ -1,16 +1,10 @@
 // @flow
-import {
-  offset,
-  withScroll,
-  type BoxModel,
-  type Position,
-} from 'css-box-model';
 import invariant from 'tiny-invariant';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import type {
   Published,
   DraggableId,
-  DroppableId,
+  DraggableDimension,
   DropPendingState,
   DraggingState,
   DimensionMap,
@@ -18,29 +12,24 @@ import type {
 } from '../../../../src/types';
 import publish from '../../../../src/state/publish';
 import { getPreset } from '../../../utils/dimension';
-import { patch, negate } from '../../../../src/state/position';
 import { copy } from '../../../utils/preset-action-args';
-import { empty } from './util';
+import { empty, withScrollables, scrollableForeign } from './util';
 
 const state = getStatePreset();
 const preset = getPreset();
 
-const original: CollectingState = state.collecting();
+const original: CollectingState = withScrollables(state.collecting());
 const published: Published = {
   ...empty,
-  removals: {
-    draggables: preset.inForeignList.map(d => d.descriptor.id),
-    droppables: [preset.foreign.descriptor.id],
-  },
+  removals: preset.inForeignList.map(
+    (draggable: DraggableDimension): DraggableId => draggable.descriptor.id,
+  ),
+  modified: [scrollableForeign],
 };
-const expected: DimensionMap = copy(preset.dimensions);
+const expected: DimensionMap = copy(original.dimensions);
 
-published.removals.draggables.forEach((id: DraggableId) => {
+published.removals.forEach((id: DraggableId) => {
   delete expected.draggables[id];
-});
-
-published.removals.droppables.forEach((id: DroppableId) => {
-  delete expected.droppables[id];
 });
 
 it('should remove any removed draggables and droppables', () => {

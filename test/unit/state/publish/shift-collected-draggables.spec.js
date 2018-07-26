@@ -10,7 +10,7 @@ import {
   getClosestScrollable,
 } from '../../../utils/dimension';
 import getStatePreset from '../../../utils/get-simple-state-preset';
-import { empty, shift } from './util';
+import { empty, shift, withScrollables, scrollableHome } from './util';
 import { patch, add, origin, negate } from '../../../../src/state/position';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 import { scrollDroppable } from '../../../../src/state/droppable-dimension';
@@ -54,15 +54,15 @@ it('should shift added draggables to account for change in page scroll since sta
   });
   const published: Published = {
     ...empty,
-    additions: {
-      draggables: [added],
-      droppables: [],
-    },
+    additions: [added],
+    modified: [scrollableHome],
   };
-  const original: CollectingState = state.collecting(
-    preset.inHome1.descriptor.id,
-    preset.inHome1.client.borderBox.center,
-    scrolledViewport,
+  const original: CollectingState = withScrollables(
+    state.collecting(
+      preset.inHome1.descriptor.id,
+      preset.inHome1.client.borderBox.center,
+      scrolledViewport,
+    ),
   );
 
   const result: DraggingState | DropPendingState = publish({
@@ -78,12 +78,14 @@ it('should shift added draggables to account for change in droppable scroll sinc
   // Scroll droppable
   const scrollChange: Position = { x: 20, y: 40 };
   const scrollDisplacement: Position = negate(scrollChange);
-  const scrollable: DroppableDimension = makeScrollable(preset.home);
   const newScroll: Position = add(
-    getClosestScrollable(scrollable).scroll.initial,
+    getClosestScrollable(scrollableHome).scroll.initial,
     scrollChange,
   );
-  const scrolled: DroppableDimension = scrollDroppable(scrollable, newScroll);
+  const scrolled: DroppableDimension = scrollDroppable(
+    scrollableHome,
+    newScroll,
+  );
   // validation
   expect(getClosestScrollable(scrolled).scroll.current).toEqual(scrollChange);
   // dimensions
@@ -106,10 +108,8 @@ it('should shift added draggables to account for change in droppable scroll sinc
   });
   const published: Published = {
     ...empty,
-    additions: {
-      draggables: [added],
-      droppables: [],
-    },
+    additions: [added],
+    modified: [scrolled],
   };
   const original: CollectingState = state.collecting(
     preset.inHome1.descriptor.id,

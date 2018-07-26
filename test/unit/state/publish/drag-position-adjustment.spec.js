@@ -4,7 +4,7 @@ import invariant from 'tiny-invariant';
 import publish from '../../../../src/state/publish';
 import { getPreset } from '../../../utils/dimension';
 import getStatePreset from '../../../utils/get-simple-state-preset';
-import { empty, shift } from './util';
+import { empty, shift, withScrollables, scrollableHome } from './util';
 import { patch, add, origin, negate } from '../../../../src/state/position';
 import type {
   Published,
@@ -21,7 +21,7 @@ const state = getStatePreset();
 const preset = getPreset();
 
 it('should not adjust the drag positions if nothing was changed', () => {
-  const original: CollectingState = state.collecting();
+  const original: CollectingState = withScrollables(state.collecting());
 
   const result: DraggingState | DropPendingState = publish({
     state: original,
@@ -45,14 +45,12 @@ it('should not adjust the drag positions if an item was added after the critical
   };
   const published: Published = {
     ...empty,
-    additions: {
-      draggables: [added],
-      droppables: [],
-    },
+    additions: [added],
+    modified: [scrollableHome],
   };
 
-  const original: CollectingState = state.collecting(
-    preset.inHome2.descriptor.id,
+  const original: CollectingState = withScrollables(
+    state.collecting(preset.inHome2.descriptor.id),
   );
 
   const result: DraggingState | DropPendingState = publish({
@@ -114,14 +112,12 @@ const adjust = (original: CollectingState, change: Position): AdjustResult => {
 it('should not adjust the drag positions if an item was removed after the critical', () => {
   const published: Published = {
     ...empty,
-    removals: {
-      draggables: [preset.inHome3.descriptor.id],
-      droppables: [],
-    },
+    removals: [preset.inHome3.descriptor.id],
+    modified: [scrollableHome],
   };
 
-  const original: CollectingState = state.collecting(
-    preset.inHome2.descriptor.id,
+  const original: CollectingState = withScrollables(
+    state.collecting(preset.inHome2.descriptor.id),
   );
 
   const result: DraggingState | DropPendingState = publish({
@@ -154,15 +150,13 @@ it('should account for additions before the critical', () => {
       type: preset.home.descriptor.type,
     },
   };
-  const original: CollectingState = state.collecting(
-    preset.inHome2.descriptor.id,
+  const original: CollectingState = withScrollables(
+    state.collecting(preset.inHome2.descriptor.id),
   );
   const published: Published = {
     ...empty,
-    additions: {
-      draggables: [added1, added2],
-      droppables: [],
-    },
+    additions: [added1, added2],
+    modified: [scrollableHome],
   };
 
   const result: DraggingState | DropPendingState = publish({
@@ -196,15 +190,13 @@ it('should account for additions before the critical', () => {
 });
 
 it('should account for removals before the critical', () => {
-  const original: CollectingState = state.collecting(
-    preset.inHome3.descriptor.id,
+  const original: CollectingState = withScrollables(
+    state.collecting(preset.inHome3.descriptor.id),
   );
   const published: Published = {
     ...empty,
-    removals: {
-      draggables: [preset.inHome1.descriptor.id, preset.inHome2.descriptor.id],
-      droppables: [],
-    },
+    removals: [preset.inHome1.descriptor.id, preset.inHome2.descriptor.id],
+    modified: [scrollableHome],
   };
 
   const result: DraggingState | DropPendingState = publish({
@@ -251,18 +243,13 @@ it('should account for changes that result in no net movement before the critica
       type: preset.home.descriptor.type,
     },
   };
-  const original: CollectingState = state.collecting(
-    preset.inHome2.descriptor.id,
+  const original: CollectingState = withScrollables(
+    state.collecting(preset.inHome2.descriptor.id),
   );
   const published: Published = {
-    removals: {
-      draggables: [preset.inHome1.descriptor.id],
-      droppables: [],
-    },
-    additions: {
-      draggables: [added1],
-      droppables: [],
-    },
+    removals: [preset.inHome1.descriptor.id],
+    additions: [added1],
+    modified: [scrollableHome],
   };
 
   const result: DraggingState | DropPendingState = publish({

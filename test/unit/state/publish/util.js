@@ -62,8 +62,6 @@ export const scrollableForeign: DroppableDimension = makeScrollable(
   preset.foreign,
 );
 
-export const withScrollables = (
-  state: CollectingState | DropPendingState,
-): CollectingState | DropPendingState =>
+export const withScrollables = (state: CollectingState): CollectingState =>
   // $FlowFixMe - wrong types for these functions
   addDroppable(addDroppable(state, scrollableHome), scrollableForeign);
