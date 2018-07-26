@@ -57,6 +57,7 @@ export default [
       sizeSnapshot(snapshotArgs),
     ],
   },
+
   // Minified UMD build
   {
     input,
@@ -78,6 +79,7 @@ export default [
       uglify(),
     ],
   },
+
   // CommonJS (cjs) build
   // - Keeping console.log statements
   // - All external packages are not bundled
@@ -90,6 +92,7 @@ export default [
       babel(getBabelOptions({ useESModules: false })),
     ],
   },
+
   // EcmaScript Module (esm) build
   // - Keeping console.log statements
   // - All external packages are not bundled
