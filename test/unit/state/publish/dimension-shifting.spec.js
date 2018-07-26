@@ -1,10 +1,5 @@
 // @flow
-import {
-  offset,
-  withScroll,
-  type BoxModel,
-  type Position,
-} from 'css-box-model';
+import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import type {

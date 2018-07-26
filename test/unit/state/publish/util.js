@@ -14,7 +14,6 @@ import type {
   Published,
   DraggableDimension,
   DroppableDimension,
-  DropPendingState,
   CollectingState,
 } from '../../../../src/types';
 

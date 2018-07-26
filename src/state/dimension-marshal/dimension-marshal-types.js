@@ -1,5 +1,5 @@
 // @flow
-import type { Position, BoxModel } from 'css-box-model';
+import type { Position } from 'css-box-model';
 import type {
   UpdateDroppableScrollArgs,
   UpdateDroppableIsEnabledArgs,

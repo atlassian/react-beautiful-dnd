@@ -31,7 +31,6 @@ import type {
   DimensionMap,
   DraggingState,
   ScrollSize,
-  CollectingState,
 } from '../../src/types';
 
 type GetComputedSpacingArgs = {|

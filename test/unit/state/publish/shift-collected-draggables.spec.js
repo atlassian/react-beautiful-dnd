@@ -6,12 +6,11 @@ import {
   getPreset,
   getDraggableDimension,
   addDroppable,
-  makeScrollable,
   getClosestScrollable,
 } from '../../../utils/dimension';
 import getStatePreset from '../../../utils/get-simple-state-preset';
-import { empty, shift, withScrollables, scrollableHome } from './util';
-import { patch, add, origin, negate } from '../../../../src/state/position';
+import { empty, withScrollables, scrollableHome } from './util';
+import { add, negate } from '../../../../src/state/position';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 import { scrollDroppable } from '../../../../src/state/droppable-dimension';
 import type {

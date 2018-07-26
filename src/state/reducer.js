@@ -7,7 +7,7 @@ import publish from './publish';
 import moveInDirection, {
   type Result as MoveInDirectionResult,
 } from './move-in-direction';
-import { add, isEqual, subtract, origin } from './position';
+import { add, isEqual, subtract } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
 import isMovementAllowed from './is-movement-allowed';
