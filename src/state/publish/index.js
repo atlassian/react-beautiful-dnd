@@ -11,14 +11,15 @@ import type {
   DraggableId,
   DraggableDimension,
   DroppableDimensionMap,
+  DraggableDimensionMap,
 } from '../../types';
 import * as timings from '../../debug/timings';
 import getDragImpact from '../get-drag-impact';
 import getHomeImpact from '../get-home-impact';
-import getDimensionMap from './get-dimension-map';
 import getDragPositions from './get-drag-positions';
 import changeDroppableSubjectSize from './change-droppable-subject-size';
 import adjustAdditionsForScrollChanges from './adjust-additions-for-scroll-changes';
+import getDraggableMap from './get-draggable-map';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -52,11 +53,16 @@ export default ({
   };
 
   // Add, remove and shift dimensions
-  const dimensions: DimensionMap = getDimensionMap({
+  const draggables: DraggableDimensionMap = getDraggableMap({
     existing: patched,
     published: withShifted,
     initialWindowScroll: state.viewport.scroll.initial,
   });
+
+  const dimensions: DimensionMap = {
+    droppables,
+    draggables,
+  };
 
   const dragging: DraggableId = state.critical.draggable.id;
   const original: DraggableDimension = state.dimensions.draggables[dragging];

@@ -5,7 +5,7 @@ import {
   type Position,
   type BoxModel,
 } from 'css-box-model';
-import { origin, add, isEqual, patch } from '../position';
+import { origin, add } from '../position';
 import type {
   Published,
   Viewport,
@@ -71,7 +71,7 @@ export default ({ published, droppables, viewport }: Args): Published => {
   // Need to undo the displacement caused by window scroll changes
   const windowScrollChange: Position = viewport.scroll.diff.value;
 
-  const shifted: DraggableDimension[] = published.additions.draggables.map(
+  const shifted: DraggableDimension[] = published.additions.map(
     (draggable: DraggableDimension): DraggableDimension => {
       const droppableScrollChange: Position = getDroppableScrollChange(
         droppables,
@@ -101,11 +101,7 @@ export default ({ published, droppables, viewport }: Args): Published => {
 
   const updated: Published = {
     ...published,
-    additions: {
-      draggables: shifted,
-      // TODO: shift required
-      droppables: published.additions.droppables,
-    },
+    additions: shifted,
   };
 
   return updated;

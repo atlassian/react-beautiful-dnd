@@ -20,13 +20,15 @@ import publish from '../../../../src/state/publish';
 import { getPreset } from '../../../utils/dimension';
 import { patch, negate } from '../../../../src/state/position';
 import getDraggablesInsideDroppable from '../../../../src/state/get-draggables-inside-droppable';
-import { empty, shift } from './util';
+import { empty, shift, withScrollables, scrollableHome } from './util';
 
 const state = getStatePreset();
 const preset = getPreset();
 
 it('should do not modify the dimensions when nothing has changed', () => {
-  const original: CollectingState = state.collecting();
+  const original: CollectingState | DropPendingState = withScrollables(
+    state.collecting(),
+  );
 
   const result: DraggingState | DropPendingState = publish({
     state: original,
@@ -56,14 +58,12 @@ it('should not shift anything when draggables are added to the end of a list', (
   };
   const published: Published = {
     ...empty,
-    additions: {
-      draggables: [added1, added2],
-      droppables: [],
-    },
+    additions: [added1, added2],
+    modified: [scrollableHome],
   };
 
   const result: DraggingState | DropPendingState = publish({
-    state: state.collecting(),
+    state: withScrollables(state.collecting()),
     published,
   });
 
@@ -81,15 +81,12 @@ it('should not shift anything when draggables are added to the end of a list', (
 it('should not shift anything when draggables are removed from the end of the list', () => {
   const published: Published = {
     ...empty,
-    removals: {
-      // removing the last two draggables from inHome
-      draggables: [preset.inHome3.descriptor.id, preset.inHome4.descriptor.id],
-      droppables: [],
-    },
+    removals: [preset.inHome3.descriptor.id, preset.inHome4.descriptor.id],
+    modified: [scrollableHome],
   };
 
   const result: DraggingState | DropPendingState = publish({
-    state: state.collecting(),
+    state: withScrollables(state.collecting()),
     published,
   });
 
@@ -128,13 +125,11 @@ it('should shift draggables after an added draggable', () => {
   };
   const published: Published = {
     ...empty,
-    additions: {
-      draggables: [added1, added2],
-      droppables: [],
-    },
+    additions: [added1, added2],
+    modified: [scrollableHome],
   };
-  const original: CollectingState = state.collecting(
-    preset.inHome3.descriptor.id,
+  const original: CollectingState | DropPendingState = withScrollables(
+    state.collecting(preset.inHome3.descriptor.id),
   );
 
   const result: DraggingState | DropPendingState = publish({
@@ -186,13 +181,11 @@ it('should shift draggables after an added draggable', () => {
 it('should shift draggables after a removed draggable', () => {
   const published: Published = {
     ...empty,
-    removals: {
-      draggables: [preset.inHome2.descriptor.id, preset.inHome3.descriptor.id],
-      droppables: [],
-    },
+    removals: [preset.inHome2.descriptor.id, preset.inHome3.descriptor.id],
+    modified: [scrollableHome],
   };
-  const original: CollectingState = state.collecting(
-    preset.inHome4.descriptor.id,
+  const original: CollectingState | DropPendingState = withScrollables(
+    state.collecting(preset.inHome4.descriptor.id),
   );
 
   const result: DraggingState | DropPendingState = publish({
@@ -257,17 +250,12 @@ it('should shift draggables after multiple changes', () => {
     },
   };
   const published: Published = {
-    removals: {
-      draggables: [preset.inHome2.descriptor.id],
-      droppables: [],
-    },
-    additions: {
-      draggables: [added1, added2],
-      droppables: [],
-    },
+    removals: [preset.inHome2.descriptor.id],
+    additions: [added1, added2],
+    modified: [scrollableHome],
   };
-  const original: CollectingState = state.collecting(
-    preset.inHome3.descriptor.id,
+  const original: CollectingState | DropPendingState = withScrollables(
+    state.collecting(preset.inHome3.descriptor.id),
   );
 
   const result: DraggingState | DropPendingState = publish({

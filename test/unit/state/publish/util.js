@@ -5,20 +5,25 @@ import {
   type BoxModel,
   type Position,
 } from 'css-box-model';
-import { getPreset } from '../../../utils/dimension';
-import type { Published, DraggableDimension } from '../../../../src/types';
+import {
+  getPreset,
+  makeScrollable,
+  addDroppable,
+} from '../../../utils/dimension';
+import type {
+  Published,
+  DraggableDimension,
+  DroppableDimension,
+  DropPendingState,
+  CollectingState,
+} from '../../../../src/types';
 
 const preset = getPreset();
 
 export const empty: Published = {
-  additions: {
-    draggables: [],
-    droppables: [],
-  },
-  removals: {
-    draggables: [],
-    droppables: [],
-  },
+  additions: [],
+  removals: [],
+  modified: [],
 };
 
 type ShiftArgs = {|
@@ -51,3 +56,14 @@ export const shift = ({
 
   return moved;
 };
+
+export const scrollableHome: DroppableDimension = makeScrollable(preset.home);
+export const scrollableForeign: DroppableDimension = makeScrollable(
+  preset.foreign,
+);
+
+export const withScrollables = (
+  state: CollectingState | DropPendingState,
+): CollectingState | DropPendingState =>
+  // $FlowFixMe - wrong types for these functions
+  addDroppable(addDroppable(state, scrollableHome), scrollableForeign);

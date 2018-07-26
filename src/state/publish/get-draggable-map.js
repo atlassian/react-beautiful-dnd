@@ -1,5 +1,4 @@
 // @flow
-import invariant from 'tiny-invariant';
 import {
   offset as offsetBox,
   withScroll,
@@ -11,19 +10,12 @@ import type {
   DimensionMap,
   Published,
   DraggableId,
-  DroppableId,
   DroppableDimension,
   DraggableDimension,
   DraggableDimensionMap,
-  DroppableDimensionMap,
 } from '../../types';
-import {
-  toDroppableMap,
-  toDraggableMap,
-  toDraggableList,
-  toDroppableList,
-} from '../dimension-structures';
-import { patch, origin, isEqual, add, negate } from '../position';
+import { toDraggableMap, toDroppableList } from '../dimension-structures';
+import { patch, add, negate } from '../position';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 
 type Args = {|
@@ -45,7 +37,7 @@ export default ({
   existing,
   published,
   initialWindowScroll,
-}: Args): DimensionMap => {
+}: Args): DraggableDimensionMap => {
   const droppables: DroppableDimension[] = toDroppableList(existing.droppables);
 
   const shifted: DraggableDimensionMap = {};
@@ -76,7 +68,7 @@ export default ({
 
     // phase 1: removals
     const removals: DraggableDimensionMap = toDraggableMap(
-      published.removals.draggables
+      published.removals
         .map((id: DraggableId): DraggableDimension => existing.draggables[id])
         // only care about the ones inside of this droppable
         .filter(
@@ -120,7 +112,7 @@ export default ({
     // phase 2: additions
     // We do this on the withRemovals array as the new index coming in already account for removals
 
-    const additions: DraggableDimension[] = published.additions.draggables.filter(
+    const additions: DraggableDimension[] = published.additions.filter(
       (draggable: DraggableDimension): boolean =>
         draggable.descriptor.droppableId === droppable.descriptor.id,
     );
@@ -204,23 +196,13 @@ export default ({
     // will overwrite existing draggables with shifted values if required
     ...shifted,
     // add the additions without modification - they are already in the right spot
-    ...toDraggableMap(published.additions.draggables),
+    ...toDraggableMap(published.additions),
   };
 
   // delete draggables that have been removed
-  published.removals.draggables.forEach((id: DraggableId) => {
+  published.removals.forEach((id: DraggableId) => {
     delete draggableMap[id];
   });
 
-  const droppableMap: DroppableDimensionMap = {
-    ...existing.droppables,
-    ...toDroppableMap(published.additions.droppables),
-  };
-
-  published.removals.droppables.forEach((id: DroppableId) => {
-    delete droppableMap[id];
-  });
-
-  // return result;
-  return { draggables: draggableMap, droppables: droppableMap };
+  return draggableMap;
 };
