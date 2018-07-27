@@ -30,6 +30,14 @@ jobs:
           name: Install Dependencies
           command: yarn
 
+      - run:
+          name: Validate Yarn Lock File
+          command: |
+              if [ -n "$(git status -s)" ]; then
+                echo "Your yarn.lock was modified during install, please check in any changes to the yarn.lock file"
+                exit 1
+              fi
+
       # Save the node_modules cache
       - save_cache:
           paths:
