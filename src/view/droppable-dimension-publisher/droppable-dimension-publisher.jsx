@@ -363,6 +363,12 @@ export default class DroppableDimensionPublisher extends React.Component<
     const targetRef: ?HTMLElement = this.props.getDroppableRef();
     invariant(targetRef, 'Cannot recollect without a droppable ref');
 
+    // cancel any pending scroll update: this recollected
+    // dimension will be used for the diff
+    if (!watching.options.shouldPublishImmediately) {
+      this.scheduleScrollUpdate.cancel();
+    }
+
     // TODO: needs to disable the placeholder for the collection
     // this.props.placeholder.hide();
     const { dimension } = this.getDimension(origin);

@@ -1,11 +1,13 @@
 // @flow
+import invariant from 'tiny-invariant';
 import {
   offset,
   withScroll,
   type Position,
   type BoxModel,
 } from 'css-box-model';
-import { origin, add } from '../position';
+import { origin, add, subtract } from '../position';
+import { toDroppableMap } from '../dimension-structures';
 import type {
   Published,
   Viewport,
@@ -13,6 +15,7 @@ import type {
   DroppableDimension,
   Scrollable,
   DroppableDimensionMap,
+  DroppableId,
 } from '../../types';
 
 type Args = {|
@@ -21,23 +24,36 @@ type Args = {|
   viewport: Viewport,
 |};
 
-const getDroppableScrollChange = (
-  droppables: DroppableDimensionMap,
-  draggable: DraggableDimension,
-): Position => {
-  const droppable: ?DroppableDimension =
-    droppables[draggable.descriptor.droppableId];
+type ChangeArgs = {|
+  original: DroppableDimension,
+  modified: DroppableDimension,
+|};
 
-  // might be being added to a new droppable
-  if (!droppable) {
+const getDroppableScrollChange = ({
+  original,
+  modified,
+}: ChangeArgs): Position => {
+  const oldScrollable: ?Scrollable = original.viewport.closestScrollable;
+
+  // original droppable was not scrollable
+  if (!oldScrollable) {
     return origin;
   }
 
-  const scrollable: ?Scrollable = droppable.viewport.closestScrollable;
+  // the new scollable will have the latest scroll - which can be different
+  // from the current scroll as stored in the droppable due to pending scroll changes
+  const newScrollable: ?Scrollable = modified.viewport.closestScrollable;
+  invariant(
+    newScrollable,
+    'Cannot get droppable scroll change from modified droppable',
+  );
 
-  if (!scrollable) {
-    return origin;
-  }
+  const diff: Position = subtract(
+    newScrollable.scroll.current,
+    oldScrollable.scroll.initial,
+  );
+
+  return diff;
 
   // TODO: the shift is wrong as it does not account for the additional shift
   // caused by the bulk add of additions!
@@ -55,7 +71,7 @@ const getDroppableScrollChange = (
   // // the scroll of the droppable has been impacted by the addition
   // return add(scrollable.scroll.diff.value, size);
 
-  return scrollable.scroll.diff.value;
+  // return oldScrollable.scroll.diff.value;
 };
 
 export default ({ published, droppables, viewport }: Args): Published => {
@@ -70,13 +86,18 @@ export default ({ published, droppables, viewport }: Args): Published => {
 
   // Need to undo the displacement caused by window scroll changes
   const windowScrollChange: Position = viewport.scroll.diff.value;
+  const modifiedMap: DroppableDimensionMap = toDroppableMap(published.modified);
 
   const shifted: DraggableDimension[] = published.additions.map(
     (draggable: DraggableDimension): DraggableDimension => {
-      const droppableScrollChange: Position = getDroppableScrollChange(
-        droppables,
-        draggable,
-      );
+      const droppableId: DroppableId = draggable.descriptor.droppableId;
+      const original: DroppableDimension = droppables[droppableId];
+      const modified: DroppableDimension = modifiedMap[droppableId];
+
+      const droppableScrollChange: Position = getDroppableScrollChange({
+        original,
+        modified,
+      });
 
       const totalChange: Position = add(
         windowScrollChange,

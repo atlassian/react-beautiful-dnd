@@ -121,7 +121,7 @@ export default ({
       const scrolled: DroppableDimension = scrollDroppable(
         withSizeChanged,
         // TODO: scroll changes due to insertions..>?
-        oldScrollable.scroll.current,
+        newScrollable.scroll.initial,
       );
 
       return scrolled;
