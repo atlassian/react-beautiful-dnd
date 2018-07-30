@@ -29,6 +29,7 @@
   },
   "scripts": {
     "test": "jest --config ./jest.config.js",
+    "test:browser": "testcafe 'chrome:headless,chrome:headless:emulation:device=iphone 6;touch=true,firefox:headless' ./test/browser/*  -r spec,xunit:./test-reports/browser/test-results.xml",
     "validate": "yarn prettier:check && yarn lint:eslint && yarn lint:css && yarn typecheck",
     "prettier:check": "yarn prettier --debug-check $npm_package_config_prettier_target",
     "prettier:write": "yarn prettier --write $npm_package_config_prettier_target",
@@ -49,7 +50,7 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@babel/runtime": "7.0.0-beta.52",
+    "@babel/runtime": "7.0.0-beta.54",
     "css-box-model": "^1.0.0",
     "memoize-one": "^4.0.0",
     "prop-types": "^15.6.1",
@@ -61,14 +62,13 @@
   },
   "devDependencies": {
     "@atlaskit/css-reset": "^2.0.7",
-    "@babel/core": "^7.0.0-beta.52",
-    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.52",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.52",
-    "@babel/plugin-transform-modules-commonjs": "^7.0.0-beta.52",
-    "@babel/plugin-transform-runtime": "^7.0.0-beta.52",
-    "@babel/preset-env": "^7.0.0-beta.52",
-    "@babel/preset-flow": "^7.0.0-beta.52",
-    "@babel/preset-react": "^7.0.0-beta.52",
+    "@babel/core": "^7.0.0-beta.54",
+    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.54",
+    "@babel/plugin-transform-modules-commonjs": "^7.0.0-beta.54",
+    "@babel/plugin-transform-runtime": "^7.0.0-beta.54",
+    "@babel/preset-env": "^7.0.0-beta.54",
+    "@babel/preset-flow": "^7.0.0-beta.54",
+    "@babel/preset-react": "^7.0.0-beta.54",
     "@storybook/react": "^3.4.8",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^8.2.5",
@@ -93,7 +93,6 @@
     "jest-watch-typeahead": "^0.1.0",
     "opn-cli": "^3.1.0",
     "prettier": "^1.13.7",
-    "puppeteer": "^1.5.0",
     "raf-stub": "^2.0.2",
     "react": "^16.3.1",
     "react-dom": "^16.3.1",
@@ -108,11 +107,13 @@
     "rollup-plugin-strip": "^1.1.1",
     "rollup-plugin-uglify": "^4.0.0",
     "styled-components": "^3.3.3",
-    "stylelint": "9.3.0",
+    "stylelint": "9.4.0",
     "stylelint-config-prettier": "^3.3.0",
     "stylelint-config-standard": "^18.2.0",
     "stylelint-config-styled-components": "^0.1.1",
     "stylelint-processor-styled-components": "^1.3.1",
+    "testcafe": "^0.20.5",
+    "testcafe-reporter-xunit": "^2.1.0",
     "wait-port": "^0.2.2"
   },
   "peerDependencies": {
@@ -122,5 +123,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/atlassian/react-beautiful-dnd.git"
+  },
+  "jest-junit": {
+    "output": "test-reports/junit/js-test-results.xml"
   }
 }

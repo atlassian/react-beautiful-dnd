@@ -1,0 +1,3 @@
+yarn run v1.2.1
+$ start-storybook -p 9002 & opn http://localhost:9002
+Done in 0.35s.
