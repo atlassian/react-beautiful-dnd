@@ -3,11 +3,14 @@
 (answer here)
 
 <!--
+## Get started
+If you are new to `react-beautiful-dnd` we recommend taking at look at our getting started course: https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd
+
+It will give you a good base understanding of how everything fits together. This can often be the best help in overcomming your issue.
+
 ## Duplicates
 
-Before raising a feature request or bug please search through our open and closed issues
-to see if there is something similiar. If you do find one similiar you can show it is important
-to you by adding a reaction (such as 👍) to the issue
+Before raising a feature request or bug please search through our open and closed issues to see if there is something similar. If you do find one similar you can show it is important to you by adding a reaction (such as 👍) to the issue
 
 Open and closed issues:
 https://github.com/atlassian/react-beautiful-dnd/issues?utf8=%E2%9C%93&q=is%3Aopen%20is%3Aclosed%20is%3Aissue%20
@@ -24,6 +27,8 @@ Before raising a new feature please ensure that it falls within the philosophy
 of the library.
 
 https://github.com/atlassian/react-beautiful-dnd#driving-philosophy-physicality
+
+All features need to have a clear and generally applicable keyboard interaction pattern in order for us to deliver on our core goal of being highly accessible.
 -->
 
 <!-- ## Bug -->
