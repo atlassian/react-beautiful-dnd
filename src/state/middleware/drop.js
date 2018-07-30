@@ -24,7 +24,7 @@ import type {
   DimensionMap,
   DraggableDimension,
 } from '../../types';
-import type { Store, Action } from '../store-types';
+import type { MiddlewareStore, Action } from '../store-types';
 
 const getScrollDisplacement = (
   droppable: DroppableDimension,
@@ -32,9 +32,9 @@ const getScrollDisplacement = (
 ): Position =>
   withDroppableDisplacement(droppable, viewport.scroll.diff.displacement);
 
-export default ({ getState, dispatch }: Store) => (next: Action => mixed) => (
-  action: Action,
-): mixed => {
+export default ({ getState, dispatch }: MiddlewareStore) => (
+  next: Action => mixed,
+) => (action: Action): mixed => {
   if (action.type !== 'DROP') {
     next(action);
     return;

@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import { prepare, completeDrop, initialPublish } from '../action-creators';
 import type { DimensionMarshal } from '../dimension-marshal/dimension-marshal-types';
 import type { State, ScrollOptions, LiftRequest } from '../../types';
-import type { Store, Action } from '../store-types';
+import type { MiddlewareStore, Action } from '../store-types';
 
 export default (getMarshal: () => DimensionMarshal) => {
   let timeoutId: ?TimeoutID = null;
@@ -16,9 +16,9 @@ export default (getMarshal: () => DimensionMarshal) => {
     timeoutId = null;
   };
 
-  return ({ getState, dispatch }: Store) => (next: Action => mixed) => (
-    action: Action,
-  ): mixed => {
+  return ({ getState, dispatch }: MiddlewareStore) => (
+    next: Action => mixed,
+  ) => (action: Action): mixed => {
     // a lift might be cancelled before we enter phase 2
     if (action.type === 'CLEAN') {
       tryAbortCriticalCollection();

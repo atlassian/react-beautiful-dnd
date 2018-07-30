@@ -1,7 +1,7 @@
 // @flow
 import type { AutoScroller } from '../auto-scroller/auto-scroller-types';
 import type { State } from '../../types';
-import type { Action, Middleware, MiddlewareStore } from '../store-types';
+import type { Action, MiddlewareStore } from '../store-types';
 
 const shouldCancel = (action: Action) =>
   action.type === 'CANCEL' ||
@@ -10,9 +10,9 @@ const shouldCancel = (action: Action) =>
   action.type === 'DROP_COMPLETE' ||
   action.type === 'COLLECTION_STARTING';
 
-export default (getScroller: () => AutoScroller) => (store: Store) => (
-  next: Action => mixed,
-) => (action: Action): mixed => {
+export default (getScroller: () => AutoScroller) => (
+  store: MiddlewareStore,
+) => (next: Action => mixed) => (action: Action): mixed => {
   if (shouldCancel(action)) {
     getScroller().cancel();
     next(action);

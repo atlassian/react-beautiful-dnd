@@ -16,7 +16,7 @@ import type {
   OnDragUpdateHook,
   OnDragEndHook,
 } from '../../types';
-import type { Store, Action } from '../store-types';
+import type { MiddlewareStore, Action } from '../store-types';
 
 type AnyHookFn = OnDragStartHook | OnDragUpdateHook | OnDragEndHook;
 type AnyHookData = DragStart | DragUpdate | DropResult;
@@ -236,7 +236,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     };
   })();
 
-  return (store: Store) => (next: Action => mixed) => (
+  return (store: MiddlewareStore) => (next: Action => mixed) => (
     action: Action,
   ): mixed => {
     // letting the reducer update first

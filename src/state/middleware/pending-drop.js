@@ -1,9 +1,9 @@
 // @flow
 import { drop } from '../action-creators';
 import type { State } from '../../types';
-import type { Store, Action } from '../store-types';
+import type { MiddlewareStore, Action } from '../store-types';
 
-export default (store: Store) => (next: Action => mixed) => (
+export default (store: MiddlewareStore) => (next: Action => mixed) => (
   action: Action,
 ): mixed => {
   // Always let the action go through first

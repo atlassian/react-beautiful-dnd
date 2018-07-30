@@ -2,7 +2,7 @@
 import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
 import type { State, Viewport, DraggableLocation } from '../../types';
-import type { Action, Store } from '../store-types';
+import type { Action, MiddlewareStore } from '../store-types';
 import getMaxScroll from '../get-max-scroll';
 import { isEqual } from '../position';
 import { updateViewportMaxScroll } from '../action-creators';
@@ -79,7 +79,7 @@ const getNewMaxScroll = (
   return maxScroll;
 };
 
-export default (store: Store) => (next: Action => mixed) => (
+export default (store: MiddlewareStore) => (next: Action => mixed) => (
   action: Action,
 ): mixed => {
   const previous: State = store.getState();
