@@ -4,9 +4,8 @@
 
 Beautiful, accessible drag and drop for lists with [`React.js`](https://facebook.github.io/react/)
 
-
 [![CircleCI branch](https://img.shields.io/circleci/project/github/atlassian/react-beautiful-dnd/master.svg)](https://circleci.com/gh/atlassian/react-beautiful-dnd/tree/master)
- [![npm](https://img.shields.io/npm/v/react-beautiful-dnd.svg)](https://www.npmjs.com/package/react-beautiful-dnd) [![dependencies](https://david-dm.org/atlassian/react-beautiful-dnd.svg)](https://david-dm.org/atlassian/react-beautiful-dnd) [![Greenkeeper badge](https://badges.greenkeeper.io/atlassian/react-beautiful-dnd.svg)](https://greenkeeper.io/) [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
+[![npm](https://img.shields.io/npm/v/react-beautiful-dnd.svg)](https://www.npmjs.com/package/react-beautiful-dnd) [![dependencies](https://david-dm.org/atlassian/react-beautiful-dnd.svg)](https://david-dm.org/atlassian/react-beautiful-dnd) [![Greenkeeper badge](https://badges.greenkeeper.io/atlassian/react-beautiful-dnd.svg)](https://greenkeeper.io/) [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
 
 ![quote application example](https://raw.githubusercontent.com/alexreardon/files/master/resources/website-board.gif?raw=true)
 
@@ -33,8 +32,6 @@ We have created some basic examples on `codesandbox` for you to play with direct
 - [Simple horizontal list](https://codesandbox.io/s/mmrp44okvj)
 - [Simple DnD between two lists](https://codesandbox.io/s/ql08j35j3q)
 
-> Coming soon: a getting starting guide!
-
 ## Core characteristics
 
 - Beautiful, natural movement of items
@@ -43,6 +40,12 @@ We have created some basic examples on `codesandbox` for you to play with direct
 - Unopinionated styling
 - No creation of additional wrapper dom nodes - flexbox and focus management friendly!
 - Accessible
+
+## Get started 🤩
+
+We have created [a free course on `egghead.io`](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd) to help you to get started with `react-beautiful-dnd` as quickly as possible.
+
+![Course logo](https://user-images.githubusercontent.com/2182637/43372837-8c72d3f8-93e8-11e8-9d92-a82adde7718f.png)
 
 ## Read this in other languages
 
