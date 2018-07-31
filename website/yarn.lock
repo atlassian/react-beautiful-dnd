@@ -2,27 +2,25 @@
 # yarn lockfile v1
 
 
-"@atlaskit/css-reset@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@atlaskit/css-reset/-/css-reset-2.0.0.tgz#ed831c8461e32f5c7d1a040fb5a1630faff1e947"
+"@atlaskit/css-reset@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/css-reset/-/css-reset-3.0.0.tgz#118161050f4c389519518d66079c28adf7fe8ae7"
   dependencies:
     "@atlaskit/util-shared-styles" "^2.10.3"
 
-"@atlaskit/icon@^11.0.0":
-  version "11.0.0"
-  resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-11.0.0.tgz#47422ba7441fa3af4d9ff6c8eba437f1fdb676e5"
+"@atlaskit/icon@^13.2.0":
+  version "13.2.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-13.2.0.tgz#1ca16a5555adee6aaaa361acfb5ef289577fbe8e"
   dependencies:
-    "@atlaskit/theme" "^3.0.0"
+    "@atlaskit/theme" "^5.0.0"
     babel-runtime "^6.26.0"
-    styled-components "1.4.6 - 3"
     uuid "^3.1.0"
 
-"@atlaskit/theme@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-3.0.0.tgz#1ab9ae3fac1ac2572ff82df9508349880f252e75"
+"@atlaskit/theme@^5.0.0", "@atlaskit/theme@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-5.1.0.tgz#9cad08612eb0363035835879c583478fb92c6329"
   dependencies:
     prop-types "^15.5.10"
-    styled-components "1.4.6 - 3"
 
 "@atlaskit/util-shared-styles@^2.10.3":
   version "2.10.7"
@@ -7371,9 +7369,9 @@ react-dom@^15.6.0:
     object-assign "^4.1.0"
     prop-types "^15.5.10"
 
-react-dom@^16.3.1:
-  version "16.3.1"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.3.1.tgz#6a3c90a4fb62f915bdbcf6204422d93a7d4ca573"
+react-dom@^16.4.1:
+  version "16.4.1"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.4.1.tgz#7f8b0223b3a5fbe205116c56deb85de32685dad6"
   dependencies:
     fbjs "^0.8.16"
     loose-envify "^1.1.0"
@@ -7412,6 +7410,10 @@ react-icons@^2.2.7:
   resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-2.2.7.tgz#d7860826b258557510dac10680abea5ca23cf650"
   dependencies:
     react-icon-base "2.1.0"
+
+react-is@^16.3.1:
+  version "16.4.1"
+  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.4.1.tgz#d624c4650d2c65dbd52c72622bbf389435d9776e"
 
 react-media@^1.8.0:
   version "1.8.0"
@@ -7471,9 +7473,9 @@ react@^15.6.0:
     object-assign "^4.1.0"
     prop-types "^15.5.10"
 
-react@^16.3.1:
-  version "16.3.1"
-  resolved "https://registry.yarnpkg.com/react/-/react-16.3.1.tgz#4a2da433d471251c69b6033ada30e2ed1202cfd8"
+react@^16.4.1:
+  version "16.4.1"
+  resolved "https://registry.yarnpkg.com/react/-/react-16.4.1.tgz#de51ba5764b5dbcd1f9079037b862bd26b82fe32"
   dependencies:
     fbjs "^0.8.16"
     loose-envify "^1.1.0"
@@ -8800,9 +8802,9 @@ style-loader@^0.13.0:
   dependencies:
     loader-utils "^1.0.2"
 
-"styled-components@1.4.6 - 3", styled-components@^3.2.5:
-  version "3.2.5"
-  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-3.2.5.tgz#b5d5d7d618ab240ff10602b5ca5886b8db3d0a0d"
+styled-components@^3.3.3:
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-3.3.3.tgz#09e702055ab11f7a8eab8229b1c0d0b855095686"
   dependencies:
     buffer "^5.0.3"
     css-to-react-native "^2.0.3"
@@ -8810,6 +8812,7 @@ style-loader@^0.13.0:
     hoist-non-react-statics "^2.5.0"
     is-plain-object "^2.0.1"
     prop-types "^15.5.4"
+    react-is "^16.3.1"
     stylis "^3.5.0"
     stylis-rule-sheet "^0.0.10"
     supports-color "^3.2.3"
