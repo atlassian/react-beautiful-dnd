@@ -1,10 +1,10 @@
 // @flow
-import type { Action } from '../store-types';
+import type { Action, Dispatch } from '../store-types';
 import type { StyleMarshal } from '../../view/style-marshal/style-marshal-types';
 
-export default (marshal: StyleMarshal) => () => (next: Action => mixed) => (
+export default (marshal: StyleMarshal) => () => (next: Dispatch) => (
   action: Action,
-): mixed => {
+): any => {
   if (action.type === 'INITIAL_PUBLISH' || action.type === 'PUBLISH') {
     marshal.dragging();
   }

@@ -255,7 +255,11 @@ describe('update', () => {
       // move up into the original position
       store.dispatch(moveUp());
       // no current displacement
-      expect(store.getState().impact.movement.displaced).toEqual([]);
+      {
+        const current: State = store.getState();
+        invariant(current.impact);
+        expect(current.impact.movement.displaced).toEqual([]);
+      }
       const lastUpdate: DragUpdate = {
         draggableId: preset.inHome2.descriptor.id,
         type: preset.home.descriptor.type,

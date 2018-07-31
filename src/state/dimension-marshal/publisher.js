@@ -33,8 +33,8 @@ type Staging = {|
 |};
 
 type Callbacks = {|
-  publish: (args: Published) => void,
-  collectionStarting: () => void,
+  publish: (args: Published) => mixed,
+  collectionStarting: () => mixed,
 |};
 
 type Args = {|

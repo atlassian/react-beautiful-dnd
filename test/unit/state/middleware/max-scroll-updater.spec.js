@@ -12,7 +12,7 @@ import {
   moveRight,
 } from '../../../../src/state/action-creators';
 import type { Store } from '../../../../src/state/store-types';
-import type { Viewport } from '../../../../src/types';
+import type { Viewport, State } from '../../../../src/types';
 import getMaxScroll from '../../../../src/state/get-max-scroll';
 import { initialPublishArgs } from '../../../utils/preset-action-args';
 import getViewport from '../../../../src/view/window/get-viewport';
@@ -62,7 +62,11 @@ it('should update if the max scroll position has changed and the destination has
   // now dragging
   store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
-  expect(store.getState().isDragging).toBe(true);
+  {
+    const current: State = store.getState();
+    invariant(current.isDragging);
+    expect(current.isDragging).toBe(true);
+  }
   mock.mockClear();
 
   // change in scroll size
@@ -89,7 +93,11 @@ it('should not update if the max scroll position has not changed and destination
   // now dragging
   store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
-  expect(store.getState().isDragging).toBe(true);
+  {
+    const current: State = store.getState();
+    invariant(current.isDragging);
+    expect(current.isDragging).toBe(true);
+  }
   mock.mockClear();
 
   // no change in scroll size but there is a change in destination
@@ -106,7 +114,11 @@ it('should not update if the destination has not changed (even if the scroll siz
   // now dragging
   store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
-  expect(store.getState().isDragging).toBe(true);
+  {
+    const current: State = store.getState();
+    invariant(current.isDragging);
+    expect(current.isDragging).toBe(true);
+  }
   mock.mockClear();
 
   // change in scroll size

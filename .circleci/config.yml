@@ -30,6 +30,14 @@ jobs:
           name: Install Dependencies
           command: yarn
 
+      - run:
+          name: Validate Yarn Lock File
+          command: |
+              if [ -n "$(git status -s)" ]; then
+                echo "Your yarn.lock was modified during install, please check in any changes to the yarn.lock file"
+                exit 1
+              fi
+
       # Save the node_modules cache
       - save_cache:
           paths:
@@ -83,13 +91,20 @@ jobs:
 
       - run:
           name: Jest Suite
-          command: yarn storybook > .storybook-out & yarn test --testResultsProcessor="jest-junit"
+          command: yarn test
           environment:
-            JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
+            JEST_JUNIT_OUTPUT: "test-reports/junit/js-test-results.xml"
 
       - store_test_results:
-          path: reports/junit
+          path: test-reports/junit
 
+      - run:
+          name: Browser Suite
+          command: node tools/testHarness.js yarn test:browser
+
+      - store_test_results:
+          path: test-reports/browser
+      
       - store_artifacts:
           path: .storybook-out
           destination: storybook-out

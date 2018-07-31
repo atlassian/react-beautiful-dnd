@@ -101,10 +101,10 @@ export type DimensionMarshal = {|
 |};
 
 export type Callbacks = {|
-  publish: (args: Published) => void,
-  updateDroppableScroll: (args: UpdateDroppableScrollArgs) => void,
-  updateDroppableIsEnabled: (args: UpdateDroppableIsEnabledArgs) => void,
-  collectionStarting: () => void,
+  collectionStarting: () => mixed,
+  publish: (args: Published) => mixed,
+  updateDroppableScroll: (args: UpdateDroppableScrollArgs) => mixed,
+  updateDroppableIsEnabled: (args: UpdateDroppableIsEnabledArgs) => mixed,
   // can a droppable have Draggables added or removed from it during a drag
   // TODO: get this working
   // canAddOrRemoveDuringDrag: (id: DroppableId) => boolean,
