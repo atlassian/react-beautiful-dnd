@@ -1,11 +1,11 @@
 // @flow
 import { drop } from '../action-creators';
 import type { State } from '../../types';
-import type { MiddlewareStore, Action } from '../store-types';
+import type { MiddlewareStore, Dispatch, Action } from '../store-types';
 
-export default (store: MiddlewareStore) => (next: Action => mixed) => (
+export default (store: MiddlewareStore) => (next: Dispatch) => (
   action: Action,
-): mixed => {
+): any => {
   // Always let the action go through first
   next(action);
 

@@ -33,8 +33,8 @@ const getScrollDisplacement = (
   withDroppableDisplacement(droppable, viewport.scroll.diff.displacement);
 
 export default ({ getState, dispatch }: MiddlewareStore) => (
-  next: Action => mixed,
-) => (action: Action): mixed => {
+  next: Dispatch,
+) => (action: Action): any => {
   if (action.type !== 'DROP') {
     next(action);
     return;
