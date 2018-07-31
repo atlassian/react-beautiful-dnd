@@ -37,8 +37,8 @@ export type Provided = {|
 |};
 
 type Callbacks = {|
-  publish: (args: Publish) => void,
-  collectionStarting: () => void,
+  publish: (args: Publish) => mixed,
+  collectionStarting: () => mixed,
 |};
 
 type Args = {|

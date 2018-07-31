@@ -106,8 +106,8 @@ export type DimensionMarshal = {|
 |};
 
 export type Callbacks = {|
-  publish: (args: Publish) => void,
-  updateDroppableScroll: (args: UpdateDroppableScrollArgs) => void,
-  updateDroppableIsEnabled: (args: UpdateDroppableIsEnabledArgs) => void,
-  collectionStarting: () => void,
+  collectionStarting: () => mixed,
+  publish: (args: Publish) => mixed,
+  updateDroppableScroll: (args: UpdateDroppableScrollArgs) => mixed,
+  updateDroppableIsEnabled: (args: UpdateDroppableIsEnabledArgs) => mixed,
 |};

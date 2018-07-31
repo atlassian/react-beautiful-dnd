@@ -2,11 +2,11 @@
 import invariant from 'tiny-invariant';
 import { completeDrop } from '../action-creators';
 import type { State } from '../../types';
-import type { Store, Action } from '../store-types';
+import type { MiddlewareStore, Action, Dispatch } from '../store-types';
 
-export default (store: Store) => (next: Action => mixed) => (
+export default (store: MiddlewareStore) => (next: Dispatch) => (
   action: Action,
-): mixed => {
+): any => {
   if (action.type !== 'DROP_ANIMATION_FINISHED') {
     next(action);
     return;
