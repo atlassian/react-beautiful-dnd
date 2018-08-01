@@ -43,7 +43,7 @@ We have created some basic examples on `codesandbox` for you to play with direct
 
 ## Get started 🤩
 
-We have created [a free course on `egghead.io`](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd) to help you to get started with `react-beautiful-dnd` as quickly as possible.
+We have created [a free course on `egghead.io`](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd) to help people get started with `react-beautiful-dnd` as quickly as possible
 
 ![Course logo](https://user-images.githubusercontent.com/2182637/43372837-8c72d3f8-93e8-11e8-9d92-a82adde7718f.png)
 
