@@ -24,7 +24,7 @@ import type {
   DimensionMap,
   DraggableDimension,
 } from '../../types';
-import type { MiddlewareStore, Action } from '../store-types';
+import type { MiddlewareStore, Dispatch, Action } from '../store-types';
 
 const getScrollDisplacement = (
   droppable: DroppableDimension,
