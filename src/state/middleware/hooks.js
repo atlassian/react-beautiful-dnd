@@ -239,14 +239,20 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
   return (store: MiddlewareStore) => (next: Dispatch) => (
     action: Action,
   ): any => {
-    // letting the reducer update first
-    next(action);
-
     if (action.type === 'INITIAL_PUBLISH') {
       const critical: Critical = action.payload.critical;
+      // Need to fire the onDragStart hook before the reducer is updated and the
+      // This is so consumers can do work in their onDragStart function
+      // before we have applied any styles to anything,
+      // such as position: fixed to the dragging item.
+      // This is important for use cases such as a table which uses dimension locking
       publisher.start(critical);
+      next(action);
       return;
     }
+
+    // All other hooks can fire after we have updated our connected components
+    next(action);
 
     // Drag end
     if (action.type === 'DROP_COMPLETE') {
