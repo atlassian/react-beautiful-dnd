@@ -16,7 +16,12 @@ import type {
   OnDragUpdateHook,
   OnDragEndHook,
 } from '../../types';
-import type { Action, Middleware, MiddlewareStore } from '../store-types';
+import type {
+  Action,
+  Middleware,
+  MiddlewareStore,
+  Dispatch,
+} from '../store-types';
 
 type AnyHookFn = OnDragStartHook | OnDragUpdateHook | OnDragEndHook;
 type AnyHookData = DragStart | DragUpdate | DropResult;
