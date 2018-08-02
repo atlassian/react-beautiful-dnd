@@ -1,5 +1,5 @@
 // @flow
-
+import invariant from 'tiny-invariant';
 import type {
   DragImpact,
   DimensionMap,
@@ -94,6 +94,17 @@ export default ({
     previousImpact: getHomeImpact(state.critical, dimensions),
     viewport: state.viewport,
   });
+
+  const isOrphaned: boolean = Boolean(
+    state.autoScrollMode === 'JUMP' &&
+      state.impact.destination &&
+      !impact.destination,
+  );
+
+  invariant(
+    !isOrphaned,
+    'Dragging item no longer has a valid destination after a dynamic update. This is not supported',
+  );
 
   timings.finish(timingsKey);
 
