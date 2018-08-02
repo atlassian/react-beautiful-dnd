@@ -82,6 +82,22 @@ export default ({
           oldScrollable.frameClient,
           newScrollable.frameClient,
         );
+
+        const isFrameEqual: boolean =
+          oldScrollable.frameClient.marginBox.height ===
+            newScrollable.frameClient.marginBox.height &&
+          oldScrollable.frameClient.marginBox.width ===
+            newScrollable.frameClient.marginBox.width;
+
+        if (!isFrameEqual) {
+          console.error(
+            'frame has changed',
+            'old',
+            oldScrollable.frameClient.borderBox.height,
+            'new',
+            newScrollable.frameClient.borderBox.height,
+          );
+        }
       }
 
       const client: BoxModel = createBox({
@@ -91,6 +107,7 @@ export default ({
         padding: provided.client.padding,
       });
 
+      // TODO: should the frameClient be changing at all!?
       const frameClient: BoxModel = createBox({
         borderBox: expandBorderBox(
           oldScrollable.frameClient.borderBox,

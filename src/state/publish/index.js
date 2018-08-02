@@ -110,6 +110,9 @@ export default ({
     'Dragging item no longer has a valid destination after a dynamic update. This is not supported',
   );
 
+  // TODO: move into move visually pleasing position if using
+  // JUMP auto scrolling
+
   timings.finish(timingsKey);
 
   const draggingState: DraggingState = {

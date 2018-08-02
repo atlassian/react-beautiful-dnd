@@ -72,25 +72,20 @@ During a drag, `react-beautiful-dnd` supports the addition or removal a `Draggab
 }
 ```
 
-#### Drag ends while we are patching the virual model
+#### Drag end while we are patching the virtual model
 
 If a drag ends after a `Draggable` has been added or removed, but we have not finished collecting and patching the _virtual dimension model_ then we will delay the drop until the patch is finished. This is usually only a single frame. The `onDropEnd` callback will be called with a `DropResult` that is correct after the patch.
 
 ### Limitations
 
-- The change cannot shift the placement of any other `Draggable` or `Droppable` component
-- The change cannot change the size of the `body`
-- You cannot change the size of any `Draggable` from the time a drag starts
+- The addition or removal of a `Draggable` cannot shift the placement of any other `Droppable` component.
+- The change cannot impact the size of the `body`
 
 ## Unsupported: everything else
 
-For the sake of clarity: here are some behaviors that are not supported during a drag:
+For the sake of clarity, here are some behaviors that are not supported during a drag:
 
-- Changing the dimensions of a `Draggable` during a drag
+- Changing the size of a `Draggable` during a drag
 - Adding or removing a `Droppable`
 - Adding or removing a `Draggable` to a `Droppable` that does not have a scroll container
 - Adding or removing a `Draggable` to a `Droppable` that is not of the same `type` as the dragging item
-
-```
-
-```
