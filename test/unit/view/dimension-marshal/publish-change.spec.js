@@ -228,7 +228,7 @@ describe('removals', () => {
   });
 });
 
-describe('cancelling', () => {
+describe('cancelling mid publish', () => {
   it('should cancel any pending collections', () => {
     const callbacks: Callbacks = getCallbacksStub();
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);

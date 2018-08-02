@@ -20,6 +20,7 @@ import getDragPositions from './get-drag-positions';
 import changeDroppableSubjectSize from './change-droppable-subject-size';
 import adjustAdditionsForScrollChanges from './adjust-additions-for-scroll-changes';
 import getDraggableMap from './get-draggable-map';
+import withNoAnimatedDisplacement from './with-no-animated-displacement';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -86,14 +87,16 @@ export default ({
   });
 
   // Get the impact of all of our changes
-  const impact: DragImpact = getDragImpact({
-    pageBorderBoxCenter: current.page.borderBoxCenter,
-    draggable: dimensions.draggables[state.critical.draggable.id],
-    draggables: dimensions.draggables,
-    droppables: dimensions.droppables,
-    previousImpact: getHomeImpact(state.critical, dimensions),
-    viewport: state.viewport,
-  });
+  const impact: DragImpact = withNoAnimatedDisplacement(
+    getDragImpact({
+      pageBorderBoxCenter: current.page.borderBoxCenter,
+      draggable: dimensions.draggables[state.critical.draggable.id],
+      draggables: dimensions.draggables,
+      droppables: dimensions.droppables,
+      previousImpact: getHomeImpact(state.critical, dimensions),
+      viewport: state.viewport,
+    }),
+  );
 
   const isOrphaned: boolean = Boolean(
     state.autoScrollMode === 'JUMP' &&
@@ -101,6 +104,7 @@ export default ({
       !impact.destination,
   );
 
+  // TODO: try and recover?
   invariant(
     !isOrphaned,
     'Dragging item no longer has a valid destination after a dynamic update. This is not supported',
