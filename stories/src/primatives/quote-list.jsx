@@ -54,6 +54,7 @@ type Props = {|
   quotes: Quote[],
   title?: string,
   internalScroll?: boolean,
+  scrollContainerStyle?: Object,
   isDropDisabled?: boolean,
   style?: Object,
   // may not be provided - and might be null
@@ -123,6 +124,7 @@ export default class QuoteList extends React.Component<Props> {
     const {
       ignoreContainerClipping,
       internalScroll,
+      scrollContainerStyle,
       isDropDisabled,
       listId,
       listType,
@@ -150,6 +152,7 @@ export default class QuoteList extends React.Component<Props> {
           >
             {internalScroll ? (
               <ScrollContainer
+                style={scrollContainerStyle}
                 onScroll={e => console.log('scroll', e.target.scrollTop)}
               >
                 <InnerList

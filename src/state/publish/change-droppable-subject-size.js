@@ -21,7 +21,8 @@ import type {
   Scrollable,
 } from '../../types';
 
-const expandBorderBox = (old: Rect, fresh: Rect): Spacing => ({
+const adjustBorderBoxSize = (old: Rect, fresh: Rect): Spacing => ({
+  // top and left positions cannot change
   top: old.top,
   left: old.left,
   // this is the main logic of this file - the size adjustment
@@ -75,6 +76,7 @@ export default ({
       const newClient: BoxModel = provided.client;
       const oldScrollable: Scrollable = getClosestScrollable(existing);
       const newScrollable: Scrollable = getClosestScrollable(provided);
+
       // Extra checks to help with development
       if (process.env.NODE_ENV !== 'production') {
         throwIfSpacingChange(existing.client, provided.client);
@@ -84,46 +86,36 @@ export default ({
         );
 
         const isFrameEqual: boolean =
-          oldScrollable.frameClient.marginBox.height ===
-            newScrollable.frameClient.marginBox.height &&
-          oldScrollable.frameClient.marginBox.width ===
-            newScrollable.frameClient.marginBox.width;
+          oldScrollable.frameClient.borderBox.height ===
+            newScrollable.frameClient.borderBox.height &&
+          oldScrollable.frameClient.borderBox.width ===
+            newScrollable.frameClient.borderBox.width;
 
-        if (!isFrameEqual) {
-          console.error(
-            'frame has changed',
-            'old',
-            oldScrollable.frameClient.borderBox.height,
-            'new',
-            newScrollable.frameClient.borderBox.height,
-          );
-        }
+        invariant(
+          isFrameEqual,
+          'The width and height of your Droppable scroll container cannot change when adding or removing Draggables during a drag',
+        );
       }
 
       const client: BoxModel = createBox({
-        borderBox: expandBorderBox(oldClient.borderBox, newClient.borderBox),
-        margin: provided.client.margin,
-        border: provided.client.border,
-        padding: provided.client.padding,
-      });
-
-      // TODO: should the frameClient be changing at all!?
-      const frameClient: BoxModel = createBox({
-        borderBox: expandBorderBox(
-          oldScrollable.frameClient.borderBox,
-          newScrollable.frameClient.borderBox,
+        borderBox: adjustBorderBoxSize(
+          oldClient.borderBox,
+          newClient.borderBox,
         ),
-        margin: newScrollable.frameClient.margin,
-        border: newScrollable.frameClient.border,
-        padding: newScrollable.frameClient.padding,
+        margin: oldClient.margin,
+        border: oldClient.border,
+        padding: oldClient.padding,
       });
 
       const closest: Closest = {
-        client: frameClient,
-        page: withScroll(frameClient, initialWindowScroll),
-        scrollSize: newScrollable.scrollSize,
-        scroll: oldScrollable.scroll.initial,
+        // not allowing a change to the scrollable frame size during a drag
+        client: oldScrollable.frameClient,
+        page: withScroll(oldScrollable.frameClient, initialWindowScroll),
         shouldClipSubject: oldScrollable.shouldClipSubject,
+        // the scroll size can change during a drag
+        scrollSize: newScrollable.scrollSize,
+        // using the initial scroll point (this will be adjusted)
+        scroll: oldScrollable.scroll.initial,
       };
 
       const withSizeChanged: DroppableDimension = getDroppableDimension({

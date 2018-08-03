@@ -248,6 +248,12 @@ export default (state: State = idle, action: Action): State => {
       return state;
     }
 
+    // We will be updating the scroll in response to dynamic changes
+    // manually on the droppable so we can ignore this change
+    if (state.phase === 'COLLECTING') {
+      return state;
+    }
+
     invariant(
       isMovementAllowed(state),
       `${action.type} not permitted in phase ${state.phase}`,

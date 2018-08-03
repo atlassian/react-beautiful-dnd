@@ -1,6 +1,12 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { createBox, type BoxModel, withScroll } from 'css-box-model';
+import {
+  createBox,
+  withScroll,
+  type BoxModel,
+  type Spacing,
+  type Position,
+} from 'css-box-model';
 import type {
   DropPendingState,
   DraggingState,
@@ -9,7 +15,6 @@ import type {
   DraggableDimension,
   Published,
   Scrollable,
-  Position,
 } from '../../../../src/types';
 import {
   getPreset,
@@ -17,12 +22,10 @@ import {
   getClosestScrollable,
   addDroppable,
 } from '../../../utils/dimension';
-import { isEqual, expandByPosition } from '../../../../src/state/spacing';
+import { isEqual, noSpacing } from '../../../../src/state/spacing';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import publish from '../../../../src/state/publish';
 import { empty } from './util';
-import { getDroppableDimension } from '../../../../src/state/droppable-dimension';
-import { expand } from '../../../../node_modules/rxjs/operators';
 
 const preset = getPreset();
 const state = getStatePreset();
@@ -46,27 +49,20 @@ const added1: DraggableDimension = {
   },
 };
 
-const expandBox = (box: BoxModel, point: Position): BoxModel =>
+const adjustBox = (box: BoxModel, point: Position): BoxModel =>
   createBox({
-    borderBox: expandByPosition(box.borderBox, point),
+    borderBox: {
+      // top and left cannot change as a result of this adjustment
+      top: box.borderBox.top,
+      left: box.borderBox.left,
+      // only growing in one direction
+      right: box.borderBox.right + point.x,
+      bottom: box.borderBox.bottom + point.y,
+    },
     margin: box.margin,
     border: box.border,
     padding: box.padding,
   });
-
-const scrollableHomeWithAdjustment: DroppableDimension = {
-  ...scrollableHome,
-  viewport: {
-    ...scrollableHome.viewport,
-    closestScrollable: {
-      ...getClosestScrollable(scrollableHome),
-      frameClient: expandBox(getClosestScrollable(scrollableHome).frameClient, {
-        x: 0,
-        y: 10,
-      }),
-    },
-  },
-};
 
 // $FlowFixMe - wrong type
 const original: CollectingState = addDroppable(
@@ -76,6 +72,17 @@ const original: CollectingState = addDroppable(
 );
 
 it('should adjust a subject in response to a change', () => {
+  const expandedSubjectClient: BoxModel = adjustBox(scrollableHome.client, {
+    x: 1,
+    y: 1,
+  });
+
+  const scrollableHomeWithAdjustment: DroppableDimension = {
+    ...scrollableHome,
+    client: expandedSubjectClient,
+    page: withScroll(expandedSubjectClient, preset.windowScroll),
+  };
+
   const published: Published = {
     ...empty,
     additions: [added1],
@@ -92,7 +99,8 @@ it('should adjust a subject in response to a change', () => {
   const postUpdateHome: DroppableDimension =
     result.dimensions.droppables[scrollableHome.descriptor.id];
 
-  // droppable subject has changed
+  // droppable client subject has changed
+  expect(postUpdateHome.client).toEqual(expandedSubjectClient);
   expect(postUpdateHome.client).toEqual(scrollableHomeWithAdjustment.client);
 
   // frame has not changed
@@ -102,16 +110,22 @@ it('should adjust a subject in response to a change', () => {
 });
 
 it('should throw if the frame size changes', () => {
-  const expandedClient: BoxModel = createBox({
-    borderBox: expandByPosition(preset.home.client.borderBox, { x: 1, y: 1 }),
-    margin: preset.home.client.margin,
-    border: preset.home.client.border,
-    padding: preset.home.client.padding,
-  });
   const withFrameSizeChanged: DroppableDimension = {
     ...scrollableHome,
-    client: expandedClient,
-    page: withScroll(expandedClient, preset.windowScroll),
+    viewport: {
+      ...scrollableHome.viewport,
+      closestScrollable: {
+        ...getClosestScrollable(scrollableHome),
+        // changing the size of the frame
+        frameClient: adjustBox(
+          getClosestScrollable(scrollableHome).frameClient,
+          {
+            x: 0,
+            y: 10,
+          },
+        ),
+      },
+    },
   };
   const published: Published = {
     ...empty,
@@ -124,7 +138,115 @@ it('should throw if the frame size changes', () => {
       state: original,
       published,
     }),
-  ).toThrow('Cannot change the size of a Droppable frame during a drag');
+  ).toThrow(
+    'The width and height of your Droppable scroll container cannot change when adding or removing Draggables during a drag',
+  );
 });
 
-it('should throw if any spacing changes', () => {});
+it('should throw if any spacing changes to the client', () => {
+  const margin: Spacing = scrollableHome.client.margin;
+  const padding: Spacing = scrollableHome.client.padding;
+  const border: Spacing = scrollableHome.client.border;
+
+  const withNewSpacing: BoxModel[] = [
+    createBox({
+      borderBox: scrollableHome.client.borderBox,
+      margin: noSpacing,
+      padding,
+      border,
+    }),
+    createBox({
+      borderBox: scrollableHome.client.borderBox,
+      margin,
+      padding,
+      border: noSpacing,
+    }),
+    createBox({
+      borderBox: scrollableHome.client.borderBox,
+      margin,
+      padding: noSpacing,
+      border,
+    }),
+  ];
+
+  withNewSpacing.forEach((newClient: BoxModel) => {
+    const scrollableHomeWithAdjustment: DroppableDimension = {
+      ...scrollableHome,
+      client: newClient,
+      page: withScroll(newClient, preset.windowScroll),
+    };
+
+    const published: Published = {
+      ...empty,
+      additions: [added1],
+      modified: [scrollableHomeWithAdjustment],
+    };
+
+    expect(() =>
+      publish({
+        state: original,
+        published,
+      }),
+    ).toThrow(
+      /Cannot change the (margin|padding|border) of a Droppable during a drag/,
+    );
+  });
+});
+
+it('should throw if any spacing changes to the frame', () => {
+  const scrollable: Scrollable = getClosestScrollable(scrollableHome);
+  const frameClient: BoxModel = scrollable.frameClient;
+  const margin: Spacing = frameClient.margin;
+  const padding: Spacing = frameClient.padding;
+  const border: Spacing = frameClient.border;
+
+  const withNewFrameSpacing: BoxModel[] = [
+    createBox({
+      borderBox: frameClient.borderBox,
+      margin: noSpacing,
+      padding,
+      border,
+    }),
+    createBox({
+      borderBox: frameClient.borderBox,
+      margin,
+      padding,
+      border: noSpacing,
+    }),
+    createBox({
+      borderBox: frameClient.borderBox,
+      margin,
+      padding: noSpacing,
+      border,
+    }),
+  ];
+
+  withNewFrameSpacing.forEach((withSpacing: BoxModel) => {
+    const withFrameSizeChanged: DroppableDimension = {
+      ...scrollableHome,
+      viewport: {
+        ...scrollableHome.viewport,
+        closestScrollable: {
+          ...getClosestScrollable(scrollableHome),
+          // changing the size of the frame
+          frameClient: withSpacing,
+        },
+      },
+    };
+
+    const published: Published = {
+      ...empty,
+      additions: [added1],
+      modified: [withFrameSizeChanged],
+    };
+
+    expect(() =>
+      publish({
+        state: original,
+        published,
+      }),
+    ).toThrow(
+      /Cannot change the (margin|padding|border) of a Droppable during a drag/,
+    );
+  });
+});

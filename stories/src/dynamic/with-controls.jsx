@@ -27,22 +27,26 @@ class Controls extends React.Component<{|
           <li>
             <strong>
               <kbd>b</kbd>
-            </strong>: add to <strong>start</strong> of list
+            </strong>
+            : add to <strong>start</strong> of list
           </li>
           <li>
             <strong>
               <kbd>a</kbd>
-            </strong>: add to <strong>end</strong> of list
+            </strong>
+            : add to <strong>end</strong> of list
           </li>
           <li>
             <strong>
               <kbd>s</kbd>
-            </strong>: remove from <strong>start</strong> of list
+            </strong>
+            : remove from <strong>start</strong> of list
           </li>
           <li>
             <strong>
               <kbd>d</kbd>
-            </strong>: remove from <strong>end</strong> of list
+            </strong>
+            : remove from <strong>end</strong> of list
           </li>
         </ul>
         <br />
@@ -239,6 +243,8 @@ export default class WithControls extends React.Component<*, State> {
               key={key}
               listId={key}
               quotes={quoteMap[key]}
+              style={{ border: '3px solid blue', paddingBottom: grid }}
+              scrollContainerStyle={{ height: 300, border: '3px solid green' }}
               internalScroll
             />
           ))}
