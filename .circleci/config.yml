@@ -30,6 +30,14 @@ jobs:
           name: Install Dependencies
           command: yarn
 
+      - run: 
+          name: Update Lockfile
+          command: $(yarn global bin)/greenkeeper-lockfile-update
+
+      - run:
+          name: Upload Lockfile
+          command: $(yarn global bin)/greenkeeper-lockfile-upload
+
       - run:
           name: Validate Yarn Lock File
           command: |
@@ -48,14 +56,6 @@ jobs:
           paths:
             - website/node_modules
           key: v1-website-dependencies-{{ checksum "website/yarn.lock" }}
-
-      - run: 
-          name: Update Lockfile
-          command: $(yarn global bin)/greenkeeper-lockfile-update
-
-      - run:
-          name: Upload Lockfile
-          command: $(yarn global bin)/greenkeeper-lockfile-upload
   validate:
     docker:
       - image: circleci/node:8.11.3-browsers
