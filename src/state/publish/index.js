@@ -17,10 +17,11 @@ import * as timings from '../../debug/timings';
 import getDragImpact from '../get-drag-impact';
 import getHomeImpact from '../get-home-impact';
 import getDragPositions from './get-drag-positions';
-import adjustModifiedDroppable from './adjust-modified-droppable';
+import adjustModifiedDroppables from './adjust-modified-droppables';
 import adjustAdditionsForScrollChanges from './adjust-additions-for-scroll-changes';
 import getDraggableMap from './get-draggable-map';
 import withNoAnimatedDisplacement from './with-no-animated-displacement';
+import { toDroppableMap } from '../dimension-structures';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -34,18 +35,22 @@ export default ({
   published,
 }: Args): DraggingState | DropPendingState => {
   timings.start(timingsKey);
-  // TODO: write validate that every removed draggable must have a removed droppable
-  const withShifted: Published = adjustAdditionsForScrollChanges({
-    published,
+
+  // Change the subject size and scroll of droppables
+  const withAdjusted: Published = adjustModifiedDroppables({
     droppables: state.dimensions.droppables,
-    viewport: state.viewport,
+    published,
+    initialWindowScroll: state.viewport.scroll.initial,
   });
 
-  // Change the client size of modified droppables
-  const droppables: DroppableDimensionMap = adjustModifiedDroppable({
-    droppables: state.dimensions.droppables,
-    modified: published.modified,
-    initialWindowScroll: state.viewport.scroll.initial,
+  const droppables: DroppableDimensionMap = toDroppableMap(
+    withAdjusted.modified,
+  );
+
+  // TODO: write validate that every removed draggable must have a removed droppable
+  const withShifted: Published = adjustAdditionsForScrollChanges({
+    published: withAdjusted,
+    viewport: state.viewport,
   });
 
   const patched: DimensionMap = {

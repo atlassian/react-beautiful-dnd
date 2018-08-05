@@ -6,7 +6,7 @@ import {
   type Position,
   type BoxModel,
 } from 'css-box-model';
-import { origin, add, subtract } from '../position';
+import { add } from '../position';
 import { toDroppableMap } from '../dimension-structures';
 import type {
   Published,
@@ -19,44 +19,11 @@ import type {
 } from '../../types';
 
 type Args = {|
-  droppables: DroppableDimensionMap,
   published: Published,
   viewport: Viewport,
 |};
 
-type ChangeArgs = {|
-  original: DroppableDimension,
-  modified: DroppableDimension,
-|};
-
-const getDroppableScrollChange = ({
-  original,
-  modified,
-}: ChangeArgs): Position => {
-  const oldScrollable: ?Scrollable = original.viewport.closestScrollable;
-
-  // original droppable was not scrollable
-  if (!oldScrollable) {
-    return origin;
-  }
-
-  // the new scollable will have the latest scroll - which can be different
-  // from the current scroll as stored in the droppable due to pending scroll changes
-  const newScrollable: ?Scrollable = modified.viewport.closestScrollable;
-  invariant(
-    newScrollable,
-    'Cannot get droppable scroll change from modified droppable',
-  );
-
-  const diff: Position = subtract(
-    newScrollable.scroll.current,
-    oldScrollable.scroll.initial,
-  );
-
-  return diff;
-};
-
-export default ({ published, droppables, viewport }: Args): Published => {
+export default ({ published, viewport }: Args): Published => {
   // We need to adjust collected draggables so that they
   // match the model we had when the drag started.
   // When a draggable is dynamically collected it does not have
@@ -73,13 +40,12 @@ export default ({ published, droppables, viewport }: Args): Published => {
   const shifted: DraggableDimension[] = published.additions.map(
     (draggable: DraggableDimension): DraggableDimension => {
       const droppableId: DroppableId = draggable.descriptor.droppableId;
-      const original: DroppableDimension = droppables[droppableId];
       const modified: DroppableDimension = modifiedMap[droppableId];
+      const closest: ?Scrollable = modified.viewport.closestScrollable;
 
-      const droppableScrollChange: Position = getDroppableScrollChange({
-        original,
-        modified,
-      });
+      invariant(closest);
+
+      const droppableScrollChange: Position = closest.scroll.diff.value;
 
       const totalChange: Position = add(
         windowScrollChange,

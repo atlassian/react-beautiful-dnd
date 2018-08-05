@@ -9,7 +9,6 @@ import {
   type Rect,
 } from 'css-box-model';
 import { isEqual } from '../spacing';
-import { toDroppableMap } from '../dimension-structures';
 import {
   getDroppableDimension,
   type Closest,
@@ -19,6 +18,7 @@ import type {
   DroppableDimension,
   DroppableDimensionMap,
   Scrollable,
+  Published,
 } from '../../types';
 
 const adjustBorderBoxSize = (old: Rect, fresh: Rect): Spacing => ({
@@ -50,25 +50,25 @@ const getClosestScrollable = (droppable: DroppableDimension): Scrollable => {
 };
 
 type Args = {|
+  published: Published,
   droppables: DroppableDimensionMap,
-  modified: DroppableDimension[],
   initialWindowScroll: Position,
 |};
 
 export default ({
+  published,
   droppables,
-  modified,
   initialWindowScroll,
-}: Args): DroppableDimensionMap => {
+}: Args): Published => {
   // dynamically adjusting the client subject and page subject
   // of a droppable in response to dynamic additions and removals
 
   // No existing droppables modified
-  if (!modified.length) {
-    return droppables;
+  if (!published.modified.length) {
+    return published;
   }
 
-  const changed: DroppableDimension[] = modified.map(
+  const adjusted: DroppableDimension[] = published.modified.map(
     (provided: DroppableDimension): DroppableDimension => {
       const existing: ?DroppableDimension = droppables[provided.descriptor.id];
       invariant(existing, 'Could not locate droppable in existing droppables');
@@ -137,9 +137,9 @@ export default ({
     },
   );
 
-  const result: DroppableDimensionMap = {
-    ...droppables,
-    ...toDroppableMap(changed),
+  const result: Published = {
+    ...published,
+    modified: adjusted,
   };
 
   return result;
