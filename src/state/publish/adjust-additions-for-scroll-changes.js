@@ -54,24 +54,6 @@ const getDroppableScrollChange = ({
   );
 
   return diff;
-
-  // TODO: the shift is wrong as it does not account for the additional shift
-  // caused by the bulk add of additions!
-  // Going to try to recapture the droppable
-
-  // if (isEqual(scrollable.scroll.diff.value, origin)) {
-  //   return origin;
-  // }
-
-  // const size: Position = patch(
-  //   droppable.axis.line,
-  //   draggable.client.marginBox[droppable.axis.size],
-  // );
-
-  // // the scroll of the droppable has been impacted by the addition
-  // return add(scrollable.scroll.diff.value, size);
-
-  // return oldScrollable.scroll.diff.value;
 };
 
 export default ({ published, droppables, viewport }: Args): Published => {
