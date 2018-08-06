@@ -46,7 +46,7 @@ export default ({
 
   // not considering margin so that items move based on visible edges
   const isBeyondStartPosition: boolean =
-    currentCenter[axis.line] - originalCenter[axis.line] > 0;
+    currentCenter[axis.line] > originalCenter[axis.line];
 
   // TODO: if currentCenter === originalCenter can just abort
 
