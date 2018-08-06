@@ -22,8 +22,20 @@ import type {
 } from '../../types';
 import { vertical } from '../axis';
 
+const throwIfSpacingChange = (old: BoxModel, fresh: BoxModel) => {
+  if (process.env.NODE_ENV !== 'production') {
+    const getMessage = (type: string) =>
+      `Cannot change the ${type} of a Droppable during a drag`;
+    invariant(isEqual(old.margin, fresh.margin), getMessage('margin'));
+    invariant(isEqual(old.border, fresh.border), getMessage('border'));
+    invariant(isEqual(old.padding, fresh.padding), getMessage('padding'));
+  }
+};
+
 const adjustBorderBoxSize = (axis: Axis, old: Rect, fresh: Rect): Spacing => {
-  // Only allowing dynamic changes on the main axis
+  // Only allowing dynamic changes on the main axis.
+  // Dynamic changes can cause a scrollbar to appear or be removed during a drag
+  // Rather than accounting for that we lock the cross axis size
   const width: number = axis === vertical ? old.width : fresh.width;
   const height: number = axis === vertical ? fresh.height : old.height;
 
@@ -35,16 +47,6 @@ const adjustBorderBoxSize = (axis: Axis, old: Rect, fresh: Rect): Spacing => {
     right: old.left + width,
     bottom: old.top + height,
   };
-};
-
-const throwIfSpacingChange = (old: BoxModel, fresh: BoxModel) => {
-  if (process.env.NODE_ENV !== 'production') {
-    const getMessage = (type: string) =>
-      `Cannot change the ${type} of a Droppable during a drag`;
-    invariant(isEqual(old.margin, fresh.margin), getMessage('margin'));
-    invariant(isEqual(old.border, fresh.border), getMessage('border'));
-    invariant(isEqual(old.padding, fresh.padding), getMessage('padding'));
-  }
 };
 
 const getClosestScrollable = (droppable: DroppableDimension): Scrollable => {
