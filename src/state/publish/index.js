@@ -10,6 +10,7 @@ import type {
   Critical,
   DraggableId,
   DraggableDimension,
+  DroppableDimension,
   DroppableDimensionMap,
   DraggableDimensionMap,
 } from '../../types';
@@ -37,36 +38,38 @@ export default ({
   timings.start(timingsKey);
 
   // Change the subject size and scroll of droppables
-  const withAdjusted: Published = adjustModifiedDroppables({
-    droppables: state.dimensions.droppables,
-    published,
+  const adjusted: DroppableDimension[] = adjustModifiedDroppables({
+    modified: published.modified,
+    existing: state.dimensions.droppables,
     initialWindowScroll: state.viewport.scroll.initial,
   });
 
-  const droppables: DroppableDimensionMap = toDroppableMap(
-    withAdjusted.modified,
-  );
-
   // TODO: write validate that every removed draggable must have a removed droppable
-  const withShifted: Published = adjustAdditionsForScrollChanges({
-    published: withAdjusted,
+  const shifted: DraggableDimension[] = adjustAdditionsForScrollChanges({
+    additions: published.additions,
+    // using our already adjusted droppables as they have the correct scroll changes
+    modified: adjusted,
     viewport: state.viewport,
   });
 
   const patched: DimensionMap = {
     draggables: state.dimensions.draggables,
-    droppables,
+    droppables: {
+      ...state.dimensions.droppables,
+      ...toDroppableMap(adjusted),
+    },
   };
 
   // Add, remove and shift dimensions
   const draggables: DraggableDimensionMap = getDraggableMap({
     existing: patched,
-    published: withShifted,
+    additions: shifted,
+    removals: published.removals,
     initialWindowScroll: state.viewport.scroll.initial,
   });
 
   const dimensions: DimensionMap = {
-    droppables,
+    droppables: patched.droppables,
     draggables,
   };
 

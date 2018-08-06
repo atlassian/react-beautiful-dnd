@@ -2,6 +2,7 @@
 import {
   offset,
   withScroll,
+  createBox,
   type BoxModel,
   type Position,
 } from 'css-box-model';
@@ -64,3 +65,18 @@ export const scrollableForeign: DroppableDimension = makeScrollable(
 export const withScrollables = (state: CollectingState): CollectingState =>
   // $FlowFixMe - wrong types for these functions
   addDroppable(addDroppable(state, scrollableHome), scrollableForeign);
+
+export const adjustBox = (box: BoxModel, point: Position): BoxModel =>
+  createBox({
+    borderBox: {
+      // top and left cannot change as a result of this adjustment
+      top: box.borderBox.top,
+      left: box.borderBox.left,
+      // only growing in one direction
+      right: box.borderBox.right + point.x,
+      bottom: box.borderBox.bottom + point.y,
+    },
+    margin: box.margin,
+    border: box.border,
+    padding: box.padding,
+  });

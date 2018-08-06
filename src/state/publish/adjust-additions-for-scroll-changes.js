@@ -9,7 +9,6 @@ import {
 import { add } from '../position';
 import { toDroppableMap } from '../dimension-structures';
 import type {
-  Published,
   Viewport,
   DraggableDimension,
   DroppableDimension,
@@ -19,11 +18,16 @@ import type {
 } from '../../types';
 
 type Args = {|
-  published: Published,
+  additions: DraggableDimension[],
+  modified: DroppableDimension[],
   viewport: Viewport,
 |};
 
-export default ({ published, viewport }: Args): Published => {
+export default ({
+  additions,
+  modified: modifiedDroppables,
+  viewport,
+}: Args): DraggableDimension[] => {
   // We need to adjust collected draggables so that they
   // match the model we had when the drag started.
   // When a draggable is dynamically collected it does not have
@@ -35,9 +39,9 @@ export default ({ published, viewport }: Args): Published => {
 
   // Need to undo the displacement caused by window scroll changes
   const windowScrollChange: Position = viewport.scroll.diff.value;
-  const modifiedMap: DroppableDimensionMap = toDroppableMap(published.modified);
+  const modifiedMap: DroppableDimensionMap = toDroppableMap(modifiedDroppables);
 
-  const shifted: DraggableDimension[] = published.additions.map(
+  const shifted: DraggableDimension[] = additions.map(
     (draggable: DraggableDimension): DraggableDimension => {
       const droppableId: DroppableId = draggable.descriptor.droppableId;
       const modified: DroppableDimension = modifiedMap[droppableId];
@@ -68,10 +72,5 @@ export default ({ published, viewport }: Args): Published => {
     },
   );
 
-  const updated: Published = {
-    ...published,
-    additions: shifted,
-  };
-
-  return updated;
+  return shifted;
 };

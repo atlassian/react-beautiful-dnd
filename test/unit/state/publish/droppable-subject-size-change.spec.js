@@ -5,7 +5,6 @@ import {
   withScroll,
   type BoxModel,
   type Spacing,
-  type Position,
 } from 'css-box-model';
 import type {
   DropPendingState,
@@ -25,7 +24,7 @@ import {
 import { isEqual, noSpacing } from '../../../../src/state/spacing';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import publish from '../../../../src/state/publish';
-import { empty } from './util';
+import { empty, adjustBox } from './util';
 
 const preset = getPreset();
 const state = getStatePreset();
@@ -48,21 +47,6 @@ const added1: DraggableDimension = {
     id: 'added1',
   },
 };
-
-const adjustBox = (box: BoxModel, point: Position): BoxModel =>
-  createBox({
-    borderBox: {
-      // top and left cannot change as a result of this adjustment
-      top: box.borderBox.top,
-      left: box.borderBox.left,
-      // only growing in one direction
-      right: box.borderBox.right + point.x,
-      bottom: box.borderBox.bottom + point.y,
-    },
-    margin: box.margin,
-    border: box.border,
-    padding: box.padding,
-  });
 
 // $FlowFixMe - wrong type
 const original: CollectingState = addDroppable(

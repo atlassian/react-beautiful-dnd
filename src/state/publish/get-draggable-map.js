@@ -8,7 +8,6 @@ import {
 import type {
   Axis,
   DimensionMap,
-  Published,
   DraggableId,
   DroppableDimension,
   DraggableDimension,
@@ -20,7 +19,8 @@ import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 
 type Args = {|
   existing: DimensionMap,
-  published: Published,
+  additions: DraggableDimension[],
+  removals: DraggableId[],
   initialWindowScroll: Position,
 |};
 
@@ -35,7 +35,8 @@ type ShiftMap = {
 
 export default ({
   existing,
-  published,
+  additions: addedDraggables,
+  removals: removedDraggables,
   initialWindowScroll,
 }: Args): DraggableDimensionMap => {
   const droppables: DroppableDimension[] = toDroppableList(existing.droppables);
@@ -68,7 +69,7 @@ export default ({
 
     // phase 1: removals
     const removals: DraggableDimensionMap = toDraggableMap(
-      published.removals
+      removedDraggables
         .map((id: DraggableId): DraggableDimension => existing.draggables[id])
         // only care about the ones inside of this droppable
         .filter(
@@ -112,7 +113,7 @@ export default ({
     // phase 2: additions
     // We do this on the withRemovals array as the new index coming in already account for removals
 
-    const additions: DraggableDimension[] = published.additions.filter(
+    const additions: DraggableDimension[] = addedDraggables.filter(
       (draggable: DraggableDimension): boolean =>
         draggable.descriptor.droppableId === droppable.descriptor.id,
     );
@@ -196,11 +197,11 @@ export default ({
     // will overwrite existing draggables with shifted values if required
     ...shifted,
     // add the additions without modification - they are already in the right spot
-    ...toDraggableMap(published.additions),
+    ...toDraggableMap(addedDraggables),
   };
 
   // delete draggables that have been removed
-  published.removals.forEach((id: DraggableId) => {
+  removedDraggables.forEach((id: DraggableId) => {
     delete draggableMap[id];
   });
 

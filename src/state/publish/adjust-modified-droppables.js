@@ -18,7 +18,6 @@ import type {
   DroppableDimension,
   DroppableDimensionMap,
   Scrollable,
-  Published,
 } from '../../types';
 
 const adjustBorderBoxSize = (old: Rect, fresh: Rect): Spacing => ({
@@ -50,27 +49,28 @@ const getClosestScrollable = (droppable: DroppableDimension): Scrollable => {
 };
 
 type Args = {|
-  published: Published,
-  droppables: DroppableDimensionMap,
+  modified: DroppableDimension[],
+  existing: DroppableDimensionMap,
   initialWindowScroll: Position,
 |};
 
 export default ({
-  published,
-  droppables,
+  modified,
+  existing: existingDroppables,
   initialWindowScroll,
-}: Args): Published => {
+}: Args): DroppableDimension[] => {
   // dynamically adjusting the client subject and page subject
   // of a droppable in response to dynamic additions and removals
 
   // No existing droppables modified
-  if (!published.modified.length) {
-    return published;
+  if (!modified.length) {
+    return modified;
   }
 
-  const adjusted: DroppableDimension[] = published.modified.map(
+  const adjusted: DroppableDimension[] = modified.map(
     (provided: DroppableDimension): DroppableDimension => {
-      const existing: ?DroppableDimension = droppables[provided.descriptor.id];
+      const existing: ?DroppableDimension =
+        existingDroppables[provided.descriptor.id];
       invariant(existing, 'Could not locate droppable in existing droppables');
       const oldClient: BoxModel = existing.client;
       const newClient: BoxModel = provided.client;
@@ -114,7 +114,7 @@ export default ({
         shouldClipSubject: oldScrollable.shouldClipSubject,
         // the scroll size can change during a drag
         scrollSize: newScrollable.scrollSize,
-        // using the initial scroll point (this will be adjusted)
+        // using the initial scroll point
         scroll: oldScrollable.scroll.initial,
       };
 
@@ -129,18 +129,13 @@ export default ({
 
       const scrolled: DroppableDimension = scrollDroppable(
         withSizeChanged,
-        // TODO: scroll changes due to insertions..>?
-        newScrollable.scroll.initial,
+        // TODO: use .initial - i guess both work though..
+        newScrollable.scroll.current,
       );
 
       return scrolled;
     },
   );
 
-  const result: Published = {
-    ...published,
-    modified: adjusted,
-  };
-
-  return result;
+  return adjusted;
 };
