@@ -39,9 +39,10 @@ export default ({
 
   // Need to undo the displacement caused by window scroll changes
   const windowScrollChange: Position = viewport.scroll.diff.value;
+  // These modified droppables have already had their scroll changes correctly updated
   const modifiedMap: DroppableDimensionMap = toDroppableMap(modifiedDroppables);
 
-  const shifted: DraggableDimension[] = additions.map(
+  return additions.map(
     (draggable: DraggableDimension): DraggableDimension => {
       const droppableId: DroppableId = draggable.descriptor.droppableId;
       const modified: DroppableDimension = modifiedMap[droppableId];
@@ -71,6 +72,4 @@ export default ({
       return moved;
     },
   );
-
-  return shifted;
 };
