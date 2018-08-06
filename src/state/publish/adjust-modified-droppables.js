@@ -36,14 +36,15 @@ const adjustBorderBoxSize = (axis: Axis, old: Rect, fresh: Rect): Spacing => {
   // Only allowing dynamic changes on the main axis.
   // Dynamic changes can cause a scrollbar to appear or be removed during a drag
   // Rather than accounting for that we lock the cross axis size
-  const width: number = axis === vertical ? old.width : fresh.width;
-  const height: number = axis === vertical ? fresh.height : old.height;
+  const isVertical: boolean = axis === vertical;
+  const width: number = isVertical ? old.width : fresh.width;
+  const height: number = isVertical ? fresh.height : old.height;
 
   return {
     // top and left positions cannot change
     top: old.top,
     left: old.left,
-    // this is the main logic of this file - the size adjustment
+    // this is the main logic of this function - the size adjustment
     right: old.left + width,
     bottom: old.top + height,
   };
