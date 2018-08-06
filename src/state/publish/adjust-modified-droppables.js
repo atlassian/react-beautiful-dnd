@@ -18,16 +18,24 @@ import type {
   DroppableDimension,
   DroppableDimensionMap,
   Scrollable,
+  Axis,
 } from '../../types';
+import { vertical } from '../axis';
 
-const adjustBorderBoxSize = (old: Rect, fresh: Rect): Spacing => ({
-  // top and left positions cannot change
-  top: old.top,
-  left: old.left,
-  // this is the main logic of this file - the size adjustment
-  right: old.left + fresh.width,
-  bottom: old.top + fresh.height,
-});
+const adjustBorderBoxSize = (axis: Axis, old: Rect, fresh: Rect): Spacing => {
+  // Only allowing dynamic changes on the main axis
+  const width: number = axis === vertical ? old.width : fresh.width;
+  const height: number = axis === vertical ? fresh.height : old.height;
+
+  return {
+    // top and left positions cannot change
+    top: old.top,
+    left: old.left,
+    // this is the main logic of this file - the size adjustment
+    right: old.left + width,
+    bottom: old.top + height,
+  };
+};
 
 const throwIfSpacingChange = (old: BoxModel, fresh: BoxModel) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -99,6 +107,7 @@ export default ({
 
       const client: BoxModel = createBox({
         borderBox: adjustBorderBoxSize(
+          existing.axis,
           oldClient.borderBox,
           newClient.borderBox,
         ),
