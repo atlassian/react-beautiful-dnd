@@ -11,7 +11,6 @@ import type {
   DraggableId,
   DraggableDimension,
   DroppableDimension,
-  DroppableDimensionMap,
   DraggableDimensionMap,
 } from '../../types';
 import * as timings from '../../debug/timings';
