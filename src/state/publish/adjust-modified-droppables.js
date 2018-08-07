@@ -20,7 +20,6 @@ import type {
   Scrollable,
   Axis,
 } from '../../types';
-import { vertical } from '../axis';
 
 const throwIfSpacingChange = (old: BoxModel, fresh: BoxModel) => {
   if (process.env.NODE_ENV !== 'production') {
