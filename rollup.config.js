@@ -19,7 +19,7 @@ const excludeAllExternals = id => !id.startsWith('.') && !id.startsWith('/');
 const getBabelOptions = ({ useESModules }) => ({
   exclude: 'node_modules/**',
   runtimeHelpers: true,
-  plugins: [['@babel/transform-runtime', { useESModules }]],
+  plugins: [['@babel/transform-runtime', { corejs: 2, useESModules }]],
 });
 
 const snapshotArgs = (() => {
