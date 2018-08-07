@@ -521,7 +521,7 @@ describe('is totally visible', () => {
 
       expect(
         isTotallyVisible({
-          // is visibile in the droppable
+          // is visible in the droppable
           target: notInViewport,
           // but not visible in the viewport
           viewport,
