@@ -32,24 +32,16 @@ const throwIfSpacingChange = (old: BoxModel, fresh: BoxModel) => {
   }
 };
 
-const adjustBorderBoxSize = (axis: Axis, old: Rect, fresh: Rect): Spacing => {
-  // Only allowing dynamic changes on the main axis.
-  // Dynamic changes can cause a scrollbar to appear or be removed during a drag
-  // Rather than accounting for that we lock the cross axis size
-  const isVertical: boolean = axis === vertical;
-  const width: number = isVertical ? old.width : fresh.width;
-  const height: number = isVertical ? fresh.height : old.height;
+const adjustBorderBoxSize = (axis: Axis, old: Rect, fresh: Rect): Spacing => ({
+  // top and left positions cannot change
+  top: old.top,
+  left: old.left,
+  // this is the main logic of this function - the size adjustment
+  right: old.left + fresh.width,
+  bottom: old.top + fresh.height,
+});
 
-  return {
-    // top and left positions cannot change
-    top: old.top,
-    left: old.left,
-    // this is the main logic of this function - the size adjustment
-    right: old.left + width,
-    bottom: old.top + height,
-  };
-};
-
+// TODO: pull out into its own file - this is used everywhere
 const getClosestScrollable = (droppable: DroppableDimension): Scrollable => {
   const scrollable: ?Scrollable = droppable.viewport.closestScrollable;
   invariant(

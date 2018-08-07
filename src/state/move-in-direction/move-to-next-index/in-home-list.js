@@ -81,6 +81,10 @@ export default ({
     destination: droppable,
     newPageBorderBoxCenter,
     viewport: viewport.frame,
+    // we only care about it being visible relative to the main axis
+    // this is important with dynamic changes as scroll bar and toggle
+    // on the cross axis during a drag
+    onlyOnMainAxis: true,
   });
 
   const displaced: Displacement[] = isMovingTowardStart

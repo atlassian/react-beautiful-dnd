@@ -2,7 +2,11 @@
 import { type Position, type Rect, type Spacing } from 'css-box-model';
 import { subtract } from '../../position';
 import { offsetByPosition } from '../../spacing';
-import { isTotallyVisible } from '../../visibility/is-visible';
+import {
+  isTotallyVisible,
+  isTotallyVisibleOnAxis,
+  type Args as IsVisibleArgs,
+} from '../../visibility/is-visible';
 import type { DraggableDimension, DroppableDimension } from '../../../types';
 
 type Args = {|
@@ -10,6 +14,7 @@ type Args = {|
   destination: DroppableDimension,
   newPageBorderBoxCenter: Position,
   viewport: Rect,
+  onlyOnMainAxis?: boolean,
 |};
 
 export default ({
@@ -17,6 +22,7 @@ export default ({
   destination,
   newPageBorderBoxCenter,
   viewport,
+  onlyOnMainAxis = false,
 }: Args): boolean => {
   // What would the location of the Draggable be once the move is completed?
   // We are not considering margins for this calculation.
@@ -29,10 +35,15 @@ export default ({
   const shifted: Spacing = offsetByPosition(draggable.page.borderBox, diff);
 
   // Must be totally visible, not just partially visible.
-
-  return isTotallyVisible({
+  const args: IsVisibleArgs = {
     target: shifted,
     destination,
     viewport,
-  });
+  };
+
+  if (onlyOnMainAxis) {
+    return isTotallyVisibleOnAxis(args);
+  }
+
+  return isTotallyVisible(args);
 };
