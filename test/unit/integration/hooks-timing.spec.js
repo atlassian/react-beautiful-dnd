@@ -107,4 +107,9 @@ it('should call the onDragStart before any connected components are updated', ()
   // validation
   expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
   expect(onItemRender).toHaveBeenCalledTimes(1);
+
+  // Super validation
+  jest.runAllTimers();
+  expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+  expect(onItemRender).toHaveBeenCalledTimes(1);
 });
