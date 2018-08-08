@@ -7,11 +7,11 @@ import * as keyCodes from '../../../src/view/key-codes';
 import type {
   DraggableProvided,
   DroppableProvided,
-  Hooks,
   DragStart,
   DragUpdate,
   DropResult,
 } from '../../../src';
+import type { Hooks } from '../../../src/types';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import { getComputedSpacing } from '../../utils/dimension';
 

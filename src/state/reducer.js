@@ -23,7 +23,6 @@ import type {
   DragPositions,
   CollectingState,
   DropAnimatingState,
-  WaitingForOnDragStartState,
   DropPendingState,
   DragImpact,
   Viewport,
@@ -144,8 +143,8 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
-    const result: WaitingForOnDragStartState = {
-      phase: 'WAITING_FOR_ON_DRAG_START',
+    const result: DraggingState = {
+      phase: 'DRAGGING',
       isDragging: true,
       critical,
       autoScrollMode,
@@ -156,6 +155,8 @@ export default (state: State = idle, action: Action): State => {
       viewport,
       scrollJumpRequest: null,
       shouldAnimate: false,
+      // We will wait for the onDragStart hook to fire before applying any styles
+      shouldApplyStyles: false,
     };
 
     return result;
@@ -163,14 +164,13 @@ export default (state: State = idle, action: Action): State => {
 
   if (action.type === 'ON_DRAG_START_FINISHED') {
     // No longer needed
-    if (state.phase !== 'WAITING_FOR_ON_DRAG_START') {
+    if (state.phase !== 'DRAGGING') {
       return state;
     }
     const result: DraggingState = {
-      phase: 'DRAGGING',
       ...state,
-      // eslint-disable-next-line
-      phase: 'DRAGGING',
+      // We can now apply our dragging styles
+      shouldApplyStyles: true,
     };
     return result;
   }

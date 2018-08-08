@@ -270,13 +270,9 @@ export type DraggingState = {|
   scrollJumpRequest: ?Position,
   // whether or not draggable movements should be animated
   shouldAnimate: boolean,
-|};
-
-// We release onDragStart to the consumer after the reducer has been updated
-// However, we do not want to apply any of the styles until onDragStart has finished
-export type WaitingForOnDragStartState = {|
-  ...DraggingState,
-  phase: 'WAITING_FOR_ON_DRAG_START',
+  // We release onDragStart to the consumer after the reducer has been updated
+  // However, we do not want to apply any of the styles until onDragStart has finished
+  shouldApplyStyles: boolean,
 |};
 
 // While dragging we can enter into a bulk collection phase
@@ -311,7 +307,6 @@ export type DropAnimatingState = {|
 export type State =
   | IdleState
   | PreparingState
-  | WaitingForOnDragStartState
   | DraggingState
   | CollectingState
   | DropPendingState
