@@ -162,7 +162,7 @@ export default (state: State = idle, action: Action): State => {
     return result;
   }
 
-  if (action.type === 'ON_DRAG_START_FINISHED') {
+  if (action.type === 'ON_DRAG_START_COMPLETED') {
     // No longer needed
     if (state.phase !== 'DRAGGING') {
       return state;

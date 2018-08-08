@@ -67,17 +67,17 @@ describe('start', () => {
   });
 
   it('should dispatch a onDragStartCompleted action after the hook is called', () => {
-    let timeonDragStartCompletedCalled: ?number = null;
-    let timeOnDragStartCalled: ?number = null;
+    let timeOnDragStartCompletedWasCalled: ?number = null;
+    let timeOnDragStartWasCalled: ?number = null;
     const mock = jest.fn().mockImplementation((action: Action) => {
       if (action.type === onDragStartCompleted().type) {
-        timeonDragStartCompletedCalled = performance.now();
+        timeOnDragStartCompletedWasCalled = performance.now();
       }
     });
     const hooks: Hooks = createHooks();
     // $FlowFixMe - mockImplementation is not a property of hooks
     hooks.onDragStart.mockImplementation(() => {
-      timeOnDragStartCalled = performance.now();
+      timeOnDragStartWasCalled = performance.now();
     });
 
     const store: Store = createStore(
@@ -101,9 +101,11 @@ describe('start', () => {
     expect(mock).toHaveBeenCalledWith(onDragStartCompleted());
     expect(mock).toHaveBeenCalledTimes(2);
     // asserting order
-    invariant(timeonDragStartCompletedCalled);
-    invariant(timeOnDragStartCalled);
-    expect(timeOnDragStartCalled).toBeLessThan(timeonDragStartCompletedCalled);
+    invariant(timeOnDragStartCompletedWasCalled);
+    invariant(timeOnDragStartWasCalled);
+    expect(timeOnDragStartWasCalled).toBeLessThan(
+      timeOnDragStartCompletedWasCalled,
+    );
   });
 
   it('should throw an exception if an initial publish is called before a drag ends', () => {

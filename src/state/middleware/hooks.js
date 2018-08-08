@@ -256,7 +256,11 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
       // such as position: fixed to the dragging item.
       // This is important for use cases such as a table which uses dimension locking
       publisher.start(critical);
-      store.dispatch(onDragStartCompleted());
+
+      // It is possible for the hook to end the drag (such as through an error)
+      if (store.getState().phase === 'DRAGGING') {
+        store.dispatch(onDragStartCompleted());
+      }
       return;
     }
 

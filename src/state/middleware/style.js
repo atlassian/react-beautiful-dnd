@@ -6,7 +6,7 @@ export default (marshal: StyleMarshal) => () => (next: Dispatch) => (
   action: Action,
 ): any => {
   // Applying global styles after the onDragStart hook has been called
-  if (action.type === 'ON_DRAG_START_FINISHED') {
+  if (action.type === 'ON_DRAG_START_COMPLETED') {
     marshal.dragging();
   }
 
