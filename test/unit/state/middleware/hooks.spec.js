@@ -13,10 +13,13 @@ import {
   move,
   publish,
   collectionStarting,
+  onDragStartCompleted,
   type MoveArgs,
   type InitialPublishArgs,
+  type Action,
 } from '../../../../src/state/action-creators';
 import createStore from './util/create-store';
+import passThrough from './util/pass-through-middleware';
 import { getPreset } from '../../../utils/dimension';
 import {
   initialPublishArgs,
@@ -61,6 +64,46 @@ describe('start', () => {
       getDragStart(),
       expect.any(Object),
     );
+  });
+
+  it('should dispatch a onDragStartCompleted action after the hook is called', () => {
+    let timeonDragStartCompletedCalled: ?number = null;
+    let timeOnDragStartCalled: ?number = null;
+    const mock = jest.fn().mockImplementation((action: Action) => {
+      if (action.type === onDragStartCompleted().type) {
+        timeonDragStartCompletedCalled = performance.now();
+      }
+    });
+    const hooks: Hooks = createHooks();
+    // $FlowFixMe - mockImplementation is not a property of hooks
+    hooks.onDragStart.mockImplementation(() => {
+      timeOnDragStartCalled = performance.now();
+    });
+
+    const store: Store = createStore(
+      passThrough(mock),
+      middleware(() => hooks, getAnnounce()),
+    );
+
+    // prepare step should not trigger hook
+    store.dispatch(prepare());
+    expect(hooks.onDragStart).not.toHaveBeenCalled();
+
+    // first initial publish
+    mock.mockClear();
+    store.dispatch(initialPublish(initialPublishArgs));
+    expect(hooks.onDragStart).toHaveBeenCalledWith(
+      getDragStart(),
+      expect.any(Object),
+    );
+
+    expect(mock).toHaveBeenCalledWith(initialPublish(initialPublishArgs));
+    expect(mock).toHaveBeenCalledWith(onDragStartCompleted());
+    expect(mock).toHaveBeenCalledTimes(2);
+    // asserting order
+    invariant(timeonDragStartCompletedCalled);
+    invariant(timeOnDragStartCalled);
+    expect(timeOnDragStartCalled).toBeLessThan(timeonDragStartCompletedCalled);
   });
 
   it('should throw an exception if an initial publish is called before a drag ends', () => {

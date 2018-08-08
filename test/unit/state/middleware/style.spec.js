@@ -11,7 +11,7 @@ import {
   animateDrop,
   completeDrop,
   clean,
-  onDragStartFinished,
+  onDragStartCompleted,
 } from '../../../../src/state/action-creators';
 import {
   initialPublishArgs,
@@ -40,7 +40,7 @@ it('should use the dragging styles on an initial publish', () => {
   store.dispatch(initialPublish(initialPublishArgs));
   expect(marshal.dragging).not.toHaveBeenCalled();
 
-  store.dispatch(onDragStartFinished());
+  store.dispatch(onDragStartCompleted());
   expect(marshal.dragging).toHaveBeenCalled();
 });
 

@@ -2,7 +2,7 @@
 import invariant from 'tiny-invariant';
 import messagePreset from './util/message-preset';
 import * as timings from '../../debug/timings';
-import { onDragStartFinished } from '../action-creators';
+import { onDragStartCompleted } from '../action-creators';
 import type {
   State,
   DropResult,
@@ -256,7 +256,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
       // such as position: fixed to the dragging item.
       // This is important for use cases such as a table which uses dimension locking
       publisher.start(critical);
-      store.dispatch(onDragStartFinished());
+      store.dispatch(onDragStartCompleted());
       return;
     }
 
