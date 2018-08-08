@@ -71,7 +71,7 @@ export const makeMapStateToProps = (): Selector => {
 
     const id: DroppableId = ownProps.droppableId;
 
-    if (state.isDragging && state.hasOnDragStartFinished) {
+    if (state.isDragging) {
       const destination: ?DraggableLocation = state.impact.destination;
       const isDraggingOver: boolean = getIsDraggingOver(id, destination);
       const draggableId: DraggableId = state.critical.draggable.id;

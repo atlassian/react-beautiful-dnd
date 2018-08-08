@@ -120,7 +120,7 @@ export const makeMapStateToProps = (): Selector => {
 
   const draggingSelector = (state: State, ownProps: OwnProps): ?MapProps => {
     // Dragging
-    if (state.isDragging && state.hasOnDragStartFinished) {
+    if (state.isDragging) {
       // not the dragging item
       if (state.critical.draggable.id !== ownProps.draggableId) {
         return null;

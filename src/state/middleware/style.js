@@ -5,7 +5,7 @@ import type { StyleMarshal } from '../../view/style-marshal/style-marshal-types'
 export default (marshal: StyleMarshal) => () => (next: Dispatch) => (
   action: Action,
 ): any => {
-  if (action.type === 'INITIAL_PUBLISH' || action.type === 'PUBLISH') {
+  if (action.type === 'ON_DRAG_START_FINISHED' || action.type === 'PUBLISH') {
     marshal.dragging();
   }
 

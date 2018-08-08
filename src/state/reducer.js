@@ -23,6 +23,7 @@ import type {
   DragPositions,
   CollectingState,
   DropAnimatingState,
+  WaitingForOnDragStartState,
   DropPendingState,
   DragImpact,
   Viewport,
@@ -143,9 +144,8 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
-    const result: DraggingState = {
-      phase: 'DRAGGING',
-      hasOnDragStartFinished: false,
+    const result: WaitingForOnDragStartState = {
+      phase: 'WAITING_FOR_ON_DRAG_START',
       isDragging: true,
       critical,
       autoScrollMode,
@@ -162,16 +162,17 @@ export default (state: State = idle, action: Action): State => {
   }
 
   if (action.type === 'ON_DRAG_START_FINISHED') {
-    if (!state.isDragging) {
+    // No longer needed
+    if (state.phase !== 'WAITING_FOR_ON_DRAG_START') {
       return state;
     }
-    return {
+    const result: DraggingState = {
       phase: 'DRAGGING',
       ...state,
       // eslint-disable-next-line
-      phase: state.phase,
-      hasOnDragStartFinished: true,
+      phase: 'DRAGGING',
     };
+    return result;
   }
 
   if (action.type === 'COLLECTION_STARTING') {
