@@ -76,7 +76,7 @@ export const makeMapStateToProps = (): Selector => {
     if (state.isDragging) {
       // Not applying any dragging styles until the onDragStart hook has finished
       // This allows dimension locking for table reordering
-      if (!state.shouldApplyStyles) {
+      if (!state.shouldApplyChanges) {
         return getDefault();
       }
 

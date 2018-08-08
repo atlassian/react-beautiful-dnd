@@ -272,7 +272,7 @@ export type DraggingState = {|
   shouldAnimate: boolean,
   // We release onDragStart to the consumer after the reducer has been updated
   // However, we do not want to apply any of the styles until onDragStart has finished
-  shouldApplyStyles: boolean,
+  shouldApplyChanges: boolean,
 |};
 
 // While dragging we can enter into a bulk collection phase

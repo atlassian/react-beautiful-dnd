@@ -155,8 +155,8 @@ export default (state: State = idle, action: Action): State => {
       viewport,
       scrollJumpRequest: null,
       shouldAnimate: false,
-      // We will wait for the onDragStart hook to fire before applying any styles
-      shouldApplyStyles: false,
+      // We will wait for the onDragStart hook to fire before applying any styles or updating snapshots
+      shouldApplyChanges: false,
     };
 
     return result;
@@ -170,7 +170,7 @@ export default (state: State = idle, action: Action): State => {
     const result: DraggingState = {
       ...state,
       // We can now apply our dragging styles
-      shouldApplyStyles: true,
+      shouldApplyChanges: true,
     };
     return result;
   }

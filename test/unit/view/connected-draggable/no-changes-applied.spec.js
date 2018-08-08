@@ -23,7 +23,7 @@ draggingStates.forEach((current: IsDraggingState) => {
       // for flow
       phase: 'DRAGGING',
       ...move(current, { x: 20, y: 30 }),
-      shouldApplyStyles: false,
+      shouldApplyChanges: false,
     };
 
     it('should not apply dragging styles if asked not to while dragging', () => {
