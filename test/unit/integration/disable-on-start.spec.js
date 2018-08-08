@@ -42,8 +42,8 @@ class App extends React.Component<*, State> {
   };
 
   onDragStart = (start: DragStart) => {
-    this.setState({ isDropDisabled: true });
     this.props.onDragStart(start);
+    this.setState({ isDropDisabled: true });
   };
 
   onDragUpdate = (update: DragUpdate) => {
@@ -51,8 +51,8 @@ class App extends React.Component<*, State> {
   };
 
   onDragEnd = (result: DropResult) => {
-    this.setState({ isDropDisabled: false });
     this.props.onDragEnd(result);
+    this.setState({ isDropDisabled: false });
   };
   // Normally you would want to split things out into separate components.
   // But in this example everything is just done in one place for simplicity

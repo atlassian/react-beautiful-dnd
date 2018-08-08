@@ -64,9 +64,17 @@ export const makeMapStateToProps = (): Selector => {
     }),
   );
 
+  const getDefault = (): MapProps => getMapProps(false, null, null);
+
   const selector = (state: State, ownProps: OwnProps): MapProps => {
     if (ownProps.isDropDisabled) {
-      return getMapProps(false, null, null);
+      return getDefault();
+    }
+
+    // Not applying any dragging styles until the onDragStart hook has finished
+    // This allows dimension locking for table reordering
+    if (state.phase === 'WAITING_FOR_ON_DRAG_START') {
+      return getDefault();
     }
 
     const id: DroppableId = ownProps.droppableId;
@@ -113,7 +121,7 @@ export const makeMapStateToProps = (): Selector => {
       return getMapProps(isDraggingOver, draggingOverWith, placeholder);
     }
 
-    return getMapProps(false, null, null);
+    return getDefault();
   };
 
   return selector;

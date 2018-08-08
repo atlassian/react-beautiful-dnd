@@ -1,10 +1,24 @@
 // @flow
-import React, { Component } from 'react';
+import React from 'react';
 import { storiesOf } from '@storybook/react';
-import { DragDropContext, Droppable, Draggable } from '../src';
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  type DropResult,
+  type DraggableProvided,
+  type DraggableStateSnapshot,
+  type DroppableProvided,
+  type DroppableStateSnapshot,
+} from '../src';
+
+type Item = {|
+  id: string,
+  content: string,
+|};
 
 // fake data generator
-const getItems = count =>
+const getItems = (count: number): Item[] =>
   Array.from({ length: count }, (v, k) => k).map(k => ({
     id: `item-${k}`,
     content: `item ${k}`,
@@ -19,7 +33,7 @@ const reorder = (list, startIndex, endIndex) => {
   return result;
 };
 
-const grid = 8;
+const grid: number = 8;
 
 const getItemStyle = (isDragging, draggableStyle) => ({
   // some basic styles to make the items look a bit nicer
@@ -36,26 +50,26 @@ const getItemStyle = (isDragging, draggableStyle) => ({
 
 const getListStyle = isDraggingOver => ({
   background: isDraggingOver ? 'lightblue' : 'lightgrey',
-  display: 'flex',
   padding: grid,
   overflow: 'auto',
 });
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      items: getItems(6),
-    };
-    this.onDragStart = this.onDragStart.bind(this);
-    this.onDragEnd = this.onDragEnd.bind(this);
-  }
+type State = {|
+  items: Item[],
+  isDropDisabled: boolean,
+|};
 
-  onDragStart(result) {
-    this.setState({ isDropDisabled: true });
-  }
+class App extends React.Component<*, State> {
+  state: State = {
+    items: getItems(6),
+    isDropDisabled: false,
+  };
 
-  onDragEnd(result) {
+  onDragStart = () => {
+    this.setState({ isDropDisabled: !this.state.isDropDisabled });
+  };
+
+  onDragEnd = (result: DropResult) => {
     // dropped outside the list
     if (!result.destination) {
       return;
@@ -70,7 +84,7 @@ class App extends Component {
     this.setState({
       items,
     });
-  }
+  };
 
   // Normally you would want to split things out into separate components.
   // But in this example everything is just done in one place for simplicity
@@ -82,10 +96,9 @@ class App extends Component {
       >
         <Droppable
           droppableId="droppable"
-          direction="horizontal"
           isDropDisabled={this.state.isDropDisabled}
         >
-          {(provided, snapshot) => (
+          {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
             <div
               ref={provided.innerRef}
               style={getListStyle(snapshot.isDraggingOver)}
@@ -93,14 +106,17 @@ class App extends Component {
             >
               {this.state.items.map((item, index) => (
                 <Draggable key={item.id} draggableId={item.id} index={index}>
-                  {(provided, snapshot) => (
+                  {(
+                    draggableProvided: DraggableProvided,
+                    draggableSnapshot: DraggableStateSnapshot,
+                  ) => (
                     <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
+                      ref={draggableProvided.innerRef}
+                      {...draggableProvided.draggableProps}
+                      {...draggableProvided.dragHandleProps}
                       style={getItemStyle(
-                        snapshot.isDragging,
-                        provided.draggableProps.style,
+                        draggableSnapshot.isDragging,
+                        draggableProvided.draggableProps.style,
                       )}
                     >
                       {item.content}
@@ -112,9 +128,14 @@ class App extends Component {
             </div>
           )}
         </Droppable>
+        <div style={{ marginTop: grid * 2 }}>
+          Is drop disabled? {this.state.isDropDisabled ? 'yes' : 'no'}
+        </div>
       </DragDropContext>
     );
   }
 }
 
-storiesOf('bug', module).add('bug town', () => <App />);
+storiesOf('toggle isDropDisabled onDragStart', module).add('here we go', () => (
+  <App />
+));
