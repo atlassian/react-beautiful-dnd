@@ -15,7 +15,6 @@ import {
   withImpact,
 } from '../../../utils/dragging-state';
 import getOwnProps from './get-own-props';
-import getHomeLocation from '../../../../src/state/get-home-location';
 
 const preset = getPreset();
 const state = getStatePreset();

@@ -258,6 +258,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
       publisher.start(critical);
 
       // It is possible for the hook to end the drag (such as through an error)
+      // TODO: do we need this?
       if (store.getState().phase === 'DRAGGING') {
         store.dispatch(onDragStartCompleted());
       }
