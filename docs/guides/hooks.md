@@ -18,7 +18,7 @@ Hooks are top level application events that you can use to perform your own stat
 
 > Generally you will not need to use `onBeforeDragStart`, and it has a slightly different function signature to the rest of the hooks
 
-- `onBeforeDragStart`\*: Called just before `onDragStart` and can be useful to do dimension locking for [table reordering](docs/patterns/tables.md).
+- `onBeforeDragStart`\: Called just before `onDragStart` and can be useful to do dimension locking for [table reordering](docs/patterns/tables.md).
 
 ## The second argument to hooks: `provided: HookProvided`
 
@@ -32,7 +32,7 @@ type Announce = (message: string) => void;
 
 All hooks (except for `onBeforeDragStart`) are provided with a second argument: `HookProvided`. This object has one property: `announce`. This function is used to synchronously announce a message to screen readers. If you do not use this function we will announce a default english message. We have created a [guide for screen reader usage](docs/guides/screen-reader.md) which we recommend using if you are interested in controlling the screen reader messages for yourself and to support internationalisation. If you are using `announce` it must be called synchronously.
 
-## Hook: `onDragStart` (optional)
+## `onDragStart` (optional)
 
 ```js
 type OnDragStartHook = (start: DragStart, provided: HookProvided) => void;
@@ -79,7 +79,7 @@ type DroppableId = Id;
 type TypeId = Id;
 ```
 
-## Hook: `onDragUpdate` (optional)
+## `onDragUpdate` (optional)
 
 ```js
 type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => void;
