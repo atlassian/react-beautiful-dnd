@@ -155,9 +155,6 @@ export default (state: State = idle, action: Action): State => {
       viewport,
       scrollJumpRequest: null,
       shouldAnimate: false,
-      // We will wait for the onDragStart hook to fire before applying any styles or updating snapshots
-      // TEMP!
-      shouldApplyChanges: true,
     };
 
     return result;
