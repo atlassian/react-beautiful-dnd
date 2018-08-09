@@ -147,21 +147,30 @@ If you need to persist a reorder to a remote data store - update the list synchr
 
 ## When are the hooks called?
 
-When a drag is starting we do some minor preperations and collecting before any hooks are fired. If the drag ends before this phase is completed then no hooks will be fired.
+### Phase 1: prepare (asynchronous steps)
 
-### `onDragStart`
+- User initiates a drag
+- We prepare and collect information required for the drag (async). If the drag ends before this phase is completed then no hooks will be fired.
 
-Called _after_ the `Draggable` and `Droppable` `snapshot` values are updated to reflect that a drag has started. At this point it is safe to make changes such as changing the `isDropDisabled` prop on a `Droppable`.
+### Phase 2: publish (synchronous steps)
 
-### `onDragUpdate`
+- `onBeforeDragStart` is called
+- `Draggable` and `Droppable` components are updated with initial `snapshot` values
+- `onDragStart` is called
 
-Called _after_ the `Draggable` and `Droppable` `snapshot` values are updated
+### Phase 3: updates
 
-### `onDragEnd`
+- User moves a dragging item
+- `Draggable` and `Droppable` components are updated with latest `snapshot` values
+- `onDragUpdate` is called
 
-Called _after_ the `Draggable` and `Droppable` `snapshot` values are updated
+### Phase 4: drop
 
-### `onBeforeDragStart`
+- User drops a dragging item
+- Once drop animation is finished the `Draggable` and `Droppable` components are updated with resting `snapshot` values
+- `onDragEnd` is called
+
+## Notes about `onBeforeDragStart`
 
 > The use cases for this hook is super limited
 
