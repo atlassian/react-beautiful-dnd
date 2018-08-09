@@ -90,7 +90,6 @@ export default (axis?: Axis = vertical) => {
       viewport,
       scrollJumpRequest: null,
       shouldAnimate: false,
-      shouldApplyChanges: true,
     };
 
     return result;

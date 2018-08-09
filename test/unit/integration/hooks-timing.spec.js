@@ -37,10 +37,15 @@ class Item extends React.Component<ItemProps> {
 
 jest.useFakeTimers();
 
-it('should call the onDragStart before any connected components are updated', () => {
+it('should call the onBeforeDragStart before connected components are updated, and onDragStart after', () => {
+  let onBeforeDragStartTime: ?DOMHighResTimeStamp = null;
   let onDragStartTime: ?DOMHighResTimeStamp = null;
   let renderTime: ?DOMHighResTimeStamp = null;
   const hooks: Hooks = {
+    onBeforeDragStart: jest.fn().mockImplementation(() => {
+      invariant(!onBeforeDragStartTime, 'onBeforeDragStartTime already set');
+      onBeforeDragStartTime = performance.now();
+    }),
     onDragStart: jest.fn().mockImplementation(() => {
       invariant(!onDragStartTime, 'onDragStartTime already set');
       onDragStartTime = performance.now();
@@ -98,18 +103,22 @@ it('should call the onDragStart before any connected components are updated', ()
   jest.runOnlyPendingTimers();
 
   // checking values are set
+  invariant(onBeforeDragStartTime, 'onBeforeDragStartTime should be set');
   invariant(onDragStartTime, 'onDragStartTime should be set');
   invariant(renderTime, 'renderTime should be set');
 
-  // core assertion
-  expect(onDragStartTime).toBeLessThan(renderTime);
+  // core assertions
+  expect(onBeforeDragStartTime).toBeLessThan(renderTime);
+  expect(renderTime).toBeLessThan(onDragStartTime);
 
   // validation
+  expect(hooks.onBeforeDragStart).toHaveBeenCalledTimes(1);
   expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
   expect(onItemRender).toHaveBeenCalledTimes(1);
 
   // Super validation
   jest.runAllTimers();
+  expect(hooks.onBeforeDragStart).toHaveBeenCalledTimes(1);
   expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
   expect(onItemRender).toHaveBeenCalledTimes(1);
 });

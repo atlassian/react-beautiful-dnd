@@ -13,7 +13,6 @@ import {
   move,
   publish,
   collectionStarting,
-  onDragStartCompleted,
   type MoveArgs,
   type InitialPublishArgs,
   type Action,
@@ -42,6 +41,7 @@ import type { Store } from '../../../../src/state/store-types';
 const preset = getPreset();
 
 const createHooks = (): Hooks => ({
+  onBeforeDragStart: jest.fn(),
   onDragStart: jest.fn(),
   onDragUpdate: jest.fn(),
   onDragEnd: jest.fn(),
@@ -66,76 +66,44 @@ describe('start', () => {
     );
   });
 
-  it('should dispatch a onDragStartCompleted action after the hook is called', () => {
-    let timeOnDragStartCompletedWasCalled: ?number = null;
-    let timeOnDragStartWasCalled: ?number = null;
-    const mock = jest.fn().mockImplementation((action: Action) => {
-      if (action.type === onDragStartCompleted().type) {
-        timeOnDragStartCompletedWasCalled = performance.now();
-      }
+  it('should call the onBeforeDragState and onDragStart in the correct order', () => {
+    let mockCalled: ?number = null;
+    let onBeforeDragStartCalled: ?number = null;
+    let onDragStartCalled: ?number = null;
+    const mock = jest.fn().mockImplementation(() => {
+      mockCalled = performance.now();
     });
     const hooks: Hooks = createHooks();
-    // $FlowFixMe - mockImplementation is not a property of hooks
-    hooks.onDragStart.mockImplementation(() => {
-      timeOnDragStartWasCalled = performance.now();
+    // $FlowFixMe - no property mockImplementation
+    hooks.onBeforeDragStart.mockImplementation(() => {
+      onBeforeDragStartCalled = performance.now();
     });
-
+    // $FlowFixMe - no property mockImplementation
+    hooks.onDragStart.mockImplementation(() => {
+      onDragStartCalled = performance.now();
+    });
     const store: Store = createStore(
-      passThrough(mock),
       middleware(() => hooks, getAnnounce()),
+      passThrough(mock),
     );
 
     // prepare step should not trigger hook
     store.dispatch(prepare());
-    expect(hooks.onDragStart).not.toHaveBeenCalled();
+    expect(hooks.onBeforeDragStart).not.toHaveBeenCalled();
+    mock.mockClear();
+    mockCalled = null;
 
     // first initial publish
-    mock.mockClear();
     store.dispatch(initialPublish(initialPublishArgs));
-    expect(hooks.onDragStart).toHaveBeenCalledWith(
-      getDragStart(),
-      expect.any(Object),
-    );
+    expect(hooks.onBeforeDragStart).toHaveBeenCalledWith(getDragStart());
 
-    expect(mock).toHaveBeenCalledWith(initialPublish(initialPublishArgs));
-    expect(mock).toHaveBeenCalledWith(onDragStartCompleted());
-    expect(mock).toHaveBeenCalledTimes(2);
-    // asserting order
-    invariant(timeOnDragStartCompletedWasCalled);
-    invariant(timeOnDragStartWasCalled);
-    expect(timeOnDragStartWasCalled).toBeLessThan(
-      timeOnDragStartCompletedWasCalled,
-    );
-  });
-
-  it('should not dispatch a onDragStartCompleted action if onDragStart ends the drag', () => {
-    const mock = jest.fn();
-    const hooks: Hooks = createHooks();
-    const store: Store = createStore(
-      passThrough(mock),
-      middleware(() => hooks, getAnnounce()),
-    );
-    // $FlowFixMe - unknown property mockImplementation on onDragStart
-    hooks.onDragStart.mockImplementation(() => {
-      store.dispatch(clean());
-    });
-
-    // prepare step should not trigger hook
-    store.dispatch(prepare());
-    expect(hooks.onDragStart).not.toHaveBeenCalled();
-
-    // first initial publish
-    mock.mockClear();
-    store.dispatch(initialPublish(initialPublishArgs));
-    expect(hooks.onDragStart).toHaveBeenCalledWith(
-      getDragStart(),
-      expect.any(Object),
-    );
-
-    expect(mock).toHaveBeenCalledWith(initialPublish(initialPublishArgs));
-    expect(mock).not.toHaveBeenCalledWith(onDragStartCompleted());
-    expect(mock).toHaveBeenCalledWith(clean());
-    expect(mock).toHaveBeenCalledTimes(2);
+    // checking the order
+    invariant(onBeforeDragStartCalled);
+    invariant(mockCalled);
+    invariant(onDragStartCalled);
+    expect(mock).toHaveBeenCalledTimes(1);
+    expect(onBeforeDragStartCalled).toBeLessThan(mockCalled);
+    expect(mockCalled).toBeLessThan(onDragStartCalled);
   });
 
   it('should throw an exception if an initial publish is called before a drag ends', () => {

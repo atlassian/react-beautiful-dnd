@@ -12,6 +12,7 @@ import type {
   DragStart,
   Announce,
   DragUpdate,
+  OnBeforeDragStartHook,
   OnDragStartHook,
   OnDragUpdateHook,
   OnDragEndHook,
@@ -23,7 +24,7 @@ import type {
   Dispatch,
 } from '../store-types';
 
-type AnyHookFn = OnDragStartHook | OnDragUpdateHook | OnDragEndHook;
+type AnyPrimaryHookFn = OnDragStartHook | OnDragUpdateHook | OnDragEndHook;
 type AnyHookData = DragStart | DragUpdate | DropResult;
 
 const withTimings = (key: string, fn: Function) => {
@@ -123,7 +124,7 @@ const getDragStart = (critical: Critical): DragStart => ({
 
 export default (getHooks: () => Hooks, announce: Announce): Middleware => {
   const execute = (
-    hook: ?AnyHookFn,
+    hook: ?AnyPrimaryHookFn,
     data: AnyHookData,
     getDefaultMessage: (data: any) => string,
   ) => {
@@ -156,9 +157,13 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
         'Cannot fire onBeforeDragStart as a drag start has already been published',
       );
       const data: DragStart = getDragStart(critical);
-      withTimings('onBeforeDragStart', () =>
-        getHooks().onBeforeDragStart(data),
-      );
+      withTimings('onBeforeDragStart', () => {
+        // No use of screen reader for this hook
+        const fn: ?OnBeforeDragStartHook = getHooks().onBeforeDragStart;
+        if (fn) {
+          fn(data);
+        }
+      });
     };
 
     const start = (critical: Critical) => {
