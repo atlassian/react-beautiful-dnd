@@ -136,6 +136,7 @@ class App extends React.Component<*, State> {
   }
 }
 
-storiesOf('toggle isDropDisabled onDragStart', module).add('here we go', () => (
-  <App />
-));
+storiesOf('onDragStart', module).add(
+  'toggle isDropDisabled onDragStart',
+  () => <App />,
+);
