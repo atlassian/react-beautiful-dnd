@@ -34,9 +34,8 @@ it('should use the dragging styles on an initial publish', () => {
   const store: Store = createStore(middleware(marshal));
 
   store.dispatch(prepare());
-
-  // dragging styles not applied until after the onDragStart
   store.dispatch(initialPublish(initialPublishArgs));
+
   expect(marshal.dragging).toHaveBeenCalled();
 });
 
