@@ -14,7 +14,6 @@ import {
   publish,
   collectionStarting,
   onDragStartCompleted,
-  drop,
   type MoveArgs,
   type InitialPublishArgs,
   type Action,
