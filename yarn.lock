@@ -4919,9 +4919,9 @@ flatten@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/flatten/-/flatten-1.0.2.tgz#dae46a9d78fbe25292258cc1e780a41d95c03782"
 
-flow-bin@0.77.0:
-  version "0.77.0"
-  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.77.0.tgz#4e5c93929f289a0c28e08fb361a9734944a11297"
+flow-bin@0.78.0:
+  version "0.78.0"
+  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.78.0.tgz#df9fe7f9c9a2dfaff39083949fe2d831b41627b7"
 
 flush-write-stream@^1.0.0:
   version "1.0.3"
@@ -10190,9 +10190,9 @@ testcafe-browser-tools@1.6.4:
     read-file-relative "^1.2.0"
     which-promise "^1.0.0"
 
-testcafe-hammerhead@14.2.2:
-  version "14.2.2"
-  resolved "https://registry.yarnpkg.com/testcafe-hammerhead/-/testcafe-hammerhead-14.2.2.tgz#be0261465f9e2aba234db99097f7e90a82e66d30"
+testcafe-hammerhead@14.2.4:
+  version "14.2.4"
+  resolved "https://registry.yarnpkg.com/testcafe-hammerhead/-/testcafe-hammerhead-14.2.4.tgz#ff0275567450c279e88f74bfbad71f5228b77038"
   dependencies:
     bowser "1.6.0"
     brotli "^1.3.1"
@@ -10256,9 +10256,9 @@ testcafe-reporter-xunit@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/testcafe-reporter-xunit/-/testcafe-reporter-xunit-2.1.0.tgz#e6d66c572ce15af266706af0fd610b2a841dd443"
 
-testcafe@^0.20.5:
-  version "0.20.5"
-  resolved "https://registry.yarnpkg.com/testcafe/-/testcafe-0.20.5.tgz#3230d2731d1ec2d84856115c218228dafb16883c"
+testcafe@^0.21.1:
+  version "0.21.1"
+  resolved "https://registry.yarnpkg.com/testcafe/-/testcafe-0.21.1.tgz#078a1c28b071cc61d9dddad5a4e7fa50e4dc6c49"
   dependencies:
     async-exit-hook "^1.1.2"
     babel-core "^6.22.1"
@@ -10312,7 +10312,7 @@ testcafe@^0.20.5:
     source-map-support "^0.5.5"
     strip-bom "^2.0.0"
     testcafe-browser-tools "1.6.4"
-    testcafe-hammerhead "14.2.2"
+    testcafe-hammerhead "14.2.4"
     testcafe-legacy-api "3.1.7"
     testcafe-reporter-json "^2.1.0"
     testcafe-reporter-list "^2.1.0"
