@@ -17,6 +17,7 @@ import {
   type InitialPublishArgs,
 } from '../../../../src/state/action-creators';
 import createStore from './util/create-store';
+import passThrough from './util/pass-through-middleware';
 import { getPreset, makeScrollable } from '../../../utils/dimension';
 import {
   initialPublishArgs,
@@ -41,6 +42,7 @@ import type { Store } from '../../../../src/state/store-types';
 const preset = getPreset();
 
 const createHooks = (): Hooks => ({
+  onBeforeDragStart: jest.fn(),
   onDragStart: jest.fn(),
   onDragUpdate: jest.fn(),
   onDragEnd: jest.fn(),
@@ -63,6 +65,46 @@ describe('start', () => {
       getDragStart(),
       expect.any(Object),
     );
+  });
+
+  it('should call the onBeforeDragState and onDragStart in the correct order', () => {
+    let mockCalled: ?number = null;
+    let onBeforeDragStartCalled: ?number = null;
+    let onDragStartCalled: ?number = null;
+    const mock = jest.fn().mockImplementation(() => {
+      mockCalled = performance.now();
+    });
+    const hooks: Hooks = createHooks();
+    // $FlowFixMe - no property mockImplementation
+    hooks.onBeforeDragStart.mockImplementation(() => {
+      onBeforeDragStartCalled = performance.now();
+    });
+    // $FlowFixMe - no property mockImplementation
+    hooks.onDragStart.mockImplementation(() => {
+      onDragStartCalled = performance.now();
+    });
+    const store: Store = createStore(
+      middleware(() => hooks, getAnnounce()),
+      passThrough(mock),
+    );
+
+    // prepare step should not trigger hook
+    store.dispatch(prepare());
+    expect(hooks.onBeforeDragStart).not.toHaveBeenCalled();
+    mock.mockClear();
+    mockCalled = null;
+
+    // first initial publish
+    store.dispatch(initialPublish(initialPublishArgs));
+    expect(hooks.onBeforeDragStart).toHaveBeenCalledWith(getDragStart());
+
+    // checking the order
+    invariant(onBeforeDragStartCalled);
+    invariant(mockCalled);
+    invariant(onDragStartCalled);
+    expect(mock).toHaveBeenCalledTimes(1);
+    expect(onBeforeDragStartCalled).toBeLessThan(mockCalled);
+    expect(mockCalled).toBeLessThan(onDragStartCalled);
   });
 
   it('should throw an exception if an initial publish is called before a drag ends', () => {

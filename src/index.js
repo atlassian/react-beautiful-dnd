@@ -17,7 +17,7 @@ export type {
   TypeId,
   DraggableId,
   DroppableId,
-  // Hooks
+  // Hooks,
   DragStart,
   DragUpdate,
   DropResult,

@@ -324,13 +324,10 @@ export default (state: State = idle, action: Action): State => {
     const { id, isEnabled } = action.payload;
     const target: ?DroppableDimension = state.dimensions.droppables[id];
 
-    // This can happen if the enabled state changes on the droppable between
-    // a onDragStart and the initial publishing of the Droppable.
-    // The isEnabled state will be correctly populated when the Droppable dimension
-    // is published. Therefore we do not need to log any error here
-    if (!target) {
-      return state;
-    }
+    invariant(
+      target,
+      `Cannot find Droppable[id: ${id}] to toggle its enabled state`,
+    );
 
     invariant(
       target.isEnabled !== isEnabled,
