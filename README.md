@@ -515,12 +515,14 @@ In order to use drag and drop, you need to have the part of your `React` tree th
 ```js
 type Hooks = {|
   // optional
+  onDragBeforeStart?: OnDragBeforeStartHook,
   onDragStart?: OnDragStartHook,
   onDragUpdate?: OnDragUpdateHook,
-  // always required
+  // required
   onDragEnd: OnDragEndHook,
 |};
 
+type OnBeforeDragStartHook = (start: DragStart) => void;
 type OnDragStartHook = (start: DragStart, provided: HookProvided) => void;
 type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => void;
 type OnDragEndHook = (result: DropResult, provided: HookProvided) => void;
