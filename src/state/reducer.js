@@ -156,24 +156,10 @@ export default (state: State = idle, action: Action): State => {
       scrollJumpRequest: null,
       shouldAnimate: false,
       // We will wait for the onDragStart hook to fire before applying any styles or updating snapshots
-      shouldApplyChanges: false,
-    };
-
-    return result;
-  }
-
-  if (action.type === 'ON_DRAG_START_COMPLETED') {
-    invariant(
-      state.isDragging,
-      `Unexpected action: ${action.type} in phase ${state.phase}`,
-    );
-    const result: State = {
-      // appeasing flow - will be overwritten by spread
-      phase: 'DRAGGING',
-      ...state,
-      // We can now apply our dragging styles
+      // TEMP!
       shouldApplyChanges: true,
     };
+
     return result;
   }
 

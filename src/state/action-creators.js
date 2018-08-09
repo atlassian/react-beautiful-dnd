@@ -53,16 +53,6 @@ export const initialPublish = (
   payload: args,
 });
 
-export type onDragStartCompletedAction = {|
-  type: 'ON_DRAG_START_COMPLETED',
-  payload: null,
-|};
-
-export const onDragStartCompleted = () => ({
-  type: 'ON_DRAG_START_COMPLETED',
-  payload: null,
-});
-
 export type PublishAction = {|
   type: 'PUBLISH',
   payload: Publish,
@@ -278,7 +268,6 @@ export const dropAnimationFinished = (): DropAnimationFinishedAction => ({
 export type Action =
   | LiftAction
   | InitialPublishAction
-  | onDragStartCompletedAction
   | PublishAction
   | CollectionStartingAction
   | UpdateDroppableScrollAction

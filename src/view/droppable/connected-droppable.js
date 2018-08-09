@@ -74,12 +74,6 @@ export const makeMapStateToProps = (): Selector => {
     const id: DroppableId = ownProps.droppableId;
 
     if (state.isDragging) {
-      // Not applying any dragging styles until the onDragStart hook has finished
-      // This allows dimension locking for table reordering
-      if (!state.shouldApplyChanges) {
-        return getDefault();
-      }
-
       const destination: ?DraggableLocation = state.impact.destination;
       const isDraggingOver: boolean = getIsDraggingOver(id, destination);
       const draggableId: DraggableId = state.critical.draggable.id;

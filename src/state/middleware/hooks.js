@@ -2,7 +2,6 @@
 import invariant from 'tiny-invariant';
 import messagePreset from './util/message-preset';
 import * as timings from '../../debug/timings';
-import { onDragStartCompleted } from '../action-creators';
 import type {
   State,
   DropResult,
@@ -151,15 +150,26 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
     let lastCritical: ?Critical = null;
     let isDragStartPublished: boolean = false;
 
+    const beforeStart = (critical: Critical) => {
+      invariant(
+        !isDragStartPublished,
+        'Cannot fire onBeforeDragStart as a drag start has already been published',
+      );
+      const data: DragStart = getDragStart(critical);
+      withTimings('onBeforeDragStart', () =>
+        getHooks().onBeforeDragStart(data),
+      );
+    };
+
     const start = (critical: Critical) => {
       invariant(
         !isDragStartPublished,
-        'Cannot fire onDragStart as a drag start has already been published',
+        'Cannot fire onBeforeDragStart as a drag start has already been published',
       );
       const data: DragStart = getDragStart(critical);
-      isDragStartPublished = true;
       lastCritical = critical;
       lastLocation = data.source;
+      isDragStartPublished = true;
       withTimings('onDragStart', () =>
         execute(getHooks().onDragStart, data, messagePreset.onDragStart),
       );
@@ -234,6 +244,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
     };
 
     return {
+      beforeStart,
       start,
       move,
       drop,
@@ -245,25 +256,16 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
   return (store: MiddlewareStore) => (next: Dispatch) => (
     action: Action,
   ): any => {
-    // All other hooks can fire after we have updated our connected components
-    next(action);
-
     if (action.type === 'INITIAL_PUBLISH') {
       const critical: Critical = action.payload.critical;
-      // Need to fire the onDragStart hook before the connected components are rendered
-      // This is so consumers can do work in their onDragStart function
-      // before we have applied any inline styles to anything,
-      // such as position: fixed to the dragging item.
-      // This is important for use cases such as a table which uses dimension locking
+      publisher.beforeStart(critical);
+      next(action);
       publisher.start(critical);
-
-      // It is possible for the hook to end the drag (such as through an error)
-      // TODO: do we need this?
-      if (store.getState().phase === 'DRAGGING') {
-        store.dispatch(onDragStartCompleted());
-      }
       return;
     }
+
+    // All other hooks can fire after we have updated our connected components
+    next(action);
 
     // Drag end
     if (action.type === 'DROP_COMPLETE') {

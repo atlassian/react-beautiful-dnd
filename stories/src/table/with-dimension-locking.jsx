@@ -173,7 +173,7 @@ export default class TableApp extends Component<AppProps, AppState> {
     isDragging: false,
   };
 
-  onDragStart = () => {
+  onBeforeDragStart = () => {
     this.setState({
       isDragging: true,
     });
@@ -243,7 +243,7 @@ export default class TableApp extends Component<AppProps, AppState> {
   render() {
     return (
       <DragDropContext
-        onDragStart={this.onDragStart}
+        onBeforeDragStart={this.onBeforeDragStart}
         onDragEnd={this.onDragEnd}
       >
         <Fragment>

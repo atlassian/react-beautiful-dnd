@@ -5,8 +5,7 @@ import type { StyleMarshal } from '../../view/style-marshal/style-marshal-types'
 export default (marshal: StyleMarshal) => () => (next: Dispatch) => (
   action: Action,
 ): any => {
-  // Applying global styles after the onDragStart hook has been called
-  if (action.type === 'ON_DRAG_START_COMPLETED') {
+  if (action.type === 'INITIAL_PUBLISH') {
     marshal.dragging();
   }
 
