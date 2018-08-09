@@ -6,18 +6,14 @@ import createStore from './util/create-store';
 import {
   initialPublish,
   prepare,
-  collectionStarting,
-  publish,
   animateDrop,
   completeDrop,
   clean,
 } from '../../../../src/state/action-creators';
 import {
   initialPublishArgs,
-  publishAdditionArgs,
   animateDropArgs,
   completeDropArgs,
-  initialPublishWithScrollables,
 } from '../../../utils/preset-action-args';
 
 const getMarshalStub = (): StyleMarshal => ({
@@ -36,21 +32,6 @@ it('should use the dragging styles on an initial publish', () => {
   store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
 
-  expect(marshal.dragging).toHaveBeenCalled();
-});
-
-it('should use the dragging styles after a dynamic publish', () => {
-  const marshal: StyleMarshal = getMarshalStub();
-  const store: Store = createStore(middleware(marshal));
-
-  store.dispatch(prepare());
-  store.dispatch(initialPublish(initialPublishWithScrollables));
-  marshal.dragging.mockReset();
-
-  store.dispatch(collectionStarting());
-  expect(marshal.dragging).not.toHaveBeenCalled();
-
-  store.dispatch(publish(publishAdditionArgs));
   expect(marshal.dragging).toHaveBeenCalled();
 });
 
