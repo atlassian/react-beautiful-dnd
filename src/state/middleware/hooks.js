@@ -156,12 +156,11 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
         !isDragStartPublished,
         'Cannot fire onBeforeDragStart as a drag start has already been published',
       );
-      const data: DragStart = getDragStart(critical);
       withTimings('onBeforeDragStart', () => {
         // No use of screen reader for this hook
         const fn: ?OnBeforeDragStartHook = getHooks().onBeforeDragStart;
         if (fn) {
-          fn(data);
+          fn(getDragStart(critical));
         }
       });
     };
