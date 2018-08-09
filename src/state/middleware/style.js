@@ -5,12 +5,18 @@ import type { StyleMarshal } from '../../view/style-marshal/style-marshal-types'
 export default (marshal: StyleMarshal) => () => (next: Dispatch) => (
   action: Action,
 ): any => {
-  if (action.type === 'INITIAL_PUBLISH' || action.type === 'PUBLISH') {
+  if (action.type === 'INITIAL_PUBLISH') {
     marshal.dragging();
   }
 
+  // Dynamic collection starting
   if (action.type === 'COLLECTION_STARTING') {
     marshal.collecting();
+  }
+
+  // Dynamic collection finished
+  if (action.type === 'PUBLISH') {
+    marshal.dragging();
   }
 
   if (action.type === 'DROP_ANIMATE') {

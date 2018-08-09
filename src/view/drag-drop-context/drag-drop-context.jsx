@@ -86,6 +86,7 @@ export default class DragDropContext extends React.Component<Props> {
       // This is a function as users are allowed to change their hook functions
       // at any time
       getHooks: (): Hooks => ({
+        onBeforeDragStart: this.props.onBeforeDragStart,
         onDragStart: this.props.onDragStart,
         onDragEnd: this.props.onDragEnd,
         onDragUpdate: this.props.onDragUpdate,
