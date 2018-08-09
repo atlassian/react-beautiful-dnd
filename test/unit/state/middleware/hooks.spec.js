@@ -15,7 +15,6 @@ import {
   collectionStarting,
   type MoveArgs,
   type InitialPublishArgs,
-  type Action,
 } from '../../../../src/state/action-creators';
 import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';

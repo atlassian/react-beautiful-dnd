@@ -118,24 +118,29 @@ type TableRowProps = {|
   quote: Quote,
   provided: DraggableProvided,
   snapshot: DraggableStateSnapshot,
-  isDragOccurring: boolean,
 |};
+
+const IsDraggingContext = React.createContext(false);
 
 class TableRow extends Component<TableRowProps> {
   render() {
-    const { snapshot, quote, provided, isDragOccurring } = this.props;
+    const { snapshot, quote, provided } = this.props;
     return (
-      <Row
-        innerRef={provided.innerRef}
-        isDragging={snapshot.isDragging}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
-      >
-        <TableCell isDragOccurring={isDragOccurring}>
-          {quote.author.name}
-        </TableCell>
-        <TableCell isDragOccurring={isDragOccurring}>{quote.content}</TableCell>
-      </Row>
+      <IsDraggingContext.Consumer>
+        {(isDragging: boolean) => (
+          <Row
+            innerRef={provided.innerRef}
+            isDragging={snapshot.isDragging}
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+          >
+            <TableCell isDragOccurring={isDragging}>
+              {quote.author.name}
+            </TableCell>
+            <TableCell isDragOccurring={isDragging}>{quote.content}</TableCell>
+          </Row>
+        )}
+      </IsDraggingContext.Consumer>
     );
   }
 }
@@ -242,66 +247,67 @@ export default class TableApp extends Component<AppProps, AppState> {
 
   render() {
     return (
-      <DragDropContext
-        onBeforeDragStart={this.onBeforeDragStart}
-        onDragEnd={this.onDragEnd}
-      >
-        <Fragment>
-          <Header>
-            <LayoutControl>
-              Current layout: <code>{this.state.layout}</code>
-              <button type="button" onClick={this.toggleTableLayout}>
-                Toggle
-              </button>
-            </LayoutControl>
-            <div>
-              Copy table to clipboard:
-              <CopyTableButton onClick={this.copyTableToClipboard}>
-                Copy
-              </CopyTableButton>
-            </div>
-          </Header>
-          <Table layout={this.state.layout}>
-            <THead>
-              <tr>
-                <th>Author</th>
-                <th>Content</th>
-              </tr>
-            </THead>
-            <Droppable droppableId="table">
-              {(droppableProvided: DroppableProvided) => (
-                <TBody
-                  innerRef={(ref: ?HTMLElement) => {
-                    this.tableRef = ref;
-                    droppableProvided.innerRef(ref);
-                  }}
-                  {...droppableProvided.droppableProps}
-                >
-                  {this.state.quotes.map((quote: Quote, index: number) => (
-                    <Draggable
-                      draggableId={quote.id}
-                      index={index}
-                      key={quote.id}
-                    >
-                      {(
-                        provided: DraggableProvided,
-                        snapshot: DraggableStateSnapshot,
-                      ) => (
-                        <TableRow
-                          provided={provided}
-                          snapshot={snapshot}
-                          quote={quote}
-                          isDragOccurring={this.state.isDragging}
-                        />
-                      )}
-                    </Draggable>
-                  ))}
-                </TBody>
-              )}
-            </Droppable>
-          </Table>
-        </Fragment>
-      </DragDropContext>
+      <IsDraggingContext.Provider value={this.state.isDragging}>
+        <DragDropContext
+          onBeforeDragStart={this.onBeforeDragStart}
+          onDragEnd={this.onDragEnd}
+        >
+          <Fragment>
+            <Header>
+              <LayoutControl>
+                Current layout: <code>{this.state.layout}</code>
+                <button type="button" onClick={this.toggleTableLayout}>
+                  Toggle
+                </button>
+              </LayoutControl>
+              <div>
+                Copy table to clipboard:
+                <CopyTableButton onClick={this.copyTableToClipboard}>
+                  Copy
+                </CopyTableButton>
+              </div>
+            </Header>
+            <Table layout={this.state.layout}>
+              <THead>
+                <tr>
+                  <th>Author</th>
+                  <th>Content</th>
+                </tr>
+              </THead>
+              <Droppable droppableId="table">
+                {(droppableProvided: DroppableProvided) => (
+                  <TBody
+                    innerRef={(ref: ?HTMLElement) => {
+                      this.tableRef = ref;
+                      droppableProvided.innerRef(ref);
+                    }}
+                    {...droppableProvided.droppableProps}
+                  >
+                    {this.state.quotes.map((quote: Quote, index: number) => (
+                      <Draggable
+                        draggableId={quote.id}
+                        index={index}
+                        key={quote.id}
+                      >
+                        {(
+                          provided: DraggableProvided,
+                          snapshot: DraggableStateSnapshot,
+                        ) => (
+                          <TableRow
+                            provided={provided}
+                            snapshot={snapshot}
+                            quote={quote}
+                          />
+                        )}
+                      </Draggable>
+                    ))}
+                  </TBody>
+                )}
+              </Droppable>
+            </Table>
+          </Fragment>
+        </DragDropContext>
+      </IsDraggingContext.Provider>
     );
   }
 }
