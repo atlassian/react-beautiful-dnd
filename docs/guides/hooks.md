@@ -151,20 +151,6 @@ type OnBeforeDragStartHook = (start: DragStart) => void;
 // Otherwise the same type information as OnDragStartHook
 ```
 
-## Synchronous reordering
-
-Because this library does not control your state, it is up to you to _synchronously_ reorder your lists based on the `result: DropResult`.
-
-### Here is what you need to do
-
-- if the `destination` is `null`: all done!
-- if `source.droppableId` equals `destination.droppableId` you need to remove the item from your list and insert it at the correct position.
-- if `source.droppableId` does not equal `destination.droppableId`, then you need to remove the `Draggable` from the `source.droppableId` list and add it into the correct position of the `destination.droppableId` list.
-
-### Persisting a reorder
-
-If you need to persist a reorder to a remote data store - update the list synchronously on the client and fire off a request in the background to persist the change. If the remote save fails it is up to you how to communicate that to the user and update, or not update, the list.
-
 ## When are the hooks called?
 
 ### Phase 1: prepare (asynchronous steps)
@@ -189,6 +175,20 @@ If you need to persist a reorder to a remote data store - update the list synchr
 - User drops a dragging item
 - Once drop animation is finished the `Draggable` and `Droppable` components are updated with resting `snapshot` values
 - `onDragEnd` is called
+
+## Synchronous reordering
+
+Because this library does not control your state, it is up to you to _synchronously_ reorder your lists based on the `result: DropResult`.
+
+### Here is what you need to do
+
+- if the `destination` is `null`: all done!
+- if `source.droppableId` equals `destination.droppableId` you need to remove the item from your list and insert it at the correct position.
+- if `source.droppableId` does not equal `destination.droppableId`, then you need to remove the `Draggable` from the `source.droppableId` list and add it into the correct position of the `destination.droppableId` list.
+
+### Persisting a reorder
+
+If you need to persist a reorder to a remote data store - update the list synchronously on the client and fire off a request in the background to persist the change. If the remote save fails it is up to you how to communicate that to the user and update, or not update, the list.
 
 ## Block updates during a drag
 
