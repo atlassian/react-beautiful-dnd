@@ -12,6 +12,7 @@ import type {
   DragStart,
   Announce,
   DragUpdate,
+  OnBeforeDragStartHook,
   OnDragStartHook,
   OnDragUpdateHook,
   OnDragEndHook,
@@ -23,7 +24,7 @@ import type {
   Dispatch,
 } from '../store-types';
 
-type AnyHookFn = OnDragStartHook | OnDragUpdateHook | OnDragEndHook;
+type AnyPrimaryHookFn = OnDragStartHook | OnDragUpdateHook | OnDragEndHook;
 type AnyHookData = DragStart | DragUpdate | DropResult;
 
 const withTimings = (key: string, fn: Function) => {
@@ -123,7 +124,7 @@ const getDragStart = (critical: Critical): DragStart => ({
 
 export default (getHooks: () => Hooks, announce: Announce): Middleware => {
   const execute = (
-    hook: ?AnyHookFn,
+    hook: ?AnyPrimaryHookFn,
     data: AnyHookData,
     getDefaultMessage: (data: any) => string,
   ) => {
@@ -150,15 +151,29 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
     let lastCritical: ?Critical = null;
     let isDragStartPublished: boolean = false;
 
+    const beforeStart = (critical: Critical) => {
+      invariant(
+        !isDragStartPublished,
+        'Cannot fire onBeforeDragStart as a drag start has already been published',
+      );
+      withTimings('onBeforeDragStart', () => {
+        // No use of screen reader for this hook
+        const fn: ?OnBeforeDragStartHook = getHooks().onBeforeDragStart;
+        if (fn) {
+          fn(getDragStart(critical));
+        }
+      });
+    };
+
     const start = (critical: Critical) => {
       invariant(
         !isDragStartPublished,
-        'Cannot fire onDragStart as a drag start has already been published',
+        'Cannot fire onBeforeDragStart as a drag start has already been published',
       );
       const data: DragStart = getDragStart(critical);
-      isDragStartPublished = true;
       lastCritical = critical;
       lastLocation = data.source;
+      isDragStartPublished = true;
       withTimings('onDragStart', () =>
         execute(getHooks().onDragStart, data, messagePreset.onDragStart),
       );
@@ -233,6 +248,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
     };
 
     return {
+      beforeStart,
       start,
       move,
       drop,
@@ -246,13 +262,9 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
   ): any => {
     if (action.type === 'INITIAL_PUBLISH') {
       const critical: Critical = action.payload.critical;
-      // Need to fire the onDragStart hook before the connected components are rendered
-      // This is so consumers can do work in their onDragStart function
-      // before we have applied any inline styles to anything,
-      // such as position: fixed to the dragging item.
-      // This is important for use cases such as a table which uses dimension locking
-      publisher.start(critical);
+      publisher.beforeStart(critical);
       next(action);
+      publisher.start(critical);
       return;
     }
 
