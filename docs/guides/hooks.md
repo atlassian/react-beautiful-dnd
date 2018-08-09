@@ -38,7 +38,7 @@ All hooks (except for `onBeforeDragStart`) are provided with a second argument: 
 type OnDragStartHook = (start: DragStart, provided: HookProvided) => void;
 ```
 
-`onDragStart` will get notified when a drag starts. This hook is _optional_ and therefore does not need to be provided. It is **highly recommended** that you use this function to block updates to all `Draggable` and `Droppable` components during a drag. (See [_Best practices for `hooks` _](https://github.com/atlassian/react-beautiful-dnd#best-practices-for-hooks))
+`onDragStart` will get notified when a drag starts. This hook is _optional_ and therefore does not need to be provided. It is **highly recommended** that you use this function to block updates to all `Draggable` and `Droppable` components during a drag. (See **Block updates during a drag** below)
 
 You are provided with the following details:
 
