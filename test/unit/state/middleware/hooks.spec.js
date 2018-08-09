@@ -14,6 +14,7 @@ import {
   publish,
   collectionStarting,
   onDragStartCompleted,
+  drop,
   type MoveArgs,
   type InitialPublishArgs,
   type Action,
@@ -106,6 +107,36 @@ describe('start', () => {
     expect(timeOnDragStartWasCalled).toBeLessThan(
       timeOnDragStartCompletedWasCalled,
     );
+  });
+
+  it('should not dispatch a onDragStartCompleted action if onDragStart ends the drag', () => {
+    const mock = jest.fn();
+    const hooks: Hooks = createHooks();
+    const store: Store = createStore(
+      passThrough(mock),
+      middleware(() => hooks, getAnnounce()),
+    );
+    // $FlowFixMe - unknown property mockImplementation on onDragStart
+    hooks.onDragStart.mockImplementation(() => {
+      store.dispatch(clean());
+    });
+
+    // prepare step should not trigger hook
+    store.dispatch(prepare());
+    expect(hooks.onDragStart).not.toHaveBeenCalled();
+
+    // first initial publish
+    mock.mockClear();
+    store.dispatch(initialPublish(initialPublishArgs));
+    expect(hooks.onDragStart).toHaveBeenCalledWith(
+      getDragStart(),
+      expect.any(Object),
+    );
+
+    expect(mock).toHaveBeenCalledWith(initialPublish(initialPublishArgs));
+    expect(mock).not.toHaveBeenCalledWith(onDragStartCompleted());
+    expect(mock).toHaveBeenCalledWith(clean());
+    expect(mock).toHaveBeenCalledTimes(2);
   });
 
   it('should throw an exception if an initial publish is called before a drag ends', () => {

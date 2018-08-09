@@ -163,11 +163,13 @@ export default (state: State = idle, action: Action): State => {
   }
 
   if (action.type === 'ON_DRAG_START_COMPLETED') {
-    // No longer needed
-    if (state.phase !== 'DRAGGING') {
-      return state;
-    }
-    const result: DraggingState = {
+    invariant(
+      state.isDragging,
+      `Unexpected action: ${action.type} in phase ${state.phase}`,
+    );
+    const result: State = {
+      // appeasing flow - will be overwritten by spread
+      phase: 'DRAGGING',
       ...state,
       // We can now apply our dragging styles
       shouldApplyChanges: true,
