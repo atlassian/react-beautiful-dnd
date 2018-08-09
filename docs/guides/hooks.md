@@ -131,6 +131,26 @@ type DropReason = 'DROP' | 'CANCEL';
 - `result.destination`: the location where the `Draggable` finished. The `destination` will be `null` if the user dropped while not over a `Droppable`.
 - `result.reason`: the reason a drop occurred. This information can be helpful in crafting more useful messaging in the `HookProvided` > `announce` function.
 
+## Secondary: `onBeforeDragStart`
+
+> The use cases for this hook is super limited
+
+Once we have all of the information we need to start a drag we call the `onBeforeDragStart` function. This is called just before we update the `snapshot` values for the `Draggable` and `Droppable` components. At this point the application is not in a dragging state and so changing of props such as `isDropDisabled` will fail. The `onBeforeDragStart` hook is a good opportunity to do any dimension locking required for [table reordering](docs/patterns/tables.md).
+
+- ✅ Can apply modifications to existing components to lock their sizes
+- ❌ Cannot remove or add any `Draggable` or `Droppable`
+- ❌ Cannot modify the sizes of any `Draggable` or `Droppable`
+- ❌ No screen reader announcement yet
+
+### `OnBeforeDragStartHook` type information
+
+```js
+// No second 'provided' argument
+type OnBeforeDragStartHook = (start: DragStart) => void;
+
+// Otherwise the same type information as OnDragStartHook
+```
+
 ## Synchronous reordering
 
 Because this library does not control your state, it is up to you to _synchronously_ reorder your lists based on the `result: DropResult`.
@@ -169,17 +189,6 @@ If you need to persist a reorder to a remote data store - update the list synchr
 - User drops a dragging item
 - Once drop animation is finished the `Draggable` and `Droppable` components are updated with resting `snapshot` values
 - `onDragEnd` is called
-
-## Notes about `onBeforeDragStart`
-
-> The use cases for this hook is super limited
-
-Once we have all of the information we need to start a drag we call the `onBeforeDragStart` function. This is called just before we update the `snapshot` values for the `Draggable` and `Droppable` components. At this point the application is not in a dragging state and so changing of props such as `isDropDisabled` will fail. The `onBeforeDragStart` hook is a good opportunity to do any dimension locking required for [table reordering](docs/patterns/tables.md).
-
-- ✅ Can apply modifications to existing components to lock their sizes
-- ❌ Cannot remove or add any `Draggable` or `Droppable`
-- ❌ Cannot modify the sizes of any `Draggable` or `Droppable`
-- ❌ No screen reader announcement yet
 
 ## Block updates during a drag
 
