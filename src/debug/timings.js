@@ -47,7 +47,7 @@ export const finish = (key: string) => {
     const rounded: string = result.toFixed(2);
 
     const style: Style = (() => {
-      if (result < 16) {
+      if (result < 12) {
         return {
           textColor: 'green',
           symbol: '✅',
