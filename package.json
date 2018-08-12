@@ -30,6 +30,7 @@
   "scripts": {
     "test": "jest --config ./jest.config.js",
     "test:browser": "testcafe 'chrome:headless,chrome:headless:emulation:device=iphone 6;touch=true,firefox:headless' ./test/browser/*  -r spec,xunit:./test-reports/browser/test-results.xml",
+    "test:coverage": "yarn test --coverage --coveragePathIgnorePatterns=/debug",
     "validate": "yarn prettier:check && yarn lint:eslint && yarn lint:css && yarn typecheck",
     "prettier:check": "yarn prettier --debug-check $npm_package_config_prettier_target",
     "prettier:write": "yarn prettier --write $npm_package_config_prettier_target",

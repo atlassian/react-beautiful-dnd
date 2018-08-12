@@ -1,10 +1,10 @@
 // @flow
 /* eslint-disable no-console */
-import type { Store, Action } from '../store-types';
+import type { Action } from '../../state/store-types';
 
 export default (store: Store) => (next: Action => mixed) => (
   action: Action,
-): mixed => {
+): any => {
   console.group(`action: ${action.type}`);
   console.log('state before', store.getState());
 

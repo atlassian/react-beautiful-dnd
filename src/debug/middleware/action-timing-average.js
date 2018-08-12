@@ -1,6 +1,6 @@
 // @flow
 /* eslint-disable no-console */
-import type { Action } from '../store-types';
+import type { Action } from '../../state/store-types';
 
 type Bucket = {
   [key: string]: number[],
@@ -19,7 +19,7 @@ export default (groupSize: number) => {
   console.log(`Will take an average every ${groupSize} actions`);
   const bucket: Bucket = {};
 
-  return () => (next: Action => mixed) => (action: Action): mixed => {
+  return () => (next: Action => mixed) => (action: Action): any => {
     const start: number = performance.now();
 
     const result: mixed = next(action);

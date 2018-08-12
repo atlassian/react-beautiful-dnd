@@ -1,9 +1,9 @@
 // @flow
 /* eslint-disable no-console */
-import * as timings from '../../debug/timings';
-import type { Action } from '../store-types';
+import * as timings from '../timings';
+import type { Action } from '../../state/store-types';
 
-export default () => (next: Action => mixed) => (action: Action): mixed => {
+export default () => (next: Action => mixed) => (action: Action): any => {
   const key = `redux action: ${action.type}`;
   timings.start(key);
 
