@@ -522,10 +522,10 @@ type Hooks = {|
   onDragEnd: OnDragEndHook,
 |};
 
-type OnBeforeDragStartHook = (start: DragStart) => void;
-type OnDragStartHook = (start: DragStart, provided: HookProvided) => void;
-type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => void;
-type OnDragEndHook = (result: DropResult, provided: HookProvided) => void;
+type OnBeforeDragStartHook = (start: DragStart) => mixed;
+type OnDragStartHook = (start: DragStart, provided: HookProvided) => mixed;
+type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => mixed;
+type OnDragEndHook = (result: DropResult, provided: HookProvided) => mixed;
 
 type Props = {|
   ...Hooks,
