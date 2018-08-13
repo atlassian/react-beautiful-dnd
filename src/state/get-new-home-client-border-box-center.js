@@ -2,6 +2,7 @@
 import { type Position, type Rect } from 'css-box-model';
 import type {
   Axis,
+  Displacement,
   DraggableDimension,
   DraggableDimensionMap,
   DragMovement,
@@ -33,7 +34,10 @@ export default ({
     return originalCenter;
   }
 
-  const { displaced, isBeyondStartPosition } = movement;
+  const displaced: Displacement[] = movement ? movement.displaced : [];
+  const isBeyondStartPosition: boolean = movement
+    ? movement.isBeyondStartPosition
+    : false;
   const axis: Axis = destination.axis;
 
   const isWithinHomeDroppable: boolean =

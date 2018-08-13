@@ -103,10 +103,9 @@ export const makeMapStateToProps = (): Selector => {
       return null;
     }
 
-    const movement: DragMovement = impact.movement;
     // Doing this cuts 50% of the time to move
     // Otherwise need to loop over every item in every selector (yuck!)
-    const map: DisplacementMap = getDisplacementMap(movement.displaced);
+    const map: DisplacementMap = getDisplacementMap(impact);
     const displacement: ?Displacement = map[id];
 
     // does not need to move
@@ -119,6 +118,7 @@ export const makeMapStateToProps = (): Selector => {
       return null;
     }
 
+    const movement: DragMovement = impact.movement;
     const amount: Position = movement.isBeyondStartPosition
       ? negate(movement.amount)
       : movement.amount;

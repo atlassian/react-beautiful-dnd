@@ -1,7 +1,7 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
-import type { State, Viewport, DraggableLocation } from '../../types';
+import type { State, Viewport, DragImpact } from '../../types';
 import type { Action, MiddlewareStore, Dispatch } from '../store-types';
 import getMaxScroll from '../get-max-scroll';
 import { isEqual } from '../position';
@@ -18,20 +18,20 @@ const shouldCheckOnAction = (action: Action): boolean =>
 
 // optimisation: body size can only change when the destination has changed
 const hasDroppableOverChanged = (
-  previous: ?DraggableLocation,
-  current: ?DraggableLocation,
+  previous: ?DragImpact,
+  current: ?DragImpact,
 ): boolean => {
   // no previous - if there is a next return true
   if (!previous) {
-    return Boolean(current);
+    return Boolean(current && current.destination);
   }
 
   // no current - if there is a previous return true
   if (!current) {
-    return Boolean(previous);
+    return Boolean(previous && previous.destination);
   }
 
-  return previous.droppableId !== current.droppableId;
+  return previous.destination.droppableId !== current.destination.droppableId;
 };
 
 const getNewMaxScroll = (
@@ -47,12 +47,7 @@ const getNewMaxScroll = (
     return null;
   }
 
-  if (
-    !hasDroppableOverChanged(
-      previous.impact.destination,
-      current.impact.destination,
-    )
-  ) {
+  if (!hasDroppableOverChanged(previous.impact, current.impact)) {
     return null;
   }
 

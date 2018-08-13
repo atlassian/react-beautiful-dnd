@@ -67,8 +67,7 @@ export const makeMapStateToProps = (): Selector => {
       return getDefault();
     }
 
-    const isDraggingOver: boolean =
-      impact.destination.droppableId === draggable.descriptor.id;
+    const isDraggingOver: boolean = id === impact.destination.droppableId;
 
     if (!isDraggingOver) {
       return getDefault();

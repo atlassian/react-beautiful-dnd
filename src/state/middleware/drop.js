@@ -17,7 +17,9 @@ import type {
   Viewport,
   Critical,
   DraggableLocation,
+  GroupingLocation,
   DragImpact,
+  DragMovement,
   DropResult,
   PendingDrop,
   DimensionMap,
@@ -78,11 +80,14 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
 
   const critical: Critical = state.critical;
   const dimensions: DimensionMap = state.dimensions;
-  const impact: ?DragImpact = reason === 'DROP' ? state.impact : null;
   const home: DroppableDimension =
     dimensions.droppables[state.critical.droppable.id];
   const draggable: DraggableDimension =
     dimensions.draggables[state.critical.draggable.id];
+
+  // Only keep the impact if we are explicitly dropping
+  const impact: ?DragImpact = reason === 'DROP' ? state.impact : null;
+
   const droppable: ?DroppableDimension =
     impact && impact.destination
       ? dimensions.droppables[impact.destination.droppableId]
@@ -93,19 +98,23 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     droppableId: critical.droppable.id,
   };
 
-  invariant(impact, 'TODO');
-  invariant(
-    impact.type === 'REORDER',
-    `Currently not supporting ${impact.type}`,
-  );
+  const destination: ?DraggableLocation =
+    impact && impact.type === 'REORDER' ? impact.destination : null;
+  const groupingWith: ?GroupingLocation =
+    impact && impact.type === 'GROUPING' ? impact.destination : null;
+
+  // invariant(impact, 'TODO');
+  // invariant(
+  //   impact.type === 'REORDER',
+  //   `Currently not supporting ${impact.type}`,
+  // );
 
   const result: DropResult = {
     draggableId: draggable.descriptor.id,
     type: home.descriptor.type,
     source,
-    // TODO! grouping
-    destination: impact.destination,
-    groupingWith: null,
+    destination,
+    groupingWith,
     reason,
   };
 
@@ -116,8 +125,10 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     }
 
     // TODO
+    const movement: ?DragMovement =
+      impact && impact.type === 'REORDER' ? impact.movement : null;
     const newBorderBoxClientCenter: Position = getNewHomeClientBorderBoxCenter({
-      movement: impact.movement,
+      movement,
       draggable,
       draggables: dimensions.draggables,
       destination: droppable,

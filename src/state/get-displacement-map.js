@@ -1,6 +1,6 @@
 // @flow
 import memoizeOne from 'memoize-one';
-import type { DraggableId, Displacement } from '../types';
+import type { DraggableId, Displacement, DragImpact } from '../types';
 
 export type DisplacementMap = { [key: DraggableId]: Displacement };
 
