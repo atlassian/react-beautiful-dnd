@@ -522,10 +522,10 @@ type Hooks = {|
   onDragEnd: OnDragEndHook,
 |};
 
-type OnBeforeDragStartHook = (start: DragStart) => void;
-type OnDragStartHook = (start: DragStart, provided: HookProvided) => void;
-type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => void;
-type OnDragEndHook = (result: DropResult, provided: HookProvided) => void;
+type OnBeforeDragStartHook = (start: DragStart) => mixed;
+type OnDragStartHook = (start: DragStart, provided: HookProvided) => mixed;
+type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => mixed;
+type OnDragEndHook = (result: DropResult, provided: HookProvided) => mixed;
 
 type Props = {|
   ...Hooks,
@@ -758,7 +758,7 @@ Unfortunately we are [unable to apply this optimisation for you](https://medium.
 
 `Draggable` components can be dragged around and dropped onto `Droppable`s. A `Draggable` must always be contained within a `Droppable`. It is **possible** to reorder a `Draggable` within its home `Droppable` or move to another `Droppable`. It is **possible** because a `Droppable` is free to control what it allows to be dropped on it.
 
-Every `Draggable` has a _drag handle_. A _drag handle_ is the element that the user interacts with in order to drag a `Draggable`. A _drag handle_ can be a the `Draggable` element itself, or a child of the `Draggable`.
+Every `Draggable` has a _drag handle_. A _drag handle_ is the element that the user interacts with in order to drag a `Draggable`. A _drag handle_ can be a the `Draggable` element itself, or a child of the `Draggable`. Note that by default a _drag handle_ cannot be an interactive element, since [event handlers are blocked on nested interactive elements](#interactive-child-elements-within-a-draggable). Proper semantics for accessibility are added to the _drag handle_ element. If you wish to use an interactive element, `disableInteractiveElementBlocking` must be set.
 
 ```js
 import { Draggable } from 'react-beautiful-dnd';
