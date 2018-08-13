@@ -12,7 +12,7 @@ export type Args = {|
   isMovingForward: boolean,
   draggableId: DraggableId,
   previousPageBorderBoxCenter: Position,
-  previousImpact: DragImpact,
+  previousImpact: ?DragImpact,
   droppable: DroppableDimension,
   draggables: DraggableDimensionMap,
   viewport: Viewport,

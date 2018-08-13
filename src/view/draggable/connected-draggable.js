@@ -99,7 +99,7 @@ export const makeMapStateToProps = (): Selector => {
     }
 
     // Currently not supported
-    if (impact.type === 'GROUPING') {
+    if (impact.type === 'GROUP') {
       return null;
     }
 

@@ -31,7 +31,7 @@ const getClientSelection = (
 
 export default ({ state, type }: Args): ?Result => {
   const { droppable, isMainAxisMovementAllowed } = (() => {
-    if (state.impact.destination) {
+    if (state.impact && state.impact.destination) {
       return {
         droppable:
           state.dimensions.droppables[state.impact.destination.droppableId],

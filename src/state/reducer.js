@@ -90,16 +90,18 @@ const moveWithPositionUpdates = ({
     };
   }
 
-  const newImpact: DragImpact =
-    impact ||
-    getDragImpact({
-      pageBorderBoxCenter: page.borderBoxCenter,
-      draggable: state.dimensions.draggables[state.critical.draggable.id],
-      draggables: state.dimensions.draggables,
-      droppables: state.dimensions.droppables,
-      previousImpact: state.impact,
-      viewport: newViewport,
-    });
+  // Use impact if it is provided - even if it is null
+  const newImpact: ?DragImpact =
+    typeof impact === 'undefined'
+      ? impact
+      : getDragImpact({
+          pageBorderBoxCenter: page.borderBoxCenter,
+          draggable: state.dimensions.draggables[state.critical.draggable.id],
+          draggables: state.dimensions.draggables,
+          droppables: state.dimensions.droppables,
+          previousImpact: state.impact,
+          viewport: newViewport,
+        });
 
   // dragging!
   const result: DraggingState = {
@@ -348,7 +350,7 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
-    const impact: DragImpact = getDragImpact({
+    const impact: ?DragImpact = getDragImpact({
       pageBorderBoxCenter: state.current.page.borderBoxCenter,
       draggable: dimensions.draggables[state.critical.draggable.id],
       draggables: dimensions.draggables,

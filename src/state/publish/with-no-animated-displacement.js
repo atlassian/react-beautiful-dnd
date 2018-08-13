@@ -1,7 +1,17 @@
 // @flow
+import invariant from 'tiny-invariant';
 import type { DragImpact, Displacement } from '../../types';
 
-export default (impact: DragImpact): DragImpact => {
+export default (impact: ?DragImpact): ?DragImpact => {
+  if (!impact) {
+    return impact;
+  }
+
+  invariant(
+    impact.type === 'REORDER',
+    'TODO: currently not supporting grouping',
+  );
+
   const displaced: Displacement[] = impact.movement.displaced;
   // nothing is displaced - we don't need to update anything
   if (!displaced.length) {

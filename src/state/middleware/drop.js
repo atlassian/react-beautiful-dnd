@@ -101,7 +101,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
   const destination: ?DraggableLocation =
     impact && impact.type === 'REORDER' ? impact.destination : null;
   const groupingWith: ?GroupingLocation =
-    impact && impact.type === 'GROUPING' ? impact.destination : null;
+    impact && impact.type === 'GROUP' ? impact.destination : null;
 
   // invariant(impact, 'TODO');
   // invariant(

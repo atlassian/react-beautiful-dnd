@@ -9,7 +9,7 @@ export type DisplacementMap = { [key: DraggableId]: Displacement };
 // a really important optimisation for big lists
 export default memoizeOne(
   (impact: ?DragImpact): DisplacementMap => {
-    if (!impact || impact.type === 'GROUPING') {
+    if (!impact || impact.type === 'GROUP') {
       return {};
     }
     return impact.movement.displaced.reduce(

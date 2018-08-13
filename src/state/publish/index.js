@@ -94,7 +94,7 @@ export default ({
   });
 
   // Get the impact of all of our changes
-  const impact: DragImpact = withNoAnimatedDisplacement(
+  const impact: ?DragImpact = withNoAnimatedDisplacement(
     getDragImpact({
       pageBorderBoxCenter: current.page.borderBoxCenter,
       draggable: dimensions.draggables[state.critical.draggable.id],
@@ -106,9 +106,7 @@ export default ({
   );
 
   const isOrphaned: boolean = Boolean(
-    state.autoScrollMode === 'JUMP' &&
-      state.impact.destination &&
-      !impact.destination,
+    state.autoScrollMode === 'JUMP' && state.impact && !impact,
   );
 
   // TODO: try and recover?

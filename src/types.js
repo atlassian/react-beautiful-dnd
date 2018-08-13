@@ -160,7 +160,7 @@ export type GroupingLocation = {|
 export type Location = DraggableLocation | GroupingLocation;
 
 export type GroupingImpact = {|
-  type: 'GROUPING',
+  type: 'GROUP',
   destination: GroupingLocation,
 |};
 
