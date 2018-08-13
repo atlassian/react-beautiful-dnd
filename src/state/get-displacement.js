@@ -15,7 +15,7 @@ import type {
 type Args = {|
   draggable: DraggableDimension,
   destination: DroppableDimension,
-  previousImpact: DragImpact,
+  previousImpact: ?DragImpact,
   viewport: Rect,
 |};
 
@@ -30,9 +30,7 @@ export default ({
   viewport,
 }: Args): Displacement => {
   const id: DraggableId = draggable.descriptor.id;
-  const map: DisplacementMap = getDisplacementMap(
-    previousImpact.movement.displaced,
-  );
+  const map: DisplacementMap = getDisplacementMap(previousImpact);
 
   // only displacing items that are visible in the droppable and the viewport
   const isVisible: boolean = isPartiallyVisible({

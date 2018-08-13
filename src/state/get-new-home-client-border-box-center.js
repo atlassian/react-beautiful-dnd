@@ -11,7 +11,7 @@ import moveToEdge from './move-to-edge';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
 
 type NewHomeArgs = {|
-  movement: DragMovement,
+  movement: ?DragMovement,
   draggable: DraggableDimension,
   // all draggables in the system
   draggables: DraggableDimensionMap,

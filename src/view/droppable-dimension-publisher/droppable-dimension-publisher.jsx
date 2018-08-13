@@ -13,6 +13,7 @@ import {
 } from 'css-box-model';
 import rafSchedule from 'raf-schd';
 import getClosestScrollable from '../get-closest-scrollable';
+import checkForNestedScrollContainers from './check-for-nested-scroll-container';
 import { dimensionMarshalKey } from '../context-keys';
 import { origin } from '../../state/position';
 import {
@@ -38,39 +39,12 @@ type Props = {|
   type: TypeId,
   direction: Direction,
   isDropDisabled: boolean,
+  isGroupingEnabled: boolean,
   ignoreContainerClipping: boolean,
   isDropDisabled: boolean,
   getDroppableRef: () => ?HTMLElement,
   children: Node,
 |};
-
-// We currently do not support nested scroll containers
-// But will hopefully support this soon!
-const checkForNestedScrollContainers = (scrollable: ?Element) => {
-  if (process.env.NODE_ENV === 'production') {
-    return;
-  }
-
-  if (!scrollable) {
-    return;
-  }
-
-  const anotherScrollParent: ?Element = getClosestScrollable(
-    scrollable.parentElement,
-  );
-
-  if (!anotherScrollParent) {
-    return;
-  }
-
-  console.warn(`
-    Droppable: unsupported nested scroll container detected.
-    A Droppable can only have one scroll parent (which can be itself)
-    Nested scroll containers are currently not supported.
-
-    We hope to support nested scroll containers soon: https://github.com/atlassian/react-beautiful-dnd/issues/131
-  `);
-};
 
 const getScroll = (el: Element): Position => ({
   x: el.scrollLeft,
@@ -375,6 +349,7 @@ export default class DroppableDimensionPublisher extends React.Component<
       direction,
       ignoreContainerClipping,
       isDropDisabled,
+      isGroupingEnabled,
       getDroppableRef,
     } = this.props;
 
@@ -418,6 +393,7 @@ export default class DroppableDimensionPublisher extends React.Component<
     const dimension: DroppableDimension = getDroppableDimension({
       descriptor,
       isEnabled: !isDropDisabled,
+      isGroupingEnabled,
       direction,
       client,
       page,

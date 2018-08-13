@@ -122,14 +122,17 @@ export default class Droppable extends Component<Props> {
 
   render() {
     const {
+      // ownProps
       children,
       direction,
+      type,
       droppableId,
+      isDropDisabled,
+      isGroupingEnabled,
+      // mapProps
       ignoreContainerClipping,
       isDraggingOver,
-      isDropDisabled,
       draggingOverWith,
-      type,
     } = this.props;
     const provided: Provided = {
       innerRef: this.setRef,
@@ -150,6 +153,7 @@ export default class Droppable extends Component<Props> {
         direction={direction}
         ignoreContainerClipping={ignoreContainerClipping}
         isDropDisabled={isDropDisabled}
+        isGroupingEnabled={isGroupingEnabled}
         getDroppableRef={this.getDroppableRef}
       >
         {children(provided, snapshot)}

@@ -9,6 +9,9 @@ import type {
   HookProvided,
   Critical,
   DraggableLocation,
+  GroupingLocation,
+  DragImpact,
+  Location,
   DragStart,
   Announce,
   DragUpdate,
@@ -33,11 +36,7 @@ const withTimings = (key: string, fn: Function) => {
   timings.finish(key);
 };
 
-const areLocationsEqual = (
-  first: ?DraggableLocation,
-  second: ?DraggableLocation,
-): boolean => {
-  // if both are null - we are equal
+const areLocationsEqual = (first: ?Location, second: ?Location): boolean => {
   if (first == null && second == null) {
     return true;
   }
@@ -47,10 +46,26 @@ const areLocationsEqual = (
     return false;
   }
 
-  // compare their actual values
-  return (
-    first.droppableId === second.droppableId && first.index === second.index
-  );
+  // For either DraggableLocation or GroupingLocation - if the droppable id
+  // is not the same then we can bail
+  if (first.droppableId !== second.droppableId) {
+    return false;
+  }
+
+  // DraggableLocation
+  if (first.index != null) {
+    if (second.index == null) {
+      return false;
+    }
+    return first.index === second.index;
+  }
+
+  // GroupingLocation
+  if (first.draggableId == null || second.draggableId == null) {
+    return false;
+  }
+
+  return first.draggableId === second.draggableId;
 };
 
 const isCriticalEqual = (first: Critical, second: Critical): boolean => {
@@ -147,7 +162,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
   };
 
   const publisher = (() => {
-    let lastLocation: ?DraggableLocation = null;
+    let lastLocation: ?Location = null;
     let lastCritical: ?Critical = null;
     let isDragStartPublished: boolean = false;
 
@@ -180,7 +195,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
     };
 
     // Passing in the critical location again as it can change during a drag
-    const move = (critical: Critical, location: ?DraggableLocation) => {
+    const move = (critical: Critical, impact: ?DragImpact) => {
       invariant(
         isDragStartPublished && lastCritical,
         'Cannot fire onDragMove when onDragStart has not been called',
@@ -194,6 +209,8 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
       if (hasCriticalChanged) {
         lastCritical = critical;
       }
+
+      const location: ?Location = impact ? impact.destination : null;
 
       // Has the location changed? Will result in a destination change
       const hasLocationChanged: boolean = !areLocationsEqual(
@@ -209,9 +226,16 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
         return;
       }
 
+      const destination: ?DraggableLocation =
+        impact && impact.type === 'REORDER' ? impact.destination : null;
+      const groupingWith: ?GroupingLocation =
+        impact && impact.type === 'GROUPING' ? impact.destination : null;
+
       const data: DragUpdate = {
         ...getDragStart(critical),
-        destination: location,
+        // TODO: grouping logic
+        destination,
+        groupingWith,
       };
 
       withTimings('onDragUpdate', () =>
@@ -242,6 +266,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
       const result: DropResult = {
         ...getDragStart(lastCritical),
         destination: null,
+        groupingWith: null,
         reason: 'CANCEL',
       };
       drop(result);
@@ -300,7 +325,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
 
     const state: State = store.getState();
     if (state.phase === 'DRAGGING') {
-      publisher.move(state.critical, state.impact.destination);
+      publisher.move(state.critical, state.impact);
     }
   };
 };

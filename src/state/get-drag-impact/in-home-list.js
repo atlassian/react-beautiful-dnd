@@ -5,6 +5,7 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DragImpact,
+  ReorderImpact,
   Axis,
   Displacement,
   Viewport,
@@ -21,7 +22,7 @@ type Args = {|
   draggable: DraggableDimension,
   home: DroppableDimension,
   insideHome: DraggableDimension[],
-  previousImpact: DragImpact,
+  previousImpact: ?DragImpact,
   viewport: Viewport,
 |};
 
@@ -120,7 +121,8 @@ export default ({
     isBeyondStartPosition,
   };
 
-  const impact: DragImpact = {
+  const impact: ReorderImpact = {
+    type: 'REORDER',
     movement,
     direction: axis.direction,
     destination: {

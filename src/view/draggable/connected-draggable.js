@@ -29,6 +29,7 @@ import type {
   DraggableDimension,
   Displacement,
   PendingDrop,
+  DragImpact,
 } from '../../types';
 import type {
   MapProps,
@@ -91,8 +92,18 @@ export const makeMapStateToProps = (): Selector => {
 
   const getOutOfTheWayMovement = (
     id: DraggableId,
-    movement: DragMovement,
+    impact: ?DragImpact,
   ): ?MapProps => {
+    if (!impact) {
+      return null;
+    }
+
+    // Currently not supported
+    if (impact.type === 'GROUPING') {
+      return null;
+    }
+
+    const movement: DragMovement = impact.movement;
     // Doing this cuts 50% of the time to move
     // Otherwise need to loop over every item in every selector (yuck!)
     const map: DisplacementMap = getDisplacementMap(movement.displaced);
@@ -130,9 +141,10 @@ export const makeMapStateToProps = (): Selector => {
       const dimension: DraggableDimension =
         state.dimensions.draggables[ownProps.draggableId];
       const shouldAnimateDragMovement: boolean = state.shouldAnimate;
-      const draggingOver: ?DroppableId = state.impact.destination
-        ? state.impact.destination.droppableId
-        : null;
+      const draggingOver: ?DroppableId =
+        state.impact && state.impact.destination
+          ? state.impact.destination.droppableId
+          : null;
 
       return getDraggingProps(
         memoizedOffset(offset.x, offset.y),
@@ -182,10 +194,7 @@ export const makeMapStateToProps = (): Selector => {
         return null;
       }
 
-      return getOutOfTheWayMovement(
-        ownProps.draggableId,
-        state.impact.movement,
-      );
+      return getOutOfTheWayMovement(ownProps.draggableId, state.impact);
     }
 
     // Dropping
@@ -194,11 +203,7 @@ export const makeMapStateToProps = (): Selector => {
       if (state.pending.result.draggableId === ownProps.draggableId) {
         return null;
       }
-
-      return getOutOfTheWayMovement(
-        ownProps.draggableId,
-        state.pending.impact.movement,
-      );
+      return getOutOfTheWayMovement(ownProps.draggableId, state.pending.impact);
     }
 
     // Otherwise

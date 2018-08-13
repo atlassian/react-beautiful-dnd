@@ -8,7 +8,7 @@ export const noMovement: DragMovement = {
   isBeyondStartPosition: false,
 };
 
-const noImpact: DragImpact = {
+const noImpact: ?DragImpact = {
   movement: noMovement,
   direction: null,
   destination: null,

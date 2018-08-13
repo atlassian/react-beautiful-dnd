@@ -11,7 +11,8 @@ import {
 import { type MoveArgs } from '../action-creators';
 import type {
   DroppableDimension,
-  DraggableLocation,
+  Location,
+  DragImpact,
   Viewport,
   DraggingState,
   DroppableId,
@@ -95,12 +96,10 @@ export default ({
       return;
     }
 
-    const destination: ?DraggableLocation = state.impact.destination;
+    const impact: ?DragImpact = state.impact;
+    invariant(impact, 'Cannot perform a jump scroll when there is no impact');
 
-    invariant(
-      destination,
-      'Cannot perform a jump scroll when there is no destination',
-    );
+    const destination: Location = impact.destination;
 
     // 1. We scroll the droppable first if we can to avoid the draggable
     // leaving the list

@@ -112,6 +112,7 @@ export type DroppableDimension = {|
   descriptor: DroppableDescriptor,
   axis: Axis,
   isEnabled: boolean,
+  isGroupingEnabled: boolean,
   // relative to the current viewport
   client: BoxModel,
   // relative to the whole page
@@ -143,12 +144,27 @@ export type DragMovement = {|
   isBeyondStartPosition: boolean,
 |};
 
-export type DragImpact = {|
+export type ReorderImpact = {|
+  type: 'REORDER',
   movement: DragMovement,
   // the direction of the Droppable you are over
-  direction: ?Direction,
-  destination: ?DraggableLocation,
+  direction: Direction,
+  destination: DraggableLocation,
 |};
+
+export type GroupingLocation = {|
+  droppableId: DroppableId,
+  draggableId: DraggableId,
+|};
+
+export type Location = DraggableLocation | GroupingLocation;
+
+export type GroupingImpact = {|
+  type: 'GROUPING',
+  destination: GroupingLocation,
+|};
+
+export type DragImpact = ReorderImpact | GroupingImpact;
 
 export type ClientPositions = {|
   // where the user initially selected
@@ -193,6 +209,8 @@ export type DragUpdate = {|
   ...DragStart,
   // may not have any destination (drag to nowhere)
   destination: ?DraggableLocation,
+  // populated when a draggable is dragging over another in grouping mode
+  groupingWith: ?GroupingLocation,
 |};
 
 export type DropReason = 'DROP' | 'CANCEL';
@@ -206,7 +224,7 @@ export type DropResult = {|
 export type PendingDrop = {|
   // TODO: newHomeClientOffset
   newHomeOffset: Position,
-  impact: DragImpact,
+  impact: ?DragImpact,
   result: DropResult,
 |};
 
@@ -263,7 +281,7 @@ export type DraggingState = {|
   dimensions: DimensionMap,
   initial: DragPositions,
   current: DragPositions,
-  impact: DragImpact,
+  impact: ?DragImpact,
   viewport: Viewport,
   // if we need to jump the scroll (keyboard dragging)
   scrollJumpRequest: ?Position,

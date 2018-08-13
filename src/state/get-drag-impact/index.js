@@ -11,7 +11,6 @@ import type {
 } from '../../types';
 import getDroppableOver from '../get-droppable-over';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import noImpact from '../no-impact';
 import inHomeList from './in-home-list';
 import inForeignList from './in-foreign-list';
 
@@ -21,7 +20,7 @@ type Args = {|
   // all dimensions in system
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
-  previousImpact: DragImpact,
+  previousImpact: ?DragImpact,
   viewport: Viewport,
 |};
 
@@ -32,9 +31,9 @@ export default ({
   droppables,
   previousImpact,
   viewport,
-}: Args): DragImpact => {
+}: Args): ?DragImpact => {
   const previousDroppableOverId: ?DroppableId =
-    previousImpact.destination && previousImpact.destination.droppableId;
+    previousImpact && previousImpact.destination.droppableId;
 
   const destinationId: ?DroppableId = getDroppableOver({
     target: pageBorderBoxCenter,
@@ -46,13 +45,13 @@ export default ({
 
   // not dragging over anything
   if (!destinationId) {
-    return noImpact;
+    return null;
   }
 
   const destination: DroppableDimension = droppables[destinationId];
 
   if (!destination.isEnabled) {
-    return noImpact;
+    return null;
   }
 
   const home: DroppableDimension = droppables[draggable.descriptor.droppableId];
@@ -68,7 +67,7 @@ export default ({
       draggable,
       home,
       insideHome: insideDestination,
-      previousImpact: previousImpact || noImpact,
+      previousImpact,
       viewport,
     });
   }
@@ -78,7 +77,7 @@ export default ({
     draggable,
     destination,
     insideDestination,
-    previousImpact: previousImpact || noImpact,
+    previousImpact,
     viewport,
   });
 };

@@ -4,6 +4,7 @@ import { type Position } from 'css-box-model';
 import moveToEdge from '../../../move-to-edge';
 import getDisplacement from '../../../get-displacement';
 import withDroppableDisplacement from '../../../with-droppable-displacement';
+import { patch } from '../../../position';
 import type { Edge } from '../../../move-to-edge';
 import type { Result } from '../move-cross-axis-types';
 import type {
@@ -11,6 +12,7 @@ import type {
   Viewport,
   Displacement,
   DragImpact,
+  ReorderImpact,
   DraggableDimension,
   DroppableDimension,
 } from '../../../../types';
@@ -22,7 +24,7 @@ type Args = {|
   insideDestination: DraggableDimension[],
   draggable: DraggableDimension,
   destination: DroppableDimension,
-  previousImpact: DragImpact,
+  previousImpact: ?DragImpact,
   viewport: Viewport,
 |};
 
@@ -48,22 +50,23 @@ export default ({
   // Super simple - just move it back to the original center with no impact
   if (targetIndex === homeIndex) {
     const newCenter: Position = draggable.page.borderBox.center;
-    const newImpact: DragImpact = {
-      movement: {
-        displaced: [],
-        amount,
-        isBeyondStartPosition: false,
-      },
-      direction: destination.axis.direction,
-      destination: {
-        droppableId: destination.descriptor.id,
-        index: homeIndex,
-      },
-    };
 
     return {
       pageBorderBoxCenter: withDroppableDisplacement(destination, newCenter),
-      impact: newImpact,
+      // TODO: use getHomeImpact (this is just copied)
+      impact: {
+        type: 'REORDER',
+        movement: {
+          displaced: [],
+          isBeyondStartPosition: false,
+          amount: patch(axis.line, draggable.client.marginBox[axis.size]),
+        },
+        direction: axis.direction,
+        destination: {
+          index: draggable.descriptor.index,
+          droppableId: draggable.descriptor.droppableId,
+        },
+      },
     };
   }
 
@@ -115,7 +118,8 @@ export default ({
       }),
   );
 
-  const newImpact: DragImpact = {
+  const newImpact: ReorderImpact = {
+    type: 'REORDER',
     movement: {
       displaced,
       amount,

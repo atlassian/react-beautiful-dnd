@@ -7,7 +7,6 @@ import {
   animateDrop,
   clean,
 } from '../action-creators';
-import noImpact from '../no-impact';
 import getNewHomeClientBorderBoxCenter from '../get-new-home-client-border-box-center';
 import { add, subtract, isEqual, origin } from '../position';
 import withDroppableDisplacement from '../with-droppable-displacement';
@@ -79,7 +78,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
 
   const critical: Critical = state.critical;
   const dimensions: DimensionMap = state.dimensions;
-  const impact: DragImpact = reason === 'DROP' ? state.impact : noImpact;
+  const impact: ?DragImpact = reason === 'DROP' ? state.impact : null;
   const home: DroppableDimension =
     dimensions.droppables[state.critical.droppable.id];
   const draggable: DraggableDimension =
@@ -93,14 +92,20 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     index: critical.draggable.index,
     droppableId: critical.droppable.id,
   };
-  const destination: ?DraggableLocation =
-    reason === 'DROP' ? impact.destination : null;
+
+  invariant(impact, 'TODO');
+  invariant(
+    impact.type === 'REORDER',
+    `Currently not supporting ${impact.type}`,
+  );
 
   const result: DropResult = {
     draggableId: draggable.descriptor.id,
     type: home.descriptor.type,
     source,
-    destination,
+    // TODO! grouping
+    destination: impact.destination,
+    groupingWith: null,
     reason,
   };
 
@@ -110,6 +115,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
       return origin;
     }
 
+    // TODO
     const newBorderBoxClientCenter: Position = getNewHomeClientBorderBoxCenter({
       movement: impact.movement,
       draggable,

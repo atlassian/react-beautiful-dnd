@@ -28,7 +28,7 @@ type Args = {|
   // the source location of the draggable
   home: DraggableLocation,
   // the impact of a previous drag,
-  previousImpact: DragImpact,
+  previousImpact: ?DragImpact,
   // the viewport
   viewport: Viewport,
 |};

@@ -275,7 +275,7 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
 
     const droppable: ?DroppableDimension = getBestScrollableDroppable({
       center,
-      destination: state.impact.destination,
+      destination: state.impact ? state.impact.destination : null,
       droppables: state.dimensions.droppables,
     });
 

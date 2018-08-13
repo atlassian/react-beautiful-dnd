@@ -278,7 +278,7 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
-    const impact: DragImpact = (() => {
+    const impact: ?DragImpact = (() => {
       // flow is getting confused - so running this check again
       invariant(isMovementAllowed(state));
 

@@ -8,9 +8,16 @@ export type DisplacementMap = { [key: DraggableId]: Displacement };
 // it saves needing to loop over the list in every component
 // a really important optimisation for big lists
 export default memoizeOne(
-  (displaced: Displacement[]): DisplacementMap =>
-    displaced.reduce((map: DisplacementMap, displacement: Displacement) => {
-      map[displacement.draggableId] = displacement;
-      return map;
-    }, {}),
+  (impact: ?DragImpact): DisplacementMap => {
+    if (!impact || impact.type === 'GROUPING') {
+      return {};
+    }
+    return impact.movement.displaced.reduce(
+      (map: DisplacementMap, displacement: Displacement) => {
+        map[displacement.draggableId] = displacement;
+        return map;
+      },
+      {},
+    );
+  },
 );
