@@ -263,26 +263,11 @@ export const makeMapStateToProps = (): Selector => {
     return null;
   };
 
-  const selector = (state: State, ownProps: OwnProps): MapProps => {
-    const dragging: ?MapProps = draggingSelector(state, ownProps);
-    if (dragging) {
-      return dragging;
-    }
-
-    const groupedWith: ?MapProps = groupedOverBySelector(state, ownProps);
-    if (groupedWith) {
-      return groupedWith;
-    }
-
-    const movingOutOfTheWay: ?MapProps = movingOutOfTheWaySelector(
-      state,
-      ownProps,
-    );
-    if (movingOutOfTheWay) {
-      return movingOutOfTheWay;
-    }
-    return defaultMapProps;
-  };
+  const selector = (state: State, ownProps: OwnProps): MapProps =>
+    draggingSelector(state, ownProps) ||
+    groupedOverBySelector(state, ownProps) ||
+    movingOutOfTheWaySelector(state, ownProps) ||
+    defaultMapProps;
 
   return selector;
 };
