@@ -6,6 +6,7 @@ import type {
   DroppableDimension,
   DraggableDimensionMap,
   DroppableDimensionMap,
+  UserDirection,
   DragImpact,
   Viewport,
 } from '../../types';
@@ -22,6 +23,7 @@ type Args = {|
   droppables: DroppableDimensionMap,
   previousImpact: ?DragImpact,
   viewport: Viewport,
+  direction: UserDirection,
 |};
 
 export default ({
@@ -69,6 +71,7 @@ export default ({
       insideHome: insideDestination,
       previousImpact,
       viewport,
+      direction,
     });
   }
 

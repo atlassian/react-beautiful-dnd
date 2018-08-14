@@ -9,6 +9,7 @@ import type {
   Axis,
   Displacement,
   Viewport,
+  UserDirection,
 } from '../../types';
 import { patch } from '../position';
 import getDisplacement from '../get-displacement';
@@ -24,6 +25,7 @@ type Args = {|
   insideHome: DraggableDimension[],
   previousImpact: ?DragImpact,
   viewport: Viewport,
+  direction: UserDirection,
 |};
 
 export default ({
@@ -33,6 +35,7 @@ export default ({
   insideHome,
   previousImpact,
   viewport,
+  direction,
 }: Args): DragImpact => {
   const axis: Axis = home.axis;
   // The starting center position

@@ -159,8 +159,19 @@ export type GroupingLocation = {|
 
 export type Location = DraggableLocation | GroupingLocation;
 
+export type UserDirection = {|
+  vertical: 'up' | 'down',
+  horizontal: 'left' | 'right',
+  // TODO: record amount of shift from start
+  // Would be useful for auto scrolling
+  // Gotcha: droppable scroll changes...
+  // clientDiffFromStart: Spacing,
+|};
+
 export type GroupingImpact = {|
   type: 'GROUP',
+  // This has an impact on the hitbox for a grouping action
+  whenEntered: UserDirection,
   destination: GroupingLocation,
 |};
 
@@ -281,6 +292,7 @@ export type DraggingState = {|
   dimensions: DimensionMap,
   initial: DragPositions,
   current: DragPositions,
+  direction: UserDirection,
   impact: ?DragImpact,
   viewport: Viewport,
   // if we need to jump the scroll (keyboard dragging)
