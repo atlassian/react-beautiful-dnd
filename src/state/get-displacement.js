@@ -15,7 +15,7 @@ import type {
 type Args = {|
   draggable: DraggableDimension,
   destination: DroppableDimension,
-  previousImpact: ?DragImpact,
+  previousImpact: DragImpact,
   viewport: Rect,
 |};
 

@@ -31,7 +31,7 @@ type Args = {|
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
   // any previous impact
-  previousImpact: ?DragImpact,
+  previousImpact: DragImpact,
   // the current viewport
   viewport: Viewport,
 |};

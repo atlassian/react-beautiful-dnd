@@ -144,20 +144,10 @@ export type DragMovement = {|
   isBeyondStartPosition: boolean,
 |};
 
-export type ReorderImpact = {|
-  type: 'REORDER',
-  movement: DragMovement,
-  // the direction of the Droppable you are over
-  direction: Direction,
-  destination: DraggableLocation,
-|};
-
 export type GroupingLocation = {|
   droppableId: DroppableId,
   draggableId: DraggableId,
 |};
-
-export type Location = DraggableLocation | GroupingLocation;
 
 export type UserDirection = {|
   vertical: 'up' | 'down',
@@ -169,13 +159,18 @@ export type UserDirection = {|
 |};
 
 export type GroupingImpact = {|
-  type: 'GROUP',
   // This has an impact on the hitbox for a grouping action
   whenEntered: UserDirection,
-  destination: GroupingLocation,
+  groupingWith: GroupingLocation,
 |};
 
-export type DragImpact = ReorderImpact | GroupingImpact;
+export type DragImpact = {|
+  movement: DragMovement,
+  // the direction of the Droppable you are over
+  direction: ?Direction,
+  destination: ?DraggableLocation,
+  group: ?GroupingImpact,
+|};
 
 export type ClientPositions = {|
   // where the user initially selected
@@ -235,7 +230,7 @@ export type DropResult = {|
 export type PendingDrop = {|
   // TODO: newHomeClientOffset
   newHomeOffset: Position,
-  impact: ?DragImpact,
+  impact: DragImpact,
   result: DropResult,
 |};
 
@@ -293,7 +288,7 @@ export type DraggingState = {|
   initial: DragPositions,
   current: DragPositions,
   direction: UserDirection,
-  impact: ?DragImpact,
+  impact: DragImpact,
   viewport: Viewport,
   // if we need to jump the scroll (keyboard dragging)
   scrollJumpRequest: ?Position,

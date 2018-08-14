@@ -9,8 +9,6 @@ import type {
   HookProvided,
   Critical,
   DraggableLocation,
-  GroupingLocation,
-  DragImpact,
   DragStart,
   Announce,
   DragUpdate,
@@ -35,22 +33,11 @@ const withTimings = (key: string, fn: Function) => {
   timings.finish(key);
 };
 
-type ReorderLocationRecord = {|
-  type: 'REORDER',
-  value: DraggableLocation,
-|};
-
-type GroupingLocationRecord = {|
-  type: 'GROUP',
-  value: GroupingLocation,
-|};
-
-type LocationRecord = ReorderLocationRecord | GroupingLocationRecord;
-
 const areLocationsEqual = (
-  first: ?LocationRecord,
-  second: ?LocationRecord,
+  first: ?DraggableLocation,
+  second: ?DraggableLocation,
 ): boolean => {
+  // if both are null - we are equal
   if (first == null && second == null) {
     return true;
   }
@@ -60,25 +47,10 @@ const areLocationsEqual = (
     return false;
   }
 
-  // different record type
-  if (first.type !== second.type) {
-    return false;
-  }
-
-  // For either DraggableLocation or GroupingLocation - if the droppable id
-  // is not the same then we can bail
-  if (first.value.droppableId !== second.value.droppableId) {
-    return false;
-  }
-
-  if (first.type === 'REORDER') {
-    // $FlowFixMe - flow is getting confused here
-    return first.value.index === second.value.index;
-  }
-
-  // GROUP
-  // $FlowFixMe - flow is getting confused here
-  return first.value.draggableId === second.value.draggableId;
+  // compare their actual values
+  return (
+    first.droppableId === second.droppableId && first.index === second.index
+  );
 };
 
 const isCriticalEqual = (first: Critical, second: Critical): boolean => {
@@ -97,22 +69,6 @@ const isCriticalEqual = (first: Critical, second: Critical): boolean => {
     first.droppable.type === second.droppable.type;
 
   return isDraggableEqual && isDroppableEqual;
-};
-
-const getLocationRecord = (impact: ?DragImpact): ?LocationRecord => {
-  if (!impact) {
-    return null;
-  }
-  if (impact.type === 'REORDER') {
-    return {
-      type: 'REORDER',
-      value: impact.destination,
-    };
-  }
-  return {
-    type: 'GROUP',
-    value: impact.destination,
-  };
 };
 
 const getExpiringAnnounce = (announce: Announce) => {
@@ -191,7 +147,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
   };
 
   const publisher = (() => {
-    let lastLocation: ?LocationRecord = null;
+    let lastLocation: ?DraggableLocation = null;
     let lastCritical: ?Critical = null;
     let isDragStartPublished: boolean = false;
 
@@ -216,10 +172,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
       );
       const data: DragStart = getDragStart(critical);
       lastCritical = critical;
-      lastLocation = {
-        type: 'REORDER',
-        value: data.source,
-      };
+      lastLocation = data.source;
       isDragStartPublished = true;
       withTimings('onDragStart', () =>
         execute(getHooks().onDragStart, data, messagePreset.onDragStart),
@@ -227,7 +180,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
     };
 
     // Passing in the critical location again as it can change during a drag
-    const move = (critical: Critical, impact: ?DragImpact) => {
+    const move = (critical: Critical, location: ?DraggableLocation) => {
       invariant(
         isDragStartPublished && lastCritical,
         'Cannot fire onDragMove when onDragStart has not been called',
@@ -241,8 +194,6 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
       if (hasCriticalChanged) {
         lastCritical = critical;
       }
-
-      const location: ?LocationRecord = getLocationRecord(impact);
 
       // Has the location changed? Will result in a destination change
       const hasLocationChanged: boolean = !areLocationsEqual(
@@ -258,16 +209,11 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
         return;
       }
 
-      const destination: ?DraggableLocation =
-        impact && impact.type === 'REORDER' ? impact.destination : null;
-      const groupingWith: ?GroupingLocation =
-        impact && impact.type === 'GROUP' ? impact.destination : null;
-
       const data: DragUpdate = {
         ...getDragStart(critical),
-        // TODO: grouping logic
-        destination,
-        groupingWith,
+        // TODO
+        groupingWith: null,
+        destination: location,
       };
 
       withTimings('onDragUpdate', () =>
@@ -297,8 +243,8 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
 
       const result: DropResult = {
         ...getDragStart(lastCritical),
-        destination: null,
         groupingWith: null,
+        destination: null,
         reason: 'CANCEL',
       };
       drop(result);
@@ -357,7 +303,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
 
     const state: State = store.getState();
     if (state.phase === 'DRAGGING') {
-      publisher.move(state.critical, state.impact);
+      publisher.move(state.critical, state.impact.destination);
     }
   };
 };

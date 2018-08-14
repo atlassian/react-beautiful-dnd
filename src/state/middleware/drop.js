@@ -7,6 +7,7 @@ import {
   animateDrop,
   clean,
 } from '../action-creators';
+import noImpact from '../no-impact';
 import getNewHomeClientBorderBoxCenter from '../get-new-home-client-border-box-center';
 import { add, subtract, isEqual, origin } from '../position';
 import withDroppableDisplacement from '../with-droppable-displacement';
@@ -19,7 +20,6 @@ import type {
   DraggableLocation,
   GroupingLocation,
   DragImpact,
-  DragMovement,
   DropResult,
   PendingDrop,
   DimensionMap,
@@ -80,14 +80,12 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
 
   const critical: Critical = state.critical;
   const dimensions: DimensionMap = state.dimensions;
+  // Only keeping impact when doing a user drop - otherwise we are cancelling
+  const impact: DragImpact = reason === 'DROP' ? state.impact : noImpact;
   const home: DroppableDimension =
     dimensions.droppables[state.critical.droppable.id];
   const draggable: DraggableDimension =
     dimensions.draggables[state.critical.draggable.id];
-
-  // Only keep the impact if we are explicitly dropping
-  const impact: ?DragImpact = reason === 'DROP' ? state.impact : null;
-
   const droppable: ?DroppableDimension =
     impact && impact.destination
       ? dimensions.droppables[impact.destination.droppableId]
@@ -97,17 +95,11 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     index: critical.draggable.index,
     droppableId: critical.droppable.id,
   };
-
-  const destination: ?DraggableLocation =
-    impact && impact.type === 'REORDER' ? impact.destination : null;
   const groupingWith: ?GroupingLocation =
-    impact && impact.type === 'GROUP' ? impact.destination : null;
-
-  // invariant(impact, 'TODO');
-  // invariant(
-  //   impact.type === 'REORDER',
-  //   `Currently not supporting ${impact.type}`,
-  // );
+    impact && impact.group ? impact.group.groupingWith : null;
+  // Only publishing destination if there is no grouping occurring
+  const destination: ?DraggableLocation =
+    impact && !groupingWith ? impact.destination : null;
 
   const result: DropResult = {
     draggableId: draggable.descriptor.id,
@@ -124,11 +116,8 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
       return origin;
     }
 
-    // TODO
-    const movement: ?DragMovement =
-      impact && impact.type === 'REORDER' ? impact.movement : null;
     const newBorderBoxClientCenter: Position = getNewHomeClientBorderBoxCenter({
-      movement,
+      movement: impact.movement,
       draggable,
       draggables: dimensions.draggables,
       destination: droppable,

@@ -12,7 +12,6 @@ import type {
   Viewport,
   Displacement,
   DragImpact,
-  ReorderImpact,
   DraggableDimension,
   DroppableDimension,
 } from '../../../../types';
@@ -24,7 +23,7 @@ type Args = {|
   insideDestination: DraggableDimension[],
   draggable: DraggableDimension,
   destination: DroppableDimension,
-  previousImpact: ?DragImpact,
+  previousImpact: DragImpact,
   viewport: Viewport,
 |};
 
@@ -55,7 +54,6 @@ export default ({
       pageBorderBoxCenter: withDroppableDisplacement(destination, newCenter),
       // TODO: use getHomeImpact (this is just copied)
       impact: {
-        type: 'REORDER',
         movement: {
           displaced: [],
           isBeyondStartPosition: false,
@@ -66,6 +64,7 @@ export default ({
           index: draggable.descriptor.index,
           droppableId: draggable.descriptor.droppableId,
         },
+        group: null,
       },
     };
   }
@@ -118,8 +117,7 @@ export default ({
       }),
   );
 
-  const newImpact: ReorderImpact = {
-    type: 'REORDER',
+  const newImpact: DragImpact = {
     movement: {
       displaced,
       amount,
@@ -130,6 +128,7 @@ export default ({
       droppableId: destination.descriptor.id,
       index: targetIndex,
     },
+    group: null,
   };
 
   return {

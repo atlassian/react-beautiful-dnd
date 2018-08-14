@@ -21,7 +21,7 @@ type Args = {|
   insideDestination: DraggableDimension[],
   draggable: DraggableDimension,
   destination: DroppableDimension,
-  previousImpact: ?DragImpact,
+  previousImpact: DragImpact,
   viewport: Viewport,
 |};
 
@@ -57,7 +57,6 @@ export default ({
     });
 
     const newImpact: DragImpact = {
-      type: 'REORDER',
       movement: {
         displaced: [],
         amount,
@@ -68,6 +67,7 @@ export default ({
         droppableId: destination.descriptor.id,
         index: 0,
       },
+      group: null,
     };
 
     return {
@@ -114,7 +114,6 @@ export default ({
     );
 
   const newImpact: DragImpact = {
-    type: 'REORDER',
     movement: {
       displaced,
       amount,
@@ -125,6 +124,7 @@ export default ({
       droppableId: destination.descriptor.id,
       index: proposedIndex,
     },
+    group: null,
   };
 
   return {

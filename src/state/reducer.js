@@ -107,18 +107,17 @@ const moveWithPositionUpdates = ({
   }
 
   // Use impact if it is provided - even if it is null
-  const newImpact: ?DragImpact =
-    typeof impact === 'undefined'
-      ? impact
-      : getDragImpact({
-          pageBorderBoxCenter: page.borderBoxCenter,
-          draggable: state.dimensions.draggables[state.critical.draggable.id],
-          draggables: state.dimensions.draggables,
-          droppables: state.dimensions.droppables,
-          previousImpact: state.impact,
-          viewport: newViewport,
-          direction,
-        });
+  const newImpact: DragImpact =
+    impact ||
+    getDragImpact({
+      pageBorderBoxCenter: page.borderBoxCenter,
+      draggable: state.dimensions.draggables[state.critical.draggable.id],
+      draggables: state.dimensions.draggables,
+      droppables: state.dimensions.droppables,
+      previousImpact: state.impact,
+      viewport: newViewport,
+      direction,
+    });
 
   // dragging!
   const result: DraggingState = {
@@ -303,7 +302,7 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
-    const impact: ?DragImpact = (() => {
+    const impact: DragImpact = (() => {
       // flow is getting confused - so running this check again
       invariant(isMovementAllowed(state));
 
@@ -319,6 +318,8 @@ export default (state: State = idle, action: Action): State => {
         droppables: dimensions.droppables,
         previousImpact: state.impact,
         viewport: state.viewport,
+        // TODO: is this correct?
+        direction: state.direction,
       });
     })();
 
@@ -373,13 +374,14 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
-    const impact: ?DragImpact = getDragImpact({
+    const impact: DragImpact = getDragImpact({
       pageBorderBoxCenter: state.current.page.borderBoxCenter,
       draggable: dimensions.draggables[state.critical.draggable.id],
       draggables: dimensions.draggables,
       droppables: dimensions.droppables,
       previousImpact: state.impact,
       viewport: state.viewport,
+      direction: state.direction,
     });
 
     return {

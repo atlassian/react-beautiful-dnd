@@ -99,33 +99,18 @@ export const makeMapStateToProps = (): Selector => {
   const getGroupedOverBy = (
     ownId: DraggableId,
     draggingId: DraggableId,
-    impact: ?DragImpact,
+    impact: DragImpact,
   ): ?MapProps => {
-    if (!impact) {
-      return null;
+    if (impact.group && impact.group.groupingWith.draggableId === ownId) {
+      return getGroupedOverByProps(draggingId);
     }
-    if (impact.type !== 'GROUP') {
-      return null;
-    }
-    if (impact.destination.draggableId !== ownId) {
-      return null;
-    }
-    return getGroupedOverByProps(draggingId);
+    return null;
   };
 
   const getOutOfTheWayMovement = (
     id: DraggableId,
-    impact: ?DragImpact,
+    impact: DragImpact,
   ): ?MapProps => {
-    if (!impact) {
-      return null;
-    }
-
-    // Only look at reordering impacts
-    if (impact.type !== 'REORDER') {
-      return null;
-    }
-
     // Doing this cuts 50% of the time to move
     // Otherwise need to loop over every item in every selector (yuck!)
     const map: DisplacementMap = getDisplacementMap(impact);
@@ -164,15 +149,13 @@ export const makeMapStateToProps = (): Selector => {
       const dimension: DraggableDimension =
         state.dimensions.draggables[ownProps.draggableId];
       const shouldAnimateDragMovement: boolean = state.shouldAnimate;
-      const draggingOver: ?DroppableId =
-        state.impact && state.impact.destination
-          ? state.impact.destination.droppableId
-          : null;
+      const draggingOver: ?DroppableId = state.impact.destination
+        ? state.impact.destination.droppableId
+        : null;
 
-      const groupingWith: ?DraggableId =
-        state.impact && state.impact.type === 'GROUP'
-          ? ownProps.draggableId
-          : null;
+      const groupingWith: ?DraggableId = state.impact.group
+        ? state.impact.group.groupingWith.draggableId
+        : null;
 
       return getDraggingProps(
         memoizedOffset(offset.x, offset.y),

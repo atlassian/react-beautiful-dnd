@@ -5,12 +5,10 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DragImpact,
-  ReorderImpact,
   Axis,
   Displacement,
   Viewport,
   UserDirection,
-  GroupingImpact,
 } from '../../types';
 import { patch } from '../position';
 import getDisplacement from '../get-displacement';
@@ -26,7 +24,7 @@ type Args = {|
   draggable: DraggableDimension,
   home: DroppableDimension,
   insideHome: DraggableDimension[],
-  previousImpact: ?DragImpact,
+  previousImpact: DragImpact,
   viewport: Viewport,
   direction: UserDirection,
 |};
@@ -54,10 +52,9 @@ export default ({
   // Are we grouping?
   // const isGroupingEnabled: boolean = home.isGroupingEnabled;
 
-  const direction: UserDirection =
-    previousImpact && previousImpact.type === 'GROUP'
-      ? previousImpact.whenEntered
-      : currentDirection;
+  const direction: UserDirection = previousImpact.group
+    ? previousImpact.group.whenEntered
+    : currentDirection;
 
   const isMovingForward: boolean =
     axis === vertical
@@ -89,20 +86,7 @@ export default ({
   );
 
   if (groupedWith) {
-    console.log(
-      draggable.descriptor.id,
-      'is grouping with',
-      groupedWith.descriptor.id,
-    );
-    const result: GroupingImpact = {
-      type: 'GROUP',
-      whenEntered: direction,
-      destination: {
-        droppableId: home.descriptor.id,
-        draggableId: groupedWith.descriptor.id,
-      },
-    };
-    return result;
+    console.log('grouped with', groupedWith.descriptor.id);
   }
 
   // not considering margin so that items move based on visible edges
@@ -181,14 +165,15 @@ export default ({
     isBeyondStartPosition,
   };
 
-  const impact: ReorderImpact = {
-    type: 'REORDER',
+  const impact: DragImpact = {
     movement,
     direction: axis.direction,
     destination: {
       droppableId: home.descriptor.id,
       index,
     },
+    // TODO
+    group: null,
   };
 
   return impact;

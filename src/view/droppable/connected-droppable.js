@@ -61,13 +61,14 @@ export const makeMapStateToProps = (): Selector => {
   const getDraggingOverProps = (
     id: DroppableId,
     draggable: DraggableDimension,
-    impact: ?DragImpact,
+    impact: DragImpact,
   ) => {
-    if (!impact) {
+    const destination: ?DraggableLocation = impact.destination;
+    if (!destination) {
       return getDefault();
     }
 
-    const isDraggingOver: boolean = id === impact.destination.droppableId;
+    const isDraggingOver: boolean = id === destination.droppableId;
 
     if (!isDraggingOver) {
       return getDefault();
@@ -76,7 +77,7 @@ export const makeMapStateToProps = (): Selector => {
     const placeholder: ?Placeholder = shouldUsePlaceholder(
       id,
       draggable.descriptor,
-      impact.destination,
+      destination,
     )
       ? draggable.placeholder
       : null;
