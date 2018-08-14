@@ -10,10 +10,13 @@ import type {
   Displacement,
   Viewport,
   UserDirection,
+  GroupingImpact,
 } from '../../types';
 import { patch } from '../position';
 import getDisplacement from '../get-displacement';
 import withDroppableScroll from '../with-droppable-scroll';
+import isWithin from '../is-within';
+import { vertical } from '../axis';
 
 // It is the responsibility of this function
 // to return the impact of a drag
@@ -35,7 +38,7 @@ export default ({
   insideHome,
   previousImpact,
   viewport,
-  direction,
+  direction: currentDirection,
 }: Args): DragImpact => {
   const axis: Axis = home.axis;
   // The starting center position
@@ -49,14 +52,57 @@ export default ({
   );
 
   // Are we grouping?
-  const isGroupingEnabled: boolean = home.isGroupingEnabled;
+  // const isGroupingEnabled: boolean = home.isGroupingEnabled;
 
-  if (isGroupingEnabled) {
-    // If over a group hitbox: then use that
-    // Otherwise perform a standard reorder
-    // User direction:
-    // if there is a previous grouping impact: use the direction from that
-    // otherwise use the current user direction
+  const direction: UserDirection =
+    previousImpact && previousImpact.type === 'GROUP'
+      ? previousImpact.whenEntered
+      : currentDirection;
+
+  const isMovingForward: boolean =
+    axis === vertical
+      ? direction.vertical === 'down'
+      : direction.horizontal === 'right';
+
+  // if (isGroupingEnabled) {
+  // are we over the top over any draggable?
+  const groupedWith: ?DraggableDimension = insideHome.find(
+    (child: DraggableDimension): boolean => {
+      // Cannot group with yourself
+      if (child.descriptor.id === draggable.descriptor.id) {
+        return false;
+      }
+
+      const marginBox: Rect = child.page.marginBox;
+      const start: number = marginBox[axis.start];
+      const end: number = marginBox[axis.end];
+      const size: number = marginBox[axis.size];
+      const oneThird: number = size * 0.333;
+
+      const adjustedStart: number = isMovingForward ? start : start + oneThird;
+      const adjustedEnd: number = isMovingForward ? end - oneThird : end;
+
+      const isOver = isWithin(adjustedStart, adjustedEnd);
+
+      return isOver(currentCenter[axis.line]);
+    },
+  );
+
+  if (groupedWith) {
+    console.log(
+      draggable.descriptor.id,
+      'is grouping with',
+      groupedWith.descriptor.id,
+    );
+    const result: GroupingImpact = {
+      type: 'GROUP',
+      whenEntered: direction,
+      destination: {
+        droppableId: home.descriptor.id,
+        draggableId: groupedWith.descriptor.id,
+      },
+    };
+    return result;
   }
 
   // not considering margin so that items move based on visible edges

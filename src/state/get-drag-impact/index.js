@@ -33,6 +33,7 @@ export default ({
   droppables,
   previousImpact,
   viewport,
+  direction,
 }: Args): ?DragImpact => {
   const previousDroppableOverId: ?DroppableId =
     previousImpact && previousImpact.destination.droppableId;

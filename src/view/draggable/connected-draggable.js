@@ -51,6 +51,7 @@ const defaultMapProps: MapProps = {
   dimension: null,
   draggingOver: null,
   groupingWith: null,
+  groupedOverBy: null,
 };
 
 // Returning a function to ensure each
@@ -62,17 +63,16 @@ export const makeMapStateToProps = (): Selector => {
 
   const getNotDraggingProps = memoizeOne(
     (offset: Position, shouldAnimateDisplacement: boolean): MapProps => ({
-      isDropAnimating: false,
-      isDragging: false,
+      ...defaultMapProps,
       offset,
       shouldAnimateDisplacement,
-      // not relevant
-      shouldAnimateDragMovement: false,
-      dimension: null,
-      draggingOver: null,
-      groupingWith: null,
     }),
   );
+
+  const getGroupedOverByProps = memoizeOne((groupedOverBy: DraggableId) => ({
+    ...defaultMapProps,
+    groupedOverBy,
+  }));
 
   const getDraggingProps = memoizeOne(
     (
@@ -92,8 +92,26 @@ export const makeMapStateToProps = (): Selector => {
       dimension,
       draggingOver,
       groupingWith,
+      groupedOverBy: null,
     }),
   );
+
+  const getGroupedOverBy = (
+    ownId: DraggableId,
+    draggingId: DraggableId,
+    impact: ?DragImpact,
+  ): ?MapProps => {
+    if (!impact) {
+      return null;
+    }
+    if (impact.type !== 'GROUP') {
+      return null;
+    }
+    if (impact.destination.draggableId !== ownId) {
+      return null;
+    }
+    return getGroupedOverByProps(draggingId);
+  };
 
   const getOutOfTheWayMovement = (
     id: DraggableId,
@@ -103,8 +121,8 @@ export const makeMapStateToProps = (): Selector => {
       return null;
     }
 
-    // Currently not supported
-    if (impact.type === 'GROUP') {
+    // Only look at reordering impacts
+    if (impact.type !== 'REORDER') {
       return null;
     }
 
@@ -152,9 +170,7 @@ export const makeMapStateToProps = (): Selector => {
           : null;
 
       const groupingWith: ?DraggableId =
-        state.impact &&
-        state.impact.type === 'GROUP' &&
-        state.impact.destination.draggableId === ownProps.draggableId
+        state.impact && state.impact.type === 'GROUP'
           ? ownProps.draggableId
           : null;
 
@@ -192,12 +208,48 @@ export const makeMapStateToProps = (): Selector => {
         draggingOver,
         // animation will be controlled by the isDropAnimating flag
         shouldAnimateDragMovement: false,
+        // Grouping
+        groupingWith,
+        groupedOverBy: null,
         // not relevant,
         shouldAnimateDisplacement: false,
-        groupingWith,
       };
     }
 
+    return null;
+  };
+
+  const groupedOverBySelector = (
+    state: State,
+    ownProps: OwnProps,
+  ): ?MapProps => {
+    if (state.isDragging) {
+      // we do not care about the dragging item
+      if (state.critical.draggable.id === ownProps.draggableId) {
+        return null;
+      }
+
+      return getGroupedOverBy(
+        ownProps.draggableId,
+        state.critical.draggable.id,
+        state.impact,
+      );
+    }
+
+    // Dropping
+    if (state.phase === 'DROP_ANIMATING') {
+      // do nothing if this was the dragging item
+      if (state.pending.result.draggableId === ownProps.draggableId) {
+        return null;
+      }
+      return getGroupedOverBy(
+        ownProps.draggableId,
+        state.pending.result.draggableId,
+        state.pending.impact,
+      );
+    }
+
+    // Otherwise
     return null;
   };
 
@@ -233,6 +285,12 @@ export const makeMapStateToProps = (): Selector => {
     if (dragging) {
       return dragging;
     }
+
+    const groupedWith: ?MapProps = groupedOverBySelector(state, ownProps);
+    if (groupedWith) {
+      return groupedWith;
+    }
+
     const movingOutOfTheWay: ?MapProps = movingOutOfTheWaySelector(
       state,
       ownProps,

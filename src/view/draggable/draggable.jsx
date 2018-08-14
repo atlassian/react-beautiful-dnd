@@ -261,11 +261,13 @@ export default class Draggable extends Component<Props> {
       isDropAnimating: boolean,
       draggingOver: ?DroppableId,
       groupingWith: ?DraggableId,
+      groupedOverBy: ?DraggableId,
     ): StateSnapshot => ({
       isDragging: isDraggingOrDropping,
       isDropAnimating,
       draggingOver,
       groupingWith,
+      groupedOverBy,
     }),
   );
 
@@ -278,6 +280,7 @@ export default class Draggable extends Component<Props> {
       isDropAnimating,
       draggingOver,
       groupingWith,
+      groupedOverBy,
       dimension,
       shouldAnimateDisplacement,
       children,
@@ -298,6 +301,7 @@ export default class Draggable extends Component<Props> {
         isDropAnimating,
         draggingOver,
         groupingWith,
+        groupedOverBy,
       ),
     );
 
