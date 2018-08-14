@@ -7,9 +7,6 @@ import Draggable from './draggable';
 import { storeKey } from '../context-keys';
 import { negate, origin } from '../../state/position';
 import isStrictEqual from '../is-strict-equal';
-import getDisplacementMap, {
-  type DisplacementMap,
-} from '../../state/get-displacement-map';
 import {
   lift as liftAction,
   move as moveAction,
@@ -30,6 +27,7 @@ import type {
   Displacement,
   PendingDrop,
   DragImpact,
+  DisplacementMap,
 } from '../../types';
 import type {
   MapProps,
@@ -113,7 +111,7 @@ export const makeMapStateToProps = (): Selector => {
   ): ?MapProps => {
     // Doing this cuts 50% of the time to move
     // Otherwise need to loop over every item in every selector (yuck!)
-    const map: DisplacementMap = getDisplacementMap(impact.movement.displaced);
+    const map: DisplacementMap = impact.movement.map;
     const displacement: ?Displacement = map[id];
 
     // does not need to move

@@ -5,6 +5,7 @@ import moveToEdge from '../../../move-to-edge';
 import getDisplacement from '../../../get-displacement';
 import withDroppableDisplacement from '../../../with-droppable-displacement';
 import { patch } from '../../../position';
+import getDisplacementMap from '../../../get-displacement-map';
 import type { Edge } from '../../../move-to-edge';
 import type { Result } from '../move-cross-axis-types';
 import type {
@@ -56,6 +57,7 @@ export default ({
       impact: {
         movement: {
           displaced: [],
+          map: {},
           isBeyondStartPosition: false,
           amount: patch(axis.line, draggable.client.marginBox[axis.size]),
         },
@@ -120,6 +122,7 @@ export default ({
   const newImpact: DragImpact = {
     movement: {
       displaced,
+      map: getDisplacementMap(displaced),
       amount,
       isBeyondStartPosition: isMovingPastOriginalIndex,
     },

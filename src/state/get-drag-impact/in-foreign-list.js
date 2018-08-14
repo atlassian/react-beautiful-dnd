@@ -12,6 +12,7 @@ import type {
 import { patch } from '../position';
 import getDisplacement from '../get-displacement';
 import withDroppableScroll from '../with-droppable-scroll';
+import getDisplacementMap from '../get-displacement-map';
 
 type Args = {|
   pageBorderBoxCenter: Position,
@@ -65,6 +66,7 @@ export default ({
   const movement: DragMovement = {
     amount: patch(axis.line, draggable.page.marginBox[axis.size]),
     displaced,
+    map: getDisplacementMap(displaced),
     isBeyondStartPosition: false,
   };
 

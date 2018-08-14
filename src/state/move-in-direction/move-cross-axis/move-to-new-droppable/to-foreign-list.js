@@ -5,6 +5,7 @@ import moveToEdge from '../../../move-to-edge';
 import type { Result } from '../move-cross-axis-types';
 import getDisplacement from '../../../get-displacement';
 import withDroppableDisplacement from '../../../with-droppable-displacement';
+import getDisplacementMap from '../../../get-displacement-map';
 import type {
   Axis,
   DragImpact,
@@ -59,6 +60,7 @@ export default ({
     const newImpact: DragImpact = {
       movement: {
         displaced: [],
+        map: {},
         amount,
         isBeyondStartPosition: false,
       },
@@ -116,6 +118,7 @@ export default ({
   const newImpact: DragImpact = {
     movement: {
       displaced,
+      map: getDisplacementMap(displaced),
       amount,
       isBeyondStartPosition: false,
     },

@@ -7,6 +7,7 @@ import withDroppableDisplacement from '../../with-droppable-displacement';
 import moveToEdge from '../../move-to-edge';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
+import getDisplacementMap from '../../get-displacement-map';
 import type { Edge } from '../../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import type {
@@ -118,6 +119,7 @@ export default ({
   const newImpact: DragImpact = {
     movement: {
       displaced,
+      map: getDisplacementMap(displaced),
       amount: patch(axis.line, draggable.page.marginBox[axis.size]),
       // When we are in foreign list we are only displacing items forward
       isBeyondStartPosition: false,

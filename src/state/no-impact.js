@@ -4,6 +4,7 @@ import { origin } from './position';
 
 export const noMovement: DragMovement = {
   displaced: [],
+  map: {},
   amount: origin,
   isBeyondStartPosition: false,
 };

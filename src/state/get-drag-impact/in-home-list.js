@@ -5,6 +5,7 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DragImpact,
+  GroupingImpact,
   Axis,
   Displacement,
   Viewport,
@@ -12,6 +13,7 @@ import type {
 } from '../../types';
 import { patch } from '../position';
 import getDisplacement from '../get-displacement';
+import getDisplacementMap from '../get-displacement-map';
 import withDroppableScroll from '../with-droppable-scroll';
 import isWithin from '../is-within';
 import { vertical } from '../axis';
@@ -70,6 +72,8 @@ export default ({
         return false;
       }
 
+      // const displacement
+
       const marginBox: Rect = child.page.marginBox;
       const start: number = marginBox[axis.start];
       const end: number = marginBox[axis.end];
@@ -80,10 +84,21 @@ export default ({
       const adjustedEnd: number = isMovingForward ? end - oneThird : end;
 
       const isOver = isWithin(adjustedStart, adjustedEnd);
+      // const isOver = isWithin(start, end);
 
       return isOver(currentCenter[axis.line]);
     },
   );
+
+  const group: ?GroupingImpact = groupedWith
+    ? {
+        whenEntered: direction,
+        groupingWith: {
+          draggableId: groupedWith.descriptor.id,
+          droppableId: home.descriptor.id,
+        },
+      }
+    : null;
 
   if (groupedWith) {
     console.log('grouped with', groupedWith.descriptor.id);
@@ -106,6 +121,11 @@ export default ({
       (child: DraggableDimension): boolean => {
         // do not want to move the item that is dragging
         if (child === draggable) {
+          return false;
+        }
+
+        // do not want to move an item that is being groupedWith
+        if (child === groupedWith) {
           return false;
         }
 
@@ -162,6 +182,7 @@ export default ({
   const movement: DragMovement = {
     amount,
     displaced: ordered,
+    map: getDisplacementMap(ordered),
     isBeyondStartPosition,
   };
 
@@ -173,7 +194,7 @@ export default ({
       index,
     },
     // TODO
-    group: null,
+    group,
   };
 
   return impact;

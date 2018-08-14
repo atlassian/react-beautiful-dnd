@@ -134,10 +134,14 @@ export type Displacement = {|
   shouldAnimate: boolean,
 |};
 
+export type DisplacementMap = { [key: DraggableId]: Displacement };
+
 export type DragMovement = {|
   // The draggables that need to move in response to a drag.
   // Ordered by closest draggable to the *current* location of the dragging item
   displaced: Displacement[],
+  // displaced as a map
+  map: DisplacementMap,
   amount: Position,
   // is moving forward relative to the starting position
   // TODO: rename to 'shouldDisplaceForward'?
