@@ -27,13 +27,6 @@ export default ({
   viewport,
 }: Args): ?Result => {
   invariant(
-    previousImpact,
-    'Cannot move to next index when there was no previous destination',
-  );
-  // TODO: support grouping
-  invariant(previousImpact.type === 'REORDER');
-
-  invariant(
     previousImpact.destination,
     'Cannot move to next index where there is no previous destination',
   );
@@ -123,7 +116,6 @@ export default ({
   })();
 
   const newImpact: DragImpact = {
-    type: 'REORDER',
     movement: {
       displaced,
       amount: patch(axis.line, draggable.page.marginBox[axis.size]),
@@ -135,6 +127,7 @@ export default ({
       index: proposedIndex,
     },
     direction: droppable.axis.direction,
+    group: null,
   };
 
   if (isVisibleInNewLocation) {

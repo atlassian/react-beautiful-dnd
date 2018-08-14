@@ -113,7 +113,7 @@ export const makeMapStateToProps = (): Selector => {
   ): ?MapProps => {
     // Doing this cuts 50% of the time to move
     // Otherwise need to loop over every item in every selector (yuck!)
-    const map: DisplacementMap = getDisplacementMap(impact);
+    const map: DisplacementMap = getDisplacementMap(impact.movement.displaced);
     const displacement: ?Displacement = map[id];
 
     // does not need to move

@@ -7,7 +7,7 @@ import { toDroppableList } from '../dimension-structures';
 import type {
   DroppableDimension,
   DroppableDimensionMap,
-  Location,
+  DraggableLocation,
 } from '../../types';
 
 const getScrollableDroppables = memoizeOne(
@@ -47,7 +47,7 @@ const getScrollableDroppableOver = (
 
 type Api = {|
   center: Position,
-  destination: ?Location,
+  destination: ?DraggableLocation,
   droppables: DroppableDimensionMap,
 |};
 

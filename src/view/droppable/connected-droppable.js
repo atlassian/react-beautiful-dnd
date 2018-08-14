@@ -11,7 +11,6 @@ import type {
   DraggableId,
   DragImpact,
   DraggableLocation,
-  GroupingLocation,
   DraggableDimension,
   DraggableDescriptor,
   Placeholder,
@@ -29,7 +28,7 @@ export const makeMapStateToProps = (): Selector => {
   const shouldUsePlaceholder = (
     id: DroppableId,
     descriptor: DraggableDescriptor,
-    destination: DraggableLocation | GroupingLocation,
+    destination: DraggableLocation,
   ): boolean => {
     if (!destination) {
       return false;

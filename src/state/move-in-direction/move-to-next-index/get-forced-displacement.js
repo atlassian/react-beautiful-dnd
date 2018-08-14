@@ -33,11 +33,6 @@ export const withFirstAdded = ({
     shouldAnimate: true,
   };
 
-  invariant(
-    previousImpact.type === 'REORDER',
-    'TODO: currently not supporting grouping',
-  );
-
   const added: Displacement[] = [
     newDisplacement,
     ...previousImpact.movement.displaced,
@@ -93,11 +88,6 @@ export const withFirstRemoved = ({
   droppable,
   draggables,
 }: WithLastRemoved): Displacement[] => {
-  invariant(
-    previousImpact.type === 'REORDER',
-    'TODO: currently not supporting grouping',
-  );
-
   const last: Displacement[] = previousImpact.movement.displaced;
   invariant(last.length, 'Cannot remove displacement from empty list');
 

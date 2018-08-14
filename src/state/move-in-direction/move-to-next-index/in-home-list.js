@@ -26,18 +26,11 @@ export default ({
   draggables,
   viewport,
 }: Args): ?Result => {
+  const location: ?DraggableLocation = previousImpact.destination;
   invariant(
-    previousImpact,
+    location,
     'Cannot move to next index in home list when there is no previous destination',
   );
-
-  // TODO
-  invariant(
-    previousImpact.type === 'REORDER',
-    'Only supporting reordering jumps for now',
-  );
-
-  const location: DraggableLocation = previousImpact.destination;
 
   const draggable: DraggableDimension = draggables[draggableId];
   const axis: Axis = droppable.axis;
@@ -111,7 +104,6 @@ export default ({
       });
 
   const newImpact: DragImpact = {
-    type: 'REORDER',
     movement: {
       displaced,
       amount: patch(axis.line, draggable.page.marginBox[axis.size]),
@@ -122,6 +114,7 @@ export default ({
       index: proposedIndex,
     },
     direction: droppable.axis.direction,
+    group: null,
   };
 
   if (isVisibleInNewLocation) {

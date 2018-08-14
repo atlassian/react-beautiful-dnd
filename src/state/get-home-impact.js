@@ -4,23 +4,19 @@ import getHomeLocation from './get-home-location';
 import type {
   Critical,
   DimensionMap,
-  ReorderImpact,
   DraggableDimension,
   DroppableDimension,
+  DragImpact,
   Axis,
 } from '../types';
 
-export default (
-  critical: Critical,
-  dimensions: DimensionMap,
-): ReorderImpact => {
+export default (critical: Critical, dimensions: DimensionMap): DragImpact => {
   const home: DroppableDimension = dimensions.droppables[critical.droppable.id];
   const axis: Axis = home.axis;
   const draggable: DraggableDimension =
     dimensions.draggables[critical.draggable.id];
 
   return {
-    type: 'REORDER',
     movement: {
       displaced: [],
       isBeyondStartPosition: false,
@@ -28,5 +24,6 @@ export default (
     },
     direction: axis.direction,
     destination: getHomeLocation(critical),
+    group: null,
   };
 };
