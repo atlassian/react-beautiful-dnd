@@ -24,6 +24,7 @@ import type {
   DroppableId,
   DragMovement,
   DraggableDimension,
+  GroupingImpact,
   Displacement,
   PendingDrop,
   DragImpact,
@@ -59,18 +60,21 @@ export const makeMapStateToProps = (): Selector => {
     (x: number, y: number): Position => ({ x, y }),
   );
 
-  const getNotDraggingProps = memoizeOne(
-    (offset: Position, shouldAnimateDisplacement: boolean): MapProps => ({
-      ...defaultMapProps,
-      offset,
-      shouldAnimateDisplacement,
-    }),
+  const getSecondaryProps = memoizeOne(
+    (
+      offset: Position,
+      groupedOverBy: ?DraggableId = null,
+      shouldAnimateDisplacement: boolean,
+    ): MapProps => {
+      console.log('recalcing secondary props');
+      return {
+        ...defaultMapProps,
+        offset,
+        shouldAnimateDisplacement,
+        groupedOverBy,
+      };
+    },
   );
-
-  const getGroupedOverByProps = memoizeOne((groupedOverBy: DraggableId) => ({
-    ...defaultMapProps,
-    groupedOverBy,
-  }));
 
   const getDraggingProps = memoizeOne(
     (
@@ -94,25 +98,38 @@ export const makeMapStateToProps = (): Selector => {
     }),
   );
 
-  const getGroupedOverBy = (
-    ownId: DraggableId,
-    draggingId: DraggableId,
-    impact: DragImpact,
-  ): ?MapProps => {
-    if (impact.group && impact.group.groupingWith.draggableId === ownId) {
-      return getGroupedOverByProps(draggingId);
-    }
-    return null;
+  const getDisplacedOffset = (movement: DragMovement): Position => {
+    const amount: Position = movement.isBeyondStartPosition
+      ? negate(movement.amount)
+      : movement.amount;
+    return memoizedOffset(amount.x, amount.y);
   };
 
-  const getOutOfTheWayMovement = (
-    id: DraggableId,
+  const getSecondaryMovement = (
+    ownId: DraggableId,
+    draggingId: DraggableId,
     impact: DragImpact,
   ): ?MapProps => {
     // Doing this cuts 50% of the time to move
     // Otherwise need to loop over every item in every selector (yuck!)
     const map: DisplacementMap = impact.movement.map;
-    const displacement: ?Displacement = map[id];
+    const displacement: ?Displacement = map[ownId];
+    const group: ?GroupingImpact = impact.group;
+    const movement: DragMovement = impact.movement;
+    const isGroupedOver: boolean = Boolean(
+      group && group.groupingWith.draggableId === ownId,
+    );
+
+    if (isGroupedOver) {
+      console.log('CONNECT: is grouped over!', ownId);
+      return getSecondaryProps(
+        displacement ? getDisplacedOffset(movement) : origin,
+        draggingId,
+        displacement
+          ? displacement.shouldAnimate
+          : defaultMapProps.shouldAnimateDisplacement,
+      );
+    }
 
     // does not need to move
     if (!displacement) {
@@ -124,13 +141,9 @@ export const makeMapStateToProps = (): Selector => {
       return null;
     }
 
-    const movement: DragMovement = impact.movement;
-    const amount: Position = movement.isBeyondStartPosition
-      ? negate(movement.amount)
-      : movement.amount;
-
-    return getNotDraggingProps(
-      memoizedOffset(amount.x, amount.y),
+    return getSecondaryProps(
+      getDisplacedOffset(movement),
+      null,
       displacement.shouldAnimate,
     );
   };
@@ -200,17 +213,15 @@ export const makeMapStateToProps = (): Selector => {
     return null;
   };
 
-  const groupedOverBySelector = (
-    state: State,
-    ownProps: OwnProps,
-  ): ?MapProps => {
+  const notDraggingSelector = (state: State, ownProps: OwnProps): ?MapProps => {
+    // Dragging
     if (state.isDragging) {
       // we do not care about the dragging item
       if (state.critical.draggable.id === ownProps.draggableId) {
         return null;
       }
 
-      return getGroupedOverBy(
+      return getSecondaryMovement(
         ownProps.draggableId,
         state.critical.draggable.id,
         state.impact,
@@ -223,7 +234,7 @@ export const makeMapStateToProps = (): Selector => {
       if (state.pending.result.draggableId === ownProps.draggableId) {
         return null;
       }
-      return getGroupedOverBy(
+      return getSecondaryMovement(
         ownProps.draggableId,
         state.pending.result.draggableId,
         state.pending.impact,
@@ -234,37 +245,9 @@ export const makeMapStateToProps = (): Selector => {
     return null;
   };
 
-  const movingOutOfTheWaySelector = (
-    state: State,
-    ownProps: OwnProps,
-  ): ?MapProps => {
-    // Dragging
-    if (state.isDragging) {
-      // we do not care about the dragging item
-      if (state.critical.draggable.id === ownProps.draggableId) {
-        return null;
-      }
-
-      return getOutOfTheWayMovement(ownProps.draggableId, state.impact);
-    }
-
-    // Dropping
-    if (state.phase === 'DROP_ANIMATING') {
-      // do nothing if this was the dragging item
-      if (state.pending.result.draggableId === ownProps.draggableId) {
-        return null;
-      }
-      return getOutOfTheWayMovement(ownProps.draggableId, state.pending.impact);
-    }
-
-    // Otherwise
-    return null;
-  };
-
   const selector = (state: State, ownProps: OwnProps): MapProps =>
     draggingSelector(state, ownProps) ||
-    groupedOverBySelector(state, ownProps) ||
-    movingOutOfTheWaySelector(state, ownProps) ||
+    notDraggingSelector(state, ownProps) ||
     defaultMapProps;
 
   return selector;

@@ -19,6 +19,7 @@ export default (critical: Critical, dimensions: DimensionMap): DragImpact => {
   return {
     movement: {
       displaced: [],
+      map: {},
       isBeyondStartPosition: false,
       amount: patch(axis.line, draggable.client.marginBox[axis.size]),
     },

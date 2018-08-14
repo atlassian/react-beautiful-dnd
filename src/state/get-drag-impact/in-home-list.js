@@ -10,6 +10,7 @@ import type {
   Displacement,
   Viewport,
   UserDirection,
+  DisplacementMap,
 } from '../../types';
 import { patch } from '../position';
 import getDisplacement from '../get-displacement';
@@ -43,6 +44,9 @@ export default ({
   const axis: Axis = home.axis;
   // The starting center position
   const originalCenter: Position = draggable.page.borderBox.center;
+  const movement: DragMovement = previousImpact.movement;
+  const map: DisplacementMap = movement.map;
+  const group: ?GroupingImpact = previousImpact.group;
 
   // Where the element actually is now.
   // Need to take into account the change of scroll in the droppable
@@ -54,16 +58,18 @@ export default ({
   // Are we grouping?
   // const isGroupingEnabled: boolean = home.isGroupingEnabled;
 
-  const direction: UserDirection = previousImpact.group
-    ? previousImpact.group.whenEntered
-    : currentDirection;
+  const direction: UserDirection = group ? group.whenEntered : currentDirection;
 
   const isMovingForward: boolean =
     axis === vertical
       ? direction.vertical === 'down'
       : direction.horizontal === 'right';
 
-  // if (isGroupingEnabled) {
+  // if (isGroupingEnabled)
+
+  const modifier: number = movement.isBeyondStartPosition ? -1 : 1;
+  const shift: number = movement.amount[axis.line] * modifier;
+
   // are we over the top over any draggable?
   const groupedWith: ?DraggableDimension = insideHome.find(
     (child: DraggableDimension): boolean => {
@@ -72,11 +78,15 @@ export default ({
         return false;
       }
 
-      // const displacement
+      const isDisplaced: boolean = Boolean(map[child.descriptor.id]);
+      // TODO: if already displaced then we need to account for that when grouping
+      console.log('is already displaced!', isDisplaced);
+
+      const localShift: number = isDisplaced ? shift : 0;
 
       const marginBox: Rect = child.page.marginBox;
-      const start: number = marginBox[axis.start];
-      const end: number = marginBox[axis.end];
+      const start: number = marginBox[axis.start] + localShift;
+      const end: number = marginBox[axis.end] + localShift;
       const size: number = marginBox[axis.size];
       const oneThird: number = size * 0.333;
 
@@ -90,7 +100,7 @@ export default ({
     },
   );
 
-  const group: ?GroupingImpact = groupedWith
+  const newGroup: ?GroupingImpact = groupedWith
     ? {
         whenEntered: direction,
         groupingWith: {
@@ -124,9 +134,11 @@ export default ({
           return false;
         }
 
+        const isAlreadyDisplaced: boolean = Boolean(map[child.descriptor.id]);
+
         // do not want to move an item that is being groupedWith
         if (child === groupedWith) {
-          return false;
+          return isAlreadyDisplaced;
         }
 
         const borderBox: Rect = child.page.borderBox;
@@ -179,7 +191,7 @@ export default ({
     return startIndex - length;
   })();
 
-  const movement: DragMovement = {
+  const newMovement: DragMovement = {
     amount,
     displaced: ordered,
     map: getDisplacementMap(ordered),
@@ -187,14 +199,14 @@ export default ({
   };
 
   const impact: DragImpact = {
-    movement,
+    movement: newMovement,
     direction: axis.direction,
     destination: {
       droppableId: home.descriptor.id,
       index,
     },
     // TODO
-    group,
+    group: newGroup,
   };
 
   return impact;

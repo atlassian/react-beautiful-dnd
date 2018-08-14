@@ -19,18 +19,26 @@ type BlockerProps = {|
 
 // Working around react-motion double render issue
 class DoubleRenderBlocker extends React.Component<BlockerProps> {
+  hasBlockedChange: boolean = false;
+
   shouldComponentUpdate(nextProps: BlockerProps): boolean {
+    if (this.hasBlockedChange) {
+      this.hasBlockedChange = false;
+      return true;
+    }
+
     // let a render go through if not moving anywhere
     if (isEqual(origin, nextProps.change)) {
       return true;
     }
 
-    // blocking a duplicate change (workaround for react-motion)
-    if (isEqual(this.props.change, nextProps.change)) {
-      return false;
+    // Must allow render if the offset has changed
+    if (!isEqual(this.props.change, nextProps.change)) {
+      return true;
     }
 
-    // let everything else through
+    // blocking a duplicate change (workaround for react-motion)
+    this.hasBlockedChange = true;
     return true;
   }
   render() {
