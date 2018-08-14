@@ -400,8 +400,10 @@ describe('get drag impact', () => {
                   // will cut the subject,
                   [axis.end]: 100,
                 },
-                scrollWidth: 100,
-                scrollHeight: 100,
+                scrollSize: {
+                  scrollWidth: 100,
+                  scrollHeight: 100,
+                },
                 scroll: { x: 0, y: 0 },
                 shouldClipSubject: true,
               },
@@ -1073,8 +1075,10 @@ describe('get drag impact', () => {
                   // will cut off the subject
                   [axis.end]: 100,
                 },
-                scrollWidth: 100,
-                scrollHeight: 100,
+                scrollSize: {
+                  scrollWidth: 100,
+                  scrollHeight: 100,
+                },
                 scroll: { x: 0, y: 0 },
                 shouldClipSubject: true,
               },

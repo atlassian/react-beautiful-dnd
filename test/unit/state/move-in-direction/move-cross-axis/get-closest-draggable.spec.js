@@ -230,8 +230,10 @@ describe('get closest draggable', () => {
           borderBox,
           closest: {
             borderBox: expandByPosition(borderBox, patch(axis.line, 100)),
-            scrollHeight: borderBox.width + 100,
-            scrollWidth: borderBox.height + 100,
+            scrollSize: {
+              scrollHeight: borderBox.width + 100,
+              scrollWidth: borderBox.height + 100,
+            },
             scroll: { x: 0, y: 0 },
             shouldClipSubject: true,
           },

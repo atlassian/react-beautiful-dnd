@@ -16,6 +16,7 @@ import type {
   DroppableDescriptor,
   Scrollable,
   DroppableDimensionViewport,
+  ScrollSize,
 } from '../types';
 
 export const clip = (frame: Spacing, subject: Spacing): ?Rect => {
@@ -36,9 +37,8 @@ export const clip = (frame: Spacing, subject: Spacing): ?Rect => {
 export type Closest = {|
   client: BoxModel,
   page: BoxModel,
-  scrollHeight: number,
-  scrollWidth: number,
   scroll: Position,
+  scrollSize: ScrollSize,
   shouldClipSubject: boolean,
 |};
 
@@ -64,16 +64,20 @@ export const getDroppableDimension = ({
       return null;
     }
 
+    const { scrollSize, client: frameClient } = closest;
+
     // scrollHeight and scrollWidth are based on the padding box
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight
     const maxScroll: Position = getMaxScroll({
-      scrollHeight: closest.scrollHeight,
-      scrollWidth: closest.scrollWidth,
-      height: closest.client.paddingBox.height,
-      width: closest.client.paddingBox.width,
+      scrollHeight: scrollSize.scrollHeight,
+      scrollWidth: scrollSize.scrollWidth,
+      height: frameClient.paddingBox.height,
+      width: frameClient.paddingBox.width,
     });
 
     return {
+      frameClient,
+      scrollSize,
       framePageMarginBox: closest.page.marginBox,
       shouldClipSubject: closest.shouldClipSubject,
       scroll: {
@@ -131,8 +135,7 @@ export const scrollDroppable = (
   // This can occur when scrolling a foreign list that now has a placeholder.
 
   const closestScrollable: Scrollable = {
-    framePageMarginBox: scrollable.framePageMarginBox,
-    shouldClipSubject: scrollable.shouldClipSubject,
+    ...scrollable,
     scroll: {
       initial: scrollable.scroll.initial,
       current: newScroll,
@@ -166,12 +169,3 @@ export const scrollDroppable = (
   };
   return result;
 };
-
-// TODO: make this work
-// const growSubjectIfNeeded = ({
-//   draggables: DraggableDimensionMap,
-//   droppable: DroppableDimension,
-//   addition: Position,
-// }): DroppableDimension => {
-
-// };

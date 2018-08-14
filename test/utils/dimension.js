@@ -30,6 +30,7 @@ import type {
   DroppableDimensionMap,
   DimensionMap,
   DraggingState,
+  ScrollSize,
 } from '../../src/types';
 
 type GetComputedSpacingArgs = {|
@@ -84,9 +85,9 @@ export const makeScrollable = (
   });
 
   // add scroll space on the main axis
-  const scrollSize = {
-    width: borderBox.width + horizontalGrowth,
-    height: borderBox.height + verticalGrowth,
+  const scrollSize: ScrollSize = {
+    scrollWidth: borderBox.width + horizontalGrowth,
+    scrollHeight: borderBox.height + verticalGrowth,
   };
 
   const newClient: BoxModel = createBox({
@@ -110,8 +111,7 @@ export const makeScrollable = (
       // using old dimensions for frame
       client: droppable.client,
       page: droppable.page,
-      scrollWidth: scrollSize.width,
-      scrollHeight: scrollSize.height,
+      scrollSize,
       scroll: origin,
       shouldClipSubject: true,
     },
@@ -195,13 +195,12 @@ export const getDraggableDimension = ({
   return result;
 };
 
-type ClosestSubset = {|
+type ClosestMaker = {|
   borderBox: Spacing,
   margin?: Spacing,
   border?: Spacing,
   padding?: Spacing,
-  scrollHeight: number,
-  scrollWidth: number,
+  scrollSize: ScrollSize,
   scroll: Position,
   shouldClipSubject: boolean,
 |};
@@ -214,7 +213,7 @@ type GetDroppableArgs = {|
   border?: Spacing,
   padding?: Spacing,
   windowScroll?: Position,
-  closest?: ?ClosestSubset,
+  closest?: ?ClosestMaker,
   isEnabled?: boolean,
 |};
 
@@ -254,8 +253,7 @@ export const getDroppableDimension = ({
     const result: Closest = {
       client: frameClient,
       page: framePage,
-      scrollHeight: closest.scrollHeight,
-      scrollWidth: closest.scrollWidth,
+      scrollSize: closest.scrollSize,
       scroll: closest.scroll,
       shouldClipSubject: closest.shouldClipSubject,
     };

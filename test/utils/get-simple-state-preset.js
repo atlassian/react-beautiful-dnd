@@ -22,7 +22,8 @@ import type {
   Critical,
   CollectingState,
   Viewport,
-  ItemPositions,
+  ClientPositions,
+  PagePositions,
   DragPositions,
   DraggingState,
   DropPendingState,
@@ -61,16 +62,15 @@ export default (axis?: Axis = vertical) => {
       droppable: droppable.descriptor,
     };
 
-    const client: ItemPositions = {
+    const client: ClientPositions = {
       selection: clientSelection,
       borderBoxCenter: clientSelection,
       offset: origin,
     };
 
-    const page: ItemPositions = {
+    const page: PagePositions = {
       selection: add(client.selection, viewport.scroll.initial),
       borderBoxCenter: add(client.borderBoxCenter, viewport.scroll.initial),
-      offset: origin,
     };
 
     const initial: DragPositions = {
@@ -95,9 +95,13 @@ export default (axis?: Axis = vertical) => {
     return result;
   };
 
-  const collecting = (): CollectingState => ({
+  const collecting = (
+    id?: DraggableId,
+    selection?: Position,
+    viewport?: Viewport,
+  ): CollectingState => ({
     phase: 'COLLECTING',
-    ...dragging(),
+    ...dragging(id, selection, viewport),
     // eslint-disable-next-line
     phase: 'COLLECTING',
   });

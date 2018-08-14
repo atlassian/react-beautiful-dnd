@@ -27,8 +27,8 @@ import type {
   DraggableDimension,
   DraggableId,
   DroppableId,
+  ClientPositions,
   TypeId,
-  ItemPositions,
   Viewport,
 } from '../../../src/types';
 import { getPreset } from '../../utils/dimension';
@@ -409,7 +409,7 @@ describe('Draggable - unconnected', () => {
             x: 50,
             y: 60,
           };
-          const client: ItemPositions = {
+          const client: ClientPositions = {
             selection,
             borderBoxCenter,
             offset: origin,

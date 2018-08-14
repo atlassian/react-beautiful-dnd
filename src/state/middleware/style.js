@@ -9,16 +9,6 @@ export default (marshal: StyleMarshal) => () => (next: Dispatch) => (
     marshal.dragging();
   }
 
-  // Dynamic collection starting
-  if (action.type === 'COLLECTION_STARTING') {
-    marshal.collecting();
-  }
-
-  // Dynamic collection finished
-  if (action.type === 'PUBLISH') {
-    marshal.dragging();
-  }
-
   if (action.type === 'DROP_ANIMATE') {
     marshal.dropping(action.payload.result.reason);
   }

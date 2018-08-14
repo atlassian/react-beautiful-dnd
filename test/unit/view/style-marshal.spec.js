@@ -67,15 +67,6 @@ describe('style marshal', () => {
     expect(active).toEqual(styles.resting);
   });
 
-  it('should apply the collecting styles when asked', () => {
-    marshal.mount();
-
-    marshal.collecting();
-    const active: string = getStyleFromTag(marshal.styleContext);
-
-    expect(active).toEqual(styles.collecting);
-  });
-
   it('should apply the dragging styles when asked', () => {
     marshal.mount();
 
@@ -139,9 +130,6 @@ describe('style marshal', () => {
 
       marshal.dragging();
       expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.dragging);
-
-      marshal.collecting();
-      expect(getStyleFromTag(marshal.styleContext)).toEqual(styles.collecting);
 
       marshal.dropping('DROP');
       expect(getStyleFromTag(marshal.styleContext)).toEqual(

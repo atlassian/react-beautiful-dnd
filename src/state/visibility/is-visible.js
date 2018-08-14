@@ -2,11 +2,12 @@
 import { type Position, type Spacing, type Rect } from 'css-box-model';
 import isPartiallyVisibleThroughFrame from './is-partially-visible-through-frame';
 import isTotallyVisibleThroughFrame from './is-totally-visible-through-frame';
+import isTotallyVisibleThroughFrameOnAxis from './is-totally-visible-through-frame-on-axis';
 import { offsetByPosition } from '../spacing';
 import { origin } from '../position';
 import type { DroppableDimension } from '../../types';
 
-type Args = {|
+export type Args = {|
   target: Spacing,
   destination: DroppableDimension,
   viewport: Rect,
@@ -51,26 +52,22 @@ const isVisible = ({
   return isVisibleInDroppable && isVisibleInViewport;
 };
 
-export const isPartiallyVisible = ({
-  target,
-  destination,
-  viewport,
-}: Args): boolean =>
+export const isPartiallyVisible = (args: Args): boolean =>
   isVisible({
-    target,
-    destination,
-    viewport,
+    ...args,
     isVisibleThroughFrameFn: isPartiallyVisibleThroughFrame,
   });
 
-export const isTotallyVisible = ({
-  target,
-  destination,
-  viewport,
-}: Args): boolean =>
+export const isTotallyVisible = (args: Args): boolean =>
   isVisible({
-    target,
-    destination,
-    viewport,
+    ...args,
     isVisibleThroughFrameFn: isTotallyVisibleThroughFrame,
+  });
+
+export const isTotallyVisibleOnAxis = (args: Args): boolean =>
+  isVisible({
+    ...args,
+    isVisibleThroughFrameFn: isTotallyVisibleThroughFrameOnAxis(
+      args.destination.axis,
+    ),
   });

@@ -1,5 +1,5 @@
 // @flow
-import { getPreset, getDraggableDimension } from './dimension';
+import { getPreset, getDraggableDimension, makeScrollable } from './dimension';
 import { offsetByPosition } from '../../src/state/spacing';
 import getHomeLocation from '../../src/state/get-home-location';
 import getHomeImpact from '../../src/state/get-home-impact';
@@ -7,11 +7,12 @@ import type {
   Critical,
   DropResult,
   DragStart,
-  ItemPositions,
+  ClientPositions,
   DimensionMap,
-  Publish,
   DraggableDimension,
+  DroppableDimension,
   PendingDrop,
+  Published,
 } from '../../src/types';
 import type {
   InitialPublishArgs,
@@ -20,13 +21,15 @@ import type {
 
 // In case a consumer needs the references
 export const preset = getPreset();
+const scrollableHome: DroppableDimension = makeScrollable(preset.home);
+const scrollableForeign: DroppableDimension = makeScrollable(preset.foreign);
 
 export const critical: Critical = {
   draggable: preset.inHome1.descriptor,
   droppable: preset.home.descriptor,
 };
 
-const client: ItemPositions = {
+const client: ClientPositions = {
   selection: preset.inHome1.client.borderBox.center,
   borderBoxCenter: preset.inHome1.client.borderBox.center,
   offset: { x: 0, y: 0 },
@@ -47,7 +50,20 @@ export const initialPublishArgs: InitialPublishArgs = {
   autoScrollMode: 'FLUID',
 };
 
-export const publishAdditionArgs: Publish = (() => {
+export const initialPublishWithScrollables: InitialPublishArgs = {
+  ...initialPublishArgs,
+  dimensions: {
+    draggables: preset.dimensions.draggables,
+    droppables: {
+      ...preset.dimensions.droppables,
+      [scrollableHome.descriptor.id]: scrollableHome,
+      [scrollableForeign.descriptor.id]: scrollableForeign,
+    },
+  },
+};
+
+export const publishAdditionArgs: Published = (() => {
+  // home must be scrollable to publish changes to it
   const addition: DraggableDimension = getDraggableDimension({
     descriptor: {
       ...preset.inHome4.descriptor,
@@ -62,14 +78,9 @@ export const publishAdditionArgs: Publish = (() => {
     windowScroll: preset.windowScroll,
   });
   return {
-    removals: {
-      draggables: [],
-      droppables: [],
-    },
-    additions: {
-      draggables: [addition],
-      droppables: [],
-    },
+    removals: [],
+    additions: [addition],
+    modified: [scrollableHome],
   };
 })();
 

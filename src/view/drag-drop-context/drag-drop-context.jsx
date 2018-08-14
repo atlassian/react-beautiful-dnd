@@ -1,6 +1,7 @@
 // @flow
 import React, { type Node } from 'react';
 import { bindActionCreators } from 'redux';
+import invariant from 'tiny-invariant';
 import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
@@ -53,13 +54,15 @@ const printFatalDevError = (error: Error) => {
   if (process.env.NODE_ENV === 'production') {
     return;
   }
-  console.warn(`
+  console.error(
+    `
     An error has occurred while a drag is occurring.
     Any existing drag will be cancelled.
 
-    Raw error:
-  `);
-  console.error(error);
+    > ${error.message}
+  `,
+    error,
+  );
 };
 
 export default class DragDropContext extends React.Component<Props> {
@@ -96,10 +99,10 @@ export default class DragDropContext extends React.Component<Props> {
     });
     const callbacks: DimensionMarshalCallbacks = bindActionCreators(
       {
-        collectionStarting,
         publish,
         updateDroppableScroll,
         updateDroppableIsEnabled,
+        collectionStarting,
       },
       this.store.dispatch,
     );

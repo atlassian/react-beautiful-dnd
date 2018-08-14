@@ -9,7 +9,7 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DimensionMap,
-  Publish,
+  Published,
 } from '../../../../src/types';
 import { critical, preset } from '../../../utils/preset-action-args';
 import {
@@ -18,15 +18,22 @@ import {
   getCallbacksStub,
 } from '../../../utils/dimension-marshal';
 import { defaultRequest, withExpectedAdvancedUsageWarning } from './util';
+import { makeScrollable } from '../../../utils/dimension';
 
-const empty: Publish = {
-  removals: {
-    draggables: [],
-    droppables: [],
-  },
-  additions: {
-    draggables: [],
-    droppables: [],
+const empty: Published = {
+  removals: [],
+  additions: [],
+  modified: [],
+};
+
+const scrollableHome: DroppableDimension = makeScrollable(preset.home);
+const scrollableForeign: DroppableDimension = makeScrollable(preset.foreign);
+const withScrollables: DimensionMap = {
+  draggables: preset.dimensions.draggables,
+  droppables: {
+    ...preset.dimensions.droppables,
+    [scrollableHome.descriptor.id]: scrollableHome,
+    [scrollableForeign.descriptor.id]: scrollableForeign,
   },
 };
 
@@ -46,13 +53,21 @@ const inAnotherType: DraggableDimension = {
     index: 0,
   },
 };
+const anotherDroppable: DroppableDimension = {
+  ...preset.foreign,
+  descriptor: {
+    ...preset.foreign.descriptor,
+    id: 'another droppable',
+  },
+};
 
+// TODO: remove
 const justCritical: DimensionMap = {
   draggables: {
     [preset.inHome1.descriptor.id]: preset.inHome1,
   },
   droppables: {
-    [preset.home.descriptor.id]: preset.home,
+    [preset.home.descriptor.id]: scrollableHome,
   },
 };
 
@@ -61,25 +76,26 @@ afterEach(() => {
 });
 
 describe('additions', () => {
-  it('should collect and publish the dimensions', () => {
+  it('should collect and publish the draggables', () => {
     const beforeInHome1: DraggableDimension = {
       ...preset.inHome1,
       descriptor: {
         ...preset.inHome1.descriptor,
-        id: 'addition!',
+        id: 'addition1',
         index: 0,
       },
     };
-    const anotherDroppable: DroppableDimension = {
-      ...preset.foreign,
+    const beforeInHome2: DraggableDimension = {
+      ...preset.inHome2,
       descriptor: {
-        ...preset.foreign.descriptor,
-        id: 'another droppable',
+        ...preset.inHome2.descriptor,
+        id: 'addition2',
+        index: 1,
       },
     };
     const callbacks: Callbacks = getCallbacksStub();
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, preset.dimensions);
+    populateMarshal(marshal, withScrollables);
 
     // A publish has started
     marshal.startPublishing(defaultRequest, preset.windowScroll);
@@ -89,46 +105,53 @@ describe('additions', () => {
     withExpectedAdvancedUsageWarning(() => {
       marshal.registerDraggable(beforeInHome1.descriptor, () => beforeInHome1);
     });
-    // Registering a new droppable
-    marshal.registerDroppable(
-      anotherDroppable.descriptor,
-      getDroppableCallbacks(anotherDroppable),
-    );
+    marshal.registerDraggable(beforeInHome2.descriptor, () => beforeInHome2);
     expect(callbacks.publish).not.toHaveBeenCalled();
 
     // Fire the collection / publish step
     requestAnimationFrame.step();
-    const expected: Publish = {
+    const expected: Published = {
       ...empty,
-      additions: {
-        droppables: [anotherDroppable],
-        draggables: [beforeInHome1],
-      },
+      additions: [beforeInHome1, beforeInHome2],
+      modified: [scrollableHome],
     };
     expect(callbacks.publish).toHaveBeenCalledWith(expected);
   });
 
-  it('should not collect a dimension that does not have the same type as the dragging item', () => {
+  it('should throw if trying to add a droppable', () => {
     const callbacks: Callbacks = getCallbacksStub();
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, preset.dimensions);
+    populateMarshal(marshal, withScrollables);
+
+    // A publish has started
+    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    expect(callbacks.publish).not.toHaveBeenCalled();
+
+    const register = () =>
+      marshal.registerDroppable(
+        anotherDroppable.descriptor,
+        getDroppableCallbacks(anotherDroppable),
+      );
+
+    expect(register).toThrow();
+  });
+
+  it('should throw if trying to add a draggable that does not have the same type as the dragging item', () => {
+    const callbacks: Callbacks = getCallbacksStub();
+    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
+    populateMarshal(marshal, withScrollables);
 
     // A publish has started
     marshal.startPublishing(defaultRequest, preset.windowScroll);
     expect(callbacks.publish).not.toHaveBeenCalled();
 
     // Registering a new draggable (inserted before inHome1)
-    marshal.registerDraggable(inAnotherType.descriptor, () => inAnotherType);
-    // Registering a new droppable
-    marshal.registerDroppable(
-      ofAnotherType.descriptor,
-      getDroppableCallbacks(ofAnotherType),
-    );
-    expect(callbacks.publish).not.toHaveBeenCalled();
+    const execute = () =>
+      marshal.registerDraggable(inAnotherType.descriptor, () => inAnotherType);
 
-    // Fire the collection / publish step
-    requestAnimationFrame.flush();
-    expect(callbacks.publish).not.toHaveBeenCalled();
+    expect(execute).toThrow(
+      'This is not of the same type as the dragging item',
+    );
   });
 });
 
@@ -136,21 +159,7 @@ describe('removals', () => {
   it('should publish a removal', () => {
     const callbacks: Callbacks = getCallbacksStub();
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    const anotherDroppable: DroppableDimension = {
-      ...preset.foreign,
-      descriptor: {
-        type: preset.home.descriptor.type,
-        id: 'another droppable',
-      },
-    };
-    const dimensions: DimensionMap = {
-      draggables: preset.dimensions.draggables,
-      droppables: {
-        ...preset.dimensions.droppables,
-        [anotherDroppable.descriptor.id]: anotherDroppable,
-      },
-    };
-    populateMarshal(marshal, dimensions);
+    populateMarshal(marshal, withScrollables);
 
     // A publish has started
     marshal.startPublishing(defaultRequest, preset.windowScroll);
@@ -159,34 +168,34 @@ describe('removals', () => {
     withExpectedAdvancedUsageWarning(() => {
       marshal.unregisterDraggable(preset.inHome2.descriptor);
     });
-    marshal.unregisterDroppable(anotherDroppable.descriptor);
+    marshal.unregisterDraggable(preset.inHome3.descriptor);
+    marshal.unregisterDraggable(preset.inForeign1.descriptor);
     expect(callbacks.publish).not.toHaveBeenCalled();
 
     // Fire the collection / publish step
     requestAnimationFrame.flush();
-    const expected: Publish = {
-      additions: {
-        droppables: [],
-        draggables: [],
-      },
-      removals: {
-        draggables: [preset.inHome2.descriptor.id],
-        droppables: [anotherDroppable.descriptor.id],
-      },
+    const expected: Published = {
+      additions: [],
+      removals: [
+        preset.inHome2.descriptor.id,
+        preset.inHome3.descriptor.id,
+        preset.inForeign1.descriptor.id,
+      ],
+      modified: [scrollableHome, scrollableForeign],
     };
     expect(callbacks.publish).toHaveBeenCalledWith(expected);
   });
 
-  it('should not publish a removal when the dimension type is not the same as the dragging item', () => {
+  it('should throw if tying to remove a draggable of a different type', () => {
     const callbacks: Callbacks = getCallbacksStub();
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
     const dimensions: DimensionMap = {
       draggables: {
-        ...preset.dimensions.draggables,
+        ...withScrollables.draggables,
         [inAnotherType.descriptor.id]: inAnotherType,
       },
       droppables: {
-        ...preset.dimensions.droppables,
+        ...withScrollables.droppables,
         [ofAnotherType.descriptor.id]: ofAnotherType,
       },
     };
@@ -195,30 +204,31 @@ describe('removals', () => {
     // A publish has started
     marshal.startPublishing(defaultRequest, preset.windowScroll);
 
-    marshal.unregisterDraggable(inAnotherType.descriptor);
-    // Registering a new droppable
-    marshal.unregisterDroppable(ofAnotherType.descriptor);
-    expect(callbacks.publish).not.toHaveBeenCalled();
+    const unregister = () =>
+      marshal.unregisterDraggable(inAnotherType.descriptor);
 
-    // Fire the collection / publish step
-    requestAnimationFrame.flush();
-    // The removals where not published
-    expect(callbacks.publish).not.toHaveBeenCalled();
+    expect(unregister).toThrow(
+      'This is not of the same type as the dragging item',
+    );
   });
 
   it('should throw an error if trying to remove a critical dimension', () => {
     const callbacks: Callbacks = getCallbacksStub();
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, preset.dimensions);
+    populateMarshal(marshal, withScrollables);
 
     marshal.startPublishing(defaultRequest, preset.windowScroll);
 
-    expect(() => marshal.unregisterDraggable(critical.draggable)).toThrow();
-    expect(() => marshal.unregisterDroppable(critical.droppable)).toThrow();
+    expect(() => marshal.unregisterDraggable(critical.draggable)).toThrow(
+      'Cannot remove the dragging item during a drag',
+    );
+    expect(() => marshal.unregisterDroppable(critical.droppable)).toThrow(
+      'Cannot add a Droppable during a drag',
+    );
   });
 });
 
-describe('cancelling', () => {
+describe('cancelling mid publish', () => {
   it('should cancel any pending collections', () => {
     const callbacks: Callbacks = getCallbacksStub();
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
@@ -240,10 +250,6 @@ describe('cancelling', () => {
         () => preset.inHome2,
       );
     });
-    marshal.registerDroppable(
-      preset.foreign.descriptor,
-      getDroppableCallbacks(preset.foreign),
-    );
     // no request animation fired yet
     expect(callbacks.publish).not.toHaveBeenCalled();
 

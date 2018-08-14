@@ -18,9 +18,10 @@ import {
 } from '../../../../src/state/action-creators';
 import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset, makeScrollable } from '../../../utils/dimension';
 import {
   initialPublishArgs,
+  initialPublishWithScrollables,
   getDragStart,
   publishAdditionArgs,
 } from '../../../utils/preset-action-args';
@@ -32,8 +33,9 @@ import type {
   DragUpdate,
   DropResult,
   HookProvided,
-  Publish,
+  Published,
   DragStart,
+  DroppableDimension,
 } from '../../../../src/types';
 import type { Store } from '../../../../src/state/store-types';
 
@@ -227,21 +229,19 @@ describe('update', () => {
     expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
   });
 
-  // TODO: enable when we use dynamic dimensions
-  // eslint-disable-next-line jest/no-disabled-tests
-  describe.skip('updates caused by dynamic changes', () => {
+  describe('updates caused by dynamic changes', () => {
     it('should not call onDragUpdate if the destination or source have not changed', () => {
       const hooks: Hooks = createHooks();
       const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
       store.dispatch(prepare());
-      store.dispatch(initialPublish(initialPublishArgs));
+      store.dispatch(initialPublish(initialPublishWithScrollables));
       expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
       expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
       store.dispatch(collectionStarting());
       store.dispatch(publish(publishAdditionArgs));
-      // not called yet as position has not changed
+      // // not called yet as position has not changed
       expect(hooks.onDragUpdate).not.toHaveBeenCalled();
     });
 
@@ -251,12 +251,20 @@ describe('update', () => {
       const hooks: Hooks = createHooks();
       const store: Store = createStore(middleware(() => hooks, getAnnounce()));
       // dragging inHome2 with no impact
+      const scrollableHome: DroppableDimension = makeScrollable(preset.home);
       const customInitial: InitialPublishArgs = {
         critical: {
           draggable: preset.inHome2.descriptor,
           droppable: preset.home.descriptor,
         },
-        dimensions: preset.dimensions,
+        dimensions: {
+          ...preset.dimensions,
+          droppables: {
+            ...preset.dimensions.droppables,
+            // needs to be scrollable to allow dynamic changes
+            [preset.home.descriptor.id]: scrollableHome,
+          },
+        },
         client: {
           selection: preset.inHome2.client.borderBox.center,
           borderBoxCenter: preset.inHome2.client.borderBox.center,
@@ -316,15 +324,10 @@ describe('update', () => {
       hooks.onDragUpdate.mockReset();
 
       // removing inHome1
-      const customPublish: Publish = {
-        removals: {
-          draggables: [preset.inHome1.descriptor.id],
-          droppables: [],
-        },
-        additions: {
-          draggables: [],
-          droppables: [],
-        },
+      const customPublish: Published = {
+        additions: [],
+        removals: [preset.inHome1.descriptor.id],
+        modified: [scrollableHome],
       };
 
       store.dispatch(collectionStarting());

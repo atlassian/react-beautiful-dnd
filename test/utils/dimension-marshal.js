@@ -58,6 +58,7 @@ export const getDroppableCallbacks = (
   dimension: DroppableDimension,
 ): DroppableCallbacks => ({
   getDimensionAndWatchScroll: jest.fn().mockReturnValue(dimension),
+  recollect: jest.fn().mockReturnValue(dimension),
   scroll: jest.fn(),
   unwatchScroll: jest.fn(),
 });
@@ -69,6 +70,7 @@ export type DimensionWatcher = {|
   droppable: {|
     getDimensionAndWatchScroll: Function,
     scroll: Function,
+    recollect: Function,
     unwatchScroll: Function,
     hidePlaceholder: Function,
     showPlaceholder: Function,
@@ -94,6 +96,7 @@ export const populateMarshal = (
     droppable: {
       getDimensionAndWatchScroll: jest.fn(),
       scroll: jest.fn(),
+      recollect: jest.fn(),
       unwatchScroll: jest.fn(),
       hidePlaceholder: jest.fn(),
       showPlaceholder: jest.fn(),
@@ -109,6 +112,10 @@ export const populateMarshal = (
       },
       scroll: (change: Position) => {
         watcher.droppable.scroll(id, change);
+      },
+      recollect: () => {
+        watcher.droppable.recollect(id);
+        return droppable;
       },
       unwatchScroll: () => {
         watcher.droppable.unwatchScroll(id);

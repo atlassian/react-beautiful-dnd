@@ -3,14 +3,13 @@ import type { Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import { scrollDroppable } from './droppable-dimension';
 import getDragImpact from './get-drag-impact';
-// import publish from './publish';
+import publish from './publish';
 import moveInDirection, {
   type Result as MoveInDirectionResult,
 } from './move-in-direction';
-import { add, isEqual, subtract, origin } from './position';
+import { add, isEqual, subtract } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
-import getPageItemPositions from './get-page-item-positions';
 import isMovementAllowed from './is-movement-allowed';
 import type {
   State,
@@ -19,8 +18,9 @@ import type {
   IdleState,
   PreparingState,
   DraggingState,
-  ItemPositions,
   DragPositions,
+  ClientPositions,
+  PagePositions,
   CollectingState,
   DropAnimatingState,
   DropPendingState,
@@ -59,19 +59,21 @@ const moveWithPositionUpdates = ({
   const newViewport: Viewport = viewport || state.viewport;
   const currentWindowScroll: Position = newViewport.scroll.current;
 
-  const client: ItemPositions = (() => {
-    const offset: Position = subtract(
-      clientSelection,
-      state.initial.client.selection,
-    );
-    return {
-      offset,
-      selection: clientSelection,
-      borderBoxCenter: add(state.initial.client.borderBoxCenter, offset),
-    };
-  })();
+  const offset: Position = subtract(
+    clientSelection,
+    state.initial.client.selection,
+  );
 
-  const page: ItemPositions = getPageItemPositions(client, currentWindowScroll);
+  const client: ClientPositions = {
+    offset,
+    selection: clientSelection,
+    borderBoxCenter: add(state.initial.client.borderBoxCenter, offset),
+  };
+
+  const page: PagePositions = {
+    selection: add(client.selection, currentWindowScroll),
+    borderBoxCenter: add(client.borderBoxCenter, currentWindowScroll),
+  };
 
   const current: DragPositions = {
     client,
@@ -139,7 +141,6 @@ export default (state: State = idle, action: Action): State => {
       page: {
         selection: add(client.selection, viewport.scroll.initial),
         borderBoxCenter: add(client.selection, viewport.scroll.initial),
-        offset: origin,
       },
     };
 
@@ -190,16 +191,10 @@ export default (state: State = idle, action: Action): State => {
       `Unexpected ${action.type} received in phase ${state.phase}`,
     );
 
-    invariant(
-      false,
-      `Dynamic additions and removals of Draggable and Droppable components
-      is currently not supported. But will be soon!`,
-    );
-
-    // return publish({
-    //   state,
-    //   publish: action.payload,
-    // });
+    return publish({
+      state,
+      published: action.payload,
+    });
   }
 
   if (action.type === 'MOVE') {
@@ -250,6 +245,12 @@ export default (state: State = idle, action: Action): State => {
     // Cannot get this during a DROP_ANIMATING as the dimension
     // marshal will cancel any pending scroll updates
     if (state.phase === 'DROP_PENDING') {
+      return state;
+    }
+
+    // We will be updating the scroll in response to dynamic changes
+    // manually on the droppable so we can ignore this change
+    if (state.phase === 'COLLECTING') {
       return state;
     }
 

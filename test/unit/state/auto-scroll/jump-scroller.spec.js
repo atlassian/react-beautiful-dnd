@@ -233,8 +233,10 @@ describe('jump auto scrolling', () => {
           },
           closest: {
             borderBox: frameClient.borderBox,
-            scrollWidth: scrollableScrollSize.scrollWidth,
-            scrollHeight: scrollableScrollSize.scrollHeight,
+            scrollSize: {
+              scrollWidth: scrollableScrollSize.scrollWidth,
+              scrollHeight: scrollableScrollSize.scrollHeight,
+            },
             scroll: { x: 0, y: 0 },
             shouldClipSubject: true,
           },

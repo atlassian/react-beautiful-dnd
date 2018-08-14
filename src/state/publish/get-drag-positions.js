@@ -1,9 +1,13 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
-import { isEqual, subtract, add, origin } from '../position';
-import getPageItemPositions from '../get-page-item-positions';
-import type { DragPositions, Viewport, ItemPositions } from '../../types';
+import { isEqual, subtract, add, origin, negate } from '../position';
+import type {
+  DragPositions,
+  Viewport,
+  ClientPositions,
+  PagePositions,
+} from '../../types';
 
 type Args = {|
   initial: DragPositions,
@@ -25,49 +29,48 @@ export default ({
   newClientBorderBoxCenter,
   viewport,
 }: Args): Result => {
-  // Nothing needs to be changed
-  if (isEqual(oldClientBorderBoxCenter, newClientBorderBoxCenter)) {
-    return { initial: oldInitial, current: oldCurrent };
-  }
+  // TODO: what about page shifts?
 
-  // how much the dragging item has shifted
-  const centerDiff: Position = subtract(
+  // how much the dragging item has shifted in the DOM
+  const shift: Position = subtract(
     newClientBorderBoxCenter,
     oldClientBorderBoxCenter,
   );
-  // const displacement: Position = negate(centerDiff);
 
-  const clientSelection: Position = add(
-    oldInitial.client.selection,
-    centerDiff,
-  );
-
+  // Correcting its new original position
   const initial: DragPositions = (() => {
-    const client: ItemPositions = {
-      selection: clientSelection,
+    const client: ClientPositions = {
+      selection: add(oldInitial.client.selection, shift),
       borderBoxCenter: newClientBorderBoxCenter,
       offset: origin,
+    };
+    const page: PagePositions = {
+      selection: add(client.selection, viewport.scroll.initial),
+      borderBoxCenter: add(client.selection, viewport.scroll.initial),
     };
 
     return {
       client,
-      page: getPageItemPositions(client, viewport.scroll.initial),
+      page,
     };
   })();
 
-  const offset: Position = subtract(
-    // The offset before the update
-    oldCurrent.client.offset,
-    // The change caused by the update
-    centerDiff,
-  );
-
   const current: DragPositions = (() => {
-    const client: ItemPositions = {
+    // We need to undo the shift to keep the dragging item
+    // in the same visual spot
+    const reverse: Position = negate(shift);
+    const offset: Position = add(oldCurrent.client.offset, reverse);
+
+    const client: ClientPositions = {
       selection: add(initial.client.selection, offset),
       // this should be the same as the previous client borderBox center
       borderBoxCenter: add(initial.client.borderBoxCenter, offset),
       offset,
+    };
+    const page: PagePositions = {
+      selection: add(client.selection, viewport.scroll.current),
+      // this should be the same as the previous client borderBox center
+      borderBoxCenter: add(client.borderBoxCenter, viewport.scroll.current),
     };
 
     invariant(
@@ -81,7 +84,7 @@ export default ({
 
     return {
       client,
-      page: getPageItemPositions(client, viewport.scroll.current),
+      page,
     };
   })();
 

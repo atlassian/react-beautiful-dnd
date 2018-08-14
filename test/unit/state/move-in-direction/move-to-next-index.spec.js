@@ -515,8 +515,10 @@ describe('move to next index', () => {
                     // will cut off the subject
                     [axis.end]: 100,
                   },
-                  scrollHeight: droppableScrollSize.scrollHeight,
-                  scrollWidth: droppableScrollSize.scrollWidth,
+                  scrollSize: {
+                    scrollHeight: droppableScrollSize.scrollHeight,
+                    scrollWidth: droppableScrollSize.scrollWidth,
+                  },
                   shouldClipSubject: true,
                   scroll: { x: 0, y: 0 },
                 },
@@ -1342,8 +1344,10 @@ describe('move to next index', () => {
                     right: 100,
                     bottom: 100,
                   },
-                  scrollHeight: 200,
-                  scrollWidth: 200,
+                  scrollSize: {
+                    scrollHeight: 200,
+                    scrollWidth: 200,
+                  },
                   scroll: { x: 0, y: 0 },
                   shouldClipSubject: true,
                 },

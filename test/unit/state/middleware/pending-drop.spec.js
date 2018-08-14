@@ -16,14 +16,13 @@ import {
   collectionStarting,
 } from '../../../../src/state/action-creators';
 import {
-  initialPublishArgs,
   getDragStart,
   critical,
   publishAdditionArgs,
+  initialPublishWithScrollables,
 } from '../../../utils/preset-action-args';
 
-// eslint-disable-next-line jest/no-disabled-tests
-describe.skip('skipping pending drop', () => {
+describe('skipping pending drop', () => {
   it('should trigger a drop on a dynamic publish if a drop pending is waiting', () => {
     const mock = jest.fn();
     const store: Store = createStore(
@@ -34,7 +33,7 @@ describe.skip('skipping pending drop', () => {
     );
 
     store.dispatch(prepare());
-    store.dispatch(initialPublish(initialPublishArgs));
+    store.dispatch(initialPublish(initialPublishWithScrollables));
     store.dispatch(collectionStarting());
     store.dispatch(drop({ reason: 'DROP' }));
 
@@ -70,7 +69,7 @@ describe.skip('skipping pending drop', () => {
     );
 
     store.dispatch(prepare());
-    store.dispatch(initialPublish(initialPublishArgs));
+    store.dispatch(initialPublish(initialPublishWithScrollables));
     store.dispatch(collectionStarting());
 
     mock.mockReset();

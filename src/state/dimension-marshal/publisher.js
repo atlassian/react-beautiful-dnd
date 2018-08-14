@@ -1,59 +1,56 @@
 // @flow
-import type { Position } from 'css-box-model';
+import invariant from 'tiny-invariant';
 import type {
   DraggableId,
   DroppableId,
-  Publish,
+  Published,
   DraggableDimension,
   DroppableDimension,
+  DraggableDescriptor,
 } from '../../types';
-import type { Collection, Entries } from './dimension-marshal-types';
+import type { Entries, DroppableEntry } from './dimension-marshal-types';
 import * as timings from '../../debug/timings';
+import { origin } from '../position';
 
 export type Publisher = {|
-  addDraggable: (id: DraggableId) => void,
-  addDroppable: (id: DroppableId) => void,
-  removeDraggable: (id: DraggableId) => void,
-  removeDroppable: (id: DroppableId) => void,
+  add: (descriptor: DraggableDescriptor) => void,
+  remove: (descriptor: DraggableDescriptor) => void,
   stop: () => void,
 |};
 
 type DraggableMap = {
-  [id: DraggableId]: true,
+  [id: DraggableId]: DraggableDescriptor,
 };
 
 type DroppableMap = {
   [id: DroppableId]: true,
 };
 
-type Map = {|
-  draggables: DraggableMap,
-  droppables: DroppableMap,
-|};
-
-export type Provided = {|
-  entries: Entries,
-  collection: Collection,
+type Staging = {|
+  additions: DraggableMap,
+  removals: DraggableMap,
+  modified: DroppableMap,
 |};
 
 type Callbacks = {|
-  publish: (args: Publish) => mixed,
+  publish: (args: Published) => mixed,
   collectionStarting: () => mixed,
 |};
 
 type Args = {|
-  getProvided: () => Provided,
+  getEntries: () => Entries,
   callbacks: Callbacks,
 |};
 
-const getEmptyMap = (): Map => ({
-  draggables: {},
-  droppables: {},
+const clean = (): Staging => ({
+  additions: {},
+  removals: {},
+  modified: {},
 });
 
 const timingKey: string = 'Publish collection from DOM';
 
-export default ({ getProvided, callbacks }: Args): Publisher => {
+export default ({ getEntries, callbacks }: Args): Publisher => {
   const advancedUsageWarning = (() => {
     // noop for production
     if (process.env.NODE_ENV === 'production') {
@@ -90,14 +87,8 @@ export default ({ getProvided, callbacks }: Args): Publisher => {
     };
   })();
 
-  let additions: Map = getEmptyMap();
-  let removals: Map = getEmptyMap();
+  let staging: Staging = clean();
   let frameId: ?AnimationFrameID = null;
-
-  const reset = () => {
-    additions = getEmptyMap();
-    removals = getEmptyMap();
-  };
 
   const collect = () => {
     advancedUsageWarning();
@@ -111,78 +102,52 @@ export default ({ getProvided, callbacks }: Args): Publisher => {
       callbacks.collectionStarting();
       timings.start(timingKey);
 
-      const { entries, collection } = getProvided();
-      const windowScroll: Position = collection.initialWindowScroll;
+      const entries: Entries = getEntries();
+      const { additions, removals, modified } = staging;
 
-      const draggables: DraggableDimension[] = Object.keys(
-        additions.draggables,
-      ).map(
+      const added: DraggableDimension[] = Object.keys(additions).map(
+        // Using the origin as the window scroll. This will be adjusted when processing the published values
         (id: DraggableId): DraggableDimension =>
-          // TODO
-          entries.draggables[id].getDimension(windowScroll),
+          entries.draggables[id].getDimension(origin),
       );
 
-      const droppables: DroppableDimension[] = Object.keys(
-        additions.droppables,
-      ).map(
-        (id: DroppableId): DroppableDimension =>
-          entries.droppables[id].callbacks.getDimensionAndWatchScroll(
-            // TODO: need to figure out diff from start?
-            windowScroll,
-            collection.scrollOptions,
-          ),
+      const updated: DroppableDimension[] = Object.keys(modified).map(
+        (id: DroppableId) => {
+          const entry: ?DroppableEntry = entries.droppables[id];
+          invariant(entry, 'Cannot find dynamically added droppable in cache');
+          return entry.callbacks.recollect();
+        },
       );
 
-      const result: Publish = {
-        additions: {
-          draggables,
-          droppables,
-        },
-        removals: {
-          draggables: Object.keys(removals.draggables),
-          droppables: Object.keys(removals.droppables),
-        },
+      const result: Published = {
+        additions: added,
+        removals: Object.keys(removals),
+        modified: updated,
       };
 
-      reset();
+      staging = clean();
 
       timings.finish(timingKey);
       callbacks.publish(result);
     });
   };
 
-  const addDraggable = (id: DraggableId) => {
-    additions.draggables[id] = true;
+  const add = (descriptor: DraggableDescriptor) => {
+    staging.additions[descriptor.id] = descriptor;
+    staging.modified[descriptor.droppableId] = true;
 
-    if (removals.draggables[id]) {
-      delete removals.draggables[id];
+    if (staging.removals[descriptor.id]) {
+      delete staging.removals[descriptor.id];
     }
     collect();
   };
 
-  const removeDraggable = (id: DraggableId) => {
-    removals.draggables[id] = true;
+  const remove = (descriptor: DraggableDescriptor) => {
+    staging.removals[descriptor.id] = descriptor;
+    staging.modified[descriptor.droppableId] = true;
 
-    if (additions.draggables[id]) {
-      delete additions.draggables[id];
-    }
-    collect();
-  };
-
-  const addDroppable = (id: DroppableId) => {
-    additions.droppables[id] = true;
-
-    if (removals.droppables[id]) {
-      delete removals.droppables[id];
-    }
-    collect();
-  };
-
-  const removeDroppable = (id: DroppableId) => {
-    removals.droppables[id] = true;
-
-    if (additions.droppables[id]) {
-      delete additions.droppables[id];
+    if (staging.additions[descriptor.id]) {
+      delete staging.additions[descriptor.id];
     }
     collect();
   };
@@ -194,14 +159,12 @@ export default ({ getProvided, callbacks }: Args): Publisher => {
 
     cancelAnimationFrame(frameId);
     frameId = null;
-    reset();
+    staging = clean();
   };
 
   return {
-    addDraggable,
-    removeDraggable,
-    addDroppable,
-    removeDroppable,
+    add,
+    remove,
     stop,
   };
 };

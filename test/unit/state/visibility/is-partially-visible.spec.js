@@ -125,8 +125,10 @@ describe('is partially visible', () => {
         },
         closest: {
           borderBox: viewport,
-          scrollWidth: viewport.width,
-          scrollHeight: viewport.bottom + 100,
+          scrollSize: {
+            scrollWidth: viewport.width,
+            scrollHeight: viewport.bottom + 100,
+          },
           scroll: { x: 0, y: 0 },
           shouldClipSubject: true,
         },
@@ -214,8 +216,10 @@ describe('is partially visible', () => {
       borderBox,
       closest: {
         borderBox: frameBorderBox,
-        scrollHeight: borderBox.height,
-        scrollWidth: borderBox.width,
+        scrollSize: {
+          scrollWidth: borderBox.width,
+          scrollHeight: borderBox.height,
+        },
         scroll: { x: 0, y: 0 },
         shouldClipSubject: true,
       },
@@ -312,8 +316,10 @@ describe('is partially visible', () => {
           },
           closest: {
             borderBox: ourFrame,
-            scrollHeight: 600,
-            scrollWidth: ourFrame.width,
+            scrollSize: {
+              scrollHeight: 600,
+              scrollWidth: ourFrame.width,
+            },
             scroll: { x: 0, y: 0 },
             shouldClipSubject: true,
           },
@@ -414,8 +420,10 @@ describe('is partially visible', () => {
               bottom: 100,
               right: 100,
             },
-            scrollHeight: 600,
-            scrollWidth: 600,
+            scrollSize: {
+              scrollHeight: 600,
+              scrollWidth: 600,
+            },
             scroll: { x: 0, y: 0 },
             shouldClipSubject: true,
           },

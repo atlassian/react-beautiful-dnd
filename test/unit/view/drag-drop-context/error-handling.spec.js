@@ -86,11 +86,11 @@ it('should reset the application state and swallow the exception if an invariant
   wrapper.find(WillThrow).simulate('keydown', { keyCode: keyCodes.space });
   // throw is swallowed
   expect(() => jest.runOnlyPendingTimers()).not.toThrow();
-  // Messages printed
-  expect(console.warn).toHaveBeenCalledWith(
-    expect.stringContaining('Any existing drag will be cancelled'),
+  // Message printed
+  expect(console.error).toHaveBeenCalledWith(
+    expect.stringContaining('An error has occurred while a drag is occurring'),
+    expect.any(Error),
   );
-  expect(console.error).toHaveBeenCalled();
 
   // WillThrough can still be found in the DOM
   const willThrough: ReactWrapper = wrapper.find(WillThrow);
@@ -114,10 +114,10 @@ it('should not reset the application state an exception occurs and throw it', ()
   // throw is NOT swallowed
   expect(() => jest.runOnlyPendingTimers()).toThrow();
   // Messages printed
-  expect(console.warn).toHaveBeenCalledWith(
-    expect.stringContaining('Any existing drag will be cancelled'),
+  expect(console.error).toHaveBeenCalledWith(
+    expect.stringContaining('An error has occurred while a drag is occurring'),
+    expect.any(Error),
   );
-  expect(console.error).toHaveBeenCalled();
 
   const willThrough: ReactWrapper = wrapper.find(WillThrow);
   expect(willThrough.length).toBeTruthy();

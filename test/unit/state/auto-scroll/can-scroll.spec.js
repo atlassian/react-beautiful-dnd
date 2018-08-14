@@ -42,8 +42,10 @@ const scrollable: DroppableDimension = getDroppableDimension({
       right: 100,
       bottom: 100,
     },
-    scrollWidth: scrollableScrollSize.scrollWidth,
-    scrollHeight: scrollableScrollSize.scrollHeight,
+    scrollSize: {
+      scrollWidth: scrollableScrollSize.scrollWidth,
+      scrollHeight: scrollableScrollSize.scrollHeight,
+    },
     scroll: { x: 0, y: 0 },
     shouldClipSubject: true,
   },

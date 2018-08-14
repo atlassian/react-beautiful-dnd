@@ -50,6 +50,25 @@ export type HorizontalAxis = {|
 
 export type Axis = VerticalAxis | HorizontalAxis;
 
+export type ScrollSize = {|
+  scrollHeight: number,
+  scrollWidth: number,
+|};
+
+export type ScrollDetails = {|
+  initial: Position,
+  current: Position,
+  // the maximum allowable scroll for the frame
+  max: Position,
+  diff: {|
+    value: Position,
+    // The actual displacement as a result of a scroll is in the opposite
+    // direction to the scroll itself. When scrolling down items are displaced
+    // upwards. This value is the negated version of the 'value'
+    displacement: Position,
+  |},
+|};
+
 export type Placeholder = {|
   client: BoxModel,
   tagName: string,
@@ -67,25 +86,16 @@ export type DraggableDimension = {|
 |};
 
 export type Scrollable = {|
+  // Used for comparision with dynamic recollecting
+  frameClient: BoxModel,
+  scrollSize: ScrollSize,
   // This is the window through which the droppable is observed
   // It does not change during a drag
   framePageMarginBox: Rect,
   // Whether or not we should clip the subject by the frame
   // Is controlled by the ignoreContainerClipping prop
   shouldClipSubject: boolean,
-  scroll: {|
-    initial: Position,
-    current: Position,
-    // the maximum allowable scroll for the frame
-    max: Position,
-    diff: {|
-      value: Position,
-      // The actual displacement as a result of a scroll is in the opposite
-      // direction to the scroll itself. When scrolling down items are displaced
-      // upwards. This value is the negated version of the 'value'
-      displacement: Position,
-    |},
-  |},
+  scroll: ScrollDetails,
 |};
 
 export type DroppableDimensionViewport = {|
@@ -140,7 +150,7 @@ export type DragImpact = {|
   destination: ?DraggableLocation,
 |};
 
-export type ItemPositions = {|
+export type ClientPositions = {|
   // where the user initially selected
   // This point is not used to calculate the impact of a dragging item
   // It is used to calculate the offset from the initial selection point
@@ -149,6 +159,11 @@ export type ItemPositions = {|
   borderBoxCenter: Position,
   // how far the item has moved from its original position
   offset: Position,
+|};
+
+export type PagePositions = {|
+  selection: Position,
+  borderBoxCenter: Position,
 |};
 
 // When dragging with a pointer such as a mouse or touch input we want to automatically
@@ -163,8 +178,8 @@ export type AutoScrollMode = 'FLUID' | 'JUMP';
 // |}
 
 export type DragPositions = {|
-  client: ItemPositions,
-  page: ItemPositions,
+  client: ClientPositions,
+  page: PagePositions,
 |};
 
 // published when a drag starts
@@ -218,17 +233,7 @@ export type Critical = {|
 export type Viewport = {|
   // live updates with the latest values
   frame: Rect,
-  scroll: {|
-    initial: Position,
-    current: Position,
-    max: Position,
-    diff: {|
-      value: Position,
-      // The actual displacement as a result of a scroll is in the opposite
-      // direction to the scroll itself.
-      displacement: Position,
-    |},
-  |},
+  scroll: ScrollDetails,
 |};
 
 export type DimensionMap = {|
@@ -236,16 +241,10 @@ export type DimensionMap = {|
   droppables: DroppableDimensionMap,
 |};
 
-export type Publish = {|
-  additions: {|
-    draggables: DraggableDimension[],
-    droppables: DroppableDimension[],
-  |},
-  // additions: DimensionMap,
-  removals: {|
-    draggables: DraggableId[],
-    droppables: DroppableId[],
-  |},
+export type Published = {|
+  additions: DraggableDimension[],
+  removals: DraggableId[],
+  modified: DroppableDimension[],
 |};
 
 export type IdleState = {|

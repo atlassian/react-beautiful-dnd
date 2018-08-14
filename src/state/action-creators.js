@@ -5,20 +5,20 @@ import type {
   DraggableId,
   DroppableId,
   DropResult,
-  ItemPositions,
+  ClientPositions,
   AutoScrollMode,
   Viewport,
   DimensionMap,
   DropReason,
   PendingDrop,
-  Publish,
+  Published,
 } from '../types';
 
 export type LiftArgs = {|
   // lifting with DraggableId rather than descriptor
   // as the descriptor might change after a drop is flushed
   id: DraggableId,
-  client: ItemPositions,
+  client: ClientPositions,
   viewport: Viewport,
   autoScrollMode: AutoScrollMode,
 |};
@@ -36,7 +36,7 @@ export const lift = (args: LiftArgs): LiftAction => ({
 export type InitialPublishArgs = {|
   critical: Critical,
   dimensions: DimensionMap,
-  client: ItemPositions,
+  client: ClientPositions,
   viewport: Viewport,
   autoScrollMode: AutoScrollMode,
 |};
@@ -55,10 +55,10 @@ export const initialPublish = (
 
 export type PublishAction = {|
   type: 'PUBLISH',
-  payload: Publish,
+  payload: Published,
 |};
 
-export const publish = (args: Publish): PublishAction => ({
+export const publish = (args: Published): PublishAction => ({
   type: 'PUBLISH',
   payload: args,
 });

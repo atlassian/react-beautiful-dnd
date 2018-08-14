@@ -1,8 +1,8 @@
 // @flow
-import { type Position } from 'css-box-model';
-import {
-  type UpdateDroppableScrollArgs,
-  type UpdateDroppableIsEnabledArgs,
+import type { Position } from 'css-box-model';
+import type {
+  UpdateDroppableScrollArgs,
+  UpdateDroppableIsEnabledArgs,
 } from '../action-creators';
 import type {
   DraggableDescriptor,
@@ -15,7 +15,7 @@ import type {
   Critical,
   DimensionMap,
   LiftRequest,
-  Publish,
+  Published,
 } from '../../types';
 
 export type GetDraggableDimensionFn = (
@@ -29,6 +29,7 @@ export type GetDroppableDimensionFn = (
 
 export type DroppableCallbacks = {|
   getDimensionAndWatchScroll: GetDroppableDimensionFn,
+  recollect: () => DroppableDimension,
   // scroll a droppable
   scroll: (change: Position) => void,
   // If the Droppable is listening for scroll events - it needs to stop!
@@ -57,12 +58,6 @@ export type DroppableEntryMap = {
 export type Entries = {|
   droppables: DroppableEntryMap,
   draggables: DraggableEntryMap,
-|};
-
-export type Collection = {|
-  scrollOptions: ScrollOptions,
-  critical: Critical,
-  initialWindowScroll: Position,
 |};
 
 export type StartPublishingResult = {|
@@ -107,7 +102,10 @@ export type DimensionMarshal = {|
 
 export type Callbacks = {|
   collectionStarting: () => mixed,
-  publish: (args: Publish) => mixed,
+  publish: (args: Published) => mixed,
   updateDroppableScroll: (args: UpdateDroppableScrollArgs) => mixed,
   updateDroppableIsEnabled: (args: UpdateDroppableIsEnabledArgs) => mixed,
+  // can a droppable have Draggables added or removed from it during a drag
+  // TODO: get this working
+  // canAddOrRemoveDuringDrag: (id: DroppableId) => boolean,
 |};
