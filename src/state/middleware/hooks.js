@@ -11,7 +11,6 @@ import type {
   DraggableLocation,
   GroupingLocation,
   DragImpact,
-  Location,
   DragStart,
   Announce,
   DragUpdate,
@@ -36,7 +35,22 @@ const withTimings = (key: string, fn: Function) => {
   timings.finish(key);
 };
 
-const areLocationsEqual = (first: ?Location, second: ?Location): boolean => {
+type ReorderLocationRecord = {|
+  type: 'REORDER',
+  value: DraggableLocation,
+|};
+
+type GroupingLocationRecord = {|
+  type: 'GROUP',
+  value: GroupingLocation,
+|};
+
+type LocationRecord = ReorderLocationRecord | GroupingLocationRecord;
+
+const areLocationsEqual = (
+  first: ?LocationRecord,
+  second: ?LocationRecord,
+): boolean => {
   if (first == null && second == null) {
     return true;
   }
@@ -46,26 +60,25 @@ const areLocationsEqual = (first: ?Location, second: ?Location): boolean => {
     return false;
   }
 
+  // different record type
+  if (first.type !== second.type) {
+    return false;
+  }
+
   // For either DraggableLocation or GroupingLocation - if the droppable id
   // is not the same then we can bail
-  if (first.droppableId !== second.droppableId) {
+  if (first.value.droppableId !== second.value.droppableId) {
     return false;
   }
 
-  // DraggableLocation
-  if (first.index != null) {
-    if (second.index == null) {
-      return false;
-    }
-    return first.index === second.index;
+  if (first.type === 'REORDER') {
+    // $FlowFixMe - flow is getting confused here
+    return first.value.index === second.value.index;
   }
 
-  // GroupingLocation
-  if (first.draggableId == null || second.draggableId == null) {
-    return false;
-  }
-
-  return first.draggableId === second.draggableId;
+  // GROUP
+  // $FlowFixMe - flow is getting confused here
+  return first.value.draggableId === second.value.draggableId;
 };
 
 const isCriticalEqual = (first: Critical, second: Critical): boolean => {
@@ -84,6 +97,22 @@ const isCriticalEqual = (first: Critical, second: Critical): boolean => {
     first.droppable.type === second.droppable.type;
 
   return isDraggableEqual && isDroppableEqual;
+};
+
+const getLocationRecord = (impact: ?DragImpact): ?LocationRecord => {
+  if (!impact) {
+    return null;
+  }
+  if (impact.type === 'REORDER') {
+    return {
+      type: 'REORDER',
+      value: impact.destination,
+    };
+  }
+  return {
+    type: 'GROUP',
+    value: impact.destination,
+  };
 };
 
 const getExpiringAnnounce = (announce: Announce) => {
@@ -162,7 +191,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
   };
 
   const publisher = (() => {
-    let lastLocation: ?Location = null;
+    let lastLocation: ?LocationRecord = null;
     let lastCritical: ?Critical = null;
     let isDragStartPublished: boolean = false;
 
@@ -187,7 +216,10 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
       );
       const data: DragStart = getDragStart(critical);
       lastCritical = critical;
-      lastLocation = data.source;
+      lastLocation = {
+        type: 'REORDER',
+        value: data.source,
+      };
       isDragStartPublished = true;
       withTimings('onDragStart', () =>
         execute(getHooks().onDragStart, data, messagePreset.onDragStart),
@@ -210,7 +242,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
         lastCritical = critical;
       }
 
-      const location: ?Location = impact ? impact.destination : null;
+      const location: ?LocationRecord = getLocationRecord(impact);
 
       // Has the location changed? Will result in a destination change
       const hasLocationChanged: boolean = !areLocationsEqual(

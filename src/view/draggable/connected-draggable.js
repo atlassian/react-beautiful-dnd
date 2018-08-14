@@ -50,6 +50,7 @@ const defaultMapProps: MapProps = {
   // these properties are only populated when the item is dragging
   dimension: null,
   draggingOver: null,
+  groupingWith: null,
 };
 
 // Returning a function to ensure each
@@ -69,6 +70,7 @@ export const makeMapStateToProps = (): Selector => {
       shouldAnimateDragMovement: false,
       dimension: null,
       draggingOver: null,
+      groupingWith: null,
     }),
   );
 
@@ -79,6 +81,8 @@ export const makeMapStateToProps = (): Selector => {
       dimension: DraggableDimension,
       // the id of the droppable you are over
       draggingOver: ?DroppableId,
+      // the id of a draggable you are grouping with
+      groupingWith: ?DraggableId,
     ): MapProps => ({
       isDragging: true,
       isDropAnimating: false,
@@ -87,6 +91,7 @@ export const makeMapStateToProps = (): Selector => {
       shouldAnimateDragMovement,
       dimension,
       draggingOver,
+      groupingWith,
     }),
   );
 
@@ -146,11 +151,19 @@ export const makeMapStateToProps = (): Selector => {
           ? state.impact.destination.droppableId
           : null;
 
+      const groupingWith: ?DraggableId =
+        state.impact &&
+        state.impact.type === 'GROUP' &&
+        state.impact.destination.draggableId === ownProps.draggableId
+          ? ownProps.draggableId
+          : null;
+
       return getDraggingProps(
         memoizedOffset(offset.x, offset.y),
         shouldAnimateDragMovement,
         dimension,
         draggingOver,
+        groupingWith,
       );
     }
 
@@ -165,6 +178,10 @@ export const makeMapStateToProps = (): Selector => {
         ? pending.result.destination.droppableId
         : null;
 
+      const groupingWith: ?DraggableId = pending.result.groupingWith
+        ? pending.result.groupingWith.draggableId
+        : null;
+
       // not memoized as it is the only execution
       return {
         isDragging: false,
@@ -177,6 +194,7 @@ export const makeMapStateToProps = (): Selector => {
         shouldAnimateDragMovement: false,
         // not relevant,
         shouldAnimateDisplacement: false,
+        groupingWith,
       };
     }
 

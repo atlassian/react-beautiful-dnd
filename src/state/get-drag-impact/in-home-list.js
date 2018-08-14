@@ -45,6 +45,17 @@ export default ({
     pageBorderBoxCenter,
   );
 
+  // Are we grouping?
+  const isGroupingEnabled: boolean = home.isGroupingEnabled;
+
+  if (isGroupingEnabled) {
+    // If over a group hitbox: then use that
+    // Otherwise perform a standard reorder
+    // User direction:
+    // if there is a previous grouping impact: use the direction from that
+    // otherwise use the current user direction
+  }
+
   // not considering margin so that items move based on visible edges
   const isBeyondStartPosition: boolean =
     currentCenter[axis.line] > originalCenter[axis.line];

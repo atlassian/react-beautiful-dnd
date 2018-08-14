@@ -8,6 +8,7 @@ import { isEqual, origin } from '../../state/position';
 import type {
   DraggableDimension,
   ClientPositions,
+  DraggableId,
   DroppableId,
   AutoScrollMode,
   TypeId,
@@ -256,13 +257,15 @@ export default class Draggable extends Component<Props> {
 
   getSnapshot = memoizeOne(
     (
-      isDragging: boolean,
+      isDraggingOrDropping: boolean,
       isDropAnimating: boolean,
       draggingOver: ?DroppableId,
+      groupingWith: ?DraggableId,
     ): StateSnapshot => ({
-      isDragging: isDragging || isDropAnimating,
+      isDragging: isDraggingOrDropping,
       isDropAnimating,
       draggingOver,
+      groupingWith,
     }),
   );
 
@@ -273,12 +276,14 @@ export default class Draggable extends Component<Props> {
     const {
       isDragging,
       isDropAnimating,
-      dimension,
       draggingOver,
+      groupingWith,
+      dimension,
       shouldAnimateDisplacement,
       children,
     } = this.props;
 
+    const isDraggingOrDropping: boolean = isDragging || isDropAnimating;
     const child: ?Node = children(
       this.getProvided(
         change,
@@ -288,10 +293,13 @@ export default class Draggable extends Component<Props> {
         dimension,
         dragHandleProps,
       ),
-      this.getSnapshot(isDragging, isDropAnimating, draggingOver),
+      this.getSnapshot(
+        isDraggingOrDropping,
+        isDropAnimating,
+        draggingOver,
+        groupingWith,
+      ),
     );
-
-    const isDraggingOrDropping: boolean = isDragging || isDropAnimating;
 
     const placeholder: ?Node = (() => {
       if (!isDraggingOrDropping) {

@@ -73,6 +73,7 @@ export type Provided = {|
 export type StateSnapshot = {|
   isDragging: boolean,
   isDropAnimating: boolean,
+  groupingWith: ?DraggableId,
   draggingOver: ?DroppableId,
 |};
 
@@ -101,6 +102,7 @@ export type MapProps = {|
   // only provided when dragging
   dimension: ?DraggableDimension,
   draggingOver: ?DroppableId,
+  groupingWith: ?DraggableId,
 |};
 
 export type OwnProps = {|
