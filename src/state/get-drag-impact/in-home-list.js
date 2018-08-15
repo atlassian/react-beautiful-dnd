@@ -17,6 +17,7 @@ import getDisplacement from '../get-displacement';
 import getDisplacementMap from '../get-displacement-map';
 import withDroppableScroll from '../with-droppable-scroll';
 import getGroupingImpact from './get-grouping-impact';
+import isUserMovingForward from '../is-user-moving-forward';
 
 // It is the responsibility of this function
 // to return the impact of a drag
@@ -43,8 +44,6 @@ export default ({
   const axis: Axis = home.axis;
   // The starting center position
   const originalCenter: Position = draggable.page.borderBox.center;
-  const movement: DragMovement = previousImpact.movement;
-  const map: DisplacementMap = movement.map;
 
   // Where the element actually is now.
   // Need to take into account the change of scroll in the droppable
@@ -52,6 +51,11 @@ export default ({
     home,
     pageBorderBoxCenter,
   );
+  const isDisplacingForward: boolean =
+    currentCenter[axis.line] < originalCenter[axis.line];
+
+  const movement: DragMovement = previousImpact.movement;
+  const map: DisplacementMap = movement.map;
 
   const group: ?GroupingImpact = getGroupingImpact({
     pageCenterWithDroppableScroll: currentCenter,
@@ -63,17 +67,23 @@ export default ({
     impact: previousImpact,
   });
 
+  const isMovingForward: boolean = isUserMovingForward(
+    currentDirection,
+    home.axis,
+  );
+  console.log('is moving forward', isMovingForward);
+
   // not considering margin so that items move based on visible edges
-  const isBeyondStartPosition: boolean =
-    currentCenter[axis.line] > originalCenter[axis.line];
 
   // TODO: if currentCenter === originalCenter can just abort
 
   // Amount to move needs to include the margins
-  const amount: Position = patch(
-    axis.line,
-    draggable.client.marginBox[axis.size],
-  );
+  // const amount: Position = patch(
+  //   axis.line,
+  //   draggable.client.marginBox[axis.size],
+  // );
+  const modifier: number = movement.isBeyondStartPosition ? -1 : 1;
+  const shift: number = movement.amount[axis.line] * modifier;
 
   const displaced: Displacement[] = insideHome
     .filter(
@@ -83,17 +93,34 @@ export default ({
           return false;
         }
 
-        // Maintain current displacement if grouping
-        if (group) {
-          if (child.descriptor.id === group.groupingWith.draggableId) {
-            const isAlreadyDisplaced: boolean = Boolean(
-              map[child.descriptor.id],
-            );
-            return isAlreadyDisplaced;
-          }
+        const isDisplaced: boolean = Boolean(map[child.descriptor.id]);
+        const shiftedBy: number = isDisplaced ? shift : 0;
+        const borderBox: Rect = child.page.borderBox;
+        const start: number = borderBox[axis.start] + shiftedBy;
+        const end: number = borderBox[axis.end] + shiftedBy;
+
+        // if (isDisplacingForward) {
+        // }
+
+        // if moving forward then the center position needs to be
+        // greater that the start of the
+        if (isMovingForward) {
+          return currentCenter[axis.line] > start;
         }
 
-        const borderBox: Rect = child.page.borderBox;
+        // moving backwards
+        // The center of the draggable needs to be smaller than the
+        // end of the thing behind it
+        return currentCenter[axis.line] < end;
+
+        // const
+
+        // Maintain current displacement if grouping
+        // if (group && child.descriptor.id === group.groupingWith.draggableId) {
+        //   return isAlreadyDisplaced;
+        // }
+
+        // const borderBox: Rect = child.page.borderBox;
 
         if (isBeyondStartPosition) {
           // 1. item needs to start ahead of the moving item
@@ -124,6 +151,9 @@ export default ({
         }),
     );
 
+  const isBeyondStartPosition: boolean =
+    currentCenter[axis.line] > originalCenter[axis.line];
+
   // Need to ensure that we always order by the closest impacted item
   const ordered: Displacement[] = isBeyondStartPosition
     ? displaced.reverse()
@@ -144,7 +174,7 @@ export default ({
   })();
 
   const newMovement: DragMovement = {
-    amount,
+    amount: previousImpact.movement.amount,
     displaced: ordered,
     map: getDisplacementMap(ordered),
     isBeyondStartPosition,

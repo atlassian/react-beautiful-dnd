@@ -46,7 +46,8 @@ export default ({
   const modifier: number = movement.isBeyondStartPosition ? -1 : 1;
   const shift: number = movement.amount[axis.line] * modifier;
 
-  // TODO!
+  // TODO!\
+  return null;
 
   const target: ?DraggableDimension = insideDestination.find(
     (child: DraggableDimension): boolean => {

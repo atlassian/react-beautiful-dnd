@@ -156,10 +156,6 @@ export type GroupingLocation = {|
 export type UserDirection = {|
   vertical: 'up' | 'down',
   horizontal: 'left' | 'right',
-  // TODO: record amount of shift from start
-  // Would be useful for auto scrolling
-  // Gotcha: droppable scroll changes...
-  // clientDiffFromStart: Spacing,
 |};
 
 export type GroupingImpact = {|
