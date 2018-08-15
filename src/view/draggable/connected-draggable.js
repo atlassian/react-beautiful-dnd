@@ -65,15 +65,12 @@ export const makeMapStateToProps = (): Selector => {
       offset: Position,
       groupedOverBy: ?DraggableId = null,
       shouldAnimateDisplacement: boolean,
-    ): MapProps => {
-      console.log('recalcing secondary props');
-      return {
-        ...defaultMapProps,
-        offset,
-        shouldAnimateDisplacement,
-        groupedOverBy,
-      };
-    },
+    ): MapProps => ({
+      ...defaultMapProps,
+      offset,
+      shouldAnimateDisplacement,
+      groupedOverBy,
+    }),
   );
 
   const getDraggingProps = memoizeOne(
@@ -121,7 +118,6 @@ export const makeMapStateToProps = (): Selector => {
     );
 
     if (isGroupedOver) {
-      console.log('CONNECT: is grouped over!', ownId);
       return getSecondaryProps(
         displacement ? getDisplacedOffset(movement) : origin,
         draggingId,

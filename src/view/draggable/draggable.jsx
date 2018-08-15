@@ -286,10 +286,6 @@ export default class Draggable extends Component<Props> {
       children,
     } = this.props;
 
-    if (groupedOverBy) {
-      console.warn(this.props.draggableId, 'groupedOverBy', groupedOverBy);
-    }
-
     const isDraggingOrDropping: boolean = isDragging || isDropAnimating;
     const child: ?Node = children(
       this.getProvided(
@@ -335,6 +331,7 @@ export default class Draggable extends Component<Props> {
       isDragging,
       isDropAnimating,
       isDragDisabled,
+      groupedOverBy,
       shouldAnimateDragMovement,
       disableInteractiveElementBlocking,
     } = this.props;
@@ -346,7 +343,6 @@ export default class Draggable extends Component<Props> {
       shouldAnimateDragMovement,
       isDropAnimating,
     );
-    console.log('groupedOverBy', this.props.groupedOverBy);
 
     return (
       <DraggableDimensionPublisher
@@ -357,7 +353,12 @@ export default class Draggable extends Component<Props> {
         index={index}
         getDraggableRef={this.getDraggableRef}
       >
-        <Moveable speed={speed} destination={offset} onMoveEnd={this.onMoveEnd}>
+        <Moveable
+          speed={speed}
+          destination={offset}
+          onMoveEnd={this.onMoveEnd}
+          dontSkipRenderWhenChanged={groupedOverBy}
+        >
           {(change: Position) => (
             <DragHandle
               draggableId={draggableId}

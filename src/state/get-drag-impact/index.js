@@ -85,5 +85,6 @@ export default ({
     insideDestination,
     previousImpact,
     viewport,
+    direction,
   });
 };

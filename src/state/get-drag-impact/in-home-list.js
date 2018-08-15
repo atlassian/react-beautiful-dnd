@@ -16,8 +16,7 @@ import { patch } from '../position';
 import getDisplacement from '../get-displacement';
 import getDisplacementMap from '../get-displacement-map';
 import withDroppableScroll from '../with-droppable-scroll';
-import isWithin from '../is-within';
-import { vertical } from '../axis';
+import getGroupingImpact from './get-grouping-impact';
 
 // It is the responsibility of this function
 // to return the impact of a drag
@@ -46,7 +45,6 @@ export default ({
   const originalCenter: Position = draggable.page.borderBox.center;
   const movement: DragMovement = previousImpact.movement;
   const map: DisplacementMap = movement.map;
-  const group: ?GroupingImpact = previousImpact.group;
 
   // Where the element actually is now.
   // Need to take into account the change of scroll in the droppable
@@ -55,64 +53,15 @@ export default ({
     pageBorderBoxCenter,
   );
 
-  // Are we grouping?
-  // const isGroupingEnabled: boolean = home.isGroupingEnabled;
-
-  const direction: UserDirection = group ? group.whenEntered : currentDirection;
-
-  const isMovingForward: boolean =
-    axis === vertical
-      ? direction.vertical === 'down'
-      : direction.horizontal === 'right';
-
-  // if (isGroupingEnabled)
-
-  const modifier: number = movement.isBeyondStartPosition ? -1 : 1;
-  const shift: number = movement.amount[axis.line] * modifier;
-
-  // are we over the top over any draggable?
-  const groupedWith: ?DraggableDimension = insideHome.find(
-    (child: DraggableDimension): boolean => {
-      // Cannot group with yourself
-      if (child.descriptor.id === draggable.descriptor.id) {
-        return false;
-      }
-
-      const isDisplaced: boolean = Boolean(map[child.descriptor.id]);
-      // TODO: if already displaced then we need to account for that when grouping
-      console.log('is already displaced!', isDisplaced);
-
-      const localShift: number = isDisplaced ? shift : 0;
-
-      const marginBox: Rect = child.page.marginBox;
-      const start: number = marginBox[axis.start] + localShift;
-      const end: number = marginBox[axis.end] + localShift;
-      const size: number = marginBox[axis.size];
-      const oneThird: number = size * 0.333;
-
-      const adjustedStart: number = isMovingForward ? start : start + oneThird;
-      const adjustedEnd: number = isMovingForward ? end - oneThird : end;
-
-      const isOver = isWithin(adjustedStart, adjustedEnd);
-      // const isOver = isWithin(start, end);
-
-      return isOver(currentCenter[axis.line]);
-    },
-  );
-
-  const newGroup: ?GroupingImpact = groupedWith
-    ? {
-        whenEntered: direction,
-        groupingWith: {
-          draggableId: groupedWith.descriptor.id,
-          droppableId: home.descriptor.id,
-        },
-      }
-    : null;
-
-  if (groupedWith) {
-    console.log('grouped with', groupedWith.descriptor.id);
-  }
+  const group: ?GroupingImpact = getGroupingImpact({
+    pageCenterWithDroppableScroll: currentCenter,
+    draggable,
+    destination: home,
+    displaced: map,
+    insideDestination: insideHome,
+    direction: currentDirection,
+    impact: previousImpact,
+  });
 
   // not considering margin so that items move based on visible edges
   const isBeyondStartPosition: boolean =
@@ -134,11 +83,14 @@ export default ({
           return false;
         }
 
-        const isAlreadyDisplaced: boolean = Boolean(map[child.descriptor.id]);
-
-        // do not want to move an item that is being groupedWith
-        if (child === groupedWith) {
-          return isAlreadyDisplaced;
+        // Maintain current displacement if grouping
+        if (group) {
+          if (child.descriptor.id === group.groupingWith.draggableId) {
+            const isAlreadyDisplaced: boolean = Boolean(
+              map[child.descriptor.id],
+            );
+            return isAlreadyDisplaced;
+          }
         }
 
         const borderBox: Rect = child.page.borderBox;
@@ -206,7 +158,7 @@ export default ({
       index,
     },
     // TODO
-    group: newGroup,
+    group,
   };
 
   return impact;

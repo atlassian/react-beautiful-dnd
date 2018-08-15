@@ -114,9 +114,6 @@ const Attribution = styled.small`
 export default class QuoteItem extends React.PureComponent<Props> {
   render() {
     const { quote, isDragging, isGroupedOver, provided } = this.props;
-    if (quote.id === '2') {
-      console.warn('2 isGroupedOver', isGroupedOver);
-    }
 
     return (
       <Container
