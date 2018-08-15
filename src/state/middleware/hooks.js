@@ -211,6 +211,8 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
 
       const data: DragUpdate = {
         ...getDragStart(critical),
+        // TODO
+        groupingWith: null,
         destination: location,
       };
 
@@ -241,6 +243,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
 
       const result: DropResult = {
         ...getDragStart(lastCritical),
+        groupingWith: null,
         destination: null,
         reason: 'CANCEL',
       };

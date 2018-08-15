@@ -102,6 +102,7 @@ export default ({
       droppables: dimensions.droppables,
       previousImpact: getHomeImpact(state.critical, dimensions),
       viewport: state.viewport,
+      direction: state.direction,
     }),
   );
 

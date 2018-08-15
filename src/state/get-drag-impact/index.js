@@ -6,14 +6,15 @@ import type {
   DroppableDimension,
   DraggableDimensionMap,
   DroppableDimensionMap,
+  UserDirection,
   DragImpact,
   Viewport,
 } from '../../types';
 import getDroppableOver from '../get-droppable-over';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import noImpact from '../no-impact';
 import inHomeList from './in-home-list';
 import inForeignList from './in-foreign-list';
+import noImpact from '../no-impact';
 
 type Args = {|
   pageBorderBoxCenter: Position,
@@ -23,6 +24,7 @@ type Args = {|
   droppables: DroppableDimensionMap,
   previousImpact: DragImpact,
   viewport: Viewport,
+  direction: UserDirection,
 |};
 
 export default ({
@@ -32,9 +34,11 @@ export default ({
   droppables,
   previousImpact,
   viewport,
+  direction,
 }: Args): DragImpact => {
-  const previousDroppableOverId: ?DroppableId =
-    previousImpact.destination && previousImpact.destination.droppableId;
+  const previousDroppableOverId: ?DroppableId = previousImpact.destination
+    ? previousImpact.destination.droppableId
+    : null;
 
   const destinationId: ?DroppableId = getDroppableOver({
     target: pageBorderBoxCenter,
@@ -68,8 +72,9 @@ export default ({
       draggable,
       home,
       insideHome: insideDestination,
-      previousImpact: previousImpact || noImpact,
+      previousImpact,
       viewport,
+      direction,
     });
   }
 
@@ -78,7 +83,8 @@ export default ({
     draggable,
     destination,
     insideDestination,
-    previousImpact: previousImpact || noImpact,
+    previousImpact,
     viewport,
+    direction,
   });
 };

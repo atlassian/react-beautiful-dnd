@@ -18,6 +18,7 @@ import type {
   Viewport,
   Critical,
   DraggableLocation,
+  GroupingLocation,
   DragImpact,
   DropResult,
   PendingDrop,
@@ -79,6 +80,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
 
   const critical: Critical = state.critical;
   const dimensions: DimensionMap = state.dimensions;
+  // Only keeping impact when doing a user drop - otherwise we are cancelling
   const impact: DragImpact = reason === 'DROP' ? state.impact : noImpact;
   const home: DroppableDimension =
     dimensions.droppables[state.critical.droppable.id];
@@ -93,14 +95,18 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     index: critical.draggable.index,
     droppableId: critical.droppable.id,
   };
+  const groupingWith: ?GroupingLocation =
+    impact && impact.group ? impact.group.groupingWith : null;
+  // Only publishing destination if there is no grouping occurring
   const destination: ?DraggableLocation =
-    reason === 'DROP' ? impact.destination : null;
+    impact && !groupingWith ? impact.destination : null;
 
   const result: DropResult = {
     draggableId: draggable.descriptor.id,
     type: home.descriptor.type,
     source,
     destination,
+    groupingWith,
     reason,
   };
 

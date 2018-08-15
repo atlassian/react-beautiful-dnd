@@ -124,6 +124,7 @@ export default ({
       const withSizeChanged: DroppableDimension = getDroppableDimension({
         descriptor: provided.descriptor,
         isEnabled: provided.isEnabled,
+        isGroupingEnabled: provided.isGroupingEnabled,
         direction: provided.axis.direction,
         client,
         page: withScroll(client, initialWindowScroll),

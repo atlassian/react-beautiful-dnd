@@ -45,6 +45,7 @@ export type Closest = {|
 type GetDroppableArgs = {|
   descriptor: DroppableDescriptor,
   isEnabled: boolean,
+  isGroupingEnabled: boolean,
   direction: 'vertical' | 'horizontal',
   client: BoxModel,
   page: BoxModel,
@@ -54,6 +55,7 @@ type GetDroppableArgs = {|
 export const getDroppableDimension = ({
   descriptor,
   isEnabled,
+  isGroupingEnabled,
   direction,
   client,
   page,
@@ -109,6 +111,7 @@ export const getDroppableDimension = ({
     descriptor,
     axis: direction === 'vertical' ? vertical : horizontal,
     isEnabled,
+    isGroupingEnabled,
     client,
     page,
     viewport,

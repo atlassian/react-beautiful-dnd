@@ -9,6 +9,7 @@ export type Props = {|
   destination: Position,
   onMoveEnd: () => void,
   children: Position => Element<*>,
+  dontSkipRenderWhenChanged?: mixed,
 |};
 
 export type DefaultProps = {|

@@ -1,8 +1,5 @@
 // @flow
 import { type Rect } from 'css-box-model';
-import getDisplacementMap, {
-  type DisplacementMap,
-} from './get-displacement-map';
 import { isPartiallyVisible } from './visibility/is-visible';
 import type {
   DraggableId,
@@ -10,6 +7,7 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DragImpact,
+  DisplacementMap,
 } from '../types';
 
 type Args = {|
@@ -30,9 +28,7 @@ export default ({
   viewport,
 }: Args): Displacement => {
   const id: DraggableId = draggable.descriptor.id;
-  const map: DisplacementMap = getDisplacementMap(
-    previousImpact.movement.displaced,
-  );
+  const map: DisplacementMap = previousImpact.movement.map;
 
   // only displacing items that are visible in the droppable and the viewport
   const isVisible: boolean = isPartiallyVisible({

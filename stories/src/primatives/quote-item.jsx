@@ -9,13 +9,24 @@ type Props = {
   quote: Quote,
   isDragging: boolean,
   provided: DraggableProvided,
+  isGroupedOver?: boolean,
+};
+
+const getBackgroundColor = (isDragging: boolean, isGroupedOver: boolean) => {
+  if (isDragging) {
+    return colors.green;
+  }
+  if (isGroupedOver) {
+    return colors.orange;
+  }
+  return colors.white;
 };
 
 const Container = styled.a`
   border-radius: ${borderRadius}px;
   border: 1px solid grey;
-  background-color: ${({ isDragging }) =>
-    isDragging ? colors.green : colors.white};
+  background-color: ${props =>
+    getBackgroundColor(props.isDragging, props.isGroupedOver)};
   box-shadow: ${({ isDragging }) =>
     isDragging ? `2px 2px 1px ${colors.shadow}` : 'none'};
   padding: ${grid}px;
@@ -102,12 +113,13 @@ const Attribution = styled.small`
 // will be using PureComponent
 export default class QuoteItem extends React.PureComponent<Props> {
   render() {
-    const { quote, isDragging, provided } = this.props;
+    const { quote, isDragging, isGroupedOver, provided } = this.props;
 
     return (
       <Container
         href={quote.author.url}
         isDragging={isDragging}
+        isGroupedOver={isGroupedOver}
         innerRef={provided.innerRef}
         {...provided.draggableProps}
         {...provided.dragHandleProps}

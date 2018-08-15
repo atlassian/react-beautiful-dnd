@@ -15,6 +15,7 @@ type PositionLike = {|
 type BlockerProps = {|
   change: Position,
   children: Position => Element<*>,
+  dontSkipRenderWhenChanged?: mixed,
 |};
 
 // Working around react-motion double render issue
@@ -25,13 +26,20 @@ class DoubleRenderBlocker extends React.Component<BlockerProps> {
       return true;
     }
 
-    // blocking a duplicate change (workaround for react-motion)
-    if (isEqual(this.props.change, nextProps.change)) {
-      return false;
+    // Must allow render if the offset has changed
+    if (!isEqual(this.props.change, nextProps.change)) {
+      return true;
     }
 
-    // let everything else through
-    return true;
+    if (
+      this.props.dontSkipRenderWhenChanged !==
+      nextProps.dontSkipRenderWhenChanged
+    ) {
+      return true;
+    }
+
+    // blocking a duplicate change (workaround for react-motion)
+    return false;
   }
   render() {
     return this.props.children(this.props.change);
@@ -77,7 +85,10 @@ export default class Moveable extends Component<Props> {
             speed === 'INSTANT' ? destination : (current: any);
 
           return (
-            <DoubleRenderBlocker change={target}>
+            <DoubleRenderBlocker
+              change={target}
+              dontSkipRenderWhenChanged={this.props.dontSkipRenderWhenChanged}
+            >
               {children}
             </DoubleRenderBlocker>
           );

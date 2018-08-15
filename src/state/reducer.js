@@ -28,11 +28,21 @@ import type {
   Viewport,
   DimensionMap,
   DropReason,
+  UserDirection,
 } from '../types';
 import type { Action } from './store-types';
 
 const idle: IdleState = { phase: 'IDLE' };
 const preparing: PreparingState = { phase: 'PREPARING' };
+
+const getUserDirection = (
+  oldPageBorderBoxCenter: Position,
+  newPageBorderBoxCenter: Position,
+): UserDirection => ({
+  vertical: newPageBorderBoxCenter.y > oldPageBorderBoxCenter.y ? 'down' : 'up',
+  horizontal:
+    newPageBorderBoxCenter.x > oldPageBorderBoxCenter.x ? 'right' : 'left',
+});
 
 type MoveArgs = {|
   state: DraggingState | CollectingState,
@@ -80,6 +90,11 @@ const moveWithPositionUpdates = ({
     page,
   };
 
+  const direction: UserDirection = getUserDirection(
+    state.current.page.borderBoxCenter,
+    current.page.borderBoxCenter,
+  );
+
   // Not updating impact while bulk collecting
   if (state.phase === 'COLLECTING') {
     return {
@@ -87,9 +102,11 @@ const moveWithPositionUpdates = ({
       phase: 'COLLECTING',
       ...state,
       current,
+      direction,
     };
   }
 
+  // Use impact if it is provided - even if it is null
   const newImpact: DragImpact =
     impact ||
     getDragImpact({
@@ -99,6 +116,7 @@ const moveWithPositionUpdates = ({
       droppables: state.dimensions.droppables,
       previousImpact: state.impact,
       viewport: newViewport,
+      direction,
     });
 
   // dragging!
@@ -106,6 +124,7 @@ const moveWithPositionUpdates = ({
     ...state,
     current,
     shouldAnimate,
+    direction,
     impact: newImpact,
     scrollJumpRequest: scrollJumpRequest || null,
     viewport: newViewport,
@@ -154,6 +173,11 @@ export default (state: State = idle, action: Action): State => {
       current: initial,
       impact: getHomeImpact(critical, dimensions),
       viewport,
+      // TODO: what should the default be?
+      direction: {
+        vertical: 'down',
+        horizontal: 'right',
+      },
       scrollJumpRequest: null,
       shouldAnimate: false,
     };
@@ -294,6 +318,8 @@ export default (state: State = idle, action: Action): State => {
         droppables: dimensions.droppables,
         previousImpact: state.impact,
         viewport: state.viewport,
+        // TODO: is this correct?
+        direction: state.direction,
       });
     })();
 
@@ -355,6 +381,7 @@ export default (state: State = idle, action: Action): State => {
       droppables: dimensions.droppables,
       previousImpact: state.impact,
       viewport: state.viewport,
+      direction: state.direction,
     });
 
     return {

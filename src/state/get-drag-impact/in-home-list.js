@@ -5,13 +5,18 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DragImpact,
+  GroupingImpact,
   Axis,
   Displacement,
   Viewport,
+  UserDirection,
+  DisplacementMap,
 } from '../../types';
 import { patch } from '../position';
 import getDisplacement from '../get-displacement';
+import getDisplacementMap from '../get-displacement-map';
 import withDroppableScroll from '../with-droppable-scroll';
+import getGroupingImpact from './get-grouping-impact';
 
 // It is the responsibility of this function
 // to return the impact of a drag
@@ -23,6 +28,7 @@ type Args = {|
   insideHome: DraggableDimension[],
   previousImpact: DragImpact,
   viewport: Viewport,
+  direction: UserDirection,
 |};
 
 export default ({
@@ -32,10 +38,13 @@ export default ({
   insideHome,
   previousImpact,
   viewport,
+  direction: currentDirection,
 }: Args): DragImpact => {
   const axis: Axis = home.axis;
   // The starting center position
   const originalCenter: Position = draggable.page.borderBox.center;
+  const movement: DragMovement = previousImpact.movement;
+  const map: DisplacementMap = movement.map;
 
   // Where the element actually is now.
   // Need to take into account the change of scroll in the droppable
@@ -43,6 +52,16 @@ export default ({
     home,
     pageBorderBoxCenter,
   );
+
+  const group: ?GroupingImpact = getGroupingImpact({
+    pageCenterWithDroppableScroll: currentCenter,
+    draggable,
+    destination: home,
+    displaced: map,
+    insideDestination: insideHome,
+    direction: currentDirection,
+    impact: previousImpact,
+  });
 
   // not considering margin so that items move based on visible edges
   const isBeyondStartPosition: boolean =
@@ -62,6 +81,16 @@ export default ({
         // do not want to move the item that is dragging
         if (child === draggable) {
           return false;
+        }
+
+        // Maintain current displacement if grouping
+        if (group) {
+          if (child.descriptor.id === group.groupingWith.draggableId) {
+            const isAlreadyDisplaced: boolean = Boolean(
+              map[child.descriptor.id],
+            );
+            return isAlreadyDisplaced;
+          }
         }
 
         const borderBox: Rect = child.page.borderBox;
@@ -114,19 +143,22 @@ export default ({
     return startIndex - length;
   })();
 
-  const movement: DragMovement = {
+  const newMovement: DragMovement = {
     amount,
     displaced: ordered,
+    map: getDisplacementMap(ordered),
     isBeyondStartPosition,
   };
 
   const impact: DragImpact = {
-    movement,
+    movement: newMovement,
     direction: axis.direction,
     destination: {
       droppableId: home.descriptor.id,
       index,
     },
+    // TODO
+    group,
   };
 
   return impact;

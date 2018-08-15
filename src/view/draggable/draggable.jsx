@@ -8,6 +8,7 @@ import { isEqual, origin } from '../../state/position';
 import type {
   DraggableDimension,
   ClientPositions,
+  DraggableId,
   DroppableId,
   AutoScrollMode,
   TypeId,
@@ -256,13 +257,17 @@ export default class Draggable extends Component<Props> {
 
   getSnapshot = memoizeOne(
     (
-      isDragging: boolean,
+      isDraggingOrDropping: boolean,
       isDropAnimating: boolean,
       draggingOver: ?DroppableId,
+      groupingWith: ?DraggableId,
+      groupedOverBy: ?DraggableId,
     ): StateSnapshot => ({
-      isDragging: isDragging || isDropAnimating,
+      isDragging: isDraggingOrDropping,
       isDropAnimating,
       draggingOver,
+      groupingWith,
+      groupedOverBy,
     }),
   );
 
@@ -273,12 +278,15 @@ export default class Draggable extends Component<Props> {
     const {
       isDragging,
       isDropAnimating,
-      dimension,
       draggingOver,
+      groupingWith,
+      groupedOverBy,
+      dimension,
       shouldAnimateDisplacement,
       children,
     } = this.props;
 
+    const isDraggingOrDropping: boolean = isDragging || isDropAnimating;
     const child: ?Node = children(
       this.getProvided(
         change,
@@ -288,10 +296,14 @@ export default class Draggable extends Component<Props> {
         dimension,
         dragHandleProps,
       ),
-      this.getSnapshot(isDragging, isDropAnimating, draggingOver),
+      this.getSnapshot(
+        isDraggingOrDropping,
+        isDropAnimating,
+        draggingOver,
+        groupingWith,
+        groupedOverBy,
+      ),
     );
-
-    const isDraggingOrDropping: boolean = isDragging || isDropAnimating;
 
     const placeholder: ?Node = (() => {
       if (!isDraggingOrDropping) {
@@ -319,6 +331,7 @@ export default class Draggable extends Component<Props> {
       isDragging,
       isDropAnimating,
       isDragDisabled,
+      groupedOverBy,
       shouldAnimateDragMovement,
       disableInteractiveElementBlocking,
     } = this.props;
@@ -340,7 +353,12 @@ export default class Draggable extends Component<Props> {
         index={index}
         getDraggableRef={this.getDraggableRef}
       >
-        <Moveable speed={speed} destination={offset} onMoveEnd={this.onMoveEnd}>
+        <Moveable
+          speed={speed}
+          destination={offset}
+          onMoveEnd={this.onMoveEnd}
+          dontSkipRenderWhenChanged={groupedOverBy}
+        >
           {(change: Position) => (
             <DragHandle
               draggableId={draggableId}

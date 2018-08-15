@@ -96,7 +96,6 @@ export default ({
     }
 
     const destination: ?DraggableLocation = state.impact.destination;
-
     invariant(
       destination,
       'Cannot perform a jump scroll when there is no destination',

@@ -112,6 +112,7 @@ export type DroppableDimension = {|
   descriptor: DroppableDescriptor,
   axis: Axis,
   isEnabled: boolean,
+  isGroupingEnabled: boolean,
   // relative to the current viewport
   client: BoxModel,
   // relative to the whole page
@@ -133,14 +134,38 @@ export type Displacement = {|
   shouldAnimate: boolean,
 |};
 
+export type DisplacementMap = { [key: DraggableId]: Displacement };
+
 export type DragMovement = {|
   // The draggables that need to move in response to a drag.
   // Ordered by closest draggable to the *current* location of the dragging item
   displaced: Displacement[],
+  // displaced as a map
+  map: DisplacementMap,
   amount: Position,
   // is moving forward relative to the starting position
   // TODO: rename to 'shouldDisplaceForward'?
   isBeyondStartPosition: boolean,
+|};
+
+export type GroupingLocation = {|
+  droppableId: DroppableId,
+  draggableId: DraggableId,
+|};
+
+export type UserDirection = {|
+  vertical: 'up' | 'down',
+  horizontal: 'left' | 'right',
+  // TODO: record amount of shift from start
+  // Would be useful for auto scrolling
+  // Gotcha: droppable scroll changes...
+  // clientDiffFromStart: Spacing,
+|};
+
+export type GroupingImpact = {|
+  // This has an impact on the hitbox for a grouping action
+  whenEntered: UserDirection,
+  groupingWith: GroupingLocation,
 |};
 
 export type DragImpact = {|
@@ -148,6 +173,7 @@ export type DragImpact = {|
   // the direction of the Droppable you are over
   direction: ?Direction,
   destination: ?DraggableLocation,
+  group: ?GroupingImpact,
 |};
 
 export type ClientPositions = {|
@@ -193,6 +219,8 @@ export type DragUpdate = {|
   ...DragStart,
   // may not have any destination (drag to nowhere)
   destination: ?DraggableLocation,
+  // populated when a draggable is dragging over another in grouping mode
+  groupingWith: ?GroupingLocation,
 |};
 
 export type DropReason = 'DROP' | 'CANCEL';
@@ -263,6 +291,7 @@ export type DraggingState = {|
   dimensions: DimensionMap,
   initial: DragPositions,
   current: DragPositions,
+  direction: UserDirection,
   impact: DragImpact,
   viewport: Viewport,
   // if we need to jump the scroll (keyboard dragging)

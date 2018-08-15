@@ -8,10 +8,15 @@ import type {
   Axis,
   Displacement,
   Viewport,
+  GroupingImpact,
+  UserDirection,
+  DisplacementMap,
 } from '../../types';
 import { patch } from '../position';
 import getDisplacement from '../get-displacement';
 import withDroppableScroll from '../with-droppable-scroll';
+import getDisplacementMap from '../get-displacement-map';
+import getGroupingImpact from './get-grouping-impact';
 
 type Args = {|
   pageBorderBoxCenter: Position,
@@ -20,6 +25,7 @@ type Args = {|
   insideDestination: DraggableDimension[],
   previousImpact: DragImpact,
   viewport: Viewport,
+  direction: UserDirection,
 |};
 
 export default ({
@@ -29,8 +35,10 @@ export default ({
   insideDestination,
   previousImpact,
   viewport,
+  direction,
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
+  const map: DisplacementMap = previousImpact.movement.map;
 
   // We need to know what point to use to compare to the other
   // draggables in the list.
@@ -42,9 +50,29 @@ export default ({
     pageBorderBoxCenter,
   );
 
+  const group: ?GroupingImpact = getGroupingImpact({
+    pageCenterWithDroppableScroll: currentCenter,
+    draggable,
+    destination,
+    displaced: previousImpact.movement.map,
+    insideDestination,
+    direction,
+    impact: previousImpact,
+  });
+
   const displaced: Displacement[] = insideDestination
     .filter(
       (child: DraggableDimension): boolean => {
+        // Maintain current displacement if grouping
+        if (group) {
+          if (child.descriptor.id === group.groupingWith.draggableId) {
+            const isAlreadyDisplaced: boolean = Boolean(
+              map[child.descriptor.id],
+            );
+            console.log('is already displaced', isAlreadyDisplaced, map);
+            return isAlreadyDisplaced;
+          }
+        }
         // Items will be displaced forward if they sit ahead of the dragging item
         const threshold: number = child.page.borderBox[axis.end];
         return threshold > currentCenter[axis.line];
@@ -65,6 +93,7 @@ export default ({
   const movement: DragMovement = {
     amount: patch(axis.line, draggable.page.marginBox[axis.size]),
     displaced,
+    map: getDisplacementMap(displaced),
     isBeyondStartPosition: false,
   };
 
@@ -75,6 +104,7 @@ export default ({
       droppableId: destination.descriptor.id,
       index: newIndex,
     },
+    group,
   };
 
   return impact;
