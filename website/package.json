@@ -8,7 +8,6 @@
     "@atlaskit/icon": "^13.2.2",
     "@atlaskit/theme": "^5.1.2",
     "gatsby": "next",
-    "gatsby-link": "next",
     "gatsby-plugin-react-helmet": "next",
     "gatsby-plugin-styled-components": "next",
     "gatsby-source-filesystem": "^next",

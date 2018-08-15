@@ -1,16 +1,16 @@
 // @flow
 import React, { type Node } from 'react';
-import ExampleWrapper, {
-  gatsbyUrlToCSBPath,
-} from '../components/ExampleWrapper';
-import CommonPage from '../components/CommonPage';
-import PageWrapper from '../components/PageWrapper';
-import { getTitleFromExamplePath } from '../utils';
-import type { SidebarData } from '../components/types';
+import { graphql } from 'gatsby';
+
+import ExampleWrapper, { gatsbyUrlToCSBPath } from '../ExampleWrapper';
+import CommonPage from '../CommonPage';
+import PageWrapper from '../PageWrapper';
+import { getTitleFromExamplePath } from '../../utils';
+import type { SidebarData } from '../types';
 
 type Props = {
   data: SidebarData,
-  children: () => Node,
+  children: Node,
   location: {
     pathname: string,
   },
@@ -28,7 +28,7 @@ const ExamplePage = ({ children, data, location }: Props) => (
         title={getTitleFromExamplePath(location.pathname, '/examples/')}
         path={gatsbyUrlToCSBPath(location.pathname)}
       >
-        {children()}
+        {children}
       </ExampleWrapper>
     </PageWrapper>
   </CommonPage>

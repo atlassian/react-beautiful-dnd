@@ -1,12 +1,13 @@
 // @flow
 import React, { type Node } from 'react';
+import { graphql } from 'gatsby';
 
-import PageWrapper from '../components/PageWrapper';
-import CommonPage from '../components/CommonPage';
-import type { SidebarData } from '../components/types';
+import PageWrapper from '../PageWrapper';
+import CommonPage from '../CommonPage';
+import type { SidebarData } from '../types';
 
 type Props = {
-  children: () => Node,
+  children: Node,
   data: SidebarData,
 };
 
@@ -18,7 +19,7 @@ const PageTemplate = ({ children, data }: Props) => (
       internal={data.internal}
       showInternal={data.site.siteMetadata.isDevelopment}
     >
-      {children()}
+      {children}
     </PageWrapper>
   </CommonPage>
 );

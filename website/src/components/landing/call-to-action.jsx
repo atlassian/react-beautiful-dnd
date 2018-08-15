@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import Link from 'gatsby-link';
+import { Link } from 'gatsby';
 import { colors } from '@atlaskit/theme';
 import SendIcon from '@atlaskit/icon/glyph/send';
 import BookIcon from '@atlaskit/icon/glyph/book';
