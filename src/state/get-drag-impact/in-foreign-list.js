@@ -1,5 +1,5 @@
 // @flow
-import { type Position } from 'css-box-model';
+import { type Position, type Rect } from 'css-box-model';
 import type {
   DragMovement,
   DraggableDimension,
@@ -17,6 +17,7 @@ import getDisplacement from '../get-displacement';
 import withDroppableScroll from '../with-droppable-scroll';
 import getDisplacementMap from '../get-displacement-map';
 import getGroupingImpact from './get-grouping-impact';
+import isUserMovingForward from '../is-user-moving-forward';
 
 type Args = {|
   pageBorderBoxCenter: Position,
@@ -50,32 +51,62 @@ export default ({
     pageBorderBoxCenter,
   );
 
-  const group: ?GroupingImpact = getGroupingImpact({
-    pageCenterWithDroppableScroll: currentCenter,
-    draggable,
-    destination,
-    displaced: previousImpact.movement.map,
-    insideDestination,
+  const isMovingForward: boolean = isUserMovingForward(
     direction,
-    impact: previousImpact,
-  });
+    destination.axis,
+  );
+
+  const amount: Position = patch(
+    axis.line,
+    draggable.page.marginBox[axis.size],
+  );
+  // always displaced forward
+  const displacedBy: number = amount[axis.line];
+
+  // const group: ?GroupingImpact = getGroupingImpact({
+  //   pageCenterWithDroppableScroll: currentCenter,
+  //   draggable,
+  //   destination,
+  //   displaced: previousImpact.movement.map,
+  //   insideDestination,
+  //   direction,
+  //   impact: previousImpact,
+  // });
 
   const displaced: Displacement[] = insideDestination
     .filter(
       (child: DraggableDimension): boolean => {
-        // Maintain current displacement if grouping
-        if (group) {
-          if (child.descriptor.id === group.groupingWith.draggableId) {
-            const isAlreadyDisplaced: boolean = Boolean(
-              map[child.descriptor.id],
-            );
-            console.log('is already displaced', isAlreadyDisplaced, map);
-            return isAlreadyDisplaced;
+        const isDisplaced: boolean = Boolean(map[child.descriptor.id]);
+
+        const borderBox: Rect = child.page.borderBox;
+        const start: number = borderBox[axis.start];
+        const end: number = borderBox[axis.end];
+
+        // When in foreign list, can only displace forwards
+        // Moving forward will decrease the amount of things needed to be displaced
+        if (isMovingForward) {
+          if (isDisplaced) {
+            return currentCenter[axis.line] < start + displacedBy;
           }
+
+          return currentCenter[axis.line] < start;
         }
+
+        // Moving backwards
+        // Moving backwards will increase the amount of things needed to be displaced
+
+        if (isDisplaced) {
+          return true;
+        }
+
+        // No longer need to displace
+        return currentCenter[axis.line] < end;
+
         // Items will be displaced forward if they sit ahead of the dragging item
-        const threshold: number = child.page.borderBox[axis.end];
-        return threshold > currentCenter[axis.line];
+        // const threshold: number = child.page.borderBox[axis.end];
+        // return threshold > currentCenter[axis.line];
+
+        // return false;
       },
     )
     .map(
@@ -91,7 +122,7 @@ export default ({
   const newIndex: number = insideDestination.length - displaced.length;
 
   const movement: DragMovement = {
-    amount: patch(axis.line, draggable.page.marginBox[axis.size]),
+    amount,
     displaced,
     map: getDisplacementMap(displaced),
     isBeyondStartPosition: false,
@@ -104,7 +135,7 @@ export default ({
       droppableId: destination.descriptor.id,
       index: newIndex,
     },
-    group,
+    group: null,
   };
 
   return impact;

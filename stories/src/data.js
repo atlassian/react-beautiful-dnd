@@ -39,8 +39,11 @@ export const quotes: Quote[] = [
   },
   {
     id: '2',
-    content:
-      'Sucking at something is the first step towards being sorta good at something. Sucking at something is the first step towards being sorta good at something. Sucking at something is the first step towards being sorta good at something.',
+    content: Array.from(
+      { length: 5 },
+      () =>
+        'Sucking at something is the first step towards being sorta good at something.',
+    ).join(''),
     author: jake,
   },
   {
