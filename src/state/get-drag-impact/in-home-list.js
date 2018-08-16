@@ -117,13 +117,14 @@ export default ({
           // end edge of the target
           // Can reduce the amount of things that are displaced
           if (isMovingTowardStart) {
-            // Is was not displaced, then does not need to move
-            if (!isDisplaced) {
-              console.warn('hit !isDisplaced');
-              return currentCenter[axis.line] > borderBox.center[axis.line];
+            // already displaced
+            if (isDisplaced) {
+              return currentCenter[axis.line] > end + displacedBy;
             }
-            // was displaced
-            return currentCenter[axis.line] > end + displacedBy;
+
+            // If this case is hit then the user has entered the list
+            // from an edge
+            return currentCenter[axis.line] > borderBox.center[axis.line];
           }
 
           // if was displaced and continuing to move away then will continue to be displaced
