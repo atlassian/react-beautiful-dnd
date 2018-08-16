@@ -22,6 +22,8 @@ import isUserMovingForward from '../is-user-moving-forward';
 // It is the responsibility of this function
 // to return the impact of a drag
 
+let logCount = 0;
+
 type Args = {|
   pageBorderBoxCenter: Position,
   draggable: DraggableDimension,
@@ -44,6 +46,10 @@ export default ({
   const axis: Axis = home.axis;
   // The starting center position
   const originalCenter: Position = draggable.page.borderBox.center;
+  const amount: Position = patch(
+    axis.line,
+    draggable.client.marginBox[axis.size],
+  );
 
   // Where the element actually is now.
   // Need to take into account the change of scroll in the droppable
@@ -63,7 +69,7 @@ export default ({
     ? !isMovingForward
     : isMovingForward;
 
-  console.group('boom');
+  console.group(`execution: ${++logCount}`);
   console.log('isInFrontOfStart', isInFrontOfStart);
   console.log('isMovingForward', isMovingForward);
   console.log('isMovingTowardStart', isMovingTowardStart);
@@ -71,7 +77,7 @@ export default ({
   const movement: DragMovement = previousImpact.movement;
   const map: DisplacementMap = movement.map;
   const modifier: number = movement.isBeyondStartPosition ? -1 : 1;
-  const displacedBy: number = movement.amount[axis.line] * modifier;
+  const displacedBy: number = amount[axis.line] * modifier;
   // console.log('possible displacement', displacedBy);
 
   const displaced: Displacement[] = insideHome
@@ -113,7 +119,8 @@ export default ({
           if (isMovingTowardStart) {
             // Is was not displaced, then does not need to move
             if (!isDisplaced) {
-              return false;
+              console.warn('hit !isDisplaced');
+              return currentCenter[axis.line] > borderBox.center[axis.line];
             }
             // was displaced
             return currentCenter[axis.line] > end + displacedBy;
@@ -138,7 +145,7 @@ export default ({
         if (isMovingTowardStart) {
           // If not displaced then cannot be impacted
           if (!isDisplaced) {
-            return false;
+            return currentCenter[axis.line] < borderBox.center[axis.line];
           }
           return currentCenter[axis.line] < start + displacedBy;
         }
@@ -181,7 +188,7 @@ export default ({
   })();
 
   const newMovement: DragMovement = {
-    amount: previousImpact.movement.amount,
+    amount,
     displaced: ordered,
     map: getDisplacementMap(ordered),
     isBeyondStartPosition: isInFrontOfStart,
@@ -198,7 +205,7 @@ export default ({
     group: null,
   };
 
-  console.log('displaced', ordered.map(d => d.draggableId));
+  console.log('displaced', ordered.map(d => d.draggableId), ordered);
   console.groupEnd();
 
   return impact;

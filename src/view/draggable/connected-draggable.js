@@ -137,6 +137,8 @@ export const makeMapStateToProps = (): Selector => {
       return null;
     }
 
+    console.log('displaced offset', getDisplacedOffset(movement));
+
     return getSecondaryProps(
       getDisplacedOffset(movement),
       null,
