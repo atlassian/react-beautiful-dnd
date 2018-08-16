@@ -77,7 +77,7 @@ export default ({
   const movement: DragMovement = previousImpact.movement;
   const map: DisplacementMap = movement.map;
   const modifier: number = movement.isBeyondStartPosition ? -1 : 1;
-  const displacedBy: number = amount[axis.line] * modifier;
+  const displacement: number = amount[axis.line] * modifier;
   // console.log('possible displacement', displacedBy);
 
   const displaced: Displacement[] = insideHome
@@ -108,6 +108,7 @@ export default ({
 
         // At this point we know that the draggable could be displaced
         const isDisplaced: boolean = Boolean(map[child.descriptor.id]);
+        const displacedBy: number = isDisplaced ? displacement : 0;
         const start: number = borderBox[axis.start];
         const end: number = borderBox[axis.end];
 
@@ -117,14 +118,7 @@ export default ({
           // end edge of the target
           // Can reduce the amount of things that are displaced
           if (isMovingTowardStart) {
-            // already displaced
-            if (isDisplaced) {
-              return currentCenter[axis.line] > end + displacedBy;
-            }
-
-            // If this case is hit then the user has entered the list
-            // from an edge
-            return currentCenter[axis.line] > borderBox.center[axis.line];
+            return currentCenter[axis.line] > end + displacedBy;
           }
 
           // if was displaced and continuing to move away then will continue to be displaced
@@ -144,18 +138,15 @@ export default ({
         // Moving back towards the starting location
         // Can reduce the amount of things displaced
         if (isMovingTowardStart) {
-          // If not displaced then cannot be impacted
-          if (!isDisplaced) {
-            return currentCenter[axis.line] < borderBox.center[axis.line];
-          }
           return currentCenter[axis.line] < start + displacedBy;
         }
 
-        // Continuing to move further away from the start
+        // Continuing to move further away backwards from the start
         // Can increase the amount of things that are displaced
         if (isDisplaced) {
           return true;
         }
+        // Shift once the center goes over the end of the thing before it
         return currentCenter[axis.line] < end;
       },
     )
