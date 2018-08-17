@@ -5,7 +5,6 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DragImpact,
-  GroupingImpact,
   Axis,
   Displacement,
   Viewport,
@@ -16,13 +15,12 @@ import { patch } from '../position';
 import getDisplacement from '../get-displacement';
 import getDisplacementMap from '../get-displacement-map';
 import withDroppableScroll from '../with-droppable-scroll';
-import getGroupingImpact from './get-grouping-impact';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
 
 // It is the responsibility of this function
 // to return the impact of a drag
 
-let logCount = 0;
+const logCount = 0;
 
 type Args = {|
   pageBorderBoxCenter: Position,
@@ -68,11 +66,6 @@ export default ({
   const isMovingTowardStart: boolean = isInFrontOfStart
     ? !isMovingForward
     : isMovingForward;
-
-  console.group(`execution: ${++logCount}`);
-  console.log('isInFrontOfStart', isInFrontOfStart);
-  console.log('isMovingForward', isMovingForward);
-  console.log('isMovingTowardStart', isMovingTowardStart);
 
   const movement: DragMovement = previousImpact.movement;
   const map: DisplacementMap = movement.map;
@@ -196,9 +189,6 @@ export default ({
     // TODO
     group: null,
   };
-
-  console.log('displaced', ordered.map(d => d.draggableId), ordered);
-  console.groupEnd();
 
   return impact;
 };
