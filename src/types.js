@@ -148,14 +148,17 @@ export type DragMovement = {|
   isBeyondStartPosition: boolean,
 |};
 
+export type VerticalUserDirection = 'up' | 'down';
+export type HorizontalUserDirection = 'left' | 'right';
+
+export type UserDirection = {|
+  vertical: VerticalUserDirection,
+  horizontal: HorizontalUserDirection,
+|};
+
 export type GroupingLocation = {|
   droppableId: DroppableId,
   draggableId: DraggableId,
-|};
-
-export type UserDirection = {|
-  vertical: 'up' | 'down',
-  horizontal: 'left' | 'right',
 |};
 
 export type GroupingImpact = {|

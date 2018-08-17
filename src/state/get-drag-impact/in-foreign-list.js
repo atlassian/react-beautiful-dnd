@@ -17,7 +17,7 @@ import getDisplacement from '../get-displacement';
 import withDroppableScroll from '../with-droppable-scroll';
 import getDisplacementMap from '../get-displacement-map';
 import getGroupingImpact from './get-grouping-impact';
-import isUserMovingForward from '../is-user-moving-forward';
+import isUserMovingForward from '../user-direction/is-user-moving-forward';
 
 type Args = {|
   pageBorderBoxCenter: Position,

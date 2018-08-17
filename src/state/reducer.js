@@ -11,6 +11,7 @@ import { add, isEqual, subtract } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
 import isMovementAllowed from './is-movement-allowed';
+import getUserDirection from './user-direction/get-user-direction';
 import type {
   State,
   DroppableDimension,
@@ -34,15 +35,6 @@ import type { Action } from './store-types';
 
 const idle: IdleState = { phase: 'IDLE' };
 const preparing: PreparingState = { phase: 'PREPARING' };
-
-const getUserDirection = (
-  oldPageBorderBoxCenter: Position,
-  newPageBorderBoxCenter: Position,
-): UserDirection => ({
-  vertical: newPageBorderBoxCenter.y > oldPageBorderBoxCenter.y ? 'down' : 'up',
-  horizontal:
-    newPageBorderBoxCenter.x > oldPageBorderBoxCenter.x ? 'right' : 'left',
-});
 
 type MoveArgs = {|
   state: DraggingState | CollectingState,
@@ -91,9 +83,26 @@ const moveWithPositionUpdates = ({
   };
 
   const direction: UserDirection = getUserDirection(
+    state.direction,
     state.current.page.borderBoxCenter,
     current.page.borderBoxCenter,
   );
+
+  if (direction.vertical !== state.direction.vertical) {
+    console.warn(
+      'VERTICAL DIRECTION CHANGE',
+      subtract(current.page.borderBoxCenter, state.current.page.borderBoxCenter)
+        .y,
+    );
+  }
+
+  if (direction.horizontal !== state.direction.horizontal) {
+    console.warn(
+      'HORIZONTAL DIRECTION CHANGE',
+      subtract(current.page.borderBoxCenter, state.current.page.borderBoxCenter)
+        .x,
+    );
+  }
 
   // Not updating impact while bulk collecting
   if (state.phase === 'COLLECTING') {
