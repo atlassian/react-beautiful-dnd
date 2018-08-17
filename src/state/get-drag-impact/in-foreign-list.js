@@ -52,8 +52,8 @@ export default ({
   );
 
   const isMovingForward: boolean = isUserMovingForward(
-    direction,
     destination.axis,
+    direction,
   );
 
   const amount: Position = patch(

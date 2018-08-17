@@ -62,8 +62,8 @@ export default ({
     currentCenter[axis.line] > originalCenter[axis.line];
 
   const isMovingForward: boolean = isUserMovingForward(
-    currentDirection,
     home.axis,
+    currentDirection,
   );
   const isMovingTowardStart: boolean = isInFrontOfStart
     ? !isMovingForward
