@@ -27,6 +27,10 @@ const viewport: Viewport = getViewport();
         droppables: preset.droppables,
         previousImpact: noImpact,
         viewport,
+        direction: {
+          vertical: 'down',
+          horizontal: 'right',
+        },
       });
 
       expect(impact).toEqual(noImpact);

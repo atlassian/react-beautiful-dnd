@@ -21,11 +21,16 @@ import type {
   DragImpact,
   DraggableDimensionMap,
   Viewport,
+  UserDirection,
 } from '../../../../src/types';
 
 const viewport: Viewport = getViewport();
+const dontCareAboutDirection: UserDirection = {
+  vertical: 'down',
+  horizontal: 'right',
+};
 
-[vertical, horizontal].forEach((axis: Axis) => {
+[(vertical, horizontal)].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const {
       home,
@@ -36,25 +41,6 @@ const viewport: Viewport = getViewport();
       droppables,
       draggables,
     } = getPreset(axis);
-
-    it('should return no impact when not dragging over anything', () => {
-      // dragging up above the list
-      const farAway: Position = {
-        x: 1000,
-        y: 1000,
-      };
-
-      const impact: DragImpact = getDragImpact({
-        pageBorderBoxCenter: farAway,
-        draggable: inHome1,
-        draggables,
-        droppables,
-        previousImpact: noImpact,
-        viewport,
-      });
-
-      expect(impact).toEqual(noImpact);
-    });
 
     it('should return no impact when home is disabled', () => {
       const disabled: DroppableDimension = disableDroppable(home);
@@ -72,6 +58,7 @@ const viewport: Viewport = getViewport();
         droppables: withDisabled,
         previousImpact: noImpact,
         viewport,
+        direction: dontCareAboutDirection,
       });
 
       expect(impact).toEqual(noImpact);
