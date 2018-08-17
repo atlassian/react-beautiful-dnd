@@ -61,7 +61,7 @@ export default ({
     draggable.page.marginBox[axis.size],
   );
   // always displaced forward
-  const displacedBy: number = amount[axis.line];
+  const displacement: number = amount[axis.line];
 
   // const group: ?GroupingImpact = getGroupingImpact({
   //   pageCenterWithDroppableScroll: currentCenter,
@@ -77,6 +77,7 @@ export default ({
     .filter(
       (child: DraggableDimension): boolean => {
         const isDisplaced: boolean = Boolean(map[child.descriptor.id]);
+        const displacedBy: number = isDisplaced ? displacement : 0;
 
         const borderBox: Rect = child.page.borderBox;
         const start: number = borderBox[axis.start];
@@ -85,11 +86,7 @@ export default ({
         // When in foreign list, can only displace forwards
         // Moving forward will decrease the amount of things needed to be displaced
         if (isMovingForward) {
-          if (isDisplaced) {
-            return currentCenter[axis.line] < start + displacedBy;
-          }
-
-          return currentCenter[axis.line] < start;
+          return currentCenter[axis.line] < start + displacedBy;
         }
 
         // Moving backwards
@@ -101,12 +98,6 @@ export default ({
 
         // No longer need to displace
         return currentCenter[axis.line] < end;
-
-        // Items will be displaced forward if they sit ahead of the dragging item
-        // const threshold: number = child.page.borderBox[axis.end];
-        // return threshold > currentCenter[axis.line];
-
-        // return false;
       },
     )
     .map(
