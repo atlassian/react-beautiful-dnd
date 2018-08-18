@@ -3,13 +3,13 @@ import React from 'react';
 import { graphql } from 'gatsby';
 import Layout from '../components/layouts';
 
-type Data = {
-  markdownRemark: {
-    html: string,
+type Props = {
+  data: {
+    markdownRemark: {
+      html: string,
+    },
   },
 };
-
-type Props = { data: Data };
 
 export default ({ data }: Props) => (
   <Layout>
