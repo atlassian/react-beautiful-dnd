@@ -3,7 +3,7 @@ import React from 'react';
 import QuoteApp from '../../components/examples/multiple-vertical/quote-app';
 import { getQuotes } from '../../components/examples/data';
 import type { QuoteMap } from '../../components/examples/types';
-import Layout from '../../components/layouts';
+import Layout from '../../components/layouts/example';
 
 const alpha: string = 'alpha';
 const beta: string = 'beta';
@@ -29,8 +29,14 @@ const quoteMap: QuoteMap = {
   [kappa]: getQuotes(5),
 };
 
-export default () => (
-  <Layout>
+type Props = {
+  location: {
+    pathname: string,
+  },
+};
+
+export default (props: Props) => (
+  <Layout location={props.location}>
     <div>multiple vertical lists: stress test</div>
     <QuoteApp initial={quoteMap} />
   </Layout>

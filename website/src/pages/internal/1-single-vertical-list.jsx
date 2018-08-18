@@ -4,7 +4,13 @@ import styled from 'styled-components';
 import QuoteApp from '../../components/examples/vertical/quote-app';
 import { quotes, getQuotes } from '../../components/examples/data';
 import { grid } from '../../components/examples/constants';
-import Layout from '../../components/layouts';
+import Layout from '../../components/layouts/example';
+
+type Props = {
+  location: {
+    pathname: string,
+  },
+};
 
 const data = {
   small: quotes,
@@ -29,8 +35,8 @@ const Title = styled.h4`
   margin-bottom: ${grid}px;
 `;
 
-export default () => (
-  <Layout>
+export default (props: Props) => (
+  <Layout location={props.location}>
     <div>basic</div>
     <QuoteApp initial={data.small} />
     <div>large data set</div>

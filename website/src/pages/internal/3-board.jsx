@@ -5,15 +5,21 @@ import {
   authorQuoteMap,
   generateQuoteMap,
 } from '../../components/examples/data';
-import Layout from '../../components/layouts';
+import Layout from '../../components/layouts/example';
 
 const data = {
   medium: generateQuoteMap(100),
   large: generateQuoteMap(500),
 };
 
-export default () => (
-  <Layout>
+type Props = {
+  location: {
+    pathname: string,
+  },
+};
+
+export default (props: Props) => (
+  <Layout location={props.location}>
     <div>Board</div>
     <Board initial={authorQuoteMap} />
     <div>Medium Data Set</div>

@@ -8,7 +8,7 @@ import reorder from '../../components/examples/reorder';
 import type { Quote } from '../../components/examples/types';
 import { quotes as initialQuotes } from '../../components/examples/data';
 import type { DropResult, DragStart } from '../../../../src/types';
-import Layout from '../../components/layouts';
+import Layout from '../../components/layouts/example';
 
 /* eslint-disable no-console */
 const publishOnDragStart = (v?: any) => console.log('onDragStart', v);
@@ -29,6 +29,9 @@ const Root = styled.div`
 
 type Props = {|
   listStyle?: Object,
+  location: {
+    pathname: string,
+  },
 |};
 
 type State = {|
@@ -78,7 +81,7 @@ export default class QuoteApp extends Component<Props, State> {
     const { quotes } = this.state;
 
     return (
-      <Layout>
+      <Layout location={this.props.location}>
         <DragDropContext
           onDragStart={this.onDragStart}
           onDragEnd={this.onDragEnd}
