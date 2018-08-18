@@ -8,6 +8,7 @@ import reorder from '../../components/examples/reorder';
 import type { Quote } from '../../components/examples/types';
 import { quotes as initialQuotes } from '../../components/examples/data';
 import type { DropResult, DragStart } from '../../../../src/types';
+import Layout from '../../components/layouts';
 
 /* eslint-disable no-console */
 const publishOnDragStart = (v?: any) => console.log('onDragStart', v);
@@ -77,18 +78,20 @@ export default class QuoteApp extends Component<Props, State> {
     const { quotes } = this.state;
 
     return (
-      <DragDropContext
-        onDragStart={this.onDragStart}
-        onDragEnd={this.onDragEnd}
-      >
-        <Root>
-          <QuoteList
-            listId="list"
-            style={this.props.listStyle}
-            quotes={quotes}
-          />
-        </Root>
-      </DragDropContext>
+      <Layout>
+        <DragDropContext
+          onDragStart={this.onDragStart}
+          onDragEnd={this.onDragEnd}
+        >
+          <Root>
+            <QuoteList
+              listId="list"
+              style={this.props.listStyle}
+              quotes={quotes}
+            />
+          </Root>
+        </DragDropContext>
+      </Layout>
     );
   }
 }

@@ -5,6 +5,7 @@ import {
   authorQuoteMap,
   generateQuoteMap,
 } from '../../components/examples/data';
+import Layout from '../../components/layouts';
 
 const data = {
   medium: generateQuoteMap(100),
@@ -12,7 +13,7 @@ const data = {
 };
 
 export default () => (
-  <div>
+  <Layout>
     <div>Board</div>
     <Board initial={authorQuoteMap} />
     <div>Medium Data Set</div>
@@ -23,5 +24,5 @@ export default () => (
     <Board initial={data.large} />
     <div>long lists in a short container</div>
     <Board initial={data.medium} containerHeight="60vh" />
-  </div>
+  </Layout>
 );

@@ -1,10 +1,11 @@
 // @flow
 import React from 'react';
 import Simple from '../../components/examples/simple/simple';
+import Layout from '../../components/layouts';
 
 export default () => (
-  <div>
+  <Layout>
     <div>Super Simple: Vertical List</div>
     <Simple />
-  </div>
+  </Layout>
 );

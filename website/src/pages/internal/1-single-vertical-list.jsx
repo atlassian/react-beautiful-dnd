@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import QuoteApp from '../../components/examples/vertical/quote-app';
 import { quotes, getQuotes } from '../../components/examples/data';
 import { grid } from '../../components/examples/constants';
+import Layout from '../../components/layouts';
 
 const data = {
   small: quotes,
@@ -29,7 +30,7 @@ const Title = styled.h4`
 `;
 
 export default () => (
-  <div>
+  <Layout>
     <div>basic</div>
     <QuoteApp initial={data.small} />
     <div>large data set</div>
@@ -57,5 +58,5 @@ export default () => (
       <Title>List is within a larger scroll container</Title>
       <QuoteApp initial={data.medium} />
     </ScrollContainer>
-  </div>
+  </Layout>
 );

@@ -1,10 +1,11 @@
 // @flow
 import React from 'react';
 import TaskApp from '../../components/examples/multi-drag/task-app';
+import Layout from '../../components/layouts';
 
 export default () => (
-  <div>
+  <Layout>
     <div>Multi drag: pattern</div>
     <TaskApp />
-  </div>
+  </Layout>
 );
