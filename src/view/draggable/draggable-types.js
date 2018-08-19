@@ -28,7 +28,7 @@ export type DraggingStyle = {|
   boxSizing: 'border-box',
   width: number,
   height: number,
-  transition: 'none',
+  transition: string, // 'none' or: drop animation and optional group into fade out
   transform: ?string,
   zIndex: ZIndex,
 
@@ -62,7 +62,7 @@ export type DraggableProps = {|
   // used for shared global styles
   'data-react-beautiful-dnd-draggable': string,
   // used to know when a transition ends
-  onTransitionEnd: ?Function,
+  onTransitionEnd: ?() => mixed,
 |};
 
 export type Provided = {|
@@ -102,6 +102,7 @@ export type MapProps = {|
   // we need to know if that movement should be animated
   shouldAnimateDisplacement: boolean,
   isDropAnimating: boolean,
+  dropDuration: number,
   offset: Position,
   // only provided when dragging
   dimension: ?DraggableDimension,

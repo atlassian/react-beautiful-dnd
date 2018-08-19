@@ -11,6 +11,7 @@ import noImpact from '../no-impact';
 import getNewHomeClientBorderBoxCenter from '../get-new-home-client-border-box-center';
 import { add, subtract, isEqual, origin } from '../position';
 import withDroppableDisplacement from '../with-droppable-displacement';
+import { getDropDuration } from '../../view/animation';
 import type {
   State,
   DropReason,
@@ -146,8 +147,17 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     newHomeOffset,
   );
 
+  const dropDuration: number = getDropDuration({
+    current: state.current.client.offset,
+    destination: newHomeOffset,
+    reason,
+  });
+
+  console.log('drop duration', dropDuration);
+
   const pending: PendingDrop = {
     newHomeOffset,
+    dropDuration,
     result,
     impact,
   };

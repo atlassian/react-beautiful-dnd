@@ -40,6 +40,7 @@ import type {
 
 const defaultMapProps: MapProps = {
   isDropAnimating: false,
+  dropDuration: 0,
   isDragging: false,
   offset: origin,
   shouldAnimateDragMovement: false,
@@ -85,6 +86,7 @@ export const makeMapStateToProps = (): Selector => {
     ): MapProps => ({
       isDragging: true,
       isDropAnimating: false,
+      dropDuration: 0,
       shouldAnimateDisplacement: false,
       offset,
       shouldAnimateDragMovement,
@@ -137,8 +139,6 @@ export const makeMapStateToProps = (): Selector => {
       return null;
     }
 
-    console.log('displaced offset', getDisplacedOffset(movement));
-
     return getSecondaryProps(
       getDisplacedOffset(movement),
       null,
@@ -190,10 +190,13 @@ export const makeMapStateToProps = (): Selector => {
         ? pending.result.groupingWith.draggableId
         : null;
 
+      const dropDuration: number = pending.dropDuration;
+
       // not memoized as it is the only execution
       return {
         isDragging: false,
         isDropAnimating: true,
+        dropDuration,
         offset: pending.newHomeOffset,
         // still need to provide the dimension for the placeholder
         dimension: state.dimensions.draggables[ownProps.draggableId],
