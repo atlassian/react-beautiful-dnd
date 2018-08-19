@@ -201,16 +201,6 @@ export const clean = (): CleanAction => ({
   payload: null,
 });
 
-type PrepareAction = {|
-  type: 'PREPARE',
-  payload: null,
-|};
-
-export const prepare = (): PrepareAction => ({
-  type: 'PREPARE',
-  payload: null,
-});
-
 export type DropAnimateAction = {
   type: 'DROP_ANIMATE',
   payload: PendingDrop,
@@ -284,5 +274,4 @@ export type Action =
   | DropAnimateAction
   | DropAnimationFinishedAction
   | DropCompleteAction
-  | PrepareAction
   | CleanAction;

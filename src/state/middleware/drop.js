@@ -52,13 +52,6 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     return;
   }
 
-  // Drag ended before preparing phase had finished
-  // No hooks have been called at this point
-  if (state.phase === 'PREPARING') {
-    dispatch(clean());
-    return;
-  }
-
   // Could have occurred in response to an error
   if (state.phase === 'IDLE') {
     return;

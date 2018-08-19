@@ -36,7 +36,7 @@ export const getDropDuration = ({
   // * range from:
   // 0px = 0.33s
   // 1500px and over = 0.55s
-  // * If reason === 'CANCEL' then speeding up the animation by 40%
+  // * If reason === 'CANCEL' then speeding up the animation by 30%
   // * round to 2 decimal points
 
   const percentage: number = value / maxAtDistance;

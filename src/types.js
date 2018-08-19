@@ -279,10 +279,6 @@ export type IdleState = {|
   phase: 'IDLE',
 |};
 
-export type PreparingState = {|
-  phase: 'PREPARING',
-|};
-
 export type DraggingState = {|
   phase: 'DRAGGING',
   isDragging: true,
@@ -331,7 +327,6 @@ export type DropAnimatingState = {|
 
 export type State =
   | IdleState
-  | PreparingState
   | DraggingState
   | CollectingState
   | DropPendingState
