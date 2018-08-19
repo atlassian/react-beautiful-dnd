@@ -69,8 +69,8 @@ export const makeMapStateToProps = (): Selector => {
     ): MapProps => ({
       ...defaultMapProps,
       offset,
-      shouldAnimateDisplacement,
       groupedOverBy,
+      shouldAnimateDisplacement,
     }),
   );
 
