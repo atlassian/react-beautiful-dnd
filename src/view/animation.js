@@ -9,10 +9,23 @@ type GetDropDurationArgs = {|
   reason: DropReason,
 |};
 
-const min: number = 0.33;
-const max: number = 0.55;
-const range: number = max - min;
-const maxAtDistance: number = 1500;
+// For debug
+// const min: number = 5;
+// const max: number = 10;
+
+const drop = (() => {
+  const min: number = 0.33;
+  const max: number = 0.55;
+
+  return {
+    min,
+    max,
+    range: max - min,
+    maxAtDistance: 1500,
+  };
+})();
+
+// will bring a time lower - which makes it faster
 const faster: number = 0.6;
 
 export const getDropDuration = ({
@@ -27,11 +40,11 @@ export const getDropDuration = ({
   const value: number = distance(current, destination);
 
   if (value === 0) {
-    return min;
+    return drop.min;
   }
 
-  if (value >= maxAtDistance) {
-    return max;
+  if (value >= drop.maxAtDistance) {
+    return drop.max;
   }
 
   // * range from:
@@ -40,8 +53,8 @@ export const getDropDuration = ({
   // * If reason === 'CANCEL' then speeding up the animation by 30%
   // * round to 2 decimal points
 
-  const percentage: number = value / maxAtDistance;
-  const duration: number = min + range * percentage;
+  const percentage: number = value / drop.maxAtDistance;
+  const duration: number = drop.min + drop.range * percentage;
 
   const withDuration: number =
     reason === 'CANCEL' ? duration * faster : duration;
@@ -50,10 +63,11 @@ export const getDropDuration = ({
 };
 
 const dropCurve: string = `cubic-bezier(.2,1,.1,1)`;
+const slide: number = 0.2;
 
 export const css = {
-  outOfTheWay: 'transform 0.2s cubic-bezier(0.2, 0, 0, 1)',
-  jump: `transform ${min * faster}s ${dropCurve}`,
+  outOfTheWay: `transform ${slide}s cubic-bezier(0.2, 0, 0, 1)`,
+  jump: `transform ${slide}s ${dropCurve}`,
   isDropping: (duration: number): string =>
     `transform ${duration}s ${dropCurve}`,
 };
