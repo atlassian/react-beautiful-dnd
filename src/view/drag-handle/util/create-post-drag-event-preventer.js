@@ -1,6 +1,6 @@
 // @flow
 /* eslint-disable no-use-before-define */
-import type { EventBinding } from './event-types';
+import type { EventBinding, EventOptions } from './event-types';
 import { bindEvents, unbindEvents } from './bind-events';
 
 type GetWindowFn = () => HTMLElement;
@@ -10,6 +10,8 @@ export type EventPreventer = {|
   abort: () => void,
 |};
 
+const sharedOptions: EventOptions = { capture: true };
+
 export default (getWindow: GetWindowFn): EventPreventer => {
   let isBound: boolean = false;
 
@@ -18,7 +20,7 @@ export default (getWindow: GetWindowFn): EventPreventer => {
       return;
     }
     isBound = true;
-    bindEvents(getWindow(), pointerEvents, { capture: true });
+    bindEvents(getWindow(), pointerEvents, sharedOptions);
   };
 
   const unbind = () => {
@@ -26,7 +28,7 @@ export default (getWindow: GetWindowFn): EventPreventer => {
       return;
     }
     isBound = false;
-    unbindEvents(getWindow(), pointerEvents, { capture: true });
+    unbindEvents(getWindow(), pointerEvents, sharedOptions);
   };
 
   const pointerEvents: EventBinding[] = [
