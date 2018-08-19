@@ -35,7 +35,7 @@ All hooks (except for `onBeforeDragStart`) are provided with a second argument: 
 ## `onDragStart` (optional)
 
 ```js
-type OnDragStartHook = (start: DragStart, provided: HookProvided) => void;
+type OnDragStartHook = (start: DragStart, provided: HookProvided) => mixed;
 ```
 
 `onDragStart` will get notified when a drag starts. This hook is _optional_ and therefore does not need to be provided. It is **highly recommended** that you use this function to block updates to all `Draggable` and `Droppable` components during a drag. (See **Block updates during a drag** below)
@@ -58,8 +58,10 @@ type DragStart = {|
 
 ### `onDragStart` type information
 
+**Note:** while the return type is `mixed`, the return value is not used.
+
 ```js
-type OnDragStartHook = (start: DragStart, provided: HookProvided) => void;
+type OnDragStartHook = (start: DragStart, provided: HookProvided) => mixed;
 
 // supporting types
 type DragStart = {|
@@ -82,7 +84,7 @@ type TypeId = Id;
 ## `onDragUpdate` (optional)
 
 ```js
-type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => void;
+type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => mixed;
 ```
 
 This hook is called whenever something changes during a drag. The possible changes are:
@@ -91,7 +93,7 @@ This hook is called whenever something changes during a drag. The possible chang
 - The `Draggable` is now over a different `Droppable`
 - The `Draggable` is now over no `Droppable`
 
-It is important that you not do too much work as a result of this function as it will slow down the drag.
+It is important that you not do too much work as a result of this function as it will slow down the drag. While the return type is `mixed`, the return value is not used.
 
 ### `update: DragUpdate`
 
@@ -144,9 +146,11 @@ Once we have all of the information we need to start a drag we call the `onBefor
 
 ### `OnBeforeDragStartHook` type information
 
+**Note:** while the return type is `mixed`, the return value is not used.
+
 ```js
 // No second 'provided' argument
-type OnBeforeDragStartHook = (start: DragStart) => void;
+type OnBeforeDragStartHook = (start: DragStart) => mixed;
 
 // Otherwise the same type information as OnDragStartHook
 ```

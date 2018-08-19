@@ -170,7 +170,7 @@ export default class DragDropContext extends React.Component<Props> {
   }
 
   componentWillUnmount() {
-    window.addEventListener('error', this.onWindowError);
+    window.removeEventListener('error', this.onWindowError);
 
     const state: State = this.store.getState();
     if (state.phase !== 'IDLE') {

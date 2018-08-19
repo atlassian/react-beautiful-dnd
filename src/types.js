@@ -338,19 +338,19 @@ export type HookProvided = {|
   announce: Announce,
 |};
 
-export type OnBeforeDragStartHook = (start: DragStart) => void;
+export type OnBeforeDragStartHook = (start: DragStart) => mixed;
 export type OnDragStartHook = (
   start: DragStart,
   provided: HookProvided,
-) => void;
+) => mixed;
 export type OnDragUpdateHook = (
   update: DragUpdate,
   provided: HookProvided,
-) => void;
+) => mixed;
 export type OnDragEndHook = (
   result: DropResult,
   provided: HookProvided,
-) => void;
+) => mixed;
 
 export type Hooks = {|
   onBeforeDragStart?: OnBeforeDragStartHook,
