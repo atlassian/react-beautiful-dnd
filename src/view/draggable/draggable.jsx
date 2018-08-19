@@ -55,6 +55,21 @@ const getTranslate = (offset: Position): ?string => {
   return `translate(${offset.x}px, ${offset.y}px)`;
 };
 
+const getDraggingTransition = (
+  shouldAnimateDragMovement: boolean,
+  isDropAnimating: boolean,
+  dropDuration: number,
+): string => {
+  if (isDropAnimating) {
+    return css.isDropping(dropDuration);
+  }
+
+  if (shouldAnimateDragMovement) {
+    return css.jump;
+  }
+  return 'none';
+};
+
 export default class Draggable extends Component<Props> {
   /* eslint-disable react/sort-comp */
   callbacks: DragHandleCallbacks;
@@ -153,10 +168,16 @@ export default class Draggable extends Component<Props> {
     (
       change: Position,
       dimension: DraggableDimension,
+      shouldAnimateDragMovement: boolean,
       isDropAnimating: boolean,
       dropDuration: number,
     ): DraggingStyle => {
       const box: BoxModel = dimension.client;
+      const transition: string = getDraggingTransition(
+        shouldAnimateDragMovement,
+        isDropAnimating,
+        dropDuration,
+      );
       const style: DraggingStyle = {
         // ## Placement
         position: 'fixed',
@@ -172,7 +193,7 @@ export default class Draggable extends Component<Props> {
 
         // ## Movement
         // Opting out of the standard css transition for the dragging item
-        transition: isDropAnimating ? css.isDropping(dropDuration) : 'none',
+        transition,
         // Layering
         zIndex: isDropAnimating
           ? zIndexOptions.dropAnimating
@@ -209,6 +230,7 @@ export default class Draggable extends Component<Props> {
       isDropAnimating: boolean,
       dropDuration: number,
       shouldAnimateDisplacement: boolean,
+      shouldAnimateDragMovement: boolean,
       dimension: ?DraggableDimension,
       dragHandleProps: ?DragHandleProps,
     ): Provided => {
@@ -226,6 +248,7 @@ export default class Draggable extends Component<Props> {
         return this.getDraggingStyle(
           change,
           dimension,
+          shouldAnimateDragMovement,
           isDropAnimating,
           dropDuration,
         );
@@ -273,6 +296,7 @@ export default class Draggable extends Component<Props> {
       groupedOverBy,
       dimension,
       shouldAnimateDisplacement,
+      shouldAnimateDragMovement,
       children,
     } = this.props;
 
@@ -284,6 +308,7 @@ export default class Draggable extends Component<Props> {
         isDropAnimating,
         dropDuration,
         shouldAnimateDisplacement,
+        shouldAnimateDragMovement,
         dimension,
         dragHandleProps,
       ),
@@ -323,17 +348,11 @@ export default class Draggable extends Component<Props> {
       isDropAnimating,
       isDragDisabled,
       groupedOverBy,
-      shouldAnimateDragMovement,
+      // TODO: shouldAnimateDragMovement
       disableInteractiveElementBlocking,
     } = this.props;
     const droppableId: DroppableId = this.context[droppableIdKey];
     const type: TypeId = this.context[droppableTypeKey];
-
-    // const speed: Speed = getSpeed(
-    //   isDragging,
-    //   shouldAnimateDragMovement,
-    //   isDropAnimating,
-    // );
 
     return (
       <DraggableDimensionPublisher

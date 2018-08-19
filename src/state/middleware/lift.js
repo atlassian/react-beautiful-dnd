@@ -25,8 +25,7 @@ export default (getMarshal: () => DimensionMarshal) => ({
     dispatch(completeDrop(initial.pending.result));
   }
 
-  const state: State = getState();
-  invariant(state.phase === 'IDLE', 'Incorrect phase to start a drag');
+  invariant(getState().phase === 'IDLE', 'Incorrect phase to start a drag');
 
   // will communicate with the marshal to start requesting dimensions
   const scrollOptions: ScrollOptions = {
