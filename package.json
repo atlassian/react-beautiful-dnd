@@ -107,7 +107,7 @@
     "rollup-plugin-strip": "^1.1.1",
     "rollup-plugin-uglify": "^4.0.0",
     "styled-components": "^3.3.3",
-    "stylelint": "9.4.0",
+    "stylelint": "9.5.0",
     "stylelint-config-prettier": "^3.3.0",
     "stylelint-config-standard": "^18.2.0",
     "stylelint-config-styled-components": "^0.1.1",
