@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import { isEqual, origin } from '../../state/position';
+import { css } from '../animation';
 import type {
   DraggableDimension,
   ClientPositions,
@@ -190,7 +191,7 @@ export default class Draggable extends Component<Props> {
 
         // ## Movement
         // Opting out of the standard css transition for the dragging item
-        transition: 'none',
+        transition: isDropAnimating ? css.isDropping : 'none',
         // Layering
         zIndex: isDropAnimating
           ? zIndexOptions.dropAnimating
@@ -229,10 +230,10 @@ export default class Draggable extends Component<Props> {
       dimension: ?DraggableDimension,
       dragHandleProps: ?DragHandleProps,
     ): Provided => {
-      const useDraggingStyle: boolean = isDragging || isDropAnimating;
+      const isDraggingOrDropping: boolean = isDragging || isDropAnimating;
 
       const draggableStyle: DraggableStyle = (() => {
-        if (!useDraggingStyle) {
+        if (!isDraggingOrDropping) {
           return this.getNotDraggingStyle(change, shouldAnimateDisplacement);
         }
 
@@ -248,6 +249,7 @@ export default class Draggable extends Component<Props> {
         draggableProps: {
           'data-react-beautiful-dnd-draggable': this.styleContext,
           style: draggableStyle,
+          onTransitionEnd: isDropAnimating ? this.onMoveEnd : null,
         },
         dragHandleProps,
       };
@@ -338,11 +340,11 @@ export default class Draggable extends Component<Props> {
     const droppableId: DroppableId = this.context[droppableIdKey];
     const type: TypeId = this.context[droppableTypeKey];
 
-    const speed: Speed = getSpeed(
-      isDragging,
-      shouldAnimateDragMovement,
-      isDropAnimating,
-    );
+    // const speed: Speed = getSpeed(
+    //   isDragging,
+    //   shouldAnimateDragMovement,
+    //   isDropAnimating,
+    // );
 
     return (
       <DraggableDimensionPublisher
@@ -353,29 +355,20 @@ export default class Draggable extends Component<Props> {
         index={index}
         getDraggableRef={this.getDraggableRef}
       >
-        <Moveable
-          speed={speed}
-          destination={offset}
-          onMoveEnd={this.onMoveEnd}
-          dontSkipRenderWhenChanged={groupedOverBy}
+        <DragHandle
+          draggableId={draggableId}
+          isDragging={isDragging}
+          isDropAnimating={isDropAnimating}
+          isEnabled={!isDragDisabled}
+          callbacks={this.callbacks}
+          getDraggableRef={this.getDraggableRef}
+          // by default we do not allow dragging on interactive elements
+          canDragInteractiveElements={disableInteractiveElementBlocking}
         >
-          {(change: Position) => (
-            <DragHandle
-              draggableId={draggableId}
-              isDragging={isDragging}
-              isDropAnimating={isDropAnimating}
-              isEnabled={!isDragDisabled}
-              callbacks={this.callbacks}
-              getDraggableRef={this.getDraggableRef}
-              // by default we do not allow dragging on interactive elements
-              canDragInteractiveElements={disableInteractiveElementBlocking}
-            >
-              {(dragHandleProps: ?DragHandleProps) =>
-                this.renderChildren(change, dragHandleProps)
-              }
-            </DragHandle>
-          )}
-        </Moveable>
+          {(dragHandleProps: ?DragHandleProps) =>
+            this.renderChildren(offset, dragHandleProps)
+          }
+        </DragHandle>
       </DraggableDimensionPublisher>
     );
   }

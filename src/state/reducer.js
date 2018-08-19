@@ -88,22 +88,6 @@ const moveWithPositionUpdates = ({
     current.page.borderBoxCenter,
   );
 
-  if (direction.vertical !== state.direction.vertical) {
-    console.warn(
-      'VERTICAL DIRECTION CHANGE',
-      subtract(current.page.borderBoxCenter, state.current.page.borderBoxCenter)
-        .y,
-    );
-  }
-
-  if (direction.horizontal !== state.direction.horizontal) {
-    console.warn(
-      'HORIZONTAL DIRECTION CHANGE',
-      subtract(current.page.borderBoxCenter, state.current.page.borderBoxCenter)
-        .x,
-    );
-  }
-
   // Not updating impact while bulk collecting
   if (state.phase === 'COLLECTING') {
     return {

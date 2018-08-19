@@ -44,7 +44,8 @@ export type NotDraggingStyle = {|
   transform: ?string,
   // null: use the global animation style
   // none: skip animation (used in certain displacement situations)
-  transition: null | 'none',
+  // css.isDropping: drop animation
+  transition: null | string,
 |};
 
 export type DraggableStyle = DraggingStyle | NotDraggingStyle;
@@ -60,6 +61,8 @@ export type DraggableProps = {|
   style: ?DraggableStyle,
   // used for shared global styles
   'data-react-beautiful-dnd-draggable': string,
+  // used to know when a transition ends
+  onTransitionEnd: ?Function,
 |};
 
 export type Provided = {|

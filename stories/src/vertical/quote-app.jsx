@@ -37,7 +37,7 @@ export default class QuoteApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
 
   state: State = {
-    quotes: this.props.initial.slice(0, 3),
+    quotes: this.props.initial,
   };
 
   onDragStart = (initial: DragStart) => {
