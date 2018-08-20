@@ -1,100 +1,67 @@
 // @flow
-import { type Rect, type Position } from 'css-box-model';
+import type { Position } from 'css-box-model';
 import type {
-  DragMovement,
-  DraggableDimension,
-  DroppableDimension,
   DragImpact,
+  DroppableDimension,
+  Displacement,
   GroupingImpact,
-  Axis,
-  UserDirection,
-  DisplacementMap,
 } from '../../types';
-import { vertical } from '../axis';
-import isWithin from '../is-within';
+import getDisplacementMap from '../get-displacement-map';
 
 type Args = {|
-  pageCenterWithDroppableScroll: Position,
-  draggable: DraggableDimension,
-  destination: DroppableDimension,
-  displaced: DisplacementMap,
+  pageBorderBoxCenter: Position,
   impact: DragImpact,
-  insideDestination: DraggableDimension[],
-  direction: UserDirection,
+  destination: DroppableDimension,
 |};
 
 export default ({
-  pageCenterWithDroppableScroll: currentCenter,
-  draggable,
-  destination,
-  displaced,
-  insideDestination,
-  direction: currentDirection,
+  pageBorderBoxCenter,
   impact,
-}: Args): ?GroupingImpact => {
-  const axis: Axis = destination.axis;
-  const movement: DragMovement = impact.movement;
-  const direction: UserDirection = impact.group
-    ? impact.group.whenEntered
-    : currentDirection;
-
-  const isMovingForward: boolean =
-    axis === vertical
-      ? direction.vertical === 'down'
-      : direction.horizontal === 'right';
-
-  const modifier: number = movement.isBeyondStartPosition ? -1 : 1;
-  const shift: number = movement.amount[axis.line] * modifier;
-
-  // TODO!\
-  return null;
-
-  const target: ?DraggableDimension = insideDestination.find(
-    (child: DraggableDimension): boolean => {
-      // Cannot group with yourself
-      if (child.descriptor.id === draggable.descriptor.id) {
-        return false;
-      }
-
-      const isDisplaced: boolean = Boolean(displaced[child.descriptor.id]);
-      // TODO: if already displaced then we need to account for that when grouping
-
-      const shiftedBy: number = isDisplaced ? shift : 0;
-
-      const marginBox: Rect = child.page.marginBox;
-      const start: number = marginBox[axis.start] + shiftedBy;
-      const end: number = marginBox[axis.end] + shiftedBy;
-      const size: number = marginBox[axis.size];
-      const oneThird: number = size * 0.33333;
-      console.group('shift');
-      console.log('shifted by', shiftedBy);
-      console.log('start', marginBox[axis.start]);
-      console.log('start(shifted)', start);
-      console.log('end', marginBox[axis.end]);
-      console.log('end(shifted)', end);
-      console.log('target', currentCenter[axis.line]);
-
-      const adjustedStart: number = isMovingForward ? start : start + oneThird;
-      const adjustedEnd: number = isMovingForward ? end - oneThird : end;
-
-      const isOver = isWithin(adjustedStart, adjustedEnd);
-      // const isOver = isWithin(start, end);
-
-      console.log('isOver', isOver(currentCenter[axis.line]));
-      console.groupEnd();
-      return isOver(currentCenter[axis.line]);
-    },
-  );
-
-  if (!target) {
-    return null;
+  destination,
+}: Args): DragImpact => {
+  if (!destination.isGroupingEnabled) {
+    return impact;
   }
 
-  return {
-    whenEntered: direction,
+  // Nothing would have been displaced
+  if (!impact.movement.displaced.length) {
+    return impact;
+  }
+
+  // the displaced array is ordered by closest impacted
+  // the only possible grouping target is the closest displaced
+  const target: Displacement = impact.movement.displaced[0];
+
+  const group: GroupingImpact = {
     groupingWith: {
-      draggableId: target.descriptor.id,
+      draggableId: target.draggableId,
       droppableId: destination.descriptor.id,
     },
   };
+  console.group('yay');
+
+  console.log(
+    'before roup displacement',
+    impact.movement.displaced.map(i => i.draggableId),
+  );
+
+  const withoutGroupedWith: Displacement[] = impact.movement.displaced.slice(1);
+
+  const withGroup: DragImpact = {
+    ...impact,
+    movement: {
+      ...impact.movement,
+      displaced: withoutGroupedWith,
+      map: getDisplacementMap(withoutGroupedWith),
+    },
+    group,
+  };
+
+  console.log(
+    'with group displaced',
+    withGroup.movement.displaced.map(i => i.draggableId),
+  );
+  console.groupEnd();
+
+  return withGroup;
 };

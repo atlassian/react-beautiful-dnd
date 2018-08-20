@@ -14,6 +14,7 @@ import getDroppableOver from '../get-droppable-over';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import inHomeList from './in-home-list';
 import inForeignList from './in-foreign-list';
+import withGroupImpact from './get-grouping-impact';
 import noImpact from '../no-impact';
 
 type Args = {|
@@ -66,25 +67,29 @@ export default ({
     draggables,
   );
 
-  if (isWithinHomeDroppable) {
-    return inHomeList({
-      pageBorderBoxCenter,
-      draggable,
-      home,
-      insideHome: insideDestination,
-      previousImpact,
-      viewport,
-      direction,
-    });
-  }
+  const impact: DragImpact = isWithinHomeDroppable
+    ? inHomeList({
+        pageBorderBoxCenter,
+        draggable,
+        home,
+        insideHome: insideDestination,
+        previousImpact,
+        viewport,
+        direction,
+      })
+    : inForeignList({
+        pageBorderBoxCenter,
+        draggable,
+        destination,
+        insideDestination,
+        previousImpact,
+        viewport,
+        direction,
+      });
 
-  return inForeignList({
+  return withGroupImpact({
     pageBorderBoxCenter,
-    draggable,
+    impact,
     destination,
-    insideDestination,
-    previousImpact,
-    viewport,
-    direction,
   });
 };

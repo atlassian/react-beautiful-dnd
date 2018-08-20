@@ -140,6 +140,7 @@ export default class QuoteList extends React.Component<Props> {
         type={listType}
         ignoreContainerClipping={ignoreContainerClipping}
         isDropDisabled={isDropDisabled}
+        isGroupingEnabled
       >
         {(
           dropProvided: DroppableProvided,
@@ -152,10 +153,7 @@ export default class QuoteList extends React.Component<Props> {
             {...dropProvided.droppableProps}
           >
             {internalScroll ? (
-              <ScrollContainer
-                style={scrollContainerStyle}
-                onScroll={e => console.log('scroll', e.target.scrollTop)}
-              >
+              <ScrollContainer style={scrollContainerStyle}>
                 <InnerList
                   quotes={quotes}
                   title={title}

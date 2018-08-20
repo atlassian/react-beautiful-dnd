@@ -16,7 +16,7 @@ import { patch } from '../position';
 import getDisplacement from '../get-displacement';
 import withDroppableScroll from '../with-droppable-scroll';
 import getDisplacementMap from '../get-displacement-map';
-import getGroupingImpact from './get-grouping-impact';
+import getGroupingImpact from './get-grouping-impact.old';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
 
 type Args = {|

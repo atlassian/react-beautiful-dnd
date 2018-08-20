@@ -163,7 +163,7 @@ export type GroupingLocation = {|
 
 export type GroupingImpact = {|
   // This has an impact on the hitbox for a grouping action
-  whenEntered: UserDirection,
+  // whenEntered: UserDirection,
   groupingWith: GroupingLocation,
 |};
 
