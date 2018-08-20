@@ -113,21 +113,21 @@ export const makeMapStateToProps = (): Selector => {
     // Otherwise need to loop over every item in every selector (yuck!)
     const map: DisplacementMap = impact.movement.map;
     const displacement: ?Displacement = map[ownId];
-    const group: ?GroupingImpact = impact.group;
     const movement: DragMovement = impact.movement;
-    const isGroupedOver: boolean = Boolean(
-      group && group.groupingWith.draggableId === ownId,
-    );
+    // const group: ?GroupingImpact = impact.group;
+    // const isGroupedOver: boolean = Boolean(
+    //   group && group.groupingWith.draggableId === ownId,
+    // );
 
-    if (isGroupedOver) {
-      return getSecondaryProps(
-        displacement ? getDisplacedOffset(movement) : origin,
-        draggingId,
-        displacement
-          ? displacement.shouldAnimate
-          : defaultMapProps.shouldAnimateDisplacement,
-      );
-    }
+    // if (isGroupedOver) {
+    //   return getSecondaryProps(
+    //     displacement ? getDisplacedOffset(movement) : origin,
+    //     draggingId,
+    //     displacement
+    //       ? displacement.shouldAnimate
+    //       : defaultMapProps.shouldAnimateDisplacement,
+    //   );
+    // }
 
     // does not need to move
     if (!displacement) {
