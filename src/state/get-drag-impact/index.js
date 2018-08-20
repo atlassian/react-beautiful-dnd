@@ -14,8 +14,9 @@ import getDroppableOver from '../get-droppable-over';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import inHomeList from './in-home-list';
 import inForeignList from './in-foreign-list';
-import withGroupImpact from './get-grouping-impact';
+import withGroupImpact from './with-grouping-impact';
 import noImpact from '../no-impact';
+import withDroppableScroll from '../with-droppable-scroll';
 
 type Args = {|
   pageBorderBoxCenter: Position,
@@ -60,25 +61,31 @@ export default ({
     return noImpact;
   }
 
-  const home: DroppableDimension = droppables[draggable.descriptor.droppableId];
-  const isWithinHomeDroppable: boolean = home.descriptor.id === destinationId;
+  const isWithinHomeDroppable: boolean =
+    draggable.descriptor.droppableId === destinationId;
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
     destination,
     draggables,
   );
+  // Where the element actually is now.
+  // Need to take into account the change of scroll in the droppable
+  const pageBorderBoxCenterWithDroppableScroll: Position = withDroppableScroll(
+    destination,
+    pageBorderBoxCenter,
+  );
 
   const impact: DragImpact = isWithinHomeDroppable
     ? inHomeList({
-        pageBorderBoxCenter,
+        pageBorderBoxCenterWithDroppableScroll,
         draggable,
-        home,
+        home: destination,
         insideHome: insideDestination,
         previousImpact,
         viewport,
         direction,
       })
     : inForeignList({
-        pageBorderBoxCenter,
+        pageBorderBoxCenterWithDroppableScroll,
         draggable,
         destination,
         insideDestination,
@@ -87,9 +94,14 @@ export default ({
         direction,
       });
 
-  return withGroupImpact({
-    pageBorderBoxCenter,
-    impact,
-    destination,
-  });
+  if (!destination.isGroupingEnabled) {
+    return impact;
+  }
+
+  return impact;
+  // return withGroupingImpact({
+  //   pageBorderBoxCenterWithDroppableScroll,
+  //   impact,
+  //   direction,
+  // });
 };

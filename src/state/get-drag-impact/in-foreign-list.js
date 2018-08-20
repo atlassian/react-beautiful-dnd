@@ -8,19 +8,16 @@ import type {
   Axis,
   Displacement,
   Viewport,
-  GroupingImpact,
   UserDirection,
   DisplacementMap,
 } from '../../types';
 import { patch } from '../position';
 import getDisplacement from '../get-displacement';
-import withDroppableScroll from '../with-droppable-scroll';
 import getDisplacementMap from '../get-displacement-map';
-import getGroupingImpact from './get-grouping-impact.old';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
 
 type Args = {|
-  pageBorderBoxCenter: Position,
+  pageBorderBoxCenterWithDroppableScroll: Position,
   draggable: DraggableDimension,
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
@@ -30,7 +27,7 @@ type Args = {|
 |};
 
 export default ({
-  pageBorderBoxCenter,
+  pageBorderBoxCenterWithDroppableScroll: currentCenter,
   draggable,
   destination,
   insideDestination,
@@ -40,16 +37,6 @@ export default ({
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
   const map: DisplacementMap = previousImpact.movement.map;
-
-  // We need to know what point to use to compare to the other
-  // draggables in the list.
-  // To do this we need to consider any displacement caused by
-  // a change in scroll in the droppable we are currently over.
-
-  const currentCenter: Position = withDroppableScroll(
-    destination,
-    pageBorderBoxCenter,
-  );
 
   const isMovingForward: boolean = isUserMovingForward(
     destination.axis,
@@ -62,16 +49,6 @@ export default ({
   );
   // always displaced forward
   const displacement: number = amount[axis.line];
-
-  // const group: ?GroupingImpact = getGroupingImpact({
-  //   pageCenterWithDroppableScroll: currentCenter,
-  //   draggable,
-  //   destination,
-  //   displaced: previousImpact.movement.map,
-  //   insideDestination,
-  //   direction,
-  //   impact: previousImpact,
-  // });
 
   const displaced: Displacement[] = insideDestination
     .filter(

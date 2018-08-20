@@ -17,13 +17,8 @@ import getDisplacementMap from '../get-displacement-map';
 import withDroppableScroll from '../with-droppable-scroll';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
 
-// It is the responsibility of this function
-// to return the impact of a drag
-
-const logCount = 0;
-
 type Args = {|
-  pageBorderBoxCenter: Position,
+  pageBorderBoxCenterWithDroppableScroll: Position,
   draggable: DraggableDimension,
   home: DroppableDimension,
   insideHome: DraggableDimension[],
@@ -33,7 +28,7 @@ type Args = {|
 |};
 
 export default ({
-  pageBorderBoxCenter,
+  pageBorderBoxCenterWithDroppableScroll: currentCenter,
   draggable,
   home,
   insideHome,
@@ -47,13 +42,6 @@ export default ({
   const amount: Position = patch(
     axis.line,
     draggable.client.marginBox[axis.size],
-  );
-
-  // Where the element actually is now.
-  // Need to take into account the change of scroll in the droppable
-  const currentCenter: Position = withDroppableScroll(
-    home,
-    pageBorderBoxCenter,
   );
 
   const isInFrontOfStart: boolean =
