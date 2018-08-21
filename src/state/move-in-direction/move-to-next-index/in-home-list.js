@@ -109,7 +109,7 @@ export default ({
       displaced,
       map: getDisplacementMap(displaced),
       amount: patch(axis.line, draggable.page.marginBox[axis.size]),
-      isBeyondStartPosition: proposedIndex > startIndex,
+      isInFrontOfStart: proposedIndex > startIndex,
     },
     destination: {
       droppableId: droppable.descriptor.id,

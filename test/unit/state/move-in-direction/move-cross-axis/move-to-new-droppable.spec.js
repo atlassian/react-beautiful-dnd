@@ -128,7 +128,7 @@ describe('move to new droppable', () => {
                 movement: {
                   displaced: [],
                   amount: patch(axis.line, inHome2.page.marginBox[axis.size]),
-                  isBeyondStartPosition: false,
+                  isInFrontOfStart: false,
                 },
                 direction: axis.direction,
                 destination: {
@@ -182,7 +182,7 @@ describe('move to new droppable', () => {
                 movement: {
                   displaced: [],
                   amount: patch(axis.line, inHome2.page.marginBox[axis.size]),
-                  isBeyondStartPosition: false,
+                  isInFrontOfStart: false,
                 },
                 direction: axis.direction,
                 destination: {
@@ -246,7 +246,7 @@ describe('move to new droppable', () => {
                     },
                   ],
                   amount: patch(axis.line, inHome4.page.marginBox[axis.size]),
-                  isBeyondStartPosition: false,
+                  isInFrontOfStart: false,
                 },
                 direction: axis.direction,
                 destination: {
@@ -358,7 +358,7 @@ describe('move to new droppable', () => {
                   ],
                   amount: patch(axis.line, inHome1.page.marginBox[axis.size]),
                   // is moving beyond start position
-                  isBeyondStartPosition: true,
+                  isInFrontOfStart: true,
                 },
                 direction: axis.direction,
                 destination: {
@@ -486,7 +486,7 @@ describe('move to new droppable', () => {
                   },
                 ],
                 amount: patch(axis.line, inside.page.marginBox[axis.size]),
-                isBeyondStartPosition: true,
+                isInFrontOfStart: true,
               },
               direction: axis.direction,
               // moving into the outside position
@@ -573,7 +573,7 @@ describe('move to new droppable', () => {
                   },
                 ],
                 amount: patch(axis.line, inside.page.marginBox[axis.size]),
-                isBeyondStartPosition: true,
+                isInFrontOfStart: true,
               },
               direction: axis.direction,
               // moving into the outside position
@@ -673,7 +673,7 @@ describe('move to new droppable', () => {
                     foreign.axis.line,
                     inHome1.page.marginBox[foreign.axis.size],
                   ),
-                  isBeyondStartPosition: false,
+                  isInFrontOfStart: false,
                 },
                 direction: foreign.axis.direction,
                 destination: {
@@ -786,7 +786,7 @@ describe('move to new droppable', () => {
                     foreign.axis.line,
                     inHome1.page.marginBox[foreign.axis.size],
                   ),
-                  isBeyondStartPosition: false,
+                  isInFrontOfStart: false,
                 },
                 direction: foreign.axis.direction,
                 destination: {
@@ -896,7 +896,7 @@ describe('move to new droppable', () => {
                     foreign.axis.line,
                     inHome4.page.marginBox[foreign.axis.size],
                   ),
-                  isBeyondStartPosition: false,
+                  isInFrontOfStart: false,
                 },
                 direction: foreign.axis.direction,
                 destination: {
@@ -1043,7 +1043,7 @@ describe('move to new droppable', () => {
                   customInHome.page.marginBox[axis.size],
                 ),
                 // always false in foreign list
-                isBeyondStartPosition: false,
+                isInFrontOfStart: false,
               },
               direction: axis.direction,
               // moving into the outside position
@@ -1149,7 +1149,7 @@ describe('move to new droppable', () => {
                   customInHome.page.marginBox[axis.size],
                 ),
                 // always false in foreign list
-                isBeyondStartPosition: false,
+                isInFrontOfStart: false,
               },
               direction: axis.direction,
               // moving into the outside position

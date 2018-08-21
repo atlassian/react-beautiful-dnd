@@ -135,7 +135,7 @@ const dontCareAboutDirection: UserDirection = {
             },
           ],
           amount: patch(axis.line, notVisible2.page.marginBox[axis.size]),
-          isBeyondStartPosition: false,
+          isInFrontOfStart: false,
         },
         direction: axis.direction,
         // moved into the first position
@@ -242,7 +242,7 @@ const dontCareAboutDirection: UserDirection = {
             },
           ],
           amount: patch(axis.line, notVisible2.page.marginBox[axis.size]),
-          isBeyondStartPosition: false,
+          isInFrontOfStart: false,
         },
         direction: axis.direction,
         // moved into the first position

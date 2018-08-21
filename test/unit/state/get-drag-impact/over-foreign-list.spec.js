@@ -92,7 +92,7 @@ const viewport: Viewport = getViewport();
             movement: {
               displaced: [],
               amount: patch(axis.line, inHome1.page.marginBox[axis.size]),
-              isBeyondStartPosition: false,
+              isInFrontOfStart: false,
             },
             direction: axis.direction,
             destination: {
@@ -128,7 +128,7 @@ const viewport: Viewport = getViewport();
             movement: {
               amount: patch(axis.line, inHome1.page.marginBox[axis.size]),
               displaced: [],
-              isBeyondStartPosition: true,
+              isInFrontOfStart: true,
             },
             direction: axis.direction,
             destination: {
@@ -174,7 +174,7 @@ const viewport: Viewport = getViewport();
                 shouldAnimate: true,
               },
             ],
-            isBeyondStartPosition: true,
+            isInFrontOfStart: true,
           },
           direction: axis.direction,
           destination: {
@@ -222,7 +222,7 @@ const viewport: Viewport = getViewport();
                   shouldAnimate: true,
                 },
               ],
-              isBeyondStartPosition: false,
+              isInFrontOfStart: false,
             },
             direction: axis.direction,
             destination: {
@@ -287,7 +287,7 @@ const viewport: Viewport = getViewport();
                     shouldAnimate: true,
                   },
                 ],
-                isBeyondStartPosition: true,
+                isInFrontOfStart: true,
               },
               direction: axis.direction,
               destination: {
@@ -350,7 +350,7 @@ const viewport: Viewport = getViewport();
                     shouldAnimate: true,
                   },
                 ],
-                isBeyondStartPosition: false,
+                isInFrontOfStart: false,
               },
               direction: axis.direction,
               destination: {
@@ -474,7 +474,7 @@ const viewport: Viewport = getViewport();
                 },
               ],
               amount: patch(axis.line, notVisible2.page.marginBox[axis.size]),
-              isBeyondStartPosition: false,
+              isInFrontOfStart: false,
             },
             direction: axis.direction,
             // moved into the first position
@@ -581,7 +581,7 @@ const viewport: Viewport = getViewport();
                 },
               ],
               amount: patch(axis.line, notVisible2.page.marginBox[axis.size]),
-              isBeyondStartPosition: false,
+              isInFrontOfStart: false,
             },
             direction: axis.direction,
             // moved into the first position
@@ -664,7 +664,7 @@ const viewport: Viewport = getViewport();
                   shouldAnimate: true,
                 },
               ],
-              isBeyondStartPosition: false,
+              isInFrontOfStart: false,
             },
             direction: axis.direction,
             destination: {
@@ -717,7 +717,7 @@ const viewport: Viewport = getViewport();
                   shouldAnimate: true,
                 },
               ],
-              isBeyondStartPosition: false,
+              isInFrontOfStart: false,
             },
             direction: axis.direction,
             destination: {
@@ -754,7 +754,7 @@ const viewport: Viewport = getViewport();
               amount: patch(axis.line, inHome1.page.marginBox[axis.size]),
               // nothing is moved - moving to the end of the list
               displaced: [],
-              isBeyondStartPosition: false,
+              isInFrontOfStart: false,
             },
             direction: axis.direction,
             destination: {
@@ -787,7 +787,7 @@ const viewport: Viewport = getViewport();
             movement: {
               amount: patch(axis.line, inHome1.page.marginBox[axis.size]),
               displaced: [],
-              isBeyondStartPosition: false,
+              isInFrontOfStart: false,
             },
             direction: axis.direction,
             destination: {
@@ -847,7 +847,7 @@ const viewport: Viewport = getViewport();
                   shouldAnimate: true,
                 },
               ],
-              isBeyondStartPosition: false,
+              isInFrontOfStart: false,
             },
             direction: axis.direction,
             destination: {
@@ -888,7 +888,7 @@ const viewport: Viewport = getViewport();
                   shouldAnimate: true,
                 },
               ],
-              isBeyondStartPosition: false,
+              isInFrontOfStart: false,
             },
             direction: axis.direction,
             destination: {
@@ -947,7 +947,7 @@ const viewport: Viewport = getViewport();
                   shouldAnimate: true,
                 },
               ],
-              isBeyondStartPosition: false,
+              isInFrontOfStart: false,
             },
             direction: axis.direction,
             destination: {
@@ -989,7 +989,7 @@ const viewport: Viewport = getViewport();
                   shouldAnimate: true,
                 },
               ],
-              isBeyondStartPosition: false,
+              isInFrontOfStart: false,
             },
             direction: axis.direction,
             destination: {
@@ -1128,7 +1128,7 @@ const viewport: Viewport = getViewport();
                 },
               ],
               amount: patch(axis.line, inSource1.page.marginBox[axis.size]),
-              isBeyondStartPosition: false,
+              isInFrontOfStart: false,
             },
             direction: axis.direction,
             // moved into the first position
@@ -1255,7 +1255,7 @@ const viewport: Viewport = getViewport();
                 },
               ],
               amount: patch(axis.line, inSource1.page.marginBox[axis.size]),
-              isBeyondStartPosition: false,
+              isInFrontOfStart: false,
             },
             direction: axis.direction,
             // moved into the first position

@@ -79,7 +79,7 @@ describe('get new home client center', () => {
                 },
               ],
               amount: inHome1Size,
-              isBeyondStartPosition: true,
+              isInFrontOfStart: true,
             };
 
             const newCenter = getNewHomeClientBorderBoxCenter({
@@ -120,7 +120,7 @@ describe('get new home client center', () => {
               ],
               amount: inHome1Size,
               // is not beyond start position - going backwards
-              isBeyondStartPosition: false,
+              isInFrontOfStart: false,
             };
 
             const newCenter = getNewHomeClientBorderBoxCenter({
@@ -172,7 +172,7 @@ describe('get new home client center', () => {
               ],
               amount: inHome1Size,
               // not relevant when moving into new list
-              isBeyondStartPosition: false,
+              isInFrontOfStart: false,
             };
 
             const newCenter = getNewHomeClientBorderBoxCenter({
@@ -202,7 +202,7 @@ describe('get new home client center', () => {
               displaced: [],
               amount: inHome1Size,
               // not relevant when moving into new list
-              isBeyondStartPosition: false,
+              isInFrontOfStart: false,
             };
 
             const newCenter = getNewHomeClientBorderBoxCenter({
@@ -230,7 +230,7 @@ describe('get new home client center', () => {
               displaced: [],
               amount: inHome1Size,
               // not relevant when moving into new list
-              isBeyondStartPosition: false,
+              isInFrontOfStart: false,
             };
 
             const newCenter = getNewHomeClientBorderBoxCenter({

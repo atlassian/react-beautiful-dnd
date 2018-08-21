@@ -58,7 +58,7 @@ export default ({
         movement: {
           displaced: [],
           map: {},
-          isBeyondStartPosition: false,
+          isInFrontOfStart: false,
           amount: patch(axis.line, draggable.client.marginBox[axis.size]),
         },
         direction: axis.direction,
@@ -124,7 +124,7 @@ export default ({
       displaced,
       map: getDisplacementMap(displaced),
       amount,
-      isBeyondStartPosition: isMovingPastOriginalIndex,
+      isInFrontOfStart: isMovingPastOriginalIndex,
     },
     direction: axis.direction,
     destination: {

@@ -6,7 +6,7 @@ export const noMovement: DragMovement = {
   displaced: [],
   map: {},
   amount: origin,
-  isBeyondStartPosition: false,
+  isInFrontOfStart: false,
 };
 
 const noImpact: DragImpact = {

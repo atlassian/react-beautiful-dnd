@@ -33,7 +33,7 @@ export default ({
     return originalCenter;
   }
 
-  const { displaced, isBeyondStartPosition } = movement;
+  const { displaced, isInFrontOfStart } = movement;
   const axis: Axis = destination.axis;
 
   const isWithinHomeDroppable: boolean =
@@ -75,7 +75,7 @@ export default ({
 
   const { sourceEdge, destinationEdge } = (() => {
     if (isWithinHomeDroppable) {
-      if (isBeyondStartPosition) {
+      if (isInFrontOfStart) {
         // move below the target
         return { sourceEdge: 'end', destinationEdge: 'end' };
       }

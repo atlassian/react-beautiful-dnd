@@ -53,7 +53,7 @@ import type {
             // ordered by closest to current location
             displaced,
             map: getDisplacementMap(displaced),
-            isBeyondStartPosition: true,
+            isInFrontOfStart: true,
           },
           direction: axis.direction,
           destination: {
@@ -104,7 +104,7 @@ import type {
             // ordered by closest to current location
             displaced,
             map: getDisplacementMap(displaced),
-            isBeyondStartPosition: true,
+            isInFrontOfStart: true,
           },
           direction: axis.direction,
           destination: {

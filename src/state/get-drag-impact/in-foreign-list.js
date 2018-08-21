@@ -93,7 +93,7 @@ export default ({
     amount,
     displaced,
     map: getDisplacementMap(displaced),
-    isBeyondStartPosition: false,
+    isInFrontOfStart: false,
   };
 
   const impact: DragImpact = {

@@ -56,7 +56,7 @@ export default ({
 
   const movement: DragMovement = previousImpact.movement;
   const map: DisplacementMap = movement.map;
-  const modifier: number = movement.isBeyondStartPosition ? -1 : 1;
+  const modifier: number = movement.isInFrontOfStart ? -1 : 1;
   const displacement: number = amount[axis.line] * modifier;
   // console.log('possible displacement', displacedBy);
 
@@ -163,7 +163,7 @@ export default ({
     amount,
     displaced: ordered,
     map: getDisplacementMap(ordered),
-    isBeyondStartPosition: isInFrontOfStart,
+    isInFrontOfStart: isInFrontOfStart,
   };
 
   const impact: DragImpact = {

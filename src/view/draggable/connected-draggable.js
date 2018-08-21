@@ -98,7 +98,7 @@ export const makeMapStateToProps = (): Selector => {
   );
 
   const getDisplacedOffset = (movement: DragMovement): Position => {
-    const amount: Position = movement.isBeyondStartPosition
+    const amount: Position = movement.isInFrontOfStart
       ? negate(movement.amount)
       : movement.amount;
     return memoizedOffset(amount.x, amount.y);

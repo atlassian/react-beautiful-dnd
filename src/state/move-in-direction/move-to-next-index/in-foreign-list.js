@@ -122,7 +122,7 @@ export default ({
       map: getDisplacementMap(displaced),
       amount: patch(axis.line, draggable.page.marginBox[axis.size]),
       // When we are in foreign list we are only displacing items forward
-      isBeyondStartPosition: false,
+      isInFrontOfStart: false,
     },
     destination: {
       droppableId: droppable.descriptor.id,

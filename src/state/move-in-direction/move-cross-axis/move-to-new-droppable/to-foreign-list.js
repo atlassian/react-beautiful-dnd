@@ -62,7 +62,7 @@ export default ({
         displaced: [],
         map: {},
         amount,
-        isBeyondStartPosition: false,
+        isInFrontOfStart: false,
       },
       direction: axis.direction,
       destination: {
@@ -120,7 +120,7 @@ export default ({
       displaced,
       map: getDisplacementMap(displaced),
       amount,
-      isBeyondStartPosition: false,
+      isInFrontOfStart: false,
     },
     direction: axis.direction,
     destination: {

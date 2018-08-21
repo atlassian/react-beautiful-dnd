@@ -43,7 +43,7 @@ export default ({
       ? direction.vertical === 'down'
       : direction.horizontal === 'right';
 
-  const modifier: number = movement.isBeyondStartPosition ? -1 : 1;
+  const modifier: number = movement.isInFrontOfStart ? -1 : 1;
   const shift: number = movement.amount[axis.line] * modifier;
 
   // TODO!\

@@ -77,7 +77,7 @@ const dontCareAboutDirection: UserDirection = {
                 shouldAnimate: true,
               },
             ],
-            isBeyondStartPosition: true,
+            isInFrontOfStart: true,
           },
           direction: axis.direction,
           destination: {
@@ -140,7 +140,7 @@ const dontCareAboutDirection: UserDirection = {
                 shouldAnimate: true,
               },
             ],
-            isBeyondStartPosition: false,
+            isInFrontOfStart: false,
           },
           direction: axis.direction,
           destination: {

@@ -143,12 +143,11 @@ export type DragMovement = {|
   // displaced as a map
   map: DisplacementMap,
 
-  // TODO: also store shift
   amount: Position,
   // is moving forward relative to the starting position
   // TODO: rename to 'isInFrontOfStart' || 'shouldDisplaceForward'?
 
-  isBeyondStartPosition: boolean,
+  isInFrontOfStart: boolean,
 |};
 
 export type VerticalUserDirection = 'up' | 'down';

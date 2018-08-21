@@ -25,7 +25,7 @@ const dontCareAboutDirection: UserDirection = {
           displaced: [],
           map: {},
           amount: patch(axis.line, preset.inHome1.page.marginBox[axis.size]),
-          isBeyondStartPosition: false,
+          isInFrontOfStart: false,
         },
         direction: axis.direction,
         destination: {
@@ -62,7 +62,7 @@ const dontCareAboutDirection: UserDirection = {
           amount: patch(axis.line, preset.inHome1.page.marginBox[axis.size]),
           displaced: [],
           map: {},
-          isBeyondStartPosition: true,
+          isInFrontOfStart: true,
         },
         direction: axis.direction,
         destination: {
