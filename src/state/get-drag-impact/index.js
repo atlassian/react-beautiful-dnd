@@ -77,7 +77,7 @@ export default ({
 
   const group: ?GroupingImpact = getGroupingImpact({
     pageBorderBoxCenterWithDroppableScroll,
-    previous: previousImpact.group,
+    previousImpact,
     draggable,
     destination,
     insideDestination,
@@ -85,7 +85,7 @@ export default ({
   });
 
   // If there is a grouping impact then the displacement
-  // cannot change
+  // cannot change displacement
   // TODO: what if entering a new list?
   if (group) {
     const withGroup: DragImpact = {

@@ -1,12 +1,25 @@
 // @flow
-import type { Position } from 'css-box-model';
+import type { Rect, Position } from 'css-box-model';
 import type {
+  Axis,
   UserDirection,
   DraggableDimension,
   DroppableDimension,
   GroupingImpact,
   DragImpact,
+  DisplacementMap,
 } from '../../types';
+import isWithin from '../is-within';
+import isUserMovingForward from '../user-direction/is-user-moving-forward';
+
+type GetBoundariesArgs = {||};
+
+type Boundaries = {|
+  start: number,
+  end: number,
+|};
+
+const getBoundaries = {};
 
 type Args = {|
   pageBorderBoxCenterWithDroppableScroll: Position,
@@ -17,7 +30,7 @@ type Args = {|
   direction: UserDirection,
 |};
 export default ({
-  pageBorderBoxCenterWithDroppableScroll,
+  pageBorderBoxCenterWithDroppableScroll: currentCenter,
   previousImpact,
   draggable,
   destination,
@@ -28,16 +41,10 @@ export default ({
     return null;
   }
 
-  return null;
-
-  const movement: DragMovement = previousImpact.movement;
-  const map: DisplacementMap = movement.map;
-  const modifier: number = movement.isInFrontOfStart ? -1 : 1;
-  const displacement: number = amount[axis.line] * modifier;
-  const amount: Position = patch(
-    axis.line,
-    draggable.client.marginBox[axis.size],
-  );
+  const axis: Axis = destination.axis;
+  const map: DisplacementMap = previousImpact.movement.map;
+  const canBeDisplacedBy: number = previousImpact.movement.displacedBy.value;
+  const isMovingForward: boolean = isUserMovingForward(axis, direction);
 
   const target: ?DraggableDimension = insideDestination.find(
     (child: DraggableDimension): boolean => {
@@ -47,7 +54,28 @@ export default ({
       }
 
       const isDisplaced: boolean = Boolean(map[child.descriptor.id]);
-      const displacedBy: number = isDisplaced ? displacement : 0;
+      const displacedBy: number = isDisplaced ? canBeDisplacedBy : 0;
+
+      const borderBox: Rect = child.page.borderBox;
+      const start: number = borderBox[axis.start] + displacedBy;
+      const end: number = borderBox[axis.end] + displacedBy;
+
+      const isOver = isWithin(start, end);
+
+      return isOver(currentCenter[axis.line]);
     },
   );
+
+  if (!target) {
+    return null;
+  }
+
+  const result: GroupingImpact = {
+    whenEntered: direction,
+    groupingWith: {
+      draggableId: target.descriptor.id,
+      droppableId: destination.descriptor.id,
+    },
+  };
+  return result;
 };
