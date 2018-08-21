@@ -43,11 +43,6 @@ export default ({
   previousImpact,
   viewport,
 }: Args): Result => {
-  const amount: Position = patch(
-    destination.axis.line,
-    draggable.client.marginBox[destination.axis.size],
-  );
-
   // moving back to the home list
   if (destination.descriptor.id === draggable.descriptor.droppableId) {
     invariant(
@@ -56,7 +51,6 @@ export default ({
     );
 
     return toHomeList({
-      amount,
       homeIndex: home.index,
       movingRelativeTo,
       insideDestination,
@@ -69,7 +63,6 @@ export default ({
 
   // moving to a foreign list
   return toForeignList({
-    amount,
     pageBorderBoxCenter,
     movingRelativeTo,
     insideDestination,

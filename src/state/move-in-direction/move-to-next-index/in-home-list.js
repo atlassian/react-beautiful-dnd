@@ -2,12 +2,13 @@
 import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
-import { patch, subtract } from '../../position';
+import { subtract } from '../../position';
 import withDroppableDisplacement from '../../with-droppable-displacement';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 import moveToEdge from '../../move-to-edge';
 import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
 import getDisplacementMap from '../../get-displacement-map';
+import getDisplacedBy from '../../get-displaced-by';
 import type { Edge } from '../../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import type {
@@ -16,6 +17,7 @@ import type {
   Displacement,
   Axis,
   DragImpact,
+  DisplacedBy,
 } from '../../../types';
 
 export default ({
@@ -104,12 +106,19 @@ export default ({
         viewport,
       });
 
+  const isInFrontOfStart: boolean = proposedIndex > startIndex;
+  const displacedBy: DisplacedBy = getDisplacedBy(
+    axis,
+    draggable.displaceBy,
+    isInFrontOfStart,
+  );
+
   const newImpact: DragImpact = {
     movement: {
+      displacedBy,
       displaced,
       map: getDisplacementMap(displaced),
-      amount: patch(axis.line, draggable.page.marginBox[axis.size]),
-      isInFrontOfStart: proposedIndex > startIndex,
+      isInFrontOfStart,
     },
     destination: {
       droppableId: droppable.descriptor.id,

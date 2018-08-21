@@ -4,8 +4,9 @@ import { type Position } from 'css-box-model';
 import moveToEdge from '../../../move-to-edge';
 import getDisplacement from '../../../get-displacement';
 import withDroppableDisplacement from '../../../with-droppable-displacement';
-import { patch } from '../../../position';
 import getDisplacementMap from '../../../get-displacement-map';
+import { noMovement } from '../../../no-impact';
+import getDisplacedBy from '../../../get-displaced-by';
 import type { Edge } from '../../../move-to-edge';
 import type { Result } from '../move-cross-axis-types';
 import type {
@@ -15,10 +16,10 @@ import type {
   DragImpact,
   DraggableDimension,
   DroppableDimension,
+  DisplacedBy,
 } from '../../../../types';
 
 type Args = {|
-  amount: Position,
   homeIndex: number,
   movingRelativeTo: DraggableDimension,
   insideDestination: DraggableDimension[],
@@ -29,7 +30,6 @@ type Args = {|
 |};
 
 export default ({
-  amount,
   homeIndex,
   movingRelativeTo,
   insideDestination,
@@ -55,12 +55,7 @@ export default ({
       pageBorderBoxCenter: withDroppableDisplacement(destination, newCenter),
       // TODO: use getHomeImpact (this is just copied)
       impact: {
-        movement: {
-          displaced: [],
-          map: {},
-          isInFrontOfStart: false,
-          amount: patch(axis.line, draggable.client.marginBox[axis.size]),
-        },
+        movement: noMovement,
         direction: axis.direction,
         destination: {
           index: draggable.descriptor.index,
@@ -79,13 +74,13 @@ export default ({
   // We align the dragging item to the end of the target
   // and move everything from the target to the original position backwards
 
-  const isMovingPastOriginalIndex = targetIndex > homeIndex;
-  const edge: Edge = isMovingPastOriginalIndex ? 'end' : 'start';
+  const isInFrontOfStart = targetIndex > homeIndex;
+  const edge: Edge = isInFrontOfStart ? 'end' : 'start';
 
   const newCenter: Position = moveToEdge({
     source: draggable.page.borderBox,
     sourceEdge: edge,
-    destination: isMovingPastOriginalIndex
+    destination: isInFrontOfStart
       ? movingRelativeTo.page.borderBox
       : movingRelativeTo.page.marginBox,
     destinationEdge: edge,
@@ -93,7 +88,7 @@ export default ({
   });
 
   const modified: DraggableDimension[] = (() => {
-    if (!isMovingPastOriginalIndex) {
+    if (!isInFrontOfStart) {
       return insideDestination.slice(targetIndex, homeIndex);
     }
 
@@ -119,12 +114,18 @@ export default ({
       }),
   );
 
+  const displacedBy: DisplacedBy = getDisplacedBy(
+    destination.axis,
+    draggable.displaceBy,
+    isInFrontOfStart,
+  );
+
   const newImpact: DragImpact = {
     movement: {
+      displacedBy,
       displaced,
       map: getDisplacementMap(displaced),
-      amount,
-      isInFrontOfStart: isMovingPastOriginalIndex,
+      isInFrontOfStart,
     },
     direction: axis.direction,
     destination: {

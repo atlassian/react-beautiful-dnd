@@ -6,6 +6,8 @@ import type { Result } from '../move-cross-axis-types';
 import getDisplacement from '../../../get-displacement';
 import withDroppableDisplacement from '../../../with-droppable-displacement';
 import getDisplacementMap from '../../../get-displacement-map';
+import getDisplacedBy from '../../../get-displaced-by';
+import { noMovement } from '../../../no-impact';
 import type {
   Axis,
   DragImpact,
@@ -13,10 +15,10 @@ import type {
   DroppableDimension,
   Displacement,
   Viewport,
+  DisplacedBy,
 } from '../../../../types';
 
 type Args = {|
-  amount: Position,
   pageBorderBoxCenter: Position,
   movingRelativeTo: ?DraggableDimension,
   insideDestination: DraggableDimension[],
@@ -27,7 +29,6 @@ type Args = {|
 |};
 
 export default ({
-  amount,
   pageBorderBoxCenter,
   movingRelativeTo,
   insideDestination,
@@ -58,12 +59,7 @@ export default ({
     });
 
     const newImpact: DragImpact = {
-      movement: {
-        displaced: [],
-        map: {},
-        amount,
-        isInFrontOfStart: false,
-      },
+      movement: noMovement,
       direction: axis.direction,
       destination: {
         droppableId: destination.descriptor.id,
@@ -115,11 +111,17 @@ export default ({
         }),
     );
 
+  const displacedBy: DisplacedBy = getDisplacedBy(
+    destination.axis,
+    draggable.displaceBy,
+    false,
+  );
+
   const newImpact: DragImpact = {
     movement: {
+      displacedBy,
       displaced,
       map: getDisplacementMap(displaced),
-      amount,
       isInFrontOfStart: false,
     },
     direction: axis.direction,

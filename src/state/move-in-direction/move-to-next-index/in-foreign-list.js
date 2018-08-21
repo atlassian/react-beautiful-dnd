@@ -2,12 +2,13 @@
 import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
-import { patch, subtract } from '../../position';
+import { subtract } from '../../position';
 import withDroppableDisplacement from '../../with-droppable-displacement';
 import moveToEdge from '../../move-to-edge';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
 import getDisplacementMap from '../../get-displacement-map';
+import getDisplacedBy from '../../get-displaced-by';
 import type { Edge } from '../../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import type {
@@ -16,6 +17,7 @@ import type {
   Axis,
   DragImpact,
   Displacement,
+  DisplacedBy,
 } from '../../../types';
 
 export default ({
@@ -116,13 +118,21 @@ export default ({
     });
   })();
 
+  const isInFrontOfStart: boolean = false;
+
+  const displacedBy: DisplacedBy = getDisplacedBy(
+    axis,
+    draggable.displaceBy,
+    isInFrontOfStart,
+  );
+
   const newImpact: DragImpact = {
     movement: {
+      displacedBy,
       displaced,
       map: getDisplacementMap(displaced),
-      amount: patch(axis.line, draggable.page.marginBox[axis.size]),
       // When we are in foreign list we are only displacing items forward
-      isInFrontOfStart: false,
+      isInFrontOfStart,
     },
     destination: {
       droppableId: droppable.descriptor.id,
