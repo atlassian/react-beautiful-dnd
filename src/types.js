@@ -142,9 +142,12 @@ export type DragMovement = {|
   displaced: Displacement[],
   // displaced as a map
   map: DisplacementMap,
+
+  // TODO: also store shift
   amount: Position,
   // is moving forward relative to the starting position
-  // TODO: rename to 'shouldDisplaceForward'?
+  // TODO: rename to 'isInFrontOfStart' || 'shouldDisplaceForward'?
+
   isBeyondStartPosition: boolean,
 |};
 
@@ -163,7 +166,7 @@ export type GroupingLocation = {|
 
 export type GroupingImpact = {|
   // This has an impact on the hitbox for a grouping action
-  // whenEntered: UserDirection,
+  whenEntered: UserDirection,
   groupingWith: GroupingLocation,
 |};
 

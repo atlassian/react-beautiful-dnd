@@ -8,13 +8,14 @@ import type {
   DroppableDimensionMap,
   UserDirection,
   DragImpact,
+  GroupingImpact,
   Viewport,
 } from '../../types';
 import getDroppableOver from '../get-droppable-over';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import inHomeList from './in-home-list';
 import inForeignList from './in-foreign-list';
-import withGroupImpact from './with-grouping-impact';
+import getGroupingImpact from './get-grouping-impact';
 import noImpact from '../no-impact';
 import withDroppableScroll from '../with-droppable-scroll';
 
@@ -74,7 +75,27 @@ export default ({
     pageBorderBoxCenter,
   );
 
-  const impact: DragImpact = isWithinHomeDroppable
+  const group: ?GroupingImpact = getGroupingImpact({
+    pageBorderBoxCenterWithDroppableScroll,
+    previous: previousImpact.group,
+    draggable,
+    destination,
+    insideDestination,
+    direction,
+  });
+
+  // If there is a grouping impact then the displacement
+  // cannot change
+  // TODO: what if entering a new list?
+  if (group) {
+    const withGroup: DragImpact = {
+      ...previousImpact,
+      group,
+    };
+    return withGroup;
+  }
+
+  return isWithinHomeDroppable
     ? inHomeList({
         pageBorderBoxCenterWithDroppableScroll,
         draggable,
@@ -93,15 +114,4 @@ export default ({
         viewport,
         direction,
       });
-
-  if (!destination.isGroupingEnabled) {
-    return impact;
-  }
-
-  return impact;
-  // return withGroupingImpact({
-  //   pageBorderBoxCenterWithDroppableScroll,
-  //   impact,
-  //   direction,
-  // });
 };

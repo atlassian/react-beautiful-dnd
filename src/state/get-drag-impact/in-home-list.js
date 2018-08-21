@@ -14,7 +14,6 @@ import type {
 import { patch } from '../position';
 import getDisplacement from '../get-displacement';
 import getDisplacementMap from '../get-displacement-map';
-import withDroppableScroll from '../with-droppable-scroll';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
 
 type Args = {|

@@ -1,67 +1,53 @@
 // @flow
 import type { Position } from 'css-box-model';
 import type {
-  DragImpact,
+  UserDirection,
+  DraggableDimension,
   DroppableDimension,
-  Displacement,
   GroupingImpact,
+  DragImpact,
 } from '../../types';
-import getDisplacementMap from '../get-displacement-map';
 
 type Args = {|
-  pageBorderBoxCenter: Position,
-  impact: DragImpact,
+  pageBorderBoxCenterWithDroppableScroll: Position,
+  previousImpact: DragImpact,
+  draggable: DraggableDimension,
   destination: DroppableDimension,
+  insideDestination: DraggableDimension[],
+  direction: UserDirection,
 |};
-
 export default ({
-  pageBorderBoxCenter,
-  impact,
+  pageBorderBoxCenterWithDroppableScroll,
+  previousImpact,
+  draggable,
   destination,
-}: Args): DragImpact => {
+  insideDestination,
+  direction,
+}: Args): ?GroupingImpact => {
   if (!destination.isGroupingEnabled) {
-    return impact;
+    return null;
   }
 
-  // Nothing would have been displaced
-  if (!impact.movement.displaced.length) {
-    return impact;
-  }
+  return null;
 
-  // the displaced array is ordered by closest impacted
-  // the only possible grouping target is the closest displaced
-  const target: Displacement = impact.movement.displaced[0];
-
-  const group: GroupingImpact = {
-    groupingWith: {
-      draggableId: target.draggableId,
-      droppableId: destination.descriptor.id,
-    },
-  };
-  console.group('yay');
-
-  console.log(
-    'before roup displacement',
-    impact.movement.displaced.map(i => i.draggableId),
+  const movement: DragMovement = previousImpact.movement;
+  const map: DisplacementMap = movement.map;
+  const modifier: number = movement.isBeyondStartPosition ? -1 : 1;
+  const displacement: number = amount[axis.line] * modifier;
+  const amount: Position = patch(
+    axis.line,
+    draggable.client.marginBox[axis.size],
   );
 
-  const withoutGroupedWith: Displacement[] = impact.movement.displaced.slice(1);
+  const target: ?DraggableDimension = insideDestination.find(
+    (child: DraggableDimension): boolean => {
+      // Cannot group with yourself
+      if (child.descriptor.id === draggable.descriptor.id) {
+        return false;
+      }
 
-  const withGroup: DragImpact = {
-    ...impact,
-    movement: {
-      ...impact.movement,
-      displaced: withoutGroupedWith,
-      map: getDisplacementMap(withoutGroupedWith),
+      const isDisplaced: boolean = Boolean(map[child.descriptor.id]);
+      const displacedBy: number = isDisplaced ? displacement : 0;
     },
-    group,
-  };
-
-  console.log(
-    'with group displaced',
-    withGroup.movement.displaced.map(i => i.draggableId),
   );
-  console.groupEnd();
-
-  return withGroup;
 };
