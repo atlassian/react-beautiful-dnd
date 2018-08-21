@@ -1,7 +1,7 @@
 // @flow
 import React, { Component, Fragment, type Node } from 'react';
 import ReactDOM from 'react-dom';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import reorder from '../reorder';
 import { colors, grid } from '../constants';
