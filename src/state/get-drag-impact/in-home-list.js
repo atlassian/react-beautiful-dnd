@@ -58,7 +58,8 @@ export default ({
   );
 
   const previousMap: DisplacementMap = previousImpact.movement.map;
-  const previousDisplacedBy: DisplacedBy = previousImpact.movement.displacedBy;
+  const previousDisplacement: number =
+    previousImpact.movement.displacedBy.value;
 
   const displaced: Displacement[] = insideHome
     .filter(
@@ -88,9 +89,7 @@ export default ({
 
         // At this point we know that the draggable could be displaced
         const isDisplaced: boolean = Boolean(previousMap[child.descriptor.id]);
-        const isDisplacedBy: number = isDisplaced
-          ? previousDisplacedBy.value
-          : 0;
+
         const start: number = borderBox[axis.start];
         const end: number = borderBox[axis.end];
 
@@ -100,7 +99,7 @@ export default ({
           // end edge of the target
           // Can reduce the amount of things that are displaced
           if (isMovingTowardStart) {
-            return currentCenter[axis.line] > end + isDisplacedBy;
+            return currentCenter[axis.line] > end + previousDisplacement;
           }
 
           // if was displaced and continuing to move away then will continue to be displaced
@@ -120,7 +119,7 @@ export default ({
         // Moving back towards the starting location
         // Can reduce the amount of things displaced
         if (isMovingTowardStart) {
-          return currentCenter[axis.line] < start + isDisplacedBy;
+          return currentCenter[axis.line] < start + previousDisplacement;
         }
 
         // Continuing to move further away backwards from the start
