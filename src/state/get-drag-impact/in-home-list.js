@@ -10,11 +10,12 @@ import type {
   Viewport,
   UserDirection,
   DisplacementMap,
+  DisplacedBy,
 } from '../../types';
-import { patch } from '../position';
 import getDisplacement from '../get-displacement';
 import getDisplacementMap from '../get-displacement-map';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
+import getDisplacedBy from '../get-displaced-by';
 
 type Args = {|
   pageBorderBoxCenterWithDroppableScroll: Position,
@@ -38,10 +39,6 @@ export default ({
   const axis: Axis = home.axis;
   // The starting center position
   const originalCenter: Position = draggable.page.borderBox.center;
-  const amount: Position = patch(
-    axis.line,
-    draggable.client.marginBox[axis.size],
-  );
 
   const isInFrontOfStart: boolean =
     currentCenter[axis.line] > originalCenter[axis.line];
@@ -54,11 +51,14 @@ export default ({
     ? !isMovingForward
     : isMovingForward;
 
-  const movement: DragMovement = previousImpact.movement;
-  const map: DisplacementMap = movement.map;
-  const modifier: number = movement.isInFrontOfStart ? -1 : 1;
-  const displacement: number = amount[axis.line] * modifier;
-  // console.log('possible displacement', displacedBy);
+  const displacedBy: DisplacedBy = getDisplacedBy(
+    home.axis,
+    draggable.displaceBy,
+    isInFrontOfStart,
+  );
+
+  const previousMap: DisplacementMap = previousImpact.movement.map;
+  const previousDisplacedBy: DisplacedBy = previousImpact.movement.displacedBy;
 
   const displaced: Displacement[] = insideHome
     .filter(
@@ -87,8 +87,10 @@ export default ({
         }
 
         // At this point we know that the draggable could be displaced
-        const isDisplaced: boolean = Boolean(map[child.descriptor.id]);
-        const displacedBy: number = isDisplaced ? displacement : 0;
+        const isDisplaced: boolean = Boolean(previousMap[child.descriptor.id]);
+        const isDisplacedBy: number = isDisplaced
+          ? previousDisplacedBy.value
+          : 0;
         const start: number = borderBox[axis.start];
         const end: number = borderBox[axis.end];
 
@@ -98,7 +100,7 @@ export default ({
           // end edge of the target
           // Can reduce the amount of things that are displaced
           if (isMovingTowardStart) {
-            return currentCenter[axis.line] > end + displacedBy;
+            return currentCenter[axis.line] > end + isDisplacedBy;
           }
 
           // if was displaced and continuing to move away then will continue to be displaced
@@ -118,7 +120,7 @@ export default ({
         // Moving back towards the starting location
         // Can reduce the amount of things displaced
         if (isMovingTowardStart) {
-          return currentCenter[axis.line] < start + displacedBy;
+          return currentCenter[axis.line] < start + isDisplacedBy;
         }
 
         // Continuing to move further away backwards from the start
@@ -160,10 +162,10 @@ export default ({
   })();
 
   const newMovement: DragMovement = {
-    amount,
     displaced: ordered,
     map: getDisplacementMap(ordered),
-    isInFrontOfStart: isInFrontOfStart,
+    isInFrontOfStart,
+    displacedBy,
   };
 
   const impact: DragImpact = {

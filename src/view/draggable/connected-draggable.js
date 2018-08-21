@@ -5,7 +5,7 @@ import memoizeOne from 'memoize-one';
 import { connect } from 'react-redux';
 import Draggable from './draggable';
 import { storeKey } from '../context-keys';
-import { negate, origin } from '../../state/position';
+import { origin } from '../../state/position';
 import isStrictEqual from '../is-strict-equal';
 import {
   lift as liftAction,
@@ -97,13 +97,6 @@ export const makeMapStateToProps = (): Selector => {
     }),
   );
 
-  const getDisplacedOffset = (movement: DragMovement): Position => {
-    const amount: Position = movement.isInFrontOfStart
-      ? negate(movement.amount)
-      : movement.amount;
-    return memoizedOffset(amount.x, amount.y);
-  };
-
   const getSecondaryMovement = (
     ownId: DraggableId,
     draggingId: DraggableId,
@@ -118,10 +111,12 @@ export const makeMapStateToProps = (): Selector => {
     const isGroupedOver: boolean = Boolean(
       group && group.groupingWith.draggableId === ownId,
     );
+    const displacedBy: Position = movement.displacedBy.point;
+    const offset: Position = memoizedOffset(displacedBy.x, displacedBy.y);
 
     if (isGroupedOver) {
       return getSecondaryProps(
-        displacement ? getDisplacedOffset(movement) : origin,
+        displacement ? offset : origin,
         draggingId,
         displacement
           ? displacement.shouldAnimate
@@ -139,11 +134,7 @@ export const makeMapStateToProps = (): Selector => {
       return null;
     }
 
-    return getSecondaryProps(
-      getDisplacedOffset(movement),
-      null,
-      displacement.shouldAnimate,
-    );
+    return getSecondaryProps(offset, null, displacement.shouldAnimate);
   };
 
   const draggingSelector = (state: State, ownProps: OwnProps): ?MapProps => {

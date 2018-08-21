@@ -83,6 +83,9 @@ export type DraggableDimension = {|
   client: BoxModel,
   // relative to the whole page
   page: BoxModel,
+  // how much displacement the draggable causes
+  // this is the size of the marginBox
+  displaceBy: Position,
 |};
 
 export type Scrollable = {|
@@ -136,18 +139,19 @@ export type Displacement = {|
 
 export type DisplacementMap = { [key: DraggableId]: Displacement };
 
+export type DisplacedBy = {|
+  value: number,
+  point: Position,
+|};
+
 export type DragMovement = {|
   // The draggables that need to move in response to a drag.
   // Ordered by closest draggable to the *current* location of the dragging item
   displaced: Displacement[],
   // displaced as a map
   map: DisplacementMap,
-
-  amount: Position,
-  // is moving forward relative to the starting position
-  // TODO: rename to 'isInFrontOfStart' || 'shouldDisplaceForward'?
-
   isInFrontOfStart: boolean,
+  displacedBy: DisplacedBy,
 |};
 
 export type VerticalUserDirection = 'up' | 'down';

@@ -127,10 +127,15 @@ export default class DraggableDimensionPublisher extends Component<Props> {
       tagName: targetRef.tagName.toLowerCase(),
       display: computedStyles.display,
     };
+    const displaceBy: Position = {
+      x: client.marginBox.width,
+      y: client.marginBox.height,
+    };
 
     const dimension: DraggableDimension = {
       descriptor,
       placeholder,
+      displaceBy,
       client,
       page,
     };

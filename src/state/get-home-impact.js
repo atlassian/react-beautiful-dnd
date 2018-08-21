@@ -1,10 +1,9 @@
 // @flow
-import { patch } from './position';
 import getHomeLocation from './get-home-location';
+import { noMovement } from './no-impact';
 import type {
   Critical,
   DimensionMap,
-  DraggableDimension,
   DroppableDimension,
   DragImpact,
   Axis,
@@ -13,16 +12,9 @@ import type {
 export default (critical: Critical, dimensions: DimensionMap): DragImpact => {
   const home: DroppableDimension = dimensions.droppables[critical.droppable.id];
   const axis: Axis = home.axis;
-  const draggable: DraggableDimension =
-    dimensions.draggables[critical.draggable.id];
 
   return {
-    movement: {
-      displaced: [],
-      map: {},
-      isInFrontOfStart: false,
-      amount: patch(axis.line, draggable.client.marginBox[axis.size]),
-    },
+    movement: noMovement,
     direction: axis.direction,
     destination: getHomeLocation(critical),
     group: null,
