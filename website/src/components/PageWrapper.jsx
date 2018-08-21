@@ -1,10 +1,10 @@
 // @flow
 import React, { type Node } from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import Media from 'react-media';
 import Sidebar from './sidebar';
 import type { sitePage, docsPage } from './types';
-import { smallView } from '../components/media';
+import { smallView } from './media';
 import { grid, sidebarWidth } from '../constants';
 
 const gutter: number = grid * 2;
@@ -46,7 +46,6 @@ type ExternalProps = {|
   examples: sitePage,
   docs: docsPage,
   internal: sitePage,
-  showInternal: boolean,
   children: Node,
 |};
 
@@ -93,23 +92,11 @@ class WithConditionalSidebar extends React.Component<InternalProps, State> {
   };
 
   render() {
-    const {
-      examples,
-      docs,
-      internal,
-      showInternal,
-      children,
-      isInLargeView,
-    } = this.props;
+    const { examples, docs, internal, children, isInLargeView } = this.props;
     const { showSidebar } = this.state;
 
     const sidebar: Node = showSidebar ? (
-      <Sidebar
-        examples={examples}
-        docs={docs}
-        internal={internal}
-        showInternal={showInternal}
-      />
+      <Sidebar examples={examples} docs={docs} internal={internal} />
     ) : null;
 
     const topbar: Node = isInLargeView ? null : (

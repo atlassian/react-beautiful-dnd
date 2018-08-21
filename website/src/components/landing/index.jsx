@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import Media from 'react-media';
 import Board from './board';
 import CallToAction from './call-to-action';

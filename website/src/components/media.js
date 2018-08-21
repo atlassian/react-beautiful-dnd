@@ -1,5 +1,5 @@
 // @flow
-import { css } from 'styled-components';
+import { css } from 'react-emotion';
 
 type WhenRuleFn = (...args: mixed[]) => mixed;
 
