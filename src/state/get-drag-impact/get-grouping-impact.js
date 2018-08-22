@@ -21,14 +21,15 @@ const getDirectionForDetection = (
   if (!oldGroup) {
     return currentDirection;
   }
-  if (oldGroup.groupingWith === id) {
-    return oldGroup.whenEntered;
+  if (id !== oldGroup.groupingWith.draggableId) {
+    return currentDirection;
   }
-  return currentDirection;
+  return oldGroup.whenEntered;
 };
 
-type GetBoundariesArgs = {|
+type IsGroupingWithArgs = {|
   id: DraggableId,
+  currentCenter: Position,
   axis: Axis,
   borderBox: Rect,
   displacedBy: number,
@@ -36,19 +37,15 @@ type GetBoundariesArgs = {|
   oldGroup: ?GroupingImpact,
 |};
 
-type Boundaries = {|
-  start: number,
-  end: number,
-|};
-
-const getBoundaries = ({
+const isGroupingWith = ({
   id,
+  currentCenter,
   axis,
   borderBox,
   displacedBy,
   currentDirection,
   oldGroup,
-}: GetBoundariesArgs): Boundaries => {
+}: IsGroupingWithArgs): boolean => {
   const start: number = borderBox[axis.start] + displacedBy;
   const end: number = borderBox[axis.end] + displacedBy;
   const size: number = borderBox[axis.size];
@@ -61,20 +58,12 @@ const getBoundaries = ({
   );
   const isMovingForward: boolean = isUserMovingForward(axis, direction);
 
+  // if moving forward then we will be hitting the start edge of the thing after us
+  // if moving backwards we will be hitting the bottom edge of the thing behind us
   const adjustedStart: number = isMovingForward ? start : start + oneThird;
   const adjustedEnd: number = isMovingForward ? end - oneThird : end;
 
-  console.group('check');
-  console.log('current direction', currentDirection);
-  console.log('using direction', direction);
-  console.log('start', start);
-  console.log('adjustedStart', adjustedStart);
-  console.log('end', end);
-  console.log('adjustedEnd', adjustedEnd);
-  console.log('when entered', oldGroup ? oldGroup.whenEntered : null);
-  console.groupEnd();
-
-  return { start: adjustedStart, end: adjustedEnd };
+  return isWithin(adjustedStart, adjustedEnd)(currentCenter[axis.line]);
 };
 
 type Args = {|
@@ -113,18 +102,15 @@ export default ({
       const isDisplaced: boolean = Boolean(map[id]);
       const displacedBy: number = isDisplaced ? canBeDisplacedBy : 0;
 
-      const { start, end } = getBoundaries({
+      return isGroupingWith({
         id,
+        currentCenter,
         axis,
         borderBox: child.page.borderBox,
         displacedBy,
         currentDirection: direction,
         oldGroup,
       });
-
-      const isOver = isWithin(start, end);
-
-      return isOver(currentCenter[axis.line]);
     },
   );
 
