@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { Draggable } from '../../../src';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../src';
 import type { Task as TaskType } from '../types';

@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import QuoteApp from './src/vertical/quote-app';
 import { quotes, getQuotes } from './src/data';
 import { grid } from './src/constants';

@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { Droppable, Draggable } from '../../../src';
 import QuoteItem from '../primatives/quote-item';
 import Title from '../primatives/title';
@@ -34,7 +34,7 @@ const Container = styled.div`
   }
 `;
 
-const NestedContainer = Container.extend`
+const NestedContainer = styled(Container)`
   padding: 0;
   margin-bottom: ${grid}px;
 `;

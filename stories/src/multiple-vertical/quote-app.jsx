@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';

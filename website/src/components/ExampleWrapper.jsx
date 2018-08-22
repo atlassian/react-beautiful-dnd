@@ -1,7 +1,7 @@
 // @flow
 import React, { type Node } from 'react';
 import Codesandboxer from 'react-codesandboxer';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { colors } from '@atlaskit/theme';
 import pkg from '../../../package.json';
 import { grid } from '../constants';

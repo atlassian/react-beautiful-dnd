@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { colors } from '@atlaskit/theme';
 import GithubIcon from 'react-icons/lib/fa/github';
 import TwitterIcon from 'react-icons/lib/fa/twitter';
@@ -15,7 +15,7 @@ const ExternalLink = styled.a`
   transition: color 0.2s ease;
 `;
 
-const TwitterLink = ExternalLink.extend`
+const TwitterLink = styled(ExternalLink)`
   margin-left: ${grid}px;
 
   :hover,
@@ -24,7 +24,7 @@ const TwitterLink = ExternalLink.extend`
   }
 `;
 
-const GithubLink = ExternalLink.extend`
+const GithubLink = styled(ExternalLink)`
   :hover,
   :active {
     color: ${colors.N70};

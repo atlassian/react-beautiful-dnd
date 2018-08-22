@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { colors } from '@atlaskit/theme';
 import { Draggable } from '../../../../../src';
 import { grid } from '../../constants';

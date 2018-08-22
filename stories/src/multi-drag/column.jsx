@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import memoizeOne from 'memoize-one';
 import { Droppable } from '../../../src';
 import { grid, colors, borderRadius } from '../constants';

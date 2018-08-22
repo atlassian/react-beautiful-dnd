@@ -1,5 +1,5 @@
 // @flow
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { colors, grid } from '../constants';
 
 export default styled.h4`

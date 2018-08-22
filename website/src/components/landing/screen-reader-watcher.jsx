@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { colors } from '@atlaskit/theme';
 import FeedbackIcon from '@atlaskit/icon/glyph/feedback';
 import { grid } from '../constants';
