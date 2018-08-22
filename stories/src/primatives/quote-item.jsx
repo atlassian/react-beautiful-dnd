@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { borderRadius, colors, grid } from '../constants';
 import type { Quote } from '../types';
 import type { DraggableProvided } from '../../../src';

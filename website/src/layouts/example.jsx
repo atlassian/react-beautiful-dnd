@@ -22,7 +22,6 @@ const ExamplePage = ({ children, data, location }: Props) => (
       examples={data.examples}
       docs={data.docs}
       internal={data.internal}
-      showInternal={data.site.siteMetadata.isDevelopment}
     >
       <ExampleWrapper
         title={getTitleFromExamplePath(location.pathname, '/examples/')}

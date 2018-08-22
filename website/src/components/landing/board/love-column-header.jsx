@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import HeartIcon from 'react-icons/lib/go/heart';
 import { grid } from '../../constants';
 

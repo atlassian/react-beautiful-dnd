@@ -1,5 +1,5 @@
 // @flow
-import { keyframes } from 'styled-components';
+import { keyframes } from 'react-emotion';
 
 const movement: number = 6;
 

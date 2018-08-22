@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
-import styled, { injectGlobal } from 'styled-components';
+import styled from 'react-emotion';
+import { injectGlobal } from 'emotion';
 import { action } from '@storybook/addon-actions';
 import Column from './column';
 import { colors } from '../constants';
