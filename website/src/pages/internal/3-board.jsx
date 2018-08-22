@@ -5,14 +5,21 @@ import {
   authorQuoteMap,
   generateQuoteMap,
 } from '../../components/examples/data';
+import Layout from '../../components/layouts/example';
 
 const data = {
   medium: generateQuoteMap(100),
   large: generateQuoteMap(500),
 };
 
-export default () => (
-  <div>
+type Props = {
+  location: {
+    pathname: string,
+  },
+};
+
+export default (props: Props) => (
+  <Layout location={props.location}>
     <div>Board</div>
     <Board initial={authorQuoteMap} />
     <div>Medium Data Set</div>
@@ -23,5 +30,5 @@ export default () => (
     <Board initial={data.large} />
     <div>long lists in a short container</div>
     <Board initial={data.medium} containerHeight="60vh" />
-  </div>
+  </Layout>
 );

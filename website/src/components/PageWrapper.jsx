@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import Media from 'react-media';
 import Sidebar from './sidebar';
 import type { sitePage, docsPage } from './types';
-import { smallView } from '../components/media';
+import { smallView } from './media';
 import { grid, sidebarWidth } from '../constants';
 
 const gutter: number = grid * 2;

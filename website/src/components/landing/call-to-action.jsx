@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import Link from 'gatsby-link';
+import { Link } from 'gatsby';
 import { colors } from '@atlaskit/theme';
 import SendIcon from '@atlaskit/icon/glyph/send';
 import BookIcon from '@atlaskit/icon/glyph/book';
@@ -101,19 +101,19 @@ const DocumentationLink = ActionLink.extend`
 
 export default () => (
   <ActionBox>
-    <GetStartedLink to="/guides/get-started">
+    <GetStartedLink to="/quick-start/getting-started">
       <span>Get started</span>
       <ButtonIcon>
         <SendIcon size="large" label="Get started" />
       </ButtonIcon>
     </GetStartedLink>
-    <ExampleLink to="/examples">
+    <ExampleLink to="/examples/Basic-Example/">
       <span>Examples</span>
       <ButtonIcon>
         <EditIcon size="large" label="Examples" />
       </ButtonIcon>
     </ExampleLink>
-    <DocumentationLink to="/documentation">
+    <DocumentationLink to="/core-concepts/dragging-stuff">
       <span>Documentation</span>
       <ButtonIcon>
         <BookIcon size="large" label="Documentation" />
