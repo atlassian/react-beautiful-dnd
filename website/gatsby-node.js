@@ -166,20 +166,20 @@ exports.createPages = ({ graphql, boundActionCreators } /* : NodeParams */) => {
   });
 };
 
-exports.onCreatePage = async (
-  { page, boundActionCreators } /* : PageParams  */,
-) => {
-  const { createPage } = boundActionCreators;
+// exports.onCreatePage = async (
+//   { page, boundActionCreators } /* : PageParams  */,
+// ) => {
+//   const { createPage } = boundActionCreators;
 
-  return new Promise(resolve => {
-    if (page.path === '/') {
-      page.layout = 'landing';
-      // Update the page.
-      createPage(page);
-    } else if (page.path.match(/^\/(examples|internal)\/./)) {
-      page.layout = 'example';
-      createPage(page);
-    }
-    resolve();
-  });
-};
+//   return new Promise(resolve => {
+//     if (page.path === '/') {
+//       page.layout = 'landing';
+//       // Update the page.
+//       createPage(page);
+//     } else if (page.path.match(/^\/(examples|internal)\/./)) {
+//       page.layout = 'example';
+//       createPage(page);
+//     }
+//     resolve();
+//   });
+// };

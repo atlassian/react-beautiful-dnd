@@ -1,5 +1,6 @@
 // @flow
 import React from 'react';
+import { graphql } from 'gatsby';
 
 type Data = {
   markdownRemark: {
