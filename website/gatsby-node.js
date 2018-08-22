@@ -60,21 +60,21 @@ type Page = {
   },
 }
 
-type boundActionCreators = {
+type actions = {
   createNodeField: (nodeField) => mixed,
   createPage: (Page) => mixed
 }
 
 type NodeParams = {
   node: Node,
-  boundActionCreators: boundActionCreators,
+  actions: actions,
   getNode: (string) => fileNode,
   graphql: (string) => Promise<markdownGraphQLResult>
 }
 
 type PageParams = {
   page: Page,
-  boundActionCreators: boundActionCreators,
+  actions: actions,
 }
 */
 
@@ -112,10 +112,8 @@ const addRaw = (node, createNodeField) => {
   }
 };
 
-exports.onCreateNode = (
-  { node, boundActionCreators, getNode } /* : NodeParams */,
-) => {
-  const { createNodeField } = boundActionCreators;
+exports.onCreateNode = ({ node, actions, getNode } /* : NodeParams */) => {
+  const { createNodeField } = actions;
   if (node.internal.type === 'MarkdownRemark') {
     addMD({ getNode, node, createNodeField });
   } else if (node.internal.type === 'SitePage') {
@@ -123,8 +121,8 @@ exports.onCreateNode = (
   }
 };
 
-exports.createPages = ({ graphql, boundActionCreators } /* : NodeParams */) => {
-  const { createPage } = boundActionCreators;
+exports.createPages = ({ graphql, actions } /* : NodeParams */) => {
+  const { createPage } = actions;
 
   return new Promise((resolve, reject) => {
     const markdownPage = path.resolve('src/templates/markdown.jsx');
@@ -166,20 +164,18 @@ exports.createPages = ({ graphql, boundActionCreators } /* : NodeParams */) => {
   });
 };
 
-// exports.onCreatePage = async (
-//   { page, boundActionCreators } /* : PageParams  */,
-// ) => {
-//   const { createPage } = boundActionCreators;
+exports.onCreatePage = async ({ page, actions } /* : PageParams  */) => {
+  const { createPage } = actions;
 
-//   return new Promise(resolve => {
-//     if (page.path === '/') {
-//       page.layout = 'landing';
-//       // Update the page.
-//       createPage(page);
-//     } else if (page.path.match(/^\/(examples|internal)\/./)) {
-//       page.layout = 'example';
-//       createPage(page);
-//     }
-//     resolve();
-//   });
-// };
+  return new Promise(resolve => {
+    if (page.path === '/') {
+      page.layout = 'landing';
+      // Update the page.
+      createPage(page);
+    } else if (page.path.match(/^\/(examples|internal)\/./)) {
+      page.layout = 'example';
+      createPage(page);
+    }
+    resolve();
+  });
+};
