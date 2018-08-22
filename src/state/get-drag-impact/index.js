@@ -90,6 +90,7 @@ export default ({
   if (group) {
     const withGroup: DragImpact = {
       ...previousImpact,
+      destination: null,
       group,
     };
     return withGroup;

@@ -22,6 +22,24 @@ import type {
   Selector,
 } from './droppable-types';
 
+const getIsDraggingOver = (
+  id: DraggableId,
+  destination: ?DraggableLocation,
+  group: ?GroupingImpact,
+): boolean => {
+  // Only want placeholder for foreign lists
+
+  if (destination) {
+    return id === destination.droppableId;
+  }
+
+  if (group) {
+    return id === group.groupingWith.droppableId;
+  }
+
+  return false;
+};
+
 // Returning a function to ensure each
 // Droppable gets its own selector
 export const makeMapStateToProps = (): Selector => {
@@ -47,38 +65,13 @@ export const makeMapStateToProps = (): Selector => {
     const destination: ?DraggableLocation = impact.destination;
     const group: ?GroupingImpact = impact.group;
     const isHomeList = id === draggable.descriptor.id;
-
-    if (group) {
-      const isDraggingOver: boolean = id === group.groupingWith.droppableId;
-
-      if (!isDraggingOver) {
-        return getDefault();
-      }
-
-      const shouldUsePlaceholder: boolean = Boolean(
-        impact.movement.displaced.length && !isHomeList,
-      );
-
-      return getMapProps(
-        isDraggingOver,
-        draggable.descriptor.id,
-        shouldUsePlaceholder ? draggable.placeholder : null,
-      );
-    }
-
-    if (!destination) {
-      return getDefault();
-    }
-
-    const isDraggingOver: boolean = id === destination.droppableId;
-
-    if (!isDraggingOver) {
-      return getDefault();
-    }
-
     const placeholder: ?Placeholder = isHomeList ? null : draggable.placeholder;
 
-    return getMapProps(isDraggingOver, draggable.descriptor.id, placeholder);
+    const isDraggingOver: boolean = getIsDraggingOver(id, destination, group);
+
+    return isDraggingOver
+      ? getMapProps(true, draggable.descriptor.id, placeholder)
+      : getDefault();
   };
 
   const selector = (state: State, ownProps: OwnProps): MapProps => {
