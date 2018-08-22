@@ -9,6 +9,7 @@ import type {
   HookProvided,
   Critical,
   DraggableLocation,
+  GroupingLocation,
   DragStart,
   Announce,
   DragUpdate,
@@ -50,6 +51,25 @@ const areLocationsEqual = (
   // compare their actual values
   return (
     first.droppableId === second.droppableId && first.index === second.index
+  );
+};
+
+const isGroupingEqual = (
+  first: ?GroupingLocation,
+  second: ?GroupingLocation,
+): boolean => {
+  if (first == null && second == null) {
+    return true;
+  }
+
+  // only one is null
+  if (first == null || second == null) {
+    return false;
+  }
+
+  return (
+    first.draggableId === second.draggableId &&
+    first.droppableId === second.droppableId
   );
 };
 
@@ -148,6 +168,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
 
   const publisher = (() => {
     let lastLocation: ?DraggableLocation = null;
+    let lastGrouping: ?GroupingLocation = null;
     let lastCritical: ?Critical = null;
     let isDragStartPublished: boolean = false;
 
@@ -173,6 +194,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
       const data: DragStart = getDragStart(critical);
       lastCritical = critical;
       lastLocation = data.source;
+      lastGrouping = null;
       isDragStartPublished = true;
       withTimings('onDragStart', () =>
         execute(getHooks().onDragStart, data, messagePreset.onDragStart),
@@ -180,7 +202,11 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
     };
 
     // Passing in the critical location again as it can change during a drag
-    const move = (critical: Critical, location: ?DraggableLocation) => {
+    const move = (
+      critical: Critical,
+      location: ?DraggableLocation,
+      grouping: ?GroupingLocation,
+    ) => {
       invariant(
         isDragStartPublished && lastCritical,
         'Cannot fire onDragMove when onDragStart has not been called',
@@ -203,16 +229,22 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
       if (hasLocationChanged) {
         lastLocation = location;
       }
+      const hasGroupingChanged: boolean = !isGroupingEqual(
+        lastGrouping,
+        grouping,
+      );
+      if (hasGroupingChanged) {
+        lastGrouping = grouping;
+      }
 
       // Nothing has changed - no update needed
-      if (!hasCriticalChanged && !hasLocationChanged) {
+      if (!hasCriticalChanged && !hasLocationChanged && !hasGroupingChanged) {
         return;
       }
 
       const data: DragUpdate = {
         ...getDragStart(critical),
-        // TODO
-        groupingWith: null,
+        grouping,
         destination: location,
       };
 
@@ -229,6 +261,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
       isDragStartPublished = false;
       lastLocation = null;
       lastCritical = null;
+      lastGrouping = null;
       withTimings('onDragEnd', () =>
         execute(getHooks().onDragEnd, result, messagePreset.onDragEnd),
       );
@@ -243,7 +276,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
 
       const result: DropResult = {
         ...getDragStart(lastCritical),
-        groupingWith: null,
+        grouping: null,
         destination: null,
         reason: 'CANCEL',
       };

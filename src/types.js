@@ -225,7 +225,7 @@ export type DragUpdate = {|
   // may not have any destination (drag to nowhere)
   destination: ?DraggableLocation,
   // populated when a draggable is dragging over another in grouping mode
-  groupingWith: ?GroupingLocation,
+  grouping: ?GroupingLocation,
 |};
 
 export type DropReason = 'DROP' | 'CANCEL';
