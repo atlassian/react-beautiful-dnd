@@ -5,7 +5,7 @@ import { colors } from '@atlaskit/theme';
 import SendIcon from '@atlaskit/icon/glyph/send';
 import BookIcon from '@atlaskit/icon/glyph/book';
 import EditIcon from '@atlaskit/icon/glyph/edit';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { grid } from '../constants';
 import { shake } from '../animations';
 import { smallView } from '../media';
@@ -65,7 +65,7 @@ const ButtonIcon = styled.span`
   }
 `;
 
-const GetStartedLink = ActionLink.extend`
+const GetStartedLink = styled(ActionLink)`
   background-color: ${colors.G300};
   border-color: ${colors.G100};
   margin-left: 0;
@@ -76,7 +76,7 @@ const GetStartedLink = ActionLink.extend`
   }
 `;
 
-const ExampleLink = ActionLink.extend`
+const ExampleLink = styled(ActionLink)`
   background-color: ${colors.Y300};
   border-color: ${colors.Y100};
 
@@ -86,7 +86,7 @@ const ExampleLink = ActionLink.extend`
   }
 `;
 
-const DocumentationLink = ActionLink.extend`
+const DocumentationLink = styled(ActionLink)`
   background-color: ${colors.P300}
   border-color: ${colors.P100};
 

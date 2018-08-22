@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { DragDropContext } from '../../../../src';
 import QuoteList from '../../components/examples/primatives/quote-list';
 import { colors, grid } from '../../components/examples/constants';

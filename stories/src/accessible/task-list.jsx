@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { Droppable } from '../../../src';
 import Task from './task';
 import type { DroppableProvided } from '../../../src';

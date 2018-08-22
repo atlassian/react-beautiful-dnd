@@ -1,7 +1,7 @@
 // @flow
 import React, { Fragment } from 'react';
 import Link from 'gatsby-link';
-import styled, { css } from 'styled-components';
+import styled, { css } from 'react-emotion';
 import { colors as akColors } from '@atlaskit/theme';
 import { grid, sidebarWidth } from '../../constants';
 import type { docsPage, sitePage, innerDocsPage } from '../types';
@@ -114,7 +114,6 @@ type Props = {
   docs: docsPage,
   examples: sitePage,
   internal: sitePage,
-  showInternal: boolean,
 };
 
 type DocsSectionProps = {
@@ -143,7 +142,7 @@ const DocsSection = ({ sectionTitle, pages, sectionDir }: DocsSectionProps) => (
   </Fragment>
 );
 
-export default ({ docs, examples, internal, showInternal }: Props) => (
+export default ({ docs, examples, internal }: Props) => (
   <Sidebar>
     <h2>Header goes here</h2>
     <Section>
@@ -170,14 +169,5 @@ export default ({ docs, examples, internal, showInternal }: Props) => (
     <Section>
       <NavFromUrls href="/examples/" title="Examples" pages={examples} />
     </Section>
-    {showInternal ? (
-      <Section>
-        <NavFromUrls
-          href="/internal/"
-          title="Internal Examples"
-          pages={internal}
-        />
-      </Section>
-    ) : null}
   </Sidebar>
 );

@@ -16,7 +16,6 @@ const PageTemplate = ({ children, data }: Props) => (
       examples={data.examples}
       docs={data.docs}
       internal={data.internal}
-      showInternal={data.site.siteMetadata.isDevelopment}
     >
       {children()}
     </PageWrapper>
