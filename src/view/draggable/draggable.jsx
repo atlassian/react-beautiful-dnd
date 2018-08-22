@@ -37,6 +37,7 @@ import type {
   NotDraggingStyle,
   DraggableStyle,
   ZIndexOptions,
+  DroppingState,
 } from './draggable-types';
 import getWindowScroll from '../window/get-window-scroll';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
@@ -57,11 +58,10 @@ const getTranslate = (offset: Position): ?string => {
 
 const getDraggingTransition = (
   shouldAnimateDragMovement: boolean,
-  isDropAnimating: boolean,
-  dropDuration: number,
+  dropping: ?DroppingState,
 ): string => {
-  if (isDropAnimating) {
-    return css.isDropping(dropDuration);
+  if (dropping) {
+    return css.isDropping(dropping.duration);
   }
 
   if (shouldAnimateDragMovement) {
@@ -111,7 +111,7 @@ export default class Draggable extends Component<Props> {
   }
 
   onMoveEnd = () => {
-    if (this.props.isDropAnimating) {
+    if (this.props.dropping) {
       this.props.dropAnimationFinished();
     }
   };
@@ -169,14 +169,12 @@ export default class Draggable extends Component<Props> {
       change: Position,
       dimension: DraggableDimension,
       shouldAnimateDragMovement: boolean,
-      isDropAnimating: boolean,
-      dropDuration: number,
+      dropping: ?DroppingState,
     ): DraggingStyle => {
       const box: BoxModel = dimension.client;
       const transition: string = getDraggingTransition(
         shouldAnimateDragMovement,
-        isDropAnimating,
-        dropDuration,
+        dropping,
       );
       const style: DraggingStyle = {
         // ## Placement
@@ -195,9 +193,7 @@ export default class Draggable extends Component<Props> {
         // Opting out of the standard css transition for the dragging item
         transition,
         // Layering
-        zIndex: isDropAnimating
-          ? zIndexOptions.dropAnimating
-          : zIndexOptions.dragging,
+        zIndex: dropping ? zIndexOptions.dropAnimating : zIndexOptions.dragging,
         // Moving in response to user input
         transform: getTranslate(change),
 
@@ -227,14 +223,13 @@ export default class Draggable extends Component<Props> {
     (
       change: Position,
       isDragging: boolean,
-      isDropAnimating: boolean,
-      dropDuration: number,
+      dropping: ?DroppingState,
       shouldAnimateDisplacement: boolean,
       shouldAnimateDragMovement: boolean,
       dimension: ?DraggableDimension,
       dragHandleProps: ?DragHandleProps,
     ): Provided => {
-      const isDraggingOrDropping: boolean = isDragging || isDropAnimating;
+      const isDraggingOrDropping: boolean = isDragging || Boolean(dropping);
 
       const draggableStyle: DraggableStyle = (() => {
         if (!isDraggingOrDropping) {
@@ -249,8 +244,7 @@ export default class Draggable extends Component<Props> {
           change,
           dimension,
           shouldAnimateDragMovement,
-          isDropAnimating,
-          dropDuration,
+          dropping,
         );
       })();
 
@@ -259,7 +253,7 @@ export default class Draggable extends Component<Props> {
         draggableProps: {
           'data-react-beautiful-dnd-draggable': this.styleContext,
           style: draggableStyle,
-          onTransitionEnd: isDropAnimating ? this.onMoveEnd : null,
+          onTransitionEnd: dropping ? this.onMoveEnd : null,
         },
         dragHandleProps,
       };
@@ -270,13 +264,13 @@ export default class Draggable extends Component<Props> {
   getSnapshot = memoizeOne(
     (
       isDraggingOrDropping: boolean,
-      isDropAnimating: boolean,
+      dropping: ?DroppingState,
       draggingOver: ?DroppableId,
       groupingWith: ?DraggableId,
       groupedOverBy: ?DraggableId,
     ): StateSnapshot => ({
       isDragging: isDraggingOrDropping,
-      isDropAnimating,
+      dropping,
       draggingOver,
       groupingWith,
       groupedOverBy,
@@ -289,8 +283,7 @@ export default class Draggable extends Component<Props> {
   ): ?Node => {
     const {
       isDragging,
-      isDropAnimating,
-      dropDuration,
+      dropping,
       draggingOver,
       groupingWith,
       groupedOverBy,
@@ -300,13 +293,12 @@ export default class Draggable extends Component<Props> {
       children,
     } = this.props;
 
-    const isDraggingOrDropping: boolean = isDragging || isDropAnimating;
+    const isDraggingOrDropping: boolean = isDragging || Boolean(dropping);
     const child: ?Node = children(
       this.getProvided(
         change,
         isDragging,
-        isDropAnimating,
-        dropDuration,
+        dropping,
         shouldAnimateDisplacement,
         shouldAnimateDragMovement,
         dimension,
@@ -314,7 +306,7 @@ export default class Draggable extends Component<Props> {
       ),
       this.getSnapshot(
         isDraggingOrDropping,
-        isDropAnimating,
+        dropping,
         draggingOver,
         groupingWith,
         groupedOverBy,
@@ -345,7 +337,7 @@ export default class Draggable extends Component<Props> {
       index,
       offset,
       isDragging,
-      isDropAnimating,
+      dropping,
       isDragDisabled,
       groupedOverBy,
       // TODO: shouldAnimateDragMovement
@@ -366,7 +358,7 @@ export default class Draggable extends Component<Props> {
         <DragHandle
           draggableId={draggableId}
           isDragging={isDragging}
-          isDropAnimating={isDropAnimating}
+          isDropAnimating={Boolean(dropping)}
           isEnabled={!isDragDisabled}
           callbacks={this.callbacks}
           getDraggableRef={this.getDraggableRef}

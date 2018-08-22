@@ -7,6 +7,7 @@ import type {
   DraggableDimension,
   ZIndex,
   State,
+  DropReason,
 } from '../../types';
 import {
   lift,
@@ -73,9 +74,14 @@ export type Provided = {|
   innerRef: (?HTMLElement) => void,
 |};
 
+export type DroppingState = {|
+  reason: DropReason,
+  duration: number,
+|};
+
 export type StateSnapshot = {|
   isDragging: boolean,
-  isDropAnimating: boolean,
+  dropping: ?DroppingState,
   draggingOver: ?DroppableId,
   groupingWith: ?DraggableId,
   groupedOverBy: ?DraggableId,
@@ -101,8 +107,7 @@ export type MapProps = {|
   // when an item is being displaced by a dragging item,
   // we need to know if that movement should be animated
   shouldAnimateDisplacement: boolean,
-  isDropAnimating: boolean,
-  dropDuration: number,
+  dropping: ?DroppingState,
   offset: Position,
   // only provided when dragging
   dimension: ?DraggableDimension,
