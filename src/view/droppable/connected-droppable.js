@@ -12,8 +12,8 @@ import type {
   DragImpact,
   DraggableLocation,
   DraggableDimension,
-  DraggableDescriptor,
   Placeholder,
+  GroupingImpact,
 } from '../../types';
 import type {
   OwnProps,
@@ -25,24 +25,6 @@ import type {
 // Returning a function to ensure each
 // Droppable gets its own selector
 export const makeMapStateToProps = (): Selector => {
-  const shouldUsePlaceholder = (
-    id: DroppableId,
-    descriptor: DraggableDescriptor,
-    destination: DraggableLocation,
-  ): boolean => {
-    if (!destination) {
-      return false;
-    }
-
-    // Do not use a placeholder when over the home list
-    if (id === descriptor.droppableId) {
-      return false;
-    }
-
-    // TODO: no placeholder if over foreign list
-    return id === destination.droppableId;
-  };
-
   const getMapProps = memoizeOne(
     (
       isDraggingOver: boolean,
@@ -63,6 +45,27 @@ export const makeMapStateToProps = (): Selector => {
     impact: DragImpact,
   ) => {
     const destination: ?DraggableLocation = impact.destination;
+    const group: ?GroupingImpact = impact.group;
+    const isHomeList = id === draggable.descriptor.id;
+
+    if (group) {
+      const isDraggingOver: boolean = id === group.groupingWith.droppableId;
+
+      if (!isDraggingOver) {
+        return getDefault();
+      }
+
+      const shouldUsePlaceholder: boolean = Boolean(
+        impact.movement.displaced.length && !isHomeList,
+      );
+
+      return getMapProps(
+        isDraggingOver,
+        draggable.descriptor.id,
+        shouldUsePlaceholder ? draggable.placeholder : null,
+      );
+    }
+
     if (!destination) {
       return getDefault();
     }
@@ -73,13 +76,7 @@ export const makeMapStateToProps = (): Selector => {
       return getDefault();
     }
 
-    const placeholder: ?Placeholder = shouldUsePlaceholder(
-      id,
-      draggable.descriptor,
-      destination,
-    )
-      ? draggable.placeholder
-      : null;
+    const placeholder: ?Placeholder = isHomeList ? null : draggable.placeholder;
 
     return getMapProps(isDraggingOver, draggable.descriptor.id, placeholder);
   };

@@ -167,10 +167,11 @@ export default class Draggable extends Component<Props> {
   getDraggingStyle = memoizeOne(
     (
       change: Position,
-      dimension: DraggableDimension,
+      dimension: ?DraggableDimension,
       shouldAnimateDragMovement: boolean,
       dropping: ?DroppingState,
     ): DraggingStyle => {
+      invariant(dimension, 'Cannot get draggable style without a dimension');
       const box: BoxModel = dimension.client;
       const transition: string = getDraggingTransition(
         shouldAnimateDragMovement,
@@ -231,22 +232,14 @@ export default class Draggable extends Component<Props> {
     ): Provided => {
       const isDraggingOrDropping: boolean = isDragging || Boolean(dropping);
 
-      const draggableStyle: DraggableStyle = (() => {
-        if (!isDraggingOrDropping) {
-          return this.getNotDraggingStyle(change, shouldAnimateDisplacement);
-        }
-
-        invariant(dimension, 'draggable dimension required for dragging');
-
-        // Need to position element in original visual position. To do this
-        // we position it without
-        return this.getDraggingStyle(
-          change,
-          dimension,
-          shouldAnimateDragMovement,
-          dropping,
-        );
-      })();
+      const draggableStyle: DraggableStyle = isDraggingOrDropping
+        ? this.getDraggingStyle(
+            change,
+            dimension,
+            shouldAnimateDragMovement,
+            dropping,
+          )
+        : this.getNotDraggingStyle(change, shouldAnimateDisplacement);
 
       const provided: Provided = {
         innerRef: this.setRef,
