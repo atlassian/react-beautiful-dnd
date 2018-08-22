@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
 import { graphql } from 'gatsby';
+import Layout from '../components/layouts';
 
 type Data = {
   markdownRemark: {
@@ -8,10 +9,17 @@ type Data = {
   },
 };
 
-type Props = { data: Data };
+type Props = {
+  data: Data,
+  location: {
+    pathname: string,
+  },
+};
 
-export default ({ data }: Props) => (
-  <div dangerouslySetInnerHTML={{ __html: data.markdownRemark.html }} />
+export default ({ data, location }: Props) => (
+  <Layout location={location}>
+    <div dangerouslySetInnerHTML={{ __html: data.markdownRemark.html }} />
+  </Layout>
 );
 
 /* eslint-disable no-undef */

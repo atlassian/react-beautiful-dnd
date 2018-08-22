@@ -6,7 +6,7 @@ import CommonPage from '../CommonPage';
 import type { SidebarData } from '../types';
 
 type Props = {
-  children: () => Node,
+  children: Node,
 };
 
 const PageTemplate = ({ children }: Props) => (

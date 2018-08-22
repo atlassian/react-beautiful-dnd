@@ -101,19 +101,19 @@ const DocumentationLink = styled(ActionLink)`
 
 export default () => (
   <ActionBox>
-    <GetStartedLink to="/guides/get-started">
+    <GetStartedLink to="/quick-start/getting-started">
       <span>Get started</span>
       <ButtonIcon>
         <SendIcon size="large" label="Get started" />
       </ButtonIcon>
     </GetStartedLink>
-    <ExampleLink to="/examples">
+    <ExampleLink to="/examples/Basic-Example">
       <span>Examples</span>
       <ButtonIcon>
         <EditIcon size="large" label="Examples" />
       </ButtonIcon>
     </ExampleLink>
-    <DocumentationLink to="/documentation">
+    <DocumentationLink to="/core-concepts/dragging-stuff">
       <span>Documentation</span>
       <ButtonIcon>
         <BookIcon size="large" label="Documentation" />

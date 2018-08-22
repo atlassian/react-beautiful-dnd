@@ -8,7 +8,7 @@ import { getTitleFromExamplePath } from '../../utils';
 import type { SidebarData } from '../types';
 
 type Props = {
-  children: () => Node,
+  children: Node,
   location: {
     pathname: string,
   },
