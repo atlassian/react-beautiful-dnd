@@ -15,6 +15,19 @@ const BaseStyles = styled.div`
   background: ${colors.dark500};
   line-height: ${lineHeight};
   font-size: ${fontSizeEm}em;
+
+  blockquote {
+    padding: 0 1em;
+    color: ${colors.dark200};
+    border-left: 0.25em solid ${colors.dark400};
+  }
+  blockquote:before,
+  blockquote:after {
+    content: '';
+  }
+  pre {
+    margin: 20px 0;
+  }
 `;
 
 const CommonPage = ({ children }: Props) => (

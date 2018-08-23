@@ -29,6 +29,11 @@ const ContentSpacing = styled.div`
   margin-top: ${grid * 4}px;
   width: 100%;
   min-height: 100vh;
+
+  // This should be applied only within Content
+  a {
+    color: ${colors.green400};
+  }
 `;
 
 type MobileTopBarProps = {|
