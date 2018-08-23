@@ -1,10 +1,9 @@
 // @flow
 import React from 'react';
 import styled from 'react-emotion';
-import { colors } from '@atlaskit/theme';
 import { Draggable, Droppable } from '../../../../../src';
 import Quote from './quote';
-import { grid } from '../../constants';
+import { grid } from '../../../constants';
 import type {
   DroppableProvided,
   DraggableProvided,
@@ -36,12 +35,12 @@ class InnerList extends React.Component<InnerListProps> {
   }
 }
 
-const interactive: string = colors.G50;
+const interactive: string = 'yellow';
 
 const Container = styled.div`
-  background-color: ${props => (props.isDragging ? interactive : colors.N30)};
+  background-color: ${props => (props.isDragging ? interactive : 'purple')};
   margin: 0 ${grid}px;
-  color: ${colors.N800};
+  color: red;
   border-radius: 2px;
   font-weight: bold;
   user-select: none;
@@ -59,7 +58,7 @@ const Header = styled.div`
   }
 
   &:focus {
-    outline: 3px solid ${colors.P300};
+    outline: 3px solid red;
   }
 `;
 
@@ -67,13 +66,12 @@ const List = styled.div`
   min-height: 100px;
   padding: ${grid}px;
   /* The list will already been pushed down by the cards */
-  xpadding-bottom: 0;
   transition: background-color 0.2s ease;
 
   ${props =>
     props.isDraggingOver
       ? `
-    background-color: ${colors.R50};
+    background-color: red;
   `
       : ''};
 `;

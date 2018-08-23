@@ -1,12 +1,11 @@
 // @flow
 import React from 'react';
 import { Link } from 'gatsby';
-import { colors } from '@atlaskit/theme';
 import SendIcon from '@atlaskit/icon/glyph/send';
 import BookIcon from '@atlaskit/icon/glyph/book';
 import EditIcon from '@atlaskit/icon/glyph/edit';
 import styled from 'react-emotion';
-import { grid } from '../constants';
+import { grid } from '../../constants';
 import { shake } from '../animations';
 import { smallView } from '../media';
 
@@ -26,8 +25,7 @@ const ActionLink = styled(Link)`
   margin: 0 ${grid}px;
   padding: ${grid * 1}px ${grid * 2}px;
   border-radius: 2px;
-  border-radius: 2px;
-  color: ${colors.N10};
+  color: red;
   font-size: 1.1rem;
   font-weight: bold;
   user-select: none;
@@ -45,7 +43,7 @@ const ActionLink = styled(Link)`
   :hover {
     cursor: pointer;
     text-decoration: none;
-    color: ${colors.N10};
+    color: red;
   }
 
   ${smallView.fn`
@@ -66,37 +64,38 @@ const ButtonIcon = styled.span`
 `;
 
 const GetStartedLink = styled(ActionLink)`
-  background-color: ${colors.G300};
-  border-color: ${colors.G100};
+  background-color: red;
+  border-color: red;
   margin-left: 0;
 
   :hover,
   :active {
-    background-color: ${colors.G200};
+    background-color: red;
   }
 `;
 
 const ExampleLink = styled(ActionLink)`
-  background-color: ${colors.Y300};
-  border-color: ${colors.Y100};
+  background-color: red;
+  border-color: red;
 
   :hover,
   :active {
-    background-color: ${colors.Y200};
+    background-color: red;
   }
 `;
 
 const DocumentationLink = styled(ActionLink)`
-  background-color: ${colors.P300}
-  border-color: ${colors.P100};
+  background-color: red;
+  border-color: red;
 
-  :hover, :active {
-    background-color: ${colors.P200};
+  :hover,
+  :active {
+    background-color: red;
   }
 
   ${smallView.fn`
     margin-bottom: 0;
-  `}
+  `};
 `;
 
 export default () => (

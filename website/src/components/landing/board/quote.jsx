@@ -1,9 +1,8 @@
 // @flow
 import React from 'react';
 import styled from 'react-emotion';
-import { colors } from '@atlaskit/theme';
 import { Draggable } from '../../../../../src';
-import { grid } from '../../constants';
+import { grid } from '../../../constants';
 import type {
   DraggableProvided,
   DraggableStateSnapshot,
@@ -17,9 +16,8 @@ type Props = {|
 
 const Container = styled.div`
   background-color: ${props =>
-    props.isDragging ? props.author.colors.soft : colors.N0};
-  box-shadow: ${props =>
-    props.isDragging ? `1px 1px 1px ${colors.N50}` : 'none'};
+    props.isDragging ? props.author.colors.soft : 'red'};
+  box-shadow: ${props => (props.isDragging ? `1px 1px 1px red` : 'none')};
   border-width: 1px;
   border-style: solid;
   border-color: ${props =>

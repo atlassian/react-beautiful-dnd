@@ -2,7 +2,6 @@
 import React, { type Node } from 'react';
 import Codesandboxer from 'react-codesandboxer';
 import styled from 'react-emotion';
-import { colors } from '@atlaskit/theme';
 import pkg from '../../../package.json';
 import { grid } from '../constants';
 
@@ -26,7 +25,7 @@ const ActionLink = styled.button`
   margin: 0 ${grid}px;
   padding: ${grid * 1}px ${grid * 2}px;
   border-radius: 2px;
-  color: ${colors.N10};
+  color: red;
   font-size: 1.1rem;
   font-weight: bold;
   user-select: none;
@@ -43,14 +42,14 @@ const ActionLink = styled.button`
   :hover {
     cursor: pointer;
     text-decoration: none;
-    color: ${colors.N10};
+    color: red;
   }
-  background-color: ${colors.Y300};
-  border-color: ${colors.Y100};
+  background-color: red;
+  border-color: red;
 
   :hover,
   :active {
-    background-color: ${colors.Y200};
+    background-color: red;
   }
 `;
 

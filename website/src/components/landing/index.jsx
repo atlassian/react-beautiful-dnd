@@ -3,9 +3,10 @@ import React from 'react';
 import styled from 'react-emotion';
 import Media from 'react-media';
 import Board from './board';
+import CommonPage from '../CommonPage';
 import CallToAction from './call-to-action';
 import SocialIcons from './social-icons';
-import { grid } from '../constants';
+import { grid } from '../../constants';
 import { smallView } from '../media';
 
 const Title = styled.h1`
@@ -26,10 +27,6 @@ const Tagline = styled.p`
 `;
 
 const Landing = styled.div`
-  /* Trello blue 500 https://design.trello.com/style/color */
-  background: #0079bf;
-
-  color: white;
   min-height: 100vh;
 `;
 
@@ -41,7 +38,7 @@ const SideBySide = styled.div`
   margin: 0 auto;
 
   display: flex;
-  /* wrap early if we need it (hopefully not!)*/
+  /* wrap early if we need it (hopefully not!) */
   /* flex-wrap: wrap; */
 
   ${smallView.fn`
@@ -75,27 +72,29 @@ const Example = styled.div`
 `;
 
 const IndexPage = () => (
-  <Landing>
-    <SideBySide>
-      <Content>
-        <Title>React-Beautiful-Dnd</Title>
-        <Tagline>
-          Beautiful, accessible drag and drop for lists with React.js{' '}
-        </Tagline>
-        <VerticalRhythm>
-          <CallToAction />
-        </VerticalRhythm>
-        <VerticalRhythm>
-          <SocialIcons />
-        </VerticalRhythm>
-      </Content>
-      <Example>
-        <Media query={smallView.negatedQuery}>
-          {(matches: boolean) => <Board numberOfColumns={matches ? 2 : 1} />}
-        </Media>
-      </Example>
-    </SideBySide>
-  </Landing>
+  <CommonPage>
+    <Landing>
+      <SideBySide>
+        <Content>
+          <Title>React-Beautiful-Dnd</Title>
+          <Tagline>
+            Beautiful, accessible drag and drop for lists with React.js{' '}
+          </Tagline>
+          <VerticalRhythm>
+            <CallToAction />
+          </VerticalRhythm>
+          <VerticalRhythm>
+            <SocialIcons />
+          </VerticalRhythm>
+        </Content>
+        <Example>
+          <Media query={smallView.negatedQuery}>
+            {(matches: boolean) => <Board numberOfColumns={matches ? 2 : 1} />}
+          </Media>
+        </Example>
+      </SideBySide>
+    </Landing>
+  </CommonPage>
 );
 
 export default IndexPage;

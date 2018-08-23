@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import styled from 'react-emotion';
 import { Droppable, Draggable } from '../../../../../src';
 import QuoteItem from './quote-item';
-import { grid, colors } from '../constants';
+import { grid, colors } from '../../../constants';
 import Title from './title';
 import type { Quote } from '../types';
 import type {
@@ -15,7 +15,7 @@ import type {
 
 const Wrapper = styled.div`
   background-color: ${({ isDraggingOver }) =>
-    isDraggingOver ? colors.blue.lighter : colors.blue.light};
+    isDraggingOver ? 'skyblue' : 'lightblue'};
   display: flex;
   flex-direction: column;
   opacity: ${({ isDropDisabled }) => (isDropDisabled ? 0.5 : 'inherit')};
