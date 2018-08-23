@@ -20,6 +20,7 @@ const ActionBox = styled.div`
     flex-direction: column;
     align-items: stretch;
     min-width: 60vw;
+    text-align: center;
   `)};
 `;
 
