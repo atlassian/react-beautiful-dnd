@@ -2,7 +2,7 @@
 import React, { type Node } from 'react';
 import { StaticQuery, graphql } from 'gatsby';
 import PageWrapper from '../page-wrapper';
-import CommonPage from '../CommonPage';
+import CommonPage from '../common-page';
 import type { SidebarData } from '../types';
 
 type Props = {
