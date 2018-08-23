@@ -2,7 +2,7 @@
 import React, { Fragment } from 'react';
 import { Link } from 'gatsby';
 import styled, { css } from 'react-emotion';
-import { grid, sidebarWidth, colors } from '../../constants';
+import { grid, sidebarWidth } from '../../constants';
 import type { docsPage, sitePage, innerDocsPage } from '../types';
 import { getTitleFromExamplePath } from '../../utils';
 

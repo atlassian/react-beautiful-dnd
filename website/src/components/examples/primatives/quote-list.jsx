@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import styled from 'react-emotion';
 import { Droppable, Draggable } from '../../../../../src';
 import QuoteItem from './quote-item';
-import { grid, colors } from '../../../constants';
+import { grid } from '../../../constants';
 import Title from './title';
 import type { Quote } from '../types';
 import type {
