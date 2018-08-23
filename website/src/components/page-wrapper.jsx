@@ -14,14 +14,13 @@ const gutter: number = grid * 2;
 const Content = styled.div`
   margin-left: ${sidebarWidth + gutter}px;
   margin-right: ${gutter}px;
-  margin-top ${grid * 4}px;
   display: flex;
   justify-content: center;
   color: ${colors.dark100};
 
   ${smallView.fn`
     margin-left: 16px;
-  `}
+  `};
 `;
 
 const ContentSpacing = styled.div`

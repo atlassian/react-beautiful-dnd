@@ -2,9 +2,10 @@
 import React, { Fragment } from 'react';
 import { Link } from 'gatsby';
 import styled, { css } from 'react-emotion';
-import { grid, sidebarWidth } from '../../constants';
+import { grid, sidebarWidth, colors } from '../../constants';
 import type { docsPage, sitePage, innerDocsPage } from '../types';
 import { getTitleFromExamplePath } from '../../utils';
+import Heading from './heading';
 
 const Sidebar = styled.div`
   height: 100vh;
@@ -46,18 +47,18 @@ const Item = styled.h4`
 `;
 
 const StyledLink = styled(Link)`
-  color: red;
+  color: ${colors.dark200};
   transition: background-color ease 0.2s, color ease 0.2s;
 
   ${props =>
     props.isActiveLink
       ? css`
-          color: white;
+          color: ${colors.dark100};
           background: ${props.hoverColor};
           text-decoration: none;
         `
       : ''} :hover, :active, :focus {
-    color: white;
+    color: ${colors.dark100};
     background: ${props => props.hoverColor};
     text-decoration: none;
   }
@@ -99,7 +100,7 @@ const NavFromUrls = ({ pages, href, title }: NavFromUrlsProps) => (
       return (
         <NavItem
           key={path}
-          hoverColor="yellow"
+          hoverColor={colors.green500}
           href={path}
           title={getTitleFromExamplePath(path, href)}
         />
@@ -111,7 +112,6 @@ const NavFromUrls = ({ pages, href, title }: NavFromUrlsProps) => (
 type Props = {
   docs: docsPage,
   examples: sitePage,
-  internal: sitePage,
 };
 
 type DocsSectionProps = {
@@ -127,7 +127,12 @@ const DocsSection = ({ sectionTitle, pages, sectionDir }: DocsSectionProps) => (
       const { slug, title, dir } = page.node.fields;
       if (sectionDir === dir) {
         return (
-          <NavItem key={slug} href={slug} title={title} hoverColor="blue" />
+          <NavItem
+            key={slug}
+            href={slug}
+            title={title}
+            hoverColor={colors.purple500}
+          />
         );
       }
       return null;
@@ -135,22 +140,10 @@ const DocsSection = ({ sectionTitle, pages, sectionDir }: DocsSectionProps) => (
   </Fragment>
 );
 
-export default ({ docs, examples, internal }: Props) => (
+export default ({ docs, examples }: Props) => (
   <Sidebar>
-    <h2>Header goes here</h2>
     <Section>
-      <DocsSection
-        pages={docs.edges}
-        sectionTitle="Quick Start"
-        sectionDir="quick-start"
-      />
-    </Section>
-    <Section>
-      <DocsSection
-        pages={docs.edges}
-        sectionTitle="Core Concepts"
-        sectionDir="core-concepts"
-      />
+      <Heading />
     </Section>
     <Section>
       <DocsSection
@@ -158,6 +151,9 @@ export default ({ docs, examples, internal }: Props) => (
         sectionTitle="Guides"
         sectionDir="guides"
       />
+    </Section>
+    <Section>
+      <DocsSection pages={docs.edges} sectionTitle="API" sectionDir="api" />
     </Section>
     <Section>
       <NavFromUrls href="/examples/" title="Examples" pages={examples} />
