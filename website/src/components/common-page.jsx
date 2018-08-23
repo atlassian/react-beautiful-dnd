@@ -12,7 +12,7 @@ type Props = {
 
 const BaseStyles = styled.div`
   color: ${colors.dark100};
-  background: ${colors.dark500};
+  background: ${colors.dark400};
   line-height: ${lineHeight};
   font-size: ${fontSizeEm}em;
 `;
