@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import styled from 'react-emotion';
-import CommonPage from '../CommonPage';
+import CommonPage from '../common-page';
 import Welcome from './welcome';
 import Beautiful from './beautiful';
 import Accessible from './accessible';

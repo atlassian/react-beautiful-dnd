@@ -12,6 +12,7 @@ require('prismjs/themes/prism-tomorrow.css');
 const gutter: number = grid * 2;
 
 const Content = styled.div`
+  background: ${colors.dark400};
   margin-left: ${sidebarWidth + gutter}px;
   margin-right: ${gutter}px;
   display: flex;
@@ -24,11 +25,16 @@ const Content = styled.div`
 `;
 
 const ContentSpacing = styled.div`
-  background: ${colors.dark500};
   max-width: ${contentWidth}px;
   margin-top: ${grid * 4}px;
   width: 100%;
   min-height: 100vh;
+  padding: ${grid * 4}px;
+
+  // This should be applied only within Content
+  a {
+    color: ${colors.green400};
+  }
 `;
 
 type MobileTopBarProps = {|
@@ -39,7 +45,9 @@ class MobileTopBar extends React.Component<MobileTopBarProps> {
     return (
       <div>
         Mobile topbar
-        <button onClick={this.props.onMenuToggle}>Toggle menu</button>
+        <button type="button" onClick={this.props.onMenuToggle}>
+          Toggle menu
+        </button>
       </div>
     );
   }
@@ -62,12 +70,6 @@ type State = {|
 |};
 
 class WithConditionalSidebar extends React.Component<InternalProps, State> {
-  // Show the sidebar if moving into large view
-  // Hide the sidebar is moving into small view
-  static getDerivedStateFromProps = (nextProps: InternalProps): State => ({
-    showSidebar: nextProps.isInLargeView,
-  });
-
   state: State = {
     showSidebar: false,
   };
@@ -93,6 +95,12 @@ class WithConditionalSidebar extends React.Component<InternalProps, State> {
       showSidebar: false,
     });
   };
+
+  // Show the sidebar if moving into large view
+  // Hide the sidebar is moving into small view
+  static getDerivedStateFromProps = (nextProps: InternalProps): State => ({
+    showSidebar: nextProps.isInLargeView,
+  });
 
   render() {
     const { examples, docs, internal, children, isInLargeView } = this.props;
