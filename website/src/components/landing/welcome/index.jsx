@@ -74,26 +74,28 @@ const Brand = styled.div`
 `;
 
 export default () => (
-  <SideBySide>
-    <Content>
-      <Brand>
-        <DraggableLogo />
-        <Title>react-beautiful-dnd</Title>
-      </Brand>
-      <Tagline>
-        Beautiful and accessible drag and drop for lists with React{' '}
-      </Tagline>
-      <VerticalRhythm>
-        <CallToAction />
-      </VerticalRhythm>
-      <VerticalRhythm>
-        <SocialIcons />
-      </VerticalRhythm>
-    </Content>
-    <Example>
-      <Media query={smallView.negatedQuery}>
-        {(matches: boolean) => <Board numberOfColumns={matches ? 2 : 1} />}
-      </Media>
-    </Example>
-  </SideBySide>
+  <Media query={smallView.query}>
+    {(isSmall: boolean) => (
+      <SideBySide>
+        <Content>
+          <Brand>
+            <DraggableLogo />
+            <Title>react-beautiful-dnd</Title>
+          </Brand>
+          <Tagline>
+            Beautiful and accessible drag and drop for lists with React{' '}
+          </Tagline>
+          <VerticalRhythm>
+            <CallToAction isSmallView={isSmall} />
+          </VerticalRhythm>
+          <VerticalRhythm>
+            <SocialIcons />
+          </VerticalRhythm>
+        </Content>
+        <Example>
+          <Board numberOfColumns={isSmall ? 1 : 2} />
+        </Example>
+      </SideBySide>
+    )}
+  </Media>
 );
