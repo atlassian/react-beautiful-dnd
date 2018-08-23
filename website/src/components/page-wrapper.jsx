@@ -24,11 +24,12 @@ const Content = styled.div`
 `;
 
 const ContentSpacing = styled.div`
-  background: ${colors.dark500};
+  background: ${colors.dark400};
   max-width: ${contentWidth}px;
   margin-top: ${grid * 4}px;
   width: 100%;
   min-height: 100vh;
+  padding: ${grid * 4}px;
 
   // This should be applied only within Content
   a {
