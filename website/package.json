@@ -22,6 +22,7 @@
     "gatsby-transformer-remark": "^2.1.1-rc.0",
     "lodash.lowercase": "^4.3.0",
     "prettier": "^1.14.2",
+    "prism-themes": "^1.0.1",
     "prismjs": "^1.15.0",
     "react": "^16.4.2",
     "react-codesandboxer": "^2.1.3",

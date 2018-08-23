@@ -7,7 +7,7 @@ import type { sitePage, docsPage } from './types';
 import { smallView } from './media';
 import { grid, sidebarWidth, colors, contentWidth } from '../constants';
 
-require('prismjs/themes/prism-tomorrow.css');
+require('prism-themes/themes/prism-a11y-dark.css');
 
 const gutter: number = grid * 2;
 
@@ -31,9 +31,10 @@ const ContentSpacing = styled.div`
   min-height: 100vh;
   padding: ${grid * 4}px;
 
-  // This should be applied only within Content
+  /* This should be applied only within Content */
   a {
     color: ${colors.green400};
+    font-weight: bold;
   }
 `;
 

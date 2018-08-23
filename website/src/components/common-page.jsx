@@ -10,6 +10,8 @@ type Props = {
   children: Node,
 };
 
+const sectionGap: number = grid * 4;
+
 const BaseStyles = styled.div`
   color: ${colors.dark100};
   background: ${colors.dark500};
@@ -20,14 +22,23 @@ const BaseStyles = styled.div`
     padding: 0 ${grid * 2}px;
     color: ${colors.dark200};
     border-left: ${grid / 2}px solid ${colors.dark300};
-    margin: ${grid * 4}px 0;
+    margin: ${sectionGap}px 0;
   }
-  blockquote:before,
-  blockquote:after {
+  blockquote::before,
+  blockquote::after {
     content: '';
   }
-  pre {
-    margin: ${grid * 3}px 0;
+
+  /* code blocks */
+  pre[class*='language-'] {
+    margin: ${sectionGap}px 0;
+  }
+
+  /* inline code */
+  .language-text {
+    display: inline-block;
+    padding: 0 ${grid / 2}px;
+    margin: 0 ${grid / 2}px;
   }
 `;
 
