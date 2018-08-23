@@ -39,7 +39,9 @@ class MobileTopBar extends React.Component<MobileTopBarProps> {
     return (
       <div>
         Mobile topbar
-        <button onClick={this.props.onMenuToggle}>Toggle menu</button>
+        <button type="button" onClick={this.props.onMenuToggle}>
+          Toggle menu
+        </button>
       </div>
     );
   }
@@ -62,12 +64,6 @@ type State = {|
 |};
 
 class WithConditionalSidebar extends React.Component<InternalProps, State> {
-  // Show the sidebar if moving into large view
-  // Hide the sidebar is moving into small view
-  static getDerivedStateFromProps = (nextProps: InternalProps): State => ({
-    showSidebar: nextProps.isInLargeView,
-  });
-
   state: State = {
     showSidebar: false,
   };
@@ -93,6 +89,12 @@ class WithConditionalSidebar extends React.Component<InternalProps, State> {
       showSidebar: false,
     });
   };
+
+  // Show the sidebar if moving into large view
+  // Hide the sidebar is moving into small view
+  static getDerivedStateFromProps = (nextProps: InternalProps): State => ({
+    showSidebar: nextProps.isInLargeView,
+  });
 
   render() {
     const { examples, docs, internal, children, isInLargeView } = this.props;
