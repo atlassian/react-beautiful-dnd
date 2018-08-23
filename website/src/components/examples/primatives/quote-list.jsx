@@ -14,7 +14,6 @@ import type {
 } from '../../../../../src';
 
 const Wrapper = styled.div`
-  background-color: ${({ isDraggingOver }) =>
     isDraggingOver ? 'skyblue' : 'lightblue'};
   display: flex;
   flex-direction: column;

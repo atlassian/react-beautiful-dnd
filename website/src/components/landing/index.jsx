@@ -8,11 +8,11 @@ import CallToAction from './call-to-action';
 import SocialIcons from './social-icons';
 import { grid } from '../../constants';
 import { smallView } from '../media';
+import Logo from '../logo';
 
 const Title = styled.h1`
-  font-family: 'Clicker Script', cursive;
   font-weight: normal;
-  font-size: 90px;
+  font-size: 50px;
 
   ${smallView.fn`
     text-align: center;
@@ -76,9 +76,10 @@ const IndexPage = () => (
     <Landing>
       <SideBySide>
         <Content>
-          <Title>React-Beautiful-Dnd</Title>
+          <Logo width={90} />
+          <Title>react-beautiful-dnd</Title>
           <Tagline>
-            Beautiful, accessible drag and drop for lists with React.js{' '}
+            Beautiful and accessible drag and drop for lists with React{' '}
           </Tagline>
           <VerticalRhythm>
             <CallToAction />

@@ -9346,9 +9346,9 @@ style-loader@^0.21.0:
     loader-utils "^1.1.0"
     schema-utils "^0.4.5"
 
-styled-components@^3.4.2:
-  version "3.4.2"
-  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-3.4.2.tgz#8f518419932327e47fe9144824e3184b3e2da95d"
+styled-components@^3.4.4:
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-3.4.4.tgz#dbd2ea6338fb050b5b56783e189434fd7f18eda5"
   dependencies:
     buffer "^5.0.3"
     css-to-react-native "^2.0.3"
