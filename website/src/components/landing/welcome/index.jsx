@@ -15,16 +15,16 @@ const Title = styled.h1`
   margin: 0;
   padding-left: ${grid * 2}px;
 
-  ${smallView.fn`
+  ${smallView.fn(`
     text-align: center;
     font-size: 10vw;
     white-space: nowrap;
-  `};
+  `)};
 `;
 
 const Tagline = styled.p`
   font-size: 20px;
-  ${smallView.fn`text-align: center`};
+  ${smallView.fn(`text-align: center`)};
 `;
 
 const SideBySide = styled.div`
@@ -38,10 +38,10 @@ const SideBySide = styled.div`
   /* wrap early if we need it (hopefully not!) */
   /* flex-wrap: wrap; */
 
-  ${smallView.fn`
+  ${smallView.fn(`
     flex-direction: column;
     align-items: center;
-  `};
+  `)};
 `;
 
 const verticalSpacing = `margin-top: ${grid * 4}px;`;
@@ -57,15 +57,15 @@ const Content = styled.div`
   display: flex;
   flex-direction: column;
 
-  ${smallView.fn`
+  ${smallView.fn(`
     align-items: center;
-  `};
+  `)};
 `;
 
 const Example = styled.div`
   flex-grow: 0;
 
-  ${smallView.fn`${verticalSpacing}`};
+  ${smallView.fn(`${verticalSpacing}`)};
 `;
 
 const Brand = styled.div`

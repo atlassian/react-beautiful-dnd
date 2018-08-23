@@ -16,11 +16,11 @@ const ActionBox = styled.div`
   display: flex;
   align-items: center;
 
-  ${smallView.fn`
+  ${smallView.fn(`
     flex-direction: column;
     align-items: stretch;
     min-width: 60vw;
-  `};
+  `)};
 `;
 
 const linkBase = css`
@@ -39,6 +39,12 @@ const linkBase = css`
     text-decoration: none;
     color: ${colors.dark100};
   }
+
+  ${smallView.fn(`
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 8px;
+  `)};
 `;
 
 // const getColors = (base: string, active: string): string => `
@@ -184,4 +190,55 @@ export default class CallToAction extends React.Component<*, State> {
       </DragDropContext>
     );
   }
+<<<<<<< HEAD
 }
+=======
+`;
+
+const ExampleLink = styled(ActionLink)`
+  background-color: red;
+  border-color: red;
+
+  :hover,
+  :active {
+    background-color: red;
+  }
+`;
+
+const DocumentationLink = styled(ActionLink)`
+  background-color: red;
+  border-color: red;
+
+  :hover,
+  :active {
+    background-color: red;
+  }
+
+  ${smallView.fn(`
+    margin-bottom: 0;
+  `)};
+`;
+
+export default () => (
+  <ActionBox>
+    <GetStartedLink to="/quick-start/getting-started">
+      <span>Get started</span>
+      <ButtonIcon>
+        <SendIcon size="large" label="Get started" />
+      </ButtonIcon>
+    </GetStartedLink>
+    <ExampleLink to="/examples/Basic-Example">
+      <span>Examples</span>
+      <ButtonIcon>
+        <EditIcon size="large" label="Examples" />
+      </ButtonIcon>
+    </ExampleLink>
+    <DocumentationLink to="/core-concepts/dragging-stuff">
+      <span>Documentation</span>
+      <ButtonIcon>
+        <BookIcon size="large" label="Documentation" />
+      </ButtonIcon>
+    </DocumentationLink>
+  </ActionBox>
+);
+>>>>>>> Re-enable mobile toggle
