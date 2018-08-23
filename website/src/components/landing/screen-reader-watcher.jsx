@@ -1,17 +1,16 @@
 // @flow
 import React from 'react';
 import styled from 'react-emotion';
-import { colors } from '@atlaskit/theme';
 import FeedbackIcon from '@atlaskit/icon/glyph/feedback';
-import { grid } from '../constants';
+import { grid } from '../../constants';
 
 const isMutationObserverSupported: boolean =
   typeof MutationObserver !== 'undefined';
 
 const Container = styled.div`
-  background-color: ${colors.T300};
+  background-color: red;
   border-radius: 3px;
-  color: ${colors.N0};
+  color: red;
   padding: ${grid}px;
   min-height: 110px;
   text-align: center;

@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import styled from 'react-emotion';
-import { borderRadius, colors, grid } from '../constants';
+import { borderRadius, grid } from '../../../constants';
 import type { Quote } from '../types';
 import type { DraggableProvided } from '../../../../../src';
 
@@ -14,11 +14,10 @@ type Props = {
 const Container = styled.a`
   border-radius: ${borderRadius}px;
   border: 1px solid grey;
-  background-color: ${({ isDragging }) =>
-    isDragging ? colors.green : colors.white};
+  background-color: ${({ isDragging }) => (isDragging ? 'green' : 'white')};
 
   box-shadow: ${({ isDragging }) =>
-    isDragging ? `2px 2px 1px ${colors.shadow}` : 'none'};
+    isDragging ? `2px 2px 1px orange` : 'none'};
   padding: ${grid}px;
   min-height: 40px;
   margin-bottom: ${grid}px;
@@ -26,14 +25,14 @@ const Container = styled.a`
   transition: background-color 0.1s ease;
 
   /* anchor overrides */
-  color: ${colors.black};
+  color: yellow;
 
   &:hover {
-    color: ${colors.black};
+    color: yellow;
     text-decoration: none;
   }
   &:focus {
-    outline: 2px solid ${colors.purple};
+    outline: 2px solid purple;
     box-shadow: none;
   }
 

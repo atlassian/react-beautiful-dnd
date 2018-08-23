@@ -1,17 +1,16 @@
 // @flow
 import React from 'react';
 import styled from 'react-emotion';
-import { colors } from '@atlaskit/theme';
 import GithubIcon from 'react-icons/lib/fa/github';
 import TwitterIcon from 'react-icons/lib/fa/twitter';
-import { grid } from '../constants';
+import { grid } from '../../constants';
 
 const Container = styled.div`
   display: flex;
 `;
 
 const ExternalLink = styled.a`
-  color: ${colors.N0};
+  color: red;
   transition: color 0.2s ease;
 `;
 
@@ -20,14 +19,14 @@ const TwitterLink = styled(ExternalLink)`
 
   :hover,
   :active {
-    color: ${colors.T75};
+    color: red;
   }
 `;
 
 const GithubLink = styled(ExternalLink)`
   :hover,
   :active {
-    color: ${colors.N70};
+    color: red;
   }
 `;
 

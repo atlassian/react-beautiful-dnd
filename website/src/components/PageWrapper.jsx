@@ -5,7 +5,7 @@ import Media from 'react-media';
 import Sidebar from './sidebar';
 import type { sitePage, docsPage } from './types';
 import { smallView } from './media';
-import { grid, sidebarWidth } from '../constants';
+import { grid, sidebarWidth, colors } from '../constants';
 
 const gutter: number = grid * 2;
 
@@ -15,6 +15,7 @@ const Content = styled.div`
   margin-top ${grid * 4}px;
   display: flex;
   justify-content: center;
+  color: ${colors.dark100};
 
   ${smallView.fn`
     margin-left: 16px;

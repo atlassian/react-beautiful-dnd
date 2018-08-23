@@ -2,8 +2,7 @@
 import React, { Fragment } from 'react';
 import { Link } from 'gatsby';
 import styled, { css } from 'react-emotion';
-import { colors as akColors } from '@atlaskit/theme';
-import { grid, sidebarWidth } from '../../constants';
+import { grid, sidebarWidth, colors } from '../../constants';
 import type { docsPage, sitePage, innerDocsPage } from '../types';
 import { getTitleFromExamplePath } from '../../utils';
 
@@ -14,7 +13,6 @@ const Sidebar = styled.div`
   position: fixed;
   left: 0;
   top: 0;
-  background: ${akColors.G50};
   overflow: auto;
   padding-bottom: ${grid * 2}px;
 
@@ -48,7 +46,7 @@ const Item = styled.h4`
 `;
 
 const StyledLink = styled(Link)`
-  color: ${akColors.N600};
+  color: red;
   transition: background-color ease 0.2s, color ease 0.2s;
 
   ${props =>
@@ -101,7 +99,7 @@ const NavFromUrls = ({ pages, href, title }: NavFromUrlsProps) => (
       return (
         <NavItem
           key={path}
-          hoverColor={akColors.Y300}
+          hoverColor="yellow"
           href={path}
           title={getTitleFromExamplePath(path, href)}
         />
@@ -129,12 +127,7 @@ const DocsSection = ({ sectionTitle, pages, sectionDir }: DocsSectionProps) => (
       const { slug, title, dir } = page.node.fields;
       if (sectionDir === dir) {
         return (
-          <NavItem
-            key={slug}
-            href={slug}
-            title={title}
-            hoverColor={akColors.B300}
-          />
+          <NavItem key={slug} href={slug} title={title} hoverColor="blue" />
         );
       }
       return null;
