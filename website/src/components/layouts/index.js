@@ -20,13 +20,6 @@ const PageTemplate = ({ children }: Props) => (
             }
           }
         }
-        internal: allSitePage(filter: { path: { regex: "/^/internal/.+/" } }) {
-          edges {
-            node {
-              path
-            }
-          }
-        }
         docs: allMarkdownRemark(sort: { fields: [fields___dir], order: ASC }) {
           edges {
             node {
