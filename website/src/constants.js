@@ -15,3 +15,4 @@ export const colors = {
 export const grid: number = 8;
 export const borderRadius: number = 2;
 export const sidebarWidth: number = 250;
+export const contentWidth: number = 960;
