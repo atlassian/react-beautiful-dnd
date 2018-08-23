@@ -6,21 +6,21 @@ import Welcome from './welcome';
 import Beautiful from './beautiful';
 import Accessible from './accessible';
 
-const Section = styled.section`
+const FullPageSection = styled.section`
   min-height: 100vh;
 `;
 
 const IndexPage = () => (
   <CommonPage>
-    <Section>
+    <FullPageSection>
       <Welcome />
-    </Section>
-    <Section>
+    </FullPageSection>
+    <FullPageSection>
       <Beautiful />
-    </Section>
-    <Section>
+    </FullPageSection>
+    <FullPageSection>
       <Accessible />
-    </Section>
+    </FullPageSection>
   </CommonPage>
 );
 
