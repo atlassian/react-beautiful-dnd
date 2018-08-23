@@ -8,20 +8,6 @@
   dependencies:
     "@atlaskit/util-shared-styles" "^2.10.3"
 
-"@atlaskit/icon@^13.2.2":
-  version "13.2.2"
-  resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-13.2.2.tgz#a512eaceb1b3afca8307310ddbcaaba588b6fe0e"
-  dependencies:
-    "@atlaskit/theme" "^5.1.2"
-    babel-runtime "^6.26.0"
-    uuid "^3.1.0"
-
-"@atlaskit/theme@^5.1.2":
-  version "5.1.2"
-  resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-5.1.2.tgz#774f864504f82eff63308a1f640f82c21a494425"
-  dependencies:
-    prop-types "^15.5.10"
-
 "@atlaskit/util-shared-styles@^2.10.3":
   version "2.10.7"
   resolved "https://registry.yarnpkg.com/@atlaskit/util-shared-styles/-/util-shared-styles-2.10.7.tgz#d5b4a38f42daa08154e43a3e85f7605182903b41"

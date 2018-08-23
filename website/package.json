@@ -5,7 +5,6 @@
   "author": "Alex Reardon <areardon@atlassian.com>",
   "dependencies": {
     "@atlaskit/css-reset": "^3.0.1",
-    "@atlaskit/icon": "^13.2.2",
     "emotion": "^9.2.6",
     "emotion-server": "^9.2.6",
     "gatsby": "^2.0.0-rc.0",

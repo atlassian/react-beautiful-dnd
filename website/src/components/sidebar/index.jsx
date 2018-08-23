@@ -40,7 +40,7 @@ const Section = styled.div`
 const Title = styled.h3`
   font-size: 20px;
   padding: ${grid}px;
-  padding-left ${grid * 2}px;
+  padding-left: ${grid * 2}px;
 `;
 const Item = styled.h4`
   padding: ${grid}px;
