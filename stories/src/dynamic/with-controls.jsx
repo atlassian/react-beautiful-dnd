@@ -89,6 +89,7 @@ export default class WithControls extends React.Component<*, State> {
 
     const quoteMap: QuoteMap = this.state.quoteMap;
 
+    // eslint-disable-next-line no-console
     console.log('event.key', event.key);
 
     // Add quote to start of list ('before')
@@ -162,6 +163,7 @@ export default class WithControls extends React.Component<*, State> {
   };
 
   onDragUpdate = (update: DragUpdate) => {
+    // eslint-disable-next-line no-console
     console.log(
       'Update: current index =>',
       update.destination ? update.destination.index : null,
