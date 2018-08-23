@@ -4,7 +4,7 @@ import Helmet from 'react-helmet';
 /* eslint-disable-next-line import/extensions */
 import '@atlaskit/css-reset';
 import styled from 'react-emotion';
-import { colors } from '../constants';
+import { colors, lineHeight, fontSizeEm } from '../constants';
 
 type Props = {
   children: Node,
@@ -13,6 +13,8 @@ type Props = {
 const BaseStyles = styled.div`
   color: ${colors.dark100};
   background: ${colors.dark500};
+  line-height: ${lineHeight};
+  font-size: ${fontSizeEm}em;
 `;
 
 const CommonPage = ({ children }: Props) => (

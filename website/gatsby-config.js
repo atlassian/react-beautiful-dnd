@@ -29,7 +29,13 @@ module.exports = {
               dashes: `oldschool`,
             },
           },
-          `gatsby-remark-prismjs`,
+          {
+            resolve: `gatsby-remark-prismjs`,
+            aliases: {
+              classPrefix: 'language-',
+            },
+          },
+
           `gatsby-remark-a11y-emoji`,
         ],
       },

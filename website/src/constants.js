@@ -31,3 +31,5 @@ export const grid: number = 8;
 export const borderRadius: number = 2;
 export const sidebarWidth: number = 250;
 export const contentWidth: number = 960;
+export const lineHeight: number = 1.4;
+export const fontSizeEm: number = 1.2;
