@@ -8,11 +8,13 @@ import CallToAction from './call-to-action';
 import SocialIcons from './social-icons';
 import { grid } from '../../constants';
 import { smallView } from '../media';
+import Logo from '../logo';
 
 const Title = styled.h1`
-  font-family: 'Clicker Script', cursive;
   font-weight: normal;
-  font-size: 90px;
+  font-size: 40px;
+  margin: 0;
+  padding-left: ${grid * 2}px;
 
   ${smallView.fn`
     text-align: center;
@@ -71,14 +73,22 @@ const Example = styled.div`
   ${smallView.fn`${verticalSpacing}`};
 `;
 
+const Brand = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 const IndexPage = () => (
   <CommonPage>
     <Landing>
       <SideBySide>
         <Content>
-          <Title>React-Beautiful-Dnd</Title>
+          <Brand>
+            <Logo width={90} />
+            <Title>react-beautiful-dnd</Title>
+          </Brand>
           <Tagline>
-            Beautiful, accessible drag and drop for lists with React.js{' '}
+            Beautiful and accessible drag and drop for lists with React{' '}
           </Tagline>
           <VerticalRhythm>
             <CallToAction />
