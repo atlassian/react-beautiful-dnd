@@ -19,7 +19,7 @@ const BaseStyles = styled.div`
   blockquote {
     padding: 0 1em;
     color: ${colors.dark200};
-    border-left: 0.25em solid ${colors.dark400};
+    border-left: 0.25em solid ${colors.dark300};
   }
   blockquote:before,
   blockquote:after {
