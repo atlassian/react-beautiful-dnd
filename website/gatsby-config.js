@@ -13,8 +13,29 @@ module.exports = {
         path: `${__dirname}/documentation/`,
       },
     },
-    'gatsby-transformer-remark',
+    {
+      resolve: `gatsby-transformer-remark`,
+      options: {
+        plugins: [
+          {
+            resolve: `gatsby-remark-images`,
+            options: {
+              maxWidth: 740,
+            },
+          },
+          {
+            resolve: `gatsby-remark-smartypants`,
+            options: {
+              dashes: `oldschool`,
+            },
+          },
+          `gatsby-remark-prismjs`,
+          `gatsby-remark-a11y-emoji`,
+        ],
+      },
+    },
     'gatsby-plugin-emotion',
     'gatsby-plugin-flow',
+    'gatsby-plugin-sharp',
   ],
 };

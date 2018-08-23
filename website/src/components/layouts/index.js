@@ -1,7 +1,7 @@
 // @flow
 import React, { type Node } from 'react';
 import { StaticQuery, graphql } from 'gatsby';
-import PageWrapper from '../PageWrapper';
+import PageWrapper from '../page-wrapper';
 import CommonPage from '../CommonPage';
 import type { SidebarData } from '../types';
 

@@ -5,7 +5,9 @@ import Media from 'react-media';
 import Sidebar from './sidebar';
 import type { sitePage, docsPage } from './types';
 import { smallView } from './media';
-import { grid, sidebarWidth, colors } from '../constants';
+import { grid, sidebarWidth, colors, contentWidth } from '../constants';
+
+require('prismjs/themes/prism-tomorrow.css');
 
 const gutter: number = grid * 2;
 
@@ -23,8 +25,9 @@ const Content = styled.div`
 `;
 
 const ContentSpacing = styled.div`
-  background: lightgreen;
-  max-width: 960px;
+  background: ${colors.dark500};
+  max-width: ${contentWidth}px;
+  margin-top: ${grid * 4}px;
   width: 100%;
   min-height: 100vh;
 `;

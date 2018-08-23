@@ -3,7 +3,7 @@ import React, { type Node } from 'react';
 import { StaticQuery, graphql } from 'gatsby';
 import ExampleWrapper, { gatsbyUrlToCSBPath } from '../ExampleWrapper';
 import CommonPage from '../CommonPage';
-import PageWrapper from '../PageWrapper';
+import PageWrapper from '../page-wrapper';
 import { getTitleFromExamplePath } from '../../utils';
 import type { SidebarData } from '../types';
 
