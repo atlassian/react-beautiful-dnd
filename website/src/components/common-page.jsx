@@ -4,7 +4,7 @@ import Helmet from 'react-helmet';
 /* eslint-disable-next-line import/extensions */
 import '@atlaskit/css-reset';
 import styled from 'react-emotion';
-import { colors, lineHeight, fontSizeEm } from '../constants';
+import { colors, lineHeight, fontSizeEm, grid } from '../constants';
 
 type Props = {
   children: Node,
@@ -17,16 +17,17 @@ const BaseStyles = styled.div`
   font-size: ${fontSizeEm}em;
 
   blockquote {
-    padding: 0 1em;
+    padding: 0 ${grid * 2}px;
     color: ${colors.dark200};
-    border-left: 0.25em solid ${colors.dark300};
+    border-left: ${grid / 2}px solid ${colors.dark300};
+    margin: ${grid * 4}px 0;
   }
   blockquote:before,
   blockquote:after {
     content: '';
   }
   pre {
-    margin: 20px 0;
+    margin: ${grid * 3}px 0;
   }
 `;
 
