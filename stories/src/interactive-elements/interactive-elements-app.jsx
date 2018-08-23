@@ -21,7 +21,7 @@ const initial: ItemType[] = [
     component: (
       <div>
         <p>Standard</p>
-        <button>hello world</button>
+        <button type="button">hello world</button>
         <br />
         <p>
           With child{' '}
@@ -33,7 +33,7 @@ const initial: ItemType[] = [
             phrasing content
           </a>
         </p>
-        <button>
+        <button type="button">
           why{' '}
           <strong>
             hello <em>there!</em>
@@ -49,7 +49,7 @@ const initial: ItemType[] = [
             SVGElement
           </a>
         </p>
-        <button>
+        <button type="button">
           My circle <br />
           <svg width="40" height="40">
             <circle cx="20" cy="20" r="20" />
@@ -240,7 +240,9 @@ export default class InteractiveElementsApp extends React.Component<*, State> {
                 {canDragInteractiveElements ? 'enabled' : 'disabled'}
               </Status>
             </p>
-            <button onClick={this.toggleBlocking}>toggle</button>
+            <button type="button" onClick={this.toggleBlocking}>
+              toggle
+            </button>
           </Controls>
         </Container>
       </DragDropContext>

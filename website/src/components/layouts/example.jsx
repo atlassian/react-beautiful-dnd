@@ -2,8 +2,8 @@
 import React, { type Node } from 'react';
 import { StaticQuery, graphql } from 'gatsby';
 import ExampleWrapper, { gatsbyUrlToCSBPath } from '../ExampleWrapper';
-import CommonPage from '../CommonPage';
-import PageWrapper from '../PageWrapper';
+import CommonPage from '../common-page';
+import PageWrapper from '../page-wrapper';
 import { getTitleFromExamplePath } from '../../utils';
 import type { SidebarData } from '../types';
 
@@ -19,13 +19,6 @@ const ExamplePage = ({ children, location }: Props) => (
     query={graphql`
       query examplesSidebarInfo {
         examples: allSitePage(filter: { path: { regex: "/^/examples/.+/" } }) {
-          edges {
-            node {
-              path
-            }
-          }
-        }
-        internal: allSitePage(filter: { path: { regex: "/^/internal/.+/" } }) {
           edges {
             node {
               path

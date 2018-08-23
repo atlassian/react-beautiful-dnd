@@ -2,10 +2,10 @@
 import React, { Fragment } from 'react';
 import { Link } from 'gatsby';
 import styled, { css } from 'react-emotion';
-import { colors as akColors } from '@atlaskit/theme';
-import { grid, sidebarWidth } from '../../constants';
+import { grid, sidebarWidth, colors } from '../../constants';
 import type { docsPage, sitePage, innerDocsPage } from '../types';
 import { getTitleFromExamplePath } from '../../utils';
+import Heading from './heading';
 
 const Sidebar = styled.div`
   height: 100vh;
@@ -14,9 +14,9 @@ const Sidebar = styled.div`
   position: fixed;
   left: 0;
   top: 0;
-  background: ${akColors.G50};
   overflow: auto;
   padding-bottom: ${grid * 2}px;
+  background: ${colors.dark500};
 
   ::-webkit-scrollbar {
     width: ${grid}px;
@@ -40,7 +40,7 @@ const Section = styled.div`
 const Title = styled.h3`
   font-size: 20px;
   padding: ${grid}px;
-  padding-left ${grid * 2}px;
+  padding-left: ${grid * 2}px;
 `;
 const Item = styled.h4`
   padding: ${grid}px;
@@ -48,18 +48,18 @@ const Item = styled.h4`
 `;
 
 const StyledLink = styled(Link)`
-  color: ${akColors.N600};
+  color: ${colors.dark200};
   transition: background-color ease 0.2s, color ease 0.2s;
 
   ${props =>
     props.isActiveLink
       ? css`
-          color: white;
+          color: ${colors.dark100};
           background: ${props.hoverColor};
           text-decoration: none;
         `
       : ''} :hover, :active, :focus {
-    color: white;
+    color: ${colors.dark100};
     background: ${props => props.hoverColor};
     text-decoration: none;
   }
@@ -101,7 +101,7 @@ const NavFromUrls = ({ pages, href, title }: NavFromUrlsProps) => (
       return (
         <NavItem
           key={path}
-          hoverColor={akColors.Y300}
+          hoverColor={colors.green500}
           href={path}
           title={getTitleFromExamplePath(path, href)}
         />
@@ -113,7 +113,6 @@ const NavFromUrls = ({ pages, href, title }: NavFromUrlsProps) => (
 type Props = {
   docs: docsPage,
   examples: sitePage,
-  internal: sitePage,
 };
 
 type DocsSectionProps = {
@@ -133,7 +132,7 @@ const DocsSection = ({ sectionTitle, pages, sectionDir }: DocsSectionProps) => (
             key={slug}
             href={slug}
             title={title}
-            hoverColor={akColors.B300}
+            hoverColor={colors.purple500}
           />
         );
       }
@@ -142,21 +141,18 @@ const DocsSection = ({ sectionTitle, pages, sectionDir }: DocsSectionProps) => (
   </Fragment>
 );
 
-export default ({ docs, examples, internal }: Props) => (
+export default ({ docs, examples }: Props) => (
   <Sidebar>
-    <h2>Header goes here</h2>
     <Section>
-      <DocsSection
-        pages={docs.edges}
-        sectionTitle="Quick Start"
-        sectionDir="quick-start"
-      />
+      <Heading />
     </Section>
     <Section>
-      <DocsSection
-        pages={docs.edges}
-        sectionTitle="Core Concepts"
-        sectionDir="core-concepts"
+      <NavItem
+        key="getting-started"
+        href="/getting-started"
+        title="Getting Started"
+        isTitle
+        hoverColor={colors.blue500}
       />
     </Section>
     <Section>
@@ -165,6 +161,9 @@ export default ({ docs, examples, internal }: Props) => (
         sectionTitle="Guides"
         sectionDir="guides"
       />
+    </Section>
+    <Section>
+      <DocsSection pages={docs.edges} sectionTitle="API" sectionDir="api" />
     </Section>
     <Section>
       <NavFromUrls href="/examples/" title="Examples" pages={examples} />

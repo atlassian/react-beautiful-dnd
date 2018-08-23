@@ -1,17 +1,18 @@
 // @flow
 import React from 'react';
 import styled from 'react-emotion';
-import { DragDropContext, Droppable } from '../../../../../src';
+import { DragDropContext, Droppable } from '../../../../../../src';
 import Column from './column';
 import initial from './entities';
-import reorder from '../../reorder';
+import reorder from '../../../reorder';
 import type {
   DroppableProvided,
   DropResult,
   DraggableLocation,
-} from '../../../../../src';
+} from '../../../../../../src';
+import { smallView } from '../../../media';
 import type { Entities, Column as ColumnType, ColumnMap } from './board-types';
-import type { Id, Quote } from '../../types';
+import type { Id, Quote } from '../../../types';
 
 type State = {|
   entities: Entities,
@@ -25,6 +26,12 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-start;
+
+  /* Board should not be rendered on small devices */
+  /* But for SSR we need to render it - so we will just hide it */
+  ${smallView.fn(`
+    display: none;
+  `)};
 `;
 
 const withQuotes = (column: ColumnType, quoteIds: Id[]): ColumnType => {

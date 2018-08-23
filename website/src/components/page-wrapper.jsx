@@ -5,27 +5,61 @@ import Media from 'react-media';
 import Sidebar from './sidebar';
 import type { sitePage, docsPage } from './types';
 import { smallView } from './media';
-import { grid, sidebarWidth } from '../constants';
+import { grid, gutter, sidebarWidth, colors, contentWidth } from '../constants';
 
-const gutter: number = grid * 2;
+require('prism-themes/themes/prism-a11y-dark.css');
+
+const sectionGap: number = gutter.large;
 
 const Content = styled.div`
-  margin-left: ${sidebarWidth + gutter}px;
-  margin-right: ${gutter}px;
-  margin-top ${grid * 4}px;
+  background: ${colors.dark400};
+  margin-left: ${sidebarWidth + gutter.normal}px;
+  margin-right: ${gutter.normal}px;
   display: flex;
   justify-content: center;
+  color: ${colors.dark100};
 
-  ${smallView.fn`
+  ${smallView.fn(`
     margin-left: 16px;
-  `}
+  `)};
 `;
 
 const ContentSpacing = styled.div`
-  background: lightgreen;
-  max-width: 960px;
+  max-width: ${contentWidth}px;
+  padding: ${sectionGap}px;
+  padding-top: ${sectionGap}px;
   width: 100%;
+  box-sizing: border-box;
   min-height: 100vh;
+
+  /* This should be applied only within Content */
+  a {
+    color: ${colors.green400};
+    font-weight: bold;
+  }
+
+  blockquote {
+    padding: 0 ${gutter}px;
+    color: ${colors.dark200};
+    border-left: ${grid / 2}px solid ${colors.dark300};
+    margin: ${sectionGap}px 0;
+  }
+  blockquote::before,
+  blockquote::after {
+    content: '';
+  }
+
+  /* code blocks */
+  pre[class*='language-'] {
+    margin: ${sectionGap}px 0;
+  }
+
+  /* inline code */
+  .language-text {
+    display: inline-block;
+    padding: 0 ${grid / 2}px;
+    margin: 0 ${grid / 2}px;
+  }
 `;
 
 type MobileTopBarProps = {|
@@ -36,7 +70,9 @@ class MobileTopBar extends React.Component<MobileTopBarProps> {
     return (
       <div>
         Mobile topbar
-        <button onClick={this.props.onMenuToggle}>Toggle menu</button>
+        <button type="button" onClick={this.props.onMenuToggle}>
+          Toggle menu
+        </button>
       </div>
     );
   }
@@ -56,22 +92,18 @@ type InternalProps = {|
 
 type State = {|
   showSidebar: boolean,
+  mobileSidebar: boolean,
 |};
 
 class WithConditionalSidebar extends React.Component<InternalProps, State> {
-  // Show the sidebar if moving into large view
-  // Hide the sidebar is moving into small view
-  static getDerivedStateFromProps = (nextProps: InternalProps): State => ({
-    showSidebar: nextProps.isInLargeView,
-  });
-
   state: State = {
     showSidebar: false,
+    mobileSidebar: false,
   };
 
   onMenuToggle = () => {
     this.setState({
-      showSidebar: !this.state.showSidebar,
+      mobileSidebar: !this.state.mobileSidebar,
     });
   };
 
@@ -82,27 +114,37 @@ class WithConditionalSidebar extends React.Component<InternalProps, State> {
       return;
     }
 
-    if (!this.state.showSidebar) {
+    if (!this.state.mobileSidebar) {
       return;
     }
 
     this.setState({
-      showSidebar: false,
+      mobileSidebar: false,
     });
   };
 
+  // Show the sidebar if moving into large view
+  // Hide the sidebar is moving into small view
+  static getDerivedStateFromProps = (
+    nextProps: InternalProps,
+    state: State,
+  ): State => ({
+    showSidebar: nextProps.isInLargeView,
+    mobileSidebar: state.mobileSidebar,
+  });
+
   render() {
     const { examples, docs, internal, children, isInLargeView } = this.props;
-    const { showSidebar } = this.state;
+    const { showSidebar, mobileSidebar } = this.state;
 
-    const sidebar: Node = showSidebar ? (
-      <Sidebar examples={examples} docs={docs} internal={internal} />
-    ) : null;
+    const sidebar: Node =
+      showSidebar || mobileSidebar ? (
+        <Sidebar examples={examples} docs={docs} internal={internal} />
+      ) : null;
 
     const topbar: Node = isInLargeView ? null : (
       <MobileTopBar onMenuToggle={this.onMenuToggle} />
     );
-
     return (
       <React.Fragment>
         {sidebar}

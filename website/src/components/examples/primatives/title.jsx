@@ -1,6 +1,6 @@
 // @flow
 import styled from 'react-emotion';
-import { colors, grid } from '../constants';
+import { grid } from '../../../constants';
 
 export default styled.h4`
   padding: ${grid}px;
@@ -9,7 +9,7 @@ export default styled.h4`
   user-select: none;
   position: relative;
   &:focus {
-    outline: 2px solid ${colors.purple};
+    outline: 2px solid purple;
     outline-offset: 2px;
   }
 `;

@@ -167,7 +167,9 @@ export default class TableApp extends Component<AppProps, AppState> {
           <Header>
             <LayoutControl>
               Current layout: <code>{this.state.layout}</code>
-              <button onClick={this.toggleTableLayout}>Toggle</button>
+              <button type="button" onClick={this.toggleTableLayout}>
+                Toggle
+              </button>
             </LayoutControl>
             <div>
               Copy table to clipboard:

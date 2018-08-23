@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import styled from 'react-emotion';
 import { DragDropContext } from '../../../../src';
 import QuoteList from '../../components/examples/primatives/quote-list';
-import { colors, grid } from '../../components/examples/constants';
+import { grid, colors } from '../../constants';
 import reorder from '../../components/examples/reorder';
 import type { Quote } from '../../components/examples/types';
 import { quotes as initialQuotes } from '../../components/examples/data';
@@ -16,7 +16,7 @@ const publishOnDragEnd = (v?: any) => console.log('onDragEnd', v);
 /* eslint-enable no-console */
 
 const Root = styled.div`
-  background-color: ${colors.blue.deep};
+  background-color: ${colors.dark300};
   box-sizing: border-box;
   padding: ${grid * 2}px;
   min-height: 100vh;

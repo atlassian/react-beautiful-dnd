@@ -1,8 +1,8 @@
 // @flow
 import React, { type Node } from 'react';
 import { StaticQuery, graphql } from 'gatsby';
-import PageWrapper from '../PageWrapper';
-import CommonPage from '../CommonPage';
+import PageWrapper from '../page-wrapper';
+import CommonPage from '../common-page';
 import type { SidebarData } from '../types';
 
 type Props = {
@@ -14,13 +14,6 @@ const PageTemplate = ({ children }: Props) => (
     query={graphql`
       query sidebarInfo {
         examples: allSitePage(filter: { path: { regex: "/^/examples/.+/" } }) {
-          edges {
-            node {
-              path
-            }
-          }
-        }
-        internal: allSitePage(filter: { path: { regex: "/^/internal/.+/" } }) {
           edges {
             node {
               path

@@ -1,5 +1,4 @@
 // @flow
-import { colors } from '@atlaskit/theme';
 import type { Quote, QuoteMap, Author, AuthorMap } from './types';
 
 const jake: Author = {
@@ -7,8 +6,8 @@ const jake: Author = {
   name: 'Jake',
   avatarUrl: 'https://68.media.tumblr.com/avatar_1f7bdbbeb59c_128.png',
   colors: {
-    medium: colors.Y100,
-    soft: colors.Y50,
+    medium: 'yellow',
+    soft: 'lightyellow',
   },
 };
 
@@ -17,8 +16,8 @@ const BMO: Author = {
   name: 'BMO',
   avatarUrl: 'https://68.media.tumblr.com/avatar_1a34fe6de498_128.png',
   colors: {
-    medium: colors.G100,
-    soft: colors.G50,
+    medium: 'green',
+    soft: 'lightgreen',
   },
 };
 
@@ -27,8 +26,8 @@ const finn: Author = {
   name: 'Finn',
   avatarUrl: 'https://68.media.tumblr.com/avatar_09404f3287c6_128.png',
   colors: {
-    medium: colors.B100,
-    soft: colors.B50,
+    medium: 'blue',
+    soft: 'lightblue',
   },
 };
 
@@ -37,8 +36,8 @@ const princess: Author = {
   name: 'Princess bubblegum',
   avatarUrl: 'https://68.media.tumblr.com/avatar_ec98529441c4_128.png',
   colors: {
-    medium: colors.P100,
-    soft: colors.P50,
+    medium: 'pink',
+    soft: 'lightpink',
   },
 };
 
