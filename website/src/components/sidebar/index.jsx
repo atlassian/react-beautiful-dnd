@@ -16,6 +16,7 @@ const Sidebar = styled.div`
   top: 0;
   overflow: auto;
   padding-bottom: ${grid * 2}px;
+  background: ${colors.dark500};
 
   ::-webkit-scrollbar {
     width: ${grid}px;

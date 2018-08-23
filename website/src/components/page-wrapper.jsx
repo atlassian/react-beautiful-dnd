@@ -19,9 +19,9 @@ const Content = styled.div`
   justify-content: center;
   color: ${colors.dark100};
 
-  ${smallView.fn`
+  ${smallView.fn(`
     margin-left: 16px;
-  `};
+  `)};
 `;
 
 const ContentSpacing = styled.div`
@@ -68,16 +68,18 @@ type InternalProps = {|
 
 type State = {|
   showSidebar: boolean,
+  mobileSidebar: boolean,
 |};
 
 class WithConditionalSidebar extends React.Component<InternalProps, State> {
   state: State = {
     showSidebar: false,
+    mobileSidebar: false,
   };
 
   onMenuToggle = () => {
     this.setState({
-      showSidebar: !this.state.showSidebar,
+      mobileSidebar: !this.state.mobileSidebar,
     });
   };
 
@@ -88,33 +90,37 @@ class WithConditionalSidebar extends React.Component<InternalProps, State> {
       return;
     }
 
-    if (!this.state.showSidebar) {
+    if (!this.state.mobileSidebar) {
       return;
     }
 
     this.setState({
-      showSidebar: false,
+      mobileSidebar: false,
     });
   };
 
   // Show the sidebar if moving into large view
   // Hide the sidebar is moving into small view
-  static getDerivedStateFromProps = (nextProps: InternalProps): State => ({
+  static getDerivedStateFromProps = (
+    nextProps: InternalProps,
+    state: State,
+  ): State => ({
     showSidebar: nextProps.isInLargeView,
+    mobileSidebar: state.mobileSidebar,
   });
 
   render() {
     const { examples, docs, internal, children, isInLargeView } = this.props;
-    const { showSidebar } = this.state;
+    const { showSidebar, mobileSidebar } = this.state;
 
-    const sidebar: Node = showSidebar ? (
-      <Sidebar examples={examples} docs={docs} internal={internal} />
-    ) : null;
+    const sidebar: Node =
+      showSidebar || mobileSidebar ? (
+        <Sidebar examples={examples} docs={docs} internal={internal} />
+      ) : null;
 
     const topbar: Node = isInLargeView ? null : (
       <MobileTopBar onMenuToggle={this.onMenuToggle} />
     );
-
     return (
       <React.Fragment>
         {sidebar}

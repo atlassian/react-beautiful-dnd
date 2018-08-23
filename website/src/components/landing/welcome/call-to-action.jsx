@@ -16,11 +16,11 @@ const ActionBox = styled.div`
   display: flex;
   align-items: center;
 
-  ${smallView.fn`
+  ${smallView.fn(`
     flex-direction: column;
     align-items: stretch;
     min-width: 60vw;
-  `};
+  `)};
 `;
 
 const linkBase = css`
@@ -39,6 +39,12 @@ const linkBase = css`
     text-decoration: none;
     color: ${colors.dark100};
   }
+
+  ${smallView.fn(`
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 8px;
+  `)};
 `;
 
 // const getColors = (base: string, active: string): string => `
