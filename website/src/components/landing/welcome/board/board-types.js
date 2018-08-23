@@ -1,6 +1,6 @@
 // @flow
 import { type Node } from 'react';
-import type { Id, QuoteMap } from '../../types';
+import type { Id, QuoteMap } from '../../../types';
 
 export type Column = {|
   id: Id,

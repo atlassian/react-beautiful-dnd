@@ -1,7 +1,7 @@
 // @flow
 import loveColumnHeader from './love-column-header';
-import { quotes, quoteMap } from '../../quotes';
-import type { Quote, Id } from '../../types';
+import { quotes, quoteMap } from '../../../quotes';
+import type { Quote, Id } from '../../../types';
 import type { Column, ColumnMap, Entities } from './board-types';
 
 const half: number = quotes.length / 2;

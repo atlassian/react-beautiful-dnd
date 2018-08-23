@@ -1,17 +1,17 @@
 // @flow
 import React from 'react';
 import styled from 'react-emotion';
-import { Draggable, Droppable } from '../../../../../src';
+import { Draggable, Droppable } from '../../../../../../src';
 import Quote from './quote';
-import { grid } from '../../../constants';
+import { grid } from '../../../../constants';
 import type {
   DroppableProvided,
   DraggableProvided,
   DroppableStateSnapshot,
   DraggableStateSnapshot,
-} from '../../../../../src';
+} from '../../../../../../src';
 import type { Column as ColumnType } from './board-types';
-import type { Quote as QuoteType } from '../../types';
+import type { Quote as QuoteType } from '../../../types';
 
 type InnerListProps = {|
   quotes: QuoteType[],

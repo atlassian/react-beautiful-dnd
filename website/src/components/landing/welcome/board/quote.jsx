@@ -1,13 +1,13 @@
 // @flow
 import React from 'react';
 import styled from 'react-emotion';
-import { Draggable } from '../../../../../src';
-import { grid } from '../../../constants';
+import { Draggable } from '../../../../../../src';
+import { grid } from '../../../../constants';
 import type {
   DraggableProvided,
   DraggableStateSnapshot,
-} from '../../../../../src';
-import type { Quote as QuoteType, Author as AuthorType } from '../../types';
+} from '../../../../../../src';
+import type { Quote as QuoteType, Author as AuthorType } from '../../../types';
 
 type Props = {|
   quote: QuoteType,

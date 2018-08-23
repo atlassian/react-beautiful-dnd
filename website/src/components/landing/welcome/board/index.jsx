@@ -1,17 +1,17 @@
 // @flow
 import React from 'react';
 import styled from 'react-emotion';
-import { DragDropContext, Droppable } from '../../../../../src';
+import { DragDropContext, Droppable } from '../../../../../../src';
 import Column from './column';
 import initial from './entities';
-import reorder from '../../reorder';
+import reorder from '../../../reorder';
 import type {
   DroppableProvided,
   DropResult,
   DraggableLocation,
-} from '../../../../../src';
+} from '../../../../../../src';
 import type { Entities, Column as ColumnType, ColumnMap } from './board-types';
-import type { Id, Quote } from '../../types';
+import type { Id, Quote } from '../../../types';
 
 type State = {|
   entities: Entities,
