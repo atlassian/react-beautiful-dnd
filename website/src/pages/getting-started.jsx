@@ -21,7 +21,7 @@ export default () => (
     <p>
       <Aye href={courseUrl}>
         <Logo />
-        <h2>Check out our egghead course to get started</h2>
+        <h2>Check out our free egghead course to get started</h2>
       </Aye>
     </p>
   </Layout>

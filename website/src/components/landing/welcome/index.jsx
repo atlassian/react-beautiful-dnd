@@ -9,6 +9,16 @@ import DraggableLogo from './draggable-logo';
 import { grid } from '../../../constants';
 import { smallView } from '../../media';
 
+const Brand = styled.div`
+  display: flex;
+  align-items: center;
+
+  ${smallView.fn(`
+    flex-direction: column;
+    margin-bottom: ${grid * 2}px;
+  `)};
+`;
+
 const Title = styled.h1`
   font-weight: normal;
   font-size: 40px;
@@ -16,8 +26,7 @@ const Title = styled.h1`
   padding-left: ${grid * 2}px;
 
   ${smallView.fn(`
-    text-align: center;
-    font-size: 10vw;
+    font-size: 8vw;
     white-space: nowrap;
   `)};
 `;
@@ -41,6 +50,7 @@ const SideBySide = styled.div`
   ${smallView.fn(`
     flex-direction: column;
     align-items: center;
+    padding-top: ${grid * 2}px;
   `)};
 `;
 
@@ -68,32 +78,29 @@ const Example = styled.div`
   ${smallView.fn(`${verticalSpacing}`)};
 `;
 
-const Brand = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
 export default () => (
-  <SideBySide>
-    <Content>
-      <Brand>
-        <DraggableLogo />
-        <Title>react-beautiful-dnd</Title>
-      </Brand>
-      <Tagline>
-        Beautiful and accessible drag and drop for lists with React{' '}
-      </Tagline>
-      <VerticalRhythm>
-        <CallToAction />
-      </VerticalRhythm>
-      <VerticalRhythm>
-        <SocialIcons />
-      </VerticalRhythm>
-    </Content>
-    <Example>
-      <Media query={smallView.negatedQuery}>
-        {(matches: boolean) => <Board numberOfColumns={matches ? 2 : 1} />}
-      </Media>
-    </Example>
-  </SideBySide>
+  <Media query={smallView.query}>
+    {(isSmall: boolean) => (
+      <SideBySide>
+        <Content>
+          <Brand>
+            <DraggableLogo />
+            <Title>react-beautiful-dnd</Title>
+          </Brand>
+          <Tagline>
+            Beautiful and accessible drag and drop for lists with React{' '}
+          </Tagline>
+          <VerticalRhythm>
+            <CallToAction isSmallView={isSmall} />
+          </VerticalRhythm>
+          <VerticalRhythm>
+            <SocialIcons />
+          </VerticalRhythm>
+        </Content>
+        <Example>
+          <Board numberOfColumns={isSmall ? 1 : 2} />
+        </Example>
+      </SideBySide>
+    )}
+  </Media>
 );

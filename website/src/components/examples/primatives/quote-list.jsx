@@ -14,7 +14,6 @@ import type {
 } from '../../../../../src';
 
 const Wrapper = styled.div`
-    isDraggingOver ? 'skyblue' : 'lightblue'};
   display: flex;
   flex-direction: column;
   opacity: ${({ isDropDisabled }) => (isDropDisabled ? 0.5 : 'inherit')};

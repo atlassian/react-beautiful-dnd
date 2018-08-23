@@ -20,6 +20,7 @@ const ActionBox = styled.div`
     flex-direction: column;
     align-items: stretch;
     min-width: 60vw;
+    text-align: center;
   `)};
 `;
 
@@ -46,32 +47,6 @@ const linkBase = css`
     margin-bottom: 8px;
   `)};
 `;
-
-// const getColors = (base: string, active: string): string => `
-//   background-color: ${base};
-
-//   :hover,
-//   :active {
-//     background-color: ${active};
-//   }
-// `;
-
-// const GetStartedLink = styled(ActionLink)`
-//   margin-left: 0;
-//   ${getColors(colors.blue400, colors.blue500)};
-// `;
-
-// const DocumentationLink = styled(ActionLink)`
-//   ${getColors(colors.green400, colors.green500)};
-// `;
-
-// const ExampleLink = styled(ActionLink)`
-//   ${getColors(colors.purple400, colors.purple500)};
-
-//   ${smallView.fn`
-//     margin-bottom: 0;
-//   `};
-// `;
 
 type Entry = {|
   id: string,
@@ -149,11 +124,15 @@ const initial: Entry[] = [
   },
 ];
 
+type Props = {|
+  isSmallView: boolean,
+|};
+
 type State = {|
   entries: Entry[],
 |};
 
-export default class CallToAction extends React.Component<*, State> {
+export default class CallToAction extends React.Component<Props, State> {
   state: State = {
     entries: initial,
   };
@@ -172,9 +151,10 @@ export default class CallToAction extends React.Component<*, State> {
   };
 
   render() {
+    const direction = this.props.isSmallView ? 'vertical' : 'horizontal';
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
-        <Droppable droppableId="droppable" direction="horizontal">
+        <Droppable droppableId="droppable" direction={direction}>
           {(provided: DroppableProvided) => (
             <ActionBox
               {...provided.droppableProps}

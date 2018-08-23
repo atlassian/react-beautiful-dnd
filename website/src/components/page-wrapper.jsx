@@ -10,6 +10,7 @@ import { grid, sidebarWidth, colors, contentWidth } from '../constants';
 require('prism-themes/themes/prism-a11y-dark.css');
 
 const gutter: number = grid * 2;
+const sectionGap: number = grid * 4;
 
 const Content = styled.div`
   background: ${colors.dark400};
@@ -26,15 +27,38 @@ const Content = styled.div`
 
 const ContentSpacing = styled.div`
   max-width: ${contentWidth}px;
-  margin-top: ${grid * 4}px;
+  margin-top: ${sectionGap}px;
   width: 100%;
   min-height: 100vh;
-  padding: ${grid * 4}px;
+  padding: ${sectionGap}px;
 
   /* This should be applied only within Content */
   a {
     color: ${colors.green400};
     font-weight: bold;
+  }
+
+  blockquote {
+    padding: 0 ${gutter}px;
+    color: ${colors.dark200};
+    border-left: ${grid / 2}px solid ${colors.dark300};
+    margin: ${sectionGap}px 0;
+  }
+  blockquote::before,
+  blockquote::after {
+    content: '';
+  }
+
+  /* code blocks */
+  pre[class*='language-'] {
+    margin: ${sectionGap}px 0;
+  }
+
+  /* inline code */
+  .language-text {
+    display: inline-block;
+    padding: 0 ${grid / 2}px;
+    margin: 0 ${grid / 2}px;
   }
 `;
 

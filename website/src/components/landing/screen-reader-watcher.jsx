@@ -1,8 +1,9 @@
 // @flow
 import React from 'react';
 import styled from 'react-emotion';
-import FeedbackIcon from '@atlaskit/icon/glyph/feedback';
 import { grid } from '../../constants';
+
+const FeedbackIcon = () => 'TODO';
 
 const isMutationObserverSupported: boolean =
   typeof MutationObserver !== 'undefined';
