@@ -146,6 +146,15 @@ export default ({ docs, examples }: Props) => (
       <Heading />
     </Section>
     <Section>
+      <NavItem
+        key="getting-started"
+        href="/getting-started"
+        title="Getting Started"
+        isTitle
+        hoverColor={colors.blue500}
+      />
+    </Section>
+    <Section>
       <DocsSection
         pages={docs.edges}
         sectionTitle="Guides"
