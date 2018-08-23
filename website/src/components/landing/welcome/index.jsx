@@ -6,7 +6,7 @@ import Board from './board';
 import CallToAction from './call-to-action';
 import SocialIcons from './social-icons';
 import DraggableLogo from './draggable-logo';
-import { grid } from '../../../constants';
+import { grid, gutter } from '../../../constants';
 import { smallView } from '../../media';
 
 const Brand = styled.div`
@@ -15,7 +15,7 @@ const Brand = styled.div`
 
   ${smallView.fn(`
     flex-direction: column;
-    margin-bottom: ${grid * 2}px;
+    margin-bottom: ${gutter.normal}px;
   `)};
 `;
 
@@ -23,7 +23,7 @@ const Title = styled.h1`
   font-weight: normal;
   font-size: 40px;
   margin: 0;
-  padding-left: ${grid * 2}px;
+  padding-left: ${gutter.normal}px;
 
   ${smallView.fn(`
     font-size: 8vw;
@@ -50,11 +50,11 @@ const SideBySide = styled.div`
   ${smallView.fn(`
     flex-direction: column;
     align-items: center;
-    padding-top: ${grid * 2}px;
+    padding-top: ${gutter.normal}px;
   `)};
 `;
 
-const verticalSpacing = `margin-top: ${grid * 4}px;`;
+const verticalSpacing = `margin-top: ${gutter.large}px;`;
 
 const VerticalRhythm = styled.div`
   ${verticalSpacing};
@@ -79,8 +79,8 @@ const Example = styled.div`
 `;
 
 export default () => (
-  <Media query={smallView.query}>
-    {(isSmall: boolean) => (
+  <Media query={smallView.negatedQuery}>
+    {(isLarge: boolean) => (
       <SideBySide>
         <Content>
           <Brand>
@@ -91,15 +91,13 @@ export default () => (
             Beautiful and accessible drag and drop for lists with React{' '}
           </Tagline>
           <VerticalRhythm>
-            <CallToAction isSmallView={isSmall} />
+            <CallToAction isSmallView={!isLarge} />
           </VerticalRhythm>
           <VerticalRhythm>
             <SocialIcons />
           </VerticalRhythm>
         </Content>
-        <Example>
-          <Board numberOfColumns={isSmall ? 1 : 2} />
-        </Example>
+        <Example>{isLarge ? <Board /> : null}</Example>
       </SideBySide>
     )}
   </Media>

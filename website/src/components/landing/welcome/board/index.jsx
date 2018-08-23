@@ -10,6 +10,7 @@ import type {
   DropResult,
   DraggableLocation,
 } from '../../../../../../src';
+import { smallView } from '../../../media';
 import type { Entities, Column as ColumnType, ColumnMap } from './board-types';
 import type { Id, Quote } from '../../../types';
 
@@ -25,6 +26,12 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-start;
+
+  /* Board should not be rendered on small devices */
+  /* But for SSR we need to render it - so we will just hide it */
+  ${smallView.fn(`
+    display: none;
+  `)};
 `;
 
 const withQuotes = (column: ColumnType, quoteIds: Id[]): ColumnType => {

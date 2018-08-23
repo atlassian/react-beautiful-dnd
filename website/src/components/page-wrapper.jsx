@@ -5,17 +5,16 @@ import Media from 'react-media';
 import Sidebar from './sidebar';
 import type { sitePage, docsPage } from './types';
 import { smallView } from './media';
-import { grid, sidebarWidth, colors, contentWidth } from '../constants';
+import { grid, gutter, sidebarWidth, colors, contentWidth } from '../constants';
 
 require('prism-themes/themes/prism-a11y-dark.css');
 
-const gutter: number = grid * 2;
-const sectionGap: number = grid * 4;
+const sectionGap: number = gutter.large;
 
 const Content = styled.div`
   background: ${colors.dark400};
-  margin-left: ${sidebarWidth + gutter}px;
-  margin-right: ${gutter}px;
+  margin-left: ${sidebarWidth + gutter.normal}px;
+  margin-right: ${gutter.normal}px;
   display: flex;
   justify-content: center;
   color: ${colors.dark100};
@@ -27,10 +26,11 @@ const Content = styled.div`
 
 const ContentSpacing = styled.div`
   max-width: ${contentWidth}px;
-  margin-top: ${sectionGap}px;
-  width: 100%;
-  min-height: 100vh;
   padding: ${sectionGap}px;
+  padding-top: ${sectionGap}px;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 100vh;
 
   /* This should be applied only within Content */
   a {

@@ -27,9 +27,13 @@ export const colors = {
   purple300: '#723874',
 };
 
-export const grid: number = 8;
 export const borderRadius: number = 2;
 export const sidebarWidth: number = 250;
 export const contentWidth: number = 960;
 export const lineHeight: number = 1.5;
 export const fontSizeEm: number = 1.2;
+export const grid: number = 8;
+export const gutter = {
+  normal: grid * 2,
+  large: grid * 4,
+};
