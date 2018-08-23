@@ -10,6 +10,21 @@ export const colors = {
   dark200: '#9D9DB7',
   // headings, text color
   dark100: '#D6DBF3',
+
+  // blues
+  blue500: '#004178',
+  blue400: '#1573C8',
+  blue300: '#29BCF3',
+
+  // greens
+  green500: '#033F55',
+  green400: '#00C584',
+  green300: '#00FFAD',
+
+  // purples / reds
+  purple500: '#4C0D31',
+  purple400: '#982957',
+  purple300: '#723874',
 };
 
 export const grid: number = 8;

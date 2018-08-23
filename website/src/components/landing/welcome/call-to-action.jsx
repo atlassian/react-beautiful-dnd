@@ -5,9 +5,9 @@ import SendIcon from '@atlaskit/icon/glyph/send';
 import BookIcon from '@atlaskit/icon/glyph/book';
 import EditIcon from '@atlaskit/icon/glyph/edit';
 import styled from 'react-emotion';
-import { grid } from '../../constants';
-import { shake } from '../animations';
-import { smallView } from '../media';
+import { grid } from '../../../constants';
+import { shake } from '../../animations';
+import { smallView } from '../../media';
 
 const ActionBox = styled.div`
   display: flex;

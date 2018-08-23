@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'react-emotion';
 import GithubIcon from 'react-icons/lib/fa/github';
 import TwitterIcon from 'react-icons/lib/fa/twitter';
-import { grid } from '../../constants';
+import { grid } from '../../../constants';
 
 const Container = styled.div`
   display: flex;
