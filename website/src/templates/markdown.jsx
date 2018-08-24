@@ -4,7 +4,8 @@ import { graphql } from 'gatsby';
 import styled from 'react-emotion';
 import EditIcon from 'react-icons/lib/fa/pencil';
 import Layout from '../components/layouts';
-import { colors, grid } from '../constants';
+import { colors, grid, gutter } from '../constants';
+import { smallView } from '../components/media';
 
 type Data = {
   markdownRemark: {
@@ -26,6 +27,11 @@ const EditLink = styled.a`
   float: right;
   display: flex;
   align-items: center;
+
+  ${smallView.fn(`
+    float: none;
+    margin-bottom: ${gutter.normal}px;
+  `)};
 `;
 
 const EditText = styled.span`

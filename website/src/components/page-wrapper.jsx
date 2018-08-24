@@ -64,6 +64,10 @@ const ContentSpacing = styled.div`
     max-width: 100%;
     margin: ${sectionGap}px 0;
   }
+
+  h1 {
+    margin-bottom: ${sectionGap}px;
+  }
 `;
 
 const StyledButton = styled('button')`

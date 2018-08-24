@@ -110,7 +110,6 @@ export default ({ docs, examples }: Props) => (
     <Heading />
     <Section>
       <Link
-        key="get-started"
         to="/get-started"
         style={{ paddingLeft: 0 }}
         className={linkClassName(colors.blue500)}

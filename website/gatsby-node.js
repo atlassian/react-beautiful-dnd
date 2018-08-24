@@ -93,20 +93,25 @@ const addMD = async ({ getNode, node, createNodeField }) => {
   const fileNode = getNode(node.parent);
   const parsedFilePath = path.parse(fileNode.relativePath);
 
-  const directory = parsedFilePath.dir.toLowerCase();
-  const slug = `/${directory}/${parsedFilePath.name.toLowerCase()}`;
+  const directory = parsedFilePath.dir
+    ? parsedFilePath.dir.toLowerCase()
+    : null;
+
+  const filename = parsedFilePath.name.toLowerCase();
+  const slug = directory ? `/${directory}/${filename}` : `/${filename}`;
+
   const title = (() => {
     const base = lowerCase(parsedFilePath.name);
-    if (directory !== 'api') {
-      return capitalise(base);
+    if (directory === 'api') {
+      const camel = base
+        .split(' ')
+        .map(capitalise)
+        .join('');
+
+      return `<${camel} />`;
     }
 
-    const camel = base
-      .split(' ')
-      .map(capitalise)
-      .join('');
-
-    return `<${camel} />`;
+    return capitalise(base);
   })();
 
   // The fileNode.relativePath gives us the path relative to the website
@@ -197,10 +202,12 @@ exports.onCreatePage = async ({ page, actions } /* : PageParams  */) => {
 
   return new Promise(resolve => {
     if (page.path === '/') {
+      // TODO: is this needed?
       page.layout = 'landing';
       // Update the page.
       createPage(page);
     } else if (page.path.match(/^\/(examples|internal)\/./)) {
+      // TODO: is this needed?
       page.layout = 'example';
       createPage(page);
     }
