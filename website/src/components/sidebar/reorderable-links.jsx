@@ -1,45 +1,25 @@
 // @flow
 import React from 'react';
-import styled, { css } from 'react-emotion';
 import { Link } from 'gatsby';
-import { grid, gutter, colors } from '../../constants';
 import reorder from '../reorder';
 import type { NavLink } from './sidebar-types';
 import { Draggable, Droppable, DragDropContext } from '../../../../src';
+import { linkClassName, isActiveClassName } from './link-class-name';
 import type {
   DraggableProvided,
   DroppableProvided,
   DropResult,
 } from '../../../../src';
 
-const base = ({ isActive, hoverColor }) => css`
-  color: ${colors.dark200};
-  display: block;
-  padding: ${grid}px;
-  padding-left: ${grid * 3}px;
-
-  background-color: ${isActive ? hoverColor : 'inherit'};
-  transition: background-color ease 0.2s, color ease 0.2s;
-
-  :hover,
-  :active,
-  :focus {
-    color: ${colors.dark100};
-    background-color: ${hoverColor};
-    text-decoration: none;
-  }
-`;
-
 type NavLinkItemProps = {|
   link: NavLink,
   index: number,
-  isActive: boolean,
   hoverColor: string,
 |};
 
 class NavLinkItem extends React.Component<NavLinkItemProps> {
   render() {
-    const { link, isActive, index, hoverColor } = this.props;
+    const { link, index, hoverColor } = this.props;
     return (
       <Draggable draggableId={link.href} index={index}>
         {(provided: DraggableProvided) => (
@@ -48,7 +28,8 @@ class NavLinkItem extends React.Component<NavLinkItemProps> {
             {...provided.dragHandleProps}
             innerRef={provided.innerRef}
             to={link.href}
-            className={base({ isActive, hoverColor })}
+            className={linkClassName(hoverColor)}
+            activeClassName={isActiveClassName(hoverColor)}
           >
             {link.title}
           </Link>
@@ -58,29 +39,20 @@ class NavLinkItem extends React.Component<NavLinkItemProps> {
   }
 }
 
-type SectionProps = {|
-  title: string,
-  hoverColor: string,
-  links: NavLink[],
-|};
-
-const Title = styled.h3`
-  font-size: 20px;
-  padding: ${grid}px;
-  padding-left: ${gutter.normal}px;
-`;
-
-type LinkListProps = {|
+type ReorderableLinksProps = {|
   links: NavLink[],
   hoverColor: string,
 |};
 
-type LinkListState = {|
+type ReorderableLinksState = {|
   ordered: NavLink[],
 |};
 
-class LinkList extends React.Component<LinkListProps, LinkListState> {
-  state: LinkListState = {
+export default class ReorderableLinks extends React.Component<
+  ReorderableLinksProps,
+  ReorderableLinksState,
+> {
+  state: ReorderableLinksState = {
     ordered: this.props.links,
   };
 
@@ -108,7 +80,6 @@ class LinkList extends React.Component<LinkListProps, LinkListState> {
                 <NavLinkItem
                   key={link.href}
                   link={link}
-                  isActive={window.location.pathname === link.href}
                   hoverColor={this.props.hoverColor}
                   index={index}
                 />
@@ -118,17 +89,6 @@ class LinkList extends React.Component<LinkListProps, LinkListState> {
           )}
         </Droppable>
       </DragDropContext>
-    );
-  }
-}
-
-export default class ReorderableSection extends React.Component<SectionProps> {
-  render() {
-    return (
-      <React.Fragment>
-        <Title>{this.props.title}</Title>
-        <LinkList links={this.props.links} hoverColor={this.props.hoverColor} />
-      </React.Fragment>
     );
   }
 }

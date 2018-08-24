@@ -1,13 +1,14 @@
 // @flow
 import React from 'react';
 import { Link } from 'gatsby';
-import styled, { css } from 'react-emotion';
-import { grid, sidebarWidth, colors } from '../../constants';
+import styled from 'react-emotion';
+import { grid, sidebarWidth, colors, gutter } from '../../constants';
 import type { DocsPage, MarkdownPage, SitePage } from '../types';
 import { getTitleFromExamplePath } from '../../utils';
 import Heading from './heading';
 import type { NavLink } from './sidebar-types';
-import ReorderableSection from './reorderable-section';
+import ReorderableLinks from './reorderable-links';
+import { linkClassName, isActiveClassName } from './link-class-name';
 
 const Sidebar = styled.div`
   height: 100vh;
@@ -40,54 +41,11 @@ const Section = styled.div`
 `;
 
 const Title = styled.h3`
+  color: ${colors.dark100};
   font-size: 20px;
   padding: ${grid}px;
-  padding-left: ${grid * 2}px;
+  padding-left: ${gutter.normal}px;
 `;
-const Item = styled.h4`
-  padding: ${grid}px;
-  padding-left: ${grid * 3}px;
-`;
-
-const StyledLink = styled(Link)`
-  color: ${colors.dark200};
-  transition: background-color ease 0.2s, color ease 0.2s;
-
-  ${props =>
-    props.isActiveLink
-      ? css`
-          color: ${colors.dark100};
-          background: ${props.hoverColor};
-          text-decoration: none;
-        `
-      : ''} :hover, :active, :focus {
-    color: ${colors.dark100};
-    background: ${props => props.hoverColor};
-    text-decoration: none;
-  }
-`;
-
-type NavItemProps = {|
-  href: string,
-  title: string,
-  hoverColor: string,
-  isTitle?: boolean,
-|};
-
-const NavItem = ({ isTitle, href, title, hoverColor }: NavItemProps) => {
-  const isActiveLink = window.location.pathname === href;
-  const Wrapper = isTitle ? Title : Item;
-  return (
-    <StyledLink
-      hoverColor={hoverColor}
-      to={href}
-      href={href}
-      isActiveLink={isActiveLink}
-    >
-      <Wrapper>{title}</Wrapper>
-    </StyledLink>
-  );
-};
 
 type NavFromUrlsProps = {
   examples: SitePage,
@@ -107,11 +65,10 @@ const ExampleSection = ({ examples, title }: NavFromUrlsProps) => {
   );
 
   return (
-    <ReorderableSection
-      title={title}
-      links={links}
-      hoverColor={colors.blue300}
-    />
+    <Section>
+      <Title>{title}</Title>
+      <ReorderableLinks links={links} hoverColor={colors.blue300} />
+    </Section>
   );
 };
 
@@ -141,11 +98,10 @@ const DocsSection = ({ title, pages, directory }: DocsSectionProps) => {
     );
 
   return (
-    <ReorderableSection
-      title={title}
-      links={links}
-      hoverColor={colors.purple300}
-    />
+    <Section>
+      <Title>{title}</Title>
+      <ReorderableLinks links={links} hoverColor={colors.purple300} />
+    </Section>
   );
 };
 
@@ -155,22 +111,18 @@ export default ({ docs, examples }: Props) => (
       <Heading />
     </Section>
     <Section>
-      <NavItem
+      <Link
         key="get-started"
-        href="/get-started"
-        title="Get Started"
-        isTitle
-        hoverColor={colors.blue500}
-      />
+        to="/get-started"
+        style={{ paddingLeft: 0 }}
+        className={linkClassName(colors.blue500)}
+        activeClassName={isActiveClassName(colors.blue500)}
+      >
+        <Title>Get started</Title>
+      </Link>
     </Section>
-    <Section>
-      <DocsSection pages={docs.edges} title="Guides" directory="guides" />
-    </Section>
-    <Section>
-      <DocsSection pages={docs.edges} title="API" directory="api" />
-    </Section>
-    <Section>
-      <ExampleSection examples={examples} title="Examples" />
-    </Section>
+    <DocsSection pages={docs.edges} title="Guides" directory="guides" />
+    <DocsSection pages={docs.edges} title="API" directory="api" />
+    <ExampleSection examples={examples} title="Examples" />
   </Sidebar>
 );
