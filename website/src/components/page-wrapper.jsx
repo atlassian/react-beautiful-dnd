@@ -60,6 +60,10 @@ const ContentSpacing = styled.div`
     padding: 0 ${grid / 2}px;
     margin: 0 ${grid / 2}px;
   }
+  img {
+    max-width: 100%;
+    margin: ${sectionGap}px 0;
+  }
 `;
 
 type MobileTopBarProps = {|
