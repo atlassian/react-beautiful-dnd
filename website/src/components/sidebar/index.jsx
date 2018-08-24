@@ -7,7 +7,7 @@ import type { DocsPage, MarkdownPage, SitePage } from '../types';
 import { getTitleFromExamplePath } from '../../utils';
 import Heading from './heading';
 import type { NavLink } from './sidebar-types';
-import ReorderableLinks from './reorderable-links';
+import LinkList from './link-list';
 import spacing from './spacing';
 import { linkClassName, isActiveClassName } from './link-class-name';
 
@@ -67,7 +67,7 @@ const ExampleSection = ({ examples, title }: NavFromUrlsProps) => {
   return (
     <Section>
       <Title>{title}</Title>
-      <ReorderableLinks links={links} hoverColor={colors.blue500} />
+      <LinkList links={links} hoverColor={colors.blue500} />
     </Section>
   );
 };
@@ -100,7 +100,7 @@ const DocsSection = ({ title, pages, directory }: DocsSectionProps) => {
   return (
     <Section>
       <Title>{title}</Title>
-      <ReorderableLinks links={links} hoverColor={colors.purple300} />
+      <LinkList links={links} hoverColor={colors.purple300} />
     </Section>
   );
 };

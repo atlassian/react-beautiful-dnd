@@ -2,7 +2,9 @@
 import React from 'react';
 import { graphql } from 'gatsby';
 import styled from 'react-emotion';
+import EditIcon from 'react-icons/lib/fa/pencil';
 import Layout from '../components/layouts';
+import { colors, grid } from '../constants';
 
 type Data = {
   markdownRemark: {
@@ -20,13 +22,22 @@ type Props = {
   },
 };
 
-const Link = styled.a`
+const EditLink = styled.a`
   float: right;
+  display: flex;
+  align-items: center;
+`;
+
+const EditText = styled.span`
+  padding-left: ${grid}px;
 `;
 
 export default ({ data, location }: Props) => (
   <Layout location={location}>
-    <Link href={data.markdownRemark.fields.gitUrl}>Edit these docs</Link>
+    <EditLink href={data.markdownRemark.fields.gitUrl}>
+      <EditIcon height={20} width={20} color={colors.dark200} />{' '}
+      <EditText>edit these docs</EditText>
+    </EditLink>
     {/* eslint-disable-next-line react/no-danger */}
     <div dangerouslySetInnerHTML={{ __html: data.markdownRemark.html }} />
   </Layout>
