@@ -10,7 +10,12 @@ const favicon32 = require('./src/assets/favicon-32x32.png');
 
 exports.onRenderBody = ({ setHeadComponents }: renderBodyParams) =>
   setHeadComponents([
-    <link rel="shortcut icon" type="image/x-icon" href={faviconIco} />,
-    <link rel="icon" href={favicon16} />,
-    <link rel="icon" href={favicon32} />,
+    <link
+      key="ie-favicon"
+      rel="shortcut icon"
+      type="image/x-icon"
+      href={faviconIco}
+    />,
+    <link key="small-favicon" rel="icon" href={favicon16} />,
+    <link key="large-favicon" rel="icon" href={favicon32} />,
   ]);
