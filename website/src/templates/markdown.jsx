@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
 import { graphql } from 'gatsby';
+import styled from 'react-emotion';
 import Layout from '../components/layouts';
 
 type Data = {
@@ -19,9 +20,13 @@ type Props = {
   },
 };
 
+const Link = styled.a`
+  float: right;
+`;
+
 export default ({ data, location }: Props) => (
   <Layout location={location}>
-    <a href={data.markdownRemark.fields.gitUrl}>Edit these docs</a>
+    <Link href={data.markdownRemark.fields.gitUrl}>Edit these docs</Link>
     <div dangerouslySetInnerHTML={{ __html: data.markdownRemark.html }} />
   </Layout>
 );
