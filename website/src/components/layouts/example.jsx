@@ -1,7 +1,7 @@
 // @flow
 import React, { type Node } from 'react';
 import { StaticQuery, graphql } from 'gatsby';
-import ExampleWrapper, { gatsbyUrlToCSBPath } from '../ExampleWrapper';
+import ExampleWrapper, { gatsbyUrlToCSBPath } from '../example-wrapper';
 import CommonPage from '../common-page';
 import PageWrapper from '../page-wrapper';
 import { getTitleFromExamplePath } from '../../utils';
