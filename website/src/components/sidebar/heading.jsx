@@ -4,6 +4,7 @@ import { Link } from 'gatsby';
 import styled from 'react-emotion';
 import GithubIcon from 'react-icons/lib/fa/github';
 import { grid, colors, gutter } from '../../constants';
+import spacing from './spacing';
 import Logo from '../logo';
 
 const iconSize: number = grid * 4;
@@ -21,7 +22,7 @@ const transitionColor = `transition: color 0.2s ease`;
 const HomeLink = styled(Link)`
   padding: ${gutter.normal}px;
   /* same as a section */
-  padding-top: ${grid * 3}px;
+  padding-top: ${spacing.top}px;
   color: ${colors.green400};
   ${transitionColor};
   :hover,
@@ -50,7 +51,7 @@ const GithubLink = styled.a`
   color: ${colors.dark100};
   padding: ${gutter.normal}px;
   /* same as a section */
-  padding-top: ${grid * 3}px;
+  padding-top: ${spacing.top}px;
   ${transitionColor};
 
   :hover,

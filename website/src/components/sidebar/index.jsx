@@ -8,6 +8,7 @@ import { getTitleFromExamplePath } from '../../utils';
 import Heading from './heading';
 import type { NavLink } from './sidebar-types';
 import ReorderableLinks from './reorderable-links';
+import spacing from './spacing';
 import { linkClassName, isActiveClassName } from './link-class-name';
 
 const Sidebar = styled.div`
@@ -18,7 +19,7 @@ const Sidebar = styled.div`
   left: 0;
   top: 0;
   overflow: auto;
-  padding-bottom: ${grid * 2}px;
+  padding-bottom: ${spacing.side}px;
   background: ${colors.dark500};
 
   ::-webkit-scrollbar {
@@ -35,7 +36,7 @@ const Sidebar = styled.div`
 `;
 
 const Section = styled.div`
-  margin-top: ${grid * 3}px;
+  margin-top: ${spacing.top}px;
   display: flex;
   flex-direction: column;
 `;
@@ -43,8 +44,7 @@ const Section = styled.div`
 const Title = styled.h3`
   color: ${colors.dark100};
   font-size: 20px;
-  padding: ${grid}px;
-  padding-left: ${gutter.normal}px;
+  padding: ${grid}px ${spacing.side}px;
 `;
 
 type NavFromUrlsProps = {
