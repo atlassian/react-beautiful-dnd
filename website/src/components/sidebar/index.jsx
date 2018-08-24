@@ -67,7 +67,7 @@ const ExampleSection = ({ examples, title }: NavFromUrlsProps) => {
   return (
     <Section>
       <Title>{title}</Title>
-      <ReorderableLinks links={links} hoverColor={colors.blue300} />
+      <ReorderableLinks links={links} hoverColor={colors.blue500} />
     </Section>
   );
 };
