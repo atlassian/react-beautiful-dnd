@@ -107,9 +107,7 @@ const DocsSection = ({ title, pages, directory }: DocsSectionProps) => {
 
 export default ({ docs, examples }: Props) => (
   <Sidebar>
-    <Section>
-      <Heading />
-    </Section>
+    <Heading />
     <Section>
       <Link
         key="get-started"
