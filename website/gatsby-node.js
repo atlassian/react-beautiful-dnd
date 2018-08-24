@@ -7,9 +7,13 @@
 const path = require('path');
 const lowerCase = require('lodash.lowercase');
 const fs = require('fs');
+const findUp = require('find-up');
+
+const gitUrlBase =
+  'https://github.com/atlassian/react-beautiful-dnd/edit/master';
 
 /* ::
-type fileNode = { relativePath: string }
+type fileNode = { relativePath: string, absolutePath: string }
 
 type BaseNode = {
   internal: {
@@ -78,7 +82,7 @@ type PageParams = {
 }
 */
 
-const addMD = ({ getNode, node, createNodeField }) => {
+const addMD = async ({ getNode, node, createNodeField }) => {
   const fileNode = getNode(node.parent);
   const parsedFilePath = path.parse(fileNode.relativePath);
   let slug = '';
@@ -92,9 +96,22 @@ const addMD = ({ getNode, node, createNodeField }) => {
     title = lowerCase(parsedFilePath.name);
   }
 
+  // The fileNode.relativePath gives us the path relative to the website
+  // directory while we need it relative to git root.
+  const pkgRoot = findUp.sync('.git');
+  const relativePath = path.relative(
+    path.dirname(pkgRoot),
+    fileNode.absolutePath,
+  );
+
   title = title.charAt(0).toUpperCase() + title.slice(1);
 
   createNodeField({ node, name: 'slug', value: slug });
+  createNodeField({
+    node,
+    name: 'gitUrl',
+    value: `${gitUrlBase}/${relativePath}`,
+  });
   createNodeField({ node, name: 'title', value: title });
   createNodeField({
     node,
