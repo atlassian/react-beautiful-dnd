@@ -2,12 +2,13 @@
 import React from 'react';
 import { Link } from 'gatsby';
 import styled from 'react-emotion';
-import { grid, sidebarWidth, colors, gutter } from '../../constants';
+import { grid, sidebarWidth, colors } from '../../constants';
 import type { DocsPage, MarkdownPage, SitePage } from '../types';
 import { getTitleFromExamplePath } from '../../utils';
 import Heading from './heading';
 import type { NavLink } from './sidebar-types';
 import ReorderableLinks from './reorderable-links';
+import spacing from './spacing';
 import { linkClassName, isActiveClassName } from './link-class-name';
 
 const Sidebar = styled.div`
@@ -18,7 +19,7 @@ const Sidebar = styled.div`
   left: 0;
   top: 0;
   overflow: auto;
-  padding-bottom: ${grid * 2}px;
+  padding-bottom: ${spacing.side}px;
   background: ${colors.dark500};
 
   ::-webkit-scrollbar {
@@ -26,16 +27,16 @@ const Sidebar = styled.div`
   }
 
   ::-webkit-scrollbar-track {
-    background-color: pink;
+    background-color: ${colors.purple500};
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: darkgrey;
+    background-color: ${colors.purple400};
   }
 `;
 
 const Section = styled.div`
-  margin-top: ${grid * 3}px;
+  margin-top: ${spacing.top}px;
   display: flex;
   flex-direction: column;
 `;
@@ -43,8 +44,7 @@ const Section = styled.div`
 const Title = styled.h3`
   color: ${colors.dark100};
   font-size: 20px;
-  padding: ${grid}px;
-  padding-left: ${gutter.normal}px;
+  padding: ${grid}px ${spacing.side}px;
 `;
 
 type NavFromUrlsProps = {
@@ -107,9 +107,7 @@ const DocsSection = ({ title, pages, directory }: DocsSectionProps) => {
 
 export default ({ docs, examples }: Props) => (
   <Sidebar>
-    <Section>
-      <Heading />
-    </Section>
+    <Heading />
     <Section>
       <Link
         key="get-started"
