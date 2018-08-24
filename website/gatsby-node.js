@@ -82,19 +82,32 @@ type PageParams = {
 }
 */
 
+const capitalise = value => {
+  if (!value) {
+    return value;
+  }
+  return value.charAt(0).toUpperCase() + value.slice(1);
+};
+
 const addMD = async ({ getNode, node, createNodeField }) => {
   const fileNode = getNode(node.parent);
   const parsedFilePath = path.parse(fileNode.relativePath);
-  let slug = '';
-  let title = '';
-  if (parsedFilePath.dir) {
-    slug += `/${parsedFilePath.dir.toLowerCase()}`;
-    title = lowerCase(parsedFilePath.dir);
-  }
-  if (parsedFilePath.name !== 'index') {
-    slug += `/${parsedFilePath.name.toLowerCase()}`;
-    title = lowerCase(parsedFilePath.name);
-  }
+
+  const directory = parsedFilePath.dir.toLowerCase();
+  const slug = `/${directory}/${parsedFilePath.name.toLowerCase()}`;
+  const title = (() => {
+    const base = lowerCase(parsedFilePath.name);
+    if (directory !== 'api') {
+      return capitalise(base);
+    }
+
+    const camel = base
+      .split(' ')
+      .map(capitalise)
+      .join('');
+
+    return `<${camel} />`;
+  })();
 
   // The fileNode.relativePath gives us the path relative to the website
   // directory while we need it relative to git root.
@@ -103,8 +116,6 @@ const addMD = async ({ getNode, node, createNodeField }) => {
     path.dirname(pkgRoot),
     fileNode.absolutePath,
   );
-
-  title = title.charAt(0).toUpperCase() + title.slice(1);
 
   createNodeField({ node, name: 'slug', value: slug });
   createNodeField({
@@ -116,7 +127,7 @@ const addMD = async ({ getNode, node, createNodeField }) => {
   createNodeField({
     node,
     name: 'dir',
-    value: parsedFilePath.dir.toLowerCase(),
+    value: directory,
   });
 };
 

@@ -18,11 +18,9 @@ const Aye = styled.a`
 
 export default () => (
   <Layout>
-    <p>
-      <Aye href={courseUrl}>
-        <Logo />
-        <h2>Check out our free egghead course to get started</h2>
-      </Aye>
-    </p>
+    <Aye href={courseUrl}>
+      <Logo />
+      <h2>Check out our free egghead course to get started</h2>
+    </Aye>
   </Layout>
 );

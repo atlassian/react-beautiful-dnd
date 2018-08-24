@@ -27,6 +27,7 @@ const Link = styled.a`
 export default ({ data, location }: Props) => (
   <Layout location={location}>
     <Link href={data.markdownRemark.fields.gitUrl}>Edit these docs</Link>
+    {/* eslint-disable-next-line react/no-danger */}
     <div dangerouslySetInnerHTML={{ __html: data.markdownRemark.html }} />
   </Layout>
 );

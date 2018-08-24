@@ -3,7 +3,7 @@ import React, { type Node } from 'react';
 import styled from 'react-emotion';
 import Media from 'react-media';
 import Sidebar from './sidebar';
-import type { sitePage, docsPage } from './types';
+import type { SitePage, DocsPage } from './types';
 import { smallView } from './media';
 import { grid, gutter, sidebarWidth, colors, contentWidth } from '../constants';
 
@@ -32,7 +32,6 @@ const ContentSpacing = styled.div`
   box-sizing: border-box;
   min-height: 100vh;
 
-  /* This should be applied only within Content */
   a {
     color: ${colors.green400};
     font-weight: bold;
@@ -83,9 +82,9 @@ class MobileTopBar extends React.Component<MobileTopBarProps> {
 }
 
 type ExternalProps = {|
-  examples: sitePage,
-  docs: docsPage,
-  internal: sitePage,
+  examples: SitePage,
+  docs: DocsPage,
+  internal: SitePage,
   children: Node,
 |};
 

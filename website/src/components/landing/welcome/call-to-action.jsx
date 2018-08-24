@@ -106,7 +106,7 @@ const initial: Entry[] = [
   },
   {
     id: 'docs',
-    path: '/guides',
+    path: '/api/drag-drop-context',
     text: 'Docs',
     color: {
       background: colors.green400,
