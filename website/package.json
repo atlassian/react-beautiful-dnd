@@ -7,6 +7,7 @@
     "@atlaskit/css-reset": "^3.0.1",
     "emotion": "^9.2.6",
     "emotion-server": "^9.2.6",
+    "find-up": "^3.0.0",
     "gatsby": "^2.0.0-rc.0",
     "gatsby-plugin-emotion": "^2.0.0-rc.0",
     "gatsby-plugin-flow": "^1.0.1-beta.0",
