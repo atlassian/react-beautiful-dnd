@@ -56,7 +56,7 @@ const GithubLink = styled.a`
   :hover,
   :active,
   :focus {
-    color: ${colors.green400};
+    color: ${colors.green300};
     text-decoration: none;
   }
 `;
