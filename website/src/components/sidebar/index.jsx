@@ -26,11 +26,11 @@ const Sidebar = styled.div`
   }
 
   ::-webkit-scrollbar-track {
-    background-color: pink;
+    background-color: ${colors.purple500};
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: darkgrey;
+    background-color: ${colors.purple400};
   }
 `;
 
