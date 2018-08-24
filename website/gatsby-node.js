@@ -13,7 +13,7 @@ const gitUrlBase =
   'https://github.com/atlassian/react-beautiful-dnd/edit/master';
 
 /* ::
-type fileNode = { relativePath: string, absolutePath }
+type fileNode = { relativePath: string, absolutePath: string }
 
 type BaseNode = {
   internal: {
