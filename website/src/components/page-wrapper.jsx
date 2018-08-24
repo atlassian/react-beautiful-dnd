@@ -2,6 +2,7 @@
 import React, { type Node } from 'react';
 import styled from 'react-emotion';
 import Media from 'react-media';
+import MenuIcon from 'react-icons/lib/go/three-bars';
 import Sidebar from './sidebar';
 import type { SitePage, DocsPage } from './types';
 import { smallView } from './media';
@@ -65,18 +66,30 @@ const ContentSpacing = styled.div`
   }
 `;
 
+const StyledButton = styled('button')`
+  border: none;
+  background: ${colors.dark100};
+  border-radius: 2px;
+  margin-top: ${grid * 2}px;
+  margin-left: ${grid * 2}px;
+  padding: ${grid}px;
+  cursor: pointer;
+`;
+
+const MobileIcon = styled(MenuIcon)`
+  height: ${grid * 4}px;
+  width: ${grid * 4}px;
+`;
+
 type MobileTopBarProps = {|
   onMenuToggle: () => void,
 |};
 class MobileTopBar extends React.Component<MobileTopBarProps> {
   render() {
     return (
-      <div>
-        Mobile topbar
-        <button type="button" onClick={this.props.onMenuToggle}>
-          Toggle menu
-        </button>
-      </div>
+      <StyledButton type="button" onClick={this.props.onMenuToggle}>
+        <MobileIcon />
+      </StyledButton>
     );
   }
 }
