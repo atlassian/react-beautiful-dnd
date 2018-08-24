@@ -18,6 +18,8 @@ module.exports = {
       resolve: `gatsby-transformer-remark`,
       options: {
         plugins: [
+          `gatsby-remark-unwrap-images`,
+          // I think this only work for local images and not hosted.
           {
             resolve: `gatsby-remark-images`,
             options: {

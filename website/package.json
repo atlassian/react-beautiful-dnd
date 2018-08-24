@@ -18,6 +18,7 @@
     "gatsby-remark-prettier": "^1.0.0",
     "gatsby-remark-prismjs": "^3.0.0-rc.0",
     "gatsby-remark-smartypants": "^2.0.0-rc.0",
+    "gatsby-remark-unwrap-images": "^1.0.1",
     "gatsby-source-filesystem": "^2.0.1-rc.0",
     "gatsby-transformer-remark": "^2.1.1-rc.0",
     "lodash.lowercase": "^4.3.0",
