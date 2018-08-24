@@ -1,11 +1,13 @@
 // @flow
-import React, { Fragment } from 'react';
+import React from 'react';
 import { Link } from 'gatsby';
 import styled, { css } from 'react-emotion';
 import { grid, sidebarWidth, colors } from '../../constants';
-import type { docsPage, sitePage, innerDocsPage } from '../types';
+import type { DocsPage, MarkdownPage, SitePage } from '../types';
 import { getTitleFromExamplePath } from '../../utils';
 import Heading from './heading';
+import type { NavLink } from './sidebar-types';
+import ReorderableSection from './reorderable-section';
 
 const Sidebar = styled.div`
   height: 100vh;
@@ -88,58 +90,64 @@ const NavItem = ({ isTitle, href, title, hoverColor }: NavItemProps) => {
 };
 
 type NavFromUrlsProps = {
-  pages: sitePage,
-  href: string,
+  examples: SitePage,
   title: string,
 };
 
-const NavFromUrls = ({ pages, href, title }: NavFromUrlsProps) => (
-  <Fragment>
-    <Title>{title}</Title>
-    {pages.edges.map(page => {
-      const { path } = page.node;
-      return (
-        <NavItem
-          key={path}
-          hoverColor={colors.green500}
-          href={path}
-          title={getTitleFromExamplePath(path, href)}
-        />
-      );
-    })}
-  </Fragment>
-);
+const ExampleSection = ({ examples, title }: NavFromUrlsProps) => {
+  const links: NavLink[] = examples.edges.map(
+    (edge): NavLink => {
+      const { path: href } = edge.node;
+      const link: NavLink = {
+        title: getTitleFromExamplePath(href, '/examples/'),
+        href,
+      };
+      return link;
+    },
+  );
+
+  return (
+    <ReorderableSection
+      title={title}
+      links={links}
+      hoverColor={colors.blue300}
+    />
+  );
+};
 
 type Props = {
-  docs: docsPage,
-  examples: sitePage,
+  docs: DocsPage,
+  examples: SitePage,
 };
 
 type DocsSectionProps = {
-  sectionTitle: string,
-  sectionDir: string,
-  pages: Array<innerDocsPage>,
+  title: string,
+  directory: string,
+  pages: MarkdownPage[],
 };
 
-const DocsSection = ({ sectionTitle, pages, sectionDir }: DocsSectionProps) => (
-  <Fragment>
-    <Title>{sectionTitle}</Title>
-    {pages.map(page => {
-      const { slug, title, dir } = page.node.fields;
-      if (sectionDir === dir) {
-        return (
-          <NavItem
-            key={slug}
-            href={slug}
-            title={title}
-            hoverColor={colors.purple500}
-          />
-        );
-      }
-      return null;
-    })}
-  </Fragment>
-);
+const DocsSection = ({ title, pages, directory }: DocsSectionProps) => {
+  const links: NavLink[] = pages
+    .filter((page: MarkdownPage): boolean => directory === page.node.fields.dir)
+    .map(
+      (page: MarkdownPage): NavLink => {
+        const { slug, title: pageTitle } = page.node.fields;
+        const link: NavLink = {
+          title: pageTitle,
+          href: slug,
+        };
+        return link;
+      },
+    );
+
+  return (
+    <ReorderableSection
+      title={title}
+      links={links}
+      hoverColor={colors.purple300}
+    />
+  );
+};
 
 export default ({ docs, examples }: Props) => (
   <Sidebar>
@@ -148,25 +156,21 @@ export default ({ docs, examples }: Props) => (
     </Section>
     <Section>
       <NavItem
-        key="getting-started"
-        href="/getting-started"
-        title="Getting Started"
+        key="get-started"
+        href="/get-started"
+        title="Get Started"
         isTitle
         hoverColor={colors.blue500}
       />
     </Section>
     <Section>
-      <DocsSection
-        pages={docs.edges}
-        sectionTitle="Guides"
-        sectionDir="guides"
-      />
+      <DocsSection pages={docs.edges} title="Guides" directory="guides" />
     </Section>
     <Section>
-      <DocsSection pages={docs.edges} sectionTitle="API" sectionDir="api" />
+      <DocsSection pages={docs.edges} title="API" directory="api" />
     </Section>
     <Section>
-      <NavFromUrls href="/examples/" title="Examples" pages={examples} />
+      <ExampleSection examples={examples} title="Examples" />
     </Section>
   </Sidebar>
 );

@@ -97,7 +97,7 @@ class EntryItem extends React.Component<EntryProps> {
 const initial: Entry[] = [
   {
     id: 'get-started',
-    path: '/get-started',
+    path: '/get-started/',
     text: 'Get started',
     color: {
       background: colors.blue400,
@@ -106,7 +106,7 @@ const initial: Entry[] = [
   },
   {
     id: 'docs',
-    path: '/guides',
+    path: '/guides/',
     text: 'Docs',
     color: {
       background: colors.green400,
@@ -115,7 +115,7 @@ const initial: Entry[] = [
   },
   {
     id: 'examples',
-    path: '/examples',
+    path: '/examples/',
     text: 'Examples',
     color: {
       background: colors.purple400,

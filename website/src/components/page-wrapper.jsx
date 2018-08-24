@@ -32,7 +32,6 @@ const ContentSpacing = styled.div`
   box-sizing: border-box;
   min-height: 100vh;
 
-  /* This should be applied only within Content */
   a {
     color: ${colors.green400};
     font-weight: bold;
