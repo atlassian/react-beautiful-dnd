@@ -1,7 +1,6 @@
 // @flow
 module.exports = {
   siteMetadata: {
-    title: 'react beautiful-dnd',
     isDevelopment: process.env.NODE_ENV === 'development',
   },
   plugins: [
