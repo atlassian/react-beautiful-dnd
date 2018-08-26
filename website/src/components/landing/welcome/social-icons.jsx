@@ -1,32 +1,33 @@
 // @flow
-import React from 'react';
+import React, { type Node } from 'react';
 import styled from 'react-emotion';
 import GithubIcon from 'react-icons/lib/fa/github';
 import TwitterIcon from 'react-icons/lib/fa/twitter';
-import { grid } from '../../../constants';
+import { grid, colors } from '../../../constants';
+import reorder from '../../reorder';
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  type DroppableProvided,
+  type DraggableProvided,
+  type DropResult,
+} from '../../../../../src';
 
 const Container = styled.div`
   display: flex;
 `;
 
 const ExternalLink = styled.a`
-  color: red;
+  color: ${colors.dark100};
   transition: color 0.2s ease;
-`;
-
-const TwitterLink = styled(ExternalLink)`
-  margin-left: ${grid}px;
+  margin-right: ${grid}px;
 
   :hover,
-  :active {
-    color: red;
-  }
-`;
-
-const GithubLink = styled(ExternalLink)`
-  :hover,
-  :active {
-    color: red;
+  :active,
+  :focus {
+    color: ${colors.green300};
+    text-decoration: none;
   }
 `;
 
@@ -35,17 +36,73 @@ const iconProps: Object = {
   height: 40,
 };
 
-export default class SocialIcons extends React.Component<*> {
+type SocialLink = {|
+  id: string,
+  href: string,
+  icon: Node,
+|};
+
+type State = {|
+  links: SocialLink[],
+|};
+
+const initial: SocialLink[] = [
+  {
+    id: 'social',
+    href: 'https://github.com/atlassian/react-beautiful-dnd',
+    icon: <GithubIcon {...iconProps} />,
+  },
+  {
+    id: 'twitter',
+    href: 'https://twitter.com/alexandereardon',
+    icon: <TwitterIcon {...iconProps} />,
+  },
+];
+
+export default class SocialIcons extends React.Component<*, State> {
+  state: State = {
+    links: initial,
+  };
+  onDragEnd = (result: DropResult) => {
+    if (!result.destination) {
+      return;
+    }
+    this.setState({
+      links: reorder(
+        this.state.links,
+        result.source.index,
+        result.destination.index,
+      ),
+    });
+  };
   render() {
     return (
-      <Container>
-        <GithubLink href="https://github.com/atlassian/react-beautiful-dnd">
-          <GithubIcon {...iconProps} />
-        </GithubLink>
-        <TwitterLink href="https://twitter.com/alexandereardon">
-          <TwitterIcon {...iconProps} />
-        </TwitterLink>
-      </Container>
+      <DragDropContext onDragEnd={this.onDragEnd}>
+        <Droppable droppableId="droppable" direction="horizontal">
+          {(provided: DroppableProvided) => (
+            <Container
+              {...provided.droppableProps}
+              innerRef={provided.innerRef}
+            >
+              {this.state.links.map((link: SocialLink, index: number) => (
+                <Draggable draggableId={link.id} key={link.id} index={index}>
+                  {(draggableProvided: DraggableProvided) => (
+                    <ExternalLink
+                      innerRef={draggableProvided.innerRef}
+                      {...draggableProvided.draggableProps}
+                      {...draggableProvided.dragHandleProps}
+                      href={link.href}
+                    >
+                      {link.icon}
+                    </ExternalLink>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </Container>
+          )}
+        </Droppable>
+      </DragDropContext>
     );
   }
 }
