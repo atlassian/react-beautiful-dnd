@@ -28,9 +28,6 @@ const Root = styled('div')`
 
 type Props = {|
   listStyle?: Object,
-  location: {
-    pathname: string,
-  },
 |};
 
 type State = {|
