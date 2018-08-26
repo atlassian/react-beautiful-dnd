@@ -9,11 +9,14 @@ const gitInfo = {
   account: 'atlassian',
   repository: 'react-beautiful-dnd',
   host: 'github',
+  branch: 'website',
 };
 
 // this needs to handle internal v external
-export const gatsbyUrlToCSBPath = (url: string) =>
-  `website/src/pages${url.replace(/\/$/, '.jsx')}`;
+export const gatsbyUrlToCSBPath = (url: string) => {
+  console.log(url);
+  return `${url.replace(/\/$/, '.jsx')}`;
+};
 
 const importReplacements = [
   ['src', 'react-beautiful-dnd'],
