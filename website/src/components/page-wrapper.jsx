@@ -12,7 +12,7 @@ require('prism-themes/themes/prism-a11y-dark.css');
 
 const sectionGap: number = gutter.large;
 
-const Content = styled.div`
+const Content = styled('div')`
   background: ${colors.dark400};
   margin-left: ${sidebarWidth + gutter.normal}px;
   margin-right: ${gutter.normal}px;
@@ -25,7 +25,7 @@ const Content = styled.div`
   `)};
 `;
 
-const ContentSpacing = styled.div`
+const ContentSpacing = styled('div')`
   max-width: ${contentWidth}px;
   padding: ${sectionGap}px;
   padding-top: ${sectionGap}px;

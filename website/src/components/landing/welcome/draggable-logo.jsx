@@ -36,7 +36,7 @@ const minorRotation = keyframes`
 // eslint-disable-next-line import/prefer-default-export
 const shake = `${minorRotation} 0.5s linear infinite`;
 
-const Shaker = styled.div`
+const Shaker = styled('div')`
   animation: ${props => (props.shake ? shake : 'none')};
 `;
 

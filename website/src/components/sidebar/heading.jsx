@@ -9,11 +9,11 @@ import Logo from '../logo';
 
 const iconSize: number = grid * 4;
 
-const Container = styled.div`
+const Container = styled('div')`
   display: flex;
 `;
 
-const Title = styled.h2`
+const Title = styled('h2')`
   margin: 0;
 `;
 
@@ -46,7 +46,7 @@ const SmallLogo = styled(Logo)`
   flex-grow: 0;
 `;
 
-const GithubLink = styled.a`
+const GithubLink = styled('a')`
   display: block;
   color: ${colors.dark100};
   padding: ${gutter.normal}px;

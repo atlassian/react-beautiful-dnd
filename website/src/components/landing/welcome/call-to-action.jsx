@@ -12,7 +12,7 @@ import type {
   DropResult,
 } from '../../../../../src';
 
-const ActionBox = styled.div`
+const ActionBox = styled('div')`
   display: flex;
   align-items: center;
 

@@ -8,7 +8,7 @@ const FeedbackIcon = () => 'TODO';
 const isMutationObserverSupported: boolean =
   typeof MutationObserver !== 'undefined';
 
-const Container = styled.div`
+const Container = styled('div')`
   background-color: red;
   border-radius: 3px;
   color: red;
@@ -31,18 +31,18 @@ const Container = styled.div`
   }
 `;
 
-const Title = styled.h4`
+const Title = styled('h4')`
   margin-bottom: ${grid}px;
   display: flex;
   justify-content: center;
   align-items: center;
 `;
 
-const TitleIcon = styled.span`
+const TitleIcon = styled('span')`
   margin-left: ${grid}px;
 `;
 
-const Speech = styled.div``;
+const Speech = styled('div')``;
 
 const defaultMessage: string = `
   (This is what the screen reader will announce)

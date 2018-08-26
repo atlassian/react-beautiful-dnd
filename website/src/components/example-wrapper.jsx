@@ -9,13 +9,7 @@ const gitInfo = {
   account: 'atlassian',
   repository: 'react-beautiful-dnd',
   host: 'github',
-  branch: 'website',
-};
-
-// this needs to handle internal v external
-export const gatsbyUrlToCSBPath = (url: string) => {
-  console.log(url);
-  return `${url.replace(/\/$/, '.jsx')}`;
+  branch: 'bcon/fixing-codesandboxer',
 };
 
 const importReplacements = [
@@ -23,7 +17,7 @@ const importReplacements = [
   ['src/', 'react-beautiful-dnd'],
 ];
 
-const ActionLink = styled.button`
+const ActionLink = styled('button')`
   border: 2px solid grey;
   margin: 0 ${grid}px;
   padding: ${grid * 1}px ${grid * 2}px;
@@ -56,11 +50,11 @@ const ActionLink = styled.button`
   }
 `;
 
-const Title = styled.h2`
+const Title = styled('h2')`
   display: inline-block;
 `;
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   display: flex;
   margin-bottom: 20px;
 `;
