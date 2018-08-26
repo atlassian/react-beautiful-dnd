@@ -15,7 +15,7 @@ const gitInfo = {
   host: 'github',
   // this branch variable is the thing to change to repoint codesandboxer.
   // if it is pointing away from master, it should not be merged into master.
-  branch: 'bcon/fixing-codesandboxer',
+  branch: 'master',
 };
 
 const importReplacements = [

@@ -194,21 +194,3 @@ exports.createPages = ({ graphql, actions } /* : NodeParams */) => {
     );
   });
 };
-
-exports.onCreatePage = async ({ page, actions } /* : PageParams  */) => {
-  const { createPage } = actions;
-
-  return new Promise(resolve => {
-    if (page.path === '/') {
-      // TODO: is this needed?
-      page.layout = 'landing';
-      // Update the page.
-      createPage(page);
-    } else if (page.path.match(/^\/(examples|internal)\/./)) {
-      // TODO: is this needed?
-      page.layout = 'example';
-      createPage(page);
-    }
-    resolve();
-  });
-};
