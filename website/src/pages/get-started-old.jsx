@@ -8,7 +8,7 @@ import Logo from '../components/egghead-logo';
 const courseUrl =
   'https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd';
 
-const Aye = styled.a`
+const Aye = styled('a')`
   margin: auto;
   display: block;
   width: 424px;

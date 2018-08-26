@@ -5,10 +5,16 @@ import styled from 'react-emotion';
 import pkg from '../../../package.json';
 import { grid } from '../constants';
 
+// USEFUL INFO: Codesandboxer pulls info in from github, which means that whatever
+// branch is specified on this file will be pulled from, and you will need to push
+// if you want to see changes you have made reflected on codesandbox.
+
 const gitInfo = {
   account: 'atlassian',
   repository: 'react-beautiful-dnd',
   host: 'github',
+  // this branch variable is the thing to change to repoint codesandboxer.
+  // if it is pointing away from master, it should not be merged into master.
   branch: 'bcon/fixing-codesandboxer',
 };
 

@@ -14,7 +14,7 @@ const publishOnDragStart = (v?: any) => console.log('onDragStart', v);
 const publishOnDragEnd = (v?: any) => console.log('onDragEnd', v);
 /* eslint-enable no-console */
 
-const Root = styled.div`
+const Root = styled('div')`
   background-color: ${colors.dark300};
   box-sizing: border-box;
   padding: ${grid * 2}px;
