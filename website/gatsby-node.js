@@ -93,10 +93,8 @@ const addMD = async ({ getNode, node, createNodeField }) => {
   const fileNode = getNode(node.parent);
   const parsedFilePath = path.parse(fileNode.relativePath);
 
-  const directory = parsedFilePath.dir
-    ? parsedFilePath.dir.toLowerCase()
-    : null;
-
+  // Can be the empty string if no parent
+  const directory = parsedFilePath.dir.toLowerCase();
   const filename = parsedFilePath.name.toLowerCase();
   const slug = directory ? `/${directory}/${filename}` : `/${filename}`;
 
