@@ -13,6 +13,7 @@ export default class LinkList extends React.Component<Props> {
     const { links, hoverColor } = this.props;
     return links.map((link: NavLink) => (
       <Link
+        key={link.href}
         to={link.href}
         className={linkClassName(hoverColor)}
         activeClassName={isActiveClassName(hoverColor)}
