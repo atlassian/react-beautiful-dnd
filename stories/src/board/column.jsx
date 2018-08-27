@@ -8,13 +8,13 @@ import QuoteList from '../primatives/quote-list';
 import Title from '../primatives/title';
 import type { Quote } from '../types';
 
-const Container = styled.div`
+const Container = styled('div')`
   margin: ${grid}px;
   display: flex;
   flex-direction: column;
 `;
 
-const Header = styled.div`
+const Header = styled('div')`
   display: flex;
   align-items: center;
   justify-content: center;

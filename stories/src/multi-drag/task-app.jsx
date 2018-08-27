@@ -10,7 +10,7 @@ import type { DragStart, DropResult, DraggableLocation } from '../../../src';
 import type { Task, Id } from '../types';
 import type { Entities } from './types';
 
-const Container = styled.div`
+const Container = styled('div')`
   display: flex;
   user-select: none;
 `;

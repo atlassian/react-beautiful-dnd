@@ -26,11 +26,11 @@ export type QuoteMap = {
   [quoteId: Id]: Quote,
 };
 
-export type sitePage = {
+export type SitePage = {
   edges: Array<{ node: { path: string } }>,
 };
 
-export type innerDocsPage = {
+export type MarkdownPage = {
   node: {
     fields: {
       slug: string,
@@ -40,14 +40,14 @@ export type innerDocsPage = {
   },
 };
 
-export type docsPage = {
-  edges: Array<innerDocsPage>,
+export type DocsPage = {
+  edges: Array<MarkdownPage>,
 };
 
 export type SidebarData = {
-  examples: sitePage,
-  internal: sitePage,
-  docs: docsPage,
+  examples: SitePage,
+  internal: SitePage,
+  docs: DocsPage,
   site: {
     siteMetadata: {
       isDevelopment: boolean,

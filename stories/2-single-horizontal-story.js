@@ -8,7 +8,7 @@ import type { Quote } from './src/types';
 
 const bigData: Quote[] = getQuotes(30);
 
-const WideWindow = styled.div`
+const WideWindow = styled('div')`
   width: 120vw;
 `;
 

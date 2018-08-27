@@ -14,11 +14,11 @@ import type {
   DraggableStateSnapshot,
 } from '../../../src';
 
-const Root = styled.div`
+const Root = styled('div')`
   width: 250px;
 `;
 
-const Container = styled.div`
+const Container = styled('div')`
   background-color: ${({ isDraggingOver }) =>
     isDraggingOver ? colors.blue.lighter : colors.blue.light};
   display: flex;

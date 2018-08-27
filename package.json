@@ -34,8 +34,8 @@
     "validate": "yarn prettier:check && yarn lint:eslint && yarn lint:css && yarn typecheck",
     "prettier:check": "yarn prettier --debug-check $npm_package_config_prettier_target",
     "prettier:write": "yarn prettier --write $npm_package_config_prettier_target",
-    "lint:eslint": "yarn eslint .",
-    "lint:css": "stylelint \"stories/**/*.{js,jsx}\"",
+    "lint:eslint": "yarn eslint \"./**/*.{js,jsx}\"",
+    "lint:css": "stylelint \"stories/**/*.{js,jsx}\" \"website/src/**/*.{js,jsx}\"",
     "typecheck": "flow check",
     "bundle-size:check": "cross-env SNAPSHOT=match yarn build:dist && yarn build:clean",
     "bundle-size:update": "yarn build:dist && yarn build:clean",
@@ -52,7 +52,6 @@
   },
   "dependencies": {
     "@babel/runtime-corejs2": "7.0.0-beta.56",
-    "babel-plugin-emotion": "^9.2.6",
     "css-box-model": "^1.0.0",
     "emotion": "^9.2.6",
     "memoize-one": "^4.0.0",
