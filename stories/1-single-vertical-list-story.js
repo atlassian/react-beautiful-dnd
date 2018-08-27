@@ -12,7 +12,7 @@ const data = {
   large: getQuotes(500),
 };
 
-const ScrollContainer = styled.div`
+const ScrollContainer = styled('div')`
   box-sizing: border-box;
   background: lightgrey;
   padding: ${grid * 2}px;
@@ -22,7 +22,7 @@ const ScrollContainer = styled.div`
   position: relative;
 `;
 
-const Title = styled.h4`
+const Title = styled('h4')`
   text-align: center;
   margin-bottom: ${grid}px;
 `;

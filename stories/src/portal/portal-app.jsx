@@ -28,7 +28,7 @@ if (!document.body) {
 
 document.body.appendChild(portal);
 
-const SimpleQuote = styled.div`
+const SimpleQuote = styled('div')`
   padding: ${grid}px;
   margin-bottom: ${grid}px;
   background-color: ${colors.blue.light};
@@ -90,7 +90,7 @@ type AppState = {|
   quotes: Quote[],
 |};
 
-const Container = styled.div`
+const Container = styled('div')`
   margin: 0 auto;
   width: 300px;
 `;

@@ -1,19 +1,21 @@
-// @flow
+// // @flow
 import React, { Component } from 'react';
 import styled from 'react-emotion';
-import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src';
-import QuoteList from '../primatives/quote-list';
-import { colors, grid } from '../constants';
-import reorder from '../reorder';
-import type { Quote } from '../types';
+import QuoteList from '../components/examples/primatives/quote-list';
+import { grid, colors } from '../constants';
+import reorder from '../components/examples/reorder';
+import type { Quote } from '../components/examples/types';
+import { quotes as initialQuotes } from '../components/examples/data';
 import type { DropResult, DragStart } from '../../../src/types';
 
-const publishOnDragStart = action('onDragStart');
-const publishOnDragEnd = action('onDragEnd');
+/* eslint-disable no-console */
+const publishOnDragStart = (v?: any) => console.log('onDragStart', v);
+const publishOnDragEnd = (v?: any) => console.log('onDragEnd', v);
+/* eslint-enable no-console */
 
 const Root = styled('div')`
-  background-color: ${colors.blue.deep};
+  background-color: ${colors.dark300};
   box-sizing: border-box;
   padding: ${grid * 2}px;
   min-height: 100vh;
@@ -25,7 +27,6 @@ const Root = styled('div')`
 `;
 
 type Props = {|
-  initial: Quote[],
   listStyle?: Object,
 |};
 
@@ -37,7 +38,7 @@ export default class QuoteApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
 
   state: State = {
-    quotes: this.props.initial,
+    quotes: initialQuotes,
   };
 
   onDragStart = (initial: DragStart) => {

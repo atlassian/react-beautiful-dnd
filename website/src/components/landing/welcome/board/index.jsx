@@ -22,7 +22,7 @@ type Props = {|
   numberOfColumns: 1 | 2,
 |};
 
-const Container = styled.div`
+const Container = styled('div')`
   display: flex;
   justify-content: center;
   align-items: flex-start;

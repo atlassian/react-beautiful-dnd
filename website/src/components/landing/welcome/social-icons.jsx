@@ -14,11 +14,11 @@ import {
   type DropResult,
 } from '../../../../../src';
 
-const Container = styled.div`
+const Container = styled('div')`
   display: flex;
 `;
 
-const ExternalLink = styled.a`
+const ExternalLink = styled('a')`
   color: ${colors.dark100};
   transition: color 0.2s ease;
   margin-right: ${grid}px;

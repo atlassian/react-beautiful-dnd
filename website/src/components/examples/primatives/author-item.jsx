@@ -8,7 +8,7 @@ import type {
 } from '../../../../../src';
 import type { Author } from '../types';
 
-const Avatar = styled.img`
+const Avatar = styled('img')`
   width: 60px;
   height: 60px;
   border-radius: 50%;

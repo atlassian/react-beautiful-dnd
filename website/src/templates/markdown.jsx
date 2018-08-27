@@ -23,7 +23,7 @@ type Props = {
   },
 };
 
-const EditLink = styled.a`
+const EditLink = styled('a')`
   float: right;
   display: flex;
   align-items: center;
@@ -34,7 +34,7 @@ const EditLink = styled.a`
   `)};
 `;
 
-const EditText = styled.span`
+const EditText = styled('span')`
   padding-left: ${grid}px;
 `;
 

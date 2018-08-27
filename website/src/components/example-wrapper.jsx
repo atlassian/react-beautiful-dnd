@@ -5,22 +5,25 @@ import styled from 'react-emotion';
 import pkg from '../../../package.json';
 import { grid } from '../constants';
 
+// USEFUL INFO: Codesandboxer pulls info in from github, which means that whatever
+// branch is specified on this file will be pulled from, and you will need to push
+// if you want to see changes you have made reflected on codesandbox.
+
 const gitInfo = {
   account: 'atlassian',
   repository: 'react-beautiful-dnd',
   host: 'github',
+  // this branch variable is the thing to change to repoint codesandboxer.
+  // if it is pointing away from master, it should not be merged into master.
+  branch: 'master',
 };
-
-// this needs to handle internal v external
-export const gatsbyUrlToCSBPath = (url: string) =>
-  `website/src/pages${url.replace(/\/$/, '.jsx')}`;
 
 const importReplacements = [
   ['src', 'react-beautiful-dnd'],
   ['src/', 'react-beautiful-dnd'],
 ];
 
-const ActionLink = styled.button`
+const ActionLink = styled('button')`
   border: 2px solid grey;
   margin: 0 ${grid}px;
   padding: ${grid * 1}px ${grid * 2}px;
@@ -53,11 +56,11 @@ const ActionLink = styled.button`
   }
 `;
 
-const Title = styled.h2`
+const Title = styled('h2')`
   display: inline-block;
 `;
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   display: flex;
   margin-bottom: 20px;
 `;

@@ -11,7 +11,7 @@ import LinkList from './link-list';
 import spacing from './spacing';
 import { linkClassName, isActiveClassName } from './link-class-name';
 
-const Sidebar = styled.div`
+const Sidebar = styled('div')`
   height: 100vh;
   width: ${sidebarWidth}px;
   box-sizing: border-box;
@@ -35,13 +35,13 @@ const Sidebar = styled.div`
   }
 `;
 
-const Section = styled.div`
+const Section = styled('div')`
   margin-top: ${spacing.top}px;
   display: flex;
   flex-direction: column;
 `;
 
-const Title = styled.h3`
+const Title = styled('h3')`
   color: ${colors.dark100};
   font-size: 20px;
   padding: ${grid}px ${spacing.side}px;

@@ -17,7 +17,7 @@ import type {
 const publishOnDragStart = action('onDragStart');
 const publishOnDragEnd = action('onDragEnd');
 
-const Root = styled.div`
+const Root = styled('div')`
   background-color: ${colors.blue.deep};
   box-sizing: border-box;
   padding: ${grid * 2}px;
@@ -29,11 +29,11 @@ const Root = styled.div`
   align-items: flex-start;
 `;
 
-const Column = styled.div`
+const Column = styled('div')`
   margin: 0 ${grid * 2}px;
 `;
 
-const HorizontalScrollContainer = styled.div`
+const HorizontalScrollContainer = styled('div')`
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
@@ -43,7 +43,7 @@ const HorizontalScrollContainer = styled.div`
   overflow: auto;
 `;
 
-const VerticalScrollContainer = styled.div`
+const VerticalScrollContainer = styled('div')`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -54,7 +54,7 @@ const VerticalScrollContainer = styled.div`
   overflow: auto;
 `;
 
-const PushDown = styled.div`
+const PushDown = styled('div')`
   height: 200px;
 `;
 

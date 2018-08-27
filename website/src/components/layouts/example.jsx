@@ -1,7 +1,7 @@
 // @flow
 import React, { type Node } from 'react';
 import { StaticQuery, graphql } from 'gatsby';
-import ExampleWrapper, { gatsbyUrlToCSBPath } from '../example-wrapper';
+import ExampleWrapper from '../example-wrapper';
 import CommonPage from '../common-page';
 import PageWrapper from '../page-wrapper';
 import { getTitleFromExamplePath } from '../../utils';
@@ -12,9 +12,10 @@ type Props = {
   location: {
     pathname: string,
   },
+  examplePath: string,
 };
 
-const ExamplePage = ({ children, location }: Props) => (
+const ExamplePage = ({ children, location, examplePath }: Props) => (
   <StaticQuery
     query={graphql`
       query examplesSidebarInfo {
@@ -52,7 +53,7 @@ const ExamplePage = ({ children, location }: Props) => (
         >
           <ExampleWrapper
             title={getTitleFromExamplePath(location.pathname, '/examples/')}
-            path={gatsbyUrlToCSBPath(location.pathname)}
+            path={examplePath}
           >
             {children}
           </ExampleWrapper>

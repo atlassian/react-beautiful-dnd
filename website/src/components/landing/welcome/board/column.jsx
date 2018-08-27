@@ -37,7 +37,7 @@ class InnerList extends React.Component<InnerListProps> {
 
 const interactive: string = 'yellow';
 
-const Container = styled.div`
+const Container = styled('div')`
   background-color: ${props => (props.isDragging ? interactive : 'purple')};
   margin: 0 ${grid}px;
   color: red;
@@ -47,7 +47,7 @@ const Container = styled.div`
   width: 270px;
 `;
 
-const Header = styled.div`
+const Header = styled('div')`
   font-size: 20px;
   padding: ${grid}px;
   border-top-left-radius: 2px;
@@ -62,7 +62,7 @@ const Header = styled.div`
   }
 `;
 
-const List = styled.div`
+const List = styled('div')`
   min-height: 100px;
   padding: ${grid}px;
   /* The list will already been pushed down by the cards */

@@ -12,18 +12,18 @@ type Props = {|
   title: string,
 |};
 
-const Container = styled.div`
+const Container = styled('div')`
   width: 300px;
   background-color: ${colors.grey.dark};
   border-radius: ${borderRadius}px;
 `;
 
-const Title = styled.h3`
+const Title = styled('h3')`
   font-weight: bold;
   padding: ${grid}px;
 `;
 
-const List = styled.div`
+const List = styled('div')`
   padding: ${grid}px;
   padding-bottom: 0;
   display: flex;

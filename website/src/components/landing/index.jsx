@@ -7,7 +7,7 @@ import Welcome from './welcome';
 import Beautiful from './beautiful';
 import Accessible from './accessible';
 
-const FullPageSection = styled.section`
+const FullPageSection = styled('section')`
   min-height: 100vh;
   background-color: ${colors.dark500};
 `;
