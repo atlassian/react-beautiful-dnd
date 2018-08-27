@@ -56,6 +56,19 @@ const getTranslate = (offset: Position): ?string => {
   return `translate(${offset.x}px, ${offset.y}px)`;
 };
 
+const getOpacity = (
+  isDropAnimating: boolean,
+  isGroupingWith: boolean,
+): ?number => {
+  if (!isDropAnimating) {
+    return null;
+  }
+  if (!isGroupingWith) {
+    return null;
+  }
+  return 0;
+};
+
 const getDraggingTransition = (
   shouldAnimateDragMovement: boolean,
   dropping: ?DroppingState,
@@ -169,6 +182,7 @@ export default class Draggable extends Component<Props> {
       change: Position,
       dimension: ?DraggableDimension,
       shouldAnimateDragMovement: boolean,
+      isGroupingWith: boolean,
       dropping: ?DroppingState,
     ): DraggingStyle => {
       invariant(dimension, 'Cannot get draggable style without a dimension');
@@ -177,6 +191,7 @@ export default class Draggable extends Component<Props> {
         shouldAnimateDragMovement,
         dropping,
       );
+      const isDropAnimating: boolean = Boolean(dropping);
       const style: DraggingStyle = {
         // ## Placement
         position: 'fixed',
@@ -197,7 +212,7 @@ export default class Draggable extends Component<Props> {
         zIndex: dropping ? zIndexOptions.dropAnimating : zIndexOptions.dragging,
         // Moving in response to user input
         transform: getTranslate(change),
-
+        opacity: getOpacity(isDropAnimating, isGroupingWith),
         // ## Performance
         pointerEvents: 'none',
       };
@@ -224,6 +239,7 @@ export default class Draggable extends Component<Props> {
     (
       change: Position,
       isDragging: boolean,
+      isGroupingWith: boolean,
       dropping: ?DroppingState,
       shouldAnimateDisplacement: boolean,
       shouldAnimateDragMovement: boolean,
@@ -237,6 +253,7 @@ export default class Draggable extends Component<Props> {
             change,
             dimension,
             shouldAnimateDragMovement,
+            isGroupingWith,
             dropping,
           )
         : this.getNotDraggingStyle(change, shouldAnimateDisplacement);
@@ -291,6 +308,7 @@ export default class Draggable extends Component<Props> {
       this.getProvided(
         change,
         isDragging,
+        Boolean(groupingWith),
         dropping,
         shouldAnimateDisplacement,
         shouldAnimateDragMovement,

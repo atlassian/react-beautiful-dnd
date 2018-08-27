@@ -80,27 +80,24 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     dimensions.droppables[state.critical.droppable.id];
   const draggable: DraggableDimension =
     dimensions.draggables[state.critical.draggable.id];
-  const droppable: ?DroppableDimension =
-    impact && impact.destination
-      ? dimensions.droppables[impact.destination.droppableId]
-      : null;
+  const destination: ?DraggableLocation = impact ? impact.destination : null;
+  const droppable: ?DroppableDimension = destination
+    ? dimensions.droppables[destination.droppableId]
+    : null;
+  const grouping: ?GroupingLocation =
+    impact && impact.group ? impact.group.groupingWith : null;
 
   const source: DraggableLocation = {
     index: critical.draggable.index,
     droppableId: critical.droppable.id,
   };
-  const groupingWith: ?GroupingLocation =
-    impact && impact.group ? impact.group.groupingWith : null;
-  // Only publishing destination if there is no grouping occurring
-  const destination: ?DraggableLocation =
-    impact && !groupingWith ? impact.destination : null;
 
   const result: DropResult = {
     draggableId: draggable.descriptor.id,
     type: home.descriptor.type,
     source,
     destination,
-    groupingWith,
+    grouping,
     reason,
   };
 
@@ -111,7 +108,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     }
 
     const newBorderBoxClientCenter: Position = getNewHomeClientBorderBoxCenter({
-      movement: impact.movement,
+      impact,
       draggable,
       draggables: dimensions.draggables,
       destination: droppable,
@@ -145,8 +142,6 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     destination: newHomeOffset,
     reason,
   });
-
-  console.log('drop duration', dropDuration);
 
   const pending: PendingDrop = {
     newHomeOffset,

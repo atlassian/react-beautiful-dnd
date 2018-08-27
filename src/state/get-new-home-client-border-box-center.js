@@ -4,14 +4,17 @@ import type {
   Axis,
   DraggableDimension,
   DraggableDimensionMap,
-  DragMovement,
+  DragImpact,
   DroppableDimension,
+  GroupingImpact,
+  DraggableId,
 } from '../types';
 import moveToEdge from './move-to-edge';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
+import { add } from './position';
 
 type NewHomeArgs = {|
-  movement: DragMovement,
+  impact: DragImpact,
   draggable: DraggableDimension,
   // all draggables in the system
   draggables: DraggableDimensionMap,
@@ -21,19 +24,32 @@ type NewHomeArgs = {|
 // Returns the client offset required to move an item from its
 // original client position to its final resting position
 export default ({
-  movement,
+  impact,
   draggable,
   draggables,
   destination,
 }: NewHomeArgs): Position => {
   const originalCenter: Position = draggable.client.borderBox.center;
 
+  // If grouping return the center position of the group target
+  const group: ?GroupingImpact = impact.group;
+  if (group) {
+    const groupingWith: DraggableId = group.groupingWith.draggableId;
+    const isDisplaced: boolean = Boolean(impact.movement.map[groupingWith]);
+    console.log('is displaced?', isDisplaced);
+    const center: Position = draggables[groupingWith].client.borderBox.center;
+
+    return isDisplaced
+      ? add(center, impact.movement.displacedBy.point)
+      : center;
+  }
+
   // not dropping anywhere
   if (destination == null) {
     return originalCenter;
   }
 
-  const { displaced, isInFrontOfStart } = movement;
+  const { displaced, isInFrontOfStart } = impact.movement;
   const axis: Axis = destination.axis;
 
   const isWithinHomeDroppable: boolean =

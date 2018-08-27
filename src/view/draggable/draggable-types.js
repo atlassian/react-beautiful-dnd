@@ -31,6 +31,8 @@ export type DraggingStyle = {|
   height: number,
   transition: string, // 'none' or: drop animation and optional group into fade out
   transform: ?string,
+  // we animate the opacity down to 0 when dropping while grouping
+  opacity: ?number,
   zIndex: ZIndex,
 
   // Avoiding any processing of mouse events.
