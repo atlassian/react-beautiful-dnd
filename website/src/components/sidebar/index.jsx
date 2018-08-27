@@ -1,173 +1,130 @@
 // @flow
-import React, { Fragment } from 'react';
-import Link from 'gatsby-link';
-import styled, { css } from 'react-emotion';
-import { colors as akColors } from '@atlaskit/theme';
-import { grid, sidebarWidth } from '../../constants';
-import type { docsPage, sitePage, innerDocsPage } from '../types';
+import React from 'react';
+import { Link } from 'gatsby';
+import styled from 'react-emotion';
+import { grid, sidebarWidth, colors } from '../../constants';
+import type { DocsPage, MarkdownPage, SitePage } from '../types';
 import { getTitleFromExamplePath } from '../../utils';
+import Heading from './heading';
+import type { NavLink } from './sidebar-types';
+import LinkList from './link-list';
+import spacing from './spacing';
+import { linkClassName, isActiveClassName } from './link-class-name';
 
-const Sidebar = styled.div`
+const Sidebar = styled('div')`
   height: 100vh;
   width: ${sidebarWidth}px;
   box-sizing: border-box;
   position: fixed;
   left: 0;
   top: 0;
-  background: ${akColors.G50};
   overflow: auto;
-  padding-bottom: ${grid * 2}px;
+  padding-bottom: ${spacing.side}px;
+  background: ${colors.dark500};
 
   ::-webkit-scrollbar {
     width: ${grid}px;
   }
 
   ::-webkit-scrollbar-track {
-    background-color: pink;
+    background-color: ${colors.purple500};
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: darkgrey;
+    background-color: ${colors.purple400};
   }
 `;
 
-const Section = styled.div`
-  margin-top: ${grid * 3}px;
+const Section = styled('div')`
+  margin-top: ${spacing.top}px;
   display: flex;
   flex-direction: column;
 `;
 
-const Title = styled.h3`
+const Title = styled('h3')`
+  color: ${colors.dark100};
   font-size: 20px;
-  padding: ${grid}px;
-  padding-left ${grid * 2}px;
-`;
-const Item = styled.h4`
-  padding: ${grid}px;
-  padding-left: ${grid * 3}px;
+  padding: ${grid}px ${spacing.side}px;
 `;
 
-const StyledLink = styled(Link)`
-  color: ${akColors.N600};
-  transition: background-color ease 0.2s, color ease 0.2s;
-
-  ${props =>
-    props.isActiveLink
-      ? css`
-          color: white;
-          background: ${props.hoverColor};
-          text-decoration: none;
-        `
-      : ''} :hover, :active, :focus {
-    color: white;
-    background: ${props => props.hoverColor};
-    text-decoration: none;
-  }
-`;
-
-type NavItemProps = {|
-  href: string,
+type NavFromUrlsProps = {
+  examples: SitePage,
   title: string,
-  hoverColor: string,
-  isTitle?: boolean,
-|};
+};
 
-const NavItem = ({ isTitle, href, title, hoverColor }: NavItemProps) => {
-  const isActiveLink = window.location.pathname === href;
-  const Wrapper = isTitle ? Title : Item;
+const ExampleSection = ({ examples, title }: NavFromUrlsProps) => {
+  const links: NavLink[] = examples.edges.map(
+    (edge): NavLink => {
+      const { path: href } = edge.node;
+      const link: NavLink = {
+        title: getTitleFromExamplePath(href, '/examples/'),
+        href,
+      };
+      return link;
+    },
+  );
+
   return (
-    <StyledLink
-      hoverColor={hoverColor}
-      to={href}
-      href={href}
-      isActiveLink={isActiveLink}
-    >
-      <Wrapper>{title}</Wrapper>
-    </StyledLink>
+    <Section>
+      <Title>{title}</Title>
+      <LinkList links={links} hoverColor={colors.blue500} />
+    </Section>
   );
 };
 
-type NavFromUrlsProps = {
-  pages: sitePage,
-  href: string,
-  title: string,
-};
-
-const NavFromUrls = ({ pages, href, title }: NavFromUrlsProps) => (
-  <Fragment>
-    <Title>{title}</Title>
-    {pages.edges.map(page => {
-      const { path } = page.node;
-      return (
-        <NavItem
-          key={path}
-          hoverColor={akColors.Y300}
-          href={path}
-          title={getTitleFromExamplePath(path, href)}
-        />
-      );
-    })}
-  </Fragment>
-);
-
 type Props = {
-  docs: docsPage,
-  examples: sitePage,
-  internal: sitePage,
+  docs: DocsPage,
+  examples: SitePage,
 };
 
 type DocsSectionProps = {
-  sectionTitle: string,
-  sectionDir: string,
-  pages: Array<innerDocsPage>,
+  title: string,
+  directory: string,
+  pages: MarkdownPage[],
 };
 
-const DocsSection = ({ sectionTitle, pages, sectionDir }: DocsSectionProps) => (
-  <Fragment>
-    <Title>{sectionTitle}</Title>
-    {pages.map(page => {
-      const { slug, title, dir } = page.node.fields;
-      if (sectionDir === dir) {
-        return (
-          <NavItem
-            key={slug}
-            href={slug}
-            title={title}
-            hoverColor={akColors.B300}
-          />
-        );
-      }
-      return null;
-    })}
-  </Fragment>
-);
+const DocsSection = ({ title, pages, directory }: DocsSectionProps) => {
+  const links: NavLink[] = pages
+    .filter((page: MarkdownPage): boolean => directory === page.node.fields.dir)
+    .map(
+      (page: MarkdownPage): NavLink => {
+        const { slug, title: pageTitle } = page.node.fields;
+        const link: NavLink = {
+          title: pageTitle,
+          href: slug,
+        };
+        return link;
+      },
+    );
 
-export default ({ docs, examples, internal }: Props) => (
+  return (
+    <Section>
+      <Title>{title}</Title>
+      <LinkList links={links} hoverColor={colors.purple300} />
+    </Section>
+  );
+};
+
+export default ({ docs, examples }: Props) => (
   <Sidebar>
-    <h2>Header goes here</h2>
+    <Heading />
     <Section>
-      <DocsSection
-        pages={docs.edges}
-        sectionTitle="Quick Start"
-        sectionDir="quick-start"
-      />
+      <Link
+        to="/get-started"
+        style={{ paddingLeft: 0 }}
+        className={linkClassName(colors.blue500)}
+        activeClassName={isActiveClassName(colors.blue500)}
+      >
+        <Title>Get started</Title>
+      </Link>
     </Section>
-    <Section>
-      <DocsSection
-        pages={docs.edges}
-        sectionTitle="Core Concepts"
-        sectionDir="core-concepts"
-      />
-    </Section>
-    <Section>
-      <DocsSection
-        pages={docs.edges}
-        sectionTitle="Guides"
-        sectionDir="guides"
-      />
-    </Section>
-    <Section>
-      <NavFromUrls href="/examples/" title="Examples" pages={examples} />
-    </Section>
+    <DocsSection
+      pages={docs.edges}
+      title="Core concepts"
+      directory="core-concepts"
+    />
+    <DocsSection pages={docs.edges} title="Guides" directory="guides" />
+    <DocsSection pages={docs.edges} title="API" directory="api" />
+    <ExampleSection examples={examples} title="Examples" />
   </Sidebar>
 );

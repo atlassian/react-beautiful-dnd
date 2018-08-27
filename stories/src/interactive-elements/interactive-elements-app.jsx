@@ -21,7 +21,7 @@ const initial: ItemType[] = [
     component: (
       <div>
         <p>Standard</p>
-        <button>hello world</button>
+        <button type="button">hello world</button>
         <br />
         <p>
           With child{' '}
@@ -33,7 +33,7 @@ const initial: ItemType[] = [
             phrasing content
           </a>
         </p>
-        <button>
+        <button type="button">
           why{' '}
           <strong>
             hello <em>there!</em>
@@ -49,7 +49,7 @@ const initial: ItemType[] = [
             SVGElement
           </a>
         </p>
-        <button>
+        <button type="button">
           My circle <br />
           <svg width="40" height="40">
             <circle cx="20" cy="20" r="20" />
@@ -133,13 +133,13 @@ const initial: ItemType[] = [
   },
 ];
 
-const List = styled.div`
+const List = styled('div')`
   width: 250px;
   background-color: ${colors.blue.deep};
   padding: ${grid * 2}px;
 `;
 
-const Item = styled.div`
+const Item = styled('div')`
   min-height: 80px;
   background-color: ${colors.white};
   border: 1px solid ${colors.grey.dark};
@@ -147,16 +147,16 @@ const Item = styled.div`
   margin-bottom: ${grid}px;
 `;
 
-const Container = styled.div`
+const Container = styled('div')`
   display: flex;
 `;
 
-const Controls = styled.div`
+const Controls = styled('div')`
   padding: ${grid * 2}px;
   width: 250px;
 `;
 
-const Status = styled.strong`
+const Status = styled('strong')`
   color: ${({ isEnabled }) => (isEnabled ? colors.blue.deep : colors.purple)};
 `;
 
@@ -240,7 +240,9 @@ export default class InteractiveElementsApp extends React.Component<*, State> {
                 {canDragInteractiveElements ? 'enabled' : 'disabled'}
               </Status>
             </p>
-            <button onClick={this.toggleBlocking}>toggle</button>
+            <button type="button" onClick={this.toggleBlocking}>
+              toggle
+            </button>
           </Controls>
         </Container>
       </DragDropContext>

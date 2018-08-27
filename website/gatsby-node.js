@@ -7,9 +7,13 @@
 const path = require('path');
 const lowerCase = require('lodash.lowercase');
 const fs = require('fs');
+const findUp = require('find-up');
+
+const gitUrlBase =
+  'https://github.com/atlassian/react-beautiful-dnd/edit/master';
 
 /* ::
-type fileNode = { relativePath: string }
+type fileNode = { relativePath: string, absolutePath: string }
 
 type BaseNode = {
   internal: {
@@ -60,46 +64,73 @@ type Page = {
   },
 }
 
-type boundActionCreators = {
+type actions = {
   createNodeField: (nodeField) => mixed,
   createPage: (Page) => mixed
 }
 
 type NodeParams = {
   node: Node,
-  boundActionCreators: boundActionCreators,
+  actions: actions,
   getNode: (string) => fileNode,
   graphql: (string) => Promise<markdownGraphQLResult>
 }
 
 type PageParams = {
   page: Page,
-  boundActionCreators: boundActionCreators,
+  actions: actions,
 }
 */
 
-const addMD = ({ getNode, node, createNodeField }) => {
+const capitalise = value => {
+  if (!value) {
+    return value;
+  }
+  return value.charAt(0).toUpperCase() + value.slice(1);
+};
+
+const addMD = async ({ getNode, node, createNodeField }) => {
   const fileNode = getNode(node.parent);
   const parsedFilePath = path.parse(fileNode.relativePath);
-  let slug = '';
-  let title = '';
-  if (parsedFilePath.dir) {
-    slug += `/${parsedFilePath.dir.toLowerCase()}`;
-    title = lowerCase(parsedFilePath.dir);
-  }
-  if (parsedFilePath.name !== 'index') {
-    slug += `/${parsedFilePath.name.toLowerCase()}`;
-    title = lowerCase(parsedFilePath.name);
-  }
 
-  title = title.charAt(0).toUpperCase() + title.slice(1);
+  // Can be the empty string if no parent
+  const directory = parsedFilePath.dir.toLowerCase();
+  const filename = parsedFilePath.name.toLowerCase();
+  const slug = directory ? `/${directory}/${filename}` : `/${filename}`;
+
+  const title = (() => {
+    const base = lowerCase(parsedFilePath.name);
+    if (directory === 'api') {
+      const camel = base
+        .split(' ')
+        .map(capitalise)
+        .join('');
+
+      return `<${camel} />`;
+    }
+
+    return capitalise(base);
+  })();
+
+  // The fileNode.relativePath gives us the path relative to the website
+  // directory while we need it relative to git root.
+  const pkgRoot = findUp.sync('.git');
+  const relativePath = path.relative(
+    path.dirname(pkgRoot),
+    fileNode.absolutePath,
+  );
 
   createNodeField({ node, name: 'slug', value: slug });
+  createNodeField({
+    node,
+    name: 'gitUrl',
+    value: `${gitUrlBase}/${relativePath}`,
+  });
   createNodeField({ node, name: 'title', value: title });
   createNodeField({
     node,
     name: 'dir',
-    value: parsedFilePath.dir.toLowerCase(),
+    value: directory,
   });
 };
 
@@ -112,10 +143,8 @@ const addRaw = (node, createNodeField) => {
   }
 };
 
-exports.onCreateNode = (
-  { node, boundActionCreators, getNode } /* : NodeParams */,
-) => {
-  const { createNodeField } = boundActionCreators;
+exports.onCreateNode = ({ node, actions, getNode } /* : NodeParams */) => {
+  const { createNodeField } = actions;
   if (node.internal.type === 'MarkdownRemark') {
     addMD({ getNode, node, createNodeField });
   } else if (node.internal.type === 'SitePage') {
@@ -123,8 +152,8 @@ exports.onCreateNode = (
   }
 };
 
-exports.createPages = ({ graphql, boundActionCreators } /* : NodeParams */) => {
-  const { createPage } = boundActionCreators;
+exports.createPages = ({ graphql, actions } /* : NodeParams */) => {
+  const { createPage } = actions;
 
   return new Promise((resolve, reject) => {
     const markdownPage = path.resolve('src/templates/markdown.jsx');
@@ -163,23 +192,5 @@ exports.createPages = ({ graphql, boundActionCreators } /* : NodeParams */) => {
         });
       }),
     );
-  });
-};
-
-exports.onCreatePage = async (
-  { page, boundActionCreators } /* : PageParams  */,
-) => {
-  const { createPage } = boundActionCreators;
-
-  return new Promise(resolve => {
-    if (page.path === '/') {
-      page.layout = 'landing';
-      // Update the page.
-      createPage(page);
-    } else if (page.path.match(/^\/(examples|internal)\/./)) {
-      page.layout = 'example';
-      createPage(page);
-    }
-    resolve();
   });
 };

@@ -11,7 +11,7 @@ type Props = {|
   index: number,
 |};
 
-const Container = styled.div`
+const Container = styled('div')`
   border-bottom: 1px solid #ccc;
   background: ${colors.white};
   padding: ${grid}px;

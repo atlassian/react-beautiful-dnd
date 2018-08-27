@@ -30,7 +30,7 @@ const initialList: NestedQuoteList = {
 const publishOnDragStart = action('onDragStart');
 const publishOnDragEnd = action('onDragEnd');
 
-const Root = styled.div`
+const Root = styled('div')`
   background-color: ${colors.blue.deep};
   box-sizing: border-box;
   padding: ${grid * 2}px;
