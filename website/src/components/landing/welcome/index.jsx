@@ -88,7 +88,7 @@ export default () => (
             <Title>react-beautiful-dnd</Title>
           </Brand>
           <Tagline>
-            Beautiful and accessible drag and drop for lists with React{' '}
+            Beautiful and accessible drag and drop for lists with React
           </Tagline>
           <VerticalRhythm>
             <CallToAction isSmallView={!isLarge} />
