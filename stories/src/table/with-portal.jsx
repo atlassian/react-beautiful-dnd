@@ -13,27 +13,27 @@ import type {
   DraggableStateSnapshot,
 } from '../../../src';
 
-const Table = styled.table`
+const Table = styled('table')`
   width: 500px;
   margin: 0 auto;
   table-layout: ${props => props.layout};
 `;
 
-const TBody = styled.tbody`
+const TBody = styled('tbody')`
   border: 0;
 `;
 
-const THead = styled.thead`
+const THead = styled('thead')`
   border: 0;
   border-bottom: none;
   background-color: ${colors.grey.light};
 `;
 
-const Row = styled.tr`
+const Row = styled('tr')`
   ${props => (props.isDragging ? `background: ${colors.green};` : '')};
 `;
 
-const Cell = styled.td`
+const Cell = styled('td')`
   box-sizing: border-box;
   padding: ${grid}px;
 `;
@@ -232,7 +232,7 @@ class TableRow extends Component<TableRowProps> {
 }
 
 // TODO: make this look nicer!
-const Header = styled.header`
+const Header = styled('header')`
   display: flex;
   flex-direction: column;
   width: 500px;
@@ -241,9 +241,9 @@ const Header = styled.header`
 `;
 
 /* stylelint-disable block-no-empty */
-const LayoutControl = styled.div``;
+const LayoutControl = styled('div')``;
 
-const CopyTableButton = styled.button``;
+const CopyTableButton = styled('button')``;
 /* stylelint-enable */
 
 type AppProps = {|

@@ -51,7 +51,7 @@ const getColor = ({ isSelected, isGhosting }): string => {
   return colors.black;
 };
 
-const Container = styled.div`
+const Container = styled('div')`
   background-color: ${props => getBackgroundColor(props)};
   color: ${props => getColor(props)};
   padding: ${grid}px;
@@ -77,11 +77,11 @@ const Container = styled.div`
   }
 `;
 /* stylelint-disable block-no-empty */
-const Content = styled.div``;
+const Content = styled('div')``;
 /* stylelint-enable */
 const size: number = 30;
 
-const SelectionCount = styled.div`
+const SelectionCount = styled('div')`
   right: -${grid}px;
   top: -${grid}px;
   color: ${colors.white};

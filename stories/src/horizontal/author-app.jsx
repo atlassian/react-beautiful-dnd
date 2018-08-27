@@ -21,7 +21,7 @@ type State = {|
   quotes: Quote[],
 |};
 
-const Root = styled.div`
+const Root = styled('div')`
   padding: ${grid}px;
   background: ${colors.blue.light};
 `;
