@@ -118,6 +118,11 @@ export default ({ docs, examples }: Props) => (
         <Title>Get started</Title>
       </Link>
     </Section>
+    <DocsSection
+      pages={docs.edges}
+      title="Core concepts"
+      directory="core-concepts"
+    />
     <DocsSection pages={docs.edges} title="Guides" directory="guides" />
     <DocsSection pages={docs.edges} title="API" directory="api" />
     <ExampleSection examples={examples} title="Examples" />
