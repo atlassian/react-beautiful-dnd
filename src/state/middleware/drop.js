@@ -1,14 +1,10 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
-import {
-  dropPending,
-  completeDrop,
-  animateDrop,
-  clean,
-} from '../action-creators';
+import { dropPending, completeDrop, animateDrop } from '../action-creators';
 import noImpact from '../no-impact';
-import getNewHomeClientBorderBoxCenter from '../get-new-home-client-border-box-center';
+import whenGrouping from '../get-new-home-client-border-box-center/when-grouping';
+import whenReordering from '../get-new-home-client-border-box-center/when-reordering';
 import { add, subtract, isEqual, origin } from '../position';
 import withDroppableDisplacement from '../with-droppable-displacement';
 import { getDropDuration } from '../../view/animation';
@@ -107,12 +103,18 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
       return origin;
     }
 
-    const newBorderBoxClientCenter: Position = getNewHomeClientBorderBoxCenter({
-      impact,
-      draggable,
-      draggables: dimensions.draggables,
-      destination: droppable,
-    });
+    const newBorderBoxClientCenter: Position =
+      whenGrouping({
+        impact,
+        draggables: dimensions.draggables,
+      }) ||
+      whenReordering({
+        impact,
+        draggable,
+        draggables: dimensions.draggables,
+        destination: droppable,
+      }) ||
+      draggable.client.borderBox.center;
 
     // What would the offset be from our original center?
     return subtract(
