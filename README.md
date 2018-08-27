@@ -786,7 +786,11 @@ import { Draggable } from 'react-beautiful-dnd';
   this.props.items.map((item, index) => (
     <Draggable draggableId={item.id} index={index}>
       {(provided, snapshot) => (
-        <div ref={provided.innerRef} {...provided.draggableProps}>
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+        >
           {item.content}
         </div>
       )}
