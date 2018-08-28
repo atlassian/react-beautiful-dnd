@@ -3,6 +3,7 @@ import type { Position } from 'css-box-model';
 import { withPlaceholder, withoutPlaceholder } from '../droppable-dimension';
 import { patch } from '../position';
 import shouldUsePlaceholder from '../droppable/should-use-placeholder';
+import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 import type {
   DroppableDimension,
   DraggingState,
@@ -10,7 +11,7 @@ import type {
   DimensionMap,
   DraggableDimension,
   DragImpact,
-  DraggableLocation,
+  DroppableId,
 } from '../../types';
 
 type AcceptedState = DraggingState | CollectingState;
@@ -19,26 +20,25 @@ const clearUnusedPlaceholder = (
   state: AcceptedState,
   impact: DragImpact,
 ): DimensionMap => {
-  const previous: ?DraggableLocation = state.impact.destination;
-  const current: ?DraggableLocation = impact.destination;
+  const last: ?DroppableId = whatIsDraggedOver(state.impact);
+  const now: ?DroppableId = whatIsDraggedOver(impact);
 
-  // no previous destination so there where no placeholders
-  if (!previous) {
+  if (!last) {
     return state.dimensions;
   }
 
-  // no change in droppable - can maintain the last ones
-  if (current && previous.droppableId === current.droppableId) {
+  // no change - can keep the last state
+  if (last === now) {
     return state.dimensions;
   }
 
-  const lastDroppable: DroppableDimension =
-    state.dimensions.droppables[previous.droppableId];
+  const lastDroppable: DroppableDimension = state.dimensions.droppables[last];
 
   // nothing to clear
   if (!lastDroppable.subject.withPlaceholder) {
     return state.dimensions;
   }
+
   const patched: DroppableDimension = withoutPlaceholder(lastDroppable);
 
   // TODO: need to unwind any existing placeholders
@@ -59,12 +59,12 @@ type Args = {|
 
 export default ({ state: oldState, draggable, impact }: Args): DimensionMap => {
   const base: DimensionMap = clearUnusedPlaceholder(oldState, impact);
-  const destination: ?DraggableLocation = impact.destination;
-  if (!destination) {
+  const droppableId: ?DroppableId = whatIsDraggedOver(impact);
+  if (!droppableId) {
     return base;
   }
   const usePlaceholder: boolean = shouldUsePlaceholder(
-    destination.droppableId,
+    droppableId,
     draggable.descriptor,
     impact,
   );
@@ -73,8 +73,7 @@ export default ({ state: oldState, draggable, impact }: Args): DimensionMap => {
     return base;
   }
 
-  const droppable: DroppableDimension =
-    base.droppables[destination.droppableId];
+  const droppable: DroppableDimension = base.droppables[droppableId];
 
   // already have a placeholder - nothing to do here!
   if (droppable.subject.withPlaceholder) {

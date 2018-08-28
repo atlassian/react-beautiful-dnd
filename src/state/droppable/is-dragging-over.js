@@ -1,17 +1,9 @@
 // @flow
 import type { DroppableId, DragImpact } from '../../types';
+import whatIsDraggedOver from './what-is-dragged-over';
 
 export default (droppableId: DroppableId, impact: DragImpact): boolean => {
-  // Only want placeholder for foreign lists
-  const { group, destination } = impact;
+  const id: ?DroppableId = whatIsDraggedOver(impact);
 
-  if (destination) {
-    return droppableId === destination.droppableId;
-  }
-
-  if (group) {
-    return droppableId === group.groupingWith.droppableId;
-  }
-
-  return false;
+  return id ? id === droppableId : false;
 };
