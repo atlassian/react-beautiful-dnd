@@ -24,14 +24,14 @@ const isVisible = ({
   viewport,
   isVisibleThroughFrameFn,
 }: HelperArgs): boolean => {
-  const displacement: Position = destination.viewport.closestScrollable
-    ? destination.viewport.closestScrollable.scroll.diff.displacement
+  const displacement: Position = destination.frame
+    ? destination.frame.scroll.diff.displacement
     : origin;
   const withDisplacement: Spacing = offsetByPosition(target, displacement);
 
   // destination subject is totally hidden by frame
   // this should never happen - but just guarding against it
-  if (!destination.viewport.clippedPageMarginBox) {
+  if (!destination.subject.active) {
     return false;
   }
 
@@ -40,7 +40,7 @@ const isVisible = ({
   // adjust for the scroll as the clipped viewport takes into account
   // the scroll of the droppable.
   const isVisibleInDroppable: boolean = isVisibleThroughFrameFn(
-    destination.viewport.clippedPageMarginBox,
+    destination.subject.active,
   )(withDisplacement);
 
   // We also need to consider whether the destination scroll when detecting

@@ -39,16 +39,9 @@ export default ({
   viewport,
   direction,
 }: Args): DragImpact => {
-  const previousDroppableOverId: ?DroppableId = previousImpact.destination
-    ? previousImpact.destination.droppableId
-    : null;
-
   const destinationId: ?DroppableId = getDroppableOver({
     target: pageBorderBoxCenter,
-    draggable,
-    draggables,
     droppables,
-    previousDroppableOverId,
   });
 
   // not dragging over anything

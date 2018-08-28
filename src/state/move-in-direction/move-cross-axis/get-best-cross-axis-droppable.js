@@ -25,7 +25,7 @@ type GetBestDroppableArgs = {|
 |};
 
 const getSafeClipped = (droppable: DroppableDimension): Rect => {
-  const rect: ?Rect = droppable.viewport.clippedPageMarginBox;
+  const rect: ?Rect = droppable.subject.active;
 
   invariant(rect, 'Cannot get clipped area from droppable');
 
@@ -39,17 +39,14 @@ export default ({
   droppables,
   viewport,
 }: GetBestDroppableArgs): ?DroppableDimension => {
-  const sourceClipped: ?Rect = source.viewport.clippedPageMarginBox;
+  const active: ?Rect = source.subject.active;
 
-  if (!sourceClipped) {
+  if (!active) {
     return null;
   }
 
   const axis: Axis = source.axis;
-  const isBetweenSourceClipped = isWithin(
-    sourceClipped[axis.start],
-    sourceClipped[axis.end],
-  );
+  const isBetweenSourceClipped = isWithin(active[axis.start], active[axis.end]);
   const candidates: DroppableDimension[] = toDroppableList(droppables)
     // Remove the source droppable from the list
     .filter((droppable: DroppableDimension): boolean => droppable !== source)
@@ -58,16 +55,13 @@ export default ({
     // Remove any droppables that are not partially visible
     .filter(
       (droppable: DroppableDimension): boolean => {
-        const clippedPageMarginBox: ?Rect =
-          droppable.viewport.clippedPageMarginBox;
+        const clipped: ?Rect = droppable.subject.active;
         // subject is not visible at all in frame
-        if (!clippedPageMarginBox) {
+        if (!clipped) {
           return false;
         }
         // TODO: only need to be totally visible on the cross axis
-        return isPartiallyVisibleThroughFrame(viewport.frame)(
-          clippedPageMarginBox,
-        );
+        return isPartiallyVisibleThroughFrame(viewport.frame)(clipped);
       },
     )
     .filter(
@@ -76,15 +70,10 @@ export default ({
 
         // is the target in front of the source on the cross axis?
         if (isMovingForward) {
-          return (
-            sourceClipped[axis.crossAxisEnd] < targetClipped[axis.crossAxisEnd]
-          );
+          return active[axis.crossAxisEnd] < targetClipped[axis.crossAxisEnd];
         }
         // is the target behind the source on the cross axis?
-        return (
-          targetClipped[axis.crossAxisStart] <
-          sourceClipped[axis.crossAxisStart]
-        );
+        return targetClipped[axis.crossAxisStart] < active[axis.crossAxisStart];
       },
     )
     // Must have some overlap on the main axis
@@ -100,8 +89,8 @@ export default ({
         return (
           isBetweenSourceClipped(targetClipped[axis.start]) ||
           isBetweenSourceClipped(targetClipped[axis.end]) ||
-          isBetweenDestinationClipped(sourceClipped[axis.start]) ||
-          isBetweenDestinationClipped(sourceClipped[axis.end])
+          isBetweenDestinationClipped(active[axis.start]) ||
+          isBetweenDestinationClipped(active[axis.end])
         );
       },
     )
