@@ -176,8 +176,8 @@ export const makeMapStateToProps = (): Selector => {
         ? pending.result.destination.droppableId
         : null;
 
-      const groupingWith: ?DraggableId = pending.result.groupingWith
-        ? pending.result.groupingWith.draggableId
+      const groupingWith: ?DraggableId = pending.result.grouping
+        ? pending.result.grouping.draggableId
         : null;
 
       const duration: number = pending.dropDuration;
