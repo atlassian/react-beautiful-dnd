@@ -47,8 +47,7 @@ export type NotDraggingStyle = {|
   transform: ?string,
   // null: use the global animation style
   // none: skip animation (used in certain displacement situations)
-  // css.isDropping: drop animation
-  transition: null | string,
+  transition: null | 'none',
 |};
 
 export type DraggableStyle = DraggingStyle | NotDraggingStyle;
