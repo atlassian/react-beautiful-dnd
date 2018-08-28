@@ -1,5 +1,5 @@
 // @flow
-import type { DroppableId, DraggableDescriptor, DragImpact } from '../types';
+import type { DroppableId, DraggableDescriptor, DragImpact } from '../../types';
 import isDraggingOver from './is-dragging-over';
 
 export default (

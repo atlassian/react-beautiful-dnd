@@ -65,6 +65,7 @@ export default ({ state: oldState, draggable, impact }: Args): DimensionMap => {
   }
   const usePlaceholder: boolean = shouldUsePlaceholder(
     destination.droppableId,
+    draggable.descriptor,
     impact,
   );
 
