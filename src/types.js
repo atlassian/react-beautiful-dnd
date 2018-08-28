@@ -104,7 +104,7 @@ export type Scrollable = {|
 export type DroppableSubject = {|
   // raw, unchanging
   pageMarginBox: Rect,
-  withPlaceholderSize: Position,
+  withPlaceholder: ?Position,
   // The hitbox for a droppable
   // - page margin box
   // - with scroll changes

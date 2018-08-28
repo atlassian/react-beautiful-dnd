@@ -24,7 +24,6 @@ const isVisible = ({
   viewport,
   isVisibleThroughFrameFn,
 }: HelperArgs): boolean => {
-  // TODO: with droppable displacement?
   const displacement: Position = destination.frame
     ? destination.frame.scroll.diff.displacement
     : origin;

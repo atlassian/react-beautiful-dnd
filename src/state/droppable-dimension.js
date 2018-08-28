@@ -55,7 +55,7 @@ type GetDroppableArgs = {|
 
 type GetSubjectArgs = {|
   pageMarginBox: Rect,
-  withPlaceholderSize: Position,
+  withPlaceholder: ?Position,
   axis: Axis,
   scrollDisplacement: Position,
   frame: ?Scrollable,
@@ -63,16 +63,18 @@ type GetSubjectArgs = {|
 
 const getSubject = ({
   pageMarginBox,
-  withPlaceholderSize,
+  withPlaceholder,
   axis,
   scrollDisplacement,
   frame,
 }: GetSubjectArgs): DroppableSubject => {
   const scrolled: Spacing = offsetByPosition(pageMarginBox, scrollDisplacement);
-  const expanded: Spacing = {
-    ...scrolled,
-    [axis.end]: scrolled[axis.end] + withPlaceholderSize[axis.line],
-  };
+  const expanded: Spacing = withPlaceholder
+    ? {
+        ...scrolled,
+        [axis.end]: scrolled[axis.end] + withPlaceholder[axis.line],
+      }
+    : scrolled;
   const clipped: ?Rect =
     frame && frame.shouldClipSubject
       ? clip(frame.pageMarginBox, expanded)
@@ -80,7 +82,7 @@ const getSubject = ({
 
   return {
     pageMarginBox,
-    withPlaceholderSize,
+    withPlaceholder,
     active: clipped,
   };
 };
@@ -132,7 +134,7 @@ export const getDroppableDimension = ({
 
   const subject: DroppableSubject = getSubject({
     pageMarginBox: subjectPageMarginBox,
-    withPlaceholderSize: origin,
+    withPlaceholder: null,
     axis,
     scrollDisplacement: origin,
     frame,
@@ -156,36 +158,108 @@ export const withPlaceholder = (
   droppable: DroppableDimension,
   withPlaceholderSize: Position,
 ): DroppableDimension => {
+  console.log('adding placeholder to droppable');
+  const frame: ?Scrollable = droppable.frame;
+
+  if (!frame) {
+    const subject: DroppableSubject = getSubject({
+      pageMarginBox: droppable.subject.pageMarginBox,
+      withPlaceholder: withPlaceholderSize,
+      axis: droppable.axis,
+      scrollDisplacement: origin,
+      frame: droppable.frame,
+    });
+    return {
+      ...droppable,
+      subject,
+    };
+  }
+
+  invariant(
+    !droppable.subject.withPlaceholder,
+    'Cannot add placeholder size to a subject when it already has one',
+  );
+
+  const maxScroll: Position = getMaxScroll({
+    scrollHeight: frame.scrollSize.scrollHeight + withPlaceholderSize.y,
+    scrollWidth: frame.scrollSize.scrollWidth + withPlaceholderSize.x,
+    height: frame.frameClient.paddingBox.height,
+    width: frame.frameClient.paddingBox.width,
+  });
+
+  const newFrame: Scrollable = {
+    ...frame,
+    scroll: {
+      ...frame.scroll,
+      max: maxScroll,
+    },
+  };
+
   const subject: DroppableSubject = getSubject({
     pageMarginBox: droppable.subject.pageMarginBox,
-    withPlaceholderSize,
+    withPlaceholder: withPlaceholderSize,
     axis: droppable.axis,
-    scrollDisplacement: droppable.frame
-      ? droppable.frame.scroll.diff.displacement
-      : origin,
-    frame: droppable.frame,
+    scrollDisplacement: newFrame.scroll.diff.displacement,
+    frame: newFrame,
   });
   return {
     ...droppable,
     subject,
+    frame: newFrame,
   };
 };
 
 export const withoutPlaceholder = (
   droppable: DroppableDimension,
 ): DroppableDimension => {
+  invariant(
+    droppable.subject.withPlaceholder,
+    'Cannot remove placeholder size from subject when there was none',
+  );
+
+  const frame: ?Scrollable = droppable.frame;
+
+  if (!frame) {
+    const subject: DroppableSubject = getSubject({
+      pageMarginBox: droppable.subject.pageMarginBox,
+      withPlaceholder: null,
+      axis: droppable.axis,
+      scrollDisplacement: origin,
+      frame: droppable.frame,
+    });
+    return {
+      ...droppable,
+      subject,
+    };
+  }
+
+  // Original max scroll
+  const maxScroll: Position = getMaxScroll({
+    scrollHeight: frame.scrollSize.scrollHeight,
+    scrollWidth: frame.scrollSize.scrollWidth,
+    height: frame.frameClient.paddingBox.height,
+    width: frame.frameClient.paddingBox.width,
+  });
+
+  const newFrame: Scrollable = {
+    ...frame,
+    scroll: {
+      ...frame.scroll,
+      max: maxScroll,
+    },
+  };
+
   const subject: DroppableSubject = getSubject({
     pageMarginBox: droppable.subject.pageMarginBox,
-    withPlaceholderSize: origin,
+    withPlaceholder: null,
     axis: droppable.axis,
-    scrollDisplacement: droppable.frame
-      ? droppable.frame.scroll.diff.displacement
-      : origin,
-    frame: droppable.frame,
+    scrollDisplacement: newFrame.scroll.diff.displacement,
+    frame: newFrame,
   });
   return {
     ...droppable,
     subject,
+    frame: newFrame,
   };
 };
 
@@ -220,7 +294,7 @@ export const scrollDroppable = (
 
   const subject: DroppableSubject = getSubject({
     pageMarginBox: droppable.subject.pageMarginBox,
-    withPlaceholderSize: droppable.subject.withPlaceholderSize,
+    withPlaceholder: droppable.subject.withPlaceholder,
     axis: droppable.axis,
     scrollDisplacement,
     frame,
