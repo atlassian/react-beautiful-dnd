@@ -64,7 +64,7 @@ export const makeMapStateToProps = (): Selector => {
   ) => {
     const destination: ?DraggableLocation = impact.destination;
     const group: ?GroupingImpact = impact.group;
-    const isHomeList = id === draggable.descriptor.id;
+    const isHomeList: boolean = id === draggable.descriptor.droppableId;
     const placeholder: ?Placeholder = isHomeList ? null : draggable.placeholder;
 
     const isDraggingOver: boolean = getIsDraggingOver(id, destination, group);
