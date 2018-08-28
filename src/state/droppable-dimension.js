@@ -158,7 +158,6 @@ export const withPlaceholder = (
   droppable: DroppableDimension,
   withPlaceholderSize: Position,
 ): DroppableDimension => {
-  console.log('adding placeholder to droppable');
   const frame: ?Scrollable = droppable.frame;
 
   if (!frame) {
@@ -180,6 +179,7 @@ export const withPlaceholder = (
     'Cannot add placeholder size to a subject when it already has one',
   );
 
+  // Original max scroll with increased scroll size
   const maxScroll: Position = getMaxScroll({
     scrollHeight: frame.scrollSize.scrollHeight + withPlaceholderSize.y,
     scrollWidth: frame.scrollSize.scrollWidth + withPlaceholderSize.x,

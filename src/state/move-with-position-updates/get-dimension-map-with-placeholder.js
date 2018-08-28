@@ -1,10 +1,10 @@
 // @flow
 import type { Position } from 'css-box-model';
 import { withPlaceholder, withoutPlaceholder } from '../droppable-dimension';
-import { isEqual, patch } from '../position';
+import { patch } from '../position';
+import shouldUsePlaceholder from '../droppable/should-use-placeholder';
 import type {
   DroppableDimension,
-  DroppableId,
   DraggingState,
   CollectingState,
   DimensionMap,
@@ -63,12 +63,12 @@ export default ({ state: oldState, draggable, impact }: Args): DimensionMap => {
   if (!destination) {
     return base;
   }
-  const droppableId: DroppableId = destination.droppableId;
-  const isOverHome: boolean = Boolean(
-    droppableId === oldState.critical.droppable.id,
+  const usePlaceholder: boolean = shouldUsePlaceholder(
+    destination.droppableId,
+    impact,
   );
 
-  if (isOverHome) {
+  if (!usePlaceholder) {
     return base;
   }
 
