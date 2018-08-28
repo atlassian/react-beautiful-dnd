@@ -62,18 +62,17 @@ export const getDropDuration = ({
   return Number(withDuration.toFixed(2));
 };
 
-const dropCurve: string = `cubic-bezier(.2,1,.1,1)`;
 const curves = {
   outOfTheWay: 'cubic-bezier(0.2, 0, 0, 1)',
+  drop: 'cubic-bezier(.2,1,.1,1)',
 };
 const timeForSlide: number = 0.2;
 
 export const css = {
   outOfTheWay: `transform ${timeForSlide}s ${curves.outOfTheWay}`,
-  jump: `transform ${timeForSlide}s ${dropCurve}`,
-  // TODO: not sure what to do for opacity animation curve
+  jump: `transform ${timeForSlide}s ${curves.drop}`,
   isDropping: (duration: number): string =>
-    `transform ${duration}s ${dropCurve}, opacity ${duration}s ${
+    `transform ${duration}s ${curves.drop}, opacity ${duration}s ${
       curves.outOfTheWay
     }`,
 };
