@@ -344,7 +344,6 @@ describe('Focus retention moving between lists (focus retention between mounts)'
     expect(third.getDOMNode()).not.toBe(document.activeElement);
 
     // cleanup
-    second.unmount();
     third.unmount();
   });
 

@@ -155,6 +155,7 @@ exports.onCreateNode = ({ node, actions, getNode } /* : NodeParams */) => {
 exports.createPages = ({ graphql, actions } /* : NodeParams */) => {
   const { createPage } = actions;
 
+  // $FlowFixMe - not sure what this is after
   return new Promise((resolve, reject) => {
     const markdownPage = path.resolve('src/templates/markdown.jsx');
     resolve(

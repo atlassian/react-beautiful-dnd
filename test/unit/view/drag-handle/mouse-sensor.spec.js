@@ -60,7 +60,9 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  wrapper.unmount();
+  if (wrapper.length) {
+    wrapper.unmount();
+  }
 
   console.warn.mockRestore();
   console.error.mockRestore();
