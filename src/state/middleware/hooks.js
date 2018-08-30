@@ -8,6 +8,7 @@ import type {
   Hooks,
   HookProvided,
   Critical,
+  DragImpact,
   DraggableLocation,
   GroupingLocation,
   DragStart,
@@ -58,6 +59,7 @@ const isGroupingEqual = (
   first: ?GroupingLocation,
   second: ?GroupingLocation,
 ): boolean => {
+  // if both are null - we are equal
   if (first == null && second == null) {
     return true;
   }
@@ -202,11 +204,11 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
     };
 
     // Passing in the critical location again as it can change during a drag
-    const move = (
-      critical: Critical,
-      location: ?DraggableLocation,
-      grouping: ?GroupingLocation,
-    ) => {
+    const move = (critical: Critical, impact: DragImpact) => {
+      const location: ?DraggableLocation = impact.destination;
+      const grouping: ?GroupingLocation = impact.group
+        ? impact.group.groupingWith
+        : null;
       invariant(
         isDragStartPublished && lastCritical,
         'Cannot fire onDragMove when onDragStart has not been called',
@@ -336,7 +338,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
 
     const state: State = store.getState();
     if (state.phase === 'DRAGGING') {
-      publisher.move(state.critical, state.impact.destination);
+      publisher.move(state.critical, state.impact);
     }
   };
 };
