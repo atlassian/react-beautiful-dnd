@@ -12,6 +12,7 @@ import type {
   DisplacedBy,
   DisplacementMap,
 } from '../../types';
+import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 import getDisplacement from '../get-displacement';
 import getDisplacementMap from '../get-displacement-map';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
@@ -50,22 +51,28 @@ export default ({
     false,
   );
 
+  const targetCenter: number = currentCenter[axis.line];
+  const displacement: number = displacedBy.value;
+
+  const isEnteringList: boolean =
+    whatIsDraggedOver(previousImpact) !== destination.descriptor.id;
+
   const displaced: Displacement[] = insideDestination
     .filter(
       (child: DraggableDimension): boolean => {
-        const isDisplaced: boolean = Boolean(map[child.descriptor.id]);
-        const isDisplacedBy: number = isDisplaced
-          ? previousImpact.movement.displacedBy.value
-          : 0;
-
         const borderBox: Rect = child.page.borderBox;
         const start: number = borderBox[axis.start];
         const end: number = borderBox[axis.end];
 
+        const isDisplaced: boolean = Boolean(map[child.descriptor.id]);
+        // If entering list then assume everything is displaced for initial impact
+        const isDisplacedBy: number =
+          isDisplaced || isEnteringList ? displacement : 0;
+
         // When in foreign list, can only displace forwards
         // Moving forward will decrease the amount of things needed to be displaced
         if (isMovingForward) {
-          return currentCenter[axis.line] < start + isDisplacedBy;
+          return targetCenter < start + isDisplacedBy;
         }
 
         // Moving backwards
@@ -76,7 +83,7 @@ export default ({
         }
 
         // No longer need to displace
-        return currentCenter[axis.line] < end;
+        return targetCenter < end;
       },
     )
     .map(
