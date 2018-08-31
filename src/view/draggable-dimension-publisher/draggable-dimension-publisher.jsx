@@ -62,7 +62,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
       if (!this.publishedDescriptor) {
         return;
       }
-      // this.getDimension();
+      this.getDimension();
       console.log('draggable warmed up');
     });
   }
