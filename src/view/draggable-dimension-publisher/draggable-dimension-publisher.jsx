@@ -18,6 +18,7 @@ import type {
   DroppableId,
   TypeId,
 } from '../../types';
+import { origin } from '../../state/position';
 import type { DimensionMarshal } from '../../state/dimension-marshal/dimension-marshal-types';
 
 type Props = {|
@@ -36,9 +37,34 @@ export default class DraggableDimensionPublisher extends Component<Props> {
   };
 
   publishedDescriptor: ?DraggableDescriptor = null;
+  warmUpId: ?IdleCallbackID = null;
+
+  cancelWarmUp = () => {
+    if (!cancelIdleCallback) {
+      return;
+    }
+    if (!this.warmUpId) {
+      return;
+    }
+    cancelIdleCallback(this.warmUpId);
+    this.warmUpId = null;
+  };
 
   componentDidMount() {
     this.publish();
+
+    if (!requestIdleCallback) {
+      return;
+    }
+    this.warmUpId = requestIdleCallback(() => {
+      this.warmUpId = null;
+
+      if (!this.publishedDescriptor) {
+        return;
+      }
+      // this.getDimension();
+      console.log('draggable warmed up');
+    });
   }
 
   componentDidUpdate() {
@@ -47,6 +73,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
   componentWillUnmount() {
     this.unpublish();
+    this.cancelWarmUp();
   }
 
   getMemoizedDescriptor = memoizeOne(
@@ -105,7 +132,9 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     this.publishedDescriptor = null;
   };
 
-  getDimension = (windowScroll: Position): DraggableDimension => {
+  getDimension = (windowScroll?: Position = origin): DraggableDimension => {
+    // a warm up would no longer be needed
+    this.cancelWarmUp();
     const targetRef: ?HTMLElement = this.props.getDraggableRef();
     const descriptor: ?DraggableDescriptor = this.publishedDescriptor;
 

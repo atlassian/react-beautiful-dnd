@@ -247,6 +247,9 @@ export default class DroppableDimensionPublisher extends React.Component<
     // Note: not calling `marshal.updateDroppableIsEnabled()`
     // If the dimension marshal needs to get the dimension immediately
     // then it will get the enabled state of the dimension at that point
+    // warm up
+    console.log('warming up droppable', this.props.droppableId);
+    this.getDimension({ x: 0, y: 0 });
   }
 
   componentDidUpdate(prevProps: Props) {
