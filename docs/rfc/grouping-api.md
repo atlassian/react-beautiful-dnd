@@ -2,6 +2,8 @@
 
 We will be adding the ability to add 'grouping' support to `react-beautiful-dnd`. I am attempting to create naming for the new api that feels right. The grouping feature will enable ability to hover over a Draggable to group with it. Right now I have been calling the feature 'grouping'. However, I am not sure if even that is the right name for the feature.
 
+What the consumer actually achieves with this feature may vary. By default when dropping a item over another one, the dragging item will drop _into_ the one being hovered over
+
 ## API
 
 ### `Draggable` > isGroupingEnabled
