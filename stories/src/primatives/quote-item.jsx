@@ -16,9 +16,9 @@ const getBackgroundColor = (isDragging: boolean, isGroupedOver: boolean) => {
   if (isDragging) {
     return colors.green;
   }
-  if (isGroupedOver) {
-    return colors.orange;
-  }
+  // if (isGroupedOver) {
+  //   return colors.orange;
+  // }
   return colors.white;
 };
 

@@ -47,26 +47,53 @@ export const zIndexOptions: ZIndexOptions = {
   dropAnimating: 4500,
 };
 
-const getTranslate = (offset: Position): ?string => {
-  // we do not translate to origin
-  // we simply clear the translate
-  if (isEqual(offset, origin)) {
+type GetTransformArgs = {|
+  offset: Position,
+  isGroupingWith: boolean,
+  isGroupingOver: boolean,
+  isDropping: boolean,
+|};
+
+const getTransform = ({
+  offset,
+  isGroupingWith,
+  isGroupingOver,
+  isDropping,
+}: GetTransformArgs): ?string => {
+  const scale: ?string = (() => {
+    if (isGroupingWith && isDropping) {
+      return `scale(0.5)`;
+    }
+    if (isGroupingOver) {
+      return `scale(1.04)`;
+    }
+    return null;
+  })();
+
+  const translate: ?string = isEqual(offset, origin)
+    ? null
+    : `translate(${offset.x}px, ${offset.y}px)`;
+
+  if (!scale && !translate) {
     return null;
   }
-  return `translate(${offset.x}px, ${offset.y}px)`;
+
+  return [translate, scale].join(' ');
 };
 
 const getOpacity = (
   isDropAnimating: boolean,
   isGroupingWith: boolean,
 ): ?number => {
-  if (!isDropAnimating) {
-    return null;
-  }
   if (!isGroupingWith) {
     return null;
   }
-  return 0;
+
+  if (isDropAnimating) {
+    return 0;
+  }
+
+  return 0.7;
 };
 
 const getDraggingTransition = (
@@ -80,7 +107,7 @@ const getDraggingTransition = (
   if (shouldAnimateDragMovement) {
     return css.jump;
   }
-  return 'none';
+  return 'opacity 0.2s ease';
 };
 
 export default class Draggable extends Component<Props> {
@@ -209,9 +236,16 @@ export default class Draggable extends Component<Props> {
         // Opting out of the standard css transition for the dragging item
         transition,
         // Layering
-        zIndex: dropping ? zIndexOptions.dropAnimating : zIndexOptions.dragging,
+        zIndex: isDropAnimating
+          ? zIndexOptions.dropAnimating
+          : zIndexOptions.dragging,
         // Moving in response to user input
-        transform: getTranslate(change),
+        transform: getTransform({
+          offset: change,
+          isGroupingWith,
+          isGroupingOver: false,
+          isDropping: isDropAnimating,
+        }),
         opacity: getOpacity(isDropAnimating, isGroupingWith),
         // ## Performance
         pointerEvents: 'none',
@@ -224,9 +258,15 @@ export default class Draggable extends Component<Props> {
     (
       current: Position,
       shouldAnimateDisplacement: boolean,
+      isGroupingOver: boolean,
     ): NotDraggingStyle => {
       const style: NotDraggingStyle = {
-        transform: getTranslate(current),
+        transform: getTransform({
+          offset: current,
+          isGroupingWith: false,
+          isGroupingOver,
+          isDropping: false,
+        }),
         // use the global animation for animation - or opt out of it
         transition: shouldAnimateDisplacement ? null : 'none',
         // transition: css.outOfTheWay,
@@ -240,6 +280,7 @@ export default class Draggable extends Component<Props> {
       change: Position,
       isDragging: boolean,
       isGroupingWith: boolean,
+      isGroupingOver: boolean,
       dropping: ?DroppingState,
       shouldAnimateDisplacement: boolean,
       shouldAnimateDragMovement: boolean,
@@ -256,7 +297,11 @@ export default class Draggable extends Component<Props> {
             isGroupingWith,
             dropping,
           )
-        : this.getNotDraggingStyle(change, shouldAnimateDisplacement);
+        : this.getNotDraggingStyle(
+            change,
+            shouldAnimateDisplacement,
+            isGroupingOver,
+          );
 
       const provided: Provided = {
         innerRef: this.setRef,
@@ -309,6 +354,7 @@ export default class Draggable extends Component<Props> {
         change,
         isDragging,
         Boolean(groupingWith),
+        Boolean(groupedOverBy),
         dropping,
         shouldAnimateDisplacement,
         shouldAnimateDragMovement,
