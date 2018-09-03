@@ -174,7 +174,7 @@ export default ({
       index,
     },
     // TODO
-    group: null,
+    merge: null,
   };
 
   return impact;

@@ -85,7 +85,7 @@ class InnerQuoteList extends React.Component<QuoteListProps> {
             key={quote.id}
             quote={quote}
             isDragging={dragSnapshot.isDragging}
-            isGroupedOver={Boolean(dragSnapshot.groupedOverBy)}
+            isGroupedOver={Boolean(dragSnapshot.combineTargetFor)}
             provided={dragProvided}
           />
         )}

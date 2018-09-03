@@ -112,7 +112,7 @@ export default ({
       droppableId: destination.descriptor.id,
       index: newIndex,
     },
-    group: null,
+    merge: null,
   };
 
   return impact;

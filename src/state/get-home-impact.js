@@ -17,6 +17,6 @@ export default (critical: Critical, dimensions: DimensionMap): DragImpact => {
     movement: noMovement,
     direction: axis.direction,
     destination: getHomeLocation(critical),
-    group: null,
+    merge: null,
   };
 };

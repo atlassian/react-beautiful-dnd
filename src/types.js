@@ -167,7 +167,7 @@ export type UserDirection = {|
   horizontal: HorizontalUserDirection,
 |};
 
-export type CombineWith = {|
+export type Combine = {|
   draggableId: DraggableId,
   droppableId: DroppableId,
 |};
@@ -175,7 +175,7 @@ export type CombineWith = {|
 export type CombineImpact = {|
   // This has an impact on the hitbox for a grouping action
   whenEntered: UserDirection,
-  combineWith: CombineWith,
+  combine: Combine,
 |};
 
 export type DragImpact = {|
@@ -183,7 +183,7 @@ export type DragImpact = {|
   // the direction of the Droppable you are over
   direction: ?Direction,
   destination: ?DraggableLocation,
-  combine: ?CombineImpact,
+  merge: ?CombineImpact,
 |};
 
 export type ClientPositions = {|
@@ -230,7 +230,7 @@ export type DragUpdate = {|
   // may not have any destination (drag to nowhere)
   destination: ?DraggableLocation,
   // populated when a draggable is dragging over another in combine mode
-  combine: ?CombineWith,
+  combine: ?Combine,
 |};
 
 export type DropReason = 'DROP' | 'CANCEL';

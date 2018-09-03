@@ -18,12 +18,12 @@ type Args = {|
 // original client position to its final resting position
 export default ({ impact, draggables }: Args): ?Position => {
   // If grouping return the center position of the group target
-  const combine: ?CombineImpact = impact.combine;
+  const merge: ?CombineImpact = impact.merge;
 
-  if (!combine) {
+  if (!merge) {
     return null;
   }
-  const groupingWith: DraggableId = combine.combineWith.draggableId;
+  const groupingWith: DraggableId = merge.combine.draggableId;
   const isDisplaced: boolean = Boolean(impact.movement.map[groupingWith]);
   const center: Position = draggables[groupingWith].client.borderBox.center;
 

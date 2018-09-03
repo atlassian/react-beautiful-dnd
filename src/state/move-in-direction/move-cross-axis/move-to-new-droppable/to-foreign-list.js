@@ -65,7 +65,7 @@ export default ({
         droppableId: destination.descriptor.id,
         index: 0,
       },
-      group: null,
+      merge: null,
     };
 
     return {
@@ -129,7 +129,7 @@ export default ({
       droppableId: destination.descriptor.id,
       index: proposedIndex,
     },
-    group: null,
+    merge: null,
   };
 
   return {

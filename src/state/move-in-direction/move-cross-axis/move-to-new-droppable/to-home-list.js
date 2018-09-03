@@ -61,7 +61,7 @@ export default ({
           index: draggable.descriptor.index,
           droppableId: draggable.descriptor.droppableId,
         },
-        group: null,
+        merge: null,
       },
     };
   }
@@ -132,7 +132,7 @@ export default ({
       droppableId: destination.descriptor.id,
       index: targetIndex,
     },
-    group: null,
+    merge: null,
   };
 
   return {

@@ -68,7 +68,7 @@ export default ({
     pageBorderBoxCenter,
   );
 
-  const combine: ?CombineImpact = getCombineImpact({
+  const merge: ?CombineImpact = getCombineImpact({
     pageBorderBoxCenterWithDroppableScroll,
     previousImpact,
     draggable,
@@ -80,13 +80,13 @@ export default ({
   // If there is a combine impact then the displacement
   // cannot change displacement
   // TODO: what if entering a new list?
-  if (combine) {
-    const withGroup: DragImpact = {
+  if (merge) {
+    const withMerge: DragImpact = {
       ...previousImpact,
       destination: null,
-      combine,
+      merge,
     };
-    return withGroup;
+    return withMerge;
   }
 
   return isWithinHomeDroppable

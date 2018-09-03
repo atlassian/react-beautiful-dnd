@@ -18,7 +18,7 @@ import type {
   DragImpact,
   DropResult,
   PendingDrop,
-  CombineWith,
+  Combine,
   DimensionMap,
   DraggableDimension,
 } from '../../types';
@@ -80,8 +80,8 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
   const droppable: ?DroppableDimension = destination
     ? dimensions.droppables[destination.droppableId]
     : null;
-  const combine: ?CombineWith =
-    impact && impact.combine ? impact.combine.combineWith : null;
+  const combine: ?Combine =
+    impact && impact.merge ? impact.merge.combine : null;
 
   const source: DraggableLocation = {
     index: critical.draggable.index,

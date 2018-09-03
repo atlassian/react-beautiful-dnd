@@ -125,7 +125,7 @@ export default ({
       index: proposedIndex,
     },
     direction: droppable.axis.direction,
-    group: null,
+    merge: null,
   };
 
   if (isVisibleInNewLocation) {

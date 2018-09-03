@@ -106,9 +106,9 @@ export const makeMapStateToProps = (): Selector => {
     const map: DisplacementMap = impact.movement.map;
     const displacement: ?Displacement = map[ownId];
     const movement: DragMovement = impact.movement;
-    const combine: ?CombineImpact = impact.combine;
+    const merge: ?CombineImpact = impact.merge;
     const isCombinedWith: boolean = Boolean(
-      combine && combine.combineWith.draggableId === ownId,
+      merge && merge.combine.draggableId === ownId,
     );
     const displacedBy: Position = movement.displacedBy.point;
     const offset: Position = memoizedOffset(displacedBy.x, displacedBy.y);
@@ -152,8 +152,8 @@ export const makeMapStateToProps = (): Selector => {
         ? state.impact.destination.droppableId
         : null;
 
-      const combineWith: ?DraggableId = state.impact.combine
-        ? state.impact.combine.combineWith.draggableId
+      const combineWith: ?DraggableId = state.impact.merge
+        ? state.impact.merge.combine.draggableId
         : null;
 
       return getDraggingProps(

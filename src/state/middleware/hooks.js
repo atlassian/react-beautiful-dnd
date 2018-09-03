@@ -10,7 +10,7 @@ import type {
   Critical,
   DragImpact,
   DraggableLocation,
-  CombineWith,
+  Combine,
   DragStart,
   Announce,
   DragUpdate,
@@ -55,7 +55,7 @@ const areLocationsEqual = (
   );
 };
 
-const isCombineEqual = (first: ?CombineWith, second: ?CombineWith): boolean => {
+const isCombineEqual = (first: ?Combine, second: ?Combine): boolean => {
   // if both are null - we are equal
   if (first == null && second == null) {
     return true;
@@ -167,7 +167,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
 
   const publisher = (() => {
     let lastLocation: ?DraggableLocation = null;
-    let lastCombine: ?CombineWith = null;
+    let lastCombine: ?Combine = null;
     let lastCritical: ?Critical = null;
     let isDragStartPublished: boolean = false;
 
@@ -203,9 +203,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
     // Passing in the critical location again as it can change during a drag
     const move = (critical: Critical, impact: DragImpact) => {
       const location: ?DraggableLocation = impact.destination;
-      const combine: ?CombineWith = impact.combine
-        ? impact.combine.combineWith
-        : null;
+      const combine: ?Combine = impact.merge ? impact.merge.combine : null;
       invariant(
         isDragStartPublished && lastCritical,
         'Cannot fire onDragMove when onDragStart has not been called',

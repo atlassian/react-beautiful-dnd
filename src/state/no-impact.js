@@ -18,7 +18,7 @@ const noImpact: DragImpact = {
   movement: noMovement,
   direction: null,
   destination: null,
-  group: null,
+  merge: null,
 };
 
 export default noImpact;

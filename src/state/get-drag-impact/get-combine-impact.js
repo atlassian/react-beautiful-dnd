@@ -16,15 +16,15 @@ import isUserMovingForward from '../user-direction/is-user-moving-forward';
 const getDirectionForDetection = (
   id: DraggableId,
   currentDirection: UserDirection,
-  oldCombine: ?CombineImpact,
+  oldMerge: ?CombineImpact,
 ): UserDirection => {
-  if (!oldCombine) {
+  if (!oldMerge) {
     return currentDirection;
   }
-  if (id !== oldCombine.combineWith.draggableId) {
+  if (id !== oldMerge.combine.draggableId) {
     return currentDirection;
   }
-  return oldCombine.whenEntered;
+  return oldMerge.whenEntered;
 };
 
 type IsCombiningWithArgs = {|
@@ -34,7 +34,7 @@ type IsCombiningWithArgs = {|
   borderBox: Rect,
   displacedBy: number,
   currentDirection: UserDirection,
-  oldCombine: ?CombineImpact,
+  oldMerge: ?CombineImpact,
 |};
 
 const isCombiningWith = ({
@@ -44,7 +44,7 @@ const isCombiningWith = ({
   borderBox,
   displacedBy,
   currentDirection,
-  oldCombine,
+  oldMerge,
 }: IsCombiningWithArgs): boolean => {
   const start: number = borderBox[axis.start] + displacedBy;
   const end: number = borderBox[axis.end] + displacedBy;
@@ -54,7 +54,7 @@ const isCombiningWith = ({
   const direction: UserDirection = getDirectionForDetection(
     id,
     currentDirection,
-    oldCombine,
+    oldMerge,
   );
   const isMovingForward: boolean = isUserMovingForward(axis, direction);
 
@@ -89,7 +89,7 @@ export default ({
   const axis: Axis = destination.axis;
   const map: DisplacementMap = previousImpact.movement.map;
   const canBeDisplacedBy: number = previousImpact.movement.displacedBy.value;
-  const oldCombine: ?CombineImpact = previousImpact.combine;
+  const oldMerge: ?CombineImpact = previousImpact.merge;
 
   const target: ?DraggableDimension = insideDestination.find(
     (child: DraggableDimension): boolean => {
@@ -109,7 +109,7 @@ export default ({
         borderBox: child.page.borderBox,
         displacedBy,
         currentDirection: direction,
-        oldCombine,
+        oldMerge,
       });
     },
   );
@@ -122,9 +122,9 @@ export default ({
     whenEntered: getDirectionForDetection(
       target.descriptor.id,
       direction,
-      oldCombine,
+      oldMerge,
     ),
-    combineWith: {
+    combine: {
       draggableId: target.descriptor.id,
       droppableId: destination.descriptor.id,
     },
