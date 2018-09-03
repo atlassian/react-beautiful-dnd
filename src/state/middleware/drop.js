@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
 import { dropPending, completeDrop, animateDrop } from '../action-creators';
 import noImpact from '../no-impact';
-import whenGrouping from '../get-new-home-client-border-box-center/when-grouping';
+import whenCombining from '../get-new-home-client-border-box-center/when-combining';
 import whenReordering from '../get-new-home-client-border-box-center/when-reordering';
 import { add, subtract, isEqual, origin } from '../position';
 import withDroppableDisplacement from '../with-droppable-displacement';
@@ -15,10 +15,10 @@ import type {
   Viewport,
   Critical,
   DraggableLocation,
-  GroupingLocation,
   DragImpact,
   DropResult,
   PendingDrop,
+  CombineWith,
   DimensionMap,
   DraggableDimension,
 } from '../../types';
@@ -80,8 +80,8 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
   const droppable: ?DroppableDimension = destination
     ? dimensions.droppables[destination.droppableId]
     : null;
-  const grouping: ?GroupingLocation =
-    impact && impact.group ? impact.group.groupingWith : null;
+  const combine: ?CombineWith =
+    impact && impact.combine ? impact.combine.combineWith : null;
 
   const source: DraggableLocation = {
     index: critical.draggable.index,
@@ -93,7 +93,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     type: home.descriptor.type,
     source,
     destination,
-    grouping,
+    combine,
     reason,
   };
 
@@ -104,7 +104,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     }
 
     const newBorderBoxClientCenter: Position =
-      whenGrouping({
+      whenCombining({
         impact,
         draggables: dimensions.draggables,
       }) ||

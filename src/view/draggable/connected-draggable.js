@@ -24,7 +24,7 @@ import type {
   DroppableId,
   DragMovement,
   DraggableDimension,
-  GroupingImpact,
+  CombineImpact,
   Displacement,
   PendingDrop,
   DragImpact,
@@ -50,8 +50,8 @@ const defaultMapProps: MapProps = {
   // these properties are only populated when the item is dragging
   dimension: null,
   draggingOver: null,
-  groupingWith: null,
-  groupedOverBy: null,
+  combineWith: null,
+  combineTargetFor: null,
 };
 
 // Returning a function to ensure each
@@ -64,12 +64,12 @@ export const makeMapStateToProps = (): Selector => {
   const getSecondaryProps = memoizeOne(
     (
       offset: Position,
-      groupedOverBy: ?DraggableId = null,
+      combineTargetFor: ?DraggableId = null,
       shouldAnimateDisplacement: boolean,
     ): MapProps => ({
       ...defaultMapProps,
       offset,
-      groupedOverBy,
+      combineTargetFor,
       shouldAnimateDisplacement,
     }),
   );
@@ -82,7 +82,7 @@ export const makeMapStateToProps = (): Selector => {
       // the id of the droppable you are over
       draggingOver: ?DroppableId,
       // the id of a draggable you are grouping with
-      groupingWith: ?DraggableId,
+      combineWith: ?DraggableId,
     ): MapProps => ({
       isDragging: true,
       dropping: null,
@@ -91,8 +91,8 @@ export const makeMapStateToProps = (): Selector => {
       shouldAnimateDragMovement,
       dimension,
       draggingOver,
-      groupingWith,
-      groupedOverBy: null,
+      combineWith,
+      combineTargetFor: null,
     }),
   );
 
@@ -106,14 +106,14 @@ export const makeMapStateToProps = (): Selector => {
     const map: DisplacementMap = impact.movement.map;
     const displacement: ?Displacement = map[ownId];
     const movement: DragMovement = impact.movement;
-    const group: ?GroupingImpact = impact.group;
-    const isGroupedOver: boolean = Boolean(
-      group && group.groupingWith.draggableId === ownId,
+    const combine: ?CombineImpact = impact.combine;
+    const isCombinedWith: boolean = Boolean(
+      combine && combine.combineWith.draggableId === ownId,
     );
     const displacedBy: Position = movement.displacedBy.point;
     const offset: Position = memoizedOffset(displacedBy.x, displacedBy.y);
 
-    if (isGroupedOver) {
+    if (isCombinedWith) {
       return getSecondaryProps(
         displacement ? offset : origin,
         draggingId,
@@ -152,8 +152,8 @@ export const makeMapStateToProps = (): Selector => {
         ? state.impact.destination.droppableId
         : null;
 
-      const groupingWith: ?DraggableId = state.impact.group
-        ? state.impact.group.groupingWith.draggableId
+      const combineWith: ?DraggableId = state.impact.combine
+        ? state.impact.combine.combineWith.draggableId
         : null;
 
       return getDraggingProps(
@@ -161,7 +161,7 @@ export const makeMapStateToProps = (): Selector => {
         shouldAnimateDragMovement,
         dimension,
         draggingOver,
-        groupingWith,
+        combineWith,
       );
     }
 
@@ -176,8 +176,8 @@ export const makeMapStateToProps = (): Selector => {
         ? pending.result.destination.droppableId
         : null;
 
-      const groupingWith: ?DraggableId = pending.result.grouping
-        ? pending.result.grouping.draggableId
+      const combineWith: ?DraggableId = pending.result.combine
+        ? pending.result.combine.draggableId
         : null;
 
       const duration: number = pending.dropDuration;
@@ -196,9 +196,9 @@ export const makeMapStateToProps = (): Selector => {
         draggingOver,
         // animation will be controlled by the isDropAnimating flag
         shouldAnimateDragMovement: false,
-        // Grouping
-        groupingWith,
-        groupedOverBy: null,
+        // Combining
+        combineWith,
+        combineTargetFor: null,
         // not relevant,
         shouldAnimateDisplacement: false,
       };

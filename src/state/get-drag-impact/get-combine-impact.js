@@ -6,7 +6,7 @@ import type {
   UserDirection,
   DraggableDimension,
   DroppableDimension,
-  GroupingImpact,
+  CombineImpact,
   DragImpact,
   DisplacementMap,
 } from '../../types';
@@ -16,36 +16,36 @@ import isUserMovingForward from '../user-direction/is-user-moving-forward';
 const getDirectionForDetection = (
   id: DraggableId,
   currentDirection: UserDirection,
-  oldGroup: ?GroupingImpact,
+  oldCombine: ?CombineImpact,
 ): UserDirection => {
-  if (!oldGroup) {
+  if (!oldCombine) {
     return currentDirection;
   }
-  if (id !== oldGroup.groupingWith.draggableId) {
+  if (id !== oldCombine.combineWith.draggableId) {
     return currentDirection;
   }
-  return oldGroup.whenEntered;
+  return oldCombine.whenEntered;
 };
 
-type IsGroupingWithArgs = {|
+type IsCombiningWithArgs = {|
   id: DraggableId,
   currentCenter: Position,
   axis: Axis,
   borderBox: Rect,
   displacedBy: number,
   currentDirection: UserDirection,
-  oldGroup: ?GroupingImpact,
+  oldCombine: ?CombineImpact,
 |};
 
-const isGroupingWith = ({
+const isCombiningWith = ({
   id,
   currentCenter,
   axis,
   borderBox,
   displacedBy,
   currentDirection,
-  oldGroup,
-}: IsGroupingWithArgs): boolean => {
+  oldCombine,
+}: IsCombiningWithArgs): boolean => {
   const start: number = borderBox[axis.start] + displacedBy;
   const end: number = borderBox[axis.end] + displacedBy;
   const size: number = borderBox[axis.size];
@@ -54,7 +54,7 @@ const isGroupingWith = ({
   const direction: UserDirection = getDirectionForDetection(
     id,
     currentDirection,
-    oldGroup,
+    oldCombine,
   );
   const isMovingForward: boolean = isUserMovingForward(axis, direction);
 
@@ -81,15 +81,15 @@ export default ({
   destination,
   insideDestination,
   direction,
-}: Args): ?GroupingImpact => {
-  if (!destination.isGroupingEnabled) {
+}: Args): ?CombineImpact => {
+  if (!destination.isCombineEnabled) {
     return null;
   }
 
   const axis: Axis = destination.axis;
   const map: DisplacementMap = previousImpact.movement.map;
   const canBeDisplacedBy: number = previousImpact.movement.displacedBy.value;
-  const oldGroup: ?GroupingImpact = previousImpact.group;
+  const oldCombine: ?CombineImpact = previousImpact.combine;
 
   const target: ?DraggableDimension = insideDestination.find(
     (child: DraggableDimension): boolean => {
@@ -102,14 +102,14 @@ export default ({
       const isDisplaced: boolean = Boolean(map[id]);
       const displacedBy: number = isDisplaced ? canBeDisplacedBy : 0;
 
-      return isGroupingWith({
+      return isCombiningWith({
         id,
         currentCenter,
         axis,
         borderBox: child.page.borderBox,
         displacedBy,
         currentDirection: direction,
-        oldGroup,
+        oldCombine,
       });
     },
   );
@@ -118,13 +118,13 @@ export default ({
     return null;
   }
 
-  const result: GroupingImpact = {
+  const result: CombineImpact = {
     whenEntered: getDirectionForDetection(
       target.descriptor.id,
       direction,
-      oldGroup,
+      oldCombine,
     ),
-    groupingWith: {
+    combineWith: {
       draggableId: target.descriptor.id,
       droppableId: destination.descriptor.id,
     },

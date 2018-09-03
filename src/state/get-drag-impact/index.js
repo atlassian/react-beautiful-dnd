@@ -8,14 +8,14 @@ import type {
   DroppableDimensionMap,
   UserDirection,
   DragImpact,
-  GroupingImpact,
+  CombineImpact,
   Viewport,
 } from '../../types';
 import getDroppableOver from '../get-droppable-over';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import inHomeList from './in-home-list';
 import inForeignList from './in-foreign-list';
-import getGroupingImpact from './get-grouping-impact';
+import getCombineImpact from './get-combine-impact';
 import noImpact from '../no-impact';
 import withDroppableScroll from '../with-droppable-scroll';
 
@@ -68,7 +68,7 @@ export default ({
     pageBorderBoxCenter,
   );
 
-  const group: ?GroupingImpact = getGroupingImpact({
+  const combine: ?CombineImpact = getCombineImpact({
     pageBorderBoxCenterWithDroppableScroll,
     previousImpact,
     draggable,
@@ -77,14 +77,14 @@ export default ({
     direction,
   });
 
-  // If there is a grouping impact then the displacement
+  // If there is a combine impact then the displacement
   // cannot change displacement
   // TODO: what if entering a new list?
-  if (group) {
+  if (combine) {
     const withGroup: DragImpact = {
       ...previousImpact,
       destination: null,
-      group,
+      combine,
     };
     return withGroup;
   }

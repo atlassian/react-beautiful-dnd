@@ -3,7 +3,7 @@ import { type Position } from 'css-box-model';
 import type {
   DraggableDimensionMap,
   DragImpact,
-  GroupingImpact,
+  CombineImpact,
   DraggableId,
 } from '../../types';
 import { add } from '../position';
@@ -18,12 +18,12 @@ type Args = {|
 // original client position to its final resting position
 export default ({ impact, draggables }: Args): ?Position => {
   // If grouping return the center position of the group target
-  const group: ?GroupingImpact = impact.group;
+  const combine: ?CombineImpact = impact.combine;
 
-  if (!group) {
+  if (!combine) {
     return null;
   }
-  const groupingWith: DraggableId = group.groupingWith.draggableId;
+  const groupingWith: DraggableId = combine.combineWith.draggableId;
   const isDisplaced: boolean = Boolean(impact.movement.map[groupingWith]);
   const center: Position = draggables[groupingWith].client.borderBox.center;
 

@@ -10,7 +10,7 @@ import type {
   Critical,
   DragImpact,
   DraggableLocation,
-  GroupingLocation,
+  CombineWith,
   DragStart,
   Announce,
   DragUpdate,
@@ -55,10 +55,7 @@ const areLocationsEqual = (
   );
 };
 
-const isGroupingEqual = (
-  first: ?GroupingLocation,
-  second: ?GroupingLocation,
-): boolean => {
+const isCombineEqual = (first: ?CombineWith, second: ?CombineWith): boolean => {
   // if both are null - we are equal
   if (first == null && second == null) {
     return true;
@@ -170,7 +167,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
 
   const publisher = (() => {
     let lastLocation: ?DraggableLocation = null;
-    let lastGrouping: ?GroupingLocation = null;
+    let lastCombine: ?CombineWith = null;
     let lastCritical: ?Critical = null;
     let isDragStartPublished: boolean = false;
 
@@ -196,7 +193,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
       const data: DragStart = getDragStart(critical);
       lastCritical = critical;
       lastLocation = data.source;
-      lastGrouping = null;
+      lastCombine = null;
       isDragStartPublished = true;
       withTimings('onDragStart', () =>
         execute(getHooks().onDragStart, data, messagePreset.onDragStart),
@@ -206,8 +203,8 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
     // Passing in the critical location again as it can change during a drag
     const move = (critical: Critical, impact: DragImpact) => {
       const location: ?DraggableLocation = impact.destination;
-      const grouping: ?GroupingLocation = impact.group
-        ? impact.group.groupingWith
+      const combine: ?CombineWith = impact.combine
+        ? impact.combine.combineWith
         : null;
       invariant(
         isDragStartPublished && lastCritical,
@@ -231,12 +228,9 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
       if (hasLocationChanged) {
         lastLocation = location;
       }
-      const hasGroupingChanged: boolean = !isGroupingEqual(
-        lastGrouping,
-        grouping,
-      );
+      const hasGroupingChanged: boolean = !isCombineEqual(lastCombine, combine);
       if (hasGroupingChanged) {
-        lastGrouping = grouping;
+        lastCombine = combine;
       }
 
       // Nothing has changed - no update needed
@@ -246,7 +240,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
 
       const data: DragUpdate = {
         ...getDragStart(critical),
-        grouping,
+        combine,
         destination: location,
       };
 
@@ -263,7 +257,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
       isDragStartPublished = false;
       lastLocation = null;
       lastCritical = null;
-      lastGrouping = null;
+      lastCombine = null;
       withTimings('onDragEnd', () =>
         execute(getHooks().onDragEnd, result, messagePreset.onDragEnd),
       );
@@ -278,7 +272,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
 
       const result: DropResult = {
         ...getDragStart(lastCritical),
-        grouping: null,
+        combine: null,
         destination: null,
         reason: 'CANCEL',
       };

@@ -39,7 +39,7 @@ type Props = {|
   type: TypeId,
   direction: Direction,
   isDropDisabled: boolean,
-  isGroupingEnabled: boolean,
+  isCombineEnabled: boolean,
   ignoreContainerClipping: boolean,
   isDropDisabled: boolean,
   getDroppableRef: () => ?HTMLElement,
@@ -349,7 +349,7 @@ export default class DroppableDimensionPublisher extends React.Component<
       direction,
       ignoreContainerClipping,
       isDropDisabled,
-      isGroupingEnabled,
+      isCombineEnabled,
       getDroppableRef,
     } = this.props;
 
@@ -393,7 +393,7 @@ export default class DroppableDimensionPublisher extends React.Component<
     const dimension: DroppableDimension = getDroppableDimension({
       descriptor,
       isEnabled: !isDropDisabled,
-      isGroupingEnabled,
+      isCombineEnabled,
       direction,
       client,
       page,

@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import { isEqual, origin } from '../../state/position';
-import { transitions } from '../animation';
+import { transitions, opacity } from '../animation';
 import type {
   DraggableDimension,
   ClientPositions,
@@ -49,9 +49,9 @@ export const zIndexOptions: ZIndexOptions = {
 
 export const getOpacity = (
   isDropAnimating: boolean,
-  isGroupingWith: boolean,
+  isCombining: boolean,
 ): ?number => {
-  if (!isGroupingWith) {
+  if (!isCombining) {
     return null;
   }
 
@@ -59,22 +59,22 @@ export const getOpacity = (
     return 0;
   }
 
-  return 0.7;
+  return opacity.isCombiningWith;
 };
 
 type GetTransformArgs = {|
   offset: Position,
-  isGroupingWith: boolean,
-  isGroupingOver: boolean,
+  isCombining: boolean,
+  isCombineTargetFor: boolean,
   isDropping: boolean,
 |};
 
 export const getTransform = (() => {
-  const getScale = (isGroupingWith, isGroupingOver, isDropping): ?string => {
-    if (isGroupingWith && isDropping) {
+  const getScale = (isCombining, isCombineTargetFor, isDropping): ?string => {
+    if (isCombining && isDropping) {
       return `scale(0.75)`;
     }
-    if (isGroupingOver) {
+    if (isCombineTargetFor) {
       return `scale(1.04)`;
     }
     return null;
@@ -82,14 +82,18 @@ export const getTransform = (() => {
 
   return ({
     offset,
-    isGroupingWith,
-    isGroupingOver,
+    isCombining,
+    isCombineTargetFor,
     isDropping,
   }: GetTransformArgs): ?string => {
     const translate: ?string = !isEqual(offset, origin)
       ? `translate(${offset.x}px, ${offset.y}px)`
       : null;
-    const scale: ?string = getScale(isGroupingWith, isGroupingOver, isDropping);
+    const scale: ?string = getScale(
+      isCombining,
+      isCombineTargetFor,
+      isDropping,
+    );
 
     if (translate && scale) {
       return `${translate} ${scale}`;
@@ -211,7 +215,7 @@ export default class Draggable extends Component<Props> {
       change: Position,
       dimension: ?DraggableDimension,
       shouldAnimateDragMovement: boolean,
-      isGroupingWith: boolean,
+      isCombining: boolean,
       dropping: ?DroppingState,
     ): DraggingStyle => {
       invariant(dimension, 'Cannot get draggable style without a dimension');
@@ -244,11 +248,11 @@ export default class Draggable extends Component<Props> {
         // Moving in response to user input
         transform: getTransform({
           offset: change,
-          isGroupingWith,
-          isGroupingOver: false,
+          isCombining,
+          isCombineTargetFor: false,
           isDropping: isDropAnimating,
         }),
-        opacity: getOpacity(isDropAnimating, isGroupingWith),
+        opacity: getOpacity(isDropAnimating, isCombining),
         // ## Performance
         pointerEvents: 'none',
       };
@@ -260,13 +264,13 @@ export default class Draggable extends Component<Props> {
     (
       current: Position,
       shouldAnimateDisplacement: boolean,
-      isGroupingOver: boolean,
+      isCombineTargetFor: boolean,
     ): NotDraggingStyle => {
       const style: NotDraggingStyle = {
         transform: getTransform({
           offset: current,
-          isGroupingWith: false,
-          isGroupingOver,
+          isCombining: false,
+          isCombineTargetFor,
           isDropping: false,
         }),
         // transition style is applied in the head
@@ -280,8 +284,8 @@ export default class Draggable extends Component<Props> {
     (
       change: Position,
       isDragging: boolean,
-      isGroupingWith: boolean,
-      isGroupingOver: boolean,
+      isCombining: boolean,
+      isCombineTargetFor: boolean,
       dropping: ?DroppingState,
       shouldAnimateDisplacement: boolean,
       shouldAnimateDragMovement: boolean,
@@ -295,13 +299,13 @@ export default class Draggable extends Component<Props> {
             change,
             dimension,
             shouldAnimateDragMovement,
-            isGroupingWith,
+            isCombining,
             dropping,
           )
         : this.getNotDraggingStyle(
             change,
             shouldAnimateDisplacement,
-            isGroupingOver,
+            isCombineTargetFor,
           );
 
       const provided: Provided = {
@@ -322,14 +326,14 @@ export default class Draggable extends Component<Props> {
       isDraggingOrDropping: boolean,
       dropping: ?DroppingState,
       draggingOver: ?DroppableId,
-      groupingWith: ?DraggableId,
-      groupedOverBy: ?DraggableId,
+      combineWith: ?DraggableId,
+      combineTargetFor: ?DraggableId,
     ): StateSnapshot => ({
       isDragging: isDraggingOrDropping,
       dropping,
       draggingOver,
-      groupingWith,
-      groupedOverBy,
+      combineWith,
+      combineTargetFor,
     }),
   );
 
@@ -341,8 +345,8 @@ export default class Draggable extends Component<Props> {
       isDragging,
       dropping,
       draggingOver,
-      groupingWith,
-      groupedOverBy,
+      combineWith,
+      combineTargetFor,
       dimension,
       shouldAnimateDisplacement,
       shouldAnimateDragMovement,
@@ -354,8 +358,8 @@ export default class Draggable extends Component<Props> {
       this.getProvided(
         change,
         isDragging,
-        Boolean(groupingWith),
-        Boolean(groupedOverBy),
+        Boolean(combineWith),
+        Boolean(combineTargetFor),
         dropping,
         shouldAnimateDisplacement,
         shouldAnimateDragMovement,
@@ -366,8 +370,8 @@ export default class Draggable extends Component<Props> {
         isDraggingOrDropping,
         dropping,
         draggingOver,
-        groupingWith,
-        groupedOverBy,
+        combineWith,
+        combineTargetFor,
       ),
     );
 
@@ -397,7 +401,6 @@ export default class Draggable extends Component<Props> {
       isDragging,
       dropping,
       isDragDisabled,
-      groupedOverBy,
       // TODO: shouldAnimateDragMovement
       disableInteractiveElementBlocking,
     } = this.props;

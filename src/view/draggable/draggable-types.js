@@ -113,8 +113,8 @@ export type MapProps = {|
   // only provided when dragging
   dimension: ?DraggableDimension,
   draggingOver: ?DroppableId,
-  groupingWith: ?DraggableId,
-  groupedOverBy: ?DraggableId,
+  combineWith: ?DraggableId,
+  combineTargetFor: ?DraggableId,
 |};
 
 export type OwnProps = {|

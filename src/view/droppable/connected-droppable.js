@@ -118,7 +118,7 @@ connectedDroppable.defaultProps = ({
   type: 'DEFAULT',
   direction: 'vertical',
   isDropDisabled: false,
-  isGroupingEnabled: false,
+  isCombineEnabled: false,
   ignoreContainerClipping: false,
 }: DefaultProps);
 

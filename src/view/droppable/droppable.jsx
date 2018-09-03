@@ -128,7 +128,7 @@ export default class Droppable extends Component<Props> {
       type,
       droppableId,
       isDropDisabled,
-      isGroupingEnabled,
+      isCombineEnabled,
       // mapProps
       ignoreContainerClipping,
       isDraggingOver,
@@ -153,7 +153,7 @@ export default class Droppable extends Component<Props> {
         direction={direction}
         ignoreContainerClipping={ignoreContainerClipping}
         isDropDisabled={isDropDisabled}
-        isGroupingEnabled={isGroupingEnabled}
+        isCombineEnabled={isCombineEnabled}
         getDroppableRef={this.getDroppableRef}
       >
         {children(provided, snapshot)}

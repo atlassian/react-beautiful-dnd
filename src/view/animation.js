@@ -78,7 +78,7 @@ export const scale = {
 };
 
 export const opacity = {
-  isGroupingOver: 0.7,
+  isCombiningWith: 0.7,
 };
 
 export const transitions = {
