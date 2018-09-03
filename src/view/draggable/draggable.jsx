@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import { isEqual, origin } from '../../state/position';
-import { transitions, getOpacity } from '../animation';
+import { transitions } from '../animation';
 import type {
   DraggableDimension,
   ClientPositions,
@@ -47,6 +47,21 @@ export const zIndexOptions: ZIndexOptions = {
   dropAnimating: 4500,
 };
 
+export const getOpacity = (
+  isDropAnimating: boolean,
+  isGroupingWith: boolean,
+): ?number => {
+  if (!isGroupingWith) {
+    return null;
+  }
+
+  if (isDropAnimating) {
+    return 0;
+  }
+
+  return 0.7;
+};
+
 type GetTransformArgs = {|
   offset: Position,
   isGroupingWith: boolean,
@@ -54,13 +69,8 @@ type GetTransformArgs = {|
   isDropping: boolean,
 |};
 
-const getTransform = ({
-  offset,
-  isGroupingWith,
-  isGroupingOver,
-  isDropping,
-}: GetTransformArgs): ?string => {
-  const scale: ?string = (() => {
+export const getTransform = (() => {
+  const getScale = (isGroupingWith, isGroupingOver, isDropping): ?string => {
     if (isGroupingWith && isDropping) {
       return `scale(0.75)`;
     }
@@ -68,18 +78,26 @@ const getTransform = ({
       return `scale(1.04)`;
     }
     return null;
-  })();
+  };
 
-  const translate: ?string = isEqual(offset, origin)
-    ? null
-    : `translate(${offset.x}px, ${offset.y}px)`;
+  return ({
+    offset,
+    isGroupingWith,
+    isGroupingOver,
+    isDropping,
+  }: GetTransformArgs): ?string => {
+    const translate: ?string = !isEqual(offset, origin)
+      ? `translate(${offset.x}px, ${offset.y}px)`
+      : null;
+    const scale: ?string = getScale(isGroupingWith, isGroupingOver, isDropping);
 
-  if (!scale && !translate) {
-    return null;
-  }
+    if (translate && scale) {
+      return `${translate} ${scale}`;
+    }
 
-  return [translate, scale].join(' ');
-};
+    return translate || scale || null;
+  };
+})();
 
 const getDraggingTransition = (
   shouldAnimateDragMovement: boolean,
@@ -91,7 +109,7 @@ const getDraggingTransition = (
   if (shouldAnimateDragMovement) {
     return transitions.snapTo;
   }
-  return transitions.whileDragging;
+  return transitions.opacity;
 };
 
 export default class Draggable extends Component<Props> {

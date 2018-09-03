@@ -1,7 +1,7 @@
 // @flow
 import type { Position } from 'css-box-model';
 import type { DropReason } from '../types';
-import { distance, isEqual } from '../state/position';
+import { distance, isEqual, origin } from '../state/position';
 
 type GetDropDurationArgs = {|
   current: Position,
@@ -71,23 +71,18 @@ const curves = {
   drop: 'cubic-bezier(.2,1,.1,1)',
 };
 
-export const getOpacity = (
-  isDropAnimating: boolean,
-  isGroupingWith: boolean,
-): ?number => {
-  if (!isGroupingWith) {
-    return null;
-  }
+// TODO
+export const scale = {
+  dropOntoGroupTarget: 0.75,
+  groupTarget: 1.04,
+};
 
-  if (isDropAnimating) {
-    return 0;
-  }
-
-  return 0.7;
+export const opacity = {
+  isGroupingOver: 0.7,
 };
 
 export const transitions = {
-  whileDragging: `opacity ${durations.slide}s ${curves.outOfTheWay}`,
+  opacity: `opacity ${durations.slide}s ${curves.outOfTheWay}`,
   snapTo: `transform ${durations.slide}s ${curves.drop}`,
   outOfTheWay: `transform ${durations.slide}s ${curves.outOfTheWay}`,
   isDropping: (duration: number): string =>
