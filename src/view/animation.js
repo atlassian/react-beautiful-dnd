@@ -62,15 +62,34 @@ export const getDropDuration = ({
   return Number(withDuration.toFixed(2));
 };
 
+const durations = {
+  slide: 0.2,
+};
+
 const curves = {
   outOfTheWay: 'cubic-bezier(0.2, 0, 0, 1)',
   drop: 'cubic-bezier(.2,1,.1,1)',
 };
-const timeForSlide: number = 0.2;
 
-export const css = {
-  outOfTheWay: `transform ${timeForSlide}s ${curves.outOfTheWay}`,
-  jump: `transform ${timeForSlide}s ${curves.drop}`,
+export const getOpacity = (
+  isDropAnimating: boolean,
+  isGroupingWith: boolean,
+): ?number => {
+  if (!isGroupingWith) {
+    return null;
+  }
+
+  if (isDropAnimating) {
+    return 0;
+  }
+
+  return 0.7;
+};
+
+export const transitions = {
+  whileDragging: `opacity ${durations.slide} ${curves.outOfTheWay}`,
+  snapTo: `transform ${durations.slide}s ${curves.drop}`,
+  outOfTheWay: `transform ${durations.slide}s ${curves.outOfTheWay}`,
   isDropping: (duration: number): string =>
     `transform ${duration}s ${curves.drop}, opacity ${duration}s ${
       curves.outOfTheWay

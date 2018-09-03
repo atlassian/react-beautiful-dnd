@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import { isEqual, origin } from '../../state/position';
-import { css } from '../animation';
+import { transitions, getOpacity } from '../animation';
 import type {
   DraggableDimension,
   ClientPositions,
@@ -62,7 +62,7 @@ const getTransform = ({
 }: GetTransformArgs): ?string => {
   const scale: ?string = (() => {
     if (isGroupingWith && isDropping) {
-      return `scale(0.5)`;
+      return `scale(0.75)`;
     }
     if (isGroupingOver) {
       return `scale(1.04)`;
@@ -81,33 +81,17 @@ const getTransform = ({
   return [translate, scale].join(' ');
 };
 
-const getOpacity = (
-  isDropAnimating: boolean,
-  isGroupingWith: boolean,
-): ?number => {
-  if (!isGroupingWith) {
-    return null;
-  }
-
-  if (isDropAnimating) {
-    return 0;
-  }
-
-  return 0.7;
-};
-
 const getDraggingTransition = (
   shouldAnimateDragMovement: boolean,
   dropping: ?DroppingState,
 ): string => {
   if (dropping) {
-    return css.isDropping(dropping.duration);
+    return transitions.isDropping(dropping.duration);
   }
-
   if (shouldAnimateDragMovement) {
-    return css.jump;
+    return transitions.snapTo;
   }
-  return 'opacity 0.2s ease';
+  return transitions.whileDragging;
 };
 
 export default class Draggable extends Component<Props> {
@@ -267,9 +251,8 @@ export default class Draggable extends Component<Props> {
           isGroupingOver,
           isDropping: false,
         }),
-        // use the global animation for animation - or opt out of it
+        // transition style is applied in the head
         transition: shouldAnimateDisplacement ? null : 'none',
-        // transition: css.outOfTheWay,
       };
       return style;
     },
