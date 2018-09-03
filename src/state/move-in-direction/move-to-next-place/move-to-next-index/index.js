@@ -2,7 +2,7 @@
 import inHomeList from './in-home-list';
 import inForeignList from './in-foreign-list';
 import type { Args, Result } from './move-to-next-index-types';
-import type { DraggableDimension } from '../../../types';
+import type { DraggableDimension } from '../../../../types';
 
 export default (args: Args): ?Result => {
   const { draggableId, draggables, droppable } = args;

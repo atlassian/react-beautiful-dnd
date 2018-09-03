@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import getDisplacement from '../../get-displacement';
+import getDisplacement from '../../../get-displacement';
 import type {
   Viewport,
   Axis,
@@ -10,7 +10,7 @@ import type {
   DroppableDimension,
   DraggableDimension,
   Displacement,
-} from '../../../types';
+} from '../../../../types';
 
 type WithAdded = {|
   add: DraggableId,

@@ -1,13 +1,13 @@
 // @flow
 import { type Position, type Rect, type Spacing } from 'css-box-model';
-import { subtract } from '../../position';
-import { offsetByPosition } from '../../spacing';
+import { subtract } from '../../../position';
+import { offsetByPosition } from '../../../spacing';
 import {
   isTotallyVisible,
   isTotallyVisibleOnAxis,
   type Args as IsVisibleArgs,
-} from '../../visibility/is-visible';
-import type { DraggableDimension, DroppableDimension } from '../../../types';
+} from '../../../visibility/is-visible';
+import type { DraggableDimension, DroppableDimension } from '../../../../types';
 
 type Args = {|
   draggable: DraggableDimension,

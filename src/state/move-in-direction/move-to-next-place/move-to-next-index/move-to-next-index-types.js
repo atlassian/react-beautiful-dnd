@@ -6,7 +6,7 @@ import type {
   DroppableDimension,
   DraggableDimensionMap,
   Viewport,
-} from '../../../types';
+} from '../../../../types';
 
 export type Args = {|
   isMovingForward: boolean,

@@ -1,81 +1,90 @@
 // @flow
 import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
-import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
-import { subtract } from '../../position';
-import withDroppableDisplacement from '../../with-droppable-displacement';
+import getDraggablesInsideDroppable from '../../../get-draggables-inside-droppable';
+import { subtract } from '../../../position';
+import withDroppableDisplacement from '../../../with-droppable-displacement';
+import moveToEdge from '../../../move-to-edge';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
-import moveToEdge from '../../move-to-edge';
 import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
-import getDisplacementMap from '../../get-displacement-map';
-import getDisplacedBy from '../../get-displaced-by';
-import type { Edge } from '../../move-to-edge';
+import getDisplacementMap from '../../../get-displacement-map';
+import getDisplacedBy from '../../../get-displaced-by';
+import type { Edge } from '../../../move-to-edge';
 import type { Args, Result } from './move-to-next-index-types';
 import type {
   DraggableLocation,
   DraggableDimension,
-  Displacement,
   Axis,
   DragImpact,
+  Displacement,
   DisplacedBy,
-} from '../../../types';
+} from '../../../../types';
 
 export default ({
   isMovingForward,
   draggableId,
-  previousPageBorderBoxCenter,
   previousImpact,
+  previousPageBorderBoxCenter,
   droppable,
   draggables,
   viewport,
 }: Args): ?Result => {
-  const location: ?DraggableLocation = previousImpact.destination;
   invariant(
-    location,
-    'Cannot move to next index in home list when there is no previous destination',
+    previousImpact.destination,
+    'Cannot move to next index where there is no previous destination',
   );
 
+  const location: DraggableLocation = previousImpact.destination;
   const draggable: DraggableDimension = draggables[draggableId];
   const axis: Axis = droppable.axis;
 
-  const insideDroppable: DraggableDimension[] = getDraggablesInsideDroppable(
+  const insideForeignDroppable: DraggableDimension[] = getDraggablesInsideDroppable(
     droppable,
     draggables,
   );
 
-  const startIndex: number = draggable.descriptor.index;
   const currentIndex: number = location.index;
-  const proposedIndex = isMovingForward ? currentIndex + 1 : currentIndex - 1;
+  const proposedIndex: number = isMovingForward
+    ? currentIndex + 1
+    : currentIndex - 1;
+  const lastIndex: number = insideForeignDroppable.length - 1;
 
-  // cannot move forward beyond the last item
-  if (proposedIndex > insideDroppable.length - 1) {
+  // draggable is allowed to exceed the foreign droppables count by 1
+  if (proposedIndex > insideForeignDroppable.length) {
     return null;
   }
 
-  // cannot move before the first item
+  // Cannot move before the first item
   if (proposedIndex < 0) {
     return null;
   }
 
-  const destination: DraggableDimension = insideDroppable[proposedIndex];
-  const isMovingTowardStart =
-    (isMovingForward && proposedIndex <= startIndex) ||
-    (!isMovingForward && proposedIndex >= startIndex);
+  // Always moving relative to the draggable at the current index
+  const movingRelativeTo: DraggableDimension =
+    insideForeignDroppable[
+      // We want to move relative to the proposed index
+      // or if we are going beyond to the end of the list - use that index
+      Math.min(proposedIndex, lastIndex)
+    ];
 
-  const edge: Edge = (() => {
-    // is moving away from the start
-    if (!isMovingTowardStart) {
-      return isMovingForward ? 'end' : 'start';
+  const isMovingPastLastIndex: boolean = proposedIndex > lastIndex;
+  const sourceEdge: Edge = 'start';
+  const destinationEdge: Edge = (() => {
+    // moving past the last item
+    // in this case we are moving relative to the last item
+    // as there is nothing at the proposed index.
+    if (isMovingPastLastIndex) {
+      return 'end';
     }
-    // is moving back towards the start
-    return isMovingForward ? 'start' : 'end';
+
+    return 'start';
   })();
 
   const newPageBorderBoxCenter: Position = moveToEdge({
     source: draggable.page.borderBox,
-    sourceEdge: edge,
-    destination: destination.page.borderBox,
-    destinationEdge: edge,
+    sourceEdge,
+    destination: movingRelativeTo.page.marginBox,
+    destinationEdge,
     destinationAxis: droppable.axis,
   });
 
@@ -90,23 +99,27 @@ export default ({
     onlyOnMainAxis: true,
   });
 
-  const displaced: Displacement[] = isMovingTowardStart
-    ? withFirstRemoved({
+  const displaced: Displacement[] = (() => {
+    if (isMovingForward) {
+      return withFirstRemoved({
         dragging: draggableId,
         isVisibleInNewLocation,
         previousImpact,
         droppable,
         draggables,
-      })
-    : withFirstAdded({
-        add: destination.descriptor.id,
-        previousImpact,
-        droppable,
-        draggables,
-        viewport,
       });
+    }
+    return withFirstAdded({
+      add: movingRelativeTo.descriptor.id,
+      previousImpact,
+      droppable,
+      draggables,
+      viewport,
+    });
+  })();
 
-  const isInFrontOfStart: boolean = proposedIndex > startIndex;
+  const isInFrontOfStart: boolean = false;
+
   const displacedBy: DisplacedBy = getDisplacedBy(
     axis,
     draggable.displaceBy,
@@ -118,6 +131,7 @@ export default ({
       displacedBy,
       displaced,
       map: getDisplacementMap(displaced),
+      // When we are in foreign list we are only displacing items forward
       isInFrontOfStart,
     },
     destination: {
@@ -140,13 +154,13 @@ export default ({
   }
 
   // The full distance required to get from the previous page center to the new page center
-  const distance: Position = subtract(
+  const distanceMoving: Position = subtract(
     newPageBorderBoxCenter,
     previousPageBorderBoxCenter,
   );
   const distanceWithScroll: Position = withDroppableDisplacement(
     droppable,
-    distance,
+    distanceMoving,
   );
 
   return {
