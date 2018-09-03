@@ -85,10 +85,11 @@ export default (styleContext: string): Styles => {
         `,
         resting: grabCursor,
         dragging: 'pointer-events: none;',
+        // it is fine for users to start dragging another item when a drop animation is occurring
         dropAnimating: grabCursor,
+        // Not applying grab cursor during a user cancel as it is not possible for users to reorder
+        // items during a cancel
       },
-      // Not applying grab cursor during a cancel as it is not possible for users to reorder
-      // items during a cancel
     };
   })();
 
@@ -150,17 +151,11 @@ export default (styleContext: string): Styles => {
 
   const rules: Rule[] = [draggable, dragHandle, droppable, body];
 
-  const always: string = getStyles(rules, 'always');
-  const resting: string = getStyles(rules, 'resting');
-  const dragging: string = getStyles(rules, 'dragging');
-  const dropAnimating: string = getStyles(rules, 'dropAnimating');
-  const userCancel: string = getStyles(rules, 'userCancel');
-
   return {
-    always,
-    resting,
-    dragging,
-    dropAnimating,
-    userCancel,
+    always: getStyles(rules, 'always'),
+    resting: getStyles(rules, 'resting'),
+    dragging: getStyles(rules, 'dragging'),
+    dropAnimating: getStyles(rules, 'dropAnimating'),
+    userCancel: getStyles(rules, 'userCancel'),
   };
 };

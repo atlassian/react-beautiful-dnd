@@ -87,7 +87,7 @@ export const getOpacity = (
 };
 
 export const transitions = {
-  whileDragging: `opacity ${durations.slide} ${curves.outOfTheWay}`,
+  whileDragging: `opacity ${durations.slide}s ${curves.outOfTheWay}`,
   snapTo: `transform ${durations.slide}s ${curves.drop}`,
   outOfTheWay: `transform ${durations.slide}s ${curves.outOfTheWay}`,
   isDropping: (duration: number): string =>
