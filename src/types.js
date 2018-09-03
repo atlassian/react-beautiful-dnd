@@ -118,7 +118,7 @@ export type DroppableDimension = {|
   descriptor: DroppableDescriptor,
   axis: Axis,
   isEnabled: boolean,
-  isGroupingEnabled: boolean,
+  isCombiningEnabled: boolean,
   // relative to the current viewport
   client: BoxModel,
   // relative to the whole page
@@ -167,15 +167,10 @@ export type UserDirection = {|
   horizontal: HorizontalUserDirection,
 |};
 
-export type GroupingLocation = {|
-  droppableId: DroppableId,
-  draggableId: DraggableId,
-|};
-
-export type GroupingImpact = {|
+export type CombineImpact = {|
   // This has an impact on the hitbox for a grouping action
   whenEntered: UserDirection,
-  groupingWith: GroupingLocation,
+  merged: DraggableLocation,
 |};
 
 export type DragImpact = {|
@@ -183,7 +178,7 @@ export type DragImpact = {|
   // the direction of the Droppable you are over
   direction: ?Direction,
   destination: ?DraggableLocation,
-  group: ?GroupingImpact,
+  combine: ?CombineImpact,
 |};
 
 export type ClientPositions = {|
@@ -229,8 +224,8 @@ export type DragUpdate = {|
   ...DragStart,
   // may not have any destination (drag to nowhere)
   destination: ?DraggableLocation,
-  // populated when a draggable is dragging over another in grouping mode
-  grouping: ?GroupingLocation,
+  // populated when a draggable is dragging over another in combine mode
+  combine: ?DraggableLocation,
 |};
 
 export type DropReason = 'DROP' | 'CANCEL';

@@ -84,8 +84,8 @@ export type StateSnapshot = {|
   isDragging: boolean,
   dropping: ?DroppingState,
   draggingOver: ?DroppableId,
-  groupingWith: ?DraggableId,
-  groupedOverBy: ?DraggableId,
+  combineWith: ?DraggableId,
+  combineTargetFor: ?DraggableId,
 |};
 
 export type DispatchProps = {|
