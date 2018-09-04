@@ -4,8 +4,8 @@ import { subtract } from '../position';
 import getHomeLocation from '../get-home-location';
 import moveCrossAxis from './move-cross-axis';
 import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';
-import moveToNextIndex from './move-to-next-place/move-to-next-index';
-import type { Result as MoveToNextIndexResult } from './move-to-next-place/move-to-next-index/move-to-next-index-types';
+import moveToNextPlace from './move-to-next-place';
+import type { Result as MoveToNextPlaceResult } from './move-to-next-place/move-to-next-place-types';
 import type {
   DraggingState,
   DragImpact,
@@ -64,10 +64,10 @@ export default ({ state, type }: Args): ?Result => {
     type === 'MOVE_DOWN' || type === 'MOVE_RIGHT';
 
   if (isMovingOnMainAxis) {
-    const result: ?MoveToNextIndexResult = moveToNextIndex({
+    const result: ?MoveToNextPlaceResult = moveToNextPlace({
       isMovingForward,
       draggableId: state.critical.draggable.id,
-      droppable,
+      destination: droppable,
       draggables: state.dimensions.draggables,
       previousPageBorderBoxCenter: state.current.page.borderBoxCenter,
       previousImpact: state.impact,

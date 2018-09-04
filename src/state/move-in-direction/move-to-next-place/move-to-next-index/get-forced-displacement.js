@@ -4,7 +4,6 @@ import getDisplacement from '../../../get-displacement';
 import type {
   Viewport,
   Axis,
-  DraggableId,
   DragImpact,
   DraggableDimensionMap,
   DroppableDimension,
@@ -13,22 +12,22 @@ import type {
 } from '../../../../types';
 
 type WithAdded = {|
-  add: DraggableId,
-  previousImpact: DragImpact,
-  droppable: DroppableDimension,
+  add: DraggableDimension,
   draggables: DraggableDimensionMap,
+  previousImpact: DragImpact,
+  destination: DroppableDimension,
   viewport: Viewport,
 |};
 
 export const withFirstAdded = ({
   add,
-  previousImpact,
-  droppable,
   draggables,
+  previousImpact,
+  destination,
   viewport,
 }: WithAdded): Displacement[] => {
   const newDisplacement: Displacement = {
-    draggableId: add,
+    draggableId: add.descriptor.id,
     isVisible: true,
     shouldAnimate: true,
   };
@@ -47,7 +46,7 @@ export const withFirstAdded = ({
 
       const updated: Displacement = getDisplacement({
         draggable: draggables[current.draggableId],
-        destination: droppable,
+        destination,
         previousImpact,
         viewport: viewport.frame,
       });
@@ -60,10 +59,10 @@ export const withFirstAdded = ({
 };
 
 type WithLastRemoved = {|
-  dragging: DraggableId,
+  dragging: DraggableDimension,
   isVisibleInNewLocation: boolean,
   previousImpact: DragImpact,
-  droppable: DroppableDimension,
+  destination: DroppableDimension,
   draggables: DraggableDimensionMap,
 |};
 
@@ -83,9 +82,9 @@ const forceVisibleDisplacement = (current: Displacement): Displacement => {
 
 export const withFirstRemoved = ({
   dragging,
+  destination,
   isVisibleInNewLocation,
   previousImpact,
-  droppable,
   draggables,
 }: WithLastRemoved): Displacement[] => {
   const last: Displacement[] = previousImpact.movement.displaced;
@@ -105,14 +104,14 @@ export const withFirstRemoved = ({
     return withFirstRestored;
   }
 
-  const axis: Axis = droppable.axis;
+  const axis: Axis = destination.axis;
 
   // When we are forcing this displacement, we need to adjust the visibility of draggables
   // within a particular range. This range is the size of the dragging item and the item
   // that is being restored to its original
   const sizeOfRestored: number =
     draggables[last[0].draggableId].page.marginBox[axis.size];
-  const sizeOfDragging: number = draggables[dragging].page.marginBox[axis.size];
+  const sizeOfDragging: number = dragging.page.marginBox[axis.size];
   let buffer: number = sizeOfRestored + sizeOfDragging;
 
   const withUpdatedVisibility: Displacement[] = withFirstRestored.map(

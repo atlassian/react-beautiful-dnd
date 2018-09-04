@@ -1,56 +1,39 @@
 // @flow
-import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
-import getDraggablesInsideDroppable from '../../../get-draggables-inside-droppable';
-import { subtract } from '../../../position';
-import withDroppableDisplacement from '../../../with-droppable-displacement';
 import moveToEdge from '../../../move-to-edge';
-import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
-import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
-import getDisplacementMap from '../../../get-displacement-map';
-import getDisplacedBy from '../../../get-displaced-by';
 import type { Edge } from '../../../move-to-edge';
-import type { Args, Result } from './move-to-next-index-types';
+import type { InListResult } from './move-to-next-index-types';
 import type {
   DraggableLocation,
   DraggableDimension,
+  DroppableDimension,
   Axis,
-  DragImpact,
-  Displacement,
-  DisplacedBy,
 } from '../../../../types';
+
+type Args = {|
+  isMovingForward: boolean,
+  draggable: DraggableDimension,
+  location: DraggableLocation,
+  destination: DroppableDimension,
+  insideDestination: DraggableDimension[],
+|};
 
 export default ({
   isMovingForward,
-  draggableId,
-  previousImpact,
-  previousPageBorderBoxCenter,
-  droppable,
-  draggables,
-  viewport,
-}: Args): ?Result => {
-  invariant(
-    previousImpact.destination,
-    'Cannot move to next index where there is no previous destination',
-  );
-
-  const location: DraggableLocation = previousImpact.destination;
-  const draggable: DraggableDimension = draggables[draggableId];
-  const axis: Axis = droppable.axis;
-
-  const insideForeignDroppable: DraggableDimension[] = getDraggablesInsideDroppable(
-    droppable,
-    draggables,
-  );
-
+  draggable,
+  location,
+  destination,
+  insideDestination,
+}: Args): ?InListResult => {
+  const axis: Axis = destination.axis;
   const currentIndex: number = location.index;
   const proposedIndex: number = isMovingForward
     ? currentIndex + 1
     : currentIndex - 1;
-  const lastIndex: number = insideForeignDroppable.length - 1;
+  const lastIndex: number = insideDestination.length - 1;
 
   // draggable is allowed to exceed the foreign droppables count by 1
-  if (proposedIndex > insideForeignDroppable.length) {
+  if (proposedIndex > insideDestination.length) {
     return null;
   }
 
@@ -61,7 +44,7 @@ export default ({
 
   // Always moving relative to the draggable at the current index
   const movingRelativeTo: DraggableDimension =
-    insideForeignDroppable[
+    insideDestination[
       // We want to move relative to the proposed index
       // or if we are going beyond to the end of the list - use that index
       Math.min(proposedIndex, lastIndex)
@@ -69,103 +52,24 @@ export default ({
 
   const isMovingPastLastIndex: boolean = proposedIndex > lastIndex;
   const sourceEdge: Edge = 'start';
-  const destinationEdge: Edge = (() => {
-    // moving past the last item
-    // in this case we are moving relative to the last item
-    // as there is nothing at the proposed index.
-    if (isMovingPastLastIndex) {
-      return 'end';
-    }
 
-    return 'start';
-  })();
+  // moving past the last item
+  // in this case we are moving relative to the last item
+  // as there is nothing at the proposed index.
+  const destinationEdge: Edge = isMovingPastLastIndex ? 'end' : 'start';
 
   const newPageBorderBoxCenter: Position = moveToEdge({
     source: draggable.page.borderBox,
     sourceEdge,
     destination: movingRelativeTo.page.marginBox,
     destinationEdge,
-    destinationAxis: droppable.axis,
+    destinationAxis: axis,
   });
-
-  const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
-    draggable,
-    destination: droppable,
-    newPageBorderBoxCenter,
-    viewport: viewport.frame,
-    // we only care about it being visible relative to the main axis
-    // this is important with dynamic changes as scroll bar and toggle
-    // on the cross axis during a drag
-    onlyOnMainAxis: true,
-  });
-
-  const displaced: Displacement[] = (() => {
-    if (isMovingForward) {
-      return withFirstRemoved({
-        dragging: draggableId,
-        isVisibleInNewLocation,
-        previousImpact,
-        droppable,
-        draggables,
-      });
-    }
-    return withFirstAdded({
-      add: movingRelativeTo.descriptor.id,
-      previousImpact,
-      droppable,
-      draggables,
-      viewport,
-    });
-  })();
-
-  const isInFrontOfStart: boolean = false;
-
-  const displacedBy: DisplacedBy = getDisplacedBy(
-    axis,
-    draggable.displaceBy,
-    isInFrontOfStart,
-  );
-
-  const newImpact: DragImpact = {
-    movement: {
-      displacedBy,
-      displaced,
-      map: getDisplacementMap(displaced),
-      // When we are in foreign list we are only displacing items forward
-      isInFrontOfStart,
-    },
-    destination: {
-      droppableId: droppable.descriptor.id,
-      index: proposedIndex,
-    },
-    direction: droppable.axis.direction,
-    merge: null,
-  };
-
-  if (isVisibleInNewLocation) {
-    return {
-      pageBorderBoxCenter: withDroppableDisplacement(
-        droppable,
-        newPageBorderBoxCenter,
-      ),
-      impact: newImpact,
-      scrollJumpRequest: null,
-    };
-  }
-
-  // The full distance required to get from the previous page center to the new page center
-  const distanceMoving: Position = subtract(
-    newPageBorderBoxCenter,
-    previousPageBorderBoxCenter,
-  );
-  const distanceWithScroll: Position = withDroppableDisplacement(
-    droppable,
-    distanceMoving,
-  );
 
   return {
-    pageBorderBoxCenter: previousPageBorderBoxCenter,
-    impact: newImpact,
-    scrollJumpRequest: distanceWithScroll,
+    addToDisplacement: isMovingForward ? movingRelativeTo : null,
+    newPageBorderBoxCenter,
+    isInFrontOfStart: false,
+    proposedIndex,
   };
 };
