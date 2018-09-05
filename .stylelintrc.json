@@ -1,0 +1,8 @@
+{
+  "extends": ["stylelint-config-standard", "stylelint-config-prettier"],
+  "rules": {
+    "declaration-empty-line-before": null,
+    "comment-empty-line-before": null,
+    "block-no-empty": null
+  }
+}
