@@ -100,7 +100,9 @@ export default (styleContext: string): Styles => {
   // The main draggable is controlled by react-motion.
 
   const draggable: Rule = (() => {
-    const transition: string = `transition: ${transitions.outOfTheWay}`;
+    const transition: string = `
+      transition: ${transitions.outOfTheWay};
+    `;
     return {
       selector: getSelector(attributes.draggable),
       styles: {

@@ -29,25 +29,23 @@ const getClientSelection = (
   currentScroll: Position,
 ): Position => subtract(pageBorderBoxCenter, currentScroll);
 
-export default ({ state, type }: Args): ?Result => {
-  const { droppable, isMainAxisMovementAllowed } = (() => {
-    if (state.impact && state.impact.destination) {
-      return {
-        droppable:
-          state.dimensions.droppables[state.impact.destination.droppableId],
-        isMainAxisMovementAllowed: true,
-      };
-    }
+const getDroppable = (state: DraggingState) => {
+  const id: ?DroppableId = whatIsDraggedOver(state.impact);
 
-    // No destination - this can happen when lifting an a disabled droppable
-    // In this case we want to allow movement out of the list with a keyboard
-    // but not within the list
+  if (id) {
     return {
-      droppable: state.dimensions.droppables[state.critical.droppable.id],
-      isMainAxisMovementAllowed: false,
+      droppable: state.dimensions.droppables[id],
+      isMainAxisMovementAllowed: true,
     };
-  })();
+  }
+  return {
+    droppable: state.dimensions.droppables[state.critical.droppable.id],
+    isMainAxisMovementAllowed: false,
+  };
+};
 
+export default ({ state, type }: Args): ?Result => {
+  const { droppable, isMainAxisMovementAllowed } = getDroppable(state);
   const direction: Direction = droppable.axis.direction;
   const isMovingOnMainAxis: boolean =
     (direction === 'vertical' &&

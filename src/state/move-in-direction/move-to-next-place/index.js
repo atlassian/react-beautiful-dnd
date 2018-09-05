@@ -44,11 +44,9 @@ export default ({
 
   const withMerge: ?Result = moveToNextCombine({
     isMovingForward,
-    draggable,
     destination,
     insideDestination,
     previousImpact,
-    viewport,
   });
 
   if (withMerge) {
