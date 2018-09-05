@@ -41,6 +41,7 @@ import type {
 } from './draggable-types';
 import getWindowScroll from '../window/get-window-scroll';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
+import checkOwnPropsInDev from './check-own-props-in-dev';
 
 export const zIndexOptions: ZIndexOptions = {
   dragging: 5000,
@@ -149,6 +150,11 @@ export default class Draggable extends Component<Props> {
 
     this.callbacks = callbacks;
     this.styleContext = context[styleContextKey];
+
+    // Only running this check on creation.
+    // Could run it on updates, but I don't think that would be needed
+    // as it is designed to prevent setup issues
+    checkOwnPropsInDev(props);
   }
 
   componentWillUnmount() {

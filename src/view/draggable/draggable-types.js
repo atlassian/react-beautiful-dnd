@@ -119,8 +119,8 @@ export type MapProps = {|
 
 export type OwnProps = {|
   draggableId: DraggableId,
-  children: (Provided, StateSnapshot) => ?Node,
   index: number,
+  children: (Provided, StateSnapshot) => ?Node,
   isDragDisabled: boolean,
   disableInteractiveElementBlocking: boolean,
 |};
