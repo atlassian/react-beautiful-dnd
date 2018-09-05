@@ -16,6 +16,7 @@ import getClosestScrollable from '../get-closest-scrollable';
 import checkForNestedScrollContainers from './check-for-nested-scroll-container';
 import { dimensionMarshalKey } from '../context-keys';
 import { origin } from '../../state/position';
+import warmUpDimension from '../warm-up-dimension';
 import {
   getDroppableDimension,
   type Closest,
@@ -135,6 +136,7 @@ export default class DroppableDimensionPublisher extends React.Component<
   watchingScroll: ?WatchingScroll = null;
   callbacks: DroppableCallbacks;
   publishedDescriptor: ?DroppableDescriptor = null;
+  cancelWarmUp: () => void;
 
   constructor(props: Props, context: mixed) {
     super(props, context);
@@ -243,6 +245,7 @@ export default class DroppableDimensionPublisher extends React.Component<
 
   componentDidMount() {
     this.publish();
+    this.cancelWarmUp = warmUpDimension(this.getDimension);
 
     // Note: not calling `marshal.updateDroppableIsEnabled()`
     // If the dimension marshal needs to get the dimension immediately
@@ -276,6 +279,7 @@ export default class DroppableDimensionPublisher extends React.Component<
     }
 
     this.unpublish();
+    this.cancelWarmUp();
   }
 
   getMemoizedDescriptor = memoizeOne(
@@ -339,12 +343,12 @@ export default class DroppableDimensionPublisher extends React.Component<
 
     // TODO: needs to disable the placeholder for the collection
     // this.props.placeholder.hide();
-    const { dimension } = this.getDimension(origin);
+    const { dimension } = this.getDimension();
     // this.props.placeholder.show();
     return dimension;
   };
 
-  getDimension = (windowScroll: Position): GetDimensionResult => {
+  getDimension = (windowScroll?: Position = origin): GetDimensionResult => {
     const {
       direction,
       ignoreContainerClipping,
@@ -353,6 +357,7 @@ export default class DroppableDimensionPublisher extends React.Component<
       getDroppableRef,
     } = this.props;
 
+    this.cancelWarmUp();
     const targetRef: ?HTMLElement = getDroppableRef();
     const descriptor: ?DroppableDescriptor = this.publishedDescriptor;
 
