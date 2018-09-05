@@ -15,6 +15,7 @@ import type {
   Axis,
   DraggableDimension,
   Displacement,
+  CombineImpact,
   DroppableDimension,
   DraggableDimensionMap,
   DragImpact,
@@ -23,8 +24,72 @@ import type {
   DraggableLocation,
 } from '../../../../types';
 
+const getCurrentLocation = (
+  isInHomeList: boolean,
+  draggable: DraggableDimension,
+  isMovingForward: boolean,
+  previousImpact: DragImpact,
+  draggables: DraggableDimensionMap,
+): DraggableLocation => {
+  // need to create what the location would have been before the combine
+  const merge: ?CombineImpact = previousImpact.merge;
+
+  // was not previously merging - use the last destination
+  if (!merge) {
+    const location: ?DraggableLocation = previousImpact.destination;
+    invariant(location, 'Cannot keyboard move without a previous destination');
+    return location;
+  }
+
+  // was previously merging - need to fake the 'last location'
+  const isCombinedWith: DraggableDimension =
+    draggables[merge.combine.draggableId];
+  const isDisplaced: boolean = Boolean(
+    previousImpact.movement.map[isCombinedWith.descriptor.id],
+  );
+  // const isInFrontOfStart: boolean = isInHomeList
+  //   ? isCombinedWith.descriptor.index > draggable.descriptor.index
+  //   : false;
+  // const isMovingIntoCombinedSpot: boolean = isDisplaced &&
+
+  // const combinedIndex: number = isCombinedWith.descriptor.index;
+  // // where we expect the index to be AFTER the movement
+  // const finalIndex: number = (() => {
+  //   // moving forward will increase the amount of things displaced
+  //   if (isInFrontOfStart) {
+  //     if (isDisplaced) {
+  //       return isMovingForward
+  //         ? combinedIndex
+  //         : combinedIndex - 1;
+  //     }
+  //     return isMovingForward ? combinedIndex
+  //   }
+
+  //   if (isDisplaced) {
+  //     return isMovingForward
+  //       ? isCombinedWith.descriptor.index
+  //       : isCombinedWith.descriptor.index;
+  //   }
+
+  //   return isMovingForward
+  //     ? isCombinedWith.descriptor.index - 1
+  //     : isCombinedWith.descriptor.index + 1;
+  // })();
+
+  // const index: number = isMovingForward ? finalIndex - 1 : finalIndex + 1;
+
+  const fudged: DraggableLocation = {
+    droppableId: isCombinedWith.descriptor.droppableId,
+    index: 0,
+  };
+  // console.log('was combined with', wasCombined.descriptor.id);
+  // console.log('fudged', fudged);
+  return fudged;
+};
+
 export type Args = {|
   isMovingForward: boolean,
+  isInHomeList: boolean,
   draggable: DraggableDimension,
   destination: DroppableDimension,
   draggables: DraggableDimensionMap,
@@ -36,6 +101,7 @@ export type Args = {|
 
 export default ({
   isMovingForward,
+  isInHomeList,
   draggable,
   destination,
   draggables,
@@ -44,25 +110,26 @@ export default ({
   previousPageBorderBoxCenter,
   viewport,
 }: Args): ?Result => {
-  const isInHomeList: boolean =
-    draggable.descriptor.droppableId === destination.descriptor.id;
-
-  const oldLocation: ?DraggableLocation = previousImpact.destination;
-  invariant(oldLocation);
+  const location: DraggableLocation = getCurrentLocation(
+    isInHomeList,
+    isMovingForward,
+    previousImpact,
+    draggables,
+  );
 
   const inList: ?InListResult = isInHomeList
     ? inHomeList({
         isMovingForward,
         draggable,
         destination,
-        location: oldLocation,
+        location,
         insideDestination,
       })
     : inForeignList({
         isMovingForward,
         draggable,
         destination,
-        location: oldLocation,
+        location,
         insideDestination,
       });
 

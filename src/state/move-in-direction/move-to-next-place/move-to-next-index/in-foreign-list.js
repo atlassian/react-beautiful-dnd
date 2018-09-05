@@ -33,7 +33,7 @@ export default ({
   const lastIndex: number = insideDestination.length - 1;
 
   // draggable is allowed to exceed the foreign droppables count by 1
-  if (proposedIndex > insideDestination.length) {
+  if (proposedIndex > lastIndex + 1) {
     return null;
   }
 

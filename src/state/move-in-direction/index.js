@@ -5,8 +5,10 @@ import getHomeLocation from '../get-home-location';
 import moveCrossAxis from './move-cross-axis';
 import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';
 import moveToNextPlace from './move-to-next-place';
+import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 import type { Result as MoveToNextPlaceResult } from './move-to-next-place/move-to-next-place-types';
 import type {
+  DroppableId,
   DraggingState,
   DragImpact,
   DraggableLocation,

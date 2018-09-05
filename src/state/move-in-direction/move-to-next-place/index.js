@@ -41,9 +41,13 @@ export default ({
     destination,
     draggables,
   );
+  const isInHomeList: boolean =
+    destination.descriptor.id === draggable.descriptor.droppableId;
 
   const withMerge: ?Result = moveToNextCombine({
+    isInHomeList,
     isMovingForward,
+    draggable,
     destination,
     insideDestination,
     previousImpact,
@@ -55,6 +59,7 @@ export default ({
 
   return moveToNextIndex({
     isMovingForward,
+    isInHomeList,
     draggable,
     draggables,
     destination,
