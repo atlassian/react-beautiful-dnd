@@ -1295,13 +1295,13 @@ Great care has been taken to keep the library as light as possible. It is curren
 
 This library supports the standard [Atlassian supported browsers](https://confluence.atlassian.com/cloud/supported-browsers-744721663.html) for desktop:
 
-| Desktop                              | Version                                              |
-| ------------------------------------ | ---------------------------------------------------- |
-| Microsoft Internet Explorer(Windows) | Version 11                                           |
-| Microsoft Edge                       | Latest stable version supported                      |
-| Mozilla Firefox (all platforms)      | Latest stable version supported                      |
-| Google Chrome (Windows and Mac)      | Latest stable version supported                      |
-| Safari (Mac)                         | Latest stable version on latest OS release supported |
+| Desktop                              | Version                                                                                                                                                      |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Microsoft Internet Explorer(Windows) | Version 11 (Need to [polyfill `Array.prototype.find`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find#Polyfill)) |
+| Microsoft Edge                       | Latest stable version supported                                                                                                                              |
+| Mozilla Firefox (all platforms)      | Latest stable version supported                                                                                                                              |
+| Google Chrome (Windows and Mac)      | Latest stable version supported                                                                                                                              |
+| Safari (Mac)                         | Latest stable version on latest OS release supported                                                                                                         |
 
 | Mobile                   | Version                                                   |
 | ------------------------ | --------------------------------------------------------- |
