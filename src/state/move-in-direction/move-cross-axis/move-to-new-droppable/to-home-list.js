@@ -1,7 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { type Position } from 'css-box-model';
-import moveToEdge from '../../../move-to-edge';
+import { type Position, type BoxModel, offset } from 'css-box-model';
 import getDisplacement from '../../../get-displacement';
 import withDroppableDisplacement from '../../../with-droppable-displacement';
 import getDisplacementMap from '../../../get-displacement-map';
@@ -17,14 +16,16 @@ import type {
   DragImpact,
   DraggableDimension,
   DroppableDimension,
+  DraggableDimensionMap,
   DisplacedBy,
 } from '../../../../types';
 
 type Args = {|
   homeIndex: number,
-  movingRelativeTo: DraggableDimension,
+  movingIntoIndexOf: DraggableDimension,
   insideDestination: DraggableDimension[],
   draggable: DraggableDimension,
+  draggables: DraggableDimensionMap,
   destination: DroppableDimension,
   previousImpact: DragImpact,
   viewport: Viewport,
@@ -32,15 +33,16 @@ type Args = {|
 
 export default ({
   homeIndex,
-  movingRelativeTo,
+  movingIntoIndexOf,
   insideDestination,
   draggable,
+  draggables,
   destination,
   previousImpact,
   viewport,
 }: Args): Result => {
   const axis: Axis = destination.axis;
-  const targetIndex: number = insideDestination.indexOf(movingRelativeTo);
+  const targetIndex: number = insideDestination.indexOf(movingIntoIndexOf);
 
   invariant(
     targetIndex !== -1,
@@ -82,35 +84,19 @@ export default ({
     startIndexInHome: homeIndex,
   });
 
-  console.log('proposed index', proposedIndex);
-  console.log('proposed index', proposedIndex);
-  console.log('will displace forward?', willDisplaceForward);
-
-  const moveArgs = {
-    axis: destination.axis,
-    moveRelativeTo: movingRelativeTo.client,
-    isMoving: draggable.client,
-  };
-
-  const newCenter: Position = willDisplaceForward
-    ? goAfter(moveArgs)
-    : goBefore(moveArgs);
-
+  const isMovingAfter: boolean = !willDisplaceForward;
+  // Which draggables will need to move?
+  // Everything between the target index and the start index
   const modified: DraggableDimension[] = (() => {
-    if (willDisplaceForward) {
-      return insideDestination.slice(targetIndex, homeIndex);
+    // we will be displacing these items backwards
+    if (isMovingAfter) {
+      // homeIndex + 1 so we don't include the home
+      // .reverse() so the closest displaced will be first
+      return insideDestination.slice(homeIndex + 1, targetIndex + 1).reverse();
     }
 
-    // We are aligning to the bottom of the target and moving everything
-    // back to the original index backwards
-
-    // We want everything after the original index to move
-    const from: number = homeIndex + 1;
-    // We need the target to move backwards
-    const to: number = targetIndex + 1;
-
-    // Need to ensure that the list is sorted with the closest item being first
-    return insideDestination.slice(from, to).reverse();
+    // homeIndex - 1 so we don't include the home
+    return insideDestination.slice(targetIndex, homeIndex - 1);
   })();
 
   const displaced: Displacement[] = modified.map(
@@ -128,6 +114,23 @@ export default ({
     draggable.displaceBy,
     willDisplaceForward,
   );
+
+  const closestToBeDisplaced: DraggableDimension =
+    draggables[displaced[0].draggableId];
+  const closestDisplaced: BoxModel = offset(
+    closestToBeDisplaced.client,
+    displacedBy.point,
+  );
+
+  const moveArgs = {
+    axis: destination.axis,
+    moveRelativeTo: closestDisplaced,
+    isMoving: draggable.client,
+  };
+
+  const newCenter: Position = isMovingAfter
+    ? goAfter(moveArgs)
+    : goBefore(moveArgs);
 
   const newImpact: DragImpact = {
     movement: {

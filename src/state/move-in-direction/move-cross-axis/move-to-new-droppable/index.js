@@ -3,7 +3,6 @@ import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import toHomeList from './to-home-list';
 import toForeignList from './to-foreign-list';
-import { patch } from '../../../position';
 import type { Result } from '../move-cross-axis-types';
 import type {
   DraggableDimension,
@@ -11,6 +10,7 @@ import type {
   DraggableLocation,
   DragImpact,
   Viewport,
+  DraggableDimensionMap,
 } from '../../../../types';
 
 type Args = {|
@@ -31,6 +31,7 @@ type Args = {|
   previousImpact: DragImpact,
   // the viewport
   viewport: Viewport,
+  draggables: DraggableDimensionMap,
 |};
 
 export default ({
@@ -38,6 +39,7 @@ export default ({
   destination,
   insideDestination,
   draggable,
+  draggables,
   movingRelativeTo,
   home,
   previousImpact,
@@ -52,9 +54,10 @@ export default ({
 
     return toHomeList({
       homeIndex: home.index,
-      movingRelativeTo,
+      movingIntoIndexOf: movingRelativeTo,
       insideDestination,
       draggable,
+      draggables,
       destination,
       previousImpact,
       viewport,

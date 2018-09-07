@@ -88,6 +88,7 @@ export default ({
     pageBorderBoxCenter,
     destination,
     draggable,
+    draggables,
     movingRelativeTo,
     insideDestination,
     home,
