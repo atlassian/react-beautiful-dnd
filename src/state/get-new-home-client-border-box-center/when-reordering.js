@@ -1,15 +1,15 @@
 // @flow
-import { type Position, type Rect } from 'css-box-model';
+import { offset, type Position, type BoxModel } from 'css-box-model';
 import type {
   Axis,
   DraggableDimension,
   DraggableDimensionMap,
   DragImpact,
-  DraggableId,
+  DraggableLocation,
   DroppableDimension,
 } from '../../types';
-import moveToEdge from '../move-to-edge';
-import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
+import isInHomeList from '../is-in-home-list';
+import { patch } from '../position';
 
 type NewHomeArgs = {|
   impact: DragImpact,
@@ -31,80 +31,61 @@ export default ({
   if (destination == null) {
     return null;
   }
+  // dropping outside of any list
+  const location: ?DraggableLocation = impact.destination;
 
-  const { displaced, isInFrontOfStart } = impact.movement;
-  const axis: Axis = destination.axis;
-
-  const isWithinHomeDroppable: boolean =
-    destination.descriptor.id === draggable.descriptor.droppableId;
-
-  // dropping back into home index
-  if (isWithinHomeDroppable && !displaced.length) {
+  if (!location) {
     return null;
   }
 
-  // All the draggables in the destination (even the ones that haven't moved)
-  const draggablesInDestination: DraggableDimension[] = getDraggablesInsideDroppable(
-    destination,
-    draggables,
+  const { displaced, willDisplaceForward } = impact.movement;
+  const axis: Axis = destination.axis;
+
+  const inHomeList: boolean = isInHomeList(draggable, destination);
+
+  // there can be no displaced if:
+  // - you are in the home index or
+  // - in the last position of a foreign droppable
+  const lastDisplaced: ?DraggableDimension = displaced.length
+    ? draggables[displaced[0].draggableId]
+    : null;
+
+  // dropping back into home index
+  if (inHomeList && !lastDisplaced) {
+    return null;
+  }
+
+  // TODO: last spot in foreign list
+  if (!lastDisplaced) {
+    return null;
+  }
+
+  const displacedBy: Position = impact.movement.displacedBy.point;
+  const displacedClient: BoxModel = offset(lastDisplaced.client, displacedBy);
+  const draggableClient: BoxModel = draggable.client;
+  const shouldDropInFrontOfDisplaced: boolean = !willDisplaceForward;
+
+  // going in front of displaced item
+  if (shouldDropInFrontOfDisplaced) {
+    return patch(
+      axis.line,
+      displacedClient.marginBox[axis.end] +
+        draggableClient.margin.top +
+        draggableClient.border.top +
+        draggableClient.padding.top +
+        draggableClient.contentBox[axis.size] / 2,
+      displacedClient.marginBox.center[axis.crossAxisLine],
+    );
+  }
+
+  // going behind displaced item
+  return patch(
+    axis.line,
+    displacedClient.marginBox[axis.start] -
+      draggableClient.margin.bottom -
+      draggableClient.border.bottom -
+      draggableClient.padding.bottom -
+      draggableClient.contentBox[axis.size] / 2,
+    displacedClient.marginBox.center[axis.crossAxisLine],
   );
-
-  // Find the dimension we need to compare the dragged item with
-  const movingRelativeTo: Rect = (() => {
-    if (isWithinHomeDroppable) {
-      return draggables[displaced[0].draggableId].client.borderBox;
-    }
-
-    // In a foreign list
-
-    if (displaced.length) {
-      return draggables[displaced[0].draggableId].client.borderBox;
-    }
-
-    // If we're dragging to the last place in a new droppable
-    // which has items in it (but which haven't moved)
-    if (draggablesInDestination.length) {
-      return draggablesInDestination[draggablesInDestination.length - 1].client
-        .marginBox;
-    }
-
-    // Otherwise, return the dimension of the empty foreign droppable
-    return destination.client.contentBox;
-  })();
-
-  const { sourceEdge, destinationEdge } = (() => {
-    if (isWithinHomeDroppable) {
-      if (isInFrontOfStart) {
-        // move below the target
-        return { sourceEdge: 'end', destinationEdge: 'end' };
-      }
-
-      // move above the target
-      return { sourceEdge: 'start', destinationEdge: 'start' };
-    }
-
-    // not within our home droppable
-
-    // If we're moving in after the last draggable
-    // we want to move the draggable below the last item
-    if (!displaced.length && draggablesInDestination.length) {
-      return { sourceEdge: 'start', destinationEdge: 'end' };
-    }
-
-    // move above the target
-    return { sourceEdge: 'start', destinationEdge: 'start' };
-  })();
-
-  const source: Rect = draggable.client.borderBox;
-
-  // This is the draggable's new home
-  const targetCenter: Position = moveToEdge({
-    source,
-    sourceEdge,
-    destination: movingRelativeTo,
-    destinationEdge,
-    destinationAxis: axis,
-  });
-
-  return targetCenter;
 };
