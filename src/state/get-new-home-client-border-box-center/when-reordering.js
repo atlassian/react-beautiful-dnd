@@ -9,7 +9,7 @@ import type {
   DroppableDimension,
 } from '../../types';
 import isInHomeList from '../is-in-home-list';
-import { patch } from '../position';
+import { goBefore, goAfter } from '../move-relative-to-draggable';
 
 type NewHomeArgs = {|
   impact: DragImpact,
@@ -67,25 +67,17 @@ export default ({
 
   // going in front of displaced item
   if (shouldDropInFrontOfDisplaced) {
-    return patch(
-      axis.line,
-      displacedClient.marginBox[axis.end] +
-        draggableClient.margin.top +
-        draggableClient.border.top +
-        draggableClient.padding.top +
-        draggableClient.contentBox[axis.size] / 2,
-      displacedClient.marginBox.center[axis.crossAxisLine],
-    );
+    return goAfter({
+      axis,
+      moveRelativeTo: displacedClient,
+      isMoving: draggableClient,
+    });
   }
 
   // going behind displaced item
-  return patch(
-    axis.line,
-    displacedClient.marginBox[axis.start] -
-      draggableClient.margin.bottom -
-      draggableClient.border.bottom -
-      draggableClient.padding.bottom -
-      draggableClient.contentBox[axis.size] / 2,
-    displacedClient.marginBox.center[axis.crossAxisLine],
-  );
+  return goBefore({
+    axis,
+    moveRelativeTo: displacedClient,
+    isMoving: draggableClient,
+  });
 };
