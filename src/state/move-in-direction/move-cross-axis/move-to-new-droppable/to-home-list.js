@@ -7,7 +7,8 @@ import withDroppableDisplacement from '../../../with-droppable-displacement';
 import getDisplacementMap from '../../../get-displacement-map';
 import { noMovement } from '../../../no-impact';
 import getDisplacedBy from '../../../get-displaced-by';
-import type { Edge } from '../../../move-to-edge';
+import getWillDisplaceForward from '../../../will-displace-forward';
+import { goBefore, goAfter } from '../../../move-relative-to';
 import type { Result } from '../move-cross-axis-types';
 import type {
   Axis,
@@ -74,21 +75,29 @@ export default ({
   // We align the dragging item to the end of the target
   // and move everything from the target to the original position backwards
 
-  const isInFrontOfStart = targetIndex > homeIndex;
-  const edge: Edge = isInFrontOfStart ? 'end' : 'start';
-
-  const newCenter: Position = moveToEdge({
-    source: draggable.page.borderBox,
-    sourceEdge: edge,
-    destination: isInFrontOfStart
-      ? movingRelativeTo.page.borderBox
-      : movingRelativeTo.page.marginBox,
-    destinationEdge: edge,
-    destinationAxis: axis,
+  // We will displace forward when moving behind the start position
+  const willDisplaceForward: boolean = getWillDisplaceForward({
+    isInHomeList: true,
+    proposedIndex: targetIndex,
+    startIndexInHome: homeIndex,
   });
 
+  console.log('proposed index', proposedIndex);
+  console.log('proposed index', proposedIndex);
+  console.log('will displace forward?', willDisplaceForward);
+
+  const moveArgs = {
+    axis: destination.axis,
+    moveRelativeTo: movingRelativeTo.client,
+    isMoving: draggable.client,
+  };
+
+  const newCenter: Position = willDisplaceForward
+    ? goAfter(moveArgs)
+    : goBefore(moveArgs);
+
   const modified: DraggableDimension[] = (() => {
-    if (!isInFrontOfStart) {
+    if (willDisplaceForward) {
       return insideDestination.slice(targetIndex, homeIndex);
     }
 
@@ -117,7 +126,7 @@ export default ({
   const displacedBy: DisplacedBy = getDisplacedBy(
     destination.axis,
     draggable.displaceBy,
-    isInFrontOfStart,
+    willDisplaceForward,
   );
 
   const newImpact: DragImpact = {
@@ -125,7 +134,7 @@ export default ({
       displacedBy,
       displaced,
       map: getDisplacementMap(displaced),
-      isInFrontOfStart,
+      willDisplaceForward,
     },
     direction: axis.direction,
     destination: {

@@ -12,6 +12,7 @@ import type {
   DraggableLocation,
 } from '../../../../types';
 import type { InListResult } from './move-to-next-index-types';
+import getWillDisplaceForward from '../../../will-displace-forward';
 
 type Args = {|
   isMovingForward: boolean,
@@ -73,11 +74,11 @@ export default ({
     return !isMovingForward;
   })();
 
-  const willDisplaceForward: boolean = isInForeignList
-    ? // always displacing forward when in a foreign list
-      true
-    : // items will be displaced forward when moving backwards in a home list
-      proposedIndex < startIndexInHome;
+  const willDisplaceForward: boolean = getWillDisplaceForward({
+    isInHomeList,
+    proposedIndex,
+    startIndexInHome,
+  });
 
   const useDisplacementFrom: DraggableDimension = (() => {
     if (isIncreasingDisplacement) {

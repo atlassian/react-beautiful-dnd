@@ -9,7 +9,8 @@ import type {
   DroppableDimension,
 } from '../../types';
 import isInHomeList from '../is-in-home-list';
-import { goBefore, goAfter } from '../move-relative-to-draggable';
+import { goBefore, goAfter, goIntoStart } from '../move-relative-to';
+import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 
 type NewHomeArgs = {|
   impact: DragImpact,
@@ -33,13 +34,28 @@ export default ({
   }
   // dropping outside of any list
   const location: ?DraggableLocation = impact.destination;
-
   if (!location) {
     return null;
   }
 
-  const { displaced, willDisplaceForward } = impact.movement;
+  const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
+    destination,
+    draggables,
+  );
+
+  const draggableClient: BoxModel = draggable.client;
   const axis: Axis = destination.axis;
+
+  // this will only happen in a foreign list
+  if (!insideDestination.length) {
+    return goIntoStart({
+      axis,
+      moveInto: destination.client,
+      isMoving: draggableClient,
+    });
+  }
+
+  const { displaced, willDisplaceForward } = impact.movement;
 
   const inHomeList: boolean = isInHomeList(draggable, destination);
 
@@ -55,14 +71,19 @@ export default ({
     return null;
   }
 
-  // TODO: last spot in foreign list
+  // this can happen when moving into the last spot of a foreign list
   if (!lastDisplaced) {
-    return null;
+    const moveRelativeTo: DraggableDimension =
+      insideDestination[insideDestination.length - 1];
+    return goAfter({
+      axis,
+      moveRelativeTo: moveRelativeTo.client,
+      isMoving: draggableClient,
+    });
   }
 
   const displacedBy: Position = impact.movement.displacedBy.point;
   const displacedClient: BoxModel = offset(lastDisplaced.client, displacedBy);
-  const draggableClient: BoxModel = draggable.client;
   const shouldDropInFrontOfDisplaced: boolean = !willDisplaceForward;
 
   // going in front of displaced item
