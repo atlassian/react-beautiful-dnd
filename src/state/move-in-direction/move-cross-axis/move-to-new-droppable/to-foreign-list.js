@@ -47,9 +47,8 @@ export default ({
   if (!movingIntoIndexOf || !insideDestination.length) {
     const newCenter: Position = goIntoStart({
       axis,
-      // TODO: page!?
-      moveInto: destination.client,
-      isMoving: draggable.client,
+      moveInto: destination.page,
+      isMoving: draggable.page,
     });
 
     const newImpact: DragImpact = {
