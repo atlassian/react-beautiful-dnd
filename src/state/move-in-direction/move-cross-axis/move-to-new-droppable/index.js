@@ -44,14 +44,9 @@ export default ({
   home,
   previousImpact,
   viewport,
-}: Args): Result => {
+}: Args): ?Result => {
   // moving back to the home list
   if (destination.descriptor.id === draggable.descriptor.droppableId) {
-    invariant(
-      movingRelativeTo,
-      'There will always be a target in the original list',
-    );
-
     return toHomeList({
       homeIndex: home.index,
       movingIntoIndexOf: movingRelativeTo,

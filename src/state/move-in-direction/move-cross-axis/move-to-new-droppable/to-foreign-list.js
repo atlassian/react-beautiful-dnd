@@ -1,6 +1,11 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { type Position, type BoxModel, offset } from 'css-box-model';
+import {
+  type Position,
+  type BoxModel,
+  type Spacing,
+  offset,
+} from 'css-box-model';
 import type { Result } from '../move-cross-axis-types';
 import getDisplacement from '../../../get-displacement';
 import withDroppableDisplacement from '../../../with-droppable-displacement';
@@ -8,6 +13,7 @@ import getDisplacementMap from '../../../get-displacement-map';
 import getDisplacedBy from '../../../get-displaced-by';
 import { noMovement } from '../../../no-impact';
 import { goIntoStart, goAfter, goBefore } from '../../../move-relative-to';
+import { isTotallyVisible } from '../../../visibility/is-visible';
 import type {
   Axis,
   DragImpact,
@@ -39,7 +45,7 @@ export default ({
   destination,
   previousImpact,
   viewport,
-}: Args): Result => {
+}: Args): ?Result => {
   const axis: Axis = destination.axis;
 
   // Moving to an empty list
@@ -50,6 +56,23 @@ export default ({
       moveInto: destination.page,
       isMoving: draggable.page,
     });
+
+    // we might not be able to see the position we are hoping to move to
+    const fake: Spacing = {
+      top: newCenter.y,
+      right: newCenter.x,
+      bottom: newCenter.y,
+      left: newCenter.x,
+    };
+    const isVisible: boolean = isTotallyVisible({
+      target: fake,
+      destination,
+      viewport: viewport.frame,
+    });
+
+    if (!isVisible) {
+      return null;
+    }
 
     const newImpact: DragImpact = {
       movement: noMovement,
