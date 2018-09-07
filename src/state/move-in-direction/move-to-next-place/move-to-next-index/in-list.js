@@ -11,7 +11,7 @@ import type {
   DragImpact,
   DraggableLocation,
 } from '../../../../types';
-import type { Result } from './move-to-next-index-types';
+import type { InListResult } from './move-to-next-index-types';
 
 type Args = {|
   isMovingForward: boolean,
@@ -35,7 +35,7 @@ export default ({
   location,
   insideDestination: initialInside,
   previousPageBorderBoxCenter,
-}: Args): ?Result => {
+}: Args): ?InListResult => {
   const insideDestination: DraggableDimension[] = initialInside.slice();
   const currentIndex: number = location.index;
   const isInForeignList: boolean = !isInHomeList;
@@ -109,7 +109,7 @@ export default ({
   return {
     newPageBorderBoxCenter,
     addToDisplacement: isIncreasingDisplacement ? target : null,
-    isInFrontOfStart: !willDisplaceForward,
+    willDisplaceForward,
     proposedIndex,
   };
 };

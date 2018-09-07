@@ -42,6 +42,7 @@ export default ({
 
   const isInFrontOfStart: boolean =
     currentCenter[axis.line] > originalCenter[axis.line];
+  const willDisplaceForward: boolean = !isInFrontOfStart;
 
   const isMovingForward: boolean = isUserMovingForward(
     home.axis,
@@ -54,7 +55,7 @@ export default ({
   const displacedBy: DisplacedBy = getDisplacedBy(
     home.axis,
     draggable.displaceBy,
-    isInFrontOfStart,
+    willDisplaceForward,
   );
 
   const map: DisplacementMap = previousImpact.movement.map;
@@ -162,7 +163,7 @@ export default ({
   const newMovement: DragMovement = {
     displaced: ordered,
     map: getDisplacementMap(ordered),
-    isInFrontOfStart,
+    willDisplaceForward,
     displacedBy,
   };
 

@@ -1,8 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
-import inHomeList from './in-home-list';
-import inForeignList from './in-foreign-list';
 import fromCombine, { type Result as FromCombineResult } from './from-combine';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
@@ -10,7 +8,7 @@ import getDisplacedBy from '../../../get-displaced-by';
 import getDisplacementMap from '../../../get-displacement-map';
 import withDroppableDisplacement from '../../../with-droppable-displacement';
 import { subtract } from '../../../position';
-import attempt2 from './attempt2';
+import getInListResult from './in-list';
 import type { Result } from '../move-to-next-place-types';
 import type { InListResult } from './move-to-next-index-types';
 import type {
@@ -60,26 +58,7 @@ export default ({
 
   invariant(location, 'requires a previous location to move');
 
-  // const inList: ?InListResult = isInHomeList
-  //   ? inHomeList({
-  //       isMovingForward,
-  //       draggable,
-  //       destination,
-  //       location,
-  //       insideDestination,
-  //     })
-  //   : inForeignList({
-  //       isMovingForward,
-  //       draggable,
-  //       destination,
-  //       location,
-  //       insideDestination,
-  //     });
-
-  // const location: ?DraggableLocation = previousImpact.destination;
-  // invariant(location);
-
-  const inList: ?InListResult = attempt2({
+  const inList: ?InListResult = getInListResult({
     isMovingForward,
     isInHomeList,
     draggable,
@@ -95,15 +74,8 @@ export default ({
     return null;
   }
 
-  // const shouldChangeDisplacement: boolean = fromMerge
-  //   ? fromMerge.shouldDisplace
-  //   : false;
-
-  // const addToDisplacement: ?DraggableDimension = shouldChangeDisplacement
-  //   ? inList.addToDisplacement
-  //   : null;
   const newPageBorderBoxCenter: Position = inList.newPageBorderBoxCenter;
-  const isInFrontOfStart: boolean = inList.isInFrontOfStart;
+  const willDisplaceForward: boolean = inList.willDisplaceForward;
   const proposedIndex: number = inList.proposedIndex;
   const axis: Axis = destination.axis;
 
@@ -137,7 +109,7 @@ export default ({
   const displacedBy: DisplacedBy = getDisplacedBy(
     axis,
     draggable.displaceBy,
-    isInFrontOfStart,
+    willDisplaceForward,
   );
 
   const newImpact: DragImpact = {
@@ -145,7 +117,7 @@ export default ({
       displacedBy,
       displaced,
       map: getDisplacementMap(displaced),
-      isInFrontOfStart,
+      willDisplaceForward,
     },
     destination: {
       droppableId: destination.descriptor.id,

@@ -155,7 +155,7 @@ export type DragMovement = {|
   displaced: Displacement[],
   // displaced as a map
   map: DisplacementMap,
-  isInFrontOfStart: boolean,
+  willDisplaceForward: boolean,
   displacedBy: DisplacedBy,
 |};
 

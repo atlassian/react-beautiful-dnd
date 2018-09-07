@@ -9,10 +9,9 @@ export default memoizeOne(
   (
     axis: Axis,
     displaceBy: Position,
-    isInFrontOfStart: boolean,
+    willDisplaceForward: boolean,
   ): DisplacedBy => {
-    // in front of the start = displace backward
-    const modifier: number = isInFrontOfStart ? -1 : 1;
+    const modifier: number = willDisplaceForward ? 1 : -1;
     const displacement: number = displaceBy[axis.line] * modifier;
     return {
       value: displacement,

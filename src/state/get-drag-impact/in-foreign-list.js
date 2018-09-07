@@ -48,7 +48,7 @@ export default ({
   const displacedBy: DisplacedBy = getDisplacedBy(
     destination.axis,
     draggable.displaceBy,
-    false,
+    true,
   );
 
   const targetCenter: number = currentCenter[axis.line];
@@ -102,7 +102,7 @@ export default ({
     displacedBy,
     displaced,
     map: getDisplacementMap(displaced),
-    isInFrontOfStart: false,
+    willDisplaceForward: true,
   };
 
   const impact: DragImpact = {
