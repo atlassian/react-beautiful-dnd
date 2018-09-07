@@ -118,14 +118,14 @@ export default ({
   const closestToBeDisplaced: DraggableDimension =
     draggables[displaced[0].draggableId];
   const closestDisplaced: BoxModel = offset(
-    closestToBeDisplaced.client,
+    closestToBeDisplaced.page,
     displacedBy.point,
   );
 
   const moveArgs = {
     axis: destination.axis,
     moveRelativeTo: closestDisplaced,
-    isMoving: draggable.client,
+    isMoving: draggable.page,
   };
 
   const newCenter: Position = isMovingAfter

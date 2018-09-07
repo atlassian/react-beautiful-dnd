@@ -67,9 +67,10 @@ export default ({
   // moving to a foreign list
   return toForeignList({
     pageBorderBoxCenter,
-    movingRelativeTo,
+    movingIntoIndexOf: movingRelativeTo,
     insideDestination,
     draggable,
+    draggables,
     destination,
     previousImpact,
     viewport,
