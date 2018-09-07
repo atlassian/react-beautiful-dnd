@@ -12,7 +12,7 @@ const flag: string = '__react-beautiful-dnd-debug-timings-hook__';
 const isTimingsEnabled = (): boolean => Boolean(window[flag]);
 
 // Debug: uncomment to enable
-// window[flag] = true;
+window[flag] = true;
 
 export const start = (key: string) => {
   // we want to strip all the code out for production builds

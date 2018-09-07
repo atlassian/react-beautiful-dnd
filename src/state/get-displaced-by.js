@@ -11,12 +11,12 @@ export default memoizeOne(
     displaceBy: Position,
     isInFrontOfStart: boolean,
   ): DisplacedBy => {
+    // in front of the start = displace backward
     const modifier: number = isInFrontOfStart ? -1 : 1;
     const displacement: number = displaceBy[axis.line] * modifier;
-    const result: DisplacedBy = {
+    return {
       value: displacement,
       point: patch(axis.line, displacement),
     };
-    return result;
   },
 );

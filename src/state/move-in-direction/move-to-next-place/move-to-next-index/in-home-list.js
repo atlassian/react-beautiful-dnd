@@ -23,6 +23,7 @@ const getEdge = (
   isMovingForward: boolean,
 ): Edge => {
   // is moving away from the start
+  // increasing displacement
   if (!isMovingTowardStart) {
     return isMovingForward ? 'end' : 'start';
   }

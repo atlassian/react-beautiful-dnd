@@ -32,13 +32,13 @@ export default ({
     : currentIndex - 1;
   const lastIndex: number = insideDestination.length - 1;
 
-  // draggable is allowed to exceed the foreign droppables count by 1
-  if (proposedIndex > lastIndex + 1) {
+  // Cannot move before the first item
+  if (proposedIndex < 0) {
     return null;
   }
 
-  // Cannot move before the first item
-  if (proposedIndex < 0) {
+  // draggable is allowed to exceed the foreign droppables count by 1
+  if (proposedIndex > lastIndex + 1) {
     return null;
   }
 
@@ -67,7 +67,7 @@ export default ({
   });
 
   return {
-    addToDisplacement: isMovingForward ? movingRelativeTo : null,
+    addToDisplacement: isMovingForward ? null : movingRelativeTo,
     newPageBorderBoxCenter,
     isInFrontOfStart: false,
     proposedIndex,

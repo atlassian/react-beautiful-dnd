@@ -3,19 +3,20 @@ import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
 import inHomeList from './in-home-list';
 import inForeignList from './in-foreign-list';
+import fromCombine, { type Result as FromCombineResult } from './from-combine';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
 import getDisplacedBy from '../../../get-displaced-by';
 import getDisplacementMap from '../../../get-displacement-map';
 import withDroppableDisplacement from '../../../with-droppable-displacement';
-import type { Result } from '../move-to-next-place-types';
 import { subtract } from '../../../position';
+import attempt2 from './attempt2';
+import type { Result } from '../move-to-next-place-types';
 import type { InListResult } from './move-to-next-index-types';
 import type {
   Axis,
   DraggableDimension,
   Displacement,
-  CombineImpact,
   DroppableDimension,
   DraggableDimensionMap,
   DragImpact,
@@ -23,69 +24,6 @@ import type {
   DisplacedBy,
   DraggableLocation,
 } from '../../../../types';
-
-const getCurrentLocation = (
-  isInHomeList: boolean,
-  draggable: DraggableDimension,
-  isMovingForward: boolean,
-  previousImpact: DragImpact,
-  draggables: DraggableDimensionMap,
-): DraggableLocation => {
-  // need to create what the location would have been before the combine
-  const merge: ?CombineImpact = previousImpact.merge;
-
-  // was not previously merging - use the last destination
-  if (!merge) {
-    const location: ?DraggableLocation = previousImpact.destination;
-    invariant(location, 'Cannot keyboard move without a previous destination');
-    return location;
-  }
-
-  // was previously merging - need to fake the 'last location'
-  const isCombinedWith: DraggableDimension =
-    draggables[merge.combine.draggableId];
-  const isDisplaced: boolean = Boolean(
-    previousImpact.movement.map[isCombinedWith.descriptor.id],
-  );
-  // const isInFrontOfStart: boolean = isInHomeList
-  //   ? isCombinedWith.descriptor.index > draggable.descriptor.index
-  //   : false;
-  // const isMovingIntoCombinedSpot: boolean = isDisplaced &&
-
-  // const combinedIndex: number = isCombinedWith.descriptor.index;
-  // // where we expect the index to be AFTER the movement
-  // const finalIndex: number = (() => {
-  //   // moving forward will increase the amount of things displaced
-  //   if (isInFrontOfStart) {
-  //     if (isDisplaced) {
-  //       return isMovingForward
-  //         ? combinedIndex
-  //         : combinedIndex - 1;
-  //     }
-  //     return isMovingForward ? combinedIndex
-  //   }
-
-  //   if (isDisplaced) {
-  //     return isMovingForward
-  //       ? isCombinedWith.descriptor.index
-  //       : isCombinedWith.descriptor.index;
-  //   }
-
-  //   return isMovingForward
-  //     ? isCombinedWith.descriptor.index - 1
-  //     : isCombinedWith.descriptor.index + 1;
-  // })();
-
-  // const index: number = isMovingForward ? finalIndex - 1 : finalIndex + 1;
-
-  const fudged: DraggableLocation = {
-    droppableId: isCombinedWith.descriptor.droppableId,
-    index: 0,
-  };
-  // console.log('was combined with', wasCombined.descriptor.id);
-  // console.log('fudged', fudged);
-  return fudged;
-};
 
 export type Args = {|
   isMovingForward: boolean,
@@ -110,34 +48,60 @@ export default ({
   previousPageBorderBoxCenter,
   viewport,
 }: Args): ?Result => {
-  const location: DraggableLocation = getCurrentLocation(
-    isInHomeList,
-    isMovingForward,
-    previousImpact,
-    draggables,
-  );
+  // const fromMerge: ?FromCombineResult = fromCombine({
+  //   isMovingForward,
+  //   isInHomeList,
+  //   previousImpact,
+  //   destination,
+  //   insideDestination,
+  //   draggables,
+  // });
+  const location: ?DraggableLocation = previousImpact.destination;
 
-  const inList: ?InListResult = isInHomeList
-    ? inHomeList({
-        isMovingForward,
-        draggable,
-        destination,
-        location,
-        insideDestination,
-      })
-    : inForeignList({
-        isMovingForward,
-        draggable,
-        destination,
-        location,
-        insideDestination,
-      });
+  invariant(location, 'requires a previous location to move');
+
+  // const inList: ?InListResult = isInHomeList
+  //   ? inHomeList({
+  //       isMovingForward,
+  //       draggable,
+  //       destination,
+  //       location,
+  //       insideDestination,
+  //     })
+  //   : inForeignList({
+  //       isMovingForward,
+  //       draggable,
+  //       destination,
+  //       location,
+  //       insideDestination,
+  //     });
+
+  // const location: ?DraggableLocation = previousImpact.destination;
+  // invariant(location);
+
+  const inList: ?InListResult = attempt2({
+    isMovingForward,
+    isInHomeList,
+    draggable,
+    location,
+    destination,
+    draggables,
+    previousImpact,
+    insideDestination,
+    previousPageBorderBoxCenter,
+  });
 
   if (!inList) {
     return null;
   }
 
-  const addToDisplacement: ?DraggableDimension = inList.addToDisplacement;
+  // const shouldChangeDisplacement: boolean = fromMerge
+  //   ? fromMerge.shouldDisplace
+  //   : false;
+
+  // const addToDisplacement: ?DraggableDimension = shouldChangeDisplacement
+  //   ? inList.addToDisplacement
+  //   : null;
   const newPageBorderBoxCenter: Position = inList.newPageBorderBoxCenter;
   const isInFrontOfStart: boolean = inList.isInFrontOfStart;
   const proposedIndex: number = inList.proposedIndex;
@@ -154,9 +118,9 @@ export default ({
     onlyOnMainAxis: true,
   });
 
-  const displaced: Displacement[] = addToDisplacement
+  const displaced: Displacement[] = inList.addToDisplacement
     ? withFirstAdded({
-        add: addToDisplacement,
+        add: inList.addToDisplacement,
         destination,
         draggables,
         previousImpact,

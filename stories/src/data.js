@@ -55,7 +55,8 @@ export const quotes: Quote[] = [
   },
   {
     id: '5',
-    content: 'Homies help homies. Always',
+    content:
+      'Homies help homies. Always Homies help homies. Always Homies help homies. Always Homies help homies. Always Homies help homies. Always Homies help homies. Always Homies help homies. Alwayss',
     author: finn,
   },
   {
