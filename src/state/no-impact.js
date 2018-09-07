@@ -11,7 +11,7 @@ export const noMovement: DragMovement = {
   displaced: [],
   map: {},
   displacedBy: noDisplacedBy,
-  isInFrontOfStart: false,
+  willDisplaceForward: true,
 };
 
 const noImpact: DragImpact = {

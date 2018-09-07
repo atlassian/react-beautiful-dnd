@@ -46,16 +46,7 @@ export default ({
   previousPageBorderBoxCenter,
   viewport,
 }: Args): ?Result => {
-  // const fromMerge: ?FromCombineResult = fromCombine({
-  //   isMovingForward,
-  //   isInHomeList,
-  //   previousImpact,
-  //   destination,
-  //   insideDestination,
-  //   draggables,
-  // });
   const location: ?DraggableLocation = previousImpact.destination;
-
   invariant(location, 'requires a previous location to move');
 
   const inList: ?InListResult = getInListResult({
