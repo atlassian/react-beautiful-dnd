@@ -9,23 +9,23 @@ type Args = {|
   isMoving: BoxModel,
 |};
 
-const distanceFromTopToCenter = (axis: Axis, box: BoxModel): number =>
-  box.margin.top +
-  box.border.top +
-  box.padding.top +
+const distanceFromStartToCenter = (axis: Axis, box: BoxModel): number =>
+  box.margin[axis.start] +
+  box.border[axis.start] +
+  box.padding[axis.start] +
   box.contentBox[axis.size] / 2;
 
-const distanceFromBottomToCenter = (axis: Axis, box: BoxModel): number =>
-  box.margin.bottom +
-  box.border.bottom +
-  box.padding.bottom +
+const distanceFromEndToCenter = (axis: Axis, box: BoxModel): number =>
+  box.margin[axis.end] +
+  box.border[axis.end] +
+  box.padding[axis.end] +
   box.contentBox[axis.size] / 2;
 
 export const goAfter = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
   patch(
     axis.line,
     moveRelativeTo.marginBox[axis.end] +
-      distanceFromTopToCenter(axis, isMoving),
+      distanceFromStartToCenter(axis, isMoving),
     moveRelativeTo.marginBox.center[axis.crossAxisLine],
   );
 
@@ -33,7 +33,7 @@ export const goBefore = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
   patch(
     axis.line,
     moveRelativeTo.marginBox[axis.start] -
-      distanceFromBottomToCenter(axis, isMoving),
+      distanceFromEndToCenter(axis, isMoving),
     moveRelativeTo.marginBox.center[axis.crossAxisLine],
   );
 
@@ -51,6 +51,6 @@ export const goIntoStart = ({
 }: GoIntoArgs): Position =>
   patch(
     axis.line,
-    moveInto.contentBox[axis.start] + distanceFromTopToCenter(axis, isMoving),
+    moveInto.contentBox[axis.start] + distanceFromStartToCenter(axis, isMoving),
     moveInto.contentBox.center[axis.crossAxisLine],
   );
