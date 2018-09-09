@@ -1,12 +1,10 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
-import fromCombine, { type Result as FromCombineResult } from './from-combine';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
 import getDisplacedBy from '../../../get-displaced-by';
 import getDisplacementMap from '../../../get-displacement-map';
-import withDroppableDisplacement from '../../../with-droppable-displacement';
 import { subtract } from '../../../position';
 import getInListResult from './in-list';
 import type { Result } from '../move-to-next-place-types';
@@ -123,10 +121,7 @@ export default ({
 
   if (isVisibleInNewLocation) {
     return {
-      pageBorderBoxCenter: withDroppableDisplacement(
-        destination,
-        newPageBorderBoxCenter,
-      ),
+      pageBorderBoxCenter: newPageBorderBoxCenter,
       impact: newImpact,
       scrollJumpRequest: null,
     };
