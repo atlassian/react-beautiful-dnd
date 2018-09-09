@@ -11,6 +11,7 @@ export type Args = {|
   target: Spacing,
   destination: DroppableDimension,
   viewport: Rect,
+  withDroppableDisplacement: boolean,
 |};
 
 type HelperArgs = {|
@@ -18,16 +19,27 @@ type HelperArgs = {|
   isVisibleThroughFrameFn: (frame: Spacing) => (subject: Spacing) => boolean,
 |};
 
+const getDroppableDisplaced = (
+  target: Spacing,
+  destination: DroppableDimension,
+) => {
+  const displacement: Position = destination.frame
+    ? destination.frame.scroll.diff.displacement
+    : origin;
+
+  return offsetByPosition(target, displacement);
+};
+
 const isVisible = ({
   target,
   destination,
   viewport,
+  withDroppableDisplacement,
   isVisibleThroughFrameFn,
 }: HelperArgs): boolean => {
-  const displacement: Position = destination.frame
-    ? destination.frame.scroll.diff.displacement
-    : origin;
-  const withDisplacement: Spacing = offsetByPosition(target, displacement);
+  const withDisplacement = withDroppableDisplacement
+    ? getDroppableDisplaced(target, destination)
+    : target;
 
   // destination subject is totally hidden by frame
   // this should never happen - but just guarding against it

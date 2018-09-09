@@ -41,6 +41,7 @@ export default ({
           target: draggable.page.borderBox,
           destination,
           viewport: viewport.frame,
+          withDroppableDisplacement: true,
         }),
     )
     .sort(

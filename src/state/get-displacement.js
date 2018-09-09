@@ -52,6 +52,7 @@ export default ({
     target: draggable.page.marginBox,
     destination,
     viewport,
+    withDroppableDisplacement: true,
   });
 
   const shouldAnimate: boolean = getShouldAnimate(isVisible, map[id]);

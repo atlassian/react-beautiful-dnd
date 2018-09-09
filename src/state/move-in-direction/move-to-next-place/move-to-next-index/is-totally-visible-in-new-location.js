@@ -14,6 +14,7 @@ type Args = {|
   destination: DroppableDimension,
   newPageBorderBoxCenter: Position,
   viewport: Rect,
+  withDroppableDisplacement: boolean,
   onlyOnMainAxis?: boolean,
 |};
 
@@ -22,6 +23,7 @@ export default ({
   destination,
   newPageBorderBoxCenter,
   viewport,
+  withDroppableDisplacement,
   onlyOnMainAxis = false,
 }: Args): boolean => {
   // What would the location of the Draggable be once the move is completed?
@@ -38,6 +40,7 @@ export default ({
   const args: IsVisibleArgs = {
     target: shifted,
     destination,
+    withDroppableDisplacement,
     viewport,
   };
 

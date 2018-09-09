@@ -75,6 +75,9 @@ export default ({
     destination,
     newPageBorderBoxCenter,
     viewport: viewport.frame,
+    // not applying the displacement of the droppable for this check
+    // we are only interested in the page location of the dragging item
+    withDroppableDisplacement: false,
     // we only care about it being visible relative to the main axis
     // this is important with dynamic changes as scroll bar and toggle
     // on the cross axis during a drag
@@ -134,14 +137,10 @@ export default ({
     newPageBorderBoxCenter,
     previousPageBorderBoxCenter,
   );
-  const distanceWithScroll: Position = withDroppableDisplacement(
-    destination,
-    distance,
-  );
 
   return {
     pageBorderBoxCenter: previousPageBorderBoxCenter,
     impact: newImpact,
-    scrollJumpRequest: distanceWithScroll,
+    scrollJumpRequest: distance,
   };
 };

@@ -68,6 +68,7 @@ export default ({
       target: fake,
       destination,
       viewport: viewport.frame,
+      withDroppableDisplacement: true,
     });
 
     if (!isVisible) {

@@ -113,5 +113,7 @@ export default ({
     viewport: newViewport,
   };
 
+  console.log('new page center', current.page.borderBoxCenter);
+
   return result;
 };
