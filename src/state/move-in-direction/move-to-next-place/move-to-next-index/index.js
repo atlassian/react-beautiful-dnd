@@ -68,9 +68,6 @@ export default ({
   const proposedIndex: number = inList.proposedIndex;
   const axis: Axis = destination.axis;
 
-  console.log('previousPageBorderBoxCenter', previousPageBorderBoxCenter);
-  console.log('proposed newPageBorderBoxCenter', newPageBorderBoxCenter);
-
   const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
     draggable,
     destination,
