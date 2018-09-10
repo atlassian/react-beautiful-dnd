@@ -210,7 +210,7 @@ export const withPlaceholder = (
     draggables,
   );
 
-  const inSubject: PlaceholderInSubject = {
+  const growBy: PlaceholderInSubject = {
     placeholderSize: withPlaceholderSize,
     increasedBy: requiredGrowth,
   };
@@ -218,7 +218,7 @@ export const withPlaceholder = (
   if (!frame) {
     const subject: DroppableSubject = getSubject({
       pageMarginBox: droppable.subject.pageMarginBox,
-      withPlaceholder: inSubject,
+      withPlaceholder: growBy,
       axis: droppable.axis,
       scrollDisplacement: origin,
       frame: droppable.frame,
@@ -229,19 +229,9 @@ export const withPlaceholder = (
     };
   }
 
-  // Original max scroll with increased scroll size
-  // it is not this simple...!
-  // need to figure out how much to increase the max scroll by
-  // const newMaxScroll: Position = getMaxScrollWithPlaceholder(
-  //   droppable,
-  //   withPlaceholderSize,
-  //   draggables,
-  // );
   const maxScroll: Position = requiredGrowth
     ? add(frame.scroll.max, requiredGrowth)
     : frame.scroll.max;
-  console.log('old max scroll', frame.scroll.max);
-  console.log('new max scroll', maxScroll);
 
   const newFrame: Scrollable = {
     ...frame,
@@ -253,7 +243,7 @@ export const withPlaceholder = (
 
   const subject: DroppableSubject = getSubject({
     pageMarginBox: droppable.subject.pageMarginBox,
-    withPlaceholder: inSubject,
+    withPlaceholder: growBy,
     axis: droppable.axis,
     scrollDisplacement: newFrame.scroll.diff.displacement,
     frame: newFrame,

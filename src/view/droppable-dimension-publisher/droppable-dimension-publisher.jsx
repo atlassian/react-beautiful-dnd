@@ -204,13 +204,18 @@ export default class DroppableDimensionPublisher extends React.Component<
     closestScrollable.scrollLeft += change.x;
     const after: Position = this.getClosestScroll();
     const actual: Position = subtract(after, before);
-    if (!isEqual(actual, change)) {
-      console.group('droppable scroll not applied correctly');
-      console.log('requested', change);
-      console.log('actual', actual);
-      console.log('unaccounted for', subtract(change, actual));
-      console.groupEnd();
-    }
+    // if (!isEqual(actual, change)) {
+    //   console.group('droppable scroll not applied correctly');
+    //   console.log('requested', change);
+    //   console.log('actual', actual);
+    //   console.log('unaccounted for', subtract(change, actual));
+    //   console.groupEnd();
+    // }
+    // const overlap: Position = subtract(change, actual);
+    // if (isEqual(overlap, origin)) {
+    //   return;
+    // }
+    // this.props.scrollOverlap(overlap);
   };
 
   watchScroll = (closestScrollable: Element, options: ScrollOptions) => {
