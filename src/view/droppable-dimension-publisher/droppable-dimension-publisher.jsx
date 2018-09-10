@@ -15,7 +15,7 @@ import rafSchedule from 'raf-schd';
 import getClosestScrollable from '../get-closest-scrollable';
 import checkForNestedScrollContainers from './check-for-nested-scroll-container';
 import { dimensionMarshalKey } from '../context-keys';
-import { origin } from '../../state/position';
+import { origin, subtract, isEqual } from '../../state/position';
 import warmUpDimension from '../warm-up-dimension';
 import {
   getDroppableDimension,
@@ -198,8 +198,19 @@ export default class DroppableDimensionPublisher extends React.Component<
       'Cannot scroll a droppable with no closest scrollable',
     );
     const { closestScrollable } = this.watchingScroll;
+    console.log('forcing scroll change on el', change);
+    const before: Position = this.getClosestScroll();
     closestScrollable.scrollTop += change.y;
     closestScrollable.scrollLeft += change.x;
+    const after: Position = this.getClosestScroll();
+    const actual: Position = subtract(after, before);
+    if (!isEqual(actual, change)) {
+      console.group('droppable scroll not applied correctly');
+      console.log('requested', change);
+      console.log('actual', actual);
+      console.log('unaccounted for', subtract(change, actual));
+      console.groupEnd();
+    }
   };
 
   watchScroll = (closestScrollable: Element, options: ScrollOptions) => {

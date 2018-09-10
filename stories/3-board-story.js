@@ -17,5 +17,5 @@ storiesOf('board', module)
     <Board initial={data.medium} containerHeight="60vh" />
   ))
   .add('scrollable columns', () => (
-    <Board initial={data.medium} withScrollableColumns />
+    <Board initial={authorQuoteMap} withScrollableColumns />
   ));

@@ -27,9 +27,11 @@ const Wrapper = styled('div')`
   width: 250px;
 `;
 
+const scrollContainerHeight: number = 250;
+
 const DropZone = styled('div')`
   /* stop the list collapsing when empty */
-  min-height: 250px;
+  min-height: ${scrollContainerHeight}px;
 
   /*
     not relying on the items for a margin-bottom
@@ -41,7 +43,7 @@ const DropZone = styled('div')`
 const ScrollContainer = styled('div')`
   overflow-x: hidden;
   overflow-y: auto;
-  max-height: 300px;
+  max-height: ${scrollContainerHeight}px;
 `;
 
 /* stylelint-disable block-no-empty */

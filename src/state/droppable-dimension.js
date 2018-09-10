@@ -8,16 +8,20 @@ import {
   type Spacing,
 } from 'css-box-model';
 import { vertical, horizontal } from './axis';
-import { subtract, negate, origin } from './position';
+import { add, subtract, negate, origin, patch } from './position';
 import { offsetByPosition } from './spacing';
+import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
 import getMaxScroll from './get-max-scroll';
 import type {
   Axis,
   DroppableDimension,
+  DraggableDimension,
   DroppableDescriptor,
+  DraggableDimensionMap,
   Scrollable,
   DroppableSubject,
   ScrollSize,
+  PlaceholderInSubject,
 } from '../types';
 
 export const clip = (frame: Spacing, subject: Spacing): ?Rect => {
@@ -55,7 +59,7 @@ type GetDroppableArgs = {|
 
 type GetSubjectArgs = {|
   pageMarginBox: Rect,
-  withPlaceholder: ?Position,
+  withPlaceholder: ?PlaceholderInSubject,
   axis: Axis,
   scrollDisplacement: Position,
   frame: ?Scrollable,
@@ -69,21 +73,23 @@ const getSubject = ({
   frame,
 }: GetSubjectArgs): DroppableSubject => {
   const scrolled: Spacing = offsetByPosition(pageMarginBox, scrollDisplacement);
-  const expanded: Spacing = withPlaceholder
-    ? {
-        ...scrolled,
-        [axis.end]: scrolled[axis.end] + withPlaceholder[axis.line],
-      }
-    : scrolled;
-  const clipped: ?Rect =
+  const maybeIncreased: Spacing =
+    withPlaceholder && withPlaceholder.increasedBy
+      ? {
+          ...scrolled,
+          [axis.end]:
+            scrolled[axis.end] + withPlaceholder.increasedBy[axis.line],
+        }
+      : scrolled;
+  const maybeClipped: ?Rect =
     frame && frame.shouldClipSubject
-      ? clip(frame.pageMarginBox, expanded)
-      : getRect(expanded);
+      ? clip(frame.pageMarginBox, maybeIncreased)
+      : getRect(maybeIncreased);
 
   return {
     pageMarginBox,
     withPlaceholder,
-    active: clipped,
+    active: maybeClipped,
   };
 };
 
@@ -154,16 +160,65 @@ export const getDroppableDimension = ({
   return dimension;
 };
 
+const getRequiredGrowthForPlaceholder = (
+  droppable: DroppableDimension,
+  withPlaceholderSize: Position,
+  draggables: DraggableDimensionMap,
+): ?Position => {
+  const axis: Axis = droppable.axis;
+  // TODO: margin collapsing?
+  const availableSpace: number = droppable.subject.pageMarginBox[axis.size];
+  const insideDroppable: DraggableDimension[] = getDraggablesInsideDroppable(
+    droppable,
+    draggables,
+  );
+  const spaceUsed: number = insideDroppable.reduce(
+    (sum: number, dimension: DraggableDimension): number =>
+      sum + dimension.client.marginBox[axis.size],
+    0,
+  );
+  console.log('available space', availableSpace);
+  console.log('space used', spaceUsed);
+  const requiredSpace: number = spaceUsed + withPlaceholderSize[axis.line];
+  console.log('required space', requiredSpace);
+  const needsToGrowBy: number = requiredSpace - availableSpace;
+  console.log('required growth', needsToGrowBy);
+
+  // nothing to do here
+  if (needsToGrowBy <= 0) {
+    return null;
+  }
+
+  return patch(axis.line, needsToGrowBy);
+};
+
 export const withPlaceholder = (
   droppable: DroppableDimension,
   withPlaceholderSize: Position,
+  draggables: DraggableDimensionMap,
 ): DroppableDimension => {
   const frame: ?Scrollable = droppable.frame;
+
+  invariant(
+    !droppable.subject.withPlaceholder,
+    'Cannot add placeholder size to a subject when it already has one',
+  );
+
+  const requiredGrowth: ?Position = getRequiredGrowthForPlaceholder(
+    droppable,
+    withPlaceholderSize,
+    draggables,
+  );
+
+  const inSubject: PlaceholderInSubject = {
+    placeholderSize: withPlaceholderSize,
+    increasedBy: requiredGrowth,
+  };
 
   if (!frame) {
     const subject: DroppableSubject = getSubject({
       pageMarginBox: droppable.subject.pageMarginBox,
-      withPlaceholder: withPlaceholderSize,
+      withPlaceholder: inSubject,
       axis: droppable.axis,
       scrollDisplacement: origin,
       frame: droppable.frame,
@@ -174,18 +229,19 @@ export const withPlaceholder = (
     };
   }
 
-  invariant(
-    !droppable.subject.withPlaceholder,
-    'Cannot add placeholder size to a subject when it already has one',
-  );
-
   // Original max scroll with increased scroll size
-  const maxScroll: Position = getMaxScroll({
-    scrollHeight: frame.scrollSize.scrollHeight + withPlaceholderSize.y,
-    scrollWidth: frame.scrollSize.scrollWidth + withPlaceholderSize.x,
-    height: frame.frameClient.paddingBox.height,
-    width: frame.frameClient.paddingBox.width,
-  });
+  // it is not this simple...!
+  // need to figure out how much to increase the max scroll by
+  // const newMaxScroll: Position = getMaxScrollWithPlaceholder(
+  //   droppable,
+  //   withPlaceholderSize,
+  //   draggables,
+  // );
+  const maxScroll: Position = requiredGrowth
+    ? add(frame.scroll.max, requiredGrowth)
+    : frame.scroll.max;
+  console.log('old max scroll', frame.scroll.max);
+  console.log('new max scroll', maxScroll);
 
   const newFrame: Scrollable = {
     ...frame,
@@ -197,7 +253,7 @@ export const withPlaceholder = (
 
   const subject: DroppableSubject = getSubject({
     pageMarginBox: droppable.subject.pageMarginBox,
-    withPlaceholder: withPlaceholderSize,
+    withPlaceholder: inSubject,
     axis: droppable.axis,
     scrollDisplacement: newFrame.scroll.diff.displacement,
     frame: newFrame,
@@ -234,6 +290,14 @@ export const withoutPlaceholder = (
   }
 
   // Original max scroll
+  // TODO: should just store this somewhere?
+  /*
+    scroll: {
+      // then we can just revert to this
+      originalMax: Position
+
+    }
+  */
   const maxScroll: Position = getMaxScroll({
     scrollHeight: frame.scrollSize.scrollHeight,
     scrollWidth: frame.scrollSize.scrollWidth,

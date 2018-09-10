@@ -101,10 +101,17 @@ export type Scrollable = {|
   scroll: ScrollDetails,
 |};
 
+export type PlaceholderInSubject = {|
+  // might not actually be increased by
+  // placeholder if there is no required space
+  increasedBy: ?Position,
+  placeholderSize: Position,
+|};
+
 export type DroppableSubject = {|
   // raw, unchanging
   pageMarginBox: Rect,
-  withPlaceholder: ?Position,
+  withPlaceholder: ?PlaceholderInSubject,
   // The hitbox for a droppable
   // - page margin box
   // - with scroll changes

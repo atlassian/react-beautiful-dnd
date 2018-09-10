@@ -85,11 +85,17 @@ export default ({ state: oldState, draggable, impact }: Args): DimensionMap => {
     draggable.displaceBy[droppable.axis.line],
   );
 
+  console.log('increasing droppable by', placeholderSize);
+
   // Need to patch the existing droppable
   const patched: DroppableDimension = withPlaceholder(
     droppable,
     placeholderSize,
+    base.draggables,
   );
+
+  console.log('before', droppable.subject.active);
+  console.log('patched', patched.subject.active);
 
   return {
     draggables: base.draggables,

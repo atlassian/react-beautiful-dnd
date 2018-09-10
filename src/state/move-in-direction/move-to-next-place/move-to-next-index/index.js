@@ -5,7 +5,7 @@ import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location'
 import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
 import getDisplacedBy from '../../../get-displaced-by';
 import getDisplacementMap from '../../../get-displacement-map';
-import { subtract } from '../../../position';
+import { subtract, patch, isEqual } from '../../../position';
 import getInListResult from './in-list';
 import type { Result } from '../move-to-next-place-types';
 import type { InListResult } from './move-to-next-index-types';
@@ -67,6 +67,9 @@ export default ({
   const willDisplaceForward: boolean = inList.willDisplaceForward;
   const proposedIndex: number = inList.proposedIndex;
   const axis: Axis = destination.axis;
+
+  console.log('previousPageBorderBoxCenter', previousPageBorderBoxCenter);
+  console.log('proposed newPageBorderBoxCenter', newPageBorderBoxCenter);
 
   const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
     draggable,

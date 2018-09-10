@@ -29,6 +29,7 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   padding: grid * 2,
   margin: `0 0 ${grid}px 0`,
   border: '5px solid yellow',
+  height: 30,
 
   // change background colour if dragging
   background: isDragging ? 'lightgreen' : 'red',
@@ -40,7 +41,6 @@ const getItemStyle = (isDragging, draggableStyle) => ({
 const getListStyle = (isDraggingOver, overflow) => ({
   background: isDraggingOver ? 'lightblue' : 'grey',
   padding: grid,
-  margin: grid,
   border: '5px solid pink',
   width: 250,
   maxHeight: '50vh',
@@ -93,6 +93,9 @@ export default class App extends Component {
                 droppableSnapshot.isDraggingOver,
                 this.props.overflow,
               )}
+              onScroll={e =>
+                console.log('current scrollTop', e.currentTarget.scrollTop)
+              }
             >
               {this.state.items.map((item, index) => (
                 <Draggable key={item.id} draggableId={item.id} index={index}>
