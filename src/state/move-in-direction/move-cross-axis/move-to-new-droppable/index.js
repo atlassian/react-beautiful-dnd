@@ -49,7 +49,6 @@ export default ({
   isInHomeList(draggable, destination)
     ? // moving back to the home list
       toHomeList({
-        homeIndex: home.index,
         movingIntoIndexOf: movingRelativeTo,
         insideDestination,
         draggable,

@@ -21,7 +21,6 @@ import type {
 } from '../../../../types';
 
 type Args = {|
-  homeIndex: number,
   movingIntoIndexOf: ?DraggableDimension,
   insideDestination: DraggableDimension[],
   draggable: DraggableDimension,
@@ -32,7 +31,6 @@ type Args = {|
 |};
 
 export default ({
-  homeIndex,
   movingIntoIndexOf,
   insideDestination,
   draggable,
@@ -47,7 +45,8 @@ export default ({
   }
 
   const axis: Axis = destination.axis;
-  const targetIndex: number = insideDestination.indexOf(movingIntoIndexOf);
+  const homeIndex: number = draggable.descriptor.index;
+  const targetIndex: number = movingIntoIndexOf.descriptor.index;
   invariant(
     targetIndex !== -1,
     'Unable to find target in destination droppable',
@@ -55,7 +54,7 @@ export default ({
 
   // Moving back to original index
   // Super simple - just move it back to the original center with no impact
-  if (targetIndex === homeIndex) {
+  if (homeIndex === targetIndex) {
     const newCenter: Position = draggable.page.borderBox.center;
 
     return {
@@ -65,7 +64,7 @@ export default ({
         movement: noMovement,
         direction: axis.direction,
         destination: {
-          index: draggable.descriptor.index,
+          index: homeIndex,
           droppableId: draggable.descriptor.droppableId,
         },
         merge: null,
@@ -91,17 +90,12 @@ export default ({
   const isMovingAfter: boolean = !willDisplaceForward;
   // Which draggables will need to move?
   // Everything between the target index and the start index
-  const modified: DraggableDimension[] = (() => {
-    // we will be displacing these items backwards
-    if (isMovingAfter) {
+  const modified: DraggableDimension[] = isMovingAfter
+    ? // we will be displacing these items backwards
       // homeIndex + 1 so we don't include the home
       // .reverse() so the closest displaced will be first
-      return insideDestination.slice(homeIndex + 1, targetIndex + 1).reverse();
-    }
-
-    // homeIndex - 1 so we don't include the home
-    return insideDestination.slice(targetIndex, homeIndex - 1);
-  })();
+      insideDestination.slice(homeIndex + 1, targetIndex + 1).reverse()
+    : insideDestination.slice(targetIndex, homeIndex);
 
   const displaced: Displacement[] = modified.map(
     (dimension: DraggableDimension): Displacement =>
@@ -113,22 +107,27 @@ export default ({
       }),
   );
 
+  invariant(
+    displaced.length,
+    'Must displace as least one thing if not moving into the home index',
+  );
+
   const displacedBy: DisplacedBy = getDisplacedBy(
     destination.axis,
     draggable.displaceBy,
     willDisplaceForward,
   );
 
-  const closestToBeDisplaced: DraggableDimension =
-    draggables[displaced[0].draggableId];
-  const closestDisplaced: BoxModel = offset(
-    closestToBeDisplaced.page,
+  const closest: DraggableDimension = draggables[displaced[0].draggableId];
+
+  const closestWhenDisplaced: BoxModel = offset(
+    closest.page,
     displacedBy.point,
   );
 
   const moveArgs = {
     axis: destination.axis,
-    moveRelativeTo: closestDisplaced,
+    moveRelativeTo: closestWhenDisplaced,
     isMoving: draggable.page,
   };
 
