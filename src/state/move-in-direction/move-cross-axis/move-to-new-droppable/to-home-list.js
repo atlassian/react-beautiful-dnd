@@ -21,7 +21,7 @@ import type {
 } from '../../../../types';
 
 type Args = {|
-  movingIntoIndexOf: ?DraggableDimension,
+  moveIntoIndexOf: ?DraggableDimension,
   insideDestination: DraggableDimension[],
   draggable: DraggableDimension,
   draggables: DraggableDimensionMap,
@@ -31,7 +31,7 @@ type Args = {|
 |};
 
 export default ({
-  movingIntoIndexOf,
+  moveIntoIndexOf,
   insideDestination,
   draggable,
   draggables,
@@ -40,13 +40,13 @@ export default ({
   viewport,
 }: Args): ?Result => {
   // this can happen when the position is not visible
-  if (!movingIntoIndexOf) {
+  if (!moveIntoIndexOf) {
     return null;
   }
 
   const axis: Axis = destination.axis;
   const homeIndex: number = draggable.descriptor.index;
-  const targetIndex: number = movingIntoIndexOf.descriptor.index;
+  const targetIndex: number = moveIntoIndexOf.descriptor.index;
   invariant(
     targetIndex !== -1,
     'Unable to find target in destination droppable',

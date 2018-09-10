@@ -12,7 +12,6 @@ import type {
   DraggableDimension,
   DraggableDimensionMap,
   DroppableDimensionMap,
-  DraggableLocation,
   DragImpact,
   Viewport,
 } from '../../../types';
@@ -25,8 +24,6 @@ type Args = {|
   draggableId: DraggableId,
   // the droppable the dragging item is in
   droppableId: DroppableId,
-  // the original location of the draggable
-  home: DraggableLocation,
   // all the dimensions in the system
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
@@ -41,7 +38,6 @@ export default ({
   pageBorderBoxCenter,
   draggableId,
   droppableId,
-  home,
   draggables,
   droppables,
   previousImpact,
@@ -70,7 +66,7 @@ export default ({
     draggables,
   );
 
-  const movingRelativeTo: ?DraggableDimension = getClosestDraggable({
+  const moveRelativeTo: ?DraggableDimension = getClosestDraggable({
     axis: destination.axis,
     pageBorderBoxCenter,
     destination,
@@ -80,7 +76,7 @@ export default ({
 
   // Draggables available, but none are candidates for movement (eg none are visible)
   // Cannot move into the list
-  if (insideDestination.length && !movingRelativeTo) {
+  if (insideDestination.length && !moveRelativeTo) {
     return null;
   }
 
@@ -89,9 +85,8 @@ export default ({
     destination,
     draggable,
     draggables,
-    movingRelativeTo,
+    moveRelativeTo,
     insideDestination,
-    home,
     previousImpact,
     viewport,
   });

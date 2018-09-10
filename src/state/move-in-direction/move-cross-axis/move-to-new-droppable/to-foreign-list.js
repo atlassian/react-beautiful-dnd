@@ -27,7 +27,7 @@ import type {
 
 type Args = {|
   pageBorderBoxCenter: Position,
-  movingIntoIndexOf: ?DraggableDimension,
+  moveRelativeTo: ?DraggableDimension,
   insideDestination: DraggableDimension[],
   draggable: DraggableDimension,
   draggables: DraggableDimensionMap,
@@ -38,7 +38,7 @@ type Args = {|
 
 export default ({
   pageBorderBoxCenter,
-  movingIntoIndexOf,
+  moveRelativeTo,
   insideDestination,
   draggable,
   draggables,
@@ -49,8 +49,7 @@ export default ({
   const axis: Axis = destination.axis;
 
   // Moving to an empty list
-
-  if (!movingIntoIndexOf || !insideDestination.length) {
+  if (!moveRelativeTo || !insideDestination.length) {
     const newCenter: Position = goIntoStart({
       axis,
       moveInto: destination.page,
@@ -91,14 +90,14 @@ export default ({
     };
   }
 
-  // // Moving to a populated list
+  // Moving to a populated list
 
-  const targetIndex: number = insideDestination.indexOf(movingIntoIndexOf);
+  const targetIndex: number = insideDestination.indexOf(moveRelativeTo);
   invariant(targetIndex !== -1);
 
   const isGoingBeforeTarget: boolean = Boolean(
     pageBorderBoxCenter[destination.axis.line] <
-      movingIntoIndexOf.page.borderBox.center[destination.axis.line],
+      moveRelativeTo.page.borderBox.center[destination.axis.line],
   );
 
   const proposedIndex: number = isGoingBeforeTarget

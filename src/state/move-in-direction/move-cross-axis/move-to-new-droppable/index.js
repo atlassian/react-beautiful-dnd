@@ -1,5 +1,4 @@
 // @flow
-import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import toHomeList from './to-home-list';
 import toForeignList from './to-foreign-list';
@@ -8,7 +7,6 @@ import type { Result } from '../move-cross-axis-types';
 import type {
   DraggableDimension,
   DroppableDimension,
-  DraggableLocation,
   DragImpact,
   Viewport,
   DraggableDimensionMap,
@@ -21,13 +19,11 @@ type Args = {|
   draggable: DraggableDimension,
   // what the draggable is moving towards
   // can be null if the destination is empty
-  movingRelativeTo: ?DraggableDimension,
+  moveRelativeTo: ?DraggableDimension,
   // the droppable the draggable is moving to
   destination: DroppableDimension,
   // all the draggables inside the destination
   insideDestination: DraggableDimension[],
-  // the source location of the draggable
-  home: DraggableLocation,
   // the impact of a previous drag,
   previousImpact: DragImpact,
   // the viewport
@@ -41,15 +37,14 @@ export default ({
   insideDestination,
   draggable,
   draggables,
-  movingRelativeTo,
-  home,
+  moveRelativeTo,
   previousImpact,
   viewport,
 }: Args): ?Result =>
   isInHomeList(draggable, destination)
     ? // moving back to the home list
       toHomeList({
-        movingIntoIndexOf: movingRelativeTo,
+        moveIntoIndexOf: moveRelativeTo,
         insideDestination,
         draggable,
         draggables,
@@ -59,7 +54,7 @@ export default ({
       })
     : toForeignList({
         pageBorderBoxCenter,
-        movingIntoIndexOf: movingRelativeTo,
+        moveRelativeTo,
         insideDestination,
         draggable,
         draggables,

@@ -177,12 +177,8 @@ const getRequiredGrowthForPlaceholder = (
       sum + dimension.client.marginBox[axis.size],
     0,
   );
-  console.log('available space', availableSpace);
-  console.log('space used', spaceUsed);
   const requiredSpace: number = spaceUsed + withPlaceholderSize[axis.line];
-  console.log('required space', requiredSpace);
   const needsToGrowBy: number = requiredSpace - availableSpace;
-  console.log('required growth', needsToGrowBy);
 
   // nothing to do here
   if (needsToGrowBy <= 0) {

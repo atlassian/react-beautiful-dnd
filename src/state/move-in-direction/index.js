@@ -1,7 +1,6 @@
 // @flow
 import type { Position } from 'css-box-model';
 import { subtract } from '../position';
-import getHomeLocation from '../get-home-location';
 import moveCrossAxis from './move-cross-axis';
 import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';
 import moveToNextPlace from './move-to-next-place';
@@ -11,7 +10,6 @@ import type {
   DroppableId,
   DraggingState,
   DragImpact,
-  DraggableLocation,
   Direction,
 } from '../../types';
 
@@ -89,15 +87,11 @@ export default ({ state, type }: Args): ?Result => {
     };
   }
 
-  // moving on cross axis
-  const home: DraggableLocation = getHomeLocation(state.critical);
-
   const result: ?MoveCrossAxisResult = moveCrossAxis({
     isMovingForward,
     pageBorderBoxCenter: state.current.page.borderBoxCenter,
     draggableId: state.critical.draggable.id,
     droppableId: droppable.descriptor.id,
-    home,
     draggables: state.dimensions.draggables,
     droppables: state.dimensions.droppables,
     previousImpact: state.impact,
