@@ -34,6 +34,7 @@ const Container = styled('div')`
 
 type Props = {|
   initial: QuoteMap,
+  withScrollableColumns?: boolean,
   containerHeight?: string,
 |};
 
@@ -132,6 +133,7 @@ export default class Board extends Component<Props, State> {
                 index={index}
                 title={key}
                 quotes={columns[key]}
+                isScrollable={this.props.withScrollableColumns}
               />
             ))}
           </Container>

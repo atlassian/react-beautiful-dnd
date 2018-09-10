@@ -33,6 +33,7 @@ type Props = {|
   title: string,
   quotes: Quote[],
   index: number,
+  isScrollable?: boolean,
 |};
 
 export default class Column extends Component<Props> {
@@ -52,7 +53,12 @@ export default class Column extends Component<Props> {
                 {title}
               </Title>
             </Header>
-            <QuoteList listId={title} listType="QUOTE" quotes={quotes} />
+            <QuoteList
+              listId={title}
+              listType="QUOTE"
+              quotes={quotes}
+              internalScroll={this.props.isScrollable}
+            />
           </Container>
         )}
       </Draggable>
