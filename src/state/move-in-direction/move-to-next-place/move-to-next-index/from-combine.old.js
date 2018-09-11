@@ -130,10 +130,6 @@ export default ({
     };
   }
 
-  const proposedIndex: number = (() => {
-    if(willDisplaceForward
-  })();
-
   const willDisplaceForward: boolean = getWillDisplaceForward({
     isInHomeList,
     proposedIndex,
