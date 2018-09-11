@@ -8,10 +8,13 @@ import type {
   CombineImpact,
   UserDirection,
   DraggableLocation,
+  Viewport,
 } from '../../../../types';
 import type { Result } from '../move-to-next-place-types';
 import withDroppableDisplacement from '../../../with-droppable-displacement';
 import { add } from '../../../position';
+import withScrollRequest from '../with-scroll-request';
+import isTotallyVisibleInNewLocation from '../is-totally-visible-in-new-location';
 
 const forward: UserDirection = {
   vertical: 'down',
@@ -30,6 +33,8 @@ export type Args = {|
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
   previousImpact: DragImpact,
+  previousPageBorderBoxCenter: Position,
+  viewport: Viewport,
 |};
 
 export default ({
@@ -39,6 +44,8 @@ export default ({
   destination,
   insideDestination,
   previousImpact,
+  previousPageBorderBoxCenter,
+  viewport,
 }: Args): ?Result => {
   if (!destination.isCombineEnabled) {
     return null;
@@ -90,7 +97,7 @@ export default ({
   const withDisplacement: Position = isTargetDisplaced
     ? add(targetCenter, previousImpact.movement.displacedBy.point)
     : targetCenter;
-  const pageBorderBoxCenter: Position = withDroppableDisplacement(
+  const newPageBorderBoxCenter: Position = withDroppableDisplacement(
     destination,
     withDisplacement,
   );
@@ -112,11 +119,24 @@ export default ({
     merge,
   };
 
-  const result: Result = {
-    pageBorderBoxCenter,
-    impact: newImpact,
-    scrollJumpRequest: null,
-  };
+  const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
+    draggable,
+    destination,
+    newPageBorderBoxCenter,
+    viewport: viewport.frame,
+    // not applying the displacement of the droppable for this check
+    // we are only interested in the page location of the dragging item
+    withDroppableDisplacement: false,
+    // we only care about it being visible relative to the main axis
+    // this is important with dynamic changes as scroll bar and toggle
+    // on the cross axis during a drag
+    onlyOnMainAxis: true,
+  });
 
-  return result;
+  return withScrollRequest({
+    previousPageBorderBoxCenter,
+    newPageBorderBoxCenter,
+    impact: newImpact,
+    isVisibleInNewLocation,
+  });
 };

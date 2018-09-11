@@ -12,6 +12,7 @@ import type { Result } from './move-to-next-place-types';
 import moveToNextIndex from './move-to-next-index';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
 import moveToNextCombine from './move-to-next-combine';
+import getIsInHomeList from '../../is-in-home-list';
 
 type Args = {|
   isMovingForward: boolean,
@@ -41,31 +42,29 @@ export default ({
     destination,
     draggables,
   );
-  const isInHomeList: boolean =
-    destination.descriptor.id === draggable.descriptor.droppableId;
+  const isInHomeList: boolean = getIsInHomeList(draggable, destination);
 
-  const withMerge: ?Result = moveToNextCombine({
-    isInHomeList,
-    isMovingForward,
-    draggable,
-    destination,
-    insideDestination,
-    previousImpact,
-  });
-
-  if (withMerge) {
-    return withMerge;
-  }
-
-  return moveToNextIndex({
-    isMovingForward,
-    isInHomeList,
-    draggable,
-    draggables,
-    destination,
-    insideDestination,
-    previousPageBorderBoxCenter,
-    previousImpact,
-    viewport,
-  });
+  return (
+    moveToNextCombine({
+      isInHomeList,
+      isMovingForward,
+      draggable,
+      destination,
+      insideDestination,
+      previousPageBorderBoxCenter,
+      previousImpact,
+      viewport,
+    }) ||
+    moveToNextIndex({
+      isMovingForward,
+      isInHomeList,
+      draggable,
+      draggables,
+      destination,
+      insideDestination,
+      previousPageBorderBoxCenter,
+      previousImpact,
+      viewport,
+    })
+  );
 };

@@ -8,10 +8,10 @@ import {
   getWindowOverlap,
   getDroppableOverlap,
 } from './can-scroll';
+import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 import { type MoveArgs } from '../action-creators';
 import type {
   DroppableDimension,
-  DraggableLocation,
   Viewport,
   DraggingState,
   DroppableId,
@@ -102,7 +102,7 @@ export default ({
       return;
     }
 
-    const destination: ?DraggableLocation = state.impact.destination;
+    const destination: ?DroppableId = whatIsDraggedOver(state.impact);
     invariant(
       destination,
       'Cannot perform a jump scroll when there is no destination',
@@ -112,7 +112,7 @@ export default ({
     // leaving the list
 
     const droppableRemainder: ?Position = scrollDroppableAsMuchAsItCan(
-      state.dimensions.droppables[destination.droppableId],
+      state.dimensions.droppables[destination],
       request,
     );
 

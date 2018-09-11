@@ -1,12 +1,5 @@
 // @flow
 import type { Position } from 'css-box-model';
-import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
-import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
-import getDisplacedBy from '../../../get-displaced-by';
-import getDisplacementMap from '../../../get-displacement-map';
-import { subtract } from '../../../position';
-import fromReorder from './from-reorder';
-import fromCombine from './from-combine';
 import type { Result } from '../move-to-next-place-types';
 import type {
   MoveFromResult,
@@ -22,6 +15,14 @@ import type {
   Viewport,
   DisplacedBy,
 } from '../../../../types';
+import isTotallyVisibleInNewLocation from '../is-totally-visible-in-new-location';
+import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
+import getDisplacedBy from '../../../get-displaced-by';
+import getDisplacementMap from '../../../get-displacement-map';
+import { subtract } from '../../../position';
+import fromReorder from './from-reorder';
+import fromCombine from './from-combine';
+import withScrollRequest from '../with-scroll-request';
 
 export type Args = {|
   isMovingForward: boolean,
@@ -69,6 +70,8 @@ export default ({
   if (!move) {
     return null;
   }
+
+  console.warn('another movement');
 
   console.log('proposed index', move.proposedIndex);
 
@@ -138,23 +141,10 @@ export default ({
     merge: null,
   };
 
-  if (isVisibleInNewLocation) {
-    return {
-      pageBorderBoxCenter: newPageBorderBoxCenter,
-      impact: newImpact,
-      scrollJumpRequest: null,
-    };
-  }
-
-  // The full distance required to get from the previous page center to the new page center
-  const distance: Position = subtract(
-    newPageBorderBoxCenter,
-    previousPageBorderBoxCenter,
-  );
-
-  return {
-    pageBorderBoxCenter: previousPageBorderBoxCenter,
+  return withScrollRequest({
     impact: newImpact,
-    scrollJumpRequest: distance,
-  };
+    previousPageBorderBoxCenter,
+    newPageBorderBoxCenter,
+    isVisibleInNewLocation,
+  });
 };
