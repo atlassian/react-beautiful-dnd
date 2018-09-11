@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { Droppable, Draggable } from '../../../src';
 import QuoteItem from './quote-item';
 import { grid, colors } from '../constants';
@@ -13,7 +13,7 @@ import type {
   DraggableStateSnapshot,
 } from '../../../src';
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   background-color: ${({ isDraggingOver }) =>
     isDraggingOver ? colors.blue.lighter : colors.blue.light};
   display: flex;
@@ -27,9 +27,11 @@ const Wrapper = styled.div`
   width: 250px;
 `;
 
-const DropZone = styled.div`
+const scrollContainerHeight: number = 250;
+
+const DropZone = styled('div')`
   /* stop the list collapsing when empty */
-  min-height: 250px;
+  min-height: ${scrollContainerHeight}px;
 
   /*
     not relying on the items for a margin-bottom
@@ -38,14 +40,14 @@ const DropZone = styled.div`
   margin-bottom: ${grid}px;
 `;
 
-const ScrollContainer = styled.div`
+const ScrollContainer = styled('div')`
   overflow-x: hidden;
   overflow-y: auto;
-  max-height: 300px;
+  max-height: ${scrollContainerHeight}px;
 `;
 
 /* stylelint-disable block-no-empty */
-const Container = styled.div``;
+const Container = styled('div')``;
 /* stylelint-enable */
 
 type Props = {|
@@ -85,6 +87,7 @@ class InnerQuoteList extends React.Component<QuoteListProps> {
             key={quote.id}
             quote={quote}
             isDragging={dragSnapshot.isDragging}
+            isGroupedOver={Boolean(dragSnapshot.combineTargetFor)}
             provided={dragProvided}
           />
         )}
@@ -139,6 +142,7 @@ export default class QuoteList extends React.Component<Props> {
         type={listType}
         ignoreContainerClipping={ignoreContainerClipping}
         isDropDisabled={isDropDisabled}
+        isCombineEnabled
       >
         {(
           dropProvided: DroppableProvided,
@@ -151,10 +155,7 @@ export default class QuoteList extends React.Component<Props> {
             {...dropProvided.droppableProps}
           >
             {internalScroll ? (
-              <ScrollContainer
-                style={scrollContainerStyle}
-                onScroll={e => console.log('scroll', e.target.scrollTop)}
-              >
+              <ScrollContainer style={scrollContainerStyle}>
                 <InnerList
                   quotes={quotes}
                   title={title}

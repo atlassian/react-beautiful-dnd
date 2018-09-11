@@ -40,6 +40,7 @@ export type OwnProps = {|
   droppableId: DroppableId,
   type: TypeId,
   isDropDisabled: boolean,
+  isCombineEnabled: boolean,
   direction: Direction,
   ignoreContainerClipping: boolean,
 |};
@@ -47,6 +48,7 @@ export type OwnProps = {|
 export type DefaultProps = {|
   type: string,
   isDropDisabled: boolean,
+  isCombineEnabled: false,
   direction: Direction,
   ignoreContainerClipping: boolean,
 |};

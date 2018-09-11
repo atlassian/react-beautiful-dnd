@@ -1,9 +1,10 @@
 // @flow
 import React, { Component } from 'react';
+import invariant from 'tiny-invariant';
 import PropTypes from 'prop-types';
+import DroppableDimensionPublisher from '../droppable-dimension-publisher';
 import type { Props, Provided, StateSnapshot } from './droppable-types';
 import type { DroppableId, TypeId } from '../../types';
-import DroppableDimensionPublisher from '../droppable-dimension-publisher';
 import Placeholder from '../placeholder';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 import {
@@ -31,6 +32,11 @@ export default class Droppable extends Component<Props> {
     super(props, context);
 
     this.styleContext = context[styleContextKey];
+
+    // a little check to avoid an easy to catch setup
+    if (process.env.NODE_ENV !== 'production') {
+      invariant(props.droppableId, 'A Droppable requires a droppableId prop');
+    }
   }
 
   // Need to declare childContextTypes without flow
@@ -122,14 +128,17 @@ export default class Droppable extends Component<Props> {
 
   render() {
     const {
+      // ownProps
       children,
       direction,
+      type,
       droppableId,
+      isDropDisabled,
+      isCombineEnabled,
+      // mapProps
       ignoreContainerClipping,
       isDraggingOver,
-      isDropDisabled,
       draggingOverWith,
-      type,
     } = this.props;
     const provided: Provided = {
       innerRef: this.setRef,
@@ -150,6 +159,7 @@ export default class Droppable extends Component<Props> {
         direction={direction}
         ignoreContainerClipping={ignoreContainerClipping}
         isDropDisabled={isDropDisabled}
+        isCombineEnabled={isCombineEnabled}
         getDroppableRef={this.getDroppableRef}
       >
         {children(provided, snapshot)}

@@ -116,7 +116,7 @@ describe('get displacement', () => {
             ],
             // not populating correctly
             amount: { x: 0, y: 0 },
-            isBeyondStartPosition: false,
+            isInFrontOfStart: false,
           },
           // not populating correctly
           destination: {
@@ -155,7 +155,7 @@ describe('get displacement', () => {
             ],
             // not populating correctly
             amount: { x: 0, y: 0 },
-            isBeyondStartPosition: false,
+            isInFrontOfStart: false,
           },
           // not populating correctly
           destination: {
@@ -194,7 +194,7 @@ describe('get displacement', () => {
             ],
             // not populating correctly
             amount: { x: 0, y: 0 },
-            isBeyondStartPosition: false,
+            isInFrontOfStart: false,
           },
           // not populating correctly
           destination: {
@@ -240,7 +240,7 @@ describe('get displacement', () => {
             ],
             // not populating correctly
             amount: { x: 0, y: 0 },
-            isBeyondStartPosition: false,
+            isInFrontOfStart: false,
           },
           // not populating correctly
           destination: {

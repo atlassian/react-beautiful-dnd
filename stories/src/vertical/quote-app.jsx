@@ -1,18 +1,19 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
 import reorder from '../reorder';
 import type { Quote } from '../types';
-import type { DropResult, DragStart } from '../../../src/types';
+import type { DropResult, DragStart, DragUpdate } from '../../../src/types';
 
 const publishOnDragStart = action('onDragStart');
+const publishOnDragUpdate = action('onDragUpdate');
 const publishOnDragEnd = action('onDragEnd');
 
-const Root = styled.div`
+const Root = styled('div')`
   background-color: ${colors.blue.deep};
   box-sizing: border-box;
   padding: ${grid * 2}px;
@@ -49,6 +50,10 @@ export default class QuoteApp extends Component<Props, State> {
     }
   };
 
+  onDragUpdate = (update: DragUpdate) => {
+    publishOnDragUpdate(update);
+  };
+
   onDragEnd = (result: DropResult) => {
     publishOnDragEnd(result);
 
@@ -78,6 +83,7 @@ export default class QuoteApp extends Component<Props, State> {
     return (
       <DragDropContext
         onDragStart={this.onDragStart}
+        onDragUpdate={this.onDragUpdate}
         onDragEnd={this.onDragEnd}
       >
         <Root>

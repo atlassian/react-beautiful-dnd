@@ -2,10 +2,14 @@
 
 # react-beautiful-dnd
 
-Beautiful, accessible drag and drop for lists with [`React.js`](https://facebook.github.io/react/)
+Beautiful and accessible drag and drop for lists with [`React`](https://facebook.github.io/react/)
 
 [![CircleCI branch](https://img.shields.io/circleci/project/github/atlassian/react-beautiful-dnd/master.svg)](https://circleci.com/gh/atlassian/react-beautiful-dnd/tree/master)
-[![npm](https://img.shields.io/npm/v/react-beautiful-dnd.svg)](https://www.npmjs.com/package/react-beautiful-dnd) [![dependencies](https://david-dm.org/atlassian/react-beautiful-dnd.svg)](https://david-dm.org/atlassian/react-beautiful-dnd) [![Greenkeeper badge](https://badges.greenkeeper.io/atlassian/react-beautiful-dnd.svg)](https://greenkeeper.io/) [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
+[![npm](https://img.shields.io/npm/v/react-beautiful-dnd.svg)](https://www.npmjs.com/package/react-beautiful-dnd)
+[![dependencies](https://david-dm.org/atlassian/react-beautiful-dnd.svg)](https://david-dm.org/atlassian/react-beautiful-dnd)
+[![Downloads per month](https://img.shields.io/npm/dm/react-beautiful-dnd.svg)](https://www.npmjs.com/package/react-beautiful-dnd)
+[![Greenkeeper badge](https://badges.greenkeeper.io/atlassian/react-beautiful-dnd.svg)](https://greenkeeper.io/)
+[![SemVer](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
 
 ![quote application example](https://raw.githubusercontent.com/alexreardon/files/master/resources/website-board.gif?raw=true)
 
@@ -522,10 +526,10 @@ type Hooks = {|
   onDragEnd: OnDragEndHook,
 |};
 
-type OnBeforeDragStartHook = (start: DragStart) => void;
-type OnDragStartHook = (start: DragStart, provided: HookProvided) => void;
-type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => void;
-type OnDragEndHook = (result: DropResult, provided: HookProvided) => void;
+type OnBeforeDragStartHook = (start: DragStart) => mixed;
+type OnDragStartHook = (start: DragStart, provided: HookProvided) => mixed;
+type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => mixed;
+type OnDragEndHook = (result: DropResult, provided: HookProvided) => mixed;
 
 type Props = {|
   ...Hooks,
@@ -758,7 +762,7 @@ Unfortunately we are [unable to apply this optimisation for you](https://medium.
 
 `Draggable` components can be dragged around and dropped onto `Droppable`s. A `Draggable` must always be contained within a `Droppable`. It is **possible** to reorder a `Draggable` within its home `Droppable` or move to another `Droppable`. It is **possible** because a `Droppable` is free to control what it allows to be dropped on it.
 
-Every `Draggable` has a _drag handle_. A _drag handle_ is the element that the user interacts with in order to drag a `Draggable`. A _drag handle_ can be a the `Draggable` element itself, or a child of the `Draggable`.
+Every `Draggable` has a _drag handle_. A _drag handle_ is the element that the user interacts with in order to drag a `Draggable`. A _drag handle_ can be a the `Draggable` element itself, or a child of the `Draggable`. Note that by default a _drag handle_ cannot be an interactive element, since [event handlers are blocked on nested interactive elements](#interactive-child-elements-within-a-draggable). Proper semantics for accessibility are added to the _drag handle_ element. If you wish to use an interactive element, `disableInteractiveElementBlocking` must be set.
 
 ```js
 import { Draggable } from 'react-beautiful-dnd';
@@ -786,7 +790,11 @@ import { Draggable } from 'react-beautiful-dnd';
   this.props.items.map((item, index) => (
     <Draggable draggableId={item.id} index={index}>
       {(provided, snapshot) => (
-        <div ref={provided.innerRef} {...provided.draggableProps}>
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+        >
           {item.content}
         </div>
       )}

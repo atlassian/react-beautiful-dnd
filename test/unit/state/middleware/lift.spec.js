@@ -97,7 +97,7 @@ it('should flush any animating drops', () => {
           x: 0,
           y: 0,
         },
-        isBeyondStartPosition: false,
+        isInFrontOfStart: false,
       },
       direction: 'vertical',
       destination: getHomeLocation(critical),

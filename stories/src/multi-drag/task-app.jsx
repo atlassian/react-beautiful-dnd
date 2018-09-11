@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { DragDropContext } from '../../../src';
 import initial from './data';
 import Column from './column';
@@ -10,7 +10,7 @@ import type { DragStart, DropResult, DraggableLocation } from '../../../src';
 import type { Task, Id } from '../types';
 import type { Entities } from './types';
 
-const Container = styled.div`
+const Container = styled('div')`
   display: flex;
   user-select: none;
 `;

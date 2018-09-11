@@ -8,7 +8,9 @@ import type {
   Hooks,
   HookProvided,
   Critical,
+  DragImpact,
   DraggableLocation,
+  Combine,
   DragStart,
   Announce,
   DragUpdate,
@@ -50,6 +52,23 @@ const areLocationsEqual = (
   // compare their actual values
   return (
     first.droppableId === second.droppableId && first.index === second.index
+  );
+};
+
+const isCombineEqual = (first: ?Combine, second: ?Combine): boolean => {
+  // if both are null - we are equal
+  if (first == null && second == null) {
+    return true;
+  }
+
+  // only one is null
+  if (first == null || second == null) {
+    return false;
+  }
+
+  return (
+    first.draggableId === second.draggableId &&
+    first.droppableId === second.droppableId
   );
 };
 
@@ -148,6 +167,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
 
   const publisher = (() => {
     let lastLocation: ?DraggableLocation = null;
+    let lastCombine: ?Combine = null;
     let lastCritical: ?Critical = null;
     let isDragStartPublished: boolean = false;
 
@@ -173,6 +193,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
       const data: DragStart = getDragStart(critical);
       lastCritical = critical;
       lastLocation = data.source;
+      lastCombine = null;
       isDragStartPublished = true;
       withTimings('onDragStart', () =>
         execute(getHooks().onDragStart, data, messagePreset.onDragStart),
@@ -180,7 +201,9 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
     };
 
     // Passing in the critical location again as it can change during a drag
-    const move = (critical: Critical, location: ?DraggableLocation) => {
+    const move = (critical: Critical, impact: DragImpact) => {
+      const location: ?DraggableLocation = impact.destination;
+      const combine: ?Combine = impact.merge ? impact.merge.combine : null;
       invariant(
         isDragStartPublished && lastCritical,
         'Cannot fire onDragMove when onDragStart has not been called',
@@ -203,14 +226,19 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
       if (hasLocationChanged) {
         lastLocation = location;
       }
+      const hasGroupingChanged: boolean = !isCombineEqual(lastCombine, combine);
+      if (hasGroupingChanged) {
+        lastCombine = combine;
+      }
 
       // Nothing has changed - no update needed
-      if (!hasCriticalChanged && !hasLocationChanged) {
+      if (!hasCriticalChanged && !hasLocationChanged && !hasGroupingChanged) {
         return;
       }
 
       const data: DragUpdate = {
         ...getDragStart(critical),
+        combine,
         destination: location,
       };
 
@@ -227,6 +255,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
       isDragStartPublished = false;
       lastLocation = null;
       lastCritical = null;
+      lastCombine = null;
       withTimings('onDragEnd', () =>
         execute(getHooks().onDragEnd, result, messagePreset.onDragEnd),
       );
@@ -241,6 +270,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
 
       const result: DropResult = {
         ...getDragStart(lastCritical),
+        combine: null,
         destination: null,
         reason: 'CANCEL',
       };
@@ -300,7 +330,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
 
     const state: State = store.getState();
     if (state.phase === 'DRAGGING') {
-      publisher.move(state.critical, state.impact.destination);
+      publisher.move(state.critical, state.impact);
     }
   };
 };

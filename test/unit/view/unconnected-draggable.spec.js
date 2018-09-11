@@ -8,7 +8,6 @@ import Draggable, {
 } from '../../../src/view/draggable/draggable';
 import DragHandle from '../../../src/view/drag-handle/drag-handle';
 import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
-import Moveable from '../../../src/view/moveable';
 import Placeholder from '../../../src/view/placeholder';
 import type { PlaceholderStyle } from '../../../src/view/placeholder/placeholder-types';
 import { subtract } from '../../../src/state/position';
@@ -100,11 +99,14 @@ const disabledOwnProps: OwnProps = {
 const defaultMapProps: MapProps = {
   isDragging: false,
   isDropAnimating: false,
+  dropDuration: 0,
   shouldAnimateDragMovement: false,
   shouldAnimateDisplacement: true,
   offset: origin,
   dimension: null,
   draggingOver: null,
+  groupingWith: null,
+  groupedOverBy: null,
 };
 
 const somethingElseDraggingMapProps: MapProps = defaultMapProps;
@@ -112,22 +114,28 @@ const somethingElseDraggingMapProps: MapProps = defaultMapProps;
 const draggingMapProps: MapProps = {
   isDragging: true,
   isDropAnimating: false,
+  dropDuration: 0,
   shouldAnimateDragMovement: false,
   shouldAnimateDisplacement: false,
   offset: { x: 75, y: 75 },
   // this may or may not be set during a drag
   dimension,
   draggingOver: null,
+  groupingWith: null,
+  groupedOverBy: null,
 };
 
 const dropAnimatingMapProps: MapProps = {
   isDragging: false,
   isDropAnimating: true,
+  dropDuration: 0.5,
   offset: { x: 75, y: 75 },
   shouldAnimateDisplacement: false,
   shouldAnimateDragMovement: false,
   dimension,
   draggingOver: null,
+  groupingWith: null,
+  groupedOverBy: null,
 };
 
 const dropCompleteMapProps: MapProps = defaultMapProps;
@@ -300,7 +308,7 @@ describe('Draggable - unconnected', () => {
   describe('drag handle', () => {
     // we need to unmount after each test to avoid
     // cross EventMarshal contamination
-    let managedWrapper: ReactWrapper;
+    let managedWrapper: ?ReactWrapper = null;
 
     const startDragWithHandle = (wrapper: ReactWrapper) => ({
       selection = origin,
@@ -319,6 +327,7 @@ describe('Draggable - unconnected', () => {
     afterEach(() => {
       if (managedWrapper) {
         managedWrapper.unmount();
+        managedWrapper = null;
       }
     });
 
@@ -754,26 +763,13 @@ describe('Draggable - unconnected', () => {
           top: dimension.client.marginBox.top,
           left: dimension.client.marginBox.left,
           pointerEvents: 'none',
+          // moving instantly
           transition: 'none',
           transform: `translate(${offset.x}px, ${offset.y}px)`,
         };
 
         const provided: Provided = getLastCall(myMock)[0].provided;
         expect(provided.draggableProps.style).toEqual(expected);
-      });
-
-      it('should not move instantly if drag animation is enabled', () => {
-        // $ExpectError - spread operator on exact type
-        const mapProps: MapProps = {
-          ...draggingMapProps,
-          shouldAnimateDragMovement: true,
-        };
-
-        const wrapper = mountDraggable({
-          mapProps,
-        });
-
-        expect(wrapper.find(Moveable).props().speed).toBe('FAST');
       });
 
       it('should move by the provided offset on mount', () => {

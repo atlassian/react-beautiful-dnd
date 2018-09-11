@@ -20,7 +20,7 @@ const getScrollableDroppables = memoizeOne(
         }
 
         // only want droppables that are scrollable
-        if (!droppable.viewport.closestScrollable) {
+        if (!droppable.frame) {
           return false;
         }
 
@@ -35,10 +35,8 @@ const getScrollableDroppableOver = (
 ): ?DroppableDimension => {
   const maybe: ?DroppableDimension = getScrollableDroppables(droppables).find(
     (droppable: DroppableDimension): boolean => {
-      invariant(droppable.viewport.closestScrollable, 'Invalid result');
-      return isPositionInFrame(
-        droppable.viewport.closestScrollable.framePageMarginBox,
-      )(target);
+      invariant(droppable.frame, 'Invalid result');
+      return isPositionInFrame(droppable.frame.pageMarginBox)(target);
     },
   );
 
@@ -61,7 +59,7 @@ export default ({
 
   if (destination) {
     const dimension: DroppableDimension = droppables[destination.droppableId];
-    if (!dimension.viewport.closestScrollable) {
+    if (!dimension.frame) {
       return null;
     }
     return dimension;

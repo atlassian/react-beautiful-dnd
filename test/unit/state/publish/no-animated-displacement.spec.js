@@ -64,7 +64,7 @@ it('should not animate any displacement', () => {
       // The position of the dragging item has been patched
       // to keep it in the same visual spot. This has actually
       // resulting in the dragging item moving backwards
-      isBeyondStartPosition: false,
+      isInFrontOfStart: false,
     },
     direction: scrollableHome.axis.direction,
     destination: {

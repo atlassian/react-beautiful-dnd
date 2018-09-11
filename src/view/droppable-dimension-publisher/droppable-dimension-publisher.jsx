@@ -13,8 +13,10 @@ import {
 } from 'css-box-model';
 import rafSchedule from 'raf-schd';
 import getClosestScrollable from '../get-closest-scrollable';
+import checkForNestedScrollContainers from './check-for-nested-scroll-container';
 import { dimensionMarshalKey } from '../context-keys';
 import { origin } from '../../state/position';
+import warmUpDimension from '../warm-up-dimension';
 import {
   getDroppableDimension,
   type Closest,
@@ -38,39 +40,12 @@ type Props = {|
   type: TypeId,
   direction: Direction,
   isDropDisabled: boolean,
+  isCombineEnabled: boolean,
   ignoreContainerClipping: boolean,
   isDropDisabled: boolean,
   getDroppableRef: () => ?HTMLElement,
   children: Node,
 |};
-
-// We currently do not support nested scroll containers
-// But will hopefully support this soon!
-const checkForNestedScrollContainers = (scrollable: ?Element) => {
-  if (process.env.NODE_ENV === 'production') {
-    return;
-  }
-
-  if (!scrollable) {
-    return;
-  }
-
-  const anotherScrollParent: ?Element = getClosestScrollable(
-    scrollable.parentElement,
-  );
-
-  if (!anotherScrollParent) {
-    return;
-  }
-
-  console.warn(`
-    Droppable: unsupported nested scroll container detected.
-    A Droppable can only have one scroll parent (which can be itself)
-    Nested scroll containers are currently not supported.
-
-    We hope to support nested scroll containers soon: https://github.com/atlassian/react-beautiful-dnd/issues/131
-  `);
-};
 
 const getScroll = (el: Element): Position => ({
   x: el.scrollLeft,
@@ -161,6 +136,7 @@ export default class DroppableDimensionPublisher extends React.Component<
   watchingScroll: ?WatchingScroll = null;
   callbacks: DroppableCallbacks;
   publishedDescriptor: ?DroppableDescriptor = null;
+  cancelWarmUp: () => void;
 
   constructor(props: Props, context: mixed) {
     super(props, context);
@@ -269,6 +245,7 @@ export default class DroppableDimensionPublisher extends React.Component<
 
   componentDidMount() {
     this.publish();
+    this.cancelWarmUp = warmUpDimension(this.getDimension);
 
     // Note: not calling `marshal.updateDroppableIsEnabled()`
     // If the dimension marshal needs to get the dimension immediately
@@ -302,6 +279,7 @@ export default class DroppableDimensionPublisher extends React.Component<
     }
 
     this.unpublish();
+    this.cancelWarmUp();
   }
 
   getMemoizedDescriptor = memoizeOne(
@@ -365,19 +343,21 @@ export default class DroppableDimensionPublisher extends React.Component<
 
     // TODO: needs to disable the placeholder for the collection
     // this.props.placeholder.hide();
-    const { dimension } = this.getDimension(origin);
+    const { dimension } = this.getDimension();
     // this.props.placeholder.show();
     return dimension;
   };
 
-  getDimension = (windowScroll: Position): GetDimensionResult => {
+  getDimension = (windowScroll?: Position = origin): GetDimensionResult => {
     const {
       direction,
       ignoreContainerClipping,
       isDropDisabled,
+      isCombineEnabled,
       getDroppableRef,
     } = this.props;
 
+    this.cancelWarmUp();
     const targetRef: ?HTMLElement = getDroppableRef();
     const descriptor: ?DroppableDescriptor = this.publishedDescriptor;
 
@@ -418,6 +398,7 @@ export default class DroppableDimensionPublisher extends React.Component<
     const dimension: DroppableDimension = getDroppableDimension({
       descriptor,
       isEnabled: !isDropDisabled,
+      isCombineEnabled,
       direction,
       client,
       page,

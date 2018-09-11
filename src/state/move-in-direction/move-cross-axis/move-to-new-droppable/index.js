@@ -1,16 +1,15 @@
 // @flow
-import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import toHomeList from './to-home-list';
 import toForeignList from './to-foreign-list';
-import { patch } from '../../../position';
+import isInHomeList from '../../../is-in-home-list';
 import type { Result } from '../move-cross-axis-types';
 import type {
   DraggableDimension,
   DroppableDimension,
-  DraggableLocation,
   DragImpact,
   Viewport,
+  DraggableDimensionMap,
 } from '../../../../types';
 
 type Args = {|
@@ -20,17 +19,16 @@ type Args = {|
   draggable: DraggableDimension,
   // what the draggable is moving towards
   // can be null if the destination is empty
-  movingRelativeTo: ?DraggableDimension,
+  moveRelativeTo: ?DraggableDimension,
   // the droppable the draggable is moving to
   destination: DroppableDimension,
   // all the draggables inside the destination
   insideDestination: DraggableDimension[],
-  // the source location of the draggable
-  home: DraggableLocation,
   // the impact of a previous drag,
   previousImpact: DragImpact,
   // the viewport
   viewport: Viewport,
+  draggables: DraggableDimensionMap,
 |};
 
 export default ({
@@ -38,44 +36,29 @@ export default ({
   destination,
   insideDestination,
   draggable,
-  movingRelativeTo,
-  home,
+  draggables,
+  moveRelativeTo,
   previousImpact,
   viewport,
-}: Args): Result => {
-  const amount: Position = patch(
-    destination.axis.line,
-    draggable.client.marginBox[destination.axis.size],
-  );
-
-  // moving back to the home list
-  if (destination.descriptor.id === draggable.descriptor.droppableId) {
-    invariant(
-      movingRelativeTo,
-      'There will always be a target in the original list',
-    );
-
-    return toHomeList({
-      amount,
-      homeIndex: home.index,
-      movingRelativeTo,
-      insideDestination,
-      draggable,
-      destination,
-      previousImpact,
-      viewport,
-    });
-  }
-
-  // moving to a foreign list
-  return toForeignList({
-    amount,
-    pageBorderBoxCenter,
-    movingRelativeTo,
-    insideDestination,
-    draggable,
-    destination,
-    previousImpact,
-    viewport,
-  });
-};
+}: Args): ?Result =>
+  isInHomeList(draggable, destination)
+    ? // moving back to the home list
+      toHomeList({
+        moveIntoIndexOf: moveRelativeTo,
+        insideDestination,
+        draggable,
+        draggables,
+        destination,
+        previousImpact,
+        viewport,
+      })
+    : toForeignList({
+        pageBorderBoxCenter,
+        moveRelativeTo,
+        insideDestination,
+        draggable,
+        draggables,
+        destination,
+        previousImpact,
+        viewport,
+      });

@@ -49,7 +49,7 @@ draggingStates.forEach((current: IsDraggingState) => {
               },
             ],
             amount: inHome1Amount,
-            isBeyondStartPosition: true,
+            isInFrontOfStart: true,
           },
           direction: preset.home.axis.direction,
           destination: {
@@ -86,7 +86,7 @@ draggingStates.forEach((current: IsDraggingState) => {
               },
             ],
             amount: inHome1Amount,
-            isBeyondStartPosition: true,
+            isInFrontOfStart: true,
           },
           direction: preset.home.axis.direction,
           destination: {

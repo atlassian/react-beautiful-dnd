@@ -77,6 +77,14 @@ export default class DragDropContext extends React.Component<Props> {
   constructor(props: Props, context: mixed) {
     super(props, context);
 
+    // A little setup check for dev
+    if (process.env.NODE_ENV !== 'production') {
+      invariant(
+        typeof props.onDragEnd === 'function',
+        'A DragDropContext requires an onDragEnd function to perform reordering logic',
+      );
+    }
+
     this.announcer = createAnnouncer();
 
     // create the style marshal
@@ -170,7 +178,7 @@ export default class DragDropContext extends React.Component<Props> {
   }
 
   componentWillUnmount() {
-    window.addEventListener('error', this.onWindowError);
+    window.removeEventListener('error', this.onWindowError);
 
     const state: State = this.store.getState();
     if (state.phase !== 'IDLE') {

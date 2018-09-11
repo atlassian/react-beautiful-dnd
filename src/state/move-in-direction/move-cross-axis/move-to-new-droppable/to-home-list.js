@@ -1,10 +1,13 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { type Position } from 'css-box-model';
-import moveToEdge from '../../../move-to-edge';
+import { type Position, type BoxModel, offset } from 'css-box-model';
 import getDisplacement from '../../../get-displacement';
 import withDroppableDisplacement from '../../../with-droppable-displacement';
-import type { Edge } from '../../../move-to-edge';
+import getDisplacementMap from '../../../get-displacement-map';
+import { noMovement } from '../../../no-impact';
+import getDisplacedBy from '../../../get-displaced-by';
+import getWillDisplaceForward from '../../../will-displace-forward';
+import { goBefore, goAfter } from '../../../move-relative-to';
 import type { Result } from '../move-cross-axis-types';
 import type {
   Axis,
@@ -13,32 +16,37 @@ import type {
   DragImpact,
   DraggableDimension,
   DroppableDimension,
+  DraggableDimensionMap,
+  DisplacedBy,
 } from '../../../../types';
 
 type Args = {|
-  amount: Position,
-  homeIndex: number,
-  movingRelativeTo: DraggableDimension,
+  moveIntoIndexOf: ?DraggableDimension,
   insideDestination: DraggableDimension[],
   draggable: DraggableDimension,
+  draggables: DraggableDimensionMap,
   destination: DroppableDimension,
   previousImpact: DragImpact,
   viewport: Viewport,
 |};
 
 export default ({
-  amount,
-  homeIndex,
-  movingRelativeTo,
+  moveIntoIndexOf,
   insideDestination,
   draggable,
+  draggables,
   destination,
   previousImpact,
   viewport,
-}: Args): Result => {
-  const axis: Axis = destination.axis;
-  const targetIndex: number = insideDestination.indexOf(movingRelativeTo);
+}: Args): ?Result => {
+  // this can happen when the position is not visible
+  if (!moveIntoIndexOf) {
+    return null;
+  }
 
+  const axis: Axis = destination.axis;
+  const homeIndex: number = draggable.descriptor.index;
+  const targetIndex: number = moveIntoIndexOf.descriptor.index;
   invariant(
     targetIndex !== -1,
     'Unable to find target in destination droppable',
@@ -46,24 +54,21 @@ export default ({
 
   // Moving back to original index
   // Super simple - just move it back to the original center with no impact
-  if (targetIndex === homeIndex) {
+  if (homeIndex === targetIndex) {
     const newCenter: Position = draggable.page.borderBox.center;
-    const newImpact: DragImpact = {
-      movement: {
-        displaced: [],
-        amount,
-        isBeyondStartPosition: false,
-      },
-      direction: destination.axis.direction,
-      destination: {
-        droppableId: destination.descriptor.id,
-        index: homeIndex,
-      },
-    };
 
     return {
       pageBorderBoxCenter: withDroppableDisplacement(destination, newCenter),
-      impact: newImpact,
+      // TODO: use getHomeImpact (this is just copied)
+      impact: {
+        movement: noMovement,
+        direction: axis.direction,
+        destination: {
+          index: homeIndex,
+          droppableId: draggable.descriptor.droppableId,
+        },
+        merge: null,
+      },
     };
   }
 
@@ -75,35 +80,22 @@ export default ({
   // We align the dragging item to the end of the target
   // and move everything from the target to the original position backwards
 
-  const isMovingPastOriginalIndex = targetIndex > homeIndex;
-  const edge: Edge = isMovingPastOriginalIndex ? 'end' : 'start';
-
-  const newCenter: Position = moveToEdge({
-    source: draggable.page.borderBox,
-    sourceEdge: edge,
-    destination: isMovingPastOriginalIndex
-      ? movingRelativeTo.page.borderBox
-      : movingRelativeTo.page.marginBox,
-    destinationEdge: edge,
-    destinationAxis: axis,
+  // We will displace forward when moving behind the start position
+  const willDisplaceForward: boolean = getWillDisplaceForward({
+    isInHomeList: true,
+    proposedIndex: targetIndex,
+    startIndexInHome: homeIndex,
   });
 
-  const modified: DraggableDimension[] = (() => {
-    if (!isMovingPastOriginalIndex) {
-      return insideDestination.slice(targetIndex, homeIndex);
-    }
-
-    // We are aligning to the bottom of the target and moving everything
-    // back to the original index backwards
-
-    // We want everything after the original index to move
-    const from: number = homeIndex + 1;
-    // We need the target to move backwards
-    const to: number = targetIndex + 1;
-
-    // Need to ensure that the list is sorted with the closest item being first
-    return insideDestination.slice(from, to).reverse();
-  })();
+  const isMovingAfter: boolean = !willDisplaceForward;
+  // Which draggables will need to move?
+  // Everything between the target index and the start index
+  const modified: DraggableDimension[] = isMovingAfter
+    ? // we will be displacing these items backwards
+      // homeIndex + 1 so we don't include the home
+      // .reverse() so the closest displaced will be first
+      insideDestination.slice(homeIndex + 1, targetIndex + 1).reverse()
+    : insideDestination.slice(targetIndex, homeIndex);
 
   const displaced: Displacement[] = modified.map(
     (dimension: DraggableDimension): Displacement =>
@@ -115,17 +107,47 @@ export default ({
       }),
   );
 
+  invariant(
+    displaced.length,
+    'Must displace as least one thing if not moving into the home index',
+  );
+
+  const displacedBy: DisplacedBy = getDisplacedBy(
+    destination.axis,
+    draggable.displaceBy,
+    willDisplaceForward,
+  );
+
+  const closest: DraggableDimension = draggables[displaced[0].draggableId];
+
+  const closestWhenDisplaced: BoxModel = offset(
+    closest.page,
+    displacedBy.point,
+  );
+
+  const moveArgs = {
+    axis: destination.axis,
+    moveRelativeTo: closestWhenDisplaced,
+    isMoving: draggable.page,
+  };
+
+  const newCenter: Position = isMovingAfter
+    ? goAfter(moveArgs)
+    : goBefore(moveArgs);
+
   const newImpact: DragImpact = {
     movement: {
+      displacedBy,
       displaced,
-      amount,
-      isBeyondStartPosition: isMovingPastOriginalIndex,
+      map: getDisplacementMap(displaced),
+      willDisplaceForward,
     },
     direction: axis.direction,
     destination: {
       droppableId: destination.descriptor.id,
       index: targetIndex,
     },
+    merge: null,
   };
 
   return {

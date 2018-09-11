@@ -1,32 +1,30 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
-import { colors, grid } from '../constants';
+import styled from 'react-emotion';
+import { grid } from '../../../constants';
 import type {
   DraggableProvided,
   DraggableStateSnapshot,
 } from '../../../../../src';
 import type { Author } from '../types';
 
-const Avatar = styled.img`
+const Avatar = styled('img')`
   width: 60px;
   height: 60px;
   border-radius: 50%;
   margin-right: ${grid}px;
-  border-color: ${({ isDragging }) =>
-    isDragging ? colors.green : colors.white};
+  border-color: ${({ isDragging }) => (isDragging ? 'green' : 'white')};
   border-style: solid;
   border-width: ${grid}px;
   box-shadow: ${({ isDragging }) =>
-    isDragging ? `2px 2px 1px ${colors.shadow}` : 'none'};
+    isDragging ? `2px 2px 1px orange` : 'none'};
 
   &:focus {
     /* disable standard focus color */
     outline: none;
 
     /* use our own awesome one */
-    border-color: ${({ isDragging }) =>
-      isDragging ? colors.green : colors.blue.deep};
+    border-color: ${({ isDragging }) => (isDragging ? 'green' : 'blue')};
   }
 `;
 

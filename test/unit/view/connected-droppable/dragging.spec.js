@@ -127,7 +127,7 @@ describe('foreign list', () => {
       movement: {
         displaced: [],
         amount: { x: 0, y: 0 },
-        isBeyondStartPosition: false,
+        isInFrontOfStart: false,
       },
       direction: preset.foreign.axis.direction,
       destination: {

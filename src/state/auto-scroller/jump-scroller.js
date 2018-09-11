@@ -8,10 +8,10 @@ import {
   getWindowOverlap,
   getDroppableOverlap,
 } from './can-scroll';
+import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 import { type MoveArgs } from '../action-creators';
 import type {
   DroppableDimension,
-  DraggableLocation,
   Viewport,
   DraggingState,
   DroppableId,
@@ -51,12 +51,14 @@ export default ({
 
     // Droppable can absorb the entire change
     if (!overlap) {
+      console.log('scrolling droppable entirerly', change);
       scrollDroppable(droppable.descriptor.id, change);
       return null;
     }
 
     // Droppable can only absorb a part of the change
     const whatTheDroppableCanScroll: Position = subtract(change, overlap);
+    console.log('scrolling droppable: partial', whatTheDroppableCanScroll);
     scrollDroppable(droppable.descriptor.id, whatTheDroppableCanScroll);
 
     const remainder: Position = subtract(change, whatTheDroppableCanScroll);
@@ -76,12 +78,17 @@ export default ({
 
     // window can absorb entire scroll
     if (!overlap) {
+      console.log('entire window scroll scroll absorb', change.y);
       scrollWindow(change);
       return null;
     }
 
     // window can only absorb a part of the scroll
     const whatTheWindowCanScroll: Position = subtract(change, overlap);
+    console.log(
+      'partial window scroll scroll absorb',
+      whatTheWindowCanScroll.y,
+    );
     scrollWindow(whatTheWindowCanScroll);
 
     const remainder: Position = subtract(change, whatTheWindowCanScroll);
@@ -95,8 +102,7 @@ export default ({
       return;
     }
 
-    const destination: ?DraggableLocation = state.impact.destination;
-
+    const destination: ?DroppableId = whatIsDraggedOver(state.impact);
     invariant(
       destination,
       'Cannot perform a jump scroll when there is no destination',
@@ -106,12 +112,13 @@ export default ({
     // leaving the list
 
     const droppableRemainder: ?Position = scrollDroppableAsMuchAsItCan(
-      state.dimensions.droppables[destination.droppableId],
+      state.dimensions.droppables[destination],
       request,
     );
 
     // droppable absorbed the entire scroll
     if (!droppableRemainder) {
+      console.log('droppable absorbed all');
       return;
     }
 
@@ -128,6 +135,7 @@ export default ({
 
     // The entire scroll could not be absorbed by the droppable and window
     // so we manually move whatever is left
+    console.log('manual movement', windowRemainder.y);
     moveByOffset(state, windowRemainder);
   };
 

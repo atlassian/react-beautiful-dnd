@@ -1,8 +1,5 @@
 // @flow
 import { type Rect } from 'css-box-model';
-import getDisplacementMap, {
-  type DisplacementMap,
-} from './get-displacement-map';
 import { isPartiallyVisible } from './visibility/is-visible';
 import type {
   DraggableId,
@@ -10,6 +7,7 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DragImpact,
+  DisplacementMap,
 } from '../types';
 
 type Args = {|
@@ -18,6 +16,23 @@ type Args = {|
   previousImpact: DragImpact,
   viewport: Rect,
 |};
+
+const getShouldAnimate = (isVisible: boolean, previous: ?Displacement) => {
+  // if should be displaced and not visible
+  if (!isVisible) {
+    return false;
+  }
+
+  // if visible and no previous entries: animate!
+  if (!previous) {
+    return true;
+  }
+
+  // return our previous value
+  // for items that where originally not visible this will be false
+  // otherwise it will be true
+  return previous.shouldAnimate;
+};
 
 // Note: it is also an optimisation to undo the displacement on
 // items when they are no longer visible.
@@ -30,36 +45,17 @@ export default ({
   viewport,
 }: Args): Displacement => {
   const id: DraggableId = draggable.descriptor.id;
-  const map: DisplacementMap = getDisplacementMap(
-    previousImpact.movement.displaced,
-  );
+  const map: DisplacementMap = previousImpact.movement.map;
 
   // only displacing items that are visible in the droppable and the viewport
   const isVisible: boolean = isPartiallyVisible({
     target: draggable.page.marginBox,
     destination,
     viewport,
+    withDroppableDisplacement: true,
   });
 
-  const shouldAnimate: boolean = (() => {
-    // if should be displaced and not visible
-    if (!isVisible) {
-      return false;
-    }
-
-    // see if we can find a previous value
-    const previous: ?Displacement = map[id];
-
-    // if visible and no previous entries: animate!
-    if (!previous) {
-      return true;
-    }
-
-    // return our previous value
-    // for items that where originally not visible this will be false
-    // otherwise it will be true
-    return previous.shouldAnimate;
-  })();
+  const shouldAnimate: boolean = getShouldAnimate(isVisible, map[id]);
 
   const displacement: Displacement = {
     draggableId: id,

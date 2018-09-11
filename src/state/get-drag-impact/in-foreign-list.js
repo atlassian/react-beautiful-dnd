@@ -1,5 +1,5 @@
 // @flow
-import { type Position } from 'css-box-model';
+import { type Position, type Rect } from 'css-box-model';
 import type {
   DragMovement,
   DraggableDimension,
@@ -8,46 +8,82 @@ import type {
   Axis,
   Displacement,
   Viewport,
+  UserDirection,
+  DisplacedBy,
+  DisplacementMap,
 } from '../../types';
-import { patch } from '../position';
+import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 import getDisplacement from '../get-displacement';
-import withDroppableScroll from '../with-droppable-scroll';
+import getDisplacementMap from '../get-displacement-map';
+import isUserMovingForward from '../user-direction/is-user-moving-forward';
+import getDisplacedBy from '../get-displaced-by';
 
 type Args = {|
-  pageBorderBoxCenter: Position,
+  pageBorderBoxCenterWithDroppableScroll: Position,
   draggable: DraggableDimension,
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
   previousImpact: DragImpact,
   viewport: Viewport,
+  direction: UserDirection,
 |};
 
 export default ({
-  pageBorderBoxCenter,
+  pageBorderBoxCenterWithDroppableScroll: currentCenter,
   draggable,
   destination,
   insideDestination,
   previousImpact,
   viewport,
+  direction,
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
+  const map: DisplacementMap = previousImpact.movement.map;
 
-  // We need to know what point to use to compare to the other
-  // draggables in the list.
-  // To do this we need to consider any displacement caused by
-  // a change in scroll in the droppable we are currently over.
-
-  const currentCenter: Position = withDroppableScroll(
-    destination,
-    pageBorderBoxCenter,
+  const isMovingForward: boolean = isUserMovingForward(
+    destination.axis,
+    direction,
   );
+
+  const displacedBy: DisplacedBy = getDisplacedBy(
+    destination.axis,
+    draggable.displaceBy,
+    true,
+  );
+
+  const targetCenter: number = currentCenter[axis.line];
+  const displacement: number = displacedBy.value;
+
+  const isEnteringList: boolean =
+    whatIsDraggedOver(previousImpact) !== destination.descriptor.id;
 
   const displaced: Displacement[] = insideDestination
     .filter(
       (child: DraggableDimension): boolean => {
-        // Items will be displaced forward if they sit ahead of the dragging item
-        const threshold: number = child.page.borderBox[axis.end];
-        return threshold > currentCenter[axis.line];
+        const borderBox: Rect = child.page.borderBox;
+        const start: number = borderBox[axis.start];
+        const end: number = borderBox[axis.end];
+
+        const isDisplaced: boolean = Boolean(map[child.descriptor.id]);
+        // If entering list then assume everything is displaced for initial impact
+        const isDisplacedBy: number =
+          isDisplaced || isEnteringList ? displacement : 0;
+
+        // When in foreign list, can only displace forwards
+        // Moving forward will decrease the amount of things needed to be displaced
+        if (isMovingForward) {
+          return targetCenter < start + isDisplacedBy;
+        }
+
+        // Moving backwards
+        // Moving backwards will increase the amount of things needed to be displaced
+
+        if (isDisplaced) {
+          return true;
+        }
+
+        // No longer need to displace
+        return targetCenter < end;
       },
     )
     .map(
@@ -63,9 +99,10 @@ export default ({
   const newIndex: number = insideDestination.length - displaced.length;
 
   const movement: DragMovement = {
-    amount: patch(axis.line, draggable.page.marginBox[axis.size]),
+    displacedBy,
     displaced,
-    isBeyondStartPosition: false,
+    map: getDisplacementMap(displaced),
+    willDisplaceForward: true,
   };
 
   const impact: DragImpact = {
@@ -75,6 +112,7 @@ export default ({
       droppableId: destination.descriptor.id,
       index: newIndex,
     },
+    merge: null,
   };
 
   return impact;

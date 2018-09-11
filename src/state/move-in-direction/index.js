@@ -1,15 +1,15 @@
 // @flow
 import type { Position } from 'css-box-model';
 import { subtract } from '../position';
-import getHomeLocation from '../get-home-location';
 import moveCrossAxis from './move-cross-axis';
 import type { Result as MoveCrossAxisResult } from './move-cross-axis/move-cross-axis-types';
-import moveToNextIndex from './move-to-next-index';
-import type { Result as MoveToNextIndexResult } from './move-to-next-index/move-to-next-index-types';
+import moveToNextPlace from './move-to-next-place';
+import whatIsDraggedOver from '../droppable/what-is-dragged-over';
+import type { Result as MoveToNextPlaceResult } from './move-to-next-place/move-to-next-place-types';
 import type {
+  DroppableId,
   DraggingState,
   DragImpact,
-  DraggableLocation,
   Direction,
 } from '../../types';
 
@@ -29,25 +29,23 @@ const getClientSelection = (
   currentScroll: Position,
 ): Position => subtract(pageBorderBoxCenter, currentScroll);
 
-export default ({ state, type }: Args): ?Result => {
-  const { droppable, isMainAxisMovementAllowed } = (() => {
-    if (state.impact.destination) {
-      return {
-        droppable:
-          state.dimensions.droppables[state.impact.destination.droppableId],
-        isMainAxisMovementAllowed: true,
-      };
-    }
+const getDroppable = (state: DraggingState) => {
+  const id: ?DroppableId = whatIsDraggedOver(state.impact);
 
-    // No destination - this can happen when lifting an a disabled droppable
-    // In this case we want to allow movement out of the list with a keyboard
-    // but not within the list
+  if (id) {
     return {
-      droppable: state.dimensions.droppables[state.critical.droppable.id],
-      isMainAxisMovementAllowed: false,
+      droppable: state.dimensions.droppables[id],
+      isMainAxisMovementAllowed: true,
     };
-  })();
+  }
+  return {
+    droppable: state.dimensions.droppables[state.critical.droppable.id],
+    isMainAxisMovementAllowed: false,
+  };
+};
 
+export default ({ state, type }: Args): ?Result => {
+  const { droppable, isMainAxisMovementAllowed } = getDroppable(state);
   const direction: Direction = droppable.axis.direction;
   const isMovingOnMainAxis: boolean =
     (direction === 'vertical' &&
@@ -64,10 +62,10 @@ export default ({ state, type }: Args): ?Result => {
     type === 'MOVE_DOWN' || type === 'MOVE_RIGHT';
 
   if (isMovingOnMainAxis) {
-    const result: ?MoveToNextIndexResult = moveToNextIndex({
+    const result: ?MoveToNextPlaceResult = moveToNextPlace({
       isMovingForward,
       draggableId: state.critical.draggable.id,
-      droppable,
+      destination: droppable,
       draggables: state.dimensions.draggables,
       previousPageBorderBoxCenter: state.current.page.borderBoxCenter,
       previousImpact: state.impact,
@@ -89,15 +87,11 @@ export default ({ state, type }: Args): ?Result => {
     };
   }
 
-  // moving on cross axis
-  const home: DraggableLocation = getHomeLocation(state.critical);
-
   const result: ?MoveCrossAxisResult = moveCrossAxis({
     isMovingForward,
     pageBorderBoxCenter: state.current.page.borderBoxCenter,
     draggableId: state.critical.draggable.id,
     droppableId: droppable.descriptor.id,
-    home,
     draggables: state.dimensions.draggables,
     droppables: state.dimensions.droppables,
     previousImpact: state.impact,

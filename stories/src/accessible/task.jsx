@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { Draggable } from '../../../src';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../src';
 import type { Task as TaskType } from '../types';
@@ -11,7 +11,7 @@ type Props = {|
   index: number,
 |};
 
-const Container = styled.div`
+const Container = styled('div')`
   border-bottom: 1px solid #ccc;
   background: ${colors.white};
   padding: ${grid}px;

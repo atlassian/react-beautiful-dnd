@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src';
 import type { DropResult, DragStart } from '../../../src';
@@ -21,7 +21,7 @@ type State = {|
   quotes: Quote[],
 |};
 
-const Root = styled.div`
+const Root = styled('div')`
   padding: ${grid}px;
   background: ${colors.blue.light};
 `;

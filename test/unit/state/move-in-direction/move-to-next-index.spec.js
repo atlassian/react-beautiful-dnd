@@ -149,7 +149,7 @@ describe('move to next index', () => {
                       axis.line,
                       preset.inHome1.page.marginBox[axis.size],
                     ),
-                    isBeyondStartPosition: true,
+                    isInFrontOfStart: true,
                   },
                   direction: axis.direction,
                   // is now in the second position
@@ -214,7 +214,7 @@ describe('move to next index', () => {
                       axis.line,
                       preset.inHome2.page.marginBox[axis.size],
                     ),
-                    isBeyondStartPosition: true,
+                    isInFrontOfStart: true,
                   },
                   direction: axis.direction,
                   // is now in the second position
@@ -243,7 +243,7 @@ describe('move to next index', () => {
                     axis.line,
                     preset.inHome1.page.marginBox[axis.size],
                   ),
-                  isBeyondStartPosition: true,
+                  isInFrontOfStart: true,
                 },
                 direction: axis.direction,
                 // draggable1 is now in the second position
@@ -304,7 +304,7 @@ describe('move to next index', () => {
                       axis.line,
                       preset.inHome1.page.marginBox[axis.size],
                     ),
-                    isBeyondStartPosition: true,
+                    isInFrontOfStart: true,
                   },
                   direction: axis.direction,
                   // is now in the second position
@@ -336,7 +336,7 @@ describe('move to next index', () => {
                     axis.line,
                     preset.inHome2.page.marginBox[axis.size],
                   ),
-                  isBeyondStartPosition: false,
+                  isInFrontOfStart: false,
                 },
                 direction: axis.direction,
                 destination: {
@@ -384,7 +384,7 @@ describe('move to next index', () => {
                       axis.line,
                       preset.inHome2.page.marginBox[axis.size],
                     ),
-                    isBeyondStartPosition: false,
+                    isInFrontOfStart: false,
                   },
                   destination: {
                     droppableId: preset.home.descriptor.id,
@@ -419,7 +419,7 @@ describe('move to next index', () => {
                     axis.line,
                     preset.inHome3.page.marginBox[axis.size],
                   ),
-                  isBeyondStartPosition: true,
+                  isInFrontOfStart: true,
                 },
                 direction: axis.direction,
                 // draggable3 is now in the first position
@@ -472,7 +472,7 @@ describe('move to next index', () => {
                       preset.inHome3.page.marginBox[axis.size],
                     ),
                     // is still behind where it started
-                    isBeyondStartPosition: false,
+                    isInFrontOfStart: false,
                   },
                   direction: axis.direction,
                   // is now in the second position
@@ -661,7 +661,7 @@ describe('move to next index', () => {
                       },
                     ],
                     amount: patch(axis.line, inHome1.page.marginBox[axis.size]),
-                    isBeyondStartPosition: true,
+                    isInFrontOfStart: true,
                   },
                   direction: axis.direction,
                   // is now in the last position
@@ -747,7 +747,7 @@ describe('move to next index', () => {
                       },
                     ],
                     amount: patch(axis.line, inHome1.page.marginBox[axis.size]),
-                    isBeyondStartPosition: true,
+                    isInFrontOfStart: true,
                   },
                   direction: axis.direction,
                   // is now in the second last position
@@ -787,7 +787,7 @@ describe('move to next index', () => {
                   axis.line,
                   preset.inHome1.page.marginBox[axis.size],
                 ),
-                isBeyondStartPosition: false,
+                isInFrontOfStart: false,
               },
               direction: axis.direction,
               destination: {
@@ -819,7 +819,7 @@ describe('move to next index', () => {
                     axis.line,
                     preset.inHome2.page.marginBox[axis.size],
                   ),
-                  isBeyondStartPosition: false,
+                  isInFrontOfStart: false,
                 },
                 destination: {
                   droppableId: preset.home.descriptor.id,
@@ -868,7 +868,7 @@ describe('move to next index', () => {
                       axis.line,
                       preset.inHome2.page.marginBox[axis.size],
                     ),
-                    isBeyondStartPosition: false,
+                    isInFrontOfStart: false,
                   },
                   destination: {
                     droppableId: preset.home.descriptor.id,
@@ -890,7 +890,7 @@ describe('move to next index', () => {
                     axis.line,
                     preset.inHome3.page.marginBox[axis.size],
                   ),
-                  isBeyondStartPosition: false,
+                  isInFrontOfStart: false,
                 },
                 destination: {
                   droppableId: preset.home.descriptor.id,
@@ -939,7 +939,7 @@ describe('move to next index', () => {
                       axis.line,
                       preset.inHome3.page.marginBox[axis.size],
                     ),
-                    isBeyondStartPosition: false,
+                    isInFrontOfStart: false,
                   },
                   destination: {
                     droppableId: preset.home.descriptor.id,
@@ -971,7 +971,7 @@ describe('move to next index', () => {
                     axis.line,
                     preset.inHome2.page.marginBox[axis.size],
                   ),
-                  isBeyondStartPosition: true,
+                  isInFrontOfStart: true,
                 },
                 direction: axis.direction,
                 destination: {
@@ -1020,7 +1020,7 @@ describe('move to next index', () => {
                       axis.line,
                       preset.inHome2.page.marginBox[axis.size],
                     ),
-                    isBeyondStartPosition: false,
+                    isInFrontOfStart: false,
                   },
                   destination: {
                     droppableId: preset.home.descriptor.id,
@@ -1056,7 +1056,7 @@ describe('move to next index', () => {
                     axis.line,
                     preset.inHome1.page.marginBox[axis.size],
                   ),
-                  isBeyondStartPosition: true,
+                  isInFrontOfStart: true,
                 },
                 direction: axis.direction,
                 destination: {
@@ -1107,7 +1107,7 @@ describe('move to next index', () => {
                       axis.line,
                       preset.inHome1.page.marginBox[axis.size],
                     ),
-                    isBeyondStartPosition: true,
+                    isInFrontOfStart: true,
                   },
                   destination: {
                     droppableId: preset.home.descriptor.id,
@@ -1208,7 +1208,7 @@ describe('move to next index', () => {
                     axis.line,
                     asBigAsViewport.page.marginBox[axis.size],
                   ),
-                  isBeyondStartPosition: true,
+                  isInFrontOfStart: true,
                 },
                 destination: {
                   droppableId: droppable.descriptor.id,
@@ -1295,7 +1295,7 @@ describe('move to next index', () => {
                     },
                   ],
                   amount: patch(axis.line, visible.page.marginBox[axis.size]),
-                  isBeyondStartPosition: true,
+                  isInFrontOfStart: true,
                 },
                 destination: {
                   droppableId: droppable.descriptor.id,
@@ -1419,7 +1419,7 @@ describe('move to next index', () => {
                     },
                   ],
                   amount: patch(axis.line, inside.page.marginBox[axis.size]),
-                  isBeyondStartPosition: true,
+                  isInFrontOfStart: true,
                 },
                 destination: {
                   droppableId: droppable.descriptor.id,
@@ -1482,7 +1482,7 @@ describe('move to next index', () => {
                   preset.inHome1.page.marginBox[axis.size],
                 ),
                 // Always false when in another list
-                isBeyondStartPosition: false,
+                isInFrontOfStart: false,
               },
               direction: axis.direction,
               destination: {
@@ -1537,7 +1537,7 @@ describe('move to next index', () => {
                     axis.line,
                     preset.inHome1.page.marginBox[axis.size],
                   ),
-                  isBeyondStartPosition: false,
+                  isInFrontOfStart: false,
                 },
                 direction: axis.direction,
                 destination: {
@@ -1567,7 +1567,7 @@ describe('move to next index', () => {
                   preset.inHome1.page.marginBox[axis.size],
                 ),
                 // Always false when in another list
-                isBeyondStartPosition: false,
+                isInFrontOfStart: false,
               },
               direction: axis.direction,
               destination: {
@@ -1611,7 +1611,7 @@ describe('move to next index', () => {
                     axis.line,
                     preset.inHome1.page.marginBox[axis.size],
                   ),
-                  isBeyondStartPosition: false,
+                  isInFrontOfStart: false,
                 },
                 direction: axis.direction,
                 destination: {
@@ -1634,7 +1634,7 @@ describe('move to next index', () => {
                   axis.line,
                   preset.inHome1.page.marginBox[axis.size],
                 ),
-                isBeyondStartPosition: false,
+                isInFrontOfStart: false,
               },
               direction: axis.direction,
               destination: {
@@ -1693,7 +1693,7 @@ describe('move to next index', () => {
                   preset.inHome1.page.marginBox[axis.size],
                 ),
                 // Always false when in another list
-                isBeyondStartPosition: false,
+                isInFrontOfStart: false,
               },
               direction: axis.direction,
               destination: {
@@ -1734,7 +1734,7 @@ describe('move to next index', () => {
                   axis.line,
                   preset.inHome1.page.marginBox[axis.size],
                 ),
-                isBeyondStartPosition: false,
+                isInFrontOfStart: false,
               },
               direction: axis.direction,
               destination: {
@@ -1791,7 +1791,7 @@ describe('move to next index', () => {
                     axis.line,
                     preset.inHome1.page.marginBox[axis.size],
                   ),
-                  isBeyondStartPosition: false,
+                  isInFrontOfStart: false,
                 },
                 direction: axis.direction,
                 destination: {
@@ -1831,7 +1831,7 @@ describe('move to next index', () => {
                   axis.line,
                   preset.inHome1.page.marginBox[axis.size],
                 ),
-                isBeyondStartPosition: false,
+                isInFrontOfStart: false,
               },
               direction: axis.direction,
               destination: {
@@ -1897,7 +1897,7 @@ describe('move to next index', () => {
                     axis.line,
                     preset.inHome1.page.marginBox[axis.size],
                   ),
-                  isBeyondStartPosition: false,
+                  isInFrontOfStart: false,
                 },
                 direction: axis.direction,
                 destination: {

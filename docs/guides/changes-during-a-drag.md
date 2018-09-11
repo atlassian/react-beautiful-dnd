@@ -1,6 +1,10 @@
 # Changes during a drag
 
-You are welcome to make whatever changes you would like when a drag is not occurring. Generally we advise not changing the dimensions of any `Draggable` or `Droppable` component during a drag. This is fairly advanced behavior.
+You are welcome to make whatever changes you would like when a drag is not occurring. During a drag this is more limited:
+
+✅ Add and remove no `Draggable` or `Droppable` during a drag
+
+Generally we advise not adding or removing any `Draggable` component during a drag. This is fairly advanced behavior.
 
 ## Background
 

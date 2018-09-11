@@ -5,13 +5,14 @@ import memoizeOne from 'memoize-one';
 import { storeKey } from '../context-keys';
 import Droppable from './droppable';
 import isStrictEqual from '../is-strict-equal';
+import getIsDraggingOver from '../../state/droppable/is-dragging-over';
+import shouldUsePlaceholder from '../../state/droppable/should-use-placeholder';
 import type {
   State,
   DroppableId,
   DraggableId,
-  DraggableLocation,
+  DragImpact,
   DraggableDimension,
-  DraggableDescriptor,
   Placeholder,
 } from '../../types';
 import type {
@@ -21,37 +22,15 @@ import type {
   Selector,
 } from './droppable-types';
 
+const defaultMapProps: MapProps = {
+  isDraggingOver: false,
+  draggingOverWith: null,
+  placeholder: null,
+};
+
 // Returning a function to ensure each
 // Droppable gets its own selector
 export const makeMapStateToProps = (): Selector => {
-  const getIsDraggingOver = (
-    id: DroppableId,
-    destination: ?DraggableLocation,
-  ): boolean => {
-    if (!destination) {
-      return false;
-    }
-    return destination.droppableId === id;
-  };
-
-  const shouldUsePlaceholder = (
-    id: DroppableId,
-    descriptor: DraggableDescriptor,
-    destination: ?DraggableLocation,
-  ): boolean => {
-    if (!destination) {
-      return false;
-    }
-
-    // Do not use a placeholder when over the home list
-    if (id === descriptor.droppableId) {
-      return false;
-    }
-
-    // TODO: no placeholder if over foreign list
-    return id === destination.droppableId;
-  };
-
   const getMapProps = memoizeOne(
     (
       isDraggingOver: boolean,
@@ -64,58 +43,48 @@ export const makeMapStateToProps = (): Selector => {
     }),
   );
 
-  const getDefault = (): MapProps => getMapProps(false, null, null);
+  const getDraggingOverProps = (
+    id: DroppableId,
+    draggable: DraggableDimension,
+    impact: DragImpact,
+  ) => {
+    const isOver: boolean = getIsDraggingOver(id, impact);
+    if (!isOver) {
+      return defaultMapProps;
+    }
+
+    const usePlaceholder: boolean = shouldUsePlaceholder(
+      id,
+      draggable.descriptor,
+      impact,
+    );
+    const placeholder: ?Placeholder = usePlaceholder
+      ? draggable.placeholder
+      : null;
+
+    return getMapProps(true, draggable.descriptor.id, placeholder);
+  };
 
   const selector = (state: State, ownProps: OwnProps): MapProps => {
     if (ownProps.isDropDisabled) {
-      return getDefault();
+      return defaultMapProps;
     }
 
     const id: DroppableId = ownProps.droppableId;
 
     if (state.isDragging) {
-      const destination: ?DraggableLocation = state.impact.destination;
-      const isDraggingOver: boolean = getIsDraggingOver(id, destination);
-      const draggableId: DraggableId = state.critical.draggable.id;
-      const draggingOverWith: ?DraggableId = isDraggingOver
-        ? draggableId
-        : null;
       const draggable: DraggableDimension =
-        state.dimensions.draggables[draggableId];
-
-      const placeholder: ?Placeholder = shouldUsePlaceholder(
-        id,
-        draggable.descriptor,
-        destination,
-      )
-        ? draggable.placeholder
-        : null;
-
-      return getMapProps(isDraggingOver, draggingOverWith, placeholder);
+        state.dimensions.draggables[state.critical.draggable.id];
+      return getDraggingOverProps(id, draggable, state.impact);
     }
 
     if (state.phase === 'DROP_ANIMATING') {
-      const destination: ?DraggableLocation = state.pending.impact.destination;
-      const isDraggingOver = getIsDraggingOver(id, destination);
-      const draggableId: DraggableId = state.pending.result.draggableId;
-      const draggingOverWith: ?DraggableId = isDraggingOver
-        ? draggableId
-        : null;
       const draggable: DraggableDimension =
-        state.dimensions.draggables[draggableId];
-
-      const placeholder: ?Placeholder = shouldUsePlaceholder(
-        id,
-        draggable.descriptor,
-        destination,
-      )
-        ? draggable.placeholder
-        : null;
-
-      return getMapProps(isDraggingOver, draggingOverWith, placeholder);
+        state.dimensions.draggables[state.pending.result.draggableId];
+      return getDraggingOverProps(id, draggable, state.pending.impact);
     }
 
-    return getDefault();
+    return defaultMapProps;
   };
 
   return selector;
@@ -147,8 +116,9 @@ const connectedDroppable: OwnProps => Node = (connect(
 
 connectedDroppable.defaultProps = ({
   type: 'DEFAULT',
-  isDropDisabled: false,
   direction: 'vertical',
+  isDropDisabled: false,
+  isCombineEnabled: false,
   ignoreContainerClipping: false,
 }: DefaultProps);
 

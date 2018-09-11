@@ -3,7 +3,6 @@ import { type Position } from 'css-box-model';
 import getBestCrossAxisDroppable from './get-best-cross-axis-droppable';
 import getClosestDraggable from './get-closest-draggable';
 import moveToNewDroppable from './move-to-new-droppable';
-import noImpact from '../../no-impact';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
 import type { Result } from './move-cross-axis-types';
 import type {
@@ -13,7 +12,6 @@ import type {
   DraggableDimension,
   DraggableDimensionMap,
   DroppableDimensionMap,
-  DraggableLocation,
   DragImpact,
   Viewport,
 } from '../../../types';
@@ -26,13 +24,11 @@ type Args = {|
   draggableId: DraggableId,
   // the droppable the dragging item is in
   droppableId: DroppableId,
-  // the original location of the draggable
-  home: DraggableLocation,
   // all the dimensions in the system
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
   // any previous impact
-  previousImpact: ?DragImpact,
+  previousImpact: DragImpact,
   // the current viewport
   viewport: Viewport,
 |};
@@ -42,7 +38,6 @@ export default ({
   pageBorderBoxCenter,
   draggableId,
   droppableId,
-  home,
   draggables,
   droppables,
   previousImpact,
@@ -71,7 +66,7 @@ export default ({
     draggables,
   );
 
-  const movingRelativeTo: ?DraggableDimension = getClosestDraggable({
+  const moveRelativeTo: ?DraggableDimension = getClosestDraggable({
     axis: destination.axis,
     pageBorderBoxCenter,
     destination,
@@ -81,7 +76,7 @@ export default ({
 
   // Draggables available, but none are candidates for movement (eg none are visible)
   // Cannot move into the list
-  if (insideDestination.length && !movingRelativeTo) {
+  if (insideDestination.length && !moveRelativeTo) {
     return null;
   }
 
@@ -89,10 +84,10 @@ export default ({
     pageBorderBoxCenter,
     destination,
     draggable,
-    movingRelativeTo,
+    draggables,
+    moveRelativeTo,
     insideDestination,
-    home,
-    previousImpact: previousImpact || noImpact,
+    previousImpact,
     viewport,
   });
 };

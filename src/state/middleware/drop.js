@@ -1,16 +1,13 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
-import {
-  dropPending,
-  completeDrop,
-  animateDrop,
-  clean,
-} from '../action-creators';
+import { dropPending, completeDrop, animateDrop } from '../action-creators';
 import noImpact from '../no-impact';
-import getNewHomeClientBorderBoxCenter from '../get-new-home-client-border-box-center';
+import whenCombining from '../get-new-home-client-border-box-center/when-combining';
+import whenReordering from '../get-new-home-client-border-box-center/when-reordering';
 import { add, subtract, isEqual, origin } from '../position';
 import withDroppableDisplacement from '../with-droppable-displacement';
+import { getDropDuration } from '../../view/animation';
 import type {
   State,
   DropReason,
@@ -21,6 +18,7 @@ import type {
   DragImpact,
   DropResult,
   PendingDrop,
+  Combine,
   DimensionMap,
   DraggableDimension,
 } from '../../types';
@@ -50,13 +48,6 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     return;
   }
 
-  // Drag ended before preparing phase had finished
-  // No hooks have been called at this point
-  if (state.phase === 'PREPARING') {
-    dispatch(clean());
-    return;
-  }
-
   // Could have occurred in response to an error
   if (state.phase === 'IDLE') {
     return;
@@ -79,28 +70,30 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
 
   const critical: Critical = state.critical;
   const dimensions: DimensionMap = state.dimensions;
+  // Only keeping impact when doing a user drop - otherwise we are cancelling
   const impact: DragImpact = reason === 'DROP' ? state.impact : noImpact;
   const home: DroppableDimension =
     dimensions.droppables[state.critical.droppable.id];
   const draggable: DraggableDimension =
     dimensions.draggables[state.critical.draggable.id];
-  const droppable: ?DroppableDimension =
-    impact && impact.destination
-      ? dimensions.droppables[impact.destination.droppableId]
-      : null;
+  const destination: ?DraggableLocation = impact ? impact.destination : null;
+  const droppable: ?DroppableDimension = destination
+    ? dimensions.droppables[destination.droppableId]
+    : null;
+  const combine: ?Combine =
+    impact && impact.merge ? impact.merge.combine : null;
 
   const source: DraggableLocation = {
     index: critical.draggable.index,
     droppableId: critical.droppable.id,
   };
-  const destination: ?DraggableLocation =
-    reason === 'DROP' ? impact.destination : null;
 
   const result: DropResult = {
     draggableId: draggable.descriptor.id,
     type: home.descriptor.type,
     source,
     destination,
+    combine,
     reason,
   };
 
@@ -110,12 +103,18 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
       return origin;
     }
 
-    const newBorderBoxClientCenter: Position = getNewHomeClientBorderBoxCenter({
-      movement: impact.movement,
-      draggable,
-      draggables: dimensions.draggables,
-      destination: droppable,
-    });
+    const newBorderBoxClientCenter: Position =
+      whenCombining({
+        impact,
+        draggables: dimensions.draggables,
+      }) ||
+      whenReordering({
+        impact,
+        draggable,
+        draggables: dimensions.draggables,
+        destination: droppable,
+      }) ||
+      draggable.client.borderBox.center;
 
     // What would the offset be from our original center?
     return subtract(
@@ -140,8 +139,15 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     newHomeOffset,
   );
 
+  const dropDuration: number = getDropDuration({
+    current: state.current.client.offset,
+    destination: newHomeOffset,
+    reason,
+  });
+
   const pending: PendingDrop = {
     newHomeOffset,
+    dropDuration,
     result,
     impact,
   };

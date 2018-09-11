@@ -1,72 +1,87 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { type Position } from 'css-box-model';
-import moveToEdge from '../../../move-to-edge';
+import {
+  type Position,
+  type BoxModel,
+  type Spacing,
+  offset,
+} from 'css-box-model';
 import type { Result } from '../move-cross-axis-types';
 import getDisplacement from '../../../get-displacement';
 import withDroppableDisplacement from '../../../with-droppable-displacement';
+import getDisplacementMap from '../../../get-displacement-map';
+import getDisplacedBy from '../../../get-displaced-by';
+import { noMovement } from '../../../no-impact';
+import { goIntoStart, goAfter, goBefore } from '../../../move-relative-to';
+import { isTotallyVisible } from '../../../visibility/is-visible';
 import type {
   Axis,
   DragImpact,
   DraggableDimension,
   DroppableDimension,
+  DraggableDimensionMap,
   Displacement,
   Viewport,
+  DisplacedBy,
 } from '../../../../types';
 
 type Args = {|
-  amount: Position,
   pageBorderBoxCenter: Position,
-  movingRelativeTo: ?DraggableDimension,
+  moveRelativeTo: ?DraggableDimension,
   insideDestination: DraggableDimension[],
   draggable: DraggableDimension,
+  draggables: DraggableDimensionMap,
   destination: DroppableDimension,
   previousImpact: DragImpact,
   viewport: Viewport,
 |};
 
 export default ({
-  amount,
   pageBorderBoxCenter,
-  movingRelativeTo,
+  moveRelativeTo,
   insideDestination,
   draggable,
+  draggables,
   destination,
   previousImpact,
   viewport,
-}: Args): Result => {
+}: Args): ?Result => {
   const axis: Axis = destination.axis;
-  const isGoingBeforeTarget: boolean = Boolean(
-    movingRelativeTo &&
-      pageBorderBoxCenter[destination.axis.line] <
-        movingRelativeTo.page.borderBox.center[destination.axis.line],
-  );
 
   // Moving to an empty list
-
-  if (!movingRelativeTo) {
-    // Move to start edge of the destination
-    // based on the axis of the destination
-
-    const newCenter: Position = moveToEdge({
-      source: draggable.page.borderBox,
-      sourceEdge: 'start',
-      destination: destination.page.contentBox,
-      destinationEdge: 'start',
-      destinationAxis: axis,
+  if (!moveRelativeTo || !insideDestination.length) {
+    const newCenter: Position = goIntoStart({
+      axis,
+      moveInto: destination.page,
+      isMoving: draggable.page,
     });
 
+    // we might not be able to see the position we are hoping to move to
+    const fake: Spacing = {
+      top: newCenter.y,
+      right: newCenter.x,
+      bottom: newCenter.y,
+      left: newCenter.x,
+    };
+    const isVisible: boolean = isTotallyVisible({
+      target: fake,
+      destination,
+      viewport: viewport.frame,
+      withDroppableDisplacement: true,
+    });
+
+    if (!isVisible) {
+      return null;
+    }
+
     const newImpact: DragImpact = {
-      movement: {
-        displaced: [],
-        amount,
-        isBeyondStartPosition: false,
-      },
+      movement: noMovement,
       direction: axis.direction,
       destination: {
         droppableId: destination.descriptor.id,
         index: 0,
       },
+      merge: null,
     };
 
     return {
@@ -77,52 +92,69 @@ export default ({
 
   // Moving to a populated list
 
-  const targetIndex: number = insideDestination.indexOf(movingRelativeTo);
-  invariant(
-    targetIndex !== -1,
-    'The target was not found within its droppable',
+  const targetIndex: number = insideDestination.indexOf(moveRelativeTo);
+  invariant(targetIndex !== -1);
+
+  const isGoingBeforeTarget: boolean = Boolean(
+    pageBorderBoxCenter[destination.axis.line] <
+      moveRelativeTo.page.borderBox.center[destination.axis.line],
   );
 
   const proposedIndex: number = isGoingBeforeTarget
     ? targetIndex
     : targetIndex + 1;
 
-  const newCenter: Position = moveToEdge({
-    // Aligning to visible top of draggable
-    source: draggable.page.borderBox,
-    sourceEdge: 'start',
-    destination: movingRelativeTo.page.marginBox,
-    destinationEdge: isGoingBeforeTarget ? 'start' : 'end',
-    destinationAxis: axis,
-  });
+  const displaced: Displacement[] = insideDestination.slice(proposedIndex).map(
+    (dimension: DraggableDimension): Displacement =>
+      getDisplacement({
+        draggable: dimension,
+        destination,
+        viewport: viewport.frame,
+        previousImpact,
+      }),
+  );
 
-  // Can only displace forward when moving into a foreign list
-  // if going before: move everything down including the target
-  // if going after: move everything down excluding the target
+  const willDisplaceForward: boolean = true;
+  const displacedBy: DisplacedBy = getDisplacedBy(
+    destination.axis,
+    draggable.displaceBy,
+    willDisplaceForward,
+  );
 
-  const displaced: Displacement[] = insideDestination
-    .slice(proposedIndex, insideDestination.length)
-    .map(
-      (dimension: DraggableDimension): Displacement =>
-        getDisplacement({
-          draggable: dimension,
-          destination,
-          viewport: viewport.frame,
-          previousImpact,
-        }),
-    );
+  const newCenter: Position = (() => {
+    // nothing displaced, and not an empty list.
+    // move below the last item
+    if (!displaced.length) {
+      const target: DraggableDimension =
+        insideDestination[insideDestination.length - 1];
+      return goAfter({
+        axis,
+        moveRelativeTo: target.page,
+        isMoving: draggable.page,
+      });
+    }
+    const first: DraggableDimension = draggables[displaced[0].draggableId];
+    const withDisplacement: BoxModel = offset(first.page, displacedBy.point);
+    return goBefore({
+      axis,
+      moveRelativeTo: withDisplacement,
+      isMoving: draggable.page,
+    });
+  })();
 
   const newImpact: DragImpact = {
     movement: {
+      displacedBy,
       displaced,
-      amount,
-      isBeyondStartPosition: false,
+      map: getDisplacementMap(displaced),
+      willDisplaceForward,
     },
     direction: axis.direction,
     destination: {
       droppableId: destination.descriptor.id,
       index: proposedIndex,
     },
+    merge: null,
   };
 
   return {

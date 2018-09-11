@@ -7,6 +7,7 @@ import type {
   DraggableDimension,
   ZIndex,
   State,
+  DropReason,
 } from '../../types';
 import {
   lift,
@@ -28,8 +29,10 @@ export type DraggingStyle = {|
   boxSizing: 'border-box',
   width: number,
   height: number,
-  transition: 'none',
+  transition: string, // 'none' or: drop animation and optional group into fade out
   transform: ?string,
+  // we animate the opacity down to 0 when dropping while grouping
+  opacity: ?number,
   zIndex: ZIndex,
 
   // Avoiding any processing of mouse events.
@@ -60,6 +63,8 @@ export type DraggableProps = {|
   style: ?DraggableStyle,
   // used for shared global styles
   'data-react-beautiful-dnd-draggable': string,
+  // used to know when a transition ends
+  onTransitionEnd: ?() => mixed,
 |};
 
 export type Provided = {|
@@ -70,10 +75,17 @@ export type Provided = {|
   innerRef: (?HTMLElement) => void,
 |};
 
+export type DroppingState = {|
+  reason: DropReason,
+  duration: number,
+|};
+
 export type StateSnapshot = {|
   isDragging: boolean,
-  isDropAnimating: boolean,
+  dropping: ?DroppingState,
   draggingOver: ?DroppableId,
+  combineWith: ?DraggableId,
+  combineTargetFor: ?DraggableId,
 |};
 
 export type DispatchProps = {|
@@ -96,17 +108,19 @@ export type MapProps = {|
   // when an item is being displaced by a dragging item,
   // we need to know if that movement should be animated
   shouldAnimateDisplacement: boolean,
-  isDropAnimating: boolean,
+  dropping: ?DroppingState,
   offset: Position,
   // only provided when dragging
   dimension: ?DraggableDimension,
   draggingOver: ?DroppableId,
+  combineWith: ?DraggableId,
+  combineTargetFor: ?DraggableId,
 |};
 
 export type OwnProps = {|
   draggableId: DraggableId,
-  children: (Provided, StateSnapshot) => ?Node,
   index: number,
+  children: (Provided, StateSnapshot) => ?Node,
   isDragDisabled: boolean,
   disableInteractiveElementBlocking: boolean,
 |};

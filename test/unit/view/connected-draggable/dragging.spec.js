@@ -33,12 +33,15 @@ draggingStates.forEach((current: IsDraggingState) => {
 
       const expected: MapProps = {
         isDropAnimating: false,
+        dropDuration: 0,
         isDragging: true,
         offset: { x: 20, y: 30 },
         shouldAnimateDragMovement: false,
         shouldAnimateDisplacement: false,
         dimension: preset.inHome1,
         draggingOver: preset.home.descriptor.id,
+        groupingWith: null,
+        groupedOverBy: null,
       };
       expect(result).toEqual(expected);
     });

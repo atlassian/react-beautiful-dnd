@@ -69,7 +69,7 @@ export const finish = (key: string) => {
     console.log(
       `${style.symbol} %cTiming %c${rounded} %cms %c${key}`,
       // title
-      'color: blue; font-weight: bold; ',
+      'color: blue; font-weight: bold;',
       // result
       `color: ${style.textColor}; font-size: 1.1em;`,
       // ms
