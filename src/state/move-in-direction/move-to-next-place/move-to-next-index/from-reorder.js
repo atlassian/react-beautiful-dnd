@@ -11,7 +11,7 @@ import type {
   DragImpact,
   DraggableLocation,
 } from '../../../../types';
-import type { InListResult } from './move-to-next-index-types';
+import type { MoveFromResult } from './move-to-next-index-types';
 import getWillDisplaceForward from '../../../will-displace-forward';
 
 type Args = {|
@@ -20,7 +20,6 @@ type Args = {|
   draggable: DraggableDimension,
   destination: DroppableDimension,
   previousImpact: DragImpact,
-  location: DraggableLocation,
   insideDestination: DraggableDimension[],
   draggables: DraggableDimensionMap,
   previousPageBorderBoxCenter: Position,
@@ -33,10 +32,16 @@ export default ({
   draggable,
   draggables,
   destination,
-  location,
   insideDestination: initialInside,
   previousPageBorderBoxCenter,
-}: Args): ?InListResult => {
+}: Args): ?MoveFromResult => {
+  // not handling movements from a merge
+  if (previousImpact.merge) {
+    return null;
+  }
+  const location: ?DraggableLocation = previousImpact.destination;
+  invariant(location, 'Cannot move to next index without previous destination');
+
   const insideDestination: DraggableDimension[] = initialInside.slice();
   const currentIndex: number = location.index;
   const isInForeignList: boolean = !isInHomeList;

@@ -2,7 +2,7 @@
 import type { Position } from 'css-box-model';
 import type { DraggableDimension } from '../../../../types';
 
-export type InListResult = {|
+export type MoveFromResult = {|
   newPageBorderBoxCenter: Position,
   addToDisplacement: ?DraggableDimension,
   willDisplaceForward: boolean,

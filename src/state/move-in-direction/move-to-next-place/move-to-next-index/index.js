@@ -1,14 +1,14 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
 import getDisplacedBy from '../../../get-displaced-by';
 import getDisplacementMap from '../../../get-displacement-map';
-import { subtract, patch, isEqual } from '../../../position';
-import getInListResult from './in-list';
+import { subtract } from '../../../position';
+import fromReorder from './from-reorder';
+import fromCombine from './from-combine';
 import type { Result } from '../move-to-next-place-types';
-import type { InListResult } from './move-to-next-index-types';
+import type { MoveFromResult } from './move-to-next-index-types';
 import type {
   Axis,
   DraggableDimension,
@@ -18,7 +18,6 @@ import type {
   DragImpact,
   Viewport,
   DisplacedBy,
-  DraggableLocation,
 } from '../../../../types';
 
 export type Args = {|
@@ -44,28 +43,33 @@ export default ({
   previousPageBorderBoxCenter,
   viewport,
 }: Args): ?Result => {
-  const location: ?DraggableLocation = previousImpact.destination;
-  invariant(location, 'requires a previous location to move');
+  const move: ?MoveFromResult =
+    fromReorder({
+      isMovingForward,
+      isInHomeList,
+      draggable,
+      destination,
+      draggables,
+      previousImpact,
+      insideDestination,
+      previousPageBorderBoxCenter,
+    }) ||
+    fromCombine({
+      isMovingForward,
+      isInHomeList,
+      draggable,
+      destination,
+      draggables,
+      previousImpact,
+    });
 
-  const inList: ?InListResult = getInListResult({
-    isMovingForward,
-    isInHomeList,
-    draggable,
-    location,
-    destination,
-    draggables,
-    previousImpact,
-    insideDestination,
-    previousPageBorderBoxCenter,
-  });
-
-  if (!inList) {
+  if (!move) {
     return null;
   }
 
-  const newPageBorderBoxCenter: Position = inList.newPageBorderBoxCenter;
-  const willDisplaceForward: boolean = inList.willDisplaceForward;
-  const proposedIndex: number = inList.proposedIndex;
+  const newPageBorderBoxCenter: Position = move.newPageBorderBoxCenter;
+  const willDisplaceForward: boolean = move.willDisplaceForward;
+  const proposedIndex: number = move.proposedIndex;
   const axis: Axis = destination.axis;
 
   const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
@@ -82,9 +86,9 @@ export default ({
     onlyOnMainAxis: true,
   });
 
-  const displaced: Displacement[] = inList.addToDisplacement
+  const displaced: Displacement[] = move.addToDisplacement
     ? withFirstAdded({
-        add: inList.addToDisplacement,
+        add: move.addToDisplacement,
         destination,
         draggables,
         previousImpact,
