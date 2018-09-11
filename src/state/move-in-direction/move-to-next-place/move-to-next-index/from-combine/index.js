@@ -37,21 +37,31 @@ export default ({
     return null;
   }
 
-  return isInHomeList
-    ? inHomeList({
-        isMovingForward,
-        draggable,
-        destination,
-        merge,
-        movement: previousImpact.movement,
-        draggables,
-      })
-    : inForeignList({
-        isMovingForward,
-        draggable,
-        destination,
-        merge,
-        movement: previousImpact.movement,
-        draggables,
-      });
+  return inHomeList({
+    isInHomeList,
+    isMovingForward,
+    draggable,
+    destination,
+    merge,
+    movement: previousImpact.movement,
+    draggables,
+  });
+
+  // return isInHomeList
+  //   ? inHomeList({
+  //       isMovingForward,
+  //       draggable,
+  //       destination,
+  //       merge,
+  //       movement: previousImpact.movement,
+  //       draggables,
+  //     })
+  //   : inForeignList({
+  //       isMovingForward,
+  //       draggable,
+  //       destination,
+  //       merge,
+  //       movement: previousImpact.movement,
+  //       draggables,
+  //     });
 };

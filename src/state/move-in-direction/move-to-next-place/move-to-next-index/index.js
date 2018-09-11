@@ -70,6 +70,8 @@ export default ({
     return null;
   }
 
+  console.log('proposed index', move.proposedIndex);
+
   const newPageBorderBoxCenter: Position = move.newPageBorderBoxCenter;
   const willDisplaceForward: boolean = move.willDisplaceForward;
   const proposedIndex: number = move.proposedIndex;
