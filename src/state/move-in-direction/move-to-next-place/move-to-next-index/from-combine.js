@@ -1,5 +1,7 @@
 // @flow
+import { offset, type Position, type BoxModel } from 'css-box-model';
 import type {
+  Axis,
   DroppableDimension,
   DragImpact,
   DragMovement,
@@ -8,6 +10,8 @@ import type {
   DraggableDimensionMap,
   DraggableId,
 } from '../../../../types';
+import { goAfter, goBefore } from '../../../move-relative-to';
+import { patch } from '../../../position';
 import type { MoveFromResult } from './move-to-next-index-types';
 
 type Args = {|
@@ -37,26 +41,196 @@ export default ({
     return null;
   }
 
-  const combineWithId: DraggableId = merge.combine.draggableId;
-  const combineWith: DraggableDimension = draggables[combineWithId];
-  const combineWithStartIndex: number = combineWith.descriptor.index;
+  const axis: Axis = destination.axis;
+  const combineId: DraggableId = merge.combine.draggableId;
+  const combine: DraggableDimension = draggables[combineId];
+  const combineStartIndex: number = combine.descriptor.index;
   const movement: DragMovement = previousImpact.movement;
-  const isTargetDisplaced: boolean = Boolean(movement.map[combineWithId]);
-  const isDisplacedForward: boolean =
-    isTargetDisplaced && movement.willDisplaceForward;
+  const willDisplaceForward: boolean = movement.willDisplaceForward;
+  const isCombineDisplaced: boolean = Boolean(movement.map[combineId]);
+  const isDisplacedForward: boolean = isCombineDisplaced && willDisplaceForward;
 
-  const combineWithVisualIndex: number = (() => {
-    if (!isTargetDisplaced) {
-      return combineWithStartIndex;
+  const combineVisualIndex: number = (() => {
+    if (!isCombineDisplaced) {
+      return combineStartIndex;
     }
-    return isDisplacedForward
-      ? combineWithStartIndex + 1
-      : combineWithStartIndex - 1;
+    return isDisplacedForward ? combineStartIndex + 1 : combineStartIndex - 1;
   })();
 
-  // const { proposedIndex, addToDisplacement } = (() => {
+  console.log('is moving forward', isMovingForward);
+  console.log('isCombineDisplaced', isCombineDisplaced);
+  console.log('will displace forward', willDisplaceForward);
+  console.log('displace by', movement.displacedBy.value);
+  const unshifted: BoxModel = combine.page;
+  if (isCombineDisplaced) {
+    const displaced: BoxModel = offset(unshifted, movement.displacedBy.point);
+    if (isDisplacedForward) {
+      // will eat up displacement
+      if (isMovingForward) {
+        const newPageBorderBoxCenter: Position = goAfter({
+          axis,
+          moveRelativeTo: unshifted,
+          isMoving: draggable.page,
+        });
+        return {
+          newPageBorderBoxCenter,
+          changeDisplacement: {
+            type: 'REMOVE_CLOSEST',
+          },
+          willDisplaceForward,
+          proposedIndex: combine.descriptor.index + 1,
+        };
+      }
+      // moving backwards - should maintain displacement
+      const newPageBorderBoxCenter: Position = goBefore({
+        axis,
+        moveRelativeTo: displaced,
+        isMoving: draggable.page,
+      });
+      return {
+        newPageBorderBoxCenter,
+        changeDisplacement: {
+          type: 'DO_NOTHING',
+        },
+        willDisplaceForward,
+        proposedIndex: combine.descriptor.index,
+      };
+    }
+    // displaced backwards
 
-  // })();
+    // should maintain displacement
+    if (isMovingForward) {
+      const newPageBorderBoxCenter: Position = goAfter({
+        axis,
+        moveRelativeTo: displaced,
+        isMoving: draggable.page,
+      });
+      return {
+        newPageBorderBoxCenter,
+        changeDisplacement: {
+          type: 'DO_NOTHING',
+        },
+        willDisplaceForward,
+        proposedIndex: combine.descriptor.index + 1,
+      };
+    }
+    // should remove displacement
+    const newPageBorderBoxCenter: Position = goBefore({
+      axis,
+      moveRelativeTo: unshifted,
+      isMoving: draggable.page,
+    });
+    return {
+      newPageBorderBoxCenter,
+      changeDisplacement: {
+        type: 'REMOVE_CLOSEST',
+      },
+      willDisplaceForward,
+      proposedIndex: combine.descriptor.index - 1,
+    };
+  }
+
+  const proposedIndex: number = (() => {
+    if(willDisplaceForward
+  })();
+
+  const willDisplaceForward: boolean = getWillDisplaceForward({
+    isInHomeList,
+    proposedIndex,
+    startIndexInHome,
+  });
+
+  const wouldDisplaceBy: Position = patch(
+    axis.line,
+    draggable.displaceBy[axis.line] * (willDisplaceForward ? 1 : -1),
+  );
+  console.log('would displace by', wouldDisplaceBy);
+  const displaced: BoxModel = offset(unshifted, wouldDisplaceBy);
+
+  // combine is not displaced
+  if (willDisplaceForward) {
+    if (isMovingForward) {
+      console.log('will displace forward', 'isMovingForward');
+      const newPageBorderBoxCenter: Position = goAfter({
+        axis,
+        moveRelativeTo: unshifted,
+        isMoving: draggable.page,
+      });
+      return {
+        newPageBorderBoxCenter,
+        changeDisplacement: {
+          type: 'DO_NOTHING',
+        },
+        willDisplaceForward,
+        proposedIndex: combine.descriptor.index,
+      };
+    }
+    // is moving backwards
+    const newPageBorderBoxCenter: Position = goBefore({
+      axis,
+      moveRelativeTo: displaced,
+      isMoving: draggable.page,
+    });
+    return {
+      newPageBorderBoxCenter,
+      changeDisplacement: {
+        type: 'ADD_CLOSEST',
+        add: combine,
+      },
+      willDisplaceForward,
+      proposedIndex: combine.descriptor.index,
+    };
+  }
+  // not displaced && will displace backwards
+
+  if (isMovingForward) {
+    const newPageBorderBoxCenter: Position = goAfter({
+      axis,
+      moveRelativeTo: displaced,
+      isMoving: draggable.page,
+    });
+    return {
+      newPageBorderBoxCenter,
+      changeDisplacement: {
+        type: 'ADD_CLOSEST',
+        add: combine,
+      },
+      willDisplaceForward,
+      proposedIndex: combine.descriptor.index + 1,
+    };
+  }
+  const newPageBorderBoxCenter: Position = goBefore({
+    axis,
+    moveRelativeTo: displaced,
+    isMoving: draggable.page,
+  });
+  return {
+    newPageBorderBoxCenter,
+    changeDisplacement: {
+      type: 'ADD_CLOSEST',
+      add: combine,
+    },
+    willDisplaceForward,
+    proposedIndex: combine.descriptor.index,
+  };
+
+  // only for home list for now
+
+  // combine is not displaced
+  // console.log('target not displaced - lets figure this out');
+
+  // // this needs to be aware of whether we are in the home or not
+  // console.log(
+  //   isMovingForward
+  //     ? 'move after combine, should displace'
+  //     : 'move before combine, do not displace',
+  // );
+
+  // displaced forward + moving forward: undo displacement and move into index of displaced item
+  // displaced forward + moving backwards: maintain current displacement and move into position of non-displaced item
+  // displaced backwards + moving forward:  maintain current displacement and move into position of non-displaced item
+  // displaced backwards + moving backward: undo displacement and move into index of displaced item
+  // not displaced + moving forward: ???
 
   // const proposedIndex: number = (() => {
   //   // the movement will undo the displacement?
@@ -84,5 +258,5 @@ export default ({
   //   proposedIndex,
   //   startIndexInHome,
   // });
-  console.log('visual index', combineWithVisualIndex);
+  // console.log('visual indcombineVisualIndexIndex);
 };

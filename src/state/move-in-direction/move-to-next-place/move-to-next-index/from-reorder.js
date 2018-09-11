@@ -11,7 +11,10 @@ import type {
   DragImpact,
   DraggableLocation,
 } from '../../../../types';
-import type { MoveFromResult } from './move-to-next-index-types';
+import type {
+  MoveFromResult,
+  ChangeDisplacement,
+} from './move-to-next-index-types';
 import getWillDisplaceForward from '../../../will-displace-forward';
 
 type Args = {|
@@ -112,9 +115,18 @@ export default ({
     shift,
   );
 
+  const change: ChangeDisplacement = isIncreasingDisplacement
+    ? {
+        type: 'ADD_CLOSEST',
+        add: target,
+      }
+    : {
+        type: 'REMOVE_CLOSEST',
+      };
+
   return {
     newPageBorderBoxCenter,
-    addToDisplacement: isIncreasingDisplacement ? target : null,
+    changeDisplacement: change,
     willDisplaceForward,
     proposedIndex,
   };

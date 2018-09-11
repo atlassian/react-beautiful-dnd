@@ -8,7 +8,10 @@ import { subtract } from '../../../position';
 import fromReorder from './from-reorder';
 import fromCombine from './from-combine';
 import type { Result } from '../move-to-next-place-types';
-import type { MoveFromResult } from './move-to-next-index-types';
+import type {
+  MoveFromResult,
+  ChangeDisplacement,
+} from './move-to-next-index-types';
 import type {
   Axis,
   DraggableDimension,
@@ -86,21 +89,31 @@ export default ({
     onlyOnMainAxis: true,
   });
 
-  const displaced: Displacement[] = move.addToDisplacement
-    ? withFirstAdded({
-        add: move.addToDisplacement,
+  const displaced: Displacement[] = (() => {
+    const change: ChangeDisplacement = move.changeDisplacement;
+
+    if (change.type === 'DO_NOTHING') {
+      return previousImpact.movement.displaced;
+    }
+
+    if (change.type === 'ADD_CLOSEST') {
+      return withFirstAdded({
+        add: change.add,
         destination,
         draggables,
         previousImpact,
         viewport,
-      })
-    : withFirstRemoved({
-        dragging: draggable,
-        destination,
-        isVisibleInNewLocation,
-        previousImpact,
-        draggables,
       });
+    }
+
+    return withFirstRemoved({
+      dragging: draggable,
+      destination,
+      isVisibleInNewLocation,
+      previousImpact,
+      draggables,
+    });
+  })();
 
   const displacedBy: DisplacedBy = getDisplacedBy(
     axis,
