@@ -11,8 +11,12 @@ const flag: string = '__react-beautiful-dnd-debug-timings-hook__';
 
 const isTimingsEnabled = (): boolean => Boolean(window[flag]);
 
+export const forceEnable = () => {
+  window[flag] = true;
+};
+
 // Debug: uncomment to enable
-// window[flag] = true;
+// forceEnable();
 
 export const start = (key: string) => {
   // we want to strip all the code out for production builds
@@ -41,7 +45,10 @@ export const finish = (key: string) => {
 
     const previous: ?number = records[key];
 
-    invariant(previous, 'cannot finish timing as no previous time found');
+    if (!previous) {
+      console.warn('cannot finish timing as no previous time found', key);
+      return;
+    }
 
     const result: number = now - previous;
     const rounded: string = result.toFixed(2);

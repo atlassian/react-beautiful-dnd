@@ -75,7 +75,7 @@ onDragUpdate = (update: DragUpdate, provided: HookProvided) => {
 
 The user has moved backwards or forwards within the same list, so we want to tell the user what position they are now in.
 
-**Default message**: "You have moved the item to position `${update.destination.index + 1}`".
+**Default message**: "You have moved the item from position `${update.source.index + 1}` to position `${update.destination.index + 1}`".
 
 Think about including of `${listLength}` in your messaging.
 
@@ -83,7 +83,11 @@ Think about including of `${listLength}` in your messaging.
 
 The user has moved on the cross axis into a different list, so we want to tell them a number of things.
 
-**Default message**: "You have moved the item from list `${update.source.droppableId}` in position `${update.source.index + 1}` to list `${update.destination.droppableId}` in position `${update.destination.index + 1}`".
+**Default message**
+"You have moved the item from position `${update.source.index + 1}`
+in list `${source.droppableId}`
+to list `${destination.droppableId}`
+in position `${update.destination.index + 1}`"
 
 We tell the user the following:
 
@@ -94,9 +98,13 @@ We tell the user the following:
 
 Think about using friendlier text for the name of the droppable, and including the length of the lists in the messaging.
 
-**Message with more info**: "You have moved the item from list `${sourceName}` in position `${lastIndex}` of `${sourceLength}` to list `${destinationName}` in position `${newIndex}` of `${destinationLength}`".
+**Message with more info**: "You have moved the item from list `${sourceName}` in position `${sourcePosition}` of `${sourceLength}` to list `${destinationName}` in position `${newPosition}` of `${destinationLength}`".
 
-#### Scenario 3. Moved over no list
+#### Scenario 4. Combining in same list
+
+#### Scenario 5: Combining in different list
+
+#### Scenario 6. Over no drop target
 
 You can't do this with a keyboard, but it's worthwhile having a message for this scenario, in case the user has a pointer for dragging.
 
