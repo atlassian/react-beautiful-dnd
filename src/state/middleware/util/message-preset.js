@@ -1,5 +1,12 @@
 // @flow
-import type { DragStart, DragUpdate, DropResult } from '../../../types';
+import type {
+  DraggableId,
+  DragStart,
+  DragUpdate,
+  DropResult,
+  DraggableLocation,
+  Combine,
+} from '../../../types';
 
 export type MessagePreset = {|
   onDragStart: (start: DragStart) => string,
@@ -7,81 +14,107 @@ export type MessagePreset = {|
   onDragEnd: (result: DropResult) => string,
 |};
 
+const position = (index: number): number => index + 1;
+
 // We cannot list what index the Droppable is in automatically as we are not sure how
 // the Droppable's have been configured
 const onDragStart = (start: DragStart): string => `
-  You have lifted an item in position ${start.source.index + 1}.
+  You have lifted an item in position ${position(start.source.index)}.
   Use the arrow keys to move, space bar to drop, and escape to cancel.
 `;
 
-const onDragUpdate = (update: DragUpdate): string => {
-  if (!update.destination) {
-    return 'You are currently not dragging over a droppable area';
-  }
+const withLocation = (
+  source: DraggableLocation,
+  destination: DraggableLocation,
+) => {
+  const isInHomeList: boolean = source.droppableId === destination.droppableId;
 
-  // Moving in the same list
-  if (update.source.droppableId === update.destination.droppableId) {
-    return `You have moved the item to position ${update.destination.index +
-      1}`;
-  }
+  const startPosition: number = position(source.index);
+  const endPosition: number = position(destination.index);
 
-  // Moving into a new list
+  if (isInHomeList) {
+    return `
+      You have moved the item from position ${startPosition}
+      to position ${endPosition}
+    `;
+  }
 
   return `
-    You have moved the item from list ${
-      update.source.droppableId
-    } in position ${update.source.index + 1}
-    to list ${update.destination.droppableId} in position ${update.destination
-    .index + 1}
+    You have moved the item from position ${startPosition}
+    in list ${source.droppableId}
+    to list ${destination.droppableId}
+    in position ${endPosition}
   `;
 };
+
+const withCombine = (
+  id: DraggableId,
+  source: DraggableLocation,
+  combine: Combine,
+): string => {
+  const inHomeList: boolean = source.droppableId === combine.droppableId;
+
+  if (inHomeList) {
+    return `
+      The item ${id}
+      has been combined with ${combine.draggableId}`;
+  }
+
+  return `
+      The item ${id}
+      in list ${source.droppableId}
+      has been combined with ${combine.draggableId}
+      in list ${combine.droppableId}
+    `;
+};
+
+const onDragUpdate = (update: DragUpdate): string => {
+  const location: ?DraggableLocation = update.destination;
+  if (location) {
+    return withLocation(update.source, location);
+  }
+
+  const combine: ?Combine = update.combine;
+  if (combine) {
+    return withCombine(update.draggableId, update.source, combine);
+  }
+
+  return 'You are over an area that cannot be dropped on';
+};
+
+const returnedToStart = (source: DraggableLocation): string => `
+  The item has returned to its starting position
+  of ${position(source.index)}
+`;
 
 const onDragEnd = (result: DropResult): string => {
   if (result.reason === 'CANCEL') {
     return `
       Movement cancelled.
-      The item has returned to its starting position of ${result.source.index +
-        1}
+      ${returnedToStart(result.source)}
     `;
   }
 
-  // Not moved anywhere (such as when dropped over no list)
-  if (!result.destination) {
-    return `
-      The item has been dropped while not over a droppable location.
-      The item has returned to its starting position of ${result.source.index +
-        1}
-    `;
-  }
+  const location: ?DraggableLocation = result.destination;
+  const combine: ?Combine = result.combine;
 
-  // Dropped in home list
-  if (result.source.droppableId === result.destination.droppableId) {
-    // It is in the position that it started in
-    if (result.source.index === result.destination.index) {
-      return `
-        You have dropped the item.
-        It has been dropped on its starting position of ${result.source.index +
-          1}
-      `;
-    }
-
-    // It is in a new position
+  if (location) {
     return `
       You have dropped the item.
-      It has moved from position ${result.source.index + 1} to ${result
-      .destination.index + 1}
+      ${withLocation(result.source, location)}
     `;
   }
 
-  // Dropped in a new list
+  if (combine) {
+    return `
+      You have dropped the item.
+      ${withCombine(result.draggableId, result.source, combine)}
+    `;
+  }
+
   return `
-    You have dropped the item.
-    It has moved from position ${result.source.index + 1} in list ${
-    result.source.droppableId
-  }
-    to position ${result.destination.index + 1} in list ${
-    result.destination.droppableId
-  }
+    The item has been dropped while not over a drop area.
+    ${returnedToStart(result.source)}
   `;
 };
 
