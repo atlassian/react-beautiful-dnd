@@ -2,7 +2,10 @@
 
 type CancelFn = () => void;
 
-const isSupported: boolean = Boolean(requestIdleCallback && cancelIdleCallback);
+const isSupported: boolean =
+  typeof window !== 'undefined' &&
+  typeof requestIdleCallback !== 'undefined' &&
+  typeof cancelAnimationFrame !== 'undefined';
 const noop: CancelFn = () => {};
 
 // Flow does not have this type so I am making it here
