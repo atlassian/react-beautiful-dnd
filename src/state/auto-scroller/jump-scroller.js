@@ -82,9 +82,6 @@ export default ({
 
     // window can only absorb a part of the scroll
     const whatTheWindowCanScroll: Position = subtract(change, overlap);
-      'partial window scroll scroll absorb',
-      whatTheWindowCanScroll.y,
-    );
     scrollWindow(whatTheWindowCanScroll);
 
     const remainder: Position = subtract(change, whatTheWindowCanScroll);
