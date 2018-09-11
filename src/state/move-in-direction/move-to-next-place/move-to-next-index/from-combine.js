@@ -50,13 +50,6 @@ export default ({
 
   const isCombineDisplaced: boolean = Boolean(movement.map[combineId]);
 
-  // const combineVisualIndex: number = (() => {
-  //   if (!isCombineDisplaced) {
-  //     return combineStartIndex;
-  //   }
-  //   return isDisplacedForward ? combineStartIndex + 1 : combineStartIndex - 1;
-  // })();
-
   const unshifted: BoxModel = combine.page;
   console.log('is combine displaced?', isCombineDisplaced);
   console.log('is moving forward?', isMovingForward);
