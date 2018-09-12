@@ -77,7 +77,9 @@ export type Provided = {|
 
 export type DroppingState = {|
   reason: DropReason,
+  // to easily enable patching of styles
   duration: number,
+  curve: string,
 |};
 
 export type StateSnapshot = {|

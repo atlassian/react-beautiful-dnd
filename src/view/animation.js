@@ -66,7 +66,7 @@ const durations = {
   slide: 0.2,
 };
 
-const curves = {
+export const curves = {
   outOfTheWay: 'cubic-bezier(0.2, 0, 0, 1)',
   drop: 'cubic-bezier(.2,1,.1,1)',
 };

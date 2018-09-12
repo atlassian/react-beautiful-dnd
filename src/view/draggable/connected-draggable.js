@@ -7,6 +7,8 @@ import Draggable from './draggable';
 import { storeKey } from '../context-keys';
 import { origin } from '../../state/position';
 import isStrictEqual from '../is-strict-equal';
+// reaching into view :(
+import { curves } from '../animation';
 import {
   lift as liftAction,
   move as moveAction,
@@ -187,8 +189,9 @@ export const makeMapStateToProps = (): Selector => {
       return {
         isDragging: false,
         dropping: {
-          duration,
           reason,
+          duration,
+          curve: curves.drop,
         },
         offset: pending.newHomeOffset,
         // still need to provide the dimension for the placeholder
