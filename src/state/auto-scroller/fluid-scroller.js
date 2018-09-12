@@ -211,7 +211,7 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
     const subject: Rect = draggable.page.marginBox;
 
     // 1. Can we scroll the viewport?
-    if (state.canAutoScrollWindow) {
+    if (state.isWindowScrollAllowed) {
       const viewport: Viewport = state.viewport;
       const requiredWindowScroll: ?Position = getRequiredScroll({
         container: viewport.frame,

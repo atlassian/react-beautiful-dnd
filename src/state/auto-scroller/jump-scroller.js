@@ -121,7 +121,7 @@ export default ({
 
     const viewport: Viewport = state.viewport;
     const windowRemainder: ?Position = scrollWindowAsMuchAsItCan(
-      state.canAutoScrollWindow,
+      state.isWindowScrollAllowed,
       viewport,
       droppableRemainder,
     );

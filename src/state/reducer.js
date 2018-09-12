@@ -59,9 +59,11 @@ export default (state: State = idle, action: Action): State => {
     };
 
     // Can only auto scroll the window if every list is not fixed on the page
-    const canAutoScrollWindow: boolean = toDroppableList(
+    const isWindowScrollAllowed: boolean = toDroppableList(
       dimensions.droppables,
     ).every((droppable: DroppableDimension) => !droppable.isFixedOnPage);
+
+    console.log('isWindowScrollAllowed?', isWindowScrollAllowed);
 
     const result: DraggingState = {
       phase: 'DRAGGING',
@@ -71,7 +73,7 @@ export default (state: State = idle, action: Action): State => {
       dimensions,
       initial,
       current: initial,
-      canAutoScrollWindow,
+      isWindowScrollAllowed,
       impact: getHomeImpact(critical, dimensions),
       viewport,
       // TODO: what should the default be?
@@ -296,6 +298,15 @@ export default (state: State = idle, action: Action): State => {
       isMovementAllowed(state),
       `Cannot move by window in phase ${state.phase}`,
     );
+
+    if (!state.isWindowScrollAllowed) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn(
+          'Window scrolling is currently not supported for fixed lists. Aborting drag',
+        );
+      }
+      return idle;
+    }
 
     const newScroll: Position = action.payload.scroll;
 

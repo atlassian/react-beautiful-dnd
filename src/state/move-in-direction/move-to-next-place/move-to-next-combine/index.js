@@ -89,7 +89,6 @@ export default ({
   }
 
   const target: DraggableDimension = current[targetIndex];
-  console.log('target id', target.descriptor.id);
   const isTargetDisplaced: boolean = Boolean(
     previousImpact.movement.map[target.descriptor.id],
   );

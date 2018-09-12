@@ -311,7 +311,7 @@ export type DraggingState = {|
   impact: DragImpact,
   viewport: Viewport,
   // when there is a fixed list we want to opt out of this behaviour
-  canAutoScrollWindow: boolean,
+  isWindowScrollAllowed: boolean,
   // if we need to jump the scroll (keyboard dragging)
   scrollJumpRequest: ?Position,
   // whether or not draggable movements should be animated
