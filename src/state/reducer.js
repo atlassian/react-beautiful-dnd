@@ -63,8 +63,6 @@ export default (state: State = idle, action: Action): State => {
       dimensions.droppables,
     ).every((droppable: DroppableDimension) => !droppable.isFixedOnPage);
 
-    console.log('isWindowScrollAllowed?', isWindowScrollAllowed);
-
     const result: DraggingState = {
       phase: 'DRAGGING',
       isDragging: true,

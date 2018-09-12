@@ -239,7 +239,6 @@ export const makeMapStateToProps = (): Selector => {
     }
 
     // Otherwise
-    console.log('not dragging in selector');
     return null;
   };
 
