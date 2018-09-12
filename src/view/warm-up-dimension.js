@@ -44,7 +44,6 @@ export default (fn: () => mixed): CancelFn => {
         fn();
         callCount++;
       }
-      // console.log('call count', callCount);
     },
   );
 

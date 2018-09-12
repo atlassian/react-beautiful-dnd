@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 import { Component, type Node } from 'react';
 import invariant from 'tiny-invariant';
 import { dimensionMarshalKey } from '../context-keys';
-import warmUp from '../warm-up-dimension';
+import warmUpDimension from '../warm-up-dimension';
 import { origin } from '../../state/position';
 import type {
   DraggableDescriptor,
@@ -41,7 +41,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
   cancelWarmUp: () => void;
 
   componentDidMount() {
-    this.cancelWarmUp = warmUp(this.getDimension);
+    this.cancelWarmUp = warmUpDimension(this.getDimension);
     this.publish();
   }
 
