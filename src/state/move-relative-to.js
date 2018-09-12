@@ -24,17 +24,21 @@ const distanceFromEndToCenter = (axis: Axis, box: BoxModel): number =>
 export const goAfter = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
   patch(
     axis.line,
+    // start measuring from the bottom of the target
     moveRelativeTo.marginBox[axis.end] +
       distanceFromStartToCenter(axis, isMoving),
-    moveRelativeTo.marginBox.center[axis.crossAxisLine],
+    // align the moving item to the visual center of the target
+    moveRelativeTo.borderBox.center[axis.crossAxisLine],
   );
 
 export const goBefore = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
   patch(
     axis.line,
+    // start measuring from the top of the target
     moveRelativeTo.marginBox[axis.start] -
       distanceFromEndToCenter(axis, isMoving),
-    moveRelativeTo.marginBox.center[axis.crossAxisLine],
+    // align the moving item to the visual center of the target
+    moveRelativeTo.borderBox.center[axis.crossAxisLine],
   );
 
 type GoIntoArgs = {|
