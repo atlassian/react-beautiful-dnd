@@ -175,6 +175,10 @@ export default ({
     {
       eventName: 'wheel',
       fn: cancel,
+      // chrome says it is a violation for this to not be passive
+      // it is fine for it to be passive as we just cancel as soon as we get
+      // any event
+      options: { passive: true },
     },
     // Need to respond instantly to a jump scroll request
     // Not using the scheduler

@@ -64,7 +64,6 @@ export type Entries = {|
 export type StartPublishingResult = {|
   critical: Critical,
   dimensions: DimensionMap,
-  autoScrollWindow: boolean,
 |};
 
 export type DimensionMarshal = {|

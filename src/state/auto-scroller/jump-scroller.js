@@ -64,11 +64,16 @@ export default ({
   };
 
   const scrollWindowAsMuchAsItCan = (
+    isEnabled: boolean,
     viewport: Viewport,
     change: Position,
   ): ?Position => {
-    // window cannot absorb any of the scroll
+    if (!isEnabled) {
+      return change;
+    }
+
     if (!canScrollWindow(viewport, change)) {
+      // window cannot absorb any of the scroll
       return change;
     }
 
@@ -116,6 +121,7 @@ export default ({
 
     const viewport: Viewport = state.viewport;
     const windowRemainder: ?Position = scrollWindowAsMuchAsItCan(
+      state.canAutoScrollWindow,
       viewport,
       droppableRemainder,
     );

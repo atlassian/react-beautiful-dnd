@@ -206,27 +206,26 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
   const scroller = (state: DraggingState): void => {
     const center: Position = state.current.page.borderBoxCenter;
 
-    // 1. Can we scroll the viewport?
-
     const draggable: DraggableDimension =
       state.dimensions.draggables[state.critical.draggable.id];
     const subject: Rect = draggable.page.marginBox;
-    const viewport: Viewport = state.viewport;
 
-    // Don't do page scrolling when over a fixed droppable
-    const requiredWindowScroll: ?Position = getRequiredScroll({
-      container: viewport.frame,
-      subject,
-      center,
-    });
+    // 1. Can we scroll the viewport?
+    if (state.canAutoScrollWindow) {
+      const viewport: Viewport = state.viewport;
+      const requiredWindowScroll: ?Position = getRequiredScroll({
+        container: viewport.frame,
+        subject,
+        center,
+      });
 
-    if (
-      state.autoScrollWindow &&
-      requiredWindowScroll &&
-      canScrollWindow(viewport, requiredWindowScroll)
-    ) {
-      scheduleWindowScroll(requiredWindowScroll);
-      return;
+      if (
+        requiredWindowScroll &&
+        canScrollWindow(viewport, requiredWindowScroll)
+      ) {
+        scheduleWindowScroll(requiredWindowScroll);
+        return;
+      }
     }
 
     // 2. We are not scrolling the window. Can we scroll a Droppable?

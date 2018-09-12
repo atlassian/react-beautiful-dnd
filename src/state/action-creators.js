@@ -39,7 +39,6 @@ export type InitialPublishArgs = {|
   client: ClientPositions,
   viewport: Viewport,
   autoScrollMode: AutoScrollMode,
-  autoScrollWindow: boolean,
 |};
 
 export type InitialPublishAction = {|

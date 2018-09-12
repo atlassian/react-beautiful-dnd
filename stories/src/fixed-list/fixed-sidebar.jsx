@@ -1,5 +1,6 @@
 // @flow
-import React from 'react';
+import React, { type Node } from 'react';
+import ReactDOM from 'react-dom';
 import styled from 'react-emotion';
 import type { Quote } from '../types';
 import { colors, grid } from '../constants';
@@ -35,6 +36,15 @@ type ListProps = {|
   quotes: Quote[],
 |};
 
+const sidebarPortal: HTMLElement = document.createElement('div');
+sidebarPortal.classList.add('sidebar-portal');
+
+if (!document.body) {
+  throw new Error('body not ready for portal creation!');
+}
+
+document.body.appendChild(sidebarPortal);
+
 class Sidebar extends React.Component<ListProps> {
   render() {
     return (
@@ -51,13 +61,21 @@ class Sidebar extends React.Component<ListProps> {
                   {(
                     draggableProvided: DraggableProvided,
                     draggableSnapshot: DraggableStateSnapshot,
-                  ) => (
-                    <QuoteItem
-                      quote={quote}
-                      isDragging={draggableSnapshot.isDragging}
-                      provided={draggableProvided}
-                    />
-                  )}
+                  ) => {
+                    const usePortal: boolean = draggableSnapshot.isDragging;
+
+                    const child: Node = (
+                      <QuoteItem
+                        quote={quote}
+                        isDragging={draggableSnapshot.isDragging}
+                        provided={draggableProvided}
+                      />
+                    );
+                    if (!usePortal) {
+                      return child;
+                    }
+                    return ReactDOM.createPortal(child, sidebarPortal);
+                  }}
                 </Draggable>
               ))}
               {droppableProvided.placeholder}

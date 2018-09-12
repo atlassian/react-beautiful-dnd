@@ -12,6 +12,7 @@ import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
 import isMovementAllowed from './is-movement-allowed';
 import moveWithPositionUpdates from './move-with-position-updates';
+import { toDroppableList } from './dimension-structures';
 import type {
   State,
   DroppableDimension,
@@ -47,7 +48,6 @@ export default (state: State = idle, action: Action): State => {
       viewport,
       dimensions,
       autoScrollMode,
-      autoScrollWindow,
     } = action.payload;
 
     const initial: DragPositions = {
@@ -58,6 +58,11 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
+    // Can only auto scroll the window if every list is not fixed on the page
+    const canAutoScrollWindow: boolean = toDroppableList(
+      dimensions.droppables,
+    ).every((droppable: DroppableDimension) => !droppable.isFixedOnPage);
+
     const result: DraggingState = {
       phase: 'DRAGGING',
       isDragging: true,
@@ -66,7 +71,7 @@ export default (state: State = idle, action: Action): State => {
       dimensions,
       initial,
       current: initial,
-      autoScrollWindow,
+      canAutoScrollWindow,
       impact: getHomeImpact(critical, dimensions),
       viewport,
       // TODO: what should the default be?

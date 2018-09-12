@@ -48,10 +48,6 @@ export default ({
         entry.callbacks.getDimensionAndWatchScroll(windowScroll, scrollOptions),
     );
 
-  const autoScrollWindow: boolean = droppables.every(
-    (droppable: DroppableDimension): boolean => !droppable.isFixedOnPage,
-  );
-
   const draggables: DraggableDimension[] = Object.keys(entries.draggables)
     .map((id: DraggableId): DraggableEntry => entries.draggables[id])
     .filter(
@@ -63,17 +59,16 @@ export default ({
         entry.getDimension(windowScroll),
     );
 
-  timings.finish(timingKey);
-
   const dimensions: DimensionMap = {
     draggables: toDraggableMap(draggables),
     droppables: toDroppableMap(droppables),
   };
 
+  timings.finish(timingKey);
+
   const result: StartPublishingResult = {
     dimensions,
     critical,
-    autoScrollWindow,
   };
 
   return result;
