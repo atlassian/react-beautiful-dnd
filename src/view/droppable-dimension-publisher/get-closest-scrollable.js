@@ -4,7 +4,7 @@ const isScrollable = (...values: string[]): boolean =>
     (value: string): boolean => value === 'auto' || value === 'scroll',
   );
 
-const isElementScrollable = (el: Element) => {
+const isElementScrollable = (el: Element): boolean => {
   const style = window.getComputedStyle(el);
   return isScrollable(style.overflow, style.overflowY, style.overflowX);
 };

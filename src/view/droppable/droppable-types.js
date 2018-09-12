@@ -1,5 +1,6 @@
 // @flow
 import { type Node } from 'react';
+import { cancel } from '../../state/action-creators';
 import type {
   DraggableId,
   DroppableId,
@@ -23,6 +24,10 @@ export type Provided = {|
 export type StateSnapshot = {|
   isDraggingOver: boolean,
   draggingOverWith: ?DraggableId,
+|};
+
+export type DispatchProps = {|
+  cancel: typeof cancel,
 |};
 
 export type MapProps = {|
@@ -54,8 +59,9 @@ export type DefaultProps = {|
 |};
 
 export type Props = {|
-  ...OwnProps,
   ...MapProps,
+  ...DispatchProps,
+  ...OwnProps,
 |};
 
 // Having issues getting the correct type

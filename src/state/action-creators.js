@@ -39,6 +39,7 @@ export type InitialPublishArgs = {|
   client: ClientPositions,
   viewport: Viewport,
   autoScrollMode: AutoScrollMode,
+  autoScrollWindow: boolean,
 |};
 
 export type InitialPublishAction = {|
@@ -234,6 +235,8 @@ export const drop = (args: DropArgs) => ({
   type: 'DROP',
   payload: args,
 });
+
+export const cancel = () => drop({ reason: 'CANCEL' });
 
 export type DropPendingAction = {|
   type: 'DROP_PENDING',

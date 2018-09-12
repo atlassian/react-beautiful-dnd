@@ -52,7 +52,7 @@ export default ({
         // user timing api
         // require('../debug/middleware/user-timing').default,
         // debugging timer
-        // require('../debug/middleware/action-timing').default,
+        require('../debug/middleware/action-timing').default,
         // average action timer
         // require('../debug/middleware/action-timing-average').default(200),
 

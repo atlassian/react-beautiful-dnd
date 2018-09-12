@@ -12,7 +12,6 @@ import {
   type Spacing,
 } from 'css-box-model';
 import rafSchedule from 'raf-schd';
-import getClosestScrollable from '../get-closest-scrollable';
 import checkForNestedScrollContainers from './check-for-nested-scroll-container';
 import { dimensionMarshalKey } from '../context-keys';
 import { origin } from '../../state/position';
@@ -25,6 +24,7 @@ import type {
   DimensionMarshal,
   DroppableCallbacks,
 } from '../../state/dimension-marshal/dimension-marshal-types';
+import getEnv, { type Env } from './get-env';
 import type {
   DroppableId,
   TypeId,
@@ -44,8 +44,19 @@ type Props = {|
   ignoreContainerClipping: boolean,
   isDropDisabled: boolean,
   getDroppableRef: () => ?HTMLElement,
+  cancel: Function,
   children: Node,
 |};
+
+type WhileDragging = {|
+  env: Env,
+  scrollOptions: ScrollOptions,
+  // isWatchingScroll: boolean,
+  // isWatchingWindowScroll: boolean,
+|};
+
+const getClosestScrollable = (dragging: ?WhileDragging): ?Element =>
+  (dragging && dragging.env.closestScrollable) || null;
 
 const getScroll = (el: Element): Position => ({
   x: el.scrollLeft,
@@ -115,25 +126,20 @@ const getClient = (
   return client;
 };
 
-type WatchingScroll = {|
-  closestScrollable: Element,
-  options: ScrollOptions,
-|};
-
-type GetDimensionResult = {|
-  dimension: DroppableDimension,
-  closestScrollable: ?Element,
-|};
-
 const listenerOptions = {
   passive: true,
+};
+
+const windowScrollOptions = {
+  capture: false,
+  passive: false,
 };
 
 export default class DroppableDimensionPublisher extends React.Component<
   Props,
 > {
   /* eslint-disable react/sort-comp */
-  watchingScroll: ?WatchingScroll = null;
+  dragging: ?WhileDragging;
   callbacks: DroppableCallbacks;
   publishedDescriptor: ?DroppableDescriptor = null;
   cancelWarmUp: () => void;
@@ -143,7 +149,7 @@ export default class DroppableDimensionPublisher extends React.Component<
     const callbacks: DroppableCallbacks = {
       getDimensionAndWatchScroll: this.getDimensionAndWatchScroll,
       recollect: this.recollect,
-      unwatchScroll: this.unwatchScroll,
+      dragStopped: this.dragStopped,
       scroll: this.scroll,
     };
     this.callbacks = callbacks;
@@ -154,11 +160,12 @@ export default class DroppableDimensionPublisher extends React.Component<
   };
 
   getClosestScroll = (): Position => {
-    if (!this.watchingScroll) {
+    const dragging: ?WhileDragging = this.dragging;
+    if (!dragging || !dragging.env.closestScrollable) {
       return origin;
     }
 
-    return getScroll(this.watchingScroll.closestScrollable);
+    return getScroll(dragging.env.closestScrollable);
   };
 
   memoizedUpdateScroll = memoizeOne((x: number, y: number) => {
@@ -180,11 +187,14 @@ export default class DroppableDimensionPublisher extends React.Component<
   scheduleScrollUpdate = rafSchedule(this.updateScroll);
 
   onClosestScroll = () => {
+    const dragging: ?WhileDragging = this.dragging;
+    const closest: ?Element = getClosestScrollable(this.dragging);
+
     invariant(
-      this.watchingScroll,
+      dragging && closest,
       'Could not find scroll options while scrolling',
     );
-    const options: ScrollOptions = this.watchingScroll.options;
+    const options: ScrollOptions = dragging.scrollOptions;
     if (options.shouldPublishImmediately) {
       this.updateScroll();
       return;
@@ -193,59 +203,49 @@ export default class DroppableDimensionPublisher extends React.Component<
   };
 
   scroll = (change: Position) => {
-    invariant(
-      this.watchingScroll,
-      'Cannot scroll a droppable with no closest scrollable',
-    );
-    const { closestScrollable } = this.watchingScroll;
-    closestScrollable.scrollTop += change.y;
-    closestScrollable.scrollLeft += change.x;
+    const closest: ?Element = getClosestScrollable(this.dragging);
+    invariant(closest, 'Cannot scroll a droppable with no closest scrollable');
+    closest.scrollTop += change.y;
+    closest.scrollLeft += change.x;
   };
 
-  watchScroll = (closestScrollable: Element, options: ScrollOptions) => {
-    invariant(
-      !this.watchingScroll,
-      'Droppable cannot watch scroll as it is already watching scroll',
-    );
+  dragStopped = () => {
+    const dragging: ?WhileDragging = this.dragging;
+    invariant(dragging, 'Cannot stop drag when no previous one recorded');
+    const closest: ?Element = getClosestScrollable(dragging);
 
-    if (!closestScrollable) {
-      return;
+    // unwatch scroll
+    if (closest) {
+      this.scheduleScrollUpdate.cancel();
+      closest.removeEventListener(
+        'scroll',
+        this.onClosestScroll,
+        listenerOptions,
+      );
     }
 
-    this.watchingScroll = {
-      options,
-      closestScrollable,
-    };
+    // unwatch window scroll
+    if (dragging.env.isFixedOnPage) {
+      window.removeEventListener(
+        'scroll',
+        this.cancelOnWindowScroll,
+        windowScrollOptions,
+      );
+    }
 
-    closestScrollable.addEventListener(
-      'scroll',
-      this.onClosestScroll,
-      listenerOptions,
-    );
+    // goodbye old friend
+    this.dragging = null;
   };
 
-  unwatchScroll = () => {
-    // Was not previously watching scroll.
-    // It is possible for a Droppable to be asked to unwatch a scroll
-    // (Eg it has not been collected yet, and the drag ends)
-    const watching: ?WatchingScroll = this.watchingScroll;
-
-    if (!watching) {
-      return;
-    }
-
-    this.scheduleScrollUpdate.cancel();
-    watching.closestScrollable.removeEventListener(
-      'scroll',
-      this.onClosestScroll,
-      listenerOptions,
-    );
-    this.watchingScroll = null;
+  warmUp = () => {
+    const ref: ?HTMLElement = this.props.getDroppableRef();
+    invariant(ref, 'Cannot warm up droppable without a ref');
+    this.getDimension(getEnv(ref));
   };
 
   componentDidMount() {
     this.publish();
-    this.cancelWarmUp = warmUpDimension(this.getDimension);
+    this.cancelWarmUp = warmUpDimension(this.warmUp);
 
     // Note: not calling `marshal.updateDroppableIsEnabled()`
     // If the dimension marshal needs to get the dimension immediately
@@ -271,15 +271,15 @@ export default class DroppableDimensionPublisher extends React.Component<
   }
 
   componentWillUnmount() {
-    if (this.watchingScroll) {
+    if (this.dragging) {
       if (process.env.NODE_ENV !== 'production') {
-        console.warn('Unmounting droppable while it was watching scroll');
+        console.warn('Unmounting droppable while a drag is occurring');
       }
-      this.unwatchScroll();
+      this.dragStopped();
     }
 
-    this.unpublish();
     this.cancelWarmUp();
+    this.unpublish();
   }
 
   getMemoizedDescriptor = memoizeOne(
@@ -330,25 +330,34 @@ export default class DroppableDimensionPublisher extends React.Component<
     this.publishedDescriptor = null;
   };
 
+  cancelOnWindowScroll = () => {
+    this.props.cancel();
+  };
+
   // Used when Draggables are added or removed from a Droppable during a drag
   recollect = (): DroppableDimension => {
-    const watching: ?WatchingScroll = this.watchingScroll;
+    const dragging: ?WhileDragging = this.dragging;
     invariant(
-      watching,
+      dragging,
+      'Can only recollect droppable when a drag is occurring',
+    );
+    const closest: ?Element = getClosestScrollable(dragging);
+    invariant(
+      closest,
       'Can only recollect Droppable client for Droppables that have a scroll container',
     );
 
-    const targetRef: ?HTMLElement = this.props.getDroppableRef();
-    invariant(targetRef, 'Cannot recollect without a droppable ref');
-
     // TODO: needs to disable the placeholder for the collection
     // this.props.placeholder.hide();
-    const { dimension } = this.getDimension();
+    const dimension = this.getDimension(dragging.env);
     // this.props.placeholder.show();
     return dimension;
   };
 
-  getDimension = (windowScroll?: Position = origin): GetDimensionResult => {
+  getDimension = (
+    env: Env,
+    windowScroll?: Position = origin,
+  ): DroppableDimension => {
     const {
       direction,
       ignoreContainerClipping,
@@ -356,22 +365,12 @@ export default class DroppableDimensionPublisher extends React.Component<
       isCombineEnabled,
       getDroppableRef,
     } = this.props;
-
-    this.cancelWarmUp();
-    const targetRef: ?HTMLElement = getDroppableRef();
     const descriptor: ?DroppableDescriptor = this.publishedDescriptor;
-
-    invariant(
-      targetRef,
-      'Cannot calculate a dimension when not attached to the DOM',
-    );
     invariant(descriptor, 'Cannot get dimension for unpublished droppable');
+    const targetRef: ?HTMLElement = getDroppableRef();
+    invariant(targetRef);
 
-    const closestScrollable: ?Element = getClosestScrollable(targetRef);
-
-    // print a debug warning if using an unsupported nested scroll container setup
-    checkForNestedScrollContainers(closestScrollable);
-
+    const closestScrollable: ?Element = env.closestScrollable;
     const client: BoxModel = getClient(targetRef, closestScrollable);
     const page: BoxModel = withScroll(client, windowScroll);
 
@@ -399,23 +398,56 @@ export default class DroppableDimensionPublisher extends React.Component<
       descriptor,
       isEnabled: !isDropDisabled,
       isCombineEnabled,
+      isFixedOnPage: env.isFixedOnPage,
       direction,
       client,
       page,
       closest,
     });
 
-    return { dimension, closestScrollable };
+    return dimension;
   };
 
   getDimensionAndWatchScroll = (
     windowScroll: Position,
     options: ScrollOptions,
   ): DroppableDimension => {
-    const { dimension, closestScrollable } = this.getDimension(windowScroll);
-    if (closestScrollable) {
-      this.watchScroll(closestScrollable, options);
+    invariant(
+      !this.dragging,
+      'Cannot collect a droppable while a drag is occurring',
+    );
+    const targetRef: ?HTMLElement = this.props.getDroppableRef();
+    invariant(targetRef, 'Cannot collect without a droppable ref');
+    const env: Env = getEnv(targetRef);
+
+    const dragging: WhileDragging = {
+      env,
+      scrollOptions: options,
+    };
+    this.dragging = dragging;
+
+    const dimension: DroppableDimension = this.getDimension(env, windowScroll);
+
+    if (env.closestScrollable) {
+      // bind scroll listener
+      env.closestScrollable.addEventListener(
+        'scroll',
+        this.onClosestScroll,
+        listenerOptions,
+      );
+      // print a debug warning if using an unsupported nested scroll container setup
+      checkForNestedScrollContainers(env.closestScrollable);
     }
+
+    // cancel on window scroll when there is a fixed list
+    if (env.isFixedOnPage) {
+      window.addEventListener(
+        'scroll',
+        this.cancelOnWindowScroll,
+        windowScrollOptions,
+      );
+    }
+
     return dimension;
   };
 

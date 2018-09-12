@@ -7,6 +7,7 @@ import Droppable from './droppable';
 import isStrictEqual from '../is-strict-equal';
 import getIsDraggingOver from '../../state/droppable/is-dragging-over';
 import shouldUsePlaceholder from '../../state/droppable/should-use-placeholder';
+import { cancel as cancelAction } from '../../state/action-creators';
 import type {
   State,
   DroppableId,
@@ -16,9 +17,10 @@ import type {
   Placeholder,
 } from '../../types';
 import type {
+  MapProps,
+  DispatchProps,
   OwnProps,
   DefaultProps,
-  MapProps,
   Selector,
 } from './droppable-types';
 
@@ -90,14 +92,17 @@ export const makeMapStateToProps = (): Selector => {
   return selector;
 };
 
+const mapDispatchToProps: DispatchProps = {
+  cancel: cancelAction,
+};
+
 // Leaning heavily on the default shallow equality checking
 // that `connect` provides.
 // It avoids needing to do it own within `Droppable`
-const connectedDroppable: OwnProps => Node = (connect(
+const ConnectedDroppable: OwnProps => Node = (connect(
   // returning a function so each component can do its own memoization
   makeMapStateToProps,
-  // mapDispatchToProps - not using
-  null,
+  (mapDispatchToProps: any),
   // mergeProps - using default
   null,
   {
@@ -114,7 +119,7 @@ const connectedDroppable: OwnProps => Node = (connect(
   },
 ): any)(Droppable);
 
-connectedDroppable.defaultProps = ({
+ConnectedDroppable.defaultProps = ({
   type: 'DEFAULT',
   direction: 'vertical',
   isDropDisabled: false,
@@ -122,4 +127,4 @@ connectedDroppable.defaultProps = ({
   ignoreContainerClipping: false,
 }: DefaultProps);
 
-export default connectedDroppable;
+export default ConnectedDroppable;

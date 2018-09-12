@@ -47,6 +47,7 @@ export default (state: State = idle, action: Action): State => {
       viewport,
       dimensions,
       autoScrollMode,
+      autoScrollWindow,
     } = action.payload;
 
     const initial: DragPositions = {
@@ -65,6 +66,7 @@ export default (state: State = idle, action: Action): State => {
       dimensions,
       initial,
       current: initial,
+      autoScrollWindow,
       impact: getHomeImpact(critical, dimensions),
       viewport,
       // TODO: what should the default be?

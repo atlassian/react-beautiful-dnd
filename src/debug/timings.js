@@ -1,6 +1,4 @@
 // @flow
-import invariant from 'tiny-invariant';
-
 type Records = {
   [key: string]: number,
 };

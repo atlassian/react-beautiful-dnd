@@ -51,8 +51,10 @@ type GetDroppableArgs = {|
   descriptor: DroppableDescriptor,
   isEnabled: boolean,
   isCombineEnabled: boolean,
+  isFixedOnPage: boolean,
   direction: 'vertical' | 'horizontal',
   client: BoxModel,
+  // is null when in a fixed container
   page: BoxModel,
   closest?: ?Closest,
 |};
@@ -97,6 +99,7 @@ export const getDroppableDimension = ({
   descriptor,
   isEnabled,
   isCombineEnabled,
+  isFixedOnPage,
   direction,
   client,
   page,
@@ -149,6 +152,7 @@ export const getDroppableDimension = ({
   const dimension: DroppableDimension = {
     descriptor,
     isCombineEnabled,
+    isFixedOnPage,
     axis,
     isEnabled,
     client,

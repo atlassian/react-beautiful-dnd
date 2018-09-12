@@ -36,7 +36,7 @@ export default (getMarshal: () => DimensionMarshal) => ({
     scrollOptions,
   };
   // Let's get the marshal started!
-  const { critical, dimensions } = marshal.startPublishing(
+  const { critical, dimensions, autoScrollWindow } = marshal.startPublishing(
     request,
     viewport.scroll.current,
   );
@@ -47,6 +47,7 @@ export default (getMarshal: () => DimensionMarshal) => ({
       dimensions,
       client,
       autoScrollMode,
+      autoScrollWindow,
       viewport,
     }),
   );

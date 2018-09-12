@@ -129,6 +129,8 @@ export type DroppableDimension = {|
   // relative to the current viewport
   client: BoxModel,
   // relative to the whole page
+  isFixedOnPage: boolean,
+  // relative to the page
   page: BoxModel,
   // The container of the droppable
   frame: ?Scrollable,
@@ -308,6 +310,8 @@ export type DraggingState = {|
   direction: UserDirection,
   impact: DragImpact,
   viewport: Viewport,
+  // when there is a fixed list we want to opt out of this behaviour
+  autoScrollWindow: boolean,
   // if we need to jump the scroll (keyboard dragging)
   scrollJumpRequest: ?Position,
   // whether or not draggable movements should be animated

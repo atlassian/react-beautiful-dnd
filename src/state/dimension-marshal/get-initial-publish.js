@@ -7,14 +7,13 @@ import type {
   DraggableEntry,
   StartPublishingResult,
 } from './dimension-marshal-types';
+import { toDraggableMap, toDroppableMap } from '../dimension-structures';
 import type {
   DraggableId,
   DroppableId,
   DroppableDescriptor,
   DroppableDimension,
   DraggableDimension,
-  DraggableDimensionMap,
-  DroppableDimensionMap,
   DimensionMap,
   ScrollOptions,
   Critical,
@@ -38,7 +37,7 @@ export default ({
 
   const home: DroppableDescriptor = critical.droppable;
 
-  const droppables: DroppableDimensionMap = Object.keys(entries.droppables)
+  const droppables: DroppableDimension[] = Object.keys(entries.droppables)
     .map((id: DroppableId): DroppableEntry => entries.droppables[id])
     // Exclude things of the wrong type
     .filter(
@@ -47,16 +46,13 @@ export default ({
     .map(
       (entry: DroppableEntry): DroppableDimension =>
         entry.callbacks.getDimensionAndWatchScroll(windowScroll, scrollOptions),
-    )
-    .reduce(
-      (previous: DroppableDimensionMap, dimension: DroppableDimension) => {
-        previous[dimension.descriptor.id] = dimension;
-        return previous;
-      },
-      {},
     );
 
-  const draggables: DraggableDimensionMap = Object.keys(entries.draggables)
+  const autoScrollWindow: boolean = droppables.every(
+    (droppable: DroppableDimension): boolean => !droppable.isFixedOnPage,
+  );
+
+  const draggables: DraggableDimension[] = Object.keys(entries.draggables)
     .map((id: DraggableId): DraggableEntry => entries.draggables[id])
     .filter(
       (entry: DraggableEntry): boolean =>
@@ -65,22 +61,19 @@ export default ({
     .map(
       (entry: DraggableEntry): DraggableDimension =>
         entry.getDimension(windowScroll),
-    )
-    .reduce(
-      (previous: DraggableDimensionMap, dimension: DraggableDimension) => {
-        previous[dimension.descriptor.id] = dimension;
-        return previous;
-      },
-      {},
     );
 
   timings.finish(timingKey);
 
-  const dimensions: DimensionMap = { draggables, droppables };
+  const dimensions: DimensionMap = {
+    draggables: toDraggableMap(draggables),
+    droppables: toDroppableMap(droppables),
+  };
 
   const result: StartPublishingResult = {
     dimensions,
     critical,
+    autoScrollWindow,
   };
 
   return result;

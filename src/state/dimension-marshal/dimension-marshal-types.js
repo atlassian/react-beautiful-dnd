@@ -28,13 +28,14 @@ export type GetDroppableDimensionFn = (
 ) => DroppableDimension;
 
 export type DroppableCallbacks = {|
+  // a drag is starting
   getDimensionAndWatchScroll: GetDroppableDimensionFn,
   recollect: () => DroppableDimension,
   // scroll a droppable
   scroll: (change: Position) => void,
   // If the Droppable is listening for scroll events - it needs to stop!
   // Can be called on droppables that have not been asked to watch scroll
-  unwatchScroll: () => void,
+  dragStopped: () => void,
 |};
 
 export type DroppableEntry = {|
@@ -63,6 +64,7 @@ export type Entries = {|
 export type StartPublishingResult = {|
   critical: Critical,
   dimensions: DimensionMap,
+  autoScrollWindow: boolean,
 |};
 
 export type DimensionMarshal = {|

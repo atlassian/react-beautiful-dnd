@@ -36,14 +36,15 @@ export default (fn: () => mixed): CancelFn => {
       while (
         // trying to get to 10 calls
         callCount < 10 &&
-        // only allowing a max of one millisecond of operations
-        Date.now() - start < 1 &&
+        // only allowing a max of five milliseconds of operations
+        Date.now() - start < 5 &&
         // super safe: making sure we do not exceed the allowed time
         deadline.timeRemaining() > 0
       ) {
         fn();
         callCount++;
       }
+      // console.log('call count', callCount);
     },
   );
 

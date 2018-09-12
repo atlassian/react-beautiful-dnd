@@ -1,10 +1,11 @@
 // @flow
 import rafSchd from 'raf-schd';
 import type { Rect, Position, Spacing } from 'css-box-model';
-import { apply, isEqual, origin } from '../position';
-import getBestScrollableDroppable from './get-best-scrollable-droppable';
 import { horizontal, vertical } from '../axis';
-import { canScrollWindow, canPartiallyScroll } from './can-scroll';
+import { apply, isEqual, origin } from '../position';
+import { canPartiallyScroll, canScrollWindow } from './can-scroll';
+import getBestScrollableDroppable from './get-best-scrollable-droppable';
+import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 import type {
   Axis,
   DraggingState,
@@ -211,6 +212,8 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
       state.dimensions.draggables[state.critical.draggable.id];
     const subject: Rect = draggable.page.marginBox;
     const viewport: Viewport = state.viewport;
+
+    // Don't do page scrolling when over a fixed droppable
     const requiredWindowScroll: ?Position = getRequiredScroll({
       container: viewport.frame,
       subject,
@@ -218,6 +221,7 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
     });
 
     if (
+      state.autoScrollWindow &&
       requiredWindowScroll &&
       canScrollWindow(viewport, requiredWindowScroll)
     ) {
@@ -226,7 +230,6 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
     }
 
     // 2. We are not scrolling the window. Can we scroll a Droppable?
-
     const droppable: ?DroppableDimension = getBestScrollableDroppable({
       center,
       destination: state.impact.destination,

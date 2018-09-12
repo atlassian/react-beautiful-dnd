@@ -264,7 +264,7 @@ export default (callbacks: Callbacks) => {
           entries.droppables[id].descriptor.type === home.type,
       )
       .forEach((id: DroppableId) =>
-        entries.droppables[id].callbacks.unwatchScroll(),
+        entries.droppables[id].callbacks.dragStopped(),
       );
 
     // Finally - clear our collection
