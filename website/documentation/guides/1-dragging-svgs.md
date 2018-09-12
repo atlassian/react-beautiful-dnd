@@ -6,7 +6,7 @@
 
 We require that a `Draggable` and its drag handle be a `HTMLElement`. Almost every element that you make in the browser is a `HTMLElement`. [See huge list on MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Element). A `HTMLElement` extends [`Element`](https://developer.mozilla.org/en-US/docs/Web/API/Element)
 
-![HTMLElement](https://user-images.githubusercontent.com/2182637/42302315-9150d4e0-805d-11e8-8345-71bc32135203.png)
+![HTMLElement](../images/event-diagram1.png)
 
 ## Using focus
 
@@ -18,7 +18,7 @@ An element loses focus when it moves into a [`React Portal`](https://reactjs.org
 
 An `SVGElement` does not implement `HTMLElement`, and directly extends `Element`.
 
-![SVGElement](https://user-images.githubusercontent.com/2182637/42304424-8360143e-8069-11e8-9693-64f5e9763315.png)
+![SVGElement](../images/event-diagram2.png)
 
 `SVGElement` has **inconsistent**, and sometimes, **non-existent** focus management behavior across browsers. [more information](https://allyjs.io/tutorials/focusing-in-svg.html). Trying to call `svgElement.focus()` on IE11 will cause an exception. There are also additional concerns:
 
