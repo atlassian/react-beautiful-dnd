@@ -6,7 +6,6 @@ import type {
   DroppableDimension,
   DragImpact,
   CombineImpact,
-  UserDirection,
   DraggableLocation,
   Viewport,
 } from '../../../../types';
@@ -15,16 +14,10 @@ import withDroppableDisplacement from '../../../with-droppable-displacement';
 import { add } from '../../../position';
 import withScrollRequest from '../with-scroll-request';
 import isTotallyVisibleInNewLocation from '../is-totally-visible-in-new-location';
-
-const forward: UserDirection = {
-  vertical: 'down',
-  horizontal: 'right',
-};
-
-const backward: UserDirection = {
-  vertical: 'up',
-  horizontal: 'left',
-};
+import {
+  forward,
+  backward,
+} from '../../../user-direction/user-direction-preset';
 
 export type Args = {|
   isMovingForward: boolean,

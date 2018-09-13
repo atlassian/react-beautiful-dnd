@@ -7,7 +7,10 @@ import {
   isTotallyVisibleOnAxis,
   type Args as IsVisibleArgs,
 } from '../../visibility/is-visible';
-import type { DraggableDimension, DroppableDimension } from '../../../../types';
+import type {
+  DraggableDimension,
+  DroppableDimension,
+} from '../../../../../types';
 
 type Args = {|
   draggable: DraggableDimension,
