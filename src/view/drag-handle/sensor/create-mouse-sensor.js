@@ -89,7 +89,9 @@ export default ({
       stopPendingDrag();
       return;
     }
-    stopDragging(fn);
+    if (state.isDragging) {
+      stopDragging(fn);
+    }
   };
 
   const unmount = (): void => {

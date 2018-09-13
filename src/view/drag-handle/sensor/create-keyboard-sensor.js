@@ -53,7 +53,11 @@ export default ({
     setState({ isDragging: false });
     fn();
   };
-  const kill = () => stopDragging();
+  const kill = () => {
+    if (state.isDragging) {
+      stopDragging();
+    }
+  };
   const cancel = () => {
     stopDragging(callbacks.onCancel);
   };
