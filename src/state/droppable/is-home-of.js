@@ -1,5 +1,5 @@
 // @flow
-import type { DraggableDimension, DroppableDimension } from '../types';
+import type { DraggableDimension, DroppableDimension } from '../../types';
 
 export default (
   draggable: DraggableDimension,

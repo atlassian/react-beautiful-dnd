@@ -1,18 +1,15 @@
 // @flow
-import type { DroppableId, DraggableDescriptor, DragImpact } from '../../types';
-import isDraggingOver from './is-dragging-over';
+import type { DraggableDescriptor, DragImpact, DroppableId } from '../../types';
+import whatIsDraggedOver from './what-is-dragged-over';
 
 export default (
-  droppableId: DroppableId,
-  draggable: DraggableDescriptor,
+  descriptor: DraggableDescriptor,
   impact: DragImpact,
 ): boolean => {
-  const isHomeList: boolean = droppableId === draggable.droppableId;
-
-  // No droppable placeholder in home list
-  if (isHomeList) {
+  // use a placeholder when over a foreign list
+  const isOver: ?DroppableId = whatIsDraggedOver(impact);
+  if (!isOver) {
     return false;
   }
-
-  return isDraggingOver(droppableId, impact);
+  return isOver !== descriptor.droppableId;
 };

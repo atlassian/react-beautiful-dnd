@@ -2,7 +2,7 @@
 import { type Position } from 'css-box-model';
 import toHomeList from './to-home-list';
 import toForeignList from './to-foreign-list';
-import isInHomeList from '../../../is-in-home-list';
+import isHomeOf from '../../../droppable/is-home-of';
 import type { Result } from '../move-cross-axis-types';
 import type {
   DraggableDimension,
@@ -41,7 +41,7 @@ export default ({
   previousImpact,
   viewport,
 }: Args): ?Result =>
-  isInHomeList(draggable, destination)
+  isHomeOf(draggable, destination)
     ? // moving back to the home list
       toHomeList({
         moveIntoIndexOf: moveRelativeTo,

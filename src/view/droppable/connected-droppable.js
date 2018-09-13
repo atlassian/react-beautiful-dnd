@@ -5,8 +5,8 @@ import memoizeOne from 'memoize-one';
 import { storeKey } from '../context-keys';
 import Droppable from './droppable';
 import isStrictEqual from '../is-strict-equal';
-import getIsDraggingOver from '../../state/droppable/is-dragging-over';
 import shouldUsePlaceholder from '../../state/droppable/should-use-placeholder';
+import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
 import { cancel as cancelAction } from '../../state/action-creators';
 import type {
   State,
@@ -50,13 +50,12 @@ export const makeMapStateToProps = (): Selector => {
     draggable: DraggableDimension,
     impact: DragImpact,
   ) => {
-    const isOver: boolean = getIsDraggingOver(id, impact);
+    const isOver: boolean = whatIsDraggedOver(impact) === id;
     if (!isOver) {
       return defaultMapProps;
     }
 
     const usePlaceholder: boolean = shouldUsePlaceholder(
-      id,
       draggable.descriptor,
       impact,
     );

@@ -59,12 +59,8 @@ type Args = {|
 
 export default ({ state: oldState, draggable, impact }: Args): DimensionMap => {
   const base: DimensionMap = clearUnusedPlaceholder(oldState, impact);
-  const droppableId: ?DroppableId = whatIsDraggedOver(impact);
-  if (!droppableId) {
-    return base;
-  }
+
   const usePlaceholder: boolean = shouldUsePlaceholder(
-    droppableId,
     draggable.descriptor,
     impact,
   );
@@ -73,6 +69,10 @@ export default ({ state: oldState, draggable, impact }: Args): DimensionMap => {
     return base;
   }
 
+  const droppableId: ?DroppableId = whatIsDraggedOver(impact);
+  if (!droppableId) {
+    return base;
+  }
   const droppable: DroppableDimension = base.droppables[droppableId];
 
   // already have a placeholder - nothing to do here!

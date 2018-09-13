@@ -8,9 +8,9 @@ import type {
   DraggableLocation,
   DroppableDimension,
 } from '../../types';
-import isInHomeList from '../is-in-home-list';
 import { goBefore, goAfter, goIntoStart } from '../move-relative-to';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
+import isHomeOf from '../droppable/is-home-of';
 
 type NewHomeArgs = {|
   impact: DragImpact,
@@ -57,7 +57,7 @@ export default ({
 
   const { displaced, willDisplaceForward } = impact.movement;
 
-  const inHomeList: boolean = isInHomeList(draggable, destination);
+  const isOverHome: boolean = isHomeOf(draggable, destination);
 
   // there can be no displaced if:
   // - you are in the home index or
@@ -67,7 +67,7 @@ export default ({
     : null;
 
   // dropping back into home index
-  if (inHomeList && !lastDisplaced) {
+  if (isOverHome && !lastDisplaced) {
     return null;
   }
 

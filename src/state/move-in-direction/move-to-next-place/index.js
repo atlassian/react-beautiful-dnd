@@ -12,7 +12,7 @@ import type { Result } from './move-to-next-place-types';
 import moveToNextIndex from './move-to-next-index';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
 import moveToNextCombine from './move-to-next-combine';
-import getIsInHomeList from '../../is-in-home-list';
+import isHomeOf from '../../droppable/is-home-of';
 
 type Args = {|
   isMovingForward: boolean,
@@ -42,7 +42,7 @@ export default ({
     destination,
     draggables,
   );
-  const isInHomeList: boolean = getIsInHomeList(draggable, destination);
+  const isInHomeList: boolean = isHomeOf(draggable, destination);
 
   return (
     moveToNextCombine({
