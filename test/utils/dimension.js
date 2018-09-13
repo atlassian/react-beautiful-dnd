@@ -107,6 +107,8 @@ export const makeScrollable = (
     direction: axis.direction,
     client: newClient,
     page: newPage,
+    isCombineEnabled: false,
+    isFixedOnPage: false,
     closest: {
       // using old dimensions for frame
       client: droppable.client,
@@ -184,12 +186,17 @@ export const getDraggableDimension = ({
     padding,
     border,
   });
+  const displaceBy: Position = {
+    x: client.marginBox.width,
+    y: client.marginBox.height,
+  };
 
   const result: DraggableDimension = {
     descriptor,
     client,
     page: withScroll(client, windowScroll),
     placeholder: getPlaceholder(client),
+    displaceBy,
   };
 
   return result;
