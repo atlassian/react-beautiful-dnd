@@ -1,6 +1,6 @@
 // @flow
 import memoizeOne from 'memoize-one';
-import values from './object-values';
+import { values } from '../native-with-fallback';
 import type {
   DroppableDimension,
   DroppableDimensionMap,

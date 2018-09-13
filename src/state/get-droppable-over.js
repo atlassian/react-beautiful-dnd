@@ -2,6 +2,7 @@
 import type { Position, Rect } from 'css-box-model';
 import { toDroppableList } from './dimension-structures';
 import isPositionInFrame from './visibility/is-position-in-frame';
+import { find } from '../native-with-fallback';
 import type {
   DroppableDimension,
   DroppableDimensionMap,
@@ -14,7 +15,8 @@ type Args = {|
 |};
 
 export default ({ target, droppables }: Args): ?DroppableId => {
-  const maybe: ?DroppableDimension = toDroppableList(droppables).find(
+  const maybe: ?DroppableDimension = find(
+    toDroppableList(droppables),
     (droppable: DroppableDimension): boolean => {
       // only want enabled droppables
       if (!droppable.isEnabled) {

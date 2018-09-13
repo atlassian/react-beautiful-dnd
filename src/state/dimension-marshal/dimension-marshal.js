@@ -10,7 +10,7 @@ import type {
   LiftRequest,
   Critical,
 } from '../../types';
-import values from '../object-values';
+import { values } from '../../native-with-fallback';
 import type {
   DimensionMarshal,
   Callbacks,

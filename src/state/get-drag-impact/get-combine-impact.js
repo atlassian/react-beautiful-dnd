@@ -11,6 +11,7 @@ import type {
   DisplacementMap,
 } from '../../types';
 import isWithin from '../is-within';
+import { find } from '../../native-with-fallback';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
 
 const getDirectionForDetection = (
@@ -91,7 +92,8 @@ export default ({
   const canBeDisplacedBy: number = previousImpact.movement.displacedBy.value;
   const oldMerge: ?CombineImpact = previousImpact.merge;
 
-  const target: ?DraggableDimension = insideDestination.find(
+  const target: ?DraggableDimension = find(
+    insideDestination,
     (child: DraggableDimension): boolean => {
       // Cannot group with yourself
       const id: DraggableId = child.descriptor.id;

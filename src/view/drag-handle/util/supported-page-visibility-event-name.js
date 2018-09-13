@@ -1,4 +1,6 @@
 // @flow
+import { find } from '../../../native-with-fallback';
+
 const supportedEventName: string = ((): string => {
   const base: string = 'visibilitychange';
 
@@ -16,7 +18,8 @@ const supportedEventName: string = ((): string => {
     `o${base}`,
   ];
 
-  const supported: ?string = candidates.find(
+  const supported: ?string = find(
+    candidates,
     (eventName: string): boolean => `on${eventName}` in document,
   );
 

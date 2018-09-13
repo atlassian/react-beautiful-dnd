@@ -4,6 +4,7 @@ import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import isPositionInFrame from '../visibility/is-position-in-frame';
 import { toDroppableList } from '../dimension-structures';
+import { find } from '../../native-with-fallback';
 import type {
   DroppableDimension,
   DroppableDimensionMap,
@@ -33,7 +34,8 @@ const getScrollableDroppableOver = (
   target: Position,
   droppables: DroppableDimensionMap,
 ): ?DroppableDimension => {
-  const maybe: ?DroppableDimension = getScrollableDroppables(droppables).find(
+  const maybe: ?DroppableDimension = find(
+    getScrollableDroppables(droppables),
     (droppable: DroppableDimension): boolean => {
       invariant(droppable.frame, 'Invalid result');
       return isPositionInFrame(droppable.frame.pageMarginBox)(target);

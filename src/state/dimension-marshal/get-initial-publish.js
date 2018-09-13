@@ -8,7 +8,7 @@ import type {
   StartPublishingResult,
 } from './dimension-marshal-types';
 import { toDraggableMap, toDroppableMap } from '../dimension-structures';
-import values from '../object-values';
+import { values } from '../../native-with-fallback';
 import type {
   DroppableDescriptor,
   DroppableDimension,
