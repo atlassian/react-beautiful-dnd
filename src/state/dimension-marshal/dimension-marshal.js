@@ -10,6 +10,7 @@ import type {
   LiftRequest,
   Critical,
 } from '../../types';
+import values from '../object-values';
 import type {
   DimensionMarshal,
   Callbacks,
@@ -258,14 +259,11 @@ export default (callbacks: Callbacks) => {
     // Tell all droppables to stop watching scroll
     // all good if they where not already listening
     const home: DroppableDescriptor = collection.critical.droppable;
-    Object.keys(entries.droppables)
+    values(entries.droppables)
       .filter(
-        (id: DroppableId): boolean =>
-          entries.droppables[id].descriptor.type === home.type,
+        (entry: DroppableEntry): boolean => entry.descriptor.type === home.type,
       )
-      .forEach((id: DroppableId) =>
-        entries.droppables[id].callbacks.dragStopped(),
-      );
+      .forEach((entry: DroppableEntry) => entry.callbacks.dragStopped());
 
     // Finally - clear our collection
     collection = null;

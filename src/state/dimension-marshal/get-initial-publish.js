@@ -8,9 +8,8 @@ import type {
   StartPublishingResult,
 } from './dimension-marshal-types';
 import { toDraggableMap, toDroppableMap } from '../dimension-structures';
+import values from '../object-values';
 import type {
-  DraggableId,
-  DroppableId,
   DroppableDescriptor,
   DroppableDimension,
   DraggableDimension,
@@ -37,8 +36,7 @@ export default ({
 
   const home: DroppableDescriptor = critical.droppable;
 
-  const droppables: DroppableDimension[] = Object.keys(entries.droppables)
-    .map((id: DroppableId): DroppableEntry => entries.droppables[id])
+  const droppables: DroppableDimension[] = values(entries.droppables)
     // Exclude things of the wrong type
     .filter(
       (entry: DroppableEntry): boolean => entry.descriptor.type === home.type,
@@ -48,8 +46,7 @@ export default ({
         entry.callbacks.getDimensionAndWatchScroll(windowScroll, scrollOptions),
     );
 
-  const draggables: DraggableDimension[] = Object.keys(entries.draggables)
-    .map((id: DraggableId): DraggableEntry => entries.draggables[id])
+  const draggables: DraggableDimension[] = values(entries.draggables)
     .filter(
       (entry: DraggableEntry): boolean =>
         entry.descriptor.type === critical.draggable.type,
