@@ -297,14 +297,10 @@ export default (state: State = idle, action: Action): State => {
       `Cannot move by window in phase ${state.phase}`,
     );
 
-    if (!state.isWindowScrollAllowed) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn(
-          'Window scrolling is currently not supported for fixed lists. Aborting drag',
-        );
-      }
-      return idle;
-    }
+    invariant(
+      state.isWindowScrollAllowed,
+      'Window scrolling is currently not supported for fixed lists. Aborting drag',
+    );
 
     const newScroll: Position = action.payload.scroll;
 
