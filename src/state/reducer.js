@@ -13,6 +13,7 @@ import getHomeImpact from './get-home-impact';
 import isMovementAllowed from './is-movement-allowed';
 import moveWithPositionUpdates from './move-with-position-updates';
 import { toDroppableList } from './dimension-structures';
+import { forward } from './user-direction/user-direction-preset';
 import type {
   State,
   DroppableDimension,
@@ -74,11 +75,7 @@ export default (state: State = idle, action: Action): State => {
       isWindowScrollAllowed,
       impact: getHomeImpact(critical, dimensions),
       viewport,
-      // TODO: what should the default be?
-      direction: {
-        vertical: 'down',
-        horizontal: 'right',
-      },
+      direction: forward,
       scrollJumpRequest: null,
       shouldAnimate: false,
     };
