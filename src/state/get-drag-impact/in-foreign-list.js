@@ -66,6 +66,7 @@ export default ({
 
         const isDisplaced: boolean = Boolean(map[child.descriptor.id]);
         // If entering list then assume everything is displaced for initial impact
+        // reminder: 'displacement' can be positive or negative
         const isDisplacedBy: number =
           isDisplaced || isEnteringList ? displacement : 0;
 
