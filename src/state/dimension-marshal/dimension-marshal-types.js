@@ -28,6 +28,8 @@ export type GetDroppableDimensionFn = (
 ) => DroppableDimension;
 
 export type DroppableCallbacks = {|
+  // optimisation: used to warm up
+  warm: GetDroppableDimensionFn,
   // a drag is starting
   getDimensionAndWatchScroll: GetDroppableDimensionFn,
   recollect: () => DroppableDimension,

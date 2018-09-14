@@ -10,7 +10,6 @@ import PropTypes from 'prop-types';
 import { Component, type Node } from 'react';
 import invariant from 'tiny-invariant';
 import { dimensionMarshalKey } from '../context-keys';
-import warmUpDimension from '../warm-up-dimension';
 import { origin } from '../../state/position';
 import type {
   DraggableDescriptor,
@@ -38,10 +37,8 @@ export default class DraggableDimensionPublisher extends Component<Props> {
   };
 
   publishedDescriptor: ?DraggableDescriptor = null;
-  cancelWarmUp: () => void;
 
   componentDidMount() {
-    this.cancelWarmUp = warmUpDimension(this.getDimension);
     this.publish();
   }
 
@@ -51,7 +48,6 @@ export default class DraggableDimensionPublisher extends Component<Props> {
 
   componentWillUnmount() {
     this.unpublish();
-    this.cancelWarmUp();
   }
 
   getMemoizedDescriptor = memoizeOne(
@@ -111,7 +107,6 @@ export default class DraggableDimensionPublisher extends Component<Props> {
   };
 
   getDimension = (windowScroll?: Position = origin): DraggableDimension => {
-    this.cancelWarmUp();
     const targetRef: ?HTMLElement = this.props.getDraggableRef();
     const descriptor: ?DraggableDescriptor = this.publishedDescriptor;
 

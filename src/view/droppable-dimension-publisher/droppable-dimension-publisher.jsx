@@ -8,7 +8,6 @@ import rafSchedule from 'raf-schd';
 import checkForNestedScrollContainers from './check-for-nested-scroll-container';
 import { dimensionMarshalKey } from '../context-keys';
 import { origin } from '../../state/position';
-import warmUpDimension from '../warm-up-dimension';
 import getScroll from './get-scroll';
 import type {
   DimensionMarshal,
@@ -59,11 +58,11 @@ export default class DroppableDimensionPublisher extends React.Component<
   dragging: ?WhileDragging;
   callbacks: DroppableCallbacks;
   publishedDescriptor: ?DroppableDescriptor = null;
-  cancelWarmUp: () => void;
 
   constructor(props: Props, context: mixed) {
     super(props, context);
     const callbacks: DroppableCallbacks = {
+      warm: this.warmUp,
       getDimensionAndWatchScroll: this.getDimensionAndWatchScroll,
       recollect: this.recollect,
       dragStopped: this.dragStopped,
@@ -147,11 +146,11 @@ export default class DroppableDimensionPublisher extends React.Component<
     );
   };
 
-  warmUp = () => {
+  warmUp = (): DroppableDimension => {
     const ref: ?HTMLElement = this.props.getDroppableRef();
     const descriptor: ?DroppableDescriptor = this.publishedDescriptor;
     invariant(ref && descriptor, 'Missing required values for warm up');
-    getDimension({
+    return getDimension({
       ref,
       descriptor,
       env: getEnv(ref),
@@ -165,7 +164,6 @@ export default class DroppableDimensionPublisher extends React.Component<
 
   componentDidMount() {
     this.publish();
-    this.cancelWarmUp = warmUpDimension(this.warmUp);
 
     // Note: not calling `marshal.updateDroppableIsEnabled()`
     // If the dimension marshal needs to get the dimension immediately
@@ -198,7 +196,6 @@ export default class DroppableDimensionPublisher extends React.Component<
       this.dragStopped();
     }
 
-    this.cancelWarmUp();
     this.unpublish();
   }
 
