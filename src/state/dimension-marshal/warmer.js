@@ -28,63 +28,32 @@ export default () => {
     return empty;
   }
   let isActive: boolean = true;
-  let warmUpId: ?IdleCallbackID = null;
-  const toWarm: Function[] = [];
+  const warmUpIds: IdleCallbackID[] = [];
 
-  const work = (deadline: IdleDeadline) => {
-    warmUpId = null;
-    if (!toWarm.length) {
-      return;
-    }
+  const schedule = (fn: Function) => {
+    const id: IdleCallbackID = requestIdleCallback((deadline: IdleDeadline) => {
+      const index: number = warmUpIds.indexOf(id);
+      warmUpIds.splice(index, 1);
 
-    // grab the first and remove it from the array
-    const fn: Function = toWarm.shift();
+      // exit condition setup
+      let callCount = 0;
+      const start: number = Date.now();
 
-    // exit condition setup
-    let callCount = 0;
-    const start: number = Date.now();
-
-    while (
-      // trying to get to 10 calls
-      callCount < 10 &&
-      // only allowing a max of one millisecond of operations
-      Date.now() - start < 1 &&
-      // super safe: making sure we do not exceed the allowed time
-      deadline.timeRemaining() > 0
-    ) {
-      fn();
-      callCount++;
-    }
-
-    console.log('warmer did work', callCount);
-
-    if (!toWarm.length) {
-      console.log('no more warmer work');
-      return;
-    }
-    schedule();
-  };
-
-  const schedule = () => {
-    if (!isActive) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn('Cannot schedule more warm up work when no longer active');
+      while (
+        // trying to get to 10 calls
+        callCount < 10 &&
+        // only allowing a max of one millisecond of operations
+        Date.now() - start < 1 &&
+        // super safe: making sure we do not exceed the allowed time
+        deadline.timeRemaining() > 0
+      ) {
+        fn();
+        callCount++;
       }
-      return;
-    }
-    if (warmUpId) {
-      return;
-    }
 
-    warmUpId = requestIdleCallback(work);
-  };
-
-  const abortScheduled = () => {
-    if (!warmUpId) {
-      return;
-    }
-    cancelIdleCallback(warmUpId);
-    warmUpId = null;
+      console.log('warmer did work', callCount);
+    });
+    warmUpIds.push(id);
   };
 
   const register = (fn: Function) => {
@@ -94,18 +63,22 @@ export default () => {
       }
       return;
     }
-    toWarm.push(fn);
-    schedule();
+    schedule(fn);
   };
 
   const stop = () => {
     if (!isActive) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('warmer.stop() called, but it is already stopped');
+      }
       return;
     }
-    console.log('killing warmer');
-    abortScheduled();
     isActive = false;
-    toWarm.length = 0;
+    if (!warmUpIds.length) {
+      return;
+    }
+    warmUpIds.forEach((id: IdleCallbackID) => cancelIdleCallback(id));
+    warmUpIds.length = 0;
   };
 
   const warmer: Warmer = {
