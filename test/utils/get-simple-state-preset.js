@@ -86,7 +86,7 @@ export default (axis?: Axis = vertical) => {
       dimensions: preset.dimensions,
       initial,
       current: initial,
-      impact: getHomeImpact(ourCritical, preset.dimensions),
+      impact: getHomeImpact(draggable, droppable),
       viewport,
       scrollJumpRequest: null,
       shouldAnimate: false,

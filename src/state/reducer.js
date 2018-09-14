@@ -73,7 +73,10 @@ export default (state: State = idle, action: Action): State => {
       initial,
       current: initial,
       isWindowScrollAllowed,
-      impact: getHomeImpact(critical, dimensions),
+      impact: getHomeImpact(
+        dimensions.draggables[critical.draggable.id],
+        dimensions.droppables[critical.droppable.id],
+      ),
       viewport,
       direction: forward,
       scrollJumpRequest: null,

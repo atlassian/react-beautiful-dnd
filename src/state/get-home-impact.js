@@ -2,21 +2,17 @@
 import getHomeLocation from './get-home-location';
 import { noMovement } from './no-impact';
 import type {
-  Critical,
-  DimensionMap,
+  DraggableDimension,
   DroppableDimension,
   DragImpact,
-  Axis,
 } from '../types';
 
-export default (critical: Critical, dimensions: DimensionMap): DragImpact => {
-  const home: DroppableDimension = dimensions.droppables[critical.droppable.id];
-  const axis: Axis = home.axis;
-
-  return {
-    movement: noMovement,
-    direction: axis.direction,
-    destination: getHomeLocation(critical),
-    merge: null,
-  };
-};
+export default (
+  draggable: DraggableDimension,
+  home: DroppableDimension,
+): DragImpact => ({
+  movement: noMovement,
+  direction: home.axis.direction,
+  destination: getHomeLocation(draggable.descriptor),
+  merge: null,
+});
