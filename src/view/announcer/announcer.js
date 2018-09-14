@@ -30,8 +30,23 @@ export default (): Announcer => {
   let el: ?HTMLElement = null;
 
   const announce: Announce = (message: string): void => {
-    invariant(el, 'Cannot announce to unmounted node');
-    el.textContent = message;
+    if (el) {
+      el.textContent = message;
+      return;
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(`
+        A screen reader message was trying to be announced but it was unable to do so.
+        This can occur if you unmount your <DragDropContext /> in your onDragEnd.
+        Consider calling provided.announce() before the unmount so that the instruction will
+        not be lost for users relying on a screen reader.
+
+        Message not passed to screen reader:
+
+        "${message}"
+      `);
+    }
   };
 
   const mount = () => {
@@ -57,7 +72,7 @@ export default (): Announcer => {
   };
 
   const unmount = () => {
-    invariant(el, 'Will not unmount annoucer as it is already unmounted');
+    invariant(el, 'Will not unmount announcer as it is already unmounted');
 
     // Remove from body
     getBody().removeChild(el);

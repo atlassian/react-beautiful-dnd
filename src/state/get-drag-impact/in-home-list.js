@@ -42,6 +42,9 @@ export default ({
 
   const isInFrontOfStart: boolean =
     currentCenter[axis.line] > originalCenter[axis.line];
+
+  // when behind where we started we push items forward
+  // when infront of where we started we push items backwards
   const willDisplaceForward: boolean = !isInFrontOfStart;
 
   const isMovingForward: boolean = isUserMovingForward(
@@ -119,7 +122,7 @@ export default ({
         // Moving back towards the starting location
         // Can reduce the amount of things displaced
         if (isMovingTowardStart) {
-          return currentCenter[axis.line] < start + displacement;
+          return currentCenter[axis.line] <= start + displacement;
         }
 
         // Continuing to move further away backwards from the start

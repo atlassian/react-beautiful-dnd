@@ -18,6 +18,7 @@ import inForeignList from './in-foreign-list';
 import getCombineImpact from './get-combine-impact';
 import noImpact from '../no-impact';
 import withDroppableScroll from '../with-droppable-scroll';
+import isHomeOf from '../droppable/is-home-of';
 
 type Args = {|
   pageBorderBoxCenter: Position,
@@ -55,8 +56,7 @@ export default ({
     return noImpact;
   }
 
-  const isWithinHomeDroppable: boolean =
-    draggable.descriptor.droppableId === destinationId;
+  const isWithinHomeDroppable: boolean = isHomeOf(draggable, destination);
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
     destination,
     draggables,
