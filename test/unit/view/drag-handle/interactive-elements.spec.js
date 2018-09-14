@@ -134,7 +134,7 @@ forEach((control: Control) => {
         'http://www.w3.org/2000/svg',
         'svg',
       );
-      expect(svg instanceof SVGElement).toBe(true);
+      expect(svg.nodeName === 'svg' || svg instanceof SVGElement).toBe(true);
 
       mixedCase(interactiveTagNames).forEach((tagName: string) => {
         const parent: HTMLElement = document.createElement(tagName);
@@ -164,10 +164,10 @@ forEach((control: Control) => {
         'http://www.w3.org/2000/svg',
         'svg',
       );
-      expect(svg instanceof SVGElement).toBe(true);
+      expect(svg.nodeName === 'svg' || svg instanceof SVGElement).toBe(true);
 
       const div: HTMLElement = document.createElement('div');
-      expect(div instanceof HTMLElement).toBe(true);
+      expect(div && dev.nodeType === 1).toBe(true);
 
       [div, svg].forEach((child: Element) => {
         mixedCase(interactiveTagNames).forEach((tagName: string) => {

@@ -13,7 +13,7 @@ const isSVG = (el: mixed) => {
   }
 
   // $FlowFixMe - flow does not know about SVGElement
-  return el instanceof SVGElement;
+  return el.nodeName === 'svg' || el instanceof SVGElement;
 };
 
 const throwIfSVG = (el: mixed) => {
@@ -51,7 +51,7 @@ const getDragHandleRef = (draggableRef: HTMLElement): HTMLElement => {
     `,
   );
 
-  invariant(el instanceof HTMLElement, 'A drag handle must be a HTMLElement');
+  invariant(el && el.nodeType === 1, 'A drag handle must be a HTMLElement');
 
   return el;
 };

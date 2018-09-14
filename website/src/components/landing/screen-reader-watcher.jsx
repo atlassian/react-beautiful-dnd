@@ -101,7 +101,7 @@ export default class ScreenReaderWatcher extends React.Component<*, State> {
   onWindowFocus = (event: FocusEvent) => {
     const target: EventTarget = event.target;
 
-    if (!(target instanceof HTMLElement)) {
+    if (target.nodeType !== 1) {
       this.setState({ message: null });
       return;
     }
