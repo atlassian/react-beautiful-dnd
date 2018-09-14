@@ -167,7 +167,7 @@ forEach((control: Control) => {
       expect(svg.nodeName === 'svg' || svg instanceof SVGElement).toBe(true);
 
       const div: HTMLElement = document.createElement('div');
-      expect(div && dev.nodeType === 1).toBe(true);
+      expect(div && div.nodeType === 1).toBe(true);
 
       [div, svg].forEach((child: Element) => {
         mixedCase(interactiveTagNames).forEach((tagName: string) => {
