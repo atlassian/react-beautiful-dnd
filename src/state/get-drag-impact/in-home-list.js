@@ -16,6 +16,7 @@ import getDisplacement from '../get-displacement';
 import getDisplacementMap from '../get-displacement-map';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
+import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 
 type Args = {|
   pageBorderBoxCenterWithDroppableScroll: Position,
@@ -61,6 +62,9 @@ export default ({
     willDisplaceForward,
   );
 
+  const isEnteringList: boolean =
+    whatIsDraggedOver(previousImpact) !== home.descriptor.id;
+
   const map: DisplacementMap = previousImpact.movement.map;
   const displacement: number = displacedBy.value;
 
@@ -92,7 +96,8 @@ export default ({
 
         // At this point we know that the draggable could be displaced
         const isDisplaced: boolean = Boolean(map[child.descriptor.id]);
-
+        const isDisplacedBy: number =
+          isDisplaced || isEnteringList ? displacement : 0;
         const start: number = borderBox[axis.start];
         const end: number = borderBox[axis.end];
 
@@ -102,7 +107,7 @@ export default ({
           // end edge of the target
           // Can reduce the amount of things that are displaced
           if (isMovingTowardStart) {
-            return currentCenter[axis.line] > end + displacement;
+            return currentCenter[axis.line] >= end + isDisplacedBy;
           }
 
           // if was displaced and continuing to move away then will continue to be displaced
@@ -122,7 +127,7 @@ export default ({
         // Moving back towards the starting location
         // Can reduce the amount of things displaced
         if (isMovingTowardStart) {
-          return currentCenter[axis.line] <= start + displacement;
+          return currentCenter[axis.line] <= start + isDisplacedBy;
         }
 
         // Continuing to move further away backwards from the start

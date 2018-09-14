@@ -51,6 +51,7 @@ const viewport: Viewport = getViewport();
       willDisplaceForward,
     );
 
+    // ordered by closest displaced
     const displaced: Displacement[] = [
       {
         draggableId: preset.inHome1.descriptor.id,
@@ -214,6 +215,117 @@ const viewport: Viewport = getViewport();
           merge: null,
         };
         expect(second).toEqual(expected);
+      });
+    });
+
+    describe('entering list', () => {
+      it('should apply displacement to items if moving forwards towards start in edge detection', () => {
+        // actual
+        {
+          // moving inHome3 over the top edge of displaced inHome1
+          const target: Position = patch(
+            axis.line,
+            // over top edge with with displacement
+            preset.inHome1.page.borderBox[axis.start] +
+              preset.inHome3.displaceBy[axis.line] +
+              1,
+            // no change
+            preset.inHome3.page.borderBox.center[axis.crossAxisLine],
+          );
+
+          // moving from outside of the list
+          const impact: DragImpact = getDragImpact({
+            pageBorderBoxCenter: target,
+            draggable: preset.inHome3,
+            draggables: preset.draggables,
+            droppables: preset.droppables,
+            // no previous impact
+            previousImpact: noImpact,
+            viewport,
+            direction: forward,
+          });
+
+          const newDisplaced: Displacement[] = [
+            {
+              draggableId: preset.inHome2.descriptor.id,
+              isVisible: true,
+              shouldAnimate: true,
+            },
+          ];
+          const newMap: DisplacementMap = getDisplacementMap(newDisplaced);
+          const expected: DragImpact = {
+            movement: {
+              // ordered by closest to current location
+              displaced: newDisplaced,
+              map: newMap,
+              willDisplaceForward,
+              displacedBy,
+            },
+            direction: axis.direction,
+            destination: {
+              droppableId: preset.home.descriptor.id,
+              // is now after inHome1
+              index: 1,
+            },
+            merge: null,
+          };
+          expect(impact).toEqual(expected);
+        }
+        // validation
+        {
+          // moving inHome3 over the top edge of displaced inHome1
+          const target: Position = patch(
+            axis.line,
+            // not moving far enough to go past displaced inHome1
+            preset.inHome1.page.borderBox[axis.start] +
+              preset.inHome3.displaceBy[axis.line],
+            // no change
+            preset.inHome3.page.borderBox.center[axis.crossAxisLine],
+          );
+
+          // moving from outside of the list
+          const impact: DragImpact = getDragImpact({
+            pageBorderBoxCenter: target,
+            draggable: preset.inHome3,
+            draggables: preset.draggables,
+            droppables: preset.droppables,
+            // no previous impact
+            previousImpact: noImpact,
+            viewport,
+            direction: forward,
+          });
+
+          const newDisplaced: Displacement[] = [
+            {
+              draggableId: preset.inHome1.descriptor.id,
+              isVisible: true,
+              shouldAnimate: true,
+            },
+            {
+              draggableId: preset.inHome2.descriptor.id,
+              isVisible: true,
+              shouldAnimate: true,
+            },
+          ];
+          const newMap: DisplacementMap = getDisplacementMap(newDisplaced);
+          const expected: DragImpact = {
+            movement: {
+              // ordered by closest to current location
+              displaced: newDisplaced,
+              map: newMap,
+              willDisplaceForward,
+              displacedBy,
+            },
+            direction: axis.direction,
+            destination: {
+              droppableId: preset.home.descriptor.id,
+              // before inhome1
+              index: 0,
+            },
+            merge: null,
+          };
+          expect(impact).toEqual(expected);
+        }
       });
     });
   });
