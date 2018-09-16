@@ -38,12 +38,6 @@
   dependencies:
     "@babel/highlight" "7.0.0-beta.42"
 
-"@babel/code-frame@^7.0.0-beta.47":
-  version "7.0.0-beta.51"
-  resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.0.0-beta.51.tgz#bd71d9b192af978df915829d39d4094456439a0c"
-  dependencies:
-    "@babel/highlight" "7.0.0-beta.51"
-
 "@babel/core@^7.0.0":
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.0.0.tgz#0cb0c0fd2e78a0a2bec97698f549ae9ce0b99515"
@@ -329,14 +323,6 @@
 "@babel/highlight@7.0.0-beta.46":
   version "7.0.0-beta.46"
   resolved "https://registry.yarnpkg.com/@babel/highlight/-/highlight-7.0.0-beta.46.tgz#c553c51e65f572bdedd6eff66fc0bb563016645e"
-  dependencies:
-    chalk "^2.0.0"
-    esutils "^2.0.2"
-    js-tokens "^3.0.0"
-
-"@babel/highlight@7.0.0-beta.51":
-  version "7.0.0-beta.51"
-  resolved "https://registry.yarnpkg.com/@babel/highlight/-/highlight-7.0.0-beta.51.tgz#e8844ae25a1595ccfd42b89623b4376ca06d225d"
   dependencies:
     chalk "^2.0.0"
     esutils "^2.0.2"
@@ -9522,12 +9508,14 @@ rollup-plugin-strip@^1.1.1:
     magic-string "^0.15.0"
     rollup-pluginutils "^1.3.1"
 
-rollup-plugin-uglify@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-uglify/-/rollup-plugin-uglify-4.0.0.tgz#6eb471738f1ce9ba7d9d4bc43b71cba02417c8fb"
+rollup-plugin-uglify@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-uglify/-/rollup-plugin-uglify-6.0.0.tgz#15aa8919e5cdc63b7cfc9319c781788b40084ce4"
   dependencies:
-    "@babel/code-frame" "^7.0.0-beta.47"
-    uglify-js "^3.3.25"
+    "@babel/code-frame" "^7.0.0"
+    jest-worker "^23.2.0"
+    serialize-javascript "^1.5.0"
+    uglify-js "^3.4.9"
 
 rollup-pluginutils@^1.3.1:
   version "1.5.2"
@@ -9668,6 +9656,10 @@ send@0.16.2:
 serialize-javascript@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/serialize-javascript/-/serialize-javascript-1.4.0.tgz#7c958514db6ac2443a8abc062dc9f7886a7f6005"
+
+serialize-javascript@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/serialize-javascript/-/serialize-javascript-1.5.0.tgz#1aa336162c88a890ddad5384baebc93a655161fe"
 
 serve-favicon@^2.4.5:
   version "2.5.0"
@@ -10737,11 +10729,11 @@ uglify-js@^2.6, uglify-js@^2.8.29:
   optionalDependencies:
     uglify-to-browserify "~1.0.0"
 
-uglify-js@^3.3.25:
-  version "3.4.2"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.4.2.tgz#70511a390eb62423675ba63c374ba1abf045116c"
+uglify-js@^3.4.9:
+  version "3.4.9"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.4.9.tgz#af02f180c1207d76432e473ed24a28f4a782bae3"
   dependencies:
-    commander "~2.15.0"
+    commander "~2.17.1"
     source-map "~0.6.1"
 
 uglify-to-browserify@~1.0.0:
