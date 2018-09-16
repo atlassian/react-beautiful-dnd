@@ -23,10 +23,13 @@ type IdleDeadline = {
   didTimeout: boolean,
 };
 
+let totalTime: number = 0;
+
 export default () => {
   if (!isSupported) {
     return empty;
   }
+  // return empty;
   let isActive: boolean = true;
   const warmUpIds: IdleCallbackID[] = [];
 
@@ -51,7 +54,9 @@ export default () => {
         callCount++;
       }
 
-      console.log('warmer did work', callCount);
+      // console.log('warmer did work', callCount);
+      totalTime += Date.now() - start;
+      console.log('total time', totalTime);
     });
     warmUpIds.push(id);
   };

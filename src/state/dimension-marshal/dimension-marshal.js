@@ -11,7 +11,6 @@ import type {
   Critical,
 } from '../../types';
 import { values } from '../../native-with-fallback';
-import createWarmer, { type Warmer } from './warmer';
 import type {
   DimensionMarshal,
   Callbacks,
@@ -50,15 +49,6 @@ export default (callbacks: Callbacks) => {
     draggables: {},
   };
   let collection: ?Collection = null;
-  const warmer: Warmer = createWarmer();
-  let isWarmingAllowed: boolean = true;
-  const stopWarmer = () => {
-    if (!isWarmingAllowed) {
-      return;
-    }
-    isWarmingAllowed = false;
-    warmer.stop();
-  };
 
   const publisher: Publisher = createPublisher({
     callbacks: {
@@ -82,10 +72,6 @@ export default (callbacks: Callbacks) => {
       getDimension,
     };
     entries.draggables[descriptor.id] = entry;
-
-    if (isWarmingAllowed) {
-      warmer.register(entry.getDimension);
-    }
 
     if (!collection) {
       return;
@@ -121,7 +107,6 @@ export default (callbacks: Callbacks) => {
   };
 
   const unregisterDraggable = (descriptor: DraggableDescriptor) => {
-    stopWarmer();
     const entry: ?DraggableEntry = entries.draggables[descriptor.id];
     invariant(
       entry,
@@ -167,10 +152,6 @@ export default (callbacks: Callbacks) => {
       callbacks: droppableCallbacks,
     };
 
-    if (isWarmingAllowed) {
-      warmer.register(droppableCallbacks.warm);
-    }
-
     invariant(!collection, 'Cannot add a Droppable during a drag');
   };
 
@@ -200,7 +181,6 @@ export default (callbacks: Callbacks) => {
   };
 
   const unregisterDroppable = (descriptor: DroppableDescriptor) => {
-    stopWarmer();
     const entry: ?DroppableEntry = entries.droppables[descriptor.id];
 
     invariant(
@@ -302,8 +282,6 @@ export default (callbacks: Callbacks) => {
     const home: ?DroppableEntry =
       entries.droppables[entry.descriptor.droppableId];
     invariant(home, 'Cannot find critical droppable entry');
-
-    stopWarmer();
 
     const critical: Critical = {
       draggable: entry.descriptor,
