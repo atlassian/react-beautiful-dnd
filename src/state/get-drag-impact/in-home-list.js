@@ -77,24 +77,6 @@ export default ({
         }
 
         const borderBox: Rect = child.page.borderBox;
-
-        // If in front of where we started:
-        // Nothing behind start can be displaced
-        if (isInFrontOfStart) {
-          if (borderBox.center[axis.line] < originalCenter[axis.line]) {
-            return false;
-          }
-        }
-
-        // If behind of where we started:
-        // Nothing in front of start can be displaced
-        if (!isInFrontOfStart) {
-          if (borderBox.center[axis.line] > originalCenter[axis.line]) {
-            return false;
-          }
-        }
-
-        // At this point we know that the draggable could be displaced
         const isDisplaced: boolean = Boolean(map[child.descriptor.id]);
         const isDisplacedBy: number =
           isDisplaced || isEnteringList ? displacement : 0;
@@ -102,6 +84,11 @@ export default ({
         const end: number = borderBox[axis.end];
 
         if (isInFrontOfStart) {
+          // Nothing behind start can be displaced
+          if (borderBox.center[axis.line] < originalCenter[axis.line]) {
+            return false;
+          }
+
           // Moving backwards towards the starting location
           // Need to check if the center is going over the
           // end edge of the target
@@ -123,6 +110,11 @@ export default ({
         }
 
         // is behind where we started
+
+        // Nothing in front of start can be displaced
+        if (borderBox.center[axis.line] > originalCenter[axis.line]) {
+          return false;
+        }
 
         // Moving back towards the starting location
         // Can reduce the amount of things displaced

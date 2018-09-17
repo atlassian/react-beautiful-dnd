@@ -178,9 +178,10 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
     });
 
     it('should apply displacement to edge detection if entering the list', () => {
-      const endEdge: number = preset.inHome1.page.borderBox[axis.start];
-      const displacedEndEdge: number =
-        endEdge + preset.inHome3.displaceBy[axis.line];
+      const startEdge: number = preset.inHome1.page.borderBox[axis.start];
+      // will be displaced backwards when in front of start
+      const displacedStart: number =
+        startEdge - preset.inHome3.displaceBy[axis.line];
       const crossAxisCenter: number =
         preset.inHome3.page.borderBox.center[axis.crossAxisLine];
       // actual
@@ -189,13 +190,14 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
         const target: Position = patch(
           axis.line,
           // over top edge with with displacement
-          displacedEndEdge + 1,
+          displacedStart + 1,
           // no change
           crossAxisCenter,
         );
 
         // moving from outside of the list
-        const impact: DragImpact = getDragImpact({
+        // TODO: also for backwards?
+        const movingForwards: DragImpact = getDragImpact({
           pageBorderBoxCenter: target,
           draggable: preset.inHome3,
           draggables: preset.draggables,
@@ -230,7 +232,7 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
           },
           merge: null,
         };
-        expect(impact).toEqual(expected);
+        expect(movingForwards).toEqual(expected);
       }
       // validation
       {
@@ -238,7 +240,7 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
         const target: Position = patch(
           axis.line,
           // not over displaced edge
-          displacedEndEdge,
+          displacedStart,
           // no change
           crossAxisCenter,
         );
