@@ -7,10 +7,9 @@ import {
   type Position,
   type Spacing,
 } from 'css-box-model';
-import {
-  getDroppableDimension,
+import getDroppableDimension, {
   type Closest,
-} from '../../state/droppable-dimension';
+} from '../../state/droppable/get-droppable';
 import type { Env } from './get-env';
 import type {
   DroppableDimension,

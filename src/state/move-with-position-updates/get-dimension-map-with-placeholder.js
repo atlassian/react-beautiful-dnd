@@ -1,6 +1,9 @@
 // @flow
 import type { Position } from 'css-box-model';
-import { withPlaceholder, withoutPlaceholder } from '../droppable-dimension';
+import {
+  withPlaceholder,
+  withoutPlaceholder,
+} from '../droppable/with-placeholder';
 import { patch } from '../position';
 import shouldUsePlaceholder from '../droppable/should-use-placeholder';
 import whatIsDraggedOver from '../droppable/what-is-dragged-over';

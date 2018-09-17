@@ -1,7 +1,7 @@
 // @flow
 import type { Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import { scrollDroppable } from './droppable-dimension';
+import scrollDroppable from './droppable/scroll-droppable';
 import getDragImpact from './get-drag-impact';
 import publish from './publish';
 import moveInDirection, {
@@ -183,6 +183,7 @@ export default (state: State = idle, action: Action): State => {
       return state;
     }
 
+    console.log('trying to update droppable scroll');
     const updated: DroppableDimension = scrollDroppable(target, offset);
 
     const dimensions: DimensionMap = {

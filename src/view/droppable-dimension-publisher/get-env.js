@@ -5,10 +5,12 @@ export type Env = {|
   isFixedOnPage: boolean,
 |};
 
-const isScrollable = (style: CSSStyleDeclaration): boolean =>
-  [style.overflow, style.overflowY, style.overflowX].some(
+const isScrollable = (style: CSSStyleDeclaration): boolean => {
+  console.log('checking if scrollable');
+  return [style.overflow, style.overflowY, style.overflowX].some(
     (value: string) => value === 'auto' || value === 'scroll',
   );
+};
 
 const isFixed = (style: CSSStyleDeclaration) => style.position === 'fixed';
 
@@ -36,7 +38,7 @@ const find = (
   const style: CSSStyleDeclaration = window.getComputedStyle(el);
 
   const closest: ?Element =
-    closestScrollable || isScrollable(style) ? el : null;
+    closestScrollable || (isScrollable(style) ? el : null);
   const fixed: boolean = isFixedOnPage || isFixed(style);
 
   return find(el.parentElement, closest, fixed);

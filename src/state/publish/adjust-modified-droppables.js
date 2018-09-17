@@ -9,11 +9,10 @@ import {
   type Rect,
 } from 'css-box-model';
 import { isEqual } from '../spacing';
-import {
-  getDroppableDimension,
+import scrollDroppable from '../droppable/scroll-droppable';
+import getDroppableDimension, {
   type Closest,
-  scrollDroppable,
-} from '../droppable-dimension';
+} from '../droppable/get-droppable';
 import type {
   DroppableDimension,
   DroppableDimensionMap,
