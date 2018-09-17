@@ -73,17 +73,21 @@ export default ({
         // When in foreign list, can only displace forwards
         // Moving forward will decrease the amount of things needed to be displaced
         if (isMovingForward) {
-          return targetCenter < start + isDisplacedBy;
+          // is the target center behind the displaced start?
+          return targetCenter <= start + isDisplacedBy;
         }
 
-        // Moving backwards
+        // Moving backwards towards top of list
         // Moving backwards will increase the amount of things needed to be displaced
 
         if (isDisplaced) {
           return true;
         }
 
-        // No longer need to displace
+        // this will be hit when:
+        // - move backwards in the first position
+        // - enter into a foreign list moving backwards
+
         return targetCenter < end;
       },
     )

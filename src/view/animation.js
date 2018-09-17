@@ -1,7 +1,7 @@
 // @flow
 import type { Position } from 'css-box-model';
 import type { DropReason } from '../types';
-import { distance, isEqual, origin } from '../state/position';
+import { distance, isEqual } from '../state/position';
 
 type GetDropDurationArgs = {|
   current: Position,
