@@ -42,19 +42,18 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
       preset.inHome3.displaceBy,
       willDisplaceForward,
     );
+    const goingBackwards: DragImpact = getDragImpact({
+      pageBorderBoxCenter: goingBackwardsCenter,
+      draggable: preset.inHome3,
+      draggables: preset.draggables,
+      droppables: preset.droppables,
+      // previousImpact: noImpact,
+      previousImpact: getHomeImpact(preset.inHome3, preset.home),
+      viewport,
+      direction: backward,
+    });
 
     it('should displace items when moving over their bottom edge', () => {
-      const impact: DragImpact = getDragImpact({
-        pageBorderBoxCenter: goingBackwardsCenter,
-        draggable: preset.inHome3,
-        draggables: preset.draggables,
-        droppables: preset.droppables,
-        // previousImpact: noImpact,
-        previousImpact: getHomeImpact(preset.inHome3, preset.home),
-        viewport,
-        direction: backward,
-      });
-
       // ordered by closest displaced
       const expected: DragImpact = {
         movement: {
@@ -83,27 +82,21 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
         merge: null,
       };
 
-      expect(impact).toEqual(expected);
+      expect(goingBackwards).toEqual(expected);
     });
 
     it('should end displacement if moving forward over the displaced top edge', () => {
-      // initial backwards displacement
-      const goingBackwards: DragImpact = getDragImpact({
-        pageBorderBoxCenter: goingBackwardsCenter,
-        draggable: preset.inHome3,
-        draggables: preset.draggables,
-        droppables: preset.droppables,
-        previousImpact: noImpact,
-        viewport,
-        direction: backward,
-      });
-
+      const crossAxisCenter: number =
+        preset.inHome3.page.borderBox.center[axis.crossAxisLine];
+      const topEdge: number = preset.inHome1.page.borderBox[axis.start];
+      const displacedTopEdge: number =
+        topEdge + preset.inHome3.displaceBy[axis.line];
       const goingForwards1: Position = patch(
         axis.line,
         // over top edge with without displacement
-        preset.inHome1.page.borderBox[axis.start] + 1,
+        topEdge + 1,
         // no change
-        preset.inHome3.page.borderBox.center[axis.crossAxisLine],
+        crossAxisCenter,
       );
       const forwardImpact1: DragImpact = getDragImpact({
         pageBorderBoxCenter: goingForwards1,
@@ -120,10 +113,9 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
       const goingForwards2: Position = patch(
         axis.line,
         // over top edge with without displacement
-        preset.inHome1.page.borderBox[axis.start] +
-          preset.inHome3.displaceBy[axis.line],
+        displacedTopEdge,
         // no change
-        preset.inHome3.page.borderBox.center[axis.crossAxisLine],
+        crossAxisCenter,
       );
       const forwardImpact2: DragImpact = getDragImpact({
         pageBorderBoxCenter: goingForwards2,
@@ -140,11 +132,9 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
       const goingForwardsEnough: Position = patch(
         axis.line,
         // over top edge with with displacement
-        preset.inHome1.page.borderBox[axis.start] +
-          preset.inHome3.displaceBy[axis.line] +
-          1,
+        displacedTopEdge + 1,
         // no change
-        preset.inHome3.page.borderBox.center[axis.crossAxisLine],
+        crossAxisCenter,
       );
 
       // checking that it does not matter which impact we are going from
@@ -186,17 +176,20 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
     });
 
     it('should apply displacement to edge detection if entering the list', () => {
+      const crossAxisCenter: number =
+        preset.inHome3.page.borderBox.center[axis.crossAxisLine];
+      const topEdge: number = preset.inHome1.page.borderBox[axis.start];
+      const displacedTopEdge: number =
+        topEdge + preset.inHome3.displaceBy[axis.line];
       // actual
       {
         // moving inHome3 over the top edge of displaced inHome1
         const target: Position = patch(
           axis.line,
           // over top edge with with displacement
-          preset.inHome1.page.borderBox[axis.start] +
-            preset.inHome3.displaceBy[axis.line] +
-            1,
+          displacedTopEdge + 1,
           // no change
-          preset.inHome3.page.borderBox.center[axis.crossAxisLine],
+          crossAxisCenter,
         );
 
         // moving from outside of the list
@@ -242,11 +235,10 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
         // moving inHome3 over the top edge of displaced inHome1
         const target: Position = patch(
           axis.line,
-          // not moving far enough to go past displaced inHome1
-          preset.inHome1.page.borderBox[axis.start] +
-            preset.inHome3.displaceBy[axis.line],
+          // not moving beyond top edge
+          displacedTopEdge,
           // no change
-          preset.inHome3.page.borderBox.center[axis.crossAxisLine],
+          crossAxisCenter,
         );
 
         // moving from outside of the list
