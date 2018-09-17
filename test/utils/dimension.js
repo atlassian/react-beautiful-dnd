@@ -12,10 +12,9 @@ import { vertical } from '../../src/state/axis';
 import { noSpacing, offsetByPosition } from '../../src/state/spacing';
 import getViewport from '../../src/view/window/get-viewport';
 import scrollViewport from '../../src/state/scroll-viewport';
-import {
-  getDroppableDimension as getDroppable,
+import getDroppable, {
   type Closest,
-} from '../../src/state/droppable-dimension';
+} from '../../src/state/droppable/get-droppable';
 import type {
   Axis,
   Placeholder,
@@ -154,15 +153,6 @@ const getPlaceholder = (client: BoxModel): Placeholder => ({
   display: 'block',
 });
 
-export const getClosestScrollable = (
-  droppable: DroppableDimension,
-): Scrollable => {
-  if (!droppable.viewport.closestScrollable) {
-    throw new Error('Cannot get closest scrollable');
-  }
-  return droppable.viewport.closestScrollable;
-};
-
 type GetDraggableArgs = {|
   descriptor: DraggableDescriptor,
   borderBox: Spacing,
@@ -222,6 +212,8 @@ type GetDroppableArgs = {|
   windowScroll?: Position,
   closest?: ?ClosestMaker,
   isEnabled?: boolean,
+  isFixedOnPage?: boolean,
+  isCombineEnabled?: boolean,
 |};
 
 export const getDroppableDimension = ({
@@ -234,6 +226,8 @@ export const getDroppableDimension = ({
   closest,
   isEnabled = true,
   direction = 'vertical',
+  isFixedOnPage = false,
+  isCombineEnabled = false,
 }: GetDroppableArgs): DroppableDimension => {
   const client: BoxModel = createBox({
     borderBox,
@@ -275,6 +269,8 @@ export const getDroppableDimension = ({
     client,
     page,
     closest: closestScrollable,
+    isCombineEnabled,
+    isFixedOnPage,
   });
 };
 

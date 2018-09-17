@@ -288,7 +288,6 @@ export default class DroppableDimensionPublisher extends React.Component<
     invariant(descriptor, 'Cannot get dimension for unpublished droppable');
     const ref: ?HTMLElement = this.props.getDroppableRef();
     invariant(ref, 'Cannot collect without a droppable ref');
-    console.log('getting env');
     const env: Env = getEnv(ref);
 
     const dragging: WhileDragging = {

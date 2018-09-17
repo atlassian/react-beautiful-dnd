@@ -42,7 +42,6 @@ export default (
     pageMarginBox: droppable.subject.pageMarginBox,
     withPlaceholder: droppable.subject.withPlaceholder,
     axis: droppable.axis,
-    scrollDisplacement,
     frame,
   });
   const result: DroppableDimension = {

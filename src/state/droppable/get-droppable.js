@@ -83,7 +83,6 @@ export default ({
     pageMarginBox: subjectPageMarginBox,
     withPlaceholder: null,
     axis,
-    scrollDisplacement: origin,
     frame,
   });
 
