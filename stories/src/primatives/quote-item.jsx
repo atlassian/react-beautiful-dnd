@@ -35,7 +35,6 @@ const Container = styled('a')`
   margin-left: ${grid}px;
   margin-right: ${grid}px;
   user-select: none;
-  transition: background-color 0.1s ease;
 
   /* anchor overrides */
   color: ${colors.black};

@@ -1,5 +1,6 @@
 // @flow
 import type { DragImpact, Displacement } from '../../types';
+import getDisplacementMap from '../get-displacement-map';
 
 export default (impact: DragImpact): DragImpact => {
   const displaced: Displacement[] = impact.movement.displaced;
@@ -28,6 +29,7 @@ export default (impact: DragImpact): DragImpact => {
     movement: {
       ...impact.movement,
       displaced: withoutAnimation,
+      map: getDisplacementMap(withoutAnimation),
     },
   };
 

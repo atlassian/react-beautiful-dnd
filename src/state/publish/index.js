@@ -95,20 +95,18 @@ export default ({
   });
 
   // Get the impact of all of our changes
-  // const impact: DragImpact = withNoAnimatedDisplacement(
-  console.log('getting impact');
-  console.log('pageBorderBoxCenter', current.page.borderBoxCenter);
-  const impact: DragImpact = getDragImpact({
-    pageBorderBoxCenter: current.page.borderBoxCenter,
-    draggable: dimensions.draggables[state.critical.draggable.id],
-    draggables: dimensions.draggables,
-    droppables: dimensions.droppables,
-    // starting from a fresh slate
-    previousImpact: noImpact,
-    viewport: state.viewport,
-    direction: state.direction,
-  });
-  // );
+  const impact: DragImpact = withNoAnimatedDisplacement(
+    getDragImpact({
+      pageBorderBoxCenter: current.page.borderBoxCenter,
+      draggable: dimensions.draggables[state.critical.draggable.id],
+      draggables: dimensions.draggables,
+      droppables: dimensions.droppables,
+      // starting from a fresh slate
+      previousImpact: noImpact,
+      viewport: state.viewport,
+      direction: state.direction,
+    }),
+  );
 
   const isOrphaned: boolean = Boolean(
     state.autoScrollMode === 'JUMP' &&
@@ -123,7 +121,7 @@ export default ({
   );
 
   // TODO: move into move visually pleasing position if using
-  // JUMP auto scrolling
+  // JUMP auto scrolling\
 
   timings.finish(timingsKey);
 
