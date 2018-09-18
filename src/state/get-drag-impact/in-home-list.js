@@ -9,14 +9,28 @@ import type {
   Displacement,
   Viewport,
   UserDirection,
-  DisplacementMap,
   DisplacedBy,
 } from '../../types';
 import getDisplacement from '../get-displacement';
 import getDisplacementMap from '../get-displacement-map';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
-import whatIsDraggedOver from '../droppable/what-is-dragged-over';
+
+const getNewIndex = (
+  startIndex: number,
+  amountOfDisplaced: number,
+  isInFrontOfStart: boolean,
+): number => {
+  if (!amountOfDisplaced) {
+    return startIndex;
+  }
+
+  if (isInFrontOfStart) {
+    return startIndex + amountOfDisplaced;
+  }
+  // is moving backwards
+  return startIndex - amountOfDisplaced;
+};
 
 type Args = {|
   pageBorderBoxCenterWithDroppableScroll: Position,
@@ -45,7 +59,7 @@ export default ({
     currentCenter[axis.line] > originalCenter[axis.line];
 
   // when behind where we started we push items forward
-  // when infront of where we started we push items backwards
+  // when in front of where we started we push items backwards
   const willDisplaceForward: boolean = !isInFrontOfStart;
 
   const isMovingForward: boolean = isUserMovingForward(
@@ -61,11 +75,6 @@ export default ({
     draggable.displaceBy,
     willDisplaceForward,
   );
-
-  const isEnteringList: boolean =
-    whatIsDraggedOver(previousImpact) !== home.descriptor.id;
-
-  const map: DisplacementMap = previousImpact.movement.map;
   const displacement: number = displacedBy.value;
 
   const displaced: Displacement[] = insideHome
@@ -77,9 +86,6 @@ export default ({
         }
 
         const borderBox: Rect = child.page.borderBox;
-        const isDisplaced: boolean = Boolean(map[child.descriptor.id]);
-        const isDisplacedBy: number =
-          isDisplaced || isEnteringList ? displacement : 0;
         const start: number = borderBox[axis.start];
         const end: number = borderBox[axis.end];
 
@@ -90,16 +96,15 @@ export default ({
           }
 
           // Moving backwards towards the starting location
-          // Need to check if the center is going over the
-          // end edge of the target
           // Can reduce the amount of things that are displaced
-          if (isMovingTowardStart) {
-            return currentCenter[axis.line] >= end + isDisplacedBy;
-          }
+          // Need to check if the center is going over the
+          // end edge of a the target
+          // We apply the displacement to the calculation even if
+          // the item is not displaced so that it will have a consistent
+          // impact moving in a list as well as moving into it
 
-          // if was displaced and continuing to move away then will continue to be displaced
-          if (isDisplaced) {
-            return true;
+          if (isMovingTowardStart) {
+            return currentCenter[axis.line] >= end + displacement;
           }
 
           // Moving forwards away from the starting location
@@ -118,15 +123,15 @@ export default ({
 
         // Moving back towards the starting location
         // Can reduce the amount of things displaced
+        // We apply the displacement to the calculation even if
+        // the item is not displaced so that it will have a consistent
+        // impact moving in a list as well as moving into it
         if (isMovingTowardStart) {
-          return currentCenter[axis.line] <= start + isDisplacedBy;
+          return currentCenter[axis.line] <= start + displacement;
         }
 
         // Continuing to move further away backwards from the start
         // Can increase the amount of things that are displaced
-        if (isDisplaced) {
-          return true;
-        }
         // Shift once the center goes over the end of the thing before it
         return currentCenter[axis.line] < end;
       },
@@ -142,23 +147,16 @@ export default ({
     );
 
   // Need to ensure that we always order by the closest impacted item
+  // when in front of start (displacing backwards) we need to reverse
+  // the natural order of the list so that it is ordered from last to first
   const ordered: Displacement[] = isInFrontOfStart
     ? displaced.reverse()
     : displaced;
-  const index: number = (() => {
-    // const startIndex = insideHome.indexOf(draggable);
-    const startIndex = draggable.descriptor.index;
-    const length: number = ordered.length;
-    if (!length) {
-      return startIndex;
-    }
-
-    if (isInFrontOfStart) {
-      return startIndex + length;
-    }
-    // is moving backwards
-    return startIndex - length;
-  })();
+  const index: number = getNewIndex(
+    draggable.descriptor.index,
+    ordered.length,
+    isInFrontOfStart,
+  );
 
   const newMovement: DragMovement = {
     displaced: ordered,
@@ -174,7 +172,6 @@ export default ({
       droppableId: home.descriptor.id,
       index,
     },
-    // TODO
     merge: null,
   };
 

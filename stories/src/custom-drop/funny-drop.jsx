@@ -2,6 +2,7 @@
 import React from 'react';
 import styled from 'react-emotion';
 import { grid, colors } from '../constants';
+import reorder from '../reorder';
 import {
   DragDropContext,
   Draggable,
@@ -11,6 +12,7 @@ import {
   type DraggableStateSnapshot,
   type DraggableStyle,
   type DraggableDroppingState,
+  type DropResult,
 } from '../../../src';
 
 type Task = {|
@@ -91,7 +93,18 @@ export default class App extends React.Component<*, State> {
     tasks: initial,
   };
 
-  onDragEnd = () => {};
+  onDragEnd = (result: DropResult) => {
+    if (!result.destination) {
+      return;
+    }
+    this.setState({
+      tasks: reorder(
+        this.state.tasks,
+        result.source.index,
+        result.destination.index,
+      ),
+    });
+  };
 
   render() {
     return (
