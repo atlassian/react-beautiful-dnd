@@ -58,6 +58,7 @@ type Props = {|
   internalScroll?: boolean,
   scrollContainerStyle?: Object,
   isDropDisabled?: boolean,
+  isCombineEnabled?: boolean,
   style?: Object,
   // may not be provided - and might be null
   ignoreContainerClipping?: boolean,
@@ -129,6 +130,7 @@ export default class QuoteList extends React.Component<Props> {
       internalScroll,
       scrollContainerStyle,
       isDropDisabled,
+      isCombineEnabled,
       listId,
       listType,
       style,
@@ -142,7 +144,7 @@ export default class QuoteList extends React.Component<Props> {
         type={listType}
         ignoreContainerClipping={ignoreContainerClipping}
         isDropDisabled={isDropDisabled}
-        isCombineEnabled={false}
+        isCombineEnabled={isCombineEnabled}
       >
         {(
           dropProvided: DroppableProvided,
