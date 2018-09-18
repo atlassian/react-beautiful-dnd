@@ -8,10 +8,12 @@ import type {
   DraggingState,
   DropPendingState,
   DragImpact,
+  Displacement,
 } from '../../../../src/types';
 import { scrollableHome, empty } from './util';
 import getSimpleStatePreset from '../../../utils/get-simple-state-preset';
 import publish from '../../../../src/state/publish';
+import getDisplacementMap from '../../../../src/state/get-displacement-map';
 
 const preset = getPreset();
 const state = getSimpleStatePreset();
@@ -49,22 +51,28 @@ it('should not animate any displacement', () => {
 
   invariant(result.phase === 'DRAGGING');
 
+  const displaced: Displacement[] = [
+    {
+      draggableId: added.descriptor.id,
+      isVisible: true,
+      // animation cleared
+      shouldAnimate: false,
+    },
+  ];
+
   const expected: DragImpact = {
     movement: {
-      displaced: [
-        {
-          draggableId: added.descriptor.id,
-          isVisible: true,
-          // animation cleared
-          shouldAnimate: false,
-        },
-      ],
-      amount: { x: 0, y: added.client.marginBox.height },
+      displaced,
+      map: getDisplacementMap(displaced),
+      displacedBy: {
+        value: preset.inHome1.displaceBy[preset.home.axis.line],
+        point: preset.inHome1.displaceBy,
+      },
       // this is a little confusing.
       // The position of the dragging item has been patched
       // to keep it in the same visual spot. This has actually
       // resulting in the dragging item moving backwards
-      isInFrontOfStart: false,
+      willDisplaceForward: false,
     },
     direction: scrollableHome.axis.direction,
     destination: {
@@ -72,6 +80,8 @@ it('should not animate any displacement', () => {
       index: 0,
       droppableId: scrollableHome.descriptor.id,
     },
+
+    merge: null,
   };
   expect(result.impact).toEqual(expected);
 });

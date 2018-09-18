@@ -310,7 +310,6 @@ export default class DroppableDimensionPublisher extends React.Component<
     });
 
     if (env.closestScrollable) {
-      console.log('closest scrollable', env.closestScrollable);
       // bind scroll listener
       env.closestScrollable.addEventListener(
         'scroll',
