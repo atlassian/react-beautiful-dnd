@@ -39,14 +39,13 @@ const adjustBorderBoxSize = (axis: Axis, old: Rect, fresh: Rect): Spacing => ({
   bottom: old.top + fresh.height,
 });
 
-// TODO: pull out into its own file - this is used everywhere
-const getClosestScrollable = (droppable: DroppableDimension): Scrollable => {
-  const scrollable: ?Scrollable = droppable.viewport.closestScrollable;
+const getFrame = (droppable: DroppableDimension): Scrollable => {
+  const frame: ?Scrollable = droppable.frame;
   invariant(
-    scrollable,
+    frame,
     'Droppable must be a scroll container to allow dynamic changes',
   );
-  return scrollable;
+  return frame;
 };
 
 type Args = {|
@@ -75,8 +74,8 @@ export default ({
       invariant(existing, 'Could not locate droppable in existing droppables');
       const oldClient: BoxModel = existing.client;
       const newClient: BoxModel = provided.client;
-      const oldScrollable: Scrollable = getClosestScrollable(existing);
-      const newScrollable: Scrollable = getClosestScrollable(provided);
+      const oldScrollable: Scrollable = getFrame(existing);
+      const newScrollable: Scrollable = getFrame(provided);
 
       // Extra checks to help with development
       if (process.env.NODE_ENV !== 'production') {
@@ -124,6 +123,7 @@ export default ({
         descriptor: provided.descriptor,
         isEnabled: provided.isEnabled,
         isCombineEnabled: provided.isCombineEnabled,
+        isFixedOnPage: provided.isFixedOnPage,
         direction: provided.axis.direction,
         client,
         page: withScroll(client, initialWindowScroll),

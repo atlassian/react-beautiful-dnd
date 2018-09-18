@@ -100,7 +100,10 @@ export default ({
       draggable: dimensions.draggables[state.critical.draggable.id],
       draggables: dimensions.draggables,
       droppables: dimensions.droppables,
-      previousImpact: getHomeImpact(state.critical, dimensions),
+      previousImpact: getHomeImpact(
+        dimensions.draggables[state.critical.draggable.id],
+        dimensions.droppables[state.critical.droppable.id],
+      ),
       viewport: state.viewport,
       direction: state.direction,
     }),

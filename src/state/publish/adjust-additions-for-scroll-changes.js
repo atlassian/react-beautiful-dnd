@@ -46,11 +46,11 @@ export default ({
     (draggable: DraggableDimension): DraggableDimension => {
       const droppableId: DroppableId = draggable.descriptor.droppableId;
       const modified: DroppableDimension = modifiedMap[droppableId];
-      const closest: ?Scrollable = modified.viewport.closestScrollable;
 
-      invariant(closest);
+      const frame: ?Scrollable = modified.frame;
+      invariant(frame);
 
-      const droppableScrollChange: Position = closest.scroll.diff.value;
+      const droppableScrollChange: Position = frame.scroll.diff.value;
 
       const totalChange: Position = add(
         windowScrollChange,
