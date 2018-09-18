@@ -9,15 +9,18 @@ import type {
   DroppableSubject,
   DroppableDescriptor,
   Scrollable,
-} from '../../../../../src/types';
+} from '../../../../src/types';
 import {
   getDroppableDimension,
   getDraggableDimension,
-} from '../../../../utils/dimension';
-import { withPlaceholder } from '../../../../../src/state/droppable/with-placeholder';
-import { toDraggableMap } from '../../../../../src/state/dimension-structures';
-import { vertical, horizontal } from '../../../../../src/state/axis';
-import { add, patch, origin, isEqual } from '../../../../../src/state/position';
+} from '../../../utils/dimension';
+import {
+  addPlaceholder,
+  removePlaceholder,
+} from '../../../../src/state/droppable/with-placeholder';
+import { toDraggableMap } from '../../../../src/state/dimension-structures';
+import { vertical, horizontal } from '../../../../src/state/axis';
+import { add, patch, origin, isEqual } from '../../../../src/state/position';
 
 const crossAxisStart: number = 0;
 const crossAxisEnd: number = 100;
@@ -77,57 +80,73 @@ const gap: number = 10;
     ]);
 
     describe('without frame', () => {
-      it('should not grow the subject if not required', () => {
-        const placeholderSize: Position = patch(axis.line, gap - 5);
+      describe('adding placeholder', () => {
+        it('should not grow the subject if not required', () => {
+          const placeholderSize: Position = patch(axis.line, gap - 5);
 
-        const result: DroppableDimension = withPlaceholder(
-          withoutFrame,
-          placeholderSize,
-          draggables,
-        );
-
-        const expected: DroppableSubject = {
-          // unchanged
-          pageMarginBox: withoutFrame.subject.pageMarginBox,
-          active: withoutFrame.subject.active,
-          // added
-          withPlaceholder: {
-            increasedBy: null,
-            oldFrameMaxScroll: null,
+          const result: DroppableDimension = addPlaceholder(
+            withoutFrame,
             placeholderSize,
-          },
-        };
-        expect(result.subject).toEqual(expected);
+            draggables,
+          );
+
+          const expected: DroppableSubject = {
+            // unchanged
+            pageMarginBox: withoutFrame.subject.pageMarginBox,
+            active: withoutFrame.subject.active,
+            // added
+            withPlaceholder: {
+              increasedBy: null,
+              oldFrameMaxScroll: null,
+              placeholderSize,
+            },
+          };
+          expect(result.subject).toEqual(expected);
+        });
+
+        it('should grow the subject if required', () => {
+          const excess: number = 20;
+          const placeholderSize: Position = patch(axis.line, gap + excess);
+
+          const result: DroppableDimension = addPlaceholder(
+            withoutFrame,
+            placeholderSize,
+            draggables,
+          );
+
+          const active: ?Rect = withoutFrame.subject.active;
+          invariant(active);
+          const expected: DroppableSubject = {
+            // unchanged
+            pageMarginBox: withoutFrame.subject.pageMarginBox,
+            // increased
+            active: getRect({
+              ...active,
+              [axis.end]: active[axis.end] + excess,
+            }),
+            // added
+            withPlaceholder: {
+              increasedBy: patch(axis.line, excess),
+              oldFrameMaxScroll: null,
+              placeholderSize,
+            },
+          };
+          expect(result.subject).toEqual(expected);
+        });
       });
 
-      it('should grow the subject if required', () => {
+      it('should restore the subject to its original size when placeholder is no longer needed', () => {
         const excess: number = 20;
         const placeholderSize: Position = patch(axis.line, gap + excess);
 
-        const result: DroppableDimension = withPlaceholder(
+        const added: DroppableDimension = addPlaceholder(
           withoutFrame,
           placeholderSize,
           draggables,
         );
+        const removed: DroppableDimension = removePlaceholder(added);
 
-        const active: ?Rect = withoutFrame.subject.active;
-        invariant(active);
-        const expected: DroppableSubject = {
-          // unchanged
-          pageMarginBox: withoutFrame.subject.pageMarginBox,
-          // increased
-          active: getRect({
-            ...active,
-            [axis.end]: active[axis.end] + excess,
-          }),
-          // added
-          withPlaceholder: {
-            increasedBy: patch(axis.line, excess),
-            oldFrameMaxScroll: null,
-            placeholderSize,
-          },
-        };
-        expect(result.subject).toEqual(expected);
+        expect(removed).toEqual(withoutFrame);
       });
     });
 
@@ -155,7 +174,7 @@ const gap: number = 10;
       it('should not grow the subject if not required', () => {
         const placeholderSize: Position = patch(axis.line, gap - 5);
 
-        const result: DroppableDimension = withPlaceholder(
+        const result: DroppableDimension = addPlaceholder(
           withFrame,
           placeholderSize,
           draggables,
@@ -185,7 +204,7 @@ const gap: number = 10;
         const excess: number = 20;
         const placeholderSize: Position = patch(axis.line, gap + excess);
 
-        const result: DroppableDimension = withPlaceholder(
+        const result: DroppableDimension = addPlaceholder(
           withFrame,
           placeholderSize,
           draggables,
@@ -219,6 +238,20 @@ const gap: number = 10;
         );
         // no client change
         expect(newFrame.frameClient).toEqual(newFrame.frameClient);
+      });
+
+      it('should restore the original frame when placeholder is no longer needed', () => {
+        const excess: number = 20;
+        const placeholderSize: Position = patch(axis.line, gap + excess);
+
+        const added: DroppableDimension = addPlaceholder(
+          withFrame,
+          placeholderSize,
+          draggables,
+        );
+        const removed: DroppableDimension = removePlaceholder(added);
+
+        expect(removed).toEqual(withFrame);
       });
     });
   });

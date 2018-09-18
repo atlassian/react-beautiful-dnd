@@ -1,8 +1,8 @@
 // @flow
 import type { Position } from 'css-box-model';
 import {
-  withPlaceholder,
-  withoutPlaceholder,
+  addPlaceholder,
+  removePlaceholder,
 } from '../droppable/with-placeholder';
 import { patch } from '../position';
 import shouldUsePlaceholder from '../droppable/should-use-placeholder';
@@ -42,7 +42,7 @@ const clearUnusedPlaceholder = (
     return state.dimensions;
   }
 
-  const patched: DroppableDimension = withoutPlaceholder(lastDroppable);
+  const patched: DroppableDimension = removePlaceholder(lastDroppable);
 
   // TODO: need to unwind any existing placeholders
   return {
@@ -89,7 +89,7 @@ export default ({ state: oldState, draggable, impact }: Args): DimensionMap => {
   );
 
   // Need to patch the existing droppable
-  const patched: DroppableDimension = withPlaceholder(
+  const patched: DroppableDimension = addPlaceholder(
     droppable,
     placeholderSize,
     base.draggables,

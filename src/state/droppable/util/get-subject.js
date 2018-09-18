@@ -1,5 +1,5 @@
 // @flow
-import { getRect, type Position, type Rect, type Spacing } from 'css-box-model';
+import { getRect, type Rect, type Spacing } from 'css-box-model';
 import type {
   Axis,
   Scrollable,
@@ -8,19 +8,13 @@ import type {
 } from '../../../types';
 import executeClip from './clip';
 import { offsetByPosition } from '../../spacing';
-import { isEqual, origin } from '../../position';
 
 const scroll = (target: Spacing, frame: ?Scrollable): Spacing => {
   if (!frame) {
     return target;
   }
 
-  const displacement: Position = frame.scroll.diff.displacement;
-  if (isEqual(displacement, origin)) {
-    return target;
-  }
-
-  return offsetByPosition(target, displacement);
+  return offsetByPosition(target, frame.scroll.diff.displacement);
 };
 
 const increase = (
