@@ -80,6 +80,7 @@ export type DroppingState = {|
   // to easily enable patching of styles
   duration: number,
   curve: string,
+  moveTo: Position,
 |};
 
 export type StateSnapshot = {|

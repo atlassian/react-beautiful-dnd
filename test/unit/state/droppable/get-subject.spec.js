@@ -75,6 +75,7 @@ it('should increase the subject by a placeholder', () => {
       withPlaceholder: {
         increasedBy,
         placeholderSize: increasedBy,
+        oldFrameMaxScroll: null,
       },
       axis,
       frame: null,

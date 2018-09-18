@@ -192,6 +192,7 @@ export const makeMapStateToProps = (): Selector => {
           reason,
           duration,
           curve: curves.drop,
+          moveTo: pending.newHomeOffset,
         },
         offset: pending.newHomeOffset,
         // still need to provide the dimension for the placeholder

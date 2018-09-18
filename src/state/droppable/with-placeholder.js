@@ -134,7 +134,7 @@ export const removePlaceholder = (
   const oldMaxScroll: ?Position = added.oldFrameMaxScroll;
   invariant(
     oldMaxScroll,
-    'Expected droppable to have old frame scroll when removing placeholder',
+    'Expected droppable with frame to have old max frame scroll when removing placeholder',
   );
 
   const newFrame: Scrollable = withMaxScroll(frame, oldMaxScroll);

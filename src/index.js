@@ -40,6 +40,7 @@ export type {
 export type {
   Provided as DraggableProvided,
   StateSnapshot as DraggableStateSnapshot,
+  DroppingState as DraggableDroppingState,
   DraggableProps,
   DraggableStyle,
   DraggingStyle,
