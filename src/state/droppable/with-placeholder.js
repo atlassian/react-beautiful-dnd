@@ -20,7 +20,7 @@ export const getRequiredGrowthForPlaceholder = (
   draggables: DraggableDimensionMap,
 ): ?Position => {
   const axis: Axis = droppable.axis;
-  // TODO: margin collapsing?
+  // TODO: consider margin collapsing?
   const availableSpace: number = droppable.subject.pageMarginBox[axis.size];
   const insideDroppable: DraggableDimension[] = getDraggablesInsideDroppable(
     droppable,
