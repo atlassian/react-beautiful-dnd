@@ -106,6 +106,9 @@ export type PlaceholderInSubject = {|
   // placeholder if there is no required space
   increasedBy: ?Position,
   placeholderSize: Position,
+  // max scroll before placeholder added
+  // will be null if there was no frame
+  oldFrameMaxScroll: ?Position,
 |};
 
 export type DroppableSubject = {|

@@ -11,11 +11,10 @@ import type {
   PlaceholderInSubject,
 } from '../../types';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import getMaxScroll from '../get-max-scroll';
-import { add, origin, patch } from '../position';
+import { add, patch } from '../position';
 import getSubject from './util/get-subject';
 
-const getRequiredGrowthForPlaceholder = (
+export const getRequiredGrowthForPlaceholder = (
   droppable: DroppableDimension,
   withPlaceholderSize: Position,
   draggables: DraggableDimensionMap,
@@ -43,6 +42,14 @@ const getRequiredGrowthForPlaceholder = (
   return patch(axis.line, needsToGrowBy);
 };
 
+const withMaxScroll = (frame: Scrollable, max: Position): Scrollable => ({
+  ...frame,
+  scroll: {
+    ...frame.scroll,
+    max,
+  },
+});
+
 export const withPlaceholder = (
   droppable: DroppableDimension,
   withPlaceholderSize: Position,
@@ -64,6 +71,7 @@ export const withPlaceholder = (
   const growBy: PlaceholderInSubject = {
     placeholderSize: withPlaceholderSize,
     increasedBy: requiredGrowth,
+    oldFrameMaxScroll: droppable.frame ? droppable.frame.scroll.max : null,
   };
 
   if (!frame) {
@@ -71,7 +79,6 @@ export const withPlaceholder = (
       pageMarginBox: droppable.subject.pageMarginBox,
       withPlaceholder: growBy,
       axis: droppable.axis,
-      scrollDisplacement: origin,
       frame: droppable.frame,
     });
     return {
@@ -84,19 +91,12 @@ export const withPlaceholder = (
     ? add(frame.scroll.max, requiredGrowth)
     : frame.scroll.max;
 
-  const newFrame: Scrollable = {
-    ...frame,
-    scroll: {
-      ...frame.scroll,
-      max: maxScroll,
-    },
-  };
+  const newFrame: Scrollable = withMaxScroll(frame, maxScroll);
 
   const subject: DroppableSubject = getSubject({
     pageMarginBox: droppable.subject.pageMarginBox,
     withPlaceholder: growBy,
     axis: droppable.axis,
-    scrollDisplacement: newFrame.scroll.diff.displacement,
     frame: newFrame,
   });
   return {
@@ -111,7 +111,7 @@ export const withoutPlaceholder = (
 ): DroppableDimension => {
   invariant(
     droppable.subject.withPlaceholder,
-    'Cannot remove placeholder size from subject when there was none',
+    'Cannot remove placeholder form subject when there was none',
   );
 
   const frame: ?Scrollable = droppable.frame;
@@ -121,7 +121,6 @@ export const withoutPlaceholder = (
       pageMarginBox: droppable.subject.pageMarginBox,
       withPlaceholder: null,
       axis: droppable.axis,
-      scrollDisplacement: origin,
       frame: droppable.frame,
     });
     return {
@@ -130,35 +129,18 @@ export const withoutPlaceholder = (
     };
   }
 
-  // Original max scroll
-  // TODO: should just store this somewhere?
-  /*
-    scroll: {
-      // then we can just revert to this
-      originalMax: Position
+  const oldMaxScroll: Position = withPlaceholder.oldFrameMaxScroll;
+  invariant(
+    oldMaxScroll,
+    'Expected droppable to have old frame scroll when removing placeholder',
+  );
 
-    }
-  */
-  const maxScroll: Position = getMaxScroll({
-    scrollHeight: frame.scrollSize.scrollHeight,
-    scrollWidth: frame.scrollSize.scrollWidth,
-    height: frame.frameClient.paddingBox.height,
-    width: frame.frameClient.paddingBox.width,
-  });
-
-  const newFrame: Scrollable = {
-    ...frame,
-    scroll: {
-      ...frame.scroll,
-      max: maxScroll,
-    },
-  };
+  const newFrame: Scrollable = withMaxScroll(frame, oldMaxScroll);
 
   const subject: DroppableSubject = getSubject({
     pageMarginBox: droppable.subject.pageMarginBox,
     withPlaceholder: null,
     axis: droppable.axis,
-    scrollDisplacement: newFrame.scroll.diff.displacement,
     frame: newFrame,
   });
   return {
