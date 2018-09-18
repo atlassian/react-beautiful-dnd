@@ -22,6 +22,7 @@ import adjustAdditionsForScrollChanges from './adjust-additions-for-scroll-chang
 import getDraggableMap from './get-draggable-map';
 import withNoAnimatedDisplacement from './with-no-animated-displacement';
 import { toDroppableMap } from '../dimension-structures';
+import noImpact from '../no-impact';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -94,20 +95,20 @@ export default ({
   });
 
   // Get the impact of all of our changes
-  const impact: DragImpact = withNoAnimatedDisplacement(
-    getDragImpact({
-      pageBorderBoxCenter: current.page.borderBoxCenter,
-      draggable: dimensions.draggables[state.critical.draggable.id],
-      draggables: dimensions.draggables,
-      droppables: dimensions.droppables,
-      previousImpact: getHomeImpact(
-        dimensions.draggables[state.critical.draggable.id],
-        dimensions.droppables[state.critical.droppable.id],
-      ),
-      viewport: state.viewport,
-      direction: state.direction,
-    }),
-  );
+  // const impact: DragImpact = withNoAnimatedDisplacement(
+  console.log('getting impact');
+  console.log('pageBorderBoxCenter', current.page.borderBoxCenter);
+  const impact: DragImpact = getDragImpact({
+    pageBorderBoxCenter: current.page.borderBoxCenter,
+    draggable: dimensions.draggables[state.critical.draggable.id],
+    draggables: dimensions.draggables,
+    droppables: dimensions.droppables,
+    // starting from a fresh slate
+    previousImpact: noImpact,
+    viewport: state.viewport,
+    direction: state.direction,
+  });
+  // );
 
   const isOrphaned: boolean = Boolean(
     state.autoScrollMode === 'JUMP' &&

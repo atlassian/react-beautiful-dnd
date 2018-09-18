@@ -14,7 +14,7 @@ import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import { add, patch } from '../position';
 import getSubject from './util/get-subject';
 
-export const getRequiredGrowthForPlaceholder = (
+const getRequiredGrowthForPlaceholder = (
   droppable: DroppableDimension,
   placeholderSize: Position,
   draggables: DraggableDimensionMap,
