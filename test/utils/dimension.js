@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import {
   createBox,
   getRect,
@@ -40,6 +41,11 @@ type GetComputedSpacingArgs = {|
 |};
 
 const origin: Position = { x: 0, y: 0 };
+
+export const getFrame = (droppable: DroppableDimension): Scrollable => {
+  invariant(droppable.frame);
+  return droppable.frame;
+};
 
 export const getComputedSpacing = ({
   margin = noSpacing,

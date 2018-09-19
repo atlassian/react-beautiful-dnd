@@ -6,13 +6,13 @@ import {
   getPreset,
   getDraggableDimension,
   addDroppable,
-  getClosestScrollable,
+  getFrame,
 } from '../../../utils/dimension';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import { empty, withScrollables, scrollableHome } from './util';
 import { add, negate } from '../../../../src/state/position';
 import scrollViewport from '../../../../src/state/scroll-viewport';
-import { scrollDroppable } from '../../../../src/state/droppable-dimension';
+import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
 import type {
   Published,
   DraggableDimension,
@@ -78,7 +78,7 @@ it('should shift added draggables to account for change in droppable scroll sinc
   const scrollChange: Position = { x: 20, y: 40 };
   const scrollDisplacement: Position = negate(scrollChange);
   const newScroll: Position = add(
-    getClosestScrollable(scrollableHome).scroll.initial,
+    getFrame(scrollableHome).scroll.initial,
     scrollChange,
   );
   const scrolled: DroppableDimension = scrollDroppable(
@@ -86,7 +86,7 @@ it('should shift added draggables to account for change in droppable scroll sinc
     newScroll,
   );
   // validation
-  expect(getClosestScrollable(scrolled).scroll.current).toEqual(scrollChange);
+  expect(getFrame(scrolled).scroll.current).toEqual(scrollChange);
   // dimensions
   const added: DraggableDimension = getDraggableDimension({
     descriptor: {

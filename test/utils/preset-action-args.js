@@ -87,19 +87,24 @@ export const publishAdditionArgs: Published = (() => {
 export const getDragStart = (custom?: Critical = critical): DragStart => ({
   draggableId: custom.draggable.id,
   type: custom.droppable.type,
-  source: getHomeLocation(custom),
+  source: getHomeLocation(custom.draggable),
 });
 
 export const completeDropArgs: DropResult = {
   ...getDragStart(critical),
-  destination: getHomeLocation(critical),
+  destination: getHomeLocation(critical.draggable),
   reason: 'DROP',
+  combine: null,
 };
 
 export const animateDropArgs: PendingDrop = {
   newHomeOffset: { x: 10, y: 10 },
-  impact: getHomeImpact(critical, preset.dimensions),
+  impact: getHomeImpact(
+    preset.dimensions.draggables[critical.draggable.id],
+    preset.dimensions.droppables[critical.droppable.id],
+  ),
   result: completeDropArgs,
+  dropDuration: 1,
 };
 
 export const userCancelArgs: PendingDrop = {

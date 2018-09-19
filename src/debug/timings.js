@@ -14,7 +14,7 @@ export const forceEnable = () => {
 };
 
 // Debug: uncomment to enable
-forceEnable();
+// forceEnable();
 
 export const start = (key: string) => {
   // we want to strip all the code out for production builds

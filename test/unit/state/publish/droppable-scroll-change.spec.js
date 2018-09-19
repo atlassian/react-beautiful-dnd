@@ -14,13 +14,11 @@ import {
   getPreset,
   makeScrollable,
   addDroppable,
-  getClosestScrollable,
+  getFrame,
 } from '../../../utils/dimension';
 import getStatePreset from '../../../utils/get-simple-state-preset';
-import {
-  scrollDroppable,
-  getDroppableDimension,
-} from '../../../../src/state/droppable-dimension';
+import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
+import getDroppable from '../../../../src/state/droppable/get-droppable';
 import publish from '../../../../src/state/publish';
 import { empty, adjustBox } from './util';
 import { withScroll } from '../../../../node_modules/css-box-model';
@@ -72,12 +70,12 @@ it('should adjust the current droppable scroll in response to a change', () => {
   const updated: DroppableDimension =
     result.dimensions.droppables[preset.home.descriptor.id];
   // current scroll set to the
-  expect(getClosestScrollable(updated).scroll.current).toEqual(currentScroll);
+  expect(getFrame(updated).scroll.current).toEqual(currentScroll);
 });
 
 it('should adjust for a new scroll size', () => {
   const scrollableHome: DroppableDimension = makeScrollable(preset.home, 0);
-  const scrollable: Scrollable = getClosestScrollable(scrollableHome);
+  const scrollable: Scrollable = getFrame(scrollableHome);
   const increase: Position = {
     x: 10,
     y: 20,
@@ -87,10 +85,12 @@ it('should adjust for a new scroll size', () => {
     scrollWidth: scrollable.scrollSize.scrollWidth + increase.x,
   };
   const client: BoxModel = adjustBox(scrollableHome.client, increase);
-  const withIncreased: DroppableDimension = getDroppableDimension({
+  const withIncreased: DroppableDimension = getDroppable({
     descriptor: scrollableHome.descriptor,
     isEnabled: scrollableHome.isEnabled,
     direction: scrollableHome.axis.direction,
+    isCombineEnabled: scrollableHome.isCombineEnabled,
+    isFixedOnPage: scrollableHome.isFixedOnPage,
     client,
     page: withScroll(client, preset.windowScroll),
     closest: {
@@ -125,5 +125,5 @@ it('should adjust for a new scroll size', () => {
   const updated: DroppableDimension =
     result.dimensions.droppables[preset.home.descriptor.id];
   // current scroll set to the
-  expect(getClosestScrollable(updated).scrollSize).toEqual(increased);
+  expect(getFrame(updated).scrollSize).toEqual(increased);
 });

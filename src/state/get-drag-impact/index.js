@@ -40,7 +40,6 @@ export default ({
   viewport,
   direction,
 }: Args): DragImpact => {
-  console.log('DRAG IMPACT CALLED');
   const destinationId: ?DroppableId = getDroppableOver({
     target: pageBorderBoxCenter,
     droppables,

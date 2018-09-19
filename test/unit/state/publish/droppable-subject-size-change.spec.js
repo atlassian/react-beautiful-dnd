@@ -18,7 +18,7 @@ import type {
 import {
   getPreset,
   makeScrollable,
-  getClosestScrollable,
+  getFrame,
   addDroppable,
 } from '../../../utils/dimension';
 import { isEqual, noSpacing } from '../../../../src/state/spacing';
@@ -34,7 +34,7 @@ const scrollableHome: DroppableDimension = makeScrollable(preset.home, 0);
 invariant(
   isEqual(
     scrollableHome.client.marginBox,
-    getClosestScrollable(scrollableHome).frameClient.marginBox,
+    getFrame(scrollableHome).frameClient.marginBox,
   ),
   'Expected scrollableHome to have no scroll area',
 );
@@ -88,27 +88,21 @@ it('should adjust a subject in response to a change', () => {
   expect(postUpdateHome.client).toEqual(scrollableHomeWithAdjustment.client);
 
   // frame has not changed
-  expect(getClosestScrollable(postUpdateHome).frameClient).toEqual(
-    getClosestScrollable(scrollableHome).frameClient,
+  expect(getFrame(postUpdateHome).frameClient).toEqual(
+    getFrame(scrollableHome).frameClient,
   );
 });
 
 it('should throw if the frame size changes', () => {
   const withFrameSizeChanged: DroppableDimension = {
     ...scrollableHome,
-    viewport: {
-      ...scrollableHome.viewport,
-      closestScrollable: {
-        ...getClosestScrollable(scrollableHome),
-        // changing the size of the frame
-        frameClient: adjustBox(
-          getClosestScrollable(scrollableHome).frameClient,
-          {
-            x: 5,
-            y: 10,
-          },
-        ),
-      },
+    frame: {
+      ...scrollableHome.frame,
+      // changing the size of the frame
+      frameClient: adjustBox(getFrame(scrollableHome).frameClient, {
+        x: 5,
+        y: 10,
+      }),
     },
   };
   const published: Published = {
@@ -178,7 +172,7 @@ it('should throw if any spacing changes to the client', () => {
 });
 
 it('should throw if any spacing changes to the frame', () => {
-  const scrollable: Scrollable = getClosestScrollable(scrollableHome);
+  const scrollable: Scrollable = getFrame(scrollableHome);
   const frameClient: BoxModel = scrollable.frameClient;
   const margin: Spacing = frameClient.margin;
   const padding: Spacing = frameClient.padding;
@@ -208,13 +202,10 @@ it('should throw if any spacing changes to the frame', () => {
   withNewFrameSpacing.forEach((withSpacing: BoxModel) => {
     const withFrameSizeChanged: DroppableDimension = {
       ...scrollableHome,
-      viewport: {
-        ...scrollableHome.viewport,
-        closestScrollable: {
-          ...getClosestScrollable(scrollableHome),
-          // changing the size of the frame
-          frameClient: withSpacing,
-        },
+      frame: {
+        ...scrollableHome.frame,
+        // changing the size of the frame
+        frameClient: withSpacing,
       },
     };
 

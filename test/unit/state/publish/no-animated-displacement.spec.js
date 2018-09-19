@@ -2,6 +2,7 @@
 import invariant from 'tiny-invariant';
 import { getPreset, addDroppable } from '../../../utils/dimension';
 import type {
+  Axis,
   DraggableDimension,
   CollectingState,
   Published,
@@ -14,6 +15,7 @@ import { scrollableHome, empty } from './util';
 import getSimpleStatePreset from '../../../utils/get-simple-state-preset';
 import publish from '../../../../src/state/publish';
 import getDisplacementMap from '../../../../src/state/get-displacement-map';
+import { patch } from '../../../../src/state/position';
 
 const preset = getPreset();
 const state = getSimpleStatePreset();
@@ -59,20 +61,17 @@ it('should not animate any displacement', () => {
       shouldAnimate: false,
     },
   ];
+  const axis: Axis = preset.home.axis;
 
   const expected: DragImpact = {
     movement: {
       displaced,
       map: getDisplacementMap(displaced),
       displacedBy: {
-        value: preset.inHome1.displaceBy[preset.home.axis.line],
-        point: preset.inHome1.displaceBy,
+        value: preset.inHome1.displaceBy[axis.line],
+        point: patch(axis.line, preset.inHome1.displaceBy[axis.line]),
       },
-      // this is a little confusing.
-      // The position of the dragging item has been patched
-      // to keep it in the same visual spot. This has actually
-      // resulting in the dragging item moving backwards
-      willDisplaceForward: false,
+      willDisplaceForward: true,
     },
     direction: scrollableHome.axis.direction,
     destination: {
