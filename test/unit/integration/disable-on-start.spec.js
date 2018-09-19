@@ -95,8 +95,6 @@ class App extends React.Component<*, State> {
 }
 
 it('should allow the disabling of a droppable in onDragStart', () => {
-  jest.useFakeTimers();
-
   const hooks: Hooks = {
     onDragStart: jest.fn(),
     onDragUpdate: jest.fn(),
@@ -105,9 +103,6 @@ it('should allow the disabling of a droppable in onDragStart', () => {
   const wrapper: ReactWrapper = mount(<App {...hooks} />);
 
   pressSpacebar(wrapper.find('.drag-handle'));
-
-  // run out prepare phase
-  jest.runOnlyPendingTimers();
 
   const start: DragStart = {
     draggableId: 'draggable',
@@ -124,6 +119,7 @@ it('should allow the disabling of a droppable in onDragStart', () => {
     ...start,
     // no destination as it is now disabled
     destination: null,
+    combine: null,
   };
   expect(hooks.onDragUpdate).toHaveBeenCalledWith(update);
 });

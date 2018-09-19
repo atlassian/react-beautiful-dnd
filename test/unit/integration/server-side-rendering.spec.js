@@ -31,7 +31,7 @@ class App extends Component<*, *> {
         <Droppable droppableId="drop-1">
           {(provided: DroppableProvided) => (
             <div ref={provided.innerRef} {...provided.droppableProps}>
-              <Draggable draggableId="drag-1">
+              <Draggable draggableId="drag-1" index={0}>
                 {(dragProvided: DraggableProvided) => (
                   <div
                     ref={dragProvided.innerRef}

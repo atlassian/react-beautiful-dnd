@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import React from 'react';
 import { mount } from 'enzyme';
 import { getRect, type Rect, type Position } from 'css-box-model';
@@ -58,6 +59,7 @@ describe('hooks integration', () => {
 
     return mount(
       <DragDropContext
+        onBeforeDragStart={hooks.onBeforeDragStart}
         onDragStart={hooks.onDragStart}
         onDragUpdate={hooks.onDragUpdate}
         onDragEnd={hooks.onDragEnd}
@@ -90,8 +92,8 @@ describe('hooks integration', () => {
 
   beforeEach(() => {
     requestAnimationFrame.reset();
-    jest.useFakeTimers();
     hooks = {
+      onBeforeDragStart: jest.fn(),
       onDragStart: jest.fn(),
       onDragUpdate: jest.fn(),
       onDragEnd: jest.fn(),
@@ -102,9 +104,6 @@ describe('hooks integration', () => {
   });
 
   afterEach(() => {
-    requestAnimationFrame.reset();
-    jest.useRealTimers();
-
     // clean up any loose events
     wrapper.unmount();
 
@@ -138,10 +137,6 @@ describe('hooks integration', () => {
 
       // Drag does not start until mouse has moved past a certain threshold
       windowMouseMove(dragStart);
-
-      // Need to wait for the nested async lift action to complete
-      // this takes two async actions.
-      jest.runAllTimers();
     };
 
     const move = () => {
@@ -154,11 +149,8 @@ describe('hooks integration', () => {
     };
 
     const waitForReturnToHome = () => {
-      // flush the return to home animation
-      requestAnimationFrame.flush();
-
-      // animation finishing waits a tick before calling the callback
-      jest.runOnlyPendingTimers();
+      // cheating
+      wrapper.find(Draggable).simulate('transitionEnd');
     };
 
     const stop = () => {
@@ -201,6 +193,7 @@ describe('hooks integration', () => {
       source,
       // did not move anywhere
       destination: source,
+      combine: null,
       reason: 'DROP',
     };
 
@@ -209,22 +202,34 @@ describe('hooks integration', () => {
       type: 'DEFAULT',
       source,
       destination: null,
+      combine: null,
       reason: 'CANCEL',
     };
 
     return { start, completed, cancelled };
   })();
 
+  const wasOnBeforeDragCalled = (
+    amountOfDrags?: number = 1,
+    provided?: Hooks = hooks,
+  ) => {
+    invariant(provided.onBeforeDragStart);
+    expect(provided.onBeforeDragStart).toHaveBeenCalledTimes(amountOfDrags);
+    // $ExpectError - mock property
+    expect(provided.onBeforeDragStart.mock.calls[amountOfDrags - 1][0]).toEqual(
+      expected.start,
+    );
+  };
+
   const wasDragStarted = (
     amountOfDrags?: number = 1,
     provided?: Hooks = hooks,
   ) => {
+    invariant(
+      provided.onDragStart,
+      'cannot validate if drag was started without onDragStart hook',
+    );
     expect(provided.onDragStart).toHaveBeenCalledTimes(amountOfDrags);
-    if (!hooks.onDragStart) {
-      throw new Error(
-        'cannot validate if drag was started without onDragStart hook',
-      );
-    }
     // $ExpectError - mock property
     expect(provided.onDragStart.mock.calls[amountOfDrags - 1][0]).toEqual(
       expected.start,
@@ -248,6 +253,31 @@ describe('hooks integration', () => {
     );
   };
 
+  describe('before drag start', () => {
+    it('should call the onBeforeDragStart hook just before the drag starts', () => {
+      drag.start();
+
+      wasOnBeforeDragCalled();
+
+      // cleanup
+      drag.stop();
+    });
+
+    it('should not call onDragStart while the drag is occurring', () => {
+      drag.start();
+
+      wasOnBeforeDragCalled();
+
+      drag.move();
+
+      // should not have called on drag start again
+      expect(hooks.onBeforeDragStart).toHaveBeenCalledTimes(1);
+
+      // cleanup
+      drag.stop();
+    });
+  });
+
   describe('drag start', () => {
     it('should call the onDragStart hook when a drag starts', () => {
       drag.start();
@@ -260,6 +290,7 @@ describe('hooks integration', () => {
 
     it('should not call onDragStart while the drag is occurring', () => {
       drag.start();
+
       wasDragStarted();
 
       drag.move();
@@ -318,10 +349,12 @@ describe('hooks integration', () => {
     it('should publish subsequent drags after a cancel', () => {
       drag.start();
       drag.cancel();
+      wasOnBeforeDragCalled(1);
       wasDragStarted(1);
       wasDragCancelled(1);
 
       drag.perform();
+      wasOnBeforeDragCalled(2);
       wasDragStarted(2);
       wasDragCompleted(2);
     });
