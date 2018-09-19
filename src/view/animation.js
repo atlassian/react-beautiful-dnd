@@ -1,7 +1,7 @@
 // @flow
 import type { Position } from 'css-box-model';
 import type { DropReason } from '../types';
-import { distance, isEqual } from '../state/position';
+import { distance as getDistance, isEqual, origin } from '../state/position';
 
 type GetDropDurationArgs = {|
   current: Position,
@@ -9,24 +9,13 @@ type GetDropDurationArgs = {|
   reason: DropReason,
 |};
 
-// For debug
-// const min: number = 5;
-// const max: number = 10;
-
-const drop = (() => {
-  const min: number = 0.33;
-  const max: number = 0.55;
-
-  return {
-    min,
-    max,
-    range: max - min,
-    maxAtDistance: 1500,
-  };
-})();
-
+const minDropTime: number = 0.33;
+const maxDropTime: number = 0.55;
+const dropTimeRange: number = maxDropTime - minDropTime;
+const maxDropTimeAtDistance: number = 1500;
 // will bring a time lower - which makes it faster
-const faster: number = 0.6;
+const cancelDropModifier: number = 0.6;
+const outOfTheWayTime: number = 0.2;
 
 export const getDropDuration = ({
   current,
@@ -37,33 +26,29 @@ export const getDropDuration = ({
     return 0;
   }
 
-  const value: number = distance(current, destination);
+  const distance: number = getDistance(current, destination);
 
-  if (value === 0) {
-    return drop.min;
+  if (distance === 0) {
+    return minDropTime;
   }
 
-  if (value >= drop.maxAtDistance) {
-    return drop.max;
+  if (distance >= maxDropTimeAtDistance) {
+    return maxDropTime;
   }
 
   // * range from:
   // 0px = 0.33s
   // 1500px and over = 0.55s
-  // * If reason === 'CANCEL' then speeding up the animation by 30%
+  // * If reason === 'CANCEL' then speeding up the animation
   // * round to 2 decimal points
 
-  const percentage: number = value / drop.maxAtDistance;
-  const duration: number = drop.min + drop.range * percentage;
+  const percentage: number = distance / maxDropTimeAtDistance;
+  const duration: number = minDropTime + dropTimeRange * percentage;
 
   const withDuration: number =
-    reason === 'CANCEL' ? duration * faster : duration;
+    reason === 'CANCEL' ? duration * cancelDropModifier : duration;
   // To two decimal points by converting to string and back
   return Number(withDuration.toFixed(2));
-};
-
-const durations = {
-  slide: 0.2,
 };
 
 export const curves = {
@@ -71,22 +56,13 @@ export const curves = {
   drop: 'cubic-bezier(.2,1,.1,1)',
 };
 
-// TODO
-export const scale = {
-  dropOntoGroupTarget: 0.75,
-  groupTarget: 1.04,
-};
-
-export const opacity = {
-  isCombiningWith: 0.7,
-};
-
 export const transitions = {
-  opacity: `opacity ${durations.slide}s ${curves.outOfTheWay}`,
-  snapTo: `transform ${durations.slide}s ${curves.drop}`,
-  outOfTheWay: `transform ${durations.slide}s ${curves.outOfTheWay}`,
-  isDropping: (duration: number): string =>
-    `transform ${duration}s ${curves.drop}, opacity ${duration}s ${
-      curves.outOfTheWay
-    }`,
+  snapTo: `transform ${outOfTheWayTime}s ${curves.drop}`,
+  outOfTheWay: `transform ${outOfTheWayTime}s ${curves.outOfTheWay}`,
+  drop: (duration: number): string => `transform ${duration}s ${curves.drop}`,
+};
+
+export const transforms = {
+  moveTo: (offset: Position) =>
+    isEqual(offset, origin) ? null : `translate(${offset.x}px, ${offset.y}px)`,
 };

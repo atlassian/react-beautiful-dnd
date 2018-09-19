@@ -4,8 +4,8 @@ import { type Position, type BoxModel } from 'css-box-model';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
-import { isEqual, origin } from '../../state/position';
-import { transitions, opacity } from '../animation';
+import { origin } from '../../state/position';
+import { transitions, transforms } from '../animation';
 import type {
   DraggableDimension,
   ClientPositions,
@@ -48,73 +48,29 @@ export const zIndexOptions: ZIndexOptions = {
   dropAnimating: 4500,
 };
 
-export const getOpacity = (
-  isDropAnimating: boolean,
-  isCombining: boolean,
-): ?number => {
-  if (!isCombining) {
+const getPlaceholder = (
+  isDraggingOrDropping: boolean,
+  dimension: ?DraggableDimension,
+): ?Node => {
+  if (!isDraggingOrDropping) {
     return null;
   }
 
-  if (isDropAnimating) {
-    return 0;
-  }
-
-  return opacity.isCombiningWith;
+  invariant(dimension, 'Draggable: Dimension is required for dragging');
+  return <Placeholder placeholder={dimension.placeholder} />;
 };
-
-type GetTransformArgs = {|
-  offset: Position,
-  isCombining: boolean,
-  isCombineTargetFor: boolean,
-  isDropping: boolean,
-|};
-
-export const getTransform = (() => {
-  const getScale = (isCombining, isCombineTargetFor, isDropping): ?string => {
-    if (isCombining && isDropping) {
-      return `scale(0.75)`;
-    }
-    if (isCombineTargetFor) {
-      return `scale(1.04)`;
-    }
-    return null;
-  };
-
-  return ({
-    offset,
-    isCombining,
-    isCombineTargetFor,
-    isDropping,
-  }: GetTransformArgs): ?string => {
-    const translate: ?string = !isEqual(offset, origin)
-      ? `translate(${offset.x}px, ${offset.y}px)`
-      : null;
-    const scale: ?string = getScale(
-      isCombining,
-      isCombineTargetFor,
-      isDropping,
-    );
-
-    if (translate && scale) {
-      return `${translate} ${scale}`;
-    }
-
-    return translate || scale || null;
-  };
-})();
 
 const getDraggingTransition = (
   shouldAnimateDragMovement: boolean,
   dropping: ?DroppingState,
 ): string => {
   if (dropping) {
-    return transitions.isDropping(dropping.duration);
+    return transitions.drop(dropping.duration);
   }
   if (shouldAnimateDragMovement) {
     return transitions.snapTo;
   }
-  return transitions.opacity;
+  return 'none';
 };
 
 export default class Draggable extends Component<Props> {
@@ -218,7 +174,7 @@ export default class Draggable extends Component<Props> {
 
   getDraggingStyle = memoizeOne(
     (
-      change: Position,
+      offset: Position,
       dimension: ?DraggableDimension,
       shouldAnimateDragMovement: boolean,
       isCombining: boolean,
@@ -226,10 +182,6 @@ export default class Draggable extends Component<Props> {
     ): DraggingStyle => {
       invariant(dimension, 'Cannot get draggable style without a dimension');
       const box: BoxModel = dimension.client;
-      const transition: string = getDraggingTransition(
-        shouldAnimateDragMovement,
-        dropping,
-      );
       const isDropAnimating: boolean = Boolean(dropping);
       const style: DraggingStyle = {
         // ## Placement
@@ -246,19 +198,13 @@ export default class Draggable extends Component<Props> {
 
         // ## Movement
         // Opting out of the standard css transition for the dragging item
-        transition,
-        // Layering
+        transition: getDraggingTransition(shouldAnimateDragMovement, dropping),
+        transform: transforms.moveTo(offset),
+        // ## Layering
         zIndex: isDropAnimating
           ? zIndexOptions.dropAnimating
           : zIndexOptions.dragging,
-        // Moving in response to user input
-        transform: getTransform({
-          offset: change,
-          isCombining,
-          isCombineTargetFor: false,
-          isDropping: isDropAnimating,
-        }),
-        opacity: getOpacity(isDropAnimating, isCombining),
+
         // ## Performance
         pointerEvents: 'none',
       };
@@ -268,22 +214,13 @@ export default class Draggable extends Component<Props> {
 
   getNotDraggingStyle = memoizeOne(
     (
-      current: Position,
+      offset: Position,
       shouldAnimateDisplacement: boolean,
-      isCombineTargetFor: boolean,
-    ): NotDraggingStyle => {
-      const style: NotDraggingStyle = {
-        transform: getTransform({
-          offset: current,
-          isCombining: false,
-          isCombineTargetFor,
-          isDropping: false,
-        }),
-        // transition style is applied in the head
-        transition: shouldAnimateDisplacement ? null : 'none',
-      };
-      return style;
-    },
+    ): NotDraggingStyle => ({
+      transform: transforms.moveTo(offset),
+      // transition style is applied in the head
+      transition: shouldAnimateDisplacement ? null : 'none',
+    }),
   );
 
   getProvided = memoizeOne(
@@ -308,11 +245,7 @@ export default class Draggable extends Component<Props> {
             isCombining,
             dropping,
           )
-        : this.getNotDraggingStyle(
-            change,
-            shouldAnimateDisplacement,
-            isCombineTargetFor,
-          );
+        : this.getNotDraggingStyle(change, shouldAnimateDisplacement);
 
       const provided: Provided = {
         innerRef: this.setRef,
@@ -343,11 +276,9 @@ export default class Draggable extends Component<Props> {
     }),
   );
 
-  renderChildren = (
-    change: Position,
-    dragHandleProps: ?DragHandleProps,
-  ): ?Node => {
+  renderChildren = (dragHandleProps: ?DragHandleProps): ?Node => {
     const {
+      offset,
       isDragging,
       dropping,
       draggingOver,
@@ -362,7 +293,7 @@ export default class Draggable extends Component<Props> {
     const isDraggingOrDropping: boolean = isDragging || Boolean(dropping);
     const child: ?Node = children(
       this.getProvided(
-        change,
+        offset,
         isDragging,
         Boolean(combineWith),
         Boolean(combineTargetFor),
@@ -380,16 +311,7 @@ export default class Draggable extends Component<Props> {
         combineTargetFor,
       ),
     );
-
-    const placeholder: ?Node = (() => {
-      if (!isDraggingOrDropping) {
-        return null;
-      }
-
-      invariant(dimension, 'Draggable: Dimension is required for dragging');
-
-      return <Placeholder placeholder={dimension.placeholder} />;
-    })();
+    const placeholder: ?Node = getPlaceholder(isDraggingOrDropping, dimension);
 
     return (
       <Fragment>
@@ -403,11 +325,9 @@ export default class Draggable extends Component<Props> {
     const {
       draggableId,
       index,
-      offset,
       isDragging,
       dropping,
       isDragDisabled,
-      // TODO: shouldAnimateDragMovement
       disableInteractiveElementBlocking,
     } = this.props;
     const droppableId: DroppableId = this.context[droppableIdKey];
@@ -432,9 +352,7 @@ export default class Draggable extends Component<Props> {
           // by default we do not allow dragging on interactive elements
           canDragInteractiveElements={disableInteractiveElementBlocking}
         >
-          {(dragHandleProps: ?DragHandleProps) =>
-            this.renderChildren(offset, dragHandleProps)
-          }
+          {this.renderChildren}
         </DragHandle>
       </DraggableDimensionPublisher>
     );
