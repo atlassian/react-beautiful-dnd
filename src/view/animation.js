@@ -63,6 +63,6 @@ export const transitions = {
 };
 
 export const transforms = {
-  moveTo: (offset: Position) =>
+  moveTo: (offset: Position): ?string =>
     isEqual(offset, origin) ? null : `translate(${offset.x}px, ${offset.y}px)`,
 };
