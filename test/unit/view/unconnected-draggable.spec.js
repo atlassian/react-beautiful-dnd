@@ -210,7 +210,7 @@ const executeOnLift = (wrapper: ReactWrapper) => ({
     .props()
     .callbacks.onLift({
       clientSelection: selection,
-      autoScrollMode: 'FLUID',
+      movementMode: 'FLUID',
     });
 
   resetViewport();
@@ -435,7 +435,7 @@ describe('Draggable - unconnected', () => {
             id: draggableId,
             client,
             viewport: preset.viewport,
-            autoScrollMode: 'FLUID',
+            movementMode: 'FLUID',
           });
         });
 

@@ -217,7 +217,7 @@ export type PagePositions = {|
 // When dragging with a pointer such as a mouse or touch input we want to automatically
 // scroll user the under input when we get near the bottom of a Droppable or the window.
 // When Dragging with a keyboard we want to jump as required
-export type AutoScrollMode = 'FLUID' | 'JUMP';
+export type MovementMode = 'FLUID' | 'JUMP';
 
 // export type Viewport = {|
 //   scroll: Position,
@@ -306,11 +306,11 @@ export type DraggingState = {|
   phase: 'DRAGGING',
   isDragging: true,
   critical: Critical,
-  autoScrollMode: AutoScrollMode,
+  movementMode: MovementMode,
   dimensions: DimensionMap,
   initial: DragPositions,
   current: DragPositions,
-  direction: UserDirection,
+  userDirection: UserDirection,
   impact: DragImpact,
   viewport: Viewport,
   // when there is a fixed list we want to opt out of this behaviour

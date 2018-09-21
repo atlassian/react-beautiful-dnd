@@ -87,7 +87,7 @@ describe('initiation', () => {
 
         expect(customCallbacks.onLift).toHaveBeenCalledWith({
           clientSelection: point,
-          autoScrollMode: 'FLUID',
+          movementMode: 'FLUID',
         });
 
         customWrapper.unmount();

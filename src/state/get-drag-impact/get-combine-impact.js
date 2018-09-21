@@ -73,7 +73,7 @@ type Args = {|
   draggable: DraggableDimension,
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
-  direction: UserDirection,
+  userDirection: UserDirection,
 |};
 export default ({
   pageBorderBoxCenterWithDroppableScroll: currentCenter,
@@ -81,7 +81,7 @@ export default ({
   draggable,
   destination,
   insideDestination,
-  direction,
+  userDirection,
 }: Args): ?CombineImpact => {
   if (!destination.isCombineEnabled) {
     return null;
@@ -110,7 +110,7 @@ export default ({
         axis,
         borderBox: child.page.borderBox,
         displacedBy,
-        currentDirection: direction,
+        currentDirection: userDirection,
         oldMerge,
       });
     },
@@ -123,7 +123,7 @@ export default ({
   const result: CombineImpact = {
     whenEntered: getDirectionForDetection(
       target.descriptor.id,
-      direction,
+      userDirection,
       oldMerge,
     ),
     combine: {

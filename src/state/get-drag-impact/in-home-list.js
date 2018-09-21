@@ -39,7 +39,7 @@ type Args = {|
   insideHome: DraggableDimension[],
   previousImpact: DragImpact,
   viewport: Viewport,
-  direction: UserDirection,
+  userDirection: UserDirection,
 |};
 
 export default ({
@@ -49,7 +49,7 @@ export default ({
   insideHome,
   previousImpact,
   viewport,
-  direction: currentDirection,
+  userDirection: currentUserDirection,
 }: Args): DragImpact => {
   const axis: Axis = home.axis;
   // The starting center position
@@ -64,7 +64,7 @@ export default ({
 
   const isMovingForward: boolean = isUserMovingForward(
     home.axis,
-    currentDirection,
+    currentUserDirection,
   );
   const isMovingTowardStart: boolean = isInFrontOfStart
     ? !isMovingForward

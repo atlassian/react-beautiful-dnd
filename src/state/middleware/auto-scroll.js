@@ -30,7 +30,7 @@ export default (getScroller: () => AutoScroller) => (
     return;
   }
 
-  if (state.autoScrollMode === 'FLUID') {
+  if (state.movementMode === 'FLUID') {
     getScroller().fluidScroll(state);
     return;
   }

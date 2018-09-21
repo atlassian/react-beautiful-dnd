@@ -271,7 +271,7 @@ describe('update', () => {
           offset: { x: 0, y: 0 },
         },
         viewport: preset.viewport,
-        autoScrollMode: 'FLUID',
+        movementMode: 'FLUID',
       };
 
       store.dispatch(prepare());

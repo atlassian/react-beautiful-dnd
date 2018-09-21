@@ -63,8 +63,8 @@ export default ({
     page,
   };
 
-  const direction: UserDirection = getUserDirection(
-    state.direction,
+  const userDirection: UserDirection = getUserDirection(
+    state.userDirection,
     state.current.page.borderBoxCenter,
     current.page.borderBoxCenter,
   );
@@ -76,7 +76,7 @@ export default ({
       phase: 'COLLECTING',
       ...state,
       current,
-      direction,
+      userDirection,
     };
   }
 
@@ -92,7 +92,7 @@ export default ({
       droppables: state.dimensions.droppables,
       previousImpact: state.impact,
       viewport: newViewport,
-      direction,
+      userDirection,
     });
 
   const dimensions: DimensionMap = getDimensionMapWithPlaceholder({
@@ -106,7 +106,7 @@ export default ({
     ...state,
     current,
     shouldAnimate,
-    direction,
+    userDirection,
     dimensions,
     impact: newImpact,
     scrollJumpRequest: scrollJumpRequest || null,

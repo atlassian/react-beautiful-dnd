@@ -6,7 +6,7 @@ import type {
   DroppableId,
   DropResult,
   ClientPositions,
-  AutoScrollMode,
+  MovementMode,
   Viewport,
   DimensionMap,
   DropReason,
@@ -20,7 +20,7 @@ export type LiftArgs = {|
   id: DraggableId,
   client: ClientPositions,
   viewport: Viewport,
-  autoScrollMode: AutoScrollMode,
+  movementMode: MovementMode,
 |};
 
 export type LiftAction = {|
@@ -38,7 +38,7 @@ export type InitialPublishArgs = {|
   dimensions: DimensionMap,
   client: ClientPositions,
   viewport: Viewport,
-  autoScrollMode: AutoScrollMode,
+  movementMode: MovementMode,
 |};
 
 export type InitialPublishAction = {|

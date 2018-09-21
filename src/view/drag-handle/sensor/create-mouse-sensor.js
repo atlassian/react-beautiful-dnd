@@ -141,7 +141,7 @@ export default ({
         startDragging(() =>
           callbacks.onLift({
             clientSelection: point,
-            autoScrollMode: 'FLUID',
+            movementMode: 'FLUID',
           }),
         );
       },

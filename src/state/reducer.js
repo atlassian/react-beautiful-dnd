@@ -45,7 +45,7 @@ const getDragImpactWithNewDimensions = (
     droppables: dimensions.droppables,
     previousImpact: state.impact,
     viewport: state.viewport,
-    direction: state.direction,
+    userDirection: state.userDirection,
   });
 };
 export default (state: State = idle, action: Action): State => {
@@ -63,7 +63,7 @@ export default (state: State = idle, action: Action): State => {
       client,
       viewport,
       dimensions,
-      autoScrollMode,
+      movementMode,
     } = action.payload;
 
     const initial: DragPositions = {
@@ -83,7 +83,7 @@ export default (state: State = idle, action: Action): State => {
       phase: 'DRAGGING',
       isDragging: true,
       critical,
-      autoScrollMode,
+      movementMode,
       dimensions,
       initial,
       current: initial,
@@ -93,7 +93,7 @@ export default (state: State = idle, action: Action): State => {
         dimensions.droppables[critical.droppable.id],
       ),
       viewport,
-      direction: forward,
+      userDirection: forward,
       scrollJumpRequest: null,
       shouldAnimate: false,
     };
@@ -160,7 +160,7 @@ export default (state: State = idle, action: Action): State => {
 
     // If we are jump scrolling - manual movements should not update the impact
     const impact: ?DragImpact =
-      state.autoScrollMode === 'JUMP' ? state.impact : null;
+      state.movementMode === 'JUMP' ? state.impact : null;
 
     return moveWithPositionUpdates({
       state,
@@ -210,7 +210,7 @@ export default (state: State = idle, action: Action): State => {
 
     // If we are jump scrolling - dimension changes should not update the impact
     const impact: DragImpact =
-      state.autoScrollMode === 'JUMP'
+      state.movementMode === 'JUMP'
         ? state.impact
         : getDragImpactWithNewDimensions(state, dimensions);
 
@@ -359,7 +359,7 @@ export default (state: State = idle, action: Action): State => {
     }
 
     // If we are jump scrolling - any window scrolls should not update the impact
-    const isJumpScrolling: boolean = state.autoScrollMode === 'JUMP';
+    const isJumpScrolling: boolean = state.movementMode === 'JUMP';
     const impact: ?DragImpact = isJumpScrolling ? state.impact : null;
 
     const viewport: Viewport = scrollViewport(state.viewport, newScroll);

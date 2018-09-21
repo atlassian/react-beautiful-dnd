@@ -39,7 +39,7 @@ export const liftArgs: LiftArgs = {
   id: critical.draggable.id,
   client,
   viewport: preset.viewport,
-  autoScrollMode: 'FLUID',
+  movementMode: 'FLUID',
 };
 
 export const initialPublishArgs: InitialPublishArgs = {
@@ -47,7 +47,7 @@ export const initialPublishArgs: InitialPublishArgs = {
   dimensions: preset.dimensions,
   client,
   viewport: preset.viewport,
-  autoScrollMode: 'FLUID',
+  movementMode: 'FLUID',
 };
 
 export const initialPublishWithScrollables: InitialPublishArgs = {

@@ -23,7 +23,7 @@ type Args = {|
   insideDestination: DraggableDimension[],
   previousImpact: DragImpact,
   viewport: Viewport,
-  direction: UserDirection,
+  userDirection: UserDirection,
 |};
 
 export default ({
@@ -33,13 +33,13 @@ export default ({
   insideDestination,
   previousImpact,
   viewport,
-  direction,
+  userDirection,
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
 
   const isMovingForward: boolean = isUserMovingForward(
     destination.axis,
-    direction,
+    userDirection,
   );
 
   const displacedBy: DisplacedBy = getDisplacedBy(

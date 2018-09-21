@@ -15,7 +15,6 @@ import type {
 } from '../../types';
 import * as timings from '../../debug/timings';
 import getDragImpact from '../get-drag-impact';
-import getHomeImpact from '../get-home-impact';
 import getDragPositions from './get-drag-positions';
 import adjustModifiedDroppables from './adjust-modified-droppables';
 import adjustAdditionsForScrollChanges from './adjust-additions-for-scroll-changes';
@@ -104,12 +103,12 @@ export default ({
       // starting from a fresh slate
       previousImpact: noImpact,
       viewport: state.viewport,
-      direction: state.direction,
+      userDirection: state.userDirection,
     }),
   );
 
   const isOrphaned: boolean = Boolean(
-    state.autoScrollMode === 'JUMP' &&
+    state.movementMode === 'JUMP' &&
       state.impact.destination &&
       !impact.destination,
   );

@@ -28,7 +28,7 @@ type Args = {|
   droppables: DroppableDimensionMap,
   previousImpact: DragImpact,
   viewport: Viewport,
-  direction: UserDirection,
+  userDirection: UserDirection,
 |};
 
 export default ({
@@ -38,7 +38,7 @@ export default ({
   droppables,
   previousImpact,
   viewport,
-  direction,
+  userDirection,
 }: Args): DragImpact => {
   const destinationId: ?DroppableId = getDroppableOver({
     target: pageBorderBoxCenter,
@@ -74,7 +74,7 @@ export default ({
     draggable,
     destination,
     insideDestination,
-    direction,
+    userDirection,
   });
 
   // If there is a combine impact then the displacement
@@ -97,7 +97,7 @@ export default ({
         insideHome: insideDestination,
         previousImpact,
         viewport,
-        direction,
+        userDirection,
       })
     : inForeignList({
         pageBorderBoxCenterWithDroppableScroll,
@@ -106,6 +106,6 @@ export default ({
         insideDestination,
         previousImpact,
         viewport,
-        direction,
+        userDirection,
       });
 };

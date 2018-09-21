@@ -142,7 +142,7 @@ export default ({
 
     callbacks.onLift({
       clientSelection: pending,
-      autoScrollMode: 'FLUID',
+      movementMode: 'FLUID',
     });
   };
   const stopDragging = (fn?: Function = noop) => {

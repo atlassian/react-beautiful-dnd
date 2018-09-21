@@ -76,12 +76,12 @@ export default (axis?: Axis = vertical) => {
       phase: 'DRAGGING',
       critical: ourCritical,
       isDragging: true,
-      autoScrollMode: 'FLUID',
+      movementMode: 'FLUID',
       dimensions: preset.dimensions,
       initial,
       current: initial,
       impact: getHomeImpact(draggable, droppable),
-      direction: forward,
+      userDirection: forward,
       isWindowScrollAllowed: true,
       viewport,
       scrollJumpRequest: null,
@@ -130,7 +130,7 @@ export default (axis?: Axis = vertical) => {
 
     return {
       ...state,
-      autoScrollMode: 'JUMP',
+      movementMode: 'JUMP',
       scrollJumpRequest: request,
     };
   };

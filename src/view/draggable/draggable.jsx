@@ -11,7 +11,7 @@ import type {
   ClientPositions,
   DraggableId,
   DroppableId,
-  AutoScrollMode,
+  MovementMode,
   TypeId,
 } from '../../types';
 import DraggableDimensionPublisher from '../draggable-dimension-publisher';
@@ -126,7 +126,7 @@ export default class Draggable extends Component<Props> {
 
   onLift = (options: {
     clientSelection: Position,
-    autoScrollMode: AutoScrollMode,
+    movementMode: MovementMode,
   }) => {
     timings.start('LIFT');
     const ref: ?HTMLElement = this.ref;
@@ -135,7 +135,7 @@ export default class Draggable extends Component<Props> {
       !this.props.isDragDisabled,
       'Cannot lift a Draggable when it is disabled',
     );
-    const { clientSelection, autoScrollMode } = options;
+    const { clientSelection, movementMode } = options;
     const { lift, draggableId } = this.props;
 
     const client: ClientPositions = {
@@ -147,7 +147,7 @@ export default class Draggable extends Component<Props> {
     lift({
       id: draggableId,
       client,
-      autoScrollMode,
+      movementMode,
       viewport: getViewport(),
     });
     timings.finish('LIFT');

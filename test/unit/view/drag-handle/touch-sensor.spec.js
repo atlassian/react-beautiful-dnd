@@ -79,7 +79,7 @@ describe('initiation', () => {
 
     expect(callbacks.onLift).toHaveBeenCalledWith({
       clientSelection,
-      autoScrollMode: 'FLUID',
+      movementMode: 'FLUID',
     });
   });
 

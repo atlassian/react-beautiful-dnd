@@ -15,7 +15,7 @@ export default (getMarshal: () => DimensionMarshal) => ({
   }
 
   const marshal: DimensionMarshal = getMarshal();
-  const { id, client, autoScrollMode, viewport } = action.payload;
+  const { id, client, movementMode, viewport } = action.payload;
   const initial: State = getState();
 
   // flush dropping animation if needed
@@ -29,7 +29,7 @@ export default (getMarshal: () => DimensionMarshal) => ({
 
   // will communicate with the marshal to start requesting dimensions
   const scrollOptions: ScrollOptions = {
-    shouldPublishImmediately: autoScrollMode === 'JUMP',
+    shouldPublishImmediately: movementMode === 'JUMP',
   };
   const request: LiftRequest = {
     draggableId: id,
@@ -47,7 +47,7 @@ export default (getMarshal: () => DimensionMarshal) => ({
       critical,
       dimensions,
       client,
-      autoScrollMode,
+      movementMode,
       viewport,
     }),
   );
