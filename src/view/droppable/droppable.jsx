@@ -139,7 +139,6 @@ export default class Droppable extends Component<Props> {
       ignoreContainerClipping,
       isDraggingOver,
       draggingOverWith,
-      cancel,
     } = this.props;
     const provided: Provided = {
       innerRef: this.setRef,
@@ -162,7 +161,6 @@ export default class Droppable extends Component<Props> {
         isDropDisabled={isDropDisabled}
         isCombineEnabled={isCombineEnabled}
         getDroppableRef={this.getDroppableRef}
-        cancel={cancel}
       >
         {children(provided, snapshot)}
       </DroppableDimensionPublisher>

@@ -33,7 +33,6 @@ type Props = {|
   ignoreContainerClipping: boolean,
   isDropDisabled: boolean,
   getDroppableRef: () => ?HTMLElement,
-  cancel: Function,
   children: Node,
 |};
 
@@ -62,7 +61,6 @@ export default class DroppableDimensionPublisher extends React.Component<
   constructor(props: Props, context: mixed) {
     super(props, context);
     const callbacks: DroppableCallbacks = {
-      warm: this.warmUp,
       getDimensionAndWatchScroll: this.getDimensionAndWatchScroll,
       recollect: this.recollect,
       dragStopped: this.dragStopped,
@@ -144,22 +142,6 @@ export default class DroppableDimensionPublisher extends React.Component<
       this.onClosestScroll,
       listenerOptions,
     );
-  };
-
-  warmUp = (): DroppableDimension => {
-    const ref: ?HTMLElement = this.props.getDroppableRef();
-    const descriptor: ?DroppableDescriptor = this.publishedDescriptor;
-    invariant(ref && descriptor, 'Missing required values for warm up');
-    return getDimension({
-      ref,
-      descriptor,
-      env: getEnv(ref),
-      windowScroll: origin,
-      direction: this.props.direction,
-      isDropDisabled: this.props.isDropDisabled,
-      isCombineEnabled: this.props.isCombineEnabled,
-      shouldClipSubject: !this.props.ignoreContainerClipping,
-    });
   };
 
   componentDidMount() {
@@ -245,10 +227,6 @@ export default class DroppableDimensionPublisher extends React.Component<
     const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
     marshal.unregisterDroppable(this.publishedDescriptor);
     this.publishedDescriptor = null;
-  };
-
-  cancelOnWindowScroll = () => {
-    this.props.cancel();
   };
 
   // Used when Draggables are added or removed from a Droppable during a drag
