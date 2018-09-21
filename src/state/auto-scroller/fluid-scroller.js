@@ -112,6 +112,30 @@ const adjustForSizeLimits = ({
   };
 };
 
+const getY = (container: Rect, distance: Spacing): number => {
+  const thresholds: PixelThresholds = getPixelThresholds(container, vertical);
+  const isCloserToBottom: boolean = distance.bottom < distance.top;
+
+  if (isCloserToBottom) {
+    return getSpeed(distance.bottom, thresholds);
+  }
+
+  // closer to top
+  return -1 * getSpeed(distance.top, thresholds);
+};
+
+const getX = (container: Rect, distance: Spacing): number => {
+  const thresholds: PixelThresholds = getPixelThresholds(container, horizontal);
+  const isCloserToRight: boolean = distance.right < distance.left;
+
+  if (isCloserToRight) {
+    return getSpeed(distance.right, thresholds);
+  }
+
+  // closer to left
+  return -1 * getSpeed(distance.left, thresholds);
+};
+
 type GetRequiredScrollArgs = {|
   container: Rect,
   subject: Rect,
@@ -141,32 +165,8 @@ const getRequiredScroll = ({
   // Maximum speed value should be hit before the distance is 0
   // Negative values to not continue to increase the speed
 
-  const y: number = (() => {
-    const thresholds: PixelThresholds = getPixelThresholds(container, vertical);
-    const isCloserToBottom: boolean = distance.bottom < distance.top;
-
-    if (isCloserToBottom) {
-      return getSpeed(distance.bottom, thresholds);
-    }
-
-    // closer to top
-    return -1 * getSpeed(distance.top, thresholds);
-  })();
-
-  const x: number = (() => {
-    const thresholds: PixelThresholds = getPixelThresholds(
-      container,
-      horizontal,
-    );
-    const isCloserToRight: boolean = distance.right < distance.left;
-
-    if (isCloserToRight) {
-      return getSpeed(distance.right, thresholds);
-    }
-
-    // closer to left
-    return -1 * getSpeed(distance.left, thresholds);
-  })();
+  const y: number = getY(container, distance);
+  const x: number = getX(container, distance);
 
   const required: Position = clean({ x, y });
 
