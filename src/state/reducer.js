@@ -33,6 +33,21 @@ import type { Action } from './store-types';
 
 const idle: IdleState = { phase: 'IDLE' };
 
+const getDragImpactWithNewDimensions = (
+  state: State,
+  dimensions: DimensionMap,
+) => {
+  invariant(isMovementAllowed(state));
+  return getDragImpact({
+    pageBorderBoxCenter: state.current.page.borderBoxCenter,
+    draggable: dimensions.draggables[state.critical.draggable.id],
+    draggables: dimensions.draggables,
+    droppables: dimensions.droppables,
+    previousImpact: state.impact,
+    viewport: state.viewport,
+    direction: state.direction,
+  });
+};
 export default (state: State = idle, action: Action): State => {
   if (action.type === 'CLEAN') {
     return idle;
@@ -193,26 +208,11 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
-    const impact: DragImpact = (() => {
-      // flow is getting confused - so running this check again
-      invariant(isMovementAllowed(state));
-
-      // If we are jump scrolling - dimension changes should not update the impact
-      if (state.autoScrollMode === 'JUMP') {
-        return state.impact;
-      }
-
-      return getDragImpact({
-        pageBorderBoxCenter: state.current.page.borderBoxCenter,
-        draggable: dimensions.draggables[state.critical.draggable.id],
-        draggables: dimensions.draggables,
-        droppables: dimensions.droppables,
-        previousImpact: state.impact,
-        viewport: state.viewport,
-        // TODO: is this correct?
-        direction: state.direction,
-      });
-    })();
+    // If we are jump scrolling - dimension changes should not update the impact
+    const impact: DragImpact =
+      state.autoScrollMode === 'JUMP'
+        ? state.impact
+        : getDragImpactWithNewDimensions(state, dimensions);
 
     return {
       // appeasing flow
@@ -265,10 +265,20 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
-    return moveWithPositionUpdates({
+    const impact: DragImpact = getDragImpactWithNewDimensions(
       state,
       dimensions,
-    });
+    );
+
+    return {
+      // appeasing flow
+      phase: 'DRAGGING',
+      ...state,
+      // eslint-disable-next-line
+      phase: state.phase,
+      impact,
+      dimensions,
+    };
   }
 
   if (action.type === 'UPDATE_DROPPABLE_IS_COMBINE_ENABLED') {
@@ -309,10 +319,20 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
-    return moveWithPositionUpdates({
+    const impact: DragImpact = getDragImpactWithNewDimensions(
       state,
       dimensions,
-    });
+    );
+
+    return {
+      // appeasing flow
+      phase: 'DRAGGING',
+      ...state,
+      // eslint-disable-next-line
+      phase: state.phase,
+      impact,
+      dimensions,
+    };
   }
 
   if (action.type === 'MOVE_BY_WINDOW_SCROLL') {
@@ -350,6 +370,8 @@ export default (state: State = idle, action: Action): State => {
       viewport,
       shouldAnimate: false,
       impact,
+      // this would have cleared any scroll jump requests
+      scrollJumpRequest: null,
     });
   }
 
