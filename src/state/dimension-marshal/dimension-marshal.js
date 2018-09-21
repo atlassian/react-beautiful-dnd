@@ -208,7 +208,7 @@ export default (callbacks: Callbacks) => {
   const updateDroppableIsEnabled = (id: DroppableId, isEnabled: boolean) => {
     invariant(
       entries.droppables[id],
-      `Cannot update the scroll on Droppable ${id} as it is not registered`,
+      `Cannot update is enabled flag of Droppable ${id} as it is not registered`,
     );
 
     // no need to update the application state if a collection is not occurring
@@ -220,6 +220,23 @@ export default (callbacks: Callbacks) => {
     // but may have its enabled state changed. For now we still publish this change
     // and let the reducer exit early if it cannot find the dimension in the state.
     callbacks.updateDroppableIsEnabled({ id, isEnabled });
+  };
+
+  const updateDroppableIsCombineEnabled = (
+    id: DroppableId,
+    isCombineEnabled: boolean,
+  ) => {
+    invariant(
+      entries.droppables[id],
+      `Cannot update isCombineEnabled flag of Droppable ${id} as it is not registered`,
+    );
+
+    // no need to update
+    if (!collection) {
+      return;
+    }
+
+    callbacks.updateDroppableIsCombineEnabled({ id, isCombineEnabled });
   };
 
   const updateDroppableScroll = (id: DroppableId, newScroll: Position) => {
@@ -311,6 +328,7 @@ export default (callbacks: Callbacks) => {
 
     // droppable changes
     updateDroppableIsEnabled,
+    updateDroppableIsCombineEnabled,
     scrollDroppable,
     updateDroppableScroll,
 

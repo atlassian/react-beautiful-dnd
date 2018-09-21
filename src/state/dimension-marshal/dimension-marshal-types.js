@@ -3,6 +3,7 @@ import type { Position } from 'css-box-model';
 import type {
   UpdateDroppableScrollArgs,
   UpdateDroppableIsEnabledArgs,
+  UpdateDroppableIsCombineEnabledArgs,
 } from '../action-creators';
 import type {
   DraggableDescriptor,
@@ -90,6 +91,11 @@ export type DimensionMarshal = {|
   ) => void,
   // it is possible for a droppable to change whether it is enabled during a drag
   updateDroppableIsEnabled: (id: DroppableId, isEnabled: boolean) => void,
+  // it is also possible to update whether combining is enabled
+  updateDroppableIsCombineEnabled: (
+    id: DroppableId,
+    isEnabled: boolean,
+  ) => void,
   updateDroppableScroll: (id: DroppableId, newScroll: Position) => void,
   scrollDroppable: (id: DroppableId, change: Position) => void,
   unregisterDroppable: (descriptor: DroppableDescriptor) => void,
@@ -106,7 +112,7 @@ export type Callbacks = {|
   publish: (args: Published) => mixed,
   updateDroppableScroll: (args: UpdateDroppableScrollArgs) => mixed,
   updateDroppableIsEnabled: (args: UpdateDroppableIsEnabledArgs) => mixed,
-  // can a droppable have Draggables added or removed from it during a drag
-  // TODO: get this working
-  // canAddOrRemoveDuringDrag: (id: DroppableId) => boolean,
+  updateDroppableIsCombineEnabled: (
+    args: UpdateDroppableIsCombineEnabledArgs,
+  ) => mixed,
 |};

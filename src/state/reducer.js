@@ -183,7 +183,6 @@ export default (state: State = idle, action: Action): State => {
       return state;
     }
 
-    console.log('trying to update droppable scroll');
     const updated: DroppableDimension = scrollDroppable(target, offset);
 
     const dimensions: DimensionMap = {
@@ -266,25 +265,54 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
-    const impact: DragImpact = getDragImpact({
-      pageBorderBoxCenter: state.current.page.borderBoxCenter,
-      draggable: dimensions.draggables[state.critical.draggable.id],
-      draggables: dimensions.draggables,
-      droppables: dimensions.droppables,
-      previousImpact: state.impact,
-      viewport: state.viewport,
-      direction: state.direction,
-    });
-
-    return {
-      // appeasing flow - this placeholder phase will be overwritten by spread
-      phase: 'DRAGGING',
-      ...state,
-      // eslint-disable-next-line
-      phase: state.phase,
-      impact,
+    return moveWithPositionUpdates({
+      state,
       dimensions,
+    });
+  }
+
+  if (action.type === 'UPDATE_DROPPABLE_IS_COMBINE_ENABLED') {
+    // Things are locked at this point
+    if (state.phase === 'DROP_PENDING') {
+      return state;
+    }
+
+    invariant(
+      isMovementAllowed(state),
+      `Attempting to move in an unsupported phase ${state.phase}`,
+    );
+
+    const { id, isCombineEnabled } = action.payload;
+    const target: ?DroppableDimension = state.dimensions.droppables[id];
+
+    invariant(
+      target,
+      `Cannot find Droppable[id: ${id}] to toggle its isCombineEnabled state`,
+    );
+
+    invariant(
+      target.isCombineEnabled !== isCombineEnabled,
+      `Trying to set droppable isCombineEnabled to ${String(isCombineEnabled)}
+      but it is already ${String(target.isCombineEnabled)}`,
+    );
+
+    const updated: DroppableDimension = {
+      ...target,
+      isCombineEnabled,
     };
+
+    const dimensions: DimensionMap = {
+      ...state.dimensions,
+      droppables: {
+        ...state.dimensions.droppables,
+        [id]: updated,
+      },
+    };
+
+    return moveWithPositionUpdates({
+      state,
+      dimensions,
+    });
   }
 
   if (action.type === 'MOVE_BY_WINDOW_SCROLL') {

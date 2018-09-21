@@ -33,6 +33,7 @@ import {
   publish,
   updateDroppableScroll,
   updateDroppableIsEnabled,
+  updateDroppableIsCombineEnabled,
   collectionStarting,
 } from '../../state/action-creators';
 
@@ -110,6 +111,7 @@ export default class DragDropContext extends React.Component<Props> {
         publish,
         updateDroppableScroll,
         updateDroppableIsEnabled,
+        updateDroppableIsCombineEnabled,
         collectionStarting,
       },
       this.store.dispatch,

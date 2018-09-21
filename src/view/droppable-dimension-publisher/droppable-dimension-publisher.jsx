@@ -31,7 +31,6 @@ type Props = {|
   isDropDisabled: boolean,
   isCombineEnabled: boolean,
   ignoreContainerClipping: boolean,
-  isDropDisabled: boolean,
   getDroppableRef: () => ?HTMLElement,
   children: Node,
 |};
@@ -156,24 +155,43 @@ export default class DroppableDimensionPublisher extends React.Component<
     // Update the descriptor if needed
     this.publish();
 
-    // We now need to check if the disabled flag has changed
-    if (this.props.isDropDisabled === prevProps.isDropDisabled) {
+    // Do not need to update the marshal if no drag is occurring
+    if (!this.dragging) {
       return;
     }
 
-    // The enabled state of the droppable is changing.
-    // We need to let the marshal know incase a drag is currently occurring
+    // Need to update the marshal if an enabled state is changing
+
+    const isDisabledChanged: boolean =
+      this.props.isDropDisabled !== prevProps.isDropDisabled;
+    const isCombineChanged: boolean =
+      this.props.isCombineEnabled !== prevProps.isCombineEnabled;
+
+    if (!isDisabledChanged && !isCombineChanged) {
+      return;
+    }
+
     const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.updateDroppableIsEnabled(
-      this.props.droppableId,
-      !this.props.isDropDisabled,
-    );
+
+    if (isDisabledChanged) {
+      marshal.updateDroppableIsEnabled(
+        this.props.droppableId,
+        !this.props.isDropDisabled,
+      );
+    }
+
+    if (isCombineChanged) {
+      marshal.updateDroppableIsCombineEnabled(
+        this.props.droppableId,
+        this.props.isCombineEnabled,
+      );
+    }
   }
 
   componentWillUnmount() {
     if (this.dragging) {
       if (process.env.NODE_ENV !== 'production') {
-        console.warn('Unmounting droppable while a drag is occurring');
+        console.warn('unmounting droppable while a drag is occurring');
       }
       this.dragStopped();
     }
