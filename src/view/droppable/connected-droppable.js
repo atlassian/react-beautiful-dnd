@@ -7,7 +7,6 @@ import Droppable from './droppable';
 import isStrictEqual from '../is-strict-equal';
 import shouldUsePlaceholder from '../../state/droppable/should-use-placeholder';
 import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
-import { cancel as cancelAction } from '../../state/action-creators';
 import type {
   State,
   DroppableId,
@@ -18,7 +17,6 @@ import type {
 } from '../../types';
 import type {
   MapProps,
-  DispatchProps,
   OwnProps,
   DefaultProps,
   Selector,
@@ -91,17 +89,14 @@ export const makeMapStateToProps = (): Selector => {
   return selector;
 };
 
-const mapDispatchToProps: DispatchProps = {
-  cancel: cancelAction,
-};
-
 // Leaning heavily on the default shallow equality checking
 // that `connect` provides.
 // It avoids needing to do it own within `Droppable`
 const ConnectedDroppable: OwnProps => Node = (connect(
   // returning a function so each component can do its own memoization
   makeMapStateToProps,
-  (mapDispatchToProps: any),
+  // no dispatch props for droppable
+  null,
   // mergeProps - using default
   null,
   {
@@ -109,7 +104,7 @@ const ConnectedDroppable: OwnProps => Node = (connect(
     // This allows consumers to also use redux
     // Note: the default store key is 'store'
     storeKey,
-    // Default value, but being really clear
+    // pure: true is default value, but being really clear
     pure: true,
     // When pure, compares the result of mapStateToProps to its previous value.
     // Default value: shallowEqual
