@@ -29,6 +29,11 @@ import type {
 type AnyPrimaryHookFn = OnDragStartHook | OnDragUpdateHook | OnDragEndHook;
 type AnyHookData = DragStart | DragUpdate | DropResult;
 
+const resolved = Promise.resolve();
+const microTask = (fn: Function) => {
+  resolved.then(fn);
+};
+
 const withTimings = (key: string, fn: Function) => {
   timings.start(key);
   fn();
@@ -292,9 +297,16 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
   ): any => {
     if (action.type === 'INITIAL_PUBLISH') {
       const critical: Critical = action.payload.critical;
+      console.log('BEFORE START');
       publisher.beforeStart(critical);
+      console.log('NEXT (release to reducer)');
       next(action);
+
+      // console.log('MICRO TASK QUEUED');
+      // microTask(() => {
+      console.log('START');
       publisher.start(critical);
+      // });
       return;
     }
 

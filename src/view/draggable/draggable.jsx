@@ -333,6 +333,8 @@ export default class Draggable extends Component<Props> {
     const droppableId: DroppableId = this.context[droppableIdKey];
     const type: TypeId = this.context[droppableTypeKey];
 
+    console.log('draggable render', draggableId);
+
     return (
       <DraggableDimensionPublisher
         key={draggableId}
