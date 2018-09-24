@@ -33,6 +33,9 @@ export type DraggingStyle = {|
   transform: ?string,
   zIndex: ZIndex,
 
+  // for combining
+  opacity: ?number,
+
   // Avoiding any processing of mouse events.
   // This is already applied by the shared styles during a drag.
   // During a drop it prevents a draggable from being dragged.

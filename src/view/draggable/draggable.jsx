@@ -68,9 +68,24 @@ const getDraggingTransition = (
     return transitions.drop(dropping.duration);
   }
   if (shouldAnimateDragMovement) {
-    return transitions.snapTo;
+    return transitions.jump;
   }
-  return 'none';
+  return transitions.fluid;
+};
+
+const getDraggingOpacity = (
+  isCombining: boolean,
+  isDropAnimating: boolean,
+): ?number => {
+  // if not combining: no not impact opacity
+  if (!isCombining) {
+    return null;
+  }
+
+  // if combining:
+  // while dropping: fade out totally
+  // while dragging: fade out partially
+  return isDropAnimating ? 0 : 0.7;
 };
 
 export default class Draggable extends Component<Props> {
@@ -183,6 +198,10 @@ export default class Draggable extends Component<Props> {
       invariant(dimension, 'Cannot get draggable style without a dimension');
       const box: BoxModel = dimension.client;
       const isDropAnimating: boolean = Boolean(dropping);
+      const transform: ?string = isDropAnimating
+        ? transforms.drop(offset, isCombining)
+        : transforms.moveTo(offset);
+      console.log('transform', transform);
       const style: DraggingStyle = {
         // ## Placement
         position: 'fixed',
@@ -199,13 +218,15 @@ export default class Draggable extends Component<Props> {
         // ## Movement
         // Opting out of the standard css transition for the dragging item
         transition: getDraggingTransition(shouldAnimateDragMovement, dropping),
-        transform: transforms.moveTo(offset),
+        transform,
+        opacity: getDraggingOpacity(isCombining, isDropAnimating),
         // ## Layering
         zIndex: isDropAnimating
           ? zIndexOptions.dropAnimating
           : zIndexOptions.dragging,
 
-        // ## Performance
+        // ## Blocking any pointer events on the dragging or dropping item
+        // global styles on cover while dragging
         pointerEvents: 'none',
       };
       return style;

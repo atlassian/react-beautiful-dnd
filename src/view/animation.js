@@ -56,13 +56,35 @@ export const curves = {
   drop: 'cubic-bezier(.2,1,.1,1)',
 };
 
+const outOfTheWayTiming = `${outOfTheWayTime}s ${curves.outOfTheWay}`;
+
 export const transitions = {
-  snapTo: `transform ${outOfTheWayTime}s ${curves.drop}`,
-  outOfTheWay: `transform ${outOfTheWayTime}s ${curves.outOfTheWay}`,
-  drop: (duration: number): string => `transform ${duration}s ${curves.drop}`,
+  fluid: `opacity ${outOfTheWayTiming}`,
+  jump: `transform ${outOfTheWayTiming}, opacity ${outOfTheWayTiming}`,
+  drop: (duration: number): string => {
+    const timing: string = `${duration}s ${curves.drop}`;
+    return `transform ${timing}, opacity ${timing}`;
+  },
+  outOfTheWay: `transform ${outOfTheWayTiming}`,
 };
 
+const moveTo = (offset: Position): ?string =>
+  isEqual(offset, origin) ? null : `translate(${offset.x}px, ${offset.y}px)`;
+
 export const transforms = {
-  moveTo: (offset: Position): ?string =>
-    isEqual(offset, origin) ? null : `translate(${offset.x}px, ${offset.y}px)`,
+  moveTo,
+  drop: (offset: Position, isCombining: boolean) => {
+    const translate: ?string = moveTo(offset);
+    if (!translate) {
+      return null;
+    }
+
+    // only transforming the translate
+    if (!isCombining) {
+      return translate;
+    }
+
+    // when dropping while combining we also update the scale
+    return `${translate} scale(0.75)`;
+  },
 };
