@@ -8,6 +8,7 @@ import type {
   ZIndex,
   State,
   DropReason,
+  MovementMode,
 } from '../../types';
 import {
   lift,
@@ -90,6 +91,7 @@ export type StateSnapshot = {|
   draggingOver: ?DroppableId,
   combineWith: ?DraggableId,
   combineTargetFor: ?DraggableId,
+  mode: ?MovementMode,
 |};
 
 export type DispatchProps = {|
@@ -104,21 +106,26 @@ export type DispatchProps = {|
   dropAnimationFinished: typeof dropAnimationFinished,
 |};
 
-export type MapProps = {|
-  isDragging: boolean,
-  // whether or not a drag movement should be animated
-  // used for dropping and keyboard dragging
-  shouldAnimateDragMovement: boolean,
-  // when an item is being displaced by a dragging item,
-  // we need to know if that movement should be animated
-  shouldAnimateDisplacement: boolean,
-  dropping: ?DroppingState,
+export type DraggingMapProps = {|
   offset: Position,
-  // only provided when dragging
-  dimension: ?DraggableDimension,
+  mode: MovementMode,
+  dropping: ?DroppingState,
+  dimension: DraggableDimension,
   draggingOver: ?DroppableId,
   combineWith: ?DraggableId,
+|};
+
+export type SecondaryMapProps = {|
+  offset: Position,
   combineTargetFor: ?DraggableId,
+  shouldAnimateDisplacement: boolean,
+|};
+
+export type MapProps = {|
+  // when an item is being displaced by a dragging item,
+  // we need to know if that movement should be animated
+  dragging: ?DraggingMapProps,
+  secondary: ?SecondaryMapProps,
 |};
 
 export type OwnProps = {|

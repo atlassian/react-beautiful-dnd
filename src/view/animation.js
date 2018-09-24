@@ -16,6 +16,7 @@ const maxDropTimeAtDistance: number = 1500;
 // will bring a time lower - which makes it faster
 const cancelDropModifier: number = 0.6;
 const outOfTheWayTime: number = 0.2;
+const dropScale: number = 0.75;
 
 export const getDropDuration = ({
   current,
@@ -85,6 +86,6 @@ export const transforms = {
     }
 
     // when dropping while combining we also update the scale
-    return `${translate} scale(0.75)`;
+    return `${translate} scale(${dropScale})`;
   },
 };

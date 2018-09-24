@@ -32,6 +32,7 @@ import type {
   DragImpact,
   DisplacementMap,
   DropReason,
+  MovementMode,
 } from '../../types';
 import type {
   MapProps,
@@ -42,18 +43,12 @@ import type {
 } from './draggable-types';
 
 const defaultMapProps: MapProps = {
-  isDragging: false,
-  dropping: null,
-  offset: origin,
-  shouldAnimateDragMovement: false,
-  // This is set to true by default so that as soon as Draggable
-  // needs to be displaced it can without needing to change this flag
-  shouldAnimateDisplacement: true,
-  // these properties are only populated when the item is dragging
-  dimension: null,
-  draggingOver: null,
-  combineWith: null,
-  combineTargetFor: null,
+  secondary: {
+    offset: origin,
+    combineTargetFor: null,
+    shouldAnimateDisplacement: true,
+  },
+  dragging: null,
 };
 
 // Returning a function to ensure each
@@ -69,32 +64,34 @@ export const makeMapStateToProps = (): Selector => {
       combineTargetFor: ?DraggableId = null,
       shouldAnimateDisplacement: boolean,
     ): MapProps => ({
-      ...defaultMapProps,
-      offset,
-      combineTargetFor,
-      shouldAnimateDisplacement,
+      secondary: {
+        offset,
+        combineTargetFor,
+        shouldAnimateDisplacement,
+      },
+      dragging: null,
     }),
   );
 
   const getDraggingProps = memoizeOne(
     (
       offset: Position,
-      shouldAnimateDragMovement: boolean,
+      mode: MovementMode,
       dimension: DraggableDimension,
       // the id of the droppable you are over
       draggingOver: ?DroppableId,
       // the id of a draggable you are grouping with
       combineWith: ?DraggableId,
     ): MapProps => ({
-      isDragging: true,
-      dropping: null,
-      shouldAnimateDisplacement: false,
-      offset,
-      shouldAnimateDragMovement,
-      dimension,
-      draggingOver,
-      combineWith,
-      combineTargetFor: null,
+      dragging: {
+        mode,
+        dropping: null,
+        offset,
+        dimension,
+        draggingOver,
+        combineWith,
+      },
+      secondary: null,
     }),
   );
 
@@ -119,9 +116,7 @@ export const makeMapStateToProps = (): Selector => {
       return getSecondaryProps(
         displacement ? offset : origin,
         draggingId,
-        displacement
-          ? displacement.shouldAnimate
-          : defaultMapProps.shouldAnimateDisplacement,
+        displacement ? displacement.shouldAnimate : true,
       );
     }
 
@@ -149,7 +144,8 @@ export const makeMapStateToProps = (): Selector => {
       const offset: Position = state.current.client.offset;
       const dimension: DraggableDimension =
         state.dimensions.draggables[ownProps.draggableId];
-      const shouldAnimateDragMovement: boolean = state.shouldAnimate;
+      // const shouldAnimateDragMovement: boolean = state.shouldAnimate;
+      const mode: MovementMode = state.movementMode;
       const draggingOver: ?DroppableId = state.impact.destination
         ? state.impact.destination.droppableId
         : null;
@@ -160,7 +156,7 @@ export const makeMapStateToProps = (): Selector => {
 
       return getDraggingProps(
         memoizedOffset(offset.x, offset.y),
-        shouldAnimateDragMovement,
+        mode,
         dimension,
         draggingOver,
         combineWith,
@@ -184,34 +180,32 @@ export const makeMapStateToProps = (): Selector => {
 
       const duration: number = pending.dropDuration;
       const reason: DropReason = pending.result.reason;
+      const mode: MovementMode = pending.result.mode;
 
       // not memoized as it is the only execution
       return {
-        isDragging: false,
-        dropping: {
-          reason,
-          duration,
-          curve: curves.drop,
-          moveTo: pending.newHomeOffset,
+        dragging: {
+          offset: pending.newHomeOffset,
+          // still need to provide the dimension for the placeholder
+          dimension: state.dimensions.draggables[ownProps.draggableId],
+          draggingOver,
+          combineWith,
+          mode,
+          dropping: {
+            reason,
+            duration,
+            curve: curves.drop,
+            moveTo: pending.newHomeOffset,
+          },
         },
-        offset: pending.newHomeOffset,
-        // still need to provide the dimension for the placeholder
-        dimension: state.dimensions.draggables[ownProps.draggableId],
-        draggingOver,
-        // animation will be controlled by the isDropAnimating flag
-        shouldAnimateDragMovement: false,
-        // Combining
-        combineWith,
-        combineTargetFor: null,
-        // not relevant,
-        shouldAnimateDisplacement: false,
+        secondary: null,
       };
     }
 
     return null;
   };
 
-  const notDraggingSelector = (state: State, ownProps: OwnProps): ?MapProps => {
+  const displacedSelector = (state: State, ownProps: OwnProps): ?MapProps => {
     // Dragging
     if (state.isDragging) {
       // we do not care about the dragging item
@@ -245,7 +239,7 @@ export const makeMapStateToProps = (): Selector => {
 
   const selector = (state: State, ownProps: OwnProps): MapProps =>
     draggingSelector(state, ownProps) ||
-    notDraggingSelector(state, ownProps) ||
+    displacedSelector(state, ownProps) ||
     defaultMapProps;
 
   return selector;

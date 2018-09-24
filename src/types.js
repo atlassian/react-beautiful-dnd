@@ -235,6 +235,7 @@ export type DragStart = {|
   draggableId: DraggableId,
   type: TypeId,
   source: DraggableLocation,
+  mode: MovementMode,
 |};
 
 export type DragUpdate = {|
