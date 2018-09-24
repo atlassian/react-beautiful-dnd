@@ -178,6 +178,12 @@ We tell the user the following:
 - They dropped over a location that is not droppable
 - Where the item has returned to
 
+## `VoiceOver` on Mac
+
+If you are using Mac, then you are welcome to test against the inbuilt `VoiceOver` screen reader. Here is a [quick start guide](https://www.imore.com/how-enable-voiceover-mac)
+
+> To start `VoiceOver`: <kbd>`cmd`</kbd> + <kbd>`f5`</kbd>
+
 ## That's all folks
 
 We hope you find this guide useful. Feel free to send in suggestions for scenarios you'd like to see included, or you might want to share your own default messages and grow the knowledge even further 🙂.

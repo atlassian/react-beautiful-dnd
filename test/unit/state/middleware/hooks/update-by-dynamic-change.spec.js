@@ -40,7 +40,9 @@ it('should not call onDragUpdate if the destination or source have not changed',
 
   store.dispatch(collectionStarting());
   store.dispatch(publish(publishAdditionArgs));
-  // // not called yet as position has not changed
+  // checking there are no queued frames
+  requestAnimationFrame.step();
+  // not called yet as position has not changed
   expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 });
 
@@ -85,16 +87,19 @@ it('should call onDragUpdate if the source has changed - even if the destination
   };
   expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
   expect(hooks.onDragStart).toHaveBeenCalledWith(start, expect.any(Object));
+  requestAnimationFrame.step();
   expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
-  // first move down
+  // first move down (and release update frame)
   store.dispatch(moveDown());
+  requestAnimationFrame.step();
   expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
   // $ExpectError - unknown mock reset property
   hooks.onDragUpdate.mockReset();
 
-  // move up into the original position
+  // move up into the original position (and release frame)
   store.dispatch(moveUp());
+  requestAnimationFrame.step();
   // no current displacement
   {
     const current: State = store.getState();
@@ -132,6 +137,8 @@ it('should call onDragUpdate if the source has changed - even if the destination
 
   store.dispatch(collectionStarting());
   store.dispatch(publish(customPublish));
+  // releasing update frame
+  requestAnimationFrame.step();
 
   const postPublishUpdate: DragUpdate = {
     draggableId: preset.inHome2.descriptor.id,

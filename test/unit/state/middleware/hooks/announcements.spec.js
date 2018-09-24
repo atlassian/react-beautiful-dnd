@@ -45,6 +45,7 @@ const start = (dispatch: Dispatch) => {
 
 const update = (dispatch: Dispatch) => {
   dispatch(moveDown());
+  requestAnimationFrame.step();
 };
 
 const end = (dispatch: Dispatch) => {

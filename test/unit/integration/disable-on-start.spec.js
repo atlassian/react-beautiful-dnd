@@ -116,6 +116,10 @@ it('should allow the disabling of a droppable in onDragStart', () => {
   };
   expect(hooks.onDragStart).toHaveBeenCalledWith(start);
 
+  // onDragUpdate will occur after animation frame
+  expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+
+  requestAnimationFrame.step();
   // an update should be fired as the home location has changed
   const update: DragUpdate = {
     ...start,

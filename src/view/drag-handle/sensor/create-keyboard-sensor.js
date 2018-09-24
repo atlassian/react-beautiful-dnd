@@ -47,11 +47,11 @@ export default ({
     bindWindowEvents();
     fn();
   };
-  const stopDragging = (fn?: Function = noop) => {
+  const stopDragging = (postDragFn?: Function = noop) => {
     schedule.cancel();
     unbindWindowEvents();
     setState({ isDragging: false });
-    fn();
+    postDragFn();
   };
   const kill = () => {
     if (state.isDragging) {

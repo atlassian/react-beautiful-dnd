@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import messagePreset from '../util/message-preset';
 import * as timings from '../../../debug/timings';
 import getExpiringAnnounce from './expiring-announce';
-import getFlushableFrame, { type FlushableFrame } from './flushable-frame';
+import getFrameMarshal, { type FrameMarshal } from './frame-marshal';
 import type {
   DropResult,
   Hooks,
@@ -64,25 +64,19 @@ const execute = (
   }
 };
 
+type WhileDragging = {|
+  lastCritical: Critical,
+  lastCombine: ?Combine,
+  lastLocation: ?DraggableLocation,
+|};
+
 export default (getHooks: () => Hooks, announce: Announce) => {
-  let lastLocation: ?DraggableLocation = null;
-  let lastCombine: ?Combine = null;
-  let lastCritical: ?Critical = null;
-  let isDragStartPublished: boolean = false;
-  let flushableStart: ?FlushableFrame = null;
-
-  const tryFlushStart = () => {
-    if (!flushableStart) {
-      return;
-    }
-
-    flushableStart.flush();
-    flushableStart = null;
-  };
+  let dragging: ?WhileDragging = null;
+  const frameMarshal: FrameMarshal = getFrameMarshal();
 
   const beforeStart = (critical: Critical) => {
     invariant(
-      !isDragStartPublished,
+      !dragging,
       'Cannot fire onBeforeDragStart as a drag start has already been published',
     );
     withTimings('onBeforeDragStart', () => {
@@ -96,19 +90,18 @@ export default (getHooks: () => Hooks, announce: Announce) => {
 
   const start = (critical: Critical) => {
     invariant(
-      !isDragStartPublished,
+      !dragging,
       'Cannot fire onBeforeDragStart as a drag start has already been published',
     );
     const data: DragStart = getDragStart(critical);
-    lastCritical = critical;
-    lastLocation = data.source;
-    lastCombine = null;
-    // letting consumers know publish has started
-    // even though it could take up to a frame to happen
-    isDragStartPublished = true;
+    dragging = {
+      lastCritical: critical,
+      lastLocation: data.source,
+      lastCombine: null,
+    };
 
     // we will flush this frame if we receive any hook updates
-    flushableStart = getFlushableFrame(() => {
+    frameMarshal.add(() => {
       withTimings('onDragStart', () =>
         execute(
           getHooks().onDragStart,
@@ -122,34 +115,37 @@ export default (getHooks: () => Hooks, announce: Announce) => {
 
   // Passing in the critical location again as it can change during a drag
   const move = (critical: Critical, impact: DragImpact) => {
-    tryFlushStart();
+    frameMarshal.flush();
     const location: ?DraggableLocation = impact.destination;
     const combine: ?Combine = impact.merge ? impact.merge.combine : null;
     invariant(
-      isDragStartPublished && lastCritical,
+      dragging,
       'Cannot fire onDragMove when onDragStart has not been called',
     );
 
     // Has the critical changed? Will result in a source change
     const hasCriticalChanged: boolean = !isCriticalEqual(
       critical,
-      lastCritical,
+      dragging.lastCritical,
     );
     if (hasCriticalChanged) {
-      lastCritical = critical;
+      dragging.lastCritical = critical;
     }
 
     // Has the location changed? Will result in a destination change
     const hasLocationChanged: boolean = !areLocationsEqual(
-      lastLocation,
+      dragging.lastLocation,
       location,
     );
     if (hasLocationChanged) {
-      lastLocation = location;
+      dragging.lastLocation = location;
     }
-    const hasGroupingChanged: boolean = !isCombineEqual(lastCombine, combine);
+    const hasGroupingChanged: boolean = !isCombineEqual(
+      dragging.lastCombine,
+      combine,
+    );
     if (hasGroupingChanged) {
-      lastCombine = combine;
+      dragging.lastCombine = combine;
     }
 
     // Nothing has changed - no update needed
@@ -163,26 +159,27 @@ export default (getHooks: () => Hooks, announce: Announce) => {
       destination: location,
     };
 
-    withTimings('onDragUpdate', () =>
-      execute(
-        getHooks().onDragUpdate,
-        data,
-        announce,
-        messagePreset.onDragUpdate,
-      ),
-    );
+    frameMarshal.add(() => {
+      withTimings('onDragUpdate', () =>
+        execute(
+          getHooks().onDragUpdate,
+          data,
+          announce,
+          messagePreset.onDragUpdate,
+        ),
+      );
+    });
   };
 
   const drop = (result: DropResult) => {
-    tryFlushStart();
     invariant(
-      isDragStartPublished,
+      dragging,
       'Cannot fire onDragEnd when there is no matching onDragStart',
     );
-    isDragStartPublished = false;
-    lastLocation = null;
-    lastCritical = null;
-    lastCombine = null;
+    dragging = null;
+
+    frameMarshal.flush();
+    // not adding to frame marshal
     withTimings('onDragEnd', () =>
       execute(getHooks().onDragEnd, result, announce, messagePreset.onDragEnd),
     );
@@ -190,14 +187,13 @@ export default (getHooks: () => Hooks, announce: Announce) => {
 
   // A non user initiated cancel
   const abort = () => {
-    tryFlushStart();
-    invariant(
-      isDragStartPublished && lastCritical,
-      'Cannot cancel when onDragStart not fired',
-    );
+    // aborting can happen defensively
+    if (!dragging) {
+      return;
+    }
 
     const result: DropResult = {
-      ...getDragStart(lastCritical),
+      ...getDragStart(dragging.lastCritical),
       combine: null,
       destination: null,
       reason: 'CANCEL',
@@ -211,6 +207,5 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     move,
     drop,
     abort,
-    isDragStartPublished: (): boolean => isDragStartPublished,
   };
 };

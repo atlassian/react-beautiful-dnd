@@ -33,6 +33,10 @@ it('should call onDragUpdate if the position has changed on move', () => {
 
   // Okay let's move it
   store.dispatch(moveDown());
+  // not called until after a frame
+  expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+
+  requestAnimationFrame.step();
   const update: DragUpdate = {
     ...getDragStart(),
     combine: null,
@@ -50,6 +54,9 @@ it('should not call onDragUpdate if there is no movement from the last update', 
 
   start(store.dispatch);
   expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+
+  // onDragUpdate not called yet
+  requestAnimationFrame.flush();
   expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
   // A movement to the same index is not causing an update
@@ -60,10 +67,13 @@ it('should not call onDragUpdate if there is no movement from the last update', 
   };
   store.dispatch(move(moveArgs));
 
+  // update not called after flushing
+  requestAnimationFrame.step();
   expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
   // Triggering an actual movement
   store.dispatch(moveDown());
+  requestAnimationFrame.step();
   expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
 
   const state: State = store.getState();
@@ -80,5 +90,6 @@ it('should not call onDragUpdate if there is no movement from the last update', 
     }),
   );
 
+  requestAnimationFrame.flush();
   expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
 });

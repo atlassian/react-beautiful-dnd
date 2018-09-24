@@ -38,6 +38,8 @@ it('should behave correctly across multiple drags', () => {
       combine: null,
     };
     store.dispatch(moveDown());
+    // flush hook call
+    requestAnimationFrame.step();
     expect(hooks.onDragUpdate).toHaveBeenCalledWith(update, expect.any(Object));
     expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
 

@@ -157,28 +157,29 @@ type OnBeforeDragStartHook = (start: DragStart) => mixed;
 
 ## When are the hooks called?
 
-### Phase 1: prepare (asynchronous steps)
+### Phase 1: prepare
 
 - User initiates a drag
 - We prepare and collect information required for the drag (async). If the drag ends before this phase is completed then no hooks will be fired.
 
-### Phase 2: publish (synchronous steps)
+### Phase 2: publish
 
 - `onBeforeDragStart` is called
 - `Draggable` and `Droppable` components are updated with initial `snapshot` values
-- `onDragStart` is called
+- `onDragStart` is called in the next [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame)
 
 ### Phase 3: updates
 
 - User moves a dragging item
 - `Draggable` and `Droppable` components are updated with latest `snapshot` values
-- `onDragUpdate` is called
+- `onDragUpdate` is called in the next [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame)
 
 ### Phase 4: drop
 
 - User drops a dragging item
-- Once drop animation is finished the `Draggable` and `Droppable` components are updated with resting `snapshot` values
-- `onDragEnd` is called
+- Once drop animation is finished the `Draggable` and `Droppable` components are updated with resting `snapshot` values and the `onDragEnd` hook is called
+- You perform your reorder operation in `onDragEnd` which can result in a `setState` to update the order
+- The `Draggable` and `Droppable` snapshot updates and any `setState` caused by `onDragEnd` are batched together into the render cycle by `react ⚛️` 🤘
 
 ## Synchronous reordering
 
@@ -192,7 +193,7 @@ Because this library does not control your state, it is up to you to _synchronou
 
 ### Persisting a reorder
 
-If you need to persist a reorder to a remote data store - update the list synchronously on the client and fire off a request in the background to persist the change. If the remote save fails it is up to you how to communicate that to the user and update, or not update, the list.
+If you need to persist a reorder to a remote data store - update the list synchronously on the client (such as through `this.setState()`) and fire off a request in the background to persist the change. If the remote save fails it is up to you how to communicate that to the user and update, or not update, the list.
 
 ## Block updates during a drag
 
@@ -223,4 +224,4 @@ Here are a few poor user experiences that can occur if you change things _during
 
 ## `onDragStart` and `onDragEnd` pairing
 
-We try very hard to ensure that each `onDragStart` event is paired with a single `onDragEnd` event. However, there maybe a rogue situation where this is not the case. If that occurs - it is a bug. Currently there is no mechanism to tell the library to cancel a current drag externally.
+We try very hard to ensure that each `onDragStart` event is paired with a single `onDragEnd` event. However, there maybe a rogue situation where this is not the case. If that occurs - it is a bug. Currently there is no official mechanism to tell the library to cancel a current drag externally.

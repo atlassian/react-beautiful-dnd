@@ -41,21 +41,11 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
     // Drag state resetting - need to check if
     // we should fire a onDragEnd hook
     if (action.type === 'CLEAN') {
-      // Unmatched drag start call - need to cancel
-      if (publisher.isDragStartPublished()) {
-        publisher.abort();
-      }
-
+      publisher.abort();
       return;
     }
 
     // ## Perform drag updates
-
-    // No drag updates required
-    if (!publisher.isDragStartPublished()) {
-      return;
-    }
-
     // impact of action has already been reduced
 
     const state: State = store.getState();
