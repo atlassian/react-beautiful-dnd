@@ -11,7 +11,7 @@ export default (): FrameMarshal => {
   let frameId: ?AnimationFrameID = null;
 
   const execute = () => {
-    invariant(last);
+    invariant(last, 'Cannot execute fn as none can be found');
     last();
     last = null;
     frameId = null;
@@ -26,6 +26,7 @@ export default (): FrameMarshal => {
   };
 
   const add = (cb: Function) => {
+    // flush anything that is pending
     flush();
     last = cb;
     frameId = requestAnimationFrame(execute);
