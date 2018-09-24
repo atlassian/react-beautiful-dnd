@@ -125,9 +125,7 @@ export const updateDroppableIsCombineEnabled = (
 });
 
 export type MoveArgs = {|
-  // TODO: clientSelection
   client: Position,
-  shouldAnimate: boolean,
 |};
 
 export type MoveAction = {|

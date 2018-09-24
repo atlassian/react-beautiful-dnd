@@ -82,6 +82,7 @@ export const makeMapStateToProps = (): Selector => {
       draggingOver: ?DroppableId,
       // the id of a draggable you are grouping with
       combineWith: ?DraggableId,
+      forceShouldAnimate: ?boolean,
     ): MapProps => ({
       dragging: {
         mode,
@@ -90,6 +91,7 @@ export const makeMapStateToProps = (): Selector => {
         dimension,
         draggingOver,
         combineWith,
+        forceShouldAnimate,
       },
       secondary: null,
     }),
@@ -154,12 +156,15 @@ export const makeMapStateToProps = (): Selector => {
         ? state.impact.merge.combine.draggableId
         : null;
 
+      const forceShouldAnimate: ?boolean = state.forceShouldAnimate;
+
       return getDraggingProps(
         memoizedOffset(offset.x, offset.y),
         mode,
         dimension,
         draggingOver,
         combineWith,
+        forceShouldAnimate,
       );
     }
 
@@ -191,6 +196,7 @@ export const makeMapStateToProps = (): Selector => {
           draggingOver,
           combineWith,
           mode,
+          forceShouldAnimate: null,
           dropping: {
             reason,
             duration,

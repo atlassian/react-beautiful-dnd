@@ -92,6 +92,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     draggableId: draggable.descriptor.id,
     type: home.descriptor.type,
     source,
+    mode: state.movementMode,
     destination,
     combine,
     reason,

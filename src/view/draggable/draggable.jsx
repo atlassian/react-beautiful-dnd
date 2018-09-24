@@ -9,7 +9,6 @@ import { transitions, transforms } from '../animation';
 import type {
   DraggableDimension,
   ClientPositions,
-  DraggableId,
   DroppableId,
   MovementMode,
   TypeId,
@@ -39,6 +38,7 @@ import type {
   DroppingState,
   SecondaryMapProps,
   DraggingMapProps,
+  ChildrenFn,
 } from './draggable-types';
 import getWindowScroll from '../window/get-window-scroll';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
@@ -77,6 +77,13 @@ const getDraggingOpacity = (
   return isDropAnimating ? 0 : 0.7;
 };
 
+const getShouldDraggingAnimate = (dragging: DraggingMapProps): boolean => {
+  if (dragging.forceShouldAnimate != null) {
+    return dragging.forceShouldAnimate;
+  }
+  return dragging.mode === 'JUMP';
+};
+
 export default class Draggable extends Component<Props> {
   /* eslint-disable react/sort-comp */
   callbacks: DragHandleCallbacks;
@@ -97,7 +104,7 @@ export default class Draggable extends Component<Props> {
     const callbacks: DragHandleCallbacks = {
       onLift: this.onLift,
       onMove: (clientSelection: Position) =>
-        props.move({ client: clientSelection, shouldAnimate: false }),
+        props.move({ client: clientSelection }),
       onDrop: () => props.drop({ reason: 'DROP' }),
       onCancel: () => props.drop({ reason: 'CANCEL' }),
       onMoveUp: props.moveUp,
@@ -180,15 +187,17 @@ export default class Draggable extends Component<Props> {
     (dragging: DraggingMapProps): DraggingStyle => {
       const dimension: DraggableDimension = dragging.dimension;
       const box: BoxModel = dimension.client;
-      const { offset, combineWith, dropping, mode } = dragging;
+      const { offset, combineWith, dropping } = dragging;
 
       const isCombining: boolean = Boolean(combineWith);
-      const shouldAnimate: boolean = mode === 'JUMP';
+
+      const shouldAnimate: boolean = getShouldDraggingAnimate(dragging);
       const isDropAnimating: boolean = Boolean(dropping);
 
       const transform: ?string = isDropAnimating
         ? transforms.drop(offset, isCombining)
         : transforms.moveTo(offset);
+
       const style: DraggingStyle = {
         // ## Placement
         position: 'fixed',
@@ -292,7 +301,9 @@ export default class Draggable extends Component<Props> {
   renderChildren = (dragHandleProps: ?DragHandleProps): ?Node => {
     const dragging: ?DraggingMapProps = this.props.dragging;
     const secondary: ?SecondaryMapProps = this.props.secondary;
-    const children = this.props.children;
+    const children: ChildrenFn = this.props.children;
+
+    // console.log('rendering dragging', this.props.draggableId);
 
     if (dragging) {
       const child: ?Node = children(

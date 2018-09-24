@@ -22,9 +22,9 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
   ): any => {
     if (action.type === 'INITIAL_PUBLISH') {
       const critical: Critical = action.payload.critical;
-      publisher.beforeStart(critical);
+      publisher.beforeStart(critical, action.payload.movementMode);
       next(action);
-      publisher.start(critical);
+      publisher.start(critical, action.payload.movementMode);
       return;
     }
 

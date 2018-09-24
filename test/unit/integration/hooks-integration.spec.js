@@ -185,15 +185,14 @@ describe('hooks integration', () => {
       draggableId,
       type: 'DEFAULT',
       source,
+      mode: 'FLUID',
     };
 
     // Unless we do some more hardcore stubbing
     // both completed and cancelled look the same.
     // Ideally we would move one item below another
     const completed: DropResult = {
-      draggableId,
-      type: 'DEFAULT',
-      source,
+      ...start,
       // did not move anywhere
       destination: source,
       combine: null,
@@ -201,9 +200,7 @@ describe('hooks integration', () => {
     };
 
     const cancelled: DropResult = {
-      draggableId,
-      type: 'DEFAULT',
-      source,
+      ...start,
       destination: null,
       combine: null,
       reason: 'CANCEL',

@@ -95,7 +95,7 @@ export default (state: State = idle, action: Action): State => {
       viewport,
       userDirection: forward,
       scrollJumpRequest: null,
-      shouldAnimate: false,
+      forceShouldAnimate: null,
     };
 
     return result;
@@ -148,13 +148,10 @@ export default (state: State = idle, action: Action): State => {
       `${action.type} not permitted in phase ${state.phase}`,
     );
 
-    const { client, shouldAnimate } = action.payload;
+    const { client } = action.payload;
 
     // nothing needs to be done
-    if (
-      state.shouldAnimate === shouldAnimate &&
-      isEqual(client, state.current.client.selection)
-    ) {
+    if (isEqual(client, state.current.client.selection)) {
       return state;
     }
 
@@ -166,7 +163,6 @@ export default (state: State = idle, action: Action): State => {
       state,
       clientSelection: client,
       impact,
-      shouldAnimate,
     });
   }
 
@@ -224,6 +220,7 @@ export default (state: State = idle, action: Action): State => {
       dimensions,
       // At this point any scroll jump request would need to be cleared
       scrollJumpRequest: null,
+      forceShouldAnimate: null,
     };
   }
 
@@ -278,6 +275,7 @@ export default (state: State = idle, action: Action): State => {
       phase: state.phase,
       impact,
       dimensions,
+      forceShouldAnimate: null,
     };
   }
 
@@ -332,6 +330,7 @@ export default (state: State = idle, action: Action): State => {
       phase: state.phase,
       impact,
       dimensions,
+      forceShouldAnimate: null,
     };
   }
 
@@ -368,7 +367,6 @@ export default (state: State = idle, action: Action): State => {
       state,
       clientSelection: state.current.client.selection,
       viewport,
-      shouldAnimate: false,
       impact,
       // this would have cleared any scroll jump requests
       scrollJumpRequest: null,
@@ -396,6 +394,7 @@ export default (state: State = idle, action: Action): State => {
       // eslint-disable-next-line
       phase: state.phase,
       viewport,
+      forceShouldAnimate: null,
     };
   }
 
@@ -429,7 +428,6 @@ export default (state: State = idle, action: Action): State => {
       state,
       impact: result.impact,
       clientSelection: result.clientSelection,
-      shouldAnimate: true,
       scrollJumpRequest: result.scrollJumpRequest,
     });
   }

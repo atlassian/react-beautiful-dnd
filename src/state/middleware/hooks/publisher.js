@@ -15,6 +15,7 @@ import type {
   DragStart,
   Announce,
   DragUpdate,
+  MovementMode,
   OnBeforeDragStartHook,
   OnDragStartHook,
   OnDragUpdateHook,
@@ -28,13 +29,14 @@ const withTimings = (key: string, fn: Function) => {
   timings.finish(key);
 };
 
-const getDragStart = (critical: Critical): DragStart => ({
+const getDragStart = (critical: Critical, mode: MovementMode): DragStart => ({
   draggableId: critical.draggable.id,
   type: critical.droppable.type,
   source: {
     droppableId: critical.droppable.id,
     index: critical.draggable.index,
   },
+  mode,
 });
 
 type AnyPrimaryHookFn = OnDragStartHook | OnDragUpdateHook | OnDragEndHook;
@@ -65,6 +67,7 @@ const execute = (
 };
 
 type WhileDragging = {|
+  mode: MovementMode,
   lastCritical: Critical,
   lastCombine: ?Combine,
   lastLocation: ?DraggableLocation,
@@ -74,7 +77,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
   let dragging: ?WhileDragging = null;
   const frameMarshal: FrameMarshal = getFrameMarshal();
 
-  const beforeStart = (critical: Critical) => {
+  const beforeStart = (critical: Critical, mode: MovementMode) => {
     invariant(
       !dragging,
       'Cannot fire onBeforeDragStart as a drag start has already been published',
@@ -83,18 +86,19 @@ export default (getHooks: () => Hooks, announce: Announce) => {
       // No use of screen reader for this hook
       const fn: ?OnBeforeDragStartHook = getHooks().onBeforeDragStart;
       if (fn) {
-        fn(getDragStart(critical));
+        fn(getDragStart(critical, mode));
       }
     });
   };
 
-  const start = (critical: Critical) => {
+  const start = (critical: Critical, mode: MovementMode) => {
     invariant(
       !dragging,
       'Cannot fire onBeforeDragStart as a drag start has already been published',
     );
-    const data: DragStart = getDragStart(critical);
+    const data: DragStart = getDragStart(critical, mode);
     dragging = {
+      mode,
       lastCritical: critical,
       lastLocation: data.source,
       lastCombine: null,
@@ -154,7 +158,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     }
 
     const data: DragUpdate = {
-      ...getDragStart(critical),
+      ...getDragStart(critical, dragging.mode),
       combine,
       destination: location,
     };
@@ -177,9 +181,10 @@ export default (getHooks: () => Hooks, announce: Announce) => {
       'Cannot fire onDragEnd when there is no matching onDragStart',
     );
     dragging = null;
-
+    // ensure any pending hooks are flushed
     frameMarshal.flush();
-    // not adding to frame marshal
+    // not adding to frame marshal - we want this to be done in the same render pass
+    // we also want the consumers reorder logic to be in the same render pass
     withTimings('onDragEnd', () =>
       execute(getHooks().onDragEnd, result, announce, messagePreset.onDragEnd),
     );
@@ -193,7 +198,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     }
 
     const result: DropResult = {
-      ...getDragStart(dragging.lastCritical),
+      ...getDragStart(dragging.lastCritical, dragging.mode),
       combine: null,
       destination: null,
       reason: 'CANCEL',

@@ -319,7 +319,7 @@ export type DraggingState = {|
   // if we need to jump the scroll (keyboard dragging)
   scrollJumpRequest: ?Position,
   // whether or not draggable movements should be animated
-  shouldAnimate: boolean,
+  forceShouldAnimate: ?boolean,
 |};
 
 // While dragging we can enter into a bulk collection phase

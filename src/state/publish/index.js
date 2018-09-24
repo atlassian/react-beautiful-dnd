@@ -135,7 +135,7 @@ export default ({
     impact,
     dimensions,
     // not animating this movement
-    shouldAnimate: false,
+    forceShouldAnimate: false,
   };
 
   if (state.phase === 'COLLECTING') {

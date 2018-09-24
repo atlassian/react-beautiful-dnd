@@ -20,7 +20,6 @@ import type {
 type MoveArgs = {|
   state: DraggingState | CollectingState,
   clientSelection: Position,
-  shouldAnimate: boolean,
   viewport?: Viewport,
   // force a custom drag impact
   impact?: ?DragImpact,
@@ -31,7 +30,6 @@ type MoveArgs = {|
 export default ({
   state,
   clientSelection,
-  shouldAnimate,
   viewport,
   impact: forcedImpact,
   scrollJumpRequest,
@@ -105,12 +103,12 @@ export default ({
   const result: DraggingState = {
     ...state,
     current,
-    shouldAnimate,
     userDirection,
     dimensions,
     impact: newImpact,
     scrollJumpRequest: scrollJumpRequest || null,
     viewport: newViewport,
+    forceShouldAnimate: null,
   };
 
   return result;

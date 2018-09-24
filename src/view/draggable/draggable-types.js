@@ -113,6 +113,7 @@ export type DraggingMapProps = {|
   dimension: DraggableDimension,
   draggingOver: ?DroppableId,
   combineWith: ?DraggableId,
+  forceShouldAnimate: ?boolean,
 |};
 
 export type SecondaryMapProps = {|
@@ -128,10 +129,12 @@ export type MapProps = {|
   secondary: ?SecondaryMapProps,
 |};
 
+export type ChildrenFn = (Provided, StateSnapshot) => ?Node;
+
 export type OwnProps = {|
   draggableId: DraggableId,
   index: number,
-  children: (Provided, StateSnapshot) => ?Node,
+  children: ChildrenFn,
   isDragDisabled: boolean,
   disableInteractiveElementBlocking: boolean,
 |};
