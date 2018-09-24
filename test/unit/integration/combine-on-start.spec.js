@@ -16,7 +16,7 @@ import { DragDropContext, Droppable, Draggable } from '../../../src';
 import { getComputedSpacing } from '../../utils/dimension';
 
 const pressSpacebar = withKeyboard(keyCodes.space);
-const pressDown = withKeyboard(keyCodes.arrowDown);
+const pressArrowDown = withKeyboard(keyCodes.arrowDown);
 
 // Both list and item will have the same dimensions
 jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() =>
@@ -130,7 +130,8 @@ it('should allow the changing of combining in onDragStart', () => {
   expect(hooks.onDragStart).toHaveBeenCalledWith(start);
 
   // now moving down will cause a combine impact!
-  pressDown(wrapper.find('.drag-handle').first());
+  pressArrowDown(wrapper.find('.drag-handle').first());
+  requestAnimationFrame.step();
   const update: DragUpdate = {
     ...start,
     destination: null,
