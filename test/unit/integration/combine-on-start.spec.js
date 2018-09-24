@@ -16,6 +16,7 @@ import { DragDropContext, Droppable, Draggable } from '../../../src';
 import { getComputedSpacing } from '../../utils/dimension';
 
 const pressSpacebar = withKeyboard(keyCodes.space);
+const pressDown = withKeyboard(keyCodes.arrowDown);
 
 // Both list and item will have the same dimensions
 jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() =>
@@ -33,17 +34,17 @@ jest
   .mockImplementation(() => getComputedSpacing({}));
 
 type State = {|
-  isDropDisabled: boolean,
+  isCombineEnabled: boolean,
 |};
 
 class App extends React.Component<*, State> {
   state: State = {
-    isDropDisabled: false,
+    isCombineEnabled: false,
   };
 
   onDragStart = (start: DragStart) => {
     this.props.onDragStart(start);
-    this.setState({ isDropDisabled: true });
+    this.setState({ isCombineEnabled: true });
   };
 
   onDragUpdate = (update: DragUpdate) => {
@@ -52,7 +53,7 @@ class App extends React.Component<*, State> {
 
   onDragEnd = (result: DropResult) => {
     this.props.onDragEnd(result);
-    this.setState({ isDropDisabled: false });
+    this.setState({ isCombineEnabled: false });
   };
   // Normally you would want to split things out into separate components.
   // But in this example everything is just done in one place for simplicity
@@ -66,14 +67,14 @@ class App extends React.Component<*, State> {
         <Droppable
           droppableId="droppable"
           direction="horizontal"
-          isDropDisabled={this.state.isDropDisabled}
+          isCombineEnabled={this.state.isCombineEnabled}
         >
           {(droppableProvided: DroppableProvided) => (
             <div
               ref={droppableProvided.innerRef}
               {...droppableProvided.droppableProps}
             >
-              <Draggable draggableId="draggable" index={0}>
+              <Draggable draggableId="first" index={0}>
                 {(draggableProvided: DraggableProvided) => (
                   <div
                     ref={draggableProvided.innerRef}
@@ -81,7 +82,19 @@ class App extends React.Component<*, State> {
                     {...draggableProvided.draggableProps}
                     {...draggableProvided.dragHandleProps}
                   >
-                    Drag me!
+                    First
+                  </div>
+                )}
+              </Draggable>
+              <Draggable draggableId="second" index={1}>
+                {(draggableProvided: DraggableProvided) => (
+                  <div
+                    ref={draggableProvided.innerRef}
+                    className="drag-handle"
+                    {...draggableProvided.draggableProps}
+                    {...draggableProvided.dragHandleProps}
+                  >
+                    Second
                   </div>
                 )}
               </Draggable>
@@ -94,7 +107,7 @@ class App extends React.Component<*, State> {
   }
 }
 
-it('should allow the disabling of a droppable in onDragStart', () => {
+it('should allow the changing of combining in onDragStart', () => {
   const hooks: Hooks = {
     onDragStart: jest.fn(),
     onDragUpdate: jest.fn(),
@@ -102,12 +115,12 @@ it('should allow the disabling of a droppable in onDragStart', () => {
   };
   const wrapper: ReactWrapper = mount(<App {...hooks} />);
 
-  pressSpacebar(wrapper.find('.drag-handle'));
+  pressSpacebar(wrapper.find('.drag-handle').first());
   // flush animation frame for lift hook
   requestAnimationFrame.step();
 
   const start: DragStart = {
-    draggableId: 'draggable',
+    draggableId: 'first',
     source: {
       droppableId: 'droppable',
       index: 0,
@@ -116,12 +129,15 @@ it('should allow the disabling of a droppable in onDragStart', () => {
   };
   expect(hooks.onDragStart).toHaveBeenCalledWith(start);
 
-  // an update should be fired as the home location has changed
+  // now moving down will cause a combine impact!
+  pressDown(wrapper.find('.drag-handle').first());
   const update: DragUpdate = {
     ...start,
-    // no destination as it is now disabled
     destination: null,
-    combine: null,
+    combine: {
+      draggableId: 'second',
+      droppableId: 'droppable',
+    },
   };
   expect(hooks.onDragUpdate).toHaveBeenCalledWith(update);
 });

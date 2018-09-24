@@ -97,6 +97,8 @@ it('should call the onBeforeDragStart before connected components are updated, a
 
   // start a drag
   pressSpacebar(wrapper.find('.drag-handle'));
+  // flushing animation frame for drag start
+  requestAnimationFrame.step();
 
   // checking values are set
   invariant(onBeforeDragStartTime, 'onBeforeDragStartTime should be set');

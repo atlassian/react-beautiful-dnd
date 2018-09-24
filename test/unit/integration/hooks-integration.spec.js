@@ -137,6 +137,9 @@ describe('hooks integration', () => {
 
       // Drag does not start until mouse has moved past a certain threshold
       windowMouseMove(dragStart);
+
+      // drag start hook is scheduled with requestAnimationFrame
+      requestAnimationFrame.step();
     };
 
     const move = () => {
