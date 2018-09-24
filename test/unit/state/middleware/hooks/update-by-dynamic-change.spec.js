@@ -3,10 +3,10 @@ import invariant from 'tiny-invariant';
 import {
   collectionStarting,
   initialPublish,
-  InitialPublishArgs,
   moveDown,
   moveUp,
   publish,
+  type InitialPublishArgs,
 } from '../../../../../src/state/action-creators';
 import middleware from '../../../../../src/state/middleware/hooks';
 import { getPreset, makeScrollable } from '../../../../utils/dimension';

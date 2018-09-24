@@ -3,8 +3,8 @@ import invariant from 'tiny-invariant';
 import {
   initialPublish,
   move,
-  MoveArgs,
   moveDown,
+  type MoveArgs,
 } from '../../../../../src/state/action-creators';
 import middleware from '../../../../../src/state/middleware/hooks';
 import { add } from '../../../../../src/state/position';
