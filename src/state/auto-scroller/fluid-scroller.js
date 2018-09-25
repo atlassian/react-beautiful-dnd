@@ -231,7 +231,7 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
     // 2. We are not scrolling the window. Can we scroll a Droppable?
     const droppable: ?DroppableDimension = getBestScrollableDroppable({
       center,
-      destination: state.impact.destination,
+      destination: whatIsDraggedOver(state.impact),
       droppables: state.dimensions.droppables,
     });
 

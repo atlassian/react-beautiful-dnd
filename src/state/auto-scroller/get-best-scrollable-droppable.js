@@ -8,7 +8,7 @@ import { find } from '../../native-with-fallback';
 import type {
   DroppableDimension,
   DroppableDimensionMap,
-  DraggableLocation,
+  DroppableId,
 } from '../../types';
 
 const getScrollableDroppables = memoizeOne(
@@ -47,7 +47,7 @@ const getScrollableDroppableOver = (
 
 type Api = {|
   center: Position,
-  destination: ?DraggableLocation,
+  destination: ?DroppableId,
   droppables: DroppableDimensionMap,
 |};
 
@@ -60,7 +60,7 @@ export default ({
   // placeholder buffer logic works correctly
 
   if (destination) {
-    const dimension: DroppableDimension = droppables[destination.droppableId];
+    const dimension: DroppableDimension = droppables[destination];
     if (!dimension.frame) {
       return null;
     }

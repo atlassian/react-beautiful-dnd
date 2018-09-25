@@ -214,16 +214,10 @@ export type PagePositions = {|
   borderBoxCenter: Position,
 |};
 
-// When dragging with a pointer such as a mouse or touch input we want to automatically
-// scroll user the under input when we get near the bottom of a Droppable or the window.
-// When Dragging with a keyboard we want to jump as required
+// There are two seperate modes that a drag can be in
+// FLUID: everything is done in response to highly granular input (eg mouse)
+// SNAP: items move in response to commands (eg arrowDown);
 export type MovementMode = 'FLUID' | 'SNAP';
-
-// export type Viewport = {|
-//   scroll: Position,
-//   maxScroll: Position,
-//   subject: Rect,
-// |}
 
 export type DragPositions = {|
   client: ClientPositions,

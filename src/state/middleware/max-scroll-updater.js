@@ -1,12 +1,13 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
-import type { State, Viewport, DraggableLocation } from '../../types';
+import type { State, Viewport } from '../../types';
 import type { Action, MiddlewareStore, Dispatch } from '../store-types';
 import getMaxScroll from '../get-max-scroll';
 import { isEqual } from '../position';
 import { updateViewportMaxScroll } from '../action-creators';
 import isMovementAllowed from '../is-movement-allowed';
+import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 
 const shouldCheckOnAction = (action: Action): boolean =>
   action.type === 'MOVE' ||
@@ -15,24 +16,6 @@ const shouldCheckOnAction = (action: Action): boolean =>
   action.type === 'MOVE_DOWN' ||
   action.type === 'MOVE_LEFT' ||
   action.type === 'MOVE_BY_WINDOW_SCROLL';
-
-// optimisation: body size can only change when the destination has changed
-const hasDroppableOverChanged = (
-  previous: ?DraggableLocation,
-  current: ?DraggableLocation,
-): boolean => {
-  // no previous - if there is a next return true
-  if (!previous) {
-    return Boolean(current);
-  }
-
-  // no current - if there is a previous return true
-  if (!current) {
-    return Boolean(previous);
-  }
-
-  return previous.droppableId !== current.droppableId;
-};
 
 const getNewMaxScroll = (
   previous: State,
@@ -47,11 +30,9 @@ const getNewMaxScroll = (
     return null;
   }
 
+  // optimisation: body size can only change when the destination has changed
   if (
-    !hasDroppableOverChanged(
-      previous.impact.destination,
-      current.impact.destination,
-    )
+    whatIsDraggedOver(previous.impact) === whatIsDraggedOver(current.impact)
   ) {
     return null;
   }
@@ -88,6 +69,7 @@ export default (store: MiddlewareStore) => (next: Dispatch) => (
   const maxScroll: ?Position = getNewMaxScroll(previous, current, action);
 
   // max scroll has changed - updating before action
+  // TODO: this is not before action...
   if (maxScroll) {
     next(updateViewportMaxScroll(maxScroll));
   }

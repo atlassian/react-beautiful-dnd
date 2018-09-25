@@ -71,10 +71,19 @@ describe('unmounting', () => {
 });
 
 describe('announcing', () => {
-  it('should throw if not mounted', () => {
+  it('should warm if not mounted', () => {
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
     const announcer: Announcer = createAnnouncer();
 
-    expect(() => announcer.announce('test')).toThrow();
+    announcer.announce('test');
+
+    expect(console.warn).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'A screen reader message was trying to be announced but it was unable to do so',
+      ),
+    );
+
+    console.warn.mockRestore();
   });
 
   it('should set the text content of the announcement element', () => {
