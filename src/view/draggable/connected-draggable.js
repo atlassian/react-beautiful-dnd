@@ -41,6 +41,14 @@ import type {
   DispatchProps,
   Selector,
 } from './draggable-types';
+import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
+
+const getCombineWith = (impact: DragImpact): ?DraggableId => {
+  if (!impact.merge) {
+    return null;
+  }
+  return impact.merge.combine.draggableId;
+};
 
 const defaultMapProps: MapProps = {
   secondary: {
@@ -148,13 +156,8 @@ export const makeMapStateToProps = (): Selector => {
         state.dimensions.draggables[ownProps.draggableId];
       // const shouldAnimateDragMovement: boolean = state.shouldAnimate;
       const mode: MovementMode = state.movementMode;
-      const draggingOver: ?DroppableId = state.impact.destination
-        ? state.impact.destination.droppableId
-        : null;
-
-      const combineWith: ?DraggableId = state.impact.merge
-        ? state.impact.merge.combine.draggableId
-        : null;
+      const draggingOver: ?DroppableId = whatIsDraggedOver(state.impact);
+      const combineWith: ?DraggableId = getCombineWith(state.impact);
 
       const forceShouldAnimate: ?boolean = state.forceShouldAnimate;
 
@@ -175,14 +178,8 @@ export const makeMapStateToProps = (): Selector => {
         return null;
       }
 
-      const draggingOver: ?DroppableId = pending.result.destination
-        ? pending.result.destination.droppableId
-        : null;
-
-      const combineWith: ?DraggableId = pending.result.combine
-        ? pending.result.combine.draggableId
-        : null;
-
+      const draggingOver: ?DroppableId = whatIsDraggedOver(pending.impact);
+      const combineWith: ?DraggableId = getCombineWith(pending.impact);
       const duration: number = pending.dropDuration;
       const reason: DropReason = pending.result.reason;
       const mode: MovementMode = pending.result.mode;
