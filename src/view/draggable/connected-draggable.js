@@ -211,7 +211,7 @@ export const makeMapStateToProps = (): Selector => {
     return null;
   };
 
-  const displacedSelector = (state: State, ownProps: OwnProps): ?MapProps => {
+  const secondarySelector = (state: State, ownProps: OwnProps): ?MapProps => {
     // Dragging
     if (state.isDragging) {
       // we do not care about the dragging item
@@ -245,7 +245,7 @@ export const makeMapStateToProps = (): Selector => {
 
   const selector = (state: State, ownProps: OwnProps): MapProps =>
     draggingSelector(state, ownProps) ||
-    displacedSelector(state, ownProps) ||
+    secondarySelector(state, ownProps) ||
     defaultMapProps;
 
   return selector;

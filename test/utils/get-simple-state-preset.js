@@ -85,7 +85,7 @@ export default (axis?: Axis = vertical) => {
       isWindowScrollAllowed: true,
       viewport,
       scrollJumpRequest: null,
-      shouldAnimate: false,
+      forceShouldAnimate: null,
     };
 
     return result;
@@ -156,6 +156,7 @@ export default (axis?: Axis = vertical) => {
         destination: getHomeLocation(draggable.descriptor),
         reason,
         combine: null,
+        mode: 'FLUID',
       },
     };
 

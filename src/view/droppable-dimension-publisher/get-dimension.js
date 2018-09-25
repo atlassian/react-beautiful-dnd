@@ -37,7 +37,7 @@ const getClient = (
 
   // Droppable is scrollable
 
-  // Element.getBoundingClient() returns:
+  // Element.getBoundingClient() returns a clipped padding box:
   // When not scrollable: the full size of the element
   // When scrollable: the visible size of the element
   // (which is not the full width of its scrollable content)
@@ -52,6 +52,7 @@ const getClient = (
   const bottom: number = top + closestScrollable.scrollHeight;
   const right: number = left + closestScrollable.scrollWidth;
 
+  // unclipped padding box
   const paddingBox: Spacing = {
     top,
     right,
@@ -60,6 +61,7 @@ const getClient = (
   };
 
   // Creating the borderBox by adding the borders to the paddingBox
+  // TODO: export expand from css-box-model
   const borderBox: Spacing = {
     top: paddingBox.top - base.border.top,
     right: paddingBox.right + base.border.right,

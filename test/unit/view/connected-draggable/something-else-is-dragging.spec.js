@@ -1,39 +1,36 @@
 // @flow
-import type { Position } from 'css-box-model';
 import { makeMapStateToProps } from '../../../../src/view/draggable/connected-draggable';
 import { getPreset } from '../../../utils/dimension';
 import noImpact from '../../../../src/state/no-impact';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import getDisplacementMap from '../../../../src/state/get-displacement-map';
-import { negate, patch } from '../../../../src/state/position';
 import {
   draggingStates,
   withImpact,
   move,
   type IsDraggingState,
 } from '../../../utils/dragging-state';
-import getOwnProps from './get-own-props';
+import getOwnProps from './util/get-own-props';
 import type {
   Selector,
   OwnProps,
   MapProps,
+  SecondaryMapProps,
 } from '../../../../src/view/draggable/draggable-types';
+import getSecondaryMapProps from './util/get-secondary-map-props';
 import type {
   Axis,
   DragImpact,
   DraggableLocation,
   Displacement,
+  DisplacedBy,
 } from '../../../../src/types';
+import getDisplacedBy from '../../../../src/state/get-displaced-by';
 
 const preset = getPreset();
 const state = getStatePreset();
 const ownProps: OwnProps = getOwnProps(preset.inHome2);
 const axis: Axis = preset.home.axis;
-
-const inHome1Amount: Position = patch(
-  axis.line,
-  preset.inHome1.client.marginBox[axis.size],
-);
 
 draggingStates.forEach((current: IsDraggingState) => {
   describe(`in phase: ${current.phase}`, () => {
@@ -92,7 +89,7 @@ draggingStates.forEach((current: IsDraggingState) => {
         index: preset.inHome2.descriptor.index,
         droppableId: preset.home.descriptor.id,
       };
-      it('should move out backwards of the way', () => {
+      it('should move out backwards of the way (willDisplaceForwards = false)', () => {
         const displaced: Displacement[] = [
           {
             draggableId: ownProps.draggableId,
@@ -100,39 +97,39 @@ draggingStates.forEach((current: IsDraggingState) => {
             shouldAnimate: true,
           },
         ];
+        const willDisplaceForward: boolean = false;
+        const displacedBy: DisplacedBy = getDisplacedBy(
+          axis,
+          preset.inHome1.displaceBy,
+          willDisplaceForward,
+        );
         const impact: DragImpact = {
           movement: {
             displaced,
             map: getDisplacementMap(displaced),
-            amount: inHome1Amount,
-            isInFrontOfStart: true,
+            displacedBy,
+            willDisplaceForward,
           },
           direction: preset.home.axis.direction,
           destination: inHome2Location,
-          group: null,
+          merge: null,
         };
         const impacted: IsDraggingState = withImpact(current, impact);
 
         const selector: Selector = makeMapStateToProps();
 
         const expected: MapProps = {
-          isDropAnimating: false,
-          dropDuration: 0,
-          isDragging: false,
-          // inHome2 will be moving backwards
-          offset: negate(inHome1Amount),
-          shouldAnimateDisplacement: true,
-          // not relevant
-          shouldAnimateDragMovement: false,
-          dimension: null,
-          draggingOver: null,
-          groupingWith: null,
-          groupedOverBy: null,
+          dragging: null,
+          secondary: {
+            shouldAnimateDisplacement: true,
+            offset: displacedBy.point,
+            combineTargetFor: null,
+          },
         };
         expect(selector(impacted, ownProps)).toEqual(expected);
       });
 
-      it('should move out forwards of the way', () => {
+      it('should move out forwards of the way (willDisplaceForwards = true)', () => {
         const selector: Selector = makeMapStateToProps();
         const displaced: Displacement[] = [
           {
@@ -141,33 +138,32 @@ draggingStates.forEach((current: IsDraggingState) => {
             shouldAnimate: true,
           },
         ];
+        const willDisplaceForward: boolean = true;
+        const displacedBy: DisplacedBy = getDisplacedBy(
+          axis,
+          preset.inHome1.displaceBy,
+          willDisplaceForward,
+        );
         const impact: DragImpact = {
           movement: {
             displaced,
             map: getDisplacementMap(displaced),
-            amount: inHome1Amount,
-            // does not make a lot of sense in this case, but this is fine
-            isInFrontOfStart: false,
+            displacedBy,
+            willDisplaceForward,
           },
           direction: preset.home.axis.direction,
           destination: inHome2Location,
-          group: null,
+          merge: null,
         };
         const impacted: IsDraggingState = withImpact(current, impact);
 
         const expected: MapProps = {
-          isDropAnimating: false,
-          dropDuration: 0,
-          isDragging: false,
-          // inHome2 will be moving forwards
-          offset: inHome1Amount,
-          shouldAnimateDisplacement: true,
-          // not relevant
-          shouldAnimateDragMovement: false,
-          dimension: null,
-          draggingOver: null,
-          groupingWith: null,
-          groupedOverBy: null,
+          dragging: null,
+          secondary: {
+            shouldAnimateDisplacement: true,
+            offset: displacedBy.point,
+            combineTargetFor: null,
+          },
         };
         expect(selector(impacted, ownProps)).toEqual(expected);
       });
@@ -188,16 +184,23 @@ draggingStates.forEach((current: IsDraggingState) => {
             shouldAnimate: false,
           },
         ];
+        // moving inHome1 forward past inHome2 (will displace backwards)
+        const willDisplaceForward: boolean = false;
+        const displacedBy: DisplacedBy = getDisplacedBy(
+          axis,
+          preset.inHome1.displaceBy,
+          willDisplaceForward,
+        );
         const withAnimation: DragImpact = {
           movement: {
             displaced: displaceWithAnimation,
             map: getDisplacementMap(displaceWithAnimation),
-            amount: inHome1Amount,
-            isInFrontOfStart: true,
+            displacedBy,
+            willDisplaceForward,
           },
           direction: preset.home.axis.direction,
           destination: inHome2Location,
-          group: null,
+          merge: null,
         };
         const withoutAnimation: DragImpact = {
           ...withAnimation,
@@ -208,13 +211,11 @@ draggingStates.forEach((current: IsDraggingState) => {
           },
         };
 
-        const first: MapProps = selector(
-          withImpact(current, withAnimation),
-          ownProps,
+        const first: SecondaryMapProps = getSecondaryMapProps(
+          selector(withImpact(current, withAnimation), ownProps),
         );
-        const second: MapProps = selector(
-          withImpact(current, withoutAnimation),
-          ownProps,
+        const second: SecondaryMapProps = getSecondaryMapProps(
+          selector(withImpact(current, withoutAnimation), ownProps),
         );
 
         expect(first.shouldAnimateDisplacement).toBe(true);
@@ -232,16 +233,23 @@ draggingStates.forEach((current: IsDraggingState) => {
             shouldAnimate: false,
           },
         ];
+        // moving inHome1 forward past inHome2 (will displace backwards)
+        const willDisplaceForward: boolean = false;
+        const displacedBy: DisplacedBy = getDisplacedBy(
+          axis,
+          preset.inHome1.displaceBy,
+          willDisplaceForward,
+        );
         const impact: DragImpact = {
           movement: {
             displaced,
             map: getDisplacementMap(displaced),
-            amount: inHome1Amount,
-            isInFrontOfStart: true,
+            displacedBy,
+            willDisplaceForward,
           },
           direction: preset.home.axis.direction,
           destination: inHome2Location,
-          group: null,
+          merge: null,
         };
         const impacted: IsDraggingState = withImpact(current, impact);
 
@@ -258,31 +266,33 @@ draggingStates.forEach((current: IsDraggingState) => {
             shouldAnimate: true,
           },
         ];
+        // moving inHome1 forward past inHome2 (will displace backwards)
+        const willDisplaceForward: boolean = false;
+        const displacedBy: DisplacedBy = getDisplacedBy(
+          axis,
+          preset.inHome1.displaceBy,
+          willDisplaceForward,
+        );
         const impact: DragImpact = {
           movement: {
             displaced,
             map: getDisplacementMap(displaced),
-            amount: inHome1Amount,
-            isInFrontOfStart: true,
+            displacedBy,
+            willDisplaceForward,
           },
           direction: preset.home.axis.direction,
           destination: inHome2Location,
-          group: null,
+          merge: null,
         };
         const first: MapProps = selector(withImpact(current, impact), ownProps);
 
         const expected: MapProps = {
-          isDropAnimating: false,
-          isDragging: false,
-          dropDuration: 0,
-          offset: negate(inHome1Amount),
-          shouldAnimateDisplacement: true,
-          // not relevant
-          shouldAnimateDragMovement: false,
-          dimension: null,
-          draggingOver: null,
-          groupingWith: null,
-          groupedOverBy: null,
+          dragging: null,
+          secondary: {
+            offset: displacedBy.point,
+            shouldAnimateDisplacement: true,
+            combineTargetFor: null,
+          },
         };
         expect(first).toEqual(expected);
 
@@ -307,15 +317,15 @@ draggingStates.forEach((current: IsDraggingState) => {
           movement: {
             displaced: secondDisplacement,
             map: getDisplacementMap(secondDisplacement),
-            amount: inHome1Amount,
-            isInFrontOfStart: true,
+            displacedBy,
+            willDisplaceForward,
           },
           direction: preset.home.axis.direction,
           destination: {
             index: preset.inHome1.descriptor.index,
             droppableId: preset.home.descriptor.id,
           },
-          group: null,
+          merge: null,
         };
 
         expect(selector(withImpact(current, secondImpact), ownProps)).toBe(
@@ -325,6 +335,13 @@ draggingStates.forEach((current: IsDraggingState) => {
 
       it('should not break memoization moving between different dragging phases', () => {
         const selector: Selector = makeMapStateToProps();
+        // moving inHome1 forward past inHome2 (will displace backwards)
+        const willDisplaceForward: boolean = false;
+        const displacedBy: DisplacedBy = getDisplacedBy(
+          axis,
+          preset.inHome1.displaceBy,
+          willDisplaceForward,
+        );
         const displaced: Displacement[] = [
           {
             draggableId: ownProps.draggableId,
@@ -336,24 +353,24 @@ draggingStates.forEach((current: IsDraggingState) => {
           movement: {
             displaced,
             map: getDisplacementMap(displaced),
-            amount: inHome1Amount,
-            isInFrontOfStart: true,
+            displacedBy,
+            willDisplaceForward,
           },
           direction: preset.home.axis.direction,
           destination: inHome2Location,
-          group: null,
+          merge: null,
         };
 
         const first: MapProps = selector(
-          withImpact(state.dragging(), impact),
+          withImpact(state.dragging(), { ...impact }),
           ownProps,
         );
         const second: MapProps = selector(
-          withImpact(state.collecting(), impact),
+          withImpact(state.collecting(), { ...impact }),
           ownProps,
         );
         const third: MapProps = selector(
-          withImpact(state.dropPending(), impact),
+          withImpact(state.dropPending(), { ...impact }),
           ownProps,
         );
 
@@ -367,7 +384,14 @@ draggingStates.forEach((current: IsDraggingState) => {
 describe('something else impacted by drag (testing for memoization leaks)', () => {
   it('should not break memoization moving between different dragging phases', () => {
     const selector: Selector = makeMapStateToProps();
-    const inHome3OwnProps: OwnProps = getOwnProps(preset.inHome3);
+
+    // moving inHome1 forwards past inHome2 (will displace backwards)
+    const willDisplaceForward: boolean = false;
+    const displacedBy: DisplacedBy = getDisplacedBy(
+      axis,
+      preset.inHome1.displaceBy,
+      willDisplaceForward,
+    );
     const displaced: Displacement[] = [
       {
         draggableId: preset.inHome2.descriptor.id,
@@ -377,32 +401,33 @@ describe('something else impacted by drag (testing for memoization leaks)', () =
     ];
     const impact: DragImpact = {
       movement: {
-        // moving inHome2 - no impact on inHome3
         displaced,
         map: getDisplacementMap(displaced),
-        amount: inHome1Amount,
-        isInFrontOfStart: true,
+        displacedBy,
+        willDisplaceForward,
       },
       direction: preset.home.axis.direction,
       destination: {
         index: preset.inHome2.descriptor.index,
         droppableId: preset.home.descriptor.id,
       },
-      group: null,
+      merge: null,
     };
-    const defaultMapProps: MapProps = selector(state.idle, inHome3OwnProps);
+    // drag should have no impact on inHome3
+    const unrelatedToDrag: OwnProps = getOwnProps(preset.inHome3);
+    const defaultMapProps: MapProps = selector(state.idle, unrelatedToDrag);
 
     const first: MapProps = selector(
       withImpact(state.dragging(), impact),
-      inHome3OwnProps,
+      unrelatedToDrag,
     );
     const second: MapProps = selector(
       withImpact(state.collecting(), impact),
-      inHome3OwnProps,
+      unrelatedToDrag,
     );
     const third: MapProps = selector(
       withImpact(state.dropPending(), impact),
-      inHome3OwnProps,
+      unrelatedToDrag,
     );
 
     expect(first).toBe(defaultMapProps);

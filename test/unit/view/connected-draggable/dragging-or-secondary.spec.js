@@ -13,22 +13,18 @@ import type { State } from '../../../../src/types';
 const preset = getPreset();
 const state = getStatePreset();
 
-it('should not break memoization across selectors', () => {
+it('should always have either a dragging or secondary value populated', () => {
   const inHome1Selector: Selector = makeMapStateToProps();
   const inHome1OwnProps: OwnProps = getOwnProps(preset.inHome1);
   const inHome2Selector: Selector = makeMapStateToProps();
   const inHome2OwnProps: OwnProps = getOwnProps(preset.inHome2);
-  const defaultInHome2MapProps: MapProps = inHome2Selector(
-    state.idle,
-    inHome2OwnProps,
-  );
 
   state.allPhases(preset.inHome1.descriptor.id).forEach((current: State) => {
     // independent selector
-    inHome1Selector(current, inHome1OwnProps);
-    // should not break memoization of inHome2
-    expect(inHome2Selector(current, inHome2OwnProps)).toBe(
-      defaultInHome2MapProps,
-    );
+    const mapProps1: MapProps = inHome1Selector(current, inHome1OwnProps);
+    const mapProps2: MapProps = inHome2Selector(current, inHome2OwnProps);
+
+    expect(mapProps1.dragging || mapProps2.secondary).toBeTruthy();
+    expect(mapProps2.secondary).toBeTruthy();
   });
 });

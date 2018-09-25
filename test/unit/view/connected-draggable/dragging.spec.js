@@ -8,6 +8,7 @@ import type {
   Selector,
   OwnProps,
   MapProps,
+  DraggingMapProps,
 } from '../../../../src/view/draggable/draggable-types';
 import {
   move,
@@ -15,7 +16,8 @@ import {
   withImpact,
   type IsDraggingState,
 } from '../../../utils/dragging-state';
-import getOwnProps from './get-own-props';
+import getOwnProps from './util/get-own-props';
+import getDraggingMapProps from './util/get-dragging-map-props';
 
 const preset = getPreset();
 const state = getStatePreset();
@@ -32,38 +34,45 @@ draggingStates.forEach((current: IsDraggingState) => {
       );
 
       const expected: MapProps = {
-        isDropAnimating: false,
-        dropDuration: 0,
-        isDragging: true,
-        offset: { x: 20, y: 30 },
-        shouldAnimateDragMovement: false,
-        shouldAnimateDisplacement: false,
-        dimension: preset.inHome1,
-        draggingOver: preset.home.descriptor.id,
-        groupingWith: null,
-        groupedOverBy: null,
+        dragging: {
+          offset: { x: 20, y: 30 },
+          mode: 'FLUID',
+          dimension: preset.inHome1,
+          draggingOver: preset.home.descriptor.id,
+          dropping: null,
+          combineWith: null,
+          forceShouldAnimate: null,
+        },
+        secondary: null,
       };
       expect(result).toEqual(expected);
     });
 
-    it('should control drag animation', () => {
+    it('should allow force control of drag animation', () => {
       const selector: Selector = makeMapStateToProps();
+
+      expect(
+        getDraggingMapProps(selector(current, ownProps)).forceShouldAnimate,
+      ).toBe(null);
+
       const withAnimation: IsDraggingState = ({
         ...current,
-        shouldAnimate: true,
-      }: any);
-
-      expect(selector(withAnimation, ownProps).shouldAnimateDragMovement).toBe(
-        true,
-      );
-
-      const withoutAnimation: IsDraggingState = ({
-        ...current,
-        shouldAnimate: false,
+        forceShouldAnimate: true,
       }: any);
 
       expect(
-        selector(withoutAnimation, ownProps).shouldAnimateDragMovement,
+        getDraggingMapProps(selector(withAnimation, ownProps))
+          .forceShouldAnimate,
+      ).toBe(true);
+
+      const withoutAnimation: IsDraggingState = ({
+        ...current,
+        forceShouldAnimate: false,
+      }: any);
+
+      expect(
+        getDraggingMapProps(selector(withoutAnimation, ownProps))
+          .forceShouldAnimate,
       ).toBe(false);
     });
 
@@ -72,14 +81,18 @@ draggingStates.forEach((current: IsDraggingState) => {
 
       const inHome: IsDraggingState = withImpact(
         current,
-        getHomeImpact(state.critical, preset.dimensions),
+        getHomeImpact(preset.inHome1, preset.home),
+      );
+      const overHome: DraggingMapProps = getDraggingMapProps(
+        selector(inHome, ownProps),
       );
       const noWhere: IsDraggingState = withImpact(current, noImpact);
-
-      expect(selector(inHome, ownProps).draggingOver).toBe(
-        state.critical.droppable.id,
+      const overNothing: DraggingMapProps = getDraggingMapProps(
+        selector(noWhere, ownProps),
       );
-      expect(selector(noWhere, ownProps).draggingOver).toBe(null);
+
+      expect(overHome.draggingOver).toBe(state.critical.droppable.id);
+      expect(overNothing.draggingOver).toBe(null);
     });
 
     it('should not break memoization on multiple calls to the same offset', () => {
