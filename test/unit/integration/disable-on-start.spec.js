@@ -113,7 +113,7 @@ it('should allow the disabling of a droppable in onDragStart', () => {
       index: 0,
     },
     type: 'DEFAULT',
-    mode: 'JUMP',
+    mode: 'SNAP',
   };
   expect(hooks.onDragStart).toHaveBeenCalledWith(start);
 

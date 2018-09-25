@@ -68,7 +68,7 @@ it('should fire a fluid scroll when in the FLUID auto scrolling mode', () => {
 it('should fire a jump scroll when in the JUMP auto scrolling mode and there is a scroll jump request', () => {
   const customInitial: InitialPublishArgs = {
     ...initialPublishArgs,
-    movementMode: 'JUMP',
+    movementMode: 'SNAP',
   };
   const scroller: AutoScroller = getScrollerStub();
   const store: Store = createStore(middleware(() => scroller));

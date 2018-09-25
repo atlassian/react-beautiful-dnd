@@ -130,7 +130,7 @@ export default (axis?: Axis = vertical) => {
 
     return {
       ...state,
-      movementMode: 'JUMP',
+      movementMode: 'SNAP',
       scrollJumpRequest: request,
     };
   };

@@ -157,7 +157,7 @@ export default (state: State = idle, action: Action): State => {
 
     // If we are jump scrolling - manual movements should not update the impact
     const impact: ?DragImpact =
-      state.movementMode === 'JUMP' ? state.impact : null;
+      state.movementMode === 'SNAP' ? state.impact : null;
 
     return moveWithPositionUpdates({
       state,
@@ -206,7 +206,7 @@ export default (state: State = idle, action: Action): State => {
 
     // If we are jump scrolling - dimension changes should not update the impact
     const impact: DragImpact =
-      state.movementMode === 'JUMP'
+      state.movementMode === 'SNAP'
         ? state.impact
         : getDragImpactWithNewDimensions(state, dimensions);
 
@@ -358,7 +358,7 @@ export default (state: State = idle, action: Action): State => {
     }
 
     // If we are jump scrolling - any window scrolls should not update the impact
-    const isJumpScrolling: boolean = state.movementMode === 'JUMP';
+    const isJumpScrolling: boolean = state.movementMode === 'SNAP';
     const impact: ?DragImpact = isJumpScrolling ? state.impact : null;
 
     const viewport: Viewport = scrollViewport(state.viewport, newScroll);

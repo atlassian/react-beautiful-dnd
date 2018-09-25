@@ -29,7 +29,7 @@ export default (getMarshal: () => DimensionMarshal) => ({
 
   // will communicate with the marshal to start requesting dimensions
   const scrollOptions: ScrollOptions = {
-    shouldPublishImmediately: movementMode === 'JUMP',
+    shouldPublishImmediately: movementMode === 'SNAP',
   };
   const request: LiftRequest = {
     draggableId: id,

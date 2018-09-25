@@ -108,7 +108,7 @@ export default ({
   );
 
   const isOrphaned: boolean = Boolean(
-    state.movementMode === 'JUMP' &&
+    state.movementMode === 'SNAP' &&
       state.impact.destination &&
       !impact.destination,
   );

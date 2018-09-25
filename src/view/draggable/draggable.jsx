@@ -78,7 +78,7 @@ const getShouldDraggingAnimate = (dragging: DraggingMapProps): boolean => {
   if (dragging.forceShouldAnimate != null) {
     return dragging.forceShouldAnimate;
   }
-  return dragging.mode === 'JUMP';
+  return dragging.mode === 'SNAP';
 };
 
 export default class Draggable extends Component<Props> {

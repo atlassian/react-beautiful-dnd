@@ -126,7 +126,7 @@ it('should allow the changing of combining in onDragStart', () => {
       index: 0,
     },
     type: 'DEFAULT',
-    mode: 'JUMP',
+    mode: 'SNAP',
   };
   expect(hooks.onDragStart).toHaveBeenCalledWith(start);
 

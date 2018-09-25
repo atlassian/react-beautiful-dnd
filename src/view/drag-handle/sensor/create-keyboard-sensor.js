@@ -95,7 +95,7 @@ export default ({
       startDragging(() =>
         callbacks.onLift({
           clientSelection: center,
-          movementMode: 'JUMP',
+          movementMode: 'SNAP',
         }),
       );
       return;
