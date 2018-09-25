@@ -13,8 +13,12 @@ import type {
   DisplacedBy,
   Axis,
   DragImpact,
+  Combine,
 } from '../../../../src/types';
-import { curves } from '../../../../src/view/animation';
+import {
+  curves,
+  combine as combineStyle,
+} from '../../../../src/view/animation';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 
@@ -39,6 +43,8 @@ describe('dropping', () => {
           duration: current.pending.dropDuration,
           curve: curves.drop,
           moveTo: current.pending.newHomeOffset,
+          opacity: null,
+          scale: null,
         },
       },
       secondary: null,
@@ -103,6 +109,8 @@ describe('dropping', () => {
           duration: withCombine.pending.dropDuration,
           curve: curves.drop,
           moveTo: withCombine.pending.newHomeOffset,
+          scale: combineStyle.scale.drop,
+          opacity: combineStyle.opacity.drop,
         },
       },
       secondary: null,

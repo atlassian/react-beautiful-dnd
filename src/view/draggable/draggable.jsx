@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import { origin } from '../../state/position';
-import { transitions, transforms } from '../animation';
+import { transitions, transforms, combine } from '../animation';
 import type {
   DraggableDimension,
   ClientPositions,
@@ -71,10 +71,7 @@ const getDraggingOpacity = (
     return null;
   }
 
-  // if combining:
-  // while dropping: fade out totally
-  // while dragging: fade out partially
-  return isDropAnimating ? 0 : 0.7;
+  return isDropAnimating ? combine.opacity.drop : combine.opacity.combining;
 };
 
 const getShouldDraggingAnimate = (dragging: DraggingMapProps): boolean => {

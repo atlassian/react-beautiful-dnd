@@ -16,7 +16,6 @@ const maxDropTimeAtDistance: number = 1500;
 // will bring a time lower - which makes it faster
 const cancelDropModifier: number = 0.6;
 const outOfTheWayTime: number = 0.2;
-const dropScale: number = 0.75;
 
 export const getDropDuration = ({
   current,
@@ -57,6 +56,18 @@ export const curves = {
   drop: 'cubic-bezier(.2,1,.1,1)',
 };
 
+export const combine = {
+  opacity: {
+    // while dropping: fade out totally
+    drop: 0,
+    // while dragging: fade out partially
+    combining: 0.7,
+  },
+  scale: {
+    drop: 0.75,
+  },
+};
+
 const outOfTheWayTiming = `${outOfTheWayTime}s ${curves.outOfTheWay}`;
 
 export const transitions = {
@@ -86,6 +97,6 @@ export const transforms = {
     }
 
     // when dropping while combining we also update the scale
-    return `${translate} scale(${dropScale})`;
+    return `${translate} scale(${combine.scale.drop})`;
   },
 };

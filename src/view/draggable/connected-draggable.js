@@ -7,8 +7,7 @@ import Draggable from './draggable';
 import { storeKey } from '../context-keys';
 import { origin } from '../../state/position';
 import isStrictEqual from '../is-strict-equal';
-// reaching into view :(
-import { curves } from '../animation';
+import { curves, combine } from '../animation';
 import {
   lift as liftAction,
   move as moveAction,
@@ -199,6 +198,8 @@ export const makeMapStateToProps = (): Selector => {
             duration,
             curve: curves.drop,
             moveTo: pending.newHomeOffset,
+            opacity: combineWith ? combine.opacity.drop : null,
+            scale: combineWith ? combine.scale.drop : null,
           },
         },
         secondary: null,
