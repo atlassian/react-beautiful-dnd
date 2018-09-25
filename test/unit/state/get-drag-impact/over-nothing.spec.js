@@ -6,6 +6,7 @@ import noImpact from '../../../../src/state/no-impact';
 import getViewport from '../../../../src/view/window/get-viewport';
 import { getPreset } from '../../../utils/dimension';
 import type { Axis, DragImpact, Viewport } from '../../../../src/types';
+import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 
 const viewport: Viewport = getViewport();
 
@@ -27,10 +28,7 @@ const viewport: Viewport = getViewport();
         droppables: preset.droppables,
         previousImpact: noImpact,
         viewport,
-        direction: {
-          vertical: 'down',
-          horizontal: 'right',
-        },
+        userDirection: forward,
       });
 
       expect(impact).toEqual(noImpact);

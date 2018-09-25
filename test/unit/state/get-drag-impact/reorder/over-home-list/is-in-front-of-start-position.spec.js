@@ -53,7 +53,7 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
         // previousImpact: noImpact,
         previousImpact: getHomeImpact(preset.inHome2, preset.home),
         viewport,
-        direction: forward,
+        userDirection: forward,
       });
 
       it('should displace items when moving over their start edge', () => {
@@ -110,7 +110,7 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
           droppables: preset.droppables,
           previousImpact: goingForwards,
           viewport,
-          direction: backward,
+          userDirection: backward,
         });
         expect(backwardImpact1).toEqual(goingForwards);
 
@@ -129,7 +129,7 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
           droppables: preset.droppables,
           previousImpact: backwardImpact1,
           viewport,
-          direction: backward,
+          userDirection: backward,
         });
         expect(backwardImpact2).toEqual(goingForwards);
 
@@ -152,7 +152,7 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
               droppables: preset.droppables,
               previousImpact,
               viewport,
-              direction: backward,
+              userDirection: backward,
             });
             const expected: DragImpact = {
               movement: {
@@ -206,7 +206,7 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
             // no previous impact
             previousImpact: noImpact,
             viewport,
-            direction: backward,
+            userDirection: backward,
           });
           // ordered by closest impacted
           const newDisplaced: Displacement[] = [
@@ -256,7 +256,7 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
             // no previous impact
             previousImpact: noImpact,
             viewport,
-            direction: backward,
+            userDirection: backward,
           });
           const newDisplaced: Displacement[] = [
             {
@@ -307,7 +307,7 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
             // no previous impact
             previousImpact: noImpact,
             viewport,
-            direction: forward,
+            userDirection: forward,
           });
           const newDisplaced: Displacement[] = [
             {
@@ -352,7 +352,7 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
             // no previous impact
             previousImpact: noImpact,
             viewport,
-            direction: forward,
+            userDirection: forward,
           });
           const newDisplaced: Displacement[] = [
             {

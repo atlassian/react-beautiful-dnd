@@ -38,7 +38,7 @@ const dontCareAboutDirection: UserDirection = {
         droppables: withDisabled,
         previousImpact: noImpact,
         viewport: preset.viewport,
-        direction: dontCareAboutDirection,
+        userDirection: dontCareAboutDirection,
       });
 
       expect(impact).toEqual(noImpact);
@@ -61,7 +61,7 @@ const dontCareAboutDirection: UserDirection = {
         droppables: withDisabled,
         previousImpact: noImpact,
         viewport: preset.viewport,
-        direction: dontCareAboutDirection,
+        userDirection: dontCareAboutDirection,
       });
 
       expect(impact).toEqual(noImpact);
