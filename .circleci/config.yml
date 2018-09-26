@@ -30,6 +30,14 @@ jobs:
           name: Install Dependencies
           command: yarn
 
+      - run: 
+          name: Update Lockfile
+          command: $(yarn global bin)/greenkeeper-lockfile-update
+
+      - run:
+          name: Upload Lockfile
+          command: $(yarn global bin)/greenkeeper-lockfile-upload
+
       - run:
           name: Update Lockfile
           command: $(yarn global bin)/greenkeeper-lockfile-update
