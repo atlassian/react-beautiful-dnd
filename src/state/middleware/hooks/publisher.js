@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import messagePreset from '../util/message-preset';
 import * as timings from '../../../debug/timings';
 import getExpiringAnnounce from './expiring-announce';
-import getFrameMarshal, { type FrameMarshal } from './frame-marshal';
+import getAsyncMarshal, { type FrameMarshal } from './async-marshal';
 import type {
   DropResult,
   Hooks,
@@ -75,13 +75,14 @@ type WhileDragging = {|
 
 export default (getHooks: () => Hooks, announce: Announce) => {
   let dragging: ?WhileDragging = null;
-  const frameMarshal: FrameMarshal = getFrameMarshal();
+  const asyncMarshal: FrameMarshal = getAsyncMarshal();
 
   const beforeStart = (critical: Critical, mode: MovementMode) => {
     invariant(
       !dragging,
       'Cannot fire onBeforeDragStart as a drag start has already been published',
     );
+    console.log('onDragBeforeStart: fire');
     withTimings('onBeforeDragStart', () => {
       // No use of screen reader for this hook
       const fn: ?OnBeforeDragStartHook = getHooks().onBeforeDragStart;
@@ -105,7 +106,8 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     };
 
     // we will flush this frame if we receive any hook updates
-    frameMarshal.add(() => {
+    asyncMarshal.add(() => {
+      console.log('onDragStart: fire');
       withTimings('onDragStart', () =>
         execute(
           getHooks().onDragStart,
@@ -119,7 +121,6 @@ export default (getHooks: () => Hooks, announce: Announce) => {
 
   // Passing in the critical location again as it can change during a drag
   const move = (critical: Critical, impact: DragImpact) => {
-    frameMarshal.flush();
     const location: ?DraggableLocation = impact.destination;
     const combine: ?Combine = impact.merge ? impact.merge.combine : null;
     invariant(
@@ -163,7 +164,8 @@ export default (getHooks: () => Hooks, announce: Announce) => {
       destination: location,
     };
 
-    frameMarshal.add(() => {
+    asyncMarshal.add(() => {
+      console.log('onDragUpdate: fire');
       withTimings('onDragUpdate', () =>
         execute(
           getHooks().onDragUpdate,
@@ -182,9 +184,10 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     );
     dragging = null;
     // ensure any pending hooks are flushed
-    frameMarshal.flush();
+    asyncMarshal.flush();
     // not adding to frame marshal - we want this to be done in the same render pass
     // we also want the consumers reorder logic to be in the same render pass
+    console.log('onDragEnd: fire');
     withTimings('onDragEnd', () =>
       execute(getHooks().onDragEnd, result, announce, messagePreset.onDragEnd),
     );

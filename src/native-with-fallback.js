@@ -16,3 +16,9 @@ export function values<T>(map: Map<T>): T[] {
 export function find<T>(list: Array<T>, predicate: T => boolean): ?T {
   return list.find ? list.find(predicate) : list.filter(predicate)[0];
 }
+
+export function findIndex<T>(list: Array<T>, predicate: T => boolean): number {
+  return list.findIndex
+    ? list.findIndex(predicate)
+    : list.indexOf(find(list, predicate));
+}
