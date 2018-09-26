@@ -1,13 +1,13 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
-import { dropPending, completeDrop, animateDrop } from '../action-creators';
-import noImpact from '../no-impact';
-import whenCombining from '../get-new-home-client-border-box-center/when-combining';
-import whenReordering from '../get-new-home-client-border-box-center/when-reordering';
-import { add, subtract, isEqual, origin } from '../position';
-import withDroppableDisplacement from '../with-droppable-displacement';
-import { getDropDuration } from '../../view/animation';
+import { dropPending, completeDrop, animateDrop } from '../../action-creators';
+import noImpact from '../../no-impact';
+import whenCombining from '../../get-new-home-client-border-box-center/when-combining';
+import whenReordering from '../../get-new-home-client-border-box-center/when-reordering';
+import { add, subtract, isEqual, origin } from '../../position';
+import withDroppableDisplacement from '../../with-droppable-displacement';
+import getDropDuration from './get-drop-duration';
 import type {
   State,
   DropReason,
@@ -21,8 +21,8 @@ import type {
   Combine,
   DimensionMap,
   DraggableDimension,
-} from '../../types';
-import type { MiddlewareStore, Dispatch, Action } from '../store-types';
+} from '../../../types';
+import type { MiddlewareStore, Dispatch, Action } from '../../store-types';
 
 const getScrollDisplacement = (
   droppable: DroppableDimension,

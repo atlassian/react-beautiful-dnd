@@ -1,11 +1,17 @@
 // @flow
+import type { Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import middleware from '../../../../src/state/middleware/drop';
-import createStore from './util/create-store';
-import getHomeLocation from '../../../../src/state/get-home-location';
-import { add, patch } from '../../../../src/state/position';
-import { getPreset, makeScrollable } from '../../../utils/dimension';
-import passThrough from './util/pass-through-middleware';
+import middleware from '../../../../../src/state/middleware/drop';
+import getDropDuration from '../../../../../src/state/middleware/drop/get-drop-duration';
+import createStore from '../util/create-store';
+import getHomeLocation from '../../../../../src/state/get-home-location';
+import { add, patch, origin, negate } from '../../../../../src/state/position';
+import {
+  getPreset,
+  makeScrollable,
+  getFrame,
+} from '../../../../utils/dimension';
+import passThrough from '../util/pass-through-middleware';
 import {
   clean,
   drop,
@@ -19,14 +25,14 @@ import {
   type InitialPublishArgs,
   type DropAnimateAction,
   collectionStarting,
-} from '../../../../src/state/action-creators';
+} from '../../../../../src/state/action-creators';
 import {
   initialPublishArgs,
   getDragStart,
   critical,
-} from '../../../utils/preset-action-args';
-import noImpact, { noMovement } from '../../../../src/state/no-impact';
-import { vertical } from '../../../../src/state/axis';
+} from '../../../../utils/preset-action-args';
+import noImpact, { noMovement } from '../../../../../src/state/no-impact';
+import { vertical } from '../../../../../src/state/axis';
 import type {
   State,
   DropResult,
@@ -35,8 +41,9 @@ import type {
   DropReason,
   DroppableDimension,
   Axis,
-} from '../../../../src/types';
-import type { Store } from '../../../../src/state/store-types';
+} from '../../../../../src/types';
+import type { Store } from '../../../../../src/state/store-types';
+import getHomeImpact from '../../../../../src/state/get-home-impact';
 
 const axis: Axis = vertical;
 const preset = getPreset(vertical);
@@ -169,9 +176,10 @@ describe('drop animation required', () => {
       expect(store.getState().phase).toBe('DRAGGING');
 
       // moving a little bit so that a drop animation will be needed
+      const shift: Position = { x: 1, y: 1 };
       store.dispatch(
         move({
-          client: add(initialPublishArgs.client.selection, { x: 1, y: 1 }),
+          client: add(initialPublishArgs.client.selection, shift),
         }),
       );
 
@@ -179,9 +187,13 @@ describe('drop animation required', () => {
       store.dispatch(drop({ reason: 'CANCEL' }));
 
       const pending: PendingDrop = {
-        newHomeOffset: { x: 0, y: 0 },
+        newHomeOffset: origin,
         impact: noImpact,
-        dropDuration: 1,
+        dropDuration: getDropDuration({
+          current: shift,
+          destination: origin,
+          reason: 'CANCEL',
+        }),
         result: {
           ...getDragStart(),
           // destination cleared
@@ -218,10 +230,11 @@ describe('drop animation required', () => {
       expect(store.getState().phase).toBe('DRAGGING');
 
       // doing a small scroll
+      const scroll: Position = { x: 1, y: 1 };
       store.dispatch(
         updateDroppableScroll({
           id: customArgs.critical.droppable.id,
-          offset: { x: 1, y: 1 },
+          offset: scroll,
         }),
       );
 
@@ -230,15 +243,22 @@ describe('drop animation required', () => {
       store.dispatch(drop({ reason: 'CANCEL' }));
       const pending: PendingDrop = {
         // what we need to do to get back to the origin
-        newHomeOffset: { x: -1, y: -1 },
+        newHomeOffset: negate(scroll),
+        dropDuration: getDropDuration({
+          current: scroll,
+          destination: negate(scroll),
+          reason: 'CANCEL',
+        }),
         impact: {
           movement: noMovement,
           direction: null,
           destination: null,
+          merge: null,
         },
         result: {
           ...getDragStart(customArgs.critical),
           destination: null,
+          combine: null,
           reason: 'CANCEL',
         },
       };
@@ -274,7 +294,6 @@ describe('drop animation required', () => {
       store.dispatch(
         move({
           client: scrollableForeign.client.borderBox.center,
-          shouldAnimate: false,
         }),
       );
       const state: State = store.getState();
@@ -335,7 +354,6 @@ describe('drop animation required', () => {
             x: preset.home.client.marginBox.center.x,
             y: preset.home.client.marginBox.bottom + 1,
           },
-          shouldAnimate: false,
         }),
       );
 
@@ -345,10 +363,11 @@ describe('drop animation required', () => {
       invariant(!state.impact.destination, 'Should have no destination');
 
       // scroll the home droppable
+      const scroll: Position = { x: 1, y: 1 };
       store.dispatch(
         updateDroppableScroll({
           id: customArgs.critical.droppable.id,
-          offset: { x: 1, y: 1 },
+          offset: scroll,
         }),
       );
 
@@ -357,14 +376,18 @@ describe('drop animation required', () => {
       store.dispatch(drop({ reason: 'DROP' }));
       const pending: PendingDrop = {
         // what we need to do to get back to the origin
-        newHomeOffset: { x: -1, y: -1 },
+        newHomeOffset: negate(scroll),
+        // $FlowFixMe - not a number ;)
+        dropDuration: expect.any(Number),
         impact: {
           movement: noMovement,
           direction: null,
+          merge: null,
           destination: null,
         },
         result: {
           ...getDragStart(customArgs.critical),
+          combine: null,
           destination: null,
           reason: 'DROP',
         },
@@ -376,7 +399,7 @@ describe('drop animation required', () => {
 
     // Could also add a test to check this is true for foreign droppables - but it has proven
     // very difficult to setup that test correctly
-    it('should account for any change in scroll in the droppable being dropped into', () => {
+    it.only('should account for any change in scroll in the droppable being dropped into', () => {
       const mock = jest.fn();
       const store: Store = createStore(passThrough(mock), middleware);
 
@@ -395,11 +418,13 @@ describe('drop animation required', () => {
       store.dispatch(initialPublish(customArgs));
       expect(store.getState().phase).toBe('DRAGGING');
 
-      // moving to the top of the foreign droppable
+      // moving to the top of the home droppable
       store.dispatch(
         move({
-          client: { x: 1, y: 1 },
-          shouldAnimate: false,
+          client: {
+            y: 0,
+            x: 0,
+          },
         }),
       );
       const state: State = store.getState();
@@ -423,22 +448,16 @@ describe('drop animation required', () => {
       const pending: PendingDrop = {
         // what we need to do to get back to the origin
         newHomeOffset: { x: -1, y: -1 },
-        impact: {
-          movement: {
-            displaced: [],
-            amount: patch(
-              axis.line,
-              preset.inHome1.client.marginBox[axis.size],
-            ),
-            isInFrontOfStart: false,
-          },
-          direction: preset.home.axis.direction,
-          destination: getHomeLocation(customArgs.critical),
-        },
+        dropDuration: 1,
+        impact: getHomeImpact(
+          customArgs.dimensions.draggables[customArgs.critical.draggable.id],
+          customArgs.dimensions.droppables[customArgs.critical.droppable.id],
+        ),
         result: {
           ...getDragStart(customArgs.critical),
-          destination: getHomeLocation(customArgs.critical),
+          destination: getHomeLocation(customArgs.critical.draggable),
           reason: 'DROP',
+          combine: null,
         },
       };
       expect(mock).toHaveBeenCalledWith(drop({ reason: 'DROP' }));

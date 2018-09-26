@@ -5,7 +5,7 @@ import type { Store } from '../../../../src/state/store-types';
 import middleware from '../../../../src/state/middleware/pending-drop';
 import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';
-import dropMiddleware from '../../../../src/state/middleware/drop';
+import dropMiddleware from '../../../../src/state/middleware/drop/drop-middleware';
 import getHomeLocation from '../../../../src/state/get-home-location';
 import {
   initialPublish,

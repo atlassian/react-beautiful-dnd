@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import type { DropResult, State } from '../../../../src/types';
 import type { Store } from '../../../../src/state/store-types';
 import middleware from '../../../../src/state/middleware/drop-animation-finish';
-import dropMiddleware from '../../../../src/state/middleware/drop';
+import dropMiddleware from '../../../../src/state/middleware/drop/drop-middleware';
 import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';
 import { add } from '../../../../src/state/position';

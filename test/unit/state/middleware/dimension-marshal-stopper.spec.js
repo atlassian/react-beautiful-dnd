@@ -3,7 +3,7 @@ import type { DropResult, PendingDrop } from '../../../../src/types';
 import type { Store } from '../../../../src/state/store-types';
 import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import middleware from '../../../../src/state/middleware/dimension-marshal-stopper';
-import dropMiddleware from '../../../../src/state/middleware/drop';
+import dropMiddleware from '../../../../src/state/middleware/drop/drop-middleware';
 import createStore from './util/create-store';
 import {
   clean,

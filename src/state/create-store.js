@@ -4,7 +4,7 @@ import { applyMiddleware, createStore, compose } from 'redux';
 import reducer from './reducer';
 import lift from './middleware/lift';
 import style from './middleware/style';
-import drop from './middleware/drop';
+import drop from './middleware/drop/drop-middleware';
 import hooks from './middleware/hooks/hooks-middleware';
 import dropAnimationFinish from './middleware/drop-animation-finish';
 import dimensionMarshalStopper from './middleware/dimension-marshal-stopper';
