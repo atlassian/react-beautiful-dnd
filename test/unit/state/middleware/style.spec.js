@@ -5,7 +5,6 @@ import type { Store } from '../../../../src/state/store-types';
 import createStore from './util/create-store';
 import {
   initialPublish,
-  prepare,
   animateDrop,
   completeDrop,
   clean,
@@ -29,7 +28,6 @@ it('should use the dragging styles on an initial publish', () => {
   const marshal: StyleMarshal = getMarshalStub();
   const store: Store = createStore(middleware(marshal));
 
-  store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
 
   expect(marshal.dragging).toHaveBeenCalled();
@@ -39,7 +37,6 @@ it('should use the dropping styles when drop animating', () => {
   const marshal: StyleMarshal = getMarshalStub();
   const store: Store = createStore(middleware(marshal));
 
-  store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
   store.dispatch(animateDrop(animateDropArgs));
 
@@ -50,7 +47,6 @@ it('should use the resting styles when a drop completes', () => {
   const marshal: StyleMarshal = getMarshalStub();
   const store: Store = createStore(middleware(marshal));
 
-  store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
 
   expect(marshal.resting).not.toHaveBeenCalled();
@@ -63,7 +59,6 @@ it('should use the resting styles when aborting', () => {
   const marshal: StyleMarshal = getMarshalStub();
   const store: Store = createStore(middleware(marshal));
 
-  store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
 
   expect(marshal.resting).not.toHaveBeenCalled();

@@ -7,10 +7,8 @@ import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';
 import { setViewport, resetViewport } from '../../../utils/viewport';
 import {
-  prepare,
   lift,
   initialPublish,
-  clean,
   animateDrop,
   completeDrop,
 } from '../../../../src/state/action-creators';
@@ -25,6 +23,7 @@ import {
   getDragStart,
   critical,
 } from '../../../utils/preset-action-args';
+import { noMovement } from '../../../../src/state/no-impact';
 
 const getMarshal = (store: Store): DimensionMarshal => {
   const marshal: DimensionMarshal = getDimensionMarshal(store.dispatch);
@@ -54,25 +53,10 @@ it('should throw if a drag cannot be started when a lift action occurs', () => {
   // first lift is all good
   store.dispatch(lift(liftArgs));
   expect(mock).toHaveBeenCalledWith(lift(liftArgs));
-  expect(mock).toHaveBeenCalledWith(prepare());
-  expect(store.getState().phase).toBe('PREPARING');
+  expect(store.getState().phase).toBe('DRAGGING');
 
-  // a lift is not permitted in the PREPARING phase
+  // a lift is not permitted in the DRAGGING phase
   expect(() => store.dispatch(lift(liftArgs))).toThrow();
-});
-
-it('should dispatch a prepare action to flush react-motion', () => {
-  const mock = jest.fn();
-  const store: Store = createStore(
-    passThrough(mock),
-    middleware(() => getMarshal(store)),
-  );
-
-  // first lift is all good
-  store.dispatch(lift(liftArgs));
-  expect(mock).toHaveBeenCalledWith(lift(liftArgs));
-  expect(mock).toHaveBeenCalledWith(prepare());
-  expect(store.getState().phase).toBe('PREPARING');
 });
 
 it('should flush any animating drops', () => {
@@ -83,28 +67,23 @@ it('should flush any animating drops', () => {
   );
 
   // start a drag
-  store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
   expect(store.getState().phase).toBe('DRAGGING');
 
   // start a drop
   const pending: PendingDrop = {
     newHomeOffset: { x: -1, y: -1 },
+    dropDuration: 1,
     impact: {
-      movement: {
-        displaced: [],
-        amount: {
-          x: 0,
-          y: 0,
-        },
-        isInFrontOfStart: false,
-      },
+      movement: noMovement,
       direction: 'vertical',
-      destination: getHomeLocation(critical),
+      destination: getHomeLocation(critical.draggable),
+      merge: null,
     },
     result: {
       ...getDragStart(),
-      destination: getHomeLocation(critical),
+      destination: getHomeLocation(critical.draggable),
+      combine: null,
       reason: 'DROP',
     },
   };
@@ -118,51 +97,20 @@ it('should flush any animating drops', () => {
   // the previous drag is flushed
   expect(mock).toHaveBeenCalledWith(completeDrop(pending.result));
   // the new lift continues
-  expect(mock).toHaveBeenCalledWith(prepare());
   expect(mock).toHaveBeenCalledTimes(3);
 });
 
-describe('collection phase', () => {
-  it('should not collect if the lift is aborted', () => {
-    const mock = jest.fn();
-    const store: Store = createStore(
-      passThrough(mock),
-      middleware(() => getMarshal(store)),
-    );
+it('should publish the initial dimensions when lifting', () => {
+  const mock = jest.fn();
+  const store: Store = createStore(
+    passThrough(mock),
+    middleware(() => getMarshal(store)),
+  );
 
-    // first lift is preparing
-    store.dispatch(lift(liftArgs));
-    expect(mock).toHaveBeenCalledWith(lift(liftArgs));
-    expect(mock).toHaveBeenCalledWith(prepare());
-    expect(store.getState().phase).toBe('PREPARING');
-
-    // lift is aborted
-    store.dispatch(clean());
-
-    // would normally start a lift
-    mock.mockReset();
-    jest.runOnlyPendingTimers();
-    expect(mock).not.toHaveBeenCalled();
-  });
-
-  it('should publish the initial dimensions', () => {
-    const mock = jest.fn();
-    const store: Store = createStore(
-      passThrough(mock),
-      middleware(() => getMarshal(store)),
-    );
-
-    // first lift is preparing
-    store.dispatch(lift(liftArgs));
-    expect(mock).toHaveBeenCalledWith(lift(liftArgs));
-    expect(mock).toHaveBeenCalledWith(prepare());
-    expect(store.getState().phase).toBe('PREPARING');
-
-    // complete lift
-    mock.mockReset();
-    jest.runOnlyPendingTimers();
-    expect(mock).toHaveBeenCalledWith(initialPublish(initialPublishArgs));
-    expect(mock).toHaveBeenCalledTimes(1);
-    expect(store.getState().phase).toBe('DRAGGING');
-  });
+  // first lift is preparing
+  store.dispatch(lift(liftArgs));
+  expect(mock).toHaveBeenCalledWith(lift(liftArgs));
+  expect(mock).toHaveBeenCalledWith(initialPublish(initialPublishArgs));
+  expect(mock).toHaveBeenCalledTimes(2);
+  expect(store.getState().phase).toBe('DRAGGING');
 });

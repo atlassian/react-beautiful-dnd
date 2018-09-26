@@ -8,7 +8,6 @@ import passThrough from './util/pass-through-middleware';
 import dropMiddleware from '../../../../src/state/middleware/drop';
 import getHomeLocation from '../../../../src/state/get-home-location';
 import {
-  prepare,
   initialPublish,
   drop,
   completeDrop,
@@ -32,7 +31,6 @@ describe('skipping pending drop', () => {
       middleware,
     );
 
-    store.dispatch(prepare());
     store.dispatch(initialPublish(initialPublishWithScrollables));
     store.dispatch(collectionStarting());
     store.dispatch(drop({ reason: 'DROP' }));
@@ -51,8 +49,9 @@ describe('skipping pending drop', () => {
     expect(mock).toHaveBeenCalledWith(drop({ reason: 'DROP' }));
     const expected: DropResult = {
       ...getDragStart(),
-      destination: getHomeLocation(critical),
+      destination: getHomeLocation(critical.draggable),
       reason: 'DROP',
+      combine: null,
     };
     expect(mock).toHaveBeenCalledWith(completeDrop(expected));
     expect(mock).toHaveBeenCalledTimes(3);
@@ -68,7 +67,6 @@ describe('skipping pending drop', () => {
       middleware,
     );
 
-    store.dispatch(prepare());
     store.dispatch(initialPublish(initialPublishWithScrollables));
     store.dispatch(collectionStarting());
 

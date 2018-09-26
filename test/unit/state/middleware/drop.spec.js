@@ -9,7 +9,6 @@ import passThrough from './util/pass-through-middleware';
 import {
   clean,
   drop,
-  prepare,
   initialPublish,
   animateDrop,
   dropPending,
@@ -53,7 +52,6 @@ it('should throw an error if a drop action occurs while not in a phase where you
 
   // drop animating
   store.dispatch(clean());
-  store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
   expect(store.getState().phase).toBe('DRAGGING');
 
@@ -61,7 +59,6 @@ it('should throw an error if a drop action occurs while not in a phase where you
   store.dispatch(
     move({
       client: add(initialPublishArgs.client.selection, { x: 1, y: 1 }),
-      shouldAnimate: true,
     }),
   );
 
@@ -75,7 +72,6 @@ it('should dispatch a DROP_PENDING action if COLLECTING', () => {
   const mock = jest.fn();
   const store: Store = createStore(passThrough(mock), middleware);
 
-  store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
   expect(store.getState().phase).toBe('DRAGGING');
   store.dispatch(collectionStarting());
@@ -93,24 +89,10 @@ it('should dispatch a DROP_PENDING action if COLLECTING', () => {
   expect(store.getState().phase).toBe('DROP_PENDING');
 });
 
-it('should reset the state if a drop occurs while the application is preparing', () => {
-  const mock = jest.fn();
-  const store: Store = createStore(passThrough(mock), middleware);
-
-  store.dispatch(prepare());
-  expect(store.getState().phase).toBe('PREPARING');
-
-  store.dispatch(drop({ reason: 'DROP' }));
-  expect(store.getState().phase).toBe('IDLE');
-  expect(mock).toHaveBeenCalledWith(drop({ reason: 'DROP' }));
-  expect(mock).toHaveBeenCalledWith(clean());
-});
-
 it('should throw if a drop action is fired and there is DROP_PENDING and it is waiting for a publish', () => {
   const mock = jest.fn();
   const store: Store = createStore(passThrough(mock), middleware);
 
-  store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
   store.dispatch(collectionStarting());
 
@@ -144,7 +126,6 @@ describe('no drop animation required', () => {
         const store: Store = createStore(passThrough(mock), middleware);
 
         store.dispatch(clean());
-        store.dispatch(prepare());
         store.dispatch(initialPublish(initialPublishArgs));
         expect(store.getState().phase).toBe('DRAGGING');
 
@@ -165,6 +146,7 @@ describe('no drop animation required', () => {
           ...getDragStart(),
           destination,
           reason,
+          combine: null,
         };
         expect(mock).toHaveBeenCalledWith(drop({ reason }));
         expect(mock).toHaveBeenCalledWith(completeDrop(result));
@@ -183,7 +165,6 @@ describe('drop animation required', () => {
       const mock = jest.fn();
       const store: Store = createStore(passThrough(mock), middleware);
 
-      store.dispatch(prepare());
       store.dispatch(initialPublish(initialPublishArgs));
       expect(store.getState().phase).toBe('DRAGGING');
 
@@ -191,7 +172,6 @@ describe('drop animation required', () => {
       store.dispatch(
         move({
           client: add(initialPublishArgs.client.selection, { x: 1, y: 1 }),
-          shouldAnimate: true,
         }),
       );
 
@@ -201,10 +181,12 @@ describe('drop animation required', () => {
       const pending: PendingDrop = {
         newHomeOffset: { x: 0, y: 0 },
         impact: noImpact,
+        dropDuration: 1,
         result: {
           ...getDragStart(),
           // destination cleared
           destination: null,
+          combine: null,
           reason: 'CANCEL',
         },
       };
@@ -232,7 +214,6 @@ describe('drop animation required', () => {
 
       // getting into a drag
       store.dispatch(clean());
-      store.dispatch(prepare());
       store.dispatch(initialPublish(customArgs));
       expect(store.getState().phase).toBe('DRAGGING');
 
@@ -286,7 +267,6 @@ describe('drop animation required', () => {
 
       // getting into a drag
       store.dispatch(clean());
-      store.dispatch(prepare());
       store.dispatch(initialPublish(customInitial));
       expect(store.getState().phase).toBe('DRAGGING');
 
@@ -345,7 +325,6 @@ describe('drop animation required', () => {
       };
 
       // getting into a drag
-      store.dispatch(prepare());
       store.dispatch(initialPublish(customArgs));
       expect(store.getState().phase).toBe('DRAGGING');
 
@@ -413,7 +392,6 @@ describe('drop animation required', () => {
       };
 
       // getting into a drag
-      store.dispatch(prepare());
       store.dispatch(initialPublish(customArgs));
       expect(store.getState().phase).toBe('DRAGGING');
 
@@ -474,7 +452,6 @@ describe('drop animation required', () => {
 
       // getting into a drag
       store.dispatch(clean());
-      store.dispatch(prepare());
       store.dispatch(initialPublish(initialPublishArgs));
       expect(store.getState().phase).toBe('DRAGGING');
 

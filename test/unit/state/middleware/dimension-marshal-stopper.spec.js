@@ -7,7 +7,6 @@ import dropMiddleware from '../../../../src/state/middleware/drop';
 import createStore from './util/create-store';
 import {
   clean,
-  prepare,
   initialPublish,
   drop,
   completeDrop,
@@ -34,7 +33,6 @@ it('should stop a collection if a drag is aborted', () => {
     middleware(() => getMarshal(stopPublishing)),
   );
 
-  store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
 
   expect(stopPublishing).not.toHaveBeenCalled();
@@ -50,7 +48,6 @@ it('should not stop a collection if a drop is pending', () => {
     dropMiddleware,
   );
 
-  store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
   expect(store.getState().phase).toBe('DRAGGING');
   store.dispatch(collectionStarting());
@@ -71,7 +68,6 @@ it('should stop a collection if a drag is complete', () => {
     dropMiddleware,
   );
 
-  store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
   expect(store.getState().phase).toBe('DRAGGING');
   expect(stopPublishing).not.toHaveBeenCalled();
@@ -80,6 +76,7 @@ it('should stop a collection if a drag is complete', () => {
   const result: DropResult = {
     ...getDragStart(),
     destination: null,
+    combine: null,
     reason: 'CANCEL',
   };
   store.dispatch(completeDrop(result));
@@ -95,7 +92,6 @@ it('should stop a collection if a drop animation starts', () => {
     dropMiddleware,
   );
 
-  store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
   expect(store.getState().phase).toBe('DRAGGING');
   expect(stopPublishing).not.toHaveBeenCalled();
@@ -103,9 +99,11 @@ it('should stop a collection if a drop animation starts', () => {
   const pending: PendingDrop = {
     newHomeOffset: { x: 0, y: 0 },
     impact: noImpact,
+    dropDuration: 1,
     result: {
       ...getDragStart(),
       // destination cleared
+      combine: null,
       destination: null,
       reason: 'CANCEL',
     },

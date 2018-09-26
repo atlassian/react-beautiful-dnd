@@ -8,7 +8,6 @@ import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';
 import { add } from '../../../../src/state/position';
 import {
-  prepare,
   initialPublish,
   completeDrop,
   move,
@@ -27,7 +26,6 @@ it('should fire a complete drop action when a drop animation finish action is fi
     middleware,
   );
 
-  store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
 
   expect(store.getState().phase).toBe('DRAGGING');
@@ -36,7 +34,6 @@ it('should fire a complete drop action when a drop animation finish action is fi
   store.dispatch(
     move({
       client: add(initialPublishArgs.client.selection, { x: 1, y: 1 }),
-      shouldAnimate: true,
     }),
   );
   store.dispatch(drop({ reason: 'DROP' }));

@@ -49,7 +49,6 @@ const getDragImpactWithNewDimensions = (
   });
 };
 export default (state: State = idle, action: Action): State => {
-  console.log('action', action.type);
   if (action.type === 'CLEAN') {
     return idle;
   }
