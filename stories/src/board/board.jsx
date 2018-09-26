@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
-import styled, { injectGlobal } from 'styled-components';
+import styled from 'react-emotion';
+import { injectGlobal } from 'emotion';
 import { action } from '@storybook/addon-actions';
 import Column from './column';
 import { colors } from '../constants';
@@ -17,13 +18,13 @@ import type { QuoteMap } from '../types';
 const publishOnDragStart = action('onDragStart');
 const publishOnDragEnd = action('onDragEnd');
 
-const ParentContainer = styled.div`
+const ParentContainer = styled('div')`
   height: ${({ height }) => height};
   overflow-x: hidden;
   overflow-y: auto;
 `;
 
-const Container = styled.div`
+const Container = styled('div')`
   min-height: 100vh;
 
   /* like display:flex but will allow bleeding over the window width */

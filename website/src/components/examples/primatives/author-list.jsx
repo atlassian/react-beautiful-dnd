@@ -1,9 +1,9 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { Droppable, Draggable } from '../../../../../src';
 import Author from './author-item';
-import { grid, colors } from '../constants';
+import { grid } from '../../../constants';
 import type { Quote } from '../types';
 import type {
   DroppableProvided,
@@ -12,9 +12,9 @@ import type {
   DraggableStateSnapshot,
 } from '../../../../../src';
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   background-color: ${({ isDraggingOver }) =>
-    isDraggingOver ? colors.blue.lighter : colors.blue.light};
+    isDraggingOver ? 'skyblue' : 'lightblue'};
   display: flex;
   flex-direction: column;
   padding: ${grid}px;
@@ -23,7 +23,7 @@ const Wrapper = styled.div`
   margin: ${grid}px 0;
 `;
 
-const DropZone = styled.div`
+const DropZone = styled('div')`
   display: flex;
   /*
     Needed to avoid growth in list due to lifting the first item
@@ -35,11 +35,11 @@ const DropZone = styled.div`
   min-width: 600px;
 `;
 
-const ScrollContainer = styled.div`
+const ScrollContainer = styled('div')`
   overflow: auto;
 `;
 
-const Container = styled.div`
+const Container = styled('div')`
   /* flex child */
   flex-grow: 1;
 

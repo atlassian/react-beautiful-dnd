@@ -1,14 +1,14 @@
 // @flow
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import AuthorApp from './src/horizontal/author-app';
 import { quotes, getQuotes } from './src/data';
 import type { Quote } from './src/types';
 
 const bigData: Quote[] = getQuotes(30);
 
-const WideWindow = styled.div`
+const WideWindow = styled('div')`
   width: 120vw;
 `;
 

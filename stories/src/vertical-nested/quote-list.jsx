@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { Droppable, Draggable } from '../../../src';
 import QuoteItem from '../primatives/quote-item';
 import Title from '../primatives/title';
@@ -14,11 +14,11 @@ import type {
   DraggableStateSnapshot,
 } from '../../../src';
 
-const Root = styled.div`
+const Root = styled('div')`
   width: 250px;
 `;
 
-const Container = styled.div`
+const Container = styled('div')`
   background-color: ${({ isDraggingOver }) =>
     isDraggingOver ? colors.blue.lighter : colors.blue.light};
   display: flex;
@@ -34,7 +34,7 @@ const Container = styled.div`
   }
 `;
 
-const NestedContainer = Container.extend`
+const NestedContainer = styled(Container)`
   padding: 0;
   margin-bottom: ${grid}px;
 `;

@@ -30,7 +30,7 @@ The only thing you need to do is set `display: table` on a `Draggable` row while
 
 This strategy will work with columns that have automatic column widths based on content. It will also work with fixed layouts. **It is a more robust strategy than the first, but it is also less performant.**
 
-When we apply `position: fixed` to the dragging item it removes it from the automatic column width calculations that a table uses. So before a drag starts we _lock_ all of the cell widths using inline styles to prevent the column dimensions from changing when a drag starts.
+When we apply `position: fixed` to the dragging item it removes it from the automatic column width calculations that a table uses. So before a drag starts we _lock_ all of the cell widths using inline styles to prevent the column dimensions from changing when a drag starts. You can achieve this with the [`onBeforeDragStart` hook](docs/guides/hooks.md).
 
 This has poor performance characteristics at scale as it requires:
 
@@ -45,7 +45,7 @@ For tables with less than 50 rows this should approach be fine!
 
 If you want to use `React.Portal` in combination with table row reordering then there are few extra steps you need to go through.
 
-First up, have a read of our [using a portal guide](docs/guides/using-a-portal.md) to get familiar with the approach.
+First up, have a read of our [using a portal pattern](docs/patterns/using-a-portal.md) to get familiar with the approach.
 
 It is important to know things timings of mount / unmount actions in React. We have created a [codesandbox.io example](https://codesandbox.io/s/nkl52y1wn0) to show how the mount timings work when moving in and out of a `React.Portal`.
 

@@ -10,17 +10,17 @@ jobs:
 
       - restore_cache:
           keys:
-          # Restore cached node_modules
-          - v1-dependencies-{{ checksum "yarn.lock" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+            # Restore cached node_modules
+            - v1-dependencies-{{ checksum "yarn.lock" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
 
       - restore_cache:
           keys:
-          # Restore cached website node_modules
-          - v1-website-dependencies-{{ checksum "website/yarn.lock" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-website-dependencies-
+            # Restore cached website node_modules
+            - v1-website-dependencies-{{ checksum "website/yarn.lock" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-website-dependencies-
 
       - run:
           name: Add CI global modules
@@ -39,12 +39,20 @@ jobs:
           command: $(yarn global bin)/greenkeeper-lockfile-upload
 
       - run:
+          name: Update Lockfile
+          command: $(yarn global bin)/greenkeeper-lockfile-update
+
+      - run:
+          name: Upload Lockfile
+          command: $(yarn global bin)/greenkeeper-lockfile-upload
+
+      - run:
           name: Validate Yarn Lock File
           command: |
-              if [ -n "$(git status -s)" ]; then
-                echo "Your yarn.lock was modified during install, please check in any changes to the yarn.lock file"
-                exit 1
-              fi
+            if [ -n "$(git status -s)" ]; then
+              echo "Your yarn.lock was modified during install, please check in any changes to the yarn.lock file"
+              exit 1
+            fi
 
       # Save the node_modules cache
       - save_cache:
@@ -65,15 +73,20 @@ jobs:
 
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "yarn.lock" }}
+            - v1-dependencies-{{ checksum "yarn.lock" }}
 
       - restore_cache:
           keys:
-          - v1-website-dependencies-{{ checksum "website/yarn.lock" }}
+            - v1-website-dependencies-{{ checksum "website/yarn.lock" }}
 
       - run:
-            name: Lint + Typecheck
-            command: yarn validate
+          # PR's from forks cannot use the dependency cache for performance reasons
+          name: 'Forked PR dependency install'
+          command: yarn
+
+      - run:
+          name: Lint + Typecheck
+          command: yarn validate
   test:
     docker:
       - image: circleci/node:8.11.3-browsers
@@ -83,17 +96,22 @@ jobs:
 
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "yarn.lock" }}
+            - v1-dependencies-{{ checksum "yarn.lock" }}
 
       - restore_cache:
           keys:
-          - v1-website-dependencies-{{ checksum "website/yarn.lock" }}
+            - v1-website-dependencies-{{ checksum "website/yarn.lock" }}
+
+      - run:
+          # PR's from forks cannot use the dependency cache for performance reasons
+          name: 'Forked PR dependency install'
+          command: yarn
 
       - run:
           name: Jest Suite
           command: yarn test
           environment:
-            JEST_JUNIT_OUTPUT: "test-reports/junit/js-test-results.xml"
+            JEST_JUNIT_OUTPUT: 'test-reports/junit/js-test-results.xml'
 
       - store_test_results:
           path: test-reports/junit
@@ -104,7 +122,7 @@ jobs:
 
       - store_test_results:
           path: test-reports/browser
-      
+
       - store_artifacts:
           path: .storybook-out
           destination: storybook-out
@@ -117,11 +135,16 @@ jobs:
 
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "yarn.lock" }}
+            - v1-dependencies-{{ checksum "yarn.lock" }}
 
       - restore_cache:
           keys:
-          - v1-website-dependencies-{{ checksum "website/yarn.lock" }}
+            - v1-website-dependencies-{{ checksum "website/yarn.lock" }}
+
+      - run:
+          # PR's from forks cannot use the dependency cache for performance reasons
+          name: 'Forked PR dependency install'
+          command: yarn
 
       - run:
           name: Check Bundle Size

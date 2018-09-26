@@ -1,11 +1,11 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from 'react-emotion';
 import { colors, grid } from '../constants';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../src';
 import type { Author } from '../types';
 
-const Avatar = styled.img`
+const Avatar = styled('img')`
   width: 60px;
   height: 60px;
   border-radius: 50%;

@@ -1,5 +1,4 @@
 // @flow
-import { css } from 'styled-components';
 
 type WhenRuleFn = (...args: mixed[]) => mixed;
 
@@ -15,7 +14,7 @@ export const smallView: MediaRule = (() => {
   const negatedQuery: string = '(min-width: 1300px)';
 
   // $ExpectError - incorrect typing for css function
-  const fn: WhenRuleFn = (...args) => `@media ${query} { ${css(...args)} }`;
+  const fn: WhenRuleFn = (...args) => `@media ${query} { ${args} }`;
 
   return {
     query,
