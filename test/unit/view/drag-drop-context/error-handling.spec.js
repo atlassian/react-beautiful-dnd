@@ -79,6 +79,15 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
+const whenIdle: DraggableStateSnapshot = {
+  draggingOver: null,
+  isDragging: false,
+  dropping: null,
+  combineWith: null,
+  combineTargetFor: null,
+  mode: null,
+};
+
 it('should reset the application state and swallow the exception if an invariant exception occurs', () => {
   const wrapper: ReactWrapper = withThrow(() => invariant(false));
 
@@ -95,13 +104,8 @@ it('should reset the application state and swallow the exception if an invariant
   // WillThrough can still be found in the DOM
   const willThrough: ReactWrapper = wrapper.find(WillThrow);
   expect(willThrough.length).toBeTruthy();
-  const expected: DraggableStateSnapshot = {
-    draggingOver: null,
-    isDragging: false,
-    isDropAnimating: false,
-  };
   // no longer dragging
-  expect(willThrough.props().snapshot).toEqual(expected);
+  expect(willThrough.props().snapshot).toEqual(whenIdle);
 });
 
 it('should not reset the application state an exception occurs and throw it', () => {
@@ -110,9 +114,10 @@ it('should not reset the application state an exception occurs and throw it', ()
   });
 
   // Execute a lift which will throw an error
-  wrapper.find(WillThrow).simulate('keydown', { keyCode: keyCodes.space });
   // throw is NOT swallowed
-  expect(() => jest.runOnlyPendingTimers()).toThrow();
+  expect(() =>
+    wrapper.find(WillThrow).simulate('keydown', { keyCode: keyCodes.space }),
+  ).toThrow();
   // Messages printed
   expect(console.error).toHaveBeenCalledWith(
     expect.stringContaining('An error has occurred while a drag is occurring'),
@@ -121,11 +126,6 @@ it('should not reset the application state an exception occurs and throw it', ()
 
   const willThrough: ReactWrapper = wrapper.find(WillThrow);
   expect(willThrough.length).toBeTruthy();
-  const expected: DraggableStateSnapshot = {
-    draggingOver: null,
-    isDragging: false,
-    isDropAnimating: false,
-  };
   // no longer dragging
-  expect(willThrough.props().snapshot).toEqual(expected);
+  expect(willThrough.props().snapshot).toEqual(whenIdle);
 });
