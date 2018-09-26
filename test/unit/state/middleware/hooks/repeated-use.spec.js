@@ -15,13 +15,15 @@ import type { Hooks, DragUpdate, DropResult } from '../../../../../src/types';
 import createHooks from './util/get-hooks-stub';
 import getAnnounce from './util/get-announce-stub';
 
+jest.useFakeTimers();
+
 it('should behave correctly across multiple drags', () => {
   const hooks: Hooks = createHooks();
   const store = createStore(middleware(() => hooks, getAnnounce()));
   Array.from({ length: 4 }).forEach(() => {
     // start
     store.dispatch(initialPublish(initialPublishArgs));
-    requestAnimationFrame.step();
+    jest.runOnlyPendingTimers();
     expect(hooks.onDragStart).toHaveBeenCalledWith(
       getDragStart(),
       expect.any(Object),
@@ -39,7 +41,7 @@ it('should behave correctly across multiple drags', () => {
     };
     store.dispatch(moveDown());
     // flush hook call
-    requestAnimationFrame.step();
+    jest.runOnlyPendingTimers();
     expect(hooks.onDragUpdate).toHaveBeenCalledWith(update, expect.any(Object));
     expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
 

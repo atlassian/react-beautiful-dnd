@@ -18,9 +18,11 @@ import createHooks from './util/get-hooks-stub';
 import type { Hooks, State, DragUpdate } from '../../../../../src/types';
 import type { Store, Dispatch } from '../../../../../src/state/store-types';
 
+jest.useFakeTimers();
+
 const start = (dispatch: Dispatch) => {
   dispatch(initialPublish(initialPublishArgs));
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
 };
 
 it('should call onDragUpdate if the position has changed on move', () => {
@@ -33,10 +35,10 @@ it('should call onDragUpdate if the position has changed on move', () => {
 
   // Okay let's move it
   store.dispatch(moveDown());
-  // not called until after a frame
+  // not called until next cycle
   expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
   const update: DragUpdate = {
     ...getDragStart(),
     combine: null,
@@ -56,24 +58,23 @@ it('should not call onDragUpdate if there is no movement from the last update', 
   expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
 
   // onDragUpdate not called yet
-  requestAnimationFrame.flush();
+  jest.runOnlyPendingTimers();
   expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
   // A movement to the same index is not causing an update
   const moveArgs: MoveArgs = {
     // tiny change
     client: add(initialPublishArgs.client.selection, { x: 1, y: 1 }),
-    shouldAnimate: true,
   };
   store.dispatch(move(moveArgs));
 
   // update not called after flushing
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
   expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
   // Triggering an actual movement
   store.dispatch(moveDown());
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
   expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
 
   const state: State = store.getState();
@@ -86,10 +87,9 @@ it('should not call onDragUpdate if there is no movement from the last update', 
   store.dispatch(
     move({
       client: add(state.current.client.selection, { x: -1, y: -1 }),
-      shouldAnimate: true,
     }),
   );
 
-  requestAnimationFrame.flush();
+  jest.runOnlyPendingTimers();
   expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
 });

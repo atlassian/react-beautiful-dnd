@@ -27,6 +27,7 @@ import type {
 } from '../../../../../src/types';
 import type { Store } from '../../../../../src/state/store-types';
 
+jest.useFakeTimers();
 const preset = getPreset();
 
 it('should not call onDragUpdate if the destination or source have not changed', () => {
@@ -34,14 +35,14 @@ it('should not call onDragUpdate if the destination or source have not changed',
   const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
   store.dispatch(initialPublish(initialPublishWithScrollables));
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
   expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
   expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
   store.dispatch(collectionStarting());
   store.dispatch(publish(publishAdditionArgs));
-  // checking there are no queued frames
-  requestAnimationFrame.step();
+  // checking there are no queued hooks
+  jest.runAllTimers();
   // not called yet as position has not changed
   expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 });
@@ -76,7 +77,7 @@ it('should call onDragUpdate if the source has changed - even if the destination
   };
 
   store.dispatch(initialPublish(customInitial));
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
   const start: DragStart = {
     draggableId: preset.inHome2.descriptor.id,
     type: preset.home.descriptor.type,
@@ -84,22 +85,23 @@ it('should call onDragUpdate if the source has changed - even if the destination
       droppableId: preset.home.descriptor.id,
       index: 1,
     },
+    mode: 'FLUID',
   };
   expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
   expect(hooks.onDragStart).toHaveBeenCalledWith(start, expect.any(Object));
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
   expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
-  // first move down (and release update frame)
+  // first move down (and release hook)
   store.dispatch(moveDown());
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
   expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
   // $ExpectError - unknown mock reset property
   hooks.onDragUpdate.mockReset();
 
-  // move up into the original position (and release frame)
+  // move up into the original position (and release cycle)
   store.dispatch(moveUp());
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
   // no current displacement
   {
     const current: State = store.getState();
@@ -119,6 +121,7 @@ it('should call onDragUpdate if the source has changed - even if the destination
       index: 1,
     },
     combine: null,
+    mode: 'FLUID',
   };
   expect(hooks.onDragUpdate).toHaveBeenCalledWith(
     lastUpdate,
@@ -138,7 +141,7 @@ it('should call onDragUpdate if the source has changed - even if the destination
   store.dispatch(collectionStarting());
   store.dispatch(publish(customPublish));
   // releasing update frame
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
 
   const postPublishUpdate: DragUpdate = {
     draggableId: preset.inHome2.descriptor.id,
@@ -151,6 +154,7 @@ it('should call onDragUpdate if the source has changed - even if the destination
     // destination has not changed from last update
     destination: lastUpdate.destination,
     combine: null,
+    mode: 'FLUID',
   };
   expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
   expect(hooks.onDragUpdate).toHaveBeenCalledWith(

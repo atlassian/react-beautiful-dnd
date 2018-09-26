@@ -94,6 +94,8 @@ class App extends React.Component<*, State> {
   }
 }
 
+jest.useFakeTimers();
+
 it('should allow the disabling of a droppable in onDragStart', () => {
   const hooks: Hooks = {
     onDragStart: jest.fn(),
@@ -103,8 +105,8 @@ it('should allow the disabling of a droppable in onDragStart', () => {
   const wrapper: ReactWrapper = mount(<App {...hooks} />);
 
   pressSpacebar(wrapper.find('.drag-handle'));
-  // flush animation frame for lift hook
-  requestAnimationFrame.step();
+  // flush hook
+  jest.runOnlyPendingTimers();
 
   const start: DragStart = {
     draggableId: 'draggable',
@@ -117,10 +119,10 @@ it('should allow the disabling of a droppable in onDragStart', () => {
   };
   expect(hooks.onDragStart).toHaveBeenCalledWith(start);
 
-  // onDragUpdate will occur after animation frame
+  // onDragUpdate will occur after setTimeout
   expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
   // an update should be fired as the home location has changed
   const update: DragUpdate = {
     ...start,

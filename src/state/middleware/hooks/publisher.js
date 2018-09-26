@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import messagePreset from '../util/message-preset';
 import * as timings from '../../../debug/timings';
 import getExpiringAnnounce from './expiring-announce';
-import getAsyncMarshal, { type FrameMarshal } from './async-marshal';
+import getAsyncMarshal, { type AsyncMarshal } from './async-marshal';
 import type {
   DropResult,
   Hooks,
@@ -75,7 +75,7 @@ type WhileDragging = {|
 
 export default (getHooks: () => Hooks, announce: Announce) => {
   let dragging: ?WhileDragging = null;
-  const asyncMarshal: FrameMarshal = getAsyncMarshal();
+  const asyncMarshal: AsyncMarshal = getAsyncMarshal();
 
   const beforeStart = (critical: Critical, mode: MovementMode) => {
     invariant(

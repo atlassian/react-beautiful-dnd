@@ -10,6 +10,7 @@ import {
   initialPublish,
   completeDrop,
   moveDown,
+  moveUp,
 } from '../../../../../src/state/action-creators';
 import type { Store } from '../../../../../src/state/store-types';
 import getHooks from './util/get-hooks-stub';
@@ -25,18 +26,20 @@ const result: DropResult = {
   reason: 'DROP',
 };
 
-it('should trigger an on drag start after an animation frame', () => {
+jest.useFakeTimers();
+
+it('should trigger an on drag start after in the next cycle', () => {
   const hooks: Hooks = getHooks();
   const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
   store.dispatch(initialPublish(initialPublishArgs));
   expect(hooks.onDragStart).not.toHaveBeenCalled();
 
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
   expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
 });
 
-it('should flush a drag start if an action comes in while the frame is pending', () => {
+it('should queue a drag start if an action comes in while the timeout is pending', () => {
   const hooks: Hooks = getHooks();
   const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
@@ -44,69 +47,58 @@ it('should flush a drag start if an action comes in while the frame is pending',
   expect(hooks.onDragStart).not.toHaveBeenCalled();
 
   store.dispatch(moveDown());
+  expect(hooks.onDragStart).not.toHaveBeenCalled();
+
+  jest.runOnlyPendingTimers();
+
   expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+  expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
 });
 
-it('should flush a drag start if a drop occurs', () => {
+it('should flush any pending hooks if a drop occurs', () => {
   const hooks: Hooks = getHooks();
   const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
   store.dispatch(initialPublish(initialPublishArgs));
   expect(hooks.onDragStart).not.toHaveBeenCalled();
+  expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+
+  store.dispatch(moveDown());
+  expect(hooks.onDragStart).not.toHaveBeenCalled();
+  expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+
+  store.dispatch(moveUp());
+  expect(hooks.onDragStart).not.toHaveBeenCalled();
+  expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
   store.dispatch(completeDrop(result));
   expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+  expect(hooks.onDragUpdate).toHaveBeenCalledTimes(2);
   expect(hooks.onDragEnd).toHaveBeenCalledWith(result, expect.any(Object));
 });
 
-it('should trigger an on drag update after an animation frame', () => {
+it('should work across multiple drags', () => {
   const hooks: Hooks = getHooks();
   const store: Store = createStore(middleware(() => hooks, getAnnounce()));
+  Array.from({ length: 4 }).forEach(() => {
+    store.dispatch(initialPublish(initialPublishArgs));
+    expect(hooks.onBeforeDragStart).toHaveBeenCalled();
+    expect(hooks.onDragStart).not.toHaveBeenCalled();
 
-  store.dispatch(initialPublish(initialPublishArgs));
+    store.dispatch(moveDown());
+    expect(hooks.onDragStart).not.toHaveBeenCalled();
+    expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
-  store.dispatch(moveDown());
-  expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+    store.dispatch(completeDrop(result));
+    expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+    expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
+    expect(hooks.onDragEnd).toHaveBeenCalledWith(result, expect.any(Object));
 
-  requestAnimationFrame.step();
-  expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
-});
-
-it('should flush a drag update if another update comes in', () => {
-  const hooks: Hooks = getHooks();
-  const store: Store = createStore(middleware(() => hooks, getAnnounce()));
-
-  store.dispatch(initialPublish(initialPublishArgs));
-
-  // first not called
-  store.dispatch(moveDown());
-  expect(hooks.onDragUpdate).not.toHaveBeenCalled();
-
-  // flushing first
-  store.dispatch(moveDown());
-  expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
-
-  // flushing second
-  store.dispatch(moveDown());
-  expect(hooks.onDragUpdate).toHaveBeenCalledTimes(2);
-
-  // flushing third
-  requestAnimationFrame.step();
-  expect(hooks.onDragUpdate).toHaveBeenCalledTimes(3);
-});
-
-it('should flush a drag update if a drop occurs', () => {
-  const hooks: Hooks = getHooks();
-  const store: Store = createStore(middleware(() => hooks, getAnnounce()));
-
-  store.dispatch(initialPublish(initialPublishArgs));
-
-  store.dispatch(moveDown());
-  expect(hooks.onDragUpdate).not.toHaveBeenCalled();
-
-  store.dispatch(completeDrop(result));
-  // update flushed
-  expect(hooks.onDragUpdate).toHaveBeenCalled();
-  // drop occurred without flushing
-  expect(hooks.onDragEnd).toHaveBeenCalled();
+    // $FlowFixMe - hook does not have mockReset property
+    hooks.onDragStart.mockReset();
+    // $FlowFixMe - hook does not have mockReset property
+    hooks.onDragUpdate.mockReset();
+    // $FlowFixMe - hook does not have mockReset property
+    hooks.onDragEnd.mockReset();
+  });
 });

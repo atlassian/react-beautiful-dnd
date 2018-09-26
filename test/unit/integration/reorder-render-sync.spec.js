@@ -195,8 +195,8 @@ it('should call the onBeforeDragStart before connected components are updated, a
 
   // start a drag
   pressSpacebar(wrapper.find('.drag-handle').first());
-  // flushing animation frame for drag start
-  requestAnimationFrame.step();
+  // flushing onDragStart
+  jest.runOnlyPendingTimers();
 
   // initial lift will render the first item
   expect(first.onRender).toHaveBeenCalledTimes(1);
@@ -204,6 +204,7 @@ it('should call the onBeforeDragStart before connected components are updated, a
   clearRenderMocks();
 
   pressArrowDown(wrapper.find('.drag-handle').first());
+  // flushing keyboard movement
   requestAnimationFrame.step();
 
   // item1: moving down

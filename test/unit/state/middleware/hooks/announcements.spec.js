@@ -23,6 +23,8 @@ import type { Store } from '../../../../../src/state/store-types';
 import createHooks from './util/get-hooks-stub';
 import getAnnounce from './util/get-announce-stub';
 
+jest.useFakeTimers();
+
 type Case = {|
   title: 'onDragStart' | 'onDragUpdate' | 'onDragEnd',
   execute: (store: Store) => void,
@@ -40,12 +42,12 @@ const moveForwardUpdate: DragUpdate = {
 
 const start = (dispatch: Dispatch) => {
   dispatch(initialPublish(initialPublishArgs));
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
 };
 
 const update = (dispatch: Dispatch) => {
   dispatch(moveDown());
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
 };
 
 const end = (dispatch: Dispatch) => {

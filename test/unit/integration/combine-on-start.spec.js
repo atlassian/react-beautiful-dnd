@@ -107,6 +107,7 @@ class App extends React.Component<*, State> {
   }
 }
 
+jest.useFakeTimers();
 it('should allow the changing of combining in onDragStart', () => {
   const hooks: Hooks = {
     onDragStart: jest.fn(),
@@ -116,8 +117,8 @@ it('should allow the changing of combining in onDragStart', () => {
   const wrapper: ReactWrapper = mount(<App {...hooks} />);
 
   pressSpacebar(wrapper.find('.drag-handle').first());
-  // flush animation frame for lift hook
-  requestAnimationFrame.step();
+  // flush onDragStart  hook
+  jest.runOnlyPendingTimers();
 
   const start: DragStart = {
     draggableId: 'first',
@@ -132,7 +133,7 @@ it('should allow the changing of combining in onDragStart', () => {
 
   // now moving down will cause a combine impact!
   pressArrowDown(wrapper.find('.drag-handle').first());
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
   const update: DragUpdate = {
     ...start,
     destination: null,

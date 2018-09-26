@@ -91,7 +91,7 @@ describe('hooks integration', () => {
   };
 
   beforeEach(() => {
-    requestAnimationFrame.reset();
+    jest.useFakeTimers();
     hooks = {
       onBeforeDragStart: jest.fn(),
       onDragStart: jest.fn(),
@@ -106,6 +106,7 @@ describe('hooks integration', () => {
   afterEach(() => {
     // clean up any loose events
     wrapper.unmount();
+    jest.useRealTimers();
 
     // clean up any stubs
     if (Element.prototype.getBoundingClientRect.mockRestore) {
@@ -138,8 +139,8 @@ describe('hooks integration', () => {
       // Drag does not start until mouse has moved past a certain threshold
       windowMouseMove(dragStart);
 
-      // drag start hook is scheduled with requestAnimationFrame
-      requestAnimationFrame.step();
+      // drag start hook is scheduled with setTimeout
+      jest.runOnlyPendingTimers();
     };
 
     const move = () => {
@@ -147,8 +148,8 @@ describe('hooks integration', () => {
         x: dragMove.x,
         y: dragMove.y + sloppyClickThreshold + 1,
       });
-      // movements are scheduled with requestAnimationFrame
-      requestAnimationFrame.step();
+      // movements are scheduled with setTimeout
+      jest.runOnlyPendingTimers();
     };
 
     const waitForReturnToHome = () => {

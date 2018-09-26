@@ -13,6 +13,8 @@ import type { Store } from '../../../../../src/state/store-types';
 import getHooksStub from './util/get-hooks-stub';
 import getAnnounce from './util/get-announce-stub';
 
+jest.useFakeTimers();
+
 it('should call the onDragStart hook when a initial publish occurs', () => {
   const hooks: Hooks = getHooksStub();
   const store: Store = createStore(middleware(() => hooks, getAnnounce()));
@@ -24,8 +26,8 @@ it('should call the onDragStart hook when a initial publish occurs', () => {
   store.dispatch(initialPublish(initialPublishArgs));
   expect(hooks.onDragStart).not.toHaveBeenCalled();
 
-  // flushing animation frame for onDragStart
-  requestAnimationFrame.step();
+  // flushing onDragStart
+  jest.runOnlyPendingTimers();
   expect(hooks.onDragStart).toHaveBeenCalledWith(
     getDragStart(),
     expect.any(Object),
@@ -57,7 +59,7 @@ it('should call the onBeforeDragState and onDragStart in the correct order', () 
   store.dispatch(initialPublish(initialPublishArgs));
   expect(hooks.onBeforeDragStart).toHaveBeenCalledWith(getDragStart());
   // flushing onDragStart
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
 
   // checking the order
   invariant(onBeforeDragStartCalled);
@@ -74,7 +76,7 @@ it('should throw an exception if an initial publish is called before a drag ends
 
   const start = () => {
     store.dispatch(initialPublish(initialPublishArgs));
-    requestAnimationFrame.step();
+    jest.runOnlyPendingTimers();
   };
   // first execution is all good
   start();

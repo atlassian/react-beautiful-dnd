@@ -36,6 +36,7 @@ class Item extends React.Component<ItemProps> {
 }
 
 it('should call the onBeforeDragStart before connected components are updated, and onDragStart after', () => {
+  jest.useFakeTimers();
   let onBeforeDragStartTime: ?DOMHighResTimeStamp = null;
   let onDragStartTime: ?DOMHighResTimeStamp = null;
   let renderTime: ?DOMHighResTimeStamp = null;
@@ -97,8 +98,8 @@ it('should call the onBeforeDragStart before connected components are updated, a
 
   // start a drag
   pressSpacebar(wrapper.find('.drag-handle'));
-  // flushing animation frame for drag start
-  requestAnimationFrame.step();
+  // flushing onDragStart
+  jest.runOnlyPendingTimers();
 
   // checking values are set
   invariant(onBeforeDragStartTime, 'onBeforeDragStartTime should be set');
@@ -116,4 +117,5 @@ it('should call the onBeforeDragStart before connected components are updated, a
   expect(hooks.onBeforeDragStart).toHaveBeenCalledTimes(1);
   expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
   expect(onItemRender).toHaveBeenCalledTimes(1);
+  jest.useRealTimers();
 });

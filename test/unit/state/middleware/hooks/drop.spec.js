@@ -24,12 +24,14 @@ const result: DropResult = {
   reason: 'DROP',
 };
 
+jest.useFakeTimers();
+
 it('should call the onDragEnd hook when a DROP_COMPLETE action occurs', () => {
   const hooks: Hooks = getHooks();
   const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
   store.dispatch(initialPublish(initialPublishArgs));
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
   expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
 
   store.dispatch(completeDrop(result));

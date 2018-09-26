@@ -21,13 +21,15 @@ import type {
 } from '../../../../../src/types';
 import type { Store } from '../../../../../src/state/store-types';
 
+jest.useFakeTimers();
+
 it('should call onDragEnd with the last published critical descriptor', () => {
   const hooks: Hooks = createHooks();
   const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
   store.dispatch(clean());
   store.dispatch(initialPublish(initialPublishArgs));
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
   expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
 
   store.dispatch(clean());
@@ -46,7 +48,7 @@ it('should publish an onDragEnd with no destination even if there is a current d
 
   store.dispatch(clean());
   store.dispatch(initialPublish(initialPublishArgs));
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
 
   const state: State = store.getState();
   invariant(state.phase === 'DRAGGING');
@@ -75,7 +77,7 @@ it('should not publish an onDragEnd if aborted after a drop', () => {
   // lift
   store.dispatch(clean());
   store.dispatch(initialPublish(initialPublishArgs));
-  requestAnimationFrame.step();
+  jest.runOnlyPendingTimers();
   expect(hooks.onDragStart).toHaveBeenCalled();
 
   // drop
