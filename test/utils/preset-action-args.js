@@ -88,6 +88,7 @@ export const getDragStart = (custom?: Critical = critical): DragStart => ({
   draggableId: custom.draggable.id,
   type: custom.droppable.type,
   source: getHomeLocation(custom.draggable),
+  mode: 'SNAP',
 });
 
 export const completeDropArgs: DropResult = {

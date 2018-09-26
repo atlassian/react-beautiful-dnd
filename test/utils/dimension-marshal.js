@@ -6,6 +6,7 @@ import {
   publish,
   updateDroppableScroll,
   updateDroppableIsEnabled,
+  updateDroppableIsCombineEnabled,
   collectionStarting,
 } from '../../src/state/action-creators';
 import { getPreset } from './dimension';
@@ -29,6 +30,7 @@ export default (dispatch: Function): DimensionMarshal => {
       collectionStarting,
       updateDroppableScroll,
       updateDroppableIsEnabled,
+      updateDroppableIsCombineEnabled,
     },
     dispatch,
   );
@@ -49,6 +51,7 @@ export const getMarshalStub = (): DimensionMarshal => ({
   unregisterDroppable: jest.fn(),
   updateDroppableScroll: jest.fn(),
   updateDroppableIsEnabled: jest.fn(),
+  updateDroppableIsCombineEnabled: jest.fn(),
   scrollDroppable: jest.fn(),
   startPublishing: jest.fn(),
   stopPublishing: jest.fn(),
@@ -60,7 +63,7 @@ export const getDroppableCallbacks = (
   getDimensionAndWatchScroll: jest.fn().mockReturnValue(dimension),
   recollect: jest.fn().mockReturnValue(dimension),
   scroll: jest.fn(),
-  unwatchScroll: jest.fn(),
+  dragStopped: jest.fn(),
 });
 
 export type DimensionWatcher = {|
@@ -71,9 +74,7 @@ export type DimensionWatcher = {|
     getDimensionAndWatchScroll: Function,
     scroll: Function,
     recollect: Function,
-    unwatchScroll: Function,
-    hidePlaceholder: Function,
-    showPlaceholder: Function,
+    dragStopped: Function,
   |},
 |};
 
@@ -97,9 +98,7 @@ export const populateMarshal = (
       getDimensionAndWatchScroll: jest.fn(),
       scroll: jest.fn(),
       recollect: jest.fn(),
-      unwatchScroll: jest.fn(),
-      hidePlaceholder: jest.fn(),
-      showPlaceholder: jest.fn(),
+      dragStopped: jest.fn(),
     },
   };
 
@@ -117,8 +116,8 @@ export const populateMarshal = (
         watcher.droppable.recollect(id);
         return droppable;
       },
-      unwatchScroll: () => {
-        watcher.droppable.unwatchScroll(id);
+      dragStopped: () => {
+        watcher.droppable.dragStopped(id);
       },
     };
 
@@ -141,5 +140,6 @@ export const getCallbacksStub = (): Callbacks => ({
   publish: jest.fn(),
   updateDroppableScroll: jest.fn(),
   updateDroppableIsEnabled: jest.fn(),
+  updateDroppableIsCombineEnabled: jest.fn(),
   collectionStarting: jest.fn(),
 });

@@ -7,7 +7,7 @@ import {
   getDroppableDimension,
   getDraggableDimension,
 } from '../../utils/dimension';
-import { scrollDroppable } from '../../../src/state/droppable-dimension';
+import scrollDroppable from '../../../src/state/droppable/scroll-droppable';
 import type {
   DraggableId,
   DraggableDimension,
@@ -29,10 +29,7 @@ describe('get droppable over', () => {
 
     const result: ?DroppableId = getDroppableOver({
       target,
-      draggable: preset.inHome1,
-      draggables: preset.draggables,
       droppables: preset.droppables,
-      previousDroppableOverId: null,
     });
 
     expect(result).toBe(null);
@@ -44,10 +41,7 @@ describe('get droppable over', () => {
 
       const result: ?DroppableId = getDroppableOver({
         target: draggable.page.borderBox.center,
-        draggable,
-        draggables: preset.draggables,
         droppables: preset.droppables,
-        previousDroppableOverId: null,
       });
 
       expect(result).toBe(draggable.descriptor.droppableId);
@@ -63,17 +57,11 @@ describe('get droppable over', () => {
 
     const whileEnabled: ?DroppableId = getDroppableOver({
       target,
-      draggable: preset.inHome1,
-      draggables: preset.draggables,
       droppables: preset.droppables,
-      previousDroppableOverId: null,
     });
     const whileDisabled: ?DroppableId = getDroppableOver({
       target,
-      draggable: preset.inHome1,
-      draggables: preset.draggables,
       droppables: withDisabled,
-      previousDroppableOverId: null,
     });
 
     expect(whileEnabled).toBe(preset.home.descriptor.id);
@@ -108,28 +96,11 @@ describe('get droppable over', () => {
         shouldClipSubject: true,
       },
     });
-    const draggable: DraggableDimension = getDraggableDimension({
-      descriptor: {
-        id: 'draggable',
-        droppableId: droppable.descriptor.id,
-        type: droppable.descriptor.type,
-        index: 0,
-      },
-      borderBox: {
-        top: 0,
-        left: 0,
-        right: 50,
-        bottom: 50,
-      },
-    });
 
     const result: ?DroppableId = getDroppableOver({
       // over the hidden part of the droppable subject
       target: { x: 60, y: 50 },
-      draggable,
-      draggables: { [draggable.descriptor.id]: draggable },
       droppables: { [droppable.descriptor.id]: droppable },
-      previousDroppableOverId: null,
     });
 
     expect(result).toBe(null);
@@ -148,13 +119,13 @@ describe('get droppable over', () => {
         bottom: 100,
       },
       closest: {
-        // will partially hide the subject
         // will totally hide the subject
         borderBox: {
           top: 0,
+          // cutting off on horizontal plane
           left: 101,
           right: 200,
-          bottom: 100,
+          bottom: 200,
         },
         scrollSize: {
           scrollHeight: 100,
@@ -164,33 +135,19 @@ describe('get droppable over', () => {
         shouldClipSubject: true,
       },
     });
-    const draggable: DraggableDimension = getDraggableDimension({
-      descriptor: {
-        id: 'draggable',
-        droppableId: droppable.descriptor.id,
-        type: droppable.descriptor.type,
-        index: 0,
-      },
-      borderBox: {
-        top: 0,
-        left: 0,
-        right: 50,
-        bottom: 50,
-      },
-    });
 
+    // totally hidden
+    expect(droppable.subject.active).toBe(null);
     const result: ?DroppableId = getDroppableOver({
       target: { x: 50, y: 50 },
-      draggable,
-      draggables: { [draggable.descriptor.id]: draggable },
       droppables: { [droppable.descriptor.id]: droppable },
-      previousDroppableOverId: null,
     });
 
     expect(result).toBe(null);
   });
 
   describe('placeholder buffer', () => {
+    throw new Error('REMOVE ME')
     const margin: Spacing = {
       top: 10,
       right: 10,
