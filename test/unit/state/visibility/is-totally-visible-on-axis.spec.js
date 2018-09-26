@@ -44,6 +44,7 @@ const inViewport: Spacing = {
 
       targets.forEach((target: Spacing) => {
         const isVisible: boolean = isTotallyVisibleOnAxis({
+          withDroppableDisplacement: true,
           target,
           destination,
           viewport,
@@ -62,6 +63,7 @@ const inViewport: Spacing = {
 
       targets.forEach((target: Spacing) => {
         const isVisible: boolean = isTotallyVisibleOnAxis({
+          withDroppableDisplacement: true,
           target,
           destination,
           viewport,

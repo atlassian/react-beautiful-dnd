@@ -4,12 +4,9 @@ import {
   isTotallyVisible,
   isPartiallyVisible,
 } from '../../../../src/state/visibility/is-visible';
-import { scrollDroppable } from '../../../../src/state/droppable-dimension';
+import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
 import { offsetByPosition } from '../../../../src/state/spacing';
-import {
-  getDroppableDimension,
-  getClosestScrollable,
-} from '../../../utils/dimension';
+import { getDroppableDimension, getFrame } from '../../../utils/dimension';
 import type { DroppableDimension } from '../../../../src/types';
 
 const viewport: Rect = getRect({
@@ -62,6 +59,7 @@ describe('is totally visible', () => {
       it('should return false if the item is not in the viewport', () => {
         expect(
           isTotallyVisible({
+            withDroppableDisplacement: true,
             target: notInViewport,
             viewport,
             destination: asBigAsViewport,
@@ -72,6 +70,7 @@ describe('is totally visible', () => {
       it('should return true if item takes up entire viewport', () => {
         expect(
           isTotallyVisible({
+            withDroppableDisplacement: true,
             target: viewport,
             viewport,
             destination: asBigAsViewport,
@@ -82,6 +81,7 @@ describe('is totally visible', () => {
       it('should return true if the item is totally visible in the viewport', () => {
         expect(
           isTotallyVisible({
+            withDroppableDisplacement: true,
             target: inViewport1,
             viewport,
             destination: asBigAsViewport,
@@ -104,6 +104,7 @@ describe('is totally visible', () => {
         partials.forEach((partial: Spacing) => {
           expect(
             isTotallyVisible({
+              withDroppableDisplacement: true,
               target: partial,
               viewport,
               destination: asBigAsViewport,
@@ -113,6 +114,7 @@ describe('is totally visible', () => {
           // validation
           expect(
             isPartiallyVisible({
+              withDroppableDisplacement: true,
               target: partial,
               viewport,
               destination: asBigAsViewport,
@@ -158,6 +160,7 @@ describe('is totally visible', () => {
           // originally invisible
           expect(
             isTotallyVisible({
+              withDroppableDisplacement: true,
               target: originallyInvisible,
               destination: clippedByViewport,
               viewport,
@@ -167,6 +170,7 @@ describe('is totally visible', () => {
           // after scroll the target is now visible
           expect(
             isTotallyVisible({
+              withDroppableDisplacement: true,
               target: originallyInvisible,
               destination: scrollDroppable(clippedByViewport, { x: 0, y: 100 }),
               viewport,
@@ -187,6 +191,7 @@ describe('is totally visible', () => {
           // originally visible
           expect(
             isTotallyVisible({
+              withDroppableDisplacement: true,
               target: originallyVisible,
               destination: clippedByViewport,
               viewport,
@@ -196,6 +201,7 @@ describe('is totally visible', () => {
           // after scroll the target is now invisible
           expect(
             isTotallyVisible({
+              withDroppableDisplacement: true,
               target: originallyVisible,
               destination: scrollDroppable(clippedByViewport, { x: 0, y: 100 }),
               viewport,
@@ -241,6 +247,7 @@ describe('is totally visible', () => {
       it('should return false if outside the droppable', () => {
         expect(
           isTotallyVisible({
+            withDroppableDisplacement: true,
             target: inViewport2,
             viewport,
             destination: asBigAsInViewport1,
@@ -251,6 +258,7 @@ describe('is totally visible', () => {
       it('should return false if the target is bigger than the droppable', () => {
         expect(
           isTotallyVisible({
+            withDroppableDisplacement: true,
             target: viewport,
             viewport,
             destination: asBigAsInViewport1,
@@ -261,6 +269,7 @@ describe('is totally visible', () => {
       it('should return true if the same size of the droppable', () => {
         expect(
           isTotallyVisible({
+            withDroppableDisplacement: true,
             target: inViewport1,
             viewport,
             destination: asBigAsInViewport1,
@@ -278,6 +287,7 @@ describe('is totally visible', () => {
 
         expect(
           isTotallyVisible({
+            withDroppableDisplacement: true,
             target: insideDroppable,
             viewport,
             destination: asBigAsInViewport1,
@@ -300,6 +310,7 @@ describe('is totally visible', () => {
         partials.forEach((partial: Spacing) => {
           expect(
             isTotallyVisible({
+              withDroppableDisplacement: true,
               target: partial,
               viewport,
               destination: asBigAsInViewport1,
@@ -312,6 +323,7 @@ describe('is totally visible', () => {
               target: partial,
               viewport,
               destination: asBigAsInViewport1,
+              withDroppableDisplacement: true,
             }),
           ).toBe(true);
         });
@@ -353,6 +365,7 @@ describe('is totally visible', () => {
 
         expect(
           isTotallyVisible({
+            withDroppableDisplacement: true,
             target: inSubjectOutsideFrame,
             destination: clippedDroppable,
             viewport,
@@ -374,6 +387,7 @@ describe('is totally visible', () => {
           // originally invisible
           expect(
             isTotallyVisible({
+              withDroppableDisplacement: true,
               target: originallyInvisible,
               destination: scrollable,
               viewport,
@@ -387,6 +401,7 @@ describe('is totally visible', () => {
           });
           expect(
             isTotallyVisible({
+              withDroppableDisplacement: true,
               target: originallyInvisible,
               destination: scrolled,
               viewport,
@@ -406,6 +421,7 @@ describe('is totally visible', () => {
           // originally visible
           expect(
             isTotallyVisible({
+              withDroppableDisplacement: true,
               target: originallyVisible,
               destination: scrollable,
               viewport,
@@ -415,12 +431,54 @@ describe('is totally visible', () => {
           // after scroll the target is now invisible
           expect(
             isTotallyVisible({
+              withDroppableDisplacement: true,
               target: originallyVisible,
               destination: scrollDroppable(scrollable, { x: 0, y: 100 }),
               viewport,
             }),
           ).toBe(false);
         });
+      });
+
+      it('should ignore droppable scroll if asked to', () => {
+        const originallyVisible: Spacing = {
+          ...frame,
+          top: 10,
+          bottom: 20,
+        };
+
+        // originally visible
+        expect(
+          isTotallyVisible({
+            withDroppableDisplacement: true,
+            target: originallyVisible,
+            destination: scrollable,
+            viewport,
+          }),
+        ).toBe(true);
+
+        const scrolled: DroppableDimension = scrollDroppable(scrollable, {
+          x: 0,
+          y: 100,
+        });
+        expect(
+          isTotallyVisible({
+            // still visible because we are not considering the droppable scroll
+            withDroppableDisplacement: false,
+            target: originallyVisible,
+            destination: scrolled,
+            viewport,
+          }),
+        ).toBe(true);
+        // validation: with scroll the item would not be invisible
+        expect(
+          isTotallyVisible({
+            withDroppableDisplacement: true,
+            target: originallyVisible,
+            destination: scrolled,
+            viewport,
+          }),
+        ).toBe(false);
       });
     });
 
@@ -463,6 +521,7 @@ describe('is totally visible', () => {
         // originally visible
         expect(
           isTotallyVisible({
+            withDroppableDisplacement: true,
             target: originallyVisible,
             destination: droppable,
             viewport,
@@ -472,14 +531,15 @@ describe('is totally visible', () => {
         // subject is now totally invisible
         const scrolled: DroppableDimension = scrollDroppable(
           droppable,
-          getClosestScrollable(droppable).scroll.max,
+          getFrame(droppable).scroll.max,
         );
         // asserting frame is not visible
-        expect(scrolled.viewport.clippedPageMarginBox).toBe(null);
+        expect(scrolled.subject.active).toBe(null);
 
         // now asserting that this check will fail
         expect(
           isTotallyVisible({
+            withDroppableDisplacement: true,
             target: originallyVisible,
             destination: scrolled,
             viewport,
@@ -493,6 +553,7 @@ describe('is totally visible', () => {
     it('should return true if visible in the viewport and the droppable', () => {
       expect(
         isTotallyVisible({
+          withDroppableDisplacement: true,
           target: inViewport1,
           viewport,
           destination: asBigAsInViewport1,
@@ -503,6 +564,7 @@ describe('is totally visible', () => {
     it('should return false if not visible in the droppable even if visible in the viewport', () => {
       expect(
         isTotallyVisible({
+          withDroppableDisplacement: true,
           target: inViewport2,
           viewport,
           destination: asBigAsInViewport1,
@@ -521,6 +583,7 @@ describe('is totally visible', () => {
 
       expect(
         isTotallyVisible({
+          withDroppableDisplacement: true,
           // is visible in the droppable
           target: notInViewport,
           // but not visible in the viewport
