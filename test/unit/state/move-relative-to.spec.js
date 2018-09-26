@@ -47,7 +47,7 @@ const isMoving: BoxModel = createBox({
   padding: getAssortedSpacing(),
 });
 
-[(vertical, horizontal)].forEach((axis: Axis) => {
+[vertical, horizontal].forEach((axis: Axis) => {
   it('should align before the target', () => {
     const newCenter: Position = goBefore({
       axis,

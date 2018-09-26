@@ -12,7 +12,7 @@ const dontCareAboutDirection: UserDirection = {
   horizontal: 'right',
 };
 
-[(vertical, horizontal)].forEach((axis: Axis) => {
+[vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
 

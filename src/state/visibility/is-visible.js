@@ -55,13 +55,17 @@ const isVisible = ({
     destination.subject.active,
   )(withDisplacement);
 
+  if (!isVisibleInDroppable) {
+    return false;
+  }
+
   // We also need to consider whether the destination scroll when detecting
   // if we are visible in the viewport.
   const isVisibleInViewport: boolean = isVisibleThroughFrameFn(viewport)(
     withDisplacement,
   );
 
-  return isVisibleInDroppable && isVisibleInViewport;
+  return isVisibleInViewport;
 };
 
 export const isPartiallyVisible = (args: Args): boolean =>

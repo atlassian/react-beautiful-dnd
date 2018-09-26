@@ -125,8 +125,6 @@ export default ({
     });
     const additionMap: DraggableDimensionMap = toDraggableMap(additions);
 
-    // console.log('with additions', withAdditions.map(d => d.descriptor.id));
-
     // Calculate the offset to be applied to shifted items
     withAdditions.forEach((item: DraggableDimension, index: number) => {
       const wasAdded: boolean = Boolean(additionMap[item.descriptor.id]);

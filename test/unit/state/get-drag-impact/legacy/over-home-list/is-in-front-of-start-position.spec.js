@@ -13,7 +13,7 @@ import type {
   Displacement,
 } from '../../../../../src/types';
 
-[(vertical, horizontal)].forEach((axis: Axis) => {
+[vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
 
