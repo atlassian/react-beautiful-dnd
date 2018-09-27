@@ -91,7 +91,6 @@ export default class QuoteApp extends Component<Props, State> {
             listId="list"
             style={this.props.listStyle}
             quotes={quotes}
-            isCombineEnabled
           />
         </Root>
       </DragDropContext>
