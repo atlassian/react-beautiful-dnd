@@ -74,8 +74,8 @@ type WhileDragging = {|
 |};
 
 export default (getHooks: () => Hooks, announce: Announce) => {
-  let dragging: ?WhileDragging = null;
   const asyncMarshal: AsyncMarshal = getAsyncMarshal();
+  let dragging: ?WhileDragging = null;
 
   const beforeStart = (critical: Critical, mode: MovementMode) => {
     invariant(

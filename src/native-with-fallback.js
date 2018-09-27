@@ -14,7 +14,18 @@ export function values<T>(map: Map<T>): T[] {
 }
 
 export function find<T>(list: Array<T>, predicate: T => boolean): ?T {
-  return list.find ? list.find(predicate) : list.filter(predicate)[0];
+  if (list.find) {
+    return list.find(predicate);
+  }
+  // Using a for loop so that we can exit early
+  // alternative: list.filter(predicate)[0]
+  for (let i = 0; i < list.length; i++) {
+    if (predicate(list[i])) {
+      return list[i];
+    }
+  }
+  // Array.prototype.find returns undefined when nothing is found
+  return undefined;
 }
 
 export function findIndex<T>(list: Array<T>, predicate: T => boolean): number {
