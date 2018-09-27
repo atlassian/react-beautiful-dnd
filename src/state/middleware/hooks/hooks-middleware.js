@@ -22,23 +22,18 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
   ): any => {
     if (action.type === 'INITIAL_PUBLISH') {
       const critical: Critical = action.payload.critical;
-      console.log('BEFORE');
       publisher.beforeStart(critical, action.payload.movementMode);
-      console.log('NEXT');
       next(action);
-      console.log('START');
       publisher.start(critical, action.payload.movementMode);
       return;
     }
 
     // All other hooks can fire after we have updated our connected components
-    console.log('NEXT');
     next(action);
 
     // Drag end
     if (action.type === 'DROP_COMPLETE') {
       const result: DropResult = action.payload;
-      console.log('DROP');
       publisher.drop(result);
       return;
     }
@@ -55,7 +50,6 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
 
     const state: State = store.getState();
     if (state.phase === 'DRAGGING') {
-      console.log('MOVE?');
       publisher.move(state.critical, state.impact);
     }
   };
