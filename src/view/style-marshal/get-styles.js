@@ -38,6 +38,8 @@ const getStyles = (rules: Rule[], property: string): string =>
     )
     .join(' ');
 
+const noPointerEvents: string = 'pointer-events: none;';
+
 export default (styleContext: string): Styles => {
   const getSelector = makeGetSelector(styleContext);
 
@@ -84,7 +86,7 @@ export default (styleContext: string): Styles => {
           touch-action: manipulation;
         `,
         resting: grabCursor,
-        dragging: 'pointer-events: none;',
+        dragging: noPointerEvents,
         // it is fine for users to start dragging another item when a drop animation is occurring
         dropAnimating: grabCursor,
         // Not applying grab cursor during a user cancel as it is not possible for users to reorder
@@ -121,10 +123,16 @@ export default (styleContext: string): Styles => {
   // This does not work well with reordering DOM nodes.
   // When we drop a Draggable it already has the correct scroll applied.
 
+  // pointer-events: none;
+  // It is very common for users to have accidental mouse handlers and
+  // hover styles on elements around a draggable which can cause
+  // performance and visual issues. So just turning it off here
+
   const droppable: Rule = {
     selector: getSelector(attributes.droppable),
     styles: {
       always: `overflow-anchor: none;`,
+      dragging: noPointerEvents,
     },
   };
 
