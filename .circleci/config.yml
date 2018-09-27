@@ -39,14 +39,6 @@ jobs:
           command: $(yarn global bin)/greenkeeper-lockfile-upload
 
       - run:
-          name: Update Lockfile
-          command: $(yarn global bin)/greenkeeper-lockfile-update
-
-      - run:
-          name: Upload Lockfile
-          command: $(yarn global bin)/greenkeeper-lockfile-upload
-
-      - run:
           name: Validate Yarn Lock File
           command: |
             if [ -n "$(git status -s)" ]; then
