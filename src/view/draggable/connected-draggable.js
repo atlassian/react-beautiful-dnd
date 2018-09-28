@@ -30,7 +30,6 @@ import type {
   PendingDrop,
   DragImpact,
   DisplacementMap,
-  DropReason,
   MovementMode,
 } from '../../types';
 import type {
@@ -180,7 +179,6 @@ export const makeMapStateToProps = (): Selector => {
       const draggingOver: ?DroppableId = whatIsDraggedOver(pending.impact);
       const combineWith: ?DraggableId = getCombineWith(pending.impact);
       const duration: number = pending.dropDuration;
-      const reason: DropReason = pending.result.reason;
       const mode: MovementMode = pending.result.mode;
 
       // not memoized as it is the only execution
@@ -194,7 +192,6 @@ export const makeMapStateToProps = (): Selector => {
           mode,
           forceShouldAnimate: null,
           dropping: {
-            reason,
             duration,
             curve: curves.drop,
             moveTo: pending.newHomeOffset,

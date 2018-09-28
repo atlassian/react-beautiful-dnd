@@ -77,8 +77,7 @@ export type Provided = {|
   innerRef: (?HTMLElement) => void,
 |};
 
-export type DroppingState = {|
-  reason: DropReason,
+export type DropAnimation = {|
   // to easily enable patching of styles
   duration: number,
   curve: string,
@@ -90,7 +89,8 @@ export type DroppingState = {|
 
 export type StateSnapshot = {|
   isDragging: boolean,
-  dropping: ?DroppingState,
+  isDropAnimating: boolean,
+  dropAnimation: ?DropAnimation,
   draggingOver: ?DroppableId,
   combineWith: ?DraggableId,
   combineTargetFor: ?DraggableId,
@@ -112,7 +112,7 @@ export type DispatchProps = {|
 export type DraggingMapProps = {|
   offset: Position,
   mode: MovementMode,
-  dropping: ?DroppingState,
+  dropping: ?DropAnimation,
   dimension: DraggableDimension,
   draggingOver: ?DroppableId,
   combineWith: ?DraggableId,

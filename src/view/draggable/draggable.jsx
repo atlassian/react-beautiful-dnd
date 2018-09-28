@@ -265,7 +265,8 @@ export default class Draggable extends Component<Props> {
   getDraggingSnapshot = memoizeOne(
     (dragging: DraggingMapProps): StateSnapshot => ({
       isDragging: true,
-      dropping: dragging.dropping,
+      isDropAnimating: Boolean(dragging.dropping),
+      dropAnimation: dragging.dropping,
       mode: dragging.mode,
       draggingOver: dragging.draggingOver,
       combineWith: dragging.combineWith,
@@ -276,7 +277,8 @@ export default class Draggable extends Component<Props> {
   getSecondarySnapshot = memoizeOne(
     (secondary: SecondaryMapProps): StateSnapshot => ({
       isDragging: false,
-      dropping: null,
+      isDropAnimating: false,
+      dropAnimation: null,
       mode: null,
       draggingOver: null,
       combineTargetFor: secondary.combineTargetFor,
@@ -289,7 +291,7 @@ export default class Draggable extends Component<Props> {
     const secondary: ?SecondaryMapProps = this.props.secondary;
     const children: ChildrenFn = this.props.children;
 
-    console.log('rendering dragging', this.props.draggableId);
+    console.log('rendering draggable', this.props.draggableId);
 
     if (dragging) {
       const child: ?Node = children(
