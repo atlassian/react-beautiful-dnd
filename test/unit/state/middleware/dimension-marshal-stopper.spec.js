@@ -97,7 +97,7 @@ it('should stop a collection if a drop animation starts', () => {
   expect(stopPublishing).not.toHaveBeenCalled();
 
   const pending: PendingDrop = {
-    newHomeOffset: { x: 0, y: 0 },
+    newHomeClientOffset: { x: 0, y: 0 },
     impact: noImpact,
     dropDuration: 1,
     result: {

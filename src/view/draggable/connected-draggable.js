@@ -184,7 +184,7 @@ export const makeMapStateToProps = (): Selector => {
       // not memoized as it is the only execution
       return {
         dragging: {
-          offset: pending.newHomeOffset,
+          offset: pending.newHomeClientOffset,
           // still need to provide the dimension for the placeholder
           dimension: state.dimensions.draggables[ownProps.draggableId],
           draggingOver,
@@ -194,7 +194,7 @@ export const makeMapStateToProps = (): Selector => {
           dropping: {
             duration,
             curve: curves.drop,
-            moveTo: pending.newHomeOffset,
+            moveTo: pending.newHomeClientOffset,
             opacity: combineWith ? combine.opacity.drop : null,
             scale: combineWith ? combine.scale.drop : null,
           },

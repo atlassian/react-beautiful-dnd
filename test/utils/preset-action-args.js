@@ -1,4 +1,5 @@
 // @flow
+import type { Position } from 'css-box-model';
 import { getPreset, getDraggableDimension, makeScrollable } from './dimension';
 import { offsetByPosition } from '../../src/state/spacing';
 import getHomeLocation from '../../src/state/get-home-location';
@@ -7,7 +8,6 @@ import type {
   Critical,
   DropResult,
   DragStart,
-  ClientPositions,
   DimensionMap,
   DraggableDimension,
   DroppableDimension,
@@ -29,23 +29,18 @@ export const critical: Critical = {
   droppable: preset.home.descriptor,
 };
 
-const client: ClientPositions = {
-  selection: preset.inHome1.client.borderBox.center,
-  borderBoxCenter: preset.inHome1.client.borderBox.center,
-  offset: { x: 0, y: 0 },
-};
+const clientSelection: Position = preset.inHome1.client.borderBox.center;
 
 export const liftArgs: LiftArgs = {
   id: critical.draggable.id,
-  client,
-  viewport: preset.viewport,
+  clientSelection,
   movementMode: 'FLUID',
 };
 
 export const initialPublishArgs: InitialPublishArgs = {
   critical,
   dimensions: preset.dimensions,
-  client,
+  clientSelection,
   viewport: preset.viewport,
   movementMode: 'FLUID',
 };
@@ -99,7 +94,7 @@ export const completeDropArgs: DropResult = {
 };
 
 export const animateDropArgs: PendingDrop = {
-  newHomeOffset: { x: 10, y: 10 },
+  newHomeClientOffset: { x: 10, y: 10 },
   impact: getHomeImpact(
     preset.dimensions.draggables[critical.draggable.id],
     preset.dimensions.droppables[critical.droppable.id],

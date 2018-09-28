@@ -1,18 +1,14 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
-import { dropPending, completeDrop, animateDrop } from '../../action-creators';
+import { animateDrop, completeDrop, dropPending } from '../../action-creators';
 import noImpact from '../../no-impact';
-import whenCombining from '../../get-new-home-client-border-box-center/when-combining';
-import whenReordering from '../../get-new-home-client-border-box-center/when-reordering';
-import { add, subtract, isEqual, origin } from '../../position';
-import withDroppableDisplacement from '../../with-droppable-displacement';
+import { isEqual } from '../../position';
 import getDropDuration from './get-drop-duration';
+import getNewHomeClientOffset from './get-new-home-client-offset';
 import type {
   State,
   DropReason,
-  DroppableDimension,
-  Viewport,
   Critical,
   DraggableLocation,
   DragImpact,
@@ -23,12 +19,6 @@ import type {
   DraggableDimension,
 } from '../../../types';
 import type { MiddlewareStore, Dispatch, Action } from '../../store-types';
-
-const getScrollDisplacement = (
-  droppable: DroppableDimension,
-  viewport: Viewport,
-): Position =>
-  withDroppableDisplacement(droppable, viewport.scroll.diff.displacement);
 
 export default ({ getState, dispatch }: MiddlewareStore) => (
   next: Dispatch,
@@ -71,15 +61,11 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
   const critical: Critical = state.critical;
   const dimensions: DimensionMap = state.dimensions;
   // Only keeping impact when doing a user drop - otherwise we are cancelling
+
   const impact: DragImpact = reason === 'DROP' ? state.impact : noImpact;
-  const home: DroppableDimension =
-    dimensions.droppables[state.critical.droppable.id];
   const draggable: DraggableDimension =
     dimensions.draggables[state.critical.draggable.id];
   const destination: ?DraggableLocation = impact ? impact.destination : null;
-  const droppable: ?DroppableDimension = destination
-    ? dimensions.droppables[destination.droppableId]
-    : null;
   const combine: ?Combine =
     impact && impact.merge ? impact.merge.combine : null;
 
@@ -90,7 +76,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
 
   const result: DropResult = {
     draggableId: draggable.descriptor.id,
-    type: home.descriptor.type,
+    type: draggable.descriptor.type,
     source,
     mode: state.movementMode,
     destination,
@@ -98,66 +84,39 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     reason,
   };
 
-  const clientOffset: Position = (() => {
-    // We are moving back to where we started
-    if (reason === 'CANCEL') {
-      return origin;
-    }
-
-    const newBorderBoxClientCenter: Position =
-      whenCombining({
-        impact,
-        draggables: dimensions.draggables,
-      }) ||
-      whenReordering({
-        impact,
-        draggable,
-        draggables: dimensions.draggables,
-        destination: droppable,
-      }) ||
-      draggable.client.borderBox.center;
-
-    // What would the offset be from our original center?
-    return subtract(
-      newBorderBoxClientCenter,
-      draggable.client.borderBox.center,
-    );
-  })();
-
-  const newHomeOffset: Position = add(
-    clientOffset,
-    // If cancelling: consider the home droppable
-    // If dropping over nothing: consider the home droppable
-    // If dropping over a droppable: consider the scroll of the droppable you are over
-    getScrollDisplacement(droppable || home, state.viewport),
-  );
+  const newHomeClientOffset: Position = getNewHomeClientOffset({
+    reason,
+    impact,
+    draggable,
+    dimensions,
+    viewport: state.viewport,
+  });
 
   // Do not animate if you do not need to.
   // This will be the case if either you are dragging with a
   // keyboard or if you manage to nail it with a mouse / touch.
   const isAnimationRequired = !isEqual(
     state.current.client.offset,
-    newHomeOffset,
+    newHomeClientOffset,
   );
+
+  if (!isAnimationRequired) {
+    dispatch(completeDrop(result));
+    return;
+  }
 
   const dropDuration: number = getDropDuration({
     current: state.current.client.offset,
-    destination: newHomeOffset,
+    destination: newHomeClientOffset,
     reason,
   });
 
   const pending: PendingDrop = {
-    newHomeOffset,
+    newHomeClientOffset,
     dropDuration,
     result,
     impact,
   };
 
-  if (isAnimationRequired) {
-    // will be completed by the drop-animation-finish middleware
-    dispatch(animateDrop(pending));
-    return;
-  }
-
-  dispatch(completeDrop(result));
+  dispatch(animateDrop(pending));
 };

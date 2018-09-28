@@ -143,7 +143,7 @@ export default (axis?: Axis = vertical) => {
     const home: DroppableDimension =
       preset.droppables[draggable.descriptor.droppableId];
     const pending: PendingDrop = {
-      newHomeOffset: { x: 10, y: 20 },
+      newHomeClientOffset: { x: 10, y: 20 },
       dropDuration: 1,
       impact: getHomeImpact(draggable, home),
       result: {

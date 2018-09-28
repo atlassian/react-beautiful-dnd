@@ -187,7 +187,7 @@ describe('drop animation required', () => {
       store.dispatch(drop({ reason: 'CANCEL' }));
 
       const pending: PendingDrop = {
-        newHomeOffset: origin,
+        newHomeClientOffset: origin,
         impact: noImpact,
         dropDuration: getDropDuration({
           current: shift,
@@ -243,7 +243,7 @@ describe('drop animation required', () => {
       store.dispatch(drop({ reason: 'CANCEL' }));
       const pending: PendingDrop = {
         // what we need to do to get back to the origin
-        newHomeOffset: negate(scroll),
+        newHomeClientOffset: negate(scroll),
         dropDuration: getDropDuration({
           current: scroll,
           destination: negate(scroll),
@@ -322,7 +322,7 @@ describe('drop animation required', () => {
       // Expecting return to origin as the scroll has not changed
       const action: DropAnimateAction = (mock.mock.calls[1][0]: any);
       expect(action.type).toEqual('DROP_ANIMATE');
-      expect(action.payload.newHomeOffset).toEqual({ x: 0, y: 0 });
+      expect(action.payload.newHomeClientOffset).toEqual({ x: 0, y: 0 });
       expect(mock).toHaveBeenCalledTimes(2);
     });
   });
@@ -376,7 +376,7 @@ describe('drop animation required', () => {
       store.dispatch(drop({ reason: 'DROP' }));
       const pending: PendingDrop = {
         // what we need to do to get back to the origin
-        newHomeOffset: negate(scroll),
+        newHomeClientOffset: negate(scroll),
         // $FlowFixMe - not a number ;)
         dropDuration: expect.any(Number),
         impact: {
@@ -447,7 +447,7 @@ describe('drop animation required', () => {
       store.dispatch(drop({ reason: 'DROP' }));
       const pending: PendingDrop = {
         // what we need to do to get back to the origin
-        newHomeOffset: { x: -1, y: -1 },
+        newHomeClientOffset: { x: -1, y: -1 },
         dropDuration: 1,
         impact: getHomeImpact(
           customArgs.dimensions.draggables[customArgs.critical.draggable.id],
@@ -487,7 +487,7 @@ describe('drop animation required', () => {
       expect(mock).toHaveBeenCalledWith(drop({ reason: 'DROP' }));
       const pending: PendingDrop = {
         // what we need to do to get back to the origin
-        newHomeOffset: { x: -1, y: -1 },
+        newHomeClientOffset: { x: -1, y: -1 },
         impact: {
           movement: {
             displaced: [],

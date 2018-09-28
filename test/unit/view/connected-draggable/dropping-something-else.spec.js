@@ -92,7 +92,7 @@ draggingStates.forEach((current: IsDraggingState) => {
 
         const base: DropAnimatingState = state.dropAnimating();
         const pending: PendingDrop = {
-          newHomeOffset: { x: 10, y: 20 },
+          newHomeClientOffset: { x: 10, y: 20 },
           // being super caucious
           impact: JSON.parse(JSON.stringify(impact)),
           result: base.pending.result,

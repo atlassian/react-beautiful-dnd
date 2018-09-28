@@ -72,7 +72,7 @@ it('should flush any animating drops', () => {
 
   // start a drop
   const pending: PendingDrop = {
-    newHomeOffset: { x: -1, y: -1 },
+    newHomeClientOffset: { x: -1, y: -1 },
     dropDuration: 1,
     impact: {
       movement: noMovement,

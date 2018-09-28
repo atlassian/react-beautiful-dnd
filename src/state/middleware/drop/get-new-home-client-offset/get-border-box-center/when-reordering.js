@@ -4,75 +4,63 @@ import type {
   Axis,
   DraggableDimension,
   DraggableDimensionMap,
-  DragImpact,
-  DraggableLocation,
+  DragMovement,
   DroppableDimension,
-} from '../../types';
-import { goBefore, goAfter, goIntoStart } from '../move-relative-to';
-import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import isHomeOf from '../droppable/is-home-of';
+} from '../../../../../types';
+import { goBefore, goAfter, goIntoStart } from '../../../../move-relative-to';
+import getDraggablesInsideDroppable from '../../../../get-draggables-inside-droppable';
+import isHomeOf from '../../../../droppable/is-home-of';
 
 type NewHomeArgs = {|
-  impact: DragImpact,
+  movement: DragMovement,
   draggable: DraggableDimension,
-  // all draggables in the system
   draggables: DraggableDimensionMap,
-  destination: ?DroppableDimension,
+  droppable: DroppableDimension,
 |};
 
 // Returns the client offset required to move an item from its
 // original client position to its final resting position
 export default ({
-  impact,
+  movement,
   draggable,
   draggables,
-  destination,
-}: NewHomeArgs): ?Position => {
-  // not dropping anywhere
-  if (destination == null) {
-    return null;
-  }
-  // dropping outside of any list
-  const location: ?DraggableLocation = impact.destination;
-  if (!location) {
-    return null;
-  }
-
+  droppable,
+}: NewHomeArgs): Position => {
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
-    destination,
+    droppable,
     draggables,
   );
 
   const draggableClient: BoxModel = draggable.client;
-  const axis: Axis = destination.axis;
+  const axis: Axis = droppable.axis;
 
   // this will only happen in a foreign list
   if (!insideDestination.length) {
     return goIntoStart({
       axis,
-      moveInto: destination.client,
+      moveInto: droppable.client,
       isMoving: draggableClient,
     });
   }
 
-  const { displaced, willDisplaceForward } = impact.movement;
+  const { displaced, willDisplaceForward, displacedBy } = movement;
 
-  const isOverHome: boolean = isHomeOf(draggable, destination);
+  const isOverHome: boolean = isHomeOf(draggable, droppable);
 
   // there can be no displaced if:
   // - you are in the home index or
   // - in the last position of a foreign droppable
-  const lastDisplaced: ?DraggableDimension = displaced.length
+  const closestDisplaced: ?DraggableDimension = displaced.length
     ? draggables[displaced[0].draggableId]
     : null;
 
   // dropping back into home index
-  if (isOverHome && !lastDisplaced) {
-    return null;
+  if (isOverHome && !closestDisplaced) {
+    return draggable.client.borderBox.center;
   }
 
   // this can happen when moving into the last spot of a foreign list
-  if (!lastDisplaced) {
+  if (!closestDisplaced) {
     const moveRelativeTo: DraggableDimension =
       insideDestination[insideDestination.length - 1];
     return goAfter({
@@ -82,21 +70,22 @@ export default ({
     });
   }
 
-  const displacedBy: Position = impact.movement.displacedBy.point;
-  const displacedClient: BoxModel = offset(lastDisplaced.client, displacedBy);
-  const shouldDropInFrontOfDisplaced: boolean = !willDisplaceForward;
+  const displacedClient: BoxModel = offset(
+    closestDisplaced.client,
+    displacedBy.point,
+  );
 
-  // going in front of displaced item
-  if (shouldDropInFrontOfDisplaced) {
-    return goAfter({
+  // go before and item that is displaced forward
+  if (willDisplaceForward) {
+    return goBefore({
       axis,
       moveRelativeTo: displacedClient,
       isMoving: draggableClient,
     });
   }
 
-  // going behind displaced item
-  return goBefore({
+  // go after an item that is displaced backwards
+  return goAfter({
     axis,
     moveRelativeTo: displacedClient,
     isMoving: draggableClient,
