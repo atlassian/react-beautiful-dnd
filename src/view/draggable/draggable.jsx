@@ -4,23 +4,19 @@ import { type Position, type BoxModel } from 'css-box-model';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
-import { origin } from '../../state/position';
 import { transitions, transforms, combine } from '../animation';
 import type {
   DraggableDimension,
-  ClientPositions,
   DroppableId,
   MovementMode,
   TypeId,
 } from '../../types';
 import DraggableDimensionPublisher from '../draggable-dimension-publisher';
 import DragHandle from '../drag-handle';
-import getViewport from '../window/get-viewport';
 import type {
   DragHandleProps,
   Callbacks as DragHandleCallbacks,
 } from '../drag-handle/drag-handle-types';
-import getBorderBoxCenterPosition from '../get-border-box-center-position';
 import Placeholder from '../placeholder';
 import {
   droppableIdKey,
@@ -146,17 +142,10 @@ export default class Draggable extends Component<Props> {
     const { clientSelection, movementMode } = options;
     const { lift, draggableId } = this.props;
 
-    const client: ClientPositions = {
-      selection: clientSelection,
-      borderBoxCenter: getBorderBoxCenterPosition(ref),
-      offset: origin,
-    };
-
     lift({
       id: draggableId,
-      client,
+      clientSelection,
       movementMode,
-      viewport: getViewport(),
     });
     timings.finish('LIFT');
   };

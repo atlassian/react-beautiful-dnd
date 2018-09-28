@@ -7,7 +7,7 @@ import publish from './publish';
 import moveInDirection, {
   type Result as MoveInDirectionResult,
 } from './move-in-direction';
-import { add, isEqual } from './position';
+import { add, isEqual, origin } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
 import isMovementAllowed from './is-movement-allowed';
@@ -16,11 +16,13 @@ import { toDroppableList } from './dimension-structures';
 import { forward } from './user-direction/user-direction-preset';
 import type {
   State,
+  DraggableDimension,
   DroppableDimension,
   PendingDrop,
   IdleState,
   DraggingState,
   DragPositions,
+  ClientPositions,
   CollectingState,
   DropAnimatingState,
   DropPendingState,
@@ -60,11 +62,22 @@ export default (state: State = idle, action: Action): State => {
     );
     const {
       critical,
-      client,
+      clientSelection,
       viewport,
       dimensions,
       movementMode,
     } = action.payload;
+
+    const draggable: DraggableDimension =
+      dimensions.draggables[critical.draggable.id];
+    const home: DroppableDimension =
+      dimensions.droppables[critical.droppable.id];
+
+    const client: ClientPositions = {
+      selection: clientSelection,
+      borderBoxCenter: draggable.client.borderBox.center,
+      offset: origin,
+    };
 
     const initial: DragPositions = {
       client,
@@ -77,7 +90,7 @@ export default (state: State = idle, action: Action): State => {
     // Can only auto scroll the window if every list is not fixed on the page
     const isWindowScrollAllowed: boolean = toDroppableList(
       dimensions.droppables,
-    ).every((droppable: DroppableDimension) => !droppable.isFixedOnPage);
+    ).every((item: DroppableDimension) => !item.isFixedOnPage);
 
     const result: DraggingState = {
       phase: 'DRAGGING',
@@ -88,10 +101,7 @@ export default (state: State = idle, action: Action): State => {
       initial,
       current: initial,
       isWindowScrollAllowed,
-      impact: getHomeImpact(
-        dimensions.draggables[critical.draggable.id],
-        dimensions.droppables[critical.droppable.id],
-      ),
+      impact: getHomeImpact(draggable, home),
       viewport,
       userDirection: forward,
       scrollJumpRequest: null,

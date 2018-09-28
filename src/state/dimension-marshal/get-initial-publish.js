@@ -16,23 +16,25 @@ import type {
   DimensionMap,
   ScrollOptions,
   Critical,
+  Viewport,
 } from '../../types';
+import getViewport from '../../view/window/get-viewport';
 
 type Args = {|
   critical: Critical,
   scrollOptions: ScrollOptions,
-  windowScroll: Position,
   entries: Entries,
 |};
 
 export default ({
   critical,
   scrollOptions,
-  windowScroll,
   entries,
 }: Args): StartPublishingResult => {
   const timingKey: string = 'Initial collection from DOM';
   timings.start(timingKey);
+  const viewport: Viewport = getViewport();
+  const windowScroll: Position = viewport.scroll.current;
 
   const home: DroppableDescriptor = critical.droppable;
 
@@ -66,6 +68,7 @@ export default ({
   const result: StartPublishingResult = {
     dimensions,
     critical,
+    viewport,
   };
 
   return result;

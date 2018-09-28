@@ -286,10 +286,7 @@ export default (callbacks: Callbacks) => {
     collection = null;
   };
 
-  const startPublishing = (
-    request: LiftRequest,
-    windowScroll: Position,
-  ): StartPublishingResult => {
+  const startPublishing = (request: LiftRequest): StartPublishingResult => {
     invariant(
       !collection,
       'Cannot start capturing critical dimensions as there is already a collection',
@@ -311,7 +308,6 @@ export default (callbacks: Callbacks) => {
 
     return getInitialPublish({
       critical,
-      windowScroll,
       entries,
       scrollOptions: request.scrollOptions,
     });

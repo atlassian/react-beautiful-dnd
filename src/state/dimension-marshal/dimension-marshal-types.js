@@ -65,6 +65,7 @@ export type Entries = {|
 export type StartPublishingResult = {|
   critical: Critical,
   dimensions: DimensionMap,
+  viewport: Viewport,
 |};
 
 export type DimensionMarshal = {|
@@ -100,10 +101,7 @@ export type DimensionMarshal = {|
   scrollDroppable: (id: DroppableId, change: Position) => void,
   unregisterDroppable: (descriptor: DroppableDescriptor) => void,
   // Entry
-  startPublishing: (
-    request: LiftRequest,
-    windowScroll: Position,
-  ) => StartPublishingResult,
+  startPublishing: (request: LiftRequest) => StartPublishingResult,
   stopPublishing: () => void,
 |};
 

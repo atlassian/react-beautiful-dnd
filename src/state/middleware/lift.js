@@ -15,7 +15,7 @@ export default (getMarshal: () => DimensionMarshal) => ({
   }
 
   const marshal: DimensionMarshal = getMarshal();
-  const { id, client, movementMode, viewport } = action.payload;
+  const { id, clientSelection, movementMode } = action.payload;
   const initial: State = getState();
 
   // flush dropping animation if needed
@@ -36,17 +36,14 @@ export default (getMarshal: () => DimensionMarshal) => ({
     scrollOptions,
   };
   // Let's get the marshal started!
-  const { critical, dimensions } = marshal.startPublishing(
-    request,
-    viewport.scroll.current,
-  );
+  const { critical, dimensions, viewport } = marshal.startPublishing(request);
 
   // Okay, we are good to start dragging now
   dispatch(
     initialPublish({
       critical,
       dimensions,
-      client,
+      clientSelection,
       movementMode,
       viewport,
     }),
