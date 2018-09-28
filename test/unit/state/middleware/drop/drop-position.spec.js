@@ -1,59 +1,156 @@
 // @flow
-import { type Position } from 'css-box-model';
-import whenReordering from '../../../../../src/state/get-new-home-client-border-box-center/when-reordering';
-import noImpact from '../../../../../src/state/no-impact';
-import { patch } from '../../../../../src/state/position';
+import { offset, type Position, type BoxModel } from 'css-box-model';
 import { vertical, horizontal } from '../../../../../src/state/axis';
 import { getPreset } from '../../../../utils/dimension';
-import type { Axis, DragMovement } from '../../../../../src/types';
+import type {
+  Axis,
+  DisplacedBy,
+  Displacement,
+  DragImpact,
+  DraggableDimension,
+} from '../../../../../src/types';
+import getOffsetFromStart from '../../../../../src/state/middleware/drop/get-new-home-client-offset';
+import noImpact from '../../../../../src/state/no-impact';
 import getHomeImpact from '../../../../../src/state/get-home-impact';
+import { origin, subtract } from '../../../../../src/state/position';
+import getDisplacedBy from '../../../../../src/state/get-displaced-by';
+import getDisplacementMap from '../../../../../src/state/get-displacement-map';
+import { goAfter, goBefore } from '../../../../../src/state/move-relative-to';
+
+const getDisplacement = (draggable: DraggableDimension): Displacement => ({
+  isVisible: true,
+  shouldAnimate: true,
+  draggableId: draggable.descriptor.id,
+});
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`dropping on ${axis.direction} list`, () => {
-    const {
-      home,
-      inHome1,
-      inHome2,
-      inHome3,
-      foreign,
-      inForeign1,
-      inForeign2,
-      inForeign3,
-      inForeign4,
-      emptyForeign,
-      draggables,
-    } = getPreset(axis);
-
-    const inHome1Size: Position = patch(
-      axis.line,
-      inHome1.page.borderBox[axis.size],
-    );
+    const preset = getPreset(axis);
 
     it('should return home position when not over anything', () => {
-      const result: ?Position = whenReordering({
+      const result: Position = getOffsetFromStart({
+        reason: 'DROP',
         impact: noImpact,
-        draggable: inHome1,
-        draggables,
-        destination: null,
+        draggable: preset.inHome1,
+        dimensions: preset.dimensions,
+        viewport: preset.viewport,
       });
 
-      expect(result).toEqual(null);
+      expect(result).toEqual(origin);
     });
 
     it('should return home position over home location', () => {
-      const newCenter: ?Position = whenReordering({
-        impact: getHomeImpact(inHome1, home),
-        draggables,
-        draggable: inHome1,
-        destination: home,
+      const result: Position = getOffsetFromStart({
+        reason: 'DROP',
+        impact: getHomeImpact(preset.inHome1, preset.home),
+        draggable: preset.inHome1,
+        dimensions: preset.dimensions,
+        viewport: preset.viewport,
       });
 
-      expect(newCenter).toEqual(null);
+      expect(result).toEqual(origin);
     });
 
-    it('should drop in front of the closest backwards displaced item', () => {});
+    it('should drop in front of the closest backwards displaced item', () => {
+      // inHome1 moving forward past inHome2 and inHome3
+      const willDisplaceForward: boolean = false;
+      // ordered by closest impacted
+      const displaced: Displacement[] = [
+        getDisplacement(preset.inHome3),
+        getDisplacement(preset.inHome2),
+      ];
+      const displacedBy: DisplacedBy = getDisplacedBy(
+        axis,
+        preset.inHome1.displaceBy,
+        willDisplaceForward,
+      );
+      const impact: DragImpact = {
+        movement: {
+          displaced,
+          map: getDisplacementMap(displaced),
+          willDisplaceForward,
+          displacedBy,
+        },
+        direction: axis.direction,
+        destination: {
+          index: preset.inHome3.descriptor.index,
+          droppableId: preset.home.descriptor.id,
+        },
+        merge: null,
+      };
 
-    it('should drop in behind of the closest forwards displaced item', () => {});
+      const result: Position = getOffsetFromStart({
+        reason: 'DROP',
+        impact,
+        draggable: preset.inHome1,
+        dimensions: preset.dimensions,
+        viewport: preset.viewport,
+      });
+
+      const displacedInHome3: BoxModel = offset(
+        preset.inHome3.client,
+        displacedBy.point,
+      );
+      const expectedCenter: Position = goAfter({
+        axis,
+        moveRelativeTo: displacedInHome3,
+        isMoving: preset.inHome1.client,
+      });
+      const original: Position = preset.inHome1.client.borderBox.center;
+      const expectedOffset: Position = subtract(expectedCenter, original);
+      expect(result).toEqual(expectedOffset);
+    });
+
+    it('should drop in behind of the closest forwards displaced item', () => {
+      // inHome3 moving backward past inHome1 and inHome2
+      const willDisplaceForward: boolean = true;
+      // ordered by closest impacted
+      const displaced: Displacement[] = [
+        getDisplacement(preset.inHome1),
+        getDisplacement(preset.inHome2),
+      ];
+      const displacedBy: DisplacedBy = getDisplacedBy(
+        axis,
+        preset.inHome3.displaceBy,
+        willDisplaceForward,
+      );
+      const impact: DragImpact = {
+        movement: {
+          displaced,
+          map: getDisplacementMap(displaced),
+          willDisplaceForward,
+          displacedBy,
+        },
+        direction: axis.direction,
+        // moving into the first position
+        destination: {
+          index: 0,
+          droppableId: preset.home.descriptor.id,
+        },
+        merge: null,
+      };
+
+      const result: Position = getOffsetFromStart({
+        reason: 'DROP',
+        impact,
+        draggable: preset.inHome3,
+        dimensions: preset.dimensions,
+        viewport: preset.viewport,
+      });
+
+      const displacedInHome1: BoxModel = offset(
+        preset.inHome1.client,
+        displacedBy.point,
+      );
+      const expectedCenter: Position = goBefore({
+        axis,
+        moveRelativeTo: displacedInHome1,
+        isMoving: preset.inHome3.client,
+      });
+      const original: Position = preset.inHome3.client.borderBox.center;
+      const expectedOffset: Position = subtract(expectedCenter, original);
+      expect(result).toEqual(expectedOffset);
+    });
 
     it('should drop after the last item in a list if nothing is displaced', () => {});
 
@@ -61,197 +158,12 @@ import getHomeImpact from '../../../../../src/state/get-home-impact';
 
     it('should drop into the center of a displaced combined item', () => {});
 
-    describe('dropping in home list', () => {
-      describe('is moving forward (is always beyond start position)', () => {
-        // moving the first item forward past the third item
-        it('should move after the closest impacted draggable', () => {
-          const targetCenter: Position = moveToEdge({
-            source: inHome1.client.borderBox,
-            sourceEdge: 'end',
-            destination: inHome3.client.borderBox,
-            destinationEdge: 'end',
-            destinationAxis: axis,
-          });
-          // the movement from the last drag
-          const movement: DragMovement = {
-            // ordered by closest to impacted
-            displaced: [
-              {
-                draggableId: inHome3.descriptor.id,
-                isVisible: true,
-                shouldAnimate: true,
-              },
-              {
-                draggableId: inHome2.descriptor.id,
-                isVisible: true,
-                shouldAnimate: true,
-              },
-            ],
-            amount: inHome1Size,
-            isInFrontOfStart: true,
-          };
+    it('should account for the scroll of the droppable you are over when reordering', () => {});
 
-          const newCenter = whenReordering({
-            movement,
-            draggables,
-            draggable: inHome1,
-            destination: home,
-          });
+    it('should account for the scroll of the droppable you are over when combining', () => {});
 
-          expect(newCenter).toEqual(targetCenter);
-        });
-      });
+    it('should account for the scroll of your home list if you are not over any list', () => {});
 
-      describe('is moving backward (is always not beyond start position)', () => {
-        // moving inHome3 back past inHome1
-        it('should move before the closest impacted draggable', () => {
-          const targetCenter: Position = moveToEdge({
-            source: inHome3.client.borderBox,
-            sourceEdge: 'start',
-            destination: inHome1.client.borderBox,
-            destinationEdge: 'start',
-            destinationAxis: axis,
-          });
-          // the movement from the last drag
-          const movement: DragMovement = {
-            // ordered by closest to impacted
-            displaced: [
-              {
-                draggableId: inHome1.descriptor.id,
-                isVisible: true,
-                shouldAnimate: true,
-              },
-              {
-                draggableId: inHome2.descriptor.id,
-                isVisible: true,
-                shouldAnimate: true,
-              },
-            ],
-            amount: inHome1Size,
-            // is not beyond start position - going backwards
-            isInFrontOfStart: false,
-          };
-
-          const newCenter = whenReordering({
-            movement,
-            draggables,
-            draggable: inHome3,
-            destination: home,
-          });
-
-          expect(newCenter).toEqual(targetCenter);
-        });
-      });
-    });
-
-    describe('dropping in foreign list', () => {
-      describe('is moving into a populated list', () => {
-        it('should move above the target', () => {
-          const targetCenter: Position = moveToEdge({
-            source: inHome1.client.borderBox,
-            sourceEdge: 'start',
-            destination: inForeign1.client.borderBox,
-            destinationEdge: 'start',
-            destinationAxis: axis,
-          });
-          // the movement from the last drag
-          const movement: DragMovement = {
-            // ordered by closest to impacted
-            displaced: [
-              {
-                draggableId: inForeign1.descriptor.id,
-                isVisible: true,
-                shouldAnimate: true,
-              },
-              {
-                draggableId: inForeign2.descriptor.id,
-                isVisible: true,
-                shouldAnimate: true,
-              },
-              {
-                draggableId: inForeign3.descriptor.id,
-                isVisible: true,
-                shouldAnimate: true,
-              },
-              {
-                draggableId: inForeign4.descriptor.id,
-                isVisible: true,
-                shouldAnimate: true,
-              },
-            ],
-            amount: inHome1Size,
-            // not relevant when moving into new list
-            isInFrontOfStart: false,
-          };
-
-          const newCenter = whenReordering({
-            movement,
-            draggables,
-            draggable: inHome1,
-            destination: foreign,
-          });
-
-          expect(newCenter).toEqual(targetCenter);
-        });
-      });
-
-      describe('is moving to end of a list', () => {
-        it('should draggable below the last item in the list', () => {
-          const targetCenter: Position = moveToEdge({
-            source: inHome1.client.borderBox,
-            sourceEdge: 'start',
-            // will target the last in the foreign droppable
-            destination: inForeign4.client.marginBox,
-            destinationEdge: 'end',
-            destinationAxis: axis,
-          });
-          // the movement from the last drag
-          const movement: DragMovement = {
-            // nothing has moved (going to end of list)
-            displaced: [],
-            amount: inHome1Size,
-            // not relevant when moving into new list
-            isInFrontOfStart: false,
-          };
-
-          const newCenter = whenReordering({
-            movement,
-            draggables,
-            draggable: inHome1,
-            destination: foreign,
-          });
-
-          expect(newCenter).toEqual(targetCenter);
-        });
-      });
-
-      describe('is moving to empty list', () => {
-        it('should move to the start of the list', () => {
-          const targetCenter: Position = moveToEdge({
-            source: inHome1.client.borderBox,
-            sourceEdge: 'start',
-            destination: emptyForeign.client.contentBox,
-            destinationEdge: 'start',
-            destinationAxis: axis,
-          });
-          // the movement from the last drag
-          const movement: DragMovement = {
-            displaced: [],
-            amount: inHome1Size,
-            // not relevant when moving into new list
-            isInFrontOfStart: false,
-          };
-
-          const newCenter = whenReordering({
-            movement,
-            draggables,
-            draggable: inHome1,
-            destination: emptyForeign,
-          });
-
-          expect(newCenter).toEqual(targetCenter);
-        });
-      });
-    });
+    it('should account for any changes in the window scroll', () => {});
   });
 });

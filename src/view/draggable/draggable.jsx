@@ -31,7 +31,7 @@ import type {
   DraggingStyle,
   NotDraggingStyle,
   ZIndexOptions,
-  DroppingState,
+  DropAnimation,
   SecondaryMapProps,
   DraggingMapProps,
   ChildrenFn,
@@ -47,7 +47,7 @@ export const zIndexOptions: ZIndexOptions = {
 
 const getDraggingTransition = (
   shouldAnimateDragMovement: boolean,
-  dropping: ?DroppingState,
+  dropping: ?DropAnimation,
 ): string => {
   if (dropping) {
     return transitions.drop(dropping.duration);
