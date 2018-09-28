@@ -81,8 +81,9 @@ afterEach(() => {
 
 const whenIdle: DraggableStateSnapshot = {
   draggingOver: null,
+  dropAnimation: null,
+  isDropAnimating: false,
   isDragging: false,
-  dropping: null,
   combineWith: null,
   combineTargetFor: null,
   mode: null,

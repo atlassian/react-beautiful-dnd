@@ -82,7 +82,6 @@ export default (getHooks: () => Hooks, announce: Announce) => {
       !dragging,
       'Cannot fire onBeforeDragStart as a drag start has already been published',
     );
-    console.log('onDragBeforeStart: fire');
     withTimings('onBeforeDragStart', () => {
       // No use of screen reader for this hook
       const fn: ?OnBeforeDragStartHook = getHooks().onBeforeDragStart;
@@ -107,7 +106,6 @@ export default (getHooks: () => Hooks, announce: Announce) => {
 
     // we will flush this frame if we receive any hook updates
     asyncMarshal.add(() => {
-      console.log('onDragStart: fire');
       withTimings('onDragStart', () =>
         execute(
           getHooks().onDragStart,
@@ -165,7 +163,6 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     };
 
     asyncMarshal.add(() => {
-      console.log('onDragUpdate: fire');
       withTimings('onDragUpdate', () =>
         execute(
           getHooks().onDragUpdate,
@@ -187,7 +184,6 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     asyncMarshal.flush();
     // not adding to frame marshal - we want this to be done in the same render pass
     // we also want the consumers reorder logic to be in the same render pass
-    console.log('onDragEnd: fire');
     withTimings('onDragEnd', () =>
       execute(getHooks().onDragEnd, result, announce, messagePreset.onDragEnd),
     );

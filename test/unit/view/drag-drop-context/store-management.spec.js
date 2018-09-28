@@ -86,7 +86,7 @@ describe('Playing with other redux apps', () => {
                     ref={droppableProvided.innerRef}
                     {...droppableProvided.droppableProps}
                   >
-                    <Draggable draggableId="draggableId">
+                    <Draggable draggableId="draggableId" index={0}>
                       {(draggableProvided: DraggableProvided) => (
                         <div
                           ref={draggableProvided.innerRef}
@@ -122,7 +122,7 @@ describe('Playing with other redux apps', () => {
                   ref={droppableProvided.innerRef}
                   {...droppableProvided.droppableProps}
                 >
-                  <Draggable draggableId="draggableId">
+                  <Draggable draggableId="draggableId" index={0}>
                     {(draggableProvided: DraggableProvided) => (
                       <div
                         ref={draggableProvided.innerRef}

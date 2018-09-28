@@ -291,8 +291,6 @@ export default class Draggable extends Component<Props> {
     const secondary: ?SecondaryMapProps = this.props.secondary;
     const children: ChildrenFn = this.props.children;
 
-    console.log('rendering draggable', this.props.draggableId);
-
     if (dragging) {
       const child: ?Node = children(
         this.getDraggingProvided(dragging, dragHandleProps),

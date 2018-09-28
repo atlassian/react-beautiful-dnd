@@ -77,11 +77,10 @@ export type Provided = {|
   innerRef: (?HTMLElement) => void,
 |};
 
+// to easily enable patching of styles
 export type DropAnimation = {|
-  // to easily enable patching of styles
   duration: number,
   curve: string,
-  // TODO: are these needed?
   moveTo: Position,
   opacity: ?number,
   scale: ?number,

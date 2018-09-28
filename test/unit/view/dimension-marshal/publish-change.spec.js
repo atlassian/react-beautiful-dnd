@@ -10,6 +10,7 @@ import type {
   DroppableDimension,
   DimensionMap,
   Published,
+  Viewport,
 } from '../../../../src/types';
 import { critical, preset } from '../../../utils/preset-action-args';
 import {
@@ -19,6 +20,10 @@ import {
 } from '../../../utils/dimension-marshal';
 import { defaultRequest, withExpectedAdvancedUsageWarning } from './util';
 import { makeScrollable } from '../../../utils/dimension';
+import { setViewport } from '../../../utils/viewport';
+
+const viewport: Viewport = preset.viewport;
+setViewport(viewport);
 
 const empty: Published = {
   removals: [],
@@ -98,7 +103,7 @@ describe('additions', () => {
     populateMarshal(marshal, withScrollables);
 
     // A publish has started
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    marshal.startPublishing(defaultRequest);
     expect(callbacks.publish).not.toHaveBeenCalled();
 
     // Registering a new draggable (inserted before inHome1)
@@ -124,7 +129,7 @@ describe('additions', () => {
     populateMarshal(marshal, withScrollables);
 
     // A publish has started
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    marshal.startPublishing(defaultRequest);
     expect(callbacks.publish).not.toHaveBeenCalled();
 
     const register = () =>
@@ -142,7 +147,7 @@ describe('additions', () => {
     populateMarshal(marshal, withScrollables);
 
     // A publish has started
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    marshal.startPublishing(defaultRequest);
     expect(callbacks.publish).not.toHaveBeenCalled();
 
     // Registering a new draggable (inserted before inHome1)
@@ -162,7 +167,7 @@ describe('removals', () => {
     populateMarshal(marshal, withScrollables);
 
     // A publish has started
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    marshal.startPublishing(defaultRequest);
     expect(callbacks.publish).not.toHaveBeenCalled();
 
     withExpectedAdvancedUsageWarning(() => {
@@ -202,7 +207,7 @@ describe('removals', () => {
     populateMarshal(marshal, dimensions);
 
     // A publish has started
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    marshal.startPublishing(defaultRequest);
 
     const unregister = () =>
       marshal.unregisterDraggable(inAnotherType.descriptor);
@@ -217,7 +222,7 @@ describe('removals', () => {
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
     populateMarshal(marshal, withScrollables);
 
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    marshal.startPublishing(defaultRequest);
 
     expect(() => marshal.unregisterDraggable(critical.draggable)).toThrow(
       'Cannot remove the dragging item during a drag',
@@ -237,11 +242,11 @@ describe('cancelling mid publish', () => {
 
     const result: StartPublishingResult = marshal.startPublishing(
       defaultRequest,
-      preset.windowScroll,
     );
     expect(result).toEqual({
       critical,
       dimensions: justCritical,
+      viewport,
     });
 
     withExpectedAdvancedUsageWarning(() => {
@@ -268,7 +273,7 @@ describe('subsequent', () => {
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
     populateMarshal(marshal, justCritical);
 
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    marshal.startPublishing(defaultRequest);
 
     withExpectedAdvancedUsageWarning(() => {
       marshal.registerDraggable(
@@ -290,7 +295,7 @@ describe('subsequent', () => {
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
     populateMarshal(marshal, justCritical);
 
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    marshal.startPublishing(defaultRequest);
 
     withExpectedAdvancedUsageWarning(() => {
       marshal.registerDraggable(
@@ -305,7 +310,7 @@ describe('subsequent', () => {
     marshal.stopPublishing();
 
     // second drag
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    marshal.startPublishing(defaultRequest);
 
     marshal.registerDraggable(preset.inHome3.descriptor, () => preset.inHome3);
     requestAnimationFrame.step();
@@ -321,7 +326,7 @@ describe('advanced usage warning', () => {
     const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
     populateMarshal(marshal, justCritical);
 
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    marshal.startPublishing(defaultRequest);
     expect(console.warn).not.toHaveBeenCalled();
 
     marshal.registerDraggable(preset.inHome1.descriptor, () => preset.inHome1);

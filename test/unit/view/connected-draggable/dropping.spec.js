@@ -39,7 +39,6 @@ describe('dropping', () => {
         mode: current.pending.result.mode,
         combineWith: null,
         dropping: {
-          reason: 'DROP',
           duration: current.pending.dropDuration,
           curve: curves.drop,
           moveTo: current.pending.newHomeOffset,
@@ -105,7 +104,6 @@ describe('dropping', () => {
         mode: withCombine.pending.result.mode,
         combineWith: preset.inHome2.descriptor.id,
         dropping: {
-          reason: 'DROP',
           duration: withCombine.pending.dropDuration,
           curve: curves.drop,
           moveTo: withCombine.pending.newHomeOffset,
