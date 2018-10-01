@@ -17,6 +17,7 @@ import type {
   DimensionMap,
   LiftRequest,
   Published,
+  Viewport,
 } from '../../types';
 
 export type GetDraggableDimensionFn = (

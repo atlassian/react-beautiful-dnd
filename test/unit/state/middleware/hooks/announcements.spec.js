@@ -130,7 +130,6 @@ cases.forEach((current: Case) => {
     });
 
     it('should prevent async announcements', () => {
-      jest.useFakeTimers();
       jest.spyOn(console, 'warn').mockImplementation(() => {});
 
       let provided: HookProvided;
@@ -156,7 +155,6 @@ cases.forEach((current: Case) => {
       expect(console.warn).toHaveBeenCalled();
 
       // cleanup
-      jest.useRealTimers();
       console.warn.mockRestore();
     });
 

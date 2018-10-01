@@ -33,7 +33,7 @@ it('should fire a complete drop action when a drop animation finish action is fi
   // A small movement so a drop animation will be needed
   store.dispatch(
     move({
-      client: add(initialPublishArgs.client.selection, { x: 1, y: 1 }),
+      client: add(initialPublishArgs.clientSelection, { x: 1, y: 1 }),
     }),
   );
   store.dispatch(drop({ reason: 'DROP' }));

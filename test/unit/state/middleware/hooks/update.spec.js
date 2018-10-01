@@ -64,7 +64,7 @@ it('should not call onDragUpdate if there is no movement from the last update', 
   // A movement to the same index is not causing an update
   const moveArgs: MoveArgs = {
     // tiny change
-    client: add(initialPublishArgs.client.selection, { x: 1, y: 1 }),
+    client: add(initialPublishArgs.clientSelection, { x: 1, y: 1 }),
   };
   store.dispatch(move(moveArgs));
 

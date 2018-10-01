@@ -35,7 +35,7 @@ const getStyle = (
   style: ?DraggableStyle,
   snapshot: DraggableStateSnapshot,
 ): ?Object => {
-  if (!snapshot.dropping) {
+  if (!snapshot.isDropAnimating) {
     return style;
   }
   return {

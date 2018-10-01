@@ -11,7 +11,7 @@ import {
   type DraggableProvided,
   type DraggableStateSnapshot,
   type DraggableStyle,
-  type DraggableDroppingState,
+  type DropAnimation,
   type DropResult,
 } from '../../../src';
 
@@ -36,7 +36,7 @@ const getStyle = (
   style: ?DraggableStyle,
   snapshot: DraggableStateSnapshot,
 ): ?Object => {
-  const dropping: ?DraggableDroppingState = snapshot.dropping;
+  const dropping: ?DropAnimation = snapshot.dropAnimation;
   if (!dropping) {
     return style;
   }
@@ -61,7 +61,7 @@ class TaskItem extends React.Component<TaskItemProps> {
             innerRef={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
-            isDragging={snapshot.isDragging && !snapshot.dropping}
+            isDragging={snapshot.isDragging && !snapshot.isDropAnimating}
             style={getStyle(provided.draggableProps.style, snapshot)}
           >
             {task.content}

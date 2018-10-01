@@ -67,11 +67,7 @@ it('should call onDragUpdate if the source has changed - even if the destination
         [preset.home.descriptor.id]: scrollableHome,
       },
     },
-    client: {
-      selection: preset.inHome2.client.borderBox.center,
-      borderBoxCenter: preset.inHome2.client.borderBox.center,
-      offset: { x: 0, y: 0 },
-    },
+    clientSelection: preset.inHome2.client.borderBox.center,
     viewport: preset.viewport,
     movementMode: 'FLUID',
   };
