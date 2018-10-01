@@ -88,6 +88,7 @@
     "eslint-plugin-prettier": "^2.6.2",
     "eslint-plugin-react": "^7.11.1",
     "flow-bin": "0.81.0",
+    "globby": "^8.0.1",
     "jest": "^23.6.0",
     "jest-junit": "^5.1.0",
     "jest-watch-typeahead": "^0.2.0",
