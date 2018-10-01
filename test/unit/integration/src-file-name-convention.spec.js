@@ -9,8 +9,9 @@ it('should have every source file following the file name convention', async () 
   console.log('running');
   const src = await globby('src/**/*');
   const website = await globby('website/src/**/*');
-  const examples = await invariant(src.length, 'Could not find source files');
-  invariant(website.length, 'Could not find website source files');
+
+  invariant(src.length, 'Could not find /src files');
+  invariant(website.length, 'Could not find /website/src files');
 
   [...src, ...website].forEach((filePath: string) => {
     const isMatching: boolean = isSnakeCase(filePath);
