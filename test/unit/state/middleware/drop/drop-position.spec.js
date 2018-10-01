@@ -20,7 +20,10 @@ import {
   goBefore,
   goIntoStart,
 } from '../../../../../src/state/move-relative-to';
-import { forward } from '../../../../../src/state/user-direction/user-direction-preset';
+import {
+  forward,
+  backward,
+} from '../../../../../src/state/user-direction/user-direction-preset';
 
 const getDisplacement = (draggable: DraggableDimension): Displacement => ({
   isVisible: true,
@@ -282,7 +285,7 @@ const getDisplacement = (draggable: DraggableDimension): Displacement => ({
       expect(result).toEqual(expectedOffset);
     });
 
-    it('should drop into the center of a displaced combined item', () => {
+    it('should drop into the center of a forward displaced combined item', () => {
       // inHome1 combining with displaced inForeign1
       // displacing forward in foreign list
       const willDisplaceForward: boolean = true;
@@ -325,6 +328,54 @@ const getDisplacement = (draggable: DraggableDimension): Displacement => ({
       );
       const expectedCenter: Position = displacedInForeign1.borderBox.center;
       const original: Position = preset.inHome1.client.borderBox.center;
+      const expectedOffset: Position = subtract(expectedCenter, original);
+      expect(result).toEqual(expectedOffset);
+    });
+
+    it('should drop into the center of a backwards displaced combined item', () => {
+      // inHome2 combining with displaced inHome3
+      // Would have dragged forwards and now dragging backwards
+      // displacing backwards in home list
+      const willDisplaceForward: boolean = false;
+      const displacedBy: DisplacedBy = getDisplacedBy(
+        axis,
+        preset.inHome2.displaceBy,
+        willDisplaceForward,
+      );
+      // displaced inForeign1 forward
+      const displaced: Displacement[] = [getDisplacement(preset.inHome3)];
+      const impact: DragImpact = {
+        movement: {
+          displaced,
+          map: getDisplacementMap(displaced),
+          willDisplaceForward,
+          displacedBy,
+        },
+        direction: axis.direction,
+        destination: null,
+        merge: {
+          whenEntered: backward,
+          combine: {
+            draggableId: preset.inHome3.descriptor.id,
+            droppableId: preset.home.descriptor.id,
+          },
+        },
+      };
+
+      const result: Position = getOffsetFromStart({
+        reason: 'DROP',
+        impact,
+        draggable: preset.inHome2,
+        dimensions: preset.dimensions,
+        viewport: preset.viewport,
+      });
+
+      const displacedInHome3: BoxModel = offset(
+        preset.inHome3.client,
+        displacedBy.point,
+      );
+      const expectedCenter: Position = displacedInHome3.borderBox.center;
+      const original: Position = preset.inHome2.client.borderBox.center;
       const expectedOffset: Position = subtract(expectedCenter, original);
       expect(result).toEqual(expectedOffset);
     });
