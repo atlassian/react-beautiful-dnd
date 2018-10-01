@@ -1268,6 +1268,10 @@ Here is an [example written in typescript](https://github.com/abeaudoin2013/reac
 
 We have created a [sample application](https://github.com/alexreardon/react-beautiful-dnd-flow-example) which exercises the flowtypes. It is a super simple `React` project based on [`react-create-app`](https://github.com/facebookincubator/create-react-app). You can use this as a reference to see how to set things up correctly.
 
+## Addons
+
+- [natural-drag-animation-rbdnd](https://github.com/rokborf/natural-drag-animation-rbdnd) adds natural dragging animation
+
 ## Engineering health
 
 ### Typed
