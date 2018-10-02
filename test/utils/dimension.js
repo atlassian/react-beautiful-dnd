@@ -16,6 +16,10 @@ import scrollViewport from '../../src/state/scroll-viewport';
 import getDroppable, {
   type Closest,
 } from '../../src/state/droppable/get-droppable';
+import {
+  toDroppableMap,
+  toDroppableList,
+} from '../../src/state/dimension-structures';
 import type {
   Axis,
   Placeholder,
@@ -614,3 +618,15 @@ export const shiftDraggables = ({
       previous[current.descriptor.id] = current;
       return previous;
     }, {});
+
+export const enableCombining = (
+  droppables: DroppableDimensionMap,
+): DroppableDimensionMap =>
+  toDroppableMap(
+    toDroppableList(droppables).map(
+      (droppable: DroppableDimension): DroppableDimension => ({
+        ...droppable,
+        isCombineEnabled: true,
+      }),
+    ),
+  );

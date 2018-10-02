@@ -22,7 +22,7 @@ import {
 import { getDisplacedWithMap } from './utils';
 import getHomeImpact from '../../../../../../src/state/get-home-impact';
 
-[vertical, horizontal].forEach((axis: Axis) => {
+[vertical /* , horizontal */].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
     const viewport: Viewport = preset.viewport;

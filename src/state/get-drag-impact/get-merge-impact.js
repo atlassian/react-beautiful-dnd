@@ -48,9 +48,12 @@ const isCombiningWith = ({
   oldMerge,
 }: IsCombiningWithArgs): boolean => {
   const start: number = borderBox[axis.start] + displacedBy;
+  const overStart: number = start + 1;
   const end: number = borderBox[axis.end] + displacedBy;
+  const overEnd: number = end - 1;
   const size: number = borderBox[axis.size];
   const oneThird: number = size * 0.333;
+  const twoThirds: number = oneThird * 0.666;
 
   const userDirection: UserDirection = getWhenEntered(
     id,
@@ -61,8 +64,8 @@ const isCombiningWith = ({
 
   // if moving forward then we will be hitting the start edge of the thing after us
   // if moving backwards we will be hitting the bottom edge of the thing behind us
-  const adjustedStart: number = isMovingForward ? start : start + oneThird;
-  const adjustedEnd: number = isMovingForward ? end - oneThird : end;
+  const adjustedStart: number = isMovingForward ? overStart : start + oneThird;
+  const adjustedEnd: number = isMovingForward ? start + twoThirds : overEnd;
 
   return isWithin(adjustedStart, adjustedEnd)(currentCenter[axis.line]);
 };
@@ -82,7 +85,7 @@ export default ({
   destination,
   insideDestination,
   userDirection,
-}: Args): ?CombineImpact => {
+}: Args): ?DragImpact => {
   if (!destination.isCombineEnabled) {
     return null;
   }
@@ -120,12 +123,20 @@ export default ({
     return null;
   }
 
-  const result: CombineImpact = {
+  const merge: CombineImpact = {
     whenEntered: getWhenEntered(target.descriptor.id, userDirection, oldMerge),
     combine: {
       draggableId: target.descriptor.id,
       droppableId: destination.descriptor.id,
     },
   };
-  return result;
+
+  // no change of displacement
+  // clearing any destination
+  const withMerge: DragImpact = {
+    ...previousImpact,
+    destination: null,
+    merge,
+  };
+  return withMerge;
 };
