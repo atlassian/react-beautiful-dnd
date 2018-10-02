@@ -1,7 +1,9 @@
 // @flow
 import invariant from 'tiny-invariant';
+import warning from 'tiny-warning';
 import type { Announce } from '../../types';
 import type { Announcer } from './announcer-types';
+import getWarningMessage from '../../debug/get-warning-message';
 
 let count: number = 0;
 
@@ -35,18 +37,19 @@ export default (): Announcer => {
       return;
     }
 
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn(`
-        A screen reader message was trying to be announced but it was unable to do so.
-        This can occur if you unmount your <DragDropContext /> in your onDragEnd.
-        Consider calling provided.announce() before the unmount so that the instruction will
-        not be lost for users relying on a screen reader.
+    warning(
+      false,
+      getWarningMessage(`
+      A screen reader message was trying to be announced but it was unable to do so.
+      This can occur if you unmount your <DragDropContext /> in your onDragEnd.
+      Consider calling provided.announce() before the unmount so that the instruction will
+      not be lost for users relying on a screen reader.
 
-        Message not passed to screen reader:
+      Message not passed to screen reader:
 
-        "${message}"
-      `);
-    }
+      "${message}"
+    `),
+    );
   };
 
   const mount = () => {

@@ -1,5 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
+import warning from 'tiny-warning';
 import type {
   DraggableId,
   DroppableId,
@@ -11,6 +12,7 @@ import type {
 import type { Entries, DroppableEntry } from './dimension-marshal-types';
 import * as timings from '../../debug/timings';
 import { origin } from '../position';
+import getWarningMessage from '../../debug/get-warning-message';
 
 export type Publisher = {|
   add: (descriptor: DraggableDescriptor) => void,
@@ -66,23 +68,18 @@ export default ({ getEntries, callbacks }: Args): Publisher => {
 
       hasAnnounced = true;
 
-      if (process.env.NODE_ENV === 'production') {
-        return;
-      }
+      warning(
+        false,
+        getWarningMessage(`
+          Advanced usage warning: you are adding or removing a dimension during a drag
+          This an advanced feature used to support dynamic interactions such as lazy loading lists.
 
-      console.warn(
-        `
-        Advanced usage warning: you are adding or removing a dimension during a drag
-        This an advanced feature used to support dynamic interactions such as lazy loading lists.
+          Keep in mind the following restrictions:
 
-        Keep in mind the following restrictions:
-
-        - Draggable's can only be added to Droppable's that are scroll containers
-        - Adding a Droppable cannot impact the placement of other Droppables
-          (it cannot push a Droppable on the page)
-
-        (This warning will be stripped in production builds)
-      `.trim(),
+          - Draggable's can only be added to Droppable's that are scroll containers
+          - Adding a Droppable cannot impact the placement of other Droppables
+            (it cannot push a Droppable on the page)
+        `),
       );
     };
   })();

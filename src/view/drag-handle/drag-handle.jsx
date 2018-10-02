@@ -2,6 +2,7 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
+import warning from 'tiny-warning';
 import invariant from 'tiny-invariant';
 import getWindowFromRef from '../get-window-from-ref';
 import getDragHandleRef from './util/get-drag-handle-ref';
@@ -19,6 +20,7 @@ import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-tar
 import createMouseSensor from './sensor/create-mouse-sensor';
 import createKeyboardSensor from './sensor/create-keyboard-sensor';
 import createTouchSensor from './sensor/create-touch-sensor';
+import getWarningMessage from '../../debug/get-warning-message';
 
 const preventHtml5Dnd = (event: DragEvent) => {
   event.preventDefault();
@@ -128,11 +130,12 @@ export default class DragHandle extends Component<Props> {
 
         // It is fine for a draggable to be disabled while a drag is pending
         if (wasDragging) {
-          if (process.env.NODE_ENV !== 'production') {
-            console.warn(
+          warning(
+            false,
+            getWarningMessage(
               'You have disabled dragging on a Draggable while it was dragging. The drag has been cancelled',
-            );
-          }
+            ),
+          );
           this.props.callbacks.onCancel();
         }
       });

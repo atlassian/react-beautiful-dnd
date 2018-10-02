@@ -1,5 +1,7 @@
 // @flow
+import warning from 'tiny-warning';
 import getDragHandleRef from './get-drag-handle-ref';
+import getWarningMessage from '../../../debug/get-warning-message';
 import type { DraggableId } from '../../../types';
 
 type FocusRetainer = {|
@@ -80,7 +82,10 @@ const tryRestoreFocus = (id: DraggableId, draggableRef: HTMLElement) => {
   const dragHandleRef: ?HTMLElement = getDragHandleRef(draggableRef);
 
   if (!dragHandleRef) {
-    console.warn('Could not find drag handle in the DOM to focus on it');
+    warning(
+      false,
+      getWarningMessage('Could not find drag handle in the DOM to focus on it'),
+    );
     return;
   }
   dragHandleRef.focus();

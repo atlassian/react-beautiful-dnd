@@ -3,6 +3,7 @@ import React, { type Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
+import warning from 'tiny-warning';
 import { type Position } from 'css-box-model';
 import rafSchedule from 'raf-schd';
 import checkForNestedScrollContainers from './check-for-nested-scroll-container';
@@ -23,6 +24,7 @@ import type {
   ScrollOptions,
 } from '../../types';
 import getDimension from './get-dimension';
+import getWarningMessage from '../../debug/get-warning-message';
 
 type Props = {|
   droppableId: DroppableId,
@@ -190,9 +192,10 @@ export default class DroppableDimensionPublisher extends React.Component<
 
   componentWillUnmount() {
     if (this.dragging) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn('unmounting droppable while a drag is occurring');
-      }
+      warning(
+        false,
+        getWarningMessage('unmounting droppable while a drag is occurring'),
+      );
       this.dragStopped();
     }
 

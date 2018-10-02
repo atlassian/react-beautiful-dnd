@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import invariant from 'tiny-invariant';
+import warning from 'tiny-warning';
 import PropTypes from 'prop-types';
 import DroppableDimensionPublisher from '../droppable-dimension-publisher';
 import type { Props, Provided, StateSnapshot } from './droppable-types';
@@ -12,6 +13,7 @@ import {
   droppableTypeKey,
   styleContextKey,
 } from '../context-keys';
+import getWarningMessage from '../../debug/get-warning-message';
 
 type Context = {
   [string]: DroppableId | TypeId,
@@ -76,12 +78,15 @@ export default class Droppable extends Component<Props> {
       return;
     }
 
-    console.warn(`
+    warning(
+      false,
+      getWarningMessage(`
       Droppable setup issue: DroppableProvided > placeholder could not be found.
       Please be sure to add the {provided.placeholder} Node as a child of your Droppable
 
       More information: https://github.com/atlassian/react-beautiful-dnd#1-provided-droppableprovided
-    `);
+    `),
+    );
   }
 
   /* eslint-enable */
