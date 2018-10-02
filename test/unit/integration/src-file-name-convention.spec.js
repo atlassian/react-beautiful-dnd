@@ -1,36 +1,40 @@
 // @flow
 import globby from 'globby';
 import invariant from 'tiny-invariant';
+import pkg from '../../../package.json';
 
 // Regex playground: https://regexr.com/40fin
 const convention: RegExp = /^[a-z0-9\-_./]+$/;
 const isSnakeCase = (filePath: string): boolean => convention.test(filePath);
 
-it('should have every source file following the file name convention', async () => {
-  const src = await globby('src/**/*');
-  const docs = await globby('docs/**/*');
-  const test = await globby('test/**/*');
-  const website = await globby([
-    'website/src/**/*',
-    // TODO: fix
-    // 'website/documentation/**/*',
-  ]);
+const exceptions: string[] = [
+  'CHANGELOG.md',
+  'CODE_OF_CONDUCT.md',
+  'CONTRIBUTING.md',
+  'ISSUE_TEMPLATE.md',
+  'README.md',
+];
 
-  invariant(src.length, 'Could not find /src files');
-  invariant(docs.length, 'Could not find /docs files');
-  invariant(test.length, 'Could not find /test/src files');
-  invariant(website.length, 'Could not find /website/src files');
+it('should have every prettier target following the file name convention', async () => {
+  const targets: string[] = pkg.config.prettier_target.split(' ');
+  const paths: string[] = await globby(targets);
 
-  [...src, ...test, ...website, ...docs].forEach((filePath: string) => {
+  invariant(
+    paths.length,
+    'Could not find files to test against file name convention',
+  );
+
+  paths.forEach((filePath: string) => {
+    if (exceptions.includes(filePath)) {
+      return;
+    }
+
     const isMatching: boolean = isSnakeCase(filePath);
 
-    if (!isMatching) {
-      console.warn(
-        filePath,
-        'does not follow the file path convention (snake-case.js)',
-        convention,
-      );
-    }
+    invariant(
+      isMatching,
+      `${filePath} does not follow the file path convention (snake-case.js) ${convention.toString()}`,
+    );
 
     expect(isMatching).toBe(true);
   });
