@@ -3,7 +3,6 @@ import React, { type Node } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
-import warning from 'tiny-warning';
 import { type Position } from 'css-box-model';
 import rafSchedule from 'raf-schd';
 import checkForNestedScrollContainers from './check-for-nested-scroll-container';
@@ -24,7 +23,7 @@ import type {
   ScrollOptions,
 } from '../../types';
 import getDimension from './get-dimension';
-import getWarningMessage from '../../debug/get-warning-message';
+import { warning } from '../../debug/dev-warning';
 
 type Props = {|
   droppableId: DroppableId,

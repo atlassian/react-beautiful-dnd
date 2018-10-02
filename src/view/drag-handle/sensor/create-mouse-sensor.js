@@ -1,7 +1,6 @@
 // @flow
 /* eslint-disable no-use-before-define */
 import invariant from 'tiny-invariant';
-import warning from 'tiny-warning';
 import { type Position } from 'css-box-model';
 import createScheduler from '../util/create-scheduler';
 import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
@@ -17,7 +16,7 @@ import createEventMarshal, {
 import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
 import type { EventBinding } from '../util/event-types';
 import type { MouseSensor, CreateSensorArgs } from './sensor-types';
-import getWarningMessage from '../../../debug/get-warning-message';
+import { warning } from '../../../debug/dev-warning';
 
 // Custom event format for force press inputs
 type MouseForceChangedEvent = MouseEvent & {
@@ -227,10 +226,7 @@ export default ({
           (MouseEvent: any).WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null
         ) {
           warning(
-            false,
-            getWarningMessage(
-              'handling a mouse force changed event when it is not supported',
-            ),
+            'handling a mouse force changed event when it is not supported',
           );
           return;
         }

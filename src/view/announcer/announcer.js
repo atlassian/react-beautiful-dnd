@@ -1,9 +1,8 @@
 // @flow
 import invariant from 'tiny-invariant';
-import warning from 'tiny-warning';
 import type { Announce } from '../../types';
 import type { Announcer } from './announcer-types';
-import getWarningMessage from '../../debug/get-warning-message';
+import { warning } from '../../debug/dev-warning';
 
 let count: number = 0;
 
@@ -37,9 +36,7 @@ export default (): Announcer => {
       return;
     }
 
-    warning(
-      false,
-      getWarningMessage(`
+    warning(`
       A screen reader message was trying to be announced but it was unable to do so.
       This can occur if you unmount your <DragDropContext /> in your onDragEnd.
       Consider calling provided.announce() before the unmount so that the instruction will
@@ -48,8 +45,7 @@ export default (): Announcer => {
       Message not passed to screen reader:
 
       "${message}"
-    `),
-    );
+    `);
   };
 
   const mount = () => {

@@ -1,7 +1,6 @@
 // @flow
-import warning from 'tiny-warning';
 import type { Announce } from '../../../types';
-import getWarningMessage from '../../../debug/get-warning-message';
+import { warning } from '../../../debug/dev-warning';
 
 export default (announce: Announce) => {
   let wasCalled: boolean = false;
@@ -14,24 +13,16 @@ export default (announce: Announce) => {
 
   const result = (message: string): void => {
     if (wasCalled) {
-      warning(
-        false,
-        getWarningMessage(
-          'Announcement already made. Not making a second announcement',
-        ),
-      );
+      warning('Announcement already made. Not making a second announcement');
 
       return;
     }
 
     if (isExpired) {
-      warning(
-        false,
-        getWarningMessage(`
-          Announcements cannot be made asynchronously.
-          Default message has already been announced.
-        `),
-      );
+      warning(`
+        Announcements cannot be made asynchronously.
+        Default message has already been announced.
+      `);
       return;
     }
 

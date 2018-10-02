@@ -58,8 +58,7 @@
     "raf-schd": "^4.0.0",
     "react-redux": "^5.0.7",
     "redux": "^4.0.0",
-    "tiny-invariant": "^1.0.0",
-    "tiny-warning": "^0.0.3"
+    "tiny-invariant": "^1.0.0"
   },
   "devDependencies": {
     "@atlaskit/css-reset": "^3.0.1",
