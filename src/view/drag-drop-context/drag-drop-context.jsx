@@ -55,6 +55,7 @@ const printFatalDevError = (error: Error) => {
   if (process.env.NODE_ENV === 'production') {
     return;
   }
+  // eslint-disable-next-line no-console
   console.error(
     `
     An error has occurred while a drag is occurring.
