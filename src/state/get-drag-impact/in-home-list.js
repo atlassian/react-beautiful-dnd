@@ -54,9 +54,8 @@ export default ({
   const axis: Axis = home.axis;
   // The starting center position
   const originalCenter: Position = draggable.page.borderBox.center;
-
-  const isInFrontOfStart: boolean =
-    currentCenter[axis.line] > originalCenter[axis.line];
+  const targetCenter: number = currentCenter[axis.line];
+  const isInFrontOfStart: boolean = targetCenter > originalCenter[axis.line];
 
   // when behind where we started we push items forward
   // when in front of where we started we push items backwards
@@ -91,7 +90,7 @@ export default ({
 
         if (isInFrontOfStart) {
           // Nothing behind start can be displaced
-          if (borderBox.center[axis.line] < originalCenter[axis.line]) {
+          if (child.descriptor.index < draggable.descriptor.index) {
             return false;
           }
 
@@ -104,20 +103,20 @@ export default ({
           // impact moving in a list as well as moving into it
 
           if (isMovingTowardStart) {
-            return currentCenter[axis.line] >= end + displacement;
+            return targetCenter >= end + displacement;
           }
 
           // Moving forwards away from the starting location
           // Need to check if the center is going over the
           // start edge of the target
           // Can increase the amount of things that are displaced
-          return currentCenter[axis.line] > start;
+          return targetCenter > start;
         }
 
         // is behind where we started
 
         // Nothing in front of start can be displaced
-        if (borderBox.center[axis.line] > originalCenter[axis.line]) {
+        if (child.descriptor.index > draggable.descriptor.index) {
           return false;
         }
 
@@ -127,13 +126,13 @@ export default ({
         // the item is not displaced so that it will have a consistent
         // impact moving in a list as well as moving into it
         if (isMovingTowardStart) {
-          return currentCenter[axis.line] <= start + displacement;
+          return targetCenter <= start + displacement;
         }
 
         // Continuing to move further away backwards from the start
         // Can increase the amount of things that are displaced
         // Shift once the center goes over the end of the thing before it
-        return currentCenter[axis.line] < end;
+        return targetCenter < end;
       },
     )
     .map(
