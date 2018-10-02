@@ -33,7 +33,6 @@ export default ({
   scrollWindow,
 }: Args): JumpScroller => {
   const moveByOffset = (state: DraggingState, offset: Position) => {
-    // TODO: use center?
     const client: Position = add(state.current.client.selection, offset);
     move({ client });
   };
@@ -64,11 +63,11 @@ export default ({
   };
 
   const scrollWindowAsMuchAsItCan = (
-    isEnabled: boolean,
+    isWindowScrollAllowed: boolean,
     viewport: Viewport,
     change: Position,
   ): ?Position => {
-    if (!isEnabled) {
+    if (!isWindowScrollAllowed) {
       return change;
     }
 
