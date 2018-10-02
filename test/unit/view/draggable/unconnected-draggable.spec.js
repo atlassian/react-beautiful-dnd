@@ -5,14 +5,14 @@ import { mount, type ReactWrapper } from 'enzyme';
 import { getRect, type Position } from 'css-box-model';
 import Draggable, {
   zIndexOptions,
-} from '../../../src/view/draggable/draggable';
-import DragHandle from '../../../src/view/drag-handle/drag-handle';
-import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
-import Placeholder from '../../../src/view/placeholder';
-import type { PlaceholderStyle } from '../../../src/view/placeholder/placeholder-types';
-import { subtract } from '../../../src/state/position';
-import createStyleMarshal from '../../../src/view/style-marshal/style-marshal';
-import type { StyleMarshal } from '../../../src/view/style-marshal/style-marshal-types';
+} from '../../../../src/view/draggable/draggable';
+import DragHandle from '../../../../src/view/drag-handle/drag-handle';
+import { sloppyClickThreshold } from '../../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
+import Placeholder from '../../../../src/view/placeholder';
+import type { PlaceholderStyle } from '../../../../src/view/placeholder/placeholder-types';
+import { subtract } from '../../../../src/state/position';
+import createStyleMarshal from '../../../../src/view/style-marshal/style-marshal';
+import type { StyleMarshal } from '../../../../src/view/style-marshal/style-marshal-types';
 import type {
   OwnProps,
   MapProps,
@@ -21,7 +21,7 @@ import type {
   DispatchProps,
   Provided,
   StateSnapshot,
-} from '../../../src/view/draggable/draggable-types';
+} from '../../../../src/view/draggable/draggable-types';
 import type {
   DraggableDimension,
   DraggableId,
@@ -29,8 +29,8 @@ import type {
   ClientPositions,
   TypeId,
   Viewport,
-} from '../../../src/types';
-import { getPreset } from '../../utils/dimension';
+} from '../../../../src/types';
+import { getPreset } from '../../../utils/dimension';
 import {
   combine,
   withStore,
@@ -39,13 +39,13 @@ import {
   withDimensionMarshal,
   withCanLift,
   withDroppableType,
-} from '../../utils/get-context-options';
+} from '../../../utils/get-context-options';
 import {
   dispatchWindowMouseEvent,
   mouseEvent,
-} from '../../utils/user-input-util';
-import { setViewport, resetViewport } from '../../utils/viewport';
-import * as attributes from '../../../src/view/data-attributes';
+} from '../../../utils/user-input-util';
+import { setViewport, resetViewport } from '../../../utils/viewport';
+import * as attributes from '../../../../src/view/data-attributes';
 
 class Item extends Component<{ provided: Provided }> {
   render() {
