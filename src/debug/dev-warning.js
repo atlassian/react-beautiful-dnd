@@ -12,8 +12,7 @@ const getDevMessage = (message: string) =>
   clean(`
   %creact-beautiful-dnd
 
-  %c${message}
-
+  %c${clean(message)}
 
   %c👷‍ This is a development only message. It will be removed in production builds.
 `);
