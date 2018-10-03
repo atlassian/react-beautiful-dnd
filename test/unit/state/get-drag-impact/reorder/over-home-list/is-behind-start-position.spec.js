@@ -39,8 +39,8 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
       // moving inHome3 back past inHome1
       const goingBackwardsCenter: Position = patch(
         axis.line,
-        // over bottom edge
-        preset.inHome1.page.borderBox[axis.end] - 1,
+        // on bottom edge
+        preset.inHome1.page.borderBox[axis.end],
         // no change
         preset.inHome3.page.borderBox.center[axis.crossAxisLine],
       );
@@ -91,18 +91,20 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
       it('should end displacement if moving forward over the displaced top edge', () => {
         const crossAxisCenter: number =
           preset.inHome3.page.borderBox.center[axis.crossAxisLine];
-        const topEdge: number = preset.inHome1.page.borderBox[axis.start];
-        const displacedTopEdge: number =
-          topEdge + preset.inHome3.displaceBy[axis.line];
-        const goingForwards1: Position = patch(
+        const topEdgeOfInHome1: number =
+          preset.inHome1.page.borderBox[axis.start];
+        const displacedTopEdgeOfInHome1: number =
+          topEdgeOfInHome1 + preset.inHome3.displaceBy[axis.line];
+
+        const ontoTopEdge: Position = patch(
           axis.line,
-          // over top edge with without displacement
-          topEdge + 1,
+          // onto top edge with without displacement
+          topEdgeOfInHome1,
           // no change
           crossAxisCenter,
         );
         const forwardImpact1: DragImpact = getDragImpact({
-          pageBorderBoxCenter: goingForwards1,
+          pageBorderBoxCenter: ontoTopEdge,
           draggable: preset.inHome3,
           draggables: preset.draggables,
           droppables: preset.droppables,
@@ -115,8 +117,8 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
         // still not far enough
         const goingForwards2: Position = patch(
           axis.line,
-          // over top edge with without displacement
-          displacedTopEdge,
+          // before top edge with without displacement
+          displacedTopEdgeOfInHome1 - 1,
           // no change
           crossAxisCenter,
         );
@@ -134,8 +136,8 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
         // okay, now far enough
         const goingForwardsEnough: Position = patch(
           axis.line,
-          // over top edge with with displacement
-          displacedTopEdge + 1,
+          // on top of edge with with displacement
+          displacedTopEdgeOfInHome1,
           // no change
           crossAxisCenter,
         );

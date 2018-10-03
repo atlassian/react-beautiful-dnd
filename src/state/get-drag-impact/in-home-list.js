@@ -101,16 +101,16 @@ export default ({
           // We apply the displacement to the calculation even if
           // the item is not displaced so that it will have a consistent
           // impact moving in a list as well as moving into it
-
           if (isMovingTowardStart) {
-            return targetCenter >= end + displacement;
+            const displacedEndEdge: number = end + displacement;
+            return targetCenter > displacedEndEdge;
           }
 
           // Moving forwards away from the starting location
           // Need to check if the center is going over the
           // start edge of the target
           // Can increase the amount of things that are displaced
-          return targetCenter > start;
+          return targetCenter >= start;
         }
 
         // is behind where we started
@@ -125,14 +125,16 @@ export default ({
         // We apply the displacement to the calculation even if
         // the item is not displaced so that it will have a consistent
         // impact moving in a list as well as moving into it
+        // End displacement when we move onto the displaced start edge
         if (isMovingTowardStart) {
-          return targetCenter <= start + displacement;
+          const displacedStartEdge: number = start + displacement;
+          return targetCenter < displacedStartEdge;
         }
 
         // Continuing to move further away backwards from the start
         // Can increase the amount of things that are displaced
-        // Shift once the center goes over the end of the thing before it
-        return targetCenter < end;
+        // Shift once the center goes onto the end of the thing before it
+        return targetCenter <= end;
       },
     )
     .map(
