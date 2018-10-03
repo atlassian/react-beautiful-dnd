@@ -10,13 +10,13 @@ import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
 import pkg from './package.json';
 
 const input = './src/index.js';
-const extensions = ['.js', '.jsx'];
+export const extensions = ['.js', '.jsx'];
 
 // Treat as externals all not relative and not absolute paths
 // e.g. 'react'
 const excludeAllExternals = id => !id.startsWith('.') && !id.startsWith('/');
 
-const getBabelOptions = ({ useESModules }) => ({
+export const getBabelOptions = ({ useESModules }) => ({
   exclude: 'node_modules/**',
   runtimeHelpers: true,
   plugins: [['@babel/transform-runtime', { corejs: 2, useESModules }]],
@@ -50,10 +50,10 @@ export default [
     // Only deep dependency required is React
     external: ['react'],
     plugins: [
+      replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
       babel(getBabelOptions({ useESModules: true })),
       resolve({ extensions }),
       commonjs({ include: 'node_modules/**' }),
-      replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
       sizeSnapshot(snapshotArgs),
     ],
   },
@@ -70,11 +70,11 @@ export default [
     // Only deep dependency required is React
     external: ['react'],
     plugins: [
+      replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       babel(getBabelOptions({ useESModules: true })),
       resolve({ extensions }),
       commonjs({ include: 'node_modules/**' }),
       strip({ debugger: true }),
-      replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       sizeSnapshot(snapshotArgs),
       uglify(),
     ],

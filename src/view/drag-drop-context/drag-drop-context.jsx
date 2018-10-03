@@ -36,6 +36,7 @@ import {
   updateDroppableIsCombineEnabled,
   collectionStarting,
 } from '../../state/action-creators';
+import { getFormattedMessage } from '../../debug/dev-warning';
 
 type Props = {|
   ...Hooks,
@@ -57,14 +58,17 @@ const printFatalDevError = (error: Error) => {
   }
   // eslint-disable-next-line no-console
   console.error(
-    `
-    An error has occurred while a drag is occurring.
-    Any existing drag will be cancelled.
+    ...getFormattedMessage(
+      `
+      An error has occurred while a drag is occurring.
+      Any existing drag will be cancelled.
 
-    > ${error.message}
-  `,
-    error,
+      > ${error.message}
+      `,
+    ),
   );
+  // eslint-disable-next-line no-console
+  console.error('raw', error);
 };
 
 export default class DragDropContext extends React.Component<Props> {
