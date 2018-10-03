@@ -28,34 +28,34 @@ import getDisplacementMap from '../../../../../src/state/get-displacement-map';
     );
 
     describe('non-displaced item', () => {
-      // moving inHome1 forward
-      const willDisplaceForward: boolean = false;
+      // moving inHome2 backward
+      const willDisplaceForward: boolean = true;
       const displacedBy: DisplacedBy = getDisplacedBy(
         axis,
-        preset.inHome1.displaceBy,
+        preset.inHome2.displaceBy,
         willDisplaceForward,
       );
-      const beforeStart: Position = patch(
+      const afterEnd: Position = patch(
         axis.line,
-        preset.inHome2.page.borderBox[axis.start] - 1,
-        preset.inHome2.page.borderBox.center[axis.crossAxisLine],
+        preset.inHome1.page.borderBox[axis.end] + 1,
+        preset.inHome1.page.borderBox.center[axis.crossAxisLine],
       );
-      const onStart: Position = add(beforeStart, patch(axis.line, 1));
-      const onTwoThirds: Position = add(
-        onStart,
-        patch(axis.line, preset.inHome2.page.borderBox[axis.size] * 0.666),
+      const onEnd: Position = subtract(afterEnd, patch(axis.line, 1));
+      const onTwoThirds: Position = subtract(
+        onEnd,
+        patch(axis.line, preset.inHome1.page.borderBox[axis.size] * 0.666),
       );
 
-      it('should start combining when moving forward onto the start of an item', () => {
+      it.only('should start combining when moving backward onto the end of an item', () => {
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: beforeStart,
-            draggable: preset.inHome1,
+            pageBorderBoxCenter: afterEnd,
+            draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
             previousImpact: homeImpact,
             viewport: preset.viewport,
-            userDirection: forward,
+            userDirection: backward,
           });
 
           const expected: DragImpact = {
@@ -69,7 +69,7 @@ import getDisplacementMap from '../../../../../src/state/get-displacement-map';
             // still in home position
             destination: {
               droppableId: preset.home.descriptor.id,
-              index: 0,
+              index: preset.inHome2.descriptor.index,
             },
             merge: null,
           };
@@ -77,13 +77,13 @@ import getDisplacementMap from '../../../../../src/state/get-displacement-map';
         }
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: onStart,
-            draggable: preset.inHome1,
+            pageBorderBoxCenter: onEnd,
+            draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
             previousImpact: homeImpact,
             viewport: preset.viewport,
-            userDirection: forward,
+            userDirection: backward,
           });
 
           const expected: DragImpact = {
@@ -91,9 +91,9 @@ import getDisplacementMap from '../../../../../src/state/get-displacement-map';
             direction: axis.direction,
             destination: null,
             merge: {
-              whenEntered: forward,
+              whenEntered: backward,
               combine: {
-                draggableId: preset.inHome2.descriptor.id,
+                draggableId: preset.inHome1.descriptor.id,
                 droppableId: preset.home.descriptor.id,
               },
             },
@@ -102,17 +102,17 @@ import getDisplacementMap from '../../../../../src/state/get-displacement-map';
         }
       });
 
-      it('should start combining if first entered within start 2/3 of the size', () => {
+      it.only('should start combining if first entered within end 2/3 of the size', () => {
         // entered within first 2/3
         {
           const impact: DragImpact = getDragImpact({
             pageBorderBoxCenter: onTwoThirds,
-            draggable: preset.inHome1,
+            draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
             previousImpact: homeImpact,
             viewport: preset.viewport,
-            userDirection: forward,
+            userDirection: backward,
           });
 
           const expected: DragImpact = {
@@ -120,9 +120,9 @@ import getDisplacementMap from '../../../../../src/state/get-displacement-map';
             direction: axis.direction,
             destination: null,
             merge: {
-              whenEntered: forward,
+              whenEntered: backward,
               combine: {
-                draggableId: preset.inHome2.descriptor.id,
+                draggableId: preset.inHome1.descriptor.id,
                 droppableId: preset.home.descriptor.id,
               },
             },
@@ -132,19 +132,19 @@ import getDisplacementMap from '../../../../../src/state/get-displacement-map';
         // not entered within first 2/3
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: add(onTwoThirds, patch(axis.line, 1)),
-            draggable: preset.inHome1,
+            pageBorderBoxCenter: subtract(onTwoThirds, patch(axis.line, 1)),
+            draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
             previousImpact: homeImpact,
             viewport: preset.viewport,
-            userDirection: forward,
+            userDirection: backward,
           });
 
           // has now moved into a reorder
           const displaced: Displacement[] = [
             {
-              draggableId: preset.inHome2.descriptor.id,
+              draggableId: preset.inHome1.descriptor.id,
               isVisible: true,
               shouldAnimate: true,
             },
@@ -158,7 +158,7 @@ import getDisplacementMap from '../../../../../src/state/get-displacement-map';
             },
             direction: axis.direction,
             destination: {
-              index: 1,
+              index: 0,
               droppableId: preset.home.descriptor.id,
             },
             merge: null,

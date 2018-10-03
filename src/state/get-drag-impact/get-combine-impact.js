@@ -50,7 +50,7 @@ const isCombiningWith = ({
   const start: number = borderBox[axis.start] + displacedBy;
   const end: number = borderBox[axis.end] + displacedBy;
   const size: number = borderBox[axis.size];
-  const oneThird: number = size * 0.333;
+  const twoThirdsOfSize: number = size * 0.666;
 
   const whenEntered: UserDirection = getWhenEntered(
     id,
@@ -58,13 +58,14 @@ const isCombiningWith = ({
     oldMerge,
   );
   const isMovingForward: boolean = isUserMovingForward(axis, whenEntered);
+  const targetCenter: number = currentCenter[axis.line];
 
   if (isMovingForward) {
     // combine when moving in the front 2/3 of the item
-    return isWithin(start, end - oneThird)(currentCenter[axis.line]);
+    return isWithin(start, start + twoThirdsOfSize)(targetCenter);
   }
   // combine when moving in the back 2/3 of the item
-  return isWithin(start + oneThird, end)(currentCenter[axis.line]);
+  return isWithin(end - twoThirdsOfSize, end)(targetCenter);
 };
 
 type Args = {|

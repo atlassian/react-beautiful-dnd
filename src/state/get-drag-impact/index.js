@@ -17,7 +17,7 @@ import inForeignList from './in-foreign-list';
 import noImpact from '../no-impact';
 import withDroppableScroll from '../with-droppable-scroll';
 import isHomeOf from '../droppable/is-home-of';
-import getMergeImpact from './get-merge-impact';
+import getCombineImpact from './get-combine-impact';
 
 type Args = {|
   pageBorderBoxCenter: Position,
@@ -67,7 +67,7 @@ export default ({
     pageBorderBoxCenter,
   );
 
-  const withMerge: ?DragImpact = getMergeImpact({
+  const withMerge: ?DragImpact = getCombineImpact({
     pageBorderBoxCenterWithDroppableScroll,
     previousImpact,
     draggable,

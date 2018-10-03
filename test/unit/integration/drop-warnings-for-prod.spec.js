@@ -15,7 +15,8 @@ const getCode = async ({ mode }): Promise<string> => {
     commonjs({ include: 'node_modules/**' }),
   ];
   if (mode === 'production') {
-    plugins.push(uglify());
+    // not mangling so we can be sure we are matching in tests
+    plugins.push(uglify({ mangle: false }));
   }
 
   const inputOptions = {
@@ -34,11 +35,13 @@ const getCode = async ({ mode }): Promise<string> => {
 };
 
 it('should contain warnings in development', async () => {
-  const dev: string = await getCode({ mode: 'development' });
-  expect(dev.includes('This is a development only message')).toBe(true);
+  const code: string = await getCode({ mode: 'development' });
+  expect(code.includes('This is a development only message')).toBe(true);
 });
 
 it('should not contain warnings in production', async () => {
-  const prod: string = await getCode({ mode: 'production' });
-  expect(prod.includes('This is a development only message')).toBe(false);
+  const code: string = await getCode({ mode: 'production' });
+  expect(code.includes('This is a development only message')).toBe(false);
+  expect(code.includes('console.warn')).toBe(false);
+  expect(code.includes('console.error')).toBe(false);
 });
