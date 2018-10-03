@@ -116,8 +116,8 @@ export const makeScrollable = (
     direction: axis.direction,
     client: newClient,
     page: newPage,
-    isCombineEnabled: false,
-    isFixedOnPage: false,
+    isCombineEnabled: droppable.isCombineEnabled,
+    isFixedOnPage: droppable.isFixedOnPage,
     closest: {
       // using old dimensions for frame
       client: droppable.client,
