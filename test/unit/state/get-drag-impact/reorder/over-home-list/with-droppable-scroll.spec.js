@@ -6,7 +6,7 @@ import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
 import getDragImpact from '../../../../../../src/state/get-drag-impact';
 import noImpact from '../../../../../../src/state/no-impact';
-import { add, patch, subtract } from '../../../../../../src/state/position';
+import { patch, subtract } from '../../../../../../src/state/position';
 import {
   backward,
   forward,
@@ -44,10 +44,9 @@ const viewport: Viewport = getViewport();
           preset.inHome2.page.borderBox[axis.start],
           preset.inHome2.page.borderBox.center[axis.crossAxisLine],
         );
-        const distanceNeeded: Position = add(
-          subtract(startOfInHome2, preset.inHome1.page.borderBox.center),
-          // need to move over the edge
-          patch(axis.line, 1),
+        const distanceNeeded: Position = subtract(
+          startOfInHome2,
+          preset.inHome1.page.borderBox.center,
         );
         const scrolledHome: DroppableDimension = scrollDroppable(
           scrollableHome,
@@ -113,10 +112,9 @@ const viewport: Viewport = getViewport();
           preset.inHome2.page.borderBox[axis.end],
           preset.inHome2.page.borderBox.center[axis.crossAxisLine],
         );
-        const distanceNeeded: Position = add(
-          subtract(endOfInHome2, preset.inHome4.page.borderBox.center),
-          // need to move over the edge
-          patch(axis.line, -1),
+        const distanceNeeded: Position = subtract(
+          endOfInHome2,
+          preset.inHome4.page.borderBox.center,
         );
         const scrolledHome: DroppableDimension = scrollDroppable(
           scrollableHome,

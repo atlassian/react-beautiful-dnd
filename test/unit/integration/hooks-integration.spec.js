@@ -116,6 +116,7 @@ describe('hooks integration', () => {
       window.getComputedStyle.mockRestore();
     }
 
+    // eslint-disable-next-line no-console
     console.warn.mockRestore();
   });
 

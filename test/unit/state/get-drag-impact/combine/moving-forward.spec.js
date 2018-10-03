@@ -17,6 +17,7 @@ import { patch, add } from '../../../../../src/state/position';
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
+    const homeImpact: DragImpact = getHomeImpact(preset.inHome1, preset.home);
     const withCombineEnabled: DroppableDimensionMap = enableCombining(
       preset.droppables,
     );
@@ -29,26 +30,25 @@ import { patch, add } from '../../../../../src/state/position';
     );
 
     describe('non-displaced item', () => {
-      const onStart: Position = patch(
+      const beforeStart: Position = patch(
         axis.line,
-        preset.inHome2.page.borderBox[axis.start],
+        preset.inHome2.page.borderBox[axis.start] - 1,
         preset.inHome2.page.borderBox.center[axis.crossAxisLine],
       );
-      const overStart: Position = add(onStart, patch(axis.line, 1));
+      const onStart: Position = add(beforeStart, patch(axis.line, 1));
       const onTwoThirds: Position = add(
         onStart,
-        patch(axis.line, preset.inHome2.page.borderBox[axis.size]),
+        patch(axis.line, preset.inHome2.page.borderBox[axis.size] * 0.666),
       );
-      const overTwoThirds: Position = add(onTwoThirds, patch(axis.line, 1));
 
-      it('should start combining when moving forward over the start of item', () => {
+      it('should start combining when moving forward onto the start of an item', () => {
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: onStart,
+            pageBorderBoxCenter: beforeStart,
             draggable: preset.inHome1,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
-            previousImpact: getHomeImpact(preset.inHome1, preset.home),
+            previousImpact: homeImpact,
             viewport: preset.viewport,
             userDirection: forward,
           });
@@ -72,17 +72,17 @@ import { patch, add } from '../../../../../src/state/position';
         }
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: overStart,
+            pageBorderBoxCenter: onStart,
             draggable: preset.inHome1,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
-            previousImpact: getHomeImpact(preset.inHome1, preset.home),
+            previousImpact: homeImpact,
             viewport: preset.viewport,
             userDirection: forward,
           });
 
           const expected: DragImpact = {
-            movement: getHomeImpact(preset.inHome1, preset.home).movement,
+            movement: homeImpact.movement,
             direction: axis.direction,
             destination: null,
             merge: {
@@ -97,25 +97,20 @@ import { patch, add } from '../../../../../src/state/position';
         }
       });
 
-      it('should start combining if first hit up to 2/3 of the size', () => {
+      it('should start combining if first entered within start 2/3 of the size', () => {
         {
           const impact: DragImpact = getDragImpact({
             pageBorderBoxCenter: onTwoThirds,
             draggable: preset.inHome1,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
-            previousImpact: getHomeImpact(preset.inHome1, preset.home),
+            previousImpact: homeImpact,
             viewport: preset.viewport,
             userDirection: forward,
           });
 
           const expected: DragImpact = {
-            movement: {
-              displacedBy,
-              willDisplaceForward,
-              displaced: [],
-              map: {},
-            },
+            movement: homeImpact.movement,
             direction: axis.direction,
             destination: null,
             merge: {
