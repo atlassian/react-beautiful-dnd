@@ -1,7 +1,7 @@
 // @flow
 import { getRect, type Rect, type Position } from 'css-box-model';
 import getClosestDraggable from '../../../../../src/state/move-in-direction/move-cross-axis/get-closest-draggable';
-import { scrollDroppable } from '../../../../../src/state/droppable-dimension';
+import scrollDroppable from '../../../../../src/state/droppable/scroll-droppable';
 import { add, distance, patch } from '../../../../../src/state/position';
 import {
   getDroppableDimension,

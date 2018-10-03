@@ -191,10 +191,7 @@ export default class DroppableDimensionPublisher extends React.Component<
 
   componentWillUnmount() {
     if (this.dragging) {
-      warning(
-        false,
-        getWarningMessage('unmounting droppable while a drag is occurring'),
-      );
+      warning('unmounting droppable while a drag is occurring');
       this.dragStopped();
     }
 

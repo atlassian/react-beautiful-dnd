@@ -44,13 +44,14 @@ export default ({
     return null;
   }
 
+  invariant(
+    moveIntoIndexOf.descriptor.droppableId === destination.descriptor.id,
+    'Unable to find target in destination droppable',
+  );
+
   const axis: Axis = destination.axis;
   const homeIndex: number = draggable.descriptor.index;
   const targetIndex: number = moveIntoIndexOf.descriptor.index;
-  invariant(
-    targetIndex !== -1,
-    'Unable to find target in destination droppable',
-  );
 
   // Moving back to original index
   // Super simple - just move it back to the original center with no impact
@@ -72,25 +73,16 @@ export default ({
     };
   }
 
-  // When moving *before* where the item started:
-  // We align the dragging item top of the target
-  // and move everything from the target to the original position forwards
-
-  // When moving *after* where the item started:
-  // We align the dragging item to the end of the target
-  // and move everything from the target to the original position backwards
-
-  // We will displace forward when moving behind the start position
   const willDisplaceForward: boolean = getWillDisplaceForward({
     isInHomeList: true,
     proposedIndex: targetIndex,
     startIndexInHome: homeIndex,
   });
 
-  const isMovingAfter: boolean = !willDisplaceForward;
+  const isMovingAfterStart: boolean = !willDisplaceForward;
   // Which draggables will need to move?
   // Everything between the target index and the start index
-  const modified: DraggableDimension[] = isMovingAfter
+  const modified: DraggableDimension[] = isMovingAfterStart
     ? // we will be displacing these items backwards
       // homeIndex + 1 so we don't include the home
       // .reverse() so the closest displaced will be first
@@ -131,7 +123,7 @@ export default ({
     isMoving: draggable.page,
   };
 
-  const newCenter: Position = isMovingAfter
+  const newCenter: Position = isMovingAfterStart
     ? goAfter(moveArgs)
     : goBefore(moveArgs);
 
