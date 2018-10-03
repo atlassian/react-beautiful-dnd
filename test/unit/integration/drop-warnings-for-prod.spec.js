@@ -42,6 +42,5 @@ it('should contain warnings in development', async () => {
 it('should not contain warnings in production', async () => {
   const code: string = await getCode({ mode: 'production' });
   expect(code.includes('This is a development only message')).toBe(false);
-  expect(code.includes('console.warn')).toBe(false);
-  expect(code.includes('console.error')).toBe(false);
+  expect(code.includes('console.')).toBe(false);
 });

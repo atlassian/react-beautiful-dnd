@@ -168,7 +168,7 @@ import getDisplacementMap from '../../../../../src/state/get-displacement-map';
       });
 
       it('should continue to combine if not moving forward past 2/3 of the non-displaced item - even if moving backwards', () => {
-        const first: DragImpact = getDragImpact({
+        const onTwoThirdsImpact: DragImpact = getDragImpact({
           pageBorderBoxCenter: onTwoThirds,
           draggable: preset.inHome1,
           draggables: preset.draggables,
@@ -177,13 +177,13 @@ import getDisplacementMap from '../../../../../src/state/get-displacement-map';
           viewport: preset.viewport,
           userDirection: forward,
         });
-        // moving backwards!!
-        const second: DragImpact = getDragImpact({
+        // moving backwards within the first 2/3!!
+        const pastTwoThirdsImpact: DragImpact = getDragImpact({
           pageBorderBoxCenter: subtract(onTwoThirds, patch(axis.line, 1)),
           draggable: preset.inHome1,
           draggables: preset.draggables,
           droppables: withCombineEnabled,
-          previousImpact: first,
+          previousImpact: onTwoThirdsImpact,
           viewport: preset.viewport,
           userDirection: backward,
         });
@@ -200,8 +200,8 @@ import getDisplacementMap from '../../../../../src/state/get-displacement-map';
             },
           },
         };
-        expect(first).toEqual(expected);
-        expect(second).toEqual(expected);
+        expect(onTwoThirdsImpact).toEqual(expected);
+        expect(pastTwoThirdsImpact).toEqual(expected);
       });
 
       it('should not combine if entered after 2/3 size of the non-displaced item', () => {
@@ -272,20 +272,24 @@ import getDisplacementMap from '../../../../../src/state/get-displacement-map';
         merge: null,
       };
 
-      const onStart: Position = patch(
+      const onInHome1Start: Position = patch(
         axis.line,
         preset.inHome1.page.borderBox[axis.start],
         preset.inHome1.page.borderBox.center[axis.crossAxisLine],
       );
       const sizeOfDisplacement: number = preset.inHome2.displaceBy[axis.line];
-      const onDisplacedStart: Position = add(
-        onStart,
+      const onInHome1DisplacedStart: Position = add(
+        onInHome1Start,
         patch(axis.line, sizeOfDisplacement),
+      );
+      const onInHome1DisplacedTwoThirds: Position = add(
+        onInHome1DisplacedStart,
+        patch(axis.line, preset.inHome1.page.borderBox[axis.size] * 0.666),
       );
 
       it('should not combine if only moving to the non-displaced start', () => {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: onStart,
+          pageBorderBoxCenter: onInHome1Start,
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: withCombineEnabled,
@@ -298,7 +302,7 @@ import getDisplacementMap from '../../../../../src/state/get-displacement-map';
 
       it('should combine when moving forward onto the start of a displaced item', () => {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: onDisplacedStart,
+          pageBorderBoxCenter: onInHome1DisplacedStart,
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: withCombineEnabled,
@@ -322,22 +326,50 @@ import getDisplacementMap from '../../../../../src/state/get-displacement-map';
         expect(impact).toEqual(expected);
       });
 
-      it('should not combine when moving forward to 2/3 of the size of the displaced item', () => {
-        const onDisplacedTwoThirds: Position = add(
-          onDisplacedStart,
-          patch(axis.line, preset.inHome1.page.borderBox[axis.size]),
-        );
-        const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: onDisplacedTwoThirds,
-          draggable: preset.inHome2,
-          draggables: preset.draggables,
-          droppables: withCombineEnabled,
-          previousImpact: withDisplacement,
-          viewport: preset.viewport,
-          userDirection: forward,
-        });
+      it('should not combine when moving forward past 2/3 of the size of the displaced item', () => {
+        // on 2/3 line
+        {
+          const impact: DragImpact = getDragImpact({
+            pageBorderBoxCenter: onInHome1DisplacedTwoThirds,
+            draggable: preset.inHome2,
+            draggables: preset.draggables,
+            droppables: withCombineEnabled,
+            previousImpact: withDisplacement,
+            viewport: preset.viewport,
+            userDirection: forward,
+          });
 
-        expect(impact.merge).toEqual(null);
+          const expected: DragImpact = {
+            movement: withDisplacement.movement,
+            direction: axis.direction,
+            destination: null,
+            merge: {
+              whenEntered: forward,
+              combine: {
+                draggableId: preset.inHome1.descriptor.id,
+                droppableId: preset.home.descriptor.id,
+              },
+            },
+          };
+          expect(impact).toEqual(expected);
+        }
+        // past 2/3 line
+        {
+          const impact: DragImpact = getDragImpact({
+            pageBorderBoxCenter: add(
+              onInHome1DisplacedTwoThirds,
+              patch(axis.line, 1),
+            ),
+            draggable: preset.inHome2,
+            draggables: preset.draggables,
+            droppables: withCombineEnabled,
+            previousImpact: withDisplacement,
+            viewport: preset.viewport,
+            userDirection: forward,
+          });
+
+          expect(impact.merge).toEqual(null);
+        }
       });
     });
   });

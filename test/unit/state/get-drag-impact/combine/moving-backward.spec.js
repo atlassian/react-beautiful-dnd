@@ -282,6 +282,10 @@ import getDisplacementMap from '../../../../../src/state/get-displacement-map';
         onEnd,
         patch(axis.line, sizeOfDisplacement),
       );
+      const onDisplacedTwoThirds: Position = subtract(
+        onDisplacedEnd,
+        patch(axis.line, preset.inHome2.page.borderBox[axis.size] * 0.666),
+      );
 
       it('should not combine if only moving to the non-displaced end', () => {
         const impact: DragImpact = getDragImpact({
@@ -322,22 +326,48 @@ import getDisplacementMap from '../../../../../src/state/get-displacement-map';
         expect(impact).toEqual(expected);
       });
 
-      it('should not combine when moving backward to 2/3 of the size of the displaced item', () => {
-        const onDisplacedTwoThirds: Position = add(
-          onDisplacedEnd,
-          patch(axis.line, preset.inHome2.page.borderBox[axis.size]),
-        );
-        const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: onDisplacedTwoThirds,
-          draggable: preset.inHome1,
-          draggables: preset.draggables,
-          droppables: withCombineEnabled,
-          previousImpact: withDisplacement,
-          viewport: preset.viewport,
-          userDirection: backward,
-        });
+      it('should not combine when moving backward past 2/3 of the size of the displaced item', () => {
+        {
+          const impact: DragImpact = getDragImpact({
+            pageBorderBoxCenter: onDisplacedTwoThirds,
+            draggable: preset.inHome1,
+            draggables: preset.draggables,
+            droppables: withCombineEnabled,
+            previousImpact: withDisplacement,
+            viewport: preset.viewport,
+            userDirection: backward,
+          });
 
-        expect(impact.merge).toEqual(null);
+          const expected: DragImpact = {
+            movement: withDisplacement.movement,
+            direction: axis.direction,
+            destination: null,
+            merge: {
+              whenEntered: backward,
+              combine: {
+                draggableId: preset.inHome2.descriptor.id,
+                droppableId: preset.home.descriptor.id,
+              },
+            },
+          };
+          expect(impact).toEqual(expected);
+        }
+        {
+          const impact: DragImpact = getDragImpact({
+            pageBorderBoxCenter: subtract(
+              onDisplacedTwoThirds,
+              patch(axis.line, 1),
+            ),
+            draggable: preset.inHome1,
+            draggables: preset.draggables,
+            droppables: withCombineEnabled,
+            previousImpact: withDisplacement,
+            viewport: preset.viewport,
+            userDirection: backward,
+          });
+
+          expect(impact.merge).toEqual(null);
+        }
       });
     });
   });
