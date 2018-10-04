@@ -604,6 +604,7 @@ export const shiftDraggables = ({
           ...dimension.descriptor,
           index: dimension.descriptor.index + indexChange,
         },
+        displaceBy: dimension.displaceBy,
         client,
         page,
         placeholder: {
