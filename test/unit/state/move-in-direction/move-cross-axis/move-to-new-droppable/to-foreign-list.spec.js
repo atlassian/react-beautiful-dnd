@@ -293,31 +293,30 @@ const dontCare: Position = { x: 0, y: 0 };
         });
 
         it('should move the target and everything below it forward', () => {
+          // ordered by closest impacted
+          const displaced: Displacement[] = [
+            {
+              draggableId: preset.inForeign2.descriptor.id,
+              isVisible: true,
+              shouldAnimate: true,
+            },
+            {
+              draggableId: preset.inForeign3.descriptor.id,
+              isVisible: true,
+              shouldAnimate: true,
+            },
+            {
+              draggableId: preset.inForeign4.descriptor.id,
+              isVisible: true,
+              shouldAnimate: true,
+            },
+          ];
           const expected: DragImpact = {
             movement: {
-              // ordered by closest impacted
-              displaced: [
-                {
-                  draggableId: preset.inForeign2.descriptor.id,
-                  isVisible: true,
-                  shouldAnimate: true,
-                },
-                {
-                  draggableId: inForeign3.descriptor.id,
-                  isVisible: true,
-                  shouldAnimate: true,
-                },
-                {
-                  draggableId: inForeign4.descriptor.id,
-                  isVisible: true,
-                  shouldAnimate: true,
-                },
-              ],
-              amount: patch(
-                preset.foreign.axis.line,
-                preset.inHome1.page.marginBox[preset.foreign.axis.size],
-              ),
-              isInFrontOfStart: false,
+              displaced,
+              map: getDisplacementMap(displaced),
+              displacedBy,
+              willDisplaceForward,
             },
             direction: preset.foreign.axis.direction,
             destination: {
@@ -325,6 +324,7 @@ const dontCare: Position = { x: 0, y: 0 };
               // index of preset.foreign2
               index: 1,
             },
+            merge: null,
           };
 
           expect(result.impact).toEqual(expected);
@@ -337,18 +337,19 @@ const dontCare: Position = { x: 0, y: 0 };
           10,
         );
         const scroll: Position = patch(axis.line, 10);
-        const displacement: Position = negate(scroll);
+        const scrollDisplacement: Position = negate(scroll);
         const scrolled: DroppableDimension = scrollDroppable(
           scrollable,
           patch(axis.line, 10),
         );
 
-        const result: Result = moveToNewDroppable({
+        const result: ?Result = moveToNewDroppable({
           pageBorderBoxCenter: preset.inHome1.page.borderBox.center,
           draggable: preset.inHome1,
+          draggables: preset.draggables,
           moveRelativeTo: preset.inForeign2,
           destination: scrolled,
-          insideDestination: draggables,
+          insideDestination: preset.inForeignList,
           previousImpact: noImpact,
           viewport,
         });
@@ -357,17 +358,19 @@ const dontCare: Position = { x: 0, y: 0 };
           throw new Error('Invalid result');
         }
 
-        it('should account for changes in droppable scroll', () => {
-          const withoutScroll: Position = moveToEdge({
-            source: preset.inHome1.page.borderBox,
-            sourceEdge: 'start',
-            destination: preset.inForeign2.page.marginBox,
-            destinationEdge: 'start',
-            destinationAxis: preset.foreign.axis,
+        it('should move before the displaced target and account for changes in droppable scroll', () => {
+          const displaced: BoxModel = offset(
+            preset.inForeign2.page,
+            displacedBy.point,
+          );
+          const before: Position = goBefore({
+            axis,
+            moveRelativeTo: displaced,
+            isMoving: preset.inHome1.page,
           });
-          const expected: Position = add(withoutScroll, displacement);
+          const withScroll: Position = add(before, scrollDisplacement);
 
-          expect(result.pageBorderBoxCenter).toEqual(expected);
+          expect(result.pageBorderBoxCenter).toEqual(withScroll);
         });
       });
     });
