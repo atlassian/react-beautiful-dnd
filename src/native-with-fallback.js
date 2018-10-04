@@ -5,11 +5,9 @@ type Map<T> = {
 
 // @babel/runtime-corejs2 will replace Object.values
 export function values<T>(map: Map<T>): T[] {
-  return Object.values
-    ? // https://github.com/facebook/flow/issues/2221
-      // $FlowFixMe - Object.values currently does not have good flow support
-      Object.values(map)
-    : Object.keys(map).map((key: string): T => map[key]);
+  // https://github.com/facebook/flow/issues/2221
+  // $FlowFixMe - Object.values currently does not have good flow support
+  return Object.values(map);
 }
 
 export function find<T>(list: Array<T>, predicate: T => boolean): ?T {
