@@ -91,7 +91,6 @@ export default ({
   }
 
   // Moving to a populated list
-
   const targetIndex: number = insideDestination.indexOf(moveRelativeTo);
   invariant(targetIndex !== -1, 'Cannot find draggable in foreign list');
 

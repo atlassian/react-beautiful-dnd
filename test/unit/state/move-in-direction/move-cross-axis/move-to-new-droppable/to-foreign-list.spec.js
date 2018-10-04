@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import { offset, type Position, type BoxModel } from 'css-box-model';
 import type {
   Viewport,
@@ -33,7 +34,7 @@ import scrollViewport from '../../../../../../src/state/scroll-viewport';
 
 const dontCare: Position = { x: 0, y: 0 };
 
-[vertical /* , horizontal */].forEach((axis: Axis) => {
+[vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
     const viewport: Viewport = preset.viewport;
@@ -197,7 +198,7 @@ const dontCare: Position = { x: 0, y: 0 };
 
         it('should not move into the start of list if the position is not visible due to page scroll', () => {
           const distanceToStartOfViewport: number =
-            foreignPageBox.marginBox.top;
+            foreignPageBox.marginBox[axis.start];
           const onVisibleEdge: Position = patch(
             axis.line,
             distanceToStartOfViewport +
@@ -251,7 +252,7 @@ const dontCare: Position = { x: 0, y: 0 };
       });
     });
 
-    describe('is moving before the target', () => {
+    describe('is going before a target', () => {
       // moving home1 into the second position of the list
       // always displace forward in foreign list
       const willDisplaceForward: boolean = true;
@@ -375,109 +376,112 @@ const dontCare: Position = { x: 0, y: 0 };
       });
     });
 
-    describe('is moving after the target', () => {
-      describe('without droppable scroll', () => {
-        // moving home4 into the second position of the preset.foreign list
-        const result: Result = moveToNewDroppable({
-          pageBorderBoxCenter: preset.inHome4.page.borderBox.center,
-          draggable: preset.inHome4,
-          moveRelativeTo: preset.inForeign2,
-          destination: preset.foreign,
-          insideDestination: draggables,
-          previousImpact: noImpact,
-          viewport,
-        });
-
-        if (!result) {
-          throw new Error('invalid test setup');
-        }
-
-        it('should move after the target', () => {
-          const expected = moveToEdge({
-            source: preset.inHome4.page.borderBox,
-            sourceEdge: 'start',
-            destination: preset.inForeign2.page.marginBox,
-            // going after
-            destinationEdge: 'end',
-            destinationAxis: preset.foreign.axis,
-          });
-
-          expect(result.pageBorderBoxCenter).toEqual(expected);
-        });
-
-        it('should move everything after the proposed index forward', () => {
-          const expected: DragImpact = {
-            movement: {
-              // ordered by closest impacted
-              displaced: [
-                {
-                  draggableId: inForeign3.descriptor.id,
-                  isVisible: true,
-                  shouldAnimate: true,
-                },
-                {
-                  draggableId: inForeign4.descriptor.id,
-                  isVisible: true,
-                  shouldAnimate: true,
-                },
-              ],
-              amount: patch(
-                preset.foreign.axis.line,
-                preset.inHome4.page.marginBox[preset.foreign.axis.size],
-              ),
-              isInFrontOfStart: false,
-            },
-            direction: preset.foreign.axis.direction,
-            destination: {
-              droppableId: preset.foreign.descriptor.id,
-              // going after target, so index is target index + 1
-              index: 2,
-            },
-          };
-
-          expect(result.impact).toEqual(expected);
-        });
+    describe('is going after a target', () => {
+      // moving inHome3 relative to inForeign1 (will go after inForeign1)
+      // always displace forward in foreign list
+      const willDisplaceForward: boolean = true;
+      const displacedBy: DisplacedBy = getDisplacedBy(
+        axis,
+        preset.inHome3.displaceBy,
+        willDisplaceForward,
+      );
+      const result: ?Result = moveToNewDroppable({
+        pageBorderBoxCenter: preset.inHome1.page.borderBox.center,
+        draggable: preset.inHome3,
+        draggables: preset.draggables,
+        // moving relative to inForeign1
+        // will actually go after it
+        moveRelativeTo: preset.inForeign1,
+        destination: preset.foreign,
+        insideDestination: preset.inForeignList,
+        previousImpact: noImpact,
+        viewport,
       });
 
-      describe('with droppable scroll', () => {
-        const scrollable: DroppableDimension = makeScrollable(
-          preset.foreign,
-          10,
-        );
-        const scroll: Position = patch(axis.line, 10);
-        const displacement: Position = negate(scroll);
-        const scrolled: DroppableDimension = scrollDroppable(
-          scrollable,
-          patch(axis.line, 10),
+      if (!result) {
+        throw new Error('invalid test setup');
+      }
+
+      it('should move before the displaced item after the relative move target', () => {
+        const displaced: BoxModel = offset(
+          preset.inForeign2.page,
+          displacedBy.point,
         );
 
-        const result: Result = moveToNewDroppable({
-          pageBorderBoxCenter: preset.inHome4.page.borderBox.center,
+        const expected: Position = goBefore({
+          axis,
+          moveRelativeTo: displaced,
+          isMoving: preset.inHome3.page,
+        });
+
+        expect(result.pageBorderBoxCenter).toEqual(expected);
+      });
+
+      it('should move the target and everything below it forward', () => {
+        // ordered by closest impacted
+        // everything after inForeign1
+        const displaced: Displacement[] = [
+          {
+            draggableId: preset.inForeign2.descriptor.id,
+            isVisible: true,
+            shouldAnimate: true,
+          },
+          {
+            draggableId: preset.inForeign3.descriptor.id,
+            isVisible: true,
+            shouldAnimate: true,
+          },
+          {
+            draggableId: preset.inForeign4.descriptor.id,
+            isVisible: true,
+            shouldAnimate: true,
+          },
+        ];
+        const expected: DragImpact = {
+          movement: {
+            displaced,
+            map: getDisplacementMap(displaced),
+            displacedBy,
+            willDisplaceForward,
+          },
+          direction: preset.foreign.axis.direction,
+          destination: {
+            droppableId: preset.foreign.descriptor.id,
+            // index after inForeign1
+            index: 1,
+          },
+          merge: null,
+        };
+
+        expect(result.impact).toEqual(expected);
+      });
+    });
+
+    describe('is moving after the last position of a list', () => {
+      it('should go after the non-displaced last item in the list', () => {
+        // Moving inHome4 relative to inForeign1
+        // Stripping out all the other items in the foreign so that we
+        // are sure to move after the last item (inForeign1)
+        const result: ?Result = moveToNewDroppable({
+          pageBorderBoxCenter: preset.inHome1.page.borderBox.center,
           draggable: preset.inHome4,
-          moveRelativeTo: preset.inForeign2,
-          destination: scrolled,
-          insideDestination: draggables,
+          draggables: preset.draggables,
+          moveRelativeTo: preset.inForeign1,
+          destination: preset.foreign,
+          insideDestination: [preset.inForeign1],
           previousImpact: noImpact,
           viewport,
         });
 
-        if (!result) {
-          throw new Error('Invalid result');
-        }
+        invariant(result);
 
-        it('should account for changes in droppable scroll', () => {
-          const withoutScroll: Position = moveToEdge({
-            source: preset.inHome4.page.borderBox,
-            sourceEdge: 'start',
-            destination: preset.inForeign2.page.marginBox,
-            // going after
-            destinationEdge: 'end',
-            destinationAxis: preset.foreign.axis,
-          });
-          const expected: Position = add(withoutScroll, displacement);
-
-          expect(result.pageBorderBoxCenter).toEqual(expected);
+        const after: Position = goAfter({
+          axis,
+          // not displaced!!
+          moveRelativeTo: preset.inForeign1.page,
+          isMoving: preset.inHome4.page,
         });
+        expect(result.pageBorderBoxCenter).toEqual(after);
       });
     });
 
@@ -555,20 +559,26 @@ const dontCare: Position = { x: 0, y: 0 };
           },
         });
 
-        const customInsideForeign: DraggableDimension[] = [customInForeign];
         // moving outside back into list with closest being 'outside'
+        const willDisplaceForward: boolean = true;
+        const displacedBy: DisplacedBy = getDisplacedBy(
+          axis,
+          customInHome.displaceBy,
+          willDisplaceForward,
+        );
+        const displaced: Displacement[] = [
+          {
+            draggableId: customInForeign.descriptor.id,
+            isVisible: false,
+            shouldAnimate: false,
+          },
+        ];
         const expected: DragImpact = {
           movement: {
-            displaced: [
-              {
-                draggableId: customInForeign.descriptor.id,
-                isVisible: false,
-                shouldAnimate: false,
-              },
-            ],
-            amount: patch(axis.line, customInHome.page.marginBox[axis.size]),
-            // always false in preset.foreign list
-            isInFrontOfStart: false,
+            displaced,
+            map: getDisplacementMap(displaced),
+            displacedBy,
+            willDisplaceForward,
           },
           direction: axis.direction,
           // moving into the outside position
@@ -576,14 +586,16 @@ const dontCare: Position = { x: 0, y: 0 };
             droppableId: customForeign.descriptor.id,
             index: customInForeign.descriptor.index,
           },
+          merge: null,
         };
 
-        const result: Result = moveToNewDroppable({
+        const result: ?Result = moveToNewDroppable({
           pageBorderBoxCenter: dontCare,
           draggable: customInHome,
+          draggables: toDraggableMap([customInForeign, customInHome]),
           moveRelativeTo: customInForeign,
           destination: customForeign,
-          insideDestination: customInsideForeign,
+          insideDestination: [customInForeign],
           previousImpact: noImpact,
           viewport,
         });
@@ -634,7 +646,7 @@ const dontCare: Position = { x: 0, y: 0 };
             [axis.crossAxisStart]: 0,
             [axis.crossAxisEnd]: 100,
             [axis.start]: 0,
-            // exteding beyond the viewport
+            // extending beyond the viewport
             [axis.end]: viewport.frame[axis.end] + 100,
           },
         });
@@ -654,20 +666,25 @@ const dontCare: Position = { x: 0, y: 0 };
           },
         });
 
-        const customInsideForeign: DraggableDimension[] = [customInForeign];
-        // moving outside back into list with closest being 'outside'
+        const willDisplaceForward: boolean = true;
+        const displacedBy: DisplacedBy = getDisplacedBy(
+          axis,
+          customInHome.displaceBy,
+          willDisplaceForward,
+        );
+        const displaced: Displacement[] = [
+          {
+            draggableId: customInForeign.descriptor.id,
+            isVisible: false,
+            shouldAnimate: false,
+          },
+        ];
         const expected: DragImpact = {
           movement: {
-            displaced: [
-              {
-                draggableId: customInForeign.descriptor.id,
-                isVisible: false,
-                shouldAnimate: false,
-              },
-            ],
-            amount: patch(axis.line, customInHome.page.marginBox[axis.size]),
-            // always false in preset.foreign list
-            isInFrontOfStart: false,
+            displaced,
+            map: getDisplacementMap(displaced),
+            displacedBy,
+            willDisplaceForward,
           },
           direction: axis.direction,
           // moving into the outside position
@@ -675,14 +692,16 @@ const dontCare: Position = { x: 0, y: 0 };
             droppableId: customForeign.descriptor.id,
             index: customInForeign.descriptor.index,
           },
+          merge: null,
         };
 
-        const result: Result = moveToNewDroppable({
+        const result: ?Result = moveToNewDroppable({
           pageBorderBoxCenter: dontCare,
           draggable: customInHome,
+          draggables: toDraggableMap([customInForeign, customInHome]),
           moveRelativeTo: customInForeign,
           destination: customForeign,
-          insideDestination: customInsideForeign,
+          insideDestination: [customInForeign],
           previousImpact: noImpact,
           viewport,
         });
