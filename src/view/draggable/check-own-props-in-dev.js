@@ -7,13 +7,11 @@ export default (props: Props) => {
     return;
   }
 
-  // IE11 does not support this check
-  if (Number.isInteger) {
-    invariant(
-      Number.isInteger(props.index),
-      'Draggable requires an integer index prop',
-    );
-  }
+  // Number.isInteger will be provided by @babel/runtime-corejs2
+  invariant(
+    Number.isInteger(props.index),
+    'Draggable requires an integer index prop',
+  );
 
   invariant(props.draggableId, 'Draggable requires a draggableId');
 };

@@ -3,8 +3,7 @@ type Map<T> = {
   [key: string]: T,
 };
 
-// Use native Object.values if it exists
-// Otherwise use Object.keys (ie11)
+// @babel/runtime-corejs2 will replace Object.values
 export function values<T>(map: Map<T>): T[] {
   return Object.values
     ? // https://github.com/facebook/flow/issues/2221

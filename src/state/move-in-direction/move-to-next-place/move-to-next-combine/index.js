@@ -56,7 +56,6 @@ export default ({
 
   // When finding the target we need to consider displacement
   // We need to move onto things in their current displacement
-  // TODO: don't use IIFE
 
   const current: DraggableDimension[] = (() => {
     const shallow = insideDestination.slice();

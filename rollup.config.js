@@ -10,13 +10,13 @@ import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
 import pkg from './package.json';
 
 const input = './src/index.js';
-export const extensions = ['.js', '.jsx'];
+const extensions = ['.js', '.jsx'];
 
 // Treat as externals all not relative and not absolute paths
 // e.g. 'react'
 const excludeAllExternals = id => !id.startsWith('.') && !id.startsWith('/');
 
-export const getBabelOptions = ({ useESModules }) => ({
+const getBabelOptions = ({ useESModules }) => ({
   exclude: 'node_modules/**',
   runtimeHelpers: true,
   plugins: [['@babel/transform-runtime', { corejs: 2, useESModules }]],
@@ -57,7 +57,6 @@ export default [
       sizeSnapshot(snapshotArgs),
     ],
   },
-
   // Minified UMD build
   {
     input,
@@ -79,7 +78,6 @@ export default [
       uglify(),
     ],
   },
-
   // CommonJS (cjs) build
   // - Keeping console.log statements
   // - All external packages are not bundled
@@ -92,7 +90,6 @@ export default [
       babel(getBabelOptions({ useESModules: false })),
     ],
   },
-
   // EcmaScript Module (esm) build
   // - Keeping console.log statements
   // - All external packages are not bundled

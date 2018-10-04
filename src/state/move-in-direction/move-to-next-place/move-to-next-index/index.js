@@ -19,7 +19,6 @@ import isTotallyVisibleInNewLocation from '../is-totally-visible-in-new-location
 import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
 import getDisplacedBy from '../../../get-displaced-by';
 import getDisplacementMap from '../../../get-displacement-map';
-import { subtract } from '../../../position';
 import fromReorder from './from-reorder';
 import fromCombine from './from-combine';
 import withScrollRequest from '../with-scroll-request';
