@@ -1,5 +1,6 @@
 // @flow
 import { type Position } from 'css-box-model';
+import invariant from 'tiny-invariant';
 import toHomeList from './to-home-list';
 import toForeignList from './to-foreign-list';
 import isHomeOf from '../../../droppable/is-home-of';
@@ -40,8 +41,22 @@ export default ({
   moveRelativeTo,
   previousImpact,
   viewport,
-}: Args): ?Result =>
-  isHomeOf(draggable, destination)
+}: Args): ?Result => {
+  // Draggables available, but none are candidates for movement (eg none are visible)
+  // Cannot move into the list
+  // Note: can move to empty list and then !moveRelativeTo && !insideDestination.length
+  if (insideDestination.length && !moveRelativeTo) {
+    return null;
+  }
+
+  if (moveRelativeTo) {
+    invariant(
+      moveRelativeTo.descriptor.droppableId === destination.descriptor.id,
+      'Unable to find target in destination droppable',
+    );
+  }
+
+  return isHomeOf(draggable, destination)
     ? // moving back to the home list
       toHomeList({
         moveIntoIndexOf: moveRelativeTo,
@@ -62,3 +77,4 @@ export default ({
         previousImpact,
         viewport,
       });
+};

@@ -74,13 +74,6 @@ export default ({
     viewport,
   });
 
-  // Draggables available, but none are candidates for movement (eg none are visible)
-  // Cannot move into the list
-  // Note: can move to empty list and then !moveRelativeTo && !insideDestination.length
-  if (insideDestination.length && !moveRelativeTo) {
-    return null;
-  }
-
   return moveToNewDroppable({
     pageBorderBoxCenter,
     destination,

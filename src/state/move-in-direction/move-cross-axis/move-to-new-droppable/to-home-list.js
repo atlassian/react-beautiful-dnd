@@ -44,11 +44,6 @@ export default ({
     return null;
   }
 
-  invariant(
-    moveIntoIndexOf.descriptor.droppableId === destination.descriptor.id,
-    'Unable to find target in destination droppable',
-  );
-
   const axis: Axis = destination.axis;
   const homeIndex: number = draggable.descriptor.index;
   const targetIndex: number = moveIntoIndexOf.descriptor.index;
