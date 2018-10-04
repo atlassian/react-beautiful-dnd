@@ -50,13 +50,14 @@ export default [
     // Only deep dependency required is React
     external: ['react'],
     plugins: [
-      replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
       babel(getBabelOptions({ useESModules: true })),
       resolve({ extensions }),
       commonjs({ include: 'node_modules/**' }),
+      replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
       sizeSnapshot(snapshotArgs),
     ],
   },
+
   // Minified UMD build
   {
     input,
@@ -69,15 +70,16 @@ export default [
     // Only deep dependency required is React
     external: ['react'],
     plugins: [
-      replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       babel(getBabelOptions({ useESModules: true })),
       resolve({ extensions }),
       commonjs({ include: 'node_modules/**' }),
       strip({ debugger: true }),
+      replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       sizeSnapshot(snapshotArgs),
       uglify(),
     ],
   },
+
   // CommonJS (cjs) build
   // - Keeping console.log statements
   // - All external packages are not bundled
@@ -90,6 +92,7 @@ export default [
       babel(getBabelOptions({ useESModules: false })),
     ],
   },
+
   // EcmaScript Module (esm) build
   // - Keeping console.log statements
   // - All external packages are not bundled
