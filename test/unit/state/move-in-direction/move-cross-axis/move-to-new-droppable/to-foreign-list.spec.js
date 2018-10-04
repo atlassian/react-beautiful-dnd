@@ -252,12 +252,20 @@ const dontCare: Position = { x: 0, y: 0 };
     });
 
     describe('is moving before the target', () => {
+      // moving home1 into the second position of the list
+      // always displace forward in foreign list
+      const willDisplaceForward: boolean = true;
+      const displacedBy: DisplacedBy = getDisplacedBy(
+        axis,
+        preset.inHome1.displaceBy,
+        willDisplaceForward,
+      );
       describe('without droppable scroll', () => {
-        // moving home1 into the second position of the list
         const result: ?Result = moveToNewDroppable({
           pageBorderBoxCenter: preset.inHome1.page.borderBox.center,
           draggable: preset.inHome1,
           draggables: preset.draggables,
+          // moving before target
           moveRelativeTo: preset.inForeign2,
           destination: preset.foreign,
           insideDestination: preset.inForeignList,
@@ -269,13 +277,16 @@ const dontCare: Position = { x: 0, y: 0 };
           throw new Error('invalid test setup');
         }
 
-        it('should move before the target', () => {
-          const expected: Position = moveToEdge({
-            source: preset.inHome1.page.borderBox,
-            sourceEdge: 'start',
-            destination: preset.inForeign2.page.marginBox,
-            destinationEdge: 'start',
-            destinationAxis: preset.foreign.axis,
+        it('should move before the displaced target', () => {
+          const displaced: BoxModel = offset(
+            preset.inForeign2.page,
+            displacedBy.point,
+          );
+
+          const expected: Position = goBefore({
+            axis,
+            moveRelativeTo: displaced,
+            isMoving: preset.inHome1.page,
           });
 
           expect(result.pageBorderBoxCenter).toEqual(expected);
