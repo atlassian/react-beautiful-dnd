@@ -45,6 +45,7 @@ const inViewport: DraggableDimension = getDraggableDimension({
     droppableId: droppable.descriptor.id,
     type: droppable.descriptor.type,
     index: 0,
+    payload: null,
   },
   borderBox: {
     top: 0,
@@ -60,6 +61,7 @@ const notInViewport: DraggableDimension = getDraggableDimension({
     droppableId: droppable.descriptor.id,
     type: droppable.descriptor.type,
     index: 1,
+    payload: null,
   },
   // outside of viewport but within droppable
   borderBox: {

@@ -506,6 +506,7 @@ const dontCare: Position = { x: 0, y: 0 };
             droppableId: customHome.descriptor.id,
             type: customHome.descriptor.type,
             index: 0,
+            payload: null,
           },
           borderBox: {
             [axis.crossAxisStart]: 0,
@@ -549,6 +550,7 @@ const dontCare: Position = { x: 0, y: 0 };
             droppableId: customForeign.descriptor.id,
             type: customForeign.descriptor.type,
             index: 0,
+            payload: null,
           },
           borderBox: {
             [axis.crossAxisStart]: 0,
@@ -627,6 +629,7 @@ const dontCare: Position = { x: 0, y: 0 };
             droppableId: customHome.descriptor.id,
             type: customHome.descriptor.type,
             index: 0,
+            payload: null,
           },
           borderBox: {
             [axis.crossAxisStart]: 0,
@@ -656,6 +659,7 @@ const dontCare: Position = { x: 0, y: 0 };
             droppableId: customForeign.descriptor.id,
             type: customForeign.descriptor.type,
             index: 0,
+            payload: null,
           },
           borderBox: {
             [axis.crossAxisStart]: 0,

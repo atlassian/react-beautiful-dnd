@@ -185,6 +185,7 @@ describe('hooks integration', () => {
 
     const start: DragStart = {
       draggableId,
+      payload: null,
       type: 'DEFAULT',
       source,
       mode: 'FLUID',

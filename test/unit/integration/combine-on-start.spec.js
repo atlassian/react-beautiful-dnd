@@ -126,6 +126,7 @@ it('should allow the changing of combining in onDragStart', () => {
       droppableId: 'droppable',
       index: 0,
     },
+    payload: null,
     type: 'DEFAULT',
     mode: 'SNAP',
   };

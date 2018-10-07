@@ -7,7 +7,6 @@ import type {
   DraggableDimension,
   ZIndex,
   State,
-  DropReason,
   MovementMode,
 } from '../../types';
 import {
@@ -131,17 +130,19 @@ export type MapProps = {|
   secondary: ?SecondaryMapProps,
 |};
 
-export type ChildrenFn = (Provided, StateSnapshot) => ?Node;
+export type ChildrenFn = (Provided, StateSnapshot) => Node;
 
 export type OwnProps = {|
   draggableId: DraggableId,
   index: number,
+  payload: ?mixed,
   children: ChildrenFn,
   isDragDisabled: boolean,
   disableInteractiveElementBlocking: boolean,
 |};
 
 export type DefaultProps = {|
+  payload: null,
   isDragDisabled: boolean,
   disableInteractiveElementBlocking: boolean,
 |};

@@ -32,6 +32,7 @@ const withTimings = (key: string, fn: Function) => {
 const getDragStart = (critical: Critical, mode: MovementMode): DragStart => ({
   draggableId: critical.draggable.id,
   type: critical.droppable.type,
+  payload: critical.draggable.payload,
   source: {
     droppableId: critical.droppable.id,
     index: critical.draggable.index,

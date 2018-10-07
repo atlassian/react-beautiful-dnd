@@ -283,6 +283,7 @@ const ConnectedDraggable: OwnProps => Node = (connect(
 ): any)(Draggable);
 
 ConnectedDraggable.defaultProps = ({
+  payload: null,
   isDragDisabled: false,
   // cannot drag interactive elements by default
   disableInteractiveElementBlocking: false,

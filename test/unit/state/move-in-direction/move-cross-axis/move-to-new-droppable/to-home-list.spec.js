@@ -410,6 +410,7 @@ const dontCare: Position = { x: 0, y: 0 };
             droppableId: droppable.descriptor.id,
             type: droppable.descriptor.type,
             index: 0,
+            payload: null,
           },
           borderBox: {
             [axis.crossAxisStart]: 0,
@@ -424,6 +425,7 @@ const dontCare: Position = { x: 0, y: 0 };
             droppableId: droppable.descriptor.id,
             type: droppable.descriptor.type,
             index: 1,
+            payload: null,
           },
           borderBox: {
             [axis.crossAxisStart]: 0,
@@ -504,6 +506,7 @@ const dontCare: Position = { x: 0, y: 0 };
             droppableId: droppable.descriptor.id,
             type: droppable.descriptor.type,
             index: 0,
+            payload: null,
           },
           borderBox: {
             [axis.crossAxisStart]: 0,
@@ -518,6 +521,7 @@ const dontCare: Position = { x: 0, y: 0 };
             droppableId: droppable.descriptor.id,
             type: droppable.descriptor.type,
             index: 1,
+            payload: null,
           },
           borderBox: {
             [axis.crossAxisStart]: 0,

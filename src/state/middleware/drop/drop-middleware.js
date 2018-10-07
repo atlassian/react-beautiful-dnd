@@ -77,6 +77,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
   const result: DropResult = {
     draggableId: draggable.descriptor.id,
     type: draggable.descriptor.type,
+    payload: draggable.descriptor.payload,
     source,
     mode: state.movementMode,
     destination,

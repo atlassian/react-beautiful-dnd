@@ -15,6 +15,7 @@ export type DroppableDescriptor = {|
 export type DraggableDescriptor = {|
   id: DraggableId,
   index: number,
+  payload: ?mixed,
   // Inherited from Droppable
   droppableId: DroppableId,
   // This is technically redundant but it avoids
@@ -228,6 +229,7 @@ export type DragPositions = {|
 export type DragStart = {|
   draggableId: DraggableId,
   type: TypeId,
+  payload: ?mixed,
   source: DraggableLocation,
   mode: MovementMode,
 |};

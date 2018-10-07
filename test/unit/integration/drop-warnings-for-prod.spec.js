@@ -5,7 +5,14 @@ import replace from 'rollup-plugin-replace';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import { uglify } from 'rollup-plugin-uglify';
-import { getBabelOptions, extensions } from '../../../rollup.config';
+
+const extensions = ['.js', '.jsx'];
+
+const getBabelOptions = ({ useESModules }) => ({
+  exclude: 'node_modules/**',
+  runtimeHelpers: true,
+  plugins: [['@babel/transform-runtime', { corejs: 2, useESModules }]],
+});
 
 const getCode = async ({ mode }): Promise<string> => {
   const plugins = [

@@ -782,6 +782,21 @@ import { Draggable } from 'react-beautiful-dnd';
 
 ### Draggable Props
 
+```js
+import type { Node } from 'react';
+
+type Props = {|
+  // required
+  draggableId: DraggableId,
+  index: number,
+  children: (DraggableProvided, DraggableStateSnapshot) => Node,
+  // optional
+  payload: ?mixed,
+  isDragDisabled: ?boolean,
+  disableInteractiveElementBlocking: ?boolean,
+|};
+```
+
 - `draggableId`: A _required_ `DraggableId(string)` that uniquely identifies the `Draggable` for the application. Please do not change this prop - especially during a drag.
 - `index`: A _required_ `number` that matches the order of the `Draggable` in the `Droppable`. It is simply the index of the `Draggable` in the list. The `index` needs to be unique within a `Droppable` but does not need to be unique between `Droppables`. Typically the `index` value will simply be the `index` provided by a `Array.prototype.map` function:
 
@@ -803,12 +818,13 @@ import { Draggable } from 'react-beautiful-dnd';
 }
 ```
 
+- `payload`: An _optional_ piece of data that is passed to `DragDropContext` > `hook` functions
 - `isDragDisabled`: An _optional_ flag to control whether or not the `Draggable` is permitted to drag. You can use this to implement your own conditional drag logic. It will default to `false`.
 - `disableInteractiveElementBlocking`: An _optional_ flag to opt out of blocking a drag from interactive elements. For more information refer to the section _Interactive child elements within a `Draggable`_
 
-### Children function (render props)
+### Children function (render props / function as child)
 
-The `React` children of a `Draggable` must be a function that returns a `ReactElement`.
+The `React` children of a `Draggable` must be a function that returns a `ReactNode`.
 
 ```js
 <Draggable draggableId="draggable-1" index={0}>

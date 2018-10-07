@@ -85,6 +85,7 @@ const getDispatchPropsStub = (): DispatchProps => ({
 
 const defaultOwnProps: OwnProps = {
   draggableId,
+  payload: null,
   index: 0,
   isDragDisabled: false,
   disableInteractiveElementBlocking: false,

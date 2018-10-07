@@ -65,6 +65,7 @@ const viewport: Viewport = getViewport();
           droppableId: droppable.descriptor.id,
           type: droppable.descriptor.type,
           index: 0,
+          payload: null,
         },
         borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
@@ -79,6 +80,7 @@ const viewport: Viewport = getViewport();
           droppableId: droppable.descriptor.id,
           type: droppable.descriptor.type,
           index: 1,
+          payload: null,
         },
         borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
@@ -94,6 +96,7 @@ const viewport: Viewport = getViewport();
           droppableId: droppable.descriptor.id,
           type: droppable.descriptor.type,
           index: 2,
+          payload: null,
         },
         borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
@@ -109,6 +112,7 @@ const viewport: Viewport = getViewport();
           droppableId: droppable.descriptor.id,
           type: droppable.descriptor.type,
           index: 3,
+          payload: null,
         },
         borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
@@ -206,6 +210,7 @@ const viewport: Viewport = getViewport();
           droppableId: droppable.descriptor.id,
           type: droppable.descriptor.type,
           index: 0,
+          payload: null,
         },
         borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
@@ -220,6 +225,7 @@ const viewport: Viewport = getViewport();
           droppableId: droppable.descriptor.id,
           type: droppable.descriptor.type,
           index: 1,
+          payload: null,
         },
         borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
@@ -234,6 +240,7 @@ const viewport: Viewport = getViewport();
           droppableId: droppable.descriptor.id,
           type: droppable.descriptor.type,
           index: 2,
+          payload: null,
         },
         borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
@@ -249,6 +256,7 @@ const viewport: Viewport = getViewport();
           droppableId: droppable.descriptor.id,
           type: droppable.descriptor.type,
           index: 3,
+          payload: null,
         },
         borderBox: {
           [axis.crossAxisStart]: crossAxisStart,

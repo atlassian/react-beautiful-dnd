@@ -149,6 +149,7 @@ export default (axis?: Axis = vertical) => {
       result: {
         draggableId: draggable.descriptor.id,
         type: draggable.descriptor.type,
+        payload: draggable.descriptor.payload,
         source: {
           droppableId: draggable.descriptor.droppableId,
           index: draggable.descriptor.index,

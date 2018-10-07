@@ -54,6 +54,7 @@ const inAnotherType: DraggableDimension = {
   descriptor: {
     type: ofAnotherType.descriptor.type,
     droppableId: ofAnotherType.descriptor.id,
+    payload: null,
     id: 'addition!',
     index: 0,
   },
