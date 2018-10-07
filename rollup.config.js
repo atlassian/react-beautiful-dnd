@@ -22,18 +22,13 @@ const getBabelOptions = ({ useESModules }) => ({
   plugins: [['@babel/transform-runtime', { corejs: 2, useESModules }]],
 });
 
-const snapshotArgs = (() => {
-  const shouldMatch = process.env.SNAPSHOT === 'match';
-
-  if (!shouldMatch) {
-    return {};
-  }
-
-  return {
-    matchSnapshot: true,
-    threshold: 1000,
-  };
-})();
+const snapshotArgs =
+  process.env.SNAPSHOT === 'match'
+    ? {
+        matchSnapshot: true,
+        threshold: 1000,
+      }
+    : {};
 
 export default [
   // Universal module definition (UMD) build
