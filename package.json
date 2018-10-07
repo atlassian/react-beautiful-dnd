@@ -99,7 +99,7 @@
     "react-emotion": "^9.2.8",
     "react-test-renderer": "^16.4.2",
     "rimraf": "^2.6.2",
-    "rollup": "^0.65.0",
+    "rollup": "^0.66.3",
     "rollup-plugin-babel": "^4.0.2",
     "rollup-plugin-commonjs": "^9.1.6",
     "rollup-plugin-node-resolve": "^3.3.0",
