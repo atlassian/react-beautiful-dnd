@@ -51,7 +51,6 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           type: droppable.descriptor.type,
           index: 0,
-          payload: null,
         },
         borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
@@ -70,7 +69,6 @@ describe('get closest draggable', () => {
             droppableId: droppable.descriptor.id,
             type: droppable.descriptor.type,
             index: 1,
-            payload: null,
           },
           borderBox: {
             [axis.crossAxisStart]: crossAxisStart,
@@ -88,7 +86,6 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           type: droppable.descriptor.type,
           index: 2,
-          payload: null,
         },
         borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
@@ -105,7 +102,6 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           type: droppable.descriptor.type,
           index: 3,
-          payload: null,
         },
         borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
@@ -124,7 +120,6 @@ describe('get closest draggable', () => {
             droppableId: droppable.descriptor.id,
             type: droppable.descriptor.type,
             index: 4,
-            payload: null,
           },
           borderBox: {
             [axis.crossAxisStart]: crossAxisStart,
@@ -143,7 +138,6 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           type: droppable.descriptor.type,
           index: 5,
-          payload: null,
         },
         borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
@@ -160,7 +154,6 @@ describe('get closest draggable', () => {
           droppableId: droppable.descriptor.id,
           type: droppable.descriptor.type,
           index: 6,
-          payload: null,
         },
         borderBox: {
           [axis.crossAxisStart]: crossAxisStart,

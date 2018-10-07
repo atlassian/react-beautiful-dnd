@@ -38,7 +38,6 @@ it('should not adjust the drag positions if an item was added after the critical
     ...preset.inHome3,
     descriptor: {
       index: preset.inHome3.descriptor.index,
-      payload: preset.inHome3.descriptor.payload,
       id: 'added',
       droppableId: preset.home.descriptor.id,
       type: preset.home.descriptor.type,
@@ -140,7 +139,6 @@ it('should account for additions before the critical', () => {
       id: 'added1',
       droppableId: preset.home.descriptor.id,
       type: preset.home.descriptor.type,
-      payload: preset.inHome2.descriptor.payload,
     },
   };
   const added2: DraggableDimension = {
@@ -150,7 +148,6 @@ it('should account for additions before the critical', () => {
       id: 'added2',
       droppableId: preset.home.descriptor.id,
       type: preset.home.descriptor.type,
-      payload: preset.inHome3.descriptor.payload,
     },
   };
   const original: CollectingState = withScrollables(
@@ -244,7 +241,6 @@ it('should account for changes that result in no net movement before the critica
       id: 'added1',
       droppableId: preset.home.descriptor.id,
       type: preset.home.descriptor.type,
-      payload: preset.inHome1.descriptor.payload,
     },
   };
   const original: CollectingState = withScrollables(

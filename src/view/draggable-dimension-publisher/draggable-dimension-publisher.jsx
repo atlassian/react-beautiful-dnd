@@ -26,7 +26,6 @@ type Props = {|
   droppableId: DroppableId,
   type: TypeId,
   index: number,
-  payload: ?mixed,
   getDraggableRef: () => ?HTMLElement,
   children: Node,
 |};
@@ -55,14 +54,12 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     (
       id: DraggableId,
       index: number,
-      payload: ?mixed,
       droppableId: DroppableId,
       type: TypeId,
     ): DraggableDescriptor => ({
       id,
       index,
       droppableId,
-      payload,
       type,
     }),
   );
@@ -72,7 +69,6 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
       this.props.draggableId,
       this.props.index,
-      this.props.payload,
       this.props.droppableId,
       this.props.type,
     );

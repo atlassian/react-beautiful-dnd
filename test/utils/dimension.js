@@ -356,7 +356,6 @@ export const getPreset = (axis?: Axis = vertical) => {
       droppableId: home.descriptor.id,
       type: home.descriptor.type,
       index: 0,
-      payload: { some: 'more data' },
     },
     borderBox: {
       // starting at start of home
@@ -375,7 +374,6 @@ export const getPreset = (axis?: Axis = vertical) => {
       droppableId: home.descriptor.id,
       type: home.descriptor.type,
       index: 1,
-      payload: { some: 'other data' },
     },
     // pushed forward by margin of inHome1
     borderBox: {
@@ -394,7 +392,6 @@ export const getPreset = (axis?: Axis = vertical) => {
       droppableId: home.descriptor.id,
       type: home.descriptor.type,
       index: 2,
-      payload: null,
     },
     borderBox: {
       [axis.start]: 60,
@@ -412,7 +409,6 @@ export const getPreset = (axis?: Axis = vertical) => {
       droppableId: home.descriptor.id,
       type: home.descriptor.type,
       index: 3,
-      payload: null,
     },
     borderBox: {
       [axis.start]: 100,
@@ -431,7 +427,6 @@ export const getPreset = (axis?: Axis = vertical) => {
       droppableId: foreign.descriptor.id,
       type: foreign.descriptor.type,
       index: 0,
-      payload: null,
     },
     borderBox: {
       [axis.start]: 10,
@@ -449,7 +444,6 @@ export const getPreset = (axis?: Axis = vertical) => {
       droppableId: foreign.descriptor.id,
       type: foreign.descriptor.type,
       index: 1,
-      payload: null,
     },
     borderBox: {
       [axis.start]: 30,
@@ -467,7 +461,6 @@ export const getPreset = (axis?: Axis = vertical) => {
       droppableId: foreign.descriptor.id,
       type: foreign.descriptor.type,
       index: 2,
-      payload: null,
     },
     borderBox: {
       [axis.start]: 60,
@@ -485,7 +478,6 @@ export const getPreset = (axis?: Axis = vertical) => {
       droppableId: foreign.descriptor.id,
       type: foreign.descriptor.type,
       index: 3,
-      payload: null,
     },
     borderBox: {
       [axis.start]: 100,
@@ -611,7 +603,6 @@ export const shiftDraggables = ({
         descriptor: {
           ...dimension.descriptor,
           index: dimension.descriptor.index + indexChange,
-          payload: null,
         },
         displaceBy: dimension.displaceBy,
         client,

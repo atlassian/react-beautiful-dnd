@@ -40,7 +40,6 @@ it('should shift added draggables to account for change in page scroll since sta
       id: 'added',
       droppableId: preset.home.descriptor.id,
       type: preset.home.descriptor.type,
-      payload: null,
     },
     // when collected this dimension would have been displaced by the scroll
     borderBox: offset(preset.inHome1.client, scrollDisplacement).borderBox,
@@ -95,7 +94,6 @@ it('should shift added draggables to account for change in droppable scroll sinc
       id: 'added',
       droppableId: preset.home.descriptor.id,
       type: preset.home.descriptor.type,
-      payload: null,
     },
     // when collected this dimension would have been displaced by the scroll
     borderBox: offset(preset.inHome1.client, scrollDisplacement).borderBox,

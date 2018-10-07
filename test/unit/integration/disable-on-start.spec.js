@@ -114,7 +114,6 @@ it('should allow the disabling of a droppable in onDragStart', () => {
       droppableId: 'droppable',
       index: 0,
     },
-    payload: null,
     type: 'DEFAULT',
     mode: 'SNAP',
   };

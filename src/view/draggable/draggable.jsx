@@ -327,7 +327,6 @@ export default class Draggable extends Component<Props> {
     const {
       draggableId,
       index,
-      payload,
       dragging,
       isDragDisabled,
       disableInteractiveElementBlocking,
@@ -343,7 +342,6 @@ export default class Draggable extends Component<Props> {
         draggableId={draggableId}
         droppableId={droppableId}
         type={type}
-        payload={payload}
         index={index}
         getDraggableRef={this.getDraggableRef}
       >

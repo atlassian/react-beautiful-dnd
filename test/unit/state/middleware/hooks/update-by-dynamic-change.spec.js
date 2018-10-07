@@ -76,7 +76,6 @@ it('should call onDragUpdate if the source has changed - even if the destination
   jest.runOnlyPendingTimers();
   const start: DragStart = {
     draggableId: preset.inHome2.descriptor.id,
-    payload: preset.inHome2.descriptor.payload,
     type: preset.inHome2.descriptor.type,
     source: {
       droppableId: preset.home.descriptor.id,
@@ -107,7 +106,6 @@ it('should call onDragUpdate if the source has changed - even if the destination
   }
   const lastUpdate: DragUpdate = {
     draggableId: preset.inHome2.descriptor.id,
-    payload: preset.inHome2.descriptor.payload,
     type: preset.home.descriptor.type,
     source: {
       droppableId: preset.home.descriptor.id,
@@ -143,7 +141,6 @@ it('should call onDragUpdate if the source has changed - even if the destination
 
   const postPublishUpdate: DragUpdate = {
     draggableId: preset.inHome2.descriptor.id,
-    payload: preset.inHome2.descriptor.payload,
     type: preset.home.descriptor.type,
     // new source as inHome1 was removed
     source: {

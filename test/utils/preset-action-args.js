@@ -82,7 +82,6 @@ export const publishAdditionArgs: Published = (() => {
 export const getDragStart = (custom?: Critical = critical): DragStart => ({
   draggableId: custom.draggable.id,
   type: custom.droppable.type,
-  payload: custom.draggable.payload,
   source: getHomeLocation(custom.draggable),
   mode: 'FLUID',
 });

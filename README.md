@@ -791,7 +791,6 @@ type Props = {|
   index: number,
   children: (DraggableProvided, DraggableStateSnapshot) => Node,
   // optional
-  payload: ?mixed,
   isDragDisabled: ?boolean,
   disableInteractiveElementBlocking: ?boolean,
 |};

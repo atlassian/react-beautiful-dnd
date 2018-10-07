@@ -41,7 +41,6 @@ it('should return null if there are draggables in a destination list but none ar
       droppableId: custom.descriptor.id,
       type: custom.descriptor.type,
       index: 0,
-      payload: null,
     },
     borderBox: {
       left: preset.home.client.borderBox.left + 1,

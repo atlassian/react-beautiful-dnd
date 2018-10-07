@@ -50,19 +50,13 @@ it('should not contain warnings in production', async () => {
   const code: string = await getCode({ mode: 'production' });
   expect(code.includes('This is a development only message')).toBe(false);
 
-  if (!code.includes('console.')) {
-    expect('You are awesome').toBeTruthy();
-    return;
-  }
-
-  // Nice error message printing (helpful for debugging)
+  // Checking there are no console.* messages
+  // Using regex so we can get really nice error messages
 
   // https://regexr.com/40pno
+  // .*? is a lazy match - will grab as little as possible
   const regex: RegExp = /console\.\w+\(.*?\)/g;
 
-  const matches = code.match(regex);
+  const matches: ?(string[]) = code.match(regex);
   expect(matches).toEqual(null);
-
-  // if we get to this point there must have been something wrong with our regex
-  throw new Error('console.* statement found, but unable to find match');
 });

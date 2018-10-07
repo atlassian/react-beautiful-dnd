@@ -48,7 +48,6 @@ const gap: number = 10;
       descriptor: {
         id: 'draggable-1',
         index: 0,
-        payload: null,
         droppableId: descriptor.id,
         type: descriptor.type,
       },
@@ -64,7 +63,6 @@ const gap: number = 10;
       descriptor: {
         id: 'draggable-2',
         index: 1,
-        payload: null,
         droppableId: descriptor.id,
         type: descriptor.type,
       },

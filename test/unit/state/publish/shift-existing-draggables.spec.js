@@ -105,7 +105,6 @@ it('should shift draggables after an added draggable', () => {
       id: 'added1',
       droppableId: preset.home.descriptor.id,
       type: preset.home.descriptor.type,
-      payload: preset.inHome2.descriptor.payload,
     },
   };
   const added2: DraggableDimension = {
@@ -115,7 +114,6 @@ it('should shift draggables after an added draggable', () => {
       id: 'added2',
       droppableId: preset.home.descriptor.id,
       type: preset.home.descriptor.type,
-      payload: preset.inHome3.descriptor.payload,
     },
   };
   const published: Published = {
@@ -233,7 +231,6 @@ it('should shift draggables after multiple changes', () => {
       id: 'added1',
       droppableId: preset.home.descriptor.id,
       type: preset.home.descriptor.type,
-      payload: null,
     },
   };
   const added2: DraggableDimension = {
@@ -243,7 +240,6 @@ it('should shift draggables after multiple changes', () => {
       id: 'added2',
       droppableId: preset.home.descriptor.id,
       type: preset.home.descriptor.type,
-      payload: null,
     },
   };
   const published: Published = {
