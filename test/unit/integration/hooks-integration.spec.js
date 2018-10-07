@@ -37,6 +37,7 @@ describe('hooks integration', () => {
 
   const draggableId: DraggableId = 'drag-1';
   const droppableId: DroppableId = 'drop-1';
+  const payload: mixed = { some: 'cool payload' };
 
   // both our list and item have the same dimension for now
   const borderBox: Rect = getRect({
@@ -71,7 +72,7 @@ describe('hooks integration', () => {
               {...droppableProvided.droppableProps}
             >
               <h2>Droppable</h2>
-              <Draggable draggableId={draggableId} index={0}>
+              <Draggable draggableId={draggableId} index={0} payload={payload}>
                 {(draggableProvided: DraggableProvided) => (
                   <div
                     className="drag-handle"
@@ -185,7 +186,7 @@ describe('hooks integration', () => {
 
     const start: DragStart = {
       draggableId,
-      payload: null,
+      payload,
       type: 'DEFAULT',
       source,
       mode: 'FLUID',
