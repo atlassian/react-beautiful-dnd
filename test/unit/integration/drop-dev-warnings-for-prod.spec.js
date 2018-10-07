@@ -51,13 +51,18 @@ it('should not contain warnings in production', async () => {
   expect(code.includes('This is a development only message')).toBe(false);
 
   if (!code.includes('console.')) {
+    expect('You are awesome').toBeTruthy();
     return;
   }
+
+  // Nice error message printing (helpful for debugging)
 
   // https://regexr.com/40pno
   const regex: RegExp = /console\.\w+\(.*?\)/g;
 
   const matches = code.match(regex);
   expect(matches).toEqual(null);
+
+  // if we get to this point there must have been something wrong with our regex
   throw new Error('console.* statement found, but unable to find match');
 });
