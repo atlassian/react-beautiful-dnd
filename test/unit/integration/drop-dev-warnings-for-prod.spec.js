@@ -49,5 +49,15 @@ it('should contain warnings in development', async () => {
 it('should not contain warnings in production', async () => {
   const code: string = await getCode({ mode: 'production' });
   expect(code.includes('This is a development only message')).toBe(false);
-  expect(code.includes('console.')).toBe(false);
+
+  if (!code.includes('console.')) {
+    return;
+  }
+
+  // https://regexr.com/40pno
+  const regex: RegExp = /console\.\w+\(.*?\)/g;
+
+  const matches = code.match(regex);
+  expect(matches).toEqual(null);
+  throw new Error('console.* statement found, but unable to find match');
 });
