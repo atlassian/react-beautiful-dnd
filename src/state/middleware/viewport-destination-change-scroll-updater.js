@@ -4,10 +4,14 @@ import type { Position } from 'css-box-model';
 import type { State, Viewport } from '../../types';
 import type { Action, MiddlewareStore, Dispatch } from '../store-types';
 import getMaxScroll from '../get-max-scroll';
-import { isEqual } from '../position';
-import { updateViewportMaxScroll } from '../action-creators';
+import { isEqual, subtract } from '../position';
+import {
+  updateViewportScrollFromDestinationChange as updateViewportScroll,
+  type ViewportScrollChangeFromDestinationChangeArgs as ScrollUpdateArgs,
+} from '../action-creators';
 import isMovementAllowed from '../is-movement-allowed';
 import whatIsDraggedOver from '../droppable/what-is-dragged-over';
+import getWindowScroll from '../../view/window/get-window-scroll';
 
 const shouldCheckOnAction = (action: Action): boolean =>
   action.type === 'MOVE' ||
@@ -21,7 +25,7 @@ const getNewMaxScroll = (
   previous: State,
   current: State,
   action: Action,
-): ?Position => {
+): ?ScrollUpdateArgs => {
   if (!shouldCheckOnAction(action)) {
     return null;
   }
@@ -52,12 +56,23 @@ const getNewMaxScroll = (
     height: viewport.frame.height,
   });
 
-  // No change from current max scroll
-  if (isEqual(maxScroll, viewport.scroll.max)) {
+  const currentScroll: Position = getWindowScroll();
+
+  // No change in current or max scroll
+  if (
+    isEqual(viewport.scroll.max, maxScroll) &&
+    isEqual(viewport.scroll.current, currentScroll)
+  ) {
     return null;
   }
 
-  return maxScroll;
+  const shift: Position = subtract(currentScroll, viewport.scroll.current);
+
+  return {
+    current: currentScroll,
+    shift,
+    max: maxScroll,
+  };
 };
 
 export default (store: MiddlewareStore) => (next: Dispatch) => (
@@ -66,11 +81,10 @@ export default (store: MiddlewareStore) => (next: Dispatch) => (
   const previous: State = store.getState();
   next(action);
   const current: State = store.getState();
-  const maxScroll: ?Position = getNewMaxScroll(previous, current, action);
+  const update: ?ScrollUpdateArgs = getNewMaxScroll(previous, current, action);
 
   // max scroll has changed - updating before action
-  // TODO: this is not before action...
-  if (maxScroll) {
-    next(updateViewportMaxScroll(maxScroll));
+  if (update) {
+    next(updateViewportScroll(update));
   }
 };

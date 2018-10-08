@@ -7,7 +7,7 @@ import publish from './publish';
 import moveInDirection, {
   type Result as MoveInDirectionResult,
 } from './move-in-direction';
-import { add, isEqual, origin } from './position';
+import { add, isEqual, origin, subtract } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
 import isMovementAllowed from './is-movement-allowed';
@@ -165,7 +165,7 @@ export default (state: State = idle, action: Action): State => {
       return state;
     }
 
-    // If we are jump scrolling - manual movements should not update the impact
+    // If we are snap moving - manual movements should not update the impact
     const impact: ?DragImpact =
       state.movementMode === 'SNAP' ? state.impact : null;
 
@@ -383,29 +383,40 @@ export default (state: State = idle, action: Action): State => {
     });
   }
 
-  if (action.type === 'UPDATE_VIEWPORT_MAX_SCROLL') {
+  if (action.type === 'UPDATE_VIEWPORT_SCROLL_FROM_DESTINATION_CHANGE') {
     invariant(
-      state.isDragging,
-      'Cannot update the max viewport scroll if not dragging',
+      isMovementAllowed(state),
+      `Cannot update viewport scroll in phase ${state.phase}`,
     );
     const existing: Viewport = state.viewport;
-    const viewport: Viewport = {
+    const withNewMax: Viewport = {
       ...existing,
       scroll: {
         ...existing.scroll,
-        max: action.payload,
+        max: action.payload.max,
       },
     };
+    const scrolled: Viewport = scrollViewport(
+      withNewMax,
+      action.payload.current,
+    );
 
-    return {
-      // appeasing flow
-      phase: 'DRAGGING',
-      ...state,
-      // eslint-disable-next-line
-      phase: state.phase,
-      viewport,
-      forceShouldAnimate: null,
-    };
+    const isSnapping: boolean = state.movementMode === 'SNAP';
+
+    // if snap moving: do not update the impact as we use forced impacts
+    const impact: ?DragImpact = isSnapping ? state.impact : null;
+
+    // If snap moving: shift the visual position of the item for a better fit
+    const clientSelection: Position = isSnapping
+      ? subtract(state.current.client.selection, action.payload.shift)
+      : state.current.client.selection;
+
+    return moveWithPositionUpdates({
+      state,
+      impact,
+      clientSelection,
+      viewport: scrolled,
+    });
   }
 
   if (

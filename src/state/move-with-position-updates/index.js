@@ -30,15 +30,15 @@ type MoveArgs = {|
 export default ({
   state,
   clientSelection,
-  viewport,
+  viewport: forcedViewport,
   impact: forcedImpact,
   scrollJumpRequest,
 }: MoveArgs): CollectingState | DraggingState => {
   // DRAGGING: can update position and impact
   // COLLECTING: can update position but cannot update impact
 
-  const newViewport: Viewport = viewport || state.viewport;
-  const currentWindowScroll: Position = newViewport.scroll.current;
+  const viewport: Viewport = forcedViewport || state.viewport;
+  const currentWindowScroll: Position = viewport.scroll.current;
 
   const offset: Position = subtract(
     clientSelection,
@@ -89,7 +89,7 @@ export default ({
       draggables: state.dimensions.draggables,
       droppables: state.dimensions.droppables,
       previousImpact: state.impact,
-      viewport: newViewport,
+      viewport,
       userDirection,
     });
 
@@ -107,7 +107,7 @@ export default ({
     dimensions,
     impact: newImpact,
     scrollJumpRequest: scrollJumpRequest || null,
-    viewport: newViewport,
+    viewport,
     forceShouldAnimate: null,
   };
 

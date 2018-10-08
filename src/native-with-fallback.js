@@ -5,8 +5,8 @@ type Map<T> = {
 
 // @babel/runtime-corejs2 will replace Object.values
 // Using this helper to ensure there are correct flow types
+// https://github.com/facebook/flow/issues/2221
 export function values<T>(map: Map<T>): T[] {
-  // https://github.com/facebook/flow/issues/2221
   // $FlowFixMe - Object.values currently does not have good flow support
   return Object.values(map);
 }
