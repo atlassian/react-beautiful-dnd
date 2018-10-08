@@ -97,14 +97,14 @@ export default ({
     // We are going to undo the last displacement
 
     // displacement is ordered by closest impacted
-    const displacement: ?Displacement = previousImpact.movement.displaced[0];
+    const closest: ?Displacement = previousImpact.movement.displaced[0];
 
     invariant(
-      displacement,
-      'Cannot move relative to last displacement when there is no previous displacement',
+      closest,
+      'Cannot move relative to closest displacement when there is no previous displacement',
     );
 
-    return draggables[displacement.draggableId];
+    return draggables[closest.draggableId];
   })();
 
   const modifier: number = isMovingForward ? 1 : -1;

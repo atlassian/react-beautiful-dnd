@@ -17,7 +17,7 @@ import type {
 } from './move-to-next-index-types';
 import getWillDisplaceForward from '../../../will-displace-forward';
 import getDisplacedBy from '../../../get-displaced-by';
-import { goAfter } from '../../../move-relative-to';
+import { goAfter, goBefore } from '../../../move-relative-to';
 
 type Args = {|
   isMovingForward: boolean,
@@ -30,49 +30,35 @@ type Args = {|
   previousPageBorderBoxCenter: Position,
 |};
 
-// type IsIncreasingDisplacementArgs = {|
-//   isMovingForward: boolean,
-//   isInHomeList: boolean,
-//   proposedIndex: number,
-//   startIndexInHome: number,
-// |};
-
-// const getIsIncreasingDisplacement = ({
-//   isMovingForward,
-//   isInHomeList,
-//   proposedIndex,
-//   startIndexInHome,
-// }: IsIncreasingDisplacementArgs): boolean => {
-//   // foreign list
-//   if (!isInHomeList) {
-//     // decreasing displacement as we move forward
-//     return !isMovingForward;
-//   }
-
-//   // home list
-
-//   // increase displacement if moving forward past start
-//   if (isMovingForward) {
-//     return proposedIndex > startIndexInHome;
-//   }
-
-//   // increase displacement if moving backwards away from start
-//   return proposedIndex < startIndexInHome;
-// };
-
-type GetNewPageBorderBoxCenterArgs = {|
-  axis: Axis,
-  draggable: DraggableDimension,
-  atProposedIndex: DraggableDimension,
-  willDisplaceForward: boolean,
+type IsIncreasingDisplacementArgs = {|
+  isMovingForward: boolean,
+  isInHomeList: boolean,
+  proposedIndex: number,
+  startIndexInHome: number,
 |};
 
-const getNewPageBorderBoxCenter = ({
-  axis,
-  draggable,
-  atProposedIndex,
-  willDisplaceForward,
-}: GetNewPageBorderBoxCenterArgs): Position => {};
+const getIsIncreasingDisplacement = ({
+  isMovingForward,
+  isInHomeList,
+  proposedIndex,
+  startIndexInHome,
+}: IsIncreasingDisplacementArgs): boolean => {
+  // foreign list
+  if (!isInHomeList) {
+    // decreasing displacement as we move forward
+    return !isMovingForward;
+  }
+
+  // home list
+
+  // increase displacement if moving forward past start
+  if (isMovingForward) {
+    return proposedIndex > startIndexInHome;
+  }
+
+  // increase displacement if moving backwards away from start
+  return proposedIndex < startIndexInHome;
+};
 
 export default ({
   isMovingForward,
@@ -117,14 +103,23 @@ export default ({
     startIndexInHome,
   });
 
-  const atProposedIndex: DraggableDimension = insideDestination[proposedIndex];
+  const isIncreasingDisplacement: boolean = getIsIncreasingDisplacement({
+    isMovingForward,
+    isInHomeList,
+    startIndexInHome,
+    proposedIndex,
+  });
 
-  // const isIncreasingDisplacement: boolean = getIsIncreasingDisplacement({
-  //   isMovingForward,
-  //   isInHomeList,
-  //   startIndexInHome,
-  //   proposedIndex,
-  // });
+  const atProposedIndex: DraggableDimension = insideDestination[proposedIndex];
+  const closestDisplaced: Displacement = previousImpact.movement.displaced[0];
+
+  const closest: DraggableId = isIncreasingDisplacement
+    ? atProposedIndex.descriptor.id
+    : closestDisplaced;
+
+  if (willDisplaceForward) {
+    return goBefore(
+  }
 
   const changeDisplacement: ChangeDisplacement = isIncreasingDisplacement
     ? {

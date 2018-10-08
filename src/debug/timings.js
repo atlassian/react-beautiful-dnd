@@ -4,13 +4,12 @@ type Records = {
 };
 
 const records: Records = {};
+let isEnabled: boolean = false;
 
-const flag: string = '__react-beautiful-dnd-debug-timings-hook__';
-
-const isTimingsEnabled = (): boolean => Boolean(window[flag]);
+const isTimingsEnabled = (): boolean => isEnabled;
 
 export const forceEnable = () => {
-  window[flag] = true;
+  isEnabled = true;
 };
 
 // Debug: uncomment to enable

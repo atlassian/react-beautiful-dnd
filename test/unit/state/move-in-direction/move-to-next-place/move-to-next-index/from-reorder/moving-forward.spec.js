@@ -88,14 +88,6 @@ const getVisibleDisplacement = (
         // when behind start we displace forward
         const willDisplaceForward: boolean = true;
 
-        // inHome4 has previously moved backwards to the second position
-
-        const displacedBy: DisplacedBy = getDisplacedBy(
-          axis,
-          preset.inHome3.displaceBy,
-          willDisplaceForward,
-        );
-
         it('should move into next index and decrease forwards displacement', () => {});
       });
     });

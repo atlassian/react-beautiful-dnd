@@ -27,10 +27,19 @@ export const getFormattedMessage = (message: string): string[] => [
   'color: #723874;',
 ];
 
+const isDisabledFlag: string = '__react-beautiful-dnd-disable-dev-warnings';
+
 export const warning = (message: string) => {
+  // no warnings in production
   if (isProduction) {
     return;
   }
+
+  // manual opt out of warnings
+  if (typeof window !== 'undefined' && window[isDisabledFlag]) {
+    return;
+  }
+
   // eslint-disable-next-line no-console
   console.warn(...getFormattedMessage(message));
 };
