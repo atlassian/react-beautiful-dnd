@@ -9,7 +9,7 @@ import type {
   Viewport,
 } from '../../../types';
 import type { Result } from './move-to-next-place-types';
-import moveToNextIndex from './move-to-next-index';
+import moveToNextIndex from './move-to-next-index-2';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
 import moveToNextCombine from './move-to-next-combine';
 import isHomeOf from '../../droppable/is-home-of';

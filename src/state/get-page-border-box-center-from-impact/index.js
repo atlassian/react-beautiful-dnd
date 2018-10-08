@@ -1,11 +1,11 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
 import whenCombining from './when-combining';
 import whenReordering from './when-reordering';
 import type {
   DragImpact,
   DraggableDimension,
+  DroppableDimension,
   DraggableDimensionMap,
   CombineImpact,
   DraggableLocation,
@@ -14,7 +14,7 @@ import type {
 type Args = {|
   impact: DragImpact,
   draggable: DraggableDimension,
-  droppables: DroppableDimensionMap,
+  droppable: ?DroppableDimension,
   draggables: DraggableDimensionMap,
 |};
 

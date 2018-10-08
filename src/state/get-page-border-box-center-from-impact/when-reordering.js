@@ -54,13 +54,13 @@ export default ({
     ? draggables[displaced[0].draggableId]
     : null;
 
-  // moving back into home index
-  if (isOverHome && !closest) {
-    return draggable.page.borderBox.center;
-  }
-
-  // this can happen when moving into the last spot of a foreign list
   if (!closest) {
+    // moving back into home index
+    if (isOverHome) {
+      return draggable.page.borderBox.center;
+    }
+
+    // this can happen when moving into the last spot of a foreign list
     const moveRelativeTo: DraggableDimension =
       insideDestination[insideDestination.length - 1];
     return goAfter({
