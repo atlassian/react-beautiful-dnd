@@ -7,15 +7,13 @@ import type {
   DimensionMap,
   DraggableDimension,
   DroppableId,
-  DropReason,
-} from '../../../../types';
-import withDroppableDisplacement from '../../../with-droppable-displacement';
-import whatIsDraggedOver from '../../../droppable/what-is-dragged-over';
-import { add, subtract } from '../../../position';
-import getBorderBoxCenter from './get-border-box-center';
+} from '../../../types';
+import withDroppableDisplacement from '../../with-droppable-displacement';
+import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
+import { add, subtract } from '../../position';
+import getPageBorderBoxCenterFromImpact from '../../get-page-border-box-center-from-impact';
 
 type Args = {|
-  reason: DropReason,
   impact: DragImpact,
   draggable: DraggableDimension,
   dimensions: DimensionMap,
@@ -29,7 +27,6 @@ const getScrollDisplacement = (
   withDroppableDisplacement(droppable, viewport.scroll.diff.displacement);
 
 export default ({
-  reason,
   impact,
   draggable,
   dimensions,
@@ -42,17 +39,17 @@ export default ({
     : null;
   const home: DroppableDimension = droppables[draggable.descriptor.droppableId];
 
-  const newBorderBoxClientCenter: Position = getBorderBoxCenter({
-    reason,
+  const newBorderBoxPageCenter: Position = getPageBorderBoxCenterFromImpact({
     impact,
     draggable,
     draggables,
     droppable,
   });
 
+  // client offset will be the same as the page offset :D
   const offset: Position = subtract(
-    newBorderBoxClientCenter,
-    draggable.client.borderBox.center,
+    newBorderBoxPageCenter,
+    draggable.page.borderBox.center,
   );
 
   const newHomeClientOffset: Position = add(

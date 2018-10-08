@@ -85,7 +85,6 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
   };
 
   const newHomeClientOffset: Position = getNewHomeClientOffset({
-    reason,
     impact,
     draggable,
     dimensions,
