@@ -145,6 +145,10 @@ export default (styleContext: string): Styles => {
   // user-select: none
   // This prevents the user from selecting text on the page while dragging
 
+  // overflow-anchor: none
+  // We are in control and aware of all of the window scrolls that occur
+  // we do not want the browser to have behaviors we do not expect
+
   const body: Rule = {
     selector: 'body',
     styles: {
@@ -155,6 +159,7 @@ export default (styleContext: string): Styles => {
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
+        overflow-anchor: none;
       `,
     },
   };

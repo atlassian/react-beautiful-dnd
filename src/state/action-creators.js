@@ -152,20 +152,20 @@ export const moveByWindowScroll = (
   payload: args,
 });
 
-export type ViewportScrollChangeFromDestinationChangeArgs = {|
+export type UpdateViewportScrollArgs = {|
   current: Position,
   shift: Position,
   max: Position,
 |};
 
-type UpdateViewportScrollFromDestinationChangeAction = {|
+type UpdateViewportScrollAction = {|
   type: 'UPDATE_VIEWPORT_SCROLL_FROM_DESTINATION_CHANGE',
-  payload: ViewportScrollChangeFromDestinationChangeArgs,
+  payload: UpdateViewportScrollArgs,
 |};
 
-export const updateViewportScrollFromDestinationChange = (
-  args: ViewportScrollChangeFromDestinationChangeArgs,
-): UpdateViewportScrollFromDestinationChangeAction => ({
+export const updateViewportScroll = (
+  args: UpdateViewportScrollArgs,
+): UpdateViewportScrollAction => ({
   type: 'UPDATE_VIEWPORT_SCROLL_FROM_DESTINATION_CHANGE',
   payload: args,
 });
@@ -285,7 +285,7 @@ export type Action =
   | UpdateDroppableIsEnabledAction
   | UpdateDroppableIsCombineEnabledAction
   | MoveByWindowScrollAction
-  | UpdateViewportScrollFromDestinationChangeAction
+  | UpdateViewportScrollAction
   | MoveAction
   | MoveUpAction
   | MoveDownAction

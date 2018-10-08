@@ -11,7 +11,10 @@ export function values<T>(map: Map<T>): T[] {
   return Object.values(map);
 }
 
-export function find<T>(list: Array<T>, predicate: T => boolean): ?T {
+// Could also extend to pass index and list
+type PredicateFn<T> = (value: T) => boolean;
+
+export function find<T>(list: Array<T>, predicate: PredicateFn<T>): ?T {
   if (list.find) {
     return list.find(predicate);
   }
@@ -26,7 +29,10 @@ export function find<T>(list: Array<T>, predicate: T => boolean): ?T {
   return undefined;
 }
 
-export function findIndex<T>(list: Array<T>, predicate: T => boolean): number {
+export function findIndex<T>(
+  list: Array<T>,
+  predicate: PredicateFn<T>,
+): number {
   return list.findIndex
     ? list.findIndex(predicate)
     : list.indexOf(find(list, predicate));

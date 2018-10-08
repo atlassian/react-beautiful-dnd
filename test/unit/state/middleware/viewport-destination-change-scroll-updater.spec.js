@@ -2,15 +2,16 @@
 import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
 import passThrough from './util/pass-through-middleware';
-import middleware from '../../../../src/state/middleware/max-scroll-updater';
+import middleware from '../../../../src/state/middleware/viewport-destination-change-scroll-updater';
 import createStore from './util/create-store';
 import {
-  updateViewportMaxScroll,
+  updateViewportScroll,
   initialPublish,
   moveDown,
   moveRight,
   clean,
   updateDroppableIsCombineEnabled,
+  type UpdateViewportScrollArgs,
 } from '../../../../src/state/action-creators';
 import type { Store } from '../../../../src/state/store-types';
 import type {
@@ -20,30 +21,23 @@ import type {
   DroppableId,
 } from '../../../../src/types';
 import getMaxScroll from '../../../../src/state/get-max-scroll';
+import { setViewport, setWindowScroll } from '../../../utils/viewport';
 import { initialPublishArgs, preset } from '../../../utils/preset-action-args';
-import getViewport from '../../../../src/view/window/get-viewport';
+// import getViewport from '../../../../src/view/window/get-viewport';
+import { origin, add } from '../../../../src/state/position';
 
-const viewport: Viewport = getViewport();
+// using viewport from initial publish args
+const viewport: Viewport = initialPublishArgs.viewport;
 const doc: ?HTMLElement = document.documentElement;
 invariant(doc, 'Cannot find document');
-
-// These properties are not setup correctly in jsdom
-const originalHeight: number = doc.scrollHeight;
-const originalWidth: number = doc.scrollWidth;
 
 const scrollHeight: number = viewport.frame.height;
 const scrollWidth: number = viewport.frame.width;
 doc.scrollHeight = scrollHeight;
 doc.scrollWidth = scrollWidth;
 
-afterEach(() => {
-  doc.scrollHeight = scrollHeight;
-  doc.scrollWidth = scrollWidth;
-});
-
-afterAll(() => {
-  doc.scrollHeight = originalHeight;
-  doc.scrollWidth = originalWidth;
+beforeEach(() => {
+  setViewport(viewport);
 });
 
 describe('not dragging', () => {
@@ -78,20 +72,25 @@ it('should update if the max scroll position has changed and the destination has
   doc.scrollHeight = scrollHeight + 10;
   doc.scrollWidth = scrollWidth + 10;
 
-  const expected: Position = getMaxScroll({
+  const newMax: Position = getMaxScroll({
     height: viewport.frame.height,
     width: viewport.frame.width,
     scrollHeight: scrollHeight + 10,
     scrollWidth: scrollWidth + 10,
   });
+  const expected: UpdateViewportScrollArgs = {
+    max: newMax,
+    shift: origin,
+    current: viewport.scroll.current,
+  };
   // changing droppable
   store.dispatch(moveRight());
   expect(mock).toHaveBeenCalledTimes(2);
   expect(mock).toHaveBeenCalledWith(moveRight());
-  expect(mock).toHaveBeenCalledWith(updateViewportMaxScroll(expected));
+  expect(mock).toHaveBeenCalledWith(updateViewportScroll(expected));
 });
 
-it('should not update if the max scroll position has not changed and destination has', () => {
+it('should update if the current scroll position has changed and the destination has changed', () => {
   const mock = jest.fn();
   const store: Store = createStore(middleware, passThrough(mock));
 
@@ -104,7 +103,37 @@ it('should not update if the max scroll position has not changed and destination
   }
   mock.mockClear();
 
-  // no change in scroll size but there is a change in destination
+  // change in scroll
+  const shift: Position = { x: 10, y: 20 };
+  const newScroll: Position = add(viewport.scroll.current, shift);
+  setWindowScroll(newScroll);
+
+  const expected: UpdateViewportScrollArgs = {
+    max: viewport.scroll.max,
+    shift,
+    current: newScroll,
+  };
+  // changing droppable
+  store.dispatch(moveRight());
+  expect(mock).toHaveBeenCalledTimes(2);
+  expect(mock).toHaveBeenCalledWith(moveRight());
+  expect(mock).toHaveBeenCalledWith(updateViewportScroll(expected));
+});
+
+it('should not update if the max and current scroll have not changed and destination has', () => {
+  const mock = jest.fn();
+  const store: Store = createStore(middleware, passThrough(mock));
+
+  // now dragging
+  store.dispatch(initialPublish(initialPublishArgs));
+  {
+    const current: State = store.getState();
+    invariant(current.isDragging);
+    expect(current.isDragging).toBe(true);
+  }
+  mock.mockClear();
+
+  // no change in scroll but there is a change in destination
   store.dispatch(moveRight());
   expect(mock).toHaveBeenCalledWith(moveRight());
   expect(mock).toHaveBeenCalledTimes(1);
@@ -134,7 +163,7 @@ it('should not update if the destination has not changed (even if the scroll siz
   expect(mock).toHaveBeenCalledWith(moveDown());
 });
 
-it('should not update if the moving from a reorder to combine in the same list', () => {
+it('should not update if moving from a reorder to combine in the same list', () => {
   // the scroll size should not change in response to a drag if the destination has not changed
   const mock = jest.fn();
   const store: Store = createStore(middleware, passThrough(mock));
@@ -207,18 +236,24 @@ it('should change if moving from combine to another list', () => {
     expect(impact.merge && impact.merge.combine.droppableId).toBe(homeId);
   }
 
+  // change in max scroll
   doc.scrollHeight = scrollHeight + 20;
   doc.scrollWidth = scrollWidth + 20;
 
-  const expected: Position = getMaxScroll({
+  const newMax: Position = getMaxScroll({
     height: viewport.frame.height,
     width: viewport.frame.width,
     scrollHeight: scrollHeight + 20,
     scrollWidth: scrollWidth + 20,
   });
+  const expected: UpdateViewportScrollArgs = {
+    max: newMax,
+    shift: origin,
+    current: viewport.scroll.current,
+  };
   // changing droppable
   store.dispatch(moveRight());
   expect(mock).toHaveBeenCalledTimes(2);
   expect(mock).toHaveBeenCalledWith(moveRight());
-  expect(mock).toHaveBeenCalledWith(updateViewportMaxScroll(expected));
+  expect(mock).toHaveBeenCalledWith(updateViewportScroll(expected));
 });

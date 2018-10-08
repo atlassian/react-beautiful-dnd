@@ -6,8 +6,8 @@ import type { Action, MiddlewareStore, Dispatch } from '../store-types';
 import getMaxScroll from '../get-max-scroll';
 import { isEqual, subtract } from '../position';
 import {
-  updateViewportScrollFromDestinationChange as updateViewportScroll,
-  type ViewportScrollChangeFromDestinationChangeArgs as ScrollUpdateArgs,
+  updateViewportScroll,
+  type UpdateViewportScrollArgs,
 } from '../action-creators';
 import isMovementAllowed from '../is-movement-allowed';
 import whatIsDraggedOver from '../droppable/what-is-dragged-over';
@@ -25,7 +25,7 @@ const getNewMaxScroll = (
   previous: State,
   current: State,
   action: Action,
-): ?ScrollUpdateArgs => {
+): ?UpdateViewportScrollArgs => {
   if (!shouldCheckOnAction(action)) {
     return null;
   }
@@ -81,7 +81,11 @@ export default (store: MiddlewareStore) => (next: Dispatch) => (
   const previous: State = store.getState();
   next(action);
   const current: State = store.getState();
-  const update: ?ScrollUpdateArgs = getNewMaxScroll(previous, current, action);
+  const update: ?UpdateViewportScrollArgs = getNewMaxScroll(
+    previous,
+    current,
+    action,
+  );
 
   // max scroll has changed - updating before action
   if (update) {
