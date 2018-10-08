@@ -93,12 +93,12 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
   });
 
   // Do not animate if you do not need to.
-  // This will be the case if either you are dragging with a
-  // keyboard or if you manage to nail it with a mouse / touch.
-  const isAnimationRequired = !isEqual(
-    state.current.client.offset,
-    newHomeClientOffset,
-  );
+  // Animate the drop if:
+  // - not already in the right spot OR
+  // - doing a combine (we still want to animate the scale and opacity fade)
+  const isAnimationRequired: boolean =
+    !isEqual(state.current.client.offset, newHomeClientOffset) ||
+    Boolean(result.combine);
 
   if (!isAnimationRequired) {
     dispatch(completeDrop(result));

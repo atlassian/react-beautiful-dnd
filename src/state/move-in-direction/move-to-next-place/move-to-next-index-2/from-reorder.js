@@ -1,37 +1,18 @@
 // @flow
 import invariant from 'tiny-invariant';
-import type { Position } from 'css-box-model';
 import type {
   Axis,
   DisplacedBy,
   DraggableDimension,
   Displacement,
   DroppableDimension,
-  DraggableDimensionMap,
   DragImpact,
   DraggableLocation,
 } from '../../../../types';
 import getWillDisplaceForward from '../../../will-displace-forward';
 import getDisplacementMap from '../../../get-displacement-map';
 import getDisplacedBy from '../../../get-displaced-by';
-
-const simpleAddClosest = (
-  add: DraggableDimension,
-  displaced: Displacement[],
-): Displacement[] => {
-  const simple: Displacement = {
-    draggableId: add.descriptor.id,
-    isVisible: true,
-    shouldAnimate: true,
-  };
-  return [simple, ...displaced];
-};
-
-const simpleClosestRemoved = (displaced: Displacement[]): Displacement[] => {
-  const shallow: Displacement[] = [...displaced];
-  shallow.shift();
-  return shallow;
-};
+import { addClosest, removeClosest } from './get-forced-displacement';
 
 type Args = {|
   isMovingForward: boolean,
@@ -106,8 +87,8 @@ export default ({
 
   const lastDisplaced: Displacement[] = previousImpact.movement.displaced;
   const displaced: Displacement[] = isIncreasingDisplacement
-    ? simpleAddClosest(atProposedIndex, lastDisplaced)
-    : simpleClosestRemoved(lastDisplaced);
+    ? addClosest(atProposedIndex, lastDisplaced)
+    : removeClosest(lastDisplaced);
 
   return {
     movement: {
