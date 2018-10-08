@@ -65,33 +65,37 @@ export default ({
     return null;
   }
 
-  const target: DraggableDimension = insideDestination[proposedIndex];
-  const isIncreasingDisplacement: boolean = (() => {
-    if (isInHomeList) {
-      // if moving away from start then increasing displacement
-
-      return (
-        // moving forward from start
-        (isMovingForward && proposedIndex > startIndexInHome) ||
-        // moving backwards from start
-        (!isMovingForward && proposedIndex < startIndexInHome)
-      );
-    }
-
-    // in foreign list moving forward will reduce the amount displaced
-    return !isMovingForward;
-  })();
-
   const willDisplaceForward: boolean = getWillDisplaceForward({
     isInHomeList,
     proposedIndex,
     startIndexInHome,
   });
 
-  const useDisplacementFrom: DraggableDimension = (() => {
-    if (isIncreasingDisplacement) {
-      return target;
+  const atProposedIndex: DraggableDimension = insideDestination[proposedIndex];
+
+  const isIncreasingDisplacement: boolean = (() => {
+    if (isInHomeList) {
+      // increase displacement if moving forward past start
+      if (isMovingForward) {
+        return proposedIndex > startIndexInHome;
+      }
+      // increase displacement if moving backwards away from start
+      return proposedIndex < startIndexInHome;
     }
+
+    // in foreign list moving forward will reduce the amount displaced
+    return !isMovingForward;
+  })();
+
+  const useDisplacementFrom: DraggableDimension = (() => {
+    // Option 1:
+    // We need to shift by the amount of the thing we are moving past
+    if (isIncreasingDisplacement) {
+      return atProposedIndex;
+    }
+    // Option 2:
+    // We are going to undo the last displacement
+
     // displacement is ordered by closest impacted
     const displacement: ?Displacement = previousImpact.movement.displaced[0];
 
@@ -118,7 +122,7 @@ export default ({
   const change: ChangeDisplacement = isIncreasingDisplacement
     ? {
         type: 'ADD_CLOSEST',
-        add: target,
+        add: atProposedIndex,
       }
     : {
         type: 'REMOVE_CLOSEST',
