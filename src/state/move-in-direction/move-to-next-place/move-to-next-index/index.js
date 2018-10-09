@@ -12,6 +12,7 @@ import fromReorder from './from-reorder';
 import getPageBorderBoxCenterFromImpact from '../../../get-page-border-box-center-from-impact';
 import isTotallyVisibleInNewLocation from '../is-totally-visible-in-new-location';
 import { subtract } from '../../../position';
+import { speculativelyIncrease, recompute } from './update-visibility';
 
 export type Args = {|
   isMovingForward: boolean,
@@ -32,10 +33,17 @@ export default ({
   destination,
   draggables,
   insideDestination,
-  previousImpact,
+  previousImpact: needsVisibilityCheck,
   previousPageBorderBoxCenter,
   viewport,
 }: Args): ?InternalResult => {
+  const previousImpact: DragImpact = recompute({
+    impact: needsVisibilityCheck,
+    viewport,
+    draggables,
+    destination,
+  });
+
   const impact: ?DragImpact = fromReorder({
     isMovingForward,
     isInHomeList,
@@ -71,15 +79,6 @@ export default ({
     onlyOnMainAxis: true,
   });
 
-  if (!isVisibleInNewLocation) {
-    console.warn('IS NOT VISIBLE');
-  }
-
-  console.log(
-    'displacement',
-    impact.movement.displaced.map(d => d.draggableId),
-  );
-
   if (isVisibleInNewLocation) {
     return {
       pageBorderBoxCenter: newPageBorderBoxCenter,
@@ -88,20 +87,24 @@ export default ({
     };
   }
 
-  console.warn('NOT VISIBLE IN NEW LOCATION', newPageBorderBoxCenter);
-  console.log('using', previousPageBorderBoxCenter);
+  console.warn('NOT VISIBLE IN NEW LOCATION');
   // The full distance required to get from the previous page center to the new page center
   const distance: Position = subtract(
     newPageBorderBoxCenter,
     previousPageBorderBoxCenter,
   );
 
-  // console.log('previous page border box center');
-  // console.log('distance', distance);
+  const updated: DragImpact = speculativelyIncrease({
+    impact,
+    viewport,
+    destination,
+    draggables,
+    maxScrollChange: distance,
+  });
 
   return {
     pageBorderBoxCenter: previousPageBorderBoxCenter,
-    impact,
+    impact: updated,
     scrollJumpRequest: distance,
   };
 };

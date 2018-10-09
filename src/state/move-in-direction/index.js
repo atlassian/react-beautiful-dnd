@@ -80,8 +80,6 @@ export default ({ state, type }: Args): ?PublicResult => {
     droppable,
     state.viewport,
   );
-  console.log('pageBorderBoxCenter', result.pageBorderBoxCenter);
-  console.log('client selection', withDisplacement);
 
   return {
     clientSelection: withDisplacement,
