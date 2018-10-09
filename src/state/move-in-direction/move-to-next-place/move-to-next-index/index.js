@@ -13,6 +13,7 @@ import getPageBorderBoxCenterFromImpact from '../../../get-page-border-box-cente
 import isTotallyVisibleInNewLocation from '../is-totally-visible-in-new-location';
 import { subtract } from '../../../position';
 import { speculativelyIncrease, recompute } from './update-visibility';
+import withDroppableDisplacement from '../../../with-scroll-change/with-droppable-displacement';
 
 export type Args = {|
   isMovingForward: boolean,
@@ -26,6 +27,8 @@ export type Args = {|
   viewport: Viewport,
 |};
 
+let callCount = 0;
+
 export default ({
   isMovingForward,
   isInHomeList,
@@ -37,6 +40,7 @@ export default ({
   previousPageBorderBoxCenter,
   viewport,
 }: Args): ?InternalResult => {
+  console.warn(`🏃‍♂️ MOVE TO NEXT INDEX: ${++callCount}`);
   const previousImpact: DragImpact = recompute({
     impact: needsVisibilityCheck,
     viewport,
@@ -70,9 +74,7 @@ export default ({
     destination,
     newPageBorderBoxCenter,
     viewport: viewport.frame,
-    // not applying the displacement of the droppable for this check
-    // we are only interested in the page location of the dragging item
-    withDroppableDisplacement: false,
+    withDroppableDisplacement: true,
     // we only care about it being visible relative to the main axis
     // this is important with dynamic changes as scroll bar and toggle
     // on the cross axis during a drag
@@ -81,18 +83,26 @@ export default ({
 
   if (isVisibleInNewLocation) {
     return {
+      type: 'MOVE',
       pageBorderBoxCenter: newPageBorderBoxCenter,
       impact,
-      scrollJumpRequest: null,
     };
   }
 
-  console.warn('NOT VISIBLE IN NEW LOCATION');
+  console.log('👻 not visible in new location');
+
   // The full distance required to get from the previous page center to the new page center
-  const distance: Position = subtract(
+  const withDisplacement: Position = withDroppableDisplacement(
+    destination,
     newPageBorderBoxCenter,
+  );
+
+  const distance: Position = subtract(
+    withDisplacement,
     previousPageBorderBoxCenter,
   );
+
+  console.log('distance needed', distance);
 
   const updated: DragImpact = speculativelyIncrease({
     impact,
@@ -103,8 +113,8 @@ export default ({
   });
 
   return {
-    pageBorderBoxCenter: previousPageBorderBoxCenter,
+    type: 'SCROLL_JUMP',
+    request: distance,
     impact: updated,
-    scrollJumpRequest: distance,
   };
 };

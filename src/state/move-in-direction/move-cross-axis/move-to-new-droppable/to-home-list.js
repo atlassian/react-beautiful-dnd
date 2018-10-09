@@ -1,13 +1,11 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { type Position, type BoxModel, offset } from 'css-box-model';
+import { type Position } from 'css-box-model';
 import getDisplacement from '../../../get-displacement';
-import withDroppableDisplacement from '../../../with-scroll-change/with-droppable-displacement';
 import getDisplacementMap from '../../../get-displacement-map';
-import { noMovement } from '../../../no-impact';
 import getDisplacedBy from '../../../get-displaced-by';
 import getWillDisplaceForward from '../../../will-displace-forward';
-import { goBefore, goAfter } from '../../../move-relative-to';
+import getHomeImpact from '../../../get-home-impact';
 import type { InternalResult } from '../../move-in-direction-types';
 import type {
   Axis,
@@ -19,6 +17,7 @@ import type {
   DraggableDimensionMap,
   DisplacedBy,
 } from '../../../../types';
+import getPageBorderBoxCenterFromImpact from '../../../get-page-border-box-center-from-impact';
 
 type Args = {|
   moveIntoIndexOf: ?DraggableDimension,
@@ -51,21 +50,19 @@ export default ({
   // Moving back to original index
   // Super simple - just move it back to the original center with no impact
   if (homeIndex === targetIndex) {
-    const newCenter: Position = draggable.page.borderBox.center;
+    const impact: DragImpact = getHomeImpact(draggable, destination);
+    const pageBorderBoxCenter: Position = getPageBorderBoxCenterFromImpact({
+      impact,
+      draggable,
+      droppable: destination,
+      draggables,
+    });
+    // const newCenter: Position = draggable.page.borderBox.center;
 
     return {
-      pageBorderBoxCenter: withDroppableDisplacement(destination, newCenter),
-      // TODO: use getHomeImpact (this is just copied)
-      impact: {
-        movement: noMovement,
-        direction: axis.direction,
-        destination: {
-          index: homeIndex,
-          droppableId: draggable.descriptor.droppableId,
-        },
-        merge: null,
-      },
-      scrollJumpRequest: null,
+      type: 'MOVE',
+      impact,
+      pageBorderBoxCenter,
     };
   }
 
@@ -106,24 +103,7 @@ export default ({
     willDisplaceForward,
   );
 
-  const closest: DraggableDimension = draggables[displaced[0].draggableId];
-
-  const closestWhenDisplaced: BoxModel = offset(
-    closest.page,
-    displacedBy.point,
-  );
-
-  const moveArgs = {
-    axis: destination.axis,
-    moveRelativeTo: closestWhenDisplaced,
-    isMoving: draggable.page,
-  };
-
-  const newCenter: Position = isMovingAfterStart
-    ? goAfter(moveArgs)
-    : goBefore(moveArgs);
-
-  const newImpact: DragImpact = {
+  const impact: DragImpact = {
     movement: {
       displacedBy,
       displaced,
@@ -138,9 +118,16 @@ export default ({
     merge: null,
   };
 
+  const pageBorderBoxCenter: Position = getPageBorderBoxCenterFromImpact({
+    impact,
+    draggable,
+    droppable: destination,
+    draggables,
+  });
+
   return {
-    pageBorderBoxCenter: withDroppableDisplacement(destination, newCenter),
-    impact: newImpact,
-    scrollJumpRequest: null,
+    type: 'MOVE',
+    pageBorderBoxCenter,
+    impact,
   };
 };

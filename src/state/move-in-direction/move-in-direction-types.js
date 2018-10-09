@@ -2,16 +2,19 @@
 import type { Position } from 'css-box-model';
 import type { DragImpact } from '../../types';
 
-export type InternalResult = {|
-  // the new page center position of the element
-  pageBorderBoxCenter: Position,
-  // the impact of the movement
+export type ScrollJumpResult = {|
+  type: 'SCROLL_JUMP',
+  request: Position,
   impact: DragImpact,
-  // Any scroll that is required for the movement.
-  // If this is present then the pageBorderBoxCenter and impact
-  // will just be the same as the previous drag
-  scrollJumpRequest: ?Position,
 |};
+
+export type MoveResult = {|
+  type: 'MOVE',
+  pageBorderBoxCenter: Position,
+  impact: DragImpact,
+|};
+
+export type InternalResult = ScrollJumpResult | MoveResult;
 
 export type PublicResult = {|
   clientSelection: Position,

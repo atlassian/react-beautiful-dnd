@@ -70,6 +70,14 @@ export default ({ state, type }: Args): ?PublicResult => {
     return null;
   }
 
+  if (result.type === 'SCROLL_JUMP') {
+    return {
+      clientSelection: state.current.client.selection,
+      impact: result.impact,
+      scrollJumpRequest: result.request,
+    };
+  }
+
   const withoutInitialPageScroll: Position = subtract(
     result.pageBorderBoxCenter,
     state.viewport.scroll.initial,
@@ -84,6 +92,6 @@ export default ({ state, type }: Args): ?PublicResult => {
   return {
     clientSelection: withDisplacement,
     impact: result.impact,
-    scrollJumpRequest: result.scrollJumpRequest,
+    scrollJumpRequest: null,
   };
 };

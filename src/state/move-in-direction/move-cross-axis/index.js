@@ -4,7 +4,7 @@ import getBestCrossAxisDroppable from './get-best-cross-axis-droppable';
 import getClosestDraggable from './get-closest-draggable';
 import moveToNewDroppable from './move-to-new-droppable';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
-import type { Result } from '../move-in-direction-types';
+import type { InternalResult } from '../move-in-direction-types';
 import type {
   DraggableId,
   DroppableId,
@@ -42,7 +42,7 @@ export default ({
   droppables,
   previousImpact,
   viewport,
-}: Args): ?Result => {
+}: Args): ?InternalResult => {
   const draggable: DraggableDimension = draggables[draggableId];
   const source: DroppableDimension = droppables[droppableId];
 

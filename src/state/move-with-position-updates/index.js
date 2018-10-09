@@ -44,7 +44,6 @@ export default ({
     clientSelection,
     state.initial.client.selection,
   );
-  console.log('client offset', offset);
 
   const client: ClientPositions = {
     offset,
@@ -56,6 +55,11 @@ export default ({
     selection: add(client.selection, currentWindowScroll),
     borderBoxCenter: add(client.borderBoxCenter, currentWindowScroll),
   };
+
+  console.group('final values');
+  console.log('client center', client.borderBoxCenter.y);
+  console.log('page center', page.borderBoxCenter.y);
+  console.groupEnd();
 
   const current: DragPositions = {
     client,
