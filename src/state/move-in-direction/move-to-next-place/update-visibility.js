@@ -6,12 +6,12 @@ import type {
   DragImpact,
   Displacement,
   Viewport,
-} from '../../../../types';
-import scrollViewport from '../../../scroll-viewport';
-import scrollDroppable from '../../../droppable/scroll-droppable';
-import getDisplacement from '../../../get-displacement';
-import getDisplacementMap from '../../../get-displacement-map';
-import { add } from '../../../position';
+} from '../../../types';
+import scrollViewport from '../../scroll-viewport';
+import scrollDroppable from '../../droppable/scroll-droppable';
+import getDisplacement from '../../get-displacement';
+import getDisplacementMap from '../../get-displacement-map';
+import { add } from '../../position';
 
 const withNewDisplacement = (
   impact: DragImpact,

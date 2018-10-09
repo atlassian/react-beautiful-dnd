@@ -12,7 +12,7 @@ import type {
 import getWillDisplaceForward from '../../../will-displace-forward';
 import getDisplacementMap from '../../../get-displacement-map';
 import getDisplacedBy from '../../../get-displaced-by';
-import { addClosest, removeClosest } from './update-displacement';
+import { addClosest, removeClosest } from '../update-displacement';
 
 type Args = {|
   isMovingForward: boolean,

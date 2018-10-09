@@ -8,15 +8,13 @@ import type {
   DraggableDimensionMap,
   CombineImpact,
   DraggableLocation,
-  Viewport,
 } from '../../../../types';
-import type { InternalResult } from '../../move-in-direction-types';
-import isTotallyVisibleInNewLocation from '../is-totally-visible-in-new-location';
 import {
   forward,
   backward,
 } from '../../../user-direction/user-direction-preset';
 import getPageBorderBoxCenterFromImpact from '../../../get-page-border-box-center-from-impact';
+import type { MoveResult } from '../move-to-next-place-types';
 
 export type Args = {|
   isMovingForward: boolean,
@@ -26,7 +24,6 @@ export type Args = {|
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
   previousImpact: DragImpact,
-  viewport: Viewport,
 |};
 
 export default ({
@@ -37,8 +34,7 @@ export default ({
   destination,
   insideDestination,
   previousImpact,
-  viewport,
-}: Args): ?InternalResult => {
+}: Args): ?MoveResult => {
   if (!destination.isCombineEnabled) {
     return null;
   }
@@ -105,25 +101,8 @@ export default ({
     draggables,
   });
 
-  const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
-    draggable,
-    destination,
-    newPageBorderBoxCenter: pageBorderBoxCenter,
-    viewport: viewport.frame,
-    withDroppableDisplacement: true,
-    // we only care about it being visible relative to the main axis
-    // this is important with dynamic changes as scroll bar and toggle
-    // on the cross axis during a drag
-    onlyOnMainAxis: true,
-  });
-
-  if (isVisibleInNewLocation) {
-    return {
-      type: 'MOVE',
-      pageBorderBoxCenter,
-      impact,
-    };
-  }
-
-  throw new Error('TODO');
+  return {
+    pageBorderBoxCenter,
+    impact,
+  };
 };

@@ -9,10 +9,15 @@ import type {
   Viewport,
 } from '../../../types';
 import type { InternalResult } from '../move-in-direction-types';
+import type { MoveResult } from './move-to-next-place-types';
 import moveToNextIndex from './move-to-next-index';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
 import moveToNextCombine from './move-to-next-combine';
 import isHomeOf from '../../droppable/is-home-of';
+import withDroppableDisplacement from '../../with-scroll-change/with-droppable-displacement';
+import { speculativelyIncrease, recompute } from './update-visibility';
+import { subtract } from '../../position';
+import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 
 type Args = {|
   isMovingForward: boolean,
@@ -30,12 +35,19 @@ export default ({
   destination,
   draggables,
   viewport,
-  previousImpact,
+  previousImpact: needsVisibilityCheck,
   previousPageBorderBoxCenter,
 }: Args): ?InternalResult => {
   if (!destination.isEnabled) {
     return null;
   }
+
+  const previousImpact: DragImpact = recompute({
+    impact: needsVisibilityCheck,
+    viewport,
+    draggables,
+    destination,
+  });
 
   const draggable: DraggableDimension = draggables[draggableId];
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
@@ -44,7 +56,7 @@ export default ({
   );
   const isInHomeList: boolean = isHomeOf(draggable, destination);
 
-  return (
+  const result: ?MoveResult =
     moveToNextCombine({
       isInHomeList,
       isMovingForward,
@@ -53,7 +65,6 @@ export default ({
       destination,
       insideDestination,
       previousImpact,
-      viewport,
     }) ||
     moveToNextIndex({
       isMovingForward,
@@ -62,9 +73,61 @@ export default ({
       draggables,
       destination,
       insideDestination,
-      previousPageBorderBoxCenter,
       previousImpact,
-      viewport,
-    })
+    });
+
+  if (!result) {
+    return null;
+  }
+
+  const { impact, pageBorderBoxCenter } = result;
+
+  const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
+    draggable,
+    destination,
+    newPageBorderBoxCenter: pageBorderBoxCenter,
+    viewport: viewport.frame,
+    withDroppableDisplacement: true,
+    // we only care about it being visible relative to the main axis
+    // this is important with dynamic changes as scroll bar and toggle
+    // on the cross axis during a drag
+    onlyOnMainAxis: true,
+  });
+
+  if (isVisibleInNewLocation) {
+    return {
+      type: 'MOVE',
+      pageBorderBoxCenter,
+      impact,
+    };
+  }
+
+  console.log('👻 not visible in new location');
+
+  // The full distance required to get from the previous page center to the new page center
+  const withDisplacement: Position = withDroppableDisplacement(
+    destination,
+    pageBorderBoxCenter,
   );
+
+  const distance: Position = subtract(
+    withDisplacement,
+    previousPageBorderBoxCenter,
+  );
+
+  console.log('distance needed', distance);
+
+  const updated: DragImpact = speculativelyIncrease({
+    impact,
+    viewport,
+    destination,
+    draggables,
+    maxScrollChange: distance,
+  });
+
+  return {
+    type: 'SCROLL_JUMP',
+    request: distance,
+    impact: updated,
+  };
 };
