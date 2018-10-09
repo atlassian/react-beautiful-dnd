@@ -9,7 +9,7 @@ import type {
   DraggableLocation,
   Viewport,
 } from '../../../../types';
-import type { Result } from '../move-to-next-place-types';
+import type { InternalResult } from '../../move-in-direction-types';
 import withDroppableDisplacement from '../../../with-droppable-displacement';
 import { add } from '../../../position';
 import withScrollRequest from '../with-scroll-request';
@@ -39,7 +39,7 @@ export default ({
   previousImpact,
   previousPageBorderBoxCenter,
   viewport,
-}: Args): ?Result => {
+}: Args): ?InternalResult => {
   if (!destination.isCombineEnabled) {
     return null;
   }

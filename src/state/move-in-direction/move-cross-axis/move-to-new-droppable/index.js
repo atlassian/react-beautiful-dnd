@@ -4,7 +4,7 @@ import invariant from 'tiny-invariant';
 import toHomeList from './to-home-list';
 import toForeignList from './to-foreign-list';
 import isHomeOf from '../../../droppable/is-home-of';
-import type { Result } from '../move-cross-axis-types';
+import type { InternalResult } from '../../move-in-direction-types';
 import type {
   DraggableDimension,
   DroppableDimension,
@@ -41,7 +41,7 @@ export default ({
   moveRelativeTo,
   previousImpact,
   viewport,
-}: Args): ?Result => {
+}: Args): ?InternalResult => {
   // Draggables available, but none are candidates for movement (eg none are visible)
   // Cannot move into the list
   // Note: can move to empty list and then !moveRelativeTo && !insideDestination.length

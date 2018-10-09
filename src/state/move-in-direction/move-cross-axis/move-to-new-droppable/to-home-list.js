@@ -8,7 +8,7 @@ import { noMovement } from '../../../no-impact';
 import getDisplacedBy from '../../../get-displaced-by';
 import getWillDisplaceForward from '../../../will-displace-forward';
 import { goBefore, goAfter } from '../../../move-relative-to';
-import type { Result } from '../move-cross-axis-types';
+import type { InternalResult } from '../../move-in-direction-types';
 import type {
   Axis,
   Viewport,
@@ -38,7 +38,7 @@ export default ({
   destination,
   previousImpact,
   viewport,
-}: Args): ?Result => {
+}: Args): ?InternalResult => {
   // this can happen when the position is not visible
   if (!moveIntoIndexOf) {
     return null;
@@ -65,6 +65,7 @@ export default ({
         },
         merge: null,
       },
+      scrollJumpRequest: null,
     };
   }
 
@@ -140,5 +141,6 @@ export default ({
   return {
     pageBorderBoxCenter: withDroppableDisplacement(destination, newCenter),
     impact: newImpact,
+    scrollJumpRequest: null,
   };
 };

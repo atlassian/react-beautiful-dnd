@@ -1,34 +1,26 @@
 // @flow
 import type { Position } from 'css-box-model';
-import type { Result } from '../move-to-next-place-types';
+import type { InternalResult } from '../../move-in-direction-types';
 import type {
-  MoveFromResult,
-  ChangeDisplacement,
-} from './move-to-next-index-types';
-import type {
-  Axis,
   DraggableDimension,
-  Displacement,
   DroppableDimension,
   DraggableDimensionMap,
   DragImpact,
   Viewport,
-  DisplacedBy,
 } from '../../../../types';
-import isTotallyVisibleInNewLocation from '../is-totally-visible-in-new-location';
-import { withFirstAdded, withFirstRemoved } from './get-forced-displacement';
-import getDisplacedBy from '../../../get-displaced-by';
-import getDisplacementMap from '../../../get-displacement-map';
 import fromReorder from './from-reorder';
-import fromCombine from './from-combine';
-import withScrollRequest from '../with-scroll-request';
+import getPageBorderBoxCenterFromImpact from '../../../get-page-border-box-center-from-impact';
+import isTotallyVisibleInNewLocation from '../is-totally-visible-in-new-location';
+import { subtract } from '../../../position';
+import { withUpdatedVisibility } from './get-forced-displacement';
+import withDroppableDisplacement from '../../../with-droppable-displacement';
 
 export type Args = {|
   isMovingForward: boolean,
   isInHomeList: boolean,
   draggable: DraggableDimension,
-  destination: DroppableDimension,
   draggables: DraggableDimensionMap,
+  destination: DroppableDimension,
   insideDestination: DraggableDimension[],
   previousImpact: DragImpact,
   previousPageBorderBoxCenter: Position,
@@ -42,38 +34,40 @@ export default ({
   destination,
   draggables,
   insideDestination,
-  previousImpact,
+  previousImpact: needsVisibilityCheck,
   previousPageBorderBoxCenter,
   viewport,
-}: Args): ?Result => {
-  const move: ?MoveFromResult =
-    fromReorder({
-      isMovingForward,
-      isInHomeList,
-      draggable,
-      destination,
-      draggables,
-      previousImpact,
-      insideDestination,
-      previousPageBorderBoxCenter,
-    }) ||
-    fromCombine({
-      isMovingForward,
-      isInHomeList,
-      draggable,
-      destination,
-      draggables,
-      previousImpact,
-    });
+}: Args): ?InternalResult => {
+  // The last impact would not have its visibility updated.
+  // In order to prevent a large amount of renders when moving between lists
+  // we need to be sure to keep the amount of displaced things small.
+  const previousImpact: DragImpact = withUpdatedVisibility({
+    previousImpact: needsVisibilityCheck,
+    viewport,
+    destination,
+    draggables,
+  });
 
-  if (!move) {
+  const impact: ?DragImpact = fromReorder({
+    isMovingForward,
+    isInHomeList,
+    draggable,
+    destination,
+    previousImpact,
+    insideDestination,
+  });
+
+  // no impact can be achieved
+  if (!impact) {
     return null;
   }
 
-  const newPageBorderBoxCenter: Position = move.newPageBorderBoxCenter;
-  const willDisplaceForward: boolean = move.willDisplaceForward;
-  const proposedIndex: number = move.proposedIndex;
-  const axis: Axis = destination.axis;
+  const newPageBorderBoxCenter: Position = getPageBorderBoxCenterFromImpact({
+    impact,
+    draggable,
+    droppable: destination,
+    draggables,
+  });
 
   const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
     draggable,
@@ -89,57 +83,35 @@ export default ({
     onlyOnMainAxis: true,
   });
 
-  const displaced: Displacement[] = (() => {
-    const change: ChangeDisplacement = move.changeDisplacement;
+  if (!isVisibleInNewLocation) {
+    console.warn('IS NOT VISIBLE');
+  }
 
-    if (change.type === 'DO_NOTHING') {
-      return previousImpact.movement.displaced;
-    }
-
-    if (change.type === 'ADD_CLOSEST') {
-      return withFirstAdded({
-        add: change.add,
-        destination,
-        draggables,
-        previousImpact,
-        viewport,
-      });
-    }
-
-    return withFirstRemoved({
-      dragging: draggable,
-      destination,
-      isVisibleInNewLocation,
-      previousImpact,
-      draggables,
-    });
-  })();
-
-  const displacedBy: DisplacedBy = getDisplacedBy(
-    axis,
-    draggable.displaceBy,
-    willDisplaceForward,
+  console.log(
+    'displacement',
+    impact.movement.displaced.map(d => d.draggableId),
   );
 
-  const newImpact: DragImpact = {
-    movement: {
-      displacedBy,
-      displaced,
-      map: getDisplacementMap(displaced),
-      willDisplaceForward,
-    },
-    destination: {
-      droppableId: destination.descriptor.id,
-      index: proposedIndex,
-    },
-    direction: axis.direction,
-    merge: null,
-  };
+  if (isVisibleInNewLocation) {
+    return {
+      pageBorderBoxCenter: newPageBorderBoxCenter,
+      impact,
+      scrollJumpRequest: null,
+    };
+  }
 
-  return withScrollRequest({
-    impact: newImpact,
-    previousPageBorderBoxCenter,
+  // The full distance required to get from the previous page center to the new page center
+  const distance: Position = subtract(
     newPageBorderBoxCenter,
-    isVisibleInNewLocation,
-  });
+    previousPageBorderBoxCenter,
+  );
+
+  // console.log('previous page border box center');
+  // console.log('distance', distance);
+
+  return {
+    pageBorderBoxCenter: previousPageBorderBoxCenter,
+    impact,
+    scrollJumpRequest: distance,
+  };
 };

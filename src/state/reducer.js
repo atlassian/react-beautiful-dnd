@@ -4,9 +4,8 @@ import invariant from 'tiny-invariant';
 import scrollDroppable from './droppable/scroll-droppable';
 import getDragImpact from './get-drag-impact';
 import publish from './publish';
-import moveInDirection, {
-  type Result as MoveInDirectionResult,
-} from './move-in-direction';
+import moveInDirection from './move-in-direction';
+import type { Result as MoveInDirectionResult } from './move-in-direction/move-in-direction-types';
 import { add, isEqual, origin, subtract } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';

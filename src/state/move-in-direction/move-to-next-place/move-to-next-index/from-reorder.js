@@ -1,31 +1,26 @@
 // @flow
 import invariant from 'tiny-invariant';
-import type { Position } from 'css-box-model';
-import { add, patch } from '../../../position';
 import type {
   Axis,
+  DisplacedBy,
   DraggableDimension,
   Displacement,
   DroppableDimension,
-  DraggableDimensionMap,
   DragImpact,
   DraggableLocation,
 } from '../../../../types';
-import type {
-  MoveFromResult,
-  ChangeDisplacement,
-} from './move-to-next-index-types';
 import getWillDisplaceForward from '../../../will-displace-forward';
+import getDisplacementMap from '../../../get-displacement-map';
+import getDisplacedBy from '../../../get-displaced-by';
+import { addClosest, removeClosest } from './get-forced-displacement';
 
 type Args = {|
   isMovingForward: boolean,
   isInHomeList: boolean,
   draggable: DraggableDimension,
   destination: DroppableDimension,
-  previousImpact: DragImpact,
   insideDestination: DraggableDimension[],
-  draggables: DraggableDimensionMap,
-  previousPageBorderBoxCenter: Position,
+  previousImpact: DragImpact,
 |};
 
 export default ({
@@ -33,18 +28,16 @@ export default ({
   isInHomeList,
   previousImpact,
   draggable,
-  draggables,
   destination,
   insideDestination: initialInside,
-  previousPageBorderBoxCenter,
-}: Args): ?MoveFromResult => {
-  // not handling movements from a merge
+}: Args): ?DragImpact => {
   if (previousImpact.merge) {
     return null;
   }
   const location: ?DraggableLocation = previousImpact.destination;
   invariant(location, 'Cannot move to next index without previous destination');
 
+  const axis: Axis = destination.axis;
   const insideDestination: DraggableDimension[] = initialInside.slice();
   const currentIndex: number = location.index;
   const isInForeignList: boolean = !isInHomeList;
@@ -70,6 +63,11 @@ export default ({
     proposedIndex,
     startIndexInHome,
   });
+  const displacedBy: DisplacedBy = getDisplacedBy(
+    axis,
+    draggable.displaceBy,
+    willDisplaceForward,
+  );
 
   const atProposedIndex: DraggableDimension = insideDestination[proposedIndex];
 
@@ -87,51 +85,23 @@ export default ({
     return !isMovingForward;
   })();
 
-  const useDisplacementFrom: DraggableDimension = (() => {
-    // Option 1:
-    // We need to shift by the amount of the thing we are moving past
-    if (isIncreasingDisplacement) {
-      return atProposedIndex;
-    }
-    // Option 2:
-    // We are going to undo the last displacement
-
-    // displacement is ordered by closest impacted
-    const closest: ?Displacement = previousImpact.movement.displaced[0];
-
-    invariant(
-      closest,
-      'Cannot move relative to closest displacement when there is no previous displacement',
-    );
-
-    return draggables[closest.draggableId];
-  })();
-
-  const modifier: number = isMovingForward ? 1 : -1;
-  const axis: Axis = destination.axis;
-  const shift: Position = patch(
-    axis.line,
-    useDisplacementFrom.displaceBy[axis.line] * modifier,
-  );
-
-  const newPageBorderBoxCenter: Position = add(
-    previousPageBorderBoxCenter,
-    shift,
-  );
-
-  const change: ChangeDisplacement = isIncreasingDisplacement
-    ? {
-        type: 'ADD_CLOSEST',
-        add: atProposedIndex,
-      }
-    : {
-        type: 'REMOVE_CLOSEST',
-      };
+  const lastDisplaced: Displacement[] = previousImpact.movement.displaced;
+  const displaced: Displacement[] = isIncreasingDisplacement
+    ? addClosest(atProposedIndex, lastDisplaced)
+    : removeClosest(lastDisplaced);
 
   return {
-    newPageBorderBoxCenter,
-    changeDisplacement: change,
-    willDisplaceForward,
-    proposedIndex,
+    movement: {
+      displacedBy,
+      willDisplaceForward,
+      displaced,
+      map: getDisplacementMap(displaced),
+    },
+    direction: axis.direction,
+    destination: {
+      droppableId: destination.descriptor.id,
+      index: proposedIndex,
+    },
+    merge: null,
   };
 };

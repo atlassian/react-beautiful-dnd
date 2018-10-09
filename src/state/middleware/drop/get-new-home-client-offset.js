@@ -8,10 +8,10 @@ import type {
   DraggableDimension,
   DroppableId,
 } from '../../../types';
-import withDroppableDisplacement from '../../with-droppable-displacement';
 import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
-import { add, subtract } from '../../position';
+import { subtract } from '../../position';
 import getPageBorderBoxCenterFromImpact from '../../get-page-border-box-center-from-impact';
+import getClientPoint from '../../get-client-point';
 
 type Args = {|
   impact: DragImpact,
@@ -19,12 +19,6 @@ type Args = {|
   dimensions: DimensionMap,
   viewport: Viewport,
 |};
-
-const getScrollDisplacement = (
-  droppable: DroppableDimension,
-  viewport: Viewport,
-): Position =>
-  withDroppableDisplacement(droppable, viewport.scroll.diff.displacement);
 
 export default ({
   impact,
@@ -52,13 +46,5 @@ export default ({
     draggable.page.borderBox.center,
   );
 
-  const newHomeClientOffset: Position = add(
-    offset,
-    // If cancelling: consider the home droppable
-    // If dropping over nothing: consider the home droppable
-    // If dropping over a droppable: consider the scroll of the droppable you are over
-    getScrollDisplacement(droppable || home, viewport),
-  );
-
-  return newHomeClientOffset;
+  return getClientPoint(offset, droppable || home, viewport);
 };

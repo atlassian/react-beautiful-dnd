@@ -6,7 +6,7 @@ import {
   type Spacing,
   offset,
 } from 'css-box-model';
-import type { Result } from '../move-cross-axis-types';
+import type { InternalResult } from '../../move-in-direction-types';
 import getDisplacement from '../../../get-displacement';
 import withDroppableDisplacement from '../../../with-droppable-displacement';
 import getDisplacementMap from '../../../get-displacement-map';
@@ -45,7 +45,7 @@ export default ({
   destination,
   previousImpact,
   viewport,
-}: Args): ?Result => {
+}: Args): ?InternalResult => {
   const axis: Axis = destination.axis;
 
   // Moving to an empty list
@@ -87,6 +87,7 @@ export default ({
     return {
       pageBorderBoxCenter: withDroppableDisplacement(destination, newCenter),
       impact: newImpact,
+      scrollJumpRequest: null,
     };
   }
 
@@ -159,5 +160,6 @@ export default ({
   return {
     pageBorderBoxCenter: withDroppableDisplacement(destination, newCenter),
     impact: newImpact,
+    scrollJumpRequest: null,
   };
 };

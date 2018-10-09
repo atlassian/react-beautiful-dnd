@@ -8,8 +8,8 @@ import type {
   DragImpact,
   Viewport,
 } from '../../../types';
-import type { Result } from './move-to-next-place-types';
-import moveToNextIndex from './move-to-next-index-2';
+import type { InternalResult } from '../move-in-direction-types';
+import moveToNextIndex from './move-to-next-index';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
 import moveToNextCombine from './move-to-next-combine';
 import isHomeOf from '../../droppable/is-home-of';
@@ -32,7 +32,7 @@ export default ({
   viewport,
   previousImpact,
   previousPageBorderBoxCenter,
-}: Args): ?Result => {
+}: Args): ?InternalResult => {
   if (!destination.isEnabled) {
     return null;
   }
