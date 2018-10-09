@@ -1,49 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import type {
-  Viewport,
-  DragImpact,
-  DraggableDimensionMap,
-  DroppableDimension,
-  DraggableDimension,
-  Displacement,
-} from '../../../../types';
-import getDisplacement from '../../../get-displacement';
-import getDisplacementMap from '../../../get-displacement-map';
-
-type WithUpdatedVisibilityArgs = {|
-  previousImpact: DragImpact,
-  viewport: Viewport,
-  destination: DroppableDimension,
-  draggables: DraggableDimensionMap,
-|};
-
-export const withUpdatedVisibility = ({
-  previousImpact,
-  viewport,
-  destination,
-  draggables,
-}: WithUpdatedVisibilityArgs): DragImpact => {
-  const displaced: Displacement[] = previousImpact.movement.displaced.map(
-    (current: Displacement): Displacement =>
-      getDisplacement({
-        draggable: draggables[current.draggableId],
-        destination,
-        previousImpact,
-        viewport: viewport.frame,
-      }),
-  );
-
-  const updated: DragImpact = {
-    ...previousImpact,
-    movement: {
-      ...previousImpact.movement,
-      displaced,
-      map: getDisplacementMap(displaced),
-    },
-  };
-  return updated;
-};
+import type { DraggableDimension, Displacement } from '../../../../types';
 
 export const addClosest = (
   add: DraggableDimension,

@@ -12,7 +12,6 @@ import fromReorder from './from-reorder';
 import getPageBorderBoxCenterFromImpact from '../../../get-page-border-box-center-from-impact';
 import isTotallyVisibleInNewLocation from '../is-totally-visible-in-new-location';
 import { subtract } from '../../../position';
-import { withUpdatedVisibility } from './get-forced-displacement';
 
 export type Args = {|
   isMovingForward: boolean,
@@ -33,20 +32,10 @@ export default ({
   destination,
   draggables,
   insideDestination,
-  previousImpact: needsVisibilityCheck,
+  previousImpact,
   previousPageBorderBoxCenter,
   viewport,
 }: Args): ?InternalResult => {
-  // The last impact would not have its visibility updated.
-  // In order to prevent a large amount of renders when moving between lists
-  // we need to be sure to keep the amount of displaced things small.
-  const previousImpact: DragImpact = withUpdatedVisibility({
-    previousImpact: needsVisibilityCheck,
-    viewport,
-    destination,
-    draggables,
-  });
-
   const impact: ?DragImpact = fromReorder({
     isMovingForward,
     isInHomeList,

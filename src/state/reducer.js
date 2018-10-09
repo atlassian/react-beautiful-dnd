@@ -5,7 +5,8 @@ import scrollDroppable from './droppable/scroll-droppable';
 import getDragImpact from './get-drag-impact';
 import publish from './publish';
 import moveInDirection from './move-in-direction';
-import type { Result as MoveInDirectionResult } from './move-in-direction/move-in-direction-types';
+import type { PublicResult as MoveInDirectionResult } from './move-in-direction/move-in-direction-types';
+import updateDisplacementVisibility from './update-displacement-visibility';
 import { add, isEqual, origin, subtract } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
@@ -29,8 +30,10 @@ import type {
   Viewport,
   DimensionMap,
   DropReason,
+  DroppableId,
 } from '../types';
 import type { Action } from './store-types';
+import whatIsDraggedOver from './droppable/what-is-dragged-over';
 
 const idle: IdleState = { phase: 'IDLE' };
 
@@ -450,6 +453,34 @@ export default (state: State = idle, action: Action): State => {
       clientSelection: result.clientSelection,
       scrollJumpRequest: result.scrollJumpRequest,
     });
+  }
+
+  if (action.type === 'UPDATE_DISPLACEMENT_VISIBILITY') {
+    invariant(state.isDragging);
+
+    invariant(
+      state.movementMode === 'SNAP',
+      'Can only force visibility update when in SNAP mode',
+    );
+    const droppableId: ?DroppableId = whatIsDraggedOver(state.impact);
+    invariant(droppableId, 'Must be over a destination to update visibility');
+    const destination: DroppableDimension =
+      state.dimensions.droppables[droppableId];
+
+    console.warn('force updating visibility');
+    const impact: DragImpact = updateDisplacementVisibility({
+      previousImpact: state.impact,
+      viewport: state.viewport,
+      destination,
+      draggables: state.dimensions.draggables,
+    });
+
+    return {
+      phase: 'DRAGGING',
+      ...state,
+      impact,
+      scrollJumpRequest: null,
+    };
   }
 
   if (action.type === 'DROP_PENDING') {

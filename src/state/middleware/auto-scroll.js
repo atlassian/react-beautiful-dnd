@@ -2,6 +2,7 @@
 import type { AutoScroller } from '../auto-scroller/auto-scroller-types';
 import type { State } from '../../types';
 import type { Action, Dispatch, MiddlewareStore } from '../store-types';
+import { updateDisplacementVisibility } from '../action-creators';
 
 const shouldCancel = (action: Action) =>
   action.type === 'CANCEL' ||
@@ -40,4 +41,6 @@ export default (getScroller: () => AutoScroller) => (
   }
 
   getScroller().jumpScroll(state);
+  // need to update the displacement visibility after a jump scroll
+  store.dispatch(updateDisplacementVisibility());
 };
