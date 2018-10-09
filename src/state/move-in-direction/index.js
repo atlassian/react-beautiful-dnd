@@ -57,7 +57,7 @@ export default ({ state, type }: Args): ?PublicResult => {
       })
     : moveCrossAxis({
         isMovingForward,
-        pageBorderBoxCenter: state.current.page.borderBoxCenter,
+        previousPageBorderBoxCenter: state.current.page.borderBoxCenter,
         draggableId: state.critical.draggable.id,
         droppableId: droppable.descriptor.id,
         draggables: state.dimensions.draggables,

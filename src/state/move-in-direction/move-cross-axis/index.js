@@ -19,7 +19,7 @@ import type {
 type Args = {|
   isMovingForward: boolean,
   // the current page center of the dragging item
-  pageBorderBoxCenter: Position,
+  previousPageBorderBoxCenter: Position,
   // the dragging item
   draggableId: DraggableId,
   // the droppable the dragging item is in
@@ -35,7 +35,7 @@ type Args = {|
 
 export default ({
   isMovingForward,
-  pageBorderBoxCenter,
+  previousPageBorderBoxCenter,
   draggableId,
   droppableId,
   draggables,
@@ -50,7 +50,7 @@ export default ({
 
   const destination: ?DroppableDimension = getBestCrossAxisDroppable({
     isMovingForward,
-    pageBorderBoxCenter,
+    pageBorderBoxCenter: previousPageBorderBoxCenter,
     source,
     droppables,
     viewport,
@@ -68,14 +68,14 @@ export default ({
 
   const moveRelativeTo: ?DraggableDimension = getClosestDraggable({
     axis: destination.axis,
-    pageBorderBoxCenter,
+    pageBorderBoxCenter: previousPageBorderBoxCenter,
     destination,
     insideDestination,
     viewport,
   });
 
   return moveToNewDroppable({
-    pageBorderBoxCenter,
+    previousPageBorderBoxCenter,
     destination,
     draggable,
     draggables,
