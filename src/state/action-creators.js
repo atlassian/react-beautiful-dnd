@@ -276,16 +276,6 @@ export const dropAnimationFinished = (): DropAnimationFinishedAction => ({
   payload: null,
 });
 
-export type UpdateDisplacementVisibilityAction = {|
-  type: 'UPDATE_DISPLACEMENT_VISIBILITY',
-  payload: null,
-|};
-
-export const updateDisplacementVisibility = (): UpdateDisplacementVisibilityAction => ({
-  type: 'UPDATE_DISPLACEMENT_VISIBILITY',
-  payload: null,
-});
-
 export type Action =
   | LiftAction
   | InitialPublishAction
@@ -296,7 +286,6 @@ export type Action =
   | UpdateDroppableIsCombineEnabledAction
   | MoveByWindowScrollAction
   | UpdateViewportScrollAction
-  | UpdateDisplacementVisibilityAction
   | MoveAction
   | MoveUpAction
   | MoveDownAction
