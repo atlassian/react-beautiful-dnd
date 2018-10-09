@@ -80,9 +80,10 @@ export default ({
     }
 
     return {
-      type: 'MOVE',
+      type: 'MOVE_CROSS_AXIS',
       pageBorderBoxCenter,
       impact,
+      destination,
     };
   }
 
@@ -139,8 +140,9 @@ export default ({
   });
 
   return {
-    type: 'MOVE',
+    type: 'MOVE_CROSS_AXIS',
     pageBorderBoxCenter,
     impact,
+    destination,
   };
 };

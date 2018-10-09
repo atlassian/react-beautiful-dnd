@@ -60,9 +60,10 @@ export default ({
     // const newCenter: Position = draggable.page.borderBox.center;
 
     return {
-      type: 'MOVE',
+      type: 'MOVE_CROSS_AXIS',
       impact,
       pageBorderBoxCenter,
+      destination,
     };
   }
 
@@ -126,8 +127,9 @@ export default ({
   });
 
   return {
-    type: 'MOVE',
+    type: 'MOVE_CROSS_AXIS',
     pageBorderBoxCenter,
     impact,
+    destination,
   };
 };

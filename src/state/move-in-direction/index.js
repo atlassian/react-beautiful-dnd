@@ -83,6 +83,20 @@ export default ({ state, type }: Args): ?PublicResult => {
     state.viewport.scroll.initial,
   );
 
+  if (result.type === 'MOVE_CROSS_AXIS') {
+    const withDisplacement: Position = withScrollDisplacement(
+      withoutInitialPageScroll,
+      result.destination,
+      state.viewport,
+    );
+
+    return {
+      clientSelection: withDisplacement,
+      impact: result.impact,
+      scrollJumpRequest: null,
+    };
+  }
+
   const withDisplacement: Position = withScrollDisplacement(
     withoutInitialPageScroll,
     droppable,
