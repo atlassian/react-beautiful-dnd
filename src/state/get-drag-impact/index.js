@@ -15,7 +15,7 @@ import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import inHomeList from './in-home-list';
 import inForeignList from './in-foreign-list';
 import noImpact from '../no-impact';
-import withDroppableScroll from '../with-droppable-scroll';
+import withDroppableScroll from '../with-scroll-change/with-droppable-scroll';
 import isHomeOf from '../droppable/is-home-of';
 import getCombineImpact from './get-combine-impact';
 

@@ -13,7 +13,6 @@ import getPageBorderBoxCenterFromImpact from '../../../get-page-border-box-cente
 import isTotallyVisibleInNewLocation from '../is-totally-visible-in-new-location';
 import { subtract } from '../../../position';
 import { withUpdatedVisibility } from './get-forced-displacement';
-import withDroppableDisplacement from '../../../with-droppable-displacement';
 
 export type Args = {|
   isMovingForward: boolean,
@@ -100,6 +99,8 @@ export default ({
     };
   }
 
+  console.warn('NOT VISIBLE IN NEW LOCATION', newPageBorderBoxCenter);
+  console.log('using', previousPageBorderBoxCenter);
   // The full distance required to get from the previous page center to the new page center
   const distance: Position = subtract(
     newPageBorderBoxCenter,

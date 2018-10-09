@@ -2,7 +2,7 @@
 import invariant from 'tiny-invariant';
 import { type Position, type BoxModel, offset } from 'css-box-model';
 import getDisplacement from '../../../get-displacement';
-import withDroppableDisplacement from '../../../with-droppable-displacement';
+import withDroppableDisplacement from '../../../with-scroll-change/with-droppable-displacement';
 import getDisplacementMap from '../../../get-displacement-map';
 import { noMovement } from '../../../no-impact';
 import getDisplacedBy from '../../../get-displaced-by';

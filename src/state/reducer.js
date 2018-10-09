@@ -439,7 +439,7 @@ export default (state: State = idle, action: Action): State => {
       type: action.type,
     });
 
-    // cannot mov in that direction
+    // cannot move in that direction
     if (!result) {
       return state;
     }

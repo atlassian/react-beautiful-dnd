@@ -44,6 +44,7 @@ export default ({
     clientSelection,
     state.initial.client.selection,
   );
+  console.log('client offset', offset);
 
   const client: ClientPositions = {
     offset,

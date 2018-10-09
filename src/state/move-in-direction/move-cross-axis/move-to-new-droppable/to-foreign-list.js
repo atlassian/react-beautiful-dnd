@@ -8,7 +8,7 @@ import {
 } from 'css-box-model';
 import type { InternalResult } from '../../move-in-direction-types';
 import getDisplacement from '../../../get-displacement';
-import withDroppableDisplacement from '../../../with-droppable-displacement';
+import withDroppableDisplacement from '../../../with-scroll-change/with-droppable-displacement';
 import getDisplacementMap from '../../../get-displacement-map';
 import getDisplacedBy from '../../../get-displaced-by';
 import { noMovement } from '../../../no-impact';

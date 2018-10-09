@@ -5,7 +5,8 @@ import moveToNextPlace from './move-to-next-place';
 import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 import type { InternalResult, PublicResult } from './move-in-direction-types';
 import type { DroppableId, DraggingState, Direction } from '../../types';
-import getClientPoint from '../get-client-point';
+import withScrollDisplacement from '../with-scroll-change/with-all-displacement';
+import { subtract } from '../position';
 
 type Args = {|
   state: DraggingState,
@@ -69,15 +70,22 @@ export default ({ state, type }: Args): ?PublicResult => {
     return null;
   }
 
-  const clientSelection: Position = getClientPoint(
+  const withoutInitialPageScroll: Position = subtract(
     result.pageBorderBoxCenter,
+    state.viewport.scroll.initial,
+  );
+
+  const withDisplacement: Position = withScrollDisplacement(
+    withoutInitialPageScroll,
     droppable,
     state.viewport,
   );
+  console.log('pageBorderBoxCenter', result.pageBorderBoxCenter);
+  console.log('client selection', withDisplacement);
 
   return {
-    clientSelection,
+    clientSelection: withDisplacement,
     impact: result.impact,
-    scrollJumpRequest: null,
+    scrollJumpRequest: result.scrollJumpRequest,
   };
 };

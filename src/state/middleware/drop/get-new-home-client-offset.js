@@ -11,7 +11,7 @@ import type {
 import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
 import { subtract } from '../../position';
 import getPageBorderBoxCenterFromImpact from '../../get-page-border-box-center-from-impact';
-import getClientPoint from '../../get-client-point';
+import withAllDisplacement from '../../with-scroll-change/with-all-displacement';
 
 type Args = {|
   impact: DragImpact,
@@ -46,5 +46,5 @@ export default ({
     draggable.page.borderBox.center,
   );
 
-  return getClientPoint(offset, droppable || home, viewport);
+  return withAllDisplacement(offset, droppable || home, viewport);
 };

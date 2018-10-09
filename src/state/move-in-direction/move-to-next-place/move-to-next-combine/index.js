@@ -10,7 +10,7 @@ import type {
   Viewport,
 } from '../../../../types';
 import type { InternalResult } from '../../move-in-direction-types';
-import withDroppableDisplacement from '../../../with-droppable-displacement';
+import withDroppableDisplacement from '../../../with-scroll-change/with-droppable-displacement';
 import { add } from '../../../position';
 import withScrollRequest from '../with-scroll-request';
 import isTotallyVisibleInNewLocation from '../is-totally-visible-in-new-location';
