@@ -5,28 +5,27 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DragImpact,
+  DraggableDimensionMap,
   CombineImpact,
   DraggableLocation,
   Viewport,
 } from '../../../../types';
 import type { InternalResult } from '../../move-in-direction-types';
-import withDroppableDisplacement from '../../../with-scroll-change/with-droppable-displacement';
-import { add } from '../../../position';
-import withScrollRequest from '../with-scroll-request';
 import isTotallyVisibleInNewLocation from '../is-totally-visible-in-new-location';
 import {
   forward,
   backward,
 } from '../../../user-direction/user-direction-preset';
+import getPageBorderBoxCenterFromImpact from '../../../get-page-border-box-center-from-impact';
 
 export type Args = {|
   isMovingForward: boolean,
   isInHomeList: boolean,
   draggable: DraggableDimension,
+  draggables: DraggableDimensionMap,
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
   previousImpact: DragImpact,
-  previousPageBorderBoxCenter: Position,
   viewport: Viewport,
 |};
 
@@ -34,10 +33,10 @@ export default ({
   isMovingForward,
   isInHomeList,
   draggable,
+  draggables,
   destination,
   insideDestination,
   previousImpact,
-  previousPageBorderBoxCenter,
   viewport,
 }: Args): ?InternalResult => {
   if (!destination.isCombineEnabled) {
@@ -81,17 +80,6 @@ export default ({
   }
 
   const target: DraggableDimension = current[targetIndex];
-  const isTargetDisplaced: boolean = Boolean(
-    previousImpact.movement.map[target.descriptor.id],
-  );
-  const targetCenter: Position = target.page.borderBox.center;
-  const withDisplacement: Position = isTargetDisplaced
-    ? add(targetCenter, previousImpact.movement.displacedBy.point)
-    : targetCenter;
-  const newPageBorderBoxCenter: Position = withDroppableDisplacement(
-    destination,
-    withDisplacement,
-  );
 
   const merge: CombineImpact = {
     whenEntered: isMovingForward ? forward : backward,
@@ -101,7 +89,7 @@ export default ({
     },
   };
 
-  const newImpact: DragImpact = {
+  const impact: DragImpact = {
     // grouping does not modify the existing displacement
     movement: previousImpact.movement,
     // grouping removes the destination
@@ -110,24 +98,32 @@ export default ({
     merge,
   };
 
+  const pageBorderBoxCenter: Position = getPageBorderBoxCenterFromImpact({
+    impact,
+    draggable,
+    droppable: destination,
+    draggables,
+  });
+
   const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
     draggable,
     destination,
-    newPageBorderBoxCenter,
+    newPageBorderBoxCenter: pageBorderBoxCenter,
     viewport: viewport.frame,
-    // not applying the displacement of the droppable for this check
-    // we are only interested in the page location of the dragging item
-    withDroppableDisplacement: false,
+    withDroppableDisplacement: true,
     // we only care about it being visible relative to the main axis
     // this is important with dynamic changes as scroll bar and toggle
     // on the cross axis during a drag
     onlyOnMainAxis: true,
   });
 
-  return withScrollRequest({
-    previousPageBorderBoxCenter,
-    newPageBorderBoxCenter,
-    impact: newImpact,
-    isVisibleInNewLocation,
-  });
+  if (isVisibleInNewLocation) {
+    return {
+      type: 'MOVE',
+      pageBorderBoxCenter,
+      impact,
+    };
+  }
+
+  throw new Error('TODO');
 };

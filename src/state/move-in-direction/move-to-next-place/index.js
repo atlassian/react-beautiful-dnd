@@ -49,9 +49,9 @@ export default ({
       isInHomeList,
       isMovingForward,
       draggable,
+      draggables,
       destination,
       insideDestination,
-      previousPageBorderBoxCenter,
       previousImpact,
       viewport,
     }) ||
