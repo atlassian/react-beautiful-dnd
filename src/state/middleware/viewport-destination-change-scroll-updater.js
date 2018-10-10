@@ -102,7 +102,10 @@ export default (store: MiddlewareStore) => (next: Dispatch) => (
   };
 
   // max scroll has changed - updating before action
-  setTimeout(() => {
+  requestAnimationFrame(() => {
+    if (!store.getState().isDragging) {
+      return;
+    }
     next(postDestinationChange(args));
-  }, 50);
+  });
 };

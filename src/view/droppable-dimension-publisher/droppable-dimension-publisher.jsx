@@ -46,16 +46,15 @@ type WhileDragging = {|
 const getClosestScrollable = (dragging: ?WhileDragging): ?Element =>
   (dragging && dragging.env.closestScrollable) || null;
 
-const getListenerOptions = (options: ScrollOptions) => {
-  if (options.shouldPublishImmediately) {
-    return {
-      passive: false,
-    };
-  }
-  return {
-    passive: true,
-  };
+const immediate = {
+  passive: true,
 };
+const delayed = {
+  passive: false,
+};
+
+const getListenerOptions = (options: ScrollOptions) =>
+  options.shouldPublishImmediately ? immediate : delayed;
 
 export default class DroppableDimensionPublisher extends React.Component<
   Props,
@@ -117,11 +116,9 @@ export default class DroppableDimensionPublisher extends React.Component<
     );
     const options: ScrollOptions = dragging.scrollOptions;
     if (options.shouldPublishImmediately) {
-      console.log('immediate scroll update', this.publishedDescriptor.id);
       this.updateScroll();
       return;
     }
-    console.error('scheduled scrolled update', this.publishedDescriptor.id);
     this.scheduleScrollUpdate();
   };
 
@@ -315,10 +312,6 @@ export default class DroppableDimensionPublisher extends React.Component<
 
     if (env.closestScrollable) {
       // bind scroll listener
-      console.log(
-        'getListenerOptions',
-        getListenerOptions(dragging.scrollOptions),
-      );
       env.closestScrollable.addEventListener(
         'scroll',
         this.onClosestScroll,

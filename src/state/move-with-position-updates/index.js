@@ -27,8 +27,6 @@ type MoveArgs = {|
   scrollJumpRequest?: ?Position,
 |};
 
-let callCount = 0;
-
 export default ({
   state,
   clientSelection,
@@ -57,11 +55,6 @@ export default ({
     selection: add(client.selection, currentWindowScroll),
     borderBoxCenter: add(client.borderBoxCenter, currentWindowScroll),
   };
-
-  console.group(`final values ${++callCount}`);
-  console.log('client center', client.borderBoxCenter.y);
-  console.log('page center', page.borderBoxCenter.y);
-  console.groupEnd();
 
   const current: DragPositions = {
     client,
