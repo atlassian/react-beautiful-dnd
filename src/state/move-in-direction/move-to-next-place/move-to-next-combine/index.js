@@ -4,7 +4,6 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DragImpact,
-  DraggableDimensionMap,
   CombineImpact,
   DraggableLocation,
 } from '../../../../types';
