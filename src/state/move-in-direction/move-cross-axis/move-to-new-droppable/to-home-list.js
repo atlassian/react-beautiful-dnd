@@ -1,12 +1,10 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { type Position } from 'css-box-model';
 import getDisplacement from '../../../get-displacement';
 import getDisplacementMap from '../../../get-displacement-map';
 import getDisplacedBy from '../../../get-displaced-by';
 import getWillDisplaceForward from '../../../will-displace-forward';
 import getHomeImpact from '../../../get-home-impact';
-import type { InternalResult } from '../../move-in-direction-types';
 import type {
   Axis,
   Viewport,
@@ -14,16 +12,13 @@ import type {
   DragImpact,
   DraggableDimension,
   DroppableDimension,
-  DraggableDimensionMap,
   DisplacedBy,
 } from '../../../../types';
-import getPageBorderBoxCenterFromImpact from '../../../get-center-from-impact/get-page-border-box-center';
 
 type Args = {|
   moveIntoIndexOf: ?DraggableDimension,
   insideDestination: DraggableDimension[],
   draggable: DraggableDimension,
-  draggables: DraggableDimensionMap,
   destination: DroppableDimension,
   previousImpact: DragImpact,
   viewport: Viewport,
@@ -33,11 +28,10 @@ export default ({
   moveIntoIndexOf,
   insideDestination,
   draggable,
-  draggables,
   destination,
   previousImpact,
   viewport,
-}: Args): ?InternalResult => {
+}: Args): ?DragImpact => {
   // this can happen when the position is not visible
   if (!moveIntoIndexOf) {
     return null;
@@ -47,24 +41,9 @@ export default ({
   const homeIndex: number = draggable.descriptor.index;
   const targetIndex: number = moveIntoIndexOf.descriptor.index;
 
-  // Moving back to original index
-  // Super simple - just move it back to the original center with no impact
+  // Moving back home
   if (homeIndex === targetIndex) {
-    const impact: DragImpact = getHomeImpact(draggable, destination);
-    const pageBorderBoxCenter: Position = getPageBorderBoxCenterFromImpact({
-      impact,
-      draggable,
-      droppable: destination,
-      draggables,
-    });
-    // const newCenter: Position = draggable.page.borderBox.center;
-
-    return {
-      type: 'MOVE_CROSS_AXIS',
-      impact,
-      pageBorderBoxCenter,
-      destination,
-    };
+    return getHomeImpact(draggable, destination);
   }
 
   const willDisplaceForward: boolean = getWillDisplaceForward({
@@ -119,17 +98,5 @@ export default ({
     merge: null,
   };
 
-  const pageBorderBoxCenter: Position = getPageBorderBoxCenterFromImpact({
-    impact,
-    draggable,
-    droppable: destination,
-    draggables,
-  });
-
-  return {
-    type: 'MOVE_CROSS_AXIS',
-    pageBorderBoxCenter,
-    impact,
-    destination,
-  };
+  return impact;
 };

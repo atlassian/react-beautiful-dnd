@@ -1,23 +1,22 @@
 // @flow
 import type { Position, Spacing } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import getDisplacedBy from '../../../get-displaced-by';
-import getDisplacement from '../../../get-displacement';
-import getDisplacementMap from '../../../get-displacement-map';
-import getPageBorderBoxCenterFromImpact from '../../../get-center-from-impact/get-page-border-box-center';
-import { noMovement } from '../../../no-impact';
-import { isTotallyVisible } from '../../../visibility/is-visible';
-import type { InternalResult } from '../../move-in-direction-types';
 import type {
   Axis,
   DragImpact,
   DraggableDimension,
-  DroppableDimension,
   DraggableDimensionMap,
+  DroppableDimension,
   Displacement,
   Viewport,
   DisplacedBy,
 } from '../../../../types';
+import getDisplacedBy from '../../../get-displaced-by';
+import getDisplacement from '../../../get-displacement';
+import getDisplacementMap from '../../../get-displacement-map';
+import { noMovement } from '../../../no-impact';
+import getPageBorderBoxCenter from '../../../get-center-from-impact/get-page-border-box-center';
+import { isTotallyVisible } from '../../../visibility/is-visible';
 
 type Args = {|
   previousPageBorderBoxCenter: Position,
@@ -39,7 +38,7 @@ export default ({
   destination,
   previousImpact,
   viewport,
-}: Args): ?InternalResult => {
+}: Args): ?DragImpact => {
   const axis: Axis = destination.axis;
 
   // Moving to an empty list
@@ -53,14 +52,13 @@ export default ({
       },
       merge: null,
     };
-
-    const pageBorderBoxCenter: Position = getPageBorderBoxCenterFromImpact({
+    // Might not be a visible location so we need to do our own checks
+    const pageBorderBoxCenter: Position = getPageBorderBoxCenter({
       impact,
       draggable,
       droppable: destination,
       draggables,
     });
-
     // we might not be able to see the position we are hoping to move to
     const fake: Spacing = {
       top: pageBorderBoxCenter.y,
@@ -75,16 +73,7 @@ export default ({
       withDroppableDisplacement: true,
     });
 
-    if (!isVisible) {
-      return null;
-    }
-
-    return {
-      type: 'MOVE_CROSS_AXIS',
-      pageBorderBoxCenter,
-      impact,
-      destination,
-    };
+    return isVisible ? impact : null;
   }
 
   // Moving to a populated list
@@ -131,18 +120,5 @@ export default ({
     },
     merge: null,
   };
-
-  const pageBorderBoxCenter: Position = getPageBorderBoxCenterFromImpact({
-    impact,
-    draggable,
-    droppable: destination,
-    draggables,
-  });
-
-  return {
-    type: 'MOVE_CROSS_AXIS',
-    pageBorderBoxCenter,
-    impact,
-    destination,
-  };
+  return impact;
 };

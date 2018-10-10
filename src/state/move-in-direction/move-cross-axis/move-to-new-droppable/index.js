@@ -1,9 +1,6 @@
 // @flow
 import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import toHomeList from './to-home-list';
-import toForeignList from './to-foreign-list';
-import isHomeOf from '../../../droppable/is-home-of';
 import type { InternalResult } from '../../move-in-direction-types';
 import type {
   DraggableDimension,
@@ -12,6 +9,10 @@ import type {
   Viewport,
   DraggableDimensionMap,
 } from '../../../../types';
+import getPageBorderBoxCenterFromImpact from '../../../get-center-from-impact/get-page-border-box-center';
+import toHomeList from './to-home-list';
+import toForeignList from './to-foreign-list';
+import isHomeOf from '../../../droppable/is-home-of';
 
 type Args = {|
   // the current center position of the draggable
@@ -56,13 +57,13 @@ export default ({
     );
   }
 
-  return isHomeOf(draggable, destination)
-    ? // moving back to the home list
-      toHomeList({
+  const isMovingToHome: boolean = isHomeOf(draggable, destination);
+
+  const impact: ?DragImpact = isMovingToHome
+    ? toHomeList({
         moveIntoIndexOf: moveRelativeTo,
         insideDestination,
         draggable,
-        draggables,
         destination,
         previousImpact,
         viewport,
@@ -77,4 +78,23 @@ export default ({
         previousImpact,
         viewport,
       });
+
+  if (!impact) {
+    return null;
+  }
+
+  const pageBorderBoxCenter: Position = getPageBorderBoxCenterFromImpact({
+    impact,
+    draggable,
+    droppable: destination,
+    draggables,
+  });
+
+  // No additional visibility checks required
+  return {
+    type: 'MOVE_CROSS_AXIS',
+    pageBorderBoxCenter,
+    impact,
+    destination,
+  };
 };

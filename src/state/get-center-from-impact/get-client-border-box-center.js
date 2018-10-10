@@ -35,7 +35,7 @@ export default ({
 
   const originalClientCenter: Position = draggable.client.borderBox.center;
 
-  // client offset will be the same as the page offset :D
+  // unwinding window scroll and manual client movement
   const offset: Position = subtract(
     newBorderBoxPageCenter,
     draggable.page.borderBox.center,
