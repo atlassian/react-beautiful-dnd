@@ -14,7 +14,7 @@ import {
   forward,
   backward,
 } from '../../../user-direction/user-direction-preset';
-import getPageBorderBoxCenterFromImpact from '../../../get-page-border-box-center-from-impact';
+import getPageBorderBoxCenterFromImpact from '../../../get-center-from-impact/get-page-border-box-center';
 import getDisplacedBy from '../../../get-displaced-by';
 import getWillDisplaceForward from '../../../will-displace-forward';
 import type { MoveResult } from '../move-to-next-place-types';

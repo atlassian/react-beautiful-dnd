@@ -9,7 +9,7 @@ import type {
   DragImpact,
 } from '../../../../types';
 import fromReorder from './get-next-impact/get-next-index-from-reorder';
-import getPageBorderBoxCenterFromImpact from '../../../get-page-border-box-center-from-impact';
+import getPageBorderBoxCenterFromImpact from '../../../get-center-from-impact/get-page-border-box-center';
 import fromCombine from './get-next-impact/get-next-index-from-combine';
 import getNextImpact from './get-next-impact';
 

@@ -4,7 +4,7 @@ import invariant from 'tiny-invariant';
 import getDisplacedBy from '../../../get-displaced-by';
 import getDisplacement from '../../../get-displacement';
 import getDisplacementMap from '../../../get-displacement-map';
-import getPageBorderBoxCenterFromImpact from '../../../get-page-border-box-center-from-impact';
+import getPageBorderBoxCenterFromImpact from '../../../get-center-from-impact/get-page-border-box-center';
 import { noMovement } from '../../../no-impact';
 import { isTotallyVisible } from '../../../visibility/is-visible';
 import type { InternalResult } from '../../move-in-direction-types';

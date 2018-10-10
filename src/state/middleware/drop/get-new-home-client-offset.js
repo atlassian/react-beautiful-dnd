@@ -10,8 +10,6 @@ import type {
 } from '../../../types';
 import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
 import { subtract } from '../../position';
-import getPageBorderBoxCenterFromImpact from '../../get-page-border-box-center-from-impact';
-import withAllDisplacement from '../../with-scroll-change/with-all-displacement';
 import getClientBorderBoxCenter from '../../get-center-from-impact/get-client-border-box-center';
 
 type Args = {|

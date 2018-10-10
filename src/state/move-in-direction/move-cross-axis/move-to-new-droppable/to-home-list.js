@@ -17,7 +17,7 @@ import type {
   DraggableDimensionMap,
   DisplacedBy,
 } from '../../../../types';
-import getPageBorderBoxCenterFromImpact from '../../../get-page-border-box-center-from-impact';
+import getPageBorderBoxCenterFromImpact from '../../../get-center-from-impact/get-page-border-box-center';
 
 type Args = {|
   moveIntoIndexOf: ?DraggableDimension,

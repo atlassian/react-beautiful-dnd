@@ -26,17 +26,13 @@ import scrollDroppable from './droppable/scroll-droppable';
 import getDragImpact from './get-drag-impact';
 import publish from './publish';
 import moveInDirection from './move-in-direction';
-import { add, isEqual, origin, subtract } from './position';
+import { add, isEqual, origin } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
 import isMovementAllowed from './is-movement-allowed';
 import moveWithPositionUpdates from './move-with-position-updates';
 import { toDroppableList } from './dimension-structures';
 import { forward } from './user-direction/user-direction-preset';
-import getPageBorderBoxCenterFromImpact from './get-page-border-box-center-from-impact';
-import getClientFromPagePoint from './get-client-from-page-point';
-import withDroppableDisplacement from './with-scroll-change/with-droppable-displacement';
-import withAllDisplacement from './with-scroll-change/with-all-displacement';
 import getClientBorderBoxCenter from './get-center-from-impact/get-client-border-box-center';
 
 const idle: IdleState = { phase: 'IDLE' };
