@@ -9,6 +9,7 @@ import type {
   DraggableId,
   DragMovement,
 } from '../../../../../types';
+import type { Instruction } from './get-next-impact-types';
 
 type Args = {|
   isInHomeList: boolean,
@@ -28,7 +29,7 @@ export default ({
   previousImpact,
   draggables,
   merge,
-}: Args): ?number => {
+}: Args): ?Instruction => {
   if (!destination.isCombineEnabled) {
     return null;
   }
@@ -41,15 +42,12 @@ export default ({
 
   // moving from an item that is not displaced
   if (!isCombineDisplaced) {
-    console.warn('from NOT combined');
-    console.log('combine index', combineIndex);
     // Need to know if targeting the combined item would normally displace forward
     const willDisplaceForward: boolean = getWillDisplaceForward({
       isInHomeList,
       proposedIndex: combineIndex,
       startIndexInHome: draggable.descriptor.index,
     });
-    console.log('willDisplaceforward', willDisplaceForward);
 
     if (willDisplaceForward) {
       // will displace forwards (eg home list moving backward from start)
@@ -57,18 +55,34 @@ export default ({
       // moving backward will increase displacement
 
       if (isMovingForward) {
-        return combineIndex + 1;
+        // we skip displacement when we move past a displaced item
+        console.warn('skipping displacement 1');
+        return {
+          proposedIndex: combineIndex + 1,
+          modifyDisplacement: false,
+        };
       }
-      return combineIndex;
+      return {
+        proposedIndex: combineIndex,
+        modifyDisplacement: true,
+      };
     }
 
     // will displace backwards (eg home list moving forward from start)
     // moving forward will increase displacement
     // moving backward will decrease displacement
     if (isMovingForward) {
-      return combineIndex;
+      return {
+        proposedIndex: combineIndex,
+        modifyDisplacement: true,
+      };
     }
-    return combineIndex - 1;
+    console.warn('skipping displacement 2');
+    // we skip displacement when we move past a displaced item
+    return {
+      proposedIndex: combineIndex - 1,
+      modifyDisplacement: false,
+    };
   }
 
   console.warn('from YES combined');
@@ -82,19 +96,36 @@ export default ({
   if (isDisplacedForward) {
     // if displaced forward, then moving forward will undo the displacement
     if (isMovingForward) {
-      return visualIndex;
+      return {
+        proposedIndex: visualIndex,
+        modifyDisplacement: true,
+      };
     }
     // if moving backwards, will move in front of the displaced item
-    return visualIndex - 1;
+    // want to leave the displaced item in place
+    console.warn('skipping displacement 3');
+    // we skip displacement when we move past a displaced item
+    return {
+      proposedIndex: visualIndex - 1,
+      modifyDisplacement: false,
+    };
   }
 
   // is displaced backwards
 
   // moving forward will increase the displacement
   if (isMovingForward) {
-    return visualIndex + 1;
+    console.warn('skipping displacement 4');
+    // we skip displacement when we move past a displaced item
+    return {
+      proposedIndex: visualIndex + 1,
+      modifyDisplacement: false,
+    };
   }
 
   // moving backwards will undo the displacement
-  return visualIndex;
+  return {
+    proposedIndex: visualIndex,
+    modifyDisplacement: true,
+  };
 };

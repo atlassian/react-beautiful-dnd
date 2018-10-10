@@ -9,6 +9,7 @@ import type {
   DragImpact,
   DraggableLocation,
 } from '../../../../../types';
+import type { Instruction } from './get-next-impact-types';
 
 type Args = {|
   isMovingForward: boolean,
@@ -24,7 +25,7 @@ export default ({
   previousImpact,
   draggable,
   insideDestination: initialInside,
-}: Args): ?number => {
+}: Args): ?Instruction => {
   if (previousImpact.merge) {
     return null;
   }
@@ -50,5 +51,8 @@ export default ({
     return null;
   }
 
-  return proposedIndex;
+  return {
+    proposedIndex,
+    modifyDisplacement: true,
+  };
 };

@@ -8,12 +8,13 @@ import type {
   DisplacedBy,
   Displacement,
 } from '../../../../../types';
-import getNextIndexFromReorder from './get-next-index-from-reorder';
-import getNextIndexFromCombine from './get-next-index-from-combine';
+import type { Instruction } from './get-next-impact-types';
 import getDisplacementMap from '../../../../get-displacement-map';
 import { addClosest, removeClosest } from '../../update-displacement';
 import getWillDisplaceForward from '../../../../will-displace-forward';
 import getDisplacedBy from '../../../../get-displaced-by';
+import fromReorder from './from-reorder';
+import fromCombine from './from-combine';
 
 export type Args = {|
   isMovingForward: boolean,
@@ -34,9 +35,9 @@ export default ({
   insideDestination,
   previousImpact,
 }: Args) => {
-  const proposedIndex: ?number = (() => {
+  const instruction: ?Instruction = (() => {
     if (previousImpact.destination) {
-      return getNextIndexFromReorder({
+      return fromReorder({
         isMovingForward,
         isInHomeList,
         draggable,
@@ -50,7 +51,7 @@ export default ({
       'Cannot move to next spot without a destination or merge',
     );
 
-    return getNextIndexFromCombine({
+    return fromCombine({
       isInHomeList,
       isMovingForward,
       draggable,
@@ -61,12 +62,11 @@ export default ({
     });
   })();
 
-  console.warn('proposed index', proposedIndex);
-
-  if (proposedIndex == null) {
+  if (instruction == null) {
     return null;
   }
 
+  const { proposedIndex, modifyDisplacement } = instruction;
   const startIndexInHome: number = draggable.descriptor.index;
   const willDisplaceForward: boolean = getWillDisplaceForward({
     isInHomeList,
@@ -81,22 +81,25 @@ export default ({
 
   const atProposedIndex: DraggableDimension = insideDestination[proposedIndex];
 
-  const isIncreasingDisplacement: boolean = (() => {
-    if (isInHomeList) {
-      // increase displacement if moving forward past start
-      if (isMovingForward) {
-        return proposedIndex > startIndexInHome;
-      }
-      // increase displacement if moving backwards away from start
-      return proposedIndex < startIndexInHome;
+  // TODO: pull out into another function
+  const displaced: Displacement[] = (() => {
+    if (!modifyDisplacement) {
+      return previousImpact.movement.displaced;
     }
 
-    // in foreign list moving forward will reduce the amount displaced
-    return !isMovingForward;
-  })();
+    const isIncreasingDisplacement: boolean = (() => {
+      if (isInHomeList) {
+        // increase displacement if moving forward past start
+        if (isMovingForward) {
+          return proposedIndex > startIndexInHome;
+        }
+        // increase displacement if moving backwards away from start
+        return proposedIndex < startIndexInHome;
+      }
 
-  const displaced: Displacement[] = (() => {
-    // TODO: there are some cases where we do not want to update the displacement
+      // in foreign list moving forward will reduce the amount displaced
+      return !isMovingForward;
+    })();
 
     const lastDisplaced: Displacement[] = previousImpact.movement.displaced;
     const updated: Displacement[] = isIncreasingDisplacement
