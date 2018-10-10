@@ -22,9 +22,9 @@ export default ({
   reason,
 }: GetDropDurationArgs): number => {
   const distance: number = getDistance(current, destination);
-  // no where to travel
-  if (distance === 0) {
-    return 0;
+  // even if there is no distance to travel, we might still need to animate opacity
+  if (distance <= 0) {
+    return minDropTime;
   }
 
   if (distance >= maxDropTimeAtDistance) {

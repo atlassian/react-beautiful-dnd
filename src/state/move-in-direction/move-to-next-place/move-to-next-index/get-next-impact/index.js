@@ -101,6 +101,10 @@ export default ({
     : removeClosest(lastDisplaced);
 
   console.log('displaced', displaced.map(d => d.draggableId));
+  console.log(
+    'visibile',
+    displaced.filter(d => d.isVisible).map(d => d.draggableId),
+  );
 
   return {
     movement: {
