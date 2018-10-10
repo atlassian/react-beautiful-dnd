@@ -37,6 +37,7 @@ import getPageBorderBoxCenterFromImpact from './get-page-border-box-center-from-
 import getClientFromPagePoint from './get-client-from-page-point';
 import withDroppableDisplacement from './with-scroll-change/with-droppable-displacement';
 import withAllDisplacement from './with-scroll-change/with-all-displacement';
+import getClientBorderBoxCenter from './get-center-from-impact/get-client-border-box-center';
 
 const idle: IdleState = { phase: 'IDLE' };
 
@@ -428,32 +429,17 @@ export default (state: State = idle, action: Action): State => {
       state.dimensions.droppables[droppableId];
     const draggable: DraggableDimension =
       state.dimensions.draggables[state.critical.draggable.id];
-    // the keyboard impact might be off, need to recompute impact
-    const pageBorderBoxCenter: Position = getPageBorderBoxCenterFromImpact({
+
+    const newClientCenter: Position = getClientBorderBoxCenter({
       impact: state.impact,
       draggable,
+      droppable,
       draggables: state.dimensions.draggables,
-      droppable,
+      viewport: state.viewport,
     });
-    // const client: Position = getClientFromPagePoint(
-    //   pageBorderBoxCenter,
-    //   state.viewport,
-    // );
-    // client offset will be the same as the page offset :D
-    const offset: Position = subtract(
-      pageBorderBoxCenter,
-      draggable.page.borderBox.center,
-    );
-    const selection: Position = add(state.initial.client.selection, offset);
-
-    const withDisplacement: Position = withAllDisplacement(
-      selection,
-      droppable,
-      state.viewport,
-    );
 
     // Nothing to do here
-    if (isEqual(state.current.client.selection, withDisplacement)) {
+    if (isEqual(state.current.client.selection, newClientCenter)) {
       return state;
     }
 
@@ -462,7 +448,7 @@ export default (state: State = idle, action: Action): State => {
       state,
       // not changing impact
       impact: state.impact,
-      clientSelection: withDisplacement,
+      clientSelection: newClientCenter,
     });
   }
 

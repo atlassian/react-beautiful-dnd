@@ -9,7 +9,7 @@ import type {
   DraggableDimensionMap,
   CombineImpact,
   DraggableLocation,
-} from '../../types';
+} from '../../../types';
 
 type Args = {|
   impact: DragImpact,

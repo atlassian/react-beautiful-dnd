@@ -12,6 +12,7 @@ import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
 import { subtract } from '../../position';
 import getPageBorderBoxCenterFromImpact from '../../get-page-border-box-center-from-impact';
 import withAllDisplacement from '../../with-scroll-change/with-all-displacement';
+import getClientBorderBoxCenter from '../../get-center-from-impact/get-client-border-box-center';
 
 type Args = {|
   impact: DragImpact,
@@ -28,23 +29,24 @@ export default ({
 }: Args): Position => {
   const { draggables, droppables } = dimensions;
   const droppableId: ?DroppableId = whatIsDraggedOver(impact);
-  const droppable: ?DroppableDimension = droppableId
+  const destination: ?DroppableDimension = droppableId
     ? droppables[droppableId]
     : null;
   const home: DroppableDimension = droppables[draggable.descriptor.droppableId];
 
-  const newBorderBoxPageCenter: Position = getPageBorderBoxCenterFromImpact({
+  const newClientCenter: Position = getClientBorderBoxCenter({
     impact,
     draggable,
     draggables,
-    droppable,
+    // if there is no destination, then we will be dropping back into the home
+    droppable: destination || home,
+    viewport,
   });
 
-  // client offset will be the same as the page offset :D
   const offset: Position = subtract(
-    newBorderBoxPageCenter,
-    draggable.page.borderBox.center,
+    newClientCenter,
+    draggable.client.borderBox.center,
   );
 
-  return withAllDisplacement(offset, droppable || home, viewport);
+  return offset;
 };

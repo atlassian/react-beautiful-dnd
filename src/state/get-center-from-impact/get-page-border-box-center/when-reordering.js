@@ -7,9 +7,9 @@ import type {
   DragMovement,
   DroppableDimension,
 } from '../../types';
-import { goBefore, goAfter, goIntoStart } from '../move-relative-to';
-import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import isHomeOf from '../droppable/is-home-of';
+import { goBefore, goAfter, goIntoStart } from '../../move-relative-to';
+import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
+import isHomeOf from '../../droppable/is-home-of';
 
 type NewHomeArgs = {|
   movement: DragMovement,

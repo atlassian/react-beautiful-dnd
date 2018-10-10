@@ -77,6 +77,7 @@ export default (store: MiddlewareStore) => (next: Dispatch) => (
     return;
   }
 
+  // TODO: cancel if no longer needed?
   requestAnimationFrame(() => {
     if (!store.getState().isDragging) {
       return;

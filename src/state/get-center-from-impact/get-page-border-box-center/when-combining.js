@@ -6,7 +6,7 @@ import type {
   Combine,
   DragMovement,
 } from '../../types';
-import { add } from '../position';
+import { add } from '../../position';
 
 type Args = {|
   movement: DragMovement,
