@@ -100,6 +100,8 @@ export default ({
     ? addClosest(atProposedIndex, lastDisplaced)
     : removeClosest(lastDisplaced);
 
+  console.log('displaced', displaced.map(d => d.draggableId));
+
   return {
     movement: {
       displacedBy,

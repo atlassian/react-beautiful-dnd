@@ -45,46 +45,91 @@ export default ({
 
   const isCombineDisplaced: boolean = Boolean(movement.map[combineId]);
   const willDisplaceForward: boolean = movement.willDisplaceForward;
-
-  const proposedIndex: number = (() => {
-    console.log({
-      isCombineDisplaced,
-      willDisplaceForward,
-      isMovingForward,
-    });
-    if (isCombineDisplaced) {
-      if (willDisplaceForward) {
-        if (isMovingForward) {
-          return combineIndex + 1;
-        }
-        // moving backwards
-        return combineIndex;
-      }
-      // will displace backwards
-      if (isMovingForward) {
-        return combineIndex + 1;
-      }
-      // moving backwards
-      return combineIndex - 1;
+  const visualIndex: number = (() => {
+    if (!isCombineDisplaced) {
+      return combineIndex;
     }
+    return willDisplaceForward ? combineIndex + 1 : combineIndex - 1;
+  })();
 
-    // not displaced
+  console.log('visual index', visualIndex);
+  console.log({
+    isCombineDisplaced,
+    willDisplaceForward,
+    isMovingForward,
+    combineIndex,
+    visualIndex,
+  });
+
+  // moving from an item that is not displaced
+  if (!isCombineDisplaced) {
     if (willDisplaceForward) {
+      // will displace forwards (eg home list moving backward from start)
+      // moving forward will decrease displacement
+      // moving backward will increase displacement
+
       if (isMovingForward) {
         return combineIndex + 1;
       }
-      // moving backwards
       return combineIndex;
     }
 
-    // will displace backwards
+    // will displace backwards (eg home list moving forward from start)
+    // moving forward will increase displacement
+    // moving backward will decrease displacement
     if (isMovingForward) {
       return combineIndex;
     }
-
     return combineIndex - 1;
-  })();
+  }
+  return null;
 
-  console.log('');
-  return proposedIndex;
+  // const willDisplaceForward: boolean = movement.willDisplaceForward;
+
+  // const proposedIndex: number = (() => {
+  //   console.log({
+  //     isCombineDisplaced,
+  //     willDisplaceForward,
+  //     isMovingForward,
+  //   });
+  //   // will we be moving into the spot of the displaced item,
+  //   // or moving onto the next ...?
+
+  //   if (isCombineDisplaced) {
+  //     if (willDisplaceForward) {
+  //       if (isMovingForward) {
+  //         return combineIndex + 1;
+  //       }
+  //       // moving backwards
+  //       return combineIndex;
+  //     }
+  //     // will displace backwards
+  //     if (isMovingForward) {
+  //       return combineIndex + 1;
+  //     }
+  //     // moving backwards
+  //     return combineIndex - 1;
+  //   }
+
+  //   // will we be moving into the spot of the combined item,
+  //   // or pushing it out of the way?
+
+  //   // not displaced
+  //   if (willDisplaceForward) {
+  //     if (isMovingForward) {
+  //       return combineIndex + 1;
+  //     }
+  //     // moving backwards
+  //     return combineIndex;
+  //   }
+
+  //   // will displace backwards
+  //   if (isMovingForward) {
+  //     return combineIndex;
+  //   }
+
+  //   return combineIndex - 1;
+  // })();
+
+  // return proposedIndex;
 };
