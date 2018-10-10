@@ -179,7 +179,6 @@ export default (state: State = idle, action: Action): State => {
   }
 
   if (action.type === 'UPDATE_DROPPABLE_SCROLL') {
-    console.warn('UPDATE_DROPPABLE_SCROLL', whatIsDraggedOver(state.impact));
     // Not allowing changes while a drop is pending
     // Cannot get this during a DROP_ANIMATING as the dimension
     // marshal will cancel any pending scroll updates
@@ -426,6 +425,7 @@ export default (state: State = idle, action: Action): State => {
     const draggable: DraggableDimension =
       state.dimensions.draggables[state.critical.draggable.id];
 
+    // we use the center position as the selection position when snap moving
     const newClientCenter: Position = getClientBorderBoxCenter({
       impact: state.impact,
       draggable,
@@ -439,7 +439,6 @@ export default (state: State = idle, action: Action): State => {
       return state;
     }
 
-    console.warn('post cross axis client offset');
     return moveWithPositionUpdates({
       state,
       // not changing impact
