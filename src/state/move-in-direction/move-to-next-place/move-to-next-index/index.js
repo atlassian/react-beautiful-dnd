@@ -1,5 +1,4 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
 import type { MoveResult } from '../move-to-next-place-types';
 import type {
@@ -8,9 +7,7 @@ import type {
   DraggableDimensionMap,
   DragImpact,
 } from '../../../../types';
-import fromReorder from './get-next-impact/get-next-index-from-reorder';
 import getPageBorderBoxCenterFromImpact from '../../../get-center-from-impact/get-page-border-box-center';
-import fromCombine from './get-next-impact/get-next-index-from-combine';
 import getNextImpact from './get-next-impact';
 
 export type Args = {|

@@ -95,10 +95,16 @@ export default ({
     return !isMovingForward;
   })();
 
-  const lastDisplaced: Displacement[] = previousImpact.movement.displaced;
-  const displaced: Displacement[] = isIncreasingDisplacement
-    ? addClosest(atProposedIndex, lastDisplaced)
-    : removeClosest(lastDisplaced);
+  const displaced: Displacement[] = (() => {
+    // TODO: there are some cases where we do not want to update the displacement
+
+    const lastDisplaced: Displacement[] = previousImpact.movement.displaced;
+    const updated: Displacement[] = isIncreasingDisplacement
+      ? addClosest(atProposedIndex, lastDisplaced)
+      : removeClosest(lastDisplaced);
+
+    return updated;
+  })();
 
   console.log('displaced', displaced.map(d => d.draggableId));
   console.log(

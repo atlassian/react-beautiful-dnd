@@ -1,7 +1,6 @@
 // @flow
-import { offset, type Position, type BoxModel } from 'css-box-model';
+import getWillDisplaceForward from '../../../../will-displace-forward';
 import type {
-  Axis,
   DroppableDimension,
   DragImpact,
   CombineImpact,
@@ -9,11 +8,7 @@ import type {
   DraggableDimensionMap,
   DraggableId,
   DragMovement,
-} from '../../../../types';
-import { goAfter, goBefore } from '../../../../move-relative-to';
-import getWillDisplaceForward from '../../../../will-displace-forward';
-import getDisplacedBy from '../../../../get-displaced-by';
-import type { MoveResult } from '../move-to-next-place-types';
+} from '../../../../../types';
 
 type Args = {|
   isInHomeList: boolean,
@@ -46,12 +41,15 @@ export default ({
 
   // moving from an item that is not displaced
   if (!isCombineDisplaced) {
+    console.warn('from NOT combined');
+    console.log('combine index', combineIndex);
     // Need to know if targeting the combined item would normally displace forward
     const willDisplaceForward: boolean = getWillDisplaceForward({
       isInHomeList,
       proposedIndex: combineIndex,
       startIndexInHome: draggable.descriptor.index,
     });
+    console.log('willDisplaceforward', willDisplaceForward);
 
     if (willDisplaceForward) {
       // will displace forwards (eg home list moving backward from start)
@@ -72,6 +70,8 @@ export default ({
     }
     return combineIndex - 1;
   }
+
+  console.warn('from YES combined');
 
   // moving from an item that is already displaced
   const isDisplacedForward: boolean = movement.willDisplaceForward;
@@ -97,53 +97,4 @@ export default ({
 
   // moving backwards will undo the displacement
   return visualIndex;
-
-  // const willDisplaceForward: boolean = movement.willDisplaceForward;
-
-  // const proposedIndex: number = (() => {
-  //   console.log({
-  //     isCombineDisplaced,
-  //     willDisplaceForward,
-  //     isMovingForward,
-  //   });
-  //   // will we be moving into the spot of the displaced item,
-  //   // or moving onto the next ...?
-
-  //   if (isCombineDisplaced) {
-  //     if (willDisplaceForward) {
-  //       if (isMovingForward) {
-  //         return combineIndex + 1;
-  //       }
-  //       // moving backwards
-  //       return combineIndex;
-  //     }
-  //     // will displace backwards
-  //     if (isMovingForward) {
-  //       return combineIndex + 1;
-  //     }
-  //     // moving backwards
-  //     return combineIndex - 1;
-  //   }
-
-  //   // will we be moving into the spot of the combined item,
-  //   // or pushing it out of the way?
-
-  //   // not displaced
-  //   if (willDisplaceForward) {
-  //     if (isMovingForward) {
-  //       return combineIndex + 1;
-  //     }
-  //     // moving backwards
-  //     return combineIndex;
-  //   }
-
-  //   // will displace backwards
-  //   if (isMovingForward) {
-  //     return combineIndex;
-  //   }
-
-  //   return combineIndex - 1;
-  // })();
-
-  // return proposedIndex;
 };
