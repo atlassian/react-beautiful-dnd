@@ -16,6 +16,32 @@ import getDisplacedBy from '../../../get-displaced-by';
 import fromReorder from './from-reorder';
 import fromCombine from './from-combine';
 
+type IsIncreasingDisplacementArgs = {|
+  isInHomeList: boolean,
+  isMovingForward: boolean,
+  proposedIndex: number,
+  startIndexInHome: number,
+|};
+
+const getIsIncreasingDisplacement = ({
+  isInHomeList,
+  isMovingForward,
+  proposedIndex,
+  startIndexInHome,
+}: IsIncreasingDisplacementArgs): boolean => {
+  // in foreign list moving forward will reduce the amount displaced
+  if (!isInHomeList) {
+    return !isMovingForward;
+  }
+
+  // increase displacement if moving forward past start
+  if (isMovingForward) {
+    return proposedIndex > startIndexInHome;
+  }
+  // increase displacement if moving backwards away from start
+  return proposedIndex < startIndexInHome;
+};
+
 export type Args = {|
   isMovingForward: boolean,
   isInHomeList: boolean,
@@ -81,32 +107,22 @@ export default ({
 
   const atProposedIndex: DraggableDimension = insideDestination[proposedIndex];
 
-  // TODO: pull out into another function
   const displaced: Displacement[] = (() => {
     if (!modifyDisplacement) {
       return previousImpact.movement.displaced;
     }
 
-    const isIncreasingDisplacement: boolean = (() => {
-      if (isInHomeList) {
-        // increase displacement if moving forward past start
-        if (isMovingForward) {
-          return proposedIndex > startIndexInHome;
-        }
-        // increase displacement if moving backwards away from start
-        return proposedIndex < startIndexInHome;
-      }
-
-      // in foreign list moving forward will reduce the amount displaced
-      return !isMovingForward;
-    })();
+    const isIncreasingDisplacement: boolean = getIsIncreasingDisplacement({
+      isInHomeList,
+      isMovingForward,
+      proposedIndex,
+      startIndexInHome,
+    });
 
     const lastDisplaced: Displacement[] = previousImpact.movement.displaced;
-    const updated: Displacement[] = isIncreasingDisplacement
+    return isIncreasingDisplacement
       ? addClosest(atProposedIndex, lastDisplaced)
       : removeClosest(lastDisplaced);
-
-    return updated;
   })();
 
   console.log('displaced', displaced.map(d => d.draggableId));
