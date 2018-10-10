@@ -95,21 +95,21 @@ export default ({
 
   // const isTargetDisplacedForward: boolean =
   console.warn('targetIndex', targetIndex);
-  // const visualIndex: number = (() => {
-  //   const isCombineDisplaced: boolean = Boolean(
-  //     previousImpact.movement.map[target.descriptor.id],
-  //   );
+  const visualIndex: number = (() => {
+    const isCombineDisplaced: boolean = Boolean(
+      previousImpact.movement.map[target.descriptor.id],
+    );
 
-  //   if (!isCombineDisplaced) {
-  //     return targetIndex;
-  //   }
+    if (!isCombineDisplaced) {
+      return targetIndex;
+    }
 
-  //   const isDisplacedForward: boolean =
-  //     previousImpact.movement.willDisplaceForward;
+    const isDisplacedForward: boolean =
+      previousImpact.movement.willDisplaceForward;
 
-  //   return isDisplacedForward ? targetIndex + 1 : targetIndex - 1;
-  // })();
-  // console.warn('visual index', visualIndex);
+    return isDisplacedForward ? targetIndex + 1 : targetIndex - 1;
+  })();
+  console.warn('visual index', visualIndex);
 
   const willDisplaceForward: boolean = getWillDisplaceForward({
     isInHomeList,
@@ -121,18 +121,18 @@ export default ({
     draggable.displaceBy,
     willDisplaceForward,
   );
-  if (previousImpact.movement.willDisplaceForward !== willDisplaceForward) {
-    console.warn('CHANGE IN WILLDISPLACEFORWARD');
-  }
+  // if (previousImpact.movement.willDisplaceForward !== willDisplaceForward) {
+  //   console.warn('CHANGE IN WILLDISPLACEFORWARD');
+  // }
 
   const impact: DragImpact = {
     // grouping does not modify the existing displacement
-    // movement: previousImpact.movement,
-    movement: {
-      ...previousImpact.movement,
-      willDisplaceForward,
-      displacedBy,
-    },
+    movement: previousImpact.movement,
+    // movement: {
+    //   ...previousImpact.movement,
+    //   willDisplaceForward,
+    //   displacedBy,
+    // },
     // grouping removes the destination
     destination: null,
     direction: destination.axis.direction,

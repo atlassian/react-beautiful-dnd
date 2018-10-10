@@ -42,27 +42,17 @@ export default ({
   const combineId: DraggableId = merge.combine.draggableId;
   const combine: DraggableDimension = draggables[combineId];
   const combineIndex: number = combine.descriptor.index;
-
   const isCombineDisplaced: boolean = Boolean(movement.map[combineId]);
-  const willDisplaceForward: boolean = movement.willDisplaceForward;
-  const visualIndex: number = (() => {
-    if (!isCombineDisplaced) {
-      return combineIndex;
-    }
-    return willDisplaceForward ? combineIndex + 1 : combineIndex - 1;
-  })();
-
-  console.log('visual index', visualIndex);
-  console.log({
-    isCombineDisplaced,
-    willDisplaceForward,
-    isMovingForward,
-    combineIndex,
-    visualIndex,
-  });
 
   // moving from an item that is not displaced
   if (!isCombineDisplaced) {
+    // Need to know if targeting the combined item would normally displace forward
+    const willDisplaceForward: boolean = getWillDisplaceForward({
+      isInHomeList,
+      proposedIndex: combineIndex,
+      startIndexInHome: draggable.descriptor.index,
+    });
+
     if (willDisplaceForward) {
       // will displace forwards (eg home list moving backward from start)
       // moving forward will decrease displacement
@@ -82,7 +72,31 @@ export default ({
     }
     return combineIndex - 1;
   }
-  return null;
+
+  // moving from an item that is already displaced
+  const isDisplacedForward: boolean = movement.willDisplaceForward;
+  const visualIndex: number = isDisplacedForward
+    ? combineIndex + 1
+    : combineIndex - 1;
+
+  if (isDisplacedForward) {
+    // if displaced forward, then moving forward will undo the displacement
+    if (isMovingForward) {
+      return visualIndex;
+    }
+    // if moving backwards, will move in front of the displaced item
+    return visualIndex - 1;
+  }
+
+  // is displaced backwards
+
+  // moving forward will increase the displacement
+  if (isMovingForward) {
+    return visualIndex + 1;
+  }
+
+  // moving backwards will undo the displacement
+  return visualIndex;
 
   // const willDisplaceForward: boolean = movement.willDisplaceForward;
 
