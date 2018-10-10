@@ -104,7 +104,7 @@ export default ({
 
   console.log('👻 not visible in new location');
 
-  // The full distance required to get from the previous page center to the new page center
+  // Need to account for any changes in the scroll in the destination
   const withDisplacement: Position = withDroppableDisplacement(
     destination,
     pageBorderBoxCenter,
@@ -115,8 +115,9 @@ export default ({
     previousPageBorderBoxCenter,
   );
 
-  console.log('distance needed', distance);
-
+  // need to guess the increased visible displacement
+  // this is a worst case guess, which means that
+  // it may visually displace things that do not need to
   const updated: DragImpact = speculativelyIncrease({
     impact,
     viewport,
