@@ -8,9 +8,10 @@ import type {
   DraggableDimensionMap,
   DragImpact,
 } from '../../../../types';
-import fromReorder from './from-reorder';
+import fromReorder from './get-next-impact/get-next-index-from-reorder';
 import getPageBorderBoxCenterFromImpact from '../../../get-page-border-box-center-from-impact';
-import fromCombine from './from-combine';
+import fromCombine from './get-next-impact/get-next-index-from-combine';
+import getNextImpact from './get-next-impact';
 
 export type Args = {|
   isMovingForward: boolean,
@@ -31,24 +32,15 @@ export default ({
   insideDestination,
   previousImpact,
 }: Args): ?MoveResult => {
-  const impact: ?DragImpact = (() => {
-    if (previousImpact.destination) {
-      return fromReorder({
-        isMovingForward,
-        isInHomeList,
-        draggable,
-        destination,
-        previousImpact,
-        insideDestination,
-      });
-    }
-
-    invariant(
-      previousImpact.merge,
-      'Cannot move to next spot without a destination or merge',
-    );
-    // return fromCombine({});
-  })();
+  const impact: ?DragImpact = getNextImpact({
+    isMovingForward,
+    isInHomeList,
+    draggable,
+    draggables,
+    destination,
+    insideDestination,
+    previousImpact,
+  });
 
   // no impact can be achieved
   if (!impact) {

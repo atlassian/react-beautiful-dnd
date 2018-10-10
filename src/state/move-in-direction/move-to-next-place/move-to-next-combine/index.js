@@ -8,12 +8,15 @@ import type {
   DraggableDimensionMap,
   CombineImpact,
   DraggableLocation,
+  DisplacedBy,
 } from '../../../../types';
 import {
   forward,
   backward,
 } from '../../../user-direction/user-direction-preset';
 import getPageBorderBoxCenterFromImpact from '../../../get-page-border-box-center-from-impact';
+import getDisplacedBy from '../../../get-displaced-by';
+import getWillDisplaceForward from '../../../will-displace-forward';
 import type { MoveResult } from '../move-to-next-place-types';
 
 export type Args = {|
@@ -84,15 +87,47 @@ export default ({
       droppableId: destination.descriptor.id,
     },
   };
+  console.group('mergin');
+
+  // const movement: DragMovement = (() => {
+  //   if(targetIndex === )
+  // })();
+
+  // const isTargetDisplacedForward: boolean =
+  console.warn('targetIndex', targetIndex);
+
+  const willDisplaceForward: boolean = getWillDisplaceForward({
+    isInHomeList,
+    proposedIndex: targetIndex,
+    startIndexInHome: draggable.descriptor.index,
+  });
+  const displacedBy: DisplacedBy = getDisplacedBy(
+    destination.axis,
+    draggable.displaceBy,
+    willDisplaceForward,
+  );
+  console.log(
+    'old willDisplaceForward',
+    previousImpact.movement.willDisplaceForward,
+  );
+
+  console.log('new: willDisplaceForward', willDisplaceForward);
 
   const impact: DragImpact = {
     // grouping does not modify the existing displacement
-    movement: previousImpact.movement,
+    movement: {
+      ...previousImpact.movement,
+      willDisplaceForward,
+      displacedBy,
+    },
     // grouping removes the destination
     destination: null,
     direction: destination.axis.direction,
     merge,
   };
+
+  console.log('impact', impact);
+  console.groupEnd();
 
   const pageBorderBoxCenter: Position = getPageBorderBoxCenterFromImpact({
     impact,

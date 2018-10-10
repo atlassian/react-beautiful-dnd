@@ -1,23 +1,25 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type {
-  Axis,
-  DisplacedBy,
   DraggableDimension,
-  Displacement,
   DroppableDimension,
+  DraggableDimensionMap,
   DragImpact,
-  DraggableLocation,
-} from '../../../../types';
-import getWillDisplaceForward from '../../../will-displace-forward';
-import getDisplacementMap from '../../../get-displacement-map';
-import getDisplacedBy from '../../../get-displaced-by';
-import { addClosest, removeClosest } from '../update-displacement';
+  DisplacedBy,
+  Displacement,
+} from '../../../../../types';
+import getNextIndexFromReorder from './get-next-index-from-reorder';
+import getNextIndexFromCombine from './get-next-index-from-combine';
+import getDisplacementMap from '../../../../get-displacement-map';
+import { addClosest, removeClosest } from '../../update-displacement';
+import getWillDisplaceForward from '../../../../will-displace-forward';
+import getDisplacedBy from '../../../../get-displaced-by';
 
-type Args = {|
+export type Args = {|
   isMovingForward: boolean,
   isInHomeList: boolean,
   draggable: DraggableDimension,
+  draggables: DraggableDimensionMap,
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
   previousImpact: DragImpact,
@@ -26,45 +28,53 @@ type Args = {|
 export default ({
   isMovingForward,
   isInHomeList,
-  previousImpact,
   draggable,
+  draggables,
   destination,
-  insideDestination: initialInside,
-}: Args): ?DragImpact => {
-  if (previousImpact.merge) {
+  insideDestination,
+  previousImpact,
+}: Args) => {
+  const proposedIndex: ?number = (() => {
+    if (previousImpact.destination) {
+      return getNextIndexFromReorder({
+        isMovingForward,
+        isInHomeList,
+        draggable,
+        previousImpact,
+        insideDestination,
+      });
+    }
+
+    invariant(
+      previousImpact.merge,
+      'Cannot move to next spot without a destination or merge',
+    );
+
+    return getNextIndexFromCombine({
+      isInHomeList,
+      isMovingForward,
+      draggable,
+      destination,
+      previousImpact,
+      draggables,
+      merge: previousImpact.merge,
+    });
+  })();
+
+  console.warn('proposed index', proposedIndex);
+
+  if (proposedIndex == null) {
     return null;
   }
-  const location: ?DraggableLocation = previousImpact.destination;
-  invariant(location, 'Cannot move to next index without previous destination');
 
-  const axis: Axis = destination.axis;
-  const insideDestination: DraggableDimension[] = initialInside.slice();
-  const currentIndex: number = location.index;
-  const isInForeignList: boolean = !isInHomeList;
   const startIndexInHome: number = draggable.descriptor.index;
-
-  // in foreign list we need to insert the item into the right spot
-  if (isInForeignList) {
-    insideDestination.splice(location.index, 0, draggable);
-  }
-  const proposedIndex: number = isMovingForward
-    ? currentIndex + 1
-    : currentIndex - 1;
-
-  if (proposedIndex < 0) {
-    return null;
-  }
-  if (proposedIndex > insideDestination.length - 1) {
-    return null;
-  }
-
   const willDisplaceForward: boolean = getWillDisplaceForward({
     isInHomeList,
     proposedIndex,
     startIndexInHome,
   });
   const displacedBy: DisplacedBy = getDisplacedBy(
-    axis,
+    destination.axis,
     draggable.displaceBy,
     willDisplaceForward,
   );
@@ -97,7 +107,7 @@ export default ({
       displaced,
       map: getDisplacementMap(displaced),
     },
-    direction: axis.direction,
+    direction: destination.axis.direction,
     destination: {
       droppableId: destination.descriptor.id,
       index: proposedIndex,
