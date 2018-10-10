@@ -33,10 +33,10 @@ import isMovementAllowed from './is-movement-allowed';
 import moveWithPositionUpdates from './move-with-position-updates';
 import { toDroppableList } from './dimension-structures';
 import { forward } from './user-direction/user-direction-preset';
-
 import getPageBorderBoxCenterFromImpact from './get-page-border-box-center-from-impact';
 import getClientFromPagePoint from './get-client-from-page-point';
 import withDroppableDisplacement from './with-scroll-change/with-droppable-displacement';
+import withAllDisplacement from './with-scroll-change/with-all-displacement';
 
 const idle: IdleState = { phase: 'IDLE' };
 
@@ -366,36 +366,23 @@ export default (state: State = idle, action: Action): State => {
       'Window scrolling is currently not supported for fixed lists. Aborting drag',
     );
 
-    const newScroll: Position = action.payload.current;
-    const newMax: Position = action.payload.max;
+    const newScroll: Position = action.payload.newScroll;
 
     // nothing needs to be done
-    if (
-      isEqual(state.viewport.scroll.current, newScroll) &&
-      isEqual(state.viewport.scroll.max, newMax)
-    ) {
+    if (isEqual(state.viewport.scroll.current, newScroll)) {
       return state;
     }
 
     const isSnapping: boolean = state.movementMode === 'SNAP';
     const impact: ?DragImpact = isSnapping ? state.impact : null;
 
-    const withNewMax: Viewport = {
-      ...state.viewport,
-      scroll: {
-        ...state.viewport.scroll,
-        max: newMax,
-      },
-    };
-    const viewport: Viewport = scrollViewport(withNewMax, newScroll);
+    const viewport: Viewport = scrollViewport(state.viewport, newScroll);
 
     return moveWithPositionUpdates({
       state,
       clientSelection: state.current.client.selection,
       viewport,
       impact,
-      // this would have cleared any scroll jump requests
-      scrollJumpRequest: null,
     });
   }
 
@@ -414,52 +401,69 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
-    console.log('updating viewport max scroll');
-
     return {
       // phase will be overridden - appeasing flow
       phase: 'DRAGGING',
       ...state,
       viewport: withMaxScroll,
     };
+  }
 
-    // snapping
+  if (action.type === 'POST_CROSS_AXIS_MOVE') {
+    invariant(
+      isMovementAllowed(state),
+      `Cannot update viewport scroll in phase ${state.phase}`,
+    );
+    invariant(
+      state.movementMode === 'SNAP',
+      'Can only cross axis move when snapping',
+    );
 
-    // console.warn('POST_DESTINATION_CHANGE');
-
-    // const viewport: Viewport = newViewport || state.viewport;
-    // const droppableId: ?DroppableId = whatIsDraggedOver(state.impact);
-    // invariant(
-    //   droppableId,
-    //   'Expecting a destination change to result in a change in destination',
-    // );
-    // const droppable: DroppableDimension =
-    //   state.dimensions.droppables[droppableId];
-    // // the keyboard impact might be off, need to recompute impact
-    // const pageBorderBoxCenter: Position = getPageBorderBoxCenterFromImpact({
-    //   impact: state.impact,
-    //   draggable: state.dimensions.draggables[state.critical.draggable.id],
-    //   draggables: state.dimensions.draggables,
-    //   droppable,
-    // });
+    const droppableId: ?DroppableId = whatIsDraggedOver(state.impact);
+    invariant(
+      droppableId,
+      'Expecting a destination change to result in a change in destination',
+    );
+    const droppable: DroppableDimension =
+      state.dimensions.droppables[droppableId];
+    const draggable: DraggableDimension =
+      state.dimensions.draggables[state.critical.draggable.id];
+    // the keyboard impact might be off, need to recompute impact
+    const pageBorderBoxCenter: Position = getPageBorderBoxCenterFromImpact({
+      impact: state.impact,
+      draggable,
+      draggables: state.dimensions.draggables,
+      droppable,
+    });
     // const client: Position = getClientFromPagePoint(
     //   pageBorderBoxCenter,
-    //   viewport,
+    //   state.viewport,
     // );
-    // const withDisplacement: Position = withDroppableDisplacement(
-    //   droppable,
-    //   client,
-    // );
+    // client offset will be the same as the page offset :D
+    const offset: Position = subtract(
+      pageBorderBoxCenter,
+      draggable.page.borderBox.center,
+    );
+    const selection: Position = add(state.initial.client.selection, offset);
 
-    // console.log('impact', state.impact);
+    const withDisplacement: Position = withAllDisplacement(
+      selection,
+      droppable,
+      state.viewport,
+    );
 
-    // return moveWithPositionUpdates({
-    //   state,
-    //   // not changing impact
-    //   impact: state.impact,
-    //   clientSelection: withDisplacement,
-    //   viewport,
-    // });
+    // Nothing to do here
+    if (isEqual(state.current.client.selection, withDisplacement)) {
+      return state;
+    }
+
+    console.warn('post cross axis client offset');
+    return moveWithPositionUpdates({
+      state,
+      // not changing impact
+      impact: state.impact,
+      clientSelection: withDisplacement,
+    });
   }
 
   if (

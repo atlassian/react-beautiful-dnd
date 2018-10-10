@@ -84,8 +84,6 @@ export default ({ state, type }: Args): ?PublicResult => {
   );
 
   if (result.type === 'MOVE_CROSS_AXIS') {
-    console.log('moving cross axis');
-    console.log('impact', result.impact);
     const withDisplacement: Position = withScrollDisplacement(
       client,
       result.destination,

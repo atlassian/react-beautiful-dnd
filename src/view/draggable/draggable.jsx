@@ -37,7 +37,6 @@ import type {
   ChildrenFn,
 } from './draggable-types';
 import getWindowScroll from '../window/get-window-scroll';
-import getMaxWindowScroll from '../window/get-max-window-scroll';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 import checkOwnPropsInDev from './check-own-props-in-dev';
 
@@ -107,8 +106,7 @@ export default class Draggable extends Component<Props> {
       onMoveLeft: props.moveLeft,
       onWindowScroll: () =>
         props.moveByWindowScroll({
-          current: getWindowScroll(),
-          max: getMaxWindowScroll(),
+          newScroll: getWindowScroll(),
         }),
     };
 

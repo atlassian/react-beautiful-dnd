@@ -137,8 +137,7 @@ export const move = (args: MoveArgs): MoveAction => ({
 });
 
 type MoveByWindowScrollArgs = {|
-  current: Position,
-  max: Position,
+  newScroll: Position,
 |};
 
 export type MoveByWindowScrollAction = {|
@@ -167,6 +166,16 @@ export const updateViewportMaxScroll = (
 ): UpdateViewportMaxScrollAction => ({
   type: 'UPDATE_VIEWPORT_MAX_SCROLL',
   payload: args,
+});
+
+type PostCrossAxisMoveAction = {|
+  type: 'POST_CROSS_AXIS_MOVE',
+  payload: null,
+|};
+
+export const postCrossAxisMove = (): PostCrossAxisMoveAction => ({
+  type: 'POST_CROSS_AXIS_MOVE',
+  payload: null,
 });
 
 export type MoveUpAction = {|
@@ -285,6 +294,7 @@ export type Action =
   | UpdateDroppableIsCombineEnabledAction
   | MoveByWindowScrollAction
   | UpdateViewportMaxScrollAction
+  | PostCrossAxisMoveAction
   | MoveAction
   | MoveUpAction
   | MoveDownAction
