@@ -1,15 +1,11 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type {
-  Axis,
-  DisplacedBy,
   DraggableDimension,
-  Displacement,
-  DroppableDimension,
   DragImpact,
   DraggableLocation,
-} from '../../../../../types';
-import type { Instruction } from './get-next-impact-types';
+} from '../../../../types';
+import type { Instruction } from './move-to-next-index-types';
 
 type Args = {|
   isMovingForward: boolean,

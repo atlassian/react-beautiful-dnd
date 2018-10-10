@@ -1,5 +1,5 @@
 // @flow
-import getWillDisplaceForward from '../../../../will-displace-forward';
+import getWillDisplaceForward from '../../../will-displace-forward';
 import type {
   DroppableDimension,
   DragImpact,
@@ -8,8 +8,8 @@ import type {
   DraggableDimensionMap,
   DraggableId,
   DragMovement,
-} from '../../../../../types';
-import type { Instruction } from './get-next-impact-types';
+} from '../../../../types';
+import type { Instruction } from './move-to-next-index-types';
 
 type Args = {|
   isInHomeList: boolean,

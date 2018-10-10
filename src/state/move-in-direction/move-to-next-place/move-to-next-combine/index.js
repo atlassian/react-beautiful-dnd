@@ -1,6 +1,5 @@
 // @flow
 import invariant from 'tiny-invariant';
-import type { Position } from 'css-box-model';
 import type {
   DraggableDimension,
   DroppableDimension,
@@ -8,22 +7,16 @@ import type {
   DraggableDimensionMap,
   CombineImpact,
   DraggableLocation,
-  DisplacedBy,
 } from '../../../../types';
 import {
   forward,
   backward,
 } from '../../../user-direction/user-direction-preset';
-import getPageBorderBoxCenterFromImpact from '../../../get-center-from-impact/get-page-border-box-center';
-import getDisplacedBy from '../../../get-displaced-by';
-import getWillDisplaceForward from '../../../will-displace-forward';
-import type { MoveResult } from '../move-to-next-place-types';
 
 export type Args = {|
   isMovingForward: boolean,
   isInHomeList: boolean,
   draggable: DraggableDimension,
-  draggables: DraggableDimensionMap,
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
   previousImpact: DragImpact,
@@ -33,11 +26,10 @@ export default ({
   isMovingForward,
   isInHomeList,
   draggable,
-  draggables,
   destination,
   insideDestination,
   previousImpact,
-}: Args): ?MoveResult => {
+}: Args): ?DragImpact => {
   if (!destination.isCombineEnabled) {
     return null;
   }
@@ -97,15 +89,5 @@ export default ({
     merge,
   };
 
-  const pageBorderBoxCenter: Position = getPageBorderBoxCenterFromImpact({
-    impact,
-    draggable,
-    droppable: destination,
-    draggables,
-  });
-
-  return {
-    pageBorderBoxCenter,
-    impact,
-  };
+  return impact;
 };

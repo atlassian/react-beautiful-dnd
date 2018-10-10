@@ -9,15 +9,15 @@ import type {
   Viewport,
 } from '../../../types';
 import type { InternalResult } from '../move-in-direction-types';
-import type { MoveResult } from './move-to-next-place-types';
-import moveToNextIndex from './move-to-next-index';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
 import moveToNextCombine from './move-to-next-combine';
+import moveToNextIndex from './move-to-next-index';
 import isHomeOf from '../../droppable/is-home-of';
 import withDroppableDisplacement from '../../with-scroll-change/with-droppable-displacement';
 import { speculativelyIncrease, recompute } from './update-visibility';
 import { subtract } from '../../position';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
+import getPageBorderBoxCenter from '../../get-center-from-impact/get-page-border-box-center';
 
 type Args = {|
   isMovingForward: boolean,
@@ -56,12 +56,11 @@ export default ({
   );
   const isInHomeList: boolean = isHomeOf(draggable, destination);
 
-  const result: ?MoveResult =
+  const impact: ?DragImpact =
     moveToNextCombine({
       isInHomeList,
       isMovingForward,
       draggable,
-      draggables,
       destination,
       insideDestination,
       previousImpact,
@@ -76,11 +75,16 @@ export default ({
       previousImpact,
     });
 
-  if (!result) {
+  if (!impact) {
     return null;
   }
 
-  const { impact, pageBorderBoxCenter } = result;
+  const pageBorderBoxCenter: Position = getPageBorderBoxCenter({
+    impact,
+    draggable,
+    droppable: destination,
+    draggables,
+  });
 
   const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
     draggable,
