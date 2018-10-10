@@ -10,7 +10,7 @@ import dropAnimationFinish from './middleware/drop-animation-finish';
 import dimensionMarshalStopper from './middleware/dimension-marshal-stopper';
 import autoScroll from './middleware/auto-scroll';
 // import pendingDrop from './middleware/pending-drop';
-import viewportCrossAxisMoveScrollUpdater from './middleware/viewport-destination-change-scroll-updater';
+import postCrossAxisMoveUpdater from './middleware/post-cross-axis-move-updater';
 import type { DimensionMarshal } from './dimension-marshal/dimension-marshal-types';
 import type { StyleMarshal } from '../view/style-marshal/style-marshal-types';
 import type { AutoScroller } from './auto-scroller/auto-scroller-types';
@@ -78,7 +78,7 @@ export default ({
         dropAnimationFinish,
         // TODO: enable for dynamic dimensions
         // pendingDrop,
-        viewportCrossAxisMoveScrollUpdater,
+        postCrossAxisMoveUpdater,
         autoScroll(getScroller),
         // Fire hooks for consumers (after update to store)
         hooks(getHooks, announce),
