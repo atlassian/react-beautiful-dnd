@@ -5,7 +5,7 @@ import type {
   DraggableId,
   Combine,
   DragMovement,
-} from '../../types';
+} from '../../../types';
 import { add } from '../../position';
 
 type Args = {|

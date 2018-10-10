@@ -1,7 +1,7 @@
 // @flow
 import type { Position, BoxModel } from 'css-box-model';
-import { patch } from './position';
-import type { Axis } from '../types';
+import { patch } from '../position';
+import type { Axis } from '../../types';
 
 type Args = {|
   axis: Axis,

@@ -6,8 +6,8 @@ import type {
   DraggableDimensionMap,
   DragMovement,
   DroppableDimension,
-} from '../../types';
-import { goBefore, goAfter, goIntoStart } from '../../move-relative-to';
+} from '../../../types';
+import { goBefore, goAfter, goIntoStart } from '../move-relative-to';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
 import isHomeOf from '../../droppable/is-home-of';
 
