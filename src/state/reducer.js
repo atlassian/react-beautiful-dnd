@@ -1,18 +1,6 @@
 // @flow
-import type { Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import scrollDroppable from './droppable/scroll-droppable';
-import getDragImpact from './get-drag-impact';
-import publish from './publish';
-import moveInDirection from './move-in-direction';
-import type { PublicResult as MoveInDirectionResult } from './move-in-direction/move-in-direction-types';
-import { add, isEqual, origin, subtract } from './position';
-import scrollViewport from './scroll-viewport';
-import getHomeImpact from './get-home-impact';
-import isMovementAllowed from './is-movement-allowed';
-import moveWithPositionUpdates from './move-with-position-updates';
-import { toDroppableList } from './dimension-structures';
-import { forward } from './user-direction/user-direction-preset';
+import type { Position } from 'css-box-model';
 import type {
   State,
   DraggableDimension,
@@ -32,7 +20,23 @@ import type {
   DroppableId,
 } from '../types';
 import type { Action } from './store-types';
+import type { PublicResult as MoveInDirectionResult } from './move-in-direction/move-in-direction-types';
 import whatIsDraggedOver from './droppable/what-is-dragged-over';
+import scrollDroppable from './droppable/scroll-droppable';
+import getDragImpact from './get-drag-impact';
+import publish from './publish';
+import moveInDirection from './move-in-direction';
+import { add, isEqual, origin, subtract } from './position';
+import scrollViewport from './scroll-viewport';
+import getHomeImpact from './get-home-impact';
+import isMovementAllowed from './is-movement-allowed';
+import moveWithPositionUpdates from './move-with-position-updates';
+import { toDroppableList } from './dimension-structures';
+import { forward } from './user-direction/user-direction-preset';
+
+import getPageBorderBoxCenterFromImpact from './get-page-border-box-center-from-impact';
+import getClientFromPagePoint from './get-client-from-page-point';
+import withDroppableDisplacement from './with-scroll-change/with-droppable-displacement';
 
 const idle: IdleState = { phase: 'IDLE' };
 
@@ -178,6 +182,7 @@ export default (state: State = idle, action: Action): State => {
   }
 
   if (action.type === 'UPDATE_DROPPABLE_SCROLL') {
+    console.warn('UPDATE_DROPPABLE_SCROLL', whatIsDraggedOver(state.impact));
     // Not allowing changes while a drop is pending
     // Cannot get this during a DROP_ANIMATING as the dimension
     // marshal will cancel any pending scroll updates
@@ -384,39 +389,63 @@ export default (state: State = idle, action: Action): State => {
     });
   }
 
-  if (action.type === 'UPDATE_VIEWPORT_SCROLL_FROM_DESTINATION_CHANGE') {
+  if (action.type === 'POST_DESTINATION_CHANGE') {
     invariant(
       isMovementAllowed(state),
       `Cannot update viewport scroll in phase ${state.phase}`,
     );
-    const existing: Viewport = state.viewport;
-    const withNewMax: Viewport = {
-      ...existing,
-      scroll: {
-        ...existing.scroll,
-        max: action.payload.max,
-      },
-    };
-    const scrolled: Viewport = scrollViewport(
-      withNewMax,
-      action.payload.current,
-    );
 
     const isSnapping: boolean = state.movementMode === 'SNAP';
+    const newViewport: ?Viewport = action.payload.viewport;
 
-    // if snap moving: do not update the impact as we use forced impacts
-    const impact: ?DragImpact = isSnapping ? state.impact : null;
+    if (!isSnapping) {
+      // nothing needs to be done
+      if (!newViewport) {
+        return state;
+      }
+      // need to update the viewport
+      return {
+        // will be overwritten
+        phase: 'DRAGGING',
+        ...state,
+        viewport: newViewport,
+      };
+    }
 
-    // If snap moving: shift the visual position of the item for a better fit
-    const clientSelection: Position = isSnapping
-      ? subtract(state.current.client.selection, action.payload.shift)
-      : state.current.client.selection;
+    console.warn('POST_DESTINATION_CHANGE');
+
+    const viewport: Viewport = newViewport || state.viewport;
+    const droppableId: ?DroppableId = whatIsDraggedOver(state.impact);
+    invariant(
+      droppableId,
+      'Expecting a destination change to result in a change in destination',
+    );
+    const droppable: DroppableDimension =
+      state.dimensions.droppables[droppableId];
+    // the keyboard impact might be off, need to recompute impact
+    const pageBorderBoxCenter: Position = getPageBorderBoxCenterFromImpact({
+      impact: state.impact,
+      draggable: state.dimensions.draggables[state.critical.draggable.id],
+      draggables: state.dimensions.draggables,
+      droppable,
+    });
+    const client: Position = getClientFromPagePoint(
+      pageBorderBoxCenter,
+      viewport,
+    );
+    const withDisplacement: Position = withDroppableDisplacement(
+      droppable,
+      client,
+    );
+
+    console.log('impact', state.impact);
 
     return moveWithPositionUpdates({
       state,
-      impact,
-      clientSelection,
-      viewport: scrolled,
+      // not changing impact
+      impact: state.impact,
+      clientSelection: withDisplacement,
+      viewport,
     });
   }
 

@@ -46,8 +46,15 @@ type WhileDragging = {|
 const getClosestScrollable = (dragging: ?WhileDragging): ?Element =>
   (dragging && dragging.env.closestScrollable) || null;
 
-const listenerOptions = {
-  passive: true,
+const getListenerOptions = (options: ScrollOptions) => {
+  if (options.shouldPublishImmediately) {
+    return {
+      passive: false,
+    };
+  }
+  return {
+    passive: true,
+  };
 };
 
 export default class DroppableDimensionPublisher extends React.Component<
@@ -110,9 +117,11 @@ export default class DroppableDimensionPublisher extends React.Component<
     );
     const options: ScrollOptions = dragging.scrollOptions;
     if (options.shouldPublishImmediately) {
+      console.log('immediate scroll update', this.publishedDescriptor.id);
       this.updateScroll();
       return;
     }
+    console.error('scheduled scrolled update', this.publishedDescriptor.id);
     this.scheduleScrollUpdate();
   };
 
@@ -140,7 +149,7 @@ export default class DroppableDimensionPublisher extends React.Component<
     closest.removeEventListener(
       'scroll',
       this.onClosestScroll,
-      listenerOptions,
+      getListenerOptions(dragging.scrollOptions),
     );
   };
 
@@ -306,10 +315,14 @@ export default class DroppableDimensionPublisher extends React.Component<
 
     if (env.closestScrollable) {
       // bind scroll listener
+      console.log(
+        'getListenerOptions',
+        getListenerOptions(dragging.scrollOptions),
+      );
       env.closestScrollable.addEventListener(
         'scroll',
         this.onClosestScroll,
-        listenerOptions,
+        getListenerOptions(dragging.scrollOptions),
       );
       // print a debug warning if using an unsupported nested scroll container setup
       checkForNestedScrollContainers(env.closestScrollable);

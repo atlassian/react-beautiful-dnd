@@ -6,7 +6,7 @@ import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 import type { InternalResult, PublicResult } from './move-in-direction-types';
 import type { DroppableId, DraggingState, Direction } from '../../types';
 import withScrollDisplacement from '../with-scroll-change/with-all-displacement';
-import { subtract } from '../position';
+import getClientFromPagePoint from '../get-client-from-page-point';
 
 type Args = {|
   state: DraggingState,
@@ -78,14 +78,16 @@ export default ({ state, type }: Args): ?PublicResult => {
     };
   }
 
-  const withoutInitialPageScroll: Position = subtract(
+  const client: Position = getClientFromPagePoint(
     result.pageBorderBoxCenter,
-    state.viewport.scroll.initial,
+    state.viewport,
   );
 
   if (result.type === 'MOVE_CROSS_AXIS') {
+    console.log('moving cross axis');
+    console.log('impact', result.impact);
     const withDisplacement: Position = withScrollDisplacement(
-      withoutInitialPageScroll,
+      client,
       result.destination,
       state.viewport,
     );
@@ -98,7 +100,7 @@ export default ({ state, type }: Args): ?PublicResult => {
   }
 
   const withDisplacement: Position = withScrollDisplacement(
-    withoutInitialPageScroll,
+    client,
     droppable,
     state.viewport,
   );
