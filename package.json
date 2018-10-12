@@ -14,6 +14,10 @@
     "natural",
     "beautiful"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atlassian/react-beautiful-dnd.git"
+  },
   "bugs": {
     "url": "https://github.com/atlassian/react-beautiful-dnd/issues"
   },
@@ -52,13 +56,13 @@
   },
   "dependencies": {
     "@babel/runtime-corejs2": "^7.0.0",
-    "css-box-model": "^1.0.0",
+    "css-box-model": "^1.1.0",
     "memoize-one": "^4.0.2",
     "prop-types": "^15.6.1",
     "raf-schd": "^4.0.0",
     "react-redux": "^5.0.7",
     "redux": "^4.0.0",
-    "tiny-invariant": "^1.0.0"
+    "tiny-invariant": "^1.0.1"
   },
   "devDependencies": {
     "@atlaskit/css-reset": "^3.0.1",
@@ -121,10 +125,6 @@
     "react": "^16.3.1"
   },
   "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atlassian/react-beautiful-dnd.git"
-  },
   "jest-junit": {
     "output": "test-reports/junit/js-test-results.xml"
   }

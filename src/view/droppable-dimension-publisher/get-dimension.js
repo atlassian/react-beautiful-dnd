@@ -3,6 +3,7 @@ import {
   getBox,
   withScroll,
   createBox,
+  expand,
   type BoxModel,
   type Position,
   type Spacing,
@@ -61,13 +62,7 @@ const getClient = (
   };
 
   // Creating the borderBox by adding the borders to the paddingBox
-  // TODO: export expand from css-box-model
-  const borderBox: Spacing = {
-    top: paddingBox.top - base.border.top,
-    right: paddingBox.right + base.border.right,
-    bottom: paddingBox.bottom + base.border.bottom,
-    left: paddingBox.left - base.border.left,
-  };
+  const borderBox: Spacing = expand(paddingBox, base.border);
 
   // We are not accounting for scrollbars
   // Adjusting for scrollbars is hard because:
