@@ -2,13 +2,20 @@
 import type { Position } from 'css-box-model';
 import getDropDuration from '../../../../../src/state/middleware/drop/get-drop-duration';
 
-it('should return 0 if not moving anywhere', () => {
-  const result: number = getDropDuration({
+it('should return the a small amount if not moving anywhere', () => {
+  const noWhere: number = getDropDuration({
     current: { x: 10, y: 10 },
     destination: { x: 10, y: 10 },
     reason: 'DROP',
   });
-  expect(result).toBe(0);
+  const further: number = getDropDuration({
+    current: { x: 1, y: 1 },
+    destination: { x: 100, y: 100 },
+    reason: 'DROP',
+  });
+
+  expect(noWhere).toEqual(expect.any(Number));
+  expect(noWhere).toBeLessThan(further);
 });
 
 it('should return higher drop times the further away you are', () => {
