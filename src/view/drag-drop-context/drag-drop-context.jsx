@@ -40,7 +40,7 @@ import { getFormattedMessage } from '../../debug/dev-warning';
 
 type Props = {|
   ...Hooks,
-  children: ?Node,
+  children: Node | null,
 |};
 
 type Context = {
@@ -180,6 +180,7 @@ export default class DragDropContext extends React.Component<Props> {
       return;
     }
 
+    console.log('ITS OVER');
     // Error is more serious and we throw it
     throw error;
   }
