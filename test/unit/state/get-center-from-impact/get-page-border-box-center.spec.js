@@ -1,34 +1,28 @@
 // @flow
 import { offset, type Position, type BoxModel } from 'css-box-model';
-import { getPreset, makeScrollable } from '../../../utils/dimension';
+import { horizontal, vertical } from '../../../../src/state/axis';
+import getPageBorderBoxCenter from '../../../../src/state/get-center-from-impact/get-page-border-box-center';
+import {
+  goAfter,
+  goBefore,
+  goIntoStart,
+} from '../../../../src/state/get-center-from-impact/move-relative-to';
+import getDisplacedBy from '../../../../src/state/get-displaced-by';
+import getDisplacementMap from '../../../../src/state/get-displacement-map';
+import getHomeImpact from '../../../../src/state/get-home-impact';
+import noImpact from '../../../../src/state/no-impact';
+import {
+  backward,
+  forward,
+} from '../../../../src/state/user-direction/user-direction-preset';
+import { getPreset } from '../../../utils/dimension';
 import type {
   Axis,
   DisplacedBy,
   Displacement,
   DragImpact,
   DraggableDimension,
-  DroppableDimension,
-  DimensionMap,
-  Viewport,
 } from '../../../../src/types';
-import noImpact from '../../../../src/state/no-impact';
-import getHomeImpact from '../../../../src/state/get-home-impact';
-import { origin, subtract, negate, add } from '../../../../src/state/position';
-import getDisplacedBy from '../../../../src/state/get-displaced-by';
-import getDisplacementMap from '../../../../src/state/get-displacement-map';
-import {
-  goAfter,
-  goBefore,
-  goIntoStart,
-} from '../../../../src/state/get-center-from-impact/move-relative-to';
-import {
-  forward,
-  backward,
-} from '../../../../src/state/user-direction/user-direction-preset';
-import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
-import scrollViewport from '../../../../src/state/scroll-viewport';
-import getPageBorderBoxCenter from '../../../../src/state/get-center-from-impact/get-page-border-box-center';
-import { vertical, horizontal } from '../../../../src/state/axis';
 
 const getDisplacement = (draggable: DraggableDimension): Displacement => ({
   isVisible: true,

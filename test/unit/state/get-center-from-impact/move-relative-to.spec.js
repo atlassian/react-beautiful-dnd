@@ -5,14 +5,14 @@ import {
   type Spacing,
   type Position,
 } from 'css-box-model';
-import type { Axis } from '../../../src/types';
+import type { Axis } from '../../../../src/types';
 import {
   goBefore,
   goAfter,
   goIntoStart,
-} from '../../../src/state/move-relative-to';
-import { vertical, horizontal } from '../../../src/state/axis';
-import { patch } from '../../../src/state/position';
+} from '../../../../src/state/get-center-from-impact/move-relative-to';
+import { vertical, horizontal } from '../../../../src/state/axis';
+import { patch } from '../../../../src/state/position';
 
 let spacing: number = 1;
 
