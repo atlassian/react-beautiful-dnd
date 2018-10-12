@@ -180,7 +180,6 @@ export default class DragDropContext extends React.Component<Props> {
       return;
     }
 
-    console.log('ITS OVER');
     // Error is more serious and we throw it
     throw error;
   }

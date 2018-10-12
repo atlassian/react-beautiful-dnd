@@ -182,10 +182,6 @@ export default class Draggable extends Component<Props> {
       const shouldAnimate: boolean = getShouldDraggingAnimate(dragging);
       const isDropAnimating: boolean = Boolean(dropping);
 
-      if (dropping) {
-        console.warn(dropping);
-      }
-
       const transform: ?string = isDropAnimating
         ? transforms.drop(offset, isCombining)
         : transforms.moveTo(offset);
