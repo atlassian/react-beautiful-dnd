@@ -1270,7 +1270,7 @@ We have created a [sample application](https://github.com/alexreardon/react-beau
 
 ## Community
 
-- [kanban-dnd](https://kanban-dnd.glitch.me) \- A Kanban style to-do list.
+- [kanban-dnd](https://kanban-dnd.glitch.me) \- A Kanban style to-do list, with the ability to create custom lanes and reorder them on the fly. 
 
 ## Addons
 
