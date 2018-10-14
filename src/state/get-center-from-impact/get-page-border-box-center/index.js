@@ -2,6 +2,7 @@
 import type { Position } from 'css-box-model';
 import whenCombining from './when-combining';
 import whenReordering from './when-reordering';
+import withDroppableDisplacement from '../../with-scroll-change/with-droppable-displacement';
 import type {
   DragImpact,
   DraggableDimension,
@@ -18,7 +19,7 @@ type Args = {|
   draggables: DraggableDimensionMap,
 |};
 
-export default ({
+const withoutDroppableDisplacement = ({
   impact,
   draggable,
   droppable,
@@ -51,4 +52,16 @@ export default ({
   }
 
   return original;
+};
+
+export default (args: Args): Position => {
+  const withoutDisplacement: Position = withoutDroppableDisplacement(args);
+
+  const droppable: ?DroppableDimension = args.droppable;
+
+  const withDisplacement: Position = droppable
+    ? withDroppableDisplacement(droppable, withoutDisplacement)
+    : withoutDisplacement;
+
+  return withDisplacement;
 };

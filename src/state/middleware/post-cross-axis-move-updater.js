@@ -82,6 +82,7 @@ export default (store: MiddlewareStore) => (next: Dispatch) => (
     if (!store.getState().isDragging) {
       return;
     }
+    console.warn('POST CROSS AXIS MOVE UPDATE');
     next(postCrossAxisMove());
   });
 };

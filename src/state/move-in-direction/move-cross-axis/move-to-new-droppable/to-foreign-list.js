@@ -70,7 +70,8 @@ export default ({
       target: fake,
       destination,
       viewport: viewport.frame,
-      withDroppableDisplacement: true,
+      // we are already taking that into account when we get the page border box center
+      withDroppableDisplacement: false,
     });
 
     return isVisible ? impact : null;

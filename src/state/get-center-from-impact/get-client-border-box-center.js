@@ -7,9 +7,9 @@ import type {
   DraggableDimension,
   DraggableDimensionMap,
 } from '../../types';
-import { subtract, add } from '../position';
+import { subtract, add, isEqual, origin } from '../position';
 import getPageBorderBoxCenterFromImpact from './get-page-border-box-center';
-import withAllDisplacement from '../with-scroll-change/with-all-displacement';
+import withViewportDisplacement from '../with-scroll-change/with-viewport-displacement';
 
 type Args = {|
   impact: DragImpact,
@@ -33,15 +33,23 @@ export default ({
     droppable,
   });
 
-  const originalClientCenter: Position = draggable.client.borderBox.center;
+  if (isEqual(draggable.page.borderBox.center, newBorderBoxPageCenter)) {
+    console.warn('no change in border box center');
+  }
 
-  // unwinding window scroll and manual client movement
-  const offset: Position = subtract(
+  const offsetWithWindowScrollChange: Position = subtract(
     newBorderBoxPageCenter,
     draggable.page.borderBox.center,
   );
 
-  const newClientCenter: Position = add(originalClientCenter, offset);
+  const clientOffset: Position = withViewportDisplacement(
+    viewport,
+    offsetWithWindowScrollChange,
+  );
 
-  return withAllDisplacement(newClientCenter, droppable, viewport);
+  if (isEqual(clientOffset, origin)) {
+    console.warn('no change in client pos');
+  }
+
+  return add(draggable.client.borderBox.center, clientOffset);
 };

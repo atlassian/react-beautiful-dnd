@@ -13,7 +13,6 @@ import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable'
 import moveToNextCombine from './move-to-next-combine';
 import moveToNextIndex from './move-to-next-index';
 import isHomeOf from '../../droppable/is-home-of';
-import withDroppableDisplacement from '../../with-scroll-change/with-droppable-displacement';
 import { speculativelyIncrease, recompute } from './update-visibility';
 import { subtract } from '../../position';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
@@ -91,7 +90,8 @@ export default ({
     destination,
     newPageBorderBoxCenter: pageBorderBoxCenter,
     viewport: viewport.frame,
-    withDroppableDisplacement: true,
+    // already taken into account by getPageBorderBoxCenter
+    withDroppableDisplacement: false,
     // we only care about it being visible relative to the main axis
     // this is important with dynamic changes as scroll bar and toggle
     // on the cross axis during a drag
@@ -100,22 +100,15 @@ export default ({
 
   if (isVisibleInNewLocation) {
     return {
-      type: 'MOVE',
-      pageBorderBoxCenter,
+      type: 'SNAP_MOVE',
       impact,
     };
   }
 
   console.log('👻 not visible in new location');
 
-  // Need to account for any changes in the scroll in the destination
-  const withDisplacement: Position = withDroppableDisplacement(
-    destination,
-    pageBorderBoxCenter,
-  );
-
   const distance: Position = subtract(
-    withDisplacement,
+    pageBorderBoxCenter,
     previousPageBorderBoxCenter,
   );
 

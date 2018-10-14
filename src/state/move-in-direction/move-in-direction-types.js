@@ -1,6 +1,6 @@
 // @flow
 import type { Position } from 'css-box-model';
-import type { DragImpact, DroppableDimension } from '../../types';
+import type { DragImpact } from '../../types';
 
 export type ScrollJumpResult = {|
   type: 'SCROLL_JUMP',
@@ -8,20 +8,12 @@ export type ScrollJumpResult = {|
   impact: DragImpact,
 |};
 
-export type MoveResult = {|
-  type: 'MOVE',
-  pageBorderBoxCenter: Position,
+export type SnapMoveResult = {|
+  type: 'SNAP_MOVE',
   impact: DragImpact,
 |};
 
-export type CrossAxisResult = {|
-  type: 'MOVE_CROSS_AXIS',
-  pageBorderBoxCenter: Position,
-  impact: DragImpact,
-  destination: DroppableDimension,
-|};
-
-export type InternalResult = ScrollJumpResult | MoveResult | CrossAxisResult;
+export type InternalResult = ScrollJumpResult | SnapMoveResult;
 
 export type PublicResult = {|
   clientSelection: Position,

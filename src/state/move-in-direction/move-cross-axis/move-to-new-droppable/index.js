@@ -9,7 +9,6 @@ import type {
   Viewport,
   DraggableDimensionMap,
 } from '../../../../types';
-import getPageBorderBoxCenterFromImpact from '../../../get-center-from-impact/get-page-border-box-center';
 import toHomeList from './to-home-list';
 import toForeignList from './to-foreign-list';
 import isHomeOf from '../../../droppable/is-home-of';
@@ -83,18 +82,8 @@ export default ({
     return null;
   }
 
-  const pageBorderBoxCenter: Position = getPageBorderBoxCenterFromImpact({
-    impact,
-    draggable,
-    droppable: destination,
-    draggables,
-  });
-
-  // No additional visibility checks required
   return {
-    type: 'MOVE_CROSS_AXIS',
-    pageBorderBoxCenter,
+    type: 'SNAP_MOVE',
     impact,
-    destination,
   };
 };
