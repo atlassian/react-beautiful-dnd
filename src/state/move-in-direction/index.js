@@ -116,10 +116,13 @@ export default ({ state, type }: Args): ?PublicResult => {
     viewport: viewport.frame,
     // already taken into account by getPageBorderBoxCenter
     withDroppableDisplacement: false,
+    // When in same droppable:
     // we only care about it being visible relative to the main axis
     // this is important with dynamic changes as scroll bar and toggle
     // on the cross axis during a drag
-    onlyOnMainAxis: false,
+    // When moving droppable:
+    // we care about whether the entire draggable is visible
+    onlyOnMainAxis: destination === isOver,
   });
 
   if (isVisibleInNewLocation) {
