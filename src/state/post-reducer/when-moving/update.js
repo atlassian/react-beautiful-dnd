@@ -1,24 +1,24 @@
 // @flow
 import type { Position } from 'css-box-model';
-import getDragImpact from '../get-drag-impact';
-import { add, subtract } from '../position';
+import getDragImpact from '../../get-drag-impact';
+import { add, subtract } from '../../position';
 import getDimensionMapWithPlaceholder from './get-dimension-map-with-placeholder';
-import getUserDirection from '../user-direction/get-user-direction';
+import getUserDirection from '../../user-direction/get-user-direction';
 import type {
   DraggableDimension,
   DraggingState,
   ClientPositions,
   PagePositions,
   DragPositions,
-  CollectingState,
   DragImpact,
   Viewport,
   DimensionMap,
   UserDirection,
-} from '../../types';
+  StateWhenUpdatesAllowed,
+} from '../../../types';
 
-type MoveArgs = {|
-  state: DraggingState | CollectingState,
+type Args = {|
+  state: StateWhenUpdatesAllowed,
   clientSelection?: Position,
   dimensions?: DimensionMap,
   viewport?: Viewport,
@@ -35,7 +35,7 @@ export default ({
   viewport: forcedViewport,
   impact: forcedImpact,
   scrollJumpRequest,
-}: MoveArgs): CollectingState | DraggingState => {
+}: Args): StateWhenUpdatesAllowed => {
   // DRAGGING: can update position and impact
   // COLLECTING: can update position but cannot update impact
 

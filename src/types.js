@@ -351,6 +351,8 @@ export type State =
   | DropPendingState
   | DropAnimatingState;
 
+export type StateWhenUpdatesAllowed = DraggingState | CollectingState;
+
 export type Announce = (message: string) => void;
 
 export type HookProvided = {|

@@ -21,7 +21,6 @@ import type {
 } from '../types';
 import type { Action } from './store-types';
 import type { PublicResult as MoveInDirectionResult } from './move-in-direction/move-in-direction-types';
-import whatIsDraggedOver from './droppable/what-is-dragged-over';
 import scrollDroppable from './droppable/scroll-droppable';
 import publish from './publish';
 import moveInDirection from './move-in-direction';
@@ -29,91 +28,12 @@ import { add, isEqual, origin } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
 import isMovementAllowed from './is-movement-allowed';
-import isSnapMoving from './is-snap-moving';
-import moveWithPositionUpdates from './move-with-position-updates';
 import { toDroppableList } from './dimension-structures';
 import { forward } from './user-direction/user-direction-preset';
-import getClientBorderBoxCenter from './get-center-from-impact/get-client-border-box-center';
-import { recompute } from './move-in-direction/update-displacement-visibility';
+import whenMoving from './post-reducer/when-moving';
+import withUpdatedDroppable from './post-reducer/when-moving/with-updated-droppable';
 
 const idle: IdleState = { phase: 'IDLE' };
-
-type RefreshSnapArgs = {|
-  state: State,
-  impact?: DragImpact,
-  dimensions?: DimensionMap,
-  viewport?: Viewport,
-|};
-
-const refreshSnap = ({
-  state,
-  impact: forcedImpact,
-  dimensions: forcedDimensions,
-  viewport: forcedViewport,
-}: RefreshSnapArgs): State => {
-  invariant(isMovementAllowed(state));
-  invariant(isSnapMoving(state));
-  const viewport: Viewport = forcedViewport || state.viewport;
-  const dimensions: DimensionMap = forcedDimensions || state.dimensions;
-  const { draggables, droppables } = dimensions;
-
-  const draggable: DraggableDimension = draggables[state.critical.draggable.id];
-  const isOver: ?DroppableId = whatIsDraggedOver(state.impact);
-  invariant(isOver, 'Must be over a destination in SNAP movement mode');
-  const destination: DroppableDimension = droppables[isOver];
-
-  const needsVisibilityCheck: DragImpact = forcedImpact || state.impact;
-  const impact: DragImpact = recompute({
-    impact: needsVisibilityCheck,
-    viewport,
-    destination,
-    draggables,
-  });
-
-  const clientSelection: Position = getClientBorderBoxCenter({
-    impact,
-    draggable,
-    droppable: destination,
-    draggables,
-    viewport: state.viewport,
-  });
-
-  return moveWithPositionUpdates({
-    state,
-    clientSelection,
-    dimensions,
-    impact,
-  });
-};
-
-const withUpdatedDroppable = (
-  state: State,
-  updated: DroppableDimension,
-): State => {
-  invariant(isMovementAllowed(state));
-
-  const isSnapping: boolean = isSnapMoving(state);
-
-  const dimensions: DimensionMap = {
-    ...state.dimensions,
-    droppables: {
-      ...state.dimensions.droppables,
-      [updated.descriptor.id]: updated,
-    },
-  };
-
-  if (isSnapping) {
-    return refreshSnap({
-      state,
-      dimensions,
-    });
-  }
-
-  return moveWithPositionUpdates({
-    state,
-    dimensions,
-  });
-};
 
 export default (state: State = idle, action: Action): State => {
   if (action.type === 'CLEAN') {
@@ -230,13 +150,10 @@ export default (state: State = idle, action: Action): State => {
       return state;
     }
 
-    // If we are snap moving - manual movements should not update the impact
-    const impact: ?DragImpact = isSnapMoving(state) ? state.impact : null;
-
-    return moveWithPositionUpdates({
+    whenMoving({
       state,
       clientSelection: client,
-      impact,
+      noSnapUpdate: true,
     });
   }
 
@@ -363,18 +280,9 @@ export default (state: State = idle, action: Action): State => {
     }
 
     const scrolled: Viewport = scrollViewport(state.viewport, newScroll);
-    const isSnapping: boolean = isSnapMoving(state);
 
-    if (isSnapping) {
-      return refreshSnap({
-        state,
-        viewport: scrolled,
-      });
-    }
-
-    return moveWithPositionUpdates({
+    return whenMoving({
       state,
-      clientSelection: state.current.client.selection,
       viewport: scrolled,
     });
   }
@@ -394,14 +302,15 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
-    return refreshSnap({
+    whenMoving({
       state,
       viewport: withMaxScroll,
     });
   }
 
   if (action.type === 'POST_SNAP_DESTINATION_CHANGE') {
-    return refreshSnap({
+    invariant(isMovementAllowed(state));
+    whenMoving({
       state,
     });
   }
@@ -437,11 +346,12 @@ export default (state: State = idle, action: Action): State => {
       return state;
     }
 
-    return moveWithPositionUpdates({
+    return whenMoving({
       state,
       impact: result.impact,
       clientSelection: result.clientSelection,
       scrollJumpRequest: result.scrollJumpRequest,
+      noSnapUpdate: true,
     });
   }
 
@@ -456,8 +366,6 @@ export default (state: State = idle, action: Action): State => {
       // appeasing flow
       phase: 'DROP_PENDING',
       ...state,
-      // eslint-disable-next-line
-      phase: 'DROP_PENDING',
       isWaiting: true,
       reason,
     };

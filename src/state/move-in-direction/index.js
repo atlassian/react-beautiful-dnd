@@ -13,11 +13,11 @@ import type {
   DraggableDimension,
   DroppableDimensionMap,
   DragImpact,
+  Viewport,
 } from '../../types';
 import getPageBorderBoxCenter from '../get-center-from-impact/get-page-border-box-center';
 import isTotallyVisibleInNewLocation from './move-to-next-place/is-totally-visible-in-new-location';
 import { subtract } from '../position';
-import { speculativelyIncrease } from './update-displacement-visibility';
 import fromPageBorderBoxCenter from '../get-center-from-impact/get-client-border-box-center/from-page-border-box-center';
 
 type Args = {|
@@ -74,7 +74,6 @@ export default ({ state, type }: Args): ?PublicResult => {
         draggables,
         previousPageBorderBoxCenter,
         previousImpact: state.impact,
-        viewport,
       })
     : moveCrossAxis({
         isMovingForward,
@@ -146,17 +145,6 @@ export default ({ state, type }: Args): ?PublicResult => {
     pageBorderBoxCenter,
     previousPageBorderBoxCenter,
   );
-
-  // need to guess the increased visible displacement
-  // this is a worst case guess, which means that
-  // it may visually displace things that do not need to
-  // const updated: DragImpact = speculativelyIncrease({
-  //   impact: result.impact,
-  //   viewport,
-  //   destination,
-  //   draggables,
-  //   maxScrollChange: distance,
-  // });
 
   return {
     clientSelection: state.current.client.selection,

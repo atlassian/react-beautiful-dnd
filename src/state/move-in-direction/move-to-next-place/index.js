@@ -12,14 +12,12 @@ import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable'
 import moveToNextCombine from './move-to-next-combine';
 import moveToNextIndex from './move-to-next-index';
 import isHomeOf from '../../droppable/is-home-of';
-import { recompute } from '../update-displacement-visibility';
 
 type Args = {|
   isMovingForward: boolean,
   draggable: DraggableDimension,
   destination: DroppableDimension,
   draggables: DraggableDimensionMap,
-  viewport: Viewport,
   previousImpact: DragImpact,
   previousPageBorderBoxCenter: Position,
 |};
@@ -29,19 +27,11 @@ export default ({
   draggable,
   destination,
   draggables,
-  viewport,
   previousImpact,
 }: Args): ?InternalResult => {
   if (!destination.isEnabled) {
     return null;
   }
-
-  // const previousImpact: DragImpact = recompute({
-  //   impact: needsVisibilityCheck,
-  //   viewport,
-  //   draggables,
-  //   destination,
-  // });
 
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
     destination.descriptor.id,

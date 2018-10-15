@@ -3,17 +3,18 @@ import type { Position } from 'css-box-model';
 import {
   addPlaceholder,
   removePlaceholder,
-} from '../droppable/with-placeholder';
-import { patch } from '../position';
-import shouldUsePlaceholder from '../droppable/should-use-placeholder';
-import whatIsDraggedOver from '../droppable/what-is-dragged-over';
+} from '../../droppable/with-placeholder';
+import { patch } from '../../position';
+import shouldUsePlaceholder from '../../droppable/should-use-placeholder';
+import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
 import type {
   DroppableDimension,
   DimensionMap,
   DraggableDimension,
   DragImpact,
   DroppableId,
-} from '../../types';
+} from '../../../types';
+import patchDroppableMap from './patch-droppable-map';
 
 type ClearArgs = {|
   previousImpact: DragImpact,
@@ -45,16 +46,8 @@ const clearUnusedPlaceholder = ({
     return dimensions;
   }
 
-  const patched: DroppableDimension = removePlaceholder(lastDroppable);
-
-  // TODO: need to unwind any existing placeholders
-  return {
-    draggables: dimensions.draggables,
-    droppables: {
-      ...dimensions.droppables,
-      [patched.descriptor.id]: patched,
-    },
-  };
+  const updated: DroppableDimension = removePlaceholder(lastDroppable);
+  return patchDroppableMap(dimensions, updated);
 };
 
 type Args = {|
@@ -108,11 +101,5 @@ export default ({
     base.draggables,
   );
 
-  return {
-    draggables: base.draggables,
-    droppables: {
-      ...base.droppables,
-      [patched.descriptor.id]: patched,
-    },
-  };
+  return patchDroppableMap(base, patched);
 };
