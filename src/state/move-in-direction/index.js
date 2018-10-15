@@ -14,10 +14,7 @@ import type {
   DroppableDimensionMap,
   DragImpact,
 } from '../../types';
-import withViewportDisplacement from '../with-scroll-change/with-viewport-displacement';
-import { subtract, isEqual } from '../position';
 import getClientBorderBoxCenter from '../get-center-from-impact/get-client-border-box-center';
-import getPageBorderBoxCenter from '../get-center-from-impact/get-page-border-box-center';
 
 type Args = {|
   state: DraggingState,
@@ -33,16 +30,17 @@ const getDroppableOver = (
 };
 
 export default ({ state, type }: Args): ?PublicResult => {
-  const isOver: ?DroppableDimension = getDroppableOver(
+  const isActuallyOver: ?DroppableDimension = getDroppableOver(
     state.impact,
     state.dimensions.droppables,
   );
-  const isMainAxisMovementAllowed: boolean = Boolean(isOver);
+  const isMainAxisMovementAllowed: boolean = Boolean(isActuallyOver);
   const home: DroppableDimension =
     state.dimensions.droppables[state.critical.droppable.id];
-  const useDroppable: DroppableDimension = isOver || home;
+  // use home when not actually over a droppable (can happen when move is disabled)
+  const isOver: DroppableDimension = isActuallyOver || home;
 
-  const direction: Direction = useDroppable.axis.direction;
+  const direction: Direction = isOver.axis.direction;
   const isMovingOnMainAxis: boolean =
     (direction === 'vertical' &&
       (type === 'MOVE_UP' || type === 'MOVE_DOWN')) ||
@@ -59,24 +57,27 @@ export default ({ state, type }: Args): ?PublicResult => {
 
   const draggable: DraggableDimension =
     state.dimensions.draggables[state.critical.draggable.id];
+  const previousPageBorderBoxCenter: Position =
+    state.current.page.borderBoxCenter;
+  const { draggables, droppables } = state.dimensions;
 
   const result: ?InternalResult = isMovingOnMainAxis
     ? moveToNextPlace({
         isMovingForward,
-        draggableId: state.critical.draggable.id,
-        destination: useDroppable,
-        draggables: state.dimensions.draggables,
-        previousPageBorderBoxCenter: state.current.page.borderBoxCenter,
+        draggable,
+        destination: isOver,
+        draggables,
+        previousPageBorderBoxCenter,
         previousImpact: state.impact,
         viewport: state.viewport,
       })
     : moveCrossAxis({
         isMovingForward,
-        previousPageBorderBoxCenter: state.current.page.borderBoxCenter,
-        draggableId: state.critical.draggable.id,
-        droppableId: useDroppable.descriptor.id,
-        draggables: state.dimensions.draggables,
-        droppables: state.dimensions.droppables,
+        previousPageBorderBoxCenter,
+        draggable,
+        isOver,
+        draggables,
+        droppables,
         previousImpact: state.impact,
         viewport: state.viewport,
       });
@@ -94,20 +95,21 @@ export default ({ state, type }: Args): ?PublicResult => {
   }
 
   // A move can update destination
-  const newDroppable: ?DroppableDimension = getDroppableOver(
+  const destination: ?DroppableDimension = getDroppableOver(
     result.impact,
     state.dimensions.droppables,
   );
   invariant(
-    newDroppable,
+    destination,
     'Cannot move in direction and not move to a Droppable',
   );
 
+  // using the client center as the selection point
   const clientSelection: Position = getClientBorderBoxCenter({
     impact: result.impact,
     draggable,
-    droppable: newDroppable,
-    draggables: state.dimensions.draggables,
+    droppable: destination,
+    draggables,
     viewport: state.viewport,
   });
 

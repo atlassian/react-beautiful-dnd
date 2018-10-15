@@ -3,7 +3,6 @@ import type { Position } from 'css-box-model';
 import type {
   DroppableDimension,
   DraggableDimension,
-  DraggableId,
   DraggableDimensionMap,
   DragImpact,
   Viewport,
@@ -20,7 +19,7 @@ import getPageBorderBoxCenter from '../../get-center-from-impact/get-page-border
 
 type Args = {|
   isMovingForward: boolean,
-  draggableId: DraggableId,
+  draggable: DraggableDimension,
   destination: DroppableDimension,
   draggables: DraggableDimensionMap,
   viewport: Viewport,
@@ -30,7 +29,7 @@ type Args = {|
 
 export default ({
   isMovingForward,
-  draggableId,
+  draggable,
   destination,
   draggables,
   viewport,
@@ -48,7 +47,6 @@ export default ({
     destination,
   });
 
-  const draggable: DraggableDimension = draggables[draggableId];
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
     destination,
     draggables,
