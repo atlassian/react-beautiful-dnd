@@ -2,6 +2,7 @@
 import type { AutoScroller } from '../auto-scroller/auto-scroller-types';
 import type { State } from '../../types';
 import type { Action, Dispatch, MiddlewareStore } from '../store-types';
+import { postJumpScroll } from '../action-creators';
 
 const shouldCancel = (action: Action) =>
   action.type === 'CANCEL' ||
@@ -40,4 +41,12 @@ export default (getScroller: () => AutoScroller) => (
   }
 
   getScroller().jumpScroll(state);
+
+  requestAnimationFrame(() => {
+    if (!store.getState().isDragging) {
+      return;
+    }
+    console.warn('POST JUMP SCROLL UPDATER');
+    postJumpScroll();
+  });
 };

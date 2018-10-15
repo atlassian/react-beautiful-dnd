@@ -30,18 +30,18 @@ export default ({
   destination,
   draggables,
   viewport,
-  previousImpact: needsVisibilityCheck,
+  previousImpact,
 }: Args): ?InternalResult => {
   if (!destination.isEnabled) {
     return null;
   }
 
-  const previousImpact: DragImpact = recompute({
-    impact: needsVisibilityCheck,
-    viewport,
-    draggables,
-    destination,
-  });
+  // const previousImpact: DragImpact = recompute({
+  //   impact: needsVisibilityCheck,
+  //   viewport,
+  //   draggables,
+  //   destination,
+  // });
 
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
     destination,

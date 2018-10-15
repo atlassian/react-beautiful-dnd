@@ -168,13 +168,13 @@ export const updateViewportMaxScroll = (
   payload: args,
 });
 
-type PostCrossAxisMoveAction = {|
-  type: 'POST_CROSS_AXIS_MOVE',
+type PostJumpScrollAction = {|
+  type: 'POST_JUMP_SCROLL',
   payload: null,
 |};
 
-export const postCrossAxisMove = (): PostCrossAxisMoveAction => ({
-  type: 'POST_CROSS_AXIS_MOVE',
+export const postJumpScroll = (): PostJumpScrollAction => ({
+  type: 'POST_JUMP_SCROLL',
   payload: null,
 });
 
@@ -294,7 +294,7 @@ export type Action =
   | UpdateDroppableIsCombineEnabledAction
   | MoveByWindowScrollAction
   | UpdateViewportMaxScrollAction
-  | PostCrossAxisMoveAction
+  | PostJumpScrollAction
   | MoveAction
   | MoveUpAction
   | MoveDownAction

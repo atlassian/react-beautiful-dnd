@@ -41,12 +41,14 @@ export default ({
     viewport,
   });
 
-  console.warn('drop new client center', newClientCenter);
+  console.log('drop client center', newClientCenter);
 
   const offset: Position = subtract(
     newClientCenter,
     draggable.client.borderBox.center,
   );
+
+  console.log('drop offset', offset);
 
   return offset;
 };

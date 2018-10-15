@@ -53,36 +53,37 @@ const getUpdatedViewportMax = (viewport: Viewport): ?Position => {
 export default (store: MiddlewareStore) => (next: Dispatch) => (
   action: Action,
 ): any => {
-  const previous: State = store.getState();
   next(action);
-  const current: State = store.getState();
+  // const previous: State = store.getState();
+  // next(action);
+  // const current: State = store.getState();
 
-  if (!current.isDragging) {
-    return;
-  }
+  // if (!current.isDragging) {
+  //   return;
+  // }
 
-  if (!wasDestinationChange(previous, current, action)) {
-    return;
-  }
+  // if (!wasDestinationChange(previous, current, action)) {
+  //   return;
+  // }
 
-  const maxScroll: ?Position = getUpdatedViewportMax(current.viewport);
+  // const maxScroll: ?Position = getUpdatedViewportMax(current.viewport);
 
-  if (maxScroll) {
-    next(updateViewportMaxScroll({ maxScroll }));
-  }
+  // if (maxScroll) {
+  //   next(updateViewportMaxScroll({ maxScroll }));
+  // }
 
-  const isSnapping: boolean = current.movementMode === 'SNAP';
+  // const isSnapping: boolean = current.movementMode === 'SNAP';
 
-  if (!isSnapping) {
-    return;
-  }
+  // if (!isSnapping) {
+  //   return;
+  // }
 
-  // TODO: cancel if no longer needed?
-  requestAnimationFrame(() => {
-    if (!store.getState().isDragging) {
-      return;
-    }
-    console.warn('POST CROSS AXIS MOVE UPDATE');
-    next(postCrossAxisMove());
-  });
+  // // TODO: cancel if no longer needed?
+  // requestAnimationFrame(() => {
+  //   if (!store.getState().isDragging) {
+  //     return;
+  //   }
+  //   console.warn('POST CROSS AXIS MOVE UPDATE');
+  //   next(postCrossAxisMove());
+  // });
 };

@@ -34,6 +34,7 @@ import moveWithPositionUpdates from './move-with-position-updates';
 import { toDroppableList } from './dimension-structures';
 import { forward } from './user-direction/user-direction-preset';
 import getClientBorderBoxCenter from './get-center-from-impact/get-client-border-box-center';
+import { recompute } from './move-in-direction/update-displacement-visibility';
 
 const idle: IdleState = { phase: 'IDLE' };
 
@@ -405,7 +406,7 @@ export default (state: State = idle, action: Action): State => {
     };
   }
 
-  if (action.type === 'POST_CROSS_AXIS_MOVE') {
+  if (action.type === 'POST_JUMP_SCROLL') {
     invariant(
       isMovementAllowed(state),
       `Cannot update viewport scroll in phase ${state.phase}`,
@@ -425,6 +426,8 @@ export default (state: State = idle, action: Action): State => {
     const draggable: DraggableDimension =
       state.dimensions.draggables[state.critical.draggable.id];
 
+    const withUpdatedVisibility: DragImpact = recompute({});
+
     // we use the center position as the selection position when snap moving
     const newClientCenter: Position = getClientBorderBoxCenter({
       impact: state.impact,
@@ -435,9 +438,9 @@ export default (state: State = idle, action: Action): State => {
     });
 
     // Nothing to do here
-    if (isEqual(state.current.client.selection, newClientCenter)) {
-      return state;
-    }
+    // if (isEqual(state.current.client.selection, newClientCenter)) {
+    //   return state;
+    // }
 
     return moveWithPositionUpdates({
       state,

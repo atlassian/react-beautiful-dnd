@@ -25,7 +25,7 @@ export default ({
   destination,
   insideDestination,
 }: Args): ?DraggableDimension => {
-  const result: DraggableDimension[] = insideDestination.sort(
+  const sorted: DraggableDimension[] = insideDestination.slice(0).sort(
     (a: DraggableDimension, b: DraggableDimension): number => {
       // Need to consider the change in scroll in the destination
       const distanceToA = distance(
@@ -53,5 +53,5 @@ export default ({
     },
   );
 
-  return result.length ? result[0] : null;
+  return sorted[0] || null;
 };

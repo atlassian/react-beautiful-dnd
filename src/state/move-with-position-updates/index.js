@@ -51,6 +51,8 @@ export default ({
     borderBoxCenter: add(state.initial.client.borderBoxCenter, offset),
   };
 
+  console.log('computed client', client);
+
   const page: PagePositions = {
     selection: add(client.selection, currentWindowScroll),
     borderBoxCenter: add(client.borderBoxCenter, currentWindowScroll),

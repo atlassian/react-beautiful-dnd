@@ -101,6 +101,7 @@ export default ({ state, type }: Args): ?PublicResult => {
     'Cannot move in direction and not move to a Droppable',
   );
 
+  console.log('new impact', result.impact);
   const pageBorderBoxCenter: Position = getPageBorderBoxCenter({
     impact: result.impact,
     draggable,
@@ -118,7 +119,7 @@ export default ({ state, type }: Args): ?PublicResult => {
     // we only care about it being visible relative to the main axis
     // this is important with dynamic changes as scroll bar and toggle
     // on the cross axis during a drag
-    onlyOnMainAxis: true,
+    onlyOnMainAxis: false,
   });
 
   if (isVisibleInNewLocation) {
