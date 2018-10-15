@@ -5,21 +5,9 @@ import type {
   DragImpact,
   Displacement,
   Viewport,
-} from '../../../../types';
+} from '../../types';
 import getDisplacement from '../get-displacement';
-import getDisplacementMap from '../get-displacement-map';
-
-const withNewDisplacement = (
-  impact: DragImpact,
-  displaced: Displacement[],
-): DragImpact => ({
-  ...impact,
-  movement: {
-    ...impact.movement,
-    displaced,
-    map: getDisplacementMap(displaced),
-  },
-});
+import withNewDisplacement from './with-new-displacement';
 
 type RecomputeArgs = {|
   impact: DragImpact,

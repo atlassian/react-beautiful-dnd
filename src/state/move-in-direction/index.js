@@ -19,6 +19,7 @@ import getPageBorderBoxCenter from '../get-center-from-impact/get-page-border-bo
 import isTotallyVisibleInNewLocation from './move-to-next-place/is-totally-visible-in-new-location';
 import { subtract } from '../position';
 import fromPageBorderBoxCenter from '../get-center-from-impact/get-client-border-box-center/from-page-border-box-center';
+import speculativelyIncrease from '../update-displacement-visibility/speculatively-increase';
 
 type Args = {|
   state: DraggingState,
@@ -107,6 +108,8 @@ export default ({ state, type }: Args): ?PublicResult => {
     draggables,
   });
 
+  const isSameDestination: boolean = destination === isOver;
+
   const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
     draggable,
     destination,
@@ -120,7 +123,7 @@ export default ({ state, type }: Args): ?PublicResult => {
     // on the cross axis during a drag
     // When moving droppable:
     // we care about whether the entire draggable is visible
-    onlyOnMainAxis: destination === isOver,
+    onlyOnMainAxis: isSameDestination,
   });
 
   if (isVisibleInNewLocation) {
@@ -145,9 +148,20 @@ export default ({ state, type }: Args): ?PublicResult => {
     previousPageBorderBoxCenter,
   );
 
+  // increasing the amount of displaced items for a worst case scroll shift
+  const cautious: DragImpact = isSameDestination
+    ? speculativelyIncrease({
+        impact: result.impact,
+        viewport,
+        destination,
+        draggables,
+        maxScrollChange: distance,
+      })
+    : result.impact;
+
   return {
     clientSelection: state.current.client.selection,
-    impact: result.impact,
+    impact: cautious,
     scrollJumpRequest: distance,
   };
 };
