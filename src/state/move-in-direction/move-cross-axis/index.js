@@ -66,7 +66,6 @@ export default ({
     pageBorderBoxCenter: previousPageBorderBoxCenter,
     destination,
     insideDestination,
-    viewport,
   });
 
   return moveToNewDroppable({

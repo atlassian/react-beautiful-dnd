@@ -1,5 +1,4 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type { DraggableDimension, Displacement } from '../../../types';
 
 export const addClosest = (
@@ -16,7 +15,3 @@ export const addClosest = (
 
 export const removeClosest = (displaced: Displacement[]): Displacement[] =>
   displaced.slice(1);
-// invariant(
-//   displaced.length,
-//   'Cannot remove closest when there is nothing to remove',
-// );

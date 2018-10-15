@@ -42,7 +42,7 @@ export default ({
   previousImpact,
   viewport,
 }: Args): ?InternalResult => {
-  // Draggables available, but none are candidates for movement (eg none are visible)
+  // Draggables available, but none are candidates for movement
   // Cannot move into the list
   // Note: can move to empty list and then !moveRelativeTo && !insideDestination.length
   if (insideDestination.length && !moveRelativeTo) {

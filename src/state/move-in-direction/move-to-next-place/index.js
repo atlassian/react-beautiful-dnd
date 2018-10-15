@@ -12,10 +12,7 @@ import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable'
 import moveToNextCombine from './move-to-next-combine';
 import moveToNextIndex from './move-to-next-index';
 import isHomeOf from '../../droppable/is-home-of';
-import { speculativelyIncrease, recompute } from './update-visibility';
-import { subtract } from '../../position';
-import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
-import getPageBorderBoxCenter from '../../get-center-from-impact/get-page-border-box-center';
+import { recompute } from '../update-displacement-visibility';
 
 type Args = {|
   isMovingForward: boolean,
@@ -34,7 +31,6 @@ export default ({
   draggables,
   viewport,
   previousImpact: needsVisibilityCheck,
-  previousPageBorderBoxCenter,
 }: Args): ?InternalResult => {
   if (!destination.isEnabled) {
     return null;
@@ -76,54 +72,8 @@ export default ({
     return null;
   }
 
-  const pageBorderBoxCenter: Position = getPageBorderBoxCenter({
-    impact,
-    draggable,
-    droppable: destination,
-    draggables,
-  });
-
-  const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
-    draggable,
-    destination,
-    newPageBorderBoxCenter: pageBorderBoxCenter,
-    viewport: viewport.frame,
-    // already taken into account by getPageBorderBoxCenter
-    withDroppableDisplacement: false,
-    // we only care about it being visible relative to the main axis
-    // this is important with dynamic changes as scroll bar and toggle
-    // on the cross axis during a drag
-    onlyOnMainAxis: true,
-  });
-
-  if (isVisibleInNewLocation) {
-    return {
-      type: 'SNAP_MOVE',
-      impact,
-    };
-  }
-
-  console.log('👻 not visible in new location');
-
-  const distance: Position = subtract(
-    pageBorderBoxCenter,
-    previousPageBorderBoxCenter,
-  );
-
-  // need to guess the increased visible displacement
-  // this is a worst case guess, which means that
-  // it may visually displace things that do not need to
-  const updated: DragImpact = speculativelyIncrease({
-    impact,
-    viewport,
-    destination,
-    draggables,
-    maxScrollChange: distance,
-  });
-
   return {
-    type: 'SCROLL_JUMP',
-    request: distance,
-    impact: updated,
+    type: 'SNAP_MOVE',
+    impact,
   };
 };

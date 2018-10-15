@@ -14,7 +14,11 @@ import type {
   DroppableDimensionMap,
   DragImpact,
 } from '../../types';
-import getClientBorderBoxCenter from '../get-center-from-impact/get-client-border-box-center';
+import getPageBorderBoxCenter from '../get-center-from-impact/get-page-border-box-center';
+import isTotallyVisibleInNewLocation from './move-to-next-place/is-totally-visible-in-new-location';
+import { subtract } from '../position';
+import { speculativelyIncrease } from './update-displacement-visibility';
+import fromPageBorderBoxCenter from '../get-center-from-impact/get-client-border-box-center/from-page-border-box-center';
 
 type Args = {|
   state: DraggingState,
@@ -60,6 +64,7 @@ export default ({ state, type }: Args): ?PublicResult => {
   const previousPageBorderBoxCenter: Position =
     state.current.page.borderBoxCenter;
   const { draggables, droppables } = state.dimensions;
+  const viewport: Viewport = state.viewport;
 
   const result: ?InternalResult = isMovingOnMainAxis
     ? moveToNextPlace({
@@ -69,7 +74,7 @@ export default ({ state, type }: Args): ?PublicResult => {
         draggables,
         previousPageBorderBoxCenter,
         previousImpact: state.impact,
-        viewport: state.viewport,
+        viewport,
       })
     : moveCrossAxis({
         isMovingForward,
@@ -79,19 +84,11 @@ export default ({ state, type }: Args): ?PublicResult => {
         draggables,
         droppables,
         previousImpact: state.impact,
-        viewport: state.viewport,
+        viewport,
       });
 
   if (!result) {
     return null;
-  }
-
-  if (result.type === 'SCROLL_JUMP') {
-    return {
-      clientSelection: state.current.client.selection,
-      impact: result.impact,
-      scrollJumpRequest: result.request,
-    };
   }
 
   // A move can update destination
@@ -104,18 +101,61 @@ export default ({ state, type }: Args): ?PublicResult => {
     'Cannot move in direction and not move to a Droppable',
   );
 
-  // using the client center as the selection point
-  const clientSelection: Position = getClientBorderBoxCenter({
+  const pageBorderBoxCenter: Position = getPageBorderBoxCenter({
     impact: result.impact,
     draggable,
     droppable: destination,
     draggables,
-    viewport: state.viewport,
+  });
+
+  const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
+    draggable,
+    destination,
+    newPageBorderBoxCenter: pageBorderBoxCenter,
+    viewport: viewport.frame,
+    // already taken into account by getPageBorderBoxCenter
+    withDroppableDisplacement: false,
+    // we only care about it being visible relative to the main axis
+    // this is important with dynamic changes as scroll bar and toggle
+    // on the cross axis during a drag
+    onlyOnMainAxis: true,
+  });
+
+  if (isVisibleInNewLocation) {
+    // using the client center as the selection point
+    const clientSelection: Position = fromPageBorderBoxCenter({
+      pageBorderBoxCenter,
+      draggable,
+      viewport,
+    });
+    return {
+      clientSelection,
+      impact: result.impact,
+      scrollJumpRequest: null,
+    };
+  }
+
+  console.log('👻 not visible in new location');
+
+  const distance: Position = subtract(
+    pageBorderBoxCenter,
+    previousPageBorderBoxCenter,
+  );
+
+  // need to guess the increased visible displacement
+  // this is a worst case guess, which means that
+  // it may visually displace things that do not need to
+  const updated: DragImpact = speculativelyIncrease({
+    impact: result.impact,
+    viewport,
+    destination,
+    draggables,
+    maxScrollChange: distance,
   });
 
   return {
-    clientSelection,
-    impact: result.impact,
-    scrollJumpRequest: null,
+    clientSelection: state.current.client.selection,
+    impact: updated,
+    scrollJumpRequest: distance,
   };
 };

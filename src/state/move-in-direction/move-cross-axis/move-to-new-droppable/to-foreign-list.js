@@ -15,8 +15,6 @@ import getDisplacedBy from '../../../get-displaced-by';
 import getDisplacement from '../../../get-displacement';
 import getDisplacementMap from '../../../get-displacement-map';
 import { noMovement } from '../../../no-impact';
-import getPageBorderBoxCenter from '../../../get-center-from-impact/get-page-border-box-center';
-import { isTotallyVisible } from '../../../visibility/is-visible';
 
 type Args = {|
   previousPageBorderBoxCenter: Position,
@@ -34,7 +32,6 @@ export default ({
   moveRelativeTo,
   insideDestination,
   draggable,
-  draggables,
   destination,
   previousImpact,
   viewport,
@@ -43,7 +40,7 @@ export default ({
 
   // Moving to an empty list
   if (!moveRelativeTo || !insideDestination.length) {
-    const impact: DragImpact = {
+    return {
       movement: noMovement,
       direction: axis.direction,
       destination: {
@@ -52,29 +49,6 @@ export default ({
       },
       merge: null,
     };
-    // Might not be a visible location so we need to do our own checks
-    const pageBorderBoxCenter: Position = getPageBorderBoxCenter({
-      impact,
-      draggable,
-      droppable: destination,
-      draggables,
-    });
-    // we might not be able to see the position we are hoping to move to
-    const fake: Spacing = {
-      top: pageBorderBoxCenter.y,
-      right: pageBorderBoxCenter.x,
-      bottom: pageBorderBoxCenter.y,
-      left: pageBorderBoxCenter.x,
-    };
-    const isVisible: boolean = isTotallyVisible({
-      target: fake,
-      destination,
-      viewport: viewport.frame,
-      // we are already taking that into account when we get the page border box center
-      withDroppableDisplacement: false,
-    });
-
-    return isVisible ? impact : null;
   }
 
   // Moving to a populated list
