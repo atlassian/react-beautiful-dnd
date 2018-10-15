@@ -6,8 +6,8 @@ import type {
   Displacement,
   Viewport,
 } from '../../../../types';
-import getDisplacement from '../../../get-displacement';
-import getDisplacementMap from '../../../get-displacement-map';
+import getDisplacement from '../get-displacement';
+import getDisplacementMap from '../get-displacement-map';
 
 const withNewDisplacement = (
   impact: DragImpact,

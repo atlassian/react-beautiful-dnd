@@ -11,7 +11,7 @@ import type {
   Viewport,
 } from '../../../../types';
 import whatIsDraggedOver from '../../../droppable/what-is-dragged-over';
-import recomputeDisplacementVisibility from './recompute-displacement-visibility';
+import recomputeDisplacementVisibility from '../../../update-displacement-visibility/recompute';
 import getClientBorderBoxCenter from '../../../get-center-from-impact/get-client-border-box-center';
 
 type Args = {|
