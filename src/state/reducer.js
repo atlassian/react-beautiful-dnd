@@ -13,6 +13,7 @@ import type {
   CollectingState,
   DropAnimatingState,
   DropPendingState,
+  DraggableDimensionMap,
   DragImpact,
   Viewport,
   DimensionMap,
@@ -369,17 +370,40 @@ export default (state: State = idle, action: Action): State => {
     if (isEqual(state.viewport.scroll.current, newScroll)) {
       return state;
     }
+    console.warn('MOVE BY WINDOW SCROLL: UPDATING SCROLL');
 
+    const scrolled: Viewport = scrollViewport(state.viewport, newScroll);
     const isSnapping: boolean = state.movementMode === 'SNAP';
-    const impact: ?DragImpact = isSnapping ? state.impact : null;
 
-    const viewport: Viewport = scrollViewport(state.viewport, newScroll);
+    if (!isSnapping) {
+      return moveWithPositionUpdates({
+        state,
+        clientSelection: state.current.client.selection,
+        viewport: scrolled,
+      });
+    }
+
+    const { draggables, droppables } = state.dimensions;
+    const draggable: DraggableDimension =
+      draggables[state.critical.draggable.id];
+
+    const isOver: ?DroppableId = whatIsDraggedOver(state.impact);
+    invariant(isOver, 'Must be over a destination in SNAP movement mode');
+    const droppable: DroppableDimension = droppables[isOver];
+
+    const clientSelection: Position = getClientBorderBoxCenter({
+      impact: state.impact,
+      draggable,
+      droppable,
+      draggables,
+      viewport: scrolled,
+    });
 
     return moveWithPositionUpdates({
       state,
-      clientSelection: state.current.client.selection,
-      viewport,
-      impact,
+      clientSelection,
+      viewport: scrolled,
+      impact: state.impact,
     });
   }
 
@@ -388,6 +412,7 @@ export default (state: State = idle, action: Action): State => {
       isMovementAllowed(state),
       `Cannot update viewport scroll in phase ${state.phase}`,
     );
+    console.log('reducer:', action.type);
 
     const maxScroll: Position = action.payload.maxScroll;
     const withMaxScroll: Viewport = {
@@ -421,6 +446,7 @@ export default (state: State = idle, action: Action): State => {
       droppableId,
       'Expecting a destination change to result in a change in destination',
     );
+    console.warn('POST JUMP SCROLL');
     const droppable: DroppableDimension =
       state.dimensions.droppables[droppableId];
     const draggable: DraggableDimension =
@@ -429,6 +455,7 @@ export default (state: State = idle, action: Action): State => {
     const withUpdatedVisibility: DragImpact = recompute({});
 
     // we use the center position as the selection position when snap moving
+    console.log('viewport', viewport);
     const newClientCenter: Position = getClientBorderBoxCenter({
       impact: state.impact,
       draggable,
