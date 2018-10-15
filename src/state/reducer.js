@@ -150,10 +150,10 @@ export default (state: State = idle, action: Action): State => {
       return state;
     }
 
-    whenMoving({
+    return whenMoving({
       state,
       clientSelection: client,
-      noSnapUpdate: true,
+      noSnapRefresh: true,
     });
   }
 
@@ -302,7 +302,7 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
-    whenMoving({
+    return whenMoving({
       state,
       viewport: withMaxScroll,
     });
@@ -310,7 +310,7 @@ export default (state: State = idle, action: Action): State => {
 
   if (action.type === 'POST_SNAP_DESTINATION_CHANGE') {
     invariant(isMovementAllowed(state));
-    whenMoving({
+    return whenMoving({
       state,
     });
   }
@@ -351,7 +351,7 @@ export default (state: State = idle, action: Action): State => {
       impact: result.impact,
       clientSelection: result.clientSelection,
       scrollJumpRequest: result.scrollJumpRequest,
-      noSnapUpdate: true,
+      noSnapRefresh: true,
     });
   }
 

@@ -14,7 +14,7 @@ type Args = {|
 
   dimensions?: DimensionMap,
   viewport?: Viewport,
-  noSnapUpdate?: boolean,
+  noSnapRefresh?: boolean,
   impact?: ?DragImpact,
   // Only relevant for non-snap updates
   // force a custom drag impact
@@ -27,13 +27,13 @@ export default ({
   dimensions,
   viewport,
   impact,
-  noSnapUpdate,
+  noSnapRefresh,
   // only relevant for non-snap refresh updates
   clientSelection,
   scrollJumpRequest,
-}: Args) => {
+}: Args): StateWhenUpdatesAllowed => {
   const shouldRefreshSnap: boolean =
-    !noSnapUpdate && state.movementMode === 'SNAP';
+    !noSnapRefresh && state.movementMode === 'SNAP';
 
   if (!shouldRefreshSnap) {
     return update({

@@ -100,7 +100,6 @@ export default ({ state, type }: Args): ?PublicResult => {
     'Cannot move in direction and not move to a Droppable',
   );
 
-  console.log('new impact', result.impact);
   const pageBorderBoxCenter: Position = getPageBorderBoxCenter({
     impact: result.impact,
     draggable,
