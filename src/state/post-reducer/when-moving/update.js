@@ -43,7 +43,7 @@ export default ({
   const currentWindowScroll: Position = viewport.scroll.current;
   const dimensions: DimensionMap = forcedDimensions || state.dimensions;
   const clientSelection: Position =
-    forcedClientSelection || state.initial.client.selection;
+    forcedClientSelection || state.current.client.selection;
 
   const offset: Position = subtract(
     clientSelection,
