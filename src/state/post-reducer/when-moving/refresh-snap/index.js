@@ -34,14 +34,15 @@ export default ({
 
   const viewport: Viewport = forcedViewport || state.viewport;
   const dimensions: DimensionMap = forcedDimensions || state.dimensions;
+  const needsVisibilityCheck: DragImpact = state.impact;
   const { draggables, droppables } = dimensions;
 
   const draggable: DraggableDimension = draggables[state.critical.draggable.id];
-  const isOver: ?DroppableId = whatIsDraggedOver(state.impact);
+  const isOver: ?DroppableId = whatIsDraggedOver(needsVisibilityCheck);
   invariant(isOver, 'Must be over a destination in SNAP movement mode');
   const destination: DroppableDimension = droppables[isOver];
 
-  const needsVisibilityCheck: DragImpact = state.impact;
+  // TODO: this should only be done when there is a scroll or destination change?
   const impact: DragImpact = recomputeDisplacementVisibility({
     impact: needsVisibilityCheck,
     viewport,
@@ -54,7 +55,7 @@ export default ({
     draggable,
     droppable: destination,
     draggables,
-    viewport: state.viewport,
+    viewport,
   });
 
   return { impact, clientSelection };

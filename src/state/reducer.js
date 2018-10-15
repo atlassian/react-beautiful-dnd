@@ -13,11 +13,8 @@ import type {
   CollectingState,
   DropAnimatingState,
   DropPendingState,
-  DragImpact,
   Viewport,
-  DimensionMap,
   DropReason,
-  DroppableId,
 } from '../types';
 import type { Action } from './store-types';
 import type { PublicResult as MoveInDirectionResult } from './move-in-direction/move-in-direction-types';
