@@ -57,7 +57,7 @@ export default ({
   }
 
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
-    destination,
+    destination.descriptor.id,
     draggables,
   );
 

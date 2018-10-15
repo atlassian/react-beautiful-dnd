@@ -44,7 +44,7 @@ export default ({
   // });
 
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
-    destination,
+    destination.descriptor.id,
     draggables,
   );
   const isInHomeList: boolean = isHomeOf(draggable, destination);

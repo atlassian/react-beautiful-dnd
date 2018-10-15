@@ -47,7 +47,7 @@ export default ({
     const axis: Axis = droppable.axis;
 
     const original: DraggableDimension[] = getDraggablesInsideDroppable(
-      droppable,
+      droppable.descriptor.id,
       existing.draggables,
     );
 

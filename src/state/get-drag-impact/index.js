@@ -57,7 +57,7 @@ export default ({
 
   const isWithinHomeDroppable: boolean = isHomeOf(draggable, destination);
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
-    destination,
+    destination.descriptor.id,
     draggables,
   );
   // Where the element actually is now.

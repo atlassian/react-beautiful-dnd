@@ -13,7 +13,6 @@ import type {
   CollectingState,
   DropAnimatingState,
   DropPendingState,
-  DraggableDimensionMap,
   DragImpact,
   Viewport,
   DimensionMap,
@@ -24,13 +23,13 @@ import type { Action } from './store-types';
 import type { PublicResult as MoveInDirectionResult } from './move-in-direction/move-in-direction-types';
 import whatIsDraggedOver from './droppable/what-is-dragged-over';
 import scrollDroppable from './droppable/scroll-droppable';
-import getDragImpact from './get-drag-impact';
 import publish from './publish';
 import moveInDirection from './move-in-direction';
 import { add, isEqual, origin } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
 import isMovementAllowed from './is-movement-allowed';
+import isSnapMoving from './is-snap-moving';
 import moveWithPositionUpdates from './move-with-position-updates';
 import { toDroppableList } from './dimension-structures';
 import { forward } from './user-direction/user-direction-preset';
@@ -39,21 +38,83 @@ import { recompute } from './move-in-direction/update-displacement-visibility';
 
 const idle: IdleState = { phase: 'IDLE' };
 
-const getDragImpactWithNewDimensions = (
+type RefreshSnapArgs = {|
   state: State,
-  dimensions: DimensionMap,
-) => {
+  impact?: DragImpact,
+  dimensions?: DimensionMap,
+  viewport?: Viewport,
+|};
+
+const refreshSnap = ({
+  state,
+  impact: forcedImpact,
+  dimensions: forcedDimensions,
+  viewport: forcedViewport,
+}: RefreshSnapArgs): State => {
   invariant(isMovementAllowed(state));
-  return getDragImpact({
-    pageBorderBoxCenter: state.current.page.borderBoxCenter,
-    draggable: dimensions.draggables[state.critical.draggable.id],
-    draggables: dimensions.draggables,
-    droppables: dimensions.droppables,
-    previousImpact: state.impact,
+  invariant(isSnapMoving(state));
+  const viewport: Viewport = forcedViewport || state.viewport;
+  const dimensions: DimensionMap = forcedDimensions || state.dimensions;
+  const { draggables, droppables } = dimensions;
+
+  const draggable: DraggableDimension = draggables[state.critical.draggable.id];
+  const isOver: ?DroppableId = whatIsDraggedOver(state.impact);
+  invariant(isOver, 'Must be over a destination in SNAP movement mode');
+  const destination: DroppableDimension = droppables[isOver];
+
+  const needsVisibilityCheck: DragImpact = forcedImpact || state.impact;
+  const impact: DragImpact = recompute({
+    impact: needsVisibilityCheck,
+    viewport,
+    destination,
+    draggables,
+  });
+
+  const clientSelection: Position = getClientBorderBoxCenter({
+    impact,
+    draggable,
+    droppable: destination,
+    draggables,
     viewport: state.viewport,
-    userDirection: state.userDirection,
+  });
+
+  return moveWithPositionUpdates({
+    state,
+    clientSelection,
+    dimensions,
+    impact,
   });
 };
+
+const withUpdatedDroppable = (
+  state: State,
+  updated: DroppableDimension,
+): State => {
+  invariant(isMovementAllowed(state));
+
+  const isSnapping: boolean = isSnapMoving(state);
+
+  const dimensions: DimensionMap = {
+    ...state.dimensions,
+    droppables: {
+      ...state.dimensions.droppables,
+      [updated.descriptor.id]: updated,
+    },
+  };
+
+  if (isSnapping) {
+    return refreshSnap({
+      state,
+      dimensions,
+    });
+  }
+
+  return moveWithPositionUpdates({
+    state,
+    dimensions,
+  });
+};
+
 export default (state: State = idle, action: Action): State => {
   if (action.type === 'CLEAN') {
     return idle;
@@ -170,8 +231,7 @@ export default (state: State = idle, action: Action): State => {
     }
 
     // If we are snap moving - manual movements should not update the impact
-    const impact: ?DragImpact =
-      state.movementMode === 'SNAP' ? state.impact : null;
+    const impact: ?DragImpact = isSnapMoving(state) ? state.impact : null;
 
     return moveWithPositionUpdates({
       state,
@@ -210,32 +270,7 @@ export default (state: State = idle, action: Action): State => {
 
     const updated: DroppableDimension = scrollDroppable(target, offset);
 
-    const dimensions: DimensionMap = {
-      ...state.dimensions,
-      droppables: {
-        ...state.dimensions.droppables,
-        [id]: updated,
-      },
-    };
-
-    // If we are jump scrolling - dimension changes should not update the impact
-    const impact: DragImpact =
-      state.movementMode === 'SNAP'
-        ? state.impact
-        : getDragImpactWithNewDimensions(state, dimensions);
-
-    return {
-      // appeasing flow
-      phase: 'DRAGGING',
-      ...state,
-      // eslint-disable-next-line
-      phase: state.phase,
-      impact,
-      dimensions,
-      // At this point any scroll jump request would need to be cleared
-      scrollJumpRequest: null,
-      forceShouldAnimate: null,
-    };
+    return withUpdatedDroppable(state, updated);
   }
 
   if (action.type === 'UPDATE_DROPPABLE_IS_ENABLED') {
@@ -268,29 +303,7 @@ export default (state: State = idle, action: Action): State => {
       isEnabled,
     };
 
-    const dimensions: DimensionMap = {
-      ...state.dimensions,
-      droppables: {
-        ...state.dimensions.droppables,
-        [id]: updated,
-      },
-    };
-
-    const impact: DragImpact = getDragImpactWithNewDimensions(
-      state,
-      dimensions,
-    );
-
-    return {
-      // appeasing flow
-      phase: 'DRAGGING',
-      ...state,
-      // eslint-disable-next-line
-      phase: state.phase,
-      impact,
-      dimensions,
-      forceShouldAnimate: null,
-    };
+    return withUpdatedDroppable(state, updated);
   }
 
   if (action.type === 'UPDATE_DROPPABLE_IS_COMBINE_ENABLED') {
@@ -323,29 +336,7 @@ export default (state: State = idle, action: Action): State => {
       isCombineEnabled,
     };
 
-    const dimensions: DimensionMap = {
-      ...state.dimensions,
-      droppables: {
-        ...state.dimensions.droppables,
-        [id]: updated,
-      },
-    };
-
-    const impact: DragImpact = getDragImpactWithNewDimensions(
-      state,
-      dimensions,
-    );
-
-    return {
-      // appeasing flow
-      phase: 'DRAGGING',
-      ...state,
-      // eslint-disable-next-line
-      phase: state.phase,
-      impact,
-      dimensions,
-      forceShouldAnimate: null,
-    };
+    return withUpdatedDroppable(state, updated);
   }
 
   if (action.type === 'MOVE_BY_WINDOW_SCROLL') {
@@ -370,40 +361,21 @@ export default (state: State = idle, action: Action): State => {
     if (isEqual(state.viewport.scroll.current, newScroll)) {
       return state;
     }
-    console.warn('MOVE BY WINDOW SCROLL: UPDATING SCROLL');
 
     const scrolled: Viewport = scrollViewport(state.viewport, newScroll);
-    const isSnapping: boolean = state.movementMode === 'SNAP';
+    const isSnapping: boolean = isSnapMoving(state);
 
-    if (!isSnapping) {
-      return moveWithPositionUpdates({
+    if (isSnapping) {
+      return refreshSnap({
         state,
-        clientSelection: state.current.client.selection,
         viewport: scrolled,
       });
     }
 
-    const { draggables, droppables } = state.dimensions;
-    const draggable: DraggableDimension =
-      draggables[state.critical.draggable.id];
-
-    const isOver: ?DroppableId = whatIsDraggedOver(state.impact);
-    invariant(isOver, 'Must be over a destination in SNAP movement mode');
-    const droppable: DroppableDimension = droppables[isOver];
-
-    const clientSelection: Position = getClientBorderBoxCenter({
-      impact: state.impact,
-      draggable,
-      droppable,
-      draggables,
-      viewport: scrolled,
-    });
-
     return moveWithPositionUpdates({
       state,
-      clientSelection,
+      clientSelection: state.current.client.selection,
       viewport: scrolled,
-      impact: state.impact,
     });
   }
 
@@ -412,7 +384,6 @@ export default (state: State = idle, action: Action): State => {
       isMovementAllowed(state),
       `Cannot update viewport scroll in phase ${state.phase}`,
     );
-    console.log('reducer:', action.type);
 
     const maxScroll: Position = action.payload.maxScroll;
     const withMaxScroll: Viewport = {
@@ -423,59 +394,22 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
-    return {
-      // phase will be overridden - appeasing flow
-      phase: 'DRAGGING',
-      ...state,
-      viewport: withMaxScroll,
-    };
-  }
-
-  if (action.type === 'POST_JUMP_SCROLL') {
-    invariant(
-      isMovementAllowed(state),
-      `Cannot update viewport scroll in phase ${state.phase}`,
-    );
-    invariant(
-      state.movementMode === 'SNAP',
-      'Can only cross axis move when snapping',
-    );
-
-    const droppableId: ?DroppableId = whatIsDraggedOver(state.impact);
-    invariant(
-      droppableId,
-      'Expecting a destination change to result in a change in destination',
-    );
-    console.warn('POST JUMP SCROLL');
-    const droppable: DroppableDimension =
-      state.dimensions.droppables[droppableId];
-    const draggable: DraggableDimension =
-      state.dimensions.draggables[state.critical.draggable.id];
-
-    const withUpdatedVisibility: DragImpact = recompute({});
-
-    // we use the center position as the selection position when snap moving
-    console.log('viewport', viewport);
-    const newClientCenter: Position = getClientBorderBoxCenter({
-      impact: state.impact,
-      draggable,
-      droppable,
-      draggables: state.dimensions.draggables,
-      viewport: state.viewport,
-    });
-
-    // Nothing to do here
-    // if (isEqual(state.current.client.selection, newClientCenter)) {
-    //   return state;
-    // }
-
-    return moveWithPositionUpdates({
+    return refreshSnap({
       state,
-      // not changing impact
-      impact: state.impact,
-      clientSelection: newClientCenter,
+      viewport: withMaxScroll,
     });
   }
+
+  if (action.type === 'POST_SNAP_DESTINATION_CHANGE') {
+    return refreshSnap({
+      state,
+    });
+  }
+
+  // TODO
+  // if (action.type === 'POST_JUMP_SCROLL') {
+  //   return refreshSnap(state);
+  // }
 
   if (
     action.type === 'MOVE_UP' ||

@@ -27,7 +27,7 @@ export default ({
   droppable,
 }: NewHomeArgs): Position => {
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
-    droppable,
+    droppable.descriptor.id,
     draggables,
   );
 

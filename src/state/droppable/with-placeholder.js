@@ -23,7 +23,7 @@ const getRequiredGrowthForPlaceholder = (
   // TODO: consider margin collapsing?
   const availableSpace: number = droppable.subject.pageMarginBox[axis.size];
   const insideDroppable: DraggableDimension[] = getDraggablesInsideDroppable(
-    droppable,
+    droppable.descriptor.id,
     draggables,
   );
   const spaceUsed: number = insideDroppable.reduce(

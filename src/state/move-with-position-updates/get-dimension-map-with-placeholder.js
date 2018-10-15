@@ -9,59 +9,72 @@ import shouldUsePlaceholder from '../droppable/should-use-placeholder';
 import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 import type {
   DroppableDimension,
-  DraggingState,
-  CollectingState,
   DimensionMap,
   DraggableDimension,
   DragImpact,
   DroppableId,
 } from '../../types';
 
-type AcceptedState = DraggingState | CollectingState;
-
-const clearUnusedPlaceholder = (
-  state: AcceptedState,
+type ClearArgs = {|
+  previousImpact: DragImpact,
   impact: DragImpact,
-): DimensionMap => {
-  const last: ?DroppableId = whatIsDraggedOver(state.impact);
+  dimensions: DimensionMap,
+|};
+
+const clearUnusedPlaceholder = ({
+  previousImpact,
+  impact,
+  dimensions,
+}: ClearArgs): DimensionMap => {
+  const last: ?DroppableId = whatIsDraggedOver(previousImpact);
   const now: ?DroppableId = whatIsDraggedOver(impact);
 
   if (!last) {
-    return state.dimensions;
+    return dimensions;
   }
 
   // no change - can keep the last state
   if (last === now) {
-    return state.dimensions;
+    return dimensions;
   }
 
-  const lastDroppable: DroppableDimension = state.dimensions.droppables[last];
+  const lastDroppable: DroppableDimension = dimensions.droppables[last];
 
   // nothing to clear
   if (!lastDroppable.subject.withPlaceholder) {
-    return state.dimensions;
+    return dimensions;
   }
 
   const patched: DroppableDimension = removePlaceholder(lastDroppable);
 
   // TODO: need to unwind any existing placeholders
   return {
-    draggables: state.dimensions.draggables,
+    draggables: dimensions.draggables,
     droppables: {
-      ...state.dimensions.droppables,
+      ...dimensions.droppables,
       [patched.descriptor.id]: patched,
     },
   };
 };
 
 type Args = {|
-  state: AcceptedState,
+  dimensions: DimensionMap,
   draggable: DraggableDimension,
   impact: DragImpact,
+  previousImpact: DragImpact,
 |};
 
-export default ({ state: oldState, draggable, impact }: Args): DimensionMap => {
-  const base: DimensionMap = clearUnusedPlaceholder(oldState, impact);
+export default ({
+  dimensions,
+  previousImpact,
+  draggable,
+  impact,
+}: Args): DimensionMap => {
+  const base: DimensionMap = clearUnusedPlaceholder({
+    previousImpact,
+    impact,
+    dimensions,
+  });
 
   const usePlaceholder: boolean = shouldUsePlaceholder(
     draggable.descriptor,

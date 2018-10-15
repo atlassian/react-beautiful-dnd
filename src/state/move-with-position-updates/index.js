@@ -19,7 +19,8 @@ import type {
 
 type MoveArgs = {|
   state: DraggingState | CollectingState,
-  clientSelection: Position,
+  clientSelection?: Position,
+  dimensions?: DimensionMap,
   viewport?: Viewport,
   // force a custom drag impact
   impact?: ?DragImpact,
@@ -29,7 +30,8 @@ type MoveArgs = {|
 
 export default ({
   state,
-  clientSelection,
+  clientSelection: forcedClientSelection,
+  dimensions: forcedDimensions,
   viewport: forcedViewport,
   impact: forcedImpact,
   scrollJumpRequest,
@@ -39,6 +41,9 @@ export default ({
 
   const viewport: Viewport = forcedViewport || state.viewport;
   const currentWindowScroll: Position = viewport.scroll.current;
+  const dimensions: DimensionMap = forcedDimensions || state.dimensions;
+  const clientSelection: Position =
+    forcedClientSelection || state.initial.client.selection;
 
   const offset: Position = subtract(
     clientSelection,
@@ -50,8 +55,6 @@ export default ({
     selection: clientSelection,
     borderBoxCenter: add(state.initial.client.borderBoxCenter, offset),
   };
-
-  console.log('computed client', client);
 
   const page: PagePositions = {
     selection: add(client.selection, currentWindowScroll),
@@ -75,6 +78,8 @@ export default ({
       // adding phase to appease flow (even though it will be overwritten by spread)
       phase: 'COLLECTING',
       ...state,
+      dimensions,
+      viewport,
       current,
       userDirection,
     };
@@ -95,10 +100,11 @@ export default ({
       userDirection,
     });
 
-  const dimensions: DimensionMap = getDimensionMapWithPlaceholder({
-    state,
+  const withUpdatedPlaceholders: DimensionMap = getDimensionMapWithPlaceholder({
     draggable,
     impact: newImpact,
+    previousImpact: state.impact,
+    dimensions,
   });
 
   // dragging!
@@ -106,7 +112,7 @@ export default ({
     ...state,
     current,
     userDirection,
-    dimensions,
+    dimensions: withUpdatedPlaceholders,
     impact: newImpact,
     scrollJumpRequest: scrollJumpRequest || null,
     viewport,

@@ -223,7 +223,6 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
         requiredWindowScroll &&
         canScrollWindow(viewport, requiredWindowScroll)
       ) {
-        console.log('SCROLLING WINDOW!!!');
         scheduleWindowScroll(requiredWindowScroll);
         return;
       }

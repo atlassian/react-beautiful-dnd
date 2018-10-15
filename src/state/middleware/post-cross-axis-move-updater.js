@@ -3,11 +3,13 @@ import type { Position } from 'css-box-model';
 import type { State, Viewport } from '../../types';
 import type { Action, MiddlewareStore, Dispatch } from '../store-types';
 import { isEqual } from '../position';
-import { updateViewportMaxScroll } from '../action-creators';
+import {
+  updateViewportMaxScroll,
+  postSnapDestinationChange,
+} from '../action-creators';
 import isMovementAllowed from '../is-movement-allowed';
 import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 import getMaxWindowScroll from '../../view/window/get-max-window-scroll';
-import getWindowScroll from '../../view/window/get-window-scroll';
 
 const shouldCheckOnAction = (action: Action): boolean =>
   action.type === 'MOVE' ||
@@ -51,15 +53,6 @@ const getUpdatedViewportMax = (viewport: Viewport): ?Position => {
   return maxScroll;
 };
 
-const getUpdatedViewportCurrent = (viewport: Viewport): ?Position => {
-  const currentScroll: Position = getWindowScroll();
-
-  if (isEqual(viewport.scroll.current, currentScroll)) {
-    return null;
-  }
-  return currentScroll;
-};
-
 export default (store: MiddlewareStore) => (next: Dispatch) => (
   action: Action,
 ): any => {
@@ -75,8 +68,12 @@ export default (store: MiddlewareStore) => (next: Dispatch) => (
     return;
   }
 
+  // console.warn('POST SNAP DESTINATION CHANGE');
+  // if (current.movementMode === 'SNAP') {
+  // next(postSnapDestinationChange());
+  // }
+
   const maxScroll: ?Position = getUpdatedViewportMax(current.viewport);
-  const currentScroll: ?Position = getUpdatedViewportCurrent(current.viewport);
 
   if (maxScroll) {
     console.warn('MAX SCROLL UPDATE!');

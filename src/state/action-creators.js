@@ -178,6 +178,16 @@ export const postJumpScroll = (): PostJumpScrollAction => ({
   payload: null,
 });
 
+type PostSnapDestinationChangeAction = {|
+  type: 'POST_SNAP_DESTINATION_CHANGE',
+  payload: null,
+|};
+
+export const postSnapDestinationChange = (): PostSnapDestinationChangeAction => ({
+  type: 'POST_SNAP_DESTINATION_CHANGE',
+  payload: null,
+});
+
 export type MoveUpAction = {|
   type: 'MOVE_UP',
   payload: null,
@@ -295,6 +305,7 @@ export type Action =
   | MoveByWindowScrollAction
   | UpdateViewportMaxScrollAction
   | PostJumpScrollAction
+  | PostSnapDestinationChangeAction
   | MoveAction
   | MoveUpAction
   | MoveDownAction
