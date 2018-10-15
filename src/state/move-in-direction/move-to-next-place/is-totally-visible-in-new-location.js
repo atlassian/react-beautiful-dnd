@@ -14,7 +14,8 @@ type Args = {|
   destination: DroppableDimension,
   newPageBorderBoxCenter: Position,
   viewport: Rect,
-  withDroppableDisplacement: boolean,
+  // only allowing a 'false' value. Being super clear
+  withDroppableDisplacement: false,
   onlyOnMainAxis?: boolean,
 |};
 

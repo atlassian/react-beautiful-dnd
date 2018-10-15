@@ -122,6 +122,7 @@ export default ({ state, type }: Args): ?PublicResult => {
   });
 
   if (isVisibleInNewLocation) {
+    console.warn('👓 is visible in new position');
     // using the client center as the selection point
     const clientSelection: Position = fromPageBorderBoxCenter({
       pageBorderBoxCenter,
@@ -145,17 +146,17 @@ export default ({ state, type }: Args): ?PublicResult => {
   // need to guess the increased visible displacement
   // this is a worst case guess, which means that
   // it may visually displace things that do not need to
-  const updated: DragImpact = speculativelyIncrease({
-    impact: result.impact,
-    viewport,
-    destination,
-    draggables,
-    maxScrollChange: distance,
-  });
+  // const updated: DragImpact = speculativelyIncrease({
+  //   impact: result.impact,
+  //   viewport,
+  //   destination,
+  //   draggables,
+  //   maxScrollChange: distance,
+  // });
 
   return {
     clientSelection: state.current.client.selection,
-    impact: updated,
+    impact: result.impact,
     scrollJumpRequest: distance,
   };
 };
