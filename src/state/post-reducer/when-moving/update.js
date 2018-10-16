@@ -114,9 +114,12 @@ export default ({
     userDirection,
     dimensions: withUpdatedPlaceholders,
     impact: newImpact,
-    scrollJumpRequest: scrollJumpRequest || null,
     viewport,
-    forceShouldAnimate: null,
+    scrollJumpRequest: scrollJumpRequest || null,
+    // client updates can be applied as a part of a jump scroll
+    // this can be to immediately reverse movement to allow for a nice animation
+    // into the final position
+    forceShouldAnimate: scrollJumpRequest ? false : null,
   };
 
   return result;

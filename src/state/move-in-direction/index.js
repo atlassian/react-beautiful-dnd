@@ -17,7 +17,7 @@ import type {
 } from '../../types';
 import getPageBorderBoxCenter from '../get-center-from-impact/get-page-border-box-center';
 import isTotallyVisibleInNewLocation from './move-to-next-place/is-totally-visible-in-new-location';
-import { subtract } from '../position';
+import { subtract, patch } from '../position';
 import fromPageBorderBoxCenter from '../get-center-from-impact/get-client-border-box-center/from-page-border-box-center';
 import speculativelyIncrease from '../update-displacement-visibility/speculatively-increase';
 
@@ -155,8 +155,30 @@ export default ({ state, type }: Args): ?PublicResult => {
     maxScrollChange: distance,
   });
 
+  if (isSameDestination) {
+    return {
+      clientSelection: state.current.client.selection,
+      impact: cautious,
+      scrollJumpRequest: distance,
+    };
+  }
+
+  // Goal: after the window scroll the item looks like it is animating
+  // from the original spot.
+  // How: we move the item backwards on the cross axis to account for the shift
+  // then when we update the impact after the window scroll it will animate
+  // from it's pre jump scroll current spot
+
+  const crossAxisDistance: Position = patch(
+    destination.axis.crossAxisLine,
+    distance[destination.axis.crossAxisLine],
+  );
+
   return {
-    clientSelection: state.current.client.selection,
+    clientSelection: subtract(
+      state.current.client.selection,
+      crossAxisDistance,
+    ),
     impact: cautious,
     scrollJumpRequest: distance,
   };
