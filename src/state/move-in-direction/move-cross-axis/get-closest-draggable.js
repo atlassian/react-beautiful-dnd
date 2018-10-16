@@ -29,18 +29,18 @@ export default ({
 }: Args): ?DraggableDimension => {
   const sorted: DraggableDimension[] = insideDestination
     .filter(
-      (draggable: DraggableDimension): boolean => {
-        const result: boolean = isTotallyVisible({
+      (draggable: DraggableDimension): boolean =>
+        // Allowing movement to draggables that are not visible in the viewport
+        // but must be visible in the droppable
+        // We can improve this, but this limitation is easier for now
+        isTotallyVisible({
           target: draggable.page.borderBox,
           destination,
           viewport: viewport.frame,
           withDroppableDisplacement: true,
           shouldCheckViewport: false,
           shouldCheckDroppable: true,
-        });
-        console.log(`is ${draggable.descriptor.id} visible?`, result);
-        return result;
-      },
+        }),
     )
     .sort(
       (a: DraggableDimension, b: DraggableDimension): number => {
@@ -69,8 +69,6 @@ export default ({
         return a.page.borderBox[axis.start] - b.page.borderBox[axis.start];
       },
     );
-
-  console.warn('closest draggable', sorted[0]);
 
   return sorted[0] || null;
 };

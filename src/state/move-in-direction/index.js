@@ -147,15 +147,6 @@ export default ({ state, type }: Args): ?PublicResult => {
     previousPageBorderBoxCenter,
   );
 
-  // if (isSameDestination) {
-  console.log(
-    'displaced',
-    result.impact.movement.displaced.map(d => d.draggableId),
-  );
-  console.log(
-    'is visible',
-    result.impact.movement.displaced.map(d => d.isVisible),
-  );
   const cautious: DragImpact = speculativelyIncrease({
     impact: result.impact,
     viewport,
@@ -163,31 +154,10 @@ export default ({ state, type }: Args): ?PublicResult => {
     draggables,
     maxScrollChange: distance,
   });
-  console.log(
-    'is visible (post speculative)',
-    cautious.movement.displaced.map(d => d.isVisible),
-  );
 
   return {
     clientSelection: state.current.client.selection,
     impact: cautious,
     scrollJumpRequest: distance,
   };
-  // }
-
-  // TODO: a bit off??
-
-  // const cautious: DragImpact = speculativelyIncrease({
-  //   impact: result.impact,
-  //   viewport,
-  //   destination,
-  //   draggables,
-  //   maxScrollChange: result.impact.movement.displacedBy.point,
-  // });
-
-  // return {
-  //   clientSelection: state.current.client.selection,
-  //   impact: cautious,
-  //   scrollJumpRequest: distance,
-  // };
 };

@@ -22,7 +22,6 @@ export default ({
   destination,
   draggables,
 }: RecomputeArgs): DragImpact => {
-  console.warn('recomputing displacement');
   const updated: Displacement[] = impact.movement.displaced.map(
     (entry: Displacement) =>
       getDisplacement({
@@ -32,13 +31,6 @@ export default ({
         viewport: viewport.frame,
       }),
   );
-
-  // TEMP Hack
-  // const updated: Displacement[] = impact.movement.displaced.map(entry => ({
-  //   draggableId: entry.draggableId,
-  //   isVisible: true,
-  //   shouldAnimate: true,
-  // }));
 
   return withNewDisplacement(impact, updated);
 };

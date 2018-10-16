@@ -74,7 +74,6 @@ export default ({
 
   // go before and item that is displaced forward
   if (willDisplaceForward) {
-    console.log('going before displaced', closest.descriptor.id);
     return goBefore({
       axis,
       moveRelativeTo: displacedClosest,

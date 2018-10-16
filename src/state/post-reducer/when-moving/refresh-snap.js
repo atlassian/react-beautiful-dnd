@@ -37,22 +37,13 @@ export default ({
   const isOver: ?DroppableId = whatIsDraggedOver(needsVisibilityCheck);
   invariant(isOver, 'Must be over a destination in SNAP movement mode');
   const destination: DroppableDimension = droppables[isOver];
-  console.log('destination scroll', destination.frame.scroll);
 
-  // TODO: this should only be done when there is a scroll or destination change?
   const impact: DragImpact = recomputeDisplacementVisibility({
     impact: needsVisibilityCheck,
     viewport,
     destination,
     draggables,
   });
-
-  console.log(
-    'refresh snap',
-    impact.movement.displaced.map(d => d.draggableId),
-  );
-
-  console.log('is visible', impact.movement.displaced.map(d => d.isVisible));
 
   const clientSelection: Position = getClientBorderBoxCenter({
     impact,

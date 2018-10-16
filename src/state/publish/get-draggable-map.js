@@ -156,7 +156,6 @@ export default ({
     });
 
     // Phase 3: shift dimensions
-    // console.log('shift', toShift);
     withAdditions.forEach((item: DraggableDimension) => {
       if (additionMap[item.descriptor.id]) {
         return;

@@ -68,15 +68,9 @@ export default (store: MiddlewareStore) => (next: Dispatch) => (
     return;
   }
 
-  // console.warn('POST SNAP DESTINATION CHANGE');
-  // if (current.movementMode === 'SNAP') {
-  // next(postSnapDestinationChange());
-  // }
-
   const maxScroll: ?Position = getUpdatedViewportMax(current.viewport);
 
   if (maxScroll) {
-    console.warn('MAX SCROLL UPDATE!');
     next(updateViewportMaxScroll({ maxScroll }));
   }
 };

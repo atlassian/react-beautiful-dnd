@@ -57,7 +57,6 @@ const postDroppableChange = (
 const idle: IdleState = { phase: 'IDLE' };
 
 export default (state: State = idle, action: Action): State => {
-  console.log('ACTION:', action.type);
   if (action.type === 'CLEAN') {
     return idle;
   }
@@ -209,7 +208,6 @@ export default (state: State = idle, action: Action): State => {
     }
 
     const scrolled: DroppableDimension = scrollDroppable(target, offset);
-    console.log('scrolled droppable', scrolled.frame.scroll);
     return postDroppableChange(state, scrolled);
   }
 
