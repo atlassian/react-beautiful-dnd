@@ -3,10 +3,7 @@ import type { Position } from 'css-box-model';
 import type { State, Viewport } from '../../types';
 import type { Action, MiddlewareStore, Dispatch } from '../store-types';
 import { isEqual } from '../position';
-import {
-  updateViewportMaxScroll,
-  postSnapDestinationChange,
-} from '../action-creators';
+import { updateViewportMaxScroll } from '../action-creators';
 import isMovementAllowed from '../is-movement-allowed';
 import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 import getMaxWindowScroll from '../../view/window/get-max-window-scroll';
