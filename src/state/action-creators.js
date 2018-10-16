@@ -168,25 +168,25 @@ export const updateViewportMaxScroll = (
   payload: args,
 });
 
-type PostJumpScrollAction = {|
-  type: 'POST_JUMP_SCROLL',
-  payload: null,
-|};
+// type PostJumpScrollAction = {|
+//   type: 'POST_JUMP_SCROLL',
+//   payload: null,
+// |};
 
-export const postJumpScroll = (): PostJumpScrollAction => ({
-  type: 'POST_JUMP_SCROLL',
-  payload: null,
-});
+// export const postJumpScroll = (): PostJumpScrollAction => ({
+//   type: 'POST_JUMP_SCROLL',
+//   payload: null,
+// });
 
-type PostSnapDestinationChangeAction = {|
-  type: 'POST_SNAP_DESTINATION_CHANGE',
-  payload: null,
-|};
+// type PostSnapDestinationChangeAction = {|
+//   type: 'POST_SNAP_DESTINATION_CHANGE',
+//   payload: null,
+// |};
 
-export const postSnapDestinationChange = (): PostSnapDestinationChangeAction => ({
-  type: 'POST_SNAP_DESTINATION_CHANGE',
-  payload: null,
-});
+// export const postSnapDestinationChange = (): PostSnapDestinationChangeAction => ({
+//   type: 'POST_SNAP_DESTINATION_CHANGE',
+//   payload: null,
+// });
 
 export type MoveUpAction = {|
   type: 'MOVE_UP',
@@ -304,8 +304,8 @@ export type Action =
   | UpdateDroppableIsCombineEnabledAction
   | MoveByWindowScrollAction
   | UpdateViewportMaxScrollAction
-  | PostJumpScrollAction
-  | PostSnapDestinationChangeAction
+  // | PostJumpScrollAction
+  // | PostSnapDestinationChangeAction
   | MoveAction
   | MoveUpAction
   | MoveDownAction

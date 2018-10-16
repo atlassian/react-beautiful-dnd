@@ -2,7 +2,9 @@
 import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
 import type {
+  DimensionMap,
   State,
+  StateWhenUpdatesAllowed,
   DraggableDimension,
   DroppableDimension,
   PendingDrop,
@@ -27,8 +29,30 @@ import getHomeImpact from './get-home-impact';
 import isMovementAllowed from './is-movement-allowed';
 import { toDroppableList } from './dimension-structures';
 import { forward } from './user-direction/user-direction-preset';
-import whenMoving from './post-reducer/when-moving';
-import withUpdatedDroppable from './post-reducer/when-moving/with-updated-droppable';
+import update from './post-reducer/when-moving/update';
+import refreshSnap from './post-reducer/when-moving/refresh-snap';
+import patchDroppableMap from './patch-droppable-map';
+
+const getIsSnapping = (state: StateWhenUpdatesAllowed): boolean =>
+  state.movementMode === 'SNAP';
+
+const postDroppableChange = (
+  state: StateWhenUpdatesAllowed,
+  updated: DroppableDimension,
+): StateWhenUpdatesAllowed => {
+  const dimensions: DimensionMap = patchDroppableMap(state.dimensions, updated);
+
+  if (getIsSnapping(state)) {
+    return refreshSnap({
+      state,
+      dimensions,
+    });
+  }
+  return update({
+    state,
+    dimensions,
+  });
+};
 
 const idle: IdleState = { phase: 'IDLE' };
 
@@ -140,17 +164,18 @@ export default (state: State = idle, action: Action): State => {
       `${action.type} not permitted in phase ${state.phase}`,
     );
 
-    const { client } = action.payload;
+    const { client: clientSelection } = action.payload;
 
     // nothing needs to be done
-    if (isEqual(client, state.current.client.selection)) {
+    if (isEqual(clientSelection, state.current.client.selection)) {
       return state;
     }
 
-    return whenMoving({
+    return update({
       state,
-      clientSelection: client,
-      noSnapRefresh: true,
+      clientSelection,
+      // If we are snap moving - manual movements should not update the impact
+      impact: getIsSnapping(state) ? state.impact : null,
     });
   }
 
@@ -183,8 +208,7 @@ export default (state: State = idle, action: Action): State => {
     }
 
     const updated: DroppableDimension = scrollDroppable(target, offset);
-
-    return withUpdatedDroppable(state, updated);
+    return postDroppableChange(state, updated);
   }
 
   if (action.type === 'UPDATE_DROPPABLE_IS_ENABLED') {
@@ -217,7 +241,7 @@ export default (state: State = idle, action: Action): State => {
       isEnabled,
     };
 
-    return withUpdatedDroppable(state, updated);
+    return postDroppableChange(state, updated);
   }
 
   if (action.type === 'UPDATE_DROPPABLE_IS_COMBINE_ENABLED') {
@@ -250,7 +274,7 @@ export default (state: State = idle, action: Action): State => {
       isCombineEnabled,
     };
 
-    return withUpdatedDroppable(state, updated);
+    return postDroppableChange(state, updated);
   }
 
   if (action.type === 'MOVE_BY_WINDOW_SCROLL') {
@@ -276,11 +300,18 @@ export default (state: State = idle, action: Action): State => {
       return state;
     }
 
-    const scrolled: Viewport = scrollViewport(state.viewport, newScroll);
+    const viewport: Viewport = scrollViewport(state.viewport, newScroll);
 
-    return whenMoving({
+    if (getIsSnapping(state)) {
+      return refreshSnap({
+        state,
+        viewport,
+      });
+    }
+
+    return update({
       state,
-      viewport: scrolled,
+      viewport,
     });
   }
 
@@ -299,17 +330,22 @@ export default (state: State = idle, action: Action): State => {
       },
     };
 
-    return whenMoving({
-      state,
+    // don't need to recalc any updates
+    return {
+      // phase will be overridden - appeasing flow
+      phase: 'DRAGGING',
+      ...state,
       viewport: withMaxScroll,
-    });
+    };
   }
 
   if (action.type === 'POST_SNAP_DESTINATION_CHANGE') {
-    invariant(isMovementAllowed(state));
-    return whenMoving({
-      state,
-    });
+    console.warn('NOT HANDLING', action.type);
+    return state;
+    // invariant(isMovementAllowed(state));
+    // return whenMoving({
+    //   state,
+    // });
   }
 
   // TODO
@@ -343,12 +379,11 @@ export default (state: State = idle, action: Action): State => {
       return state;
     }
 
-    return whenMoving({
+    return update({
       state,
       impact: result.impact,
       clientSelection: result.clientSelection,
       scrollJumpRequest: result.scrollJumpRequest,
-      noSnapRefresh: true,
     });
   }
 

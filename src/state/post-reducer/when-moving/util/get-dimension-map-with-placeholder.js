@@ -3,10 +3,10 @@ import type { Position } from 'css-box-model';
 import {
   addPlaceholder,
   removePlaceholder,
-} from '../../droppable/with-placeholder';
-import { patch } from '../../position';
-import shouldUsePlaceholder from '../../droppable/should-use-placeholder';
-import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
+} from '../../../droppable/with-placeholder';
+import { patch } from '../../../position';
+import shouldUsePlaceholder from '../../../droppable/should-use-placeholder';
+import whatIsDraggedOver from '../../../droppable/what-is-dragged-over';
 import type {
   DroppableDimension,
   DimensionMap,
@@ -14,7 +14,7 @@ import type {
   DragImpact,
   DroppableId,
 } from '../../../types';
-import patchDroppableMap from './patch-droppable-map';
+import patchDroppableMap from '../../../patch-droppable-map';
 
 type ClearArgs = {|
   previousImpact: DragImpact,

@@ -9,10 +9,11 @@ import type {
   DimensionMap,
   DragImpact,
   Viewport,
-} from '../../../../types';
-import whatIsDraggedOver from '../../../droppable/what-is-dragged-over';
-import recomputeDisplacementVisibility from '../../../update-displacement-visibility/recompute';
-import getClientBorderBoxCenter from '../../../get-center-from-impact/get-client-border-box-center';
+} from '../../../../../types';
+import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
+import recomputeDisplacementVisibility from '../../update-displacement-visibility/recompute';
+import getClientBorderBoxCenter from '../../get-center-from-impact/get-client-border-box-center';
+import update from './update';
 
 type Args = {|
   state: StateWhenUpdatesAllowed,
@@ -20,16 +21,11 @@ type Args = {|
   viewport?: Viewport,
 |};
 
-export type Result = {|
-  clientSelection: Position,
-  impact: DragImpact,
-|};
-
 export default ({
   state,
   dimensions: forcedDimensions,
   viewport: forcedViewport,
-}: Args): Result => {
+}: Args): StateWhenUpdatesAllowed => {
   invariant(state.movementMode === 'SNAP');
 
   const viewport: Viewport = forcedViewport || state.viewport;
@@ -58,5 +54,13 @@ export default ({
     viewport,
   });
 
-  return { impact, clientSelection };
+  return update({
+    // new
+    impact,
+    clientSelection,
+    // pass through
+    state,
+    dimensions,
+    viewport,
+  });
 };
