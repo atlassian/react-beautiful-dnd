@@ -338,21 +338,6 @@ export default (state: State = idle, action: Action): State => {
       viewport: withMaxScroll,
     };
   }
-
-  if (action.type === 'POST_SNAP_DESTINATION_CHANGE') {
-    console.warn('NOT HANDLING', action.type);
-    return state;
-    // invariant(isMovementAllowed(state));
-    // return whenMoving({
-    //   state,
-    // });
-  }
-
-  // TODO
-  // if (action.type === 'POST_JUMP_SCROLL') {
-  //   return refreshSnap(state);
-  // }
-
   if (
     action.type === 'MOVE_UP' ||
     action.type === 'MOVE_DOWN' ||

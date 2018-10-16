@@ -40,12 +40,4 @@ export default (getScroller: () => AutoScroller) => (
   }
 
   getScroller().jumpScroll(state);
-
-  // requestAnimationFrame(() => {
-  //   if (!store.getState().isDragging) {
-  //     return;
-  //   }
-  //   console.warn('POST JUMP SCROLL UPDATER');
-  //   postJumpScroll();
-  // });
 };

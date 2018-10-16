@@ -144,7 +144,7 @@ export default class QuoteList extends React.Component<Props> {
         type={listType}
         ignoreContainerClipping={ignoreContainerClipping}
         isDropDisabled={isDropDisabled}
-        isCombineEnabled={false}
+        isCombineEnabled={isCombineEnabled}
       >
         {(
           dropProvided: DroppableProvided,
