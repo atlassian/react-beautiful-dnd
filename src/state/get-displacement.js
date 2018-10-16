@@ -49,6 +49,7 @@ export default ({
 
   // only displacing items that are visible in the droppable and the viewport
   const isVisible: boolean = isPartiallyVisible({
+    // TODO: borderBox?
     target: draggable.page.marginBox,
     destination,
     viewport,

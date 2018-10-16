@@ -13,6 +13,7 @@ import type {
 type Args = {|
   axis: Axis,
   pageBorderBoxCenter: Position,
+  viewport: Viewport,
   // the droppable that is being moved to
   destination: DroppableDimension,
   // the droppables inside the destination
@@ -22,36 +23,54 @@ type Args = {|
 export default ({
   axis,
   pageBorderBoxCenter,
+  viewport,
   destination,
   insideDestination,
 }: Args): ?DraggableDimension => {
-  const sorted: DraggableDimension[] = insideDestination.slice(0).sort(
-    (a: DraggableDimension, b: DraggableDimension): number => {
-      // Need to consider the change in scroll in the destination
-      const distanceToA = distance(
-        pageBorderBoxCenter,
-        withDroppableDisplacement(destination, a.page.borderBox.center),
-      );
-      const distanceToB = distance(
-        pageBorderBoxCenter,
-        withDroppableDisplacement(destination, b.page.borderBox.center),
-      );
+  const sorted: DraggableDimension[] = insideDestination
+    .filter(
+      (draggable: DraggableDimension): boolean => {
+        const result: boolean = isTotallyVisible({
+          target: draggable.page.borderBox,
+          destination,
+          viewport: viewport.frame,
+          withDroppableDisplacement: true,
+          shouldCheckViewport: false,
+          shouldCheckDroppable: true,
+        });
+        console.log(`is ${draggable.descriptor.id} visible?`, result);
+        return result;
+      },
+    )
+    .sort(
+      (a: DraggableDimension, b: DraggableDimension): number => {
+        // Need to consider the change in scroll in the destination
+        const distanceToA = distance(
+          pageBorderBoxCenter,
+          withDroppableDisplacement(destination, a.page.borderBox.center),
+        );
+        const distanceToB = distance(
+          pageBorderBoxCenter,
+          withDroppableDisplacement(destination, b.page.borderBox.center),
+        );
 
-      // if a is closer - return a
-      if (distanceToA < distanceToB) {
-        return -1;
-      }
+        // if a is closer - return a
+        if (distanceToA < distanceToB) {
+          return -1;
+        }
 
-      // if b is closer - return b
-      if (distanceToB < distanceToA) {
-        return 1;
-      }
+        // if b is closer - return b
+        if (distanceToB < distanceToA) {
+          return 1;
+        }
 
-      // if the distance to a and b are the same:
-      // return the one that appears first on the main axis
-      return a.page.borderBox[axis.start] - b.page.borderBox[axis.start];
-    },
-  );
+        // if the distance to a and b are the same:
+        // return the one that appears first on the main axis
+        return a.page.borderBox[axis.start] - b.page.borderBox[axis.start];
+      },
+    );
+
+  console.warn('closest draggable', sorted[0]);
 
   return sorted[0] || null;
 };

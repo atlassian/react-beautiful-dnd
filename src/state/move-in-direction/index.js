@@ -140,28 +140,54 @@ export default ({ state, type }: Args): ?PublicResult => {
       scrollJumpRequest: null,
     };
   }
-
-  console.log('👻 not visible in new location');
+  console.warn('👻 is not visible in new position');
 
   const distance: Position = subtract(
     pageBorderBoxCenter,
     previousPageBorderBoxCenter,
   );
 
-  // increasing the amount of displaced items for a worst case scroll shift
-  const cautious: DragImpact = isSameDestination
-    ? speculativelyIncrease({
-        impact: result.impact,
-        viewport,
-        destination,
-        draggables,
-        maxScrollChange: distance,
-      })
-    : result.impact;
+  // if (isSameDestination) {
+  console.log(
+    'displaced',
+    result.impact.movement.displaced.map(d => d.draggableId),
+  );
+  console.log(
+    'is visible',
+    result.impact.movement.displaced.map(d => d.isVisible),
+  );
+  const cautious: DragImpact = speculativelyIncrease({
+    impact: result.impact,
+    viewport,
+    destination,
+    draggables,
+    maxScrollChange: distance,
+  });
+  console.log(
+    'is visible (post speculative)',
+    cautious.movement.displaced.map(d => d.isVisible),
+  );
 
   return {
     clientSelection: state.current.client.selection,
     impact: cautious,
     scrollJumpRequest: distance,
   };
+  // }
+
+  // TODO: a bit off??
+
+  // const cautious: DragImpact = speculativelyIncrease({
+  //   impact: result.impact,
+  //   viewport,
+  //   destination,
+  //   draggables,
+  //   maxScrollChange: result.impact.movement.displacedBy.point,
+  // });
+
+  // return {
+  //   clientSelection: state.current.client.selection,
+  //   impact: cautious,
+  //   scrollJumpRequest: distance,
+  // };
 };

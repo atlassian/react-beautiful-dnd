@@ -64,6 +64,7 @@ export default ({
   const moveRelativeTo: ?DraggableDimension = getClosestDraggable({
     axis: destination.axis,
     pageBorderBoxCenter: previousPageBorderBoxCenter,
+    viewport,
     destination,
     insideDestination,
   });

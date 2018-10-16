@@ -13,7 +13,7 @@ import type {
   DraggableDimension,
   DragImpact,
   DroppableId,
-} from '../../../types';
+} from '../../../../types';
 import patchDroppableMap from '../../../patch-droppable-map';
 
 type ClearArgs = {|

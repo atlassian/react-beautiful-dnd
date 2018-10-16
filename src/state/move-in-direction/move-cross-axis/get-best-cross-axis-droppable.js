@@ -52,17 +52,11 @@ export default ({
     .filter((droppable: DroppableDimension): boolean => droppable !== source)
     // Remove any options that are not enabled
     .filter((droppable: DroppableDimension): boolean => droppable.isEnabled)
-    // Remove any droppables that are not partially visible
+    // Remove any droppables that do not have a visible subject
+    // it is okay if the droppable is not visible on the window
     .filter(
-      (droppable: DroppableDimension): boolean => {
-        const clipped: ?Rect = droppable.subject.active;
-        // subject is not visible at all in frame
-        if (!clipped) {
-          return false;
-        }
-        // TODO: only need to be totally visible on the cross axis
-        return isPartiallyVisibleThroughFrame(viewport.frame)(clipped);
-      },
+      (droppable: DroppableDimension): boolean =>
+        Boolean(droppable.subject.active),
     )
     .filter(
       (droppable: DroppableDimension): boolean => {
