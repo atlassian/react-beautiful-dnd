@@ -1,7 +1,6 @@
 // @flow
 import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import type { InternalResult } from '../../move-in-direction-types';
 import type {
   DraggableDimension,
   DroppableDimension,
@@ -41,7 +40,7 @@ export default ({
   moveRelativeTo,
   previousImpact,
   viewport,
-}: Args): ?InternalResult => {
+}: Args): ?DragImpact => {
   // Draggables available, but none are candidates for movement
   // Cannot move into the list
   // Note: can move to empty list and then !moveRelativeTo && !insideDestination.length
@@ -58,7 +57,7 @@ export default ({
 
   const isMovingToHome: boolean = isHomeOf(draggable, destination);
 
-  const impact: ?DragImpact = isMovingToHome
+  return isMovingToHome
     ? toHomeList({
         moveIntoIndexOf: moveRelativeTo,
         insideDestination,
@@ -77,13 +76,4 @@ export default ({
         previousImpact,
         viewport,
       });
-
-  if (!impact) {
-    return null;
-  }
-
-  return {
-    type: 'SNAP_MOVE',
-    impact,
-  };
 };

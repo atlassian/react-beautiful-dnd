@@ -7,11 +7,16 @@ import type {
   DragImpact,
   Viewport,
 } from '../../../types';
-import type { InternalResult } from '../move-in-direction-types';
+import type { PublicResult } from '../move-in-direction-types';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
 import moveToNextCombine from './move-to-next-combine';
 import moveToNextIndex from './move-to-next-index';
 import isHomeOf from '../../droppable/is-home-of';
+import getPageBorderBoxCenter from '../../get-center-from-impact/get-page-border-box-center';
+import speculativelyIncrease from '../../update-displacement-visibility/speculatively-increase';
+import fromPageBorderBoxCenter from '../../get-center-from-impact/get-client-border-box-center/from-page-border-box-center';
+import { subtract } from '../../position';
+import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 
 type Args = {|
   isMovingForward: boolean,
@@ -19,6 +24,8 @@ type Args = {|
   destination: DroppableDimension,
   draggables: DraggableDimensionMap,
   previousImpact: DragImpact,
+  viewport: Viewport,
+  previousClientSelection: Position,
   previousPageBorderBoxCenter: Position,
 |};
 
@@ -28,7 +35,10 @@ export default ({
   destination,
   draggables,
   previousImpact,
-}: Args): ?InternalResult => {
+  viewport,
+  previousPageBorderBoxCenter,
+  previousClientSelection,
+}: Args): ?PublicResult => {
   if (!destination.isEnabled) {
     return null;
   }
@@ -62,8 +72,58 @@ export default ({
     return null;
   }
 
-  return {
-    type: 'SNAP_MOVE',
+  const pageBorderBoxCenter: Position = getPageBorderBoxCenter({
     impact,
+    draggable,
+    droppable: destination,
+    draggables,
+  });
+
+  const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
+    draggable,
+    destination,
+    newPageBorderBoxCenter: pageBorderBoxCenter,
+    viewport: viewport.frame,
+    // already taken into account by getPageBorderBoxCenter
+    withDroppableDisplacement: false,
+    // we only care about it being visible relative to the main axis
+    // this is important with dynamic changes as scroll bar and toggle
+    // on the cross axis during a drag
+    onlyOnMainAxis: true,
+  });
+
+  if (isVisibleInNewLocation) {
+    console.warn('👓 is visible in new position');
+    // using the client center as the selection point
+    const clientSelection: Position = fromPageBorderBoxCenter({
+      pageBorderBoxCenter,
+      draggable,
+      viewport,
+    });
+    return {
+      clientSelection,
+      impact,
+      scrollJumpRequest: null,
+    };
+  }
+  console.warn('👻 is not visible in new position');
+
+  const distance: Position = subtract(
+    pageBorderBoxCenter,
+    previousPageBorderBoxCenter,
+  );
+
+  const cautious: DragImpact = speculativelyIncrease({
+    impact,
+    viewport,
+    destination,
+    draggables,
+    maxScrollChange: distance,
+  });
+
+  return {
+    clientSelection: previousClientSelection,
+    impact: cautious,
+    scrollJumpRequest: distance,
   };
 };

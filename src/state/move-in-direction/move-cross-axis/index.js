@@ -1,10 +1,6 @@
 // @flow
 import { type Position } from 'css-box-model';
-import getBestCrossAxisDroppable from './get-best-cross-axis-droppable';
-import getClosestDraggable from './get-closest-draggable';
-import moveToNewDroppable from './move-to-new-droppable';
-import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
-import type { InternalResult } from '../move-in-direction-types';
+import type { PublicResult } from '../move-in-direction-types';
 import type {
   DroppableDimension,
   DraggableDimension,
@@ -13,6 +9,14 @@ import type {
   DragImpact,
   Viewport,
 } from '../../../types';
+import getBestCrossAxisDroppable from './get-best-cross-axis-droppable';
+import getClosestDraggable from './get-closest-draggable';
+import moveToNewDroppable from './move-to-new-droppable';
+import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
+
+import fromPageBorderBoxCenter from '../../get-center-from-impact/get-client-border-box-center/from-page-border-box-center';
+import getPageBorderBoxCenter from '../../get-center-from-impact/get-page-border-box-center';
+import isTotallyVisibleInNewLocation from '../move-to-next-place/is-totally-visible-in-new-location';
 
 type Args = {|
   isMovingForward: boolean,
@@ -40,7 +44,7 @@ export default ({
   droppables,
   previousImpact,
   viewport,
-}: Args): ?InternalResult => {
+}: Args): ?PublicResult => {
   // not considering the container scroll changes as container scrolling cancels a keyboard drag
 
   const destination: ?DroppableDimension = getBestCrossAxisDroppable({
@@ -69,7 +73,7 @@ export default ({
     insideDestination,
   });
 
-  return moveToNewDroppable({
+  const impact: ?DragImpact = moveToNewDroppable({
     previousPageBorderBoxCenter,
     destination,
     draggable,
@@ -79,4 +83,41 @@ export default ({
     previousImpact,
     viewport,
   });
+
+  if (!impact) {
+    return null;
+  }
+
+  const pageBorderBoxCenter: Position = getPageBorderBoxCenter({
+    impact,
+    draggable,
+    droppable: destination,
+    draggables,
+  });
+
+  const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
+    draggable,
+    destination,
+    newPageBorderBoxCenter: pageBorderBoxCenter,
+    viewport: viewport.frame,
+    // already taken into account by getPageBorderBoxCenter
+    withDroppableDisplacement: false,
+    onlyOnMainAxis: false,
+  });
+
+  if (!isVisibleInNewLocation) {
+    return null;
+  }
+
+  const clientSelection: Position = fromPageBorderBoxCenter({
+    pageBorderBoxCenter,
+    draggable,
+    viewport,
+  });
+
+  return {
+    clientSelection,
+    impact,
+    scrollJumpRequest: null,
+  };
 };

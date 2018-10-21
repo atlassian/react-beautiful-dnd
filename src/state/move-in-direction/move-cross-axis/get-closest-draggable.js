@@ -38,8 +38,6 @@ export default ({
           destination,
           viewport: viewport.frame,
           withDroppableDisplacement: true,
-          shouldCheckViewport: false,
-          shouldCheckDroppable: true,
         }),
     )
     .sort(

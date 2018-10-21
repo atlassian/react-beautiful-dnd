@@ -1,11 +1,11 @@
 // @flow
 import { type Position, type Spacing, type Rect } from 'css-box-model';
+import type { DroppableDimension } from '../../types';
 import isPartiallyVisibleThroughFrame from './is-partially-visible-through-frame';
 import isTotallyVisibleThroughFrame from './is-totally-visible-through-frame';
 import isTotallyVisibleThroughFrameOnAxis from './is-totally-visible-through-frame-on-axis';
 import { offsetByPosition } from '../spacing';
 import { origin } from '../position';
-import type { DroppableDimension } from '../../types';
 
 export type Args = {|
   target: Spacing,
@@ -55,43 +55,30 @@ const isVisibleInDroppable = (
   return isVisibleThroughFrameFn(destination.subject.active)(target);
 };
 
+const isVisibleInViewport = (
+  target: Spacing,
+  viewport: Rect,
+  isVisibleThroughFrameFn: IsVisibleThroughFrameFn,
+): boolean => isVisibleThroughFrameFn(viewport)(target);
+
 const isVisible = ({
   target: toBeDisplaced,
   destination,
   viewport,
   withDroppableDisplacement,
-  shouldCheckDroppable = true,
-  shouldCheckViewport = true,
   isVisibleThroughFrameFn,
 }: InternalArgs): boolean => {
   const displacedTarget: Spacing = withDroppableDisplacement
     ? getDroppableDisplaced(toBeDisplaced, destination)
     : toBeDisplaced;
 
-  if (shouldCheckDroppable) {
-    const result: boolean = isVisibleInDroppable(
+  return (
+    isVisibleInDroppable(
       displacedTarget,
       destination,
       isVisibleThroughFrameFn,
-    );
-
-    if (!result) {
-      return false;
-    }
-  }
-
-  // no more checks required
-  if (!shouldCheckViewport) {
-    return true;
-  }
-
-  // We also need to consider whether the destination scroll when detecting
-  // if we are visible in the viewport.
-  const isVisibleInViewport: boolean = isVisibleThroughFrameFn(viewport)(
-    displacedTarget,
+    ) && isVisibleInViewport(displacedTarget, viewport, isVisibleThroughFrameFn)
   );
-
-  return isVisibleInViewport;
 };
 
 export const isPartiallyVisible = (args: Args): boolean =>

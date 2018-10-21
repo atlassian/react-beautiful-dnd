@@ -1,10 +1,9 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
 import moveCrossAxis from './move-cross-axis';
 import moveToNextPlace from './move-to-next-place';
 import whatIsDraggedOver from '../droppable/what-is-dragged-over';
-import type { InternalResult, PublicResult } from './move-in-direction-types';
+import type { PublicResult } from './move-in-direction-types';
 import type {
   DroppableId,
   DraggingState,
@@ -15,11 +14,6 @@ import type {
   DragImpact,
   Viewport,
 } from '../../types';
-import getPageBorderBoxCenter from '../get-center-from-impact/get-page-border-box-center';
-import isTotallyVisibleInNewLocation from './move-to-next-place/is-totally-visible-in-new-location';
-import { subtract, patch } from '../position';
-import fromPageBorderBoxCenter from '../get-center-from-impact/get-client-border-box-center/from-page-border-box-center';
-import speculativelyIncrease from '../update-displacement-visibility/speculatively-increase';
 
 type Args = {|
   state: DraggingState,
@@ -67,13 +61,15 @@ export default ({ state, type }: Args): ?PublicResult => {
   const { draggables, droppables } = state.dimensions;
   const viewport: Viewport = state.viewport;
 
-  const result: ?InternalResult = isMovingOnMainAxis
+  return isMovingOnMainAxis
     ? moveToNextPlace({
         isMovingForward,
         draggable,
         destination: isOver,
         draggables,
+        viewport,
         previousPageBorderBoxCenter,
+        previousClientSelection: state.current.client.selection,
         previousImpact: state.impact,
       })
     : moveCrossAxis({
@@ -86,100 +82,4 @@ export default ({ state, type }: Args): ?PublicResult => {
         previousImpact: state.impact,
         viewport,
       });
-
-  if (!result) {
-    return null;
-  }
-
-  // A move can update destination
-  const destination: ?DroppableDimension = getDroppableOver(
-    result.impact,
-    state.dimensions.droppables,
-  );
-  invariant(
-    destination,
-    'Cannot move in direction and not move to a Droppable',
-  );
-
-  const pageBorderBoxCenter: Position = getPageBorderBoxCenter({
-    impact: result.impact,
-    draggable,
-    droppable: destination,
-    draggables,
-  });
-
-  const isSameDestination: boolean = destination === isOver;
-
-  const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
-    draggable,
-    destination,
-    newPageBorderBoxCenter: pageBorderBoxCenter,
-    viewport: viewport.frame,
-    // already taken into account by getPageBorderBoxCenter
-    withDroppableDisplacement: false,
-    // When in same droppable:
-    // we only care about it being visible relative to the main axis
-    // this is important with dynamic changes as scroll bar and toggle
-    // on the cross axis during a drag
-    // When moving droppable:
-    // we care about whether the entire draggable is visible
-    onlyOnMainAxis: isSameDestination,
-  });
-
-  if (isVisibleInNewLocation) {
-    console.warn('👓 is visible in new position');
-    // using the client center as the selection point
-    const clientSelection: Position = fromPageBorderBoxCenter({
-      pageBorderBoxCenter,
-      draggable,
-      viewport,
-    });
-    return {
-      clientSelection,
-      impact: result.impact,
-      scrollJumpRequest: null,
-    };
-  }
-  console.warn('👻 is not visible in new position');
-
-  const distance: Position = subtract(
-    pageBorderBoxCenter,
-    previousPageBorderBoxCenter,
-  );
-
-  const cautious: DragImpact = speculativelyIncrease({
-    impact: result.impact,
-    viewport,
-    destination,
-    draggables,
-    maxScrollChange: distance,
-  });
-
-  if (isSameDestination) {
-    return {
-      clientSelection: state.current.client.selection,
-      impact: cautious,
-      scrollJumpRequest: distance,
-    };
-  }
-
-  // Goal: after the window scroll the item looks like it is animating
-  // from the original spot.
-  // How: we move the item backwards on the cross axis to account for the shift
-  // then when we update the impact after the window scroll it will animate
-  // from it's pre jump scroll current spot
-
-  const crossAxisDistance: Position = patch(
-    destination.axis.crossAxisLine,
-    distance[destination.axis.crossAxisLine],
-  );
-
-  return {
-    clientSelection: subtract(
-      state.current.client.selection,
-      crossAxisDistance,
-    ),
-    impact: cautious,
-    scrollJumpRequest: distance,
-  };
 };

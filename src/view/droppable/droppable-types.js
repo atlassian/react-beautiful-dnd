@@ -36,7 +36,7 @@ export type MapProps = {|
 |};
 
 export type OwnProps = {|
-  children: (Provided, StateSnapshot) => ?Node,
+  children: (Provided, StateSnapshot) => Node,
   droppableId: DroppableId,
   type: TypeId,
   isDropDisabled: boolean,
