@@ -16,7 +16,6 @@ import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable'
 
 import fromPageBorderBoxCenter from '../../get-center-from-impact/get-client-border-box-center/from-page-border-box-center';
 import getPageBorderBoxCenter from '../../get-center-from-impact/get-page-border-box-center';
-import isTotallyVisibleInNewLocation from '../move-to-next-place/is-totally-visible-in-new-location';
 
 type Args = {|
   isMovingForward: boolean,
