@@ -1,5 +1,5 @@
 // @flow
-import type { Position, Spacing } from 'css-box-model';
+import type { Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import type {
   Axis,
@@ -15,6 +15,8 @@ import getDisplacedBy from '../../../get-displaced-by';
 import getDisplacement from '../../../get-displacement';
 import getDisplacementMap from '../../../get-displacement-map';
 import { noMovement } from '../../../no-impact';
+import getPageBorderBoxCenter from '../../../get-center-from-impact/get-page-border-box-center';
+import isTotallyVisibleInNewLocation from '../../move-to-next-place/is-totally-visible-in-new-location';
 
 type Args = {|
   previousPageBorderBoxCenter: Position,
@@ -32,6 +34,7 @@ export default ({
   moveRelativeTo,
   insideDestination,
   draggable,
+  draggables,
   destination,
   previousImpact,
   viewport,
@@ -39,8 +42,9 @@ export default ({
   const axis: Axis = destination.axis;
 
   // Moving to an empty list
+  // Could be invisible location - so need to check
   if (!moveRelativeTo || !insideDestination.length) {
-    return {
+    const proposed: DragImpact = {
       movement: noMovement,
       direction: axis.direction,
       destination: {
@@ -49,6 +53,24 @@ export default ({
       },
       merge: null,
     };
+    const pageBorderBoxCenter: Position = getPageBorderBoxCenter({
+      impact: proposed,
+      draggable,
+      droppable: destination,
+      draggables,
+    });
+
+    const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
+      draggable,
+      destination,
+      newPageBorderBoxCenter: pageBorderBoxCenter,
+      viewport: viewport.frame,
+      // already taken into account by getPageBorderBoxCenter
+      withDroppableDisplacement: false,
+      onlyOnMainAxis: false,
+    });
+
+    return isVisibleInNewLocation ? proposed : null;
   }
 
   // Moving to a populated list

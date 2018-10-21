@@ -40,6 +40,7 @@ import { getFormattedMessage } from '../../debug/dev-warning';
 
 type Props = {|
   ...Hooks,
+  // we do not technically need any children for this component
   children: Node | null,
 |};
 

@@ -95,20 +95,6 @@ export default ({
     draggables,
   });
 
-  const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
-    draggable,
-    destination,
-    newPageBorderBoxCenter: pageBorderBoxCenter,
-    viewport: viewport.frame,
-    // already taken into account by getPageBorderBoxCenter
-    withDroppableDisplacement: false,
-    onlyOnMainAxis: false,
-  });
-
-  if (!isVisibleInNewLocation) {
-    return null;
-  }
-
   const clientSelection: Position = fromPageBorderBoxCenter({
     pageBorderBoxCenter,
     draggable,
